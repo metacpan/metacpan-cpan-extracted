@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 use Punk ();
 use File::Spec ();
@@ -15,11 +15,16 @@ use File::Raw::JSON ();
 
 sub register {
     my ($class, $app, $opts) = @_;
+    # uncoverable condition right
     $opts ||= {};
+    # uncoverable branch true
     ref $opts eq 'HASH'
         or die "Punk::Plugin::I18n: options must be a hashref\n";
 
     my $dir = $opts->{dir};
+    # uncoverable branch true
+    # uncoverable condition left
+    # uncoverable condition right
     defined $dir && length $dir
         or die "Punk::Plugin::I18n: `dir` is required - it is where the "
              . "catalogues live (plugin 'I18n' => { dir => 'i18n', "
@@ -30,6 +35,7 @@ sub register {
              . "its translations, and it should fail here rather than serve "
              . "every page in the default language\n";
 
+    # uncoverable branch true
     opendir my $dh, $dir
         or die "Punk::Plugin::I18n: cannot read '$dir': $!\n";
     my @files = sort grep { /\.json\z/ } readdir $dh;
@@ -50,6 +56,7 @@ sub register {
         if (!defined $data) {
             my $why = $@;
             $why =~ s/\s+\z//;
+            # uncoverable branch false
             die -r $path
                 ? "Punk::Plugin::I18n: '$path' will not parse: $why\n"
                 : "Punk::Plugin::I18n: cannot read '$path': $!\n";

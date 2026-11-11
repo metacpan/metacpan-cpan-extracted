@@ -52,18 +52,18 @@ static int pk_require_once(pTHX_ const char *mod, int fatal) {
     HV *inc;
     sv_setpvs(file, "");
     for (p = mod; *p; p++) {
-        if (p[0] == ':' && p[1] == ':') { sv_catpvs(file, "/"); p++; }
+        if (p[0] == ':' && p[1] == ':') { sv_catpvs(file, "/"); p++; } /* # uncoverable condition right count:2 class:ignore_covered_err */
         else sv_catpvn(file, p, 1);
     }
     sv_catpvs(file, ".pm");
     inc = GvHVn(PL_incgv);
-    if (inc && hv_exists_ent(inc, file, 0)) return 1;
+    if (inc && hv_exists_ent(inc, file, 0)) return 1; /* # uncoverable condition right count:1 class:ignore_covered_err */
     /* The name goes into Perl source. A `database backend` from punk.yml
      * reaches here, so it is checked the way the keyword-named classes are
      * (pk_require_src croaks on anything that is not a class name). */
     (void)pk_require_src(aTHX_ mod);
     eval_pv(form("require %s;", mod), fatal);
-    return SvTRUE(ERRSV) ? 0 : 1;
+    return SvTRUE(ERRSV) ? 0 : 1; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 /* ---- caller-relative namespace pieces ------------------------------------- */

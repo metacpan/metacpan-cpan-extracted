@@ -65,36 +65,36 @@ DBIx::Squirrel::Context - what a stage can ask about the result it's making
 =head1 DESCRIPTION
 
 Inside a stage run by a L<DBIx::Squirrel::Iterator>, these functions
-return what the stage might want to know about the result it's making,
-which it can't work out from the value it's given. Outside a stage,
-they return C<undef>. None is exported by default.
+tell the stage about the result it's making: things it can't work out
+from the value it's given. Outside a stage, they return C<undef>. None
+is exported by default.
 
 =head1 FUNCTIONS
 
 =head2 iterator
 
 The iterator running the stage. Its C<sth> is the statement handle,
-and the statement handle's C<Database>, the database handle.
+and the statement handle's C<Database> is the database handle.
 
 =head2 result_number
 
 The number of the result being made, from 1. It counts results, not
-rows: while a stage drops rows, the number stays the same, and each
-value a stage returns in place of one row is a result of its own. In an
-end function of a stage made with L<DBIx::Squirrel::Gather>, it's the
+rows. While a stage drops rows, the number stays the same. Each value
+a stage returns in place of one row is a result of its own. In an end
+function of a stage made with L<DBIx::Squirrel::Gather>, it's the
 number of the first value the end returns.
 
 =head2 result_original
 
 The row the result is being made from, as it was fetched, before any
 stage changed it. In an end function of a stage made with
-L<DBIx::Squirrel::Gather>, and the stages after it, it's C<undef>, as
-what an end gives comes from every row.
+L<DBIx::Squirrel::Gather>, and the stages after it, it's C<undef>. What
+an end gives comes from every row, not one.
 
 =head2 within
 
 For DBIx::Squirrel's iterators, which set the context while their
-stages run; not for use elsewhere.
+stages run. It's not for use elsewhere.
 
 =head1 SEE ALSO
 

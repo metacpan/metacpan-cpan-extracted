@@ -60,6 +60,23 @@ int32_t SPVM__UV__Handle__Idle__start(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__UV__Handle__Idle__stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_idle = stack[0].oval;
+  
+  uv_idle_t* uv_idle = env->get_pointer(env, stack, obj_uv_idle);
+  
+  int32_t status = uv_idle_stop(uv_idle);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_idle_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
 int32_t SPVM__UV__Handle__Idle__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

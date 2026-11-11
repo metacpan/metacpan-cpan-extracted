@@ -16,8 +16,14 @@ require "./$SCRIPT";    ## no critic (Modules::RequireBarewordIncludes) a script
 my %sections = (
     'REFERENCE.md' =>
         {'the-pipeline' => 'The pipeline', 'pipe-and-tap' => 'pipe and tap'},
-    'HOWTO.md' => {'stop-early' => 'Stop early'},
+    'HOWTO.md'                           => {'stop-early' => 'Stop early'},
+    'Ekorn::Pipeline::Manual::Reference' => {
+        'end-functions'                   => 'End functions',
+        'pipe-and-tap-ekornpipelinepipes' => 'pipe and tap: Ekorn::Pipeline::Pipes',
+    },
 );
+
+my $EKORN = 'https://github.com/nukopian/Ekorn-Pipeline';
 
 # The POD made from Markdown in the reference, without what's put around
 # it: NAME, DESCRIPTION and the footer.
@@ -105,6 +111,42 @@ subtest 'links' => sub {
         'to another file, where it is instead';
 };
 
+subtest 'links to Ekorn::Pipeline, by module name' => sub {
+    is body("[Ekorn]($EKORN)\n"), "L<Ekorn|Ekorn::Pipeline>\n\n",
+        'to its repository';
+    is body("[its reference]($EKORN/blob/main/docs/REFERENCE.md)\n"),
+        "L<its reference|Ekorn::Pipeline::Manual::Reference>\n\n",
+        'to its reference';
+    is body("[its how-to]($EKORN/blob/main/docs/HOWTO.md)\n"),
+        "L<its how-to|Ekorn::Pipeline::Manual::HowTo>\n\n", 'to its how-to';
+    is body("[ends]($EKORN/blob/main/docs/REFERENCE.md#end-functions)\n"),
+        qq{L<ends|Ekorn::Pipeline::Manual::Reference/"End functions">\n\n},
+        'to a section, by its name';
+    is body(
+        "[pipe]($EKORN/blob/main/docs/REFERENCE.md#pipe-and-tap-ekornpipelinepipes)\n"),
+        qq{L<pipe|Ekorn::Pipeline::Manual::Reference/"pipe and tap: Ekorn::Pipeline::Pipes">\n\n},
+        'one whose name has punctuation';
+    like dies { body("[x]($EKORN/blob/main/docs/REFERENCE.md#nowhere)\n") },
+        qr( Reference\ has\ no\ heading\ for )x,
+        'refusing a section it has no heading for';
+    like dies { body("[x]($EKORN/blob/main/README.md)\n") },
+        qr( isn't\ one\ of\ Ekorn::Pipeline's\ manuals )x,
+        'or another of its files';
+    like dies { body("[x]($EKORN#readme)\n") },
+        qr( isn't\ one\ of\ Ekorn::Pipeline's\ manuals )x,
+        'or a section of its repository';
+    is body("[other](https://github.com/nukopian/Ekorn-Pipeline-X)\n"),
+        "L<other|https://github.com/nukopian/Ekorn-Pipeline-X>\n\n",
+        'leaving a URL that only starts the same';
+};
+
+subtest 'section names from POD' => sub {
+    is Manuals::pod_plain('C<pipe> and C<tap>'), 'pipe and tap', 'code';
+    is Manuals::pod_plain('C<< a > b >> and B<I<both>>'), 'a > b and both',
+        'double brackets, and codes inside codes';
+    is Manuals::pod_plain('E<lt>stageE<gt>'), '<stage>', 'escapes';
+};
+
 subtest 'lists and tables' => sub {
     is body("- One,\n  and on.\n- Two.\n"),
         "=over 4\n\n=item *\n\nOne,\nand on.\n\n=item *\n\nTwo.\n\n=back\n\n",
@@ -190,6 +232,24 @@ subtest 'each link between the manuals finds its section' => sub {
             ok $heads{$to}{$section}, "$module: $to has $section";
         }
     }
+};
+
+subtest q(each link to Ekorn's manuals finds its section) => sub {
+    my $n = 0;
+    for my $file (sort map { $_->[1] } values %Manuals::MANUAL) {
+        my $pod = Manuals::slurp($file);
+        unlike $pod, qr( github\.com/nukopian/Ekorn-Pipeline )x,
+            "$file links to none of them on GitHub";
+        for my $link (
+            $pod =~ m( L< [^|>]+ \| (Ekorn::Pipeline::Manual::\w+ / "[^"]+") > )xg)
+        {
+            my($to, $section) = $link =~ m( \A ([\w:]+) / "(.+)" \z )x;
+            my %have = reverse %{ Manuals::ekorn_sections($to) };
+            ok $have{$section}, "$file: $to has $section";
+            $n++;
+        }
+    }
+    ok $n, "and there are some ($n)";
 };
 
 done_testing;

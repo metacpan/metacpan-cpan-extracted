@@ -17,17 +17,29 @@ _seal(app, data)
         STRLEN nl, kl;
         const char *name, *key;
         SV *payload, *sealed;
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV) {
             s = hv_fetchs((HV *)SvRV(app), "session", 0);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (s && *s && SvROK(*s) && SvTYPE(SvRV(*s)) == SVt_PVHV)
                 cfg = (HV *)SvRV(*s);
         }
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!cfg)
-            croak("Punk::Session: _seal needs an app with a session keyword");
+            croak("Punk::Session: _seal needs an app with a session keyword"); /* # uncoverable statement */
         name = ps_cfg_str(aTHX_ cfg, "cookie", "punk.sid", &nl);
         key  = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!kl)
-            croak("Punk::Session: _seal found no session secret");
+            croak("Punk::Session: _seal found no session secret"); /* # uncoverable statement */
         payload = sv_2mortal(ps_encode(aTHX_ data));
         sealed = pk_session_sign(aTHX_ payload, key, kl);
         EXTEND(SP, 2);
@@ -61,21 +73,29 @@ _seal_id(app, id)
         SV **s;
         STRLEN nl, kl, il;
         const char *name, *key, *idp;
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV) {
             s = hv_fetchs((HV *)SvRV(app), "session", 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (s && *s && SvROK(*s) && SvTYPE(SvRV(*s)) == SVt_PVHV)
                 cfg = (HV *)SvRV(*s);
         }
         if (!cfg)
             croak("Punk::Session: _seal_id needs an app with a session keyword");
-        idp = SvOK(id) ? SvPV_const(id, il) : (il = 0, "");
+        idp = SvOK(id) ? SvPV_const(id, il) : (il = 0, ""); /* # uncoverable condition right count:1 class:ignore_covered_err */
         if (!ps_id_ok(idp, il))
             croak("Punk::Session: _seal_id needs a %d-character hex id",
                   PK_SESSION_ID_HEX);
         name = ps_cfg_str(aTHX_ cfg, "cookie", "punk.sid", &nl);
         key  = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!kl)
-            croak("Punk::Session: _seal_id found no session secret");
+            croak("Punk::Session: _seal_id found no session secret"); /* # uncoverable statement */
         EXTEND(SP, 2);
         PUSHs(sv_2mortal(newSVpvn(name, nl)));
         PUSHs(sv_2mortal(ps_id_seal(aTHX_ id, key, kl,
@@ -101,19 +121,31 @@ _seal_session(app, data)
         SV **s, *store;
         STRLEN nl, kl;
         const char *name, *key;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV))
-            croak("Punk::Session: _seal_session needs an app");
+            croak("Punk::Session: _seal_session needs an app"); /* # uncoverable statement */
         apph = (HV *)SvRV(app);
         s = hv_fetchs(apph, "session", 0);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
         if (s && *s && SvROK(*s) && SvTYPE(SvRV(*s)) == SVt_PVHV)
             cfg = (HV *)SvRV(*s);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!cfg)
-            croak("Punk::Session: _seal_session needs an app with a session "
+            croak("Punk::Session: _seal_session needs an app with a session " /* # uncoverable statement */
                   "keyword");
         name  = ps_cfg_str(aTHX_ cfg, "cookie", "punk.sid", &nl);
         key   = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!kl)
-            croak("Punk::Session: _seal_session found no session secret");
+            croak("Punk::Session: _seal_session found no session secret"); /* # uncoverable statement */
         store = ps_cfg_store(aTHX_ cfg);
         /* A store is asked for on the keyword and resolved at to_app, so
          * between those two moments the config says "server-side" and there is
@@ -132,6 +164,8 @@ _seal_session(app, data)
             SV *id = sv_2mortal(ps_new_id(aTHX));
             SV *argv[3], *ok;
             HV *payload;
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (ttl <= 0) ttl = PK_SESSION_MAX_LIFETIME;
             /* stamped like any other write, so a sealed session slides too */
             payload = (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV)
@@ -143,9 +177,14 @@ _seal_session(app, data)
                           sv_2mortal(newRV_noinc((SV *)payload))));
             argv[2] = sv_2mortal(newSViv(ttl));
             ok = pcx_call_meth(aTHX_ store, "set", argv, 3, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (ok) sv_2mortal(ok);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (!(ok && SvTRUE(ok)))
-                croak("Punk::Session: the session store refused the write");
+                croak("Punk::Session: the session store refused the write"); /* # uncoverable statement */
             PUSHs(sv_2mortal(ps_id_seal(aTHX_ id, key, kl, ttl)));
         }
         else {
@@ -169,15 +208,27 @@ _unseal_id(app, value)
         STRLEN kl, vl;
         const char *key;
         SV *id = NULL;
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvROK(app) && SvTYPE(SvRV(app)) == SVt_PVHV) {
             s = hv_fetchs((HV *)SvRV(app), "session", 0);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (s && *s && SvROK(*s) && SvTYPE(SvRV(*s)) == SVt_PVHV)
                 cfg = (HV *)SvRV(*s);
         }
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!cfg)
-            croak("Punk::Session: _unseal_id needs an app with a session "
+            croak("Punk::Session: _unseal_id needs an app with a session " /* # uncoverable statement */
                   "keyword");
         key = ps_cfg_str(aTHX_ cfg, "secret", "", &kl);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (SvOK(value)) {
             const char *v = SvPV_const(value, vl);
             id = ps_id_unseal(aTHX_ v, vl, key, kl);

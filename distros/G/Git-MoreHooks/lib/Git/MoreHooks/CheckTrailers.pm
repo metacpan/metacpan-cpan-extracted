@@ -5,7 +5,7 @@ use warnings;
 
 # ABSTRACT: GitHooks plugin to enforce a commit message trailer policy
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use utf8;
 use Encode   qw( encode );
@@ -21,9 +21,6 @@ my $CFG = __PACKAGE__ =~ s/.*::/githooks./rmsx;
 # The kinds of commit which may be exempted from the 'require' check.
 my @KINDS = qw( merge revert fixup );
 
-# Reported at most once per process, however many commits a push carries.
-my $announced_no_interpret_trailers = 0;
-
 #############
 # Grok hook configuration, check it and set defaults.
 
@@ -35,6 +32,7 @@ sub _setup_config {
     # repository object) calls it again after changing the configuration, and a
     # cache that outlived the change would answer for the old one.
     delete $git->cache('checktrailers')->{'specs'};
+    delete $git->cache('checktrailers')->{'announced_no_interpret_trailers'};
 
     my $config = $git->get_config();
     $config->{ lc $CFG } //= {};
@@ -236,8 +234,16 @@ sub _trailers {
     my $out = eval { $git->run( qw( interpret-trailers --parse ), { input => $msg } ) };
     if ( !defined $out ) {
         my $error = $EVAL_ERROR;
-        if ( !$announced_no_interpret_trailers ) {
-            $announced_no_interpret_trailers = 1;
+
+        # Reported at most once, however many commits a push carries. Held in
+        # the per-repository cache and not in a package variable: a package
+        # variable outlives the invocation in any interpreter that handles
+        # more than one -- a test suite walking several repositories, or a
+        # persistent worker -- and the second repository would then never be
+        # told that the plugin could not do its job. _setup_config clears it.
+        my $cache = $git->cache('checktrailers');
+        if ( !$cache->{'announced_no_interpret_trailers'} ) {
+            $cache->{'announced_no_interpret_trailers'} = 1;
             $git->fault(
                 'Cannot read the commit message trailers. `git interpret-trailers --parse` failed, '
                   . 'so this plugin cannot tell whether the message complies.',
@@ -581,7 +587,7 @@ Git::MoreHooks::CheckTrailers - GitHooks plugin to enforce a commit message trai
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

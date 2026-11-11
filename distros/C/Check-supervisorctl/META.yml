@@ -25,5 +25,5 @@ requires:
   perl: '5.006'
 resources:
   repository: https://github.com/VVelox/Check-supervisorctl
-version: v0.1.0
+version: v0.2.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

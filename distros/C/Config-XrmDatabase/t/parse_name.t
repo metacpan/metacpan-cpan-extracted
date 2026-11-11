@@ -61,4 +61,23 @@ subtest 'fq name' => sub {
 
 };
 
+subtest 'is_binding_operator' => sub {
+    ok( is_binding_operator( $_ ),  "'$_'" ) for q{.}, q{*};
+    ok( !is_binding_operator( $_ ), "'$_'" ) for q{?}, 'a';
+};
+
+subtest 'is_wildcard (deprecated)' => sub {
+    for my $char ( q{.}, q{*}, q{?}, 'a' ) {
+        my $result;
+        like( warning { $result = is_wildcard( $char ) }, qr/is_wildcard is deprecated/,
+            "'$char': warns", );
+        is( !!$result, !!is_binding_operator( $char ), "'$char': same as is_binding_operator" );
+    }
+
+    ok(
+        no_warnings { no warnings 'deprecated'; is_wildcard( q{.} ) },
+        q{silenced by no warnings 'deprecated'},
+    );
+};
+
 done_testing;

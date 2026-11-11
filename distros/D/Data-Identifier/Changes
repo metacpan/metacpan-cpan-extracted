@@ -1,3 +1,8 @@
+v0.38  2026-11-10Z
+    - Preform correct isa()-recheck as part of as()
+    - Corrected validation for simple tags
+    - Updated when two identifiers are considered equal
+
 v0.37  2026-09-29Z
     - Fixed handling of $id->as($as) when $as is an Data::Identifier and $id isn't
     - Reserved methods classes_of() and _classes_of_provider() in Data::Identifier::Interface::Known

@@ -1,10 +1,10 @@
 package Git::Helpers::CPAN;
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 use Moo;
 
 use MetaCPAN::Client 2.029000 ();
-use Try::Tiny qw( try );
-use Types::Standard qw( HashRef InstanceOf Maybe Str );
+use Try::Tiny                 qw( try );
+use Types::Standard           qw( HashRef InstanceOf Maybe Str );
 
 has _client => (
     is      => 'ro',
@@ -61,7 +61,7 @@ sub _build_release_name {
     };
 
     if ( !$release_name ) {
-        die sprintf( "Cannot find a module named %s", $self->name );
+        die sprintf( 'Cannot find a module named %s', $self->name );
     }
 
     return $release_name;
@@ -76,7 +76,7 @@ sub _build_latest_release {
     };
 
     if ( !$release ) {
-        die sprintf( "Cannot find a release named %s", $self->release_name );
+        die sprintf( 'Cannot find a release named %s', $self->release_name );
     }
     return $release;
 }
@@ -97,7 +97,7 @@ Git::Helpers::CPAN - Get repository information for a CPAN module or release
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env perl
-package Dist::Conformance::Program 0.003;
+package Dist::Conformance::Program 0.004;
 
 use 5.040;
 use warnings FATAL => 'all';
@@ -148,7 +148,7 @@ conformance - Check a repository against its flavor of the standards, and bring 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

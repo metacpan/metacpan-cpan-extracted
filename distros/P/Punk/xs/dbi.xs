@@ -35,6 +35,8 @@ _returning(self)
         SV *r;
         (void)pdbi_dbh(aTHX_ self);
         r = pdbi_get(aTHX_ pdbi_hv(aTHX_ self), "returning");
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         RETVAL = r ? SvIV(r) : 0;
     }
     OUTPUT:
@@ -104,22 +106,31 @@ get(self, ...)
         sth = pdbi_sth_dbh(aTHX_ pdbi_get(aTHX_ slot, "dbh"), sql);
         pdbi_execute_sql(aTHX_ sth, bind, sql);
         row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         { SV *f = pdbi_meth0(aTHX_ sth, "finish"); if (f) SvREFCNT_dec(f); }
-        RETVAL = (row && SvOK(row)) ? row : (row ? (SvREFCNT_dec(row), newSV(0))
-                                                 : newSV(0));
+        RETVAL = (row && SvOK(row)) ? row : (row ? (SvREFCNT_dec(row), newSV(0)) /* # uncoverable condition left count:1 class:ignore_covered_err */
+                                                 : newSV(0)); /* # uncoverable statement class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
 
 SV *
+# uncoverable statement
+# uncoverable subroutine
 all(self)
         SV *self
     CODE:
     {
         SV *argv[2];
-        argv[0] = sv_2mortal(newRV_noinc((SV *)newHV()));
-        argv[1] = sv_2mortal(newRV_noinc((SV *)newHV()));
-        RETVAL = pcx_call_meth(aTHX_ self, "search", argv, 2, 1);
+        argv[0] = sv_2mortal(newRV_noinc((SV *)newHV())); /* # uncoverable statement */
+        argv[1] = sv_2mortal(newRV_noinc((SV *)newHV())); /* # uncoverable statement */
+        RETVAL = pcx_call_meth(aTHX_ self, "search", argv, 2, 1); /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         if (!RETVAL) RETVAL = newSV(0);
     }
     OUTPUT:
@@ -145,6 +156,8 @@ search(self, filter = &PL_sv_undef, opts = &PL_sv_undef)
         SV *pk    = pdbi_get(aTHX_ h, "primary");
         SV *table = pdbi_get(aTHX_ h, "table");
         SV *colsv = pdbi_get(aTHX_ h, "col");
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         HV *col   = (colsv && SvROK(colsv)) ? (HV *)SvRV(colsv) : NULL;
         HV *slot  = pdbi_slot_for(aTHX_ self);
         SV *dbh   = pdbi_get(aTHX_ slot, "dbh");
@@ -165,6 +178,8 @@ search(self, filter = &PL_sv_undef, opts = &PL_sv_undef)
             argv[0] = sv_2mortal(newRV_noinc((SV *)newHV()));
             rows_sv = pcx_call_meth(aTHX_ sth, "fetchall_arrayref", argv, 1, 1);
         }
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         { SV *f2 = pdbi_meth0(aTHX_ sth, "finish"); if (f2) SvREFCNT_dec(f2); }
 
         RETVAL = pdbq_page(aTHX_ rows_sv, limit, cols, desc, pk_only);
@@ -185,6 +200,8 @@ count(self, filter = &PL_sv_undef)
                  ? (HV *)SvRV(filter) : NULL;
         SV *table = pdbi_get(aTHX_ h, "table");
         SV *colsv = pdbi_get(aTHX_ h, "col");
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         HV *col   = (colsv && SvROK(colsv)) ? (HV *)SvRV(colsv) : NULL;
         HV *slot  = pdbi_slot_for(aTHX_ self);
         SV *dbh   = pdbi_get(aTHX_ slot, "dbh");
@@ -196,12 +213,24 @@ count(self, filter = &PL_sv_undef)
         sth = pdbi_sth_dbh(aTHX_ dbh, sql);
         pdbi_execute_sql(aTHX_ sth, bind, sql);
         row = pdbi_meth0(aTHX_ sth, "fetchrow_arrayref");
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         { SV *f2 = pdbi_meth0(aTHX_ sth, "finish"); if (f2) SvREFCNT_dec(f2); }
         RETVAL = 0;
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (row && SvROK(row) && SvTYPE(SvRV(row)) == SVt_PVAV) {
             SV **n = av_fetch((AV *)SvRV(row), 0, 0);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (n && *n && SvOK(*n)) RETVAL = SvIV(*n);
         }
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (row) SvREFCNT_dec(row);
     }
     OUTPUT:
@@ -222,6 +251,8 @@ create(self, data)
         HV *d   = (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV)
                   ? (HV *)SvRV(data) : NULL;
         SV *colset = pdbi_get(aTHX_ h, "col");
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         HV *known  = (colset && SvROK(colset)) ? (HV *)SvRV(colset) : NULL;
         SV *table  = pdbi_get(aTHX_ h, "table");
         SV *pk     = pdbi_get(aTHX_ h, "primary");
@@ -233,8 +264,11 @@ create(self, data)
 
         for (i = 0; i < n; i++) {
             SV *k = *av_fetch(all, i, 0);
-            HE *he = d ? hv_fetch_ent(d, k, 0, 0) : NULL;
-            if (!(known && hv_exists_ent(known, k, 0))) continue;
+            HE *he = d ? hv_fetch_ent(d, k, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            if (!(known && hv_exists_ent(known, k, 0))) continue; /* # uncoverable condition left count:1 class:ignore_covered_err */
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (!(he && SvOK(HeVAL(he)))) continue;   /* defined values only */
             av_push(cols, newSVsv(k));
             av_push(bind, newSVsv(HeVAL(he)));
@@ -259,6 +293,9 @@ create(self, data)
         (void)pdbi_dbh(aTHX_ self);          /* connect, so returning is set */
         {
             SV *r = pdbi_get(aTHX_ h, "returning");
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (r && SvIV(r)) {
                 SV *row;
                 sv_catpvs(sql, " RETURNING *");
@@ -266,34 +303,67 @@ create(self, data)
                 pdbi_execute_sql(aTHX_ sth, bind, sql);
                 row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
                 { SV *f = pdbi_meth0(aTHX_ sth, "finish");
+                  # uncoverable branch false
+                  # uncoverable condition right count:1 class:ignore_covered_err
                   if (f) SvREFCNT_dec(f); }
                 RETVAL = (row && SvOK(row)) ? row
+                       # uncoverable statement class:ignore_covered_err
+                       # uncoverable condition left count:1
+                       # uncoverable condition right count:1
                        : (row ? (SvREFCNT_dec(row), newSV(0)) : newSV(0));
                 goto done_create;
             }
         }
 
-        sth = pdbi_sth(aTHX_ self, sql);
-        pdbi_execute_sql(aTHX_ sth, bind, sql);
+        sth = pdbi_sth(aTHX_ self, sql); /* # uncoverable statement */
+        pdbi_execute_sql(aTHX_ sth, bind, sql); /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         if (pk && SvOK(pk)) {
+            # uncoverable statement
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
             HE *he = d ? hv_fetch_ent(d, pk, 0, 0) : NULL;
             SV *id;
+            # uncoverable statement
+            # uncoverable branch true
+            # uncoverable branch false
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
+            # uncoverable condition left count:2
+            # uncoverable condition right count:2
             if (he && SvOK(HeVAL(he))) id = sv_2mortal(newSVsv(HeVAL(he)));
             else {
                 SV *argv[4];
-                argv[0] = &PL_sv_undef; argv[1] = &PL_sv_undef;
-                argv[2] = table;        argv[3] = &PL_sv_undef;
-                id = pcx_call_meth(aTHX_ pdbi_dbh(aTHX_ self),
-                                   "last_insert_id", argv, 4, 1);
+                argv[0] = &PL_sv_undef; argv[1] = &PL_sv_undef; /* # uncoverable statement */
+                argv[2] = table;        argv[3] = &PL_sv_undef; /* # uncoverable statement */
+                id = pcx_call_meth(aTHX_ pdbi_dbh(aTHX_ self), /* # uncoverable statement */
+                                   "last_insert_id", argv, 4, 1); /* # uncoverable statement */
+                # uncoverable statement
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 id = id ? sv_2mortal(id) : &PL_sv_undef;
             }
             {
                 SV *argv[2];
-                argv[0] = pk; argv[1] = id;
-                RETVAL = pcx_call_meth(aTHX_ self, "get", argv, 2, 1);
+                argv[0] = pk; argv[1] = id; /* # uncoverable statement */
+                RETVAL = pcx_call_meth(aTHX_ self, "get", argv, 2, 1); /* # uncoverable statement */
+                # uncoverable statement
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 if (!RETVAL) RETVAL = newSV(0);
             }
         }
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         else RETVAL = d ? newRV_noinc((SV *)newHVhv(d)) : newSV(0);
       done_create: ;
     }
@@ -312,6 +382,8 @@ update(self, data)
         HV *d   = (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV)
                   ? (HV *)SvRV(data) : NULL;
         SV *colset = pdbi_get(aTHX_ h, "col");
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         HV *known  = (colset && SvROK(colset)) ? (HV *)SvRV(colset) : NULL;
         SV *table  = pdbi_get(aTHX_ h, "table");
         SV *pk     = pdbi_get(aTHX_ h, "primary");
@@ -320,10 +392,13 @@ update(self, data)
         HE *pke;
         SSize_t i, n;
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(pk && SvOK(pk)))
-            croak("Punk::Model::DBI: update needs a primary key");
-        pke = d ? hv_fetch_ent(d, pk, 0, 0) : NULL;
-        if (!(pke && SvOK(HeVAL(pke))))
+            croak("Punk::Model::DBI: update needs a primary key"); /* # uncoverable statement */
+        pke = d ? hv_fetch_ent(d, pk, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        if (!(pke && SvOK(HeVAL(pke)))) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Punk::Model::DBI: update needs the primary key in the data");
         id = sv_2mortal(newSVsv(HeVAL(pke)));
 
@@ -335,10 +410,13 @@ update(self, data)
             SV *k = *av_fetch(all, i, 0);
             HE *he;
             if (sv_eq(k, pk)) continue;
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (!(known && hv_exists_ent(known, k, 0))) continue;
             he = hv_fetch_ent(d, k, 0, 0);
             av_push(cols, newSVsv(k));
-            av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
+            av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef)); /* # uncoverable condition right count:1 class:ignore_covered_err */
         }
         if (av_len(cols) < 0)
             croak("Punk::Model::DBI: update with no columns to change");
@@ -346,6 +424,8 @@ update(self, data)
         set = sv_2mortal(newSVpvs(""));
         n = av_len(cols) + 1;
         for (i = 0; i < n; i++) {
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (i) sv_catpvs(set, ", ");
             sv_catsv(set, pdbi_qi(aTHX_ self, *av_fetch(cols, i, 0)));
             sv_catpvs(set, " = ?");
@@ -360,6 +440,9 @@ update(self, data)
         (void)pdbi_dbh(aTHX_ self);
         {
             SV *r = pdbi_get(aTHX_ h, "returning");
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (r && SvIV(r)) {
                 SV *row;
                 sv_catpvs(sql, " RETURNING *");
@@ -367,18 +450,28 @@ update(self, data)
                 pdbi_execute_sql(aTHX_ sth, bind, sql);
                 row = pdbi_meth0(aTHX_ sth, "fetchrow_hashref");
                 { SV *f = pdbi_meth0(aTHX_ sth, "finish");
+                  # uncoverable branch false
+                  # uncoverable condition right count:1 class:ignore_covered_err
                   if (f) SvREFCNT_dec(f); }
                 RETVAL = (row && SvOK(row)) ? row
+                       # uncoverable statement class:ignore_covered_err
+                       # uncoverable condition left count:1
+                       # uncoverable condition right count:1
                        : (row ? (SvREFCNT_dec(row), newSV(0)) : newSV(0));
                 goto done_update;
             }
         }
-        sth = pdbi_sth(aTHX_ self, sql);
-        pdbi_execute_sql(aTHX_ sth, bind, sql);
+        sth = pdbi_sth(aTHX_ self, sql); /* # uncoverable statement */
+        pdbi_execute_sql(aTHX_ sth, bind, sql); /* # uncoverable statement */
         {
             SV *argv[2];
-            argv[0] = pk; argv[1] = id;
-            RETVAL = pcx_call_meth(aTHX_ self, "get", argv, 2, 1);
+            argv[0] = pk; argv[1] = id; /* # uncoverable statement */
+            RETVAL = pcx_call_meth(aTHX_ self, "get", argv, 2, 1); /* # uncoverable statement */
+            # uncoverable statement
+            # uncoverable branch true
+            # uncoverable branch false
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
             if (!RETVAL) RETVAL = newSV(0);
         }
       done_update: ;
@@ -417,8 +510,14 @@ delete(self, ...)
         sth = pdbi_sth_dbh(aTHX_ pdbi_get(aTHX_ slot, "dbh"), sql);
         pdbi_execute_sql(aTHX_ sth, bind, sql);
         n = pdbi_meth0(aTHX_ sth, "rows");
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         { SV *f = pdbi_meth0(aTHX_ sth, "finish"); if (f) SvREFCNT_dec(f); }
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         RETVAL = (n && SvOK(n)) ? SvIV(n) : 0;
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (n) SvREFCNT_dec(n);
     }
     OUTPUT:
@@ -466,12 +565,15 @@ do(...)
     {
         const punk_dbiobs_m *m = &PUNK_DBIOBS[ix];
         void *tok = NULL;
-        I32 flags = ((GIMME_V == G_ARRAY) ? G_ARRAY : G_SCALAR) | G_EVAL;
+        I32 flags = ((GIMME_V == G_ARRAY) ? G_ARRAY : G_SCALAR) | G_EVAL; /* # uncoverable condition left count:1 class:ignore_covered_err */
         I32 count, i;
         SV **out = NULL;
         SV *err = NULL;
         int nbind = (items > m->bind_from) ? (int)(items - m->bind_from) : 0;
 
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (!PUNK_DBIOBS_IN && PK_OBS_WANT_QUERY)
             tok = pk_obs_query_start(aTHX_
                       punk_dbiobs_sql(aTHX_ items > 1 ? ST(1) : NULL), nbind);
@@ -487,6 +589,8 @@ do(...)
         count = call_sv((SV *)punk_dbiobs_super(aTHX_ (int)ix, m->super), flags);
         SPAGAIN;
 
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (count > 0) {
             Newx(out, count, SV *);
             for (i = count - 1; i >= 0; i--) out[i] = sv_2mortal(SvREFCNT_inc(POPs));
@@ -494,19 +598,25 @@ do(...)
         PUTBACK;
         LEAVE;                      /* puts PUNK_DBIOBS_IN back */
 
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (SvTRUE(ERRSV)) err = sv_2mortal(newSVsv(ERRSV));
 
         /* Success here is "it ran", not what it returned: these hand back
          * data, and a query that legitimately matched no rows has not failed.
          * One that went wrong raised, because RaiseError is this framework's
          * default, and that is the failure worth reporting. */
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (tok) pk_obs_query_done(aTHX_ tok, err ? &PL_sv_no : &PL_sv_yes);
 
-        if (err) { if (out) Safefree(out); croak_sv(err); }
+        if (err) { if (out) Safefree(out); croak_sv(err); } /* # uncoverable condition right count:2 class:ignore_covered_err */
 
         SP = PL_stack_base + ax - 1;
         EXTEND(SP, count);
         for (i = 0; i < count; i++) PUSHs(out[i]);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (out) Safefree(out);
         PUTBACK;
         return;
@@ -529,6 +639,8 @@ execute(...)
         /* Inside a Punk::DBI::db wrapper this is DBI's own inner execute and
          * the statement was already reported at the altitude the caller asked
          * for. */
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (!PUNK_DBIOBS_IN && PK_OBS_WANT_QUERY && items > 0)
             tok = pk_obs_query_start(aTHX_
                       punk_dbiobs_sql(aTHX_ ST(0)), (int)(items - 1));
@@ -545,6 +657,8 @@ execute(...)
                         G_SCALAR | G_EVAL);
         SPAGAIN;
 
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (count > 0) {
             Newx(out, count, SV *);
             for (i = count - 1; i >= 0; i--) out[i] = sv_2mortal(SvREFCNT_inc(POPs));
@@ -553,14 +667,25 @@ execute(...)
         PUTBACK;
         LEAVE;
 
+        # uncoverable branch true
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (SvTRUE(ERRSV)) err = sv_2mortal(newSVsv(ERRSV));
-        if (tok) pk_obs_query_done(aTHX_ tok, err ? &PL_sv_no : r);
+        if (tok) pk_obs_query_done(aTHX_ tok, err ? &PL_sv_no : r); /* # uncoverable condition left count:2 class:ignore_covered_err */
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (err) { if (out) Safefree(out); croak_sv(err); }
 
         SP = PL_stack_base + ax - 1;
         EXTEND(SP, count);
         for (i = 0; i < count; i++) PUSHs(out[i]);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (out) Safefree(out);
         PUTBACK;
         return;

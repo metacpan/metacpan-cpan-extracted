@@ -32,10 +32,10 @@ my $t = Devel::XSCover::Test->new(dir => "$dir", make => $make, prove => $prove,
 is($t->db_path, $db, 'the db path is absolute under the dir');
 my $dep = Devel::XSCover::Test->new->deparse_switch;
 like($dep, qr/(?:^|\s)-MDevel::XSCover::Deparse$/, 'the deparse switch loads the module');
-my $sw = "$dep -MDevel::Cover=-db,$db,-ignore,^/,-ignore,/Install/Files\\.pm\$,-silent,1";
+my $sw = "$dep -MDevel::Cover=-db,$db,-dir,$db_dir,-ignore,^/,-ignore,/Install/Files\\.pm\$,-silent,1";
 is($t->switches, $sw, 'the switches, silent since the object is');
-is(Devel::XSCover::Test->new(dir => "$dir")->switches, "$dep -MDevel::Cover=-db,$db,-ignore,^/,-ignore,/Install/Files\\.pm\$", 'the switches without silent, with the ignores of absolute paths and of the ExtUtils::Depends file');
-is(Devel::XSCover::Test->new(dir => "$dir", no_deparse => 1)->switches, "-MDevel::Cover=-db,$db,-ignore,^/,-ignore,/Install/Files\\.pm\$", 'and without the deparse module when told');
+is(Devel::XSCover::Test->new(dir => "$dir")->switches, "$dep -MDevel::Cover=-db,$db,-dir,$db_dir,-ignore,^/,-ignore,/Install/Files\\.pm\$", 'the switches without silent, with the ignores of absolute paths and of the ExtUtils::Depends file');
+is(Devel::XSCover::Test->new(dir => "$dir", no_deparse => 1)->switches, "-MDevel::Cover=-db,$db,-dir,$db_dir,-ignore,^/,-ignore,/Install/Files\\.pm\$", 'and without the deparse module when told');
 {
     local $ENV{DEVEL_COVER_TEST_OPTS} = '-Ilocal';
     is($t->switches, "-Ilocal $sw", 'DEVEL_COVER_TEST_OPTS comes first');
@@ -44,7 +44,7 @@ like(Devel::XSCover::Test->new(dir => "$dir", silent => 1)->switches, qr/,-silen
 {
     local $^O = 'MSWin32';
     (my $win = File::Spec->rel2abs('a\\b', $db_dir)) =~ s/\\/\\\\/g;
-    is(Devel::XSCover::Test->new(dir => "$dir", db => 'a\\b', no_deparse => 1)->switches, "-MDevel::Cover=-db,$win,-ignore,^[A-Za-z]:,-ignore,/Install/Files\\.pm\$", 'on Windows the backslashes of the path are doubled and the ignore is of drive paths');
+    is(Devel::XSCover::Test->new(dir => "$dir", db => 'a\\b', no_deparse => 1)->switches, "-MDevel::Cover=-db,$win,-dir,$db_dir,-ignore,^[A-Za-z]:,-ignore,/Install/Files\\.pm\$", 'on Windows the backslashes of the path are doubled and the ignore is of drive paths');
 }
 {
     delete local $INC{'Devel/XSCover/Test.pm'};

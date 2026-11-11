@@ -1,0 +1,28 @@
+Changes
+cpanfile
+example/cgi-bin/page.fcgi
+example/conf/default
+example/templates/web/Web/VWF/Display/index.tmpl
+example/templates/web/Web/VWF/Display/meta_data.tmpl
+lib/Web/VWF.pm
+lib/Web/VWF/Allow.pm
+lib/Web/VWF/Blacklist.pm
+lib/Web/VWF/CAPTCHA.pm
+lib/Web/VWF/Config.pm
+lib/Web/VWF/Data/index.pm
+lib/Web/VWF/Data/vwf_log.pm
+lib/Web/VWF/Display.pm
+lib/Web/VWF/Display/captcha.pm
+lib/Web/VWF/Display/index.pm
+lib/Web/VWF/Display/meta_data.pm
+lib/Web/VWF/Display/table.pm
+lib/Web/VWF/Throttle.pm
+lib/Web/VWF/Utils.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/function.t
+t/meta-data-charts.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

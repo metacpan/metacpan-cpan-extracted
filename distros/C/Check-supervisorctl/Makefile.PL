@@ -22,7 +22,7 @@ my %WriteMakefileArgs = (
 		'File::Slurp' => 0,
 	},
 	dist       => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-	clean      => { FILES    => 'Check-supervisorctl-*' },
+	clean      => { FILES    => 'Check-supervisorctl-* t/tmp' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
 		# Monitoring::Sneck::Checks::supervisorctl is only loaded by Monitoring::Sneck::Checks, so

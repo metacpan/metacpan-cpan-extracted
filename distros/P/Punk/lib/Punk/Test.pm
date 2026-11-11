@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 use Test::Builder ();
 use Scalar::Util ();
@@ -36,14 +36,17 @@ sub new {
     if (ref $app ne 'CODE') {
         my $name = $app;
         unless ($name->can('to_app')) {
+            # uncoverable branch false
             eval "require $name"
                 or die "Punk::Test: could not load $name: $@";
         }
+        # uncoverable branch true
         $name->can('to_app')
             or die "Punk::Test: $name has no to_app - not a Punk app?\n";
         # to_app compiles once per class, and two clients against one app
         # (two browsers, one server) is a thing tests want - so the frozen
         # coderef is shared
+        # uncoverable condition false
         $app = $APPS{$name} //= $name->to_app;
     }
     return bless {
@@ -54,6 +57,9 @@ sub new {
         timeout     => $opts{timeout}     // 5,
         max_bytes   => $opts{max_bytes}   // 1_000_000,
         csrf_cookie => $opts{csrf_cookie} // 'csrf',
+        # uncoverable condition left count:2
+        # uncoverable condition left count:3
+        # uncoverable condition left count:4
         csrf_header => $opts{csrf_header} // 'X-CSRF-Token',
         res         => undef,
     }, $class;
@@ -84,6 +90,7 @@ sub login_as {
     my $key  = $auth->{session_key} // 'user_id';
     my $idf  = ($auth->{fields} || {})->{id} // 'id';
     my $id   = ref $user eq 'HASH' ? $user->{$idf} : $user;
+    # uncoverable branch true
     defined $id or die "Punk::Test: login_as needs a user row or id\n";
     # _seal_session, not _seal: an application with `session store => ...`
     # keeps the payload server-side, so a cookie with the session sealed into
@@ -117,7 +124,9 @@ sub request_header {
 
 sub _urlenc {
     my ($s) = @_;
+    # uncoverable branch true
     $s = '' unless defined $s;
+    # uncoverable branch true
     utf8::encode($s) if utf8::is_utf8($s);
     $s =~ s/([^A-Za-z0-9_.~-])/sprintf '%%%02X', ord $1/ge;
     return $s;
@@ -136,7 +145,11 @@ sub _resolve_path {
         or die "Punk::Test: [ '$name', ... ] names a route, which needs the "
              . "application class - construct the client with "
              . "Punk::Test->new('MyApp') rather than with a coderef\n";
+    # uncoverable branch false
     my $app = $class->can('punk_app') ? $class->punk_app : undef;
+    # uncoverable branch true
+    # uncoverable condition left
+    # uncoverable condition right
     $app && $app->can('url_for')
         or die "Punk::Test: [ '$name', ... ] needs Punk 0.31 or newer\n";
     return $app->url_for($name, @args);
@@ -158,18 +171,21 @@ sub _build_env {
     }
     elsif (exists $o{json}) {
         $body = File::Raw::JSON::file_json_encode($o{json});
+        # uncoverable condition left
         $type //= 'application/json';
     }
     elsif (exists $o{xml}) {
         # a Document or Node serialises itself; anything else is markup the
         # caller wrote, including the malformed strings a test wants to send
         $body = ref $o{xml} ? $o{xml}->to_string : $o{xml};
+        # uncoverable condition left
         $type //= 'application/xml';
     }
     elsif (exists $o{form}) {
         my $f = $o{form};
         $body = join '&', map { _urlenc($_) . '=' . _urlenc($f->{$_}) }
                           sort keys %$f;
+        # uncoverable condition left
         $type //= 'application/x-www-form-urlencoded';
     }
     elsif (defined $o{body}) {
@@ -177,6 +193,7 @@ sub _build_env {
     }
 
     unless ($in) {
+        # uncoverable branch true
         open $in, '<', \$body or die "Punk::Test: $!";
         $clen = length $body if length $body or defined $type;
     }
@@ -196,6 +213,7 @@ sub _build_env {
     };
     if (defined $clen) {
         $env->{CONTENT_LENGTH} = $clen;
+        # uncoverable condition right
         $env->{CONTENT_TYPE}   = $type // '';
     }
     # Sticky headers first, so a single request's `headers` can still override
@@ -205,6 +223,9 @@ sub _build_env {
         for my $k (keys %$h) {
             my $ek = uc $k;
             $ek =~ tr/-/_/;
+            # uncoverable branch false
+            # uncoverable condition left
+            # uncoverable condition right
             $ek = "HTTP_$ek"
                 unless $ek eq 'CONTENT_TYPE' || $ek eq 'CONTENT_LENGTH';
             $env->{$ek} = $h->{$k};
@@ -244,6 +265,7 @@ sub _mp_boundary { join '', 'PunkTest', map { $_BND[int rand @_BND] } 1 .. 16 }
 # what arrives; it does not decode.
 sub _mp_name {
     my ($s) = @_;
+    # uncoverable branch true
     $s = '' unless defined $s;
     utf8::encode($s) if utf8::is_utf8($s);
     $s =~ s/(["\r\n])/sprintf '%%%02X', ord $1/ge;
@@ -256,10 +278,12 @@ sub _mp_name {
 sub _mp_contains {
     my ($src, $bnd) = @_;
     return index($$src, $bnd) >= 0 if ref $src;
+    # uncoverable branch true
     open my $fh, '<:raw', $src or die "Punk::Test: cannot open '$src': $!";
     my ($tail, $keep) = ('', length($bnd) - 1);
     while (read $fh, my $chunk, 65536) {
         $chunk = $tail . $chunk;
+        # uncoverable branch true
         return 1 if index($chunk, $bnd) >= 0;
         $tail = length $chunk > $keep ? substr($chunk, -$keep) : $chunk;
     }
@@ -268,18 +292,22 @@ sub _mp_contains {
 
 sub _multipart_input {
     my ($self, $form, $upload) = @_;
+    # uncoverable branch true
     die "Punk::Test: upload takes a hashref of field => arrayref\n"
         unless ref $upload eq 'HASH';
     my (@parts, @scan);
     for my $k (sort keys %{ $form || {} }) {
         my $val = $form->{$k};
+        # uncoverable branch true
         $val = '' unless defined $val;
+        # uncoverable branch true
         utf8::encode($val) if utf8::is_utf8($val);
         push @parts, { name => $k, content => $val };
         push @scan, \$val;
     }
     for my $field (sort keys %$upload) {
         my $v = $upload->{$field};
+        # uncoverable condition right
         die "Punk::Test: upload => { $field => ... } takes an arrayref: "
           . "a path or a scalar ref of content, then optional filename "
           . "and type\n" unless ref $v eq 'ARRAY' && @$v;
@@ -288,17 +316,23 @@ sub _multipart_input {
             my %p = (name => $field,
                      type => $ftype // 'application/octet-stream');
             if (ref $src eq 'SCALAR') {
+                # uncoverable condition right
                 my $bytes = $$src // '';
+                # uncoverable branch true
                 utf8::encode($bytes) if utf8::is_utf8($bytes);
                 $p{content}  = $bytes;
+                # uncoverable condition false
                 $p{filename} = $fname // $field;
                 push @scan, \$bytes;
             }
             else {
+                # uncoverable condition right count:1
+                # uncoverable condition left count:2
                 die "Punk::Test: upload => { $field => ... }: no file at '"
                   . ($src // '') . "'\n" unless defined $src && -f $src;
                 $p{path}     = $src;
                 $p{size}     = -s $src;
+                # uncoverable condition false
                 $p{filename} = $fname // ($src =~ m{([^/\\]+)\z})[0];
                 push @scan, $src;
             }
@@ -311,6 +345,7 @@ sub _multipart_input {
     # starts, so a bad path fails here and not as a truncated body.
     my $bnd = _mp_boundary();
     for (my $tries = 1; grep { _mp_contains($_, $bnd) } @scan; $tries++) {
+        # uncoverable branch true
         die "Punk::Test: could not pick a boundary absent from the "
           . "content\n" if $tries >= 16;
         $bnd = _mp_boundary();
@@ -327,6 +362,7 @@ sub _multipart_input {
         $hdr .= "\r\n\r\n";
         if (defined $p->{path}) {
             open my $fh, '<:raw', $p->{path}
+                # uncoverable branch true
                 or die "Punk::Test: cannot open '$p->{path}': $!";
             push @items, $hdr, { fh => $fh };
             $len += $p->{size};
@@ -342,6 +378,7 @@ sub _multipart_input {
     $len += length $items[-1];
 
     push @Punk::Test::_MPInput::QUEUE, \@items;
+    # uncoverable branch true
     open my $in, '<:via(Punk::Test::_MPInput)', \(my $empty = '')
         or die "Punk::Test: $!";
     return ($in, $len, "multipart/form-data; boundary=$bnd");
@@ -356,14 +393,19 @@ sub _request_ok {
     my $err = $@;
     if (ref $r eq 'CODE') {                 # a psgi.streaming response
         $r = eval { $self->_drive_streaming($r) };
+        # uncoverable condition left
+        # uncoverable condition right
         $err ||= $@;
     }
     if (ref $r eq 'ARRAY') {
         $self->_set_response($r);
+        # uncoverable condition false
         $TB->ok(1, $o{name} // "$method $path");
     }
     else {
         $self->{res} = undef;
+        # uncoverable condition left
+        # uncoverable condition false
         $TB->ok(0, $o{name} // "$method $path");
         $TB->diag($err ? "the application died: $err"
                        : 'the application did not return a PSGI response');
@@ -379,6 +421,7 @@ sub _drive_streaming {
     my $got = 0;
     my $writer = Punk::Test::_Writer->new(sub {
         $got += length $_[0];
+        # uncoverable branch true
         die "Punk::Test: stream exceeded $max bytes without closing\n"
             if $got > $max;
         push @writes, $_[0];
@@ -391,12 +434,14 @@ sub _drive_streaming {
         $closed = 1;
         return;
     });
+    # uncoverable condition right
     return [ $status, $headers // [], [ join '', @writes ] ];
 }
 
 sub _set_response {
     my ($self, $r) = @_;
     my $body = $r->[2];
+    # uncoverable condition right
     if (ref $body eq 'ARRAY') {
         $body = join '', grep { defined } @$body;
     }
@@ -409,6 +454,7 @@ sub _set_response {
     else {                                  # a filehandle (Punk::Static)
         local $/;
         my $fh = $body;
+        # uncoverable condition right
         $body = <$fh> // '';
         eval { $fh->close };
     }
@@ -417,7 +463,9 @@ sub _set_response {
     my @h = @{ $r->[1] };
     while (my ($k, $v) = splice @h, 0, 2) {
         next unless lc $k eq 'set-cookie';
+        # uncoverable branch true
         my ($name, $value) = $v =~ /\A\s*([^=;\s]+)=([^;]*)/ or next;
+        # uncoverable condition right
         if ($value eq '' || $v =~ /;\s*Max-Age\s*=\s*0\s*(?:;|\z)/i) {
             delete $self->{jar}{$name};
         }
@@ -437,11 +485,14 @@ sub _jar_header {
 
 # ---- the response ------------------------------------------------------------
 
+# uncoverable branch false
 sub status { $_[0]{res} ? $_[0]{res}{status} : undef }
+# uncoverable branch false
 sub body   { $_[0]{res} ? $_[0]{res}{body}   : undef }
 
 sub header {
     my ($self, $name) = @_;
+    # uncoverable branch true
     return unless $self->{res};
     my @h = @{ $self->{res}{headers} };
     while (my ($k, $v) = splice @h, 0, 2) {
@@ -452,12 +503,14 @@ sub header {
 
 sub json {
     my ($self) = @_;
+    # uncoverable branch true
     return unless $self->{res};
     return $self->{json} //= eval { File::Raw::JSON::file_json_decode($self->{res}{body}) };
 }
 
 sub xml {
     my ($self) = @_;
+    # uncoverable branch true
     return unless $self->{res};
     return $self->{xml} //= eval {
         File::Raw::XML::file_xml_decode($self->{res}{body});
@@ -483,6 +536,7 @@ sub _no_response {
 sub status_is {
     my ($self, $want, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "status is $want";
     return $self->_no_response($name) unless $self->{res};
     $TB->is_num($self->{res}{status}, $want, $name)
@@ -493,7 +547,9 @@ sub status_is {
 sub status_isnt {
     my ($self, $want, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "status is not $want";
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     $TB->isnt_num($self->{res}{status}, $want, $name);
     return $self;
@@ -502,7 +558,9 @@ sub status_isnt {
 sub header_is {
     my ($self, $h, $want, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "$h header is " . (defined $want ? "'$want'" : 'undef');
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     $TB->is_eq($self->header($h), $want, $name);
     return $self;
@@ -511,8 +569,11 @@ sub header_is {
 sub header_like {
     my ($self, $h, $re, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "$h header matches";
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
+    # uncoverable condition right
     $TB->like($self->header($h) // '', $re, $name);
     return $self;
 }
@@ -520,7 +581,10 @@ sub header_like {
 sub header_exists {
     my ($self, $h, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition left
+    # uncoverable condition false
     $name //= "$h header exists";
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     $TB->ok(defined $self->header($h), $name);
     return $self;
@@ -530,6 +594,7 @@ sub content_is {
     my ($self, $want, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     $name //= 'exact body';
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     $TB->is_eq($self->{res}{body}, $want, $name);
     return $self;
@@ -539,6 +604,7 @@ sub content_like {
     my ($self, $re, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     $name //= 'body matches';
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     $TB->like($self->{res}{body}, $re, $name);
     return $self;
@@ -548,6 +614,7 @@ sub content_unlike {
     my ($self, $re, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     $name //= 'body does not match';
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     $TB->unlike($self->{res}{body}, $re, $name);
     return $self;
@@ -557,7 +624,9 @@ sub content_unlike {
 # (found, value).
 sub _ptr_get {
     my ($doc, $ptr) = @_;
+    # uncoverable condition left
     return (1, $doc) if !defined $ptr || $ptr eq '';
+    # uncoverable branch true
     return (0, undef) unless $ptr =~ s{\A/}{};
     for my $tok (split m{/}, $ptr, -1) {
         $tok =~ s/~1/\//g;
@@ -567,6 +636,9 @@ sub _ptr_get {
             $doc = $doc->{$tok};
         }
         elsif (ref $doc eq 'ARRAY') {
+            # uncoverable branch true
+            # uncoverable condition left
+            # uncoverable condition right
             return (0, undef) unless $tok =~ /\A\d+\z/ && $tok <= $#$doc;
             $doc = $doc->[$tok];
         }
@@ -596,10 +668,13 @@ sub _json_at {
 sub json_is {
     my ($self, $ptr, $want, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "json at '$ptr'";
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
     my $slot = $self->_json_at($ptr, $name) or return $self;
     my $got = $$slot;
+    # uncoverable condition right
     if (ref $got || ref $want) {
         # deep-compare through canonical JSON, wrapped so scalars encode
         $TB->is_eq(File::Raw::JSON::file_json_encode([$got],  sort_keys => 1),
@@ -614,8 +689,11 @@ sub json_is {
 sub json_has {
     my ($self, $ptr, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "json has '$ptr'";
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
+    # uncoverable branch true
     my $slot = $self->_json_at($ptr, $name) or return $self;
     $TB->ok(1, $name);
     return $self;
@@ -624,17 +702,25 @@ sub json_has {
 sub json_like {
     my ($self, $ptr, $re, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "json at '$ptr' matches";
+    # uncoverable branch true
     return $self->_no_response($name) unless $self->{res};
+    # uncoverable branch true
     my $slot = $self->_json_at($ptr, $name) or return $self;
+    # uncoverable branch false
+    # uncoverable condition left
+    # uncoverable condition right
     $TB->like(defined $$slot && !ref $$slot ? $$slot : '', $re, $name);
     return $self;
 }
 
 sub _body_head {
     my ($self) = @_;
+    # uncoverable branch false
     my $b = $self->{res} ? $self->{res}{body} : '';
     $b = substr($b, 0, 500) . '...' if length $b > 500;
+    # uncoverable branch false
     return length $b ? $b : '(empty body)';
 }
 
@@ -644,7 +730,10 @@ sub sse_ok {
     my ($self, $path, %o) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     $path = $self->_resolve_path($path);
+    # uncoverable condition left
+    # uncoverable condition false
     my $name = $o{name} // "SSE $path";
+    # uncoverable condition left
     $o{headers}{Accept} //= 'text/event-stream';
     my $env = $self->_build_env(GET => $path, %o);
     $env->{'psgi.streaming'} = 1;
@@ -653,6 +742,8 @@ sub sse_ok {
     my $err = $@;
     if (ref $r eq 'CODE') {
         $r = eval { $self->_drive_streaming($r) };
+        # uncoverable condition left
+        # uncoverable condition right
         $err ||= $@;
     }
     unless (ref $r eq 'ARRAY') {
@@ -663,13 +754,16 @@ sub sse_ok {
         return $self;
     }
     $self->_set_response($r);
+    # uncoverable condition right
     my $ct = $self->header('Content-Type') // '';
+    # uncoverable condition left
     if ($r->[0] == 200 && $ct =~ m{\Atext/event-stream}) {
         $self->{sse} = _parse_sse($self->{res}{body});
         $TB->ok(1, $name);
     }
     else {
         $TB->ok(0, $name);
+        # uncoverable condition right
         $TB->diag("expected a 200 text/event-stream, got $r->[0] "
                 . ($ct || '(no content type)') . ': ' . $self->_body_head);
     }
@@ -689,7 +783,9 @@ sub _parse_sse {
         }
         if ($line =~ /\A:\s?(.*)\z/s) { push @comments, $1; next }
         my ($field, $value) = $line =~ /\A([^:]+)(?::\s?(.*))?\z/s;
+        # uncoverable condition right
         $value //= '';
+        # uncoverable branch false count:4
         if    ($field eq 'data')  { $cur{data} = defined $cur{data}
                                               ? "$cur{data}\n$value" : $value }
         elsif ($field eq 'event') { $cur{event} = $value }
@@ -699,7 +795,9 @@ sub _parse_sse {
     return { events => \@events, comments => \@comments };
 }
 
+# uncoverable branch false
 sub sse_events   { $_[0]{sse} ? $_[0]{sse}{events}   : undef }
+# uncoverable branch false
 sub sse_comments { $_[0]{sse} ? $_[0]{sse}{comments} : undef }
 
 sub _sse_event {
@@ -723,13 +821,18 @@ sub _sse_event {
 sub sse_event_is {
     my ($self, $i, $event, $data, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition left
+    # uncoverable condition false
     $name //= "event $i is $event";
     my $ev = $self->_sse_event($i, $name) or return $self;
+    # uncoverable condition right
     if (($ev->{event} // '') eq $event) {
+        # uncoverable condition right
         $TB->is_eq($ev->{data} // '', $data, $name);
     }
     else {
         $TB->ok(0, $name);
+        # uncoverable condition right
         $TB->diag("event $i is named '" . ($ev->{event} // '')
                 . "', not '$event'");
     }
@@ -739,8 +842,11 @@ sub sse_event_is {
 sub sse_data_is {
     my ($self, $i, $data, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "event $i data";
+    # uncoverable branch true
     my $ev = $self->_sse_event($i, $name) or return $self;
+    # uncoverable condition right
     $TB->is_eq($ev->{data} // '', $data, $name);
     return $self;
 }
@@ -748,11 +854,15 @@ sub sse_data_is {
 sub sse_json_is {
     my ($self, $i, $ptr, $want, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition false
     $name //= "event $i json at '$ptr'";
+    # uncoverable branch true
     my $ev = $self->_sse_event($i, $name) or return $self;
+    # uncoverable condition right
     my $doc = eval { File::Raw::JSON::file_json_decode($ev->{data} // '') };
     unless (defined $doc) {
         $TB->ok(0, $name);
+        # uncoverable condition right
         $TB->diag("event $i data is not JSON: " . ($ev->{data} // ''));
         return $self;
     }
@@ -762,6 +872,7 @@ sub sse_json_is {
         $TB->diag("nothing at JSON pointer '$ptr' in event $i");
         return $self;
     }
+    # uncoverable condition right
     if (ref $got || ref $want) {
         $TB->is_eq(File::Raw::JSON::file_json_encode([$got],  sort_keys => 1),
                    File::Raw::JSON::file_json_encode([$want], sort_keys => 1), $name);
@@ -777,6 +888,7 @@ sub sse_json_is {
 # Whether the live (forked Hyperman) transport can run here at all - tests
 # use this to SKIP, the same way t/1011-ws-live.t does.
 sub ws_live_available {
+    # uncoverable branch false
     return eval {
         require Hyperman;
         require Punk::WebSocket;
@@ -788,6 +900,8 @@ sub websocket_ok {
     my ($self, $path, %o) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
     $path = $self->_resolve_path($path);
+    # uncoverable condition left
+    # uncoverable condition false
     my $name = $o{name} // "websocket $path";
     $self->_ws_teardown;
 
@@ -797,12 +911,15 @@ sub websocket_ok {
             my ($acc) = $hdr =~ /Sec-WebSocket-Accept: (\S+)/i;
             $self->{ws}     = $conn;
             $self->{ws_hdr} = $hdr;
+            # uncoverable condition right
             $TB->is_eq($acc // '', Punk::Test::WS::accept_key($key), $name);
             return $self;
         }
+        # uncoverable branch false
         $conn->close if $conn;
         if ($status != 501) {   # 501 = this transport cannot upgrade; go live
             $TB->ok(0, $name);
+            # uncoverable branch false
             $TB->diag($status
                 ? "the upgrade was answered with a $status:\n$hdr"
                 : 'no bytes came back from the upgrade request');
@@ -810,28 +927,40 @@ sub websocket_ok {
         }
     }
 
+    # uncoverable branch true
     unless (ws_live_available()) {
+        # uncoverable statement
         $TB->ok(0, $name);
+        # uncoverable statement
         $TB->diag('this route needs the live transport (Hyperman 0.11+); '
                 . 'guard the test with Punk::Test::ws_live_available');
+        # uncoverable statement
         return $self;
     }
     my ($conn, $hdr, $key) = $self->_ws_live($path, %o);
+    # uncoverable branch true
     unless ($conn) {
+        # uncoverable statement
         $TB->ok(0, $name);
+        # uncoverable statement
+        # uncoverable condition left
+        # uncoverable condition right
         $TB->diag($hdr // 'could not connect to the live worker');
+        # uncoverable statement
         return $self;
     }
     if ($hdr =~ m{\AHTTP/1\.1 101 }) {
         my ($acc) = $hdr =~ /Sec-WebSocket-Accept: (\S+)/i;
         $self->{ws}     = $conn;
         $self->{ws_hdr} = $hdr;
+        # uncoverable condition right
         $TB->is_eq($acc // '', Punk::Test::WS::accept_key($key), $name);
     }
     else {
         $conn->close;
         $TB->ok(0, $name);
         my ($line) = split /\r\n/, $hdr;
+        # uncoverable condition right
         $TB->diag('the upgrade was answered with: ' . ($line // '(nothing)'));
     }
     return $self;
@@ -854,25 +983,30 @@ sub _ws_inprocess {
     }
     if (my $jar = $self->_jar_header) { $env->{HTTP_COOKIE} = $jar }
 
+    # uncoverable branch true
     socketpair(my $ours, my $theirs, AF_UNIX, SOCK_STREAM, PF_UNSPEC)
         or die "Punk::Test: socketpair: $!";
+    # uncoverable condition right
     my $pid = fork // die "Punk::Test: fork: $!";
     if (!$pid) {
         # the child owns no test state: keep it off the TAP pipe entirely,
-        # and leave through _exit so no END blocks or destructors run
+        # and leave by exit with the test ending turned off, so the counters flush
         close $ours;
         open STDIN,  '<', '/dev/null';
         open STDOUT, '>', '/dev/null';
         open STDERR, '>', '/dev/null';
         $env->{'psgix.io'} = $theirs;
         my $r = eval { $self->{app}->($env) };
+        # uncoverable branch false count:2
         if (ref $r eq 'ARRAY') {
             # a successful blocking upgrade already spoke on the socket and
             # returns the empty 200 sentinel; anything else (a guard's 403,
             # the 501 of a route this transport cannot carry, a plain route
             # answering) is relayed as minimal HTTP so the parent sees why
             my $body = ref $r->[2] eq 'ARRAY'
+                # uncoverable branch false
                 ? join('', grep { defined } @{ $r->[2] }) : '';
+            # uncoverable condition right
             syswrite $theirs, "HTTP/1.1 $r->[0] X\r\n"
                             . "Content-Length: " . length($body) . "\r\n"
                             . "\r\n$body"
@@ -881,13 +1015,15 @@ sub _ws_inprocess {
         elsif (!defined $r) {
             syswrite $theirs, "HTTP/1.1 500 X\r\n\r\n";
         }
-        POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
     close $theirs;
     my $conn = Punk::Test::WS::Conn->new(
         sock => $ours, timeout => $self->{timeout}, pid => $pid);
     my $hdr = $conn->read_headers;
     my ($status) = $hdr =~ m{\AHTTP/1\.1 (\d+)};
+    # uncoverable condition right
     return ($conn, $hdr, $key, $status // 0);
 }
 
@@ -896,8 +1032,10 @@ sub _ws_inprocess {
 # t/1011-ws-live.t.
 sub _ws_live {
     my ($self, $path, %o) = @_;
+    # uncoverable branch true
     my $host = $self->_live_host or return (undef, 'live worker failed to start');
     require IO::Socket::INET;
+    # uncoverable branch true
     my $sock = IO::Socket::INET->new(PeerAddr => $host)
         or return (undef, "connect $host: $!");
     $sock->autoflush(1);
@@ -916,9 +1054,11 @@ sub _ws_live {
 
 sub _live_host {
     my ($self) = @_;
+    # uncoverable branch true
     return $self->{live}{host} if $self->{live};
     require IO::Socket::INET;
     my $port = 27000 + ($$ % 400);
+    # uncoverable condition right
     my $pid  = fork // die "Punk::Test: fork: $!";
     if (!$pid) {
         open STDIN,  '<', '/dev/null';
@@ -928,7 +1068,8 @@ sub _live_host {
             Hyperman->run(app => $self->{app}, host => '127.0.0.1',
                           port => $port, workers => 1);
         };
-        POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
     my $host = "127.0.0.1:$port";
     for (1 .. 100) {
@@ -937,14 +1078,18 @@ sub _live_host {
                   return $host }
         select undef, undef, undef, 0.1;
     }
+    # uncoverable statement
     kill 'KILL', $pid;
+    # uncoverable statement
     waitpid $pid, 0;
+    # uncoverable statement
     return;
 }
 
 sub send_ok {
     my ($self, $payload, %o) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition left
     my $name = $o{name} // 'send';
     unless ($self->{ws}) {
         $TB->ok(0, $name);
@@ -952,6 +1097,7 @@ sub send_ok {
         return $self;
     }
     my $n = $self->{ws}->send_frame(
+        # uncoverable condition left
         opcode  => $o{binary} ? 2 : ($o{opcode} // 1),
         payload => $payload);
     $TB->ok(defined $n, $name);
@@ -964,9 +1110,11 @@ sub _next_message {
     my $payload = '';
     while (1) {
         my $f = $self->{ws}->read_frame or return undef;
+        # uncoverable branch true
         next if $f->{opcode} == 10;              # a pong
         return { close => 1, frame => $f } if $f->{opcode} == 8;
         $payload .= $f->{payload};
+        # uncoverable branch false
         return { payload => $payload, frame => $f } if $f->{fin};
     }
 }
@@ -1006,6 +1154,7 @@ sub message_like {
 sub finish_ok {
     my ($self, $name) = @_;
     local $Test::Builder::Level = $Test::Builder::Level + 1;
+    # uncoverable condition left
     $name //= 'clean close';
     unless ($self->{ws}) {
         $TB->ok(0, $name);
@@ -1015,9 +1164,11 @@ sub finish_ok {
     $self->{ws}->send_frame(opcode => 8, payload => pack('n', 1000));
     my $echoed = 0;
     while (my $f = $self->{ws}->read_frame) {
+        # uncoverable branch false
         if ($f->{opcode} == 8) { $echoed = 1; last }
     }
     $TB->ok($echoed, $name);
+    # uncoverable branch true
     $TB->diag('the close was never echoed') unless $echoed;
     $self->_ws_teardown;
     return $self;
@@ -1064,6 +1215,7 @@ sub FILL {
         close $it->{fh};
         shift @$items;
     }
+    # uncoverable statement
     return undef;
 }
 

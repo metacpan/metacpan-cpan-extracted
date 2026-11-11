@@ -3,7 +3,7 @@ package Database::BI::Command::password;
 use strict;
 use warnings;
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 use Mojo::Base 'Mojolicious::Command';
 
@@ -85,7 +85,7 @@ Database::BI::Command::password - Make the password_hash for the login
 
 =head1 VERSION
 
-0.022.0
+0.023.0
 
 =head1 SYNOPSIS
 

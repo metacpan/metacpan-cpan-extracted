@@ -46,6 +46,7 @@ WriteMakefile(
 		'LWP::UserAgent'		=> 0,		# Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 		'LWP::UserAgent::Cached'	=> 0,		# Used by Database::Abstraction for URL-backed tables (import_url)
 		'Scalar::Util'			=> 0,		# Used in DataSource.pm (blessed, looks_like_number)
+		'JSON::PP'			=> 0,		# Boundary.pm reads Nominatim's replies with it (core, declared for completeness)
 		'DB_File'			=> 0,		# Used in DataSource.pm for Berkeley DB magic-byte detection
 		'Mojolicious'	=> '9.49',
 		'Mojolicious::Plugin::Buffer'          => '0.001.1',
@@ -121,6 +122,12 @@ WriteMakefile(
 					'DBD::MariaDB' => 0,
 					# Rendering the map itself (Phase 6.1).  Also runtime-required: the
 					# rest of the application installs, starts and tests without it.
+					# 0.14 is the oldest that draws a map.  County outlines use more as
+					# it is there, and do without otherwise: the checkbox that hides
+					# them (0.15), the key to their colours (0.16), lines side by side
+					# (0.17), a key of boxes for Colour shade (0.18), and the marker key
+					# coming back while they are hidden (0.19).  The floor stays 0.14:
+					# t/recommended-versions.t holds every test and message to this entry.
 					'HTML::OSM' => '0.14',
 					# script/bi-alert reads CSV faster with it, and falls back to Text::CSV.
 					'Text::CSV_XS' => 0

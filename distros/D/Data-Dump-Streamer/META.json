@@ -4,7 +4,7 @@
       "Yves Orton <yves@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4232",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
@@ -13,32 +13,21 @@
       "version" : 2
    },
    "name" : "Data-Dump-Streamer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
    "prereqs" : {
       "build" : {
          "requires" : {
-            "B::Deparse" : "0",
-            "Carp" : "0",
-            "Config" : "0",
-            "Data::Dumper" : "0",
-            "Devel::Peek" : "0",
-            "ExtUtils::CBuilder" : "0",
-            "Symbol" : "0",
-            "Test::More" : "0",
-            "Text::Abbrev" : "0",
-            "base" : "0",
-            "overload" : "0",
-            "re" : "0",
-            "strict" : "0",
-            "utf8" : "0",
-            "vars" : "0",
-            "warnings" : "0"
+            "ExtUtils::MakeMaker" : "0"
          }
       },
       "configure" : {
          "requires" : {
-            "ExtUtils::Depends" : "0",
-            "Module::Build" : "0",
-            "perl" : "5.006"
+            "ExtUtils::MakeMaker" : "6.64"
          }
       },
       "runtime" : {
@@ -52,43 +41,42 @@
          "requires" : {
             "B" : "0",
             "B::Deparse" : "0",
-            "B::Utils" : "0",
             "Data::Dumper" : "0",
             "DynaLoader" : "0",
             "Exporter" : "0",
             "Hash::Util" : "0",
-            "IO::File" : "0",
+            "IO::Handle" : "0",
             "Symbol" : "0",
-            "Text::Abbrev" : "0",
-            "Text::Balanced" : "0",
-            "overload" : "0",
+            "perl" : "5.018",
             "re" : "0",
             "strict" : "0",
             "vars" : "0",
             "warnings" : "0",
             "warnings::register" : "0"
          }
-      }
-   },
-   "provides" : {
-      "Data::Dump::Streamer" : {
-         "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.42"
       },
-      "Data::Dump::Streamer::Deparser" : {
-         "file" : "lib/Data/Dump/Streamer.pm",
-         "version" : "2.42"
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config" : "0",
+            "Devel::Peek" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "overload" : "0",
+            "utf8" : "0"
+         }
       }
    },
    "release_status" : "stable",
    "resources" : {
-      "license" : [
-         "http://dev.perl.org/licenses/"
-      ],
       "repository" : {
-         "url" : "https://github.com/demerphq/Data-Dump-Streamer"
+         "type" : "git",
+         "url" : "https://github.com/demerphq/Data-Dump-Streamer.git",
+         "web" : "https://github.com/demerphq/Data-Dump-Streamer"
       }
    },
-   "version" : "2.42",
-   "x_serialization_backend" : "JSON::PP version 4.06"
+   "version" : "3.001",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

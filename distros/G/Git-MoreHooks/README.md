@@ -18,7 +18,7 @@
 More plugins (Git hooks) for package Git::Hooks.
 
 
-0.020
+0.021
 
 
 # SYNOPSIS

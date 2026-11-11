@@ -32,10 +32,10 @@ DBIx::Squirrel::Stages::Flow - stages taking or dropping values: take, drop, tak
 DBIx::Squirrel's name for L<Ekorn::Pipeline::Stages::Flow>, which
 describes its stages in full. It exports C<take> and C<drop> by
 default, and C<take_while> and C<drop_while> on request, or all four
-with C<:all>: Ekorn's functions, from a list of DBIx::Squirrel's own,
-so a stage added there reaches this module only once it's listed here.
-It's here to stay, beside DBIx::Squirrel's own stages, such as
-L<DBIx::Squirrel::Stages::Rows>.
+with C<:all>. They're Ekorn's functions, from a list of
+DBIx::Squirrel's own, so a stage added there reaches this module only
+once it's listed here. The module is here to stay, beside
+DBIx::Squirrel's own stages, such as L<DBIx::Squirrel::Stages::Rows>.
 
 =head1 SEE ALSO
 

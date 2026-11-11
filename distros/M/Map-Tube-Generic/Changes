@@ -1,6 +1,18 @@
-Revision history for Perl extension Map::Tube::Generic
+Revision history for Perl module Map::Tube::Generic
+
+0.2.1 2026-11-11
+  - Fixed problem with delegation of some core Map::Tube methods.
+
+0.2.0 2026-11-10
+  - Fixed problem preventing Map::Tube plugins from working.
+  - Augmented documentation.
+  - Added another test.
+  - Switched README to markdown.
+  - Added guidelines on contributing and security.
+  - Reorganised tests.
 
 0.1.0 2026-06-30
   - First public release.
+
 0.0.1 2025-03-05
   - Internal development version. No public release yet.

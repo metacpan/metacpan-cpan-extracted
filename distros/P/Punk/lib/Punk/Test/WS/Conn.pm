@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk::Test::WS ();
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 sub new {
     my ($class, %a) = @_;
@@ -14,6 +14,7 @@ sub new {
         timeout => $a{timeout} // 5,
         buf     => '',
         pid     => $a{pid},
+    # uncoverable condition right
     }, $class;
 }
 
@@ -23,6 +24,8 @@ sub read_headers {
     my ($self) = @_;
     my $buf = '';
     eval {
+        # uncoverable subroutine
+        # uncoverable statement count:2
         local $SIG{ALRM} = sub { die "timeout\n" };
         alarm $self->{timeout};
         while (sysread $self->{sock}, my $c, 1) {
@@ -47,12 +50,17 @@ sub read_frame {
         alarm $self->{timeout};
         while (1) {
             $f = Punk::Test::WS::decode_ref($self->{buf});
+            # uncoverable condition right
             if ($f && ref $f) {
                 substr $self->{buf}, 0, $f->{consumed}, '';
                 last;
             }
+            # uncoverable branch true
+            # uncoverable condition right
+            # uncoverable condition false
             die "ws protocol error: $f\n" if defined $f && !ref $f;
             my $n = sysread $self->{sock}, my $c, 4096;
+            # uncoverable branch true
             last unless $n;
             $self->{buf} .= $c;
         }

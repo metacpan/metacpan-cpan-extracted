@@ -24,11 +24,11 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 =head1 VERSION
 
-Version 0.17
+Version 0.19
 
 =cut
 
-our $VERSION = '0.17';
+our $VERSION = '0.19';
 
 # CDN URLs pinned to tested versions.  Override via constructor params to use
 # a self-hosted copy or a different version.
@@ -82,6 +82,9 @@ Readonly::Scalar my $LEGEND_SWATCH_MAX       => 25;
 # Where a GeoJSON layer's key goes: away from the marker key and the layer
 # control, which are top right.
 Readonly::Scalar my $DEFAULT_KEY_POSITION    => 'bottomright';
+# How a layer key draws an entry's colour: a line, as an outline, or a filled
+# box, as a filled area.  The first is the default.
+Readonly::Array my @KEY_SHAPES => qw(line box);
 
 =head1 SYNOPSIS
 
@@ -234,10 +237,19 @@ the reader pans or zooms, the key is drawn again, so it shows only the
 entries for what can be seen.  A marker hidden in a cluster still counts.
 An entry without a group is always listed.
 
+=item C<unless_layer>
+
+The name of a GeoJSON layer (C<add_geojson>'s C<name>).  The entry is listed
+only while that layer is hidden: for an entry the layer's own C<key> stands in
+for while the layer is shown, so the reader is not given the same colours
+twice.  When the reader unticks the layer, its key goes and the entry comes
+back.  A name no layer has leaves the entry always listed.
+
 =back
 
 When no entry is listed, the key says C<legend_empty>, by default
-"Nothing in this view".
+"Nothing in this view".  When every entry is left out for a layer that is
+shown (C<unless_layer>), the key is not drawn at all.
 
 C<new()> croaks on an entry it cannot use, and on an unknown position.
 Values from a config file or a clone skip that check, so C<onload_render()>
@@ -608,7 +620,8 @@ Returns 1 on success.
   show  : boolean   Whether a named layer is drawn when the map opens (default 1)
   key   : hashref   A key to the layer's colours, shown while the layer is
                     (see L</LAYER KEY>):
-                    { entries => [ { label, colour }, ... ], title?, position? }
+                    { entries => [ { label, colour }, ... ], title?, position?,
+                      shape? }
   bands : string    Feature property holding a list of colours, each drawn
                     as a line of its own just inside the outline, side by side
                     (see L</BANDS>)
@@ -677,6 +690,11 @@ Text printed above the entries.
 
 C<bottomright> (the default), C<bottomleft>, C<topright> or C<topleft>.  The
 marker key (C<legend>) and the layer control are top right by default.
+
+=item C<shape>
+
+C<line> (the default) draws each entry's colour as a short line, for a layer
+of outlines; C<box> draws a filled box, for a layer whose areas are filled.
 
 =back
 
@@ -1451,7 +1469,7 @@ sub onload_render
 			(map { [ @{$_}[0, 1, 4] ] } @valid_coordinates),
 			(map { [ @{$_}[0, 1, 5] ] } @valid_circles),
 		);
-		$body .= $self->_legend_js(\@legend, $legend_position, \@points);
+		$body .= $self->_legend_js(\@legend, $legend_position, \@points, _layers_shown($geojson_layers));
 	}
 
 	# GeoJSON layers.
@@ -1691,9 +1709,38 @@ sub _legend_entries
 			}
 			$out{'group'} = "$group";
 		}
+		if(defined(my $layer = $entry->{unless_layer})) {
+			if(ref($layer) || !length($layer)) {
+				$fail->("legend entry $n: unless_layer must be a layer's name");
+				next;
+			}
+			$out{'unless_layer'} = "$layer";
+		}
 		push @checked, \%out;
 	}
 	return @checked;
+}
+
+# _layers_shown: The names of the GeoJSON layers drawn when the map opens.
+# Purpose: The marker key leaves out an entry while its unless_layer is
+#          shown, so it must know which are shown before any checkbox is used.
+# Entry:   The GeoJSON layers, as add_geojson stored them.
+# Exit:    An arrayref of names, as _geojson_js decides them: a named layer
+#          is shown unless every layer of that name has show off.
+# Side effects: none.
+sub _layers_shown
+{
+	my $layers = shift;
+
+	my %shown;
+	for my $layer (@{ $layers // [] }) {
+		my $opts = $layer->{opts} || {};
+		my $name = $opts->{name};
+		next if !defined($name) || ref($name) || !length($name);
+		my $show = $opts->{show};
+		$shown{$name} = 1 if !defined($show) || ($show && $show !~ /\A(?:false|no|off)\z/i);
+	}
+	return [ sort keys %shown ];
 }
 
 # _legend_js: The script that draws the key and keeps it to what is in view.
@@ -1708,7 +1755,15 @@ sub _legend_entries
 #          the page through textContent, never as markup.
 sub _legend_js
 {
-	my ($self, $entries, $position, $points) = @_;
+	my ($self, $entries, $position, $points, $shown) = @_;
+
+	# An entry may wait on a layer being hidden.  The layer control reports a
+	# layer by its label, which is the name escaped as HTML, so that is what
+	# the script compares; the entries are copied, not changed.
+	$entries = [ map {
+		defined($_->{unless_layer}) ? { %{$_}, unless_layer => _html_attr($_->{unless_layer}) } : $_
+	} @{$entries} ];
+	my $shown_json = _html_json({ map { _html_attr($_) => \1 } @{ $shown // [] } });
 
 	# Groups are numbered, so each marker adds two numbers and an index
 	my (%index, @groups);
@@ -1733,6 +1788,7 @@ sub _legend_js
 				var legendPoints = [$points_js];
 				var legendTitle = '$title';
 				var legendEmpty = '$empty';
+				var layerShown = $shown_json;
 				var legend = L.control({ position: '$position' });
 				legend.onAdd = function() {
 					var div = L.DomUtil.create('div', 'html-osm-legend');
@@ -1757,7 +1813,9 @@ sub _legend_js
 						div.appendChild(title);
 					}
 					var shown = 0;
+					var waiting = 0;
 					legendEntries.forEach(function(e) {
+						if(e.unless_layer !== undefined && layerShown[e.unless_layer]) { waiting++; return; }
 						if(e.group !== undefined && !inView[e.group]) { return; }
 						var row = document.createElement('div');
 						row.className = 'html-osm-legend-entry';
@@ -1773,6 +1831,8 @@ sub _legend_js
 						div.appendChild(row);
 						shown++;
 					});
+					// Every entry stood in for by a layer's own key: no key here
+					div.style.display = (waiting && waiting === legendEntries.length) ? 'none' : '';
 					if(!shown) {
 						var none = document.createElement('em');
 						none.textContent = legendEmpty;
@@ -1781,6 +1841,8 @@ sub _legend_js
 				}
 				drawLegend();
 				map.on('moveend', drawLegend);
+				map.on('overlayadd', function(e) { layerShown[e.name] = true; drawLegend(); });
+				map.on('overlayremove', function(e) { layerShown[e.name] = false; drawLegend(); });
 			})();
 };
 }
@@ -1941,8 +2003,13 @@ Readonly::Scalar my $LAYER_KEY_JS => <<'JS';
 							var row = document.createElement('div');
 							row.className = 'html-osm-legend-entry';
 							var swatch = document.createElement('span');
-							swatch.style.cssText = 'display: inline-block; vertical-align: middle; margin-right: 6px; width: 18px; height: 0;';
-							swatch.style.borderTop = '3px solid ' + e.colour;
+							if(k.shape === 'box') {
+								swatch.style.cssText = 'display: inline-block; vertical-align: middle; margin-right: 6px; width: 16px; height: 12px; border: 1px solid rgba(0,0,0,0.35);';
+								swatch.style.background = e.colour;
+							} else {
+								swatch.style.cssText = 'display: inline-block; vertical-align: middle; margin-right: 6px; width: 18px; height: 0;';
+								swatch.style.borderTop = '3px solid ' + e.colour;
+							}
 							row.appendChild(swatch);
 							row.appendChild(document.createTextNode(e.label));
 							div.appendChild(row);
@@ -2149,7 +2216,11 @@ sub _layer_key
 	croak 'add_geojson: key position must be one of ' . join(', ', @LEGEND_POSITIONS)
 		unless !ref($position) && grep { $_ eq $position } @LEGEND_POSITIONS;
 
-	my %out = (entries => \@checked, position => $position);
+	my $shape = $key->{shape} // $KEY_SHAPES[0];
+	croak 'add_geojson: key shape must be one of ' . join(', ', @KEY_SHAPES)
+		unless !ref($shape) && grep { $_ eq $shape } @KEY_SHAPES;
+
+	my %out = (entries => \@checked, position => $position, shape => $shape);
 	if(defined(my $title = $key->{title})) {
 		croak 'add_geojson: key title must be text' if ref($title);
 		$out{title} = "$title" if length($title);

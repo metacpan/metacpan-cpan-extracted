@@ -4,8 +4,10 @@ package DBIx::Squirrel::Util;
 
 use Data::Dumper qw();
 use Exporter     qw(import);
-use Ref::Util    qw(is_arrayref is_coderef is_hashref is_ref);
+use Ref::Util    qw(is_arrayref is_hashref is_ref);
 use Sub::Util    qw(set_subname subname);
+
+use Ekorn::Pipeline qw(is_stage);
 
 use DBIx::Squirrel::Errors qw(croakf);
 
@@ -73,11 +75,11 @@ sub split_attrs ($attrs) {
     return $attrs && \%dbi, \%ekorn;
 }
 
-# Take the code references off the end of a list of arguments, and return
-# them.
+# Take the stages off the end of a list of arguments, and return them. A
+# stage is a code reference or a pipeline.
 sub split_stages ($args) {
     my $n = @$args;
-    $n -= 1 while $n && is_coderef($args->[$n - 1]);
+    $n -= 1 while $n && is_stage($args->[$n - 1]);
     return splice @$args, $n;
 }
 
@@ -110,8 +112,8 @@ DBIx::Squirrel::Util - helpers shared by DBIx::Squirrel's modules
 =head1 DESCRIPTION
 
 Functions DBIx::Squirrel's modules share, exported on request. They're
-for DBIx::Squirrel itself, not for use elsewhere, and may change without
-notice.
+for DBIx::Squirrel itself, not for use elsewhere. They may change
+without notice.
 
 =head1 FUNCTIONS
 
@@ -121,8 +123,8 @@ notice.
 
     $string = canonical(\%options);
 
-Returns options as a string, the same for the same options, for the
-DBI's caches to key on.
+Returns options as a string, for the DBI's caches to key on. The same
+options give the same string.
 
 =item install_sub
 
@@ -140,8 +142,8 @@ Returns true if a name can be a subroutine's.
 
     $iterator = iterator_going($sth);
 
-Returns the iterator going through a statement handle's results, if one
-has results left to hand out, or nothing.
+Returns the iterator going through a statement handle's results, if it
+has results left to hand out. Otherwise returns nothing.
 
 =item shift_attrs
 
@@ -161,16 +163,17 @@ starting C<ekorn_>.
 
     @stages = split_stages(\@args);
 
-Takes the code references off the end of a list of arguments, and
-returns them.
+Takes the stages, code references or pipelines, off the end of a list
+of arguments, and returns them.
 
 =item unwrap_values
 
     @values = unwrap_values($driver, $taken, $lists, @values);
 
 Returns the bind values given, or those in an array reference given
-alone, unless it's the one value of a statement taking one: a list, for
-a list placeholder, or, with DBD::Pg, a PostgreSQL array.
+alone. The exception is an array reference that's the one value of a
+statement taking one: a list, for a list placeholder, or, with
+DBD::Pg, a PostgreSQL array. That's returned unchanged.
 
 =back
 
@@ -180,8 +183,8 @@ a list placeholder, or, with DBD::Pg, a PostgreSQL array.
 
 =item Expected a reference to a HASH or ARRAY
 
-The first argument after a statement was a reference, but not to a hash
-or an array, as L<DBIx::Squirrel::db/do> describes.
+The first argument after a statement was a reference, but not to a
+hash or an array. See L<DBIx::Squirrel::db/do>.
 
 =back
 

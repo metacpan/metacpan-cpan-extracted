@@ -74,19 +74,19 @@ DBIx::Squirrel::Results - an iterator handing out rows as objects
 
 =head1 DESCRIPTION
 
-A result set is a L<DBIx::Squirrel::Iterator> whose rows are objects:
-each row is fetched as an array and blessed into a class with a method
-for each column, named in lower case, before the stages see it.
-L<DBIx::Squirrel::Result> says how the classes are made, and how to give
-rows methods of their own with the C<ekorn_result_class> attribute, on
-C<connect> or C<prepare>.
+A result set is a L<DBIx::Squirrel::Iterator> whose rows are objects.
+Each row is fetched as an array, then blessed into a class with a
+method for each column, named in lower case, before the stages see it.
+L<DBIx::Squirrel::Result> says how the classes are made. It also says
+how to give rows methods of their own, with the C<ekorn_result_class>
+attribute, on C<connect> or C<prepare>.
 
-Rows are always arrays: the C<ekorn_slice> attribute doesn't apply.
+Rows are always arrays. The C<ekorn_slice> attribute doesn't apply.
 
 A result set is made by L<DBIx::Squirrel::db/results> or
-L<DBIx::Squirrel::st/results>, and has the iterator's methods, and no
+L<DBIx::Squirrel::st/results>. It has the iterator's methods, and no
 others. A row needs nothing from its result set, and can be kept after
-it's gone.
+the result set has gone.
 
 =head1 DIAGNOSTICS
 

@@ -1023,6 +1023,27 @@ subtest 'loc= repeated geocodes the columns joined with ", "' => sub {
 		->json_is('/columns/address/kind' => 'location');
 	$t->post_ok('/geo/save' => form => { l => $houses_spec, col => 'country', kind => 'suffix' })
 		->status_is(400, 'an unknown kind is still refused');
+
+	# Remember columns keeps the text added to each place too.
+	$t->get_ok('/open?path=' . url_escape($houses_csv))
+		->element_exists('input#map-loc-text-inp[name="loc_text"]', 'the panel has Add to each place');
+	$t->post_ok('/geo/save' => form => {
+		l => $houses_spec, replace => 1, col => 'address', kind => 'location', loc_text => '  Slovenia ',
+	})->status_is(200);
+	$t->get_ok('/geo/list?l=' . url_escape($houses_spec))
+		->json_is('/loc_text' => 'Slovenia', 'remembered, tidied')
+		->json_is('/columns/address/kind' => 'location')
+		->json_hasnt('/columns/country', 'replace=1 forgot the old columns');
+	$t->post_ok('/geo/save' => form => { l => $houses_spec, replace => 1, col => 'address', kind => 'location' })
+		->status_is(200);
+	$t->get_ok('/geo/list?l=' . url_escape($houses_spec))
+		->json_hasnt('/loc_text', 'saved again without it, it is forgotten');
+	$t->post_ok('/geo/save' => form => { l => $houses_spec, col => 'address', kind => 'location', loc_text => 'Slovenia' });
+	$t->post_ok('/geo/delete' => form => { l => $houses_spec })->status_is(200);
+	$t->get_ok('/geo/list?l=' . url_escape($houses_spec))
+		->json_hasnt('/loc_text', 'Forget remembered columns forgets it too');
+	$t->post_ok('/geo/save' => form => { l => $houses_spec, col => 'address', kind => 'location', loc_text => 'x' x 201 })
+		->status_is(400, 'text the map would refuse is refused');
 };
 
 subtest 'the places that were not plotted can be listed, and their rows opened' => sub {
@@ -1210,7 +1231,7 @@ subtest 'A browser is shown the map at once, with the places to look up listed' 
 		'it counts the places that are not cached, once each, without the bare number');
 	like($body, qr/L\.marker\(\[51\.33, 1\.42\]/, 'a cached place is on the map already');
 	unlike($body, qr/class="map-notes"/, 'the notes wait until the places are looked up');
-	like($body, qr{fetch\('/geo/lookup'}, 'the page posts to /geo/lookup');
+	like($body, qr{fetch\(outline \? '/geo/boundary' : '/geo/lookup'}, 'the page posts to /geo/lookup (and an outline to /geo/boundary)');
 
 	my ($json) = $body =~ m{<script\b[^>]*\stype="application/json" id="map-pending">(.*?)</script>}s;
 	ok(defined($json), 'the places are listed for the script');
@@ -1253,6 +1274,16 @@ subtest 'A browser is shown the map at once, with the places to look up listed' 
 	my ($retry) = $body =~ /id="map-retry" href="([^"]*)"/;
 	ok(defined($retry), 'with a link to look it up');
 	unlike(html_unescape($retry // ''), qr/geocode=/, 'which is the map without geocode=');
+
+	# Trying again looks up only what is left: Walmer, found before Cancel,
+	# comes from the cache.
+	$t->get_ok(html_unescape($retry // ''), $html)->status_is(200);
+	$body = $t->tx->res->body;
+	is(scalar @{ $stub->{'calls'} }, $calls + 1, 'trying again asks nothing before the bar starts');
+	my ($again) = $body =~ m{<script\b[^>]*\stype="application/json" id="map-pending">(.*?)</script>}s;
+	is_deeply([ map { $_->{place} } @{ decode_json($again // '[]') } ], [ 'Sandwich' ],
+		'only the place not looked up is listed again');
+	like($body, qr/L\.marker\(\[51\.2, 1\.4\]/, 'and Walmer is on the map already');
 
 	# Sandwich is not found: remembered as such, so the next page is complete.
 	$t->post_ok('/geo/lookup' => form => $pending->[1])->status_is(200)
@@ -1351,5 +1382,65 @@ subtest 'a popup lists every row at a place, capped, with a link to the rest' =>
 	unlike $t->tx->res->body, qr/and \d+ more/, 'a bad map_popup_rows is ignored';
 };
 
+# ===========================================================================
+# loc_text= -- text added to the end of each place before it is looked up
+# ===========================================================================
+
+subtest 'GET /map?loc_text= adds text to each place' => sub {
+	$stub->{'results'}{'Deal, Kent, England'} =
+		Stub::Point->new(latitude => 51.22, longitude => 1.40, database => 'OpenAddresses');
+	my $before = scalar @{ $stub->{'calls'} };
+
+	$t->get_ok(_url(l => $towns_spec, loc => 'town', loc_text => '  Kent,   England '))
+		->status_is(200)
+		->content_like(qr/from column town with &ldquo;Kent, England&rdquo; added/, 'the summary says so');
+
+	my @asked = map { @{ $_->{'values'} } } @{ $stub->{'calls'} }[ $before .. $#{ $stub->{'calls'} } ];
+	is_deeply([ sort @asked ], [ 'Deal, Kent, England', 'Faversham, Kent, England' ],
+		'each place is looked up with the text, its spaces tidied');
+	like($t->tx->res->body, qr/L\.marker\(\[51\.22, 1\.4\]/, 'and plotted');
+
+	my $chart = decode_json($t->tx->res->dom->at('#new-canvas-panel')->attr('data-chart'));
+	is($chart->{encode}{loc_text}, 'Kent, England', 'a canvas card made from the map keeps it');
+
+	# A leading comma is dropped, as the place and the text are joined with one.
+	$before = scalar @{ $stub->{'calls'} };
+	$t->get_ok(_url(l => $towns_spec, loc => 'town', loc_text => ', Kent, England'))->status_is(200);
+	is(scalar @{ $stub->{'calls'} }, $before, 'the same places, answered from the cache');
+
+	# Cancelled part way, with the text: what was found is kept under the
+	# place with its text, and trying again lists only the rest.
+	my $html = { Accept => 'text/html' };
+	my $kent = _write_file(File::Spec->catfile(tempdir(CLEANUP => 1), 'kent.csv'),
+		"id,town\n1,Whitstable\n2,Herne Bay\n");
+	my $kent_url = _url(l => "path:$kent", loc => 'town', loc_text => 'Kent');
+	$t->get_ok($kent_url, $html)->status_is(200);
+	my ($json) = $t->tx->res->body =~ m{<script\b[^>]*\stype="application/json" id="map-pending">(.*?)</script>}s;
+	my $pending = decode_json($json // '[]');
+	is_deeply([ map { $_->{place} } @{$pending} ], [ 'Whitstable, Kent', 'Herne Bay, Kent' ],
+		'the progress bar looks up each place with the text');
+	$stub->{'results'}{'Whitstable, Kent'} =
+		Stub::Point->new(latitude => 51.36, longitude => 1.03, database => 'OpenAddresses');
+	$t->post_ok('/geo/lookup' => form => $pending->[0])->status_is(200)->json_is('/stored', 1);
+	$before = scalar @{ $stub->{'calls'} };
+	$t->get_ok($kent_url, $html)->status_is(200);	# after Cancel, opened again
+	($json) = $t->tx->res->body =~ m{<script\b[^>]*\stype="application/json" id="map-pending">(.*?)</script>}s;
+	is_deeply([ map { $_->{place} } @{ decode_json($json // '[]') } ], [ 'Herne Bay, Kent' ],
+		'opened again, only the place not looked up is listed');
+	like($t->tx->res->body, qr/L\.marker\(\[51\.36, 1\.03\]/, 'the one found is drawn from the cache');
+	is(scalar @{ $stub->{'calls'} }, $before, 'without asking the geocoder');
+
+	# A row with no place is not looked up at the text alone.
+	$t->get_ok(_url(l => $places_spec, loc => 'place', loc_text => 'Kent'))->status_is(200);
+	ok(!(grep { $_ eq 'Kent' } map { @{ $_->{'values'} } } @{ $stub->{'calls'} }), 'no lookup of "Kent" alone');
+
+	$t->get_ok(_url(l => $towns_spec, loc => 'town', loc_text => 'x' x 201))->status_is(400)
+		->content_like(qr/loc_text= is the text added to the end of each place, at most 200 characters/);
+	$t->get_ok(_url(l => $towns_spec, loc => 'town', loc_text => "Kent\nEngland"))->status_is(400);
+
+	# Coordinates need no help.
+	$t->get_ok(_url(l => $places_spec, lat => 'lat', lon => 'lon', loc_text => 'Kent'))->status_is(200)
+		->content_unlike(qr/added\./, 'ignored with lat= and lon=');
+};
 
 done_testing();

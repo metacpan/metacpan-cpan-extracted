@@ -204,7 +204,7 @@ EXPECT
         same(scalar $o->Data(*g)->Out, <<'EXPECT', "self glob", $o);
 $VAR1 = *::g;
 *::g = \do { my $v = 'V: *::g{SCALAR}' };
-${*::g} = *::g{SCALAR};
+${*::g{SCALAR}} = *::g{SCALAR};
 EXPECT
     }
 
@@ -231,7 +231,6 @@ EXPECT
     same("Named Globs", $o->Declare(0)->Names('*foo', '*bar', '*baz'),
         <<'EXPECT', (\\*foo, \\@foo, \\%foo));
 $foo = \\*::foo;
-*::foo = \do { my $v = 5 };
 $bar = \[
          -10,
          $$foo,
@@ -240,10 +239,11 @@ $bar = \[
 *::foo = $$bar;
 $baz = \{
          a => 1,
-         b => *::foo{SCALAR},
+         b => \do { my $v = 5 },
          c => $$bar,
          d => 'V: $$baz'
        };
+*::foo = ${$baz}->{b};
 *::foo = $$baz;
 ${$bar}->[2] = $$baz;
 ${$baz}->{d} = $$baz;
@@ -253,7 +253,6 @@ EXPECT
         $o->Names('foo', 'bar', 'baz'),
         <<'EXPECT', (\\*foo, \\@foo, \\%foo));
 $foo = \\*::foo;
-*::foo = \do { my $v = 5 };
 $bar = \[
          -10,
          $$foo,
@@ -262,10 +261,11 @@ $bar = \[
 *::foo = $$bar;
 $baz = \{
          a => 1,
-         b => *::foo{SCALAR},
+         b => \do { my $v = 5 },
          c => $$bar,
          d => 'V: $$baz'
        };
+*::foo = ${$baz}->{b};
 *::foo = $$baz;
 ${$bar}->[2] = $$baz;
 ${$baz}->{d} = $$baz;
@@ -275,7 +275,6 @@ EXPECT
         $o->Declare(1)->Names('*foo', '*bar', '*baz'),
         <<'EXPECT', (\\*foo, \\@foo, \\%foo));
 my $foo = \\*::foo;
-*::foo = \do { my $v = 5 };
 my $bar = \[
             -10,
             $$foo,
@@ -284,10 +283,11 @@ my $bar = \[
 *::foo = $$bar;
 my $baz = \{
             a => 1,
-            b => *::foo{SCALAR},
+            b => \do { my $v = 5 },
             c => $$bar,
             d => 'V: $$baz'
           };
+*::foo = ${$baz}->{b};
 *::foo = $$baz;
 ${$bar}->[2] = $$baz;
 ${$baz}->{d} = $$baz;
@@ -297,7 +297,6 @@ EXPECT
         $o->Names('foo', 'bar', 'baz'),
         <<'EXPECT', (\\*foo, \\@foo, \\%foo));
 my $foo = \\*::foo;
-*::foo = \do { my $v = 5 };
 my $bar = \[
             -10,
             $$foo,
@@ -306,10 +305,11 @@ my $bar = \[
 *::foo = $$bar;
 my $baz = \{
             a => 1,
-            b => *::foo{SCALAR},
+            b => \do { my $v = 5 },
             c => $$bar,
             d => 'V: $$baz'
           };
+*::foo = ${$baz}->{b};
 *::foo = $$baz;
 ${$bar}->[2] = $$baz;
 ${$baz}->{d} = $$baz;

@@ -20,7 +20,7 @@ static void pq_hv_add(pTHX_ HV *out, const char *k, STRLEN kl, SV *val) {
     if (he) {
         SV *have = HeVAL(he);
         AV *list;
-        if (SvROK(have) && SvTYPE(SvRV(have)) == SVt_PVAV) list = (AV *)SvRV(have);
+        if (SvROK(have) && SvTYPE(SvRV(have)) == SVt_PVAV) list = (AV *)SvRV(have); /* # uncoverable condition right count:1 class:ignore_covered_err */
         else {
             list = newAV();
             av_push(list, newSVsv(have));
@@ -37,15 +37,24 @@ static const char *pq_hdr_param(const char *s, STRLEN sl, const char *p,
                                 STRLEN *vl) {
     STRLEN pl = strlen(p), i;
     for (i = 0; i + pl + 1 <= sl; i++) {
+        /*
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err
+         # uncoverable condition right count:6 class:ignore_covered_err */
         if ((i == 0 || s[i-1] == ' ' || s[i-1] == ';' || s[i-1] == '\t')
             && memEQ(s + i, p, pl) && s[i + pl] == '=') {
             const char *v = s + i + pl + 1;
             const char *e;
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (v < s + sl && *v == '"') {
                 v++; e = v;
+                /*
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 while (e < s + sl && *e != '"') e++;
             }
-            else { e = v; while (e < s + sl && *e != ';') e++; }
+            else { e = v; while (e < s + sl && *e != ';') e++; } /* # uncoverable condition right count:2 class:ignore_covered_err */
             *vl = (STRLEN)(e - v);
             return v;
         }

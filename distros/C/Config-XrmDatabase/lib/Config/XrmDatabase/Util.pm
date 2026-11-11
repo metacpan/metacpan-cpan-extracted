@@ -5,7 +5,7 @@ package Config::XrmDatabase::Util;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Config::XrmDatabase::Failure ':all';
 
@@ -51,7 +51,7 @@ our %EXPORT_TAGS = (
     hashes    => [qw( %META %RMETA )],
     funcs     => [
         qw( parse_resource_name parse_fq_resource_name
-          normalize_key name_arr_to_str is_wildcard ),
+          normalize_key name_arr_to_str is_binding_operator is_wildcard ),
     ],
 );
 
@@ -162,11 +162,33 @@ sub name_arr_to_str ( $name_arr ) {
 
 
 
-
-sub is_wildcard( $string ) {
+sub is_binding_operator( $string ) {
     return $string eq TIGHT || $string eq LOOSE;
 }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+sub is_wildcard( $string ) {
+    warnings::warnif( 'deprecated',
+        'Config::XrmDatabase::Util::is_wildcard is deprecated; use is_binding_operator instead' );
+    return is_binding_operator( $string );
+}
 
 1;
 
@@ -192,7 +214,7 @@ Config::XrmDatabase::Util - Constants that won't change, and other utilitarian t
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 SUBROUTINES
 
@@ -224,14 +246,29 @@ validate the input.
 
   $str = name_arr_to_str( \@array );
 
-Given a key name in internal representation, return an non-normalized string name.
+Given a key name in internal representation, return a normalized string name.
+
+=head2 is_binding_operator
+
+   $bool = is_binding_operator( $char );
+
+Returns true if the character is a binding operator (C<.> or C<*>).
 
 =head2 is_wildcard
 
    $bool = is_wildcard( $char );
 
-Returns true if the character is a wildcard character (nominally C<*>
-and C<?>).
+B<Deprecated.> Use L</is_binding_operator> instead.
+
+Despite its name and its earlier documentation (which claimed it
+tested for C<*> and C<?>), this returns true if the character is a
+binding operator (C<.> or C<*>).  It is identical to
+L</is_binding_operator>.
+
+Calling it emits a warning in the C<deprecated> category, which may
+be silenced with
+
+   no warnings 'deprecated';
 
 =for Pod::Coverage TIGHT
 SINGLE

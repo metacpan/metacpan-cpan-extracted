@@ -1,4 +1,4 @@
-package Dist::Conformance::Config 0.003;
+package Dist::Conformance::Config 0.004;
 
 # ABSTRACT: .conformance.yml, which picks the flavor of a repository and its source
 
@@ -64,7 +64,7 @@ Dist::Conformance::Config - .conformance.yml, which picks the flavor of a reposi
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

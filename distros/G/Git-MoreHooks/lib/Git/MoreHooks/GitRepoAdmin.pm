@@ -12,10 +12,10 @@ use feature qw( say );
 
 # ABSTRACT: Integrate with .git-repo-admin
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 
-use Git::Hooks;
+use Git::Hooks 2.014000;    # v2.14.0: oldest release on CPAN
 use English qw( -no_match_vars );
 use Path::Tiny;
 use Cwd;
@@ -277,7 +277,7 @@ Git::MoreHooks::GitRepoAdmin - Integrate with .git-repo-admin
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

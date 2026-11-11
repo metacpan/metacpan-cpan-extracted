@@ -3,7 +3,7 @@ verbose = 11
 
 theme = core + pbp + bugs + maintenance + cosmetic + complexity + security + tests + moose
 
-exclude = Subroutines::ProhibitCallsToUndeclaredSubs
+exclude = Subroutines::ProhibitCallsToUndeclaredSubs ValuesAndExpressions::RequireConsistentQuoting
 
 [BuiltinFunctions::ProhibitStringySplit]
 severity = 3

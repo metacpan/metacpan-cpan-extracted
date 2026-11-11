@@ -1,5 +1,5 @@
 package Gears::Generator;
-$Gears::Generator::VERSION = '0.104';
+$Gears::Generator::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -56,7 +56,6 @@ sub generate ($self, $name, $target_dir)
 		($target_file, $content) = $self->_process_file($target_file, $content);
 
 		$target_file = path($target_file);
-		$target_file->parent->mkdir;
 		push @generated, [$target_file, $content];
 
 		Gears::X::Generator->raise("file already exists: $target_file, aborting")
@@ -64,6 +63,7 @@ sub generate ($self, $name, $target_dir)
 	}
 
 	foreach my $item (@generated) {
+		$item->[0]->parent->mkdir;
 		$item->[0]->spew({binmode => ':encoding(UTF-8)'}, $item->[1]);
 	}
 

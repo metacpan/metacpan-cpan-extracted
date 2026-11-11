@@ -333,7 +333,9 @@ apophis_meta_read(pTHX_ const char *meta_path)
     char *buf, *p, *end;
     SSize_t nread;
 
-    if (apophis_stat(meta_path, &st) != 0) return NULL;
+    /* A directory opens, and on the BSDs, Cygwin and the Hurd reads
+     * too, so it is refused by its mode rather than by the read. */
+    if (apophis_stat(meta_path, &st) != 0 || S_ISDIR(st.st_mode)) return NULL;
 
     fh = PerlIO_open(meta_path, "r");
     if (!fh) return NULL;
@@ -345,10 +347,17 @@ apophis_meta_read(pTHX_ const char *meta_path)
     if (!buf) { PerlIO_close(fh); return NULL; }
 
     nread = PerlIO_read(fh, buf, (Size_t)st.st_size);
-    if (PerlIO_error(fh)) nread = -1;
+    /* A read that fails after the open and the stat succeeded is
+     * nothing a test can arrange on a file.
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
+    if (nread < 0 || PerlIO_error(fh)) {
+        PerlIO_close(fh); /* # uncoverable statement */
+        free(buf); /* # uncoverable statement */
+        return NULL; /* # uncoverable statement */
+    }
     PerlIO_close(fh);
-
-    if (nread < 0) { free(buf); return NULL; }
     buf[nread] = '\0';
 
     meta = newHV();
@@ -548,6 +557,8 @@ apophis_do_fetch(pTHX_ const char *who, SV *self, SV *id, SV **args, I32 items)
     apophis_id_path(aTHX_ who, apophis_self_hv(aTHX_ who, self), id, args, items, path, sizeof(path), &id_str, &id_len);
     if (apophis_stat(path, &st) != 0)
         return &PL_sv_undef;
+    if (S_ISDIR(st.st_mode))
+        croak("%s: read error on '%s': %s", who, path, strerror(EISDIR));
 
     fh = PerlIO_open(path, "rb");
     if (!fh)
@@ -556,14 +567,17 @@ apophis_do_fetch(pTHX_ const char *who, SV *self, SV *id, SV **args, I32 items)
     content = newSV((STRLEN)st.st_size + 1);
     SvPOK_on(content);
     nread = PerlIO_read(fh, SvPVX(content), (Size_t)st.st_size);
-    if (PerlIO_error(fh))
-        nread = -1;
-    PerlIO_close(fh);
-
-    if (nread < 0) {
-        SvREFCNT_dec(content);
-        croak("%s: read error on '%s'", who, path);
+    /* A read that fails after the open and the stat succeeded is
+     * nothing a test can arrange on a file.
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
+    if (nread < 0 || PerlIO_error(fh)) {
+        PerlIO_close(fh); /* # uncoverable statement */
+        SvREFCNT_dec(content); /* # uncoverable statement */
+        croak("%s: read error on '%s'", who, path); /* # uncoverable statement */
     }
+    PerlIO_close(fh);
     SvCUR_set(content, (STRLEN)nread);
     *SvEND(content) = '\0';
     return newRV_noinc(content);
@@ -743,14 +757,16 @@ ap_ck_entersub(pTHX_ OP *o)
         if (len == ap_names[i].len && memEQ(name, ap_names[i].name, len)) {
             o->op_type   = OP_CUSTOM;
             o->op_ppaddr = ap_pp[ap_names[i].which];
-#if PERL_VERSION_GE(5,16,0)
             /* A perl that gives entersub a pad slot of its own, as 5.40
-             * and 5.42 do, never reaches the allocation.
+             * and 5.42 do, never reaches the allocation. One that does
+             * not, every perl below 5.16 among them, would otherwise
+             * leave the op writing to pad slot 0. Perl_pad_alloc is
+             * the name every perl exports, pad_alloc the API only
+             * since 5.16.
              # uncoverable branch true
              # uncoverable condition left count:1 */
             if (!o->op_targ)
-                o->op_targ = pad_alloc(OP_ENTERSUB, SVs_PADTMP); /* # uncoverable statement */
-#endif
+                o->op_targ = Perl_pad_alloc(aTHX_ OP_ENTERSUB, SVs_PADTMP); /* # uncoverable statement */
             break;
         }
     }
@@ -885,13 +901,18 @@ ap_boot_ops(pTHX)
         XopENTRY_set(&ap_xop[i], xop_class, OA_UNOP);
         Perl_custom_op_register(aTHX_ ap_pp[i], &ap_xop[i]);
     }
+    /* A perl before 5.14 has no XOP, so B cannot tell the shape of a
+     * custom op and its walkers, B::Deparse's among them, die at the
+     * kids. There the calls stay entersubs. */
 #if PERL_VERSION_GE(5,16,0)
     wrap_op_checker(OP_ENTERSUB, ap_ck_entersub, &ap_next_ck_entersub);
-#else
+#elif PERL_VERSION_GE(5,14,0)
     if (!ap_next_ck_entersub) {
         ap_next_ck_entersub = PL_check[OP_ENTERSUB];
         PL_check[OP_ENTERSUB] = ap_ck_entersub;
     }
+#else
+    PERL_UNUSED_VAR(ap_next_ck_entersub);
 #endif
 }
 

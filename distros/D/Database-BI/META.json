@@ -62,6 +62,7 @@
             "HTTP::Message" : "0",
             "HTTP::Request" : "0",
             "IPC::System::Simple" : "0",
+            "JSON::PP" : "0",
             "LWP::UserAgent" : "0",
             "LWP::UserAgent::Cached" : "0",
             "List::Util" : "1.40",
@@ -124,6 +125,6 @@
          "web" : "https://github.com/nigelhorne/Database-BI"
       }
    },
-   "version" : "0.022.0",
+   "version" : "0.023.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

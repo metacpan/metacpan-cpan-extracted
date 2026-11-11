@@ -223,6 +223,18 @@ alone.
 Every other option is passed through as written, so text inside `legend`, `text`
 and friends is Python syntax throughout: `legend => 'loc = "upper left"'`.
 
+**Never pass untrusted text to an option.**  Text that reads as Python is
+written into the script as Python, so text from a web form, a file you did not
+write, or anyone else is a way to run code as you.  In a `title`, a label or
+`suptitle`, `'"t", fontsize = __import__("os").getpid()'` reads as a literal
+followed by a keyword argument, and lands in the script whole.  Only text with
+no quote character in it, `'` or `"`, is certain to be quoted, so a label built
+from untrusted text must have its quotes removed first.  `legend`, `text` and
+the other options passed through as written are never quoted at all:
+`legend => 'x = exec(...)'` runs, quotes or no quotes, so untrusted text must
+never reach them.  The keys of `data` are always escaped, and are
+the place for text you did not write.
+
 The exception is an option written as a `plt.` call, such as `xscale`, `ylim`
 or `axhline`, at a single plot and at a subplot alike.  A word is quoted for
 you, so `xscale => 'log'` becomes `plt.xscale('log')`.  A value that is already
@@ -296,6 +308,36 @@ another.  The rest of the call stays as it is:
        title       => 'Gospel word counts',
        engine      => 'gnuplot',    # or 'ggplot2', or 'matplotlib', the default
     );
+
+Here is one call, a `bar`, a `boxplot`, a `hist` and a `plot` in four subplots,
+drawn by each engine in its own default style.  Only `engine` differs between
+them; `engine.examples.pl` in the repository draws all three.
+
+    plt(
+       output_file => 'engines.png',
+       engine      => $engine,    # 'matplotlib', 'gnuplot' or 'ggplot2'
+       ncols       => 2,
+       nrows       => 2,
+       suptitle    => "engine: $engine",
+       plots       => [
+          { plot_type => 'bar',     title => 'bar',
+            data => { Matthew => 18345, Mark => 11304, Luke => 19482, John => 15635 } },
+          { plot_type => 'boxplot', title => 'boxplot', data => \%groups },
+          { plot_type => 'hist',    title => 'hist',    data => \%groups },
+          { plot_type => 'plot',    title => 'plot',
+            data => { sin => [ \@x, [ map { sin } @x ] ],
+                      cos => [ \@x, [ map { cos } @x ] ] } },
+       ],
+    );
+
+where `%groups` holds two samples of 200 normal deviates, `A` and `B`, and `@x`
+runs from 0 to 10.
+
+<img width="651" height="491" alt="four subplots drawn by matplotlib" src="https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/engine.matplotlib.png" />
+
+<img width="640" height="480" alt="four subplots drawn by gnuplot" src="https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/engine.gnuplot.png" />
+
+<img width="640" height="480" alt="four subplots drawn by ggplot2" src="https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/engine.ggplot2.png" />
 
 | `engine` | writes | runs it with | needs |
 | -------- | ------- | ------- | ------- |
@@ -445,7 +487,7 @@ Colarbar args attempt to match matplotlib closely
 | Option | Description | Example |
 | -------- | ------- | ------- 
 |`cbdrawedges` | Whether to draw lines at color boundaries | `cbdrawedges => 1`|
-|`cblabel`      | The label on the colorbar's long axis | `cblabel => 1` |
+|`cblabel`      | The label on the colorbar's long axis | `cblabel => 'kJ/mol'` |
 |`cblocation`   |  of the colorbar None or {'left', 'right', 'top', 'bottom'} | |
 |`cborientation` | # None or {`vertical`, `horizontal`} |
 |`cbpad`        | pad : float, default: 0.05 if vertical, 0.15 if horizontal; Fraction of original Axes between colorbar and new image Axes
@@ -467,6 +509,7 @@ Anything else, such as `'yes'`, is refused by name, since it could mean either.
 |`scale`  | scale/multiply the size of the output figure; this and the two below must be finite and above 0 | `scale => 2.4`|
 |`scalex` | scale/multiply the x-axis only | `scalex => 2.4` |
 |`scaley` | scale/multiply the y-axis only | `scaley => 1.4` |
+|`dpi` | dots per inch of the saved file, a finite number above 0; matplotlib's own default if left out. Given beside `plots` or `p`, not in a subplot. The matplotlib engine only, as of version 0.3343 | `dpi => 300` |
 
 # Examples/Plot Types
 

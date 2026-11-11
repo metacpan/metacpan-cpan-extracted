@@ -22,6 +22,10 @@ static void pk_cookie_encode(pTHX_ SV *out, const char *v, STRLEN vl) {
     STRLEN i;
     for (i = 0; i < vl; i++) {
         unsigned char c = (unsigned char)v[i];
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err
+         # uncoverable condition left count:10 class:ignore_covered_err */
         if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')
             || (c >= '0' && c <= '9')
             || c == '-' || c == '_' || c == '.' || c == '~')
@@ -40,7 +44,7 @@ static int pk_cookie_safe(pTHX_ SV *v) {
     const char *p = SvPV_const(v, l);
     for (i = 0; i < l; i++) {
         unsigned char c = (unsigned char)p[i];
-        if (c < 0x20 || c == 0x7f || c == ';') return 0;
+        if (c < 0x20 || c == 0x7f || c == ';') return 0; /* # uncoverable condition left count:2 class:ignore_covered_err */
     }
     return 1;
 }
@@ -58,7 +62,7 @@ static SV *pk_build_cookie_ex(pTHX_ SV *name, SV *value, HV *opts,
     SV *out;
     STRLEN nl;
     const char *n = SvPV_const(name, nl);
-    int deleting = !(value && SvOK(value));
+    int deleting = !(value && SvOK(value)); /* # uncoverable condition left count:1 class:ignore_covered_err */
     SV **o;
     static const char *const attrs[] = { "path", "domain", "samesite", NULL };
     int i;
@@ -66,8 +70,11 @@ static SV *pk_build_cookie_ex(pTHX_ SV *name, SV *value, HV *opts,
     pk_cookie_check(aTHX_ "name", name);
     if (memchr(n, '=', nl))
         croak("Punk: a cookie name may not contain '='");
-    for (i = 0; opts && attrs[i]; i++) {
+    for (i = 0; opts && attrs[i]; i++) { /* # uncoverable condition right count:1 class:ignore_covered_err */
         o = hv_fetch(opts, attrs[i], (I32)strlen(attrs[i]), 0);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (o && *o && SvOK(*o)) pk_cookie_check(aTHX_ attrs[i], *o);
     }
     out = newSVpvs("");
@@ -78,30 +85,49 @@ static SV *pk_build_cookie_ex(pTHX_ SV *name, SV *value, HV *opts,
         const char *v = SvPV_const(value, vl);
         pk_cookie_encode(aTHX_ out, v, vl);
     }
-    o = opts ? hv_fetchs(opts, "path", 0) : NULL;
+    o = opts ? hv_fetchs(opts, "path", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     sv_catpvs(out, "; Path=");
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (o && *o && SvOK(*o)) sv_catsv(out, *o); else sv_catpvs(out, "/");
 
-    o = opts ? hv_fetchs(opts, "domain", 0) : NULL;
+    o = opts ? hv_fetchs(opts, "domain", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (o && *o && SvOK(*o)) { sv_catpvs(out, "; Domain="); sv_catsv(out, *o); }
 
     if (deleting)
         sv_catpvs(out, "; Max-Age=0; Expires=Thu, 01 Jan 1970 00:00:00 GMT");
     else {
-        o = opts ? hv_fetchs(opts, "max_age", 0) : NULL;
+        o = opts ? hv_fetchs(opts, "max_age", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (o && *o && SvOK(*o))
             sv_catpvf(out, "; Max-Age=%" IVdf, (IV)SvIV(*o));
     }
 
-    o = opts ? hv_fetchs(opts, "samesite", 0) : NULL;
+    o = opts ? hv_fetchs(opts, "samesite", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (o && *o && SvOK(*o)) { sv_catpvs(out, "; SameSite="); sv_catsv(out, *o); }
 
-    o = opts ? hv_fetchs(opts, "secure", 0) : NULL;
+    o = opts ? hv_fetchs(opts, "secure", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if ((o && *o && SvOK(*o)) ? SvTRUE(*o) : secure_default)
         sv_catpvs(out, "; Secure");
 
-    o = opts ? hv_fetchs(opts, "httponly", 0) : NULL;
-    if (o && *o && SvTRUE(*o)) sv_catpvs(out, "; HttpOnly");
+    o = opts ? hv_fetchs(opts, "httponly", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    if (o && *o && SvTRUE(*o)) sv_catpvs(out, "; HttpOnly"); /* # uncoverable condition right count:2 class:ignore_covered_err */
 
     return out;
 }

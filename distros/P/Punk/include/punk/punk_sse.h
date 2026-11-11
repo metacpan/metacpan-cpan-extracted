@@ -69,8 +69,12 @@ static const char SSE_RESPONSE[] =
     "\r\n";
 
 static punk_sse *se_of(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!SvROK(self) || !SvIOK(SvRV(self)))
-        croak("Punk::SSE: not a stream");
+        croak("Punk::SSE: not a stream"); /* # uncoverable statement */
     return (punk_sse *)INT2PTR(void *, SvIV(SvRV(self)));
 }
 
@@ -83,7 +87,17 @@ static void se_flush(pTHX_ punk_sse *sse) {
     while (sse->woff < sse->wlen) {
         ssize_t n = write(sse->fd, sse->wbuf + sse->woff, sse->wlen - sse->woff);
         if (n > 0) { sse->woff += (size_t)n; continue; }
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK)) {
+            /*
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err
+             # uncoverable condition right count:4 class:ignore_covered_err */
             if (!sse->writing && sse->mode == SSE_MODE_DETACH
                 && sse->abi && sse->loop) {
                 sse->abi->io_watch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE,
@@ -92,26 +106,47 @@ static void se_flush(pTHX_ punk_sse *sse) {
             }
             return;
         }
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1
+         # uncoverable condition left count:2
+         # uncoverable condition right count:2 */
         if (n < 0 && errno == EINTR) continue;
-        se_teardown(aTHX_ sse);                  /* write error: client gone */
-        return;
+        se_teardown(aTHX_ sse);                  /* write error: client gone */ /* # uncoverable statement */
+        return; /* # uncoverable statement */
     }
     sse->wlen = sse->woff = 0;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (sse->writing && sse->abi && sse->loop) {
-        sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE);
-        sse->writing = 0;
+        sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE); /* # uncoverable statement */
+        sse->writing = 0; /* # uncoverable statement */
     }
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static void se_on_writable_in(pTHX_ int fd, int mask, void *ud) {
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
-    se_flush(aTHX_ (punk_sse *)ud);
+    se_flush(aTHX_ (punk_sse *)ud); /* # uncoverable statement */
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static void se_on_writable(pTHX_ int fd, int mask, void *ud) {
-    PK_LOOP_ENTER;
-    se_on_writable_in(aTHX_ fd, mask, ud);
-    PK_LOOP_LEAVE;
+    PK_LOOP_ENTER; /* # uncoverable statement */
+    se_on_writable_in(aTHX_ fd, mask, ud); /* # uncoverable statement */
+    PK_LOOP_LEAVE; /* # uncoverable statement */
 }
 
 /* the client closing is the only thing we read for; a read of 0 tears down */
@@ -121,9 +156,31 @@ static void se_on_readable_in(pTHX_ int fd, int mask, void *ud) {
     ssize_t n;
     PERL_UNUSED_ARG(fd); PERL_UNUSED_ARG(mask);
     n = read(sse->fd, scratch, sizeof scratch);
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (n == 0) { se_teardown(aTHX_ sse); return; }
+    /*
+     # uncoverable statement class:ignore_covered_err
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1
+     # uncoverable condition left count:2
+     # uncoverable condition right count:2
+     # uncoverable condition left count:3
+     # uncoverable condition right count:3
+     # uncoverable condition left count:4
+     # uncoverable condition right count:4 */
     if (n < 0 && (errno == EAGAIN || errno == EWOULDBLOCK || errno == EINTR))
-        return;
+        return; /* # uncoverable statement */
+    /*
+     # uncoverable statement class:ignore_covered_err
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1 */
     if (n < 0) se_teardown(aTHX_ sse);
     /* n > 0: a client should not send on an SSE stream; ignore it */
 }
@@ -136,19 +193,30 @@ static void se_on_readable(pTHX_ int fd, int mask, void *ud) {
 
 /* queue bytes to the active backend */
 static void se_write(pTHX_ punk_sse *sse, const char *bytes, size_t len) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (sse->state != SSE_OPEN) return;
     if (sse->mode == SSE_MODE_HSTREAM) {
         /* The write can close the connection under us, and Hyperman fires
          * the abort callback from there - which tears this stream down and
          * drops its own last reference. So the reference is held across the
          * call, exactly as the heartbeat holds one. */
-        SV *keep = sse->self_rv ? SvREFCNT_inc(sse->self_rv) : NULL;
+        SV *keep = sse->self_rv ? SvREFCNT_inc(sse->self_rv) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         int r = sse->abi->stream_write(aTHX_ sse->sh, bytes, len);
         /* HM_ABI_STREAM_FULL is not an error: the bytes were taken and the
          * connection is merely backed up. An event stream's writes are small
          * and there is nothing useful to drop, so the bound that matters is
          * Hyperman's own connection buffer rather than one kept here. */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (r < 0 && sse->state == SSE_OPEN) se_teardown(aTHX_ sse);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (keep) SvREFCNT_dec(keep);             /* sse may be gone now */
         return;
     }
@@ -156,16 +224,22 @@ static void se_write(pTHX_ punk_sse *sse, const char *bytes, size_t len) {
         dSP;
         ENTER; SAVETMPS;
         PUSHMARK(SP); EXTEND(SP, 2);
-        PUSHs(sse->writer ? sse->writer : &PL_sv_undef);
+        PUSHs(sse->writer ? sse->writer : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUSHs(sv_2mortal(newSVpvn(bytes, len)));
         PUTBACK;
         call_method("write", G_DISCARD | G_EVAL);
         SPAGAIN;
+        /*
+         # uncoverable branch true
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (SvTRUE(ERRSV)) { FREETMPS; LEAVE; se_teardown(aTHX_ sse); return; }
         PUTBACK; FREETMPS; LEAVE;
         return;
     }
-    if (sse->write_buffer_limit
+    if (sse->write_buffer_limit /* # uncoverable condition right count:1 class:ignore_covered_err */
         && sse->wlen - sse->woff + len > sse->write_buffer_limit) {
         se_teardown(aTHX_ sse);                  /* a client that will not read */
         return;
@@ -194,7 +268,7 @@ static void se_append_data(pTHX_ SV *out, SV *data) {
     }
     else {
         STRLEN l = 0, i, start = 0;
-        const char *p = SvOK(data) ? SvPV_const(data, l) : "";
+        const char *p = SvOK(data) ? SvPV_const(data, l) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
         for (i = 0; i <= l; i++) {
             if (i == l || p[i] == '\n' || p[i] == '\r') {
                 sv_catpvs(out, "data: ");
@@ -216,8 +290,12 @@ static void se_send(pTHX_ punk_sse *sse, SV *data) {
 
 static void se_event(pTHX_ punk_sse *sse, SV *name, SV *data) {
     SV *out = sv_2mortal(newSVpvs("event: "));
-    STRLEN nl; const char *n = SvOK(name) ? SvPV_const(name, nl) : "";
+    STRLEN nl; const char *n = SvOK(name) ? SvPV_const(name, nl) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
     STRLEN i;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     for (i = 0; i < nl; i++) if (n[i] == '\n' || n[i] == '\r') break;  /* one line */
     sv_catpvn(out, n, i);
     sv_catpvs(out, "\n");
@@ -228,8 +306,12 @@ static void se_event(pTHX_ punk_sse *sse, SV *name, SV *data) {
 
 static void se_field(pTHX_ punk_sse *sse, const char *field, SV *val) {
     SV *out = sv_2mortal(newSVpv(field, 0));
-    STRLEN vl; const char *v = SvOK(val) ? SvPV_const(val, vl) : "";
+    STRLEN vl; const char *v = SvOK(val) ? SvPV_const(val, vl) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
     STRLEN i;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     for (i = 0; i < vl; i++) if (v[i] == '\n' || v[i] == '\r') break;
     sv_catpvn(out, v, i);
     sv_catpvs(out, "\n");
@@ -248,12 +330,18 @@ static void se_arm_heartbeat(pTHX_ punk_sse *sse);
  * the loop a timer pointed at it. */
 static void se_heartbeat_cb_in(pTHX_ void *ud) {
     punk_sse *sse = (punk_sse *)ud;
-    SV *keep = sse->self_rv ? SvREFCNT_inc(sse->self_rv) : NULL;
+    SV *keep = sse->self_rv ? SvREFCNT_inc(sse->self_rv) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     sse->hb_tw = NULL;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (sse->state == SSE_OPEN) {
         se_write(aTHX_ sse, ":\n\n", 3);         /* a keep-alive comment */
         se_arm_heartbeat(aTHX_ sse);
     }
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (keep) SvREFCNT_dec(keep);                /* sse may be gone after this */
 }
 
@@ -292,14 +380,27 @@ static void se_on_abort(pTHX_ void *h, void *ud) {
 
 static SV *se_cb(pTHX_ punk_sse *sse, const char *name) {
     SV **e = sse->cbs ? hv_fetch(sse->cbs, name, (I32)strlen(name), 0) : NULL;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (e && *e && SvROK(*e)) ? *e : NULL;
 }
 
 static void se_teardown(pTHX_ punk_sse *sse) {
     SV *cb;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (sse->in_teardown || sse->state == SSE_CLOSED) return;
     sse->in_teardown = 1;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (sse->mode == SSE_MODE_DETACH && sse->abi && sse->loop) {
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (sse->reading) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_READ);
         if (sse->writing) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE);
     }
@@ -307,6 +408,9 @@ static void se_teardown(pTHX_ punk_sse *sse) {
         sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw);
         sse->hb_tw = NULL;
     }
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (sse->mode == SSE_MODE_HSTREAM && sse->abi && sse->sh) {
         /* NULLed first: closing ends the body, which on an EOF-delimited
          * HTTP/1.1 response closes the connection, and a re-entrant teardown
@@ -316,7 +420,7 @@ static void se_teardown(pTHX_ punk_sse *sse) {
         (void)sse->abi->stream_close(aTHX_ h);
     }
     sse->reading = sse->writing = 0;
-    if (sse->mode == SSE_MODE_STREAM && sse->writer) {
+    if (sse->mode == SSE_MODE_STREAM && sse->writer) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         dSP;
         ENTER; SAVETMPS;
         PUSHMARK(SP); EXTEND(SP, 1); PUSHs(sse->writer); PUTBACK;
@@ -330,36 +434,66 @@ static void se_teardown(pTHX_ punk_sse *sse) {
         dSP;
         ENTER; SAVETMPS;
         PUSHMARK(SP); EXTEND(SP, 1);
-        PUSHs(sse->self_rv ? sse->self_rv : &PL_sv_undef);
+        PUSHs(sse->self_rv ? sse->self_rv : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK;
         call_sv(cb, G_DISCARD | G_EVAL);
         SPAGAIN; PUTBACK; FREETMPS; LEAVE;
     }
     if (sse->cbs) { SvREFCNT_dec((SV *)sse->cbs); sse->cbs = NULL; }
     sse->in_teardown = 0;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (sse->self_rv) { SV *s = sse->self_rv; sse->self_rv = NULL; SvREFCNT_dec(s); }
 }
 
 static void se_free(pTHX_ punk_sse *sse) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!sse) return;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (sse->mode == SSE_MODE_DETACH && sse->abi && sse->loop) {
         /* the watchers name this struct, so they must go before it does -
          * and before the fd, or the loop is left watching a number the next
          * connection will be given */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (sse->reading) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_READ);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (sse->writing) sse->abi->io_unwatch(aTHX_ sse->loop, sse->fd, HM_ABI_WRITE);
     }
-    if (SE_ON_LOOP(sse) && sse->abi && sse->loop && sse->hb_tw)
-        sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw);
+    if (SE_ON_LOOP(sse) && sse->abi && sse->loop && sse->hb_tw) /* # uncoverable branch true */
+        sse->abi->timer_cancel(aTHX_ sse->loop, sse->hb_tw); /* # uncoverable statement */
     /* The handle names this struct through its callbacks, so it goes first;
      * stream_close is the only entry point that releases one, and a stream
      * aborted underneath us still has to be closed. */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (sse->mode == SSE_MODE_HSTREAM && sse->abi && sse->sh)
-        (void)sse->abi->stream_close(aTHX_ sse->sh);
+        (void)sse->abi->stream_close(aTHX_ sse->sh); /* # uncoverable statement */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (sse->fd >= 0) close(sse->fd);
     if (sse->wbuf)   free(sse->wbuf);
     if (sse->writer) SvREFCNT_dec(sse->writer);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (sse->cbs)    SvREFCNT_dec((SV *)sse->cbs);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (sse->self_rv) SvREFCNT_dec(sse->self_rv);
     Safefree(sse);
 }
@@ -376,10 +510,23 @@ static punk_sse *se_new(pTHX_ int mode, HV *opts) {
     /* bounded unless told otherwise: a client that opens a stream and stops
      * reading would otherwise have every event kept for it for ever */
     sse->write_buffer_limit = PW_DEFAULT_WRITE_LIMIT;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (opts) {
         SV **h = hv_fetchs(opts, "heartbeat", 0);
         SV **w = hv_fetchs(opts, "write_buffer_limit", 0);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (h && *h && SvOK(*h)) sse->heartbeat = SvNV(*h);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (w && *w && SvOK(*w)) sse->write_buffer_limit = (size_t)SvUV(*w);
     }
     return sse;
@@ -393,16 +540,19 @@ static void se_run_handler(pTHX_ SV *code, SV *c, SV *self) {
     PUSHMARK(SP); EXTEND(SP, 2); PUSHs(c); PUSHs(self); PUTBACK;
     call_sv(code, G_DISCARD | G_EVAL);
     SPAGAIN;
-    died = SvTRUE(ERRSV) ? 1 : 0;
+    died = SvTRUE(ERRSV) ? 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     PUTBACK; FREETMPS; LEAVE;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (died) {
         {   /* escaped: a die text is request-shaped, and a newline in it
              * would be a second log line (the 0.59 pl_plain rule) */
-            STRLEN el; const char *ep = SvPV_const(ERRSV, el);
-            warn("Punk::SSE: handler died: %" SVf,
-                 SVfARG(pl_plain(aTHX_ ep, el, SvUTF8(ERRSV))));
+            STRLEN el; const char *ep = SvPV_const(ERRSV, el); /* # uncoverable statement */
+            warn("Punk::SSE: handler died: %" SVf, /* # uncoverable statement */
+                 SVfARG(pl_plain(aTHX_ ep, el, SvUTF8(ERRSV)))); /* # uncoverable statement */
         }
-        se_teardown(aTHX_ se_of(aTHX_ self));
+        se_teardown(aTHX_ se_of(aTHX_ self)); /* # uncoverable statement */
     }
 }
 
@@ -426,10 +576,17 @@ static AV *se_header_av(pTHX) {
 /* The `retry: N` field, which has to go out before anything the handler
  * writes and is the same three lines on every transport. */
 static void se_send_retry(pTHX_ punk_sse *sse, HV *opts) {
-    SV **r = opts ? hv_fetchs(opts, "retry", 0) : NULL;
+    SV **r = opts ? hv_fetchs(opts, "retry", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (r && *r && SvOK(*r)) {
-        se_field(aTHX_ sse, "retry: ", *r);   /* retry: N */
-        se_write(aTHX_ sse, "\n", 1);         /* + blank = dispatch */
+        se_field(aTHX_ sse, "retry: ", *r);   /* retry: N */ /* # uncoverable statement */
+        se_write(aTHX_ sse, "\n", 1);         /* + blank = dispatch */ /* # uncoverable statement */
     }
 }
 
@@ -445,15 +602,24 @@ XS_INTERNAL(sse_stream_cb) {
     SV *code = *av_fetch(cap, 1, 0);
     SV *osv  = *av_fetch(cap, 2, 0);
     SV *esv  = *av_fetch(cap, 3, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *opts = (SvROK(osv) && SvTYPE(SvRV(osv)) == SVt_PVHV) ? (HV *)SvRV(osv) : NULL;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *envh = (SvROK(esv) && SvTYPE(SvRV(esv)) == SVt_PVHV) ? (HV *)SvRV(esv) : NULL;
-    SV *responder = items > 0 ? ST(0) : &PL_sv_undef;
+    SV *responder = items > 0 ? ST(0) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
     AV *hdrs = se_header_av(aTHX);
     SV *self;
     punk_sse *sse;
     const hm_abi *A = NULL;
     void *loop = NULL, *h = NULL;
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (envh) h = punk_hm_stream_open(aTHX_ envh, &A, &loop, 200, hdrs);
     if (h) {
         sse = se_new(aTHX_ SSE_MODE_HSTREAM, opts);
@@ -483,7 +649,7 @@ XS_INTERNAL(sse_stream_cb) {
         PUTBACK;
         n = call_sv(responder, G_SCALAR);
         SPAGAIN;
-        writer = n > 0 ? SvREFCNT_inc(POPs) : &PL_sv_undef;
+        writer = n > 0 ? SvREFCNT_inc(POPs) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK; FREETMPS; LEAVE;
         sse = se_new(aTHX_ SSE_MODE_STREAM, opts);
         sse->writer = writer;                          /* +1 owned */
@@ -498,19 +664,43 @@ XS_INTERNAL(sse_stream_cb) {
 /* ---- the dispatcher ------------------------------------------------------- */
 
 static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *envh = (SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV) ? (HV *)SvRV(env) : NULL;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *rech = (SvROK(rec) && SvTYPE(SvRV(rec)) == SVt_PVHV) ? (HV *)SvRV(rec) : NULL;
     HV *opts = NULL;
     SV **x, *code;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!envh || !rech) return pw_err(aTHX_ 500, "bad sse dispatch\n", NULL, NULL);
     x = hv_fetchs(rech, "sse", 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (x && *x && SvROK(*x) && SvTYPE(SvRV(*x)) == SVt_PVHV) opts = (HV *)SvRV(*x);
     x = hv_fetchs(rech, K_CODE, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     code = (x && *x) ? *x : &PL_sv_undef;
 
     /* HEAD is the headers and nothing else: no stream is opened and the
      * handler is not run. */
     x = hv_fetchs(envh, "REQUEST_METHOD", 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:5 class:ignore_covered_err */
     if (x && *x && SvOK(*x) && SvCUR(*x) == 4
         && memEQ(SvPVX(*x), "HEAD", 4)) {
         AV *resp = newAV();
@@ -530,18 +720,35 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
      * a reason to try the next transport rather than an answer to the
      * client. */
     x = hv_fetchs(envh, "psgix.hyperman.conn", 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (x && *x && SvROK(*x) && SvTYPE(SvRV(*x)) == SVt_PVAV) {
         const hm_abi *A = punk_hm(aTHX);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (A) {
             AV *cid = (AV *)SvRV(*x);
             SV **fsv = av_fetch(cid, 0, 0), **isv = av_fetch(cid, 1, 0);
             void *loop = A->cur_loop(aTHX);
             int fd; int fl;
             punk_sse *sse; SV *self;
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err
+             # uncoverable condition right count:4 class:ignore_covered_err
+             # uncoverable condition right count:5 class:ignore_covered_err
+             # uncoverable condition right count:6 class:ignore_covered_err */
             if (fsv && *fsv && isv && *isv && loop
                 && (fd = (int)SvIV(*fsv)) >= 0
                 && A->conn_detach(aTHX_ loop, fd, SvUV(*isv)) == 0) {
                 fl = fcntl(fd, F_GETFL, 0);
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 if (fl >= 0) (void)fcntl(fd, F_SETFL, fl | O_NONBLOCK);
                 sse = se_new(aTHX_ SSE_MODE_DETACH, opts);
                 sse->fd = fd; sse->abi = A; sse->loop = loop;
@@ -564,22 +771,41 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
      * psgi.streaming writer. sse_stream_cb decides, because the choice can
      * only be made once the response has been deferred. */
     x = hv_fetchs(envh, "psgi.streaming", 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (x && *x && SvTRUE(*x)) {
         AV *cap = newAV();
         av_push(cap, newSVsv(c));
         av_push(cap, newSVsv(code));
-        av_push(cap, opts ? newRV_inc((SV *)opts) : newSV(0));
+        av_push(cap, opts ? newRV_inc((SV *)opts) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
         av_push(cap, newRV_inc((SV *)envh));
         return punk_closure(aTHX_ sse_stream_cb, cap);   /* the responder */
     }
 
     /* 3. blocking psgix.io: stream inside the handler (pins a worker) */
-    x = opts ? hv_fetchs(opts, K_BLOCKING, 0) : NULL;
+    x = opts ? hv_fetchs(opts, K_BLOCKING, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (x && *x && SvTRUE(*x)) {
         SV **iop = hv_fetchs(envh, "psgix.io", 0);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (iop && *iop && SvOK(*iop)) {
             IO *io = sv_2io(*iop);
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             int fd = (io && IoIFP(io)) ? PerlIO_fileno(IoIFP(io)) : -1;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (fd >= 0) {
                 punk_sse *sse = se_new(aTHX_ SSE_MODE_BLOCK, opts);
                 SV *self;
@@ -595,7 +821,7 @@ static SV *punk_sse_dispatch(pTHX_ SV *c, SV *rec, SV *env) {
         }
     }
 
-    return pw_err(aTHX_ 501,
+    return pw_err(aTHX_ 501, /* # uncoverable statement */
         "this server cannot stream server-sent events (needs Hyperman "
         "0.11+, a psgi.streaming server, or blocking => 1 with psgix.io)\n",
         NULL, NULL);

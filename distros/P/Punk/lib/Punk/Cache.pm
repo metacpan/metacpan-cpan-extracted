@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 # All of it is C (include/punk/punk_cachefront.h + xs/cache.xs).
 

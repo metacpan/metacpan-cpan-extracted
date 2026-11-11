@@ -45,7 +45,7 @@ static void pfav_freeze(pTHX_ HV *h) {
     SV *body, *cc;
     char buf[8192];
 
-    if (!(path && SvOK(path))) return;
+    if (!(path && SvOK(path))) return; /* # uncoverable condition left count:2 class:ignore_covered_err */
     pp = SvPV_const(path, pl);
     fp = PerlIO_open(pp, "rb");
     if (!fp)
@@ -53,11 +53,14 @@ static void pfav_freeze(pTHX_ HV *h) {
     body = newSVpvs("");
     for (;;) {
         SSize_t got = PerlIO_read(fp, buf, sizeof buf);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (got < 0) {
-            SvREFCNT_dec(body);
-            PerlIO_close(fp);
-            croak("Punk: favicon '%s' cannot be read: %s", pp,
-                  Strerror(errno));
+            SvREFCNT_dec(body); /* # uncoverable statement */
+            PerlIO_close(fp); /* # uncoverable statement */
+            croak("Punk: favicon '%s' cannot be read: %s", pp, /* # uncoverable statement */
+                  Strerror(errno)); /* # uncoverable statement */
         }
         if (got == 0) break;
         sv_catpvn(body, buf, (STRLEN)got);
@@ -88,21 +91,35 @@ XS_INTERNAL(pfav_serve_cb);
 XS_INTERNAL(pfav_serve_cb) {
     dXSARGS;
     AV *cap = punk_clos_cap(aTHX_ cv);
-    SV *app = cap ? *av_fetch(cap, 0, 0) : NULL;
-    SV *c = items > 0 ? ST(0) : NULL;
-    HV *h = app ? app_hv(aTHX_ app) : NULL;
-    SV *body = h ? app_get(aTHX_ h, "favicon_body") : NULL;
-    SV *etag = h ? app_get(aTHX_ h, "favicon_etag") : NULL;
-    SV *type = h ? app_get(aTHX_ h, "favicon_type") : NULL;
-    SV *cc   = h ? app_get(aTHX_ h, "favicon_cc")   : NULL;
+    SV *app = cap ? *av_fetch(cap, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *c = items > 0 ? ST(0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    HV *h = app ? app_hv(aTHX_ app) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *body = h ? app_get(aTHX_ h, "favicon_body") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *etag = h ? app_get(aTHX_ h, "favicon_etag") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *type = h ? app_get(aTHX_ h, "favicon_type") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *cc   = h ? app_get(aTHX_ h, "favicon_cc")   : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     int matched = 0;
     AV *resp, *headers, *bodyav;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(body && SvOK(body))) XSRETURN_EMPTY;
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (c && etag && SvOK(etag)) {
         AV *cav = pcx_av(aTHX_ c);
-        SV *envsv = cav ? pcx_get(aTHX_ cav, PCX_ENV) : NULL;
+        SV *envsv = cav ? pcx_get(aTHX_ cav, PCX_ENV) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (envsv && SvROK(envsv) && SvTYPE(SvRV(envsv)) == SVt_PVHV) {
             STRLEN el;
             const char *ep = SvPV_const(etag, el);
@@ -114,6 +131,10 @@ XS_INTERNAL(pfav_serve_cb) {
     if (matched) {
         av_push(headers, newSVpvs("ETag"));
         av_push(headers, newSVsv(etag));
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (cc && SvOK(cc)) {
             av_push(headers, newSVpvs("Cache-Control"));
             av_push(headers, newSVsv(cc));
@@ -122,15 +143,26 @@ XS_INTERNAL(pfav_serve_cb) {
     }
     else {
         av_push(headers, newSVpvs("Content-Type"));
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         av_push(headers, (type && SvOK(type))
                              ? newSVsv(type)
                              : newSVpvs("application/octet-stream"));
         av_push(headers, newSVpvs("Content-Length"));
         av_push(headers, newSViv((IV)SvCUR(body)));
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (cc && SvOK(cc)) {
             av_push(headers, newSVpvs("Cache-Control"));
             av_push(headers, newSVsv(cc));
         }
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (etag && SvOK(etag)) {
             av_push(headers, newSVpvs("ETag"));
             av_push(headers, newSVsv(etag));

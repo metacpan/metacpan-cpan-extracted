@@ -7,6 +7,8 @@ use DBI        qw();
 use List::Util qw(all max);
 use Ref::Util  qw(is_arrayref is_coderef is_hashref is_ref);
 
+use Ekorn::Pipeline qw(is_stage);
+
 use DBIx::Squirrel::Errors       qw(at_caller croakf failed in_method);
 use DBIx::Squirrel::Placeholders qw(
     expand_lists key_of study_sql values_for values_taken
@@ -243,7 +245,7 @@ sub results ($self, $statement, @args) {
 # prepare, for the bind values in their arguments, taking the attributes
 # off the front of them, unless a stage is there.
 sub _prepare_to_iterate ($self, $statement, $args) {
-    my $attrs  = @$args && is_coderef($args->[0]) ? undef : shift_attrs($args);
+    my $attrs  = @$args && is_stage($args->[0]) ? undef : shift_attrs($args);
     my @values = @$args;
     split_stages(\@values);
     return _prepare_as($self, 'prepare', $statement, $attrs, undef, @values);
@@ -452,8 +454,8 @@ DBIx::Squirrel::db - DBIx::Squirrel's database handle class
 =head1 DESCRIPTION
 
 A database handle from L<DBIx::Squirrel/connect> is blessed into this
-class, a subclass of the DBI's C<DBI::db>, so it does everything a DBI
-database handle does. It also inherits L<DBIx::Squirrel/pipe> and
+class. It's a subclass of the DBI's C<DBI::db>, so it does everything a
+DBI database handle does. It also inherits L<DBIx::Squirrel/pipe> and
 L<DBIx::Squirrel/tap> from L<DBIx::Squirrel::Pipes>.
 
 =head1 METHODS
@@ -467,8 +469,8 @@ Prepares a statement, as the DBI's C<prepare> does, and returns a
 L<DBIx::Squirrel::st>. L</do> and the DBI's select methods, such as
 C<selectrow_array>, prepare a statement this way too.
 
-The statement can use placeholders in any of these styles, which are
-rewritten as C<?> before the DBI sees them:
+The statement can use placeholders in any of these styles. Each is
+rewritten as C<?> before the DBI sees it:
 
     SELECT * FROM artist WHERE id = ?
     SELECT * FROM artist WHERE id = ?1
@@ -476,77 +478,107 @@ rewritten as C<?> before the DBI sees them:
     SELECT * FROM artist WHERE id = $1
     SELECT * FROM artist WHERE id = :id
 
-A statement uses one style of placeholder throughout; C<prepare> croaks
-if it finds more than one. The same placeholder can appear more than
-once.
+A statement uses one style of placeholder throughout. C<prepare>
+croaks if it finds more than one. The same placeholder can appear more
+than once.
 
 A numbered placeholder is bound once, wherever it appears, and a named
-one by name, as L<DBIx::Squirrel::st/bind> describes. Numbers start
-from 1.
+one is bound by name. Numbers start from 1. L<DBIx::Squirrel::st/bind>
+says more.
 
-A placeholder with C<...> before it takes a list, which is written as a
-C<?> for each of its values, separated by commas:
+A placeholder with C<...> before it takes a list. The list is written
+as a C<?> for each of its values, separated by commas:
 
     SELECT * FROM artist WHERE id IN (...?)
     SELECT * FROM artist WHERE id IN (...$1)
     SELECT * FROM artist WHERE id IN (...:ids)
 
-Its value is a reference to an array of at least one plain value. As
-the number of values decides the statement the DBI prepares, a statement
-taking a list is prepared with its values, by L</do>, L</iterate>,
-L</results> or a select method, never by C<prepare> or C<prepare_cached>
-alone, which croak. A placeholder takes a list everywhere it's used, or
-nowhere. L<DBIx::Squirrel::st/Lists> says more.
+Its value is a reference to an array of at least one plain value. The
+number of values decides the statement the DBI prepares. So a
+statement taking a list is prepared with its values, by L</do>,
+L</iterate>, L</results> or a select method. C<prepare> and
+C<prepare_cached> croak given one. A placeholder takes a list
+everywhere it's used, or nowhere. L<DBIx::Squirrel::st/Lists> says
+more.
 
-Placeholders are looked for only in the SQL itself. Anything that looks
-like one inside a quoted string or identifier (C<'10:30'>, C<"a:b">,
-C<`c?`>), a comment (C<-- :x>, C</* $1 */>) or a PostgreSQL
-dollar-quoted body (C<$$ ... $$>, C<$tag$ ... $tag$>) is left as it is,
-and so is a cast, such as C<x::int>, or an identifier containing C<$>,
-such as C<v$session>.
+Placeholders are looked for only in the SQL itself. These are left
+unchanged:
+
+=over
+
+=item * anything that looks like one inside a quoted string or
+identifier (C<'10:30'>, C<"a:b">, C<`c?`>), a comment (C<-- :x>,
+C</* $1 */>) or a PostgreSQL dollar-quoted body (C<$$ ... $$>,
+C<$tag$ ... $tag$>);
+
+=item * a cast, such as C<x::int>;
+
+=item * an identifier containing C<$>, such as C<v$session>.
+
+=back
 
 Strings are read by the rules of the database handle's driver. With
-DBD::mysql and DBD::MariaDB, a backslash escapes a character in a string
-(C<'it\'s'>), C<"..."> is a string, and C<#> starts a comment. With other
-drivers, a backslash is an ordinary character in a string (C<'C:\'>),
-except in PostgreSQL's C<E'...'> strings. MySQL's
+DBD::mysql and DBD::MariaDB, a backslash escapes a character in a
+string (C<'it\'s'>), C<"..."> is a string, and C<#> starts a comment.
+With other drivers, a backslash is an ordinary character in a string
+(C<'C:\'>), except in PostgreSQL's C<E'...'> strings. MySQL's
 C<NO_BACKSLASH_ESCAPES> mode isn't noticed.
 
 A database reached through another driver, such as DBD::ODBC or
-DBD::Proxy, is read by its own rules if it says what it is, as
-L<DBIx::Squirrel/connect> describes, and by the standard rules if it
-doesn't. To read a statement as another dialect, name that dialect's
+DBD::Proxy, is read by its own rules if it says what it is. If it
+doesn't, it's read by the standard rules. L<DBIx::Squirrel/connect>
+says more. To read a statement as another dialect, name that dialect's
 driver in the C<ekorn_dialect> attribute:
 
     $dbh->prepare($statement, {ekorn_dialect => 'mysql'});
 
 Attributes starting C<ekorn_> are DBIx::Squirrel's own, and aren't
 passed on to the DBI. Passed to L<DBIx::Squirrel/connect>, they're the
-defaults for every statement the handle prepares; passed to C<prepare>,
-they override those for one statement.
+defaults for every statement the handle prepares. Passed to
+C<prepare>, they override those for one statement.
 
-To use a C<?>, C<:> or C<$> that isn't a placeholder, such as one of
-PostgreSQL's C<?>, C<?|> and C<?&> operators, put a backslash before it,
-as L<DBD::Pg> allows. The backslash and the character after it are
-passed on as they are, and DBD::Pg removes the backslash:
+To use a C<?>, C<:> or C<$> that isn't a placeholder, put a backslash
+before it, as L<DBD::Pg> allows. PostgreSQL's C<?>, C<?|> and C<?&>
+operators are examples. The backslash and the character after it are
+passed on unchanged, and DBD::Pg removes the backslash:
 
     $dbh->prepare(q{SELECT * FROM doc WHERE data \? 'key' AND id = :id});
 
 DBD::Pg's own placeholder options are followed too, whether set on the
-database handle or passed to C<prepare>. With C<pg_placeholder_dollaronly>,
-only C<$1>-style placeholders are recognised, and the statement is passed
-on as written, for DBD::Pg to read, so none can take a list. With
-C<pg_placeholder_nocolons>, the C<:1> and C<:name> styles aren't
-placeholders, so array slices such as C<data[:2]> are left alone.
+database handle or passed to C<prepare>:
 
-The statement can be a string, an array reference of lines, which are
-joined with spaces, a code reference returning either, or a statement
-handle, whose statement is prepared again. Blank space around the
-statement is removed; comments are passed on to the database.
+=over
 
-Unlike the DBI's C<prepare>, it B<always croaks> if the statement can't
-be prepared, whatever C<RaiseError> is set to, with the message the DBI
-raises under C<RaiseError>, such as
+=item * With C<pg_placeholder_dollaronly>, only C<$1>-style
+placeholders are recognised. The statement is passed on as written, for
+DBD::Pg to read, so none can take a list.
+
+=item * With C<pg_placeholder_nocolons>, the C<:1> and C<:name> styles
+aren't placeholders, so array slices such as C<data[:2]> are left
+alone.
+
+=back
+
+The statement can be:
+
+=over
+
+=item * a string;
+
+=item * an array reference of lines, which are joined with spaces;
+
+=item * a code reference returning either;
+
+=item * a statement handle, whose statement is prepared again.
+
+=back
+
+Blank space around the statement is removed. Comments are passed on to
+the database.
+
+Unlike the DBI's C<prepare>, it B<always croaks> if the statement
+can't be prepared, whatever C<RaiseError> is set to. The message is
+the one the DBI raises under C<RaiseError>, such as
 C<DBD::SQLite::db prepare failed: near "SELEC": syntax error>.
 
 =head2 prepare_cached
@@ -559,11 +591,12 @@ As L</prepare>, using the DBI's cache of statement handles. Its errors
 name C<prepare_cached>, as the DBI's do. Like C<prepare>, it croaks
 given a statement taking a list.
 
-A cached handle that an iterator is part way through isn't handed out,
-or finished, as the DBI would finish an active one, which would cut the
-iterator's results short. A new handle is made instead, and cached in its
-place, unless C<$if_active> is 2, which asks for the cached handle as it
-is. Otherwise, C<$if_active> means what it does to the DBI.
+The DBI finishes a cached handle that's still active before handing it
+out. If an iterator is part way through the handle, that would cut its
+results short. So such a handle isn't handed out or finished. A new
+handle is made instead, and cached in its place. The exception is
+C<$if_active> of 2, which asks for the cached handle, unchanged.
+Otherwise, C<$if_active> means what it does to the DBI.
 
 =head2 do
 
@@ -574,20 +607,22 @@ is. Otherwise, C<$if_active> means what it does to the DBI.
 
 Runs a statement, and returns what the DBI's C<do> returns: the number
 of rows affected, C<0E0> for none, or C<undef> on an error without
-C<RaiseError>. Unlike the DBI's, the attributes may be left out: the
+C<RaiseError>. Unlike the DBI's, the attributes may be left out. The
 first argument after the statement is taken as the attributes only if
 it's a hash reference or C<undef>. An error names C<do>, as the DBI's
 does: C<DBD::SQLite::db do failed: ...>.
 
 A statement with C<?> placeholders, or none, goes to the driver's own
-C<do>, as with plain DBI, so the driver's row counts and options apply,
-such as running several statements with DBD::SQLite's
-C<sqlite_allow_multiple_statements>. A statement with numbered or named
-placeholders is prepared, as L</prepare> does, and executed, with the
-values bound as L<DBIx::Squirrel::st/bind> binds them; some drivers,
-such as DBD::SQLite, then count the rows of an C<UPDATE ... RETURNING>
-only as they're fetched, giving C<0E0>. So is a statement taking a list,
-prepared for the values given.
+C<do>, as with plain DBI. So the driver's row counts and options
+apply, such as running several statements with DBD::SQLite's
+C<sqlite_allow_multiple_statements>.
+
+A statement with numbered or named placeholders is prepared, as
+L</prepare> does, and executed, with the values bound as
+L<DBIx::Squirrel::st/bind> binds them. So is a statement taking a
+list, prepared for the values given. Some drivers, such as
+DBD::SQLite, then count the rows of an C<UPDATE ... RETURNING> only as
+they're fetched, giving C<0E0>.
 
 Like the DBI's, C<do> returns no rows, even from a C<SELECT> or a
 C<RETURNING> clause. Use L</prepare> and C<execute>, or the select
@@ -599,10 +634,9 @@ methods, for those.
     $it = $dbh->iterate($statement, @bind_values, @stages);
 
 Prepares a statement, as L</prepare> does, and returns a
-L<DBIx::Squirrel::Iterator>, an iterator over its results, as
-L<DBIx::Squirrel::st/iterate> does. As with L</do>, the attributes may
-be left out. A statement taking a list is prepared for the values
-given.
+L<DBIx::Squirrel::Iterator> over its results. See
+L<DBIx::Squirrel::st/iterate>. As with L</do>, the attributes may be
+left out. A statement taking a list is prepared for the values given.
 
 =head2 results
 
@@ -639,16 +673,19 @@ objects with a method for each column.
 
 =back
 
-Each works as the DBI's, preparing the statement as L</prepare> does, unless it's
-already a statement handle, and binding the values as
+Each works as the DBI's does. It prepares the statement as L</prepare>
+does, unless it's already a statement handle, and binds the values as
 L<DBIx::Squirrel::st/bind> binds them. A statement taking a list is
-prepared for the values given. The DBI's C<selectall_array>
-goes through C<selectall_arrayref>, so it does too. As with L</do>, the
-attributes may be left out: the first argument after the statement, or
-after C<selectall_hashref>'s key field, is taken as the attributes only
-if it's a hash reference or C<undef>. Unlike L</prepare>,
-they don't croak if the statement can't be prepared: without
-C<RaiseError>, each returns what the DBI's returns, as C<do> does.
+prepared for the values given. The DBI's C<selectall_array> goes
+through C<selectall_arrayref>, so it does all this too.
+
+As with L</do>, the attributes may be left out. The first argument
+after the statement, or after C<selectall_hashref>'s key field, is
+taken as the attributes only if it's a hash reference or C<undef>.
+
+Unlike L</prepare>, they don't croak if the statement can't be
+prepared. Without C<RaiseError>, each returns what the DBI's returns,
+as C<do> does.
 
 =head1 DIAGNOSTICS
 
@@ -672,9 +709,9 @@ takes.
 =item Expected bind values with a statement taking a list (%s)
 
 A statement with a list placeholder, such as C<...:ids>, was given to
-L</prepare> or L</prepare_cached>, which have no values to prepare it
-for. Each list placeholder is named, a C<?> with its position, as in
-C<...? at 2>.
+L</prepare> or L</prepare_cached>. They have no values to prepare it
+for. Each list placeholder is named, and a C<?> is named by its
+position, as in C<...? at 2>.
 
 =item Expected a placeholder to take a list everywhere or nowhere (%s)
 

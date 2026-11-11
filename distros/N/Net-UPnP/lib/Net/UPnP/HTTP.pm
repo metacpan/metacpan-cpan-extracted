@@ -301,7 +301,7 @@ sub post {
 	$req_content_len = length($req_content);
 	
 $req_header = <<"REQUEST_HEADER";
-$method $path HTTP/1.0
+$method $path HTTP/1.1
 Host: $post_addr:$post_port
 Content-Length: $req_content_len
 REQUEST_HEADER

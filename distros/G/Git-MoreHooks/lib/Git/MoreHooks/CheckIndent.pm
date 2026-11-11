@@ -12,12 +12,12 @@ use utf8;
 
 # ABSTRACT: Check committed files for problems with indentation.
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 
 use Git::MoreHooks::CheckCommitBase \&do_hook;
 
-use Git::Hooks;
+use Git::Hooks 2.014000;    # v2.14.0: oldest release on CPAN
 use Path::Tiny;
 use Log::Any qw{$log};
 use Params::Validate qw(:all);
@@ -233,7 +233,7 @@ Git::MoreHooks::CheckIndent - Check committed files for problems with indentatio
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

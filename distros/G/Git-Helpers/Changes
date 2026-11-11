@@ -1,5 +1,9 @@
 Revision history for Git-Helpers
 
+1.000002  2026-11-10 18:43:37Z
+    - Fix https_remote_url() for remotes with ports and local paths (GH#39)
+      (Olaf Alders)
+
 1.000001  2021-11-02 01:31:05Z
     - Bump Term::Choose to latest version (1.743) (GH#18) (Olaf Alders)
     - Update use of Term::Choose in delete-git-branches (GH#16) (kuerbis)

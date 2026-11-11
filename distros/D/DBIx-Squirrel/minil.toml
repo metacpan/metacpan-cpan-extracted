@@ -6,6 +6,9 @@ license = "perl_5"
 # Minilla always writes README.md from POD. The README is written by hand
 # in README.pod, not in the main module's POD.
 readme_from = "README.pod"
+# The CPAN badge is shields.io's, in README.pod, not Minilla's "metacpan",
+# whose badge.fury.io image GitHub's image proxy kept for days after a
+# release.
 badges = ["github-actions/test.yml"]
 
 # Changes keeps an "Unreleased" heading, edited by hand at a release,

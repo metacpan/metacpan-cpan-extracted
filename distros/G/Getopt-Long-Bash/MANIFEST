@@ -4,8 +4,6 @@ GETOPTLONG.md
 LICENSE
 README.md
 cpanfile
-ex/cmap
-ex/cmap-prefix
 ex/dest.sh
 ex/md
 ex/prefix.sh

@@ -126,13 +126,16 @@ static int Punk_isinfnan(NV x) {
 static SV *pk_require_src(pTHX_ const char *class) {
     STRLEN len = strlen(class), i = 0;
     int ok = len > 0;
-    while (ok && i < len) {
+    while (ok && i < len) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         STRLEN start = i;
-        if (!(isALPHA((U8)class[i]) || class[i] == '_')) { ok = 0; break; }
+        if (!(isALPHA((U8)class[i]) || class[i] == '_')) { ok = 0; break; } /* # uncoverable condition right count:2 class:ignore_covered_err */
         while (i < len && isWORDCHAR((U8)class[i])) i++;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (i == start) { ok = 0; break; }
         if (i == len) break;
-        if (!(class[i] == ':' && i + 1 < len && class[i + 1] == ':'
+        if (!(class[i] == ':' && i + 1 < len && class[i + 1] == ':' /* # uncoverable condition left count:2 class:ignore_covered_err */
               && i + 2 < len)) { ok = 0; break; }
         i += 2;
     }

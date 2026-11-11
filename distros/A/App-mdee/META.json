@@ -51,7 +51,7 @@
             "App::ansiecho" : "0",
             "App::ansifold" : "1.38",
             "App::cat::v" : "0",
-            "App::nup" : "1.10",
+            "App::nup" : "1.13",
             "Command::Run" : "1.04",
             "File::Share" : "0",
             "Getopt::EX" : "3.05",
@@ -76,22 +76,22 @@
    "provides" : {
       "App::Greple::md" : {
          "file" : "lib/App/Greple/md.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "App::Greple::md::Blocks" : {
          "file" : "lib/App/Greple/md/Blocks.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "App::Greple::md::Step" : {
          "file" : "lib/App/Greple/md.pm"
       },
       "App::Greple::md::widen" : {
          "file" : "lib/App/Greple/md/widen.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       },
       "App::mdee" : {
          "file" : "lib/App/mdee.pm",
-         "version" : "1.17"
+         "version" : "1.18"
       }
    },
    "release_status" : "stable",
@@ -106,7 +106,7 @@
          "web" : "https://github.com/tecolicom/App-mdee"
       }
    },
-   "version" : "1.17",
+   "version" : "1.18",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"
    ],

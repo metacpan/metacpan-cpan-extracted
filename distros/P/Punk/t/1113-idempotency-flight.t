@@ -25,7 +25,8 @@ use Punk ();
 #     processes too.
 #
 # Fork discipline: the children never touch the TAP pipe - stdio to
-# /dev/null, POSIX::_exit - or the harness sees a duplicate plan.
+# /dev/null, and exit with Test::Builder's ending turned off, which keeps
+# the plan single and lets the child write its coverage counters.
 
 my $dir = File::Temp->newdir;
 
@@ -111,11 +112,12 @@ sub spawn {
           headers => { @{ $r->[1] } },
           body    => join('', @{ $r->[2] }) };
     } || { status => 0, headers => {}, body => "died: $@" };
-    open my $fh, '>', "$dir/$label.tmp" or POSIX::_exit(1);
+    open my $fh, '>', "$dir/$label.tmp" or do { Test::Builder->new->no_ending(1); exit 1 };
     print {$fh} file_json_encode($out);
     close $fh;
     rename "$dir/$label.tmp", "$dir/$label.json";
-    POSIX::_exit(0);
+    Test::Builder->new->no_ending(1);
+    exit 0;
 }
 
 sub wait_for {

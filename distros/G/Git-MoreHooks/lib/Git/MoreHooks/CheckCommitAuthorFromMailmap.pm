@@ -9,10 +9,10 @@ use utf8;
 
 # ABSTRACT: Check Git commit author by using the mailmap file.
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 
-use Git::Hooks;
+use Git::Hooks 3.001001;    # v3.1.1: GITHOOKS_CHECK_* drivers
 use Path::Tiny;
 use Try::Tiny;
 use Log::Any qw{$log};
@@ -241,7 +241,7 @@ Git::MoreHooks::CheckCommitAuthorFromMailmap - Check Git commit author by using 
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

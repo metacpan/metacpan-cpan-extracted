@@ -4,7 +4,7 @@ use Carp ();
 use Symbol 'gensym';
 use strict;
 use warnings;
-require overload;
+use overload ();
 
 # imports same()
 require "./t/test_helper.pl";
@@ -86,7 +86,7 @@ $T1->[1]{r2} = $T1->[0][7];
 *::foofoo = [
               ( 'foo' ) x 2
             ];
-${*::foofoo} = *::foofoo{ARRAY};
+${*::foofoo{SCALAR}} = *::foofoo{ARRAY};
 bless( $T1->[0][6], 'T' );
 bless( $T1->[0][7], 'T' );
 bless( $T1->[0][8], 'T' );

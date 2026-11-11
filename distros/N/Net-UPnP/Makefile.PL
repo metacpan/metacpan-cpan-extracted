@@ -7,6 +7,7 @@ WriteMakefile(
     AUTHOR              => 'Satoshi Konno <skonno@cybergarage.org>',
     VERSION_FROM        => 'lib/Net/UPnP.pm',
     ABSTRACT_FROM       => 'lib/Net/UPnP.pm',
+    LICENSE             => 'bsd',
     PL_FILES            => {},
     PREREQ_PM => {
         'Test::More' => 0,

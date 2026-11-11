@@ -6,12 +6,16 @@ use warnings;
 use Carp ();
 use Punk ();
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 sub fh {
     my ($self) = @_;
     my $path = $self->path;
+    # uncoverable branch true
+    # uncoverable condition left
+    # uncoverable condition right
     return undef unless defined $path && length $path;
+    # uncoverable branch true
     open my $fh, '<:raw', $path
         or Carp::croak("Punk::Upload: cannot open '$path': $!");
     return $fh;

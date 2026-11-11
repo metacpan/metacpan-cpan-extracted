@@ -52,6 +52,6 @@
          "web" : "https://github.com/VVelox/Check-supervisorctl"
       }
    },
-   "version" : "v0.1.0",
+   "version" : "v0.2.1",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

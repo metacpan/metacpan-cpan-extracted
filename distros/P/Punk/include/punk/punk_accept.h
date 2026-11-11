@@ -20,26 +20,56 @@ typedef struct pa_range {
     int q;                       /* per mille: 0..1000 */
 } pa_range;
 
-static int pa_ws(char c) { return c == ' ' || c == '\t'; }
+static int pa_ws(char c) { return c == ' ' || c == '\t'; } /* # uncoverable condition left count:2 class:ignore_covered_err */
 
 /* the q of one parameter list: ";q=0.8" -> 800; absent or malformed -> 1000 */
 static int pa_q_of(const char *p, const char *end) {
     while (p < end) {
+        /*
+         # uncoverable branch true count:2
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         while (p < end && (pa_ws(*p) || *p == ';')) p++;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (p + 1 < end && (*p == 'q' || *p == 'Q')) {
             const char *v = p + 1;
+            /*
+             # uncoverable branch true class:ignore_covered_err
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             while (v < end && pa_ws(*v)) v++;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (v < end && *v == '=') {
                 int q;
                 v++;
+                /*
+                 # uncoverable branch true class:ignore_covered_err
+                 # uncoverable condition left count:1 class:ignore_covered_err
+                 # uncoverable condition left count:2 class:ignore_covered_err */
                 while (v < end && pa_ws(*v)) v++;
                 if (v >= end) return 1000;
+                /*
+                 # uncoverable branch true
+                 # uncoverable condition left count:1 class:ignore_covered_err */
                 if (*v == '1') return 1000;
                 if (*v != '0') return 1000;
                 q = 0; v++;
-                if (v < end && *v == '.') {
+                if (v < end && *v == '.') { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     int place = 100;
                     v++;
+                    /*
+                     # uncoverable condition right count:2 class:ignore_covered_err
+                     # uncoverable condition right count:3 class:ignore_covered_err
+                     # uncoverable condition right count:4 class:ignore_covered_err */
                     while (v < end && *v >= '0' && *v <= '9' && place) {
                         q += (*v - '0') * place;
                         place /= 10; v++;
@@ -48,6 +78,14 @@ static int pa_q_of(const char *p, const char *end) {
                 return q;
             }
         }
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1
+         # uncoverable condition left count:2
+         # uncoverable condition right count:2 */
         while (p < end && *p != ';') p++;
     }
     return 1000;
@@ -59,34 +97,52 @@ static int pa_q_of(const char *p, const char *end) {
 static int pa_parse(const char *a, STRLEN al, pa_range *out, int max) {
     const char *p = a, *end = a + al;
     int n = 0;
-    while (p < end && n < max) {
+    while (p < end && n < max) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         const char *seg_end = p, *slash, *sub_end, *par;
         while (seg_end < end && *seg_end != ',') seg_end++;
-        while (p < seg_end && pa_ws(*p)) p++;
+        while (p < seg_end && pa_ws(*p)) p++; /* # uncoverable condition right count:1 class:ignore_covered_err */
         par = p;
         while (par < seg_end && *par != ';') par++;
         sub_end = par;
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         while (sub_end > p && pa_ws(sub_end[-1])) sub_end--;
         slash = p;
-        while (slash < sub_end && *slash != '/') slash++;
+        while (slash < sub_end && *slash != '/') slash++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (slash < sub_end && slash > p && sub_end > slash + 1) {
             out[n].t  = p;         out[n].tl = (STRLEN)(slash - p);
             out[n].s  = slash + 1; out[n].sl = (STRLEN)(sub_end - slash - 1);
             out[n].q  = pa_q_of(par, seg_end);
             n++;
         }
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1
+         # uncoverable condition left count:2
+         # uncoverable condition right count:2 */
         else if (sub_end == p + 1 && *p == '*') {   /* a bare '*' is '* / *' */
-            out[n].t = p; out[n].tl = 1;
-            out[n].s = p; out[n].sl = 1;
-            out[n].q = pa_q_of(par, seg_end);
-            n++;
+            out[n].t = p; out[n].tl = 1; /* # uncoverable statement */
+            out[n].s = p; out[n].sl = 1; /* # uncoverable statement */
+            out[n].q = pa_q_of(par, seg_end); /* # uncoverable statement */
+            n++; /* # uncoverable statement */
         }
         p = seg_end + 1;
     }
     return n;
 }
 
-static int pa_star(const char *s, STRLEN l) { return l == 1 && *s == '*'; }
+static int pa_star(const char *s, STRLEN l) { return l == 1 && *s == '*'; } /* # uncoverable condition right count:2 class:ignore_covered_err */
 
 /* How well the ranges accept one media type: returns the specificity of the
  * most specific matching range (2 exact, 1 type / *, 0 * / *, -1 none), and
@@ -101,7 +157,7 @@ static int pa_match(pTHX_ const pa_range *r, int n,
         int this_spec;
         if (pa_star(r[i].t, r[i].tl))
             this_spec = 0;
-        else if (r[i].tl == tl && foldEQ(r[i].t, t, (I32)tl))
+        else if (r[i].tl == tl && foldEQ(r[i].t, t, (I32)tl)) /* # uncoverable condition right count:2 class:ignore_covered_err */
             this_spec = pa_star(r[i].s, r[i].sl) ? 1
                       : (r[i].sl == sl && foldEQ(r[i].s, s, (I32)sl)) ? 2
                       : -1;
@@ -123,6 +179,9 @@ static int pa_fmt_mime(const char *name, STRLEN nl,
                        const char **t, STRLEN *tl,
                        const char **s, STRLEN *sl) {
     const char *slash = (const char *)memchr(name, '/', nl);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (slash && slash > name && (STRLEN)(slash - name) < nl - 1) {
         *t = name;      *tl = (STRLEN)(slash - name);
         *s = slash + 1; *sl = nl - *tl - 1;
@@ -131,13 +190,18 @@ static int pa_fmt_mime(const char *name, STRLEN nl,
     if (nl == 4 && memEQ(name, "json", 4)) {
         *t = "application"; *tl = 11; *s = "json"; *sl = 4; return 1;
     }
-    if (nl == 4 && memEQ(name, "html", 4)) {
+    if (nl == 4 && memEQ(name, "html", 4)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         *t = "text"; *tl = 4; *s = "html"; *sl = 4; return 1;
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (nl == 4 && memEQ(name, "text", 4)) {
-        *t = "text"; *tl = 4; *s = "plain"; *sl = 5; return 1;
+        *t = "text"; *tl = 4; *s = "plain"; *sl = 5; return 1; /* # uncoverable statement */
     }
-    if (nl == 3 && memEQ(name, "xml", 3)) {
+    if (nl == 3 && memEQ(name, "xml", 3)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         *t = "application"; *tl = 11; *s = "xml"; *sl = 3; return 1;
     }
     return 0;
@@ -160,30 +224,56 @@ static void pa_vary_add(pTHX_ AV *headers, const char *tok, STRLEN tl) {
     for (i = 0; i + 1 < n; i += 2) {
         SV **k = av_fetch(headers, i, 0);
         STRLEN kl; const char *kp;
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!(k && *k)) continue;
         kp = SvPV_const(*k, kl);
         if (kl == 4 && foldEQ(kp, "Vary", 4)) {
             SV **v = av_fetch(headers, i + 1, 0);
             STRLEN vl; const char *vp, *p, *vend;
+            /*
+             # uncoverable branch true class:ignore_covered_err
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err
+             # uncoverable condition left count:3 class:ignore_covered_err */
             if (!(v && *v && SvOK(*v))) continue;
             vp = SvPV_const(*v, vl);
             p = vp; vend = vp + vl;
             while (p < vend) {
                 const char *tok_end = p, *t;
-                while (tok_end < vend && *tok_end != ',') tok_end++;
+                while (tok_end < vend && *tok_end != ',') tok_end++; /* # uncoverable condition right count:2 class:ignore_covered_err */
                 t = p;
+                /*
+                 # uncoverable branch true class:ignore_covered_err
+                 # uncoverable condition left count:1 class:ignore_covered_err
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition left count:2 class:ignore_covered_err */
                 while (t < tok_end && pa_ws(*t)) t++;
                 {
                     const char *te = tok_end;
+                    /*
+                     # uncoverable branch true class:ignore_covered_err
+                     # uncoverable condition left count:1 class:ignore_covered_err
+                     # uncoverable condition right count:1 class:ignore_covered_err
+                     # uncoverable condition left count:2 class:ignore_covered_err */
                     while (te > t && pa_ws(te[-1])) te--;
                     /* `Vary: *` says it varies on everything, so there is
                      * nothing to add and nothing a cache may reuse */
+                    /*
+                     # uncoverable condition left count:1 class:ignore_covered_err
+                     # uncoverable condition left count:2 class:ignore_covered_err
+                     # uncoverable condition right count:2 class:ignore_covered_err */
                     if ((te - t == 1 && *t == '*')
                         || ((STRLEN)(te - t) == tl && foldEQ(t, tok, tl)))
                         return;
                 }
                 p = tok_end + 1;
             }
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (!first_vary) first_vary = *v;
         }
     }

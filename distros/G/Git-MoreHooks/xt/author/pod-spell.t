@@ -58,6 +58,7 @@ ctags
 de
 dir
 filename
+filepath
 githooks
 gnustavo
 http

@@ -137,7 +137,9 @@ sub getposturl() {
 	
 	$location_url = $dev->getlocation();
 	$url_base = $dev->geturlbase();
-	$ctrl_url = $this->getcontrolurl();
+	# Use the caller's URL when given; fall back to the service's
+	# controlURL only when none is supplied (RT #21076).
+	$ctrl_url = $this->getcontrolurl() unless defined($ctrl_url) && length($ctrl_url);
 
 	#print "$location_url\n";
 	#print "$url_base\n";
@@ -146,27 +148,31 @@ sub getposturl() {
 	unless ($ctrl_url =~ m{http://(.*)}i) {
 		if (0 < length($url_base)) {
 			# Thanks for Thus0 (2005/01/12)
-			if (rindex($url_base, '/') == (length($url_base)-1) && index($ctrl_url, '/') == 0) {
-				$ctrl_url = $url_base . substr($ctrl_url, 1);
-			} else {
-				$ctrl_url = $url_base . $ctrl_url;
-			}
+			$ctrl_url = _joinurl($url_base, $ctrl_url);
+		}
+		elsif ($location_url =~ m{http://([0-9a-z.-]+)(?::(\d+))?(?:/|\z)}i) {
+			# A relative controlURL is resolved against the host of the
+			# description URL, always separated by exactly one "/"
+			# (RT #21076).
+			my $port = $2 || 80;
+			$ctrl_url = _joinurl('http://' . $1 . ':' . $port, $ctrl_url);
 		}
 		else {
-			if ($location_url =~ m{http://([0-9a-z.-]+)(?::(\d+))?/(.*)}i) {
-                                my $port = $2 || 80;
-				if (defined($3) && 0 < length($3)) {
-					$ctrl_url = 'http://' . $1 . ":" . $port . $ctrl_url;
-				} else {
-					$ctrl_url = 'http://' . $1 . ":" . $port . '/' . $ctrl_url;
-				}
-			} else {
-				$ctrl_url = $location_url .  $ctrl_url;
-			}
+			$ctrl_url = _joinurl($location_url, $ctrl_url);
 		}
 	}
 	
 	return $ctrl_url;
+}
+
+sub _joinurl {
+	my ($base, $path) = @_;
+	return $base unless defined($path) && length($path);
+	my $base_slash = substr($base, -1) eq '/';
+	my $path_slash = index($path, '/') == 0;
+	return $base . substr($path, 1) if $base_slash && $path_slash;
+	return $base . $path if $base_slash || $path_slash;
+	return $base . '/' . $path;
 }
 
 #------------------------------

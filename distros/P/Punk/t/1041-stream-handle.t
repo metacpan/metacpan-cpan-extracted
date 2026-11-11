@@ -171,7 +171,8 @@ sub serve {
         alarm 60;
         Hyperman->run(app => $app, host => '127.0.0.1', workers => 1,
                       http2 => 1, %o);
-        POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
     for (1 .. 60) {
         my $c = IO::Socket::INET->new(PeerAddr => "127.0.0.1:$o{port}");

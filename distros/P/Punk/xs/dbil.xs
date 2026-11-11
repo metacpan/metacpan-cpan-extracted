@@ -24,7 +24,7 @@ db(self)
     CODE:
     {
         SV *v = pdbi_get(aTHX_ pdl_handle(aTHX_ self), "db");
-        RETVAL = v ? newSVsv(v) : newSV(0);
+        RETVAL = v ? newSVsv(v) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -37,7 +37,7 @@ dbh(self)
     CODE:
     {
         SV *v = pdbi_get(aTHX_ pdl_handle(aTHX_ self), "dbh");
-        RETVAL = v ? newSVsv(v) : newSV(0);
+        RETVAL = v ? newSVsv(v) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -49,17 +49,24 @@ adapter(self)
     CODE:
     {
         SV *v = pdbi_get(aTHX_ pdl_handle(aTHX_ self), "adapter");
-        RETVAL = v ? newSVsv(v) : newSV(0);
+        RETVAL = v ? newSVsv(v) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
 
 IV
+# uncoverable statement
+# uncoverable subroutine
 _returning(self)
         SV *self
     CODE:
     {
-        SV *r = pdbi_get(aTHX_ pdl_handle(aTHX_ self), "returning");
+        SV *r = pdbi_get(aTHX_ pdl_handle(aTHX_ self), "returning"); /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         RETVAL = r ? SvIV(r) : 0;
     }
     OUTPUT:
@@ -71,7 +78,7 @@ _abi_ok(class)
         SV *class
     CODE:
         PERL_UNUSED_VAR(class);
-        RETVAL = punk_dbil_try(aTHX) ? 1 : 0;
+        RETVAL = punk_dbil_try(aTHX) ? 1 : 0; /* # uncoverable condition left count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -105,10 +112,12 @@ count(self, filter = &PL_sv_undef)
         RETVAL
 
 SV *
+# uncoverable statement
+# uncoverable subroutine
 all(self)
         SV *self
     CODE:
-        RETVAL = pdl_search(aTHX_ self, &PL_sv_undef, &PL_sv_undef);
+        RETVAL = pdl_search(aTHX_ self, &PL_sv_undef, &PL_sv_undef); /* # uncoverable statement */
     OUTPUT:
         RETVAL
 

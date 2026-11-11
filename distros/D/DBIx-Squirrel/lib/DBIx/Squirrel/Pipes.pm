@@ -29,10 +29,10 @@ L<DBIx::Squirrel/tap>. DBIx::Squirrel's database and statement handle
 classes, L<DBIx::Squirrel::db> and L<DBIx::Squirrel::st>, inherit from
 it as well as from the DBI's own.
 
-It's a subclass of L<Ekorn::Pipeline::Pipes>, whose methods it
-inherits: C<pipe> runs the handle through a pipeline of stages and
-returns what comes out, and C<tap> runs it through them for their side
-effects and returns the handle.
+It's a subclass of L<Ekorn::Pipeline::Pipes>, and inherits its
+methods. C<pipe> runs the handle through a pipeline of stages, and
+returns what comes out. C<tap> runs it through them for their side
+effects, and returns the handle.
 
 =head1 SEE ALSO
 

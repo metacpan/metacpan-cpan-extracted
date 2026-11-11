@@ -21,4 +21,5 @@ class UV::Handle::Stream extends UV::Handle {
   # Instance Methods
   native method read_start : void ($buffer : mutable string, $buffer_length : int, $cb : UV::Callback::Read, $buffer_offset : int = 0);
   
+  native method read_stop : void ();
 }

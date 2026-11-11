@@ -31,14 +31,14 @@ DBIx::Squirrel::Stages::Taps - stages run for their side effects: peek, count_in
 
 DBIx::Squirrel's name for L<Ekorn::Pipeline::Stages::Taps>, which
 describes its stages in full. It exports C<peek> and C<count_into> by
-default, and C<dump_to> on request, or all three with C<:all>: Ekorn's
-functions, from a list of DBIx::Squirrel's own, so a stage added there
-reaches this module only once it's listed here. It's here to stay,
-beside DBIx::Squirrel's own stages, such as
+default, and C<dump_to> on request, or all three with C<:all>. They're
+Ekorn's functions, from a list of DBIx::Squirrel's own, so a stage
+added there reaches this module only once it's listed here. The module
+is here to stay, beside DBIx::Squirrel's own stages, such as
 L<DBIx::Squirrel::Stages::Rows>.
 
 C<dump_to> is for debugging. It writes each value in full, secrets and
-all, and doesn't escape control characters in strings, so a value from
+all. It doesn't escape control characters in strings, so a value from
 outside can send escape sequences to a terminal.
 
 =head1 SEE ALSO

@@ -3,7 +3,7 @@
 requires 'perl', '5.028000';
 
 requires 'CGI::Info';
-requires 'CGI::Lingua', '0.88';   # 0.88 reads the locale (LC_ALL, LC_MESSAGES, LANG) for the scripts
+requires 'CGI::Lingua', '0.88';   # 0.88 reads the locale (LC_ALL, then LC_MESSAGES, then LANG), which the scripts' messages follow
 requires 'CHI';
 requires 'Carp';
 requires 'Crypt::URandom';   # The login's password salt (script/database-bi password); Windows has no /dev/urandom
@@ -23,6 +23,7 @@ requires 'HTML::TagCloud', '0.38';   # word cloud page (/wordcloud)
 requires 'HTTP::Message';   # HTTP::Response, for SafeUA's refusals (the dist HTTP::Request comes from)
 requires 'HTTP::Request';   # Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
 requires 'IPC::System::Simple';   # For autodie (:all) in DataSource.pm at runtime
+requires 'JSON::PP';   # Boundary.pm reads Nominatim's replies with it (core, declared for completeness)
 requires 'LWP::UserAgent';   # Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
 requires 'LWP::UserAgent::Cached';   # Used by Database::Abstraction for URL-backed tables (import_url)
 requires 'List::Util', '1.40';

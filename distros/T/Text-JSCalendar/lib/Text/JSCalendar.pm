@@ -424,15 +424,15 @@ BEGIN {
 
 =head1 NAME
 
-Text::JSCalendar
+Text::JSCalendar - convert between iCalendar and JSCalendar
 
 =head1 VERSION
 
-Version 0.10
+Version 0.11
 
 =cut
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 =head1 SYNOPSIS
 
@@ -1127,9 +1127,26 @@ sub CompareEvents {
   return _safeeq($E1, $E2);
 }
 
+# Text::VCardFast recurses once per BEGIN, in C: nesting tens of thousands
+# deep overflows the stack and kills the process (no eval can catch that).
+# Real iCalendar nests four or so (VCALENDAR, VEVENT, VALARM); refuse
+# anything deeper than this before it gets there.
+our $MAX_NESTING = 16;
+sub _nesting_ok {
+  my ($text) = @_;
+  my ($depth, $max) = (0, 0);
+  while ($text =~ /^(BEGIN|END)[ \t]*:/mgi) {
+    if (uc $1 eq 'BEGIN') { $depth++; return 0 if $depth > $MAX_NESTING }
+    else { $depth-- if $depth > 0 }
+  }
+  return 1;
+}
+
 sub _getEventsFromVCalendar {
   my ($Self, $VCalendar) = @_;
 
+  confess "Error parsing VCalendar data: components nested more than $MAX_NESTING deep\n"
+    unless _nesting_ok($VCalendar);
   my $CalendarData = eval { vcard2hash($VCalendar, multival => ['rrule'], only_one => 1) }
     or confess "Error parsing VCalendar data: $@\n\n$VCalendar";
 
@@ -2643,6 +2660,10 @@ sub _sanitizeParam {
   $val =~ s/[\r\n]+/ /g;
   # DQUOTE can't be escaped either; Data::ICal drops it with a warning
   $val =~ s/[\x00-\x08\x0a-\x1f\x7f"]//g;
+  # nor a backslash: RFC 5545 gives it no meaning in a parameter, but
+  # Text::VCardFast reads \; \: \" as escapes, so "Evil \" swallowed the
+  # next parameter, or left the line unreadable
+  $val =~ s/\\//g;
   return $val;
 }
 
@@ -2765,6 +2786,12 @@ sub _makeRecurrence {
   }
 
   if ($Args->{rscale}) {
+    # written into the RRULE as they are: an rscale like "gregorian;COUNT=1"
+    # would add rule parts past the checks below (RFC 7529: an rscale is a
+    # calendar name; skip is one of three values)
+    confess "recurrence rscale ($Args->{rscale}) is not valid" unless $Args->{rscale} =~ /\A[A-Za-z0-9-]{1,64}\z/;
+    confess "recurrence skip ($Args->{skip}) is not valid"
+      if exists $Args->{skip} && ($Args->{skip} // '') !~ /\A(?:omit|backward|forward)\z/i;
     $Recurrence{RSCALE} = uc $Args->{rscale};
     $Recurrence{SKIP} = uc $Args->{skip} if exists $Args->{skip};
   }
@@ -3009,6 +3036,10 @@ a class method.
 =cut
 
 our $MaxOccurrences = 5000;
+# Bounds on one rule's expansion (a rule is untrusted input): the periods
+# and candidate dates looked at, and the entries of any one BYxxx list.
+our $MaxExpandWork = 250_000;
+our $MaxRuleList   = 400;
 
 sub occurrences {
   my ($Self, $Event, %Opts) = @_;
@@ -3170,11 +3201,21 @@ sub _expandRule {
     my $list = _list($Rule->{$name}) or next;
     $by{$name} = [ map { croak "recurrence $name ($_) is not valid" unless defined $_ and /^[-+]?\d+$/; 0 + $_ } @$list ];
   }
-  my %range = (byHour => [0, 23], byMinute => [0, 59], bySecond => [0, 60]);
+  # RFC 5545 S3.3.10's ranges (a negative day counts from the end), and no
+  # list longer than any calendar could need: a rule is untrusted input,
+  # and every entry is work in every period
+  my %range = (byHour => [0, 23], byMinute => [0, 59], bySecond => [0, 60],
+               byMonthDay => [-31, 31], byYearDay => [-366, 366], byWeekNo => [-53, 53],
+               bySetPosition => [-366, 366]);
   foreach my $name (keys %range) {
     next unless $by{$name};
+    croak "recurrence $name has too many entries" if @{$by{$name}} > $MaxRuleList;
     croak "recurrence $name is out of range"
-      if grep { $_ < $range{$name}[0] or $_ > $range{$name}[1] } @{$by{$name}};
+      if grep { $_ < $range{$name}[0] or $_ > $range{$name}[1] or $_ == 0 && $range{$name}[0] < 0 } @{$by{$name}};
+  }
+  foreach my $name (qw(byMonth byDay)) {
+    my $list = _list($Rule->{$name}) or next;
+    croak "recurrence $name has too many entries" if @$list > $MaxRuleList;
   }
   if (my $list = _list($Rule->{byMonth})) {
     # a leap month ("5L") never matches in the Gregorian calendar
@@ -3290,6 +3331,28 @@ sub _expandRule {
     return @days;
   };
 
+  # the days of the given months of year $y that pass every date filter:
+  # $daysOf over only the months byMonth allows, or, with byMonthDay (and
+  # no byWeekNo or byYearDay to widen it), straight from its values -- not
+  # every day of the year tested in turn
+  my $daysOfMonths = sub {
+    my ($y, @months) = @_;
+    @months = grep { $by{byMonth}{$_} } @months if $by{byMonth};
+    if ($by{byMonthDay} and !$by{byWeekNo} and !$by{byYearDay}) {
+      my %days;
+      foreach my $m (@months) {
+        my $dim = _daysInMonth($y, $m);
+        foreach my $v (@{$by{byMonthDay}}) {
+          my $d = $v > 0 ? $v : $dim + 1 + $v;
+          $days{_dayNumber($y, $m, $d)} = 1 if $d >= 1 and $d <= $dim;
+        }
+      }
+      return grep { my @c = _civil($_); $dayMatchesUpToMonthDay->($_, @c) and $dayMatchesByDay->($_, @c) }
+             sort { $a <=> $b } keys %days;
+    }
+    return map { $daysOf->(_dayNumber($y, $_, 1), _dayNumber($y, $_, _daysInMonth($y, $_))) } @months;
+  };
+
   my @hours   = sort { $a <=> $b } keys %{$inList{byHour}};
   my @minutes = sort { $a <=> $b } keys %{$inList{byMinute}};
   my @seconds = sort { $a <=> $b } keys %{$inList{bySecond}};
@@ -3309,15 +3372,13 @@ sub _expandRule {
     if ($freq eq 'yearly') {
       my $y = $sy + $n * $interval;
       $periodStart = sprintf('%04d-01-01T00:00:00', $y);
-      @days = $skipping ? $skipDays->($y, 1 .. 12)
-                        : $daysOf->(_dayNumber($y, 1, 1), _dayNumber($y, 12, 31));
+      @days = $skipping ? $skipDays->($y, 1 .. 12) : $daysOfMonths->($y, 1 .. 12);
     }
     elsif ($freq eq 'monthly') {
       my $mi = ($sy * 12 + $sm - 1) + $n * $interval;
       my ($y, $m) = (int($mi / 12), $mi % 12 + 1);
       $periodStart = sprintf('%04d-%02d-01T00:00:00', $y, $m);
-      @days = $skipping ? $skipDays->($y, $m)
-                        : $daysOf->(_dayNumber($y, $m, 1), _dayNumber($y, $m, _daysInMonth($y, $m)));
+      @days = $skipping ? $skipDays->($y, $m) : $daysOfMonths->($y, $m);
     }
     elsif ($freq eq 'weekly') {
       my $first = $startDay - ((_weekday($startDay) - $wkst) % 7) + 7 * $n * $interval;
@@ -3412,8 +3473,12 @@ sub _expandRule {
     $n0 = 0 if $n0 < 0;
   }
 
+  # a hard bound on the work one expansion may do: whatever the rule, it
+  # ends after this many periods and candidates looked at
+  my $work = 0;
   for (my $n = $n0; ; $n++) {
     my @c = $candidates->($n);
+    return if ($work += 1 + @c) > $MaxExpandWork;
     return if defined $until and $periodStart gt $until;
     return if defined $before and $periodStart ge $before;
     my $any = 0;
@@ -3431,6 +3496,28 @@ sub _expandRule {
       my $left = int((86400 - ($H * 3600 + $M * 60 + $S) - 1) / ($unit * $interval));
       $n += $left;
       $sinceLast += $left;
+    }
+    elsif ($subDaily and !@c) {
+      # the day passed but this period's hour (or minute) did not: jump to
+      # the last period that starts before the next allowed one, as above
+      # for a day (MINUTELY;BYHOUR=9 looked at every minute of the day)
+      my $unit = { hourly => 3600, minutely => 60, secondly => 1 }->{$freq};
+      my ($H, $M, $S) = map { 0 + $_ } $periodStart =~ /T(\d\d):(\d\d):(\d\d)$/;
+      my $now = $H * 3600 + $M * 60 + $S;
+      my $next;
+      if (%{$inList{byHour}} and !$inList{byHour}{$H}) {
+        my ($h) = grep { $_ > $H } @hours;
+        $next = defined $h ? $h * 3600 : 86400;
+      }
+      elsif ($freq ne 'hourly' and %{$inList{byMinute}} and !$inList{byMinute}{$M}) {
+        my ($m) = grep { $_ > $M } @minutes;
+        $next = $H * 3600 + (defined $m ? $m * 60 : 3600);
+      }
+      if (defined $next) {
+        my $left = int(($next - $now - 1) / ($unit * $interval));
+        $n += $left;
+        $sinceLast += $left;
+      }
     }
   }
 }
@@ -3517,11 +3604,13 @@ sub _maximise {
   my $Recurrence = shift;
   my $recurrenceId = shift;
 
-  my $new = _deepcopy($Event);
+  # a copy of the master without its rule and overrides (copying them for
+  # every override and then dropping them made writing an event O(N^2) in
+  # its overrides)
+  my %master = %$Event;
+  delete @master{'recurrenceRule', 'recurrenceOverrides', SYNTHETIC_MASTER()};
+  my $new = _deepcopy(\%master);
   $new->{start} = $recurrenceId;
-  delete $new->{recurrenceRule};
-  delete $new->{recurrenceOverrides};
-  delete $new->{SYNTHETIC_MASTER()};
 
   foreach my $path (sort keys %$Recurrence) {
     # overrides can't change the identity or type of the master event

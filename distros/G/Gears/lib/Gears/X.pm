@@ -1,5 +1,5 @@
 package Gears::X;
-$Gears::X::VERSION = '0.104';
+$Gears::X::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -110,7 +110,7 @@ sub as_string ($self, $trace = $PRINT_TRACE)
 		$class =~ s/^${base}::(.+)$/[$1] /;
 	}
 
-	return "An error occured: $class$raised";
+	return "An error occurred: $class$raised";
 }
 
 sub as_number ($self)
@@ -141,7 +141,7 @@ Gears::X - Base exception class
 	}
 	catch ($e) {
 		say $e->message;                  # Error occurred
-		say $e;                           # An error occured: Error occurred (raised at ...)
+		say $e;                           # An error occurred: Error occurred (raised at ...)
 		my ($file, $line) = $e->caller->@*;
 	}
 
@@ -246,7 +246,7 @@ This method is called automatically when the exception is stringified.
 
 If the exception is a subclass, the class name is included:
 
-	An error occured: [HTTP] 404 - Not Found (raised at ...)
+	An error occurred: [HTTP] 404 - Not Found (raised at ...)
 
 =head3 as_number
 

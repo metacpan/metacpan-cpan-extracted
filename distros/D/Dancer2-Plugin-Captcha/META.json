@@ -1,16 +1,16 @@
 {
    "abstract" : "Dancer2 add-on for CAPTCHA.",
    "author" : [
-      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+      "Mohammad Sajid Anwar <mohammad.anwar@yahoo.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "artistic_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Dancer2-Plugin-Captcha",
    "no_index" : {
@@ -35,27 +35,28 @@
       },
       "runtime" : {
          "requires" : {
-            "Dancer2" : "0.159002",
-            "Dancer2::Plugin" : "0.159002",
+            "Dancer2" : "v2.3.0",
+            "Dancer2::Plugin" : "v2.3.0",
             "GD::SecurityImage" : "0",
             "perl" : "5.006"
          }
       }
    },
-   "provides" : {
-      "Dancer2::Plugin::Captcha" : {
-         "file" : "lib/Dancer2/Plugin/Captcha.pm",
-         "version" : "0.14"
-      }
-   },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/manwar/Dancer2-Plugin-Captcha/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/manwar/Dancer2-Plugin-Captcha.git",
          "web" : "https://github.com/manwar/Dancer2-Plugin-Captcha"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+   "version" : "v1.0.0",
+   "x_Dancer2::Plugin::Captcha" : {
+      "file" : "lib/Dancer2/Plugin/Captcha.pm",
+      "version" : "v1.0.0"
+   },
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

@@ -164,8 +164,8 @@ my $app = Hard->to_app;
                          length => $claim);
             print {$wr} $r ? "$r->[0] " . text($r) : 'died';
             close $wr;
-            require POSIX;
-            POSIX::_exit(0);
+            Test::Builder->new->no_ending(1);
+            exit 0;
         }
         close $wr;
         my $got = do { local $/; <$rd> };

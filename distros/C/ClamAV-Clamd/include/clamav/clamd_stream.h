@@ -77,12 +77,21 @@ static ssize_t cc_source_next(cc_source *s, const char **p, cc_err *err) {
         s->memoff += take;
         return (ssize_t)take;
     }
-    for (;;) {
-        ssize_t n = cc_read_fd(s->fd, s->iobuf, s->chunk);
-        if (n >= 0) { *p = s->iobuf; return n; }
-        if (errno == EINTR) continue;
-        cc_err_set(err, CC_ERR_IO, "read", strerror(errno));
-        return -1;
+    {
+        ssize_t n;
+        do {
+            n = cc_read_fd(s->fd, s->iobuf, s->chunk);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1
+         # uncoverable condition left count:2 */
+        } while (n < 0 && errno == EINTR);
+        if (n < 0) {
+            cc_err_set(err, CC_ERR_IO, "read", strerror(errno));
+            return -1;
+        }
+        *p = s->iobuf;
+        return n;
     }
 }
 

@@ -18,7 +18,7 @@ use Carp;
 use Data::Identifier;
 use Data::Identifier::Generate;
 
-our $VERSION = v0.37;
+our $VERSION = v0.38;
 
 use constant {
     BOOL_TRUE  => Data::Identifier->new(uuid => 'eb50b3dc-28be-4cfc-a9ea-bd7cee73aed5')->register,
@@ -828,7 +828,7 @@ Data::Identifier::Util - format independent identifier object
 
 =head1 VERSION
 
-version v0.37
+version v0.38
 
 =head1 SYNOPSIS
 

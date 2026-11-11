@@ -34,6 +34,7 @@
          "requires" : {
             "JSON::PP" : "0",
             "Keyword::Simple" : "0.04",
+            "Time::HiRes" : "0",
             "perl" : "5.038000"
          }
       },
@@ -45,6 +46,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : "0.02",
+   "version" : "0.03",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

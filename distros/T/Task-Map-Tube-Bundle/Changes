@@ -1,5 +1,18 @@
 Revision history for Task::Map::Tube::Bundle
 
+v1.0.8  2026-11-11
+        - Updated pod w.r.t the following new maps:
+          Brussels
+          Chicago
+          Hannover
+          Leipzig
+          Muenchen
+          Napoli
+          Paris
+          SanFrancisco
+          Stuttgart
+        - Removed Bielefeld map for now, which is broken.
+
 v1.0.7  2026-03-31
         - Updated pod w.r.t the new map: Sydney.
         - Switched to dotted-decimal versioning (v-strings).

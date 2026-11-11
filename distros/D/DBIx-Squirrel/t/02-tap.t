@@ -57,12 +57,12 @@ subtest 'a stage that dies is reported where tap was called' => sub {
         "Pipeline stage #2 failed at ${\ __FILE__ } line $line:\n    boom\n";
 };
 
-subtest 'a stage that is not a code reference' => sub {
+subtest 'a stage that is neither a code reference nor a pipeline' => sub {
     my @stages = (sub { $_ }, 'x');
     my $line   = __LINE__ + 1;
     my $err    = dies { $dbh->tap(@stages) };
     is $err,
-        "Expected stage #2 to be a code reference at ${\ __FILE__ } line $line.\n";
+        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n";
 };
 
 subtest 'a statement handle has tap too' => sub {

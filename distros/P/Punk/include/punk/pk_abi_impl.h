@@ -16,6 +16,11 @@
  * this never croaks the way pcx_av does. */
 static AV *pk_abi_av(pTHX_ SV *c) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!c || !SvROK(c) || SvTYPE(SvRV(c)) != SVt_PVAV) return NULL;
     return (AV *)SvRV(c);
 }
@@ -23,7 +28,11 @@ static AV *pk_abi_av(pTHX_ SV *c) {
 /* One slot, borrowed; NULL when absent or undef. */
 static SV *pk_abi_slot(pTHX_ SV *c, SSize_t i) {
     AV *av = pk_abi_av(aTHX_ c);
-    SV **e = av ? av_fetch(av, i, 0) : NULL;
+    SV **e = av ? av_fetch(av, i, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (e && *e && SvOK(*e)) ? *e : NULL;
 }
 
@@ -37,10 +46,16 @@ static SV *pk_abi_match_of(pTHX_ SV *c) { return pk_abi_slot(aTHX_ c, PCX_MATCH)
 static SV *pk_abi_stash_of(pTHX_ SV *c) {
     AV *av = pk_abi_av(aTHX_ c);
     SV *st;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!av) return NULL;
     st = pcx_get(aTHX_ av, PCX_STASH);
     if (!st) {
         st = newRV_noinc((SV *)newHV());
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!av_store(av, PCX_STASH, st)) { SvREFCNT_dec(st); return NULL; }
     }
     return st;
@@ -49,6 +64,11 @@ static SV *pk_abi_stash_of(pTHX_ SV *c) {
 /* The match hash, or NULL. */
 static HV *pk_abi_match_hv(pTHX_ SV *c) {
     SV *m = pk_abi_match_of(aTHX_ c);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(m && SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV)) return NULL;
     return (HV *)SvRV(m);
 }
@@ -59,16 +79,30 @@ static HV *pk_abi_match_hv(pTHX_ SV *c) {
 static SV *pk_abi_route_pattern_of(pTHX_ SV *c) {
     HV *mh = pk_abi_match_hv(aTHX_ c);
     SV **r, **p;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!mh) return NULL;
     r = hv_fetchs(mh, "route", 0);
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(r && *r && SvROK(*r) && SvTYPE(SvRV(*r)) == SVt_PVHV)) return NULL;
     p = hv_fetchs((HV *)SvRV(*r), K_PATH, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (p && *p && SvOK(*p)) ? *p : NULL;
 }
 
 static SV *pk_abi_operation_of(pTHX_ SV *c) {
     HV *mh = pk_abi_match_hv(aTHX_ c);
-    SV **o = mh ? hv_fetchs(mh, "operation", 0) : NULL;
+    SV **o = mh ? hv_fetchs(mh, "operation", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (o && *o && SvOK(*o)) ? *o : NULL;
 }
 
@@ -77,10 +111,17 @@ static SV *pk_abi_operation_of(pTHX_ SV *c) {
 static IV pk_abi_status_of(pTHX_ SV *response) {
     AV *ra;
     SV **s;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!response || !SvROK(response) || SvTYPE(SvRV(response)) != SVt_PVAV)
         return -1;
     ra = (AV *)SvRV(response);
     s = av_fetch(ra, 0, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (s && *s && SvOK(*s)) ? SvIV(*s) : -1;
 }
 

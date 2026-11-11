@@ -321,7 +321,7 @@ SKIP: {
         like($slurp->($get->("/await?n=$n")), qr/got:42/,
             "await returns the value after a callback grew the stack by $n");
     }
-    kill 9, $pid; waitpid $pid, 0;
+    kill q{TERM}, $pid; waitpid $pid, 0;
 }
 
 done_testing;

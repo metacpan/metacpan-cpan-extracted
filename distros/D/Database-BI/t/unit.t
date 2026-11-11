@@ -3626,6 +3626,122 @@ subtest 'Geocode.models_with_cache -- does not mutate the caller hashref' => sub
 		$tm->post_ok('/geo/lookup' => form => { place => 'Paris', sig => 'forged' })->status_is(403);
 		message_ok(Dashboard => 'error_geo_lookup_unsigned', $tm->tx->res->json->{error});
 
+		# County outlines (bounds=county), with Nominatim's reverse lookup and
+		# HTML::OSM stood in for: geo.csv has two points, one in each box.
+		{
+			require BI::Test::Boundary;
+			my $areas = [
+				{ name => 'Ten', id => 1, box => [ 9, 19, 11, 21 ] },
+				{ name => 'Thirty', id => 2, box => [ 29, 39, 31, 41 ] },
+			];
+			my $bounds = "/map?$l&lat=lat&lon=lon&bounds=county";
+			$tm->get_ok("/map?$l&loc=place&loc_text=" . ('x' x 201))->status_is(400);
+			message_ok(Dashboard => 'error_map_loc_text', $tm->tx->res->body, [200, 'x' x 201]);
+			$tm->post_ok('/geo/save' => form => { l => 'table:x', col => 'place', kind => 'location', loc_text => "a\nb" })
+				->status_is(400);
+			message_ok(Dashboard => 'error_map_loc_text', $tm->tx->res->json->{error}, [200, "a\nb"]);
+			$tm->get_ok("/map?$l&lat=lat&lon=lon&bounds=shire")->status_is(400);
+			message_ok(Dashboard => 'error_map_bounds_unknown', $tm->tx->res->body, ['shire']);
+
+			no warnings qw(redefine once);
+			local *Database::BI::Controller::Dashboard::_map_renderer_version = sub { (1, '0.15') };
+			my @layers;
+			local *HTML::OSM::new = sub { bless {}, 'Unit::FakeOSM' };
+			local *Unit::FakeOSM::add_marker = sub { 1 };
+			my @popups;
+			my @keys;
+			local *Unit::FakeOSM::add_geojson = sub {
+				my (undef, $data, %o) = @_;
+				push @layers, $o{name};
+				push @keys, $o{key} if $o{key};
+				push @popups, map { $_->{properties}{name} } @{ $data->{features} };
+				1;
+			};
+			local *Unit::FakeOSM::add_heatmap = sub { 1 };
+			local *Unit::FakeOSM::onload_render = sub { ('', '<div id="map"></div>') };
+
+			my $outlines = unit_app();
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$outlines->get_ok($bounds)->status_is(200);
+			});
+			message_ok(Dashboard => 'map_bounds_layer', $layers[0], ['County']);
+
+			# With the heat layer, each outline's popup gives its total.
+			@popups = ();
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$outlines->get_ok("$bounds&heat=1&weight=id")->status_is(200);
+			});
+			message_ok(Dashboard => 'map_bounds_total', $popups[0], ['Ten', 1, 'id']);
+			message_ok(Dashboard => 'map_bounds_key_total', $keys[-1]{title}, ['id', 'county']);
+			@popups = ();
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$outlines->get_ok("$bounds&heat=1")->status_is(200);
+			});
+			message_ok(Dashboard => 'map_bounds_row', $popups[0], ['Ten']);
+			# A colour covering unequal totals names its range: more outlines
+			# than the nine colours, one marker each.
+			my $row = unit_csv('row.csv', "id,lat,lon\n" . join('', map { "$_,40.5,@{[ $_ + 0.5 ]}\n" } 1 .. 20));
+			@keys = ();
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => [
+				map { { name => "C$_", id => 100 + $_, box => [ 40, $_, 41, $_ + 1 ] } } 1 .. 20
+			]), sub {
+				$outlines->get_ok('/map?l=' . $e->("path:$row") . '&lat=lat&lon=lon&bounds=county&heat=1&weight=id')
+					->status_is(200);
+			});
+			message_ok(Dashboard => 'map_bounds_key_range', $keys[-1]{entries}[0]{label}, [17, 20]);
+			# Two rows in one outline are "2 rows"; one alone is "1 row", above.
+			my $pair = unit_csv('pair.csv', "id,lat,lon\n1,50.5,1.5\n2,50.5,1.5\n3,50.5,3.5\n");
+			@popups = ();
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => [
+				{ name => 'Pair', id => 301, box => [ 50, 1, 51, 2 ] },
+				{ name => 'Solo', id => 302, box => [ 50, 3, 51, 4 ] },
+			]), sub {
+				$outlines->get_ok('/map?l=' . $e->("path:$pair") . '&lat=lat&lon=lon&bounds=county&heat=1')->status_is(200);
+			});
+			message_ok(Dashboard => 'map_bounds_rows', $popups[-1], ['Pair', 2]);
+			message_ok(Dashboard => 'map_bounds_key_rows', $keys[-1]{title}, ['county']);
+
+			my $capped = unit_app();
+			$capped->app->config->{map_geocode_online_max} = 1;
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$capped->get_ok($bounds)->status_is(200);
+			});
+			message_ok(Dashboard => 'warn_map_bounds_pending_one', $capped->tx->res->body, [1, 2], 1);
+			# More than one left: "places have ... look them up".
+			my $many = unit_app();
+			$many->app->config->{map_geocode_online_max} = 1;
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$many->get_ok('/map?l=' . $e->("path:$row") . '&lat=lat&lon=lon&bounds=county')->status_is(200);
+			});
+			message_ok(Dashboard => 'warn_map_bounds_pending', $many->tx->res->body, [19, 20], 1);
+
+			my $offline = unit_app();
+			$offline->app->config->{map_geocode_online} = 0;
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$offline->get_ok($bounds)->status_is(200);
+			});
+			message_ok(Dashboard => 'warn_map_bounds_offline', $offline->tx->res->body, [2, 2], 1);
+			# One place alone "has" no outline.
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas), sub {
+				$offline->get_ok("$bounds&f=id:eq:1")->status_is(200);
+			});
+			message_ok(Dashboard => 'warn_map_bounds_offline_one', $offline->tx->res->body, [1, 1], 1);
+
+			my $down = unit_app();
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas, fail => 1), sub {
+				$down->get_ok($bounds)->status_is(200);
+			});
+			message_ok(Dashboard => 'warn_map_bounds_failed', $down->tx->res->body, [2, 2], 1);
+			BI::Test::Boundary::with_ua(BI::Test::Boundary->new(areas => $areas, fail => 1), sub {
+				$down->get_ok("$bounds&f=id:eq:1")->status_is(200);
+			});
+			message_ok(Dashboard => 'warn_map_bounds_failed_one', $down->tx->res->body, [1, 1], 1);
+		}
+		$tm->post_ok('/geo/boundary')->status_is(400);
+		message_ok(Dashboard => 'error_geo_boundary_point', $tm->tx->res->json->{error});
+		$tm->post_ok('/geo/boundary' => form => { point => '10.000,20.000', sig => 'forged' })->status_is(403);
+		message_ok(Dashboard => 'error_geo_boundary_unsigned', $tm->tx->res->json->{error});
+
 		# The AI routes: the provider is the only thing replaced.
 		require HTTP::Response;
 		$tm->post_ok("/api/ask?l=$SPEC&q=x")->status_is(503);

@@ -3,7 +3,7 @@ package Database::BI::Sessions;
 use strict;
 use warnings;
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 use Mojo::Base 'Mojolicious::Sessions';
 
@@ -30,7 +30,7 @@ Database::BI::Sessions - Session cookies that are Secure over https
 
 =head1 VERSION
 
-0.022.0
+0.023.0
 
 =head1 SYNOPSIS
 

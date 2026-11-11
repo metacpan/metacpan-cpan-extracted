@@ -1436,6 +1436,12 @@
           [%- END -%]
         </select>
       </div>
+      <div class="join-field" id="map-loc-text-field" hidden>
+        <label for="map-loc-text-inp">Add to each place</label>
+        <input type="text" id="map-loc-text-inp" name="loc_text" disabled maxlength="200"
+               placeholder="e.g. Virginia, USA" autocomplete="off"
+               title="Text added to the end of every place before it is looked up, after a comma: a column of county names with &quot;Virginia, USA&quot; looks up &quot;Accomack, Virginia, USA&quot;">
+      </div>
       <div class="graph-btn-col">
         <span class="graph-btn-spacer"></span>
         <label class="check-label">
@@ -1457,6 +1463,26 @@
           <input type="checkbox" id="map-heat-chk">
           Heatmap layer
         </label>
+      </div>
+      <div class="join-field">
+        <label class="check-label" title="Draw the outline of the county each marker is in. The outlines come from OpenStreetMap, which is sent each marker's position, rounded to about 100 metres; each outline is then remembered.">
+          <input type="checkbox" id="map-bounds-chk">
+          Show county boundaries
+        </label>
+      </div>
+      <div class="join-field" id="map-shade-field" hidden>
+        <label for="map-shade-sel" title="Fill each county in a shade of one colour: the darker, the larger this column's total in it">Colour shade</label>
+        <select id="map-shade-sel">
+          <option value="">&#x2014; none &#x2014;</option>
+          [%- FOREACH col IN columns -%]
+          <option value="[% col | html %]">[% col | html %]</option>
+          [%- END -%]
+        </select>
+      </div>
+      <div class="join-field" id="map-shade-color-field" hidden>
+        <label for="map-shade-color-inp">Shade colour</label>
+        <input type="text" id="map-shade-color-inp" placeholder="#d94801" size="10"
+               title="The colour of the darkest shade: a name such as green, or #rrggbb">
       </div>
       <div class="join-field" id="map-weight-field" hidden>
         <label for="map-weight-sel">Heat weight column</label>
@@ -4517,6 +4543,8 @@ function biDetectColType(colName) {
   var locSel        = document.getElementById('map-loc-sel');
   var loc2Sel       = document.getElementById('map-loc2-sel');
   var loc2Field     = document.getElementById('map-loc2-field');
+  var locTextInp    = document.getElementById('map-loc-text-inp');
+  var locTextField  = document.getElementById('map-loc-text-field');
   var latField      = document.getElementById('map-lat-field');
   var lonField      = document.getElementById('map-lon-field');
   var locField      = document.getElementById('map-loc-field');
@@ -4546,6 +4574,8 @@ function biDetectColType(colName) {
     lonField.hidden = loc;
     locField.hidden = !loc;
     loc2Field.hidden = !loc;
+    if (locTextField) locTextField.hidden = !loc;
+    if (locTextInp) locTextInp.disabled = !loc;
     latSel.disabled = loc;
     lonSel.disabled = loc;
     locSel.disabled = !loc;
@@ -4624,6 +4654,9 @@ function biDetectColType(colName) {
           var saved = !!(data && data.columns && Object.keys(data.columns).length);
           if (saved) {
             applyGeoPrefs(data.columns);
+            // The text added to each place, unless one has been typed.
+            if (locTextInp && !locTextInp.value && typeof data.loc_text === 'string')
+              locTextInp.value = data.loc_text;
           } else {
             guessColumns();
           }
@@ -4654,6 +4687,7 @@ function biDetectColType(colName) {
     }).then(function (r) { return r.json(); }).then(function (j) {
       if (!j.ok) return;
       forgetBtn.hidden = true;
+      if (locTextInp) locTextInp.value = '';
       guessColumns();
       syncMode();
     }).catch(function () {});
@@ -4764,6 +4798,21 @@ function biDetectColType(colName) {
     if (weightFld) weightFld.hidden = !heatChk.checked;
   });
 
+  // Colour shade fills the county outlines, so it is offered with them, and
+  // its colour once a column is chosen.
+  var boundsChk     = document.getElementById('map-bounds-chk');
+  var shadeFld      = document.getElementById('map-shade-field');
+  var shadeSel      = document.getElementById('map-shade-sel');
+  var shadeColorFld = document.getElementById('map-shade-color-field');
+  function syncShade() {
+    var on = !!(boundsChk && boundsChk.checked);
+    if (shadeFld) shadeFld.hidden = !on;
+    if (shadeColorFld) shadeColorFld.hidden = !(on && shadeSel && shadeSel.value);
+  }
+  boundsChk && boundsChk.addEventListener('change', syncShade);
+  shadeSel && shadeSel.addEventListener('change', syncShade);
+  syncShade();
+
   mapForm.addEventListener('submit', function () {
     function addHidden(nm, val) {
       var inp = document.createElement('input');
@@ -4774,6 +4823,8 @@ function biDetectColType(colName) {
     // "Followed by: nothing" sends no second loc=; opening the panel again
     // enables it (syncMode).
     if (!loc2Sel.value) loc2Sel.disabled = true;
+    // Nothing typed sends no loc_text=.
+    if (locTextInp && !locTextInp.value.trim()) locTextInp.disabled = true;
 
     // Save column preferences when the checkbox is checked.
     var remChk = document.getElementById('map-remember-chk');
@@ -4792,6 +4843,7 @@ function biDetectColType(colName) {
           saves.push({ col: loc2Sel.value, kind: 'location_suffix' });
         // One request, which replaces what was saved before; keepalive lets it
         // finish while the form takes the page to the map.
+        var locText = (byLocation() && locTextInp) ? locTextInp.value.trim() : '';
         if (saves.length) {
           fetch('/geo/save', {
             method: 'POST',
@@ -4799,7 +4851,7 @@ function biDetectColType(colName) {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'l=' + encodeURIComponent(lVal) + '&replace=1' + saves.map(function (s) {
               return '&col=' + encodeURIComponent(s.col) + '&kind=' + encodeURIComponent(s.kind);
-            }).join(''),
+            }).join('') + (locText ? '&loc_text=' + encodeURIComponent(locText) : ''),
           });
         }
       }
@@ -4815,6 +4867,17 @@ function biDetectColType(colName) {
     }
     var zVal = zoomInpEl ? zoomInpEl.value.trim() : '';
     if (zVal !== '') addHidden('zoom', zVal);
+    var boundsChkEl = document.getElementById('map-bounds-chk');
+    if (boundsChkEl && boundsChkEl.checked) {
+      addHidden('bounds', 'county');
+      var shadeSelEl = document.getElementById('map-shade-sel');
+      var shadeInpEl = document.getElementById('map-shade-color-inp');
+      if (shadeSelEl && shadeSelEl.value) {
+        addHidden('shade', shadeSelEl.value);
+        var shadeCol = shadeInpEl ? shadeInpEl.value.trim() : '';
+        if (shadeCol) addHidden('shade_color', shadeCol);
+      }
+    }
 
     var col = colorSel ? colorSel.value : '';
     if (!col) return;

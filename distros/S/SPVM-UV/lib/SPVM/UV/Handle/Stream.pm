@@ -74,6 +74,18 @@ If $cb is not defined, an exception is thrown.
 
 If uv_read_start> fails, an exception is thrown.
 
+=head2 read_stop
+
+C<method read_stop : void ();>
+
+Stops reading data from the stream.
+
+This method calls the L<uv_read_stop|https://docs.libuv.org/en/v1.x/stream.html#c.uv_read_stop> function internally.
+
+Exceptions:
+
+If uv_read_stop fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

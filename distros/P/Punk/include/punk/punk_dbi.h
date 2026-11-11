@@ -27,14 +27,14 @@
 #define PUNK_DBI_H
 
 static HV *pdbi_hv(pTHX_ SV *self) {
-    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) /* # uncoverable condition left count:1 class:ignore_covered_err */
         croak("Punk::Model::DBI: not a backend object");
     return (HV *)SvRV(self);
 }
 
 static SV *pdbi_get(pTHX_ HV *h, const char *k) {
     SV **e = hv_fetch(h, k, (I32)strlen(k), 0);
-    return (e && *e) ? *e : NULL;
+    return (e && *e) ? *e : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
 }
 
 /* ---- the connection pool ---------------------------------------------------
@@ -66,8 +66,17 @@ static SV *pdbi_slot(pTHX_ HV *pool, SV *key) {
  * are magical hashes, so this goes through hv_fetch, which runs the magic. */
 static SV *pdbi_attr(pTHX_ SV *h, const char *name) {
     SV **e;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(h && SvROK(h) && SvTYPE(SvRV(h)) == SVt_PVHV)) return NULL;
     e = hv_fetch((HV *)SvRV(h), name, (I32)strlen(name), 0);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(e && *e)) return NULL;
     SvGETMAGIC(*e);
     return *e;
@@ -78,28 +87,55 @@ static SV *pdbi_attr(pTHX_ SV *h, const char *name) {
  * failing is not fatal - a 0 here only costs an extra SELECT. */
 static int pdbi_detect_returning(pTHX_ SV *dbh) {
     SV *drv = pdbi_attr(aTHX_ dbh, "Driver");
-    SV *name = drv ? pdbi_attr(aTHX_ drv, "Name") : NULL;
+    SV *name = drv ? pdbi_attr(aTHX_ drv, "Name") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     const char *n;
     STRLEN nl;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(name && SvOK(name))) return 0;
     n = SvPV_const(name, nl);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (nl == 2 && memEQ(n, "Pg", 2)) return 1;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (nl == 6 && memEQ(n, "SQLite", 6)) {
         SV *v = pdbi_attr(aTHX_ dbh, "sqlite_version");
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (v && SvOK(v)) {
             STRLEN vl;
             const char *s = SvPV_const(v, vl);
             int maj = 0, min = 0;
             STRLEN i = 0;
-            while (i < vl && isDIGIT((U8)s[i])) maj = maj * 10 + (s[i++] - '0');
+            while (i < vl && isDIGIT((U8)s[i])) maj = maj * 10 + (s[i++] - '0'); /* # uncoverable condition right count:1 class:ignore_covered_err */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (i < vl && s[i] == '.') {
                 i++;
-                while (i < vl && isDIGIT((U8)s[i])) min = min * 10 + (s[i++] - '0');
+                while (i < vl && isDIGIT((U8)s[i])) min = min * 10 + (s[i++] - '0'); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
+            /*
+             # uncoverable branch false
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (maj > 3 || (maj == 3 && min >= 35)) return 1;
         }
     }
-    return 0;
+    return 0; /* # uncoverable statement */
 }
 
 /* The pool slot for a set of connection options, connected on first use in
@@ -108,21 +144,36 @@ static int pdbi_detect_returning(pTHX_ SV *dbh) {
  * and not to any one model, can reach the slot from the database options
  * the `database` keyword recorded. */
 static HV *pdbi_slot_for_opts(pTHX_ HV *o) {
-    SV *dsn  = o ? pdbi_get(aTHX_ o, "dsn") : NULL;
-    SV *user = o ? pdbi_get(aTHX_ o, "user") : NULL;
-    SV *pass = o ? pdbi_get(aTHX_ o, "password") : NULL;
+    SV *dsn  = o ? pdbi_get(aTHX_ o, "dsn") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *user = o ? pdbi_get(aTHX_ o, "user") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV *pass = o ? pdbi_get(aTHX_ o, "password") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     SV *key, *slot_sv, *dbh;
     HV *pool = pdbi_pool(aTHX), *slot;
     SV *pid;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(dsn && SvOK(dsn) && SvTRUE(dsn)))
-        croak("Punk::Model::DBI: no dsn - add a database keyword");
+        croak("Punk::Model::DBI: no dsn - add a database keyword"); /* # uncoverable statement */
 
     /* NUL-joined so a dsn containing the separator cannot collide */
     key = sv_2mortal(newSVsv(dsn));
     sv_catpvn(key, "\0", 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (user && SvOK(user)) sv_catsv(key, user);
     sv_catpvn(key, "\0", 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (pass && SvOK(pass)) sv_catsv(key, pass);
 
     slot_sv = pdbi_slot(aTHX_ pool, key);
@@ -130,11 +181,16 @@ static HV *pdbi_slot_for_opts(pTHX_ HV *o) {
     pid  = pdbi_get(aTHX_ slot, "pid");
     dbh  = pdbi_get(aTHX_ slot, "dbh");
 
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err
+     # uncoverable condition left count:5 class:ignore_covered_err */
     if (!(pid && SvOK(pid) && SvIV(pid) == (IV)PerlProc_getpid())
         || !(dbh && SvROK(dbh))) {
         SV *argv[4], *attr_rv, *conn;
         HV *attr = newHV();
-        SV *user_attr = o ? pdbi_get(aTHX_ o, "attr") : NULL;
+        SV *user_attr = o ? pdbi_get(aTHX_ o, "attr") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         (void)hv_stores(attr, "RaiseError", newSViv(1));
         (void)hv_stores(attr, "AutoCommit", newSViv(1));
         (void)hv_stores(attr, "PrintError", newSViv(0));
@@ -142,6 +198,9 @@ static HV *pdbi_slot_for_opts(pTHX_ HV *o) {
          * for itself, and freeing it must not say goodbye on a socket the
          * parent is still using. */
         (void)hv_stores(attr, "AutoInactiveDestroy", newSViv(1));
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (user_attr && SvROK(user_attr)
             && SvTYPE(SvRV(user_attr)) == SVt_PVHV) {
             HV *ua = (HV *)SvRV(user_attr);
@@ -167,11 +226,22 @@ static HV *pdbi_slot_for_opts(pTHX_ HV *o) {
 
         (void)pk_require_once(aTHX_ "DBI", TRUE);
         argv[0] = dsn;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         argv[1] = (user && SvOK(user)) ? user : &PL_sv_undef;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         argv[2] = (pass && SvOK(pass)) ? pass : &PL_sv_undef;
         argv[3] = attr_rv;
         conn = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs("DBI")), "connect",
                              argv, 4, 1);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!conn) conn = newSV(0);
         (void)hv_stores(slot, "dbh", conn);
         (void)hv_stores(slot, "pid", newSViv((IV)PerlProc_getpid()));
@@ -200,7 +270,7 @@ static HV *pdbi_slot_for(pTHX_ SV *self) {
      * pooled slot, which is where the detection actually lives */
     {
         SV *r = pdbi_get(aTHX_ slot, "returning");
-        (void)hv_stores(h, "returning", newSViv(r ? SvIV(r) : 0));
+        (void)hv_stores(h, "returning", newSViv(r ? SvIV(r) : 0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     return slot;
 }
@@ -208,7 +278,7 @@ static HV *pdbi_slot_for(pTHX_ SV *self) {
 /* The live handle for this backend's dsn. Borrowed. */
 static SV *pdbi_dbh(pTHX_ SV *self) {
     SV *dbh = pdbi_get(aTHX_ pdbi_slot_for(aTHX_ self), "dbh");
-    return dbh ? dbh : &PL_sv_undef;
+    return dbh ? dbh : &PL_sv_undef; /* # uncoverable condition left count:1 class:ignore_covered_err */
 }
 
 /* $dbh->quote_identifier($name), on a handle the caller already holds - the
@@ -218,7 +288,7 @@ static SV *pdbi_qi_dbh(pTHX_ SV *dbh, SV *name) {
     SV *argv[1], *q;
     argv[0] = name;
     q = pcx_call_meth(aTHX_ dbh, "quote_identifier", argv, 1, 1);
-    return q ? sv_2mortal(q) : sv_2mortal(newSVsv(name));
+    return q ? sv_2mortal(q) : sv_2mortal(newSVsv(name)); /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 /* quote_identifier, memoised on the pool slot.
@@ -237,6 +307,10 @@ static SV *pdbi_qi_slot(pTHX_ HV *slot, SV *dbh, SV *name) {
     SV **e = hv_fetchs(slot, "qi", 0);
     HV *cache;
     HE *he;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
         cache = (HV *)SvRV(*e);
     else {
@@ -244,9 +318,15 @@ static SV *pdbi_qi_slot(pTHX_ HV *slot, SV *dbh, SV *name) {
         (void)hv_stores(slot, "qi", newRV_noinc((SV *)cache));
     }
     he = hv_fetch_ent(cache, name, 0, 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (he && HeVAL(he) && SvOK(HeVAL(he))) return HeVAL(he);
     he = hv_store_ent(cache, name,
                       newSVsv(pdbi_qi_dbh(aTHX_ dbh, name)), 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     return (he && HeVAL(he)) ? HeVAL(he) : name;
 }
 
@@ -254,11 +334,14 @@ static SV *pdbi_qi_slot(pTHX_ HV *slot, SV *dbh, SV *name) {
 static SV *pdbi_qi(pTHX_ SV *self, SV *name) {
     HV *slot = pdbi_slot_for(aTHX_ self);
     SV *dbh  = pdbi_get(aTHX_ slot, "dbh");
-    return pdbi_qi_slot(aTHX_ slot, dbh ? dbh : &PL_sv_undef, name);
+    return pdbi_qi_slot(aTHX_ slot, dbh ? dbh : &PL_sv_undef, name); /* # uncoverable condition left count:1 class:ignore_covered_err */
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static SV *pdbi_qi_pv(pTHX_ SV *self, const char *name) {
-    return pdbi_qi(aTHX_ self, sv_2mortal(newSVpv(name, 0)));
+    return pdbi_qi(aTHX_ self, sv_2mortal(newSVpv(name, 0))); /* # uncoverable statement */
 }
 
 /* prepare_cached: one statement handle per distinct SQL string on the
@@ -270,6 +353,9 @@ static SV *pdbi_sth_dbh(pTHX_ SV *dbh, SV *sql) {
     argv[1] = &PL_sv_undef;
     argv[2] = sv_2mortal(newSViv(3));
     sth = pcx_call_meth(aTHX_ dbh, "prepare_cached", argv, 3, 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!sth) croak("Punk::Model::DBI: prepare_cached returned nothing");
     return sv_2mortal(sth);
 }
@@ -291,16 +377,22 @@ static SV *pdbi_sth(pTHX_ SV *self, SV *sql) {
  * this altitude would want it, and threading it back through eight call sites
  * later is worse than an unused argument now. */
 static void pdbi_execute_sql(pTHX_ SV *sth, AV *bind, SV *sql) {
-    SSize_t n = bind ? av_len(bind) + 1 : 0, i;
+    SSize_t n = bind ? av_len(bind) + 1 : 0, i; /* # uncoverable condition right count:1 class:ignore_covered_err */
     SV **argv = n ? (SV **)safemalloc(sizeof(SV *) * (size_t)n) : NULL;
     SV *r;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(bind, i, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         argv[i] = (e && *e) ? *e : &PL_sv_undef;
     }
     PERL_UNUSED_ARG(sql);
     r = pcx_call_meth(aTHX_ sth, "execute", argv, (int)n, 1);
     if (argv) safefree(argv);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (r) SvREFCNT_dec(r);
 }
 
@@ -372,11 +464,18 @@ static SV *pdbi_b64u_decode(pTHX_ const char *s, STRLEN len) {
     for (i = 0; i < len; i++) {
         char c = s[i];
         int x;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (c == '=') break;
         if      (c >= 'A' && c <= 'Z') x = c - 'A';
-        else if (c >= 'a' && c <= 'z') x = c - 'a' + 26;
-        else if (c >= '0' && c <= '9') x = c - '0' + 52;
-        else if (c == '-' || c == '+') x = 62;
+        else if (c >= 'a' && c <= 'z') x = c - 'a' + 26; /* # uncoverable condition right count:2 class:ignore_covered_err */
+        else if (c >= '0' && c <= '9') x = c - '0' + 52; /* # uncoverable condition right count:2 class:ignore_covered_err */
+        else if (c == '-' || c == '+') x = 62; /* # uncoverable condition left count:2 class:ignore_covered_err */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         else if (c == '_' || c == '/') x = 63;
         else { SvREFCNT_dec(out); return NULL; }
         v = (v << 6) | (unsigned)x;
@@ -410,10 +509,16 @@ static SV *pdbi_encode_token(pTHX_ SV *val) {
  * switching backends breaks every paginated URL in flight. */
 static SV *pdbi_decode_token(pTHX_ SV *tok, const char *cls) {
     STRLEN tl;
-    const char *tp = SvOK(tok) ? SvPV_const(tok, tl) : "";
+    const char *tp = SvOK(tok) ? SvPV_const(tok, tl) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
     SV *json, *doc, *out = NULL;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!SvOK(tok)) tl = 0;
     json = pdbi_b64u_decode(aTHX_ tp, tl);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!json) croak("%s: invalid pagination token", cls);
     sv_2mortal(json);
 
@@ -433,18 +538,35 @@ static SV *pdbi_decode_token(pTHX_ SV *tok, const char *cls) {
         count = call_pv("File::Raw::JSON::file_json_decode",
                         G_SCALAR | G_EVAL);
         SPAGAIN;
-        doc = (count > 0) ? SvREFCNT_inc(POPs) : NULL;
+        doc = (count > 0) ? SvREFCNT_inc(POPs) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK; FREETMPS; LEAVE;
+        /*
+         # uncoverable branch true
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (SvTRUE(ERRSV)) { SvREFCNT_dec(doc); doc = NULL; }
         PERL_UNUSED_VAR(argv);
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!doc) croak("%s: invalid pagination token", cls);
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (SvROK(doc) && SvTYPE(SvRV(doc)) == SVt_PVHV) {
         SV *k = pdbi_get(aTHX_ (HV *)SvRV(doc), "k");
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (k) out = newSVsv(k);
     }
     SvREFCNT_dec(doc);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!out) croak("%s: invalid pagination token", cls);
     return out;
 }
@@ -464,7 +586,7 @@ static SV *pdbi_where_eq_slot(pTHX_ HV *slot, SV *dbh, HV *src,
         sv_catsv(where, pdbi_qi_slot(aTHX_ slot, dbh, k));
         sv_catpvs(where, " = ?");
         he = hv_fetch_ent(src, k, 0, 0);
-        av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
+        av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef)); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     return where;
 }
@@ -476,13 +598,20 @@ static void pdbi_bind_keys(pTHX_ HV *src, AV *keys, AV *bind) {
     for (i = 0; i < n; i++) {
         SV *k  = *av_fetch(keys, i, 0);
         HE *he = hv_fetch_ent(src, k, 0, 0);
-        av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef));
+        av_push(bind, newSVsv(he ? HeVAL(he) : &PL_sv_undef)); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static SV *pdbi_where_eq(pTHX_ SV *self, HV *src, AV *keys, AV *bind) {
-    HV *slot = pdbi_slot_for(aTHX_ self);
-    SV *dbh  = pdbi_get(aTHX_ slot, "dbh");
+    HV *slot = pdbi_slot_for(aTHX_ self); /* # uncoverable statement */
+    SV *dbh  = pdbi_get(aTHX_ slot, "dbh"); /* # uncoverable statement */
+    /*
+     # uncoverable statement
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1 */
     return pdbi_where_eq_slot(aTHX_ slot, dbh ? dbh : &PL_sv_undef,
                               src, keys, bind);
 }
@@ -500,6 +629,10 @@ static SV *pdbi_sql_cached(pTHX_ HV *slot, SV *sig, SV *sql) {
     SV **e = hv_fetchs(slot, "sqlc", 0);
     HV *cache;
     HE *he;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
         cache = (HV *)SvRV(*e);
     else {
@@ -508,9 +641,15 @@ static SV *pdbi_sql_cached(pTHX_ HV *slot, SV *sig, SV *sql) {
     }
     if (!sql) {
         he = hv_fetch_ent(cache, sig, 0, 0);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         return (he && HeVAL(he) && SvOK(HeVAL(he))) ? HeVAL(he) : NULL;
     }
     he = hv_store_ent(cache, sig, newSVsv(sql), 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     return (he && HeVAL(he)) ? HeVAL(he) : sql;
 }
 
@@ -520,12 +659,20 @@ static SV *pdbi_sql_cached(pTHX_ HV *slot, SV *sig, SV *sql) {
  * read each other's statement. Mortal. */
 static SV *pdbi_sig(pTHX_ const char *op, SV *table, AV *keys) {
     SV *sig = sv_2mortal(newSVpv(op, 0));
-    SSize_t i, n = keys ? av_len(keys) + 1 : 0;
+    SSize_t i, n = keys ? av_len(keys) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     sv_catpvn(sig, "\0", 1);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (table && SvOK(table)) sv_catsv(sig, table);
     for (i = 0; i < n; i++) {
         SV **k = av_fetch(keys, i, 0);
         sv_catpvn(sig, "\0", 1);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (k && *k) sv_catsv(sig, *k);
     }
     return sig;
@@ -537,13 +684,21 @@ static AV *pdbi_key_args(pTHX_ SV **st, I32 items, HV **out,
                          const char *what, const char *cls) {
     HV *key = newHV();
     I32 i;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (items < 3 || !((items - 1) % 2 == 0))
-        croak("%s: %s needs a key", cls, what);
+        croak("%s: %s needs a key", cls, what); /* # uncoverable statement */
     for (i = 1; i + 1 < items; i += 2)
         (void)hv_store_ent(key, st[i], newSVsv(st[i + 1]), 0);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!HvUSEDKEYS(key)) {
-        SvREFCNT_dec((SV *)key);
-        croak("%s: %s needs a key", cls, what);
+        SvREFCNT_dec((SV *)key); /* # uncoverable statement */
+        croak("%s: %s needs a key", cls, what); /* # uncoverable statement */
     }
     *out = (HV *)sv_2mortal((SV *)key);
     return pdbi_sorted_keys(aTHX_ key);
@@ -561,21 +716,33 @@ static SV *pdbi_build_self(pTHX_ SV *class, SV **st, I32 items,
     I32 i;
     for (i = 1; i + 1 < items; i += 2) {
         STRLEN kl; const char *k = SvPV_const(st[i], kl);
-        if      (kl == 5 && memEQ(k, "table",    5)) table    = st[i + 1];
+        if      (kl == 5 && memEQ(k, "table",    5)) table    = st[i + 1]; /* # uncoverable condition right count:2 class:ignore_covered_err */
         else if (kl == 7 && memEQ(k, "primary",  7)) primary  = st[i + 1];
-        else if (kl == 7 && memEQ(k, "columns",  7)) columns  = st[i + 1];
-        else if (kl == 8 && memEQ(k, "database", 8)) database = st[i + 1];
+        else if (kl == 7 && memEQ(k, "columns",  7)) columns  = st[i + 1]; /* # uncoverable condition right count:2 class:ignore_covered_err */
+        else if (kl == 8 && memEQ(k, "database", 8)) database = st[i + 1]; /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(table && SvOK(table) && SvTRUE(table))) {
-        SvREFCNT_dec((SV *)h); SvREFCNT_dec((SV *)col);
-        croak("%s: a model with no table", cls);
+        SvREFCNT_dec((SV *)h); SvREFCNT_dec((SV *)col); /* # uncoverable statement */
+        croak("%s: a model with no table", cls); /* # uncoverable statement */
     }
     /* the column set, for the create/update filters */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (columns && SvROK(columns) && SvTYPE(SvRV(columns)) == SVt_PVAV) {
         AV *c = (AV *)SvRV(columns);
         SSize_t n = av_len(c) + 1, j;
         for (j = 0; j < n; j++) {
             SV **e = av_fetch(c, j, 0);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (e && *e) (void)hv_store_ent(col, *e, newSViv(1), 0);
         }
     }

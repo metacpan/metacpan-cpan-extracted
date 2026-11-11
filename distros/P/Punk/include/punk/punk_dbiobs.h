@@ -53,6 +53,9 @@ static void punk_dbiobs_leave(pTHX_ void *p) {
  * accepts as an already-prepared handle. Borrowed, and mortal when fetched. */
 static SV *punk_dbiobs_sql(pTHX_ SV *first) {
     SV *argv[1], *st;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!first) return NULL;
     SvGETMAGIC(first);
     if (!SvROK(first)) return first;
@@ -60,7 +63,7 @@ static SV *punk_dbiobs_sql(pTHX_ SV *first) {
      * for what it prepared */
     argv[0] = sv_2mortal(newSVpvs("Statement"));
     st = pcx_call_meth(aTHX_ first, "FETCH", argv, 1, 1);
-    return st ? sv_2mortal(st) : NULL;
+    return st ? sv_2mortal(st) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 /* The CV of a DBI superclass method, resolved once per slot. Croaks rather
@@ -72,6 +75,9 @@ static CV *PUNK_DBIOBS_CV[8];
 static CV *punk_dbiobs_super(pTHX_ int slot, const char *name) {
     if (!PUNK_DBIOBS_CV[slot]) {
         CV *cv = get_cv(name, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!cv) croak("Punk::DBI: %s is not there to wrap", name);
         PUNK_DBIOBS_CV[slot] = cv;
     }

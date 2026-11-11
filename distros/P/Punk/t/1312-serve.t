@@ -110,7 +110,8 @@ SKIP: {
         open STDERR, '>', '/dev/null';
         eval { Punk::Command->main('serve', "$dir",
                                    '--port', $port, '--quiet') };
-        POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
 
     my $host = "127.0.0.1:$port";

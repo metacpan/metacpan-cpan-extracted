@@ -74,7 +74,7 @@ logic NetworkTopology {
 }
 
 say "=" x 70;
-say "   SUBGOAL TABLING & CYCLIC GRAPH DEMO";
+say "   SUBGOAL TABLING & CYCLIC GRAPH DEMO (Logic::Relational v0.02)";
 say "=" x 70;
 
 # ------------------------------------------------------------------------------
@@ -149,4 +149,3 @@ say "    Raw derivations (all_values)      : ["
   . scalar(@raw_tabled)
   . " memoized answers)";
 say "";
-

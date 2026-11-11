@@ -25,15 +25,25 @@ enum {
 };
 
 static AV *punk_req_av(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV)
-        croak("Punk::Request: not a request object");
+        croak("Punk::Request: not a request object"); /* # uncoverable statement */
     return (AV *)SvRV(self);
 }
 
 static HV *punk_req_env(pTHX_ AV *req) {
     SV **e = av_fetch(req, PQ_ENV, 0);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!e || !*e || !SvROK(*e) || SvTYPE(SvRV(*e)) != SVt_PVHV)
-        croak("Punk::Request: no PSGI environment");
+        croak("Punk::Request: no PSGI environment"); /* # uncoverable statement */
     return (HV *)SvRV(*e);
 }
 
@@ -52,6 +62,9 @@ static HV *pq_headers(pTHX_ HV *env) {
     HV *out = newHV();
     HE *he;
     SV **e;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!env) return out;
 
     hv_iterinit(env);
@@ -60,19 +73,25 @@ static HV *pq_headers(pTHX_ HV *env) {
         const char *k = hv_iterkey(he, &kl);
         char stackbuf[64], *lname;
         STRLEN nl, i;
-        if (!(kl > 5 && memEQ(k, "HTTP_", 5))) continue;
+        if (!(kl > 5 && memEQ(k, "HTTP_", 5))) continue; /* # uncoverable condition left count:1 class:ignore_covered_err */
         nl = (STRLEN)(kl - 5);
-        lname = nl < sizeof stackbuf ? stackbuf : (char *)safemalloc(nl);
+        lname = nl < sizeof stackbuf ? stackbuf : (char *)safemalloc(nl); /* # uncoverable condition right count:1 class:ignore_covered_err */
         for (i = 0; i < nl; i++) {
             char c = k[5 + i];
-            lname[i] = (c == '_') ? '-' : (char)toLOWER((U8)c);
+            lname[i] = (c == '_') ? '-' : (char)toLOWER((U8)c); /* # uncoverable condition right count:2 class:ignore_covered_err */
         }
         (void)hv_store(out, lname, (I32)nl,
                        newSVsv(hv_iterval(env, he)), 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (lname != stackbuf) safefree(lname);
     }
 
     e = hv_fetchs(env, "CONTENT_TYPE", 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (e && *e && SvOK(*e)) {
         STRLEN vl;
         (void)SvPV_const(*e, vl);      /* not SvCUR: it may not be a PV yet */
@@ -91,6 +110,10 @@ static SV *pq_decode(pTHX_ const char *s, STRLEN len) {
     for (i = 0; i < len; i++) {
         char c = s[i];
         if (c == '+') d[o++] = ' ';
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         else if (c == '%' && i + 2 < len
                  && isXDIGIT((U8)s[i + 1]) && isXDIGIT((U8)s[i + 2])) {
             unsigned hi = isDIGIT((U8)s[i+1]) ? (unsigned)(s[i+1] - '0')
@@ -117,8 +140,13 @@ static void pq_store_pair(pTHX_ HV *out,
     if (he) {
         SV *have = HeVAL(he);
         AV *list;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (SvROK(have) && SvTYPE(SvRV(have)) == SVt_PVAV)
-            list = (AV *)SvRV(have);
+            list = (AV *)SvRV(have); /* # uncoverable statement */
         else {
             list = newAV();
             av_push(list, newSVsv(have));
@@ -156,17 +184,26 @@ static HV *pq_parse_cookies(pTHX_ const char *s, STRLEN len) {
     STRLEN start = 0, i;
     for (i = 0; i <= len; i++) {
         if (i == len || s[i] == ';') {
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (i > start) {
                 const char *pair = s + start;
                 STRLEN plen = i - start, j, eq = plen;
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 for (j = 0; j < plen; j++)
                     if (pair[j] == '=') { eq = j; break; }
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 if (eq > 0) {
                     SV *key = sv_2mortal(newSVpvn(pair, eq));
                     if (!hv_exists_ent(out, key, 0)) {
                         SV *val = eq < plen
                             ? pq_decode(aTHX_ pair + eq + 1, plen - eq - 1)
-                            : newSVpvs("");
+                            : newSVpvs(""); /* # uncoverable statement class:ignore_covered_err */
                         (void)hv_store_ent(out, key, val, 0);
                     }
                 }
@@ -193,6 +230,9 @@ static SV *pq_cached(pTHX_ AV *req, I32 slot, HV *built) {
  * NULL when the accessor gave back something that is not a hashref. */
 static HV *pq_table(pTHX_ SV *self, AV *req, I32 slot, const char *meth) {
     SV **c = av_fetch(req, slot, 0);
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(c && *c && SvROK(*c))) {
         dSP;
         PUSHMARK(SP); XPUSHs(self); PUTBACK;
@@ -209,10 +249,10 @@ static HV *pq_table(pTHX_ SV *self, AV *req, I32 slot, const char *meth) {
  * undef, so params(@keys) can leave an absent key out of its hash. */
 static SV *pq_param_get(pTHX_ SV *self, AV *req, SV *name) {
     HV *t  = pq_table(aTHX_ self, req, PQ_QUERY, "query");
-    HE *he = t ? hv_fetch_ent(t, name, 0, 0) : NULL;
+    HE *he = t ? hv_fetch_ent(t, name, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     if (!he) {
         t  = pq_table(aTHX_ self, req, PQ_FORM, "form");
-        he = t ? hv_fetch_ent(t, name, 0, 0) : NULL;
+        he = t ? hv_fetch_ent(t, name, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     return he ? HeVAL(he) : NULL;
 }
@@ -221,6 +261,9 @@ static SV *pq_param_get(pTHX_ SV *self, AV *req, SV *name) {
  * precedence order. NULL sources are skipped. */
 static void pq_overlay_hv(pTHX_ HV *out, HV *src) {
     HE *he;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!src) return;
     hv_iterinit(src);
     while ((he = hv_iternext(src)))
@@ -230,6 +273,11 @@ static void pq_overlay_hv(pTHX_ HV *out, HV *src) {
 /* The same, taking whatever an accessor returned: anything that is not a
  * hashref overlays nothing. */
 static void pq_overlay(pTHX_ HV *out, SV *src) {
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (src && SvROK(src) && SvTYPE(SvRV(src)) == SVt_PVHV)
         pq_overlay_hv(aTHX_ out, (HV *)SvRV(src));
 }
@@ -244,6 +292,9 @@ static void pq_overlay(pTHX_ HV *out, SV *src) {
 
 static IV pq_read_state(pTHX_ AV *req) {
     SV **flag = av_fetch(req, PQ_READ, 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (flag && *flag && SvOK(*flag)) ? SvIV(*flag) : PQ_UNREAD;
 }
 
@@ -263,7 +314,10 @@ static IV pq_read_state(pTHX_ AV *req) {
  * reading to EOF safe - and it is set by every server that buffers, on every
  * protocol version, which is why the decision keys off it first. */
 static int pq_input_buffered(pTHX_ HV *env) {
-    SV **b = env ? hv_fetchs(env, "psgix.input.buffered", 0) : NULL;
+    SV **b = env ? hv_fetchs(env, "psgix.input.buffered", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (b && *b && SvTRUE(*b)) ? 1 : 0;
 }
 
@@ -275,7 +329,10 @@ static int pq_input_buffered(pTHX_ HV *env) {
 #define PQ_ENV_MAX_BODY "punk.max_body"
 
 static IV pq_env_ceiling(pTHX_ HV *env) {
-    SV **e = env ? hv_fetchs(env, PQ_ENV_MAX_BODY, 0) : NULL;
+    SV **e = env ? hv_fetchs(env, PQ_ENV_MAX_BODY, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     IV n = (e && *e && SvOK(*e)) ? SvIV(*e) : 0;
     return n > 0 ? n : 0;
 }
@@ -301,17 +358,30 @@ static SV *pq_body(pTHX_ AV *req) {
         croak("Punk::Request: the body was streamed and is gone - a body "
               "can be read once, either whole (body/json/form) or in chunks "
               "(body_each/body_to)");
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(flag && *flag && SvTRUE(*flag))) {
         HV *env = punk_req_env(aTHX_ req);
         SV **in = hv_fetchs(env, "psgi.input", 0);
         SV **cl = hv_fetchs(env, "CONTENT_LENGTH", 0);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         IV len  = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : -1;
         IV max  = pq_env_ceiling(aTHX_ env);
         if (len < 0 && !pq_input_buffered(aTHX_ env)) len = 0;
         (void)av_store(req, PQ_READ, newSViv(1));
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (in && *in && SvTRUE(*in) && len != 0) {
             IO *io = sv_2io(*in);
-            PerlIO *fp = io ? IoIFP(io) : NULL;
+            PerlIO *fp = io ? IoIFP(io) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (fp) {
                 /* into the slot before the first read: the ceiling croaks
                  * from inside the loop, and the request must still own what
@@ -341,6 +411,9 @@ static SV *pq_body(pTHX_ AV *req) {
                         STRLEN grow = SvLEN(raw) * 2;
                         if (len >= 0 && grow > (STRLEN)len + 1)
                             grow = (STRLEN)len + 1;
+                        /*
+                         # uncoverable branch true
+                         # uncoverable condition left count:1 class:ignore_covered_err */
                         if (grow < need) grow = need;
                         (void)SvGROW(raw, grow);
                     }
@@ -354,11 +427,14 @@ static SV *pq_body(pTHX_ AV *req) {
                 }
                 (void)PerlIO_seek(fp, 0, SEEK_SET);
             }
-            else (void)av_store(req, PQ_BODY, newSV(0));
+            else (void)av_store(req, PQ_BODY, newSV(0)); /* # uncoverable statement */
         }
         else (void)av_store(req, PQ_BODY, newSV(0));
     }
     b = av_fetch(req, PQ_BODY, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     return b && *b ? *b : &PL_sv_undef;
 }
 
@@ -383,11 +459,18 @@ static IV pq_stream_cached(pTHX_ SV *body, STRLEN chunk, pq_sink_fn sink,
                            void *ud) {
     STRLEN len, off = 0;
     const char *p;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!body || !SvOK(body)) return 0;
     p = SvPV_const(body, len);
     while (off < len) {
         STRLEN n = len - off;
         if (n > chunk) n = chunk;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (sink(aTHX_ ud, p + off, n)) break;
         off += n;
     }
@@ -438,6 +521,9 @@ static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
               "(body_each/body_to)");
     case PQ_SLURPED: {
         SV **b = av_fetch(req, PQ_BODY, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         return pq_stream_cached(aTHX_ (b && *b) ? *b : NULL, chunk, sink, ud);
     }
     default: break;
@@ -446,11 +532,15 @@ static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
     env = punk_req_env(aTHX_ req);
     in  = hv_fetchs(env, "psgi.input", 0);
     cl  = hv_fetchs(env, "CONTENT_LENGTH", 0);
-    len = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : -1;
+    len = (cl && *cl && SvOK(*cl)) ? SvIV(*cl) : -1; /* # uncoverable condition right count:2 class:ignore_covered_err */
     if (!max) max = pq_env_ceiling(aTHX_ env);
 
     if (len < 0 && !pq_input_buffered(aTHX_ env)) {
         SV **te = hv_fetchs(env, "HTTP_TRANSFER_ENCODING", 0);
+        /*
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!(te && *te && SvOK(*te) && SvCUR(*te))) {
             /* no length and no transfer coding: the request has no body */
             (void)av_store(req, PQ_READ, newSViv(PQ_STREAMED));
@@ -467,9 +557,18 @@ static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
      * so rather than handed the remainder */
     (void)av_store(req, PQ_READ, newSViv(PQ_STREAMED));
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(in && *in && SvTRUE(*in)) || len == 0) return 0;
     io = sv_2io(*in);
-    fp = io ? IoIFP(io) : NULL;
+    fp = io ? IoIFP(io) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!fp) return 0;
 
     window = sv_2mortal(newSV(chunk + 1));
@@ -484,6 +583,9 @@ static IV pq_body_stream(pTHX_ AV *req, STRLEN chunk, IV max,
         if (n <= 0) break;
         got += (IV)n;
         if (max && got > max) PQ_OVER_CEILING(max);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (sink(aTHX_ ud, w, (STRLEN)n)) break;
     }
     return got;
@@ -515,6 +617,9 @@ typedef struct { PerlIO *fp; int open; } pq_out;
 
 static void pq_out_cleanup(pTHX_ void *p) {
     pq_out *o = (pq_out *)p;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (o->open) { (void)PerlIO_close(o->fp); o->open = 0; }
 }
 
@@ -523,8 +628,13 @@ static int pq_sink_io(pTHX_ void *ud, const char *buf, STRLEN len) {
     STRLEN off = 0;
     while (off < len) {
         SSize_t n = PerlIO_write(out, buf + off, len - off);
+        /*
+         # uncoverable branch true
+         # uncoverable branch true count:2 class:ignore_covered_err
+         # uncoverable branch false count:3 class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (n <= 0) croak("Punk::Request: writing the body failed: %s",
-                          Strerror(errno));
+                          Strerror(errno)); /* # uncoverable statement */
         off += (STRLEN)n;
     }
     return 0;

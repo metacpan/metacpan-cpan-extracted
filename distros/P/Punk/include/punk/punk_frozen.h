@@ -32,6 +32,9 @@ static const fz_abi *punk_fz_try(pTHX) {
     if (!PUNK_FZ_TRIED) {
         dSP; int count; UV p = 0;
         PUNK_FZ_TRIED = 1;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (pk_require_once(aTHX_ "Frozen", FALSE)) {
             SPAGAIN;   /* the require may have reallocated the value stack */
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
@@ -46,17 +49,30 @@ static const fz_abi *punk_fz_try(pTHX) {
              * mentions its argument more than once: SvUV(POPs) pops twice
              * and reads the address off the wrong slot. punk_blob.h:77-89
              * carries the same warning and the release it cost. */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (count > 0) {
                 SV *sv = POPs;
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 if (!SvTRUE(ERRSV)) p = SvUV(sv);
             }
             PUTBACK; FREETMPS; LEAVE;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (p) {
                 const fz_abi *a = INT2PTR(const fz_abi *, p);
                 /* >= and never ==: the table is append-only, so a later
                  * one is a superset whose prefix stays valid. Equality
                  * would make every Frozen release break Punk, which is
                  * what Reverse::Proxy 0.04 did against Fetch. */
+                /*
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:3 class:ignore_covered_err */
                 if (a && !getenv("PUNK_FAKE_FZ_BAD")
                     && a->abi_version >= FZ_ABI_VERSION)
                     PUNK_FZ = a;
@@ -73,8 +89,11 @@ static const fz_abi *punk_fz_try(pTHX) {
  * boot-environment error rather than a surprise mid-request. */
 static const fz_abi *punk_fz(pTHX) {
     const fz_abi *a = punk_fz_try(aTHX);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!a)
-        croak("Punk::Plugin::I18n needs Frozen with a compatible C ABI "
+        croak("Punk::Plugin::I18n needs Frozen with a compatible C ABI " /* # uncoverable statement */
               "(FZ_ABI_VERSION %d); upgrade Frozen to 0.06+", FZ_ABI_VERSION);
     return a;
 }

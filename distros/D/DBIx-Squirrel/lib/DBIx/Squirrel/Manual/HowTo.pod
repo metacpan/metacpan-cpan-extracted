@@ -12,13 +12,34 @@ DBIx::Squirrel::Manual::HowTo - DBIx::Squirrel how-to
 =head1 DESCRIPTION
 
 Recipes for everyday database work with DBIx::Squirrel, one task at a
-time. Each shows the shortest way to do the job; L<the
-reference|DBIx::Squirrel::Manual::Reference> says what every method and attribute does, in
-full.
+time. Each shows the shortest way to do the job.
+L<The reference|DBIx::Squirrel::Manual::Reference> says what every method and attribute
+does, in full.
 
-This is version 2, a rewrite of DBIx::Squirrel 1.x for Perl 5.36 or
-later. The reference's L<Upgrading from 1.x|DBIx::Squirrel::Manual::Reference/"Upgrading from 1.x">
-lists what changes for code written for 1.x.
+The recipes are for three kinds of reader:
+
+=over 4
+
+=item *
+
+B<People who use the DBI,> and want less boilerplate around their
+SQL. The chapters from L<Connecting|/"Connecting"> to
+L<Handling errors|/"Handling errors"> are for you, in the order you'll
+need them.
+
+=item *
+
+B<People moving code from DBIx::Squirrel 1.x.> This is version 2, a
+rewrite for Perl 5.36 or later.
+L<Moving from 1.x|/"Moving from 1.x"> has the changes you'll meet first.
+
+=item *
+
+B<Authors of functions and stages,> who want callers to add stages
+of their own, or to write stages for others. The last three chapters
+are for you.
+
+=back
 
 =head1 Contents
 
@@ -54,11 +75,15 @@ L<Transforming rows with stages|/"Transforming rows with stages">
 
 =item *
 
-L<Rows as objects|/"Rows as objects">
+L<Stopping and taking|/"Stopping and taking">
 
 =item *
 
-L<Pipelines without a database|/"Pipelines without a database">
+L<Gathering and ends|/"Gathering and ends">
+
+=item *
+
+L<Rows as objects|/"Rows as objects">
 
 =item *
 
@@ -66,19 +91,35 @@ L<A function for each database and statement|/"A function for each database and 
 
 =item *
 
-L<Caching|/"Caching">
+L<Caching and connections|/"Caching and connections">
 
 =item *
 
 L<Handling errors|/"Handling errors">
+
+=item *
+
+L<Moving from 1.x|/"Moving from 1.x">
+
+=item *
+
+L<Pipelines without a database|/"Pipelines without a database">
+
+=item *
+
+L<Writing a function that takes stages|/"Writing a function that takes stages">
+
+=item *
+
+L<Writing stages for others|/"Writing stages for others">
 
 =back
 
 =head1 The examples' database
 
 Every example below runs against this small SQLite database, a file
-called C<music.db>, set up here. The examples follow on from each other,
-so C<$dbh> is this handle wherever it appears.
+called C<music.db>, set up here. The examples follow on from each
+other, so C<$dbh> is this handle wherever it appears.
 
     use v5.36;
     use DBIx::Squirrel;
@@ -148,11 +189,33 @@ C<use DBIx::Squirrel> takes whatever C<use DBI> takes:
 
     say SQL_INTEGER;    # 4
 
+=head2 Give the handles methods of your own
+
+Make a subclass of DBIx::Squirrel, with a database handle class and a
+statement handle class of its own. Each is a subclass of
+DBIx::Squirrel's. C<connect>, called on your class, gives your handles:
+
+    package My::Squirrel     { our @ISA = 'DBIx::Squirrel' }
+    package My::Squirrel::st { our @ISA = 'DBIx::Squirrel::st' }
+
+    package My::Squirrel::db {
+        our @ISA = 'DBIx::Squirrel::db';
+
+        sub artist_names ($self) {
+            return $self->iterate('SELECT name FROM artist ORDER BY id', sub { $_->[0] })->all;
+        }
+    }
+
+    my $mine = My::Squirrel->connect('dbi:SQLite:dbname=music.db', {RaiseError => 1});
+    say join ' ', $mine->artist_names;    # Abba Blur Cream
+
+Without both handle classes, the DBI warns, and gives its own handles.
+
 =head2 Read a database's quoting rules through ODBC
 
 Statements are read by the database's own rules for strings and
 comments. Through DBD::ODBC or DBD::Proxy, DBIx::Squirrel asks the
-database what it is; when it can't tell, name it:
+database what it is. When it can't tell, name it:
 
     my $dbh = DBIx::Squirrel->connect($odbc_dsn, $user, $pass, {ekorn_dialect => 'mysql'});
 
@@ -169,11 +232,12 @@ style throughout.
         'SELECT title FROM album WHERE year = :1',
         'SELECT title FROM album WHERE year = $1',
         'SELECT title FROM album WHERE year = :year',
+        'SELECT title FROM album WHERE year = $year',
     );
     for my $sql (@styles) {
         my $sth = $dbh->prepare($sql);
-        $sth->execute($sql =~ m( :year )x ? (year => 1994) : 1994);
-        say $sth->fetchrow_arrayref->[0];    # Parklife, five times
+        $sth->execute($sql =~ m( [:\$] year )x ? (year => 1994) : 1994);    # by name, or in order
+        say $sth->fetchrow_arrayref->[0];    # Parklife, six times
     }
 
 =head2 Use one value in several places
@@ -190,7 +254,7 @@ So does a named one, wherever its name appears.
 
 =head2 Match any of a list of values
 
-Put C<...> before a placeholder, and give it an array reference: it's
+Put C<...> before a placeholder, and give it an array reference. It's
 written as a C<?> for each value.
 
     my $titles = $dbh->selectcol_arrayref(
@@ -203,13 +267,13 @@ written as a C<?> for each value.
     my $names = $dbh->selectcol_arrayref('SELECT name FROM artist WHERE id IN (...?)', [1, 3]);
     say "@$names";    # Abba Cream
 
-The statement is prepared for its values, so give them with it, to
-C<do>, a select method, C<iterate> or C<results>; C<prepare> alone croaks.
+The statement is prepared for its values. So give them with it, to
+C<do>, a select method, C<iterate> or C<results>. C<prepare> alone croaks.
 An empty list croaks too, as C<IN ()> isn't SQL, so check for one first.
 
 =head2 Write a long statement over several lines
 
-Give the lines in an array reference; they're joined with spaces:
+Give the lines in an array reference. They're joined with spaces:
 
     my $sth = $dbh->prepare([
         'SELECT title',
@@ -222,7 +286,7 @@ Give the lines in an array reference; they're joined with spaces:
 
 =head2 Keep quotes, comments and casts as they are
 
-Placeholders are only looked for in the SQL itself, so these need no
+Placeholders are looked for only in the SQL itself, so these need no
 escaping:
 
     my $row = $dbh->selectrow_arrayref(
@@ -235,6 +299,23 @@ On PostgreSQL, put a backslash before a C<?>, C<:> or C<$> that's an
 operator, such as jsonb's C<?>:
 
     my $sth = $pg->prepare(q{SELECT * FROM doc WHERE data \? 'key' AND id = :id});
+
+=head2 Read one statement by another database's rules
+
+Strings are read by the rules of the handle's database. MySQL's allow
+a backslash before a quote, and take C<#> as a comment. To read one
+statement by another database's rules, give it C<ekorn_dialect>:
+
+    my $sth = $dbh->prepare(q{SELECT 'it\'s :not a placeholder', :id}, {ekorn_dialect => 'mysql'});
+
+=head2 Use DBD::Pg's own placeholder options
+
+DBD::Pg's C<pg_placeholder_dollaronly> and C<pg_placeholder_nocolons>
+are followed, on the handle or given to C<prepare>. With
+C<pg_placeholder_nocolons>, an array slice such as C<data[:2]> is left
+alone:
+
+    my $sth = $pg->prepare('SELECT data[:2] FROM doc WHERE id = $1', {pg_placeholder_nocolons => 1});
 
 =head1 Binding values
 
@@ -272,8 +353,8 @@ is a PostgreSQL array, as with the DBI:
 
 =head2 Bind one value, with its type
 
-C<bind_param> takes a placeholder's name or number, and binds every use
-of it:
+C<bind_param> takes a placeholder's name or number. It binds every use
+of the placeholder:
 
     use DBIx::Squirrel qw(:sql_types);
 
@@ -286,18 +367,32 @@ of it:
 
 =head2 Change rows
 
-C<do> takes bind values without the attributes in front, and returns the
+C<do> takes bind values without the attributes in front. It returns the
 number of rows changed:
 
     my $rows = $dbh->do('UPDATE track SET plays = plays + 1 WHERE album_id = :album', album => 1);
     say $rows;    # 2: Arrival's two tracks, one play more each from here on
 
+=head2 Use transactions, and the DBI's other methods
+
+The handles are the DBI's, so its other methods work as they always
+have: transactions, C<last_insert_id>, C<quote> and the rest.
+
+    $dbh->begin_work;
+    $dbh->do('INSERT INTO artist (name) VALUES (:name)', name => 'Dido');
+    say $dbh->last_insert_id;                                     # 4
+    say $dbh->selectrow_array('SELECT COUNT(*) FROM artist');    # 4
+    $dbh->rollback;
+    say $dbh->selectrow_array('SELECT COUNT(*) FROM artist');    # 3
+
+    say $dbh->quote("it's");    # 'it''s'
+
 =head2 Fetch one row
 
 The DBI's select methods work as they do with the DBI, with
-placeholders in any style, and, as with C<do>, the attributes left out
-when there are none. C<selectrow_array> returns the first row's columns,
-or, in scalar context, its first column:
+placeholders in any style. As with C<do>, the attributes can be left out
+when there are none. C<selectrow_array> returns the first row's
+columns. In scalar context, it returns its first column:
 
     my($title, $year) = $dbh->selectrow_array('SELECT title, year FROM album WHERE id = ?', 2);
     say "$title ($year)";    # Parklife (1994)
@@ -305,8 +400,8 @@ or, in scalar context, its first column:
     my $tracks = $dbh->selectrow_array('SELECT COUNT(*) FROM track');
     say $tracks;    # 6
 
-C<selectrow_arrayref> and C<selectrow_hashref> return the row as an array
-or a hash, or C<undef> if there's none:
+C<selectrow_arrayref> and C<selectrow_hashref> return the row as an
+array or a hash. They return C<undef> if there's none:
 
     my $top = $dbh->selectrow_arrayref(
         'SELECT name, plays FROM track WHERE album_id = $1 AND plays > $2 ORDER BY plays DESC',
@@ -328,13 +423,14 @@ C<selectcol_arrayref> returns the first column of every row:
     say "@$titles";    # Parklife The Great Escape
 
 With the DBI's C<Columns> attribute, it returns those columns of each
-row, one after the other, which makes a hash of two:
+row, one after the other. Two columns make a hash:
 
     my %name = @{ $dbh->selectcol_arrayref('SELECT id, name FROM artist', {Columns => [1, 2]}) };
     say $name{3};    # Cream
 
 Named values in a hash reference need the attributes, or C<undef>, in
-front, as a hash reference there is taken as the attributes:
+front. A hash reference straight after the statement is taken as the
+attributes:
 
     my $between = $dbh->selectcol_arrayref(
         'SELECT title FROM album WHERE year BETWEEN :from AND :to ORDER BY year',
@@ -344,8 +440,9 @@ front, as a hash reference there is taken as the attributes:
 
 =head2 Fetch every row
 
-C<selectall_arrayref> returns every row, each as an array, or, with the
-DBI's C<Slice> attribute, as a hash; C<MaxRows> stops after that many:
+C<selectall_arrayref> returns every row, each as an array. With the
+DBI's C<Slice> attribute, each is a hash. C<MaxRows> stops after that
+many:
 
     my $rows = $dbh->selectall_arrayref(
         'SELECT name, plays FROM track WHERE plays >= ?1 ORDER BY plays DESC',
@@ -366,8 +463,8 @@ C<selectall_array> returns the rows as a list:
         say $row->[0];    # Parklife, then The Great Escape
     }
 
-C<selectall_hashref> returns the rows keyed by a column, or by several,
-nested in order:
+C<selectall_hashref> returns the rows keyed by a column. Keyed by
+several, they're nested in order:
 
     my $by_id = $dbh->selectall_hashref('SELECT id, name FROM artist', 'id');
     say $by_id->{3}{name};    # Cream
@@ -383,8 +480,9 @@ nested in order:
 
 =head2 Select with a statement handle, lines or an array of values
 
-Each select method also takes a statement handle, prepared once, a
-statement over several lines, or its values in an array reference:
+Each select method also takes a statement handle, prepared once, or a
+statement over several lines. It also takes its values in an array
+reference:
 
     my $sth = $dbh->prepare('SELECT name FROM track WHERE album_id = :album ORDER BY name');
     say join ', ', @{ $dbh->selectcol_arrayref($sth, album => 2) };    # Girls & Boys, Parklife
@@ -420,12 +518,13 @@ to fetch finishes it first:
     }
 
 Read C<next> in list context, as here, so a result that is C<undef> isn't
-taken for the end.
+taken for the end. Rows are fetched 100 at a time, so a large result is
+never held all at once.
 
 =head2 Stop when you've had enough
 
-The statement is fetched 100 rows at a time, so leaving early never
-reads the rest:
+C<count> says how many results have been handed out. Leaving early
+never reads the rest:
 
     my $it = $dbh->iterate('SELECT name FROM track ORDER BY plays DESC');
     while (my($row) = $it->next) {
@@ -441,17 +540,17 @@ reads the rest:
     say "@names";    # Abba Blur Cream
     say $count;      # 3
 
-Without stages, C<all> fetches the rest of the rows at once, nearly as
-quickly as the DBI's own C<selectall_arrayref>. Stages cost a little for
-each row, so for a large result, when every row is wanted and only
-needs changing, C<map> over C<all> is quicker:
+Without stages, C<all> fetches the rest of the rows at once. That's
+nearly as quick as the DBI's own C<selectall_arrayref>. Stages cost a
+little for each row. So for a large result, when every row is wanted
+and only needs changing, C<map> over C<all> is quicker:
 
     my @fast = map { $_->[0] } $dbh->iterate('SELECT name FROM artist')->all;
     say "@fast";    # Abba Blur Cream
 
 =head2 Get exactly one result
 
-C<single> returns the one result, or nothing, and croaks if there's more
+C<single> returns the one result, or nothing. It croaks if there's more
 than one:
 
     my $total = $dbh->iterate('SELECT SUM(plays) FROM track', sub { $_->[0] })->single;
@@ -464,6 +563,14 @@ than one:
         say "$row->{id}: $row->{name}";    # 1: Abba, 2: Blur, 3: Cream
     }
 
+=head2 Find the column names
+
+C<column_names> gives the statement's columns, as C<fetchrow_hashref>
+would key them:
+
+    my $it = $dbh->iterate('SELECT id, title AS Album FROM album');
+    say join ', ', $it->column_names;    # id, Album
+
 =head2 Run one statement for several values
 
 Prepare it once, and iterate over it with each value:
@@ -474,10 +581,26 @@ Prepare it once, and iterate over it with each value:
         say "$artist_id: @titles";    # 1: Arrival, 2: Parklife The Great Escape
     }
 
+=head2 Use one iterator at a time on a statement handle
+
+A statement handle runs one statement at a time. So while one iterator
+has results left, another over the same handle croaks. Read the first
+to the end, or let it go, first:
+
+    my $sth = $dbh->prepare('SELECT name FROM artist ORDER BY id');
+    my $one = $sth->iterate;
+    my $two = $sth->iterate;
+    $one->next;
+    eval { $two->next };
+    print $@;    # Expected the statement handle's other iterator to be finished at ... line ...
+
+    $one->all;
+    say $two->next->[0];    # Abba
+
 =head2 Start an iterator again from the top
 
 C<reset> executes the statement again. Bind values given replace those
-given before; stages given are added to those given when the iterator
+given before. Stages given are added to those given when the iterator
 was made.
 
     my $it = $dbh->iterate('SELECT name FROM artist WHERE id > ? ORDER BY id', 0, sub { $_->[0] });
@@ -488,18 +611,21 @@ was made.
 
 =head1 Transforming rows with stages
 
-A stage is a code reference given after the bind values. Each row goes
-through every stage in turn, and what comes out of the last is the
-result. A stage gets its value as its argument and in C<$_>, so write it
-whichever way reads best:
+Stages are given after the bind values. A stage is a code reference,
+or a pipeline, which stands for its stages. See
+L<Reuse a pipeline|/"Reuse a pipeline">. Each row goes through every
+stage in turn, and what comes out of the last is the result. A stage
+gets its value as its argument and in C<$_>. Write it whichever way
+reads best:
 
     my @a = $dbh->iterate('SELECT name FROM artist', sub ($row) { $row->[0] })->all;
     my @b = $dbh->iterate('SELECT name FROM artist', sub { $_->[0] })->all;
 
     say "@a" eq "@b" ? 'the same' : 'different';    # the same
 
-The recipes here are for rows. Ekorn::Pipeline's L<how-to|https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/HOWTO.md> has
-more, for stages over any values, and they work here too, with
+The recipes here are for rows. Ekorn::Pipeline's
+L<how-to|Ekorn::Pipeline::Manual::HowTo>
+has more, for stages over any values. They work here too, with
 DBIx::Squirrel's names for its modules.
 
 =head2 Change each row (map)
@@ -534,52 +660,11 @@ Return a list:
     )->all;
     say "@words";    # disraeli gears arrival parklife the great escape
 
-=head2 Stop early, from a stage
-
-C<Stop> ends the iteration. The results already out are kept, and any
-values given to C<Stop> go on through the stages after it:
-
-    use DBIx::Squirrel::Stop;
-
-    my @upto = $dbh->iterate(
-        'SELECT title, year FROM album ORDER BY year',
-        sub { $_->[1] >= 1990 ? Stop($_) : $_ },    # this one, then no more
-        sub { $_->[0] },
-    )->all;
-    say "@upto";    # Disraeli Gears Arrival Parklife
-
-=head2 Take the first few, or drop some, after a stage
-
-C<take>, C<drop>, C<take_while> and C<drop_while>, from
-DBIx::Squirrel::Stages::Flow, decide which values go on, by their place
-or by a test. In plain SQL, C<LIMIT> and C<OFFSET> do the first two in
-the database; these are for when a stage in Perl decides which rows go
-on, or for C<pipe>. C<take> stops the iteration once it has its values,
-so no more rows are fetched:
-
-    use DBIx::Squirrel::Stages::Flow qw(:DEFAULT take_while);
-
-    my @page = $dbh->iterate(
-        'SELECT name FROM track ORDER BY id',
-        sub { $_->[0] },
-        sub { m( \s )x ? $_ : () },    # names of more than one word
-        drop(1), take(2),              # the second and third of them
-    )->all;
-    say for @page;    # Knowing Me, Knowing You
-                      # Girls & Boys
-
-    my @hits = $dbh->iterate(
-        'SELECT name, plays FROM track ORDER BY plays DESC',
-        take_while { $_->[1] > 6000 },
-        sub { $_->[0] },
-    )->all;
-    say join ', ', @hits;    # Dancing Queen, Sunshine of Your Love, Girls & Boys
-
 =head2 Take one column, or make rows hashes
 
-C<pluck> and C<as_hash>, from DBIx::Squirrel::Stages::Rows, work whatever
-shape the rows were fetched in. C<pluck> takes a column by name, in any
-case, or by position, from 0; C<as_hash> gives each row as
+C<pluck> and C<as_hash>, from DBIx::Squirrel::Stages::Rows, work
+whatever shape the rows were fetched in. C<pluck> takes a column by
+name, in any case, or by position, from 0. C<as_hash> gives each row as
 C<fetchrow_hashref> would:
 
     use DBIx::Squirrel::Stages::Rows;
@@ -604,71 +689,13 @@ row it's making it from:
     )->all;
     say $chart[0];    # 1. Dancing Queen (9101 plays)
 
-=head2 Hand out rows in batches
-
-C<batch>, from DBIx::Squirrel::Stages::Batch, passes rows on in batches,
-each an array, the last, shorter one when the rows run out:
-
-    use DBIx::Squirrel::Stages::Batch;
-    use DBIx::Squirrel::Stages::Rows;
-
-    my $batches = $dbh->iterate('SELECT name FROM track ORDER BY id', pluck(0), batch(4));
-    while (my($batch) = $batches->next) {
-        say scalar(@$batch), ': ', join ', ', @$batch;
-    }
-    # 4: Dancing Queen, Knowing Me, Knowing You, Girls & Boys, Parklife
-    # 2: Country House, Sunshine of Your Love
-
-=head2 Make one value from every row
-
-C<collect> holds the rows, and once they run out, passes on what its
-block makes of them, given as its arguments, or, without a block, an
-array of them:
-
-    use DBIx::Squirrel::Stages::Batch;
-
-    my $names = $dbh->iterate(
-        'SELECT name FROM artist ORDER BY name',
-        sub { $_->[0] },
-        collect { join ', ', @_ },
-    )->single;
-    say $names;    # Abba, Blur, Cream
-
-    my $rows = $dbh->iterate('SELECT name FROM artist', collect)->single;
-    say scalar @$rows;    # 3
-
-The block is called even when there are no rows, so an empty result
-still gives a value: here, an empty string, or an empty array.
-
-=head2 Write a stage that keeps count, or acts at the end
-
-C<batch> and C<collect> are made with C<gather>, from
-DBIx::Squirrel::Gather. Its block is called each time the statement
-runs, so what it declares starts afresh, and it returns the stage, and
-optionally a function called when the rows run out:
-
-    use DBIx::Squirrel::Gather;
-
-    # Each value, then, once they run out, how many there were
-    sub and_count () {
-        return gather {
-            my $count = 0;    # fresh on each run
-            my $stage = sub ($value) { $count++; return $value };
-            my $end   = sub () { "($count)" };
-            return ($stage, $end);
-        };
-    }
-
-    my @lines = $dbh->iterate('SELECT name FROM artist ORDER BY name', sub { $_->[0] }, and_count)->all;
-    say "@lines";    # Abba Blur Cream (3)
-
 =head2 Watch rows go by, or count them
 
-C<peek> and C<count_into>, from DBIx::Squirrel::Stages::Taps, look at each
-value as it goes by, and pass it on as it is. C<dump_to>, on request,
-writes each with Data::Dumper, to STDERR or a filehandle you give. It's
-for debugging, and writes values in full, so take it out before the
-code goes live:
+C<peek> and C<count_into>, from DBIx::Squirrel::Stages::Taps, look at
+each value as it goes by, and pass it on unchanged. C<dump_to>, on
+request, writes each with Data::Dumper, to STDERR or a filehandle you
+give. It's for debugging, and writes values in full, so take it out
+before the code goes live:
 
     use DBIx::Squirrel::Stages::Flow;
     use DBIx::Squirrel::Stages::Taps;
@@ -689,11 +716,12 @@ code goes live:
 C<take> stops the iteration once it has two, so the third row is never
 read.
 
-=head2 Reuse a pipeline's stages
+=head2 Reuse a pipeline
 
-Make a pipeline once, and give its stages, with C<stages>, wherever
-stages go: to C<iterate>, C<results> or another pipeline, with more
-stages after them:
+Make a pipeline once, and give it wherever a stage goes: to C<iterate>,
+C<results>, C<reset>, C<pipe>, C<tap>, a
+L<statement's function|/"Give a statement a pipeline"> or another
+pipeline, with more stages before or after it:
 
     use DBIx::Squirrel::Pipeline;
     use DBIx::Squirrel::Stages::Flow;
@@ -705,20 +733,79 @@ stages after them:
     );
 
     my $by_plays = 'SELECT name, plays FROM track ORDER BY plays DESC';
-    say join ', ', $dbh->iterate($by_plays, $hits->stages)->all;
+    say join ', ', $dbh->iterate($by_plays, $hits)->all;
         # Dancing Queen, Sunshine of Your Love, Girls & Boys, Parklife
-    say join ', ', $dbh->iterate($by_plays, $hits->stages, take(2))->all;
+    say join ', ', $dbh->iterate($by_plays, $hits, take(2))->all;
         # Dancing Queen, Sunshine of Your Love
 
-The stages run as if listed there. Give C<< $hits->stages >>, not C<$hits>:
-a pipeline isn't a stage. A stage that keeps count or remembers
-something should be made with C<gather>, so it starts afresh in each
-pipeline it's given to.
+Its stages run in its place, as if written out there. For a function
+that takes only code references, give it C<< $hits->stages >>.
+
+A stage that keeps count or remembers something should be made with
+C<gather>, so it starts afresh in each run, as in
+L<Build a pipeline afresh for each run|/"Build a pipeline afresh for each run">.
+
+=head1 Stopping and taking
+
+=head2 Stop early, from a stage
+
+C<Stop> ends the iteration. The results already out are kept, and any
+values given to C<Stop> go on through the stages after it:
+
+    use DBIx::Squirrel::Stop;
+
+    my @upto = $dbh->iterate(
+        'SELECT title, year FROM album ORDER BY year',
+        sub { $_->[1] >= 1990 ? Stop($_) : $_ },    # this one, then no more
+        sub { $_->[0] },
+    )->all;
+    say "@upto";    # Disraeli Gears Arrival Parklife
+
+=head2 Take the first few, or drop some, after a stage
+
+C<take>, C<drop>, C<take_while> and C<drop_while>, from
+DBIx::Squirrel::Stages::Flow, decide which values go on, by their
+place or by a test. In plain SQL, C<LIMIT> and C<OFFSET> do the first
+two in the database. These are for when a stage in Perl decides which
+rows go on, or for C<pipe>. C<take> stops the iteration once it has its
+values, so no more rows are fetched:
+
+    use DBIx::Squirrel::Stages::Flow qw(:DEFAULT take_while);
+
+    my @page = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        sub { $_->[0] },
+        sub { m( \s )x ? $_ : () },    # names of more than one word
+        drop(1), take(2),              # the second and third of them
+    )->all;
+    say for @page;    # Knowing Me, Knowing You
+                      # Girls & Boys
+
+    my @hits = $dbh->iterate(
+        'SELECT name, plays FROM track ORDER BY plays DESC',
+        take_while { $_->[1] > 6000 },
+        sub { $_->[0] },
+    )->all;
+    say join ', ', @hits;    # Dancing Queen, Sunshine of Your Love, Girls & Boys
+
+=head2 Skip rows until a test fails
+
+C<drop_while> drops rows while its block is true of them, then passes
+on the rest, from the first it's false of:
+
+    use DBIx::Squirrel::Stages::Flow qw(drop_while);
+
+    my @later = $dbh->iterate(
+        'SELECT title, year FROM album ORDER BY year',
+        drop_while { $_->[1] < 1990 },
+        sub { $_->[0] },
+    )->all;
+    say "@later";    # Parklife The Great Escape
 
 =head2 Catch errors in a stage
 
-A stage that catches errors itself should throw a stop on again, so the
-iterator still stops:
+A stage that catches errors itself should throw a stop on again. Then
+the iterator still stops:
 
     use experimental qw(try);
     use DBIx::Squirrel::Stop;
@@ -738,22 +825,86 @@ iterator still stops:
     )->all;
     say "@safe";    # ABBA BLUR
 
-=head2 See what went wrong in a stage
+=head1 Gathering and ends
 
-A stage that dies is reported at the line that asked for the result,
-with the stage's number:
+=head2 Hand out rows in batches
 
-    my $it = $dbh->iterate('SELECT name FROM artist', sub { die "no names today\n" });
-    eval { $it->next };
-    print $@;    # Pipeline stage #1 failed at ... line ...:
-                 #     no names today
+C<batch>, from DBIx::Squirrel::Stages::Batch, passes rows on in
+batches, each an array. The last, shorter one comes when the rows run
+out:
 
-    my @after = $it->next;    # (): the iterator has ended
+    use DBIx::Squirrel::Stages::Batch;
+    use DBIx::Squirrel::Stages::Rows;
 
-Once a stage dies, the iterator has ended: C<next> returns nothing more,
-and the statement is finished. C<reset> runs it again from the start.
-To pass over a row a stage can't handle, catch the error in the stage,
-as in L<Catch errors in a stage|/"Catch errors in a stage">.
+    my $batches = $dbh->iterate('SELECT name FROM track ORDER BY id', pluck(0), batch(4));
+    while (my($batch) = $batches->next) {
+        say scalar(@$batch), ': ', join ', ', @$batch;
+    }
+    # 4: Dancing Queen, Knowing Me, Knowing You, Girls & Boys, Parklife
+    # 2: Country House, Sunshine of Your Love
+
+=head2 Make one value from every row
+
+C<collect> holds the rows. Once they run out, it passes on what its
+block makes of them, given as its arguments. Without a block, it
+passes on an array of them:
+
+    use DBIx::Squirrel::Stages::Batch;
+
+    my $names = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY name',
+        sub { $_->[0] },
+        collect { join ', ', @_ },
+    )->single;
+    say $names;    # Abba, Blur, Cream
+
+    my $rows = $dbh->iterate('SELECT name FROM artist', collect)->single;
+    say scalar @$rows;    # 3
+
+The block is called even when there are no rows. So an empty result
+still gives a value: here, an empty string, or an empty array.
+
+=head2 Write a stage that keeps count, or acts at the end
+
+C<batch> and C<collect> are made with C<gather>, from
+DBIx::Squirrel::Gather. Its block is called each time the statement
+runs, so what it declares starts afresh. It returns the stage, and
+optionally an end function, called when the rows run out:
+
+    use DBIx::Squirrel::Gather;
+
+    # Each value, then, once they run out, how many there were
+    sub and_count () {
+        return gather {
+            my $count = 0;    # fresh on each run
+            my $stage = sub ($value) { $count++; return $value };
+            my $end   = sub () { "($count)" };
+            return ($stage, $end);
+        };
+    }
+
+    my @lines = $dbh->iterate('SELECT name FROM artist ORDER BY name', sub { $_->[0] }, and_count)->all;
+    say "@lines";    # Abba Blur Cream (3)
+
+=head2 Build a pipeline afresh for each run
+
+The stage a C<gather> block returns can be a pipeline. The block runs at
+the start of each run, so it can build the pipeline then, or choose
+one, and whatever the pipeline's stages keep starts afresh:
+
+    use DBIx::Squirrel::Gather;
+    use DBIx::Squirrel::Pipeline;
+    use DBIx::Squirrel::Stages::Flow;
+
+    my $it = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY name',
+        gather {
+            my $n = 0;    # this run's
+            DBIx::Squirrel::Pipeline->new(sub { ++$n . ". $_->[0]" }, take(2));
+        },
+    );
+    say join ', ', $it->all;           # 1. Abba, 2. Blur
+    say join ', ', $it->reset->all;    # 1. Abba, 2. Blur, counted afresh
 
 =head1 Rows as objects
 
@@ -770,7 +921,7 @@ Rows are arrays still, so C<< $album->[1] >> works too.
 =head2 Name a column that has no method
 
 A column whose name can't be a method's, such as C<COUNT(*)>, gets a
-method if the statement gives it a name, and C<get_column> reaches it
+method if the statement gives it a name. C<get_column> reaches it
 either way:
 
     my $row = $dbh->results('SELECT COUNT(*), COUNT(*) AS albums FROM album')->single;
@@ -796,6 +947,9 @@ C<ekorn_result_class> attribute:
         say $album->label;    # Disraeli Gears (1967), ...
     }
 
+A column named as one of your methods gets no method of its own.
+C<get_column> reaches it.
+
 =head2 Transform objects with stages
 
 Stages see the objects:
@@ -807,100 +961,16 @@ Stages see the objects:
     )->all;
     say "@recent";    # Parklife The Great Escape
 
-=head1 Pipelines without a database
-
-=head2 Run a handle through stages
-
-C<pipe> runs a database or statement handle through stages, and returns
-what comes out. C<tap> does the same for the side effects, and returns
-the handle:
-
-    my @names = $dbh->pipe(
-        sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist') } },
-        sub { uc },
-    );
-    say "@names";    # ABBA BLUR CREAM
-
-    $dbh->tap(sub ($dbh) { say 'albums: ', $dbh->selectrow_array('SELECT COUNT(*) FROM album') })
-        ->do('UPDATE album SET year = year WHERE id = 1');
-
-The canned stages work here too, as the handle is just the first value:
-
-    use DBIx::Squirrel::Stages::Flow;
-    use DBIx::Squirrel::Stages::Taps;
-
-    my @two = $dbh->pipe(
-        sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist ORDER BY name') } },
-        take(2),
-    );
-    say "@two";    # Abba Blur
-
-    $dbh->tap(peek { say "on $_->{Driver}{Name}" })->do('UPDATE album SET year = year WHERE id = 1');
-    # on SQLite
-
-=head2 Run any values through stages
-
-A pipeline is called with values, and returns what comes out of its
-last stage:
-
-    use DBIx::Squirrel::Pipeline;
-
-    my $evens_squared = DBIx::Squirrel::Pipeline->new(
-        sub { $_ % 2 ? () : $_ },
-        sub { $_ * $_ },
-    );
-    say join ' ', $evens_squared->(1 .. 6);    # 4 16 36
-
-=head2 Let callers of your own functions add stages
-
-A function can take stages from its caller, as C<iterate> does, and run
-what it returns through them, so the caller gets it ready to use.
-Loading the pipeline, C<gather>, C<Stop> and the canned stages doesn't
-load the DBI, so this works in code that has nothing to do with a
-database:
-
-    use DBIx::Squirrel::Pipeline;
-    use DBIx::Squirrel::Stages::Rows;
-
-    # The bands, as hashes, through whatever stages the caller gives
-    sub bands (@stages) {
-        my @bands = (
-            {name => 'Abba',  formed => 1972},
-            {name => 'Blur',  formed => 1988},
-            {name => 'Cream', formed => 1966},
-        );
-        return DBIx::Squirrel::Pipeline->new(@stages)->(@bands);
-    }
-
-    my @older = bands(sub { $_->{formed} < 1980 ? $_ : () }, pluck('name'));
-    say "@older";    # Abba Cream
-
-    my @all = bands();    # without stages, as they are
-    say scalar @all;      # 3
-
-The stages that need a statement's column names need an iterator:
-C<as_hash>, and C<pluck> with a name for an array or a position for a
-hash. C<pluck> with a name for a hash, as here, doesn't. Outside an
-iterator, DBIx::Squirrel::Context's functions return C<undef>.
-
-=head2 Pull values from anything, one at a time
-
-A pipeline's C<iterator> pulls values from a source of your own, such as
-a file or a paged API. Ekorn::Pipeline's how-to has the recipes, in
-L<Pulling values one at a time|https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/HOWTO.md#pulling-values-one-at-a-time>, and
-more on functions that take stages, in
-L<Writing a function that takes stages|https://github.com/nukopian/Ekorn-Pipeline/blob/main/docs/HOWTO.md#writing-a-function-that-takes-stages>.
-
 =head1 A function for each database and statement
 
 DBIx::Squirrel::Sugar gives each database, and each statement, a
-function of its own name.
+function with its own name.
 
 =head2 Name a database
 
-Defined on C<use>, the function is there as the program compiles, so it
-can be called without parentheses. The database is connected to when
-it's first used.
+Defined on C<use>, the function is there as the program compiles. So
+it can be called without parentheses. The database is connected to
+when it's first used.
 
     use DBIx::Squirrel::Sugar database => {
         music => ['dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1}],
@@ -941,19 +1011,39 @@ it's first used.
     say $n;    # 3
     say ref database('archive');    # DBIx::Squirrel::db
 
-=head1 Caching
+=head2 Give a statement a pipeline
+
+A pipeline can be one of a statement's own stages, or be given to a
+call of its function, as any stage can. One made as the program runs
+needs a statement defined then too:
+
+    use DBIx::Squirrel::Pipeline;
+    use DBIx::Squirrel::Stages::Flow;
+    use DBIx::Squirrel::Stages::Rows;
+    use DBIx::Squirrel::Sugar qw(statement);
+
+    my $hits = DBIx::Squirrel::Pipeline->new(
+        sub { $_->[1] >= 5000 ? $_ : () },    # 5,000 plays or more
+        pluck('name'),
+    );
+    statement(top_hits => archive => 'SELECT name, plays FROM track ORDER BY plays DESC', $hits);
+
+    say join ', ', top_hits();           # Dancing Queen, Sunshine of Your Love, Girls & Boys, Parklife
+    say join ', ', top_hits(take(2));    # Dancing Queen, Sunshine of Your Love
+
+=head1 Caching and connections
 
 =head2 Prepare a statement once, wherever it's used
 
-C<prepare_cached> keeps the handle on the database handle, as the DBI
-does. A statement written two ways gets a handle each:
+C<prepare_cached> keeps the statement handle on the database handle, as
+the DBI does. A statement written two ways gets a handle for each:
 
     my $one = $dbh->prepare_cached('SELECT :a, :b');
     my $two = $dbh->prepare_cached('SELECT :b, :a');
     say $one == $two ? 'shared' : 'apart';    # apart
 
-A cached handle an iterator is part way through is left to it, and a
-new one is made in its place:
+A cached handle an iterator is part way through is left to it. A new
+one is made in its place:
 
     my $sql   = 'SELECT name FROM artist ORDER BY id';
     my $first = $dbh->prepare_cached($sql)->iterate(sub { $_->[0] });
@@ -971,18 +1061,38 @@ C<connect_cached> hands back the same handle for the same arguments:
     my $two = DBIx::Squirrel->connect_cached('dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1});
     say $one == $two ? 'the same handle' : 'two handles';    # the same handle
 
+=head2 Let Sugar connect when it's needed
+
+A Sugar database connects when it's first used, with C<connect_cached>,
+so two defined with the same arguments share a handle. The handle is
+kept. If it's disconnected, or the connection has gone, the next call
+makes a new one:
+
+    use DBIx::Squirrel::Sugar database => {
+        chart => ['dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1, PrintError => 0}],
+    };
+
+    my $first = chart;    # a handle of its own, as its attributes differ from music's
+    $first->disconnect;
+    my $again = chart;
+    say $again == $first ? 'the same handle' : 'a new handle';    # a new handle
+    say $again->ping ? 'connected' : 'not connected';            # connected
+
+The call just after a connection drops fails, as it would with plain
+DBI. The one after that has a new connection.
+
 =head1 Handling errors
 
 =head2 Find the line that went wrong
 
 Every error is reported at the line of your code that called
-DBIx::Squirrel, the DBI's own included:
+DBIx::Squirrel, including the DBI's own:
 
     eval { $dbh->prepare('SELEC name FROM artist') };
     print $@;    # DBD::SQLite::db prepare failed: near "SELEC": syntax error at ... line ...
 
-So is each warning the DBI gives under C<PrintError>, its default, naming
-the method you called, as plain DBI does:
+So is each warning the DBI gives under C<PrintError>, its default. It
+names the method you called, as plain DBI does:
 
     my $chatty = DBIx::Squirrel->connect('dbi:SQLite:dbname=music.db', {RaiseError => 0, PrintError => 1});
     local $SIG{__WARN__} = sub ($warning) { print "warned: $warning" };
@@ -993,7 +1103,7 @@ the method you called, as plain DBI does:
 
 C<connect> and C<prepare> croak whatever C<RaiseError> says, so they need
 no C<or die>. Without C<RaiseError>, the other methods return what the
-DBI's return:
+DBI's methods return:
 
     my $quiet = DBIx::Squirrel->connect('dbi:SQLite:dbname=music.db', {RaiseError => 0, PrintError => 0});
 
@@ -1005,14 +1115,14 @@ DBI's return:
 
 =head2 Mismatched bind values
 
-Binding croaks, at your line, when the values don't fit the
+Binding croaks at your line when the values don't fit the
 placeholders:
 
     eval { $dbh->prepare('SELECT :id, :name')->execute(id => 1) };
     print $@;    # Expected a value for each placeholder (none for name) at ... line ...
 
-Executing without any values croaks too, unless each placeholder has a
-value bound already, where the DBI would quietly read it as C<NULL>:
+Executing without any values croaks too, unless each placeholder
+already has a value bound. The DBI would quietly read it as C<NULL>:
 
     my $sth = $dbh->prepare('SELECT name FROM artist WHERE id = :id');
     eval { $sth->execute };
@@ -1024,6 +1134,341 @@ value bound already, where the DBI would quietly read it as C<NULL>:
 
     eval { $dbh->selectrow_array('SELECT name FROM artist WHERE id = $1') };
     print $@;    # Expected a value for each placeholder (none for 1) at ... line ...
+
+=head2 See what went wrong in a stage
+
+A stage that dies is reported at the line that asked for the result.
+The message gives the stage's number:
+
+    my $it = $dbh->iterate('SELECT name FROM artist', sub { die "no names today\n" });
+    eval { $it->next };
+    print $@;    # Pipeline stage #1 failed at ... line ...:
+                 #     no names today
+
+    my @after = $it->next;    # (): the iterator has ended
+
+A stage inside a pipeline given as a stage is named by its place in
+each: C<#2.2> is the second stage of the pipeline given as stage #2:
+
+    use DBIx::Squirrel::Pipeline;
+
+    my $checked = DBIx::Squirrel::Pipeline->new(sub { $_ }, sub { die "no names today\n" });
+    eval { $dbh->iterate('SELECT name FROM artist', sub { $_ }, $checked)->next };
+    print $@;    # Pipeline stage #2.2 failed at ... line ...:
+                 #     no names today
+
+Once a stage dies, the iterator has ended. C<next> returns nothing more,
+and the statement is finished. C<reset> runs it again from the start.
+To pass over a row a stage can't handle, catch the error in the stage,
+as in L<Catch errors in a stage|/"Catch errors in a stage">.
+
+=head2 Handle errors your own way
+
+The DBI's C<HandleError> works as it does with plain DBI. An error it
+throws, such as an exception object, is passed on unchanged:
+
+    package My::Error {
+        sub new ($class, $message) { return bless {message => $message}, $class }
+    }
+
+    my $strict = DBIx::Squirrel->connect('dbi:SQLite:dbname=music.db', {
+        PrintError  => 0,
+        HandleError => sub ($message, $handle, $value) { die My::Error->new($message) },
+    });
+    eval { $strict->do('DELETE FROM nowhere') };
+    say ref $@;             # My::Error
+    say $@->{message};      # DBD::SQLite::db do failed: no such table: nowhere
+
+=head1 Moving from 1.x
+
+The reference's L<Upgrading from 1.x|DBIx::Squirrel::Manual::Reference/"Upgrading from 1.x">
+lists every change. These are the ones most code meets first.
+
+=head2 Replace database entities with Sugar
+
+1.x gave helpers a handle at run time. In 2.0, Sugar defines a
+database by the arguments to connect with, and a statement by its SQL
+and stages:
+
+    # 1.x
+    use DBIx::Squirrel database_entities => [qw(db artist)];
+    db(DBIx::Squirrel->connect($dsn, $user, $pass));
+    artist(db->results('SELECT * FROM artist WHERE name = ? LIMIT 1'));
+    say artist('Blur')->single->Id;
+
+    # 2.0
+    use DBIx::Squirrel::Sugar
+        database  => {db => ['dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1}]},
+        statement => {artist_id => [db => 'SELECT id FROM artist WHERE name = ?', sub ($row) { $row->[0] }]};
+
+    my($id) = artist_id('Blur');
+    say $id;    # 2
+
+=head2 Give stages after the bind values
+
+1.x took bind values and transformations together in an array
+reference. In 2.0, the stages come after the bind values:
+
+    # 1.x
+    my $it = $dbh->iterate($sql, [2, sub { $_->[0] }]);
+
+    # 2.0
+    my @titles = $dbh->iterate(
+        'SELECT title FROM album WHERE artist_id = ? ORDER BY year',
+        2, sub { $_->[0] },
+    )->all;
+    say "@titles";    # Parklife The Great Escape
+
+=head2 Call a column's method in lower case
+
+1.x matched a column's method in any case. In 2.0, methods are in
+lower case only:
+
+    my $album = $dbh->results('SELECT Title FROM album WHERE id = 1')->single;
+    say $album->title;    # Arrival
+
+C<get_column> takes a name in any case.
+
+=head1 Pipelines without a database
+
+=head2 Run a handle through stages
+
+C<pipe> runs a database or statement handle through stages, and returns
+what comes out. C<tap> does the same for the side effects, and returns
+the handle instead:
+
+    my @names = $dbh->pipe(
+        sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist') } },
+        sub { uc },
+    );
+    say "@names";    # ABBA BLUR CREAM
+
+    $dbh->tap(sub ($dbh) { say 'albums: ', $dbh->selectrow_array('SELECT COUNT(*) FROM album') })
+        ->do('UPDATE album SET year = year WHERE id = 1');
+
+The canned stages work here too. The handle is just the first value:
+
+    use DBIx::Squirrel::Stages::Flow;
+    use DBIx::Squirrel::Stages::Taps;
+
+    my @two = $dbh->pipe(
+        sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist ORDER BY name') } },
+        take(2),
+    );
+    say "@two";    # Abba Blur
+
+    $dbh->tap(peek { say "on $_->{Driver}{Name}" })->do('UPDATE album SET year = year WHERE id = 1');
+    # on SQLite
+
+=head2 Run any values through stages
+
+A pipeline is called with values, and returns what comes out of its
+last stage:
+
+    use DBIx::Squirrel::Pipeline;
+
+    my $evens_squared = DBIx::Squirrel::Pipeline->new(
+        sub { $_ % 2 ? () : $_ },
+        sub { $_ * $_ },
+    );
+    say join ' ', $evens_squared->(1 .. 6);    # 4 16 36
+
+=head1 Writing a function that takes stages
+
+=head2 Let callers of your own functions add stages
+
+A function can take stages from its caller, as C<iterate> does, and run
+what it returns through them. The caller then gets it ready to use.
+Loading the pipeline, C<gather>, C<Stop> and the canned stages doesn't
+load the DBI. So this works in code that has nothing to do with a
+database:
+
+    use DBIx::Squirrel::Pipeline;
+    use DBIx::Squirrel::Stages::Rows;
+
+    # The bands, as hashes, through whatever stages the caller gives
+    sub bands (@stages) {
+        my @bands = (
+            {name => 'Abba',  formed => 1972},
+            {name => 'Blur',  formed => 1988},
+            {name => 'Cream', formed => 1966},
+        );
+        return DBIx::Squirrel::Pipeline->new(@stages)->(@bands);
+    }
+
+    my @older = bands(sub { $_->{formed} < 1980 ? $_ : () }, pluck('name'));
+    say "@older";    # Abba Cream
+
+    my @all = bands();    # without stages, as they are
+    say scalar @all;      # 3
+
+Some stages need a statement's column names, so they need an iterator:
+C<as_hash>, and C<pluck> with a name for an array or a position for a
+hash. C<pluck> with a name for a hash, as here, doesn't. Outside an
+iterator, DBIx::Squirrel::Context's functions return C<undef>.
+
+=head2 Pull values from anything, one at a time
+
+A pipeline's C<iterator> pulls values from a source of your own, such as
+a file or a paged API. Ekorn::Pipeline's how-to has the recipes, in
+L<Pulling values one at a time|Ekorn::Pipeline::Manual::HowTo/"Pulling values one at a time">.
+It has more on functions that take stages, in
+L<Writing a function that takes stages|Ekorn::Pipeline::Manual::HowTo/"Writing a function that takes stages">.
+
+=head1 Writing stages for others
+
+A stage for others is made by a function, so it can check its options
+once, when it's made. These recipes build a small module of stages,
+C<My::Stages>. Ekorn::Pipeline's how-to has more, in
+L<Writing stages for others|Ekorn::Pipeline::Manual::HowTo/"Writing stages for others">.
+
+=head2 Decide where a stage belongs
+
+A stage goes where what it needs to know is. Ask what it has to know
+to do its job, not what its values happen to be:
+
+=over 4
+
+=item *
+
+B<A stage that needs a database, a statement, a row's column names,
+or the row a result came from> goes under
+C<DBIx::Squirrel::Stages::>. C<pluck> and C<as_hash> need a statement's
+column names, so they're in DBIx::Squirrel::Stages::Rows.
+
+=item *
+
+B<A stage that would work on values from anywhere> belongs under
+C<Ekorn::Pipeline::Stages::>, where any function's stages can use it.
+That holds even if you wrote it for rows. A stage that works on hash
+references from a query works as well on hash references from a
+JSON file.
+
+=back
+
+Two things settle the cases in between:
+
+=over 4
+
+=item *
+
+B<Ekorn::Pipeline can't depend on DBIx::Squirrel.> DBIx::Squirrel
+depends on it, not the other way round. So a stage that would C<use>
+DBIx::Squirrel, or any of its modules, belongs under
+C<DBIx::Squirrel::Stages::>.
+
+=item *
+
+**A stage under C<Ekorn::Pipeline::Stages::> reaches DBIx::Squirrel's
+users only once DBIx::Squirrel adds it.** DBIx::Squirrel's own
+modules of stages export Ekorn's by name, from a list of their own.
+Until then, use it from its own module.
+
+=back
+
+Either way, a stage is built from the same parts: C<gather> for state
+and an end, C<Stop> to end early, and C<croakf> to report mistakes at
+the caller's line. Under C<Ekorn::Pipeline::Stages::>, take them from
+Ekorn::Pipeline's own modules, so the stage needs nothing of
+DBIx::Squirrel.
+
+=head2 Write a function that makes a stage
+
+Check what the function is given, and croak at once if it's wrong.
+Keep a stage's state in a C<gather> block, so it starts afresh on each
+run:
+
+    package My::Stages {
+        use DBIx::Squirrel::Errors qw(croakf);
+        use DBIx::Squirrel::Gather;
+
+        our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
+
+        # Each value, numbered from $start on each run
+        sub numbered_from ($start) {
+            croakf 'Expected a whole number to start from (%s)', $start
+                unless $start =~ m( \A \d+ \z )x;
+            return gather {
+                my $n = $start;
+                return sub ($value) { $n++ . ". $value" };
+            };
+        }
+
+        # Each row, unless a column is NULL
+        sub no_nulls () {
+            return sub ($row) {
+                croakf 'Expected no NULL columns' if grep { !defined } @$row;
+                return $row;
+            };
+        }
+    }
+
+    my $chart = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        My::Stages::numbered_from(1),
+    );
+    say join ', ', $chart->all;           # 1. Abba, 2. Blur, 3. Cream
+    say join ', ', $chart->reset->all;    # 1. Abba, 2. Blur, 3. Cream
+
+=head2 Report mistakes at the caller's line
+
+C<croakf>, from DBIx::Squirrel::Errors, croaks with a message made by
+C<sprintf>. Its format is a literal, never data. With
+C<@DBIx::Squirrel::Errors::INTERNAL> as the module's C<@CARP_NOT>, as
+above, each mistake is reported at the caller's line. A mistake in
+making the stage is reported where the function was called. One a
+stage finds in a row is reported where the result was asked for:
+
+    eval { My::Stages::numbered_from('one') };
+    print $@;    # Expected a whole number to start from (one) at ... line ...
+
+    eval { $dbh->iterate('SELECT name, NULL FROM artist', My::Stages::no_nulls())->all };
+    print $@;    # Pipeline stage #1 failed at ... line ...:
+                 #     Expected no NULL columns at ... line ...
+
+=head2 Make a stage out of others
+
+A function can return a pipeline, made of other stages. It goes
+wherever a stage goes, and works on each shape of row that the stages
+in it do:
+
+    use DBIx::Squirrel::Pipeline;
+    use DBIx::Squirrel::Stages::Rows;
+
+    sub loud_names () {
+        return DBIx::Squirrel::Pipeline->new(pluck('name'), sub { uc });
+    }
+
+    say join ' ', $dbh->iterate('SELECT id, name FROM artist ORDER BY id', loud_names)->all;
+        # ABBA BLUR CREAM
+    say join ' ', $dbh->results('SELECT id, name FROM artist ORDER BY id', loud_names)->all;
+        # ABBA BLUR CREAM
+
+=head2 Test a stage
+
+A pipeline called with values tests a stage without a database. Run it
+twice, to show it starts afresh. Then run it on rows from an in-memory
+SQLite database, in each shape it takes:
+
+    use Test2::V0;
+    use DBIx::Squirrel::Pipeline;
+    use My::Stages;
+
+    my $p = DBIx::Squirrel::Pipeline->new(My::Stages::numbered_from(1));
+    is [$p->(qw(a b))], ['1. a', '2. b'], 'numbered';
+    is [$p->(qw(c))],   ['1. c'],         'from 1 on each run';
+
+    done_testing;
+
+=head2 Publish a module of stages
+
+Name it for its job, in the namespace
+L<where its stages belong|/"Decide where a stage belongs">. Name the
+distribution after it, as
+C<DBIx-Squirrel-Stages-JSON> for C<DBIx::Squirrel::Stages::JSON>. Have
+it require the DBIx::Squirrel it was tested with. The reference's
+L<Writing stages|DBIx::Squirrel::Manual::Reference/"Writing stages"> has the details.
 
 =head1 SEE ALSO
 

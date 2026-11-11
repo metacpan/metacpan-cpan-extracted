@@ -27,7 +27,7 @@ handle(self)
     {
         static const char *const k[] = { "handle", "name", "class" };
         SV *v = pdbi_get(aTHX_ ptx_hv(aTHX_ self), k[ix]);
-        RETVAL = v ? newSVsv(v) : newSV(0);
+        RETVAL = v ? newSVsv(v) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -38,7 +38,7 @@ is_active(self)
     CODE:
     {
         SV *v = pdbi_get(aTHX_ ptx_hv(aTHX_ self), "active");
-        RETVAL = (v && SvTRUE(v)) ? 1 : 0;
+        RETVAL = (v && SvTRUE(v)) ? 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -86,8 +86,10 @@ txn(self, ...)
     {
         SV *name = &PL_sv_undef, *code = &PL_sv_undef;
         if (items == 2)      code = ST(1);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         else if (items == 3) { name = ST(1); code = ST(2); }
-        else croak("Punk::Txn: txn takes a coderef, or a database name and a "
+        else croak("Punk::Txn: txn takes a coderef, or a database name and a " /* # uncoverable statement */
                    "coderef");
         RETVAL = ptx_context_txn(aTHX_ self, name, code);
     }

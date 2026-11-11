@@ -19,9 +19,7 @@ nup - n-up, multi-column paged output for commands and files
      -F  --no-paginate      disable page mode
      -A  --auto-paginate    auto disable page mode for single column
      -H  --filename         show filename headers (default: on)
-     -G  --grid=#           grid layout (e.g., 2x3)
-     -C  --pane=#           number of columns
-     -R  --row=#            number of rows
+     -C  --pane=#[,#]       number of columns, and rows (e.g., 2,2)
      -P  --page=#           page height in lines
      -S  --pane-width=#     pane width (default: 85)
     --bs --border-style=#   border style (default: heavy-box)
@@ -35,6 +33,11 @@ nup - n-up, multi-column paged output for commands and files
          --textconv[=EXT]   textconv for non-text files
          --pager=#          pager command (empty to disable)
          --no-pager         disable pager
+     -T  --device=#         output device: tty, pdf, or a paper for PDF
+                            (e.g., a4, a4p, a3l)
+     -o  --output=FILE      output file (PDF when it ends with .pdf)
+         --pdf-opts=#       options for ansi2pdf (e.g., "-l 80")
+         --geometry         print the size and the kind of the device
          --white-board      black on white board
          --black-board      white on black board
          --green-board      white on green board
@@ -42,7 +45,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.09
+Version 1.12
 
 # DESCRIPTION
 
@@ -147,17 +150,23 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
 
 ## Layout Options
 
-- **-C** _N_, **--pane**=_N_
+- **-C** _C_\[,_R_\], **--pane**=_C_\[,_R_\]
 
-    Set the number of columns (panes).
+    Set the number of columns (panes), and the number of rows when it is
+    given after a comma.  For example, `-C2` creates 2 columns, and
+    `-C2,3` creates 2 columns and 3 rows.
 
 - **-R** _N_, **--row**=_N_
 
     Set the number of rows.
+    This option is kept for compatibility and may be removed in the
+    future.
 
 - **-G** _CxR_, **--grid**=_CxR_
 
-    Set grid layout. For example, `-G2x3` creates 2 columns and 3 rows.
+    Set grid layout.  `-G2x3` is equivalent to `-C2,3`.
+    This option is kept for compatibility and may be removed in the
+    future.
 
 - **-P** _N_, **--page**=_N_
 
@@ -247,14 +256,87 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
 
     Disable pager.
 
+## PDF Output
+
+- **-T** _DEVICE_, **--device**=_DEVICE_
+
+    Set the device to show the output on.  The default is `tty`, the
+    terminal.  Any other device is a paper, and the output is printed to
+    PDF by `ansi2pdf`, instead of being shown on the terminal.
+
+    The name of a paper is the one for the `-p` option of `ansi2pdf`,
+    such as `a4`, `a3`, `b5` or `letter`.  A paper is used in
+    landscape orientation.  The letter `p` or `l` after the name gives
+    the orientation: `a4p` is A4 in portrait, and `a4l` is A4 in
+    landscape.  The device `pdf` is the default paper of `ansi2pdf`, A4.
+
+        nup -T a4 man nup > nup.pdf     # A4, landscape
+        nup -T a4p -C1 man nup | lpr    # A4, portrait
+
+    A sheet of paper takes the place of the terminal, and `ansi2pdf`
+    takes the place of the pager.  The size of a sheet in columns and
+    lines is asked to `ansi2pdf`, the output is formatted for that size
+    in the same way as for a terminal, and each screen is printed on a
+    sheet as it is.  The default is a landscape A4 sheet of 60 lines,
+    which has room for two panes of the default width.
+
+- **-o** _FILE_, **--output**=_FILE_
+
+    Write the output to _FILE_.  When the name ends with `.pdf`, the
+    output is PDF without `-T` as well.
+
+        nup -o nup.pdf man nup          # A4, landscape
+        nup -T a3 -o nup.pdf man nup    # A3, landscape
+
+    Otherwise, what is shown on the terminal is written to the file as it
+    is, with the ANSI sequences and in the size of the terminal, and the
+    pager is not used.  `-T tty` does so for a name ending with `.pdf`
+    as well.
+
+        nup -o nup.txt man nup          # the same as --no-pager > nup.txt
+
+- **--geometry**
+
+    Print the size of the device in columns and lines and its kind,
+    `tty` or `pdf`, and exit.  No file is read and no command is run.
+
+        $ nup -T a4p --geometry
+        100 60 pdf
+        $ nup -o nup.pdf -P 80 --geometry
+        275 80 pdf
+
+    For a paper, the size is that of a sheet, which follows `-T`, `-o`,
+    `-P`, the number of rows, `--pdf-opts` and `-w` of `ansicolumn`
+    given after the file names.  For the terminal, it is the size of the
+    terminal.  This is for a program that formats text before giving it
+    to `nup`, as [mdee(1)](https://metacpan.org/pod/App%3A%3Amdee) does.
+
+- **--pdf-opts**=_OPTIONS_
+
+    Give other options to `ansi2pdf`, such as the number of lines on a
+    sheet, the margin and the fonts.  They are given after the paper, so
+    they take precedence.
+
+        nup -o nup.pdf --pdf-opts='-l 80 -m 15' man nup
+
+The `-P` option sets the number of lines of a page for PDF as well:
+a sheet has that many lines for each row.  The `-w` option of
+`ansicolumn`, given after the files or the command, sets the number
+of columns of a sheet.  The font size follows them, and the one that
+is not given is decided to fill the sheet.  With neither of them, a
+sheet has 60 lines.
+
+    nup -o nup.pdf -P 80 man nup         # 80 lines on a sheet
+    nup -o nup.pdf -C2,2 -P 40 man nup   # 2x2 pages of 40 lines
+    nup -o nup.pdf -C3 file -w 300       # 300 columns on a sheet
+
 ## Terminal Size
 
 The terminal size is taken from the controlling terminal
 (`/dev/tty`).  When it is not available, as when `nup` is run
 without a terminal, the `COLUMNS` environment variable gives the
 width (default 80), and `LINES` gives the height (default 24) used
-to split the screen when the number of rows is set with `-R` or
-`-G`:
+to split the screen when the number of rows is set, as in `-C2,2`:
 
     COLUMNS=170 nup -C2 file1.txt file2.txt
 
@@ -278,11 +360,13 @@ Typical n-up usage:
 
     nup man nup                # view manual in n-up layout
     nup -C2 man perl           # 2 columns
-    nup -G2x2 man perl         # 2x2 grid (4-up layout)
+    nup -C2,2 man perl         # 2x2 grid (4-up layout)
     nup -F man perl            # no pagination
     nup file1.txt file2.txt    # view files side by side
     nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
     nup -e ./script.sh         # force command mode for a file
+    nup -o nup.pdf man nup     # print to PDF (requires ansi2pdf)
+    nup -T a4p -C1 file | lpr  # print on A4 in portrait
 
 Using `nup` as a `MANPAGER`:
 

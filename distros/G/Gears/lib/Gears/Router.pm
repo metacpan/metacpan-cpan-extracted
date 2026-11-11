@@ -1,5 +1,5 @@
 package Gears::Router;
-$Gears::Router::VERSION = '0.104';
+$Gears::Router::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -14,7 +14,7 @@ has extended 'router' => (
 );
 
 has param 'pattern_separator' => (
-	isa => Str,
+	isa => StrLength [1],
 	default => '/',
 );
 
@@ -203,12 +203,15 @@ I<Not available in constructor>
 
 =head3 pattern_separator
 
-A string used as a separator for patterns - when a location is added under
-another location, their patterns will be joined using this separator, and
+A single character used as a separator for patterns - when a location is added
+under another location, their patterns will be joined using this separator, and
 trailing separator from parent and leading separator from child will be
 stripped.
 
-By default, C</> character is used.
+By default, C</> character is used. If a different character is to be used, it
+must be used when declaring routes accordingly. Note that some implementations
+may be incompatible with some separators, for example SigilMatch is not
+compatible with all the characters it uses for placeholders (C<< :?*> >>).
 
 I<Available in constructor>
 

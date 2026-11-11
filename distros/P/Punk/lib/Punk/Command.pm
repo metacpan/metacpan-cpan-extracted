@@ -10,7 +10,7 @@ use File::Basename ();
 use Getopt::Long ();
 use Punk ();
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 # The whole punk command line. bin/punk is two lines - `exit
 # Punk::Command->main(@ARGV)` - and everything else is here: a registry of
@@ -62,7 +62,11 @@ my  %DOCTOR_OWNER;
 
 sub register {
     my ($class, $name, $spec, $owner) = @_;
+    # uncoverable condition false
     $owner //= caller;
+    # uncoverable condition left count:1
+    # uncoverable condition right count:1
+    # uncoverable condition left count:2
     Carp::croak('Punk::Command: register needs a name and a spec hashref')
         unless defined $name && length $name && ref $spec eq 'HASH';
     if (my $prev = $OWNER{$name}) {
@@ -71,6 +75,8 @@ sub register {
     }
     $OWNER{$name} = $owner;
     push @ORDER, $name;
+    # uncoverable condition left
+    # uncoverable condition false
     $spec->{name} //= $name;   # so a diagnostic can name the command it is about
     $SPECS{$name} = $spec;
     return $class;
@@ -80,6 +86,8 @@ sub register {
 # here too, so a plugin's rows land in the same report.
 sub register_doctor {
     my ($class, $label, $probe, $owner) = @_;
+    # uncoverable condition right
+    # uncoverable condition false
     $owner //= caller;
     if (my $prev = $DOCTOR_OWNER{$label}) {
         Carp::croak("Punk::Command: doctor row '$label' is registered by "
@@ -110,10 +118,14 @@ sub main {
     local *STDOUT = $OUT if $OUT;
     local *STDERR = $ERR if $ERR;
 
+    # uncoverable branch true
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
     if (!@argv || $argv[0] eq '-h' || $argv[0] eq '--help') {
         _usage_all(\*STDOUT);
         return 0;
     }
+    # uncoverable condition left
     if ($argv[0] eq '-v' || $argv[0] eq '--version') {
         print "punk $Punk::VERSION\n";
         return 0;
@@ -132,6 +144,7 @@ sub main {
     # descend nested verbs (punk api sync, punk queue jobs ...)
     my $path = $name;
     while ($spec->{commands}) {
+        # uncoverable condition right
         my $tok = (@argv && $argv[0] !~ /^-/) ? $argv[0] : undef;
         if (defined $tok && $spec->{commands}{$tok}) {
             shift @argv;
@@ -139,6 +152,7 @@ sub main {
             $path .= " $tok";
             next;
         }
+        # uncoverable branch true
         last if $spec->{code};
         if (defined $tok) {
             my @verbs = sort keys %{ $spec->{commands} };
@@ -218,6 +232,7 @@ sub main {
 
     my $code = eval { $spec->{code}->(\%opt, @argv) };
     if (my $err = $@) {
+        # uncoverable condition right
         if (ref $err eq 'HASH' && defined $err->{usage_error}) {
             print STDERR "punk $path: $err->{usage_error}\n\n";
             _usage_cmd($path, $spec, \*STDERR, \@extra);
@@ -225,12 +240,14 @@ sub main {
         }
         return _fail($path, $err, $spec->{hints});
     }
+    # uncoverable branch false
     return defined $code ? int $code : 0;
 }
 
 # the plugin seam: Punk::Command::<Ucfirst> registers at load
 sub _probe {
     my ($name) = @_;
+    # uncoverable branch true
     return unless $name =~ /^[a-z][a-z0-9_-]*$/;
     (my $mod = ucfirst $name) =~ s/[-_](\w)/\U$1/g;
     return unless eval { require "Punk/Command/$mod.pm"; 1 };
@@ -239,7 +256,9 @@ sub _probe {
 
 sub _cmd_help {
     my ($topic, @rest) = @_;
+    # uncoverable condition right
     if (defined $topic && length $topic) {
+        # uncoverable condition right
         my $spec = $SPECS{$topic} // _probe($topic);
         unless ($spec) {
             print STDERR "punk help: no such command '$topic'\n\n";
@@ -247,6 +266,9 @@ sub _cmd_help {
             return 2;
         }
         my $path = $topic;
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         while (@rest && $spec->{commands} && $spec->{commands}{$rest[0]}) {
             my $t = shift @rest;
             $spec = $spec->{commands}{$t};
@@ -285,11 +307,15 @@ sub _options_for {
     # declared: which of the two Getopt bound would decide what the command
     # does, and that is not a thing to leave to ordering.
     my @extra;
+    # uncoverable branch true
     for my $o (@{ $extra || [] }) {
         my $k = _opt_key($o->{spec});
         Carp::croak("Punk::Command: option '--$k' is defined by both "
                   . "'" . ($spec->{name} // '?') . "' and "
                   . ($o->{owner} // 'a kit'))
+            # uncoverable condition right count:1
+            # uncoverable condition right count:2
+            # uncoverable condition right count:3
             if $own_key{$k} || $k eq 'help';
         push @extra, $o;
     }
@@ -297,6 +323,7 @@ sub _options_for {
 
     return (
         (grep { !$own_key{ _opt_key($_->{spec}) }
+                # uncoverable condition right
                 && !$extra_key{ _opt_key($_->{spec}) } } @SHARED_OPTIONS),
         @own,
         @extra,
@@ -312,10 +339,13 @@ sub _usage_all {
     for my $name (@ORDER) {
         my $spec = $SPECS{$name};
         next if $spec->{hidden};
+        # uncoverable condition false count:1
+        # uncoverable condition right count:2
         push @rows, [ $spec->{display} // $name, $spec->{abstract} // '' ];
     }
     push @rows, [ 'help [command]', "this, or a command's own options" ];
     my $w = 0;
+    # uncoverable condition false
     length $_->[0] > $w and $w = length $_->[0] for @rows;
     printf {$fh} "  %-*s  %s\n", $w, @{$_}[0, 1] for @rows;
     print {$fh} "\n  punk --version\n";
@@ -327,11 +357,14 @@ sub _usage_cmd {
     if ($spec->{raw}) {
         # the adapted CLI owns its own help
         print {$fh} 'usage: punk ' . $path . ' '
+                  # uncoverable condition right
                   . ($spec->{usage} // '<command> [options]') . "\n";
+        # uncoverable branch false
         print {$fh} "\n$spec->{desc}\n" if $spec->{desc};
         print {$fh} "\nsee `punk $path help` for its commands\n";
         return;
     }
+    # uncoverable condition right count:1
     if ($spec->{commands} && !$spec->{code}
         && 1 == keys %{ $spec->{commands} }) {
         # one mandatory verb reads better spelled out: "usage: punk api sync"
@@ -343,6 +376,7 @@ sub _usage_cmd {
     if ($spec->{commands}) {
         my @names = sort keys %{ $spec->{commands} };
         my $w = 0;
+        # uncoverable condition false
         length $_ > $w and $w = length $_ for @names;
         print {$fh} "\ncommands:\n";
         printf {$fh} "  %-*s  %s\n", $w, $_,
@@ -359,19 +393,24 @@ sub _usage_cmd {
         my ($long) = $o->{spec} =~ /^([^=|!+\@]+)/;
         (my $shown = $long) =~ tr/_/-/;
         my $left = "--$shown" . (defined $o->{arg} && length $o->{arg}
+                                 # uncoverable condition right
                                  ? " $o->{arg}" : '');
+        # uncoverable condition right
         my $doc = $o->{doc} // '';
         $doc .= " (default: $o->{default})"
             if defined $o->{default} && !ref $o->{default}
+            # uncoverable condition right count:2
             && length $o->{default};
         push @{ $is_extra{ _opt_key($o->{spec}) } ? \@extra_rows : \@rows },
              [ $left, $doc ];
     }
     my $w = 0;
+    # uncoverable condition false
     length $_->[0] > $w and $w = length $_->[0] for @rows, @extra_rows;
     print {$fh} "\noptions:\n";
     printf {$fh} "  %-*s  %s\n", $w, @{$_}[0, 1] for @rows;
     if (@extra_rows) {
+        # uncoverable condition right
         my $title = $extra[0]{section} // 'more options';
         print {$fh} "\n$title:\n";
         printf {$fh} "  %-*s  %s\n", $w, @{$_}[0, 1] for @extra_rows;
@@ -399,28 +438,39 @@ sub routes {
     my $app = _load_app($opt{dir}) or return 1;
 
     my @rows;
+    # uncoverable condition right
     my $recs = eval { $app->{registrar}{router}->records } || [];
     for my $rec (@$recs) {
         push @rows, {
             method => $rec->{method} // '?',
             path   => $rec->{path}   // '?',
             target => _code_name($rec->{code}),
+            # uncoverable branch true
             guards => scalar @{ $rec->{guards} || [] },
             name   => $rec->{name},
+            # uncoverable condition right count:1
+            # uncoverable condition right count:2
             kind   => 'route',
         };
     }
 
     # API operations live in their mount, not the router: the spec is the
     # routing table for everything under the mount's prefix.
+    # uncoverable branch true
     for my $m (@{ $app->{registrar}{api_mounts} || [] }) {
+        # uncoverable condition right
         my $prefix = $m->{prefix} // '';
+        # uncoverable branch true
         my $api    = $m->{api} or next;
+        # uncoverable condition right
         my $ops    = eval { $api->operations } || [];
+        # uncoverable branch false
         my $by_id  = ref $m->{ops} eq 'HASH' ? $m->{ops} : {};
         for my $op (sort { $a->{path} cmp $b->{path}
+                        # uncoverable branch true
                         || $a->{method} cmp $b->{method} } @$ops) {
             my $rec  = $by_id->{ $op->{operationId} };
+            # uncoverable branch false
             my $code = ref $rec eq 'HASH' ? $rec->{code} : undef;
             push @rows, {
                 method => uc $op->{method},
@@ -428,10 +478,13 @@ sub routes {
                 target => (ref $code eq 'CODE'
                             ? _code_name($code) : $op->{operationId}),
                 guards => (ref $rec eq 'HASH'
+                            # uncoverable branch true
                             ? scalar @{ $rec->{guards} || [] } : 0),
                 # an operationId IS the name: it is what url_for takes, and
                 # it shares the one namespace with the route names
                 name   => $op->{operationId},
+                # uncoverable branch false count:1
+                # uncoverable branch false count:2
                 kind   => 'api',
             };
         }
@@ -443,11 +496,16 @@ sub routes {
             path   => $w->{path} // '?',
             target => (ref $w->{target} ? _code_name($w->{target})
                                         : ($w->{target} // '?')),
+            # uncoverable branch true count:1
+            # uncoverable branch false count:2
+            # uncoverable condition right count:1
+            # uncoverable condition left count:2
             guards => scalar @{ $w->{guards} || [] },
             kind   => 'ws',
         };
     }
 
+    # uncoverable branch true
     for my $m (@{ $app->{registrar}{mounts} || [] }) {
         push @rows, {
             method => 'ANY',
@@ -456,6 +514,11 @@ sub routes {
                     : $m->{md_dir} ? "markdown $m->{md_dir}"
                     :                'mounted psgi app',
             guards => 0,
+            # uncoverable branch true count:1
+            # uncoverable branch false count:1
+            # uncoverable branch false count:2
+            # uncoverable branch true count:3
+            # uncoverable condition right
             kind   => $m->{md_dir} ? 'markdown' : 'mount',
         };
     }
@@ -486,6 +549,7 @@ sub routes {
         return 0;
     }
 
+    # uncoverable branch true
     @rows = sort { $a->{path} cmp $b->{path} || $a->{method} cmp $b->{method} }
             @rows if $opt{sort};
 
@@ -508,6 +572,9 @@ sub routes {
             ($named ? sprintf('%-*s  ', $w_n, $r->{name} // '') : ''),
             $r->{target},
             $r->{guards} ? "  [$r->{guards} guard"
+                         # uncoverable branch true count:2
+                         # uncoverable branch false count:2
+                         # uncoverable branch true count:3
                          . ($r->{guards} > 1 ? 's' : '') . ']' : '';
     }
     printf "\n%d route%s\n", scalar @rows, @rows == 1 ? '' : 's';
@@ -544,17 +611,27 @@ sub doctor {
     for my $mod (qw(Open::API Template::Stencil File::Raw::JSON File::Raw::XML
                     JSON::Schema::Fast YAML::XS Hyperman)) {
         my $v = _module_version($mod);
+        # uncoverable branch true
         $bad++ unless defined $v;
+        # uncoverable branch false
+        # uncoverable condition right
         _line($mod, $v // '-', defined $v ? 'ok' : 'MISSING');
     }
 
     print "\noptional\n";
     for my $mod (qw(DBI Future Open::API::UI Plack)) {
         my $v = _module_version($mod);
+        # uncoverable branch false
+        # uncoverable condition right
         _line($mod, $v // '-', defined $v ? 'ok' : 'not installed');
     }
     {   # a database backend is only useful with a driver behind it
         my @drv = eval { require DBI; DBI->available_drivers } ;
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
+        # uncoverable branch false count:3
+        # uncoverable condition right
+        # uncoverable condition false
         _line('DBD drivers', (@drv ? join(' ', sort @drv) : '-'),
               @drv ? 'ok' : 'none') if @drv || !$@;
     }
@@ -563,6 +640,7 @@ sub doctor {
     # resolved, and at which version.
     print "\nC ABIs\n";
     for my $abi (_abi_report()) {
+        # uncoverable branch true
         $bad++ if $abi->{state} ne 'ok';
         _line($abi->{name}, $abi->{detail}, $abi->{state});
     }
@@ -582,6 +660,7 @@ sub doctor {
 
     # rows other distributions registered (register_doctor) - a probe returns
     # (ok, detail); a die is a failed row, not a failed doctor
+    # uncoverable branch false
     if (@DOCTOR) {
         print "\nplugins\n";
         for my $row (@DOCTOR) {
@@ -592,6 +671,7 @@ sub doctor {
                 ($ok, $detail) = (0, $e);
             }
             $bad++ unless $ok;
+            # uncoverable condition right
             _line($label, $detail // '-', $ok ? 'ok' : 'FAILED');
         }
     }
@@ -600,15 +680,21 @@ sub doctor {
         print "\napplication\n";
         _line('class', $app->{class}, 'ok');
         _line('root',  $app->{root},  'ok');
+        # uncoverable condition right
         my $n = eval { scalar @{ $app->{registrar}{router}->records } } || 0;
+        # uncoverable branch false
         _line('routes', $n, $n ? 'ok' : 'none');
+        # uncoverable branch false
         if (my $cfg = $app->{registrar}{config}) {
             _line('config', join(' ', @{ $cfg->files }), 'ok');
+            # uncoverable condition right
             my $s = eval { $cfg->secret_paths } || [];
+            # uncoverable branch true
             _line('secrets', (@$s ? scalar(@$s) . ' resolved' : 'none'), 'ok');
         }
     }
 
+    # uncoverable branch true count:1
     print "\n", $bad ? "$bad problem" . ($bad > 1 ? 's' : '') . " found\n"
                      : "no problems found\n";
     return $bad ? 1 : 0;
@@ -622,13 +708,18 @@ sub doctor {
 # reference and reports all of them, rather than dying on the first.
 sub config_check {
     my (%opt) = @_;
+    # uncoverable condition left
     my $root = $opt{root} || _find_root($opt{dir}) or do {
         print STDERR "punk config: no application found "
             . "(looked for app.psgi upwards from "
+            # uncoverable condition false
             . ($opt{dir} || Cwd::getcwd()) . ")\n";
         return 2;
     };
+    # uncoverable condition left
+    # uncoverable condition false
     my $file = $opt{file} || File::Spec->catfile($root, 'config', 'punk.yml');
+    # uncoverable condition left
     my $env  = $opt{env} || $ENV{PUNK_ENV} || 'production';
 
     unless (-f $file) {
@@ -645,8 +736,11 @@ sub config_check {
         _line($l->[0], $l->[1], -f $l->[1] ? 'ok' : 'absent');
     }
 
+    # uncoverable branch true
     unless (@present) {
+        # uncoverable statement
         print STDERR "\nno layer files exist\n";
+        # uncoverable statement
         return 1;
     }
 
@@ -681,9 +775,11 @@ sub config_check {
     my $cfg = eval {
         local $ENV{PUNK_ENV} = $env;
         Punk::Config->load(file => $file, env => $env,
+                           # uncoverable branch true
                            ($opt{secrets} ? (secrets => $opt{secrets}) : ()));
     };
     if (!$cfg) {
+        # uncoverable condition right
         my $err = $@ || 'failed';
         $err =~ s/ at \S+ line \d+\.?\s*\z//;
         _line('Punk::Config->load', $err, 'FAILED');
@@ -699,8 +795,12 @@ sub config_check {
         print $d->Dump;
     }
 
+    # uncoverable branch true count:1
+    # uncoverable branch false count:1
+    # uncoverable branch true count:2
     print "\n", $bad ? "$bad secret" . ($bad > 1 ? 's' : '')
                      . " could not be resolved\n" : "configuration is sound\n";
+    # uncoverable branch true
     return $bad ? 1 : 0;
 }
 
@@ -713,11 +813,16 @@ sub _redact_inline {
     if (ref $v eq 'HASH') {
         return { map {
             my $k = $_;
+            # uncoverable condition left
+            # uncoverable condition false
             ($k => _redact_inline($v->{$k},
                        $hide || $k =~ /pass|secret|token|api_?key|private/i))
         } keys %$v };
     }
     return [ map { _redact_inline($_, $hide) } @$v ] if ref $v eq 'ARRAY';
+    # uncoverable condition left count:1
+    # uncoverable condition right count:1
+    # uncoverable condition left count:2
     return $v if ref $v || !defined $v || !$hide;
     return '[redacted]';
 }
@@ -730,6 +835,7 @@ sub _redact_inline {
 # `punk new --api` a workflow rather than a one-shot.
 sub api_sync {
     my (%opt) = @_;
+    # uncoverable condition left
     my $root = $opt{root} || _find_root($opt{dir}) or do {
         print STDERR "punk api: no application found\n";
         return 2;
@@ -738,6 +844,7 @@ sub api_sync {
         print STDERR "punk api: cannot work out the application class in $root\n";
         return 2;
     };
+    # uncoverable condition false
     my $spec = $opt{spec} || File::Spec->catfile($root, 'openapi.json');
     unless (-f $spec) {
         print STDERR "punk api: no such spec: $spec\n";
@@ -774,15 +881,21 @@ sub api_sync {
         my $file = File::Spec->catfile($ctrl_dir, "$group->{group}.pm");
         # Only for operations that fell through to Default - a tag the author
         # wrote is a placement decision, and it outranks any guess made here.
+        # uncoverable condition right count:1
         if (!-f $file && !length($group->{group_label} // '')) {
             my %by_home;
             for my $op (@new) {
                 my ($seg) = grep { length } split m{/}, $op->{path};
+                # uncoverable condition right
                 my $home  = Punk::Generate->ident($seg // '');
+                # uncoverable branch false
                 my $f     = length $home
                           ? File::Spec->catfile($ctrl_dir, "$home.pm") : '';
+                # uncoverable condition left
                 push @{ $by_home{ (length $f && -f $f) ? $f : $file } }, $op;
             }
+            # uncoverable branch false
+            # uncoverable condition false
             if (keys %by_home > 1 || !exists $by_home{$file}) {
                 for my $f (sort keys %by_home) {
                     my $ops = $by_home{$f};
@@ -793,6 +906,7 @@ sub api_sync {
                     else {
                         Punk::Generate->write_skel('controller_api.tmpl', $f,
                             { name => $class, path => $path, api => 1,
+                              # uncoverable branch false
                               %$group, ops => $ops }) unless $opt{dry_run};
                         my $stem = $base;
                         $stem =~ s/\.pm\z//;   # s///r is 5.14
@@ -852,16 +966,22 @@ sub api_sync {
     if (@orphans) {
         # Reported, never removed: a sub the spec no longer declares may still
         # be wanted, and deleting someone's code is not this command's job.
+        # uncoverable branch false
         printf "\n%d method%s with no operation in the spec (left alone)\n",
             scalar @orphans, @orphans == 1 ? '' : 's';
         print "  $_\n" for @orphans;
     }
+    # uncoverable condition right count:2
     if ($auth_file && -f $auth_file && @{ $plan->{schemes} }) {
         my %have = _implemented_ops($ctrl_dir,
             only => qr/\A\Q$plan->{auth_class}\E\.pm\z/);
         my @miss = grep { !$have{ $_->{method} } } @{ $plan->{schemes} };
         printf "\n%d security checker%s missing from %s.pm: %s\n",
             scalar @miss, @miss == 1 ? '' : 's', $plan->{auth_class},
+            # uncoverable statement count:2
+            # uncoverable branch true count:1
+            # uncoverable branch false count:1
+            # uncoverable branch true count:2
             join(', ', map { $_->{method} } @miss) if @miss;
     }
     return 0;
@@ -871,6 +991,7 @@ sub api_sync {
 
 sub console {
     my (%opt) = @_;
+    # uncoverable branch true
     my $app = _load_app($opt{dir}) or return 1;
 
     # Named so the evals below can see them by name rather than by closure.
@@ -896,33 +1017,55 @@ sub console {
     # Term::ReadLine::Stub reads nothing from a pipe, so it is for terminals
     # only; falling back to STDIN keeps the console scriptable.
     my $tty  = -t STDIN;
+    # uncoverable statement count:2
+    # uncoverable branch true
     my $term = $tty ? eval { require Term::ReadLine;
+                             # uncoverable statement
                              Term::ReadLine->new('punk') } : undef;
 
     # History survives sessions when the reader supports it - only on a
     # terminal, so piped input never rewrites the file.
     my $hist = $ENV{PUNK_HISTFILE}
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition false count:2
         // File::Spec->catfile($ENV{HOME} || '.', '.punk_history');
+    # uncoverable branch true
+    # uncoverable condition right
+    # uncoverable condition false
     if ($term && $term->can('ReadHistory')) {
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
         $term->ReadHistory($hist) if -f $hist;
     }
 
     while (1) {
+        # uncoverable branch true
         my $line = $term ? $term->readline('punk> ') : do {
+            # uncoverable branch true
             print 'punk> ' if $tty;
             my $l = <STDIN>;
             $l;
         };
         last unless defined $line;
         chomp $line;
+        # uncoverable branch true
         next unless $line =~ /\S/;
+        # uncoverable branch true
         last if $line =~ /^\s*(?:q|quit|exit)\s*$/;
         my @out = eval _console_wrap($line);
         if ($@) { print "!! $@"; next }
+        # uncoverable branch true
         next unless @out;
         print _console_dump(@out);
     }
+    # uncoverable branch true
+    # uncoverable condition right
+    # uncoverable condition false
     if ($term && $term->can('WriteHistory')) {
+        # uncoverable statement count:1
+        # uncoverable statement count:2
         eval { $term->WriteHistory($hist) };
     }
     print "\n";
@@ -936,27 +1079,37 @@ sub console {
 # runs in a child, the parent watches for changes and replaces it.
 sub dev {
     my (%opt) = @_;
+    # uncoverable condition left
     my $root = $opt{root} || _find_root($opt{dir}) or do {
         print STDERR "punk dev: no application found\n";
         return 2;
     };
     my $psgi = File::Spec->catfile($root, 'app.psgi');
+    # uncoverable condition right
     my $port = $opt{port} || 5000;
+    # uncoverable condition right
     my $host = $opt{host} || '127.0.0.1';
+    # uncoverable condition right
     my $workers = $opt{workers} || 1;
 
+    # uncoverable branch true
     unless (eval { require Hyperman; 1 }) {
+        # uncoverable statement
         print STDERR "punk dev: Hyperman is not installed\n";
+        # uncoverable statement
         return 1;
     }
 
+    # uncoverable branch true
     my @watch_rel = @{ $opt{watch} || [] };
     @watch_rel = qw(lib config root/templates) unless @watch_rel;
     my @watch = grep { -d $_ }
+                # uncoverable branch true
                 map { File::Spec->file_name_is_absolute($_)
                       ? $_ : File::Spec->catdir($root, $_) } @watch_rel;
     printf "punk dev  http://%s:%d\n", $host, $port;
     printf "watching  %s\n\n", join(' ', map { _rel($root, $_) } @watch)
+        # uncoverable condition left
         if @watch && !$opt{no_reload};
 
     my $child;
@@ -971,8 +1124,10 @@ sub dev {
 
     while (!$stop) {
         $child = fork();
+        # uncoverable branch true
         defined $child or die "punk dev: cannot fork: $!\n";
         unless ($child) {
+            # uncoverable branch true
             chdir $root or die "punk dev: cannot chdir to $root: $!\n";
             # punk dev IS the development opt-in: the environment defaults
             # to production everywhere else. --env overrides even an
@@ -983,6 +1138,9 @@ sub dev {
             # server loading the file would
             local $0 = $psgi;
             my $app = do $psgi;
+            # uncoverable condition left
+            # uncoverable condition right
+            # uncoverable condition false
             die($@ || $! || "punk dev: $psgi did not return an app\n")
                 unless ref $app eq 'CODE';
             Hyperman->run(app => $app, host => $host, port => $port,
@@ -1007,10 +1165,14 @@ sub dev {
             }
             my %now = _mtimes(@watch);
             next if _same(\%seen, \%now);
+            # uncoverable condition right count:1
+            # uncoverable condition right count:2
             my ($what) = grep { ($seen{$_} // 0) != ($now{$_} // 0) }
                          sort keys %now;
+            # uncoverable condition right
             printf "\n-- %s changed, restarting --\n", _rel($root, $what // '');
             %seen = %now;
+            # uncoverable branch false
             if ($child) {
                 kill 'TERM', $child;
                 waitpid $child, 0;
@@ -1040,13 +1202,22 @@ sub _cmd_serve {
     my ($opt, @args) = @_;
     my $dir = shift(@args);
     die { usage_error => "unexpected argument '$args[0]'" } if @args;
+    # uncoverable branch true
+    # uncoverable condition left
+    # uncoverable condition right
     $dir = $opt->{dir} unless defined $dir && length $dir;
+    # uncoverable branch true
+    # uncoverable condition left
+    # uncoverable condition right
     $dir = '.' unless defined $dir && length $dir;
 
     -d $dir or die "no such directory: $dir\n";
 
+    # uncoverable branch true
     unless (eval { require Hyperman; 1 }) {
+        # uncoverable statement
         print STDERR "punk serve: Hyperman is not installed\n";
+        # uncoverable statement
         return 1;
     }
 
@@ -1054,12 +1225,19 @@ sub _cmd_serve {
     my $app = Punk::Static->app($dir,
         ($opt->{no_index} ? () : (index => $opt->{index})),
         ($opt->{list}     ? (list  => 1) : ()),
+        # uncoverable branch true count:1
+        # uncoverable branch true count:2
+        # uncoverable branch true count:3
         (defined $opt->{max_age} ? (max_age => $opt->{max_age}) : ()),
     );
 
+    # uncoverable condition right
     my $port = $opt->{port} || 8000;
+    # uncoverable condition right
     my $host = $opt->{host} || '127.0.0.1';
     printf "punk serve  http://%s:%d\n", $host, $port;
+    # uncoverable condition right
+    # uncoverable condition false
     printf "serving     %s\n\n", Cwd::abs_path($dir) // $dir;
 
     # access_log takes an open handle and formats Combined Log Format in C,
@@ -1067,6 +1245,8 @@ sub _cmd_serve {
     # Perl frame, which is the only reason it is on by default.
     Hyperman->run(app => $app, host => $host, port => $port,
                   workers => ($opt->{workers} || 1),
+                  # uncoverable branch false
+                  # uncoverable condition right
                   ($opt->{quiet} ? () : (access_log => \*STDERR)));
     return 0;
 }
@@ -1077,6 +1257,8 @@ sub _cmd_serve {
 # identifies the root. Walk up from where the command was run.
 sub _find_root {
     my ($dir) = @_;
+    # uncoverable branch true
+    # uncoverable condition false
     my $here = Cwd::abs_path($dir || Cwd::getcwd()) or return undef;
     for (1 .. 40) {
         return $here if -f File::Spec->catfile($here, 'app.psgi');
@@ -1091,6 +1273,7 @@ sub _find_root {
 sub _class_of {
     my ($root) = @_;
     my $psgi = File::Spec->catfile($root, 'app.psgi');
+    # uncoverable branch true
     open my $fh, '<', $psgi or return undef;
     local $/;
     my $src = <$fh>;
@@ -1107,6 +1290,7 @@ sub _load_app_info {
     my $say = sub { $$errref = $_[0]; return undef };
 
     my $root = _find_root($dir);
+    # uncoverable condition false
     return $say->("no application found (looked for app.psgi upwards from "
                 . ($dir || Cwd::getcwd()) . ")") unless $root;
 
@@ -1126,7 +1310,9 @@ sub _load_app_info {
     # tables wants its own directory back.
     chdir($o{chdir} ? $root : $cwd);
     unless (ref $psgi eq 'CODE') {
+        # uncoverable condition left
         my $err = $@ || $! || 'it returned no coderef';
+        # uncoverable branch false
         chdir $cwd unless $o{chdir};
         return $say->("$psgi_file did not load: $err");
     }
@@ -1170,15 +1356,18 @@ sub load_app {
 sub _load_command_plugins {
     my %seen;
     for my $inc (@INC) {
+        # uncoverable branch true
         next if ref $inc;
         my $dir = File::Spec->catdir($inc, 'Punk', 'Command');
         next unless -d $dir;
+        # uncoverable branch true
         opendir(my $dh, $dir) or next;
         my @mods = grep { /\A[A-Za-z]\w*\.pm\z/ } readdir $dh;
         closedir $dh;
         for my $file (sort @mods) {
             next if $seen{$file}++;
             (my $mod = "Punk/Command/$file") =~ s{/}{/}g;
+            # uncoverable branch true
             next if $INC{$mod};
             eval { require $mod; 1 };
         }
@@ -1192,6 +1381,7 @@ sub _fmt {
     my ($name, $detail, $state) = @_;
     my $mark = $state eq 'ok' ? ' ' : $state =~ /^(?:absent|none|not installed)$/
              ? '-' : '!';
+    # uncoverable branch false count:1
     return sprintf "%s %-26s %s%s", $mark, $name,
         (defined $detail ? $detail : ''),
         ($state eq 'ok' || $state =~ /^(?:absent|none|not installed)$/
@@ -1209,8 +1399,12 @@ sub _widest {
 
 sub _rel {
     my ($root, $path) = @_;
+    # uncoverable branch true
+    # uncoverable condition left
+    # uncoverable condition right
     return '' unless defined $path && length $path;
     my $r = File::Spec->abs2rel($path, $root);
+    # uncoverable branch true
     return $r =~ /^\.\./ ? $path : $r;
 }
 
@@ -1219,30 +1413,42 @@ sub _rel {
 # their file and line, which is the equivalent answer for them.
 sub _code_name {
     my ($code) = @_;
+    # uncoverable branch true
     return '?' unless ref $code eq 'CODE';
     require B;
     my $cv = B::svref_2object($code);
+    # uncoverable branch true
     my $gv = eval { $cv->GV } or return 'sub {...}';
+    # uncoverable condition right
     my $name  = eval { $gv->NAME }  // '';
+    # uncoverable condition right
     my $stash = eval { $gv->STASH->NAME } // '';
+    # uncoverable condition right
     if ($name eq '__ANON__' || !length $name) {
+        # uncoverable condition right
         my $file = eval { $cv->FILE } // '';
+        # uncoverable condition right
         my $line = eval { $gv->LINE } // 0;
+        # uncoverable branch false
         $file = File::Basename::basename($file) if length $file;
         # a magic-CV closure (the static app, a docs route) reports the C file
         # it was created in, which tells a reader nothing useful
         return 'native handler' if $file =~ /\.h\z/;
+        # uncoverable branch false
         return length $file ? "sub {...} at $file:$line" : 'sub {...}';
     }
+    # uncoverable branch false
     return length $stash ? "${stash}::${name}" : $name;
 }
 
 sub _module_version {
     my ($mod) = @_;
     (my $file = $mod) =~ s{::}{/}g;
+    # uncoverable branch true
     return undef unless eval { require "$file.pm"; 1 };
     no strict 'refs';
     my $v = ${"${mod}::VERSION"};
+    # uncoverable branch false
     return defined $v ? "$v" : 'installed';
 }
 
@@ -1256,14 +1462,19 @@ sub _abi_report {
         detail => do {
             my $want = eval { Punk::_oa_abi_version() };
             my $ok   = eval { Punk::_oa_available() };
+            # uncoverable branch false count:1
+            # uncoverable branch false count:2
             defined $want ? "v$want" . ($ok ? ', resolved' : '') : 'unknown';
         },
+        # uncoverable branch false
         state  => (eval { Punk::_oa_available() } ? 'ok' : 'NOT RESOLVED'),
     };
 
     push @out, do {
         my $ok = eval { require Punk::View::Stencil;
                         Punk::View::Stencil::_abi_ok() };
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
         { name => 'Template::Stencil (st_abi)',
           detail => $ok ? 'resolved' : 'not resolved',
           state  => $ok ? 'ok' : 'NOT RESOLVED' };
@@ -1271,7 +1482,14 @@ sub _abi_report {
 
     push @out, do {
         my $v = eval { require Hyperman; Hyperman::_abi_version() };
+        # uncoverable branch false
         my $d = eval { Hyperman->can('detach') } ? ', detach' : '';
+        # uncoverable branch false count:1
+        # uncoverable branch true count:2
+        # uncoverable branch false count:2
+        # uncoverable branch false count:3
+        # uncoverable condition left
+        # uncoverable condition right
         { name   => 'Hyperman (hm_abi)',
           detail => defined $v ? "v$v$d" : 'not available',
           state  => (defined $v && $v >= 2) ? 'ok'
@@ -1280,6 +1498,8 @@ sub _abi_report {
 
     push @out, do {
         my $p = eval { require File::Raw::JSON; File::Raw::JSON::_abi_ptr() };
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
         { name => 'File::Raw::JSON (frj_abi)',
           detail => $p ? 'resolved' : 'not resolved',
           state  => $p ? 'ok' : 'NOT RESOLVED' };
@@ -1288,6 +1508,9 @@ sub _abi_report {
     push @out, do {
         my $p = eval { require File::Raw::XML; File::Raw::XML::_abi_ptr() };
         my $v = eval { File::Raw::XML::_abi_version() };
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
+        # uncoverable condition right
         { name   => 'File::Raw::XML (frx_abi)',
           detail => $p ? "v" . ($v // '?') . ", resolved" : 'not resolved',
           state  => $p ? 'ok' : 'NOT RESOLVED' };
@@ -1300,6 +1523,12 @@ sub _abi_report {
         my $ok   = eval { Punk::_fz_available() };
         my $want = eval { Punk::_fz_abi_version() };
         my $have = eval { require Frozen; Frozen::_abi_version() };
+        # uncoverable branch true count:1
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
+        # uncoverable branch true count:3
+        # uncoverable branch false count:3
+        # uncoverable branch false count:4
         { name   => 'Frozen (fz_abi)',
           detail => $ok ? "v$have, resolved"
                   : defined $have ? "v$have present, v$want wanted"
@@ -1314,6 +1543,10 @@ sub _abi_report {
     push @out, do {
         my $ok = eval { Punk::_mds_available() };
         my $v  = eval { Punk::_mds_abi_version() };
+        # uncoverable branch true count:1
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
+        # uncoverable branch false count:3
         { name   => 'Markdown::Simple (mds_abi)',
           detail => $ok ? "v$v, resolved"
                   : defined $v ? "v$v wanted, not resolved" : 'not available',
@@ -1323,6 +1556,10 @@ sub _abi_report {
     push @out, do {
         my $ok = eval { Punk::_sg_available() };
         my $v  = eval { Punk::_sg_abi_version() };
+        # uncoverable branch true count:1
+        # uncoverable branch false count:1
+        # uncoverable branch false count:2
+        # uncoverable branch false count:3
         { name   => 'Search::Trigram (sg_abi)',
           detail => $ok ? "v$v, resolved"
                   : defined $v ? "v$v wanted, not resolved" : 'not available',
@@ -1340,6 +1577,7 @@ sub _abi_report {
 sub _layer_files {
     my ($file, $env) = @_;
     my ($stem, $ext) = $file =~ /\A(.*?)(\.[^.\/]*)?\z/;
+    # uncoverable branch true
     $ext = '' unless defined $ext;
     return ( [ 'base',  "$stem$ext" ],
              [ $env,    "$stem.$env$ext" ],
@@ -1349,11 +1587,13 @@ sub _layer_files {
 sub _yaml_file {
     my ($file) = @_;
     require YAML::XS;
+    # uncoverable branch true
     open my $fh, '<', $file or die "cannot read $file: $!\n";
     local $/;
     my $body = <$fh>;
     close $fh;
     my $doc = YAML::XS::Load($body);
+    # uncoverable branch false
     return ref $doc eq 'HASH' ? $doc : {};
 }
 
@@ -1365,6 +1605,7 @@ sub _walk_secrets {
         my @k = keys %$node;
         if (@k == 1 && $k[0] =~ /\A\$(env|file|exec|literal)\z/) {
             $cb->({ path => ($path || '(root)'), kind => $k[0],
+                    # uncoverable condition right
                     value => $node->{ $k[0] } });
             return;
         }
@@ -1383,26 +1624,43 @@ sub _try_resolver {
         return (1, 'inline value');
     }
     if ($kind eq '$env') {
+        # uncoverable branch true
+        # uncoverable condition right
         my $name = ref $value ? '(not a name)' : ($value // '');
         return (0, "$name is not set") unless defined $ENV{$name};
         return (1, "$name is set");
     }
     if ($kind eq '$file') {
+        # uncoverable branch true
+        # uncoverable condition right
         my $f = ref $value ? '(not a path)' : ($value // '');
         return (0, "$f does not exist")  unless -e $f;
+        # uncoverable branch true class:ignore_covered_err
         return (0, "$f is not readable") unless -r $f;
         return (1, $f);
     }
+    # uncoverable branch false
     if ($kind eq '$exec') {
+        # uncoverable branch false
+        # uncoverable condition left
+        # uncoverable condition right
         my @cmd = ref $value eq 'ARRAY' ? @$value : ($value // '');
+        # uncoverable condition right
         my $prog = $cmd[0] // '';
+        # uncoverable branch true
         return (0, 'no command given') unless length $prog;
+        # uncoverable branch true
+        # uncoverable condition right
+        # uncoverable condition false
         return (1, join ' ', @cmd) if $prog =~ m{/} && -x $prog;
+        # uncoverable condition right
         for my $d (split /:/, ($ENV{PATH} // '')) {
+            # uncoverable branch true
             return (1, join ' ', @cmd) if -x File::Spec->catfile($d, $prog);
         }
         return (0, "$prog is not on PATH");
     }
+    # uncoverable statement
     return (0, 'unknown resolver');
 }
 
@@ -1414,13 +1672,16 @@ sub _try_resolver {
 sub _implemented_ops {
     my ($dir, %o) = @_;
     my %seen;
+    # uncoverable branch true
     return %seen unless -d $dir;
+    # uncoverable branch true
     opendir(my $dh, $dir) or return %seen;
     my @files = grep { /\.pm\z/ } readdir $dh;
     closedir $dh;
     for my $f (@files) {
         next if $o{only} && $f !~ $o{only};
         next if $o{skip} && $f =~ $o{skip};
+        # uncoverable branch true
         open my $fh, '<', File::Spec->catfile($dir, $f) or next;
         while (my $l = <$fh>) {
             last if $l =~ /\A__END__/;
@@ -1435,6 +1696,7 @@ sub _implemented_ops {
 sub _insert_stubs {
     my ($file, $ops, $dry) = @_;
     return if $dry;
+    # uncoverable branch true
     open my $fh, '<', $file or Carp::croak("punk api: cannot read $file: $!");
     local $/;
     my $src = <$fh>;
@@ -1449,6 +1711,7 @@ sub _insert_stubs {
     if ($src =~ /\n1;\s*\n/) { $src =~ s/\n1;\s*\n/\n$stubs\n1;\n/ }
     else                     { $src .= "\n$stubs" }
 
+    # uncoverable branch true
     open my $out, '>', $file or Carp::croak("punk api: cannot write $file: $!");
     print $out $src;
     close $out;
@@ -1462,6 +1725,7 @@ sub _console_context {
     return eval {
         require Punk::Context;
         my $class = $app->{class} . '::_Context';
+        # uncoverable branch true
         $class = 'Punk::Context' unless $class->can('req');
         $class->_build({ REQUEST_METHOD => 'GET', PATH_INFO => '/',
                          QUERY_STRING => '', 'psgi.url_scheme' => 'http',
@@ -1494,15 +1758,19 @@ sub _mtimes {
     require File::Find;
     File::Find::find({ no_chdir => 1, wanted => sub {
         return unless -f $File::Find::name;
+        # uncoverable branch true
         return if $File::Find::name =~ m{/\.};
         $m{$File::Find::name} = (stat _)[9];
+    # uncoverable branch false
     } }, @dirs) if @dirs;
     return %m;
 }
 
 sub _same {
     my ($a, $b) = @_;
+    # uncoverable branch true
     return 0 if keys %$a != keys %$b;
+    # uncoverable condition left
     for (keys %$a) { return 0 if !exists $b->{$_} || $a->{$_} != $b->{$_} }
     return 1;
 }
@@ -1530,6 +1798,7 @@ sub _kit_class {
         $err =~ s/\s+\z//;
         die "kit '$kit' failed to load: $err\n";
     }
+    # uncoverable branch true
     die "$class is not a kit: a kit subclasses Punk::Generate and overrides "
       . "run\n" unless $class->isa('Punk::Generate');
     return $class;
@@ -1542,6 +1811,7 @@ sub _kit_from_argv {
     my (@argv) = @_;
     for my $i (0 .. $#argv) {
         return $1 if $argv[$i] =~ /\A--kit=(.*)\z/s;
+        # uncoverable condition right
         return $argv[$i + 1] if $argv[$i] eq '--kit' && $i < $#argv;
     }
     return;
@@ -1550,8 +1820,10 @@ sub _kit_from_argv {
 sub _cmd_new {
     my ($opt, @args) = @_;
     my $name = shift @args;
+    # uncoverable condition right
     die { usage_error => 'an application name is required' }
         unless defined $name && length $name;
+    # uncoverable branch true
     die { usage_error => "unexpected argument '$args[0]'" } if @args;
     # --sqitch's engine is checked before anything is written
     die { usage_error => "--sqitch needs an engine: sqlite, pg or mysql, not '$opt->{sqitch}'" }
@@ -1572,6 +1844,8 @@ sub _cmd_new {
         (defined $opt->{dir} ? (dir => $opt->{dir}) : ()),
         (defined $opt->{api} ? (api => $opt->{api}) : ()),
         force => $opt->{force},
+    # uncoverable branch false count:1
+    # uncoverable branch true count:2
     );
     my @files = $gen->run;
     my $dir = $gen->dir;
@@ -1594,14 +1868,21 @@ sub _cmd_new {
     }
     elsif (defined $opt->{sqitch}) {
         my $engine = $opt->{sqitch};
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable statement count:3 class:ignore_covered_err
+        # uncoverable branch true class:ignore_covered_err
         if (eval { require Punk::Command::Sqitch; 1 }) {
+            # uncoverable statement class:ignore_covered_err
             print "\n";
+            # uncoverable statement class:ignore_covered_err
             $sq = Punk::Command::Sqitch::main('--dir', $dir, 'init', '--engine', $engine);
         }
         else {
+            # uncoverable statement class:ignore_covered_err
             print STDERR "\npunk new: --sqitch needs Punk-Sqitch, which is not installed; "
                        . "once it is, run\n\n  punk sqitch init --engine $engine\n\n"
                        . "inside $dir\n";
+            # uncoverable statement class:ignore_covered_err
             $sq = 1;
         }
     }
@@ -1630,14 +1911,17 @@ NEXT
 sub _cmd_generate {
     my ($kind, $opt, @args) = @_;
     my $name = shift @args;
+    # uncoverable condition right
     die { usage_error => "a $kind name is required" }
         unless defined $name && length $name;
+    # uncoverable branch true
     die { usage_error => "unexpected argument '$args[0]'" } if @args;
     die { usage_error => "'$name' is not a valid package name" }
         unless $name =~ /^[A-Z]\w*(?:::[A-Z]\w*)*$/;
 
     my $root = _find_root($opt->{dir})
         or die "no application found (run inside one, or pass --dir)\n";
+    # uncoverable branch true
     my $class = _class_of($root)
         or die "could not read the application class from app.psgi\n";
 
@@ -1655,6 +1939,7 @@ sub _cmd_generate {
         $rel  = join('/', 'lib', (split /::/, $class), 'Model', @segs) . '.pm';
         $tmpl = 'model_gen.tmpl';
         %vars = (app => $class, name => join('::', @segs),
+                 # uncoverable condition false
                  table => $opt->{table} // lc($segs[-1]) . 's');
     }
     my $abs = File::Spec->catfile($root, split m{/}, $rel);
@@ -1675,14 +1960,17 @@ sub _cmd_test {
         return 2;
     };
     require App::Prove;                       # ships with Test::Harness
+    # uncoverable branch true
     local $ENV{PUNK_ENV} = $opt->{env} if defined $opt->{env};
     my $cwd = Cwd::getcwd();
+    # uncoverable branch true
     chdir $root or die "cannot chdir to $root: $!\n";
     my $prove = App::Prove->new;
     $prove->process_args('-l', '-r', (@args ? @args : 't'));
     my $ok  = eval { $prove->run };
     my $err = $@;
     chdir $cwd;
+    # uncoverable branch true
     die $err if $err;
     return $ok ? 0 : 1;
 }
@@ -1691,11 +1979,14 @@ sub _cmd_test {
 
 sub _random_bytes {
     my ($n) = @_;
+    # uncoverable branch true
     open my $ur, '<:raw', '/dev/urandom'
         or die "cannot open /dev/urandom: $!\n";
     my $bytes;
     my $got = read($ur, $bytes, $n);
     close $ur;
+    # uncoverable branch true
+    # uncoverable condition right
     die "short read from /dev/urandom\n" unless ($got // 0) == $n;
     return $bytes;
 }
@@ -1703,6 +1994,8 @@ sub _random_bytes {
 sub _cmd_secret {
     my ($opt) = @_;
     my $n = $opt->{bytes};
+    # uncoverable condition left count:1
+    # uncoverable condition right count:2
     die { usage_error => 'bytes must be between 16 and 256' }
         if !$n || $n < 16 || $n > 256;
     my $raw = _random_bytes($n);

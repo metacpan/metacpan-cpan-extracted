@@ -11,9 +11,9 @@ use Apophis;
 # the call when the method is this module's own XSUB, so everything a method
 # call promises, a subclass's override, a wrapped sub, options, still holds.
 
-# B names a custom op by its registered name from 5.14, and every custom op
-# "custom" before that.
-sub xop { my ($name) = @_; $] < 5.014 ? qr/\bcustom\b/ : qr/\bapophis_\Q$name\E\b/ }
+plan skip_all => 'a perl before 5.14 cannot describe a custom op to B, so there the calls stay calls' if $] < 5.014;
+
+sub xop { my ($name) = @_; qr/\bapophis_\Q$name\E\b/ }
 
 sub ops_of {
     my ($code) = @_;

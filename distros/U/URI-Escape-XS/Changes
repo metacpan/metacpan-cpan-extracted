@@ -1,9 +1,25 @@
 #
-# $Id: Changes,v 0.14 2016/06/09 11:09:38 dankogai Exp dankogai $
+# $Id: Changes,v 0.15 2026/11/10 15:10:37 dankogai Exp dankogai $
 #
-# Revision history for Revision history for URI-Escape-XS
+# Revision history for URI-Escape-XS
 #
-$Revision: 0.14 $ $Date: 2016/06/09 11:09:38 $
+$Revision: 0.15 $ $Date: 2026/11/10 15:10:37 $
+! XS.xs lib/URI/Escape/XS.pm t/01-compat.t
+  Pulled: make uri_escape() conform to RFC 3986 as URI::Escape
+  https://github.com/dankogai/p5-uri-escape-xs/pull/7
+! lib/URI/Escape/XS.pm
+  $VERSION is now assigned as a literal string instead of
+  being computed from the RCS keyword (cf. Encode).
+  Added DESCRIPTION in POD; updated mail address.
+! Makefile.PL
+  Declared minimum Perl version (5.8.1) and repository metadata.
++ README.md .gitignore .github/workflows/*.yml
+- .travis.yml META.yml
+! MANIFEST
+  CI moved from Travis CI to GitHub Actions.
+  META.yml is no longer tracked; make dist generates it.
+
+0.14 2016/06/09 11:09:38
 ! XS.xs
   pulled: RT #115183: MSVC 2013 and earlier do not understand `inline`
   https://github.com/dankogai/p5-uri-escape-xs/pull/6

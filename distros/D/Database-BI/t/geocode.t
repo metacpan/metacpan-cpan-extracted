@@ -687,4 +687,51 @@ subtest 'place_rows joins a place written across columns' => sub {
 	throws_ok { $G->place_rows(\@rows, ['']) }  qr/column name is required/, 'not just an empty name';
 };
 
+subtest 'place_rows adds text to the end of each place' => sub {
+	my $G = 'Database::BI::Model::Geocode';
+	my @rows = (
+		{ county => 'Accomack', state => '' },
+		{ county => ' Loudoun ', state => 'VA' },
+		{ county => '',         state => '' },
+		'not a row',
+	);
+	my @copy = map { ref $_ ? { %{$_} } : $_ } @rows;
+
+	my ($one, $name) = $G->place_rows(\@rows, ['county'], ' Virginia, USA ');
+	is($name, 'county', 'named after the column, not the text');
+	ok($one != \@rows, 'one column with text makes new rows');
+	is_deeply($one, [
+		{ county => 'Accomack, Virginia, USA' },
+		{ county => 'Loudoun, Virginia, USA' },
+		{ county => '' },
+		undef,
+	], 'added after ", ", trimmed; a row with no place stays empty, so it is not found at the text');
+	is_deeply(\@rows, \@copy, 'the rows given are not changed');
+
+	my ($two) = $G->place_rows(\@rows, [qw(county state)], 'USA');
+	is($two->[1]{'county, state'}, 'Loudoun, VA, USA', 'after every column');
+
+	my ($none) = $G->place_rows(\@rows, ['county'], '  ');
+	ok($none == \@rows, 'text of spaces is no text');
+	my ($undef) = $G->place_rows(\@rows, ['county'], undef);
+	ok($undef == \@rows, 'nor is undef');
+};
+
+subtest 'place_text tidies the text, and refuses what is not one short line' => sub {
+	my $G = 'Database::BI::Model::Geocode';
+	is_deeply([ $G->place_text(' , Virginia,   USA ') ], [ 'Virginia, USA' ],
+		'spaces trimmed and made one, the leading comma dropped');
+	is_deeply([ $G->place_text(undef) ], [ '' ], 'undef is no text');
+	is_deeply([ $G->place_text('   ') ], [ '' ], 'nor are spaces');
+	is_deeply([ $G->place_text('0') ],   [ '0' ], '0 is text');
+	is_deeply([ $G->place_text("Virginia\nUSA") ], [], 'a second line is refused');
+	is_deeply([ $G->place_text("a\tb") ], [], 'as is any control character');
+	is_deeply([ $G->place_text([ 'x' ]) ], [], 'and a reference');
+	my $max = $Database::BI::Model::Geocode::PLACE_TEXT_MAX;
+	is($max, 200, 'at most 200 characters');
+	is_deeply([ $G->place_text('x' x $max) ], [ 'x' x $max ], 'which is allowed');
+	is_deeply([ $G->place_text('x' x ($max + 1)) ], [], 'one more is not');
+	is_deeply([ $G->place_text((' ' x 10) . ('x' x $max)) ], [ 'x' x $max ], 'counted once tidied');
+};
+
 done_testing();

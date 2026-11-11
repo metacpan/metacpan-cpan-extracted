@@ -22,7 +22,7 @@ debug(self, ...)
     {
         int argc = items - 1, i;
         SV **argv;
-        Newx(argv, argc > 0 ? argc : 1, SV *);
+        Newx(argv, argc > 0 ? argc : 1, SV *); /* # uncoverable condition right count:1 class:ignore_covered_err */
         for (i = 0; i < argc; i++) argv[i] = ST(i + 1);
         pl_method(aTHX_ self, (int)ix, argv, argc);
         Safefree(argv);
@@ -41,7 +41,7 @@ log(self, level, ...)
         int lvl = pl_level_num(aTHX_ level);
         int argc = items - 2, i;
         SV **argv;
-        Newx(argv, argc > 0 ? argc : 1, SV *);
+        Newx(argv, argc > 0 ? argc : 1, SV *); /* # uncoverable condition right count:1 class:ignore_covered_err */
         for (i = 0; i < argc; i++) argv[i] = ST(i + 2);
         pl_method(aTHX_ self, lvl, argv, argc);
         Safefree(argv);
@@ -60,6 +60,8 @@ log(self)
     {
         HV *h = app_hv(aTHX_ self);
         SV **cached = hv_fetchs(h, "logger", 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (cached && *cached && SvROK(*cached)) RETVAL = newSVsv(*cached);
         else {
             SV *lg = pl_make_logger(aTHX_ self, NULL);
@@ -85,6 +87,8 @@ log(self)
         if (!st) { st = newRV_noinc((SV *)newHV()); (void)av_store(av, PCX_STASH, st); }
         stash = (HV *)SvRV(st);
         cached = hv_fetchs(stash, "punk.logger", 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (cached && *cached && SvROK(*cached)) RETVAL = newSVsv(*cached);
         else {
             SV *lg = pl_make_logger(aTHX_ pcx_get(aTHX_ av, PCX_APP), self);

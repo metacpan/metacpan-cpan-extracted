@@ -12,7 +12,7 @@ package Matplotlib::Simple::Matplotlib;
 # The helpers keep checking their own keywords, against the same lists Matplotlib::Simple
 # checks them with, which are shared below rather than copied.
 require 5.010;
-our $VERSION = 0.3341;
+our $VERSION = 0.3343;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use File::Spec;
@@ -529,6 +529,25 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 	# though the options table offered it, and a hash value that was one number,
 	# or a key left out of the hash, died dereferencing it.
 	my $n_bars = scalar @key_order;
+	# An error bar across the bars of a simple plot -- "yerr" on a barh, "xerr"
+	# on a bar -- lies along the axis that holds the labels, which are strings.
+	# matplotlib draws one there from one number, or one per bar, but not from
+	# a lower and an upper row: it adds the errors to the labels and dies as
+	# "ConversionError: Failed to convert value(s) to axis units". The hash
+	# form always wrote two rows, so barh(yerr => { A => 1, B => 1 }) died
+	# that way though its errors were the same on both sides. Two rows that
+	# are equal are written as the one row they amount to, and two that
+	# differ are refused here, by name. A grouped plot is drawn at numbers and
+	# takes either.
+	my $across = sub {
+		my ( $err, $low, $high ) = @_;
+		return 0 unless ( $plot_type eq 'simple' ) && ( $err eq ( ( $plot->{plot_type} eq 'barh' ) ? 'yerr' : 'xerr' ) );
+		if ( grep { ( 0 + $low->[$_] ) != ( 0 + $high->[$_] ) } 0 .. $#{$low} ) {
+			die "\"$err\" on a $plot->{plot_type} lies along the axis of its labels, where matplotlib draws the same error on both sides of a bar and not a lower and an upper one, in $current_sub: give one number per bar, or \""
+			 . ( ( $err eq 'yerr' ) ? 'xerr' : 'yerr' ) . '" for an error in the bars\' own direction';
+		}
+		return 1;
+	};
 	foreach my $err ( grep { defined $plot->{$_} } ( 'xerr', 'yerr' ) ) {
 		my $ref = ref $plot->{$err};
 		if ( $ref eq '' ) {
@@ -545,6 +564,7 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 				}
 				check_numbers( $row, "\"$err\"", $current_sub );
 			}
+			pop @rows if ( scalar @rows == 2 ) && $across->( $err, @rows );
 			my @py = map { '[' . py_nums( @{$_} ) . ']' } @rows;
 			$options .= ", $err = " . ( ( scalar @rows == 1 ) ? $py[0] : '[' . join( ',', @py ) . ']' );
 		} elsif ( $ref eq 'HASH' ) {
@@ -565,10 +585,9 @@ sub barplot_helper { # this is a helper function to other matplotlib subroutines
 				push @low,  $pair[0];
 				push @high, $pair[1];
 			}
-			$options .=
-				 ", $err = [["
-			  . py_nums(@low) . '],['
-			  . py_nums(@high) . ']]';
+			$options .= $across->( $err, \@low, \@high )
+			 ? ", $err = [" . py_nums(@low) . ']'
+			 : ", $err = [[" . py_nums(@low) . '],[' . py_nums(@high) . ']]';
 		} else {
 			p $args;
 			die "$ref for $err isn't acceptable";
@@ -2290,6 +2309,14 @@ sub scatter_helper {
 		}
 		if ( defined $plot->{color_key} ) {
 			$color_key = $plot->{color_key};
+			# Asked here, before the keys are counted: a "color_key" that is not
+			# a key of three took none of them away, so the count below died
+			# first, as "needs one key for x and one for y, but "keys" and
+			# "color_key" leave the 3 above", which never named the key that
+			# was wrong.
+			if ( not defined $plot->{data}{$color_key} ) {
+				die "\"$color_key\" isn't defined for this scatter";
+			}
 			@keys = grep {$_ ne $plot->{color_key}} @keys;
 		} elsif ( scalar @keys == 3 ) {
 			$color_key = pop @keys;
@@ -2431,6 +2458,10 @@ sub scatter_helper {
 			}
 			if ( defined $plot->{color_key} ) {
 				$color_key = $plot->{color_key};
+				# before the keys are counted, as for a single set above
+				if ( not defined $sets{$set}{$color_key} ) {
+					die "\"$color_key\" isn't defined for set \"$set\"";
+				}
 				@keys = grep {$_ ne $plot->{color_key}} @keys;
 			} elsif ( scalar @keys == 3 ) {
 				$color_key = pop @keys;
@@ -2963,6 +2994,17 @@ sub python_command {
 	$python_command = [];
 	return ();
 }
+sub savefig_takes_metadata {
+	# Whether matplotlib's savefig accepts "metadata" for a file of this name:
+	# 1 for .png, .pdf, .svg, .svgz, .eps and .ps, in any case, and for a name
+	# with no extension, which matplotlib saves as its default format, a PNG;
+	# 0 for every other extension. The extension is what follows the last "."
+	# of the file's own name, as pathlib's suffix reads it, so a "." in a
+	# directory's name, or one that leads the file's name, is not one.
+	my ($file) = @_;
+	return 1 unless $file =~ m{[^/\\.][^/\\]*\.([^./\\]*)\z}s;
+	return ( lc($1) =~ m/\A(?:|png|pdf|svgz?|eps|ps)\z/ ) ? 1 : 0;
+}
 sub shared_color_scale {
 	# Python giving every color-mapped artist of the subplots that share a
 	# colorbar one scale: the lowest bottom and the highest top of any of
@@ -2999,6 +3041,8 @@ sub render {
 	#                         0 = "plots", one hash per subplot
 	#          style       => "matplotlib" or "native" (%Matplotlib::Simple::styles), which
 	#                         draw the same figure here
+	#          dpi         => the dots per inch to save "output_file" at, a
+	#                         finite number above 0, or undef for matplotlib's own
 	my ( $args, $context ) = @_;
 	my $current_sub = $context->{sub};
 	my $single_plot = $context->{single_plot};
@@ -3257,10 +3301,27 @@ sub render {
 		# type, each of which a None leaves out (backend_svg._write_metadata,
 		# matplotlib 3.11.2). Only for an SVG: the PDF backend warns about
 		# "Format" and "Type" as keys it does not know.
-		say $fh "plt.savefig(output_file, bbox_inches = 'tight', metadata={'Creator': $creator"
-		 . " + ', Python ' + platform.python_version() + ', matplotlib ' + matplotlib.__version__"
-		 . " + ', by ' + creator_user + ' on ' + creator_host"
-		 . ( $tooltips_drawn ? ", 'Date': None, 'Format': None, 'Type': None" : '' ) . '})';
+		#
+		# And only for a format that keeps metadata. The note was handed to
+		# savefig whatever the file, and matplotlib refuses it for the formats
+		# that have nowhere to put one -- "ValueError: metadata not supported
+		# for format 'jpeg'", and the like for tiff, webp, gif, avif, raw and
+		# rgba, and a TypeError for pgf -- so no .jpg, .tif, .webp, .gif or
+		# .pgf could be written at all (matplotlib 3.11.2). Those are saved
+		# without a note. matplotlib picks the format by the extension, in any
+		# case, and a name with none is the PNG it has always been.
+		# "dpi" is plt's own keyword for the resolution, checked there to be a
+		# finite number above 0. Without it savefig is called as it always
+		# was, at matplotlib's own "savefig.dpi".
+		my $dpi = defined $context->{dpi} ? ', dpi = ' . py_num( $context->{dpi} ) : '';
+		if ( savefig_takes_metadata( $args->{output_file} ) ) {
+			say $fh "plt.savefig(output_file, bbox_inches = 'tight'$dpi, metadata={'Creator': $creator"
+			 . " + ', Python ' + platform.python_version() + ', matplotlib ' + matplotlib.__version__"
+			 . " + ', by ' + creator_user + ' on ' + creator_host"
+			 . ( $tooltips_drawn ? ", 'Date': None, 'Format': None, 'Type': None" : '' ) . '})';
+		} else {
+			say $fh "plt.savefig(output_file, bbox_inches = 'tight'$dpi) # no metadata: this format keeps none";
+		}
 		# $tooltips_drawn is 1 exactly when output_file is an SVG. matplotlib
 		# writes <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" ...> from a fixed
 		# string, svgProlog in backend_svg.py, that no option turns off, so it is
@@ -3409,7 +3470,17 @@ PYTHON
 			 . ': tried ' . join( ', ', map { '"' . join( ' ', @{$_} ) . '"' } @windows_python_candidates )
 			 . '. Install Python 3 and matplotlib, set MATPLOTLIB_SIMPLE_PYTHON to the path of a Python 3 that has them, or pass "execute => 0" to write the script without running it';
 		}
-		run_script( [ @python, $fh->filename ] );
+		# What the script wrote to STDERR as it ran and succeeded: matplotlib's
+		# warnings, which are the only word the caller gets that a figure was
+		# written but is not what was asked for -- "Data has no positive
+		# values, and therefore cannot be log-scaled", a font with no glyph for
+		# a label, a deprecation. run_script captured them and returned them,
+		# and they were dropped here, so only a script that failed ever showed
+		# its STDERR. Printed as they came, to STDERR, and not with warn(),
+		# which this file's fatal warnings would make a death after the figure
+		# was written.
+		my $stderr = run_script( [ @python, $fh->filename ] );
+		print STDERR $stderr if ( defined $stderr ) && ( length $stderr );
 		say 'will write ' . "\e[36;103m$args->{output_file}\e[0m" if defined $args->{output_file};
 	} else { # not running yet
 		say 'will write ' . "\e[36;103m$args->{output_file}\e[0m" if defined $args->{output_file};

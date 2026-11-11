@@ -9,22 +9,45 @@ use Open::This   qw(
     maybe_get_url_from_parsed_text
     parse_text
 );
-use Path::Tiny qw( path );
 use Pod::Usage qw( pod2usage );
 
 pod2usage("Error: missing argument\n") unless @ARGV;
 
 my $browse;
 my $editor;
+my $help;
 my $json;
 my $print;
+my $version;
 
-GetOptions(
+my $options_ok = GetOptions(
     'browse|b'   => \$browse,
     'editor|e=s' => \$editor,
+    'help|h'     => \$help,
     'json|j'     => \$json,
     'print|p'    => \$print,
+    'version|v'  => \$version,
 );
+
+if ($help) {
+    pod2usage(
+        -exitval  => 0,
+        -output   => \*STDOUT,
+        -verbose  => 99,
+        -sections => [qw( SYNOPSIS PARAMETERS )],
+    );
+}
+
+if ($version) {
+    print STDOUT 'ot ', Open::This->VERSION, "\n";
+    exit(0);
+}
+
+# With a target left, carry on so unquoted text with a stray -foo still opens.
+if ( !$options_ok && !@ARGV ) {
+    exit_with_error( 'Invalid options', undef, 2 ) if $json;
+    pod2usage(2);
+}
 
 my $parsed = parse_text(@ARGV);
 if ( !$parsed ) {
@@ -32,18 +55,14 @@ if ( !$parsed ) {
 }
 
 if ($browse) {
-    my $url = maybe_get_url_from_parsed_text($parsed);
+    maybe_get_url_from_parsed_text($parsed);
     if ( !exists $parsed->{remote_file_url} ) {
         exit_with_error( 'Could not find remote repository', $parsed );
     }
 
-    # A relative path should be inside our repository
-    if ( path( $parsed->{remote_file_url} )->is_relative ) {
-        require Browser::Open;
-        Browser::Open::open_browser( $parsed->{remote_file_url} );
-        exit(0);
-    }
-    return undef;
+    require Browser::Open;
+    Browser::Open::open_browser( $parsed->{remote_file_url} );
+    exit(0);
 }
 
 local $ENV{EDITOR} = $editor || $ENV{EDITOR};
@@ -75,9 +94,10 @@ if ($print) {
 sub exit_with_error {
     my $error   = shift;
     my $details = shift;
+    my $status  = shift // 1;
     unless ($json) {
         print STDERR $error, "\n";
-        exit(1);
+        exit($status);
     }
     require Cpanel::JSON::XS;    ## no perlimports
     my $json = Cpanel::JSON::XS->new->canonical->encode(
@@ -88,7 +108,7 @@ sub exit_with_error {
         }
     );
     print STDOUT $json, "\n";
-    exit(1);
+    exit($status);
 }
 
 exec $ENV{EDITOR}, @editor_args;
@@ -108,7 +128,7 @@ ot - parse text and (hopefully) open an editor with the correct arguments
 
 =head1 VERSION
 
-version 0.000035
+version 0.000036
 
 =head1 SYNOPSIS
 
@@ -145,10 +165,12 @@ version 0.000035
     # Open a binary which is in your $ENV{PATH} at an arbitrary column and line
     ot cpanm:10:3
 
-    # open Foo::Bar on the GitHub web site in your browser
+    # open Foo::Bar on your forge's web site (GitHub, GitLab, Codeberg,
+    # Bitbucket or SourceHut) in your browser
     ot -b Foo::Bar
 
-    # open a file locally, using a GitHub link.  You must be at the top level
+    # open a file locally, using a GitHub (or GitLab, Codeberg, Bitbucket,
+    # SourceHut) link.  You must be at the top level
     # of this repository on a local checkout.
     ot https://github.com/oalders/git-helpers/blob/master/lib/Git/Helpers.pm#L50
 
@@ -191,8 +213,9 @@ disk.  All security caveats apply when requiring 3rd party modules.
 
 =head2 -b|--browse
 
-Open the file on the GitHub web site using your default browser, rather than
-invoking a local editor.
+Open the file on your forge's web site using your default browser, rather than
+invoking a local editor.  GitHub, GitLab, Codeberg, Bitbucket and SourceHut are
+supported; other hosts get GitHub-style URLs.
 
     ot -b Foo::Bar
 
@@ -204,6 +227,10 @@ plugins.
     ot -e kate Foo::Bar
 
     ot --editor kate Foo::Bar
+
+=head2 -h|--help
+
+Print usage information to C<STDOUT> and exit.
 
 =head2 -j|--json
 
@@ -223,6 +250,10 @@ for writing editor-specific plugins.
 
     ot --print --editor kate Foo::Bar
 
+=head2 -v|--version
+
+Print the version of C<ot> to C<STDOUT> and exit.
+
 =head1 ENVIRONMENT VARIABLES
 
 By default, C<ot> will search your C<lib> and C<t/lib> directories for local
@@ -237,6 +268,17 @@ Or
 
 Probably you want to export this variable in your C<~/.bashrc> file (or some
 other appropriate place in your dot files.
+
+The C<browse> feature uses the C<origin> remote per default. You can override
+this via the C<$ENV{OPEN_THIS_REMOTES}> variable. It accepts a comma-separated
+list of remotes and uses the first one of those which is available in the repository.
+The fallback is C<origin>.
+
+    export OPEN_THIS_REMOTES=someremote,someotherremote
+
+Or
+
+    OPEN_THIS_REMOTES=someremote,someotherremote ot --browse Foo::Bar
 
 =head1 SUPPORTED EDITORS
 

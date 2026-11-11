@@ -33,6 +33,7 @@ if ($version) {
 
 # https_remote_url( $remote_name, $use_current_branch )
 my $url = https_remote_url( shift @ARGV, $branch );
+die "No browsable URL found for this remote\n" unless $url;
 if ($echo) {
     print $url, "\n";
 }
@@ -53,7 +54,7 @@ gh-open - Open a browser window with the GitHub URL of the repository which you 
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 

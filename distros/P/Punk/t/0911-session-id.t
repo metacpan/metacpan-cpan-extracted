@@ -63,7 +63,7 @@ SKIP: {
             syswrite $wr, join('', map { Punk::Session::_new_id() . "\n" }
                                        1 .. $per);
             close $wr;
-            POSIX::_exit(0) if eval { require POSIX; 1 };
+            Test::Builder->new->no_ending(1);
             exit 0;
         }
         push @pids, $pid;

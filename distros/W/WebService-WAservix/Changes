@@ -1,0 +1,5 @@
+Revision history for WebService-WAservix
+
+1.000  2026-11-11
+    - First release: send text, media, locations and polls; message status,
+      edit, delete, resend; number check; contacts; groups; sessions; webhook check.

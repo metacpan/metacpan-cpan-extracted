@@ -24,7 +24,7 @@ package Matplotlib::Simple::Gnuplot;
 # 4.8 inch figure (rcParams figure.figsize) and 100 dots per inch for a PNG
 # (rcParams figure.dpi).
 require 5.010;
-our $VERSION = 0.3341;
+our $VERSION = 0.3343;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 use POSIX ();
@@ -935,10 +935,15 @@ sub draw_hist_native {
 		my $bins = ( ref $plot->{bins} eq 'HASH' ) ? $plot->{bins}{$set} : $plot->{bins};
 		my $given = ( ref $plot->{color} eq 'HASH' ) ? $plot->{color}{$set} : $plot->{color};
 		die "\"color\" for set \"$set\" is an array, but $current_sub draws each set in one color" if ref $given;
+		# native_bins checks "bins", so it is asked before native_bin_peak does
+		# arithmetic with it: "bins => 'auto'", numpy's estimator, reached the
+		# arithmetic first and died as "Argument "auto" isn't numeric in
+		# numeric gt (>)" under this file's fatal warnings.
+		my $native_bins = native_bins( $bins, $set );
 		push @extent, [ undef, 0 ], [ undef, native_bin_peak( $sets->{$set}, $bins ) ];
 		my $color = defined $given ? hex_of( $given, "\"color\" of \"$set\"" ) : next_color( $axes, 'patches' );
 		my $fill = defined $alpha ? sprintf( 'fs transparent solid %s ', gp_num($alpha) ) : '';
-		push @{ $g{plot} }, "$block using 1 " . native_bins( $bins, $set ) . " with boxes ${fill}lc rgb " . gp_color($color) . ' ' . key_title( $legend ? $set : undef );
+		push @{ $g{plot} }, "$block using 1 $native_bins with boxes ${fill}lc rgb " . gp_color($color) . ' ' . key_title( $legend ? $set : undef );
 		$g{legend} = 1 if $legend;
 	}
 	return \%g;

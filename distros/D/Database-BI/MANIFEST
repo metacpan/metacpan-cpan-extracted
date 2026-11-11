@@ -21,6 +21,7 @@ lib/Database/BI/Extract.pm
 lib/Database/BI/I18N.pm
 lib/Database/BI/I18N/en_us.pm
 lib/Database/BI/Insights.pm
+lib/Database/BI/Model/Boundary.pm
 lib/Database/BI/Model/DataSource.pm
 lib/Database/BI/Model/Geocode.pm
 lib/Database/BI/Password.pm
@@ -44,6 +45,7 @@ t/basic.t
 t/bi-geocode.t
 t/binned.t
 t/bom.t
+t/boundary.t
 t/breadcrumb.t
 t/cache-dir.t
 t/calc.t
@@ -78,6 +80,7 @@ t/integration.t
 t/json.t
 t/language-fallback.t
 t/launcher.t
+t/lib/BI/Test/Boundary.pm
 t/lib/BI/Test/Command.pm
 t/lib/BI/Test/EnUS.pm
 t/lib/BI/Test/Marionette.pm

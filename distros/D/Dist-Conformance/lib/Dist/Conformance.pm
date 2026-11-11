@@ -1,4 +1,4 @@
-package Dist::Conformance 0.003;
+package Dist::Conformance 0.004;
 
 # ABSTRACT: Whether the development harness of a repository conforms to its standards, and bringing it up to date
 
@@ -160,7 +160,7 @@ Dist::Conformance - Whether the development harness of a repository conforms to 
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -377,6 +377,10 @@ George S. Baugh <george@troglodyne.net>
 =item *
 
 troglodyne-bot <morpheus@troglodyne.net>
+
+=item *
+
+troglodyne-bot <troglodyne-bot@users.noreply.github.com>
 
 =item *
 

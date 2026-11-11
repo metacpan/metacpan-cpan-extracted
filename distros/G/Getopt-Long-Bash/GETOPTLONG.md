@@ -1275,15 +1275,13 @@ The `getoptlong.sh` repository includes sample scripts in the `ex/` directory th
 
 *   **`ex/prefix.sh`**: Example of `PREFIX` setting usage.
 
-*   **`ex/cmap`**: A colorizing mapper. Good example of complex option parsing, callbacks, and data processing.
-
-*   **`ex/cmap-prefix`**: `cmap` example with `PREFIX` applied.
-
 *   **`ex/md`**: Sample Markdown parser.
 
 *   **`ex/silent.sh`**: Example of `SILENT` setting usage.
 
 *   **`ex/subcmd.sh`**: A more sophisticated example of a script with subcommands, including handling of global and local options, and shared help.
+
+For a complex real-world example of option parsing, callbacks, and data processing, see [`t/cmap`](https://github.com/tecolicom/Term-ANSIColor-Concise/blob/main/t/cmap) of Term::ANSIColor::Concise.
 
 It's recommended to try running these samples and reading their code.
 

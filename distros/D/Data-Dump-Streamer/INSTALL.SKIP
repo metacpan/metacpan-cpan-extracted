@@ -1,3 +1,6 @@
+# Repository planning material is not installed.
+^planning(?:/|$)
+
 # Avoid version control files.
 \bRCS\b
 \bCVS\b

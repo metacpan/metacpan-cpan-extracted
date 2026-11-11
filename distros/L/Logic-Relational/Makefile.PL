@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
     PREREQ_PM        => {
         'Keyword::Simple' => '0.04',
         'JSON::PP'        => '0',
+        'Time::HiRes'     => '0',
     },
     TEST_REQUIRES    => {
         'Test2::V0'  => '0.000155',

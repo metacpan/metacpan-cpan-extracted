@@ -70,10 +70,11 @@ DBIx::Squirrel::Result - the base class of the rows a result set hands out
 =head1 DESCRIPTION
 
 A L<DBIx::Squirrel::Results> hands out each row as an array, blessed
-into a class with a method for each column, named as the column is, in
-lower case. The class is a subclass of this one, or of the class given
-as the C<ekorn_result_class> attribute, which must be a subclass of this
-one, and so can give rows methods of their own:
+into a class with a method for each column. Each method is named as
+its column is, in lower case. The class is a subclass of this one. Or
+it's a subclass of the class given as the C<ekorn_result_class>
+attribute, which must itself be a subclass of this one. That class can
+give rows methods of their own:
 
     package My::Artist {
         our @ISA = 'DBIx::Squirrel::Result';
@@ -82,15 +83,15 @@ one, and so can give rows methods of their own:
 
     my $results = $dbh->results($sql, {ekorn_result_class => 'My::Artist'});
 
-There's one class for each base class and list of column names, made the
-first time a result set fetches rows with those columns, and kept, so a
-row can be kept after its result set has gone.
+There's one class for each base class and list of column names. It's
+made the first time a result set fetches rows with those columns, and
+kept, so a row can be kept after its result set has gone.
 
 A column gets no method if its name can't be a method's, such as
-C<count(*)>, or if the base class already has a method of that name,
-such as C<can>, C<isa> or C<get_column>, or one of its own. When two
-columns have one name, as in C<SELECT a.id, b.id>, the method is the
-first's. L</get_column> reaches every column.
+C<count(*)>. Nor does it if the base class already has a method of that
+name, such as C<can>, C<isa> or C<get_column>, or one of its own. When
+two columns have one name, as in C<SELECT a.id, b.id>, the method is
+the first's. L</get_column> reaches every column.
 
 To give such a column a method, give it another name in the statement,
 with C<AS>:
@@ -107,13 +108,13 @@ with C<AS>:
     $value = $row->get_column($name);
     $value = $row->get_column($position);
 
-Returns a column's value, by its name, in any case, or by its position,
-from 0, as the row is an array.
+Returns a column's value, by its name, in any case, or by its
+position, from 0, as the row is an array.
 
 =head2 class_for
 
-For L<DBIx::Squirrel::Results>, which makes the row classes; not for use
-elsewhere.
+For L<DBIx::Squirrel::Results>, which makes the row classes. It's not
+for use elsewhere.
 
 =head1 DIAGNOSTICS
 

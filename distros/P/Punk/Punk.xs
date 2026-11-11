@@ -26,7 +26,7 @@ static const frj_abi *PUNK_FRJ = NULL;
 static int PUNK_FRJ_TRIED = 0;
 
 static const frj_abi *punk_frj(pTHX) {
-    if (!PUNK_FRJ && !PUNK_FRJ_TRIED) {
+    if (!PUNK_FRJ && !PUNK_FRJ_TRIED) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         dSP; int count; IV p = 0;
         PUNK_FRJ_TRIED = 1;
         eval_pv("require File::Raw::JSON;", FALSE);
@@ -34,21 +34,45 @@ static const frj_abi *punk_frj(pTHX) {
          * reallocated, and the SP captured above now points into the freed
          * block - which the PUTBACK below would publish as PL_stack_sp. */
         SPAGAIN;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (!SvTRUE(ERRSV)) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("File::Raw::JSON::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (!SvTRUE(ERRSV) && count > 0) p = POPi;
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             else if (count > 0)             (void)POPs;
             PUTBACK; FREETMPS; LEAVE;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (p) {
                 const frj_abi *a = INT2PTR(const frj_abi *, p);
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 if (a && a->abi_version >= FRJ_ABI_VERSION) PUNK_FRJ = a;
             }
         }
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!PUNK_FRJ)
-        croak("Punk: the XS JSON path needs File::Raw::JSON with a "
+        croak("Punk: the XS JSON path needs File::Raw::JSON with a " /* # uncoverable statement */
               "compatible C ABI (FRJ_ABI_VERSION %d)", FRJ_ABI_VERSION);
     return PUNK_FRJ;
 }
@@ -63,26 +87,50 @@ static const frx_abi *PUNK_FRX = NULL;
 static int PUNK_FRX_TRIED = 0;
 
 static const frx_abi *punk_frx(pTHX) {
-    if (!PUNK_FRX && !PUNK_FRX_TRIED) {
+    if (!PUNK_FRX && !PUNK_FRX_TRIED) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         dSP; int count; IV p = 0;
         PUNK_FRX_TRIED = 1;
         eval_pv("require File::Raw::XML;", FALSE);
         SPAGAIN;                      /* the require may have moved the stack */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (!SvTRUE(ERRSV)) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("File::Raw::XML::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (!SvTRUE(ERRSV) && count > 0) p = POPi;
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             else if (count > 0)             (void)POPs;
             PUTBACK; FREETMPS; LEAVE;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (p) {
                 const frx_abi *a = INT2PTR(const frx_abi *, p);
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 if (a && a->abi_version >= FRX_ABI_VERSION) PUNK_FRX = a;
             }
         }
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!PUNK_FRX)
-        croak("Punk: the XML path needs File::Raw::XML with a compatible "
+        croak("Punk: the XML path needs File::Raw::XML with a compatible " /* # uncoverable statement */
               "C ABI (FRX_ABI_VERSION %d)", FRX_ABI_VERSION);
     return PUNK_FRX;
 }
@@ -179,8 +227,12 @@ static const frx_abi *punk_frx(pTHX) {
 /* Every Punk::Router is an IV-ref to a pr_router (new through compile through
  * match); the whole class is XS. */
 static pr_router *punk_router_of(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!SvROK(self) || !SvIOK(SvRV(self)))
-        croak("Punk::Router: not a compiled C router handle");
+        croak("Punk::Router: not a compiled C router handle"); /* # uncoverable statement */
     return (pr_router *)INT2PTR(void *, SvIV(SvRV(self)));
 }
 

@@ -1,4 +1,4 @@
-package 
+package
 	FakeClamd;
 
 # A clamd-shaped listener that misbehaves on purpose.
@@ -15,6 +15,7 @@ package
 use strict;
 use warnings;
 use IO::Socket::UNIX;
+use IO::Socket::INET;
 use POSIX ();
 
 sub new {
@@ -23,8 +24,8 @@ sub new {
 
     # Short by construction: sockaddr_un allows 104 bytes on the BSDs and
     # a long TMPDIR would silently truncate.
-    my $path = $opt{path} || "/tmp/cc-t-$$-" . int(rand 9999) . ".s";
-    unlink $path;
+    my $path = $opt{tcp} ? undef : $opt{path} || "/tmp/cc-t-$$-" . int(rand 9999) . ".s";
+    unlink $path if defined $path;
 
     pipe(my $ready_r, my $ready_w) or die "pipe: $!";
 
@@ -38,16 +39,28 @@ sub new {
         open(STDERR, '>', '/dev/null');
         close STDIN;
 
-        my $srv = IO::Socket::UNIX->new(
-            Local => $path, Type => SOCK_STREAM, Listen => 5,
-        ) or POSIX::_exit(1);
+        my $srv = $opt{tcp}
+            ? IO::Socket::INET->new(
+                LocalAddr => '127.0.0.1', LocalPort => 0, Proto => 'tcp', Listen => 5,
+              )
+            : IO::Socket::UNIX->new(
+                Local => $path, Type => SOCK_STREAM, Listen => 5,
+              );
+        $srv or POSIX::_exit(1);
 
-        # Tell the parent we are bound. No sleeps: a fixed sleep before a
-        # connect is a race that only shows up on a loaded smoker.
-        syswrite($ready_w, "1");
+        # Tell the parent we are bound, and on TCP which port. No sleeps:
+        # a fixed sleep before a connect is a race that only shows up on
+        # a loaded smoker.
+        syswrite($ready_w, ($opt{tcp} ? $srv->sockport : 1) . "\n");
         close $ready_w;
 
+        # A reply carries the terminator the request was framed with:
+        # zPING answers PONG\0 and nPING answers PONG\n, as clamd does.
+        my $term = sub { $_[0] =~ /^n/ ? "\n" : "\0" };
+
+        my $connections = 0;
         while (my $c = $srv->accept) {
+            $connections++;
             if ($mode eq 'stall') {
                 # Read the command, answer nothing, hold it open.
                 sysread($c, my $b, 4096);
@@ -62,6 +75,42 @@ sub new {
             }
             elsif ($mode eq 'hangup') {
                 sysread($c, my $b, 4096);
+                close $c;
+                next;
+            }
+            elsif ($mode eq 'slam') {
+                # Gone before the client has said a word, and a flag file
+                # says so, since a client that sends before the close
+                # sees a different failure.
+                close $c;
+                if ($opt{flag}) {
+                    open my $f, '>', $opt{flag};
+                    close $f;
+                }
+                next;
+            }
+            elsif ($mode eq 'drip') {
+                # Take the command, then one byte at a time, a different
+                # count on every connection, and stop reading. The client
+                # fills the socket and is stuck at whichever byte of its
+                # stream the count leaves it on: over ten connections that
+                # is every position in a chunk's header and its payload.
+                my $cmd = '';
+                while (sysread($c, my $b, 1)) {
+                    $cmd .= $b;
+                    last if $b eq "\0";
+                }
+                sysread($c, my $b, 1) for 1 .. ($connections - 1) % 10;
+                select undef, undef, undef, 0.3;
+                close $c;
+                next;
+            }
+            elsif ($mode eq 'unterminated') {
+                # The whole reply, then the connection closed with no
+                # terminator ever sent. clamd does close after most
+                # replies, so this is a reply that simply ended.
+                sysread($c, my $b, 4096);
+                syswrite($c, 'PONG');
                 close $c;
                 next;
             }
@@ -123,7 +172,7 @@ sub new {
                 # does NOT fire.
                 sysread($c, my $b, 4096);
                 select undef, undef, undef, 0.4;
-                syswrite($c, "PONG\0");
+                syswrite($c, 'PONG' . $term->($b));
             }
             elsif ($mode eq 'literal') {
                 # Say exactly what the test asked for. Lets every reply
@@ -131,6 +180,7 @@ sub new {
                 # with no ClamAV installed at all.
                 my $tail = '';
                 sysread($c, $tail, 4096);
+                my $t = $term->($tail);
                 if ($tail =~ /INSTREAM/) {
                     while ($tail !~ /\0\0\0\0\z/) {
                         my $n = sysread($c, my $chunk, 65536);
@@ -138,7 +188,7 @@ sub new {
                         $tail = substr($tail . $chunk, -8);
                     }
                 }
-                syswrite($c, ($opt{literal} // '') . "\0");
+                syswrite($c, ($opt{literal} // '') . $t);
             }
             elsif ($mode eq 'gibberish') {
                 # A reply in no recognised shape. Must come back as an
@@ -154,6 +204,7 @@ sub new {
                 # does it tests the wrong thing.
                 my $cmd = '';
                 sysread($c, $cmd, 4096);
+                my $t = $term->($cmd);
                 if ($cmd =~ /INSTREAM/) {
                     # Drain until the zero-length terminator. It may
                     # already be sitting in $cmd - an empty stream writes
@@ -166,7 +217,7 @@ sub new {
                         last if !defined $n || $n == 0;
                         $tail = substr($tail . $chunk, -8);
                     }
-                    syswrite($c, "stream: OK\0");
+                    syswrite($c, 'stream: OK' . $t);
                 }
                 elsif ($cmd =~ /FILDES/) {
                     # The carrier byte may already have been merged into
@@ -176,10 +227,10 @@ sub new {
                     # nothing left to send.
                     my $i = index($cmd, "\0");
                     sysread($c, my $pad, 16) if $i == length($cmd) - 1;
-                    syswrite($c, "fd[9]: OK\0");
+                    syswrite($c, 'fd[9]: OK' . $t);
                 }
                 else {
-                    syswrite($c, "PONG\0");
+                    syswrite($c, 'PONG' . $t);
                 }
             }
             close $c;
@@ -188,21 +239,35 @@ sub new {
     }
 
     close $ready_w;
-    my $ok = sysread($ready_r, my $sig, 1);
+    my $ok = sysread($ready_r, my $sig, 16);
     close $ready_r;
     unless ($ok) { waitpid($pid, 0); die "FakeClamd child failed to bind" }
+    chomp $sig;
 
-    return bless { pid => $pid, path => $path }, $class;
+    return bless {
+        pid  => $pid,
+        path => $path,
+        ($opt{tcp} ? (host => '127.0.0.1', port => $sig) : ()),
+    }, $class;
 }
 
 sub path { $_[0]{path} }
+sub host { $_[0]{host} }
+sub port { $_[0]{port} }
+
+# The address as ClamAV::Clamd->new takes it.
+sub target {
+    my ($self) = @_;
+    return $self->{path} ? (socket => $self->{path})
+                         : (host => $self->{host}, port => $self->{port});
+}
 
 sub stop {
     my ($self) = @_;
     return unless $self->{pid};
     kill 'KILL', $self->{pid};
     waitpid($self->{pid}, 0);
-    unlink $self->{path};
+    unlink $self->{path} if defined $self->{path};
     delete $self->{pid};
     return;
 }

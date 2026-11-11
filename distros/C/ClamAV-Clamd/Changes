@@ -1,5 +1,18 @@
 Revision history for ClamAV-Clamd
 
+0.09    2026-11-10
+        - PING, VERSION, STATS and RELOAD run on the scan machine, so one
+          reply reader and one ceiling serve every command.
+        - The stream ends with a chunk of length zero, and a header and a
+          payload go out through the same send loop.
+        - A non-blocking connect finishes through one routine for UNIX and
+          TCP sockets.
+        - new() takes frame => undef as the default.
+        - _abi_probe drives every entry of the C ABI from the suite.
+        - FakeClamd listens on TCP when asked and answers in the framing of
+          the command.
+        - Every line of the C core is covered under Devel::XSCover
+
 0.08    2026-10-08
         - Builds on Windows: NO_XSLOCKS, and the C core no longer uses
           poll, gettimeofday or errno on a socket there.

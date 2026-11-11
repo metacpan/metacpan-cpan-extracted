@@ -23,15 +23,17 @@ WriteMakefile(
         'Map::Tube::Barcelona'       => '0',
         'Map::Tube::Beijing'         => '0',
         'Map::Tube::Berlin'          => '0',
-        'Map::Tube::Bielefeld'       => '0',
+        'Map::Tube::Brussels'        => '0',
         'Map::Tube::Bucharest'       => '0',
         'Map::Tube::Budapest'        => '0',
+        'Map::Tube::Chicago'         => '0',
         'Map::Tube::Copenhagen'      => '0',
         'Map::Tube::Delhi'           => '0',
         'Map::Tube::Dnipropetrovsk'  => '0',
         'Map::Tube::Frankfurt'       => '0',
         'Map::Tube::Glasgow'         => '0',
         'Map::Tube::Hamburg'         => '0',
+        'Map::Tube::Hannover'        => '0',
         'Map::Tube::Hongkong'        => '0',
         'Map::Tube::Kazan'           => '0',
         'Map::Tube::Kharkiv'         => '0',
@@ -39,6 +41,7 @@ WriteMakefile(
         'Map::Tube::KoelnBonn'       => '0',
         'Map::Tube::Kolkatta'        => '0',
         'Map::Tube::KualaLumpur'     => '0',
+        'Map::Tube::Leipzig'         => '0',
         'Map::Tube::London'          => '0',
         'Map::Tube::Lyon'            => '0',
         'Map::Tube::Madrid'          => '0',
@@ -46,11 +49,14 @@ WriteMakefile(
         'Map::Tube::Milan'           => '0',
         'Map::Tube::Minsk'           => '0',
         'Map::Tube::Moscow'          => '0',
+        'Map::Tube::Muenchen'        => '0',
+        'Map::Tube::Napoli'          => '0',
         'Map::Tube::Nuremberg'       => '0',
         'Map::Tube::NYC'             => '0',
         'Map::Tube::Nanjing'         => '0',
         'Map::Tube::NizhnyNovgorod'  => '0',
         'Map::Tube::Novosibirsk'     => '0',
+        'Map::Tube::Paris'           => '0',
         'Map::Tube::Prague'          => '0',
         'Map::Tube::Oslo'            => '0',
         'Map::Tube::Rome'            => '0',
@@ -59,6 +65,7 @@ WriteMakefile(
         'Map::Tube::Singapore'       => '0',
         'Map::Tube::Sofia'           => '0',
         'Map::Tube::Stockholm'       => '0',
+        'Map::Tube::Stuttgart'       => '0',
         'Map::Tube::Sydney'          => '0',
         'Map::Tube::Tbilisi'         => '0',
         'Map::Tube::Toulouse'        => '0',
@@ -69,8 +76,14 @@ WriteMakefile(
     },
     dist  => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
     clean => { FILES => 'Task-Map-Tube-Bundle-*' },
-    (eval { ExtUtils::MakeMaker->VERSION(6.46) } ? (META_MERGE => {
+    META_MERGE => {
         'meta-spec' => { version => 2 },
+        provides    => {
+            'Task::Map::Tube::Bundle' => {
+                file    => 'lib/Task/Map/Tube/Bundle.pm',
+                version => MM->parse_version('lib/Task/Map/Tube/Bundle.pm'),
+            },
+        },
         resources => {
             repository => {
                 type => 'git',
@@ -80,7 +93,6 @@ WriteMakefile(
             bugtracker => {
                 web    => 'https://github.com/manwar/Task-Map-Tube-Bundle/issues'
             },
-        }})
-     : ()
-    ),
+        },
+    },
 );

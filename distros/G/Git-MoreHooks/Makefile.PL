@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.013002;
+use 5.030;
 
 use ExtUtils::MakeMaker;
 
@@ -14,7 +14,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Git-MoreHooks",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.013002",
+  "MIN_PERL_VERSION" => "5.030",
   "NAME" => "Git::MoreHooks",
   "PREREQ_PM" => {
     "Carp" => 0,
@@ -28,8 +28,7 @@ my %WriteMakefileArgs = (
     "File::Temp" => 0,
     "Git::Hooks" => "4.0.0",
     "Git::Repository::Log" => 0,
-    "List::MoreUtils" => 0,
-    "List::Util" => 0,
+    "List::Util" => "1.33",
     "Log::Any" => 0,
     "Module::Load" => 0,
     "Params::Validate" => 0,
@@ -50,14 +49,15 @@ my %WriteMakefileArgs = (
     "Git::Repository" => 0,
     "Log::Any::Adapter" => 0,
     "Test2::Require::Module" => 0,
-    "Test2::Suite" => "1.302200",
-    "Test2::Tools::GenTemp" => "1.302200",
-    "Test2::V0" => "1.302200",
-    "Test2::V1" => "1.302200",
+    "Test2::Suite" => "1.302225",
+    "Test2::Tools::GenTemp" => "1.302225",
+    "Test2::Tools::Subtest" => 0,
+    "Test2::V0" => "1.302225",
+    "Test2::V1" => "1.302225",
     "Test::Git" => 0,
     "Test::Requires::Git" => 0
   },
-  "VERSION" => "0.020",
+  "VERSION" => "0.021",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -78,8 +78,7 @@ my %FallbackPrereqs = (
   "Git::Hooks::Test" => 0,
   "Git::Repository" => 0,
   "Git::Repository::Log" => 0,
-  "List::MoreUtils" => 0,
-  "List::Util" => 0,
+  "List::Util" => "1.33",
   "Log::Any" => 0,
   "Log::Any::Adapter" => 0,
   "Module::Load" => 0,
@@ -90,10 +89,11 @@ my %FallbackPrereqs = (
   "Perl::Tags::Naive::Moose" => 0,
   "Perl::Tags::PPI" => 0,
   "Test2::Require::Module" => 0,
-  "Test2::Suite" => "1.302200",
-  "Test2::Tools::GenTemp" => "1.302200",
-  "Test2::V0" => "1.302200",
-  "Test2::V1" => "1.302200",
+  "Test2::Suite" => "1.302225",
+  "Test2::Tools::GenTemp" => "1.302225",
+  "Test2::Tools::Subtest" => 0,
+  "Test2::V0" => "1.302225",
+  "Test2::V1" => "1.302225",
   "Test::Git" => 0,
   "Test::Requires::Git" => 0,
   "Text::Glob" => 0,

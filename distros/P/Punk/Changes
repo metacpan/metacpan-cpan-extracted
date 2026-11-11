@@ -1,5 +1,21 @@
 Revision history for Punk
 
+0.70    2026-11-10
+        - Coverage: 100% statement, branch, condition and subroutine under
+          Devel::XSCover on clang and gcc 14, with uncoverable marks on the
+          defensive arms the tests cannot reach.
+        - 30 new test files for the edges the marks do not cover: the CLI
+          (kits for real, config check secrets, api sync homes), the test
+          client (delete_ok, options_ok, message_like, live upgrades, failure
+          diagnostics), config shapes, plural rules, and the keyword, model,
+          cache, session, auth and websocket refusals.
+        - Forked test children leave through exit, not _exit, and servers
+          are stopped with TERM, so their coverage is written.
+        - t/1220-1222 take the sibling Hyperman build only when it was built
+          for this perl, so a foreign build beside the tree is passed over.
+        - t/1019 floods past any socket buffer and t/1018 reads to EOF, so
+          both hold on Linux and under load.
+
 0.69    2026-11-08
         - t/0310 expects the OS's own reading of a backslash where it is a
           path separator (Cygwin, Windows).

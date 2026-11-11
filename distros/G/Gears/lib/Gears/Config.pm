@@ -1,5 +1,5 @@
 package Gears::Config;
-$Gears::Config::VERSION = '0.104';
+$Gears::Config::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -24,7 +24,7 @@ my sub _merge ($this_conf, $this_diff)
 		my $ref = ref $value;
 		my $mode;
 
-		if ($key =~ /^([+-=])/) {
+		if ($key =~ /^([+=-])/) {
 			$mode = $1;
 			$key = substr $key, 1;
 		}
@@ -50,7 +50,11 @@ my sub _merge ($this_conf, $this_diff)
 			if (!defined $mode || $mode eq '+') {
 				push $this_conf->{$key}->@*, $value->@*;
 			}
-			elsif ($mode eq '-' && diff($this_conf->{$key}, $value, \my $rest)) {
+			elsif ($mode eq '-') {
+				my $rest;
+				$rest = []
+					unless diff($this_conf->{$key}, $value, \$rest);
+
 				$this_conf->{$key}->@* = $rest->@*;
 			}
 		}

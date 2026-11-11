@@ -1,75 +1,63 @@
 Config::XrmDatabase
 
-This is a Pure Perl implementation of the X Window Resource Manager
+This is a pure Perl implementation of the X Window Resource Manager
 Database (XrmDB). It allows creation and manipulation of Xrm compliant
 databases.
 
 Warning! The XrmDB refers to names and resources. These days they are
 more typically called keys and values. The terminology used below (and
 sometimes in the names of subroutines and methods) mixes these two
-approaches, sometimes a bit too liberally. Subroutine and method names
-will probably change to make things more consistent.
+approaches, sometimes a bit too liberally.
 
-  Why another configuration database?
+The XrmDB differs from typical key-value stores in that a stored key may
+be only partially specified, so that a single entry can provide the
+value for many different queries.
 
-The XrmDB differs from typical key-value stores by allowing stored keys
-to be either fully or partially qualified. For example, the partially
-qualified key
+  Keys
 
-    *.c.d
+A key is a sequence of *components* (such as "editor", "toolbar", and
+"foreground") separated by *bindings*. A binding says how the components
+on either side of it are related:
 
-will match a query for the keys "a.c.d", "a.b.c.d". Keys are composed of
-multiple components separated by the "." character. If the component is
-"?" it will match any single component; a component of "*" matches any
-number (including none).
+"." The next component must follow immediately. "editor.foreground"
+    matches only "editor.foreground".
 
-  Matching
+"*" Any number of components, *including none*, may come between.
+    "editor*foreground" matches "editor.foreground",
+    "editor.toolbar.foreground", "editor.toolbar.save.foreground", and
+    so on.
 
-Matching a search key against the database is a component by component
-operation, starting with the leftmost component. The component in the
-search key is checked against the same level component in the database
-keys. First the keys with non-wildcard components are compared; if there
-is an exact match, the search moves on to the next component in the
-matching database key.
+A key which begins with "*" may match starting at any level: *foreground
+matches "foreground", "toolbar.foreground", and
+"editor.toolbar.save.foreground". A key which doesn't begin with a
+binding must match starting at the first level.
 
-At this point, XrmDB adds another dimension to the search. Keys belong
-to a *class*, which has the same number of components as the key. When
-an exact match against the search key component is not found, the
-database is searched for an exact match for the same level component in
-the class.
+Separately from bindings, a component may be the placeholder "?", which
+stands for exactly one component, whatever it is. "editor.?.foreground"
+matches "editor.toolbar.foreground" and "editor.menu.foreground", but
+not "editor.foreground" or "editor.toolbar.save.foreground".
 
-Only after that fails does the algorithm switch to database keys with
-wildcard components. The same order of comparison is performed; first
-against the component in the search key, and if that fails, to the
-component in the class.
+"?" and "*" are easily confused. "?" *is* a component, and always takes
+the place of exactly one level. "*" is a binding; it sits *between*
+components and can span any number of levels, including none.
 
-For example, given a search key of
+The last component of a key must be a name or class component; a key may
+not end in "?" or in a binding. A key containing neither "?" nor "*" is
+*fully qualified*.
 
- xmh.toc.messagefunctions.incorporate.activeForeground'
+(N.B., the X Window System documentation calls "." a *tight* binding and
+"*" a *loose* binding.)
 
-with a class of
+  Names and classes
 
- Xmh.Paned.Box.Command.Foreground
+Each key that is queried has a *class*, a parallel key with the same
+number of components. Classes provide a second way of addressing a key:
+a stored key may refer to a level by the name's component or by the
+class's component. A class essentially creates a namespace, so that
+values can be assigned based on which namespace a key belongs to rather
+than on the content of the key.
 
-the database is first searched for keys which begin with "xmh". If that
-fails, the database is searched for keys which begin with "Xmh". If that
-fails, keys which start with a "?" wildcard are searched, and then those
-which start with "*". The "*" components can match an arbitrary number
-of components in the search key and class.
-
-If a match is found, the search moves on to the next unmatched component
-and the algorithm is repeated.
-
-  Classes
-
-Why the extra "class"?
-
-Assigning keys to a class provides an ability to distinguish between two
-similarly structured keys. It essentially creates namespaces for keys so
-that values can be created based on which namespace a key belongs to,
-rather than the content of the key.
-
-Let's say that you have a bunch of keys which end in "Foreground":
+Let's say that you have a number of keys that end in "Foreground":
 
   a.b.c.Foreground
   d.e.f.Foreground
@@ -77,9 +65,9 @@ Let's say that you have a bunch of keys which end in "Foreground":
 
 and you want to set a value for any keys which end in "Foreground":
 
-  *.Foreground : 'yellow'
+  *Foreground : 'yellow'
 
-To specify a separate value for each one could set
+To give each one its own value:
 
   a.b.c.Foreground : 'red'
   d.e.f.Foreground : 'blue'
@@ -93,7 +81,7 @@ same value:
   x.y.z.Foreground : 'green'
 
 At some point, a new hierarchy of keys that begin with "g" is added to
-that class, but they should has a different value:
+that class, but they should have a different value:
 
   g.V.W.Foreground : 'magenta'
 
@@ -101,11 +89,98 @@ You could try this:
 
   g.?.?.Foreground : 'magenta'
 
-But that would affect *all* keys that begin with "g" but aren't in that
-class.
+But that would affect *all* keys that begin with "g", not just those in
+that class.
 
 Classes help bring some order, but this system can become very confusing
 if some discipline isn't maintained.
+
+  Matching
+
+"query" is given a fully qualified name and its fully qualified class,
+which must have the same number of components. They are compared with
+the stored keys one level at a time, from left to right. A stored key's
+component matches a level if it is the name's component, the class's
+component, or "?"; alternatively, a "*" in the stored key may span the
+level.
+
+More than one stored key may match a query. When that happens,
+precedence rules choose the one whose value is returned.
+
+   Precedence at a single level
+
+Consider a query for the name "editor.toolbar.save.foreground" with the
+class "Editor.Box.Button.Foreground". Each of the following keys matches
+it. They differ only in how they match the third level (name "save",
+class "Button"), and are listed from highest to lowest precedence:
+
+1.  The name, immediately following the previous level
+
+      editor.toolbar.save.foreground
+
+2.  The name, following a "*" which spans no components
+
+      editor.toolbar*save.foreground
+
+3.  The class, immediately following the previous level
+
+      editor.toolbar.Button.foreground
+
+4.  The class, following a "*" which spans no components
+
+      editor.toolbar*Button.foreground
+
+5.  "?", immediately following the previous level
+
+      editor.toolbar.?.foreground
+
+6.  "?", following a "*" which spans no components
+
+      editor.toolbar*?.foreground
+
+7.  The level is spanned by a "*", so the key has no component there
+
+      editor.toolbar*foreground
+
+In other words:
+
+*   Any component that matches the level (name, class, or "?") beats
+    spanning the level with a "*".
+
+*   A name beats a class, and a class beats "?", regardless of the
+    binding which precedes them.
+
+*   Between two otherwise equal matches, a component which immediately
+    follows the previous level (".") beats one which follows a "*".
+
+Note that a "*" which spans no components does not cause a level to be
+skipped. In rules 2, 4, and 6, the key still has a component at the
+third level, and it is that component which is compared.
+
+   Precedence across levels
+
+Levels are compared from left to right, and the first level at which two
+keys differ decides between them; later levels matter only if all
+earlier ones are the same. For example, using the same query of name
+"editor.toolbar.save.foreground" with class
+"Editor.Box.Button.Foreground":
+
+  editor*save.foreground
+  editor.toolbar.?.foreground
+
+the second key wins. At the second level it matches "toolbar" by name
+(rule 1), while the first key spans that level with a "*" (rule 7). That
+the first key matches "save" by name at the third level, while the
+second key only matches it with "?", doesn't matter.
+
+Similarly, of
+
+  Editor.toolbar.save.foreground
+  editor*foreground
+
+the second key wins, even though the first is much more specific. At the
+first level, "editor" matches by name (rule 1), while "Editor" only
+matches by class (rule 3).
 
 INSTALLATION
 

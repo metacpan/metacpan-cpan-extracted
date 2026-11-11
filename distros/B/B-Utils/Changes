@@ -1,9 +1,13 @@
 Revision history for B-Utils
 
+0.29      2026-11-10 22:02:10Z
+   - adjust tests to handle a change in perl 5.45.5 (see perl issue
+     #24827) (PR #3, Richard Leach)
+
 0.28  2026-10-19
    - update ppport.h to the latest version, and keep it updated
    - adjust tests to handle a change in perl 5.45.4 (see perl issue
-     #24845) (PR #2, Richard Leach)
+     #24827) (PR #2, Richard Leach)
 
 0.27  2015-07-22
    - remove build/IFiles.pm from the shipped dist, as it is meant to be

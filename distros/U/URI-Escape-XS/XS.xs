@@ -1,5 +1,5 @@
 /*
- * $Id: XS.xs,v 0.10 2016/06/09 11:09:38 dankogai Exp dankogai $
+ * $Id: XS.xs,v 0.11 2026/11/10 15:10:37 dankogai Exp dankogai $
  */
 
 #include "EXTERN.h"
@@ -18,7 +18,7 @@
 #define inline __inline
 #endif
 
-static char escapes[256] = 
+static char escapes_rfc2396[256] =
 /*  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
 {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -36,6 +36,27 @@ static char escapes[256] =
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
+};
+
+static char escapes_rfc3986[256] =
+/*  0  1  2  3  4  5  6  7  8  9  a  b  c  d  e  f */
+{
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0,
+    1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
 };
 
@@ -58,7 +79,7 @@ static inline int my_hextol(const char *buf){
 }
 #endif
 
-SV *encode_uri_component(SV *sstr){
+SV *encode_uri_component(SV *sstr, const char *table){
     SV *str, *result;
     int slen, dlen;
     U8 *src, *dst;
@@ -75,7 +96,7 @@ SV *encode_uri_component(SV *sstr){
     dst   = (U8 *)SvPV_nolen(result);
 
     for (i = 0; i < slen; i++){
-	if (escapes[ src[i] ]){
+	if (table[ src[i] ]){
 	    dst[dlen++] = '%';
 	    dst[dlen++] = hex_chars[src[i]>>4];
 	    dst[dlen++] = hex_chars[src[i]%16];
@@ -172,7 +193,7 @@ SV *
 encodeURIComponent(str)
     SV *str;
 CODE:
-    RETVAL = encode_uri_component(str);
+    RETVAL = encode_uri_component(str, escapes_rfc2396);
 OUTPUT:
     RETVAL
 
@@ -181,5 +202,13 @@ decodeURIComponent(str)
     SV *str;
 CODE:
     RETVAL = decode_uri_component(str);
+OUTPUT:
+    RETVAL
+
+SV *
+_uri_escape(str)
+    SV *str;
+CODE:
+    RETVAL = encode_uri_component(str, escapes_rfc3986);
 OUTPUT:
     RETVAL

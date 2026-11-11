@@ -1,5 +1,5 @@
 package Gears::Router::Pattern::Match;
-$Gears::Router::Pattern::Match::VERSION = '0.104';
+$Gears::Router::Pattern::Match::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -8,10 +8,11 @@ extends 'Gears::Router::Pattern';
 sub compare ($self, $request_path)
 {
 	my $pattern = $self->pattern;
+	my $separator = $self->location->router->pattern_separator;
 
 	if ($self->is_bridge) {
 		return undef
-			unless scalar $request_path =~ m/^\Q$pattern\E/;
+			unless scalar $request_path =~ m/^\Q$pattern\E(\Q$separator\E|$)/;
 	}
 	else {
 		return undef
@@ -71,10 +72,8 @@ Inherits interface from L<Gears::Router::Pattern>.
 
 	$match_data = $pattern->compare($request_path)
 
-Compares the request path against the pattern. For bridges, returns an empty
-array reference if the path starts with the pattern. For non-bridges, returns
-an empty array reference only if the path exactly equals the pattern. Returns
-C<undef> if there's no match.
+Compares the request path against the pattern. Returns an empty array reference
+if the matching is successful. Returns C<undef> if there's no match.
 
 =head3 build
 

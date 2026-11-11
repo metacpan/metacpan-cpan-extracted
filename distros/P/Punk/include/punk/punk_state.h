@@ -61,7 +61,7 @@ typedef struct {
 
 static SV *pks_get(pTHX_ HV *h, const char *k) {
     SV **e = hv_fetch(h, k, (I32)strlen(k), 0);
-    return (e && *e) ? *e : NULL;
+    return (e && *e) ? *e : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
 }
 static SV *pks_def(pTHX_ HV *h, const char *k) {
     SV *v = pks_get(aTHX_ h, k);
@@ -69,16 +69,26 @@ static SV *pks_def(pTHX_ HV *h, const char *k) {
 }
 static AV *pks_av(pTHX_ HV *h, const char *k) {
     SV *v = pks_get(aTHX_ h, k);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (v && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) ? (AV *)SvRV(v) : NULL;
 }
 static HV *pks_hv(pTHX_ HV *h, const char *k) {
     SV *v = pks_get(aTHX_ h, k);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (v && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV) ? (HV *)SvRV(v) : NULL;
 }
 
 static int pk_state_free(pTHX_ SV *sv, MAGIC *mg) {
     pk_state *S = (pk_state *)mg->mg_ptr;
     PERL_UNUSED_ARG(sv);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (S) { if (S->rec) Safefree(S->rec); Safefree(S); }
     return 0;
 }
@@ -91,25 +101,57 @@ static void pk_rec_mirror(pTHX_ pk_rec_c *R, SV *recsv) {
     HV *rh;
     SV **x;
     Zero(R, 1, pk_rec_c);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(recsv && SvROK(recsv) && SvTYPE(SvRV(recsv)) == SVt_PVHV)) return;
     rh = (HV *)SvRV(recsv);
     x = hv_fetchs(rh, "code", 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     R->code = (x && *x) ? *x : NULL;
     x = hv_fetchs(rh, "guards", 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (x && *x && SvROK(*x) && SvTYPE(SvRV(*x)) == SVt_PVAV
         && av_len((AV *)SvRV(*x)) >= 0)
         R->guards = (AV *)SvRV(*x);
     x = hv_fetch(rh, K_MAX_BODY, (I32)strlen(K_MAX_BODY), 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (x && *x && SvOK(*x)) { R->max_body = SvIV(*x); R->has_max_body = 1; }
     x = hv_fetch(rh, K_ETAG, (I32)strlen(K_ETAG), 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:5 class:ignore_covered_err */
     R->etag = (x && *x && SvOK(*x) && !SvROK(*x) && SvTRUE(*x)) ? 1 : 0;
     x = hv_fetch(rh, K_IDEMPOTENT, (I32)strlen(K_IDEMPOTENT), 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     R->idempotent = (x && *x && SvTRUE(*x)) ? 1 : 0;
     x = hv_fetch(rh, K_WS, (I32)strlen(K_WS), 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     R->ws = (x && *x && SvTRUE(*x)) ? 1 : 0;
     x = hv_fetchs(rh, "sse", 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     R->sse = (x && *x && SvTRUE(*x)) ? 1 : 0;
     x = hv_fetch(rh, K_COMPRESS, (I32)strlen(K_COMPRESS), 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     R->nocompress = (x && *x && !SvTRUE(*x)) ? 1 : 0;
 }
 
@@ -127,12 +169,16 @@ static SV *pk_state_build(pTHX_ HV *state) {
     S->apims  = pks_av(aTHX_ state, K_API_MOUNTS);
     S->mounts = pks_av(aTHX_ state, K_MOUNTS);
     S->ctxcls = pks_get(aTHX_ state, K_CTX);
-    S->ctxstash = S->ctxcls ? gv_stashsv(S->ctxcls, GV_ADD) : NULL;
+    S->ctxstash = S->ctxcls ? gv_stashsv(S->ctxcls, GV_ADD) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     S->app    = pks_get(aTHX_ state, K_APP);
     S->upload_dir = pks_def(aTHX_ state, "upload_dir");
     S->before = pks_av(aTHX_ state, K_BEFORE);
     S->after  = pks_av(aTHX_ state, K_AFTER);
     S->before_req = pks_av(aTHX_ state, K_BEFORE_REQ);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (S->before_req && av_len(S->before_req) < 0) S->before_req = NULL;
     S->on_err = pks_get(aTHX_ state, K_ON_ERROR);
     S->on_nf  = pks_def(aTHX_ state, K_ON_NOT_FOUND);
@@ -147,19 +193,25 @@ static SV *pk_state_build(pTHX_ HV *state) {
     }
     {
         SV *cg = pks_get(aTHX_ state, K_CGET);
-        S->cget = (cg && SvTRUE(cg)) ? cg : NULL;
+        S->cget = (cg && SvTRUE(cg)) ? cg : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
     S->idem = pks_def(aTHX_ state, K_IDEM);
     S->cors = pks_hv(aTHX_ state, K_CORS);
     S->headers = pks_av(aTHX_ state, K_HEADERS);
     S->headers_scoped = pks_av(aTHX_ state, K_HEADERS_SCOPED);
     S->csp = pks_hv(aTHX_ state, K_CSP);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (S->recs) {
         SSize_t i, n = av_len(S->recs) + 1;
         Newxz(S->rec, n > 0 ? n : 1, pk_rec_c);
         S->nrec = (int)n;
         for (i = 0; i < n; i++) {
             SV **rp = av_fetch(S->recs, i, 0);
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             pk_rec_mirror(aTHX_ &S->rec[i], (rp && *rp) ? *rp : NULL);
         }
     }
@@ -171,7 +223,7 @@ static SV *pk_state_build(pTHX_ HV *state) {
 static pk_state *pk_state_of(pTHX_ SV *holder) {
     MAGIC *mg = holder ? mg_findext(holder, PERL_MAGIC_ext, &pk_state_vtbl)
                        : NULL;
-    return mg ? (pk_state *)mg->mg_ptr : NULL;
+    return mg ? (pk_state *)mg->mg_ptr : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 #endif /* PUNK_STATE_H */

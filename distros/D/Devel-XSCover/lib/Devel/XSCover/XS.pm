@@ -7,7 +7,7 @@ use warnings;
 use File::Find ();
 use File::Spec ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our ($KEYWORDS);
 

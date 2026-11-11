@@ -4,7 +4,7 @@ Git::Helpers - Shortcuts for common Git commands
 
 # VERSION
 
-version 1.000001
+version 1.000002
 
 # SYNOPSIS
 
@@ -45,6 +45,13 @@ GitHub (hopefully) doesn't need to redirect your URL.
 Turns git@github.com:oalders/git-helpers.git into https://github.com/oalders/git-helpers
 
 Turns https://github.com/oalders/git-helpers.git into https://github.com/oalders/git-helpers
+
+Turns https://git.example.com:8443/oalders/git-helpers.git into https://git.example.com:8443/oalders/git-helpers
+
+A port is kept for http and https remotes and dropped for others.
+
+Returns `undef` for a local path or file:// remote, and for a remote which
+does not exist.
 
 Defaults to using `origin` as the remote if none is supplied.
 

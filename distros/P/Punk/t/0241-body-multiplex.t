@@ -234,7 +234,8 @@ SKIP: {
         # STDERR is /dev/null is a server that silently never listens
         Hyperman->run(app => $app, host => '127.0.0.1',
                       port => $port, workers => 1, http2 => 1);
-        POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
 
     for (1 .. 50) {

@@ -2,10 +2,7 @@ do { my $x = {
        'configure' => {
                         'requires' => {
                                         'ExtUtils::MakeMaker' => '0',
-                                        'perl' => '5.006'
-                                      },
-                        'suggests' => {
-                                        'JSON::PP' => '2.27300'
+                                        'perl' => '5.010'
                                       }
                       },
        'develop' => {
@@ -37,7 +34,10 @@ do { my $x = {
                     },
        'runtime' => {
                       'recommends' => {
-                                        'Git::Helpers' => '0.000016'
+                                        'Capture::Tiny' => '0',
+                                        'File::pushd' => '0',
+                                        'Git::Helpers' => '0.000016',
+                                        'Git::Sub' => '0'
                                       },
                       'requires' => {
                                       'Browser::Open' => '0',
@@ -60,9 +60,11 @@ do { my $x = {
                                      'Git::Helpers' => '0.000016'
                                    },
                    'requires' => {
+                                   'Capture::Tiny' => '0',
                                    'Carp::Always' => '0',
                                    'ExtUtils::MakeMaker' => '0',
                                    'File::Spec' => '0',
+                                   'File::pushd' => '0',
                                    'Test::Differences' => '0',
                                    'Test::Fatal' => '0',
                                    'Test::More' => '0',
@@ -71,6 +73,7 @@ do { my $x = {
                                    'Test::Script' => '1.31',
                                    'Test::Simple' => '1.302177',
                                    'Test::Warnings' => '0',
+                                   'URI::Escape' => '0',
                                    'lib' => '0',
                                    'perl' => 'v5.12.0'
                                  }

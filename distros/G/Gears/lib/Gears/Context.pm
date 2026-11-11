@@ -1,5 +1,5 @@
 package Gears::Context;
-$Gears::Context::VERSION = '0.104';
+$Gears::Context::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -7,6 +7,7 @@ use Devel::StrictMode;
 
 has param 'app' => (
 	(STRICT ? (isa => InstanceOf ['Gears::App']) : ()),
+	required => 0,
 );
 
 __END__
@@ -28,7 +29,7 @@ Gears::Context - Request context container
 
 =head1 DESCRIPTION
 
-Gears::Context is a minimal base class for request context objects. It provides
+Gears::Context is a minimal base class for request context objects. It can hold
 a reference to the application and serves as a container for request-specific
 data such as HTTP request and response objects, session data, or any other
 state necessary to handle a single request/response cycle.
@@ -101,7 +102,7 @@ create circular reference issues.
 In strict mode, this attribute is type-checked to ensure it's a Gears::App
 instance. In non-strict mode, no type checking is performed.
 
-I<Mandatory constructor argument>
+To ease testing and custom use cases, this field is optional.
 
 =head2 Methods
 

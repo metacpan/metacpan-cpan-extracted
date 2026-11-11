@@ -414,7 +414,8 @@ sub http_get {
         my $buf = encode_client(opcode => 1, payload => 'x') x 100_000;
         my $end = time + 2;
         while (time < $end) { syswrite $a, $buf or last }
-        require POSIX; POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
     select undef, undef, undef, 0.3;
     my $t0 = Time::HiRes::time();

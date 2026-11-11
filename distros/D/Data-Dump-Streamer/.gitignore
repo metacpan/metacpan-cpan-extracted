@@ -12,3 +12,16 @@ lib/Data/Dump/Streamer.o
 lib/DDS.pm
 Data-Dump-Streamer-*/
 *.bak
+/src/*.o
+
+/Makefile
+/Makefile.old
+/Streamer.c
+/Streamer.o
+/Streamer.bs
+/dds_*.c
+/dds_*.o
+/pm_to_blib
+*.tar
+
+.perltidy-*

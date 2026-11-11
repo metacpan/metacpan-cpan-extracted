@@ -295,7 +295,7 @@ SKIP: {
         close $fs;
     }
 
-    kill 9, $pid; waitpid $pid, 0;
+    kill q{TERM}, $pid; waitpid $pid, 0;
 }
 
 done_testing;

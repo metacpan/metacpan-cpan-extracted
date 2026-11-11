@@ -4,13 +4,13 @@
       "Dan Kogai <dankogai+cpan@gmail.com>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.14, CPAN::Meta::Converter version 2.150005",
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "URI-Escape-XS",
    "no_index" : {
@@ -32,7 +32,8 @@
       },
       "runtime" : {
          "requires" : {
-            "Test::More" : "0"
+            "Test::More" : "0",
+            "perl" : "5.008001"
          }
       }
    },
@@ -44,6 +45,6 @@
          "web" : "https://github.com/dankogai/p5-uri-escape-xs"
       }
    },
-   "version" : "0.14",
-   "x_serialization_backend" : "JSON::PP version 2.27300"
+   "version" : "0.15",
+   "x_serialization_backend" : "JSON::PP version 4.18"
 }

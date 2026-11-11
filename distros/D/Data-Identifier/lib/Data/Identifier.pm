@@ -19,7 +19,7 @@ use Carp;
 use Math::BigInt lib => 'GMP';
 use URI;
 
-our $VERSION = v0.37;
+our $VERSION = v0.38;
 
 use constant {
     RE_UUID         => qr/^[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}\z/,
@@ -31,7 +31,7 @@ use constant {
     RE_DOI          => qr/^10\.[1-9][0-9]+(?:\.[0-9]+)*\/./,
     RE_GTIN         => qr/^[0-9]{8}(?:[0-9]{4,6})?\z/,
     RE_UNICODE      => qr/^U\+([0-9A-F]{4,7})\z/,
-    RE_SIMPLE_TAG   => qr/^[^\p{upper case}\s]+\z/,
+    RE_SIMPLE_TAG   => qr/^[^\p{upper case}\s:]+\z/,
 };
 
 use constant {
@@ -751,6 +751,8 @@ sub as {
 
     $self = __PACKAGE__->new(from => $self) unless eval {$self->isa(__PACKAGE__)};
 
+    return $self if ($as =~ /^[A-Z]/ || $as =~ /::/) && eval {$self->isa($as)}; # Recheck after converting to a Data::Identifier
+
     if ($as eq 'uuid' || $as eq 'oid' || $as eq 'uri' || $as eq 'sid' || $as eq 'ise') {
         my $func = $self->can($as);
         return $self->$func(%opts);
@@ -857,8 +859,11 @@ sub eq {
     if (defined($self)) {
         return undef unless defined $other;
         return 1 if $self == $other;
-        return undef unless $self->type->eq($other->type);
-        return $self->id eq $other->id;
+        if ($self->type->eq($other->type)) {
+            return $self->id eq $other->id;
+        } else {
+            return scalar(eval {$self->ise eq $other->ise});
+        }
     } else {
         return !defined($other);
     }
@@ -882,6 +887,7 @@ sub cmp {
         return undef unless defined $other;
         return 0 if $self == $other;
         if ((my $r = $self->type->cmp($other->type)) != 0) {
+            return 0 if eval {$self->ise eq $other->ise};
             return $r;
         }
 
@@ -1189,7 +1195,7 @@ Data::Identifier - format independent identifier object
 
 =head1 VERSION
 
-version v0.37
+version v0.38
 
 =head1 SYNOPSIS
 
@@ -1649,6 +1655,10 @@ If C<$identifier> or C<$other> is not an instance of L<Data::Identifier> or C<un
 then it is checked against the list of well known identifiers (see L</new>).
 If it has still no match L</new> with the virtual type C<from> is used.
 
+B<Note:>
+Identifiers are considered equal if they match by type and identifier (since v0.06)
+or mismatch by type but match by ise (since v0.38).
+
 =head2 cmp
 
     my $val = $identifier->cmp($other); # $identifier must be non-undef
@@ -1657,6 +1667,9 @@ If it has still no match L</new> with the virtual type C<from> is used.
 
 Compares the identifiers similar to C<cmp>. This method can be used to order identifiers.
 To check for them to be equal see L</eq>.
+
+This method considers two identifiers to be equal (and return C<0>) if they are considered equal by L</eq>.
+See there for details as changes there may affect ordering.
 
 The parameters are parsed the same way as L</eq>.
 

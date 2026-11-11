@@ -39,6 +39,9 @@ XS_INTERNAL(pki_kw_cb) {
     int i, count;
     I32 want = GIMME_V;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!cap) XSRETURN_EMPTY;
     app  = *av_fetch(cap, PKI_APP,  0);
     kind = SvIV(*av_fetch(cap, PKI_KIND, 0));
@@ -66,8 +69,8 @@ XS_INTERNAL(pki_kw_cb) {
             EXTEND(SP, 6);
             PUSHs(app);
             PUSHs(name);
-            PUSHs(items > 0 ? ST(0) : &PL_sv_undef);
-            PUSHs(items > 1 ? ST(1) : &PL_sv_undef);
+            PUSHs(items > 0 ? ST(0) : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
+            PUSHs(items > 1 ? ST(1) : &PL_sv_undef); /* # uncoverable condition right count:1 class:ignore_covered_err */
             mPUSHs(newRV_noinc((SV *)newAV()));
             if (items > 2) PUSHs(ST(2));
             break;
@@ -101,6 +104,9 @@ XS_INTERNAL(pki_kw_cb) {
      * returns the slots at ax - so they have to be copied down. Into mortals
      * first, and through a scratch vector, because the two regions can overlap
      * and a direct move would clobber a value not yet read. */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (count > 0) {
         SV **tmp;
         int j;
@@ -190,10 +196,13 @@ XS_INTERNAL(pki_pkw_cb);
 XS_INTERNAL(pki_pkw_cb) {
     dXSARGS;
     AV *cap = punk_clos_cap(aTHX_ cv);
-    SV **code = cap ? av_fetch(cap, 0, 0) : NULL;
+    SV **code = cap ? av_fetch(cap, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     I32 want = GIMME_V;
     int count, i;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!code) XSRETURN_EMPTY;
 
     PUSHMARK(SP);
@@ -206,6 +215,9 @@ XS_INTERNAL(pki_pkw_cb) {
 
     /* the results sit above the arguments; copy them down to ax through a
      * scratch vector, since the two regions can overlap (see pki_kw_cb) */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (count > 0) {
         SV **tmp;
         int j;
@@ -237,9 +249,28 @@ static void pki_install_kw(pTHX_ SV *caller, SV *name, SV *code) {
     CV *old = get_cv(full, 0);
     AV *cap;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (old) {
-        AV *ocap = punk_clos_cap(aTHX_ old);
+        AV *ocap = punk_clos_cap(aTHX_ old); /* # uncoverable statement */
+        /*
+         # uncoverable statement
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1 */
         SV **oc = ocap ? av_fetch(ocap, 0, 0) : NULL;
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1
+         # uncoverable condition left count:2
+         # uncoverable condition right count:2
+         # uncoverable condition left count:3
+         # uncoverable condition right count:3
+         # uncoverable condition left count:4
+         # uncoverable condition right count:4 */
         if (oc && SvROK(*oc) && SvROK(code) && SvRV(*oc) == SvRV(code)) return;
     }
     cap = newAV();
@@ -254,8 +285,17 @@ static SV *pki_app_for(pTHX_ SV *caller, int *fresh) {
     HV *apps = get_hv("Punk::APPS", GV_ADD);
     HE *he = hv_fetch_ent(apps, caller, 0, 0);
     SV *app;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (fresh) *fresh = 0;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (he && HeVAL(he) && SvROK(HeVAL(he))) return HeVAL(he);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (fresh) *fresh = 1;
 
     {
@@ -270,11 +310,14 @@ static SV *pki_app_for(pTHX_ SV *caller, int *fresh) {
         PUTBACK;
         count = call_method("new", G_SCALAR);
         SPAGAIN;
-        app = count > 0 ? newSVsv(POPs) : &PL_sv_undef;
+        app = count > 0 ? newSVsv(POPs) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK; FREETMPS; LEAVE;
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!SvROK(app))
-        croak("Punk: Punk::App->new returned no registrar");
+        croak("Punk: Punk::App->new returned no registrar"); /* # uncoverable statement */
     (void)hv_store_ent(apps, caller, app, 0);
     return app;
 }

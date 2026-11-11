@@ -49,6 +49,10 @@ XS_INTERNAL(prl_check_cb) {
     IV rem = 0, reset = 0;
     int ok;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cap || items < 1) XSRETURN_EMPTY;
     c = ST(0);
 
@@ -60,7 +64,13 @@ XS_INTERNAL(prl_check_cb) {
     tag    = SvPV(*av_fetch(cap, PRL_TAG,    0), tlen);
 
     cav = pcx_av(aTHX_ c);
-    e   = cav ? av_fetch(cav, PCX_ENV, 0) : NULL;
+    e   = cav ? av_fetch(cav, PCX_ENV, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)) XSRETURN_EMPTY;
     env = (HV *)SvRV(*e);
 
@@ -68,8 +78,12 @@ XS_INTERNAL(prl_check_cb) {
     if (flen) {
         SV **p = hv_fetchs(env, "PATH_INFO", 0);
         STRLEN plen = 0;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         const char *path = (p && *p && SvOK(*p)) ? SvPV(*p, plen) : "";
-        if (plen < flen || memcmp(path, forp, flen) != 0) XSRETURN_EMPTY;
+        if (plen < flen || memcmp(path, forp, flen) != 0) XSRETURN_EMPTY; /* # uncoverable condition left count:2 class:ignore_covered_err */
     }
 
     /* the caller's identity for this rule */
@@ -80,10 +94,17 @@ XS_INTERNAL(prl_check_cb) {
         PUSHMARK(SP);
         XPUSHs(c);
         PUTBACK;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         count = call_sv(fp && *fp ? *fp : &PL_sv_undef, G_SCALAR);
         SPAGAIN;
-        idsv = count > 0 ? newSVsv(POPs) : NULL;
+        idsv = count > 0 ? newSVsv(POPs) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK; FREETMPS; LEAVE;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!idsv || !SvOK(idsv)) { SvREFCNT_dec(idsv); XSRETURN_EMPTY; }
         id = SvPV(idsv, idlen);
     } else {                                        /* ip (0) or header (1) */
@@ -92,14 +113,30 @@ XS_INTERNAL(prl_check_cb) {
         /* A header rule with no header falls back to the address: a client
          * that simply omits the header is still one client, and a rule that
          * limited nothing for it was no limit at all. */
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err
+         # uncoverable condition left count:5 class:ignore_covered_err */
         if (by == 1 && !(ev && *ev && SvOK(*ev) && SvCUR(*ev)))
-            ev = hv_fetchs(env, "REMOTE_ADDR", 0);
+            ev = hv_fetchs(env, "REMOTE_ADDR", 0); /* # uncoverable statement class:ignore_covered_err */
+        /*
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err */
         if (!(ev && *ev && SvOK(*ev))) XSRETURN_EMPTY;
         id = SvPV(*ev, idlen);
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!idlen) { SvREFCNT_dec(idsv); XSRETURN_EMPTY; }
     /* an id is a key in a shared table, not a place to put a header's worth
      * of bytes per request */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (idlen > PRL_ID_MAX) idlen = PRL_ID_MAX;
 
     /* key = "rl\0" tag "\0" id - NUL-joined so rules and ids never collide */
@@ -113,6 +150,10 @@ XS_INTERNAL(prl_check_cb) {
     /* resolved: punk_hm's environment check is a scan of every variable,
      * per request, and the answer cannot change once the table is found */
     A = punk_hm_resolved(aTHX);
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(A && A->ratelimit_hit)) XSRETURN_EMPTY;    /* fail open */
     {
         STRLEN klen;
@@ -128,6 +169,9 @@ XS_INTERNAL(prl_check_cb) {
         AV *hdr  = newAV();
         AV *body = newAV();
         AV *resp = newAV();
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (retry < 0) retry = 0;
         av_push(hdr, newSVpvs("Content-Type"));
         av_push(hdr, newSVpvs("application/problem+json"));
@@ -165,18 +209,37 @@ static void prl_install(pTHX_ SV *self, IV limit, IV window, IV by,
     (void)av_store(cap, PRL_LIMIT,  newSViv(limit));
     (void)av_store(cap, PRL_WINDOW, newSViv(window));
     (void)av_store(cap, PRL_BY,     newSViv(by));
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     (void)av_store(cap, PRL_ENVKEY, newSVpvn(envkey ? envkey : "", envkey ? elen : 0));
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     (void)av_store(cap, PRL_FOR,    newSVpvn(forp ? forp : "", forp ? flen : 0));
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     (void)av_store(cap, PRL_TAG,    newSVpvn(tag ? tag : "", tag ? tlen : 0));
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     (void)av_store(cap, PRL_BYFN,   (by == 2 && byfn) ? newSVsv(byfn) : newSV(0));
 
     closure = punk_closure(aTHX_ prl_check_cb, cap);   /* takes cap; +1 coderef */
     hooks   = app_hash(aTHX_ app_hv(aTHX_ self), K_HOOKS);
     slot    = hv_fetchs(hooks, K_BEFORE_D, 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (slot && *slot && SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVAV)
         av_push((AV *)SvRV(*slot), closure);           /* AV owns it now */
     else
-        SvREFCNT_dec(closure);
+        SvREFCNT_dec(closure); /* # uncoverable statement */
 }
 
 /* "header:X-Api-Key" -> the env key it arrives under, as a mortal SV. */
@@ -215,10 +278,19 @@ static void prl_compile_routes(pTHX_ SV *self) {
     HV *by;
     SSize_t i, n;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(rlp && *rlp && SvROK(*rlp) && SvTYPE(SvRV(*rlp)) == SVt_PVAV))
-        return;
+        return; /* # uncoverable statement */
     rls = (AV *)SvRV(*rlp);
     n = av_len(rls) + 1;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!n) return;
     by = pk_route_index(aTHX_ self, "rate_limit");
 
@@ -234,40 +306,69 @@ static void prl_compile_routes(pTHX_ SV *self) {
         STRLEN elen = 0;
         AV *cap;
 
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!(rp && *rp && SvROK(*rp) && SvTYPE(SvRV(*rp)) == SVt_PVHV))
-            continue;
+            continue; /* # uncoverable statement */
         rr = (HV *)SvRV(*rp);
         m  = hv_fetchs(rr, K_METHOD, 0);
         p  = hv_fetchs(rr, K_PATH, 0);
         sp = hv_fetchs(rr, K_RATE_LIMIT, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err
+         # uncoverable condition left count:5 class:ignore_covered_err
+         # uncoverable condition left count:6 class:ignore_covered_err
+         # uncoverable condition left count:7 class:ignore_covered_err
+         # uncoverable condition left count:8 class:ignore_covered_err */
         if (!(m && *m && p && *p && sp && *sp
               && SvROK(*sp) && SvTYPE(SvRV(*sp)) == SVt_PVHV))
-            continue;
+            continue; /* # uncoverable statement */
         spec = (HV *)SvRV(*sp);
 
         where = sv_2mortal(newSVsv(*m));
         sv_catpvs(where, " ");
         sv_catsv(where, *p);
         he = hv_fetch_ent(by, where, 0, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!he)
-            croak("Punk: rate_limit on unknown route %s", SvPV_nolen(where));
+            croak("Punk: rate_limit on unknown route %s", SvPV_nolen(where)); /* # uncoverable statement */
         rec = (HV *)SvRV(HeVAL(he));
 
         x = hv_fetchs(spec, "limit", 0);
+        /*
+         # uncoverable branch false class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (x && *x) {
-            if (!SvOK(*x) || !looks_like_number(*x))
+            if (!SvOK(*x) || !looks_like_number(*x)) /* # uncoverable condition left count:1 class:ignore_covered_err */
                 croak("Punk: rate_limit limit on %s is a count of requests",
                       SvPV_nolen(where));
             limit = SvIV(*x);
         }
         x = hv_fetchs(spec, "window", 0);
-        if (x && *x) {
+        if (x && *x) { /* # uncoverable condition right count:2 class:ignore_covered_err */
+            /*
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (!SvOK(*x) || !looks_like_number(*x) || SvIV(*x) <= 0)
                 croak("Punk: rate_limit window on %s is a positive number "
                       "of seconds", SvPV_nolen(where));
             window = SvIV(*x);
         }
         x = hv_fetchs(spec, "by", 0);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (x && *x && SvOK(*x)) {
             if (SvROK(*x) && SvTYPE(SvRV(*x)) == SVt_PVCV) {
                 by_mode = 2; byfn = *x;
@@ -278,11 +379,16 @@ static void prl_compile_routes(pTHX_ SV *self) {
             else {
                 STRLEN bl;
                 const char *bs = SvPV(*x, bl);
-                if (bl > 7 && strnEQ(bs, "header:", 7)) {
+                if (bl > 7 && strnEQ(bs, "header:", 7)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     by_mode = 1;
                     envkeysv = prl_header_envkey(aTHX_ bs, bl);
                     envkey = SvPV(envkeysv, elen);
                 }
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition left count:2 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 else if (!(bl == 2 && memEQ(bs, "ip", 2)))
                     croak("Punk: rate_limit by on %s is 'ip', 'header:NAME' "
                           "or a coderef, not '%.*s'", SvPV_nolen(where),
@@ -290,6 +396,10 @@ static void prl_compile_routes(pTHX_ SV *self) {
             }
         }
         x = hv_fetchs(spec, "tag", 0);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (x && *x && SvOK(*x) && SvCUR(*x)) {
             tagsv = sv_2mortal(newSVsv(*x));
         }

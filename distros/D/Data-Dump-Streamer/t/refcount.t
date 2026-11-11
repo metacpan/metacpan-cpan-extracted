@@ -10,26 +10,27 @@ BEGIN {
 my $sv= "Foo";
 my $rav= [];
 my $rhv= {};
+my $stack_count= eval { Internals::stack_refcounted() & 1 } || 0;
 
-is sv_refcount($sv), 1, "sv_refcount";
-is refcount($rav),   1, "refcount av";
-is refcount($rhv),   1, "refcount hv";
+is sv_refcount($sv), 1 + $stack_count, "sv_refcount";
+is refcount($rav),   1,                "refcount av";
+is refcount($rhv),   1,                "refcount hv";
 
 is refcount(\$sv), 2, 'refcount \\$foo';
 
 my $ref= \$sv;
 
-is sv_refcount($sv), 2, 'sv_refcount after';
-is refcount(\$sv),   3, 'refcount after';
+is sv_refcount($sv), 2 + $stack_count, 'sv_refcount after';
+is refcount(\$sv),   3,                'refcount after';
 
 SKIP: {
     skip("No Weak Refs", 3)
         unless eval { weaken($ref) };
 
-    is isweak($ref),       1, "is weakened";
-    is sv_refcount($sv),   2, "weakened sv_refcount";
-    is weak_refcount($sv), 1, "weak_refcount";
-    is refcount(\$sv),     3, "weakened refcount";
+    is isweak($ref),       1,                "is weakened";
+    is sv_refcount($sv),   2 + $stack_count, "weakened sv_refcount";
+    is weak_refcount($sv), 1,                "weak_refcount";
+    is refcount(\$sv),     3,                "weakened refcount";
 }
 
 {

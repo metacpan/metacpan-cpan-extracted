@@ -1,5 +1,5 @@
 package Gears::Logger;
-$Gears::Logger::VERSION = '0.104';
+$Gears::Logger::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 

@@ -1,5 +1,40 @@
 Revision history for Database-BI
 
+0.023.0	Tue Nov 10 04:41:52 PM EST 2026
+	[ Enhancements ]
+	- Maps can outline the county each marker is in: tick Show county
+	  boundaries in the map panel (bounds=county).  The outlines come from
+	  OpenStreetMap, which is sent each marker's position rounded to about
+	  100 metres, and are remembered.  A checkbox on the map hides them
+	  (HTML::OSM 0.15).  A county is the level below a country's states, so
+	  India, Bangladesh and China get districts, Spain provinces, Kenya
+	  counties; map_bounds_ranks in the configuration sets other countries.
+	  With the heat layer on, the outlines go from green to red by the
+	  weight column's total in each county (or its rows), each step the same
+	  multiple, with a key to the colours on the map (HTML::OSM 0.16).  The
+	  map calls an outline a district, province and so on where it is one.
+	  When the markers are coloured the outlines take their colours instead.
+	  Each coloured outline is drawn inside its own edge, so neighbours of
+	  different colours show side by side, and a county holding markers of
+	  two colours gets a line of each (HTML::OSM 0.17).  A key gives its
+	  totals in round figures; each outline's popup has the exact one.
+	- Colour shade, in the map panel (shade=, shade_color=): fills each county
+	  outline in a shade of one colour, darker for a larger total of a
+	  column, with a key to the shades (boxes with HTML::OSM 0.18).
+	  With coloured markers each county is shaded in its markers' colour,
+	  stronger the further into that colour's rule (greenest furthest below a
+	  "less than" rule).  The key then lists every shade by size, and stands
+	  in for the markers' own key, which comes back while the outlines are
+	  hidden (HTML::OSM 0.19).
+	- Under a map with outlines, a list of the outlines holding more than one
+	  marker and of the markers in no outline, each with a link to its rows:
+	  a place looked up by an ambiguous name shows up there.  A note that
+	  some places have no outline yet links to their rows, and to try again.
+	- Add to each place, in the map panel (loc_text=): text added to the end
+	  of every place before it is looked up, such as "Virginia, USA" for a
+	  column of county names.  Remember columns keeps it too, and
+	  script/bi-geocode takes it as --text.
+
 0.022.0	Mon Nov  9 10:33:59 AM EST 2026
 	[ Enhancements ]
 	- American English: a browser asking for en-US gets the pages in American

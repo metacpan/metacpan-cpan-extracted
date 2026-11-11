@@ -23,6 +23,7 @@ t/participants.t
 t/side-effects.t
 t/synthetic-master.t
 t/roundtrip.t
+t/hostile.t
 testdata/alert.ics
 testdata/alert.je
 testdata/icalendar/alerts.ics

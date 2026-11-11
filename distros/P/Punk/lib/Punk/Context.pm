@@ -7,7 +7,7 @@ use Punk::Request;
 use Punk::Response;
 use Punk ();
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 1;
 

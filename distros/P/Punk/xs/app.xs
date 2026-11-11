@@ -18,13 +18,16 @@ new(class, ...)
         int i;
         for (i = 1; i + 1 < items; i += 2) {
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (kl == 6 && memEQ(k, K_CALLER, 6))
                 (void)hv_stores(h, K_CALLER, newSVsv(ST(i + 1)));
         }
         if (!hv_exists(h, K_CALLER, 6)) (void)hv_stores(h, K_CALLER, newSV(0));
         rc = sv_2mortal(newSVpvs(PK_ROUTER));
         router = pcx_call_meth(aTHX_ rc, "new", NULL, 0, 1);
-        (void)hv_stores(h, K_ROUTER, router ? router : newSV(0));
+        (void)hv_stores(h, K_ROUTER, router ? router : newSV(0)); /* # uncoverable condition left count:1 class:ignore_covered_err */
         (void)hv_stores(h, K_MOUNTS,     newRV_noinc((SV *)newAV()));
         (void)hv_stores(h, K_VIEWS,      newRV_noinc((SV *)newAV()));
         (void)hv_stores(h, K_DATABASES,  newRV_noinc((SV *)newHV()));
@@ -50,7 +53,7 @@ caller_class(self)
     CODE:
     {
         SV *c = app_get(aTHX_ app_hv(aTHX_ self), K_CALLER);
-        RETVAL = c ? newSVsv(c) : &PL_sv_undef;
+        RETVAL = c ? newSVsv(c) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -93,7 +96,7 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
         }
         if (SvOK(opts)) {
             HV *oh; HE *he; SV **vp;
-            if (!(SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV))
+            if (!(SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
                 croak("Punk: route options must be a hashref");
             oh = (HV *)SvRV(opts);
             hv_iterinit(oh);
@@ -113,6 +116,8 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * and not the memory backstop. Recorded now, stamped onto the
              * compiled record at to_app (the ws/sse/compress pattern). */
             vp = hv_fetchs(oh, K_MAX_BODY, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp)) {
                 HV *rec = newHV();
                 (void)hv_stores(rec, K_METHOD,   newSVsv(method));
@@ -129,7 +134,7 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * PSGI server could. There is no compress => 1: compressing is
              * the server's default answer for a route that says nothing. */
             vp = hv_fetchs(oh, K_COMPRESS, 0);
-            if (vp && *vp && !SvTRUE(*vp)) {
+            if (vp && *vp && !SvTRUE(*vp)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 HV *rec = newHV();
                 (void)hv_stores(rec, K_METHOD, newSVsv(method));
                 (void)hv_stores(rec, K_PATH,   newSVsv(path));
@@ -148,6 +153,8 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * the safe direction, and this is how an application says the
              * page is public anyway. */
             vp = hv_fetchs(oh, K_SITEMAP, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp)) {
                 HV *rec = newHV();
                 (void)hv_stores(rec, K_METHOD,  newSVsv(method));
@@ -170,6 +177,8 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * option that looks like it worked is worse than one that
              * failed. */
             vp = hv_fetchs(oh, K_ETAG, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp)) {
                 HV *rec;
                 int is_cv = (SvROK(*vp) && SvTYPE(SvRV(*vp)) == SVt_PVCV);
@@ -200,9 +209,11 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * timestamp to derive - inventing one (render time, boot time)
              * would manufacture false freshness. */
             vp = hv_fetchs(oh, K_LAST_MODIFIED, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp)) {
                 HV *rec;
-                int is_cv = (SvROK(*vp) && SvTYPE(SvRV(*vp)) == SVt_PVCV);
+                int is_cv = (SvROK(*vp) && SvTYPE(SvRV(*vp)) == SVt_PVCV); /* # uncoverable condition right count:2 class:ignore_covered_err */
                 if (!is_cv && SvTRUE(*vp))
                     croak("Punk: last_modified on %s %s takes a coderef "
                           "returning an epoch; there is no body form - a "
@@ -223,6 +234,9 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * honoured on every POST means a cache write on every POST, and
              * most POSTs do not need one. */
             vp = hv_fetchs(oh, K_IDEMPOTENT, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp) && SvTRUE(*vp)) {
                 HV *rec = newHV();
                 (void)hv_stores(rec, K_METHOD, newSVsv(method));
@@ -236,7 +250,7 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * duplicate croaks naming both routes. What a name may be is
              * checked HERE, so a bad one fails on the line that wrote it. */
             vp = hv_fetchs(oh, K_NAME, 0);
-            if (vp && *vp) {
+            if (vp && *vp) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 HV *rec;
                 pk_url_check_name(aTHX_ *vp, "route", method, path);
                 rec = newHV();
@@ -247,6 +261,8 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
                         newRV_noinc((SV *)rec));
             }
             vp = hv_fetchs(oh, K_VALIDATE, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp)) {
                 HV *rec = newHV();
                 (void)hv_stores(rec, K_METHOD,   newSVsv(method));
@@ -266,6 +282,8 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
              * wrote it; it is compiled into a guard at to_app, before the
              * `validate` guard, so a refused request never parses a body. */
             vp = hv_fetchs(oh, K_RATE_LIMIT, 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvOK(*vp)) {
                 HV *spec = NULL;
                 if (SvROK(*vp) && SvTYPE(SvRV(*vp)) == SVt_PVHV) {
@@ -291,18 +309,25 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
                           "options or a count, not a %s",
                           SvPV_nolen(method), SvPV_nolen(path),
                           sv_reftype(SvRV(*vp), 0));
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 else if (SvTRUE(*vp)) {
                     /* the count shorthand: `rate_limit => 5` is five a
                      * minute, the window every other spelling defaults to */
+                    # uncoverable branch false class:ignore_covered_err
+                    # uncoverable condition right count:1 class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
                     if (!looks_like_number(*vp) || SvIV(*vp) <= 0)
                         croak("Punk: rate_limit on %s %s takes a positive "
                               "count or a hashref of options, not '%s'",
                               SvPV_nolen(method), SvPV_nolen(path),
                               SvPV_nolen(*vp));
-                    spec = newHV();
-                    (void)hv_stores(spec, "limit", newSViv(SvIV(*vp)));
+                    spec = newHV(); /* # uncoverable statement class:ignore_covered_err */
+                    (void)hv_stores(spec, "limit", newSViv(SvIV(*vp))); /* # uncoverable statement class:ignore_covered_err */
                 }
                 /* rate_limit => 0 is what a route says by saying nothing */
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (spec) {
                     HV *rec = newHV();
                     (void)hv_stores(rec, K_METHOD, newSVsv(method));
@@ -320,7 +345,9 @@ route(self, method, path, target, guards = &PL_sv_undef, opts = &PL_sv_undef)
         argv[6] = sv_2mortal(newSVpvs(K_GUARDS));
         argv[7] = SvOK(guards) ? guards
                                : sv_2mortal(newRV_noinc((SV *)newAV()));
-        r = pcx_call_meth(aTHX_ router ? router : &PL_sv_undef, "add", argv, 8, 1);
+        r = pcx_call_meth(aTHX_ router ? router : &PL_sv_undef, "add", argv, 8, 1); /* # uncoverable condition left count:1 class:ignore_covered_err */
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (r) SvREFCNT_dec(r);
         RETVAL = newSVsv(self);
     }
@@ -344,6 +371,8 @@ under(self, prefix, guard = &PL_sv_undef)
         argv[5] = sv_2mortal(newRV_noinc((SV *)g));
         RETVAL = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_SCOPE)),
                                "new", argv, 6, 1);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!RETVAL) RETVAL = &PL_sv_undef;
     }
     OUTPUT:
@@ -386,14 +415,14 @@ websocket(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
          * key must not quietly take the check away. */
         {
             SV **ov = oh ? hv_fetchs(oh, "origin", 0) : NULL;
-            if (ov && *ov) {
+            if (ov && *ov) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 SV *v = *ov;
                 if (!SvOK(v))
                     croak("Punk: websocket origin is undef - spell it 0 to "
                           "serve any origin, or name the ones you answer as");
                 else if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVCV)
                     origin = newSVsv(v);
-                else if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV)
+                else if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV) /* # uncoverable condition right count:2 class:ignore_covered_err */
                     origin = newRV_noinc(
                         (SV *)pk_host_allow_av(aTHX_ v, "websocket origin"));
                 else if (!SvTRUE(v))
@@ -418,7 +447,7 @@ websocket(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
         {
             SV **nv = oh ? hv_fetchs(oh, K_NAME, 0) : NULL;
             int nargs = 4;
-            if (nv && *nv) {
+            if (nv && *nv) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 HV *ro = newHV();
                 pk_url_check_name(aTHX_ *nv, "websocket", argv[0], path);
                 (void)hv_stores(ro, K_NAME, newSVsv(*nv));
@@ -427,6 +456,8 @@ websocket(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
             }
             r = pcx_call_meth(aTHX_ self, "route", argv, nargs, 1);
         }
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (r) SvREFCNT_dec(r);
         rec = newHV();
         (void)hv_stores(rec, K_PATH, newSVsv(path));
@@ -479,11 +510,11 @@ sse(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
          * and a named sse route is a named GET route like any other. */
         argv[0] = sv_2mortal(newSVpvs("GET")); argv[1] = path;
         argv[2] = target;
-        argv[3] = SvOK(guards) ? guards : sv_2mortal(newRV_noinc((SV *)newAV()));
+        argv[3] = SvOK(guards) ? guards : sv_2mortal(newRV_noinc((SV *)newAV())); /* # uncoverable condition right count:1 class:ignore_covered_err */
         {
             SV **nv = oh ? hv_fetchs(oh, K_NAME, 0) : NULL;
             int nargs = 4;
-            if (nv && *nv) {
+            if (nv && *nv) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 HV *ro = newHV();
                 pk_url_check_name(aTHX_ *nv, "sse", argv[0], path);
                 (void)hv_stores(ro, K_NAME, newSVsv(*nv));
@@ -492,6 +523,8 @@ sse(self, path, target, opts = &PL_sv_undef, guards = &PL_sv_undef)
             }
             r = pcx_call_meth(aTHX_ self, "route", argv, nargs, 1);
         }
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (r) SvREFCNT_dec(r);
         rec = newHV();
         (void)hv_stores(rec, K_PATH, newSVsv(path));
@@ -521,7 +554,7 @@ cors(self, ...)
         HV *h = app_hv(aTHX_ self);
         HV *cfg = newHV();
         int i;
-        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             HE *e; HV *given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
@@ -534,7 +567,7 @@ cors(self, ...)
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
             (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
-        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             SvREFCNT_dec((SV *)cfg);
             (void)hv_delete(h, K_CORS, (I32)strlen(K_CORS), G_DISCARD);
         }
@@ -544,11 +577,15 @@ cors(self, ...)
              * misconfiguration. Naming origins is the only safe spelling. */
             SV **cr = hv_fetchs(cfg, "credentials", 0);
             SV **og = hv_fetchs(cfg, "origins", 0);
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (cr && *cr && SvTRUE(*cr)) {
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 int named = og && *og && SvOK(*og);
                 if (named && !SvROK(*og)) {
                     STRLEN ol; const char *o = SvPV_const(*og, ol);
-                    if (ol == 1 && *o == '*') named = 0;
+                    if (ol == 1 && *o == '*') named = 0; /* # uncoverable condition right count:2 class:ignore_covered_err */
                 }
                 if (!named) {
                     SvREFCNT_dec((SV *)cfg);
@@ -578,7 +615,7 @@ headers(self, ...)
         HV *h = app_hv(aTHX_ self);
         HV *cfg = newHV();
         int i;
-        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             HE *e; HV *given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
@@ -591,7 +628,7 @@ headers(self, ...)
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
             (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
-        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             SvREFCNT_dec((SV *)cfg);
             (void)hv_delete(h, K_HEADERS, (I32)strlen(K_HEADERS), G_DISCARD);
         }
@@ -603,7 +640,7 @@ headers(self, ...)
             while ((e = hv_iternext(cfg))) {
                 STRLEN kl; const char *k = HePV(e, kl);
                 SV *v = hv_iterval(cfg, e);
-                if (!kl || v == NULL) {
+                if (!kl || v == NULL) { /* # uncoverable condition left count:2 class:ignore_covered_err */
                     SvREFCNT_dec((SV *)cfg);
                     croak("Punk: headers needs header names as keys");
                 }
@@ -672,7 +709,7 @@ proxy(self, ...)
             "trust", "for_header", "proto_header", "host_header",
             "port_header", NULL
         };
-        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             HE *e; HV *given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
@@ -686,7 +723,7 @@ proxy(self, ...)
             (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
 
-        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             SvREFCNT_dec((SV *)cfg);
             (void)hv_delete(h, K_PROXY, (I32)strlen(K_PROXY), G_DISCARD);
         }
@@ -703,7 +740,7 @@ proxy(self, ...)
                 STRLEN kl; const char *k = HePV(e, kl);
                 int j, known = 0;
                 for (j = 0; PP_OPTS[j]; j++)
-                    if (kl == strlen(PP_OPTS[j]) && memEQ(k, PP_OPTS[j], kl))
+                    if (kl == strlen(PP_OPTS[j]) && memEQ(k, PP_OPTS[j], kl)) /* # uncoverable condition right count:2 class:ignore_covered_err */
                         { known = 1; break; }
                 if (!known) {
                     SV *msg = sv_2mortal(newSVpvf(
@@ -746,7 +783,7 @@ auth(self, ...)
         (void)hv_stores(fields, "password", newSVpvs("password_hash"));
         (void)hv_stores(fields, "verified", newSVpvs("verified"));
         (void)hv_stores(cfg, "fields", newRV_noinc((SV *)fields));
-        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             HE *e; HV *given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
@@ -759,7 +796,7 @@ auth(self, ...)
             STRLEN kl; const char *k = SvPV_const(ST(i), kl);
             (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
-        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             SvREFCNT_dec((SV *)cfg);
             (void)hv_delete(h, K_AUTH, (I32)strlen(K_AUTH), G_DISCARD);
         }
@@ -780,11 +817,13 @@ auth(self, ...)
             }
             {   /* a fields hashref merges over the defaults */
                 SV **f = hv_fetchs(cfg, "fields", 0);
+                # uncoverable condition right count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
                 if (f && *f && SvRV(*f) != (SV *)fields) {
                     HV *merged = newHV(), *given;
                     HE *fe;
                     int j;
-                    if (!(SvROK(*f) && SvTYPE(SvRV(*f)) == SVt_PVHV)) {
+                    if (!(SvROK(*f) && SvTYPE(SvRV(*f)) == SVt_PVHV)) { /* # uncoverable condition left count:2 class:ignore_covered_err */
                         SvREFCNT_dec((SV *)cfg);
                         croak("Punk: auth fields must be a hashref");
                     }
@@ -816,13 +855,20 @@ auth(self, ...)
             }
             {
                 SV **it = hv_fetchs(cfg, "iterations", 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (it && *it && SvOK(*it) && SvIV(*it) <= 0) {
                     SvREFCNT_dec((SV *)cfg);
                     croak("Punk: auth iterations must be positive");
                 }
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
+                # uncoverable condition left count:5 class:ignore_covered_err
+                # uncoverable condition right count:5 class:ignore_covered_err
                 if (it && *it && SvOK(*it)
                     && (SvIV(*it) < PWD_MIN_ITERATIONS
-                        || SvIV(*it) > PWD_MAX_ITERATIONS)) {
+                        || SvIV(*it) > PWD_MAX_ITERATIONS)) { /* # uncoverable statement class:ignore_covered_err */
                     SvREFCNT_dec((SV *)cfg);
                     croak("Punk: auth iterations must be between %d and %d",
                           PWD_MIN_ITERATIONS, PWD_MAX_ITERATIONS);
@@ -837,24 +883,33 @@ auth(self, ...)
              * an error, not a silence. */
             {
                 SV **sq = hv_fetchs(cfg, "sqitch", 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (sq && *sq && SvTRUE(*sq)) {
                     SV *dir, *argv[4], *r;
                     SV **punkpm = hv_fetchs(GvHV(PL_incgv), "Punk.pm", 0);
-                    if (!pk_require_once(aTHX_ "Punk::Plugin::Sqitch", FALSE)) {
-                        SvREFCNT_dec((SV *)cfg);
-                        croak("Punk: auth sqitch => 1 needs Punk-Sqitch "
+                    if (!pk_require_once(aTHX_ "Punk::Plugin::Sqitch", FALSE)) { /* # uncoverable branch true class:ignore_covered_err */
+                        SvREFCNT_dec((SV *)cfg); /* # uncoverable statement class:ignore_covered_err */
+                        croak("Punk: auth sqitch => 1 needs Punk-Sqitch " /* # uncoverable statement class:ignore_covered_err */
                               "(Punk::Plugin::Sqitch) installed: %s",
-                              SvPV_nolen(ERRSV));
+                              SvPV_nolen(ERRSV)); /* # uncoverable statement class:ignore_covered_err */
                     }
+                    # uncoverable branch true
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
                     if (!(punkpm && *punkpm && SvOK(*punkpm))) {
-                        SvREFCNT_dec((SV *)cfg);
-                        croak("Punk: cannot find Punk.pm in %%INC to locate "
+                        SvREFCNT_dec((SV *)cfg); /* # uncoverable statement */
+                        croak("Punk: cannot find Punk.pm in %%INC to locate " /* # uncoverable statement */
                               "the punk_auth Sqitch project");
                     }
                     /* .../Punk.pm -> .../Punk/Auth/sqitch */
                     dir = sv_2mortal(newSVsv(*punkpm));
                     {
                         STRLEN dl; const char *dp = SvPV_const(dir, dl);
+                        # uncoverable branch false
+                        # uncoverable condition right count:1 class:ignore_covered_err
+                        # uncoverable condition right count:2 class:ignore_covered_err
                         if (dl >= 3 && memEQ(dp + dl - 3, ".pm", 3))
                             SvCUR_set(dir, dl - 3);
                     }
@@ -878,6 +933,8 @@ auth(self, ...)
                                     "project", argv5, 5, 1);
                         }
                     }
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (r) SvREFCNT_dec(r);
                     (void)hv_delete(cfg, "sqitch", 6, G_DISCARD);
                 }
@@ -902,6 +959,8 @@ auth_guard(self, ...)
         AV *cap;
         int i;
         static const char *known[] = { "role", "verified", "on_denied" };
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
             HE *e; HV *given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
@@ -934,13 +993,15 @@ auth_guard(self, ...)
             {   /* on_denied is '403', '404' or a coderef - anything else is
                  * a typo croaking now, not a request-time surprise */
                 SV **od = hv_fetchs(opts, "on_denied", 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (od && *od && SvOK(*od)) {
                     int fine = SvROK(*od)
                                && SvTYPE(SvRV(*od)) == SVt_PVCV;
                     if (!fine && !SvROK(*od)) {
                         STRLEN ol; const char *o = SvPV_const(*od, ol);
                         fine = ol == 3
-                               && (memEQ(o, "403", 3) || memEQ(o, "404", 3));
+                               && (memEQ(o, "403", 3) || memEQ(o, "404", 3)); /* # uncoverable condition left count:2 class:ignore_covered_err */
                     }
                     if (!fine) {
                         SvREFCNT_dec((SV *)opts);
@@ -974,7 +1035,7 @@ headers_scoped(self, prefix, pairs)
         HV *cfg = newHV();
         HV *rec;
         HE *e; HV *given;
-        if (!(SvROK(pairs) && SvTYPE(SvRV(pairs)) == SVt_PVHV)) {
+        if (!(SvROK(pairs) && SvTYPE(SvRV(pairs)) == SVt_PVHV)) { /* # uncoverable condition left count:2 class:ignore_covered_err */
             SvREFCNT_dec((SV *)cfg);
             croak("Punk: headers_scoped takes a prefix and a hashref");
         }
@@ -983,17 +1044,22 @@ headers_scoped(self, prefix, pairs)
         while ((e = hv_iternext(given))) {
             STRLEN kl; const char *k = HePV(e, kl);
             SV *v = hv_iterval(given, e);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (!kl || v == NULL) {
-                SvREFCNT_dec((SV *)cfg);
-                croak("Punk: headers needs header names as keys");
+                SvREFCNT_dec((SV *)cfg); /* # uncoverable statement */
+                croak("Punk: headers needs header names as keys"); /* # uncoverable statement */
             }
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (SvROK(v)) {
-                SV *msg = sv_2mortal(newSVpvf(
+                SV *msg = sv_2mortal(newSVpvf( /* # uncoverable statement */
                     "Punk: headers value for '%.*s' must be a string "
                     "(or undef to drop it here), not a reference",
                     (int)kl, k));
-                SvREFCNT_dec((SV *)cfg);
-                croak("%s", SvPV_nolen(msg));
+                SvREFCNT_dec((SV *)cfg); /* # uncoverable statement */
+                croak("%s", SvPV_nolen(msg)); /* # uncoverable statement */
             }
             (void)hv_store(cfg, k, (I32)kl, newSVsv(v), 0);
         }
@@ -1024,7 +1090,7 @@ csrf(self, ...)
         (void)hv_stores(cfg, "cookie",   newSVpvs("csrf"));
         (void)hv_stores(cfg, "keep",     newSViv(1));
         (void)hv_stores(cfg, "max_body", newSViv(65536));
-        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+        if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             HE *e; HV *given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
@@ -1038,7 +1104,7 @@ csrf(self, ...)
             (void)hv_store(cfg, k, (I32)kl, newSVsv(ST(i + 1)), 0);
         }
         /* `csrf 0` turns it back off */
-        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) {
+        if (items == 2 && !SvROK(ST(1)) && !SvTRUE(ST(1))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             SvREFCNT_dec((SV *)cfg);
             (void)hv_delete(h, K_CSRF, (I32)strlen(K_CSRF), G_DISCARD);
         }
@@ -1049,11 +1115,17 @@ csrf(self, ...)
              * rather than silently matching nothing. */
             SV **ck = hv_fetchs(cfg, "cookie", 0);
             SV **hd = hv_fetchs(cfg, "header", 0);
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (ck && *ck && SvOK(*ck) && !pk_cookie_safe(aTHX_ *ck)) {
                 SvREFCNT_dec((SV *)cfg);
                 croak("Punk: csrf `cookie` may not contain ';' or a control "
                       "character");
             }
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (hd && *hd && SvOK(*hd) && SvCUR(*hd) > 120) {
                 SvREFCNT_dec((SV *)cfg);
                 croak("Punk: csrf `header` name is longer than 120 bytes");
@@ -1079,12 +1151,12 @@ ua(self, ...)
     {
         HV *h   = app_hv(aTHX_ self);
         HV *uas = app_hash(aTHX_ h, K_UA);
-        if (items == 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) {
+        if (items == 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             STRLEN nl; const char *n = SvPV_const(ST(1), nl);
             (void)hv_store(uas, n, (I32)nl,
                 newRV_noinc((SV *)newHVhv((HV *)SvRV(ST(2)))), 0);
         }
-        else if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
+        else if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             (void)hv_stores(uas, K_DEFAULT,
                 newRV_noinc((SV *)newHVhv((HV *)SvRV(ST(1)))));
         }
@@ -1119,13 +1191,15 @@ session(self, ...)
         (void)hv_stores(cfg, "path",     newSVpvs("/"));
         (void)hv_stores(cfg, "httponly", newSViv(1));
         (void)hv_stores(cfg, "samesite", newSVpvs("Lax"));
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
             HE *e; given = (HV *)SvRV(ST(1));
             hv_iterinit(given);
             while ((e = hv_iternext(given))) {
                 STRLEN kl; const char *k = HePV(e, kl); SV *v = hv_iterval(given, e);
                 ps_check_key(aTHX_ k, kl, cfg);
-                if (kl == 7 && memEQ(k, "expires", 7))
+                if (kl == 7 && memEQ(k, "expires", 7)) /* # uncoverable condition right count:2 class:ignore_covered_err */
                     (void)hv_stores(cfg, "max_age", newSViv(ps_parse_duration(aTHX_ v)));
                 else
                     (void)hv_store(cfg, k, (I32)kl, newSVsv(v), 0);
@@ -1150,7 +1224,7 @@ session(self, ...)
          * refused to seal one. */
         {
             SV **sp = hv_fetchs(cfg, "secret", 0);
-            if (!sp || !*sp || !SvOK(*sp) || !SvCUR(*sp)) {
+            if (!sp || !*sp || !SvOK(*sp) || !SvCUR(*sp)) { /* # uncoverable condition left count:2 class:ignore_covered_err */
                 SvREFCNT_dec((SV *)cfg);
                 croak("Punk: `session` needs a non-empty secret - without one "
                       "the cookie is signed with an empty key and anyone can "
@@ -1164,6 +1238,8 @@ session(self, ...)
                                                  "samesite", NULL };
             for (i = 0; attrs[i]; i++) {
                 SV **ap = hv_fetch(cfg, attrs[i], (I32)strlen(attrs[i]), 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (ap && *ap && SvOK(*ap) && !pk_cookie_safe(aTHX_ *ap)) {
                     SvREFCNT_dec((SV *)cfg);
                     croak("Punk: session `%s` may not contain ';' or a "
@@ -1187,12 +1263,23 @@ logging(self, ...)
         HV *h = app_hv(aTHX_ self);
         HV *cfg = newHV();
         int i;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
-            HE *e; HV *g = (HV *)SvRV(ST(1));
-            hv_iterinit(g);
+            HE *e; HV *g = (HV *)SvRV(ST(1)); /* # uncoverable statement */
+            hv_iterinit(g); /* # uncoverable statement */
+            # uncoverable statement
+            # uncoverable branch true
+            # uncoverable branch false
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
             while ((e = hv_iternext(g))) {
-                STRLEN kl; const char *k = HePV(e, kl);
-                (void)hv_store(cfg, k, (I32)kl, newSVsv(hv_iterval(g, e)), 0);
+                STRLEN kl; const char *k = HePV(e, kl); /* # uncoverable statement */
+                (void)hv_store(cfg, k, (I32)kl, newSVsv(hv_iterval(g, e)), 0); /* # uncoverable statement */
             }
         }
         else for (i = 1; i + 1 < items; i += 2) {
@@ -1205,6 +1292,10 @@ logging(self, ...)
              * somebody tries to log. */
             SV **to = hv_fetchs(cfg, "to", 0);
             GV *named = NULL;
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:5 class:ignore_covered_err
+            # uncoverable condition right count:6 class:ignore_covered_err
             if (to && *to && SvOK(*to) && !SvROK(*to)
                 && SvTYPE(*to) != SVt_PVGV && SvCUR(*to)) {
                 /* the NAME of an open handle first - `to: STDERR` is what
@@ -1214,6 +1305,10 @@ logging(self, ...)
             }
             if (named)
                 (void)hv_stores(cfg, "to", newRV_inc((SV *)named));
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:5 class:ignore_covered_err
+            # uncoverable condition right count:6 class:ignore_covered_err
             else if (to && *to && SvOK(*to) && !SvROK(*to)
                 && SvTYPE(*to) != SVt_PVGV && SvCUR(*to)) {
                 PerlIO *fp = PerlIO_open(SvPV_nolen(*to), "a");
@@ -1263,8 +1358,8 @@ api(self, spec, opts = &PL_sv_undef, scope = &PL_sv_undef)
         argv[6] = sv_2mortal(newSVpvs(K_GUARDS)); argv[7] = sv_2mortal(grd);
         mount = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_MOUNT_OA)),
                               "new", argv, 8, 1);
-        av_push(app_av(aTHX_ h, K_API_MOUNTS), mount ? mount : newSV(0));
-        RETVAL = mount ? newSVsv(mount) : &PL_sv_undef;
+        av_push(app_av(aTHX_ h, K_API_MOUNTS), mount ? mount : newSV(0)); /* # uncoverable condition left count:1 class:ignore_covered_err */
+        RETVAL = mount ? newSVsv(mount) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -1282,9 +1377,16 @@ docs(self, path, mount = &PL_sv_undef, opts = &PL_sv_undef)
         HV *rec = newHV();
         /* (mount, opts) = (undef, mount) if mount is a plain hashref and !opts
          * - a blessed mount object (ref ne 'HASH') is never the opts slot */
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
         if (SvROK(mount) && SvTYPE(SvRV(mount)) == SVt_PVHV
             && !SvOBJECT(SvRV(mount)) && !SvOK(opts)) {
-            opts = mount; mount = &PL_sv_undef;
+            opts = mount; mount = &PL_sv_undef; /* # uncoverable statement */
         }
         (void)hv_stores(rec, K_PATH,  newSVsv(path));
         (void)hv_stores(rec, K_MOUNT, newSVsv(mount));
@@ -1412,7 +1514,7 @@ views(self, name, opts = &PL_sv_undef)
         HV *h = app_hv(aTHX_ self);
         AV *pair = newAV();
         av_push(pair, newSVsv(name));
-        av_push(pair, (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
+        av_push(pair, (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) /* # uncoverable condition right count:2 class:ignore_covered_err */
             ? newRV_noinc((SV *)newHVhv((HV *)SvRV(opts)))
             : newRV_noinc((SV *)newHV()));
         av_push(app_av(aTHX_ h, K_VIEWS), newRV_noinc((SV *)pair));
@@ -1429,7 +1531,7 @@ database(self, ...)
     {
         HV *h  = app_hv(aTHX_ self);
         HV *db = app_hash(aTHX_ h, K_DATABASES);
-        if (items == 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) {
+        if (items == 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             STRLEN nl; const char *n = SvPV_const(ST(1), nl);
             (void)hv_store(db, n, (I32)nl,
                 newRV_noinc((SV *)newHVhv((HV *)SvRV(ST(2)))), 0);
@@ -1503,13 +1605,18 @@ on_compile(self, code, owner = &PL_sv_undef)
         HV *h = app_hv(aTHX_ self);
         AV *rec;
         SV **cp = hv_fetchs(h, K_COMPILED, 0);
-        if (!(SvROK(code) && SvTYPE(SvRV(code)) == SVt_PVCV))
+        if (!(SvROK(code) && SvTYPE(SvRV(code)) == SVt_PVCV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Punk: on_compile takes a coderef");
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (cp && *cp && SvOK(*cp) && SvIV(*cp) > 0)
             croak("Punk: on_compile after to_app - the application is already "
                   "compiled, so the callback would never run");
         rec = newAV();
         av_push(rec, newSVsv(code));
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         av_push(rec, SvOK(owner) ? newSVsv(owner)
                                  : newSVpv(CopSTASHPV(PL_curcop), 0));
         av_push(app_av(aTHX_ h, K_ON_COMPILE), newRV_noinc((SV *)rec));
@@ -1571,6 +1678,9 @@ hook(self, name, code)
         HV *hooks = app_hash(aTHX_ h, K_HOOKS);
         STRLEN nl; const char *n = SvPV_const(name, nl);
         SV **slot = hv_fetch(hooks, n, (I32)nl, 0);
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (!(slot && *slot && SvROK(*slot) && SvTYPE(SvRV(*slot)) == SVt_PVAV))
             croak("Punk: unknown hook '%s' (before_request, before_dispatch, "
                   "after_dispatch, after_response, before_render)", n);
@@ -1628,15 +1738,17 @@ helper(self, name, code, owner = &PL_sv_undef)
         STRLEN nl; const char *n = SvPV_const(name, nl);
         HV *ctxstash = gv_stashpvs(PK_CONTEXT, 0);
         SV **have; HV *rec;
-        if (ctxstash && gv_fetchmethod_autoload(ctxstash, n, 0))
+        if (ctxstash && gv_fetchmethod_autoload(ctxstash, n, 0)) /* # uncoverable condition right count:1 class:ignore_covered_err */
             croak("Punk: helper '%s' collides with a Punk::Context method", n);
         have = hv_fetch(helpers, n, (I32)nl, 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (have && *have && SvROK(*have)) {
             SV **o = hv_fetchs((HV *)SvRV(*have), K_OWNER, 0);
             croak("Punk: helper '%s' is registered by both %s and %s", n,
                   (o && *o) ? SvPV_nolen(*o) : "?",
-                  SvOK(owner) ? SvPV_nolen(owner)
-                              : CopSTASHPV(PL_curcop));
+                  SvOK(owner) ? SvPV_nolen(owner) /* # uncoverable condition right count:1 class:ignore_covered_err */
+                              : CopSTASHPV(PL_curcop)); /* # uncoverable statement */
         }
         rec = newHV();
         (void)hv_stores(rec, K_CODE, newSVsv(code));
@@ -1673,16 +1785,23 @@ install_kw(self, name, code, owner = &PL_sv_undef)
                 : sv_2mortal(newSVpv(CopSTASHPV(PL_curcop), 0));
         SV **have; HV *rec; int done = 0;
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!caller || !SvOK(caller))
-            croak("Punk: install_kw('%s') needs an application class", n);
-        if (!nl || !SvROK(code) || SvTYPE(SvRV(code)) != SVt_PVCV)
+            croak("Punk: install_kw('%s') needs an application class", n); /* # uncoverable statement */
+        if (!nl || !SvROK(code) || SvTYPE(SvRV(code)) != SVt_PVCV) /* # uncoverable condition left count:3 class:ignore_covered_err */
             croak("Punk: install_kw needs a name and a code reference");
         if (pki_is_dsl(n))
             croak("Punk: keyword '%s' is part of the Punk DSL", n);
 
         have = hv_fetch(kws, n, (I32)nl, 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (have && *have && SvROK(*have)) {
             SV **o = hv_fetchs((HV *)SvRV(*have), K_OWNER, 0);
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (o && *o && sv_eq(*o, own)) done = 1;      /* the same owner */
             else croak("Punk: keyword '%s' is installed by both %s and %s", n,
                        (o && *o) ? SvPV_nolen(*o) : "?", SvPV_nolen(own));
@@ -1729,8 +1848,13 @@ keyword(self, name, ...)
             croak("Punk: keyword '%s' is part of the Punk DSL - call the "
                   "registrar method", n);
         have = hv_fetch(kws, n, (I32)nl, 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (have && *have && SvROK(*have))
             code = hv_fetchs((HV *)SvRV(*have), K_CODE, 0);
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (!(code && *code && SvROK(*code)
               && SvTYPE(SvRV(*code)) == SVt_PVCV))
             croak("Punk: no keyword '%s' is installed on this application - "
@@ -1765,6 +1889,8 @@ has_keyword(self, name)
         SV **have = nl ? hv_fetch(kws, n, (I32)nl, 0) : NULL;
         SV **o = (have && *have && SvROK(*have))
                  ? hv_fetchs((HV *)SvRV(*have), K_OWNER, 0) : NULL;
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (!(o && *o && SvOK(*o))) XSRETURN_UNDEF;
         RETVAL = newSVsv(*o);
     }
@@ -1780,7 +1906,7 @@ plugin(self, name, opts = &PL_sv_undef)
     CODE:
     {
         STRLEN nl; const char *n = SvPV_const(name, nl);
-        int plus = (nl > 0 && n[0] == '+');
+        int plus = (nl > 0 && n[0] == '+'); /* # uncoverable condition right count:1 class:ignore_covered_err */
         SV *classsv = plus ? newSVpvn(n + 1, nl - 1)
                            : newSVpvf("Punk::Plugin::%.*s", (int)nl, n);
         STRLEN cl; const char *class = SvPV_const(classsv, cl);
@@ -1790,7 +1916,7 @@ plugin(self, name, opts = &PL_sv_undef)
         if (!(stash && gv_fetchmethod_autoload(stash, "register", 0))) {
             SV *req = pk_require_src(aTHX_ class);
             eval_sv(req, G_SCALAR);
-            if (SvTRUE(ERRSV))
+            if (SvTRUE(ERRSV)) /* # uncoverable condition right count:1 class:ignore_covered_err */
                 croak("Punk: plugin '%s' (%s) failed to load: %s",
                       n, class, SvPV_nolen(ERRSV));
             stash = gv_stashpvn(class, cl, 0);
@@ -1801,6 +1927,8 @@ plugin(self, name, opts = &PL_sv_undef)
         argv[0] = self;
         argv[1] = SvOK(opts) ? opts : sv_2mortal(newRV_noinc((SV *)newHV()));
         r = pcx_call_meth(aTHX_ p, "register", argv, 2, 1);
+        # uncoverable branch false class:ignore_covered_err
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (r) SvREFCNT_dec(r);
         RETVAL = newSVsv(self);
     }
@@ -1817,9 +1945,9 @@ config(self, ...)
         HV *h = app_hv(aTHX_ self);
         if (items <= 1) {
             SV *cfg = app_get(aTHX_ h, K_CONFIG);
-            if (cfg && SvOK(cfg)) {
+            if (cfg && SvOK(cfg)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 SV *r = pcx_call_meth(aTHX_ cfg, K_CONFIG, NULL, 0, 1);
-                RETVAL = r ? r : &PL_sv_undef;
+                RETVAL = r ? r : &PL_sv_undef; /* # uncoverable condition left count:1 class:ignore_covered_err */
             }
             else RETVAL = &PL_sv_undef;
         }
@@ -1838,9 +1966,11 @@ config(self, ...)
             cfg = pcx_call_meth(aTHX_ sv_2mortal(newSVpvs(PK_CONFIG)),
                                 "load", av2, m, 1);
             Safefree(av2);
-            (void)hv_stores(h, K_CONFIG, cfg ? cfg : newSV(0));
-            aa[0] = cfg ? cfg : &PL_sv_undef;
+            (void)hv_stores(h, K_CONFIG, cfg ? cfg : newSV(0)); /* # uncoverable condition left count:1 class:ignore_covered_err */
+            aa[0] = cfg ? cfg : &PL_sv_undef; /* # uncoverable condition left count:1 class:ignore_covered_err */
             { SV *r = pcx_call_meth(aTHX_ self, "_apply_config", aa, 1, 0);
+              # uncoverable branch true
+              # uncoverable condition left count:1 class:ignore_covered_err
               if (r) SvREFCNT_dec(r); }
             RETVAL = newSVsv(self);
         }
@@ -1857,11 +1987,11 @@ secret(self, path)
     {
         SV *cfg = app_get(aTHX_ app_hv(aTHX_ self), K_CONFIG);
         SV *argv[1], *r;
-        if (!(cfg && SvOK(cfg)))
+        if (!(cfg && SvOK(cfg))) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Punk: no configuration loaded (add a config keyword)");
         argv[0] = path;
         r = pcx_call_meth(aTHX_ cfg, "secret", argv, 1, 1);
-        RETVAL = r ? r : &PL_sv_undef;
+        RETVAL = r ? r : &PL_sv_undef; /* # uncoverable condition left count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -1877,6 +2007,8 @@ _apply_config(self, cfg)
         HV *h = app_hv(aTHX_ self);
         SV *resolved = pcx_call_meth(aTHX_ cfg, "resolved", NULL, 0, 1);
         HV *c;
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (resolved) sv_2mortal(resolved);
         c = (resolved && SvROK(resolved) && SvTYPE(SvRV(resolved)) == SVt_PVHV)
             ? (HV *)SvRV(resolved) : NULL;
@@ -1891,6 +2023,8 @@ _apply_config(self, cfg)
             SSize_t i, n;
 
             /* views: engine => opts, in declaration order */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (vp && *vp && SvTRUE(*vp)) {
                 AV *pairs = app_pairs(aTHX_ *vp, K_VIEWS);
                 n = av_len(pairs) + 1;
@@ -1901,14 +2035,18 @@ _apply_config(self, cfg)
             }
 
             /* database: one default block, or a mapping of named blocks */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (dp && *dp && SvTRUE(*dp)) {
                 HV *db; int named = 0; HE *e;
-                if (!(SvROK(*dp) && SvTYPE(SvRV(*dp)) == SVt_PVHV))
+                if (!(SvROK(*dp) && SvTYPE(SvRV(*dp)) == SVt_PVHV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
                     croak("Punk: the config database block must be a mapping");
                 db = (HV *)SvRV(*dp);
                 hv_iterinit(db);
                 while ((e = hv_iternext(db))) {
                     SV *v = hv_iterval(db, e);
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV
                         && !SvOBJECT(SvRV(v))) { named = 1; break; }
                 }
@@ -1921,7 +2059,7 @@ _apply_config(self, cfg)
                         SV **vp2 = hv_fetch(db, k, (I32)kl, 0);
                         HV *opt = (vp2 && *vp2 && SvROK(*vp2)) ?
                                   (HV *)SvRV(*vp2) : NULL;
-                        if (kl == 7 && memEQ(k, K_DEFAULT, 7)) {
+                        if (kl == 7 && memEQ(k, K_DEFAULT, 7)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                             AV *args = (AV *)sv_2mortal((SV *)newAV());
                             if (opt) {
                                 HE *oe; hv_iterinit(opt);
@@ -1952,9 +2090,11 @@ _apply_config(self, cfg)
             }
 
             /* models: auto | none | [names] | { auto=>?, only=>[names] } */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (mp && *mp && SvOK(*mp)) {
                 SV *m = *mp;
-                if (SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV
+                if (SvROK(m) && SvTYPE(SvRV(m)) == SVt_PVHV /* # uncoverable condition right count:3 class:ignore_covered_err */
                     && !SvOBJECT(SvRV(m))) {
                     HV *mh = (HV *)SvRV(m);
                     SV **au = hv_fetchs(mh, K_AUTO, 0);
@@ -1962,15 +2102,18 @@ _apply_config(self, cfg)
                     if (au)
                         (void)hv_stores(h, K_MODEL_AUTO,
                                         newSViv(SvTRUE(*au) ? 1 : 0));
+                    # uncoverable branch false class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     if (only && *only && SvTRUE(*only))
                         app_call_list(aTHX_ self, "model_class",
                                       app_list(aTHX_ *only, "models.only"));
                 }
                 else if (!SvROK(m)) {
                     STRLEN ml; const char *ms = SvPV_const(m, ml);
-                    if (ml == 4 && strncasecmp(ms, K_AUTO, 4) == 0)
+                    if (ml == 4 && strncasecmp(ms, K_AUTO, 4) == 0) /* # uncoverable condition right count:1 class:ignore_covered_err */
                         (void)hv_stores(h, K_MODEL_AUTO, newSViv(1));
-                    else if (ml == 4 && strncasecmp(ms, "none", 4) == 0)
+                    else if (ml == 4 && strncasecmp(ms, "none", 4) == 0) /* # uncoverable condition right count:1 class:ignore_covered_err */
                         (void)hv_stores(h, K_MODEL_AUTO, newSViv(0));
                     else
                         app_call_list(aTHX_ self, "model_class",
@@ -1985,16 +2128,23 @@ _apply_config(self, cfg)
             /* host: one origin, or a mapping of origin + allow. Applied
              * before plugins so a plugin registered from the same file
              * already sees it. */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (hp && *hp && SvOK(*hp)) {
                 AV *args = (AV *)sv_2mortal((SV *)newAV());
                 if (SvROK(*hp) && SvTYPE(SvRV(*hp)) == SVt_PVHV) {
                     HV *hh = (HV *)SvRV(*hp);
                     SV **org = hv_fetchs(hh, "origin", 0);
                     SV **al  = hv_fetchs(hh, "allow", 0);
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
+                    # uncoverable condition left count:5 class:ignore_covered_err
                     if (!(org && *org && SvOK(*org) && !SvROK(*org)
                           && SvCUR(*org)))
                         croak("Punk: the config host block needs an origin");
                     av_push(args, newSVsv(*org));
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     if (al && *al && SvOK(*al)) {
                         av_push(args, newSVpvs("allow"));
                         if (SvROK(*al)) av_push(args, newSVsv(*al));
@@ -2011,15 +2161,22 @@ _apply_config(self, cfg)
             }
 
             /* favicon: a path, or a mapping of path + max_age */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (fvp && *fvp && SvOK(*fvp)) {
                 AV *args = (AV *)sv_2mortal((SV *)newAV());
                 if (SvROK(*fvp) && SvTYPE(SvRV(*fvp)) == SVt_PVHV) {
                     HV *fh = (HV *)SvRV(*fvp);
                     SV **fpath = hv_fetchs(fh, "path", 0);
                     SV **fma   = hv_fetchs(fh, "max_age", 0);
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
+                    # uncoverable condition left count:4 class:ignore_covered_err
                     if (!(fpath && *fpath && SvOK(*fpath) && SvCUR(*fpath)))
                         croak("Punk: the config favicon block needs a path");
                     av_push(args, newSVsv(*fpath));
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     if (fma && *fma && SvOK(*fma)) {
                         av_push(args, newSVpvs("max_age"));
                         av_push(args, newSVsv(*fma));
@@ -2031,6 +2188,8 @@ _apply_config(self, cfg)
             }
 
             /* plugins: name => opts */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (pp && *pp && SvTRUE(*pp)) {
                 AV *pairs = app_pairs(aTHX_ *pp, "plugins");
                 n = av_len(pairs) + 1;
@@ -2041,9 +2200,11 @@ _apply_config(self, cfg)
             }
 
             /* static: url prefix => directory */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (sp && *sp && SvTRUE(*sp)) {
                 HV *st; AV *keys;
-                if (!(SvROK(*sp) && SvTYPE(SvRV(*sp)) == SVt_PVHV))
+                if (!(SvROK(*sp) && SvTYPE(SvRV(*sp)) == SVt_PVHV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
                     croak("Punk: the config static block must be a mapping "
                           "of url prefix => directory");
                 st = (HV *)SvRV(*sp);
@@ -2055,6 +2216,8 @@ _apply_config(self, cfg)
                     SV **dv = hv_fetch(st, k, (I32)kl, 0);
                     AV *args = (AV *)sv_2mortal((SV *)newAV());
                     av_push(args, newSVsv(*kp));
+                    # uncoverable condition right count:1 class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
                     av_push(args, newSVsv((dv && *dv) ? *dv : &PL_sv_undef));
                     app_call_list(aTHX_ self, "static", args);
                 }
@@ -2063,6 +2226,9 @@ _apply_config(self, cfg)
             /* session: a mapping of options -> the session keyword */
             {
                 SV **sess = hv_fetchs(c, "session", 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (sess && *sess && SvROK(*sess)
                     && SvTYPE(SvRV(*sess)) == SVt_PVHV) {
                     HV *sh = (HV *)SvRV(*sess); HE *e;
@@ -2083,6 +2249,9 @@ _apply_config(self, cfg)
              * `databases` does; a scalar is an option on the default one. */
             {
                 SV **u = hv_fetchs(c, K_UA, 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (u && *u && SvROK(*u) && SvTYPE(SvRV(*u)) == SVt_PVHV) {
                     HV *uh = (HV *)SvRV(*u); HE *e;
                     AV *dflt = (AV *)sv_2mortal((SV *)newAV());
@@ -2092,6 +2261,8 @@ _apply_config(self, cfg)
                         SV *k = hv_iterkeysv(e);
                         SV *v = hv_iterval(uh, e);
                         STRLEN kl; const char *kp = SvPV_const(k, kl);
+                        # uncoverable condition right count:2 class:ignore_covered_err
+                        # uncoverable condition right count:3 class:ignore_covered_err
                         if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV
                             && !pua_is_known_opt(aTHX_ kp, kl)) {
                             av_push(named, newSVsv(k));
@@ -2122,7 +2293,7 @@ _apply_config(self, cfg)
              * (or absent) leaves it off. */
             {
                 SV **cs = hv_fetchs(c, K_CSRF, 0);
-                if (cs && *cs && SvROK(*cs)
+                if (cs && *cs && SvROK(*cs) /* # uncoverable condition right count:2 class:ignore_covered_err */
                     && SvTYPE(SvRV(*cs)) == SVt_PVHV) {
                     HV *ch = (HV *)SvRV(*cs); HE *e;
                     AV *args = (AV *)sv_2mortal((SV *)newAV());
@@ -2133,7 +2304,7 @@ _apply_config(self, cfg)
                     }
                     app_call_list(aTHX_ self, K_CSRF, args);
                 }
-                else if (cs && *cs && app_cfg_on(aTHX_ *cs)) {
+                else if (cs && *cs && app_cfg_on(aTHX_ *cs)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     app_call_list(aTHX_ self, K_CSRF,
                                   (AV *)sv_2mortal((SV *)newAV()));
                 }
@@ -2142,7 +2313,7 @@ _apply_config(self, cfg)
             /* cors: a mapping of options, or `cors: true` for the bare form */
             {
                 SV **co = hv_fetchs(c, K_CORS, 0);
-                if (co && *co && SvROK(*co)
+                if (co && *co && SvROK(*co) /* # uncoverable condition right count:2 class:ignore_covered_err */
                     && SvTYPE(SvRV(*co)) == SVt_PVHV) {
                     HV *oh = (HV *)SvRV(*co); HE *e;
                     AV *args = (AV *)sv_2mortal((SV *)newAV());
@@ -2153,7 +2324,7 @@ _apply_config(self, cfg)
                     }
                     app_call_list(aTHX_ self, K_CORS, args);
                 }
-                else if (co && *co && app_cfg_on(aTHX_ *co)) {
+                else if (co && *co && app_cfg_on(aTHX_ *co)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     app_call_list(aTHX_ self, K_CORS,
                                   (AV *)sv_2mortal((SV *)newAV()));
                 }
@@ -2163,7 +2334,7 @@ _apply_config(self, cfg)
              * bare default set */
             {
                 SV **hd = hv_fetchs(c, K_HEADERS, 0);
-                if (hd && *hd && SvROK(*hd)
+                if (hd && *hd && SvROK(*hd) /* # uncoverable condition right count:2 class:ignore_covered_err */
                     && SvTYPE(SvRV(*hd)) == SVt_PVHV) {
                     HV *oh = (HV *)SvRV(*hd); HE *e;
                     AV *args = (AV *)sv_2mortal((SV *)newAV());
@@ -2174,7 +2345,7 @@ _apply_config(self, cfg)
                     }
                     app_call_list(aTHX_ self, K_HEADERS, args);
                 }
-                else if (hd && *hd && app_cfg_on(aTHX_ *hd)) {
+                else if (hd && *hd && app_cfg_on(aTHX_ *hd)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     app_call_list(aTHX_ self, K_HEADERS,
                                   (AV *)sv_2mortal((SV *)newAV()));
                 }
@@ -2183,6 +2354,9 @@ _apply_config(self, cfg)
             /* auth: a mapping of options -> the auth keyword */
             {
                 SV **at = hv_fetchs(c, K_AUTH, 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (at && *at && SvROK(*at)
                     && SvTYPE(SvRV(*at)) == SVt_PVHV) {
                     HV *oh = (HV *)SvRV(*at); HE *e;
@@ -2199,6 +2373,9 @@ _apply_config(self, cfg)
             /* logging: a mapping of options -> the logging keyword */
             {
                 SV **lgc = hv_fetchs(c, "logging", 0);
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (lgc && *lgc && SvROK(*lgc) && SvTYPE(SvRV(*lgc)) == SVt_PVHV) {
                     HV *gh = (HV *)SvRV(*lgc); HE *e;
                     AV *args = (AV *)sv_2mortal((SV *)newAV());
@@ -2244,7 +2421,7 @@ cache(self, ...)
         STRLEN nlen = sizeof(K_DEFAULT) - 1;
         int i, first = 1;
 
-        if (items >= 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) {
+        if (items >= 3 && SvROK(ST(2)) && SvTYPE(SvRV(ST(2))) == SVt_PVHV) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             /* cache $name => \%opts */
             HV *given = (HV *)SvRV(ST(2));
             HE *e;
@@ -2254,6 +2431,8 @@ cache(self, ...)
                 (void)hv_store_ent(opt, hv_iterkeysv(e), newSVsv(HeVAL(e)), 0);
             first = items;                      /* nothing left to scan */
         }
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         else if (items >= 2) {
             /* The backend: a name, or a ready-made object. Taking a ref here
              * as well matters - the earlier form ignored one, so `cache
@@ -2272,6 +2451,9 @@ cache(self, ...)
         if (av_len(rec) < 0) {          /* empty: av_len is -1, not 0 */
             /* a named store names its backend inside the hashref */
             SV **b = hv_fetchs(opt, "backend", 0);
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             av_push(rec, (b && *b && SvOK(*b)) ? newSVsv(*b)
                                                : newSVpvs("file"));
         }
@@ -2296,7 +2478,7 @@ upload_dir(self, path)
     CODE:
     {
         HV *h = app_hv(aTHX_ self);
-        if (!SvOK(path) || !SvCUR(path))
+        if (!SvOK(path) || !SvCUR(path)) /* # uncoverable condition left count:1 class:ignore_covered_err */
             croak("Punk: upload_dir needs a directory");
         (void)hv_stores(h, "upload_dir", newSVsv(path));
         RETVAL = newSVsv(self);
@@ -2328,20 +2510,24 @@ host(self, ...)
         HV *h = app_hv(aTHX_ self);
         if (items == 1) {
             SV *v = app_get(aTHX_ h, "host");
-            RETVAL = (v && SvOK(v)) ? newSVsv(v) : newSV(0);
+            RETVAL = (v && SvOK(v)) ? newSVsv(v) : newSV(0); /* # uncoverable condition right count:2 class:ignore_covered_err */
         }
         else {
             SV *val = ST(1);
             STRLEN vl, scheme = 0, i;
             const char *vp;
             SSize_t oi;
-            if (!SvOK(val) || !SvCUR(val))
+            if (!SvOK(val) || !SvCUR(val)) /* # uncoverable condition left count:1 class:ignore_covered_err */
                 croak("Punk: host needs an absolute origin "
                       "(https://example.com)");
             vp = SvPV_const(val, vl);
             if (vl > 8 && memEQ(vp, "https://", 8))     scheme = 8;
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             else if (vl > 7 && memEQ(vp, "http://", 7)) scheme = 7;
-            if (!scheme || vp[scheme] == '/')
+            if (!scheme || vp[scheme] == '/') /* # uncoverable condition left count:2 class:ignore_covered_err */
                 croak("Punk: host needs an absolute origin "
                       "(https://example.com), not '%.*s'", (int)vl, vp);
             /* A query, a fragment, whitespace or a control byte in an origin
@@ -2350,7 +2536,7 @@ host(self, ...)
              * reason $c->safe_path refuses one: browsers fold it to a slash. */
             for (i = 0; i < vl; i++) {
                 const unsigned char ch = (unsigned char)vp[i];
-                if (ch == '?' || ch == '#' || ch == '\\'
+                if (ch == '?' || ch == '#' || ch == '\\' /* # uncoverable condition left count:5 class:ignore_covered_err */
                     || ch <= 0x20 || ch == 0x7f)
                     croak("Punk: host may not carry '%c' - an origin has no "
                           "query, fragment or whitespace", (int)ch);
@@ -2364,7 +2550,7 @@ host(self, ...)
                 STRLEN kl;
                 const char *k = SvPV_const(ST(oi), kl);
                 SV *v = ST(oi + 1);
-                if (kl == 5 && memEQ(k, "allow", 5)) {
+                if (kl == 5 && memEQ(k, "allow", 5)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     AV *out = pk_host_allow_av(aTHX_ v, "host allow");
                     (void)hv_stores(h, "host_allow", newRV_noinc((SV *)out));
                 }
@@ -2373,7 +2559,7 @@ host(self, ...)
             }
             /* trailing slashes trimmed on store, so every consumer joining a
              * rooted path onto it produces one slash, not two */
-            while (vl > scheme && vp[vl - 1] == '/') vl--;
+            while (vl > scheme && vp[vl - 1] == '/') vl--; /* # uncoverable condition right count:1 class:ignore_covered_err */
             (void)hv_stores(h, "host", newSVpvn(vp, vl));
             RETVAL = newSVsv(self);
         }
@@ -2407,20 +2593,20 @@ url_for(self, name, ...)
 
         if ((items - 2) % 2)
             croak("Punk: url_for takes a route name then key => value pairs");
-        if (!SvOK(name) || !SvCUR(name))
+        if (!SvOK(name) || !SvCUR(name)) /* # uncoverable condition left count:1 class:ignore_covered_err */
             croak("Punk: url_for needs a route name");
 
         args = (HV *)sv_2mortal((SV *)newHV());
         for (i = 2; i + 1 < items; i += 2) {
             STRLEN kl;
             const char *k = SvPV_const(ST(i), kl);
-            if (kl == 8 && memEQ(k, "absolute", 8)) {
+            if (kl == 8 && memEQ(k, "absolute", 8)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 absolute = SvTRUE(ST(i + 1)) ? 1 : 0;
                 continue;
             }
-            if (kl == 5 && memEQ(k, "query", 5)) {
+            if (kl == 5 && memEQ(k, "query", 5)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 SV *q = ST(i + 1);
-                if (!(SvROK(q) && SvTYPE(SvRV(q)) == SVt_PVHV))
+                if (!(SvROK(q) && SvTYPE(SvRV(q)) == SVt_PVHV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
                     croak("Punk: url_for('%s'): `query` takes a hashref",
                           SvPV_nolen(name));
                 query = (HV *)SvRV(q);
@@ -2441,26 +2627,36 @@ url_for(self, name, ...)
         if (absolute) {
             STRLEN hl, hoff, hlen;
             const char *hp;
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
+            # uncoverable condition left count:3 class:ignore_covered_err
             if (!(host && SvOK(host) && SvCUR(host)))
-                croak("Punk: url_for('%s', absolute => 1): the application "
+                croak("Punk: url_for('%s', absolute => 1): the application " /* # uncoverable statement */
                       "declared no `host` - declare "
-                      "host 'https://example.com'", SvPV_nolen(name));
+                      "host 'https://example.com'", SvPV_nolen(name)); /* # uncoverable statement */
             hp = SvPV_const(host, hl);
             origin = sv_2mortal(pk_origin_bare(aTHX_ hp, hl, &hoff, &hlen));
         }
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVAV) {
-            AV *pair = (AV *)SvRV(val);
-            SV **mp = av_fetch(pair, 0, 0);
-            SV **tm = av_fetch(pair, 1, 0);
-            RETVAL = pk_url_build_op(aTHX_ (AV *)SvRV(*tm),
-                        (mp && *mp) ? *mp : NULL, args, query, prefix,
-                        origin, SvPV_nolen(name));
+            AV *pair = (AV *)SvRV(val); /* # uncoverable statement */
+            SV **mp = av_fetch(pair, 0, 0); /* # uncoverable statement */
+            SV **tm = av_fetch(pair, 1, 0); /* # uncoverable statement */
+            RETVAL = pk_url_build_op(aTHX_ (AV *)SvRV(*tm), /* # uncoverable statement */
+                        (mp && *mp) ? *mp : NULL, args, query, prefix, /* # uncoverable statement */
+                        origin, SvPV_nolen(name)); /* # uncoverable statement */
         }
         else {
             pr_router *rt = pk_url_router(aTHX_ h);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (!rt)
-                croak("Punk: url_for: this application is not compiled");
+                croak("Punk: url_for: this application is not compiled"); /* # uncoverable statement */
             RETVAL = pk_url_build(aTHX_ rt, SvIV(val), args, query,
                                   prefix, origin, SvPV_nolen(name));
         }
@@ -2482,7 +2678,7 @@ favicon(self, path, ...)
         HV *h = app_hv(aTHX_ self);
         int had = app_get(aTHX_ h, "favicon_path") != NULL;
         SSize_t i;
-        if (!SvOK(path) || !SvCUR(path))
+        if (!SvOK(path) || !SvCUR(path)) /* # uncoverable condition left count:1 class:ignore_covered_err */
             croak("Punk: favicon needs a file path");
         if ((items - 2) % 2)
             croak("Punk: favicon takes key => value options");
@@ -2491,7 +2687,9 @@ favicon(self, path, ...)
             STRLEN kl;
             const char *k = SvPV_const(ST(i), kl);
             SV *v = ST(i + 1);
-            if (kl == 7 && memEQ(k, "max_age", 7)) {
+            if (kl == 7 && memEQ(k, "max_age", 7)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
+                # uncoverable condition left count:1 class:ignore_covered_err
+                # uncoverable condition left count:2 class:ignore_covered_err
                 if (!SvOK(v) || !looks_like_number(v) || SvIV(v) < 0)
                     croak("Punk: favicon max_age needs a non-negative "
                           "number of seconds");
@@ -2515,6 +2713,8 @@ favicon(self, path, ...)
                 argv[4] = sv_2mortal(newRV_noinc((SV *)o));
             }
             r = pcx_call_meth(aTHX_ self, "route", argv, 5, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (r) SvREFCNT_dec(r);
         }
         RETVAL = newSVsv(self);
@@ -2554,6 +2754,8 @@ subscribe(self, topic, cb, ...)
         PERL_UNUSED_VAR(self);
         for (i = 3; i + 1 < items; i += 2) {
             const char *k = SvPV_nolen(ST(i));
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (strEQ(k, "group")) group = ST(i + 1);
         }
         RETVAL = punk_bus_app_subscribe(aTHX_ topic, cb, group);

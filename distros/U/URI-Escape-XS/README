@@ -2,7 +2,7 @@ NAME
     URI::Escape::XS - Drop-In replacement for URI::Escape
 
 VERSION
-    $Id: README,v 0.5 2013/02/25 17:24:25 dankogai Exp $
+    $Id: XS.pm,v 0.15 2026/11/10 15:10:37 dankogai Exp $
 
 SYNOPSIS
       # use it instead of URI::Escape
@@ -19,6 +19,14 @@ SYNOPSIS
       # if you have CNet::IDN::Encode installed
       $safe = encodeURIComponentIDN("http://ドメイン名例.jp/dan/");
       $str  = decodeURIComponentIDN("http:%2F%2Fxn--eckwd4c7cu47r2wf.jp%2Fdan%2F");
+
+DESCRIPTION
+     URI::Escape::XS is a drop-in replacement for URI::Escape for common cases which
+     offers much faster performance by using compiled XS code.
+
+     This module requires Perl 5.8.1 compared to 5.6.1 for URI::Escape.
+     The uri_escape_utf8 function from URI::Escape is not present here, as
+     our uri_escape() method handles UTF-8 characters automatically.
 
 EXPORT
   by default
@@ -83,7 +91,7 @@ FUNCTIONS
     URI::Escape::uri_escape() croak and urge you to "uri_escape_utf8()" but
     it is pointless because URI itself has no such things as utf8 flag. The
     function in this module ALWAYS TREATS the string as byte sequence. That
-    way you can safely use this function without worring about utf8 flags.
+    way you can safely use this function without worrying about utf8 flags.
 
     Note this function is NOT EXPORTED by default. That way you can use
     URI::Escape and URI::Escape::XS simultaneously.
@@ -96,7 +104,7 @@ FUNCTIONS
     function in this module does decode it into the corresponding UTF-8 byte
     sequence.
 
-    Like uri_escape, this funciton is NOT EXPORTED by default.
+    Like uri_escape, this function is NOT EXPORTED by default.
 
   Note on the %uHHHH sequence
     With this module the resulting strings never have the utf8 flag on. So
@@ -155,7 +163,7 @@ SPEED
      U::E     565112/s       8%       --
 
 AUTHOR
-    Dan Kogai, "<dankogai+cpan at gmail.com>"
+    Dan Kogai, "<dankogai at cpan.org>"
 
 BUGS
     Please report any bugs or feature requests to "bug-uri-escape-xs at
@@ -197,7 +205,7 @@ ACKNOWLEDGEMENTS
     Claus Färber for Net::IDN::Encode
 
 COPYRIGHT & LICENSE
-    Copyright 2007-2012 Dan Kogai, all rights reserved.
+    Copyright 2007-2020 Dan Kogai, all rights reserved.
 
     This program is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself.

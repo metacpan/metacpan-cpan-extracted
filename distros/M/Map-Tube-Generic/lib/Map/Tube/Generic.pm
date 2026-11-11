@@ -15,7 +15,7 @@ use warnings;
 use utf8;
 use version 0.77 ( );
 
-our $VERSION = version->declare('v0.1.0');
+our $VERSION = version->declare('v0.2.1');
 
 =encoding utf8
 
@@ -29,6 +29,8 @@ use Carp;
 use File::Spec;
 use Moo;
 use namespace::clean;
+use Map::Tube::Pluggable;
+use Map::Tube;
 
 has location  => ( is     => 'rwp',
                    isa    => sub { carp( "$_[0] is not a string" ) if ref($_[0]) },
@@ -62,7 +64,7 @@ has map       => ( is      => 'rwp',
                                 # Instead, it should be checked during module installation
                                 # that we are still complete. (That has limited dynamics
                                 # but is better than nothing).
-                                # Using Module::PrintUsed or Class:Inspector?
+                                # Using Module::PrintUsed or Class:Inspector? Or Class::MOP?
                                 qw(
                                     xml                 json
                                     get_shortest_route  get_all_routes
@@ -70,15 +72,32 @@ has map       => ( is      => 'rwp',
                                     get_line_by_id      get_line_by_name
                                     get_lines           get_stations
                                     get_next_stations   get_linked_stations
-                                    get_map_data
-                                    name                name_to_id
-                                    plugins             _active_link
-                                    _other_links        _line_stations
-                                    _line_station_index _common_lines
+                                    get_map_data        line_change_penalty
                                     nodes               lines
                                     tables              routes
+                                    trim                filter
+                                    to_perl             is_same
+                                    common_lines        get_method_map
+                                    is_valid_color
+                                    name                name_to_id
+                                    plugins             _active_link
+                                    _other_links        _link_lines
+                                    _line_stations      _line_station_index
+                                    _common_lines
                                     _lines              bgcolor
-                                    as_graph
+                                   _xml_data            _decode_utf8_if_needed
+                                   _init_map            _is_directly_linked
+                                   _init_table          _load_plugins
+                                   _get_common_lines    _capture_common_lines
+                                   _get_next_link       _set_active_links
+                                   _set_routes          _validate_map_structure
+                                   _get_path            _capture_line_station
+                                   _set_path            _validate_multi_lined_nodes
+                                   _get_length          _set_length
+                                   _get_current_lines   _set_current_lines
+                                   _get_table           _get_node_id
+                                   _order_station_lines _get_line_object_by_name
+                                   _is_visited          _get_line_object_by_id
                                   )
                               ],
                  );
@@ -219,19 +238,27 @@ sub BUILD {
     # BUILD will be executed. So we need to do it here in time.
     $self->_set_map( $self->_builder_map($args) );
   }
+
+  for my $plugin (Map::Tube::Pluggable::plugins()) {
+      # Only bother applying the approved plugins.
+      next unless (exists $Map::Tube::PLUGINS->{$plugin});
+      Role::Tiny->apply_roles_to_object($self, $plugin);
+  }
   return;
 }
 
-my %own_methods = map { $_ => 1 } qw( list_maps location map namespace );
+# my %own_methods = map { $_ => 1 } qw( list_maps location map namespace );
 around can => sub {
   # Make the "can" method cleverer to make sure that the underlying concrete Map::Tube
   # module, to which almost everything is delegated, "can".
-  my( $orig, $self, $method ) = @_;
-  my $ret = $orig->( $self, $method );
-  # manually delegate can( ) to the underlying map object, if we have one:
-  return can( $self->map( ), $method ) if ref($self) && $self->map( ) && !exists( $own_methods{$method} );
-  # ... else rely on ourselves, which is all we've got:
-  return $orig->( $self, $method );
+  my( $orig, $self, @args ) = @_;
+  if ( ref($self) && $self->map( ) ) {
+    return if ( $args[0] eq 'xml'  && $self->map( )->xml()  eq '' );
+    return if ( $args[0] eq 'json' && $self->map( )->json() eq '' );
+  }
+  return $self->$orig(@args) if $self->$orig(@args);
+  return $self->map( )->can(@args) if ref($self) && $self->map( );
+  return;
 };
 
 
@@ -333,18 +360,19 @@ in via this argument. It must do the L<Map::Tube> role. Frankly, though, if
 you already have an instantiated map, you can use it directly, and there is no
 advantage to wrapping it in a L<Map::Tube::Generic> object.
 
-=item * C<xml>
+=item * C<data>
 
-Not yet implemented.
-
-=item * C<json>
-
-Not yet implemented.
+Tries to find and load an XML or JSON map data file directly, not through a
+Map::Tube-type module. -- Not yet implemented.
 
 =item * C<...>
 
 Further arguments may be specified. These will be passed through to the
-underlying module if and when instantiating it.
+underlying module if and when instantiating it. In particular, if the
+map data support multiple languages and/or scripts using the C<nametype=>
+mechanism (see, e.g., L<Map::Tube::Beijing> or C<Map::Tube::Brussels>),
+this argument may be passed here. (Modules not supporting this mechanism
+will ignore superfluous arguments.)
 
 =back
 
@@ -352,8 +380,6 @@ underlying module if and when instantiating it.
 
 The "base name" of the underlying module will be returned (e.g., for a L<Map::Tube::London>,
 it would return C<"London">).
-
-=head2 C<BUILD>
 
 If on construction the C<location> argument was used, this will be the value
 returned. If the C<map> argument was used, the "base name" of the underlying
@@ -408,12 +434,12 @@ will take place.
 =back
 
 The return value is a reference to a hash, where the keys are the fully
-qualified module names.  The values are references to hashes with the
+qualified module names. The values are references to hashes with the
 keys C<"filepath">, stating the C<@INC>-based path in the file system
 from where this module would be loaded, and C<"location">, stating the
-"basename" of the module.  If the C<verify> argument was true, there
+"basename" of the module. If the C<verify> argument was true, there
 will also be a key C<"name>", which will reflect the name of the metro
-network as specified in the data for the metro network.  (This may be
+network as specified in the data for the metro network. (This may be
 C<undef>.)  If the same fully qualified module is found under different
 paths as per C<@INC>, only the last one will be returned.
 
@@ -450,5 +476,6 @@ it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
-L<Map::Tube>
+L<Map::Tube>, L<Map::Tube::GraphViz>, L<Map::Tube::CLI>.
+
 

@@ -16,4 +16,6 @@ class UV::Handle::Idle extends UV::Handle {
   # Instance Methods
   native method start : void ($cb : UV::Callback::Idle);
   
+  native method stop : void ();
+  
 }

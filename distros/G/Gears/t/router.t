@@ -50,6 +50,7 @@ subtest 'router should match locations' => sub {
 	# NOTE: bridges are matched even if there are no matching routes underneath them
 	_match('/test', [], 'bad match ok');
 	_match('/test1', [[$t1]], 'match bridge ok');
+	_match('/test12', [], 'match bridge prefix ok');
 	_match('/test1/1', [[$t1, $t1l1]], 'match full path ok');
 	_match('/test1/123', [[$t1]], 'match too long path ok');
 

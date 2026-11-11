@@ -13,14 +13,20 @@ Makefile.PL
 MANIFEST			This list of files
 README
 t/10-new.t
+t/15-object.t
 t/20-transport.t
+t/22-commands.t
 t/25-tcp.t
 t/30-live.t
 t/40-scan.t
+t/45-fd.t
 t/50-stream.t
+t/55-edges.t
 t/60-verdict.t
 t/70-async.t
+t/75-async-kinds.t
 t/80-abi.t
+t/85-abi-probe.t
 t/abi_consumer/Consumer.xs
 t/abi_consumer/lib/TestConsumer.pm
 t/abi_consumer/Makefile.PL

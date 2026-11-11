@@ -53,4 +53,11 @@ is_deeply([ sort keys %{ $told->{files}{"xs/one.xs"}{5}{blocks} } ], ["2:0"], "a
 my $guess = $flow->parse_llvm($twins, \%alike);
 is_deeply([ sort keys %{ $guess->{files}{"xs/one.xs"}{5}{blocks} } ], ["1:0"], "without the table the files sharing the lines are told apart by order alone");
 
+my $clash = "===== XS_T_f (1) @ T.c:6\nBlock : 0 Counter : 1\n\tDestination Edges : *1 (1), \n\tFile: 0: 6,\n\tFile: 1: 5,6,7,\n";
+my %apart = ("T.c" => { lines => { 6 => 1 } }, "xs/one.xs" => { lines => { 5 => 1, 6 => 1, 7 => 1 } });
+my $kept = $flow->parse_llvm($clash, \%apart);
+is_deeply([ sort keys %{ $kept->{files}{"xs/one.xs"} } ], [ 5, 6, 7 ],
+    "a wrapper declared at a C line that an XS index also holds does not take that index: the gcov text says whose lines they are");
+is_deeply([ sort keys %{ $kept->{files}{"T.c"} } ], [ 6 ], "and the C file keeps the index that is its own");
+
 done_testing;

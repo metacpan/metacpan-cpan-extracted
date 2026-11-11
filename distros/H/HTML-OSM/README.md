@@ -4,7 +4,7 @@ HTML::OSM - Generate an interactive OpenStreetMap with Leaflet.js
 
 ## Version
 
-Version 0.17
+Version 0.19
 
 ## Synopsis
 
@@ -155,8 +155,17 @@ default is no scale bar.
     entries for what can be seen.  A marker hidden in a cluster still counts.
     An entry without a group is always listed.
 
+- `unless_layer`
+
+    The name of a GeoJSON layer (`add_geojson`'s `name`).  The entry is listed
+    only while that layer is hidden: for an entry the layer's own `key` stands in
+    for while the layer is shown, so the reader is not given the same colours
+    twice.  When the reader unticks the layer, its key goes and the entry comes
+    back.  A name no layer has leaves the entry always listed.
+
 When no entry is listed, the key says `legend_empty`, by default
-"Nothing in this view".
+"Nothing in this view".  When every entry is left out for a layer that is
+shown (`unless_layer`), the key is not drawn at all.
 
 `new()` croaks on an entry it cannot use, and on an unknown position.
 Values from a config file or a clone skip that check, so `onload_render()`
@@ -405,7 +414,8 @@ name  : string    Label of the layer's checkbox in the map's layer control
 show  : boolean   Whether a named layer is drawn when the map opens (default 1)
 key   : hashref   A key to the layer's colours, shown while the layer is
                   (see L</LAYER KEY>):
-                  { entries => [ { label, colour }, ... ], title?, position? }
+                  { entries => [ { label, colour }, ... ], title?, position?,
+                    shape? }
 bands : string    Feature property holding a list of colours, each drawn
                   as a line of its own just inside the outline, side by side
                   (see L</BANDS>)
@@ -479,6 +489,11 @@ shows.
 
     `bottomright` (the default), `bottomleft`, `topright` or `topleft`.  The
     marker key (`legend`) and the layer control are top right by default.
+
+- `shape`
+
+    `line` (the default) draws each entry's colour as a short line, for a layer
+    of outlines; `box` draws a filled box, for a layer whose areas are filled.
 
 Layers that share a name share one key: the first `key` given for that name.
 Every text reaches the page as text, never as HTML.

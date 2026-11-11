@@ -363,17 +363,29 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			<td><code>1</code></td>
 			<td>
 				Ask OpenStreetMap's Nominatim about places the local data does not
-				know. Only the place name is sent. Set it to <code>0</code> to keep
-				every lookup on this machine.
+				know, and for county outlines. Only the place name is sent, or, for
+				an outline, the marker's position rounded to about 100 metres. Set it
+				to <code>0</code> to keep every lookup on this machine.
 			</td>
 		</tr>
 		<tr>
 			<td><code>map_geocode_online_max</code></td>
 			<td><code>20</code></td>
 			<td>
-				Places asked of Nominatim each time a map opens. Nominatim allows one
+				Places, and county outlines, asked of Nominatim each time a map opens. Nominatim allows one
 				request a second, so this is roughly how long a page can wait for it.
 				The rest are asked next time, or by <code>script/bi-geocode</code>.
+			</td>
+		</tr>
+		<tr>
+			<td><code>map_bounds_ranks</code></td>
+			<td>none</td>
+			<td>
+				Which of Nominatim's place ranks is a county, country by country,
+				for the county outlines on a map: <code>{ lk =&gt; 10 }</code>.
+				Codes are two letters; ranks are 8 (a state), 10 or 12. Countries not
+				listed use the built-in choice: 12, or 10 for India, Bangladesh,
+				China and Spain, and 8 for Kenya.
 			</td>
 		</tr>
 		<tr>
@@ -687,10 +699,13 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 	found. <code>--col</code> may be given twice for a place written across
 	columns (<code>--col Address --col Country</code>), joined with a comma as
 	<code>loc=</code> joins them on the map. <code>--offline</code> keeps every lookup
-	local, and <code>--online-max N</code> sets a limit:
+	local, and <code>--online-max N</code> sets a limit. <code>--text</code> is
+	the map panel's <em>Add to each place</em>: <code>--col county --text
+	'Virginia, USA'</code> looks up <code>Accomack, Virginia, USA</code>, which is
+	what the map then asks for:
 </p>
 <pre><code>./script/bi-geocode --spec table:customers --col city \
-                    [--data-dir DIR] [--model-dir DIR] \
+                    [--text TEXT] [--data-dir DIR] [--model-dir DIR] \
                     [--openaddr PATH] [--region CC] \
                     [--offline] [--online-max N] [--dry-run] [--verbose]</code></pre>
 <p>

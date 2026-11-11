@@ -61,6 +61,40 @@ int32_t SPVM__UV__Handle__Timer__start(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__UV__Handle__Timer__stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_timer = stack[0].oval;
+  
+  uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
+  
+  int32_t status = uv_timer_stop(uv_timer);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_timer_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
+int32_t SPVM__UV__Handle__Timer__again(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_timer = stack[0].oval;
+  
+  uv_timer_t* uv_timer = env->get_pointer(env, stack, obj_uv_timer);
+  
+  int32_t status = uv_timer_again(uv_timer);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_timer_again failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
 int32_t SPVM__UV__Handle__Timer__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

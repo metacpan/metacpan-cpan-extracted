@@ -123,10 +123,11 @@ DBIx::Squirrel::Stages::Rows - stages reshaping rows: pluck and as_hash
 =head1 DESCRIPTION
 
 Stages that reshape rows, whatever shape they were fetched in: as
-arrays, as hashes (with the C<ekorn_slice> attribute), or as row objects
-(from C<results>). Each finds what it needs from the statement's column
-names once on each run, through L<DBIx::Squirrel::Context/iterator> and
-L<DBIx::Squirrel::Iterator/column_names>, so a stage can be given to
+arrays, as hashes (with the C<ekorn_slice> attribute), or as row
+objects (from C<results>). Each finds what it needs from the
+statement's column names, once on each run, through
+L<DBIx::Squirrel::Context/iterator> and
+L<DBIx::Squirrel::Iterator/column_names>. So a stage can be given to
 statements whose columns differ.
 
 =head1 FUNCTIONS
@@ -141,17 +142,17 @@ Both are exported by default, and with C<:all>.
 Gives one column of each row, by its name, in any case, or by its
 position, from 0, as a row object's C<get_column> does. A name for an
 array row, or a position for a hash row, is found from the column
-names, so needs the stages to be run by an iterator. A column the row
-hasn't got croaks.
+names. So it needs the stages to be run by an iterator. A column the
+row hasn't got croaks.
 
 =head2 as_hash
 
     as_hash
 
 Makes each row a hash, keyed by the column names as
-C<fetchrow_hashref> would key them, following C<FetchHashKeyName>, so
+C<fetchrow_hashref> would key them, following C<FetchHashKeyName>. So
 it gives what plain DBI does. An array row, or a row object, is made
-into a new hash; a hash row is passed on as it is. As with
+into a new hash. A hash row is passed on unchanged. As with
 C<fetchrow_hashref>, of two columns with the same name, the hash has
 one. It needs the stages to be run by an iterator, for the column
 names.
@@ -172,7 +173,7 @@ A row hasn't got the column C<pluck> was given.
 
 C<as_hash>, or C<pluck> with a name for an array row or a position for
 a hash row, ran in a pipeline no iterator was running, such as one
-called with values, so the column names aren't known.
+called with values. So the column names aren't known.
 
 =item Expected a row: an array, a hash or a row object
 

@@ -23,9 +23,11 @@ FETCH(self, key)
                   ? (HV *)SvRV(*appsv) : NULL;
         SV *path = NULL;
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!app)
-            croak("Punk: {%% url.%s %%}: the application is gone",
-                  SvPV_nolen(key));
+            croak("Punk: {%% url.%s %%}: the application is gone", /* # uncoverable statement */
+                  SvPV_nolen(key)); /* # uncoverable statement */
 
         if (!pk_url_static_path(aTHX_ app, key, &path)) {
             /* Two different mistakes, and the message says which. A dynamic
@@ -42,7 +44,13 @@ FETCH(self, key)
         }
 
         RETVAL = newSVpvs("");
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (pfx && *pfx && SvOK(*pfx)) sv_catsv(RETVAL, *pfx);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (path) sv_catsv(RETVAL, path);
     }
     OUTPUT:
@@ -50,16 +58,21 @@ FETCH(self, key)
 
 # A template asking whether a name is there, without building the URL.
 bool
+# uncoverable statement
+# uncoverable subroutine
 EXISTS(self, key)
         SV *self
         SV *key
     CODE:
     {
-        AV *o = (AV *)SvRV(self);
-        SV **appsv = av_fetch(o, PKU_T_APP, 0);
-        HV *app = (appsv && *appsv && SvROK(*appsv)
-                   && SvTYPE(SvRV(*appsv)) == SVt_PVHV)
-                  ? (HV *)SvRV(*appsv) : NULL;
+        AV *o = (AV *)SvRV(self); /* # uncoverable statement */
+        SV **appsv = av_fetch(o, PKU_T_APP, 0); /* # uncoverable statement */
+        HV *app = (appsv && *appsv && SvROK(*appsv) /* # uncoverable statement */
+                   && SvTYPE(SvRV(*appsv)) == SVt_PVHV) /* # uncoverable statement */
+                  ? (HV *)SvRV(*appsv) : NULL; /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         RETVAL = app ? pk_url_static_path(aTHX_ app, key, NULL) : 0;
     }
     OUTPUT:

@@ -283,13 +283,14 @@ DBIx::Squirrel::Placeholders - find the placeholders in a statement, and match v
 
 The functions L<DBIx::Squirrel::db> and L<DBIx::Squirrel::st> use to
 find the placeholders in a statement, rewrite them as C<?> for the DBI,
-and match the values given to them. They're for DBIx::Squirrel itself,
-and none is exported by default.
+and match the values given to them. They're for DBIx::Squirrel itself.
+None is exported by default.
 
 Several take a statement's map of its placeholders' numbers or names to
-their positions, from 1, such as C<< {id => [1, 3], name => [2]} >>,
-called C<$binds> below; or what a statement handle keeps about its
-statement, called C<$state>, which holds that map as C<Binds>.
+their positions, from 1, such as C<< {id => [1, 3], name => [2]} >>.
+It's called C<$binds> below. Others take what a statement handle keeps
+about its statement, called C<$state>, which holds that map as
+C<Binds>.
 
 =head1 FUNCTIONS
 
@@ -299,28 +300,40 @@ statement, called C<$state>, which holds that map as C<Binds>.
     ($positions, $normalised, $trimmed) = study_sql($statement, \%options);
     ($positions, $normalised, $trimmed, $lists, $pieces) = study_sql($statement);
 
-Returns a hash reference mapping each placeholder's position, from 1, to
-the placeholder as written (C<?>, C<?1>, C<:1>, C<$1> or C<:name>); the
-statement with each placeholder rewritten as C<?>; and the statement as
-L</trim_sql> returns it. Returns nothing if the statement is blank.
+Returns three values:
+
+=over
+
+=item * a hash reference mapping each placeholder's position, from 1,
+to the placeholder as written (C<?>, C<?1>, C<:1>, C<$1>, C<:name> or
+C<$name>);
+
+=item * the statement with each placeholder rewritten as C<?>;
+
+=item * the statement as L</trim_sql> returns it.
+
+=back
+
+It returns nothing if the statement is blank.
 
 A placeholder with C<...> before it, such as C<...:ids>, takes a list.
-The C<...> isn't part of the placeholder as mapped. A statement with any
-such placeholders returns two more values: a hash reference whose keys
-are the positions taking a list, and an array reference of the pieces of
-the statement around its placeholders, one more than there are
-placeholders, for L</expand_lists>.
+The C<...> isn't part of the placeholder as mapped. A statement with
+any such placeholders returns two more values. The first is a hash
+reference whose keys are the positions taking a list. The second is an
+array reference of the pieces of the statement around its
+placeholders, one more than there are placeholders, for
+L</expand_lists>.
 
-Croaks if the statement uses more than one style of placeholder: one of
-C<?>, C<?1>, C<:1>, C<$1>, C<:name> or C<$name>, used throughout, with
-C<...> or without it.
+A statement must use one style of placeholder throughout: C<?>, C<?1>,
+C<:1>, C<$1>, C<:name> or C<$name>, with C<...> or without it. It
+croaks if the statement uses more than one.
 
-Placeholders are looked for only in the SQL itself, not in quoted
-strings or identifiers, comments or PostgreSQL's dollar-quoted bodies,
-and not in casts, such as C<x::int>, or identifiers containing C<$>,
-such as C<v$session>. A C<?>, C<:> or C<$> with a backslash before it
-isn't a placeholder either, and both are left as they are, for
-L<DBD::Pg>, which removes the backslash.
+Placeholders are looked for only in the SQL itself. They aren't looked
+for in quoted strings or identifiers, comments or PostgreSQL's
+dollar-quoted bodies. Nor are casts, such as C<x::int>, or identifiers
+containing C<$>, such as C<v$session>, placeholders. A C<?>, C<:> or
+C<$> with a backslash before it isn't a placeholder either. Both are
+left unchanged, for L<DBD::Pg>, which removes the backslash.
 
 C<%options> can hold:
 
@@ -329,16 +342,17 @@ C<%options> can hold:
 =item ekorn_dialect
 
 The SQL dialect the statement is written in, named as its DBI driver
-is, as in C<< $dbh->{Driver}{Name} >>. For C<mysql> and C<MariaDB>, a backslash
-escapes a character in a string, C<"..."> is a string, and C<#> starts a
-comment. For any other dialect, or none, a backslash is an ordinary
-character in a string, except in PostgreSQL's C<E'...'> strings.
+is, as in C<< $dbh->{Driver}{Name} >>. For C<mysql> and C<MariaDB>, a
+backslash escapes a character in a string, C<"..."> is a string, and
+C<#> starts a comment. For any other dialect, or none, a backslash is
+an ordinary character in a string, except in PostgreSQL's C<E'...'>
+strings.
 
 =item pg_placeholder_dollaronly
 
-With C<ekorn_dialect> C<Pg>, only C<$1>-style placeholders are found,
-and the statement is returned as it is, for L<DBD::Pg> to read. It
-croaks if one of them takes a list, as the statement isn't rewritten.
+With C<ekorn_dialect> C<Pg>, only C<$1>-style placeholders are found.
+The statement is returned unchanged, for L<DBD::Pg> to read. It croaks
+if one of them takes a list, as the statement isn't rewritten.
 
 =item pg_placeholder_nocolons
 
@@ -348,7 +362,7 @@ placeholders.
 =back
 
 Anything else in C<%options> is ignored, so the attributes passed to
-C<prepare> can be given as they are.
+C<prepare> can be given unchanged.
 
 =head2 trim_sql
 
@@ -363,9 +377,9 @@ string if it was all blank or C<undef>. Comments are kept.
     $key = key_of('?', $position);
 
 Returns a placeholder's number or name, as a statement's map of its
-placeholders keys it: without its sigil, and a number as a number, so
-C<:id> and C<id> give C<id>, and C<$02> gives 2. A bare C<?> is keyed by
-its position, given with it.
+placeholders keys it: without its sigil, and a number as a number. So
+C<:id> and C<id> give C<id>, and C<$02> gives 2. A bare C<?> is keyed
+by its position, given with it.
 
 =head2 is_numbered
 
@@ -377,45 +391,55 @@ Returns true if a statement's placeholders are numbered, not named.
 
     $count = values_taken($binds);
 
-Returns how many values a statement takes in order: its highest number,
-or 0 if its placeholders are named.
+Returns how many values a statement takes in order. That's its highest
+number, or 0 if its placeholders are named.
 
 =head2 values_for
 
     %values = values_for($binds, @bind_values);
 
 Returns each of a statement's placeholders' numbers or names, with the
-value given for it: in order, for numbered placeholders, or by name, as
-pairs or in a hash reference, for named ones. Croaks unless there's a
-value for each, and no other, as L<DBIx::Squirrel::st/bind> describes.
+value given for it. Values for numbered placeholders are given in
+order. Values for named ones are given by name, as pairs or in a hash
+reference. It croaks unless there's a value for each, and no other.
+See L<DBIx::Squirrel::st/bind>.
 
 =head2 expand_lists
 
     ($statement, $binds, $lengths) = expand_lists($state, \%values);
 
 Returns a statement with list placeholders, with each list's C<?>
-written once for each of its values, given what a statement handle
-keeps about it (its C<Placeholders>, the C<Pieces> L</study_sql>
-returns, and C<Lists>, a map of each list placeholder's number or name
-to the placeholder as written, for messages) and the values for its
-placeholders, as L</values_for> returns them. Also returns the map of
-each number or name to its positions in the statement returned, and the
-number of values in each list.
+written once for each of its values. It's given two things:
 
-Croaks unless each list is a reference to an ARRAY of at least one plain
-value: not C<undef> or a value on its own, nor a list containing an
-unblessed reference.
+=over
+
+=item * what a statement handle keeps about the statement: its
+C<Placeholders>, the C<Pieces> L</study_sql> returns, and C<Lists>, a
+map of each list placeholder's number or name to the placeholder as
+written, for messages;
+
+=item * the values for its placeholders, as L</values_for> returns
+them.
+
+=back
+
+It also returns the map of each number or name to its positions in the
+statement returned, and the number of values in each list.
+
+It croaks unless each list is a reference to an ARRAY of at least one
+plain value. A list can't be C<undef> or a value on its own, nor hold
+an unblessed reference.
 
 =head2 place_values
 
     %placed = place_values($state, %values);
 
 Returns each position of a statement's placeholders, from 1, with the
-value for it, given what its statement handle keeps about it and the
-values for its placeholders' numbers or names. A list placeholder's
-positions take the values in its list in turn, wherever it's used, and
-the list must have as many values as the statement was prepared for,
-in C<Lengths>.
+value for it. It's given what the statement handle keeps about the
+statement, and the values for its placeholders' numbers or names. A
+list placeholder's positions take the values in its list in turn,
+wherever it's used. The list must have as many values as the statement
+was prepared for, in C<Lengths>.
 
 =head1 SEE ALSO
 

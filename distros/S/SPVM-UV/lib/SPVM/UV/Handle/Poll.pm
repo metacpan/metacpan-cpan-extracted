@@ -60,6 +60,18 @@ If $cb is not defined, an exception is thrown.
 
 If uv_poll_start fails, an exception is thrown.
 
+=head2 stop
+
+C<method stop : void ();>
+
+Stops polling the file descriptor.
+
+This method calls the L<uv_poll_stop|https://docs.libuv.org/en/v1.x/poll.html#c.uv_poll_stop> function.
+
+Exceptions:
+
+If uv_poll_stop fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

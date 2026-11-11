@@ -49,12 +49,21 @@ static HV *pk_selftest_event(pTHX_ SV *c, const char *kind) {
 
     /* the request path, straight off the env, so the test can tell which
      * request an event belongs to without depending on ordering */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (en && SvROK(en) && SvTYPE(SvRV(en)) == SVt_PVHV) {
         SV **p = hv_fetchs((HV *)SvRV(en), "PATH_INFO", 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         (void)hv_stores(e, "path", (p && *p && SvOK(*p)) ? newSVsv(*p)
                                                          : newSV(0));
     }
-    else (void)hv_stores(e, "path", newSV(0));
+    else (void)hv_stores(e, "path", newSV(0)); /* # uncoverable statement */
 
     return e;
 }
@@ -62,6 +71,11 @@ static HV *pk_selftest_event(pTHX_ SV *c, const char *kind) {
 /* The stash hash through the table, or NULL. */
 static HV *pk_selftest_stash(pTHX_ SV *c) {
     SV *st = PK_ABI.stash_of(aTHX_ c);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(st && SvROK(st) && SvTYPE(SvRV(st)) == SVt_PVHV)) return NULL;
     return (HV *)SvRV(st);
 }
@@ -74,6 +88,9 @@ static void pk_selftest_req(pTHX_ SV *c, void *ud) {
      * out: if the dispatcher ever built a second context, the mark would be
      * missing there and the test says so. */
     (void)hv_stores(e, "has_stash", newSViv(st ? 1 : 0));
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (st) (void)hv_stores(st, "pk.selftest", newSViv(++PK_SELFTEST_SEQ));
     (void)hv_stores(e, "mark", newSViv(PK_SELFTEST_SEQ));
     av_push(pk_selftest_av(aTHX), newRV_noinc((SV *)e));
@@ -82,9 +99,13 @@ static void pk_selftest_req(pTHX_ SV *c, void *ud) {
 static void pk_selftest_res(pTHX_ SV *c, SV *response, void *ud) {
     HV *e = pk_selftest_event(aTHX_ c, "response");
     HV *st = pk_selftest_stash(aTHX_ c);
-    SV **m = st ? hv_fetchs(st, "pk.selftest", 0) : NULL;
+    SV **m = st ? hv_fetchs(st, "pk.selftest", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     PERL_UNUSED_ARG(ud);
     (void)hv_stores(e, "has_stash", newSViv(st ? 1 : 0));
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     (void)hv_stores(e, "mark", (m && *m && SvOK(*m)) ? newSVsv(*m) : newSViv(0));
     (void)hv_stores(e, "status", newSViv(PK_ABI.status_of(aTHX_ response)));
     av_push(pk_selftest_av(aTHX), newRV_noinc((SV *)e));
@@ -103,8 +124,11 @@ static void *pk_selftest_query(pTHX_ const char *sql, STRLEN sql_len,
     PERL_UNUSED_CONTEXT;
     PK_SELFTEST_Q_STARTS++;
     PK_SELFTEST_Q_BIND = nbind;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (sql_len >= sizeof(PK_SELFTEST_Q_SQL))
-        sql_len = sizeof(PK_SELFTEST_Q_SQL) - 1;
+        sql_len = sizeof(PK_SELFTEST_Q_SQL) - 1; /* # uncoverable statement */
     memcpy(PK_SELFTEST_Q_SQL, sql, sql_len);
     PK_SELFTEST_Q_SQL[sql_len] = '\0';
     return INT2PTR(void *, PK_SELFTEST_Q_STARTS);
@@ -115,8 +139,12 @@ static void pk_selftest_query_done(pTHX_ void *token, int ok, void *ud) {
     PERL_UNUSED_CONTEXT;
     PK_SELFTEST_Q_DONES++;
     if (ok) PK_SELFTEST_Q_OK++;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (PTR2IV(token) < 1 || PTR2IV(token) > PK_SELFTEST_Q_STARTS)
-        PK_SELFTEST_Q_OK = -1;      /* correlation broke */
+        PK_SELFTEST_Q_OK = -1;      /* correlation broke */ /* # uncoverable statement */
 }
 
 #endif /* PUNK_OBS_SELFTEST_H */

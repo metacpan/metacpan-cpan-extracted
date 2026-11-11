@@ -23,5 +23,5 @@ requires:
   SPVM::Resource::UV: '0.001'
 resources:
   repository: https://github.com/yuki-kimoto/SPVM-UV.git
-version: '0.004'
+version: '0.007'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

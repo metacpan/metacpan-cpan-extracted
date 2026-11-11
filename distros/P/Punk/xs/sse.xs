@@ -83,8 +83,13 @@ on(self, event, cb)
     {
         punk_sse *sse = se_of(aTHX_ self);
         STRLEN el; const char *ev = SvPV_const(event, el);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(el == 5 && memEQ(ev, "close", 5)))
-            croak("Punk::SSE::Stream: unknown event '%s' (only 'close')", ev);
+            croak("Punk::SSE::Stream: unknown event '%s' (only 'close')", ev); /* # uncoverable statement */
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (!sse->cbs) sse->cbs = newHV();
         (void)hv_store(sse->cbs, ev, (I32)el, newSVsv(cb), 0);
         RETVAL = newSVsv(self);

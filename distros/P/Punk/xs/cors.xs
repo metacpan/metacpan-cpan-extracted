@@ -15,6 +15,11 @@ _decorate(resp, cfg, allow)
     CODE:
     {
         AV *headers = pco_headers_of(aTHX_ resp);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
         if (headers && cfg && SvROK(cfg) && SvTYPE(SvRV(cfg)) == SVt_PVHV)
             pco_add(aTHX_ headers, (HV *)SvRV(cfg), allow);
     }

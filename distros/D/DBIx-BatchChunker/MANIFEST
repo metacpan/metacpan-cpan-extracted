@@ -24,6 +24,7 @@ t/dbh-dbic_storage.t
 t/dbh-legacy.t
 t/dbh.t
 t/dbic.t
+t/id-increment.t
 t/lib/CDTest.pm
 t/lib/CDTest/Schema.pm
 t/lib/CDTest/Schema/Result/Artist.pm

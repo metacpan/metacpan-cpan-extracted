@@ -28,7 +28,7 @@ no_index:
 provides:
   DBIx::Squirrel:
     file: lib/DBIx/Squirrel.pm
-    version: v2.0.5
+    version: v2.1.0
   DBIx::Squirrel::Context:
     file: lib/DBIx/Squirrel/Context.pm
   DBIx::Squirrel::Errors:
@@ -70,7 +70,7 @@ requires:
   DBI: '0'
   Data::Dumper: '0'
   Digest::SHA: '0'
-  Ekorn::Pipeline: '>= v0.1.1, < v0.2.0'
+  Ekorn::Pipeline: '>= v0.2.0, < v0.3.0'
   Exporter: '0'
   List::Util: '0'
   Ref::Util: '0'
@@ -83,6 +83,6 @@ resources:
   bugtracker: https://github.com/nukopian/DBIx-Squirrel/issues
   homepage: https://github.com/nukopian/DBIx-Squirrel
   repository: https://github.com/nukopian/DBIx-Squirrel.git
-version: v2.0.5
+version: v2.1.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

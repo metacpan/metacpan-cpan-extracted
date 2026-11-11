@@ -12,17 +12,18 @@ Monitoring::Sneck::Checks::supervisorctl - checks supervisorctl status, and opti
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.0';
 
 =head1 SYNOPSIS
 
     supervisor|perl:supervisorctl
     supervisor|perl:supervisorctl -c
     supervisor|perl:supervisorctl -c -f /etc/supervisor/conf.d -i foo -d bar -s stopped=1
+    supervisor|perl:supervisorctl -c -R -l
 
 =head1 DESCRIPTION
 
@@ -33,7 +34,8 @@ does not require.
 
 It takes the same options as check_supervisorctl and works out the
 status the same way, see L<Check::supervisorctl>. 'supervisorctl status'
-is ran through run_command, so it is stopped if the check times out.
+is ran through run_command, so it is stopped if the check times out,
+as are the commands for -R, -l, and -L.
 If it can not be ran, or returns anything that is not a item and its
 status, such as when it can not talk to supervisord, that is UNKNOWN
 by default, changeable via -s status_error=$value.
@@ -41,7 +43,9 @@ by default, changeable via -s status_error=$value.
 The status line has the counts of the items in each status, followed by
 the same lines check_supervisorctl prints. Perfdata is the count for
 each status, the count of ignored items, and if -c is given, the counts
-of configs not running and running items missing a config.
+of configs not running and running items missing a config. With -R,
+the counts of items restarted and failed to restart are added, and with
+-l or -L, the counts of configs added and failed to add.
 
 =head1 OPTIONS
 
@@ -58,13 +62,21 @@ Default Linux :: /etc/supervisor/conf.d
 - -s <status=value> :: Maps a status to a exit value. May be given more
 than once. See check_supervisorctl for what may be mapped.
 
+- -R :: Restart items that are stopped, exited, fatal, or backoff. See
+check_supervisorctl.
+
+- -l :: Add configs that are not running, the same as -L, for use with -R.
+Requires -R and -c.
+
+- -L :: Add configs that are not running via reread and add. Requires -c.
+
 - -p <supervisorctl> :: The supervisorctl to run.
 Default :: supervisorctl
 
 =cut
 
 sub option_spec {
-	return ( 'c', 'f=s', 'd=s@', 'i=s@', 's=s@', 'p=s' );
+	return ( 'c', 'f=s', 'd=s@', 'i=s@', 's=s@', 'p=s', 'R', 'l', 'L' );
 }
 
 sub defaults { return { p => 'supervisorctl' } }
@@ -80,19 +92,32 @@ Does the check.
 sub check {
 	my ($self) = @_;
 
-	# both die on bad options, which is UNKNOWN
+	# all of these die on bad options, which is UNKNOWN
+	if ( $self->opt('l') && !$self->opt('R') ) {
+		die("-l requires -R\n");
+	}
+	if ( ( $self->opt('l') || $self->opt('L') ) && !$self->opt('c') ) {
+		die("-l and -L require -c\n");
+	}
+	my $add_configs  = $self->opt('l') || $self->opt('L') ? 1 : 0;
 	my %mapping_opts = Check::supervisorctl->parse_mappings( @{ $self->opt('s') // [] } );
 	my $checker      = Check::supervisorctl->new(
 		config_check  => $self->opt('c') ? 1 : 0,
 		config_dir    => $self->opt('f'),
 		config_ignore => $self->opt('d') // [],
 		ignore        => $self->opt('i') // [],
+		restart       => $self->opt('R') ? 1 : 0,
+		add_configs   => $add_configs,
 		%mapping_opts,
 	);
 
 	# the exit is not of use, as it is non-zero if anything is not running, which the output says anyways
 	my ( $exit, $output ) = $self->run_command( $self->opt('p'), 'status' );
-	my $results = $checker->run( status_output => $output );
+	# restarts and adds go through run_command as well, so they are stopped if the check times out
+	my $results = $checker->run(
+		status_output => $output,
+		command       => sub { return $self->run_command( $self->opt('p'), @_ ) },
+	);
 
 	my @statuses = ( 'running', 'starting', 'backoff', 'stopping', 'stopped', 'exited', 'fatal', 'unknown' );
 	my @summary;
@@ -121,6 +146,30 @@ sub check {
 			push( @summary, 'config dir not readable' );
 		}
 	} ## end if ( $results->{config_check} )
+	if ( $results->{restart} ) {
+		my $restarted      = scalar( @{ $results->{restarted} } );
+		my $restart_failed = scalar( @{ $results->{restart_failed} } );
+		$self->perfdata( label => 'restarted',      value => $restarted,      min => 0 );
+		$self->perfdata( label => 'restart_failed', value => $restart_failed, min => 0 );
+		if ($restarted) {
+			push( @summary, $restarted . ' restarted' );
+		}
+		if ($restart_failed) {
+			push( @summary, $restart_failed . ' failed to restart' );
+		}
+	} ## end if ( $results->{restart} )
+	if ( $results->{add_configs} ) {
+		my $added      = scalar( @{ $results->{added} } );
+		my $add_failed = scalar( @{ $results->{add_failed} } );
+		$self->perfdata( label => 'added',      value => $added,      min => 0 );
+		$self->perfdata( label => 'add_failed', value => $add_failed, min => 0 );
+		if ($added) {
+			push( @summary, $added . ' config' . ( $added == 1 ? '' : 's' ) . ' added' );
+		}
+		if ($add_failed) {
+			push( @summary, $add_failed . ' config' . ( $add_failed == 1 ? '' : 's' ) . ' failed to add' );
+		}
+	} ## end if ( $results->{add_configs} )
 	if ( defined( $results->{status_errors}[0] ) ) {
 		push( @summary, $results->{status_errors}[0] );
 	}

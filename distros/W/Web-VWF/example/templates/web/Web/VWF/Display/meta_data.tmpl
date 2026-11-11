@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Meta Data</title>
+	<script src="https://d3js.org/d3.v7.min.js"></script>
+	<style>
+		body { margin: 2%; font-family: sans-serif; }
+		.panel { padding: 10px; margin-bottom: 16px; border: 1px solid #ccc; border-radius: 6px; background: #f9f9f9; }
+		.panel h2 { margin: 0 0 8px; }
+	</style>
+</head>
+<body>
+	<h1>Meta Data</h1>
+
+	<div class="panel">
+		<h2>Server Metrics</h2>
+		<p>CPUs: [% server.cpu_count %] [% server.cpu_type %]</p>
+		<p>Disk used: [% server.disk_used_pct %]%</p>
+		<p>Memory used: [% server.memory_used_pct %]%</p>
+	</div>
+
+	<div class="panel">
+		<h2>Traffic From The Access Log (last hour)</h2>
+		<p>Requests: [% traffic.requests_per_hour %]</p>
+		<p>Active users: [% traffic.active_users %]</p>
+		<p>Errors: [% traffic.errors_last_hour %]</p>
+	</div>
+
+	<div class="panel">
+		<h2>Browser Breakdown</h2>
+		[% browser_chart %]
+	</div>
+
+	<div class="panel">
+		<h2>HTTP Status Breakdown</h2>
+		[% status_chart %]
+	</div>
+
+	<div class="panel">
+		<h2>Requests and Errors (last 24 hours)</h2>
+		[% rate_chart %]
+	</div>
+
+	<div class="panel">
+		<h2>Latency (last 24 hours)</h2>
+		[% latency_chart %]
+	</div>
+
+	<div class="panel">
+		<h2>Slowest Endpoints</h2>
+		[% slow_chart %]
+	</div>
+</body>
+</html>

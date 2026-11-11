@@ -19,11 +19,10 @@ foreach $dev (@dev_list) {
 		next;
 	}
 	print "[$devNum] : " . $dev->getfriendlyname() . "\n";
-	unless ($dev->getservicebyname('urn:schemas-upnp-org:service:WANIPConnection:1')) {
-		next;
-	}
 	my $gwdev = Net::UPnP::GW::Gateway->new();
 	$gwdev->setdevice($dev);
+	# WANIPConnection, or WANPPPConnection on dial-up routers (RT #60372)
+	next unless $gwdev->getconnectionservice();
 	print "\tExternalIPAddress = " . $gwdev->getexternalipaddress() . "\n";
 	print "\tPortMappingNumberOfEntries = " . $gwdev->getportmappingnumberofentries() . "\n";
 	print "\tTotalBytesReceived = " . $gwdev->gettotalbytesreceived() . "\n";

@@ -1,10 +1,10 @@
 use strict;
 use warnings;
 
-use Capture::Tiny qw( capture_stderr );
-use File::Temp qw( tempdir );
-use File::Touch qw( touch );
-use Git::Helpers qw(
+use Capture::Tiny qw( capture capture_stderr );
+use File::Temp    qw( tempdir );
+use File::Touch   qw( touch );
+use Git::Helpers  qw(
     checkout_root
     current_branch_name
     https_remote_url
@@ -14,14 +14,17 @@ use Git::Helpers qw(
 );
 use Git::Version ();
 use Git::Sub;
-use Path::Tiny qw( path );
-use Test::Deep qw( cmp_deeply );
-use Test::Fatal qw( exception );
+use Path::Tiny      qw( path );
+use Test::Deep      qw( cmp_deeply );
+use Test::Fatal     qw( exception );
 use Test::Git 1.313 qw( test_repository );
 use Test::More import => [qw( diag done_testing is like ok skip subtest )];
 use Test::Requires::Git 1.005;
 
 test_requires_git();
+
+my $lib     = path('lib')->absolute;
+my $gh_open = path('script/gh-open')->absolute;
 
 my $r = test_repository();
 
@@ -76,6 +79,68 @@ SKIP: {
     is( current_branch_name(), $file, 'current branch is ' . $file );
 
     ok( is_inside_work_tree(), 'is_inside_work_tree' );
+
+    subtest 'https_remote_url remote forms' => sub {
+        my $expected_url = 'https://git.example.com/Test/x';
+        my @forms        = (
+            [ 'scp',  'git@git.example.com:Test/x.git', $expected_url ],
+            [ 'bare', 'git.example.com:Test/x.git',     $expected_url ],
+            [
+                'scp-absolute', 'git@git.example.com:/srv/git/x.git',
+                'https://git.example.com/srv/git/x'
+            ],
+            [
+                'https-port', 'https://git.example.com:8443/Test/x.git',
+                'https://git.example.com:8443/Test/x'
+            ],
+            [
+                'https-userinfo',
+                'https://user:secret@git.example.com/Test/x.git',
+                $expected_url
+            ],
+            [
+                'http-port', 'http://git.example.com:8080/Test/x.git',
+                'https://git.example.com:8080/Test/x'
+            ],
+            [
+                'ssh-port', 'ssh://git@git.example.com:2222/Test/x.git',
+                $expected_url
+            ],
+            [
+                'git-port', 'git://git.example.com:9418/Test/x.git',
+                $expected_url
+            ],
+            [ 'absolute-path', '/srv/git/x.git',        undef ],
+            [ 'relative-path', '../x.git',              undef ],
+            [ 'file-scheme',   'file:///srv/git/x.git', undef ],
+        );
+
+        for my $form (@forms) {
+            my ( $name, $url, $expected ) = @{$form};
+            git::remote( 'add', $name, $url );
+            is( https_remote_url($name), $expected, "$name: $url" );
+        }
+
+        is(
+            https_remote_url( 'https-port', 1 ),
+            "https://git.example.com:8443/Test/x/tree/$file",
+            'current branch is appended after the port'
+        );
+
+        is(
+            https_remote_url( 'scp', 1 ),
+            "$expected_url/tree/$file",
+            'current branch is appended to an scp-style remote'
+        );
+
+        my ( undef, $gh_open_stderr ) = capture {
+            system( $^X, "-I$lib", $gh_open, '-e', 'absolute-path' );
+        };
+        like(
+            $gh_open_stderr, qr{No browsable URL},
+            'gh-open reports a remote with no browsable URL'
+        );
+    };
 
     subtest 'ignored_files' => sub {
         my $gitignore = path('.gitignore');

@@ -1,7 +1,12 @@
 Revision history for Devel-XSCover
 
+0.10    2026-11-10
+	- Devel::Cover runs with -dir set to the distribution directory, so a test's child perl working in another directory still records the dist's files under their own names
+	- A file index in the LLVM flow dump is named by a function declared there only when the gcov text agrees, so an XSUB wrapper at a generated line that an included .xs file also numbers no longer takes that file's index (Punk: compile.xs read as Punk.c)
+
 0.09    2026-11-06
 	- An overload entry xsubpp registers
+	- An -ignore pattern also leaves out the XS maps of a generated C file it matches
 
 0.08    2026-11-06
 	- A .xs_cover file in the distribution holds default options, read before the command line

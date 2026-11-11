@@ -1,5 +1,24 @@
 Revision history for Perl extension App-mdee
 
+1.18 2026-11-11T10:03:49Z
+
+    - Print to PDF with -o FILE.pdf, or with -T and a paper as the
+      device (-T a4p is A4 in portrait, -T a4p:m10 with a margin of
+      10 mm).  The paper takes the place of the terminal: the panes
+      and the fold width follow the width of the paper, and the mode
+      is light.  nup 1.13 and ansi2pdf make the PDF
+      (https://github.com/tecolicom/App-ansi2pdf).  -o with another
+      name writes what is shown on the terminal to the file
+    - -C takes the number of rows after a comma, as in "-C2,2", the
+      same as nup
+    - Give front matter colors of its own: the delimiter lines in the
+      background of the file name, and the body in one a little apart
+      from it.  Setting meta_mark and meta_block to empty gives the
+      earlier look
+    - The manual has sections for printing to PDF and for themes, and
+      the implementation notes are in IMPLEMENTATION.md
+    - Require App::nup 1.13
+
 1.17 2026-11-09T09:21:16Z
 
     - Show front matter at the top of a file (YAML between --- lines,

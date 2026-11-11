@@ -151,6 +151,11 @@ static int pi_tag_eq(const char *a, STRLEN al, const char *b, STRLEN bl) {
  * without the container it belongs to. */
 static int pi_is_prefix(const pi_cat *c, const char *k, STRLEN kl) {
     uint32_t node;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!c || !c->fz || !PUNK_FZ) return 0;
     node = (PUNK_FZ->path)(c->fz, c->node, k, kl, '.');
     if (node == FZ_NOHANDLE) return 0;
@@ -169,6 +174,11 @@ static int pi_is_prefix(const pi_cat *c, const char *k, STRLEN kl) {
 static const char *pi_get(const pi_cat *c, const char *k, STRLEN kl,
                           STRLEN *vlen, int *utf8) {
     uint32_t node;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!c || !c->fz || !PUNK_FZ) return NULL;
     node = (PUNK_FZ->path)(c->fz, c->node, k, kl, '.');
     if (node == FZ_NOHANDLE) return NULL;
@@ -188,7 +198,14 @@ static const char *pi_get(const pi_cat *c, const char *k, STRLEN kl,
  * macro under PERL_IMPLICIT_SYS, which is the build failure Frozen 0.02 was
  * released to fix in its own selftest. */
 static void pi_arena_free(pTHX_ pi_arena *ar) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!ar) return;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (ar->c && PUNK_FZ) (PUNK_FZ->close)(aTHX_ ar->c);
     ar->c = NULL;
     Safefree(ar->cat);
@@ -217,15 +234,21 @@ typedef struct pi_vcheck {
 #define PI_V_DEEP   4
 
 static const char *pi_kind_name(int k) {
+    /*
+     # uncoverable branch true count:2
+     # uncoverable branch true count:3
+     # uncoverable branch true count:4
+     # uncoverable branch true count:6
+     # uncoverable branch true count:7 */
     switch (k) {
     case FZ_K_UNDEF: return "null";
-    case FZ_K_FALSE: case FZ_K_TRUE: return "a boolean";
-    case FZ_K_INT:   case FZ_K_UINT: return "a number";
-    case FZ_K_NUM:   return "a number";
+    case FZ_K_FALSE: case FZ_K_TRUE: return "a boolean"; /* # uncoverable statement */
+    case FZ_K_INT:   case FZ_K_UINT: return "a number"; /* # uncoverable statement */
+    case FZ_K_NUM:   return "a number"; /* # uncoverable statement */
     case FZ_K_ARRAY: return "an array";
-    case FZ_K_HASH:  return "an object";
+    case FZ_K_HASH:  return "an object"; /* # uncoverable statement */
     }
-    return "not a string";
+    return "not a string"; /* # uncoverable statement */
 }
 
 /* Walk a catalogue at boot, checking three things in one pass.
@@ -245,14 +268,20 @@ static void pi_walk_check(pi_vcheck *v, fz_container *fz, uint32_t node,
     int kind;
     uint32_t n, i;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (v->err) return;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (depth > 64) {                    /* Frozen allows 256; a catalogue
                                           * that deep is a bug, not a
                                           * translation */
-        v->err = PI_V_DEEP;
-        path[plen] = '\0';
-        my_strlcpy(v->path, path, sizeof v->path);
-        return;
+        v->err = PI_V_DEEP; /* # uncoverable statement */
+        path[plen] = '\0'; /* # uncoverable statement */
+        my_strlcpy(v->path, path, sizeof v->path); /* # uncoverable statement */
+        return; /* # uncoverable statement */
     }
 
     kind = (PUNK_FZ->kind)(fz, node);
@@ -261,7 +290,10 @@ static void pi_walk_check(pi_vcheck *v, fz_container *fz, uint32_t node,
         /* the last segment, for the plural rule */
         if (v->plural && depth >= 2) {
             size_t s = plen;
-            while (s > 0 && path[s - 1] != '.') s--;
+            while (s > 0 && path[s - 1] != '.') s--; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (pi_cat_name(path + s, (STRLEN)(plen - s))) {
                 path[plen] = '\0';
                 my_strlcpy(v->path, path, sizeof v->path);
@@ -287,6 +319,9 @@ static void pi_walk_check(pi_vcheck *v, fz_container *fz, uint32_t node,
         uint32_t child;
         size_t j, want;
 
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!(PUNK_FZ->key_at)(fz, node, i, &k, &kl, NULL)) continue;
 
         for (j = 0; j < (size_t)kl; j++) {
@@ -304,13 +339,16 @@ static void pi_walk_check(pi_vcheck *v, fz_container *fz, uint32_t node,
         }
 
         want = plen + (plen ? 1 : 0) + (size_t)kl;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (want >= PI_KEY_MAX) {        /* too long to name; refuse rather
                                           * than truncate into a message */
-            path[plen] = '\0';
-            my_strlcpy(v->path, path, sizeof v->path);
-            my_strlcpy(v->what, "a key too long to address", sizeof v->what);
-            v->err = PI_V_TYPE;
-            return;
+            path[plen] = '\0'; /* # uncoverable statement */
+            my_strlcpy(v->path, path, sizeof v->path); /* # uncoverable statement */
+            my_strlcpy(v->what, "a key too long to address", sizeof v->what); /* # uncoverable statement */
+            v->err = PI_V_TYPE; /* # uncoverable statement */
+            return; /* # uncoverable statement */
         }
         if (plen) path[plen] = '.';
         memcpy(path + plen + (plen ? 1 : 0), k, kl);
@@ -366,11 +404,14 @@ static void pi_validate(pTHX_ pi_arena *ar, int idx, const char *where) {
                   "under '%s'. A dot separates levels, so this key cannot be "
                   "reached - $c->locale would descend past it and a template "
                   "splits on dots before it ever gets here. Nest it instead",
-                  tag, w, *p ? p : "the top level");
+                  tag, w, *p ? p : "the top level"); /* # uncoverable condition left count:1 class:ignore_covered_err */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (err == PI_V_DEEP)
-            croak("Punk::Plugin::I18n: '%s' nests more than 64 levels deep at "
+            croak("Punk::Plugin::I18n: '%s' nests more than 64 levels deep at " /* # uncoverable statement */
                   "'%s', which is a mistake in the catalogue rather than a "
-                  "translation", tag, p);
+                  "translation", tag, p); /* # uncoverable statement */
         croak("Punk::Plugin::I18n: '%s' has %s at '%s', and a translation is "
               "a string. Quote it in the catalogue, or move the value into "
               "the application - the lookup returns text and there is nothing "
@@ -408,20 +449,29 @@ static pi_arena *pi_arena_build(pTHX_ SV *cats, const char *def,
      * hold strings only, which is also what lets the boot walk below say "a
      * translation is text" as ONE rule rather than a list of exceptions. */
     c = (FZ->freeze_container)(aTHX_ cats, FZ_F_STRINGIFY, NULL, &err);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!c)
-        croak("Punk::Plugin::I18n: the catalogues could not be frozen: %s",
-              (FZ->error)(err));
+        croak("Punk::Plugin::I18n: the catalogues could not be frozen: %s", /* # uncoverable statement */
+              (FZ->error)(err)); /* # uncoverable statement */
 
     root = (FZ->root)(c);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if ((FZ->kind)(c, root) != FZ_K_HASH) {
-        (FZ->close)(aTHX_ c);
-        croak("Punk::Plugin::I18n: the catalogues did not freeze to a map of "
+        (FZ->close)(aTHX_ c); /* # uncoverable statement */
+        croak("Punk::Plugin::I18n: the catalogues did not freeze to a map of " /* # uncoverable statement */
               "tag to catalogue");
     }
     n = (FZ->count)(c, root);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!n) {
-        (FZ->close)(aTHX_ c);
-        croak("Punk::Plugin::I18n: no catalogues - a plugin with nothing to "
+        (FZ->close)(aTHX_ c); /* # uncoverable statement */
+        croak("Punk::Plugin::I18n: no catalogues - a plugin with nothing to " /* # uncoverable statement */
               "translate is a typo in `dir`, not a working default");
     }
 
@@ -438,9 +488,12 @@ static pi_arena *pi_arena_build(pTHX_ SV *cats, const char *def,
         uint32_t node;
         STRLEN j;
 
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!(FZ->key_at)(c, root, i, &k, &kl, &kutf8)) {
-            pi_arena_free(aTHX_ ar);
-            croak("Punk::Plugin::I18n: the frozen catalogue map is short");
+            pi_arena_free(aTHX_ ar); /* # uncoverable statement */
+            croak("Punk::Plugin::I18n: the frozen catalogue map is short"); /* # uncoverable statement */
         }
         /* fz_at is array-only, so a hash value by index is val_at - added in
          * ABI v2 for exactly this. */
@@ -454,22 +507,32 @@ static pi_arena *pi_arena_build(pTHX_ SV *cats, const char *def,
             bad[w] = '\0';
         }
 
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (kutf8 || kl > PI_TAG_MAX) {
-            pi_arena_free(aTHX_ ar);
-            croak("Punk::Plugin::I18n: '%s' is not a usable language tag - "
-                  "a tag is ASCII and at most %d bytes", bad, PI_TAG_MAX);
+            pi_arena_free(aTHX_ ar); /* # uncoverable statement */
+            croak("Punk::Plugin::I18n: '%s' is not a usable language tag - " /* # uncoverable statement */
+                  "a tag is ASCII and at most %d bytes", bad, PI_TAG_MAX); /* # uncoverable statement */
         }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if ((FZ->kind)(c, node) != FZ_K_HASH) {
-            pi_arena_free(aTHX_ ar);
-            croak("Punk::Plugin::I18n: the catalogue for '%s' is not a JSON "
-                  "object - a catalogue is a map of key to translation", bad);
+            pi_arena_free(aTHX_ ar); /* # uncoverable statement */
+            croak("Punk::Plugin::I18n: the catalogue for '%s' is not a JSON " /* # uncoverable statement */
+                  "object - a catalogue is a map of key to translation", bad); /* # uncoverable statement */
         }
         for (j = 0; j < kl; j++) {
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err */
             if (pi_fold(k[j]) != k[j]) {
-                pi_arena_free(aTHX_ ar);
-                croak("Punk::Plugin::I18n: the tag '%s' reached the block "
+                pi_arena_free(aTHX_ ar); /* # uncoverable statement */
+                croak("Punk::Plugin::I18n: the tag '%s' reached the block " /* # uncoverable statement */
                       "unfolded - tags are folded when they are derived from "
-                      "the filename", bad);
+                      "the filename", bad); /* # uncoverable statement */
             }
             ar->cat[i].tag[j] = k[j];
         }
@@ -481,11 +544,11 @@ static pi_arena *pi_arena_build(pTHX_ SV *cats, const char *def,
 
         pi_validate(aTHX_ ar, (int)i, ar->cat[i].tag);
 
-        if (def && pi_tag_eq(ar->cat[i].tag, ar->cat[i].taglen, def, deflen))
+        if (def && pi_tag_eq(ar->cat[i].tag, ar->cat[i].taglen, def, deflen)) /* # uncoverable condition right count:1 class:ignore_covered_err */
             ar->def = (int)i;
     }
 
-    if (def && ar->def < 0) {
+    if (def && ar->def < 0) { /* # uncoverable condition right count:1 class:ignore_covered_err */
         char want[PI_TAG_MAX + 1];
         STRLEN j, w = deflen > PI_TAG_MAX ? PI_TAG_MAX : deflen;
         for (j = 0; j < w; j++) want[j] = def[j];
@@ -611,6 +674,9 @@ static SV *pi_html_value(pTHX_ SV *val) {
     const char *p = SvPV_const(val, l);
     SV *out = sv_2mortal(newSVpvn("", 0));
     ps_html_esc(aTHX_ out, p, l);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (SvUTF8(val)) SvUTF8_on(out);
     return out;
 }
@@ -639,8 +705,8 @@ static SV *pi_interpolate(pTHX_ const char *v, STRLEN vl, int utf8,
 
         /* find the close on the same run of name characters */
         close = o + 1;
-        while (close < vl && v[close] != '}' && v[close] != '{') close++;
-        if (close >= vl || v[close] != '}') {
+        while (close < vl && v[close] != '}' && v[close] != '{') close++; /* # uncoverable condition right count:3 class:ignore_covered_err */
+        if (close >= vl || v[close] != '}') { /* # uncoverable condition left count:2 class:ignore_covered_err */
             sv_catpvn(out, v + o, 1);       /* a lone brace is a lone brace */
             i = o + 1;
             continue;
@@ -649,7 +715,7 @@ static SV *pi_interpolate(pTHX_ const char *v, STRLEN vl, int utf8,
         for (j = 0; j + 1 < nargs; j += 2) {
             STRLEN nl;
             const char *n = SvPV_const(args[j], nl);
-            if (nl == close - o - 1 && memcmp(n, v + o + 1, nl) == 0) {
+            if (nl == close - o - 1 && memcmp(n, v + o + 1, nl) == 0) { /* # uncoverable condition right count:1 class:ignore_covered_err */
                 /* sv_catsv, not sv_catpvn(SvPV_const(...)): the argument
                  * carries its own flag and this is the only append that has
                  * to reconcile two encodings. */

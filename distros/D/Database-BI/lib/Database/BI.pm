@@ -18,8 +18,8 @@ use Database::BI::Model::DataSource;
 use Database::BI::Tutorial;
 
 # version->declare here alone: this is VERSION_FROM, and with it MakeMaker
-# writes 0.022.0 into META; a plain dotted string becomes v0.022.0 there.
-use version; our $VERSION = version->declare('0.022.0');
+# writes 0.023.0 into META; a plain dotted string becomes v0.023.0 there.
+use version; our $VERSION = version->declare('0.023.0');
 
 # The roadmap after 0.021.0, from its gap analysis (2026-11-06).
 #
@@ -150,7 +150,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 =head1 VERSION
 
-0.022.0
+0.023.0
 
 =head1 DESCRIPTION
 
@@ -877,6 +877,10 @@ browser, the page waits for the lookups instead (C<geocode=wait>).  Parameters:
   loc=<col>      column of places to geocode (required unless lat= and lon= are);
                  repeat it for a place written across columns, which are joined
                  with ", " in that order (loc=Address&loc=Country)
+  loc_text=<text> text added to the end of each place before it is looked
+                 up, after ", " (loc=County&loc_text=Virginia, USA looks up
+                 "Accomack, Virginia, USA"); one line, at most 200 characters;
+                 a row with no place is still not looked up
   lat=<col>      latitude column, -90..90
   lon=<col>      longitude column, -180..180
   popup=<col>    column shown in the marker popup (repeatable; default every
@@ -886,6 +890,7 @@ browser, the page waits for the lookups instead (C<geocode=wait>).  Parameters:
   max_zoom=N     tile layer maxZoom 0..28 (default: map_max_zoom, if set)
   tiles=<name>   named tile source from the tile_sources config key
   heat=1         add a heatmap layer over the markers
+  bounds=county  draw the outline of the county around each marker
   weight=<col>   numeric heatmap intensity column (normalised to 0..1)
   size=<col>     numeric bubble-radius column; markers become circles
   color=<col>    colour markers from a column
@@ -898,6 +903,97 @@ browser, the page waits for the lookups instead (C<geocode=wait>).  Parameters:
   geocode=cached look nothing up: plot what the cache knows (where Cancel leads)
   back=<url>, back2=<url>, back2_label=<text>  breadcrumb links
   f=            result filters (repeatable)
+
+With C<bounds=county> (the map panel's "Show county boundaries"), the map draws
+the outline of the county each marker is in, with a checkbox on the map to hide
+them.  The outlines come from Nominatim's reverse lookup, which is sent each
+marker's position rounded to three decimal places (about 110 metres), and only
+when C<map_geocode_online> allows it.  Each outline is remembered under
+C<model_dir> (C<boundary-cache>), with the points found in it, so a point inside
+an outline already known costs no lookup.  A county is the division of a
+country below its states, whose place rank in Nominatim depends on the country:
+12 (a US county or independent city, an English county, a German Landkreis), or
+10 for India, Bangladesh, China and Spain (district, prefecture, province), or 8
+for Kenya.  Australia, Brazil and Japan have nothing at that level.  Config
+C<map_bounds_ranks> (C<< { lk => 10 } >>: two-letter codes, ranks 8, 10 or 12)
+adds or changes countries; startup refuses anything else.  Each reply names its
+country, so a point is asked at the rank of the last country seen, and again
+at its own when that differs.
+Outlines not known yet are looked up as places are: by the progress bar, through
+C<POST /geo/boundary>, or in the request for C<geocode=wait>; at most
+C<map_geocode_online_max> in one request.  The checkbox needs L<HTML::OSM> 0.15;
+with 0.14 the outlines are always shown.
+
+With C<heat=1> as well, each outline is coloured by what is in it: the
+C<weight=> column summed over every row inside it (or its rows counted, with no
+C<weight=>), from green for the smallest total to red for the largest.  The
+colour follows the size of the total on a logarithmic scale: each step up the
+colours is the same multiple, so totals close in size share a colour and skewed
+totals (one county with 500 times the people of another) still spread across
+the scale.  When a total is zero or less the colours go by rank instead.  With
+one outline, or totals all alike, there is nothing to compare, so the outlines
+stay grey.  Each outline's popup gives its total, and the line under the title
+says what the colours mean.  The checkbox, the key and that line call an
+outline what its country does (a district in India, a province in Spain, an
+area when the map mixes them).  With L<HTML::OSM>
+0.16 a key in the map's bottom right corner lists each colour, highest first,
+with the totals it covers, rounded to two figures ("30,000 to 37,000"); it hides with the outlines'
+checkbox.
+
+When the markers are coloured (C<color=>), the outlines take their colours
+instead, with or without C<heat=1>, so a border never disagrees with the
+markers inside it.  With L<HTML::OSM> 0.17 each coloured outline, here and on the heat scale, is
+drawn just inside its own edge, so where two counties of different colours
+meet the border is a line twice as wide, one colour on each side.  An outline
+whose markers differ gets a line of each of their colours, side by side, the
+colour most of its markers have outermost.  An older HTML::OSM draws each
+outline along its edge in that first colour alone, one over another where they
+meet.  Outlines are simplified to about 100 metres one at a time, so zoomed
+well in, neighbours' lines can part or overlap a little.  The markers' key explains the colours, so the outlines have none of
+their own.
+
+A map can have fewer outlines than markers, and a list under it says why: each
+outline that holds more than one marker, with the places in it, and the markers
+in no outline at all, each with a link to its rows in the table.  Often that is
+as it should be (several shops in one county).  Where the places were looked up
+by name it can also be a wrong answer, since a name may be ambiguous, and the
+list says so; C<loc_text=>, or latitude and longitude columns, make a lookup
+surer.  The list names at most 50 outlines, the fullest first.  While some
+places have no outline yet (not looked up, or OpenStreetMap did not answer),
+the note above the map links to their rows and, for those not looked up, to
+the map again to look them up.
+
+Outlines are written into the page, about 7 KB each before compression, so a
+map of a state's counties is well under a megabyte, and one of every county in
+a large country would be very large: filter the rows first.
+
+C<shade=E<lt>columnE<gt>> (Colour shade, in the map panel) fills each outline in a
+shade of one colour, the darker the larger that column's total over the rows
+inside it, as a census map is drawn.  There are five shades, placed on the same
+logarithmic scale, from a light tint up to the colour itself: C<shade_color=>
+(a colour name or C<#rrggbb>) chooses it, orange by default.  A key lists each
+shade in use, darkest first, with the totals it covers, as filled boxes with
+L<HTML::OSM> 0.18 (lines before), and each outline's popup, which now opens from
+anywhere inside it, gives its total.  The lines stay grey, or take the markers'
+colours: with a shade the heat layer no longer colours them, since the fill
+says the same.  With one outline, or totals all alike, nothing is filled.
+
+When the markers are coloured (C<color=>) and no C<shade_color=> is given, each
+outline is shaded in its own markers' colour instead, each colour a scale of its
+own: the further a total is into what the colour stands for, the stronger the
+shade.  For a rule on the shaded column that reads "less than" (C<lt>, C<le>)
+that means the smaller total: with C<color_rule=lt:20000:green> a county of
+2,000 is a stronger green than one of 19,000, while under
+C<color_rule=gt:100000:red> the largest county is the strongest red.  The key
+lists every shade by size, the largest totals at the top, so it runs from the
+strongest red down to the strongest green.  It then stands for the markers'
+colours as well, so the markers' own key of those colours is left out while the outlines are
+shown.  With L<HTML::OSM> 0.19 it comes back when the reader hides the outlines
+with their checkbox, and goes again when they are shown; an older HTML::OSM
+leaves it out throughout.  The markers' key always stays when the shade is of
+another column or of one colour, where nothing else says what the marker
+colours mean.  Give C<shade_color=> to shade
+every outline in one colour as before.
 
 A marker stands for every row at its place, and its popup lists them all: a
 value every row shares is shown once ("Person: Valentin Puntar"), and the
@@ -1161,22 +1257,25 @@ extraction of the spec.
 
 =item C<GET /geo/list>
 
-Returns C<{ columns: { col: { kind: "lat"|"lon"|"location" } } }> for the
-saved coordinate-column preferences of the given C<l=> spec.
+Returns C<{ columns: { col: { kind: "lat"|"lon"|"location"|"location_suffix" } } }>
+for the saved coordinate-column preferences of the given C<l=> spec, with
+C<loc_text> when the text added to each place is remembered too.
 
 =item C<POST /geo/save>
 
 Saves a coordinate-column preference.  Body: C<l=&col=&kind=>,
-where C<kind> is C<lat>, C<lon>, or C<location>.  C<col=> and C<kind=> may
-repeat in pairs, so a latitude and a longitude are saved in one request, and
-C<replace=1> forgets the spec's saved columns first.  The map panel's
-"Remember columns" sends both, so a new choice replaces the old one; its
-"Forget remembered columns" calls C</geo/delete>.
+where C<kind> is C<lat>, C<lon>, C<location> or C<location_suffix>.  C<col=> and
+C<kind=> may repeat in pairs, so a latitude and a longitude are saved in one
+request, and C<replace=1> forgets the spec's saved columns first.  C<loc_text=>
+remembers the text added to each place (as C<loc_text=> on C</map>, and refused
+as it would be there).  The map panel's "Remember columns" sends all of them,
+so a new choice replaces the old one; its "Forget remembered columns" calls
+C</geo/delete>.
 
 =item C<POST /geo/delete>
 
 Removes a coordinate-column preference.  Body: C<l=&col=>.
-Omit C<col=> to clear all preferences for the spec.
+Omit C<col=> to clear all preferences for the spec, and its C<loc_text>.
 
 =item C<POST /geo/lookup>
 
@@ -1187,6 +1286,16 @@ plus C<online=0> to keep the lookup on this machine.  Returns
 C<{ place, status, stored, online_failed, messages }>, where C<status> is
 C<found>, C<not_found>, C<held> (not looked up now, and not remembered) or
 C<refused>.  See L</Maps>.
+
+=item C<POST /geo/boundary>
+
+Finds the outline of the county around one point, for the map page's progress
+bar, and remembers it at once.  Body: C<point=&level=county&sig=>, where
+C<point> is C<lat,lon> rounded to three places and C<sig> the signature the map
+page gave it (any other point is refused with 403), plus C<online=0> to ask
+nothing.  Returns C<{ point, status, stored, online_failed, name }>, where
+C<status> is C<found>, C<nowhere> (no county there, such as the sea) or C<held>
+(not settled now, and not remembered).
 
 =item C<GET /insights>
 
@@ -1803,14 +1912,16 @@ so nothing typed on a map page is sent anywhere.
 
 Map-specific config keys: C<map_geocode_max> (new geocoder lookups per request,
 default 500), C<map_geocode_online> (0 keeps geocoding on this machine: a place
-the local data does not know is not sent to OpenStreetMap's Nominatim; default
-1), C<map_geocode_online_max> (places asked of Nominatim per request, default 20;
+the local data does not know is not sent to OpenStreetMap's Nominatim, nor a
+marker's position for its county outline; default 1), C<map_geocode_online_max>
+(places, and outlines, asked of Nominatim per request, default 20;
 at one a second, the rest are left for the next request or for
 C<script/bi-geocode>; the map page's progress bar asks one place a request, so
 it reaches every place), C<secrets> (a list; the first signs the places a map
 page lists for C<POST /geo/lookup>.  Without it each start makes a random one), C<map_max_markers> (markers per request, default 2000), C<map_popup_rows>
 (rows listed in one marker's popup, default 10),
-C<map_region> (a two-letter country hint for ambiguous places), C<map_max_zoom>
+C<map_region> (a two-letter country hint for ambiguous places),
+C<map_bounds_ranks> (the place rank that is a county, by country; see above), C<map_max_zoom>
 (the default tile-layer maxZoom) and C<tile_sources> (a hashref of named tile
 sources, each C<< { url =E<gt> ... } >>, selected with C<tiles=>).
 
@@ -2026,8 +2137,12 @@ Warms the shared geocode cache for one column, so later map requests make no
 lookups:
 
     ./script/bi-geocode --spec table:customers --col city \
-                        [--data-dir DIR] [--model-dir DIR] \
+                        [--text TEXT] [--data-dir DIR] [--model-dir DIR] \
                         [--openaddr PATH] [--region CC] [--dry-run] [--verbose]
+
+C<--text> is the map panel's I<Add to each place> (C<loc_text=>): with
+C<--col county --text 'Virginia, USA'> it looks up C<Accomack, Virginia, USA>,
+the place the map then asks for.
 
 It is idempotent: a second run against a warm cache resolves nothing and says
 so.  Exit status is 0 on success, 1 when the column is missing or no rows load,
@@ -2501,6 +2616,7 @@ sub startup ($self) {
 	_check_allowed_hosts($self->config('allowed_hosts'));
 	_check_file_roots($self->config('file_roots'), $self->home);
 	_check_url_private_hosts($self->config('url_private_hosts'));
+	_check_map_bounds_ranks($self->config('map_bounds_ranks'));
 	_check_share_secret($self->config('share_secret'));
 	_check_export_dirs($self, $self->config('export_dirs'));
 	croak 'ai_calls_per_hour: give a whole number of provider calls an hour, or 0 for no limit'
@@ -3054,6 +3170,7 @@ sub startup ($self) {
 	$r->post('/geo/save')     ->to('Dashboard#geo_save');
 	$r->post('/geo/delete')   ->to('Dashboard#geo_delete');
 	$r->post('/geo/lookup')   ->to('Dashboard#geo_lookup');
+	$r->post('/geo/boundary') ->to('Dashboard#geo_boundary');
 	$r->get('/geo/list')      ->to('Dashboard#geo_list');
 	$r->get('/scatter')       ->to('Dashboard#scatter_view');
 	$r->get('/stacked')       ->to('Dashboard#stacked_view');
@@ -3331,6 +3448,27 @@ sub _check_url_private_hosts {
 				&& $name =~ /\A(?:\*\.)?[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)+\z/;
 	}
 	return;
+}
+
+# _check_map_bounds_ranks( $value ) -> void
+#
+# Purpose: Refuse a map_bounds_ranks that would not choose the county outlines.
+# Entry:   Config map_bounds_ranks: undef, or { country code => place rank },
+#          such as { lk => 10 }: the rank of Nominatim's that is a county in
+#          that country, over Boundary's own list.
+# Exit:    Returns; croaks on anything but a hash of two-letter codes to 8, 10
+#          or 12 (Boundary->new says which entry), since a mistyped one would
+#          otherwise draw no outlines, or the wrong ones, without a word.
+sub _check_map_bounds_ranks {
+	my ($value) = @_;
+	return unless defined $value;
+	croak "map_bounds_ranks: give a hash of country codes to place ranks, such as { lk => 10 }"
+		unless ref($value) eq 'HASH';
+	require Database::BI::Model::Boundary;
+	my $ok = eval { Database::BI::Model::Boundary->check_ranks($value); 1 };
+	return if $ok;
+	(my $error = $@ // 'unknown error') =~ s/ at \S+ line \d+\.?\n?\z//;
+	croak "map_bounds_ranks: $error";
 }
 
 # _check_share_secret( $value ) -> void

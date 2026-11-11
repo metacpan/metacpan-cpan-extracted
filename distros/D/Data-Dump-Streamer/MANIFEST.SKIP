@@ -23,6 +23,10 @@
 ^Build$
 
 ^\.git/
+^\.github(?:/|$)
+
+# Keep repository planning material out of release distributions.
+^planning(?:/|$)
 
 ^lib/Data/Dump/Streamer\.o$
 ^lib/Data/Dump/Streamer\.c$
@@ -44,9 +48,13 @@
 \.build\.tmpl$
 \.tar\.gz$
 DDS\.pm
-\.(bs|c|def|obj|pdb)$
+\.(bs|def|obj|pdb|o)$
 ^dds\w+\.pl
 ^MYMETA.yml$
 ^MYMETA\.json$
 .travis.yml
 tidyall.sh
+
+# MakeMaker build copies and generated XS output.
+^dds_[^/]+\.c$
+^Streamer\.(?:c|bs|o)$

@@ -180,7 +180,7 @@ subtest 'an iterator calls the ends once, after the source runs out' => sub {
 
 subtest 'a block giving the wrong things croaks, naming the stage' => sub {
     my $msg
-        = 'Expected stage #2, made with gather, to return one or two code references';
+        = 'Expected stage #2, made with gather, to return a code reference or a pipeline, and optionally an end function';
     my @bad = ([], [sub { }, sub { }, sub { }], ['x'], [sub { }, 'x']);
     for my $returns (@bad) {
         my $p    = $class->new(sub { $_ }, gather { @$returns });

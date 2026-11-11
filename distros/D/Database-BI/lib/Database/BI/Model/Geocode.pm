@@ -40,7 +40,7 @@ use Time::HiRes			();
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -93,6 +93,10 @@ Readonly my $CACHE_DIR       => 'geocode-cache';	# under model_dir, for file_cac
 # The default for map_geocode_max (section 6.2): new lookups allowed in one
 # request.  A crafted URL must not be able to turn one request into unbounded CPU.
 Readonly my $DEFAULT_MAX => 500;
+
+# The most characters of text place_text() lets be added to each place (the
+# map page's loc_text=, bi-geocode's --text).
+Readonly our $PLACE_TEXT_MAX => 200;
 
 # The model store's shared place cache.  A place name means the same place
 # whichever file's column holds it, so one answer serves every dataset: the
@@ -180,7 +184,7 @@ Database::BI::Model::Geocode - Resolve a location column to coordinates, once pe
 
 =head1 VERSION
 
-0.022.0
+0.023.0
 
 =head1 SYNOPSIS
 
@@ -793,22 +797,9 @@ sub _online_geocoder {
 	my $ok = eval {
 		require Geo::Coder::OSM;
 		Geo::Coder::OSM->VERSION($OSM_FLOOR);
-		require LWP::UserAgent::Throttled;
-		LWP::UserAgent::Throttled->VERSION($THROTTLED_FLOOR);
 		1;
 	};
-	return unless $ok;
-
-	if (!$online_ua) {
-		my $ua = LWP::UserAgent::Throttled->new(
-			agent      => $USER_AGENT,
-			timeout    => $ONLINE_TIMEOUT,
-			keep_alive => 1,
-		);
-		$ua->env_proxy();
-		$ua->throttle({ $NOMINATIM_HOST => $NOMINATIM_GAP });
-		$online_ua = $ua;
-	}
+	return unless $ok && nominatim_ua();
 
 	{
 		no warnings qw(once);	# the module's own variable, which only it reads
@@ -816,6 +807,53 @@ sub _online_geocoder {
 	}
 
 	return Geo::Coder::OSM->new(ua => $online_ua, sources => $NOMINATIM_SOURCE);
+}
+
+=head2 nominatim_ua
+
+    my $ua = Database::BI::Model::Geocode::nominatim_ua()
+        or return;    # LWP::UserAgent::Throttled is not installed
+
+The user agent every request to Nominatim goes through, from the geocoder and
+from L<Database::BI::Model::Boundary> alike: one per process, so the gap of a
+second Nominatim's usage policy asks for holds across both, and across map
+pages opened together.  It names this application, gives up after ten seconds,
+and follows the environment's proxy settings.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+An L<LWP::UserAgent::Throttled> (an L<LWP::UserAgent>), the same object on
+every call; or an empty list when LWP::UserAgent::Throttled 0.14 or later
+cannot be loaded.
+
+=cut
+
+sub nominatim_ua {
+	return $online_ua if $online_ua;
+
+	my $ok = eval {
+		require LWP::UserAgent::Throttled;
+		LWP::UserAgent::Throttled->VERSION($THROTTLED_FLOOR);
+		1;
+	};
+	return unless $ok;
+
+	my $ua = LWP::UserAgent::Throttled->new(
+		agent      => $USER_AGENT,
+		timeout    => $ONLINE_TIMEOUT,
+		keep_alive => 1,
+	);
+	$ua->env_proxy();
+	$ua->throttle({ $NOMINATIM_HOST => $NOMINATIM_GAP });
+	$online_ua = $ua;
+
+	return $online_ua;
 }
 
 # _judge() -> the object whose valid_location() decides what is a place
@@ -1610,6 +1648,9 @@ sub _catdir {
     my ($places, $name) = Database::BI::Model::Geocode->place_rows(\@rows, [ 'Address', 'Country' ]);
     my $result = $geocode->resolve_column($places, $name);
 
+    # Places that need their state and country to be found
+    my ($places, $name) = Database::BI::Model::Geocode->place_rows(\@rows, [ 'County' ], 'Virginia, USA');
+
 A place written across several columns, such as an address and then its
 country, as one column to geocode.  Each row's cells are trimmed and joined in
 the order given, with C<", ">, leaving out the empty ones:
@@ -1617,10 +1658,15 @@ C<"Brezje 8, Cerknica"> and C<"Slovenia"> become
 C<"Brezje 8, Cerknica, Slovenia">.  A row with every cell empty gives C<''>,
 which C<resolve_column> counts as skipped.
 
+Text given as the third argument is added to the end of each place, after
+C<", ">, for places the cells do not name fully: C<"Accomack"> with
+C<"Virginia, USA"> is looked up as C<"Accomack, Virginia, USA">.  A row with
+no place stays C<''>, so it is not found at the place the text names.
+
 The rows themselves are not changed (a SQL backend's are locked): the result is
 a new row for each, in the same order, holding only the joined place, so a
-marker's C<first_row> still indexes C<\@rows>.  With a single column the rows
-are returned as they are, under that column's name.
+marker's C<first_row> still indexes C<\@rows>.  With a single column and no
+text the rows are returned as they are, under that column's name.
 
 =head3 API SPECIFICATION
 
@@ -1628,11 +1674,13 @@ are returned as they are, under that column's name.
 
     \@rows       arrayref of hashrefs        # required; a row that is not a hashref gives undef
     \@columns    arrayref of column names    # required; one or more, in order
+    $text        string                      # optional; added to the end of each place
 
 =head4 OUTPUT
 
     (\@places, $name)
-        \@places   one hashref { $name => $place } per row, or \@rows itself for one column
+        \@places   one hashref { $name => $place } per row, or \@rows itself for one
+                   column and no text
         $name      the columns joined with ", " ("Address, Country")
 
 Croaks with C<error_rows_arrayref> when C<\@rows> is not an arrayref, and with
@@ -1647,7 +1695,7 @@ C<error_column_required> when C<\@columns> names no column.
 =cut
 
 sub place_rows {
-	my ($class, $rows, $columns) = @_;
+	my ($class, $rows, $columns, $text) = @_;
 
 	croak(_fmt('error_rows_arrayref', defined($rows) ? ref($rows) || $rows : 'undef'))
 		unless ref($rows) eq 'ARRAY';
@@ -1657,19 +1705,64 @@ sub place_rows {
 	croak(_fmt('error_column_required')) unless @columns;
 
 	my $name = join(', ', @columns);
-	return ($rows, $name) if @columns == 1;
+	$text = (defined($text) && !ref($text)) ? ($text =~ s/\A\s+|\s+\z//gr) : '';
+	return ($rows, $name) if @columns == 1 && !length($text);
 
 	my @places = map {
 		my $row = $_;
-		(ref($row) eq 'HASH')
-			? +{ $name => join(', ', grep { length } map {
+		my $place = (ref($row) eq 'HASH')
+			? join(', ', grep { length } map {
 				my $cell = $row->{$_};
 				(defined($cell) && !ref($cell)) ? ($cell =~ s/\A\s+|\s+\z//gr) : '';
-			} @columns) }
+			} @columns)
 			: undef;
+		$place .= ", $text" if defined($place) && length($place) && length($text);
+		defined($place) ? +{ $name => $place } : undef;
 	} @{$rows};
 
 	return (\@places, $name);
+}
+
+=head2 place_text
+
+    my ($text) = Database::BI::Model::Geocode->place_text(' , Virginia,   USA ');   # 'Virginia, USA'
+
+Tidies text to be added to the end of each place (the third argument of
+C<place_rows>): spaces are trimmed and runs of them made one, and a leading
+comma dropped, since the place and the text are joined with C<", ">.  The map
+page's C<loc_text=> and bi-geocode's C<--text> both go through it, so a place
+cached by one is found by the other.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+    $value    string    # optional; undef is no text
+
+=head4 OUTPUT
+
+    ($text)   the tidied text; '' for undef or blank
+    ()        for a reference, a control character, or more than
+              $PLACE_TEXT_MAX (200) characters once tidied
+
+Never croaks.
+
+=head3 EXAMPLE
+
+    my ($text) = Database::BI::Model::Geocode->place_text($param)
+        or die "Not one short line\n";
+    my ($places, $name) = Database::BI::Model::Geocode->place_rows($rows, [ 'County' ], $text);
+
+=cut
+
+sub place_text {
+	my ($class, $value) = @_;
+	return ('') unless defined $value;
+	return if ref($value) || $value =~ /[\x00-\x1f\x7f]/;
+	(my $text = $value) =~ s/\s+/ /g;
+	$text =~ s/\A[\s,]+|\s+\z//g;
+	return if length($text) > $PLACE_TEXT_MAX;
+	return ($text);
 }
 
 =head2 cache_from_models

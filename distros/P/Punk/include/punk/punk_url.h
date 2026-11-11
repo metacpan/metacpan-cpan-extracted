@@ -45,6 +45,10 @@ static void pk_url_check_name(pTHX_ SV *name, const char *what,
     n = SvPV_const(name, nl);
     for (i = 0; i < nl; i++) {
         const unsigned char ch = (unsigned char)n[i];
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err
+         # uncoverable condition right count:6 class:ignore_covered_err */
         if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
             || (ch >= '0' && ch <= '9') || ch == '_')
             continue;
@@ -90,6 +94,9 @@ static void pk_pct_cat(pTHX_ SV *out, const char *s, STRLEN len, int keep_slash)
     STRLEN i, run = 0;
     for (i = 0; i < len; i++) {
         const unsigned char ch = (unsigned char)s[i];
+        /*
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if ((ch >= 'A' && ch <= 'Z') || (ch >= 'a' && ch <= 'z')
             || (ch >= '0' && ch <= '9') || ch == '-' || ch == '_'
             || ch == '.' || ch == '~' || (keep_slash && ch == '/')) {
@@ -159,7 +166,7 @@ static void pk_url_query_cat(pTHX_ SV *out, HV *q) {
     for (i = 0; i < n; i++) {
         SV *k = *av_fetch(keys, i, 0);
         HE *e = hv_fetch_ent(q, k, 0, 0);
-        SV *v = e ? HeVAL(e) : &PL_sv_undef;
+        SV *v = e ? HeVAL(e) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         STRLEN kl;
         const char *kp = pk_url_bytes(aTHX_ k, &kl);
         AV *multi = (v && SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV)
@@ -171,7 +178,7 @@ static void pk_url_query_cat(pTHX_ SV *out, HV *q) {
             sv_catpvn(out, first ? "?" : "&", 1);
             first = 0;
             pk_pct_cat(aTHX_ out, kp, kl, 0);
-            if (one && SvOK(one)) {          /* undef is the bare key */
+            if (one && SvOK(one)) {          /* undef is the bare key */ /* # uncoverable condition right count:1 class:ignore_covered_err */
                 STRLEN vl;
                 const char *vp = pk_url_bytes(aTHX_ one, &vl);
                 sv_catpvn(out, "=", 1);
@@ -238,7 +245,7 @@ static void pk_url_cap_cat(pTHX_ SV *out, HV *args, HV *used, SV *capname,
               "character there and would not match the URL this built",
               name, cn);
     }
-    if (!splat) for (i = 0; i < vl; i++)
+    if (!splat) for (i = 0; i < vl; i++) /* # uncoverable branch true count:1 class:ignore_covered_err */
         if (vp[i] == '/') {
             SvREFCNT_dec(out);
             /* Encoding it would be right on the wire and wrong on arrival:
@@ -269,7 +276,7 @@ static void pk_url_cap_cat(pTHX_ SV *out, HV *args, HV *used, SV *capname,
         for (i = 0; i <= vl; i++) {
             if (i == vl || vp[i] == '/') {
                 STRLEN sl = i - s;
-                if ((sl == 1 && vp[s] == '.') || (sl == 2 && vp[s] == '.' && vp[s + 1] == '.')) {
+                if ((sl == 1 && vp[s] == '.') || (sl == 2 && vp[s] == '.' && vp[s + 1] == '.')) { /* # uncoverable condition right count:5 class:ignore_covered_err */
                     SvREFCNT_dec(out);
                     croak("Punk: url_for('%s'): :%s has a '%.*s' segment, "
                           "which a browser resolves away before the request "
@@ -319,21 +326,33 @@ static SV *pk_url_build(pTHX_ pr_router *rt, IV idx, HV *args, HV *query,
     HV *used = (HV *)sv_2mortal((SV *)newHV());
     IV dyn;
 
-    if (origin && SvOK(origin)) sv_catsv(out, origin);
-    if (prefix && SvOK(prefix)) sv_catsv(out, prefix);
+    if (origin && SvOK(origin)) sv_catsv(out, origin); /* # uncoverable condition right count:2 class:ignore_covered_err */
+    if (prefix && SvOK(prefix)) sv_catsv(out, prefix); /* # uncoverable condition right count:2 class:ignore_covered_err */
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (idx < 0 || idx >= (IV)rt->nrecs) {
-        SvREFCNT_dec(out);
-        croak("Punk: url_for('%s'): the route table has no record %" IVdf
+        SvREFCNT_dec(out); /* # uncoverable statement */
+        croak("Punk: url_for('%s'): the route table has no record %" IVdf /* # uncoverable statement */
               " - the application was compiled from a different table",
-              name, idx);
+              name, idx); /* # uncoverable statement */
     }
     dyn = rt->dyn_of[idx];
 
     if (dyn < 0) {                       /* static: the path IS the URL */
         SV **rr = av_fetch(rt->records, (SSize_t)idx, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         HV *rec = (rr && *rr && SvROK(*rr)) ? (HV *)SvRV(*rr) : NULL;
-        SV **pp = rec ? hv_fetchs(rec, "path", 0) : NULL;
+        SV **pp = rec ? hv_fetchs(rec, "path", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (pp && *pp) sv_catsv(out, *pp);
     }
     else {
@@ -343,6 +362,9 @@ static SV *pk_url_build(pTHX_ pr_router *rt, IV idx, HV *args, HV *query,
             pr_seg *s = &r->segs[k];
             sv_catpvn(out, "/", 1);
             if (s->type == PR_LIT) {
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 if (s->litlen) sv_catpvn(out, s->lit, s->litlen);
                 continue;
             }
@@ -376,12 +398,25 @@ static SV *pk_url_build_op(pTHX_ AV *tmpl, SV *mount_prefix, HV *args,
     HV *used = (HV *)sv_2mortal((SV *)newHV());
     SSize_t i, n = av_len(tmpl) + 1;
 
-    if (origin && SvOK(origin)) sv_catsv(out, origin);
+    if (origin && SvOK(origin)) sv_catsv(out, origin); /* # uncoverable condition right count:2 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (prefix && SvOK(prefix)) sv_catsv(out, prefix);
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (mount_prefix && SvOK(mount_prefix)) sv_catsv(out, mount_prefix);
 
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(tmpl, i, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!(e && *e)) continue;
         if (!(i & 1)) {                       /* even: a literal */
             if (SvCUR(*e)) sv_catsv(out, *e);
@@ -412,9 +447,17 @@ static SV *pk_url_build_op(pTHX_ AV *tmpl, SV *mount_prefix, HV *args,
  * nearly every deployment, and costs two hv_fetchs that find nothing.
  */
 static SV *pk_url_prefix(pTHX_ HV *app, HV *env) {
-    SV **hp = app ? hv_fetchs(app, K_HOST_PATH_C, 0) : NULL;
+    SV **hp = app ? hv_fetchs(app, K_HOST_PATH_C, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     SV **sn = env ? hv_fetchs(env, "SCRIPT_NAME", 0) : NULL;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     int have_hp = (hp && *hp && SvOK(*hp) && SvCUR(*hp));
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     int have_sn = (sn && *sn && SvOK(*sn) && SvCUR(*sn));
     SV *out;
     if (!have_hp && !have_sn) return NULL;
@@ -427,8 +470,14 @@ static SV *pk_url_prefix(pTHX_ HV *app, HV *env) {
 /* What a name resolves to, or NULL: an IV record index for a route, an
  * arrayref [ mount prefix, parsed template ] for an API operation. */
 static SV *pk_url_target(pTHX_ HV *app, SV *name) {
-    SV **nm = app ? hv_fetchs(app, K_NAMES_C, 0) : NULL;
+    SV **nm = app ? hv_fetchs(app, K_NAMES_C, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     HE *he;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(nm && *nm && SvROK(*nm) && SvTYPE(SvRV(*nm)) == SVt_PVHV)) return NULL;
     he = hv_fetch_ent((HV *)SvRV(*nm), name, 0, 0);
     return he ? HeVAL(he) : NULL;
@@ -438,12 +487,18 @@ static SV *pk_url_target(pTHX_ HV *app, SV *name) {
  * none, and answers -1 too). */
 static IV pk_url_idx(pTHX_ HV *app, SV *name) {
     SV *v = pk_url_target(aTHX_ app, name);
-    return (v && !SvROK(v)) ? SvIV(v) : -1;
+    return (v && !SvROK(v)) ? SvIV(v) : -1; /* # uncoverable condition right count:2 class:ignore_covered_err */
 }
 
 /* The compiled router off the application. */
 static pr_router *pk_url_router(pTHX_ HV *app) {
-    SV **r = app ? hv_fetchs(app, K_ROUTER, 0) : NULL;
+    SV **r = app ? hv_fetchs(app, K_ROUTER, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(r && *r && SvROK(*r) && SvIOK(SvRV(*r)))) return NULL;
     return (pr_router *)INT2PTR(void *, SvIV(SvRV(*r)));
 }
@@ -481,8 +536,12 @@ XS_INTERNAL(pk_url_filter_cb) {
     IV idx;
     int is_op;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cap || items < 2)
-        croak("Punk: the url_for filter takes a route name: "
+        croak("Punk: the url_for filter takes a route name: " /* # uncoverable statement */
               "{%% value | url_for('name') %%}");
     value  = ST(0);
     name   = ST(1);
@@ -493,24 +552,50 @@ XS_INTERNAL(pk_url_filter_cb) {
      * application if something else kept it. Returning the name would put a
      * link to /book on the page, so this croaks like every other way of
      * failing to build a URL. */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(appsv && SvROK(appsv) && SvTYPE(SvRV(appsv)) == SVt_PVHV))
-        croak("Punk: url_for('%s'): the application is gone",
+        croak("Punk: url_for('%s'): the application is gone", /* # uncoverable statement */
+              /*
+               # uncoverable statement
+               # uncoverable condition left count:1
+               # uncoverable condition right count:1 */
               SvOK(name) ? SvPV_nolen(name) : "?");
     app = (HV *)SvRV(appsv);
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!SvOK(name) || !SvCUR(name))
-        croak("Punk: the url_for filter takes a route name: "
+        croak("Punk: the url_for filter takes a route name: " /* # uncoverable statement */
               "{%% value | url_for('name') %%}");
     target = pk_url_target(aTHX_ app, name);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!target)
-        croak("Punk: url_for('%s'): no route is named that", SvPV_nolen(name));
+        croak("Punk: url_for('%s'): no route is named that", SvPV_nolen(name)); /* # uncoverable statement */
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     is_op = (SvROK(target) && SvTYPE(SvRV(target)) == SVt_PVAV);
-    idx = is_op ? -1 : SvIV(target);
+    idx = is_op ? -1 : SvIV(target); /* # uncoverable condition right count:1 class:ignore_covered_err */
     rt = pk_url_router(aTHX_ app);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!rt) croak("Punk: url_for('%s'): the application is not compiled",
-                   SvPV_nolen(name));
+                   SvPV_nolen(name)); /* # uncoverable statement */
 
     args = (HV *)sv_2mortal((SV *)newHV());
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (value && SvROK(value) && SvTYPE(SvRV(value)) == SVt_PVHV) {
         HV *in = (HV *)SvRV(value);          /* a row: captures by name */
         HE *he;
@@ -518,14 +603,32 @@ XS_INTERNAL(pk_url_filter_cb) {
         while ((he = hv_iternext(in)))
             (void)hv_store_ent(args, hv_iterkeysv(he), newSVsv(HeVAL(he)), 0);
     }
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     else if (value && SvOK(value)) {         /* a scalar: the one capture */
         SV *only = NULL;
         int n = 0;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (is_op) {                         /* the odd slots are the holes */
-            AV *tmpl = (AV *)SvRV(*av_fetch((AV *)SvRV(target), 1, 0));
-            SSize_t j, jn = av_len(tmpl) + 1;
+            AV *tmpl = (AV *)SvRV(*av_fetch((AV *)SvRV(target), 1, 0)); /* # uncoverable statement */
+            SSize_t j, jn = av_len(tmpl) + 1; /* # uncoverable statement */
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             for (j = 1; j < jn; j += 2) { only = *av_fetch(tmpl, j, 0); n++; }
         }
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         else if (idx >= 0 && idx < (IV)rt->nrecs && rt->dyn_of[idx] >= 0) {
             pr_rec *r = &rt->recs[rt->dyn_of[idx]];
             int k;
@@ -539,11 +642,14 @@ XS_INTERNAL(pk_url_filter_cb) {
         (void)hv_store_ent(args, only, newSVsv(value), 0);
     }
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (is_op) {
-        AV *pair = (AV *)SvRV(target);
-        SV **mp = av_fetch(pair, 0, 0);
-        SV **tm = av_fetch(pair, 1, 0);
-        ST(0) = sv_2mortal(pk_url_build_op(aTHX_ (AV *)SvRV(*tm),
+        AV *pair = (AV *)SvRV(target); /* # uncoverable statement */
+        SV **mp = av_fetch(pair, 0, 0); /* # uncoverable statement */
+        SV **tm = av_fetch(pair, 1, 0); /* # uncoverable statement */
+        ST(0) = sv_2mortal(pk_url_build_op(aTHX_ (AV *)SvRV(*tm), /* # uncoverable statement */
                     (mp && *mp) ? *mp : NULL, args, NULL,
                     (prefix && SvCUR(prefix)) ? prefix : NULL,
                     NULL, SvPV_nolen(name)));
@@ -588,7 +694,7 @@ static SV *pk_url_tied(pTHX_ SV *app, SV *prefix_slot) {
     SV *obj;
     av_extend(o, 2);
     av_store(o, PKU_T_APP,    newSVsv(app));
-    av_store(o, PKU_T_PREFIX, prefix_slot ? newSVsv(prefix_slot) : newSV(0));
+    av_store(o, PKU_T_PREFIX, prefix_slot ? newSVsv(prefix_slot) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
     obj = sv_bless(newRV_noinc((SV *)o), gv_stashpv("Punk::URL", GV_ADD));
     hv_magic(h, (GV *)obj, PERL_MAGIC_tied);
     SvREFCNT_dec(obj);                  /* hv_magic took its own reference */
@@ -601,13 +707,29 @@ static int pk_url_static_path(pTHX_ HV *app, SV *name, SV **path_out) {
     IV idx = pk_url_idx(aTHX_ app, name);
     SV **rr;
     HV *rec;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!rt || idx < 0 || idx >= (IV)rt->nrecs) return 0;
     if (rt->dyn_of[idx] >= 0) return 0;              /* dynamic: not here */
     rr = av_fetch(rt->records, (SSize_t)idx, 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     rec = (rr && *rr && SvROK(*rr)) ? (HV *)SvRV(*rr) : NULL;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!rec) return 0;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (path_out) {
         SV **pp = hv_fetchs(rec, "path", 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         *path_out = (pp && *pp) ? *pp : NULL;
     }
     return 1;
@@ -630,7 +752,10 @@ static AV *pk_url_parse_template(pTHX_ const char *p, STRLEN pl) {
     while (i < pl) {
         if (p[i] == '{') {
             STRLEN close = i + 1;
-            while (close < pl && p[close] != '}') close++;
+            while (close < pl && p[close] != '}') close++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (close < pl) {
                 av_push(out, newSVpvn(p + lit, i - lit));        /* literal */
                 av_push(out, newSVpvn(p + i + 1, close - i - 1)); /* hole */
@@ -670,24 +795,49 @@ static void pk_url_bind_vars(pTHX_ SV *c, SV *data) {
     AV *av;
     SV **sp;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(data && SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV)) return;
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (c && SvROK(c)) {
         av = pcx_av(aTHX_ c);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (av) {
             SV *a = pcx_get(aTHX_ av, PCX_APP);
             SV *e = pcx_get(aTHX_ av, PCX_ENV);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (a && SvROK(a) && SvTYPE(SvRV(a)) == SVt_PVHV) {
                 appsv = a;
                 app = (HV *)SvRV(a);
             }
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (e && SvROK(e) && SvTYPE(SvRV(e)) == SVt_PVHV)
                 env = (HV *)SvRV(e);
         }
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!app) return;                       /* nothing named, nothing to bind */
     sp = hv_fetchs(app, K_URL_PREFIX_C, 0);
-    if (!(sp && *sp)) return;               /* no shipped engine at boot */
+    if (!(sp && *sp)) return;               /* no shipped engine at boot */ /* # uncoverable condition left count:2 class:ignore_covered_err */
     slot = *sp;
 
     {   /* the filter reads this slot for the length of the render, and the

@@ -1,0 +1,63 @@
+fix '*' matching zero components and match precedence; rewrite docs
+
+Config/XrmDatabase.pm:
+
+Matching now agrees with libX11:
+
+* A '*' immediately before the last component of a key couldn't match
+  zero components, so 'a*b' didn't match 'a.b'.  The last level of
+  the search ignored entries under a '*'.
+
+* When a '*' matched zero components, precedence was wrong.  The
+  search tried every '.'-bound candidate (name, class, '?') before
+  any '*'-bound one, so for name 'a.b' and class 'A.B', 'a.?' beat
+  'a*b'.  libX11 ranks what matched before how it was bound:
+  name.  > name* > class. > class* > ?. > ?* > level spanned by '*'.
+
+* Logic in _query is now consolidated.
+
+Config/XrmDatabase/Util.pm:
+
+* is_wildcard is deprecated; it was documented as testing for '*' and
+  '?' but tests for '.' and '*'.  Its return value is unchanged, and
+  is_binding_operator, which is identical, replaces it.
+  is_wildcard now emits a 'deprecated' warning.
+
+Tests:
+
+* utils/fake
+
+  * now uses utils/lib/XrmFFI.pm, an FFI::Platypus binding to libX11's
+    Xrm functions, in place of a local X11::Xlib fork.
+
+  * generates keys in which '*' may match zero components, plus
+    explicit zero-width and precedence cases.
+
+  * no longer divides the probability of choosing a name component
+    by 100, which made name components very rare in generated keys.
+
+* t/query.t
+
+  * tests for zero-width '*' matching, interior nodes without values
+    (including on_failure and return_value handling), warnings, and
+    the reported match key.
+
+* t/parse_name.t
+
+  * tests is_binding_operator and is_wildcard.
+
+* t/read_file.t
+
+   * handles reference results with no match.
+
+Documentation:
+
+* New DESCRIPTION sections on keys and bindings, names and classes,
+  and matching precedence (with an example for each precedence
+  level); the copied X11 matching rules are removed.
+
+* Corrected query's 'reference' example and return_value option
+  name, read_file's synopsis and input restrictions, on_failure
+  subroutine arguments, to_kv/to_kv_arr return types, TO_HASH
+  contents, merge semantics, and name_arr_to_str; documented insert
+  and query exceptions and the 'query' exception class.

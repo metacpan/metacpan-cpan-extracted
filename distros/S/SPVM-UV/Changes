@@ -1,3 +1,14 @@
+0.007 2026-11-11
+  [New Features]
+    * Add stop method to UV::Handle::Poll class.
+0.006 2026-11-11
+  [New Features]
+    * Add stop method to UV::Handle::Idle class.
+0.005 2026-11-11
+  [New Features]
+    * Add stop method to UV::Handle::Timer class.
+    * Add again method to UV::Handle::Timer class.
+    * Add read_stop method to UV::Handle::Stream class.
 0.004 2026-10-28
   [Requirement Changes]
     * Require SPVM 0.990204.

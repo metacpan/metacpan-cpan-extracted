@@ -31,5 +31,6 @@ t/data/rfc822.eml
 t/data/spec-4-1-4.eml
 t/data/unknown-charset.eml
 t/data/unknown-cte.eml
+t/hostile.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

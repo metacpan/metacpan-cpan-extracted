@@ -1,5 +1,12 @@
 Revision history for Getopt-Long-Bash
 
+1.1.1 2026-11-10T10:47:07Z
+
+    - Pass-through keeps a value as one element: it was split at
+      spaces and expanded as a file name pattern
+    - Pass-through passes the value of an optional argument, in the
+      form of "--option=value": it was dropped
+
 1.1.0 2026-10-27T09:18:40Z
 
     - Auto-initialize only when getoptlong.sh is sourced as a file, so

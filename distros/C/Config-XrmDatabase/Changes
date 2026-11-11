@@ -1,5 +1,51 @@
 Revision history for Config-XrmDatabase
 
+0.09      2026-11-10 16:13:55-05:00 America/New_York
+
+  [BUG FIX]
+
+    * a '*' immediately before the last component of a key didn't
+      match zero components, e.g. 'a*b' didn't match 'a.b'.
+
+    * match precedence didn't follow libX11 when a '*' matched zero
+      components.  At each level, what matched (name, then class,
+      then '?') now takes precedence over the binding which precedes
+      it, e.g. for name 'a.b' and class 'A.B', 'a*b' now beats both
+      'a.?' and 'a.B'.
+
+  [DEPRECATION]
+
+    * Config::XrmDatabase::Util
+
+      * is_wildcard is deprecated.  It was documented as testing for
+        '*' and '?', but actually tests for the binding operators '.'
+        and '*'.  it now emits a 'deprecated' warning.
+
+      * is_binding_operator replaces is_wildcard. same API.
+
+  [DOCUMENTATION]
+
+    * documentation now distinguishes between bindings and the '?'
+      operator, and has a detailed explanation of the match algorithm.
+
+    * various corrections.
+
+  [TESTS]
+
+    * The code which generates the reference results from the actual libX11
+      library (utils/fake) now interfaces with it via FFI::Platypus.
+
+    * tests now include
+
+       * cases where '*' matches zero components.
+       * interior nodes  without values
+       * the key returned by query( return_value => 'all' )
+
+    * generated keys now use name components as often as class
+      components and '?'; previously they were very rare due to a
+      random number normalization bug..
+
+
 0.08      2025-10-06 01:56:27-04:00 America/New_York
 
   [MISC]

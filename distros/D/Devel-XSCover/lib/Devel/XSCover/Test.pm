@@ -8,7 +8,7 @@ use Cwd ();
 use File::Path ();
 use File::Spec ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub new {
     my ($class, %args) = @_;
@@ -39,9 +39,12 @@ sub db_path {
 sub switches {
     my ($self) = @_;
     my $db = $self->db_path;
-    $db =~ s/\\/\\\\/g if $^O eq 'MSWin32';
-    $db =~ s/ /\\ /g;
-    my $cover = "-MDevel::Cover=-db,$db,-ignore," . ($^O eq 'MSWin32' ? '^[A-Za-z]:' : '^/') . ',-ignore,/Install/Files\.pm$';
+    my $dir = File::Spec->rel2abs($self->{dir});
+    for ($db, $dir) {
+        s/\\/\\\\/g if $^O eq 'MSWin32';
+        s/ /\\ /g;
+    }
+    my $cover = "-MDevel::Cover=-db,$db,-dir,$dir,-ignore," . ($^O eq 'MSWin32' ? '^[A-Za-z]:' : '^/') . ',-ignore,/Install/Files\.pm$';
     $cover .= ',-silent,1' if $self->{silent};
     return join ' ', grep { defined && length } $ENV{DEVEL_COVER_TEST_OPTS}, $self->deparse_switch, $cover;
 }
@@ -196,7 +199,10 @@ Runs a distribution's tests once, under Devel::Cover for the Perl side and on th
 instrumented objects for the C side, so both land in one coverage database from
 one run. The environment is the one C<cover -test> sets: C<HARNESS_PERL_SWITCHES>
 and C<PERL5OPT> both carry C<-MDevel::Cover=-db,DIR>, after anything in
-C<DEVEL_COVER_TEST_OPTS>, plus an ignore of every absolute path: C<PERL5OPT> covers
+C<DEVEL_COVER_TEST_OPTS>, plus C<-dir> naming the distribution directory, so a
+child perl a test starts in some other directory (a generated application under
+a temporary directory, say) still records the distribution's own modules under
+the names the main run uses, and the two merge, plus an ignore of every absolute path: C<PERL5OPT> covers
 every perl that runs, C<prove> itself and the scripts a test writes under the
 temporary directory included, and none of those is the distribution's code, and an
 ignore of C<Install/Files.pm>, the file ExtUtils::Depends generates at configure time

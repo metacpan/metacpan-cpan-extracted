@@ -5,7 +5,7 @@ use warnings;
 
 package Text::JSContact;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # vCard <=> JSContact (RFC 9553) conversion, writing JSContact version 2.0
 # (RFC 9982); follows RFC 9555 for vCard mapping and RFC 9554 for extensions
@@ -260,9 +260,24 @@ my @MAP_CONVERTERS = (
 # Read a vCard given as characters.  Returns the Card, the conversion
 # context (whose {sources} maps each Card entry to the vCard properties it
 # was read from) and the parsed properties; nothing if it does not parse.
+# Text::VCardFast recurses once per BEGIN, in C: nesting tens of thousands
+# deep overflows the stack and kills the process (no eval can catch that).
+# A vCard nests at most a level or two (an AGENT); refuse anything deeper.
+our $MAX_NESTING = 16;
+sub _nesting_ok {
+  my ($text) = @_;
+  my $depth = 0;
+  while ($text =~ /^(BEGIN|END)[ \t]*:/mgi) {
+    if (uc $1 eq 'BEGIN') { $depth++; return 0 if $depth > $MAX_NESTING }
+    else { $depth-- if $depth > 0 }
+  }
+  return 1;
+}
+
 sub _read_vcard {
   my ($vcard_string) = @_;
 
+  return unless _nesting_ok($vcard_string // '');
   my $parsed = eval { vcard2hash($vcard_string, multival => [qw(n adr org)]) };
   return unless $parsed && $parsed->{objects} && @{$parsed->{objects}};
 
@@ -1678,10 +1693,14 @@ sub _split_vcard {
   return undef unless $text =~ /\n/;
   my $eol = $text =~ /\r\n/ ? "\r\n" : "\n";
 
+  # one match per logical line (a physical line and its folded
+  # continuations): a split at every newline was most of the time a card
+  # with a large folded PHOTO took
   my @lines;
-  for my $phys (split /(?<=\n)/, $text) {
-    if (@lines && $phys =~ /^[ \t]/) { $lines[-1]{raw} .= $phys }
-    else                             { push @lines, { raw => $phys } }
+  pos($text) = 0;
+  while (pos($text) < length $text) {
+    $text =~ /\G([^\n]*(?:\n|\z)(?:[ \t][^\n]*(?:\n|\z))*)/gc or last;
+    push @lines, { raw => $1 };
   }
 
   my ($depth, $end, %by_name) = (0);
@@ -2454,6 +2473,10 @@ sub _param_order {
 sub _param_value {
   my ($val) = @_;
   $val = _clean_vcard_text($val);
+  # a backslash has no meaning in a parameter (RFC 6350, 6868), but
+  # Text::VCardFast reads \; \: \" as escapes: "a \" swallowed what
+  # followed, and the card no longer parsed
+  $val =~ s/\\//g;
   $val =~ s/([\n^"])/$1 eq "\n" ? '^n' : $1 eq '^' ? '^^' : "^'"/ge;
   $val = qq{"$val"} if $val =~ /[;:,\s]/;
   return $val;

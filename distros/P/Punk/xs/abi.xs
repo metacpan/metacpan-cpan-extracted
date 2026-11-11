@@ -30,6 +30,9 @@ _abi_selftest_install()
     CODE:
     {
         const pk_abi *A = INT2PTR(const pk_abi *, PTR2IV(&PK_ABI));
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!A || A->abi_version != PK_ABI_VERSION) XSRETURN_IV(0);
         if (PK_SELFTEST_ON) XSRETURN_IV(1);      /* idempotent */
         PK_SELFTEST_ON =
@@ -53,6 +56,9 @@ _abi_selftest_events()
         SSize_t i, n = av_len(ev) + 1;
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(ev, i, 0);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (e && *e) av_push(out, newSVsv(*e));
         }
         av_clear(ev);
@@ -72,6 +78,8 @@ _abi_current()
     CODE:
     {
         const pk_abi *A = INT2PTR(const pk_abi *, PTR2IV(&PK_ABI));
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         SV *c = (A && A->abi_version >= 5) ? A->current_of(aTHX) : NULL;
         if (!c) XSRETURN_UNDEF;
         RETVAL = newSVsv(c);

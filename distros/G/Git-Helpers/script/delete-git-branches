@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 package Options;
-our $VERSION = '1.000001';
+our $VERSION = '1.000002';
 use Moo;
 use MooX::Options;
 
@@ -110,7 +110,7 @@ delete-git-branches - Interactively delete git branches
 
 =head1 VERSION
 
-version 1.000001
+version 1.000002
 
 =head1 SYNOPSIS
 

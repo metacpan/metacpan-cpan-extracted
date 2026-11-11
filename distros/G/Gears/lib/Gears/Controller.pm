@@ -1,5 +1,5 @@
 package Gears::Controller;
-$Gears::Controller::VERSION = '0.104';
+$Gears::Controller::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 

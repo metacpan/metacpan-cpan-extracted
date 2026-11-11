@@ -1,0 +1,27 @@
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 8
+UseTab: Never
+BreakBeforeBraces: Linux
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortEnumsOnASingleLine: false
+ColumnLimit: 100
+SortIncludes: Never
+BreakStringLiterals: false
+ReflowComments: false
+AlignEscapedNewlines: DontAlign
+StatementMacros:
+  - dXSARGS
+  - dSP
+  - PUTBACK
+  - SPAGAIN
+  - ENTER
+  - LEAVE
+  - SAVETMPS
+  - FREETMPS
+  - XSRETURN_YES
+  - XSRETURN_NO
+  - XSRETURN_UNDEF

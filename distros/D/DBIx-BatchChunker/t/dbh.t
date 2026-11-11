@@ -8,6 +8,7 @@ use Test2::Bundle::More;
 use Test2::Tools::Compare;
 use Test2::Tools::Exception;
 use Test2::Tools::Explain;
+use Test2::Tools::Warnings;
 
 use List::Util   qw( max );
 use POSIX        qw( ceil );
@@ -18,6 +19,7 @@ use Env          qw( BATCHCHUNK_TEST_DEBUG CDTEST_DSN CDTEST_DBUSER CDTEST_DBPAS
 use DBIx::BatchChunker;
 use DBIx::Connector::Retry;
 use CDTest;
+use Term::ProgressBar;
 
 use Path::Class 'file';
 
@@ -430,6 +432,47 @@ subtest 'Chunk resizing with non-unique IDs' => sub {
     delete $dbh->{Callbacks}{ChildCallbacks}{execute};
     delete $dbh->{Callbacks}{ChildCallbacks};
     delete $dbh->{Callbacks};
+};
+
+subtest '_print_chunk_status with undef chunk_count' => sub {
+    # Directly test that _print_chunk_status handles undef chunk_count
+    # (which occurs when no count_stmt is provided) without warnings,
+    # and outputs "?" as a placeholder for the unknown count.
+    my $batch_chunker = DBIx::BatchChunker->new(
+        chunk_size => $CHUNK_SIZE,
+        min_id     => 1,
+        max_id     => 10,
+        coderef    => sub {},
+        verbose    => 1,
+    );
+
+    my $ls = $batch_chunker->loop_state(DBIx::BatchChunker::LoopState->new({
+        batch_chunker => $batch_chunker,
+        progress_bar  => Term::ProgressBar->new({ count => 10, silent => 1 }),
+    }));
+    $ls->start(1);
+    $ls->end(3);
+    $ls->chunk_count(undef);
+    $ls->prev_runtime(0.5);
+
+    # Intercept the message passed to progress_bar->message() so we can
+    # inspect the formatted string, even though the bar is silent.
+    my @captured_messages;
+    {
+        no warnings 'redefine';
+        local *Term::ProgressBar::message = sub {
+            push @captured_messages, $_[1];
+        };
+
+        my @warnings = warnings { $batch_chunker->_print_chunk_status('processed') };
+        my @uninit = grep { /uninitialized/ } @warnings;
+        is(\@uninit, [], 'No uninitialized value warnings from _print_chunk_status');
+    }
+
+    ok(scalar @captured_messages > 0, '_print_chunk_status produced a message');
+    for my $msg (@captured_messages) {
+        like($msg, qr/\?.*rows found/, "Status message shows '?' for unknown count: $msg");
+    }
 };
 
 ############################################################

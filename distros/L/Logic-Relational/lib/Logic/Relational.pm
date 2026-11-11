@@ -9,11 +9,11 @@ Logic::Relational - A pure-Perl relational logic system.
 
 =head1 VERSION
 
-Version 0.02
+Version 0.03
 
 =cut
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 =head1 SYNOPSIS
 
@@ -417,7 +417,7 @@ Variables inside a C<not { ... }> block must be ground (bound to concrete values
 
 =head2 Subgoal Tabling (Memoization) and Cycle Handling
 
-Standard depth-first relational search can struggle with cyclic data structures (such as bidirectional networks or graphs with loops) and left-recursive rules. C<Logic::Relational> provides two complementary mechanisms to handle recursion safely and efficiently:
+Standard depth-first relational search can struggle with cyclic data structures (such as bidirectional social networks or transport graphs with loops) and left-recursive rules. C<Logic::Relational> provides two complementary mechanisms to handle recursion safely and efficiently:
 
 =over 4
 
@@ -442,8 +442,6 @@ B<Answer Deduplication:> On diamond-shaped or cyclic graphs where multiple paths
 =item *
 
 B<Dynamic Programming Performance:> Repeated subgoals within a query reuse cached answers instead of recomputing derivations.
-
-=back
 
 =back
 
@@ -474,6 +472,28 @@ Use the C<table> keyword inside a C<logic> block to enable tabling for one or mo
 	my $q;
 	query Network::reachable('A', fresh my $node) -> $q;
 	my @nodes = $q->all_values($node);    # ('A', 'B', 'C', 'D')
+
+=item 3. B<Automatic Left-Recursion Detection and Auto-Tabling>
+
+If a rule is defined with direct left-recursion (i.e. where the first body subgoal calls the exact same predicate and arity as the rule head) and the predicate has not been explicitly declared as tabled, C<Logic::Relational> will automatically enable tabling for that predicate and emit a warning via L<Carp/carp>. This prevents unintentional infinite recursion and out-of-memory errors while ensuring that the rule evaluates to its least fixpoint.
+
+=item 4. B<Execution Fuel / Search Step Limit (C<max_steps>)>
+
+To protect against runaway searches, unbounded recursion, and memory exhaustion, C<Logic::Relational::Query> enforces a maximum resolution step limit (default: 100,000 steps). If a query exceeds this limit, it throws an exception (via C<croak>).
+
+The step limit can be customized or disabled:
+
+=over 4
+
+=item * On the Program: C<$program-E<gt>max_steps(500_000)> or at construction C<Logic::Relational::Program-E<gt>new(max_steps =E<gt> 500_000)>.
+
+=item * On a Query: C<$program-E<gt>query($goal, max_steps =E<gt> 500_000)>.
+
+=item * Unlimited: specify C<max_steps =E<gt> 0> to disable step limits.
+
+=back
+
+=back
 
 See C<tabling_and_cycles.pl> in the examples.
 
@@ -662,6 +682,8 @@ C<ttl_mode => 'relative'> (or C<pause_ttl => 1>): Game/simulation time pauses wh
 =head1 SEE ALSO
 
 L<AI::Prolog>
+
+L<Logic::Probabilistic>
 
 =cut
 

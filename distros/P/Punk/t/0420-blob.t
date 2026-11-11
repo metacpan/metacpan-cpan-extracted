@@ -742,8 +742,8 @@ PROG
             };
             print {$wr} defined $out ? $out : "died: $@";
             close $wr;
-            require POSIX;
-            POSIX::_exit(0);
+            Test::Builder->new->no_ending(1);
+            exit 0;
         }
         close $wr;
         my $got = do { local $/; <$rd> };

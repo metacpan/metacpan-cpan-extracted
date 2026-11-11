@@ -60,6 +60,18 @@ If $cb is not defined, an exception is thrown.
 
 If uv_idle_start fails, an exception is thrown.
 
+=head2 stop
+
+C<method stop : void ();>
+
+Stops the idle handle.
+
+This method calls the L<uv_idle_stop|https://docs.libuv.org/en/v1.x/idle.html#c.uv_idle_stop> function.
+
+Exceptions:
+
+If uv_idle_stop fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

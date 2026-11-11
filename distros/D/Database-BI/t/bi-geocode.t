@@ -57,6 +57,27 @@ subtest '--col repeated names a place across columns' => sub {
 	like($out, qr/column "nope" not found/, 'and says which');
 };
 
+subtest '--text is added to the end of each place' => sub {
+	my ($exit, $out) = run('--spec', "path:$csv", '--col', 'country', '--text', ' , Europe ', '--verbose');
+	is($exit, 0, 'it runs') or diag $out;
+	like($out, qr/Each place ends ", Europe"/, 'tidied as the map tidies it: no leading comma or spaces');
+	like($out, qr{Resolved \d+/1 distinct places}, 'one place, Slovenia, Europe');
+
+	($exit, $out) = run('--spec', "path:$csv", '--col', 'country', '-t', 'Europe', '--verbose');
+	is($exit, 0, '-t is short for it') or diag $out;
+	like($out, qr/Each place ends ", Europe"/, 'with the same text');
+
+	($exit, $out) = run('--spec', "path:$csv", '--col', 'country', '--text', '  ', '--verbose');
+	is($exit, 0, 'spaces are no text');
+	unlike($out, qr/Each place ends/, 'so nothing is added');
+
+	for my $bad ("Europe\nAsia", 'x' x 201) {
+		($exit, $out) = run('--spec', "path:$csv", '--col', 'country', '--text', $bad);
+		is($exit, 2, 'more than one short line is a usage error');
+		like($out, qr/--text .*one line of at most 200 characters/, 'which says so');
+	}
+};
+
 subtest 'the arguments it needs' => sub {
 	my ($exit, $out) = run('--spec', "path:$csv");
 	is($exit, 2, 'no --col is a usage error');

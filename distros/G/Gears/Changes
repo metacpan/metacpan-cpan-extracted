@@ -1,5 +1,19 @@
 Revision history for Gears
 
+0.105 - 2026-11-11
+	- added effective_charset, charset_encode, charset_decode to Gears
+	- added Gears::Role::HasContext
+	- Gears::Context app attribute is now optional
+	- fixed bad check and docs on Gears::X::HTTP status range
+	- fixed unintended +-= regex range in Gears::Config prefix checking
+	- fixed not emptying config arrays using - prefix with all array elements
+	- fixed unintended addition of caret in safe characters when building a sigil location
+	- Gears::Generator no longer leaves created empty directories behind when aborting
+	- fixed incorrect handling of regex alternation in checks when building a sigil location
+	- pattern_separator Router attribute can now only be a single character
+	- fixed Match router bridge behavior - requires followup of separator or end of string
+	- fixed SigilMatch router separator behavior - uses pattern_separator when matching and building
+
 0.104 - 2026-05-26
 	- Add pattern_separator attribute to Router
 

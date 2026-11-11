@@ -34,9 +34,9 @@ sub cookie_val { my ($sc) = @_; $sc // return; my ($v) = $sc =~ /punk\.sid=([^;]
 # PARENT, so a child inherits it exactly as a prefork worker inherits it from
 # the master - which is the arrangement under test.
 #
-# The child reports down a pipe and leaves through POSIX::_exit: a child that
-# returned into the harness would inherit the TAP stream and report the
-# parent's plan a second time.
+# The child reports down a pipe and leaves through exit with Test::Builder's
+# ending turned off, so it adds nothing to the TAP stream and still writes
+# its coverage counters on the way out.
 sub in_worker {
     my ($app, %o) = @_;
     pipe my $rd, my $wr or die "pipe: $!";
@@ -50,7 +50,8 @@ sub in_worker {
         my $sc   = ref $r eq 'ARRAY' ? (set_cookie($r) // '') : '';
         syswrite $wr, join("\t", $$, $sc, $body);
         close $wr;
-        POSIX::_exit(0);
+        Test::Builder->new->no_ending(1);
+        exit 0;
     }
     close $wr;
     my $out = do { local $/; <$rd> };

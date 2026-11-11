@@ -46,6 +46,10 @@
 #define PTX_CLS "Punk::Txn"
 
 static HV *ptx_hv(pTHX_ SV *tx) {
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(tx && SvROK(tx) && SvTYPE(SvRV(tx)) == SVt_PVHV
           && sv_derived_from(tx, PTX_CLS)))
         croak(PTX_CLS ": not a transaction object");
@@ -62,13 +66,20 @@ static SV *ptx_db_opts(pTHX_ SV *app, SV *name, SV **class_out) {
     HV *dbs = app_hash(aTHX_ h, K_DATABASES);
     const char *nm = K_DEFAULT; STRLEN nl = 7;
     SV **opts, *ret, *b = NULL;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (name && SvOK(name) && SvCUR(name)) nm = SvPV_const(name, nl);
     opts = hv_fetch(dbs, nm, (I32)nl, 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (opts && *opts && SvROK(*opts) && SvTYPE(SvRV(*opts)) == SVt_PVHV) {
         ret = sv_2mortal(newSVsv(*opts));
         b = pdbi_get(aTHX_ (HV *)SvRV(*opts), "backend");
     }
-    else if (nl == 7 && memEQ(nm, K_DEFAULT, 7))
+    else if (nl == 7 && memEQ(nm, K_DEFAULT, 7)) /* # uncoverable condition right count:2 class:ignore_covered_err */
         croak(PTX_CLS ": no database configured - add a database keyword");
     else
         croak(PTX_CLS ": no database '%s' configured (the database keyword "
@@ -84,6 +95,9 @@ static SV *ptx_new(pTHX_ SV *c, SV *app, SV *name, SV *class, SV *opts) {
     HV *h = newHV();
     (void)hv_stores(h, "c",      newSVsv(c));
     (void)hv_stores(h, "app",    newSVsv(app));
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     (void)hv_stores(h, "name",   (name && SvOK(name) && SvCUR(name))
                                      ? newSVsv(name) : newSVpvs(K_DEFAULT));
     (void)hv_stores(h, "class",  newSVsv(class));
@@ -110,36 +124,62 @@ static SV *ptx_model(pTHX_ SV *tx, SV *name) {
     HV *ih, *bh, *copy, *bcopy;
     const char *mdb = K_DEFAULT; STRLEN ml = 7;
 
-    if (!(act && SvTRUE(act)))
+    if (!(act && SvTRUE(act))) /* # uncoverable condition left count:1 class:ignore_covered_err */
         croak(PTX_CLS ": the transaction is over - $tx->model is for inside "
               "the block");
     argv[0] = name;
     inst = pcx_call_meth(aTHX_ app, "model_instance", argv, 1, 1);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(inst && SvROK(inst) && SvTYPE(SvRV(inst)) == SVt_PVHV)) {
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1 */
         if (inst) SvREFCNT_dec(inst);
-        croak(PTX_CLS ": no model '%s'", SvPV_nolen(name));
+        croak(PTX_CLS ": no model '%s'", SvPV_nolen(name)); /* # uncoverable statement */
     }
     sv_2mortal(inst);
     ih = (HV *)SvRV(inst);
 
     /* the model's database, from its metadata */
     meta = pdbi_get(aTHX_ ih, "meta");
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (meta && SvROK(meta) && SvTYPE(SvRV(meta)) == SVt_PVHV) {
         SV *d = pdbi_get(aTHX_ (HV *)SvRV(meta), "database");
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (d && SvOK(d) && SvCUR(d)) mdb = SvPV_const(d, ml);
     }
-    if (!(SvCUR(txnm) == ml && memEQ(SvPVX(txnm), mdb, ml)))
+    if (!(SvCUR(txnm) == ml && memEQ(SvPVX(txnm), mdb, ml))) /* # uncoverable condition left count:2 class:ignore_covered_err */
         croak(PTX_CLS ": model '%s' lives on database '%.*s', and this "
               "transaction is on '%s'", SvPV_nolen(name), (int)ml, mdb,
               SvPV_nolen(txnm));
 
     backend = pdbi_get(aTHX_ ih, "backend");
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(backend && SvROK(backend) && SvTYPE(SvRV(backend)) == SVt_PVHV))
-        croak(PTX_CLS ": model '%s' has no backend", SvPV_nolen(name));
+        croak(PTX_CLS ": model '%s' has no backend", SvPV_nolen(name)); /* # uncoverable statement */
     bh = (HV *)SvRV(backend);
 
     bcopy = newHVhv(bh);
-    (void)hv_stores(bcopy, "_tx", newSVsv(hdl ? hdl : &PL_sv_undef));
+    (void)hv_stores(bcopy, "_tx", newSVsv(hdl ? hdl : &PL_sv_undef)); /* # uncoverable condition left count:1 class:ignore_covered_err */
     bcopy_rv = sv_bless(newRV_noinc((SV *)bcopy), SvSTASH(SvRV(backend)));
 
     copy = newHVhv(ih);
@@ -160,8 +200,19 @@ static SV *ptx_dbi_call0(pTHX_ SV *dbh, const char *meth, SV **err) {
     PUTBACK;
     count = call_method(meth, G_SCALAR | G_EVAL);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (count > 0) r = SvREFCNT_inc(POPs);
     PUTBACK;
+    /*
+     # uncoverable branch true
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (SvTRUE(ERRSV)) { *err = newSVsv(ERRSV); if (r) SvREFCNT_dec(r); r = NULL; }
     FREETMPS; LEAVE;
     return r;
@@ -177,8 +228,12 @@ static SV *ptx_dbi_run(pTHX_ SV *opts, SV *code, SV *tx) {
     HV *th   = ptx_hv(aTHX_ tx);
     SV *err  = NULL, *res = NULL, *r;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(dbh && SvROK(dbh)))
-        croak("Punk::Model::DBI: no connection for the transaction");
+        croak("Punk::Model::DBI: no connection for the transaction"); /* # uncoverable statement */
     if (open && SvTRUE(open))
         croak("Punk::Model::DBI: a transaction is already open on this "
               "connection - nested transactions are not supported, and a "
@@ -186,7 +241,13 @@ static SV *ptx_dbi_run(pTHX_ SV *opts, SV *code, SV *tx) {
               "block thinks it covers");
 
     r = ptx_dbi_call0(aTHX_ dbh, "begin_work", &err);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (r) SvREFCNT_dec(r);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (err) { sv_2mortal(err); croak_sv(err); }
 
     (void)hv_stores(slot, "txn", newSViv(1));
@@ -202,20 +263,36 @@ static SV *ptx_dbi_run(pTHX_ SV *opts, SV *code, SV *tx) {
         PUTBACK;
         count = call_sv(code, G_SCALAR | G_EVAL);
         SPAGAIN;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (count > 0) res = SvREFCNT_inc(POPs);
         PUTBACK;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (SvTRUE(ERRSV)) { err = newSVsv(ERRSV); if (res) SvREFCNT_dec(res); res = NULL; }
         FREETMPS; LEAVE;
     }
 
     if (!err) {
         r = ptx_dbi_call0(aTHX_ dbh, "commit", &err);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (r) SvREFCNT_dec(r);
     }
     if (err) {
         SV *rerr = NULL;
         r = ptx_dbi_call0(aTHX_ dbh, "rollback", &rerr);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (r) SvREFCNT_dec(r);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (rerr) SvREFCNT_dec(rerr);   /* the block's error is the one to report */
         (void)hv_stores(slot, "txn", newSViv(0));
         (void)hv_stores(th, "active", newSViv(0));
@@ -224,7 +301,7 @@ static SV *ptx_dbi_run(pTHX_ SV *opts, SV *code, SV *tx) {
     }
     (void)hv_stores(slot, "txn", newSViv(0));
     (void)hv_stores(th, "active", newSViv(0));
-    return res ? res : newSV(0);
+    return res ? res : newSV(0); /* # uncoverable condition left count:1 class:ignore_covered_err */
 }
 
 /* ---- the DBIx::Loop backend: $db->txn, with the bridge ---------------------- */
@@ -239,23 +316,46 @@ XS_INTERNAL(ptx_pf_ready_cb) {
     dXSARGS;
     AV *cap = punk_clos_cap(aTHX_ cv);
     const dbil_abi *A = punk_dbil(aTHX);
-    SV **dlfp = cap ? av_fetch(cap, PTX_CAP_DLF, 0) : NULL;
-    SV **txp  = cap ? av_fetch(cap, PTX_CAP_TX, 0)  : NULL;
+    SV **dlfp = cap ? av_fetch(cap, PTX_CAP_DLF, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    SV **txp  = cap ? av_fetch(cap, PTX_CAP_TX, 0)  : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     punk_future *pf;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(dlfp && *dlfp) || items < 1 || !pf_is_future(aTHX_ ST(0)))
-        XSRETURN_EMPTY;
+        XSRETURN_EMPTY; /* # uncoverable statement */
     /* the block is over once its future settles, whichever way */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (txp && *txp && SvROK(*txp))
         (void)hv_stores(ptx_hv(aTHX_ *txp), "active", newSViv(0));
     pf = pf_of(aTHX_ ST(0));
     if (pf->state == PF_DONE) {
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         SV **v = (pf->vals && av_len(pf->vals) >= 0) ? av_fetch(pf->vals, 0, 0) : NULL;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         A->future_done1(aTHX_ *dlfp, (v && *v) ? *v : &PL_sv_undef);
     }
     else {
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         SV **e = (pf->vals && av_len(pf->vals) >= 0) ? av_fetch(pf->vals, 0, 0) : NULL;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         A->future_fail(aTHX_ *dlfp, (e && *e) ? *e
-                       : sv_2mortal(newSVpvs("transaction block failed")));
+                       : sv_2mortal(newSVpvs("transaction block failed"))); /* # uncoverable statement */
     }
     XSRETURN_EMPTY;
 }
@@ -273,6 +373,10 @@ XS_INTERNAL(ptx_loop_block_cb) {
     const dbil_abi *A = punk_dbil(aTHX);
     SV *code, *tx, *txh, *res = NULL, *err = NULL;
     HV *th;
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cap || items < 1) croak(PTX_CLS ": the transaction block lost its capture");
     code = *av_fetch(cap, PTX_CAP_CODE, 0);
     tx   = *av_fetch(cap, PTX_CAP_TX, 0);
@@ -289,18 +393,32 @@ XS_INTERNAL(ptx_loop_block_cb) {
         PUTBACK;
         count = call_sv(code, G_SCALAR | G_EVAL);
         SPAGAIN;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (count > 0) res = SvREFCNT_inc(POPs);
         PUTBACK;
+        /*
+         # uncoverable branch true
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (SvTRUE(ERRSV)) { err = newSVsv(ERRSV); if (res) SvREFCNT_dec(res); res = NULL; }
         FREETMPS; LEAVE;
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (err) {
         /* DBIx::Loop called this under its own eval: the die is the ROLLBACK */
-        (void)hv_stores(th, "active", newSViv(0));
-        sv_2mortal(err);
-        croak_sv(err);
+        (void)hv_stores(th, "active", newSViv(0)); /* # uncoverable statement */
+        sv_2mortal(err); /* # uncoverable statement */
+        croak_sv(err); /* # uncoverable statement */
     }
-    if (res && pf_is_future(aTHX_ res)) {
+    if (res && pf_is_future(aTHX_ res)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
         SV *dlf = A->future_new(aTHX);
         AV *bcap = newAV();
         SV *cb;
@@ -315,7 +433,7 @@ XS_INTERNAL(ptx_loop_block_cb) {
         XSRETURN(1);
     }
     (void)hv_stores(th, "active", newSViv(0));
-    ST(0) = res ? sv_2mortal(res) : &PL_sv_undef;
+    ST(0) = res ? sv_2mortal(res) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
     XSRETURN(1);
 }
 
@@ -330,14 +448,21 @@ static SV *ptx_loop_run(pTHX_ SV *opts, SV *code, SV *tx) {
     SV *block, *f, *out, *argv[1];
     pdl_pend *p;
 
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(db && SvROK(db)))
-        croak(PDL_CLS ": no connection for the transaction");
+        croak(PDL_CLS ": no connection for the transaction"); /* # uncoverable statement */
     av_store(cap, PTX_CAP_CODE, newSVsv(code));
     av_store(cap, PTX_CAP_TX,   newSVsv(tx));
     block = punk_closure(aTHX_ ptx_loop_block_cb, cap);   /* owns cap */
     argv[0] = block;
     f = pcx_call_meth(aTHX_ db, "txn", argv, 1, 1);
     SvREFCNT_dec(block);                 /* txn holds its own reference */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!f) croak(PDL_CLS ": txn returned no future");
 
     p = pdl_start(aTHX_ A, slot, &out);
@@ -353,19 +478,31 @@ static SV *ptx_context_txn(pTHX_ SV *c, SV *name, SV *code) {
     AV *av  = pcx_av(aTHX_ c);
     SV *app = pcx_get(aTHX_ av, PCX_APP);
     SV *class, *opts, *tx, *argv[3], *r;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(code && SvROK(code) && SvTYPE(SvRV(code)) == SVt_PVCV))
         croak(PTX_CLS ": txn takes a coderef - $c->txn(sub { my ($tx) = @_; "
               "... }) or $c->txn(name => sub { ... })");
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(app && SvOK(app)))
-        croak(PTX_CLS ": this context has no application");
+        croak(PTX_CLS ": this context has no application"); /* # uncoverable statement */
     opts = ptx_db_opts(aTHX_ app, name, &class);
     {   /* the backend class, loaded if a model has not loaded it yet */
         HV *stash = gv_stashsv(class, 0);
-        if (!(stash && gv_fetchmethod_autoload(stash, "_txn", 0))) {
+        if (!(stash && gv_fetchmethod_autoload(stash, "_txn", 0))) { /* # uncoverable condition left count:2 class:ignore_covered_err */
             if (!pk_require_once(aTHX_ SvPV_nolen(class), FALSE))
                 croak(PTX_CLS ": backend '%s' failed to load: %s",
                       SvPV_nolen(class), SvPV_nolen(ERRSV));
             stash = gv_stashsv(class, 0);
+            /*
+             # uncoverable branch false
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (!(stash && gv_fetchmethod_autoload(stash, "_txn", 0)))
                 croak(PTX_CLS ": backend '%s' does not implement _txn - it "
                       "has no transactions", SvPV_nolen(class));
@@ -374,7 +511,7 @@ static SV *ptx_context_txn(pTHX_ SV *c, SV *name, SV *code) {
     tx = sv_2mortal(ptx_new(aTHX_ c, app, name, class, opts));
     argv[0] = opts; argv[1] = code; argv[2] = tx;
     r = pcx_call_meth(aTHX_ class, "_txn", argv, 3, 1);
-    return r ? r : newSV(0);
+    return r ? r : newSV(0); /* # uncoverable condition left count:1 class:ignore_covered_err */
 }
 
 #endif /* PUNK_TXN_H */

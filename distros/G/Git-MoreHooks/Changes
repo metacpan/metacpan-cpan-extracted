@@ -1,5 +1,14 @@
 Revision history for Git-MoreHooks
 
+0.021     2026-11-10 18:30:19+01:00 Europe/Stockholm
+            * Add options dirpath and filepath to CheckPerl.
+            * Switch List::MoreUtils to core List::Util. Function `any` available since Perl v5.19.5.
+            * Add Perl::Critic::StricterSubs to DevelopSuggests Prereqs.
+            * CheckTrailers: the once-only report of an interpret-trailers
+                failure is held per repository, not in a package variable,
+                so a second repository handled by the same interpreter is
+                still told that the plugin could not do its job.
+
 0.020     2026-10-11 00:32:16+02:00 Europe/Stockholm
             * Add Git::Mailmap to TestSuggests prereqs.
             * Add more debugging to TriggerJenkins.

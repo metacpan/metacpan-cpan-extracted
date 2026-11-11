@@ -38,6 +38,7 @@
   .map-unplotted-table a,
   .map-unplotted-all { color: var(--accent-text, #2c3e7a); text-decoration: underline; font-weight: 600; }
   .map-unplotted-all { display: inline-block; margin: 0.3rem 0 0; }
+  .map-groups-why { margin: 0.35rem 0; font-size: 0.85rem; max-width: 60rem; }
   .map-summary {
     font-size: 0.85rem;
     color: var(--text-secondary, #555);
@@ -87,10 +88,14 @@
 [% IF geocode_pending %]
 <div class="map-progress" id="map-progress" role="status" aria-live="polite"
      data-done-url="[% geocode_done_url | html %]" data-cached-url="[% geocode_cached_url | html %]">
-  <p class="map-progress-text" id="map-progress-text">Looking up [% geocode_pending %] place[% geocode_pending == 1 ? '' : 's' %] that [% geocode_pending == 1 ? 'is' : 'are' %] not in the cache yet&hellip;</p>
+  <p class="map-progress-text" id="map-progress-text">Looking up
+    [%- IF geocode_places %] [% geocode_places %] place[% geocode_places == 1 ? '' : 's' %][% END %]
+    [%- IF geocode_places && geocode_outlines %] and[% END %]
+    [%- IF geocode_outlines %] [% geocode_outlines %] county outline[% geocode_outlines == 1 ? '' : 's' %][% END %]
+    that [% geocode_pending == 1 ? 'is' : 'are' %] not in the cache yet&hellip;</p>
   <div class="map-progress-row">
     <div class="map-progress-track" role="progressbar" id="map-progress-bar"
-         aria-label="Places looked up" aria-valuemin="0" aria-valuemax="[% geocode_pending %]" aria-valuenow="0">
+         aria-label="Lookups done" aria-valuemin="0" aria-valuemax="[% geocode_pending %]" aria-valuenow="0">
       <div class="map-progress-fill" id="map-progress-fill"></div>
     </div>
     <button type="button" class="btn-secondary" id="map-progress-cancel">Cancel</button>
@@ -113,6 +118,11 @@
   var doneUrl = box.getAttribute('data-done-url');
   var cachedUrl = box.getAttribute('data-cached-url');
   var index = 0, found = 0, missing = 0, unsettled = 0, online = true;
+  // OpenStreetMap failing once stops the online lookups of places, so that a
+  // service that is down does not hold up each place left.  An outline is a
+  // larger answer, and one slow reply is not a service that is down: those
+  // stop after OUTLINE_FAILURES in a row.
+  var OUTLINE_FAILURES = 3, outlineFailures = 0;
   var stopped = false, controller = null, message = '';
 
   function show(done) {
@@ -143,15 +153,23 @@
     if (index >= list.length) { finish(); return; }
 
     var item = list[index];
-    text.textContent = 'Looking up ' + (index + 1) + ' of ' + list.length + ': ' + item.place;
+    // A place to geocode, or a point whose county outline is wanted.
+    var outline = Object.prototype.hasOwnProperty.call(item, 'point');
+    text.textContent = 'Looking up ' + (index + 1) + ' of ' + list.length + ': '
+      + (outline ? 'the county outline at ' + item.point : item.place);
 
     var body = new URLSearchParams();
-    body.append('place', item.place);
+    if (outline) {
+      body.append('point', item.point);
+      body.append('level', item.level);
+    } else {
+      body.append('place', item.place);
+    }
     body.append('sig', item.sig);
     if (!online) body.append('online', '0');
 
     controller = window.AbortController ? new AbortController() : null;
-    fetch('/geo/lookup', {
+    fetch(outline ? '/geo/boundary' : '/geo/lookup', {
       method: 'POST',
       body: body,
       headers: { 'Accept': 'application/json' },
@@ -161,9 +179,14 @@
     }).then(function (reply) {
       if (stopped) return;
       if (reply.status === 'found' && reply.stored) found++;
-      else if (reply.status === 'not_found' && reply.stored) missing++;
+      else if ((reply.status === 'not_found' || reply.status === 'nowhere') && reply.stored) missing++;
       else if (reply.status !== 'refused') unsettled++;
-      if (reply.online_failed) online = false;
+      if (outline) {
+        outlineFailures = reply.online_failed ? outlineFailures + 1 : 0;
+        if (outlineFailures >= OUTLINE_FAILURES) online = false;
+      } else if (reply.online_failed) {
+        online = false;
+      }
       if (reply.messages && reply.messages.length) message = reply.messages[reply.messages.length - 1];
       else if (reply.error) message = reply.error;
       advance();
@@ -203,6 +226,12 @@
       [%- IF message.key == 'warn_map_rows_skipped' && unplotted_url.length %]
       <br><a class="map-unplotted-all" href="[% unplotted_url | html %]">Show the [% unplotted_rows %] row[% unplotted_rows == 1 ? '' : 's' %] that [% unplotted_rows == 1 ? 'was' : 'were' %] not plotted in the table</a>
       [%- END %]
+      [%- IF message.key.match('^warn_map_bounds_') && bounds_left_url.length %]
+      <br><a class="map-unplotted-all" id="map-bounds-left" href="[% bounds_left_url | html %]">Show the [% bounds_left_rows %] row[% bounds_left_rows == 1 ? '' : 's' %] with no county outline in the table</a>
+      [%- END %]
+      [%- IF message.key == 'warn_map_bounds_pending' && bounds_retry_url.length %]
+      <br><a class="map-retry" id="map-bounds-retry" href="[% bounds_retry_url | html %]">Look up the outline[% bounds_left == 1 ? '' : 's' %] not looked up yet</a>
+      [%- END %]
       [%- IF message.key == 'warn_map_rows_skipped' && geocode_retry_url.length %]
       <br><a class="map-retry" id="map-retry" href="[% geocode_retry_url | html %]">Look up the places not looked up yet</a>
       [%- END %]
@@ -237,7 +266,30 @@
 [% END %]
 
 [% UNLESS geocode_pending && !marker_count %]
-<p class="map-summary">Plotting [% marker_count %] marker[% marker_count == 1 ? '' : 's' %] for [% row_count %] of [% source_rows %] row[% source_rows == 1 ? '' : 's' %][% IF loc_col %] from column[% loc_many ? 's' : '' %] [% loc_col | html %][% END %][% IF lat_col %] from columns [% lat_col | html %] and [% lon_col | html %][% END %][% IF backend %]; resolved by [% backend | html %][% END %].</p>
+<p class="map-summary">Plotting [% marker_count %] marker[% marker_count == 1 ? '' : 's' %] for [% row_count %] of [% source_rows %] row[% source_rows == 1 ? '' : 's' %][% IF loc_col %] from column[% loc_many ? 's' : '' %] [% loc_col | html %][% IF loc_text.length %] with &ldquo;[% loc_text | html %]&rdquo; added[% END %][% END %][% IF lat_col %] from columns [% lat_col | html %] and [% lon_col | html %][% END %][% IF backend %]; resolved by [% backend | html %][% END %][% IF bounds_drawn %], with [% bounds_drawn %] [% bounds_noun | html %] outline[% bounds_drawn == 1 ? '' : 's' %][% IF bounds_shade.length && bounds_shade_as == 'markers' %] shaded by [% bounds_shade | html %] in the colours of the markers in them, stronger the further into each colour's range[% ELSIF bounds_shade.length %] shaded by [% bounds_shade | html %], darker for more[% IF bounds_as_markers %], and outlined in the colours of the markers in them[% END %][% ELSIF bounds_as_markers %] coloured as the markers in them[% ELSIF bounds_heat %] coloured by [% IF bounds_weight.length %][% bounds_weight | html %], from green (least) to red (most)[% ELSE %]rows, from green (fewest) to red (most)[% END %][% END %][% END %].</p>
+[%- IF bounds_groups.size %]
+[%- SET shared = 0; SET shared_markers = 0; SET none_markers = 0 %]
+[%- FOREACH g IN bounds_groups; IF g.none; none_markers = g.markers; ELSE; shared = shared + 1; shared_markers = shared_markers + g.markers; END; END %]
+<details class="map-unplotted" id="map-bounds-groups">
+  <summary>[% IF shared %][% shared_markers %] markers share [% shared %] [% bounds_noun | html %] outline[% shared == 1 ? '' : 's' %][% END %][% IF shared && none_markers %], and [% END %][% IF none_markers %][% none_markers %] marker[% none_markers == 1 ? ' is' : 's are' %] in no [% bounds_noun | html %] outline[% END %]: list them</summary>
+  [%- IF loc_col %]
+  <p class="map-groups-why">These places were looked up by name, and a name can be ambiguous: a lookup may answer with another place of the same name, or a street or town named after it. Two places in one outline, or a place in none, can be such a wrong answer; they can also be right, when the places really are in the same [% bounds_noun | html %]. Adding more to each place, or giving latitude and longitude columns, makes a lookup surer.</p>
+  [%- END %]
+  <table class="map-unplotted-table">
+    <thead><tr><th scope="col">Outline</th><th scope="col">Markers</th><th scope="col">Rows</th><th scope="col">Places</th></tr></thead>
+    <tbody>
+    [%- FOREACH g IN bounds_groups %]
+    <tr[% IF g.none %] data-none="1"[% END %]>
+      <td>[% IF g.none %]<em>(in no [% bounds_noun | html %] outline)</em>[% ELSE %][% g.name | html %][% END %]</td>
+      <td class="num">[% g.markers %]</td>
+      <td class="num">[% IF g.url.length %]<a href="[% g.url | html %]" title="Show these rows in the table">[% g.rows %] row[% g.rows == 1 ? '' : 's' %]</a>[% ELSE %][% g.rows %][% END %]</td>
+      <td>[% FOREACH place IN g.places %][% IF loop.index < 12 %][% place | html %][% UNLESS loop.last %], [% END %][% ELSIF loop.index == 12 %]&hellip;[% END %][% END %]</td>
+    </tr>
+    [%- END %]
+    </tbody>
+  </table>
+</details>
+[%- END %]
 [% END %]
 
 [% IF map_body %]

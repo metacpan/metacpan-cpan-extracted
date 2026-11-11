@@ -1,5 +1,13 @@
 Revision history for Check-supervisorctl
 
+0.2.1   2026-11-10/12:30
+        - t/check.t: use t/tmp/ instead of /tmp and only the fake supervisorctl in the path.
+
+0.2.0   2026-11-10/10:00
+        - Add -R for restarting stopped, exited, fatal, and backoff items.
+        - Add -L, and -l for use with -R, for adding configs that are not running.
+        - Restarts and adds do not change the exit value.
+
 0.1.0   2026-11-02/13:30
         - Add Monitoring::Sneck::Checks::supervisorctl for running it in process via sneck.
         - supervisorctl status output that is not a item and status, such as supervisord being

@@ -16,4 +16,6 @@ class UV::Handle::Poll extends UV::Handle {
   # Instance Methods
   native method start : void ($cb : UV::Callback::Poll, $events : int);
   
+  native method stop : void ();
+  
 }

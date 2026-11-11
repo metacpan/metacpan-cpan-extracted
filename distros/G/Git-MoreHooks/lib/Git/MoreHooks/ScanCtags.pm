@@ -5,12 +5,12 @@ use warnings;
 
 # ABSTRACT: Create or update ctags after git commit or merge
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 use utf8;
 use Carp     qw( croak );
 use Log::Any qw( $log );
-use Git::Hooks;
+use Git::Hooks 2.014000;    # v2.14.0: oldest release on CPAN
 use Git::Repository::Log;
 use File::Find   qw(find);
 use List::Util   qw( any );
@@ -137,7 +137,7 @@ Git::MoreHooks::ScanCtags - Create or update ctags after git commit or merge
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

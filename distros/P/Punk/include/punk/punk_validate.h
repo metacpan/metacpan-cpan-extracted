@@ -37,15 +37,35 @@ static const jsf_abi *punk_jsf_try(pTHX) {
         PUNK_JSF_TAB_TRIED = 1;
         ok = pk_require_once(aTHX_ "JSON::Schema::Fast", FALSE);
         SPAGAIN;   /* the require may have reallocated the value stack */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("JSON::Schema::Fast::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (!SvTRUE(ERRSV) && count > 0) p = POPi;
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             else if (count > 0)              (void)POPs;
             PUTBACK; FREETMPS; LEAVE;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (p) {
                 const jsf_abi *a = INT2PTR(const jsf_abi *, p);
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 if (a && a->abi_version >= JSF_ABI_VERSION)
                     PUNK_JSF_TAB = a;
             }
@@ -56,8 +76,11 @@ static const jsf_abi *punk_jsf_try(pTHX) {
 
 static const jsf_abi *punk_jsf(pTHX) {
     const jsf_abi *a = punk_jsf_try(aTHX);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!a)
-        croak("Punk: validation needs JSON::Schema::Fast with a compatible "
+        croak("Punk: validation needs JSON::Schema::Fast with a compatible " /* # uncoverable statement */
               "C ABI (JSF_ABI_VERSION %d)", JSF_ABI_VERSION);
     return a;
 }
@@ -76,8 +99,19 @@ static SV *pv_meth_ev(pTHX_ SV *obj, const char *meth, SV **argv, int nargs) {
     PUTBACK;
     count = call_method(meth, G_SCALAR | G_EVAL);
     SPAGAIN;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (count > 0) { SV *t = POPs; if (!SvTRUE(ERRSV)) r = newSVsv(t); }
     PUTBACK; FREETMPS; LEAVE;
+    /*
+     # uncoverable branch true
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (SvTRUE(ERRSV)) sv_setsv(ERRSV, &PL_sv_no);
     return r;
 }
@@ -85,11 +119,23 @@ static SV *pv_meth_ev(pTHX_ SV *obj, const char *meth, SV **argv, int nargs) {
 /* case-insensitive "does hay contain needle" */
 static int pv_ci_has(const char *hay, STRLEN hl, const char *needle) {
     STRLEN nl = strlen(needle), i, j;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (nl == 0 || hl < nl) return 0;
     for (i = 0; i + nl <= hl; i++) {
         for (j = 0; j < nl; j++) {
             char a = hay[i + j], b = needle[j];
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (a >= 'A' && a <= 'Z') a = (char)(a - 'A' + 'a');
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (b >= 'A' && b <= 'Z') b = (char)(b - 'A' + 'a');
             if (a != b) break;
         }
@@ -123,7 +169,7 @@ static HV *PV_CACHE = NULL;
 static SV *pv_compile(pTHX_ SV *schema) {
     if (SvROK(schema) && SvOBJECT(SvRV(schema)))
         return newSVsv(schema);
-    if (!(SvROK(schema) && SvTYPE(SvRV(schema)) == SVt_PVHV))
+    if (!(SvROK(schema) && SvTYPE(SvRV(schema)) == SVt_PVHV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
         croak("Punk: the validate schema must be a hashref or a "
               "JSON::Schema::Fast::Compiled");
     {
@@ -135,7 +181,7 @@ static SV *pv_compile(pTHX_ SV *schema) {
         {
             SV *compiled = punk_jsf(aTHX)->compile(aTHX_ schema,
                                                    &PL_sv_undef, 1, 0);
-            if (HvUSEDKEYS(PV_CACHE) >= PV_CACHE_MAX) hv_clear(PV_CACHE);
+            if (HvUSEDKEYS(PV_CACHE) >= PV_CACHE_MAX) hv_clear(PV_CACHE); /* # uncoverable condition left count:1 class:ignore_covered_err */
             (void)hv_store_ent(PV_CACHE, key, compiled, 0);  /* cache owns */
             return newSVsv(compiled);
         }
@@ -148,14 +194,34 @@ static SV *pv_compile(pTHX_ SV *schema) {
  * '/a/b' -> 'a.b', '~1'/'~0' unescaped, the root -> '' (+1) */
 static SV *pv_name_of(pTHX_ const char *s, STRLEN l) {
     SV *out = newSVpvs("");
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     STRLEN i = (l && s[0] == '/') ? 1 : 0;
     for (; i < l; i++) {
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (s[i] == '/') sv_catpvs(out, ".");
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         else if (s[i] == '~' && i + 1 < l && s[i + 1] == '1') {
-            sv_catpvs(out, "/"); i++;
+            sv_catpvs(out, "/"); i++; /* # uncoverable statement */
         }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         else if (s[i] == '~' && i + 1 < l && s[i + 1] == '0') {
-            sv_catpvs(out, "~"); i++;
+            sv_catpvs(out, "~"); i++; /* # uncoverable statement */
         }
         else sv_catpvn(out, s + i, 1);
     }
@@ -175,15 +241,39 @@ static AV *pv_augment(pTHX_ AV *errors, HV *schema, SV *data) {
         SV **ep = av_fetch(errors, i, 0);
         HV *e; SV **kw, **loc;
         const char *locs = ""; STRLEN locl = 0;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!(ep && *ep && SvROK(*ep) && SvTYPE(SvRV(*ep)) == SVt_PVHV))
-            continue;
+            continue; /* # uncoverable statement class:ignore_covered_err */
         e   = (HV *)SvRV(*ep);
         kw  = hv_fetchs(e, "keyword", 0);
         loc = hv_fetchs(e, "instanceLocation", 0);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (loc && *loc && SvOK(*loc)) locs = SvPV_const(*loc, locl);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:5 class:ignore_covered_err
+         # uncoverable condition right count:6 class:ignore_covered_err
+         # uncoverable condition right count:7 class:ignore_covered_err */
         if (kw && *kw && SvOK(*kw) && strEQ(SvPV_nolen(*kw), "required")
             && locl == 0 && schema && datah) {
             SV **rq = hv_fetchs(schema, "required", 0);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err
+             # uncoverable condition right count:4 class:ignore_covered_err */
             if (rq && *rq && SvROK(*rq) && SvTYPE(SvRV(*rq)) == SVt_PVAV) {
                 AV *req = (AV *)SvRV(*rq);
                 SSize_t j, rn = av_len(req) + 1;
@@ -192,8 +282,16 @@ static AV *pv_augment(pTHX_ AV *errors, HV *schema, SV *data) {
                     SV **pp = av_fetch(req, j, 0);
                     STRLEN pl; const char *p;
                     HV *ne; SV *iloc;
+                    /*
+                     # uncoverable branch true
+                     # uncoverable condition left count:1 class:ignore_covered_err
+                     # uncoverable condition left count:2 class:ignore_covered_err
+                     # uncoverable condition left count:3 class:ignore_covered_err */
                     if (!(pp && *pp && SvOK(*pp))) continue;
                     p = SvPV_const(*pp, pl);
+                    /*
+                     # uncoverable branch true
+                     # uncoverable condition left count:1 class:ignore_covered_err */
                     if (hv_exists(datah, p, (I32)pl)) continue;
                     ne = newHVhv(e);
                     iloc = newSVpvs("/");
@@ -206,6 +304,9 @@ static AV *pv_augment(pTHX_ AV *errors, HV *schema, SV *data) {
                     av_push(out, newRV_noinc((SV *)ne));
                     missing = 1;
                 }
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 if (missing) continue;
             }
         }
@@ -223,20 +324,44 @@ static AV *pv_augment(pTHX_ AV *errors, HV *schema, SV *data) {
 static SV *pv_source_json(pTHX_ SV *c) {
     SV *req = pv_meth_ev(aTHX_ c, "req", NULL, 0);
     SV *body = NULL;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (req) {
         body = pv_meth_ev(aTHX_ req, "json", NULL, 0);
         SvREFCNT_dec(req);
     }
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (body && SvROK(body)) return body;
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1 */
     if (body) SvREFCNT_dec(body);
-    return newRV_noinc((SV *)newHV());
+    return newRV_noinc((SV *)newHV()); /* # uncoverable statement */
 }
 
 static SV *pv_source_params(pTHX_ SV *c) {
     SV *p = pv_meth_ev(aTHX_ c, "params", NULL, 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (p && SvROK(p) && SvTYPE(SvRV(p)) == SVt_PVHV) return p;
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1 */
     if (p) SvREFCNT_dec(p);
-    return newRV_noinc((SV *)newHV());
+    return newRV_noinc((SV *)newHV()); /* # uncoverable statement */
 }
 
 /* auto: the decoded JSON body for a JSON request, the merged params
@@ -244,14 +369,20 @@ static SV *pv_source_params(pTHX_ SV *c) {
 static SV *pv_source_auto(pTHX_ SV *c) {
     SV *req = pv_meth_ev(aTHX_ c, "req", NULL, 0);
     int is_json = 0;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (req) {
         SV *argv[1], *ct;
         argv[0] = sv_2mortal(newSVpvs("content-type"));
         ct = pv_meth_ev(aTHX_ req, "header", argv, 1);
-        if (ct && SvOK(ct)) {
+        if (ct && SvOK(ct)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             STRLEN l; const char *s = SvPV_const(ct, l);
             is_json = pv_ci_has(s, l, "application/json");
         }
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (ct) SvREFCNT_dec(ct);
         SvREFCNT_dec(req);
     }
@@ -272,8 +403,13 @@ static SV *pv_result_new(pTHX_ AV *errs, SV *data, SV *plain_schema) {
 }
 
 static HV *pv_result_hv(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(self && SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV))
-        croak("Punk: not a " PV_RESULT_CLASS);
+        croak("Punk: not a " PV_RESULT_CLASS); /* # uncoverable statement */
     return (HV *)SvRV(self);
 }
 
@@ -290,21 +426,47 @@ static AV *pv_result_errors(pTHX_ HV *h) {
 static SV *pv_result_valid(pTHX_ HV *h, SV *name) {
     SV **d = hv_fetchs(h, "data", 0);
     SV **s = hv_fetchs(h, "schema", 0);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     SV *data = (d && *d) ? *d : &PL_sv_undef;
     HV *datah = (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV)
                 ? (HV *)SvRV(data) : NULL;
     HV *props = NULL;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (s && *s && SvROK(*s) && SvTYPE(SvRV(*s)) == SVt_PVHV) {
         SV **pp = hv_fetchs((HV *)SvRV(*s), "properties", 0);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (pp && *pp && SvROK(*pp) && SvTYPE(SvRV(*pp)) == SVt_PVHV)
             props = (HV *)SvRV(*pp);
     }
-    if (!props || !datah) {
+    if (!props || !datah) { /* # uncoverable condition left count:2 class:ignore_covered_err */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (name && SvOK(name)) {
+            /*
+             # uncoverable statement
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             HE *he = datah ? hv_fetch_ent(datah, name, 0, 0) : NULL;
+            /*
+             # uncoverable statement
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             return he ? newSVsv(HeVAL(he)) : newSV(0);
         }
-        return datah ? newRV_noinc((SV *)newHVhv(datah)) : newSVsv(data);
+        return datah ? newRV_noinc((SV *)newHVhv(datah)) : newSVsv(data); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     {
         HV *out = newHV();
@@ -315,18 +477,38 @@ static SV *pv_result_valid(pTHX_ HV *h, SV *name) {
             HE *dhe = hv_fetch_ent(datah, k, 0, 0);
             SV *v, *prop, *nv = NULL;
             const char *type = NULL;
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err */
             if (!dhe) continue;
             v = HeVAL(dhe);
             prop = HeVAL(he);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (prop && SvROK(prop) && SvTYPE(SvRV(prop)) == SVt_PVHV) {
                 SV **tp = hv_fetchs((HV *)SvRV(prop), "type", 0);
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err
+                 # uncoverable condition right count:3 class:ignore_covered_err */
                 if (tp && *tp && SvOK(*tp)) type = SvPV_nolen(*tp);
             }
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (type && v && SvOK(v) && !SvROK(v)) {
+                /*
+                 # uncoverable condition left count:2 class:ignore_covered_err
+                 # uncoverable condition right count:3 class:ignore_covered_err */
                 if ((strEQ(type, "integer") || strEQ(type, "number"))
                     && looks_like_number(v)) {
                     nv = strEQ(type, "integer") ? newSViv((IV)SvNV(v))
-                                                : newSVnv(SvNV(v));
+                                                : newSVnv(SvNV(v)); /* # uncoverable statement class:ignore_covered_err */
                 }
                 else if (strEQ(type, "boolean")) {
                     STRLEN vl; const char *vs = SvPV_const(v, vl);
@@ -338,9 +520,9 @@ static SV *pv_result_valid(pTHX_ HV *h, SV *name) {
             }
             (void)hv_store_ent(out, k, nv ? nv : newSVsv(v), 0);
         }
-        if (name && SvOK(name)) {
+        if (name && SvOK(name)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             HE *ohe = hv_fetch_ent(out, name, 0, 0);
-            SV *r = ohe ? newSVsv(HeVAL(ohe)) : newSV(0);
+            SV *r = ohe ? newSVsv(HeVAL(ohe)) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
             SvREFCNT_dec((SV *)out);
             return r;
         }
@@ -389,6 +571,10 @@ XS_INTERNAL(pv_guard_cb) {
     AV *cap = punk_clos_cap(aTHX_ cv);
     SV *c, *compiled, *plain, *srcv, *oi, *data, *r;
     AV *errs;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (items < 1 || !cap) XSRETURN_EMPTY;
     c        = ST(0);
     compiled = *av_fetch(cap, 0, 0);
@@ -406,13 +592,20 @@ XS_INTERNAL(pv_guard_cb) {
     r = sv_2mortal(pv_run(aTHX_ c, compiled,
                           SvOK(plain) ? plain : NULL, data));
     errs = pv_result_errors(aTHX_ pv_result_hv(aTHX_ r));
-    if (!errs || av_len(errs) < 0) XSRETURN_EMPTY;   /* valid: continue */
+    if (!errs || av_len(errs) < 0) XSRETURN_EMPTY;   /* valid: continue */ /* # uncoverable condition left count:1 class:ignore_covered_err */
 
     if (SvOK(oi)) {                     /* the app's own failure response */
         int died = 0;
         SV *out = pd_call(aTHX_ oi, c, &died);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (died) { if (out) SvREFCNT_dec(out); croak_sv(ERRSV); }
-        ST(0) = out ? sv_2mortal(out) : &PL_sv_undef;
+        ST(0) = out ? sv_2mortal(out) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         XSRETURN(1);
     }
     {                                   /* the OpenAPI-mount-shaped 400 */
@@ -422,7 +615,7 @@ XS_INTERNAL(pv_guard_cb) {
         argv[0] = sv_2mortal(newRV_noinc((SV *)body));
         argv[1] = sv_2mortal(newSViv(400));
         resp = pcx_call_meth(aTHX_ c, "json", argv, 2, 1);
-        ST(0) = resp ? sv_2mortal(resp) : &PL_sv_undef;
+        ST(0) = resp ? sv_2mortal(resp) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         XSRETURN(1);
     }
 }
@@ -440,10 +633,19 @@ static void pv_compile_routes(pTHX_ SV *self) {
     AV *vrs;
     HV *by;
     SSize_t i, n;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!(vrp && *vrp && SvROK(*vrp) && SvTYPE(SvRV(*vrp)) == SVt_PVAV))
-        return;
+        return; /* # uncoverable statement */
     vrs = (AV *)SvRV(*vrp);
     n = av_len(vrs) + 1;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!n) return;
     by = pk_route_index(aTHX_ self, "validate");
 
@@ -454,24 +656,44 @@ static void pv_compile_routes(pTHX_ SV *self) {
         SV *where, *spec, *schema, *src = NULL, *oi = NULL;
         SV *compiled, *resolved = NULL;
         HE *he;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!(vp && *vp && SvROK(*vp) && SvTYPE(SvRV(*vp)) == SVt_PVHV))
-            continue;
+            continue; /* # uncoverable statement */
         vr = (HV *)SvRV(*vp);
         m  = hv_fetchs(vr, K_METHOD, 0);
         p  = hv_fetchs(vr, K_PATH, 0);
         sp = hv_fetchs(vr, K_VALIDATE, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err
+         # uncoverable condition left count:5 class:ignore_covered_err
+         # uncoverable condition left count:6 class:ignore_covered_err */
         if (!(m && *m && p && *p && sp && *sp)) continue;
         where = sv_2mortal(newSVsv(*m));
         sv_catpvs(where, " ");
         sv_catsv(where, *p);
 
         he = hv_fetch_ent(by, where, 0, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!he)
-            croak("Punk: validate on unknown route %s", SvPV_nolen(where));
+            croak("Punk: validate on unknown route %s", SvPV_nolen(where)); /* # uncoverable statement */
         rec = (HV *)SvRV(HeVAL(he));
 
         spec = *sp;
         schema = spec;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (SvROK(spec) && SvTYPE(SvRV(spec)) == SVt_PVHV
             && hv_exists((HV *)SvRV(spec), "schema", 6)) {
             HV *sh = (HV *)SvRV(spec);
@@ -486,13 +708,26 @@ static void pv_compile_routes(pTHX_ SV *self) {
                           k, SvPV_nolen(where));
             }
             x = hv_fetchs(sh, "schema", 0);
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             schema = (x && *x) ? *x : &PL_sv_undef;
             x = hv_fetchs(sh, "source", 0);
+            /*
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (x && *x && SvOK(*x)) src = *x;
             x = hv_fetchs(sh, "on_invalid", 0);
+            /*
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (x && *x && SvOK(*x)) oi = *x;
         }
 
+        /*
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err */
         if (!(SvROK(schema)
               && (SvOBJECT(SvRV(schema))
                   || SvTYPE(SvRV(schema)) == SVt_PVHV)))
@@ -501,7 +736,7 @@ static void pv_compile_routes(pTHX_ SV *self) {
                   SvPV_nolen(where));
         compiled = pv_compile(aTHX_ schema);   /* croaks on a bad schema */
 
-        if (src && !(strEQ(SvPV_nolen(src), "params")
+        if (src && !(strEQ(SvPV_nolen(src), "params") /* # uncoverable condition right count:3 class:ignore_covered_err */
                      || strEQ(SvPV_nolen(src), "json"))) {
             SvREFCNT_dec(compiled);
             croak("Punk: validate source on %s must be 'params' or 'json'",

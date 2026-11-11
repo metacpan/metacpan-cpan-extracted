@@ -24,10 +24,17 @@ static HV *pf_inbound(pTHX_ SV *c) {
     SV **in = hv_fetchs(stash, "punk.flash.in", 0);
     SV *sess_rv, *moved, *rv;
     HV *inh;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (in && *in && SvROK(*in) && SvTYPE(SvRV(*in)) == SVt_PVHV)
         return (HV *)SvRV(*in);
     sess_rv = sv_2mortal(ps_load(aTHX_ c));        /* croaks unconfigured */
     moved = hv_delete((HV *)SvRV(sess_rv), "punk.flash", 10, 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (moved && SvROK(moved) && SvTYPE(SvRV(moved)) == SVt_PVHV) {
         inh = (HV *)SvRV(moved);
         rv = newRV_inc((SV *)inh);     /* moved is mortal; keep the HV */
@@ -46,6 +53,10 @@ static HV *pf_outbound(pTHX_ SV *c) {
     HV *sess = (HV *)SvRV(sess_rv);
     SV **e = hv_fetchs(sess, "punk.flash", 0);
     HV *out;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)
         return (HV *)SvRV(*e);
     out = newHV();

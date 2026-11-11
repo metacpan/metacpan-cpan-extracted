@@ -51,6 +51,8 @@ t/18-stages-rows.t
 t/19-stages-batch.t
 t/20-stages-taps.t
 t/21-lists.t
+t/22-pipeline-as-stage.t
+t/23-documented.t
 xt/howto.t
 xt/manuals.t
 META.yml

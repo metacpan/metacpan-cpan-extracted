@@ -1,4 +1,4 @@
-package Dist::Conformance::Schema 0.003;
+package Dist::Conformance::Schema 0.004;
 
 # ABSTRACT: Parse YAML, JSON and INI, and validate the result against a schema
 
@@ -88,7 +88,7 @@ sub first_line ($text) {
 }
 
 # Config::INI::Reader keeps the last value of a repeated key, so it collects each repeat into a list.
-package Dist::Conformance::Schema::INIReader 0.003 {
+package Dist::Conformance::Schema::INIReader 0.004 {
     use parent 'Config::INI::Reader';
 
     sub set_value ( $self, $name, $value ) {
@@ -110,7 +110,7 @@ Dist::Conformance::Schema - Parse YAML, JSON and INI, and validate the result ag
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

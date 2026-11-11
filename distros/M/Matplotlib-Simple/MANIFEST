@@ -33,6 +33,7 @@ t/16.creator.t
 t/17.gnuplot.t
 t/18.ggplot2.t
 t/19.engines.t
+t/20.review.fixes.0.3342.t
 t/output.images/add.single.svg
 t/output.images/bar.sub.self.svg
 t/output.images/bar.sub.svg

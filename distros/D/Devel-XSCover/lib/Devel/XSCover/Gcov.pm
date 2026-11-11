@@ -13,7 +13,7 @@ use Symbol ();
 
 use Devel::XSCover::Flow ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 sub new {
     my ($class, %args) = @_;

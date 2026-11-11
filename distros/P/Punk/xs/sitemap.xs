@@ -35,6 +35,8 @@ import(class, ...)
         const char *pkg = CopSTASHPV(PL_curcop);
         SV *pkgsv, *appsv;
         PERL_UNUSED_VAR(class);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!pkg) XSRETURN_EMPTY;
         pkgsv = sv_2mortal(newSVpv(pkg, 0));
         /* Not a Punk application: nothing to install a keyword on, and that
@@ -44,6 +46,8 @@ import(class, ...)
          * refusing to compile the `sitemap` line, which says so itself. */
         if (!pkc_can_meth(aTHX_ pkgsv, "punk_app")) XSRETURN_EMPTY;
         appsv = pcx_call_meth(aTHX_ pkgsv, "punk_app", NULL, 0, 1);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (appsv) {
             pks_install_kw(aTHX_ sv_2mortal(appsv));
         }
@@ -71,8 +75,14 @@ register(self, app, opts = &PL_sv_undef)
         HV *h = app_hv(aTHX_ app);
         SV **b = NULL;
         PERL_UNUSED_VAR(self);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
             b = hv_fetchs((HV *)SvRV(opts), "base", 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
         if (b && *b && SvOK(*b) && SvCUR(*b))
             (void)hv_stores(h, "sitemap_base", newSVsv(*b));
         {   /* the routes this plugin adds for itself: out of the sitemap,
@@ -107,6 +117,8 @@ register(self, app, opts = &PL_sv_undef)
                 argv[4] = sv_2mortal(newRV_noinc((SV *)o));
             }
             r = pcx_call_meth(aTHX_ app, "route", argv, 5, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (r) SvREFCNT_dec(r);
 
             /* /sitemap/1.xml, /2.xml and so on. A capture, so the listing
@@ -120,6 +132,8 @@ register(self, app, opts = &PL_sv_undef)
             argv[3] = &PL_sv_undef;
             argv[4] = &PL_sv_undef;
             r = pcx_call_meth(aTHX_ app, "route", argv, 5, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (r) SvREFCNT_dec(r);
 
             /* /robots.txt, from the same exclusion list. Opts itself out
@@ -137,6 +151,8 @@ register(self, app, opts = &PL_sv_undef)
                 argv[4] = sv_2mortal(newRV_noinc((SV *)o));
             }
             r = pcx_call_meth(aTHX_ app, "route", argv, 5, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (r) SvREFCNT_dec(r);
 
             /* the `sitemap` keyword, for the URLs the route table cannot
@@ -150,19 +166,25 @@ register(self, app, opts = &PL_sv_undef)
                           ? hv_fetchs((HV *)SvRV(opts), "disallow_all", 0) : NULL;
                 SV **ag = (SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
                           ? hv_fetchs((HV *)SvRV(opts), "agents", 0) : NULL;
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (d && *d && SvROK(*d) && SvTYPE(SvRV(*d)) == SVt_PVAV)
                     (void)hv_stores(h, "sitemap_disallow", newSVsv(*d));
-                if (da && *da) (void)hv_stores(h, "sitemap_disallow_all",
+                if (da && *da) (void)hv_stores(h, "sitemap_disallow_all", /* # uncoverable condition right count:2 class:ignore_covered_err */
                                                newSViv(SvTRUE(*da) ? 1 : 0));
                 /* The user agents each group is repeated for. Checked here
                  * rather than where the file is built, because a token with a
                  * space in it is a typo that would otherwise be discovered as
                  * a crawler reading a directive that was never written. */
-                if (ag && *ag) {
+                if (ag && *ag) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     AV *av;
                     SSize_t i, n;
+                    # uncoverable branch true
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
                     if (!(SvROK(*ag) && SvTYPE(SvRV(*ag)) == SVt_PVAV))
-                        croak("Punk::Plugin::Sitemap: agents is an arrayref "
+                        croak("Punk::Plugin::Sitemap: agents is an arrayref " /* # uncoverable statement */
                               "of user-agent tokens");
                     av = (AV *)SvRV(*ag);
                     n  = av_len(av) + 1;
@@ -170,14 +192,22 @@ register(self, app, opts = &PL_sv_undef)
                         SV **e = av_fetch(av, i, 0);
                         STRLEN l, j;
                         const char *s;
+                        # uncoverable branch true
+                        # uncoverable condition left count:1 class:ignore_covered_err
+                        # uncoverable condition left count:2 class:ignore_covered_err
+                        # uncoverable condition left count:3 class:ignore_covered_err
                         if (!(e && *e && SvOK(*e)))
-                            croak("Punk::Plugin::Sitemap: agents holds a "
+                            croak("Punk::Plugin::Sitemap: agents holds a " /* # uncoverable statement */
                                   "user-agent token, not undef");
                         s = SvPV_const(*e, l);
+                        # uncoverable branch true
+                        # uncoverable condition left count:1 class:ignore_covered_err
                         if (!l)
-                            croak("Punk::Plugin::Sitemap: an empty user-agent "
+                            croak("Punk::Plugin::Sitemap: an empty user-agent " /* # uncoverable statement */
                                   "token names no crawler");
                         for (j = 0; j < l; j++)
+                            # uncoverable condition left count:2 class:ignore_covered_err
+                            # uncoverable condition left count:3 class:ignore_covered_err
                             if (isSPACE(s[j]) || s[j] == ':'
                                 || (unsigned char)s[j] < 0x20)
                                 croak("Punk::Plugin::Sitemap: '%.*s' is not a "
@@ -198,6 +228,8 @@ register(self, app, opts = &PL_sv_undef)
             av_push(cap, newSVsv(app));
             argv[0] = sv_2mortal(punk_closure(aTHX_ pks_mw_cb, cap));
             r = pcx_call_meth(aTHX_ app, "middleware", argv, 1, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (r) SvREFCNT_dec(r);
         }
     }
@@ -214,6 +246,8 @@ _doc(class, app, n = 0)
         HV *h = app_hv(aTHX_ app);
         SV *doc = NULL;
         PERL_UNUSED_VAR(class);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!h) XSRETURN_UNDEF;
         /* the same refresh a request would trigger - a seam that behaved
          * differently from the serve path would prove nothing */
@@ -222,15 +256,20 @@ _doc(class, app, n = 0)
             /* /sitemap.xml: the index when there is more than one part, and
              * otherwise the single part itself. */
             doc = app_get(aTHX_ h, "sitemap_index");
-            if (!(doc && SvOK(doc))) n = 1;
+            if (!(doc && SvOK(doc))) n = 1; /* # uncoverable condition left count:1 class:ignore_covered_err */
         }
         if (n > 0) {
             SV *ps = app_get(aTHX_ h, "sitemap_parts");
             AV *parts = (ps && SvROK(ps) && SvTYPE(SvRV(ps)) == SVt_PVAV)
                         ? (AV *)SvRV(ps) : NULL;
-            SV **e = parts ? av_fetch(parts, (SSize_t)(n - 1), 0) : NULL;
+            SV **e = parts ? av_fetch(parts, (SSize_t)(n - 1), 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             doc = (e && *e) ? *e : NULL;
         }
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(doc && SvOK(doc))) XSRETURN_UNDEF;
         RETVAL = newSVsv(doc);
     }
@@ -247,8 +286,10 @@ _parts(class, app)
         HV *h = app_hv(aTHX_ app);
         SV *ps;
         PERL_UNUSED_VAR(class);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (h) pks_ensure(aTHX_ app);
-        ps = h ? app_get(aTHX_ h, "sitemap_parts") : NULL;
+        ps = h ? app_get(aTHX_ h, "sitemap_parts") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         RETVAL = (ps && SvROK(ps) && SvTYPE(SvRV(ps)) == SVt_PVAV)
                  ? (IV)(av_len((AV *)SvRV(ps)) + 1) : 0;
     }
@@ -259,12 +300,14 @@ _parts(class, app)
 # to_app - the only moment every route has been declared and nothing has been
 # served yet.
 void
+# uncoverable statement
+# uncoverable subroutine
 _build(class, app)
         SV *class
         SV *app
     CODE:
         PERL_UNUSED_VAR(class);
-        pks_build(aTHX_ app);
+        pks_build(aTHX_ app); /* # uncoverable statement */
 
 # The robots.txt body. Private, and what the tests compare against the
 # sitemap so the two cannot be shown to disagree.
@@ -303,8 +346,11 @@ _base(class, app)
     CODE:
     {
         HV *h = app_hv(aTHX_ app);
-        SV *b = h ? app_get(aTHX_ h, "sitemap_base") : NULL;
+        SV *b = h ? app_get(aTHX_ h, "sitemap_base") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PERL_UNUSED_VAR(class);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(b && SvOK(b))) XSRETURN_UNDEF;
         RETVAL = newSVsv(b);
     }

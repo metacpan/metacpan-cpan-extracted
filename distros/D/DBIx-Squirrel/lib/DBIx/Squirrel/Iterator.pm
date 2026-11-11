@@ -272,21 +272,22 @@ DBIx::Squirrel::Iterator - an iterator over a statement's results
 
 =head1 DESCRIPTION
 
-An iterator executes a statement and hands out its rows one at a time,
-each run through a pipeline of stages, as L<DBIx::Squirrel::Pipeline>
-runs them: a stage can change a row, drop it, return several values in
-its place, or stop the iteration with L<DBIx::Squirrel::Stop>. A result
-is whatever comes out of the stages; with none, it's the row. A stage
-can ask about the result it's making with L<DBIx::Squirrel::Context>.
+An iterator executes a statement and hands out its rows one at a time.
+Each row is run through a pipeline of stages, as
+L<DBIx::Squirrel::Pipeline> runs them. A stage can change a row, drop
+it, return several values in its place, or stop the iteration with
+L<DBIx::Squirrel::Stop>. A result is whatever comes out of the stages.
+With no stages, it's the row. A stage can ask about the result it's
+making with L<DBIx::Squirrel::Context>.
 
 An iterator is made by L<DBIx::Squirrel::db/iterate> or
 L<DBIx::Squirrel::st/iterate>. It executes the statement when its first
 result is asked for, and finishes the statement when the results run
 out.
 
-Rows are fetched 100 at a time, with L<DBI/fetchall_arrayref>, or, by
-L</all> without stages, all at once; each as an array, or, with the
-C<ekorn_slice> attribute, in the shape it gives:
+Rows are fetched 100 at a time, with L<DBI/fetchall_arrayref>. L</all>
+without stages fetches them all at once. Each row is an array, or,
+with the C<ekorn_slice> attribute, in the shape it gives:
 
     $dbh = DBIx::Squirrel->connect($dsn, $user, $pass, {ekorn_slice => {}});
     $sth = $dbh->prepare($statement, {ekorn_slice => {}});
@@ -294,10 +295,10 @@ C<ekorn_slice> attribute, in the shape it gives:
 C<ekorn_slice> is a slice as L<DBI/fetchall_arrayref> takes it: an
 array reference, for rows as arrays, or a hash reference, for rows as
 hashes. Given to C<connect>, it's the default for each statement the
-handle prepares; given to C<prepare>, it's for that statement.
+handle prepares. Given to C<prepare>, it's for that statement.
 
-One statement handle can have one iterator going through its results
-at a time.
+A statement handle can have only one iterator going through its
+results at a time.
 
 =head1 METHODS
 
@@ -305,21 +306,23 @@ at a time.
 
     $it = DBIx::Squirrel::Iterator->new($sth, @bind_values, @stages);
 
-Returns an iterator over the rows of C<$sth>, a L<DBIx::Squirrel::st>,
-executed with C<@bind_values>, in any form L<DBIx::Squirrel::st/execute>
-takes, and run through C<@stages>, the code references at the end of the
-arguments. It doesn't execute the statement.
+Returns an iterator over the rows of C<$sth>, a L<DBIx::Squirrel::st>.
+It doesn't execute the statement. When it does, it's executed with
+C<@bind_values>, in any form L<DBIx::Squirrel::st/execute> takes. Each
+row is run through C<@stages>, the code references or pipelines at the
+end of the arguments.
 
 =head2 next
 
     while (my($result) = $it->next) { ... }
 
 Returns the next result, or an empty list when there are no more. A
-stage can return C<undef> as a result, so read C<next> in list context,
-as above, rather than testing whether what it returns is defined.
+stage can return C<undef> as a result. So read C<next> in list
+context, as above, rather than testing whether what it returns is
+defined.
 
-Once a stage dies, the iterator has ended: C<next> returns an empty
-list on every call after, C<all> nothing, and the statement is
+Once a stage dies, the iterator has ended. C<next> returns an empty
+list on every call after, C<all> returns nothing, and the statement is
 finished. L</reset> runs it again, from the start.
 
 =head2 all
@@ -327,45 +330,45 @@ finished. L</reset> runs it again, from the start.
     @results = $it->all;
     $count   = $it->all;
 
-Returns the results not yet fetched, or, in scalar context, how many
-there were. Either way, they're fetched, and C<next> returns nothing
-after.
+Returns the results not yet fetched. In scalar context, it returns how
+many there were. Either way, they're fetched, and C<next> returns
+nothing after.
 
-Without stages, the rows are the results, so C<all> takes what's left
+Without stages, the rows are the results. So C<all> takes what's left
 of the batch fetched last, and fetches the rest with one
-C<fetchall_arrayref>, nearly as quickly as the DBI's own
-C<selectall_arrayref>. With stages, each row goes through them in turn,
-which costs a little for each row. So to change every row of a large
-result, when nothing needs to stop early, C<map> over C<all> is
+C<fetchall_arrayref>. That's nearly as quick as the DBI's own
+C<selectall_arrayref>. With stages, each row goes through them in
+turn, which costs a little for each row. So to change every row of a
+large result, when nothing needs to stop early, C<map> over C<all> is
 quicker than a stage:
 
     my @names = map { $_->[0] } $dbh->iterate('SELECT name FROM artist')->all;
 
-Stages are for when the rows should come one at a time, from C<next>,
-or may stop early, or should go with the statement, as in a Sugar
+Use stages when the rows should come one at a time, from C<next>, or
+may stop early, or should go with the statement, as in a Sugar
 statement.
 
 =head2 single
 
     $result = $it->single;
 
-Executes the statement again, and returns its one result, or nothing if
-it has none. It croaks if there's more than one. Either way, it's done:
-C<next> returns nothing after.
+Executes the statement again, and returns its one result, or nothing
+if it has none. It croaks if there's more than one. Either way, the
+iterator is done, and C<next> returns nothing after.
 
 =head2 reset
 
     $it = $it->reset;
     $it = $it->reset(@bind_values, @stages);
 
-Executes the statement again, ready to iterate from its first row,
-finishing it first if it's still active, and returns the iterator. Bind
-values given replace those given before. Stages given are added to those
-given to L</new>. Both are kept until others are given.
+Executes the statement again, ready to iterate from its first row, and
+returns the iterator. If the statement is still active, it's finished
+first. Bind values given replace those given before. Stages given are
+added to those given to L</new>. Both are kept until others are given.
 
-A statement taking a list, as L<DBIx::Squirrel::st/Lists> describes, is
+A statement taking a list (see L<DBIx::Squirrel::st/Lists>) is
 prepared again, on a new statement handle, if a list given has a
-different number of values from the one before; L</sth> then returns
+different number of values from the one before. L</sth> then returns
 the new handle.
 
 =head2 count
@@ -379,18 +382,18 @@ Returns the number of results fetched so far.
     @names = $it->column_names;
 
 Returns the names of the statement's columns, as C<fetchrow_hashref>
-would key them, following the C<FetchHashKeyName> attribute, executing
-the statement first if it hasn't been. They're read when it's executed,
-as some drivers, such as DBD::mysql, give none once the last row is
-fetched. A statement without columns has none, as does one that
-couldn't be executed. A stage can ask for them through
-L<DBIx::Squirrel::Context/iterator>.
+would key them, following the C<FetchHashKeyName> attribute. If the
+statement hasn't been executed, it's executed first. The names are
+read when it's executed, as some drivers, such as DBD::mysql, give
+none once the last row is fetched. A statement without columns has no
+names, and nor does one that couldn't be executed. A stage can ask for
+them through L<DBIx::Squirrel::Context/iterator>.
 
 =head2 sth
 
     $sth = $it->sth;
 
-Returns the statement handle, which changes if L</reset> prepares a
+Returns the statement handle. It changes if L</reset> prepares a
 statement taking a list again.
 
 =head1 DIAGNOSTICS
@@ -407,9 +410,9 @@ L</single> found a second result.
 
 =item Expected the statement handle's other iterator to be finished
 
-The iterator's statement handle has another iterator, which has
-results left to hand out. Read that one to the end, or let it go out of
-scope, before executing this one.
+The iterator's statement handle has another iterator, with results
+left to hand out. Read that one to the end, or let it go out of scope,
+before executing this one.
 
 =back
 

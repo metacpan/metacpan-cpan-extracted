@@ -8,7 +8,7 @@ use Keyword::Simple;
 use Carp                   qw(croak);
 use Logic::Relational::DSL ();
 
-our $VERSION = '0.02';
+our $VERSION = '0.03';
 
 # Export logic syntax keywords when imported
 sub import ($class) {
@@ -471,8 +471,8 @@ s/^\s*either\s*(\{(?:[^{}]++|(?1))*\})((\s*or\s*\{(?:[^{}]++|(?3))*\})+)\s*;?\s*
         }
 
         # 4b2. $t1 \= $t2; or $t1 !:= $t2; (Non-Unifiability)
-        elsif (
-            $body_str =~ s/^\s*([^;]+?)\s*(?:\\=|\!\:\=)\s*([^;]+?)\s*;\s*//s )
+        elsif ( $body_str =~
+            s/^\s*([^;]+?)\s*(?:\\=|\!\:\=|\!\s*:\s*=)\s*([^;]+?)\s*;\s*//s )
         {
             my ( $t1, $t2 ) = ( $1, $2 );
             push @goals,
@@ -480,8 +480,8 @@ s/^\s*either\s*(\{(?:[^{}]++|(?1))*\})((\s*or\s*\{(?:[^{}]++|(?3))*\})+)\s*;?\s*
         }
 
         # 4b3. $t1 := $t2; (Infix Unification)
-        elsif (
-            $body_str =~ s/^\s*([^;]+?)\s*(?<!\!) := \s*([^;]+?)\s*;\s*//sx )
+        elsif ( $body_str =~
+            s/^\s*([^;]+?)\s*(?<!\!) (?::=|\:\s*=) \s*([^;]+?)\s*;\s*//sx )
         {
             my ( $t1, $t2 ) = ( $1, $2 );
             push @goals, "Logic::Relational::Goal::Unify->new( $t1, $t2 )";

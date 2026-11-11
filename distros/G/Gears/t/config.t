@@ -47,6 +47,12 @@ subtest 'should replace different refs' => sub {
 	is $c->config, {a => 'test', b => []}, 'config ok';
 };
 
+subtest 'should allow numbers (check erroneous range +-=)' => sub {
+	my $c = Gears::Config->new;
+	$c->add(var => {'0a' => []});
+	is $c->config, {'0a' => []}, 'config ok';
+};
+
 subtest 'should merge hashes' => sub {
 	my $c = Gears::Config->new;
 	$c->add(var => {a => {b => 1, c => 42}, d => {e => 4}});
@@ -87,6 +93,13 @@ subtest 'should remove array elements' => sub {
 	$c->add(var => {a => [1, 2, 3]});
 	$c->add(var => {'-a' => [2, 4]});
 	is $c->config, {a => [1, 3]}, 'config ok';
+};
+
+subtest 'should remove all array elements' => sub {
+	my $c = Gears::Config->new;
+	$c->add(var => {a => [1, 2, 3]});
+	$c->add(var => {'-a' => [1, 2, 3]});
+	is $c->config, {a => []}, 'config ok';
 };
 
 subtest 'should add and remove array elements at the same time' => sub {

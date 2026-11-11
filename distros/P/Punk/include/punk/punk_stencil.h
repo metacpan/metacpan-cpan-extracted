@@ -33,15 +33,34 @@ static const st_abi *punk_st_try(pTHX) {
         PUNK_ST_TRIED = 1;
         ok = pk_require_once(aTHX_ "Template::Stencil", FALSE);
         SPAGAIN;   /* the require may have reallocated the value stack */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (ok) {
             ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
             count = call_pv("Template::Stencil::_abi_ptr", G_SCALAR | G_EVAL);
             SPAGAIN;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (!SvTRUE(ERRSV) && count > 0) p = POPi;
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             else if (count > 0)             (void)POPs;
             PUTBACK; FREETMPS; LEAVE;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (p) {
                 const st_abi *a = INT2PTR(const st_abi *, p);
+                /*
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:3 class:ignore_covered_err */
                 if (a && !getenv("PUNK_FAKE_ST_BAD")
                     && a->abi_version >= ST_ABI_VERSION)
                     PUNK_ST = a;
@@ -64,13 +83,20 @@ static const st_abi *punk_st(pTHX) {
 }
 
 static AV *pvs_av(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVAV)
-        croak("Punk::View::Stencil: not a view object");
+        croak("Punk::View::Stencil: not a view object"); /* # uncoverable statement */
     return (AV *)SvRV(self);
 }
 
 static SV *pvs_slot(pTHX_ SV *self, I32 slot) {
     SV **e = av_fetch(pvs_av(aTHX_ self), slot, 0);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (e && *e && SvOK(*e)) ? *e : NULL;
 }
 
@@ -85,15 +111,21 @@ static SV *pvs_build_engine(pTHX_ SV *opts) {
     PUSHMARK(SP);
     EXTEND(SP, 2);
     mPUSHs(newSVpvs("Template::Stencil"));
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     PUSHs(opts && SvOK(opts) ? opts
                              : sv_2mortal(newRV_noinc((SV *)newHV())));
     PUTBACK;
     count = call_method("new", G_SCALAR);
     SPAGAIN;
-    obj = count > 0 ? newSVsv(POPs) : &PL_sv_undef;
+    obj = count > 0 ? newSVsv(POPs) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
     PUTBACK; FREETMPS; LEAVE;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!SvROK(obj))
-        croak("Punk::View::Stencil: Template::Stencil->new returned no object");
+        croak("Punk::View::Stencil: Template::Stencil->new returned no object"); /* # uncoverable statement */
     return obj;
 }
 
@@ -113,19 +145,22 @@ static SV *pvs_render(pTHX_ SV *self, SV *tmpl, SV *data, SV *opts) {
      * its engine and rebuilds lazily, so a cached one would dangle. The lookup
      * is a walk of the object's magic chain. */
     engine = abi->engine_of(aTHX_ engine_sv);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!engine)
-        croak("Punk::View::Stencil: the engine is not a Template::Stencil "
+        croak("Punk::View::Stencil: the engine is not a Template::Stencil " /* # uncoverable statement */
               "object");
 
-    if (data && SvOK(data)) {
-        if (!SvROK(data) || SvTYPE(SvRV(data)) != SVt_PVHV)
+    if (data && SvOK(data)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
+        if (!SvROK(data) || SvTYPE(SvRV(data)) != SVt_PVHV) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Punk::View::Stencil: render data must be a hashref");
         dhv = (HV *)SvRV(data);
     }
     out = abi->render(aTHX_ engine, tmpl, dhv,
                       (opts && SvOK(opts)) ? opts : NULL, &err);
     if (!out)
-        croak_sv(err ? err : sv_2mortal(newSVpvs(
+        croak_sv(err ? err : sv_2mortal(newSVpvs( /* # uncoverable condition left count:1 class:ignore_covered_err */
             "Punk::View::Stencil: render failed")));
     return out;
 }

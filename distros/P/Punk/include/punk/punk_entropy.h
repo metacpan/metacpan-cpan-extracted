@@ -53,8 +53,11 @@ static Pid_t         pk_ent_pid = 0;
 
 static void pk_ent_fill(pTHX) {
 #ifdef PUNK_HAVE_GETENTROPY
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (getentropy(pk_ent_buf, sizeof pk_ent_buf) != 0)
-        croak("Punk: getentropy failed: %s", Strerror(errno));
+        croak("Punk: getentropy failed: %s", Strerror(errno)); /* # uncoverable statement */
 #else
     /* The same cached descriptor punk_csrf.h uses, and the same refusal to
      * fall back to anything weaker: a guessable nonce or token is worse than

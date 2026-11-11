@@ -5,9 +5,6 @@ LICENSE
 META.json
 README.md
 cpanfile
-images/Makefile
-images/capture.sh
-images/nup.png
 lib/App/nup.pm
 lib/App/optex/up.pm
 minil.toml

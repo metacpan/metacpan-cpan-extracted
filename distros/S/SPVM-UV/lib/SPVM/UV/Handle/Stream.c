@@ -128,3 +128,24 @@ int32_t SPVM__UV__Handle__Stream__read_start(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__UV__Handle__Stream__read_stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_stream = stack[0].oval;
+  
+  if (!obj_uv_stream) {
+    return env->die(env, stack, "$uv_stream must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_stream_t* uv_stream = env->get_pointer(env, stack, obj_uv_stream);
+  
+  // Stop reading data from the stream
+  int32_t status = uv_read_stop(uv_stream);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_read_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}

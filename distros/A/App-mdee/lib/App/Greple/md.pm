@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.17";
+our $VERSION = "1.18";
 
 =encoding utf-8
 
@@ -313,9 +313,9 @@ Front matter (see L</Front Matter>) is left as it is.
 
 =head2 Front Matter
 
-Front matter at the top of the file is shown as a code block: every
-line in C<meta_block>, including the delimiter lines, whose text is
-in C<meta_mark>, with no other markup, and it is not folded or joined.
+Front matter at the top of the file is shown as a code block: the
+body in C<meta_block> and the delimiter lines in C<meta_mark>, with
+no other markup, and it is not folded or joined.
 TOML front matter is between C<+++> lines, and YAML front matter goes
 from a C<---> line to a C<---> or C<...> line, as pandoc takes it (the
 opening line is not followed by a blank line).
@@ -397,8 +397,8 @@ are used instead, and these are emphasis.
     code_info    ${base_name}=y70   L10
     code_block   /L23;E             /L05;E
     code_inline  L00/L23            L25/L05
-    meta_mark    -                  -
-    meta_block   -                  -
+    meta_mark    L15/L10E           L10/L15E
+    meta_block   L25/L12E           L00/L13E
 
 Inline code backticks are displayed as C<`contentE<0xb4>> using
 C<code_tick> color.  Multi-backtick delimiters are collapsed to a
@@ -407,8 +407,11 @@ The open/close markers can be customized via C<tick_open>/C<tick_close>
 config parameters.
 
 C<meta_mark> and C<meta_block> color the delimiter lines and the
-body of front matter (see L</Front Matter>).  They are undefined by
-default and fall back to C<code_mark> and C<code_block>.
+body of front matter (see L</Front Matter>), the delimiter lines in
+the background of the file name and the body a little apart from it.
+When they are set to empty, C<meta_block> falls back to C<code_block>,
+and the delimiter lines are in C<code_mark> inside the color of the
+body.
 
 =head2 Block Elements
 
@@ -560,6 +563,8 @@ my %default_colors = (
     code_info       => '${base_name}=y70',
     code_block      => '/L23;E',
     code_inline     => 'L00/L23',
+    meta_mark       => 'L15/L10E',
+    meta_block      => 'L25/L12E',
     comment         => '${base}+r60',
     link            => 'I',
     image           => 'I',
@@ -584,6 +589,8 @@ my %dark_overrides = (
     code_info       => 'L10',
     code_block      => '/L05;E',
     code_inline     => 'L25/L05',
+    meta_mark       => 'L10/L15E',
+    meta_block      => 'L00/L13E',
     h1              => 'L00D/${base};E',
     h2              => 'L00D/${base}-y15;E',
     h3              => 'L00DN/${base}-y15',
@@ -727,11 +734,15 @@ sub md_color {
     $cm->color($label, $text);
 }
 
+sub defined_color {
+    my $label = shift;
+    exists $cm->{HASH}{$label} && $cm->{HASH}{$label} ne '';
+}
+
 # The color of $label, or of $fallback when $label is not defined
 sub fallback_color {
     my($label, $fallback, $text) = @_;
-    $label = $fallback unless exists $cm->{HASH}{$label}
-                             && $cm->{HASH}{$label} ne '';
+    $label = $fallback unless defined_color($label);
     md_color($label, $text);
 }
 
@@ -865,12 +876,17 @@ my %colorize = (
         my($open, @body) = split /(?<=\n)/, $front;
         my $close = pop @body;
         chomp $open;
-        my $mark  = sub { fallback_color('meta_mark',  'code_mark',  $_[0]) };
         my $block = sub { fallback_color('meta_block', 'code_block', $_[0]) };
+        # A delimiter line is in meta_mark alone when it is defined, and
+        # otherwise in code_mark inside the block color, so that the
+        # background of the block runs over it
+        my $mark = defined_color('meta_mark')
+            ? sub { md_color('meta_mark', $_[0]) }
+            : sub { $block->(md_color('code_mark', $_[0])) };
         substr($_, 0, length $front) = protect(join '',
-            $block->($mark->($open)), "\n",
+            $mark->($open), "\n",
             (map { $block->($_) } @body),
-            $block->($mark->($close)));
+            $mark->($close));
     }),
 
     code_blocks => Step(sub {

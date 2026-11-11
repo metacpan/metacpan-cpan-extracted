@@ -18,6 +18,7 @@ lib/Gears/Context.pm
 lib/Gears/Controller.pm
 lib/Gears/Generator.pm
 lib/Gears/Logger.pm
+lib/Gears/Role/HasContext.pm
 lib/Gears/Router.pm
 lib/Gears/Router/Location.pm
 lib/Gears/Router/Location/Match.pm
@@ -48,6 +49,7 @@ t/generator/flat.txt
 t/generator/myapp.pl
 t/lib/Gears/Test/Router.pm
 t/logger.t
+t/router-separator.t
 t/router-sigils-build.t
 t/router-sigils-match.t
 t/router.t

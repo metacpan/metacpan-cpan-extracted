@@ -1,5 +1,5 @@
 package Gears::Router::Match;
-$Gears::Router::Match::VERSION = '0.104';
+$Gears::Router::Match::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 

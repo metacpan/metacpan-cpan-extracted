@@ -13,11 +13,15 @@ my $r = Gears::Test::Router->new(
 );
 
 subtest 'checks should be honored during location building' => sub {
-	my $l = $r->clear->add('/:num' => {checks => {num => '\d'}});
+	my $l = $r->clear->add('/:num' => {checks => {num => '\d|b'}});
+
+	ok lives { $l->build(num => 6) }, 'digit ok';
+	ok lives { $l->build(num => 'b') }, 'letter b ok';
 
 	like dies { $l->build() }, qr/no value for placeholder :num/, 'missing ok';
 	like dies { $l->build(num => 'a') }, qr/bad value for placeholder :num/, 'non-numeric ok';
 	like dies { $l->build(num => '42') }, qr/bad value for placeholder :num/, 'double digit ok';
+	like dies { $l->build(num => '5b') }, qr/bad value for placeholder :num/, 'mix digit/b ok';
 };
 
 _build(
@@ -83,6 +87,13 @@ _build(
 	'/:a',
 	{a => 'zażółć gęślą jaźń'},
 	'/za%C5%BC%C3%B3%C5%82%C4%87%20g%C4%99%C5%9Bl%C4%85%20ja%C5%BA%C5%84',
+);
+
+_build(
+	'erroneously addition of ^ character fix',
+	'/:a',
+	{a => 'abc^'},
+	'/abc%5E',
 );
 
 done_testing;

@@ -4,7 +4,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 # VERSION
 
-version 0.000035
+version 0.000036
 
 # DESCRIPTION
 
@@ -38,10 +38,16 @@ Copy/pasting a full GitHub URL.
     ot https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L17-L21
     # vim +17 lib/Open/This.pm
 
+GitLab, Codeberg, Bitbucket and SourceHut file URLs are also understood.
+
 Open a local file on the GitHub web site in your web browser.  From within a
 checked out copy of https://github.com/oalders/open-this
 
     ot -b Foo::Bar
+
+URLs are built in the style of GitHub, GitLab, Codeberg, Bitbucket or
+SourceHut, depending on the host of your remote.  Other hosts get GitHub-style
+URLs.
 
 Open a local file at the correct line on the GitHub web site in your web
 browser.  From within a checked out copy of
@@ -98,11 +104,17 @@ directly.)
 
 ## maybe\_get\_url\_from\_parsed\_text
 
-Tries to return an URL to a Git repository for a checked out file.  The URL
-will be built using the `origin` remote and the name of the current branch.  A
-line number will be attached if it can be parsed from the text.  This has only
-currently be tested with GitHub URLs and it assumes you're working on a branch
-which has already been pushed to your remote.
+Tries to return an URL to a Git repository for a checked out file. The
+repository, remote and branch are those of the checkout the file lives in,
+which need not be the one you are in. The file must be committed on the
+current branch; otherwise, or if the file is outside any checkout, `undef`
+is returned. The URL will be built using the first remote listed in
+`$ENV{OPEN_THIS_REMOTES}` (comma-separated) that exists, falling back to
+`origin`, the name of the checkout's current branch and the file's path from
+the root of the checkout. A line number will be attached if it can be parsed
+from the text. GitHub, GitLab, Codeberg, Bitbucket and SourceHut URL layouts
+are supported; other hosts get GitHub-style URLs. It assumes you're working
+on a branch which has already been pushed to your remote.
 
     my $url = maybe_get_url_from_parsed_text( parse_text('t/lib/Foo/Bar.pm:32'));
     # $url might be something like: https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L32

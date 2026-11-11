@@ -1,5 +1,35 @@
 Revision history for Perl extension Text::JSCalendar
 
+0.11  2026-11-10
+	- security: input nested more than 16 components deep is refused
+	  before Text::VCardFast sees it (its parser recurses in C once per
+	  BEGIN: tens of thousands of levels overflowed the stack and killed
+	  the process, which no eval can catch)
+	- security: a recurrence rule's expansion is bounded: it ends after
+	  looking at 250,000 periods and candidates ($MaxExpandWork), whatever
+	  the rule (FREQ=MINUTELY;BYSETPOS=2 with no bounds, or SECONDLY with
+	  a huge COUNT, ran for minutes); byMonthDay, byYearDay, byWeekNo and
+	  bySetPosition are checked against RFC 5545's ranges, and a BYxxx
+	  list may have at most 400 entries ($MaxRuleList)
+	- a backslash in a parameter value is dropped: RFC 5545 gives it no
+	  meaning there, but Text::VCardFast reads \; \: \" as escapes, so a
+	  participant named "Evil \" swallowed the next parameter, and a
+	  locale ending in one left the whole resource unreadable
+	- an rscale that is not a calendar name, or a skip other than omit,
+	  backward or forward, is refused: both are written into the RRULE as
+	  given, and "gregorian;COUNT=1" added a rule part
+	- add t/hostile.t
+	- yearly and monthly rules are expanded from their byMonth and
+	  byMonthDay, not by testing every day of the year: a birthday in a
+	  one-month range takes 0.03ms, was 0.66ms (the same occurrences for
+	  4000 random rules)
+	- a sub-daily rule whose byHour or byMinute rejects a period jumps to
+	  the next one allowed, as it did for a rejected day: MINUTELY;BYHOUR=9
+	  over a month took 111ms, now 0.7ms, and such rules no longer stop at
+	  the work bound before reaching a distant range
+	- writing a recurring event no longer copies all its overrides once per
+	  override (400 overrides: 234ms, now 186ms)
+
 0.10  2026-11-07
 	- NormaliseEvent (and so CompareEvents) keeps what it does not know
 	  instead of deleting it.  It used to delete every key missing from

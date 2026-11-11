@@ -6,7 +6,7 @@ use warnings;
 
 use File::Spec ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our ($DECISION, $DIRECTIVE);
 
@@ -72,14 +72,32 @@ sub parse_llvm {
 
 sub _llvm_files {
     my ($self, $functions, $files, $xsubs) = @_;
-    my (%name, %lines, %own);
+    my (%name, %lines, %own, %score);
     for my $f (@$functions) {
         for my $b (values %{ $f->{blocks} }) {
             for my $index (keys %{ $b->{lines} }) {
                 $lines{$index}{$_} = 1 for @{ $b->{lines}{$index} };
                 $own{ $f->{ident} }{$index} = 1 if grep { $_ == $f->{line} } @{ $b->{lines}{$index} };
-                $name{$index} = $f->{file} if !defined $name{$index} && $own{ $f->{ident} }{$index};
             }
+        }
+    }
+    for my $index (keys %lines) {
+        for my $file (keys %{ $files || {} }) {
+            my $have = $files->{$file}{lines} || {};
+            my $both = grep { $have->{$_} } keys %{ $lines{$index} };
+            next unless $both;
+            $score{$index}{$file} = $both / (keys(%{ $lines{$index} }) + keys(%$have) - $both);
+        }
+    }
+    for my $f (@$functions) {
+        for my $index (sort { $a <=> $b } keys %{ $own{ $f->{ident} } || {} }) {
+            next if defined $name{$index};
+            if (my $sc = $score{$index}) {
+                my $s = $sc->{ $f->{file} } // 0;
+                my ($top) = sort { $sc->{$b} <=> $sc->{$a} } keys %$sc;
+                next unless $s >= 0.5 || $top eq $f->{file};
+            }
+            $name{$index} = $f->{file};
         }
     }
     for my $f (@$functions) {
@@ -94,13 +112,9 @@ sub _llvm_files {
     for my $index (sort { $a <=> $b } keys %lines) {
         next if defined $name{$index};
         my ($best, $score) = (undef, 0);
-        for my $file (sort keys %{ $files || {} }) {
+        for my $file (sort keys %{ $score{$index} || {} }) {
             next if $taken{$file};
-            my $have = $files->{$file}{lines} || {};
-            my $both = grep { $have->{$_} } keys %{ $lines{$index} };
-            next unless $both;
-            my $union = keys(%{ $lines{$index} }) + keys(%$have) - $both;
-            my $s = $both / $union;
+            my $s = $score{$index}{$file};
             ($best, $score) = ($file, $s) if $s > $score;
         }
         next unless defined $best;

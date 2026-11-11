@@ -34,7 +34,7 @@ my $undef_dir = Apophis->new(namespace => 'test-errors');
 $undef_dir->{store_dir} = undef;
 ok(!eval { $undef_dir->exists($id); 1 }, 'as is an undefined store_dir in the object');
 like($@, qr/^Apophis: no store_dir specified/, 'with the same complaint');
-is($dirless->path_for($id, store_dir => $other), File::Spec->catfile($other, substr($id, 0, 2), substr($id, 2, 2), $id), 'but a store_dir passed to the call stands in');
+is($dirless->path_for($id, store_dir => $other), join('/', $other, substr($id, 0, 2), substr($id, 2, 2), $id), 'but a store_dir passed to the call stands in');
 ok(!$dirless->exists($id, store_dir => $other), 'and is used for the lookup');
 is(($dirless->find_missing([$id], store_dir => $other))[0], $id, 'and for the bulk lookup');
 is($dirless->store(\$text, store_dir => $other), $id, 'and for a store');

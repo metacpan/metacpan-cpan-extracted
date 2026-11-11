@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -235,11 +235,34 @@ Readonly my %MESSAGES => (
 	warn_map_coordinate_rows    => 'Plotted %d of %d rows; %d hold no usable coordinate',
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
 	map_legend_empty            => 'Nothing in this view',
+	map_bounds_layer            => '%s boundaries',
+	map_bounds_noun_county      => 'county',
+	map_bounds_noun_district    => 'district',
+	map_bounds_noun_province    => 'province',
+	map_bounds_noun_prefecture  => 'prefecture',
+	map_bounds_noun_department  => 'department',
+	map_bounds_noun_area        => 'area',
+	map_bounds_total            => '%s: %s %s',
+	map_bounds_row              => '%s: 1 row',
+	map_bounds_rows             => '%s: %s rows',
+	map_bounds_key_total        => '%s in each %s',
+	map_bounds_key_rows         => 'Rows in each %s',
+	map_bounds_key_range        => '%s to %s',
 	warn_map_cache_unwritten    => 'The resolved places could not be remembered in the model store, so the next request will look them up again',
 	error_map_tiles_unknown     => 'Unknown tile source "%s"; define it under tile_sources in database_bi.conf',
 	error_map_geocode_mode      => 'geocode= must be "wait" (look places up before the page is sent) or "cached" (look nothing up), not "%s"',
 	error_geo_lookup_place      => 'A lookup needs place= and the sig= the map page gave it',
 	error_geo_lookup_unsigned   => 'This place was not listed by a map page, or the server has restarted since; open the map again',
+	error_map_loc_text          => 'loc_text= is the text added to the end of each place, at most %d characters on one line, not "%s"',
+	error_map_bounds_unknown    => 'bounds= must be "county", the only kind of boundary so far, not "%s"',
+	warn_map_bounds_pending     => '%d of %d places have no county outline yet',
+	warn_map_bounds_pending_one => '%d of %d places has no county outline yet',
+	warn_map_bounds_offline     => '%d of %d places have no county outline: outlines come from OpenStreetMap, which this server does not ask (map_geocode_online is off, or LWP::UserAgent::Throttled is not installed)',
+	warn_map_bounds_offline_one => '%d of %d places has no county outline: outlines come from OpenStreetMap, which this server does not ask (map_geocode_online is off, or LWP::UserAgent::Throttled is not installed)',
+	warn_map_bounds_failed      => 'OpenStreetMap did not answer, so %d of %d places have no county outline; they are tried again next time',
+	warn_map_bounds_failed_one  => 'OpenStreetMap did not answer, so %d of %d places has no county outline; it is tried again next time',
+	error_geo_boundary_point    => 'A lookup needs point= and the sig= the map page gave it',
+	error_geo_boundary_unsigned => 'This point was not listed by a map page, or the server has restarted since; open the map again',
 	error_insights_no_data      => 'No data available to analyse',
 	insights_insufficient_data  => 'Insufficient data for this insight type (need more rows or periods)',
 	ask_unavailable    => 'Ask a question is not available: no AI provider is configured',
@@ -12029,9 +12052,11 @@ sub extract_list ($self) {
 # geo.<spec>.places and is written by _map_data independently.
 # ---------------------------------------------------------------------------
 
-# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location|location_suffix[&replace=1]
+# geo_save: POST /geo/save?l=<spec>&col=<col>&kind=lat|lon|location|location_suffix[&replace=1][&loc_text=<text>]
 # location_suffix is the column whose cells follow the place's, after ", "
-# (a country after an address).
+# (a country after an address).  loc_text= is the text the map adds to the end
+# of each place ("Virginia, USA"); it is not a column, so it is kept beside
+# them, as geo.<spec>.loc_text, and replace=1 forgets it too.
 # col= and kind= may repeat, in pairs, so a latitude and a longitude are saved
 # in one request.  replace=1 forgets the spec's saved columns first: the map
 # panel's "Remember" sends it, so a new choice replaces the old one rather than
@@ -12047,16 +12072,24 @@ sub geo_save ($self) {
 		unless @cols && !grep { !length } @cols;
 	return $self->render(json => { error => 'kind must be lat, lon, location or location_suffix' }, status => 400)
 		unless @kinds == @cols && !grep { !/\A(?:lat|lon|location|location_suffix)\z/ } @kinds;
+	my $loc_text_raw = $self->param('loc_text') // '';
+	my ($loc_text) = _map_loc_text($loc_text_raw);
+	return $self->render(json => { error => $self->_i18n('error_map_loc_text', $Database::BI::Model::Geocode::PLACE_TEXT_MAX, $loc_text_raw) }, status => 400)
+		unless defined $loc_text;
 
 	my $models = $self->_read_models;
-	delete $models->{geo}{$spec}{columns} if $self->param('replace');
+	if ($self->param('replace')) {
+		delete $models->{geo}{$spec}{columns};
+		delete $models->{geo}{$spec}{loc_text};
+	}
 	$models->{geo}{$spec}{columns}{ $cols[$_] } = { kind => $kinds[$_] } for 0 .. $#cols;
+	$models->{geo}{$spec}{loc_text} = $loc_text if length $loc_text;
 	$self->_write_models($models);
 	$self->render(json => { ok => 1 });
 }
 
 # geo_delete: POST /geo/delete?l=<spec>&col=<col>
-# Omit col= to clear all column preferences for the spec.
+# Omit col= to clear all column preferences for the spec, and its loc_text.
 sub geo_delete ($self) {
 	my $spec = canonical_spec($self->param('l')   // '');
 	my $col  = $self->param('col') // '';
@@ -12069,20 +12102,26 @@ sub geo_delete ($self) {
 		delete $models->{geo}{$spec}{columns}{$col};
 	} else {
 		delete $models->{geo}{$spec}{columns};
+		delete $models->{geo}{$spec}{loc_text};
 	}
 	$self->_write_models($models);
 	$self->render(json => { ok => 1 });
 }
 
 # geo_list: GET /geo/list?l=<spec>
-# Returns { columns: { col: { kind: "lat"|"lon"|"location" }, ... } }.
+# Returns { columns: { col: { kind: "lat"|"lon"|"location"|"location_suffix" }, ... } },
+# with loc_text: "<text>" when that is remembered too.
 sub geo_list ($self) {
 	my $spec = canonical_spec($self->param('l') // '');
 	return $self->render(json => { error => 'l= required' }, status => 400)
 		unless length $spec;
 
 	my $models = $self->_read_models;
-	$self->render(json => { columns => $models->{geo}{$spec}{columns} // {} });
+	my $loc_text = $models->{geo}{$spec}{loc_text};
+	$self->render(json => {
+		columns => $models->{geo}{$spec}{columns} // {},
+		(defined($loc_text) && !ref($loc_text) && length($loc_text) ? (loc_text => $loc_text) : ()),
+	});
 }
 
 # ---------------------------------------------------------------------------
@@ -13006,6 +13045,111 @@ sub _map_loc_columns {
 	return grep { defined($_) && !ref($_) && length($_) && !$seen{$_}++ } @names;
 }
 
+# _map_loc_text($value) -> ($text) | ()
+#
+# The text added to the end of each place (loc_text=, a card's
+# encode.loc_text): "Virginia, USA" for a column of county names, tidied by
+# Geocode->place_text, as bi-geocode's --text is.  Nothing is returned for a
+# value that is not one short line, which the map page refuses and a card,
+# stored unchecked, leaves out.
+sub _map_loc_text {
+	my ($value) = @_;
+	require Database::BI::Model::Geocode;
+	return Database::BI::Model::Geocode->place_text($value);
+}
+
+# How many outlines holding several markers the map page lists, the fullest
+# first; a map of shops has thousands, and the list is for looking into a few.
+Readonly my $MAP_OUTLINE_GROUPS_MAX => 50;
+
+# _map_outline_groups($outlines, \@markers, \@records, \@columns) -> @groups
+#
+# Purpose: Why a map has fewer outlines than markers, for the reader to look
+#          into: which outlines hold more than one marker, and which markers
+#          are in no outline.  Geocoded places that land in the wrong county
+#          show up here, as two places in one outline.
+# Entry:   $outlines as Boundary's outlines() returns it; each marker has
+#          lat, lon, row_indexes (or first_row) and, when it was geocoded,
+#          value (the place); the columns that tell rows apart, for the links.
+# Exit:    One entry for each outline holding two markers or more, the
+#          fullest first, at most $MAP_OUTLINE_GROUPS_MAX of them, then one
+#          with none => 1 for the markers in no outline, when there are any:
+#          { name, markers, places => [text, ...], rows, filters }.  A marker
+#          still waiting for its outline is in neither.  () when every marker
+#          has an outline to itself.
+# Side effects: none.
+sub _map_outline_groups {
+	my ($outlines, $markers, $records, $columns) = @_;
+
+	require Database::BI::Model::Boundary;
+	my $inside  = $outlines->{inside} // {};
+	my %waiting = map { $_ => 1 } @{ $outlines->{pending} // [] };
+	my (%held, @none);
+	for my $marker (@{$markers}) {
+		my $key = Database::BI::Model::Boundary->point_key($marker->{lat}, $marker->{lon});
+		next if !defined($key) || $waiting{$key};
+		if (defined(my $osm = $inside->{$key})) { push @{ $held{$osm} }, $marker }
+		else                                    { push @none, $marker }
+	}
+
+	my $group = sub {
+		my ($name, $in, %more) = @_;
+		my @rows = map { @{ $_->{row_indexes} // [ $_->{first_row} ] } } @{$in};
+		return {
+			name    => $name,
+			markers => scalar(@{$in}),
+			# A geocoded marker is known by its place, another by where it is
+			places  => [ map {
+				(defined($_->{value}) && !ref($_->{value}) && length($_->{value}))
+					? $_->{value} : "$_->{lat}, $_->{lon}"
+			} @{$in} ],
+			rows    => scalar(@rows),
+			filters => [ _map_rows_filters($records, \@rows, $columns) ],
+			%more,
+		};
+	};
+
+	my @shared = grep { @{ $held{ $_->{properties}{osm} // '' } // [] } > 1 } @{ $outlines->{features} };
+	@shared = sort {
+		@{ $held{ $b->{properties}{osm} } } <=> @{ $held{ $a->{properties}{osm} } }
+	} @shared;
+	splice(@shared, $MAP_OUTLINE_GROUPS_MAX) if @shared > $MAP_OUTLINE_GROUPS_MAX;
+
+	return (
+		(map { $group->($_->{properties}{name} // '', $held{ $_->{properties}{osm} }) } @shared),
+		(@none ? $group->('', \@none, none => 1) : ()),
+	);
+}
+
+# _map_rows_filters(\@records, \@row_indexes, \@columns) -> @filters
+#
+# Purpose: Filters that select exactly the given rows, for a link from the
+#          map to them in the table.
+# Entry:   Indexes into @records; the columns that tell the rows apart (the
+#          place columns, or latitude and longitude).
+# Exit:    One "col:in:[...]" filter a column, listing the cells those rows
+#          hold.  () when together they would select another row too (two
+#          columns' lists can pair up into a row that was not asked for), or
+#          when no row or column is given: a link must not show the wrong rows.
+# Side effects: none.
+sub _map_rows_filters {
+	my ($records, $indexes, $columns) = @_;
+
+	my @rows = grep { ref($_) eq 'HASH' } map { $records->[$_] } @{$indexes};
+	return () unless @rows && @{$columns};
+
+	my @filters = map {
+		my $col = $_;
+		my %cells = map { my $cell = $_->{$col}; ((defined($cell) && !ref($cell)) ? $cell : '') => 1 } @rows;
+		"$col:in:" . to_json([ sort keys %cells ]);
+	} @{$columns};
+
+	# Tried on every row: the filters are kept only if they find just these
+	my $hit = [ grep { ref($_) eq 'HASH' } @{$records} ];
+	$hit = _apply_filter_spec($hit, $_) for @filters;
+	return scalar(@{$hit}) == scalar(@rows) ? @filters : ();
+}
+
 # _map_unplotted(\@records, \@places, $loc_col, \@loc_cols, \%resolved)
 #     -> (\@entries, \@all_filters)
 #
@@ -13127,6 +13271,471 @@ sub _map_geocoder :Protected ($self, $online) {
 	);
 }
 
+# _map_boundary($self, $level, $online) -> Database::BI::Model::Boundary
+#
+# What finds the outline around each marker, for the map and /geo/boundary
+# alike.  It asks OpenStreetMap only when the operator allows the geocoder to
+# (map_geocode_online), and at most map_geocode_online_max times a request.
+# Its answers are kept beside the geocode cache, under model_dir, so they
+# outlive the process and are shared by every worker; with no model_dir it
+# keeps them in memory.  Config map_bounds_ranks adds or changes the place rank
+# that is a county in a country (checked at startup).
+sub _map_boundary :Protected ($self, $level, $online) {
+	require Database::BI::Model::Boundary;
+
+	my $cfg         = $self->app->config;
+	my $models_path = $self->_calc_models_path;
+	my $cache;
+	if (defined $models_path) {
+		my $dir = Mojo::File->new($models_path)->dirname->to_string;
+		$cache = eval { Database::BI::Model::Boundary->file_cache($dir) };
+	}
+
+	return Database::BI::Model::Boundary->new(
+		level      => $level,
+		online     => (($online && ($cfg->{map_geocode_online} // 1)) ? 1 : 0),
+		online_max => _map_limit($cfg->{map_geocode_online_max}, $DEFAULT_MAP_GEOCODE_ONLINE_MAX),
+		(defined($cache) ? (cache => $cache) : ()),
+		(ref($cfg->{map_bounds_ranks}) eq 'HASH' ? (ranks => $cfg->{map_bounds_ranks}) : ()),
+	);
+}
+
+# The colours of county outlines on a heat map, low to high: green, amber,
+# red, as the top of the heat layer's own gradient (lime, yellow, red).  An
+# outline's colour is one of $OUTLINE_STEPS steps between them, so outlines of
+# about the same total share a layer.
+Readonly my @OUTLINE_STOPS => ([ 0x1a, 0x98, 0x50 ], [ 0xf5, 0xa6, 0x23 ], [ 0xd7, 0x30, 0x27 ]);
+Readonly my $OUTLINE_STEPS => 9;
+# How an outline is drawn: thin and grey on a plain map, heavier when its
+# colour carries a meaning, so the colour can be told apart on a busy map.
+Readonly my %OUTLINE_PLAIN => (colour => '#555555', weight => 1.5, opacity => 0.8);
+Readonly my %OUTLINE_HEAT  => (weight => 2.5, opacity => 0.9);
+# Colour shade (shade=): each outline filled in a shade of one colour, darker
+# for a larger total, as a census map is.  $SHADE_STEPS shades, the lightest
+# $SHADE_LIGHTEST of the way from white to the colour so that it still shows;
+# the fill lets the map underneath through.
+Readonly my $SHADE_STEPS         => 5;
+Readonly my $SHADE_LIGHTEST      => 0.15;
+Readonly my $SHADE_OPACITY       => 0.65;
+Readonly my $DEFAULT_SHADE_COLOR => '#d94801';
+# A key's totals are rounded to $KEY_FIGURES significant figures, from
+# $KEY_ROUND_FROM up; smaller ones are short enough as they are.
+Readonly my $KEY_FIGURES    => 2;
+Readonly my $KEY_ROUND_FROM => 100;
+# The HTML::OSM whose marker key can leave an entry out while a layer is shown
+# (a legend entry's unless_layer).
+Readonly my $OSM_KEY_WAITS_VERSION => '0.19';
+
+# _map_outline_layers($self, $outlines, \@markers, $records, $weight_col)
+#     -> list of { features, colour, weight, opacity }
+#
+# The county outlines as layers for add_geojson.  Without the heat layer
+# ($weight_col undef) they are one grey layer.  With it, each outline is
+# coloured by the total of what is in it: the weight column summed over every
+# row of every marker inside it (a cell that is not a number adds nothing), or,
+# with no weight column (''), its rows counted.  _outline_shares places each
+# total between green and red.  A lone outline, or totals all alike, stays
+# grey with no key, having nothing to be compared with; $noun is what an
+# outline is called there, for the key's title.  The layers go from low to high, so where two
+# outlines share a border the higher is drawn on top; the first carries the
+# key to the colours, high to low with the totals each covers.  Each popup names the
+# outline and its total.  Leaflet reads a popup as HTML, and a name from
+# OpenStreetMap is text, so it is escaped.
+sub _map_outline_layers :Protected ($self, $outlines, $markers, $records, $weight_col, $noun) {
+	return () unless $outlines && @{ $outlines->{features} };
+
+	my @features = @{ $outlines->{features} };
+	my $named = sub {
+		my ($feature, $text) = @_;
+		# osm stays, so the fill (shade=) can find the outline's total
+		return { %{$feature}, properties => { name => xml_escape($text), osm => $feature->{properties}{osm} } };
+	};
+
+	# No heat layer: nothing to total, so one grey layer and no key.
+	unless (defined $weight_col) {
+		return {
+			features => [ map { $named->($_, $_->{properties}{name} // '') } @features ],
+			%OUTLINE_PLAIN,
+		};
+	}
+
+	my $total  = $self->_map_outline_totals($outlines->{inside} // {}, $markers, $records, $weight_col);
+	my @totals = map { $total->{ $_->{properties}{osm} } // 0 } @features;
+
+	my %seen;
+	my @distinct = grep { !$seen{$_}++ } sort { $a <=> $b } @totals;
+
+	# One outline, or totals all alike: there is nothing to compare, so a
+	# colour would mean nothing.  Grey, with no key, but the popups still
+	# give the totals.
+	if (@distinct < 2) {
+		return {
+			features => [ map {
+				$named->($features[$_], $self->_map_outline_popup(
+					$features[$_]{properties}{name} // '', $totals[$_], $weight_col))
+			} 0 .. $#features ],
+			%OUTLINE_PLAIN,
+		};
+	}
+	my $share_of = _outline_shares(\@distinct);
+
+	# Lowest first: a layer is made the first time its step is met, so the
+	# layers come out in the order they must be drawn.
+	my (%layer_of, @layers);
+	for my $i (sort { $totals[$a] <=> $totals[$b] } 0 .. $#features) {
+		my $share = $share_of->{ $totals[$i] };
+		my $step  = int($share * ($OUTLINE_STEPS - 1) + 0.5);
+		my $layer = $layer_of{$step} //= do {
+			push @layers, { features => [], totals => [],
+				colour => _outline_colour($step / ($OUTLINE_STEPS - 1)), %OUTLINE_HEAT };
+			$layers[-1];
+		};
+		# Sorted already, so each layer's totals are low to high for the key.
+		push @{ $layer->{totals} }, $totals[$i];
+		my $feature = $features[$i];
+		push @{ $layer->{features} }, $named->($feature,
+			$self->_map_outline_popup($feature->{properties}{name} // '', $totals[$i], $weight_col));
+		# Drawn inside its own edge (HTML::OSM 0.17's bands), so a neighbour of
+		# another colour is beside it, not over it.
+		$layer->{features}[-1]{properties}{colours} = [ $layer->{colour} ];
+		$layer->{bands} = 1;
+	}
+
+	# HTML::OSM 0.16 shows one key a layer name and hides it with the layer;
+	# an older copy ignores it.  The totals were only for the key.
+	$layers[0]{key} = $self->_map_outline_key(\@layers, $weight_col, $noun);
+	delete $_->{totals} for @layers;
+	return @layers;
+}
+
+# _map_outline_marker_layers($self, $outlines, \@markers)
+#     -> list of { features, colour, weight, opacity, bands }
+#
+# Purpose: The outlines coloured as the markers in them, for a map whose
+#          markers are coloured by a column.
+# Entry:   $outlines as Boundary's outlines() returns it, or undef; each
+#          coloured marker has lat, lon and colour (#rgb or #rrggbb).
+# Exit:    One layer for each distinct list of colours, the outlines of one
+#          colour first.  An outline whose markers differ lists every colour,
+#          the one most of its markers have first (the earliest on a tie), in
+#          its feature's "colours" property.  A coloured layer has bands set:
+#          HTML::OSM 0.17 then draws each outline just inside its own edge, a
+#          line of each colour side by side, the first outermost, so
+#          neighbours of different colours are beside each other; "colour"
+#          (the first) is what an older HTML::OSM draws, along the edge.  () when there is nothing to draw or no marker has a
+#          colour, so the caller can fall back.
+# Side effects: none.
+sub _map_outline_marker_layers :Protected ($self, $outlines, $markers) {
+	return () unless $outlines && @{ $outlines->{features} };
+
+	require Database::BI::Model::Boundary;
+	my $inside = $outlines->{inside} // {};
+	# How many markers of each colour are in each outline, in the order the
+	# colours were first met there.
+	my (%count, %order);
+	for my $marker (@{$markers}) {
+		my $colour = $marker->{colour} // next;
+		# The script takes #rrggbb only, so #rgb is written out in full
+		$colour =~ s/\A#(.)(.)(.)\z/#$1$1$2$2$3$3/;
+		my $key = Database::BI::Model::Boundary->point_key($marker->{lat}, $marker->{lon});
+		my $osm = defined($key) ? $inside->{$key} : undef;
+		next unless defined $osm;
+		push @{ $order{$osm} }, $colour unless $count{$osm}{$colour}++;
+	}
+	return () unless %count;
+
+	my (%layer_of, @layers);
+	for my $feature (@{ $outlines->{features} }) {
+		my $osm  = $feature->{properties}{osm} // '';
+		my $seen = $order{$osm} // [];
+		my %place = map { $seen->[$_] => $_ } 0 .. $#{$seen};
+		my @colours = sort { $count{$osm}{$b} <=> $count{$osm}{$a} || $place{$a} <=> $place{$b} } @{$seen};
+		# An outline none of whose markers is coloured stays grey
+		my $style = @colours ? { colour => $colours[0], %OUTLINE_HEAT } : { %OUTLINE_PLAIN };
+		my $layer = $layer_of{"@colours"} //= do {
+			push @layers, { features => [], %{$style}, bands => (@colours ? 1 : 0), mixed => (@colours > 1 ? 1 : 0) };
+			$layers[-1];
+		};
+		# Leaflet reads a popup as HTML, and a name from OpenStreetMap is text
+		push @{ $layer->{features} }, {
+			%{$feature},
+			properties => { name => xml_escape($feature->{properties}{name} // ''), colours => \@colours, osm => $osm },
+		};
+	}
+	# Those of several colours last: only an older HTML::OSM, which draws every
+	# outline along its edge, can draw one over another, and then they show.
+	return sort { $a->{mixed} <=> $b->{mixed} } @layers;
+}
+
+# _map_outline_shade($self, \@layers, $outlines, \@markers, $records, $col, $colour, $noun, $lower)
+#     -> list of layers, each with fill
+#
+# Purpose: Colour shade: fill each outline in a shade of a colour, by the
+#          total of $col in it.
+# Entry:   @layers as _map_outline_layers or _map_outline_marker_layers made
+#          them (each feature keeps its osm and an escaped name); $col is a
+#          column of $records.  $colour is the one colour to shade, as
+#          _parse_color takes one, or undef for the default.  $lower, when a
+#          hashref, says the markers are coloured and no colour was asked for:
+#          each outline is then shaded in its own line colour (its markers'),
+#          and $lower->{<#rrggbb>} is true for a colour whose rule is "less
+#          than", where the smaller total is the stronger.
+# Exit:    Each layer split by shade, so every part has one line style and
+#          one "fill" (#rrggbb), in the order given.  One colour: darker for a
+#          larger total, across every outline.  The markers' colours: each
+#          colour is a scale of its own over the outlines of that colour,
+#          stronger the further the total is into what the colour stands for
+#          (larger, or smaller for a "less than" colour), so a county well
+#          under a "below 20,000" rule is greener than one just under it; a
+#          colour with one total is its middle shade.  The shade follows
+#          _outline_shares, as the heat colours do.  Each popup names the
+#          outline and its total; the first layer carries the key, every
+#          shade in use by size, the largest totals first, drawn as boxes (HTML::OSM 0.18; an older copy
+#          draws lines).  () with one colour when fewer than two totals
+#          differ: nothing to compare, so the caller leaves the outlines
+#          unfilled.
+# Side effects: none.
+sub _map_outline_shade :Protected ($self, $layers, $outlines, $markers, $records, $col, $colour, $noun, $lower) {
+	return () unless $outlines && @{$layers};
+
+	my $total  = $self->_map_outline_totals($outlines->{inside} // {}, $markers, $records, $col);
+	my $amount = sub { return $total->{ $_[0]{properties}{osm} // '' } // 0 };
+	my $one    = _color_hex(_parse_color($colour // '') // $DEFAULT_SHADE_COLOR);
+
+	# The colour each layer is shaded in: the one colour, or its own line's.
+	# Written out as #rrggbb, which _shade_colour reads.
+	my $hue_of = sub {
+		my $hue = $lower ? $_[0]{colour} : $one;
+		$hue =~ s/\A#(.)(.)(.)\z/#$1$1$2$2$3$3/;
+		return lc $hue;
+	};
+
+	# Each colour's totals, then where each sits on that colour's scale.
+	my (%totals_of, @hues);
+	for my $layer (@{$layers}) {
+		my $hue = $hue_of->($layer);
+		push @hues, $hue unless $totals_of{$hue};
+		$totals_of{$hue}{ $amount->($_) } = 1 for @{ $layer->{features} };
+	}
+	return () if !$lower && keys(%{ $totals_of{ $hues[0] } }) < 2;
+	my %share_of;
+	for my $hue (@hues) {
+		my @distinct = sort { $a <=> $b } keys %{ $totals_of{$hue} };
+		my $shares   = @distinct > 1 ? _outline_shares(\@distinct) : { $distinct[0] => 0.5 };
+		# A "less than" colour is the stronger the smaller the total
+		$shares = { map { $_ => 1 - $shares->{$_} } keys %{$shares} } if $lower && $lower->{$hue};
+		$share_of{$hue} = $shares;
+	}
+
+	my (@shaded, %amounts);
+	for my $layer (@{$layers}) {
+		my $hue = $hue_of->($layer);
+		my (%part, @steps);
+		for my $feature (@{ $layer->{features} }) {
+			my $sum  = $amount->($feature);
+			my $step = int($share_of{$hue}{$sum} * ($SHADE_STEPS - 1) + 0.5);
+			push @steps, $step unless $part{$step};
+			push @{ $amounts{$hue}{$step} }, $sum;
+			# The name is escaped already; the column is text of the reader's
+			push @{ $part{$step} }, {
+				%{$feature},
+				properties => {
+					%{ $feature->{properties} },
+					name => $self->_i18n('map_bounds_total',
+						$feature->{properties}{name} // '', _map_total_text($sum), xml_escape($col)),
+				},
+			};
+		}
+		push @shaded, map {
+			+{ %{$layer}, features => $part{$_}, fill => _shade_colour($hue, $_ / ($SHADE_STEPS - 1)) }
+		} sort { $a <=> $b } @steps;
+	}
+
+	# One key for the fills, in place of any the lines had: for each colour
+	# the shades in use, strongest first as _map_outline_key lists them,
+	# drawn as boxes.
+	delete $_->{key} for @shaded;
+	# They are listed by size whatever their colour, the largest totals at the
+	# top, so a key of red above 100,000 and green below 20,000 runs from the
+	# strongest red down to the strongest green.
+	my @in_use = sort { $a->{totals}[-1] <=> $b->{totals}[-1] || $a->{totals}[0] <=> $b->{totals}[0] } map {
+		my $hue = $_;
+		map {
+			+{ colour => _shade_colour($hue, $_ / ($SHADE_STEPS - 1)),
+				totals => [ sort { $a <=> $b } @{ $amounts{$hue}{$_} } ] }
+		} keys %{ $amounts{$hue} };
+	} @hues;
+	$shaded[0]{key} = { %{ $self->_map_outline_key(\@in_use, $col, $noun) }, shape => 'box' };
+	return @shaded;
+}
+
+# _shade_colour($hex, $share) -> '#rrggbb': $hex (#rrggbb) at its full
+# strength for a share of 1, down to $SHADE_LIGHTEST of the way from white for
+# a share of 0.
+sub _shade_colour {
+	my ($hex, $share) = @_;
+	$share = 0 if $share < 0;
+	$share = 1 if $share > 1;
+	my $strength = $SHADE_LIGHTEST + (1 - $SHADE_LIGHTEST) * $share;
+	return sprintf('#%02x%02x%02x',
+		map { int(255 + (hex($_) - 255) * $strength + 0.5) } $hex =~ /\A#(..)(..)(..)\z/);
+}
+
+# _map_outline_totals($self, \%inside, \@markers, $records, $weight_col) -> \%total
+#
+# Purpose: What is in each outline, for its colour.
+# Entry:   %inside maps a point key to the osm of the outline it is in (from
+#          Boundary's outlines()); each marker has lat, lon and row_indexes
+#          (or first_row); $weight_col is a column, or '' to count rows.
+# Exit:    { osm => total }; an outline no marker is in has no entry.
+# Side effects: none.  Rows are only read, so locked SQL rows are safe.
+sub _map_outline_totals :Protected ($self, $inside, $markers, $records, $weight_col) {
+	require Database::BI::Model::Boundary;
+	my %total;
+	for my $marker (@{$markers}) {
+		my $key = Database::BI::Model::Boundary->point_key($marker->{lat}, $marker->{lon});
+		my $osm = defined($key) ? $inside->{$key} : undef;
+		next unless defined $osm;
+		# A marker stands for every row at its place, not only the first.
+		for my $index (@{ $marker->{row_indexes} // [ $marker->{first_row} ] }) {
+			my $row = $records->[$index];
+			next unless ref($row) eq 'HASH';
+			# A cell that is not a number adds nothing, as on the heat layer.
+			$total{$osm} += length($weight_col) ? (_numeric_cell($row->{$weight_col} // '') // 0) : 1;
+		}
+	}
+	return \%total;
+}
+
+# _map_outline_popup($self, $name, $total, $weight_col) -> $text
+#
+# Purpose: The text of a coloured outline's popup: its name and its total.
+# Entry:   $weight_col is the column totalled, or '' when rows were counted.
+# Exit:    Plain text (the caller escapes it); one row is "1 row", not "1 rows".
+# Side effects: none.
+sub _map_outline_popup :Protected ($self, $name, $total, $weight_col) {
+	return $self->_i18n('map_bounds_total', $name, _map_total_text($total), $weight_col) if length $weight_col;
+	return $total == 1
+		? $self->_i18n('map_bounds_row', $name)
+		: $self->_i18n('map_bounds_rows', $name, _map_total_text($total));
+}
+
+# _map_outline_key($self, \@layers, $weight_col) -> { title, entries }
+#
+# Purpose: The key to the outline colours, for add_geojson's key option.
+# Entry:   Each layer has its colour and its totals, low to high; the layers
+#          are low to high too, and there is at least one.
+# Exit:    The entries are the highest colour first, each labelled with the
+#          total it covers, or the range when it covers unequal totals.
+# Side effects: none.
+sub _map_outline_key :Protected ($self, $layers, $weight_col, $noun) {
+	my @entries = map {
+		my ($low, $high) = @{ $_->{totals} }[0, -1];
+		+{
+			colour => $_->{colour},
+			# Round figures: a key is read at a glance, and the popups
+			# give each outline's exact total.
+			label  => (_map_key_number($low) eq _map_key_number($high) ? _map_key_number($low)
+				: $self->_i18n('map_bounds_key_range', _map_key_number($low), _map_key_number($high))),
+		};
+	} reverse @{$layers};
+	return {
+		title   => (length($weight_col)
+			? $self->_i18n('map_bounds_key_total', $weight_col, $noun)
+			: $self->_i18n('map_bounds_key_rows', $noun)),
+		entries => \@entries,
+	};
+}
+
+# _outline_shares(\@distinct) -> { total => share }
+#
+# Purpose: Where each total sits between the lowest (0) and the highest (1),
+#          which decides its colour.
+# Entry:   At least two distinct totals, sorted low to high.
+# Exit:    When every total is above zero, the share is by size on a log
+#          scale: each step up the colours is the same multiple, so totals
+#          close in size share a colour and totals far apart do not.  A
+#          straight scale would leave most outlines green, because such totals
+#          are skewed (Fairfax County has 500 times the people of Highland).
+#          A total of zero or less has no logarithm, so then the share is by
+#          rank: evenly spread in order, whatever the sizes.
+# Side effects: none.
+sub _outline_shares {
+	my ($distinct) = @_;
+	my %share;
+	if ($distinct->[0] > 0) {
+		my ($low, $high) = (log $distinct->[0], log $distinct->[-1]);
+		# The ends are set exactly, so rounding cannot push them off the scale.
+		%share = map { $_ => (log($_) - $low) / ($high - $low) } @{$distinct};
+		@share{ $distinct->[0], $distinct->[-1] } = (0, 1);
+	} else {
+		%share = map { $distinct->[$_] => $_ / $#{$distinct} } 0 .. $#{$distinct};
+	}
+	return \%share;
+}
+
+# _map_outline_noun($self, $outlines) -> $word
+#
+# Purpose: What the outlines drawn are called ("county", "district"), for the
+#          layer's checkbox, the key and the summary line.
+# Entry:   $outlines as Boundary's outlines() returns it, or undef.
+# Exit:    The word for the one kind drawn; "area" when the map mixes kinds
+#          (a county and a province); "county" when nothing is drawn.
+# Side effects: none.
+sub _map_outline_noun :Protected ($self, $outlines) {
+	my %called = map { ($_->{properties}{called} // 'county') => 1 } @{ $outlines ? $outlines->{features} : [] };
+	my @kinds = keys %called;
+	my $kind  = @kinds > 1 ? 'area' : ($kinds[0] // 'county');
+	return $self->_i18n("map_bounds_noun_$kind");
+}
+
+# _outline_colour($share) -> '#rrggbb' at $share (0..1) along @OUTLINE_STOPS
+sub _outline_colour {
+	my ($share) = @_;
+	$share = 0 if $share < 0;
+	$share = 1 if $share > 1;
+	my $at   = $share * $#OUTLINE_STOPS;
+	my $from = int($at);
+	$from = $#OUTLINE_STOPS - 1 if $from >= $#OUTLINE_STOPS;
+	my $part = $at - $from;
+	my ($lo, $hi) = @OUTLINE_STOPS[ $from, $from + 1 ];
+	return sprintf('#%02x%02x%02x', map { int($lo->[$_] + ($hi->[$_] - $lo->[$_]) * $part + 0.5) } 0 .. 2);
+}
+
+# _map_key_number($n) -> a total as a key shows it: rounded to two figures
+# ("330,000" for 330,818, "1,200,000" for 1,150,309), since a key gives ranges
+# to be read at a glance.  A total under 100 is given as it is.
+sub _map_key_number {
+	my ($n) = @_;
+	return _map_total_text($n) if abs($n) < $KEY_ROUND_FROM;
+	my $unit = 10 ** (POSIX::floor(log(abs($n)) / log(10)) - ($KEY_FIGURES - 1));
+	return _map_total_text(POSIX::floor($n / $unit + 0.5) * $unit);
+}
+
+# _map_total_text($n) -> the total as a popup shows it: thousands separated,
+# and at most two decimal places ("1,150,309", "12.5").
+sub _map_total_text {
+	my ($n) = @_;
+	my $text = sprintf('%.2f', $n);
+	$text =~ s/\.?0+\z// if $text =~ /\./;
+	# A small negative total rounds to nothing; say 0, not "-0".
+	$text = '0' if $text eq '-0';
+	my ($whole, $fraction) = split /\./, $text, 2;
+	1 while $whole =~ s/^(-?\d+)(\d{3})/$1,$2/;
+	return defined($fraction) ? "$whole.$fraction" : $whole;
+}
+
+# _map_bounds_level($value) -> the level, or undef when $value names none
+#
+# bounds= on the map page, and a map card's options.bounds, which is stored
+# unchecked.
+sub _map_bounds_level {
+	my ($value) = @_;
+	return unless defined($value) && !ref($value) && length($value);
+	require Database::BI::Model::Boundary;
+	return (grep { $_ eq $value } Database::BI::Model::Boundary->levels) ? $value : undef;
+}
+
 # _map_data($self, \@records, \@columns, \%encode, \%options, $spec_key, $id_suffix)
 #     -> \%result
 #
@@ -13151,6 +13760,8 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	my $lat_col = $encode->{lat} // '';
 	my $lon_col = $encode->{lon} // '';
 	my $by_location = length $loc_col;
+	my ($loc_text) = _map_loc_text($encode->{loc_text});
+	$loc_text = '' unless defined($loc_text) && $by_location;
 
 	return { error => $self->_i18n('error_map_source'), status => 400 }
 		unless $by_location || length($lat_col) || length($lon_col);
@@ -13191,7 +13802,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 
 		# What the geocoder is given: one cell a row, under $loc_col, in the
 		# rows' own order, so a marker's first_row still indexes $records.
-		my ($places) = Database::BI::Model::Geocode->place_rows($records, \@loc_cols);
+		my ($places) = Database::BI::Model::Geocode->place_rows($records, \@loc_cols, $loc_text);
 
 		my $geocode = $self->_map_geocoder(1);
 
@@ -13271,6 +13882,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			} @loc_cols ]) : '';
 			push @markers, {
 				%{ $marker },
+				'row_indexes' => \@at,
 				'label' => _map_popup(
 					$marker->{value}, [ @{$records}[@at] ], \@popup, $popup_rows, $more_url,
 				),
@@ -13329,6 +13941,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 
 		for my $marker (@markers) {
 			my $key = sprintf('%.6f,%.6f', $marker->{lat}, $marker->{lon});
+			$marker->{row_indexes} = $rows_at{$key};
 			my $row = $records->[ $marker->{first_row} ];
 			my $more_url = $rows_url ? $rows_url->([
 				"$lat_col:eq:" . ($row->{$lat_col} // ''),
@@ -13357,6 +13970,51 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		key  => 'error_map_no_markers',
 		text => $self->_i18n('error_map_no_markers'),
 	} unless @markers;
+
+	# The outline of the county around each marker (bounds=county).  Those
+	# not known yet are looked up here, up to the online limit, unless the
+	# caller said lookup => 0: the map page in a browser lists them for its
+	# progress bar instead, as it does places.
+	my $bounds_level = _map_bounds_level($options->{bounds});
+	my ($outlines, @bounds_pending);
+	my $bounds_coloured = 0;	# set when the outlines are coloured by their totals
+	my $bounds_as_markers = 0;	# set when they take their markers' colours
+	my $bounds_shade = '';	# the column they are filled by (shade=), when they are
+	my $bounds_shade_as = '';	# 'one' colour, or the 'markers' colours
+	my (@bounds_left_filters, $bounds_left_rows);	# the rows whose marker has no outline
+	my @bounds_groups;	# why there are fewer outlines than markers (_map_outline_groups)
+	if (defined($bounds_level) && @markers) {
+		my $lookup = (defined($options->{lookup}) && !$options->{lookup}) ? 0 : 1;
+		$outlines = $self->_map_boundary($bounds_level, 1)->outlines(
+			[ map { [ $_->{lat}, $_->{lon} ] } @markers ],
+			lookup => $lookup,
+		);
+		@bounds_pending = @{ $outlines->{pending} };
+		if (@bounds_pending) {
+			# The rows behind the markers left without an outline, for a link
+			# to them in the table, as the rows not plotted have.
+			require Database::BI::Model::Boundary;
+			my %left = map { $_ => 1 } @bounds_pending;
+			my @rows = map { @{ $_->{row_indexes} // [ $_->{first_row} ] } } grep {
+				my $key = Database::BI::Model::Boundary->point_key($_->{lat}, $_->{lon});
+				defined($key) && $left{$key};
+			} @markers;
+			$bounds_left_rows    = scalar @rows;
+			@bounds_left_filters = _map_rows_filters($records, \@rows,
+				[ $by_location ? @loc_cols : ($lat_col, $lon_col) ]);
+			my $key = $outlines->{offline} ? 'warn_map_bounds_offline'
+				: $outlines->{failed}      ? 'warn_map_bounds_failed'
+				:                            'warn_map_bounds_pending';
+			push @messages, {
+				key  => $key,
+				# One place "has" no outline; the key stays the plural's
+				text => $self->_i18n($key . (@bounds_pending == 1 ? '_one' : ''),
+					scalar(@bounds_pending), $outlines->{counts}{points}),
+			};
+		}
+		@bounds_groups = _map_outline_groups($outlines, \@markers, $records,
+			[ $by_location ? @loc_cols : ($lat_col, $lon_col) ]);
+	}
 
 	# Leaflet's CSS and JS belong in the head, which the layout owns; the rest of
 	# the map - the search box, the buttons, the div and its script - goes in the
@@ -13442,8 +14100,26 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 
 			# The scale bar, and the key on the map: colours and bubble sizes.
 			my $size_range = [ _map_size_range($records, \@markers, $size_col) ];
-			my %key = $self->_map_key($color_col, $color_rules, $color_default,
-				defined($options->{scheme}), $size_col, $size_range);
+			# When the outlines are shaded in the markers' colours by the column
+			# the colours read, the shade key lists every colour with its totals,
+			# so a second key of the same colours would only repeat it.  Shaded by
+			# another column, or in one colour, the marker key is still the only
+			# place the colours are explained.  Bubble sizes are listed either way.
+			my $shade_covers = length($color_col) && $outlines && @{ $outlines->{features} }
+				&& !ref($options->{shade} // '') && ($options->{shade} // '') eq $color_col
+				&& !defined($options->{shade_color});
+			# HTML::OSM 0.19 can leave a key entry out while a layer is shown and
+			# bring it back when the reader hides the layer, so the markers are
+			# never left without a key; an older copy cannot, and gets no colour
+			# entries at all.
+			my $key_waits = $shade_covers
+				&& eval { version->parse($osm_version) >= version->parse($OSM_KEY_WAITS_VERSION) };
+			my %key = $self->_map_key((($shade_covers && !$key_waits) ? '' : $color_col), $color_rules,
+				$color_default, defined($options->{scheme}), $size_col, $size_range);
+			if ($key_waits) {
+				my $layer = $self->_i18n('map_bounds_layer', ucfirst $self->_map_outline_noun($outlines));
+				$_->{unless_layer} = $layer for grep { defined $_->{group} } @{ $key{legend} // [] };
+			}
 			$osm_args{scale} = 1;
 			# Every <script> the map writes carries the page's nonce.
 			$osm_args{nonce} = $self->csp_nonce;
@@ -13469,6 +14145,8 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 						# only what is in view
 						my $index = _color_rule_index($cval, $color_rules);
 						$group = defined($index) ? "rule$index" : 'other';
+						# Kept for the outline round it, which is drawn to match
+						$marker->{colour} = _color_hex($color);
 					}
 					if (length $size_col) {
 						my $sv = defined($row)
@@ -13518,6 +14196,68 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 					eval { $map->add_heatmap(\@heat_pts) };
 				}
 
+				# The county outlines, under the markers, with a checkbox on
+				# the map to hide them (HTML::OSM 0.15; an older copy ignores
+				# name and draws them always).  Grey, or with heat=1 coloured
+				# by what the heat layer weighs in each, one layer a colour
+				# under one name, so one checkbox still hides them all.
+				# When the markers are coloured, each outline takes the colours
+				# of the markers in it, so the two never disagree; the heat
+				# layer's own scale is for a map whose markers are all alike.
+				my $noun = $self->_map_outline_noun($outlines);
+				my @outline_layers = length($color_col)
+					? $self->_map_outline_marker_layers($outlines, \@markers) : ();
+				$bounds_as_markers = 1 if @outline_layers;
+				# Colour shade fills each outline by a column's total.  It says
+				# what the heat layer's line colours would, so those stay grey.
+				my $shade_col = $options->{shade} // '';
+				$shade_col = '' if ref($shade_col) || !$col_set{$shade_col};
+				@outline_layers = $self->_map_outline_layers($outlines, \@markers, $records,
+					(($options->{heat} && !length($shade_col)) ? ($options->{weight} // '') : undef), $noun)
+					unless @outline_layers;
+				if (length $shade_col) {
+					# Coloured markers and no colour asked for: each outline is
+					# shaded in its markers' colour.  When the shade is of the
+					# column the rules read, a "less than" rule's colour is the
+					# stronger the smaller the total.
+					my $lower;
+					if ($bounds_as_markers && !defined($options->{shade_color})) {
+						$lower = {};
+						for my $rule ($shade_col eq $color_col ? @{$color_rules} : ()) {
+							my $hue = _color_hex($rule->{color});
+							$hue =~ s/\A#(.)(.)(.)\z/#$1$1$2$2$3$3/;
+							$lower->{ lc $hue } //= (($rule->{op} // '') =~ /\Al[te]\z/) ? 1 : 0;
+						}
+					}
+					my @shaded = $self->_map_outline_shade(\@outline_layers, $outlines, \@markers,
+						$records, $shade_col, $options->{shade_color}, $noun, $lower);
+					if (@shaded) {
+						@outline_layers  = @shaded;
+						$bounds_shade    = $shade_col;
+						$bounds_shade_as = $lower ? 'markers' : 'one';
+					}
+				}
+				for my $layer (@outline_layers) {
+					# Only a layer with a key was coloured to mean something;
+					# a shaded map's key is for its fills.
+					$bounds_coloured = 1 if $layer->{key} && !length($bounds_shade);
+					$map->add_geojson(
+						{ type => 'FeatureCollection', features => $layer->{features} },
+						style => { color => $layer->{colour}, weight => $layer->{weight},
+							opacity => $layer->{opacity},
+							($layer->{fill}
+								? (fill => \1, fillColor => $layer->{fill}, fillOpacity => $SHADE_OPACITY)
+								: (fill => \0)) },
+						popup => 'name',
+						name  => $self->_i18n('map_bounds_layer', ucfirst $noun),
+						($layer->{key} ? (key => $layer->{key}) : ()),
+						# HTML::OSM 0.17 draws each colour as a line of its own,
+						# inside the outline's edge; an older copy ignores this
+						# and draws the first alone, along the edge.
+						($layer->{bands} ? (bands => 'colours') : ()),
+					);
+				}
+
 				($map_head, $map_body) = $map->onload_render();
 				($map_head, $map_body) = _canvas_map_html($map_head, $map_body, $id_suffix)
 					if defined($id_suffix) && length($id_suffix);
@@ -13547,14 +14287,21 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 	my %chart_spec = (
 		kind   => 'map',
 		title  => $title,
-		encode => ($by_location ? { loc => (@loc_cols == 1 ? $loc_cols[0] : [ @loc_cols ]) }
-		                        : { lat => $lat_col, lon => $lon_col }),
+		encode => ($by_location
+			? { loc => (@loc_cols == 1 ? $loc_cols[0] : [ @loc_cols ]),
+			    (length($loc_text) ? (loc_text => $loc_text) : ()) }
+			: { lat => $lat_col, lon => $lon_col }),
 	);
 	$chart_spec{options}{popup} = \@popup if @popup;
 	$chart_spec{options}{max}   = $options->{max}
 		if defined($options->{max}) && $options->{max} =~ /\A\d+\z/ && $options->{max} > 0;
 	$chart_spec{options}{zoom}  = $options->{zoom}  if defined $options->{zoom};
 	$chart_spec{options}{heat}  = 1                 if $options->{heat};
+	$chart_spec{options}{bounds} = $bounds_level    if defined $bounds_level;
+	$chart_spec{options}{shade}  = $options->{shade}
+		if defined($options->{shade}) && !ref($options->{shade}) && length($options->{shade});
+	$chart_spec{options}{shade_color} = $options->{shade_color}
+		if defined($chart_spec{options}{shade}) && defined($options->{shade_color}) && !ref($options->{shade_color});
 	$chart_spec{options}{weight} = $options->{weight}
 		if defined($options->{weight}) && length($options->{weight});
 	if (defined($options->{size}) && length($options->{size})) {
@@ -13580,6 +14327,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		row_count    => $plotted_rows,
 		source_rows  => scalar @$records,
 		loc_col      => ($by_location ? $loc_col : undef),
+		loc_text     => $loc_text,
 		lat_col      => ($by_location ? undef    : $lat_col),
 		lon_col      => ($by_location ? undef    : $lon_col),
 		backend      => $backend,
@@ -13587,6 +14335,20 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		unplotted    => \@unplotted,
 		unplotted_filters => \@unplotted_filters,
 		pending      => \@pending,
+		bounds_level   => $bounds_level,
+		bounds_pending => \@bounds_pending,
+		bounds_drawn   => ($outlines ? $outlines->{counts}{drawn} : 0),
+		bounds_noun    => $self->_map_outline_noun($outlines),
+		# Coloured by the heat layer's weight column, or its rows when it has
+		# none; not when the outlines had nothing to compare and stayed grey.
+		bounds_heat    => $bounds_coloured,
+		bounds_weight  => ($bounds_coloured ? ($options->{weight} // '') : ''),
+		bounds_as_markers => $bounds_as_markers,
+		bounds_shade   => $bounds_shade,
+		bounds_shade_as => $bounds_shade_as,
+		bounds_left_filters => \@bounds_left_filters,
+		bounds_groups  => \@bounds_groups,
+		bounds_left_rows    => $bounds_left_rows // 0,
 	};
 }
 
@@ -13713,7 +14475,11 @@ sub map_view ($self) {
 	my $max_zoom_raw = $self->param('max_zoom') // '';
 	my $tiles_name   = $self->param('tiles')    // '';
 	my $heat         = $self->param('heat')     // 0;
+	my $bounds_raw   = $self->param('bounds')   // '';
+	my $loc_text_raw = $self->param('loc_text') // '';
 	my $weight_col   = $self->param('weight')   // '';
+	my $shade_col    = $self->param('shade')    // '';
+	my $shade_color  = _parse_color($self->param('shade_color') // '');
 	my $size_col     = $self->param('size')     // '';
 	my $series_col   = $self->param('series')   // '';
 	my $scheme       = $self->param('scheme')   // 'tableau10';
@@ -13752,6 +14518,17 @@ sub map_view ($self) {
 
 	my $by_location = length $loc_col;
 
+	my ($loc_text) = _map_loc_text($loc_text_raw);
+	return $self->render(text => $self->_i18n('error_map_loc_text', $Database::BI::Model::Geocode::PLACE_TEXT_MAX, $loc_text_raw), status => 400)
+		unless defined $loc_text;
+
+	my $bounds_level;
+	if (length $bounds_raw) {
+		$bounds_level = _map_bounds_level($bounds_raw);
+		return $self->render(text => $self->_i18n('error_map_bounds_unknown', $bounds_raw), status => 400)
+			unless defined $bounds_level;
+	}
+
 	return $self->render(text => $self->_i18n('error_map_source'), status => 400)
 		unless $by_location || length($lat_col) || length($lon_col);
 	return $self->render(text => $self->_i18n('error_map_coordinates'), status => 400)
@@ -13777,7 +14554,7 @@ sub map_view ($self) {
 	my $geocode_mode = $self->param('geocode') // '';
 	return $self->render(text => $self->_i18n('error_map_geocode_mode', $geocode_mode), status => 400)
 		unless $geocode_mode =~ /\A(?:wait|cached|)\z/;
-	my $progress = $by_location && !length($geocode_mode)
+	my $progress = ($by_location || defined($bounds_level)) && !length($geocode_mode)
 		&& $self->req->method eq 'GET'
 		&& ($self->req->headers->accept // '') =~ m{\btext/html\b};
 
@@ -13849,7 +14626,11 @@ sub map_view ($self) {
 	$options{max_zoom} = $max_zoom_val   if defined $max_zoom_val;
 	$options{tile_url} = $tile_url_override if defined $tile_url_override;
 	$options{heat}     = 1               if $heat;
+	$options{bounds}   = $bounds_level   if defined $bounds_level;
 	$options{weight}   = $weight_col     if length($weight_col) && $col_set{$weight_col};
+	# Colour shade: a column to fill the outlines by, and the colour to shade
+	$options{shade}    = $shade_col      if length($shade_col) && $col_set{$shade_col};
+	$options{shade_color} = $shade_color if defined($shade_color) && defined($options{shade});
 	$options{lookup}   = 0               if $progress || $geocode_mode eq 'cached';
 
 	# Each place that could not be plotted, and each marker with more rows
@@ -13873,7 +14654,7 @@ sub map_view ($self) {
 
 	my $result = $self->_map_data(
 		$records, $columns,
-		($by_location ? { loc => [ @loc_cols ] } : { lat => $lat_col, lon => $lon_col }),
+		($by_location ? { loc => [ @loc_cols ], loc_text => $loc_text } : { lat => $lat_col, lon => $lon_col }),
 		\%options,
 		$self->param('l') // '',
 		undef,
@@ -13906,12 +14687,26 @@ sub map_view ($self) {
 	# map page listed: without that, any page on the web could post a string
 	# for this server to send to OpenStreetMap.
 	my @pending = $progress ? @{ $result->{pending} // [] } : ();
+	# The points whose county outline is not known yet go on the same list,
+	# after the places, each signed with its level for /geo/boundary.
+	my @bounds_pending = $progress ? @{ $result->{bounds_pending} // [] } : ();
+	my @messages = @{ $result->{messages} };
+	@messages = grep { $_->{key} ne 'warn_map_bounds_pending' } @messages if @bounds_pending;
 	my %progress;
-	if (@pending) {
-		my $json = to_json([ map { { place => $_, sig => $self->_geo_lookup_sig($_) } } @pending ]);
+	if (@pending || @bounds_pending) {
+		my $json = to_json([
+			(map { { place => $_, sig => $self->_geo_lookup_sig($_) } } @pending),
+			(map { {
+				point => $_,
+				level => $result->{bounds_level},
+				sig   => $self->_geo_boundary_sig($result->{bounds_level}, $_),
+			} } @bounds_pending),
+		]);
 		$json =~ s{</}{<\\/}g;
 		%progress = (
-			geocode_pending      => scalar @pending,
+			geocode_pending      => scalar(@pending) + scalar(@bounds_pending),
+			geocode_places       => scalar @pending,
+			geocode_outlines     => scalar @bounds_pending,
 			geocode_pending_json => $json,
 			geocode_done_url     => $here_with->(undef),
 			geocode_cached_url   => $here_with->('cached'),
@@ -13930,16 +14725,33 @@ sub map_view ($self) {
 		unplotted       => \@unplotted,
 		unplotted_rows  => $unplotted_rows,
 		unplotted_url   => $rows_url->($result->{unplotted_filters} // []),
+		# Where the outlines and the markers do not pair off, each with a link
+		# to its rows
+		bounds_groups   => [ map { +{ %{$_}, url => $rows_url->($_->{filters}) } } @{ $result->{bounds_groups} // [] } ],
+		# The rows whose place has no county outline, and this page again to
+		# look those outlines up (as it was opened: waiting, or with progress)
+		bounds_left_url  => $rows_url->($result->{bounds_left_filters} // []),
+		bounds_left_rows => $result->{bounds_left_rows},
+		bounds_left      => scalar(@{ $result->{bounds_pending} // [] }),
+		bounds_retry_url => $here_with->($geocode_mode eq 'wait' ? 'wait' : undef),
 		format          => 'html',
 		title           => $result->{title},
 		extra_head      => $result->{map_head},
 		map_body        => $result->{map_body},
-		messages        => $result->{messages},
+		messages        => \@messages,
 		marker_count    => $result->{marker_count},
+		bounds_drawn    => $result->{bounds_drawn},
+		bounds_heat     => $result->{bounds_heat},
+		bounds_noun     => $result->{bounds_noun},
+		bounds_as_markers => $result->{bounds_as_markers},
+		bounds_shade    => $result->{bounds_shade},
+		bounds_shade_as => $result->{bounds_shade_as},
+		bounds_weight   => $result->{bounds_weight},
 		row_count       => $result->{row_count},
 		source_rows     => $result->{source_rows},
 		loc_col         => $result->{loc_col},
 		loc_many        => (@loc_cols > 1 ? 1 : 0),
+		loc_text        => $result->{loc_text},
 		lat_col         => $result->{lat_col},
 		lon_col         => $result->{lon_col},
 		backend         => $result->{backend},
@@ -13962,6 +14774,55 @@ sub map_view ($self) {
 # another installation.
 sub _geo_lookup_sig :Protected ($self, $place) {
 	return hmac_sha1_sum(encode('UTF-8', "geo-lookup\0$place"), $self->app->secrets->[0]);
+}
+
+# _geo_boundary_sig($self, $level, $point) -> $hex
+#
+# The same for a point whose outline the map page lists.  Its own prefix, so a
+# place's signature is never a point's.
+sub _geo_boundary_sig :Protected ($self, $level, $point) {
+	return hmac_sha1_sum(encode('UTF-8', "geo-boundary\0$level\0$point"), $self->app->secrets->[0]);
+}
+
+# ---------------------------------------------------------------------------
+# POST /geo/boundary  point=<lat,lon>&level=county&sig=<sig>[&online=0]
+#
+# One point's outline, for the map page's progress bar: found as the map would
+# find it, and remembered at once, so a run that is cancelled keeps what it
+# found.  The point must carry the signature the map page gave it, or any page
+# on the web could have this server send coordinates to OpenStreetMap.
+# online=0 asks nothing, after OpenStreetMap has failed once.
+#
+# Replies 200 JSON:
+#   { point, status => 'found' | 'nowhere' | 'held', stored => 0|1,
+#     online_failed => 0|1, name }
+# 'nowhere' is a point in no county (at sea); 'held' could not be settled now
+# and is asked again next time.
+# 400 JSON { error } without point= or sig=, or with an unknown level=;
+# 403 JSON { error } for a bad sig=.
+# ---------------------------------------------------------------------------
+sub geo_boundary ($self) {
+	my $point = $self->param('point') // '';
+	my $sig   = $self->param('sig')   // '';
+	my $level = _map_bounds_level($self->param('level') // 'county');
+
+	return $self->render(json => { error => $self->_i18n('error_geo_boundary_point') }, status => 400)
+		unless length($point) && length($sig) && defined($level);
+	return $self->render(json => { error => $self->_i18n('error_geo_boundary_unsigned') }, status => 403)
+		unless secure_compare($sig, $self->_geo_boundary_sig($level, $point));
+
+	my $online = ($self->param('online') // 1) ? 1 : 0;
+	my $answer = eval { $self->_map_boundary($level, $online)->lookup_point($point) };
+	return $self->render(json => { error => $self->_i18n('error_geo_boundary_point') }, status => 400)
+		unless $answer;
+
+	return $self->render(json => {
+		point         => $point,
+		status        => $answer->{status},
+		stored        => ($answer->{status} eq 'held' ? 0 : 1),
+		online_failed => (($answer->{status} eq 'held' && $answer->{asked}) ? 1 : 0),
+		name          => $answer->{name},
+	});
 }
 
 # ---------------------------------------------------------------------------

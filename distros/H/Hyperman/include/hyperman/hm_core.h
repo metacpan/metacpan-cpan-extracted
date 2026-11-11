@@ -4550,6 +4550,9 @@ static void hm_process(pTHX_ hm_conn *c) {
                 if (have) {
                     size_t want = have;
                     size_t room = (size_t)(clen - c->spill_got);
+                    /*
+                     # uncoverable branch true class:ignore_covered_err
+                     # uncoverable condition left count:1 class:ignore_covered_err */
                     if (want > room) want = room;   /* the rest is the next
                                                      * request, not this body */
                     /*
@@ -7751,6 +7754,15 @@ static int hm_write_pidfile_(pTHX_ const hm_worker_cfg *cfg, int loud) {
         fd = hm_os_open_file(tmp, O_WRONLY | O_CREAT | O_EXCL | O_NOFOLLOW | O_CLOEXEC, 0644);
         if (fd < 0 && errno != EEXIST) break; /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
+    /* Eight random names cannot all exist: an EEXIST that outlasts the loop
+     * is a directory that will not create anything for this user, which
+     * DragonFly reports this way where others say EACCES (CPAN Testers,
+     * 0.68). It is handled as that refusal below. */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
+    if (fd < 0 && errno == EEXIST) errno = EACCES;
 #ifndef _WIN32
     /*
      # uncoverable branch true class:ignore_covered_err

@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.003;
+package Dist::Conformance::Check 0.004;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -91,7 +91,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 
@@ -284,7 +284,12 @@ A distribution has the files that its build needs.
 
 =item L<Dist::Conformance::Check::DataSchema>
 
-A JSON or YAML file, such as F<.perl-slop.json>, matches a schema.
+A JSON, YAML or INI file, such as F<.perl-slop.json>, matches a schema.
+
+=item L<Dist::Conformance::Check::RefusedIniKeys>
+
+An INI file, such as F<dist.ini>, sets no key that the flavor refuses, and the
+update removes each one.
 
 =item L<Dist::Conformance::Check::ClaudeSettings>
 

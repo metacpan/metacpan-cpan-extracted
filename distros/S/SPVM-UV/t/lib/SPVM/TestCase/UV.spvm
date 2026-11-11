@@ -42,6 +42,7 @@ class TestCase::UV {
       $poll->start([$fd1 : int, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($poll_handle : UV::Handle::Poll, $status : int, $events : int) {
         $status_ref->[0] = $status;
         $read_length_ref->[0] = Sys::Socket->recv($fd1, $read_data, 5, 0);
+        $poll_handle->stop;
         $poll_handle->close_safe;
       }, UV_C->UV_READABLE | UV_C->UV_WRITABLE);
       
@@ -84,6 +85,7 @@ class TestCase::UV {
       $poll->start([$fd2 : int, $read_data : mutable string, $read_length_ref : int[], $status_ref : int[]] method : void ($poll_handle : UV::Handle::Poll, $status : int, $events : int) {
         $status_ref->[0] = $status;
         $read_length_ref->[0] = Sys::Socket->recv($fd2, $read_data, 5, 0);
+        $poll_handle->stop;
         $poll_handle->close_safe;
       }, UV_C->UV_READABLE | UV_C->UV_WRITABLE);
       
@@ -114,6 +116,8 @@ class TestCase::UV {
     
     $timer->start([$called_count_ref : int[]] method : void ($timer_handle : UV::Handle::Timer) {
       $called_count_ref->[0]++;
+      $timer_handle->again;
+      $timer_handle->stop;
       $timer_handle->close_safe;
     }, 10, 0);
     
@@ -137,6 +141,7 @@ class TestCase::UV {
     
     $idle->start([$called_count_ref : int[]] method : void ($idle_handle : UV::Handle::Idle) {
       $called_count_ref->[0]++;
+      $idle_handle->stop;
       $idle_handle->close_safe;
     });
     
@@ -212,6 +217,7 @@ class TestCase::UV {
         else {
           $status_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $fd1_pipe->close_safe;
       };
@@ -269,6 +275,7 @@ class TestCase::UV {
         else {
           $status_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $fd2_pipe->close_safe;
       };
@@ -365,6 +372,7 @@ class TestCase::UV {
           }
           $read_length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $read_pipe->close_safe;
       };
@@ -438,6 +446,7 @@ class TestCase::UV {
           }
           $stdout_length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $stdout_pipe->close_safe;
       };
@@ -454,6 +463,7 @@ class TestCase::UV {
           }
           $stderr_length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $stderr_pipe->close_safe;
       };
@@ -533,6 +543,7 @@ class TestCase::UV {
           }
           $stdout_length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $stdout_pipe->close_safe;
       };
@@ -549,6 +560,7 @@ class TestCase::UV {
           }
           $stderr_length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $stderr_pipe->close_safe;
       };
@@ -630,6 +642,7 @@ class TestCase::UV {
           }
           $length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $pipe3->close_safe;
       };
@@ -712,6 +725,7 @@ class TestCase::UV {
           }
           $pair_read_length_ref->[0] = (int)$nread;
         }
+        $stream->read_stop;
         $stream->close_safe;
         $pipe_out->close_safe;
       };
@@ -733,6 +747,7 @@ class TestCase::UV {
           });
         }
         else {
+          $stream->read_stop;
           $stream->close_safe;
           $read_pipe->close_safe;
         }

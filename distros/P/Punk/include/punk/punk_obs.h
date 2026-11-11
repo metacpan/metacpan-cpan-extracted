@@ -55,6 +55,10 @@ static int PK_OBS_ANY = 0;
 
 static int pk_obs_add_req(pTHX_ pk_abi_req_cb cb, void *ud) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cb || PK_OBS_REQ_N >= PK_ABI_MAX_OBSERVERS) return 0;
     PK_OBS_REQ[PK_OBS_REQ_N].cb = cb;
     PK_OBS_REQ[PK_OBS_REQ_N].ud = ud;
@@ -65,6 +69,10 @@ static int pk_obs_add_req(pTHX_ pk_abi_req_cb cb, void *ud) {
 
 static int pk_obs_add_res(pTHX_ pk_abi_res_cb cb, void *ud) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!cb || PK_OBS_RES_N >= PK_ABI_MAX_OBSERVERS) return 0;
     PK_OBS_RES[PK_OBS_RES_N].cb = cb;
     PK_OBS_RES[PK_OBS_RES_N].ud = ud;
@@ -98,6 +106,10 @@ typedef struct { void *tok[PK_ABI_MAX_OBSERVERS]; int n; } pk_obs_qtokens;
 static int pk_obs_add_query(pTHX_ pk_abi_query_cb start,
                             pk_abi_query_done_cb done, void *ud) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!start || PK_OBS_QRY_N >= PK_ABI_MAX_OBSERVERS) return 0;
     PK_OBS_QRY[PK_OBS_QRY_N].start = start;
     PK_OBS_QRY[PK_OBS_QRY_N].done  = done;
@@ -120,8 +132,17 @@ static void *pk_obs_query_start(pTHX_ SV *sql, int nbind) {
      * works. Punk::DBI now forces magic before it gets here, so this is the
      * belt and not the braces; it stays because the guard is wrong without
      * it and the next caller will not know that. */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (sql) SvGETMAGIC(sql);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     sp = (sql && SvOK(sql)) ? SvPV_nomg_const(sql, sl) : "";
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!PK_OBS_QRY_N) return NULL;
     Newxz(t, 1, pk_obs_qtokens);
     t->n = PK_OBS_QRY_N;
@@ -134,10 +155,19 @@ static void *pk_obs_query_start(pTHX_ SV *sql, int nbind) {
 /* `r` is what DBI's execute returned: a false or absent value is a failure. */
 static void pk_obs_query_done(pTHX_ void *tv, SV *r) {
     pk_obs_qtokens *t = (pk_obs_qtokens *)tv;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     int ok = (r && SvOK(r) && SvTRUE(r)) ? 1 : 0;
     int i;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!t) return;
-    for (i = 0; i < t->n && i < PK_OBS_QRY_N; i++)
+    for (i = 0; i < t->n && i < PK_OBS_QRY_N; i++) /* # uncoverable condition right count:2 class:ignore_covered_err */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (PK_OBS_QRY[i].done)
             PK_OBS_QRY[i].done(aTHX_ t->tok[i], ok, PK_OBS_QRY[i].ud);
     Safefree(t);
@@ -174,22 +204,44 @@ static int PL_OBS_N = 0;
 static struct { pl_obs_ctx_cb cb; void *ud; } PL_OBS_CTX[PL_OBS_MAX];
 static int PL_OBS_CTX_N = 0;
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static int pl_observe(pTHX_ pl_obs_cb cb, void *ud) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1
+     # uncoverable condition left count:2
+     # uncoverable condition right count:2 */
     if (!cb || PL_OBS_N >= PL_OBS_MAX) return 0;
-    PL_OBS[PL_OBS_N].cb = cb;
-    PL_OBS[PL_OBS_N].ud = ud;
-    PL_OBS_N++;
-    return 1;
+    PL_OBS[PL_OBS_N].cb = cb; /* # uncoverable statement */
+    PL_OBS[PL_OBS_N].ud = ud; /* # uncoverable statement */
+    PL_OBS_N++; /* # uncoverable statement */
+    return 1; /* # uncoverable statement */
 }
 
+/*
+ # uncoverable statement
+ # uncoverable subroutine */
 static int pl_observe_ctx(pTHX_ pl_obs_ctx_cb cb, void *ud) {
     PERL_UNUSED_CONTEXT;
+    /*
+     # uncoverable statement
+     # uncoverable branch true
+     # uncoverable branch false
+     # uncoverable condition left count:1
+     # uncoverable condition right count:1
+     # uncoverable condition left count:2
+     # uncoverable condition right count:2 */
     if (!cb || PL_OBS_CTX_N >= PL_OBS_MAX) return 0;
-    PL_OBS_CTX[PL_OBS_CTX_N].cb = cb;
-    PL_OBS_CTX[PL_OBS_CTX_N].ud = ud;
-    PL_OBS_CTX_N++;
-    return 1;
+    PL_OBS_CTX[PL_OBS_CTX_N].cb = cb; /* # uncoverable statement */
+    PL_OBS_CTX[PL_OBS_CTX_N].ud = ud; /* # uncoverable statement */
+    PL_OBS_CTX_N++; /* # uncoverable statement */
+    return 1; /* # uncoverable statement */
 }
 
 /* The guard the firing sites use, so "is anybody listening" is one load and

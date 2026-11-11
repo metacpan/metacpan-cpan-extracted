@@ -7,7 +7,7 @@ use warnings;
 use B ();
 use B::Deparse ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our ($ORIGINAL, $CUSTOM);
 

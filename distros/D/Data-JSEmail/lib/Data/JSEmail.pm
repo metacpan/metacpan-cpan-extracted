@@ -5,7 +5,7 @@ use warnings;
 
 package Data::JSEmail;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use JSON;
 use JSON::XS;
@@ -230,7 +230,7 @@ sub asDate {
   return undef unless defined $val;
   $val =~ s/\(.*//;  # strip comments
   $val =~ s/^\s+//;  # strip leading whitespace
-  $val =~ s/\s+$//;  # strip trailing whitespace
+  $val =~ s/\s+\z//;  # strip trailing whitespace
   # Add :00 seconds if missing (e.g. "23:32 -0330" → "23:32:00 -0330")
   $val =~ s/(\s\d{2}:\d{2})\s+([-+]\d{4})/$1:00 $2/;
   my $dt = eval { DateTime::Format::Mail->parse_datetime($val) };
@@ -254,7 +254,7 @@ sub asCommaList {
   my $val = shift;
   return undef unless defined $val;
   $val =~ s/^\s+//;
-  $val =~ s/\s+$//;
+  $val =~ s/\s+\z//;
   my @list = split /\s*,\s*/, $val;
   return \@list;
 }
@@ -263,7 +263,7 @@ sub asURLs {
   my $val = shift;
   return undef unless defined $val;
   $val =~ s/^\s+//;
-  $val =~ s/\s+$//;
+  $val =~ s/\s+\z//;
   return undef unless length($val);
 
   # Extract URLs from angle brackets
@@ -297,7 +297,9 @@ sub asText {
   }
   my $res = NFC($decoded);
   $res =~ s/^\s*//;
-  $res =~ s/\s*$//;
+  # \s+\z, not \s*$: the regex engine tried every position of a long run
+  # of spaces inside the value, so "a<80000 spaces>b" took seconds
+  $res =~ s/\s+\z//;
   return $res;
 }
 
@@ -461,7 +463,7 @@ sub preview {
   }
   if ($type =~ m{text/html}i) {
     my $text = _clean($type, _body_str($eml));
-    return make_preview(htmltotext($text));
+    return make_preview(_html_preview_text($text));
   }
   foreach my $sub ($eml->subparts()) {
     my $res = eval { preview($sub) };
@@ -470,10 +472,44 @@ sub preview {
   return undef;
 }
 
+# The first 256 characters of $text with each run of whitespace made one
+# space.  Collapsing a prefix of the text gives a prefix of the collapsed
+# whole (a run cut short still becomes one space), so only as much of a
+# long body is looked at as it takes to fill the preview: collapsing all of
+# a megabyte body to keep 256 characters was most of what parsing it cost.
 sub make_preview {
-  my $text = shift;
-  $text =~ s/\s+/ /gs;
-  return substr($text, 0, 256);
+  my $text = shift // '';
+  my $len = 1024;
+  while (1) {
+    my $part = length($text) > $len ? substr($text, 0, $len) : $text;
+    (my $c = $part) =~ s/\s+/ /gs;
+    return substr($c, 0, 256) if length($c) >= 256 || length($part) == length($text);
+    $len *= 4;
+  }
+}
+
+# The text of an HTML body, as htmltotext gives it, but only enough of it
+# for a preview: HTML::Strip keeps its state between calls, so it is fed
+# pieces ending just after a '>' (never inside a tag or an entity) until
+# 256 characters of text have come out.
+sub _html_preview_text {
+  my $html = shift // '';
+  my $hs = HTML::Strip->new();
+  my ($out, $pos, $chunk) = ('', 0, 8192);
+  while ($pos < length $html) {
+    my $end = $pos + $chunk;
+    if ($end < length $html) {
+      my $gt = rindex($html, '>', $end);
+      $end = $gt + 1 if $gt >= $pos;
+    }
+    $out .= $hs->parse(substr($html, $pos, $end - $pos));
+    $pos = $end;
+    (my $c = $out) =~ s/\s+/ /gs;
+    return $out if length($c) > 256 && $pos < length $html;
+    $chunk *= 2;
+  }
+  $out .= $hs->eof // '';
+  return $out;
 }
 
 sub hasatt {
@@ -928,6 +964,11 @@ sub _leaf_part {
   my %attrs = (content_type => $type, encoding => _cte($octets, $type));
   $attrs{charset} = $charset if $is_text && defined $charset;
   my $disp = $node->{disposition} || $opt{disposition};
+  # these go into part headers as they are: a lone CR (which Email::MIME
+  # lets through) or any control character would start a header of the
+  # client's choosing in a parser that ends lines on CR
+  die "Invalid disposition\n" if defined $disp && ($disp !~ /\A[A-Za-z0-9!#\$&^_.+-]{1,64}\z/);
+  die "Invalid type\n" if $type =~ /[\x00-\x1f\x7f]/;
   $attrs{disposition} = $disp if $disp;
   $attrs{filename} = $attrs{name} = $node->{name} if $node->{name};
 
@@ -938,6 +979,8 @@ sub _leaf_part {
     $mime->header_str_set('Content-ID' => "<$node->{cid}>");
   }
   if ($node->{language} && ref($node->{language}) eq 'ARRAY') {
+    # each a language tag (RFC 5646): letters, digits and hyphens
+    die "Invalid language\n" if grep { ref || !defined || !/\A[A-Za-z0-9]{1,8}(?:-[A-Za-z0-9]{1,8})*\z/ } @{$node->{language}};
     $mime->header_str_set('Content-Language' => join(', ', @{$node->{language}}));
   }
   _apply_bodystructure_headers($mime, $node) if $opt{headers} // 1;

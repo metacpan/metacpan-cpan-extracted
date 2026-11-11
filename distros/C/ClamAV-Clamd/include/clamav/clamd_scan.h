@@ -1,23 +1,8 @@
 /* clamd_scan.h - scanning by descriptor.
  *
  * Phase 2 of plan_clamav_clamd. FILDES only; INSTREAM is phase 3.
- */
-#ifndef CLAMD_SCAN_H
-#define CLAMD_SCAN_H
-
-#include "clamav/clamd_conn.h"
-#include "clamav/clamd_stream.h"
-#include "clamav/clamd_async.h"
-
-/* CC_ERR_NOTREG and CC_ERR_NOFDPASS live in clamd_conn.h. They were
- * defined here, below the includes, which meant clamd_async.h - included
- * above - had already been parsed without them: the branch it takes on a
- * platform that cannot pass descriptors raises NOFDPASS, and would not
- * compile. */
-
-#if CC_HAVE_FD_PASSING
-
-/* THE HANDSHAKE, captured from clamdscan --fdpass against a listener
+ *
+ * THE HANDSHAKE, captured from clamdscan --fdpass against a listener
  * that dumps what it receives:
  *
  *   write   "zFILDES\0"   the command, ALONE, with no ancillary data
@@ -35,25 +20,18 @@
  * alignment rules are the sort of thing that works by accident on the
  * platform you developed on and not on the next one.
  */
-/* A descriptor that is not a regular file cannot mean what the caller
- * thinks it means: a pipe has no length and can be read exactly once, a
- * directory is not a document, and a socket is somebody else's stream.
- * Refuse rather than hand clamd something it will answer about
- * meaninglessly. */
-static int cc_check_regular(int fd, cc_err *err) {
-    cc_stat_t st;
-    if (cc_fstat(fd, &st) < 0) {
-        cc_err_set(err, CC_ERR_IO, "fstat", strerror(errno));
-        return CC_ERR_IO;
-    }
-    if (!CC_S_ISREG(st.st_mode)) {
-        cc_err_set(err, CC_ERR_NOTREG, "not a regular file", NULL);
-        return CC_ERR_NOTREG;
-    }
-    return CC_OK;
-}
+#ifndef CLAMD_SCAN_H
+#define CLAMD_SCAN_H
 
-#endif /* CC_HAVE_FD_PASSING */
+#include "clamav/clamd_conn.h"
+#include "clamav/clamd_stream.h"
+#include "clamav/clamd_async.h"
+
+/* CC_ERR_NOTREG and CC_ERR_NOFDPASS live in clamd_conn.h. They were
+ * defined here, below the includes, which meant clamd_async.h - included
+ * above - had already been parsed without them: the branch it takes on a
+ * platform that cannot pass descriptors raises NOFDPASS, and would not
+ * compile. */
 
 /* Scan an open descriptor.
  *
@@ -63,6 +41,12 @@ static int cc_check_regular(int fd, cc_err *err) {
  * past EOF, all of which detected a signature at byte 0 - so there is
  * nothing to correct, and correcting it would mutate something the
  * caller owns.
+ *
+ * A descriptor that is not a regular file cannot mean what the caller
+ * thinks it means: a pipe has no length and can be read exactly once, a
+ * directory is not a document, and a socket is somebody else's stream.
+ * Refuse rather than hand clamd something it will answer about
+ * meaninglessly.
  */
 static int cc_scan_fd(const cc_target *t, int fd,
                       char **out, size_t *outlen, int *transport, cc_err *err) {
@@ -71,7 +55,7 @@ static int cc_scan_fd(const cc_target *t, int fd,
 
     err->code = CC_OK; err->msg[0] = '\0';
     *out = NULL; *outlen = 0;
-    if (transport) *transport = CC_TRANSPORT_NONE;
+    *transport = CC_TRANSPORT_NONE;
 
     /* FILDES over TCP is not an error at clamd's end - it is a HANG.
      * Phase 0: the command produces no reply, no diagnostic, and the
@@ -109,7 +93,7 @@ static int cc_scan_fd(const cc_target *t, int fd,
     if (rc == CC_OK) rc = cc_scan_run(&sc, out, outlen, err);
     else *err = sc.err;
 
-    if (transport) *transport = sc.transport;
+    *transport = sc.transport;
     cc_scan_free(&sc);
     return rc;
 }
@@ -125,12 +109,10 @@ static int cc_scan_path(const cc_target *t, const char *path,
                         char **out, size_t *outlen, int *transport, cc_err *err) {
     int fd, rc;
 
-    err->code = CC_OK; err->msg[0] = '\0';
-    *out = NULL; *outlen = 0;
-    if (transport) *transport = CC_TRANSPORT_NONE;
-
     fd = cc_open_ro(path);
     if (fd < 0) {
+        *out = NULL; *outlen = 0;
+        *transport = CC_TRANSPORT_NONE;
         cc_err_set(err, CC_ERR_IO, "open", strerror(errno));
         return CC_ERR_IO;
     }

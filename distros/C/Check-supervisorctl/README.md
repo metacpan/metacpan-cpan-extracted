@@ -15,7 +15,7 @@ the file.
 
 ## SYNOPSIS
 
-check_supervisorctl [B<-f> <config_dir>] [B<-c>] [B<-d> <ignore_config>]  [B<-i> <ignore>] [B<-s> <status mapping>]
+check_supervisorctl [B<-f> <config_dir>] [B<-c>] [B<-d> <ignore_config>]  [B<-i> <ignore>] [B<-s> <status mapping>] [B<-R>] [B<-l>] [B<-L>]
 
 check_supervisorctl -h/--help
 
@@ -48,6 +48,32 @@ May be used more than once.
 A item from status to ignore.
 
 May be used more than once.
+
+### -R
+
+Restart items that are stopped, exited, fatal, or backoff. Items ignored
+via -i are not touched. Backoff items are restarted via
+'supervisorctl restart' and the rest via 'supervisorctl start'.
+
+This does not change the exit value. A stopped item that was restarted
+is still alerted on, so what is monitoring it knows it was restarted.
+Each is listed as RESTARTED or RESTART FAILED.
+
+### -l
+
+Add configs that are not running, the same as -L, for use with -R.
+
+Requires -R and -c.
+
+### -L
+
+Add configs that are not running via 'supervisorctl reread' and
+'supervisorctl add'. Configs ignored via -d, or for items ignored via -i,
+are not touched.
+
+This does not change the exit value. Each is listed as ADDED or ADD FAILED.
+
+Requires -c.
 
 ### -s status=mapping
 
@@ -89,6 +115,7 @@ above, plus `-p` for the path to supervisorctl.
 ```
 supervisor|perl:supervisorctl -c
 supervisor|perl:supervisorctl -c -f /etc/supervisor/conf.d -i foo -d bar -s stopped=1
+supervisor|perl:supervisorctl -c -R -l
 ```
 
 # INSTALLATION

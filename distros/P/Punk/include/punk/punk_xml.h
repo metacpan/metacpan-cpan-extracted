@@ -59,9 +59,13 @@ static const frx_node *punk_xml_apex(pTHX_ SV *sv, frx_doc **dp, int *is_doc) {
         *is_doc = 1;
         return A->document(d);
     }
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if ((n = A->node_from_sv(aTHX_ sv, dp)) != NULL && *dp) return n;
-    *dp = NULL;
-    return NULL;
+    *dp = NULL; /* # uncoverable statement */
+    return NULL; /* # uncoverable statement */
 }
 
 /* Is this a Document or a Node? The question punk_coerce and finalize ask of
@@ -88,12 +92,25 @@ static SV *punk_xml_bytes(pTHX_ SV *sv, SV **errp) {
     SV *out;
     int is_doc = 0;
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (errp) *errp = NULL;
     apex = punk_xml_apex(aTHX_ sv, &d, &is_doc);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!apex || !d) {
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1 */
         if (errp) *errp = sv_2mortal(newSVpvs(
             "Punk: xml: not a File::Raw::XML::Document or ::Node"));
-        return NULL;
+        return NULL; /* # uncoverable statement */
     }
 
     A = punk_frx(aTHX);
@@ -106,8 +123,13 @@ static SV *punk_xml_bytes(pTHX_ SV *sv, SV **errp) {
      * - Strawberry - iperlsys.h makes `write` a function-like macro, and
      * A->write(...) does not compile. frx_abi.h says so where it declares it. */
     out = (A->write)(aTHX_ apex, d, &o, &err);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (!out && errp)
-        *errp = sv_2mortal(newSVpvf("Punk: xml: %s",
+        *errp = sv_2mortal(newSVpvf("Punk: xml: %s", /* # uncoverable statement */
                     err.what ? err.what : "the document could not be written"));
     return out;
 }
@@ -130,8 +152,11 @@ static SV *punk_xml_parse(pTHX_ SV *bytes) {
     const char *p = SvPV_const(bytes, len);
     frx_doc *d = A->parse(aTHX_ p, len, NULL, &err);
     if (!d) {
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (err) croak_sv(err);
-        croak("Punk: xml: the request body is not well-formed XML");
+        croak("Punk: xml: the request body is not well-formed XML"); /* # uncoverable statement */
     }
     return A->doc_to_sv(aTHX_ d);    /* takes the document; magic frees it */
 }

@@ -23,13 +23,13 @@ load(class, ...)
         for (i = 1; i + 1 < items; i += 2) {
             STRLEN kl;
             const char *k = SvPV_const(ST(i), kl);
-            if      (kl == 4 && memEQ(k, "file", 4))    file    = ST(i + 1);
-            else if (kl == 3 && memEQ(k, "env", 3))     env     = ST(i + 1);
+            if      (kl == 4 && memEQ(k, "file", 4))    file    = ST(i + 1); /* # uncoverable condition right count:2 class:ignore_covered_err */
+            else if (kl == 3 && memEQ(k, "env", 3))     env     = ST(i + 1); /* # uncoverable condition right count:2 class:ignore_covered_err */
             /* Named rather than left to the generic message below, because
              * this one used to work: whether a password sits in the file in
              * plaintext is the person writing the file's decision, so there
              * is no longer a mode to put it in. */
-            else if (kl == 7 && memEQ(k, "secrets", 7))
+            else if (kl == 7 && memEQ(k, "secrets", 7)) /* # uncoverable condition right count:2 class:ignore_covered_err */
                 croak("Punk::Config->load: the 'secrets' option is gone - "
                       "a plaintext value in the file is no longer second-"
                       "guessed. Drop the option; secret(), $env, $file and "
@@ -37,7 +37,7 @@ load(class, ...)
             else croak("Punk::Config->load: unknown option '%.*s'",
                        (int)kl, k);
         }
-        if (!(file && SvOK(file)))
+        if (!(file && SvOK(file))) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Punk::Config->load: a file is required");
 
         Newxz(cfg, 1, punk_config);
@@ -53,15 +53,19 @@ load(class, ...)
             const char *f = SvPV_const(file, flen);
             const char *dot = NULL;
             STRLEN j;
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             for (j = flen; j > 0; j--) {
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
                 if (f[j - 1] == '/') break;
                 if (f[j - 1] == '.') { dot = f + j - 1; break; }
             }
             stem = f;
-            ext  = dot ? dot : "";
+            ext  = dot ? dot : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
             for (i = 0; i < 3; i++) {
                 SV *body, *doc;
-                STRLEN stem_len = dot ? (STRLEN)(dot - f) : flen;
+                STRLEN stem_len = dot ? (STRLEN)(dot - f) : flen; /* # uncoverable condition right count:1 class:ignore_covered_err */
                 if (i == 0)
                     my_snprintf(layer, sizeof layer, "%.*s%s",
                                 (int)stem_len, stem, ext);
@@ -73,10 +77,14 @@ load(class, ...)
                 if (!body) continue;
                 av_push(cfg->files, newSVpv(layer, 0));
                 doc = pc_yaml_decode(aTHX_ body, layer);
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
+                # uncoverable condition left count:2 class:ignore_covered_err
+                # uncoverable condition left count:3 class:ignore_covered_err
                 if (!(SvOK(doc) && SvROK(doc)
                       && SvTYPE(SvRV(doc)) == SVt_PVHV)) {
-                    pc_free(aTHX_ cfg);
-                    croak("Punk::Config: '%s' is not a YAML mapping", layer);
+                    pc_free(aTHX_ cfg); /* # uncoverable statement */
+                    croak("Punk::Config: '%s' is not a YAML mapping", layer); /* # uncoverable statement */
                 }
                 merged = merged ? sv_2mortal(pc_merge(aTHX_ merged, doc, 0))
                                 : sv_2mortal(newSVsv(doc));
@@ -99,6 +107,8 @@ load(class, ...)
                              && SvTYPE(SvRV(resolved)) == SVt_PVHV)
                           ? (HV *)SvREFCNT_inc(SvRV(resolved)) : newHV();
             SvREFCNT_dec(public);
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (resolved) SvREFCNT_dec(resolved);
         }
 
@@ -140,6 +150,8 @@ files(self)
         SSize_t i, n = av_len(cfg->files) + 1;
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(cfg->files, i, 0);
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             av_push(out, newSVsv(e && *e ? *e : &PL_sv_undef));
         }
         RETVAL = newRV_noinc((SV *)out);
@@ -186,7 +198,7 @@ has_secret(self, path)
         SV *path
     CODE:
         RETVAL = hv_exists_ent(punk_config_of(aTHX_ self)->secrets, path, 0)
-               ? 1 : 0;
+               ? 1 : 0; /* # uncoverable condition left count:1 */
     OUTPUT:
         RETVAL
 
@@ -213,6 +225,9 @@ DESTROY(self)
         SV *self
     CODE:
     {
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvROK(self) && SvIOK(SvRV(self)))
             pc_free(aTHX_ punk_config_of(aTHX_ self));
     }

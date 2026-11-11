@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
-use v5.38;
-use lib ('../lib', 'lib');
+use v5.38;    ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
+use lib ( '../lib', 'lib' );
 use Test2::V0;
 use Logic::Relational::Program;
 use Logic::Relational::Syntax;
@@ -9,7 +9,7 @@ use Logic::Relational::Syntax;
 my $p1 = Logic::Relational::Program->new;
 $p1->assert_fact(
     term       => [ match_state => 'lit', 'bedroom' ],
-    expires_in => 1,
+    expires_in => 2,
     expire_to  => [ match_state => 'burnt_out', 'bedroom' ],
 );
 
@@ -20,19 +20,25 @@ my $room_var  = Logic::Relational::DSL::variable('room');
 my $q1 = $p1->query(
     Logic::Relational::DSL::call( match_state => $state_var, $room_var ) );
 my $sol1 = $q1->next;
-is( $sol1->value($state_var), 'lit',     'Initial state is lit' );
-is( $sol1->value($room_var),  'bedroom', 'Location is bedroom' );
+ok( $sol1, 'Initial solution found before expiration' );
+if ($sol1) {
+    is( $sol1->value($state_var), 'lit',     'Initial state is lit' );
+    is( $sol1->value($room_var),  'bedroom', 'Location is bedroom' );
+}
 
-# Sleep 2 seconds for fact to expire and mutate
-sleep 2;
+# Sleep 3 seconds for fact to expire and mutate
+sleep 3;
 
 # Query again - state should automatically mutate to 'burnt_out'
 my $q2 = $p1->query(
     Logic::Relational::DSL::call( match_state => $state_var, $room_var ) );
 my $sol2 = $q2->next;
-is( $sol2->value($state_var),
-    'burnt_out', 'State mutated to burnt_out after TTL' );
-is( $sol2->value($room_var), 'bedroom', 'Location remains bedroom' );
+ok( $sol2, 'Solution found after mutation' );
+if ($sol2) {
+    is( $sol2->value($state_var),
+        'burnt_out', 'State mutated to burnt_out after TTL' );
+    is( $sol2->value($room_var), 'bedroom', 'Location remains bedroom' );
+}
 ok( !$q2->next, 'No additional match states' );
 
 # 2. Test Per-Clause on_expire Callbacks
@@ -100,8 +106,11 @@ $p5->load_snapshot( \$json_str, ttl_mode => 'relative' );
 my $q_p5 = $p5->query(
     Logic::Relational::DSL::call( match_state => $state_var, $room_var ) );
 my $sol_p5 = $q_p5->next;
-is( $sol_p5->value($state_var),
-    'lit', 'Restored match state is lit in relative TTL mode' );
+ok( $sol_p5, 'Restored match state exists in relative TTL mode' );
+if ($sol_p5) {
+    is( $sol_p5->value($state_var),
+        'lit', 'Restored match state is lit in relative TTL mode' );
+}
 
 # 5. Test Re-entrant Query inside on_expire Callback (No Deep Recursion)
 my $p6           = Logic::Relational::Program->new;

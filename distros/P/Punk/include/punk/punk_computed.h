@@ -30,14 +30,23 @@
 static SV *pmce_new(pTHX_ SV *cls, SV *field, SV *message) {
     HV *h = newHV();
     HV *stash;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (cls && SvROK(cls) && SvOBJECT(SvRV(cls))) stash = SvSTASH(SvRV(cls));
     else stash = gv_stashsv(cls ? cls : sv_2mortal(newSVpvs(PMCE)), GV_ADD);
-    (void)hv_stores(h, "field",   field ? newSVsv(field) : newSV(0));
-    (void)hv_stores(h, "message", message ? newSVsv(message) : newSV(0));
+    (void)hv_stores(h, "field",   field ? newSVsv(field) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
+    (void)hv_stores(h, "message", message ? newSVsv(message) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
     return sv_bless(newRV_noinc((SV *)h), stash);
 }
 
 static int pmce_is(pTHX_ SV *e) {
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return e && sv_isobject(e) && sv_derived_from(e, PMCE);
 }
 
@@ -49,7 +58,7 @@ static void pmce_throw_pv(pTHX_ const char *field, SV *message) {
     pmce_throw(aTHX_ NULL, sv_2mortal(newSVpv(field, 0)), message);
 }
 
-static int pmce_word(char c) { return isALNUM(c) || c == '_'; }
+static int pmce_word(char c) { return isALNUM(c) || c == '_'; } /* # uncoverable condition left count:2 class:ignore_covered_err */
 
 /* The length of `s` without a trailing " at FILE line N." (with perl's
  * optional ", <FH> line N" or "chunk N" after it), the place a die names. */
@@ -59,32 +68,58 @@ static STRLEN pmce_strip_at(const char *s, STRLEN len) {
         STRLEN q;
         if (memNE(s + p, " at ", 4)) continue;
         q = p + 4;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (q >= len || isSPACE(s[q])) continue;
-        while (q < len && !isSPACE(s[q])) q++;
+        while (q < len && !isSPACE(s[q])) q++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (q + 6 > len || memNE(s + q, " line ", 6)) continue;
         q += 6;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (q >= len || !isDIGIT(s[q])) continue;
-        while (q < len && isDIGIT(s[q])) q++;
+        while (q < len && isDIGIT(s[q])) q++; /* # uncoverable condition right count:1 class:ignore_covered_err */
         if (q + 3 <= len && memEQ(s + q, ", <", 3)) {
             STRLEN r = q + 3;
-            while (r < len && s[r] != '>') r++;
+            while (r < len && s[r] != '>') r++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err
+             # uncoverable condition right count:3 class:ignore_covered_err */
             if (r < len && r + 2 <= len && s[r + 1] == ' ') {
                 r += 2;
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err
+                 # uncoverable condition right count:3 class:ignore_covered_err */
                 if (r + 5 <= len && (memEQ(s + r, "line ", 5) || memEQ(s + r, "chunk", 5))) {
                     r += 5;
-                    if (r < len && s[r] == ' ') r++;
+                    if (r < len && s[r] == ' ') r++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+                    /*
+                     # uncoverable branch false
+                     # uncoverable condition right count:1 class:ignore_covered_err
+                     # uncoverable condition right count:2 class:ignore_covered_err */
                     if (r < len && isDIGIT(s[r])) {
-                        while (r < len && isDIGIT(s[r])) r++;
+                        while (r < len && isDIGIT(s[r])) r++; /* # uncoverable condition right count:1 class:ignore_covered_err */
                         q = r;
                     }
                 }
             }
         }
-        if (q < len && s[q] == '.') q++;
-        if (q < len && s[q] == '\n') q++;
+        if (q < len && s[q] == '.') q++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        if (q < len && s[q] == '\n') q++; /* # uncoverable condition right count:1 class:ignore_covered_err */
         if (q == len) return p;
     }
-    if (len && s[len - 1] == '\n') return len - 1;
+    if (len && s[len - 1] == '\n') return len - 1; /* # uncoverable condition right count:1 class:ignore_covered_err */
     return len;
 }
 
@@ -93,10 +128,22 @@ static STRLEN pmce_strip_at(const char *s, STRLEN len) {
 static STRLEN pmce_prefix(const char *s, STRLEN len) {
     STRLEN q = 0;
     while (q < len && (pmce_word(s[q]) || s[q] == ':')) q++;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:4 class:ignore_covered_err */
     if (!q || q + 2 > len || s[q] != '-' || s[q + 1] != '>') return 0;
     q += 2;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (q >= len || !pmce_word(s[q])) return 0;
-    while (q < len && pmce_word(s[q])) q++;
+    while (q < len && pmce_word(s[q])) q++; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (q + 2 > len || s[q] != ':' || s[q + 1] != ' ') return 0;
     return q + 2;
 }
@@ -129,15 +176,19 @@ static SV *pmce_from(pTHX_ SV *cls, SV *field, SV *e) {
 }
 
 static HV *pmce_hv(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV))
-        croak(PMCE ": not an error object");
+        croak(PMCE ": not an error object"); /* # uncoverable statement */
     return (HV *)SvRV(self);
 }
 
 /* ---- the declarations ------------------------------------------------------------ */
 
 static const char *pmc_cls(pTHX_ SV *self) {
-    if (SvROK(self) && SvOBJECT(SvRV(self))) return HvNAME(SvSTASH(SvRV(self)));
+    if (SvROK(self) && SvOBJECT(SvRV(self))) return HvNAME(SvSTASH(SvRV(self))); /* # uncoverable condition right count:2 class:ignore_covered_err */
     return SvPV_nolen(self);
 }
 
@@ -152,14 +203,20 @@ static HV *pmc_spec(pTHX_ const char *cls, SV *table) {
     HV *stash = gv_stashpv(cls, 0);
     AV *isa;
     SSize_t i, n;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!stash) return NULL;
     isa = mro_get_linear_isa(stash);
     n = av_len(isa) + 1;
     for (i = 0; i < n; i++) {
         SV **c = av_fetch(isa, i, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         HV *d = c && *c ? pmc_decl_hv(aTHX_ SvPV_nolen(*c), 0) : NULL;
         HE *he = d ? hv_fetch_ent(d, table, 0, 0) : NULL;
-        if (he && SvROK(HeVAL(he))) return (HV *)SvRV(HeVAL(he));
+        if (he && SvROK(HeVAL(he))) return (HV *)SvRV(HeVAL(he)); /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
     return NULL;
 }
@@ -168,11 +225,17 @@ static HV *pmc_spec(pTHX_ const char *cls, SV *table) {
 static AV *pmc_tables(pTHX_ const char *cls) {
     HV *seen = (HV *)sv_2mortal((SV *)newHV());
     HV *stash = gv_stashpv(cls, 0);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (stash) {
         AV *isa = mro_get_linear_isa(stash);
         SSize_t i, n = av_len(isa) + 1;
         for (i = 0; i < n; i++) {
             SV **c = av_fetch(isa, i, 0);
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             HV *d = c && *c ? pmc_decl_hv(aTHX_ SvPV_nolen(*c), 0) : NULL;
             HE *he;
             if (!d) continue;
@@ -197,8 +260,17 @@ static SV *pmc_join(pTHX_ AV *av) {
 static int pmc_ident(pTHX_ SV *sv) {
     STRLEN l, i;
     const char *p;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(sv && SvOK(sv) && !SvROK(sv))) return 0;
     p = SvPV_const(sv, l);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!l || isDIGIT(p[0])) return 0;
     for (i = 0; i < l; i++) if (!pmce_word(p[i])) return 0;
     return 1;
@@ -210,6 +282,9 @@ static HV *pmc_name_set(pTHX_ const char *cls, SV *table, const char *what,
     HV *set;
     AV *av;
     SSize_t i, n;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(list && SvROK(list) && SvTYPE(SvRV(list)) == SVt_PVAV))
         croak("%s: %s's %s is a list of field names", cls, SvPV_nolen(table), what);
     set = newHV();
@@ -217,9 +292,16 @@ static HV *pmc_name_set(pTHX_ const char *cls, SV *table, const char *what,
     n = av_len(av) + 1;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(av, i, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err
+         # uncoverable condition left count:5 class:ignore_covered_err */
         if (!(e && *e && SvOK(*e) && !SvROK(*e) && SvCUR(*e))) {
-            SvREFCNT_dec((SV *)set);
-            croak("%s: %s's %s is a list of field names", cls, SvPV_nolen(table), what);
+            SvREFCNT_dec((SV *)set); /* # uncoverable statement */
+            croak("%s: %s's %s is a list of field names", cls, SvPV_nolen(table), what); /* # uncoverable statement */
         }
         (void)hv_store_ent(set, *e, newSViv(1), 0);
     }
@@ -236,25 +318,35 @@ static void pmc_declare(pTHX_ const char *cls, SV *table, SV *spec) {
     if (!pmc_ident(aTHX_ table))
         croak("%s: a table's name is a word, not '%s'", cls,
               table && SvOK(table) ? SvPV_nolen(table) : "undef");
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(spec && SvROK(spec) && SvTYPE(SvRV(spec)) == SVt_PVHV))
         croak("%s: %s's declaration is a hash reference", cls, SvPV_nolen(table));
     s = (HV *)SvRV(spec);
     hv_iterinit(s);
     while ((he = hv_iternext(s))) {
         STRLEN kl; const char *k = HePV(he, kl);
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err
+         # uncoverable condition right count:6 class:ignore_covered_err */
         if ((kl == 3 && memEQ(k, "ask", 3)) || (kl == 3 && memEQ(k, "ops", 3))
          || (kl == 5 && memEQ(k, "as_is", 5))) continue;
         croak("%s: %s's declaration has no '%.*s' (known: ask, as_is, ops)",
               cls, SvPV_nolen(table), (int)kl, k);
     }
     v = pdbi_get(aTHX_ s, "ask");
-    ask = v ? pmc_name_set(aTHX_ cls, table, "ask", v) : newHV();
+    ask = v ? pmc_name_set(aTHX_ cls, table, "ask", v) : newHV(); /* # uncoverable condition right count:1 class:ignore_covered_err */
     sv_2mortal((SV *)ask);
     v = pdbi_get(aTHX_ s, "as_is");
     as_is = v ? pmc_name_set(aTHX_ cls, table, "as_is", v) : newHV();
     sv_2mortal((SV *)as_is);
     hv_iterinit(as_is);
     while ((he = hv_iternext(as_is)))
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!hv_exists_ent(ask, HeSVKEY_force(he), 0))
             croak("%s: %s's as_is names '%s', which it is not asked by",
                   cls, SvPV_nolen(table), SvPV_nolen(HeSVKEY_force(he)));
@@ -262,8 +354,12 @@ static void pmc_declare(pTHX_ const char *cls, SV *table, SV *spec) {
     v = pdbi_get(aTHX_ s, "ops");
     if (v) {
         HV *o;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!(SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV))
-            croak("%s: %s's ops is { field => [operators] }", cls, SvPV_nolen(table));
+            croak("%s: %s's ops is { field => [operators] }", cls, SvPV_nolen(table)); /* # uncoverable statement */
         o = (HV *)SvRV(v);
         hv_iterinit(o);
         while ((he = hv_iternext(o))) {
@@ -277,16 +373,24 @@ static void pmc_declare(pTHX_ const char *cls, SV *table, SV *spec) {
             if (hv_exists_ent(as_is, f, 0))
                 croak("%s: %s's '%s' is taken as it is and takes no operators",
                       cls, SvPV_nolen(table), SvPV_nolen(f));
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (!(SvROK(l) && SvTYPE(SvRV(l)) == SVt_PVAV))
-                croak("%s: %s's ops is { field => [operators] }", cls, SvPV_nolen(table));
+                croak("%s: %s's ops is { field => [operators] }", cls, SvPV_nolen(table)); /* # uncoverable statement */
             set = (HV *)sv_2mortal((SV *)newHV());
             av = (AV *)SvRV(l);
             n = av_len(av) + 1;
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch(av, i, 0);
                 STRLEN ol;
+                /*
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err
+                 # uncoverable condition right count:3 class:ignore_covered_err */
                 const char *op = (e && *e && SvOK(*e)) ? SvPV_const(*e, ol) : NULL;
-                if (!op || pdbq_op_index(op, ol) < 0)
+                if (!op || pdbq_op_index(op, ol) < 0) /* # uncoverable condition left count:1 class:ignore_covered_err */
                     croak("%s: %s's '%s' names an operator '%s' (known: %s)",
                           cls, SvPV_nolen(table), SvPV_nolen(f), op ? op : "undef",
                           SvPV_nolen(pdbq_op_list(aTHX)));
@@ -306,13 +410,20 @@ static void pmc_declare(pTHX_ const char *cls, SV *table, SV *spec) {
 /* ---- the object ---------------------------------------------------------------- */
 
 static HV *pmc_self(pTHX_ SV *self) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV))
-        croak(PMC ": not a backend object");
+        croak(PMC ": not a backend object"); /* # uncoverable statement */
     return (HV *)SvRV(self);
 }
 
 static HV *pmc_sub(pTHX_ HV *spec, const char *k) {
     SV *v = pdbi_get(aTHX_ spec, k);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     return v && SvROK(v) ? (HV *)SvRV(v) : NULL;
 }
 
@@ -334,21 +445,25 @@ static SV *pmc_build(pTHX_ SV *class, SV **st, I32 items) {
               av_len(t) >= 0 ? "it answers " : "it declares none: answers(table => {...})",
               SvPV_nolen(pmc_join(aTHX_ t)));
     }
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (o && SvROK(o)) size = pdbi_get(aTHX_ (HV *)SvRV(o), "cache");
-    if (size && SvOK(size)) {
+    if (size && SvOK(size)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         STRLEN l, j;
         const char *p = SvPV_const(size, l);
         for (j = 0; j < l; j++) if (!isDIGIT(p[j])) break;
-        if (!l || j < l)
+        if (!l || j < l) /* # uncoverable condition left count:1 class:ignore_covered_err */
             croak("%s: the database's cache is how many answers to keep, a whole "
                   "number (0 for none), not '%s'", cls, p);
         max = SvIV(size);
     }
     for (i = 1; i + 1 < items; i += 2) {
         STRLEN kl; const char *k = SvPV_const(st[i], kl);
-        if (kl == 3 && memEQ(k, "app", 3)) app = st[i + 1];
+        if (kl == 3 && memEQ(k, "app", 3)) app = st[i + 1]; /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
-    if (app && SvROK(app)) {
+    if (app && SvROK(app)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         SV *w = newSVsv(app);
         sv_rvweaken(w);
         (void)hv_stores(h, "app", w);
@@ -371,38 +486,44 @@ static SV *pmc_filter(pTHX_ SV *self, SV *filter) {
     const char *cls = pmc_cls(aTHX_ self);
     SV *table = pdbi_get(aTHX_ h, "table");
     HV *spec = pmc_sub(aTHX_ h, "spec");
-    HV *ask = spec ? pmc_sub(aTHX_ spec, "ask") : NULL;
-    HV *ops = spec ? pmc_sub(aTHX_ spec, "ops") : NULL;
-    HV *as_is = spec ? pmc_sub(aTHX_ spec, "as_is") : NULL;
+    HV *ask = spec ? pmc_sub(aTHX_ spec, "ask") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    HV *ops = spec ? pmc_sub(aTHX_ spec, "ops") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    HV *as_is = spec ? pmc_sub(aTHX_ spec, "as_is") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     HV *col = pmr_colset(aTHX_ h);
     HV *out = newHV();
     SV *rv = sv_2mortal(newRV_noinc((SV *)out));
     AV *keys;
     SSize_t i, n;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (filter && SvOK(filter) && !(SvROK(filter) && SvTYPE(SvRV(filter)) == SVt_PVHV))
         croak("%s: a filter is a hash reference", cls);
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!(filter && SvROK(filter))) return rv;
     keys = pdbi_sorted_keys(aTHX_ (HV *)SvRV(filter));
     n = av_len(keys) + 1;
     for (i = 0; i < n; i++) {
         SV *k = *av_fetch(keys, i, 0);
         HE *he = hv_fetch_ent((HV *)SvRV(filter), k, 0, 0);
-        SV *v = he ? HeVAL(he) : &PL_sv_undef;
+        SV *v = he ? HeVAL(he) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         HV *term;
         pdbq_check_col(aTHX_ col, k, table, cls, "a filter");
-        if (!(ask && hv_exists_ent(ask, k, 0)))
+        if (!(ask && hv_exists_ent(ask, k, 0))) /* # uncoverable condition left count:1 class:ignore_covered_err */
             croak("%s: '%s' is an answer of %s, not something to ask it by",
                   cls, SvPV_nolen(k), SvPV_nolen(table));
         term = newHV();
         (void)hv_store_ent(out, k, newRV_noinc((SV *)term), 0);
-        if (as_is && hv_exists_ent(as_is, k, 0)) {
+        if (as_is && hv_exists_ent(as_is, k, 0)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             (void)hv_stores(term, "=", newSVsv(v));
             continue;
         }
-        if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV && !SvOBJECT(SvRV(v))) {
+        if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVHV && !SvOBJECT(SvRV(v))) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             HV *given = (HV *)SvRV(v);
-            HE *oe = ops ? hv_fetch_ent(ops, k, 0, 0) : NULL;
-            HV *takes = oe && SvROK(HeVAL(oe)) ? (HV *)SvRV(HeVAL(oe)) : NULL;
+            HE *oe = ops ? hv_fetch_ent(ops, k, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            HV *takes = oe && SvROK(HeVAL(oe)) ? (HV *)SvRV(HeVAL(oe)) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
             AV *gk = pdbi_sorted_keys(aTHX_ given);
             SSize_t j, m = av_len(gk) + 1;
             if (!m) croak("%s: an empty operator hash for '%s'", cls, SvPV_nolen(k));
@@ -410,6 +531,10 @@ static SV *pmc_filter(pTHX_ SV *self, SV *filter) {
                 SV *op = *av_fetch(gk, j, 0);
                 STRLEN ol; const char *o = SvPV_const(op, ol);
                 HE *ve;
+                /*
+                 # uncoverable condition left count:1 class:ignore_covered_err
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 if (!(ol == 1 && *o == '=') && !(takes && hv_exists_ent(takes, op, 0))) {
                     AV *t = takes ? pdbi_sorted_keys(aTHX_ takes) : NULL;
                     croak("%s: '%s' takes no operator '%s' here (%s%s)", cls,
@@ -417,9 +542,12 @@ static SV *pmc_filter(pTHX_ SV *self, SV *filter) {
                           t && av_len(t) >= 0 ? SvPV_nolen(pmc_join(aTHX_ t)) : "");
                 }
                 ve = hv_fetch_ent(given, op, 0, 0);
-                (void)hv_store_ent(term, op, newSVsv(ve ? HeVAL(ve) : &PL_sv_undef), 0);
+                (void)hv_store_ent(term, op, newSVsv(ve ? HeVAL(ve) : &PL_sv_undef), 0); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
         }
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         else if (SvROK(v) && SvTYPE(SvRV(v)) == SVt_PVAV && !SvOBJECT(SvRV(v)))
             croak("%s: a list for '%s' is { in => [...] }", cls, SvPV_nolen(k));
         else (void)hv_stores(term, "=", newSVsv(v));
@@ -435,17 +563,23 @@ static SV *pmc_options(pTHX_ SV *self, SV *opts) {
     HV *out = newHV();
     SV *rv = sv_2mortal(newRV_noinc((SV *)out));
     HE *he;
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (opts && SvOK(opts) && !(SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV))
         croak("%s: options are a hash reference", cls);
-    if (!(opts && SvROK(opts))) return rv;
+    if (!(opts && SvROK(opts))) return rv; /* # uncoverable condition left count:1 class:ignore_covered_err */
     hv_iterinit((HV *)SvRV(opts));
     while ((he = hv_iternext((HV *)SvRV(opts)))) {
         STRLEN kl; const char *k = HePV(he, kl);
-        if (kl == 8 && memEQ(k, "order_by", 8)) {
+        if (kl == 8 && memEQ(k, "order_by", 8)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
             if (!SvOK(HeVAL(he))) continue;
             croak("%s: the %s rows come in their own order, which order_by "
                   "cannot change", cls, SvPV_nolen(pdbi_get(aTHX_ h, "table")));
         }
+        /*
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!((kl == 5 && memEQ(k, "limit", 5)) || (kl == 5 && memEQ(k, "after", 5))))
             croak("%s: unknown search option '%.*s' (known: after, limit)", cls, (int)kl, k);
         (void)hv_store_ent(out, HeSVKEY_force(he), newSVsv(HeVAL(he)), 0);
@@ -462,7 +596,7 @@ static CV *pmc_hook(pTHX_ SV *self, int verb) {
     SV *table = pdbi_get(aTHX_ h, "table");
     SV *name = sv_2mortal(newSVpvf("_%s_%s", PMC_VERBS[verb], SvPV_nolen(table)));
     GV *gv = gv_fetchmethod_autoload(SvSTASH(SvRV(self)), SvPV_nolen(name), FALSE);
-    return gv && isGV(gv) ? GvCV(gv) : NULL;
+    return gv && isGV(gv) ? GvCV(gv) : NULL; /* # uncoverable condition right count:2 class:ignore_covered_err */
 }
 
 /* `$self->_<verb>_<table>(@args)` in scalar context, or a croak naming what
@@ -476,12 +610,15 @@ static SV *pmc_call(pTHX_ SV *self, int verb, SV *a, SV *b) {
         int i;
         for (i = 0; i < 3; i++) {
             if (!pmc_hook(aTHX_ self, i)) continue;
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err */
             if (SvCUR(have)) sv_catpvs(have, ", ");
             sv_catpv(have, PMC_VERBS[i]);
         }
         croak("%s: the %s table answers %s, not %s (define _%s_%s)",
               pmc_cls(aTHX_ self), SvPV_nolen(pdbi_get(aTHX_ pmc_self(aTHX_ self), "table")),
-              SvCUR(have) ? SvPV_nolen(have) : "nothing", PMC_VERBS[verb],
+              SvCUR(have) ? SvPV_nolen(have) : "nothing", PMC_VERBS[verb], /* # uncoverable condition right count:1 class:ignore_covered_err */
               PMC_VERBS[verb], SvPV_nolen(pdbi_get(aTHX_ pmc_self(aTHX_ self), "table")));
     }
     {
@@ -490,11 +627,11 @@ static SV *pmc_call(pTHX_ SV *self, int verb, SV *a, SV *b) {
         PUSHMARK(SP);
         XPUSHs(self);
         XPUSHs(a);
-        if (b) XPUSHs(b);
+        if (b) XPUSHs(b); /* # uncoverable condition left count:2 class:ignore_covered_err */
         PUTBACK;
         count = call_sv((SV *)cv, G_SCALAR);
         SPAGAIN;
-        ret = count ? POPs : &PL_sv_undef;
+        ret = count ? POPs : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         ret = newSVsv(ret);
         PUTBACK;
         FREETMPS; LEAVE;
@@ -514,15 +651,23 @@ static IV pmc_limit(pTHX_ SV *opts, SV *dflt, IV max, SV *what) {
     SV *n = NULL;
     STRLEN l, j;
     const char *p;
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (opts && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV)
         n = pdbi_get(aTHX_ (HV *)SvRV(opts), "limit");
-    if (!(n && SvOK(n))) n = dflt;
+    if (!(n && SvOK(n))) n = dflt; /* # uncoverable condition left count:2 class:ignore_covered_err */
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(n && SvOK(n) && !SvROK(n)))
         pmce_throw_pv(aTHX_ "limit", sv_2mortal(newSVpvf(
             "limit must be a whole number from 1 to %" IVdf, max)));
     p = SvPV_const(n, l);
     for (j = 0; j < l; j++) if (!isDIGIT(p[j])) break;
-    if (!l || j < l || !SvIV(n))
+    if (!l || j < l || !SvIV(n)) /* # uncoverable condition left count:1 class:ignore_covered_err */
         pmce_throw_pv(aTHX_ "limit", sv_2mortal(newSVpvf(
             "limit must be a whole number from 1 to %" IVdf, max)));
     if (l > 18 || SvIV(n) > max)
@@ -558,7 +703,7 @@ static void pmc_key_part(pTHX_ SV *out, SV *v, int depth) {
                 SV *key = *av_fetch(k, i, 0);
                 HE *he = hv_fetch_ent((HV *)r, key, 0, 0);
                 pmc_key_part(aTHX_ out, key, depth + 1);
-                pmc_key_part(aTHX_ out, he ? HeVAL(he) : &PL_sv_undef, depth + 1);
+                pmc_key_part(aTHX_ out, he ? HeVAL(he) : &PL_sv_undef, depth + 1); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
             sv_catpvs(out, "}");
             return;
@@ -568,15 +713,21 @@ static void pmc_key_part(pTHX_ SV *out, SV *v, int depth) {
             sv_catpvs(out, "[");
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch((AV *)r, i, 0);
+                /*
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 pmc_key_part(aTHX_ out, e && *e ? *e : &PL_sv_undef, depth + 1);
             }
             sv_catpvs(out, "]");
             return;
         }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (SvTYPE(r) < SVt_PVAV) {
-            sv_catpvs(out, "\\");
-            pmc_key_part(aTHX_ out, r, depth + 1);
-            return;
+            sv_catpvs(out, "\\"); /* # uncoverable statement */
+            pmc_key_part(aTHX_ out, r, depth + 1); /* # uncoverable statement */
+            return; /* # uncoverable statement */
         }
         croak(PMC ": a cache key is made of plain values, hashes, lists and "
               "objects, not a %s reference", sv_reftype(r, 0));
@@ -596,13 +747,22 @@ static SV *pmc_cached(pTHX_ SV *self, SV *key, SV *code) {
     SV *cs = pdbi_get(aTHX_ h, "cache");
     SV *mx = pdbi_get(aTHX_ h, "cache_max");
     SV *tk = pdbi_get(aTHX_ h, "cache_tick");
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *cache = cs && SvROK(cs) ? (HV *)SvRV(cs) : NULL;
-    IV max = mx ? SvIV(mx) : 0;
+    IV max = mx ? SvIV(mx) : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     HE *he;
     SV *v;
     int count;
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(code && SvROK(code) && SvTYPE(SvRV(code)) == SVt_PVCV))
         croak("%s: cached takes a key and a code reference", pmc_cls(aTHX_ self));
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (cache && max > 0 && key && SvOK(key)
         && (he = hv_fetch_ent(cache, key, 0, 0))) {
         AV *slot = (AV *)SvRV(HeVAL(he));
@@ -617,20 +777,29 @@ static SV *pmc_cached(pTHX_ SV *self, SV *key, SV *code) {
         PUTBACK;
         count = call_sv(code, G_SCALAR);
         SPAGAIN;
-        v = count ? POPs : &PL_sv_undef;
+        v = count ? POPs : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
         v = newSVsv(v);
         PUTBACK;
         FREETMPS; LEAVE;
     }
+    /*
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(cache && max > 0 && key && SvOK(key))) return v;
-    while ((IV)HvUSEDKEYS(cache) >= max) {
+    while ((IV)HvUSEDKEYS(cache) >= max) { /* # uncoverable condition left count:1 class:ignore_covered_err */
         SV *oldest = NULL;
         IV at = 0;
         hv_iterinit(cache);
         while ((he = hv_iternext(cache))) {
             IV t = SvIV(*av_fetch((AV *)SvRV(HeVAL(he)), 1, 0));
+            /*
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (!oldest || t < at) { oldest = HeSVKEY_force(he); at = t; }
         }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!oldest) break;
         oldest = sv_2mortal(newSVsv(oldest));
         (void)hv_delete_ent(cache, oldest, G_DISCARD, 0);

@@ -239,8 +239,8 @@ SKIP: {
         if (!$pid) {
             my $m = JFApp->punk_app->model_instance('Thing');
             $m->create({ id => $w * 100 + $_, name => "w$w" }) for 1 .. 25;
-            require POSIX;
-            POSIX::_exit(0);
+            Test::Builder->new->no_ending(1);
+            exit 0;
         }
         push @kids, $pid;
     }

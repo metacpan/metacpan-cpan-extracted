@@ -1,8 +1,9 @@
 #!/usr/bin/env perl
-# bi-geocode -- Phase 6 geocode-cache warming CLI for Database::BI
+# bi-geocode -- geocode-cache warming CLI for Database::BI
 #
 # Opens a dataset spec, geocodes every distinct value of the named column
 # (or of several, --col repeated, joined with ", ": an address, then its country),
+# with --text added to the end of each place ("Virginia, USA"),
 # and writes the resolved coordinates into the shared geocode cache in
 # models.json.  Subsequent map views for the same dataset serve from the
 # cache without making any geocoder requests.
@@ -17,7 +18,7 @@
 #
 # Usage:
 #   bi-geocode --spec <l-spec> --col <column> [--col <column> ...]
-#              [--data-dir <dir>] [--model-dir <dir>]
+#              [--text <text>] [--data-dir <dir>] [--model-dir <dir>]
 #              [--openaddr <path>] [--region <CC>]
 #              [--offline] [--online-max <n>]
 #              [--dry-run] [--verbose]
@@ -54,11 +55,12 @@ $Database::BI::I18N::LANGUAGE = Database::BI::I18N::from_locale();
 my @opt_cols;
 my ($opt_spec, $opt_data_dir, $opt_model_dir,
 	$opt_openaddr, $opt_region, $opt_dry_run, $opt_verbose, $opt_help,
-	$opt_offline, $opt_online_max);
+	$opt_offline, $opt_online_max, $opt_text);
 
 GetOptions(
 	'spec|s=s'       => \$opt_spec,
 	'col|c=s'        => \@opt_cols,
+	'text|t=s'       => \$opt_text,
 	'data-dir|d=s'   => \$opt_data_dir,
 	'model-dir|m=s'  => \$opt_model_dir,
 	'openaddr|o=s'   => \$opt_openaddr,
@@ -84,6 +86,18 @@ unless (defined $opt_spec && length $opt_spec) {
 @opt_cols = grep { length } @opt_cols;
 unless (@opt_cols) {
 	warn "bi-geocode: --col <column> is required\n";
+	exit 2;
+}
+
+require Database::BI::Model::Geocode;
+
+# The same tidying as the map page's "Add to each place" (loc_text=), so the
+# places cached here are the ones the map asks for.
+my ($place_text) = Database::BI::Model::Geocode->place_text($opt_text);
+unless (defined $place_text) {
+	no warnings qw(once);
+	warn "bi-geocode: --text is added to the end of each place: one line of at most ",
+		$Database::BI::Model::Geocode::PLACE_TEXT_MAX, " characters\n";
 	exit 2;
 }
 
@@ -168,10 +182,10 @@ if (-f $models_file) {
 	warn "bi-geocode: could not read models.json: $@\n" if $@;
 }
 
-require Database::BI::Model::Geocode;
-
-# Several columns are one place, their cells joined with ", ", as on the map page.
-my ($places, $opt_col) = Database::BI::Model::Geocode->place_rows($records, \@opt_cols);
+# Several columns are one place, their cells joined with ", ", then --text, as
+# on the map page.
+my ($places, $opt_col) = Database::BI::Model::Geocode->place_rows($records, \@opt_cols, $place_text);
+_log("Each place ends \", %s\"", $place_text) if length $place_text;
 
 my $cache_spec = $opt_spec . '|loc=' . $opt_col;
 my $legacy  = Database::BI::Model::Geocode->cache_from_models($models, $cache_spec);
@@ -282,6 +296,8 @@ Required:
                         (--col Address --col Country)
 
 Options:
+  --text,      -t <text>  Text added to the end of each place, after ", ", as
+                          the map's "Add to each place" (--text 'Virginia, USA')
   --data-dir,  -d <dir>   Data directory (default: data)
   --model-dir, -m <dir>   Model store directory (default: .bi)
   --openaddr,  -o <path>  Path to an OpenAddresses data directory for Geo::Coder::Free
@@ -310,7 +326,7 @@ bi-geocode - fill Database::BI's geocode cache for a column of places
 =head1 SYNOPSIS
 
     bi-geocode --spec <spec> --col <column> [--col <column> ...]
-               [--data-dir <dir>] [--model-dir <dir>]
+               [--text <text>] [--data-dir <dir>] [--model-dir <dir>]
                [--openaddr <path>] [--region <CC>]
                [--offline] [--online-max <n>]
                [--dry-run] [--verbose]
@@ -319,7 +335,7 @@ bi-geocode - fill Database::BI's geocode cache for a column of places
 
 Opens a dataset, looks up every distinct value of the named column (or of
 several, C<--col> repeated, joined with C<", ">: an address, then its country),
-and writes the coordinates into the shared geocode cache in the model store.
+with C<--text> added to the end of each place, and writes the coordinates into the shared geocode cache in the model store.
 Map pages for the dataset then draw from the cache without asking a geocoder.
 
 Places are looked up in L<Geo::Coder::Free>'s local data first, then on
@@ -344,6 +360,15 @@ The dataset: C<table:name>, C<path:/abs/path> or C<url:...>.  Required.
 
 A column holding place names.  Required; repeat it for a place spread across
 columns (C<--col Address --col Country>).
+
+=item B<--text>, B<-t> I<text>
+
+Text added to the end of each place, after C<", ">, for places the cells do
+not name fully: C<--col County --text 'Virginia, USA'> looks C<Accomack> up as
+C<Accomack, Virginia, USA>.  It is the map panel's I<Add to each place>
+(C<loc_text=>), tidied the same way (spaces trimmed, a leading comma dropped),
+so the map finds what this caches.  A row with no place is not given the text.
+At most 200 characters, on one line.
 
 =item B<--data-dir>, B<-d> I<dir>
 

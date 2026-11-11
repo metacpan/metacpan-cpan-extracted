@@ -1,5 +1,15 @@
 Revision history for Apophis
 
+1.02    2026-11-10
+        - Give the custom op its pad slot on every perl, where below 5.16
+          it wrote to slot 0 and died of a read-only value.
+        - Refuse a directory at a blob or sidecar path by its mode, where
+          the BSDs, Cygwin and the Hurd read one without error.
+        - Leave the calls as calls on a perl before 5.14, whose B cannot
+          describe a custom op and dies walking one.
+        - Expect the path_for test's path with the slashes it is built with.
+        - meta and the op_ aliases documented, a MANIFEST.SKIP for the build files.
+
 1.01    2026-11-06
         - Croak on a store path that does not fit the buffer, with room for
           its .tmp and .meta suffixes, instead of writing to a truncated one.

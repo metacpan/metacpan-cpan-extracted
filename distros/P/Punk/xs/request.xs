@@ -23,6 +23,8 @@ env(self)
     CODE:
     {
         SV **e = av_fetch(punk_req_av(aTHX_ self), PQ_ENV, 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         RETVAL = e && *e ? newSVsv(*e) : newSV(0);
     }
     OUTPUT:
@@ -48,13 +50,16 @@ json(self)
     CODE:
     {
         SV *body = pq_body(aTHX_ punk_req_av(aTHX_ self));
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         if (SvOK(body) && SvCUR(body)) {
             const frj_abi *J = punk_frj(aTHX);
             STRLEN bl;
             const char *b = SvPV_const(body, bl);
             RETVAL = J->decode(aTHX_ b, bl, NULL);
         }
-        else RETVAL = newSV(0);
+        else RETVAL = newSV(0); /* # uncoverable statement */
     }
     OUTPUT:
         RETVAL
@@ -78,7 +83,7 @@ xml(self)
     {
         AV *req = punk_req_av(aTHX_ self);
         SV **c  = av_fetch(req, PQ_XML, 0);
-        if (c && *c) RETVAL = SvREFCNT_inc_simple_NN(*c);
+        if (c && *c) RETVAL = SvREFCNT_inc_simple_NN(*c); /* # uncoverable condition right count:2 class:ignore_covered_err */
         else {
             SV *body = pq_body(aTHX_ req);
             SV *doc  = (SvOK(body) && SvCUR(body))
@@ -101,6 +106,8 @@ method(self)
     {
         HV *env = punk_req_env(aTHX_ punk_req_av(aTHX_ self));
         SV **e  = hv_fetchs(env, "REQUEST_METHOD", 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         RETVAL = e && *e ? newSVsv(*e) : newSV(0);
     }
     OUTPUT:
@@ -131,6 +138,8 @@ address(self)
     {
         HV *env = punk_req_env(aTHX_ punk_req_av(aTHX_ self));
         SV **e  = hv_fetchs(env, "REMOTE_ADDR", 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         RETVAL = e && *e ? newSVsv(*e) : newSV(0);
     }
     OUTPUT:
@@ -147,20 +156,28 @@ header(self, name)
         const char *n = SvPV_const(name, nl);
         char buf[256] = "HTTP_";
         SV **e;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (nl > 240) croak("Punk::Request: header name too long");
         for (i = 0; i < nl; i++) {
             char c = n[i];
             buf[5 + i] = c == '-' ? '_' : (char)toUPPER((U8)c);
         }
         e = hv_fetch(env, buf, (I32)(nl + 5), 0);
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (!(e && *e && SvOK(*e))) {
-            if (nl == 12 && memEQ(buf + 5, "CONTENT_TYPE", 12))
+            if (nl == 12 && memEQ(buf + 5, "CONTENT_TYPE", 12)) /* # uncoverable condition right count:2 class:ignore_covered_err */
                 e = hv_fetchs(env, "CONTENT_TYPE", 0);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             else if (nl == 14 && memEQ(buf + 5, "CONTENT_LENGTH", 14))
-                e = hv_fetchs(env, "CONTENT_LENGTH", 0);
+                e = hv_fetchs(env, "CONTENT_LENGTH", 0); /* # uncoverable statement */
             else e = NULL;
         }
-        RETVAL = e && *e ? newSVsv(*e) : newSV(0);
+        RETVAL = e && *e ? newSVsv(*e) : newSV(0); /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -182,9 +199,13 @@ headers(self)
         HV *env = punk_req_env(aTHX_ punk_req_av(aTHX_ self));
         HV *h   = pq_headers(aTHX_ env);
         SV **e  = hv_fetchs(env, "CONTENT_LENGTH", 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (e && *e && SvOK(*e)) {
             STRLEN vl;
             (void)SvPV_const(*e, vl);   /* may be an IV; do not read SvCUR */
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (vl) (void)hv_stores(h, "content-length", newSVsv(*e));
         }
         RETVAL = newRV_noinc((SV *)h);
@@ -199,6 +220,8 @@ query(self)
     {
         AV *req = punk_req_av(aTHX_ self);
         SV **c  = av_fetch(req, PQ_QUERY, 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (c && *c && SvROK(*c))
             RETVAL = newSVsv(*c);
         else {
@@ -221,6 +244,8 @@ form(self)
     {
         AV *req = punk_req_av(aTHX_ self);
         SV **c  = av_fetch(req, PQ_FORM, 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (c && *c && SvROK(*c))
             RETVAL = newSVsv(*c);
         else {
@@ -243,16 +268,18 @@ form(self)
                 PUTBACK;
                 count = call_method("body", G_SCALAR);
                 SPAGAIN;
-                body = count > 0 ? POPs : &PL_sv_undef;
+                body = count > 0 ? POPs : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (SvOK(body)) {
                     STRLEN bl;
                     const char *b = SvPV_const(body, bl);
                     built = pq_parse_pairs(aTHX_ b, bl);
                 }
-                else built = newHV();
+                else built = newHV(); /* # uncoverable statement */
                 PUTBACK; FREETMPS; LEAVE;
             }
-            else if (cl >= 19 && memEQ(cts, "multipart/form-data", 19)) {
+            else if (cl >= 19 && memEQ(cts, "multipart/form-data", 19)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 /* field parts -> the form hash, file parts -> PQ_UPLOADS */
                 STRLEN boundl = 0;
                 const char *boundary = pq_hdr_param(cts, cl, "boundary", &boundl);
@@ -262,6 +289,9 @@ form(self)
                  * parts read by then would otherwise be nobody's */
                 sv_2mortal((SV *)uploads);
                 sv_2mortal((SV *)built);
+                # uncoverable branch false class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
                 if (boundary && boundl) {
                     /* Streamed off psgi.input rather than slurped through
                      * ->body.
@@ -278,12 +308,19 @@ form(self)
                     HV *env = punk_req_env(aTHX_ req);
                     SV **in  = hv_fetchs(env, "psgi.input", 0);
                     SV **cl2 = hv_fetchs(env, "CONTENT_LENGTH", 0);
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     IV len = (cl2 && *cl2 && SvOK(*cl2)) ? SvIV(*cl2) : -1;
                     /* no declared length is the h2/h3 upload, and the walk
                      * runs to EOF: max_body is then the only bound there is */
                     IV max = pq_env_ceiling(aTHX_ env);
+                    # uncoverable condition right count:1 class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     IO *io = (in && *in && SvTRUE(*in)) ? sv_2io(*in) : NULL;
-                    PerlIO *fp = io ? IoIFP(io) : NULL;
+                    PerlIO *fp = io ? IoIFP(io) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (fp) {
                         SV *dir = pq_upload_dir(aTHX_ req);
                         AV *tmps = newAV();
@@ -326,12 +363,26 @@ upload(self, name)
           (void)call_method("form", G_SCALAR | G_DISCARD); SPAGAIN;
           PUTBACK; FREETMPS; LEAVE; }
         u = av_fetch(req, PQ_UPLOADS, 0);
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         got = (u && *u && SvROK(*u)) ? hv_fetch((HV *)SvRV(*u), n, (I32)nl, 0) : NULL;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (got && *got && SvROK(*got) && SvTYPE(SvRV(*got)) == SVt_PVAV) {
-            SV **first = av_fetch((AV *)SvRV(*got), 0, 0);   /* first of several */
+            SV **first = av_fetch((AV *)SvRV(*got), 0, 0);   /* first of several */ /* # uncoverable statement */
+            # uncoverable statement
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
+            # uncoverable condition left count:2
+            # uncoverable condition right count:2
             RETVAL = (first && *first) ? newSVsv(*first) : newSV(0);
         }
-        else RETVAL = (got && *got) ? newSVsv(*got) : newSV(0);
+        else RETVAL = (got && *got) ? newSVsv(*got) : newSV(0); /* # uncoverable condition right count:2 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -348,7 +399,7 @@ uploads(self)
           PUTBACK; FREETMPS; LEAVE; }
         u = av_fetch(req, PQ_UPLOADS, 0);
         RETVAL = (u && *u && SvROK(*u)) ? newSVsv(*u)
-                                        : newRV_noinc((SV *)newHV());
+                                        : newRV_noinc((SV *)newHV()); /* # uncoverable statement class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -413,8 +464,14 @@ cookies(self)
     {
         AV *req = punk_req_av(aTHX_ self);
         SV **c  = av_fetch(req, PQ_COOKIES, 0);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (c && *c && SvROK(*c))
-            RETVAL = newSVsv(*c);
+            RETVAL = newSVsv(*c); /* # uncoverable statement */
         else {
             HV *env = punk_req_env(aTHX_ req);
             SV **h  = hv_fetchs(env, "HTTP_COOKIE", 0);
@@ -438,15 +495,21 @@ cookie(self, name)
         SV **c  = av_fetch(req, PQ_COOKIES, 0);
         HE *he  = NULL;
         dSP;
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (!(c && *c && SvROK(*c))) {
             PUSHMARK(SP); XPUSHs(self); PUTBACK;
             call_method("cookies", G_SCALAR);
             SPAGAIN; (void)POPs; PUTBACK;
             c = av_fetch(req, PQ_COOKIES, 0);
         }
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (c && *c && SvROK(*c))
             he = hv_fetch_ent((HV *)SvRV(*c), name, 0, 0);
-        RETVAL = he ? newSVsv(HeVAL(he)) : newSV(0);
+        RETVAL = he ? newSVsv(HeVAL(he)) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -469,7 +532,7 @@ body_each(self, cb, ...)
         STRLEN chunk = 0;
         IV max = 0;
         int i;
-        if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV))
+        if (!(SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
             croak("Punk::Request: body_each takes a code reference");
         if ((items - 2) % 2)
             croak("Punk::Request: body_each takes key => value options");
@@ -477,12 +540,12 @@ body_each(self, cb, ...)
             const char *k = SvPV_nolen(ST(i));
             SV *v = ST(i + 1);
             if (strEQ(k, "chunk")) {
-                IV n = SvOK(v) ? SvIV(v) : 0;
+                IV n = SvOK(v) ? SvIV(v) : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
                 if (n <= 0) croak("Punk::Request: body_each chunk is a "
                                   "positive number of bytes");
                 chunk = (STRLEN)n;
             }
-            else if (strEQ(k, "max")) max = SvOK(v) ? SvIV(v) : 0;
+            else if (strEQ(k, "max")) max = SvOK(v) ? SvIV(v) : 0; /* # uncoverable condition right count:2 class:ignore_covered_err */
             else croak("Punk::Request: unknown body_each option '%s'", k);
         }
         ud.cb = cb;
@@ -506,39 +569,62 @@ body_to(self, dest, ...)
         IV max = 0;
         int i, opened = 0;
         PerlIO *out = NULL;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if ((items - 2) % 2)
-            croak("Punk::Request: body_to takes key => value options");
+            croak("Punk::Request: body_to takes key => value options"); /* # uncoverable statement */
         for (i = 2; i + 1 < items; i += 2) {
             const char *k = SvPV_nolen(ST(i));
             SV *v = ST(i + 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (strEQ(k, "chunk")) {
-                IV n = SvOK(v) ? SvIV(v) : 0;
+                IV n = SvOK(v) ? SvIV(v) : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
                 if (n <= 0) croak("Punk::Request: body_to chunk is a "
                                   "positive number of bytes");
                 chunk = (STRLEN)n;
             }
+            # uncoverable statement
+            # uncoverable branch true
+            # uncoverable branch false
+            # uncoverable condition left count:1
+            # uncoverable condition right count:1
+            # uncoverable condition left count:2
+            # uncoverable condition right count:2
             else if (strEQ(k, "max")) max = SvOK(v) ? SvIV(v) : 0;
-            else croak("Punk::Request: unknown body_to option '%s'", k);
+            else croak("Punk::Request: unknown body_to option '%s'", k); /* # uncoverable statement */
         }
         if (!SvOK(dest))
             croak("Punk::Request: body_to takes a path or an open handle");
-        if (SvROK(dest) || SvTYPE(dest) == SVt_PVGV) {
+        if (SvROK(dest) || SvTYPE(dest) == SVt_PVGV) { /* # uncoverable condition left count:2 class:ignore_covered_err */
             IO *io = sv_2io(dest);
-            out = io ? IoOFP(io) : NULL;
+            out = io ? IoOFP(io) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (!out && io) out = IoIFP(io);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (!out)
-                croak("Punk::Request: body_to was given a handle that is "
+                croak("Punk::Request: body_to was given a handle that is " /* # uncoverable statement */
                       "not open for writing");
         }
         else {
             STRLEN plen;
             const char *path = SvPV(dest, plen);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (memchr(path, 0, plen))
-                croak("Punk::Request: body_to path contains a NUL byte");
+                croak("Punk::Request: body_to path contains a NUL byte"); /* # uncoverable statement */
             out = PerlIO_open(path, "wb");
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (!out)
-                croak("Punk::Request: cannot write '%s': %s", path,
-                      Strerror(errno));
+                croak("Punk::Request: cannot write '%s': %s", path, /* # uncoverable statement */
+                      Strerror(errno)); /* # uncoverable statement */
             opened = 1;
         }
         {   /* A die mid-read must still close what this opened, and the
@@ -555,9 +641,11 @@ body_to(self, dest, ...)
             got = pq_body_stream(aTHX_ req, chunk, max, pq_sink_io, out);
             if (o.open) {
                 o.open = 0;
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
                 if (PerlIO_close(out) != 0)
-                    croak("Punk::Request: closing the file failed: %s",
-                          Strerror(errno));
+                    croak("Punk::Request: closing the file failed: %s", /* # uncoverable statement */
+                          Strerror(errno)); /* # uncoverable statement */
             }
             LEAVE;
             RETVAL = got;

@@ -1,8 +1,9 @@
 package Logic::Relational::Goal::Call;
 
-use v5.38;
+use v5.38;    ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
 use experimental 'signatures';
 use parent 'Logic::Relational::Goal';
+use Time::HiRes qw(time);
 
 =head1 NAME
 

@@ -10,7 +10,7 @@ use utf8;
 
 # ABSTRACT: Git::Hooks plugin to create and remove jobs from Jenkins
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 
 
@@ -370,7 +370,7 @@ Git::MoreHooks::TriggerJenkins - Git::Hooks plugin to create and remove jobs fro
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

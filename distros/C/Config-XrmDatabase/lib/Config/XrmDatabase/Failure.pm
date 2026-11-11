@@ -5,7 +5,7 @@ package Config::XrmDatabase::Failure;
 use v5.26;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use custom::failures::x::alias
   -suffix => '_failure',
@@ -42,7 +42,7 @@ Config::XrmDatabase::Failure - Exception class
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =for Pod::Coverage components_failure
 file_failure

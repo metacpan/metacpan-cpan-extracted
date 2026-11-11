@@ -72,7 +72,7 @@ B<Or:>
 
 =head1 VERSION
 
-1.1.0
+1.1.1
 
 =head1 DESCRIPTION
 
@@ -312,6 +312,15 @@ C<[opt|o:!E<gt>array]>.
 
 After C<--pass foo>: C<collected=("--pass" "foo")>
 
+The value is added as one element as it is, even if it contains spaces
+or wildcard characters.  The value of an optional argument is added
+with its option as one element, because it would not be taken for the
+value as a separate one:
+
+    [mode|m?>collected]=    # Option with its value, if any
+
+After C<--mode=fast --mode>: C<collected=("--mode=fast" "--mode")>
+
 =head1 DESTINATION VARIABLE
 
 By default, values are stored in variables named after the option.
@@ -530,9 +539,11 @@ See C<ex/> directory for sample scripts:
 
 =item * C<subcmd.sh> - subcommand handling
 
-=item * C<cmap> - complex real-world example
-
 =back
+
+For a complex real-world example, see
+L<t/cmap|https://github.com/tecolicom/Term-ANSIColor-Concise/blob/main/t/cmap> of
+Term::ANSIColor::Concise.
 
 =head1 SEE ALSO
 

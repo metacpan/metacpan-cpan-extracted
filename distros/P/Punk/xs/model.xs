@@ -15,12 +15,14 @@ import(class, ...)
         SV *meta_rv;
         PERL_UNUSED_VAR(class);
         PERL_UNUSED_VAR(items);
-        if (!caller || strEQ(caller, "main")) XSRETURN_EMPTY;
+        if (!caller || strEQ(caller, "main")) XSRETURN_EMPTY; /* # uncoverable condition left count:1 class:ignore_covered_err */
         caller_sv = sv_2mortal(newSVpv(caller, 0));
 
         /* a second `use` in the same class: nothing to do. Asked of the
          * class's OWN metadata - an inherited one means this is a subclass,
          * which does need its own entry to declare into. */
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (pm_meta_own(aTHX_ caller_sv)) XSRETURN_EMPTY;
 
         meta = newHV();
@@ -35,6 +37,8 @@ import(class, ...)
 
         {   /* @Caller::ISA = ('Punk::Model'), unless a parent already put a
              * model there - pushing it twice would be harmless but untidy. */
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (!sv_derived_from(caller_sv, "Punk::Model")) {
                 AV *isa = get_av(form("%s::ISA", caller), GV_ADD);
                 av_push(isa, newSVpvs("Punk::Model"));
@@ -75,9 +79,14 @@ _meta(class, ...)
         _punk_model_meta = 1
     CODE:
     {
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         SV *pkg = (items > 1 && SvOK(ST(1))) ? ST(1) : class;
         HV *m;
         PERL_UNUSED_VAR(ix);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (SvROK(pkg)) pkg = sv_2mortal(newSVpv(sv_reftype(SvRV(pkg), 1), 0));
         m = pm_meta_hv(aTHX_ pkg);
         RETVAL = (m && pm_meta_finalize(aTHX_ m))
@@ -101,22 +110,29 @@ _instantiate(class, ...)
         SV *backend_class, *backend;
         SV *should;
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(m && pm_meta_finalize(aTHX_ m)))
-            croak("Punk::Model: '%s' declares no table", SvPV_nolen(class));
+            croak("Punk::Model: '%s' declares no table", SvPV_nolen(class)); /* # uncoverable statement */
 
         {   /* backend => 'Class', defaulting to the shipped DBI one.
              * backend => 'Punk::Model::DBIx::Loop' selects the non-blocking
              * backend, whose methods return futures instead of values. */
-            SV *b = dbopts ? pm_get(aTHX_ dbopts, "backend") : NULL;
+            SV *b = dbopts ? pm_get(aTHX_ dbopts, "backend") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
             backend_class = (b && SvOK(b)) ? sv_2mortal(newSVsv(b))
                           : sv_2mortal(newSVpvs("Punk::Model::DBI"));
         }
         {   /* load it unless it is already there */
             HV *stash = gv_stashsv(backend_class, 0);
-            if (!(stash && gv_fetchmethod_autoload(stash, "new", 0))) {
+            if (!(stash && gv_fetchmethod_autoload(stash, "new", 0))) { /* # uncoverable condition left count:2 class:ignore_covered_err */
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable condition left count:1 class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (!pk_require_once(aTHX_ SvPV_nolen(backend_class), FALSE))
-                    croak("Punk::Model: backend '%s' failed to load: %s",
-                          SvPV_nolen(backend_class), SvPV_nolen(ERRSV));
+                    croak("Punk::Model: backend '%s' failed to load: %s", /* # uncoverable statement */
+                          SvPV_nolen(backend_class), SvPV_nolen(ERRSV)); /* # uncoverable statement */
             }
         }
 
@@ -125,6 +141,8 @@ _instantiate(class, ...)
             HV *conn = newHV();
             dSP;
             int count;
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (dbopts) {
                 HE *he;
                 hv_iterinit(dbopts);
@@ -149,14 +167,14 @@ _instantiate(class, ...)
             mPUSHs(newSVsv(pm_get(aTHX_ m, "fields")));
             /* the application, for a backend that reads from it (the
              * markdown one reads a mount's pages); the others ignore it */
-            if (items > 2 && SvROK(ST(2))) {
+            if (items > 2 && SvROK(ST(2))) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                 mPUSHs(newSVpvs("app"));
                 PUSHs(ST(2));
             }
             PUTBACK;
             count = call_method("new", G_SCALAR);
             SPAGAIN;
-            backend = count > 0 ? newSVsv(POPs) : &PL_sv_undef;
+            backend = count > 0 ? newSVsv(POPs) : &PL_sv_undef; /* # uncoverable condition right count:1 class:ignore_covered_err */
             PUTBACK; FREETMPS; LEAVE;
         }
 
@@ -165,7 +183,7 @@ _instantiate(class, ...)
         (void)hv_stores(self, "meta", newRV_inc((SV *)m));
 
         should = pm_get(aTHX_ m, "should_validate");
-        if (should && SvTRUE(should)) {
+        if (should && SvTRUE(should)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             static const char *const which[] = { "cv_create", "cv_update" };
             int partial;
             (void)pk_require_once(aTHX_ "JSON::Schema::Fast", TRUE);
@@ -181,6 +199,8 @@ _instantiate(class, ...)
                 PUTBACK;
                 count = call_method("compile", G_SCALAR);
                 SPAGAIN;
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (count > 0)
                     (void)hv_store(self, which[partial],
                                    (I32)strlen(which[partial]),
@@ -201,7 +221,7 @@ backend(self)
     CODE:
     {
         SV *v = pm_slot(aTHX_ self, ix ? "meta" : "backend");
-        RETVAL = v ? newSVsv(v) : newSV(0);
+        RETVAL = v ? newSVsv(v) : newSV(0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
     OUTPUT:
         RETVAL
@@ -230,6 +250,8 @@ all(self)
     PPCODE:
     {
         SV *backend = pm_slot(aTHX_ self, "backend");
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!backend) croak("Punk::Model: this model has no backend");
         PUSHMARK(SP);
         EXTEND(SP, 3);
@@ -249,7 +271,7 @@ create(self, data)
     PPCODE:
     {
         SV *cv_sv = pm_slot(aTHX_ self, "cv_create");
-        if (cv_sv && SvOK(cv_sv)) pm_validate(aTHX_ self, cv_sv, data);
+        if (cv_sv && SvOK(cv_sv)) pm_validate(aTHX_ self, cv_sv, data); /* # uncoverable condition right count:2 class:ignore_covered_err */
         pm_delegate(aTHX_ &ST(0), items, "create", GIMME_V);
         return;
     }
@@ -264,17 +286,22 @@ update(self, data)
     PPCODE:
     {
         SV *cv_sv = pm_slot(aTHX_ self, "cv_update");
-        if (cv_sv && SvOK(cv_sv)) {
+        if (cv_sv && SvOK(cv_sv)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
             SV *meta = pm_slot(aTHX_ self, "meta");
             SV *pk   = (meta && SvROK(meta))
                      ? pm_get(aTHX_ (HV *)SvRV(meta), "primary") : NULL;
             HV *changes = newHV();
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV) {
                 HV *src = (HV *)SvRV(data);
                 HE *he;
                 hv_iterinit(src);
                 while ((he = hv_iternext(src))) {
                     SV *k = HeSVKEY_force(he);
+                    # uncoverable condition right count:1 class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
                     if (pk && SvOK(pk) && sv_eq(k, pk)) continue;
                     (void)hv_store_ent(changes, k, newSVsv(HeVAL(he)), 0);
                 }

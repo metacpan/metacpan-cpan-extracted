@@ -1,0 +1,26 @@
+# Preserve the repository's existing tidyall.sh preferences.
+-w
+-ple
+-bbb
+-bbc
+-bbs
+-nolq
+-l=80
+-noll
+-nola
+-nwls='='
+-isbc
+-nolc
+-otr
+-kis
+-ci=4
+-se
+-sot
+-sct
+-nsbl
+-pt=2
+-fs
+-fsb='#start-no-tidy'
+-fse='#end-no-tidy'
+-cpb
+-bfvt=2

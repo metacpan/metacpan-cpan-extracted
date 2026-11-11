@@ -62,6 +62,28 @@ int32_t SPVM__UV__Handle__Poll__start(SPVM_ENV* env, SPVM_VALUE* stack) {
   return 0;
 }
 
+int32_t SPVM__UV__Handle__Poll__stop(SPVM_ENV* env, SPVM_VALUE* stack) {
+  
+  int32_t error_id = 0;
+  
+  SPVM_OBJ* obj_uv_poll = stack[0].oval;
+  
+  if (!obj_uv_poll) {
+    return env->die(env, stack, "$uv_poll must be defined.", __func__, FILE_NAME, __LINE__);
+  }
+  
+  uv_poll_t* uv_poll = env->get_pointer(env, stack, obj_uv_poll);
+  
+  // Stop polling
+  int32_t status = uv_poll_stop(uv_poll);
+  
+  if (!(status == 0)) {
+    return env->die(env, stack, "uv_poll_stop failed. status=%d.", __func__, FILE_NAME, __LINE__, status);
+  }
+  
+  return 0;
+}
+
 int32_t SPVM__UV__Handle__Poll__new(SPVM_ENV* env, SPVM_VALUE* stack) {
   
   int32_t error_id = 0;

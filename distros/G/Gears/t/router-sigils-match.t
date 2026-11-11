@@ -402,6 +402,22 @@ _match(
 	checks => {a => qr/[^0-9]+/, c => qr/\d{1,2}/},
 );
 
+_match(
+	'alternation check',
+	'/:a',
+	yes => {
+		'/X' => {a => 'X'},
+		'/Y' => {a => 'Y'},
+	},
+	no => [
+		'/',
+		'/Z',
+		'/XY',
+		'/YX',
+	],
+	checks => {a => 'X|Y'},
+);
+
 done_testing;
 
 sub _get_match_named ($match)

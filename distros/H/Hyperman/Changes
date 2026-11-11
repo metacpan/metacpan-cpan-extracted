@@ -1,5 +1,11 @@
 Revision history for Hyperman
 
+0.69	2026-11-10
+        - pid_file: a directory that answers EEXIST for every fresh name
+          (DragonFly) is treated as one that refuses creation, so the file
+          is rewritten in place where it exists and declined by its own
+          name where it does not.
+
 0.68	2026-11-08
         - The refusal of user => with reuseport => 1 on a low port comes
           before any bind

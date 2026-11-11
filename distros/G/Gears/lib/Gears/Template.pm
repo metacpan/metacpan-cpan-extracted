@@ -1,5 +1,5 @@
 package Gears::Template;
-$Gears::Template::VERSION = '0.104';
+$Gears::Template::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 

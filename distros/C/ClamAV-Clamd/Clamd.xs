@@ -27,7 +27,7 @@
 #define CC_DEF_REPLY_MAX        (1024 * 1024)
 
 static HV *cc_self_hv(pTHX_ SV *self, const char *who) {
-    if (!self || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
         croak("ClamAV::Clamd::%s: not a ClamAV::Clamd object", who);
     return (HV *)SvRV(self);
 }
@@ -45,23 +45,23 @@ static void cc_target_from_hv(pTHX_ HV *self, cc_target *t) {
     t->frame           = CC_FRAME_Z;
     t->port            = CC_DEF_PORT;
 
-    if ((sv = hv_fetchs(self, "socket", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "socket", 0)) && SvOK(*sv))
         t->path = SvPV_nolen(*sv);
-    if ((sv = hv_fetchs(self, "host", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "host", 0)) && SvOK(*sv))
         t->host = SvPV_nolen(*sv);
-    if ((sv = hv_fetchs(self, "port", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "port", 0)) && SvOK(*sv))
         t->port = (int)SvIV(*sv);
-    if ((sv = hv_fetchs(self, "connect_timeout", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "connect_timeout", 0)) && SvOK(*sv))
         t->connect_timeout = SvNV(*sv);
-    if ((sv = hv_fetchs(self, "reply_timeout", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "reply_timeout", 0)) && SvOK(*sv))
         t->reply_timeout = SvNV(*sv);
-    if ((sv = hv_fetchs(self, "reply_max", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "reply_max", 0)) && SvOK(*sv))
         t->reply_max = (size_t)SvUV(*sv);
-    if ((sv = hv_fetchs(self, "chunk", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "chunk", 0)) && SvOK(*sv))
         t->chunk = (size_t)SvUV(*sv);
-    if ((sv = hv_fetchs(self, "max_size", 0)) && *sv && SvOK(*sv))
+    if ((sv = hv_fetchs(self, "max_size", 0)) && SvOK(*sv))
         t->max_size = (size_t)SvUV(*sv);
-    if ((sv = hv_fetchs(self, "frame", 0)) && *sv && SvOK(*sv)) {
+    if ((sv = hv_fetchs(self, "frame", 0)) && SvOK(*sv)) {
         const char *f = SvPV_nolen(*sv);
         t->frame = (*f == 'n') ? CC_FRAME_N : CC_FRAME_Z;
     }
@@ -74,7 +74,7 @@ static void cc_clear_error(pTHX_ HV *self) {
 
 static void cc_set_error(pTHX_ HV *self, int code, const char *msg) {
     (void)hv_stores(self, "error_code", newSViv(code));
-    (void)hv_stores(self, "error", newSVpv(msg ? msg : "unknown error", 0));
+    (void)hv_stores(self, "error", newSVpv(msg, 0));
 }
 
 /* One command, one connection. Returns a mortal SV holding the reply, or
@@ -98,8 +98,7 @@ static SV *cc_do_command(pTHX_ SV *self, const char *cmd, const char *who) {
     rc = cc_roundtrip(&t, cmd, &reply, &len, &err);
 
     if (rc != CC_OK) {
-        cc_set_error(aTHX_ hv, rc, err.msg[0] ? err.msg : "unknown error");
-        if (reply) free(reply);
+        cc_set_error(aTHX_ hv, rc, err.msg);
         return NULL;
     }
 
@@ -109,7 +108,7 @@ static SV *cc_do_command(pTHX_ SV *self, const char *cmd, const char *who) {
      * refusal, not a version string or a statistics block, and must not
      * come back as one: a caller logging "COMMAND UNAVAILABLE" as the
      * scanner version is wrong in a way it cannot detect. */
-    if (len == 19 && reply && memcmp(reply, "COMMAND UNAVAILABLE", 19) == 0) {
+    if (len == 19 && memcmp(reply, "COMMAND UNAVAILABLE", 19) == 0) {
         SV *m = sv_2mortal(newSVpvf(
             "clamd has %s disabled (clamd.conf Enable*Command no)", cmd));
         cc_set_error(aTHX_ hv, CC_ERR_UNAVAILABLE, SvPV_nolen(m));
@@ -117,9 +116,8 @@ static SV *cc_do_command(pTHX_ SV *self, const char *cmd, const char *who) {
         return NULL;
     }
 
-
-    out = sv_2mortal(newSVpvn(reply ? reply : "", len));
-    if (reply) free(reply);
+    out = sv_2mortal(newSVpvn(reply, len));
+    free(reply);
     return out;
 }
 
@@ -148,11 +146,13 @@ static SV *cc_do_exact(pTHX_ SV *self, const char *cmd, const char *want,
  * among them - and making them dig out fileno() is a papercut with a
  * wrong answer available (calling fileno on the wrong thing). */
 static int cc_fileno(pTHX_ SV *sv) {
-    if (!sv || !SvOK(sv)) return -1;
+    if (!SvOK(sv)) return -1;
 
+    /* sv_2io croaks on what is not a handle at all, and answers a closed
+     * one with no input stream. */
     if (SvROK(sv) || SvTYPE(sv) == SVt_PVGV) {
         IO *io = sv_2io(sv);
-        if (io && IoIFP(io)) {
+        if (IoIFP(io)) {
             int fd = PerlIO_fileno(IoIFP(io));
             return fd < 0 ? -1 : fd;
         }
@@ -185,10 +185,10 @@ static SV *cc_scan_result(pTHX_ HV *hv, int rc, char *reply, size_t len,
     (void)hv_stores(hv, "transport", newSViv(transport));
 
     if (rc == CC_OK) {
-        cc_parse_reply(reply ? reply : "", len, &v);
+        cc_parse_reply(reply, len, &v);
     } else {
         cc_verdict_from_error(rc, &v);
-        cc_set_error(aTHX_ hv, rc, err->msg[0] ? err->msg : "unknown error");
+        cc_set_error(aTHX_ hv, rc, err->msg);
     }
 
     vh = newHV();
@@ -201,10 +201,9 @@ static SV *cc_scan_result(pTHX_ HV *hv, int rc, char *reply, size_t len,
                     transport == CC_TRANSPORT_FILDES   ? newSVpvs("fildes")   :
                     transport == CC_TRANSPORT_INSTREAM ? newSVpvs("instream") : newSV(0));
     (void)hv_stores(vh, "raw",
-                    (rc == CC_OK) ? newSVpvn(reply ? reply : "", len) : newSV(0));
+                    (rc == CC_OK) ? newSVpvn(reply, len) : newSV(0));
     (void)hv_stores(vh, "error",
-                    (rc == CC_OK) ? newSV(0)
-                                  : newSVpv(err->msg[0] ? err->msg : "unknown error", 0));
+                    (rc == CC_OK) ? newSV(0) : newSVpv(err->msg, 0));
 
     if (reply) free(reply);
 
@@ -215,23 +214,60 @@ static SV *cc_scan_result(pTHX_ HV *hv, int rc, char *reply, size_t len,
 
 static SV *cc_vfield(pTHX_ SV *self, const char *key, I32 klen) {
     SV **sv;
-    if (!self || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
         croak("ClamAV::Clamd::Verdict: not a verdict");
     sv = hv_fetch((HV *)SvRV(self), key, klen, 0);
-    return (sv && *sv && SvOK(*sv)) ? *sv : NULL;
+    return (sv && SvOK(*sv)) ? *sv : NULL;
 }
 
 static cc_scan *cc_scan_of(pTHX_ SV *self) {
     SV **e;
-    if (!self || !SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
+    if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
         croak("ClamAV::Clamd::Scan: not a scan handle");
     e = hv_fetchs((HV *)SvRV(self), "_ptr", 0);
-    return (e && *e && SvIOK(*e)) ? INT2PTR(cc_scan *, SvIV(*e)) : NULL;
+    return (e && SvIOK(*e)) ? INT2PTR(cc_scan *, SvIV(*e)) : NULL;
 }
 
 static int cc_vstate_is(pTHX_ SV *self, const char *want) {
     SV *s = cc_vfield(aTHX_ self, "state", 5);
     return s && strEQ(SvPV_nolen(s), want);
+}
+
+/* A scan for a handle to own, empty and finished until started. */
+static cc_scan *cc_scan_alloc(pTHX) {
+    cc_scan *sc = (cc_scan *)malloc(sizeof *sc);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
+    if (!sc) croak("ClamAV::Clamd->start_scan: out of memory");
+    memset(sc, 0, sizeof *sc);
+    sc->sock = CC_INVALID_SOCK;
+    return sc;
+}
+
+/* The table hands back no scan only when it could not allocate one. */
+static void *cc_abi_scan_or_croak(pTHX_ void *scan, void *target, const char *who) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
+    if (!scan) { CLAMD_ABI.target_free(aTHX_ target); croak("%s: no scan handle", who); }
+    return scan;
+}
+
+/* Drive a scan through the table on poll, as a consumer would, and say
+ * how many steps it took. */
+static int cc_abi_drive(pTHX_ void *scan) {
+    const clamd_abi *abi = &CLAMD_ABI;
+    int steps = 0;
+    while (abi->scan_step(aTHX_ scan) == CLAMD_ABI_STEP_MORE) {
+        int w = abi->scan_want(aTHX_ scan);
+        (void)cc_wait(abi->scan_socket(aTHX_ scan), w == CLAMD_ABI_WANT_WRITE, cc_now() + 5.0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 */
+        if (++steps > 100000) break;
+    }
+    return steps;
 }
 
 MODULE = ClamAV::Clamd    PACKAGE = ClamAV::Clamd    PREFIX = cc_
@@ -288,9 +324,9 @@ cc_new(class, ...)
     }
 
     sv = hv_fetchs(self, "socket", 0);
-    have_socket = (sv && *sv && SvOK(*sv));
+    have_socket = (sv && SvOK(*sv));
     sv = hv_fetchs(self, "host", 0);
-    have_host = (sv && *sv && SvOK(*sv));
+    have_host = (sv && SvOK(*sv));
 
     if (!have_socket && !have_host) {
         SvREFCNT_dec((SV *)self);
@@ -324,8 +360,11 @@ cc_new(class, ...)
 #endif
     }
 
+    /* Every key below was stored above, so each fetch finds a slot; an
+     * undef given by the caller is what SvOK is for. */
     sv = hv_fetchs(self, "frame", 0);
-    frame = (sv && *sv && SvOK(*sv)) ? SvPV(*sv, flen) : "z";
+    if (SvOK(*sv)) frame = SvPV(*sv, flen);
+    else { frame = "z"; flen = 1; }
     if (!(flen == 1 && (*frame == 'z' || *frame == 'n'))) {
         SvREFCNT_dec((SV *)self);
         croak("ClamAV::Clamd->new: frame must be 'z' or 'n'");
@@ -338,7 +377,7 @@ cc_new(class, ...)
         keys[1] = "reply_timeout";
         for (n = 0; n < 2; n++) {
             SV **t = hv_fetch(self, keys[n], (I32)strlen(keys[n]), 0);
-            if (!t || !*t || !SvOK(*t) || SvNV(*t) <= 0.0) {
+            if (!SvOK(*t) || SvNV(*t) <= 0.0) {
                 SV *msg = sv_2mortal(newSVpvf(
                     "ClamAV::Clamd->new: %s must be a positive number", keys[n]));
                 SvREFCNT_dec((SV *)self);
@@ -399,7 +438,7 @@ cc_error(self)
     SV **sv;
   PPCODE:
     sv = hv_fetchs(cc_self_hv(aTHX_ self, "error"), "error", 0);
-    if (!sv || !*sv || !SvOK(*sv)) XSRETURN_UNDEF;
+    if (!sv || !SvOK(*sv)) XSRETURN_UNDEF;
     XPUSHs(sv_mortalcopy(*sv));
 
 # The code for that failure, so failures can be told apart without
@@ -411,7 +450,7 @@ cc_error_code(self)
     SV **sv;
   PPCODE:
     sv = hv_fetchs(cc_self_hv(aTHX_ self, "error_code"), "error_code", 0);
-    if (!sv || !*sv || !SvOK(*sv)) XSRETURN_UNDEF;
+    if (!sv || !SvOK(*sv)) XSRETURN_UNDEF;
     XPUSHs(sv_mortalcopy(*sv));
 
 # Scan an open descriptor or filehandle by passing it to clamd.
@@ -497,7 +536,7 @@ cc_scan(self, data)
     hv = cc_self_hv(aTHX_ self, "scan");
     cc_clear_error(aTHX_ hv);
 
-    if (!data || !SvOK(data)) {
+    if (!SvOK(data)) {
         cc_err bad; memset(&bad, 0, sizeof bad);
         cc_err_set(&bad, CC_ERR_CONFIG, "scan needs a defined scalar of bytes", NULL);
         XPUSHs(cc_scan_result(aTHX_ hv, CC_ERR_CONFIG, NULL, 0, CC_TRANSPORT_NONE, &bad));
@@ -538,13 +577,14 @@ cc_transport(self)
   PREINIT:
     SV **sv;
     IV   v;
+    const char *name;
   PPCODE:
     sv = hv_fetchs(cc_self_hv(aTHX_ self, "transport"), "transport", 0);
-    if (!sv || !*sv || !SvOK(*sv)) XSRETURN_UNDEF;
+    if (!sv || !SvOK(*sv)) XSRETURN_UNDEF;
     v = SvIV(*sv);
-    if (v == CC_TRANSPORT_FILDES)        XPUSHs(sv_2mortal(newSVpvs("fildes")));
-    else if (v == CC_TRANSPORT_INSTREAM) XPUSHs(sv_2mortal(newSVpvs("instream")));
-    else XSRETURN_UNDEF;
+    if (v == CC_TRANSPORT_NONE) XSRETURN_UNDEF;
+    name = (v == CC_TRANSPORT_FILDES) ? "fildes" : "instream";
+    XPUSHs(sv_2mortal(newSVpv(name, 0)));
 
 # Whether this platform can pass descriptors over a socket. False on
 # Windows, which has AF_UNIX but no SCM_RIGHTS. Phase 2 needs it, and it
@@ -719,7 +759,8 @@ _ovl_str(self, ...)
   PPCODE:
     PERL_UNUSED_VAR(items);
     s = cc_vfield(aTHX_ self, "state", 5);
-    XPUSHs(s ? sv_mortalcopy(s) : sv_2mortal(newSVpvs("error")));
+    if (!s) s = sv_2mortal(newSVpvs("error"));
+    XPUSHs(sv_mortalcopy(s));
 
 BOOT:
 {
@@ -757,7 +798,7 @@ cca_start_scan(self, what, ...)
     HV       *hv, *h;
     cc_target t;
     cc_scan  *sc;
-    int       rc, mode, fd = -1;
+    int       mode, fd = -1;
     const char *kind;
     STRLEN    dlen = 0;
     const char *dp = NULL;
@@ -769,10 +810,7 @@ cca_start_scan(self, what, ...)
 
     kind = (items > 2) ? SvPV_nolen(ST(2)) : "bytes";
 
-    sc = (cc_scan *)malloc(sizeof *sc);
-    if (!sc) croak("ClamAV::Clamd->start_scan: out of memory");
-    memset(sc, 0, sizeof *sc);
-    sc->sock = CC_INVALID_SOCK;
+    sc = cc_scan_alloc(aTHX);
 
     if (strEQ(kind, "path")) {
         const char *path = SvPV_nolen(what);
@@ -784,10 +822,9 @@ cca_start_scan(self, what, ...)
         }
         mode = (CC_HAVE_FD_PASSING && t.path) ? CC_TRANSPORT_FILDES : CC_TRANSPORT_INSTREAM;
         if (mode == CC_TRANSPORT_FILDES)
-            rc = cc_scan_start(sc, &t, mode, fd, 1, NULL, 0, -1);
+            (void)cc_scan_start(sc, &t, mode, fd, 1, NULL, 0, -1);
         else
-            rc = cc_scan_start(sc, &t, mode, -1, 1, NULL, 0, fd);
-        (void)rc;
+            (void)cc_scan_start(sc, &t, mode, -1, 1, NULL, 0, fd);
     }
     else if (strEQ(kind, "fd")) {
         fd = cc_fileno(aTHX_ what);
@@ -797,13 +834,12 @@ cca_start_scan(self, what, ...)
             sc->rc = CC_ERR_CONFIG; sc->phase = CC_PH_DONE;
             goto made;
         }
-        keep = what;
+        keep = newSVsv(what);
         mode = (CC_HAVE_FD_PASSING && t.path) ? CC_TRANSPORT_FILDES : CC_TRANSPORT_INSTREAM;
         if (mode == CC_TRANSPORT_FILDES)
-            rc = cc_scan_start(sc, &t, mode, fd, 0, NULL, 0, -1);
+            (void)cc_scan_start(sc, &t, mode, fd, 0, NULL, 0, -1);
         else
-            rc = cc_scan_start(sc, &t, mode, -1, 0, NULL, 0, fd);
-        (void)rc;
+            (void)cc_scan_start(sc, &t, mode, -1, 0, NULL, 0, fd);
     }
     else {
         if (!SvOK(what)) {
@@ -811,14 +847,18 @@ cca_start_scan(self, what, ...)
             sc->rc = CC_ERR_CONFIG; sc->phase = CC_PH_DONE;
             goto made;
         }
-        if (DO_UTF8(what) && !sv_utf8_downgrade(what, 1)) {
+        /* The bytes are read from the copy the handle keeps, never from
+         * the scalar given: that may be a temporary, gone before the
+         * first step, and a large one is unmapped memory by then. */
+        keep = newSVsv(what);
+        if (DO_UTF8(keep) && !sv_utf8_downgrade(keep, 1)) {
+            SvREFCNT_dec(keep); keep = NULL;
             cc_err_set(&sc->err, CC_ERR_CONFIG,
                        "start_scan needs bytes, not wide characters", NULL);
             sc->rc = CC_ERR_CONFIG; sc->phase = CC_PH_DONE;
             goto made;
         }
-        dp = SvPV_const(what, dlen);
-        keep = what;
+        dp = SvPV_const(keep, dlen);
         if (t.max_size && (size_t)dlen > t.max_size) {
             cc_err_set(&sc->err, CC_ERR_TOOBIGLOC,
                        "larger than max_size; refused without scanning", NULL);
@@ -832,7 +872,7 @@ cca_start_scan(self, what, ...)
     h = newHV();
     (void)hv_stores(h, "_ptr", newSViv(PTR2IV(sc)));
     /* Hold the source alive for as long as the scan can read it. */
-    if (keep) (void)hv_stores(h, "_keep", newSVsv(keep));
+    if (keep) (void)hv_stores(h, "_keep", keep);
     RETVAL = sv_bless(newRV_noinc((SV *)h),
                       gv_stashpvs("ClamAV::Clamd::Scan", GV_ADD));
   OUTPUT:
@@ -861,12 +901,12 @@ ccs_want(self)
     SV *self
   PREINIT:
     cc_scan *sc;
+    const char *name;
   PPCODE:
     sc = cc_scan_of(aTHX_ self);
     if (!sc || sc->phase == CC_PH_DONE) XSRETURN_UNDEF;
-    if (sc->want == CC_WANT_READ)  XPUSHs(sv_2mortal(newSVpvs("read")));
-    else if (sc->want == CC_WANT_WRITE) XPUSHs(sv_2mortal(newSVpvs("write")));
-    else XSRETURN_UNDEF;
+    name = (sc->want == CC_WANT_READ) ? "read" : "write";
+    XPUSHs(sv_2mortal(newSVpv(name, 0)));
 
 # Advance as far as possible without blocking. True when finished.
 void
@@ -911,7 +951,7 @@ ccs_verdict(self)
     h = (HV *)SvRV(self);
 
     cached = hv_fetchs(h, "_verdict", 0);
-    if (cached && *cached && SvOK(*cached)) {
+    if (cached) {
         XPUSHs(sv_mortalcopy(*cached));
         XSRETURN(1);
     }
@@ -942,6 +982,117 @@ ccs_cancel(self)
     sc = cc_scan_of(aTHX_ self);
     if (sc) cc_scan_cancel(sc);
     XSRETURN_EMPTY;
+
+MODULE = ClamAV::Clamd    PACKAGE = ClamAV::Clamd    PREFIX = ccab_
+
+# Every entry of the table, driven the way a consumer drives it, and every
+# refusal it can give. Private, for the suite: a consumer built outside this
+# dist is somebody else's failing smoker, and the table has to be proven here.
+#
+# Takes a hash: socket or host and port for the target, bytes or fd for the
+# scan, async to drive it on poll, cancel to abandon it first, nolen to ask
+# for the strings without their lengths, and connect_timeout, reply_timeout,
+# reply_max, chunk and max_size as given. Returns key, value pairs. With
+# null set, every entry is called with no handle and the answers come back.
+void
+ccab__abi_probe(opt)
+    HV *opt
+  PREINIT:
+    const clamd_abi *abi = &CLAMD_ABI;
+    SV **e;
+    const char *path = NULL, *host = NULL, *bp = NULL, *str;
+    STRLEN blen = 0;
+    int port = 0, fd = -1, use_fd = 0, async = 0, cancel = 0, nolen = 0;
+    int steps = 0, socket0 = -2, want0 = -1, done0 = -1;
+    size_t len = 0, *lp;
+    void *target, *scan;
+  PPCODE:
+    if ((e = hv_fetchs(opt, "null", 0)) && SvTRUE(*e)) {
+        abi->target_timeouts(aTHX_ NULL, 1.0, 1.0);
+        abi->target_limits(aTHX_ NULL, 1, 1, 1);
+        abi->target_free(aTHX_ NULL);
+        abi->scan_cancel(aTHX_ NULL);
+        abi->scan_free(aTHX_ NULL);
+        EXTEND(SP, 11);
+        mPUSHi(abi->scan_socket(aTHX_ NULL));
+        mPUSHi(abi->scan_want(aTHX_ NULL));
+        mPUSHi(abi->scan_step(aTHX_ NULL));
+        mPUSHi(abi->scan_done(aTHX_ NULL));
+        mPUSHi(abi->verdict_state(aTHX_ NULL));
+        mPUSHi(abi->verdict_signature(aTHX_ NULL, NULL) == NULL);
+        mPUSHi(abi->verdict_reason(aTHX_ NULL, NULL) == NULL);
+        mPUSHi(abi->verdict_error(aTHX_ NULL, NULL) == NULL);
+        mPUSHi(abi->verdict_transport(aTHX_ NULL));
+        mPUSHi(abi->scan_fd(aTHX_ NULL, 0) == NULL);
+        mPUSHi(abi->scan_mem(aTHX_ NULL, "x", 1) == NULL);
+        XSRETURN(11);
+    }
+
+    if ((e = hv_fetchs(opt, "socket", 0)) && SvOK(*e)) path = SvPV_nolen(*e);
+    if ((e = hv_fetchs(opt, "host", 0))   && SvOK(*e)) host = SvPV_nolen(*e);
+    if ((e = hv_fetchs(opt, "port", 0))   && SvOK(*e)) port = (int)SvIV(*e);
+    target = abi->target_new(aTHX_ path, host, port);
+    if (!target) {
+        mPUSHp("target", 6);
+        mPUSHi(0);
+        XSRETURN(2);
+    }
+    {
+        double ct = 0, rt = 0;
+        size_t reply_max = 0, chunk = 0, max_size = 0;
+        if ((e = hv_fetchs(opt, "connect_timeout", 0)) && SvOK(*e)) ct = SvNV(*e);
+        if ((e = hv_fetchs(opt, "reply_timeout", 0))   && SvOK(*e)) rt = SvNV(*e);
+        if ((e = hv_fetchs(opt, "reply_max", 0)) && SvOK(*e)) reply_max = (size_t)SvUV(*e);
+        if ((e = hv_fetchs(opt, "chunk", 0))     && SvOK(*e)) chunk     = (size_t)SvUV(*e);
+        if ((e = hv_fetchs(opt, "max_size", 0))  && SvOK(*e)) max_size  = (size_t)SvUV(*e);
+        abi->target_timeouts(aTHX_ target, ct, rt);
+        abi->target_limits(aTHX_ target, reply_max, chunk, max_size);
+    }
+    if ((e = hv_fetchs(opt, "fd", 0)) && SvOK(*e)) { use_fd = 1; fd = (int)SvIV(*e); }
+    if ((e = hv_fetchs(opt, "bytes", 0)) && SvOK(*e)) bp = SvPV(*e, blen);
+    async  = (e = hv_fetchs(opt, "async", 0))  && SvTRUE(*e);
+    cancel = (e = hv_fetchs(opt, "cancel", 0)) && SvTRUE(*e);
+    nolen  = (e = hv_fetchs(opt, "nolen", 0))  && SvTRUE(*e);
+
+    if (use_fd) scan = async ? abi->scan_start_fd(aTHX_ target, fd)
+                             : abi->scan_fd(aTHX_ target, fd);
+    else        scan = async ? abi->scan_start_mem(aTHX_ target, bp, (size_t)blen)
+                             : abi->scan_mem(aTHX_ target, bp, (size_t)blen);
+    scan = cc_abi_scan_or_croak(aTHX_ scan, target, "_abi_probe");
+
+    if (async) {
+        socket0 = abi->scan_socket(aTHX_ scan);
+        want0   = abi->scan_want(aTHX_ scan);
+        done0   = abi->scan_done(aTHX_ scan);
+        if (cancel) abi->scan_cancel(aTHX_ scan);
+        steps = cc_abi_drive(aTHX_ scan);
+    }
+
+    lp = nolen ? NULL : &len;
+    EXTEND(SP, 24);
+    mPUSHp("want_after", 10); mPUSHi(abi->scan_want(aTHX_ scan));
+    mPUSHp("target", 6);    mPUSHi(1);
+    mPUSHp("state", 5);     mPUSHi(abi->verdict_state(aTHX_ scan));
+    mPUSHp("signature", 9);
+    str = abi->verdict_signature(aTHX_ scan, lp);
+    PUSHs(str ? sv_2mortal(newSVpvn(str, lp ? len : strlen(str))) : &PL_sv_undef);
+    mPUSHp("reason", 6);
+    str = abi->verdict_reason(aTHX_ scan, lp);
+    PUSHs(str ? sv_2mortal(newSVpvn(str, lp ? len : strlen(str))) : &PL_sv_undef);
+    mPUSHp("error", 5);
+    str = abi->verdict_error(aTHX_ scan, lp);
+    PUSHs(str ? sv_2mortal(newSVpvn(str, lp ? len : strlen(str))) : &PL_sv_undef);
+    mPUSHp("transport", 9); mPUSHi(abi->verdict_transport(aTHX_ scan));
+    mPUSHp("steps", 5);     mPUSHi(steps);
+    mPUSHp("socket", 6);    mPUSHi(socket0);
+    mPUSHp("want", 4);      mPUSHi(want0);
+    mPUSHp("done", 4);      mPUSHi(done0);
+    mPUSHp("finished", 8);  mPUSHi(abi->scan_done(aTHX_ scan));
+
+    abi->scan_free(aTHX_ scan);
+    abi->target_free(aTHX_ target);
+
+MODULE = ClamAV::Clamd    PACKAGE = ClamAV::Clamd::Scan    PREFIX = ccs_
 
 void
 ccs_DESTROY(self)
@@ -994,8 +1145,7 @@ ccab__abi_selftest(socket_path, bytes)
     if (!target) croak("_abi_selftest: target_new failed");
     abi->target_timeouts(aTHX_ target, 5.0, 30.0);
 
-    scan = abi->scan_mem(aTHX_ target, bp, (size_t)blen);
-    if (!scan) { abi->target_free(aTHX_ target); croak("_abi_selftest: scan_mem failed"); }
+    scan = cc_abi_scan_or_croak(aTHX_ abi->scan_mem(aTHX_ target, bp, (size_t)blen), target, "_abi_selftest");
 
     sig = abi->verdict_signature(aTHX_ scan, &siglen);
 

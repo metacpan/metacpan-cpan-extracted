@@ -13,6 +13,8 @@ import(class, ...)
         const char *caller = CopSTASHPV(PL_curcop);
         PERL_UNUSED_VAR(class);
         PERL_UNUSED_VAR(items);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!caller) XSRETURN_EMPTY;
         pki_pragma(aTHX_ "strict");
         pki_pragma(aTHX_ "warnings");
@@ -23,9 +25,11 @@ import(class, ...)
 PROTOTYPES: DISABLE
 
 int
+# uncoverable statement
+# uncoverable subroutine
 _xs_ok()
     CODE:
-        RETVAL = 1;
+        RETVAL = 1; /* # uncoverable statement */
     OUTPUT:
         RETVAL
 

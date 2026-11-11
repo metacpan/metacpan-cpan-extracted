@@ -16,7 +16,7 @@ use Devel::XSCover::XS ();
 use Devel::XSCover::Gcov ();
 use Devel::XSCover::DB ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our (%DEFAULTS);
 

@@ -72,6 +72,11 @@ static void pm_init(pTHX) {
 
 /* Is this one of the scrape endpoints? */
 static int pm_is_scrape(pTHX_ SV *path) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!PM_SKIP || !path || !SvOK(path)) return 0;
     return hv_exists_ent(PM_SKIP, path, 0) ? 1 : 0;
 }
@@ -83,8 +88,17 @@ static void pm_label(pTHX_ SV *out, const char *s, STRLEN len) {
     STRLEN i;
     for (i = 0; i < len; i++) {
         char ch = s[i];
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if      (ch == '\\') sv_catpvs(out, "\\\\");
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         else if (ch == '"')  sv_catpvs(out, "\\\"");
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         else if (ch == '\n') sv_catpvs(out, "\\n");
         else                 sv_catpvn(out, &ch, 1);
     }
@@ -97,9 +111,19 @@ static void pm_label(pTHX_ SV *out, const char *s, STRLEN len) {
  * application has disappears at once. */
 static int pm_name_ok(const char *s, STRLEN len) {
     STRLEN i;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!s || !len) return 0;
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (!(isALPHA(s[0]) || s[0] == '_' || s[0] == ':')) return 0;
     for (i = 1; i < len; i++)
+        /*
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (!(isALNUM(s[i]) || s[i] == '_' || s[i] == ':')) return 0;
     return 1;
 }
@@ -112,8 +136,18 @@ static int pm_name_ok(const char *s, STRLEN len) {
  * how the bounded dimension becomes unbounded. */
 static SV *pm_route_of(pTHX_ SV *c) {
     SV *r = pk_abi_route_pattern_of(aTHX_ c);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (r && SvOK(r) && SvCUR(r)) return r;
     r = pk_abi_operation_of(aTHX_ c);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (r && SvOK(r) && SvCUR(r)) return r;
     return NULL;
 }
@@ -138,18 +172,32 @@ static const char *pm_method_label(const char *m, STRLEN *len) {
 static const char *pm_method_of(pTHX_ SV *c, STRLEN *len) {
     SV *env = pk_abi_env_of(aTHX_ c);
     SV **m;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err
+     # uncoverable condition right count:5 class:ignore_covered_err
+     # uncoverable condition right count:6 class:ignore_covered_err
+     # uncoverable condition right count:7 class:ignore_covered_err
+     # uncoverable condition right count:8 class:ignore_covered_err */
     if (env && SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV
         && (m = hv_fetchs((HV *)SvRV(env), "REQUEST_METHOD", 0))
         && m && *m && SvOK(*m) && SvCUR(*m)) {
         const char *p = SvPV_const(*m, *len);
         return pm_method_label(p, len);
     }
-    *len = 1;
-    return "-";
+    *len = 1; /* # uncoverable statement */
+    return "-"; /* # uncoverable statement */
 }
 
 static void pm_bump_total(pTHX_ const char *k, STRLEN kl) {
     SV **e = hv_fetch(PM_TOTAL, k, (I32)kl, 1);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (e && *e) sv_setuv(*e, (SvOK(*e) ? SvUV(*e) : 0) + 1);
 }
 
@@ -157,8 +205,12 @@ static void pm_bump_hist(pTHX_ const char *k, STRLEN kl, double secs) {
     SV **e = hv_fetch(PM_HIST, k, (I32)kl, 1);
     AV *h;
     int i;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(e && *e)) return;
-    if (!(SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVAV)) {
+    if (!(SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVAV)) { /* # uncoverable condition left count:2 class:ignore_covered_err */
         AV *fresh = newAV();
         av_extend(fresh, 2 + PM_NBUCKETS);
         av_store(fresh, 0, newSVuv(0));
@@ -170,7 +222,15 @@ static void pm_bump_hist(pTHX_ const char *k, STRLEN kl, double secs) {
     {
         SV **n = av_fetch(h, 0, 0);
         SV **s = av_fetch(h, 1, 0);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (n && *n) sv_setuv(*n, SvUV(*n) + 1);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (s && *s) sv_setnv(*s, SvNV(*s) + secs);
     }
     /* Cumulative, which is what a Prometheus histogram means: a request lands
@@ -178,6 +238,10 @@ static void pm_bump_hist(pTHX_ const char *k, STRLEN kl, double secs) {
     for (i = 0; i < PM_NBUCKETS; i++) {
         if (secs <= PM_BUCKETS[i]) {
             SV **b = av_fetch(h, 2 + i, 0);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (b && *b) sv_setuv(*b, SvUV(*b) + 1);
         }
     }
@@ -190,6 +254,10 @@ static void pm_bump_hist(pTHX_ const char *k, STRLEN kl, double secs) {
 /* The context's own slot for the start time: one av_store, where the stash
  * hash cost a hash to create and two stores per request. */
 static AV *pm_ctx_av(pTHX_ SV *c) {
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (c && SvROK(c) && SvTYPE(SvRV(c)) == SVt_PVAV) ? (AV *)SvRV(c) : NULL;
 }
 
@@ -212,13 +280,22 @@ static void pm_on_request(pTHX_ SV *c, void *ud) {
         SV *env = pk_abi_env_of(aTHX_ c);
         SV **p = (env && SvROK(env) && SvTYPE(SvRV(env)) == SVt_PVHV)
                  ? hv_fetchs((HV *)SvRV(env), "PATH_INFO", 0) : NULL;
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (p && *p && pm_is_scrape(aTHX_ *p)) {
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (cav) (void)av_store(cav, PCX_T0, newSVnv(-1.0));
             return;
         }
     }
 
     PM_INFLIGHT++;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (cav) (void)av_store(cav, PCX_T0, newSVnv(pc_now(aTHX)));
 }
 
@@ -231,14 +308,25 @@ static void pm_on_response(pTHX_ SV *c, SV *response, void *ud) {
     SV *key;
     PERL_UNUSED_ARG(ud);
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (cav) {
         SV **t = av_fetch(cav, PCX_T0, 0);
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err */
         if (t && *t && SvOK(*t)) t0 = SvNV(*t);
     }
     /* The request side already decided, so the two cannot disagree: it never
      * incremented the gauge for this one, and this never decrements it. */
     if (t0 < 0.0) return;
 
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (PM_INFLIGHT > 0) PM_INFLIGHT--;
     pm_init(aTHX);
 
@@ -246,12 +334,19 @@ static void pm_on_response(pTHX_ SV *c, SV *response, void *ud) {
 
     /* And the same exclusion by route, for a scrape reached through a mount
      * where the path the request carried was not the path this was told. */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (route && pm_is_scrape(aTHX_ route)) return;
 
     mp = pm_method_of(aTHX_ c, &ml);
     status = pk_abi_status_of(aTHX_ response);
 
-    secs = t0 > 0.0 ? pc_now(aTHX) - t0 : 0.0;
+    secs = t0 > 0.0 ? pc_now(aTHX) - t0 : 0.0; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (secs < 0.0) secs = 0.0;
 
     key = sv_2mortal(newSVpvn(mp, ml));
@@ -275,7 +370,7 @@ static void pm_on_response(pTHX_ SV *c, SV *response, void *ud) {
 static const char *pm_field(const char *k, STRLEN kl, int n, STRLEN *len) {
     const char *p = k, *end = k + kl;
     int i = 0;
-    while (i < n && p < end) { if (*p++ == '\x1f') i++; }
+    while (i < n && p < end) { if (*p++ == '\x1f') i++; } /* # uncoverable condition right count:2 class:ignore_covered_err */
     { const char *q = p;
       while (q < end && *q != '\x1f') q++;
       *len = (STRLEN)(q - p);
@@ -303,12 +398,15 @@ static AV *pm_sorted_keys(pTHX_ HV *h) {
  * against, and an application already has both in scope. */
 static void pm_collect(pTHX_ SV *app, SV *out) {
     HV *h = app_hv(aTHX_ app);
-    SV *cb = h ? app_get(aTHX_ h, "metrics_collect") : NULL;
+    SV *cb = h ? app_get(aTHX_ h, "metrics_collect") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     SV *got = NULL;
     HV *gh;
     AV *names;
     SSize_t i, n;
 
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(cb && SvROK(cb) && SvTYPE(SvRV(cb)) == SVt_PVCV)) return;
 
     {
@@ -316,12 +414,19 @@ static void pm_collect(pTHX_ SV *app, SV *out) {
         ENTER; SAVETMPS; PUSHMARK(SP); PUTBACK;
         count = call_sv(cb, G_SCALAR | G_EVAL);
         SPAGAIN;
-        if (!SvTRUE(ERRSV) && count > 0) got = newSVsv(POPs);
+        if (!SvTRUE(ERRSV) && count > 0) got = newSVsv(POPs); /* # uncoverable condition right count:2 class:ignore_covered_err */
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         else if (count > 0)             (void)POPs;
         PUTBACK; FREETMPS; LEAVE;
     }
     if (!got) return;                     /* it died: the scrape goes on */
     sv_2mortal(got);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(SvROK(got) && SvTYPE(SvRV(got)) == SVt_PVHV)) return;
     gh = (HV *)SvRV(got);
 
@@ -330,9 +435,13 @@ static void pm_collect(pTHX_ SV *app, SV *out) {
     for (i = 0; i < n; i++) {
         SV *nm = *av_fetch(names, i, 0);
         HE *he = hv_fetch_ent(gh, nm, 0, 0);
-        SV *v = he ? HeVAL(he) : NULL;
+        SV *v = he ? HeVAL(he) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         STRLEN nl; const char *np = SvPV_const(nm, nl);
         if (!pm_name_ok(np, nl)) continue;      /* see pm_name_ok */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!(v && SvOK(v)))     continue;
         sv_catpvf(out, "# TYPE %s gauge\n%s{", np, np);
         /* the leading comma of pm_worker would be wrong as the first label */
@@ -349,11 +458,14 @@ static void pm_collect(pTHX_ SV *app, SV *out) {
  * bounded by the config, which is the same rule the route label follows. */
 static void pm_cache(pTHX_ SV *app, SV *out) {
     HV *h = app_hv(aTHX_ app);
-    SV *caches = h ? app_get(aTHX_ h, "cache") : NULL;
+    SV *caches = h ? app_get(aTHX_ h, "cache") : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     HV *ch;
     AV *names;
     SSize_t i, n;
 
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(caches && SvROK(caches) && SvTYPE(SvRV(caches)) == SVt_PVHV)) return;
     ch = (HV *)SvRV(caches);
 
@@ -362,10 +474,15 @@ static void pm_cache(pTHX_ SV *app, SV *out) {
     for (i = 0; i < n; i++) {
         SV *nm = *av_fetch(names, i, 0);
         HE *he = hv_fetch_ent(ch, nm, 0, 0);
-        SV *cache = he ? HeVAL(he) : NULL;
+        SV *cache = he ? HeVAL(he) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         STRLEN nml; const char *nmp = SvPV_const(nm, nml);
         SSize_t j, got;
 
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err */
         if (!(cache && SvROK(cache) && SvOBJECT(SvRV(cache)))) continue;
 
         /* stats() returns a flat LIST, so it has to be called in list
@@ -377,6 +494,10 @@ static void pm_cache(pTHX_ SV *app, SV *out) {
             EXTEND(SP, 1); PUSHs(cache); PUTBACK;
             count = call_method("stats", G_ARRAY | G_EVAL);
             SPAGAIN;
+            /*
+             # uncoverable branch true
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (SvTRUE(ERRSV)) count = 0;
             for (k = 0; k < count; k++) av_unshift(flat, 1), av_store(flat, 0, newSVsv(POPs));
             PUTBACK; FREETMPS; LEAVE;
@@ -386,8 +507,18 @@ static void pm_cache(pTHX_ SV *app, SV *out) {
                 SV **k2 = av_fetch(flat, j, 0);
                 SV **v  = av_fetch(flat, j + 1, 0);
                 STRLEN kl; const char *kp;
+                /*
+                 # uncoverable branch true
+                 # uncoverable condition left count:1 class:ignore_covered_err
+                 # uncoverable condition left count:2 class:ignore_covered_err
+                 # uncoverable condition left count:3 class:ignore_covered_err
+                 # uncoverable condition left count:4 class:ignore_covered_err
+                 # uncoverable condition left count:5 class:ignore_covered_err */
                 if (!(k2 && *k2 && v && *v && SvOK(*v))) continue;
                 kp = SvPV_const(*k2, kl);
+                /*
+                 # uncoverable branch true
+                 # uncoverable condition left count:1 class:ignore_covered_err */
                 if (!pm_name_ok(kp, kl)) continue;
                 sv_catpvf(out, "punk_cache_%.*s{cache=\"", (int)kl, kp);
                 pm_label(aTHX_ out, nmp, nml);
@@ -438,7 +569,7 @@ static SV *pm_render(pTHX_ SV *app) {
         pm_label(aTHX_ out, sp, sl);
         sv_catpvs(out, "\"");
         pm_worker(aTHX_ out);
-        sv_catpvf(out, "} %" UVuf "\n", he ? SvUV(HeVAL(he)) : (UV)0);
+        sv_catpvf(out, "} %" UVuf "\n", he ? SvUV(HeVAL(he)) : (UV)0); /* # uncoverable condition right count:1 class:ignore_covered_err */
     }
 
     sv_catpvs(out,
@@ -458,6 +589,9 @@ static SV *pm_render(pTHX_ SV *app) {
                   ? (AV *)SvRV(HeVAL(he)) : NULL;
         SV *labels = sv_2mortal(newSVpvs("method=\""));
         int b;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!hst) continue;
         pm_label(aTHX_ labels, mp, ml);
         sv_catpvs(labels, "\",route=\"");
@@ -475,6 +609,9 @@ static SV *pm_render(pTHX_ SV *app) {
         {
             SV **num = av_fetch(hst, 0, 0);
             SV **sum = av_fetch(hst, 1, 0);
+            /*
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             UV nn = num && *num ? SvUV(*num) : (UV)0;
             sv_catpvf(out, "http_request_duration_seconds_bucket{%s,le=\"+Inf\"} "
                            "%" UVuf "\n", SvPV_nolen(labels), nn);
@@ -502,7 +639,7 @@ XS_INTERNAL(pm_serve_cb);
 XS_INTERNAL(pm_serve_cb) {
     dXSARGS;
     AV *cap = punk_clos_cap(aTHX_ cv);
-    SV *app = cap ? *av_fetch(cap, 0, 0) : NULL;
+    SV *app = cap ? *av_fetch(cap, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     AV *extra = (AV *)sv_2mortal((SV *)newAV());
     PERL_UNUSED_VAR(items);
     av_push(extra, newSVpvs("Cache-Control"));

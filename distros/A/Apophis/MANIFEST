@@ -3,6 +3,7 @@ lib/Apophis.pm
 Apophis.xs
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 PLAN.md
 ppport.h
 README

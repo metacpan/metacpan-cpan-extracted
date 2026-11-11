@@ -49,6 +49,7 @@ subtest 'a named layer with a key' => sub {
 	is_deeply($keys[0][1], {
 		title    => 'Population',
 		position => 'bottomright',
+		shape    => 'line',
 		entries  => [
 			{ label => '100,000 or more', colour => '#d73027' },
 			{ label => 'under 100,000',   colour => '#1a9850' },
@@ -119,6 +120,8 @@ subtest 'a bad key is refused' => sub {
 		[ { entries => [ { label => 'a', colour => '#fff;x' } ] } => qr/invalid colour/ ],
 		[ { %KEY, position => 'middle' }                   => qr/key position must be one of topright, topleft, bottomright, bottomleft/ ],
 		[ { %KEY, title => [] }                            => qr/key title must be text/ ],
+		[ { %KEY, shape => 'circle' }                    => qr/key shape must be one of line, box/ ],
+		[ { %KEY, shape => [] }                          => qr/key shape must be one of line, box/ ],
 	);
 	for my $case (@bad) {
 		throws_ok { $map->add_geojson(collection(), name => 'C', key => $case->[0]) }
@@ -129,6 +132,16 @@ subtest 'a bad key is refused' => sub {
 	lives_ok { $map->add_geojson(collection(), key => { %KEY, title => '' }) } 'an empty title is no title';
 	is($map->{geojson}[0]{opts}{key}{title}, undef, 'and left out');
 	is_deeply($KEY{entries}[0], { label => '100,000 or more', colour => '#D73027' }, 'the caller\'s key is not changed');
+};
+
+subtest 'a key of filled boxes' => sub {
+	my $body = body_with([ name => 'Counties', key => { %KEY, shape => 'box' } ]);
+	my ($key) = keys_in($body);
+	is($key->[1]{shape}, 'box', 'the shape is passed to the script');
+	like($body, qr/if\(k\.shape === 'box'\) \{[^}]*swatch\.style\.background = e\.colour;/s,
+		'which fills a box with the colour');
+	like($body, qr/\} else \{[^}]*swatch\.style\.borderTop = '3px solid ' \+ e\.colour;/s,
+		'and otherwise draws a line, as before');
 };
 
 done_testing();

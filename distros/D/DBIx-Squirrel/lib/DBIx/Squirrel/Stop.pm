@@ -37,15 +37,15 @@ DBIx::Squirrel::Stop - end a DBIx::Squirrel pipeline early
 
 =head1 DESCRIPTION
 
-DBIx::Squirrel's pipeline is L<Ekorn::Pipeline>'s, and this module is
+DBIx::Squirrel's pipeline is L<Ekorn::Pipeline>'s. This module is
 DBIx::Squirrel's name for L<Ekorn::Pipeline::Stop>, which describes the
-stop in full. It's a subclass of it, and exports C<Stop>, by default:
-Ekorn's function, from a list of DBIx::Squirrel's own. It's here to
-stay, so code written with it keeps working.
+stop in full. It's a subclass of it, and exports C<Stop> by default.
+That's Ekorn's function, from a list of DBIx::Squirrel's own. The
+module is here to stay, so code written with it keeps working.
 
 A stop is the exception that ends a pipeline early and quietly. The
 rest of the stage that throws it doesn't run. The values already out of
-the pipeline are kept, the values the stop carries go on through the
+the pipeline are kept. The values the stop carries go on through the
 stages after it, and nothing else is processed.
 
 =head1 FUNCTIONS
@@ -55,9 +55,9 @@ stages after it, and nothing else is processed.
     Stop();
     Stop(@values);
 
-Throws a stop carrying C<@values>. It's L<Ekorn::Pipeline::Stop/Stop>,
-so the stop is an Ekorn::Pipeline::Stop. To keep it out of your
-namespace:
+Throws a stop carrying C<@values>. The function is
+L<Ekorn::Pipeline::Stop/Stop>, so the stop is an Ekorn::Pipeline::Stop.
+To keep it out of your namespace:
 
     use DBIx::Squirrel::Stop ();
 
@@ -68,7 +68,7 @@ namespace:
     DBIx::Squirrel::Stop->throw(@values);
     My::Stop->throw(@values);
 
-Inherited from L<Ekorn::Pipeline::Stop/throw>: throws a stop carrying
+Inherited from L<Ekorn::Pipeline::Stop/throw>. Throws a stop carrying
 C<@values>, blessed into the class it was called on. A subclass of
 DBIx::Squirrel::Stop is a subclass of Ekorn::Pipeline::Stop too, so the
 pipeline stops for it.
@@ -76,9 +76,9 @@ pipeline stops for it.
 =head2 Catching errors in a stage
 
 A stage that catches errors itself, with C<eval> or C<try>, should
-throw a stop on again. Check for Ekorn::Pipeline::Stop, which every
-stop is, whether thrown with C<Stop>, by this class, or by a canned
-stage such as C<take>:
+throw a stop on again. Check for Ekorn::Pipeline::Stop. Every stop is
+one, whether thrown with C<Stop>, by this class, or by a canned stage
+such as C<take>:
 
     sub ($row) {
         try { ... }

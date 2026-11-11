@@ -4,6 +4,7 @@ use 5.006;
 use strict;
 use warnings;
 use File::Slurp qw(read_dir);
+use POSIX       ();
 
 =head1 NAME
 
@@ -11,17 +12,26 @@ Check::supervisorctl - Check the status of supervisorctl to see if it is okay.
 
 =head1 VERSION
 
-Version 0.1.0
+Version 0.2.1
 
 =cut
 
-our $VERSION = '0.1.0';
+our $VERSION = '0.2.1';
 
 # the statuses supervisorctl knows of
 my @STATUSES = ( 'stopped', 'starting', 'running', 'backoff', 'stopping', 'exited', 'fatal', 'unknown' );
 
 # the values that are not a status mapping, without the _val, that parse_mappings knows of
 my @OTHER_VALS = ( 'not_running', 'config_missing', 'config_dir_missing', 'config_dir_nonreadable', 'status_error' );
+
+# the statuses that restart acts on and the supervisorctl action for each, backoff needing
+# restart as start considers it already started
+my %RESTART_ACTIONS = (
+	stopped => 'start',
+	exited  => 'start',
+	fatal   => 'start',
+	backoff => 'restart',
+);
 
 =head1 SYNOPSIS
 
@@ -80,6 +90,19 @@ Initiates the object.
         default :: /usr/local/etc/supervisor/conf.d
         default Linux :: /etc/supervisor/conf.d
 
+    - restart :: Boolean for if items that are stopped, exited, fatal, or
+            backoff should be restarted. Ignored items are not touched.
+        default :: 0
+
+    - add_configs :: Boolean for if configs that are not running should be
+            added via 'supervisorctl reread' and 'supervisorctl add'. Requires
+            config_check. Ignored configs and ignored items are not touched.
+        default :: 0
+
+Restarting or adding does not change the exit value. It is worked out from
+how things were before, so a stopped item that was restarted is still
+alerted on, letting what is monitoring it know it was restarted.
+
 =cut
 
 sub new {
@@ -108,6 +131,8 @@ sub new {
 		config_dir_nonreadable_val => 3,
 		status_error_val           => 3,
 		config_check               => 0,
+		restart                    => 0,
+		add_configs                => 0,
 		ignore                     => {},
 		config_ignore              => {},
 		config_dir                 => '/usr/local/etc/supervisor/conf.d',
@@ -185,11 +210,17 @@ sub new {
 		} ## end foreach my $status ( keys( %{ $opts{status_mapping...}}))
 	} ## end if ( defined( $opts{status_mapping} ) )
 
-	if ( defined( $opts{config_check} ) ) {
-		if ( ref( $opts{config_check} ) ne '' ) {
-			die( '$opts{config_check} is not of ref type "" but "' . ref( $opts{config_check} ) . '"' );
+	foreach my $boolean ( 'config_check', 'restart', 'add_configs' ) {
+		if ( defined( $opts{$boolean} ) ) {
+			if ( ref( $opts{$boolean} ) ne '' ) {
+				die( '$opts{' . $boolean . '} is not of ref type "" but "' . ref( $opts{$boolean} ) . '"' );
+			}
+			$self->{$boolean} = $opts{$boolean};
 		}
-		$self->{config_check} = $opts{config_check};
+	}
+
+	if ( $self->{add_configs} && !$self->{config_check} ) {
+		die('$opts{add_configs} requires $opts{config_check}');
 	}
 
 	if ( defined( $opts{config_dir} ) ) {
@@ -266,7 +297,21 @@ been ran by something else. If not given, 'supervisorctl status' is ran.
 
     - status_output :: The output of 'supervisorctl status'.
 
+    - command :: A code ref for running supervisorctl for restart and
+            add_configs. It is passed the args for supervisorctl, such as
+            ( 'start', 'foo' ), and returns its exit code and its stdout and
+            stderr together. If it dies, run dies.
+        default :: runs supervisorctl from the path, without a shell
+
     my $results=$check_supervisorctl->run( status_output => $output );
+
+    my $results = $check_supervisorctl->run(
+        command => sub { return $check->run_command( '/usr/local/bin/supervisorctl', @_ ) },
+    );
+
+A supervisorctl command is considered to have failed if it exits non-zero or
+its output contains 'ERROR', as older versions of supervisorctl exit zero on
+failure.
 
 The returned data is as below.
 
@@ -303,6 +348,19 @@ The returned data is as below.
     - .status_errors[] :: Lines from 'supervisorctl status' that were not a item and status,
             such as when it can not talk to supervisord.
 
+    - .restart :: If it was told to restart items.
+
+    - .restarted[] :: A array of items restarted.
+
+    - .restart_failed[] :: A array of items that restarting failed for.
+
+    - .add_configs :: If it was told to add configs that are not running.
+
+    - .added[] :: A array of configs added.
+
+    - .add_failed[] :: A array of configs that adding failed for, including
+            all of them if 'supervisorctl reread' failed.
+
     - .results[] :: A descriptive a array of the results of the check.
 
 =cut
@@ -327,8 +385,19 @@ sub run {
 		config_dir_readable => 1,
 		status_list         => { map { $_ => [] } @STATUSES },
 		status_errors       => [],
+		restart             => $self->{restart},
+		restarted           => [],
+		restart_failed      => [],
+		add_configs         => $self->{add_configs},
+		added               => [],
+		add_failed          => [],
 		results             => []
 	};
+
+	my $command = $opts{command};
+	if ( !defined($command) ) {
+		$command = \&_run_supervisorctl;
+	}
 
 	my $output = $opts{status_output};
 	if ( !defined($output) ) {
@@ -369,6 +438,26 @@ sub run {
 			$self->{val_to_string}{ $self->{status_mapping}{$status} } . ' - ' . $name . ', ' . $status
 		);
 	} ## end foreach my $line ( split( /\n/, $output ) )
+
+	# restart anything not running, ignored items never made it into status
+	if ( $self->{restart} ) {
+		foreach my $name ( sort( keys( %{ $to_return->{status} } ) ) ) {
+			my $status = $to_return->{status}{$name};
+			my $action = $RESTART_ACTIONS{$status};
+			if ( !defined($action) ) {
+				next;
+			}
+			my ( $worked, $action_output ) = _supervisorctl_action( $command, $action, $name );
+			if ($worked) {
+				push( @{ $to_return->{restarted} }, $name );
+				push( @{ $to_return->{results} },   'RESTARTED - ' . $name . ', ' . $status );
+			} else {
+				push( @{ $to_return->{restart_failed} }, $name );
+				push( @{ $to_return->{results} },
+					'RESTART FAILED - ' . $name . ', ' . $status . ': ' . $action_output );
+			}
+		} ## end foreach my $name ( sort( keys( %{ $to_return->{...}})))
+	} ## end if ( $self->{restart} )
 
 	# check the config dir only if asked to
 	if ( $self->{config_check} ) {
@@ -446,8 +535,107 @@ sub run {
 		} ## end else [ if ( -d $self->{config_dir} ) ]
 	} ## end if ( $self->{config_check} )
 
+	# add configs that are not running, ignored ones never made it into config_not_running
+	if ( $self->{add_configs} && defined( $to_return->{config_not_running}[0] ) ) {
+		# supervisord has to reread the configs before it knows of new ones
+		my ( $reread_worked, $reread_output ) = _supervisorctl_action( $command, 'reread' );
+		foreach my $config ( @{ $to_return->{config_not_running} } ) {
+			my $worked;
+			my $add_output;
+			if ($reread_worked) {
+				( $worked, $add_output ) = _supervisorctl_action( $command, 'add', $config );
+			} else {
+				$add_output = 'reread failed: ' . $reread_output;
+			}
+			if ($worked) {
+				push( @{ $to_return->{added} },   $config );
+				push( @{ $to_return->{results} }, 'ADDED - config ' . $config );
+			} else {
+				push( @{ $to_return->{add_failed} }, $config );
+				push( @{ $to_return->{results} },    'ADD FAILED - config ' . $config . ': ' . $add_output );
+			}
+		} ## end foreach my $config ( @{ $to_return->{config_not_running...}})
+	} ## end if ( $self->{add_configs} && defined( $to_return...))
+
 	return $to_return;
 } ## end sub run
+
+# The default command for run, for running supervisorctl for restart and
+# add_configs. Runs supervisorctl from the path without a shell, so names
+# taken from config file names can not do anything funny, with stdout and
+# stderr together.
+#
+# Args...
+#
+#     - @args :: The args for supervisorctl, such as ( 'start', 'foo' ).
+#
+# Returns the exit code and the output. If supervisorctl can not be ran,
+# the exit is 127 and the output says why. Killed by a signal is 128 plus
+# the signal. A fork failing is a exit of -1.
+#
+# Example...
+#
+#     my ( $exit, $output ) = _run_supervisorctl( 'start', 'foo' );
+#     # ( 0, "foo: started\n" )
+sub _run_supervisorctl {
+	my (@args) = @_;
+
+	my $pid = open( my $output_fh, '-|' );
+	if ( !defined($pid) ) {
+		return ( -1, 'can not fork for supervisorctl, ' . $! );
+	}
+	if ( !$pid ) {
+		open( STDERR, '>&', \*STDOUT );
+		{ no warnings 'exec'; exec( {'supervisorctl'} 'supervisorctl', @args ); }
+		# syswrite and _exit, as the buffers and END blocks are the parent's
+		syswrite( STDOUT, 'can not run supervisorctl, ' . $! );
+		POSIX::_exit(127);
+	}
+
+	my $output = do { local $/; <$output_fh> };
+	close($output_fh);
+	if ( !defined($output) ) {
+		$output = '';
+	}
+
+	# killed by a signal is 128 plus it, as the shell does, so it is not mistaken for 0
+	if ( $? & 127 ) {
+		return ( 128 + ( $? & 127 ), $output );
+	}
+
+	return ( $? >> 8, $output );
+} ## end sub _run_supervisorctl
+
+# Runs a supervisorctl action through the command code ref given to run and
+# works out if it worked. Older versions of supervisorctl exit zero even on
+# failure, so output containing ERROR is a failure as well.
+#
+# Args...
+#
+#     - command :: The code ref to run it via, as taken by run.
+#
+#     - @args :: The args for supervisorctl, such as ( 'add', 'foo' ).
+#
+# Returns a boolean for if it worked and the output with all whitespace,
+# newlines included, squashed to single spaces and trimmed, for use in a
+# result line.
+#
+# Example...
+#
+#     my ( $worked, $output ) = _supervisorctl_action( $command, 'start', 'foo' );
+#     # ( 0, 'foo: ERROR (spawn error)' )
+sub _supervisorctl_action {
+	my ( $command, @args ) = @_;
+
+	my ( $exit, $output ) = $command->(@args);
+	if ( !defined($output) ) {
+		$output = '';
+	}
+	$output =~ s/\s+/ /g;
+	$output =~ s/^ | $//g;
+
+	return ( ( $exit == 0 && $output !~ /ERROR/ ), $output );
+} ## end sub _supervisorctl_action
 
 # raises the exit value in the passed results hash if the new one is higher
 sub _raise_exit {

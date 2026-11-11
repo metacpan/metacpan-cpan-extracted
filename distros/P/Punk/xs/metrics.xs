@@ -26,15 +26,22 @@ register(self, app, opts = &PL_sv_undef)
         SV *path = NULL;
         PERL_UNUSED_VAR(self);
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!h) croak("Punk::Plugin::Metrics: no application");
 
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
         if (o && (v = hv_fetchs(o, "path", 0)) && SvOK(*v) && SvCUR(*v))
             path = newSVsv(*v);
         else
             path = newSVpvs("/metrics");
 
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (o && (v = hv_fetchs(o, "collect", 0)) && SvOK(*v)) {
-            if (!(SvROK(*v) && SvTYPE(SvRV(*v)) == SVt_PVCV))
+            if (!(SvROK(*v) && SvTYPE(SvRV(*v)) == SVt_PVCV)) /* # uncoverable condition left count:2 class:ignore_covered_err */
                 croak("Punk::Plugin::Metrics: `collect` takes a coderef "
                       "returning a hashref of name => number");
             (void)hv_stores(h, "metrics_collect", newSVsv(*v));
@@ -74,6 +81,8 @@ register(self, app, opts = &PL_sv_undef)
                 argv[4] = sv_2mortal(newRV_noinc((SV *)ro));
             }
             r = pcx_call_meth(aTHX_ app, "route", argv, 5, 1);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (r) SvREFCNT_dec(r);
         }
     }

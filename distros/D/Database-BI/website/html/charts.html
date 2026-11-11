@@ -112,7 +112,7 @@
 		</tr>
 		<tr>
 			<td><code>/map</code></td>
-			<td>OpenStreetMap map with clustered markers, an optional heat layer, bubbles and colour rules.</td>
+			<td>OpenStreetMap map with clustered markers, an optional heat layer, county outlines, bubbles and colour rules.</td>
 			<td>see <a href="#maps">Maps</a></td>
 		</tr>
 		<tr>
@@ -208,6 +208,13 @@
 		address and country joined with a comma, leaving out an empty cell. The
 		map panel's <em>Followed by</em> field does the same.
 	</dd>
+	<dt><code>loc_text=&lt;text&gt;</code></dt>
+	<dd>
+		Text added to the end of every place before it is looked up, after a
+		comma: a column of county names with <code>loc_text=Virginia, USA</code>
+		looks up <q>Accomack, Virginia, USA</q>. A row with no place is still not
+		looked up. The map panel's <em>Add to each place</em> field.
+	</dd>
 	<dt><code>popup=&lt;col&gt;</code></dt>
 	<dd>
 		A column shown in the marker popup; repeatable. By default the popup
@@ -223,6 +230,54 @@
 	<dd>A named tile source from the <code>tile_sources</code> configuration key, for a tile server on your own network.</dd>
 	<dt><code>heat=1</code>, <code>weight=&lt;col&gt;</code></dt>
 	<dd>A heat layer over the markers, optionally weighted by a numeric column.</dd>
+	<dt><code>bounds=county</code></dt>
+	<dd>
+		The outline of the county each marker is in, with a checkbox on the map
+		to hide them; the map panel's <em>Show county boundaries</em>. The
+		outlines come from OpenStreetMap, which is sent each marker's position
+		rounded to about 100 metres, and are remembered, so a later map asks
+		again only for a point outside every outline it has. Those not known yet
+		are looked up after the page is shown, with the same progress bar as
+		places. A county is the division of a country below its states: a US
+		county or independent city, an English county, a German
+		<em>Landkreis</em>, a French <em>d&eacute;partement</em>; a district in
+		India and Bangladesh, a prefecture in China, a province in Spain, a county
+		in Kenya. Australia, Brazil and Japan have nothing at that level, so they
+		have no outlines. <code>map_bounds_ranks</code> in the configuration sets
+		it for other countries. With <code>heat=1</code> the outlines are
+		coloured by what is in each, green for the least and red for the most:
+		the <code>weight</code> column added up over the rows inside, or the rows
+		counted. Each step up the colours is the same multiple, so totals of about
+		the same size share a colour; a lone outline stays grey. Each outline's popup gives its total, and a key in the corner of
+		the map (with HTML::OSM 0.16) lists each colour with the totals it
+		covers; it hides with the outlines. When the markers are coloured
+		(<code>color=</code>) the outlines take their colours instead; with HTML::OSM
+		0.17 each coloured outline is drawn just inside its own edge, so two
+		neighbours of different colours show side by side along their border, and a
+		county whose markers differ gets a line of each colour, the commonest
+		outermost.
+	</dd>
+	<dt>Under a map with outlines</dt>
+	<dd>When there are fewer outlines than markers, a list under the map says why:
+		each outline holding more than one marker, with its places, and the markers
+		in no outline, each with a link to its rows in the table. Places looked up
+		by name can land in the wrong outline when a name is ambiguous, and show up
+		here. While some places still have no outline, the note above the map links
+		to their rows and to looking the outlines up again.
+	</dd>
+	<dt><code>shade=&lt;col&gt;</code>, with <code>bounds=county</code></dt>
+	<dd>Colour shade: fills each outline in a shade of one colour, darker for a
+		larger total of that column over the rows inside it, as a census map is
+		drawn. <code>shade_color=</code> (a colour name or <code>#rrggbb</code>)
+		chooses the colour, orange by default. A key on the map lists the shades
+		with the totals each covers (as filled boxes with HTML::OSM 0.18), and a
+		click anywhere in an outline gives its total. When the markers are coloured
+		and no <code>shade_color=</code> is given, each outline is shaded in its
+		markers' colour, stronger the further its total is into that colour's
+		rule: under <code>color_rule=lt:20000:green</code> the smallest county is
+		the greenest. In the map panel it is
+		Colour shade, under Show county boundaries.
+	</dd>
 	<dt><code>size=&lt;col&gt;</code></dt>
 	<dd>Markers become circles with a radius from a numeric column.</dd>
 	<dt><code>color=&lt;col&gt;</code> with <code>color_rule=op:value:colour</code></dt>

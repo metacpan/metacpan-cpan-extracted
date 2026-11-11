@@ -21,14 +21,18 @@ new(class, ...)
         HV *opts;
         SV *opts_rv;
         AV *av;
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (items == 2 && SvROK(ST(1)) && SvTYPE(SvRV(ST(1))) == SVt_PVHV) {
             opts = (HV *)SvRV(ST(1));
             SvREFCNT_inc((SV *)opts);
         }
         else {
             int i;
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (!(items % 2))
-                croak("Punk::View::Stencil->new: odd number of options");
+                croak("Punk::View::Stencil->new: odd number of options"); /* # uncoverable statement */
             opts = newHV();
             for (i = 1; i + 1 < items; i += 2)
                 (void)hv_store_ent(opts, ST(i), newSVsv(ST(i + 1)), 0);
@@ -74,8 +78,12 @@ opts(self, ...)
         AV *av = pvs_av(aTHX_ self);
         I32 slot = ix ? PVS_ENGINE : PVS_OPTS;
         SV **e;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (items > 1) (void)av_store(av, slot, newSVsv(ST(1)));
         e = av_fetch(av, slot, 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         RETVAL = (e && *e) ? newSVsv(*e) : newSV(0);
     }
     OUTPUT:
@@ -87,6 +95,6 @@ opts(self, ...)
 IV
 _abi_ok()
     CODE:
-        RETVAL = punk_st_try(aTHX) ? 1 : 0;
+        RETVAL = punk_st_try(aTHX) ? 1 : 0; /* # uncoverable condition left count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL

@@ -1,13 +1,13 @@
 #!/usr/bin/env perl
-use v5.38;
-use lib ('../lib', 'lib');
+use v5.38;                          ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
+use lib ( '../lib', 'lib' );
 use Test2::V0 '!call';
-no warnings 'redefine';
-no warnings 'prototype';
+no warnings 'redefine';             ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+no warnings 'prototype';            ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 use Logic::Relational qw(variable call all);
 use Logic::Relational::Program;
 use feature 'try';
-no warnings 'experimental::try';
+no warnings 'experimental::try';    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
 
 # 1. Test temporary facts with `with_facts`
 my $p = Logic::Relational::Program->new;
@@ -87,10 +87,10 @@ is(
 # 3. Test expiring facts with `assert_fact`
 my $p2 = Logic::Relational::Program->new;
 
-# Asserts a fact that expires in 1 second
+# Asserts a fact that expires in 2 seconds
 $p2->assert_fact(
     term       => [ carrying => 'bob', 'rope' ],
-    expires_in => 1,
+    expires_in => 2,
 );
 
 # Asserts a fact that is already expired (expires_at in the past)
@@ -103,12 +103,15 @@ $p2->assert_fact(
 my $item          = variable('item');
 my $q_carrying1   = $p2->query( call( carrying => $who, $item ) );
 my $sol_carrying1 = $q_carrying1->next;
-is( $sol_carrying1->value($who),  'bob',  'Bob is carrying rope' );
-is( $sol_carrying1->value($item), 'rope', 'Item is rope' );
+ok( $sol_carrying1, 'Bob carrying rope solution found before expiration' );
+if ($sol_carrying1) {
+    is( $sol_carrying1->value($who),  'bob',  'Bob is carrying rope' );
+    is( $sol_carrying1->value($item), 'rope', 'Item is rope' );
+}
 ok( !$q_carrying1->next, 'Alice is not found because her fact is expired' );
 
-# Wait 2 seconds for bob's fact to expire
-sleep 2;
+# Wait 3 seconds for bob's fact to expire
+sleep 3;
 
 # Query again - no solutions should be found since bob's fact has now expired
 my $q_carrying2 = $p2->query( call( carrying => $who, $item ) );
@@ -123,16 +126,16 @@ $p3->on_change(
     }
 );
 
-# Assert an expiring fact
+# Assert an expiring fact (expires in 2 seconds)
 $p3->assert_fact(
     term       => [ carrying => 'bob', 'rope' ],
-    expires_at => time + 1,
+    expires_at => time + 2,
 );
 is( scalar(@events),       1,        'Assert event received' );
 is( $events[0]->operation, 'assert', 'Event operation is assert' );
 
 # Wait for expiration
-sleep 2;
+sleep 3;
 
 # Prune database
 my $pruned = $p3->cleanup_expired_facts;

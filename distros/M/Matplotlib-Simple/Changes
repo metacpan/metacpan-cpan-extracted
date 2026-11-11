@@ -1,5 +1,37 @@
 Revision history for Matplotlib-Simple
 
+0.3343 2026-11-09 CST (Claude Fable 5.2 helped)
+
+ [New]
+
+ - `dpi => 300` saves the figure at 300 dots per inch. It is a keyword of the figure, given at the top level of a single plot or beside `plots` or `p`, and is handed to matplotlib's `savefig`; without it the file is saved at matplotlib's own resolution, as before. It must be a finite number above 0, and is refused by name in a subplot or an `add` graph. The gnuplot and ggplot2 engines do not draw it, and say so. Until now `dpi` died in the script (see below), and `set_dpi => 300`, the Figure method beside it, was written and ran but left the file as it was, since `savefig` takes the resolution the figure was made with (matplotlib 3.11.2).
+
+ [Fixed]
+
+ - A figure can be saved as `.jpg`, `.jpeg`, `.tif`, `.tiff`, `.webp`, `.gif` or `.pgf` again. Every one of them died in the script, as "ValueError: metadata not supported for format 'jpeg'" or its like, and no file was written: the note of where a figure came from was handed to `savefig` whatever the format, and matplotlib refuses it for the formats that have nowhere to keep one. Those are now saved without the note. `.png`, `.pdf`, `.svg`, `.svgz`, `.eps` and `.ps` carry it as before, as does a name with no extension, which matplotlib saves as a PNG. Seen with matplotlib 3.11.2.
+
+ - 65 keywords that could never have run are refused as unknown keywords, with the keywords each resembles, rather than written into the script. The lists of Axes, Figure and pyplot methods held attributes, modules and constants beside the methods, and every keyword in them is written as a call, so `dpi => 300` passed the keyword check and became `fig.dpi(300)`, "TypeError: 'float' object is not callable". `dpi` is now a keyword of its own (above); the others, `xaxis`, `yaxis`, `spines`, `zorder`, `rcParams`, `np`, `cm` and their like, are refused. The methods are all still accepted.
+
+ - What a script writes to STDERR as it runs is shown when the script succeeds, and not only when it fails. matplotlib's warnings about a figure it did write, such as "Data has no positive values, and therefore cannot be log-scaled", were captured and dropped, so nothing said that the figure was not the one asked for. They are printed to STDERR as they came. A figure drawn without a warning prints nothing more than it did.
+
+ - An `add` inside an `add` graph is refused: `"add" graph 0 has an "add" of its own, which is not drawn`. The matplotlib engine left the inner graphs out of the figure without a word, where gnuplot and ggplot2 refused them, less plainly. Every graph of a subplot goes in the one `add`.
+
+ - `barh` with `yerr` as a hash, and `bar` with `xerr` as one, are drawn. Both died in the script as "ConversionError: Failed to convert value(s) to axis units": such an error bar lies along the axis of labels, where matplotlib takes one number per bar and not a lower and an upper row, and the hash form always wrote two rows. Two rows that are equal are now written as one. Two that differ are refused by name, with the keyword that draws an error in the bars' own direction. A grouped plot, and an error bar along the bars, are as they were.
+
+ - `engine => 'gnuplot'` refuses `bins => 'auto'`, or any other name of a numpy estimator, as it refuses every other "bins" it cannot draw: `"bins" is a whole number of bins, or an array of their edges, for the gnuplot engine, not "auto"`. It died as `Argument "auto" isn't numeric in numeric gt (>)`, from arithmetic that ran before the check.
+
+ - A scatter's `color_key` that is not a key of the data is named: `"Missing" isn't defined for this scatter`, or `for set "S"`. With three keys in the data it was reported as `needs one key for x and one for y, but "keys" and "color_key" leave the 3 above`, which did not say which keyword was wrong. The matplotlib and ggplot2 engines both did so. `t/04.options.t` expected the name, and found it only in the stack trace under the message, which prints the arguments of the call; it now reads the message alone.
+
+ - A mistyped `show`, `output_file` or `plot_type` is named, with the keyword it resembles: `"shoxw" isn't defined for plot_type "bar", perhaps you meant one of these defined keywords: (show)`. With no `output_file` beside it, `shoxw => 1` died as `either "show" or "output_file" must be defined`, which did not say that `show` had been given, mistyped; `outputfile` died the same way, and `plot_typ` as `either "plot_type" or "plots" must be defined`. What was missing was looked for before any keyword was checked, and is now looked for after. A call whose keywords are all known, and which lacks one of them, dies with the same messages as before. The module was at fault; block 9 of `t/20.review.fixes.0.3342.t` is the 6 tests of it.
+
+0.3342 2026-11-06 CST (Claude Opus 5.5 helped)
+
+ [Documentation]
+
+ - The POD and README now warn, under the options that are passed through as Python, never to pass untrusted text to an option. Text that reads as Python is written into the script as Python, so a `title` or label built from someone else's text can run code, and `legend`, `text` and the other options passed through as written are never quoted at all. The keys of `data` are always escaped and are the place for such text.
+ - The "Engines" section now shows the same figure, a `bar`, a `boxplot`, a `hist` and a `plot` in four subplots, drawn by matplotlib, gnuplot and ggplot2, with the call that draws it, so that the look of each engine's default style can be seen before choosing one.
+ - The example for `cblabel` in the colorbar table is now `cblabel => 'kJ/mol'`; it was `cblabel => 1`, which is not a label.
+
 0.3341 2026-11-04 CST (Claude Opus 5.5 helped)
 
  [Fixed]

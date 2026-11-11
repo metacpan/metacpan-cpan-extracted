@@ -180,16 +180,16 @@ DBIx::Squirrel::st - DBIx::Squirrel's statement handle class
 =head1 DESCRIPTION
 
 A statement handle prepared on a DBIx::Squirrel database handle is
-blessed into this class, a subclass of the DBI's C<DBI::st>, so it does
-everything a DBI statement handle does. It also inherits
+blessed into this class. It's a subclass of the DBI's C<DBI::st>, so it
+does everything a DBI statement handle does. It also inherits
 L<DBIx::Squirrel/pipe> and L<DBIx::Squirrel/tap> from
 L<DBIx::Squirrel::Pipes>.
 
 =head2 Lists
 
 A placeholder with C<...> before it, such as C<...?>, C<...$1> or
-C<...:ids>, takes a list, as L<DBIx::Squirrel::db/prepare> describes. The
-list is the value for its placeholder, a reference to an array of plain
+C<...:ids>, takes a list. See L<DBIx::Squirrel::db/prepare>. The list
+is the value for its placeholder: a reference to an array of plain
 values, given as any other value is:
 
     $dbh->selectall_arrayref('SELECT * FROM artist WHERE id IN (...:ids)',
@@ -197,16 +197,16 @@ values, given as any other value is:
     $dbh->selectall_arrayref('SELECT * FROM artist WHERE name = ? OR id IN (...?)',
         'Abba', [1, 2, 3]);
 
-To a statement taking one value, a list, a single array reference is the
-list, not the values in it, so C<[1, 2, 3]> is a list of three values,
-and C<[[1, 2, 3]]> croaks, as a list holds plain values.
+Given to a statement whose one value is a list, a single array
+reference is the list, not the values in it. So C<[1, 2, 3]> is a list
+of three values. C<[[1, 2, 3]]> croaks, as a list holds plain values.
 
-The statement is prepared for the values it's given, and its handle for
-lists of those lengths. Executed or bound again, its lists must each
-have as many values, or it croaks; an iterator's
-L<DBIx::Squirrel::Iterator/reset> prepares the statement again, on a new
-handle, when a list has a different number. L</bind_param> binds each
-value in a list to a position of its own.
+The statement is prepared for the values it's given, so its handle is
+for lists of those lengths. Executed or bound again, each list must
+have as many values, or it croaks. An iterator's
+L<DBIx::Squirrel::Iterator/reset> prepares the statement again, on a
+new handle, when a list has a different number. L</bind_param> binds
+each value in a list to a position of its own.
 
 =head1 METHODS
 
@@ -218,9 +218,9 @@ value in a list to a position of its own.
     $sth = $sth->bind(\%values);
 
 Binds values to the statement's placeholders, as L</execute> does,
-without executing it, and returns the statement handle, or nothing if
-the DBI couldn't bind a value. How the values are matched to
-placeholders depends on the statement's style of placeholder:
+without executing it. Returns the statement handle, or nothing if the
+DBI couldn't bind a value. How values are matched to placeholders
+depends on the statement's style of placeholder:
 
 =over
 
@@ -248,13 +248,20 @@ the sigil. There must be a value for each name, and no other:
 
 A single array reference stands for the values in it, so
 C<< $sth->bind([1, 2]) >> is C<< $sth->bind(1, 2) >>. There are two
-exceptions, each for a statement taking one value. To one whose value is
-a list, as described in L</Lists>, the array reference is the list.
-L<DBD::Pg> binds an array reference as a PostgreSQL array, so, with
-DBD::Pg, an array reference given to a statement taking one value, such
-as C<SELECT * FROM artist WHERE id = ANY(?)>, is that value, as it would
-be with the DBI. Through another driver, such as DBD::ODBC, it's
+exceptions, each for a statement taking one value:
+
+=over
+
+=item * If its value is a list, as described in L</Lists>, the array
+reference is the list.
+
+=item * L<DBD::Pg> binds an array reference as a PostgreSQL array. So,
+with DBD::Pg, an array reference given to a statement taking one value,
+such as C<SELECT * FROM artist WHERE id = ANY(?)>, is that value, as it
+would be with the DBI. Through another driver, such as DBD::ODBC, it's
 unwrapped as usual, as the driver can't bind arrays.
+
+=back
 
 =head2 bind_param
 
@@ -263,11 +270,12 @@ unwrapped as usual, as the driver can't bind arrays.
     $rv = $sth->bind_param($placeholder, $value, $bind_type);
 
 Binds a value, as the DBI's C<bind_param> does, and returns what it
-returns. The placeholder can be given by number, for numbered
-placeholders, or by name, with or without its sigil, for named ones, and
-the value is bound to every use of it in the statement. A statement with
-named placeholders can also be bound by position, as with the DBI. The
-value for a list placeholder is its list, each value of which is bound
+returns. A numbered placeholder is given by number, and a named one by
+name, with or without its sigil. The value is bound to every use of it
+in the statement. A statement with named placeholders can also be bound
+by position, as with the DBI.
+
+The value for a list placeholder is its list. Each value in it is bound
 to a position of its own, with the same C<\%attr> or C<$bind_type>.
 
 =head2 execute
@@ -282,32 +290,33 @@ Executes the statement, as the DBI's C<execute> does, and returns what
 it returns. Values given are bound first, as L</bind> binds them.
 
 A statement with numbered or named placeholders, executed without
-values, croaks unless each placeholder has a value bound already, by
-L</bind>, L</bind_param> or an earlier C<execute>, as the DBI keeps
-them. The DBI would leave it unbound, which most drivers read as
-C<NULL>.
+values, croaks unless each placeholder already has a value bound. The
+value can come from L</bind>, L</bind_param> or an earlier C<execute>,
+as the DBI keeps them. The DBI would leave the placeholder unbound,
+which most drivers read as C<NULL>.
 
 The DBI doesn't finish a statement still active from an earlier
-C<execute> before executing it again, and nor does C<execute>, unless the
-C<ekorn_finish_active> attribute is true. It can be set for every
-statement of a database handle, passed to L<DBIx::Squirrel/connect>, or
-for one statement, passed to L<DBIx::Squirrel::db/prepare>.
+C<execute> before executing it again. Nor does C<execute>, unless the
+C<ekorn_finish_active> attribute is true. Pass it to
+L<DBIx::Squirrel/connect> to set it for every statement of a database
+handle, or to L<DBIx::Squirrel::db/prepare> for one statement.
 
 =head2 iterate
 
     $it = $sth->iterate(@bind_values, @stages);
 
-Returns a L<DBIx::Squirrel::Iterator>, an iterator over the statement's
-results, executed with C<@bind_values>, in any form L</execute> takes,
-and run through C<@stages>, the code references at the end of the
-arguments. The statement is executed when the first result is asked for.
+Returns a L<DBIx::Squirrel::Iterator> over the statement's results.
+The statement is executed with C<@bind_values>, in any form
+L</execute> takes, when the first result is asked for. Each row is run
+through C<@stages>, the code references or pipelines at the end of the
+arguments.
 
 =head2 results
 
     $results = $sth->results(@bind_values, @stages);
 
-Returns a L<DBIx::Squirrel::Results>, as L</iterate> does, whose rows
-are objects with a method for each column.
+As L</iterate>, returning a L<DBIx::Squirrel::Results>, whose rows are
+objects with a method for each column.
 
 =head1 DIAGNOSTICS
 
@@ -335,13 +344,13 @@ values when some had none bound.
 =item Expected a reference to an ARRAY for a list (%s)
 
 The value given for a list placeholder, named with its C<...>, wasn't a
-list: it was a plain value, C<undef>, or a reference to something other
-than an array.
+list. It was a plain value, C<undef>, or a reference to something
+other than an array.
 
 =item Expected at least one value in a list (%s)
 
-The list given for a list placeholder was empty. C<IN ()> isn't SQL, so
-an empty list is for the caller to deal with.
+The list given for a list placeholder was empty. C<IN ()> isn't SQL,
+so the caller must deal with an empty list.
 
 =item Expected plain values in a list (%s)
 
@@ -351,9 +360,9 @@ given, as in C<[[1, 2]]> to a statement whose one value is a list.
 =item Expected %d values in a list, as prepared, not %d (%s)
 
 A statement handle prepared for a list of one length was executed or
-bound with a list of another. Execute the statement through
-L<DBIx::Squirrel::db>'s methods, or reset its iterator, to prepare it
-again.
+bound with a list of another. To prepare it again, execute the
+statement through L<DBIx::Squirrel::db>'s methods, or reset its
+iterator.
 
 =back
 

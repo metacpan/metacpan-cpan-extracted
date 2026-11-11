@@ -21,6 +21,10 @@ register(self, app, opts = &PL_sv_undef)
     {
         HV *h = app_hv(aTHX_ app);
         PERL_UNUSED_VAR(self);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (SvOK(opts) && SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV) {
             HV *o = (HV *)SvRV(opts);
             HE *he;

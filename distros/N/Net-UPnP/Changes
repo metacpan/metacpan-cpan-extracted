@@ -1,5 +1,22 @@
 Revision history for Perl extension UPnP.
 
+2026-11-11 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.9
+	* Thanks for MIZUNUMA Yuto
+	* GW::Gateway falls back to the WANPPPConnection service when a router has no
+	  WANIPConnection, so dial-up (PPPoE/PPPoA) routers work (RT #60372).
+	* Add GW::Gateway connection_service_type option, setconnectionservicetype(),
+	  getconnectionservice(), getconnectionservicetype(), getstatusinfo(),
+	  getconnectiontypeinfo() and getlinklayermaxbitrates().
+
+2026-11-11 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.8
+	* Fix Device::getservicelist() croaking when the description has no <serviceList> (RT #75747).
+	* Service::getposturl() now uses the URL passed by the caller, falling back to controlURL,
+	  and always puts exactly one "/" between the host and a relative controlURL (RT #21076).
+	* Send HTTP requests as HTTP/1.1 (with Host and Connection: close) for devices that reject HTTP/1.0 (RT #88755).
+	* Declare the BSD license in Makefile.PL so the distribution metadata is no longer "unknown".
+
 2026-11-09 Satoshi Konno <skonno@cybergarage.org>
 	* v1.4.7
 	* Security hardening (see docs/network-limits.md and docs/device-and-media-safety.md):

@@ -1,5 +1,5 @@
 package Gears;
-$Gears::VERSION = '0.104';
+$Gears::VERSION = '0.105';
 ###################################################
 # ~~~~~~~~~~ We fear not our mortality ~~~~~~~~~~ #
 # ~~~~ We'll serve to the best of our ability ~~~ #
@@ -11,12 +11,16 @@ use v5.40;
 
 # TODO: replace with load_module when it stabilizes
 use Module::Load qw(load);
+use Encode qw(encode decode find_encoding);
 
 # TODO: replace with export_lexically when it stabilizes
 use Exporter qw(import);
 our @EXPORT_OK = qw(
 	load_component
 	get_component_name
+	effective_charset
+	charset_encode
+	charset_decode
 );
 
 sub load_component ($package)
@@ -35,6 +39,23 @@ sub load_component ($package)
 sub get_component_name ($package, $base)
 {
 	return "${base}::${package}" =~ s{^.+\^}{}r;
+}
+
+sub effective_charset ($this_charset)
+{
+	return find_encoding($this_charset) ? $this_charset : undef;
+}
+
+sub charset_encode ($charset, $string)
+{
+	return $string unless defined $charset;
+	return encode $charset, $string;
+}
+
+sub charset_decode ($charset, $string)
+{
+	return $string unless defined $charset;
+	return decode $charset, $string;
 }
 
 __END__
@@ -93,7 +114,7 @@ This package uses exporter and imports no symbols by default.
 
 =head2 load_component
 
-	my $class = load_component($package);
+	$class = load_component($package)
 
 Loads a component class if it hasn't been loaded yet and returns the package
 name. Uses a state cache to ensure each package is only loaded once.
@@ -106,13 +127,37 @@ Returns the package name after ensuring it's loaded.
 
 =head2 get_component_name
 
-	my $name = get_component_name($package, $base);
+	$name = get_component_name($package, $base)
 
 Glues a name of a component which is a subclass of C<$base>. C<$package> will
 be joined together with C<$base> to form a full namespace, allowing short names
 of the components to be used, for example in configuration. If C<$package>
 starts with C<^> character, then C<$base> will not be included in the final
 component name at all.
+
+=head2 effective_charset
+
+	$charset = effective_charset($charset_name)
+
+Takes a charset name and returns back if it is supported by Encode. If there is
+no charset or it isn't supported, undef will be returned. Useful to determine
+whether user-provided charset can be used.
+
+=head2 charset_encode
+
+	$encoded = charset_encode($charset, $string)
+
+Encodes C<$string> using C<$charset>. Unlike Encode, if C<$charset> is
+undefined, C<$string> is returned unchanged. Useful to encode using
+user-provided charset together with L</effective_charset>.
+
+=head2 charset_decode
+
+	$decoded = charset_decode($charset, $string)
+
+Decodes C<$string> using C<$charset>. Unlike Encode, if C<$charset> is
+undefined, C<$string> is returned unchanged. Useful to decode using
+user-provided charset together with L</effective_charset>.
 
 =head1 SEE ALSO
 

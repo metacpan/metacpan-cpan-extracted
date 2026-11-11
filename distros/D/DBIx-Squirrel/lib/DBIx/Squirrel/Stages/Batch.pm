@@ -31,10 +31,10 @@ DBIx::Squirrel::Stages::Batch - stages gathering values: batch and collect
 
 DBIx::Squirrel's name for L<Ekorn::Pipeline::Stages::Batch>, which
 describes its stages in full. It exports C<batch> and C<collect> by
-default, or with C<:all>: Ekorn's functions, from a list of
+default, or with C<:all>. They're Ekorn's functions, from a list of
 DBIx::Squirrel's own, so a stage added there reaches this module only
-once it's listed here. It's here to stay, beside DBIx::Squirrel's own
-stages, such as L<DBIx::Squirrel::Stages::Rows>.
+once it's listed here. The module is here to stay, beside
+DBIx::Squirrel's own stages, such as L<DBIx::Squirrel::Stages::Rows>.
 
 =head1 SEE ALSO
 

@@ -768,6 +768,24 @@ subtest q(refill option) => sub {
     like($out, qr/^greple .*refill=1/m, q(other themes leave default[refill]));
 };
 
+subtest q(pane option with rows) => sub {
+    my $run = sub { my $opt = shift; scalar `COLUMNS=200 $mdee -ddn $opt $test_md 2>&1` };
+
+    my $cr = $run->('-C2,2');
+    like($cr, qr/debug: nup .*--pane=2,2/, q(-C2,2 gives nup the columns and the rows));
+    like($cr, qr/fold_width=93\b/, q(-C2,2 folds for two columns));
+
+    like($run->('-C3'), qr/debug: nup .*--pane=3(?: |$)/m, q(-C3 is the columns alone));
+    like($run->('-C2,2 -w 180'), qr/debug: nup .*--pane=2,2 - -w 180/,
+         q(the rows are kept with -w));
+    like($run->('-C2,3 -R1'), qr/debug: nup .*-R 1 .*--pane=2,3/,
+         q(-R is given to nup with -C C,R));
+
+    for my $bad (qw(2x2 a ,2 2,)) {
+        like($run->("-C$bad"), qr/\Q$bad\E: invalid argument/, qq(-C$bad is an error));
+    }
+};
+
 subtest q(output width option) => sub {
     my $help = `$mdee --help 2>&1`;
     like($help, qr/--fold-width/, q(--help shows --fold-width option));
@@ -796,6 +814,66 @@ subtest q(output width option) => sub {
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
     unlike($plain, qr/debug: nup .*-w /, q(without -w nup gets no width));
     like($plain, qr/fold_width=93\b/, q(without -w the fold width comes from the terminal));
+};
+
+# Test: output device (-T) and output file (-o)
+subtest 'device and output' => sub {
+    plan skip_all => 'ansi2pdf 0.1.3 is not available'
+        unless (`ansi2pdf --geometry -p a4p 2>/dev/null` // '') =~ /^\d+ \d+$/;
+    plan skip_all => 'nup 1.13 is not available'
+        unless (`nup -T a4p --geometry 2>/dev/null </dev/null` // '') =~ /^\d+ \d+ pdf$/;
+    my $geom = sub {
+        my($cols) = `ansi2pdf -C1 --no-border -L @_ --geometry` =~ /^(\d+) /;
+        $cols;
+    };
+    my $fold = sub { my($cols, $panes) = @_; my $w = int($cols / $panes) - 3 - 4; qr/fold_width=$w\b/ };
+    my $run = sub { my $opt = shift; `COLUMNS=100 TERM_LUMINANCE=10 $mdee -d --dryrun $opt $test_md 2>&1` };
+
+    # the paper takes the place of the terminal
+    my $a4 = $run->('-T a4');
+    my $w = $geom->('-p a4');
+    cmp_ok($w, '>', 170, 'A4 in landscape has room for two panes');
+    like($a4, qr/\| nup .*-T a4\b/, '-T is given to nup');
+    like($a4, $fold->($w, 2), '-T a4: the fold width comes from the paper');
+    like($a4, qr/mode=light/, '-T a4: light mode on paper');
+    unlike($a4, qr/less/, '-T a4: no pager');
+    like($run->('-T a4 --mode=dark'), qr/mode=dark/, '--mode is kept');
+
+    # one pane goes through nup as well
+    my $a4p = $run->('-T a4p');
+    my $wp = $geom->('-p a4p');
+    cmp_ok($wp, '<', 170, 'A4 in portrait has room for one pane');
+    like($a4p, qr/\| nup .*-T a4p\b/, '-T a4p is given to nup');
+    like($a4p, $fold->($wp, 1), '-T a4p: the fold width comes from the paper');
+    unlike($a4p, qr/--no-paginate|less/, '-T a4p: nup prints the single pane');
+
+    # -o, and PDF by the name
+    my $o = $run->('-o out.pdf');
+    like($o, qr/\| nup .*-o out\.pdf\b/, '-o is given to nup');
+    like($o, $fold->($geom->(), 2), '-o out.pdf: the default paper');
+    like($o, qr/mode=light/, '-o out.pdf: light mode');
+
+    # lines of a page and columns
+    my $w80 = $geom->('-p a4 -l 80');
+    like($run->('-T a4 -P 80'), $fold->($w80, int($w80 / 85)), '-P sets the lines of a sheet');
+    like($run->('-T a4 -P 40 -G 2x2'), $fold->($w80, int($w80 / 85)), '-P with rows');
+    like($run->('-T a4 -P 40 -R 2'), $fold->($w80, int($w80 / 85)), '-P with -R');
+    like($run->('-T a4 -w 300 -C3'), $fold->(300, 3), '-w is kept');
+
+    # the terminal
+    my $tty = $run->('-T tty');
+    like($tty, qr/mode=dark/, '-T tty: mode of the terminal');
+    like($tty, $fold->(100, 1), '-T tty: width of the terminal');
+    my $txt = $run->('-o out.txt');
+    like($txt, qr/\| nup .*-o out\.txt\b/, '-o out.txt is given to nup');
+    like($txt, qr/mode=dark/, '-o out.txt: mode of the terminal');
+    unlike($txt, qr/--no-paginate|less/, '-o out.txt: no pager');
+
+    # errors
+    like($run->('-T a4 -f'), qr/need|nup/i, '-T needs nup');
+    isnt($? >> 8, 0, '-T with -f fails');
+    $run->('-T nosuch');
+    isnt($? >> 8, 0, 'unknown paper fails');
 };
 
 done_testing;

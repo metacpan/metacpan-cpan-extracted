@@ -1,10 +1,14 @@
 package Logic::Relational::Program;
 
-use v5.38;
+use v5.38;                          ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
 use experimental 'signatures';
 use feature 'try';
-no warnings 'experimental::try';
-use Carp qw(croak);
+no warnings 'experimental::try';    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
+use builtin 'blessed';
+no warnings 'experimental::builtin';
+use Carp         qw(croak carp);
+use Scalar::Util qw(openhandle);
+use Time::HiRes  qw(time);
 
 =head1 NAME
 
@@ -80,7 +84,7 @@ Returns true if the predicate with the given name and arity is tabled.
 
 =cut
 
-sub new ($class) {
+sub new ( $class, %args ) {
     my $self = {
         predicates         => {},
         active_predicates  => {},
@@ -91,9 +95,17 @@ sub new ($class) {
         next_clause_id     => 1,
         in_transaction     => 0,
         observers          => [],
+        max_steps          => $args{max_steps},
     };
     $self->{active_predicates} = $self->{predicates};
     return bless $self, $class;
+}
+
+sub max_steps ( $self, @args ) {
+    if (@args) {
+        $self->{max_steps} = $args[0];
+    }
+    return $self->{max_steps};
 }
 
 sub fact ( $self, $name, @args ) {
@@ -131,6 +143,27 @@ sub rule ( $self, %args ) {
         croak "Invalid rule head: must be a Term or Call goal";
     }
 
+    # Detect direct left-recursion (excluding well-founded structural recursion)
+    my $first_subgoal = $self->_first_subgoal($body);
+    if (
+           defined $first_subgoal
+        && blessed($first_subgoal)
+        && $first_subgoal->isa('Logic::Relational::Goal::Call')
+        && $first_subgoal->name eq $head_term->functor
+        && $first_subgoal->arity == $head_term->arity
+        && !$self->_is_structurally_decreasing(
+            $head_term->args, $first_subgoal->args
+        )
+      )
+    {
+        my $pred_spec = $head_term->functor . '/' . $head_term->arity;
+        if ( !$self->is_tabled( $head_term->functor, $head_term->arity ) ) {
+            carp
+"Warning: Direct left-recursion detected in rule for '$pred_spec'. Automatically enabling tabling for '$pred_spec'.";
+            $self->table( $head_term->functor, $head_term->arity );
+        }
+    }
+
     require Logic::Relational::Clause;
     my $clause = Logic::Relational::Clause->new(
         head     => $head_term,
@@ -138,6 +171,78 @@ sub rule ( $self, %args ) {
         metadata => $metadata,
     );
     return $self->_add_clause($clause);
+}
+
+sub _first_subgoal ( $self, $goal ) {
+    return unless defined $goal;
+    while (1) {
+        if ( ref($goal) eq 'ARRAY' ) {
+            return unless @$goal;
+            $goal = $goal->[0];
+        }
+        elsif ( blessed($goal) && $goal->isa('Logic::Relational::Goal::All') ) {
+            my $goals = $goal->goals;
+            return unless $goals && @$goals;
+            $goal = $goals->[0];
+        }
+        else {
+            last;
+        }
+    }
+    return $goal;
+}
+
+sub _is_compound ( $self, $term ) {
+    return 0 unless ref($term);
+    return 1 if ref($term) eq 'ARRAY' || ref($term) eq 'HASH';
+    return 1
+      if blessed($term)
+      && ( $term->isa('Logic::Relational::ArrayRest')
+        || ( $term->isa('Logic::Relational::Term') && $term->arity > 0 ) );
+    return 0;
+}
+
+sub _term_contains_var ( $self, $term, $target_name ) {
+    return 0 unless defined $term;
+    if ( blessed($term) ) {
+        if ( $term->isa('Logic::Relational::Variable') ) {
+            return $term->name eq $target_name ? 1 : 0;
+        }
+        if ( $term->isa('Logic::Relational::ArrayRest') ) {
+            return $self->_term_contains_var( $term->term, $target_name );
+        }
+        if ( $term->isa('Logic::Relational::Term') ) {
+            for my $arg ( @{ $term->args } ) {
+                return 1 if $self->_term_contains_var( $arg, $target_name );
+            }
+        }
+    }
+    if ( ref($term) eq 'ARRAY' ) {
+        for my $item (@$term) {
+            return 1 if $self->_term_contains_var( $item, $target_name );
+        }
+    }
+    if ( ref($term) eq 'HASH' ) {
+        for my $item ( values %$term ) {
+            return 1 if $self->_term_contains_var( $item, $target_name );
+        }
+    }
+    return 0;
+}
+
+sub _is_structurally_decreasing ( $self, $head_args, $call_args ) {
+    return 0 unless $head_args && $call_args;
+    my $count = scalar(@$head_args);
+    for ( my $i = 0 ; $i < $count ; $i++ ) {
+        my $h = $head_args->[$i];
+        my $c = $call_args->[$i];
+        if ( $self->_is_compound($h) ) {
+            if ( blessed($c) && $c->isa('Logic::Relational::Variable') ) {
+                return 1 if $self->_term_contains_var( $h, $c->name );
+            }
+        }
+    }
+    return 0;
 }
 
 sub _add_clause ( $self, $clause ) {
@@ -319,7 +424,7 @@ sub generator ( $self, $name, $arity, $code ) {
     return;
 }
 
-sub query ( $self, $goal ) {
+sub query ( $self, $goal, %options ) {
     $self->cleanup_expired_facts;
     require Logic::Relational::Query;
     return Logic::Relational::Query->new(
@@ -327,6 +432,7 @@ sub query ( $self, $goal ) {
         goals      => [$goal],
         predicates => { %{ $self->{predicates} } },    # snapshot shallow copy
         generators => { %{ $self->{generators} } },    # snapshot generators
+        %options,
     );
 }
 
@@ -426,7 +532,7 @@ sub with_facts ( $self, $facts, $code ) {
         }
 
         use feature 'defer';
-        no warnings 'experimental::defer';
+        no warnings 'experimental::defer';    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
         defer {
             for my $id (@clause_ids) {
                 try { $self->retract_clause($id); } catch ($e) {
@@ -437,7 +543,7 @@ sub with_facts ( $self, $facts, $code ) {
         return $code->();
     }
     catch ($e) {
-        die $e;    ## no critic (RequireCarping, ProhibitStringyDeath)
+        die $e;                               ## no critic (RequireCarping, ProhibitStringyDeath)
     }
     return;
 }
@@ -484,7 +590,7 @@ sub cleanup_expired_facts ($self) {
 
     $self->{in_cleanup} = 1;
     use feature 'defer';
-    no warnings 'experimental::defer';
+    no warnings 'experimental::defer';    ## no critic (TestingAndDebugging::ProhibitNoWarnings)
     defer { $self->{in_cleanup} = 0; }
 
     my $now   = time;
@@ -584,7 +690,7 @@ sub save_snapshot ( $self, $target, %options ) {
     if ( ref($target) eq 'SCALAR' ) {
         $$target = $json_str;
     }
-    elsif ( ref($target) || Scalar::Util::openhandle($target) ) {
+    elsif ( ref($target) || openhandle($target) ) {
         print {$target} $json_str;
     }
     else {
@@ -604,7 +710,7 @@ sub load_snapshot ( $self, $source, %options ) {    ## no critic (Subroutines::P
     if ( ref($source) eq 'SCALAR' ) {
         $json_str = $$source;
     }
-    elsif ( ref($source) || Scalar::Util::openhandle($source) ) {
+    elsif ( ref($source) || openhandle($source) ) {
         local $/ = undef;
         $json_str = <$source>;
     }

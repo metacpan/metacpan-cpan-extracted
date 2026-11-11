@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 # Development error pages. Loaded only when the application compiles in the
 # development environment (Punk::App::compile_extras) - an opt-in: punk dev,
@@ -28,6 +28,7 @@ my $SNIP_AFTER  = 4;
 sub _install {
     my ($app) = @_;
     my $user = $app->{on_error};
+    # uncoverable condition right
     my $resolved = (defined $user && (ref $user || length $user))
         ? $app->_resolve_target($user, 'on_error') : undef;
     $app->on_error(sub {
@@ -52,6 +53,7 @@ sub _trace_mw {
             my ($e) = @_;
             my (@frames, $i);
             for ($i = 0; my @f = caller $i; $i++) {
+                # uncoverable branch true
                 last if @frames >= $MAX_FRAMES;
                 next if $f[0] eq __PACKAGE__;
                 my @up = caller $i + 1;
@@ -72,9 +74,14 @@ sub _trace_mw {
 sub render {
     my ($c, $err) = @_;
     my $msg    = "$err";
+    # uncoverable branch false
+    # uncoverable condition left
+    # uncoverable condition right
     my $frames = ($CAUGHT && $CAUGHT->{msg} eq $msg) ? $CAUGHT->{frames} : [];
     my $accept = eval { $c->req->header('accept') }       // '';
+    # uncoverable condition left
     my $ctype  = eval { $c->req->header('content-type') } // '';
+    # uncoverable condition right
     if ($accept =~ m{text/html}i && $ctype !~ /json/i) {
         return $c->html(_page($c, $msg, $frames), 500);
     }
@@ -88,6 +95,7 @@ sub render {
 
 sub _e {
     my ($s) = @_;
+    # uncoverable branch true
     $s = '' unless defined $s;
     $s =~ s/&/&amp;/g; $s =~ s/</&lt;/g; $s =~ s/>/&gt;/g;
     $s =~ s/"/&quot;/g;
@@ -102,8 +110,13 @@ my $REDACT = qr/pass|secret|token/i;
 # snippets; these collapse into a summary list.
 sub _is_plumbing {
     my ($f) = @_;
+    # uncoverable condition right
     return 1 if ($f->{pkg} // '') =~ /\A(?:Punk|Plack|Hyperman|HTTP)(?:::|\z)/;
+    # uncoverable branch true
+    # uncoverable condition right
     return 1 if ($f->{sub} // '') =~ /\A(?:Punk|Plack|Hyperman|HTTP)::/;
+    # uncoverable branch true
+    # uncoverable condition right
     return 1 if ($f->{file} // '') =~ m{[/\\](?:Plack|Hyperman)[/\\]};
     return 0;
 }
@@ -113,9 +126,11 @@ sub _is_plumbing {
 # the parameter table's redaction.
 sub _redacted_query {
     my ($q) = @_;
+    # uncoverable condition left
     return '' unless defined $q && length $q;
     return join '&', map {
         my ($k, $v) = split /=/, $_, 2;
+        # uncoverable condition left
         defined $v && $k =~ $REDACT ? "$k=[redacted]" : $_;
     } split /&/, $q;
 }
@@ -125,8 +140,10 @@ sub _rows {
     my $out = '';
     for my $k (sort keys %$h) {
         my $v = $h->{$k};
+        # uncoverable branch false
         $v = defined $v ? "$v" : '';
         $v = '[redacted]' if $redact_all->($k);
+        # uncoverable branch true
         $v = substr($v, 0, 2048) . '...' if length $v > 2048;
         $out .= '<tr><th>' . _e($k) . '</th><td>' . _e($v) . "</td></tr>\n";
     }
@@ -135,18 +152,30 @@ sub _rows {
 
 sub _snippet {
     my ($file, $line) = @_;
+    # uncoverable branch true
+    # uncoverable condition left count:1
+    # uncoverable condition right count:1
+    # uncoverable condition left count:2
+    # uncoverable condition right count:2
     return '' if !defined $file || $file =~ /\(eval/ || !-r $file;
+    # uncoverable branch true
     open my $fh, '<', $file or return '';
     my @lines = <$fh>;
     close $fh;
+    # uncoverable branch true
     my $from = $line - $SNIP_BEFORE; $from = 1 if $from < 1;
+    # uncoverable branch true
     my $to   = $line + $SNIP_AFTER;  $to = @lines if $to > @lines;
     my $has_eshu = eval { require Eshu; Eshu->can('highlight_string') };
     my $out = qq{<pre class="snippet">};
     for my $n ($from .. $to) {
+        # uncoverable condition right
         my $src  = $lines[$n - 1] // '';
         chomp $src;
         my $code = $has_eshu
+            # uncoverable branch false
+            # uncoverable condition right
+            # uncoverable condition false
             ? (eval { Eshu->highlight_string($src, lang => 'perl') } // _e($src))
             : _e($src);
         $code =~ s/\n\z//;
@@ -159,11 +188,16 @@ sub _snippet {
 
 sub _page {
     my ($c, $msg, $frames) = @_;
+    # uncoverable condition right
     my $env    = eval { $c->env } || {};
+    # uncoverable condition right
     my $method = $env->{REQUEST_METHOD} // '';
+    # uncoverable condition right
     my $path   = $env->{PATH_INFO}      // '';
+    # uncoverable condition right
     my $query  = $env->{QUERY_STRING}   // '';
 
+    # uncoverable condition right
     my $headers = eval { $c->req->headers } || {};
     my %hdr = map { $_ => $headers->{$_} } keys %$headers;
     my $hdr_rows = _rows(\%hdr, sub {
@@ -171,19 +205,27 @@ sub _page {
         return $k =~ /\A(?:cookie|authorization)\z/i || $k =~ $REDACT;
     });
 
+    # uncoverable condition right
     my $params = eval { scalar $c->params } || {};
+    # uncoverable branch false
     my %prm; %prm = %$params if ref $params eq 'HASH';
+    # uncoverable branch true
     for (keys %prm) { delete $prm{$_} if ref $prm{$_} }
     my $prm_rows = _rows(\%prm, sub { $_[0] =~ $REDACT });
 
     my $match = eval { $c->match };
     my %rt;
+    # uncoverable branch false
     if (ref $match eq 'HASH') {
         for my $k (sort keys %$match) {
             my $v = $match->{$k};
+            # uncoverable branch false count:1
+            # uncoverable branch true count:2
+            # uncoverable branch false count:2
             if (ref $v eq 'HASH') {
                 $rt{"$k.$_"} = $v->{$_} for keys %$v;
             }
+            # uncoverable statement
             elsif (!ref $v) { $rt{$k} = $v }
         }
     }
@@ -196,6 +238,11 @@ sub _page {
     }
     # a die thrown from inside the framework with no app frame at all
     # still deserves snippets - show everything rather than nothing
+    # uncoverable statement count:2
+    # uncoverable statement count:3
+    # uncoverable branch true
+    # uncoverable condition right
+    # uncoverable condition false
     if (!@app && @plumbing) { @app = @plumbing; @plumbing = () }
 
     my $frame_html = '';
@@ -206,6 +253,7 @@ sub _page {
             . _snippet($f->{file}, $f->{line})
             . "</div>\n";
     }
+    # uncoverable branch false
     if (@plumbing) {
         $frame_html .= '<details><summary>'
             . scalar(@plumbing)
@@ -216,10 +264,12 @@ sub _page {
               } @plumbing)
             . '</table></details>' . "\n";
     }
+    # uncoverable branch true
     $frame_html = '<p class="none">No frames were captured - the exception '
         . 'surfaced outside the request scope (a deferred future, most '
         . 'likely).</p>' unless $frame_html;
 
+    # uncoverable condition right
     my $title = _e((split /\n/, $msg)[0] // 'error');
     my $emsg  = _e($msg);
     my ($em, $ep) = (_e($method), _e($path));

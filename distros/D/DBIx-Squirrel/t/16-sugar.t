@@ -297,8 +297,8 @@ subtest 'mistakes' => sub {
         qr( \A \QExpected a database and a statement for nowhere\E )x,
         'a statement on no database';
     like dies { statement(odd => music => 'SELECT 1', 'x') },
-        qr( \A \QExpected only stages after the statement for odd\E )x,
-        'anything but stages after it';
+        qr( \A \QExpected only code references or pipelines after the statement for odd\E )x,
+        'anything but code references or pipelines after it';
     like dies { statement(music => music => 'SELECT 1') },
         qr( \A \QExpected no function of the name in main already (music)\E )x,
         'a name a database has';

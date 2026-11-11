@@ -672,7 +672,11 @@ foreach my $case (@MESSAGES) {
 	if ($ok) {
 		ok( 0, "$name dies (it did not)" );
 	} else {
-		like( $result, $re, "$name dies with a message naming the problem" );
+		# message_only: the trace under the message prints the arguments of
+		# the call, so against the whole of "$@" a message that left out the
+		# name it should give -- as the multi-set "color_key" one did, until
+		# 0.3343 -- matched all the same, on the caller's own spelling of it.
+		like( message_only($result), $re, "$name dies with a message naming the problem" );
 	}
 }
 

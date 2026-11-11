@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use Punk ();
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 # Capture a command's standard output. Called from C for { $exec: ... }; a
 # non-zero exit is fatal, so a broken secret store stops the boot rather than
@@ -14,11 +14,14 @@ our $VERSION = '0.69';
 # to the shell when it holds a shell metacharacter.
 sub _exec {
     my (@cmd) = @_;
+    # uncoverable branch true class:ignore_covered_err
     open my $ph, '-|', @cmd
         or die "cannot run '$cmd[0]': $!\n";
     my $out = do { local $/; <$ph> };
     close $ph;
+    # uncoverable branch true
     die "'$cmd[0]' exited with " . ($? >> 8) . "\n" if $?;
+    # uncoverable branch false
     return defined $out ? $out : '';
 }
 

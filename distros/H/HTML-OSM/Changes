@@ -1,5 +1,17 @@
 Revision history for HTML-OSM
 
+0.19	Tue Nov 10 10:30:56 AM EST 2026
+	[ Enhancements ]
+	- A legend entry takes unless_layer: the entry is listed only while the
+	  named GeoJSON layer is hidden, for when that layer's own key shows the
+	  same colours.  With every entry left out, the key is not drawn.
+	  t/legend-layer.t
+
+0.18	Tue Nov 10 08:51:19 AM EST 2026
+	[ Enhancements ]
+	- add_geojson()'s key takes shape => 'box': each entry's colour is drawn
+	  as a filled box instead of a line, for a layer whose areas are filled.
+
 0.17	Mon Nov  9 09:22:11 PM EST 2026
 	[ Enhancements ]
 	- add_geojson() takes bands: a feature property holding a list of

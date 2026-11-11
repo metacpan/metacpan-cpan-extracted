@@ -6,7 +6,7 @@ use warnings;
 use Punk ();
 use overload '""' => 'message', fallback => 1;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 1;
 

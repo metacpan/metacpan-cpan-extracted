@@ -1,11 +1,11 @@
 package URI::Escape::XS;
 #
-# $Id: XS.pm,v 0.14 2016/06/09 11:09:14 dankogai Exp $
+# $Id: XS.pm,v 0.15 2026/11/10 15:10:37 dankogai Exp $
 #
 use 5.008001;
 use warnings;
 use strict;
-our $VERSION = sprintf "%d.%02d", q$Revision: 0.14 $ =~ /(\d+)/g;
+our $VERSION = '0.15';
 
 use base qw(Exporter);
 our @EXPORT    = qw(encodeURIComponent decodeURIComponent
@@ -46,7 +46,7 @@ sub uri_unescape {
 	    $text =~ s/($regexp{$patn})/$escapes{$1}/ge;
 	    return $text;
 	} else {
-	    return encodeURIComponent($text);
+	    return _uri_escape($text);
 	}
     }
 }
@@ -118,7 +118,7 @@ URI::Escape::XS - Drop-In replacement for URI::Escape
 
 =head1 VERSION
 
-$Id: XS.pm,v 0.14 2016/06/09 11:09:14 dankogai Exp $
+$Id: XS.pm,v 0.15 2026/11/10 15:10:37 dankogai Exp $
 
 =cut
 
@@ -138,6 +138,15 @@ $Id: XS.pm,v 0.14 2016/06/09 11:09:14 dankogai Exp $
   # if you have CNet::IDN::Encode installed
   $safe = encodeURIComponentIDN("http://ドメイン名例.jp/dan/");
   $str  = decodeURIComponentIDN("http:%2F%2Fxn--eckwd4c7cu47r2wf.jp%2Fdan%2F");
+
+=head1 DESCRIPTION
+
+ URI::Escape::XS is a drop-in replacement for URI::Escape for common cases which
+ offers much faster performance by using compiled XS code.
+
+ This module requires Perl 5.8.1 compared to 5.6.1 for URI::Escape.
+ The uri_escape_utf8 function from URI::Escape is not present here, as
+ our uri_escape() method handles UTF-8 characters automatically.
 
 =head1 EXPORT
 
@@ -287,7 +296,7 @@ On Macbook Pro 2GHz, Perl 5.8.8.
 
 =head1 AUTHOR
 
-Dan Kogai, C<< <dankogai+cpan at gmail.com> >>
+Dan Kogai, C<< <dankogai at cpan.org> >>
 
 =head1 BUGS
 
@@ -337,7 +346,7 @@ Claus Färber for L<Net::IDN::Encode>
 
 =head1 COPYRIGHT & LICENSE
 
-Copyright 2007-2014 Dan Kogai, all rights reserved.
+Copyright 2007-2020 Dan Kogai, all rights reserved.
 
 This program is free software; you can redistribute it and/or modify it
 under the same terms as Perl itself.

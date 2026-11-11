@@ -11,7 +11,7 @@ package Matplotlib::Simple;
 # alone, so the keywords are matplotlib's names throughout, and an engine that
 # has no counterpart for one refuses it by name rather than leaving it out (check_engine).
 require 5.010;
-our $VERSION = 0.3341;
+our $VERSION = 0.3343;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use POSIX ();
@@ -140,6 +140,33 @@ our @plt_methods = (
 	'xlabel','xscale','ylabel', 'ylim', 'yscale',
 #	'xlim','xticks','yticks'
 );
+# The names in the three lists above that are not something to call. The lists
+# were read off dir() of an Axes, a Figure and pyplot, which holds attributes,
+# modules and constants beside the methods, and every keyword in them is
+# written into the script as a call: "dpi => 300" passed the keyword check and
+# became fig.dpi(300), which python refused as "TypeError: 'float' object is
+# not callable", and "rcParams => ..." as "'RcParams' object is not callable".
+# Not one of them could ever have run, so each is now refused as any other
+# unknown keyword is, with the keywords it resembles. Checked against
+# matplotlib 3.11.2 with callable(getattr(obj, name)).
+my %not_callable = (
+	ax => [ qw(axison callbacks child_axes collections containers dataLim
+	 fmt_xdata fmt_ydata ignore_existing_data_limits legend_ name spines tables
+	 titleOffsetTrans transAxes transData transLimits transScale
+	 use_sticky_edges viewLim xaxis yaxis) ],
+	fig => [ qw(artists bbox bbox_inches canvas clipbox dpi dpi_scale_trans
+	 figbbox frameon images lines mouseover number patch patches stale
+	 sticky_edges subfigs subplotpars suppressComposite texts transFigure
+	 transSubfigure zorder) ],
+	plt => [ qw(TYPE_CHECKING annotations backend_registry cbook cm
+	 color_sequences functools importlib inspect logging matplotlib mlab np
+	 rcParams rcParamsDefault rcParamsOrig rcsetup sys threading time) ],
+);
+foreach my $list ( [ ax => \@ax_methods ], [ fig => \@fig_methods ], [ plt => \@plt_methods ] ) {
+	my ( $object, $methods ) = @{$list};
+	my %drop = map { $_ => 1 } @{ $not_callable{$object} };
+	@{$methods} = grep { not $drop{$_} } @{$methods};
+}
 
 our @arg = ('add', 'cmap', 'data', 'execute', 'fh', 'ncol', 'ncols', 'nrow', 'nrows', 'p', 'plot_type',  'plots', 'plot', 'output_file', 'scale', 'scalex', 'scaley', 'show', 'twinx');
 # Options of plt itself, which no helper takes. "shared_colorbar" was in @arg,
@@ -148,7 +175,12 @@ our @arg = ('add', 'cmap', 'data', 'execute', 'fh', 'ncol', 'ncols', 'nrow', 'nr
 # lists it among its own options. "engine" names what draws the whole figure,
 # and "style" how it looks; both are refused in a subplot by
 # refuse_subplot_choices.
-my @plt_arg = ( 'engine', 'shared_colorbar', 'style' );
+# "dpi" is the resolution the figure is saved at, which the matplotlib engine
+# hands to savefig. Until 0.3343 it was among the Figure "methods", and wrote
+# fig.dpi(300), a TypeError; and "set_dpi", the method beside it, is no way to
+# say it, since savefig takes the figure's resolution as it was when the figure
+# was made (matplotlib 3.11.2), so fig.set_dpi(300) left the file as it was.
+my @plt_arg = ( 'dpi', 'engine', 'shared_colorbar', 'style' );
 # Every keyword this module spelled with a dot up to 0.318, and what it is
 # called now. The old spellings are refused, not accepted: see
 # refuse_dotted_keywords.
@@ -1708,6 +1740,15 @@ sub check_add {
 	if ( scalar @not_hash > 0 ) {
 		die "\"add\"$where holds one HASH reference per graph, but index " . join( ', ', @not_hash ) . ' is not one';
 	}
+	# An "add" inside an "add" graph. The matplotlib engine draws the graphs
+	# of "add" and never looks inside one for more, so the inner graphs were
+	# left out of the figure without a word, where gnuplot and ggplot2 refused
+	# them. Every graph of a subplot goes in the one "add", so there is nothing
+	# a nested one could mean that the flat one does not say.
+	my @nested = grep { exists $add->[$_]{add} } 0 .. $#{$add};
+	if ( scalar @nested > 0 ) {
+		die "\"add\"$where graph " . join( ', ', @nested ) . ' has an "add" of its own, which is not drawn: list every graph of the subplot in the one "add"';
+	}
 }
 # The shape of "data" each plot_type reads. plot, scatter, imshow,
 # venn_proportional_area and wide are not here: each checks its own.
@@ -2244,12 +2285,6 @@ sub plt {
 	# "show => 'False'" wrote plt.show() and let the figure go without an
 	# "output_file".
 	$args->{show} = bool_option( $args->{show}, 'show', $current_sub ) if defined $args->{show};
-	# "output_file" is any name at all, so it is tested for being given rather
-	# than for Perl truth, which refused a file called "0" as missing.
-	if ( ( not ( ( defined $args->{output_file} ) && ( length $args->{output_file} ) ) ) && ( not $args->{show} ) ) {
-		p $args;
-		die 'either "show" or "output_file" must be defined';
-	}
 	my @reqd_args = $args->{show} ? () : ('output_file'); # e.g. "my_image.svg"; optional if "show" is set
 	my $single_example = 'plt({
 	\'output_file\' => \'/tmp/gospel.word.counts.svg\',
@@ -2283,17 +2318,6 @@ sub plt {
 	},
 	ncols    => 3,
 	});';
-	my @undef_args = grep { !defined $args->{$_} } @reqd_args;
-	if ( scalar @undef_args > 0 ) {
-	  p @undef_args;
-	  die 'the above args are necessary, but were not defined.';
-	}
-	if (   ( not defined $args->{plot_type} )
-	  && ( not defined $args->{plots} ) )
-	{
-		p $args;
-		die 'either "plot_type" or "plots" must be defined, but neither were';
-	}
 	if (ref $args->{output_file} ne '') {
 		p $args;
 		die '"output_file" must be a SCALAR or string, but was given a ' . ref $args->{output_file};
@@ -2324,6 +2348,22 @@ sub plt {
 			type      => defined $type_opt ? $args->{plot_type} : undef,
 			sub       => $current_sub
 		});
+	}
+	# What is missing is reported only now that every keyword given is known to
+	# be one: "shoxw => 1" died as 'either "show" or "output_file" must be
+	# defined', which did not say that "show" had been given, mistyped, and
+	# "plot_typ" as 'either "plot_type" or "plots"' likewise.
+	# "output_file" is any name at all, so it is tested for being given rather
+	# than for Perl truth, which refused a file called "0" as missing.
+	if ( ( not ( ( defined $args->{output_file} ) && ( length $args->{output_file} ) ) ) && ( not $args->{show} ) ) {
+		p $args;
+		die 'either "show" or "output_file" must be defined';
+	}
+	if (   ( not defined $args->{plot_type} )
+	  && ( not defined $args->{plots} ) )
+	{
+		p $args;
+		die 'either "plot_type" or "plots" must be defined, but neither were';
 	}
 	$args->{nrows} = $args->{nrow} if defined $args->{nrow}; # allow synonyms
 	$args->{ncols} = $args->{ncol} if defined $args->{ncol}; # allow synonyms
@@ -2425,6 +2465,31 @@ sub plt {
 	# into the script as given, as a bare "inf" or "nan".
 	foreach my $scale ( grep { defined $args->{$_} } ( 'scale', 'scalex', 'scaley' ) ) {
 		die "\"$scale\" must be a finite number above 0, not \"$args->{$scale}\"" unless ( is_finite( $args->{$scale} ) ) && ( $args->{$scale} > 0 );
+	}
+	# "dpi" is written into savefig as it stands, so it is a number here, and
+	# one a file can be drawn at.
+	if ( defined $args->{dpi} ) {
+		my $dpi = $args->{dpi};
+		if ( ( ref $dpi ) || ( not looks_like_number($dpi) ) || ( not is_finite($dpi) ) || ( $dpi <= 0 ) ) {
+			die "\"dpi\" must be a finite number above 0, the dots per inch \"output_file\" is saved at, not " . ( ref $dpi ? ( ref $dpi ) . ' reference' : "\"$dpi\"" );
+		}
+		$args->{dpi} = 0 + $dpi;    # "0300" and " 300" are numbers to perl and not to python
+	}
+	# One file is saved at one resolution, so "dpi" in a subplot or an "add"
+	# graph has nothing of its own to set. Asked here, by name: left to the
+	# helper it was "isn't defined for plot_type", with "set_dpi" suggested.
+	{
+		my @plots = ( $single_plot == 1 ) ? ( [ $args, '' ] ) : map { [ $args->{plots}[$_], " at subplot $_" ] } 0 .. $#{ ( ref $args->{plots} eq 'ARRAY' ) ? $args->{plots} : [] };
+		foreach my $drawn (@plots) {
+			my ( $plot, $where ) = @{$drawn};
+			next unless ref $plot eq 'HASH';
+			if ( ( $single_plot == 0 ) && ( exists $plot->{dpi} ) ) {
+				die "$current_sub: \"dpi\"$where: one file is saved at one resolution, so give \"dpi\" once, beside \"plots\" or \"p\"";
+			}
+			if ( ( ref $plot->{add} eq 'ARRAY' ) && ( grep { ( ref $_ eq 'HASH' ) && ( exists $_->{dpi} ) } @{ $plot->{add} } ) ) {
+				die "$current_sub: \"dpi\" in an \"add\" graph$where: one file is saved at one resolution, so give \"dpi\" once, at the top level";
+			}
+		}
 	}
 	if ((defined $args->{shared_colorbar}) && ($single_plot == 1)) {
 		warn 'There is only 1 plot/subplot, shared colorbars make no sense... deleting';
@@ -2533,7 +2598,12 @@ sub plt {
 	my $engine = engine_name( $args, $current_sub );
 	my $style  = style_name( $args, $current_sub );
 	check_engine( $engine, $args, $single_plot, $current_sub );
-	return $engine_module{$engine}->can('render')->( $args, { sub => $current_sub, single_plot => $single_plot, style => $style } );
+	# Taken out after check_engine has seen it, so that an engine that does not
+	# list "dpi" refuses it by name, and before render, so that the helper a
+	# single plot's hash is handed to does not meet a keyword that is the
+	# figure's and not its own.
+	my $dpi = delete $args->{dpi};
+	return $engine_module{$engine}->can('render')->( $args, { sub => $current_sub, single_plot => $single_plot, style => $style, dpi => $dpi } );
 }
 # Generate wrappers dynamically
 my @wrappers = qw(bar barh boxplot colored_table hexbin hist hist2d imshow pie plot scatter venn_proportional_area violin violinplot wide);
@@ -2815,6 +2885,18 @@ alone.
 Every other option is passed through as written, so text inside C<legend>, C<text>
 and friends is Python syntax throughout: C<< legend =E<gt> 'loc = "upper left"' >>.
 
+B<Never pass untrusted text to an option.>  Text that reads as Python is
+written into the script as Python, so text from a web form, a file you did not
+write, or anyone else is a way to run code as you.  In a C<title>, a label or
+C<suptitle>, C<'"t", fontsize = __import__("os").getpid()'> reads as a literal
+followed by a keyword argument, and lands in the script whole.  Only text with
+no quote character in it, C<'> or C<">, is certain to be quoted, so a label built
+from untrusted text must have its quotes removed first.  C<legend>, C<text> and
+the other options passed through as written are never quoted at all:
+C<< legend =E<gt> 'x = exec(...)' >> runs, quotes or no quotes, so untrusted text must
+never reach them.  The keys of C<data> are always escaped, and are
+the place for text you did not write.
+
 The exception is an option written as a C<plt.> call, such as C<xscale>, C<ylim>
 or C<axhline>, at a single plot and at a subplot alike.  A word is quoted for
 you, so C<< xscale =E<gt> 'log' >> becomes C<plt.xscale('log')>.  A value that is already
@@ -2888,6 +2970,51 @@ another.  The rest of the call stays as it is:
     title       => 'Gospel word counts',
     engine      => 'gnuplot',    # or 'ggplot2', or 'matplotlib', the default
  );
+
+Here is one call, a C<bar>, a C<boxplot>, a C<hist> and a C<plot> in four subplots,
+drawn by each engine in its own default style.  Only C<engine> differs between
+them; C<engine.examples.pl> in the repository draws all three.
+
+ plt(
+    output_file => 'engines.png',
+    engine      => $engine,    # 'matplotlib', 'gnuplot' or 'ggplot2'
+    ncols       => 2,
+    nrows       => 2,
+    suptitle    => "engine: $engine",
+    plots       => [
+       { plot_type => 'bar',     title => 'bar',
+         data => { Matthew => 18345, Mark => 11304, Luke => 19482, John => 15635 } },
+       { plot_type => 'boxplot', title => 'boxplot', data => \%groups },
+       { plot_type => 'hist',    title => 'hist',    data => \%groups },
+       { plot_type => 'plot',    title => 'plot',
+         data => { sin => [ \@x, [ map { sin } @x ] ],
+                   cos => [ \@x, [ map { cos } @x ] ] } },
+    ],
+ );
+
+where C<%groups> holds two samples of 200 normal deviates, C<A> and C<B>, and C<@x>
+runs from 0 to 10.
+
+
+=for html
+<p>
+<img width="651" height="491" alt="four subplots drawn by matplotlib" src="https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/engine.matplotlib.png" />
+<p>
+
+
+
+=for html
+<p>
+<img width="640" height="480" alt="four subplots drawn by gnuplot" src="https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/engine.gnuplot.png" />
+<p>
+
+
+
+=for html
+<p>
+<img width="640" height="480" alt="four subplots drawn by ggplot2" src="https://raw.githubusercontent.com/hhg7/MatPlotLib-Simple/main/output.images/engine.ggplot2.png" />
+<p>
+
 
 =for html
 <table>
@@ -3066,7 +3193,7 @@ Colarbar args attempt to match matplotlib closely
 <tr><td>Option</td><td>Description</td><td>Example</td></tr>
 <tr><td>--------</td><td>-------</td><td>-------</td></tr>
 <tr><td><code>cbdrawedges</code></td><td>Whether to draw lines at color boundaries</td><td><code>cbdrawedges => 1</code></td></tr>
-<tr><td><code>cblabel</code></td><td>The label on the colorbar's long axis</td><td><code>cblabel => 1</code></td></tr>
+<tr><td><code>cblabel</code></td><td>The label on the colorbar's long axis</td><td><code>cblabel => 'kJ/mol'</code></td></tr>
 <tr><td><code>cblocation</code></td><td>of the colorbar None or {'left', 'right', 'top', 'bottom'}</td><td></td></tr>
 <tr><td><code>cborientation</code></td><td># None or {<code>vertical</code>, <code>horizontal</code>}</td><td></td></tr>
 <tr><td><code>cbpad</code></td><td>pad : float, default: 0.05 if vertical, 0.15 if horizontal; Fraction of original Axes between colorbar and new image Axes</td><td></td></tr>
@@ -3093,6 +3220,7 @@ C<logscale> for C<bar> is the one exception, and takes Perl truth.
 <tr><td><code>scale</code></td><td>scale/multiply the size of the output figure; this and the two below must be finite and above 0</td><td><code>scale => 2.4</code></td></tr>
 <tr><td><code>scalex</code></td><td>scale/multiply the x-axis only</td><td><code>scalex => 2.4</code></td></tr>
 <tr><td><code>scaley</code></td><td>scale/multiply the y-axis only</td><td><code>scaley => 1.4</code></td></tr>
+<tr><td><code>dpi</code></td><td>dots per inch of the saved file, a finite number above 0; matplotlib's own default if left out. Given beside <code>plots</code> or <code>p</code>, not in a subplot. The matplotlib engine only, as of version 0.3343</td><td><code>dpi => 300</code></td></tr>
 </tbody>
 </table>
 

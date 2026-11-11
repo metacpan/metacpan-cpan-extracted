@@ -34,7 +34,7 @@ package Matplotlib::Simple::Ggplot2;
 # with grid's own layouts, not patchwork or cowplot, which ggplot2 does not
 # depend on.
 require 5.010;
-our $VERSION = 0.3341;
+our $VERSION = 0.3343;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 BEGIN { require Matplotlib::Simple }
@@ -1445,6 +1445,9 @@ sub draw_scatter {
 		my $color_key;
 		if ( defined $plot->{color_key} ) {
 			$color_key = $plot->{color_key};
+			# before the keys are counted, or a "color_key" that is not a key of
+			# three is reported as leaving 3 keys, without its name
+			die "$sub: \"$color_key\" isn't defined$what" unless defined $set->{$color_key};
 			@keys = grep { $_ ne $color_key } @keys;
 		} elsif ( scalar @keys == 3 ) {
 			$color_key = pop @keys;

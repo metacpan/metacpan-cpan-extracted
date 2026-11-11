@@ -25,7 +25,7 @@ sub new {
 	my($this) = {
 		$Net::UPnP::Device::_SSDP => '',
 		$Net::UPnP::Device::_DESCRIPTION => '',
-		@Net::UPnP::Device::_SERVICELIST  => (),
+		$Net::UPnP::Device::_SERVICELIST  => [],
 	};
 	bless $this, $class;
 }
@@ -100,13 +100,16 @@ sub setservicefromdescription() {
 	
 	$description = $_[0];
 	
+	# Reset first so a description without <serviceList> leaves an empty
+	# list rather than an undefined one (RT #75747).
+	$this->{$Net::UPnP::Device::_SERVICELIST} = [];
+
 	unless ($description =~ m/<serviceList>(.*)<\/serviceList>/si) {
 		return;
 	}
 
 	$servicelist_description = $1;
 
-	@{$this->{$Net::UPnP::Device::_SERVICELIST}} = ();
 	while ($servicelist_description =~ m/<service>(.*?)<\/service>/sgi) {
 		$service = Net::UPnP::Service->new();
 		$service->setdevicedescription($1);
@@ -121,7 +124,7 @@ sub setservicefromdescription() {
 
 sub getservicelist() {
 	my($this) = shift;
-	@{$this->{$Net::UPnP::Device::_SERVICELIST}};
+	@{$this->{$Net::UPnP::Device::_SERVICELIST} || []};
  }
 
 #------------------------------

@@ -92,6 +92,60 @@ like(
 	'missing config dir'
 );
 
+# restarting and adding, with a fake supervisorctl that prints the status for status,
+# logs everything else it is asked to do, and fails to start anything named broken
+my $log_file   = $dir . '/actions.log';
+my $acting_out = $dir . '/acting_status';
+open( my $acting_out_fh, '>', $acting_out ) or die($!);
+print $acting_out_fh $status . "stopme STOPPED\nbroken FATAL\n";
+close($acting_out_fh);
+my $acting = $dir . '/supervisorctl-acting';
+open( my $acting_fh, '>', $acting ) or die($!);
+print $acting_fh '#!/bin/sh
+if [ "$1" = status ]; then cat \'' . $acting_out . '\'; exit 3; fi
+echo "$@" >> \'' . $log_file . '\'
+if [ "$2" = broken ]; then echo "$2: ERROR (spawn error)"; exit 7; fi
+echo "$2: done"
+';
+close($acting_fh);
+chmod( 0755, $acting );
+my $actions = sub {
+	open( my $log_fh, '<', $log_file ) or return '';
+	local $/;
+	my $logged = <$log_fh>;
+	close($log_fh);
+	unlink($log_file);
+	return $logged;
+};
+
+$return = $run->( '-p', $acting, '-R' );
+is( $return->{code}, 2,                              '-R does not change the exit' );
+is( $actions->(),    "start broken\nstart stopme\n", '-R starts not running items' );
+like(
+	$return->{stdout},
+	qr/^SUPERVISORCTL CRITICAL - 1 running, 1 starting, 1 stopped, 1 fatal, 1 restarted, 1 failed to restart \|.* restarted=1;;;0 restart_failed=1;;;0$/m,
+	'-R status line'
+);
+like( $return->{stdout}, qr/^RESTARTED - stopme, stopped$/m,                                   'restarted line' );
+like( $return->{stdout}, qr/^RESTART FAILED - broken, fatal: broken: ERROR \(spawn error\)$/m, 'restart failed line' );
+
+$return = $run->( '-p', $acting, '-c', '-f', $conf_dir, '-i', 'stopme', '-i', 'broken', '-L' );
+is( $actions->(), "reread\nadd notrunning\n", '-L rereads and adds' );
+like(
+	$return->{stdout},
+	qr/^SUPERVISORCTL CRITICAL - .*, 1 config added \|.* added=1;;;0 add_failed=0;;;0$/m,
+	'-L status line'
+);
+like( $return->{stdout}, qr/^ADDED - config notrunning$/m, 'added line' );
+
+$return = $run->( '-p', $acting, '-c', '-f', $conf_dir, '-R', '-l' );
+is( $actions->(), "start broken\nstart stopme\nreread\nadd notrunning\n", '-R -l restarts and adds' );
+
+is( $run->( '-p', $acting, '-c', '-l' )->{code}, 3,  '-l without -R is UNKNOWN' );
+is( $run->( '-p', $acting, '-R', '-l' )->{code}, 3,  '-l without -c is UNKNOWN' );
+is( $run->( '-p', $acting, '-L' )->{code},       3,  '-L without -c is UNKNOWN' );
+is( $actions->(),                                '', 'nothing done for bad options' );
+
 # problems are UNKNOWN
 $return = $run->( '-p', $dir . '/not-there' );
 is( $return->{code}, 3, 'supervisorctl not being there is UNKNOWN' );

@@ -10,7 +10,7 @@ use File::Copy ();
 use File::Basename ();
 use Template::Stencil;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 sub new {
     my ($class, %args) = @_;
@@ -56,15 +56,18 @@ sub ident {
 sub render_skel {
     my ($class, $template, $vars) = @_;
     my ($dir) = $class->_find_skel($template);
+    # uncoverable condition right
     return _engine_for($dir)->render($template, $vars || {});
 }
 
 sub write_skel {
     my ($class, $template, $abs, $vars) = @_;
     File::Path::make_path(File::Basename::dirname($abs));
+    # uncoverable branch true
     open my $fh, '>:encoding(UTF-8)', $abs
         or Carp::croak("Punk::Generate: cannot write $abs: $!");
     print $fh $class->render_skel($template, $vars);
+    # uncoverable branch true
     close $fh or Carp::croak("Punk::Generate: cannot close $abs: $!");
     return $abs;
 }
@@ -84,6 +87,7 @@ sub run {
     my $dir = $self->{dir};
 
     if (-e $dir) {
+        # uncoverable branch true
         Carp::croak("Punk::Generate: '$dir' exists and is not a directory")
             unless -d $dir;
         Carp::croak("Punk::Generate: '$dir' is not empty")
@@ -161,6 +165,8 @@ sub _pkg_ok {
 # Perl in your application.
 sub _op_id {
     my ($id) = @_;
+    # uncoverable condition right count:1
+    # uncoverable condition left count:2
     Carp::croak("punk: operationId '" . ($id // '') . "' is not a Perl "
               . "identifier (a letter or underscore, then letters, digits "
               . "and underscores), so no handler can be generated for it")
@@ -173,10 +179,12 @@ sub _op_id {
 # resulting piece capitalised. "books & authors" -> BooksAuthors.
 sub _ident {
     my ($raw) = @_;
+    # uncoverable branch true
     return '' unless defined $raw;
     my @parts = grep { length } split /[^A-Za-z0-9]+/, $raw;
     return '' unless @parts;
     my $id = join '', map { ucfirst $_ } @parts;
+    # uncoverable branch true
     $id = "N$id" if $id =~ /\A[0-9]/;   # a package name cannot start with a digit
     return $id;
 }
@@ -189,8 +197,11 @@ sub _ident {
 # copy in the same @INC cannot disagree.
 sub skel_dir {
     my ($class) = @_;
+    # uncoverable condition left
+    # uncoverable condition false
     $class = ref $class || $class;
     (my $file = "$class.pm") =~ s{::}{/}g;
+    # uncoverable branch true
     my $pm = $INC{$file}
         or Carp::croak("$class: cannot locate my own installation");
     (my $dir = $pm) =~ s/\.pm\z//;
@@ -203,9 +214,11 @@ sub skel_dir {
 # change a line of it.
 sub skel_dirs {
     my ($class) = @_;
+    # uncoverable condition false
     $class = ref $class || $class;
     require mro;
     return grep { -d }
+           # uncoverable branch false
            map  { $_->can('skel_dir') ? $_->skel_dir : () }
            @{ mro::get_linear_isa($class) };
 }
@@ -218,6 +231,7 @@ sub _find_skel {
         my $abs = File::Spec->catfile($d, split m{/}, $rel);
         return ($d, $abs) if -f $abs;
     }
+    # uncoverable branch false
     Carp::croak("Punk::Generate: no skeleton template '$rel' in "
               . (@dirs ? join(', ', @dirs) : '(no skeleton directories)'));
 }
@@ -230,6 +244,7 @@ sub _find_skel {
 my %ENGINE;
 sub _engine_for {
     my ($dir) = @_;
+    # uncoverable condition false
     return $ENGINE{$dir} ||= Template::Stencil->new(
         template_dir => $dir,
         auto_escape  => 0,
@@ -239,6 +254,7 @@ sub _engine_for {
 
 sub _has_entries {
     my ($dir) = @_;
+    # uncoverable branch true
     opendir(my $dh, $dir) or return 0;
     my @e = grep { $_ ne '.' && $_ ne '..' } readdir $dh;
     closedir $dh;
@@ -255,9 +271,11 @@ sub _dest {
 sub _render {
     my ($self, $template, $rel, $vars) = @_;
     my $abs = $self->_dest($rel);
+    # uncoverable branch true
     open my $fh, '>:encoding(UTF-8)', $abs
         or Carp::croak("Punk::Generate: cannot write $abs: $!");
     print $fh $self->render_skel($template, $vars);
+    # uncoverable branch true
     close $fh or Carp::croak("Punk::Generate: cannot close $abs: $!");
     $self->_wrote($rel);
     return $abs;
@@ -272,6 +290,7 @@ sub _copy {
 sub _copy_file {
     my ($self, $src, $rel) = @_;
     my $abs = $self->_dest($rel);
+    # uncoverable branch true
     File::Copy::copy($src, $abs)
         or Carp::croak("Punk::Generate: cannot copy $src to $abs: $!");
     $self->_wrote($rel);
@@ -284,6 +303,7 @@ sub _copy_file {
 sub _wrote {
     my ($self, $rel) = @_;
     push @{ $self->{written} }, $rel
+        # uncoverable branch false
         unless grep { $_ eq $rel } @{ $self->{written} };
     return;
 }
@@ -298,11 +318,13 @@ sub _read_api {
     Carp::croak("Punk::Generate: no such spec file: $spec") unless -f $spec;
 
     require Open::API;
+    # uncoverable branch true
     my $api = eval { Open::API->new(spec => $spec) }
         or Carp::croak("Punk::Generate: $spec is not a usable OpenAPI "
             . "document: $@");
 
     my $ops = $api->operations;
+    # uncoverable condition left
     Carp::croak("Punk::Generate: $spec declares no operations")
         unless $ops && @$ops;
 
@@ -317,6 +339,10 @@ sub _read_api {
            $a->{path} cmp $b->{path}
         || ($rank{ uc $a->{method} } // 99) <=> ($rank{ uc $b->{method} } // 99)
         || $a->{method} cmp $b->{method}
+    # uncoverable branch true
+    # uncoverable condition right count:1
+    # uncoverable condition right count:2
+    # uncoverable condition false count:3
     } @$ops;
     $ops = \@sorted;
 
@@ -335,6 +361,7 @@ sub _read_api {
 
     for my $op (@$ops) {
         my $label = $tagged ? (_tags_for($doc, $op)->[0] // '')
+                            # uncoverable condition right count:2
                             : (grep { length } split m{/}, $op->{path})[0] // '';
         my $group = _ident($label) || 'Default';
         push @order, $group unless $by_group{$group};
@@ -361,6 +388,7 @@ sub _read_api {
         # name rather than clobbering a controller full of operations.
         my %taken = map { $_ => 1 } @order;
         ($auth_class) = grep { !$taken{$_} } qw(Auth Security Authentication);
+        # uncoverable condition right
         $auth_class ||= 'AuthSchemes';
         $_->{class} = $auth_class for @schemes;
     }
@@ -398,8 +426,10 @@ sub _schemes {
         my ($req) = @_;
         return unless ref $req eq 'ARRAY';
         for my $alt (@$req) {
+            # uncoverable branch true
             next unless ref $alt eq 'HASH';
             for my $name (sort keys %$alt) {
+                # uncoverable branch false
                 push @order, $name unless $want{$name}++;
             }
         }
@@ -407,11 +437,13 @@ sub _schemes {
     $collect->($doc->{security});
     for my $op (@$ops) {
         my $node = _op_node($doc, $op);
+        # uncoverable branch false
         $collect->($node->{security}) if $node;
     }
 
     my @out;
     for my $name (@order) {
+        # uncoverable branch false
         my $d = ref $defs->{$name} eq 'HASH' ? $defs->{$name} : {};
         push @out, {
             # Spec strings land in comment lines, so none may carry a
@@ -427,6 +459,8 @@ sub _schemes {
             type        => _one_line($d->{type}   || ''),
             in          => _one_line($d->{in}     || ''),
             key         => _one_line($d->{name}   || ''),
+            # uncoverable condition right count:1
+            # uncoverable condition right count:2
             scheme      => _one_line(lc($d->{scheme} || '')),
             description => _summary($d),
             credential  => _one_line(_credential_of($d)),
@@ -439,14 +473,19 @@ sub _schemes {
 # thing someone filling in a stub most needs to know.
 sub _credential_of {
     my ($d) = @_;
+    # uncoverable condition right
     my $type = $d->{type} || '';
     if ($type eq 'apiKey') {
+        # uncoverable condition right
         my $where = $d->{in} || 'header';
+        # uncoverable condition right
         my $key   = $d->{name} // '';
         return "the $where '$key'";
     }
     if ($type eq 'http') {
+        # uncoverable condition right
         my $s = lc($d->{scheme} || '');
+        # uncoverable branch true
         return 'the base64-decoded "user:password" from the Authorization '
              . 'header' if $s eq 'basic';
         return 'the token from the Authorization header, without the '
@@ -459,24 +498,33 @@ sub _credential_of {
 
 sub _op_node {
     my ($doc, $op) = @_;
+    # uncoverable condition left
+    # uncoverable condition right
     my $p = $doc->{paths} && $doc->{paths}{ $op->{path} };
+    # uncoverable branch true
     return undef unless ref $p eq 'HASH';
     my $node = $p->{ lc $op->{method} };
+    # uncoverable branch false
     return ref $node eq 'HASH' ? $node : undef;
 }
 
 sub _tags_for {
     my ($doc, $op) = @_;
     my $node = _op_node($doc, $op);
+    # uncoverable condition left
     my $tags = $node && $node->{tags};
+    # uncoverable branch false count:1
     return ref $tags eq 'ARRAY' ? [ grep { defined && length } @$tags ] : [];
 }
 
 sub _summary {
     my ($node) = @_;
+    # uncoverable branch true
     return '' unless ref $node eq 'HASH';
     my $s = $node->{summary};
+    # uncoverable condition right
     $s = $node->{description} unless defined $s && length $s;
+    # uncoverable condition right
     return '' unless defined $s && length $s;
     $s =~ s/\s+/ /g;                 # one line, for a comment and a POD para
     $s =~ s/\A\s+|\s+\z//g;
@@ -488,6 +536,7 @@ sub _summary {
 # it would end the comment, and a control byte would hide what follows.
 sub _one_line {
     my ($s) = @_;
+    # uncoverable branch true
     return '' unless defined $s;
     $s =~ s/[\x00-\x1f\x7f]+/ /g;
     return $s;

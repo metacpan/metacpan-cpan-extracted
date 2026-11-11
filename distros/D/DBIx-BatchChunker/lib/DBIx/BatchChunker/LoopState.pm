@@ -3,7 +3,7 @@ package DBIx::BatchChunker::LoopState;
 our $AUTHORITY = 'cpan:GSG';
 # ABSTRACT: Loop state object for DBIx::BatchChunker
 use version;
-our $VERSION = 'v1.0.2'; # VERSION
+our $VERSION = 'v1.0.3'; # VERSION
 
 use Moo;
 use MooX::StrictConstructor;
@@ -135,7 +135,8 @@ has end => (
     lazy     => 1,
     default  => sub {
         my $self = shift;
-        $self->start + $self->batch_chunker->chunk_size - 1;
+        my $bc   = $self->batch_chunker;
+        $self->start + $bc->chunk_size * $bc->id_increment - 1;
     },
 );
 
@@ -185,9 +186,9 @@ sub _reset_last_timings { shift->last_timings([]) }
 
 #pod =head2 multiplier_range
 #pod
-#pod The range (in units of L</chunk_size>) between the start and end IDs.  This starts at 1
-#pod (at the beginning of the loop), but may expand or shrink depending on chunk count checks.
-#pod Resets after block processing.
+#pod The range (in units of L</chunk_size> times L<DBIx::BatchChunker/id_increment>) between
+#pod the start and end IDs.  This starts at 1 (at the beginning of the loop), but may expand
+#pod or shrink depending on chunk count checks.  Resets after block processing.
 #pod
 #pod =cut
 
@@ -340,7 +341,7 @@ DBIx::BatchChunker::LoopState - Loop state object for DBIx::BatchChunker
 
 =head1 VERSION
 
-version v1.0.2
+version v1.0.3
 
 =head1 SYNOPSIS
 
@@ -419,9 +420,9 @@ runtime targeting.
 
 =head2 multiplier_range
 
-The range (in units of L</chunk_size>) between the start and end IDs.  This starts at 1
-(at the beginning of the loop), but may expand or shrink depending on chunk count checks.
-Resets after block processing.
+The range (in units of L</chunk_size> times L<DBIx::BatchChunker/id_increment>) between
+the start and end IDs.  This starts at 1 (at the beginning of the loop), but may expand
+or shrink depending on chunk count checks.  Resets after block processing.
 
 =head2 multiplier_step
 
@@ -458,7 +459,7 @@ Grant Street Group <developers@grantstreet.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is Copyright (c) 2018 - 2025 by Grant Street Group.
+This software is Copyright (c) 2018 - 2026 by Grant Street Group.
 
 This is free software, licensed under:
 

@@ -1,4 +1,6 @@
 ## no critic (ValuesAndExpressions::RequireInterpolationOfMetachars)
+## no critic (Subroutines::ProhibitCallsToUnexportedSubs)
+## no critic (Modules::RequireExplicitInclusion)
 
 package Git::MoreHooks::CheckPerl;
 
@@ -8,17 +10,17 @@ use utf8;
 
 # ABSTRACT: Check committed files for Perl::Critic correctness.
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 
 # use Git::MoreHooks::CheckCommitBase \&do_hook;
 
-use Git::Hooks;
-use Path::Tiny;
+use Git::Hooks 4.000_000;
+use Path::Tiny qw( path );
 use Log::Any qw{$log};
 use Module::Load qw{ load };
 use Text::Glob qw{ glob_to_regex };
-use List::MoreUtils qw( any );
+use List::Util 1.33 qw( any none );
 
 
 my $PKG = __PACKAGE__;
@@ -31,8 +33,11 @@ my $CFG = 'githooks.' . $HOOK;
 
 sub _setup_config {
     my ($git) = @_;
-    $log->debugf( __PACKAGE__ . '::_setup_config(%s):', '$git' );
+    $log->debugf( __PACKAGE__ . '::_setup_config(%s):', $git );
 
+    # The configuration is cached during the first invocation
+    # in the object Git::Repository object.
+    # https://metacpan.org/pod/Git::Repository::Plugin::GitHooks#get_config-[SECTION-[VARIABLE]]
     my $config = $git->get_config();
     $log->tracef( __PACKAGE__ . '::_setup_config(): Current Git config:\n%s.', $config );
 
@@ -42,7 +47,16 @@ sub _setup_config {
     # Set default config values.
     my $default = $config->{ lc $CFG };
     $default->{'use-temp-files'} //= [0];
-    $default->{'name'} //= ['*.p[lm]', '*.psgi', '*.t'];
+    $default->{'name'} //= [
+        '*.p[lm]',
+        '*.psgi',
+        '*.t',
+    ];
+    $default->{'dirpath'} //= [
+        'bin',
+        'script',
+    ];
+    $default->{'filepath'} //= [];
 
     $default->{'critic'} //= {};
     $default->{'perl-c'} //= {};
@@ -54,7 +68,7 @@ sub _setup_config {
     # Perl -c
     $default->{'perl-c'}->{'active'} //= [0];
 
-    $log->tracef( __PACKAGE__ . '::_setup_config(): Final Git config:\n%s.', $config );
+    $log->tracef( __PACKAGE__ . '::_setup_config(): Final Git config:\n%s.', $git->get_config() );
 
     return 1;
 }
@@ -197,7 +211,9 @@ sub check_new_or_modified_files {
         }
         push @name_patterns, $pattern;
     }
-    $log->debugf( __PACKAGE__ . q{::} . 'check_new_or_modified_files():name_patterns=%s', \@name_patterns);
+    my @dirpaths = @{ $config->{'dirpath'} };
+    my @filepaths = @{ $config->{'filepath'} };
+    $log->debugf( __PACKAGE__ . q{::} . 'check_new_or_modified_files():name_patterns=%s, dirpaths=%s, filepaths=%s', \@name_patterns, \@dirpaths, \@filepaths);
     foreach my $file ($git->run(qw/ls-files -s/, @files)) {
         my ($mode, $sha, $n, $filename) = split q{ }, $file;
         $log->tracef( __PACKAGE__ . q{::}
@@ -205,12 +221,18 @@ sub check_new_or_modified_files {
             ($mode, $sha, $n, $filename)
         );
         my $basename = path($filename)->basename;
-        $log->debugf( __PACKAGE__ . q{::} . 'check_new_or_modified_files():basename=%s', $basename);
+        my $dir = path($filename)->parent->stringify;
+        $log->debugf( __PACKAGE__ . q{::} . 'check_new_or_modified_files():basename=%s, dir=%s, filename=%s', $basename, $dir, $filename);
         # The regexes generated from globs might not be /msx compatible.
         ## no critic (RegularExpressions::RequireDotMatchAnything)
         ## no critic (RegularExpressions::RequireExtendedFormatting)
         ## no critic (RegularExpressions::RequireLineBoundaryMatching)
-        next if( ! any { $basename =~ m/$_/ } @name_patterns);
+        next if(
+            ( none { $basename =~ m/$_/ } @name_patterns )
+            && ( none { $dir eq $_ } @dirpaths )
+            && ( none { $filename eq $_ } @filepaths )
+        );
+        $log->tracef( __PACKAGE__ . q{::} . 'check_new_or_modified_files(): match found');
         my $content = $git->run(qw/cat-file -p/, $sha);
         $log->tracef( __PACKAGE__ . q{::} . 'check_new_or_modified_files():content=%s', $content);
 
@@ -289,7 +311,7 @@ Git::MoreHooks::CheckPerl - Check committed files for Perl::Critic correctness.
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 
@@ -416,6 +438,8 @@ for using different checkers.
 
 This plugin is configured by the following git options.
 
+N.B. If you set the same config item, it replaces the default.
+
 =head3 githooks.checkperl.use-temp-files BOOL
 
 Whenever a checker supports it, files are not written
@@ -456,6 +480,24 @@ Default values are:
         name = *.p[lm]
         name = *.psgi
         name = *.t
+
+=head3 githooks.checkperl.dir STRING
+
+Give exact path, one or many, to check all the files
+in those paths. This is not PATTERN.
+
+Default values are:
+
+    [githooks "checkperl"]
+        dir = bin
+        dir = script
+
+=head3 githooks.checkperl.filepath STRING
+
+Give exact filepath, one or many, to check any particular file .
+This is not PATTERN.
+
+No defaults.
 
 =head3 githooks.checkperl.critic.active BOOL
 

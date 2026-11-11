@@ -1,5 +1,16 @@
 Revision history for Dancer2::Plugin::Captcha
 
+1.0.0  2026-11-10
+       - Switched to dotted-decimal versioning (v-strings).
+       - Updated minimum requirement to Dancer2 v2.3.0.
+       - Renamed unit test: t/captcha.t => t/01-captcha.t
+       - Added unit tests: xt/changes.t and xt/version.t
+       - Use response_header instead of deprecated header keyword
+
+       Dancer2 deprecated the 'header' keyword in favour of 'response_header',
+       and it now croaks ("DEPRECATED: header keyword...") when called.
+       This made generate_captcha die with a 500, which in turn broke t/captcha.t
+
 0.14  Fri Jul 10 09:25:00 2020
       - Updated pod document, thanks Sergiy Borodych.
 

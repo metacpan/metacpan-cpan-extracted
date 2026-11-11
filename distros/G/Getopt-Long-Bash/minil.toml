@@ -12,6 +12,10 @@ branch = "main"
 hooks = [
     "perl -Ilib -MGetopt::Long::Bash -i -pE 's/^: \\$\\{GOL_VERSION:=\\K[\\d.]+/$Getopt::Long::Bash::VERSION/' script/getoptlong.sh",
     "perl -Ilib -MGetopt::Long::Bash -i -0777 -pE 's/(?<=^=head1 VERSION\\n\\n)[\\d.]+/$Getopt::Long::Bash::VERSION/m' script/getoptlong",
+    # README.md is generated before the hooks run and the copy in the
+    # distribution keeps the old version line (tokuhirom/Minilla#342);
+    # regenerate it from the updated script/getoptlong
+    "minil build",
 ]
 
 [unsupported]

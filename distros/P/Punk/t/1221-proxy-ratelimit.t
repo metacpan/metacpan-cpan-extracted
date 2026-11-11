@@ -4,8 +4,9 @@ use warnings;
 use FindBin ();
 # Prefer the sibling Hyperman build, as t/1220-ratelimit.t does: the arena and
 # ABI v3 land there first and an installed copy may still be v2.
-use lib "$FindBin::Bin/../../Hyperman/blib/lib";
-use lib "$FindBin::Bin/../../Hyperman/blib/arch";
+use Config;
+use lib grep { -e "$_/auto/Hyperman/Hyperman.$Config{dlext}" } "$FindBin::Bin/../../Hyperman/blib/arch";
+use lib grep { -e "$_/../arch/auto/Hyperman/Hyperman.$Config{dlext}" } "$FindBin::Bin/../../Hyperman/blib/lib";
 use lib "$FindBin::Bin/lib";
 use Test::More;
 use PunkTest;

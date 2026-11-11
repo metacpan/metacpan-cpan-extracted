@@ -3,7 +3,7 @@ package Database::BI::Tutorial;
 use strict;
 use warnings;
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 # ---------------------------------------------------------------------------
 # The tutorial that the application shows at GET /tutorial.
@@ -614,9 +614,15 @@ my @CHAPTERS = (
 			'Keep Coordinate columns, then choose the latitude and longitude columns.',
 			'If your table has places instead, choose Place-name column and pick that column.',
 			'If the place is split over two columns, such as an address and its country, choose the second one under Followed by. The map then looks up "Brezje 8, Cerknica, Slovenia".',
-			'Tick Remember columns. Next time, the panel chooses the same columns for this table. Click Forget remembered columns to stop this.',
+			'If the places need more to be found, type it in Add to each place. With Virginia, USA, the county Accomack is looked up as "Accomack, Virginia, USA".',
+			'Tick Remember columns. Next time, the panel chooses the same columns for this table, and fills in Add to each place. Click Forget remembered columns to stop this.',
 			'Tick Heatmap layer to colour the busy areas. Choose a Heat weight column to make some rows count for more.',
 			'Type an Initial zoom from 0 to 19 to start closer in. Leave it empty to fit every marker.',
+			'Tick Show county boundaries to outline the county each marker is in. A checkbox on the map hides the outlines again.',
+			'With the boundaries on, choose a column for Colour shade. Each county is filled in a shade of one colour, darker for a larger total.',
+			'With coloured markers too, each county is shaded in its own markers\' colour. Type a Shade colour to use one colour for them all.',
+			'Under the map, a list names each outline that holds more than one marker. Click its number of rows to see them in the table.',
+			'Two places in one outline can mean a name was looked up wrongly. Add to each place, or coordinate columns, make a lookup surer.',
 			'To colour the markers, choose Colour by column, then click Add rule. The first rule that matches gives the colour.',
 			'Type a Default colour for the markers that match no rule.',
 			'Click Open map.',
@@ -625,7 +631,7 @@ my @CHAPTERS = (
 			'Or click List the places that were not plotted to see each place.',
 			'Click the number of rows beside a place to see those rows in the table.',
 		],
-		tip   => 'Rows at one place become one marker. Click a marker to see every row it stands for. What the rows share is shown once, and the rest is a short table. A place with many rows shows the first ten, with a link to them all. The scale bar and the key change as you zoom. The key lists only the colours you can see. To size each marker by a number, add &size= and a column name to the map address. To give each category its own colour and a legend, add &series= and a column name instead. A place the local data does not know is looked up on OpenStreetMap. The map opens at once with the places already known. A bar shows each new place as it is looked up. Click Cancel to stop and see the map with the places found so far. Every place found is kept, so the next map of it opens at once.',
+		tip   => 'Rows at one place become one marker. Click a marker to see every row it stands for. What the rows share is shown once, and the rest is a short table. A place with many rows shows the first ten, with a link to them all. The scale bar and the key change as you zoom. The key lists only the colours you can see. To size each marker by a number, add &size= and a column name to the map address. To give each category its own colour and a legend, add &series= and a column name instead. A place the local data does not know is looked up on OpenStreetMap. The map opens at once with the places already known. A bar shows each new place as it is looked up. Click Cancel to stop and see the map with the places found so far. Every place found is kept, so the next map of it opens at once. County outlines come from OpenStreetMap too. It is sent each marker\'s position, rounded to about 100 metres. In India the outlines are districts, and in Spain provinces. Add &heat=1&weight= and a column name to colour each outline by its total, from green for the least to red for the most. A key in the corner of the map shows the totals each colour covers.',
 		walkthrough => {
 			title => 'Walk through: Virginia counties on a map',
 			intro => 'This example uses the virginia_counties table in the data folder.',
@@ -1005,6 +1011,8 @@ my @CHAPTERS = (
 			'Pass --spec with the table, and --col with the column that holds the place names.',
 			'Give --col twice for a place split over two columns, such as --col Address --col Country.',
 			'For example: bi-geocode --spec table:virginia_counties --col county --region US.',
+			'Pass --text to add the same words to the end of each place, as Add to each place does on the map.',
+			'For example, --text \'Virginia, USA\' looks up Accomack as Accomack, Virginia, USA.',
 			'Pass --region with a country code, such as GB or US, when the names could be in several countries.',
 			'Pass --dry-run to look the places up without keeping the result.',
 			'Places the local data does not know are looked up on OpenStreetMap, one each second. Pass --offline to stop that.',

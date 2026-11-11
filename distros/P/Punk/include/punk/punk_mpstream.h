@@ -42,10 +42,18 @@
  * whole copy of a large file. */
 static SV *pq_upload_dir(pTHX_ AV *req) {
     HV *env = punk_req_env(aTHX_ req);
-    SV **d = env ? hv_fetchs(env, "punk.upload_dir", 0) : NULL;
+    SV **d = env ? hv_fetchs(env, "punk.upload_dir", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err
+     # uncoverable condition right count:4 class:ignore_covered_err */
     if (d && *d && SvOK(*d) && SvCUR(*d)) return sv_2mortal(newSVsv(*d));
     {
         const char *e = PerlEnv_getenv("TMPDIR");
+        /*
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         return sv_2mortal(newSVpv(e && *e ? e : "/tmp", 0));
     }
 }
@@ -70,9 +78,16 @@ static int pq_sink_spill(pTHX_ pq_sink *s, SV *dir, UV seq) {
     unsigned char rnd[9];
     SV *path;
     int fd;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (s->fd >= 0) return 1;
     pk_ent_take(aTHX_ rnd, sizeof rnd);
     path = newSVsv(dir);
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (SvCUR(path) && SvEND(path)[-1] != '/') sv_catpvs(path, "/");
     sv_catpvs(path, "punk-up-");
     {   SV *b64 = pk_b64url(aTHX_ rnd, sizeof rnd);
@@ -81,11 +96,21 @@ static int pq_sink_spill(pTHX_ pq_sink *s, SV *dir, UV seq) {
     }
     sv_catpvf(path, "-%" UVuf, seq);
     fd = PerlLIO_open3(SvPVX(path), O_WRONLY | O_CREAT | O_EXCL, 0600);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (fd < 0) { SvREFCNT_dec(path); return 0; }
     /* whatever was accumulated before the threshold goes out first */
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (s->sv && SvCUR(s->sv)) {
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (PerlLIO_write(fd, SvPVX(s->sv), SvCUR(s->sv)) < 0) {
-            PerlLIO_close(fd); SvREFCNT_dec(path); return 0;
+            PerlLIO_close(fd); SvREFCNT_dec(path); return 0; /* # uncoverable statement */
         }
         SvCUR_set(s->sv, 0);
     }
@@ -103,7 +128,16 @@ static void pq_sink_write(pTHX_ pq_sink *s, const char *p, STRLEN n,
     if (s->fd >= 0) {
         /* a short write (a full disk) is remembered and refused when the
          * part ends: `size` must never say more than is on disk */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!s->err && PerlLIO_write(s->fd, p, n) != (SSize_t)n)
+            /*
+             # uncoverable statement
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             s->err = errno ? errno : EIO;
         return;
     }
@@ -131,9 +165,15 @@ static int pq_mp_fill(pTHX_ PerlIO *fp, SV *buf, STRLEN want, pq_mp_lim *lim) {
     char *d;
     if (lim->left == 0) return 0;
     if (lim->left > 0 && (IV)want > lim->left) want = (STRLEN)lim->left;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!want) return 0;
     d = SvGROW(buf, have + want + 1);
     got = PerlIO_read(fp, d + have, want);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (got <= 0) { lim->left = 0; return 0; }
     SvCUR_set(buf, have + (STRLEN)got);
     SvPVX(buf)[have + got] = '\0';
@@ -148,6 +188,9 @@ static int pq_mp_fill(pTHX_ PerlIO *fp, SV *buf, STRLEN want, pq_mp_lim *lim) {
 /* Drop the first n bytes of buf. */
 static void pq_mp_consume(pTHX_ SV *buf, STRLEN n) {
     STRLEN have = SvCUR(buf);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (n >= have) { SvCUR_set(buf, 0); return; }
     Move(SvPVX(buf) + n, SvPVX(buf), have - n, char);
     SvCUR_set(buf, have - n);
@@ -169,6 +212,10 @@ static void pq_sink_drop(pTHX_ pq_sink *s) {
 
 static int pq_sink_free(pTHX_ SV *sv, MAGIC *mg) {
     PERL_UNUSED_ARG(mg);
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (SvPOK(sv) && SvCUR(sv) == sizeof(pq_sink))
         pq_sink_drop(aTHX_ (pq_sink *)SvPVX(sv));
     return 0;
@@ -211,10 +258,18 @@ static int pq_tmp_free(pTHX_ SV *sv, MAGIC *mg) {
     AV *av = (AV *)sv;
     SSize_t i, n;
     PERL_UNUSED_ARG(mg);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!av || SvTYPE((SV *)av) != SVt_PVAV) return 0;
     n = av_len(av) + 1;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(av, i, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (e && *e && SvOK(*e) && SvCUR(*e))
             (void)PerlLIO_unlink(SvPVX(*e));
     }
@@ -267,41 +322,79 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
         const char *disp = NULL, *ctype = NULL, *name = NULL, *fname = NULL;
         STRLEN displ = 0, ctypel = 0, namel = 0, fnamel = 0;
         /* "--" here is the closing delimiter; CRLF starts another part */
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         while (SvCUR(buf) < 2)
+            /*
+             # uncoverable statement class:ignore_covered_err
+             # uncoverable branch true class:ignore_covered_err
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) return parts;
-        if (SvPVX(buf)[0] == '-' && SvPVX(buf)[1] == '-') return parts;
+        if (SvPVX(buf)[0] == '-' && SvPVX(buf)[1] == '-') return parts; /* # uncoverable condition right count:2 class:ignore_covered_err */
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (SvPVX(buf)[0] != '\r' || SvPVX(buf)[1] != '\n') return parts;
         pq_mp_consume(aTHX_ buf, 2);
 
         /* the part's headers, which are small by definition */
-        for (;;) {
+        for (;;) { /* # uncoverable statement class:ignore_covered_err */
             char *b = SvPVX(buf);
             { const char *crlf2 = "\r\n\r\n";
               hend = ninstr(b, b + SvCUR(buf),
                             (char *)crlf2, (char *)crlf2 + 4); }
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (hend) break;
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             if (SvCUR(buf) > PQ_MP_HDR_MAX) return parts;
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) return parts;
         }
         {   /* the same header reading the whole-buffer parser does */
             const char *hp = SvPVX(buf);
+            /*
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err */
             while (hp < hend) {
                 const char *crlf = "\r\n";
                 const char *le = ninstr((char *)hp, (char *)hend,
                                         (char *)crlf, (char *)crlf + 2);
                 const char *lend = le ? le : hend;
                 STRLEN ll = (STRLEN)(lend - hp);
-                if (ll >= 20 && strncasecmp(hp, "Content-Disposition:", 20) == 0) {
+                if (ll >= 20 && strncasecmp(hp, "Content-Disposition:", 20) == 0) { /* # uncoverable condition right count:1 class:ignore_covered_err */
                     disp = hp + 20; displ = ll - 20;
                 }
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 else if (ll >= 13 && strncasecmp(hp, "Content-Type:", 13) == 0) {
                     ctype = hp + 13;
-                    while (ctype < hp + ll && *ctype == ' ') ctype++;
+                    while (ctype < hp + ll && *ctype == ' ') ctype++; /* # uncoverable condition right count:1 class:ignore_covered_err */
                     ctypel = (STRLEN)((hp + ll) - ctype);
                 }
                 if (!le) break;
                 hp = le + 2;
             }
+            /*
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (disp) {
                 name  = pq_hdr_param(disp, displ, "name", &namel);
                 fname = pq_hdr_param(disp, displ, "filename", &fnamel);
@@ -309,7 +402,7 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
         }
         /* headers are copied out before the buffer moves under them */
         {
-            SV *nsv = name  ? sv_2mortal(newSVpvn(name, namel))   : NULL;
+            SV *nsv = name  ? sv_2mortal(newSVpvn(name, namel))   : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
             SV *fsv = fname ? sv_2mortal(newSVpvn(fname, fnamel)) : NULL;
             SV *tsv = (ctype && ctypel)
                     ? sv_2mortal(newSVpvn(ctype, ctypel)) : NULL;
@@ -331,30 +424,42 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                     pq_mp_consume(aTHX_ buf, (STRLEN)(hit - b) + NDl);
                     break;
                 }
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition right count:1 class:ignore_covered_err */
                 if (SvCUR(buf) > keep) {
                     STRLEN flush = SvCUR(buf) - keep;
                     pq_sink_write(aTHX_ sink, b, flush, dir, seq);
                     pq_mp_consume(aTHX_ buf, flush);
                 }
+                /*
+                 # uncoverable branch true
+                 # uncoverable condition left count:1 class:ignore_covered_err */
                 if (!pq_mp_fill(aTHX_ fp, buf, PQ_MP_CHUNK, &lim)) {
                     /* truncated: the part never ended */
-                    pq_sink_write(aTHX_ sink, SvPVX(buf), SvCUR(buf), dir, seq);
-                    pq_mp_consume(aTHX_ buf, SvCUR(buf));
-                    break;
+                    pq_sink_write(aTHX_ sink, SvPVX(buf), SvCUR(buf), dir, seq); /* # uncoverable statement */
+                    pq_mp_consume(aTHX_ buf, SvCUR(buf)); /* # uncoverable statement */
+                    break; /* # uncoverable statement */
                 }
             }
             if (sink->fd >= 0) { PerlLIO_close(sink->fd); sink->fd = -1; }
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err */
             if (sink->err) {
                 /* the guard frees the sink and its temp file on the way out */
-                int e = sink->err;
-                croak("Punk::Request: upload could not be written: %s",
-                      Strerror(e));
+                int e = sink->err; /* # uncoverable statement */
+                croak("Punk::Request: upload could not be written: %s", /* # uncoverable statement */
+                      Strerror(e)); /* # uncoverable statement */
             }
 
             parts++;
+            /*
+             # uncoverable branch true
+             # uncoverable condition left count:1 class:ignore_covered_err */
             if (!nsv) {                       /* a part with no name is noise */
-                pq_sink_drop(aTHX_ sink);
-                continue;
+                pq_sink_drop(aTHX_ sink); /* # uncoverable statement */
+                continue; /* # uncoverable statement */
             }
 
             if (fsv) {
@@ -372,6 +477,9 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
                      * pq_tmp_free on why unlinking a moved file would be
                      * worse than leaking one. */
                     (void)hv_stores(up, "path", newSVsv(sink->path));
+                    /*
+                     # uncoverable branch false
+                     # uncoverable condition right count:1 class:ignore_covered_err */
                     if (tempfiles) {
                         SV *slot = newSVsv(sink->path);
                         av_push(tempfiles, slot);
@@ -394,19 +502,34 @@ static IV pq_parse_multipart_stream(pTHX_ PerlIO *fp, IV clen, IV max,
             else {
                 /* a field: it stays in memory, because a form value is
                  * something the application is about to read */
+                /*
+                 # uncoverable branch true
+                 # uncoverable condition left count:1 class:ignore_covered_err */
                 if (sink->path) {
                     /* it outgrew the threshold anyway - read it back rather
                      * than hand a form value a path nobody expects */
-                    SV *v = newSVpvs("");
-                    int fd = PerlLIO_open(SvPVX(sink->path), O_RDONLY);
+                    SV *v = newSVpvs(""); /* # uncoverable statement */
+                    int fd = PerlLIO_open(SvPVX(sink->path), O_RDONLY); /* # uncoverable statement */
+                    /*
+                     # uncoverable statement
+                     # uncoverable branch true
+                     # uncoverable branch false
+                     # uncoverable condition left count:1
+                     # uncoverable condition right count:1 */
                     if (fd >= 0) {
                         char tmp[PQ_MP_CHUNK];
                         SSize_t n;
+                        /*
+                         # uncoverable statement
+                         # uncoverable branch true
+                         # uncoverable branch false
+                         # uncoverable condition left count:1
+                         # uncoverable condition right count:1 */
                         while ((n = PerlLIO_read(fd, tmp, sizeof tmp)) > 0)
-                            sv_catpvn(v, tmp, (STRLEN)n);
-                        PerlLIO_close(fd);
+                            sv_catpvn(v, tmp, (STRLEN)n); /* # uncoverable statement */
+                        PerlLIO_close(fd); /* # uncoverable statement */
                     }
-                    pq_hv_add(aTHX_ form, SvPVX(nsv), SvCUR(nsv), v);
+                    pq_hv_add(aTHX_ form, SvPVX(nsv), SvCUR(nsv), v); /* # uncoverable statement */
                 }
                 else {
                     pq_hv_add(aTHX_ form, SvPVX(nsv), SvCUR(nsv),

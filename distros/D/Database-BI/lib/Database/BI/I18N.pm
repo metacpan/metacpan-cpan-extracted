@@ -3,7 +3,7 @@ package Database::BI::I18N;
 use strict;
 use warnings;
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 use Carp qw(croak);
 use Readonly;
@@ -162,7 +162,7 @@ Database::BI::I18N - Choose the language of messages, and give them in it
 
 =head1 VERSION
 
-0.022.0
+0.023.0
 
 =head1 SYNOPSIS
 

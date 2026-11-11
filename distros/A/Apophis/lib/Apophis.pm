@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '1.01';
+our $VERSION = '1.02';
 
 require XSLoader;
 XSLoader::load('Apophis', $VERSION);
@@ -123,6 +123,15 @@ Writes are atomic via temp file + rename.
     my $data_ref = $ca->fetch($id);
 
 Returns a scalar reference to the stored content, or C<undef> if not found.
+A blob that is there but cannot be opened or read is an error, not a miss.
+
+=head2 meta
+
+    my $meta = $ca->meta($id);
+    my $meta = $ca->meta($id, store_dir => '/other');
+
+Returns a hash reference of the metadata stored beside the content, or
+C<undef> when there is none.
 
 =head2 exists
 
@@ -169,6 +178,14 @@ Returns the subset of IDs that do not exist in the store.
 
 Returns the namespace UUID string.
 
+=head2 op_identify, op_store, op_exists, op_fetch, op_verify, op_remove
+
+    my $id = $ca->op_identify(\$content);
+
+Aliases of C<identify>, C<store>, C<exists>, C<fetch>, C<verify> and
+C<remove>, kept from when they were the only way to the fused bodies, see
+L</CUSTOM OPS>.
+
 =head1 CUSTOM OPS
 
     use Apophis;
@@ -200,8 +217,9 @@ C<op_remove> methods are aliases of the six, kept from when they were the
 only way to the fused bodies. They take the same options and are converted
 the same way.
 
-B names the ops C<apophis_identify> and so on from perl 5.14, and
-C<B::Deparse> shows each as the method call it was. F<bench/ops.pl> measures
+B names the ops C<apophis_identify> and so on, and C<B::Deparse> shows each
+as the method call it was. A perl before 5.14 cannot describe a custom op to
+B, so there the calls stay ordinary method calls. F<bench/ops.pl> measures
 each op against the same call made as an ordinary method call.
 
 =head1 C ABI

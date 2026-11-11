@@ -77,7 +77,7 @@ static void cc_parse_reply(const char *reply, size_t len, cc_verdict *v) {
     memset(v, 0, sizeof *v);
     v->state = CC_ERROR;
 
-    if (!reply || len == 0) return;
+    if (len == 0) return;
 
     /* Trim a trailing newline, which the 'n' framing leaves behind. */
     while (len && (reply[len - 1] == '\n' || reply[len - 1] == '\r')) len--;

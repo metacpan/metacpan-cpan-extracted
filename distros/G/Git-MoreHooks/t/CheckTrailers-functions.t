@@ -276,4 +276,31 @@ subtest 'Commit kinds' => sub {
     done_testing;
 };
 
+# The once-only report of an interpret-trailers failure is held per repository
+# and not in a package variable. A package variable outlives the invocation in
+# any interpreter that handles more than one, and the second repository would
+# then never be told that the plugin could not do its job.
+#
+# This exercises the scoping and the clearing, which is what the fix changed.
+# The failure path itself stays untested: `git interpret-trailers --parse`
+# cannot be made to fail from here -- it warns and exits 0 even for a bogus
+# trailer.* configuration -- so provoking it would need the git call mocked.
+subtest 'the once-only interpret-trailers report is per repository' => sub {
+    my $first = test_repository( temp => [ CLEANUP => 1 ], init => ['--initial-branch=main'] );
+    my $other = test_repository( temp => [ CLEANUP => 1 ], init => ['--initial-branch=main'] );
+
+    $first->cache('checktrailers')->{'announced_no_interpret_trailers'} = 1;
+
+    ok( $first->cache('checktrailers')->{'announced_no_interpret_trailers'},  'set for the first repository' );
+    ok( !$other->cache('checktrailers')->{'announced_no_interpret_trailers'}, 'and not for a second one in the same interpreter' );
+
+    Git::MoreHooks::CheckTrailers::_setup_config($first);
+    ok(
+        !$first->cache('checktrailers')->{'announced_no_interpret_trailers'},
+        '_setup_config clears it, so one invocation cannot silence the next'
+    );
+
+    done_testing;
+};
+
 done_testing();

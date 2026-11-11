@@ -20,7 +20,7 @@ for my $file ( $tar->list_files ) {
 
     my $meta = "${file}.json";
 
-    in_tempdir '$file' => sub {
+    in_tempdir $file => sub {
 
         $tar->extract( $file );
         $tar->extract( $meta );
@@ -29,7 +29,7 @@ for my $file ( $tar->list_files ) {
         my $expected = decode_json( File::Slurper::read_text( $meta ) );
         my $got      = $db->query( $expected->{class}, $expected->{name} );
 
-        is( $got, $expected->{res}{value}, "$file: @{[$expected->{match}]}" )
+        is( $got, $expected->{res}{value}, "$file: @{[ $expected->{match} // q{(no match)} ]}" )
           or do {
             note 'expected: ', pp( $expected );
             note 'got: ',      pp( $got );

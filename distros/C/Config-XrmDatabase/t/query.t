@@ -118,4 +118,74 @@ subtest failure => sub {
 
 };
 
+# create a db from @$keys (each key's value is the key) and query it
+# with the given name (class is the upper-cased name).  fails if the
+# query generates any warnings.
+sub query_db ( $keys, $name, %args ) {
+    my $db = Config::XrmDatabase->new;
+    $db->insert( $_, $_ ) for @$keys;
+    my $res;
+    ok( no_warnings { $res = $db->query( uc $name, $name, %args ) }, 'no warnings' );
+    return $res;
+}
+
+subtest 'loose binding matches zero components' => sub {
+
+    for my $test ( [ 'a*b', 'a.b' ], [ '*b', 'b' ], [ 'a*b*c', 'a.b.c' ], [ 'a.b.c*d', 'a.b.c.d' ], ) {
+        my ( $key, $name ) = @$test;
+        subtest "$key matches $name" => sub {
+            is( query_db( [$key], $name ), $key, 'value' );
+        };
+    }
+};
+
+subtest 'interior node without a value is not a match' => sub {
+
+    subtest 'default' => sub {
+        is( query_db( ['a.b.c'], 'a.b' ), U(), 'value' );
+    };
+
+    subtest 'all' => sub {
+        is( query_db( ['a.b.c'], 'a.b', return_value => 'all' ), U(), 'value' );
+    };
+
+    subtest 'reference' => sub {
+        is( query_db( ['a.b.c'], 'a.b', return_value => 'reference' ), U(), 'value' );
+    };
+
+    subtest 'throw' => sub {
+        my $res = dies { query_db( ['a.b.c'], 'a.b', on_failure => 'throw' ) };
+        isa_ok( $res, ['Config::XrmDatabase::Failure::query'], 'exception' );
+    };
+
+    subtest 'does not mask a loose match' => sub {
+        is( query_db( [ 'a.b.c', 'a*b' ], 'a.b' ), 'a*b', 'value' );
+    };
+};
+
+subtest 'single wildcard before last component' => sub {
+    is( query_db( ['a?c'],   'a.b' ),   U(),   'a?c does not match a.b' );
+    is( query_db( ['a?c.d'], 'a.b' ),   U(),   'a?c.d does not match a.b' );
+    is( query_db( ['a?c'],   'a.b.c' ), 'a?c', 'a?c matches a.b.c' );
+};
+
+subtest 'matched key includes loose bindings' => sub {
+
+    for my $test (
+        [ 'a*b',   'a.b',     [qw( a * b )] ],
+        [ '*b',    'b',       [qw( * b )] ],
+        [ 'a*b.c', 'a.b.c',   [qw( a * b c )] ],
+        [ 'a*b.c', 'a.x.b.c', [qw( a * b c )] ],
+        [ 'a*?.c', 'a.b.c',   [qw( a * ? c )] ],
+        [ 'a*b*c', 'a.b.c',   [qw( a * b * c )] ],
+      )
+    {
+        my ( $key, $name, $expected ) = @$test;
+        subtest "$key vs $name" => sub {
+            my $res = query_db( [$key], $name, return_value => 'all' );
+            is( $res->{key}, $expected, 'key' );
+        };
+    }
+};
+
 done_testing;

@@ -17,4 +17,8 @@ class UV::Handle::Timer extends UV::Handle {
   # Instance Methods
   native method start : void ($cb : UV::Callback::Timer, $timeout_msec : long, $interval_msec : long = 0);
   
+  native method stop : void ();
+  
+  native method again : void ();
+  
 }

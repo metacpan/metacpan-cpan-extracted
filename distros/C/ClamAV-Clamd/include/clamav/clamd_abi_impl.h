@@ -37,14 +37,23 @@ static void *cca_target_new(pTHX_ const char *socket_path,
 #endif
 
     g = (cca_target *)malloc(sizeof *g);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!g) return NULL;
     memset(g, 0, sizeof *g);
 
     g->path = socket_path ? cc_strdup(socket_path) : NULL;
     g->host = host        ? cc_strdup(host)        : NULL;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2
+     # uncoverable condition left count:3
+     # uncoverable condition left count:4 */
     if ((socket_path && !g->path) || (host && !g->host)) {
-        free(g->path); free(g->host); free(g);
-        return NULL;
+        free(g->path); free(g->host); free(g); /* # uncoverable statement */
+        return NULL; /* # uncoverable statement */
     }
 
     g->t.path            = g->path;
@@ -87,6 +96,9 @@ static void cca_target_free(pTHX_ void *target) {
  * reason: the safe reading has to be the short one. */
 static cc_scan *cca_scan_new(void) {
     cc_scan *s = (cc_scan *)malloc(sizeof *s);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!s) return NULL;
     memset(s, 0, sizeof *s);
     s->sock    = CC_INVALID_SOCK;
@@ -108,6 +120,9 @@ static void *cca_start_fd(pTHX_ void *target, int fd, int blocking) {
     PERL_UNUSED_CONTEXT;
     if (!g) return NULL;
     s = cca_scan_new();
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!s) return NULL;
 
     {
@@ -153,6 +168,9 @@ static void *cca_start_mem(pTHX_ void *target, const char *buf, size_t len,
     PERL_UNUSED_CONTEXT;
     if (!g) return NULL;
     s = cca_scan_new();
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (!s) return NULL;
 
     if (g->t.max_size && len > g->t.max_size) {
@@ -244,7 +262,7 @@ static const char *cca_verdict_error(pTHX_ void *scan, size_t *len) {
     cc_scan *s = (cc_scan *)scan;
     PERL_UNUSED_CONTEXT;
     if (len) *len = 0;
-    if (!s || s->rc == CC_OK || !s->err.msg[0]) return NULL;
+    if (!s || s->rc == CC_OK || !s->err.msg[0]) return NULL; /* # uncoverable condition left count:3 */
     if (len) *len = strlen(s->err.msg);
     return s->err.msg;
 }

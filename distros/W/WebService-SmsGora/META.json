@@ -1,0 +1,71 @@
+{
+   "abstract" : "Perl client for the SMS Gora SMS Gateway API",
+   "author" : [
+      "Tekservix <support@tekservix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "sms",
+      "sms-gateway",
+      "bulk-sms",
+      "android",
+      "tekservix"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "WebService-SmsGora",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Digest::SHA" : "0",
+            "HTTP::Tiny" : "0.014",
+            "IO::Socket::SSL" : "1.42",
+            "JSON::PP" : "0",
+            "Net::SSLeay" : "1.49",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/TekservixHQ/smsgora-perl/issues"
+      },
+      "homepage" : "https://tekservix.com/smsgora/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/TekservixHQ/smsgora-perl.git",
+         "web" : "https://github.com/TekservixHQ/smsgora-perl"
+      }
+   },
+   "version" : "1.000",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

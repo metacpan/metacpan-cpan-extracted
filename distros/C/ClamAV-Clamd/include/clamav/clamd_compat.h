@@ -126,11 +126,17 @@ static int cc_errno_is_closed(int e) {
 #ifdef _WIN32
     return e == EPIPE;
 #else
-    if (e == EPIPE || e == ECONNRESET || e == ENOTCONN) return 1;
+    if (e == EPIPE || e == ECONNRESET || e == ENOTCONN) return 1; /* # uncoverable condition left count:3 */
 #  ifdef ESHUTDOWN
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (e == ESHUTDOWN) return 1;
 #  endif
 #  ifdef ECONNABORTED
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (e == ECONNABORTED) return 1;
 #  endif
     return 0;
@@ -159,15 +165,21 @@ static void cc_wsa_to_errno(void) {
 }
 
 static ssize_t cc_send(int fd, const char *buf, size_t len, int flags) {
-    int n = send((SOCKET)fd, buf, (int)len, flags);
-    if (n == SOCKET_ERROR) { cc_wsa_to_errno(); return -1; }
-    return (ssize_t)n;
+    int n;
+    do {
+        n = send((SOCKET)fd, buf, (int)len, flags);
+        if (n == SOCKET_ERROR) cc_wsa_to_errno();
+    } while (n == SOCKET_ERROR && errno == EINTR);
+    return n == SOCKET_ERROR ? -1 : (ssize_t)n;
 }
 
 static ssize_t cc_recv(int fd, char *buf, size_t len) {
-    int n = recv((SOCKET)fd, buf, (int)len, 0);
-    if (n == SOCKET_ERROR) { cc_wsa_to_errno(); return -1; }
-    return (ssize_t)n;
+    int n;
+    do {
+        n = recv((SOCKET)fd, buf, (int)len, 0);
+        if (n == SOCKET_ERROR) cc_wsa_to_errno();
+    } while (n == SOCKET_ERROR && errno == EINTR);
+    return n == SOCKET_ERROR ? -1 : (ssize_t)n;
 }
 
 /* Winsock has to be started before the first call into it. perl starts
@@ -183,10 +195,40 @@ static int cc_net_init(void) {
     return 0;
 }
 #else
-#  define cc_send(fd, buf, len, flags) send((fd), (buf), (len), (flags))
-#  define cc_recv(fd, buf, len)        recv((fd), (buf), (len), 0)
+/* A signal landing during a call on a non-blocking socket cannot
+ * interrupt it, since nothing sleeps; the retry is for a platform that
+ * reports one anyway, and it lives here so no caller has to. */
+static ssize_t cc_send(int fd, const char *buf, size_t len, int flags) {
+    ssize_t n;
+    do {
+        n = send(fd, buf, len, flags);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
+    } while (n < 0 && errno == EINTR);
+    return n;
+}
+
+static ssize_t cc_recv(int fd, char *buf, size_t len) {
+    ssize_t n;
+    do {
+        n = recv(fd, buf, len, 0);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1
+     # uncoverable condition left count:2 */
+    } while (n < 0 && errno == EINTR);
+    return n;
+}
 #  define cc_net_init()                0
 #endif
+
+/* EAGAIN and EWOULDBLOCK are one value on every platform this has met,
+ * which is why the second test is never the one that answers. */
+static int cc_would_block(int e) {
+    return e == EAGAIN || e == EWOULDBLOCK; /* # uncoverable condition left count:2 */
+}
 
 static void cc_suppress_sigpipe(int fd) {
 #ifdef SO_NOSIGPIPE
@@ -209,13 +251,16 @@ static double cc_now(void) {
 #else
 #  if defined(CLOCK_MONOTONIC)
     struct timespec ts;
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 */
     if (clock_gettime(CLOCK_MONOTONIC, &ts) == 0)
         return (double)ts.tv_sec + (double)ts.tv_nsec / 1e9;
 #  endif
     {
         struct timeval tv;
-        gettimeofday(&tv, NULL);
-        return (double)tv.tv_sec + (double)tv.tv_usec / 1e6;
+        gettimeofday(&tv, NULL); /* # uncoverable statement */
+        return (double)tv.tv_sec + (double)tv.tv_usec / 1e6; /* # uncoverable statement */
     }
 #endif
 }
@@ -228,15 +273,19 @@ static double cc_now(void) {
 #  define CC_SUN_PATH_MAX (sizeof(((struct sockaddr_un *)0)->sun_path))
 #endif
 
-static int cc_set_nonblock(int fd, int on) {
+/* Every socket here is non-blocking from the moment it exists, so there
+ * is only one direction to set. 0 on success, -1 on failure. */
+static int cc_set_nonblock(int fd) {
 #ifdef _WIN32
-    u_long v = on ? 1 : 0;
+    u_long v = 1;
     return ioctlsocket((SOCKET)fd, FIONBIO, &v) == 0 ? 0 : -1;
 #else
     int fl = fcntl(fd, F_GETFL, 0);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 */
     if (fl < 0) return -1;
-    fl = on ? (fl | O_NONBLOCK) : (fl & ~O_NONBLOCK);
-    return fcntl(fd, F_SETFL, fl) == 0 ? 0 : -1;
+    return fcntl(fd, F_SETFL, fl | O_NONBLOCK);
 #endif
 }
 
@@ -284,20 +333,24 @@ static int cc_wait(int fd, int for_write, double deadline) {
 #endif
         if (r > 0) return 1;
         if (r == 0) return 0;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 */
         if (errno == EINTR) continue;
-        return -1;
+        return -1; /* # uncoverable statement */
     }
 }
 
 /* Is there something to read right now? Never waits. A hangup or an
- * error counts: either way the next read has an answer. */
+ * error counts: either way the next read has an answer, and with POLLIN
+ * the only event asked for, those are the only things poll can report. */
 static int cc_readable_now(int fd) {
 #ifdef _WIN32
     return cc_select(fd, 0, 0, 0) > 0 ? 1 : 0;
 #else
     struct pollfd p;
     p.fd = fd; p.events = POLLIN; p.revents = 0;
-    return poll(&p, 1, 0) > 0 && (p.revents & (POLLIN | POLLHUP | POLLERR)) ? 1 : 0;
+    return poll(&p, 1, 0) > 0 ? 1 : 0;
 #endif
 }
 

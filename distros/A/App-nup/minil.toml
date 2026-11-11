@@ -17,4 +17,4 @@ hooks = [
 os = [ "MSWin32" ]
 
 [FileGatherer]
-exclude_match = [ '^MEMO\.md$' ]
+exclude_match = [ '^MEMO\.md$', '^images/' ]

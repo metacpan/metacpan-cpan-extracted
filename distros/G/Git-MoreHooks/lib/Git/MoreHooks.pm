@@ -10,7 +10,7 @@ use utf8;
 
 # ABSTRACT: More plugins (Git hooks) for package Git::Hooks.
 
-our $VERSION = '0.020';
+our $VERSION = '0.021';
 
 
 
@@ -28,7 +28,7 @@ Git::MoreHooks - More plugins (Git hooks) for package Git::Hooks.
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSIS
 

@@ -1,9 +1,10 @@
 package Logic::Relational::Serializer;
 
-use v5.38;
+use v5.38;    ## no critic (ValuesAndExpressions::ProhibitVersionStrings)
 use experimental 'signatures';
-use Carp     qw(croak);
-use JSON::PP ();
+use Carp        qw(croak);
+use JSON::PP    ();
+use Time::HiRes qw(time);
 use Logic::Relational::Term;
 use Logic::Relational::Atom;
 use Logic::Relational::Variable;

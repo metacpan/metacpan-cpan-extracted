@@ -1,8 +1,18 @@
-2.42
+3.001 - 2026-11-10
 
-Perltidy source to my preferred format. Fixed issues serializing
-the global stash. Added test to detect if serializing the global
-stash breaks anything. 
+Fix version assignments so PAUSE can index the distribution.
+
+3.00 - 2026-11-10
+
+Rewrite the dumping engine in C/XS, with AI assistance, for improved speed,
+correctness and compatibility with Perl's refcounted stack. Improve Unicode
+and regexp handling, and add experimental support for XPerl class objects.
+
+Require Perl 5.18 or newer and a C compiler. Replace Module::Build with
+ExtUtils::MakeMaker.
+
+There is no pure-Perl version. Please don't upgrade if you need pure-Perl
+support.
 
 2.41
 

@@ -275,7 +275,8 @@ SKIP: {
         close $theirs;
         my $got = 0;
         $got += length $_ while sysread($ours, $_, 1 << 20);
-        POSIX::_exit($got >= 64 * 1024 * 1024 ? 0 : 1);
+        Test::Builder->new->no_ending(1);
+        exit($got >= 64 * 1024 * 1024 ? 0 : 1);
     }
     close $ours;
     my $before = $rss->();
@@ -405,7 +406,7 @@ SKIP: {
        'dropping the client settles drain with 0 and the handler bails')
         or diag 'abort counter said ' . (defined $abort ? "'$abort'" : 'undef');
 
-    kill 9, $pid; waitpid $pid, 0;
+    kill q{TERM}, $pid; waitpid $pid, 0;
 }
 
 done_testing;

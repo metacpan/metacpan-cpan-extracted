@@ -1,5 +1,35 @@
 Revision history for Perl extension App-nup
 
+1.13 2026-11-11T05:11:57Z
+
+    - Add --geometry to print the size of the device in columns and
+      lines and its kind, as "206 60 pdf" or "200 50 tty", without
+      reading a file or running a command; it is for a program that
+      formats text before giving it to nup, as mdee does
+
+1.12 2026-11-11T03:11:57Z
+
+    - Add -T (--device) to give the output device: the default is
+      "tty", the terminal, and any other device is a paper to print
+      to PDF by ansi2pdf, as "-T a4", "-T a4p" (A4 in portrait) or
+      "-T a3l" (A3 in landscape); "-T pdf" is the default paper.
+      The orientation after the paper name requires ansi2pdf 0.1.3
+    - Add -o (--output) to give the output file; a name ending with
+      ".pdf" chooses PDF without -T, and any other name gets what is
+      shown on the terminal
+    - Remove --pdf[=FILE] of 1.11 (incompatible change): use -T and
+      -o instead.  --pdf-opts remains
+
+1.11 2026-11-10T13:37:11Z
+
+    - Add --pdf to print the output to a PDF file by ansi2pdf
+      (https://github.com/tecolicom/App-ansi2pdf), and --pdf-opts to
+      give options to it
+    - -C takes the number of rows after a comma, as in "-C2,2"; -R
+      and -G are kept for compatibility and may be removed in the
+      future
+    - Require Getopt::Long::Bash 1.1.1
+
 1.10 2026-10-30T10:06:30Z
 
     - Keep page mode when options for ansicolumn follow the file name,

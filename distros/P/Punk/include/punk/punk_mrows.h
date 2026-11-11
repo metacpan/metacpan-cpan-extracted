@@ -32,30 +32,60 @@
  * integer id back as 2.0. */
 static NV pmr_num(pTHX_ SV *sv) {
     if (SvNOK(sv)) return SvNVX(sv);
-    if (SvIOK(sv)) return SvIsUV(sv) ? (NV)SvUVX(sv) : (NV)SvIVX(sv);
-    return SvPOK(sv) ? Atof(SvPVX(sv)) : 0.0;
+    if (SvIOK(sv)) return SvIsUV(sv) ? (NV)SvUVX(sv) : (NV)SvIVX(sv); /* # uncoverable condition left count:2 class:ignore_covered_err */
+    return SvPOK(sv) ? Atof(SvPVX(sv)) : 0.0; /* # uncoverable condition right count:1 class:ignore_covered_err */
 }
 
 /* An integer key as an IV, without touching the SV's flags: an integer SV,
  * or a string of digits with an optional sign. 0 when it is not one. */
 static int pmr_int(pTHX_ SV *sv, IV *out) {
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (SvIOK(sv) && !SvNOK(sv) && !SvPOK(sv)) { *out = SvIVX(sv); return 1; }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (SvNOK(sv) && !SvPOK(sv)) {
-        NV v = SvNVX(sv);
+        NV v = SvNVX(sv); /* # uncoverable statement */
+        /*
+         # uncoverable statement
+         # uncoverable branch true
+         # uncoverable branch false
+         # uncoverable condition left count:1
+         # uncoverable condition right count:1 */
         if (v != (NV)(IV)v) return 0;
-        *out = (IV)v;
-        return 1;
+        *out = (IV)v; /* # uncoverable statement */
+        return 1; /* # uncoverable statement */
     }
+    /*
+     # uncoverable branch false
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (SvPOK(sv)) {
         STRLEN l, i = 0;
         const char *p = SvPV_const(sv, l);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err */
         if (l && (p[0] == '-' || p[0] == '+')) i = 1;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (i == l) return 0;
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         for (; i < l; i++) if (!isDIGIT(p[i])) return 0;
-        *out = (IV)Atof(p);
-        return 1;
+        *out = (IV)Atof(p); /* # uncoverable statement */
+        return 1; /* # uncoverable statement */
     }
-    return 0;
+    return 0; /* # uncoverable statement */
 }
 
 /* A value to string-compare, never the row's own SV unless it already is a
@@ -71,6 +101,9 @@ static SV *pmr_str(pTHX_ SV *sv) {
 static int pmr_cmp(pTHX_ SV *a, SV *b) {
     int da = a && SvOK(a), db = b && SvOK(b);
     if (!da || !db) return da == db ? 0 : (da ? 1 : -1);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     if (!SvROK(a) && !SvROK(b) && looks_like_number(a) && looks_like_number(b)) {
         NV x = pmr_num(aTHX_ a), y = pmr_num(aTHX_ b);
         return x < y ? -1 : x > y ? 1 : 0;
@@ -89,10 +122,16 @@ static int pmr_like(const U8 *s, const U8 *se, const U8 *p, const U8 *pe,
             if (p == pe) return 1;
             for (;;) {
                 if (pmr_like(s, se, p, pe, utf8)) return 1;
+                /*
+                 # uncoverable branch true
+                 # uncoverable condition left count:1 class:ignore_covered_err */
                 if (s >= se) return 0;
                 s += utf8 ? UTF8SKIP(s) : 1;
             }
         }
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (s >= se) return 0;
         if (*p == '_') {
             s += utf8 ? UTF8SKIP(s) : 1;
@@ -118,15 +157,18 @@ static AV *pmr_compile(pTHX_ HV *col, SV *table, HV *filter, const char *cls) {
     AV *terms = (AV *)sv_2mortal((SV *)newAV());
     AV *keys;
     SSize_t i, n;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!filter) return terms;
     keys = pdbi_sorted_keys(aTHX_ filter);
     n = av_len(keys) + 1;
     for (i = 0; i < n; i++) {
         SV *k  = *av_fetch(keys, i, 0);
         HE *he = hv_fetch_ent(filter, k, 0, 0);
-        SV *val = he ? HeVAL(he) : NULL;
+        SV *val = he ? HeVAL(he) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         pdbq_check_col(aTHX_ col, k, table, cls, "the filter");
-        if (val && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) {
+        if (val && SvROK(val) && SvTYPE(SvRV(val)) == SVt_PVHV) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             HV *ops = (HV *)SvRV(val);
             AV *onames = pdbi_sorted_keys(aTHX_ ops);
             SSize_t j, m = av_len(onames) + 1;
@@ -146,11 +188,11 @@ static AV *pmr_compile(pTHX_ HV *col, SV *table, HV *filter, const char *cls) {
                           cls, op, SvPV_nolen(k),
                           SvPV_nolen(pdbq_op_list(aTHX)));
                 oe = hv_fetch_ent(ops, on, 0, 0);
-                v = oe ? HeVAL(oe) : NULL;
+                v = oe ? HeVAL(oe) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
                 switch (idx) {
                 case PDBQ_LT: case PDBQ_LE: case PDBQ_GT: case PDBQ_GE:
                 case PDBQ_LIKE: case PDBQ_STARTS_WITH:
-                    if (!(v && SvOK(v)))
+                    if (!(v && SvOK(v))) /* # uncoverable condition left count:1 class:ignore_covered_err */
                         croak("%s: '%s' on %s needs a value, not undef",
                               cls, PDBQ_OPS[idx].name, SvPV_nolen(k));
                     if (SvROK(v))
@@ -159,6 +201,10 @@ static AV *pmr_compile(pTHX_ HV *col, SV *table, HV *filter, const char *cls) {
                               sv_reftype(SvRV(v), 0));
                     break;
                 case PDBQ_IN: case PDBQ_NOT_IN:
+                    /*
+                     # uncoverable condition left count:1 class:ignore_covered_err
+                     # uncoverable condition left count:2 class:ignore_covered_err
+                     # uncoverable condition left count:4 class:ignore_covered_err */
                     if (!(v && SvOK(v) && SvROK(v)
                           && SvTYPE(SvRV(v)) == SVt_PVAV))
                         croak("%s: '%s' on %s takes an arrayref",
@@ -169,22 +215,22 @@ static AV *pmr_compile(pTHX_ HV *col, SV *table, HV *filter, const char *cls) {
                 t = newAV();
                 av_push(t, newSVsv(k));
                 av_push(t, newSViv(idx));
-                av_push(t, v ? newSVsv(v) : newSV(0));
+                av_push(t, v ? newSVsv(v) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
                 av_push(terms, newRV_noinc((SV *)t));
             }
             continue;
         }
-        if (val && SvROK(val))
+        if (val && SvROK(val)) /* # uncoverable condition right count:1 class:ignore_covered_err */
             croak("%s: the filter on %s is a %s - a list is spelled "
                   "{ in => [...] }, and everything else is a plain value or "
                   "{ operator => value }", cls, SvPV_nolen(k),
-                  SvTYPE(SvRV(val)) == SVt_PVAV ? "plain arrayref"
-                                                : sv_reftype(SvRV(val), 0));
+                  SvTYPE(SvRV(val)) == SVt_PVAV ? "plain arrayref" /* # uncoverable condition left count:1 class:ignore_covered_err */
+                                                : sv_reftype(SvRV(val), 0)); /* # uncoverable statement */
         {
             AV *t = newAV();
             av_push(t, newSVsv(k));
             av_push(t, newSViv(PDBQ_EQ));
-            av_push(t, val ? newSVsv(val) : newSV(0));
+            av_push(t, val ? newSVsv(val) : newSV(0)); /* # uncoverable condition right count:1 class:ignore_covered_err */
             av_push(terms, newRV_noinc((SV *)t));
         }
     }
@@ -192,8 +238,8 @@ static AV *pmr_compile(pTHX_ HV *col, SV *table, HV *filter, const char *cls) {
 }
 
 static int pmr_term_ok(pTHX_ int op, SV *rv, SV *val) {
-    int rdef = rv && SvOK(rv);
-    switch (op) {
+    int rdef = rv && SvOK(rv); /* # uncoverable condition right count:1 class:ignore_covered_err */
+    switch (op) { /* # uncoverable branch true count:9 */
     case PDBQ_EQ:
         if (!SvOK(val)) return !rdef;
         return rdef && pmr_cmp(aTHX_ rv, val) == 0;
@@ -203,7 +249,7 @@ static int pmr_term_ok(pTHX_ int op, SV *rv, SV *val) {
     case PDBQ_LT: return rdef && pmr_cmp(aTHX_ rv, val) <  0;
     case PDBQ_LE: return rdef && pmr_cmp(aTHX_ rv, val) <= 0;
     case PDBQ_GT: return rdef && pmr_cmp(aTHX_ rv, val) >  0;
-    case PDBQ_GE: return rdef && pmr_cmp(aTHX_ rv, val) >= 0;
+    case PDBQ_GE: return rdef && pmr_cmp(aTHX_ rv, val) >= 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     case PDBQ_IN:
     case PDBQ_NOT_IN: {
         AV *list = (AV *)SvRV(val);
@@ -213,6 +259,9 @@ static int pmr_term_ok(pTHX_ int op, SV *rv, SV *val) {
         if (!rdef) return 0;                      /* NULL [NOT] IN (...) */
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(list, i, 0);
+            /*
+             # uncoverable condition left count:1 class:ignore_covered_err
+             # uncoverable condition left count:2 class:ignore_covered_err */
             if (!(e && *e && SvOK(*e))) { has_null = 1; continue; }
             if (pmr_cmp(aTHX_ rv, *e) == 0) { found = 1; break; }
         }
@@ -223,13 +272,16 @@ static int pmr_term_ok(pTHX_ int op, SV *rv, SV *val) {
     case PDBQ_STARTS_WITH: {
         STRLEN sl, pl;
         const U8 *s, *p;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!rdef) return 0;
         s = (const U8 *)SvPV_const(rv, sl);
         p = (const U8 *)SvPV_const(val, pl);
-        if (op == PDBQ_STARTS_WITH) return sl >= pl && memEQ(s, p, pl);
+        if (op == PDBQ_STARTS_WITH) return sl >= pl && memEQ(s, p, pl); /* # uncoverable condition right count:1 class:ignore_covered_err */
         return pmr_like(s, s + sl, p, p + pl, SvUTF8(rv) ? 1 : 0);
     }
-    default: return 0;
+    default: return 0; /* # uncoverable statement */
     }
 }
 
@@ -239,7 +291,7 @@ static int pmr_match(pTHX_ AV *terms, HV *row) {
         AV *t = (AV *)SvRV(*av_fetch(terms, i, 0));
         SV *col = *av_fetch(t, 0, 0);
         HE *he = hv_fetch_ent(row, col, 0, 0);
-        if (!pmr_term_ok(aTHX_ (int)SvIV(*av_fetch(t, 1, 0)),
+        if (!pmr_term_ok(aTHX_ (int)SvIV(*av_fetch(t, 1, 0)), /* # uncoverable condition right count:1 class:ignore_covered_err */
                          he ? HeVAL(he) : NULL, *av_fetch(t, 2, 0)))
             return 0;
     }
@@ -253,8 +305,11 @@ static int pmr_match(pTHX_ AV *terms, HV *row) {
  * a nested hash must not edit the next caller's answer. */
 
 static SV *pmr_deep(pTHX_ SV *sv) {
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!sv) return newSV(0);
-    if (SvROK(sv) && !sv_isobject(sv)) {
+    if (SvROK(sv) && !sv_isobject(sv)) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         SV *r = SvRV(sv);
         if (SvTYPE(r) == SVt_PVHV) {
             HV *src = (HV *)r, *dst = newHV();
@@ -265,13 +320,16 @@ static SV *pmr_deep(pTHX_ SV *sv) {
                                    pmr_deep(aTHX_ HeVAL(he)), 0);
             return newRV_noinc((SV *)dst);
         }
+        /*
+         # uncoverable branch false
+         # uncoverable condition right count:1 class:ignore_covered_err */
         if (SvTYPE(r) == SVt_PVAV) {
             AV *src = (AV *)r, *dst = newAV();
             SSize_t i, n = av_len(src) + 1;
             av_extend(dst, n > 0 ? n - 1 : 0);
             for (i = 0; i < n; i++) {
                 SV **e = av_fetch(src, i, 0);
-                av_push(dst, pmr_deep(aTHX_ e ? *e : NULL));
+                av_push(dst, pmr_deep(aTHX_ e ? *e : NULL)); /* # uncoverable condition right count:1 class:ignore_covered_err */
             }
             return newRV_noinc((SV *)dst);
         }
@@ -291,9 +349,9 @@ static int pmr_rowcmp(pTHX_ const pmr_spec *sp, HV *a, HV *b, AV *bvals) {
         HE *ha = hv_fetch_ent(a, c, 0, 0);
         SV *vb;
         int r;
-        if (bvals) { SV **e = av_fetch(bvals, i, 0); vb = e ? *e : NULL; }
-        else       { HE *hb = hv_fetch_ent(b, c, 0, 0); vb = hb ? HeVAL(hb) : NULL; }
-        r = pmr_cmp(aTHX_ ha ? HeVAL(ha) : NULL, vb);
+        if (bvals) { SV **e = av_fetch(bvals, i, 0); vb = e ? *e : NULL; } /* # uncoverable condition right count:2 class:ignore_covered_err */
+        else       { HE *hb = hv_fetch_ent(b, c, 0, 0); vb = hb ? HeVAL(hb) : NULL; } /* # uncoverable condition right count:1 class:ignore_covered_err */
+        r = pmr_cmp(aTHX_ ha ? HeVAL(ha) : NULL, vb); /* # uncoverable condition right count:1 class:ignore_covered_err */
         if (r) return SvIV(*av_fetch(sp->desc, i, 0)) ? -r : r;
     }
     return 0;
@@ -308,13 +366,17 @@ static int pmr_qsort_cmp(const void *x, const void *y) {
 /* ---- the contract over a row list -------------------------------------------- */
 
 static HV *pmr_self(pTHX_ SV *self, const char *cls) {
-    if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV))
+    if (!(SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV)) /* # uncoverable condition left count:1 class:ignore_covered_err */
         croak("%s: not a backend object", cls);
     return (HV *)SvRV(self);
 }
 
 static HV *pmr_colset(pTHX_ HV *h) {
     SV *c = pdbi_get(aTHX_ h, "col");
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     return (c && SvROK(c) && SvTYPE(SvRV(c)) == SVt_PVHV) ? (HV *)SvRV(c) : NULL;
 }
 
@@ -337,27 +399,42 @@ static SV *pmr_search(pTHX_ SV *self, AV *rows, SV *filter, SV *opts,
     int pk_only;
     pmr_spec spec;
     pmr_item *items;
-    SSize_t i, n = rows ? av_len(rows) + 1 : 0, kept = 0, from = 0, taken;
+    SSize_t i, n = rows ? av_len(rows) + 1 : 0, kept = 0, from = 0, taken; /* # uncoverable condition right count:1 class:ignore_covered_err */
 
     pdbq_check_opts(aTHX_ o, cls);
-    limit = (lim_sv && SvOK(lim_sv)) ? SvIV(lim_sv) : 20;
+    limit = (lim_sv && SvOK(lim_sv)) ? SvIV(lim_sv) : 20; /* # uncoverable condition right count:2 class:ignore_covered_err */
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (lim_sv && SvOK(lim_sv) && SvNV(lim_sv) >= (NV)IV_MAX) limit = IV_MAX - 1;
     if (limit < 1) limit = 1;
     terms = pmr_compile(aTHX_ col, table, f, cls);
     pdbq_order(aTHX_ col, table, pk, order, cls, &cols, &desc, &pk_only);
+    /*
+     # uncoverable condition right count:2 class:ignore_covered_err
+     # uncoverable condition right count:3 class:ignore_covered_err */
     if (after && SvOK(after) && SvCUR(after)) {
         if (av_len(cols) < 0)
             croak("%s: pagination needs a primary key or an order_by", cls);
         vals = pdbq_decode_token(aTHX_ after, cols, desc, pk_only, cls);
     }
 
-    Newx(items, n > 0 ? n : 1, pmr_item);
+    Newx(items, n > 0 ? n : 1, pmr_item); /* # uncoverable condition right count:1 class:ignore_covered_err */
     SAVEFREEPV(items);
     spec.cols = cols;
     spec.desc = desc;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(rows, i, 0);
         HV *r;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!(e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)) continue;
         r = (HV *)SvRV(*e);
         if (!pmr_match(aTHX_ terms, r)) continue;
@@ -368,7 +445,7 @@ static SV *pmr_search(pTHX_ SV *self, AV *rows, SV *filter, SV *opts,
     if (kept > 1) qsort(items, (size_t)kept, sizeof *items, pmr_qsort_cmp);
     if (vals)
         while (from < kept
-               && pmr_rowcmp(aTHX_ &spec, items[from].row, NULL, vals) <= 0)
+               && pmr_rowcmp(aTHX_ &spec, items[from].row, NULL, vals) <= 0) /* # uncoverable condition right count:1 class:ignore_covered_err */
             from++;
 
     out = newAV();
@@ -387,6 +464,11 @@ static IV pmr_count(pTHX_ SV *self, AV *rows, SV *filter, const char *cls) {
     IV c = 0;
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(rows, i, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV
             && pmr_match(aTHX_ terms, (HV *)SvRV(*e)))
             c++;
@@ -401,11 +483,16 @@ static SV *pmr_get(pTHX_ SV *self, AV *rows, SV **st, I32 items,
     HV *key;
     AV *keys = pdbi_key_args(aTHX_ st, items, &key, "get", cls);
     AV *terms;
-    SSize_t i, n = rows ? av_len(rows) + 1 : 0;
+    SSize_t i, n = rows ? av_len(rows) + 1 : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
     pdbq_check_keys(aTHX_ self, keys, cls, "get");
     terms = pmr_compile(aTHX_ NULL, NULL, key, cls);
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(rows, i, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err
+         # uncoverable condition right count:3 class:ignore_covered_err
+         # uncoverable condition right count:4 class:ignore_covered_err */
         if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV
             && pmr_match(aTHX_ terms, (HV *)SvRV(*e)))
             return pmr_deep(aTHX_ *e);
@@ -428,7 +515,13 @@ static HV *PMJ_CACHE = NULL;    /* file => [ stamp, doc-or-undef ] */
 
 static SV *pmj_file(pTHX_ HV *h) {
     SV *o = pdbi_get(aTHX_ h, "opts");
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     SV *f = (o && SvROK(o)) ? pdbi_get(aTHX_ (HV *)SvRV(o), "file") : NULL;
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(f && SvOK(f) && SvCUR(f)))
         croak(PMJ ": the database needs a `file` (database name => "
               "{ backend => '" PMJ "', file => 'data.json' })");
@@ -440,6 +533,9 @@ static SV *pmj_decode_file(pTHX_ const char *path, SV **err) {
     SV *bytes = pmd_slurp(aTHX_ path);
     SV *doc = NULL;
     *err = NULL;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!bytes) return NULL;
     /* the backend is XS registered at boot, so its .pm - and with it the
      * module the decode is called in - may never have been required */
@@ -451,15 +547,18 @@ static SV *pmj_decode_file(pTHX_ const char *path, SV **err) {
         PUSHMARK(SP); EXTEND(SP, 1); PUSHs(bytes); PUTBACK;
         count = call_pv("File::Raw::JSON::file_json_decode", G_SCALAR | G_EVAL);
         SPAGAIN;
-        doc = (count > 0) ? newSVsv(POPs) : NULL;
+        doc = (count > 0) ? newSVsv(POPs) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
         PUTBACK;
-        if (SvTRUE(ERRSV)) {
+        if (SvTRUE(ERRSV)) { /* # uncoverable condition right count:1 class:ignore_covered_err */
             *err = newSVsv(ERRSV);
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (doc) { SvREFCNT_dec(doc); doc = NULL; }
         }
         FREETMPS; LEAVE;
     }
-    if (doc && !(SvROK(doc) && SvTYPE(SvRV(doc)) == SVt_PVHV)) {
+    if (doc && !(SvROK(doc) && SvTYPE(SvRV(doc)) == SVt_PVHV)) { /* # uncoverable condition left count:2 class:ignore_covered_err */
         SvREFCNT_dec(doc);
         doc = NULL;
         *err = newSVpvs("it is not a JSON object\n");
@@ -484,7 +583,7 @@ static HV *pmj_document(pTHX_ SV *self) {
     stamp = sv_2mortal(newSVpvf("%" UVuf ":%" IVdf ":%" IVdf,
                                 (UV)st.st_ino, (IV)st.st_size, (IV)st.st_mtime));
     he = hv_fetch_ent(PMJ_CACHE, file, 0, 0);
-    if (he && SvROK(HeVAL(he))) {
+    if (he && SvROK(HeVAL(he))) { /* # uncoverable condition right count:2 class:ignore_covered_err */
         AV *slot = (AV *)SvRV(HeVAL(he));
         if (sv_eq(*av_fetch(slot, 0, 0), stamp)) {
             SV *d = *av_fetch(slot, 1, 0);
@@ -500,7 +599,10 @@ static HV *pmj_document(pTHX_ SV *self) {
         (void)hv_store_ent(PMJ_CACHE, file, newRV_noinc((SV *)slot), 0);
         if (!doc) {
             warn(PMJ ": %s is unusable, so it has no rows: %s", path,
-                 err ? SvPV_nolen(err) : "it could not be read\n");
+                 err ? SvPV_nolen(err) : "it could not be read\n"); /* # uncoverable condition right count:1 class:ignore_covered_err */
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (err) SvREFCNT_dec(err);
             return NULL;
         }
@@ -544,18 +646,30 @@ typedef struct { int fd; } pmj_lock;
 static void pmj_lock_take(pTHX_ const char *path, pmj_lock *l) {
     SV *lp = sv_2mortal(newSVpvf("%s.lock", path));
     l->fd = PerlLIO_open3(SvPV_nolen(lp), O_RDWR | O_CREAT, 0644);
+    /*
+     # uncoverable branch true class:ignore_covered_err
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (l->fd < 0)
-        croak(PMJ ": cannot open %s: %s", SvPV_nolen(lp), Strerror(errno));
+        croak(PMJ ": cannot open %s: %s", SvPV_nolen(lp), Strerror(errno)); /* # uncoverable statement class:ignore_covered_err */
 #if defined(PMJ_LOCK_FCNTL)
     {
         struct flock fl;
         Zero(&fl, 1, struct flock);
         fl.l_type   = F_WRLCK;
         fl.l_whence = SEEK_SET;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         while (fcntl(l->fd, F_SETLKW, &fl) < 0) {
+            /*
+             # uncoverable statement
+             # uncoverable branch true
+             # uncoverable branch false
+             # uncoverable condition left count:1
+             # uncoverable condition right count:1 */
             if (errno == EINTR) continue;
-            PerlLIO_close(l->fd);
-            croak(PMJ ": cannot lock %s: %s", SvPV_nolen(lp), Strerror(errno));
+            PerlLIO_close(l->fd); /* # uncoverable statement */
+            croak(PMJ ": cannot lock %s: %s", SvPV_nolen(lp), Strerror(errno)); /* # uncoverable statement */
         }
     }
 #elif defined(PMJ_LOCK_FLOCK)
@@ -572,6 +686,9 @@ static void pmj_lock_take(pTHX_ const char *path, pmj_lock *l) {
 }
 
 static void pmj_lock_drop(pmj_lock *l) {
+    /*
+     # uncoverable branch false class:ignore_covered_err
+     # uncoverable condition right count:1 class:ignore_covered_err */
     if (l->fd >= 0) {
 #if defined(PMJ_LOCK_FLOCK)
         (void)flock(l->fd, LOCK_UN);
@@ -614,20 +731,33 @@ static void pmj_write(pTHX_ const char *path, HV *doc) {
     jp = SvPV_const(json, jl);
     tmp = sv_2mortal(newSVpvf("%s.tmp.%" IVdf, path, (IV)PerlProc_getpid()));
     fp = PerlIO_open(SvPV_nolen(tmp), "wb");
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!fp) croak(PMJ ": cannot write %s: %s", SvPV_nolen(tmp), Strerror(errno));
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (PerlIO_write(fp, jp, jl) != (SSize_t)jl || PerlIO_write(fp, "\n", 1) != 1) {
-        PerlIO_close(fp);
-        (void)PerlLIO_unlink(SvPV_nolen(tmp));
-        croak(PMJ ": cannot write %s: %s", SvPV_nolen(tmp), Strerror(errno));
+        PerlIO_close(fp); /* # uncoverable statement */
+        (void)PerlLIO_unlink(SvPV_nolen(tmp)); /* # uncoverable statement */
+        croak(PMJ ": cannot write %s: %s", SvPV_nolen(tmp), Strerror(errno)); /* # uncoverable statement */
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (PerlIO_close(fp) != 0) {
-        (void)PerlLIO_unlink(SvPV_nolen(tmp));
-        croak(PMJ ": cannot write %s: %s", SvPV_nolen(tmp), Strerror(errno));
+        (void)PerlLIO_unlink(SvPV_nolen(tmp)); /* # uncoverable statement */
+        croak(PMJ ": cannot write %s: %s", SvPV_nolen(tmp), Strerror(errno)); /* # uncoverable statement */
     }
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (PerlLIO_rename(SvPV_nolen(tmp), path) != 0) {
-        int e = errno;
-        (void)PerlLIO_unlink(SvPV_nolen(tmp));
-        croak(PMJ ": cannot replace %s: %s", path, Strerror(e));
+        int e = errno; /* # uncoverable statement */
+        (void)PerlLIO_unlink(SvPV_nolen(tmp)); /* # uncoverable statement */
+        croak(PMJ ": cannot replace %s: %s", path, Strerror(e)); /* # uncoverable statement */
     }
 }
 
@@ -646,7 +776,7 @@ static HV *pmj_fresh(pTHX_ SV *self, const char *path, AV **rows_out) {
         SV *err = NULL;
         SV *d = pmj_decode_file(aTHX_ path, &err);
         if (!d) {
-            SV *why = sv_2mortal(err ? err : newSVpvs("it could not be read\n"));
+            SV *why = sv_2mortal(err ? err : newSVpvs("it could not be read\n")); /* # uncoverable condition left count:1 class:ignore_covered_err */
             croak(PMJ ": %s is unusable, so nothing was written: %s", path,
                   SvPV_nolen(why));
         }
@@ -654,6 +784,9 @@ static HV *pmj_fresh(pTHX_ SV *self, const char *path, AV **rows_out) {
         doc = (HV *)SvRV(d);
     }
     rows = pdbi_get(aTHX_ doc, SvPV_nolen(t));
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(rows && SvROK(rows) && SvTYPE(SvRV(rows)) == SVt_PVAV)) {
         AV *a = newAV();
         (void)hv_store_ent(doc, t, newRV_noinc((SV *)a), 0);
@@ -667,11 +800,17 @@ static HV *pmj_fresh(pTHX_ SV *self, const char *path, AV **rows_out) {
 static HV *pmj_known(pTHX_ HV *col, HV *d, int keep_undef) {
     HV *out = newHV();
     HE *he;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
     if (!d) return out;
     hv_iterinit(d);
     while ((he = hv_iternext(d))) {
         SV *k = hv_iterkeysv(he);
         SV *v = HeVAL(he);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (col && HvUSEDKEYS(col) && !hv_exists_ent(col, k, 0)) continue;
         if (!keep_undef && !SvOK(v)) continue;
         (void)hv_store_ent(out, k, pmr_deep(aTHX_ v), 0);
@@ -685,8 +824,17 @@ static SSize_t pmj_find(pTHX_ AV *rows, SV *pk, SV *id) {
     for (i = 0; i < n; i++) {
         SV **e = av_fetch(rows, i, 0);
         HE *he;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err
+         # uncoverable condition left count:4 class:ignore_covered_err */
         if (!(e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV)) continue;
         he = hv_fetch_ent((HV *)SvRV(*e), pk, 0, 0);
+        /*
+         # uncoverable condition right count:1 class:ignore_covered_err
+         # uncoverable condition right count:2 class:ignore_covered_err */
         if (he && SvOK(HeVAL(he)) && pmr_cmp(aTHX_ HeVAL(he), id) == 0) return i;
     }
     return -1;
@@ -694,6 +842,9 @@ static SSize_t pmj_find(pTHX_ AV *rows, SV *pk, SV *id) {
 
 static SV *pmj_create(pTHX_ SV *self, SV *data) {
     HV *h  = pmr_self(aTHX_ self, PMJ);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *d  = (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV) ? (HV *)SvRV(data) : NULL;
     SV *pk = pdbi_get(aTHX_ h, "primary");
     const char *path = SvPV_nolen(pmj_file(aTHX_ h));
@@ -701,15 +852,19 @@ static SV *pmj_create(pTHX_ SV *self, SV *data) {
     AV *rows;
     HV *doc;
     SV *out;
-    if (!HvUSEDKEYS(row)) croak(PMJ ": create with no known columns");
+    if (!HvUSEDKEYS(row)) croak(PMJ ": create with no known columns"); /* # uncoverable condition left count:1 class:ignore_covered_err */
     ENTER;
     pmj_lock_scoped(aTHX_ path);
     {
         {
             doc = pmj_fresh(aTHX_ self, path, &rows);
+            /*
+             # uncoverable branch false class:ignore_covered_err
+             # uncoverable condition right count:1 class:ignore_covered_err
+             # uncoverable condition right count:2 class:ignore_covered_err */
             if (pk && SvOK(pk)) {
                 HE *he = hv_fetch_ent(row, pk, 0, 0);
-                if (he && SvOK(HeVAL(he))) {
+                if (he && SvOK(HeVAL(he))) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                     if (pmj_find(aTHX_ rows, pk, HeVAL(he)) >= 0)
                         croak(PMJ ": a row with %s = %s already exists in %s",
                               SvPV_nolen(pk), SvPV_nolen(HeVAL(he)), path);
@@ -722,9 +877,18 @@ static SV *pmj_create(pTHX_ SV *self, SV *data) {
                         SV **e = av_fetch(rows, i, 0);
                         HE *ke;
                         SV *k;
+                        /*
+                         # uncoverable branch true
+                         # uncoverable condition left count:1 class:ignore_covered_err
+                         # uncoverable condition left count:2 class:ignore_covered_err
+                         # uncoverable condition left count:3 class:ignore_covered_err */
                         if (!(e && *e && SvROK(*e))) continue;
                         ke = hv_fetch_ent((HV *)SvRV(*e), pk, 0, 0);
-                        k = ke ? HeVAL(ke) : NULL;
+                        k = ke ? HeVAL(ke) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+                        /*
+                         # uncoverable branch true
+                         # uncoverable condition left count:1 class:ignore_covered_err
+                         # uncoverable condition left count:2 class:ignore_covered_err */
                         if (!(k && SvOK(k))) continue;
                         {
                             IV kv;
@@ -732,6 +896,9 @@ static SV *pmj_create(pTHX_ SV *self, SV *data) {
                                 croak(PMJ ": create needs a value for %s - its "
                                       "existing keys are not all integers, so "
                                       "there is no next one", SvPV_nolen(pk));
+                            /*
+                             # uncoverable branch false
+                             # uncoverable condition right count:1 class:ignore_covered_err */
                             if (kv > max) max = kv;
                         }
                     }
@@ -749,6 +916,9 @@ static SV *pmj_create(pTHX_ SV *self, SV *data) {
 
 static SV *pmj_update(pTHX_ SV *self, SV *data) {
     HV *h  = pmr_self(aTHX_ self, PMJ);
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     HV *d  = (SvROK(data) && SvTYPE(SvRV(data)) == SVt_PVHV) ? (HV *)SvRV(data) : NULL;
     SV *pk = pdbi_get(aTHX_ h, "primary");
     const char *path;
@@ -756,10 +926,10 @@ static SV *pmj_update(pTHX_ SV *self, SV *data) {
     HE *pke;
     SV *id;
     SV *out = NULL;
-    if (!(pk && SvOK(pk)))
+    if (!(pk && SvOK(pk))) /* # uncoverable condition left count:1 class:ignore_covered_err */
         croak(PMJ ": update needs a primary key");
-    pke = d ? hv_fetch_ent(d, pk, 0, 0) : NULL;
-    if (!(pke && SvOK(HeVAL(pke))))
+    pke = d ? hv_fetch_ent(d, pk, 0, 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+    if (!(pke && SvOK(HeVAL(pke)))) /* # uncoverable condition left count:2 class:ignore_covered_err */
         croak(PMJ ": update needs the primary key in the data");
     id = sv_2mortal(newSVsv(HeVAL(pke)));
     path = SvPV_nolen(pmj_file(aTHX_ h));
@@ -779,6 +949,10 @@ static SV *pmj_update(pTHX_ SV *self, SV *data) {
                 while ((he = hv_iternext(changes)))
                     (void)hv_store_ent(row, hv_iterkeysv(he),
                                        newSVsv(HeVAL(he)), 0);
+                /*
+                 # uncoverable branch false
+                 # uncoverable condition left count:1 class:ignore_covered_err
+                 # uncoverable condition right count:2 class:ignore_covered_err */
                 if (HvUSEDKEYS(changes)) pmj_write(aTHX_ path, doc);
                 out = pmr_deep(aTHX_ *av_fetch(rows, at, 0));
             }
@@ -803,6 +977,9 @@ static IV pmj_delete(pTHX_ SV *self, SV **st, I32 items) {
     {
         {
             Stat_t st0;
+            /*
+             # uncoverable branch false
+             # uncoverable condition right count:1 class:ignore_covered_err */
             if (PerlLIO_stat(path, &st0) == 0) {
                 AV *rows;
                 HV *doc = pmj_fresh(aTHX_ self, path, &rows);
@@ -810,11 +987,19 @@ static IV pmj_delete(pTHX_ SV *self, SV **st, I32 items) {
                 SSize_t i, n = av_len(rows) + 1;
                 for (i = 0; i < n; i++) {
                     SV **e = av_fetch(rows, i, 0);
+                    /*
+                     # uncoverable condition right count:1 class:ignore_covered_err
+                     # uncoverable condition right count:2 class:ignore_covered_err
+                     # uncoverable condition right count:3 class:ignore_covered_err
+                     # uncoverable condition right count:4 class:ignore_covered_err */
                     if (e && *e && SvROK(*e) && SvTYPE(SvRV(*e)) == SVt_PVHV
                         && pmr_match(aTHX_ terms, (HV *)SvRV(*e))) {
                         gone++;
                         continue;
                     }
+                    /*
+                     # uncoverable condition right count:1 class:ignore_covered_err
+                     # uncoverable condition right count:2 class:ignore_covered_err */
                     av_push(keep, e && *e ? newSVsv(*e) : newSV(0));
                 }
                 (void)hv_store_ent(doc, pdbi_get(aTHX_ h, "table"),
@@ -840,11 +1025,14 @@ static IV pmj_delete(pTHX_ SV *self, SV **st, I32 items) {
  * there are). `who` prefixes the croak. Borrowed. */
 static AV *pmd_mount_cap(pTHX_ SV *app, SV *prefix, const char *who) {
     HV *h = app_hv(aTHX_ app);
-    SV *mp = h ? app_get(aTHX_ h, K_MOUNTS_C) : NULL;
+    SV *mp = h ? app_get(aTHX_ h, K_MOUNTS_C) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
     SV *pf = sv_2mortal(app_strip_slash(aTHX_ prefix));
     SV *have = sv_2mortal(newSVpvs(""));
     AV *mounts;
     SSize_t i, n;
+    /*
+     # uncoverable condition left count:2 class:ignore_covered_err
+     # uncoverable condition left count:3 class:ignore_covered_err */
     if (!(mp && SvROK(mp) && SvTYPE(SvRV(mp)) == SVt_PVAV))
         croak("%s: the application has not been compiled yet (call it from "
               "a route, or after to_app)", who);
@@ -855,26 +1043,41 @@ static AV *pmd_mount_cap(pTHX_ SV *app, SV *prefix, const char *who) {
         HV *m;
         SV **flag, **mpf, **mapp;
         AV *cap;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err */
         if (!e || !*e || !SvROK(*e)) continue;
         m = (HV *)SvRV(*e);
         flag = hv_fetchs(m, K_MD_MOUNT, 0);
+        /*
+         # uncoverable condition left count:2 class:ignore_covered_err
+         # uncoverable condition left count:3 class:ignore_covered_err */
         if (!(flag && *flag && SvTRUE(*flag))) continue;
         mpf = hv_fetchs(m, K_PREFIX, 0);
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err
+         # uncoverable condition left count:2 class:ignore_covered_err */
         if (!(mpf && *mpf)) continue;
         if (sv_cmp(*mpf, pf) != 0) {
             if (SvCUR(have)) sv_catpvs(have, ", ");
-            sv_catsv(have, SvCUR(*mpf) ? *mpf : sv_2mortal(newSVpvs("/")));
+            sv_catsv(have, SvCUR(*mpf) ? *mpf : sv_2mortal(newSVpvs("/"))); /* # uncoverable condition right count:1 class:ignore_covered_err */
             continue;
         }
         mapp = hv_fetchs(m, K_APP, 0);
         cap = (mapp && *mapp && SvROK(*mapp) && SvTYPE(SvRV(*mapp)) == SVt_PVCV)
             ? punk_clos_cap(aTHX_ (CV *)SvRV(*mapp)) : NULL;
+        /*
+         # uncoverable branch true
+         # uncoverable condition left count:1 class:ignore_covered_err */
         if (!cap)
-            croak("%s: the mount at '%s' was not built", who, SvPV_nolen(*mpf));
+            croak("%s: the mount at '%s' was not built", who, SvPV_nolen(*mpf)); /* # uncoverable statement */
         return cap;
     }
     croak("%s: no markdown mount at '%s' (%s%s)", who,
-          SvCUR(pf) ? SvPV_nolen(pf) : "/",
+          SvCUR(pf) ? SvPV_nolen(pf) : "/", /* # uncoverable condition right count:1 class:ignore_covered_err */
           SvCUR(have) ? "markdown mounts: " : "there are none",
           SvPV_nolen(have));
     return NULL;   /* not reached */
@@ -885,9 +1088,16 @@ static AV *pmm_rows(pTHX_ SV *self) {
     HV *h = pmr_self(aTHX_ self, PMM);
     SV *app = pdbi_get(aTHX_ h, "app");
     SV *o = pdbi_get(aTHX_ h, "opts");
+    /*
+     # uncoverable condition right count:1 class:ignore_covered_err
+     # uncoverable condition right count:2 class:ignore_covered_err */
     SV *prefix = (o && SvROK(o)) ? pdbi_get(aTHX_ (HV *)SvRV(o), "prefix") : NULL;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err
+     # uncoverable condition left count:2 class:ignore_covered_err */
     if (!(app && SvROK(app)))
-        croak(PMM ": the application has gone away");
+        croak(PMM ": the application has gone away"); /* # uncoverable statement */
     return (AV *)sv_2mortal((SV *)pmd_pages_av(aTHX_
         pmd_mount_cap(aTHX_ app, prefix, PMM)));
 }

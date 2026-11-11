@@ -1,6 +1,16 @@
 Changelog for DBIx-BatchChunker
 
-v1.0.2 2025-01-15T21:21:46
+v1.0.3 2026-11-11T00:04:03
+ - Update Makefile / README.md (Brendan Byrd)
+ - Pull request #15: SM-6697: Add id_increment to size chunk ID ranges for
+   stepped IDs (Romain Blavier)
+ - SM-6697: Add id_increment to size chunk ID ranges for stepped IDs
+   (Romain Blavier)
+ - Pull request #14: Display '?' when count_stmt omitted (Jonathan Rubin)
+ - SM-6456 Display '?' when count_stmt omitted (Jonathan Rubin)
+ - Pull request #13: SM-5315 (Brendan Byrd)
+
+v1.0.2 2025-01-10T17:50:29
  - Add a Track ID=0 row in the CDTest schema, to test out the fixed
    scenario (Brendan Byrd)
  - Update root files (Brendan Byrd)

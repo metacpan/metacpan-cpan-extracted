@@ -1,5 +1,10 @@
 Revision history for Logic-Relational
 
+0.03	10 November 2026
+	- Added detection of direct left-recursion and automatic tabling
+	- Introduced sub-second precision timestamping via Time::HiRes for expiring facts, snapshot TTL calculations, and query goal expiration
+	- Added max_steps and step_count to prevent unbounded recursion
+
 0.02    12 October 2026
         - Added automatic ancestor cycle pruning (variant loop checking) on search states to prevent infinite recursion over cyclic graphs
         - Added subgoal tabling and iterative fixpoint answer memoization

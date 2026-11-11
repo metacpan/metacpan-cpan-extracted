@@ -3,7 +3,7 @@ package Database::BI::I18N::en_us;
 use strict;
 use warnings;
 
-our $VERSION = '0.022.0';
+our $VERSION = '0.023.0';
 
 use Readonly;
 
@@ -34,7 +34,7 @@ Database::BI::I18N::en_us - The application's messages in American English
 
 =head1 VERSION
 
-0.022.0
+0.023.0
 
 =head1 DESCRIPTION
 

@@ -19,8 +19,11 @@ filename(self)
                                          "content", "path" };
         HV *h;
         SV **v;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
-            croak("Punk::Upload: not an upload");
+            croak("Punk::Upload: not an upload"); /* # uncoverable statement */
         h = (HV *)SvRV(self);
         v = hv_fetch(h, f[ix], (I32)strlen(f[ix]), 0);
 
@@ -32,10 +35,14 @@ filename(self)
          * working rather than made to croak because every application that
          * already handles uploads calls it. */
         {
-            SV **pp = (ix == 3 && !(v && *v)) ? hv_fetchs(h, "path", 0) : NULL;
+            SV **pp = (ix == 3 && !(v && *v)) ? hv_fetchs(h, "path", 0) : NULL; /* # uncoverable condition left count:3 class:ignore_covered_err */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             if (pp && *pp && SvOK(*pp)) {
                 PerlIO *fh = PerlIO_open(SvPV_nolen(*pp), "rb");
                 RETVAL = newSVpvs("");
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (fh) {
                     char tmp[65536];
                     SSize_t n;
@@ -49,7 +56,7 @@ filename(self)
              * back ST(0) - which is `self`. That is exactly what it did, and
              * `length($up->content)` came out as 30: the length of
              * "Punk::Upload=HASH(0x...)". */
-            else RETVAL = (v && *v) ? newSVsv(*v) : newSV(0);
+            else RETVAL = (v && *v) ? newSVsv(*v) : newSV(0); /* # uncoverable condition right count:2 class:ignore_covered_err */
         }
     }
     OUTPUT:
@@ -66,10 +73,17 @@ basename(self)
         SV **v;
         STRLEN l, i, start = 0;
         const char *p;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
-            croak("Punk::Upload: not an upload");
+            croak("Punk::Upload: not an upload"); /* # uncoverable statement */
         v = hv_fetchs((HV *)SvRV(self), "filename", 0);
         RETVAL = newSV(0);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (v && *v && SvOK(*v)) {
             p = SvPV_const(*v, l);
             for (i = 0; i < l; i++)
@@ -87,6 +101,8 @@ basename(self)
                 while (lead < SvCUR(RETVAL) && SvPVX(RETVAL)[lead] == '.') lead++;
                 if (lead) sv_chop(RETVAL, SvPVX(RETVAL) + lead);
                 if (!SvCUR(RETVAL)) sv_setsv(RETVAL, &PL_sv_undef);
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
                 else if (SvUTF8(*v)) SvUTF8_on(RETVAL);
             }
         }
@@ -101,6 +117,8 @@ size(self)
     {
         SV **v = (SvROK(self) && SvTYPE(SvRV(self)) == SVt_PVHV)
             ? hv_fetchs((HV *)SvRV(self), "size", 0) : NULL;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         RETVAL = (v && *v) ? SvIV(*v) : 0;
     }
     OUTPUT:
@@ -122,8 +140,11 @@ save(self, path)
         SV **cv, **pp;
         const char *p;
         PerlIO *fh;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV)
-            croak("Punk::Upload: not an upload");
+            croak("Punk::Upload: not an upload"); /* # uncoverable statement */
         h = (HV *)SvRV(self);
         {
             STRLEN plen;
@@ -135,8 +156,12 @@ save(self, path)
         }
         pp = hv_fetchs(h, "path", 0);
 
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (pp && *pp && SvOK(*pp)) {
             const char *from = SvPV_nolen(*pp);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (PerlLIO_rename(from, p) == 0) {
                 /* it is no longer ours to clean up, and no longer a temp
                  * file: the object now points at where the caller put it */
@@ -147,52 +172,98 @@ save(self, path)
                  * unlink the place the caller just asked for */
                 {
                     SV **t = hv_fetchs(h, "tmpslot", 0);
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
+                    # uncoverable condition right count:2 class:ignore_covered_err
+                    # uncoverable condition right count:3 class:ignore_covered_err
                     if (t && *t && SvROK(*t)) sv_setsv(SvRV(*t), &PL_sv_undef);
                 }
                 RETVAL = 1;
                 XSRETURN_IV(RETVAL);
             }
             {   /* across filesystems rename fails; copy instead */
-                PerlIO *in = PerlIO_open(from, "rb");
+                PerlIO *in = PerlIO_open(from, "rb"); /* # uncoverable statement */
                 char buf[65536];
                 SSize_t n;
+                # uncoverable statement
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable branch true count:2
+                # uncoverable branch false count:2
+                # uncoverable branch true count:3
+                # uncoverable branch false count:3
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 if (!in) croak("Punk::Upload: cannot read '%s': %s",
-                               from, Strerror(errno));
-                fh = PerlIO_open(p, "wb");
+                               from, Strerror(errno)); /* # uncoverable statement */
+                fh = PerlIO_open(p, "wb"); /* # uncoverable statement */
+                # uncoverable statement
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 if (!fh) { PerlIO_close(in);
-                           croak("Punk::Upload: cannot write '%s': %s",
-                                 p, Strerror(errno)); }
+                           croak("Punk::Upload: cannot write '%s': %s", /* # uncoverable statement */
+                                 p, Strerror(errno)); } /* # uncoverable statement */
+                # uncoverable statement
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 while ((n = PerlIO_read(in, buf, sizeof buf)) > 0)
+                    # uncoverable statement
+                    # uncoverable branch true
+                    # uncoverable branch false
+                    # uncoverable condition left count:1
+                    # uncoverable condition right count:1
                     if (PerlIO_write(fh, buf, n) != n) {
-                        int e = errno;
-                        PerlIO_close(in); PerlIO_close(fh);
-                        croak("Punk::Upload: short write to '%s': %s", p,
-                              Strerror(e));
+                        int e = errno; /* # uncoverable statement */
+                        PerlIO_close(in); PerlIO_close(fh); /* # uncoverable statement */
+                        croak("Punk::Upload: short write to '%s': %s", p, /* # uncoverable statement */
+                              Strerror(e)); /* # uncoverable statement */
                     }
-                PerlIO_close(in);
+                PerlIO_close(in); /* # uncoverable statement */
+                # uncoverable statement
+                # uncoverable branch true
+                # uncoverable branch false
+                # uncoverable condition left count:1
+                # uncoverable condition right count:1
                 if (PerlIO_close(fh) != 0)
-                    croak("Punk::Upload: cannot finish '%s': %s", p,
-                          Strerror(errno));
-                RETVAL = 1;
-                XSRETURN_IV(RETVAL);
+                    croak("Punk::Upload: cannot finish '%s': %s", p, /* # uncoverable statement */
+                          Strerror(errno)); /* # uncoverable statement */
+                RETVAL = 1; /* # uncoverable statement */
+                XSRETURN_IV(RETVAL); /* # uncoverable statement */
             }
         }
 
         cv = hv_fetchs(h, "content", 0);
         {
             STRLEN cl = 0;
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
             const char *c = (cv && *cv && SvOK(*cv)) ? SvPV_const(*cv, cl) : "";
             fh = PerlIO_open(p, "wb");
+            # uncoverable branch true
+            # uncoverable branch true count:2 class:ignore_covered_err
+            # uncoverable branch false count:3 class:ignore_covered_err
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (!fh) croak("Punk::Upload: cannot write '%s': %s",
-                           p, Strerror(errno));
+                           p, Strerror(errno)); /* # uncoverable statement */
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (cl && PerlIO_write(fh, c, cl) != (SSize_t)cl) {
-                int e = errno;
-                PerlIO_close(fh);
-                croak("Punk::Upload: short write to '%s': %s", p, Strerror(e));
+                int e = errno; /* # uncoverable statement */
+                PerlIO_close(fh); /* # uncoverable statement */
+                croak("Punk::Upload: short write to '%s': %s", p, Strerror(e)); /* # uncoverable statement */
             }
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (PerlIO_close(fh) != 0)
-                croak("Punk::Upload: cannot finish '%s': %s", p,
-                      Strerror(errno));
+                croak("Punk::Upload: cannot finish '%s': %s", p, /* # uncoverable statement */
+                      Strerror(errno)); /* # uncoverable statement */
         }
         RETVAL = 1;
     }
@@ -211,9 +282,18 @@ _disown(self)
     {
         HV *h;
         SV **t;
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!SvROK(self) || SvTYPE(SvRV(self)) != SVt_PVHV) XSRETURN_EMPTY;
         h = (HV *)SvRV(self);
         t = hv_fetchs(h, "tmpslot", 0);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (t && *t && SvROK(*t)) sv_setsv(SvRV(*t), &PL_sv_undef);
         (void)hv_stores(h, "moved", newSViv(1));
     }

@@ -388,8 +388,8 @@ Code-related and emphasis-related theme keys map directly to module labels:
 | `code_block` | `code_block` | Fenced code block body (with `;E`) |
 | `code_inline` | `code_inline` | Inline code body (without `;E`) |
 | `emphasis_mark` | `emphasis_mark` | Emphasis markers (`**`, `*`, `__`, `_`, `~~`) |
-| - | `meta_mark` | Front matter delimiter lines (undefined; falls back to `code_mark`) |
-| - | `meta_block` | Front matter lines (undefined; falls back to `code_block`) |
+| - | `meta_mark` | Front matter delimiter lines (`L15/L10E` / `L10/L15E`) |
+| - | `meta_block` | Front matter body (`L25/L12E` / `L00/L13E`) |
 
 `emphasis_mark` is the default color for all emphasis markers. Per-type overrides
 (`bold_mark`, `italic_mark`, `strike_mark`) can be defined via `--cm` and take
@@ -432,7 +432,7 @@ Inline code ([CommonMark Code Spans](https://spec.commonmark.org/0.31.2/#code-sp
 
 ### Front Matter
 
-Front matter at the top of the file (`front_matter()`: TOML between `+++` lines, YAML from `---` to `---` or `...`, not with a blank line right after the opening `---`, as pandoc defines it) is shown as a fenced code block: the first step, `front_matter`, colors every line with `meta_block`, the delimiter lines too (their text with `meta_mark` inside, so the background runs over the whole block, unlike a fenced code block); the two labels are undefined by default and fall back to `code_block` and `code_mark` (`fallback_color()`, as `bold_mark` falls back to `emphasis_mark`); they are named `meta_*` because `front_matter` is the config switch and color labels share the config namespace, and protects the whole, so that no other markup applies (a `---` would otherwise be a rule, a `# comment` a heading). It is excluded from folding by `--exclude &__PACKAGE__::front_matter_region`, which finds the region by the line count `$front_lines` that `begin()` sets, because the text is colored by then, and refill leaves it alone. Front matter is not in CommonMark or GFM (checked 2026-11-09); config `front_matter=0` takes the lines as Markdown.
+Front matter at the top of the file (`front_matter()`: TOML between `+++` lines, YAML from `---` to `---` or `...`, not with a blank line right after the opening `---`, as pandoc defines it) is shown as a fenced code block: the first step, `front_matter`, colors the body with `meta_block` and the delimiter lines with `meta_mark` alone, as a fenced code block does, so that each can have its own background; by default the delimiter lines have the background of the file name label (`FILE`) and the body one a little apart, so that the front matter is striped; set to empty, `meta_block` falls back to `code_block` (`fallback_color()`, as `bold_mark` falls back to `emphasis_mark`), and without `meta_mark` (`defined_color()`) a delimiter line is `code_mark` inside the `meta_block` color, so that the background runs over the whole block, unlike a fenced code block; they are named `meta_*` because `front_matter` is the config switch and color labels share the config namespace, and protects the whole, so that no other markup applies (a `---` would otherwise be a rule, a `# comment` a heading). It is excluded from folding by `--exclude &__PACKAGE__::front_matter_region`, which finds the region by the line count `$front_lines` that `begin()` sets, because the text is colored by then, and refill leaves it alone. Front matter is not in CommonMark or GFM (checked 2026-11-09); config `front_matter=0` takes the lines as Markdown.
 
 ### Control Characters in the File
 

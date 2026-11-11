@@ -60,6 +60,30 @@ If $cb is not defined, an exception is thrown.
 
 If uv_timer_start fails, an exception is thrown.
 
+=head2 stop
+
+C<method stop : void ();>
+
+Stops the timer.
+
+This method calls the L<uv_timer_stop|https://docs.libuv.org/en/v1.x/timer.html#c.uv_timer_stop> function internally.
+
+Exceptions:
+
+If uv_timer_stop fails, an exception is thrown.
+
+=head2 again
+
+C<method again : void ();>
+
+Start the timer if it has a repeat value set.
+
+This method calls the L<uv_timer_again|https://docs.libuv.org/en/v1.x/timer.html#c.uv_timer_again> function internally.
+
+Exceptions:
+
+If uv_timer_again fails, an exception is thrown.
+
 =head1 Copyright & License
 
 Copyright (c) 2026 Yuki Kimoto

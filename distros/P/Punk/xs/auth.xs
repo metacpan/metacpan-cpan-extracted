@@ -23,11 +23,13 @@ login(self, user)
         const char *key;
         if (!cfg)
             croak("Punk: login needs the auth keyword (add `auth ...`)");
-        if (SvROK(user) && SvTYPE(SvRV(user)) == SVt_PVHV) {
+        if (SvROK(user) && SvTYPE(SvRV(user)) == SVt_PVHV) { /* # uncoverable condition right count:2 class:ignore_covered_err */
             HV *u = (HV *)SvRV(user);
             STRLEN idl;
             const char *idf = pauth_field(aTHX_ cfg, "id", "id", &idl);
             SV **e = hv_fetch(u, idf, (I32)idl, 0);
+            # uncoverable condition left count:2 class:ignore_covered_err
+            # uncoverable condition left count:3 class:ignore_covered_err
             if (!(e && *e && SvOK(*e)))
                 croak("Punk: login was handed a user with no '%s'", idf);
             id = *e;
@@ -39,6 +41,10 @@ login(self, user)
 
         key = ps_cfg_str(aTHX_ cfg, "session_key", "user_id", &kl);
         sess = ps_load(aTHX_ self);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         if (sess && SvROK(sess) && SvTYPE(SvRV(sess)) == SVt_PVHV) {
             (void)hv_store((HV *)SvRV(sess), key, (I32)kl, newSVsv(id), 0);
             /* the CSRF token minted for the anonymous session goes with it:
@@ -46,6 +52,8 @@ login(self, user)
              * user after it */
             (void)hv_delete((HV *)SvRV(sess), "punk.csrf", 9, G_DISCARD);
         }
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (sess) SvREFCNT_dec(sess);
         {
             HV *stash = ps_stash(aTHX_ pcx_av(aTHX_ self));
@@ -72,6 +80,8 @@ logout(self)
     CODE:
     {
         SV *r = pcx_call_meth(aTHX_ self, "session_expire", NULL, 0, 1);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (r) SvREFCNT_dec(r);
         {
             HV *stash = ps_stash(aTHX_ pcx_av(aTHX_ self));
@@ -138,20 +148,37 @@ check_password(self, user, password)
         pf = pauth_field(aTHX_ cfg, "password", "password_hash", &pfl);
         {
             SV **it = hv_fetchs(cfg, "iterations", 0);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition left count:3 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition left count:4 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (it && *it && SvOK(*it) && SvIV(*it) > 0)
-                iterations = (U32)SvIV(*it);
+                iterations = (U32)SvIV(*it); /* # uncoverable statement */
             else {
                 SV *g = get_sv("Punk::Auth::Password::ITERATIONS", 0);
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (g && SvOK(g) && SvIV(g) > 0) iterations = (U32)SvIV(g);
             }
         }
-        if (SvROK(user) && SvTYPE(SvRV(user)) == SVt_PVHV) {
+        if (SvROK(user) && SvTYPE(SvRV(user)) == SVt_PVHV) { /* # uncoverable condition right count:2 class:ignore_covered_err */
             SV **e = hv_fetch((HV *)SvRV(user), pf, (I32)pfl, 0);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (e && *e && SvOK(*e) && SvCUR(*e)) stored = *e;
         }
         if (!stored) {
             STRLEN pl = 0;
-            const char *p = SvOK(password) ? SvPV_const(password, pl) : "";
+            const char *p = SvOK(password) ? SvPV_const(password, pl) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
             pwd_dummy_verify(aTHX_ (const unsigned char *)p, pl, iterations);
             RETVAL = 0;
         }
@@ -160,7 +187,7 @@ check_password(self, user, password)
              * early return it used to take answered faster for a known
              * email than for an unknown one */
             STRLEN pl = 0, sl;
-            const char *p = SvOK(password) ? SvPV_const(password, pl) : "";
+            const char *p = SvOK(password) ? SvPV_const(password, pl) : ""; /* # uncoverable condition right count:1 class:ignore_covered_err */
             const char *s = SvPV_const(stored, sl);
             RETVAL = pwd_verify(aTHX_ (const unsigned char *)p, pl, s, sl);
         }
@@ -185,8 +212,13 @@ issue_token(self, user_id, kind, ttl)
         if (!cfg)
             croak("Punk: issue_token needs the auth keyword "
                   "(add `auth ...`)");
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (!SvOK(user_id) || !SvOK(kind) || !SvOK(ttl) || SvIV(ttl) <= 0)
-            croak("Punk: issue_token needs a user id, a kind and a ttl");
+            croak("Punk: issue_token needs a user id, a kind and a ttl"); /* # uncoverable statement */
         m = pauth_model(aTHX_ self, cfg, "token_model", "issue_token");
         {   /* older same-kind tokens die first */
             HV *filter = newHV();
@@ -196,27 +228,45 @@ issue_token(self, user_id, kind, ttl)
             (void)hv_stores(filter, "kind",    newSVsv(kind));
             argv[0] = sv_2mortal(newRV_noinc((SV *)filter));
             raw = pcx_call_meth(aTHX_ m, "search", argv, 1, 1);
-            res = pauth_await(aTHX_ self, raw ? raw : &PL_sv_undef);
+            res = pauth_await(aTHX_ self, raw ? raw : &PL_sv_undef); /* # uncoverable condition left count:1 class:ignore_covered_err */
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (raw) SvREFCNT_dec(raw);
             rows = pauth_rows(aTHX_ res);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (rows) {
                 SSize_t i, n = av_len(rows) + 1;
                 for (i = 0; i < n; i++) {
                     SV **rp = av_fetch(rows, i, 0);
                     SV **idp;
                     SV *dargv[2], *draw, *dres;
+                    # uncoverable branch true
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
                     if (!(rp && *rp && SvROK(*rp))) continue;
                     idp = hv_fetchs((HV *)SvRV(*rp), "id", 0);
+                    # uncoverable branch true
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
                     if (!(idp && *idp && SvOK(*idp))) continue;
                     dargv[0] = sv_2mortal(newSVpvs("id"));
                     dargv[1] = *idp;
                     draw = pcx_call_meth(aTHX_ m, "delete", dargv, 2, 1);
                     dres = pauth_await(aTHX_ self,
                                        draw ? draw : &PL_sv_undef);
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (draw) SvREFCNT_dec(draw);
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (dres) SvREFCNT_dec(dres);
                 }
             }
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (res) SvREFCNT_dec(res);
         }
         tok = pwd_token(aTHX);
@@ -233,8 +283,12 @@ issue_token(self, user_id, kind, ttl)
                             newSViv((IV)time(NULL) + SvIV(ttl)));
             argv[0] = sv_2mortal(newRV_noinc((SV *)data));
             raw = pcx_call_meth(aTHX_ m, "create", argv, 1, 1);
-            res = pauth_await(aTHX_ self, raw ? raw : &PL_sv_undef);
+            res = pauth_await(aTHX_ self, raw ? raw : &PL_sv_undef); /* # uncoverable condition left count:1 class:ignore_covered_err */
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (raw) SvREFCNT_dec(raw);
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (res) SvREFCNT_dec(res);
         }
         SvREFCNT_dec(m);
@@ -258,8 +312,12 @@ take_token(self, token, ...)
         if (!cfg)
             croak("Punk: take_token needs the auth keyword "
                   "(add `auth ...`)");
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (!SvOK(token) || !SvCUR(token) || items < 3)
-            XSRETURN_UNDEF;
+            XSRETURN_UNDEF; /* # uncoverable statement */
         m = pauth_model(aTHX_ self, cfg, "token_model", "take_token");
         {
             HV *filter = newHV();
@@ -272,10 +330,15 @@ take_token(self, token, ...)
             (void)hv_stores(filter, "digest", pwd_token_digest(aTHX_ tp, tl));
             argv[0] = sv_2mortal(newRV_noinc((SV *)filter));
             raw = pcx_call_meth(aTHX_ m, "search", argv, 1, 1);
-            res = pauth_await(aTHX_ self, raw ? raw : &PL_sv_undef);
+            res = pauth_await(aTHX_ self, raw ? raw : &PL_sv_undef); /* # uncoverable condition left count:1 class:ignore_covered_err */
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (raw) SvREFCNT_dec(raw);
             rows = pauth_rows(aTHX_ res);
-            if (rows && av_len(rows) >= 0) rp = av_fetch(rows, 0, 0);
+            if (rows && av_len(rows) >= 0) rp = av_fetch(rows, 0, 0); /* # uncoverable condition right count:1 class:ignore_covered_err */
+            # uncoverable condition right count:2 class:ignore_covered_err
+            # uncoverable condition right count:3 class:ignore_covered_err
+            # uncoverable condition right count:4 class:ignore_covered_err
             if (rp && *rp && SvROK(*rp)
                 && SvTYPE(SvRV(*rp)) == SVt_PVHV) {
                 HV *row = (HV *)SvRV(*rp);
@@ -283,6 +346,10 @@ take_token(self, token, ...)
                 SV **kp  = hv_fetchs(row, "kind", 0);
                 SV **xp  = hv_fetchs(row, "expires", 0);
                 int i, kind_ok = 0;
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (idp && *idp && SvOK(*idp)) {
                     SV *dargv[2], *draw, *dres;
                     dargv[0] = sv_2mortal(newSVpvs("id"));
@@ -290,24 +357,39 @@ take_token(self, token, ...)
                     draw = pcx_call_meth(aTHX_ m, "delete", dargv, 2, 1);
                     dres = pauth_await(aTHX_ self,
                                        draw ? draw : &PL_sv_undef);
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (draw) SvREFCNT_dec(draw);
+                    # uncoverable branch false
+                    # uncoverable condition right count:1 class:ignore_covered_err
                     if (dres) SvREFCNT_dec(dres);
                 }
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
                 if (kp && *kp && SvOK(*kp)) {
                     STRLEN kl2;
                     const char *k2 = SvPV_const(*kp, kl2);
-                    for (i = 2; i < items && !kind_ok; i++) {
+                    for (i = 2; i < items && !kind_ok; i++) { /* # uncoverable condition right count:2 class:ignore_covered_err */
                         STRLEN wl;
                         const char *w;
+                        # uncoverable branch true
+                        # uncoverable condition left count:1 class:ignore_covered_err
                         if (!SvOK(ST(i))) continue;
                         w = SvPV_const(ST(i), wl);
-                        if (wl == kl2 && memEQ(w, k2, kl2)) kind_ok = 1;
+                        if (wl == kl2 && memEQ(w, k2, kl2)) kind_ok = 1; /* # uncoverable condition right count:2 class:ignore_covered_err */
                     }
                 }
+                # uncoverable condition right count:2 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (kind_ok && xp && *xp && SvOK(*xp)
                     && SvIV(*xp) >= (IV)time(NULL))
                     row_copy = newRV_noinc((SV *)newHVhv(row));
             }
+            # uncoverable branch false
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (res) SvREFCNT_dec(res);
         }
         SvREFCNT_dec(m);

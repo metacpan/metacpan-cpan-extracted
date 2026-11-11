@@ -79,9 +79,19 @@ Returns the variable's value from the first solution, or C<undef>.
 
 Alias for C<first_value>.
 
+=head2 max_steps
+
+Returns the maximum resolution steps allowed for this query (default: 100,000; 0 for unlimited).
+
+=head2 step_count
+
+Returns the number of resolution steps executed so far by this query iterator.
+
 =cut
 
 use Carp qw(croak);
+
+our $DEFAULT_MAX_STEPS = 100_000;
 
 sub new ( $class, %args ) {
     my $program    = $args{program} // croak "program is required";
@@ -101,6 +111,17 @@ sub new ( $class, %args ) {
         table_cache  => $table_cache,
     );
 
+    my $max_steps;
+    if ( exists $args{max_steps} ) {
+        $max_steps = $args{max_steps};
+    }
+    elsif ( $program->can('max_steps') && defined $program->max_steps ) {
+        $max_steps = $program->max_steps;
+    }
+    else {
+        $max_steps = $DEFAULT_MAX_STEPS;
+    }
+
     my $self = {
         program         => $program,
         predicates      => $predicates,
@@ -109,9 +130,14 @@ sub new ( $class, %args ) {
         agenda          => [$initial_state],
         trace_cb        => undef,
         is_backtracking => 0,
+        max_steps       => $max_steps,
+        step_count      => 0,
     };
     return bless $self, $class;
 }
+
+sub max_steps  ($self) { return $self->{max_steps}; }
+sub step_count ($self) { return $self->{step_count}; }
 
 sub trace ( $self, $callback = undef ) {
     if ( defined $callback ) {
@@ -124,6 +150,15 @@ sub next ($self) {
     my $trace_cb = $self->{trace_cb};
 
     while ( my $state = pop @{ $self->{agenda} } ) {
+        $self->{step_count}++;
+        if ( defined $self->{max_steps} && $self->{max_steps} > 0 ) {
+            if ( $self->{step_count} > $self->{max_steps} ) {
+                croak "Query exceeded maximum resolution steps of "
+                  . $self->{max_steps}
+                  . " (possible recursion or unbounded search). "
+                  . "Specify max_steps => 0 for unlimited or a higher limit.";
+            }
+        }
         if ( $state->has_goals
             && ref( $state->goals->[0] ) eq 'Logic::Relational::Goal::EndCall' )
         {

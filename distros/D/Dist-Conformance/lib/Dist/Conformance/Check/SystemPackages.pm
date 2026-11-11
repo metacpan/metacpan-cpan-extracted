@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::SystemPackages 0.003;
+package Dist::Conformance::Check::SystemPackages 0.004;
 
 # ABSTRACT: The system packages that a repository declares in metamerge.yml, validated, and resolved for a host
 
@@ -244,7 +244,7 @@ Dist::Conformance::Check::SystemPackages - The system packages that a repository
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 SYNOPSIS
 

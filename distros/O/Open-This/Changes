@@ -1,5 +1,27 @@
 Revision history for Open-This
 
+0.000036  2026-11-11 00:49:32Z
+    - Add -h|--help and -v|--version to ot (GH#79) (Olaf Alders)
+    - When an unknown or invalid option leaves no target to open, ot now prints
+      usage and exits 2, or prints a JSON error and exits 2 with --json.
+      Previously it reported "Could not locate file" and exited 1 (GH#79) (Olaf
+      Alders)
+    - ot --browse and maybe_get_url_from_parsed_text now build the URL from
+      the file's path in its own checkout, using that checkout's remote and
+      branch, so relative paths from subdirectories, ".." paths and absolute
+      paths work. Files not committed on the current branch and files outside a
+      checkout get no URL (GH#83) (Olaf Alders)
+    - Don't read the port or password of a pasted URL as a line number (GH#75)
+      (Olaf Alders)
+    - Support Codeberg, GitLab, Bitbucket and SourceHut file URLs, both when
+      building ot --browse links and when opening a pasted URL (GH#76) (Olaf
+      Alders)
+    - Add the OPEN_THIS_REMOTES environment variable, a comma-separated list of
+      remotes to use for browse URLs. The first one that exists in the
+      repository is used, falling back to origin (GH#77) (Stefan Härter)
+    - Prefix relative file names starting with + or - with ./ so the editor
+      does not read them as a command or an option (GH#78) (Olaf Alders)
+
 0.000035  2025-10-28 17:23:31Z
     - Add script_fails to Test::Script import list in t/ot.t (GH#60) (Copilot)
 

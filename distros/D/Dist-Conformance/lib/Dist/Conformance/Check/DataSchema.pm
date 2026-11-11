@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::DataSchema 0.003;
+package Dist::Conformance::Check::DataSchema 0.004;
 
 # ABSTRACT: A JSON, YAML or INI file parses and matches a schema
 
@@ -69,7 +69,7 @@ Dist::Conformance::Check::DataSchema - A JSON, YAML or INI file parses and match
 
 =head1 VERSION
 
-version 0.003
+version 0.004
 
 =head1 DESCRIPTION
 
@@ -98,6 +98,10 @@ a key of a plugin:
                   not: {}
                   x-errorMessage:
                     not: overrides the account in the URL of the origin remote
+
+The update cannot remove such a key, because a schema says what is wrong and
+not how to fix it.  L<Dist::Conformance::Check::RefusedIniKeys> refuses a key
+of a plugin and removes it.
 
 The schema is in the flavor, so that it changes in the same commit as the
 standards that describe the file.  It is an OpenAPI v3 schema, as

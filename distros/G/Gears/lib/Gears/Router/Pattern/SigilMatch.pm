@@ -1,5 +1,5 @@
 package Gears::Router::Pattern::SigilMatch;
-$Gears::Router::Pattern::SigilMatch::VERSION = '0.104';
+$Gears::Router::Pattern::SigilMatch::VERSION = '0.105';
 use v5.40;
 use Mooish::Base -standard;
 
@@ -11,6 +11,7 @@ extends 'Gears::Router::Pattern';
 has extended 'location' => (
 	handles => [
 		qw(
+			router
 			checks
 			defaults
 		)
@@ -47,6 +48,7 @@ sub _rep_regex
 {
 	my ($self, $char, $switch, $token, $out) = @_;
 	my $qchar = quotemeta $char;
+	my $separator = $self->router->pattern_separator;
 	my $re;
 
 	push $self->tokens->@*, {
@@ -56,14 +58,14 @@ sub _rep_regex
 
 	my ($prefix, $suffix) = ("(?<$token>", ')');
 	if (noslash($switch)) {
-		$re = $qchar . $prefix . ($self->checks->{$token} // '[^\/]+') . $suffix;
+		$re = $qchar . $prefix . ($self->checks->{$token} // "[^\Q$separator\E]+") . $suffix;
 	}
 	elsif (matchall($switch)) {
 		$re = $qchar . $prefix . ($self->checks->{$token} // '.+') . $suffix;
 	}
 
 	if (optional($switch)) {
-		$re = "(?:$re)" if $char eq '/';
+		$re = "(?:$re)" if $char eq $separator;
 		$re .= '?';
 	}
 
@@ -74,6 +76,7 @@ sub _rep_regex
 sub _build_regex ($self)
 {
 	my $pattern = $self->pattern;
+	my $separator = $self->router->pattern_separator;
 
 	my $placeholder_pattern = qr{
 		( [^\0]? ) # preceding char, may change behavior of some placeholders
@@ -99,7 +102,7 @@ sub _build_regex ($self)
 	$pattern =~ s/\0//g;
 
 	# remember if the pattern has a trailing slash before we quote it
-	my $trailing_slash = $pattern =~ m{/$};
+	my $trailing_slash = $pattern =~ m{\Q$separator\E$};
 
 	# _rep_regex reused curies for {} placeholders, so we want to split the
 	# string by that (and include them in the result by capturing the
@@ -127,12 +130,12 @@ sub _build_regex ($self)
 		# - /testsomething does not match
 		# if the bridge is already followed by a trailing slash, it's not a
 		# concern
-		$pattern .= '(?:/|$)' unless $trailing_slash;
+		$pattern .= "(?:\Q$separator\E|\$)" unless $trailing_slash;
 	}
 	else {
 
 		# regular pattern must end immediately
-		$pattern .= quotemeta('/') . '?' unless $trailing_slash;
+		$pattern .= "\Q$separator\E?" unless $trailing_slash;
 		$pattern .= '$';
 	}
 
@@ -159,6 +162,7 @@ sub build ($self, %args)
 {
 	my $pattern = $self->pattern;
 	my $checks = $self->checks;
+	my $separator = $self->router->pattern_separator;
 	%args = ($self->defaults->%*, %args);
 
 	foreach my $token ($self->tokens->@*) {
@@ -168,8 +172,8 @@ sub build ($self, %args)
 			unless defined $value || optional $token->{sigil};
 
 		if (defined $value) {
-			my $safe = '^A-Za-z0-9\-\._~';
-			$safe .= '/' unless noslash $token->{sigil};
+			my $safe = 'A-Za-z0-9\-\._~';
+			$safe .= $separator unless noslash $token->{sigil};
 			$value = uri_escape_utf8 $value, "^$safe";
 		}
 
@@ -181,13 +185,13 @@ sub build ($self, %args)
 		if (defined $value) {
 			my $check = $checks->{$token->{label}};
 			Gears::X->raise("bad value for placeholder $token->{sigil}$token->{label}")
-				if $check && $value !~ /^$check$/;
+				if $check && $value !~ /^($check)$/;
 
 			$pattern =~ s{\{?$to_replace\}?}{$value};
 		}
 		else {
 			# slash should be removed as well for optional placeholders (if no brackets)
-			$pattern =~ s{/$to_replace|\{?$to_replace\}?}{};
+			$pattern =~ s{\Q$separator\E$to_replace|\{?$to_replace\}?}{};
 		}
 	}
 

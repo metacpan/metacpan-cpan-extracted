@@ -7,9 +7,9 @@ use File::Temp qw(tempfile);
 use lib '.';
 use t::Util;
 
-# Front matter at the top of the file is shown as a code block: every
-# line in code_block, the delimiter lines in code_mark inside it, with
-# no other markup.  The colors are replaced by marks to see which
+# Front matter at the top of the file is shown as a code block: the
+# body in meta_block, the delimiter lines in meta_mark, with no other
+# markup.  The colors are replaced by marks to see which
 # label each line gets.
 
 sub md_file {
@@ -22,7 +22,9 @@ sub md_file {
 my $marks = join ' ',
     q(--cm 'code_mark=sub{"<M:$_>"}'),
     q(--cm 'code_block=sub{"<B:$_>"}'),
-    q(--cm 'horizontal_rule=sub{"<R:$_>"}');
+    q(--cm 'horizontal_rule=sub{"<R:$_>"}'),
+    q(--cm 'meta_mark=sub{"<MM:$_>"}'),
+    q(--cm 'meta_block=sub{"<MB:$_>"}');
 
 sub show {
     my($text, $config) = @_;
@@ -33,15 +35,15 @@ sub show {
 }
 
 is(show("---\ntitle: **x**\ntags:\n  - a\n---\n\n# Head\n"),
-   "<B:<M:--->>\n<B:title: **x**\n><B:tags:\n><B:  - a\n><B:<M:--->>\n\n# Head\n",
+   "<MM:--->\n<MB:title: **x**\n><MB:tags:\n><MB:  - a\n><MM:--->\n\n# Head\n",
    'YAML front matter is a code block, without other markup');
 
 is(show("---\ntitle: x\n...\ntext\n"),
-   "<B:<M:--->>\n<B:title: x\n><B:<M:...>>\ntext\n",
+   "<MM:--->\n<MB:title: x\n><MM:...>\ntext\n",
    'YAML front matter may end with ...');
 
 is(show("+++\ntitle = \"x\"\n+++\n"),
-   "<B:<M:+++>>\n<B:title = \"x\"\n><B:<M:+++>>\n",
+   "<MM:+++>\n<MB:title = \"x\"\n><MM:+++>\n",
    'TOML front matter is a code block');
 
 is(show("---\n\ntext\n\n---\n"),
@@ -56,17 +58,21 @@ is(show("---\ntitle: x\n---\n", 'front_matter=0'),
    "<R:--->\ntitle: x\n<R:--->\n",
    'front_matter=0 takes the lines as Markdown');
 
-# meta_mark and meta_block color the front matter alone; without
-# them it has the colors of code_mark and code_block
+# meta_mark and meta_block color the front matter alone; when they
+# are emptied it has the colors of code_block, with code_mark inside
+# it on the delimiter lines
 {
     my $text = "---\ntitle: x\n---\n\n```\ncode\n```\n";
-    my $out = run(join ' ', '-Mmd', $marks,
-                  q(--cm 'meta_mark=sub{"<MM:$_>"}'),
-                  q(--cm 'meta_block=sub{"<MB:$_>"}'),
+    is(show($text),
+       "<MM:--->\n<MB:title: x\n><MM:--->\n\n<M:```>\n<B:code\n><M:```>\n",
+       'meta_mark and meta_block are for the front matter only');
+    my $out = run(join ' ', "'-Mmd::config(meta_mark=,meta_block=)'",
+                  $marks =~ s/ --cm 'meta_\w+=[^']*'//gr,
                   '--', md_file($text))->stdout;
     $out =~ s/\e\[[\d;]*[mK]//g;
-    is($out, "<MB:<MM:--->>\n<MB:title: x\n><MB:<MM:--->>\n\n<M:```>\n<B:code\n><M:```>\n",
-       'meta_mark and meta_block are for the front matter only');
+    is($out,
+       "<B:<M:--->>\n<B:title: x\n><B:<M:--->>\n\n<M:```>\n<B:code\n><M:```>\n",
+       'without meta_mark and meta_block, code_mark inside code_block');
 }
 
 # A long line in the front matter is not folded, as a list item would be

@@ -474,3 +474,75 @@ load test_helper.bash
     assert_line --index 2 "arr_1:--no-v"
     assert_line --index 3 "arr_2:-v"
 }
+
+# Test: Passthru - value with spaces is kept as one word
+@test "getoptlong: passthru - value with spaces --opt 'a b  c'" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([opt|o:>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse --opt "a b  c" -o "x y"
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_1:${pass_array[1]}"
+        echo "arr_3:${pass_array[3]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:4"
+    assert_line --index 1 "arr_1:a b  c"
+    assert_line --index 2 "arr_3:x y"
+}
+
+# Test: Passthru - value is not expanded as a file name pattern
+@test "getoptlong: passthru - value with wildcard --opt '*'" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([opt|o:>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse --opt "*"
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_1:${pass_array[1]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:2"
+    assert_line --index 1 "arr_1:*"
+}
+
+# Test: Passthru - empty value of a required argument is kept
+@test "getoptlong: passthru - empty value --opt=" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([opt|o:>pass_array]=)
+        declare -a pass_array=()
+        getoptlong init OPTS
+        getoptlong parse --opt=
+        eval "$(getoptlong set)"
+        echo "arr_len:${#pass_array[@]}"
+        echo "arr_1:<${pass_array[1]}>"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:2"
+    assert_line --index 1 "arr_1:<>"
+}
+
+# Test: Passthru - optional argument with value is passed as --opt=value
+@test "getoptlong: passthru - optional argument with value --opt=value" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optional-opt|o?>opt_array]=)
+        declare -a opt_array=()
+        getoptlong init OPTS
+        getoptlong parse --optional-opt="a b" --optional-opt
+        eval "$(getoptlong set)"
+        echo "arr_len:${#opt_array[@]}"
+        echo "arr_0:${opt_array[0]}"
+        echo "arr_1:${opt_array[1]}"
+    '
+    assert_success
+    assert_line --index 0 "arr_len:2"
+    assert_line --index 1 "arr_0:--optional-opt=a b"
+    assert_line --index 2 "arr_1:--optional-opt"
+}

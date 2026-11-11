@@ -32,21 +32,34 @@ _build(self, app, cats, opts = &PL_sv_undef)
 
         PERL_UNUSED_VAR(self);
 
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (SvOK(opts)) {
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (!(SvROK(opts) && SvTYPE(SvRV(opts)) == SVt_PVHV))
-                croak("Punk::Plugin::I18n: options must be a hashref");
+                croak("Punk::Plugin::I18n: options must be a hashref"); /* # uncoverable statement */
             o = (HV *)SvRV(opts);
         }
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(SvROK(cats) && SvTYPE(SvRV(cats)) == SVt_PVHV))
-            croak("Punk::Plugin::I18n: catalogues must be a hashref");
+            croak("Punk::Plugin::I18n: catalogues must be a hashref"); /* # uncoverable statement */
 
-        dir    = o ? hv_fetchs(o, "dir", 0)     : NULL;
-        def    = o ? hv_fetchs(o, "default", 0) : NULL;
-        param  = o ? hv_fetchs(o, "param", 0)   : NULL;
-        cookie = o ? hv_fetchs(o, "cookie", 0)  : NULL;
+        dir    = o ? hv_fetchs(o, "dir", 0)     : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        def    = o ? hv_fetchs(o, "default", 0) : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        param  = o ? hv_fetchs(o, "param", 0)   : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
+        cookie = o ? hv_fetchs(o, "cookie", 0)  : NULL; /* # uncoverable condition right count:1 class:ignore_covered_err */
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
+        # uncoverable condition left count:4 class:ignore_covered_err
         if (!(def && *def && SvOK(*def) && SvCUR(*def)))
-            croak("Punk::Plugin::I18n: `default` is required - it is the "
+            croak("Punk::Plugin::I18n: `default` is required - it is the " /* # uncoverable statement */
                   "answer when negotiation finds nothing, and an application "
                   "with no answer to that renders empty pages");
 
@@ -69,23 +82,31 @@ _build(self, app, cats, opts = &PL_sv_undef)
 
         {   /* $c->locale($key, %substitutions), and $c->locale for the tag. */
             CV *cv = get_cv("Punk::Plugin::I18n::_locale", 0);
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (cv) {
                 SV *argv[2];
                 SV *r;
                 argv[0] = sv_2mortal(newSVpvs("locale"));
                 argv[1] = sv_2mortal(newRV_inc((SV *)cv));
                 r = pcx_call_meth(aTHX_ app, "helper", argv, 2, 1);
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (r) SvREFCNT_dec(r);
             }
         }
         {   /* $c->locale_html: the same, with the values escaped for markup. */
             CV *cv = get_cv("Punk::Plugin::I18n::_locale_html", 0);
+            # uncoverable branch false class:ignore_covered_err
+            # uncoverable condition right count:1 class:ignore_covered_err
             if (cv) {
                 SV *argv[2];
                 SV *r;
                 argv[0] = sv_2mortal(newSVpvs("locale_html"));
                 argv[1] = sv_2mortal(newRV_inc((SV *)cv));
                 r = pcx_call_meth(aTHX_ app, "helper", argv, 2, 1);
+                # uncoverable branch false
+                # uncoverable condition right count:1 class:ignore_covered_err
                 if (r) SvREFCNT_dec(r);
             }
         }
@@ -116,9 +137,13 @@ _locale(c, ...)
         const pi_cat *cat;
         RETVAL = NULL;
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!ar) croak("Punk::Plugin::I18n: the plugin is not registered on "
                        "this application");
         cat = pi_for_request(aTHX_ c, cfg, ar);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
         if (!cat) XSRETURN_UNDEF;
 
         if (items < 2) {                      /* the tag itself */
@@ -141,10 +166,10 @@ _locale(c, ...)
             for (j = 2; j + 1 < items; j += 2) {
                 STRLEN nl;
                 const char *nm = SvPV_const(ST(j), nl);
-                if (nl != 5 || memcmp(nm, "count", 5) != 0) continue;
+                if (nl != 5 || memcmp(nm, "count", 5) != 0) continue; /* # uncoverable condition left count:2 class:ignore_covered_err */
                 {
                     SV *cv = ST(j + 1);
-                    NV nv = SvOK(cv) ? SvNV(cv) : 0;
+                    NV nv = SvOK(cv) ? SvNV(cv) : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
                     int is_int = 1;
                     /* At the top of the block, not beside their first use.
                      * This header has to compile on every perl from 5.10,
@@ -170,18 +195,28 @@ _locale(c, ...)
                     }
                     /* I_V, not a bare cast: a NaN or an infinity cast to IV
                      * is undefined in C, and a count can be either */
+                    # uncoverable branch true
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
+                    # uncoverable condition left count:3 class:ignore_covered_err
                     if (is_int && (Perl_isinfnan(nv) || nv != (NV)I_V(nv)))
-                        is_int = 0;
+                        is_int = 0; /* # uncoverable statement */
 
                     rule = pi_rule_for(cat->tag, cat->taglen);
+                    # uncoverable branch true class:ignore_covered_err
+                    # uncoverable condition left count:1 class:ignore_covered_err
                     if (rule == PR_NONE) break;   /* checked at boot */
                     pc  = pi_plural(rule, (double)nv, is_int);
                     cn  = PI_CAT_NAME[pc];
                     cnl = strlen(cn);
                     /* bounded by the WIDEST category: the `other` fallback
                      * below writes five bytes where a three-letter one fit */
+                    # uncoverable branch true class:ignore_covered_err
+                    # uncoverable branch false class:ignore_covered_err
+                    # uncoverable condition left count:1 class:ignore_covered_err
+                    # uncoverable condition left count:2 class:ignore_covered_err
                     if (kl + 1 + 5 > PI_KEY_MAX || kl + 1 + cnl > PI_KEY_MAX)
-                        break;
+                        break; /* # uncoverable statement */
 
                     memcpy(pkey, k, kl);
                     pkey[kl] = '.';
@@ -226,6 +261,8 @@ _locale(c, ...)
                 /* the key echoed back, so it carries the CALLER's flag and
                  * not the block's - a non-ASCII key must come back the way
                  * it went in */
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
                 if (SvUTF8(ST(1))) SvUTF8_on(RETVAL);
             }
             else if (items > 2) {
@@ -301,11 +338,24 @@ FETCH(self, key)
         SV **ctx  = av_fetch(o, PIT_CTX, 0);
         SV **nds  = av_fetch(o, PIT_NODE, 0);
         SV **dnds = av_fetch(o, PIT_DNODE, 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
         HV *cfg = (cfgs && *cfgs && SvROK(*cfgs)) ? (HV *)SvRV(*cfgs) : NULL;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         SV *c   = (ctx && *ctx) ? *ctx : NULL;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         uint32_t node  = (nds  && *nds)  ? (uint32_t)SvUV(*nds)  : FZ_NOHANDLE;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         uint32_t dnode = (dnds && *dnds) ? (uint32_t)SvUV(*dnds) : FZ_NOHANDLE;
         uint32_t child = FZ_NOHANDLE, dchild = FZ_NOHANDLE;
         const pi_cat *cat;
@@ -313,6 +363,10 @@ FETCH(self, key)
         const char *k, *vp = NULL;
         int r, vu = 0;
 
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
+        # uncoverable condition left count:3 class:ignore_covered_err
         if (!ar || idx < 0 || idx >= ar->ncat) XSRETURN_UNDEF;
         cat = &ar->cat[idx];
 
@@ -324,6 +378,8 @@ FETCH(self, key)
 
         if (r == PI_HIT) {
             RETVAL = newSVpvn(vp, vl);
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
             if (vu) SvUTF8_on(RETVAL);
         }
         else {
@@ -334,6 +390,8 @@ FETCH(self, key)
             STRLEN fl;
             const char *fp;
 
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             if (pfx && *pfx && SvOK(*pfx)) {
                 full = sv_2mortal(newSVsv(*pfx));
                 sv_catpvs(full, ".");
@@ -355,9 +413,19 @@ FETCH(self, key)
                  * an omission that is visible in a handler and invisible in
                  * a template is the worse half to lose - which is the whole
                  * reason this hash is tied. */
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
+                # uncoverable condition right count:1 class:ignore_covered_err
+                # uncoverable condition left count:2 class:ignore_covered_err
+                # uncoverable condition left count:3 class:ignore_covered_err
+                # uncoverable condition right count:3 class:ignore_covered_err
+                # uncoverable condition left count:4 class:ignore_covered_err
+                # uncoverable condition right count:4 class:ignore_covered_err
                 if (cfg && pi_dev(aTHX_ cfg) && c && SvOK(c))
-                    pi_warn_missing(aTHX_ c, fp, fl);
+                    pi_warn_missing(aTHX_ c, fp, fl); /* # uncoverable statement */
                 RETVAL = newSVpvn(fp, fl);
+                # uncoverable branch true
+                # uncoverable condition left count:1 class:ignore_covered_err
                 if (SvUTF8(key)) SvUTF8_on(RETVAL);
             }
         }
@@ -367,41 +435,101 @@ FETCH(self, key)
 
 # A template asking whether a key is there, without building its value.
 bool
+# uncoverable statement
+# uncoverable subroutine
 EXISTS(self, key)
         SV *self
         SV *key
     CODE:
     {
-        AV *o = (AV *)SvRV(self);
-        SV **arsv = av_fetch(o, PIT_ARENA, 0);
-        SV **idxs = av_fetch(o, PIT_CAT, 0);
-        SV **nds  = av_fetch(o, PIT_NODE, 0);
-        SV **dnds = av_fetch(o, PIT_DNODE, 0);
+        AV *o = (AV *)SvRV(self); /* # uncoverable statement */
+        SV **arsv = av_fetch(o, PIT_ARENA, 0); /* # uncoverable statement */
+        SV **idxs = av_fetch(o, PIT_CAT, 0); /* # uncoverable statement */
+        SV **nds  = av_fetch(o, PIT_NODE, 0); /* # uncoverable statement */
+        SV **dnds = av_fetch(o, PIT_DNODE, 0); /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         uint32_t node  = (nds  && *nds)  ? (uint32_t)SvUV(*nds)  : FZ_NOHANDLE;
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         uint32_t dnode = (dnds && *dnds) ? (uint32_t)SvUV(*dnds) : FZ_NOHANDLE;
         STRLEN kl;
         const char *k;
         const pi_cat *cat, *d;
-        uint32_t slot = 0;
+        uint32_t slot = 0; /* # uncoverable statement */
 
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
+        # uncoverable condition left count:3
+        # uncoverable condition right count:3
         if (!ar || idx < 0 || idx >= ar->ncat) XSRETURN_NO;
-        cat = &ar->cat[idx];
+        cat = &ar->cat[idx]; /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         d   = (ar->def >= 0) ? &ar->cat[ar->def] : NULL;
-        k   = SvPV_const(key, kl);
+        k   = SvPV_const(key, kl); /* # uncoverable statement */
 
         /* True for a leaf AND for a level: a template descending into
          * `items` is asking whether it can, not whether `items` is itself a
          * translation. Not routed through pi_step, because EXISTS must not
          * move the missing counter - asking is not the same as reading. */
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
+        # uncoverable condition left count:3
+        # uncoverable condition right count:3
+        # uncoverable condition left count:4
+        # uncoverable condition right count:4
         if (cat->fz && node != FZ_NOHANDLE && PUNK_FZ
-            && (PUNK_FZ->probe)(cat->fz, node, k, kl, &slot) != FZ_ABSENT)
-            XSRETURN_YES;
+            && (PUNK_FZ->probe)(cat->fz, node, k, kl, &slot) != FZ_ABSENT) /* # uncoverable statement */
+            XSRETURN_YES; /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
+        # uncoverable condition left count:3
+        # uncoverable condition right count:3
+        # uncoverable condition left count:4
+        # uncoverable condition right count:4
+        # uncoverable condition left count:5
+        # uncoverable condition right count:5
+        # uncoverable condition left count:6
+        # uncoverable condition right count:6
         if (d && d != cat && d->fz && dnode != FZ_NOHANDLE && PUNK_FZ
-            && (PUNK_FZ->probe)(d->fz, dnode, k, kl, &slot) != FZ_ABSENT)
-            XSRETURN_YES;
-        XSRETURN_NO;
+            && (PUNK_FZ->probe)(d->fz, dnode, k, kl, &slot) != FZ_ABSENT) /* # uncoverable statement */
+            XSRETURN_YES; /* # uncoverable statement */
+        XSRETURN_NO; /* # uncoverable statement */
     }
 
 # ---- iteration --------------------------------------------------------------
@@ -440,6 +568,8 @@ NEXTKEY(self, last = &PL_sv_undef)
     {
         AV *o = (AV *)SvRV(self);
         SV **it = av_fetch(o, PIT_ITER, 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         IV i = (it && *it) ? SvIV(*it) + 1 : 1;
         PERL_UNUSED_VAR(last);
         av_store(o, PIT_ITER, newSViv(i));
@@ -458,10 +588,22 @@ SCALAR(self)
         SV **arsv = av_fetch(o, PIT_ARENA, 0);
         SV **nds  = av_fetch(o, PIT_NODE, 0);
         SV **idxs = av_fetch(o, PIT_CAT, 0);
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         pi_arena *ar = (arsv && *arsv) ? INT2PTR(pi_arena *, SvIV(*arsv)) : NULL;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         int idx = (idxs && *idxs) ? (int)SvIV(*idxs) : -1;
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
         uint32_t node = (nds && *nds) ? (uint32_t)SvUV(*nds) : FZ_NOHANDLE;
         RETVAL = 0;
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
+        # uncoverable condition right count:5 class:ignore_covered_err
         if (ar && idx >= 0 && idx < ar->ncat && node != FZ_NOHANDLE && PUNK_FZ)
             RETVAL = (IV)(PUNK_FZ->count)(ar->cat[idx].fz, node);
     }
@@ -488,12 +630,14 @@ STORE(self, key, value)
               "copy of a translation");
 
 void
+# uncoverable statement
+# uncoverable subroutine
 DELETE(self, key)
         SV *self
         SV *key
     CODE:
         PERL_UNUSED_VAR(self); PERL_UNUSED_VAR(key);
-        croak("Punk::Plugin::I18n: the locale hash is read-only");
+        croak("Punk::Plugin::I18n: the locale hash is read-only"); /* # uncoverable statement */
 
 void
 CLEAR(self)
@@ -546,19 +690,29 @@ _negotiate(class, header, tags)
         const char *hp;
 
         PERL_UNUSED_VAR(class);
+        # uncoverable branch true
+        # uncoverable condition left count:1 class:ignore_covered_err
+        # uncoverable condition left count:2 class:ignore_covered_err
         if (!(SvROK(tags) && SvTYPE(SvRV(tags)) == SVt_PVAV))
-            croak("Punk::Plugin::I18n::_negotiate: tags must be an arrayref");
+            croak("Punk::Plugin::I18n::_negotiate: tags must be an arrayref"); /* # uncoverable statement */
         av = (AV *)SvRV(tags);
         n = (int)(av_len(av) + 1);
 
         Zero(&ar, 1, pi_arena);
         ar.def = -1;
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
         if (n) Newxz(ar.cat, n, pi_cat);
         for (i = 0; i < n; i++) {
             SV **e = av_fetch(av, i, 0);
             STRLEN tl;
+            # uncoverable condition right count:1 class:ignore_covered_err
+            # uncoverable condition right count:2 class:ignore_covered_err
             const char *tp = (e && *e) ? SvPV_const(*e, tl) : NULL;
             STRLEN j;
+            # uncoverable branch true
+            # uncoverable condition left count:1 class:ignore_covered_err
+            # uncoverable condition left count:2 class:ignore_covered_err
             if (!tp || tl > PI_TAG_MAX) continue;
             for (j = 0; j < tl; j++) ar.cat[ar.ncat].tag[j] = pi_fold(tp[j]);
             ar.cat[ar.ncat].tag[tl] = '\0';
@@ -591,7 +745,7 @@ MODULE = Punk    PACKAGE = Punk
 int
 _fz_available()
     CODE:
-        RETVAL = punk_fz_try(aTHX) ? 1 : 0;
+        RETVAL = punk_fz_try(aTHX) ? 1 : 0; /* # uncoverable condition left count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 

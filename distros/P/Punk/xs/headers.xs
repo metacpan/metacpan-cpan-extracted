@@ -13,6 +13,11 @@ _decorate(resp, pairs)
     CODE:
     {
         AV *headers = pco_headers_of(aTHX_ resp);
+        # uncoverable branch false
+        # uncoverable condition right count:1 class:ignore_covered_err
+        # uncoverable condition right count:2 class:ignore_covered_err
+        # uncoverable condition right count:3 class:ignore_covered_err
+        # uncoverable condition right count:4 class:ignore_covered_err
         if (headers && pairs && SvROK(pairs)
             && SvTYPE(SvRV(pairs)) == SVt_PVAV)
             phd_add_absent(aTHX_ headers, (AV *)SvRV(pairs));

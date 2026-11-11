@@ -178,8 +178,8 @@ DBIx::Squirrel::Errors - report the DBI's errors at the caller's line
 
 Under C<RaiseError>, the DBI reports an error at the line that called
 it. Inside DBIx::Squirrel, that's a line of DBIx::Squirrel's own, which
-is no help to its user. This module moves the error to the user's line,
-and does the same for the DBI's warnings, under C<PrintError>.
+is no help to its user. This module moves the error to the user's
+line. It does the same for the DBI's warnings, under C<PrintError>.
 Nothing is exported by default.
 
 =head1 VARIABLES
@@ -191,9 +191,9 @@ Nothing is exported by default.
 The packages L<Carp> looks past to report an error at the line that
 called DBIx::Squirrel: the DBI's, DBIx::Squirrel's, and
 L<Ekorn::Pipeline>'s, which runs its stages. A module of stages, or of
-functions that take stages, sets its C<@CARP_NOT> to it, so that what
-it croaks while a stage runs is reported at the line that asked for
-the result, not inside DBIx::Squirrel.
+functions that take stages, sets its C<@CARP_NOT> to it. Then what it
+croaks while a stage runs is reported at the line that asked for the
+result, not inside DBIx::Squirrel.
 
 =head1 FUNCTIONS
 
@@ -201,53 +201,55 @@ the result, not inside DBIx::Squirrel.
 
     @values = at_caller { ... };
 
-Runs the block, which calls the DBI, and returns what it returns, in the
-same context. If the block dies with a string located at the block's own
-file, the location is removed and the message is raised again with
-L<Carp/croak>, which reports it at the first line outside the DBI and
-DBIx::Squirrel. The DBI's message itself, such as
-C<DBD::SQLite::db prepare failed: ...>, is kept as it was. Any other
-error, such as an object, or a string from a C<HandleError> callback, is
+Runs the block, which calls the DBI, and returns what it returns, in
+the same context. The block may die with a string located at the
+block's own file. Then the location is removed, and the message is
+raised again with L<Carp/croak>. That reports it at the first line
+outside the DBI and DBIx::Squirrel. The DBI's message itself, such as
+C<DBD::SQLite::db prepare failed: ...>, is unchanged. Any other error,
+such as an object, or a string from a C<HandleError> callback, is
 raised again unchanged.
 
 A warning given while the block runs, as the DBI gives one under
 C<PrintError>, is moved the same way, if it's located at a line of a
-file C<at_caller> has been called from, and passed on to the
-C<__WARN__> handler there was before, or warned without one.
+file C<at_caller> has been called from. It's passed on to the
+C<__WARN__> handler there was before, or warned if there was none.
 
 =head2 croakf
 
     croakf 'Expected a value for each placeholder (none for %s)', $names;
 
 Croaks with a message made by C<sprintf> from a format and its
-arguments, reporting it at the same line as L<Carp/croak> would.
+arguments. It reports it at the same line as L<Carp/croak> would.
 
-The format is a literal, written in the code: values go in as
+The format is a literal, written in the code. Values go in as
 arguments, through C<%s> and the like, never as the format. A format
-made from data does whatever its C<%> directives say, such as
-C<%999999999s>, which makes a string of a gigabyte.
+made from data does whatever its C<%> directives say. C<%999999999s>,
+for example, makes a string of a gigabyte.
 
 =head2 failed
 
     croak failed($dbh, 'prepare');
 
 Returns the message the DBI raises under C<RaiseError> when a handle's
-method fails, as C<DBD::SQLite::db prepare failed: ...>, for an error
-DBIx::Squirrel raises itself.
+method fails, such as C<DBD::SQLite::db prepare failed: ...>. It's for
+an error DBIx::Squirrel raises itself.
 
 =head2 in_method
 
     return in_method($dbh, 'do', sub { ... });
 
 Runs the code as one method of a database handle, and returns what it
-returns. An error the DBI raises for a method the code calls, such as
-C<DBD::SQLite::st execute failed: ...>, is raised again as the DBI
-raises one for the handle's method, C<DBD::SQLite::db do failed: ...>,
-as plain DBI does. Any other error is raised again unchanged. A warning
-the DBI gives for a method the code calls, as it does under
-C<PrintError>, names the handle's method too, and is passed on to the
-C<__WARN__> handler there was before, or warned without one. Run inside
-itself, the outer call's method is the one named.
+returns. The DBI may raise an error for a method the code calls, such
+as C<DBD::SQLite::st execute failed: ...>. It's raised again as the
+DBI raises one for the handle's method, C<DBD::SQLite::db do failed: ...>,
+as plain DBI does. Any other error is raised again unchanged.
+
+A warning the DBI gives for a method the code calls, as it does under
+C<PrintError>, names the handle's method too. It's passed on to the
+C<__WARN__> handler there was before, or warned if there was none.
+When C<in_method> runs inside itself, the outer call's method is the
+one named.
 
 =head1 SEE ALSO
 

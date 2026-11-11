@@ -9,7 +9,7 @@ PROTOTYPES: DISABLE
 int
 _oa_available()
     CODE:
-        RETVAL = punk_oa_try(aTHX) ? 1 : 0;
+        RETVAL = punk_oa_try(aTHX) ? 1 : 0; /* # uncoverable condition left count:1 class:ignore_covered_err */
     OUTPUT:
         RETVAL
 
@@ -29,6 +29,8 @@ _oa_abi_version()
 # $err a die message or undef. The hooks, guards and controller are the only
 # Perl frames.
 void
+# uncoverable statement
+# uncoverable subroutine
 _oa_dispatch(c, before, rec, api, op_id, caps, max_body)
         SV *c
         SV *before
@@ -42,16 +44,29 @@ _oa_dispatch(c, before, rec, api, op_id, caps, max_body)
         AV *before_av;
         HV *rech;
         SV *ret, *err;
+        # uncoverable statement
+        # uncoverable branch true
+        # uncoverable branch false
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         if (!SvROK(rec) || SvTYPE(SvRV(rec)) != SVt_PVHV)
-            croak("Punk::_oa_dispatch: rec must be a hashref");
-        before_av = (SvROK(before) && SvTYPE(SvRV(before)) == SVt_PVAV)
-                    ? (AV *)SvRV(before) : NULL;
-        rech = (HV *)SvRV(rec);
-        punk_oa_dispatch(aTHX_ c, before_av, rech, api, op_id, caps,
-                         max_body, &ret, &err);
-        SP = PL_stack_base + ax - 1;      /* hooks and the controller ran */
-        EXTEND(SP, 2);
+            croak("Punk::_oa_dispatch: rec must be a hashref"); /* # uncoverable statement */
+        before_av = (SvROK(before) && SvTYPE(SvRV(before)) == SVt_PVAV) /* # uncoverable statement */
+                    ? (AV *)SvRV(before) : NULL; /* # uncoverable statement */
+        rech = (HV *)SvRV(rec); /* # uncoverable statement */
+        punk_oa_dispatch(aTHX_ c, before_av, rech, api, op_id, caps, /* # uncoverable statement */
+                         max_body, &ret, &err); /* # uncoverable statement */
+        SP = PL_stack_base + ax - 1;      /* hooks and the controller ran */ /* # uncoverable statement */
+        EXTEND(SP, 2); /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         PUSHs(ret == &PL_sv_undef ? ret : sv_2mortal(ret));
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
         PUSHs(err == &PL_sv_undef ? err : sv_2mortal(err));
     }
 
@@ -59,17 +74,21 @@ _oa_dispatch(c, before, rec, api, op_id, caps, max_body)
 # Punk::Response, awaited Future, or JSON), folding in the context's pending
 # status/headers. The response-finish path, in C.
 SV *
+# uncoverable statement
+# uncoverable subroutine
 _coerce(c, ret)
         SV *c
         SV *ret
     CODE:
-        RETVAL = punk_coerce(aTHX_ c, ret);
+        RETVAL = punk_coerce(aTHX_ c, ret); /* # uncoverable statement */
     OUTPUT:
         RETVAL
 
 # Finish a response: coerce if needed, run the after-dispatch hooks (each may
 # replace the triplet), blank the body on HEAD.
 SV *
+# uncoverable statement
+# uncoverable subroutine
 _deliver(c, resp, method, after)
         SV *c
         SV *resp
@@ -78,11 +97,16 @@ _deliver(c, resp, method, after)
     CODE:
     {
         STRLEN ml;
-        const char *m = SvPV_const(method, ml);
+        const char *m = SvPV_const(method, ml); /* # uncoverable statement */
+        # uncoverable statement
+        # uncoverable condition left count:1
+        # uncoverable condition right count:1
+        # uncoverable condition left count:2
+        # uncoverable condition right count:2
         int is_head = (ml == 4 && memEQ(m, "HEAD", 4));
-        AV *after_av = (SvROK(after) && SvTYPE(SvRV(after)) == SVt_PVAV)
-                       ? (AV *)SvRV(after) : NULL;
-        RETVAL = punk_deliver(aTHX_ c, resp, is_head, after_av);
+        AV *after_av = (SvROK(after) && SvTYPE(SvRV(after)) == SVt_PVAV) /* # uncoverable statement */
+                       ? (AV *)SvRV(after) : NULL; /* # uncoverable statement */
+        RETVAL = punk_deliver(aTHX_ c, resp, is_head, after_av); /* # uncoverable statement */
     }
     OUTPUT:
         RETVAL

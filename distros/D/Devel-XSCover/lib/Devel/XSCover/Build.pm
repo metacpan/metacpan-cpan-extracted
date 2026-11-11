@@ -10,7 +10,7 @@ use File::Spec ();
 use IPC::Open3 ();
 use Symbol ();
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 our (%SOURCE_EXT, $COVERAGE);
 

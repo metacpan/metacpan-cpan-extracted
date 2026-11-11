@@ -12,12 +12,14 @@ use Net::UPnP::Device;
 use Net::UPnP::Service;
 use Carp qw(croak);
 
-use vars qw($_DEVICE $DEVICE_TYPE $WANIPCONNECTION_SERVICE_TYPE $WANCOMMONINTERFACECONFIG_SERVICE_TYPE);
+use vars qw($_DEVICE $_CONNECTION_SERVICE_TYPE $DEVICE_TYPE $WANIPCONNECTION_SERVICE_TYPE $WANPPPCONNECTION_SERVICE_TYPE $WANCOMMONINTERFACECONFIG_SERVICE_TYPE);
 
 $_DEVICE = 'device';
+$_CONNECTION_SERVICE_TYPE = 'connection_service_type';
 
 $DEVICE_TYPE = 'urn:schemas-upnp-org:device:InternetGatewayDevice:1';
 $WANIPCONNECTION_SERVICE_TYPE = 'urn:schemas-upnp-org:service:WANIPConnection:1';
+$WANPPPCONNECTION_SERVICE_TYPE = 'urn:schemas-upnp-org:service:WANPPPConnection:1';
 $WANCOMMONINTERFACECONFIG_SERVICE_TYPE = 'urn:schemas-upnp-org:service:WANCommonInterfaceConfig:1';
 
 #------------------------------
@@ -26,8 +28,10 @@ $WANCOMMONINTERFACECONFIG_SERVICE_TYPE = 'urn:schemas-upnp-org:service:WANCommon
 
 sub new {
 	my($class) = shift;
+	my %args = @_;
 	my($this) = {
 		$Net::UPnP::GW::Gateway::_DEVICE => undef,
+		$Net::UPnP::GW::Gateway::_CONNECTION_SERVICE_TYPE => $args{connection_service_type},
 	};
 	bless $this, $class;
 }
@@ -49,6 +53,100 @@ sub getdevice() {
 }
 
 #------------------------------
+# connection service
+#------------------------------
+
+# Service types tried, in order, when no type has been set explicitly.
+# Dial-up (PPPoE/PPPoA) routers often provide only WANPPPConnection
+# (RT #60372).
+sub _connection_service_types {
+	return ($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE,
+		$Net::UPnP::GW::Gateway::WANPPPCONNECTION_SERVICE_TYPE);
+}
+
+sub setconnectionservicetype {
+	my($this) = shift;
+	$this->{$Net::UPnP::GW::Gateway::_CONNECTION_SERVICE_TYPE} = $_[0];
+}
+
+sub getconnectionservice {
+	my($this) = shift;
+	my $dev = $this->getdevice();
+	return undef unless $dev;
+	my $type = $this->{$Net::UPnP::GW::Gateway::_CONNECTION_SERVICE_TYPE};
+	my @types = (defined($type) && length($type)) ? ($type) : _connection_service_types();
+	foreach my $service_type (@types) {
+		my $service = $dev->getservicebyname($service_type);
+		return $service if $service;
+	}
+	return undef;
+}
+
+sub getconnectionservicetype {
+	my($this) = shift;
+	my $service = $this->getconnectionservice();
+	return '' unless $service;
+	my $type = $this->{$Net::UPnP::GW::Gateway::_CONNECTION_SERVICE_TYPE};
+	return $type if defined($type) && length($type);
+	my $dev = $this->getdevice();
+	foreach my $service_type (_connection_service_types()) {
+		my $found = $dev->getservicebyname($service_type);
+		return $service_type if $found && $found == $service;
+	}
+	return '';
+}
+
+sub _connectionaction {
+	my($this, $action_name) = @_;
+	my $service = $this->getconnectionservice();
+	return undef unless $service;
+	my $action_res = $service->postaction($action_name);
+	return undef unless $action_res->getstatuscode() == 200;
+	return $action_res->getargumentlist();
+}
+
+#------------------------------
+# getstatusinfo
+#------------------------------
+
+sub getstatusinfo {
+	my($this) = shift;
+	my $arg_list = $this->_connectionaction('GetStatusInfo') or return undef;
+	return {
+		ConnectionStatus => $arg_list->{'NewConnectionStatus'},
+		LastConnectionError => $arg_list->{'NewLastConnectionError'},
+		Uptime => $arg_list->{'NewUptime'},
+	};
+}
+
+#------------------------------
+# getconnectiontypeinfo
+#------------------------------
+
+sub getconnectiontypeinfo {
+	my($this) = shift;
+	my $arg_list = $this->_connectionaction('GetConnectionTypeInfo') or return undef;
+	return {
+		ConnectionType => $arg_list->{'NewConnectionType'},
+		PossibleConnectionTypes => $arg_list->{'NewPossibleConnectionTypes'},
+	};
+}
+
+#------------------------------
+# getlinklayermaxbitrates (WANPPPConnection only)
+#------------------------------
+
+sub getlinklayermaxbitrates {
+	my($this) = shift;
+	return undef unless $this->getconnectionservicetype() eq $Net::UPnP::GW::Gateway::WANPPPCONNECTION_SERVICE_TYPE;
+	my $arg_list = $this->_connectionaction('GetLinkLayerMaxBitRates') or return undef;
+	return {
+		UpstreamMaxBitRate => $arg_list->{'NewUpstreamMaxBitRate'},
+		DownstreamMaxBitRate => $arg_list->{'NewDownstreamMaxBitRate'},
+	};
+}
+
+#------------------------------
 # getexternalipaddress
 #------------------------------
 
@@ -64,7 +162,7 @@ sub getexternalipaddress {
 	);
 	
 	$dev = $this->getdevice();
-	$wanipcon_service = $dev->getservicebyname($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE);
+	$wanipcon_service = $this->getconnectionservice();
 	unless ($wanipcon_service) {
 		return "";
 	}
@@ -92,7 +190,7 @@ sub getportmappingnumberofentries {
 	);
 	
 	$dev = $this->getdevice();
-	$wanipcon_service = $dev->getservicebyname($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE);
+	$wanipcon_service = $this->getconnectionservice();
 	unless ($wanipcon_service) {
 		return 0;
 	}
@@ -138,7 +236,7 @@ sub getportmappingentries {
 	);
 	
 	$dev = $this->getdevice();
-	$wanipcon_service = $dev->getservicebyname($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE);
+	$wanipcon_service = $this->getconnectionservice();
 	unless ($wanipcon_service) {
 		return @port_mapping;
 	}
@@ -206,7 +304,7 @@ sub addportmapping {
 	);
 	
 	$dev = $this->getdevice();
-	$wanipcon_service = $dev->getservicebyname($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE);
+	$wanipcon_service = $this->getconnectionservice();
 	unless ($wanipcon_service) {
 		return 0;
 	}
@@ -252,7 +350,7 @@ sub deleteportmapping {
 	);
 	
 	$dev = $this->getdevice();
-	$wanipcon_service = $dev->getservicebyname($Net::UPnP::GW::Gateway::WANIPCONNECTION_SERVICE_TYPE);
+	$wanipcon_service = $this->getconnectionservice();
 	unless ($wanipcon_service) {
 		return 0;
 	}
@@ -301,7 +399,7 @@ sub gettotalbytesreceived {
 }
 
 # Backward-compatible alias for the historical misspelling (RT #123509).
-*gettotalbytesrecieved = \&gettotalbytesreceived;
+{ no warnings 'once'; *gettotalbytesrecieved = \&gettotalbytesreceived; }
 
 #------------------------------
 # gettotalbytessent
@@ -362,11 +460,10 @@ Net::UPnP::GW::Gateway - Perl extension for UPnP.
                         next;
                 }
                 print "[$devNum] : " . $dev->getfriendlyname() . "\n";
-                unless ($dev->getservicebyname('urn:schemas-upnp-org:service:WANIPConnection:1')) {
-                        next;
-                }
                 my $gwdev = Net::UPnP::GW::Gateway->new();
                 $gwdev->setdevice($dev);
+                # WANIPConnection, or WANPPPConnection on dial-up routers
+                next unless $gwdev->getconnectionservice();
                 print "\tExternalIPAddress = " . $gwdev->getexternalipaddress() . "\n";
                 print "\tPortMappingNumberOfEntries = " . $gwdev->getportmappingnumberofentries() . "\n";
                 @port_mapping = $gwdev->getportmappingentries();
@@ -400,6 +497,54 @@ Creates a new object. Read `perldoc perlboot` if you don't understand that.
 
 The new object is not associated with any UPnP devices. Please use setdevice() to set the device.
 
+
+    $gw = Net::UPnP::GW::Gateway->new(connection_service_type => $type);
+
+By default the gateway uses the C<WANIPConnection:1> service and falls back to
+C<WANPPPConnection:1>, which dial-up (PPPoE/PPPoA) routers often provide
+instead. Pass C<connection_service_type> to use one service type only.
+
+=item B<setconnectionservicetype> - select the WAN connection service type.
+
+    $gw->setconnectionservicetype('urn:schemas-upnp-org:service:WANPPPConnection:1');
+
+Use only the given service type. Pass C<undef> to restore the default
+(WANIPConnection, then WANPPPConnection).
+
+=item B<getconnectionservice> - get the WAN connection service.
+
+    $service = $gw->getconnectionservice();
+
+Returns the L<Net::UPnP::Service> used for the external IP address and port
+mapping methods, or C<undef> if the device has none.
+
+=item B<getconnectionservicetype> - get the WAN connection service type.
+
+    $type = $gw->getconnectionservicetype();
+
+Returns the service type of getconnectionservice(), or an empty string.
+
+=item B<getstatusinfo> - get the connection status.
+
+    $info = $gw->getstatusinfo();
+
+Returns a hash reference with C<ConnectionStatus>, C<LastConnectionError> and
+C<Uptime>, or C<undef> on failure.
+
+=item B<getconnectiontypeinfo> - get the connection type.
+
+    $info = $gw->getconnectiontypeinfo();
+
+Returns a hash reference with C<ConnectionType> and
+C<PossibleConnectionTypes>, or C<undef> on failure.
+
+=item B<getlinklayermaxbitrates> - get the link layer bit rates.
+
+    $info = $gw->getlinklayermaxbitrates();
+
+Returns a hash reference with C<UpstreamMaxBitRate> and
+C<DownstreamMaxBitRate>. This action exists only in WANPPPConnection, so
+C<undef> is returned when the gateway uses WANIPConnection.
 =item B<setdevice> - set a UPnP devices
 
     $gw->setdevice($dev);

@@ -42,18 +42,19 @@ DBIx::Squirrel::Gather - a stage made afresh for each run, told when the values 
 =head1 DESCRIPTION
 
 DBIx::Squirrel's name for L<Ekorn::Pipeline::Gather>, which describes
-C<gather> in full. It exports C<gather>, by default: Ekorn's
-function, from a list of DBIx::Squirrel's own. It's here to stay, so
-code written with it keeps working.
+C<gather> in full. It exports C<gather> by default. That's Ekorn's
+function, from a list of DBIx::Squirrel's own. The module is here to
+stay, so code written with it keeps working.
 
 C<gather> makes a stage afresh at the start of each run of a pipeline:
 each execution of an iterator or result set, and each call of a Sugar
-statement or of a pipeline itself. Its block returns the stage, and
-optionally a function called once the values have run out, whose
-values go through the rest of the stages.
+statement or of a pipeline itself. Its block returns the stage, which
+can be a pipeline, and optionally an end function. The end is called
+once the values have run out, and what it returns goes through the
+rest of the stages.
 
 The stage it makes is an Ekorn::Pipeline::Gather, which is what a
-pipeline looks for, so check for that class, not this one.
+pipeline looks for. So check for that class, not this one.
 
 Inside an end function, and the stages it sends values to,
 L<DBIx::Squirrel::Context/result_number> is the number of the result

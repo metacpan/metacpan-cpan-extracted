@@ -3,7 +3,7 @@ use warnings;
 
 package Open::This;
 
-our $VERSION = '0.000035';
+our $VERSION = '0.000036';
 
 our @ISA       = qw(Exporter);
 our @EXPORT_OK = qw(
@@ -25,6 +25,15 @@ use URI          ();
 
 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 
+# host => [ segments before branch, segments after branch, line anchor prefix ]
+my %FORGE_URL_PARTS = (
+    'bitbucket.org' => [ ['src'],             [],       'lines-' ],
+    'codeberg.org'  => [ [ 'src', 'branch' ], [],       'L' ],
+    'git.sr.ht'     => [ ['tree'],            ['item'], 'L' ],
+    'gitlab.com'    => [ [ '-', 'blob' ],     [],       'L' ],
+);
+my $DEFAULT_URL_PARTS = [ ['blob'], [], 'L' ];
+
 sub parse_text {
     my $text = join q{ }, @_;
 
@@ -39,6 +48,12 @@ sub parse_text {
 
     return undef if !$text;
     my %parsed = ( original_text => $text );
+
+    # A URL authority can hold a port or password, which look like line numbers
+    if ( $text =~ m{\Ahttps?://}i ) {
+        my $authority = URI->new($text)->authority // q{};
+        $text =~ s{//\Q$authority\E}{//};
+    }
 
     my ( $line, $col ) = _maybe_extract_line_number( \$text );
     $parsed{line_number}   = $line;
@@ -101,7 +116,8 @@ sub parse_text {
 sub maybe_get_url_from_parsed_text {
     my $err;
     try {
-        require_module('Git::Helpers');
+        require_module($_)
+            for qw( Git::Helpers Git::Sub File::pushd Capture::Tiny );
     }
     catch {
         $err = $_;
@@ -113,22 +129,54 @@ sub maybe_get_url_from_parsed_text {
     }
 
     my $parsed = shift;
-    return undef unless $parsed && $parsed->{file_name};
+    return undef
+        unless $parsed && $parsed->{file_name} && -f $parsed->{file_name};
 
-    my $url = Git::Helpers::https_remote_url();
+    # Ask the file's own checkout, which need not be the cwd's
+    my $file  = path( $parsed->{file_name} )->absolute;
+    my $guard = File::pushd::pushd( $file->parent );
+
+    # enable used remote to be configurable via environment variable
+    my $url;
+REMOTE:
+    for my $remote (
+        split( m{,}, $ENV{OPEN_THIS_REMOTES} || q{} ),
+        q{origin}
+    ) {
+        $url = Git::Helpers::https_remote_url($remote);
+
+        last REMOTE if $url;
+    }
+
     return undef unless $url && $url->can('host');
+
+    my ( $branch, @repo_path );
+    Capture::Tiny::capture_stderr(
+        sub {
+            try {
+                $branch = Git::Helpers::current_branch_name();
+
+                # ls-tree, unlike ls-files, runs no repo-configured fsmonitor
+                local $/ = "\0";
+                @repo_path = git::ls_tree(
+                    qw( -z --full-name --name-only HEAD -- ),
+                    ':(literal)' . $file->basename
+                );
+            };
+        }
+    );
+    return undef unless @repo_path == 1;
     $parsed->{remote_url} = $url;
+
+    my ( $before, $after, $anchor )
+        = @{ $FORGE_URL_PARTS{ $url->host } || $DEFAULT_URL_PARTS };
 
     my $clone = $url->clone;
     my @parts = $clone->path_segments;
-    push(
-        @parts,
-        'blob', Git::Helpers::current_branch_name(),
-        $parsed->{file_name}
-    );
+    push( @parts, @$before, $branch, @$after, $repo_path[0] );
     $clone->path( join '/', @parts );
     if ( $parsed->{line_number} ) {
-        $clone->fragment( 'L' . $parsed->{line_number} );
+        $clone->fragment( $anchor . $parsed->{line_number} );
     }
 
     $parsed->{remote_file_url} = $clone;
@@ -144,6 +192,9 @@ sub editor_args_from_parsed_text {
     return unless $parsed;
 
     die '$EDITOR has not been set' unless $ENV{EDITOR};
+
+    # Editors would otherwise parse a leading + or - as a command or option.
+    ( my $file_name = $parsed->{file_name} ) =~ s{\A(?=[-+])}{./};
 
     my @args;
 
@@ -163,7 +214,7 @@ sub editor_args_from_parsed_text {
     # code --goto filename:11:2
     # codium --goto filename:11:2
     elsif ( $ENV{EDITOR} =~ /^cod(e|ium)/i ) {
-        my $result = $parsed->{file_name};
+        my $result = $file_name;
         if ( $parsed->{line_number} ) {
             $result .= ":" . $parsed->{line_number};
             if ( $parsed->{column_number} ) {
@@ -208,7 +259,7 @@ sub editor_args_from_parsed_text {
         push @args, '+' . $parsed->{line_number} if $parsed->{line_number};
     }
 
-    return ( @args, $parsed->{file_name} );
+    return ( @args, $file_name );
 }
 
 sub _maybe_extract_line_number {
@@ -230,6 +281,12 @@ sub _maybe_extract_line_number {
     # lib/Open/This.pm:[17,3]
     if ( $$text =~ s{ (\w) : \[ (\d+) , (\d+) \] }{$1}x ) {
         return $2, $3;
+    }
+
+    # Bitbucket links: foo/bar.go#lines-100 or foo/bar.go#lines-100:110
+    # Must run before the git-grep rule, which would read ":110" as the line.
+    if ( $$text =~ s{(\w)#lines-(\d+)\b.*}{$1} ) {
+        return $2;
     }
 
     # ripgrep (rg --vimgrep)
@@ -300,21 +357,68 @@ sub _maybe_extract_file_from_url {
     require_module('URI');
     my $uri = URI->new($$text);
 
-    my @parts = $uri->path_segments;
+    # path_segments decodes each segment, so "%20" becomes a space
+    my ( undef, @parts ) = $uri->path_segments;
+    my @p = map { $parts[$_] // q{} } 0 .. 3;
 
-    # Is this a GitHub(ish) URL?
-    if ( $parts[3] eq 'blob' ) {
-        my $file = path( @parts[ 5 .. scalar @parts - 1 ] );
+    # GitLab nests groups, so "-/blob" can follow any number of segments
+    my ($gitlab)
+        = grep { $parts[$_] eq '-' && ( $parts[ $_ + 1 ] // q{} ) eq 'blob' }
+        0 .. $#parts;
 
-        return unless $file->is_file;
+    # Index of the first file segment, after owner/repo/<marker>/<ref>
+    my $start;
+    my $last = $#parts;    # last index the file may start at
+    if    ( defined $gitlab ) { $start = $gitlab + 3 }
+    elsif ( $p[2] eq 'blob' ) { $start = 4 }             # GitHub
+    elsif ( $p[2] eq 'tree' ) {
 
-        $file = $file->stringify;
-
-        if ( $uri->fragment && $uri->fragment =~ m{\A[\d]\z} ) {
-            $file .= ':' . $uri->fragment;
-        }
-        return $file if $file;
+        # SourceHut has tree/<ref>/item/<file>, so "item" ends the ref
+        my ($item) = grep { $parts[$_] eq 'item' } 4 .. $#parts;
+        $start = $last = $item + 1 if defined $item;
     }
+    elsif ( $p[2] eq 'src' ) {
+
+        # Codeberg has src/branch|tag|commit/<ref>, Bitbucket src/<ref>
+        $start = $p[3] =~ m{\A(?:branch|tag|commit)\z} ? 5 : 4;
+    }
+
+    # Forges never serve ".." or an encoded "/" or "\" (a Windows separator)
+    # in a path, so don't let a URL leave the repo; NUL can't name a file
+    return if !defined $start || grep { $_ eq '..' || m{[/\\\0]} } @parts;
+
+    # A ref like "feature/x" spans segments, so try longer refs that git knows
+    for my $i ( $start .. $last ) {
+
+        # Drop empty segments from "//" or a trailing slash; path() dies on them
+        my @file = grep { length } @parts[ $i .. $#parts ];
+        last unless @file;
+
+        my $file = path(@file);
+        next unless $file->is_file;
+        next
+            if $i > $start
+            && !_is_git_ref( join '/', @parts[ $start - 1 .. $i - 1 ] );
+
+        return $file->stringify;
+    }
+    return;
+}
+
+sub _is_git_ref {
+    my $ref = shift;
+
+    require_module('File::Spec');
+
+    # show-ref matches refs/heads, refs/tags and refs/remotes/*; outside a
+    # repo git complains on stderr, so silence it
+    open my $stderr, '>&', \*STDERR or return 0;
+    my $found = 0;
+    if ( open STDERR, '>', File::Spec->devnull ) {
+        $found = system( 'git', 'show-ref', '--quiet', '--', $ref ) == 0;
+    }
+    open STDERR, '>&', $stderr;
+    return $found;
 }
 
 sub _maybe_find_local_file {
@@ -401,7 +505,7 @@ Open::This - Try to Do the Right Thing when opening files
 
 =head1 VERSION
 
-version 0.000035
+version 0.000036
 
 =head1 DESCRIPTION
 
@@ -435,10 +539,16 @@ Copy/pasting a full GitHub URL.
     ot https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L17-L21
     # vim +17 lib/Open/This.pm
 
+GitLab, Codeberg, Bitbucket and SourceHut file URLs are also understood.
+
 Open a local file on the GitHub web site in your web browser.  From within a
 checked out copy of https://github.com/oalders/open-this
 
     ot -b Foo::Bar
+
+URLs are built in the style of GitHub, GitLab, Codeberg, Bitbucket or
+SourceHut, depending on the host of your remote.  Other hosts get GitHub-style
+URLs.
 
 Open a local file at the correct line on the GitHub web site in your web
 browser.  From within a checked out copy of
@@ -495,11 +605,17 @@ directly.)
 
 =head2 maybe_get_url_from_parsed_text
 
-Tries to return an URL to a Git repository for a checked out file.  The URL
-will be built using the C<origin> remote and the name of the current branch.  A
-line number will be attached if it can be parsed from the text.  This has only
-currently be tested with GitHub URLs and it assumes you're working on a branch
-which has already been pushed to your remote.
+Tries to return an URL to a Git repository for a checked out file. The
+repository, remote and branch are those of the checkout the file lives in,
+which need not be the one you are in. The file must be committed on the
+current branch; otherwise, or if the file is outside any checkout, C<undef>
+is returned. The URL will be built using the first remote listed in
+C<$ENV{OPEN_THIS_REMOTES}> (comma-separated) that exists, falling back to
+C<origin>, the name of the checkout's current branch and the file's path from
+the root of the checkout. A line number will be attached if it can be parsed
+from the text. GitHub, GitLab, Codeberg, Bitbucket and SourceHut URL layouts
+are supported; other hosts get GitHub-style URLs. It assumes you're working
+on a branch which has already been pushed to your remote.
 
     my $url = maybe_get_url_from_parsed_text( parse_text('t/lib/Foo/Bar.pm:32'));
     # $url might be something like: https://github.com/oalders/open-this/blob/master/lib/Open/This.pm#L32

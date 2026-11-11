@@ -1,5 +1,5 @@
 # At least this Perl version (can be higher):
-requires 'perl', '5.016';
+requires 'perl', '5.030';
 
 on runtime => sub {
     requires 'Git::Hooks', '>= 4.000000';
@@ -10,6 +10,8 @@ on runtime => sub {
 };
 on test => sub {
     requires 'Test2';
+    requires 'Test2::V0';
+    requires 'Test2::V1', '>= 1.302225';
     requires 'Test::CPAN::Meta';
     requires 'Test::Pod::Coverage';
     requires 'Pod::Coverage::TrustPod';

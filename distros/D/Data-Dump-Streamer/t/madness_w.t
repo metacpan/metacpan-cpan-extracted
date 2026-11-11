@@ -82,7 +82,6 @@ $ARRAY1 = [
           ];
 $ARRAY1->[0] = \$ARRAY1->[1];
 $ARRAY1->[1] = \$ARRAY1->[0];
-weaken($ARRAY1->[1]);
 alias_av(@$ARRAY1, 3, $ARRAY1->[0]);
 alias_av(@$ARRAY1, 4, $ARRAY1->[1]);
 $ARRAY2 = [
@@ -114,6 +113,7 @@ make_ro($ThisIsATest1->{Q}[0]);
 $foo_bar1 = bless( qr/this is a test/m, 'foo_bar' );
 alias_av(@$ARRAY1, 2, $foo_bar1);
 alias_av(@$ARRAY1, 5, $foo_bar1);
+weaken($ARRAY1->[1]);
 EXPECT
 
     }
@@ -156,7 +156,6 @@ $ARRAY1 = [
           ];
 $ARRAY1->[0] = \$ARRAY1->[1];
 $ARRAY1->[1] = \$ARRAY1->[0];
-weaken($ARRAY1->[1]);
 $Regexp1 = qr/foo/;
 $bar1 = bless( qr/bar/, 'bar' );
 $REF1 = \bless( qr/baz/, 'baz' );
@@ -192,7 +191,6 @@ $ARRAY2->[1] = \$ARRAY5->[0];
 $ARRAY3->[1] = $ARRAY2->[0];
 $ARRAY3->[2] = $ARRAY2->[1];
 $ARRAY5->[0] = $ARRAY2->[0];
-weaken($ARRAY5->[0]);
 $ARRAY5->[1] = $ARRAY2->[1];
 alias_ref(\$ARRAY6,\$ARRAY5);
 alias_ref(\$VAR5,\$VAR1);
@@ -204,6 +202,8 @@ $HASH2 = {
            foo2 => 'A: $HASH2->{foo}'
          };
 alias_hv(%$HASH2, 'foo2', $HASH2->{foo});
+weaken($ARRAY1->[1]);
+weaken($ARRAY5->[0]);
 EXPECT
 
     }

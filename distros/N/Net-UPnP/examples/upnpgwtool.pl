@@ -83,11 +83,13 @@ foreach $dev (@dev_list) {
 	if  ($device_type ne 'urn:schemas-upnp-org:device:InternetGatewayDevice:1') {
 		next;
 	}
-	unless ($dev->getservicebyname('urn:schemas-upnp-org:service:WANIPConnection:1')) {
-		next;
-	}
 	$gwdev = Net::UPnP::GW::Gateway->new();
 	$gwdev->setdevice($dev);
+	# WANIPConnection, or WANPPPConnection on dial-up routers (RT #60372)
+	unless ($gwdev->getconnectionservice()) {
+		undef $gwdev;
+		next;
+	}
 	$gwdev_ext_address = $gwdev->getexternalipaddress();
 	if ($search_mode) {
 		$gwdev_friendlyname = $dev->getfriendlyname();

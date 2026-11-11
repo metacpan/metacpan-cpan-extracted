@@ -38,7 +38,7 @@ mdee - em·dee, Markdown Easy on the Eyes
     --cm --colormap=L=SPEC  override color for element (e.g., h1=RD)
     --hm --heading-markup=# enable markup in headings (all/bold/...)
          --show=#           set field visibility (e.g., italic=1)
-     -C  --pane=#           number of columns
+     -C  --pane=#[,#]       number of columns, and rows
      -R  --row=#            number of rows
      -G  --grid=#           grid layout (e.g., 2x3)
      -P  --page=#           page height in lines
@@ -47,10 +47,13 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]page-number page number on border (default: on)
          --[no-]filename    file name label (default: on)
          --[no-]pager[=#]   pager command
+     -T  --device=#         output device: tty, pdf, or a paper for PDF
+                            (e.g., a4, a4p, a3l)
+     -o  --output=FILE      output file (PDF when it ends with .pdf)
 
 # VERSION
 
-Version 1.17
+Version 1.18
 
 # DESCRIPTION
 
@@ -74,6 +77,9 @@ remain clickable.
 
 Use `--no-theme` to display the original Markdown source with
 markup characters intact.
+
+The same view is printed to PDF with `-o file.pdf`.  See
+["Printing to PDF"](#printing-to-pdf).
 
 ## Concept
 
@@ -156,6 +162,45 @@ formatting — highlighted output is piped directly through a
 pager.  Use `-f` (`--style=filter`) to write highlighted
 output to stdout without a pager, suitable for piping into
 other commands.
+
+## Printing to PDF
+
+**mdee** prints the document to PDF when the output file ends with
+`.pdf`, or when a paper is given as the device with `-T`.
+
+    mdee -o README.pdf README.md           # A4 in landscape
+    mdee -T a4p -o README.pdf README.md    # A4 in portrait
+    mdee -T a3 README.md > README.pdf      # A3, to the standard output
+
+The paper takes the place of the terminal.  The number of columns is
+the width of the paper in characters divided by the pane width, and
+the text is folded for it, in the same way as on the terminal: A4 in
+landscape is 206 characters wide and has two panes, and A4 in
+portrait is 100 characters wide and has one.  `-C` and `-S` work
+as on the terminal.  The mode is `light` unless `--mode` is given,
+because the paper is white.
+
+A paper is given by its name, with the letter `p` or `l` for
+portrait or landscape, and the margin in millimeters after `:m`.
+The default is landscape with a margin of 5 mm.
+
+    mdee -T a4p:m10 -o README.pdf README.md
+
+A sheet has 60 lines.  The rows of `-C` divide the sheet, and the
+size of the characters is kept: `-C2,2` gives four pages of 30
+lines on a sheet.  `-P` sets the lines of a page instead, and the
+characters become smaller or larger to put the pages on the sheet:
+`-C2,2 -P60` prints four pages of 60 lines on a sheet in half the
+size, as a printer does for 4-up.
+
+    mdee -C2,2 -o README.pdf README.md
+    mdee -C2,2 -P60 -o README.pdf README.md
+
+[nup(1)](https://metacpan.org/pod/App%3A%3Anup) and
+[ansi2pdf(1)](https://github.com/tecolicom/App-ansi2pdf) make the
+PDF, so `ansi2pdf` has to be installed, and the output style has to
+be `nup`, which is the default.  See `-T` and `-o` in
+["Output Options"](#output-options).
 
 # INSTALLATION
 
@@ -442,99 +487,8 @@ bold text, etc.).
     Use `--no-theme` to clear the default theme.  It can be combined
     with `--theme` to start fresh.
 
-    Theme files are searched in the following order:
-
-    - 1. User theme directory: `${XDG_CONFIG_HOME:-~/.config}/mdee/theme/NAME.sh`
-    - 2. Share theme directory: installed with the distribution under `auto/share/dist/App-mdee/theme/`
-
-    Theme files are Bash scripts that can modify `theme_light[]`,
-    `theme_dark[]`, `md_config[]`, and/or `pass_md[]`:
-
-        # theme/warm.sh — change base color
-        theme_light[base]='<Coral>=y25'
-        theme_dark[base]='<Coral>=y80'
-
-        # theme/hashed.sh — enable closing hashes on h3-h6
-        md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
-
-        # theme/nomark.sh — hide markers and brackets
-        pass_md+=(--cm 'emphasis_mark=sub{""}')
-        pass_md+=(--cm 'code_tick=sub{""}')
-        pass_md+=(--cm 'link_mark=sub{""}')
-
-    Built-in themes:
-
-    - `hashed` (default)
-
-        Append closing hashes to h3-h6 headers.
-
-    - `nomark` (default)
-
-        Hide emphasis markers (`**`, `*`, `__`, `_`, `~~`),
-        inline code backticks, and link brackets (`[`, `]`).
-        Content text keeps its formatting (bold, italic,
-        strikethrough, code, clickable links) but the surrounding
-        markers are not displayed.  Table marks (`markcell`,
-        `markwrap`) are independent of this theme.
-
-    - `doubleline` (default)
-
-        Give h4 headers a double underline, which is `ESC[4:2m`, in the
-        terminals known to take it, decided by environment variables: iTerm2,
-        Ghostty, cmux, VS Code, WezTerm, kitty, Alacritty, Konsole, Windows
-        Terminal and terminals based on VTE 0.52 or later.  Elsewhere, inside
-        **tmux** and **screen**, and where the variables do not reach, as through
-        **ssh**, this theme does nothing and h4 has a single underline, the same
-        as h5.  Many terminals do not take the sequence: it becomes a background color in Terminal.app and
-        rxvt-unicode, and the Linux console and mosh drop the whole sequence
-        with its color.
-
-    - `warm`
-
-        Change base color to Coral.
-
-    - `fatchap`
-
-        Add decorative border lines (`#`) above and below h1 headings,
-        using `=+` to append a text transformation while preserving the
-        original heading color.
-
-        With `--refill`, the added lines are not counted, so paragraphs below
-        the h1 headings may not be folded properly by this module.  The text
-        itself does not change.  For this reason, this theme turns off
-        `default[refill]` in the configuration file; `--refill` given on the
-        command line still works.
-
-    - `widen`
-
-        Give circled digits and the wastebasket (U+1F5D1) a column of their
-        own, by adding a no-break space after them, for terminals that draw
-        them over two columns on top of the next character, as on macOS.
-        This gives the function of [App::Greple::md::widen](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd%3A%3Awiden) to the `--begin`
-        option of the md module.
-
-        The characters are listed in the array `widen_chars` of the theme, as
-        code points and ranges in hexadecimal.  Add more in `config.sh`:
-
-            widen_chars+=(3248-324F)   # circled numbers on black squares
-
-    - `markcell` (default)
-
-        In a table that has wrapped cells, mark the first line of every
-        body cell in the wrapped columns with `‣` (U+2023), so that the
-        rows read like a bulleted list and the continuation lines stand
-        apart.  The header row, columns that fit, and tables that fit are
-        not marked.  Sets `table_cell_mark`; `nomark` does not affect it.
-        To use another character, set it in the configuration file or in a
-        theme of your own:
-
-            md_config+=(table_cell_mark=∙)    # U+2219
-
-    - `markwrap`
-
-        Mark the second and later lines of a wrapped table cell with `›`
-        (U+203A).  Sets `table_wrap_mark`.  It can be combined with
-        `markcell`.
+    See ["THEMES"](#themes) for the themes that come with **mdee** and how to
+    write one.
 
     Use `-d` to dump current theme values in sourceable format.
 
@@ -671,8 +625,8 @@ bold text, etc.).
         code_info         Fenced code block info string
         code_block        Fenced code block body
         code_inline       Inline code body
-        meta_mark         Front matter delimiters (default: code_mark)
-        meta_block        Front matter body (default: code_block)
+        meta_mark         Front matter delimiter lines
+        meta_block        Front matter body
 
     This option can be specified multiple times.  Color labels can
     also be set via `--config`.  When both are
@@ -721,9 +675,11 @@ bold text, etc.).
     one after another.  The number of panes is the number of files
     unless `--pane` is given.  Ignored with a single file.
 
-- **-C** _N_, **--pane**=_N_
+- **-C** _C_\[,_R_\], **--pane**=_C_\[,_R_\]
 
-    Set the number of columns (panes).  When not specified (or 0),
+    Set the number of columns (panes).  The number of rows may follow
+    after a comma: `-C2,2` is 2 columns and 2 rows on a page, the same
+    as `-C2 -R2`.  When not specified (or 0),
     the number of columns is calculated from the output width
     (`--width`, default terminal width) and `--pane-width`.  If only 1 column fits, nup formatting (borders
     etc.) is preserved but pagination is handled by the pager instead.
@@ -731,11 +687,13 @@ bold text, etc.).
 
 - **-R** _N_, **--row**=_N_
 
-    Set the number of rows.
+    Set the number of rows.  `-C` takes it as well, as `-C2,2`.
 
 - **-G** _CxR_, **--grid**=_CxR_
 
     Set grid layout. For example, `-G2x3` creates 2 columns and 3 rows.
+    The text is folded for the number of columns of `-C`, which this
+    option does not tell to mdee, so `-C2,3` is better.
 
 - **-P** _N_, **--page**=_N_
 
@@ -765,12 +723,142 @@ bold text, etc.).
     the text.  The label format and color are set by the `FILE_FORMAT`
     and `FILE` theme keys (see `--config`).
 
-## Pager Options
+## Output Options
 
 - **--\[no-\]pager**\[=_COMMAND_\]
 
     Set the pager command.  Use `--pager=less` to specify a pager,
     or `--no-pager` to disable paging.
+
+- **-T** _DEVICE_, **--device**=_DEVICE_
+
+    Set the device to show the output on, which is given to
+    [nup(1)](https://metacpan.org/pod/App%3A%3Anup).  The default is `tty`, the terminal.  Any other
+    device is a paper, and the output is printed to PDF by
+    [ansi2pdf(1)](https://github.com/tecolicom/App-ansi2pdf): `a4` is A4
+    in landscape, `a4p` is A4 in portrait and `a3l` is A3 in landscape.
+    The device `pdf` is the default paper, A4.
+
+        mdee -T a4 README.md > README.pdf
+        mdee -T a4p -o README.pdf README.md
+
+    The paper takes the place of the terminal, as described in
+    ["Printing to PDF"](#printing-to-pdf), and the pager is not used.
+
+    This requires the nup style, `nup` 1.13 or later, and `ansi2pdf`
+    0.1.3 or later for PDF (0.1.4 or later for the margin).
+
+- **-o** _FILE_, **--output**=_FILE_
+
+    Write the output to _FILE_, which is given to [nup(1)](https://metacpan.org/pod/App%3A%3Anup).
+    When the name ends with `.pdf`, the output is PDF without `-T` as
+    well.  Otherwise, what is shown on the terminal is written to the
+    file as it is.
+
+        mdee -o README.pdf README.md
+
+# THEMES
+
+A theme changes how the document looks: the colors, the marks that
+are shown or hidden, and the decoration of headings and tables.
+Themes are chosen with `--theme` (see ["Theme Options"](#theme-options)), and each
+is applied in order as a transformation of the default.
+
+## Built-in Themes
+
+- `hashed` (default)
+
+    Append closing hashes to h3-h6 headers.
+
+- `nomark` (default)
+
+    Hide emphasis markers (`**`, `*`, `__`, `_`, `~~`),
+    inline code backticks, and link brackets (`[`, `]`).
+    Content text keeps its formatting (bold, italic,
+    strikethrough, code, clickable links) but the surrounding
+    markers are not displayed.  Table marks (`markcell`,
+    `markwrap`) are independent of this theme.
+
+- `doubleline` (default)
+
+    Give h4 headers a double underline, which is `ESC[4:2m`, in the
+    terminals known to take it, decided by environment variables: iTerm2,
+    Ghostty, cmux, VS Code, WezTerm, kitty, Alacritty, Konsole, Windows
+    Terminal and terminals based on VTE 0.52 or later.  Elsewhere, inside
+    **tmux** and **screen**, and where the variables do not reach, as through
+    **ssh**, this theme does nothing and h4 has a single underline, the same
+    as h5.  Many terminals do not take the sequence: it becomes a background color in Terminal.app and
+    rxvt-unicode, and the Linux console and mosh drop the whole sequence
+    with its color.
+
+- `warm`
+
+    Change base color to Coral.
+
+- `fatchap`
+
+    Add decorative border lines (`#`) above and below h1 headings,
+    using `=+` to append a text transformation while preserving the
+    original heading color.
+
+    With `--refill`, the added lines are not counted, so paragraphs below
+    the h1 headings may not be folded properly by this module.  The text
+    itself does not change.  For this reason, this theme turns off
+    `default[refill]` in the configuration file; `--refill` given on the
+    command line still works.
+
+- `widen`
+
+    Give circled digits and the wastebasket (U+1F5D1) a column of their
+    own, by adding a no-break space after them, for terminals that draw
+    them over two columns on top of the next character, as on macOS.
+    This gives the function of [App::Greple::md::widen](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd%3A%3Awiden) to the `--begin`
+    option of the md module.
+
+    The characters are listed in the array `widen_chars` of the theme, as
+    code points and ranges in hexadecimal.  Add more in `config.sh`:
+
+        widen_chars+=(3248-324F)   # circled numbers on black squares
+
+- `markcell` (default)
+
+    In a table that has wrapped cells, mark the first line of every
+    body cell in the wrapped columns with `‣` (U+2023), so that the
+    rows read like a bulleted list and the continuation lines stand
+    apart.  The header row, columns that fit, and tables that fit are
+    not marked.  Sets `table_cell_mark`; `nomark` does not affect it.
+    To use another character, set it in the configuration file or in a
+    theme of your own:
+
+        md_config+=(table_cell_mark=∙)    # U+2219
+
+- `markwrap`
+
+    Mark the second and later lines of a wrapped table cell with `›`
+    (U+203A).  Sets `table_wrap_mark`.  It can be combined with
+    `markcell`.
+
+## Theme Files
+
+Theme files are searched in the following order:
+
+- 1. User theme directory: `${XDG_CONFIG_HOME:-~/.config}/mdee/theme/NAME.sh`
+- 2. Share theme directory: installed with the distribution under `auto/share/dist/App-mdee/theme/`
+
+Theme files are Bash scripts that can modify `theme_light[]`,
+`theme_dark[]`, `md_config[]`, and/or `pass_md[]`:
+
+    # theme/warm.sh — change base color
+    theme_light[base]='<Coral>=y25'
+    theme_dark[base]='<Coral>=y80'
+
+    # theme/hashed.sh — enable closing hashes on h3-h6
+    md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
+
+    # theme/nomark.sh — hide markers and brackets
+    pass_md+=(--cm 'emphasis_mark=sub{""}')
+    pass_md+=(--cm 'code_tick=sub{""}')
+    pass_md+=(--cm 'link_mark=sub{""}')
 
 # CONFIGURATION
 
@@ -798,7 +886,7 @@ The `default` associative array supports the following keys:
 - `default[fold_width]` - Corresponds to `--fold-width` (e.g., `80`)
 - `default[refill]` - Corresponds to `--refill` (`1` to enable)
 - `default[pane_width]` - Corresponds to `--pane-width` (e.g., `100`)
-- `default[pane]` - Corresponds to `--pane` (e.g., `2`)
+- `default[pane]` - Corresponds to `--pane` (e.g., `2` or `2,2`)
 - `default[base_color]` - Corresponds to `--base-color` (e.g., `DarkCyan`)
 
 **Overriding theme colors**
@@ -840,7 +928,7 @@ To change the text before it is formatted, give a function to the
 
     mdee README.md              # view markdown file
     mdee -C2 document.md        # 2-column view
-    mdee -G2x2 manual.md        # 2x2 grid (4-up)
+    mdee -C2,2 manual.md        # 2x2 grid (4-up)
     mdee -w170 file.md          # two 85-column panes on a wide terminal
     mdee -V -w170 a.md b.md     # two files in 85 columns each
     mdee --fold-width=60 a.md   # narrower text within the pane
@@ -849,6 +937,11 @@ To change the text before it is formatted, give a function to the
     mdee --no-fold file.md      # disable line folding
     mdee --no-table file.md     # disable table formatting
     mdee -r file.md             # join paragraph lines
+
+    # PDF
+    mdee -o file.pdf file.md             # A4 in landscape
+    mdee -T a4p -o file.pdf file.md      # A4 in portrait
+    mdee -T a4p -C1,2 -o file.pdf file.md  # two pages on a sheet
 
     # Output styles
     mdee -s pager file.md       # fold + table, output to pager
@@ -892,170 +985,6 @@ needs the libcmark C library (`brew install cmark`, `apt-get install
 libcmark-dev`) and is only recommended, is used when it is there
 because it is faster; [pandoc](https://pandoc.org) 2.11.3 or later is
 a third choice.
-
-# IMPLEMENTATION
-
-**em·dee** is implemented as a Bash script that orchestrates multiple
-specialized tools into a unified pipeline.  The architecture follows
-Unix philosophy: each tool does one thing well, and they communicate
-through standard streams.
-
-The overall data flow is:
-
-    Input File
-        |
-        v
-    [greple -Mmd] --- Syntax Highlighting + Table Formatting + Text Folding
-        |
-        v
-    [nup] --- Paged Output (nup style)
-        |         or
-    [pager] --- Pager Output (pager style)
-        |
-        v
-    Terminal
-
-## Pipeline Architecture
-
-**em·dee** dynamically constructs a pipeline based on enabled options.
-Each stage is defined as a Bash function (e.g., `run_greple`,
-`run_nup`).  The `--dryrun` option prints the command line of
-each stage without running them, and `-d` prints the stage names.
-
-### Processing Stages
-
-The pipeline consists of configurable stages.  Processing options
-can be enabled or disabled independently using `--[no-]refill`,
-`--[no-]fold`, `--[no-]table`, and `--[no-]nup` options.
-
-#### Syntax Highlighting
-
-The first stage uses [greple(1)](https://metacpan.org/pod/App%3A%3AGreple) with the `--filter`
-option, which sets `--all --need=0 --exit=0` to run as a filter
-without requiring pattern arguments.  Syntax highlighting is handled
-entirely by the `-Mmd` module.
-
-Supported Markdown elements:
-
-- Headers (`# h1` through `###### h6`)
-- Bold text (`**bold**` or `__bold__`)
-- Italic text (`*italic*` or `_italic_`)
-- Inline code (`` `code` ``)
-- Code blocks (fenced with ```` ``` ```` or `~~~`)
-- Front matter (TOML between `+++` lines, YAML between `---`
-lines), shown as a code block
-- HTML comments (`<!-- comment -->`)
-
-Code block detection follows the CommonMark specification:
-
-- Opening fence: 0-3 spaces indentation, then 3+ backticks or tildes
-- Closing fence: 0-3 spaces indentation, same character, same or more count
-- Backticks and tildes cannot be mixed (```` ``` ```` must close with ```` ``` ````)
-
-#### Paragraph Refill
-
-With `--refill`, the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module joins the lines of
-each paragraph before anything else.  It asks a Markdown parser
-([App::Greple::md::Blocks](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd%3A%3ABlocks): the [CommonMark](https://metacpan.org/pod/CommonMark) module,
-[Markdown::Perl](https://metacpan.org/pod/Markdown%3A%3APerl), or [pandoc](https://pandoc.org) with the
-`sourcepos` extension) which
-lines of the text form a paragraph, a block quote, a list item or a
-definition, and joins those lines in the original text.  A line that
-starts a footnote definition (`[^name]:`) stays on its own line.  The
-joined lines are folded like list items.
-
-#### Text Folding
-
-Text folding is handled within the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module
-using [Greple::tee](https://metacpan.org/pod/Greple%3A%3Atee) to pipe matched regions through
-[ansifold(1)](https://metacpan.org/pod/App%3A%3Aansifold).  It preserves ANSI escape sequences
-and maintains proper indentation for nested lists.  List items,
-definition lists and the paragraphs joined by `--refill` are
-folded; code blocks, front matter, HTML comments, and tables are
-excluded.
-
-Recognized list markers include `*`, `+`, `-`, `1.`, `1)`, `#.`,
-and `#)`.  The `#` marker is the auto-numbered list of Pandoc's Markdown.
-
-The folding width is controlled by `--fold-width` option (default: the
-pane width minus 3 and the run-in width, 78 for a pane of 85).
-
-#### Table Formatting
-
-Table formatting is handled within the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module
-(after syntax highlighting, before output).  Markdown tables are
-detected by the pattern `^ {0,3}(\|.+\|\n){3,}` and formatted with
-aligned columns using [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) while
-preserving ANSI colors.
-
-Column alignment is parsed from the separator line: `:---` (left,
-default), `:---:` (center), `---:` (right).  The `parse_separator()`
-function extracts alignment markers and passes `--table-right` and
-`--table-center` options to [ansicolumn(1)](https://metacpan.org/pod/App%3A%3Aansicolumn) (requires
-version 1.61 or later).  Colons are stripped from the separator line
-before further processing.
-
-When `--rule` is enabled (default), ASCII pipe characters are replaced
-with Unicode box-drawing characters (`│`, `├`, `┤`, `┼`, `─`).
-
-### Output Stage
-
-The final stage uses [nup(1)](https://metacpan.org/pod/App%3A%3Anup) to provide multi-column paged output.
-Layout options (`--pane`, `--row`, `--grid`, `--page`) are passed
-directly to nup.
-
-## Theme System
-
-**em·dee** implements a theme system where themes are transformations
-applied to the built-in default theme.  Multiple themes can be
-chained via `--theme=NAME1,NAME2,...`.
-
-### Theme Structure
-
-Color definitions are managed by the [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module.
-The `theme_light` and `theme_dark` arrays contain only the base
-color.  Theme files can modify the base color and pass configuration
-to the md module via `md_config[]`:
-
-    # theme/warm.sh — change base color
-    theme_light[base]='<Coral>=y25'
-    theme_dark[base]='<Coral>=y80'
-
-    # theme/hashed.sh — enable closing hashes
-    md_config+=(hashed.h3=1 hashed.h4=1 hashed.h5=1 hashed.h6=1)
-
-The `md_config[]` entries are passed as config parameters to the
-[App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd) module.  Color labels (`h1`, `bold`, etc.)
-can also be set as config parameters:
-
-    # theme file or config.sh — override color label
-    md_config+=(h1='L25D/R;E' bold=RD)
-
-#### Base Color Expansion
-
-The `${base}` placeholder in color values is expanded by the md
-module.  The base color is determined by `--base-color` option
-(default: RoyalBlue) with automatic luminance adjustment based on
-mode (`=y25` for light, `=y80` for dark).
-
-### Color Specifications
-
-Colors are specified using [Term::ANSIColor::Concise](https://metacpan.org/pod/Term%3A%3AANSIColor%3A%3AConcise) format.
-The `--colormap` (`--cm`) option maps colors to captured groups.  For example,
-`L00D/${base};E` specifies gray foreground on base-colored background.
-
-The color specification supports modifiers:
-
-- `+y10` / `-y10`: Adjust luminance by percentage
-- `=y50`: Set absolute luminance
-- `D`: Bold, `U`: Underline, `E`: Erase line
-
-### Terminal Mode Detection
-
-**em·dee** uses [Getopt::EX::termcolor](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3Atermcolor) to detect terminal background
-luminance.  If luminance is below 50%, dark mode is automatically
-selected.  The environment variable `TERM_LUMINANCE` gives the
-luminance without the detection (see ["Terminal Luminance"](#terminal-luminance)).
 
 # LIMITATIONS
 
@@ -1177,6 +1106,10 @@ does not override them.
 
 # SEE ALSO
 
+- [Implementation of em·dee](https://github.com/tecolicom/App-mdee/blob/main/IMPLEMENTATION.md)
+
+    How the pipeline, the themes and the colors work inside.
+
 - [App::Greple::md](https://metacpan.org/pod/App%3A%3AGreple%3A%3Amd)
 
     Greple module for Markdown syntax highlighting, table formatting,
@@ -1189,6 +1122,10 @@ does not override them.
 - [nup](https://metacpan.org/pod/nup)
 
     Multi-column paged output formatter.
+
+- [ansi2pdf](https://github.com/tecolicom/App-ansi2pdf)
+
+    Renders the output to PDF.
 
 - [ansifold](https://metacpan.org/dist/App-ansifold/view/script/ansifold)
 
