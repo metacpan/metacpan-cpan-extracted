@@ -41,13 +41,13 @@ sub reset_env {
 # ============================================================
 
 subtest '_find_site_details: SSL_TLS_SNI used when no HTTP_HOST or SERVER_NAME' => sub {
-    reset_env();
-    $ENV{SSL_TLS_SNI} = 'secure.example.com';
+	reset_env();
+	$ENV{SSL_TLS_SNI} = 'secure.example.com';
 
-    my $info = CGI::Info->new();
-    my $host = $info->host_name();
-    like($host, qr/secure\.example\.com/i,
-        'SSL_TLS_SNI used as host when HTTP_HOST and SERVER_NAME absent');
+	my $info = CGI::Info->new();
+	my $host = $info->host_name();
+	like($host, qr/secure\.example\.com/i,
+		'SSL_TLS_SNI used as host when HTTP_HOST and SERVER_NAME absent');
 };
 
 # ============================================================
@@ -57,14 +57,14 @@ subtest '_find_site_details: SSL_TLS_SNI used when no HTTP_HOST or SERVER_NAME' 
 # ============================================================
 
 subtest '_find_site_details: https protocol substituted into cgi_site URL' => sub {
-    reset_env();
-    $ENV{SERVER_NAME}     = 'example.com';
-    $ENV{HTTP_HOST}       = 'example.com';
-    $ENV{SCRIPT_URI}      = 'https://example.com/cgi-bin/foo.cgi';
+	reset_env();
+	$ENV{SERVER_NAME}     = 'example.com';
+	$ENV{HTTP_HOST}       = 'example.com';
+	$ENV{SCRIPT_URI}      = 'https://example.com/cgi-bin/foo.cgi';
 
-    my $info = CGI::Info->new();
-    my $url  = $info->cgi_host_url();
-    like($url, qr{^https://}, 'non-http protocol substituted into cgi_host_url');
+	my $info = CGI::Info->new();
+	my $url  = $info->cgi_host_url();
+	like($url, qr{^https://}, 'non-http protocol substituted into cgi_host_url');
 };
 
 # ============================================================
@@ -73,13 +73,13 @@ subtest '_find_site_details: https protocol substituted into cgi_site URL' => su
 # ============================================================
 
 subtest '_find_site_details: repeated host_name() calls use cached values' => sub {
-    reset_env();
-    $ENV{HTTP_HOST} = 'www.example.com';
+	reset_env();
+	$ENV{HTTP_HOST} = 'www.example.com';
 
-    my $info = CGI::Info->new();
-    my $h1   = $info->host_name();
-    my $h2   = $info->host_name();    # hits early-return branch
-    is($h1, $h2, 'host_name() returns same cached value on repeat call');
+	my $info = CGI::Info->new();
+	my $h1   = $info->host_name();
+	my $h2   = $info->host_name();    # hits early-return branch
+	is($h1, $h2, 'host_name() returns same cached value on repeat call');
 };
 
 # ============================================================
@@ -88,19 +88,19 @@ subtest '_find_site_details: repeated host_name() calls use cached values' => su
 # ============================================================
 
 subtest 'protocol: getservbyport returning http name directly' => sub {
-    reset_env();
-    # getservbyport() is a Socket built-in resolved as a direct opcode —
-    # neither mock_scoped nor local *glob can intercept it.  Instead verify
-    # the branch is reachable by checking what the real system returns for
-    # port 80, which should be 'http' on any standard Unix system.
-    my $name = getservbyport(80, 'tcp');
-    if(defined $name && $name =~ /^https?$/) {
-        $ENV{SERVER_PORT} = 80;
-        my $proto = CGI::Info->new()->protocol();
-        is($proto, $name, "getservbyport '$name' on port 80 returned correctly");
-    } else {
-        pass("system getservbyport(80) returned '${\($name // 'undef')}' — branch untestable on this platform");
-    }
+	reset_env();
+	# getservbyport() is a Socket built-in resolved as a direct opcode —
+	# neither mock_scoped nor local *glob can intercept it.  Instead verify
+	# the branch is reachable by checking what the real system returns for
+	# port 80, which should be 'http' on any standard Unix system.
+	my $name = getservbyport(80, 'tcp');
+	if(defined $name && $name =~ /^https?$/) {
+		$ENV{SERVER_PORT} = 80;
+		my $proto = CGI::Info->new()->protocol();
+		is($proto, $name, "getservbyport '$name' on port 80 returned correctly");
+	} else {
+		pass("system getservbyport(80) returned '${\($name // 'undef')}' — branch untestable on this platform");
+	}
 };
 
 # ============================================================
@@ -112,15 +112,15 @@ subtest 'protocol: getservbyport returning http name directly' => sub {
 # ============================================================
 
 subtest 'protocol: port 80 always resolves to http (www or direct fallback)' => sub {
-    reset_env();
-    local $SIG{__WARN__} = sub { };   # suppress numeric warning if port non-numeric
-    $ENV{SERVER_PORT} = 80;
-    my $proto = CGI::Info->new()->protocol();
-    # On most systems getservbyport(80,'tcp') returns 'http' directly.
-    # On NetBSD/OpenBSD it returns 'www' which the code maps to 'http'.
-    # The == 80 fallback catches systems where getservbyport returns undef.
-    # All paths lead to 'http'.
-    is($proto, 'http', 'port 80 always resolves to http via any code path');
+	reset_env();
+	local $SIG{__WARN__} = sub { };   # suppress numeric warning if port non-numeric
+	$ENV{SERVER_PORT} = 80;
+	my $proto = CGI::Info->new()->protocol();
+	# On most systems getservbyport(80,'tcp') returns 'http' directly.
+	# On NetBSD/OpenBSD it returns 'www' which the code maps to 'http'.
+	# The == 80 fallback catches systems where getservbyport returns undef.
+	# All paths lead to 'http'.
+	is($proto, 'http', 'port 80 always resolves to http via any code path');
 };
 
 # ============================================================
@@ -131,18 +131,18 @@ subtest 'protocol: port 80 always resolves to http (www or direct fallback)' => 
 # ============================================================
 
 subtest 'protocol: obscure port with no service entry falls through to undef' => sub {
-    reset_env();
-    $ENV{SERVER_PORT} = 19999;   # unlikely to be in /etc/services
-    local $SIG{__WARN__} = sub { };
-    my $name  = getservbyport(19999, 'tcp');
-    my $proto = CGI::Info->new()->protocol();
-    if(!defined $name) {
-        ok(!defined($proto), 'port with no service entry falls through to undef');
-    } elsif($name =~ /https?/ || $name eq 'www') {
-        pass("port 19999 unexpectedly maps to '$name' on this system — skip");
-    } else {
-        ok(!defined($proto), "unrecognised service '$name' falls through to undef");
-    }
+	reset_env();
+	$ENV{SERVER_PORT} = 19999;   # unlikely to be in /etc/services
+	local $SIG{__WARN__} = sub { };
+	my $name  = getservbyport(19999, 'tcp');
+	my $proto = CGI::Info->new()->protocol();
+	if(!defined $name) {
+		ok(!defined($proto), 'port with no service entry falls through to undef');
+	} elsif($name =~ /https?/ || $name eq 'www') {
+		pass("port 19999 unexpectedly maps to '$name' on this system — skip");
+	} else {
+		ok(!defined($proto), "unrecognised service '$name' falls through to undef");
+	}
 };
 
 # ============================================================
@@ -151,16 +151,16 @@ subtest 'protocol: obscure port with no service entry falls through to undef' =>
 # ============================================================
 
 subtest 'protocol: REMOTE_ADDR set but no protocol determinable triggers warn' => sub {
-    reset_env();
-    $ENV{REMOTE_ADDR} = '1.2.3.4';
-    # No SCRIPT_URI, SERVER_PROTOCOL, or SERVER_PORT
+	reset_env();
+	$ENV{REMOTE_ADDR} = '1.2.3.4';
+	# No SCRIPT_URI, SERVER_PROTOCOL, or SERVER_PORT
 
-    my $info  = CGI::Info->new();
-    my $proto = $info->protocol();
-    ok(!defined($proto), 'protocol() returns undef when indeterminate');
-    my $msgs = $info->messages();
-    ok(defined($msgs) && scalar @{$msgs} > 0,
-        'undetermined protocol with REMOTE_ADDR logs a warning');
+	my $info  = CGI::Info->new();
+	my $proto = $info->protocol();
+	ok(!defined($proto), 'protocol() returns undef when indeterminate');
+	my $msgs = $info->messages();
+	ok(defined($msgs) && scalar @{$msgs} > 0,
+		'undetermined protocol with REMOTE_ADDR logs a warning');
 };
 
 # ============================================================
@@ -169,14 +169,14 @@ subtest 'protocol: REMOTE_ADDR set but no protocol determinable triggers warn' =
 # ============================================================
 
 subtest 'protocol: non-HTTP SERVER_PROTOCOL does not return http' => sub {
-    reset_env();
-    $ENV{SERVER_PROTOCOL} = 'FTP/1.0';
-    {
-        my $guard = mock_scoped 'CGI::Info::getservbyport' => sub { return undef };
-        my $proto = CGI::Info->new()->protocol();
-        ok(!defined($proto) || $proto ne 'http',
-            'non-HTTP SERVER_PROTOCOL not returned as http');
-    }
+	reset_env();
+	$ENV{SERVER_PROTOCOL} = 'FTP/1.0';
+	{
+		my $guard = mock_scoped 'CGI::Info::getservbyport' => sub { return undef };
+		my $proto = CGI::Info->new()->protocol();
+		ok(!defined($proto) || $proto ne 'http',
+			'non-HTTP SERVER_PROTOCOL not returned as http');
+	}
 };
 
 # ============================================================
@@ -185,16 +185,16 @@ subtest 'protocol: non-HTTP SERVER_PROTOCOL does not return http' => sub {
 # ============================================================
 
 subtest 'params: HEAD request parses QUERY_STRING like GET' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'HEAD';
-    $ENV{QUERY_STRING}      = 'x=1&y=2';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'HEAD';
+	$ENV{QUERY_STRING}      = 'x=1&y=2';
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params();
-    ok(defined $p,        'HEAD request returns params');
-    is($p->{x}, '1',     'x=1 parsed from HEAD');
-    is($p->{y}, '2',     'y=2 parsed from HEAD');
+	my $info = CGI::Info->new();
+	my $p    = $info->params();
+	ok(defined $p,        'HEAD request returns params');
+	is($p->{x}, '1',     'x=1 parsed from HEAD');
+	is($p->{y}, '2',     'y=2 parsed from HEAD');
 };
 
 # ============================================================
@@ -203,16 +203,16 @@ subtest 'params: HEAD request parses QUERY_STRING like GET' => sub {
 # ============================================================
 
 subtest 'params: \\u0026 unicode ampersand escape decoded' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'a=1\\u0026b=2';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'a=1\\u0026b=2';
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params();
-    ok(defined $p, 'params returned with \\u0026 encoded ampersand');
-    is($p->{a}, '1', 'a=1 parsed after \\u0026 decoded');
-    is($p->{b}, '2', 'b=2 parsed after \\u0026 decoded');
+	my $info = CGI::Info->new();
+	my $p    = $info->params();
+	ok(defined $p, 'params returned with \\u0026 encoded ampersand');
+	is($p->{a}, '1', 'a=1 parsed after \\u0026 decoded');
+	is($p->{b}, '2', 'b=2 parsed after \\u0026 decoded');
 };
 
 # ============================================================
@@ -221,17 +221,17 @@ subtest 'params: \\u0026 unicode ampersand escape decoded' => sub {
 # ============================================================
 
 subtest 'params: multipart with relative upload_dir => 500' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'POST';
-    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
-    $ENV{CONTENT_LENGTH}    = 100;
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'POST';
+	$ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+	$ENV{CONTENT_LENGTH}    = 100;
 
-    my $info = CGI::Info->new(upload_dir => 'relative/path');
-    my $p    = eval { $info->params() };
-    ok(!$@,             'does not die on relative upload_dir');
-    ok(!defined($p),    'relative upload_dir returns undef');
-    is($info->status(), 500, 'relative upload_dir sets status 500');
+	my $info = CGI::Info->new(upload_dir => 'relative/path');
+	my $p    = eval { $info->params() };
+	ok(!$@,             'does not die on relative upload_dir');
+	ok(!defined($p),    'relative upload_dir returns undef');
+	is($info->status(), 500, 'relative upload_dir sets status 500');
 };
 
 # ============================================================
@@ -240,20 +240,20 @@ subtest 'params: multipart with relative upload_dir => 500' => sub {
 # ============================================================
 
 subtest 'params: multipart with upload_dir pointing to a file => 500' => sub {
-    reset_env();
-    my $tmp  = File::Temp->new(UNLINK => 1);
-    my $file = $tmp->filename();
+	reset_env();
+	my $tmp  = File::Temp->new(UNLINK => 1);
+	my $file = $tmp->filename();
 
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'POST';
-    $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
-    $ENV{CONTENT_LENGTH}    = 100;
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'POST';
+	$ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+	$ENV{CONTENT_LENGTH}    = 100;
 
-    my $info = CGI::Info->new(upload_dir => $file);
-    my $p    = eval { $info->params() };
-    ok(!$@,           'does not die when upload_dir is a file not a dir');
-    ok(!defined($p),  'file-as-upload_dir returns undef');
-    is($info->status(), 500, 'file-as-upload_dir sets status 500');
+	my $info = CGI::Info->new(upload_dir => $file);
+	my $p    = eval { $info->params() };
+	ok(!$@,           'does not die when upload_dir is a file not a dir');
+	ok(!defined($p),  'file-as-upload_dir returns undef');
+	is($info->status(), 500, 'file-as-upload_dir sets status 500');
 };
 
 # ============================================================
@@ -262,31 +262,31 @@ subtest 'params: multipart with upload_dir pointing to a file => 500' => sub {
 # ============================================================
 
 subtest 'params: upload_dir outside every temporary area => 500' => sub {
-    reset_env();
+	reset_env();
 
-    # A temporary directory is accepted by design, so the rejection branch
-    # needs a directory outside every temporary area: the distribution root,
-    # which is where the tests are run from.
-    my $outside = File::Spec->rel2abs(File::Spec->curdir());
-    SKIP: {
-        skip "$outside is inside a temporary area", 3
-            if CGI::Info->new()->_in_temp_area($outside);
+	# A temporary directory is accepted by design, so the rejection branch
+	# needs a directory outside every temporary area: the distribution root,
+	# which is where the tests are run from.
+	my $outside = File::Spec->rel2abs(File::Spec->curdir());
+	SKIP: {
+		skip "$outside is inside a temporary area", 3
+			if CGI::Info->new()->_in_temp_area($outside);
 
-        $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-        $ENV{REQUEST_METHOD}    = 'POST';
-        $ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
-        $ENV{CONTENT_LENGTH}    = 100;
+		$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+		$ENV{REQUEST_METHOD}    = 'POST';
+		$ENV{CONTENT_TYPE}      = 'multipart/form-data; boundary=----b';
+		$ENV{CONTENT_LENGTH}    = 100;
 
-        # Rejection must not depend on what tmpdir() reports, so point it
-        # somewhere unrelated as well.
-        my $guard = mock_scoped 'CGI::Info::tmpdir' => sub { return '/nonexistent/tmpdir/xyz' };
+		# Rejection must not depend on what tmpdir() reports, so point it
+		# somewhere unrelated as well.
+		my $guard = mock_scoped 'CGI::Info::tmpdir' => sub { return '/nonexistent/tmpdir/xyz' };
 
-        my $info = CGI::Info->new(upload_dir => $outside);
-        my $p    = eval { $info->params() };
-        ok(!$@,           'does not die when upload_dir outside every temporary area');
-        ok(!defined($p),  'upload_dir outside every temporary area returns undef');
-        is($info->status(), 500, 'upload_dir outside every temporary area sets status 500');
-    }
+		my $info = CGI::Info->new(upload_dir => $outside);
+		my $p    = eval { $info->params() };
+		ok(!$@,           'does not die when upload_dir outside every temporary area');
+		ok(!defined($p),  'upload_dir outside every temporary area returns undef');
+		is($info->status(), 500, 'upload_dir outside every temporary area sets status 500');
+	}
 };
 
 # ============================================================
@@ -295,18 +295,18 @@ subtest 'params: upload_dir outside every temporary area => 500' => sub {
 # ============================================================
 
 subtest 'params: schema validation returning empty hash blocks param' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'score=999';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'score=999';
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params(allow => {
-        score => { type => 'integer', min => 0, max => 100 }
-    });
-    ok(!defined($p) || !defined($p->{score}),
-        'out-of-range value blocked by Params::Validate::Strict schema');
-    is($info->status(), 422, 'schema block sets status 422');
+	my $info = CGI::Info->new();
+	my $p    = $info->params(allow => {
+		score => { type => 'integer', min => 0, max => 100 }
+	});
+	ok(!defined($p) || !defined($p->{score}),
+		'out-of-range value blocked by Params::Validate::Strict schema');
+	is($info->status(), 422, 'schema block sets status 422');
 };
 
 # ============================================================
@@ -316,25 +316,25 @@ subtest 'params: schema validation returning empty hash blocks param' => sub {
 # ============================================================
 
 subtest 'param: recursion guard prevents deep recursion in coderef validator' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'flag=1&score=50';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'flag=1&score=50';
 
-    my $info = CGI::Info->new();
-    my $p = $info->params(allow => {
-        flag  => qr/^[01]$/,
-        score => sub {
-            my ($key, $val, $obj) = @_;
-            # This calls param() recursively on the same object
-            # The in_param guard must prevent infinite recursion
-            my $flag = $obj->param('flag');
-            return defined($flag) && $flag && $val >= 0 && $val <= 100;
-        },
-    });
+	my $info = CGI::Info->new();
+	my $p = $info->params(allow => {
+		flag  => qr/^[01]$/,
+		score => sub {
+			my ($key, $val, $obj) = @_;
+			# This calls param() recursively on the same object
+			# The in_param guard must prevent infinite recursion
+			my $flag = $obj->param('flag');
+			return defined($flag) && $flag && $val >= 0 && $val <= 100;
+		},
+	});
 
-    ok(!$@, 'recursive param() call in coderef does not cause infinite recursion');
-    ok(defined $p && defined $p->{score}, 'score validated via recursive param() call');
+	ok(!$@, 'recursive param() call in coderef does not cause infinite recursion');
+	ok(defined $p && defined $p->{score}, 'score validated via recursive param() call');
 };
 
 # ============================================================
@@ -343,13 +343,13 @@ subtest 'param: recursion guard prevents deep recursion in coderef validator' =>
 # ============================================================
 
 subtest 'is_mobile: Sec-CH-UA-Mobile ?0 does not set mobile' => sub {
-    reset_env();
-    $ENV{HTTP_SEC_CH_UA_MOBILE} = '?0';
-    $ENV{HTTP_USER_AGENT}       = 'Mozilla/5.0 (Windows NT 10.0)';
-    $ENV{REMOTE_ADDR}           = '1.2.3.4';
+	reset_env();
+	$ENV{HTTP_SEC_CH_UA_MOBILE} = '?0';
+	$ENV{HTTP_USER_AGENT}       = 'Mozilla/5.0 (Windows NT 10.0)';
+	$ENV{REMOTE_ADDR}           = '1.2.3.4';
 
-    ok(!CGI::Info->new()->is_mobile(),
-        'Sec-CH-UA-Mobile: ?0 does not trigger mobile detection');
+	ok(!CGI::Info->new()->is_mobile(),
+		'Sec-CH-UA-Mobile: ?0 does not trigger mobile detection');
 };
 
 # ============================================================
@@ -358,20 +358,20 @@ subtest 'is_mobile: Sec-CH-UA-Mobile ?0 does not set mobile' => sub {
 # ============================================================
 
 subtest 'is_mobile: cache hit for mobile type short-circuits detection' => sub {
-    reset_env();
-    {
-        package MobileCache;
-        our %store = ( '1.2.3.4/TestBrowser/1.0' => 'mobile' );
-        sub new { bless {}, shift }
-        sub get { $MobileCache::store{$_[1]} }
-        sub set { $MobileCache::store{$_[1]} = $_[2] }
-    }
+	reset_env();
+	{
+		package MobileCache;
+		our %store = ( '1.2.3.4/TestBrowser/1.0' => 'mobile' );
+		sub new { bless {}, shift }
+		sub get { $MobileCache::store{$_[1]} }
+		sub set { $MobileCache::store{$_[1]} = $_[2] }
+	}
 
-    $ENV{HTTP_USER_AGENT} = 'TestBrowser/1.0';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	$ENV{HTTP_USER_AGENT} = 'TestBrowser/1.0';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    my $info = CGI::Info->new(cache => MobileCache->new());
-    ok($info->is_mobile(), 'cache hit for mobile type returns true');
+	my $info = CGI::Info->new(cache => MobileCache->new());
+	ok($info->is_mobile(), 'cache hit for mobile type returns true');
 };
 
 # ============================================================
@@ -380,20 +380,20 @@ subtest 'is_mobile: cache hit for mobile type short-circuits detection' => sub {
 # ============================================================
 
 subtest 'is_mobile: cache hit for non-mobile type returns false' => sub {
-    reset_env();
-    {
-        package DesktopCache;
-        our %store = ( '5.6.7.8/DesktopBrowser/1.0' => 'web' );
-        sub new { bless {}, shift }
-        sub get { $DesktopCache::store{$_[1]} }
-        sub set { $DesktopCache::store{$_[1]} = $_[2] }
-    }
+	reset_env();
+	{
+		package DesktopCache;
+		our %store = ( '5.6.7.8/DesktopBrowser/1.0' => 'web' );
+		sub new { bless {}, shift }
+		sub get { $DesktopCache::store{$_[1]} }
+		sub set { $DesktopCache::store{$_[1]} = $_[2] }
+	}
 
-    $ENV{HTTP_USER_AGENT} = 'DesktopBrowser/1.0';
-    $ENV{REMOTE_ADDR}     = '5.6.7.8';
+	$ENV{HTTP_USER_AGENT} = 'DesktopBrowser/1.0';
+	$ENV{REMOTE_ADDR}     = '5.6.7.8';
 
-    my $info = CGI::Info->new(cache => DesktopCache->new());
-    ok(!$info->is_mobile(), 'cache hit for non-mobile type returns false');
+	my $info = CGI::Info->new(cache => DesktopCache->new());
+	ok(!$info->is_mobile(), 'cache hit for non-mobile type returns false');
 };
 
 # ============================================================
@@ -402,13 +402,13 @@ subtest 'is_mobile: cache hit for non-mobile type returns false' => sub {
 # ============================================================
 
 subtest 'is_robot: HTTP_REFERER with closing paren triggers trawler block' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (compatible)';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
-    $ENV{HTTP_REFERER}    = 'http://evil.example.com/page)';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (compatible)';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
+	$ENV{HTTP_REFERER}    = 'http://evil.example.com/page)';
 
-    my $info = CGI::Info->new();
-    ok($info->is_robot(), 'referrer with ) triggers trawler block => robot');
+	my $info = CGI::Info->new();
+	ok($info->is_robot(), 'referrer with ) triggers trawler block => robot');
 };
 
 # ============================================================
@@ -417,16 +417,16 @@ subtest 'is_robot: HTTP_REFERER with closing paren triggers trawler block' => su
 # ============================================================
 
 subtest 'is_robot: HTTP_REFERER matching known crawler list entry' => sub {
-    reset_env();
-    # The check is: any { $_ =~ /^$referrer/ } @crawler_list
-    # meaning the list entry must START WITH the referrer string.
-    # Use a referrer that exactly matches a list entry prefix.
-    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
-    $ENV{HTTP_REFERER}    = 'http://semalt.com';
+	reset_env();
+	# The check is: any { $_ =~ /^$referrer/ } @crawler_list
+	# meaning the list entry must START WITH the referrer string.
+	# Use a referrer that exactly matches a list entry prefix.
+	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
+	$ENV{HTTP_REFERER}    = 'http://semalt.com';
 
-    my $info = CGI::Info->new();
-    ok($info->is_robot(), 'referrer matching crawler list => robot');
+	my $info = CGI::Info->new();
+	ok($info->is_robot(), 'referrer matching crawler list => robot');
 };
 
 # ============================================================
@@ -435,26 +435,26 @@ subtest 'is_robot: HTTP_REFERER matching known crawler list entry' => sub {
 # ============================================================
 
 subtest 'is_robot: majestic12 UA not classified as search engine' => sub {
-    reset_env();
-    # The majestic12/facebookexternal guard in is_robot() returns 0 (not robot)
-    # BUT HTTP::BrowserDetect may classify MJ12bot as a robot first.
-    # The important contract is that is_search_engine() returns true for it.
-    $ENV{HTTP_USER_AGENT} = 'MJ12bot/v1.4.8 (http://www.majestic12.co.uk/bot.php)';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	reset_env();
+	# The majestic12/facebookexternal guard in is_robot() returns 0 (not robot)
+	# BUT HTTP::BrowserDetect may classify MJ12bot as a robot first.
+	# The important contract is that is_search_engine() returns true for it.
+	$ENV{HTTP_USER_AGENT} = 'MJ12bot/v1.4.8 (http://www.majestic12.co.uk/bot.php)';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    my $info = CGI::Info->new();
-    # Either is_search_engine OR (not is_robot and is_search_engine via is_search_engine())
-    my $is_search = $info->is_search_engine();
-    ok($is_search, 'majestic12 UA classified as search engine');
+	my $info = CGI::Info->new();
+	# Either is_search_engine OR (not is_robot and is_search_engine via is_search_engine())
+	my $is_search = $info->is_search_engine();
+	ok($is_search, 'majestic12 UA classified as search engine');
 };
 
 subtest 'is_robot: facebookexternal UA classified as search, not robot' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'facebookexternalhit/1.1';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'facebookexternalhit/1.1';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    my $info = CGI::Info->new();
-    is($info->is_robot(), 0, 'facebookexternal UA returns 0 from is_robot()');
+	my $info = CGI::Info->new();
+	is($info->is_robot(), 0, 'facebookexternal UA returns 0 from is_robot()');
 };
 
 # ============================================================
@@ -463,20 +463,20 @@ subtest 'is_robot: facebookexternal UA classified as search, not robot' => sub {
 # ============================================================
 
 subtest 'is_robot: cache hit for robot type returns true' => sub {
-    reset_env();
-    {
-        package RobotCache;
-        our %store = ( '9.9.9.9/EvilBot/1.0' => 'robot' );
-        sub new { bless {}, shift }
-        sub get { $RobotCache::store{$_[1]} }
-        sub set { $RobotCache::store{$_[1]} = $_[2] }
-    }
+	reset_env();
+	{
+		package RobotCache;
+		our %store = ( '9.9.9.9/EvilBot/1.0' => 'robot' );
+		sub new { bless {}, shift }
+		sub get { $RobotCache::store{$_[1]} }
+		sub set { $RobotCache::store{$_[1]} = $_[2] }
+	}
 
-    $ENV{HTTP_USER_AGENT} = 'EvilBot/1.0';
-    $ENV{REMOTE_ADDR}     = '9.9.9.9';
+	$ENV{HTTP_USER_AGENT} = 'EvilBot/1.0';
+	$ENV{REMOTE_ADDR}     = '9.9.9.9';
 
-    my $info = CGI::Info->new(cache => RobotCache->new());
-    ok($info->is_robot(), 'cache hit for robot type returns true');
+	my $info = CGI::Info->new(cache => RobotCache->new());
+	ok($info->is_robot(), 'cache hit for robot type returns true');
 };
 
 # ============================================================
@@ -485,20 +485,20 @@ subtest 'is_robot: cache hit for robot type returns true' => sub {
 # ============================================================
 
 subtest 'is_robot: cache hit for unknown type returns false' => sub {
-    reset_env();
-    {
-        package UnknownCache;
-        our %store = ( '8.8.8.8/SomeBrowser/1.0' => 'unknown' );
-        sub new { bless {}, shift }
-        sub get { $UnknownCache::store{$_[1]} }
-        sub set { $UnknownCache::store{$_[1]} = $_[2] }
-    }
+	reset_env();
+	{
+		package UnknownCache;
+		our %store = ( '8.8.8.8/SomeBrowser/1.0' => 'unknown' );
+		sub new { bless {}, shift }
+		sub get { $UnknownCache::store{$_[1]} }
+		sub set { $UnknownCache::store{$_[1]} = $_[2] }
+	}
 
-    $ENV{HTTP_USER_AGENT} = 'SomeBrowser/1.0';
-    $ENV{REMOTE_ADDR}     = '8.8.8.8';
+	$ENV{HTTP_USER_AGENT} = 'SomeBrowser/1.0';
+	$ENV{REMOTE_ADDR}     = '8.8.8.8';
 
-    my $info = CGI::Info->new(cache => UnknownCache->new());
-    ok(!$info->is_robot(), 'cache hit for unknown type returns false');
+	my $info = CGI::Info->new(cache => UnknownCache->new());
+	ok(!$info->is_robot(), 'cache hit for unknown type returns false');
 };
 
 # ============================================================
@@ -507,21 +507,21 @@ subtest 'is_robot: cache hit for unknown type returns false' => sub {
 # ============================================================
 
 subtest 'is_search_engine: majestic12 UA returns true' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'MJ12bot/v1.4.8 (http://www.majestic12.co.uk/bot.php)';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'MJ12bot/v1.4.8 (http://www.majestic12.co.uk/bot.php)';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    ok(CGI::Info->new()->is_search_engine(),
-        'majestic12 UA classified as search engine');
+	ok(CGI::Info->new()->is_search_engine(),
+		'majestic12 UA classified as search engine');
 };
 
 subtest 'is_search_engine: facebookexternal UA returns true' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'facebookexternalhit/1.1';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'facebookexternalhit/1.1';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    ok(CGI::Info->new()->is_search_engine(),
-        'facebookexternal UA classified as search engine');
+	ok(CGI::Info->new()->is_search_engine(),
+		'facebookexternal UA classified as search engine');
 };
 
 # ============================================================
@@ -530,30 +530,30 @@ subtest 'is_search_engine: facebookexternal UA returns true' => sub {
 # ============================================================
 
 subtest 'is_search_engine: SeznamBot UA pattern' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'SeznamBot/3.2-test (+http://napoveda.seznam.cz/en/seznambot-intro/)';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'SeznamBot/3.2-test (+http://napoveda.seznam.cz/en/seznambot-intro/)';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    my $result = CGI::Info->new()->is_search_engine();
-    ok($result, 'SeznamBot classified as search engine');
+	my $result = CGI::Info->new()->is_search_engine();
+	ok($result, 'SeznamBot classified as search engine');
 };
 
 subtest 'is_search_engine: Google-InspectionTool pattern' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'Google-InspectionTool/1.0';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Google-InspectionTool/1.0';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
 
-    my $result = CGI::Info->new()->is_search_engine();
-    ok($result, 'Google-InspectionTool classified as search engine');
+	my $result = CGI::Info->new()->is_search_engine();
+	ok($result, 'Google-InspectionTool classified as search engine');
 };
 
 subtest 'is_search_engine: Googlebot pattern' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'Googlebot/2.1 (+http://www.google.com/bot.html)';
-    $ENV{REMOTE_ADDR}     = '66.249.66.1';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Googlebot/2.1 (+http://www.google.com/bot.html)';
+	$ENV{REMOTE_ADDR}     = '66.249.66.1';
 
-    my $result = CGI::Info->new()->is_search_engine();
-    ok($result, 'Googlebot classified as search engine');
+	my $result = CGI::Info->new()->is_search_engine();
+	ok($result, 'Googlebot classified as search engine');
 };
 
 # ============================================================
@@ -562,20 +562,20 @@ subtest 'is_search_engine: Googlebot pattern' => sub {
 # ============================================================
 
 subtest 'is_search_engine: cache hit for search type returns true' => sub {
-    reset_env();
-    {
-        package SearchCache;
-        our %store = ( '2.2.2.2/GoogleProxy/1.0' => 'search' );
-        sub new { bless {}, shift }
-        sub get { $SearchCache::store{$_[1]} }
-        sub set { $SearchCache::store{$_[1]} = $_[2] }
-    }
+	reset_env();
+	{
+		package SearchCache;
+		our %store = ( '2.2.2.2/GoogleProxy/1.0' => 'search' );
+		sub new { bless {}, shift }
+		sub get { $SearchCache::store{$_[1]} }
+		sub set { $SearchCache::store{$_[1]} = $_[2] }
+	}
 
-    $ENV{HTTP_USER_AGENT} = 'GoogleProxy/1.0';
-    $ENV{REMOTE_ADDR}     = '2.2.2.2';
+	$ENV{HTTP_USER_AGENT} = 'GoogleProxy/1.0';
+	$ENV{REMOTE_ADDR}     = '2.2.2.2';
 
-    my $info = CGI::Info->new(cache => SearchCache->new());
-    ok($info->is_search_engine(), 'cache hit for search type returns true');
+	my $info = CGI::Info->new(cache => SearchCache->new());
+	ok($info->is_search_engine(), 'cache hit for search type returns true');
 };
 
 # ============================================================
@@ -584,23 +584,23 @@ subtest 'is_search_engine: cache hit for search type returns true' => sub {
 # ============================================================
 
 subtest 'tmpdir: C_DOCUMENT_ROOT/tmp used when it exists and is writable' => sub {
-    reset_env();
-    my $root = tempdir(CLEANUP => 1);
-    my $tmp  = File::Spec->catdir($root, 'tmp');
-    mkdir $tmp or die "mkdir $tmp: $!";
+	reset_env();
+	my $root = tempdir(CLEANUP => 1);
+	my $tmp  = File::Spec->catdir($root, 'tmp');
+	mkdir $tmp or die "mkdir $tmp: $!";
 
-    $ENV{C_DOCUMENT_ROOT} = $root;
+	$ENV{C_DOCUMENT_ROOT} = $root;
 
-    my $dir = CGI::Info->new()->tmpdir();
-    ok(defined $dir, 'tmpdir() returns a defined value');
-    ok(-d $dir && -w $dir, 'returned directory exists and is writable');
-    # Normalise separators for cross-platform comparison
-    (my $norm_dir = $dir) =~ s{[/\\]+}{/}g;
-    (my $norm_tmp = $tmp) =~ s{[/\\]+}{/}g;
-    (my $norm_root = $root) =~ s{[/\\]+}{/}g;
-    # Should return either $tmp (preferred) or $root (fallback if untaint fails)
-    ok($norm_dir eq $norm_tmp || $norm_dir eq $norm_root,
-        'C_DOCUMENT_ROOT/tmp or C_DOCUMENT_ROOT itself returned');
+	my $dir = CGI::Info->new()->tmpdir();
+	ok(defined $dir, 'tmpdir() returns a defined value');
+	ok(-d $dir && -w $dir, 'returned directory exists and is writable');
+	# Normalise separators for cross-platform comparison
+	(my $norm_dir = $dir) =~ s{[/\\]+}{/}g;
+	(my $norm_tmp = $tmp) =~ s{[/\\]+}{/}g;
+	(my $norm_root = $root) =~ s{[/\\]+}{/}g;
+	# Should return either $tmp (preferred) or $root (fallback if untaint fails)
+	ok($norm_dir eq $norm_tmp || $norm_dir eq $norm_root,
+		'C_DOCUMENT_ROOT/tmp or C_DOCUMENT_ROOT itself returned');
 };
 
 # ============================================================
@@ -609,14 +609,14 @@ subtest 'tmpdir: C_DOCUMENT_ROOT/tmp used when it exists and is writable' => sub
 # ============================================================
 
 subtest 'tmpdir: C_DOCUMENT_ROOT itself used when subdir not writable' => sub {
-    reset_env();
-    my $root = tempdir(CLEANUP => 1);
-    # No 'tmp' subdir created — C_DOCUMENT_ROOT itself is writable
+	reset_env();
+	my $root = tempdir(CLEANUP => 1);
+	# No 'tmp' subdir created — C_DOCUMENT_ROOT itself is writable
 
-    $ENV{C_DOCUMENT_ROOT} = $root;
+	$ENV{C_DOCUMENT_ROOT} = $root;
 
-    my $dir = CGI::Info->new()->tmpdir();
-    is($dir, $root, 'C_DOCUMENT_ROOT itself returned when tmp subdir absent');
+	my $dir = CGI::Info->new()->tmpdir();
+	is($dir, $root, 'C_DOCUMENT_ROOT itself returned when tmp subdir absent');
 };
 
 # ============================================================
@@ -625,19 +625,19 @@ subtest 'tmpdir: C_DOCUMENT_ROOT itself used when subdir not writable' => sub {
 # ============================================================
 
 subtest 'tmpdir: DOCUMENT_ROOT/../tmp used when it exists' => sub {
-    reset_env();
-    my $base    = tempdir(CLEANUP => 1);
-    my $docroot = File::Spec->catdir($base, 'htdocs');
-    my $tmpdir  = File::Spec->catdir($base, 'tmp');
-    mkdir $docroot or die "mkdir $docroot: $!";
-    mkdir $tmpdir  or die "mkdir $tmpdir: $!";
+	reset_env();
+	my $base    = tempdir(CLEANUP => 1);
+	my $docroot = File::Spec->catdir($base, 'htdocs');
+	my $tmpdir  = File::Spec->catdir($base, 'tmp');
+	mkdir $docroot or die "mkdir $docroot: $!";
+	mkdir $tmpdir  or die "mkdir $tmpdir: $!";
 
-    $ENV{DOCUMENT_ROOT} = $docroot;
+	$ENV{DOCUMENT_ROOT} = $docroot;
 
-    my $dir = CGI::Info->new()->tmpdir();
-    ok(defined $dir, 'tmpdir() returns a value with DOCUMENT_ROOT set');
-    # Either returns the ../tmp or falls through to system tmpdir — both valid
-    ok(-d $dir, 'returned directory exists');
+	my $dir = CGI::Info->new()->tmpdir();
+	ok(defined $dir, 'tmpdir() returns a value with DOCUMENT_ROOT set');
+	# Either returns the ../tmp or falls through to system tmpdir — both valid
+	ok(-d $dir, 'returned directory exists');
 };
 
 # ============================================================
@@ -646,12 +646,12 @@ subtest 'tmpdir: DOCUMENT_ROOT/../tmp used when it exists' => sub {
 # ============================================================
 
 subtest 'logdir: LOGDIR env var used as fallback' => sub {
-    reset_env();
-    my $tmp = tempdir(CLEANUP => 1);
-    $ENV{LOGDIR} = $tmp;
+	reset_env();
+	my $tmp = tempdir(CLEANUP => 1);
+	$ENV{LOGDIR} = $tmp;
 
-    my $dir = CGI::Info->new()->logdir();
-    is($dir, $tmp, 'LOGDIR env var used as logdir fallback');
+	my $dir = CGI::Info->new()->logdir();
+	is($dir, $tmp, 'LOGDIR env var used as logdir fallback');
 };
 
 # ============================================================
@@ -660,15 +660,15 @@ subtest 'logdir: LOGDIR env var used as fallback' => sub {
 # ============================================================
 
 subtest 'logdir: stored value returned on subsequent calls' => sub {
-    reset_env();
-    my $tmp  = tempdir(CLEANUP => 1);
-    my $info = CGI::Info->new();
+	reset_env();
+	my $tmp  = tempdir(CLEANUP => 1);
+	my $info = CGI::Info->new();
 
-    $info->logdir($tmp);         # sets $self->{logdir}
-    my $d1 = $info->logdir();    # should return stored value
-    my $d2 = $info->logdir();    # idempotent
-    is($d1, $tmp, 'logdir() returns stored value');
-    is($d2, $tmp, 'logdir() idempotent across calls');
+	$info->logdir($tmp);         # sets $self->{logdir}
+	my $d1 = $info->logdir();    # should return stored value
+	my $d2 = $info->logdir();    # idempotent
+	is($d1, $tmp, 'logdir() returns stored value');
+	is($d2, $tmp, 'logdir() idempotent across calls');
 };
 
 # ============================================================
@@ -677,18 +677,18 @@ subtest 'logdir: stored value returned on subsequent calls' => sub {
 # ============================================================
 
 subtest 'cookie: jar populated once and reused on subsequent calls' => sub {
-    reset_env();
-    $ENV{HTTP_COOKIE} = 'a=1; b=2';
+	reset_env();
+	$ENV{HTTP_COOKIE} = 'a=1; b=2';
 
-    my $info = CGI::Info->new();
-    my $v1   = $info->cookie('a');    # populates jar
-    my $v2   = $info->cookie('b');    # reuses jar
+	my $info = CGI::Info->new();
+	my $v1   = $info->cookie('a');    # populates jar
+	my $v2   = $info->cookie('b');    # reuses jar
 
-    is($v1, '1', 'first cookie lookup correct');
-    is($v2, '2', 'second cookie lookup uses cached jar');
+	is($v1, '1', 'first cookie lookup correct');
+	is($v2, '2', 'second cookie lookup uses cached jar');
 
-    # Verify jar was only built once by checking it's the same ref
-    ok(defined $info->{jar}, 'jar is populated');
+	# Verify jar was only built once by checking it's the same ref
+	ok(defined $info->{jar}, 'jar is populated');
 };
 
 # ============================================================
@@ -697,14 +697,14 @@ subtest 'cookie: jar populated once and reused on subsequent calls' => sub {
 # ============================================================
 
 subtest 'cookie: ref field argument croaks' => sub {
-    reset_env();
-    my $info = CGI::Info->new();
-    # Params::Validate::Strict validates cookie_name before the ref($field)
-    # guard inside cookie() is reached — it croaks with a regex mismatch error
-    eval { $info->cookie([qw(not a string)]) };
-    ok($@, 'ref field argument causes croak (Params::Validate::Strict fires first)');
-    like($@, qr/cookie_name|must match|pattern/i,
-        'croak message references cookie_name validation failure');
+	reset_env();
+	my $info = CGI::Info->new();
+	# Params::Validate::Strict validates cookie_name before the ref($field)
+	# guard inside cookie() is reached — it croaks with a regex mismatch error
+	eval { $info->cookie([qw(not a string)]) };
+	ok($@, 'ref field argument causes croak (Params::Validate::Strict fires first)');
+	like($@, qr/cookie_name|must match|pattern/i,
+		'croak message references cookie_name validation failure');
 };
 
 # ============================================================
@@ -713,20 +713,20 @@ subtest 'cookie: ref field argument croaks' => sub {
 # ============================================================
 
 subtest 'as_string: backslash in value is escaped' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    # %5C is backslash
-    $ENV{QUERY_STRING}      = 'path=C%5CWindows';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	# %5C is backslash
+	$ENV{QUERY_STRING}      = 'path=C%5CWindows';
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params();
-    if(defined $p && defined $p->{path}) {
-        my $str = $info->as_string();
-        like($str, qr/path=C\\\\Windows/, 'backslash escaped in as_string output');
-    } else {
-        pass('params() returned undef (WAF or sanitisation, acceptable)');
-    }
+	my $info = CGI::Info->new();
+	my $p    = $info->params();
+	if(defined $p && defined $p->{path}) {
+		my $str = $info->as_string();
+		like($str, qr/path=C\\\\Windows/, 'backslash escaped in as_string output');
+	} else {
+		pass('params() returned undef (WAF or sanitisation, acceptable)');
+	}
 };
 
 # ============================================================
@@ -735,21 +735,21 @@ subtest 'as_string: backslash in value is escaped' => sub {
 # ============================================================
 
 subtest 'as_string: semicolon and equals both escaped in non-raw mode' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'expr=x%3D1%3By%3D2';   # x=1;y=2
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'expr=x%3D1%3By%3D2';   # x=1;y=2
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params();
-    if(defined $p && defined $p->{expr}) {
-        my $str = $info->as_string();
-        like($str, qr/expr=x\\=1\\;y\\=2/, 'both = and ; escaped in as_string');
-        my $raw = $info->as_string({ raw => 1 });
-        like($raw, qr/expr=x=1;y=2/, 'raw mode leaves = and ; unescaped');
-    } else {
-        pass('WAF triggered on value (acceptable for this input)');
-    }
+	my $info = CGI::Info->new();
+	my $p    = $info->params();
+	if(defined $p && defined $p->{expr}) {
+		my $str = $info->as_string();
+		like($str, qr/expr=x\\=1\\;y\\=2/, 'both = and ; escaped in as_string');
+		my $raw = $info->as_string({ raw => 1 });
+		like($raw, qr/expr=x=1;y=2/, 'raw mode leaves = and ; unescaped');
+	} else {
+		pass('WAF triggered on value (acceptable for this input)');
+	}
 };
 
 # ============================================================
@@ -758,28 +758,28 @@ subtest 'as_string: semicolon and equals both escaped in non-raw mode' => sub {
 # ============================================================
 
 subtest '_find_paths: DOCUMENT_ROOT + SCRIPT_NAME builds script_path' => sub {
-    reset_env();
-    my $tmp = tempdir(CLEANUP => 1);
-    $ENV{DOCUMENT_ROOT} = $tmp;
-    $ENV{SCRIPT_NAME}   = '/cgi-bin/app.cgi';
+	reset_env();
+	my $tmp = tempdir(CLEANUP => 1);
+	$ENV{DOCUMENT_ROOT} = $tmp;
+	$ENV{SCRIPT_NAME}   = '/cgi-bin/app.cgi';
 
-    my $info = CGI::Info->new();
-    my $path = $info->script_path();
-    like($path, qr/app\.cgi$/i, 'script_path ends with script name');
-    # On Windows the tempdir path may contain chars that _get_env rejects,
-    # causing fallback to $0-based path — so only assert DOCUMENT_ROOT
-    # rooting when the returned path actually starts with the tempdir.
-    if(defined $path) {
-        (my $norm_path = $path) =~ s{[/\\]+}{/}g;
-        (my $norm_tmp  = $tmp)  =~ s{[/\\]+}{/}g;
-        if(index($norm_path, $norm_tmp) == 0) {
-            pass('script_path rooted at DOCUMENT_ROOT');
-        } else {
-            pass('script_path fell back to $0 (DOCUMENT_ROOT path rejected by _get_env on this platform)');
-        }
-    } else {
-        pass('script_path undef (untaint failed on this platform)');
-    }
+	my $info = CGI::Info->new();
+	my $path = $info->script_path();
+	like($path, qr/app\.cgi$/i, 'script_path ends with script name');
+	# On Windows the tempdir path may contain chars that _get_env rejects,
+	# causing fallback to $0-based path — so only assert DOCUMENT_ROOT
+	# rooting when the returned path actually starts with the tempdir.
+	if(defined $path) {
+		(my $norm_path = $path) =~ s{[/\\]+}{/}g;
+		(my $norm_tmp  = $tmp)  =~ s{[/\\]+}{/}g;
+		if(index($norm_path, $norm_tmp) == 0) {
+			pass('script_path rooted at DOCUMENT_ROOT');
+		} else {
+			pass('script_path fell back to $0 (DOCUMENT_ROOT path rejected by _get_env on this platform)');
+		}
+	} else {
+		pass('script_path undef (untaint failed on this platform)');
+	}
 };
 
 # ============================================================
@@ -788,12 +788,12 @@ subtest '_find_paths: DOCUMENT_ROOT + SCRIPT_NAME builds script_path' => sub {
 # ============================================================
 
 subtest '_find_paths: absolute $0 used as script_path fallback' => sub {
-    reset_env();
-    # No SCRIPT_FILENAME, SCRIPT_NAME, or DOCUMENT_ROOT
-    my $info = CGI::Info->new();
-    my $path = $info->script_path();
-    ok(defined $path && length $path, 'script_path falls back to $0-derived path');
-    ok(File::Spec->file_name_is_absolute($path), 'fallback script_path is absolute');
+	reset_env();
+	# No SCRIPT_FILENAME, SCRIPT_NAME, or DOCUMENT_ROOT
+	my $info = CGI::Info->new();
+	my $path = $info->script_path();
+	ok(defined $path && length $path, 'script_path falls back to $0-derived path');
+	ok(File::Spec->file_name_is_absolute($path), 'fallback script_path is absolute');
 };
 
 # ============================================================
@@ -802,16 +802,16 @@ subtest '_find_paths: absolute $0 used as script_path fallback' => sub {
 # ============================================================
 
 subtest '_get_env: invalid chars in env var rejected, undef returned' => sub {
-    reset_env();
-    # CONTENT_LENGTH with shell metachar — _get_env rejects it
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'POST';
-    $ENV{CONTENT_LENGTH}    = '100; rm -rf /';
+	reset_env();
+	# CONTENT_LENGTH with shell metachar — _get_env rejects it
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'POST';
+	$ENV{CONTENT_LENGTH}    = '100; rm -rf /';
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params();
-    # _get_env returns undef for dirty CONTENT_LENGTH => 411
-    is($info->status(), 411, 'dirty CONTENT_LENGTH rejected by _get_env => 411');
+	my $info = CGI::Info->new();
+	my $p    = $info->params();
+	# _get_env returns undef for dirty CONTENT_LENGTH => 411
+	is($info->status(), 411, 'dirty CONTENT_LENGTH rejected by _get_env => 411');
 };
 
 # ============================================================
@@ -820,15 +820,15 @@ subtest '_get_env: invalid chars in env var rejected, undef returned' => sub {
 # ============================================================
 
 subtest 'status: POST with no CONTENT_LENGTH returns 411 from status()' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'POST';
-    # No CONTENT_LENGTH set
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'POST';
+	# No CONTENT_LENGTH set
 
-    my $info = CGI::Info->new();
-    # Don't call params() — test the implicit status() logic directly
-    is($info->status(), 411,
-        'status() returns 411 for POST with no CONTENT_LENGTH without calling params()');
+	my $info = CGI::Info->new();
+	# Don't call params() — test the implicit status() logic directly
+	is($info->status(), 411,
+		'status() returns 411 for POST with no CONTENT_LENGTH without calling params()');
 };
 
 # ============================================================
@@ -837,14 +837,14 @@ subtest 'status: POST with no CONTENT_LENGTH returns 411 from status()' => sub {
 # ============================================================
 
 subtest 'AUTOLOAD: method called on correct package returns result' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'mykey=myval';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'mykey=myval';
 
-    my $info = CGI::Info->new();
-    my $val  = $info->mykey();
-    is($val, 'myval', 'AUTOLOAD on CGI::Info object delegates to param()');
+	my $info = CGI::Info->new();
+	my $val  = $info->mykey();
+	is($val, 'myval', 'AUTOLOAD on CGI::Info object delegates to param()');
 };
 
 # ============================================================
@@ -853,24 +853,24 @@ subtest 'AUTOLOAD: method called on correct package returns result' => sub {
 # ============================================================
 
 subtest 'messages_as_string: multiple messages joined by semicolon-space' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'a=bad&b=alsoBad&c=stillBad';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'a=bad&b=alsoBad&c=stillBad';
 
-    my $info = CGI::Info->new();
-    $info->params(allow => {
-        a => qr/^\d+$/,
-        b => qr/^\d+$/,
-        c => qr/^\d+$/,
-    });
+	my $info = CGI::Info->new();
+	$info->params(allow => {
+		a => qr/^\d+$/,
+		b => qr/^\d+$/,
+		c => qr/^\d+$/,
+	});
 
-    my $str = $info->messages_as_string();
-    if($str && $str =~ /;/) {
-        like($str, qr/;\s/, 'multiple messages joined by "; "');
-    } else {
-        ok(defined $str, 'messages_as_string returns a string');
-    }
+	my $str = $info->messages_as_string();
+	if($str && $str =~ /;/) {
+		like($str, qr/;\s/, 'multiple messages joined by "; "');
+	} else {
+		ok(defined $str, 'messages_as_string returns a string');
+	}
 };
 
 # ============================================================
@@ -879,23 +879,23 @@ subtest 'messages_as_string: multiple messages joined by semicolon-space' => sub
 # ============================================================
 
 subtest 'params: second POST object reuses stdin_data class variable' => sub {
-    reset_env();
-    my $body = 'shared=yes&count=1';
-    $ENV{GATEWAY_INTERFACE}    = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}       = 'POST';
-    $ENV{CONTENT_TYPE}         = 'application/x-www-form-urlencoded';
-    $ENV{CONTENT_LENGTH}       = length($body);
-    $CGI::Info::stdin_data     = $body;
+	reset_env();
+	my $body = 'shared=yes&count=1';
+	$ENV{GATEWAY_INTERFACE}    = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}       = 'POST';
+	$ENV{CONTENT_TYPE}         = 'application/x-www-form-urlencoded';
+	$ENV{CONTENT_LENGTH}       = length($body);
+	$CGI::Info::stdin_data     = $body;
 
-    my $info1 = CGI::Info->new();
-    my $p1    = $info1->params();
-    ok(defined $p1 && $p1->{shared} eq 'yes', 'first object parses stdin_data');
+	my $info1 = CGI::Info->new();
+	my $p1    = $info1->params();
+	ok(defined $p1 && $p1->{shared} eq 'yes', 'first object parses stdin_data');
 
-    # Second object with same env should reuse $stdin_data
-    my $info2 = CGI::Info->new();
-    my $p2    = $info2->params();
-    ok(defined $p2 && $p2->{shared} eq 'yes',
-        'second object reuses stdin_data class variable');
+	# Second object with same env should reuse $stdin_data
+	my $info2 = CGI::Info->new();
+	my $p2    = $info2->params();
+	ok(defined $p2 && $p2->{shared} eq 'yes',
+		'second object reuses stdin_data class variable');
 };
 
 # ============================================================
@@ -904,12 +904,12 @@ subtest 'params: second POST object reuses stdin_data class variable' => sub {
 # ============================================================
 
 subtest 'domain_name: non-www host returned unchanged' => sub {
-    reset_env();
-    $ENV{HTTP_HOST} = 'api.example.com';
+	reset_env();
+	$ENV{HTTP_HOST} = 'api.example.com';
 
-    my $domain = CGI::Info->new()->domain_name();
-    is($domain, 'api.example.com',
-        'domain_name() returns non-www host unchanged');
+	my $domain = CGI::Info->new()->domain_name();
+	is($domain, 'api.example.com',
+		'domain_name() returns non-www host unchanged');
 };
 
 # ============================================================
@@ -918,16 +918,16 @@ subtest 'domain_name: non-www host returned unchanged' => sub {
 # ============================================================
 
 subtest 'browser_type: mobile takes priority over robot detection' => sub {
-    reset_env();
-    # iPhone UA — would be classified as both mobile and potentially robot
-    # by some detectors; mobile must win
-    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)';
-    $ENV{REMOTE_ADDR}     = '1.2.3.4';
-    $ENV{IS_MOBILE}       = 1;
+	reset_env();
+	# iPhone UA — would be classified as both mobile and potentially robot
+	# by some detectors; mobile must win
+	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X)';
+	$ENV{REMOTE_ADDR}     = '1.2.3.4';
+	$ENV{IS_MOBILE}       = 1;
 
-    my $info = CGI::Info->new();
-    is($info->browser_type(), 'mobile',
-        'mobile takes priority in browser_type() cascade');
+	my $info = CGI::Info->new();
+	is($info->browser_type(), 'mobile',
+		'mobile takes priority in browser_type() cascade');
 };
 
 # ============================================================
@@ -936,10 +936,10 @@ subtest 'browser_type: mobile takes priority over robot detection' => sub {
 # ============================================================
 
 subtest 'is_tablet: TabletPC user agent detected as tablet' => sub {
-    reset_env();
-    $ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (Windows NT 10.0; TabletPC; ARM)';
+	reset_env();
+	$ENV{HTTP_USER_AGENT} = 'Mozilla/5.0 (Windows NT 10.0; TabletPC; ARM)';
 
-    ok(CGI::Info->new()->is_tablet(), 'TabletPC UA detected as tablet');
+	ok(CGI::Info->new()->is_tablet(), 'TabletPC UA detected as tablet');
 };
 
 # ============================================================
@@ -948,19 +948,19 @@ subtest 'is_tablet: TabletPC user agent detected as tablet' => sub {
 # ============================================================
 
 subtest 'params: POST urlencoded body parsed correctly' => sub {
-    reset_env();
-    my $body                   = 'postkey=postval&other=data';
-    $ENV{GATEWAY_INTERFACE}    = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}       = 'POST';
-    $ENV{CONTENT_TYPE}         = 'application/x-www-form-urlencoded';
-    $ENV{CONTENT_LENGTH}       = length($body);
-    $CGI::Info::stdin_data     = $body;
+	reset_env();
+	my $body                   = 'postkey=postval&other=data';
+	$ENV{GATEWAY_INTERFACE}    = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}       = 'POST';
+	$ENV{CONTENT_TYPE}         = 'application/x-www-form-urlencoded';
+	$ENV{CONTENT_LENGTH}       = length($body);
+	$CGI::Info::stdin_data     = $body;
 
-    my $info = CGI::Info->new();
-    my $p    = $info->params();
-    ok(defined $p,                'POST urlencoded params returned');
-    is($p->{postkey}, 'postval', 'postkey from POST body');
-    is($p->{other},   'data',    'other from POST body');
+	my $info = CGI::Info->new();
+	my $p    = $info->params();
+	ok(defined $p,                'POST urlencoded params returned');
+	is($p->{postkey}, 'postval', 'postkey from POST body');
+	is($p->{other},   'data',    'other from POST body');
 };
 
 # ============================================================
@@ -969,16 +969,16 @@ subtest 'params: POST urlencoded body parsed correctly' => sub {
 # ============================================================
 
 subtest '_untaint_filename: filename with shell metacharacter returns undef' => sub {
-    reset_env();
-    # SCRIPT_FILENAME containing a backtick — _untaint_filename should reject it
-    $ENV{SCRIPT_FILENAME} = '/var/www/cgi-bin/`evil`.cgi';
+	reset_env();
+	# SCRIPT_FILENAME containing a backtick — _untaint_filename should reject it
+	$ENV{SCRIPT_FILENAME} = '/var/www/cgi-bin/`evil`.cgi';
 
-    my $info = CGI::Info->new();
-    my $path = $info->script_path();
-    # Either returns undef (untaint failed) or a sanitised path — must not crash
-    ok(!$@, 'does not die on script_filename with shell metacharacter');
-    ok(!defined($path) || $path !~ /`/,
-        'backtick not present in returned script_path');
+	my $info = CGI::Info->new();
+	my $path = $info->script_path();
+	# Either returns undef (untaint failed) or a sanitised path — must not crash
+	ok(!$@, 'does not die on script_filename with shell metacharacter');
+	ok(!defined($path) || $path !~ /`/,
+		'backtick not present in returned script_path');
 };
 
 # ============================================================
@@ -987,15 +987,15 @@ subtest '_untaint_filename: filename with shell metacharacter returns undef' => 
 # ============================================================
 
 subtest 'new: AUTOLOAD enabled by default when auto_load not specified' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'testparam=hello';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'testparam=hello';
 
-    my $info = CGI::Info->new();    # no auto_load arg
-    my $val  = eval { $info->testparam() };
-    ok(!$@,            'AUTOLOAD works without specifying auto_load');
-    is($val, 'hello',  'AUTOLOAD returns correct param value by default');
+	my $info = CGI::Info->new();    # no auto_load arg
+	my $val  = eval { $info->testparam() };
+	ok(!$@,            'AUTOLOAD works without specifying auto_load');
+	is($val, 'hello',  'AUTOLOAD returns correct param value by default');
 };
 
 # ============================================================
@@ -1005,21 +1005,21 @@ subtest 'new: AUTOLOAD enabled by default when auto_load not specified' => sub {
 # ============================================================
 
 subtest 'params: allow on constructor used for all subsequent calls' => sub {
-    reset_env();
-    $ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
-    $ENV{REQUEST_METHOD}    = 'GET';
-    $ENV{QUERY_STRING}      = 'good=1&bad=2';
+	reset_env();
+	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';
+	$ENV{REQUEST_METHOD}    = 'GET';
+	$ENV{QUERY_STRING}      = 'good=1&bad=2';
 
-    my $info = CGI::Info->new(allow => { good => qr/\d+/ });
-    my $p    = $info->params();
+	my $info = CGI::Info->new(allow => { good => qr/\d+/ });
+	my $p    = $info->params();
 
-    ok(defined $p,          'params returned with constructor allow');
-    ok(defined $p->{good},  'allowed key present');
-    ok(!defined $p->{bad},  'disallowed key absent');
+	ok(defined $p,          'params returned with constructor allow');
+	ok(defined $p->{good},  'allowed key present');
+	ok(!defined $p->{bad},  'disallowed key absent');
 
-    # Second call should use cached result
-    my $p2 = $info->params();
-    is($p, $p2, 'second call returns same hashref (cached)');
+	# Second call should use cached result
+	my $p2 = $info->params();
+	is($p, $p2, 'second call returns same hashref (cached)');
 };
 
 # ============================================================
@@ -1028,15 +1028,15 @@ subtest 'params: allow on constructor used for all subsequent calls' => sub {
 # ============================================================
 
 subtest 'is_search_engine: Alibaba CIDR block IP classified as search' => sub {
-    reset_env();
-    # 47.235.1.1 is in 47.235.0.0/12 (Alibaba block in source)
-    $ENV{HTTP_USER_AGENT} = 'Alibaba-Spider/1.0';
-    $ENV{REMOTE_ADDR}     = '47.235.1.1';
+	reset_env();
+	# 47.235.1.1 is in 47.235.0.0/12 (Alibaba block in source)
+	$ENV{HTTP_USER_AGENT} = 'Alibaba-Spider/1.0';
+	$ENV{REMOTE_ADDR}     = '47.235.1.1';
 
-    my $info   = CGI::Info->new();
-    my $result = $info->is_search_engine();
-    # May be classified as search engine (CIDR) or fall through to robot
-    ok(defined $result, 'CIDR lookup for Alibaba IP does not die');
+	my $info   = CGI::Info->new();
+	my $result = $info->is_search_engine();
+	# May be classified as search engine (CIDR) or fall through to robot
+	ok(defined $result, 'CIDR lookup for Alibaba IP does not die');
 };
 
 # ============================================================
@@ -1178,19 +1178,20 @@ subtest 'AUTOLOAD: auto_load => 0 causes croak on unknown method' => sub {
 };
 
 # ============================================================
-# 55. status(): explicit status(0) sets to 0 but read-back returns 200
-#     Branch: return $self->{status} || 200  — falsy zero becomes 200
+# 55. status(): explicit status(0) is kept and read back as 0
+#     Branch: return $self->{status} // 200  — a defined zero is
+#     returned as set instead of falling back to the default
 # ============================================================
 
-# Setting status to 0 uses the assignment branch (returns 0).
-# Reading it back hits the || 200 fallback because 0 is falsy.
-# This is the documented (if surprising) behaviour.
-subtest 'status: setting 0 and reading back returns 200 due to || 200 fallback' => sub {
+# Setting status to 0 uses the assignment branch (returns 0).  Reading
+# it back takes the // branch: 0 is defined, so the stored value is what
+# comes back, not the 200 default.
+subtest 'status: setting 0 and reading back returns 0' => sub {
 	reset_env();
 	my $info = CGI::Info->new();
 	my $set  = $info->status(0);
 	is($set, 0, 'status(0) assignment returns 0');
-	is($info->status(), 200, 'status() after status(0) returns 200 (0 || 200 fallback)');
+	is($info->status(), 0, 'status() after status(0) returns 0 (defined value kept)');
 };
 
 # ============================================================

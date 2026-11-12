@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Commands — App::Test::Generator</title>
+<meta name="description" content="The ten App::Test::Generator commands: fuzz-harness-generator, extract-schemas, test-generator-mutate, test-generator-index, generate-test-dashboard, benchmark-generator, pod-example-tester, deploy-workflows, instrument-modules and demo_extractor.">
+<link rel="canonical" href="commands.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Commands — App::Test::Generator">
+<meta property="og:description" content="What each of the ten command-line tools does, and the options it takes.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html" class="current" aria-current="page">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Commands</h1>
+	<p class="lead">
+		Ten scripts, all installed by the distribution. Four carry the daily
+		workflow — generate, extract, mutate, report — and the rest are helpers
+		around them.
+	</p>
+
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Command</th><th>Purpose</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>fuzz-harness-generator</code></td><td>Schema → runnable test file.</td></tr>
+				<tr><td><code>extract-schemas</code></td><td>Perl module → schemas, optionally fuzzed and minimised.</td></tr>
+				<tr><td><code>test-generator-mutate</code></td><td>Mutation testing against your suite.</td></tr>
+				<tr><td><code>test-generator-index</code></td><td>Dashboard HTML from coverage, LCSAJ and mutation data.</td></tr>
+				<tr><td><code>generate-test-dashboard</code></td><td>The whole CI pipeline as one shell script.</td></tr>
+				<tr><td><code>benchmark-generator</code></td><td>Schema → <code>Benchmark::cmpthese</code> script.</td></tr>
+				<tr><td><code>pod-example-tester</code></td><td>POD examples → round-trip test file.</td></tr>
+				<tr><td><code>deploy-workflows</code></td><td>Two GitHub Actions workflows → another repository.</td></tr>
+				<tr><td><code>instrument-modules</code></td><td>Writes the <code>.lcsaj.json</code> path definitions.</td></tr>
+				<tr><td><code>demo_extractor</code></td><td>Self-contained demonstration of schema extraction.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="cmd">
+		<h2 id="fuzz-harness-generator">fuzz-harness-generator</h2>
+		<span class="tag">generate</span>
+	</div>
+<pre><code>fuzz-harness-generator [-r] [-o FILE] schema.yml
+fuzz-harness-generator --dry-run schema.yml
+fuzz-harness-generator --replay-corpus DIR -o t/fuzz_replay.t
+</code></pre>
+	<p>
+		Renders the harness. Without <code>-o</code> it prints the test file to
+		standard output, which is how many projects keep generated tests out of
+		version control. With <code>-r</code> it writes the file to a temporary
+		path, runs it through <code>prove</code> and prints the result, which is
+		how it is used from <code>t/fuzz.t</code>.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Option</th><th>Effect</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>-r</code>, <code>--run</code></td><td>Run the generated harness with <code>prove</code> and report the outcome.</td></tr>
+				<tr><td><code>-o FILE</code></td><td>Write the harness to <code>FILE</code> instead of standard output.</td></tr>
+				<tr><td><code>--dry-run</code></td><td>Parse the schema and report what would be generated, without writing a test file.</td></tr>
+				<tr><td><code>--replay-corpus DIR|FILE</code></td><td>Emit a harness that replays a saved corpus — every recorded input, in a deterministic order — rather than fuzzing afresh.</td></tr>
+				<tr><td><code>-v</code>, <code>--verbose</code></td><td>More diagnostics on standard error.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<div class="cmd">
+		<h2 id="extract-schemas">extract-schemas</h2>
+		<span class="tag">extract</span>
+	</div>
+<pre><code>extract-schemas [options] lib/My/Module.pm
+</code></pre>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Option</th><th>Effect</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>-o DIR</code>, <code>--output-dir DIR</code></td><td>Where the YAML files go. Default <code>schemas/</code>; created if absent.</td></tr>
+				<tr><td><code>-F NAME</code>, <code>--function NAME</code></td><td>Extract everything, then keep only <code>NAME.yml</code> and test only that routine. Prints the available names and exits 1 if <code>NAME</code> does not exist.</td></tr>
+				<tr><td><code>-s MODE</code>, <code>--strict-pod MODE</code></td><td><code>off</code>, <code>warn</code> or <code>fatal</code>: what to do when POD and code disagree about a parameter's type.</td></tr>
+				<tr><td><code>-f</code>, <code>--fuzz</code></td><td>Fuzz the extracted schemas as they are produced.</td></tr>
+				<tr><td><code>--fuzz-iters N</code></td><td>Iterations per method while fuzzing. Default 100.</td></tr>
+				<tr><td><code>--fuzz-all</code></td><td>Fuzz routines that have no input schema too.</td></tr>
+				<tr><td><code>-c DIR</code>, <code>--corpus-dir DIR</code></td><td>Where corpora persist between runs. Default <code>schemas/corpus/</code>.</td></tr>
+				<tr><td><code>--minimize-corpus</code></td><td>Trim each corpus to the smallest subset that still covers every discovered branch.</td></tr>
+				<tr><td><code>-v</code>, <code>--verbose</code></td><td>Show the analysis as it runs.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		<a href="extraction.html">How extraction works</a>, and what the confidence
+		levels mean.
+	</p>
+
+	<div class="cmd">
+		<h2 id="test-generator-mutate">test-generator-mutate</h2>
+		<span class="tag">mutation</span>
+	</div>
+<pre><code>test-generator-mutate --lib lib --tests t
+test-generator-mutate --file lib/My/Module.pm
+test-generator-mutate --min-score 85 --json mutation.json
+</code></pre>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Option</th><th>Effect</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>--lib DIR</code></td><td>The library directory to mutate. Default <code>lib</code>.</td></tr>
+				<tr><td><code>--tests DIR</code></td><td>The test directory to run per mutant. Default <code>t</code>.</td></tr>
+				<tr><td><code>--file PATH</code></td><td>Mutate one file only.</td></tr>
+				<tr><td><code>--json FILE</code></td><td>Write the machine-readable report. <code>mutation.json</code> is what the dashboard reads.</td></tr>
+				<tr><td><code>--min-score N</code></td><td>Exit non-zero if the kill percentage falls below <code>N</code>.</td></tr>
+				<tr><td><code>--changed_only</code>, <code>--base_sha SHA</code></td><td>Mutate only files changed against a git base — the fast mode for a pull request.</td></tr>
+				<tr><td><code>--exclude REGEX</code></td><td>Skip files matching the pattern. Repeatable.</td></tr>
+				<tr><td><code>--cover_json FILE</code></td><td>Use a Devel::Cover report to prioritise mutants in covered code.</td></tr>
+				<tr><td><code>--fail-fast</code></td><td>Stop at the first surviving mutant.</td></tr>
+				<tr><td><code>-v</code>, <code>--verbose</code></td><td>Show each mutant as it is applied and tested.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		<a href="mutation.html">Operators, skip markers and the survivor
+		pipeline</a>.
+	</p>
+
+	<div class="cmd">
+		<h2 id="test-generator-index">test-generator-index</h2>
+		<span class="tag">report</span>
+	</div>
+<pre><code>test-generator-index
+test-generator-index --generate_mutant_tests=t --generate_test=mutant --generate_fuzz
+</code></pre>
+	<p>
+		Reads the artefacts other steps produced and writes the dashboard. It
+		takes no general options beyond the three that drive the mutant-test
+		pipeline; where its inputs live is fixed, so that the CI workflow and a
+		local run cannot disagree.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Option</th><th>Effect</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>--generate_mutant_tests=DIR</code></td><td>Write a TODO-stub test file for every survivor into <code>DIR</code>.</td></tr>
+				<tr><td><code>--generate_test=mutant</code></td><td>For NUM_BOUNDARY survivors, extract the enclosing routine's schema and write a runnable boundary schema into <code>t/conf/</code>.</td></tr>
+				<tr><td><code>--generate_fuzz</code></td><td>Merge survivor boundary values into copies of the existing schemas, as <code>t/conf/mutant_fuzz_*.yml</code>.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		<a href="mutation.html#the-feedback-loop">The feedback loop</a> explains
+		what each of those flags produces.
+	</p>
+
+	<div class="cmd">
+		<h2 id="generate-test-dashboard">generate-test-dashboard</h2>
+		<span class="tag">pipeline</span>
+	</div>
+<pre><code>bin/generate-test-dashboard
+</code></pre>
+	<p>
+		A bash script, not a Perl program. It clears last run's artefacts, builds
+		<code>blib</code>, runs the suite under Devel::Cover, exports JSON
+		coverage, derives LCSAJ targets, runs the suite again under the LCSAJ
+		runtime debugger, merges the per-process hit files, runs mutation testing,
+		writes the mutant schemas and finally calls
+		<code>test-generator-index</code>.
+	</p>
+	<p>
+		It runs the suite twice on purpose: once for statement and branch
+		coverage, once for path coverage. That is why the workflow sets
+		<code>NO_NETWORK_TESTING</code> and why <code>t/fuzz.t</code> keeps its
+		extended-test guard — without them, a CI run takes hours rather than
+		minutes.
+	</p>
+
+	<div class="cmd">
+		<h2 id="benchmark-generator">benchmark-generator</h2>
+		<span class="tag">benchmark</span>
+	</div>
+<pre><code>benchmark-generator -i schemas/abs.yml
+benchmark-generator -i schemas/abs.yml -o benchmarks/abs.pl
+benchmark-generator -i schemas/abs.yml -r
+</code></pre>
+	<p>
+		Each transform in the schema becomes one named variant in a
+		<code>Benchmark::cmpthese</code> call, with representative values derived
+		from that transform's types and bounds. A schema with no transforms
+		produces a single <code>'default'</code> variant. <code>-r</code> writes
+		the script to a temporary file and runs it immediately.
+	</p>
+
+	<div class="cmd">
+		<h2 id="pod-example-tester">pod-example-tester</h2>
+		<span class="tag">generate</span>
+	</div>
+<pre><code>pod-example-tester lib/My/Module.pm
+pod-example-tester --output t/synopsis.t lib/My/Module.pm
+pod-example-tester --no-annotated lib/My/Module.pm
+</code></pre>
+	<p>
+		Collects runnable examples from a module's POD — <code>SYNOPSIS</code>
+		verbatim blocks, <code>=for example begin/end</code> blocks, and indented
+		lines annotated <code># returns value</code> or <code># =&gt; value</code> —
+		and emits one subtest per example. Annotated examples get an
+		<code>is()</code> assertion on the documented result; unannotated blocks
+		are wrapped in <code>eval</code> and checked for "did not die".
+	</p>
+	<p>
+		Two safety filters matter: blocks that contain only shell commands are
+		dropped, and any line that would run <code>system</code>,
+		<code>exec</code>, a backtick or <code>qx</code> is replaced with a note,
+		so a SYNOPSIS that demonstrates invoking a command does not actually run
+		it inside your test suite.
+	</p>
+
+	<div class="cmd">
+		<h2 id="deploy-workflows">deploy-workflows</h2>
+		<span class="tag">ci</span>
+	</div>
+<pre><code>deploy-workflows
+deploy-workflows --target /path/to/my-module
+deploy-workflows --dry-run --target /path/to/my-module
+</code></pre>
+	<p>
+		Copies <code>dashboard.yml</code> and <code>mutate.yml</code> into
+		<code>TARGET/.github/workflows/</code>. Both files are embedded in the
+		script, so it works after a CPAN install with no source tree present. It
+		refuses to overwrite an existing file unless <code>--force</code> is
+		given, and <code>--dry-run</code> prints what it would do without touching
+		the filesystem.
+	</p>
+	<p>
+		The two workflows are portable by design: no shared script under
+		<code>.github/scripts/</code>, because a dependent repository only ever
+		receives the two YAML files.
+	</p>
+
+	<div class="cmd">
+		<h2 id="instrument-modules">instrument-modules</h2>
+		<span class="tag">metrics</span>
+	</div>
+<pre><code>instrument-modules
+instrument-modules lib/My/Module.pm
+</code></pre>
+	<p>
+		Writes a <code>.lcsaj.json</code> control-flow path definition for each
+		module into <code>cover_html/mutation_html/lib/</code>. With no arguments
+		it walks <code>lib/</code> recursively. The dashboard reads these files to
+		compute the TER3 column, and the LCSAJ runtime debugger uses them to
+		record which paths were hit.
+	</p>
+
+	<div class="cmd">
+		<h2 id="demo_extractor">demo_extractor</h2>
+		<span class="tag">demo</span>
+	</div>
+<pre><code>demo_extractor
+</code></pre>
+	<p>
+		Creates a temporary sample module, extracts its schemas, prints them, and
+		compares the result with the expected output. Useful as a tour of what
+		extraction can infer, and as a quick check that the extractor still
+		behaves after an upgrade.
+	</p>
+
+	<h2>Exit codes</h2>
+	<p>
+		The generating and reporting commands follow the usual Perl convention:
+		0 on success, 2 for a usage error, non-zero for a failure.
+		<code>test-generator-mutate</code> additionally exits non-zero when
+		<code>--min-score</code> is not met, which is what makes it usable as a CI
+		gate.
+	</p>
+
+	<div class="pager">
+		<a href="schema.html">← Schema reference</a>
+		<a href="extraction.html">Extraction →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

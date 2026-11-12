@@ -1,0 +1,22 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "messages": [{"string": "SMART overall-health self-assessment test result: FAILED!", "severity": "error"}],
+    "exit_status": 24
+  },
+  "device": {"name": "/dev/sdc", "info_name": "/dev/sdc [SAT]", "type": "sat", "protocol": "ATA"},
+  "model_name": "ST2000DM008-2FR102",
+  "serial_number": "ZFL00001",
+  "smart_support": {"available": true, "enabled": true},
+  "smart_status": {"passed": false},
+  "ata_smart_attributes": {
+    "revision": 10,
+    "table": [
+      {"id": 5, "name": "Reallocated_Sector_Ct", "value": 5, "worst": 5, "thresh": 10, "when_failed": "now", "raw": {"value": 3912, "string": "3912"}},
+      {"id": 197, "name": "Current_Pending_Sector", "value": 100, "worst": 100, "thresh": 0, "when_failed": "", "raw": {"value": 16, "string": "16"}},
+      {"id": 198, "name": "Offline_Uncorrectable", "value": 100, "worst": 100, "thresh": 0, "when_failed": "", "raw": {"value": 16, "string": "16"}}
+    ]
+  },
+  "temperature": {"current": 40}
+}

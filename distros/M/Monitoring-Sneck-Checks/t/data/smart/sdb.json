@@ -1,0 +1,19 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "exit_status": 0},
+  "device": {"name": "/dev/sdb", "info_name": "/dev/sdb [SAT]", "type": "sat", "protocol": "ATA"},
+  "model_name": "WDC WD40EFRX-68N32N0",
+  "serial_number": "WD-WCC7K0000001",
+  "smart_support": {"available": true, "enabled": true},
+  "smart_status": {"passed": true},
+  "ata_smart_attributes": {
+    "revision": 16,
+    "table": [
+      {"id": 5, "name": "Reallocated_Sector_Ct", "value": 200, "worst": 200, "thresh": 140, "when_failed": "", "raw": {"value": 2, "string": "2"}},
+      {"id": 194, "name": "Temperature_Celsius", "value": 114, "worst": 101, "thresh": 0, "when_failed": "", "raw": {"value": 36, "string": "36"}},
+      {"id": 197, "name": "Current_Pending_Sector", "value": 200, "worst": 200, "thresh": 0, "when_failed": "", "raw": {"value": 8, "string": "8"}},
+      {"id": 198, "name": "Offline_Uncorrectable", "value": 100, "worst": 253, "thresh": 0, "when_failed": "", "raw": {"value": 0, "string": "0"}}
+    ]
+  },
+  "temperature": {"current": 36}
+}

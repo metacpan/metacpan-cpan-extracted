@@ -15,7 +15,7 @@ use Readonly;
 # --------------------------------------------------
 Readonly my $DEFAULT_OUT_DIR => 'lcsaj';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ calculation.
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head2 generate
 
@@ -70,7 +70,7 @@ Path to the Perl source file to analyse.
 =item * C<$out_dir>
 
 Directory under which the C<.lcsaj.json> file will be written.
-Optional — defaults to C<lcsaj>.
+Optional - defaults to C<lcsaj>.
 
 =back
 
@@ -90,7 +90,7 @@ file to C<$out_dir>.
 Only named subroutines are analysed. Anonymous subs and file-level
 code are not included. The control flow graph is built using a
 simplified model that treats branching compound statements as
-split points — complex nested structures may not be fully represented.
+split points - complex nested structures may not be fully represented.
 
 =head3 API specification
 

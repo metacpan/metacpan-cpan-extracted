@@ -40,7 +40,7 @@ use Time::HiRes			();
 use Params::Get			();
 use Params::Validate::Strict	qw(validate_strict);
 
-our $VERSION = '0.023.0';
+our $VERSION = '0.023.1';
 
 # The version of Geo::Coder::Free this module asks for: 0.46 added valid_location()
 # and on_error => 'undef', 0.47 added geocode_many(), and 0.48 added the
@@ -184,7 +184,7 @@ Database::BI::Model::Geocode - Resolve a location column to coordinates, once pe
 
 =head1 VERSION
 
-0.023.0
+0.023.1
 
 =head1 SYNOPSIS
 

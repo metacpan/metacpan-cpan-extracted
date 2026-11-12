@@ -3,7 +3,7 @@ package Database::BI::Password;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.0';
+our $VERSION = '0.023.1';
 
 use Carp qw(croak);
 use Digest::SHA qw(hmac_sha256);
@@ -130,7 +130,7 @@ Database::BI::Password - Hash and check the login password
 
 =head1 VERSION
 
-0.023.0
+0.023.1
 
 =head1 SYNOPSIS
 

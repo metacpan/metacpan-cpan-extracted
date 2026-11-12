@@ -13,6 +13,7 @@ build_requires:
   Test::Mojo: '0'
   Test::Most: '0'
   Test::Needs: '0'
+  Test::NoShadow: '0'
   Test::Permissions: v0.1.2
   Test::Returns: '0.005'
   Test::Without::Module: '0'
@@ -53,13 +54,18 @@ requires:
   Digest::SHA: '0'
   Encode: '0'
   Excel::Writer::XLSX: '1.07'
+  Exporter: '0'
   File::Path: '2.07'
   File::Spec: '3.40'
+  File::Temp: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
   HTML::D3: '0.30'
   HTML::TableExtract: '0'
   HTML::TagCloud: '0.38'
   HTTP::Message: '0'
   HTTP::Request: '0'
+  Hash::Util: '0'
   IPC::System::Simple: '0'
   JSON::PP: '0'
   LWP::UserAgent: '0'
@@ -82,6 +88,7 @@ requires:
   Statistics::Lite: '3.62'
   Sub::Protected: '0.03'
   Text::CSV: '0'
+  Time::HiRes: '0'
   URI: '0'
   Unicode::Normalize: '0'
   perl: '5.028000'
@@ -89,5 +96,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-BI
   repository: https://github.com/nigelhorne/Database-BI.git
-version: 0.023.0
+version: 0.023.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

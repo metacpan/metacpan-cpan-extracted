@@ -17,7 +17,7 @@ $Data::Dumper::Indent = 0; $Data::Dumper::Terse = 1; $Data::Dumper::Sortkeys = 1
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 260;
+plan tests => 323;
 $mw->geometry('+10+10');
 
 my @log;			# names of the objects destroyed, in order
@@ -540,6 +540,90 @@ is_deeply(freed { $t->editRedo }, [], 'nor the redo');
 is(nv('1.4', 0), 'later', 'which gives the value back');
 $t->blockNodedata('1.4', 0, undef);
 $t->editReset;
+
+# BUGS 31: the same when the place of such a leaf after the undo is a
+# leaf of the re-created block.  With {xa{b|c|d}y} (G nested in F),
+# deleting "{b" dissolves G: its separators make the leaves "c" and
+# "dy" of F.  Values set on them then went, with the undo, to G's
+# leaves c and d (told restore), and the redo, which dissolves G
+# again, took them into the step with G's values.  They wait in the
+# step (told stash; "dy" joins "xa" when the undo takes the remains
+# out, told move first) and the redo gives them back to c and dy.
+{
+  my @told;
+  my $bugs31 = sub {
+    my ($vals) = @_;		# values on the nodes before the deletion
+    fresh("xabcdy\n");
+    $t->blockInsert('F', '1.0', '1.6');
+    $t->blockInsert('G', '1.3', '1.6');
+    $t->blockSplit('1.6', 0);
+    $t->blockSplit('1.5', 0);
+    is(text(), '{xa{b|c|d}y}', 'BUGS 31: a block nested in a leaf');
+    if ($vals) {
+      $t->blockNodedata('1.1', 0, V->new('xa'));
+      $t->blockNodedata('1.4', -1, V->new('G'));
+      $t->blockNodedata($_->[0], 0, V->new($_->[1]))
+	for ['1.4', 'b'], ['1.6', 'c'], ['1.8', 'd'];
+    }
+    $t->editReset;
+    my $before = state();
+    is_deeply(freed { $t->delete('1.3', '1.5') }, [], 'deleting {b frees nothing');
+    is(text(), '{xa|c|dy}', 'dissolves G in F');
+    my $after = state();
+    $t->blockNodedata('1.4', 0, V->new('C'));
+    $t->blockNodedata('1.6', 0, V->new('DY'));
+    my $set = state();
+    $t->configure(-valuecommand => sub {
+      my (undef, $ev, $kind, $where, $v, $cause) = @_;
+      push @told, join ' ', $ev, $kind, Dumper($where), ref $v ? $v->{n} : 'undef', $cause;
+    });
+    for my $round (1, 2) {
+      @told = ();
+      is_deeply(freed { $t->editUndo }, [], "undo $round frees nothing");
+      is(state(), $before, "undo $round: the state before the deletion");
+      is(nv('1.6', 0), $vals ? 'c' : undef, "undo $round: G's leaf c as it was");
+      is(nv('1.8', 0), $vals ? 'd' : undef, "undo $round: and d");
+      is(nv('1.1', 0), $vals ? 'xa' : undef, "undo $round: and F's leaf");
+      my @expect = ("stash node ['1.4',0] C undo");
+      push @expect, $vals ? "stash node ['1.6',0] DY undo"
+			  : ("move node ['1.6',0,['1.1',0]] DY undo",
+			     "stash node ['1.1',0] DY undo");
+      is_deeply([grep { / (C|DY) / } @told], \@expect,
+		"undo $round: C and DY told stash");
+      @told = ();
+      is_deeply(freed { $t->editRedo }, [], "redo $round frees nothing");
+      is(state(), $set, "redo $round: the state with C and DY");
+      is(nv('1.4', 0), 'C', "redo $round: C on the leaf c of F");
+      is(nv('1.6', 0), 'DY', "redo $round: DY on the leaf dy");
+      is_deeply([grep { / (C|DY) / } @told],
+		["restore node ['1.4',0] C redo", "restore node ['1.6',0] DY redo"],
+		"redo $round: C and DY told restore");
+      ok(!grep({ /^late/ } @told), "redo $round: nothing late");
+    }
+    $t->configure(-valuecommand => undef);
+    my $gone = freed { $t->editReset };
+    is_deeply([sort @$gone], [$vals ? qw(G b c d) : ()],
+	      'edit reset frees what the step kept');
+    $gone = freed { $t->delete('1.0', 'end'); $t->editReset };
+    is_deeply([sort @$gone], [sort('C', 'DY', $vals ? 'xa' : ())],
+	      'C and DY once, when deleted');
+  };
+  $bugs31->(0);
+  $bugs31->(1);
+}
+
+# BUGS 29: a separator of a level above 0 that the undo of a deletion
+# re-creates loses the tags the deleted range had off on it.
+fresh("abcd\n");
+$t->blockInsert('F', '1.0', '1.4');
+$t->blockSplit('1.3', 1);			# {ab|cd}, the separator of level 1
+$t->tagAdd('b', '1.0', '1.end');
+$t->tagRemove('b', '1.3');
+$t->editReset;
+roundtrip('the deletion of b|c', sub { $t->delete('1.2', '1.5') });
+$t->editUndo;
+is_deeply([$t->tagRanges('b')], ['1.0', '1.3', '1.4', '1.7'],
+	  'the separator is not tagged after the undo');
 
 is_deeply(freed { $t->destroy; $mw->update }, [], 'nothing left');
 $mw->destroy;

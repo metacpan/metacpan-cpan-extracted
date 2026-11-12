@@ -2,6 +2,36 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.13.1 - 2026-11-11
+
+### Fixes
+
+- Say the free plan's daily trial and Unlimited, the free plan, and re-pin the spec ([`913a201`](https://github.com/vpndetection-io/sdk-perl/commit/913a2015f7f113217906aa8b0ef01b6e78589a80))
+
+## 3.13.0 - 2026-11-11
+
+### Features
+
+- Add trial_expired for a trial key's answers, and re-pin the spec ([`726bf3e`](https://github.com/vpndetection-io/sdk-perl/commit/726bf3e86903a48bfab49c4afeaa6f30ffa335c5))
+
+## 3.12.2 - 2026-11-11
+
+### Fixes
+
+- Name the Unlimited tier and its terms, and re-pin the spec ([`bbc1056`](https://github.com/vpndetection-io/sdk-perl/commit/bbc1056ba07626b4dbc464747356d198eb4cfe7e))
+
+## 3.12.1 - 2026-11-11
+
+### Fixes
+
+- Re-pin the spec's 2026.11.11 rebuild: plainer words on lookups without a key ([`d8e0427`](https://github.com/vpndetection-io/sdk-perl/commit/d8e0427a42cd22b651b75e9d724e27e0015a17a6))
+
+## 3.12.0 - 2026-11-11
+
+### Features
+
+- Re-pin the spec to 2026.11.11: a lookup without a key answers more ([`b2a1f78`](https://github.com/vpndetection-io/sdk-perl/commit/b2a1f78ae59f0b636463bf54fb7318bc5506304a))
+
 ## 3.11.1 - 2026-11-09
 
 ### Fixes

@@ -1,0 +1,5 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "argv": ["smartctl", "--scan-open", "-j"], "exit_status": 0},
+  "devices": []
+}

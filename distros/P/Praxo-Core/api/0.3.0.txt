@@ -1,4 +1,4 @@
-# PRAXO-CORE Perl API 0.1.1
+# PRAXO-CORE Perl API 0.3.0
 # SPEC_VERSION 0.2.0
 
 Praxo::Agent::Agent::new

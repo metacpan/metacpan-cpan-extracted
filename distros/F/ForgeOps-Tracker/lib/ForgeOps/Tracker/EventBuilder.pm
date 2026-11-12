@@ -49,7 +49,8 @@ sub new {
 # message as it would otherwise have been sent, so after scrub_pii, which is also what the server
 # fingerprints from a client without strict privacy, and keeps a message holding an email grouping
 # together), and breadcrumbs, endpoint, the SQL statement, source context, the user's
-# email/username and every context/tag key not in privacy_allowed_fields are left out.
+# email/username and every context/tag key not in privacy_allowed_fields are left out. The user's
+# id is sent only as a keyed hash, and only when privacy_user_key is set.
 sub build {
     my ($self, $error, $context, $user, $breadcrumbs, $request) = @_;
     $context ||= {};
@@ -79,7 +80,7 @@ sub build {
 
     my $payload = $config->{scrub_pii} ? $self->_scrub_payload(\%payload) : \%payload;
     return $payload unless $config->{strict_privacy};
-    return ForgeOps::Tracker::StrictPrivacy::event($payload, $config->{privacy_allowed_fields});
+    return ForgeOps::Tracker::StrictPrivacy::event($payload, $config->{privacy_allowed_fields}, $config->{privacy_user_key});
 }
 
 # See SqlStatement for what's read off the error and how it's masked. The statement itself only

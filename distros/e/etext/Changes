@@ -1,3 +1,189 @@
+2.08 (2026-11-12):
+	Ornaments (the manual's new section "Ornaments"; provisional):
+	lines, polygons, rectangles and ovals drawn over or under the
+	text, whose coordinates are reference points computed from the
+	places where characters are drawn (the anchors of the box of a
+	character or of a range, their weighted means, offsets, the x
+	of one point with the y of another, minima and maxima), computed
+	anew at every redisplay; with marks in their indices they follow
+	the text.  Subcommand "ornament" (create, delete, names,
+	configure, cget, points, coords, point).  Test t/ornament.t.
+	Private marks: an index of an ornament that names no mark and no
+	tag becomes a mark of the ornament's own, invisible to the
+	program (mark names/next/previous, dump, block list; names
+	starting with \001 are reserved), so that the point stays on its
+	character; the wrappers [leftward => INDEX] and [rightward =>
+	INDEX] make one of a given gravity.  An ornament all of whose
+	indices are private marks is deleted with its text (option
+	-keep prevents it); undo does not bring it back.  The stand-in
+	of a position that is not displayed takes the x the position had
+	when last displayed (else the middle of the text area, or with
+	the new widget option -ornamentproportional the place
+	proportional to its offset in its line): no line is laid out for
+	it any more.
+	New points [line => I1, I2, N, ANCHOR] (the piece of a range on
+	its N-th display line) and [outline => I1, I2] (all the corners
+	of a range's outline, in a line or a polygon); anchors mw, m, me
+	(the mid line) and [FX, FY] (fractions of the box).
+	Types arc (-start, -extent, -style as on a canvas) and text
+	(-text, -font, -anchor); distances of an offset in em and ex of
+	the font of its point (emmin, emmid, emmax, exmin, exmid, exmax
+	for the fonts of a range); the point [yx => P1, P2].
+	"mark next" skipped a mark at the very start of the first leaf of
+	a block; "mark previous" missed the marks in the leaves of a block
+	before the index but the first, and those after the block on its
+	line (BUGS 35).
+	A layout callback may return ornaments of the block among its
+	lists: [TYPE, X1, Y1, ..., -option => value, ...], in pixels
+	from the top left corner of the block, with the options of
+	"ornament create"; drawn with the block every time it is drawn,
+	under its text (among the stolen lines, in the order returned)
+	or over it; not leaves; their options are parsed once per
+	layout and kept with it.  A bad one is a background error, as
+	other bad results.  (Manual: "Layout callback", "Ornaments of
+	blocks".)
+	Templates on a block type: "block configure TYPE -ornaments
+	LIST", ornaments drawn for every displayed block of the type,
+	whose points are computed from the boxes of the block and of its
+	leaves with the new points [leaf => K, ANCHOR] and [block =>
+	ANCHOR] (and mix, offset, xy, yx, min, max of them; no indices).
+	A template naming a leaf that is missing or not shown is not
+	drawn for that block.  "block cget TYPE -ornaments" gives the
+	list.
+	Demo: the strokes are ornaments instead of stolen lines (block
+	addline still works, for the LR delimiters and the backgrounds):
+	the Radical's sign is a broken line its layout callback returns,
+	that grows with the contents (a tick, a stroke down to the bottom,
+	up to the top left of the contents, the bar over them) instead of
+	a glyph with a vertical line added for tall contents; the
+	Fraction's bar is a template (-ornaments of the type); the rules
+	of Table and SpanTable and the lines of Std are black rectangles
+	returned by their callbacks.  The tests that looked at the
+	stolen lines of layout results look at the ornaments.
+	Demo: a menu "Ornaments": "Box under selection" (a light filled
+	rectangle under the selected text), "Arrow from mark" (the first
+	use remembers the start of the selection in the mark ornArrowFrom,
+	the second draws an arched red arrow from there to the selection),
+	"Brace under selection" (an underbrace, a smoothed line sized in
+	em), "Remove all".  Their indices are the selection's ends,
+	private marks of the ornaments.  Test t/demo-ornaments.t.
+	A smoothed ornament that is straight on a half pixel no longer
+	jitters between two rows of pixels (rounding).
+
+2.07 (2026-11-12):
+	"bbox" of a position inside a leaf of a block that has been drawn
+	was off downwards by the top of the block in the window (BUGS 32).
+	"bbox" of the tail of a block at the end of a display line reached
+	to the right edge of the window, not just over its last leaf
+	(BUGS 33).
+	A mouse position beyond the end of a wrapped display line ending
+	with a multi-byte character ("@x,y", the mark "current") was inside
+	the character; a mark set there split it into NUL bytes (BUGS 34).
+	Demo: two block types whose layout callbacks take the tree as it
+	is: OpLimits, a big operator with limits R( op | Lower( l1 | l2 )
+	| upper | index ) (a ragged tree; flattened, empty, missing and
+	extra parts laid out too), and SpanTable, a table whose cells span
+	columns and rows by their values ({ cols => 2, rows => 3 } or
+	"2x3"; HTML's rule for the slots covered; the columns and rows a
+	cell does not fit in grow; rules between the cells).  The demo's
+	blockInsert writes down any tree (Tk::Text::Node), values
+	(Tk::Text::Valued), instance data and tagged strings.  Tests
+	t/demo-oplimits.t, t/demo-table.t; t/display-random.t lays them
+	out after random edits (ETEXT_DISPLAY_RANDOM for more seeds).
+	Demo: blocks re-created by File/Open (save.tsf) and Edit/Int Paste
+	get their instance data and node values back (a SpanTable kept
+	no spans).
+
+2.06 (2026-11-11):
+	Ragged trees: the leaves of a block's tree may be at different
+	depths (the manual's new section "Ragged trees").  The widget
+	keeps the stored tree uniform, a shallower leaf hanging from its
+	parent through padding nodes (a flag in the node), which no
+	command names; every command that names nodes follows the real
+	tree: block at and block of (a node is a list of its children,
+	leaves and nodes side by side), block nodedata (levels count real
+	ancestors from the leaf; negative levels from the root), the
+	addresses of values in undo steps and in -valuecommand's $where
+	(where the node's first leaf starts, the level counted from that
+	leaf), block trim, and the layout callback's arguments (with
+	-layoutdepth, a shallower leaf is presented inside lists of one
+	element down to that depth).  The uniform tree shows only in
+	block list and in the levels of block split.
+	New command "block sprout index1 ?index2?": with two indices the
+	leaf holding the range becomes three children of its parent, the
+	text before the range, a new node holding the range as its only
+	leaf, and the text after it (a range that starts on the delimiter
+	before the leaf, or ends just after the one after it, makes no
+	start or end piece); with one index (decision O8) the leaf the
+	index names gets a new node above it, the only leaf of a block
+	included.  Returns the number of separators put in.
+	New command "block flatten index level": the node "level" real
+	levels above the leaf of index becomes one leaf; at the root the
+	block becomes a single leaf (block at gives one number, block list
+	the depth -1, the layout callback gets the leaf alone, nodedata 0
+	and -1 name it; a newline, a split or block sprout give it a root
+	again).  Returns the number of separators deleted.
+	Deletions that join two leaves of different depths first give the
+	shallower one new nodes (WRAPs) until both are equally deep, then
+	join them as before; a newline typed in a leaf, and block split at
+	level 0, make a sibling at the leaf's depth.
+	Format change of block list (decision L1): the separator before a
+	leaf with padding is a pair [depth, defect] (a blessed array of
+	class Tk::Text::BlockSeparator, the defect being the number of
+	padding nodes above the leaf), and a padded first leaf gets
+	[undef, defect] in front of it; the list of a tree whose leaves are
+	equally deep is as before.  A single-leaf block has the depth -1.
+	The undo and the redo of every structural edit are exact for
+	ragged trees: the tree, the padding and the values come back (the
+	undo is the inverse sequence of the edit's steps; its lists carry
+	the padding).  block sprout and block flatten are recorded for
+	undo, each a kind of edit of its own for -autoseparators.
+	-valuecommand: the steps of block sprout, block flatten and of
+	deletions across depths are told one by one (a WRAP or a PULL OUT
+	changes the level in the address of the nodes above: "move" with
+	the place after the step); new event "copy" for the value block
+	sprout shares between the pieces; new event "new" (decision O5,
+	option A), told before a change for each node or leaf it creates
+	without a value, with its place after the change and the value
+	undef (newlines in blocks, block split, block insert, block sprout,
+	the WRAPs of a deletion, the leaves a dissolved block leaves in the
+	block around it, a single-leaf block's new root); not told for what
+	an undo or a redo re-creates.  block split now tells "move" for
+	the root's value when it adds levels: it inserts the new nodes
+	between the root and its children, so the root's address grows.
+	The error of block nodedata for a level beyond the root says
+	"... has N levels above this leaf" (it said "above its leaves").
+	PROVISIONAL (BUGS 28): which sequence of steps an edit uses (block
+	flatten's recipe, a deletion's WRAPs of the shallower leaf), the
+	value rules of the steps (a join keeps the start side's value; a
+	pull out the node's; block sprout shares the former leaf's value),
+	and the -valuecommand events of these commands ("copy", "new", the
+	steps told one by one).
+	Fixed (BUGS 29, since 2.01): the undo of a deletion inside a block
+	re-created the separators of level above 0 with the tags of the
+	place, also those the deleted range had off there.
+	Fixed (BUGS 30, since 2.05): -getflags was ORed into the widget's
+	own text extractions, so reserved bits changed what block list and
+	the undo's records contained (0x200 left the node values out).
+	The widget now uses only the documented bits and ignores the
+	others.
+	Fixed (BUGS 31, since 2.05): a value set, after a deletion that
+	dissolved a nested block, on a leaf the dissolution made in the
+	enclosing block went, with the undo, to the leaf of the re-created
+	block at the same place, and the redo, which dissolves that block
+	again, took it into the undo step with the block's values: the
+	leaf came back without it.  Such a value now waits in the undo
+	step (told "stash"), as one whose place does not exist after the
+	undo does (BUGS 26), and the redo gives it back to the leaf of the
+	enclosing block (told "restore").  The random -valuecommand test
+	no longer lets an undo or a redo leave a node without a value.
+	Tests: t/ragged.t, t/flatten.t, t/getflags.t; t/stress.t and
+	t/valuecommand-random.t edit ragged trees at random, undo and redo
+	at once and compare the block list with values and the shape of
+	every block; the random -valuecommand test checks in half of its
+	widgets, where every node has a value before each command, that
+	every node a command creates is told "new".
+
 2.05 (2026-11-10):
 	The values the widget keeps for Perl (on the nodes and leaves of
 	blocks, marks, runs of tags, and as the instance data of blocks)

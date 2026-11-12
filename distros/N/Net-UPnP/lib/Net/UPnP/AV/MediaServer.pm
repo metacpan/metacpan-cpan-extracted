@@ -147,7 +147,7 @@ sub getcontentlist {
 	);
 	if (defined $args{max_items}) {
 		croak 'Invalid content item limit' unless $args{max_items} =~ /\A\d+\z/
-			&& POSIX::isfinite(0 + $args{max_items}) && $args{max_items} > 0;
+			&& Net::UPnP::HTTP::_isfinite(0 + $args{max_items}) && $args{max_items} > 0;
 	}
 	my (
 		@content_list,
@@ -271,7 +271,7 @@ sub walkcontent {
     foreach my $key (qw(max_depth max_nodes timeout)) {
         my $pattern = $key eq 'timeout' ? qr/\A\d+(?:\.\d+)?\z/ : qr/\A\d+\z/;
         croak "Invalid walk $key" unless defined($options{$key})
-            && $options{$key} =~ $pattern && POSIX::isfinite(0 + $options{$key})
+            && $options{$key} =~ $pattern && Net::UPnP::HTTP::_isfinite(0 + $options{$key})
             && $options{$key} > 0;
     }
     $this->{walk_error} = '';

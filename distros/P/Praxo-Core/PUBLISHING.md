@@ -4,8 +4,8 @@
 
 Source tag `perl/v0.1.1` maps to CPAN distribution `Praxo-Core` version
 `0.1.1`. The distribution provides the root package `Praxo::Core` and the
-`Praxo::Agent` modules. The release workflow is
-`.github/workflows/perl-release.yml`.
+`Praxo::Agent` modules. PAUSE accepted `0.1.1`; MetaCPAN indexing is pending.
+The release workflow is `.github/workflows/perl-release.yml`.
 
 ## Build
 

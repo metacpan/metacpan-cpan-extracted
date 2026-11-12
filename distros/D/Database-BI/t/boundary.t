@@ -56,8 +56,8 @@ subtest 'point_key rounds a point to three places' => sub {
 	is($class->point_key(91, 0), undef, 'latitude out of range');
 	is($class->point_key(0, -181), undef, 'longitude out of range');
 	is($class->point_key('x', 1), undef, 'not a number');
-	is_deeply([ $class->levels ], [ 'county' ], 'county is the only level');
-	throws_ok { $class->new(level => 'state') } qr/Unknown boundary level 'state'/, 'another level is refused';
+	is_deeply([ $class->levels ], [qw(country state county city town neighbourhood)], 'the levels, largest first');
+	throws_ok { $class->new(level => 'shire') } qr/Unknown boundary level 'shire'/, 'another level is refused';
 };
 
 subtest 'points in one county cost one request' => sub {
@@ -385,8 +385,8 @@ subtest 'bounds=county draws the outlines as one named layer' => sub {
 
 subtest 'an unknown bounds= is refused' => sub {
 	my $t = fresh_app();
-	$t->get_ok("$map&bounds=state")->status_is(400)
-		->content_like(qr/bounds= must be "county"/);
+	$t->get_ok("$map&bounds=shire")->status_is(400)
+		->content_like(qr/bounds= must be one of country, state, county, city, town, neighbourhood, not "shire"/);
 };
 
 subtest 'a browser gets a progress bar for the outlines not known' => sub {
@@ -422,7 +422,7 @@ subtest 'a browser gets a progress bar for the outlines not known' => sub {
 			->json_like('/error' => qr/not listed by a map page/);
 		$t->post_ok('/geo/boundary' => form => { point => '10.100,20.100' })->status_is(400)
 			->json_like('/error' => qr/needs point= and the sig=/);
-		$t->post_ok('/geo/boundary' => form => { %{ $items[0] }, level => 'state' })->status_is(400);
+		$t->post_ok('/geo/boundary' => form => { %{ $items[0] }, level => 'shire' })->status_is(400);
 	});
 
 	# Cancelled: what the cache knows, and a note for the rest.
@@ -1011,5 +1011,198 @@ SKIP: {
 			'the outline is given both colours to draw side by side');
 	};
 }
+
+# ---------------------------------------------------------------------------
+# The other levels (0.023.1): country, state, city, town, neighbourhood.  Each
+# is a plan of tries, a zoom and the ranks an answer may have, as Nominatim
+# answered in November 2026 (see %LEVELS in Boundary.pm).
+# ---------------------------------------------------------------------------
+my @LEVELS_WORLD = (
+	{ name => 'Canada',       id => 900, box => [ 42, -140, 70, -52 ],  rank => 4,  country => 'ca' },
+	{ name => 'Ontario',      id => 901, box => [ 42, -95, 56, -75 ],   rank => 8,  country => 'ca' },
+	{ name => 'Saskatchewan', id => 902, box => [ 49, -110, 60, -102 ], rank => 8,  country => 'ca' },
+	{ name => 'Toronto',      id => 903, box => [ 43.5, -79.7, 43.9, -79.1 ], rank => 12, country => 'ca' },
+	{ name => 'Toronto Centre', id => 904, box => [ 43.6, -79.4, 43.7, -79.3 ], rank => 18, country => 'ca' },
+	{ name => 'Financial District', id => 905, box => [ 43.64, -79.39, 43.66, -79.37 ], rank => 20, country => 'ca' },
+
+	{ name => 'United Kingdom', id => 910, box => [ 49, -8, 61, 2 ],    rank => 4,  country => 'gb' },
+	{ name => 'England',      id => 911, box => [ 50, -6, 55.8, 2 ],    rank => 8,  country => 'gb' },
+	{ name => 'Kent',         id => 912, box => [ 51, 0, 51.5, 1.5 ],   rank => 12, country => 'gb' },
+	{ name => 'Thanet',       id => 913, box => [ 51.3, 1.2, 51.4, 1.45 ], rank => 16, country => 'gb' },
+	{ name => 'Margate',      id => 914, box => [ 51.36, 1.34, 51.4, 1.42 ], rank => 18, country => 'gb', place => 'town' },
+	{ name => 'Cliftonville', id => 915, box => [ 51.38, 1.39, 51.4, 1.42 ], rank => 19, country => 'gb', place => 'suburb', point => 1 },
+	{ name => 'Westbrook Bay', id => 916, box => [ 51.38, 1.34, 51.4, 1.37 ], rank => 19, country => 'gb', place => 'suburb', way => 1 },
+	# A parished town: the parish, and the next town along as a point
+	{ name => 'Westgate-on-Sea', id => 930, box => [ 51.37, 1.32, 51.39, 1.335 ], rank => 20, country => 'gb' },
+	{ name => 'Birchington', id => 931, box => [ 51.36, 1.29, 51.39, 1.335 ], rank => 18, country => 'gb', place => 'town', point => 1 },
+	# York: a unitary authority, and the city only as a point
+	{ name => 'York',         id => 917, box => [ 53.8, -1.3, 54.1, -0.9 ], rank => 12, country => 'gb' },
+	{ name => 'York (the point)', id => 918, box => [ 53.8, -1.3, 54.1, -0.9 ], rank => 16, country => 'gb', place => 'city', point => 1 },
+
+	{ name => 'Waikato',       id => 920, box => [ -39, 174.5, -37, 176 ], rank => 8,  country => 'nz' },
+	{ name => 'Hamilton City', id => 921, box => [ -37.9, 175.2, -37.7, 175.4 ], rank => 12, country => 'nz' },
+	{ name => 'Auckland',      id => 922, box => [ -37, 174, -36, 175.5 ], rank => 8,  country => 'nz' },
+	{ name => 'Waitemata',     id => 923, box => [ -36.9, 174.7, -36.8, 174.8 ], rank => 16, country => 'nz' },
+);
+my ($TORONTO, $SASKATOON) = ([ 43.65, -79.38 ], [ 52.13, -106.67 ]);
+my ($MARGATE, $CLIFTONVILLE, $WESTBROOK, $CANTERBURY, $YORK) =
+	([ 51.37, 1.38 ], [ 51.39, 1.405 ], [ 51.39, 1.35 ], [ 51.28, 1.08 ], [ 53.96, -1.08 ]);
+my ($HAMILTON, $AUCKLAND) = ([ -37.79, 175.28 ], [ -36.85, 174.76 ]);
+
+sub names_of { return [ map { $_->{properties}{name} } @{ $_[0]{features} } ] }
+
+subtest 'states and provinces, and countries' => sub {
+	my $ua = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	my $b  = boundary(ua => $ua, level => 'state');
+	my $r  = $b->outlines([ $TORONTO, $SASKATOON, [ 44.3, -78.3 ] ]);
+	is_deeply(names_of($r), [ 'Ontario', 'Saskatchewan' ], 'the province each point is in');
+	is_deeply([ zooms($ua->asked) ], [ 5, 5 ], 'one request a province, at state zoom');
+	like(($ua->asked)[0], qr/[?&]polygon_threshold=0\.01(?:&|\z)/, 'simplified more than a county is');
+	is($r->{features}[0]{properties}{called}, 'province', 'called a province in Canada');
+	is($b->name_for('in'), 'state', 'a state in India');
+	is($b->name_for('nz'), 'region', 'a region in New Zealand');
+	is(Database::BI::Model::Boundary->level_name('state'), 'state', 'and a state before the country is known');
+	is(Database::BI::Model::Boundary->level_name('shire'), undef, 'level_name of no level');
+
+	$ua = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	$r  = boundary(ua => $ua, level => 'country')->outlines([ $TORONTO, $SASKATOON, $MARGATE ]);
+	is_deeply(names_of($r), [ 'Canada', 'United Kingdom' ], 'the country each point is in');
+	is_deeply([ zooms($ua->asked) ], [ 3, 3 ], 'at country zoom');
+	is($r->{features}[0]{properties}{called}, 'country', 'called a country');
+};
+
+subtest 'a city is an area at zoom 10, or the authority round a point' => sub {
+	my $ua = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	my $b  = boundary(ua => $ua, level => 'city');
+	my $r  = $b->outlines([ $TORONTO ]);
+	is_deeply(names_of($r), [ 'Toronto' ], 'Toronto, rank 12 at zoom 10');
+	is_deeply([ zooms($ua->asked) ], [ 10 ], 'in one request');
+
+	$ua->clear;
+	$r = $b->outlines([ $MARGATE, $CANTERBURY ]);
+	is_deeply(names_of($r), [ 'Thanet', 'Kent' ],
+		'an English district, rank 16; where there is none, the rank 12 authority the point is in');
+	is($r->{features}[0]{properties}{called}, 'district', 'called a district in England');
+	is_deeply([ zooms($ua->asked) ], [ 10, 10 ], 'a request each');
+
+	$ua->clear;
+	$r = $b->outlines([ $YORK ]);
+	is_deeply(names_of($r), [ 'York' ], 'a city mapped as a point: the authority round it');
+	is_deeply([ zooms($ua->asked) ], [ 10, 8 ], 'from the second try');
+	$ua->clear;
+	$b->outlines([ $YORK, [ 53.9, -1.0 ] ]);
+	is(scalar($ua->asked), 0, 'and remembered: another point in it asks nothing');
+};
+
+subtest 'a New Zealand city is its territorial authority' => sub {
+	my $ua = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	my $b  = boundary(ua => $ua, level => 'city');
+	my $r  = $b->outlines([ $HAMILTON, $AUCKLAND ]);
+	is_deeply(names_of($r), [ 'Hamilton City', 'Auckland' ], 'Hamilton City, and Auckland, whose authority is its region');
+	is_deeply([ zooms($ua->asked) ], [ 10, 8, 8 ],
+		'the usual zoom names the country, then New Zealand\'s; the next point at that at once');
+	is($r->{features}[0]{properties}{called}, 'district', 'called a district');
+};
+
+subtest 'towns and neighbourhoods: places mapped as areas, not points' => sub {
+	my $ua = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	my $r  = boundary(ua => $ua, level => 'town')->outlines([ $MARGATE, $CLIFTONVILLE, $TORONTO ]);
+	is_deeply(names_of($r), [ 'Margate', 'Toronto Centre' ], 'a place=town relation, and a ward');
+	is_deeply([ zooms($ua->asked) ], [ 12, 12 ], 'at town zoom, Cliftonville inside Margate');
+	$ua->clear;
+	$r = boundary(ua => $ua, level => 'town')->outlines([ [ 51.38, 1.33 ] ]);
+	is_deeply(names_of($r), [ 'Westgate-on-Sea' ], 'a town that is a civil parish, where zoom 12 gives a point');
+	is_deeply([ zooms($ua->asked) ], [ 12, 14 ], 'from the second try');
+
+	$ua = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	my $b = boundary(ua => $ua, level => 'neighbourhood');
+	$r = $b->outlines([ $CLIFTONVILLE, $WESTBROOK, $TORONTO ]);
+	is_deeply(names_of($r), [ 'Westbrook Bay', 'Financial District' ],
+		'a suburb mapped as an area and an administrative neighbourhood; a suburb that is a point has no outline');
+	is_deeply([ map { $_->{properties}{osm} } @{ $r->{features} } ], [ 'W916', 'R905' ], 'a way is told from a relation');
+	is($r->{counts}{nowhere}, 1, 'the point is nowhere');
+	like(($ua->asked)[0], qr/[?&]zoom=14&/, 'at neighbourhood zoom');
+	like(($ua->asked)[0], qr/[?&]polygon_threshold=0\.0002(?:&|\z)/, 'in more detail than a county');
+	$ua->clear;
+	$r = $b->outlines([ $CLIFTONVILLE ]);
+	is(scalar($ua->asked), 0, 'and is remembered as nowhere');
+	is($r->{counts}{nowhere}, 1, 'still nowhere');
+	is($b->lookup_point('51.390,1.405')->{status}, 'nowhere', 'for lookup_point too');
+};
+
+subtest 'one area at two levels is kept at each level\'s detail' => sub {
+	my $ua    = BI::Test::Boundary->new(areas => \@LEVELS_WORLD);
+	my $cache = CHI->new(driver => 'Memory', global => 0);
+	boundary(ua => $ua, cache => $cache, level => 'state')->outlines([ $AUCKLAND ]);
+	boundary(ua => $ua, cache => $cache, level => 'city')->outlines([ $AUCKLAND ]);
+	is($cache->get('outline:R922:0.01')->{detail}, '0.01', 'Auckland the region');
+	is($cache->get('outline:R922:0.0005')->{detail}, '0.0005', 'and Auckland the city');
+	$ua->clear;
+	my $r = boundary(ua => $ua, cache => $cache, level => 'state')->outlines([ $AUCKLAND ]);
+	is(scalar($ua->asked), 0, 'neither fetched over the other');
+	is_deeply(names_of($r), [ 'Auckland' ], 'and the state still drawn');
+
+	# A county keeps the key it had in 0.023.0, so that cache is still read.
+	boundary(ua => $ua, cache => $cache)->outlines([ $TORONTO ]);
+	ok($cache->get('outline:R903'), 'a county outline is under its plain key');
+	# As is a point 0.023.0 found nowhere, which it kept with its rank alone.
+	$cache->set('point:county:50.000,50.000', { country => '', rank => 12 });
+	$ua->clear;
+	$r = boundary(ua => $ua, cache => $cache)->outlines([ [ 50, 50 ] ]);
+	is(scalar($ua->asked), 0, 'nowhere from 0.023.0 is not asked again');
+	is($r->{counts}{nowhere}, 1, 'and is still nowhere');
+};
+
+subtest 'bounds=state on the map page' => sub {
+	my $csv = File::Spec->catfile($data, 'canada.csv');
+	open my $fh, '>', $csv or die $!;
+	print {$fh} "name,lat,lon\nToronto,43.65,-79.38\nSaskatoon,52.13,-106.67\n";
+	close $fh;
+	my $canada = '/map?l=' . url_escape("path:$csv") . '&lat=lat&lon=lon';
+
+	my $t = fresh_app();
+	with_fakes(BI::Test::Boundary->new(areas => \@LEVELS_WORLD), sub {
+		$t->get_ok("$canada&bounds=state&geocode=wait")->status_is(200)
+			->content_like(qr/with 2 province outlines\./, 'the summary counts provinces');
+	});
+	my (undef, %opts) = @{ $Fake::OSM::geojson[0] };
+	is($opts{name}, 'Province boundaries', 'and the layer is named for them');
+
+	# Not looked up yet: the level's own word, since no country is known.
+	$t = fresh_app();
+	$t->app->config->{map_geocode_online} = 0;
+	with_fakes(BI::Test::Boundary->new(areas => \@LEVELS_WORLD), sub {
+		$t->get_ok("$canada&bounds=state")->status_is(200)
+			->content_like(qr/2 of 2 places have no state outline: outlines come from OpenStreetMap/);
+		$t->get_ok("$canada&bounds=neighbourhood")->status_is(200)
+			->content_like(qr/2 of 2 places have no neighbourhood outline:/);
+	});
+
+	$t = fresh_app();
+	with_fakes(BI::Test::Boundary->new(areas => \@LEVELS_WORLD), sub {
+		$t->get_ok("$canada&bounds=town", { Accept => 'text/html' })->status_is(200)
+			->content_like(qr/Looking up\s+2 town outlines\s+that are not in the cache yet/);
+		my $items = decode_json($t->tx->res->dom->at('#map-pending')->text);
+		is($items->[0]{level}, 'town', 'each point is listed with its level');
+		$t->post_ok('/geo/boundary' => form => $items->[0])->status_is(200)
+			->json_is('/status' => 'found')->json_is('/name' => 'Toronto Centre');
+		# A signature is for one level: it does not ask at another.
+		$t->post_ok('/geo/boundary' => form => { %{ $items->[0] }, level => 'city' })->status_is(403);
+	});
+
+	# Every word an outline can be called has its message.
+	for my $level (Database::BI::Model::Boundary->levels) {
+		my $word = Database::BI::Model::Boundary->level_name($level);
+		my $c    = Database::BI::Controller::Dashboard->new(app => $t->app);
+		is($c->_i18n("map_bounds_noun_$word"), $word, "the word for a $level");
+	}
+};
+
+subtest 'the map panel offers every level' => sub {
+	my $t = fresh_app();
+	$t->get_ok('/open?path=' . url_escape(File::Spec->catfile($data, 'spots.csv')))->status_is(200);
+	my @offered = grep { length } map { $_->attr('value') } $t->tx->res->dom->find('#map-bounds-sel option')->each;
+	is_deeply(\@offered, [ Database::BI::Model::Boundary->levels ], 'as Boundary lists them');
+};
 
 done_testing();

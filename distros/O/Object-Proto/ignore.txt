@@ -7,6 +7,10 @@ MYMETA.*
 .build/
 _build/
 cover_db/
+cover_db.gcov/
+*.gcda
+*.gcno
+Install/
 blib/
 inc/
 .lwpcookies

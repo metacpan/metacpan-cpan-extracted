@@ -4,7 +4,7 @@ Web::VWF - Versatile Web Framework - easily build a website to support different
 
 ## Version
 
-Version 0.001.0
+Version 0.002.0
 
 ## Description
 
@@ -46,31 +46,32 @@ does these modules:
 
     reCAPTCHA integration and the bypass that follows a solved challenge.
 
+- [Web::VWF::Mail](https://metacpan.org/pod/Web%3A%3AVWF%3A%3AMail)
+
+    Sends mail through sendmail(1), signed with DKIM when the site has a key.
+
+- [Web::VWF::Throttle](https://metacpan.org/pod/Web%3A%3AVWF%3A%3AThrottle)
+
+    A YAML backend for Data::Throttler that also works on Windows.
+
 - [Web::VWF::Data::&lt;source>](https://metacpan.org/pod/Web%3A%3AVWF%3A%3AData%3A%3A%3Csource%3E)
 
     The data access layer: CSV, XML and SQLite, through Database::Abstraction.
 
-`cgi-bin/page.fcgi` in this distribution is a working page script to copy and
-adapt into a site's own `cgi-bin`; `templates/`, `conf/example.com` and
-`data/` beside it are the small site it serves, and the starting point for a
-new one.  `examples/basic-site/` is that site laid out on its own - the script,
-the configuration, the templates and the data - and its `README.md` documents
-it as an example to copy: where a site's configuration is read from, what
-`root_dir` is, and how to run it before it is deployed.  `examples/links.nigelhorne.com/`
-is the other kind of site: one page of its own, a `Web::VWF::Display`
-subclass whose answer is a redirect rather than a rendering of a template, and
-whose own script it keeps - the example documents the four changes to this one
-that it takes, and why.
+`example/` in this distribution is a small working site to copy and adapt:
+`example/cgi-bin/page.fcgi` is the page script, `example/conf/default` is the
+configuration (placeholders only - put real keys in your own copy), and
+`example/templates/` holds the templates.  Run it from the command line with
+`CONFIG_DIR=$(pwd)/example/conf root_dir=$(pwd)/example perl -Ilib example/cgi-bin/page.fcgi page=index`.
 
 A site's templates sit under a path built from the page's class name,
 so the file to change when the page module is `Web::VWF::Display::index` is
-`templates/en/web/HTTP/VWF/Display/index.tmpl` - see [Web::VWF::Display](https://metacpan.org/pod/Web%3A%3AVWF%3A%3ADisplay)
-for the rest of the search order.  `CLAUDE.md` records how a request is handled
-once it arrives.
+`templates/web/Web/VWF/Display/index.tmpl` - see [Web::VWF::Display](https://metacpan.org/pod/Web%3A%3AVWF%3A%3ADisplay)
+for the rest of the search order.
 
 A site that used to carry a renamed copy of VWF of its own deletes that copy,
 installs this distribution, renames `VWF::` to `Web::VWF::` in its own code,
-and moves its templates from `.../VWF/Display/` to `.../HTTP/VWF/Display/`.
+and moves its templates from `.../VWF/Display/` to `.../Web/VWF/Display/`.
 
 ## Subroutines/Methods
 
@@ -88,16 +89,67 @@ default is `/usr/lib/vwf`.  Optional.
 - `info`, `logger`, `config_directory`, `config_file`, `config` -
 handed to [Web::VWF::Config](https://metacpan.org/pod/Web%3A%3AVWF%3A%3AConfig), which describes them.
 
-### Directory
+#### Api Specification
 
-The directory the server keeps this site's configuration in: what `new()` was
+##### Input
+
+```perl
+    {
+            directory => { type => 'string', optional => 1 },
+            info => { type => 'object', optional => 1 },
+            logger => { type => 'object', optional => 1 },
+            config_directory => { type => 'string', optional => 1 },
+            config_file => { type => 'string', optional => 1 },
+            config => { type => 'hashref', optional => 1 },
+    }
+```
+
+`new` croaks with `directory must be a string` when `directory` is a reference.
+
+##### Output
+
+```perl
+    { type => 'object', isa => 'Web::VWF' }
+```
+
+### \_Directory
+
+Internal: not part of the public interface.  The directory the server keeps this site's configuration in: what `new()` was
 given, or `/usr/lib/vwf`.  [Web::VWF::Config](https://metacpan.org/pod/Web%3A%3AVWF%3A%3AConfig) adds the site's own name to it.
 
-### Config
+#### Api Specification
 
-The site's configuration, read once and kept: a site that has no `conf/` of its
+##### Input
+
+```
+    {}
+```
+
+##### Output
+
+```perl
+    { type => 'string' }
+```
+
+### \_Config
+
+Internal: not part of the public interface.  The site's configuration, read once and kept: a site that has no `conf/` of its
 own beside `cgi-bin/` is configured from the server's directory for it, and
 [Web::VWF::Config](https://metacpan.org/pod/Web%3A%3AVWF%3A%3AConfig) describes the rest of the search.
+
+#### Api Specification
+
+##### Input
+
+```
+    {}
+```
+
+##### Output
+
+```perl
+    { type => 'object', isa => 'Web::VWF::Config' }
+```
 
 ## Author
 

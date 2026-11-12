@@ -8,7 +8,7 @@ use Digest::SHA qw(hmac_sha256_hex);
 use HTTP::Tiny;
 use JSON::PP;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $DEFAULT_BASE_URL = 'https://tekservix.com/smsgora/api/v1';
 
@@ -170,7 +170,7 @@ __END__
 
 =head1 NAME
 
-WebService::SmsGora - Perl client for the SMS Gora SMS Gateway API
+WebService::SmsGora - SMS Gora SMS Gateway: official Perl client by Tekservix (send and receive SMS through your own Android phones)
 
 =head1 SYNOPSIS
 

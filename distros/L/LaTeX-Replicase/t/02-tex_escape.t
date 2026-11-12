@@ -1,5 +1,5 @@
 # Before 'make install' is performed this script should be runnable with
-# 'make test'. After 'make install' it should work as 'perl 01-replication.t'
+# 'make test'. After 'make install' it should work as 'perl 02-tex_escape.t'
 
 #########################
 
@@ -17,7 +17,7 @@ use Test::More::UTF8;
 # use Test::NoWarnings;
 
 BEGIN { use_ok('LaTeX::Replicase') }; ### Test 1
-use LaTeX::Replicase qw(:all);
+use LaTeX::Replicase qw(tex_escape); #  :all
 
 ##### Test tex_escape() #####
 
@@ -275,7 +275,7 @@ $r = '{\hskip0pt plus .02em}\~\\/\$\&'.
 '{\hskip0pt plus .02em}---'.
 '{\hskip0pt plus .02em}1';
 
-$mflag = tex_escape( $_, $op ); # by default, tail = 3
+$mflag = tex_escape( $_, $op ); # by default, tile = 3
 is_deeply( [$_, $mflag], [ $r, 0b0111], 'Test #'.$t. ": '$v' to '$r' with option '$op'");
 ++$t;
 

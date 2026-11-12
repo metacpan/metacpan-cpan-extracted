@@ -72,7 +72,7 @@ my $expected_data = {
         ],
         'mx-host' => '*.mail.company-y.example'
       },
-      'failure_details' => [
+      'failure-details' => [
         {
           'sending-mta-ip' => '2001:0db8:abcd:0012:0000:0000:0000:0001',
           'failed-session-count' => 100,

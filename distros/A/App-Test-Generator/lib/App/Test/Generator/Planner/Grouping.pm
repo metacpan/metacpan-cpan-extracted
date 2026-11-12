@@ -20,11 +20,11 @@ Readonly my $GROUP_PURE     => 'pure';
 Readonly my $GROUP_MUTATING => 'mutating';
 Readonly my $GROUP_IMPURE   => 'impure';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -91,7 +91,7 @@ L<App::Test::Generator::Analyzer::SideEffect>.
 
 =head3 Returns
 
-A hashref with three keys — C<pure>, C<mutating>, and C<impure> —
+A hashref with three keys - C<pure>, C<mutating>, and C<impure> -
 each containing an arrayref of method names assigned to that group.
 Methods without purity metadata are placed in C<impure> by default.
 

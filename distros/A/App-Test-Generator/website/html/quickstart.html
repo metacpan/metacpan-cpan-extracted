@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Quick start — App::Test::Generator</title>
+<meta name="description" content="From an empty t/conf directory to a passing fuzz harness in four commands, then wire the schemas into prove, extract them from an existing module, and run the suite on every push.">
+<link rel="canonical" href="quickstart.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Quick start — App::Test::Generator">
+<meta property="og:description" content="A schema, a generated harness, and a t/fuzz.t that runs every schema you keep.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html" class="current" aria-current="page">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Quick start</h1>
+	<p class="lead">
+		One schema, one generated file, one command. Then a
+		<code>t/fuzz.t</code> that runs every schema you keep in the repository, so
+		<code>make test</code> and CI pick up new ones without editing anything.
+	</p>
+
+	<h2>1. Write a schema</h2>
+	<p>
+		Create <code>t/conf</code> in your module and put one file in it. The file
+		names a module and a function, and describes the arguments and the return
+		value. This example covers a plain function with one argument:
+	</p>
+<pre><code><span class="comment"># t/conf/abs.yml</span>
+---
+module: builtin
+function: abs
+
+config:
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+
+input:
+  number:
+    type: number
+    position: 0
+
+output:
+  type: number
+  min: 0
+</code></pre>
+	<p>
+		<code>module: builtin</code> means "a Perl built-in, not a module to load".
+		For your own code you would write <code>module: My::Widget</code> and
+		<code>function: validate</code>. <code>output</code> declares what a
+		successful return looks like; add <code>_STATUS: DIES</code> to say the
+		routine must croak instead. The
+		<a href="schema.html">schema reference</a> lists every key.
+	</p>
+
+	<h2>2. Generate and run</h2>
+<pre><code>fuzz-harness-generator -r t/conf/abs.yml
+</code></pre>
+	<p>
+		<code>-r</code> generates the harness, runs it through <code>prove</code>
+		and prints the result. You should see something like:
+	</p>
+<pre><code>Generated: /tmp/hK3s9aB2.t
+Result: PASS
+Files=1, Tests=47,  1 wallclock secs
+</code></pre>
+	<p>
+		Drop <code>-r</code> to write the file where you can read it. The harness
+		is ordinary Perl and is meant to be inspected:
+	</p>
+<pre><code>fuzz-harness-generator -o t/abs_fuzz.t t/conf/abs.yml
+prove -l t/abs_fuzz.t
+</code></pre>
+	<p>
+		Inside you will find the static corpus, the typed random generator, the
+		boundary cases derived from <code>min</code>/<code>max</code>, and one
+		<code>run_test()</code> helper that calls the routine, checks for the
+		expected exception, and validates the return value.
+	</p>
+
+	<h2>3. Make prove run it</h2>
+	<p>
+		Regenerating a file on every test run is unnecessary, and committing
+		generated tests is noisy. The usual pattern is a single
+		<code>t/fuzz.t</code> that reads every schema in <code>t/conf</code> and
+		asks the generator to run it in a subprocess:
+	</p>
+<pre><code><span class="comment"># t/fuzz.t</span>
+use strict;
+use warnings;
+use FindBin qw($Bin);
+use IPC::Run3;
+use Test::Needs 'App::Test::Generator';
+use Test::Most;
+
+my $dirname = "$Bin/conf";
+
+if(-d $dirname &amp;&amp; opendir(my $dh, $dirname)) {
+	while(my $filename = readdir($dh)) {
+		next if $filename eq '.' || $filename eq '..' || $filename =~ /\.swp$/;
+
+		my $filepath = "$dirname/$filename";
+		next unless -f $filepath;
+
+		my ($stdout, $stderr);
+		run3 [$^X, 'fuzz-harness-generator', '-r', $filepath], undef, \$stdout, \$stderr;
+
+		ok($? == 0, "Generated test script exits successfully: $filename");
+		ok($stdout =~ /^Result: PASS/ms, "$filename passes") if $? == 0;
+		diag($stderr) if length($stderr);
+	}
+	closedir($dh);
+}
+
+done_testing();
+</code></pre>
+	<p>
+		Note the two deliberate details: the generator is invoked through
+		<code>$^X</code> rather than by name, and <code>run3</code> keeps stdout
+		separate, so a failing harness is reported as a failing test rather than
+		as a crash.
+	</p>
+
+	<h2>4. Extract schemas from an existing module</h2>
+	<p>
+		Writing the first schema by hand is the slow part. Point
+		<code>extract-schemas</code> at a <code>.pm</code> file and it will infer
+		one schema per routine, from the signature, the validation calls, the POD
+		and any formal <code>=head4 input</code> block:
+	</p>
+<pre><code>extract-schemas lib/App/Test/Generator/Sample/Module.pm --output-dir schemas
+fuzz-harness-generator -r schemas/greet.yml
+</code></pre>
+	<p>
+		Read the generated YAML before trusting it: inference is heuristic, and a
+		schema is only as good as the type and constraint information the source
+		makes available. The extraction page explains the confidence levels and
+		what makes a schema high-confidence.
+	</p>
+
+	<h2>5. Keep the useful ones</h2>
+	<p>
+		Move the schemas worth keeping into <code>t/conf/</code> and delete the
+		rest. From then on the harnesses, the mutation runs and the dashboard all
+		follow that one directory:
+	</p>
+<pre><code>mkdir -p t/conf
+mv schemas/validate.yml schemas/normalise.yml t/conf/
+prove -l t/fuzz.t
+</code></pre>
+	<p>
+		Two things then come almost free. A
+		<a href="dashboard.html">test dashboard</a> can be generated from the same
+		run, and
+		<a href="mutation.html#the-feedback-loop">surviving mutants</a> can be
+		written back into <code>t/conf/</code> as new boundary cases.
+	</p>
+
+	<h2>6. Run it on every push</h2>
+	<p>
+		The distribution ships two GitHub Actions workflows that are designed to
+		be copied into another repository:
+	</p>
+<pre><code>deploy-workflows --target ~/src/My-Widget
+cd ~/src/My-Widget
+git add .github/workflows
+git commit -m 'Add test dashboard and mutation workflows'
+</code></pre>
+	<p>
+		They run the fuzz suite, mutation testing and the dashboard on a schedule
+		and commit the results back to a <code>gh_pages</code> branch. If you only
+		want the fuzzing part, copy the "generate fuzz tests and run them" steps
+		from <code>dashboard.yml</code> and skip the rest.
+	</p>
+
+	<div class="warn">
+		<span class="warn-title">Keep the seeds</span>
+		<p>
+			Fuzzing is random by default, which is what makes it find things —
+			and also what makes a failure hard to reproduce. When a run fails,
+			set <code>seed:</code> in the schema so the generated harness calls
+			<code>srand()</code> with that value, and raise <code>iterations:</code>
+			if the failure needs a longer hunt.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="install.html">← Install</a>
+		<a href="schema.html">Schema reference →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

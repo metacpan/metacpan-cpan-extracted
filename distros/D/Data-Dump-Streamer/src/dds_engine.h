@@ -7,6 +7,16 @@
 #include "XSUB.h"
 #include "../lib/Data/Dump/ppport.h"
 
+/* XSUB.h introduced private XSUB declarations in Perl 5.15.2. */
+#ifndef XS_INTERNAL
+#define XS_INTERNAL(name) static XSPROTO(name)
+#endif
+
+/* Unicode word-character testing used this name before Perl 5.17.6. */
+#ifndef isWORDCHAR_uni
+#define isWORDCHAR_uni(ch) isALNUM_uni(ch)
+#endif
+
 /* Older stashes expose byte names without a separate UTF-8 flag. */
 #ifndef HvNAMEUTF8
 #define HvNAMEUTF8(stash) 0

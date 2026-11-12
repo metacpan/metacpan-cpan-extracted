@@ -1,13 +1,13 @@
 package Mail::TLSRPT::Failure;
 # ABSTRACT: TLSRPT failure object
-our $VERSION = '2.20261104'; # VERSION
+our $VERSION = '2.20261112'; # VERSION
 use 5.20.0;
 use Moo;
 use Mail::TLSRPT::Pragmas;
 use Net::IP;
-    has result_type => (is => 'rw', isa => Enum[ qw( starttls-not-supported certificate-host-mismatch certificate-expired certificate-not-trusted validation-failure tlsa-invalid dnssec-invalid dane-required sts-policy-fetch-error sts-policy-invalid sts-webpki-invalid ) ], required => 1);
-    has sending_mta_ip => (is => 'rw', isa => class_type('Net::IP'), required => 1,coerce => sub{&_coerce_ip});
-    has receiving_mx_hostname => (is => 'rw', isa => Str, required => 1);
+    has result_type => (is => 'rw', isa => Str, required => 1);
+    has sending_mta_ip => (is => 'rw', isa => class_type('Net::IP'), required => 0,coerce => sub{&_coerce_ip});
+    has receiving_mx_hostname => (is => 'rw', isa => Str, required => 0);
     has receiving_mx_helo => (is => 'rw', isa => Str, required => 0);
     has receiving_ip => (is => 'rw', isa => class_type('Net::IP'), required => 0, coerce => sub{&_coerce_ip});
     has failed_session_count => (is => 'rw', isa => Int, required => 1);
@@ -16,16 +16,19 @@ use Net::IP;
 
 sub _coerce_ip {
     my $ip = shift;
-    $ip = Net::IP->new($ip) unless ref $ip eq 'Net::IP';
-    return $ip;
+    return $ip if ref $ip eq 'Net::IP';
+    # An address Net::IP can't parse is left as it was, for the type check
+    # to name in its error
+    return Net::IP->new($ip) // $ip;
 }
 
 
 sub new_from_data($class,$data) {
+    croak 'Failure is not an object' unless ref $data eq 'HASH';
     my $self = $class->new(
         result_type => $data->{'result-type'},
-        sending_mta_ip => $data->{'sending-mta-ip'},
-        receiving_mx_hostname => $data->{'receiving-mx-hostname'},
+        $data->{'sending-mta-ip'} ? ( sending_mta_ip => $data->{'sending-mta-ip'} ) : (),
+        $data->{'receiving-mx-hostname'} ? ( receiving_mx_hostname => $data->{'receiving-mx-hostname'} ) : (),
         $data->{'receiving-mx-helo'} ? ( receiving_mx_helo => $data->{'receiving-mx-helo'} ) : (),
         $data->{'receiving-ip'} ? ( receiving_ip => $data->{'receiving-ip'} ) : (),
         failed_session_count => $data->{'failed-session-count'} // 0,
@@ -36,11 +39,21 @@ sub new_from_data($class,$data) {
 }
 
 
+sub registered_result_types($class) {
+    return qw( starttls-not-supported certificate-host-mismatch certificate-expired certificate-not-trusted validation-failure tlsa-invalid dnssec-invalid dane-required sts-policy-fetch-error sts-policy-invalid sts-webpki-invalid );
+}
+
+
+sub is_registered_result_type($self) {
+    return scalar grep { $_ eq $self->result_type } $self->registered_result_types;
+}
+
+
 sub as_struct($self) {
     return {
         'result-type' => $self->result_type,
         $self->sending_mta_ip ? ( 'sending-mta-ip' => $self->sending_mta_ip->ip ) : (),
-        'receiving-mx-hostname' => $self->receiving_mx_hostname,
+        $self->receiving_mx_hostname ? ( 'receiving-mx-hostname' => $self->receiving_mx_hostname ) : (),
         $self->receiving_mx_helo ? ( 'receiving-mx-helo' => $self->receiving_mx_helo ) : (),
         $self->receiving_ip ? ( 'receiving-ip' => $self->receiving_ip->ip ) : (),
         'failed-session-count' => $self->failed_session_count,
@@ -56,7 +69,8 @@ sub as_string($self) {
         ' Failure:',
         '  Result-Type: '.$self->result_type,
         $self->sending_mta_ip ? ('  Sending-MTA-IP: '.$self->sending_mta_ip->ip) : (),
-        '  Receiving-MX-Hostname: '.$self->receiving_mx_hostname . $receiving_ip,
+        $self->receiving_mx_hostname ? ('  Receiving-MX-Hostname: '.$self->receiving_mx_hostname . $receiving_ip)
+          : $self->receiving_ip ? ('  Receiving-IP: '.$self->receiving_ip->ip) : (),
         $self->receiving_mx_helo ? ('  Receiving-MX-HELO: '.$self->receiving_mx_helo) : (),
         '  Failed-Session-Count: '.$self->failed_session_count,
         $self->additional_information ? ('  Additional-Information: '.$self->additional_information ) : (),
@@ -77,8 +91,8 @@ sub process_prometheus($self,$policy,$report,$prometheus) {
         policy_domain=>$policy->policy_domain,
         policy_mx_host=>$policy->policy_mx_host,
         result_type=>$self->result_type,
-        sending_mta_ip=>$self->sending_mta_ip,
-        receiving_mx_hostname=>$self->receiving_mx_hostname,
+        sending_mta_ip=>($self->sending_mta_ip?$self->sending_mta_ip->ip:''),
+        receiving_mx_hostname=>$self->receiving_mx_hostname // '',
         receiving_mx_helo=>$self->receiving_mx_helo // '',
         receiving_ip=>($self->receiving_ip?$self->receiving_ip->ip:''),
     });
@@ -100,8 +114,8 @@ sub _csv_headers($self) {
 sub _csv_fragment($self) {
     return (
         $self->result_type,
-        $self->sending_mta_ip->ip,
-        $self->receiving_mx_hostname,
+        $self->sending_mta_ip ? $self->sending_mta_ip->ip : '',
+        $self->receiving_mx_hostname // '',
         $self->receiving_mx_helo // '',
         $self->receiving_ip ? $self->receiving_ip->ip : '',
         $self->failed_session_count,
@@ -124,7 +138,7 @@ Mail::TLSRPT::Failure - TLSRPT failure object
 
 =head1 VERSION
 
-version 2.20261104
+version 2.20261112
 
 =head1 SYNOPSIS
 
@@ -154,6 +168,15 @@ Create a new object
 Create a new object using a data structure, this will create sub-objects as required.
 
 =head1 METHODS
+
+=head2 I<registered_result_types>
+
+Return the list of result types registered by RFC 8460, the list is expected
+to grow, so a report may contain others.
+
+=head2 I<is_registered_result_type>
+
+Return true if the result type is one of registered_result_types
 
 =head2 I<as_struct>
 

@@ -113,3 +113,19 @@ Revision history for Perl extension LaTeX::Replicase.
 	- Fixed old tests.
 	- Increased diversity of code test coverage.
 	- The manual has been corrected and expanded.
+
+0.803 Thu Nov 12 10:10:10 2026
+	- Added a new subroutine onecell().
+	- Added a new subroutine font_metrics().
+	- Added a new subroutine AGLkit().
+	- Fixed REase().
+	- Added many additional features and options to manage reliability and safety of use.
+	- Fixed a bug regarding the local environment specified using a slash ("/") for %%%VAR: tag.
+	- Bugs related to labels and error messages have been fixed.
+	- New warnings and debug messages have been added.
+	- Added control of WARNING#5 and WARNING#9 cases for %%%V:<ARRAY|HASH>.
+	- Optimized algorithms.
+	- Added new tests.
+	- Fixed old tests.
+	- Increased diversity of code test coverage (89.9 %).
+	- The manual has been corrected and expanded.

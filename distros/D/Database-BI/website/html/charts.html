@@ -112,7 +112,7 @@
 		</tr>
 		<tr>
 			<td><code>/map</code></td>
-			<td>OpenStreetMap map with clustered markers, an optional heat layer, county outlines, bubbles and colour rules.</td>
+			<td>OpenStreetMap map with clustered markers, an optional heat layer, outlines of counties, states, cities and other areas, bubbles and colour rules.</td>
 			<td>see <a href="#maps">Maps</a></td>
 		</tr>
 		<tr>
@@ -230,10 +230,18 @@
 	<dd>A named tile source from the <code>tile_sources</code> configuration key, for a tile server on your own network.</dd>
 	<dt><code>heat=1</code>, <code>weight=&lt;col&gt;</code></dt>
 	<dd>A heat layer over the markers, optionally weighted by a numeric column.</dd>
-	<dt><code>bounds=county</code></dt>
+	<dt><code>bounds=&lt;level&gt;</code></dt>
 	<dd>
-		The outline of the county each marker is in, with a checkbox on the map
-		to hide them; the map panel's <em>Show county boundaries</em>. The
+		The outline of the area each marker is in, with a checkbox on the map
+		to hide them; the map panel's <em>Show boundaries</em>. The level is
+		<code>country</code>, <code>state</code> (a state, a Canadian province,
+		a New Zealand region), <code>county</code>, <code>city</code> (a city or
+		the district named after it: Toronto, Manchester, the district of
+		Canterbury, Hamilton City), <code>town</code> (a town or city ward:
+		Margate) or <code>neighbourhood</code> (a neighbourhood, suburb or civil
+		parish). OpenStreetMap has many towns and most suburbs only as a point,
+		and a marker in one of those has no outline at that level; the list
+		under the map names them. The
 		outlines come from OpenStreetMap, which is sent each marker's position
 		rounded to about 100 metres, and are remembered, so a later map asks
 		again only for a point outside every outline it has. Those not known yet
@@ -265,7 +273,7 @@
 		here. While some places still have no outline, the note above the map links
 		to their rows and to looking the outlines up again.
 	</dd>
-	<dt><code>shade=&lt;col&gt;</code>, with <code>bounds=county</code></dt>
+	<dt><code>shade=&lt;col&gt;</code>, with <code>bounds=</code></dt>
 	<dd>Colour shade: fills each outline in a shade of one colour, darker for a
 		larger total of that column over the rows inside it, as a census map is
 		drawn. <code>shade_color=</code> (a colour name or <code>#rrggbb</code>)
@@ -276,7 +284,7 @@
 		markers' colour, stronger the further its total is into that colour's
 		rule: under <code>color_rule=lt:20000:green</code> the smallest county is
 		the greenest. In the map panel it is
-		Colour shade, under Show county boundaries.
+		Colour shade, beside Show boundaries.
 	</dd>
 	<dt><code>size=&lt;col&gt;</code></dt>
 	<dd>Markers become circles with a radius from a numeric column.</dd>

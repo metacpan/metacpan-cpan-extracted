@@ -1,6 +1,6 @@
 package Mail::TLSRPT;
 # ABSTRACT: TLSRPT object
-our $VERSION = '2.20261104'; # VERSION
+our $VERSION = '2.20261112'; # VERSION
 use 5.20.0;
 use Moo;
 use Mail::TLSRPT::Pragmas;
@@ -20,7 +20,7 @@ Mail::TLSRPT - TLSRPT object
 
 =head1 VERSION
 
-version 2.20261104
+version 2.20261112
 
 =head1 DESCRIPTION
 

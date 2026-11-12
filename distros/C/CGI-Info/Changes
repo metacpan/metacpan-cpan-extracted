@@ -1,5 +1,36 @@
 Revision history for CGI-Info
 
+1.17	Wed Nov 11 11:26:40 AM EST 2026
+	[ Bug Fixes ]
+	- Fix _temp_path on Darwin, the symlinks that Darwin uses for /tmp
+	  broke the code
+	- Fix logdir() adding LOGDIR to the caller's environment. The candidates
+	  were collected in a foreach list, and Perl aliases a %ENV element in
+	  such a list, so a plain logdir() call left $ENV{'LOGDIR'} existing with
+	  an undefined value. The candidates are now copied into an array first.
+	- logdir() now accepts a directory named "0"; it was treated as a get.
+	- Lazily-loaded helpers (String::Clean::XSS, JSON::MaybeXS,
+	  File::Basename) were imported into the CGI::Info namespace at runtime,
+	  after namespace::clean had run, so a parameter called convert_XSS,
+	  basename, dirname, decode_json, etc. could not be read through AUTOLOAD.
+	  They are now called by their fully-qualified names.
+
+	[ Enhancements ]
+	- Removed unreachable argument checks from cookie(); validation is done
+	  by Params::Validate::Strict, which now requires version 0.40.
+	- Added API SPECIFICATION sections to the POD for params(), tmpdir(),
+	  logdir(), is_robot(), is_search_engine(), browser_type(), status(),
+	  cache(), set_logger() and reset().  The params() section lists the HTTP
+	  status set for each way it can return undef.
+	- FORMAL SPECIFICATION is now its own POD section.
+
+	[ Tests ]
+	- Regression tests for the logdir() LOGDIR leak, the Darwin /private
+	  temporary areas, a "0" log directory, the AUTOLOAD namespace leak and
+	  digit-leading AUTOLOAD method names.
+	- Declare YAML::XS and the core modules used by the tests in
+	  TEST_REQUIRES; CHI is a recommended test dependency.
+
 1.16	Sat Oct 24 07:51:38 PM EDT 2026
 	[ Enhancements ]
 	- Add configurable request-complexity limits: max_body_size, max_params,
@@ -677,5 +708,5 @@ Revision history for CGI-Info
 	script_name now does something useful when not running in a CGI
 		environment
 
-0.01    Sun Dec 12 22:24:09 EST 2010
-        First draft
+0.01	Sun Dec 12 22:24:09 EST 2010
+	First draft

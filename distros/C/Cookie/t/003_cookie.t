@@ -8,8 +8,8 @@ BEGIN
     use vars qw( $DEBUG $CRYPTX_REQUIRED_VERSION );
     # 2021-11-01T08:12:10
     use Test::Time time => 1635754330;
-    use DateTime;
-    use DateTime::Format::Strptime;
+    use DateTime::Lite;
+    use DateTime::Format::Lite;
     use Module::Generic::HeaderValue;
     our $CRYPTX_REQUIRED_VERSION = '0.074';
     our $DEBUG = exists( $ENV{AUTHOR_TESTING} ) ? $ENV{AUTHOR_TESTING} : 0;
@@ -104,9 +104,9 @@ subtest 'cookie make' => sub
         [{ name => 'foo', value => 'val', same_site => 'invalid value' }, 'foo=val' ],
     );
 
-    my $fmt = DateTime::Format::Strptime->new(
-        pattern => '%a, %d %b %Y %H:%M:%S GMT',
-        locale  => 'en_GB',
+    my $fmt = DateTime::Format::Lite->new(
+        pattern   => '%a, %d %b %Y %H:%M:%S GMT',
+        locale    => 'en_GB',
         time_zone => 'GMT',
     );
     foreach my $test ( @tests )
@@ -130,7 +130,7 @@ subtest 'cookie make' => sub
         {
             my $def = $test->[2];
             $def->{time_zone} = 'GMT' unless( $def->{time_zone} );
-            my $d = DateTime->new( %$def );
+            my $d = DateTime::Lite->new( %$def );
             $d->set_time_zone( 'GMT' );
             $d->set_formatter( $fmt );
             my $datestr = "$d";

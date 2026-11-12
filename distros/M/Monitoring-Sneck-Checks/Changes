@@ -1,5 +1,21 @@
 Revision history for Monitoring-Sneck-Checks
 
+0.2.0   20226-11-11/08:15
+        - add apparmor, AppArmor enabled with profiles enforcing
+        - add auditd, auditing on, with the rules matching a list or a hash
+        - add bond, Linux bonding and FreeBSD lagg members down or not aggregating
+        - add edac, memory errors from Linux's EDAC, by DIMM
+        - add fail2ban, jails up and how many each has banned now
+        - add ldap, bind and search with response time, through Net::LDAP, which is optional
+        - add mailq, Postfix or Exim queue size and oldest message
+        - add selinux, SELinux in the mode it should be
+        - add smart, disk health through smartctl's JSON output
+        - add thermal_throttle, Intel CPU thermal throttle events since the last run
+        - add time_sync, chrony, ntpd, or timesyncd being synchronised, with offset
+        - add vrrp, keepalived, freevrrpd, or FreeBSD CARP in the state it should be
+        - add wireguard, how long since each peer last handshook
+        - add zfs, pool health, capacity, scrub age, and device errors
+
 0.1.1   2026-11-06/12:30
         - local.t: fall back to numeric IDs for file_mode owner/group
 

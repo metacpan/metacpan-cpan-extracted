@@ -1,0 +1,8 @@
+associd=0 status=0615 leap_none, sync_ntp, 1 event, clock_sync,
+version="ntpd 4.2.8p18@1.4062-o Thu Jun  6 12:00:00 UTC 2024 (1)",
+processor="amd64", system="FreeBSD/14.3-RELEASE", leap=00, stratum=3,
+precision=-23, rootdelay=12.345, rootdisp=23.456, refid=192.0.2.123,
+reftime={{ntp_ago:200}}.12345678  Sun, Nov  8 2026 23:00:00.071,
+clock=e8f3a2b3.23456789  Sun, Nov  8 2026 23:04:19.137, peer=12345, tc=10,
+mintc=3, offset=-0.123456, frequency=-12.345, sys_jitter=0.456789,
+clk_jitter=0.234, clk_wander=0.012

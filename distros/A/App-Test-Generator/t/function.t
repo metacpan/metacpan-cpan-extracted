@@ -1136,6 +1136,67 @@ subtest 'generate with schema hashref' => sub {
 	done_testing();
 };
 
+subtest 'generate compares a numeric accessor numerically' => sub {
+	# A numeric scalar has no single string form: one and the same integer can
+	# stringify as "5967331536404480" or as "5.96733153640448e+15", so a getset
+	# round trip on an integer has to compare with ==. CGI::Info::status
+	# returned exactly what it was given and its harness still failed about
+	# once in forty runs.
+	my $dir = tempdir(CLEANUP => 1);
+
+	my ($fh, $outfile) = tempfile(DIR => $dir, SUFFIX => '.t', UNLINK => 1);
+	close $fh;
+
+	my $numeric = {
+		function => 'status',
+		module   => 'CGI::Info',
+		new      => {},
+		accessor => { property => 'status', type => 'getset' },
+		input    => { status => { type => 'integer', position => 0, optional => 1 } },
+		output   => { type => 'integer' },
+	};
+
+	lives_ok {
+		App::Test::Generator->generate(schema => $numeric, output_file => $outfile)
+	} 'generate() lives for a numeric accessor';
+
+	open my $rfh, '<', $outfile or die $!;
+	my $content = do { local $/; <$rfh> };
+	close $rfh;
+
+	like($content,
+		qr/cmp_ok\(\$result, '==', \$alist\[0\], 'getset function returns what was put in'\)/,
+		'numeric accessor round trip compares with ==');
+	like($content, qr/ok\(\$obj->status\(\) == \$result, 'test getset accessor'\)/,
+		'getter is compared with ==');
+	unlike($content,
+		qr/cmp_ok\(\$result, 'eq', \$alist\[0\], 'getset function returns what was put in'\)/,
+		'numeric accessor does not compare with eq');
+
+	# A string accessor keeps eq: for strings, identity is the contract
+	my ($sfh, $soutfile) = tempfile(DIR => $dir, SUFFIX => '.t', UNLINK => 1);
+	close $sfh;
+
+	lives_ok {
+		App::Test::Generator->generate(schema => {
+			function => 'nickname',
+			module   => 'CGI::Info',
+			new      => {},
+			accessor => { property => 'nickname', type => 'getset' },
+			input    => { nickname => { type => 'string', position => 0, optional => 1 } },
+			output   => { type => 'string' },
+		}, output_file => $soutfile)
+	} 'generate() lives for a string accessor';
+
+	open my $srfh, '<', $soutfile or die $!;
+	my $scontent = do { local $/; <$srfh> };
+	close $srfh;
+
+	like($scontent, qr/cmp_ok\(\$result, 'eq', \$alist\[0\]/, 'string accessor keeps eq');
+
+	done_testing();
+};
+
 # ==================================================================
 # App::Test::Generator::Mutator
 # ==================================================================

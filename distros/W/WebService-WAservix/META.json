@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl client for the WAservix WhatsApp API Gateway",
+   "abstract" : "WAservix WhatsApp API Gateway: official Perl client by Tekservix (send WhatsApp messages from your own number)",
    "author" : [
       "Tekservix <support@tekservix.com>"
    ],
@@ -7,6 +7,7 @@
    "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
    "keywords" : [
       "whatsapp",
+      "whatsapp-api-gateway",
       "whatsapp-api",
       "messaging",
       "tekservix"
@@ -64,6 +65,6 @@
          "web" : "https://github.com/TekservixHQ/waservix-perl"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

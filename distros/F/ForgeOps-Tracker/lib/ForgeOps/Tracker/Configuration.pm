@@ -99,15 +99,22 @@ sub new {
         # Off by default. On, nothing this client sends carries free text that could hold personal
         # or health data: no error message (a message_fingerprint is sent instead, so errors still
         # group), no breadcrumbs, no endpoint, no SQL statement, no source context, no user email or
-        # username, and outbound HTTP spans named by method and host only. See
-        # ForgeOps::Tracker::StrictPrivacy for every rule. FORGE_OPS_STRICT_PRIVACY=true turns it on
-        # from the environment; init() or setting it here wins over that.
+        # username, the user's id only as a keyed hash (privacy_user_key), and outbound HTTP spans
+        # named by method and host only. See ForgeOps::Tracker::StrictPrivacy for every rule.
+        # FORGE_OPS_STRICT_PRIVACY=true turns it on from the environment; init() or setting it here
+        # wins over that.
         strict_privacy => _env_flag($ENV{FORGE_OPS_STRICT_PRIVACY}),
         # Context and tag keys strict privacy still sends (only plain values under exactly these
         # top-level keys), an arrayref such as ['error_code', 'feature'] or one comma-separated
         # string. Empty by default, so nothing from context or tags goes out.
         # FORGE_OPS_PRIVACY_ALLOWED_FIELDS=error_code,feature sets it from the environment.
         privacy_allowed_fields => [ ForgeOps::Tracker::StrictPrivacy::allowed_field_list($ENV{FORGE_OPS_PRIVACY_ALLOWED_FIELDS}) ],
+        # Strict privacy sends the user's id only as a keyed hash
+        # (ForgeOps::Tracker::StrictPrivacy::hashed_user_id) with this secret, which stays in your
+        # app; unset, no user is sent at all. Keep it the same across deploys and servers, or the
+        # same customer counts as two. FORGE_OPS_PRIVACY_USER_KEY sets it from the environment; an
+        # empty value counts as unset.
+        privacy_user_key => (defined $ENV{FORGE_OPS_PRIVACY_USER_KEY} && length $ENV{FORGE_OPS_PRIVACY_USER_KEY} ? $ENV{FORGE_OPS_PRIVACY_USER_KEY} : undef),
     }, $class;
 }
 

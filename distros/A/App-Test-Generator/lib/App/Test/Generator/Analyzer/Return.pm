@@ -15,11 +15,11 @@ Readonly my $WEIGHT_RETURNS_PROPERTY => 20;
 Readonly my $WEIGHT_RETURNS_SELF     => 15;
 Readonly my $WEIGHT_RETURNS_CONSTANT => 10;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -84,7 +84,7 @@ constant literal value.
 Normally an L<App::Test::Generator::Model::Method> object; evidence is
 added to it in place via C<add_evidence>. A plain hashref with a
 C<source> or C<body> key is also accepted defensively (as SchemaExtractor
-callers may pass one), but in that case no evidence is recorded — only
+callers may pass one), but in that case no evidence is recorded - only
 a Model::Method object exposing both C<source()> and C<add_evidence()>
 actually accumulates evidence.
 

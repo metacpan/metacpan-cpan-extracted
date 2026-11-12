@@ -1337,12 +1337,11 @@ subtest 'AUTOLOAD - disabled auto_load croaks' => sub {
 # ============================================================
 # 23. Internal helper: _sanitise_input (white-box)
 # The function is module-scope (not a method); call via full package path.
-# String::Clean::XSS is lazy-loaded inside params(); trigger it first so
-# convert_XSS() is available in the CGI::Info namespace for direct calls.
+# _sanitise_input() requires String::Clean::XSS itself, so direct calls
+# work even before params() has run.
 # ============================================================
 
-# Ensure String::Clean::XSS is imported into CGI::Info namespace before
-# any direct _sanitise_input call; params() triggers the lazy require.
+# Run params() once so the module is in a realistic, warmed-up state.
 {
 	reset_env();
 	$ENV{GATEWAY_INTERFACE} = 'CGI/1.1';

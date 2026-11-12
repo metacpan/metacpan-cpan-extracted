@@ -88,14 +88,17 @@ END_MODULE
 		'uppercase' => {
 			'optional' => 1,
 			'default' => 0,
-			'type' => 'Bool'
+			'type' => 'Bool',
+			'_type_checked' => 1
 		}, 'username' => {
 			'type' => 'Str',
-			'optional' => 0
+			'optional' => 0,
+			'_type_checked' => 1
 		}, 'roles' => {
 			'optional' => 1,
 			'type' => 'arrayref',
-			'element_type' => 'Str'
+			'element_type' => 'Str',
+			'_type_checked' => 1
 		}
 	});
 

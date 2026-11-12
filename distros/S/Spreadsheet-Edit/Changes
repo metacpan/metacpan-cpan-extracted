@@ -1,5 +1,7 @@
 Changes to Spreadsheet::Edit, Spreadsheet::Edit::IO, and/or Spreadsheet::Edit::Log
 
+1001.004 : Fix btwbt edge cases, compact output with eval frames.
+           Provide get_colorize_startend(), btw_rjust_prefix()
 1001.003 : Diagnose empty input path (rather than crashing).
            Add btwpad().  Default NO_COLOR to ! -t (logdest).
 1001.003 : Fix test to not fail on platforms without working 'tput'

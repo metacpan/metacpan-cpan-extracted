@@ -58,6 +58,8 @@ my $schema = $extractor->extract_all();
 
 ok(ref $schema eq 'HASH', 'Schema extracted as hashref');
 ok(exists $schema->{add}, 'Schema contains add()');
+ok(!($schema->{add}{input}{a} && $schema->{add}{input}{a}{_type_checked}),
+	'Code-derived type is not marked as type-checked');
 is($schema->{add}{output}{_type_confidence}, 'medium', 'Numeric expression output has medium confidence');
 cmp_bag(
 	$schema->{add}{_yamltest_hints}{boundary_values},

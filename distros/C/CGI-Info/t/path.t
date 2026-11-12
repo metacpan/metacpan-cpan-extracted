@@ -706,12 +706,12 @@ subtest 'status S6: stored truthy status returned as-is' => sub {
 	is($info->status(), 503, 'stored 503 returned');
 };
 
-subtest 'status S7: stored 0 (falsy) returns 200 via || fallback' => sub {
+subtest 'status S7: stored 0 is returned as set, not replaced' => sub {
 	plan tests => 1;
 	local %ENV;
 	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
-	$info->{status} = 0;    # force falsy stored value
-	is($info->status(), 200, 'falsy stored status → 200');
+	$info->{status} = 0;    # a defined but falsy stored value
+	is($info->status(), 0, 'stored 0 returned as-is');
 };
 
 # ===========================================================================
@@ -1008,6 +1008,38 @@ subtest 'AUTOLOAD AL4: delegates to param() for real CGI param' => sub {
 	is($info->mykey(), 'myval', 'AUTOLOAD → param() → value');
 };
 
+subtest 'AUTOLOAD AL5: digit-leading symbolic method name → croak' => sub {
+	plan tests => 1;
+	local %ENV = (GATEWAY_INTERFACE => 'CGI/1.1', REQUEST_METHOD => 'GET', QUERY_STRING => '');
+	CGI::Info->reset();
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
+	my $method = '1abc';
+	throws_ok { $info->$method() } qr/Invalid method name: 1abc/,
+		'symbolic call with a digit-leading name reaches the name check';
+};
+
+subtest 'AUTOLOAD AL6: lazily-loaded helpers do not shadow AUTOLOAD' => sub {
+	# Runtime imports bypass namespace::clean, so an imported function would
+	# be dispatched instead of AUTOLOAD -> param() for a same-named field
+	my @names = qw(convert_XSS basename dirname fileparse decode_json encode_json JSON);
+	plan tests => 2 + scalar(@names);
+	local %ENV = (
+		GATEWAY_INTERFACE => 'CGI/1.1',
+		REQUEST_METHOD    => 'GET',
+		QUERY_STRING      => 'convert_XSS=field&basename=b',
+	);
+	CGI::Info->reset();
+	my $info = CGI::Info->new(logger => Test::Log::Abstraction->new());
+	$info->params();
+	$info->script_name();	# loads File::Basename
+	foreach my $name (@names) {
+		no strict 'refs';
+		ok(!defined(&{"CGI::Info::$name"}), "$name is not imported into CGI::Info");
+	}
+	is($info->convert_XSS(), 'field', 'AUTOLOAD returns the convert_XSS field');
+	is($info->basename(), 'b', 'AUTOLOAD returns the basename field');
+};
+
 # ===========================================================================
 # set_logger() — path coverage
 # ===========================================================================
@@ -1113,25 +1145,16 @@ subtest 'reset RE2: on wrong package → carps and returns' => sub {
 };
 
 # ===========================================================================
-# DEAD CODE — documented findings
+# DEAD CODE — resolved findings
 #
-# These paths are provably unreachable.  The corresponding lines in
-# lib/CGI/Info.pm are annotated with "# TODO: Unreachable code detected
-# during path analysis."
+# 1. cookie(): the `if(!defined($field))` and `if(ref($field))` guards were
+#    unreachable because Params::Validate::Strict::validate_strict() already
+#    enforces `type => 'string', min => 1` and croaks first.  They were
+#    removed in 1.17; DC1 below pins the validator as the only guard.
 #
-# 1. cookie() lines ~2375-2384:
-#    The `if(!defined($field))` and `if(ref($field))` guards are never
-#    reached because Params::Validate::Strict::validate_strict() already
-#    enforces `type => 'string', min => 1` and croaks for any invalid input
-#    BEFORE control reaches those checks.
-#    The `return;` statements after `Carp::croak()` inside those blocks are
-#    doubly dead (croak never returns).
-#
-# 2. AUTOLOAD() line ~2667:
-#    `unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/` can only fail if
-#    $method starts with a digit.  The prior capture `/::(\w+)$/` allows
-#    digits, but Perl's dispatch never generates a digit-leading AUTOLOAD
-#    variable, making this branch unreachable in normal operation.
+# 2. AUTOLOAD(): the method-name check was flagged as unreachable, but a
+#    symbolic call (`my $m = '1abc'; $info->$m`) does reach it.  It is
+#    kept and exercised by AL5 above.
 # ===========================================================================
 
 subtest 'dead code DC1: cookie() missing name → validate_strict croaks (not inner guard)' => sub {
@@ -1139,7 +1162,7 @@ subtest 'dead code DC1: cookie() missing name → validate_strict croaks (not in
 	local %ENV = (HTTP_COOKIE => 'a=1');
 	my $info = CGI::Info->new(logger => new_ok('Test::Log::Abstraction'));
 	# The croak here originates in validate_strict, not in the !defined($field) guard
-	throws_ok { $info->cookie() } qr//, 'missing cookie name always croaks at validate_strict';
+	throws_ok { $info->cookie() } qr/cookie_name/, 'missing cookie name always croaks at validate_strict';
 };
 
 done_testing();

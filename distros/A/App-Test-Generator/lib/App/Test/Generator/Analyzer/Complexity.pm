@@ -38,18 +38,18 @@ Readonly my @EXCEPTION_TOKENS => qw(
 	die croak confess try catch eval
 );
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
 Analyses the source body of a method and produces a complexity report
 including cyclomatic score, branching points, early returns, exception
 paths, and nesting depth. Used by L<App::Test::Generator> to guide test
-planning — higher complexity methods are prioritised for more thorough
+planning - higher complexity methods are prioritised for more thorough
 test generation.
 
 =head2 new
@@ -112,19 +112,19 @@ A hashref with the following keys:
 
 =over 4
 
-=item * C<cyclomatic_score> — integer starting at 1, incremented for
+=item * C<cyclomatic_score> - integer starting at 1, incremented for
 each branching point, logical operator, early return, and exception path.
 
-=item * C<branching_points> — count of branching keywords found.
+=item * C<branching_points> - count of branching keywords found.
 
-=item * C<early_returns> — number of C<return> statements beyond the
+=item * C<early_returns> - number of C<return> statements beyond the
 first (each additional return adds a path).
 
-=item * C<exception_paths> — count of exception-related keywords found.
+=item * C<exception_paths> - count of exception-related keywords found.
 
-=item * C<nesting_depth> — maximum brace nesting depth observed.
+=item * C<nesting_depth> - maximum brace nesting depth observed.
 
-=item * C<complexity_level> — one of C<low>, C<moderate>, or C<high>
+=item * C<complexity_level> - one of C<low>, C<moderate>, or C<high>
 based on the cyclomatic score.
 
 =back

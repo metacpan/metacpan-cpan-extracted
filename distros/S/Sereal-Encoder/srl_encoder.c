@@ -194,7 +194,13 @@ srl_protect_packet(pTHX_ srl_encoder_t *enc)
 #   define DO_SHARED_HASH_ENTRY_REFCOUNT_CHECK 0
 #endif
 
-#define DEFAULT_MAX_RECUR_DEPTH 10000
+#if defined(__CYGWIN__)
+/* Cygwin's main thread stack is set by the Perl executable. */
+#define DEFAULT_MAX_RECUR_DEPTH 4096
+#else
+#define DEFAULT_MAX_RECUR_DEPTH 8192
+#endif
+#define PARANOID_MAX_RECUR_DEPTH 2048
 
 #define DEBUGHACK 0
 
@@ -213,7 +219,8 @@ SRL_STATIC_INLINE void srl_dump_nv(pTHX_ srl_encoder_t *enc, SV *src);
 SRL_STATIC_INLINE void srl_dump_ivuv(pTHX_ srl_encoder_t *enc, SV *src);
 SRL_STATIC_INLINE int srl_dump_classname(pTHX_ srl_encoder_t *enc, SV *referent, SV *replacement);
 SRL_STATIC_INLINE SV *srl_get_frozen_object(pTHX_ srl_encoder_t *enc, SV *src, SV *referent);
-SRL_STATIC_INLINE int srl_freeze_class_allowed(pTHX_ srl_encoder_t *enc, HV *stash, SV *src, SV *referent);
+SRL_STATIC_INLINE int srl_class_allowed(pTHX_ srl_encoder_t *enc, HV *allow_hash,
+    SV *allow_cb, HV *stash, SV *src, SV *referent, int with_object);
 SRL_STATIC_INLINE PTABLE_t *srl_init_string_hash(srl_encoder_t *enc);
 SRL_STATIC_INLINE PTABLE_t *srl_init_ref_hash(srl_encoder_t *enc);
 SRL_STATIC_INLINE PTABLE_t *srl_init_freezeobj_svhash(srl_encoder_t *enc);
@@ -478,6 +485,17 @@ srl_callback_end(pTHX_ srl_encoder_t *enc)
                 continue;
             }
             if (buckets && current) {
+#ifdef XPERL_VERSION
+                const UV limit = HvENTRY_LIMIT(hash);
+                for (i = 0; i < limit; i++) {
+                    HE *entry;
+                    for (entry = HvENTRY_FIRST(hash, i); entry;
+                         entry = HvENTRY_NEXT(hash, entry)) {
+                        if (entry == current)
+                            found = 1;
+                    }
+                }
+#else
                 for (i = 0; i <= HvMAX(hash); i++) {
                     HE *entry;
                     for (entry = buckets[i]; entry; entry = HeNEXT(entry)) {
@@ -485,6 +503,7 @@ srl_callback_end(pTHX_ srl_encoder_t *enc)
                             found = 1;
                     }
                 }
+#endif
             }
             if (!found)
                 croak("Sereal: input hash was modified during encoding");
@@ -826,6 +845,12 @@ srl_destroy_encoder(pTHX_ srl_encoder_t *enc)
         SvREFCNT_dec((SV*)enc->freeze_allow_hash);
     if (enc->freeze_allow_cb != NULL)
         SvREFCNT_dec(enc->freeze_allow_cb);
+    if (enc->allow_hash != NULL)
+        SvREFCNT_dec((SV*)enc->allow_hash);
+    if (enc->allow_cb != NULL)
+        SvREFCNT_dec(enc->allow_cb);
+    if (enc->track_classes != NULL)
+        SvREFCNT_dec((SV*)enc->track_classes);
 
     SvREFCNT_dec(enc->sereal_string_sv);
     SvREFCNT_dec(enc->scratch_sv);
@@ -884,6 +909,44 @@ srl_encoder_option_id(pTHX_ sv_with_hash *options, U32 option_count,
     return option_count;
 }
 
+static void
+srl_set_class_allow_list(pTHX_ SV *val, const char *name, HV **allow_hash, SV **allow_cb)
+{
+    SV *rv = SvROK(val) ? SvRV(val) : NULL;
+    if (rv && SvTYPE(rv) == SVt_PVAV) {
+        AV *av = (AV*)rv;
+        SSize_t i, len = av_len(av) + 1;
+        *allow_hash = newHV();
+        for (i = 0; i < len; i++) {
+            SV **elem = av_fetch(av, i, 0);
+            if (elem && SvOK(*elem)) {
+                STRLEN klen;
+                char *kstr = SvPV(*elem, klen);
+                (void)hv_store(*allow_hash, kstr, SvUTF8(*elem) ? -(I32)klen : (I32)klen, &PL_sv_yes, 0);
+            }
+        }
+    }
+    else if (rv && SvTYPE(rv) == SVt_PVHV) {
+        HV *src = (HV*)rv;
+        HE *ent;
+        *allow_hash = newHV();
+        hv_iterinit(src);
+        while ((ent = hv_iternext(src))) {
+            if (SvTRUE(HeVAL(ent))) {
+                STRLEN klen;
+                char *kstr = HePV(ent, klen);
+                (void)hv_store(*allow_hash, kstr, HeUTF8(ent) ? -(I32)klen : (I32)klen, &PL_sv_yes, 0);
+            }
+        }
+    }
+    else if (rv && SvTYPE(rv) == SVt_PVCV) {
+        *allow_cb = newRV_inc(rv);
+    }
+    else {
+        croak("The '%s' option must be an array ref, hash ref or code ref", name);
+    }
+}
+
 /* Builds the C-level configuration and state struct. */
 srl_encoder_t *
 srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
@@ -893,6 +956,8 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
     HE *entry;
     SV *val;
     SV *freeze_allow_classes_value = NULL;
+    SV *allow_classes_value = NULL;
+    SV *track_classes_value = NULL;
     SV *checksum_key = NULL;
     SV *checksum_policy_value = NULL;
     SV *unknown_option_policy_value = NULL;
@@ -911,6 +976,11 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
     int snappy = 0;
     int snappy_incr = 0;
     int want_freeze = 0;
+    int paranoid = 0;
+    int refuse_objects_set = 0;
+    int max_recursion_depth_set = 0;
+    int use_standard_double_set = 0;
+    int native_float_requested = 0;
 
     ENTER;
     enc = srl_empty_encoder_struct(aTHX);
@@ -942,6 +1012,7 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
                     STRLEN len;
                     const char *type = SvPV(val, len);
                     if (memEQs(type, len, "native")) {
+                        native_float_requested = 1;
 #if defined(USE_LONG_DOUBLE) && !defined(HAS_QUADMATH)
                         SRL_ENC_SET_OPTION(enc, SRL_F_USE_NATIVE_LONG_DOUBLE);
 #endif
@@ -970,6 +1041,14 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
                 if (SvTRUE(val))
                     SRL_ENC_SET_OPTION(enc, SRL_F_CROAK_ON_BLESS);
                 break;
+            case SRL_ENC_OPT_IDX_REFUSE_OBJECTS:
+                refuse_objects_set = 1;
+                if (SvTRUE(val))
+                    SRL_ENC_SET_OPTION(enc, SRL_F_REFUSE_OBJECTS);
+                break;
+            case SRL_ENC_OPT_IDX_PARANOID:
+                paranoid = SvTRUE(val) ? 1 : 0;
+                break;
             case SRL_ENC_OPT_IDX_NO_BLESS_OBJECTS:
                 if (SvTRUE(val))
                     SRL_ENC_SET_OPTION(enc, SRL_F_NO_BLESS_OBJECTS);
@@ -980,6 +1059,12 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
                 break;
             case SRL_ENC_OPT_IDX_FREEZE_ALLOW_CLASSES:
                 freeze_allow_classes_value = val;
+                break;
+            case SRL_ENC_OPT_IDX_ALLOW_CLASSES:
+                allow_classes_value = val;
+                break;
+            case SRL_ENC_OPT_IDX_TRACK_CLASSES:
+                track_classes_value = val;
                 break;
             case SRL_ENC_OPT_IDX_FREEZE_DENY_ACTION:
                 if (SvOK(val)) {
@@ -1043,10 +1128,12 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
                     SRL_ENC_SET_OPTION(enc, SRL_F_DEDUPE_STRINGS);
                 break;
             case SRL_ENC_OPT_IDX_MAX_RECURSION_DEPTH:
+                max_recursion_depth_set = 1;
                 if (SvTRUE(val))
                     enc->max_recursion_depth = SvUV(val);
                 break;
             case SRL_ENC_OPT_IDX_USE_STANDARD_DOUBLE:
+                use_standard_double_set = 1;
                 if (SvTRUE(val))
                     SRL_ENC_SET_OPTION(enc, SRL_F_USE_STANDARD_DOUBLE);
                 break;
@@ -1085,41 +1172,31 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
      * may be the options hash itself, whose iterator must not be reset. */
     val = freeze_allow_classes_value;
     if ( val && SvOK(val) ) {
-        SV *rv = SvROK(val) ? SvRV(val) : NULL;
-        if (rv && SvTYPE(rv) == SVt_PVAV) {
-            AV *av = (AV*)rv;
-            SSize_t i, len = av_len(av) + 1;
-            enc->freeze_allow_hash = newHV();
-            for (i = 0; i < len; i++) {
-                SV **elem = av_fetch(av, i, 0);
-                if (elem && SvOK(*elem)) {
-                    STRLEN klen;
-                    char *kstr = SvPV(*elem, klen);
-                    (void)hv_store(enc->freeze_allow_hash, kstr, SvUTF8(*elem) ? -(I32)klen : (I32)klen, &PL_sv_yes, 0);
-                }
-            }
-        }
-        else if (rv && SvTYPE(rv) == SVt_PVHV) {
-            HV *src = (HV*)rv;
-            HE *ent;
-            enc->freeze_allow_hash = newHV();
-            hv_iterinit(src);
-            while ((ent = hv_iternext(src))) {
-                if (SvTRUE(HeVAL(ent))) {
-                    STRLEN klen;
-                    char *kstr = HePV(ent, klen);
-                    (void)hv_store(enc->freeze_allow_hash, kstr, HeUTF8(ent) ? -(I32)klen : (I32)klen, &PL_sv_yes, 0);
-                }
-            }
-        }
-        else if (rv && SvTYPE(rv) == SVt_PVCV) {
-            enc->freeze_allow_cb = newRV_inc(rv);
-        }
-        else {
-            croak("The 'freeze_allow_classes' option must be an array "
-                  "ref, hash ref or code ref");
-        }
+        srl_set_class_allow_list(aTHX_ val, "freeze_allow_classes",
+                                 &enc->freeze_allow_hash, &enc->freeze_allow_cb);
         want_freeze = 1;
+    }
+    val = allow_classes_value;
+    if (val && SvOK(val))
+        srl_set_class_allow_list(aTHX_ val, "allow_classes",
+                                 &enc->allow_hash, &enc->allow_cb);
+    val = track_classes_value;
+    if (val && SvOK(val)) {
+        SV *rv = SvROK(val) ? SvRV(val) : NULL;
+        if (!rv || SvTYPE(rv) != SVt_PVHV)
+            croak("The 'track_classes' option must be a hash ref");
+        enc->track_classes = (HV *)SvREFCNT_inc(rv);
+    }
+
+    if (paranoid) {
+        if (!max_recursion_depth_set)
+            enc->max_recursion_depth = PARANOID_MAX_RECUR_DEPTH;
+        if (!use_standard_double_set && !native_float_requested)
+            SRL_ENC_SET_OPTION(enc, SRL_F_USE_STANDARD_DOUBLE);
+        if (!refuse_objects_set && !enc->allow_hash && !enc->allow_cb)
+            SRL_ENC_SET_OPTION(enc, SRL_F_REFUSE_OBJECTS);
+        if (!unknown_option_policy_value)
+            unknown_option_policy_value = sv_2mortal(newSVpvs("die"));
     }
 
     srl_handle_unknown_option_keys(aTHX_ unknown_option_keys, unknown_option_policy_value,
@@ -1203,6 +1280,10 @@ srl_build_encoder_struct(pTHX_ HV *opt, sv_with_hash *options,
         && SRL_ENC_HAVE_OPTION(enc, SRL_F_USE_STANDARD_DOUBLE))
         croak("float_type 'native' and use_standard_double are mutually exclusive");
 
+    /* Paranoid requires authentication unless the caller explicitly
+     * selects another policy. Package defaults cannot weaken it. */
+    if (paranoid && (!checksum_policy_value || !SvOK(checksum_policy_value)))
+        checksum_policy_value = sv_2mortal(newSVpvs("require_key"));
     enc->checksum_policy = srl_get_checksum_policy(aTHX_ checksum_policy_value, "Sereal::Encoder::ChecksumPolicy");
     if (checksum_mode == SRL_CHECKSUM_MODE_UNSET)
         checksum_mode = srl_get_default_checksum_mode(aTHX_ "Sereal::Encoder::ChecksumMode",
@@ -1261,6 +1342,18 @@ srl_build_encoder_struct_alike(pTHX_ srl_encoder_t *proto)
     if (proto->freeze_allow_cb) {
         enc->freeze_allow_cb = proto->freeze_allow_cb;
         SvREFCNT_inc(enc->freeze_allow_cb);
+    }
+    if (proto->allow_hash) {
+        enc->allow_hash = proto->allow_hash;
+        SvREFCNT_inc((SV*)enc->allow_hash);
+    }
+    if (proto->allow_cb) {
+        enc->allow_cb = proto->allow_cb;
+        SvREFCNT_inc(enc->allow_cb);
+    }
+    if (proto->track_classes) {
+        enc->track_classes = proto->track_classes;
+        SvREFCNT_inc((SV*)enc->track_classes);
     }
     enc->protocol_version = proto->protocol_version;
     enc->checksum_key_set = proto->checksum_key_set;
@@ -1527,17 +1620,17 @@ srl_dump_ivuv(pTHX_ srl_encoder_t *enc, SV *src)
     }
 }
 
-/* Decide whether the given class is allowed to have its FREEZE method invoked,
- * according to the freeze_allow_classes option. Returns true when no allow-list
- * is configured (the default), so ordinary encoding is unaffected. */
+/* Check either class allow-list. Only freeze_allow_classes passes the object
+ * as a second predicate argument; allowed_classes matches Decoder's API. */
 SRL_STATIC_INLINE int
-srl_freeze_class_allowed(pTHX_ srl_encoder_t *enc, HV *stash, SV *src, SV *referent)
+srl_class_allowed(pTHX_ srl_encoder_t *enc, HV *allow_hash, SV *allow_cb,
+                  HV *stash, SV *src, SV *referent, int with_object)
 {
     const char *classname;
     STRLEN classname_len;
     int is_utf8;
 
-    if (!enc->freeze_allow_hash && !enc->freeze_allow_cb)
+    if (!allow_hash && !allow_cb)
         return 1; /* no allow-list configured: allow everything */
 
     classname = HvNAME_get(stash);
@@ -1548,12 +1641,13 @@ srl_freeze_class_allowed(pTHX_ srl_encoder_t *enc, HV *stash, SV *src, SV *refer
     is_utf8 = 0;
 #endif
 
-    if (enc->freeze_allow_hash) {
-        return hv_exists(enc->freeze_allow_hash, classname,
+    if (allow_hash) {
+        return hv_exists(allow_hash, classname,
                          is_utf8 ? -(I32)classname_len : (I32)classname_len) ? 1 : 0;
     }
     else {
-        /* code ref predicate: $cb->($classname, $object) */
+        /* allowed_classes receives the name; freeze_allow_classes also
+         * receives the object, retaining its established API. */
         int allowed = 0;
         int count;
         SV *name_sv;
@@ -1562,14 +1656,15 @@ srl_freeze_class_allowed(pTHX_ srl_encoder_t *enc, HV *stash, SV *src, SV *refer
         ENTER;
         SAVETMPS;
         PUSHMARK(SP);
-        EXTEND(SP, 2);
+        EXTEND(SP, with_object ? 2 : 1);
         name_sv = sv_2mortal(newSVpvn(classname, classname_len));
         if (is_utf8) SvUTF8_on(name_sv);
         PUSHs(name_sv);
-        PUSHs(src);
+        if (with_object)
+            PUSHs(src);
         PUTBACK;
         srl_callback_begin(aTHX_ enc, src, referent);
-        count = call_sv(enc->freeze_allow_cb, G_SCALAR);
+        count = call_sv(allow_cb, G_SCALAR);
         SPAGAIN;
         if (count >= 1) {
             SV *res = POPs;
@@ -1622,7 +1717,9 @@ srl_get_frozen_object(pTHX_ srl_encoder_t *enc, SV *src, SV *referent)
             /* Enforce the freeze allow-list (if any). A disallowed class either
              * croaks (default) or is serialized normally (freeze_deny_action
              * => 'serialize'), which we signal by returning NULL here. */
-            if (expect_false( !srl_freeze_class_allowed(aTHX_ enc, stash, src, referent) )) {
+            if (expect_false( !srl_class_allowed(aTHX_ enc,
+                    enc->freeze_allow_hash, enc->freeze_allow_cb,
+                    stash, src, referent, 1) )) {
                 if (SRL_ENC_HAVE_OPTION(enc, SRL_F_FREEZE_DENY_SERIALIZE))
                     return NULL;
                 croak("FREEZE not allowed for class '%s' (not in freeze_allow_classes)",
@@ -1670,6 +1767,31 @@ srl_get_frozen_object(pTHX_ srl_encoder_t *enc, SV *src, SV *referent)
     }
     return NULL;
 
+}
+
+/* Count serialized object tags, including OBJECTV and frozen forms. REFP
+ * references have no class tag and are not counted. */
+SRL_STATIC_INLINE void
+srl_track_class(pTHX_ srl_encoder_t *enc, const HV *stash)
+{
+    const char *name;
+    STRLEN len;
+    int is_utf8;
+    SV **count;
+    if (!enc->track_classes)
+        return;
+    name = HvNAME_get(stash);
+    len = HvNAMELEN_get(stash);
+#if PERL_VERSION >= 16
+    is_utf8 = HvNAMEUTF8(stash) ? 1 : 0;
+#else
+    is_utf8 = 0;
+#endif
+    count = hv_fetch(enc->track_classes, name,
+                     is_utf8 ? -(I32)len : (I32)len, 1);
+    if (!count)
+        croak("Could not update track_classes");
+    sv_inc(*count);
 }
 
 /* Outputs a bless header and the class name (as some form of string or COPY).
@@ -1737,6 +1859,10 @@ srl_dump_classname(pTHX_ srl_encoder_t *enc, SV *referent, SV *replacement)
             srl_dump_pv(aTHX_ enc, class_name, len, 0);
 #endif
         }
+        /* A repeated aggregate may have had this header written only to be
+         * replaced with REFP when its referent is reached below. */
+        if (!enc->ref_seenhash || !PTABLE_fetch(enc->ref_seenhash, referent))
+            srl_track_class(aTHX_ enc, stash);
         if (is_av_or_hv) {
             return 0;
         } else {
@@ -1814,7 +1940,6 @@ srl_dump_data_structure(pTHX_ srl_encoder_t *enc, SV *src, SV *user_header_src)
     { /* Have some sort of compression */
         ptrdiff_t sereal_header_len;
         STRLEN uncompressed_body_length;
-        const STRLEN max_len = (1L << 32) - 1;
 
         /* Alas, have to write entire packet first since the header length
          * will determine offsets. */
@@ -1827,12 +1952,7 @@ srl_dump_data_structure(pTHX_ srl_encoder_t *enc, SV *src, SV *user_header_src)
         assert(BUF_POS_OFS(&enc->buf) > sereal_header_len);
         uncompressed_body_length = BUF_POS_OFS(&enc->buf) - sereal_header_len;
 
-        if ((uncompressed_body_length < (STRLEN)enc->compress_threshold) || uncompressed_body_length > max_len) {
-            if (uncompressed_body_length > max_len) {
-                /* we dont support SNAPPY on super long buffers, it has a 2**32 limit
-                 * and we currently don't support splitting things up. See Issue #88 */
-                warn("disabling SNAPPY compression as buffer is too large!");
-            }
+        if (uncompressed_body_length < (STRLEN)enc->compress_threshold) {
             /* Don't bother with compression at all if we have less than $threshold bytes of payload */
             srl_reset_compression_header_flag(&enc->buf);
         }
@@ -1972,6 +2092,24 @@ srl_dump_regexp(pTHX_ srl_encoder_t *enc, SV *sv)
     return;
 }
 
+/* qr// has been an SVt_REGEXP on newer Perls and a magical scalar on
+ * older ones. Require the real referent and the canonical class. */
+SRL_STATIC_INLINE int
+srl_is_canonical_regexp_object(pTHX_ SV *referent)
+{
+    HV *stash = SvSTASH(referent);
+    const char *class_name = stash ? HvNAME_get(stash) : NULL;
+    if (!class_name || HvNAMELEN_get(stash) != 6 ||
+        !memEQ(class_name, "Regexp", 6))
+        return 0;
+#ifdef MODERN_REGEXP
+    return SvTYPE(referent) == SVt_REGEXP;
+#else
+    return SvTYPE(referent) == SVt_PVMG &&
+        mg_find(referent, PERL_MAGIC_qr) != NULL;
+#endif
+}
+
 #define ASSUME_BYTES_PER_TAG 4
 #define BUF_SIZE_ASSERT_AV(b,n) \
         BUF_SIZE_ASSERT((b), 2 + SRL_MAX_VARINT_LENGTH + (1 * ASSUME_BYTES_PER_TAG * (n) ) )
@@ -2063,6 +2201,26 @@ srl_dump_hv_unsorted_nomg(pTHX_ srl_encoder_t *enc, HV *src, UV n)
 {
     HE *he = NULL;
     const int do_share_keys = HvSHAREKEYS((SV *)src);
+#ifdef XPERL_VERSION
+    UV i;
+    const UV limit = HvENTRY_LIMIT(src);
+    enc->frames->cursor = &he;
+
+    /* XPerl stores entries by position without bucket chains. */
+    for (i = 0; i < limit && n; i++) {
+        for (he = HvENTRY_FIRST(src, i); he;
+             he = HvENTRY_NEXT(src, he)) {
+            SV *v = HeVAL(he);
+            if (v != &PL_sv_placeholder) {
+                srl_dump_hk(aTHX_ enc, he, do_share_keys);
+                v = HeVAL(he);
+                CALL_SRL_DUMP_SV(enc, v);
+                if (--n == 0)
+                    break;
+            }
+        }
+    }
+#else
     HE **he_ptr= HvARRAY(src);
     HE **he_end= he_ptr + HvMAX(src) + 1;
     enc->frames->cursor = &he;
@@ -2081,6 +2239,7 @@ srl_dump_hv_unsorted_nomg(pTHX_ srl_encoder_t *enc, HV *src, UV n)
             }
         }
     } while ( he_ptr < he_end );
+#endif
     if (n)
         croak("Sereal: input hash was modified during encoding");
 }
@@ -2117,6 +2276,17 @@ srl_hv_iter_restore(pTHX_ HV *hv, const srl_hv_iter_state_t *st)
          * HvEITER, perl frees a deleted entry immediately instead of deferring
          * it, so only restore the pointer if it is still linked where it was. */
         HE *he = NULL;
+#ifdef XPERL_VERSION
+        if (HvARRAY(hv) && HvHasAUX(hv) && st->riter >= 0) {
+            UV i;
+            const UV limit = HvENTRY_LIMIT(hv);
+            for (i = 0; i < limit && !he; i++) {
+                for (he = HvENTRY_FIRST(hv, i); he;
+                     he = HvENTRY_NEXT(hv, he))
+                    if (he == eiter) break;
+            }
+        }
+#else
         /* SvOOK: belt and braces, the walk's hv_iternext() re-creates the aux. */
         if (HvARRAY(hv) && SvOOK((SV *)hv) && st->riter >= 0) {
             /* Under PERL_HASH_RANDOMIZE_KEYS, RITER is a position in
@@ -2135,6 +2305,7 @@ srl_hv_iter_restore(pTHX_ HV *hv, const srl_hv_iter_state_t *st)
                 for (he = HvARRAY(hv)[bucket]; he; he = HeNEXT(he))
                     if (he == eiter) break;
         }
+#endif
         if (!he) eiter = NULL;
     }
     /* A lazily-deleted entry is already unlinked and owned by the iterator
@@ -2924,8 +3095,32 @@ redo_dump:
         ref_rewrite_pos= BODY_POS_OFS(&enc->buf);
 
         if ( expect_false( SvOBJECT(referent) ) ) {
+            HV *class_stash = SvSTASH(referent);
+            int refused_regexp = SRL_ENC_HAVE_OPTION(enc, SRL_F_REFUSE_OBJECTS)
+                && srl_is_canonical_regexp_object(aTHX_ referent);
+            if (SRL_ENC_HAVE_OPTION(enc, SRL_F_CROAK_ON_BLESS))
+                croak("Attempted to serialize blessed reference. Serializing objects "
+                      "using Sereal::Encoder was explicitly disabled using the "
+                      "'croak_on_bless' option.");
+            if (SRL_ENC_HAVE_OPTION(enc, SRL_F_REFUSE_OBJECTS) && !refused_regexp)
+                croak("Attempted to serialize object while refuse_objects is enabled");
+            if (!SRL_ENC_HAVE_OPTION(enc, SRL_F_NO_BLESS_OBJECTS)
+                    && !srl_class_allowed(aTHX_ enc, enc->allow_hash,
+                        enc->allow_cb, class_stash, src, referent, 0))
+                croak("Object class '%s' is not in allow_classes", HvNAME(class_stash));
+            if ((enc->allow_hash || enc->allow_cb)
+                    && (!SvROK(src) || SvRV(src) != referent
+                        || SvSTASH(referent) != class_stash))
+                croak("Object changed during allow_classes callback");
             /* Write bless operator with class name */
-            replacement= srl_get_frozen_object(aTHX_ enc, src, referent);
+            /* An exempt regexp must stay a REGEXP, even if its package has
+             * acquired a FREEZE method. */
+            replacement= refused_regexp ? NULL :
+                srl_get_frozen_object(aTHX_ enc, src, referent);
+            if ((enc->allow_hash || enc->allow_cb)
+                    && (!SvROK(src) || SvRV(src) != referent
+                        || SvSTASH(referent) != class_stash))
+                croak("Object changed during FREEZE callback");
             if (srl_dump_classname(aTHX_ enc, referent, replacement)) {
                 /* 1 means we should not rewrite away the classname */
                 ref_rewrite_pos= BODY_POS_OFS(&enc->buf);

@@ -17,7 +17,7 @@ Readonly my %VALID_SIGNALS    => map { $_ => 1 } qw(
 	has_side_effect no_side_effect
 );
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -25,7 +25,7 @@ App::Test::Generator::Model::Method - Evidence-based model of a single method un
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -112,7 +112,7 @@ None beyond C<$self>.
 
 =head3 Returns
 
-The name string supplied to C<new>. Read-only — there is no setter;
+The name string supplied to C<new>. Read-only - there is no setter;
 C<name> ignores any extra arguments passed to it.
 
 =head3 API specification
@@ -141,7 +141,7 @@ None beyond C<$self>.
 
 =head3 Returns
 
-The source string supplied to C<new>. Read-only — there is no setter;
+The source string supplied to C<new>. Read-only - there is no setter;
 C<source> ignores any extra arguments passed to it.
 
 =head3 API specification
@@ -355,7 +355,7 @@ C<returns_self>, C<legacy_type>, C<context_aware>, C<error_pattern>
 (intended for category C<return>); C<input_validated>, C<input_typed>,
 C<input_optional> (category C<input>); and C<has_side_effect>,
 C<no_side_effect> (category C<effect>). Signal validity is checked
-against the full set regardless of category — passing a return-only
+against the full set regardless of category - passing a return-only
 signal with C<category =E<gt> 'input'> does not croak.
 
 =head3 API specification
@@ -446,7 +446,7 @@ None beyond C<$self>.
 =head3 Returns
 
 An arrayref of the same evidence hashrefs returned by C<evidence>.
-This is the live internal arrayref, not a copy — modifying it
+This is the live internal arrayref, not a copy - modifying it
 modifies the object's evidence list.
 
 =head3 API specification
@@ -707,7 +707,7 @@ C<$output-E<gt>{_error_return}>, weight 15.
 =head3 Notes
 
 C<$output> being C<undef> or any non-hashref value is silently
-ignored — no evidence is added and no exception is raised. A hashref
+ignored - no evidence is added and no exception is raised. A hashref
 with none of the four recognised keys set to a true value also adds
 no evidence.
 

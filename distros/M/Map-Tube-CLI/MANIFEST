@@ -9,6 +9,7 @@ README
 t/00-load.t
 t/01-map-tube-cli.t
 t/02-as-image.t
+t/03-load-on-demand.t
 xt/changes.t
 xt/manifest.t
 xt/pod.t

@@ -358,5 +358,47 @@
       "url": "/relative/page/7",
       "strict": "/relative/:path"
     }
+  ],
+  "user_id": [
+    {
+      "id": "42",
+      "key": "customer-secret",
+      "hashed": "h1:316d4a35bc95112698f59ef5aac5c29a"
+    },
+    {
+      "id": "43",
+      "key": "customer-secret",
+      "hashed": "h1:a185f401ec8dc760b5be8ac9a8a87062"
+    },
+    {
+      "id": "42",
+      "key": "another-key",
+      "hashed": "h1:4a90741ffdec8a5cdae43e50c2ef046d"
+    },
+    {
+      "id": "MRN-0042",
+      "key": "customer-secret",
+      "hashed": "h1:f3af768c6f9ecb0705f75939dd088b71"
+    },
+    {
+      "id": "123e4567-e89b-12d3-a456-426614174000",
+      "key": "k",
+      "hashed": "h1:36da6dfa8d219ab7599904432843f770"
+    },
+    {
+      "id": "jane@example.com",
+      "key": "customer-secret",
+      "hashed": "h1:17e2a4bfa83cb884ef24097e116e6400"
+    },
+    {
+      "id": "ünïcödé 日本",
+      "key": "clé secrète 🔑",
+      "hashed": "h1:4ba638160496ded733c7ce6f8068910f"
+    },
+    {
+      "id": "42",
+      "key": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      "hashed": "h1:19507d4e2f91a6a1bd7428b34b63adfb"
+    }
   ]
 }

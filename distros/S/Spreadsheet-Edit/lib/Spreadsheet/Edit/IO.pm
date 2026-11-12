@@ -11,8 +11,8 @@ package Spreadsheet::Edit::IO;
 
 # Allow "use <thismodule. VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1001.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2026-05-30'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-11-11'; # DATE from Dist::Zilla::Plugin::OurDate
 
 # This module is derived from the old never-released Text:CSV::Spreadsheet
 
@@ -612,7 +612,7 @@ sub _runcmd($@) {
     }
     system $cmdstr;
   } else {
-    system @cmd;
+    system { $cmd[0] } @cmd;
   }
   return $?
 }

@@ -91,7 +91,7 @@
   <p class="map-progress-text" id="map-progress-text">Looking up
     [%- IF geocode_places %] [% geocode_places %] place[% geocode_places == 1 ? '' : 's' %][% END %]
     [%- IF geocode_places && geocode_outlines %] and[% END %]
-    [%- IF geocode_outlines %] [% geocode_outlines %] county outline[% geocode_outlines == 1 ? '' : 's' %][% END %]
+    [%- IF geocode_outlines %] [% geocode_outlines %] [% bounds_noun | html %] outline[% geocode_outlines == 1 ? '' : 's' %][% END %]
     that [% geocode_pending == 1 ? 'is' : 'are' %] not in the cache yet&hellip;</p>
   <div class="map-progress-row">
     <div class="map-progress-track" role="progressbar" id="map-progress-bar"
@@ -153,10 +153,10 @@
     if (index >= list.length) { finish(); return; }
 
     var item = list[index];
-    // A place to geocode, or a point whose county outline is wanted.
+    // A place to geocode, or a point whose outline is wanted.
     var outline = Object.prototype.hasOwnProperty.call(item, 'point');
     text.textContent = 'Looking up ' + (index + 1) + ' of ' + list.length + ': '
-      + (outline ? 'the county outline at ' + item.point : item.place);
+      + (outline ? 'the outline at ' + item.point : item.place);
 
     var body = new URLSearchParams();
     if (outline) {
@@ -227,7 +227,7 @@
       <br><a class="map-unplotted-all" href="[% unplotted_url | html %]">Show the [% unplotted_rows %] row[% unplotted_rows == 1 ? '' : 's' %] that [% unplotted_rows == 1 ? 'was' : 'were' %] not plotted in the table</a>
       [%- END %]
       [%- IF message.key.match('^warn_map_bounds_') && bounds_left_url.length %]
-      <br><a class="map-unplotted-all" id="map-bounds-left" href="[% bounds_left_url | html %]">Show the [% bounds_left_rows %] row[% bounds_left_rows == 1 ? '' : 's' %] with no county outline in the table</a>
+      <br><a class="map-unplotted-all" id="map-bounds-left" href="[% bounds_left_url | html %]">Show the [% bounds_left_rows %] row[% bounds_left_rows == 1 ? '' : 's' %] with no [% bounds_noun | html %] outline in the table</a>
       [%- END %]
       [%- IF message.key == 'warn_map_bounds_pending' && bounds_retry_url.length %]
       <br><a class="map-retry" id="map-bounds-retry" href="[% bounds_retry_url | html %]">Look up the outline[% bounds_left == 1 ? '' : 's' %] not looked up yet</a>

@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::GitHooks 0.004;
+package Dist::Conformance::Check::GitHooks 0.005;
 
 # ABSTRACT: The git hooks are tracked, match their templates, and are installed
 
@@ -66,7 +66,7 @@ Dist::Conformance::Check::GitHooks - The git hooks are tracked, match their temp
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

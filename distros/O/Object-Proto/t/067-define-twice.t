@@ -18,6 +18,16 @@ is($second->t, 6, 'and its typed accessor');
 is($first->a, 1, 'an object of the first definition still reads');
 is(scalar(my @p = Object::Proto::properties('DT')), 3, 'with no slot added');
 
+# A redefinition with fewer slots than before keeps the slots it names where
+# they were: its arrays must reach those indices (1.05 read and wrote past them)
+Object::Proto::define('Shrinking', 'a', 'b', 'c:Int', 'd');
+{
+    no warnings 'redefine';
+    Object::Proto::define('Shrinking', 'd');
+}
+is(Object::Proto::slot_info('Shrinking', 'd')->{index}, 4, 'a redefinition with fewer slots keeps a slot\'s index');
+ok(Shrinking->can('d'), 'and its accessor');
+
 my $o = DT->new(a => 1);
 Object::Proto::freeze($o);
 fieldhash my %h;

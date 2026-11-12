@@ -30,14 +30,14 @@ my %WriteMakefileArgs = (
         'vars'                          => 0,
         'version'                       => 0,
         'warnings'                      => 0,
-        'DateTime'                      => '1.52',
-        'DateTime::Format::Strptime'    => '1.77',
+        'DateTime::Lite'                => 'v0.10.0',
+        'DateTime::Format::Lite'        => 'v0.1.3',
         'JSON'                          => '4.03',
-        'Module::Generic'               => 'v1.3.0',
+        'Module::Generic'               => 'v1.8.1',
         'Net::IDN::Encode'              => '2.500',
         'Scalar::Util'                  => '1.50',
         'URI::Escape'                   => '5.09',
-        'Wanted'                        => 'v0.1.0',
+        'Wanted'                        => 'v0.1.2',
     },
     TEST_REQUIRES =>
     {
@@ -63,12 +63,12 @@ my %WriteMakefileArgs = (
         resources => {
         #    homepage    => undef,
             repository  => {
-                url         => 'git@gitlab.com:jackdeguest/Cookie.git',
-                web         => 'https://gitlab.com/jackdeguest/Cookie',
+                url         => 'git@gitlab.com:deguest/Cookie.git',
+                web         => 'https://gitlab.com/deguest/Cookie',
                 type        => 'git',
             },
             bugtracker => {
-                web         => 'https://gitlab.com/jackdeguest/Cookie/issues',
+                web         => 'https://gitlab.com/deguest/Cookie/issues',
             },
         },
     }) : ()),

@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Domain.pm
-## Version v0.1.8
+## Version v0.1.9
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/05/06
-## Modified 2025/08/22
+## Modified 2026/10/09
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,8 +16,8 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $DOMAIN_RE $PUBLIC_SUFFIX_DATA $VERSION );
-    use DateTime;
-    use DateTime::Format::Strptime;
+    use DateTime::Lite;
+    use DateTime::Format::Lite;
     use Module::Generic::File qw( tempfile );
     use JSON;
     use Net::IDN::Encode ();
@@ -40,7 +40,7 @@ BEGIN
             )*
         )
     $/x;
-    our $VERSION = 'v0.1.8';
+    our $VERSION = 'v0.1.9';
 };
 
 use strict;
@@ -86,7 +86,7 @@ sub cron_fetch
     {
         $opts = { @_ };
     }
-    
+
     if( ref( $this ) )
     {
         $self = $this;
@@ -127,9 +127,9 @@ sub cron_fetch
             if( $dt )
             {
                 # HTTP Date format
-                my $dt_fmt = DateTime::Format::Strptime->new(
-                    pattern => '%a, %d %b %Y %H:%M:%S GMT',
-                    locale => 'en_GB',
+                my $dt_fmt = DateTime::Format::Lite->new(
+                    pattern   => '%a, %d %b %Y %H:%M:%S GMT',
+                    locale    => 'en_GB',
                     time_zone => 'GMT',
                 );
                 $dt->set_formatter( $dt_fmt );
@@ -137,7 +137,7 @@ sub cron_fetch
             }
         }
     }
-    
+
     # try-catch
     local $@;
     my $resp = eval
@@ -161,25 +161,25 @@ sub cron_fetch
     my $last_mod = $resp->header( 'Last-Modified' );
 
     my $tz;
-    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
+    # DateTime::Lite::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
     # "Cannot determine local time zone"
     # try-catch
     $tz = eval
     {
-        DateTime::TimeZone->new( name => 'local' );
+        DateTime::Lite::TimeZone->new( name => 'local' );
     };
     if( $@ )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    
+
     if( $last_mod )
     {
         $last_mod = $self->_parse_timestamp( $last_mod )->set_time_zone( $tz );
     }
     else
     {
-        $last_mod = DateTime->now( time_zone => $tz );
+        $last_mod = DateTime::Lite->now( time_zone => $tz );
     }
     my $epoch = $last_mod->epoch;
     if( $resp->header( 'etag' ) )
@@ -188,7 +188,7 @@ sub cron_fetch
         $meta->{etag} = $resp->header( 'etag' );
         $meta->{etag} =~ s/^\"([^"]+)\"$/$1/;
     }
-    
+
     if( $code == 304 || 
         ( !$file->is_empty && $mtime && $mtime == $epoch ) )
     {
@@ -272,7 +272,22 @@ sub load
     }
     elsif( $json_file && $json_file->exists )
     {
-        $self->load_json( $json_file ) || return( $self->pass_error );
+        if( !$self->load_json( $json_file ) )
+        {
+            # If there was an error loading the JSON, we rebuild it.
+            # We check the error string as produced in our method 'load_json' below
+            # We try up to 3 times before we give up.
+            if( $self->error->message =~ /error occurred while trying to load json data/i && ++$self->{load_json_attempt} < 4 )
+            {
+                $self->load_public_suffix( $f ) || return( $self->pass_error );
+                $self->save_as_json( $json_file ) || return( $self->pass_error );
+                return( $self );
+            }
+            else
+            {
+                return( $self->pass_error );
+            }
+        }
         my $meta = $self->meta;
         if( $f && $f->exists )
         {
@@ -420,24 +435,23 @@ sub save_as_json
     $file = $self->_is_a( $file, 'Module::Generic::File' ) ? $file : Module::Generic::File::file( "$file" );
     my $data = $self->suffixes;
     my $tz;
-    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
-    # "Cannot determine local time zone"
+    # DateTime::Lite::TimeZone will return an error if the local timezone is not set.
     # try-catch
     local $@;
     $tz = eval
     {
-        DateTime::TimeZone->new( name => 'local' );
+        DateTime::Lite::TimeZone->new( name => 'local' );
     };
-    if( $@ )
+    if( $@ || !defined( $tz ) )
     {
         $tz = DateTime::TimeZone->new( name => 'UTC' );
     }
-    my $dt_fmt = DateTime::Format::Strptime->new(
-        pattern => '%FT%T%z',
-        locale => 'en_GB',
+    my $dt_fmt = DateTime::Format::Lite->new(
+        pattern   => '%FT%T%z',
+        locale    => 'en_GB',
         time_zone => $tz->name,
     );
-    my $today = DateTime->now( time_zone => $tz, formatter => $dt_fmt );
+    my $today = DateTime::Lite->now( time_zone => $tz, formatter => $dt_fmt );
     my $meta  = $self->meta;
     my $ref =
     {
@@ -536,7 +550,7 @@ sub stat
                 $any->{ $i + 1 }->{ $i + 1 } = 1;
             }
         }
-        
+
         no warnings 'exiting';
         LABEL:
         # We found something
@@ -561,7 +575,7 @@ sub stat
         goto LABEL;
     # });
     }
-    
+
     # remove all exceptions from wildcards
     delete( @$any{ keys( %$expt ) } ) if( scalar( keys( %$expt ) ) );
     # get longest match
@@ -622,7 +636,7 @@ sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
         use Wanted;
         our $VERSION = 'v0.1.0';
     };
-    
+
     sub domain
     {
         my $self = shift( @_ );
@@ -632,7 +646,7 @@ sub suffixes { return( shift->_set_get_hash_as_mix_object( 'suffixes', @_ ) ); }
         }
         return( $self->name->join( '.', $self->suffix ) );
     }
-    
+
     sub name { return( shift->_set_get_scalar_as_object( 'name', @_ ) ); }
 
     sub sub { return( shift->_set_get_scalar_as_object( 'sub', @_ ) ); }
@@ -675,7 +689,7 @@ Cookie::Domain - Domain Name Public Suffix Query Interface
 
 =head1 VERSION
 
-    v0.1.8
+    v0.1.9
 
 =head1 DESCRIPTION
 
@@ -732,7 +746,7 @@ If this is set to true, this will prevent the object instantiation method from l
 You need to have installed the package L<LWP::UserAgent> to use this method.
 
 This method can also be called as a package subroutine, such as C<Cookie::Domain::cron_fetch>
-    
+
 Its purpose is to perform a remote connection to L<https://publicsuffix.org/list/effective_tld_names.dat> and check for an updated copy of the public suffix data file.
 
 It checks if the remote file has changed by using the http header field C<Last-Modified> in the server response, or if there is already an C<etag> stored in the cache, it performs a conditional http query using C<If-None-Matched>. See L<Mozilla documentation|https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/ETag> for more information on those types of query.

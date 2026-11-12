@@ -1,0 +1,18 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "exit_status": 0},
+  "device": {"name": "/dev/sde", "info_name": "/dev/sde", "type": "scsi", "protocol": "SCSI"},
+  "scsi_vendor": "SEAGATE",
+  "scsi_product": "ST4000NM0023",
+  "model_name": "SEAGATE ST4000NM0023",
+  "serial_number": "Z1Z0AAAA",
+  "smart_support": {"available": true, "enabled": true},
+  "smart_status": {"passed": true},
+  "temperature": {"current": 29},
+  "scsi_grown_defect_list": 12,
+  "scsi_error_counter_log": {
+    "read": {"errors_corrected_by_eccfast": 0, "errors_corrected_by_eccdelayed": 4, "total_errors_corrected": 4, "total_uncorrected_errors": 0},
+    "write": {"errors_corrected_by_eccfast": 0, "errors_corrected_by_eccdelayed": 0, "total_errors_corrected": 0, "total_uncorrected_errors": 0},
+    "verify": {"errors_corrected_by_eccfast": 0, "errors_corrected_by_eccdelayed": 0, "total_errors_corrected": 0, "total_uncorrected_errors": 0}
+  }
+}

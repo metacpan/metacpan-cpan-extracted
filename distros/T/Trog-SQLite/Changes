@@ -1,5 +1,11 @@
 Revision history for Trog-SQLite
 
+0.006 2026-11-11 TEODESIAN
+    - do_with_update_hook runs one statement with a sub as the update hook
+      of the handle, and then puts back the hook that the handle had
+      before.  SQLite counts no row that the trigger of a view writes, so
+      the hook is how a caller counts the rows of a write through a view.
+
 0.005 2026-10-26 TEODESIAN
     - dbh sets AutoInactiveDestroy, so a forked child that calls forget,
       or exits, no longer closes the handle of its parent.  DBI rolled back

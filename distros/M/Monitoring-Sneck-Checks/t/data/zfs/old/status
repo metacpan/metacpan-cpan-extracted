@@ -1,0 +1,12 @@
+  pool: tank
+ state: ONLINE
+  scan: resilvered 1.20T in 03:00:00 with 0 errors on {{days_ago:50}}
+config:
+
+	NAME        STATE     READ WRITE CKSUM
+	tank        ONLINE       0     0     0
+	  mirror-0  ONLINE       0     0     0
+	    ada0    ONLINE       0     0     0
+	    ada1    ONLINE       0     0     0
+
+errors: No known data errors

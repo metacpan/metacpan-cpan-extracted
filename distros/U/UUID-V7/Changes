@@ -1,5 +1,14 @@
 Revision history for UUID-V7
 
+0.004     2026-11-12 01:56:27+01:00 Europe/Brussels
+          - Use Postgresql's calculation method for submilliseconds.
+          - Check ivsize instead of use64bitint in Build.PL
+
+0.003     2026-11-11 22:40:44+01:00 Europe/Brussels
+          - Explicitly require a perl with 64-bit integers
+          - Require POSIX::RT::Clock 0.024 for Time::Spec support
+          - Make test more tolerant for lower-precision systems
+
 0.002     2026-11-06 17:28:22+01:00 Europe/Brussels
           - Add extract_uuid_v7_time, uuid_string_to_binary,
             uuid_binary_to_string and is_uuid_v7

@@ -15,13 +15,18 @@ requires 'Digest::MD5';   # For Extract.pm fingerprinting (Phase 4.1)
 requires 'Digest::SHA';   # HMAC-SHA256 share tokens, and the login's PBKDF2 password hash (core since Perl 5.10)
 requires 'Encode';   # Extract.pm and Summary.pm (core, listed for completeness)
 requires 'Excel::Writer::XLSX', '1.07';
+requires 'Exporter';   # Core
 requires 'File::Path', '2.07';   # For remove_tree in Dashboard.pm at runtime
 requires 'File::Spec', '3.40';
+requires 'File::Temp';   # Core
+requires 'FindBin';   # Core; the scripts' lib path
+requires 'Getopt::Long';   # Core; the scripts' options
 requires 'HTML::D3', '0.30';   # 0.30 puts a Content-Security-Policy nonce on its scripts; 0.29 colours treemap tiles by a measure, takes a combo scheme and escapes tooltip text; 0.27 stops a label ending the script it is written into; 0.20 added radius_range support for render_scatter_chart_snippet; 0.19 added scatter/stacked/combo/treemap/histogram snippets
 requires 'HTML::TableExtract';
 requires 'HTML::TagCloud', '0.38';   # word cloud page (/wordcloud)
 requires 'HTTP::Message';   # HTTP::Response, for SafeUA's refusals (the dist HTTP::Request comes from)
 requires 'HTTP::Request';   # Used by Ask.pm and Summary.pm for LLM API calls (ships with libwww-perl but not core)
+requires 'Hash::Util';   # Core; locked rows
 requires 'IPC::System::Simple';   # For autodie (:all) in DataSource.pm at runtime
 requires 'JSON::PP';   # Boundary.pm reads Nominatim's replies with it (core, declared for completeness)
 requires 'LWP::UserAgent';   # Needed for Test::Mojo HTTP testing; LWP::UserAgent::Cached is used by D::A url fetch path
@@ -44,6 +49,7 @@ requires 'Statistics::LineFit', '0.06';   # the line graph's trend line
 requires 'Statistics::Lite', '3.62';   # the line graph's min, max and mean when not pushed to SQL
 requires 'Sub::Protected', '0.03';
 requires 'Text::CSV';   # Files with no header row; script/bi-alert's fallback reader when Database::Abstraction cannot open the file
+requires 'Time::HiRes';   # Core
 requires 'URI';   # _is_safe_url's early check of an import URL
 requires 'Unicode::Normalize';   # Dashboard.pm's table sort folds accents (core)
 requires 'version', '0.77';
@@ -65,6 +71,7 @@ on 'test' => sub {
 	requires 'Test::Mojo';
 	requires 'Test::Most';
 	requires 'Test::Needs';
+	requires 'Test::NoShadow';   # t/noshadow.t
 	requires 'Test::Permissions', '0.001.2';
 	requires 'Test::Returns', '0.005';
 	requires 'Test::Without::Module';

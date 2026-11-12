@@ -58,12 +58,20 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "CHI" : "0"
+         },
          "requires" : {
+            "Config" : "0",
+            "Data::Dumper" : "0",
             "Data::Random" : "0",
             "Data::Random::String" : "0",
             "Data::Random::String::Matches" : "0",
             "Data::Random::Structure" : "0",
+            "Encode" : "0",
             "Errno" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
             "File::Temp" : "0",
             "FindBin" : "0",
             "IO::Interactive" : "0",
@@ -80,6 +88,7 @@
             "Test::Log::Abstraction" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.08",
+            "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Needs" : "0",
             "Test::NoWarnings" : "0",
@@ -88,6 +97,7 @@
             "Test::Script" : "1.12",
             "Test::Which" : "0",
             "Tie::Filehandle::Preempt::Stdin" : "0",
+            "YAML::XS" : "0",
             "autodie" : "0",
             "strict" : "0",
             "warnings" : "0"
@@ -108,6 +118,6 @@
          "web" : "https://github.com/nigelhorne/CGI-Info"
       }
    },
-   "version" : "1.16",
+   "version" : "1.17",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

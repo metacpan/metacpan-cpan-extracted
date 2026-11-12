@@ -1,5 +1,12 @@
 Revision history for Pod::Literate
 
+0.0.3 - 2026-11-11
+	- Switch to literate:command target=filename
+	- Verify inline references
+	- Reject :literate format request
+	- Fix Pod::Simple expected version
+	- Simplify some regexps
+
 0.0.2 - 2026-11-08
 	- Build fix
 

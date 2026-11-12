@@ -1,25 +1,38 @@
 #!/usr/bin/perl
 # -valuecommand, at random: widgets with blocks, nested and -empty
-# blocks, values on most nodes, runs, marks and blocks, then random
-# commands (deletions, insertions, tag changes, block insert, split and
-# trim, values set and unset, marks, undo, redo, separators, edit reset,
-# -maxundo), with "debug 1" (a detach the look-ahead did not foresee,
-# or one foreseen that did not happen as told, is then an error).
+# blocks, ragged trees (block sprout), values on most nodes, runs, marks
+# and blocks, then random commands (deletions, insertions, tag changes,
+# block insert, split, sprout, flatten and trim, values set and unset, marks,
+# undo, redo, separators, edit reset, -maxundo), with "debug 1" (a
+# detach the look-ahead did not foresee, or one foreseen that did not
+# happen as told, is then an error).
 # After each command:
 #  - every value it detached was told drop or stash before the change,
 #    at a place that named the value during the call ("blockNodedata"
 #    of [index, level], the run, the mark, the block), and a move named
-#    an existing new place;
+#    an existing new place (but a WRAP or a PULL OUT of a ragged tree,
+#    which only changes the level of a node's address, names the new
+#    place as it is after the change); a copy (block sprout) named the
+#    value at its place;
 #  - every value freed was told drop or discard; every value told drop
-#    is freed, one told stash is not;
+#    is freed (unless block sprout shares it with another owner that
+#    keeps it), one told stash is not;
 #  - every value that came back (undo, redo) was told restore;
-#  - no "late" event, and the widget refused changes during the calls.
+#  - no "late" event, and the widget refused changes during the calls;
+#  - "new" (provisional, O5) names a place [index, level] with the value
+#    undef; in half of the widgets ("fill" widgets) every node has a
+#    value before each command (the setup sets one everywhere, and after
+#    each command a value is set at each place told "new" that has none,
+#    and on a node a command unset): then a node without a value after
+#    a command is one the command created without telling "new" (or
+#    told at a wrong place).
 # ETEXT_RANDOM="first last runs ops" runs other seeds (the defaults are
 # "1 40 20 60").
 use strict;
 use warnings;
 use Test::More;
 use Scalar::Util qw(reftype);
+use Data::Dumper ();
 
 BEGIN {
   eval { require Tk; 1 } or plan skip_all => "Tk not available: $@";
@@ -29,10 +42,10 @@ use Tk::eText;
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
 my ($first, $last, $runs, $nops) = split ' ', ($ENV{ETEXT_RANDOM} || '1 40 20 60');
-plan tests => ($last - $first + 1) + 3;
+plan tests => ($last - $first + 1) + 4;
 $mw->geometry('+10+10');
 
-my (@destroyed, $serial, @events, $t, %count);
+my (@destroyed, $serial, @events, $t, %count, %shared, $fill);
 {
   package V;
   sub new { bless { n => $_[1] }, $_[0] }
@@ -76,19 +89,29 @@ sub cb {
   my ($w, $event, $kind, $where, $value, $cause) = @_;
   my $l = lab($value);
   my %e = (event => $event, kind => $kind, where => $where, label => $l, cause => $cause);
-  if ($event =~ /^(drop|stash|move|restore)$/) {
+  if ($event eq 'new') {
+    $e{bad} = 'not [index, level]' unless ref $where eq 'ARRAY' && @$where == 2
+	&& $where->[0] =~ /^\d+\.\d+$/ && $where->[1] =~ /^\d+$/;
+    $e{bad} = 'a value' if defined $value;
+  }
+  if ($event =~ /^(drop|stash|move|restore|copy)$/) {
     my $now = at_place($w, $kind, $where);
     $e{bad} = "names $now" unless $now eq $l;
-    if ($event eq 'move') {
+    if ($event eq 'move' || $event eq 'copy') {
       my $to = $where->[-1];
+      my $relevel = ($event eq 'copy') || ($kind eq 'node' && ref $to eq 'ARRAY'
+	  && $to->[0] eq $where->[0] && abs($to->[1] - $where->[1]) == 1);
       if (ref $to ne 'ARRAY') {
 	$e{bad} = 'no new place';
+      } elsif ($relevel) {
+	# The place as after the change (a WRAP, a PULL OUT, a copy).
       } elsif ($kind eq 'node' ? !eval { $w->blockNodedata(@$to[0, 1]); 1 }
 	       : !eval { $w->tagData(@$to[0, 1]); 1 }) {
 	$e{bad} = "new place [@$to] does not exist";
       }
     }
   }
+  $shared{$l} = 1 if $event eq 'copy';	# Freed when its last owner goes.
   $e{modified} = 1 if eval { $w->insert('1.0', 'Z'); 1 };
   push @events, \%e;
   $count{$event}++;
@@ -104,6 +127,43 @@ sub attached {
     elsif (ref $x && reftype($x) eq 'ARRAY') { push @todo, @$x }
   }
   \%a;
+}
+
+# Fill widgets: the nodes without a value, from the node values of
+# "block list" (a block whose nodes have none has no such element).
+sub missing_values {
+  my $n = 0;
+  my @todo = ($t->blockList('1.0', 'end'));
+  while (@todo) {
+    my $x = shift @todo;
+    next unless ref $x && ref($x) =~ /::Block$/;
+    my ($h, @rest) = @$x;
+    push @todo, @rest;
+    if (!defined $h->[3]) { $n++; next }	# Counted once: some node.
+    my @v = ($h->[3]);
+    while (@v) {
+      my $a = shift @v;
+      next unless ref $a eq 'ARRAY';
+      $n++ unless defined $a->[0];
+      push @v, @$a[1 .. $#$a];
+    }
+  }
+  $n;
+}
+# Set a value on every node without one (slow: every position, every
+# level).
+sub fill_all {
+  my $n = (split /\./, $t->index('end'))[0] - 1;
+  for my $l (1 .. $n) {
+    my $len = (split /\./, $t->index("$l.end"))[1];
+    for my $p (0 .. $len) {
+      for my $lv (0 .. 8) {
+	my $v = eval { $t->blockNodedata("$l.$p", $lv) };
+	last if $@;
+	$t->blockNodedata("$l.$p", $lv, nv()) unless defined $v;
+      }
+    }
+  }
 }
 
 sub rnd_index {
@@ -135,6 +195,11 @@ sub setup {
       my $p = $at + 1 + int rand(3 + length "@leaves");
       eval { $t->blockSplit("$l.$p", int rand 3) };
     }
+    for (1 .. int rand 4) {
+      my $p = $at + int rand(3 + length "@leaves");
+      eval { rand() < .2 ? $t->blockSprout("$l.$p")
+		: $t->blockSprout("$l.$p", "$l." . ($p + int rand 4)) };
+    }
     my $len;
     for (1 .. int rand 3) {
       $len = (split /\./, $t->index("$l.end"))[1];
@@ -147,7 +212,7 @@ sub setup {
       for my $lv (0 .. 6) {
 	my $v = eval { $t->blockNodedata("$l.$p", $lv) };
 	last if $@;
-	$t->blockNodedata("$l.$p", $lv, nv()) if !defined $v && rand() < .7;
+	$t->blockNodedata("$l.$p", $lv, nv()) if !defined $v && ($fill || rand() < .7);
       }
       if (rand() < .3) {
 	eval { $t->blockData("$l.$p", nv()) unless defined $t->blockData("$l.$p") };
@@ -188,6 +253,11 @@ my @ops = (
   [4, sub { my $i = rnd_index(); my $lv = int rand 3;
 	    ["block split $i $lv", sub { $t->blockSplit($i, $lv) }] }],
   [2, sub { my $i = rnd_index(); ["block trim $i", sub { $t->blockTrim($i) }] }],
+  [4, sub { my $i = rnd_index(); my $j = near($i);
+	    ["block sprout $i $j", sub { $t->blockSprout($i, $j) }] }],
+  [1, sub { my $i = rnd_index(); ["block sprout $i", sub { $t->blockSprout($i) }] }],
+  [3, sub { my $i = rnd_index(); my $lv = int(rand 7) - 3;
+	    ["block flatten $i $lv", sub { $t->blockFlatten($i, $lv) }] }],
   [8, sub { my $i = rnd_index(); my $lv = int(rand 4) - (rand() < .3 ? 2 : 0);
 	    my $v = rand() < .85 ? nv() : undef;
 	    ["nodedata $i $lv " . lab($v), sub { $t->blockNodedata($i, $lv, $v) }] }],
@@ -210,12 +280,82 @@ sub pick { my $r = rand $total; for (@ops) { return $_->[1] if ($r -= $_->[0]) <
 
 sub where { join ' ', map { ref $_ ? '[' . where(@$_) . ']' : $_ } @_ }
 
+# Exactness (2.06): with -undo on, a structural change (deletion,
+# insertion, tag add or remove, block insert, split, sprout, flatten or
+# trim)
+# is now and then made a step of its own and undone and redone at once,
+# twice: the state before it (the block list of the text with all the
+# values, and the shape of every block, "block at", which together give
+# the padding of ragged trees) must come back with the undo, the state
+# after it with the redo.  The events of the undo and the redo are
+# checked as the change's.
+my ($exact_checks, @inexact) = (0);
+sub norm_list {
+  my @o;
+  for my $e (@_) {
+    my $r = ref $e;
+    if ($r =~ /Mark/) {
+      my $n = reftype($e) eq 'ARRAY' ? $e->[0] : $$e;
+      push @o, $e unless $n =~ /^(insert|current)$/;
+    } elsif ($r =~ /::String$/) {
+      if (@o && !ref $o[-1]) { $o[-1] .= $$e } else { push @o, $$e }
+    } elsif ($r =~ /::NewLine$/) {
+    } elsif ($r =~ /::Block$/) {
+      push @o, [ 'B', $e->[0], norm_list(@$e[1 .. $#$e]) ];
+    } else {
+      push @o, $e;
+    }
+  }
+  # Toggles and marks at one position: their order does not matter.
+  my @r;
+  while (@o) {
+    my @run;
+    push @run, shift @o while @o && ref $o[0] && ref($o[0]) =~ /Tag|Mark/;
+    push @r, sort { Data::Dumper::Dumper($a) cmp Data::Dumper::Dumper($b) } @run;
+    push @r, shift @o if @o && !@run;
+  }
+  @r;
+}
+sub exact_state {
+  local $Data::Dumper::Indent = 0;
+  local $Data::Dumper::Sortkeys = 1;
+  my $s = Data::Dumper::Dumper([norm_list($t->blockList('1.0', 'end'))]);
+  my $lines = (split /\./, $t->index('end'))[0];
+  for my $l (1 .. $lines) {
+    for my $c (0 .. (split /\./, $t->index("$l.end"))[1]) {
+      my @r = $t->blockAt("$l.$c");
+      $s .= " $l.$c:" . Data::Dumper::Dumper($r[4]) if @r;
+    }
+  }
+  $s;
+}
+sub exact_wrap {
+  my ($desc, $code) = @_;
+  return ($desc, $code) unless $t->cget('-undo') && rand() < .3
+      && $desc =~ /^(delete|insert|tag add|tag remove|block (insert|split|trim|sprout|flatten))/;
+  ("$desc (exact)", sub {
+    $t->editSeparator;
+    my $s0 = exact_state();
+    $code->();
+    my $s1 = exact_state();
+    return if $s1 eq $s0;
+    $exact_checks++;
+    for my $round (1, 2) {
+      $t->editUndo;
+      die "not exact: undo $round\n" if exact_state() ne $s0;
+      $t->editRedo;
+      die "not exact: redo $round\n" if exact_state() ne $s1;
+    }
+  });
+}
+
 my $commands = 0;
 $SIG{__WARN__} = sub { diag "warning: @_" };
 for my $seed ($first .. $last) {
   srand $seed;
   my @failed;
   for my $run (1 .. $runs) {
+    $fill = rand() < .5;
     $t = $mw->eText(-width => 40, -height => 6, -undo => (rand() < .7 ? 1 : 0),
 		    -autoseparators => (rand() < .5 ? 1 : 0), -valuecommand => \&cb);
     $t->debug(1);
@@ -224,10 +364,14 @@ for my $seed ($first .. $last) {
     $t->blockConfigure('E', -empty => 1);
     $t->insert('end', join("\n", map { rnd_word() . rnd_word() } 1 .. 2 + int rand 3) . "\n");
     setup();
+    if ($fill && (my $m = missing_values())) {
+      push @failed, "seed $seed run $run: $m nodes without a value after the setup";
+      fill_all();
+    }
     my @log;
     for my $opn (1 .. $nops) {
       my $mark = $serial;
-      my ($desc, $code) = @{pick()->()};
+      my ($desc, $code) = exact_wrap(@{pick()->()});
       my $before = attached();
       @events = ();
       @destroyed = ();
@@ -236,7 +380,7 @@ for my $seed ($first .. $last) {
       $commands++;
       my $after = attached();
       my @p;
-      push @p, "error: $err" if !$ok && $err =~ /-valuecommand/;
+      push @p, "error: $err" if !$ok && $err =~ /-valuecommand|not exact/;
       my %told;
       for my $e (@events) {
 	push @{$told{$e->{label}}}, $e->{event};
@@ -259,11 +403,38 @@ for my $seed ($first .. $last) {
 	push @p, "$l freed, not told" unless grep { /^(drop|discard)$/ } @{$told{$l} || []};
       }
       for my $e (@events) {
-	push @p, "$e->{label} told drop, not freed" if $e->{event} eq 'drop' && !$freed{$e->{label}};
+	push @p, "$e->{label} told drop, not freed" if $e->{event} eq 'drop' && !$freed{$e->{label}}
+	  && !$shared{$e->{label}};
 	push @p, "$e->{label} told stash, freed" if $e->{event} eq 'stash' && $freed{$e->{label}};
 	push @p, "$e->{label} told move, not attached afterwards"
 	  if $e->{event} eq 'move' && !$after->{$e->{label}}
 	     && !grep { /^(drop|stash)$/ } @{$told{$e->{label}}};
+      }
+      if ($fill) {
+	# Every node had a value: those without one now were created by
+	# the command, and must have been told "new" (a value is set at
+	# each such place, which must name a node).
+	for my $e (grep { $_->{event} eq 'new' } @events) {
+	  my $v = eval { $t->blockNodedata(@{$e->{where}}) };
+	  if ($@) {
+	    push @p, "new [" . where(@{$e->{where}}) . "]: no such node";
+	  } elsif (!defined $v) {
+	    $t->blockNodedata(@{$e->{where}}, nv());
+	  }
+	}
+	if ($desc =~ /^nodedata (\S+) (\S+) undef/) {
+	  eval { $t->blockNodedata($1, $2, nv()) };
+	}
+	# An undo or a redo is not told "new" for what it re-creates:
+	# every node it leaves has a value, the one the change took or
+	# one set afterwards (waiting in the undo step meanwhile; a value
+	# set on a leaf that a dissolved nested block left came back
+	# nowhere, BUGS 31).
+	if (my $m = missing_values()) {
+	  push @p, "$m nodes without a value"
+	      . ($desc =~ /^(undo|redo)$/ ? '' : ', not told new');
+	  fill_all();
+	}
       }
       push @log, "$desc" . join('', map { "\n    $_->{event} $_->{kind} [" . where(@{$_->{where} || []})
 					  . "] $_->{label} ($_->{cause})" } @events);
@@ -281,8 +452,9 @@ for my $seed ($first .. $last) {
   ok(!@failed, "seed $seed: $runs widgets, $nops commands each") or diag $failed[0];
 }
 ok(!$count{late}, 'no late event');
-ok($count{drop} && $count{stash} && $count{move} && $count{restore} && $count{discard},
-   'every event happened');
+ok($exact_checks > 0, "$exact_checks changes undone and redone exactly");
+ok($count{drop} && $count{stash} && $count{move} && $count{restore} && $count{discard}
+   && $count{copy} && $count{new}, 'every event happened');
 note join ', ', map { "$_ $count{$_}" } sort keys %count;
 ok($commands > 0, "$commands commands");
 $mw->destroy;

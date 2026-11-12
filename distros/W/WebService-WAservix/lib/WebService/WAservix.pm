@@ -7,7 +7,7 @@ use Carp qw(croak);
 use HTTP::Tiny;
 use JSON::PP;
 
-our $VERSION = '1.000';
+our $VERSION = '1.001';
 
 my $DEFAULT_BASE_URL = 'https://tekservix.com/waservix/api';
 
@@ -156,7 +156,7 @@ __END__
 
 =head1 NAME
 
-WebService::WAservix - Perl client for the WAservix WhatsApp API Gateway
+WebService::WAservix - WAservix WhatsApp API Gateway: official Perl client by Tekservix (send WhatsApp messages from your own number)
 
 =head1 SYNOPSIS
 

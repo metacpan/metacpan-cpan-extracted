@@ -1,5 +1,13 @@
 Revision history for Perl extension UPnP.
 
+2026-11-12 Satoshi Konno <skonno@cybergarage.org>
+	* v1.4.10
+	* Thanks for Slaven Rezic
+	* Stop importing POSIX::isfinite, which only exists from perl 5.22, so the modules
+	  load again on older perls (RT #182943).
+	* Fix the limit tests on perls built with -Duselongdouble or -Dusequadmath, where the
+	  400-digit test values were still finite (RT #182942).
+
 2026-11-11 Satoshi Konno <skonno@cybergarage.org>
 	* v1.4.9
 	* Thanks for MIZUNUMA Yuto

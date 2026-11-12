@@ -1,0 +1,24 @@
+#!/usr/bin/env perl
+# Stands in for chronyc, ntpq, and timedatectl. Prints the output file
+# from the directory TIME_SYNC_TEST_SET names, with {{ago:N}} swapped
+# for the epoch N seconds ago and {{ntp_ago:N}} for it in NTP's hex, and
+# exits with what is in its exit file, if any.
+use strict;
+use warnings;
+use FindBin;
+
+my $args = "@ARGV";
+die( 'unexpected args ' . $args . "\n" ) if $args !~ /\A(?:-n -c tracking|-n -c rv|show)\z/;
+my $set = $FindBin::Bin . '/' . $ENV{TIME_SYNC_TEST_SET};
+open( my $fh, '<', $set . '/output' ) or die( 'no ' . $set . '/output' . "\n" );
+my $output = do { local $/; <$fh> };
+$output =~ s/\{\{ago:([0-9]+)\}\}/time - $1/ge;
+$output =~ s/\{\{ntp_ago:([0-9]+)\}\}/sprintf( '%08x', time - $1 + 2208988800 )/ge;
+print $output;
+my $exit = 0;
+
+if ( open( my $exit_fh, '<', $set . '/exit' ) ) {
+	$exit = <$exit_fh>;
+	chomp($exit);
+}
+exit($exit);

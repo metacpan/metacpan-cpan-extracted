@@ -17,12 +17,14 @@ t/003_cookie.t
 t/004_cookies.t
 t/005_modperl.t
 t/006_cookies_sqlite.t
+t/007_autosave.t
 t/090_coverage.t
 t/091_pod.t
 t/092_manifest.t
 t/093_prereq.t
 t/094_signature.t
 t/099_kwalitee.t
+t/autosave_end_child.pl
 t/conf/extra.conf.in
 t/CookieTest.pm
 t/server.crt

@@ -1,5 +1,5 @@
 {
-	"version" : "0.0.2",
+	"version" : "0.0.3",
 	"name"    : "Pod-Literate",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Literate programming in POD",
@@ -13,12 +13,13 @@
 		"runtime": {
 			"requires": {
 				"perl": "5.0.0",
-				"Pod::Simple": "0"
+				"Pod::Simple": "3.40"
 			}
 		},
 		"test": {
 			"requires": {
 				"File::Temp": "0.2301",
+				"Pod::Simple": "3.40",
 				"Test::More": "1.302209"
 			}
 		}

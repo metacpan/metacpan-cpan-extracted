@@ -52,6 +52,7 @@ t/10-compile.t
 t/30-basics.t
 t/40-more.t
 t/abs.t
+t/accessor_state_checks.t
 t/advanced_types.t
 t/Analyzer-Complexity.t
 t/Analyzer-Return.t
@@ -77,6 +78,7 @@ t/CoverageGuided_Fuzzer.t
 t/CoverageGuided_Fuzzer_unit.t
 t/data-flow.t
 t/default_value_extraction.t
+t/destructive_checks.t
 t/dist.t
 t/domain.t
 t/edge_cases.t
@@ -153,10 +155,24 @@ t/test_hints.t
 t/TestStrategy.t
 t/transaction.t
 t/type_params.t
+t/unbuildable_constructor.t
 t/unit.t
 t/unused.t
 t/valid_inputs.t
 t/vars.t
+website/css/site.css
+website/html/changelog.html
+website/html/commands.html
+website/html/dashboard.html
+website/html/extraction.html
+website/html/fuzzing.html
+website/html/index.html
+website/html/install.html
+website/html/limitations.html
+website/html/quickstart.html
+website/html/schema.html
+website/index.html
+website/README.md
 xt/.gitkeep
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

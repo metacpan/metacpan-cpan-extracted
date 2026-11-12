@@ -231,4 +231,122 @@ subtest 'generate() produces syntactically valid Perl for builtin schema' => sub
 	is($result, 0, 'generated Perl parses without errors');
 };
 
+# ==================================================================
+# Regression: schema text must never break the generated script
+# ==================================================================
+
+# Helper: true when the generated source compiles. The schema's own
+# 'use Module;' line is removed because the module does not exist.
+sub _compiles {
+	my ($src) = @_;
+	$src =~ s/^use (?!strict|warnings|Benchmark)[\w:]+;$//m;
+	require File::Temp;
+	my $tmp = File::Temp->new(SUFFIX => '.pl', UNLINK => 1);
+	print $tmp $src;
+	close $tmp;
+	return system($^X, '-c', "$tmp") == 0;
+}
+
+subtest 'generate() treats the string "undef" as no input' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => 'My::Mod',
+		function => 'ping',
+		input    => 'undef',
+	});
+	my $src;
+	lives_ok { $src = $bg->generate() } 'input: undef does not croak';
+	like($src, qr/My::Mod::ping\(\)/, 'call has no arguments');
+};
+
+subtest 'generate() treats a transform input of "undef" as no input' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module     => 'My::Mod',
+		function   => 'ping',
+		input      => { a => { type => 'integer' } },
+		transforms => {
+			none => { input => 'undef' },
+			base => {},
+			junk => 'not a hashref',
+		},
+	});
+	my $src;
+	lives_ok { $src = $bg->generate() } 'odd transform shapes do not croak';
+	like($src, qr/'none'\s+=> sub \{ My::Mod::ping\(\) \}/, 'input: undef gives no arguments');
+	like($src, qr/'base'\s+=> sub \{ My::Mod::ping\(a => 42\) \}/, 'missing input falls back to base');
+	like($src, qr/'junk'\s+=> sub \{ My::Mod::ping\(a => 42\) \}/, 'non-hashref transform falls back to base');
+};
+
+subtest 'generate() escapes transform names' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module     => 'My::Mod',
+		function   => 'ping',
+		transforms => {
+			q{it's}       => { input => {} },
+			q{back\\slash} => { input => {} },
+		},
+	});
+	my $src = $bg->generate();
+	like($src, qr/'it\\'s'/, 'single quote is escaped');
+	ok(_compiles($src), 'generated Perl compiles');
+};
+
+subtest 'generate() quotes parameter and constructor names that are not identifiers' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => 'My::Mod',
+		function => 'ping',
+		new      => { 'odd key' => 1, plain => 2 },
+		input    => { 'a-b' => { type => 'integer' }, ok_name => { type => 'integer' } },
+	});
+	my $src = $bg->generate();
+	like($src, qr/'odd key' => 1/, 'constructor key with a space is quoted');
+	like($src, qr/\bplain => 2/,   'plain constructor key stays bare');
+	like($src, qr/'a-b' => 42/,    'parameter name with a hyphen is quoted');
+	like($src, qr/\bok_name => 42/, 'plain parameter name stays bare');
+	ok(_compiles($src), 'generated Perl compiles');
+};
+
+subtest 'generate() does not change the schema it was given' => sub {
+	my $schema = {
+		module   => 'My::Mod',
+		function => 'ping',
+		input    => { x => undef, y => { type => 'integer' } },
+	};
+	my $src = App::Test::Generator::BenchmarkGenerator->new(schema => $schema)->generate();
+	ok(!defined $schema->{input}{x}, 'undef parameter spec is still undef');
+	like($src, qr/x => undef/, 'undef parameter spec is passed as undef');
+};
+
+subtest 'generate() writes constructor values as valid literals' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => 'My::Mod',
+		function => 'ping',
+		new      => {
+			inf    => 'Inf',
+			nan    => 'NaN',
+			padded => ' 12',
+			sci    => '-1.5e3',
+			slash  => 'ends\\',
+			nested => { list => [ 1, q{x'y} ] },
+		},
+	});
+	my $src = $bg->generate();
+	like($src, qr/inf => 'Inf'/,    'Inf is quoted');
+	like($src, qr/nan => 'NaN'/,    'NaN is quoted');
+	like($src, qr/padded => ' 12'/, 'number with leading space is quoted');
+	like($src, qr/sci => -1\.5e3/,  'plain number is not quoted');
+	unlike($src, qr/HASH\(0x/,      'nested hashref is not stringified');
+	like($src, qr/nested => \{'list' => \[1,'x\\'y'\]\}/, 'nested data is written out');
+	ok(_compiles($src), 'generated Perl compiles');
+};
+
+subtest 'generate() croaks on a constructor value it cannot write' => sub {
+	my $bg = App::Test::Generator::BenchmarkGenerator->new(schema => {
+		module   => 'My::Mod',
+		function => 'ping',
+		new      => { cb => sub { 1 } },
+	});
+	throws_ok { $bg->generate() } qr/cannot write a CODE reference as a literal/,
+		'code reference croaks';
+};
+
 done_testing();

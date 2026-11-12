@@ -1,0 +1,7 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "exit_status": 4},
+  "device": {"name": "/dev/sdf", "info_name": "/dev/sdf", "type": "scsi", "protocol": "SCSI"},
+  "model_name": "Generic Flash Disk",
+  "smart_support": {"available": false}
+}

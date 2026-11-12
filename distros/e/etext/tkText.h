@@ -554,6 +554,28 @@ typedef struct TkTextTabArray {
 					 * (added 0) of the tag "string" over
 					 * index1-index2; ranges: the ranges
 					 * the tag had there. */
+#define TK_TEXT_UNDO_SPROUT	7	/* block sprout over index1-index2
+					 * (as given); level: 1 if it made a
+					 * start piece, + 2 if it made an end
+					 * piece; added: 1 if it made the
+					 * stored tree one level higher.  The
+					 * undo pulls the new node out and
+					 * deletes the separators it put in;
+					 * the redo sprouts again, the values
+					 * coming back from the atom.  level
+					 * + 4: the block was a single leaf,
+					 * whose root it made real first;
+					 * + 8: the one-index form (the redo
+					 * checks the leaf, not the range). */
+#define TK_TEXT_UNDO_PULLOUT	8	/* A PULL OUT of block flatten: the
+					 * real parent of the leaf starting at
+					 * index1 (index2 the same) became
+					 * padding, the leaf taking its value
+					 * if it had one; added: the levels the
+					 * stored tree was made lower after.
+					 * The JOINs of block flatten are
+					 * deletions of separators
+					 * (_DELETE), in the same step. */
 
 /*
  * Values ("block nodedata") that leave the text.  Freeing a value can
@@ -667,7 +689,37 @@ typedef struct TkTextUndoAtom {
 					 * back (TkIBTreeSetSeparatorLevels).
 					 * Malloc-ed; NULL otherwise. */
     int numLevels;			/* How many. */
-    int level;				/* _SPLIT: the level asked for. */
+    int *defects;			/* _BLOCK inside a block whose tree
+					 * has padding (a ragged tree): the
+					 * defects (padding nodes directly
+					 * above) of the leaves from the one
+					 * of index1 to the one after the
+					 * separator just after index2's (the
+					 * leaves of "levels"), as they were
+					 * before the block insert; its undo
+					 * sets them back after the levels
+					 * (TkIBTreeSetLeafDefects).
+					 * Malloc-ed; NULL otherwise. */
+    int numDefects;			/* How many. */
+    int *wraps;				/* _DELETE (and _INSERT, whose undo
+					 * deletes): the WRAPs the deletion
+					 * made before joining leaves of
+					 * different depths
+					 * (TkBTreeEqualizeDelete), which
+					 * the re-insertion of the text is
+					 * followed by the PULL OUTs of, in
+					 * reverse order (TkIBTreeUndoWraps).
+					 * See TkBTreeEqualizeDelete for the
+					 * layout.  Malloc-ed; NULL if none. */
+    int *roots;				/* _INSERT, _DELETE, _SPLIT: the blocks
+					 * that were single leaves and whose
+					 * root the change made real (see
+					 * TkTextRootLogTake): their undo makes
+					 * the root padding again
+					 * (TkIBTreeRepadRoots).  Malloc-ed;
+					 * NULL if none. */
+    int level;				/* _SPLIT: the level asked for;
+					 * _SPROUT: see there. */
     int added;				/* _SPLIT: the levels the split added
 					 * above the root; _TRIM: non-zero if
 					 * the root had a value; _TAG: 1 for
@@ -735,6 +787,18 @@ typedef struct TkTextUndoStack {
 #define TK_TEXT_VC_RESTORE	4	/* An undo or a redo gave it back. */
 #define TK_TEXT_VC_DISCARD	5	/* A discarded undo step held it. */
 #define TK_TEXT_VC_LATE		6	/* Detached, not foreseen. */
+#define TK_TEXT_VC_COPY		7	/* block sprout puts the value on
+					 * another owner too (shared): the
+					 * last element of $where is that
+					 * owner, as after the change.  Told
+					 * at once, not checked at the end. */
+#define TK_TEXT_VC_NEW		8	/* (Provisional, O5.)  A node or a
+					 * leaf the change creates without a
+					 * value: $where is its place after
+					 * the change, the value undef.  Told
+					 * before the change, at once; not
+					 * for what an undo or a redo
+					 * re-creates. */
 
 #define TK_TEXT_VC_NODE		1	/* [index, level] */
 #define TK_TEXT_VC_RUN		2	/* [tag, start, end] */
@@ -767,6 +831,8 @@ typedef struct TkTextUndoStack {
 #define TK_TEXT_EDIT_TRIM	5	/* with -autoseparators, a change of */
 #define TK_TEXT_EDIT_TAGADD	6	/* kind starts a new undo step. */
 #define TK_TEXT_EDIT_TAGREMOVE	7
+#define TK_TEXT_EDIT_SPROUT	8
+#define TK_TEXT_EDIT_FLATTEN	9
 
 /*
  * A data structure of the following type is kept for each text widget that
@@ -862,6 +928,12 @@ typedef struct TkText {
     TkTextIndex topIndex;	/* Identifies first character in top display
 				 * line of window. */
     struct TextDInfo *dInfoPtr;	/* Information maintained by tkTextDisp.c. */
+    struct TkTextOrnInfo *ornInfoPtr;
+				/* Ornaments (tkTextOrn.c), or NULL. */
+    int ornProportional;	/* -ornamentproportional: the x of a
+				 * stand-in with no x remembered is
+				 * proportional to its offset in its line
+				 * (else the middle of the text area). */
 
     /*
      * Information related to selection.
@@ -991,6 +1063,17 @@ typedef struct TkText {
     TkTextValue **editValues;	/* While an undo or a redo deletes text: the
 				 * list of the atom it applies, for the
 				 * values that deletion drops; else NULL. */
+    struct TkTextUndoAtom *editAtom;
+				/* While an undo or a redo deletes text:
+				 * the atom it applies, which keeps the
+				 * WRAPs that deletion makes (wraps); else
+				 * NULL. */
+    int *rootLog;		/* The blocks that were single leaves and
+				 * whose root a change made real (a newline
+				 * in the leaf): malloc-ed [n, line, byte,
+				 * ...] of their heads, or NULL; reset and
+				 * taken by the changes recorded for undo
+				 * (TkTextRootLogReset, TkTextRootLogTake). */
     int freeingValues;		/* Non-zero while FlushValues frees values
 				 * (a DESTROY method may be running): the
 				 * round (see FlushValues); a command that
@@ -1054,6 +1137,11 @@ typedef struct TkText {
 
 #define TKT_GET_STRICT		1
 #define TKT_GET_VERBOSE		2
+/* The bits of -getflags a program may set; the others are reserved for
+ * the widget's own calls (the manual: "All undocumented bits are reserved
+ * and should be 0"), and are ignored when set by a program (BUGS 30). */
+#define TKT_GET_USER		(TKT_GET_STRICT | TKT_GET_VERBOSE)
+#define TkTextUserGetFlags(textPtr) ((textPtr)->getFlags & TKT_GET_USER)
 
 #define TKT_GET_NOCASE		0x8000
 #define TKT_GET_OFFSET		0x4000
@@ -1066,6 +1154,11 @@ typedef struct TkText {
 					 * instance data out of the block
 					 * headers of a list (the undo
 					 * records them on its own). */
+/* 0x100 was TKT_GET_DEFECTS (the undo's leaf defects): the pairs
+ * [depth, defect] of the separators in every list replace it.  It is
+ * now: */
+#define TKT_GET_PRIVATE		0x100	/* Keep the private marks in a
+					 * list (the undo's own lists). */
 
 /*
  * Records of the following type define segment types in terms of
@@ -1174,6 +1267,10 @@ typedef struct TkTextBlock {
 					 * instance data of the blocks the
 					 * B-tree code deletes, see
 					 * TkTextFreeValueLater). */
+    Arg ornamentsArg;			/* -ornaments as given. */
+    struct TkTextOrnTemplates *ornTemplates;
+					/* -ornaments parsed (tkTextOrn.c),
+					 * or NULL. */
 } TkTextBlock;
 
 /*
@@ -1325,6 +1422,26 @@ extern void		TkTextVcPredict _ANSI_ARGS_((TkText *textPtr,
 extern void		TkTextVcCandidate _ANSI_ARGS_((TkText *textPtr,
 			    TkTextData value, int kind, Tcl_Obj *where));
 extern void		TkTextVcNotify _ANSI_ARGS_((TkText *textPtr));
+extern void		TkTextVcTell _ANSI_ARGS_((TkText *textPtr,
+			    int event, int kind, Tcl_Obj *where, Arg value));
+extern void		TkTextVcNew _ANSI_ARGS_((TkText *textPtr,
+			    Tcl_Obj *where));
+extern int		TkTextVcNewOn _ANSI_ARGS_((TkText *textPtr));
+extern Tcl_Obj *	TkTextVcCharPlace _ANSI_ARGS_((TkText *textPtr,
+			    int line, int byteIndex, int chars, int level));
+extern Tcl_Obj *	TkTextVcIndexPlace _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int chars, int level));
+extern void		TkBTreeVcNewInsert _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, char *string));
+extern void		TkBTreeVcNewSplit _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int level));
+extern void		TkBTreeVcNewDissolve _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr));
+extern void		TkBTreeVcNewBlock _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr));
+extern void		TkBTreeVcNewSprout _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int startMade, int endMade));
 extern void		TkTextVcSeen _ANSI_ARGS_((TkText *textPtr,
 			    TkTextData value, int event));
 extern void		TkTextVcRestored _ANSI_ARGS_((TkText *textPtr,
@@ -1400,6 +1517,77 @@ extern int		TkTextMarkCmd _ANSI_ARGS_((TkText *textPtr,
 			    Tcl_Interp *interp, int argc, Arg *args));
 extern int		TkTextBlockCmd _ANSI_ARGS_((TkText *textPtr,
 			    Tcl_Interp *interp, int argc, Arg *args));
+
+/*
+ * Ornaments (tkTextOrn.c): the box of a character as drawn, in window
+ * coordinates (base: the y of its baseline).
+ */
+
+typedef struct TkTextOrnBox {
+    double x, y, width, height, base;
+    Tk_Font tkfont;		/* The font of the character (the widget's
+				 * for a stand-in or what has no font). */
+    void *line;			/* The display line it is in (inside a
+				 * block, the leaf's), NULL for a stand-in. */
+} TkTextOrnBox;
+
+/*
+ * The boxes a block type's ornaments (-ornaments) are computed from:
+ * the block's and its leaves', in block coordinates (from its top
+ * left corner).
+ */
+
+typedef struct TkTextOrnBlockBoxes {
+    int numLeaves;
+    TkTextOrnBox *leaves;	/* In the order of the tree. */
+    int *shown;			/* Per leaf: shown (else its box is not
+				 * known). */
+    TkTextOrnBox block;
+} TkTextOrnBlockBoxes;
+
+struct TkTextBlockOrns;
+struct TkTextOrnTemplates;
+
+extern int		TkTextOrnIsType _ANSI_ARGS_((char *string));
+extern int		TkTextOrnLayoutItem _ANSI_ARGS_((TkText *textPtr,
+			    Tcl_Interp *interp, int argc, Arg *args,
+			    int addIndex, struct TkTextBlockOrns **listPtrPtr));
+extern int		TkTextOrnTemplatesParse _ANSI_ARGS_((
+			    Tcl_Interp *interp, TkText *textPtr, Arg arg,
+			    struct TkTextOrnTemplates **templPtrPtr));
+extern void		TkTextOrnTemplatesRelease _ANSI_ARGS_((
+			    TkText *textPtr,
+			    struct TkTextOrnTemplates *templPtr));
+extern void		TkTextOrnLayoutTemplates _ANSI_ARGS_((
+			    TkText *textPtr,
+			    struct TkTextOrnTemplates *templPtr,
+			    TkTextOrnBlockBoxes *boxesPtr,
+			    struct TkTextBlockOrns **listPtrPtr));
+extern void		TkTextOrnDrawBlock _ANSI_ARGS_((TkText *textPtr,
+			    struct TkTextBlockOrns *listPtr, Drawable d,
+			    int under, int addIndex, int x, int y));
+extern void		TkTextOrnFreeBlock _ANSI_ARGS_((TkText *textPtr,
+			    struct TkTextBlockOrns *listPtr));
+extern int		TkTextOrnamentCmd _ANSI_ARGS_((TkText *textPtr,
+			    Tcl_Interp *interp, int argc, Arg *args));
+extern void		TkTextOrnFreeAll _ANSI_ARGS_((TkText *textPtr));
+extern void		TkTextOrnBeforeDelete _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr));
+extern void		TkTextOrnAfterDelete _ANSI_ARGS_((TkText *textPtr));
+extern void		TkTextOrnUpdate _ANSI_ARGS_((TkText *textPtr,
+			    void (*invalProc) _ANSI_ARGS_((TkText *textPtr,
+			    int y0, int y1))));
+extern int		TkTextOrnTouches _ANSI_ARGS_((TkText *textPtr,
+			    int y0, int y1));
+extern void		TkTextOrnDraw _ANSI_ARGS_((TkText *textPtr,
+			    Drawable d, int under, int yTop, int height));
+extern int		TkTextOrnCharBox _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int *hasXPtr, double *xPtr,
+			    TkTextOrnBox *boxPtr));
+extern int		TkTextOrnDisplayedRange _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *firstPtr, TkTextIndex *lastPtr));
+extern void		TkTextOrnUnionBox _ANSI_ARGS_((TkTextOrnBox *boxPtr,
+			    TkTextOrnBox *otherPtr));
 extern int		TkTextMarkNameToIndex _ANSI_ARGS_((TkText *textPtr,
 			    char *name, TkTextIndex *indexPtr));
 extern void		TkTextMarkSegToIndex _ANSI_ARGS_((TkText *textPtr,
@@ -1425,6 +1613,28 @@ extern int		TkTextSegToOffset _ANSI_ARGS_((TkTextSegment *segPtr,
 			    TkTextLine *linePtr));
 extern TkTextSegment *	TkTextSetMark _ANSI_ARGS_((TkText *textPtr, char *name,
 			    TkTextIndex *indexPtr));
+
+/*
+ * Private marks (the ornaments' own, tkTextOrn.c): marks whose names
+ * start with a control character, which the program never sees (mark
+ * names, next, previous, dump, block list) and cannot name (mark
+ * commands, indices).  The undo's own lists keep them
+ * (TKT_GET_PRIVATE), so that an undone deletion puts them back where
+ * they were, as it does with the program's marks.
+ */
+
+#define TK_TEXT_PRIVATE_MARK_CHAR	'\001'
+#define TkTextIsPrivateMarkName(name) \
+	((name)[0] == TK_TEXT_PRIVATE_MARK_CHAR)
+#define TkTextIsPrivateMark(textPtr, markPtr) \
+	TkTextIsPrivateMarkName(Tcl_GetHashKey(&(textPtr)->markTable, \
+		(markPtr)->body.mark.hPtr))
+extern TkTextSegment *	TkTextSetPrivateMark _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int left));
+extern void		TkTextUnsetPrivateMark _ANSI_ARGS_((TkText *textPtr,
+			    TkTextSegment *markPtr));
+extern void		TkTextSetMarkGravity _ANSI_ARGS_((TkText *textPtr,
+			    TkTextSegment *markPtr, int left));
 extern void		TkTextSetYView _ANSI_ARGS_((TkText *textPtr,
 			    TkTextIndex *indexPtr, int pickPlace));
 extern int		TkTextTagCmd _ANSI_ARGS_((TkText *textPtr,
@@ -1475,7 +1685,8 @@ int *			TkIBTreeSeparatorLevels _ANSI_ARGS_((
 			    int *numPtr));
 void			TkIBTreeSetSeparatorLevels _ANSI_ARGS_((
 			    TkText *textPtr, TkTextIndex *indexPtr,
-			    int *levels, int num));
+			    int *levels, int num, int *defects,
+			    int numDefects));
 void			TkIBTreePrint _ANSI_ARGS_((
 			    TkTextSegment *segPtr, ListFactory *listFactoryPtr,
 			    void **linePtrs));
@@ -1496,6 +1707,56 @@ int *			TkIBTreeCutPositions _ANSI_ARGS_((
 			    int *numTailsPtr));
 int			TkIBTreeSplit _ANSI_ARGS_((TkTextIndex *indexPtr, 
 			    int level));
+int			TkIBTreeWrap _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr));
+int			TkIBTreePullOut _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int lower));
+int			TkIBTreePullOutNode _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int allowRoot,
+			    int maxLower));
+int			TkIBTreeRaise _ANSI_ARGS_((TkTextIndex *indexPtr,
+			    int times));
+int			TkIBTreeRootOverPadding _ANSI_ARGS_((
+			    TkTextSegment *segPtr));
+int			TkIBTreeSingleLeaf _ANSI_ARGS_((
+			    TkTextIndex *indexPtr));
+int			TkIBTreeFlattenTarget _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, char *indexString,
+			    Arg levelArg, void **nodePtrPtr));
+int			TkIBTreeFlattenStep _ANSI_ARGS_((TkText *textPtr,
+			    void *nodePtr, TkTextIndex *posPtr));
+#define TK_IBTREE_FLATTEN_JOIN		1
+#define TK_IBTREE_FLATTEN_PULLOUT	2
+#define TK_IBTREE_FLATTEN_SELF		3
+void			TkTextRootLogReset _ANSI_ARGS_((TkText *textPtr));
+int *			TkTextRootLogTake _ANSI_ARGS_((TkText *textPtr));
+void			TkIBTreeRepadRoots _ANSI_ARGS_((TkText *textPtr,
+			    int *roots, TkTextValue **listPtr));
+void			TkIBTreeRepadRootIn _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, TkTextValue **listPtr));
+void			TkIBTreeDisplaceRoot _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, TkTextValue **listPtr));
+int			TkIBTreeSproutLeaf _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, TkTextIndex *index1Ptr,
+			    TkTextIndex *index2Ptr));
+int			TkIBTreeSproutRange _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int *startPtr, int *endPtr));
+void			TkIBTreeSproutValues _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int startMade,
+			    int endMade));
+int *			TkBTreeEqualizeDelete _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr));
+void			TkIBTreeUndoWraps _ANSI_ARGS_((TkText *textPtr,
+			    int *wraps, TkTextValue **displacedPtr));
+int *			TkIBTreeLeafDefects _ANSI_ARGS_((
+			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr,
+			    int *numPtr));
+void			TkIBTreeSetLeafDefects _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int *defects, int num));
+TkTextLine *		TkIBTreeLeafAt _ANSI_ARGS_((TkTextIndex *indexPtr));
+int			TkIBTreeSetDefect _ANSI_ARGS_((TkText *textPtr,
+			    TkTextLine *linePtr, int defect));
 TkTextValue *		TkBTreeTakeCrossingRunValues _ANSI_ARGS_((
 			    TkText *textPtr, TkTextIndex *index1Ptr,
 			    TkTextIndex *index2Ptr));

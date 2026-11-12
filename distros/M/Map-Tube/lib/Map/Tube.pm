@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.1.1');
+our $VERSION   = qv('v5.2.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,10 +13,11 @@ Map::Tube - Lightweight Routing Framework.
 
 =head1 VERSION
 
-Version v5.1.1
+Version v5.2.0
 
 =cut
 
+use Carp ();
 use Unicode::Normalize;
 use Encode qw(decode_utf8);
 
@@ -141,6 +142,8 @@ sub AUTOLOAD {
     my $name = $AUTOLOAD;
     $name =~ s/.*://;
 
+    return if $name eq 'DESTROY';
+
     my @caller = caller(0);
     @caller    = caller(2) if $caller[3] eq '(eval)';
 
@@ -154,6 +157,9 @@ sub AUTOLOAD {
             filename    => $caller[1],
             line_number => $caller[2] });
     }
+
+    my $class = ref($_[0]) || $_[0];
+    Carp::croak(qq{Can't locate object method "$name" via package "$class"});
 }
 
 sub BUILD {
@@ -632,7 +638,7 @@ sub get_map_data {
     my ($self, $caller, $method) = @_;
 
     my $data;
-    my $xml = $self->xml;
+    my $xml = $self->can('xml') ? $self->xml : '';
     if ($xml ne '') {
         eval {
             $data = XML::Twig->new->parsefile($xml)->simplify(keyattr => 'stations', forcearray => 0);
@@ -655,7 +661,7 @@ sub get_map_data {
             line_number => $caller->[2] });
     }
     else {
-        my $json = $self->json;
+        my $json = $self->can('json') ? $self->json : '';
         if ($json ne '') {
             eval { $data = to_perl($json) };
             unless ($@) {

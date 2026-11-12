@@ -1,4 +1,4 @@
-use 5.018;
+use 5.012;
 use strict;
 use warnings;
 use ExtUtils::MakeMaker 6.64;
@@ -65,7 +65,12 @@ else {
     }
 }
 
-my @native= map { s{^src/}{}r =~ s/\.c$//r } sort glob 'src/dds_*.c';
+my @native= map {
+    my $name= $_;
+    $name =~ s{^src/}{};
+    $name =~ s/\.c$//;
+    $name;
+} sort glob 'src/dds_*.c';
 my $headers= 'src/dds_engine.h lib/Data/Dump/ppport.h';
 my %depends= ('Streamer$(OBJ_EXT)' => "Streamer.c $headers");
 $depends{"$_\$(OBJ_EXT)"}= "$_.c $headers" for @native;
@@ -76,7 +81,7 @@ WriteMakefile(
     ABSTRACT_FROM      => 'lib/Data/Dump/Streamer.pm',
     AUTHOR             => 'Yves Orton <yves@cpan.org>',
     LICENSE            => 'perl',
-    MIN_PERL_VERSION   => '5.018',
+    MIN_PERL_VERSION   => '5.012',
     CONFIGURE_REQUIRES => { 'ExtUtils::MakeMaker' => '6.64' },
     PREREQ_PM          => {
         map { $_ => 0 }

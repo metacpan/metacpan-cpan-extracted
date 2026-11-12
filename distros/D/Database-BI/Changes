@@ -1,5 +1,24 @@
 Revision history for Database-BI
 
+0.023.1	Wed Nov 11 08:33:35 PM EST 2026
+	[ Enhancements ]
+	- Map boundaries are no longer only counties.  The map panel's Show
+	  boundaries is now a list: countries, states or provinces (Canada,
+	  India), counties, cities or districts (England, New Zealand), towns
+	  or wards, and neighbourhoods or parishes (bounds=country, state,
+	  county, city, town, neighbourhood).  The heat colours, marker colours
+	  and Colour shade work at every level.
+	- OpenStreetMap has many small places only as a point (most suburbs of
+	  Margate, for one).  A marker there has no outline at that level, and
+	  the list under the map names it.
+	- Outlines kept by 0.023.0 are still used.
+	- Without HTML::OSM 0.17 to 0.19 the outlines are plain lines: the
+	  colour bands, shade key and marker key need those versions.
+
+	[ Other ]
+	- Test::NoShadow and the core modules the code loads are now listed
+	  as prerequisites.
+
 0.023.0	Tue Nov 10 04:41:52 PM EST 2026
 	[ Enhancements ]
 	- Maps can outline the county each marker is in: tick Show county

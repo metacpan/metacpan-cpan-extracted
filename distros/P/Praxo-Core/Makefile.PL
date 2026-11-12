@@ -5,13 +5,14 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME             => 'Praxo::Core',
     DISTNAME         => 'Praxo-Core',
-    VERSION          => '0.1.1',
+    VERSION          => '0.3.0',
     ABSTRACT         => 'Embeddable MIT-licensed agent framework for Perl',
     AUTHOR           => 'AxisVela <releases@axisvela.com>',
     LICENSE          => 'mit',
     MIN_PERL_VERSION => '5.020',
     PREREQ_PM        => {
         'JSON::PP'  => 0,
+        'HTTP::Tiny' => 0,
         'File::Spec' => 0,
         'Cwd'       => 0,
     },
@@ -19,7 +20,7 @@ WriteMakefile(
         provides => {
             'Praxo::Core' => {
                 file    => 'lib/Praxo/Core.pm',
-                version => '0.1.1',
+                version => '0.3.0',
             },
         },
         resources => {

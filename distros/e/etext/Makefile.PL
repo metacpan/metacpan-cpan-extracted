@@ -27,7 +27,7 @@ if ($ENV{ETEXT_DATA_ARRAYS}) {
 }
 
 my @c = map { "$_.c" } qw(tkText tkTextBTree tkTextDisp tkTextIndex
-			  tkTextMark tkTextTag tkTextWind tkTextImage tkTextUndo
+			  tkTextMark tkTextTag tkTextWind tkTextImage tkTextUndo tkTextOrn
 			  pperlGlue);
 
 my %args = (

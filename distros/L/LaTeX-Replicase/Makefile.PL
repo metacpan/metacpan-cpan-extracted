@@ -20,8 +20,11 @@ WriteMakefile(
       'Test::Pod'          => '1.22', # for tests only
       'Test::Exception'    => '0.43', # for tests only
       'Test::Output'       => '1.01', # for tests only
-      'Storable'           => '2.19', # for tests only
+      'Test::Warn'         => '0.30', # for tests only
+      'Storable'           => '2.00', # for tests only
       'Data::Dumper'       => '2.183', # for tests only
+      'Text::Hyphen'       => '0.12', # for tests only
+      'Text::Hyphen::RU'   => '0.12', # for tests only
     },
     test => {
       TESTS => 't/*.t t/*/*.t',
@@ -47,4 +50,3 @@ WriteMakefile(
       (ABSTRACT_FROM  => 'lib/LaTeX/Replicase.pm',
        AUTHOR         => 'Alessandro Gorohovski <an.gorohovski@gmail.com>') : ()),
 );
-

@@ -167,18 +167,24 @@ foreach my $with_color (0, 1) {
   }
 
   { my $obj = Outer->new("btw_test"); # equivalent to btwN 0,...
-    my $explno = __LINE__ + 1;
-    checklog { $obj->doeval('btwbt "FOO-1"') } qr{^
-                              (?:main:)?${explno}\D+
-                              .* \d+\D+
-                              .*  #capture internals
-                              .* (?:main:)?${checklog_callback_lno}\D+
-                              .* \d+\D+
-                              .* \d+\D+
-                              .* \d+\D+
-                              .* \(eval${SP}\d+\):\D*1${SP}?[^\w\s]${SP}
-                              ${color_re}FOO-1${color_re} }msx,
-                            "btwbt-FOO-1 (${color_onoff})", "NOHEAD" ;
+    my $explno = __LINE__ + 2;
+    checklog { $obj->doeval('btwbt "FOO-1"') }
+               qr{^
+                  (?:main:)?${explno}\D+ \K
+                  \d+\D+
+
+                  # Capture::Tiny internals
+                  .*
+
+                  (?:main:)?${checklog_callback_lno}\D+ \K
+                  \d+\D+ \K
+                  \d+\D+ \K
+                  \d+\D+? \(eval${SP}\d+\) [^:\d]*:1
+                  ${SP}?[^\w\s]${SP}
+                  ${color_re}FOO-1${color_re}
+               }msx,
+               "btwbt-FOO-1 (${color_onoff})",
+               "NOHEAD" ;
   }
 
   { my $obj = Outer->new("btwN3_test");

@@ -96,14 +96,17 @@ END_MODULE
 		'uppercase' => {
 			'optional' => 1,
 			'default' => 0,
-			'type' => 'string'	# FIXME:  would be good to say boolean here!
+			'type' => 'string',	# FIXME:  would be good to say boolean here!
+			'_type_checked' => 1
 		}, 'username' => {
 			'type' => 'string',
-			'optional' => 0
+			'optional' => 0,
+			'_type_checked' => 1
 		}, 'roles' => {
 			'optional' => 1,
 			'type' => 'arrayref',
-			'default' => []
+			'default' => [],
+			'_type_checked' => 1
 		}
 	});
 

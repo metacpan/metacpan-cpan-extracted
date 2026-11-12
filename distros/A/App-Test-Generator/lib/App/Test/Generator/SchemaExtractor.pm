@@ -80,11 +80,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =cut
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 SYNOPSIS
 
@@ -1474,12 +1474,18 @@ sub extract_all {
 	$self->_log('Found ' . scalar(@$methods) . ' methods (pre-dedup)');
 
 	my %schemas;
+	my %delegates;
+	my $ctor_body;
 	foreach my $method (@{$methods}) {
 		$self->_log("\nAnalyzing method: $method->{name}");
 
 		my $schema = $self->_analyze_method($method);
 		$schemas{$method->{name}} = $schema;
 		$schema->{'module'} = $package_name;
+		$ctor_body = $method->{body} if($method->{name} eq 'new');
+
+		my $target = $self->_delegated_method($method->{body});
+		$delegates{$method->{name}} = $target if defined($target);
 	}
 
 	# Second pass: enrich instance-method schemas with constructor args so the
@@ -1501,6 +1507,51 @@ sub extract_all {
 		}
 	}
 
+	# A constructor can refuse to build the package itself: an abstract base
+	# class croaks on direct instantiation, and a constructor that croaks over
+	# an argument the extractor cannot supply cannot be built either.  Either
+	# way no harness can get a $self, so the instance methods are not fuzzable
+	# this way: leaving new: as the package name makes _write_schema emit
+	# new: ~, which callers report as skipped rather than failed.
+	if($ctor_body && $schemas{new} && _constructor_refuses_direct_instantiation($ctor_body, $schemas{new})) {
+		# The class itself cannot be constructed, so its new() is expected to
+		# die rather than return an object.
+		$schemas{new}{output} = { _STATUS => 'DIES' };
+		for my $method_name (keys %schemas) {
+			next if($method_name eq 'new');
+			my $schema = $schemas{$method_name};
+			next unless(exists($schema->{new}) && defined($schema->{new}));
+			$schema->{new} = $package_name;
+			$self->_log("  UNBUILDABLE: $method_name new: ~ ($package_name refuses to be built)");
+		}
+	}
+
+	# Third pass: a routine whose whole body is `return $self->other(\@_)` has
+	# exactly other()'s input contract. CGI::Info::get_cookie is such a
+	# forwarder, and without this it looked like it took no parameters at all,
+	# so the harness called it with none and died on the required cookie_name.
+	for my $method_name (sort keys %delegates) {
+		my $target = $delegates{$method_name};
+		next if $method_name eq $target;
+		my $target_schema = $schemas{$target};
+		next unless $target_schema && ref($target_schema->{input}) eq 'HASH'
+			&& scalar(keys %{$target_schema->{input}});
+
+		my $schema = $schemas{$method_name};
+		next unless $schema;
+		next if ref($schema->{input}) eq 'HASH' && scalar(keys %{$schema->{input}});
+
+		$schema->{input} = {
+			map { $_ => { %{$target_schema->{input}{$_}} } } sort keys %{$target_schema->{input}}
+		};
+		$schema->{_confidence}{input} = {
+			'level' => 'medium',
+			'factors' => [ "Forwarded to $target()" ]
+		};
+		push @{$schema->{_notes}}, "input inherited from $target(), which this routine forwards \@_ to";
+		$self->_log("  DELEGATE: $method_name input inherited from $target");
+	}
+
 	unless ($params->{no_write}) {
 		for my $method_name (keys %schemas) {
 			$self->_write_schema($method_name, $schemas{$method_name});
@@ -1508,6 +1559,39 @@ sub extract_all {
 	}
 
 	return \%schemas;
+}
+
+# --------------------------------------------------
+# _delegated_method
+#
+# Purpose:    Detect a routine whose whole body
+#             forwards its arguments to another
+#             method of the same object.
+#
+# Entry:      $code - the subroutine's source text.
+#
+# Exit:       Returns the name of the method it
+#             forwards to, or undef when the routine
+#             does anything else.
+#
+# Side effects: None.
+#
+# Notes:      Only the bare `return $self->other(\@_)`
+#             shape counts. Such a forwarder has
+#             exactly the target's input contract,
+#             which extract_all() copies so that the
+#             harness passes the right arguments
+#             (CGI::Info::get_cookie -> cookie).
+# --------------------------------------------------
+sub _delegated_method {
+	my ($self, $code) = @_;
+
+	return unless defined($code);
+
+	(my $body = $code) =~ s/\A\s*sub\s+\w+\s*//;
+	$body =~ s/\s+/ /g;
+
+	return $body =~ /\A\{ (?:my \$self = shift; )?return \$self->(\w+)\(\s*\\\@_\s*\); \}\z/ ? $1 : undef;
 }
 
 # --------------------------------------------------
@@ -1942,6 +2026,13 @@ sub _analyze_method {
 			$schema->{input}{$name}{min}       = $pod_p->{min}       if defined $pod_p->{min};
 			$schema->{input}{$name}{max}       = $pod_p->{max}       if defined $pod_p->{max};
 		}
+
+		# The routine validates its arguments, so a reference handed to a
+		# string parameter is rejected at runtime and the harness may assert
+		# that it dies.  Types that come only from POD or from code
+		# heuristics get no such mark: those describe intent, and nothing in
+		# the routine necessarily checks them.
+		$schema->{input}{$_}{_type_checked} = 1 for keys %{$schema->{input}};
 	} else {
 		# Merge field declarations into code_params before merging analyses
 		if (keys %$fields) {
@@ -1960,9 +2051,9 @@ sub _analyze_method {
 # ----------------------------------------
 
 $schema->{output} = $self->_analyze_output(
-    $method->{pod},
-    $method->{body},
-    $method->{name}
+	$method->{pod},
+	$method->{body},
+	$method->{name}
 );
 
 
@@ -2247,6 +2338,36 @@ sub _detect_accessor_methods {
 		return;
 	}
 
+	# A store guarded by the presence of an argument is the same get/set
+	# idiom as `if (@_)`, just written against a named lexical:
+	#
+	#   my $status = shift;
+	#   return $self->{status} = $status if(defined($status));
+	#   ...
+	#   return $self->{status} || 200;
+	#
+	# CGI::Info::status is this shape, and it was being typed as a plain
+	# function because every branch below only looked for `if (@_)`.
+	my $conditional_arg = 0;
+	while($code =~ /\bmy\s+\$(\w+)\s*=\s*shift\b/g) {
+		my $arg = $1;
+		# The invocant is shifted too, but a test on $self says nothing
+		# about whether an argument was supplied.
+		next if($arg eq 'self');
+		if($code =~ /(?:if|unless)\s*\(?\s*(?:defined\s*\(?\s*)?\$\Q$arg\E\b/) {
+			$conditional_arg = 1;
+			last;
+		}
+	}
+	# `if (@_)` stays the strongest signal; a named-argument guard is
+	# weaker evidence and must not turn a heuristic miss into a croak.
+	# The guard must test the argument itself: CGI::Info::protocol reads
+	# if($ENV{'SCRIPT_URI'}) and stores a value it computed, which says
+	# nothing about how the method is called. Reading any `if($x)` as an
+	# argument guard typed it as a getset accessor, and the harness then
+	# set a value the routine never looks at.
+	my $arg_guard = ($code =~ /\bif\s*\(\s*(?:\@_|scalar\s*\(\s*\@_\s*\))/) ? 1 : 0;
+
 	# -------------------------------
 	# Getter/Setter combo
 	# -------------------------------
@@ -2298,7 +2419,7 @@ sub _detect_accessor_methods {
 				};
 			}
 		}
-	} elsif($code =~ /if\s*\(\s*(?:\@_|[\$]\w+)/ &&
+	} elsif(($arg_guard || $conditional_arg) &&
 	    $code =~ /\$self\s*->\s*\{\s*['"]?([^}'"]+)['"]?\s*\}\s*=\s*(?:shift|\@_|\$_\[\d+\]|\$\w+)\b/x &&
 	    $code =~ /return\b/
 	) {
@@ -2306,6 +2427,15 @@ sub _detect_accessor_methods {
 		# Getter/Setter (validated input)
 		# -------------------------------
 		my $property = $1;
+
+		# A named-argument guard is weaker evidence than `if (@_)`, so when
+		# the method declares more than one parameter assume this is not an
+		# accessor rather than croaking further down on an ambiguous match.
+		if($conditional_arg && !$arg_guard &&
+		   (ref($schema->{input}) eq 'HASH') && (scalar(keys %{$schema->{input}}) > 1)) {
+			$self->_log("  Skipping conditional accessor: more than one argument");
+			return;
+		}
 
 		if(!defined($property)) {
 			if($code =~ /\$self\s*->\s*\{\s*['"]?([^}'"]+)['"]?\s*\}\s*=/) {
@@ -2432,8 +2562,25 @@ sub _detect_accessor_methods {
 
 		$self->_log("  Detected setter accessor for property: $property");
 
+		# A setter that hands the argument to something else before storing
+		# it, such as CGI::Info::set_logger's
+		#
+		#   $self->{'logger'} = Log::Abstraction->new($logger);
+		#
+		# does not constrain what the argument may be, so the 'string' default
+		# would invent cases like "a hash ref must die" that the routine
+		# rightly accepts. Claim 'string' only when every assignment stores the
+		# argument itself.
+		my $param_type = 'string';
+		while($code =~ /\$self\s*->\s*\{\s*['"]?\Q$property\E['"]?\s*\}\s*=\s*([^;]+);/g) {
+			if($1 =~ /(?:->|::)\w+\s*\([^)]*\$\Q$param\E\b/) {
+				$param_type = 'any';
+				last;
+			}
+		}
+
 		$schema->{input} = {
-			$param => { type => 'string' }, # safe default
+			$param => { type => $param_type }, # safe default
 		};
 		$schema->{input_style} = 'hash';
 
@@ -2726,7 +2873,7 @@ sub _extract_pvs_schema {
 
 				my $schema_str = "my \$schema = $schema_text";
 				my $schema = $compartment->reval($schema_str);
-				if(scalar keys %{$schema}) {
+				if($self->_usable_validator_schema($schema)) {
 					return {
 						input => $schema,
 						style => 'hash',
@@ -2791,7 +2938,7 @@ sub _extract_pv_schema {
 				my $schema_str = "my \$schema = $schema_text";
 				my $schema = $compartment->reval($schema_str);
 
-				if(scalar keys %{$schema}) {
+				if($self->_usable_validator_schema($schema)) {
 					foreach my $arg(keys %{$schema}) {
 						my $field = $schema->{$arg};
 						if(my $type = $field->{'type'}) {
@@ -2934,7 +3081,7 @@ sub _extract_moosex_params_schema
 				$schema_str =~ s/ArrayRef\[(.+?)\]/arrayref, element_type => $1/g;
 				my $schema = $compartment->reval($schema_str);
 
-				if(scalar keys %{$schema}) {
+				if($self->_usable_validator_schema($schema)) {
 					foreach my $arg(keys %{$schema}) {
 						my $field = $schema->{$arg};
 						if(my $isa = delete $field->{'isa'}) {
@@ -3014,6 +3161,58 @@ sub _extract_schema_hash_from_block {
 	return unless $result && ref($result) eq 'HASH' && $result->{input};
 
 	return $result->{input};
+}
+
+# --------------------------------------------------
+# _usable_validator_schema
+#
+# Purpose:    Decide whether a schema hash evaluated
+#             from source code is a real parameter
+#             schema, or the remains of a runtime
+#             expression that was never meant to be
+#             evaluated at all.
+#
+# Entry:      $schema - value returned by
+#                       Safe->reval() on the schema
+#                       text found in the call.
+#
+# Exit:       Returns true when the schema is a
+#             non-empty hash of named parameters to
+#             spec hashes, false otherwise.
+#
+# Side effects: None.
+#
+# Notes:      CGI::Info::params validates each
+#             parameter inside a loop with
+#
+#               validate_strict({
+#                   schema => { $key => $schema },
+#                   args   => { $key => $value },
+#               });
+#
+#             Evaluating { $key => $schema } with
+#             both lexicals undefined yields
+#             { '' => undef }. Accepting that as the
+#             method's input gave the schema an empty
+#             parameter name, which the harness
+#             generator rightly refuses to turn into
+#             a Perl variable, so no harness could be
+#             generated for the routine at all.
+# --------------------------------------------------
+sub _usable_validator_schema {
+	my ($self, $schema) = @_;
+
+	return 0 unless ref($schema) eq 'HASH';
+
+	my @names = keys %$schema;
+	return 0 unless @names;
+
+	for my $name (@names) {
+		return 0 unless length($name);
+		return 0 unless ref($schema->{$name}) eq 'HASH';
+	}
+
+	return 1;
 }
 
 # --------------------------------------------------
@@ -4318,8 +4517,13 @@ sub _analyze_output_from_code
 					$return_types{integer}++;
 				} elsif ($ret =~ /=/ && $ret =~ /\$\w+/) {
 					# Assignment returning a value (e.g. $self->{status} = $status)
-					# If assignment involves a numeric literal or variable, assume numeric intent
-					if ($ret =~ /\b\d+\b/) {
+					# If assignment involves a numeric literal or variable, assume numeric intent.
+					# $1, $2 and friends are regex captures - strings, not numeric
+					# literals - so drop them before looking for digits. CGI::Info::script_dir
+					# returns "$self->{script_path} =~ $dir_regex ? $1 : ..." and the
+					# "1" in $1 was being read as a numeric literal.
+					(my $numeric_ret = $ret) =~ s/\$\d+//g;
+					if ($numeric_ret =~ /\b\d+\b/) {
 						$return_types{integer} += 2;
 						$self->_log("  OUTPUT: Assignment with numeric value detected");
 					} else {
@@ -4328,9 +4532,14 @@ sub _analyze_output_from_code
 				}
 				# Variables/expressions
 				elsif ($ret =~ /\$\w+/) {
-					if ($ret =~ /\\\@/) {
+					# \@_ is this routine's own argument list being passed
+					# along, not an arrayref being returned. CGI::Info::get_cookie
+					# returns $self->cookie(\@_) and was typed as returning an
+					# arrayref because of it.
+					(my $ref_ret = $ret) =~ s/\\\@_\b//g;
+					if ($ref_ret =~ /\\\@/) {
 						$return_types{arrayref}++;
-					} elsif ($ret =~ /\\\%/) {
+					} elsif ($ref_ret =~ /\\\%/) {
 						$return_types{hashref}++;
 					} elsif ($ret =~ /bless/) {
 						$return_types{object} += 2;	# Heigher weight
@@ -5531,11 +5740,18 @@ sub _detect_filehandle_type {
 		return;
 	}
 
-	# File test operators
+	# File test operators.  A -d test is a directory requirement: the value
+	# has to name an existing directory, which no spelling pattern can
+	# capture, so it gets its own semantic rather than a filepath pattern.
 	if ($code =~ /(?:-[frwxoOeszlpSbctugkTBMAC])\s+\$$param/) {
 		$p->{type} = 'string';
-		$p->{semantic} = 'filepath';
-		$self->_log("  ADVANCED: $param is tested as file path");
+		if ($code =~ /-d\s+\$$param/) {
+			$p->{semantic} = 'directory';
+			$self->_log("  ADVANCED: $param is tested as a directory");
+		} else {
+			$p->{semantic} = 'filepath';
+			$self->_log("  ADVANCED: $param is tested as file path");
+		}
 		return;
 	}
 
@@ -6158,30 +6374,30 @@ sub _parse_signature_parameter {
 	return \%info;
 	}
 
-    # Pattern 4: Plain parameter: $name
-    elsif ($part =~ /^\$(\w+)$/s) {
-        $info{name} = $1;
-        $info{optional} = 0;
-        return \%info;
-    }
+	# Pattern 4: Plain parameter: $name
+	elsif ($part =~ /^\$(\w+)$/s) {
+		$info{name} = $1;
+		$info{optional} = 0;
+		return \%info;
+	}
 
-    # Pattern 5: Array parameter: @name
-    elsif ($part =~ /^\@(\w+)$/s) {
-        $info{name} = $1;
-        $info{type} = 'array';
-        $info{slurpy} = 1;
-        $info{optional} = 1;
-        return \%info;
-    }
+	# Pattern 5: Array parameter: @name
+	elsif ($part =~ /^\@(\w+)$/s) {
+		$info{name} = $1;
+		$info{type} = 'array';
+		$info{slurpy} = 1;
+		$info{optional} = 1;
+		return \%info;
+	}
 
-    # Pattern 6: Hash parameter: %name
-    elsif ($part =~ /^\%(\w+)$/s) {
-        $info{name} = $1;
-        $info{type} = 'hash';
-        $info{slurpy} = 1;
-        $info{optional} = 1;
-        return \%info;
-    }
+	# Pattern 6: Hash parameter: %name
+	elsif ($part =~ /^\%(\w+)$/s) {
+		$info{name} = $1;
+		$info{type} = 'hash';
+		$info{slurpy} = 1;
+		$info{optional} = 1;
+		return \%info;
+	}
 
 	return undef;
 }
@@ -6414,7 +6630,7 @@ sub _extract_field_declarations {
 			$self->_log("  FIELD: $name maps to parameter: $field_info{param_name}");
 		}
 
-        # Check for default value - must come before type constraint check
+		# Check for default value - must come before type constraint check
 	if ($modifiers =~ /=\s*([^:;]+)(?::|;|$)/) {
 		my $default = $1;
 		$default =~ s/\s+$//;
@@ -6922,6 +7138,14 @@ sub _analyze_parameter_validation {
 				$self->_log("  CODE: $param has unconditional default: $possible_default");
 			}
 		}
+	}
+
+	# A bare truthiness test ("if($dir) {...}") is a presence test: the
+	# routine does something different when nothing was passed, so the
+	# argument can be omitted.  An explicit required check wins over this.
+	if (!$is_required && ($code =~ /\b(?:if|unless)\s*\(\s*\$$param\s*\)/)) {
+		$p->{optional} = 1;
+		$self->_log("  CODE: $param is optional (only used when truthy)");
 	}
 
 	# Explicit required check overrides default detection
@@ -8337,6 +8561,14 @@ sub _serialize_parameter_for_yaml {
 			$cleaned{type} = 'string';
 			$cleaned{matches} ||= '/^[\\w\\/.\\-_]+$/';
 			$cleaned{_note} = 'File path';
+		} elsif ($semantic eq 'directory') {
+			# The value must name an existing directory.  No pattern can
+			# express that and any generated path would fail the -d test,
+			# so keep the semantic for the harness to act on instead of
+			# guessing at the spelling.
+			$cleaned{type} = 'string';
+			$cleaned{semantic} = 'directory';
+			$cleaned{_note} = 'Existing directory';
 		} elsif ($semantic eq 'callback') {
 			# Coderefs: mark as special type
 			$cleaned{type} = 'coderef';
@@ -8382,10 +8614,32 @@ sub _serialize_parameter_for_yaml {
 		$cleaned{_format} = $param->{format};
 	}
 
-	# Remove internal fields
+	# Patterns harvested from source or POD arrive as slash-delimited
+	# literals ('/^abc$/').  Consumers compile what they are given with
+	# qr//, which would take the delimiters to be part of the pattern, so
+	# no generated string could ever match.  Hand them a compiled Regexp.
+	if(defined(my $pattern = $cleaned{matches})) {
+		if(!ref($pattern)) {
+			(my $body = $pattern) =~ s{^/(.+)/$}{$1}s;
+			my $compiled = eval { qr/$body/ };
+			if($@) {
+				$self->_log("  invalid matches pattern '$pattern': $@");
+			} else {
+				$cleaned{matches} = $compiled;
+			}
+		}
+	}
+
+	# Keep the marker saying the routine's own validator enforces these
+	# types.  The harness uses it to decide whether wrong-typed values are
+	# expected to die.
+	$cleaned{_type_checked} = 1 if($param->{_type_checked});
+
+	# Remove internal fields.  The directory semantic is kept: the harness
+	# needs it to supply a path that exists.
 	delete $cleaned{_source};
 	delete $cleaned{_from_input_spec};
-	delete $cleaned{semantic};
+	delete $cleaned{semantic} unless(($cleaned{semantic} // '') eq 'directory');
 
 	return \%cleaned;
 }
@@ -8446,6 +8700,30 @@ sub _format_relationship {
 #
 # Exit:       Hashref of {param => value} or undef.
 # --------------------------------------------------
+
+# True when the constructor refuses to build the package itself.  Two idioms
+# are recognised: an explicit abstract-class check (Class::Abstract and
+# friends), and a croak over a constructor argument that the schema does not
+# describe, which the harness therefore cannot pass.
+sub _constructor_refuses_direct_instantiation
+{
+	my ($body, $ctor_schema) = @_;
+
+	# _find_methods() keeps the body as source text, but accept a PPI node too.
+	my $content = ref($body) ? eval { $body->content } : $body;
+	return 0 unless(defined($content) && length($content));
+
+	return 1 if($content =~ /\bcheck_abstract\s*\(/);
+	return 1 if(($content =~ /\bcroak\b/) && ($content =~ /\beq\s+__PACKAGE__\b/));
+
+	my %declared = (ref($ctor_schema->{input}) eq 'HASH') ? %{$ctor_schema->{input}} : ();
+	while($content =~ /\$args\{\s*(['"]?)([\w:]+)\1\s*\}\s*or\s+croak\b/sg) {
+		return 1 unless(exists($declared{$2}));
+	}
+
+	return 0;
+}
+
 sub _ctor_representative_args {
 	my ($self, $ctor_schema) = @_;
 

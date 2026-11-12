@@ -16,6 +16,12 @@ use Praxo::Plugin ();
 use Praxo::Runtime ();
 use Praxo::Middleware ();
 use Praxo::Agent ();
+use Praxo::Adapters::OpenAICompatible ();
+use Praxo::Adapters::Anthropic ();
+use Praxo::Adapters::Gemini ();
+use Praxo::Adapters::MCP ();
+use Praxo::Adapters::MCPHTTP ();
+use Praxo::Adapters::Harmovela ();
 
 my $call = Praxo::Toolcall::parse_toolcall('{"name":"echo","input":{"text":"hi"}}');
 ok(defined $call, 'toolcall parsed');
@@ -138,5 +144,303 @@ is($result->{output}, 'done', 'agent output');
 is($result->{steps}, 2, 'agent steps');
 is($invocations, 1, 'agent tool invocation');
 is_deeply($sink->types, [qw(run.started tool.call run.completed)], 'agent events');
+
+my $captured;
+my $adapter = Praxo::Adapters::OpenAICompatible->new(
+    base_url => 'http://example.test/v1',
+    model => 'test-model',
+    transport => sub {
+        my ($path, $payload) = @_;
+        $captured = [$path, $payload];
+        return {
+            choices => [{
+                message => {
+                    role => 'assistant',
+                    content => '',
+                    tool_calls => [{
+                        id => 'call-1',
+                        type => 'function',
+                        function => { name => 'echo', arguments => '{"text":"hi"}' },
+                    }],
+                },
+                finish_reason => 'tool_calls',
+            }],
+            usage => { prompt_tokens => 3, completion_tokens => 2 },
+        };
+    },
+);
+my $adapter_request = Praxo::Models::request(
+    messages => [Praxo::Models::message_text('user', 'hello')],
+    tools => [Praxo::Models::tool_spec(
+        name => 'echo', description => 'Echo', parameters => { type => 'object' },
+    )],
+    tool_choice => 'auto',
+);
+my $adapter_response = $adapter->generate($adapter_request);
+is($captured->[0], '/chat/completions', 'openai path');
+is($captured->[1]{model}, 'test-model', 'openai model');
+is($captured->[1]{messages}[0]{content}, 'hello', 'openai message content');
+is($captured->[1]{tools}[0]{function}{name}, 'echo', 'openai tool name');
+is($captured->[1]{tool_choice}, 'auto', 'openai tool choice');
+is($adapter_response->{message}{toolCalls}[0]{name}, 'echo', 'openai tool call parsed');
+is_deeply($adapter_response->{message}{toolCalls}[0]{arguments}, { text => 'hi' }, 'openai tool arguments');
+is($adapter_response->{usage}{inputTokens}, 3, 'openai input tokens');
+is($adapter_response->{usage}{outputTokens}, 2, 'openai output tokens');
+is($adapter_response->{finishReason}, 'tool_calls', 'openai finish reason');
+
+my $assistant = Praxo::Models::message_assistant(
+    '',
+    [Praxo::Models::tool_call(id => 'call-2', name => 'echo', arguments => { text => 'bye' })],
+);
+$adapter->generate(Praxo::Models::request(messages => [$assistant]));
+is($captured->[1]{messages}[0]{tool_calls}[0]{function}{arguments}, '{"text":"bye"}',
+    'openai assistant tool call encoded');
+
+my $harmovela_captured;
+my $harmovela = Praxo::Adapters::Harmovela->new(
+    base_url => 'http://example.test/aep/api/',
+    clock => sub { return (1700000000, 123456789) },
+    transport => sub {
+        my ($path, $body, $headers) = @_;
+        $harmovela_captured = { path => $path, body => $body, headers => $headers };
+        return { status => 200, body => '' };
+    },
+);
+my $harmovela_event = Praxo::Models::event(
+    type => 'tool.call', session_id => 's1', run_id => 'run-123',
+    data => { name => 'echo' },
+);
+$harmovela->emit($harmovela_event);
+is($harmovela_captured->{path}, '/events', 'harmovela path');
+is($harmovela_captured->{headers}{'content-type'}, 'application/json',
+    'harmovela content type');
+my $harmovela_envelope = Praxo::Json::parse($harmovela_captured->{body});
+is($harmovela_envelope->{spec_version}, '0.2', 'harmovela spec version');
+is($harmovela_envelope->{id}, 'run-123-1700000000123456789', 'harmovela id');
+is($harmovela_envelope->{type}, 'tool.call', 'harmovela type');
+is($harmovela_envelope->{source}, 'praxo-core', 'harmovela source');
+is($harmovela_envelope->{created_at}, '2023-11-14T22:13:20.123456789Z',
+    'harmovela created at');
+is_deeply(
+    $harmovela_envelope->{payload},
+    { name => 'echo', session_id => 's1', run_id => 'run-123' },
+    'harmovela payload',
+);
+
+my $harmovela_failed = Praxo::Adapters::Harmovela->new(
+    base_url => 'http://example.test/aep/api',
+    clock => sub { return (1700000000, 123456789) },
+    transport => sub { return { status => 500, body => 'boom' } },
+);
+my $harmovela_error;
+eval {
+    $harmovela_failed->emit($harmovela_event);
+    1;
+} or $harmovela_error = $@;
+ok(defined $harmovela_error, 'harmovela non-2xx raises');
+is(
+    Praxo::Errors::error_code($harmovela_error),
+    'HARMOVELA_HTTP',
+    'harmovela non-2xx code',
+);
+like("$harmovela_error", qr/500/, 'harmovela non-2xx status');
+like("$harmovela_error", qr/boom/, 'harmovela non-2xx body');
+
+my $anthropic_captured;
+my $anthropic = Praxo::Adapters::Anthropic->new(
+    model => 'claude-test',
+    api_key => 'ak',
+    transport => sub {
+        my ($path, $payload) = @_;
+        $anthropic_captured = [$path, $payload];
+        return {
+            content => [
+                { type => 'text', text => 'hello' },
+                { type => 'tool_use', id => 'tool-1', name => 'echo', input => { text => 'hi' } },
+            ],
+            stop_reason => 'end_turn',
+            usage => { input_tokens => 3, output_tokens => 4, cache_read_input_tokens => 2 },
+        };
+    },
+);
+my $anthropic_response = $anthropic->generate(Praxo::Models::request(
+    messages => [
+        Praxo::Models::message_text('system', 'be brief'),
+        Praxo::Models::message_text('user', 'hi'),
+    ],
+    tools => [Praxo::Models::tool_spec(
+        name => 'echo', description => 'Echo', parameters => { type => 'object' },
+    )],
+));
+is($anthropic_captured->[0], '/v1/messages', 'anthropic path');
+is($anthropic_captured->[1]{system}, 'be brief', 'anthropic system');
+is($anthropic_captured->[1]{tools}[0]{input_schema}{type}, 'object', 'anthropic tools');
+is($anthropic_response->{message}{content}, 'hello', 'anthropic content');
+is($anthropic_response->{message}{toolCalls}[0]{id}, 'tool-1', 'anthropic call id');
+is($anthropic_response->{usage}{cachedTokens}, 2, 'anthropic cached tokens');
+
+my $gemini_captured;
+my $gemini = Praxo::Adapters::Gemini->new(
+    model => 'gemini-test',
+    api_key => 'gk',
+    transport => sub {
+        my ($path, $payload) = @_;
+        $gemini_captured = [$path, $payload];
+        return {
+            candidates => [{
+                content => { parts => [
+                    { text => 'hello' },
+                    { functionCall => { name => 'echo', args => { text => 'hi' } } },
+                ] },
+                finishReason => 'STOP',
+            }],
+            usageMetadata => { promptTokenCount => 3, candidatesTokenCount => 4 },
+        };
+    },
+);
+my $gemini_response = $gemini->generate(Praxo::Models::request(
+    messages => [
+        Praxo::Models::message_text('system', 'be brief'),
+        Praxo::Models::message_text('user', 'hi'),
+    ],
+    tools => [Praxo::Models::tool_spec(
+        name => 'echo', description => 'Echo', parameters => { type => 'object' },
+    )],
+));
+like($gemini_captured->[0], qr/:generateContent$/, 'gemini path');
+is($gemini_captured->[1]{system_instruction}{parts}[0]{text}, 'be brief', 'gemini system');
+is($gemini_captured->[1]{toolConfig}{functionCallingConfig}{mode}, 'AUTO', 'gemini tool mode');
+is($gemini_response->{message}{content}, 'hello', 'gemini content');
+is($gemini_response->{message}{toolCalls}[0]{name}, 'echo', 'gemini call name');
+is($gemini_response->{usage}{inputTokens}, 3, 'gemini usage');
+
+my $mcp = Praxo::Adapters::MCP->new(
+    transport => sub {
+        my ($method, $params) = @_;
+        if ($method eq 'initialize') {
+            return { protocolVersion => '2024-11-05', serverInfo => { name => 'fake' } };
+        }
+        if ($method eq 'tools/list') {
+            return { tools => [{ name => 'echo' }] } if $params->{cursor};
+            return { tools => [{ name => 'add' }], nextCursor => 'next' };
+        }
+        if ($method eq 'tools/call') {
+            return { structuredContent => { ok => 1 } } if $params->{name} eq 'echo';
+            return { content => [{ type => 'text', text => 'hello' }] }
+                if $params->{name} eq 'text';
+            return { isError => 1 } if $params->{name} eq 'fail';
+        }
+        return {};
+    },
+);
+$mcp->start;
+is($mcp->protocol_version, '2024-11-05', 'mcp protocol version');
+is_deeply($mcp->list_tools, [{ name => 'add' }, { name => 'echo' }],
+    'mcp paginated tools');
+is_deeply($mcp->call_tool('echo'), { ok => 1 }, 'mcp structured tool');
+is($mcp->call_tool('text'), 'hello', 'mcp text tool');
+my $mcp_error;
+eval { $mcp->call_tool('fail') };
+$mcp_error = $@;
+is(Praxo::Errors::error_code($mcp_error), 'MCP_TOOL_ERROR', 'mcp tool error');
+$mcp->close;
+
+{
+    package TestHTTPMCP;
+    our @ISA = ('Praxo::Adapters::MCPHTTP');
+
+    sub _post {
+        my ($self, $method, $body, $headers) = @_;
+        push @{ $self->{seen} }, { method => $method, headers => $headers };
+        return (200, {}, '') if $method eq 'DELETE';
+        my $message = JSON::PP::decode_json($body);
+        my $name = $message->{method} // '';
+        my $id = $message->{id};
+        if ($name eq 'initialize') {
+            return (200, {
+                'mcp-session-id' => 'sess-1',
+                'content-type' => 'application/json',
+            }, JSON::PP::encode_json({
+                jsonrpc => '2.0',
+                id => $id,
+                result => {
+                    protocolVersion => '2025-03-26',
+                    capabilities => {},
+                    serverInfo => { name => 'fake-http' },
+                },
+            }));
+        }
+        if ($name =~ m{^notifications/}) {
+            return (202, {}, '');
+        }
+        if ($name eq 'tools/list') {
+            return (200, { 'content-type' => 'application/json' },
+                JSON::PP::encode_json({
+                    jsonrpc => '2.0',
+                    id => $id,
+                    result => {
+                        tools => [{
+                            name => 'echo',
+                            description => 'Echo input',
+                            inputSchema => {
+                                type => 'object',
+                                properties => { text => { type => 'string' } },
+                                required => ['text'],
+                            },
+                        }],
+                    },
+                }));
+        }
+        if ($name eq 'tools/call') {
+            my $payload = JSON::PP::encode_json({
+                jsonrpc => '2.0',
+                id => $id,
+                result => { content => [{ type => 'text', text => 'sse-ok' }] },
+            });
+            return (200, { 'content-type' => 'text/event-stream' },
+                "event: message\ndata: $payload\n\n");
+        }
+        return (200, { 'content-type' => 'application/json' },
+            JSON::PP::encode_json({
+                jsonrpc => '2.0',
+                id => $id,
+                result => {},
+            }));
+    }
+}
+
+my $http = TestHTTPMCP->new(endpoint => 'http://127.0.0.1/mcp');
+my $http_client = Praxo::Adapters::MCP->new(
+    transport => $http,
+    protocol_version => '2025-03-26',
+);
+$http_client->start;
+is($http_client->protocol_version, '2025-03-26', 'http mcp protocol version');
+is_deeply(
+    [map { $_->{name} } @{ $http_client->list_tools }],
+    ['echo'],
+    'http mcp tools'
+);
+is($http_client->call_tool('echo', { text => 'hi' }), 'sse-ok', 'http mcp sse call');
+$http_client->close;
+my ($listed) = grep {
+    $_->{method} eq 'POST'
+        && ($_->{headers}{'mcp-session-id'} // '') eq 'sess-1'
+} @{ $http->{seen} };
+ok($listed, 'http mcp session header');
+my ($protocol) = grep {
+    ($_->{headers}{'mcp-protocol-version'} // '') eq '2025-03-26'
+} @{ $http->{seen} };
+ok($protocol, 'http mcp protocol header');
+ok((grep { $_->{method} eq 'DELETE' } @{ $http->{seen} }), 'http mcp delete');
+
+my $http_rejected;
+eval { Praxo::Adapters::MCPHTTP->new(endpoint => 'http://example.com/mcp') };
+$http_rejected = $@;
+is(
+    Praxo::Errors::error_code($http_rejected),
+    'MCP_TRANSPORT',
+    'http mcp https required'
+);
 
 done_testing();

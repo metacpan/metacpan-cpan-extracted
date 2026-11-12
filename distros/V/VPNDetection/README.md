@@ -17,7 +17,7 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-**No API key needed to start.** Without a key, a lookup answers `ip` and `is_vpn`, up to 1000 a day per source address.
+**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_vpn`, Tor and relay detection, `location` and `asn`, with no daily or monthly cap, with a key or without one.
 
 ```perl
 use VPNDetection;
@@ -25,22 +25,22 @@ use VPNDetection;
 my $client = VPNDetection->new;
 
 my $result = $client->lookup('45.83.91.1');
-print $result->is_vpn;   # 1
+print $result->is_vpn;               # 1
+print $result->location->{country};  # the ISO 3166 country code
+print $result->asn->{name};          # who runs the announcing network
 ```
 
 ### With an API key
 
-A free key adds Tor and relay detection, where the address is and the AS that announces it. Every paid plan answers every field, the same on each, and the plans differ only in how many lookups they include. Create a key in the [console](https://app.vpndetection.io), then pass it in:
+Every paid plan answers every field: `is_hosting`, `is_cdn` and the four proxy flags as well, and the provider, confidence and last-seen detail behind each flag. The plans differ only in how many lookups they include, and a free account tries every field, 100 lookups a day. Create a key in the [console](https://app.vpndetection.io), then pass it in:
 
 ```perl
 my $client = VPNDetection->new(api_key => $ENV{VPNDETECTION_API_KEY});
 
 my $result = $client->lookup('45.83.91.1');
 print $result->is_vpn;               # 1
-print $result->location->{country};  # the ISO 3166 country code
-print $result->asn->{name};          # who runs the announcing network
-print $result->vpn->{provider};      # nordvpn, on a paid plan
 print $result->is_hosting;           # 1, on a paid plan
+print $result->vpn->{provider};      # nordvpn, on a paid plan
 ```
 
 ### Your own address
@@ -61,13 +61,13 @@ print $acct->{usage}{requests};    # 580
 print $acct->{usage}{window_end};  # when the allowance resets
 ```
 
-Usage counts against the anniversary of your subscription, not the calendar month and not the billing period, and it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
+Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period, and against the UTC day on the free plan; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
 
 `my_ip` returns a `VPNDetection::Result` like `lookup` does; `my_entitlement` returns the decoded hashref. `my_ip_p` and `my_entitlement_p` are the non-blocking forms.
 
 ### Batch lookup
 
-Look up many addresses at once. Bogons and cached answers are handled locally, and everything else goes to the batch endpoint in chunks of up to 1000 addresses, in parallel:
+Look up many addresses at once. Bogons and cached answers are handled locally, and everything else goes to the batch endpoint in chunks of up to 1000 addresses, in parallel. The batch endpoint needs a paid plan:
 
 ```perl
 my $answers = $client->lookup_batch(['45.83.91.1', '8.8.8.8', '1.1.1.1']);
@@ -283,11 +283,12 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Without a key only `ip` and `is_vpn` come back, and a free key adds Tor, relay, `location` and `asn`. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_hosting`, `is_cdn` and the four proxy flags, and of the detail behind each flag it answers only Tor's and relay's; a free-plan key's answer carries `trial_expired`, true once its daily trial is spent. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }     # absent counts as false
-if ($result->has('is_hosting')) { ... }   # is this field in my plan?
+if ($result->has('is_hosting')) { ... }   # is this field in my plan? Not without a key
+if ($result->trial_expired) { ... }      # a free-plan key's daily trial is spent
 ```
 
 ## Other Libraries

@@ -35,7 +35,9 @@ Readonly my $ERR_FILE_REQUIRED     => 'file required';
 Readonly my $ERR_WORKSPACE_NOT_SET => 'Workspace not prepared -- call prepare_workspace first';
 Readonly my $ERR_RELATIVE_NOT_SET  => 'Relative path not set -- call prepare_workspace first';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -43,31 +45,65 @@ App::Test::Generator::Mutator - Generate and apply mutation tests
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 SYNOPSIS
+
+A "mutant" is a copy of your code with one small, deliberate mistake.
+If your tests still pass, the mutant "survived" and your tests missed the
+mistake.  If a test fails, the mutant was "killed", which is good.
+
+Pattern 1: list the mutants for a file.  Nothing is changed on disk.
 
     use App::Test::Generator::Mutator;
 
     my $mutator = App::Test::Generator::Mutator->new(
-        file           => 'lib/My/Module.pm',
-        lib_dir        => 'lib',
-        mutation_level => 'fast',
+        file    => 'lib/My/Module.pm',
+        lib_dir => 'lib',
     );
 
     my $mutants = $mutator->generate_mutants();
     printf "Generated %d mutants\n", scalar @{$mutants};
+    printf "line %d: %s\n", $_->line, $_->description for @{$mutants};
 
-    my $workspace = $mutator->prepare_workspace();
+Pattern 2: test every mutant.  Run this from the top directory of the
+project.  The mutated file is copied over the real file for the test run
+and the real file is always put back.  This is what
+C<bin/test-generator-mutate> does.
+
+    my $file = 'lib/My/Module.pm';
+    my $read = sub { open my $fh, '<', $_[0]; local $/; <$fh> };
+    my $original = $read->($file);
 
     for my $m (@{$mutants}) {
+        my $workspace = $mutator->prepare_workspace();    # clean copy each time
         $mutator->apply_mutant($m);
-        if($mutator->run_tests()) {
-            print "SURVIVED: ${\$m->description}\n";
-        } else {
-            print "KILLED:   ${\$m->description}\n";
-        }
+        my $mutated = $read->("$workspace/$file");
+
+        { open my $fh, '>', $file; print $fh $mutated }
+        my $survived = $mutator->run_tests();
+        { open my $fh, '>', $file; print $fh $original }
+
+        printf "%s: %s\n", ($survived ? 'SURVIVED' : 'KILLED'), $m->description;
     }
+
+Pattern 3: use C<fast> mode to get fewer mutants and a shorter run.
+
+    my $quick = App::Test::Generator::Mutator->new(
+        file           => 'lib/My/Module.pm',
+        mutation_level => 'fast',
+    );
+    my $fewer = $quick->generate_mutants();
+    printf "fast: %d mutants, full: %d mutants\n",
+        scalar @{$fewer}, scalar @{$mutants};
+
+Pattern 4: protect lines of your own code from mutation.  Put these two
+comment lines around them in the file to be mutated.  Each marker must
+be alone on its line.
+
+    ## MUTANT_SKIP_BEGIN
+    return 1 if $n <= 1;    # no mutant will be made for this line
+    ## MUTANT_SKIP_END
 
 =head1 DESCRIPTION
 
@@ -104,6 +140,7 @@ Path to the Perl source file to mutate. Required. Must exist on disk.
 =item * C<lib_dir>
 
 Root library directory. Optional - defaults to C<lib>.
+Use a relative path. C<file> must begin with this path.
 
 =item * C<mutation_level>
 
@@ -116,8 +153,9 @@ Optional - defaults to C<full>.
 =head3 Returns
 
 A blessed hashref. Croaks if C<file> is missing or does not exist.
+The file is only checked here. It is read later, by C<generate_mutants>.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -155,13 +193,7 @@ C<file> was supplied but does not exist on disk.
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-Pre:  C<file> is defined ∧ C<-f file>
-
-Post: C<ref(result) eq 'App::Test::Generator::Mutator'>
-      ∧ C<result-E<gt>{file} eq file>
-      ∧ C<result-E<gt>{mutation_level} ∈ {full, fast}>
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -192,10 +224,10 @@ sub new {
 Parse the target file and generate all mutants by running each registered
 mutation strategy against the PPI document.
 
-    my $mutants = $mutator->generate_mutants();   # scalar context → arrayref
+    my $mutants = $mutator->generate_mutants();   # scalar context: arrayref
     for my $m (@{$mutants}) { ... }
 
-    my @mutants = $mutator->generate_mutants();   # list context → flat list (backward-compat)
+    my @mutants = $mutator->generate_mutants();   # list context: flat list (backward-compat)
 
 =head3 Arguments
 
@@ -211,7 +243,7 @@ After this method returns,
 C<$self-E<gt>{skip_lines}> contains a hashref mapping excluded
 line numbers to 1.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -258,22 +290,16 @@ The source file ended while still inside a skip block.
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-Pre:  C<prepare_workspace> need not have been called before this method.
-
-Post: C<ref(result) eq 'ARRAY'>
-      ∧ C<∀ m ∈ result: ref(m) eq 'App::Test::Generator::Mutant'>
-      ∧ C<∀ m ∈ result: ¬ skip_lines{m->line}>
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =head3 PSEUDOCODE
 
     parse file with PPI
-    scan lines for MUTANT_SKIP_BEGIN / MUTANT_SKIP_END pairs → skip_lines
+    scan lines for MUTANT_SKIP_BEGIN / MUTANT_SKIP_END pairs, giving skip_lines
     for each registered mutation strategy:
         skip if strategy does not apply_to(doc)
         for each mutant from strategy->mutate(doc):
-            include unless mutant.line ∈ skip_lines
+            include unless mutant.line is in skip_lines
     if mutation_level == 'fast':
         deduplicate and remove redundant mutants
     return arrayref (or flat list in list context)
@@ -342,7 +368,7 @@ sub generate_mutants {
 
 =head2 prepare_workspace
 
-Prepare an isolated temporary workspace for a single mutation test run.
+Prepare an isolated temporary workspace for a single mutant.
 
 The entire C<lib_dir> tree is copied into the workspace so that all module
 dependencies resolve correctly when the test suite runs against the mutant.
@@ -361,8 +387,8 @@ None beyond C<$self>.
 =head3 Returns
 
 A string containing the absolute path to the temporary directory created.
-The directory is automatically removed when the object goes out of scope
-via L<File::Temp>'s C<CLEANUP =E<gt> 1> behaviour.
+The directory is removed automatically when the program ends
+(L<File::Temp>'s C<CLEANUP =E<gt> 1> behaviour). It is not removed earlier.
 
 =head3 Side effects
 
@@ -372,11 +398,15 @@ C<< $self->{_lib_basename} >>. Does not modify C<< $self->{lib_dir} >>.
 
 =head3 Notes
 
-Call C<prepare_workspace> once per file, then C<apply_mutant> once per
-mutant within that file. Do not store the returned path beyond the
-lifetime of the enclosing scope.
+Call C<prepare_workspace> again before B<each> C<apply_mutant> call.
+C<apply_mutant> does not undo the previous mutant, so two mutants applied
+to the same workspace are both present in the file.
 
-=head3 API specification
+Each call makes a new directory and a new full copy of C<lib_dir>. The
+object then points at the new one. Older workspaces stay on disk until the
+program ends, so a long run needs disk space for one copy per call.
+
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -408,14 +438,7 @@ usually a permissions error.
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-Pre:  C<-d self-E<gt>{lib_dir}>
-      ∧ C<self-E<gt>{file}> begins with C<self-E<gt>{lib_dir}>
-
-Post: C<-d result>
-      ∧ C<self-E<gt>{_workspace} eq result>
-      ∧ C<self-E<gt>{lib_dir}> unchanged
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -464,13 +487,15 @@ will be applied to the workspace copy of the target file.
 
 =head3 Returns
 
-Nothing. Modifies the workspace copy of the target file in place.
+Nothing useful. Do not test the return value.
+Modifies the workspace copy of the target file in place.
 
 =head3 Side effects
 
 Overwrites the target file in the workspace with the mutated version.
+The real project file is never touched by this method.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -485,10 +510,10 @@ Overwrites the target file in the workspace with the mutated version.
 
 =head3 EXAMPLE
 
-    $mutator->prepare_workspace();
     for my $m (@{$mutants}) {
+        my $workspace = $mutator->prepare_workspace();
         $mutator->apply_mutant($m);
-        # workspace file is now mutated; run tests against it
+        # "$workspace/lib/My/Module.pm" now holds exactly one mutation
     }
 
 =head3 MESSAGES
@@ -507,14 +532,13 @@ Internal: the relative-path field was not set by C<prepare_workspace>.
 
 PPI could not parse the workspace copy of the target file.
 
+=item C<Can't call method "transform" on an undefined value>
+
+A Perl error, not a message from this module. C<$mutant> was C<undef>.
+
 =back
 
-=head3 FORMAL SPECIFICATION
-
-Pre:  C<self-E<gt>{_workspace}> is defined ∧ C<self-E<gt>{_relative}> is defined
-      ∧ C<ref(mutant-E<gt>{transform}) eq 'CODE'>
-
-Post: workspace copy of target file contains the mutated content
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -545,8 +569,7 @@ sub apply_mutant {
 
 =head2 run_tests
 
-Run the test suite against the current workspace and return whether all
-tests passed.
+Run the project's test suite and return whether all tests passed.
 
     my $survived = $mutator->run_tests();
 
@@ -556,19 +579,29 @@ None beyond C<$self>.
 
 =head3 Returns
 
-1 if all tests passed (mutant survived), 0 if any test failed (mutant
-killed).
+A true value (1) if all tests passed (mutant survived). A false value
+(the empty string, not 0) if any test failed or C<prove> could not be
+started (mutant killed). Test it with C<if>, not with C<== 0>.
 
 =head3 Side effects
 
-Executes an external process running the test suite.
+Executes an external process running the test suite. The output of
+C<prove> goes to the terminal.
 
 =head3 Notes
 
-Uses C<prove> found on PATH. Sets C<PERL5LIB> to include the workspace
-lib directory before running.
+Runs C<prove -l t> in the current directory. This tests the F<lib>
+directory of the project, B<not> the workspace. To test a mutant, copy
+the mutated file from the workspace over the project file first, and put
+the original back afterwards. See Pattern 2 in the L</SYNOPSIS>.
 
-=head3 API specification
+The C<prove> program is looked for next to the running C<perl> first,
+then in Perl's own C<bin> directory, and only then on C<PATH>.
+
+There is no time limit. A mutant that causes an endless loop makes this
+call wait for ever.
+
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -589,10 +622,7 @@ lib directory before running.
         print "mutant killed\n";
     }
 
-=head3 FORMAL SPECIFICATION
-
-Post: C<result ∈ {0, 1}>
-      ∧ C<result == 1> ⟺ all tests in C<t/> passed against current C<lib/>
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -725,6 +755,93 @@ C<generate_mutants> returns a flat list in list context and an arrayref in
 scalar context.  Assign to an arrayref (C<my $m = $mutator-E<gt>generate_mutants()>)
 to guarantee you always get a reference regardless of calling context.
 
+=item Applying two mutants to one workspace
+
+C<apply_mutant> changes the workspace file and leaves it changed. If you
+apply a second mutant without a new C<prepare_workspace> call, the file
+holds both mutations and your results are wrong.
+
+=item Expecting C<run_tests> to test the workspace
+
+C<run_tests> runs the tests against the project's own F<lib> directory.
+If you only call C<apply_mutant> and then C<run_tests>, the tests load the
+original code, every mutant "survives", and the kill rate is 0%.
+
+=item An unknown C<mutation_level> is not an error
+
+Only the exact text C<fast> turns on fast mode. Any other value, for
+example C<Fast> or C<quick>, is accepted silently and works like C<full>.
+
+=item How C<undef> and other false values are handled
+
+=over 4
+
+=item * C<< file => undef >> makes C<new> croak with C<file required>.
+An empty string makes it croak with C<file not found>.
+
+=item * C<lib_dir> and C<mutation_level> use their default when the value
+is C<undef>, an empty string or C<0>. You cannot have a library directory
+that is really named C<0>.
+
+=item * C<apply_mutant(undef)> stops with a Perl error, after the
+workspace check.
+
+=item * C<run_tests> returns an empty string for "failed". It never
+returns C<undef>.
+
+=item * A mutant's C<line>, C<original> or C<description> may be C<undef>.
+Fast mode treats each missing value as an empty string when it looks for
+duplicates.
+
+=back
+
+=item Extra arguments to C<new> are ignored
+
+A wrong spelling such as C<libdir> or C<level> is not reported. The
+default value is used and no warning is given.
+
+=item Skip markers must be alone on their line
+
+C<## MUTANT_SKIP_BEGIN> and C<## MUTANT_SKIP_END> are only seen when
+nothing else except spaces is on the same line. Markers cannot be nested.
+The two marker lines themselves are also skipped.
+
+=back
+
+=head1 ENCODING
+
+=over 4
+
+=item * The C<file> and C<lib_dir> arguments
+
+Paths are passed to the operating system unchanged. ASCII paths always
+work. For non-ASCII directory or file names, pass the path as bytes in
+the encoding of your file system (normally UTF-8).
+
+=item * Source file contents
+
+The file to mutate is read and written by L<PPI> as raw bytes. UTF-8
+text, other non-ASCII text and emojis inside strings, comments and POD
+are copied to the mutated file byte for byte. They are not damaged and
+they do not need to be decoded first.
+
+=item * Text returned by a mutant
+
+C<< $mutant->original >>, C<< $mutant->description >> and
+C<< $mutant->line_content >> can contain pieces of your source code.
+These are byte strings. If the source is UTF-8 and you print them through
+a UTF-8 file handle, decode them first with
+C<Encode::decode('UTF-8', $text)>.
+
+=item * Skip markers
+
+The markers are ASCII. They are found correctly in a file of any
+ASCII-compatible encoding, including UTF-8.
+
+=item * Error messages
+
+Messages contain the file path exactly as you gave it.
+
 =back
 
 =head1 LIMITATIONS
@@ -769,6 +886,204 @@ A C<git restore lib/...> recovers it.
 =head1 AUTHOR
 
 Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 FORMAL SPECIFICATION
+
+This section describes each method in Z notation.  It is for readers who
+want an exact, mathematical statement.  You do not need it to use the module.
+
+How to read it: a name ending in C<?> is an input, a name ending in C<!> is
+an output, and a name ending in C<'> is the value after the call.
+E<0x0394> before the state name means "this call may change the object".
+E<0x039E> means "this call does not change the object".
+
+    LEVEL == { 'full', 'fast' }
+
+    ┌─ Mutator ─────────────────────────────────────────
+    │ file, lib_dir : PATH
+    │ mutation_level : STRING
+    │ skip_lines : ℙ ℕ₁ ∪ { undef }
+    │ workspace : PATH ∪ { undef }
+    │ relative : PATH ∪ { undef }
+    ├───────────────────────────────────────────────────
+    │ workspace = undef ⇔ relative = undef
+    └───────────────────────────────────────────────────
+
+=head2 new
+
+    ┌─ New ─────────────────────────────────────────────
+    │ Mutator′
+    │ file? : VALUE
+    │ lib_dir?, mutation_level? : VALUE
+    │ result! : Mutator
+    ├───────────────────────────────────────────────────
+    │ pre   file? ≠ undef ∧ file? names an existing plain file
+    │ post  file′ = file?
+    │       lib_dir′ = if lib_dir? is true
+    │                  then lib_dir? else 'lib'
+    │       mutation_level′ = if mutation_level? is true
+    │                         then mutation_level? else 'full'
+    │       skip_lines′ = undef ∧ workspace′ = undef ∧ relative′ = undef
+    │       result! = θ Mutator′
+    └───────────────────────────────────────────────────
+
+    file? = undef                  ⇒ croak 'file required'
+    file? is not an existing file  ⇒ croak 'file not found: ' ⁀ file?
+
+=head2 generate_mutants
+
+    ┌─ GenerateMutants ─────────────────────────────────
+    │ Δ Mutator
+    │ result! : seq Mutant
+    │ all : seq Mutant
+    ├───────────────────────────────────────────────────
+    │ pre   file is valid Perl that PPI can parse
+    │       skip markers in file are paired and not nested
+    │ post  skip_lines′ = { n : ℕ₁ | line n of file lies between
+    │                       a BEGIN marker and its END marker,
+    │                       both marker lines included }
+    │       all = every mutant that the four strategies
+    │             produce for file, in strategy order
+    │       ∀ m : ran result! • m ∈ ran all ∧ m.line ∉ skip_lines′
+    │       mutation_level ≠ 'fast' ⇒
+    │           result! = all with skipped lines removed
+    │       mutation_level = 'fast' ⇒
+    │           (∀ i, j : dom result! • i ≠ j ⇒
+    │               key(result!(i)) ≠ key(result!(j)))
+    │           ∧ (∀ m : ran result! • ¬ redundant(m))
+    │       file′ = file ∧ lib_dir′ = lib_dir
+    │       workspace′ = workspace ∧ relative′ = relative
+    └───────────────────────────────────────────────────
+
+    key(m) == (m.line, m.original, m.description)
+
+    In list context the members of result! are returned as a list.
+
+=head2 prepare_workspace
+
+    ┌─ PrepareWorkspace ────────────────────────────────
+    │ Δ Mutator
+    │ result! : PATH
+    ├───────────────────────────────────────────────────
+    │ pre   lib_dir names a directory that can be copied
+    │ post  result! names a directory created by this call
+    │       result! ≠ workspace
+    │       result!/basename(lib_dir) is a full copy of lib_dir
+    │       workspace′ = result!
+    │       relative′ = file with the leading lib_dir removed
+    │       file′ = file ∧ lib_dir′ = lib_dir
+    │       mutation_level′ = mutation_level
+    │       skip_lines′ = skip_lines
+    └───────────────────────────────────────────────────
+
+    the copy fails  ⇒ croak 'dircopy failed: ' ⁀ reason
+
+=head2 apply_mutant
+
+    ┌─ ApplyMutant ─────────────────────────────────────
+    │ Ξ Mutator
+    │ mutant? : Mutant
+    │ target : PATH
+    ├───────────────────────────────────────────────────
+    │ pre   workspace ≠ undef ∧ relative is true
+    │       mutant?.transform is a CODE reference
+    │       target = workspace/basename(lib_dir)/relative
+    │       target is valid Perl that PPI can parse
+    │ post  content′(target) = mutant?.transform(content(target))
+    │       content′(file) = content(file)
+    └───────────────────────────────────────────────────
+
+    workspace = undef  ⇒ croak 'Workspace not prepared -- ...'
+    relative is false  ⇒ croak 'Relative path not set -- ...'
+    target not parsed  ⇒ croak 'Failed to parse ' ⁀ target
+
+=head2 run_tests
+
+    ┌─ RunTests ────────────────────────────────────────
+    │ Ξ Mutator
+    │ result! : { 1, '' }
+    ├───────────────────────────────────────────────────
+    │ post  result! = 1 ⇔ the command 'prove -l t', run in the
+    │                     current directory, exits with status 0
+    └───────────────────────────────────────────────────
+
+=head1 STATE DIAGRAM
+
+The object has three states. The state says what has been prepared so far.
+
+      new(file => undef) or new(file => missing file)
+    +--------------------------------------------------+
+    |  action: croak, no object                        |
+    v                                                  |
+  +-------------+                                      |
+  |  NO OBJECT  |--------------------------------------+
+  +-------------+
+        |
+        | new(file => existing file)
+        | action: store file, lib_dir, mutation_level;
+        |         build the four mutation strategies
+        v
+  +---------------------+  generate_mutants()
+  |                     |-----------------------------------------+
+  |     CONSTRUCTED     |  action: read file, set skip_lines,     |
+  |  (no workspace yet) |  return the mutants (state stays same)  |
+  |                     |<----------------------------------------+
+  |                     |
+  |                     |  run_tests()
+  |                     |-----------------------------------------+
+  |                     |  action: run 'prove -l t', return 1/''  |
+  |                     |<----------------------------------------+
+  |                     |
+  |                     |  apply_mutant(m)
+  |                     |-----------------------------------------+
+  |                     |  action: croak 'Workspace not prepared' |
+  |                     |<----------------------------------------+
+  +---------------------+
+        |
+        | prepare_workspace()
+        | action: make temp directory, copy lib_dir into it,
+        |         remember workspace path and relative file path
+        v
+  +---------------------+  generate_mutants()   (as above)
+  |                     |-----------------------------------------+
+  |   WORKSPACE CLEAN   |<----------------------------------------+
+  |  (copy is the same  |
+  |   as the original)  |  run_tests()          (as above)
+  |                     |-----------------------------------------+
+  |                     |<----------------------------------------+
+  |                     |
+  |                     |  prepare_workspace()
+  |                     |-----------------------------------------+
+  |                     |  action: new directory, new clean copy  |
+  |                     |<----------------------------------------+
+  +---------------------+
+        |            ^
+        |            | prepare_workspace()
+        |            | action: new directory, new clean copy;
+        |            |         the mutated copy is left behind
+        | apply_mutant(m)
+        | action: rewrite the workspace copy of the file
+        |         with one mutation
+        v            |
+  +---------------------+  apply_mutant(m2)
+  |                     |-----------------------------------------+
+  |  WORKSPACE MUTATED  |  action: a second mutation is added on  |
+  |                     |  top of the first (usually a mistake)   |
+  |                     |<----------------------------------------+
+  |                     |
+  |                     |  generate_mutants(), run_tests()
+  |                     |-----------------------------------------+
+  |                     |  action: as above, state stays the same |
+  |                     |<----------------------------------------+
+  +---------------------+
+
+  From any state: when the program ends, every temporary workspace
+  directory is deleted.
+
+A call that croaks leaves the object in the state it was in. The
+workspace file is only rewritten after the mutation has succeeded.
+
+No method of this class changes the real project file.
 
 =head1 LICENCE AND COPYRIGHT
 

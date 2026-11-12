@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Install — App::Test::Generator</title>
+<meta name="description" content="Install App::Test::Generator from CPAN or a checkout, see which dependencies are required, and learn which optional modules unlock coverage-guided fuzzing, property tests and signature extraction.">
+<link rel="canonical" href="install.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Install — App::Test::Generator">
+<meta property="og:description" content="From CPAN or a checkout, with the optional modules that unlock coverage-guided fuzzing and property tests.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html" class="current" aria-current="page">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Install</h1>
+	<p class="lead">
+		App::Test::Generator is one Perl distribution with ten command-line tools.
+		Nothing needs a daemon, a database or a network connection once it is
+		installed; the only runtime service any part of it touches is the CPAN
+		Testers API, and only when you ask for that part of the dashboard.
+	</p>
+
+	<h2>From CPAN</h2>
+<pre><code>cpanm App::Test::Generator
+</code></pre>
+	<p>
+		That installs the module tree and puts
+		<code>fuzz-harness-generator</code>, <code>extract-schemas</code>,
+		<code>test-generator-mutate</code>, <code>test-generator-index</code>,
+		<code>generate-test-dashboard</code>, <code>benchmark-generator</code>,
+		<code>pod-example-tester</code>, <code>deploy-workflows</code>,
+		<code>instrument-modules</code> and <code>demo_extractor</code> on your
+		<code>PATH</code>.
+	</p>
+
+	<h2>From a checkout</h2>
+<pre><code>git clone https://github.com/nigelhorne/App-Test-Generator.git
+cd App-Test-Generator
+perl Makefile.PL
+make
+make test
+make install
+</code></pre>
+	<p>
+		<code>prove -Ilib t</code> runs the suite without installing anything.
+		Two of the test files are opt-in integration tests and only run when
+		<code>EXTENDED_TESTING=1</code> is set:
+	</p>
+<pre><code>EXTENDED_TESTING=1 TEST_JOBS=4 prove -Ilib t
+</code></pre>
+	<p>
+		<code>t/app.t</code> is the canary: it takes every module in
+		<code>lib/</code>, extracts a schema from it, generates a fuzz harness and
+		proves that harness. <code>t/self-fuzz.t</code> does the same through the
+		installed command-line tools, so a change that breaks extraction or
+		generation usually shows up there first.
+	</p>
+
+	<h2>Requirements</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Needs</th><th>Why</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Perl 5.036 or later</td>
+					<td>Declared as <code>MIN_PERL_VERSION</code>. The code uses signatures and <code>say</code>-era features without <code>feature</code> pragmas.</td>
+				</tr>
+				<tr>
+					<td><code>Config::Abstraction</code> 0.36+</td>
+					<td>Reads the schema files, so YAML, JSON and Perl configuration all work.</td>
+				</tr>
+				<tr>
+					<td><code>Params::Validate::Strict</code> 0.36+ and <code>Params::Get</code> 0.15+</td>
+					<td>Used both by ATG itself and by the harnesses it generates, to validate inputs against the schema.</td>
+				</tr>
+				<tr>
+					<td><code>Return::Set</code> 0.03+</td>
+					<td>Validates the routine's return value in the generated test. 0.03 is the floor because list returns need it.</td>
+				</tr>
+				<tr>
+					<td><code>PPI</code> and <code>Text::Balanced</code></td>
+					<td>Schema extraction parses Perl source rather than guessing with regular expressions.</td>
+				</tr>
+				<tr>
+					<td><code>Template</code>, <code>Data::Section::Simple</code>, <code>Data::Random*</code>, <code>Unicode::GCString</code></td>
+					<td>The harness generator: templating, the embedded template body, and typed random data including grapheme-correct strings.</td>
+				</tr>
+				<tr>
+					<td><code>YAML::XS</code>, <code>JSON::MaybeXS</code></td>
+					<td>Reading schemas and writing <code>mutation.json</code> and the dashboard data files.</td>
+				</tr>
+				<tr>
+					<td><code>Test::Most</code></td>
+					<td>The generated <code>.t</code> files are Test::Most scripts.</td>
+				</tr>
+				<tr>
+					<td><code>prove</code></td>
+					<td>Shipped with Perl. <code>fuzz-harness-generator -r</code> and the mutation runner invoke it by absolute path, derived from <code>$^X</code>.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>Optional modules that unlock features</h2>
+	<p>
+		These are declared as recommendations, not requirements. Each one is
+		loaded at runtime, and its absence degrades a feature instead of breaking
+		the install.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Module</th><th>What you get</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>Devel::Cover</code> 1.51+</td>
+					<td>Coverage-guided fuzzing in <code>CoverageGuidedFuzzer</code> and the coverage columns in the dashboard. Without it, fuzzing runs blind — random only, no branch feedback.</td>
+				</tr>
+				<tr>
+					<td><code>Test::LectroTest</code> and <code>Test::LectroTest::Compat</code></td>
+					<td>Property-based tests. Both are in <code>TEST_REQUIRES</code>, so <code>make test</code> installs them; generated property tests skip themselves if they are missing.</td>
+				</tr>
+				<tr>
+					<td><code>Type::Params</code> and <code>Types::Common</code></td>
+					<td>Accurate schema extraction from <code>signature_for</code> declarations. Without them, extraction falls back to heuristics.</td>
+				</tr>
+				<tr>
+					<td><code>BSD::Resource</code></td>
+					<td>Applies a memory cap to the child process that evaluates a Type::Params signature. Not available on every platform, and not required anywhere else.</td>
+				</tr>
+				<tr>
+					<td><code>Code::CutNPaste</code>-style CPD data</td>
+					<td>The duplication table and per-file duplication drill-downs, if <code>cover_html/cpd.json</code> exists.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+<pre><code><span class="comment"># everything, including the optional features</span>
+cpanm --with-recommends App::Test::Generator
+</code></pre>
+
+	<h2>Verify the install</h2>
+<pre><code>perl -MApp::Test::Generator -e 'print "$App::Test::Generator::VERSION\n"'
+<span class="comment">0.47</span>
+
+fuzz-harness-generator --version
+extract-schemas --version
+test-generator-mutate --version
+</code></pre>
+	<p>
+		Then generate a harness for the sample module and run it. This is the
+		whole pipeline in two commands, and it needs nothing but the installed
+		distribution:
+	</p>
+<pre><code>extract-schemas lib/App/Test/Generator/Sample/Module.pm --output-dir /tmp/schemas
+fuzz-harness-generator -r /tmp/schemas/greet.yml
+</code></pre>
+	<p>
+		<code>fuzz-harness-generator -r</code> writes the harness to a temporary
+		file, runs it through <code>prove</code>, and prints
+		<code>Result: PASS</code> followed by the TAP file and test counts. If you
+		see that, the generator, the assertion libraries and your Perl all agree.
+	</p>
+
+	<div class="note">
+		<span class="note-title">Windows</span>
+		<p>
+			Everything works on Windows, with two differences. The
+			<code>close_stdin</code> configuration option is ignored, because
+			Windows has no equivalent of closing the inherited standard input. And
+			the shell script <code>generate-test-dashboard</code> is a bash script —
+			run it under Git Bash, MSYS2 or WSL, or run its individual steps by hand.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="index.html">← Home</a>
+		<a href="quickstart.html">Quick start →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

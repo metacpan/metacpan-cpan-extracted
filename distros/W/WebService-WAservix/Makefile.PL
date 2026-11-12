@@ -28,6 +28,6 @@ WriteMakefile(
             },
             bugtracker => { web => 'https://github.com/TekservixHQ/waservix-perl/issues' },
         },
-        keywords => [qw(whatsapp whatsapp-api messaging tekservix)],
+        keywords => [qw(whatsapp whatsapp-api-gateway whatsapp-api messaging tekservix)],
     },
 );

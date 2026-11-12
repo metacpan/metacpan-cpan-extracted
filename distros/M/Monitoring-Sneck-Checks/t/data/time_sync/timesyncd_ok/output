@@ -1,0 +1,7 @@
+Timezone=America/Chicago
+LocalRTC=no
+CanNTP=yes
+NTP=yes
+NTPSynchronized=yes
+TimeUSec=Sun 2026-11-08 23:25:12 CST
+RTCTimeUSec=Sun 2026-11-08 23:25:12 CST

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schema extraction — App::Test::Generator</title>
+<meta name="description" content="extract-schemas reads a Perl module and infers one input/output schema per routine from signatures, validation libraries, POD and formal =head4 input blocks, with a confidence level for each.">
+<link rel="canonical" href="extraction.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Schema extraction — App::Test::Generator">
+<meta property="og:description" content="From a .pm file to schemas: what SchemaExtractor reads, what it cannot know, and how it says so.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html" class="current" aria-current="page">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Extracting a schema from Perl</h1>
+	<p class="lead">
+		Writing a schema by hand means reading the source anyway. So the
+		distribution can read it for you: <code>extract-schemas</code> parses a
+		<code>.pm</code> file with PPI, infers one schema per routine, and rates
+		its own confidence in each one.
+	</p>
+
+<pre><code>extract-schemas lib/My/Module.pm --output-dir schemas --verbose
+</code></pre>
+	<p>
+		The result is one YAML file per routine. They are ordinary schemas: edit
+		them, keep the ones that are right, delete the rest. Extraction is a way
+		to skip the typing, not a statement that the inference is correct.
+	</p>
+
+	<h2>What it reads</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Source</th><th>What is inferred</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Formal <code>=head3 Input</code> / <code>=head4 Input</code> blocks</td>
+					<td>Authoritative. Both positional (<code>[ {type =&gt; 'string'}, ... ]</code>) and named (<code>{ name =&gt; {type =&gt; 'string'} }</code>) formats are understood, along with <code>isa</code>. Params from these blocks are never overridden by heuristics.</td>
+				</tr>
+				<tr>
+					<td>Formal <code>=head4 Output</code> blocks</td>
+					<td>The return type, again taking priority over inference.</td>
+				</tr>
+				<tr>
+					<td>Signatures and argument unpacking</td>
+					<td>Modern <code>sub f($x, $y)</code> signatures, <code>my ($x, $y) = @_</code>, direct <code>$_[0]</code> indexing, <code>shift</code>, and <code>Params::Get</code> named extraction.</td>
+				</tr>
+				<tr>
+					<td>Validation libraries</td>
+					<td><code>Params::Validate::Strict</code> schema hashes, and <code>Type::Params</code> <code>signature_for</code> declarations.</td>
+				</tr>
+				<tr>
+					<td>Code heuristics</td>
+					<td>What a parameter is compared with, folded into arithmetic, checked with <code>looks_like_number</code>, matched against a regex, or used to index a hash. Constraints such as <code>&gt;= 0</code> become <code>min</code>; <code>length(...) &lt;= 255</code> becomes <code>max</code>.</td>
+				</tr>
+				<tr>
+					<td>POD</td>
+					<td>Parameter names and types from <code>=item</code> entries, plus runnable examples, which become static corpus cases.</td>
+				</tr>
+				<tr>
+					<td>Structure</td>
+					<td>Accessors (getter, setter, getset), object parameters and the methods they are documented to need (<code>can</code>), constructor arguments from <code>new</code>, Perl 5.38 <code>class</code> syntax, and Moose <code>before</code>/<code>after</code>/<code>around</code> modifiers.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2>The best signal is a spec block</h2>
+	<p>
+		A formal input block beats every heuristic, because it is the author
+		stating the contract rather than the extractor guessing at it. Writing
+		one is the single most effective way to get a useful schema:
+	</p>
+<pre><code>=head2 validate
+
+=head4 input
+
+{ score =&gt; { type =&gt; 'number', min =&gt; 0, max =&gt; 100 },
+  label =&gt; { type =&gt; 'string', optional =&gt; 1 } }
+
+=head4 output
+
+{ type =&gt; 'boolean' }
+
+=cut
+
+sub validate {
+	my %args = @_;
+	...
+}
+</code></pre>
+	<p>
+		Two details worth knowing. A parameter listed in a spec block
+		<em>without</em> a <code>type</code> is treated as deliberately
+		unconstrained: the extractor will not fill in a type from heuristics, and
+		the harness will not generate wrong-type cases that are expected to die.
+		And a type may be written either as a quoted string
+		(<code>type =&gt; 'object'</code>) or as a <code>Params::Validate</code>
+		constant (<code>type =&gt; OBJECT</code>).
+	</p>
+
+	<h2 id="confidence">Confidence</h2>
+	<p>
+		Every extracted schema carries a confidence level, and the level decides
+		what the rest of the toolkit does with it:
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Level</th><th>Typical cause</th><th>Consequence</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>high</code></td><td>A formal spec block, or a validation-library schema plus agreeing code.</td><td>Used for test generation.</td></tr>
+				<tr><td><code>medium</code></td><td>Validation library or POD and code agree, without a formal block.</td><td>Used for test generation.</td></tr>
+				<tr><td><code>low</code></td><td>Only heuristics, or POD and code conflict.</td><td>Used, but worth reading before trusting.</td></tr>
+				<tr><td><code>very_low</code></td><td>Very little type information; parameters found only by name.</td><td>Falls back to a TODO stub in the mutation pipeline.</td></tr>
+				<tr><td><code>none</code></td><td>Nothing to go on.</td><td>Falls back to a TODO stub.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		<code>--strict-pod</code> controls what happens when POD and code
+		disagree: <code>off</code> ignores the conflict, <code>warn</code> reports
+		it, <code>fatal</code> refuses to extract. <code>fatal</code> is the right
+		setting in CI for a project that documents its parameters properly; it
+		turns documentation drift into a build failure.
+	</p>
+
+	<h2>Invocants are not parameters</h2>
+	<p>
+		<code>$self</code>, <code>$class</code>, <code>$pkg</code>,
+		<code>$proto</code> and <code>$klass</code> are recognised as the
+		receiver and excluded from the input schema, in every argument-unpacking
+		style. Object methods are emitted with a <code>new:</code> key, which
+		tells the generator to construct an instance first — and tells the
+		mutation pipeline that the routine needs an object it cannot build, so it
+		becomes a TODO stub rather than a broken schema.
+	</p>
+
+	<h2>Fuzzing during extraction</h2>
+	<p>
+		<code>--fuzz</code> runs each extracted schema through the
+		coverage-guided fuzzer as it is produced, so a corpus accumulates next to
+		the schemas. <code>--fuzz-iters</code> sets how hard to try,
+		<code>--corpus-dir</code> says where to keep the corpus, and
+		<code>--minimize-corpus</code> trims it to the smallest set that still
+		covers every discovered branch.
+	</p>
+<pre><code>extract-schemas --fuzz --fuzz-iters 300 \
+    --corpus-dir t/corpus --minimize-corpus lib/My/Module.pm
+</code></pre>
+	<p>
+		<a href="fuzzing.html#coverage-guided">How the fuzzer uses that
+		coverage</a>.
+	</p>
+
+	<h2>Debugging one routine</h2>
+	<p>
+		The distribution tests itself by extracting schemas from every module in
+		<code>lib/</code> and proving the harnesses that come out
+		(<code>t/self-fuzz.t</code>, opt-in via <code>EXTENDED_TESTING=1</code>).
+		When one routine fails there, isolate it with <code>--function</code>:
+	</p>
+<pre><code>extract-schemas --function bugs --output-dir /tmp/dbg \
+    lib/App/Test/Generator/CoverageGuidedFuzzer.pm
+fuzz-harness-generator -r /tmp/dbg/bugs.yml
+</code></pre>
+	<p>
+		The flag extracts everything, then keeps only <code>bugs.yml</code> and
+		limits the fuzz run and the summary table to that one routine. If the name
+		does not exist, it prints the routine names it did find and exits 1 —
+		usually the fastest way to discover that the sub is a method or is named
+		differently from what you assumed.
+	</p>
+
+	<h2>Where it stops</h2>
+	<ul>
+		<li><strong>A constructor defined in a parent class is not followed.</strong>
+		<code>@ISA</code> is not traversed, so such a routine is emitted with an
+		unenrichable <code>new:</code> rather than constructor arguments inferred
+		from the base class.</li>
+		<li><strong>Cross-package subs are skipped.</strong> <code>sub DB::DB</code>
+		and other qualified declarations are not fuzz targets.</li>
+		<li><strong>Heuristic types can be wrong.</strong> A parameter used only as
+		a hash key looks like a string. A parameter that is never compared,
+		concatenated or validated looks like a string too — because there is
+		nothing else to go on. <code>--verbose</code> shows which evidence was
+		used.</li>
+		<li><strong>Business rules are invisible.</strong> Nothing in the source
+		says a discount may not exceed the order total. Only a spec block or a
+		static case can express that.</li>
+	</ul>
+
+	<div class="note">
+		<span class="note-title">Treat the output as a draft</span>
+		<p>
+			Extraction is a very good first draft and an unreliable final one. The
+			loop that works is: extract, run the harness, fix the schema where the
+			harness is wrong, keep it in <code>t/conf/</code>. From then on it is
+			hand-written code that happens to have been typed by a program.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="commands.html">← Commands</a>
+		<a href="fuzzing.html">Fuzzing →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

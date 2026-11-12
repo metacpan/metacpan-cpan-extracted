@@ -4,7 +4,7 @@
       "Jemma Bradshaw <jemma@nothingbutstatic.dev>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150012",
+   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -40,6 +40,7 @@
             "Text::CSV" : "0",
             "Type::Utils" : "0",
             "Types::Standard" : "0",
+            "constant" : "0",
             "feature" : "0",
             "open" : "0",
             "perl" : "v5.20.0",
@@ -50,7 +51,9 @@
       "test" : {
          "requires" : {
             "Clone" : "0",
+            "IO::Compress::Gzip" : "0",
             "MIME::Base64" : "0",
+            "Prometheus::Tiny" : "0",
             "Test::Exception" : "0",
             "Test::More" : "0",
             "lib" : "0"
@@ -60,16 +63,17 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "web" : "https://github.com/marcbradshaw/mail-tls-rpt/issues"
+         "web" : "https://github.com/fastmail/mail-tls-rpt/issues"
       },
       "repository" : {
          "type" : "git",
-         "url" : "git://github.com/marcbradshaw/mail-tls-rpt.git",
-         "web" : "https://github.com/marcbradshaw/mail-tls-rpt"
+         "url" : "git://github.com/fastmail/mail-tls-rpt.git",
+         "web" : "https://github.com/fastmail/mail-tls-rpt"
       }
    },
-   "version" : "2.20261104",
+   "version" : "2.20261112",
    "x_contributors" : [
+      "Andrew Davis <adavis@fastmailteam.com>",
       "Marc Bradshaw <marc@marcbradshaw.net>"
    ],
    "x_generated_by_perl" : "v5.42.0",

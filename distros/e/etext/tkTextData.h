@@ -88,6 +88,12 @@
  *	TkTextDataCopy(d)	   a deep copy, owned by the caller
  *				   (LangCopyArg on the Lang part; the
  *				   other slots are copied as they are).
+ *	TkTextDataShare(d)	   a container holding the same Lang
+ *				   value as d (its reference count
+ *				   raised: no copy) and the same other
+ *				   slots, owned by the caller ("block
+ *				   sprout" puts the leaf's value on
+ *				   several owners).  In A it is d.
  *	TkTextDataFree(d)	   frees d and all it owns at once
  *				   (LangFreeArg on the Lang part).  Freeing
  *				   a Lang value can run Perl code (a
@@ -256,6 +262,15 @@ TK_TEXT_DATA_INLINE TkTextData
 TkTextDataCopy(TkTextData d)
 {
     return (d != NULL) ? LangCopyArg(d) : NULL;
+}
+
+TK_TEXT_DATA_INLINE TkTextData
+TkTextDataShare(TkTextData d)
+{
+    if (d != NULL) {
+	Tcl_IncrRefCount(d);
+    }
+    return d;
 }
 
 TK_TEXT_DATA_INLINE void
@@ -463,6 +478,31 @@ TkTextDataCopy(TkTextData d)
     c->size = b->size;
     copy.blockPtr = c;
     return copy;
+}
+
+TK_TEXT_DATA_INLINE TkTextData
+TkTextDataShare(TkTextData d)
+{
+    TkTextData share;
+    TkTextDataBlock *b = d.blockPtr, *c;
+    int k;
+
+    TkTextDataInit(share);
+    if (b == NULL) {
+	return share;
+    }
+    c = TkTextDataAllocBlock(b->size);
+    for (k = 0; k < b->size; k++) {
+	TkTextDataTypes(c)[k] = TkTextDataTypes(b)[k];
+	c->slots[k] = b->slots[k];
+	if ((TkTextDataTypes(b)[k] == TK_TEXT_DATA_LANG)
+		&& (b->slots[k].lang != NULL)) {
+	    Tcl_IncrRefCount(b->slots[k].lang);
+	}
+    }
+    c->size = b->size;
+    share.blockPtr = c;
+    return share;
 }
 
 TK_TEXT_DATA_INLINE void

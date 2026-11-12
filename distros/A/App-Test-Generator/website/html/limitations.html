@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Limitations — App::Test::Generator</title>
+<meta name="description" content="What App::Test::Generator does not do: black-box tests cannot know business rules, extraction is heuristic, mutants can hang, only four operators exist, and the dashboard pipeline is expensive.">
+<link rel="canonical" href="limitations.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Limitations — App::Test::Generator">
+<meta property="og:description" content="The honest list: heuristics, equivalent mutants, hangs, and what generated tests cannot know.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html" class="current" aria-current="page">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Limitations</h1>
+	<p class="lead">
+		This is a test generator, not an oracle. It knows only what the schema
+		says, and the schema is written by a person who may be wrong — or by a
+		heuristic that may be. The failures worth worrying about are the ones it
+		does not report.
+	</p>
+
+	<h2>What generated tests cannot know</h2>
+	<ul>
+		<li><strong>Intent.</strong> A schema says "a string of 1 to 64
+		characters". It cannot say that the string must be a valid shipping
+		reference, or that two customers must not share one.</li>
+		<li><strong>Anything about state.</strong> A generated harness constructs
+		an object when <code>new:</code> is present, but it does not set up a
+		database, a fixture or a sequence of calls. Behaviour that only appears
+		after three operations stays untested.</li>
+		<li><strong>Side effects.</strong> The harness checks the return value and
+		whether the call died. It does not assert what was written to a file,
+		sent over a socket, or stored in a global.</li>
+		<li><strong>Concurrency and timing.</strong> Tests run one call at a time;
+		races are out of scope.</li>
+	</ul>
+	<p>
+		These are properties of black-box testing, not defects. The response is to
+		keep writing ordinary unit tests next to the generated ones, and to use
+		mutation testing to find out which of them the suite does not really
+		check.
+	</p>
+
+	<h2>Extraction is a heuristic</h2>
+	<ul>
+		<li>Types are inferred from how a parameter is used. A parameter that is
+		only ever compared for equality looks like a string, whatever it really
+		is.</li>
+		<li>Constraints are inferred from comparisons near the parameter. A
+		bound enforced in another function, or by a database, is invisible.</li>
+		<li>Inheritance is not followed: a constructor defined in a parent class
+		leaves the schema with an unenrichable <code>new:</code> key.</li>
+		<li>Heuristics can also be too eager. A validation regex in the body can
+		be read as an enum; a documented type can conflict with the code. The
+		confidence level says how much evidence there was, and
+		<code>--strict-pod fatal</code> turns a documented-type disagreement into
+		a hard error.</li>
+	</ul>
+	<p>
+		<a href="extraction.html#confidence">The confidence levels</a> are the
+		part of extraction to read first.
+	</p>
+
+	<h2>Mutation testing costs time — and can hang</h2>
+	<ul>
+		<li><strong>No per-mutant timeout.</strong> The per-mutant
+		<code>prove</code> run is unbounded, so a mutant that causes infinite
+		recursion or a wait on a process stalls the whole run.
+		<a href="mutation.html#skipping">Skip markers</a> are the workaround; a
+		watchdog around the runner is the other.</li>
+		<li><strong>Four operators.</strong> Absence of survivors does not mean
+		absence of untested code — only that these four transformations are
+		caught.</li>
+		<li><strong>Equivalent mutants.</strong> Some mutants cannot be
+		distinguished from the original by any test. They count as survivors and
+		are not a defect.</li>
+		<li><strong>In-place writes.</strong> Mutants are applied to the real
+		<code>lib/</code> file and restored afterwards. If the process is killed
+		in between, the file stays mutated; <code>git restore lib/</code> fixes
+		it.</li>
+		<li><strong>A baseline is required.</strong> If the suite does not pass
+		before mutation begins, every mutant is reported as killed for the wrong
+		reason.</li>
+	</ul>
+
+	<h2>The dashboard is expensive</h2>
+	<ul>
+		<li>The suite runs twice — once under Devel::Cover, once under the LCSAJ
+		debugger. On a large module this dominates CI time.</li>
+		<li>Coverage-guided fuzzing needs <code>Devel::Cover</code>. Without it,
+		fuzzing still runs but gets no branch feedback and no corpus
+		minimisation benefit.</li>
+		<li>Property tests need <code>Test::LectroTest</code> and
+		<code>Test::LectroTest::Compat</code>; a generated file skips its
+		property section when they are absent.</li>
+		<li>The CPAN Testers section makes HTTP requests unless
+		<code>NO_NETWORK_TESTING</code> is set. With network access and a slow
+		API, a run can wait minutes per report.</li>
+		<li>The trend line's y-axis is the arithmetic mean of per-file
+		percentages, while the table's Total row is Devel::Cover's weighted
+		aggregate. They differ by a fraction of a percent, always, by
+		construction.</li>
+	</ul>
+
+	<h2>Platform and portability</h2>
+	<ul>
+		<li><strong>Perl 5.036 or later.</strong> Not negotiable; the code does not
+		compile on older perls.</li>
+		<li><strong>Windows.</strong> The <code>close_stdin</code> option is
+		ignored and <code>generate-test-dashboard</code> is a bash script. The
+		module itself and all the Perl commands work.</li>
+		<li><strong><code>BSD::Resource</code></strong> is used only to cap the
+		signature-evaluation subprocess, and is not available everywhere. Its
+		absence is handled, not fatal.</li>
+		<li><strong>Generated harnesses assume a POSIX-ish shell</strong> when
+		they shell out; the test suite that ships with the distribution is
+		verified on Linux, macOS and Windows CI, but a harness for code that
+		invokes system commands inherits that code's portability problems.</li>
+	</ul>
+
+	<h2>Things the schema format does not express</h2>
+	<ul>
+		<li>Nested container element types — a <code>hashref</code> of
+		<code>arrayref</code> of objects is a hashref, and only its size is
+		constrained. The generator reports this rather than guessing.</li>
+		<li>Relationships between parameters, such as "max must be greater than
+		min". Each parameter is checked against its own spec.</li>
+		<li>Ordering constraints between calls.</li>
+	</ul>
+
+	<h2>The distribution tests itself</h2>
+	<p>
+		Two integration tests run every module in <code>lib/</code> through the
+		extractor and the generator:
+	</p>
+<pre><code>EXTENDED_TESTING=1 TEST_JOBS=4 prove -Ilib t
+</code></pre>
+	<p>
+		They are the reason a change to extraction is expensive to get wrong, and
+		the reason a failure is usually easy to locate — the end-of-run table
+		names every routine and why it was skipped.
+	</p>
+
+	<div class="warn">
+		<span class="warn-title">The tests can be wrong</span>
+		<p>
+			A generated test asserts what the schema says. When one fails, decide
+			which of the two is wrong before changing either. Weakening the schema
+			until the suite is green is the failure mode this tool makes easy, and
+			it is the one to watch for in review.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="dashboard.html">← Dashboard</a>
+		<a href="changelog.html">Changes →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

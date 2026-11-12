@@ -1,0 +1,23 @@
+#!/usr/bin/env perl
+# Stands in for fail2ban-client status and status $jail. Prints status,
+# or status.$jail, from the directory FAIL2BAN_TEST_SET names, and exits
+# with what is in its exit file, if any.
+use strict;
+use warnings;
+use FindBin;
+
+die( 'unexpected args ' . "@ARGV" . "\n" ) if !@ARGV || $ARGV[0] ne 'status' || @ARGV > 2;
+my $set  = $FindBin::Bin . '/' . $ENV{FAIL2BAN_TEST_SET};
+my $file = $set . '/' . join( '.', @ARGV );
+if ( open( my $fh, '<', $file ) ) {
+	print while <$fh>;
+} else {
+	print 'ERROR   NOK: (\'' . $ARGV[1] . '\',)' . "\n";
+	exit(255);
+}
+my $exit = 0;
+if ( open( my $exit_fh, '<', $set . '/exit' ) ) {
+	$exit = <$exit_fh>;
+	chomp($exit);
+}
+exit($exit);

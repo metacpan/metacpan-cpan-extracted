@@ -15,7 +15,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 34;
+plan tests => 36;
 $mw->geometry('+10+10');
 
 my $t = $mw->eText(-undo => 1, -width => 40, -height => 10)->pack;
@@ -347,6 +347,122 @@ sub run_undoable {
 }
 $expected = qr/$expected|no run of tag|not inside a block|bad level/;
 
+# Ragged trees (2.06): block sprout and block flatten among the edits, with values on
+# nodes, undo and redo; the B-tree check includes the rules of the
+# padding nodes.
+#
+# Every structural change there is also checked for an exact undo and
+# redo (2.06, step 2): the state before it (the block list of the text
+# with the node values and marks, and the shape of every block, "block
+# at", which together give the padding of the stored tree) comes back
+# with its undo, the state after it with its redo, then again.
+use Data::Dumper;
+use Scalar::Util ();
+my @inexact;
+my $exact_checks = 0;
+sub norm_list {
+  my @o;
+  for my $e (@_) {
+    my $r = ref $e;
+    if ($r =~ /Mark/) {
+      my $n = Scalar::Util::reftype($e) eq 'ARRAY' ? $e->[0] : $$e;
+      push @o, $e unless $n =~ /^(insert|current)$/;
+    } elsif ($r =~ /::String$/) {
+      if (@o && !ref $o[-1]) { $o[-1] .= $$e } else { push @o, $$e }
+    } elsif ($r =~ /::NewLine$/) {
+    } elsif ($r =~ /::Block$/) {
+      push @o, [ 'B', $e->[0], norm_list(@$e[1 .. $#$e]) ];
+    } else {
+      push @o, $e;
+    }
+  }
+  # Toggles and marks at one position: their order does not matter.
+  my @r;
+  while (@o) {
+    my @run;
+    push @run, shift @o while @o && ref $o[0] && ref($o[0]) =~ /Tag|Mark/;
+    push @r, sort { Data::Dumper::Dumper($a) cmp Data::Dumper::Dumper($b) } @run;
+    push @r, shift @o if @o && !@run;
+  }
+  @r;
+}
+sub exact_state {
+  local $Data::Dumper::Indent = 0;
+  local $Data::Dumper::Sortkeys = 1;
+  my $s = Dumper([norm_list($t->blockList('1.0', 'end'))]);
+  my $lines = (split /\./, $t->index('end'))[0];
+  for my $l (1 .. $lines) {
+    for my $c (0 .. (split /\./, $t->index("$l.end"))[1]) {
+      my @r = $t->blockAt("$l.$c");
+      $s .= " $l.$c:" . Dumper($r[4]) if @r;
+    }
+  }
+  $s;
+}
+sub exact_op {
+  my ($what, $code) = @_;
+  $t->editSeparator;
+  my $s0 = exact_state();
+  $code->();
+  my $s1 = exact_state();
+  return if $s1 eq $s0;
+  $exact_checks++;
+  for my $round (1, 2) {
+    $t->editUndo;
+    return push @inexact, "$what: undo $round" if exact_state() ne $s0;
+    $t->editRedo;
+    return push @inexact, "$what: redo $round" if exact_state() ne $s1;
+  }
+}
+
+sub run_ragged {
+  my $seed = shift;
+  srand($seed);
+  fresh(initial_text(5, 3, 8));
+  for my $step (1 .. 300) {
+    my $op = int rand 18;
+    my ($a, $b) = ordered(random_index(5, 14), random_index(5, 14));
+    my $r = int rand 4;
+    my $check = ($op <= 8 || $op == 13 || $op == 14 || $op >= 16) && rand() < .5;
+    run_op("ragged $seed step $step op $op", $check ? sub {
+      exact_op("ragged $seed step $step op $op", sub {
+	if ($op <= 1) { $t->blockSprout($a, $t->index("$a + $r c")) }
+	elsif ($op == 2) { $t->blockSprout($a) }
+	elsif ($op == 3) { $t->blockSprout($t->index("$a - 1 c"), $t->index("$a + $r c")) }
+	elsif ($op <= 5) { $t->delete($a, $b) }
+	elsif ($op == 6) { $t->delete($a, $t->index("$a + $r c")) }
+	elsif ($op == 7) { $t->insert($a, ('x', "\n", "y\nz", "\n\n")[$r]) }
+	elsif ($op == 8) { $t->blockSplit($a, $r) }
+	elsif ($op == 13) {
+	  $t->blockInsert(('F', 'G')[$r % 2], $a, $b)
+	    if $t->compare($b, '<=', $t->index("$a lineend"));
+	}
+	elsif ($op == 14) { $t->blockTrim($a) }
+	else { $t->blockFlatten($a, $r - ($op - 16) * 4) }
+      });
+    } : sub {
+      if ($op <= 1) { $t->blockSprout($a, $t->index("$a + $r c")) }
+      elsif ($op == 2) { $t->blockSprout($a) }
+      elsif ($op == 3) { $t->blockSprout($t->index("$a - 1 c"), $t->index("$a + $r c")) }
+      elsif ($op <= 5) { $t->delete($a, $b) }
+      elsif ($op == 6) { $t->delete($a, $t->index("$a + $r c")) }
+      elsif ($op == 7) { $t->insert($a, ('x', "\n", "y\nz", "\n\n")[$r]) }
+      elsif ($op == 8) { $t->blockSplit($a, $r) }
+      elsif ($op == 9 || $op == 10) { $t->editUndo }
+      elsif ($op == 11) { $t->editRedo }
+      elsif ($op == 12) { $t->blockNodedata($a, $r - 1, StressValue->new('n' . ++$nvalue)) }
+      elsif ($op == 13) {
+	$t->blockInsert(('F', 'G')[$r % 2], $a, $b)
+	  if $t->compare($b, '<=', $t->index("$a lineend"));
+      }
+      elsif ($op == 14) { $t->blockTrim($a) }
+      elsif ($op >= 16) { $t->blockFlatten($a, $r - ($op - 16) * 4) }
+      else { $t->editSeparator }
+    });
+  }
+  $t->editReset;
+}
+
 my @block_seeds = (1 .. 12, 37, 63, 66, 86, 89, 113, 116, 130, 175, 306, 418, 447);
 my @tag_seeds = (1 .. 6, 27, 297, 431);
 my @mixed_seeds = (1 .. 10, 104, 146, 239, 291, 5087, 5218, 5466);
@@ -359,6 +475,12 @@ is_deeply(\@unexpected, [], 'random runs: no unexpected error')
 run_undoable($_) for 1 .. 12;
 is_deeply(\@unexpected, [], 'random runs of the undoable block and tag changes: no unexpected error')
   or diag(join "\n", @unexpected[0 .. ($#unexpected > 9 ? 9 : $#unexpected)]);
+@unexpected = ();
+run_ragged($_) for 1 .. 12;
+is_deeply(\@unexpected, [], 'random runs on ragged trees (block sprout, flatten): no unexpected error')
+  or diag(join "\n", @unexpected[0 .. ($#unexpected > 9 ? 9 : $#unexpected)]);
+is_deeply(\@inexact, [], "random runs on ragged trees: undo and redo exact ($exact_checks changes)")
+  or diag(join "\n", @inexact[0 .. ($#inexact > 9 ? 9 : $#inexact)]);
 ok(!$twice, "no value freed twice ($nvalue values made)");
 
 $t->destroy;

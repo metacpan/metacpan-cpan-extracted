@@ -2,7 +2,7 @@ package ForgeOps::Tracker::StrictPrivacy;
 
 use strict;
 use warnings;
-use Digest::SHA qw(sha256_hex);
+use Digest::SHA qw(sha256_hex hmac_sha256_hex);
 use Exporter qw(import);
 use Scalar::Util qw(blessed);
 
@@ -11,13 +11,13 @@ use Scalar::Util qw(blessed);
 # out (the error's class, its stack frames, release, environment, server, which request it
 # happened in, timings and counts); free text, which is where a name, an email or a diagnosis
 # hides, never leaves this process: no error message, no breadcrumbs, no endpoint, no SQL
-# statement, no source context, no user email or username, and only the context/tag keys listed in
-# privacy_allowed_fields.
+# statement, no source context, no user email or username, the user's id only as a keyed hash
+# (privacy_user_key), and only the context/tag keys listed in privacy_allowed_fields.
 #
 # The same rules as the server's own StrictPrivacy (app/services/strict_privacy.rb), which applies
 # them again on arrival when the project's Strict privacy setting is on;
 # sdks/strict_privacy_vectors.json pins the results both have to agree on, byte for byte.
-our @EXPORT_OK = qw(normalize_message message_fingerprint event span span_name transaction_name strict_path);
+our @EXPORT_OK = qw(normalize_message message_fingerprint hashed_user_id event span span_name transaction_name strict_path);
 
 use constant FINGERPRINT_LENGTH => 32;
 
@@ -69,11 +69,26 @@ sub message_fingerprint {
     return substr(sha256_hex($bytes), 0, FINGERPRINT_LENGTH);
 }
 
-# event(\%payload, \@allowed_fields): an error event payload (EventBuilder::build's shape) reduced
-# to what strict privacy sends. message is sent as "" alongside message_fingerprint, exactly what
-# the server stores for a strict project.
+# hashed_user_id($id, $key): "h1:" and the first 32 lowercase hex characters of HMAC-SHA256 of the
+# id's UTF-8 text, keyed with the app's own secret, which ForgeOps never sees. The same id hashes
+# the same under one key, so affected customers can still be counted. The id is encoded the way
+# encode_json would send it; the key, which is never sent, is taken as the UTF-8 bytes it already
+# is when Perl holds it as bytes (as it does when read from %ENV), and encoded when it holds
+# characters.
+sub hashed_user_id {
+    my ($id, $key) = @_;
+    my $id_bytes = "$id";
+    utf8::encode($id_bytes);
+    my $key_bytes = "$key";
+    utf8::encode($key_bytes) if utf8::is_utf8($key_bytes);
+    return 'h1:' . substr(hmac_sha256_hex($id_bytes, $key_bytes), 0, FINGERPRINT_LENGTH);
+}
+
+# event(\%payload, \@allowed_fields, $user_key): an error event payload (EventBuilder::build's
+# shape) reduced to what strict privacy sends. message is sent as "" alongside
+# message_fingerprint, exactly what the server stores for a strict project.
 sub event {
-    my ($payload, $allowed_fields) = @_;
+    my ($payload, $allowed_fields, $user_key) = @_;
     my %reduced = %$payload;
     delete @reduced{@EVENT_FIELDS_DROPPED};
     $reduced{message}             = '';
@@ -81,7 +96,7 @@ sub event {
     $reduced{transaction_name}    = transaction_name($payload->{transaction_name});
     $reduced{context}             = _allowed($payload->{context}, $allowed_fields);
     $reduced{tags}                = _allowed($payload->{tags}, $allowed_fields);
-    $reduced{user}                = _user($payload->{user});
+    $reduced{user}                = _user($payload->{user}, $user_key);
     $reduced{backtrace} = [
         map {
             my %frame = %$_;
@@ -205,13 +220,16 @@ sub allowed_field_list {
     return grep { length } map { (my $field = "$_") =~ s/\A\s+|\s+\z//g; $field } @fields;
 }
 
-# The user's id, as a string, and nothing else; undef when there's no id.
+# Only a keyed hash of the user's id (hashed_user_id), and only when the app set
+# privacy_user_key; undef otherwise. A raw id can be a record number that identifies a person, and
+# an unkeyed hash of a small number can be guessed back.
 sub _user {
-    my ($user) = @_;
+    my ($user, $key) = @_;
     return undef unless ref $user eq 'HASH';
+    return undef unless defined $key && length $key;
     my $id = $user->{id};
     return undef unless defined $id && !ref $id && "$id" =~ /\S/;
-    return { id => "$id" };
+    return { id => hashed_user_id($id, $key) };
 }
 
 1;

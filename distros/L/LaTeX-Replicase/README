@@ -11,6 +11,12 @@ To install this module type the following:
    perl Makefile.PL
    make
    make test
+
+   RELEASE_TESTING=2 make test		# not mandatory, voluntary
+or
+   HARNESS_PERL_SWITCHES=-MDevel::Cover RELEASE_TESTING=2 make test		# not mandatory, voluntary
+   cover				# not mandatory, voluntary
+
    make install
 or
    sudo make install
@@ -32,8 +38,12 @@ Test::More::UTF8	for tests only
 Test::Pod			for tests only
 Test::Exception	for tests only
 Test::Output		for tests only
+Test::Warn			for tests only
 Storable				for tests only
 Data::Dumper		for tests only
+Storable				for tests only
+Text::Hyphen		for tests only
+Text::Hyphen::RU	for tests only
 
 COPYRIGHT AND LICENCE
 

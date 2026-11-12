@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v5.1.1');
+our $VERSION   = qv('v5.2.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::Table - Class to represent the table in the map.
 
 =head1 VERSION
 
-Version v5.1.1
+Version v5.2.0
 
 =cut
 

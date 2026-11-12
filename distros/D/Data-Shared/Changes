@@ -1,0 +1,6 @@
+Revision history for Data-Shared
+
+0.01  2026-10-29
+    - Initial release: Linux shared-memory facade over 39 optional backends.
+    - String, array and compiled paths with an XS fast path, composite structures and node cursors.
+    - Persistent roots, retained storage, read-only opens and freeze/ship support.

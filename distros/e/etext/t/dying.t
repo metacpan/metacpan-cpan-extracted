@@ -220,8 +220,9 @@ my $t = $mw->eText(-undo => 1, -valuecommand => sub {
 })->pack;
 $t->blockConfigure('F');
 $t->insert('end', "abcdef\nnum\nden\n");
-$t->blockInsert('F', '2.0', '3.3');
+$t->blockInsert('F', '2.0', '3.3');	# Tells "new" (the callback dies).
 $t->editReset;
+$mw->update;
 sub vc_check {
   my ($what, $command, $events, $freed) = @_;
   reset_logs();

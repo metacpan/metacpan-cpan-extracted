@@ -17,7 +17,7 @@ CGI::Info - Information about the CGI environment
 
 ## Version
 
-Version 1.16
+Version 1.17
 
 ## Synopsis
 
@@ -591,6 +591,43 @@ dangerous_param => sub {
     die 'Hacking attempt!' if $_[1] =~ /DROP TABLE/;
     return 1;
 }
+=head3 API SPECIFICATION
+```
+
+##### Input
+
+```perl
+{
+  allow => { type => 'hashref', optional => 1 },      # name => regex | coderef | undef
+  upload_dir => { type => 'string', optional => 1 },  # must be inside a temporary area
+  logger => { type => 'object|string|coderef|arrayref', optional => 1 },
+  limits => { type => 'hashref', optional => 1 },
+  max_body_size => { type => 'integer', min => 0, optional => 1 },
+  max_params => { type => 'integer', min => 0, optional => 1 },
+  max_parts => { type => 'integer', min => 0, optional => 1 },
+  max_part_headers => { type => 'integer', min => 0, optional => 1 },
+  max_nesting_depth => { type => 'integer', min => 0, optional => 1 },
+}
+```
+
+##### Output
+
+A hash reference of sanitised parameters, or undef.
+When undef is returned, ["status($status)"](#status-status) gives the reason:
+
+- 200 - no parameters were given
+- 403 - the WAF blocked the request, or an XML body contained a DOCTYPE/ENTITY declaration (unless `allow_dtd` is set)
+- 405 - the request method was OPTIONS
+- 411 - a POST arrived without a valid CONTENT\_LENGTH
+- 413 - a request-complexity limit was exceeded
+- 422 - a parameter failed its `allow` rule (the parameter is dropped; the others are still returned)
+- 500 - `upload_dir` is not absolute, does not exist, is not writable, or is outside every temporary area
+- 501 - unsupported method, multipart GET, or a file upload without `upload_dir`
+
+```perl
+{
+  type => 'hashref|undef',
+}
 ```
 
 ### Param($Field)
@@ -720,6 +757,29 @@ Tmpdir allows a reference of the options to be passed.
     # or
 
     my $dir = CGI::Info->tmpdir();
+=head3 API SPECIFICATION
+```
+
+##### Input
+
+```perl
+{
+  default => { type => 'string', optional => 1 },
+}
+```
+
+May be called as a class or an instance method.
+
+##### Output
+
+An untainted directory path.  A `default` that is used is returned
+without any sanity checks.
+
+```perl
+{
+  type => 'string',
+  min => 1,
+}
 ```
 
 ### Rootdir
@@ -752,6 +812,33 @@ Gets and sets the name of a directory where you can store logs.
 
     Path to the directory where logs will be stored.
 
+#### Api Specification
+
+##### Input
+
+```perl
+{
+  dir => { type => 'string', optional => 1 }, # an existing, writable directory
+}
+```
+
+May be called as a class or an instance method.
+An undefined or empty `$dir` is treated as a get.
+
+##### Output
+
+The log directory, chosen in order from the value previously set,
+`$ENV{LOGDIR}`, ["logdir" in Sys::Path](https://metacpan.org/pod/Sys%3A%3APath#logdir) and ["tmpdir"](#tmpdir).
+Returns undef, and logs a warning, if none of those is a writable directory.
+Croaks `Invalid logdir: $dir` if `$dir` is given but is not a writable
+directory.
+
+```perl
+{
+  type => 'string|undef',
+}
+```
+
 ### Is\_Robot
 
 Is the visitor a real person or a robot?
@@ -769,6 +856,25 @@ If the client is seen to be attempting an SQL injection,
 set the HTTP status to 403,
 and return 1.
 
+#### Api Specification
+
+##### Input
+
+None.
+
+##### Output
+
+A true value if the client is a robot (including AI crawlers and clients
+whose User-Agent contains SQL injection), otherwise 0.
+Returns 0 when `REMOTE_ADDR` or `HTTP_USER_AGENT` is not set.
+When a SQL injection attempt is detected the status is also set to 403.
+
+```perl
+{
+  type => 'boolean',
+}
+```
+
 ### Is\_Search\_Engine
 
 Is the visitor a search engine?
@@ -782,6 +888,24 @@ if(CGI::Info->new()->is_search_engine()) {
 ```
 
 Can be overridden by the IS\_SEARCH\_ENGINE environment setting
+
+#### Api Specification
+
+##### Input
+
+None.
+
+##### Output
+
+A true value if the client is a search engine, otherwise 0.
+`$ENV{IS_SEARCH_ENGINE}` overrides detection.
+Returns 0 when `REMOTE_ADDR` or `HTTP_USER_AGENT` is not set.
+
+```perl
+{
+  type => 'boolean',
+}
+```
 
 ### Is\_Ai
 
@@ -898,6 +1022,23 @@ my $template = Template->new();
 $template->process($filename, {}) or croak $template->error();
 ```
 
+#### Api Specification
+
+##### Input
+
+None.
+
+##### Output
+
+The first matching type, checked in this order: mobile, ai, search, robot.
+
+```perl
+{
+  type => 'string',
+  memberof => [ 'mobile', 'ai', 'search', 'robot', 'web' ],
+}
+```
+
 ### Get\_Cookie
 
 Returns a cookie's value, or undef if no name is given, or the requested
@@ -975,6 +1116,29 @@ otherwise an HTTP error code
     Optional integer value to be set or retrieved.
     If omitted, the value is retrieved.
 
+#### Api Specification
+
+##### Input
+
+```perl
+{
+  status => { type => 'integer', optional => 1 },
+}
+```
+
+Croaks `status must be an integer` if a non-integer is given.
+
+##### Output
+
+The status that was set or, if none has been set, 405 for OPTIONS and DELETE
+requests, 411 for a POST without CONTENT\_LENGTH, otherwise 200.
+
+```perl
+{
+  type => 'integer',
+}
+```
+
 ### Messages
 
 Returns the messages that the object has generated as a ref to an array of hashes.
@@ -1008,6 +1172,29 @@ but calling this after `new()` works.
     When not given,
     returns the current cache object.
 
+#### Api Specification
+
+##### Input
+
+```perl
+{
+  cache => { type => 'object', can => [ 'get', 'set' ], optional => 1 },
+}
+```
+
+Croaks if `$cache` is not a blessed object, or lacks a `get()` or `set()`
+method.
+
+##### Output
+
+The current cache object, or undef if none has been set.
+
+```perl
+{
+  type => 'object|undef',
+}
+```
+
 ### Set\_Logger
 
 Sets the class, array, code reference, or file that will be used for logging.
@@ -1015,11 +1202,48 @@ Sets the class, array, code reference, or file that will be used for logging.
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch-22 situation.
 
+#### Api Specification
+
+##### Input
+
+```perl
+{
+  logger => { type => 'object|string|coderef|arrayref|undef' },
+}
+```
+
+The `logger` argument is required; `set_logger()` with no arguments croaks.
+A blessed object is stored as-is; anything else is passed to
+`Log::Abstraction->new()`; undef installs a default
+[Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) logger.
+
+##### Output
+
+The object, to allow chaining.
+
+```perl
+{
+  type => 'object',
+  isa => 'CGI::Info',
+}
+```
+
 ### Reset
 
 Class method to reset the class.
 You should do this in an FCGI environment before instantiating,
 but nowhere else.
+
+#### Api Specification
+
+##### Input
+
+None. Must be called as `CGI::Info->reset()`; any other invocant carps
+`Reset is a class method` and does nothing.
+
+##### Output
+
+None.
 
 ## Bugs
 
@@ -1076,9 +1300,12 @@ You can also look for information at:
 
     [http://deps.cpantesters.org/?module=CGI::Info](http://deps.cpantesters.org/?module=CGI::Info)
 
-### Formal Specification
+## Formal Specification
 
-#### New
+The following Z-style specifications describe the intended behaviour of
+selected methods.
+
+### Specification of New()
 
 ```
 -- CGI::Info construction
@@ -1110,7 +1337,7 @@ clone(self, params) ^=
   in  CGIInfo { ...merged }
 ```
 
-#### Param
+### Specification of Param()
 
 Let F be the set of all possible CGI field names, V be the set of all
 possible (sanitised) scalar values, and allow : F -> Regex | undef be the
@@ -1129,7 +1356,7 @@ param(f) =
 
 Safety invariant: for all f, param(f) /= undef => f in dom(allow) \\/ allow = undef.
 
-### Is\_Ai
+### Specification of Is\_Ai()
 
 ```
 -- is_ai ---------------------------------------------------------

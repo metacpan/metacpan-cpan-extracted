@@ -3,9 +3,10 @@ use 5.20.0;
 use strict;
 use warnings;
 use Mail::TLSRPT::Pragmas;
+use open ':std', ':encoding(UTF-8)';
 # ABSTRACT: TLSRPT report processor
 # PODNAME: tlsrpt
-our $VERSION = '2.20261104'; # VERSION
+our $VERSION = '2.20261112'; # VERSION
 use Mail::TLSRPT::App;
 
 Mail::TLSRPT::App->run;
@@ -22,7 +23,7 @@ tlsrpt - TLSRPT report processor
 
 =head1 VERSION
 
-version 2.20261104
+version 2.20261112
 
 =head1 AUTHOR
 

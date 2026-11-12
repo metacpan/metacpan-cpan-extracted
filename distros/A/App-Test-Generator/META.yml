@@ -3,22 +3,16 @@ abstract: 'Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for 
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
-  Encode: '0'
+  Capture::Tiny: '0'
   ExtUtils::MakeMaker: '0'
-  FindBin: '0'
+  File::Copy: '0'
   IPC::System::Simple: '0'
-  JSON::PP: '0'
-  Symbol: '0'
   Test::DescribeMe: '0'
-  Test::LectroTest: '0'
-  Test::LectroTest::Compat: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0.1'
-  Test::Most: '0'
   Test::Needs: '0'
-  Test::Returns: '0.03'
+  Test::Which: '0'
   Test::Without::Module: '0'
-  Unicode::Normalize: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 1
@@ -32,6 +26,7 @@ no_index:
   directory:
     - t
     - inc
+    - doc
 optional_features:
   coverage_guided_fuzzing:
     description: 'Coverage-guided corpus pruning in CoverageGuidedFuzzer'
@@ -53,19 +48,28 @@ requires:
   Data::Random::String::Matches: '0.02'
   Data::Random::Structure: '0'
   Data::Section::Simple: '0'
-  File::Copy: '0'
+  Encode: '0'
+  Exporter: '0'
+  File::Basename: '0'
   File::Copy::Recursive: '0'
+  File::Find: '0'
+  File::Glob: '0'
   File::Path: '0'
   File::Slurp: '0'
   File::Spec: '0'
   File::Temp: '0'
+  File::stat: '0'
+  FindBin: '0'
   Getopt::Long: '0'
   HTML::Entities: '0'
   HTTP::Tiny: '0'
   IPC::Open3: '0'
   IPC::Run3: '0'
   JSON::MaybeXS: '0'
+  JSON::PP: '0'
+  List::Util: '0'
   Module::Load::Conditional: '0'
+  POSIX: '0'
   PPI: '0'
   Params::Get: '0.15'
   Params::Validate::Strict: '0.36'
@@ -75,13 +79,21 @@ requires:
   Readonly::Values::Boolean: '0'
   Return::Set: '0.03'
   Safe: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  Symbol: '0'
   Template: '0'
   Test::Exception: '0'
+  Test::LectroTest: '0'
+  Test::LectroTest::Compat: '0'
+  Test::Most: '0'
+  Test::Returns: '0.03'
   Text::Balanced: '0'
   Time::HiRes: '0'
   URI: '0'
   UUID::Tiny: '0'
   Unicode::GCString: '0'
+  Unicode::Normalize: '0'
   WWW::RT::CPAN: '0'
   YAML::XS: '0'
   autodie: '0'
@@ -90,5 +102,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator
   homepage: https://metacpan.org/pod/App::Test::Generator
   repository: git://github.com/nigelhorne/App-Test-Generator.git
-version: '0.47'
+version: '0.48'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

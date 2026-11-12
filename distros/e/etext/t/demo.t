@@ -23,7 +23,7 @@ plan skip_all => "no X display available ($@)" unless $probe;
 # returns only once the probe is gone too, so the last step destroys it,
 # after $top.
 $probe->withdraw;
-plan tests => 21;
+plan tests => 25;
 binmode(Test::More->builder->$_, ':utf8') for qw(output failure_output);
 
 # The demo finds its helpers relative to $0 (FindBin), creates its own
@@ -80,6 +80,35 @@ my @steps = (
     like($got, qr/\x{2297}\x{3bc}/, 'and a tensor product with a mu');
     is_deeply(\@bgerrors, [], 'loading the sample document gives no errors')
       or diag(@bgerrors);
+  },
+  sub {
+    # The strokes are ornaments (2.08): the radical's sign is returned by
+    # its layout callback, a broken line from the tick down to the
+    # bottom, up to the top left of the contents and over them; the
+    # fraction's bar is a template of the block type; the rules of a
+    # table are black rectangles returned by its callback.
+    my $H = 20 + 3 + 1;		# A row 20 high, 3 above it, 1 below.
+    my @r = main::layoutRadical(['Radical', $text], 0, [1, 0, 30, 30, 20, 15]);
+    my @orn = grep { $_->[0] eq 'line' } @r;
+    ok(@r == 4 && @orn == 2 && $r[0][5] == $H && $r[1][1] > 0 && $r[1][2] == 3,
+       'Radical: the block, the row moved right and down, two lines')
+      or diag(explain(\@r));
+    my @c = grep { /^-?[\d.]+$/ } @{$orn[0]}[1 .. 10];
+    my ($bottom) = sort { $b <=> $a } map { $c[2*$_ + 1] } 0 .. $#c/2;
+    ok(@c == 10 && $c[2] > $c[0] && $c[3] < $c[1] && $bottom == $H - 1
+       && $c[7] == 1 && $c[9] == 1 && $c[8] == $r[0][3] - 1 && $c[6] < $r[1][1],
+       'the sign: a tick up, down to the bottom, up to the top left of the row, the bar')
+      or diag(explain($orn[0]));
+    my $bar = $text->blockCget('Fraction', '-ornaments');
+    ok(ref $bar && @$bar == 1 && $bar->[0][0] eq 'line'
+       && !grep({ ref $_ && $_->[0] eq 'leaf' && $_->[1] != 0 }
+		map { ref $_ ? ($_, @$_) : () } @{$bar->[0]}),
+       'Fraction: the bar is a template on leaf 0');
+    my @t = main::layoutTable(5, 5, 3, 3, 2, ['Table', $text], 0,
+			      [[1, 0, 10, 10, 15, 12], [1, 0, 10, 10, 15, 12]],
+			      [[1, 0, 10, 10, 15, 12], [1, 0, 10, 10, 15, 12]]);
+    my @rules = grep { $_->[0] eq 'rectangle' } @t;
+    is(scalar(@rules), 4 + 1 + 1, 'Table: rules around, between columns and rows, as rectangles');
   },
   sub {
     # Undo of a whole formula: the blocks (fractions, radicals...) come back.

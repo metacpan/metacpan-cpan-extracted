@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookies.pm
-## Version v0.1.0
+## Version v0.4.1
 ## Copyright(c) 2021 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/12/14
-## Modified 2021/12/14
+## Modified 2026/11/12
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ BEGIN
     use warnings;
     use parent qw( Cookie::Jar );
     use vars qw( $VERSION );
-    our $VERSION = $Cookie::Jar::VERSION;
+    our $VERSION = 'v0.4.1';
 };
 
 use strict;
@@ -128,7 +128,7 @@ Cookies - Cookie Jar Class for Server & Client
 
 =head1 VERSION
 
-    v0.1.1
+    v0.4.1
 
 =head1 DESCRIPTION
 

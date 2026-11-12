@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use File::Temp qw/tempfile/;
 use Pod::Literate;
-use Test::More tests=>6;
+use Test::More tests=>7;
 
 sub randword { my ($L)=@_; $L//=6; return join('',map {chr(int(97+rand(26)))} (1..$L)) }
 
@@ -67,7 +67,7 @@ subtest 'Tangling'=>sub {
 	my $doc=qq|
 =pod
 
-=for literate target:$tfn
+=for literate:command target=$tfn
 
 Some text.
 
@@ -87,7 +87,24 @@ Some text.
 =begin literate $tfn
 
 	#< Header >#
+	#< Inline conditional >#
 	#< Say something in2resting >#
+
+=end literate
+
+The conditional will check inline behavior.
+
+=for literate Inline conditional
+
+	if(#< Fifty percent chance >#) { print "Greetings!\\n" }
+
+=for literate .
+
+This will be true fifty percent of the time.
+
+=begin literate Fifty percent chance
+
+	rand()>0.5
 
 =end literate
 
@@ -95,7 +112,7 @@ Some text.
 |;
 	#
 	my $literate=Pod::Literate->new();
-	$literate->accept_targets('literate');
+	$literate->accept_targets('literate','literate:command');
 	$literate->expand_verbatim_tabs(0);
 	$literate->parse_string_document($doc);
 	#
@@ -104,6 +121,21 @@ Some text.
 	is($result,
 q|#!/usr/bin/perl
 use strict; use warnings;
+if(rand()>0.5) { print "Greetings!\n" }
 print "Hello world!\n";|,'Generated script');
+};
+
+subtest 'invalid declarations'=>sub {
+	plan tests=>2;
+	my $doc=qq|=begin :literate Section\n\n  Code\n\n=end :literate\n|;
+	my $literate=Pod::Literate->new();
+	$literate->accept_targets('literate');
+	$literate->expand_verbatim_tabs(0);
+	eval { $literate->parse_string_document($doc) };
+	like($@,qr/not .*supported/,'=begin :literate');
+	#
+	$doc=qq|=for :literate Section\n\n  Code\n\n=for :literate .\n|;
+	eval { $literate->parse_string_document($doc) };
+	like($@,qr/not .*supported/,'=for :literate');
 };
 

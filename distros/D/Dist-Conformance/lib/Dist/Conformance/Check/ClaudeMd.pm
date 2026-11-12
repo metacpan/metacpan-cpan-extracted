@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::ClaudeMd 0.004;
+package Dist::Conformance::Check::ClaudeMd 0.005;
 
 # ABSTRACT: CLAUDE.md exists and names the skills that it must
 
@@ -51,7 +51,7 @@ Dist::Conformance::Check::ClaudeMd - CLAUDE.md exists and names the skills that 
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

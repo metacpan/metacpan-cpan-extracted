@@ -12,7 +12,7 @@ use ForgeOps::Tracker;
 use ForgeOps::Tracker::Configuration;
 use ForgeOps::Tracker::EventBuilder;
 use ForgeOps::Tracker::PerformanceFlusher;
-use ForgeOps::Tracker::StrictPrivacy qw(normalize_message message_fingerprint span_name transaction_name strict_path);
+use ForgeOps::Tracker::StrictPrivacy qw(normalize_message message_fingerprint hashed_user_id span_name transaction_name strict_path);
 
 # A byte-identical copy of sdks/strict_privacy_vectors.json, generated from the server's own
 # StrictPrivacy; every SDK checks itself against the same file.
@@ -32,6 +32,21 @@ subtest 'normalizes and fingerprints every vector exactly as the server does' =>
 
 subtest 'an absent message fingerprints as an empty one' => sub {
     is(message_fingerprint(undef), message_fingerprint(''));
+};
+
+subtest 'hashes every user id vector exactly as the server does' => sub {
+    is(hashed_user_id($_->{id}, $_->{key}), $_->{hashed}, $_->{id}) for @{ $vectors->{user_id} };
+};
+
+subtest 'an integer user id hashes as its text' => sub {
+    is(hashed_user_id(42, 'customer-secret'), 'h1:316d4a35bc95112698f59ef5aac5c29a');
+};
+
+subtest 'a user key held as bytes hashes the same as one held as characters' => sub {
+    my $vector = (grep { $_->{key} =~ /[^\x00-\x7f]/ } @{ $vectors->{user_id} })[0];
+    my $key_bytes = $vector->{key};
+    utf8::encode($key_bytes);
+    is(hashed_user_id($vector->{id}, $key_bytes), $vector->{hashed});
 };
 
 subtest 'names every span vector exactly as the server does' => sub {
@@ -84,12 +99,23 @@ subtest 'performance samples cut down raw-path names only with strict privacy on
 subtest 'is off with no allowed fields by default' => sub {
     local $ENV{FORGE_OPS_STRICT_PRIVACY};
     local $ENV{FORGE_OPS_PRIVACY_ALLOWED_FIELDS};
+    local $ENV{FORGE_OPS_PRIVACY_USER_KEY};
     delete $ENV{FORGE_OPS_STRICT_PRIVACY};
     delete $ENV{FORGE_OPS_PRIVACY_ALLOWED_FIELDS};
+    delete $ENV{FORGE_OPS_PRIVACY_USER_KEY};
     my $config = ForgeOps::Tracker::Configuration->new;
 
     ok(!$config->{strict_privacy});
     is_deeply($config->{privacy_allowed_fields}, []);
+    ok(!defined $config->{privacy_user_key});
+};
+
+subtest 'reads the user key from the environment, treating empty as unset' => sub {
+    local $ENV{FORGE_OPS_PRIVACY_USER_KEY} = 'customer-secret';
+    is(ForgeOps::Tracker::Configuration->new->{privacy_user_key}, 'customer-secret');
+
+    $ENV{FORGE_OPS_PRIVACY_USER_KEY} = '';
+    ok(!defined ForgeOps::Tracker::Configuration->new->{privacy_user_key});
 };
 
 subtest 'reads both options from the environment' => sub {
@@ -104,11 +130,13 @@ subtest 'reads both options from the environment' => sub {
 subtest 'an explicit init option wins over the environment' => sub {
     local $ENV{FORGE_OPS_STRICT_PRIVACY} = 'true';
     local $ENV{FORGE_OPS_PRIVACY_ALLOWED_FIELDS} = 'error_code';
+    local $ENV{FORGE_OPS_PRIVACY_USER_KEY} = 'from-env';
     ForgeOps::Tracker::_reset_for_testing();
-    my $config = ForgeOps::Tracker::init(strict_privacy => 0, privacy_allowed_fields => ['feature'], detect_changes => 0);
+    my $config = ForgeOps::Tracker::init(strict_privacy => 0, privacy_allowed_fields => ['feature'], privacy_user_key => 'from-code', detect_changes => 0);
 
     ok(!$config->{strict_privacy});
     is_deeply($config->{privacy_allowed_fields}, ['feature']);
+    is($config->{privacy_user_key}, 'from-code');
     ForgeOps::Tracker::_reset_for_testing();
 };
 
@@ -165,7 +193,7 @@ subtest 'an event with strict privacy on carries only structured facts' => sub {
         message_fingerprint(q{DBD::Pg::st execute failed: Couldn't find Patient with id=8821 for [EMAIL FILTERED] [for Statement "SELECT * FROM patients WHERE id = 8821"]}));
     ok(!exists $payload->{$_}, "no $_") for qw(breadcrumbs endpoint sql_statement tags);
     is_deeply($payload->{context}, { error_code => 'E42', tier => 3 });
-    is_deeply($payload->{user}, { id => '7' });
+    ok(!exists $payload->{user}, 'no user without a user key');
     is($payload->{backtrace}[0]{file}, $path);
     is($payload->{backtrace}[0]{line}, 10);
     ok($payload->{backtrace}[0]{in_app});
@@ -194,8 +222,33 @@ subtest 'an event with strict privacy on leaves out a user with no id' => sub {
     my ($path, $error) = die_from_source_file();
     my $config = event_configuration($path);
     $config->{strict_privacy} = 1;
+    $config->{privacy_user_key} = 'customer-secret';
 
     ok(!exists build_event($config, $error, { email => 'jane@example.com' })->{user});
+    ok(!exists build_event($config, $error, { id => '  ' })->{user}, 'a blank id is no id');
+};
+
+subtest 'an event with strict privacy on and a user key sends only the hashed id' => sub {
+    my ($path, $error) = die_from_source_file();
+    my $config = event_configuration($path);
+    $config->{strict_privacy} = 1;
+    $config->{privacy_user_key} = 'customer-secret';
+
+    my $payload = build_event($config, $error);
+
+    is_deeply($payload->{user}, { id => hashed_user_id('7', 'customer-secret') });
+    like($payload->{user}{id}, qr/\Ah1:[0-9a-f]{32}\z/);
+};
+
+subtest 'an event with strict privacy on and no user key sends no user' => sub {
+    my ($path, $error) = die_from_source_file();
+    for my $key (undef, '') {
+        my $config = event_configuration($path);
+        $config->{strict_privacy} = 1;
+        $config->{privacy_user_key} = $key;
+
+        ok(!exists build_event($config, $error)->{user}, defined $key ? 'empty key' : 'no key');
+    }
 };
 
 subtest 'an event with strict privacy off is exactly as before' => sub {

@@ -1,5 +1,21 @@
 Revision history for Object-Proto
 
+1.06	2026-11-11
+	- Add the handles(...) slot modifier: delegate methods to an Object (every method of a role with role:Name), call a CodeRef, or run native ops on an ArrayRef or HashRef; see "Delegation (handles)"
+	- slot_info reports has_handles, handles and default_implicit
+	- A private attribute is private on every route - reader, writer, clearer, predicate, function-style accessor, inherited and role slots - and callable only from the package that declared it
+	- An unterminated '(' in a slot spec croaks instead of dropping the argument's last character
+	- Fix an inherited slot losing its readonly, required and coerce checks when its accessor is called as a function
+	- Fix a heap overflow when a class is defined again with fewer slots than before
+	- Fix a leak when a lazy value fails its type check, and a +attr on a role slot freeing the spec other classes share
+	- Add bench/handles.pl, and tests for delegation and private attributes
+
+1.05	2026-11-11
+	- Add the built-in types Ref, ScalarRef, RegexpRef, GlobRef, FileHandle, ClassName, PositiveInt, NegativeInt, NonEmptyStr and Undef
+	- A registered type takes precedence over a built-in of the same name, so a type registered as PositiveInt or NonEmptyStr keeps its meaning; registering a built-in name used to succeed and then be ignored
+	- list_types lists a registered type that shares a built-in's name once
+	- Test each new type, the paths they share and the precedence rule
+
 1.04	2026-11-04
 	- Treat a slot holding the shared undef as empty when writing in place, since av_fill left that read-only value in new slots before perl 5.20 
 	- Free the DEMOLISH test object by scope exit

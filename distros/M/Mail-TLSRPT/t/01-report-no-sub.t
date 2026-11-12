@@ -33,9 +33,10 @@ my $wanted_data = {
   'end-datetime' => '2020-03-04T00:42:09Z',
   'start-datetime' => '2020-03-03T00:42:10Z'
   },
+  'policies' => [],
   'report-id' => 'test report 1'
 };
-my $wanted_json = '{"contact-info":"test@example.com","date-range":{"end-datetime":"2020-03-04T00:42:09Z","start-datetime":"2020-03-03T00:42:10Z"},"organization-name":"my test org","report-id":"test report 1"}';
+my $wanted_json = '{"contact-info":"test@example.com","date-range":{"end-datetime":"2020-03-04T00:42:09Z","start-datetime":"2020-03-03T00:42:10Z"},"organization-name":"my test org","policies":[],"report-id":"test report 1"}';
 
 my $j = JSON->new;
 

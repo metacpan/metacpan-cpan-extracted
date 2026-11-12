@@ -1,4 +1,4 @@
-use 5.018;
+use 5.012;
 use strict;
 use warnings;
 use Test::More;
@@ -6,9 +6,13 @@ use B                    ();
 use Scalar::Util         qw(refaddr weaken isweak);
 use Data::Dump::Streamer qw(Dump :undump);
 
-sub magic_flags {
-    return B::svref_2object($_[0])->FLAGS &
-        (B::SVs_GMG() | B::SVs_SMG() | B::SVs_RMG());
+sub magic_types {
+    my $value= B::svref_2object($_[0]);
+
+    # Older B versions omit the magic flag constants. Inspect the actual
+    # magic chain so these assertions still detect newly attached magic.
+    return '' unless $value->can('MAGIC');
+    return join ',', map { $_->TYPE } $value->MAGIC;
 }
 
 for my $readonly (0, 1) {
@@ -27,15 +31,15 @@ for my $readonly (0, 1) {
         }
         my $input= [ $target, $target ];
         my $label= "$kind readonly=$readonly";
-        my $flags= magic_flags($target);
+        my $magic= magic_types($target);
         my $ro_flag= B::svref_2object($target)->FLAGS & B::SVf_READONLY();
         my $count= B::svref_2object($target)->REFCNT;
         my $d= Dump()->Names('value')->Data($input);
-        is(magic_flags($target), $flags, "$label: analysis adds no magic");
+        is(magic_types($target), $magic, "$label: analysis adds no magic");
         is(B::svref_2object($target)->REFCNT,
             $count, "$label: analysis retains no catalogue referent");
         my $text= $d->Out;
-        is(magic_flags($target), $flags, "$label: output adds no magic");
+        is(magic_types($target), $magic, "$label: output adds no magic");
         is(B::svref_2object($target)->REFCNT,
             $count, "$label: output retains no catalogue referent");
         is(B::svref_2object($target)->FLAGS & B::SVf_READONLY(),
@@ -46,7 +50,7 @@ for my $readonly (0, 1) {
         is(refaddr($copy->[0]), refaddr($copy->[1]),
             "$label: sharing survives");
         undef $d;
-        is(magic_flags($target), $flags, "$label: destruction leaves no magic");
+        is(magic_types($target), $magic, "$label: destruction leaves no magic");
     }
 }
 
@@ -55,9 +59,9 @@ for my $readonly (0, 1) {
     my $weak= $target;
     weaken($weak);
     my $input= [ $target, $target ];
-    my $flags= magic_flags($target);
+    my $magic= magic_types($target);
     my $text= Dump($input)->Out;
-    is(magic_flags($target), $flags, 'existing backref magic is preserved');
+    is(magic_types($target), $magic, 'existing backref magic is preserved');
     ok(isweak($weak), 'existing weak reference remains weak');
     is(refaddr($weak), refaddr($target),
         'existing weak reference still targets its input');

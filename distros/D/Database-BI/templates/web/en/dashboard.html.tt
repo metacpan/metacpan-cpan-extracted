@@ -1465,13 +1465,19 @@
         </label>
       </div>
       <div class="join-field">
-        <label class="check-label" title="Draw the outline of the county each marker is in. The outlines come from OpenStreetMap, which is sent each marker's position, rounded to about 100 metres; each outline is then remembered.">
-          <input type="checkbox" id="map-bounds-chk">
-          Show county boundaries
-        </label>
+        <label for="map-bounds-sel" title="Draw the outline of the area each marker is in: its country, state or province, county, city, town or neighbourhood. The outlines come from OpenStreetMap, which is sent each marker's position, rounded to about 100 metres; each outline is then remembered. A place OpenStreetMap has only as a point, as it has many suburbs, has no outline.">Show boundaries</label>
+        <select id="map-bounds-sel">
+          <option value="">&#x2014; none &#x2014;</option>
+          <option value="country">Countries</option>
+          <option value="state">States, provinces or regions</option>
+          <option value="county">Counties</option>
+          <option value="city">Cities or districts</option>
+          <option value="town">Towns or wards</option>
+          <option value="neighbourhood">Neighbourhoods or parishes</option>
+        </select>
       </div>
       <div class="join-field" id="map-shade-field" hidden>
-        <label for="map-shade-sel" title="Fill each county in a shade of one colour: the darker, the larger this column's total in it">Colour shade</label>
+        <label for="map-shade-sel" title="Fill each outline in a shade of one colour: the darker, the larger this column's total in it">Colour shade</label>
         <select id="map-shade-sel">
           <option value="">&#x2014; none &#x2014;</option>
           [%- FOREACH col IN columns -%]
@@ -1515,7 +1521,7 @@
     <div id="map-color-rules" hidden>
       <div class="filter-section-head" style="margin:0.4rem 0 0.2rem;font-size:0.85rem;font-weight:600;color:var(--text-secondary, #555)">Colour rules &mdash; first match wins</div>
       <div id="map-rule-rows"></div>
-      <button type="button" id="btn-add-map-rule" class="btn-add-filter">&#x2b; Add rule</button>
+      <button type="button" id="btn-add-map-rule" class="btn-add-filter" style="margin-bottom:0.75rem">&#x2b; Add rule</button>
     </div>
   </form>
 </div>
@@ -4798,18 +4804,18 @@ function biDetectColType(colName) {
     if (weightFld) weightFld.hidden = !heatChk.checked;
   });
 
-  // Colour shade fills the county outlines, so it is offered with them, and
-  // its colour once a column is chosen.
-  var boundsChk     = document.getElementById('map-bounds-chk');
+  // Colour shade fills the outlines, so it is offered once a kind of boundary
+  // is chosen, and its colour once a column is.
+  var boundsSel     = document.getElementById('map-bounds-sel');
   var shadeFld      = document.getElementById('map-shade-field');
   var shadeSel      = document.getElementById('map-shade-sel');
   var shadeColorFld = document.getElementById('map-shade-color-field');
   function syncShade() {
-    var on = !!(boundsChk && boundsChk.checked);
+    var on = !!(boundsSel && boundsSel.value);
     if (shadeFld) shadeFld.hidden = !on;
     if (shadeColorFld) shadeColorFld.hidden = !(on && shadeSel && shadeSel.value);
   }
-  boundsChk && boundsChk.addEventListener('change', syncShade);
+  boundsSel && boundsSel.addEventListener('change', syncShade);
   shadeSel && shadeSel.addEventListener('change', syncShade);
   syncShade();
 
@@ -4867,9 +4873,9 @@ function biDetectColType(colName) {
     }
     var zVal = zoomInpEl ? zoomInpEl.value.trim() : '';
     if (zVal !== '') addHidden('zoom', zVal);
-    var boundsChkEl = document.getElementById('map-bounds-chk');
-    if (boundsChkEl && boundsChkEl.checked) {
-      addHidden('bounds', 'county');
+    var boundsSelEl = document.getElementById('map-bounds-sel');
+    if (boundsSelEl && boundsSelEl.value) {
+      addHidden('bounds', boundsSelEl.value);
       var shadeSelEl = document.getElementById('map-shade-sel');
       var shadeInpEl = document.getElementById('map-shade-color-inp');
       if (shadeSelEl && shadeSelEl.value) {

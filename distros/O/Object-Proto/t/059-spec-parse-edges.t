@@ -63,6 +63,22 @@ $sq->clear_e;
 ok(!$sq->has_e, 'as does clearer()');
 ok(!SQ->can('get_e'), 'reader() with no name installs nothing');
 ok(!defined Object::Proto::slot_info('SQ', 'e')->{init_arg}, 'and arg() sets no init arg');
+# A '(' that is never closed croaks, naming the spec, instead of the
+# argument losing its last character
+my $unterminated = 0;
+for my $bad ('x:default(12', 'x:builder(', 'x:Str:trigger(a(b)', 'x:Int:default(1):reader(get') {
+    my $class = 'Unterminated' . ++$unterminated;
+    eval { Object::Proto::define($class, $bad) };
+    like($@, qr/^Unterminated '\(' in slot spec '\Q$bad\E' at /, "unterminated '(' in '$bad' croaks");
+}
+eval { Object::Proto::role('UnterminatedRole', 'x:default(') };
+like($@, qr/^Unterminated '\(' in slot spec 'x:default\(' at /, 'so does one in a role\'s slot');
+Object::Proto::define('Terminated', 'a:default(12)', 'b:we)ird:default((1))', 'c(:default(3)');
+my $t = Terminated->new;
+is($t->a, 12, 'a closed argument keeps every character');
+is($t->b, '(1)', 'a ) outside any argument is part of a modifier name, as before');
+is(Terminated->can('c(')->($t), 3, 'and a ( in the property name opens nothing');
+
 my $bare = SP::new();
 isa_ok($bare, 'SP', 'new called as a plain function with no arguments');
 is($bare->neg, -5, 'still fills the defaults');

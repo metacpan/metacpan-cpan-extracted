@@ -6,6 +6,8 @@ package Web::VWF::Data::vwf_log;
 use strict;
 use warnings;
 
+use version; our $VERSION = version->declare('0.002.0');
+
 use Database::Abstraction;
 use DBD::CSV;
 

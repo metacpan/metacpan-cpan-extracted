@@ -2,7 +2,8 @@ package BI::Test::Boundary;
 
 # A stand-in for Nominatim's reverse lookup, for Database::BI::Model::Boundary:
 # given areas as boxes, it answers a point with the most detailed box holding
-# it that the zoom allows (zoom 5 a rank up to 8, 6 and 7 up to 10, 8 up to 12;
+# it that the zoom allows (zoom 3 a rank up to 4, 5 up to 8, 6 and 7 up to 10,
+# 8 up to 12, 10 up to 16, 12 up to 18, 13 up to 19, 14 up to 20;
 # the first listed of equal rank), as Nominatim answers with the county a point
 # is in, and with "Unable to geocode" elsewhere (the sea).  An area with a
 # country gives the reply an address with its country_code.  It records each
@@ -14,6 +15,9 @@ package BI::Test::Boundary;
 #       { name => 'Holed County',  id => 102, box => [ ... ], hole => [ ... ] },
 #       { name => 'A State',       id => 103, box => [ ... ], rank => 8 },
 #       { name => 'A District',    id => 104, box => [ ... ], rank => 10, country => 'in' },
+#       { name => 'A Town',        id => 105, box => [ ... ], rank => 18, place => 'town' },      # place=town, a relation
+#       { name => 'A Suburb',      id => 106, box => [ ... ], rank => 19, place => 'suburb', way => 1 },
+#       { name => 'A Point',       id => 107, box => [ ... ], rank => 19, place => 'suburb', point => 1 },  # a node: no shape
 #   ]);
 #   $ua->asked;    # the URLs asked, in order
 #
@@ -28,7 +32,7 @@ use JSON::PP ();
 use URI ();
 
 # The most detailed rank Nominatim's reverse lookup returns at each zoom.
-my %MAX_RANK = (5 => 8, 6 => 10, 7 => 10, 8 => 12);
+my %MAX_RANK = (3 => 4, 5 => 8, 6 => 10, 7 => 10, 8 => 12, 10 => 16, 12 => 18, 13 => 19, 14 => 20);
 
 sub new {
 	my ($class, %args) = @_;
@@ -67,15 +71,17 @@ sub get {
 	if ($area) {
 		my $polygon = [ ring(@{ $area->{box} }), ($area->{hole} ? ring(@{ $area->{hole} }) : ()) ];
 		return _reply({
-			category     => 'boundary',
-			type         => 'administrative',
-			osm_type     => 'relation',
+			category     => ($area->{place} ? 'place' : 'boundary'),
+			type         => ($area->{place} // 'administrative'),
+			osm_type     => ($area->{point} ? 'node' : $area->{way} ? 'way' : 'relation'),
 			osm_id       => $area->{id},
 			place_rank   => $area->{rank} // 12,
 			addresstype  => 'county',
 			name         => $area->{name},
 			display_name => "$area->{name}, Somewhere",
-			geojson      => { type => 'Polygon', coordinates => $polygon },
+			geojson      => ($area->{point}
+				? { type => 'Point', coordinates => [ $lon + 0, $lat + 0 ] }
+				: { type => 'Polygon', coordinates => $polygon }),
 			($area->{country} ? (address => { country_code => $area->{country} }) : ()),
 		});
 	}

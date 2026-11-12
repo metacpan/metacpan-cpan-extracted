@@ -33,11 +33,11 @@ use constant EXEC_PATTERN => qr/\b(?:system|exec)\b|qx\(|`/;
 # --------------------------------------------------
 use constant GLOBAL_PATTERN => qr/\$(?:GLOBAL|ENV|SIG|ARGV|_|!|0)\b|\$\/|%ENV\b|%SIG\b|\@ARGV\b/;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -107,18 +107,18 @@ A hashref with the following keys:
 
 =over 4
 
-=item * C<mutates_self> — 1 if the method assigns to C<$self-E<gt>{field}>.
+=item * C<mutates_self> - 1 if the method assigns to C<$self-E<gt>{field}>.
 
-=item * C<mutates_globals> — 1 if the method modifies global variables.
+=item * C<mutates_globals> - 1 if the method modifies global variables.
 
-=item * C<performs_io> — 1 if the method performs IO operations.
+=item * C<performs_io> - 1 if the method performs IO operations.
 
-=item * C<calls_external> — 1 if the method calls external commands.
+=item * C<calls_external> - 1 if the method calls external commands.
 
-=item * C<mutation_fields> — arrayref of C<$self> field names assigned
+=item * C<mutation_fields> - arrayref of C<$self> field names assigned
 to (deduplicated).
 
-=item * C<purity_level> — one of C<pure>, C<self_mutating>, or
+=item * C<purity_level> - one of C<pure>, C<self_mutating>, or
 C<impure>.
 
 =back

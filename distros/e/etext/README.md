@@ -16,7 +16,7 @@ tk4.0b3 text widget and the Perl/Tk b9 glue.  The first commit of the Git
 repository (https://github.com/ilyaz-ai/etext) is that release, untouched.
 Everything after it is the modernization described below.
 
-## Status (version 2.05, 2026)
+## Status (version 2.08, 2026)
 
 * **The Perl extension `Tk::eText` builds and works with Perl 5.38 and
   Perl/Tk 804.036**, as a standalone module.  The widget is the
@@ -34,6 +34,17 @@ Everything after it is the modernization described below.
   work inside blocks, and the test suite compares their behaviour with
   Tk's own text widget on the same text.  The demo's TeX symbols are
   Unicode characters, not codes in 8-bit symbol fonts.
+* **Since 2.06 the trees of blocks may be ragged** (leaves at different
+  depths): `block sprout` and `block flatten`, exact undo and redo, see
+  the manual's "Ragged trees" and `BUGS` 28 for what is provisional.
+* **Since 2.07 the demo lays out ragged trees and spanning cells**: a big
+  operator with limits (OpLimits) and a table whose cells span rows and
+  columns (SpanTable), both tested after random edits.
+* **Since 2.08 ornaments** (provisional): lines, polygons, rectangles,
+  ovals, arcs and texts drawn over or under the text at reference points
+  computed from where characters are drawn; they follow the text, and
+  block types draw theirs too (the demo's radicals, fraction bars and
+  table rules).  See the manual's "Ornaments".
 * The Tcl/Tk flavour (in the Git repository only: `eText/pTk/mTk/`,
   `Makefile.etext`, `demo/etext.tcl`) is kept for reference: it replaces
   core files of tk4.0b3 and cannot be built against a current Tcl/Tk.
@@ -79,6 +90,25 @@ The interactive demo:
 
     perl -Mblib demo/etext.pl        # before "make install"
     perl demo/etext.pl               # after "make install"
+
+Among its block types (menu Insert, keys Control-Meta-<letter>, menu
+Examples) are two whose layout callbacks work on the tree as it is
+(ragged trees included), written as examples of that: `OpLimits`, a
+big operator with limits, `R( op | Lower( l1 | l2 ) | upper | index )`
+(Control-Meta-o, F6; the start text shows the starred sum over primes
+`OpLimits{∑|(p=17|p is prime)|1000|*}`), and `SpanTable`, a table whose
+cells span columns and rows, the spans being the values of the cells
+(`block nodedata`, `{ cols => 2, rows => 3 }` or `"2x3"`; a slot covered
+from above is absent from the later rows, as in HTML; Control-Meta-g, F7,
+menu Cell to set the spans).  `t/demo-oplimits.t`, `t/demo-table.t` and
+`t/display-random.t` test them.
+
+Since 2.08 the demo draws the strokes of its formulas (the sign of a
+radical, the bar of a fraction, the rules of tables) as ornaments, and
+its menu Ornaments puts some on the text: a box under the selection,
+an arched arrow from a remembered place (first use: the start of the
+selection; second use: the arrow to the selection), an underbrace
+under the selection, and "Remove all" (`t/demo-ornaments.t`).
 
 The demo's helper modules `FreezeThaw` and `Text::TeX` are bundled under
 `utils/` (they are also on CPAN; the bundled copies are not installed).

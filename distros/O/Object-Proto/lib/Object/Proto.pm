@@ -1,7 +1,7 @@
 package Object::Proto;
 use strict;
 use warnings;
-our $VERSION = '1.04';
+our $VERSION = '1.06';
 
 use DynaLoader;
 our @ISA = ('DynaLoader');
@@ -54,6 +54,18 @@ Object::Proto - objects with prototype chains
 	$cat->freeze;            # Permanent immutability
 	$cat->is_frozen;         # Check frozen state
 
+	# Delegation - methods that pass the call on to a slot's value
+	object 'Service',
+	    'logger:Object:handles(info, warn)',                 # $svc->info(...) calls $svc->logger->info(...)
+	    'formatter:CodeRef:handles(format)',                 # $svc->format(...) calls $svc->formatter->(...)
+	    'tags:ArrayRef:handles(add_tag=>push, tag_count=>count)',
+	    'opts:HashRef:handles(get_opt=>get, set_opt=>set)';
+
+	my $svc = new Service logger => $logger, formatter => sub { uc shift };
+	$svc->info('ready');
+	$svc->add_tag('a', 'b');     # 2
+	$svc->tag_count;             # 2
+
 =head1 DESCRIPTION
 
 C<Object::Proto> provides an alternative to C<bless> with prototype chains.
@@ -62,6 +74,12 @@ mapped to slot indices at compile time.
 
 Objects are properly blessed into their class, so C<isa>, C<can>, and
 custom package methods all work as expected.
+
+Each property can carry a type, a default, a builder, triggers and other
+modifiers; classes can inherit from one another and compose roles; and a
+property can delegate methods to the value it holds, with C<handles(...)>
+(see L</Delegation (handles)>). The accessors, and the methods
+C<handles> installs, are written in C.
 
 =head1 FUNCTIONS
 
@@ -91,7 +109,11 @@ using the colon-separated format:
 	    'age:Int:default(0)',          # Integer with default 0
 	    'email:Str',                   # Optional string
 	    'id:Str:required:readonly',    # Required, immutable after new()
-	    'tags:ArrayRef:default([])';   # Fresh empty array per object
+	    'tags:ArrayRef:default([])',   # Fresh empty array per object
+	    'logger:Object:handles(info)'; # $person->info(...) calls $person->logger->info(...)
+
+An argument in parentheses that is never closed, such as C<default(12>,
+croaks with C<Unterminated '(' in slot spec>.
 
 =head3 Built-in Types
 
@@ -118,6 +140,34 @@ The following types are available with inline checks (zero overhead):
 =item * B<CodeRef> - code reference
 
 =item * B<Object> - blessed reference
+
+=item * B<Ref> - any reference, blessed or not
+
+=item * B<ScalarRef> - reference to a plain scalar or to another reference
+(what C<ref> calls C<SCALAR> or C<REF>), blessed or not
+
+=item * B<RegexpRef> - a C<qr//> regular expression, whatever class it is
+blessed into
+
+=item * B<GlobRef> - reference to a glob, blessed or not
+
+=item * B<FileHandle> - an open filehandle (a glob, glob reference or IO
+reference that is open or tied), or an object that isa C<IO::Handle>. A
+handle that is not open is checked with C<isa>, which costs a method
+resolution lookup.
+
+=item * B<ClassName> - the name of a loaded package: one with a defined
+C<$VERSION>, a non-empty C<@ISA> or at least one sub. The package is looked
+up, never created. This costs a symbol table lookup, and a scan of the
+package for a sub when it has neither C<$VERSION> nor C<@ISA>.
+
+=item * B<PositiveInt> - an B<Int> greater than zero
+
+=item * B<NegativeInt> - an B<Int> less than zero
+
+=item * B<NonEmptyStr> - a B<Str> whose length is greater than zero
+
+=item * B<Undef> - an undefined value
 
 =back
 
@@ -153,7 +203,13 @@ The following types are available with inline checks (zero overhead):
 
 =item * B<arg(name)> - use different name for constructor argument (init_arg)
 
-=item * B<private> - accessor callable only from the owning package (dies elsewhere)
+=item * B<private> - the accessor and every other method generated for the
+attribute callable only from the package that declared it (dies elsewhere;
+see L</Private Attributes>)
+
+=item * B<handles(...)> - install methods that delegate to the slot's value:
+methods of an Object, calls of a CodeRef, native ops of an ArrayRef or HashRef
+(see L</Delegation (handles)>)
 
 =back
 
@@ -215,7 +271,7 @@ separate getter and setter methods:
 	my $p = new Person;
 	$p->set_name('Alice');
 	print $p->get_name;    # "Alice"
-	
+
 	# The default accessor still works
 	print $p->name;        # "Alice"
 
@@ -306,15 +362,341 @@ class's own package. Calling it from anywhere else dies:
 	$cat->age;     # dies: cannot call private attribute age on Cat from main
 
 Access is decided by the package the calling code is compiled in, not by the
-object's class or inheritance: a method of C<Cat> may use the accessor (getter
-or setter), while code in any other package - including a subclass or the
-caller of a C<Cat> method - cannot. On a violation the accessor dies with:
+object's class: a method of C<Cat> may use the accessor (getter or setter),
+while code in any other package - including a subclass or the caller of a
+C<Cat> method - cannot. On a violation the accessor dies with:
 
 	cannot call private attribute <name> on <class> from <caller>
 
-The check applies to both the method form (C<< $obj->age >>) and, when the
-accessor is imported as a function (see C<import_accessors>), the
-function-call form.
+The check applies to every method generated for the attribute: the accessor
+(C<< $obj->age >>, however C<$obj> was made, C<< Cat->new(...)->age >>
+included), its C<reader>, C<writer>, C<clearer> and C<predicate>, and the
+function-call form when the accessor is imported as a function (see
+C<import_accessors>). A private attribute's function-style accessor is not
+compiled to a custom op, so that the check can run.
+
+The attribute stays private to the package that declared it:
+
+=over 4
+
+=item * An inherited private attribute may be called from the parent that
+declared it - so the parent's methods keep working on child objects - but not
+from the child class or anywhere else. A child that adds C<private> to an
+inherited attribute with C<+attr> becomes its owner instead.
+
+=item * A role's private attribute may be called from the role's methods and
+from the class that composed the role, but not from other classes that
+compose the same role, from subclasses, or anywhere else.
+
+=back
+
+	object 'Animal', 'legs:private';
+	object 'Dog', extends => 'Animal';
+
+	package Animal;
+	sub count_legs { $_[0]->legs }     # ok, also on a Dog
+
+	package Dog;
+	sub dog_legs { $_[0]->legs }       # dies: from Dog
+
+Setting a private attribute through the constructor's arguments is not a
+call to its accessor, and is allowed from anywhere:
+
+	my $cat = Cat->new(age => 3);      # ok from main
+
+=head3 Delegation (handles)
+
+C<handles(...)> installs methods in the class that pass the call on to the
+slot's value. What a method does depends on the slot's type:
+
+	object 'Service',
+	    'logger:Object:handles(info, warn, error)',            # $svc->info(@a)  is $svc->logger->info(@a)
+	    'audit:Object:handles(log_info=>info, log_error=>error)',  # renamed
+	    'storage:Object:handles(role:Storage::API)',           # every method of the role
+	    'formatter:CodeRef:handles(format)',                    # $svc->format(@a) is $svc->formatter->(@a)
+	    'hook:CodeRef:handles(fire=>method)',                   # $svc->fire(@a)   is $svc->hook->($svc, @a)
+	    'tags:ArrayRef:handles(push_tag=>push, all_tags=>list, tag_count=>count)',
+	    'opts:HashRef:handles(get_opt=>get, set_opt=>set, has_opt=>exists)';
+
+	my $svc = new Service logger => $logger, formatter => sub { uc shift };
+	$svc->info('started');          # $logger->info('started')
+	$svc->format('text');           # 'TEXT'
+	$svc->push_tag('a', 'b');       # 2
+	$svc->set_opt(level => 3);
+	$svc->get_opt('level');         # 3
+
+=head4 Syntax
+
+	handles(ENTRY, ENTRY, ...)
+
+where each C<ENTRY> is one of:
+
+=over 4
+
+=item * C<name> - install C<name>, which calls C<name> on the delegate (or is
+the native op C<name>, or calls the code)
+
+=item * C<local=E<gt>remote> - install C<local>, which calls C<remote>
+
+=item * C<role:Role::Name> - install every method within the role (Object
+slots only)
+
+=back
+
+White space around names, commas and C<=E<gt>> is ignored. C<handles(...)>
+may come before or after the type, and a spec may have it more than once:
+the lists add up. Method names must be plain identifiers
+(C<[A-Za-z_]\w*>), and a name may appear only once.
+
+=head4 Which types support it
+
+	Slot type   Kind       handles(x) installs a method that ...
+	---------   ------     ---------------------------------------------
+	Object      method     calls the method x on the object in the slot
+	CodeRef     code       calls the code ref in the slot
+	ArrayRef    native     runs the array op x on the array in the slot
+	HashRef     native     runs the hash op x on the hash in the slot
+
+C<handles> on any other type - including an untyped slot and a type
+registered with C<register_type> - croaks when the class is defined.
+
+=head4 Object: method delegation
+
+C<$obj-E<gt>local(@args)> calls C<remote(@args)> on the object in the slot. The
+arguments are passed as they are, the caller's context (list, scalar or
+void) is passed through, the delegate's return value is returned, and an
+exception from the delegate propagates unchanged.
+
+The delegate is found the way the slot's own accessor finds its value: the
+object's own slot, then its prototype chain, then, for a C<lazy> slot, its
+builder or default. If there is none, the call croaks:
+
+	Cannot delegate info to logger: logger is not set
+
+Calling a delegated method changes nothing in the object, so it works on a
+frozen object and on a C<readonly> slot, and never fires the slot's
+C<trigger>. A C<private> slot's delegating methods are public: a class can
+keep its logger to itself and still offer C<log> methods.
+
+=head4 Roles: handles(role:Name)
+
+C<role:Name> delegates every method within the role:
+
+=over 4
+
+=item * the methods it C<requires>;
+
+=item * the subs defined in the role's package - not ones imported into it,
+not constants, not names starting with C<_>, and not the reserved names below;
+
+=item * the methods the role's slots give a class that composes it: the
+accessor, and any reader, writer, clearer and predicate - except for private
+slots, whose methods the delegating class could not call.
+
+=back
+
+	Object::Proto::role('Storage::API', 'size:Int:reader(get_size)');
+	Object::Proto::requires('Storage::API', 'get', 'put');
+	package Storage::API; sub describe { ... }
+	package main;
+
+	object 'Cache', 'storage:Object:handles(role:Storage::API)';
+	# Cache gets get, put, describe, size and get_size
+
+The role is read when the class is defined: methods it comes to require
+later are not added. A role that is not defined yet is loaded, as C<with>
+does. A name given explicitly in the same C<handles(...)> wins over the same
+name from the role: C<handles(role:Storage::API, get=E<gt>fetch)> delegates
+C<get> to C<fetch>. The delegating methods count as the class's own, so they
+satisfy a role that C<requires> them:
+
+	object 'Cache', 'storage:Object:handles(get, put)';
+	Object::Proto::with('Cache', 'Storage::API');   # passes the requires check
+
+=head4 CodeRef: calling the code
+
+A bare name, or C<local=E<gt>call>, calls the code with the arguments only:
+C<$obj-E<gt>format(@a)> is C<$obj-E<gt>formatter-E<gt>(@a)>. C<local=E<gt>method> passes the
+object first: C<$obj-E<gt>fire(@a)> is C<$obj-E<gt>hook-E<gt>($obj, @a)>, where C<$obj> is
+the object the method was called on, even when the code came from its
+prototype. Any other name after C<=E<gt>> croaks when the class is defined.
+Context, results and exceptions pass through as for method delegation, and
+the same "not set" rule applies. A value that is not a code reference (which
+the type allows only through a prototype of another class, or by writing
+into the object directly) croaks rather than being called as a sub name.
+
+=head4 ArrayRef ops
+
+	op          args             returns                          like            changes
+	--------    --------------   ------------------------------   -------------   -------
+	push        1 or more        the new number of elements       push            yes
+	unshift     1 or more        the new number of elements       unshift         yes
+	pop         none             the element removed, or undef    pop             yes
+	shift       none             the element removed, or undef    shift           yes
+	list        none             the elements; their number in    @$ref
+	                             scalar context
+	elements    (another name for list)
+	count       none             the number of elements           scalar @$ref
+	is_empty    none             true when there are none         !@$ref
+	get         index            the element, or undef            $ref->[$i]
+	set         index, value     the value stored                 $ref->[$i] = $v yes
+	clear       none             the empty list; 0 in scalar      @$ref = ()      yes
+	                             context
+
+Indices count from the end when negative, as in perl; C<set> past the end
+extends the array, and C<set> before its start croaks as perl does.
+
+=head4 HashRef ops
+
+	op          args             returns                              like              changes
+	--------    --------------   ----------------------------------   ---------------   -------
+	get         1 or more keys   the value; with several keys, the    $h{k}, @h{...}
+	                             values, or the last in scalar context
+	set         key/value pairs  the value; with several pairs, the   $h{k} = v,        yes
+	                             values, or their number in scalar    @h{...} = (...)
+	                             context
+	exists      key              true when the key exists             exists
+	defined     key              true when its value is defined       defined $h{k}
+	delete      1 or more keys   the value removed; with several      delete            yes
+	                             keys, the values, or the last in
+	                             scalar context
+	keys        none             the keys; their number in scalar     keys
+	                             context
+	values      none             the values; their number in scalar   values
+	                             context
+	kv          none             a [key, value] array ref for each    (keys, values)
+	                             key; their number in scalar context
+	count       none             the number of keys                   scalar keys
+	is_empty    none             true when there are none             !%h
+	clear       none             the empty list; 0 in scalar context  %h = ()           yes
+
+C<keys>, C<values> and C<kv> start the hash's C<each> iterator afresh in any
+context, as C<keys> does.
+
+=head4 How the native ops behave
+
+=over 4
+
+=item * B<Defaults.> An ArrayRef or HashRef slot with C<handles> gets a default
+of C<[]> or C<{}>, a new one for each object, unless it has a C<default>, a
+C<builder>, or is C<required>. The added default does not change how C<new>
+reads its arguments - a default written in a spec makes C<new> read an even
+number of arguments starting with a string as name/value pairs, this one
+does not - and C<slot_info> shows it as C<default_implicit>. A default written by hand must be C<[]> for an ArrayRef
+and C<{}> for a HashRef.
+
+=item * B<Not set.> After the slot's clearer, or when a lazy builder returns
+undef, every op croaks C<Cannot delegate push_tag to tags: tags is not set>.
+
+=item * B<Arguments.> A call with the wrong number of arguments croaks:
+C<Wrong number of arguments to get_tag (get takes 1)>.
+
+=item * B<Frozen.> On a frozen object, the ops that change the container
+croak C<Cannot modify frozen object>; the others work.
+
+=item * B<Readonly.> An op that changes the container cannot be delegated from
+a C<readonly> slot: the class definition croaks. The ops that only read can.
+
+=item * B<Triggers.> After an op that changes the container, the slot's
+C<trigger> is called once, as the setter calls it, with the object and the
+container: C<trigger($self, $container)>. A trigger that dies does not undo
+the change.
+
+=item * B<Values.> The values given back are the container's own, as C<@$ref>
+and C<values %$ref> give them; C<kv> gives copies. Values stored are copies.
+
+=item * B<Tied and restricted containers> work through the tie: a tied
+array's C<push> and C<unshift> store through C<STORE>, and a restricted hash
+croaks for a key it does not allow, as perl does. A read-only array croaks
+as perl does.
+
+=item * B<Prototypes.> An object whose slot is empty uses its prototype's
+container, as its accessor would, so a change goes to the prototype's
+container. The frozen check is on the object called.
+
+=item * B<Weak.> A C<weak> slot cannot have CodeRef, ArrayRef or HashRef
+handles (the container could be freed at once); an Object slot can.
+
+=back
+
+=head4 Names, inheritance and redefinition
+
+A delegating method is installed when the class is defined, after every
+slot's accessor, and the class definition croaks when its name is taken:
+
+=over 4
+
+=item * by a reserved name: C<new>, C<prototype>, C<set_prototype>,
+C<instance>, C<BUILD>, C<DEMOLISH>, C<DESTROY>, C<AUTOLOAD>, C<import>,
+C<unimport>, C<isa>, C<can>, C<DOES>, C<VERSION>, or a special block name;
+
+=item * by a method a slot gives the class - an accessor, reader, writer,
+clearer or predicate - or by another delegating method;
+
+=item * by a sub of the class's own.
+
+=back
+
+A child class gets delegating methods of its own for the slots it inherits,
+at its own slot positions, so they work with multiple inheritance too. What
+the child defines itself - a sub, a slot of the same name - overrides an
+inherited delegating method, as it would override any parent method, and of
+two parents delegating the same name the first wins. The child can change
+the handles with C<+attr>: the lists add up, and a name the child gives
+replaces the parent's:
+
+	object 'Base',  'logger:Object:handles(info, warn)';
+	object 'Quiet', extends => 'Base', '+logger:handles(info=>debug, trace)';
+	# Quiet: info calls debug, warn calls warn, trace calls trace
+
+A C<+attr> is checked again as a whole: adding C<readonly> to a slot whose
+handles change its container croaks.
+
+Defining a class again keeps its delegating methods, pointing them at the
+slots of the new definition, and keeps any C<before>, C<after> or C<around>
+modifiers wrapped round them. C<with> croaks when a role slot's methods would
+take a delegating method's name.
+
+=head4 Introspection
+
+C<slot_info> reports C<has_handles>, and, when it is true, C<handles>: a hash
+of each installed method to what it calls - the method name, the native op
+(C<elements> shown as C<list>), or C<call> or C<method> for a CodeRef.
+
+=head4 Errors when a class is defined
+
+	handles() needs at least one method for slot 'x'
+	Invalid method name 'log-info' in handles for slot 'x'
+	Invalid role name 'A-B' in handles for slot 'x'
+	Method 'info' appears twice in handles for slot 'x'
+	handles is not supported on a Str slot 'x'
+	handles is not supported on an untyped slot 'x'
+	weak slot 'x' cannot have ArrayRef handles
+	The default of ArrayRef slot 'tags' must be [] for handles
+	Unknown ArrayRef method 'frob' in handles for slot 'tags' (valid: push, pop, ...)
+	CodeRef handles for slot 'f' must map to call or method, not 'frob'
+	Cannot delegate push_tag=>push on readonly slot 'tags'
+	handles(role:...) needs an Object slot, 'tags' is ArrayRef
+	Role 'R' in handles for slot 'x' is not defined
+	Role 'R' in handles for slot 'x' has no methods
+	handles for slot 'x': method 'new' is reserved
+	handles for slot 'x': method 'info' is already provided by slot 'y'
+	You cannot overwrite a locally defined method (info) with a delegation
+	Slot conflict: method 'size' of slot 'size' from role 'R' is delegated in class 'C'
+
+A role that cannot be loaded croaks as C<require> does.
+
+=head4 Errors when a delegating method is called
+
+	Not an object
+	Cannot delegate info to logger: logger is not set
+	Cannot delegate format to formatter: formatter is not a CODE reference
+	Cannot delegate push_tag to tags: tags is not an ARRAY reference
+	Cannot delegate get_opt to opts: opts is not a HASH reference
+	Wrong number of arguments to get_tag (get takes 1)
+	Wrong number of arguments to push_tag (push takes at least 1)
+	Wrong number of arguments to set_opt (set takes key/value pairs)
+	Cannot modify frozen object
 
 =head3 Inheritance (extends)
 
@@ -389,6 +771,12 @@ Register a custom type for use in slot specifications.
 	object 'Counter',
 	    'value:PositiveInt',
 	    'label:TrimmedStr';
+
+A registered type takes precedence over a built-in type of the same name,
+so a type you register keeps its meaning if a later release of
+Object::Proto adds a built-in with that name. Type names are resolved when
+a class is defined: a class defined before the registration keeps the
+built-in. This applies equally to types registered from C (see below).
 
 =head2 Object::Proto::has_type($name)
 
@@ -770,6 +1158,10 @@ The returned hash always contains these boolean flags:
 
 =item * B<has_type> - Has a type constraint
 
+=item * B<is_weak> - References stored in the slot are weakened
+
+=item * B<has_handles> - Has C<handles(...)> delegation
+
 =back
 
 Additional keys may be present depending on the slot configuration:
@@ -780,9 +1172,23 @@ Additional keys may be present depending on the slot configuration:
 
 =item * B<default> - The default value (if has_default is true)
 
+=item * B<default_implicit> - 1 when the default is the C<[]> or C<{}> that
+C<handles> added, rather than one written in the spec
+
 =item * B<builder> - The builder method name (if has_builder is true)
 
+=item * B<init_arg> - The constructor argument name (if C<arg(name)> is used)
+
+=item * B<handles> - (if has_handles is true) a hash of each delegating method
+to what it calls: the method name for an Object slot, the native op for an
+ArrayRef or HashRef slot (C<elements> shown as C<list>), C<call> or C<method>
+for a CodeRef slot
+
 =back
+
+	object 'Bag', 'tags:ArrayRef:handles(add=>push, all=>elements)';
+	Object::Proto::slot_info('Bag', 'tags')->{handles};
+	# { add => 'push', all => 'list' }
 
 =head2 Object::Proto::parent($class)
 
@@ -1020,6 +1426,12 @@ Compose roles into a class:
 	print $doc->format;      # 'json' (from role)
 	print $doc->serialize;   # JSON output
 
+A role's slots may have C<handles(...)>: each class that composes the role
+gets the delegating methods. C<with> croaks if one of a role slot's methods
+(its accessor, reader, writer, clearer or predicate) would take the name of
+a delegating method the class already has. To delegate every method of a
+role to a slot, see C<handles(role:Name)> in L</Delegation (handles)>.
+
 =head2 Object::Proto::does($obj_or_class, $role)
 
 Check if an object or class consumes a role:
@@ -1194,6 +1606,55 @@ Multiple modifiers can be stacked:
 	Object::Proto typed     31742847/s      354%       336%                  128%          27%      22%                  --                     -3%
 	Object::Proto (XS func) 32693120/s      368%       349%                  135%          31%      26%                  3%                      --
 
+
+=head2 Delegation
+
+F<bench/handles.pl> compares C<handles(...)> methods with the perl they
+replace: a hand-written delegating sub such as
+C<sub info { my $self = shift; $self-E<gt>logger-E<gt>info(@_) }>, and the same
+code written out where it is used. One run (figures vary between runs by
+about 10%):
+
+	Method delegation: $svc->info(1)
+	               Rate    perl sub     handles written out
+	perl sub    36193/s          --        -32%        -43%
+	handles     52890/s         46%          --        -17%
+	written out 63747/s         76%         21%          --
+
+	CodeRef delegation: $svc->format(1) and $svc->fire(1)
+	                   Rate perl sub call perl sub method handles method handles call written out
+	perl sub call   31825/s            --            -17%           -30%         -30%        -61%
+	perl sub method 38559/s           21%              --           -15%         -16%        -52%
+	handles method  45230/s           42%             17%             --          -1%        -44%
+	handles call    45658/s           43%             18%             1%           --        -43%
+	written out     80637/s          153%            109%            78%          77%          --
+
+	ArrayRef: push and pop
+	               Rate written out     handles
+	written out 44080/s          --        -10%
+	handles     49211/s         12%          --
+
+	ArrayRef: count
+	                Rate written out     handles
+	written out 104181/s          --         -8%
+	handles     112991/s          8%          --
+
+	ArrayRef: get
+	                Rate written out     handles
+	written out  70173/s          --        -30%
+	handles     100797/s         44%          --
+
+	HashRef: get and set
+	               Rate     handles written out
+	handles     40851/s          --        -11%
+	written out 45654/s         12%          --
+
+A C<handles> method is always faster than the delegating sub it replaces.
+Against code written out in place, method and native delegation are roughly
+level - a little slower for some ops and faster for others, and the order
+changes between runs - while adding the checks described above. A code ref
+called in place stays faster than any method that calls it, because calling
+code from C starts a run loop of its own.
 
 =head1 AUTHOR
 

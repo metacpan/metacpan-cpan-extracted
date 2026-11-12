@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use parent 'Alien::Base';
 
-our $VERSION = '0.09'; # VERSION
+our $VERSION = '0.10'; # VERSION
 
 sub cxxflags {
     return $_[0]->config('system_provides')->{'C++flags'} || '';
@@ -25,7 +25,7 @@ Alien::ProtoBuf - find Google ProtoBuf library
 
 =head1 VERSION
 
-version 0.09
+version 0.10
 
 =head1 SYNOPSIS
 

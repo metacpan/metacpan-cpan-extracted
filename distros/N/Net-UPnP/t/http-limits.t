@@ -4,6 +4,10 @@ use Test::More;
 use IO::Socket::INET;
 use Time::HiRes qw(time sleep);
 use POSIX qw(_exit);
+
+# Overflows to infinity on every perl, including -Duselongdouble and
+# -Dusequadmath builds whose largest finite number is about 1e4932 (RT #182942).
+my $HUGE = "9" x 5000;
 use Net::UPnP::HTTP;
 use Net::UPnP::Device;
 
@@ -169,8 +173,8 @@ for my $wire (
 }
 
 for my $options (
-    {timeout => '9' x 400}, {max_body_bytes => '9' x 400},
-    {deadline => '9' x 400}, {max_line_bytes => 0.5},
+    {timeout => $HUGE}, {max_body_bytes => $HUGE},
+    {deadline => $HUGE}, {max_line_bytes => 0.5},
 ) {
     my $ok = eval { Net::UPnP::HTTP->new(%$options); 1; };
     ok(!$ok, 'nonfinite or fractional byte limit rejected');

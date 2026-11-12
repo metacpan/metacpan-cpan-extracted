@@ -7,7 +7,7 @@ use autodie qw(:all);
 use Carp qw(croak);
 use JSON::MaybeXS;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -15,7 +15,7 @@ App::Test::Generator::LCSAJ::Coverage - Merge LCSAJ path data with runtime hits
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -68,7 +68,7 @@ Writes to C<$out_file>. Croaks if any file cannot be read or written.
 =head3 Notes
 
 A path is considered covered if any line in the range C<start..end>
-was executed at least once. This is a conservative approximation —
+was executed at least once. This is a conservative approximation -
 it does not verify that the jump target was actually reached. As a
 result, coverage may be slightly overstated for paths where only the
 beginning of the sequence was executed.

@@ -1,4 +1,4 @@
-use 5.018;
+use 5.012;
 use strict;
 use warnings;
 use Test::More;
@@ -112,7 +112,13 @@ for my $original (@values) {
     }
 }
 
-for my $class ("Policy::Wide\x{100}", "Policy::Latin\x{fc}") {
+my $unicode_latin_class= "Policy::UnicodeLatin\x{fc}";
+utf8::upgrade($unicode_latin_class);
+for my $class ("Policy::Wide\x{100}", "Policy::Latin\x{fc}",
+    $unicode_latin_class)
+{
+    my $class_snapshot= $class;
+    my $class_utf8= !!utf8::is_utf8($class);
     my $calls= 0;
     my @objects= map { bless { n => $_ }, $class } 1 .. 3;
     my $d= Dump()->Names('value')->Freezer(
@@ -144,6 +150,10 @@ for my $class ("Policy::Wide\x{100}", "Policy::Latin\x{fc}") {
         ->Out;
     cmp_ok($calls, '>=', 2,
         'Unicode class key-order callback runs in both passes');
+    is($class, $class_snapshot,
+        'class policies leave the input name unchanged');
+    is(!!utf8::is_utf8($class),
+        $class_utf8, 'class policies preserve the input name UTF-8 flag');
 }
 
 done_testing;

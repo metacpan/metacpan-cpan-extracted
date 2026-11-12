@@ -1,0 +1,1 @@
+ERROR   Failed to access socket path: /var/run/fail2ban/fail2ban.sock. Is fail2ban running?

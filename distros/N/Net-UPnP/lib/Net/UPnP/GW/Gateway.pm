@@ -217,9 +217,9 @@ sub getportmappingentries {
 	my($this) = shift;
 	my %args = (max_entries => 1024, timeout => 30, @_);
 	croak 'Invalid mapping entry limit' unless defined($args{max_entries})
-		&& $args{max_entries} =~ /\A\d+\z/ && POSIX::isfinite(0 + $args{max_entries}) && $args{max_entries} > 0;
+		&& $args{max_entries} =~ /\A\d+\z/ && Net::UPnP::HTTP::_isfinite(0 + $args{max_entries}) && $args{max_entries} > 0;
 	croak 'Invalid mapping timeout' unless defined($args{timeout})
-		&& $args{timeout} =~ /\A\d+(?:\.\d+)?\z/ && POSIX::isfinite(0 + $args{timeout}) && $args{timeout} > 0;
+		&& $args{timeout} =~ /\A\d+(?:\.\d+)?\z/ && Net::UPnP::HTTP::_isfinite(0 + $args{timeout}) && $args{timeout} > 0;
 	$this->{error} = '';
 	my $deadline = Net::UPnP::HTTP::_now() + $args{timeout};
 	

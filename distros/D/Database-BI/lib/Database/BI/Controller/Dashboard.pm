@@ -3,7 +3,7 @@ package Database::BI::Controller::Dashboard;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.0';
+our $VERSION = '0.023.1';
 
 use Mojo::Base 'Mojolicious::Controller', -strict, -signatures;
 
@@ -236,7 +236,13 @@ Readonly my %MESSAGES => (
 	warn_map_markers_capped     => 'Showing the first %d of %d markers; add f= filters to see the rest',
 	map_legend_empty            => 'Nothing in this view',
 	map_bounds_layer            => '%s boundaries',
+	map_bounds_noun_country     => 'country',
+	map_bounds_noun_state       => 'state',
+	map_bounds_noun_region      => 'region',
 	map_bounds_noun_county      => 'county',
+	map_bounds_noun_city        => 'city',
+	map_bounds_noun_town        => 'town',
+	map_bounds_noun_neighbourhood => 'neighbourhood',
 	map_bounds_noun_district    => 'district',
 	map_bounds_noun_province    => 'province',
 	map_bounds_noun_prefecture  => 'prefecture',
@@ -254,13 +260,13 @@ Readonly my %MESSAGES => (
 	error_geo_lookup_place      => 'A lookup needs place= and the sig= the map page gave it',
 	error_geo_lookup_unsigned   => 'This place was not listed by a map page, or the server has restarted since; open the map again',
 	error_map_loc_text          => 'loc_text= is the text added to the end of each place, at most %d characters on one line, not "%s"',
-	error_map_bounds_unknown    => 'bounds= must be "county", the only kind of boundary so far, not "%s"',
-	warn_map_bounds_pending     => '%d of %d places have no county outline yet',
-	warn_map_bounds_pending_one => '%d of %d places has no county outline yet',
-	warn_map_bounds_offline     => '%d of %d places have no county outline: outlines come from OpenStreetMap, which this server does not ask (map_geocode_online is off, or LWP::UserAgent::Throttled is not installed)',
-	warn_map_bounds_offline_one => '%d of %d places has no county outline: outlines come from OpenStreetMap, which this server does not ask (map_geocode_online is off, or LWP::UserAgent::Throttled is not installed)',
-	warn_map_bounds_failed      => 'OpenStreetMap did not answer, so %d of %d places have no county outline; they are tried again next time',
-	warn_map_bounds_failed_one  => 'OpenStreetMap did not answer, so %d of %d places has no county outline; it is tried again next time',
+	error_map_bounds_unknown    => 'bounds= must be one of %s, not "%s"',
+	warn_map_bounds_pending     => '%d of %d places have no %s outline yet',
+	warn_map_bounds_pending_one => '%d of %d places has no %s outline yet',
+	warn_map_bounds_offline     => '%d of %d places have no %s outline: outlines come from OpenStreetMap, which this server does not ask (map_geocode_online is off, or LWP::UserAgent::Throttled is not installed)',
+	warn_map_bounds_offline_one => '%d of %d places has no %s outline: outlines come from OpenStreetMap, which this server does not ask (map_geocode_online is off, or LWP::UserAgent::Throttled is not installed)',
+	warn_map_bounds_failed      => 'OpenStreetMap did not answer, so %d of %d places have no %s outline; they are tried again next time',
+	warn_map_bounds_failed_one  => 'OpenStreetMap did not answer, so %d of %d places has no %s outline; it is tried again next time',
 	error_geo_boundary_point    => 'A lookup needs point= and the sig= the map page gave it',
 	error_geo_boundary_unsigned => 'This point was not listed by a map page, or the server has restarted since; open the map again',
 	error_insights_no_data      => 'No data available to analyse',
@@ -13300,7 +13306,7 @@ sub _map_boundary :Protected ($self, $level, $online) {
 	);
 }
 
-# The colours of county outlines on a heat map, low to high: green, amber,
+# The colours of the outlines on a heat map, low to high: green, amber,
 # red, as the top of the heat layer's own gradient (lime, yellow, red).  An
 # outline's colour is one of $OUTLINE_STEPS steps between them, so outlines of
 # about the same total share a layer.
@@ -13674,18 +13680,24 @@ sub _outline_shares {
 	return \%share;
 }
 
-# _map_outline_noun($self, $outlines) -> $word
+# _map_outline_noun($self, $outlines, $level) -> $word
 #
 # Purpose: What the outlines drawn are called ("county", "district"), for the
-#          layer's checkbox, the key and the summary line.
-# Entry:   $outlines as Boundary's outlines() returns it, or undef.
+#          layer's checkbox, the key, the summary line and the notes about
+#          outlines not had yet.
+# Entry:   $outlines as Boundary's outlines() returns it, or undef; $level
+#          the bounds= level they were asked at, or undef.
 # Exit:    The word for the one kind drawn; "area" when the map mixes kinds
-#          (a county and a province); "county" when nothing is drawn.
+#          (a county and a province); what the level is called by default
+#          ("state", "town") when nothing is drawn, since no country is known
+#          then; "county" with no level.
 # Side effects: none.
-sub _map_outline_noun :Protected ($self, $outlines) {
-	my %called = map { ($_->{properties}{called} // 'county') => 1 } @{ $outlines ? $outlines->{features} : [] };
+sub _map_outline_noun :Protected ($self, $outlines, $level = undef) {
+	require Database::BI::Model::Boundary;
+	my $usual  = Database::BI::Model::Boundary->level_name($level) // 'county';
+	my %called = map { ($_->{properties}{called} // $usual) => 1 } @{ $outlines ? $outlines->{features} : [] };
 	my @kinds = keys %called;
-	my $kind  = @kinds > 1 ? 'area' : ($kinds[0] // 'county');
+	my $kind  = @kinds > 1 ? 'area' : ($kinds[0] // $usual);
 	return $self->_i18n("map_bounds_noun_$kind");
 }
 
@@ -13971,7 +13983,8 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		text => $self->_i18n('error_map_no_markers'),
 	} unless @markers;
 
-	# The outline of the county around each marker (bounds=county).  Those
+	# The outline of the area around each marker (bounds=county, or another
+	# of Boundary's levels: bounds=state, bounds=city).  Those
 	# not known yet are looked up here, up to the online limit, unless the
 	# caller said lookup => 0: the map page in a browser lists them for its
 	# progress bar instead, as it does places.
@@ -14009,7 +14022,8 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 				key  => $key,
 				# One place "has" no outline; the key stays the plural's
 				text => $self->_i18n($key . (@bounds_pending == 1 ? '_one' : ''),
-					scalar(@bounds_pending), $outlines->{counts}{points}),
+					scalar(@bounds_pending), $outlines->{counts}{points},
+					$self->_map_outline_noun($outlines, $bounds_level)),
 			};
 		}
 		@bounds_groups = _map_outline_groups($outlines, \@markers, $records,
@@ -14117,7 +14131,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 			my %key = $self->_map_key((($shade_covers && !$key_waits) ? '' : $color_col), $color_rules,
 				$color_default, defined($options->{scheme}), $size_col, $size_range);
 			if ($key_waits) {
-				my $layer = $self->_i18n('map_bounds_layer', ucfirst $self->_map_outline_noun($outlines));
+				my $layer = $self->_i18n('map_bounds_layer', ucfirst $self->_map_outline_noun($outlines, $bounds_level));
 				$_->{unless_layer} = $layer for grep { defined $_->{group} } @{ $key{legend} // [] };
 			}
 			$osm_args{scale} = 1;
@@ -14204,7 +14218,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 				# When the markers are coloured, each outline takes the colours
 				# of the markers in it, so the two never disagree; the heat
 				# layer's own scale is for a map whose markers are all alike.
-				my $noun = $self->_map_outline_noun($outlines);
+				my $noun = $self->_map_outline_noun($outlines, $bounds_level);
 				my @outline_layers = length($color_col)
 					? $self->_map_outline_marker_layers($outlines, \@markers) : ();
 				$bounds_as_markers = 1 if @outline_layers;
@@ -14338,7 +14352,7 @@ sub _map_data :Protected ($self, $records, $columns, $encode, $options, $spec_ke
 		bounds_level   => $bounds_level,
 		bounds_pending => \@bounds_pending,
 		bounds_drawn   => ($outlines ? $outlines->{counts}{drawn} : 0),
-		bounds_noun    => $self->_map_outline_noun($outlines),
+		bounds_noun    => $self->_map_outline_noun($outlines, $bounds_level),
 		# Coloured by the heat layer's weight column, or its rows when it has
 		# none; not when the outlines had nothing to compare and stayed grey.
 		bounds_heat    => $bounds_coloured,
@@ -14525,7 +14539,8 @@ sub map_view ($self) {
 	my $bounds_level;
 	if (length $bounds_raw) {
 		$bounds_level = _map_bounds_level($bounds_raw);
-		return $self->render(text => $self->_i18n('error_map_bounds_unknown', $bounds_raw), status => 400)
+		return $self->render(text => $self->_i18n('error_map_bounds_unknown',
+			join(', ', Database::BI::Model::Boundary->levels), $bounds_raw), status => 400)
 			unless defined $bounds_level;
 	}
 
@@ -14687,7 +14702,7 @@ sub map_view ($self) {
 	# map page listed: without that, any page on the web could post a string
 	# for this server to send to OpenStreetMap.
 	my @pending = $progress ? @{ $result->{pending} // [] } : ();
-	# The points whose county outline is not known yet go on the same list,
+	# The points whose outline is not known yet go on the same list,
 	# after the places, each signed with its level for /geo/boundary.
 	my @bounds_pending = $progress ? @{ $result->{bounds_pending} // [] } : ();
 	my @messages = @{ $result->{messages} };
@@ -14728,7 +14743,7 @@ sub map_view ($self) {
 		# Where the outlines and the markers do not pair off, each with a link
 		# to its rows
 		bounds_groups   => [ map { +{ %{$_}, url => $rows_url->($_->{filters}) } } @{ $result->{bounds_groups} // [] } ],
-		# The rows whose place has no county outline, and this page again to
+		# The rows whose place has no outline, and this page again to
 		# look those outlines up (as it was opened: waiting, or with progress)
 		bounds_left_url  => $rows_url->($result->{bounds_left_filters} // []),
 		bounds_left_rows => $result->{bounds_left_rows},
@@ -14785,7 +14800,7 @@ sub _geo_boundary_sig :Protected ($self, $level, $point) {
 }
 
 # ---------------------------------------------------------------------------
-# POST /geo/boundary  point=<lat,lon>&level=county&sig=<sig>[&online=0]
+# POST /geo/boundary  point=<lat,lon>&level=<level>&sig=<sig>[&online=0]
 #
 # One point's outline, for the map page's progress bar: found as the map would
 # find it, and remembered at once, so a run that is cancelled keeps what it
@@ -14796,7 +14811,7 @@ sub _geo_boundary_sig :Protected ($self, $level, $point) {
 # Replies 200 JSON:
 #   { point, status => 'found' | 'nowhere' | 'held', stored => 0|1,
 #     online_failed => 0|1, name }
-# 'nowhere' is a point in no county (at sea); 'held' could not be settled now
+# 'nowhere' is a point in no area of the level (at sea); 'held' could not be settled now
 # and is asked again next time.
 # 400 JSON { error } without point= or sig=, or with an unknown level=;
 # 403 JSON { error } for a bad sig=.

@@ -15,11 +15,11 @@ use Readonly;
 Readonly my $MOCK_SYSTEM     => 'mock_system';
 Readonly my $MOCK_CAPTURE_IO => 'capture_io';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -88,7 +88,7 @@ L<App::Test::Generator::Analyzer::SideEffect>.
 =head3 Returns
 
 A hashref mapping method names to a mock strategy. Only methods that
-require mocking appear in the output — pure methods are omitted.
+require mocking appear in the output - pure methods are omitted.
 
 Currently supported strategy values are C<mock_system> and
 C<capture_io>. A method needing only one of these gets that value as

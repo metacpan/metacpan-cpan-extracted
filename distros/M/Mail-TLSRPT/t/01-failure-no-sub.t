@@ -105,14 +105,20 @@ subtest 'result_type enumeration check' => sub {
     $args->{result_type} = $allowed_type;
     lives_ok( sub { $tlsrpt = Mail::TLSRPT::Failure->new($args) }, 'result_type '.$allowed_type.' lives' );
     is( $tlsrpt->result_type, $allowed_type, 'result_type '.$allowed_type.' returned' );
+    ok( $tlsrpt->is_registered_result_type, 'result_type '.$allowed_type.' is registered' );
   }
 
-  foreach my $disallowed_type (qw{bad-certificate mta-sts-failed no-policy-found-foobar random}) {
+  foreach my $unregistered_type (qw{bad-certificate mta-sts-failed no-policy-found-foobar random}) {
     my $tlsrpt;
     my $new_args = clone $args;
-    $args->{result_type} = $disallowed_type;
-    dies_ok( sub { $tlsrpt = Mail::TLSRPT::Failure->new($args) }, 'result_type '.$disallowed_type.' dies' );
+    $args->{result_type} = $unregistered_type;
+    lives_ok( sub { $tlsrpt = Mail::TLSRPT::Failure->new($args) }, 'result_type '.$unregistered_type.' lives' );
+    is( $tlsrpt->result_type, $unregistered_type, 'result_type '.$unregistered_type.' returned' );
+    ok( ! $tlsrpt->is_registered_result_type, 'result_type '.$unregistered_type.' is not registered' );
   }
+
+  my @registered_types = Mail::TLSRPT::Failure->registered_result_types;
+  is( scalar @registered_types, 11, 'registered_result_types returns the RFC 8460 list' );
 
 };
 

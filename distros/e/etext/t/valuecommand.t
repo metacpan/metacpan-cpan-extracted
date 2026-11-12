@@ -105,11 +105,12 @@ sub fraction {
   my $t;
   $t = fraction(-valuecommand => sub {
     my ($w, $event, $kind, $where, $value, $cause) = @_;
+    return if $event eq 'new';		# The block insert of fraction().
     $seen{read} = $w->get('2.1', '2.4');
     $seen{nodedata} = lab($w->blockNodedata(@$where));
     $seen{insert} = eval { $w->insert('1.0', 'X'); 1 } ? 'ok' : $@;
     $seen{same} = ($w == $t);
-    die "oops\n" if $value->{n} eq 'die';
+    die "oops\n" if ref $value && $value->{n} eq 'die';
   });
   $t->blockNodedata('2.1', 0, V->new('a'));
   $t->blockNodedata('2.1', 0, V->new('b'));
@@ -234,7 +235,9 @@ sub runs {
   $t->blockNodedata('2.9', 0, V->new('den'));
   $t->blockConfigure('G');
   is_deeply(events { $t->blockInsert('G', '2.6', '2.10') },
-	    ['drop node [2.9 0] den (block insert)'],
+	    ['drop node [2.9 0] den (block insert)',
+	     'new node [2.7 1] undef (block insert)', 'new node [2.7 0] undef (block insert)',
+	     'new node [2.10 0] undef (block insert)'],
 	    'block insert: the two parts left of the leaves join');
   $t->destroy;
 
@@ -242,7 +245,9 @@ sub runs {
   $t->blockNodedata('2.9', 0, V->new('den'));
   $t->blockConfigure('G');
   is_deeply(events { $t->blockInsert('G', '2.6', '2.10') },
-	    ['move node [2.9 0 [2.5 0]] den (block insert)'],
+	    ['move node [2.9 0 [2.5 0]] den (block insert)',
+	     'new node [2.7 1] undef (block insert)', 'new node [2.7 0] undef (block insert)',
+	     'new node [2.10 0] undef (block insert)'],
 	    'the first part has no value: the second\'s moves');
   $t->destroy;
 
@@ -252,7 +257,9 @@ sub runs {
   $t->blockNodedata('2.6', 1, V->new('node'));
   $t->blockConfigure('G');
   is_deeply(events { $t->blockInsert('G', '2.2', '2.12') },
-	    ['drop node [2.5 1] node (block insert)'],
+	    ['drop node [2.5 1] node (block insert)',
+	     # (Provisional, O5) the new block's root and leaves:
+	     map({ "new node [$_] undef (block insert)" } '2.3 1', '2.3 0', '2.6 0', '2.7 0', '2.11 0')],
 	    'a node all of whose leaves move into the new block goes');
   $t->destroy;
 
@@ -378,7 +385,7 @@ sub runs {
   $t->insert('end', "num\nden\n");
   $t->blockInsert('F', '1.0', '2.3');
   $t->blockNodedata('1.1', 0, D->new('x'));
-  @calls = ();
+  @calls = @mine = ();
   $t->blockNodedata('1.1', 0, undef);
   is_deeply(\@mine, ['drop'], 'a subclass\'s DETACH is called');
   is(scalar(@calls), 1, 'and may pass it on');

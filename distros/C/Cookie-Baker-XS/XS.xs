@@ -98,8 +98,9 @@ MODULE = Cookie::Baker::XS    PACKAGE = Cookie::Baker::XS
 PROTOTYPES: DISABLE
 
 SV *
-crush_cookie(cookie)
+xs_crush_cookie(cookie, raw_keys)
     SV *cookie
+    SV *raw_keys
   PREINIT:
     char *key, *key_p, *val_p, *val_end_p;
     int cur_len, key_len, val_len, key_size=64;
@@ -157,11 +158,18 @@ crush_cookie(cookie)
                     val_len--;
                 }
 
-                renewmem(aTHX_ &key, &key_size, key_len);
-                url_decode_key(key_p, key_len, key, &key_len);
-                if ( !hv_exists(hv, key, key_len) ) {
-                    (void)hv_store(hv, key, key_len,
-                        url_decode_val(aTHX_ val_p, val_len), 0);
+                if (SvTRUE(raw_keys)) {
+                    if ( !hv_exists(hv, key_p, key_len) ) {
+                        (void)hv_store(hv, key_p, key_len,
+                            url_decode_val(aTHX_ val_p, val_len), 0);
+                    }
+                } else {
+                    renewmem(aTHX_ &key, &key_size, key_len);
+                    url_decode_key(key_p, key_len, key, &key_len);
+                    if ( !hv_exists(hv, key, key_len) ) {
+                        (void)hv_store(hv, key, key_len,
+                            url_decode_val(aTHX_ val_p, val_len), 0);
+                    }
                 }
             }
 

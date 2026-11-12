@@ -11,7 +11,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 81;
+plan tests => 92;
 $mw->geometry('+10+10');
 
 # Collect background errors (Tk::Error) instead of printing them.
@@ -275,7 +275,7 @@ SKIP: {
 
 # A wrong block subcommand: the error lists every valid one.
 ok(!eval { $t->block('nosuch'); 1 }, 'a wrong block subcommand is an error');
-like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, data, delete, deletelines, insert, list, names, nodedata, of, split or trim/,
+like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, data, delete, deletelines, flatten, insert, list, names, nodedata, of, split, sprout or trim/,
      'which lists all the subcommands, data included');
 
 # After an undo, the next edit starts an undo step of its own: a second
@@ -593,6 +593,119 @@ like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, d
   ok(eval { $w->insert('1.1', "x\n"); 1 }, 'a newline before it') or diag $@;
   is(($w->blockAt('2.2'))[2], 'E', 'block at, after');
   ok(eval { $w->blockSplit('2.1', 0); 1 }, 'a split before it') or diag $@;
+  $w->destroy;
+}
+
+# The bounding box of a position inside a leaf of a block, once the
+# block had been drawn, was off by the top of the block in the window:
+# the display keeps the internal lines of a drawn block in window
+# coordinates, the bbox took them as relative to the block (BUGS 32).
+{
+  my $w = $mw->eText(-font => '10x20', -borderwidth => 0,
+		     -highlightthickness => 0, -pady => 20);
+  $w->pack;
+  $w->blockConfigure('P', -layoutcmd => sub {
+    my ($data, $x, $leaf) = @_;
+    ([-1, 0, 0, 50, 50, 60, 40], [1, 5, 30, @$leaf[2, 2, 4, 5]]);
+  });
+  $w->insert('1.0', "a\n");
+  $w->blockInsert('P', '1.1');
+  $w->insert('1.2', 'x');
+  $w->update;
+  my @head = $w->bbox('1.1');
+  is(($w->bbox('1.2'))[1] - $head[1], 30, 'bbox: the leaf is where the layout callback put it');
+  is(($w->bbox('1.3'))[1] - $head[1], 30, 'and the tail (the leaf as a whole)');
+  $w->destroy;
+}
+
+# The tail of a block that ends a display line (the text after it
+# wrapped) had the box of a last character of a display line, up to the
+# right edge of the window, not its last leaf's (BUGS 33).
+{
+  my $w = $mw->eText(-font => '10x20', -width => 5, -wrap => 'char',
+		     -borderwidth => 0, -highlightthickness => 0, -padx => 0);
+  $w->pack;
+  $w->blockConfigure('P', -layoutcmd => sub {
+    my ($data, $x, $leaf) = @_;
+    ([-1, 0, 0, 50, 50, 22, 17], [1, 5, 0, @$leaf[2, 2, 4, 5]]);
+  });
+  $w->insert('1.0', "dddddd");
+  $w->blockInsert('P', '1.0');
+  $w->insert('1.1', 'nk');		# {nk}dddddd: the d's wrap
+  $w->update;
+  my @leaf = ($w->bbox('1.1'))[0, 1];
+  push @leaf, ($w->bbox('1.2'))[0] + ($w->bbox('1.2'))[2] - $leaf[0], ($w->bbox('1.2'))[3];
+  is_deeply([$w->bbox('1.3')], \@leaf, 'bbox: the tail of a block at the end of a display line is its leaf');
+  $w->destroy;
+}
+
+# A position from the mouse beyond the end of a display line that ends
+# with a multi-byte character (wrapped) was inside the character
+# (DLinePixelIndex counted back one byte): a mark set there, and the
+# mark "current" whenever the pointer was there at a redisplay, split
+# the character, and the text got NUL bytes (BUGS 34).
+{
+  my $w = $mw->eText(-font => '10x20', -width => 8, -wrap => 'char');
+  $w->pack;
+  my $s = "\x{221e}" x 30;
+  $w->insert('1.0', $s);
+  $w->update;
+  my @warn;
+  local $SIG{__WARN__} = sub { push @warn, @_ };
+  my $i = $w->index('@500,5');
+  $w->markSet('m', '@500,5');
+  $w->update;
+  is($w->get('1.0', '1.end'), $s, 'a mark set beyond a wrapped line of multi-byte characters leaves the text');
+  is($w->index('m'), $i, 'it is at the last character of the display line');
+  is_deeply(\@warn, [], 'no malformed UTF-8');
+  $w->destroy;
+}
+
+# "mark next" skipped a mark at the very start of the first leaf line of
+# a block (it went into the block's tree and stepped past the first
+# segment there), and "mark previous" searched only the first leaf line
+# of a block before the index and none of the line after the block
+# (BUGS 35).  Both must agree with the order of "dump".
+{
+  my $w = $mw->eText;
+  $w->blockConfigure('B');
+  $w->insert('1.0', "line 1 abc\n");
+  $w->blockInsert('B', '1.2', '1.6');
+  $w->markSet(m => '1.3');
+  is($w->markNext('1.0'), 'm', 'mark next finds a mark at the start of a leaf');
+  is($w->markPrevious('insert'), 'm', 'mark previous finds it from after the block');
+  $w->delete('1.0', 'end');
+  $w->insert('1.0', "line 1 abc defg\nxy\n");
+  $w->blockInsert('B', '1.2', '1.12');
+  $w->insert('1.6', "\n");			# two leaves
+  $w->blockInsert('B', '1.8', '1.10');		# a nested block
+  my @idx;
+  for (my $i = '1.0'; ; $i = $w->index("$i+1c")) {
+    push @idx, $i;
+    last if $w->compare($i, '>=', 'end');
+  }
+  $w->markSet("n$_", $idx[$_]) for 0 .. $#idx;
+  my @d = $w->dump('-mark', '1.0', 'end');
+  my @all = map { [$d[3*$_ + 1], $d[3*$_ + 2]] } 0 .. @d/3 - 1;
+  my @bad;
+  for my $k (0 .. $#all) {
+    my $name = $all[$k][0];
+    my $next = $k < $#all ? $all[$k + 1][0] : '';
+    my $prev = $k > 0 ? $all[$k - 1][0] : '';
+    push @bad, "next $name" if ($w->markNext($name) // '') ne $next;
+    push @bad, "previous $name" if ($w->markPrevious($name) // '') ne $prev;
+  }
+  is("@bad", '', 'mark next and previous of each mark follow dump');
+  @bad = ();
+  for my $i (@idx) {
+    my ($next) = map { $_->[0] } grep { $w->compare($_->[1], '>=', $i) } @all;
+    my @before = grep { $w->compare($_->[1], '<', $i) } @all;
+    push @bad, "next $i" if ($w->markNext($i) // '') ne ($next // '');
+    push @bad, "previous $i"
+	if ($w->markPrevious($i) // '') ne (@before ? $before[-1][0] : '');
+  }
+  is("@bad", '', 'mark next and previous of each index follow dump');
+  is(scalar(grep { $_->[0] =~ /^n/ } @all), scalar(@idx), 'every mark is in dump');
   $w->destroy;
 }
 

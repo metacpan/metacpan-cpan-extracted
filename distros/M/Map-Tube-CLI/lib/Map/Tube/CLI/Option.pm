@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.2.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,7 +13,7 @@ Map::Tube::CLI::Option - Option as Moo Role for Map::Tube::CLI.
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.2.0
 
 =cut
 
@@ -44,7 +44,7 @@ option list_stations => (is => 'ro', order => 14,                            doc
 option fuzzy         => (is => 'ro', order => 15, negatable => 1,            doc => 'Fuzzy station name matching (on by default if needed; switch off with --no-fuzzy)', short => 'F');
 option penalty       => (is => 'ro', order => 16, isa => Num, format => 'f', doc => 'Change hop count penalty for line changes (default: 0.5)', short => 'P');
 option tabular       => (is => 'ro', order => 17,                            doc => 'Show routes and notes in tabular format',                  short => 't');
-option force         => (is => 'ro', order => 18,                            doc => 'Force unsupported map (map name will be case sensitive)',  short => 'f');
+option force         => (is => 'ro', order => 18,                            doc => 'Obsolete. Does nothing. Kept for compatibility only.',     short => 'f');
 option debug         => (is => 'ro', order => 19,                            doc => 'Run in debug mode',          short => 'D');
 option version       => (is => 'ro', order => 20,                            doc => 'Show version information',   short => 'V');
 

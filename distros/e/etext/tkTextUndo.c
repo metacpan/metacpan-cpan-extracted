@@ -82,6 +82,10 @@ InsertSeparator(stackPtr)
     atomPtr->numHeads = atomPtr->numTails = 0;
     atomPtr->levels = NULL;
     atomPtr->numLevels = 0;
+    atomPtr->defects = NULL;
+    atomPtr->numDefects = 0;
+    atomPtr->wraps = NULL;
+    atomPtr->roots = NULL;
     atomPtr->level = atomPtr->added = atomPtr->numRanges = 0;
     atomPtr->ranges = NULL;
     TkTextDataInit(atomPtr->data);
@@ -107,6 +111,15 @@ FreeAtom(undoPtr, atomPtr)
     }
     if (atomPtr->levels != NULL) {
 	ckfree((char *) atomPtr->levels);
+    }
+    if (atomPtr->defects != NULL) {
+	ckfree((char *) atomPtr->defects);
+    }
+    if (atomPtr->wraps != NULL) {
+	ckfree((char *) atomPtr->wraps);
+    }
+    if (atomPtr->roots != NULL) {
+	ckfree((char *) atomPtr->roots);
     }
     if (atomPtr->ranges != NULL) {
 	ckfree(atomPtr->ranges);
@@ -331,6 +344,10 @@ TkTextUndoPushAction(stackPtr, type, index1, index2, string, list, listIndex,
     atomPtr->numHeads = atomPtr->numTails = 0;
     atomPtr->levels = NULL;
     atomPtr->numLevels = 0;
+    atomPtr->defects = NULL;
+    atomPtr->numDefects = 0;
+    atomPtr->wraps = NULL;
+    atomPtr->roots = NULL;
     atomPtr->level = atomPtr->added = atomPtr->numRanges = 0;
     atomPtr->ranges = NULL;
     TkTextDataInit(atomPtr->data);

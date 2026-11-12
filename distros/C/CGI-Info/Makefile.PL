@@ -59,11 +59,16 @@ WriteMakefile(
 		'namespace::clean' => 0,
 		'Sys::Path' => 0
 	}, TEST_REQUIRES => {
+		'Config' => 0,
+		'Data::Dumper' => 0,
 		'Data::Random' => 0,
 		'Data::Random::String' => 0,
 		'Data::Random::String::Matches' => 0,
 		'Data::Random::Structure' => 0,
+		'Encode' => 0,
 		'Errno' => 0,
+		'File::Find' => 0,
+		'File::Path' => 0,
 		'File::Temp' => 0,
 		'FindBin' => 0,
 		'IO::Interactive' => 0,
@@ -77,6 +82,7 @@ WriteMakefile(
 		'Test::Log::Abstraction' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::Mockingbird' => 0.08,
+		'Test::More' => 0,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
 		'Test::NoWarnings' => 0,
@@ -91,6 +97,7 @@ WriteMakefile(
 		'Taint::Runtime' => 0,
 		'Test::Returns' => 0,
 		'Tie::Filehandle::Preempt::Stdin' => 0,
+		'YAML::XS' => 0,
 	}, dist => $dist,
 	clean		=> { FILES => 'CGI-Info-*' },
 	# META_ADD => {
@@ -98,6 +105,13 @@ WriteMakefile(
 	# },
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec
 		'meta-spec' => { version => 2 },
+		prereqs => {
+			test => {
+				recommends => {
+					'CHI' => 0,	# Optional: t/is_robot.t, t/is_search.t
+				},
+			},
+		},
 		resources => {
 			homepage => 'https://metacpan.org/pod/CGI::Info',
 			repository => {

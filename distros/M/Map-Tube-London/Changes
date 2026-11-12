@@ -1,5 +1,9 @@
 Revision history for Map::Tube::London
 
+v2.1.0  2026-11-12
+        - Updated dependency on Map::Tube v5.2.0.
+        - Updated pod and removed link to redundant AnnoCPAN amd CPAN Ratings
+
 v2.0.2  2026-07-11
         - Updated dependency on Map::Tube v5.1.0.
         - Updated copyright year information.

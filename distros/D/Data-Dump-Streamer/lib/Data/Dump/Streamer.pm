@@ -1,5 +1,5 @@
 package Data::Dump::Streamer;
-use 5.018;
+use 5.012;
 use strict;
 use warnings;
 use warnings::register;
@@ -17,7 +17,7 @@ our ($VERSION, $XS_VERSION, $HasPadWalker, $DEBUG);
 our (@ISA, @EXPORT, @EXPORT_OK, @EXPORT_FAIL, %EXPORT_TAGS);
 
 BEGIN {
-    $VERSION= '3.001';
+    $VERSION= '3.002';
     $XS_VERSION= eval $VERSION;
     @ISA= qw(Exporter DynaLoader);
     @EXPORT= qw(Dump DumpLex DumpVars);
@@ -388,7 +388,7 @@ use B::Deparse;
 our @ISA= qw(B::Deparse);
 my %cache;
 
-our $VERSION= '3.001';
+our $VERSION= '3.002';
 if ($VERSION ne $Data::Dump::Streamer::VERSION) {
     die
         "Incompatible Data::Dump::Streamer::Deparser v$VERSION vs Data::Dump::Streamer v$Data::Dump::Streamer::VERSION";
@@ -819,7 +819,7 @@ doing as => 'DBI' will be mercilessly ridiculed.
 
 =head2 Interpreter and engine requirements
 
-Perl 5.18 or newer and a C compiler are required.
+Perl 5.12 or newer and a C compiler are required.
 Both graph analysis and
 Perl source emission run in XS. Object construction, options, dumping entry points, and callback dispatch
 also run in XS. Perl supplies loading and export glue, B::Deparse and

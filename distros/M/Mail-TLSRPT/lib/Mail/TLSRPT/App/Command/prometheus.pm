@@ -1,6 +1,6 @@
 package Mail::TLSRPT::App::Command::prometheus;
 # ABSTRACT: Process tlsrpt reports into prometheus
-our $VERSION = '2.20261104'; # VERSION
+our $VERSION = '2.20261112'; # VERSION
 use 5.20.0;
 use Mail::TLSRPT::Pragmas;
 use Mail::TLSRPT::App -command;
@@ -45,18 +45,18 @@ sub execute($self,$opt,$args) {
     my $payload = join('',@file_contents);
 
     $tlsrpt = eval{ Mail::TLSRPT::Report->new_from_json($payload) };
-    $tlsrpt //= eval{ Mail::TLSRPT::Report->new_from_json_gz($payload) };
+    my $error = $@;
     if ( $tlsrpt ) {
         $tlsrpt->process_prometheus($prometheus);
     }
     else {
-        warn "Could not parse file $file\n";
+        warn "Could not parse file $file: $error";
     }
 
   }
 
   if ( $opt->output ) {
-    open my $fh, '>', $opt->output or die 'Could not open output file';
+    open my $fh, '>:encoding(UTF-8)', $opt->output or die 'Could not open output file';
     print $fh $prometheus->format;
     close $fh;
   }
@@ -80,7 +80,7 @@ Mail::TLSRPT::App::Command::prometheus - Process tlsrpt reports into prometheus
 
 =head1 VERSION
 
-version 2.20261104
+version 2.20261112
 
 =head1 DESCRIPTION
 

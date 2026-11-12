@@ -4,6 +4,12 @@ use warnings;
 use feature 'signatures';
 no warnings 'experimental::signatures';
 
+# Perl 5.44.0 (and 5.43.8 to 5.45.4) aborts with signal 6 at the end of this
+# file, after every subtest has passed, giving "No plan found in TAP output".
+# It is a bug in the Perl core, not in this module:
+#   https://github.com/Perl/perl5/issues/24933
+# Fixed in blead by https://github.com/Perl/perl5/pull/25000 (5.45.5).
+
 # use Test::DescribeMe qw(extended);
 use Test::Most;
 use File::Temp qw(tempdir);

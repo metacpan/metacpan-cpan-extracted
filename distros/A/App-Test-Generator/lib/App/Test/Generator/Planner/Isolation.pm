@@ -18,11 +18,11 @@ Readonly my $FIXTURE_SHARED   => 'shared_fixture';
 Readonly my $FIXTURE_FRESH    => 'fresh_object';
 Readonly my $FIXTURE_ISOLATED => 'isolated_block';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ key with C<side_effects> and C<dependencies> sub-keys.
 =item * C<$strategy>
 
 A hashref whose keys are the method names to plan isolation for.
-Values are not used directly — the hashref is used only for its keys.
+Values are not used directly - the hashref is used only for its keys.
 
 =back
 

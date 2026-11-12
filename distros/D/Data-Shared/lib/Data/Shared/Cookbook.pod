@@ -1,0 +1,512 @@
+=encoding utf8
+
+=head1 NAME
+
+Data::Shared::Cookbook - Leaf operations and application recipes
+
+=head1 DESCRIPTION
+
+Run each recipe on a fresh root with this preamble:
+
+    use Data::Shared qw(shared_get shared_set shared_delete shared_exists
+                        shared_incr shared_call shared_push shared_pop
+                        shared_compile sharedc_get sharedc_incr);
+    use File::Temp ();
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    my $root = Data::Shared->new($dir);   # file-backed
+    # or: my $root = Data::Shared->new;   # anonymous
+
+Other processes reopen a file-backed root with C<< Data::Shared->open($dir) >>
+(L</PROCESSES>); see L</FREEZE AND SHIP> for sealed stores. A recipe that
+reopens a path the facade supplied needs the file-backed root -- L</ReqRep
+(request and response)> and L</FREEZE AND SHIP> -- since an anonymous mount
+leaves no file under F<$dir>.
+
+=head1 CHOOSING A STRUCTURE
+
+=over 4
+
+=item * An exact count per key: C<hashmap:si> with C<shared_incr>
+(L</Rate limiter over a fixed window>).
+
+=item * A cache or key-value store: C<hashmap:ii>, C<hashmap:ss> and the
+other HashMap variants.
+
+=item * Counters by integer index: C<buffer:i64>.
+
+=item * Work for other processes: C<queue:int> or C<queue:str>, consumed
+with C<pop_wait> (L</Workers forked from one root>); C<heap> when jobs have
+priorities.
+
+=item * The latest values of a stream: C<ringbuffer>; an append-only
+record: C<log>.
+
+=item * Seen before?: C<bloomfilter>, or C<cuckoofilter> when entries must
+also be removed.
+
+=item * Distinct count, frequent items, percentiles: C<hyperloglog>,
+C<countminsketch> and C<topk>, C<ddsketch> or C<histogram>.
+
+=item * A leaderboard: C<sortedset>, or C<sortedset:strings> for string
+members.
+
+=item * Prefix or route lookup: C<radixtree>; string-to-id mapping:
+C<intern>; a fixed set shipped read-only: C<perfecthash>.
+
+=item * Delays and timeouts: C<timingwheel>; bounded concurrency:
+C<sync:semaphore>; request and reply between processes: C<reqrep>.
+
+=item * One structure per user or tenant: a composite
+(L</COMPOSITES (DEEP PATHS)>).
+
+=back
+
+=head1 MAP-LIKE
+
+=head2 HashMap (cache with variants)
+
+    $root->mount('cache', 'hashmap:ii', undef, 100_000);
+    $root->mount('names', 'hashmap:ss', undef, 100_000);
+    shared_set($root, '/cache/42', 100);       # 1
+    shared_get($root, '/cache/42');            # 100
+    shared_incr($root, '/cache/42');           # 101
+    shared_incr($root, '/cache/42', 10);       # 111
+    shared_call($root, '/cache', 'cas', 42, 111, 200);   # 1: 100+1+10 -> 200
+    shared_delete($root, '/cache/42');         # 1
+    # The :ss variant takes string keys and values, for a session or a token.
+    shared_set($root, '/names/t-abc', '{"uid":42}');     # 1
+    shared_get($root, '/names/t-abc');                   # '{"uid":42}'
+    shared_delete($root, '/names/t-abc');                # 1
+
+=head2 Buffer (typed shared array)
+
+    $root->mount('counters', 'buffer:i64', undef, 1024);   # file auto-supplied
+    shared_set($root, '/counters/0', 42);       # 1
+    shared_get($root, '/counters/0');            # 42
+    shared_incr($root, '/counters/0');           # 43
+
+File-backed roots supply Buffer's path; anonymous roots use its C<new_anon> fallback.
+
+=head2 RadixTree (route table)
+
+    $root->mount('routes', 'radixtree', undef, 65536, 1 << 20);
+    shared_set($root, '/routes/10.0.0.0/8', 100);   # 1; remainder is joined
+    shared_get($root, '/routes/10.0.0.0/8');        # 100
+    shared_set($root, '/routes/10.0', 200);        # 1
+    shared_call($root, '/routes', 'longest_prefix', '10.0.0.5');   # 200: byte prefix, not CIDR
+
+=head2 Intern (reversible string ids)
+
+    $root->mount('ids', 'intern', undef, 1_000_000, 32 << 20);
+    my $id = shared_set($root, '/ids/alice');       # intern, returns id
+    shared_get($root, '/ids/alice');                # $id
+    shared_call($root, '/ids', 'string', $id);      # 'alice'
+
+=head2 SortedSet Strings (string-keyed leaderboard)
+
+    $root->mount('board', 'sortedset:strings', { max => 100_000 });
+    shared_set($root, '/board/alice', 1500);         # 1: new member
+    shared_get($root, '/board/alice');              # 1500
+    my @top = shared_call($root, '/board', 'rev_range_by_rank', 0, 9); # ('alice')
+
+=head2 Pool (slot allocator)
+
+    $root->mount('slots', 'pool:i64', undef, 1000);
+    my $idx = shared_call($root, '/slots', 'alloc'); # allocated slot index
+    shared_set($root, "/slots/$idx", 42);           # undef
+    shared_get($root, "/slots/$idx");               # 42
+    shared_delete($root, "/slots/$idx");            # 1: freed
+
+=head2 PerfectHash (immutable exact set)
+
+    $root->mount('words', 'perfecthash', { build_str => ['apple', 'banana'], path => "$dir/words.phs" });
+    shared_exists($root, '/words/banana');          # 1
+    shared_exists($root, '/words/cherry');          # 0
+    shared_call($root, '/words', 'count');          # 2
+
+=head1 SET-LIKE
+
+=head2 BloomFilter (probable membership)
+
+    $root->mount('seen', 'bloomfilter', undef, 1_000_000, 0.01);
+    shared_set($root, '/seen/event-42');            # 1: probably new
+    shared_exists($root, '/seen/event-42');         # 1: probably present
+
+=head2 CuckooFilter (deletable membership)
+
+    $root->mount('edge', 'cuckoofilter', undef, 1_000_000);
+    shared_set($root, '/edge/event-42');            # 1: inserted
+    shared_exists($root, '/edge/event-42');         # 1: probably present
+    shared_delete($root, '/edge/event-42');         # 1: removed
+
+=head2 CountingBloomFilter (occurrence estimates)
+
+    $root->mount('multi', 'countingbloomfilter', undef, 1_000_000, 0.01);
+    shared_set($root, '/multi/event-42');           # 1: probably new
+    shared_get($root, '/multi/event-42');           # 1: count estimate
+    shared_delete($root, '/multi/event-42');        # 1: decremented
+
+=head2 BitSet (dense flags)
+
+    $root->mount('bits', 'bitset', undef, 256);
+    shared_set($root, '/bits/10', 1);               # 0: previous bit
+    shared_get($root, '/bits/10');                  # 1
+    shared_set($root, '/bits/10', 0);               # 1: previous bit
+
+=head2 RoaringBitmap (sparse integer membership)
+
+    $root->mount('members', 'roaringbitmap', undef, 256);
+    shared_set($root, '/members/70000', 1);         # 1: newly added
+    shared_exists($root, '/members/70000');         # 1
+    shared_call($root, '/members', 'cardinality');  # 1
+
+=head2 DisjointSet (connected groups)
+
+    $root->mount('ds', 'disjointset', undef, 1000);
+    shared_set($root, '/ds/0', 1);                  # 1: merged 0 and 1
+    shared_call($root, '/ds', 'connected', 0, 1);   # 1
+    shared_call($root, '/ds', 'set_size', 0);       # 2
+
+=head2 SortedSet (integer members)
+
+    $root->mount('scores', 'sortedset', undef, 1000);
+    shared_set($root, '/scores/42', 1500);          # 1: new member
+    shared_set($root, '/scores/7', 900);            # 1
+    shared_get($root, '/scores/42');                # 1500
+    shared_call($root, '/scores', 'rank', 42);      # 1: lowest score first
+    shared_call($root, '/scores', 'rev_rank', 42);  # 0: highest first, for a leaderboard
+    my @top = shared_call($root, '/scores', 'rev_range_by_rank', 0, 9);  # (42, 7)
+
+=head1 QUEUE-LIKE
+
+=head2 Queue (first in, first out)
+
+    $root->mount('jobs', 'queue:int', undef, 1024);
+    shared_push($root, '/jobs', 42);                # 1
+    shared_pop($root, '/jobs');                     # 42
+    shared_call($root, '/jobs', 'pop_wait', 0.01);  # undef: empty after timeout
+
+=head2 Stack (last in, first out)
+
+    $root->mount('stack', 'stack:str', undef, 50, 256);
+    shared_push($root, '/stack', 'hello');          # 1
+    shared_pop($root, '/stack');                    # 'hello'
+
+=head2 Deque (both ends)
+
+    $root->mount('dq', 'deque:int', undef, 1024);
+    shared_push($root, '/dq', 42);                 # 1: pushed at back
+    shared_call($root, '/dq', 'push_front', 1);    # 1
+    shared_pop($root, '/dq');                      # 1: popped from front
+
+=head2 RingBuffer (recent values)
+
+    $root->mount('rb', 'ringbuffer:int', undef, 16);
+    my $seq = shared_push($root, '/rb', 42);        # sequence number 0
+    shared_get($root, "/rb/$seq");                 # 42
+    shared_get($root, '/rb');                      # 42: the latest
+
+=head2 Heap (priority queue)
+
+    $root->mount('tasks', 'heap', undef, 1000);
+    shared_push($root, '/tasks', 3, 300);           # 1: priority, value
+    shared_push($root, '/tasks', 1, 100);           # 1
+    my ($pri, $val) = shared_pop($root, '/tasks'); # (1, 100): lowest priority first
+
+=head2 Log (append-only records)
+
+    $root->mount('audit', 'log', undef, 1_000_000);
+    shared_push($root, '/audit', 'first entry');    # offset 0
+    shared_call($root, '/audit', 'entry_count');    # 1
+
+=head2 PubSub (future messages)
+
+    $root->mount('events', 'pubsub:int', undef, 1024);
+    my $sub = shared_call($root, '/events', 'subscribe'); # subscriber handle
+    shared_push($root, '/events', 42);              # 1: published
+    $sub->poll;                                    # 42
+
+=head1 INDEXED
+
+=head2 NDArray (multidimensional values)
+
+    $root->mount('lat', 'ndarray', undef, 'f64', 2, 3);
+    shared_set($root, '/lat/0/1', 1.5);             # undef
+    shared_get($root, '/lat/0/1');                  # 1.5
+    shared_call($root, '/lat', 'sum');              # 1.5
+
+=head2 Fenwick (prefix totals)
+
+    $root->mount('counts', 'fenwick', undef, 1_000_000);
+    shared_incr($root, '/counts/5', 3);             # undef: update(5, 3)
+    shared_get($root, '/counts/5');                 # 3
+    shared_call($root, '/counts', 'prefix', 9);     # 3
+
+=head2 Fenwick2D (rectangle totals)
+
+    $root->mount('grid', 'fenwick2d', undef, 24, 7);
+    shared_set($root, '/grid/9/1', 100);            # 0: previous cell value
+    shared_get($root, '/grid/9/1');                 # 100
+    shared_call($root, '/grid', 'rect', 8, 1, 12, 5); # 100
+
+=head2 SegmentTree (range aggregates)
+
+    $root->mount('arr', 'segmenttree', undef, 1000);
+    shared_set($root, '/arr/10', 42);               # undef
+    shared_incr($root, '/arr/10', 5);               # 47
+    shared_call($root, '/arr', 'sum', 0, 99);       # 47
+
+=head2 KDTree (nearest point)
+
+    $root->mount('cities', 'kdtree', undef, 2, 100_000);
+    shared_call($root, '/cities', 'add', [10.5, 20.5], 42); # insertion index 0
+    shared_call($root, '/cities', 'nearest', [10.0, 20.0]); # { id => 42, dist => ... }
+
+=head2 IntervalTree (overlapping bookings)
+
+    $root->mount('bookings', 'intervaltree', undef, 100_000);
+    shared_call($root, '/bookings', 'add', 10, 20, 7); # insertion index 0
+    my @at = shared_call($root, '/bookings', 'stab', 15); # ({ lo => 10, hi => 20, id => 7 })
+
+=head2 SpatialHash (nearby points)
+
+    $root->mount('geo', 'spatialhash', undef, 100_000, 0, 1.0);
+    shared_call($root, '/geo', 'insert', 10.5, 20.5, 42); # insertion index 0
+    my @near = shared_call($root, '/geo', 'query_radius', 10, 20, 5); # (42): payload ids
+
+=head2 Graph (node data)
+
+    $root->mount('net', 'graph', undef, 1000, 10_000);
+    my $id = shared_call($root, '/net', 'add_node', 42);    # returns the id
+    shared_get($root, "/net/$id");                          # 42
+    shared_exists($root, "/net/$id");                       # 1
+
+=head1 SKETCHES AND STATS
+
+Keyed sketches accept generic verbs; the rest are call-driven.
+
+=head2 CountMinSketch (frequency estimates)
+
+    $root->mount('freq', 'countminsketch', undef, 0.001, 0.001);
+    shared_set($root, '/freq/alice', 5);            # 5: new estimate
+    shared_get($root, '/freq/alice');               # 5
+
+=head2 TopK (heavy hitters)
+
+    $root->mount('hitters', 'topk', undef, 100);
+    shared_set($root, '/hitters/popular') for 1 .. 3;   # the value is ignored
+    shared_set($root, '/hitters/rare');                 # 1
+    shared_get($root, '/hitters/popular');              # 3
+    my @top = shared_call($root, '/hitters', 'top', 10);
+    $top[0]{key};                                       # 'popular': the heavy hitter ranks first
+
+=head2 HyperLogLog (distinct visitors)
+
+    $root->mount('visitors', 'hyperloglog', undef, 14);
+    shared_call($root, '/visitors', 'add', 'alice'); # 1: a register changed
+    shared_call($root, '/visitors', 'count');        # approximately 1
+
+=head2 DDSketch (latency quantiles)
+
+    $root->mount('latency', 'ddsketch', undef, 0.01);   # 1% relative error
+    shared_call($root, '/latency', 'add', $_) for 10, 20, 30, 40, 50;
+    shared_call($root, '/latency', 'count');          # 5
+    shared_call($root, '/latency', 'quantile', 0.5);  # 30.3: the error is the 1%
+    shared_call($root, '/latency', 'quantile', 1);    # 49.9, not 50, for the same reason
+
+=head2 Histogram (latency percentiles)
+
+    $root->mount('hist', 'histogram', undef, 1, 3_600_000_000, 3);
+    shared_call($root, '/hist', 'record', $_) for 100, 110, 120, 130, 9000;
+    shared_call($root, '/hist', 'total_count');            # 5
+    shared_call($root, '/hist', 'value_at_percentile', 50); # 120
+    shared_call($root, '/hist', 'value_at_percentile', 99); # 9007: three significant figures
+
+=head2 Reservoir (bounded stream sample)
+
+    $root->mount('sample', 'reservoir', undef, 100);
+    shared_call($root, '/sample', 'add', $_) for 1 .. 1000; # each returns 1 if retained, else 0
+    my @sample = shared_call($root, '/sample', 'sample'); # 100 sampled integers
+    shared_call($root, '/sample', 'seen');          # 1000
+
+=head2 MinHash (set similarity)
+
+    $root->mount('setsim', 'minhash', undef, 256);
+    $root->mount('other', 'minhash', undef, 256);
+    shared_call($root, $_, 'add', 'element') for '/setsim', '/other'; # each returns 1
+    shared_call($root, '/setsim', 'similarity', $root->handle('/other')); # 1: identical sets
+
+=head1 SYNC AND TIMING (call-only)
+
+=head2 Semaphore (bounded concurrency)
+
+    $root->mount('sem', 'sync:semaphore', undef, 4);
+    shared_call($root, '/sem', 'acquire');           # 1: acquired
+    shared_call($root, '/sem', 'release');           # undef
+
+=head2 TimingWheel and HierTimingWheel (delays)
+
+One wheel for short delays, a hierarchy of them for long ones; the same two
+calls drive both.
+
+    $root->mount('timers', 'timingwheel', undef, 512, 10_000);
+    my $id = shared_call($root, '/timers', 'add', 30, 42); # timer id
+    my @due = shared_call($root, '/timers', 'advance', 30); # (42)
+
+    $root->mount('htimers', 'hiertimingwheel', undef, 256, 4, 100_000);
+    my $hid = shared_call($root, '/htimers', 'add', 5000, 42); # timer id
+    my @hdue = shared_call($root, '/htimers', 'advance', 5000); # (42)
+
+=head2 ReqRep (request and response)
+
+The client sends asynchronously so this example can serve and reply in one process.
+
+    $root->mount('rpc', 'reqrep:int', undef, 1024, 64);
+    my $cli = Data::ReqRep::Shared::Int::Client->new($root->mount_info('rpc')->{file});
+    my $ticket = $cli->send(42);                    # request id; undef if full
+    my ($req, $id) = shared_call($root, '/rpc', 'recv'); # (42, $ticket)
+    shared_call($root, '/rpc', 'reply', $id, $req + 1); # 1
+    $cli->get($ticket);                             # 43
+
+=head1 COMPOSITES (DEEP PATHS)
+
+=head2 Per-user filters
+
+    $root->mount('users', ['hashmap:ss', 10_000, ['bloomfilter', 10_000, 0.01]]);
+    shared_set($root, '/users/alice/event-42', 1);   # 1
+    shared_exists($root, '/users/alice/event-42');   # 1
+    $root->children('/users');                       # ('alice') in list context
+    $root->node('/users/alice')->call('count');      # approximately 1
+    shared_delete($root, '/users/alice');            # 1: whole subtree
+
+=head2 Scores with per-member filters
+
+    # A score written through the path reserves a child, so max_children caps
+    # those members too: past it, a new score fails however large max is.
+    $root->mount('leaders', ['sortedset:strings', { max => 10_000 }, ['bloomfilter', 10_000, 0.01]]);
+    shared_set($root, '/leaders/alice', 1500);        # 1: new member
+    shared_set($root, '/leaders/alice/event-9', 1);   # 1: filter insertion
+
+=head2 Per-user queues
+
+    $root->mount('queues', ['hashmap:ss', 1000, ['queue:int', 1024]]);
+    $root->push('/queues/alice', 42);                 # 1
+    $root->pop('/queues/alice');                      # 42
+
+=head2 Budget and open-child cache
+
+    # The budget is fixed when the composite is created, and each child takes
+    # a parent entry: raise both together.
+    $root->mount('users', { spec => 'hashmap:ss', args => [100_000],
+        child => { spec => 'bloomfilter', args => [10_000, 0.01] },
+        max_children => 100_000, cache_size => 64 });
+    shared_set($root, '/users/alice/event-42', 1);   # 1
+    $root->children('/users');                       # ('alice') in list context
+
+Parents must be addressable (hashmap, sortedset, kdtree/graph by
+id); bloom filters, sketches, queues and sync mounts are leaves.
+See the DEEP PATHS section of L<Data::Shared>.
+
+=head1 PROCESSES
+
+An anonymous root is shared with every process forked after its mounts and
+disappears with the last of them. A file-backed root is found again by its
+directory, from any process, until C<unlink_all> removes it.
+
+=head2 Workers forked from one root
+
+    my $pool = Data::Shared->new;                    # anonymous: shared with forks
+    $pool->mount('jobs', 'queue:int', undef, 1024);
+    $pool->mount('done', 'hashmap:ii', undef, 1024);
+    shared_push($pool, '/jobs', $_) for 1 .. 100;
+    for (1 .. 4) {
+        my $pid = fork // die "fork: $!";
+        next if $pid;
+        while (defined(my $job = shared_call($pool, '/jobs', 'pop_wait', 0.1))) {
+            shared_set($pool, "/done/$job", $job * $job);
+        }
+        exit;
+    }
+    1 while wait > 0;
+    shared_call($pool, '/done', 'size');             # 100
+    shared_get($pool, '/done/7');                    # 49
+
+A worker here stops once the queue stays empty for the wait; a long-running
+one loops on its own stop condition instead.
+
+=head2 Separate processes over one directory
+
+    # The coordinator, once, at startup.
+    my $app = Data::Shared->new($dir);
+    $app->mount('totals', 'hashmap:si', undef, 1000) unless $app->mount_info('totals');
+    # Any worker process, at any time.
+    my $worker = Data::Shared->open($dir);
+    shared_incr($worker, '/totals/requests');        # 1
+    # At shutdown, when nothing should outlive the service.
+    $app->unlink_all;
+
+Let one coordinator mount; workers only open. A root opened before another
+process changed the topology gets C<stale manifest revision> from its next
+C<mount> and has to reopen.
+
+=head1 BUILDING APPLICATIONS
+
+=head2 Rate limiter over a fixed window
+
+HashMap:SI keeps an exact, atomic count per client and time bucket.
+
+    $root->mount('rate', 'hashmap:si', undef, 1000);
+    my $window = int(time / 60);
+    my $used = shared_incr($root, "/rate/$window:alice"); # 1 on the first request
+    my $allowed = $used <= 100;                       # 1: allow this request
+
+Run the increment for every request. A coordinator must delete expired bucket
+keys; there is no automatic expiry. Fixed windows permit bursts at boundaries.
+
+=head2 Hot loops
+
+A string path is parsed and resolved on every call. Compile it once, or take
+the native handle when the loop stays on one structure:
+
+    $root->mount('cache', 'hashmap:ii', undef, 1000);
+    my $cp = shared_compile('/cache/42');
+    sharedc_incr($root, $cp) for 1 .. 1000;
+    sharedc_get($root, $cp);                          # 1000
+    my $cache = $root->handle('/cache');              # the native HashMap
+    $cache->incr(42) for 1 .. 1000;
+    $cache->get(42);                                  # 2000
+
+=head2 Per-tenant namespace
+
+A HashMap parent gives each tenant an independent HashMap:SI of exact counters.
+
+    $root->mount('tenants', ['hashmap:ss', 100, ['hashmap:si', 1000],
+        { max_children => 100, cache_size => 8 }]);
+    shared_incr($root, '/tenants/acme/hits');         # 1
+    shared_incr($root, '/tenants/other/hits', 5);     # 5
+    shared_get($root, '/tenants/acme/hits');          # 1: separate from other
+
+=head1 FREEZE AND SHIP
+
+    $root->mount('cache', 'hashmap:ii', undef, 1000);
+    shared_set($root, '/cache/42', 100);              # 1
+    $root->freeze_all;                               # 1: newly sealed handle
+    my $ro = Data::Shared->open_readonly($dir, strict => 1);
+    shared_get($ro, '/cache/42');                     # 100: lock-free read
+
+Shipping requires every mount the manifest records to support frozen
+read-only access or be immutable (C<perfecthash>); an attached handle is
+not shipped. The 17 unsupported families listed in L<Data::Shared>
+(C<buffer>, for one) and the C<sortedset:strings> variant need writable
+mappings even for reads, so they can be read in place but cannot open from
+a write-protected copy.
+
+Freezing is one-way, so C<freeze_all> refuses a store holding an
+unsupported mount, at any composite level, before sealing anything, and
+names the first one. On the consumer side C<< open_readonly($dir,
+strict => 1) >> confirms the result, naming the first unsupported mount and
+class, including lazy composite leaves; C<frozen> is only a boolean, and
+plain C<open_readonly> may defer failure until a child is opened. Use
+C<< Data::Shared->open_sealed($dir) >> for teardown.
+
+=cut

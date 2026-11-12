@@ -39,7 +39,8 @@ SV *dds_qquote(pTHX_ SV *value)
     STRLEN len, offset = 0, chars = 0;
     const U8 *p = (const U8 *)SvPV(value, len);
     SV *out = newSVpvs("\"");
-    bool force_unicode = SvUTF8(value);
+    /* Older Perls use a char-sized bool that cannot hold SVf_UTF8. */
+    bool force_unicode = cBOOL(SvUTF8(value));
 
     /* A Latin-1-only UTF-8 value needs a Unicode escape to keep its flag
      * when the generated literal is evaluated. Empty strings need a seed. */

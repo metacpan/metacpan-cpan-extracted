@@ -4,14 +4,16 @@ author:
   - 'Jemma Bradshaw <jemma@nothingbutstatic.dev>'
 build_requires:
   Clone: '0'
+  IO::Compress::Gzip: '0'
   MIME::Base64: '0'
+  Prometheus::Tiny: '0'
   Test::Exception: '0'
   Test::More: '0'
   lib: '0'
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150012'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -32,16 +34,18 @@ requires:
   Text::CSV: '0'
   Type::Utils: '0'
   Types::Standard: '0'
+  constant: '0'
   feature: '0'
   open: '0'
   perl: v5.20.0
   strict: '0'
   warnings: '0'
 resources:
-  bugtracker: https://github.com/marcbradshaw/mail-tls-rpt/issues
-  repository: git://github.com/marcbradshaw/mail-tls-rpt.git
-version: '2.20261104'
+  bugtracker: https://github.com/fastmail/mail-tls-rpt/issues
+  repository: git://github.com/fastmail/mail-tls-rpt.git
+version: '2.20261112'
 x_contributors:
+  - 'Andrew Davis <adavis@fastmailteam.com>'
   - 'Marc Bradshaw <marc@marcbradshaw.net>'
 x_generated_by_perl: v5.42.0
 x_serialization_backend: 'YAML::Tiny version 1.76'

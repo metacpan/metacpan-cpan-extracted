@@ -1,6 +1,6 @@
 package Mail::TLSRPT::Pragmas;
 # ABSTRACT: Setup system wide pragmas
-our $VERSION = '2.20261104'; # VERSION
+our $VERSION = '2.20261112'; # VERSION
 use 5.20.0;
 use strict;
 use warnings;
@@ -12,8 +12,6 @@ use English;
 use JSON;
 use Types::Standard;
 use Type::Utils;
-
-use open ':std', ':encoding(UTF-8)';
 
 
 sub import {
@@ -43,7 +41,7 @@ Mail::TLSRPT::Pragmas - Setup system wide pragmas
 
 =head1 VERSION
 
-version 2.20261104
+version 2.20261112
 
 =head1 SYNOPSIS
 

@@ -11,11 +11,11 @@ Monitoring::Sneck::Checks - nagios style checks run as Perl inside of sneck
 
 =head1 VERSION
 
-Version 0.1.1
+Version 0.2.0
 
 =cut
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.2.0';
 
 # Seconds a check is given if run is not told otherwise.
 our $TIMEOUT = 30;
@@ -50,6 +50,12 @@ The checks that come with it are...
 
 - accounts :: L<Monitoring::Sneck::Checks::accounts>, local user accounts.
 
+- apparmor :: L<Monitoring::Sneck::Checks::apparmor>, AppArmor enabled with its profiles enforcing.
+
+- auditd :: L<Monitoring::Sneck::Checks::auditd>, Linux auditing on with the rules it should have.
+
+- bond :: L<Monitoring::Sneck::Checks::bond>, link aggregation, bonding on Linux and lagg on FreeBSD.
+
 - cciss :: L<Monitoring::Sneck::Checks::cciss>, HP Smart Array controllers, through cciss_vol_status.
 
 - cert_dir :: L<Monitoring::Sneck::Checks::cert_dir>, every certificate in directories.
@@ -71,6 +77,10 @@ The checks that come with it are...
 - dns :: L<Monitoring::Sneck::Checks::dns>, DNS lookups.
 
 - dns_sync :: L<Monitoring::Sneck::Checks::dns_sync>, a zone's nameservers having the same serial.
+
+- edac :: L<Monitoring::Sneck::Checks::edac>, memory errors Linux's EDAC has counted.
+
+- fail2ban :: L<Monitoring::Sneck::Checks::fail2ban>, fail2ban's jails up, and how many are banned.
 
 - file_age :: L<Monitoring::Sneck::Checks::file_age>, file age and size.
 
@@ -94,6 +104,8 @@ The checks that come with it are...
 
 - kernel_modules :: L<Monitoring::Sneck::Checks::kernel_modules>, kernel modules being loaded or not.
 
+- ldap :: L<Monitoring::Sneck::Checks::ldap>, a LDAP server binding and searching, needing L<Net::LDAP>.
+
 - linux_ras :: L<Monitoring::Sneck::Checks::linux_ras>, hardware errors rasdaemon has logged.
 
 - listening :: L<Monitoring::Sneck::Checks::listening>, what ports are listened on.
@@ -101,6 +113,8 @@ The checks that come with it are...
 - load :: L<Monitoring::Sneck::Checks::load>, the load averages.
 
 - log :: L<Monitoring::Sneck::Checks::log>, new lines in a log for a regex.
+
+- mailq :: L<Monitoring::Sneck::Checks::mailq>, the mail queue of Postfix or Exim.
 
 - memory :: L<Monitoring::Sneck::Checks::memory>, how much memory is used.
 
@@ -132,9 +146,13 @@ The checks that come with it are...
 
 - resolv :: L<Monitoring::Sneck::Checks::resolv>, /etc/resolv.conf.
 
+- selinux :: L<Monitoring::Sneck::Checks::selinux>, SELinux in the mode it should be.
+
 - sensors :: L<Monitoring::Sneck::Checks::sensors>, temperatures, fans, and voltages.
 
 - service :: L<Monitoring::Sneck::Checks::service>, services running.
+
+- smart :: L<Monitoring::Sneck::Checks::smart>, disk health through smartctl.
 
 - smtp :: L<Monitoring::Sneck::Checks::smtp>, a SMTP server.
 
@@ -150,9 +168,19 @@ The checks that come with it are...
 
 - tcp :: L<Monitoring::Sneck::Checks::tcp>, TCP services.
 
+- thermal_throttle :: L<Monitoring::Sneck::Checks::thermal_throttle>, CPUs being thermally throttled.
+
+- time_sync :: L<Monitoring::Sneck::Checks::time_sync>, the local time daemon being synchronised.
+
 - tls_protocols :: L<Monitoring::Sneck::Checks::tls_protocols>, what TLS versions a server takes.
 
 - uptime :: L<Monitoring::Sneck::Checks::uptime>, how long the host has been up.
+
+- vrrp :: L<Monitoring::Sneck::Checks::vrrp>, keepalived, freevrrpd, or FreeBSD's CARP being MASTER or BACKUP as it should.
+
+- wireguard :: L<Monitoring::Sneck::Checks::wireguard>, WireGuard peers having handshaken recently.
+
+- zfs :: L<Monitoring::Sneck::Checks::zfs>, ZFS pools, health, capacity, scrubs, and device errors.
 
 =head1 TIMEOUTS
 

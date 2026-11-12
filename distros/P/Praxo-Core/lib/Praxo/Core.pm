@@ -3,7 +3,7 @@ package Praxo::Core;
 use strict;
 use warnings;
 
-our $VERSION = '0.1.1';
+our $VERSION = '0.3.0';
 our $SPEC_VERSION = '0.2.0';
 
 sub version {

@@ -6,6 +6,9 @@ use POSIX qw(_exit);
 use Net::UPnP::HTTP;
 use Net::UPnP::Device;
 use Net::UPnP::Service;
+use Net::UPnP::ControlPoint;
+use Net::UPnP::AV::MediaServer;
+use Net::UPnP::GW::Gateway;
 
 my $ssdp = "HTTP/1.1 200 OK\r\nLOCATION: http://10.0.0.1:5000/desc.xml\r\n\r\n";
 
@@ -91,6 +94,29 @@ my $ssdp = "HTTP/1.1 200 OK\r\nLOCATION: http://10.0.0.1:5000/desc.xml\r\n\r\n";
     like($head, qr{^Host: 127\.0\.0\.1:$port\r$}m, 'Host header is sent');
     like($head, qr{^Connection: close\r$}m, 'Connection: close is sent');
     ok($res && $res->getcontent() eq 'ok', 'chunked HTTP/1.1 response is read');
+}
+
+# RT #182943: POSIX::isfinite only exists from perl 5.22, so the limit checks
+# must not depend on it. RT #182942: they must also hold on long double perls.
+{
+    my $inf = 9**9**9;
+    ok(Net::UPnP::HTTP::_isfinite(0), 'zero is finite');
+    ok(Net::UPnP::HTTP::_isfinite('1.5'), 'decimal string is finite');
+    ok(Net::UPnP::HTTP::_isfinite(-1e300), 'large negative number is finite');
+    ok(!Net::UPnP::HTTP::_isfinite($inf), 'infinity is not finite');
+    ok(!Net::UPnP::HTTP::_isfinite(-$inf), 'negative infinity is not finite');
+    ok(!Net::UPnP::HTTP::_isfinite($inf - $inf), 'NaN is not finite');
+    ok(!Net::UPnP::HTTP::_isfinite('9' x 5000), 'overflowing digit string is not finite');
+    ok(!eval { Net::UPnP::HTTP->new(timeout => '9' x 5000); 1; }, 'overflowing timeout is rejected');
+
+    my @offenders;
+    foreach my $module (sort grep { m{\ANet/UPnP} } keys %INC) {
+        open(my $fh, '<', $INC{$module}) or next;
+        my $source = do { local $/; <$fh> };
+        close $fh;
+        push @offenders, $module if $source =~ /^\s*use\s+POSIX\b[^;]*\bisfinite\b|POSIX::isfinite\s*\(/m;
+    }
+    is("@offenders", '', 'no module relies on POSIX::isfinite');
 }
 
 done_testing;

@@ -44,7 +44,15 @@ my %WriteMakefileArgs = (
 	clean      => { FILES    => 'Monitoring-Sneck-Checks-* t/tmp' },
 	META_MERGE => {
 		"meta-spec" => { version => 2 },
-		resources   => {
+		# only the ldap check needs it, which says so if it is not there
+		prereqs => {
+			runtime => {
+				recommends => {
+					'Net::LDAP' => '0',
+				},
+			},
+		},
+		resources => {
 			repository => {
 				type => 'git',
 				url  => 'git@github.com:VVelox/Monitoring-Sneck-Checks.git',

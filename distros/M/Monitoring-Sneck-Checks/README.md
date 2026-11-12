@@ -24,6 +24,9 @@ sneck_check --list-checks
 ## Checks
 
 - accounts :: UID 0, empty passwords, duplicates, system accounts with login shells, and accounts that must or must not be there.
+- apparmor :: AppArmor enabled, profiles that must be enforcing, and those left in complain mode.
+- auditd :: auditd running, auditing enabled and optionally immutable, and the loaded rules matching a list or a SHA-256 hash.
+- bond :: Link aggregation, bonding on Linux and lagg on FreeBSD, members down or not aggregating, and the bond itself.
 - cciss :: HP Smart Array controllers through cciss_vol_status, volumes, drives, spares, enclosures, and cache.
 - cert_dir :: Every certificate in directories, without naming each file.
 - cert_file :: Certificate files, every certificate in each, plus the key and names.
@@ -35,6 +38,8 @@ sneck_check --list-checks
 - disk :: How full file systems are, space and inodes.
 - dns :: A DNS lookup, its answers, and how long it took.
 - dns_sync :: That a zone's nameservers all answer, are authoritative, and have the same serial.
+- edac :: Corrected and uncorrected memory errors from Linux's EDAC, by DIMM, without rasdaemon.
+- fail2ban :: fail2ban answering, jails that must be running, and how many each has banned now.
 - file_age :: How old and how big a file is.
 - file_content :: A file being there, or not, with lines that must or must not match regexes, and being executable.
 - file_handles :: Open files against the system wide limit.
@@ -46,10 +51,12 @@ sneck_check --list-checks
 - interface :: Network interfaces being up, at speed and full duplex, with the right MTU, and errors and drops per second.
 - jails :: FreeBSD jails running, every one in jail.conf if wanted, and vm-bhyve VMs.
 - kernel_modules :: Kernel modules loaded or not, and kept from loading through modprobe.d, as CIS wants.
+- ldap :: A LDAP server binding, anonymously or as a DN, and searching, over LDAPS or StartTLS, with response time. Needs Net::LDAP.
 - linux_ras :: Hardware errors rasdaemon has logged, memory, PCIe, and machine checks.
 - listening :: Ports being listened on, and optionally nothing else.
 - load :: The load averages, optionally per CPU.
 - log :: New lines in a log matching a regex, with rotation handled and matches held for a while.
+- mailq :: How many messages Postfix or Exim has queued and how old the oldest is, by queue, frozen included.
 - memory :: How much memory is used, optionally counting the ZFS ARC as available.
 - mount :: That fstab's file systems are mounted, and not gone read only.
 - mtime :: Files changed at, before, or after a time, such as binaries older than a known good build.
@@ -65,8 +72,10 @@ sneck_check --list-checks
 - rbl :: If a host is on DNS block lists.
 - reboot_needed :: Updates waiting on a reboot, and processes still using replaced libraries.
 - resolv :: /etc/resolv.conf, and that its nameservers answer.
+- selinux :: SELinux running in the wanted mode, and the config not set to change it at the next boot.
 - sensors :: Temperatures, fans, and voltages from hwmon, without lm-sensors, or FreeBSD's temperatures.
 - service :: Services running, and optionally enabled, through systemd or service, jails included.
+- smart :: Disk health through smartctl, SMART status, bad sectors, NVMe critical warnings and media errors, wear, temperature, and self tests.
 - smtp :: A SMTP server, its greeting, EHLO extensions, STARTTLS, and response time.
 - sshd_config :: Settings in sshd_config, read the way sshd does.
 - swap :: How much swap is used, across every device.
@@ -74,8 +83,13 @@ sneck_check --list-checks
 - sysctl :: Sysctl values, with =, !=, <, <=, >, and >=.
 - systemd_failed :: Failed systemd units.
 - tcp :: A TCP service, optionally over TLS, with send and expect.
+- thermal_throttle :: Intel CPU thermal throttle events since the last run, for cores and packages, and the time throttled.
+- time_sync :: The local time daemon, chrony, ntpd, or timesyncd, being synchronised, its offset, and when it last updated.
 - tls_protocols :: What TLS versions a server takes, such as it refusing TLS 1.0 and 1.1, STARTTLS included.
 - uptime :: How long the host has been up, catching reboots no one planned.
+- vrrp :: keepalived VRRP instances, freevrrpd VRIDs, or CARP vhids on FreeBSD, being MASTER or BACKUP as they should, and not in FAULT.
+- wireguard :: How long since each WireGuard peer last handshook, optionally only those with persistent keepalive.
+- zfs :: ZFS pools, health, capacity, fragmentation, scrub age, resilvers, device errors, and data errors.
 
 Those that look at the host, such as disk, interface, listening, and
 sysctl, work on Linux and FreeBSD, except neighbors, oom, pressure,
@@ -120,6 +134,12 @@ pkg install p5-libwww p5-LWP-Protocol-https p5-HTTP-Message p5-Net-DNS p5-Net-IP
     p5-Proc-ProcessTable p5-BSD-Sysctl
 ```
 
+For the ldap check, which is optional.
+
+```
+pkg install p5-perl-ldap
+```
+
 Then install from source as above.
 
 ### Debian
@@ -129,6 +149,12 @@ apt-get install libwww-perl liblwp-protocol-https-perl libhttp-message-perl libn
     libnet-ip-perl libdata-validate-domain-perl libdata-validate-ip-perl libfile-slurp-perl \
     libxml-libxml-perl libio-socket-ssl-perl libnet-ssleay-perl libjson-perl libjson-xs-perl libfilesys-df-perl \
     libproc-processtable-perl
+```
+
+For the ldap check, which is optional.
+
+```
+apt-get install libnet-ldap-perl
 ```
 
 Then install from source as above.

@@ -1,5 +1,18 @@
 Revision history for Perl module Cookie
 
+v0.4.1 2026-11-12T15:02:33+0900
+    - Resubmission to CPAN
+    - No API change.
+
+v0.4.0 2026-11-12T11:02:48+0900
+    - Improved autosaving of cookie jars
+    - Ensured saving would only occur when safe to do so.
+    - Resolved the warning upon saving during the global destruction.
+
+v0.3.12 2026-10-09T01:17:34+0900
+    - Correcting a weakness that occurred when loading the JSON data of public suffixes.
+      If the JSON is corrupt somehow, it just returned an error. Now, it will try to rebuild it.
+
 v0.3.11 2026-04-01T07:26:03+0900
     - Removing debugging code
 

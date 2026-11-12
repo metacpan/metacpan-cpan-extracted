@@ -16,6 +16,22 @@ from the the Encoder and Decoder changelogs:
 * require a version 7 Decoder.                                 *
 ****************************************************************
 
+7.002
+    * Add opt-in paranoid presets for Decoder and Encoder with stricter
+      checksum, object and resource defaults; explicit options retain
+      control. Lower the normal recursion limit to 8192, or 4096 on
+      Cygwin, and use 2048 under paranoid mode.
+    * Add allow_classes and track_classes to both modules, plus
+      refuse_objects to Encoder. Clarify security and module policies.
+    * Support refcounted Perl stacks in Decoder and Encoder custom ops,
+      and XPerl hash storage in Encoder.
+    * Fix native floating-point declaration tests on older FreeBSD and
+      macOS Perls, and adapt deep-recursion tests to Cygwin's stack.
+    * Load local builds during release tests and use the canonical
+      maint/vN branches in the Encoder compatibility matrix.
+    * Add Windows and macOS Perl CI and remove hobodecoder's od dependency.
+      Bound the Decoder randomized stress test for limited-memory hosts.
+
 7.001
     * Roll up the v6 features and portability fixes with protocol v7.
       Upgrade Decoder to version 7 throughout the fleet before emitting

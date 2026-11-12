@@ -5,6 +5,10 @@ use IO::Socket::INET;
 use Time::HiRes qw(time sleep);
 use Socket;
 use POSIX qw(_exit);
+
+# Overflows to infinity on every perl, including -Duselongdouble and
+# -Dusequadmath builds whose largest finite number is about 1e4932 (RT #182942).
+my $HUGE = "9" x 5000;
 use Net::UPnP::ControlPoint;
 use Net::UPnP::GW::Gateway;
 use Net::UPnP::ActionResponse;
@@ -182,11 +186,11 @@ sub gateway {
     like($gateway->geterror(), qr/deadline/, 'overall enumeration deadline diagnostic');
 }
 
-for my $options ({mx => '9' x 400}, {max_packets => '9' x 400}) {
+for my $options ({mx => $HUGE}, {max_packets => $HUGE}) {
     my $ok = eval { Net::UPnP::ControlPoint->new()->search(%$options); 1; };
     ok(!$ok, 'nonfinite discovery limit rejected before socket setup');
 }
-for my $options ({timeout => '9' x 400}, {max_entries => '9' x 400}) {
+for my $options ({timeout => $HUGE}, {max_entries => $HUGE}) {
     my ($gateway) = gateway();
     my $ok = eval { $gateway->getportmappingentries(%$options); 1; };
     ok(!$ok, 'nonfinite gateway limit rejected');

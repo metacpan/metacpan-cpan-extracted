@@ -42,7 +42,7 @@
          "requires" : {
             "Map::Tube" : "v5.1.0",
             "Map::Tube::Exception" : "3.25",
-            "Module::Pluggable" : "5.1",
+            "Map::Tube::Generic" : "v0.2.1",
             "Moo" : "2.000000",
             "MooX::Options" : "4.023",
             "Text::ASCIITable" : "0.22",
@@ -65,11 +65,11 @@
    "provides" : {
       "Map::Tube::CLI" : {
          "file" : "lib/Map/Tube/CLI.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.2.0"
       },
       "Map::Tube::CLI::Option" : {
          "file" : "lib/Map/Tube/CLI/Option.pm",
-         "version" : "v1.1.0"
+         "version" : "v1.2.0"
       }
    },
    "release_status" : "stable",
@@ -83,6 +83,6 @@
          "web" : "https://github.com/manwar/Map-Tube-CLI"
       }
    },
-   "version" : "v1.1.0",
+   "version" : "v1.2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

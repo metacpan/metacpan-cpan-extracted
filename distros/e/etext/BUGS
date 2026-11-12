@@ -237,3 +237,189 @@ comes as soon as a value is back.  The owner postponed the question;
 telling everything at the start would need the look-ahead of all the
 changes of such a command from the widget as it is before the first.
 The manual's "Telling the program: -valuecommand" has the note.
+28) (2.06: ragged trees) What is temporary in trees whose leaves are
+at different depths (block sprout, block flatten) and in blocks that
+are a single leaf (block flatten at the root): choices made for now,
+to be reconsidered, probably by letting callbacks choose (the design
+note RAGGED-ATOMIC.md, section 8, on the branch ragged-design).  The
+undo and redo of the structural edits are exact: a deletion that joined two leaves of different
+depths records the WRAPs it made first (the nodes given to the
+shallower leaf), its undo re-creates the text with every leaf at its
+depth (the undo's lists carry the number of padding nodes above each
+leaf they re-create: the pairs [depth, defect] of the separators of
+"block list", public since decision L1) and then pulls the WRAPs out
+again; the undo of "block insert" gives the leaves of its range their
+depths back with the levels of the separators; block flatten is undone
+by the inverse of its steps in reverse order (a JOIN is recorded as the
+deletion of its separator, a PULL OUT as an atom of its own); a change
+that gives a block that was a single leaf a real root (a newline in
+the leaf, block split, block sprout, a nested block dissolved in it)
+records it, and its undo makes the root padding again (t/ragged.t,
+t/flatten.t, t/stress.t and t/valuecommand-random.t check the block
+list with the values and the shape of every block before, after,
+after the undo and after the redo).  What remains:
+- Which sequence of atomic steps an edit uses (RAGGED-ATOMIC.md 8.1),
+  chosen for now: block flatten JOINs the rightmost separator inside
+  the node whose two leaves are equally deep below their common
+  ancestor, else PULLs OUT the deepest node with a single child that
+  is a leaf (rightmost among equals), then the node itself; a deletion
+  across depths WRAPs the shallower leaf, never PULLs OUT.  The
+  shortest sequence is not unique: the shape is the same for every
+  flatten, the values that survive are not.  To reconsider, probably
+  with callbacks that choose.
+- The value rules of the atomic steps (8.2): a JOIN keeps the start
+  side's value, else takes the end side's (U1); a PULL OUT gives the
+  leaf the node's value if it has one, else the leaf keeps its own
+  (U2); block sprout shares the former leaf's value between the start
+  piece, the new node and the end piece.  Also to reconsider.
+- -valuecommand tells the WRAPs, PULL OUTs and JOINs of ragged trees
+  before each step (as the commands of 27), with the new place as it
+  is after the step, and the copies of "block sprout" as "copy"; the
+  undo of a deletion across depths tells the values coming back
+  ("restore") at their places in the tree as the WRAPs left it, then
+  each PULL OUT ("move" of the nodes renumbered).  The nodes the steps
+  make without a value are told "new" (below).  One value shared by
+  several owners (block sprout) is one entry for the look-ahead: each
+  owner is told, and any of the events foreseen for it is accepted.
+- A value set, after such a deletion, on the node a WRAP made above the
+  start leaf waits in the undo step (as every value set on a place the
+  undo takes away) and comes back with the redo; the same for a value
+  set on the root a change gave a block that was a single leaf.  A
+  value set on the joined node when the end side's node had one (which
+  the join gave to the start side) goes, with the undo, to the end
+  side's node, as in a uniform tree; the same for a value set on the
+  leaf a PULL OUT gave the node's value to: the undo gives it to the
+  node.
+- "block insert" across leaves of different depths does not equalize
+  them first (the design's "any other edit that joins leaves
+  equalizes"): it joins no nodes, the rest of the last leaf goes into
+  the first leaf, which keeps its depth; the end leaf's nodes that
+  lose their last line go.  Its undo is exact.
+- The event "new" of -valuecommand (decision O5, option A, added on
+  2026-11-11, PROVISIONAL): told before the change, once for each node
+  or leaf the change creates without a value, with its place after
+  the change ([index, level], level counted from the node's first
+  leaf) and the value undef: the new leaves of newlines typed in a
+  block and of "block split", the second halves of the nodes block
+  split cuts and, where it reaches the root, the nodes it first
+  inserts between the root and all its children (the root stays the
+  root with its value; its address grows by a level, told "move", as
+  for a WRAP); the root and the leaves of a new block (block
+  insert) without a value, and the enclosing leaf left when a whole
+  leaf moves into the new block; the leaves that the separators of a
+  block a deletion dissolves make in the block around it; the middle
+  leaf of "block sprout", its new node and its start and end pieces
+  when they receive no copy (the former leaf had no value), and the
+  root a single-leaf block gets; the nodes a deletion across depths
+  gives the start leaf (those of the end leaf, merged into the start
+  side's at once, are not told); the root of a single-leaf block made
+  real by a newline, a split or a dissolved block.  Decided for now:
+  an undo or a redo tells no "new" (what it re-creates gets back the
+  value it had, "restore"; a node without a value it re-creates or
+  removes is not told), and the disappearance of a node without a
+  value is never told.  "block sprout" tells all its "new" events
+  before its first step, with the places after the command; a
+  deletion tells those of its WRAPs before them, with the places once
+  all are made.  The owner's example in the request named the new
+  root of "block split 2.2 1" on {num|den} as new at [2.1 2]; the
+  widget tells [2.1 1]: the split inserts a node R1 between the root
+  R and all its children (R stays the root and keeps its value; its
+  address moves from [2.1 1] to [2.1 2], told "move"), then splits R1
+  into X( n ) and Y( um | den ), and R1 (= X) is the node told new at
+  [2.1 1].  t/valuecommand-random.t checks
+  that every node created is told (every node has a value before each
+  command in half of its widgets), t/ragged.t and t/flatten.t the
+  places.
+- "block sprout index" with one index (decision O8, 2.06) wraps the
+  leaf the index names (also the only leaf of a block, which the
+  two-index form cannot name: that range belongs to the enclosing
+  structure); the leaf's value moves to the new node and the leaf is
+  told "new", as for the two-index form from delimiter to delimiter.
+29)* (2.01) Found by the random undo exactness check of 2.06: the undo
+of a deletion inside a block re-created a separator of a level above 0
+(a "block split" at that level) with the tags of the place by the
+insertion rule, also those the deleted range had off on it: with x on
+"ab" and "cd" of {ab|cd} but not on the separator, deleting b|c and
+undoing gave the separator the tag x.  Separators of level 0, which
+the undo inserts as newlines, were right.  (* 2.06: fixed; the
+re-created separator loses the tags the list has off there, as text
+does (t/undo-block.t). *)
+30)* (2.05) Found while testing ragged trees: -getflags is set by the
+program, and every widget call that extracts text ORed it with its own
+flags, so the bits the manual calls reserved ("All undocumented bits
+are reserved and should be 0") reached the widget's internal ones:
+-getflags 0x200 made "block list" leave out the node values and the
+instance data (a flag the undo uses), 0x100 added the undo's leaf
+defects.  (* 2.06: fixed; the widget uses only the documented bits of
+-getflags (TKT_GET_USER in tkText.h) and ignores the others
+(t/getflags.t). *)
+31)* (2.05) Found by the random test of -valuecommand in 2.06 (the
+nodes told "new" get values): a value set, after a deletion that
+dissolved a block nested in another block, on a leaf that the
+dissolved block's separators made in the enclosing block does not
+come back with the undo and redo of the deletion: the undo gives it
+to the leaf of the re-created block at the same place (told
+"restore"), and the redo, which dissolves that block again, takes it
+into the undo step with that block's values; the leaf comes back
+without a value.  With {xa{b|c|d}y} on line 1 (an outer block F, a
+nested block G), deleting "{b" (the head of G and the leaf b) leaves
+{xa|c|dy}; values set then on "c" and "dy" are on G's leaves c and d
+after the undo, and nowhere in the text after the redo.  BUGS 26
+fixed the case where the dissolved block is not nested (the place
+does not exist after the undo, so the value waits).  Same in 2.05.
+(* 2.06: fixed; the undo keeps such a value in the undo step (told
+"stash") also when its place after the undo is inside a block the
+deletion cut, which the undo re-creates (InCutBlock in
+tkTextBTree.c), and the redo gives it back to the leaf of the
+enclosing block (told "restore").  t/undo-block.t;
+t/valuecommand-random.t no longer tolerates nodes left without a
+value after an undo or a redo. *)
+32)* (all versions) Found while testing the demo's OpLimits and
+SpanTable layouts (2.07): "bbox" of a position inside a leaf of a
+block (a character, a separator, the tail) was off downwards by the
+top of the block in the window once the block had been drawn: the
+display moves the internal lines of a drawn block to window
+coordinates (IBTreeDisplayProc, for embedded windows), and the
+bounding box took them as relative to the block, as before the first
+display.  The drawing and the mouse (IBTreeMeasureProc subtracts the
+offset) were right.  With -pady 20 and the leaf at y 30 in the block,
+bbox gave y 50 below the block's top.  (* 2.07: fixed;
+IBTreeBboxProc in tkTextDisp.c subtracts the offset as
+IBTreeMeasureProc does.  t/regress.t. *)
+33)* (all versions) Found by t/display-random.t (2.07): the tail of a
+block that ends a display line (the text after the block wrapped to
+the next display line) got the box Tk gives the last character of a
+display line, reaching to the right edge of the window, not the box
+of the block's last leaf that the manual promises ("Bounding boxes").
+With {nk}dddddd in a widget 5 characters wide and -wrap char, bbox of
+the tail was 50 pixels wide instead of the 19 of "nk".  (* 2.07:
+fixed; TkTextCharBbox in tkTextDisp.c does not widen the box of a
+block's last position.  t/regress.t. *)
+34)* (2.00) Found by t/display-random.t (2.07): a position from the
+mouse (TkTextPixelIndex: "@x,y", and the mark "current", which every
+redisplay sets where the pointer is) beyond the end of a display line
+whose last chunk ended with a multi-byte character was inside that
+character: DLinePixelIndex answered the last byte of the chunk (its
+numChars counts bytes).  A mark set there split the character's bytes
+into two segments, which became NUL bytes; the line then lost
+characters ("1.end" moved back) and "get" gave malformed UTF-8.  With
+30 "\x{221e}" in a widget 8 characters wide, -wrap char, ".t mark set
+m @500,5" was enough.  TkTextIndexOfX (2.03) already backed up to the
+character's start for itself; the mouse path was not checked (the
+HANDOVER listed it as open).  (* 2.07: fixed; DLinePixelIndex backs
+up to the start of the last character of a chunk of characters.
+t/regress.t. *)
+35)* (all versions) Found while extending the ornaments (2.08): "mark
+next" skipped a mark at the very start of the first leaf line of a
+block: MarkFindNext went into the block's tree, set the segment to the
+first one of the leaf line, and the loop's own step then went past
+it.  "mark previous" had the same step, and besides searched only the
+first leaf line of a block standing before the index, and nothing of
+the line after such a block.  With "line 1 abc" and "block insert B
+1.2 1.6", ".t mark set m 1.3": ".t mark next 1.0" gave "insert", and
+".t mark previous insert" nothing ("mark previous 1.5" and "dump"
+found m).  (* 2.08: fixed; MarkFindNext does not step after going
+into a tree, MarkFindPrev searches a line with the contents of its
+blocks in their place (LastMarkInLine in tkTextMark.c).  t/regress.t
+compares both with the order of "dump" at every mark and index of a
+line with a nested block. *)

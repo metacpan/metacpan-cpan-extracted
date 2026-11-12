@@ -102,7 +102,7 @@ static I32 my_cxinc(pTHX)
 #endif
 
 /*
-   the following three subs are outright stolen from Data::Dumper ( Dumper.xs )
+   the following two subs are outright stolen from Data::Dumper ( Dumper.xs )
    from the 5.6.1 distribution of Perl. Probably Gurusamy Sarathy's work.
    As is much of the code in _globname and globname
 */
@@ -129,20 +129,6 @@ TOP:
     } else
         return 1;
     return 0;
-}
-
-/* Count the extra backslashes needed for a single-quoted byte string. */
-static I32 num_q(register char *s, register STRLEN slen)
-{
-    register I32 ret = 0;
-
-    while (slen > 0) {
-        if (*s == '\'' || *s == '\\')
-            ++ret;
-        ++s;
-        --slen;
-    }
-    return ret;
 }
 
 /* Copy slen bytes with single-quote/backslash escaping and return the
@@ -681,7 +667,7 @@ CODE:
     dt = SvTYPE(SvRV(dst));
     st = SvTYPE(SvRV(src));
 
-    if (!(dt < SVt_PVAV && st < SVt_PVAV || dt == st && dt <= SVt_PVHV))
+    if (!((dt < SVt_PVAV && st < SVt_PVAV) || (dt == st && dt <= SVt_PVHV)))
         croak("destination and source must be same type (%d != %d)", dt, st);
 
     for (i = 0; i <= av_len(padv); ++i) {

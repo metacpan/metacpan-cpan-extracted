@@ -60,7 +60,7 @@
    "provides" : {
       "Sisimai" : {
          "file" : "lib/Sisimai.pm",
-         "version" : "v5.7.2"
+         "version" : "v5.8.0"
       },
       "Sisimai::ARF" : {
          "file" : "lib/Sisimai/ARF.pm"
@@ -448,7 +448,7 @@
       }
    },
    "release_status" : "stable",
-   "version" : "v5.7.2",
+   "version" : "v5.8.0",
    "x_contributors" : [
       "0xcdcdcdcd <0xcdcdcdcd@gmail.com>",
       "Adrian Yee <adrian@gt.net>",

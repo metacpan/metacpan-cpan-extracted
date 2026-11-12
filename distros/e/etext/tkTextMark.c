@@ -42,10 +42,14 @@ static int		MarkLayoutProc _ANSI_ARGS_((TkText *textPtr,
 			    int offset, int maxX, int maxChars,
 			    int noCharsYet, Tk_Uid wrapMode,
 			    TkTextDispChunk *chunkPtr));
+static Tcl_HashEntry *	FindPublicMark _ANSI_ARGS_((TkText *textPtr,
+			    char *name));
 static int		MarkFindNext _ANSI_ARGS_((Tcl_Interp *interp,
 			    TkText *textPtr, char *markName));
 static int		MarkFindPrev _ANSI_ARGS_((Tcl_Interp *interp,
 			    TkText *textPtr, char *markName));
+static TkTextSegment *	LastMarkInLine _ANSI_ARGS_((TkText *textPtr,
+			    TkTextLine *linePtr, TkTextSegment *stopPtr));
 
 
 /*
@@ -133,7 +137,7 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 		    NULL);
 	    return TCL_ERROR;
 	}
-	hPtr = Tcl_FindHashEntry(&textPtr->markTable, LangString(args[3]));
+	hPtr = FindPublicMark(textPtr, LangString(args[3]));
 	if (hPtr == NULL) {
 	    Tcl_AppendResult(interp, "there is no mark named \"",
 		    LangString(args[3]), "\"", NULL);
@@ -172,7 +176,7 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 		             NULL);
 	    return TCL_ERROR;
 	}
-	hPtr = Tcl_FindHashEntry(&textPtr->markTable, LangString(args[3]));
+	hPtr = FindPublicMark(textPtr, LangString(args[3]));
 	if (hPtr == NULL) {
 	    Tcl_AppendResult(interp, "there is no mark named \"",
 		    LangString(args[3]), "\"",          NULL);
@@ -198,11 +202,8 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 		    LangString(args[4]), "\": must be left or right",          NULL);
 	    return TCL_ERROR;
 	}
-	TkTextMarkSegToIndex(textPtr, markPtr, &index);
-	TkBTreeUnlinkSegment(textPtr->tree, markPtr,
-		markPtr->body.mark.linePtr);
-	markPtr->typePtr = newTypePtr;
-	TkBTreeLinkSegment(markPtr, &index);
+	TkTextSetMarkGravity(textPtr, markPtr,
+		newTypePtr == &tkTextLeftMarkType);
     } else if ((c == 'n') && (strncmp(LangString(args[2]), "names", length) == 0)) {
 	if (argc != 3) {
 	    Tcl_AppendResult(interp, "wrong # args: should be \"",
@@ -211,8 +212,11 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 	}
 	for (hPtr = Tcl_FirstHashEntry(&textPtr->markTable, &search);
 		hPtr != NULL; hPtr = Tcl_NextHashEntry(&search)) {
-	    Tcl_AppendElement(interp,
-		    Tcl_GetHashKey(&textPtr->markTable, hPtr));
+	    char *name = Tcl_GetHashKey(&textPtr->markTable, hPtr);
+
+	    if (!TkTextIsPrivateMarkName(name)) {
+		Tcl_AppendElement(interp, name);
+	    }
 	}
     } else if ((c == 'n') && (strncmp(LangString(args[2]), "next", length) == 0)) {
 	if (argc != 4) {
@@ -234,13 +238,19 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 		    LangString(args[0]), " mark set markName index\"",          NULL);
 	    return TCL_ERROR;
 	}
+	if (TkTextIsPrivateMarkName(LangString(args[3]))) {
+	    Tcl_AppendResult(interp, "bad mark name \"", LangString(args[3]),
+		    "\": names starting with the character \\001 are reserved",
+		    NULL);
+	    return TCL_ERROR;
+	}
 	if (TkTextGetIndex(interp, textPtr, LangString(args[4]), &index) != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	TkTextSetMark(textPtr, LangString(args[3]), &index);
     } else if ((c == 'u') && (strncmp(LangString(args[2]), "unset", length) == 0)) {
 	for (i = 3; i < argc; i++) {
-	    hPtr = Tcl_FindHashEntry(&textPtr->markTable, LangString(args[i]));
+	    hPtr = FindPublicMark(textPtr, LangString(args[i]));
 	    if (hPtr != NULL) {
 		markPtr = (TkTextSegment *) Tcl_GetHashValue(hPtr);
 		if ((markPtr == textPtr->insertMarkPtr)
@@ -354,6 +364,98 @@ TkTextSetMark(textPtr, name, indexPtr)
 }
 
 /*
+ *----------------------------------------------------------------------
+ *
+ * TkTextSetMarkGravity --
+ *
+ *	Gives a mark left or right gravity (it stays where it is).
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkTextSetMarkGravity(textPtr, markPtr, left)
+    TkText *textPtr;		/* Text widget containing the mark. */
+    TkTextSegment *markPtr;	/* The mark. */
+    int left;			/* 1: left gravity, 0: right. */
+{
+    TkTextIndex index;
+    Tk_SegType *newTypePtr = left ? &tkTextLeftMarkType
+	    : &tkTextRightMarkType;
+
+    if (markPtr->typePtr == newTypePtr) {
+	return;
+    }
+    TkTextMarkSegToIndex(textPtr, markPtr, &index);
+    TkBTreeUnlinkSegment(textPtr->tree, markPtr, markPtr->body.mark.linePtr);
+    markPtr->typePtr = newTypePtr;
+    TkBTreeLinkSegment(markPtr, &index);
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextSetPrivateMark, TkTextUnsetPrivateMark --
+ *
+ *	A private mark (see tkText.h) is created at an index, with a
+ *	name of its own that the program cannot see or type (a
+ *	control character, then a number), or removed.  It never has a
+ *	value.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static unsigned long privateMarkCount = 0;
+
+TkTextSegment *
+TkTextSetPrivateMark(textPtr, indexPtr, left)
+    TkText *textPtr;		/* Text widget in which to create mark. */
+    TkTextIndex *indexPtr;	/* Where. */
+    int left;			/* 1: left gravity, 0: right. */
+{
+    char name[40];
+    TkTextIndex index = *indexPtr;
+    TkTextSegment *markPtr;
+
+    do {
+	sprintf(name, "%corn%lu", TK_TEXT_PRIVATE_MARK_CHAR,
+		++privateMarkCount);
+    } while (Tcl_FindHashEntry(&textPtr->markTable, name) != NULL);
+    markPtr = TkTextSetMark(textPtr, name, &index);
+    if (left) {
+	TkTextSetMarkGravity(textPtr, markPtr, 1);
+    }
+    return markPtr;
+}
+
+void
+TkTextUnsetPrivateMark(textPtr, markPtr)
+    TkText *textPtr;		/* Text widget containing the mark. */
+    TkTextSegment *markPtr;	/* The mark (private). */
+{
+    TkBTreeUnlinkSegment(textPtr->tree, markPtr, markPtr->body.mark.linePtr);
+    Tcl_DeleteHashEntry(markPtr->body.mark.hPtr);
+    TkTextFreeValueLater(textPtr, markPtr->body.mark.value);
+    ckfree((char *) markPtr);
+}
+
+/*
+ * The hash entry of a mark the program may name (not a private one),
+ * or NULL.
+ */
+
+static Tcl_HashEntry *
+FindPublicMark(textPtr, name)
+    TkText *textPtr;
+    char *name;
+{
+    if (TkTextIsPrivateMarkName(name)) {
+	return NULL;
+    }
+    return Tcl_FindHashEntry(&textPtr->markTable, name);
+}
+
+/*
  *--------------------------------------------------------------
  *
  * TkTextMarkSegToIndex --
@@ -418,7 +520,7 @@ TkTextMarkNameToIndex(textPtr, name, indexPtr)
 {
     Tcl_HashEntry *hPtr;
 
-    hPtr = Tcl_FindHashEntry(&textPtr->markTable, name);
+    hPtr = FindPublicMark(textPtr, name);
     if (hPtr == NULL) {
 	return TCL_ERROR;
     }
@@ -714,7 +816,7 @@ MarkFindNext(interp, textPtr, string)
     int offset;
 
 
-    hPtr = Tcl_FindHashEntry(&textPtr->markTable, string);
+    hPtr = FindPublicMark(textPtr, string);
     if (hPtr != NULL) {
 	/*
 	 * If given a mark name, return the next mark in the list of
@@ -745,19 +847,25 @@ MarkFindNext(interp, textPtr, string)
 	 * segPtr points at the first possible candidate,
 	 * or NULL if we ran off the end of the line.
 	 */
-	for ( ; segPtr != NULL ; segPtr = segPtr->nextPtr) {
-	    if (segPtr->typePtr == &tkTextRightMarkType ||
-		    segPtr->typePtr == &tkTextLeftMarkType) {
+	while (segPtr != NULL) {
+	    if ((segPtr->typePtr == &tkTextRightMarkType ||
+		    segPtr->typePtr == &tkTextLeftMarkType)
+		    && !TkTextIsPrivateMark(textPtr, segPtr)) {
 		Tcl_SetResult(interp, Tcl_GetHashKey(&textPtr->markTable, segPtr->body.mark.hPtr), TCL_STATIC);
 
 
 		return TCL_OK;
 	    } else if ((segPtr->typePtr == &tkTextIBTreeType)
 		       && segPtr->body.itree.tree) {
-		/* Go into internal tree. */
+		/*
+		 * Go into internal tree.  The first segment of its first
+		 * line is a candidate too (BUGS 35): no step forward.
+		 */
 		index.linePtr = TkIBTreeFirstLine(segPtr);
 		segPtr = index.linePtr->segPtr;
+		continue;
 	    }
+	    segPtr = segPtr->nextPtr;
 	}
 	linePtr = index.linePtr;
 	index.linePtr = TkBTreeNextLine(index.linePtr);
@@ -798,11 +906,11 @@ MarkFindPrev(interp, textPtr, string)
 {
     TkTextIndex index;
     Tcl_HashEntry *hPtr;
-    register TkTextSegment *segPtr, *seg2Ptr, *prevPtr, *prevPtr2 = NULL;
+    register TkTextSegment *segPtr, *prevPtr;
     int offset;
 
 
-    hPtr = Tcl_FindHashEntry(&textPtr->markTable, string);
+    hPtr = FindPublicMark(textPtr, string);
     if (hPtr != NULL) {
 	/*
 	 * If given a mark name, return the previous mark in the list of
@@ -826,43 +934,77 @@ MarkFindPrev(interp, textPtr, string)
 	    /* Empty loop body */ ;
 	}
     }
+
+    /*
+     * segPtr is the first segment that is not a candidate (NULL: the
+     * whole line is).  The candidates of a line are its segments
+     * before segPtr, with the contents of the blocks among them in
+     * their place (LastMarkInLine); then come the lines before it in
+     * the same tree, then the line of the block holding the tree, up
+     * to that block (BUGS 35: the contents of a block were searched
+     * from the second segment of its first line only, and the rest of
+     * the line after the block was not searched).
+     */
+
     while (1) {
-	TkTextLine *linePtr;
-	/*
-	 * segPtr points just past the first possible candidate,
-	 * or at the begining of the line.
-	 *
-	 * prevPtr2 is the previous candidate, it is non-NULL only if
-	 * we go forward into iBTree.
-	 */
-	for (prevPtr = prevPtr2, seg2Ptr = index.linePtr->segPtr; 
-		seg2Ptr != NULL && seg2Ptr != segPtr;
-		seg2Ptr = seg2Ptr->nextPtr) {
-	    if (seg2Ptr->typePtr == &tkTextRightMarkType ||
-		    seg2Ptr->typePtr == &tkTextLeftMarkType) {
-		prevPtr = seg2Ptr;
-	    } else if ((seg2Ptr->typePtr == &tkTextIBTreeType)
-		       && seg2Ptr->body.itree.tree) {
-		index.linePtr = TkIBTreeFirstLine(seg2Ptr);
-		seg2Ptr = index.linePtr->segPtr;
-	    }
-	}
-	if (prevPtr != NULL && seg2Ptr == segPtr) {
+	TkTextLine *linePtr = index.linePtr;
+
+	prevPtr = LastMarkInLine(textPtr, linePtr, segPtr);
+	if (prevPtr != NULL) {
 	    Tcl_SetResult(interp, Tcl_GetHashKey(&textPtr->markTable, prevPtr->body.mark.hPtr), TCL_STATIC);
-
-
 	    return TCL_OK;
 	}
-	linePtr = index.linePtr;
-	index.linePtr = TkBTreePreviousLine(index.linePtr);
+	index.linePtr = TkBTreePreviousLine(linePtr);
 	segPtr = NULL;
 	if (index.linePtr == (TkTextLine *) NULL) {
+	    /* Pop to external tree, up to the block. */
 	    if ( (segPtr = TkIBTreeNode2seg(linePtr->parentPtr, 
 					    &(index.linePtr))) ) {
 		continue;
 	    }
 	    return TCL_OK;
 	}
-	segPtr = NULL;
     }
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * LastMarkInLine --
+ *
+ *	The last public mark among the segments of a line before
+ *	stopPtr (all of them if it is NULL), the contents of the blocks
+ *	among them included (in document order).
+ *
+ *--------------------------------------------------------------
+ */
+
+static TkTextSegment *
+LastMarkInLine(textPtr, linePtr, stopPtr)
+    TkText *textPtr;
+    TkTextLine *linePtr;
+    TkTextSegment *stopPtr;
+{
+    TkTextSegment *segPtr, *bestPtr = NULL, *innerPtr;
+    TkTextLine *innerLinePtr;
+
+    for (segPtr = linePtr->segPtr; (segPtr != NULL) && (segPtr != stopPtr);
+	    segPtr = segPtr->nextPtr) {
+	if ((segPtr->typePtr == &tkTextRightMarkType ||
+		segPtr->typePtr == &tkTextLeftMarkType)
+		&& !TkTextIsPrivateMark(textPtr, segPtr)) {
+	    bestPtr = segPtr;
+	} else if ((segPtr->typePtr == &tkTextIBTreeType)
+		&& segPtr->body.itree.tree) {
+	    for (innerLinePtr = TkIBTreeFirstLine(segPtr);
+		    innerLinePtr != NULL;
+		    innerLinePtr = TkBTreeNextLine(innerLinePtr)) {
+		innerPtr = LastMarkInLine(textPtr, innerLinePtr, NULL);
+		if (innerPtr != NULL) {
+		    bestPtr = innerPtr;
+		}
+	    }
+	}
+    }
+    return bestPtr;
 }

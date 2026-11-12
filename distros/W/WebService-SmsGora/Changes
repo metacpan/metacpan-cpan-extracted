@@ -1,5 +1,8 @@
 Revision history for WebService-SmsGora
 
+1.001  2026-11-12
+    - Description now leads with the product name; no code changes.
+
 1.000  2026-11-11
     - First release: send SMS, bulk SMS, messages, received SMS, devices,
       account, webhooks, and webhook signature check.

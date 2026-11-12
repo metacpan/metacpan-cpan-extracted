@@ -95,6 +95,8 @@ static Tk_ConfigSpec configSpecs[] = {
 	DEF_TEXT_INSERT_WIDTH, Tk_Offset(TkText, insertWidth), 0},
     {TK_CONFIG_INT, "-maxundo", "maxUndo", "MaxUndo",
 	"0", Tk_Offset(TkText, maxUndo), 0},
+    {TK_CONFIG_BOOLEAN, "-ornamentproportional", "ornamentProportional",
+	"OrnamentProportional", "0", Tk_Offset(TkText, ornProportional), 0},
     {TK_CONFIG_PIXELS, "-padx", "padX", "Pad",
 	DEF_TEXT_PADX, Tk_Offset(TkText, padX), 0},
     {TK_CONFIG_PIXELS, "-pady", "padY", "Pad",
@@ -206,6 +208,19 @@ typedef struct InsertState {
     char *tagOn;			/* For each: whether it is on at the
 					 * point of the list reached. */
     int numTags;			/* How many of them. */
+    int useDefects;			/* Whether the list's leaf defects
+					 * (the pairs [depth, defect] of its
+					 * separators) are given back. */
+    TkTextLine **defectLines;		/* The leaves re-created with a
+					 * defect, which they get once
+					 * everything is in (an array that may
+					 * grow); meanwhile they are real all
+					 * the way up, so that the separators
+					 * after them cut the stored tree at
+					 * their own levels only. */
+    int *defects;			/* Their defects. */
+    int numDefects;			/* How many. */
+    int maxDefects;			/* Room in the arrays. */
 } InsertState;
 
 /*
@@ -242,6 +257,15 @@ static Tcl_Obj *	TextGetList _ANSI_ARGS_((TkText *textPtr,
 			    TkTextIndex *index1Ptr, TkTextIndex *index2Ptr));
 static void		InsertList _ANSI_ARGS_((TkText *textPtr,
 			    TkTextIndex *indexPtr, Tcl_Obj *listObj));
+static void		NoteLeafDefect _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, int defect,
+			    struct InsertState *statePtr));
+static int		CheckListDefects _ANSI_ARGS_((AV *av, int first,
+			    int depth));
+static void		SeparatorPair _ANSI_ARGS_((SV *inner, int *depthPtr,
+			    int *defectPtr));
+static void		WrapsChanged _ANSI_ARGS_((TkText *textPtr,
+			    int *wraps));
 static void		InsertListElements _ANSI_ARGS_((TkText *textPtr,
 			    char *markName, char *startMark, AV *av, int first,
 			    InsertState *statePtr));
@@ -262,6 +286,15 @@ static void		NotOnDummyLine _ANSI_ARGS_((TkText *textPtr,
 static TkTextUndoAtom *	PushEdit _ANSI_ARGS_((TkText *textPtr, int mode,
 			    int type, char *index1, char *index2,
 			    Tcl_Obj *string));
+static int		Sprout _ANSI_ARGS_((TkText *textPtr, char *i1,
+			    char *i2, int startMade, int endMade,
+			    int doValues, int *raisedPtr,
+			    int *rootWrappedPtr));
+static int		SproutLeafIndex _ANSI_ARGS_((TkText *textPtr,
+			    char *i1, int startMade, TkTextIndex *indexPtr));
+static int		Flatten _ANSI_ARGS_((TkText *textPtr, void *nodePtr));
+static void		PullOutStep _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr));
 static void		EditOther _ANSI_ARGS_((TkText *textPtr,
 			    TkTextUndoAtom *atomPtr, int revert));
 static void		EditFinish _ANSI_ARGS_((TkText *textPtr,
@@ -281,6 +314,7 @@ static void		DeletionSeparator _ANSI_ARGS_((TkText *textPtr));
 static void		VcBegin _ANSI_ARGS_((TkText *textPtr, int argc,
 			    Arg *args));
 static int		VcFinish _ANSI_ARGS_((TkText *textPtr));
+static int		VcSamePlace _ANSI_ARGS_((Tcl_Obj *a, Tcl_Obj *b));
 static int		ModifyingCommand _ANSI_ARGS_((TkText *textPtr,
 			    int argc, Arg *args));
 static int		TextWidgetCmd _ANSI_ARGS_((ClientData clientData,
@@ -431,6 +465,7 @@ Tk_eTextCmd(clientData, interp, argc, args)
     Tcl_InitHashTable(&textPtr->imageTable, TCL_STRING_KEYS);
     textPtr->numDLines = 0;
     textPtr->dlinePtrs = NULL;
+    textPtr->ornInfoPtr = NULL;
     textPtr->state = tkTextNormalUid;
     textPtr->border = NULL;
     textPtr->borderWidth = 0;
@@ -492,6 +527,8 @@ Tk_eTextCmd(clientData, interp, argc, args)
     textPtr->valueCapture = NULL;
     textPtr->valueAddresses = NULL;
     textPtr->editValues = NULL;
+    textPtr->editAtom = NULL;
+    textPtr->rootLog = NULL;
     textPtr->freeingValues = 0;
     textPtr->freeLimit = TK_TEXT_FREE_DEPTH;
     textPtr->freeAsks = 0;
@@ -784,13 +821,13 @@ TextWidgetCmd(clientData, interp, argc, args)
 	while (linePtr != index2.linePtr) {
 	  TkBTreeLineTextAppend(textPtr, linePtr, offset, -1, 
 				(void*)&dstring, 
-				textPtr->getFlags | TKT_GET_DSTRING, NULL);
+				TkTextUserGetFlags(textPtr) | TKT_GET_DSTRING, NULL);
 	  offset = -1;			/* Report all of the rest */
 	  linePtr = TkBTreeNextLine(linePtr);
 	}
 	TkBTreeLineTextAppend(textPtr, linePtr, offset, index2.byteIndex,
 			      (void*)&dstring, 
-			      textPtr->getFlags | TKT_GET_DSTRING, NULL);
+			      TkTextUserGetFlags(textPtr) | TKT_GET_DSTRING, NULL);
 	Tcl_AppendResult(interp, Tcl_DStringValue(&dstring),          NULL);
 	Tcl_DStringFree(&dstring);
     } else if ((c == 'i') && (strncmp(LangString(args[1]), "image", length) == 0)
@@ -862,6 +899,8 @@ TextWidgetCmd(clientData, interp, argc, args)
 	}
     } else if ((c == 'd') && (strncmp(LangString(args[1]), "dump", length) == 0)) {
 	result = TextDumpCmd(textPtr, interp, argc, args);
+    } else if ((c == 'o') && (strncmp(LangString(args[1]), "ornament", length) == 0)) {
+	result = TkTextOrnamentCmd(textPtr, interp, argc, args);
     } else if ((c == 'm') && (strncmp(LangString(args[1]), "mark", length) == 0)) {
 	result = TkTextMarkCmd(textPtr, interp, argc, args);
     } else if ((c == 's') && (strcmp(LangString(args[1]), "scan") == 0) && (length >= 2)) {
@@ -887,7 +926,7 @@ TextWidgetCmd(clientData, interp, argc, args)
     } else {
 	Tcl_AppendResult(interp, "bad option \"", LangString(args[1]),
 		"\": must be bbox, block, cget, compare, configure, debug, delete, ",
-		"dlineinfo, edit, get, image, index, insert, mark, scan, search, see, ",
+		"dlineinfo, edit, get, image, index, insert, mark, ornament, scan, search, see, ",
 		"tag, window, xview, or yview",
 		         NULL);
 	result = TCL_ERROR;
@@ -1008,7 +1047,9 @@ ModifyingCommand(textPtr, argc, args)
 	    return 1;
 	}
 	return Abbrev(*sub, "trim", 1) || Abbrev(*sub, "insert", 1)
-		|| Abbrev(*sub, "split", 1) || Abbrev(*sub, "addline", 2)
+		|| Abbrev(*sub, "split", 1) || Abbrev(*sub, "sprout", 3)
+		|| Abbrev(*sub, "flatten", 1)
+		|| Abbrev(*sub, "addline", 2)
 		|| ((strlen(LangString(*sub)) > 6)
 			&& Abbrev(*sub, "deletelines", 7));
     }
@@ -1095,6 +1136,10 @@ typedef struct TkTextVcEntry {
     int predicted;			/* The event the callback was told
 					 * before the change, or 0. */
     int actual;				/* What happened last, or 0. */
+    int predictedMask;			/* All the events foreseen (1 << event):
+					 * a value that "block sprout" shares
+					 * between owners may be foreseen to go
+					 * from each in another way. */
     int pending;			/* Told nothing yet. */
     Tcl_Obj *where;			/* Its place, before the change (and,
 					 * for a move, the new one), or NULL. */
@@ -1108,17 +1153,26 @@ typedef struct TkTextVcPost {
     struct TkTextVcPost *nextPtr;
 } TkTextVcPost;
 
+typedef struct TkTextVcPending {
+    TkTextVcEntry *entryPtr;		/* The value. */
+    int event;				/* For another owner of a shared value: */
+    Tcl_Obj *where;			/* its event and place (owned); NULL for
+					 * the entry's own. */
+} TkTextVcPending;
+
 typedef struct TkTextVcState {
     Tcl_HashTable table;		/* Arg -> TkTextVcEntry. */
     TkTextVcEntry *first, *last;
-    TkTextVcEntry **pending;		/* To tell (TkTextVcNotify). */
+    TkTextVcPending *pending;		/* To tell (TkTextVcNotify). */
     int numPending, maxPending;
     TkTextVcPost *post, *lastPost;	/* To tell at the end. */
     char *cause;			/* The command. */
+    int noNew;				/* An undo or a redo: what it
+					 * re-creates is not told "new". */
 } TkTextVcState;
 
 static char *vcEvents[] = {
-    "", "drop", "stash", "move", "restore", "discard", "late"
+    "", "drop", "stash", "move", "restore", "discard", "late", "copy", "new"
 };
 static char *vcKinds[] = {
     "", "node", "run", "mark", "block"
@@ -1166,6 +1220,12 @@ VcCause(argc, args)
 	if (Abbrev(args[2], "trim", 1)) {
 	    return "block trim";
 	}
+	if (Abbrev(args[2], "sprout", 3)) {
+	    return "block sprout";
+	}
+	if (Abbrev(args[2], "flatten", 1)) {
+	    return "block flatten";
+	}
 	if (Abbrev(args[2], "split", 1)) {
 	    return "block split";
 	}
@@ -1211,6 +1271,7 @@ VcBegin(textPtr, argc, args)
     vcPtr->post = vcPtr->lastPost = NULL;
     vcPtr->cause = ckalloc((unsigned) (strlen(cause) + 1));
     strcpy(vcPtr->cause, cause);
+    vcPtr->noNew = (strcmp(cause, "undo") == 0) || (strcmp(cause, "redo") == 0);
     textPtr->vcPtr = vcPtr;
 }
 
@@ -1236,6 +1297,7 @@ VcEntry(vcPtr, id, kind)
     entryPtr->id = id;
     entryPtr->kind = kind;
     entryPtr->predicted = entryPtr->actual = entryPtr->pending = 0;
+    entryPtr->predictedMask = 0;
     entryPtr->where = NULL;
     entryPtr->nextPtr = NULL;
     if (vcPtr->last == NULL) {
@@ -1434,6 +1496,38 @@ TkTextVcPredict(textPtr, value, event, kind, where, to)
     } else if (to != NULL) {
 	Tcl_DecrRefCount(to);
     }
+    entryPtr->predictedMask |= 1 << event;
+    if (vcPtr->numPending >= vcPtr->maxPending) {
+	TkTextVcPending *grown;
+
+	vcPtr->maxPending = 2 * vcPtr->maxPending + 16;
+	grown = (TkTextVcPending *) ckalloc((unsigned)
+		(vcPtr->maxPending * sizeof(TkTextVcPending)));
+	if (vcPtr->numPending > 0) {
+	    memcpy(grown, vcPtr->pending,
+		    vcPtr->numPending * sizeof(TkTextVcPending));
+	}
+	if (vcPtr->pending != NULL) {
+	    ckfree((char *) vcPtr->pending);
+	}
+	vcPtr->pending = grown;
+    }
+    if (entryPtr->pending && !VcSamePlace(entryPtr->where, where)) {
+	/*
+	 * Another owner of the same value (shared by block sprout):
+	 * told too, with its own place.
+	 */
+
+	TkTextVcPending *pPtr = &vcPtr->pending[vcPtr->numPending++];
+
+	pPtr->entryPtr = entryPtr;
+	pPtr->event = event;
+	pPtr->where = where;
+	if ((event == TK_TEXT_VC_DROP) || (event == TK_TEXT_VC_STASH)) {
+	    entryPtr->predicted = event;
+	}
+	return;
+    }
     if (entryPtr->where != NULL) {
 	Tcl_DecrRefCount(entryPtr->where);
     }
@@ -1441,24 +1535,41 @@ TkTextVcPredict(textPtr, value, event, kind, where, to)
     entryPtr->predicted = event;
     entryPtr->actual = 0;
     if (!entryPtr->pending) {
-	if (vcPtr->numPending >= vcPtr->maxPending) {
-	    TkTextVcEntry **grown;
-
-	    vcPtr->maxPending = 2 * vcPtr->maxPending + 16;
-	    grown = (TkTextVcEntry **) ckalloc((unsigned)
-		    (vcPtr->maxPending * sizeof(TkTextVcEntry *)));
-	    if (vcPtr->numPending > 0) {
-		memcpy(grown, vcPtr->pending,
-			vcPtr->numPending * sizeof(TkTextVcEntry *));
-	    }
-	    if (vcPtr->pending != NULL) {
-		ckfree((char *) vcPtr->pending);
-	    }
-	    vcPtr->pending = grown;
-	}
-	vcPtr->pending[vcPtr->numPending++] = entryPtr;
+	vcPtr->pending[vcPtr->numPending].entryPtr = entryPtr;
+	vcPtr->pending[vcPtr->numPending].event = 0;
+	vcPtr->pending[vcPtr->numPending++].where = NULL;
 	entryPtr->pending = 1;
     }
+}
+
+/*
+ * Whether two places (as TkTextVcNodePlace and the others make them)
+ * name the same owner: their first two elements are the same.
+ */
+
+static int
+VcSamePlace(a, b)
+    Tcl_Obj *a, *b;
+{
+    Tcl_Obj **av, **bv;
+    int ac, bc, i;
+
+    if ((a == NULL) || (b == NULL)) {
+	return (a == b);
+    }
+    if ((Tcl_ListObjGetElements(NULL, a, &ac, &av) != TCL_OK)
+	    || (Tcl_ListObjGetElements(NULL, b, &bc, &bv) != TCL_OK)) {
+	return 1;
+    }
+    for (i = 0; i < 2; i++) {
+	if ((i >= ac) || (i >= bc)) {
+	    return (ac == bc);
+	}
+	if (strcmp(Tcl_GetString(av[i]), Tcl_GetString(bv[i])) != 0) {
+	    return 0;
+	}
+    }
+    return 1;
 }
 
 void
@@ -1499,12 +1610,128 @@ TkTextVcNotify(textPtr)
     num = vcPtr->numPending;
     vcPtr->numPending = 0;
     for (i = 0; i < num; i++) {
-	TkTextVcEntry *entryPtr = vcPtr->pending[i];
+	TkTextVcPending *pPtr = &vcPtr->pending[i];
+	TkTextVcEntry *entryPtr = pPtr->entryPtr;
 
 	entryPtr->pending = 0;
-	VcCall(textPtr, entryPtr->predicted, entryPtr->kind, entryPtr->where,
-		entryPtr->id);
+	if (pPtr->where != NULL) {
+	    VcCall(textPtr, pPtr->event, entryPtr->kind, pPtr->where,
+		    entryPtr->id);
+	    Tcl_DecrRefCount(pPtr->where);
+	} else {
+	    VcCall(textPtr, entryPtr->predicted, entryPtr->kind,
+		    entryPtr->where, entryPtr->id);
+	}
     }
+}
+
+/*
+ * TkTextVcTell: tell the callback at once, outside the table of what
+ * is foreseen and checked at the end: a change of a value's place that
+ * detaches nothing (the WRAP and PULL OUT of ragged trees change the
+ * levels in the addresses of the nodes above, "move"), and the copies
+ * of "block sprout" ("copy").  where is consumed.
+ */
+
+void
+TkTextVcTell(textPtr, event, kind, where, value)
+    TkText *textPtr;
+    int event, kind;
+    Tcl_Obj *where;
+    Arg value;
+{
+    if (TkTextVcOn(textPtr) && (value != NULL)) {
+	VcCall(textPtr, event, kind, where, value);
+    }
+    if (where != NULL) {
+	Tcl_DecrRefCount(where);
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextVcNew, TkTextVcNewOn, TkTextVcCharPlace, TkTextVcIndexPlace --
+ *
+ *	(Provisional, decision O5.)  The event "new": a node or a leaf
+ *	that a change creates without a value (block split, a newline in
+ *	a block, block insert, block sprout, a WRAP, the leaves a
+ *	dissolved block leaves in the enclosing one, a root that becomes
+ *	real), told before the change, at once (outside the table of
+ *	detaches), with the place the node will have after the change
+ *	and the value undef.  The look-ahead (TkBTreeVcNew... in
+ *	tkTextBTree.c) computes those places while the text is as it
+ *	was: TkTextVcCharPlace and TkTextVcIndexPlace give [index,
+ *	level] for a position now (a line and a byte offset in the
+ *	outermost tree, or an index) moved by a number of characters on
+ *	its line (a change inside a block keeps everything on one line).
+ *	What an undo or a redo re-creates is not told (TkTextVcNewOn is
+ *	0): such a node gets its value back ("restore") if it had one.
+ *	where is consumed.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkTextVcNewOn(textPtr)
+    TkText *textPtr;
+{
+    return TkTextVcOn(textPtr) && !textPtr->vcPtr->noNew;
+}
+
+void
+TkTextVcNew(textPtr, where)
+    TkText *textPtr;
+    Tcl_Obj *where;
+{
+    if (TkTextVcNewOn(textPtr)) {
+	Tcl_Obj *undef = Tcl_NewObj();
+
+	VcCall(textPtr, TK_TEXT_VC_NEW, TK_TEXT_VC_NODE, where, undef);
+	Tcl_DecrRefCount(undef);
+    }
+    if (where != NULL) {
+	Tcl_DecrRefCount(where);
+    }
+}
+
+static Tcl_Obj *
+VcShifted(position, chars, level)
+    Tcl_Obj *position;			/* "line.char", consumed. */
+    int chars, level;
+{
+    Tcl_Obj *listPtr = Tcl_NewListObj(0, NULL);
+    int line, ch;
+
+    if ((chars != 0)
+	    && (sscanf(Tcl_GetString(position), "%d.%d", &line, &ch) == 2)) {
+	char buffer[2 * TCL_INTEGER_SPACE + 2];
+
+	sprintf(buffer, "%d.%d", line, ch + chars);
+	Tcl_DecrRefCount(position);
+	position = Tcl_NewStringObj(buffer, -1);
+    }
+    Tcl_ListObjAppendElement(NULL, listPtr, position);
+    Tcl_ListObjAppendElement(NULL, listPtr, Tcl_NewIntObj(level));
+    return listPtr;
+}
+
+Tcl_Obj *
+TkTextVcCharPlace(textPtr, line, byteIndex, chars, level)
+    TkText *textPtr;
+    int line, byteIndex;		/* A position now. */
+    int chars, level;
+{
+    return VcShifted(VcPosition(textPtr, line, byteIndex), chars, level);
+}
+
+Tcl_Obj *
+TkTextVcIndexPlace(textPtr, indexPtr, chars, level)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;		/* A position now. */
+    int chars, level;
+{
+    return VcShifted(VcIndex(indexPtr), chars, level);
 }
 
 /*
@@ -1643,7 +1870,8 @@ VcFinish(textPtr)
 		VcPostLater(vcPtr, TK_TEXT_VC_LATE, entryPtr->kind,
 			entryPtr->where, entryPtr->id);
 		entryPtr->where = NULL;
-	    } else if (predicted != actual) {
+	    } else if ((predicted != actual)
+		    && !(entryPtr->predictedMask & (1 << actual))) {
 		problem = "foreseen as another event";
 	    }
 	} else if ((predicted != 0) && (actual == 0)) {
@@ -1687,6 +1915,13 @@ VcFinish(textPtr)
     }
     Tcl_DeleteHashTable(&vcPtr->table);
     if (vcPtr->pending != NULL) {
+	int i;
+
+	for (i = 0; i < vcPtr->numPending; i++) {
+	    if (vcPtr->pending[i].where != NULL) {
+		Tcl_DecrRefCount(vcPtr->pending[i].where);
+	    }
+	}
 	ckfree((char *) vcPtr->pending);
     }
     ckfree(vcPtr->cause);
@@ -1782,7 +2017,8 @@ DataSlotCmd(textPtr, interp, argc, args)
 	    return TCL_ERROR;
 	}
     } else if (what[0] == 'm') {
-	hPtr = Tcl_FindHashEntry(&textPtr->markTable, LangString(args[3]));
+	hPtr = TkTextIsPrivateMarkName(LangString(args[3])) ? NULL
+		: Tcl_FindHashEntry(&textPtr->markTable, LangString(args[3]));
 	if (hPtr == NULL) {
 	    Tcl_AppendResult(interp, "there is no mark named \"",
 		    LangString(args[3]), "\"", NULL);
@@ -2004,6 +2240,7 @@ DestroyText(memPtr)
       }
       ckfree((char*)textPtr->dlinePtrs);
     }
+    TkTextOrnFreeAll(textPtr);
     TkTextFreeDInfo(textPtr);
     TkBTreeDestroy(textPtr->tree);
     for (hPtr = Tcl_FirstHashEntry(&textPtr->blockTable, &search);
@@ -2045,6 +2282,7 @@ DestroyText(memPtr)
     textPtr->selBorder = NULL;
     textPtr->selBdString = NULL;
     TkTextUndoFreeStack(textPtr->undoStack);
+    TkTextRootLogReset(textPtr);
     textPtr->selFgColorPtr = NULL;
     Tk_FreeOptions(configSpecs, (char *) textPtr, textPtr->display, 0);
 
@@ -2422,17 +2660,21 @@ InsertChars(textPtr, indexPtr, string)
 	    offset += strlen(string);
 	}
     }
+    TkBTreeVcNewInsert(textPtr, indexPtr, string);
     TkTextChanged(textPtr, indexPtr, indexPtr);
+    TkTextRootLogReset(textPtr);
     TkBTreeInsertChars(indexPtr, string);
 
     /*
      * Record the insertion for "edit undo", and account for it in the
-     * modified flag.
+     * modified flag.  A newline in a block that was a single leaf made
+     * its root real: the undo makes it padding again (roots).
      */
 
     if (textPtr->undo) {
 	TkTextIndex toIndex;
 	char index1[TK_POS_CHARS], index2[TK_POS_CHARS];
+	TkTextUndoAtom *atomPtr;
 
 	if (textPtr->autoSeparators
 		&& (textPtr->lastEditMode != TK_TEXT_EDIT_INSERT)) {
@@ -2442,9 +2684,11 @@ InsertChars(textPtr, indexPtr, string)
 	TkTextPrintIndex(indexPtr, index1);
 	TkTextIndexForwBytes(indexPtr, (int) strlen(string), &toIndex);
 	TkTextPrintIndex(&toIndex, index2);
-	TkTextUndoPushAction(textPtr->undoStack, TK_TEXT_UNDO_INSERT,
-		index1, index2, Tcl_NewStringObj(string, -1), (Tcl_Obj *) NULL,
+	atomPtr = TkTextUndoPushAction(textPtr->undoStack,
+		TK_TEXT_UNDO_INSERT, index1, index2,
+		Tcl_NewStringObj(string, -1), (Tcl_Obj *) NULL,
 		(char *) NULL, 0);
+	atomPtr->roots = TkTextRootLogTake(textPtr);
     }
     UpdateDirtyFlag(textPtr);
     if (resetView) {
@@ -2513,6 +2757,205 @@ SplitChars(textPtr, indexPtr, level)
 }
 
 /*
+ *----------------------------------------------------------------------
+ *
+ * Sprout --
+ *
+ *	The changes of "block sprout" (see TkIBTreeSproutRange), right
+ *	to left: a separator at index2 if an end piece is made, one at
+ *	index1 if a start piece is made (as "block split" at level 0:
+ *	in a leaf with padding the new leaves get padding chains of their
+ *	own, siblings of the leaf), then the WRAP of the middle piece,
+ *	which starts just after index1.  With doValues, the former
+ *	leaf's value goes to the new node and to the end piece (the
+ *	command; its redo gets the values back from the undo atom).
+ *
+ * Results:
+ *	The number of separators put in; *raisedPtr: whether the stored
+ *	tree was made one level higher.
+ *
+ * Side effects:
+ *	The text and the block's tree change, the display is told.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+Sprout(textPtr, i1, i2, startMade, endMade, doValues, raisedPtr,
+	rootWrappedPtr)
+    TkText *textPtr;
+    char *i1, *i2;			/* The range, as given. */
+    int startMade, endMade;		/* The pieces to make. */
+    int doValues;			/* See above. */
+    int *raisedPtr;			/* Filled in. */
+    int *rootWrappedPtr;		/* Filled in: whether the block was a
+					 * single leaf, given a real root. */
+{
+    Tcl_Interp *interp = textPtr->interp;
+    TkTextIndex index, mid, head, end;
+    TkTextSegment *segPtr;
+
+    *raisedPtr = 0;
+    *rootWrappedPtr = 0;
+
+    /*
+     * A block that is a single leaf first gets a real root (the WRAP of
+     * its leaf), so that the pieces are its children.
+     */
+
+    if (SproutLeafIndex(textPtr, i1, startMade, &index)
+	    && TkIBTreeSingleLeaf(&index)) {
+	TkIBTreeWrap(textPtr, &index);
+	*rootWrappedPtr = 1;
+    }
+    if (endMade && (TkTextGetIndex(interp, textPtr, i2, &index) == TCL_OK)) {
+	SplitChars(textPtr, &index, 0);
+    }
+    if (startMade && (TkTextGetIndex(interp, textPtr, i1, &index) == TCL_OK)) {
+	SplitChars(textPtr, &index, 0);
+    }
+    if (TkTextGetIndex(interp, textPtr, i1, &index) != TCL_OK) {
+	Tcl_ResetResult(interp);
+	return 0;
+    }
+    TkTextIndexForwChars(&index, 1, &mid);
+    *raisedPtr = (TkIBTreeWrap(textPtr, &mid) > 0);
+    if (doValues) {
+	TkIBTreeSproutValues(textPtr, &mid, startMade, endMade);
+    }
+    if ((segPtr = TkIBTreeAt(&mid, 1)) != NULL) {
+	TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	TkTextIndexForwBytes(&head, segPtr->size, &end);
+	TkTextChanged(textPtr, &head, &end);
+    }
+    textPtr->abortSelections = 1;
+    return startMade + endMade;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Flatten, PullOutStep --
+ *
+ *	The changes of "block flatten" (see TkIBTreeFlattenStep): until
+ *	the node has a single leaf, the JOIN of the rightmost separator
+ *	inside it whose two leaves are equally deep below their common
+ *	ancestor (the deletion of the separator, as "delete" does it:
+ *	recorded as a deletion, told to -valuecommand as today's join),
+ *	else the PULL OUT of the deepest node inside it with a single
+ *	child that is a leaf (the rightmost among equally deep ones);
+ *	then the PULL OUT of the node itself (the root too: the block is
+ *	then a single leaf).  Each PULL OUT makes the stored tree lower
+ *	while every lowest node is padding.  With -undo, every step is
+ *	an atom of one undo step, of a kind of its own for
+ *	-autoseparators (TK_TEXT_EDIT_FLATTEN): the undo is the inverse
+ *	steps in reverse order, the redo the steps again.
+ *
+ * Results:
+ *	Flatten: the number of separators deleted.
+ *
+ * Side effects:
+ *	The text and the block's tree change, the display is told.
+ *
+ *----------------------------------------------------------------------
+ */
+
+static int
+Flatten(textPtr, nodePtr)
+    TkText *textPtr;
+    void *nodePtr;			/* The node (TkIBTreeFlattenTarget). */
+{
+    TkTextIndex pos, head, end;
+    TkTextSegment *segPtr;
+    char sep[TK_POS_CHARS];
+    int joined = 0, kind, steps = 0;
+
+    if (textPtr->undo && textPtr->autoSeparators
+	    && (textPtr->lastEditMode != TK_TEXT_EDIT_FLATTEN)) {
+	TkTextUndoInsertUndoSeparator(textPtr->undoStack);
+    }
+    do {
+	kind = TkIBTreeFlattenStep(textPtr, nodePtr, &pos);
+	if ((segPtr = TkIBTreeAt(&pos, 1)) != NULL) {
+	    TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	    TkTextIndexForwBytes(&head, segPtr->size, &end);
+	    TkTextChanged(textPtr, &head, &end);
+	}
+	if (kind == TK_IBTREE_FLATTEN_JOIN) {
+	    /*
+	     * The deletion is in the same undo step: it must not start
+	     * one of its own (DeletionSeparator).
+	     */
+
+	    TkTextPrintIndex(&pos, sep);
+	    if (textPtr->undo) {
+		textPtr->lastEditMode = TK_TEXT_EDIT_DELETE;
+	    }
+	    if (DeleteChars(textPtr, sep, (char *) NULL) != TCL_OK) {
+		Tcl_ResetResult(textPtr->interp);
+		break;
+	    }
+	    joined++;
+	} else if (kind != 0) {
+	    PullOutStep(textPtr, &pos);
+	}
+    } while ((kind != 0) && (kind != TK_IBTREE_FLATTEN_SELF)
+	    && (++steps < 100000));
+    if (textPtr->undo) {
+	textPtr->lastEditMode = TK_TEXT_EDIT_FLATTEN;
+    }
+    textPtr->abortSelections = 1;
+    return joined;
+}
+
+static void
+PullOutStep(textPtr, indexPtr)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;		/* The start of the leaf. */
+{
+    CaptureState cs;
+    TkTextUndoAtom *atomPtr = NULL;
+    char i1[TK_POS_CHARS];
+    int lowered;
+
+    if (textPtr->undo) {
+	TkTextPrintIndex(indexPtr, i1);
+	textPtr->lastEditMode = TK_TEXT_EDIT_FLATTEN;
+	atomPtr = PushEdit(textPtr, TK_TEXT_EDIT_FLATTEN, TK_TEXT_UNDO_PULLOUT,
+		i1, i1, (Tcl_Obj *) NULL);
+	CaptureStart(textPtr, &cs, &atomPtr->values, indexPtr, indexPtr);
+    }
+    lowered = TkIBTreePullOutNode(textPtr, indexPtr, 1, -1);
+    if (atomPtr != NULL) {
+	CaptureEnd(textPtr, &cs);
+	atomPtr->added = (lowered > 0) ? lowered : 0;
+    }
+}
+
+/*
+ * A position inside the leaf "block sprout" works on, before it does:
+ * index1, or the start of the leaf if index1 is the delimiter before it
+ * (no start piece).
+ */
+
+static int
+SproutLeafIndex(textPtr, i1, startMade, indexPtr)
+    TkText *textPtr;
+    char *i1;				/* index1 as given. */
+    int startMade;			/* Whether a start piece is made. */
+    TkTextIndex *indexPtr;		/* Filled in. */
+{
+    if (TkTextGetIndex(textPtr->interp, textPtr, i1, indexPtr) != TCL_OK) {
+	Tcl_ResetResult(textPtr->interp);
+	return 0;
+    }
+    if (!startMade) {
+	TkTextIndexForwChars(indexPtr, 1, indexPtr);
+    }
+    return 1;
+}
+
+/*
  * A deletion is an edit of its own kind (-autoseparators): the separator
  * goes before everything it records.
  */
@@ -2558,8 +3001,9 @@ DeleteChars(textPtr, index1String, index2String)
 				 * delete the one character given by
 				 * index1String. */
 {
-    int line1, line2, line, byteIndex, resetView;
+    int line1, line2, line, byteIndex, resetView, *wraps;
     TkTextIndex index1, index2;
+    TkTextUndoAtom *recordPtr = NULL;	/* The atom recorded, if any. */
     TkTextValue **captureList = NULL, **oldCapture;
     Tcl_HashTable addresses, *oldAddresses;
 
@@ -2658,6 +3102,25 @@ DeleteChars(textPtr, index1String, index2String)
     }
 
     /*
+     * In a block with leaves of different depths, the two leaves the
+     * deletion joins are first made equally deep (WRAPs of the
+     * shallower one: no text changes, -valuecommand is told).  Their
+     * record goes to the undo atom (below), or to the atom an undo or
+     * a redo applies (editAtom): undoing the deletion pulls them out
+     * again (TkIBTreeUndoWraps).
+     */
+
+    wraps = TkBTreeEqualizeDelete(textPtr, &index1, &index2);
+    if (textPtr->editAtom != NULL) {
+	if (textPtr->editAtom->wraps != NULL) {
+	    ckfree((char *) textPtr->editAtom->wraps);
+	}
+	textPtr->editAtom->wraps = wraps;
+	textPtr->editAtom = NULL;
+	wraps = NULL;
+    }
+
+    /*
      * With a -valuecommand: the values the deletion will detach, while
      * the text is unchanged (they go to the undo step if it can be
      * undone, see below).
@@ -2668,6 +3131,7 @@ DeleteChars(textPtr, index1String, index2String)
 		((textPtr->undo || (textPtr->editValues != NULL))
 			&& textPtr->haveValues)
 		? TK_TEXT_VC_STASH : TK_TEXT_VC_DROP);
+	TkBTreeVcNewDissolve(textPtr, &index1, &index2);
     }
 
     /*
@@ -2761,7 +3225,10 @@ DeleteChars(textPtr, index1String, index2String)
 	    atomPtr->cuts = TkIBTreeCutPositions(&index1, &index2, &ext1,
 		    &atomPtr->numHeads, &atomPtr->numTails);
 	}
+	atomPtr->wraps = wraps;
+	wraps = NULL;
 	captureList = &atomPtr->values;
+	recordPtr = atomPtr;
 	Tcl_DStringFree(&ds);
     } else if (textPtr->editValues != NULL) {
 	/*
@@ -2771,6 +3238,9 @@ DeleteChars(textPtr, index1String, index2String)
 
 	captureList = textPtr->editValues;
 	textPtr->editValues = NULL;
+    }
+    if (wraps != NULL) {
+	ckfree((char *) wraps);		/* Not recorded. */
     }
     UpdateDirtyFlag(textPtr);
 
@@ -2787,7 +3257,18 @@ DeleteChars(textPtr, index1String, index2String)
 	textPtr->valueCapture = captureList;
 	textPtr->valueAddresses = &addresses;
     }
+    TkTextRootLogReset(textPtr);
+    TkTextOrnBeforeDelete(textPtr, &index1, &index2);
     TkBTreeDeleteChars(&index1, &index2, 1, 1);
+    TkTextOrnAfterDelete(textPtr);
+    if (recordPtr != NULL) {
+	/*
+	 * The leaves of a block dissolved in a block that was a single
+	 * leaf made its root real: the undo makes it padding again.
+	 */
+
+	recordPtr->roots = TkTextRootLogTake(textPtr);
+    }
     if (textPtr->valueAddresses == &addresses) {
 	TkBTreeFreeSnapshot(&addresses);
     }
@@ -2898,7 +3379,7 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
 			      textPtr->selIndex.byteIndex,
 			      textPtr->selIndex.byteIndex + 1, 
 			      (void*)&dString, 
-			      textPtr->getFlags | TKT_GET_NOELIDE | TKT_GET_DSTRING,
+			      TkTextUserGetFlags(textPtr) | TKT_GET_NOELIDE | TKT_GET_DSTRING,
 			      NULL);
 	s = Tcl_DStringValue(&dString) + textPtr->selRest;
 	i = Tcl_DStringLength(&dString) - textPtr->selRest;
@@ -2946,7 +3427,7 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
 	    }
 	    pos = TkBTreeLineTextAppend(textPtr, linePtr, startOff, endOff,
 					(void *)buffer, 
-					textPtr->getFlags | TKT_GET_NOELIDE | TKT_GET_BUFFER,
+					TkTextUserGetFlags(textPtr) | TKT_GET_NOELIDE | TKT_GET_BUFFER,
 					&maxBytes);
 	    buffer += m - maxBytes;
 	    count  += m - maxBytes;
@@ -2970,7 +3451,7 @@ TextFetchSelection(clientData, offset, buffer, maxBytes)
 		Tcl_DStringInit(&dString);
 		TkBTreeLineTextAppend(textPtr, linePtr, pos, pos + 1, 
 				      (void*)&dString, 
-				      textPtr->getFlags | TKT_GET_NOELIDE | TKT_GET_DSTRING,
+				      TkTextUserGetFlags(textPtr) | TKT_GET_NOELIDE | TKT_GET_DSTRING,
 				      NULL);
 		s = Tcl_DStringValue(&dString);
 		while (i--) {
@@ -3281,11 +3762,11 @@ TextSearchCmd(textPtr, interp, argc, args)
 	if (lineNum == startingLine) {
 	    passes++;
 	    TkBTreeLineTextAppend(textPtr, linePtr, 0, startingChar, (void*)&line, 
-				  textPtr->getFlags | noCase | elideFlag | TKT_GET_DSTRING,
+				  TkTextUserGetFlags(textPtr) | noCase | elideFlag | TKT_GET_DSTRING,
 				  NULL);
 	    firstChar = Tcl_DStringLength(&line);
 	    TkBTreeLineTextAppend(textPtr, linePtr, startingChar, -1, (void*)&line, 
-				  textPtr->getFlags | noCase | elideFlag | TKT_GET_DSTRING,
+				  TkTextUserGetFlags(textPtr) | noCase | elideFlag | TKT_GET_DSTRING,
 				  NULL);
 	    if ((passes == 1) ^ backwards) {
 		lastChar = INT_MAX;
@@ -3295,7 +3776,7 @@ TextSearchCmd(textPtr, interp, argc, args)
 	    }
 	} else {
 	    TkBTreeLineTextAppend(textPtr, linePtr, 0, -1, (void*)&line, 
-				  textPtr->getFlags | noCase | elideFlag | TKT_GET_DSTRING,
+				  TkTextUserGetFlags(textPtr) | noCase | elideFlag | TKT_GET_DSTRING,
 				  NULL);
 	    firstChar = 0;
 	    lastChar = INT_MAX;
@@ -3378,12 +3859,12 @@ TextSearchCmd(textPtr, interp, argc, args)
 
 	    int offset = matchChar;
 	    int posStart = TkBTreeLineTextAppend(textPtr, linePtr, 0, -1, NULL,
-						 textPtr->getFlags | elideFlag | TKT_GET_OFFSET,
+						 TkTextUserGetFlags(textPtr) | elideFlag | TKT_GET_OFFSET,
 						 &offset);
 
 	    offset += matchLength;
 	    matchLength = TkBTreeLineTextAppend(textPtr, linePtr, posStart, -1, NULL,
-						textPtr->getFlags | elideFlag | TKT_GET_OFFSET,
+						TkTextUserGetFlags(textPtr) | elideFlag | TKT_GET_OFFSET,
 						&offset) 
 	      - posStart;
 	    if (offset) matchLength++; /* Include partially matched
@@ -3482,6 +3963,9 @@ static Tk_ConfigSpec blockConfigSpecs[] = {
 		TK_CONFIG_NULL_OK},
     {TK_CONFIG_CALLBACK, "-leafemptycallback",          NULL,          NULL,
 	         NULL, Tk_Offset(TkTextBlock, leafEmptyCallBack),
+		TK_CONFIG_NULL_OK},
+    {TK_CONFIG_LANGARG, "-ornaments",          NULL,          NULL,
+	         NULL, Tk_Offset(TkTextBlock, ornamentsArg),
 		TK_CONFIG_NULL_OK},
     {TK_CONFIG_END,          NULL,          NULL,          NULL,
 	         NULL, 0, 0}
@@ -3664,6 +4148,8 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	  blockPtr->widthsMin = NULL;
 	  blockPtr->widthsMax = NULL;
 	  blockPtr->widthsStr = NULL;
+	  blockPtr->ornamentsArg = NULL;
+	  blockPtr->ornTemplates = NULL;
 	} else {
 	  blockPtr = (TkTextBlock *) Tcl_GetHashValue(hPtr);
 	}
@@ -3676,9 +4162,37 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	} else {
 	    int result;
 	    char *w = LangString(args[0]);
+	    Arg oldOrnaments = blockPtr->ornamentsArg;
 
+	    /*
+	     * -ornaments: parsed into templates (tkTextOrn.c); a value
+	     * that does not parse leaves the old one.
+	     */
+
+	    if (oldOrnaments != NULL) {
+		oldOrnaments = LangCopyArg(oldOrnaments);
+	    }
 	    result = Tk_ConfigureWidget(interp, textPtr->tkwin, blockConfigSpecs,
 		    argc-4, args+4, (char *) blockPtr, 0);
+	    if (result == TCL_OK) {
+		struct TkTextOrnTemplates *templPtr;
+
+		if (TkTextOrnTemplatesParse(interp, textPtr,
+			blockPtr->ornamentsArg, &templPtr) == TCL_OK) {
+		    TkTextOrnTemplatesRelease(textPtr, blockPtr->ornTemplates);
+		    blockPtr->ornTemplates = templPtr;
+		} else {
+		    if (blockPtr->ornamentsArg != NULL) {
+			LangFreeArg(blockPtr->ornamentsArg, LANG_DYNAMIC);
+		    }
+		    blockPtr->ornamentsArg = oldOrnaments;
+		    oldOrnaments = NULL;
+		    result = TCL_ERROR;
+		}
+	    }
+	    if (oldOrnaments != NULL) {
+		LangFreeArg(oldOrnaments, LANG_DYNAMIC);
+	    }
 	    blockPtr->widthsNum = 0;
 	    if (blockPtr->widthsStr) {
               int argc, code, count;
@@ -4026,6 +4540,7 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	    TkTextValue *captured = NULL;
 	    CaptureState cs;
 	    int result, topLine, topOffset, *levels = NULL, numLevels = 0;
+	    int *defects = NULL, numDefects = 0;
 	    char i1[TK_POS_CHARS], i2[TK_POS_CHARS];
 
 	    /*
@@ -4039,9 +4554,13 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	    TkTextPrintIndex(&index2, i2);
 	    TkBTreeVcPredictBlock(textPtr, &index1, &index2, textPtr->undo
 		    ? TK_TEXT_VC_STASH : TK_TEXT_VC_DROP);
+	    if (!blockPtr->empty) {
+		TkBTreeVcNewBlock(textPtr, &index1, &index2);
+	    }
 	    if (textPtr->undo) {
 		levels = TkIBTreeSeparatorLevels(&index1, &index2,
 			&numLevels);
+		defects = TkIBTreeLeafDefects(&index1, &index2, &numDefects);
 		CaptureStart(textPtr, &cs, &captured, &index1, &index2);
 	    }
 	    TkTextChanged(textPtr, &index1, &index2);
@@ -4067,10 +4586,15 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 		    atomPtr->values = captured;
 		    atomPtr->levels = levels;
 		    atomPtr->numLevels = numLevels;
+		    atomPtr->defects = defects;
+		    atomPtr->numDefects = numDefects;
 		} else {
 		    TkTextFreeValueList(textPtr, captured);
 		    if (levels != NULL) {
 			ckfree((char *) levels);
+		    }
+		    if (defects != NULL) {
+			ckfree((char *) defects);
 		    }
 		}
 	    }
@@ -4147,8 +4671,8 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	LangSetString(&arg, "");
 	while (linePtr != index2.linePtr) {
 	  TkBTreeLineTextAppend(textPtr, linePtr, offset, -1, 
-				(void*)&listFactory, 
-				textPtr->getFlags | TKT_GET_LIST, NULL);
+				(void*)&listFactory, TkTextUserGetFlags(textPtr)
+				| TKT_GET_LIST, NULL);
 	  offset = -1;			/* Report all of the rest */
 	  ListFactoryAppendCopyWithType(&listFactory, arg, 
 					IdType("NL",
@@ -4156,11 +4680,88 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 	  linePtr = TkBTreeNextLine(linePtr);
 	}
 	TkBTreeLineTextAppend(textPtr, linePtr, offset, index2.byteIndex,
-			      (void*)&listFactory, 
-			      textPtr->getFlags | TKT_GET_LIST, NULL);
+			      (void*)&listFactory, TkTextUserGetFlags(textPtr)
+			      | TKT_GET_LIST, NULL);
 	ListFactoryResult(textPtr->interp, &listFactory);
 	ListFactoryFree(&listFactory);
 	LangFreeArg(arg, LANG_DYNAMIC);
+    } else if ((c == 'f')
+	    && (strncmp(LangString(args[2]), "flatten", length) == 0)) {
+	void *nodePtr;
+	int joined = 0;
+
+	if (argc != 5) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    LangString(args[0]), " block flatten index level\"", NULL);
+	    return TCL_ERROR;
+	}
+	if ((TkTextGetIndex(interp, textPtr, LangString(args[3]), &index1)
+		!= TCL_OK)
+		|| (TkIBTreeFlattenTarget(textPtr, &index1, LangString(args[3]),
+			args[4], &nodePtr) != TCL_OK)) {
+	    return TCL_ERROR;
+	}
+	if (nodePtr != NULL) {
+	    joined = Flatten(textPtr, nodePtr);
+	    UpdateDirtyFlag(textPtr);
+	}
+	Tcl_SetObjResult(interp, Tcl_NewIntObj(joined));
+    } else if ((c == 's') && (length >= 3)
+	    && (strncmp(LangString(args[2]), "sprout", length) == 0)) {
+	int startMade, endMade, raised, rootWrapped, oneIndex = (argc == 4);
+	char i1[TK_POS_CHARS], i2[TK_POS_CHARS];
+
+	if ((argc != 4) && (argc != 5)) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    LangString(args[0]), " block sprout index1 ?index2?\"",
+		    NULL);
+	    return TCL_ERROR;
+	}
+	if (TkTextGetIndex(interp, textPtr, LangString(args[3]), &index1)
+		!= TCL_OK) {
+	    return TCL_ERROR;
+	}
+	if (oneIndex) {
+	    /*
+	     * One index (decision O8): the WRAP of the leaf it names, as
+	     * the range from the delimiter before the leaf to just after
+	     * the one after it (which, for the only leaf of a block, the
+	     * two-index form cannot name).
+	     */
+
+	    index2 = index1;
+	    if (TkIBTreeSproutLeaf(textPtr, &index2, &index1, &index2)
+		    != TCL_OK) {
+		return TCL_ERROR;
+	    }
+	    startMade = endMade = 0;
+	} else if ((TkTextGetIndex(interp, textPtr, LangString(args[4]),
+		&index2) != TCL_OK)
+		|| (TkIBTreeSproutRange(textPtr, &index1, &index2, &startMade,
+			&endMade) != TCL_OK)) {
+	    return TCL_ERROR;
+	}
+	TkTextPrintIndex(&index1, i1);
+	TkTextPrintIndex(&index2, i2);
+	TkBTreeVcNewSprout(textPtr, &index1, &index2, startMade, endMade);
+	Sprout(textPtr, i1, i2, startMade, endMade, 1, &raised, &rootWrapped);
+
+	/*
+	 * Recorded for undo (TK_TEXT_UNDO_SPROUT): the range as given,
+	 * the pieces made, whether the tree was made higher, whether the
+	 * block was a single leaf.  It drops no values.
+	 */
+
+	if (textPtr->undo) {
+	    TkTextUndoAtom *atomPtr = PushEdit(textPtr, TK_TEXT_EDIT_SPROUT,
+		    TK_TEXT_UNDO_SPROUT, i1, i2, (Tcl_Obj *) NULL);
+
+	    atomPtr->level = startMade + 2 * endMade + 4 * rootWrapped
+		    + 8 * oneIndex;
+	    atomPtr->added = raised;
+	}
+	UpdateDirtyFlag(textPtr);
+	Tcl_SetObjResult(interp, Tcl_NewIntObj(startMade + endMade));
     } else if ((c == 's') && (strncmp(LangString(args[2]), "split", length) == 0)) {
         int level = 0;
 
@@ -4181,6 +4782,8 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 
 	    NotOnDummyLine(textPtr, &index1);
 	    TkTextPrintIndex(&index1, i1);
+	    TkBTreeVcNewSplit(textPtr, &index1, level);
+	    TkTextRootLogReset(textPtr);
 	    level = SplitChars(textPtr, &index1, level);
 
 	    /*
@@ -4199,6 +4802,7 @@ TkTextBlockCmd(textPtr, interp, argc, args)
 			TK_TEXT_UNDO_SPLIT, i1, i2, (Tcl_Obj *) NULL);
 		atomPtr->level = asked;
 		atomPtr->added = (level > 0) ? level : 0;
+		atomPtr->roots = TkTextRootLogTake(textPtr);
 	    }
 	    UpdateDirtyFlag(textPtr);
 	}
@@ -4206,7 +4810,8 @@ TkTextBlockCmd(textPtr, interp, argc, args)
     } else {
 	Tcl_AppendResult(interp, "bad block option \"", LangString(args[2]),
 		"\":  must be at, addline, cget, configure, data, delete, ",
-		"deletelines, insert, list, names, nodedata, of, split or trim",
+		"deletelines, flatten, insert, list, names, nodedata, of, ",
+		"split, sprout or trim",
 		         NULL);
 	return TCL_ERROR;
     }
@@ -4236,6 +4841,7 @@ DeleteBlock(textPtr, blockPtr)
     TkTextBlock *blockPtr;		/* Block to delete. */
 {
   Tk_FreeOptions(blockConfigSpecs, (char *) blockPtr, textPtr->display, 0);
+  TkTextOrnTemplatesRelease(textPtr, blockPtr->ornTemplates);
   if (blockPtr->widthsMin) {
     ckfree((char*)blockPtr->widthsMin);
   }
@@ -4601,7 +5207,8 @@ DumpLine(interp, textPtr, what, linePtr, extLinePtr, base, start, end, command)
 			&index, what, (Arg) NULL);
 	    }
 	} else if ((offset >= start)) {
-	    if ((what & TK_DUMP_MARK) && (segPtr->typePtr->name[0] == 'm')) {
+	    if ((what & TK_DUMP_MARK) && (segPtr->typePtr->name[0] == 'm')
+		    && !TkTextIsPrivateMark(textPtr, segPtr)) {
 		TkTextMark *markPtr = (TkTextMark *)&segPtr->body;
 		char *name = Tcl_GetHashKey(&textPtr->markTable, markPtr->hPtr);
 		DumpSegment(interp, "mark", name,
@@ -4719,7 +5326,7 @@ TextGetText(textPtr, index1Ptr, index2Ptr, dsPtr)
 {
     TkTextLine *linePtr = index1Ptr->linePtr;
     int offset = index1Ptr->byteIndex;
-    int flags = textPtr->getFlags | TKT_GET_DSTRING;
+    int flags = TkTextUserGetFlags(textPtr) | TKT_GET_DSTRING;
 
     Tcl_DStringInit(dsPtr);
     if (TkTextIndexCmp(index1Ptr, index2Ptr) >= 0) {
@@ -4917,6 +5524,30 @@ TkTextEditAction(textPtr, atomPtr, revert)
 		    (map.starts != NULL) ? &map : NULL, &atomPtr->displaced, 2);
 	    TkBTreeRestoreValues(textPtr, atomPtr->values, NULL,
 		    &atomPtr->displaced, 1);
+
+	    /*
+	     * The deletion made the leaves it joined equally deep first
+	     * (WRAPs): now that the text, its structure and the values
+	     * are back as they were after those, they are undone (PULL
+	     * OUTs, in reverse order).
+	     */
+
+	    if (atomPtr->wraps != NULL) {
+		WrapsChanged(textPtr, atomPtr->wraps);
+		TkIBTreeUndoWraps(textPtr, atomPtr->wraps,
+			&atomPtr->displaced);
+	    }
+
+	    /*
+	     * Blocks that were single leaves before the deletion (whose
+	     * roots the leaves of blocks dissolved in them made real) are
+	     * single leaves again.
+	     */
+
+	    if (atomPtr->type == TK_TEXT_UNDO_DELETE) {
+		TkIBTreeRepadRoots(textPtr, atomPtr->roots,
+			&atomPtr->displaced);
+	    }
 	} else {
 	    TkTextFreeValueList(textPtr, remainsValues);
 	    TkTextDiscardValueList(textPtr, atomPtr->values);
@@ -4945,6 +5576,10 @@ TkTextEditAction(textPtr, atomPtr, revert)
 		Tcl_DecrRefCount(atomPtr->list);
 		atomPtr->list = NULL;
 	    }
+	    if (atomPtr->wraps != NULL) {
+		ckfree((char *) atomPtr->wraps);
+		atomPtr->wraps = NULL;
+	    }
 	    if ((TkTextGetIndex(interp, textPtr, atomPtr->index1, &i1)
 		    == TCL_OK)
 		    && (TkTextGetIndex(interp, textPtr, atomPtr->index2, &i2)
@@ -4952,6 +5587,13 @@ TkTextEditAction(textPtr, atomPtr, revert)
 		    && (TkTextIndexCmp(&i1, &i2) < 0)
 		    && (TkIBTreeCutRange(&i1, &i2, &ext1, &ext2, &remains)
 			== 0)) {
+		/*
+		 * The deletion's WRAPs first (if the leaves it joins are
+		 * not equally deep), so that the list is taken from the
+		 * tree the redo restores before pulling them out.
+		 */
+
+		atomPtr->wraps = TkBTreeEqualizeDelete(textPtr, &i1, &i2);
 		atomPtr->list = TextGetList(textPtr, &i1, &i2);
 	    }
 	    Tcl_ResetResult(interp);
@@ -4966,10 +5608,14 @@ TkTextEditAction(textPtr, atomPtr, revert)
 	TkTextDiscardValueList(textPtr, atomPtr->values);
 	atomPtr->values = NULL;
 	textPtr->editValues = &atomPtr->values;
+	if (atomPtr->type == TK_TEXT_UNDO_DELETE) {
+	    textPtr->editAtom = atomPtr;	/* Its WRAPs, done again. */
+	}
 	if (DeleteChars(textPtr, atomPtr->index1, atomPtr->index2) != TCL_OK) {
 	    ok = 0;
 	}
 	textPtr->editValues = NULL;
+	textPtr->editAtom = NULL;
 
 	/*
 	 * The values the last undo (or redo) displaced come back; what
@@ -4984,6 +5630,15 @@ TkTextEditAction(textPtr, atomPtr, revert)
 	    atomPtr->displaced = NULL;
 	    TkBTreeRestoreValues(textPtr, displaced, NULL, &atomPtr->values,
 		    1);
+
+	    /*
+	     * The undo of an insertion whose newline made the root of a
+	     * block that was a single leaf real: padding again.
+	     */
+
+	    if (atomPtr->type == TK_TEXT_UNDO_INSERT) {
+		TkIBTreeRepadRoots(textPtr, atomPtr->roots, &atomPtr->values);
+	    }
 	}
 	markIndex = atomPtr->index1;
     }
@@ -4994,6 +5649,30 @@ TkTextEditAction(textPtr, atomPtr, revert)
     }
     UpdateDirtyFlag(textPtr);
     EditFinish(textPtr, markIndex);
+}
+
+/*
+ * Before the undo of a deletion's WRAPs: the block they are in is laid
+ * out again.
+ */
+
+static void
+WrapsChanged(textPtr, wraps)
+    TkText *textPtr;		/* Information about text widget. */
+    int *wraps;			/* See TkBTreeEqualizeDelete. */
+{
+    TkTextIndex index, head, end;
+    TkTextSegment *segPtr;
+
+    if ((wraps[1] < 0) || (wraps[1] >= TkBTreeNumLines(textPtr->tree))) {
+	return;
+    }
+    TkTextMakeByteIndex(textPtr->tree, wraps[1], wraps[2], &index);
+    if ((segPtr = TkIBTreeAt(&index, 1)) != NULL) {
+	TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	TkTextIndexForwBytes(&head, segPtr->size, &end);
+	TkTextChanged(textPtr, &head, &end);
+    }
 }
 
 /*
@@ -5111,6 +5790,23 @@ EditOther(textPtr, atomPtr, revert)
 		TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
 		CaptureStart(textPtr, &cs, &atomPtr->values, &head, &head);
 		for (i = 0; i < atomPtr->added; i++) {
+		    TkTextIndex leaf;
+
+		    /*
+		     * In a block that was a single leaf, the last level to
+		     * take away is the root the split added above it: its
+		     * only child is the leaf's padding (a PULL OUT of the
+		     * root: the block is a single leaf again).
+		     */
+
+		    TkTextIndexForwBytes(&head, 1, &leaf);
+		    if ((i == atomPtr->added - 1)
+			    && TkIBTreeRootOverPadding(segPtr)) {
+			if (TkIBTreePullOutNode(textPtr, &leaf, 1, -1) < 0) {
+			    break;
+			}
+			continue;
+		    }
 		    TkBTreeVcPredictTrim(textPtr, segPtr, TK_TEXT_VC_STASH);
 		    if (TkIBTreeTrim(textPtr, segPtr) != TCL_OK) {
 			break;
@@ -5119,6 +5815,10 @@ EditOther(textPtr, atomPtr, revert)
 		CaptureEnd(textPtr, &cs);
 		TkTextIndexForwBytes(&head, segPtr->size, &end);
 		TkTextChanged(textPtr, &head, &end);
+	    }
+	    if ((atomPtr->roots != NULL) && (TkTextGetIndex(interp, textPtr,
+		    atomPtr->index1, &index1) == TCL_OK)) {
+		TkIBTreeRepadRoots(textPtr, atomPtr->roots, &atomPtr->values);
 	    }
 	    mark = atomPtr->index1;
 	} else {
@@ -5176,7 +5876,23 @@ EditOther(textPtr, atomPtr, revert)
 		TkTextIndex head;
 
 		TkIBTreeSetSeparatorLevels(textPtr, &index1, atomPtr->levels,
-			atomPtr->numLevels);
+			atomPtr->numLevels, atomPtr->defects,
+			atomPtr->numDefects);
+		TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+		TkTextIndexForwBytes(&head, segPtr->size, &end);
+		TkTextChanged(textPtr, &head, &end);
+	    } else if ((atomPtr->defects != NULL) && (TkTextGetIndex(interp,
+		    textPtr, atomPtr->index1, &index1) == TCL_OK)
+		    && ((segPtr = TkIBTreeAt(&index1, 1)) != NULL)) {
+		TkTextIndex head;
+
+		/*
+		 * In a ragged tree the leaves get their defects back (the
+		 * dissolution gave them the padding of the first).
+		 */
+
+		TkIBTreeSetLeafDefects(textPtr, &index1, atomPtr->defects,
+			atomPtr->numDefects);
 		TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
 		TkTextIndexForwBytes(&head, segPtr->size, &end);
 		TkTextChanged(textPtr, &head, &end);
@@ -5215,6 +5931,11 @@ EditOther(textPtr, atomPtr, revert)
 	    }
 	    atomPtr->levels = TkIBTreeSeparatorLevels(&index1, &index2,
 		    &atomPtr->numLevels);
+	    if (atomPtr->defects != NULL) {
+		ckfree((char *) atomPtr->defects);
+	    }
+	    atomPtr->defects = TkIBTreeLeafDefects(&index1, &index2,
+		    &atomPtr->numDefects);
 	    TkBTreeVcPredictBlock(textPtr, &index1, &index2,
 		    TK_TEXT_VC_STASH);
 	    CaptureStart(textPtr, &cs, &atomPtr->values, &index1, &index2);
@@ -5243,6 +5964,137 @@ EditOther(textPtr, atomPtr, revert)
 	    }
 	}
 	break;
+    case TK_TEXT_UNDO_SPROUT: {
+	int startMade = atomPtr->level & 1, endMade = (atomPtr->level & 2) != 0;
+	int rootWrapped = (atomPtr->level & 4) != 0;
+	TkTextIndex mid, head;
+
+	if (revert) {
+	    /*
+	     * In a block that was a single leaf, a value set on the root
+	     * the sprout made real goes aside first (for the redo).
+	     */
+
+	    if (rootWrapped && (TkTextGetIndex(interp, textPtr,
+		    atomPtr->index1, &mid) == TCL_OK)) {
+		TkTextIndexForwChars(&mid, 1, &mid);
+		TkIBTreeDisplaceRoot(textPtr, &mid, &atomPtr->displaced);
+	    }
+
+	    /*
+	     * The inverse steps, right to left: the new node is pulled
+	     * out (the middle leaf takes its value), the tree made lower
+	     * again if the sprout made it higher, then the separator
+	     * after the middle leaf and the one before it are deleted
+	     * (joins: the start side keeps its value, the other goes to
+	     * the atom; the redo gets them all back).
+	     */
+
+	    TkTextIndexForwChars(&index1, 1, &mid);
+	    if ((segPtr = TkIBTreeAt(&mid, 1)) == NULL) {
+		ok = 0;
+		break;
+	    }
+	    TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	    TkTextIndexForwBytes(&head, segPtr->size, &end);
+	    TkTextChanged(textPtr, &head, &end);
+	    CaptureStart(textPtr, &cs, &atomPtr->values, &mid, &mid);
+	    TkIBTreePullOut(textPtr, &mid, atomPtr->added);
+	    CaptureEnd(textPtr, &cs);
+	    if (endMade) {
+		char sep[TK_POS_CHARS];
+
+		TkTextIndexForwChars(&index2, startMade, &end);
+		TkTextPrintIndex(&end, sep);
+		textPtr->editValues = &atomPtr->values;
+		DeleteChars(textPtr, sep, (char *) NULL);
+		textPtr->editValues = NULL;
+	    }
+	    if (startMade) {
+		textPtr->editValues = &atomPtr->values;
+		DeleteChars(textPtr, atomPtr->index1, (char *) NULL);
+		textPtr->editValues = NULL;
+	    }
+
+	    /*
+	     * The block is a single leaf again: its root padding.
+	     */
+
+	    if (rootWrapped && SproutLeafIndex(textPtr, atomPtr->index1,
+		    startMade, &mid)) {
+		TkIBTreeRepadRootIn(textPtr, &mid, &atomPtr->displaced);
+	    }
+	} else {
+	    int raised, s0, e0, oneIndex = (atomPtr->level & 8) != 0;
+
+	    if (oneIndex) {
+		TkTextIndex a, b;
+
+		/*
+		 * The one-index form: the leaf after index1 must still
+		 * go from just after index1 to just before index2.
+		 */
+
+		TkTextIndexForwChars(&index1, 1, &a);
+		if ((TkIBTreeSproutLeaf(textPtr, &a, &a, &b) != TCL_OK)
+			|| (TkTextIndexCmp(&a, &index1) != 0)
+			|| (TkTextIndexCmp(&b, &index2) != 0)) {
+		    Tcl_ResetResult(interp);
+		    ok = 0;		/* Not there: stale indices. */
+		    break;
+		}
+	    } else if ((TkIBTreeSproutRange(textPtr, &index1, &index2, &s0,
+		    &e0) != TCL_OK) || (s0 != startMade) || (e0 != endMade)) {
+		ok = 0;			/* Not there: stale indices. */
+		break;
+	    }
+	    Sprout(textPtr, atomPtr->index1, atomPtr->index2, startMade,
+		    endMade, 0, &raised, &rootWrapped);
+	    atomPtr->added = raised;
+	    atomPtr->level = startMade + 2 * endMade + 4 * rootWrapped
+		    + 8 * oneIndex;
+	}
+	mark = atomPtr->index1;
+	break;
+    }
+    case TK_TEXT_UNDO_PULLOUT: {
+	TkTextIndex head;
+
+	/*
+	 * A PULL OUT of block flatten.  Undone by a WRAP of the leaf (its
+	 * topmost padding node becomes real, after the stored tree is
+	 * made as high as before); the values come back below (the
+	 * node's from the leaf, the leaf's own).  Redone by the PULL OUT
+	 * again.
+	 */
+
+	if ((segPtr = TkIBTreeAt(&index1, 1)) == NULL) {
+	    ok = 0;
+	    break;
+	}
+	TkIBTreeStartIndex(textPtr->tree, segPtr, &head);
+	TkTextIndexForwBytes(&head, segPtr->size, &end);
+	TkTextChanged(textPtr, &head, &end);
+	if (revert) {
+	    TkIBTreeRaise(&index1, atomPtr->added);
+	    if (TkIBTreeWrap(textPtr, &index1) < 0) {
+		ok = 0;
+	    }
+	} else {
+	    int lowered;
+
+	    CaptureStart(textPtr, &cs, &atomPtr->values, &index1, &index1);
+	    lowered = TkIBTreePullOutNode(textPtr, &index1, 1, -1);
+	    CaptureEnd(textPtr, &cs);
+	    if (lowered < 0) {
+		ok = 0;
+	    } else {
+		atomPtr->added = lowered;
+	    }
+	}
+	mark = atomPtr->index1;
+	break;
+    }
     case TK_TEXT_UNDO_TRIM:
 	segPtr = TkIBTreeAt(&index1, 0);
 	if ((segPtr == NULL) || (segPtr->body.itree.tree == NULL)) {
@@ -5870,15 +6722,15 @@ TextGetList(textPtr, index1Ptr, index2Ptr)
     }
     while (linePtr != index2Ptr->linePtr) {
 	TkBTreeLineTextAppend(textPtr, linePtr, offset, -1,
-		(void *) &listFactory,
-		textPtr->getFlags | TKT_GET_LIST | TKT_GET_NOVALUES, NULL);
+		(void *) &listFactory, TkTextUserGetFlags(textPtr) | TKT_GET_LIST
+		| TKT_GET_NOVALUES | TKT_GET_PRIVATE, NULL);
 	offset = -1;
 	ListFactoryAppendCopyWithType(&listFactory, arg, "Tk::Text::NewLine");
 	linePtr = TkBTreeNextLine(linePtr);
     }
     TkBTreeLineTextAppend(textPtr, linePtr, offset, index2Ptr->byteIndex,
-	    (void *) &listFactory,
-	    textPtr->getFlags | TKT_GET_LIST | TKT_GET_NOVALUES, NULL);
+	    (void *) &listFactory, TkTextUserGetFlags(textPtr) | TKT_GET_LIST
+	    | TKT_GET_NOVALUES | TKT_GET_PRIVATE, NULL);
     LangFreeArg(arg, LANG_DYNAMIC);
     result = newRV_inc((SV *) ListFactoryArg(&listFactory));
     ListFactoryFree(&listFactory);
@@ -5911,6 +6763,21 @@ MarkOp(textPtr, op, name, extra)
     Arg argv[5];
     int argc = 4, i, result;
 
+    if (TkTextIsPrivateMarkName(name)) {
+	/*
+	 * A private mark (see InsertListElements), which the mark command
+	 * does not know: only its gravity is set here.
+	 */
+
+	Tcl_HashEntry *hPtr = Tcl_FindHashEntry(&textPtr->markTable, name);
+
+	if ((hPtr != NULL) && (strcmp(op, "gravity") == 0)) {
+	    TkTextSetMarkGravity(textPtr,
+		    (TkTextSegment *) Tcl_GetHashValue(hPtr),
+		    extra[0] == 'l');
+	}
+	return TCL_OK;
+    }
     argv[0] = argv[1] = argv[2] = argv[3] = argv[4] = NULL;
     LangSetString(&argv[0], Tk_PathName(textPtr->tkwin));
     LangSetString(&argv[1], "mark");
@@ -5976,7 +6843,24 @@ InsertList(textPtr, indexPtr, listObj)
     state.tags = NULL;
     state.tagOn = NULL;
     state.numTags = 0;
+    state.defectLines = NULL;
+    state.defects = NULL;
+    state.numDefects = state.maxDefects = 0;
     ScanListTags(textPtr, (AV *) SvRV((SV *) listObj), 0, &state);
+
+    /*
+     * The leaf defects of a list of the undo must be those of a tree
+     * that follows the rules of padding (O7): at a separator of stored
+     * depth s, both leaves have defects of at most s.  Else they are
+     * not given back (a panic under "debug": the list was not made
+     * from such a tree).
+     */
+
+    state.useDefects = CheckListDefects((AV *) SvRV((SV *) listObj), 0,
+	    -1);
+    if (!state.useDefects && tkBTreeDebug) {
+	panic("InsertList: leaf defects deeper than their separators");
+    }
 
     /*
      * Two marks: a right-gravity one that stays after everything
@@ -6016,6 +6900,22 @@ InsertList(textPtr, indexPtr, listObj)
     MarkOp(textPtr, "unset", markName, (char *) NULL);
     MarkOp(textPtr, "unset", startMark, (char *) NULL);
     undoMarkCount -= 2;
+
+    /*
+     * Everything is in: the leaves re-created get their defects (a
+     * refusal is an inconsistency: a panic under "debug").
+     */
+
+    for (i = 0; i < state.numDefects; i++) {
+	if ((TkIBTreeSetDefect(textPtr, state.defectLines[i],
+		state.defects[i]) != 0) && tkBTreeDebug) {
+	    panic("InsertList: defect %d refused", state.defects[i]);
+	}
+    }
+    if (state.defectLines != NULL) {
+	ckfree((char *) state.defectLines);
+	ckfree((char *) state.defects);
+    }
     if (state.pending != NULL) {
 	ckfree((char *) state.pending);
     }
@@ -6121,6 +7021,87 @@ ScanListTags(textPtr, av, first, statePtr)
     }
 }
 
+/*
+ * SeparatorPair --
+ *	The depth and the defect a separator element of a list gives: a
+ *	plain number (a blessed scalar) is the stored depth of the
+ *	separator, the leaf after it having no padding (defect 0); a pair
+ *	[depth, defect] (a blessed array) gives the defect of the leaf
+ *	after it; [undef, defect] stands before a padded first leaf (no
+ *	separator: *depthPtr is -1).
+ *
+ * CheckListDefects --
+ *	Whether the leaf defects of a list (or of a block's contents in it,
+ *	from element "first") follow the rule of the import (O7): at a
+ *	separator of stored depth s, both adjacent leaves have defects of
+ *	at most s; and no leaf has more padding than its block has levels
+ *	below the root (depth: the header's, or -1 if unknown).  A leaf
+ *	whose start is not in the list is not checked.
+ */
+
+static void
+SeparatorPair(inner, depthPtr, defectPtr)
+    SV *inner;			/* The referent of the element. */
+    int *depthPtr, *defectPtr;	/* Filled in. */
+{
+    SV **svp;
+
+    if (SvTYPE(inner) != SVt_PVAV) {
+	*depthPtr = (int) SvIV(inner);
+	*defectPtr = 0;
+	return;
+    }
+    svp = av_fetch((AV *) inner, 0, 0);
+    *depthPtr = ((svp != NULL) && SvOK(*svp)) ? (int) SvIV(*svp) : -1;
+    svp = av_fetch((AV *) inner, 1, 0);
+    *defectPtr = ((svp != NULL) && SvOK(*svp)) ? (int) SvIV(*svp) : 0;
+}
+
+static int
+CheckListDefects(av, first, depth)
+    AV *av;			/* The elements. */
+    int first;			/* Index of the first element to use. */
+    int depth;			/* The depth of the block's header, or -1. */
+{
+    int i, n = av_len(av) + 1, prev = -1, s, d;
+    SV **svp, *elt;
+
+    for (i = first; i < n; i++) {
+	svp = av_fetch(av, i, 0);
+	if ((svp == NULL) || !SvROK(*svp) || !sv_isobject(*svp)) {
+	    continue;
+	}
+	elt = *svp;
+	if (sv_derived_from(elt, "Tk::Text::BlockSeparator")) {
+	    SeparatorPair(SvRV(elt), &s, &d);
+	    if ((d < 0) || ((depth >= 0) && (d > depth))) {
+		return 0;
+	    }
+	    if ((s >= 0) && ((d > s) || ((prev >= 0) && (prev > s)))) {
+		return 0;
+	    }
+	    prev = d;
+	} else if (sv_derived_from(elt, "Tk::Text::Block")
+		&& (SvTYPE(SvRV(elt)) == SVt_PVAV)) {
+	    AV *bav = (AV *) SvRV(elt);
+	    int inner = -1;
+
+	    svp = av_fetch(bav, 0, 0);
+	    if ((svp != NULL) && SvROK(*svp)
+		    && (SvTYPE(SvRV(*svp)) == SVt_PVAV)) {
+		svp = av_fetch((AV *) SvRV(*svp), 1, 0);
+		if ((svp != NULL) && SvOK(*svp)) {
+		    inner = (int) SvIV(*svp);
+		}
+	    }
+	    if (!CheckListDefects(bav, 1, inner)) {
+		return 0;
+	    }
+	}
+    }
+    return 1;
+}
+
 static void
 InsertListText(textPtr, markName, indexPtr, string, statePtr)
     TkText *textPtr;		/* Overall information about text widget. */
@@ -6141,6 +7122,51 @@ InsertListText(textPtr, markName, indexPtr, string, statePtr)
 	    TkBTreeTag(&start, &end, statePtr->tags[j], 0);
 	}
     }
+}
+
+/*
+ * NoteLeafDefect --
+ *	A leaf re-created from a list starts at an index: it is real all
+ *	the way up until everything is in, then it gets its defect (see
+ *	InsertState).
+ */
+
+static void
+NoteLeafDefect(textPtr, indexPtr, defect, statePtr)
+    TkText *textPtr;		/* Overall information about text widget. */
+    TkTextIndex *indexPtr;	/* Where the leaf starts. */
+    int defect;			/* Its defect. */
+    InsertState *statePtr;	/* Where the defects go. */
+{
+    TkTextLine *linePtr = TkIBTreeLeafAt(indexPtr);
+    int j;
+
+    if (!statePtr->useDefects || (linePtr == NULL)) {
+	return;
+    }
+    if (statePtr->numDefects >= statePtr->maxDefects) {
+	TkTextLine **lines;
+	int *defects;
+
+	statePtr->maxDefects = 2 * statePtr->maxDefects + 8;
+	lines = (TkTextLine **) ckalloc((unsigned)
+		(statePtr->maxDefects * sizeof(TkTextLine *)));
+	defects = (int *) ckalloc((unsigned)
+		(statePtr->maxDefects * sizeof(int)));
+	for (j = 0; j < statePtr->numDefects; j++) {
+	    lines[j] = statePtr->defectLines[j];
+	    defects[j] = statePtr->defects[j];
+	}
+	if (statePtr->defectLines != NULL) {
+	    ckfree((char *) statePtr->defectLines);
+	    ckfree((char *) statePtr->defects);
+	}
+	statePtr->defectLines = lines;
+	statePtr->defects = defects;
+    }
+    statePtr->defectLines[statePtr->numDefects] = linePtr;
+    statePtr->defects[statePtr->numDefects++] = defect;
+    TkIBTreeSetDefect(textPtr, linePtr, 0);
 }
 
 static void
@@ -6247,6 +7273,17 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 	     */
 
 	    str = ListTagName(inner);
+
+	    /*
+	     * A private mark (an ornament's, in a list of the undo) goes
+	     * back where it was if it still exists; one whose ornament
+	     * is gone is not re-created.
+	     */
+
+	    if (TkTextIsPrivateMarkName(str)
+		    && (Tcl_FindHashEntry(&textPtr->markTable, str) == NULL)) {
+		continue;
+	    }
 	    if ((strcmp(str, "insert") != 0) && (strcmp(str, "current") != 0)
 		    && (str[0] != '#')) {
 		TkTextSegment *markPtr = TkTextSetMark(textPtr, str, &index);
@@ -6285,13 +7322,50 @@ InsertListElements(textPtr, markName, startMark, av, first, statePtr)
 		}
 	    }
 	} else if (sv_derived_from(elt, "Tk::Text::BlockSeparator")) {
-	    int level = (int) SvIV(inner);
+	    int level, defect;
 
+	    SeparatorPair(inner, &level, &defect);
+	    if (level < 0) {
+		/*
+		 * [undef, defect]: the first leaf of a block, which starts
+		 * here.
+		 */
+
+		NoteLeafDefect(textPtr, &index, defect, statePtr);
+		continue;
+	    }
 	    if (level > 0) {
+		TkTextIndex start = index;
+
 		TkTextChanged(textPtr, &index, &index);
 		TkIBTreeSplit(&index, level);
+
+		/*
+		 * The separator takes the tags of the place by the
+		 * insertion rule: those the list has off here come off
+		 * it, as off text (InsertListText does it for level 0).
+		 */
+
+		if (TkTextMarkNameToIndex(textPtr, markName, &index2)
+			== TCL_OK) {
+		    for (j = 0; j < statePtr->numTags; j++) {
+			if (!statePtr->tagOn[j]
+				&& (TkTextIndexCmp(&start, &index2) < 0)) {
+			    TkBTreeTag(&start, &index2, statePtr->tags[j], 0);
+			}
+		    }
+		}
 	    } else {
 		InsertListText(textPtr, markName, &index, "\n", statePtr);
+	    }
+
+	    /*
+	     * The leaf after the separator starts at the insertion point
+	     * now: its defect (0 for a plain number).
+	     */
+
+	    if (TkTextMarkNameToIndex(textPtr, markName, &index) == TCL_OK) {
+		NoteLeafDefect(textPtr, &index, defect, statePtr);
 	    }
 	} else if (sv_derived_from(elt, "Tk::Text::Block")
 		|| sv_derived_from(elt, "Tk::Text::Empty")) {

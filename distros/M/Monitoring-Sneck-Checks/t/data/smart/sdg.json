@@ -1,0 +1,28 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "exit_status": 128},
+  "device": {"name": "/dev/sdg", "info_name": "/dev/sdg [SAT]", "type": "sat", "protocol": "ATA"},
+  "model_name": "TOSHIBA HDWD110",
+  "serial_number": "Y0000001",
+  "smart_support": {"available": true, "enabled": true},
+  "smart_status": {"passed": true},
+  "ata_smart_attributes": {
+    "revision": 16,
+    "table": [
+      {"id": 5, "name": "Reallocated_Sector_Ct", "value": 100, "worst": 100, "thresh": 50, "when_failed": "", "raw": {"value": 0, "string": "0"}},
+      {"id": 197, "name": "Current_Pending_Sector", "value": 100, "worst": 100, "thresh": 0, "when_failed": "", "raw": {"value": 0, "string": "0"}},
+      {"id": 198, "name": "Offline_Uncorrectable", "value": 100, "worst": 100, "thresh": 0, "when_failed": "", "raw": {"value": 0, "string": "0"}}
+    ]
+  },
+  "temperature": {"current": 33},
+  "ata_smart_self_test_log": {
+    "standard": {
+      "revision": 1,
+      "table": [
+        {"type": {"value": 2, "string": "Extended offline"}, "status": {"value": 121, "string": "Completed: read failure", "remaining_percent": 90, "passed": false}, "lifetime_hours": 20100, "lba": 1234567},
+        {"type": {"value": 1, "string": "Short offline"}, "status": {"value": 0, "string": "Completed without error", "passed": true}, "lifetime_hours": 20000}
+      ],
+      "count": 2
+    }
+  }
+}

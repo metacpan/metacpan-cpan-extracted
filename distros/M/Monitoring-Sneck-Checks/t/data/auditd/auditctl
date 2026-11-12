@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+# Stands in for auditctl -s and -l. Prints status or rules from the
+# directory AUDITD_TEST_SET names, and exits with what is in its exit
+# file, if any.
+use strict;
+use warnings;
+use FindBin;
+
+my %files = ( '-s' => 'status', '-l' => 'rules' );
+die( 'unexpected args ' . "@ARGV" . "\n" ) if @ARGV != 1 || !defined( $files{ $ARGV[0] } );
+my $set = $FindBin::Bin . '/' . $ENV{AUDITD_TEST_SET};
+if ( open( my $fh, '<', $set . '/' . $files{ $ARGV[0] } ) ) {
+	print while <$fh>;
+}
+my $exit = 0;
+if ( open( my $exit_fh, '<', $set . '/exit' ) ) {
+	$exit = <$exit_fh>;
+	chomp($exit);
+}
+exit($exit);

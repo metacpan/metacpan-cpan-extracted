@@ -131,11 +131,11 @@ use Getopt::Long qw(GetOptions);
 Getopt::Long::Configure("pass_through");
 GetOptions(
   "d|debug"           => sub{ $debug=$verbose=1; $silent=0 },
-  "s|silent"          => \$silent,
+  "s|silent!"         => \$silent,
   "savepath=s"        => \$savepath,
-  "nobail"            => \$nobail,
-  "n|nonrandom"       => \$nonrandom,
-  "v|verbose"         => \$verbose,
+  "nobail!"           => \$nobail,
+  "n|nonrandom!"      => \$nonrandom,
+  "v|verbose!"        => \$verbose,
   "workdir=s"         => \$workdir,
 ) or die "bad args";
 Getopt::Long::Configure("default");
@@ -230,7 +230,7 @@ sub import {
   utf8->import::into($target);
 
   if (delete $tags{":silent"}) {
-    _start_silent() unless $debug;
+    _start_silent() unless $debug or defined($silent) && !$silent;
   }
 
   die "Unhandled tag ",keys(%tags) if keys(%tags);

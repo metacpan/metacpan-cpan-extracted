@@ -92,10 +92,11 @@ my @tests = (
     [ 'test.ac' => { name => 'test', suffix => 'ac' } ],
 
     [ 'bd' => { suffix => 'bd' } ],
-
-    [ 'c.bd' => { suffix => 'c.bd' } ],
-    [ 'b.c.bd' => { name => 'b', suffix => 'c.bd' } ],
-    [ 'a.b.c.bd' => { sub => 'a', name => 'b', suffix => 'c.bd' } ],
+    # Test 191
+    [ 'c.bd' => { name => 'c', suffix => 'bd' } ],
+    # Test 193
+    [ 'b.c.bd' => { name => 'c', sub => 'b', suffix => 'bd' } ],
+    [ 'a.b.c.bd' => { sub => 'a.b', name => 'c', suffix => 'bd' } ],
 
     # More complex suffixes:
     [ 'jp' => { suffix => 'jp' } ],

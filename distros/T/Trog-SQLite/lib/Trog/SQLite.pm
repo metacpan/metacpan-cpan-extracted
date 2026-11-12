@@ -1,4 +1,4 @@
-package Trog::SQLite 0.005;
+package Trog::SQLite 0.006;
 
 # ABSTRACT: An SQLite handle with its schema applied, its updates run, and its pragmas set
 
@@ -235,6 +235,20 @@ sub transaction {
 }
 
 
+sub do_with_update_hook {
+    my ( $db, $hook, $sql, @bind ) = @_;
+
+    my $was = $db->sqlite_update_hook($hook);
+    my $result;
+    my $ok  = eval { $result = $db->do( $sql, undef, @bind ); 1 };
+    my $err = $@ || "The statement failed\n";
+    $db->sqlite_update_hook($was);
+    die $err unless $ok;
+
+    return $result;
+}
+
+
 sub bulk_insert {
     my ( $db, $table, $keys, $action, @values ) = @_;
     $action //= 'IGNORE';
@@ -277,7 +291,7 @@ Trog::SQLite - An SQLite handle with its schema applied, its updates run, and it
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -436,6 +450,36 @@ If C<$db> is already in a transaction, C<$work> runs in that one, and the code
 that began it commits it or rolls it back.  So a sub that needs a transaction
 can call this whether or not its caller began one.
 
+=head2 do_with_update_hook($db, $hook, $sql, @bind)
+
+Runs C<$sql> with C<@bind> on the handle C<$db>, with the sub C<$hook> as its
+update hook, and returns what C<do> returns.  Then it puts back the update hook
+that C<$db> had before, also when C<$sql> dies, and dies with that error.
+
+SQLite calls C<$hook> once for each row that the statement inserts, updates or
+deletes, in any table, with four arguments: the action, which is
+C<SQLITE_INSERT>, C<SQLITE_UPDATE> or C<SQLITE_DELETE> from
+L<DBD::SQLite::Constants>, the name of the database, the name of the table, and
+the C<rowid> of the row.  See C<sqlite_update_hook> in L<DBD::SQLite>.
+
+Use it to count the rows that a write through a view writes.  A view with
+C<INSTEAD OF> triggers takes writes, but SQLite does not count the rows that a
+trigger writes, so C<do> returns C<0E0> for every write through the view.  The
+update hook reports each of those rows, with its table:
+
+    my $rows = 0;
+    Trog::SQLite::do_with_update_hook(
+        $dbh, sub { $rows++ if $_[2] eq 'addresses' },
+        'INSERT OR IGNORE INTO ips (ip, domain) VALUES (?, ?)', $ip, $domain,
+    );
+
+SQLite does not call the hook for a table C<WITHOUT ROWID>, for a row that
+C<REPLACE> deletes to resolve a conflict, or for a C<DELETE> with no C<WHERE>,
+which it does without visiting the rows.
+
+The hook belongs to the handle, and C<dbh> gives every caller in a process the
+same handle for a file.  That is why the one before is put back.
+
 =head2 bulk_insert($dbh, $table, \@keys, $action, @values)
 
 Inserts C<@values> into the columns C<@keys> of C<$table>, and returns 1.
@@ -478,11 +522,21 @@ George S. Baugh <george@troglodyne.net>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords troglodyne-bot
+=for stopwords troglodyne-bot troglodyne-robot
+
+=over 4
+
+=item *
 
 troglodyne-bot <morpheus@troglodyne.net>
+
+=item *
+
+troglodyne-robot <trogbot@troglodyne.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

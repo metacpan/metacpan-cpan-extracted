@@ -1,4 +1,4 @@
-package Dist::Conformance::Snapshot::Directory 0.004;
+package Dist::Conformance::Snapshot::Directory 0.005;
 
 # ABSTRACT: A snapshot of a checkout on this machine, which an update can change
 
@@ -141,7 +141,7 @@ Dist::Conformance::Snapshot::Directory - A snapshot of a checkout on this machin
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

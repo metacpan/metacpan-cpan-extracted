@@ -29,6 +29,6 @@ WriteMakefile(
             },
             bugtracker => { web => 'https://github.com/TekservixHQ/smsgora-perl/issues' },
         },
-        keywords => [qw(sms sms-gateway bulk-sms android tekservix)],
+        keywords => [qw(sms sms-gateway sms-api-gateway bulk-sms android tekservix)],
     },
 );

@@ -1,3 +1,42 @@
+2.20261112 2026-11-12 Australia/Melbourne
+  - Policy: Add policy_mode, the mode of an sts policy, and show a null
+    policy-string line as empty rather than warning
+  - Report, Policy: as_struct and as_json name failure-details as RFC 8460
+    does, rather than failure_details, so as_json's output can be read back,
+    and a report always includes policies. Incompatible change: code reading
+    failure_details from as_struct must read failure-details
+  - Report: Only accept dates in the RFC 3339 form RFC 8460 asks for, rather
+    than anything Date::Parse takes, such as "12:00" for today. Incompatible
+    change: a date with no UTC offset, or with no colon in its offset, such as
+    +0000, now dies
+  - App: The prometheus command says why it couldn't parse a file, as csv does
+  - Report: Errors from new_from_data say where in the report the problem is,
+    and a date or IP address that can't be parsed says so
+  - Report: Accept reports without contact-info
+  - Failure: Accept failures without receiving-mx-hostname or sending-mta-ip,
+    as for a policy fetch failure, where there may be no MX to name
+  - Failure: The prometheus sending_mta_ip label gives the address, not 3
+  - Policy: Accept mx-host as a list, as RFC 8460 describes it, keep it as a
+    list in as_struct and as_json, and add policy_mx_hosts, which new also
+    takes
+  - Policy: Accept policy types beyond the three RFC 8460 defines, and add
+    methods to list and check for those three
+  - Failure: Accept result types not in the RFC 8460 registry, which RFC 8460
+    expects to grow, and add methods to list and check for registered types
+  - Report: Limit the size of a report, 10MB by default, gunzipped or not.
+    Incompatible change: a larger report now dies unless new_from_json or
+    new_from_json_gz is given a larger max_size
+  - Report: Die with the gunzip error when a gzipped report is corrupt,
+    including a bad CRC or length in its trailer, read a report gzipped as
+    several members, and refuse a gzip inside a gzip
+  - Report: new_from_json takes UTF-8 encoded bytes, as received, and decodes
+    them as UTF-8 rather than Latin-1, and as_json returns UTF-8 encoded bytes.
+    Incompatible change: passing new_from_json a decoded string with non-ASCII
+    characters now dies, so encode it first, and as_json's result is bytes, so
+    don't print it through an :encoding(UTF-8) layer
+  - Pragmas: Only the tlsrpt command sets UTF-8 layers on STDIN, STDOUT
+    and STDERR, loading the classes no longer does
+
 2.20261104 2026-11-05 Australia/Melbourne
 
 2.20210112 2021-01-12 UTC

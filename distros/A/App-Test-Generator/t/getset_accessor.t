@@ -53,6 +53,22 @@ sub setter_only {
 	return $self;
 }
 
+# Mirrors CGI::Info::set_logger: the argument is stored as given when it is
+# already a reference, otherwise it is handed to another class's constructor,
+# so the setter accepts whatever that constructor accepts.
+sub set_wrapped {
+	my $self = shift;
+	my $thing = shift;
+
+	if(ref($thing)) {
+		$self->{thing} = $thing;
+	} else {
+		$self->{thing} = Wrapper->new($thing);
+	}
+
+	return $self;
+}
+
 sub mutator {
 	my $self = shift;
 	$self->{bar} = shift;
@@ -105,6 +121,64 @@ sub is_tablet {
 	}
 
 	return $self->{is_tablet};
+}
+
+# Mirrors CGI::Info::protocol: the value is computed from %ENV and cached, so
+# the method takes no argument at all. Its conditions test $ENV and $self, and
+# neither is evidence that an argument was supplied.
+sub protocol {
+	my $self = shift;
+
+	return $self->{protocol} if ref($self) && exists $self->{protocol};
+
+	my $result;
+	if($ENV{'SCRIPT_URI'} && ($ENV{'SCRIPT_URI'} =~ /^([a-zA-Z][a-zA-Z0-9+\-.]*):\/\//)) {
+		$result = $1;
+	} elsif($ENV{'SERVER_PORT'} && ($ENV{'SERVER_PORT'} == 443)) {
+		$result = 'https';
+	}
+
+	$self->{protocol} = $result if ref($self);
+	return $result;
+}
+
+=head2 status($status)
+
+Sets or returns the status of the object,
+200 for OK,
+otherwise an HTTP error code
+
+=over 4
+
+=item $status
+
+Optional integer value to be set or retrieved.
+If omitted, the value is retrieved.
+
+=back
+
+=cut
+
+sub status
+{
+	my $self = shift;
+	my $status = shift;
+
+	# Set status if provided
+	return $self->{status} = $status if(defined($status));
+
+	# Determine status based on request method if status is not set
+	unless (defined $self->{status}) {
+		my $method = $ENV{'REQUEST_METHOD'};
+
+		return 405 if $method && ($method eq 'OPTIONS' || $method eq 'DELETE');
+		return 411 if $method && ($method eq 'POST' && !defined $ENV{'CONTENT_LENGTH'});
+
+		return 200;
+	}
+
+	# Return current status or 200 by default
+	return $self->{status} || 200;
 }
 
 1;
@@ -210,6 +284,12 @@ is(
 );
 
 is(
+	$schemas->{set_wrapped}{input}{thing}{type},
+	'any',
+	'Setter that wraps its argument is not typed as a string'
+);
+
+is(
 	$schemas->{agent}{output}{isa},
 	'LWP::UserAgent',
 	'POD-derived object isa propagated'
@@ -292,5 +372,18 @@ ok(!exists $schemas->{mutator}{accessor});
 
 # is_tablet should be detected as getter
 is($schemas->{is_tablet}{accessor}{type}, 'getter', 'is_tablet method detected as getter');
+
+# CGI::Info::status stores its argument only when one is given, and returns
+# the stored value otherwise. This is a get/set accessor, not a plain function.
+# CGI::Info::protocol's condition on %ENV must not be read as an argument
+# guard: doing so typed it as a getset accessor and the harness set a value
+# that protocol() never looks at.
+isnt($schemas->{protocol}{accessor}{type}, 'getset', 'Environment-driven getter is not a getset accessor');
+is(scalar(keys %{ $schemas->{protocol}{input} // {} }), 0, 'Environment-driven getter takes no parameters');
+
+is($schemas->{status}{accessor}{type}, 'getset', 'Conditional setter/return detected as getset');
+is($schemas->{status}{accessor}{property}, 'status', 'Conditional accessor property detected');
+is($schemas->{status}{input}{status}{type}, 'integer', 'POD-declared integer input preserved');
+is($schemas->{status}{input}{status}{position}, 0, 'Conditional accessor argument keeps position 0');
 
 done_testing();

@@ -7,7 +7,7 @@ use base qw/Exporter/;
 use URI::Escape;
 
 BEGIN {
-    our $VERSION = "0.12";
+    our $VERSION = "0.14";
     our @EXPORT = qw/bake_cookie crush_cookie/;
     my $use_pp = $ENV{COOKIE_BAKER_PP};
     if (!$use_pp) {
@@ -28,6 +28,18 @@ BEGIN {
     }
 }
 
+
+sub valid_path {
+    my $path = shift;
+    for my $s (split //, $path) {
+        my $hex = ord($s);
+        return 0 if 0x20 > $hex;
+        return 0 if $hex >= 0x7f;
+        return 0 if $hex == 0x3b; # 0x3b is ';'
+    }
+    return 1;
+}
+
 sub bake_cookie {
     my ($name,$val) = @_;
 
@@ -38,13 +50,28 @@ sub bake_cookie {
         $args{samesite} = 'none';
         $args{secure} = 1;
     }
+
+    # validation for domain, path and max-age
+    if (exists $args{domain} && $args{domain} !~ /^[a-zA-Z0-9\.\-]+$/) {
+        warn "Invalid domain: $args{domain}";
+        delete $args{domain};
+    }
+    if (exists $args{path} && !valid_path($args{path})) {
+        warn "Invalid path: $args{path}";
+        delete $args{path};
+    }
+    if (exists $args{"max-age"} && $args{"max-age"} !~ /^\d+$/) {
+        warn "Invalid max-age: " . $args{"max-age"};
+        delete $args{"max-age"};
+    }
+
     $name = URI::Escape::uri_escape($name) if $name =~ m![^a-zA-Z\-\._~]!;
     my $cookie = "$name=" . URI::Escape::uri_escape($args{value}) . '; ';
     $cookie .= 'domain=' . $args{domain} . '; '  if $args{domain};
     $cookie .= 'path='. $args{path} . '; '       if $args{path};
     $cookie .= 'expires=' . _date($args{expires}) . '; ' if exists $args{expires} && defined $args{expires};
     $cookie .= 'max-age=' . $args{"max-age"} . '; ' if exists $args{"max-age"};
-    if (exists $args{samesite} && $args{samesite} =~ m/^(?:lax|strict|none)/i) {
+    if (exists $args{samesite} && $args{samesite} =~ m/\A(?:lax|strict|none)\Z/i) {
         $cookie .= 'SameSite=' . ucfirst(lc($args{samesite})) . '; ';
         # secure flag must be set when SameSite=None
         $args{secure} = 1 if $cookie =~ m/SameSite=None; /;
@@ -97,6 +124,7 @@ sub _date {
 
 sub pp_crush_cookie {
     my $cookie_string = shift;
+    my $raw_key = shift;
     return {} unless $cookie_string;
     my %results;
     my @pairs = grep m/=/, split /; ?/, $cookie_string;
@@ -106,7 +134,9 @@ sub pp_crush_cookie {
 
         my ($key, $value) = split( "=", $pair, 2 );
 
-        $key = URI::Escape::uri_unescape($key);
+        if (!$raw_key) {
+            $key = URI::Escape::uri_unescape($key);
+        }
 
         # Values can be quoted
         $value = "" unless defined $value;
@@ -166,6 +196,7 @@ The first argument is the cookie's name and the second argument is a plain strin
 can contain keys such as C<value>, C<domain>, C<expires>, C<path>, C<httponly>, C<secure>,
 C<max-age>, C<samesite>.
 
+domain, path and max-age should be validated to not include `;` and other special characters.
 
 =over 4
 
@@ -186,7 +217,7 @@ L<Cookies Having Independent Partitioned State specification|https://www.ietf.or
 
 Cookie's expires date time. Several formats are supported:
 
-  expires => time + 24 * 60 * 60 # epoch time
+  expires => time + 24 * 60 * 60 # epoch time (without subseconds)
   expires => 'Wed, 03-Nov-2010 20:54:16 GMT'
   expires => '+30s' # 30 seconds from now
   expires => '+10m' # ten minutes from now
@@ -226,6 +257,12 @@ Parses cookie string and returns a hashref.
 
     my $cookies_hashref = crush_cookie($headers->header('Cookie'));
     my $cookie_value = $cookies_hashref->{cookie_name}
+
+If multiple cookies have the same name, the first one is used.
+
+If you want to retrieve uri_decoded cookie name, you can pass the second argument as true.
+
+    my $cookies_hashref = crush_cookie($headers->header('Cookie'), 1); # no uri_decoded cookie names
 
 =back
 

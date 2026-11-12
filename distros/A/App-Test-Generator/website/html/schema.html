@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Schema reference — App::Test::Generator</title>
+<meta name="description" content="Every key of an App::Test::Generator schema: module, function, input types and constraints, output expectations, config switches, transforms, cases, edge cases, seeds and accessors.">
+<link rel="canonical" href="schema.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Schema reference — App::Test::Generator">
+<meta property="og:description" content="Input types, output expectations, boundary generation, transforms, edge cases and configuration.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html" class="current" aria-current="page">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Schema reference</h1>
+	<p class="lead">
+		A schema is one file describing one routine. It is read by
+		<a href="https://metacpan.org/pod/Config::Abstraction">Config::Abstraction</a>,
+		so YAML, JSON and Perl data files all work — YAML is what everything is
+		tested with. Every other part of the toolkit consumes this same file.
+	</p>
+
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Key</th><th>Meaning</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>module</code></td><td>Module to load. Optional: guessed from the filename, so <code>My-Widget.conf</code> becomes <code>My::Widget</code>. The reserved value <code>builtin</code> means a Perl built-in.</td></tr>
+				<tr><td><code>function</code></td><td>The function or method under test. Defaults to <code>run</code>.</td></tr>
+				<tr><td><code>new</code></td><td>Arguments for the constructor. Its presence makes the routine a method call on a constructed object.</td></tr>
+				<tr><td><code>input</code></td><td>Named, positional or single-argument parameter schema.</td></tr>
+				<tr><td><code>output</code></td><td>What a successful return value looks like — or that the routine must die.</td></tr>
+				<tr><td><code>config</code></td><td>Switches controlling which extra probes run.</td></tr>
+				<tr><td><code>transforms</code></td><td>Named input-subset → output-subset relationships.</td></tr>
+				<tr><td><code>cases</code>, <code>yaml_cases</code></td><td>A static corpus, inline or in a separate YAML file.</td></tr>
+				<tr><td><code>edge_cases</code>, <code>type_edge_cases</code>, <code>edge_case_array</code></td><td>Extra values to inject, beyond the generated ones.</td></tr>
+				<tr><td><code>seed</code>, <code>iterations</code></td><td>Reproducibility and how many random cases to run.</td></tr>
+				<tr><td><code>accessor</code></td><td>Declares the routine an accessor, so getter/setter tests are generated.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h2 id="naming">Naming the target</h2>
+<pre><code>---
+module: My::Widget
+function: validate
+</code></pre>
+	<p>
+		If <code>module</code> is omitted the generator guesses from the file name:
+		<code>My-Widget.conf</code> → <code>My::Widget</code>. If
+		<code>function</code> is omitted it tests <code>run</code>, which is the
+		right default for command modules.
+	</p>
+	<p>
+		The routine is a function call unless <code>new</code> is present. An
+		empty <code>new:</code> is meaningful — it asks for
+		<code>Module-&gt;new()</code> with no arguments and a method call thereafter:
+	</p>
+<pre><code>module: My::Digest
+function: hexdigest
+
+new:
+</code></pre>
+
+	<h2 id="input">input</h2>
+
+	<h3>Named parameters</h3>
+<pre><code>input:
+  name:
+    type: string
+    optional: false
+    min: 1
+    max: 64
+  age:
+    type: integer
+    optional: true
+    min: 0
+    max: 130
+</code></pre>
+
+	<h3>One unnamed parameter</h3>
+<pre><code>input:
+  type: string
+  min: 1
+  max: 1000
+</code></pre>
+
+	<h3>Positional parameters</h3>
+	<p>
+		When a routine takes a fixed argument order, say so with
+		<code>position</code>. Positions start at 0. A parameter can carry both a
+		name and a position; the name is used for diagnostics.
+	</p>
+<pre><code>module: Math::Simple::MinMax
+function: max
+
+input:
+  left:
+    type: number
+    position: 0
+  right:
+    type: number
+    position: 1
+
+output:
+  type: number
+</code></pre>
+	<p>
+		The keyword <code>undef</code> in place of the whole <code>input</code>
+		section means the routine takes no arguments:
+	</p>
+<pre><code>input: undef
+</code></pre>
+
+	<h3>Types and constraints</h3>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Key</th><th>Applies to</th><th>Effect</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>type</code></td><td>all</td><td>One of <code>string</code>, <code>integer</code>, <code>float</code>, <code>number</code>, <code>boolean</code>, <code>arrayref</code>, <code>hashref</code>, <code>object</code>, <code>any</code>, <code>undef</code>.</td></tr>
+				<tr><td><code>optional</code></td><td>all</td><td>Whether the argument may be omitted. Generated calls respect it.</td></tr>
+				<tr><td><code>min</code>, <code>max</code></td><td>numeric</td><td>Inclusive bounds. Three boundary cases are generated per bound.</td></tr>
+				<tr><td><code>min</code>, <code>max</code></td><td>string</td><td>Length bounds, in characters.</td></tr>
+				<tr><td><code>min</code>, <code>max</code></td><td>arrayref, hashref</td><td>Number of elements, or of keys.</td></tr>
+				<tr><td><code>len</code></td><td>string, arrays</td><td>Exact length, treated as <code>min == max</code>.</td></tr>
+				<tr><td><code>matches</code></td><td>string</td><td>Regex the value must satisfy. Random strings are generated until they match.</td></tr>
+				<tr><td><code>nomatch</code></td><td>string</td><td>Regex the value must not match.</td></tr>
+				<tr><td><code>memberof</code>, <code>enum</code></td><td>string, integer, number</td><td>Allowed values. Each one is tested, plus one value outside the list that should be rejected.</td></tr>
+				<tr><td><code>value</code></td><td>all</td><td>An exact expected or supplied value.</td></tr>
+				<tr><td><code>semantic</code></td><td>string</td><td>A realistic data generator instead of random characters — see below.</td></tr>
+				<tr><td><code>can</code></td><td>object</td><td>Methods the stub object must provide. Without it, a mandatory object parameter makes the routine untestable and it is skipped.</td></tr>
+				<tr><td><code>isa</code></td><td>object</td><td>Class name; the harness emits <code>use_ok</code> and <code>new_ok</code> for it.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h3>Boundary cases</h3>
+	<p>
+		For each declared constraint the harness adds three deterministic cases:
+		just inside the range, exactly on the boundary, and just outside it — the
+		last annotated <code>_STATUS =&gt; 'DIES'</code>, because a well-written
+		routine should reject it. Booleans get <code>0</code>/<code>1</code>,
+		<code>true</code>/<code>false</code> and <code>off</code>/<code>on</code>
+		plus values that should be refused. An <code>enum</code> gets one case per
+		allowed value plus one outside.
+	</p>
+
+	<h3>Semantic generators</h3>
+	<p>
+		Where a plain random string would never be valid, name a generator
+		instead:
+	</p>
+<pre><code>input:
+  email:
+    type: string
+    semantic: email
+    position: 0
+</code></pre>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Value</th><th>Produces</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>email</code></td><td><code>user@domain.tld</code></td></tr>
+				<tr><td><code>url</code></td><td>HTTP and HTTPS URLs</td></tr>
+				<tr><td><code>uuid</code></td><td>UUIDv4 identifiers</td></tr>
+				<tr><td><code>phone_us</code></td><td><code>XXX-XXX-XXXX</code></td></tr>
+				<tr><td><code>phone_e164</code></td><td><code>+XXXXXXXXXXXX</code></td></tr>
+				<tr><td><code>ipv4</code>, <code>ipv6</code></td><td>Addresses</td></tr>
+				<tr><td><code>username</code>, <code>slug</code></td><td>Alphanumeric names, and lowercase hyphenated slugs</td></tr>
+				<tr><td><code>hex_color</code></td><td><code>#RRGGBB</code></td></tr>
+				<tr><td><code>iso_date</code>, <code>iso_datetime</code></td><td><code>YYYY-MM-DD</code>, <code>YYYY-MM-DDTHH:MM:SSZ</code></td></tr>
+				<tr><td><code>semver</code></td><td><code>major.minor.patch</code></td></tr>
+				<tr><td><code>jwt</code></td><td>Base64url-shaped tokens</td></tr>
+				<tr><td><code>json</code>, <code>base64</code></td><td>Simple JSON objects; base64 strings</td></tr>
+				<tr><td><code>md5</code>, <code>sha256</code></td><td>Hex hashes of the right length</td></tr>
+				<tr><td><code>unix_timestamp</code></td><td>Epoch seconds</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		A semantic generator can be combined with <code>matches</code> when you
+		want realistic data that also satisfies a business rule:
+	</p>
+<pre><code>input:
+  corporate_email:
+    type: string
+    semantic: email
+    matches: '@company\.com$'
+</code></pre>
+
+	<h2 id="output">output</h2>
+<pre><code>output:
+  type: number
+  min: 0
+</code></pre>
+	<p>
+		The output schema is checked with
+		<a href="https://metacpan.org/pod/Return::Set">Return::Set</a>. It accepts
+		the same type and constraint keys as an input parameter, plus two special
+		forms:
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Form</th><th>Meaning</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>output: undef</code></td><td>The routine returns nothing; the harness asserts <code>!defined</code>.</td></tr>
+				<tr><td><code>_STATUS: DIES</code></td><td>The routine must croak for this input. Add it to an output spec, or to a single transform's output.</td></tr>
+				<tr><td><code>_STATUS: WARNS</code></td><td>The routine must warn instead of dying.</td></tr>
+				<tr><td><code>type: array</code></td><td>The routine returns a list. The harness captures it in list context and validates the arrayref (needs <code>Return::Set</code> 0.03+).</td></tr>
+			</tbody>
+		</table>
+	</div>
+<pre><code>---
+module: Scalar::Util
+function: blessed
+
+input:
+  type: string
+
+output: undef
+</code></pre>
+
+	<h2 id="config">config</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Key</th><th>Default</th><th>Effect</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>close_stdin</code></td><td>1</td><td>Stop the routine reading from standard input. Ignored on Windows.</td></tr>
+				<tr><td><code>test_nuls</code></td><td>1</td><td>Inject NUL bytes; the routine is expected to die.</td></tr>
+				<tr><td><code>test_undef</code></td><td>1</td><td>Try an undefined value.</td></tr>
+				<tr><td><code>test_empty</code></td><td>1</td><td>Try empty strings and empty containers.</td></tr>
+				<tr><td><code>test_non_ascii</code></td><td>1</td><td>Try strings containing non-ASCII characters.</td></tr>
+				<tr><td><code>timeout</code></td><td>10</td><td>Seconds before a call is abandoned. <code>0</code> disables the guard.</td></tr>
+				<tr><td><code>dedup</code></td><td>1</td><td>Remove duplicate generated cases.</td></tr>
+				<tr><td><code>properties</code></td><td>0</td><td>Property-based tests. Either <code>1</code>, or a hashref with <code>enable</code> and <code>trials</code>.</td></tr>
+				<tr><td><code>test_security</code></td><td>0</td><td>Add security-shaped strings: SQL fragments, markup, control characters.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Turn a probe off when the routine legitimately accepts something the
+		default probe assumes it rejects. A string-to-string function that happily
+		accepts <code>undef</code> should set <code>test_undef: no</code>, or the
+		generated test will assert a croak that never comes.
+	</p>
+
+	<h2 id="transforms">transforms</h2>
+	<p>
+		A transform names a relationship between a subset of the input and a
+		subset of the output. Each one is exercised with its own inputs, and the
+		result is checked against the transform's own output spec. With
+		<code>properties</code> enabled, each transform also becomes a LectroTest
+		property.
+	</p>
+<pre><code>---
+module: builtin
+function: abs
+
+config:
+  test_undef: no
+  test_empty: no
+  test_nuls: no
+
+input:
+  number:
+    type: number
+    position: 0
+
+output:
+  type: number
+  min: 0
+
+transforms:
+  positive:
+    input:
+      number:
+        type: number
+        position: 0
+        min: 0
+    output:
+      type: number
+      min: 0
+
+  negative:
+    input:
+      number:
+        type: number
+        position: 0
+        max: 0
+    output:
+      type: number
+      min: 0
+
+  error:
+    input: undef
+    output:
+      _STATUS: DIES
+</code></pre>
+	<p>
+		For each transform the generator makes cases from its input spec, calls
+		the routine, checks the return against the transform's output spec, and
+		requires an exact match when the output names a <code>value</code>.
+	</p>
+
+	<h3>Properties on a transform</h3>
+	<p>
+		Add a <code>properties</code> list to an individual transform to assert an
+		invariant beyond type and range. Several are built in:
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Name</th><th>Asserts</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>idempotent</code></td><td><code>f(f(x)) == f(x)</code></td></tr>
+				<tr><td><code>non_negative</code>, <code>positive</code></td><td><code>&gt;= 0</code>, <code>&gt; 0</code></td></tr>
+				<tr><td><code>non_empty</code></td><td>A string result is never empty</td></tr>
+				<tr><td><code>length_preserved</code></td><td>Output length equals input length</td></tr>
+				<tr><td><code>uppercase</code>, <code>lowercase</code></td><td>Case of a string result</td></tr>
+				<tr><td><code>trimmed</code></td><td>No leading or trailing whitespace</td></tr>
+				<tr><td><code>sorted_ascending</code>, <code>sorted_descending</code></td><td>Order of an array result</td></tr>
+				<tr><td><code>unique_elements</code></td><td>An array result contains no duplicates</td></tr>
+				<tr><td><code>preserves_keys</code></td><td>A hash result has the same keys as the input</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Anything the list does not cover can be written as Perl, with
+		<code>$result</code> holding the return value and the input parameters
+		available by name:
+	</p>
+<pre><code>transforms:
+  normalize:
+    input:
+      text:
+        type: string
+    output:
+      type: string
+    properties:
+      - name: single_spaces
+        description: No run of two or more spaces remains
+        code: $result !~ /  /
+
+      - name: reversible
+        description: Length is unchanged
+        code: length($result) == length($text)
+</code></pre>
+
+	<h2 id="corpus">cases and yaml_cases</h2>
+	<p>
+		A small static corpus maps an expected result to the arguments that
+		produce it. This is the cheapest way to pin down behaviour you already
+		know:
+	</p>
+<pre><code>cases:
+  ok:
+    input: ping
+    _STATUS: OK
+  error:
+    input: ""
+    _STATUS: DIES
+</code></pre>
+	<p>
+		<code>yaml_cases</code> names a separate YAML file with the same shape, so
+		a large corpus does not clutter the schema:
+	</p>
+<pre><code>yaml_cases: t/conf/corpus/greet.yml
+</code></pre>
+
+	<h2 id="edges">edge cases</h2>
+	<p>
+		Random generation will not stumble on the value that broke production.
+		Say it instead. For named parameters, map parameter names to values:
+	</p>
+<pre><code>edge_cases:
+  name: [ "", "a" x 1024, "\x{263A}" ]
+  age: [ -1, 0, 99999999 ]
+</code></pre>
+	<p>
+		For a routine with one unnamed parameter, use a list:
+	</p>
+<pre><code>edge_case_array:
+  - "&lt;script&gt;alert('xss')&lt;/script&gt;"
+  - "'; DROP TABLE users; --"
+  - "\0null\0byte"
+  - "emoji😊test"
+  - ""
+  - " "
+</code></pre>
+	<p>
+		During fuzzing there is a 40% chance that a case draws from the array
+		instead of the random generator, so these values are always exercised.
+	</p>
+	<p>
+		<code>type_edge_cases</code> applies to every parameter of a given type,
+		which is useful when a whole family of routines shares the same weakness:
+	</p>
+<pre><code>type_edge_cases:
+  string: [ "", " ", "\t", "\n", "\0", "long" x 1024, "\x{1F600}" ]
+  number: [ 0, 1.0, -1.0, 1e308, -1e308, 1e-308, "NaN", "Infinity" ]
+  integer: [ 0, 1, -1, 2147483647, -2147483648 ]
+</code></pre>
+
+	<h2 id="repro">seed and iterations</h2>
+<pre><code>seed: 42
+iterations: 200
+</code></pre>
+	<p>
+		<code>seed</code> makes the generated harness call <code>srand()</code>
+		with that value, so a failing run repeats exactly. <code>iterations</code>
+		defaults to 30 random cases; the boundary and corpus cases are added on
+		top of that, so the total test count is always higher.
+	</p>
+
+	<h2 id="accessor">accessor</h2>
+<pre><code>accessor:
+  property: ua
+  type: getset
+</code></pre>
+	<p>
+		Declares the routine an accessor on <code>property</code>, with
+		<code>type</code> one of <code>getter</code>, <code>setter</code> or
+		<code>getset</code>. The generated tests then check the getter/setter
+		contract — that a set is visible to a get, and that the getter with no
+		argument does not change state.
+	</p>
+
+	<div class="note">
+		<span class="note-title">A schema is a promise, not a description</span>
+		<p>
+			The generated tests are black-box: they assert what the schema says the
+			routine does. If a test fails, the question is whether the code or the
+			schema is wrong — and the honest answer is sometimes the schema.
+			Constraining a parameter to what the implementation happens to do today
+			throws away the value of the test.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="quickstart.html">← Quick start</a>
+		<a href="commands.html">Commands →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

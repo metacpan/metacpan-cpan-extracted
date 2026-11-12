@@ -1,0 +1,23 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "exit_status": 0},
+  "device": {"name": "/dev/nvme0", "info_name": "/dev/nvme0", "type": "nvme", "protocol": "NVMe"},
+  "model_name": "WD Blue SN570 1TB",
+  "serial_number": "22123A800001",
+  "smart_support": {"available": true, "enabled": true},
+  "smart_status": {"passed": true, "nvme": {"value": 0}},
+  "nvme_smart_health_information_log": {
+    "critical_warning": 0,
+    "temperature": 38,
+    "available_spare": 100,
+    "available_spare_threshold": 10,
+    "percentage_used": 3,
+    "data_units_read": 21023211,
+    "data_units_written": 30302312,
+    "power_on_hours": 9012,
+    "unsafe_shutdowns": 21,
+    "media_errors": 0,
+    "num_err_log_entries": 0
+  },
+  "temperature": {"current": 38}
+}

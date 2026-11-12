@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.11.1';
+our $VERSION = '3.13.1';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -61,7 +61,7 @@ my $LOCATION = [fields => [map { [$_ => ['string'], 1] } @VPNDetection::Result::
 my $ASN = [fields => [[asn => ['integer'], 1], map { [$_ => ['string'], 1] } qw(name domain type prefix)]];
 our $LOOKUP = [fields => [
     [ip => ['string'], 1], [is_vpn => ['boolean'], 1],
-    (map { [$_ => ['boolean']] } qw(is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy)),
+    (map { [$_ => ['boolean']] } qw(is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy is_pubproxy trial_expired)),
     [vpn => $VPN_DETAIL],
     (map { [$_ => $CLASS_DETAIL] } qw(hosting relay tor cdn)),
     (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)),
@@ -788,9 +788,10 @@ before writing an C<if>.
 
 =item api_key
 
-Your API key. Without one a lookup answers C<ip> and C<is_vpn>, up to 1000 a day
-per source address; a free key adds Tor, relay, C<location> and C<asn>, and every
-paid plan answers every field. An empty or blank key is the same as none, and
+Your API key. Without one a lookup is on Unlimited, the free plan: C<ip>,
+C<is_vpn>, the Tor and relay members, C<location> and C<asn>, with no daily or
+monthly cap.
+Every paid plan answers every field, and a batch needs one. An empty or blank key is the same as none, and
 sends no C<Authorization> header. The key is trimmed, so one read from
 a file with its newline works; a key still holding a control character, or a
 character past U+00FF, croaks here.
@@ -876,10 +877,11 @@ the other is what the key you are calling WITH may spend.
 Unlike a lookup there is no useful unauthenticated answer, so a client built
 without an API key gets an unauthorized error rather than a partial one.
 
-Usage counts against the allowance window - the anniversary of the subscription,
-not the calendar month and not the billing period - and it is the same number a
-lookup is gated on. C<hard_limit> is C<undef> when we never stop serving, which
-is not the same as a limit of zero.
+Usage counts against the allowance window - on a paid plan the anniversary of
+the subscription, not the calendar month and not the billing period, and on a
+free plan the UTC day - and it is the same number a lookup is gated on.
+C<hard_limit> is C<undef> when we never stop serving, which is not the same as a
+limit of zero.
 
 Deliberately B<not cached>: the whole point is what has been spent, and a cached
 answer is a wrong one within seconds of the next request.
@@ -895,7 +897,10 @@ C<concurrency> and C<timeout> are the per-call options, and the timeout bounds
 each chunk.
 
 There is no cap on how many addresses one call takes: everything not answered
-locally goes out in chunks of up to 1000, the most one request carries.
+locally goes out in chunks of up to 1000, the most one request carries. The batch
+endpoint needs a paid plan: without a key every address sent to it carries an
+C<unauthorized> L<VPNDetection::Error>, and a free-plan key's batch of two or
+more a C<bad_request> one (HTTP 402).
 
 Perl hashes have no insertion order, so iterate your own list if order matters:
 

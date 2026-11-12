@@ -28,7 +28,7 @@ unless (eval { $probe->WidgetMethod('_dataslot', 'live'); 1 }) {
   $mw->destroy;
   plan skip_all => 'representation A (the default build): no slots but the Perl value';
 }
-plan tests => 126;
+plan tests => 140;
 
 sub live { $probe->WidgetMethod('_dataslot', 'live') }
 sub ds { my $t = shift; $t->WidgetMethod('_dataslot', @_) }
@@ -333,6 +333,39 @@ is($base, 0, 'no data block alive at first');
   $t->destroy;
   $mw->update;
   is($destroyed{bE} . $destroyed{bF}, '11', 'the values freed once, with the widget');
+  is(live(), $base, 'all containers freed');
+}
+
+# ---------------------------------------------------------------------
+# block sprout puts the former leaf's container on the start piece, the
+# new node and the end piece: every slot, the Perl value shared (one
+# object for the three).  Undo and redo give each container back; each
+# is freed once.
+{
+  my $t = fraction(-undo => 1);
+  my $v = V->new('sprouted');
+  ds($t, 'node', '2.2', 0, 44);
+  $t->blockNodedata('2.2', 0, $v);
+  undef $v;
+  $t->blockSprout('2.2', '2.3');			# R( n | N( u ) | m | den )
+  is(ds($t, 'node', '2.1', 0), 44, 'sprout: the start piece keeps the slot');
+  is(ds($t, 'node', '2.3', 1), 44, 'the new node has it');
+  is(ds($t, 'node', '2.5', 0), 44, 'the end piece has it');
+  is(ds($t, 'node', '2.3', 0), undef, 'the middle leaf has none');
+  is(nv($t->blockNodedata('2.3', 1)), 'sprouted', 'and the Perl value');
+  ok($t->blockNodedata('2.3', 1) == $t->blockNodedata('2.5', 0),
+     'one object for the owners');
+  is(live(), $base + 3, 'three containers');
+  $t->editUndo;
+  is(ds($t, 'node', '2.2', 0), 44, 'undo: the leaf has its slot');
+  is($t->get('2.0', '2.end'), '{num|den}', 'and its text');
+  $t->editRedo;
+  is(ds($t, 'node', '2.3', 1), 44, 'redo: the new node has the slot again');
+  is(ds($t, 'node', '2.5', 0), 44, 'and the end piece');
+  ok(!$destroyed{sprouted}, 'the value is alive');
+  $t->destroy;
+  $mw->update;
+  is($destroyed{sprouted}, 1, 'freed once, with the widget');
   is(live(), $base, 'all containers freed');
 }
 

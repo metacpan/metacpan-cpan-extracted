@@ -1,4 +1,4 @@
-use 5.018;
+use 5.012;
 use strict;
 use warnings;
 use Test::More;
@@ -26,6 +26,7 @@ for my $case (
 
 for my $case (@cases) {
     subtest $case->[0] => sub {
+        plan tests => 7;
         my $original= $case->[1];
         my $snapshot= $original;
         my $unicode= utf8::is_utf8($original) ? 1 : 0;

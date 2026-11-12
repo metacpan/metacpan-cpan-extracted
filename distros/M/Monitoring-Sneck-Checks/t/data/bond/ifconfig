@@ -1,0 +1,18 @@
+#!/usr/bin/env perl
+# Stands in for ifconfig -a. Prints the output file from the directory
+# under freebsd that BOND_TEST_SET names, and exits with what is in its
+# exit file, if any.
+use strict;
+use warnings;
+use FindBin;
+
+die( 'unexpected args ' . "@ARGV" . "\n" ) if "@ARGV" ne '-a';
+my $set = $FindBin::Bin . '/freebsd/' . $ENV{BOND_TEST_SET};
+open( my $fh, '<', $set . '/output' ) or die( 'no ' . $set . '/output' . "\n" );
+print do { local $/; <$fh> };
+my $exit = 0;
+if ( open( my $exit_fh, '<', $set . '/exit' ) ) {
+	$exit = <$exit_fh>;
+	chomp($exit);
+}
+exit($exit);

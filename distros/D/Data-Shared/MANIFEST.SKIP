@@ -1,0 +1,16 @@
+#!include_default
+^MANIFEST\.bak$
+^Makefile$
+^MYMETA\.
+(^|/)blib/
+^pm_to_blib$
+^\.git/
+^\.gitignore$
+^\.github/
+\.sw[op]$
+^\.pcg/
+^REVIEW\.md$
+^Data-Shared-.*\.tar\.gz$
+^Data-Shared-\d
+^cover_db/
+^Shared\.(c|o|bs)$

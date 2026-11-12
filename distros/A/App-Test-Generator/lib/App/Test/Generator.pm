@@ -1,5 +1,15 @@
 package App::Test::Generator;
 
+# FIXME: SchemaExtractor does not strip comments before scanning for a sub's parameters,
+#	so a comment that quotes a parameter-declaration idiom is read as a real declaration
+#	and fails --strict-pod=fatal (seen in generate(); the comment there was reworded)
+# FIXME: generate() documents its output as a string but returns the result of print;
+#	either return the test source or change the =head4 Output spec (this alters the
+#	extracted schema, so check t/app.t)
+# FIXME: Schema extraction is not deterministic: SchemaExtractor::_build_schema_from_meta
+#	extracts its output type as hashref on some runs and string on others (hash order)
+# FIXME: bin/demo_extractor is installed through EXE_FILES; move it to examples/ and
+#	update Makefile.PL and MANIFEST
 # TODO: Test validator from Params::Validate::Strict 0.16
 # TODO: $seed should be passed to Data::Random::String::Matches
 # TODO: positional args - when config_undef is set, see what happens when not all args are given
@@ -53,7 +63,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 Readonly my $DEFAULT_ITERATIONS      => 30;
 Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
@@ -61,7 +71,7 @@ Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
 # Hash for O(1) lookup rather than a list needing grep O(n)
 Readonly my %VALID_CONFIG_KEYS => map { $_ => 1 } qw(
 	test_nuls test_undef test_empty test_non_ascii
-	dedup properties close_stdin test_security timeout
+	dedup properties close_stdin test_security timeout check_files check_fds check_accessors
 );
 
 # --------------------------------------------------
@@ -174,7 +184,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 SYNOPSIS
 
@@ -596,6 +606,32 @@ With this test enabled, the function is expected to die when a NUL byte is passe
 
 Setting this to 0 disables timeout testing.
 
+=item * C<check_files>, assert the routine leaves no files in the working
+ directory (default: 1)
+
+Every call is checked for files it created.  They are removed afterwards
+whatever the setting, so a routine that writes a file cannot break the cases
+that follow it; set this to 0 for a routine whose purpose is to write one.
+
+=item * C<check_fds>, assert the routine leaks no file descriptors
+ (default: 1)
+
+Only checked where F</proc/self/fd> exists.  Set this to 0 for a routine that
+returns a filehandle to its caller, which still holds a descriptor.
+
+=item * C<check_accessors>, assert an accessor leaves the object it was called
+ on alone (default: 1)
+
+The object is deep copied before each call and the state it was handed
+compared afterwards.  A getter that overwrites or deletes that state fails
+"getter leaves its object unmodified"; a getset that changes anything but the
+property it is named for fails "setter changes nothing but its property".
+Values the call fills in where it was handed undef, and keys it adds, are
+ignored, so a getter that memoises what it computed is not reported.  Set this
+to 0 for an accessor whose purpose is to change state, such as an iterator's
+C<next()>; a getter that declares no input is called with no arguments either
+way.
+
 =item * C<dedup>, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 
 =item * C<properties>, enable L<Test::LectroTest> Property tests (default: 0)
@@ -792,7 +828,9 @@ Maps the expected output string to the input and _STATUS
       input: ""
       _STATUS: DIES
 
-=head3 C<$yaml_cases> - optional path to a YAML file with the same shape as C<%cases>.
+=head3 C<$yaml_cases>
+
+An optional path to a YAML file with the same shape as C<%cases>.
 
 =head3 C<$seed>
 
@@ -847,7 +885,7 @@ During fuzzing iterations, there's a 40% probability that a test case will use a
     - "<script>alert('xss')</script>"
     - "'; DROP TABLE users; --"
     - "\0null\0byte"
-    - "emoji😊test"
+    - "emoji\U0001F60Atest"
     - ""
     - " "
 
@@ -914,6 +952,13 @@ other fuzz testing support for C<semantic> entries is being developed.
 =item * C<md5> - MD5 hashes (32 hex chars)
 
 =item * C<sha256> - SHA-256 hashes (64 hex chars)
+
+=item * C<directory> - The path of an existing, writable directory
+
+The harness creates a temporary directory and passes its path, because no
+pattern can describe "a directory that exists".
+L<App::Test::Generator::SchemaExtractor> sets this for a parameter that the
+routine tests with C<-d>.
 
 =item * C<unix_timestamp>
 
@@ -1076,10 +1121,10 @@ This example takes you through testing the online_render method of L<HTML::Genea
       name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
       steps:
-        - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+        - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
         - name: Set up Perl
-          uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
+          uses: shogo82148/actions-setup-perl@8b574cdc2dffdae49f803204a4f2b716a2fa1db7 # v1.44.2
           with:
             perl-version: ${{ matrix.perl }}
 
@@ -1597,6 +1642,16 @@ The generated test:
 
 =item * Validates inputs with Params::Get / Params::Validate::Strict
 
+=item * Asserts that a wrong-typed argument dies, where the type is enforced
+
+Passing a reference where a string is declared is only expected to die for a
+parameter whose input spec sets C<_type_checked: 1>.
+L<App::Test::Generator::SchemaExtractor> sets that key when the routine checks
+its arguments with a validator such as L<Params::Validate::Strict>.
+A type taken from POD, or inferred from the code, documents intent but does not
+promise rejection, so no such case is generated for it.
+Add the key by hand to a schema whose routine does check its argument types.
+
 =item * Validates outputs with L<Return::Set>
 
 =item * Runs static C<is(... )> corpus tests from Perl and/or YAML corpus
@@ -1622,7 +1677,7 @@ Takes a schema file and produces a test file (or STDOUT).
   # Legacy positional API
   App::Test::Generator->generate($schema_file, $test_file);
 
-=head3 API Specification
+=head3 API SPECIFICATION
 
 =head4 Input
 
@@ -1635,6 +1690,8 @@ Takes a schema file and produces a test file (or STDOUT).
 =head4 Output
 
     { type => 'string' }
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -2011,6 +2068,18 @@ sub generate
 	my $call_code;	# Code to call the function being test when used with named arguments
 	my $position_code;	# Code to call the function being test when used with position arguments
 	my $has_positions = _has_positions(\%input);
+
+	# Numeric values have no single string form: one and the same integer can
+	# stringify as "5967331536404480" (an IV) or "5.96733153640448e+15" (an
+	# NV), so a getset round trip on an integer or number parameter is compared
+	# numerically.  The routine returns the value unchanged, yet eq failed on
+	# the harness's own input about once in forty runs.
+	my $cmp_op = 'eq';
+	if(scalar(keys %input) == 1) {
+		my ($spec) = values %input;
+		my $type = (ref($spec) eq 'HASH') ? $spec->{type} : $spec;
+		$cmp_op = '==' if(defined($type) && !ref($type) && ($type =~ /^(?:integer|number|float)$/));
+	}
 	if(defined($new) && defined($module)) {
 		# keep use_ok regardless (user found earlier issue)
 		if($new_code eq '') {
@@ -2026,13 +2095,13 @@ sub generate
 					$position_code .= "my \$prev_value = \$obj->{$accessor{property}};";
 				} elsif($accessor{type} eq 'getset') {
 					$position_code .= 'if(scalar(@alist) == 1) { ';
-					$position_code .= "cmp_ok(\$result, 'eq', \$alist[0], 'getset function returns what was put in'); ok(\$obj->$function() eq \$result, 'test getset accessor');";
+					$position_code .= "cmp_ok(\$result, '$cmp_op', \$alist[0], 'getset function returns what was put in'); ok(\$obj->$function() $cmp_op \$result, 'test getset accessor');";
 					$position_code .= '}';
 				}
 				if(($accessor{type} eq 'getset') || ($accessor{type} eq 'getter')) {
 					# Since Perl doesn't support data encapsulation, we can test the getter returns the correct item
 					$position_code .= 'if(scalar(@alist) == 1) { ';
-					$position_code .= "cmp_ok(\$result, 'eq', \$obj->{$accessor{property}}, 'getset function returns correct item');";
+					$position_code .= "cmp_ok(\$result, '$cmp_op', \$obj->{$accessor{property}}, 'getset function returns correct item');";
 					if($accessor{type} eq 'getter') {
 						$position_code .= "if(defined(\$prev_value)) { cmp_ok(\$result, 'eq', \$prev_value, 'getter does not change value'); } ";
 					}
@@ -2047,7 +2116,7 @@ sub generate
 			if($output{'_returns_self'}) {
 				$call_code .= "ok(defined(\$result)); ok(\$result eq \$obj, '$function returns self')";
 			} elsif(defined($accessor{type}) && ($accessor{type} eq 'getset')) {
-				$call_code .= "ok(\$obj->$function() eq \$result, 'test getset accessor');"
+				$call_code .= "ok(\$obj->$function() $cmp_op \$result, 'test getset accessor');"
 			}
 			if(scalar(keys %input) == 0) {
 				if(defined($accessor{type}) && ($accessor{type} eq 'getter')) {
@@ -2085,6 +2154,52 @@ sub generate
 		}
 		if(defined($position_code)) {
 			$position_code =~ s/\A\$result = ([^;]+);/my \@_r = ($1); \$result = \\\@_r;/;
+		}
+	}
+
+	# A getter is called for its return value, so it must not change the state
+	# of the object it was handed.  The object is deep copied before the call
+	# and its existing state compared afterwards; values it fills in where it
+	# was handed undef are ignored along with keys it adds, because a getter
+	# that caches the value it worked out is doing its job, while one that
+	# overwrites or removes state it was given is not
+	# - the change is invisible to the caller, which still holds the object,
+	# and the next call sees different behaviour for the same input.
+	if(defined($accessor{type}) && ($accessor{type} eq 'getter')) {
+		# A getter with no declared input must be called with no arguments:
+		# $input is the schema's own hashref, and a getter that takes
+		# an optional second argument would store it as if it were a value.
+		foreach my $code (\$call_code, \$position_code) {
+			next unless(defined($$code));
+			$$code =~ s/\Q$function\E\(\$input\)/$function()/g;
+		}
+		my $snapshot = 'my $getter_copy = eval { require Storable; Storable::dclone($obj) }; ';
+		my $check = 'if(defined($getter_copy) && eval { scalar(keys %{$getter_copy}); 1 }) {'
+			. ' my %getter_state = map { $_ => $getter_copy->{$_} } grep { defined($getter_copy->{$_}) } keys %{$getter_copy};'
+			. ' is_deeply({ map { $_ => $obj->{$_} } grep { exists($obj->{$_}) } keys %getter_state }, \\%getter_state, q{getter leaves its object unmodified});'
+			. ' }';
+		foreach my $code (\$call_code, \$position_code) {
+			next unless(defined($$code) && ($config{'check_accessors'} // 1));
+			$$code = $snapshot . $$code . ' ' . $check;
+		}
+	}
+
+	# A setter is called to change one property, so everything else the object
+	# was handed must come back untouched.  The object is deep copied before the
+	# call and the rest of its state compared afterwards; the property itself is
+	# excluded, since changing that is the point, and values it fills in where it
+	# was handed undef are ignored along with keys it adds, so that lazy
+	# initialisation is not reported as damage.
+	if(defined($accessor{type}) && ($accessor{type} eq 'getset') && defined($accessor{property})) {
+		my $property = perl_quote($accessor{property});
+		my $snapshot = 'my $setter_copy = eval { require Storable; Storable::dclone($obj) }; ';
+		my $check = 'if(defined($setter_copy) && eval { scalar(keys %{$setter_copy}); 1 }) {'
+			. ' my %setter_state = map { $_ => $setter_copy->{$_} } grep { defined($setter_copy->{$_}) && ($_ ne ' . $property . ') } keys %{$setter_copy};'
+			. ' is_deeply({ map { $_ => $obj->{$_} } grep { exists($obj->{$_}) } keys %setter_state }, \\%setter_state, q{setter changes nothing but its property});'
+			. ' }';
+		foreach my $code (\$call_code, \$position_code) {
+			next unless(defined($$code) && ($config{'check_accessors'} // 1));
+			$$code = $snapshot . $$code . ' ' . $check;
 		}
 	}
 
@@ -2959,7 +3074,7 @@ The output is always a single line with no trailing newline. Suitable
 for embedding in generated test code where readability is secondary to
 correctness.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -2968,6 +3083,8 @@ correctness.
 =head4 output
 
     { type => 'string' }
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -3022,7 +3139,7 @@ Returns an empty string if C<$href> is undef, empty, or not a hashref.
 
 =head3 Notes
 
-The C<matches> and C<nomatch> sub-keys are treated specially — their
+The C<matches> and C<nomatch> sub-keys are treated specially - their
 values are compiled to C<Regexp> objects via C<eval { qr/.../ }> and
 then rendered using C<perl_quote> so they appear as C<qr{...}> in the
 generated test. This prevents unmatched bracket characters in the
@@ -3030,7 +3147,7 @@ pattern from causing compilation failures.
 
 Other sub-keys are rendered via C<perl_quote>.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -3039,6 +3156,8 @@ Other sub-keys are rendered via C<perl_quote>.
 =head4 output
 
     { type => 'string' }
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -3128,7 +3247,7 @@ in a generated test file.
 =item * C<$href>
 
 A flat hashref of key-value pairs. Values may be scalars, arrayrefs,
-or Regexp objects — all are handled by C<perl_quote>.
+or Regexp objects - all are handled by C<perl_quote>.
 
 =back
 
@@ -3144,7 +3263,7 @@ C<Regexp> values are rendered as C<qr{...}> which is correct for
 L<Params::Validate::Strict> and L<Return::Set> schema arguments in
 the generated test.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -3153,6 +3272,8 @@ the generated test.
 =head4 output
 
     { type => 'string' }
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -3193,17 +3314,18 @@ arrayrefs are silently skipped.
 
 A comma-separated string of C<'key' => [ val, ... ]> entries, one per
 qualifying key, sorted alphabetically. Returns the string C<'()'> if
-C<$href> is undef, empty, or not a hashref — this produces an empty
+C<$href> is undef or not a hashref - this produces an empty
 hash assignment in the generated test rather than a syntax error.
+Returns an empty string if C<$href> is a hashref with no arrayref values.
 
 =head3 Notes
 
 Array element values are rendered via C<perl_quote> which handles
 scalars, arrayrefs, and Regexp objects. Non-arrayref values are
-skipped without warning — this is intentional since callers may pass
+skipped without warning - this is intentional since callers may pass
 mixed-value hashes and only want the arrayref entries rendered.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -3212,6 +3334,8 @@ mixed-value hashes and only want the arrayref entries rendered.
 =head4 output
 
     { type => 'string' }
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -3405,7 +3529,7 @@ when evaluated in a generated test file.
 =item * C<$v>
 
 Any Perl value. May be undef, a scalar, an arrayref, a Regexp, or a blessed
-object. All types are handled — undef becomes C<'undef'>, the strings
+object. All types are handled - undef becomes C<'undef'>, the strings
 C<'true'>/C<'false'> become the Perl boolean constants C<!!1>/C<!!0>,
 numbers are unquoted, other strings are single-quoted, arrayrefs recurse,
 Regexps become C<qr{...}>, and anything else (including hashrefs and
@@ -3413,7 +3537,7 @@ blessed objects) falls through to C<render_fallback>.
 
 =back
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -3422,6 +3546,8 @@ blessed objects) falls through to C<render_fallback>.
 =head4 output
 
     { type => 'string' }
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -3883,6 +4009,14 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'SHA-256 hashes (64 hex characters)',
+		}, directory => {
+			code => q{
+				Gen {
+					require File::Temp;
+					File::Temp::tempdir(CLEANUP => 1);
+				}
+			},
+			description => 'Paths to existing writable directories',
 		}, unix_timestamp => {
 			code => q{
 				Gen {
@@ -4845,6 +4979,151 @@ L<http://matrix.cpantesters.org/?dist=App-Test-Generator>
 L<http://deps.cpantesters.org/?module=App::Test::Generator>
 
 =back
+
+=head1 FORMAL SPECIFICATION
+
+This section describes the documented routines in Z notation.  It is for
+readers who want an exact, mathematical statement.  You do not need it to use
+the module.
+
+How to read it: a name ending in C<?> is an input and a name ending in C<!> is
+an output.  None of these routines keeps any state between calls, so there is
+no state schema.  C<quote(v)> stands for the result of C<perl_quote(v)>.
+
+=head2 generate
+
+    ┌─ Generate ────────────────────────────────────────
+    │ schema_file? : STRING
+    │ output_file? : STRING ∪ { undef }
+    │ test : STRING
+    ├───────────────────────────────────────────────────
+    │ pre   schema_file? names a readable schema
+    │       the schema defines function
+    │       every name in the schema is an identifier
+    │ post  test is a complete Perl test file for function
+    │       output_file? ≠ undef ⇒ file output_file? holds test
+    │       output_file? = undef ⇒ test is printed on STDOUT
+    └───────────────────────────────────────────────────
+
+    no arguments                     ⇒ croak 'Usage: generate(...)'
+    output_file? cannot be written   ⇒ croak 'Cannot open ...'
+
+=head2 render_fallback
+
+    ┌─ RenderFallback ──────────────────────────────────
+    │ v? : VALUE
+    │ result! : STRING
+    ├───────────────────────────────────────────────────
+    │ post  v? = undef ⇒ result! = 'undef'
+    │       v? ≠ undef ⇒ result! is one line of Perl source
+    │                     ∧ eval(result!) is a copy of v?
+    └───────────────────────────────────────────────────
+
+=head2 render_hash
+
+    ┌─ RenderHash ──────────────────────────────────────
+    │ href? : VALUE
+    │ result! : STRING
+    │ kept : ℙ STRING
+    ├───────────────────────────────────────────────────
+    │ post  ref(href?) ≠ 'HASH' ∨ href? = ∅ ⇒ result! = ''
+    │       ref(href?) = 'HASH' ⇒
+    │           kept = { k : dom href? | href?(k) is a hashref
+    │                    ∨ href?(k) is a type name }
+    │           result! has one "'k' => { ... }" entry for each
+    │           k in kept, in sorted order
+    └───────────────────────────────────────────────────
+
+=head2 render_args_hash
+
+    ┌─ RenderArgsHash ──────────────────────────────────
+    │ href? : VALUE
+    │ result! : STRING
+    ├───────────────────────────────────────────────────
+    │ post  ref(href?) ≠ 'HASH' ∨ href? = ∅ ⇒ result! = ''
+    │       ref(href?) = 'HASH' ⇒
+    │           result! = join(', ', ⟨ k : sort(dom href?) •
+    │                       quote(k) . ' => ' . quote(href?(k)) ⟩)
+    └───────────────────────────────────────────────────
+
+=head2 render_arrayref_map
+
+    ┌─ RenderArrayrefMap ───────────────────────────────
+    │ href? : VALUE
+    │ result! : STRING
+    │ kept : ℙ STRING
+    ├───────────────────────────────────────────────────
+    │ post  href? is false ∨ ref(href?) ≠ 'HASH' ⇒ result! = '()'
+    │       ref(href?) = 'HASH' ⇒
+    │           kept = { k : dom href? | ref(href?(k)) = 'ARRAY' }
+    │           kept = ∅ ⇒ result! = ''
+    │           result! has one "'k' => [ ... ]" entry for each
+    │           k in kept, in sorted order
+    └───────────────────────────────────────────────────
+
+=head2 perl_quote
+
+    ┌─ PerlQuote ───────────────────────────────────────
+    │ v? : VALUE
+    │ result! : STRING
+    ├───────────────────────────────────────────────────
+    │ pre   v? is nested no more than 100 levels deep
+    │ post  v? = undef            ⇒ result! = 'undef'
+    │       v? = 'true'           ⇒ result! = '!!1'
+    │       v? = 'false'          ⇒ result! = '!!0'
+    │       v? looks like a number ⇒ result! = v?
+    │       v? is any other string ⇒ result! = v? in single quotes,
+    │                                with ' and \ escaped
+    │       ref(v?) = 'ARRAY'     ⇒ result! = '[ ' . join(', ',
+    │                                ⟨ e : v? • quote(e) ⟩) . ' ]'
+    │       ref(v?) = 'Regexp'    ⇒ result! = 'qr{...}'
+    │       otherwise             ⇒ result! = render_fallback(v?)
+    └───────────────────────────────────────────────────
+
+    nested more than 100 levels deep ⇒ croak 'structure too deeply nested'
+
+=head1 STATE DIAGRAM
+
+C<generate> is a class method and keeps no state.  One call runs from start
+to finish through these stages, and any stage may stop it by croaking.
+
+                +-------------+
+                |    START    |
+                +-------------+
+                       |
+                       | generate(schema_file, output_file)
+                       v
+                +-------------+   no arguments, file not readable
+                | LOAD SCHEMA |--------------------------------------+
+                +-------------+                                      |
+                       |                                             |
+                       | schema parsed                               |
+                       v                                             |
+                +-------------+   missing function, bad name,        |
+                |  VALIDATE   |   contradictory input spec           |
+                +-------------+--------------------------------------+
+                       |                                             |
+                       | schema is good                              |
+                       v                                             v
+                +-------------+                               +-------------+
+                |   RENDER    |                               |   CROAKED   |
+                +-------------+                               +-------------+
+                       |                                             ^
+                       | test source built                           |
+                       v                                             |
+                +-------------+   output_file cannot be opened       |
+                |    WRITE    |--------------------------------------+
+                +-------------+
+                       |
+                       | file written, or source printed on STDOUT
+                       v
+                +-------------+
+                |    DONE     |
+                +-------------+
+
+Side effects: C<generate> writes C<output_file> and prints one line saying so,
+or prints the test source when no output file is given.  The C<render_*>
+routines and C<perl_quote> write no files and print nothing.
 
 =head1 LICENCE AND COPYRIGHT
 

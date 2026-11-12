@@ -39,6 +39,7 @@ my %WORDS = (
 	centring => 'centering',
 	behaviour => 'behavior', behaviours => 'behaviors',
 	neighbour => 'neighbor', neighbours => 'neighbors',
+	neighbourhood => 'neighborhood', neighbourhoods => 'neighborhoods',
 	favour => 'favor', favourite => 'favorite', favourites => 'favorites',
 	honour => 'honor', labour => 'labor',
 	grey => 'gray', greyed => 'grayed',

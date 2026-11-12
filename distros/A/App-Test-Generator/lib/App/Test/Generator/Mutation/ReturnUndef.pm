@@ -2,11 +2,12 @@ package App::Test::Generator::Mutation::ReturnUndef;
 
 use strict;
 use warnings;
+use Carp qw(carp);
 use parent 'App::Test::Generator::Mutation::Base';
 use App::Test::Generator::Mutant;
 use PPI;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 NAME
 
@@ -15,7 +16,7 @@ with undef to expose missing undef-return checks in the test suite
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 METHODS
 
@@ -249,7 +250,7 @@ sub mutate {
 		# If the Mutant construction fails, report clearly rather than
 		# silently dropping the mutant from the results
 		if($@ || !$mutant) {
-			warn "Failed to construct mutant $id: $@" if $@;
+			carp "Failed to construct mutant $id: $@" if $@;
 			next;
 		}
 

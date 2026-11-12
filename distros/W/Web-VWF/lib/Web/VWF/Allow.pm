@@ -9,6 +9,8 @@ use Web::VWF::Utils;
 
 use strict;
 use warnings;
+
+use version; our $VERSION = version->declare('0.002.0');
 use Carp;
 use Error;
 use File::Spec;

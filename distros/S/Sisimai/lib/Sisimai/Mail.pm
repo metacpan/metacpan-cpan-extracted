@@ -2,6 +2,7 @@ package Sisimai::Mail;
 use v5.26;
 use strict;
 use warnings;
+use Sisimai::Eb;
 use Class::Accessor::Lite (
     'new' => 0,
     'ro'  => [
@@ -23,10 +24,12 @@ sub new {
     my $klass = undef;
     my $loads = 'Sisimai/Mail/';
     my $param = {'kind' => '', 'data' => undef, 'path' => $argv1};
+    my $xbyte = $Sisimai::Eb::XeBYTE * 32;  # 64MB * 32 = 2GB
 
     # The argumenet is a mailbox or a Maildir/.
     if( -f $argv1 ) {
         # The argument is a file, it is an mbox or email file in Maildir/
+        my $xb  = -s $argv1; return undef if $xb > $xbyte;
         $klass  = __PACKAGE__.'::Mbox';
         $loads .= 'Mbox.pm';
         $param->{'kind'} = 'mailbox';
@@ -156,7 +159,7 @@ azumakuniyuki
 
 =head1 COPYRIGHT
 
-Copyright (C) 2014-2016,2018-2021,2024,2025 azumakuniyuki, All rights reserved.
+Copyright (C) 2014-2016,2018-2021,2024-2026 azumakuniyuki, All rights reserved.
 
 =head1 LICENSE
 

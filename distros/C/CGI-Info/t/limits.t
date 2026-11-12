@@ -9,13 +9,17 @@ use CGI::Info;
 
 END { CGI::Info->reset() }
 
-# local %ENV replaces the whole environment.  TMPDIR has to survive that, or
-# tmpdir() falls back to /tmp while upload_dir still points at the directory
-# tempdir() created, and params() rejects it as outside the temporary area.
+# local %ENV replaces the whole environment.  The temporary directory settings
+# have to survive that, or tmpdir() falls back to a default while upload_dir
+# still points at the directory tempdir() created, and params() rejects it as
+# outside the temporary area.  Windows uses TEMP and TMP rather than TMPDIR,
+# and SYSTEMROOT/WINDIR for its system temporary directory.
 sub env_with_tmpdir {
 	my (%env) = @_;
 
-	$env{TMPDIR} = $ENV{TMPDIR} if defined($ENV{TMPDIR});
+	foreach my $var (qw(TMPDIR TEMP TMP SYSTEMROOT WINDIR)) {
+		$env{$var} = $ENV{$var} if defined($ENV{$var});
+	}
 
 	return %env;
 }

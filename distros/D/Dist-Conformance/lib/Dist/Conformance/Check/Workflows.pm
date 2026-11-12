@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::Workflows 0.004;
+package Dist::Conformance::Check::Workflows 0.005;
 
 # ABSTRACT: The CI workflows exist
 
@@ -65,7 +65,7 @@ Dist::Conformance::Check::Workflows - The CI workflows exist
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

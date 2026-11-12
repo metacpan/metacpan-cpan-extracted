@@ -19,11 +19,11 @@ Readonly my $PENALTY_EMPTY_LIST_CONSISTENCY        => 15;
 Readonly my $PENALTY_EXCEPTION_SWALLOW_STABILITY   => 20;
 Readonly my $BONUS_BOOLEAN_STABILITY               => 5;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.46
+Version 0.48
 
 =head1 DESCRIPTION
 
@@ -86,18 +86,18 @@ The C<output> hashref may include any of the following keys:
 
 =over 4
 
-=item C<_context_aware> — true if the function returns differently in
+=item C<_context_aware> - true if the function returns differently in
 list vs scalar context.
 
-=item C<_returns_self> — true if the function returns C<$self>.
+=item C<_returns_self> - true if the function returns C<$self>.
 
-=item C<type> — the declared return type string e.g. C<object>,
+=item C<type> - the declared return type string e.g. C<object>,
 C<boolean>, C<string>.
 
-=item C<_error_handling> — a hashref with boolean keys C<implicit_undef>,
+=item C<_error_handling> - a hashref with boolean keys C<implicit_undef>,
 C<empty_list>, and C<exception_handling>.
 
-=item C<_error_return> — the value returned on error e.g. C<undef>.
+=item C<_error_return> - the value returned on error e.g. C<undef>.
 
 =back
 
@@ -109,12 +109,12 @@ A hashref with three keys:
 
 =over 4
 
-=item * C<stability_score> — integer in [0, 100]. Higher is more stable.
+=item * C<stability_score> - integer in [0, 100]. Higher is more stable.
 
-=item * C<consistency_score> — integer in [0, 100]. Higher is more
+=item * C<consistency_score> - integer in [0, 100]. Higher is more
 consistent.
 
-=item * C<risk_flags> — arrayref of string risk identifiers detected
+=item * C<risk_flags> - arrayref of string risk identifiers detected
 during analysis.
 
 =back
@@ -125,7 +125,7 @@ Both scores start at 100 and are reduced by penalties for each detected
 risk pattern. A small bonus is applied to stability for boolean return
 types, but since C<stability_score> starts at 100 and is clamped to
 [0, 100] after all adjustments, this bonus is a no-op unless an earlier
-penalty has already reduced the score below 100 — for a boolean-returning
+penalty has already reduced the score below 100 - for a boolean-returning
 function with no other detected risk, C<stability_score> is unaffected
 by C<$BONUS_BOOLEAN_STABILITY> and remains 100.
 

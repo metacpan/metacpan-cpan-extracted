@@ -29,11 +29,11 @@ Readonly my $TEST_BOUNDARY        => 'boundary_tests';
 Readonly my $TYPE_OBJECT  => 'object';
 Readonly my $TYPE_BOOLEAN => 'boolean';
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 =head1 VERSION
 
-Version 0.46
+Version 0.48
 
 =head1 DESCRIPTION
 

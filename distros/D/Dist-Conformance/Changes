@@ -1,5 +1,15 @@
 Revision history for Dist-Conformance
 
+0.005 2026-11-11 TEODESIAN
+    - CriticProfile takes retired: a list of the policies that the
+      standards have taken back.  The check fails a profile that still
+      enables one, and names it, and the update removes its section, with
+      its parameters and the comment directly above it.  Dropping a policy
+      from the template could never take it away from a profile that had
+      it, because a policy that the template lacks may be the
+      distribution's own.  A template that enables a retired policy is an
+      error.
+
 0.004 2026-11-10 TEODESIAN
     - The update of CriticProfile appends to a profile that is there each
       policy of the template that it lacks, as the template writes its

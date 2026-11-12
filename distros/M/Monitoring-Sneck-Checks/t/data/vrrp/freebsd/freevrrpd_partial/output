@@ -1,0 +1,14 @@
+em0: flags=8943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST> metric 0 mtu 1500
+	ether 00:25:90:aa:bb:01
+	inet 192.0.2.11 netmask 0xffffff00 broadcast 192.0.2.255
+	status: active
+em1: flags=8943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST> metric 0 mtu 1500
+	ether 00:25:90:aa:bb:02
+	inet 198.51.100.11 netmask 0xffffff00 broadcast 198.51.100.255
+	status: active
+vrrp1: flags=8843<UP,BROADCAST,RUNNING,SIMPLEX,MULTICAST> metric 0 mtu 1500
+	ether 00:00:5e:00:01:01
+	inet 192.0.2.100 netmask 0xffffffff broadcast 192.0.2.100
+vrrp2: flags=8802<BROADCAST,SIMPLEX,MULTICAST> metric 0 mtu 1500
+	ether 00:00:5e:00:01:02
+	inet 198.51.100.100 netmask 0xffffffff broadcast 198.51.100.100

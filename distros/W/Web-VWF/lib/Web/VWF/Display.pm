@@ -5,7 +5,7 @@ package Web::VWF::Display;
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.002.0
 
 =cut
 
@@ -93,7 +93,7 @@ server-side form handling and do not need CSRF tokens at all:
 
 # -----------------------------------------------------------------------
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.002.0');
 
 use v5.20;
 use strict;
@@ -470,7 +470,7 @@ sub get_template_path
 	my $dir = $ENV{'root_dir'} || $self->{_config}->{root_dir} || $self->{_info}->root_dir();
 	if($self->{_logger}) {
 		$self->{_logger}->debug(__PACKAGE__, ': ', __LINE__, ": root_dir $dir");
-		$self->{_logger}->debug(Data::Dumper->new([$self->{_config}])->Dump());
+		$self->{_logger}->debug(Data::Dumper->new([Web::VWF::Utils::redact_config($self->{_config})])->Dump());
 	}
 	$dir .= '/templates';
 

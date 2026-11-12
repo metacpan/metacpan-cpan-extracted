@@ -1,0 +1,21 @@
+Data::Shared benchmark notes
+
+Recorded dispatch measurements and their environment are documented in the
+PERFORMANCE section of Data::Shared (perldoc Data::Shared).
+
+Commands for fresh measurements against the installed backends:
+  DS_BENCH_TIME=2 perl bench/benchmark.pl
+  DS_BENCH_TIME=2 perl bench/overhead.pl
+  DS_BENCH_TIME=1 perl bench/composite.pl
+  perl bench/mounts.pl
+
+The historical 2026-10-17 samples have been removed. They predated the
+released implementation, their exact source revision was not recorded, and
+the dispatch table duplicated the POD with different results. The notes
+also mixed samples and denominator corrections without complete provenance.
+
+Run on an idle host and record the source revision, Perl/backend versions,
+commands and environment with the output. CPU throughput and warm-cache
+composite timings do not describe cold-storage latency or crash durability.
+
+See bench/scaling.pl for creation, RSS, working-set and contention experiments.

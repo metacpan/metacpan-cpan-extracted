@@ -20,15 +20,17 @@ our %EXPORT_TAGS = ('all' => [ qw(
 		replication
 		tex_escape
 		REase
+		AGLkit
+		font_metrics
+		onecell
 	) ],
 );
 
 our @EXPORT_OK = ( @{ $EXPORT_TAGS{'all'} } );
 our @EXPORT = qw( );
 
-our $VERSION = '0.793';
+our $VERSION = '0.803';
 our $DEBUG = 0;
-$DEBUG += 0;
 
 our $qs = qr/^|_|\b/o;
 our $qe = qr/_|\b|$/o;
@@ -49,9 +51,23 @@ our $m = '{\\hskip0pt plus .02em}';
 our $sI = qr/[\s\x21-\x2F\x3A-\x40\x5B-\x60\x7B-\x7E]/o;
 our $sII = qr/[a-zA-Z0-9,=:;!\>\<\)\(\/\.\s\+\-\*\?]+/o;
 
+# font sizes, depending on the document's base font size (pt), see \documentclass[...pt]
+our $fontSizeTeX = {
+	names => {tiny=>0, scriptsize=>1, footnotesize=>2, small=>3, normalsize=>4, large=>5, Large=>6, LARGE=>7, huge=>8, Huge=>9},
+	#      0  1  2   3      4      5     6      7      8      9
+	10 => [5, 7, 8,  9,     10,    12,   14.4,  17.28, 20.74, 24.88],
+	11 => [6, 8, 9,  10,    10.95, 12,   14.4,  17.28, 20.74, 24.88],
+	12 => [6, 8, 10, 10.95, 12,    14.4, 17.28, 20.74, 24.88, 24.88],
+};
+
+our $refHypMsk = {
+	en => qr/[a-zA-Z\-]+/o,
+	ru => qr/[а-яёА-ЯЁ\-]+/o,
+};
 
 #-------------------
 # External functions
+#-------------------
 
 # Masks (or replaces with equivalents) the active 9 TeX characters: &, %, $, #, _, {, }, ^, \
 # with additionally replace character '~'
@@ -61,6 +77,7 @@ our $sII = qr/[a-zA-Z0-9,=:;!\>\<\)\(\/\.\s\+\-\*\?]+/o;
 # OUTPUT (and $_[1]->{mflag} if $_[1] is 'HASH'):
 #	0 -- value NOT changed
 #	1 -- value changed
+
 sub tex_escape {
 	$_[0] or return 0;
 
@@ -153,7 +170,7 @@ sub tex_escape {
 			}
 
 			if( $prm =~/(?:$qs)hyphen(?:$qe)/ ) {
-				s/(?<=[[:alpha:]])\-(?=[[:alpha:]])/"=/gi #"# make compound words with 'active' hyphens
+				s/(?<=[[:alpha:]])\-(?=[[:alpha:]])/"=/gi; #"# make compound words with 'active' hyphens
 			}
 
 		}
@@ -183,7 +200,7 @@ sub tex_escape {
 			}
 
 			if( $prm =~/(?:$qs)hyphen(?:$qe)/ ) {
-				s/(?<=[[:alpha:]])\-(?=[[:alpha:]])/"=/gi #"# make compound words with 'active' hyphens
+				s/(?<=[[:alpha:]])\-(?=[[:alpha:]])/"=/gi; #"# make compound words with 'active' hyphens
 			}
 
 			s|(?<![~\^])\\/(?=\\)||g; # '\/\' --> '\'
@@ -264,10 +281,9 @@ sub REase {
 	my $stag = ($arr[0] =~s/^%%%://) ? $& : ''; # start tag
 	my $etag = ($_[0] =~/\s+$/) ? $& : ''; # end tag
 
-
 	for( @arr ) {
 		next if $n + 2 > length
-				or /\A\p{Alpha}\Z/;
+				or /^\p{Alpha}+$/;
 
 		my $z = $_;
 
@@ -278,11 +294,10 @@ sub REase {
 		s/\>{1,2}/$&$m/g;
 
 		# removal of excess glue:
-		s/(?<=[\(\[\{])(?:$q)+(?=[[:alnum:]])//g; # after the opening parenthesis
-		s/(?<=[[:alnum:]])(?:$q)+(?=[\)\]\}])//g; # before the closing parenthesis
+		s/(?<=[\(\[\{«])(?:$q)+(?=[[:alnum:]])//g; # after the opening parenthesis
+		s/(?<=[[:alnum:]])(?:$q)+(?=[\)\]\}»])//g; # before the closing parenthesis
 
-		# Reducing of excess glue
-#		s/$p/$m/g;
+		s/(?<=\p{Alpha})(?:$q)+([,\.:!;])/$1$m/g; # permutation for these symbols
 
 		# final removal of excess glue:
 		s/^(?:\s*$q\s*)+|(?:$q\s*)+$//g; # start & end glue
@@ -314,7 +329,7 @@ sub replication {
 	my( $source, $info, %op ) = @_;
 
 	our $DEBUG;
-	$op{debug} //= $DEBUG + 0;
+	$op{debug} //= $DEBUG;
 
 	our( $qs, $qe, $sI, $sII );
 
@@ -688,9 +703,10 @@ sub _replisome {
 
 			return $end if $end;
 
-			return 1 if $t && $t eq 'T'; # END of Template area --> output everything to the end of template without substitution
-
-			undef $$tdz if $t && $t eq 'Z';
+			if( $t ) {
+				return 1 if $t eq 'T'; # END of Template area --> output everything to the end of template without substitution
+				undef $$tdz; # if $t eq 'Z';
+			}
 
 			return 0 if $$z =~/%%%ENDZ?:/; # end of %%%VAR: tag
 
@@ -699,17 +715,6 @@ sub _replisome {
 				return 0;
 			}
 		}
-#		elsif( ( $vtype eq 'HASH' and (
-#					   ref( $$vardata->{ $$key } ) =~/^(?:HASH|ARRAY|SCALAR)$/ # REF->SCALAR
-#					or ref \$$vardata->{ $$key } eq 'SCALAR'
-#				)
-#			)
-#			or ( $vtype eq 'ARRAY' and (
-#					   ref( $$vardata->[ $$key ] ) =~/^(?:HASH|ARRAY|SCALAR)$/ # REF->SCALAR
-#					or ref \$$vardata->[ $$key ] eq 'SCALAR'
-#				)
-#			)
-#		)
 		else {
 			my $vk = $vtype eq 'HASH' ? $$vardata->{ $$key } : $$vardata->[ $$key ];
 			my $sclr = (ref(\$vk) eq 'SCALAR' or ref($vk) eq 'SCALAR');
@@ -717,7 +722,7 @@ sub _replisome {
 			# Index of column in target table
 			my $j = ( @$columns && exists( $columns->[-1]{ki} ) ) ?
 						@$columns :
-						($#$columns // 0);
+						$#$columns; # ($#$columns // 0);
 			$j = 0 if $j < 0 or $sclr;
 
 			if( ! $sclr and $$z =~/^(.*?)\s?%%%+V:\s*(\*?)([^\s:%#\*]+)(%?)\s?(.*)/) {
@@ -839,7 +844,7 @@ push @{$op->{logs}}, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". 
 	if( $$z =~/(.*?)\s?%%%+VAR:\s*(\*?)([^\s:%#\*]+)(%?)\s?(.*)/) {
 		my $before = $1; # Value, by default
 		my $eXi = $2; # eXistence of Value
-		my $k = $3; # name (key)
+		my $k = my $k0 = $3; # name (key)
 		my $Np = $4; # NO \par
 		my $paste = $5; # on right text for SCALAR only
 
@@ -847,11 +852,11 @@ push @{$op->{logs}}, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". 
 		my $vd = ( $k =~s/^\/+//) ? $info : $$data;
 
 		my $xk; # for unknown/undefined sub-key
+		my @kk = grep length, split '/', $k;
 
 		# Search nested sub-keys
-		for my $sk ( split '/', $k ) {
+		foreach my $sk ( @kk ) {
 			$$vardata = $vd;
-			length( $sk ) or next;
 
 			my $vtype = ref $vd;
 
@@ -873,7 +878,7 @@ push @{$op->{logs}}, "~~> l.$. WARNING#8: ARRAY index is not numeric in %%%V:". 
 		@$columns = ();
 
 		if( $xk ) {
-push @{$op->{logs}}, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key '$xk' in %%%VAR:". $k if $op->{debug} or ! $op->{ignore};
+push @{$op->{logs}}, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF.SCALAR of sub-key '$xk' in %%%VAR:". $k0 if $op->{debug} or ! $op->{ignore};
 
 			$$vardata = $$data;
 			print { $op->{fh} } $$z;
@@ -882,11 +887,11 @@ push @{$op->{logs}}, "~~> l.$. WARNING#2: unknown or undef ARRAY|HASH|SCALAR|REF
 		}
 
 		# key or sub-...sub-key is found
-push @{$op->{logs}}, "--> l.$. Found %%%VAR:". $k if $op->{debug};
+push @{$op->{logs}}, "--> l.$. Found %%%VAR:". $k0 if $op->{debug};
 
 		my $vk = ref $$vardata eq 'HASH' ? $$vardata->{$k} : $$vardata->[$k];
 
-push @{$op->{logs}}, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk) && $op->{debug};
+push @{$op->{logs}}, "~~> l.$. NOT defined key in %%%VAR:". $k0 if ! defined($vk) && $op->{debug};
 
 		return 0 if &_chk_var( $k, $vk, $eXi, $Np, \$paste, \$before, $chkVAR, $columns, $z, $op );
 
@@ -901,7 +906,13 @@ push @{$op->{logs}}, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk)
 		my $x = $2 || 0;
 		my $i = ( $op->{$k} && $op->{$k} =~/\d\d?/ ) ? $& : 0;
 
-		$op->{$k} = $x if $i < 2;
+		if( $i < 2) {
+			$op->{$k} = $x ;
+
+push @{$op->{logs}}, "~~> l.$. Option =$k= set to $x" if $op->{debug};
+
+		}
+
 		return 0;
 	}
 	elsif( $$z =~/^(?<v>.*?)\s?%%%+V:\s*(?<x>\*?)(?<k>[^\s:%#\*]+)(?<p>%?)\s?(?<s>.*)/) {
@@ -912,16 +923,23 @@ push @{$op->{logs}}, "~~> l.$. NOT defined key in %%%VAR:". $k if ! defined($vk)
 
 		my $inidata = $$data; # save initial environment
 
+		my $slash;
 		if( $k =~s/^\/+//) {
+			$slash = 1;
 			$$data = $info; # reset to root environment
 
 			length($k) or return 0;
 		}
+		elsif( $k =~/\//) {
+			$slash = 1;
+		}
 
 		# Search nested sub-keys
-		my $x = 0; # for unknown sub-key
-		for my $sk ( split '/', $k ) {
-			length( $sk ) or next;
+		my $x = 0; # 1 is SCALAR value found or unknown sub-key
+		my @kk = grep length, split '/', $k;
+
+		my $i = 0;
+		foreach my $sk ( @kk ) {
 
 			my $dtype = ref $$data;
 
@@ -949,8 +967,19 @@ push @{$op->{logs}}, "~~> l.$. WARNING#3: unknown sub-key '$sk' in %%%V:". $k if
 
 			# Check type
 			if( $dtp =~/^(?:ARRAY|HASH)$/ ) {
-				$$data = $d; #  sub-key (path) found: redefined
-				next;
+
+				if( $slash ) {
+					$$data = $d; #  sub-key (path) found: redefined
+					next;
+				}
+
+push @{$op->{logs}}, "~~> l.$. WARNING#5: (ARRAY|HASH) w/o '/' is wrong type of '$sk' in %%%V:". $k if $op->{debug} or ! $op->{ignore};
+
+				print { $op->{fh} } $$z;
+				++$op->{nlo};
+
+				$x = 1;
+				last;
 			}
 
 			my $v;
@@ -972,11 +1001,16 @@ push @{$op->{logs}}, "~~> l.$. WARNING#4: wrong type (not SCALAR|ARRAY|HASH) of 
 
 			$_ = &_v_print( $k, $v, \%el, $op ) and return $_;
 
+push @{$op->{logs}}, "~~> l.$. WARNING#9: '$sk' is not at the end of %%%V:". $k if $i < $#kk and ( $op->{debug} or ! $op->{ignore} );
+
 			$x = 1;
 			last;
 		}
+		continue {
+			++$i;
+		}
 
-		$$data = $inidata if $x; # value found or unknown sub-key: reset to initial environment
+		$$data = $inidata if $x; # SCALAR value found or unknown sub-key: reset to initial environment
 
 		return 0;
 	}
@@ -1003,6 +1037,7 @@ sub _data_redef {
 
 	if( ref $d eq 'ARRAY' or ref $d eq 'HASH') {
 		$$data = $d; # redefined for %%%VAR:
+		$$k = $sk;
 		return 0;
 	}
 
@@ -1039,7 +1074,7 @@ sub _chk_var {
 					$$chkVAR |= 0b01000;
 				}
 				else {
-					$$chkVAR |= 0b10000;
+					$$chkVAR |= 0b10000; # other
 				}
 			}
 		}
@@ -1047,7 +1082,7 @@ sub _chk_var {
 			$$chkVAR |= 0b00100; # by default, SCALAR
 		}
 
-		if( ! $$chkVAR or $$chkVAR > 0b01000 or ($$chkVAR & ($$chkVAR - 1)) ) {
+		if( $$chkVAR > 0b01000 or ($$chkVAR & ($$chkVAR - 1)) ) { # ! $$chkVAR or 
 push @{$op->{logs}}, "~~> l.$. WARNING#6: mixed types (ARRAY with HASH with SCALAR or other) of %%%VAR:". $k if $op->{debug} or ! $op->{ignore};
 
 			print { $op->{fh} } $$z;
@@ -1209,13 +1244,17 @@ sub _s_a_prn {
 		for( @$val ) {
 			next if ref \$_ ne 'SCALAR';
 
-			$end = &_hvt_print( $i, $_, $el, $op, $$border );
+			# [...].ARRAY.ARRAY.SCALAR
+			$end = &_hvt_print( $i, $_, $el, $op, $$border ); 
 
 			++$$col;
 			$$border = 0;
 
 			last if $end;
 		}
+	}
+	else {
+push @{$op->{logs}}, "~~> l.$. WARNING#10: ...ARRAY.ARRAY[$i] is NOT a SCALAR in %%%V:$i ...skipped" if $op->{debug} or ! $op->{ignore};
 	}
 
 	return $end;
@@ -1341,7 +1380,7 @@ push @{$op->{logs}}, '--> Table row = '. $row if $op->{debug};
 							for my $vv ( @$val ) {
 								next unless ref \$vv eq 'SCALAR';
 
-								$end = &_hvt_print( $ki, $vv, $el, $op, $border ) and last _var_output_M0;
+								last _var_output_M0 if $end = &_hvt_print( $ki, $vv, $el, $op, $border );
 								++$col;
 							}
 
@@ -1373,7 +1412,7 @@ push @{$op->{logs}}, "~~> l.$. NOT defined %%%V:". $ki if $op->{debug};
 					$ki = '';
 				}
 
-				$end = &_hvt_print( $ki, $val, $el, $op, $border ) and last _var_output_M0;
+				last _var_output_M0 if $end = &_hvt_print( $ki, $val, $el, $op, $border );
 			}
 			continue {
 				++$col;
@@ -1422,7 +1461,7 @@ push @{$op->{logs}}, "-->\tl.$. ". 'NOT HASH.ARRAY.SCALAR %%%V:@->{'.$k.'} in %%
 							next;
 						}
 
-						$end = &_hvt_print( $k, $v, $el, $op, $border ) and last _var_output_M0;
+						last if $end = &_hvt_print( $k, $v, $el, $op, $border );
 						$border = 0;
 					}
 
@@ -1439,7 +1478,7 @@ push @{$op->{logs}}, "~~> l.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $op
 				$ki = '';
 			}
 
-			$end = &_hvt_print( $ki, $val, $el, $op, $border ) and last;
+			last if $end = &_hvt_print( $ki, $val, $el, $op, $border );
 		}
 		continue {
 			++$col;
@@ -1447,6 +1486,838 @@ push @{$op->{logs}}, "~~> l.$. NOT HASH.SCALAR or NOT defined %%%V:". $ki if $op
 	}
 
 	return $end;
+}
+
+
+sub _get_mate {
+	my( $glyph, $agl, $op ) = @_;
+
+	%$agl or return $glyph;
+
+	return $agl->{ $glyph } if exists( $agl->{ $glyph } ) && defined( $agl->{ $glyph } );
+
+	my $mate = $glyph;
+
+	if( $glyph =~/^uni([0-9A-F]{4}|[0-9A-F]{8})/ ) { # sprintf("uni0%X", $_)# , uniXXXX
+		my $code = $1;
+
+		if( $op->{mate} =~/^sym/) {
+			$mate = chr(hex( $code ));
+		}
+		elsif( $op->{mate} =~/^hex/) {
+			$mate = $code;
+		}
+		else { # dec
+			$mate = hex $code;
+		}
+	}
+	else {
+		carp "Undefined glyph: '$glyph'";
+		undef $mate;
+	}
+
+	return $mate;
+}
+
+#-------------------
+# External functions
+#-------------------
+# Get kit/set of 'Adobe Glyph List'
+# $op->{glyphlist} -- glyphlist file
+# $op->{mate} = 'symbol' of Unicode | 'hex' Unicode number (native). By default, decimal Unicode number
+
+sub AGLkit {
+	my( $op ) = @_;
+	my $agl = {};
+
+	if( $op->{glyphlist} ) {
+		open( my $AGL, '<', $op->{glyphlist} ) or croak "Can't find the AGL file: '$op->{glyphlist}'";
+
+		while( <$AGL> ) {
+			next if /^\s*$/ or /^\s*#/;
+
+			my( $glyph, $codes ) = split /\s*;\s*/;
+			next unless $glyph && $codes;
+
+			$glyph =~s/\s+//g;
+			$codes =~s/^\s+|\s+$//g;
+			$codes =~s/\s+/ /g;
+
+			next if ! $glyph or $glyph =~/^\.notdef$/i or $glyph =~/[^0-9A-Za-z]/
+					or ! $codes or length( $codes ) < 4 or $codes !~/^[0-9A-Fa-f\s]+$/;
+
+#			$codes =~y/0-9A-Fa-f //cd;
+#			next if ! $codes or length( $codes ) < 4;
+
+			my $mate;
+			if( $op->{mate} ) {
+				if( $op->{mate} =~/^sym/) {
+					$mate = join('', map{ chr hex } split /\s+/, $codes );
+				}
+				elsif( $op->{mate} =~/^hex/) {
+					($mate = $codes) =~s/\s+/ /g;
+					$mate = uc $mate;
+				}
+			}
+
+			$agl->{ $glyph } = $mate // join(' ', map{ hex } split /\s+/, $codes );
+#			push @{ $agl->{'@'}{ $arr[0] } } = $agl->{ $glyph } if @arr > 1; # ???
+		}
+
+		close $AGL;
+	}
+	else {
+		$agl = {
+exclamdown => ord('¡'), # \u00A1
+cent => ord('¢'), # \u00A2
+sterling => ord('£'), # \u00A3
+currency => ord('¤'), # \u00A4
+yen => ord('¥'), # \u00A5
+brokenbar => ord('¦'), # \u00A6
+section => ord('§'), # \u00A7
+dieresis => ord('¨'), # \u00A8
+copyright => ord('©'), # \u00A9
+ordfeminine => ord('ª'), # \u00AA
+guillemotleft => ord('«'), # \u00AB
+logicalnot => ord('¬'), # \u00AC
+#	sfthyphen => ord(''), # \u00AD
+registered => ord('®'), # \u00AE
+macron => ord('¯'), # \u00AF
+		#---
+degree => ord('°'), # \u00B0
+plusminus => ord('±'), # \u00B1
+twosuperior => ord('²'), # \u00B2
+threesuperior => ord('³'), # \u00B3
+acute => ord('´'), # \u00B4
+mu => ord('µ'), # \u00B5
+paragraph => ord('¶'), # \u00B6
+periodcentered => ord('·'), # \u00B7
+cedilla => ord('¸'), # \u00B8
+onesuperior => ord('¹'), # \u00B9
+ordmasculine => ord('º'), # \u00BA
+guillemotright => ord('»'), # \u00BB
+onequarter => ord('¼'), # \u00BC
+onehalf => ord('½'), # \u00BD
+threequarters => ord('¾'), # \u00BE
+questiondown => ord('¿'), # \u00BF
+		#---
+Agrave => ord('À'), # \u00C0
+Aacute => ord('Á'), # \u00C1
+Acircumflex => ord('Â'), # \u00C2
+Atilde => ord('Ã'), # \u00C3
+Adieresis => ord('Ä'), # \u00C4
+		#---
+Aring => ord('Å'), # \u00C5
+AE => ord('Æ'), # \u00C6
+Ccedilla => ord('Ç'), # \u00C7
+Egrave => ord('È'), # \u00C8
+Eacute => ord('É'), # \u00C9
+Ecircumflex => ord('Ê'), # \u00CA
+Edieresis => ord('Ë'), # \u00CB
+Igrave => ord('Ì'), # \u00CC
+Iacute => ord('Í'), # \u00CD
+Icircumflex => ord('Î'), # \u00CE
+Idieresis => ord('Ï'), # \u00CF
+		#---
+Eth => ord('Ð'), # \u00D0
+Ntilde => ord('Ñ'), # \u00D1
+Ograve => ord('Ò'), # \u00D2
+Oacute => ord('Ó'), # \u00D3
+Ocircumflex => ord('Ô'), # \u00D4
+Otilde => ord('Õ'), # \u00D5
+Odieresis => ord('Ö'), # \u00D6
+multiply => ord('×'), # \u00D7
+Oslash => ord('Ø'), # \u00D8
+Ugrave => ord('Ù'), # \u00D9
+Uacute => ord('Ú'), # \u00DA
+Ucircumflex => ord('Û'), # \u00DB
+Udieresis => ord('Ü'), # \u00DC
+Yacute => ord('Ý'), # \u00DD
+Thorn => ord('Þ'), # \u00DE
+germandbls => ord('ß'), # \u00DF
+		#---
+agrave => ord('à'), # \u00E0
+aacute => ord('á'), # \u00E1
+acircumflex => ord('â'), # \u00E2
+atilde => ord('ã'), # \u00E3
+adieresis => ord('ä'), # \u00E4
+aring => ord('å'), # \u00E5
+ae => ord('æ'), # \u00E6
+ccedilla => ord('ç'), # \u00E7
+egrave => ord('è'), # \u00E8
+eacute => ord('é'), # \u00E9
+ecircumflex => ord('ê'), # \u00EA
+edieresis => ord('ë'), # \u00EB
+igrave => ord('ì'), # \u00EC
+iacute => ord('í'), # \u00ED
+icircumflex => ord('î'), # \u00EE
+idieresis => ord('ï'), # \u00EF
+		#---
+eth => ord('ð'), # \u00F0
+ntilde => ord('ñ'), # \u00F1
+ograve => ord('ò'), # \u00F2
+oacute => ord('ó'), # \u00F3
+ocircumflex => ord('ô'), # \u00F4
+otilde => ord('õ'), # \u00F5
+odieresis => ord('ö'), # \u00F6
+divide => ord('÷'), # \u00F7
+oslash => ord('ø'), # \u00F8
+ugrave => ord('ù'), # \u00F9
+uacute => ord('ú'), # \u00FA
+ucircumflex => ord('û'), # \u00FB
+udieresis => ord('ü'), # \u00FC
+yacute => ord('ý'), # \u00FD
+thorn => ord('þ'), # \u00FE
+ydieresis => ord('ÿ'), # \u00FF
+		#---
+afii10064 => ord('δ'), # echo -e "\u03B4" # a.? \uF6C5 see "Adobe Standard Cyrillic Font Specification"
+afii10063 => ord('ι'), # a.? \uF6C4
+afii10192 => ord('g'), # a.? \uF6C6
+afii10831 => ord('й'), # a.? \uF6C7
+afii10832 => ord('ш'), # a.? \uF6C8
+afii10846 => ord('ә'), # \u04D9
+afii61352 => ord('№'), # \u2116
+		# Symbol and Punctuation Glyph
+minus => ord('−'), # \u2212
+trademark => ord('™'), # 2122
+bullet => ord('•'), # echo -e "\u2022"
+ellipsis => ord('…'), # \u2026
+endash => ord('–'), # \u2013
+emdash => ord('—'), # \u2014
+dagger => ord('†'), # \u2020
+daggerdbl => ord('‡'), # \u2021
+quotedblbase => ord('„'), # \u201E
+quotedblleft => ord('“'), # \u201C
+quotedblright => ord('”'), # \u201D
+quoteleft => ord("‘"), # \u2018
+quoteright => ord("’"), # \u2019
+quotesinglbase => ord('‚'), # \u201A
+perthousand => ord('‰'), # \u2030
+guilsinglleft => ord('‹'), # \u2039
+guilsinglright => ord('›'), # \u203A
+circumflex => ord('ˆ'), # \u02C6
+tilde => ord('˜'), # \u02DC
+hungarumlaut => ord('˝'), # \u02DD
+ring => ord('˚'), # \u02DA
+caron => ord('ˇ'), # \u02C7
+breve => ord('˘'), # \u02D8
+dotaccent => ord('˙'), # \u02D9
+ogonek => ord('˛'), # \u02DB
+dotlessi => ord('ı'), # \u0131
+dotlessj => ord(''), # \uF6BE
+fi => ord('ﬁ'), # \uFB01
+fl => ord('ﬂ'), # \uFB02
+
+		};
+
+		$agl->{$_} = ord($_) for 'A'..'Z', 'a'..'z'; # ASCII Glyph Names: 65..90, 97..122
+
+		# also ASCII Glyph Names, but 32..64, 91..96, 123..126
+		@{$agl}{qw(
+space exclam quotedbl numbersign dollar percent ampersand quotesingle parenleft parenright
+asterisk plus comma hyphen period slash zero one two three four five six seven eight nine
+colon semicolon less equal greater question at
+	bracketleft backslash bracketright asciicircumb underscore grave
+braceleft bar braceright asciitilde
+)} = ( ord(' ')..ord('@'), ord('[')..ord('`'), ord('{')..ord('~') ); #}
+
+		# Cyrillic Glyph Names: Uppercase (afiiXXXXX)
+		my $x = 10017; # start of 'А'...'Я' from afii10017 to afii10049
+		for( ord('А')..ord('Е'), ord('Ё'), ord('Ж')..ord('Я') ) {
+			$agl->{"afii$x"} = $_;
+			++$x;
+		}
+		for('Ґ','Ђ','Ѓ','Є','Ѕ','І','Ї','Ј','Љ','Њ','Ћ','Ќ','Ў') { # from afii10050 to afii10062
+			$agl->{"afii$x"} = ord $_;
+			++$x;
+		}
+		$x = 10145;
+		for('Џ','Ѣ','Ѳ','Ѵ') { # from afii10145 to afii10148
+			$agl->{"afii$x"} = ord $_;
+			++$x;
+		}
+
+		# Cyrillic Glyph Names: Lowercase
+		$x = 10065; # start of "а"..."я" from afii10065 to afii10097
+		for( ord('а')..ord('е'), ord('ё'), ord('ж')..ord('я') ) {
+			$agl->{"afii$x"} = $_;
+			++$x;
+		}
+		for('ґ','ђ','ѓ','є','ѕ','і','ї','ј','љ','њ','ћ','ќ','ў') { # from afii10098 to afii10110
+			$agl->{"afii$x"} = ord $_;
+			++$x;
+		}
+		$x = 10193;
+		for('џ','ѣ','ѳ','ѵ') { # from afii10193 to afii10196
+			$agl->{"afii$x"} = ord $_;
+			++$x;
+		}
+
+		if( $op->{mate} && $op->{mate} =~/^(?:(sym)|hex)/ ) {
+			my $f = $1 ? 1 : 0;
+
+			for( values %$agl ) {
+				$_ = $f ? chr : sprintf("%04X", $_);
+			}
+		}
+
+	}
+
+	return $agl;
+}
+
+# Get font metrics from Adobe Font Metric file
+# IN:
+#	$op->{glyphlist} -- glyphlist file
+#	$op->{noBbox} -- without 'B'-box
+#	$op->{noKPX} -- without 'KPX'
+#	$op->{mate} = 'glyph' of Adobe | 'symbol' of Unicode | 'hex' Unicode number (native). By default, decimal Unicode number
+# OUT:
+#	$font_metrics->
+#		{WX}{ $mate } -- symbol width of mate
+#		{Bbox}{ $mate } -- Bounding Box of mate
+#		{KPX}{ $mateA }{ $mateB } -- paired kerning of mateA & mateB
+
+sub font_metrics {
+	my( $AFMfile, $op ) = @_;
+
+	$op->{mate} //= '';
+	my $agl = ($op->{mate} =~/^glyph/) ? {} : &AGLkit( $op );
+
+	my %font_metrics;
+
+	open( my $AFM, '<', $AFMfile ) or croak "Can't find the AFM file";
+	while( <$AFM> ) {
+#		next if /^StartComposites/ .. /^EndComposites/; # composites not parsed yet
+
+		if( /^StartCharMetrics/i .. /^EndCharMetrics/i ) {
+			/^CH?\s/ or next; # only lines that start with "C" or "CH" are parsed
+
+			# C 32 ; WX 300 ; N space ; B 0 0 0 0 ;
+			/;\s*WX\s*(\d+)\s*;\s*N\s+([\w.]{1,63})\s*;/ or next;
+			my( $wx, $glyph ) = ($1, $2);
+
+			my $bbox = /;\s*B\s*([^;]+)\s*;/ ? $1 : '';
+			$bbox =~ s/\s+/ /g;
+			$bbox =~ s/^\s+|\s+$//g;
+
+			my $mate = &_get_mate( $glyph, $agl, $op );
+
+			if( defined $mate ) {
+				$font_metrics{WX}{ $mate } = $wx;
+				$op->{noBbox} or $font_metrics{Bbox}{ $mate } = $bbox; # 'B'-box
+			}
+
+			next;
+		}
+
+		next if $op->{noKPX}; # without 'KPX'
+
+		if( /^StartKernPairs/i .. /^EndKernPairs/i ) {
+			/^KPX\s/ or next; # only lines that start with "KPX" are parsed
+
+			# KPX space A -55
+			my( undef, $glyphA, $glyphB, $kpx ) = split /\s+/o;
+
+			$kpx =~y/0-9-//cd;
+			$kpx or next;
+
+			my $mateA = &_get_mate( $glyphA, $agl, $op );
+			my $mateB = &_get_mate( $glyphB, $agl, $op );
+
+			$font_metrics{KPX}{ $mateA }{ $mateB } ||= $kpx
+				if defined( $mateA ) && defined( $mateB ) && ! exists( $font_metrics{KPX}{ $mateA }{ $mateB } );
+
+			next;
+		}
+
+		last if /^EndFontMetrics/;
+	}
+	close $AFM;
+
+	return \%font_metrics;
+}
+
+
+# IN:
+#	$str -- string (strand)
+#	$op->
+#		{cell_width} -- width of cell/box (pt).
+#		{font_metrics} -- table of font metrics with {WX} key -- for decimal Unicode number, and {KPX} key -- for paired kerning.
+#		{base_font_size} -- depending on the document's base font size (pt), see \documentclass[...pt].
+#		{font_size} -- TeX-font size of text in cell/box, e.g. 'small', 'normalsize', 'large', etc.
+#		{shrink} -- space compressibility (the extent to which a space can become narrower than its base value if the line is compressed).
+#		{merge} = 1 -- return a combined string (paragraph) and its total width (length) in (pt), rather than an array of strings.
+#		{offset} -- offset from the beginning of $str from which characters for cell are extracted. By default, 0.
+#		{limit} -- the maximum allowable number of lines for a cell.
+#		{hyphenation} => # a array of methods for hyphenating words in specified languages, e.g.:
+#		   [
+#				{ name =>'en', action => $hyp_en, },
+#				{ name =>'ru', action => $hyp_ru, },
+#		   ]
+#		OR
+#		   [
+#				{ msk => qr/[a-zA-Z]+/o, action => $hyp_en, },
+#				{ msk => qr/[а-яА-Я]+/o, action => $hyp_ru, },
+#		   ]
+
+# OUT:
+#	HASH with keys:
+#		'lines' -- arrays of no empty lines.
+#		'wxL'   -- arrays of line widths (*100pt) from 'lines'.
+#		'numL'  -- number of no empty lines.
+#		'stop'  -- position in $str where the extraction of symbols into cell stopped.
+#		     If all non-whitespace characters have been extracted from $str and 'limit' option is specified, then '-1' is returned.
+#	or
+#	SCALAR is number of lines
+
+sub onecell {
+	return if ! defined( $_[0] )
+					 or ref \$_[0] ne 'SCALAR'
+					 or ! $_[1]
+					 or ref $_[1] ne 'HASH';
+
+	my $ArSc = wantarray;
+
+	my $op = $_[1];
+
+	if( $_[0] =~/^\s*$/ ) {
+		return $ArSc ? {lines => [ $_[0] ], wxL => [0], numL => 0, stop => 0,} : 0;
+	}
+
+	$op->{cell_width} or croak "Cell width is NOT specified!";
+
+	my $offset = $op->{offset} // 0;
+	my $szStr = length $_[0];
+
+	return if $offset < 0 or $offset >= $szStr;
+
+	my $limit = $op->{limit} // 0;
+	$limit += 0;
+	$limit = 0 if $limit < 0;
+
+	# font character width table
+	my $symWX = $op->{font_metrics}{WX} or croak "Font metrics are NOT specified!";
+	my $symKPX = $op->{font_metrics}{KPX} || {};
+
+	our( $q, $m );
+
+	my $space = ($op->{space} // 0) * 100 || $symWX->{32} or croak "Base whitespace width is NOT specified!";
+	$space -= ($op->{shrink} // 0) * 100; # reduce by the maximum whitespace compression, if specified
+	my $spcKPX = $symKPX->{32} || {}; # paired kerning for whitespace
+
+	my $hyphen = $symWX->{45}; # ord('-') -- hyphen width
+	my $wideS = $symWX->{64}; # ord('@') -- width of the average-to-maximum-width character
+
+	our $fontSizeTeX;
+	our $refHypMsk;
+
+	my $base_font_size = $op->{base_font_size} || 10; # base document font size (pt)
+
+	my $font_id = $fontSizeTeX->{names}{ $op->{font_size} || 'normalsize'}; # for 'normalsize' = 4
+
+	# cell-to-'normalsize' scaling factor
+	my $scale = ( $font_id == 4) ?
+		1 :
+		$fontSizeTeX->{ $base_font_size }[4] / $fontSizeTeX->{ $base_font_size }[ $font_id ]; # to 'normalsize'
+
+	my $cell_width = $op->{cell_width} * $scale * 100; # scale the cell width to 'normalsize' (*100pt)
+
+	my @lines = (''); # cell/box with filled lines
+	my @wxL; # line width (*100pt)
+	my $numL = 0; # number of lines
+	my $numSeq = 0; # number of sequences in input string
+
+	my $prevKPX = {}; # KPX previous (prev) symbol
+	my $curKPX = {}; # KPX current (cur) symbol
+	my $curSize = 0; # width of current (fillable) string
+
+	my $yhp = 0; # > 0 -- flag for the presence/necessity of hyphenation in $word:
+			#	1 -- hyphenation method(s) is specified;
+			#	2 -- hyphenation points have already been inserted in the word;
+			#	3 -- short word (<4 characters) | 4 -- word NOT found | 5 -- NO hyphens
+
+	# checking for the presence of method(s) for hyphenating words
+	if( $_ = $op->{hyphenation}
+		and ref $_ eq 'ARRAY'
+		and @$_
+	) {
+		my $hyp = $_;
+		@$hyp = grep{ ( ($_->{msk} or ( $_->{name} && exists( $refHypMsk->{lc $_->{name}} ) ))
+					&& exists( $_->{action} )
+					&& ( ref( $_->{action} ) eq 'CODE'
+						or ( ref( $_->{action} ) =~/::Hyphen/ and $_->{action}->can('hyphenate') )
+					)
+			) } @$hyp;
+
+		$yhp = @$hyp ? 1 : 0;
+	}
+
+	pos $_[0] = $offset;
+	my $stop = $offset;
+	my $new; # 1 = new sequence
+
+_onecell_M0:
+	while( $_[0] =~/(\S+)/g ) { # extracting character words from input string
+		$_ = $1;
+		$stop = pos $_[0];
+		$new = 1;
+
+		my @cage = grep{ length } split /(\p{Alpha}{4,})/; # to split words into alphabetic and non-alphabetic words
+
+		$yhp &&= 1;
+
+		while( defined( my $word = shift @cage ) ) {
+
+			my $szl = length $lines[-1];
+
+			my $alpha; # 1 -- alphabetic word
+			if( $word =~/^[\p{Alpha}\-]+$/) {
+				$alpha = 1;
+			}
+			else {
+				$alpha = 0;
+				$yhp &&= 1; # Reset settings
+			}
+
+			my $delta = $cell_width - $curSize;
+
+			# in a cell line, there are preceding word(s), and this is not a fragment
+			$delta -= $space if $szl
+									and ($new or ! ~~@cage)
+									and $lines[-1] !~/(?:\\-|$q)$/;
+
+			my $wS; # width of current symbol (*100pt)
+			my $wH; # width of hyphen taking pair kerning into account (*100pt)
+			my $wW = 0; # width of word/fragment (*100pt)
+			my $f = 1; # flag that the word fits into a cell line
+			my $nS = 0; # ordinal number (position) of symbol in word 
+
+			my @ss = split //, $word;
+
+			# to split word into symbols and get its decimal ID
+			foreach my $sid ( map{ ord($_) } @ss ) { # current symbol id 
+				$wH = @cage ? $hyphen : 0;
+
+				if( exists $symWX->{ $sid } ) {
+					$wS = $symWX->{ $sid };
+					$curKPX = $symKPX->{ $sid } || {};
+
+					# to take pair kerning into account: prev+cur
+					$wS += $prevKPX->{ $sid } // 0;
+					$wH += $curKPX->{45} // 0 if @cage; # for cur+hyphen
+				}
+				else {
+					carp 'Undefined width for symbol with hexcode: '. sprintf("%04X",  $sid);
+					$wS = $wideS;
+					$curKPX = {};
+				}
+
+# say "1=> word='$word', symbol='". chr($sid) ."', curSize=$curSize, delta=$delta, wW=$wW, wS=$wS, nS=$nS, f=$f, yhp=$yhp, cage=".~~@cage;
+# say Dumper \@cage;
+
+				# это: 'буквенный фрагмент/слово' И 'не последняя буква' И 'следующий фрагмент тоже буквенныы'
+				my $cnd = ($alpha && ($nS < $#ss or (@cage && $cage[0] =~/^\p{Alpha}+$/)) ) ? 1 : 0;
+
+				# symbol width or (+hyphen) > cell width
+				if( $wS > $cell_width
+					or ($cnd and $wS + $wH > $cell_width)
+				) {
+					$f = -1;
+					last;
+				}
+
+				# width of fragment > remaining (unfilled portion) cell width 
+				if( $wW + $wS > $delta
+					or ($cnd and $wW + $wS + $wH > $delta)
+				) {
+					$f = 0;
+					last;
+				}
+
+				$wW += $wS;
+				$prevKPX = $curKPX; # for pair kerning next symbol
+				++$nS;
+			}
+			$numL ||= 1; # JIC
+
+# if( $word =~/^WA$/) {
+#	say "2=> word='$word', curSize=$curSize, delta=$delta, wW=$wW, wS=$wS, nS=$nS, #ss=".$#ss.", f=$f, yhp=$yhp, cage=".~~@cage;
+#	say Dumper \@lines;
+# }
+
+			if( $f > 0 ) { # word (or fragment) is placed into the cell line in its entirety
+				if( $szl && $lines[-1] !~/(?:\\-|$q)$/ ) { # there is prev.word(s) in the cell line and it is not fragment
+					
+					# add whitespace for prev.word
+					$curSize += $space; # + ($prevKPX->{32} // 0);
+					$lines[-1] .= ' ';
+				}
+
+				# add cur.word in cell line
+				$curSize += $wW;
+				$lines[-1] .= $word;
+
+				if( @cage ) { # this is fragment (word continues further on)
+					$lines[-1] .= ($alpha && $cage[0] =~/^\p{Alpha}+$/) ? '\\-' : $m; # + supposed hyphen or glue (\hskip)
+				}
+
+				next;
+			}
+
+			my @chunks = $word=~/(.{$nS})(.)(.*)/;
+
+			if( $f < 0 ) { # symbol width > cell width
+
+				if( (! defined( $chunks[2] ) or ! length( $chunks[2] )) && ! @cage ) { # NOT "tail" or fragments
+					 # add whitespace
+					$chunks[1] .= ' ';
+					$wS += $space; # + ($prevKPX->{32} // 0);
+					$prevKPX = $spcKPX; # for paired kerning of space + next.symbol
+
+				}
+				else { # exists "tail"
+					if( $alpha && ($chunks[2] =~/^\p{Alpha}+$/ or $cage[0] =~/^\p{Alpha}+$/)) {
+						$chunks[1] .= '\\-'; # symbol + hyphen
+#						$wS += $wH; # width of (cur.symbol + hyphen + paired kerning): cur+hyphen
+					}
+					else {
+						$chunks[1] .= $m; # +glue
+					}
+				}
+
+				if( $nS ) { # exists "head" (prefix)
+
+					$lines[-1] .= $chunks[0];
+
+					if( $chunks[0] =~/^\p{Alpha}+$/) {
+						$lines[-1] .= '\\-'; # + hyphen
+#						push @wxL, $curSize + $wW + $hyphen + ($prevKPX->{45} // 0) if $ArSc; # taking paired kerning into account: prev+hyphen
+					}
+					else {
+						$lines[-1] .= $m; # + glue
+					}
+					push @wxL, $curSize + $wW if $ArSc;
+
+					if( $limit && @lines >= $limit ) {
+						$stop -= (length( join('', $word, @cage) ) - $nS);
+						last _onecell_M0;
+					}
+
+					# Next up is a new cell line
+					++$numL;
+					push @lines, $chunks[1];
+				}
+				else { # NO "head" (prefix)
+					if( $szl ) { # and cell line is NOT empty (partially filled)
+
+						my $add = 0;
+						if( $lines[-1] !~/(?:\\-|$q)$/ and ! ~~@cage ) {
+						# In cell line no word fragment at the beginning, but there is a complete word
+							$lines[-1] .= ' ';
+							$add = $space; # + ($prevKPX->{32} // 0);
+						}
+						push @wxL, $curSize + $add if $ArSc;
+
+						if( $limit && @lines >= $limit ) {
+							$stop -= length( join('', $word, @cage) );
+							last _onecell_M0;
+						}
+
+						# Next up is a new cell line
+						++$numL;
+						push @lines, $chunks[1]; # with hyphen or glue (see above)
+					}
+					else { # cell line is EMPTY
+						$lines[-1] .= $chunks[1]; # with posible? hyphen or glue
+					}
+				}
+
+				push @wxL, $wS if $ArSc; # width of symbol + space
+
+				if( $limit && @lines >= $limit ) {
+					$stop -= ( length( join('', $word, @cage) ) - ($nS + 1));
+					last _onecell_M0;
+				}
+
+				# Next up is a new cell line
+				++$numL;
+				$curSize = 0;
+				$prevKPX = {};
+				push @lines, '';
+
+				if( $chunks[2] ) {
+					$word = $chunks[2];
+
+# say "3=> word='$word', chunks[2]=$chunks[2]";
+
+					redo;
+				}
+
+# say "4=> word='$word', chunks[2]=$chunks[2]";
+
+				next;
+			}
+
+			if( $alpha && $yhp && $yhp < 3) {
+			# This is alphabetic word, and a method (action) for breaking words into hyphens is specified
+
+				if( $yhp == 2 ) { # for word it was already broken by hyphens
+
+					if( $szl ) { # and cell line is not empty (partially filled)
+
+						my $add = 0;
+						if( $lines[-1] !~/(?:\\-|$q)$/) { # there is a full word :  and ! ~~@cage 
+							$lines[-1] .= ' ';
+							$add = $space; # + ($prevKPX->{32} // 0);
+						}
+						push @wxL, $curSize + $add if $ArSc;
+
+						if( $limit && @lines >= $limit ) {
+							$stop -= length( join('', $word, @cage) );
+							last _onecell_M0;
+						}
+
+						# Try placing it into 
+						# Next up is a new cell line
+						++$numL;
+						$curSize = 0;
+
+#						$lines[-1] =~/.$/;
+						$prevKPX = {}; # $symKPX->{ord($&)} || ;
+						push @lines, '';
+
+						redo; # repeat in a new cell line
+					}
+				}
+				elsif( $#ss > 2 ) { # length of word/fragment > 3 symbols
+					for my $h ( @{ $op->{hyphenation} } ) {
+						my $msk;
+						if( $h->{msk} ) {
+							$msk = $h->{msk};
+						}
+						elsif( $h->{name} ) {
+							$msk = $refHypMsk->{lc $h->{name}};
+						}
+
+						if( $msk && $word =~/^$msk$/) {
+
+							my @arr = ( ref( $h->{action} ) eq 'CODE') ?
+								$h->{action}( $word ) :
+								$h->{action}->hyphenate( $word );
+
+							if( @arr > 1 ) {
+								$yhp = 2; # YES word breaks (hyphenations)
+								unshift @cage, @arr;
+							}
+							else {
+								$yhp = 3; # NO word breaks (hyphenations)
+							}
+							last;
+						}
+						else {
+							$yhp = 4; # word NOT found
+						}
+					}
+					next if $yhp == 2; # hyphenation has been added to the words
+				}
+				else {
+					$yhp = 5; # a small word (<4 symbols)
+				}
+
+			}
+
+			# symbol < cell width, but did not fit into the current cell line
+
+			if( $szl && $lines[-1] !~/(?:\\-|$q)$/) { # In cell line no word fragment at the beginning, but there is a complete word.
+				$lines[-1] .= ' ';
+				$curSize += $space; # + ($prevKPX->{32} // 0);
+			}
+
+			my $alpha_0 = $chunks[0] =~/^\p{Alpha}+$/ ? 1 : 0;
+
+
+# if( $word =~/^A$/) {
+#	say "5=> word='$word', wW=$wW, wS=$wS, nS=$nS, #ss=".$#ss.", f=$f, yhp=$yhp, szl=$szl, alpha_0=$alpha_0, cage=".~~@cage;
+#	say Dumper \@lines;
+# exit;
+# }
+
+			if( $nS && ($nS > 1 or ! $curSize or ! $alpha_0) ) {
+			# hyphenation allowed only after the first 2 letters, or cell is EMPTY, or if the character is not a letter
+				$lines[-1] .= $chunks[0];
+
+#				my $add = 0;
+				if( $alpha_0 && $alpha ) {
+					$lines[-1] .= '\\-'; # + hyphen
+#					$add = $hyphen + ($prevKPX->{45} // 0);
+				}
+				else {
+					$lines[-1] .= $m; # + glue
+				}
+
+				push @wxL, $curSize + $wW if $ArSc; # taking into account kerning pairs prev+hyphen
+
+				$word = $chunks[1].$chunks[2];
+			}
+			elsif( $ArSc ) { # current synbol is the 1st character of the word/fragment
+				push @wxL, $curSize;
+			}
+
+			if( $limit && @lines >= $limit ) {
+				$stop -= length( join('', $word, @cage) );
+				last _onecell_M0;
+			}
+
+			# Next up is a new cell line
+			++$numL;
+			$curSize = 0;
+			$prevKPX = $curKPX; # for paired kerning of the next symbol
+			push @lines, '';
+
+			redo; # repeat in a new cell line
+		}
+		continue {
+			$new = 0;
+		}
+	}
+	continue {
+		++$numSeq;
+	}
+
+	push @wxL, $curSize if $ArSc && $curSize && $#wxL < $#lines;
+
+	$stop = -1 if $limit
+		and ( $stop >= $szStr or @lines < $limit or $_[0] =~/\A.{$stop}\s+\z/ );
+
+	# Final preparations
+	@lines = grep{ ! /^\s*$/ } @lines;
+
+	my $i = 0;
+	for( @lines ) {
+		s/(?<=[[:alpha:]])$q(?=[\.,\?!:;%'])//g; #'
+		s/(?<=[[:alpha:]])$q$// if $i < $#lines and $lines[$i+1] =~/^[\.,\?!:;%']/; #'
+		s/(?:\\-|$q)(?=\S+\s\S)//g;
+		++$i;
+	}
+
+	if( $lines[-1] =~s/ $// && $ArSc ) {
+		$wxL[-1] -= $space;
+	}
+
+	my $wxLsum = 0;
+	if( $ArSc && $op->{merge} ) {
+		$wxLsum += $_ for @wxL;
+	}
+
+	return $ArSc ?
+		{
+			lines => ($op->{merge} ? [ join '', @lines ] : \@lines),
+			wxL => ($op->{merge} ? [ $wxLsum ] : \@wxL),
+			numL => ~~@lines, # $numL,
+			stop => $stop,
+		} :
+		~~@lines; # $numL
 }
 
 1;
@@ -1793,7 +2664,7 @@ C<replication()> supports only the following structures included in C<$info>.
 =item 1.
 single-level:
 
-C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, and their combination, e.g.
+C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, and their combinations, e.g.
 
   my $v = 'Blah-blah';
   my @ell = (11, 22, 33);
@@ -1812,7 +2683,7 @@ C<SCALAR>, C<REF>, C<ARRAY>, C<HASH>, and their combination, e.g.
 =item 2.
 two-level:
 
-C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>, C<HASH.ARRAY>, and their combination, e.g.
+C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>, C<HASH.ARRAY>, and their combinations, e.g.
 
   my $info = {
        Array_array => [ # custom user variable ARRAY-ARRAY
@@ -1848,7 +2719,7 @@ C<ARRAY.ARRAY>, C<ARRAY.HASH>, C<ARRAY.REF>, C<HASH.ARRAY>, and their combinatio
 =item 3.
 three-level:
 
-C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY>, and their combination, e.g.
+C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY>, and their combinations, e.g.
 
   my $info = {
        Array_array_array => [
@@ -1872,7 +2743,7 @@ C<ARRAY.ARRAY.ARRAY>, C<ARRAY.HASH.ARRAY>, and their combination, e.g.
   };
 
 =item 4.
-a combination of the above 1..3
+the combinations of the above 1..3
 
 =back
 
@@ -1887,7 +2758,7 @@ This module have reason only with perl 5.10 and higher.
 
 =head1 ABSTRACT
 
-Replicase is minimalistic (ascetic) interpreter (uses only 3-4 basic control tags,
+Replicase in the form of the main subroutine L</"replication()"> is minimalistic (ascetic) interpreter (uses only 3-4 basic control tags,
 like the system of 4 bases (nucleotides) and 3 codons, it is an optimal balance between diversity and stability)
 that can be used to process (fill) real TeX-LaTeX files that act as templates.
 
@@ -1895,7 +2766,10 @@ that can be used to process (fill) real TeX-LaTeX files that act as templates.
 =head1 DESCRIPTION
 
 This module is a Perl 5 extension implementing Replicase subroutines which processes TeX-LaTeX files, 
-interpreting and executing built-in control directives (tags) of Replicase.
+interpreting and executing built-in control directives (tags) of C<replication()>.
+
+Additional subroutines (L</"tex_escape()">, L</"REase()">, L</"AGLkit()">, L</"font_metrics()">, L</"onecell()">) 
+serve an auxiliary role, making it possible to prepare data for populating TeX templates.
 
 Replicase can: define and substitute variable values, execute conditional actions and capture 
 the resulting output into a new document.
@@ -2364,6 +3238,9 @@ LaTeX::Replicase provides these subroutines:
     replication( $source, $info [, %hash_options ] );
     tex_escape( $value [, $options ] );
     REase( $value [, $options ] );
+    AGLkit( [ $options ] );
+    font_metrics( $AFMfile [, $options ] );
+    onecell( $string, $options );
 
 
 =head2 replication()
@@ -2460,20 +3337,20 @@ can be changed only if when calling C<replication()> for C<esc> option the prior
 e.g. C<< esc => 2... >>.
 
 
-=item C<tail>
+=item C<tile>
 
 This option specifies the size (in characters) of the maximum 
-uncut non-alphabetic sections in the range from 1 to C<< tail + 1 >>,
+uncut non-alphabetic sections in the range from 1 to C<< tile + 1 >>,
 e.g.
 
-  $msg = replication( $source, $info, esc => 'REase', tail => 2 );
+  $msg = replication( $source, $info, esc => 'REase', tile => 2 );
 
-By default, C<< tail = 3 >>.
-C<tail> option has meaning if C<replication()> is called with C<REase>
+By default, C<< tile = 3 >>.
+C<tile> option has meaning if C<replication()> is called with C<REase>
 in C<esc> or C<< _ACTIONS_ >> option.
 
-Valid values for C<tail> are from 2 to 9.
-For a description of C<tail>, see the section on L</"REase()">.
+Valid values for C<tile> are from 2 to 9.
+For a description of C<tile>, see the section on L</"REase()">.
 
 
 =item C<< _ACTIONS_ >>
@@ -2615,7 +3492,7 @@ For example, C<$options> is a HASH:
 
   my $mflag = tex_escape( $value, {
                   esc => '~ hyphen; !stag -stag, +stag REase, strong,mutual',
-                  tail => 4,
+                  tile => 4,
                   _MFLAGS_ => 0b0001,
                 }
               );
@@ -2634,7 +3511,7 @@ i.e. makes a replacement C<< ...abc-def... >> with C<< ...abc"=def... >>.
 
 =head3 REase
 
-includes an internal call to L</"REase()"> subroutines. (See below).
+includes an internal call to L</"REase()"> subroutine. (See below).
 
 
 =head3 start tag C<%%%:>
@@ -2736,7 +3613,7 @@ C<tex_escape()> will not be executed if input C<< _MFLAGS_ & 0b0110 >>.
 
 =head2 REase()
 
-  my $mflag = REase( $value [, $options ] )
+  my $mflag = REase( $value [, $options ] );
 
 "Cuts" ("splits") C<$value>, recognizing non-alphabetic sections in it 
 (except for these characters: C<< . >>, C<< > >>, C<< < >>, C<< } >>, C<< { >>, C<'>, C<`>, C<">, C<< = >>, C<< _ >>, C<< - >>, 
@@ -2748,7 +3625,7 @@ For example, this gibberish:
  my $value = '~$&,%,$,#,_,{,},^,\2qw\ea-sdf-124-590\\\\\\>>>>---1';
  my $mflag = REase( $value );
 
-converts to a sequence (by default, C<< tail = 3 >>)
+converts to a sequence (by default, C<< tile = 3 >>)
 
   '{\hskip0pt plus .02em}~$&,'.
   '{\hskip0pt plus .02em}%'.
@@ -2789,16 +3666,16 @@ For example, C<$options> is a SCALAR:
 
 i.e. the SCALAR form of C<$options> allows passing additional options only as C<esc>.
 
-=head3 tail
+=head3 tile
 
-Here, the main auxiliary option is C<tail>, which specifies the size (in characters) of the maximum 
-uncut non-alphabetic sections in the range from 1 to C<< tail + 1 >>.
-For example, for C<< tail = 5 >>, the sizes of uncut non-alphabetic sections will be 
+Here, the main auxiliary option is C<tile>, which specifies the size (in characters) of the maximum 
+uncut non-alphabetic sections in the range from 1 to C<< tile + 1 >>.
+For example, for C<< tile = 5 >>, the sizes of uncut non-alphabetic sections will be 
 from 1 to 6 characters, e.g.:
 
   $mflag = REase( $value, { tile => 5 } );
 
-Valid values for C<tail> are from 2 to 9.
+Valid values for C<tile> are from 2 to 9.
 
 If the $value ends with TeX-command C<< \relax\/ >>, then the value itself is not modified, it is skipped.
 C<< \relax\/ >> remains untouched at the end.
@@ -2834,6 +3711,422 @@ changes were made and greatly affected TeX structures.
 C<REase()>  will not be executed if C<< _MFLAGS_ & 0b0100 >>.
 
 
+=head2 AGLkit()
+
+  my $agl = AGLkit( [ $options ] );
+
+Returns a hash table that maps glyph names to a numeric character Unicode (in decimal (default) or hexadecimal format)
+or the corresponding character equivalents for the glyphs defined by Adobe in what is known as 
+the 'Adobe Glyph List' (AGL), contained in the well-known 'glyphlist.txt' file.
+(see L<https://github.com/adobe-type-tools/agl-aglfn/blob/master/glyphlist.txt>)
+
+By default (i.e., without any additional options), a hash is returned using the ISO-8859-1 character set (also known as ISO-Adobe),
+supplemented by the 'Adobe Standard Cyrillic Glyph Names' character set, with character codes represented in B<decimal> format.
+(see L<https://en.wikipedia.org/wiki/Adobe_Glyph_List> and
+L<https://adobe-type-tools.github.io/font-tech-notes/pdfs/5013.Cyrillic_Font_Spec.pdf>).
+For example:
+
+  my $agl = AGLkit();
+  say Dumper $agl;
+
+Output a hash of 325 glyphs:
+
+  $VAR1 = {
+          'Atilde' => 195,
+          'D' => 68,
+          'afii10100' => 1107,
+          'acute' => 180,
+  ...
+          'sterling' => 163,
+          'Ucircumflex' => 219,
+          'H' => 72,
+          'R' => 82,
+          'V' => 86
+        };
+
+This subroutine accepts a list of optional settings in the form of a hash C<$options>.
+For example:
+
+  my $options = { 
+    glyphlist => 'glyphlist.txt', # glyph list file
+    mate => 'symbol', # of Unicode | 'hex' Unicode number (native). By default, decimal Unicode number
+  };
+
+  $agl = AGLkit( $options );
+
+Output:
+
+  $VAR1 = {
+          'ringhalfrightbelowcmb' => "\x{339}",
+          'afii10831' => "\x{f6c7}",
+          'thorn' => 'þ',
+          'brokenbar' => '¦',
+          'E' => 'E',
+          'two' => '2',
+          'exclam' => '!',
+          'twosuperior' => '²',
+...
+        };
+
+
+=head3 glyphlist
+
+This option allows you to transfer a file containing glyphs and their corresponding Unicode character codes,
+similar the well-known 'glyphlist.txt' file.
+(see L<https://github.com/adobe-type-tools/agl-aglfn/blob/master/glyphlist.txt>).
+E.g., in Debian (with the TeX Live system installed), the file you are looking for is located at the path
+C</usr/share/texlive/texmf-dist/fonts/map/glyphlist/>
+
+And the most reliable way to find a file is to use the C<kpsewhich> command in the terminal:
+
+  $ kpsewhich glyphlist.txt
+
+=head3 mate
+
+This option allows you to specify which mapping to set for glyphs: Unicode C<'symbol'> or C<'hex'> Unicode number.
+By default, B<decimal> Unicode number (for undefined C<mate>). For example:
+
+  $agl = AGLkit( {mate =>'hex',} );
+
+Output:
+
+  $VAR1 = {
+          'exclam' => '21',
+          'twosuperior' => 'B2',
+          'brokenbar' => 'A6',
+          'E' => '45',
+          'two' => '32',
+          'thorn' => 'FE',
+          'afii10831' => '439',
+...
+        };
+
+Invalid glyph names and names beginning with a dot ('.'), are discarded.
+
+
+=head2 font_metrics()
+
+  my $font_metrics = font_metrics( $AFMfile [, $options ] );
+
+This subroutine allows you to obtain information about a font and the metrics of various glyphs
+within that font from an AFM (Adobe Font Metrics) file --- C<$AFMfile>. All measurements in AFM files are expressed 
+in units equal to 1/1000 of the font's scale factor.
+
+This subroutine accepts a list of optional settings in the form of a hash C<$options>.
+For example:
+
+  my $font_metrics = font_metrics('PTC55F.afm'); # to get the metrics of 'PT Sans Caption' font
+  # or
+  $font_metrics = font_metrics('PTC55F.afm', { glyphlist =>'glyphlist.txt',} );
+
+  say Dumper $font_metrics;
+
+Returns a hash containing three hashes: 'WX' -- character widths, 'Bbox' -- Bounding box information, and
+'KPX' -- kerning pairs ash contains the kerning values for adjacent characters:
+
+  $VAR1 = {
+          'WX' => {
+                    '118' => '535',
+                    '1060' => '857',
+  ...
+                    '177' => '554',
+                  },
+          'Bbox' => {
+                      '118' => '0 -11 535 525 ',
+                      '1060' => '43 -20 813 720 ',
+  ...
+                      '177' => '43 168 511 699 ',
+                    },
+          'KPX' => {
+                     '118' => {
+                                '32' => '-36',
+                                '382' => '-10',
+  ...
+                                '118' => '7',
+                                '44' => '-72'
+                              },
+  ...
+                     '1060' => {
+                                 '62669' => '-16',
+                                 '1199' => '-16',
+  ...
+                                 '8218' => '-31'
+                               },
+                   }
+        };
+
+
+
+=head3 glyphlist
+
+This option is similar to the one in L</"AGLkit()"> subroutine (see above).
+
+=head3 mate
+
+This option is similar to the one in L</"AGLkit()"> subroutine (see above),
+i.e. the allowed values are 'symbol', 'hex', and an additional 'glyph' of Adobe.
+By default, decimal Unicode number (undefined C<mate>).
+
+=head3 noBbox, noKPX
+
+These options mean not to generate 'Bbox' and 'KPX' hashes respectively.
+
+
+=head2 onecell()
+
+  my( $cell ) = onecell( $string, $options );
+
+This method places (lays out) a given plain-text C<$string> (i.e., a paragraph, with no TeX/LaTeX commands!
+and no C<< \n >> characters) into a cell (or box) of a specified width, returning an array of lines or 
+the number of lines occupied within the cell.
+
+These lines, including their word breaks (in the form of TeX command 'C<< \- >>'), will largely correspond to 
+their actual layout in a PDF document generated from them --- for instance, when using a LaTeX table environment
+(such as 'C<tabular>' or 'C<longtable>') processed with the 'C<pdflatex>' command.
+
+The formation of these lines (or more precisely, the hyphenation of words at the end of lines) is influenced by 
+the 'C<hyphenation>' parameter, which results in two ways of arranging lines within a cell:
+"compact" (A) and "natural" (B).
+
+=over 3
+
+=item (A)
+
+If 'C<hyphenation>' is missing or 'C<action>' for hyphenating words of the language of the given text (C<$string>) are not specified,
+then a case of the most compact packing of lines into a cell/box is formed, with the minimum possible number of hyphenations in words.
+In PDF output, this is achieved by setting the 'C<\looseness>' parameter for a paragraph within a cell/box to B<-3> or lower
+(e.g., C<\looseness=-4>, etc.).
+
+=item (B)
+
+If 'C<action>' (from modules such as L<Text::Hyphen>, L<Text::Hyphen::RU>, L<TeX::Hyphen>, etc. with C<hyphenate()> method), are specified in the 'C<hyphenation>' parameter
+to handle word hyphenation for the languages present in the given text, the result will include natural, language-appropriate word breaks.
+In this scenario, the number of hyphenated words is kept to a reasonable minimum; however, unlike in case (A), the total number of lines 
+within a cell/box may increase by one or two. This depends on the width of the cell/box: the narrower (smaller) the width (e.g. option C<< cell_width < 10mm >>),
+the more likely it is that the number of lines will exceed that of case (A).
+
+If the strings obtained in case (B) are not used for PDF creation (via the 'C<pdflatex>' command) --- and the original text C<$string> is used
+instead -- then the results from (B) will match the PDF output (in terms of word hyphenation and the number of lines within a cell) only
+if the text language is correctly specified -- either for the entire document (in the preamble) or specifically for that cell (for instance,
+by using the 'C<otherlanguage>' environment or commands such as 'C<\foreignlanguage{}{}>' and 'C<\selectlanguage{}>') --- and provided that
+the hyphenation patterns used in both cases are identical.
+
+=back
+
+The following options are mandatory:
+
+=head3 cell_width
+
+Width of cell/box (pt).
+
+=head3 font_metrics
+
+Hash (table) of font metrics with 'C<WX>' (pairs of B<decimal> Unicode number to horizontal (X) width of a character),
+and optional 'C<KPX>' -- Kern Pair X. This table can be obtained using  L</"font_metricst()"> subroutine with 
+default parameters (see above).
+
+The following parameters are optional:
+
+=head3 base_font_size
+
+Depending on the document's base font size (pt), e.g. 12pt (see \documentclass[...pt]).
+By default, this value is 10 (i.e. 10pt).
+
+=head3 font_size
+
+TeX-font size of text in cell/box: 'tiny', 'scriptsize', 'footnotesize', 'small', 'normalsize', 'large', 'Large', 'LARGE', 'huge', and 'Huge'.
+By default, this value is 'normalsize'.
+
+
+=head3 space
+
+Regular space between words (pt) -- fontdimen 2.
+In LaTeX, you can determine the compressibility parameters for the space between words by accessing 
+the font parameters (see above C<\fontdimen> 2)
+
+You can output the current interword space parameters to the compilation log or directly onto the page using 
+the C<\the\fontdimen> command:
+
+  \documentclass{article}
+  \begin{document}
+    Regular whitespace (fontdimen 2): \the\fontdimen 2 \font\\
+    Whitespace stretching (fontdimen 3): \the\fontdimen 3 \font\\
+    Whitespace shrink (fontdimen 4): \the\fontdimen 4 \font
+  \end{document}
+
+If this parameter is not specified, the value of C<space> from the C<font_metrics> is used.
+
+=head3 shrink
+
+Space compressibility (pt) --- the extent to which a space can become narrower than its base value if the line is compressed (fontdimen 4).
+A standard space in LaTeX is a flexible space (glue) and consists of three components: a normal width, a stretch component, 
+and a shrink component. In LaTeX, you can determine the compressibility parameters for the space between words by accessing 
+the font parameters (see above C<\fontdimen> 4).
+
+By default, this value is 0.
+
+=head3 merge
+
+If C<< merge => 1 >> -- return a combined string (paragraph) and its total width (length) in (*100pt),
+rather than an array of lines.
+
+=head3 offset
+
+Offset from the beginning of $str from which characters for cell are extracted.
+By default, this value is 0.
+
+=head3 limit
+
+The maximum allowable number of lines for a cell.
+By default, the number of lines is unlimited.
+
+=head3 hyphenation
+
+Array of methods which hyphenates words in specified languages,
+e.g.:
+
+  use Text::Hyphen;
+  use Text::Hyphen::RU;
+
+  my $hyp_en = new Text::Hyphen( min_word =>4);
+  my $hyp_ru = new Text::Hyphen::RU( min_word =>4);
+
+  my $hyphenation = [
+         { name =>'en', action => $hyp_en, }, # English
+       # OR
+       # { msk => qr/[a-zA-Z]+/o, action => $hyp_en, },
+
+         { name =>'ru', action => $hyp_ru, }, # Russian
+       # OR
+       #  { msk => qr/[а-яА-Я]+/o, action => $hyp_ru, },
+      ];
+
+The primary requirement for C<action> used for this C<hyphenation> option is that their interface must resemble that of L<Text::Hyphen> module;
+specifically, when called in a list context, the object-oriented subroutine C<$hyp->hyphenate($word)> should break the C<$word> into parts at 
+the hyphenation points and return a list of these parts.
+
+It is also acceptable to use a regular function rather than an object-oriented subroutine C<$hyp->hyphenate($word)>,
+provided that its interface matches the one specified above—that is, it must return a list of word fragments.
+
+For C<name> key, two predefined values are currently permissible: B<'en'> (English) and B<'ru'> (Russian).
+
+To typeset non-English and non-Russian texts, pass in a Text::Hyphen-like object which responds to the hyphenate method, 
+returning a list of hyphen positions for that particular language (native Text::Hyphen defaults to American English hyphenation rules). 
+See L<Text::Hyphen> for the interface.
+
+For non-English and non-Russian languages, you need to use the C<msk> key, in which you specify a mask for identifying the language based on a C<$word>.
+
+Examples #1:
+
+  use utf8;
+  use open ":std", ":encoding(utf8)";
+
+  use LaTeX::Replicase qw(font_metrics onecell); # :all
+  use Text::Hyphen;
+  use Text::Hyphen::RU;
+  use Data::Dumper;
+
+  my $mm2pt = 2.845276; # 1mm ~= 2.845276pt
+  my $cell_width = 30; # (mm)
+  $cell_width *= $mm2pt; # (mm) to (pt)
+
+  my $hyp_en = new Text::Hyphen( min_word =>4);
+  my $hyp_ru = new Text::Hyphen::RU( min_word =>4);
+
+  my $op = {
+      cell_width => $cell_width, # width of cell/box, (pt)
+      font_metrics => font_metrics('PTC55F.afm', { glyphlist => 'glyphlist.txt', noBbox =>1 }),
+      base_font_size => 10, # depending on the document's base font size (pt), see \documentclass[...pt]
+      # font_size => 'normalsize', # TeX-font size of text in cell/box
+      space => 2.43, # Regular space between words (pt), see fontdimen 2
+      shrink => 0.81, # whitespace shrink (pt), see fontdimen 4
+      # merge => 1,
+      # offset => 0,
+      # limit => 25,
+      hyphenation => [
+         { name =>'en', action => $hyp_en, }, # English
+       # OR
+       # { msk => qr/[a-zA-Z]+/o, action => $hyp_en, },
+
+         { name =>'ru', action => $hyp_ru, }, # Russian
+       # OR
+       #  { msk => qr/[а-яА-Я]+/o, action => $hyp_ru, },
+      ],
+  };
+
+  my $string = "I was going to do something today but I haven't finished doing nothing from yesterday.
+  Я собирался кое-что сделать сегодня, но еще не закончил ничегонеделание со вчерашнего дня    ";
+  say 'size of string = ', length( $string );
+
+  my $nLines = onecell( $string, $op );
+  say "number of lines = $nLines";
+
+  my( $cell ) = onecell( $string, $op );
+  say Dumper $cell;
+
+  $op->{merge} => 1;
+  my( $cell ) = onecell( $string, $op );
+  say Dumper $cell;
+
+OUTPUT:
+
+  size of string = 180
+  number of lines = 12
+  $VAR1 = {
+          'lines' => [ # arrays of no empty lines
+                       'I was going to do ',
+                       'something today ',
+                       'but I haven\'t fin\-',
+                       'ished doing noth\-',
+                       'ing from yes\-ter\-',
+                       'day. Я собирался ',
+                       'кое-что сделать ',
+                       'сегодня, но еще ',
+                       'не закончил ни\-',
+                       'че\-го\-не\-де\-ла\-ние ',
+                       'со вчерашнего ',
+                       'дня'
+                     ],
+          'stop' => 176, # position in $string where the extraction of symbols into cell stopped
+          'wxL' => [ # arrays of line widths (*100pt) for 'lines'
+                     8106,
+                     8247,
+                     7530,
+                     8171,
+                     7243,
+                     8257,
+                     7901,
+                     7882,
+                     7490,
+                     7692,
+                     7423,
+                     1826
+                   ],
+          'numL' => 12 # number of no empty lines
+        };
+
+  $VAR1 = {
+          'wxL' => [
+                     87768
+                   ],
+          'lines' => [
+    "I was going to do something today but I haven't fin\\-ished doing noth\\-ing from yes\\-ter\\-day. Я собирался
+      кое-что сделать сегодня, но еще не закончил ни\\-че\\-го\\-не\\-де\\-ла\\-ние со вчерашнего дня"
+                     ],
+          'numL' => 12,
+          'stop' => 176
+        };
+
+
+The output hash contains the position in C<$string> where the extraction of symbols into cell stopped under 'C<stop>' key.
+If all non-whitespace characters have been extracted from C<$string> and 'C<limit>' option is specified,
+then C<stop = -1> is returned.
+
+B<LIMITATIONS:>
+The strings in 'lines' will have no leading spaces. The last string will have no trailing spaces.
+Words in 'lines' will be separated by exactly ONE SPACE and may contain TeX hyphenation commands ('\-').
+
+
 =head1 EXPORT
 
 LaTeX::Replicase exports nothing by default.
@@ -2859,14 +4152,21 @@ and L<Carp>.
 For LaTeX2e details see this unofficial reference manual:
 L<https://tug.org/texinfohtml/latex2e.html>
 
+For 'Adobe Glyph List' (ISO-8859-1 character set, also known as ISO-Adobe) see L<https://en.wikipedia.org/wiki/Adobe_Glyph_List>,
+L<https://github.com/adobe-type-tools/agl-aglfn>
+
+For 'Adobe Standard Cyrillic Glyph Names' character set see L<https://adobe-type-tools.github.io/font-tech-notes/pdfs/5013.Cyrillic_Font_Spec.pdf>
+
 Perl modules that offer similar functionality:
 
-L<Template::Latex>, L<LaTeX::Easy::Templates>
+L<Template::Latex>, L<LaTeX::Easy::Templates>,
+L<PostScript::DecodeGlyphName>, L<Font::GlyphNames>,
+L<Font::AFM>
 
 
 =head1 SUPPORT AND BUGS
 
-You can find documentation for this module with the perldoc command.
+You can find documentation for this module with the perldoc command:
 
   perldoc LaTeX::Replicase
 

@@ -3,22 +3,19 @@ abstract: 'Versatile Web Framework - easily build a website to support different
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
-  Data::Validate::URI: '0'
-  DateTime: '0'
   ExtUtils::MakeMaker: '0'
+  File::Copy::Recursive: '0'
   HTTP::Response: '0'
-  LWP::Simple::WithCache: '0'
+  Test::DescribeMe: '0'
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0'
   Test::Most: '0'
   Test::Returns: '0'
-  XML::LibXML: '0'
-  YAML: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
 dynamic_config: 1
 generated_by: 'ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015'
-license: open_source
+license: gpl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
   version: '1.4'
@@ -27,6 +24,10 @@ no_index:
   directory:
     - t
     - inc
+    - example
+    - t
+recommends:
+  Mail::DKIM: '0'
 requires:
   CGI::ACL: '0.06'
   CGI::Carp: '0'
@@ -44,7 +45,9 @@ requires:
   DBI: '0'
   Data::Dumper: '0'
   Data::Throttler: '0'
+  Data::Validate::URI: '0'
   Database::Abstraction: '0'
+  DateTime: '0'
   Digest::MD5: '0'
   Digest::SHA: '0'
   Error: '0'
@@ -60,6 +63,7 @@ requires:
   HTTP::Date: '0'
   HTTP::Status: '0'
   JSON::MaybeXS: '0'
+  LWP::Simple::WithCache: '0'
   LWP::UserAgent: '0'
   Log::Abstraction: '0'
   Log::WarnDie: '0.09'
@@ -79,15 +83,18 @@ requires:
   Template::Plugin::JSON: '0'
   Template::Plugin::Math: '0'
   Text::xSV::Slurp: '0'
+  Time::Duration::Parse: '0'
   Time::HiRes: '0'
   Time::Piece: '0'
   Time::Seconds: '0'
   Timer::Simple: '0'
   Try::Tiny: '0'
+  XML::LibXML: '0'
+  YAML: '0'
   perl: '5.020000'
   version: '0.77'
 resources:
   bugtracker: https://github.com/nigelhorne/Web-VWF/issues
   repository: git://github.com/nigelhorne/Web-VWF.git
-version: 0.001.0
+version: 0.002.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

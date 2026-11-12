@@ -293,6 +293,10 @@ typedef struct IBTreeInfo {
 				 * internal DLines were correct. */
     DLine **addDlPtrs;		/* Additional array of lines to display. */
     int numAddLines;		/* Length of the additional array. */
+    struct TkTextBlockOrns *ornsPtr;
+				/* Ornaments of the block (its type's
+				 * templates and those the layout callback
+				 * returned, tkTextOrn.c), or NULL. */
 } IBTreeInfo;
 
 /*
@@ -405,6 +409,23 @@ static int		SizeOfTab _ANSI_ARGS_((TkText *textPtr,
 			    int maxX));
 static void		TextInvalidateRegion _ANSI_ARGS_((TkText *textPtr,
 			    TkRegion region));
+static void		OrnInvalidateY _ANSI_ARGS_((TkText *textPtr,
+			    int y0, int y1));
+/*
+ * The ascent of the character whose box CharBboxProc found last (its
+ * baseline is that far below the top of the box), for ornaments.
+ */
+
+static int ornAscent = -1;
+
+/*
+ * The same calls set the font of the character, and IBTreeBboxProc the
+ * display line inside a block the character is in.
+ */
+
+static Tk_Font ornFont = NULL;
+static DLine *ornDLine = NULL;
+
 static int		DLinePixelIndex(TkText *textPtr, int x, int y,
 					DLine *dlPtr);
 
@@ -1896,6 +1917,15 @@ DisplayDLine(textPtr, dlPtr, prevPtr, pixmap, hoffset, voffset)
 			  hoffset, voffset);
 
     /*
+     * Ornaments under the text (only top-level lines: an ornament is
+     * drawn into the lines of the window it crosses).
+     */
+
+    if (!(dlPtr->flags & INTERNAL_DLINE) && (textPtr->ornInfoPtr != NULL)) {
+	TkTextOrnDraw(textPtr, pixmap, 1, dlPtr->y, dlPtr->height);
+    }
+
+    /*
      * Make another pass through all of the chunks to redraw the
      * insertion cursor, if it is visible on this line.  Must do
      * it here rather than in the foreground pass below because
@@ -1972,6 +2002,9 @@ DisplayDLine(textPtr, dlPtr, prevPtr, pixmap, hoffset, voffset)
      */
 
     if (!(dlPtr->flags & INTERNAL_DLINE)) {
+      if (textPtr->ornInfoPtr != NULL) {
+	TkTextOrnDraw(textPtr, pixmap, 0, dlPtr->y, dlPtr->height);
+      }
       height = dlPtr->height;
       if ((height + dlPtr->y) > dInfoPtr->maxY) {
 	height = dInfoPtr->maxY - dlPtr->y;
@@ -2429,6 +2462,27 @@ DisplayText(clientData)
 
     UpdateDisplayInfo(textPtr);
     dInfoPtr->dLinesInvalidated = 0;
+
+    /*
+     * Ornaments (tkTextOrn.c): where one moved or changed, the lines
+     * under its old and its new place are redrawn; a line under one
+     * cannot be moved by copying its pixels (they would carry pieces
+     * of the ornament along).
+     */
+
+    if (textPtr->ornInfoPtr != NULL) {
+	TkTextOrnUpdate(textPtr, OrnInvalidateY);
+	for (dlPtr = dInfoPtr->dLinePtr; dlPtr != NULL;
+		dlPtr = dlPtr->nextPtr) {
+	    if ((dlPtr->oldY != -1) && (dlPtr->oldY != dlPtr->y)
+		    && (TkTextOrnTouches(textPtr, dlPtr->y,
+			    dlPtr->y + dlPtr->height)
+		    || TkTextOrnTouches(textPtr, dlPtr->oldY,
+			    dlPtr->oldY + dlPtr->height))) {
+		dlPtr->oldY = -1;
+	    }
+	}
+    }
 
     /*
      * See if it's possible to bring some parts of the screen up-to-date
@@ -4298,7 +4352,24 @@ DLinePixelIndex(textPtr, x, y, dlPtr)
 	    offset += chunkPtr->numChars,
 	    chunkPtr = chunkPtr->nextPtr) {
 	if (chunkPtr->nextPtr == NULL) {
-	    offset += chunkPtr->numChars - 1;
+	    int last = chunkPtr->numChars - 1;
+
+	    /*
+	     * The last position of the line: in a chunk of characters,
+	     * the start of its last character (numChars counts bytes,
+	     * and a position inside a multi-byte character, made into a
+	     * mark, splits the character: BUGS 34).
+	     */
+
+	    if (chunkPtr->displayProc == CharDisplayProc) {
+		CharInfo *ciPtr = (CharInfo *) chunkPtr->clientData;
+
+		while ((last > 0)
+			&& ((UCHAR(ciPtr->chars[last]) & 0xC0) == 0x80)) {
+		    last--;
+		}
+	    }
+	    offset += last;
 	    return offset;
 	}
     }
@@ -4480,10 +4551,12 @@ TkTextCharBbox(textPtr, indexPtr, xPtr, yPtr, widthPtr, heightPtr)
 	    heightPtr);
     *xPtr = *xPtr + dInfoPtr->x - dInfoPtr->curPixelOffset;
     if ((index == (chunkPtr->numChars-1)) && (chunkPtr->nextPtr == NULL)
-	    && (chunkPtr->displayProc != ElideDisplayProc)) {
+	    && (chunkPtr->displayProc != ElideDisplayProc)
+	    && (chunkPtr->measureProc != IBTreeMeasureProc)) {
 	/*
 	 * Last character in display line.  Give it all the space up to
-	 * the line (unless it is elided: then it has no box, as in Tk).
+	 * the line (unless it is elided: then it has no box, as in Tk;
+	 * nor to the tail of a block, whose box is its last leaf's).
 	 */
 
 	if (*xPtr > dInfoPtr->maxX) {
@@ -5162,6 +5235,8 @@ CharBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
 	    *widthPtr -= *xPtr;
 	}
     }
+    ornAscent = chunkPtr->minAscent;
+    ornFont = chunkPtr->stylePtr->sValuePtr->tkfont;
     *yPtr = y + baseline - chunkPtr->minAscent;
     *heightPtr = chunkPtr->minAscent + chunkPtr->minDescent;
 }
@@ -5203,7 +5278,7 @@ IBTreeDisplayProc(chunkPtr, x, y, height, baseline, display, dst, screenY)
 {
     IBTreeInfo *biPtr = (IBTreeInfo *) chunkPtr->clientData;
     DLine *dlPtr, *prevPtr;
-    int line, i;
+    int line, i, top;
     int screenYTopOfChunk = screenY + baseline - chunkPtr->minAscent;
     int screenYTopOfDst = screenY - y;
 
@@ -5231,10 +5306,22 @@ IBTreeDisplayProc(chunkPtr, x, y, height, baseline, display, dst, screenY)
 	biPtr->y = screenYTopOfChunk;
     }
 
-    for (i = 0; i < biPtr->numAddLines; i++) {
-      DisplayDLine(biPtr->textPtr, biPtr->addDlPtrs[i], NULL, dst, 
-		   biPtr->addDlPtrs[i]->x + x - biPtr->x,
-		   biPtr->addDlPtrs[i]->y - screenYTopOfDst);
+    /*
+     * The ornaments of the block under the text, in their order among
+     * the additional lines; the leaves; the ornaments over the text.
+     * The top left corner of the block is at (x, top) in dst.
+     */
+
+    top = screenYTopOfChunk - screenYTopOfDst;
+    for (i = 0; i <= biPtr->numAddLines; i++) {
+      if (biPtr->ornsPtr != NULL) {
+	TkTextOrnDrawBlock(biPtr->textPtr, biPtr->ornsPtr, dst, 1, i, x, top);
+      }
+      if (i < biPtr->numAddLines) {
+	DisplayDLine(biPtr->textPtr, biPtr->addDlPtrs[i], NULL, dst, 
+		     biPtr->addDlPtrs[i]->x + x - biPtr->x,
+		     biPtr->addDlPtrs[i]->y - screenYTopOfDst);
+      }
     }
     for (line = 0 ; line < biPtr->numLines ; line++) {
 	for (prevPtr = NULL, dlPtr = biPtr->lines[line];
@@ -5248,6 +5335,9 @@ IBTreeDisplayProc(chunkPtr, x, y, height, baseline, display, dst, screenY)
 	    dlPtr->oldY = dlPtr->y;
 	    dlPtr->flags &= ~NEW_LAYOUT;
 	}
+    }
+    if (biPtr->ornsPtr != NULL) {
+	TkTextOrnDrawBlock(biPtr->textPtr, biPtr->ornsPtr, dst, 0, -1, x, top);
     }
 }
 
@@ -5285,6 +5375,7 @@ IBTreeUndisplayProc(textPtr, chunkPtr)
       ckfree((char*)biPtr->addDlPtrs[i++]);
     }
     if (biPtr->addDlPtrs) ckfree((char*)biPtr->addDlPtrs);
+    TkTextOrnFreeBlock(textPtr, biPtr->ornsPtr);
     if (biPtr->lines) ckfree((char *) biPtr->lines);
     ckfree((char *) biPtr);
 }
@@ -5457,6 +5548,9 @@ IBTreeBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
       if (dlPtr == NULL) {
 	panic("Ran out of DLines in IBTreeBboxProc.");
       }
+      if (!(dlPtr->flags & DONTSHOW_DLINE)) {
+	ornDLine = dlPtr;
+      }
 
       if (dlPtr->flags & DONTSHOW_DLINE) {
 	/* Asked about a hidden line in a block */
@@ -5468,10 +5562,15 @@ IBTreeBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
 	return;
       }
 
+      /*
+       * The y of the internal DLines is relative to biPtr->y: the
+       * screen y of the top of the chunk when it was last displayed
+       * (IBTreeDisplayProc), 0 before (as in IBTreeMeasureProc).
+       */
       if (index == dlPtr->count - 1) {
 	/* Asked about a whole field in a block */
 	*xPtr = dlPtr->x;
-	*yPtr = dlPtr->y + y + baseline - chunkPtr->minAscent;
+	*yPtr = dlPtr->y - biPtr->y + y + baseline - chunkPtr->minAscent;
 	*heightPtr = dlPtr->height;
 	*widthPtr = dlPtr->length;	/* Contains width! */
       } else {
@@ -5483,7 +5582,7 @@ IBTreeBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
 	  }
 	  if (index < chunkPtr->numChars) {
 	    (*chunkPtr->bboxProc)(chunkPtr, index, 
-		dlPtr->y + dlPtr->spaceAbove,
+		dlPtr->y - biPtr->y + dlPtr->spaceAbove,
 		dlPtr->height - dlPtr->spaceAbove - dlPtr->spaceBelow,
 		dlPtr->baseline - dlPtr->spaceAbove, xPtr, yPtr, widthPtr,
 		heightPtr);
@@ -5573,6 +5672,7 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     infoPtr->x = chunkPtr->x;
     infoPtr->addDlPtrs = NULL;
     infoPtr->numAddLines = 0;
+    infoPtr->ornsPtr = NULL;
 
     index.tree = segPtr->body.itree.tree;
 
@@ -5658,6 +5758,13 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       }
       line = 0;
       resultArg = Tcl_ResultArg(textPtr->interp);
+
+      /*
+       * The result is held by resultArg: the interpreter's result is
+       * free for error messages.
+       */
+
+      Tcl_ResetResult(textPtr->interp);
       code = Lang_SplitList(textPtr->interp, resultArg,
 			    &argc, &args, &freeProc);
       if ((code != TCL_OK) || (argc == 0)) {
@@ -5670,6 +5777,26 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       for (i = 0; i < argc; i++) {
 	code = Lang_SplitList(textPtr->interp, args[i],
 			      &argc1, &args1, &freeProc1);
+	if ((code == TCL_OK) && (i != 0) && (argc1 >= 1)
+	    && TkTextOrnIsType(LangString(args1[0]))) {
+	  /*
+	   * An ornament of the block (tkTextOrn.c), drawn after the
+	   * additional lines returned before it.
+	   */
+
+	  code = TkTextOrnLayoutItem(textPtr, textPtr->interp, argc1, args1,
+				     infoPtr->numAddLines, &infoPtr->ornsPtr);
+	  if (args1 != NULL && freeProc1) (*freeProc1)(argc1,args1);
+	  if (code != TCL_OK) {
+	    if (args != NULL && freeProc) (*freeProc)(argc,args);
+	    Tcl_AppendResult(textPtr->interp, " in an ornament returned by ",
+			     "the layout callback of block \"", blockPtr->name,
+			     "\".", NULL);
+	    Tcl_BackgroundError(textPtr->interp);
+	    goto finishCall;
+	  }
+	  continue;
+	}
 	if ((code != TCL_OK) 
 	    || !(((argc1 == 1) && (i != 0)) 
 		 || (argc1 == 7) || (argc1 == 13))) {
@@ -5768,6 +5895,8 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       }
     } else {
   finishCall:
+      TkTextOrnFreeBlock(textPtr, infoPtr->ornsPtr);
+      infoPtr->ornsPtr = NULL;
       for (line=0; line < infoPtr->numLines; line++) {
 	DLine *dlPtr = infoPtr->lines[line];
 	while (dlPtr) {
@@ -5782,6 +5911,54 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
       chunkPtr->width = ll;
     }
     if (resultArg)  LangFreeArg(resultArg, LANG_DYNAMIC);
+
+    /*
+     * The ornaments of the block type, from the boxes of the block and
+     * of its leaves (block coordinates).
+     */
+
+    if (blockPtr->ornTemplates != NULL) {
+      TkTextOrnBlockBoxes boxes;
+      Tk_Font blockFont = chunkPtr->stylePtr->sValuePtr->tkfont;
+      int n = infoPtr->numLines;
+
+      boxes.numLeaves = n;
+      boxes.leaves = (TkTextOrnBox *) ckalloc((n + 1) * sizeof(TkTextOrnBox));
+      boxes.shown = (int *) ckalloc((n + 1) * sizeof(int));
+      boxes.block.x = 0;
+      boxes.block.y = 0;
+      boxes.block.width = chunkPtr->width;
+      boxes.block.height = chunkPtr->minAscent + chunkPtr->minDescent;
+      boxes.block.base = chunkPtr->minAscent;
+      boxes.block.tkfont = blockFont;
+      boxes.block.line = NULL;
+      for (line = 0; line < n; line++) {
+	DLine *dlPtr = infoPtr->lines[line], *lastPtr = dlPtr;
+	TkTextOrnBox *bPtr = &boxes.leaves[line];
+
+	boxes.shown[line] = !(dlPtr->flags & DONTSHOW_DLINE);
+	bPtr->x = dlPtr->x - chunkPtr->x;
+	bPtr->y = dlPtr->y;
+	bPtr->base = dlPtr->y + dlPtr->baseline;
+	bPtr->width = 0;
+	for ( ; dlPtr != NULL; dlPtr = dlPtr->nextPtr) {
+	  if (dlPtr->length > bPtr->width) {
+	    bPtr->width = dlPtr->length;
+	  }
+	  lastPtr = dlPtr;
+	}
+	bPtr->height = lastPtr->y + lastPtr->height - bPtr->y;
+	dlPtr = infoPtr->lines[line];
+	bPtr->tkfont = ((dlPtr->chunkPtr != NULL)
+			&& (dlPtr->chunkPtr->stylePtr != NULL))
+	  ? dlPtr->chunkPtr->stylePtr->sValuePtr->tkfont : blockFont;
+	bPtr->line = NULL;
+      }
+      TkTextOrnLayoutTemplates(textPtr, blockPtr->ornTemplates, &boxes,
+			       &infoPtr->ornsPtr);
+      ckfree((char *) boxes.leaves);
+      ckfree((char *) boxes.shown);
+    }
   
     /*
      * Fill in the chunk structure.
@@ -6333,4 +6510,239 @@ NextTabStop(tkfont, x, tabOrigin)
     }
     x -= rem;
     return x;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * Ornaments (tkTextOrn.c): the places where characters are drawn.
+ *
+ *----------------------------------------------------------------------
+ */
+
+/*
+ * Marks for redisplay the display lines in the vertical range [y0, y1)
+ * of the window.
+ */
+
+static void
+OrnInvalidateY(textPtr, y0, y1)
+    TkText *textPtr;
+    int y0, y1;
+{
+    DLine *dlPtr;
+
+    for (dlPtr = textPtr->dInfoPtr->dLinePtr; dlPtr != NULL;
+	    dlPtr = dlPtr->nextPtr) {
+	if ((dlPtr->y < y1) && (dlPtr->y + dlPtr->height > y0)) {
+	    dlPtr->oldY = -1;
+	}
+    }
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextOrnCharBox --
+ *
+ *	The box of the character at an index as it is drawn, in window
+ *	coordinates, not clipped to the window (unlike TkTextCharBbox),
+ *	with the y of its baseline; inside a block, the box of the
+ *	character in its leaf.
+ *
+ *	A position that is not displayed gets a stand-in: above or below
+ *	the window, where it would be if every text line in between were
+ *	one line high (the height of the top or bottom display line), or
+ *	for a position elided between displayed lines, the place of the
+ *	next displayed one; its width is 0, its font the widget's, its
+ *	line NULL.  Its x is the one the
+ *	position had when it was last displayed, if the caller
+ *	remembers one (*hasXPtr, *xPtr: in the coordinates of the
+ *	display line, which do not change with horizontal scrolling);
+ *	else the middle of the text area, or with -ornamentproportional
+ *	the place proportional to the position's offset in its text
+ *	line.  No line is laid out for a stand-in.
+ *
+ * Results:
+ *	1 if the character is displayed (its x is remembered in *xPtr,
+ *	if hasXPtr is not NULL), 0 for a stand-in, -1 if no line is
+ *	displayed (the box is not filled).
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkTextOrnCharBox(textPtr, indexPtr, hasXPtr, xPtr, boxPtr)
+    TkText *textPtr;
+    TkTextIndex *indexPtr;
+    int *hasXPtr;		/* Is *xPtr remembered?  Or NULL. */
+    double *xPtr;		/* The x remembered. */
+    TkTextOrnBox *boxPtr;
+{
+    TextDInfo *dInfoPtr = textPtr->dInfoPtr;
+    DLine *dlPtr, *firstPtr, *lastPtr, *refPtr;
+    TkTextDispChunk *chunkPtr;
+    int index, x, y, w, h, lines;
+    TkTextIndex tmp;
+
+    if (dInfoPtr->flags & DINFO_OUT_OF_DATE) {
+	UpdateDisplayInfo(textPtr);
+    }
+    firstPtr = dInfoPtr->dLinePtr;
+    if (firstPtr == NULL) {
+	return -1;
+    }
+    for (lastPtr = firstPtr; lastPtr->nextPtr != NULL;
+	    lastPtr = lastPtr->nextPtr) {
+	/* Empty. */
+    }
+    dlPtr = FindDLine(firstPtr, indexPtr);
+    if ((dlPtr != NULL) && (TkTextIndexCmp(&dlPtr->index, indexPtr) <= 0)) {
+	index = indexPtr->byteIndex - dlPtr->index.byteIndex;
+	for (chunkPtr = dlPtr->chunkPtr; chunkPtr != NULL;
+		chunkPtr = chunkPtr->nextPtr) {
+	    if (index < chunkPtr->numChars) {
+		break;
+	    }
+	    index -= chunkPtr->numChars;
+	}
+	if (chunkPtr != NULL) {
+	    ornAscent = -1;
+	    ornFont = NULL;
+	    ornDLine = dlPtr;
+	    (*chunkPtr->bboxProc)(chunkPtr, index,
+		    dlPtr->y + dlPtr->spaceAbove,
+		    dlPtr->height - dlPtr->spaceAbove - dlPtr->spaceBelow,
+		    dlPtr->baseline - dlPtr->spaceAbove, &x, &y, &w, &h);
+	    boxPtr->x = x + dInfoPtr->x - dInfoPtr->curPixelOffset;
+	    boxPtr->y = y;
+	    boxPtr->width = w;
+	    boxPtr->height = h;
+	    boxPtr->base = (ornAscent >= 0) ? y + ornAscent : y + h;
+	    boxPtr->tkfont = (ornFont != NULL) ? ornFont : textPtr->tkfont;
+	    boxPtr->line = (void *) ornDLine;
+	    if (hasXPtr != NULL) {
+		*hasXPtr = 1;
+		*xPtr = x;
+	    }
+	    return 1;
+	}
+    }
+    if ((dlPtr != NULL) && (dlPtr != firstPtr)
+	    && (TkTextIndexCmp(indexPtr, &firstPtr->index) > 0)) {
+	/*
+	 * Elided, between displayed lines: the place of the next
+	 * displayed position.
+	 */
+
+	tmp = dlPtr->index;
+	if (TkTextOrnCharBox(textPtr, &tmp, NULL, NULL, boxPtr) < 0) {
+	    return -1;
+	}
+	boxPtr->width = 0;
+	boxPtr->tkfont = textPtr->tkfont;
+	boxPtr->line = NULL;
+	return 0;
+    }
+    if ((dlPtr != NULL) && (TkTextIndexCmp(indexPtr, &firstPtr->index) < 0)) {
+	refPtr = firstPtr;
+	lines = TkBTreeLineIndex(refPtr->index.linePtr)
+		- TkBTreeLineIndex(indexPtr->linePtr);
+	if (lines < 0) {
+	    lines = 0;
+	}
+	boxPtr->y = refPtr->y - ((lines > 0) ? lines : 1) * refPtr->height;
+    } else {
+	refPtr = lastPtr;
+	lines = TkBTreeLineIndex(indexPtr->linePtr)
+		- TkBTreeLineIndex(refPtr->index.linePtr);
+	if (lines < 0) {
+	    lines = 0;
+	}
+	boxPtr->y = refPtr->y + refPtr->height
+		+ ((lines > 0) ? lines - 1 : 0) * refPtr->height;
+    }
+    boxPtr->height = refPtr->height;
+    boxPtr->base = boxPtr->y + refPtr->baseline;
+    boxPtr->width = 0;
+    boxPtr->tkfont = textPtr->tkfont;
+    boxPtr->line = NULL;
+    if ((hasXPtr != NULL) && *hasXPtr) {
+	boxPtr->x = *xPtr + dInfoPtr->x - dInfoPtr->curPixelOffset;
+    } else if (textPtr->ornProportional) {
+	int len, offset;
+
+	tmp.tree = indexPtr->tree;
+	tmp.linePtr = indexPtr->linePtr;
+	tmp.byteIndex = TkBTreeCharsInLine(indexPtr->linePtr) - 1;
+	len = TkTextIndexCharOffset(&tmp);
+	offset = TkTextIndexCharOffset(indexPtr);
+	if (offset > len) {
+	    offset = len;
+	}
+	boxPtr->x = dInfoPtr->x + ((len > 0)
+		? (double) (dInfoPtr->maxX - dInfoPtr->x) * offset / len : 0);
+    } else {
+	boxPtr->x = (dInfoPtr->x + dInfoPtr->maxX) / 2.0;
+    }
+    return 0;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextOrnDisplayedRange --
+ *
+ *	The first displayed position and the one after the last.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkTextOrnDisplayedRange(textPtr, firstPtr, lastPtr)
+    TkText *textPtr;
+    TkTextIndex *firstPtr, *lastPtr;
+{
+    TextDInfo *dInfoPtr = textPtr->dInfoPtr;
+    DLine *dlPtr;
+
+    if (dInfoPtr->flags & DINFO_OUT_OF_DATE) {
+	UpdateDisplayInfo(textPtr);
+    }
+    dlPtr = dInfoPtr->dLinePtr;
+    if (dlPtr == NULL) {
+	return TCL_ERROR;
+    }
+    *firstPtr = dlPtr->index;
+    while (dlPtr->nextPtr != NULL) {
+	dlPtr = dlPtr->nextPtr;
+    }
+    TkTextIndexForwBytes(&dlPtr->index, dlPtr->count, lastPtr);
+    return TCL_OK;
+}
+
+/*
+ * The union of two boxes (the baseline is the first one's).
+ */
+
+void
+TkTextOrnUnionBox(boxPtr, otherPtr)
+    TkTextOrnBox *boxPtr, *otherPtr;
+{
+    double x1 = boxPtr->x + boxPtr->width, y1 = boxPtr->y + boxPtr->height;
+
+    if (otherPtr->x + otherPtr->width > x1) {
+	x1 = otherPtr->x + otherPtr->width;
+    }
+    if (otherPtr->y + otherPtr->height > y1) {
+	y1 = otherPtr->y + otherPtr->height;
+    }
+    if (otherPtr->x < boxPtr->x) {
+	boxPtr->x = otherPtr->x;
+    }
+    if (otherPtr->y < boxPtr->y) {
+	boxPtr->y = otherPtr->y;
+    }
+    boxPtr->width = x1 - boxPtr->x;
+    boxPtr->height = y1 - boxPtr->y;
 }

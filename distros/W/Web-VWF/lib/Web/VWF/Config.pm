@@ -17,6 +17,7 @@ use Carp;
 use Config::Abstraction;
 use CGI::Info;
 use Data::Dumper;
+use Web::VWF::Utils ();
 use Error::Simple;
 use File::Spec;
 use Params::Get 0.13;
@@ -29,11 +30,11 @@ Web::VWF::Config - Site-independent configuration file for the Versatile Web Fra
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.002.0
 
 =cut
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.002.0');
 
 # Where the server keeps one configuration directory per site, named after the
 # site - see Web::VWF::directory()
@@ -284,7 +285,7 @@ sub new
 		# $config->{'config_path'} = File::Spec->catdir($config_dir, $info->domain_name());
 	# }
 	if($params->{'debug'} && $params->{'logger'}) {
-		$params->{'logger'}->debug(__PACKAGE__, '(', __LINE__, '): ', Data::Dumper->new([$config])->Dump());
+		$params->{'logger'}->debug(__PACKAGE__, '(', __LINE__, '): ', Data::Dumper->new([Web::VWF::Utils::redact_config($config)])->Dump());
 	}
 
 	return bless $config, $class;

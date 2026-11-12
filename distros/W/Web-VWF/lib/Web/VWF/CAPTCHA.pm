@@ -2,6 +2,8 @@ package Web::VWF::CAPTCHA;
 
 use strict;
 use warnings;
+
+use version; our $VERSION = version->declare('0.002.0');
 use Carp qw(croak);
 use LWP::UserAgent;
 use JSON::MaybeXS;

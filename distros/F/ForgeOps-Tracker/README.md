@@ -256,11 +256,15 @@ id, and the database tables or procedures involved), never free text that could 
 email or a diagnosis:
 
 - No error message. A `message_fingerprint` is sent instead: a one-way hash of the message with
-  its numbers, hex ids and UUIDs taken out, computed in your process, so errors still group
+  its emails, quoted values, numbers, hex ids and UUIDs taken out, computed in your process, so errors still group
   without the message ever leaving it.
 - No breadcrumbs (`add_breadcrumb` records nothing), no `endpoint`, no SQL statement even with
   `capture_sql_statement` on, and no source context (the source file is never read).
-- The user is sent by `id` only, never `email` or `username`.
+- The user's `email` and `username` are never sent, and neither is the raw `id`. With
+  `privacy_user_key` set, the id is sent as a keyed hash (HMAC-SHA256 with your key, which never
+  leaves your app), so ForgeOps can still count affected customers but can't read the id. Without
+  a key, no user is sent at all. Keep the key the same across servers and deploys, or one customer
+  counts as two.
 - Context and tags only keep the top-level keys you list in `privacy_allowed_fields`, and only
   when the value is a plain string or number (or a JSON boolean). Nothing else from them is sent.
 - Spans: an outbound call is named by method and host only (`GET api.example.com`), a request
@@ -275,12 +279,13 @@ ForgeOps::Tracker::init(
     dsn                    => '...',
     strict_privacy         => 1,                         # default 0
     privacy_allowed_fields => [qw(error_code feature)],  # default []
+    privacy_user_key       => $ENV{MY_FORGE_OPS_USER_KEY}, # default undef: no user sent
 );
 ```
 
-Both can also come from the environment: `FORGE_OPS_STRICT_PRIVACY=true` and
-`FORGE_OPS_PRIVACY_ALLOWED_FIELDS=error_code,feature` (comma separated). A value passed to `init()`
-wins over the environment.
+All three can also come from the environment: `FORGE_OPS_STRICT_PRIVACY=true`,
+`FORGE_OPS_PRIVACY_ALLOWED_FIELDS=error_code,feature` (comma separated) and
+`FORGE_OPS_PRIVACY_USER_KEY=...`. A value passed to `init()` wins over the environment.
 
 ForgeOps applies the same rules again on arrival when the project's own Strict privacy setting is
 on, so an app with an older client, or one with this option off, still can't get that text stored.

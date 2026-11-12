@@ -193,8 +193,8 @@ Bug-triggering inputs are always kept regardless of coverage contribution.
 # ---------------------------------------------------------------------------
 
 my %cli_opts = (
-    help => 0,
-    man  => 0,
+	help => 0,
+	man  => 0,
 );
 
 my %extractor_opts = (
@@ -295,80 +295,80 @@ if ($fuzz) {
 	require App::Test::Generator::CoverageGuidedFuzzer;
 	make_path($corpus_dir) unless -d $corpus_dir;
 
-    # Load the target module once so all methods are callable
-    my $package = _load_target_module($input_file, $schemas);
+	# Load the target module once so all methods are callable
+	my $package = _load_target_module($input_file, $schemas);
 
-    # Try to build a default instance for object method calls.
-    # Most OO modules need a $self as the first argument.
-    # We try new() with no args, then new({}), then give up and fuzz as functions.
-    my $instance = _try_construct($package);
-    if ($instance) {
-        print "Constructed $package instance for method calls.\n";
-    } else {
-        print "Could not construct $package instance; fuzzing as functions.\n";
-    }
+	# Try to build a default instance for object method calls.
+	# Most OO modules need a $self as the first argument.
+	# We try new() with no args, then new({}), then give up and fuzz as functions.
+	my $instance = _try_construct($package);
+	if ($instance) {
+		print "Constructed $package instance for method calls.\n";
+	} else {
+		print "Could not construct $package instance; fuzzing as functions.\n";
+	}
 
-    print "Fuzzing with $fuzz_iters iterations per method",
-          ($fuzz_all ? ' (all methods)' : ' (methods with known inputs)'),
-          "...\n\n";
+	print "Fuzzing with $fuzz_iters iterations per method",
+		  ($fuzz_all ? ' (all methods)' : ' (methods with known inputs)'),
+		  "...\n\n";
 
-    foreach my $method (sort keys %$schemas) {
-        my $schema = $schemas->{$method};
-        my $iconf  = $schema->{_confidence}{input}{level} // 'low';
+	foreach my $method (sort keys %$schemas) {
+		my $schema = $schemas->{$method};
+		my $iconf  = $schema->{_confidence}{input}{level} // 'low';
 
-        unless ($fuzz_all) {
-            # Skip methods with no input schema at all — there is nothing to fuzz
-            next if $iconf eq 'none' && !%{ $schema->{input} // {} };
-        }
+		unless ($fuzz_all) {
+			# Skip methods with no input schema at all — there is nothing to fuzz
+			next if $iconf eq 'none' && !%{ $schema->{input} // {} };
+		}
 
-        my $sub_ref = $package->can($method);
-        unless ($sub_ref) {
-            warn "  Skipping $method: not callable in $package\n";
-            next;
-        }
+		my $sub_ref = $package->can($method);
+		unless ($sub_ref) {
+			warn "  Skipping $method: not callable in $package\n";
+			next;
+		}
 
-        # Skip constructors and AUTOLOAD — not suitable for direct fuzzing
-        if ($method =~ /^(new|AUTOLOAD|DESTROY|import)$/) {
-            print "  Skipping $method (constructor/special method)\n"
-                if $extractor_opts{verbose};
-            next;
-        }
+		# Skip constructors and AUTOLOAD — not suitable for direct fuzzing
+		if ($method =~ /^(new|AUTOLOAD|DESTROY|import)$/) {
+			print "  Skipping $method (constructor/special method)\n"
+				if $extractor_opts{verbose};
+			next;
+		}
 
-        my $corpus_file = File::Spec->catfile($corpus_dir, "$method.json");
+		my $corpus_file = File::Spec->catfile($corpus_dir, "$method.json");
 
-        print "  Fuzzing $method ($iconf confidence)... ";
+		print "  Fuzzing $method ($iconf confidence)... ";
 
-        my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
-            schema      => $schema,
-            target_sub  => $sub_ref,
-            instance    => $instance,
-            iterations  => $fuzz_iters,
-        );
+		my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
+			schema      => $schema,
+			target_sub  => $sub_ref,
+			instance    => $instance,
+			iterations  => $fuzz_iters,
+		);
 
-        $fuzzer->load_corpus($corpus_file) if -f $corpus_file;
+		$fuzzer->load_corpus($corpus_file) if -f $corpus_file;
 
-        my $report = $fuzzer->run();
+		my $report = $fuzzer->run();
 
-        if ($minimize_corpus) {
-            my $stats = $fuzzer->minimize_corpus();
-            printf "%d bugs, %d branches covered, corpus %d->%d entries\n",
-                $report->{bugs_found},
-                $report->{branches_covered},
-                $stats->{before},
-                $stats->{after};
-        }
+		if ($minimize_corpus) {
+			my $stats = $fuzzer->minimize_corpus();
+			printf "%d bugs, %d branches covered, corpus %d->%d entries\n",
+				$report->{bugs_found},
+				$report->{branches_covered},
+				$stats->{before},
+				$stats->{after};
+		}
 
-        $fuzzer->save_corpus($corpus_file);
+		$fuzzer->save_corpus($corpus_file);
 
-        $fuzz_results{$method} = $report;
+		$fuzz_results{$method} = $report;
 
-        printf "%d bugs, %d branches covered\n",
-            $report->{bugs_found},
-            $report->{branches_covered}
-            unless $minimize_corpus;
-    }
+		printf "%d bugs, %d branches covered\n",
+			$report->{bugs_found},
+			$report->{branches_covered}
+			unless $minimize_corpus;
+	}
 
-    print "\n";
+	print "\n";
 }
 
 # ---------------------------------------------------------------------------
@@ -376,31 +376,31 @@ if ($fuzz) {
 # ---------------------------------------------------------------------------
 
 print '=' x 70, "\n",
-      "EXTRACTION SUMMARY\n",
-      '=' x 70, "\n\n";
+	  "EXTRACTION SUMMARY\n",
+	  '=' x 70, "\n\n";
 
 my %input_confidence_counts  = (high => 0, medium => 0, low => 0, none => 0);
 my %output_confidence_counts = (high => 0, medium => 0, low => 0, none => 0);
 
 foreach my $method (sort keys %$schemas) {
-    my $schema = $schemas->{$method};
-    my $iconf  = $schema->{_confidence}{input}{level}  // 'low';
-    my $oconf  = $schema->{_confidence}{output}{level} // 'low';
-    $input_confidence_counts{$iconf}++;
-    $output_confidence_counts{$oconf}++;
+	my $schema = $schemas->{$method};
+	my $iconf  = $schema->{_confidence}{input}{level}  // 'low';
+	my $oconf  = $schema->{_confidence}{output}{level} // 'low';
+	$input_confidence_counts{$iconf}++;
+	$output_confidence_counts{$oconf}++;
 
-    my $param_count = scalar grep { $_ !~ /^_/ } keys %{ $schema->{input} };
+	my $param_count = scalar grep { $_ !~ /^_/ } keys %{ $schema->{input} };
 
-    my $fuzz_col = '';
-    if (exists $fuzz_results{$method}) {
-        my $r = $fuzz_results{$method};
-        $fuzz_col = $r->{bugs_found}
-            ? sprintf('  BUGS: %d', $r->{bugs_found})
-            : '  fuzz: ok';
-    }
+	my $fuzz_col = '';
+	if (exists $fuzz_results{$method}) {
+		my $r = $fuzz_results{$method};
+		$fuzz_col = $r->{bugs_found}
+			? sprintf('  BUGS: %d', $r->{bugs_found})
+			: '  fuzz: ok';
+	}
 
-    printf "%-30s %d params  [%s input confidence] [%s output confidence]%s\n",
-        $method, $param_count, uc($iconf), uc($oconf), $fuzz_col;
+	printf "%-30s %d params  [%s input confidence] [%s output confidence]%s\n",
+		$method, $param_count, uc($iconf), uc($oconf), $fuzz_col;
 }
 
 print "\n";
@@ -416,42 +416,42 @@ print "    Low confidence:    $output_confidence_counts{low}\n";
 print "\n";
 
 if ($input_confidence_counts{low} > 0 || $input_confidence_counts{medium} > 0) {
-    print "RECOMMENDATION:\n",
-          "Review the generated schemas in $extractor_opts{output_dir}/\n",
-          "Focus on methods with medium/low confidence ratings.\n\n";
+	print "RECOMMENDATION:\n",
+		  "Review the generated schemas in $extractor_opts{output_dir}/\n",
+		  "Focus on methods with medium/low confidence ratings.\n\n";
 }
 
 # Fuzz bug detail
 if (%fuzz_results) {
-    my $total_bugs = 0;
-    $total_bugs += $_->{bugs_found} for values %fuzz_results;
+	my $total_bugs = 0;
+	$total_bugs += $_->{bugs_found} for values %fuzz_results;
 
-    if ($total_bugs) {
-        print '=' x 70, "\n",
-              "FUZZING BUGS FOUND ($total_bugs total)\n",
-              '=' x 70, "\n\n";
+	if ($total_bugs) {
+		print '=' x 70, "\n",
+			  "FUZZING BUGS FOUND ($total_bugs total)\n",
+			  '=' x 70, "\n\n";
 
-        foreach my $method (sort keys %fuzz_results) {
-            my $r = $fuzz_results{$method};
-            next unless $r->{bugs_found};
-            print "  $method:\n";
-            for my $i (0 .. $#{ $r->{bugs} }) {
-                my $bug = $r->{bugs}[$i];
-                my $inp = defined($bug->{input}) ? qq("$bug->{input}") : 'undef';
-                printf "    Bug %d: input=%-30s error=%s\n",
-                    $i + 1, $inp, $bug->{error};
-            }
-            print "\n";
-        }
-        print "Corpora saved to: $corpus_dir/\n\n";
-    } else {
-        print "Fuzzing complete: no bugs found across ",
-              scalar(keys %fuzz_results), " methods.\n\n";
-    }
+		foreach my $method (sort keys %fuzz_results) {
+			my $r = $fuzz_results{$method};
+			next unless $r->{bugs_found};
+			print "  $method:\n";
+			for my $i (0 .. $#{ $r->{bugs} }) {
+				my $bug = $r->{bugs}[$i];
+				my $inp = defined($bug->{input}) ? qq("$bug->{input}") : 'undef';
+				printf "    Bug %d: input=%-30s error=%s\n",
+					$i + 1, $inp, $bug->{error};
+			}
+			print "\n";
+		}
+		print "Corpora saved to: $corpus_dir/\n\n";
+	} else {
+		print "Fuzzing complete: no bugs found across ",
+			  scalar(keys %fuzz_results), " methods.\n\n";
+	}
 }
 
 if ($extractor_opts{verbose}) {
-    print "Schemas:\n\t", Dumper($schemas);
+	print "Schemas:\n\t", Dumper($schemas);
 }
 
 print "Schema files written to: $extractor_opts{output_dir}/\n";
@@ -470,55 +470,55 @@ sub _load_target_module {
 
 	die 'Could not determine package name from extracted schemas' unless $package;
 
-    # Reject anything that is not a syntactically valid Perl package name
-    # before it is used to build a require path — guards against this
-    # becoming a code-injection vector if $package is ever sourced from
-    # something less constrained than a PPI-parsed 'package' statement.
-    die "Invalid package name: $package"
-        unless $package =~ /^[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
+	# Reject anything that is not a syntactically valid Perl package name
+	# before it is used to build a require path — guards against this
+	# becoming a code-injection vector if $package is ever sourced from
+	# something less constrained than a PPI-parsed 'package' statement.
+	die "Invalid package name: $package"
+		unless $package =~ /^[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/;
 
-    # Add the module's containing lib dir to @INC
-    # Walks up from the file looking for a 'lib' directory
-    my $abs = File::Spec->rel2abs($input_file);
-    my ($volume, $directory) = File::Spec->splitpath($abs);
-    my @dirs = File::Spec->splitdir($directory);
+	# Add the module's containing lib dir to @INC
+	# Walks up from the file looking for a 'lib' directory
+	my $abs = File::Spec->rel2abs($input_file);
+	my ($volume, $directory) = File::Spec->splitpath($abs);
+	my @dirs = File::Spec->splitdir($directory);
 
-    while (@dirs) {
-        # catpath() (not catdir()) keeps $volume attached, so this still
-        # resolves on Windows when the temp dir and the checkout live on
-        # different drive letters (a bare catdir() result is interpreted
-        # as relative to the *current* drive, not $volume's).
-        my $candidate = File::Spec->catpath($volume, File::Spec->catdir(@dirs, 'lib'), '');
-        if (-d $candidate) {
-            lib->import($candidate);
-            last;
-        }
-        pop @dirs;
-    }
+	while (@dirs) {
+		# catpath() (not catdir()) keeps $volume attached, so this still
+		# resolves on Windows when the temp dir and the checkout live on
+		# different drive letters (a bare catdir() result is interpreted
+		# as relative to the *current* drive, not $volume's).
+		my $candidate = File::Spec->catpath($volume, File::Spec->catdir(@dirs, 'lib'), '');
+		if (-d $candidate) {
+			lib->import($candidate);
+			last;
+		}
+		pop @dirs;
+	}
 
-    # require() the module by file path rather than via string eval, so
-    # $package is never compiled as Perl source.
-    (my $module_file = $package) =~ s{::}{/}g;
-    eval { require "$module_file.pm" }
-        or die "Could not load $package for fuzzing: $@";
+	# require() the module by file path rather than via string eval, so
+	# $package is never compiled as Perl source.
+	(my $module_file = $package) =~ s{::}{/}g;
+	eval { require "$module_file.pm" }
+		or die "Could not load $package for fuzzing: $@";
 
-    return $package;
+	return $package;
 }
 
 # Try to construct a default instance of the target package for method calls.
 # Attempts new() with progressively more forgiving argument lists.
 # Returns the instance on success, undef if nothing works.
 sub _try_construct {
-    my ($package) = @_;
+	my ($package) = @_;
 
-    for my $args ([], [{}], [undef]) {
-        my $obj = eval { $package->new(@$args) };
-        next if $@;
-        next unless defined $obj && ref $obj;
-        return $obj;
-    }
+	for my $args ([], [{}], [undef]) {
+		my $obj = eval { $package->new(@$args) };
+		next if $@;
+		next unless defined $obj && ref $obj;
+		return $obj;
+	}
 
-    return undef;
+	return undef;
 }
 
 __END__

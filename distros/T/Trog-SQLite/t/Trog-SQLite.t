@@ -322,6 +322,41 @@ subtest 'transaction: all of the work, or none of it' => sub {
     $db->rollback();
 };
 
+subtest 'do_with_update_hook: the rows that a write through a view writes' => sub {
+    Trog::SQLite::forget();
+    my ( $schema, $file ) = schema_dir( $V0 . <<'SQL' );
+CREATE VIEW IF NOT EXISTS names AS SELECT name FROM things;
+CREATE TRIGGER IF NOT EXISTS names_insert INSTEAD OF INSERT ON names
+BEGIN
+    INSERT OR IGNORE INTO things (name) VALUES (NEW.name);
+END;
+SQL
+    my $db = Trog::SQLite::dbh( $schema, $file );
+
+    my @before;
+    $db->sqlite_update_hook( sub { push @before, $_[2] } );
+
+    my @rows;
+    my $count = sub { push @rows, "$_[2] $_[3]" };
+    my $done  = Trog::SQLite::do_with_update_hook( $db, $count, 'INSERT INTO names (name) VALUES (?)', 'sea' );
+    is( $done,  '0E0',        'do counts no row that a trigger of the view writes' );
+    is( \@rows, ['things 1'], 'but the hook gets the one row, with its table and rowid' );
+
+    @rows = ();
+    Trog::SQLite::do_with_update_hook( $db, $count, 'INSERT INTO names (name) VALUES (?)', 'sea' );
+    is( \@rows, [], 'and none for a write that the trigger ignores' );
+
+    like(
+        dies { Trog::SQLite::do_with_update_hook( $db, $count, 'INSERT INTO nowhere (name) VALUES (?)', 'sky' ) },
+        qr/no[ ]such[ ]table/,
+        'a statement that fails dies with its own error'
+    );
+
+    is( \@before, [], 'the hook of the handle saw none of that' );
+    $db->do( 'INSERT INTO things (name) VALUES (?)', undef, 'sun' );
+    is( \@before, ['things'], 'and it is the hook again afterwards, also after a failure' );
+};
+
 subtest 'bulk_insert: many rows, in batches that fit the parameter limit' => sub {
     Trog::SQLite::forget();
     my ( $schema, $file ) = schema_dir('CREATE TABLE IF NOT EXISTS pairs (a INTEGER PRIMARY KEY, b INTEGER);');

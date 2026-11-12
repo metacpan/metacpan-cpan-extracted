@@ -9,7 +9,7 @@
 # its own.
 use strict;
 my @objs = map { "$_.o" } qw(tkText tkTextBTree tkTextDisp tkTextIndex
-			     tkTextMark tkTextTag tkTextWind tkTextImage tkTextUndo
+			     tkTextMark tkTextTag tkTextWind tkTextImage tkTextUndo tkTextOrn
 			     pperlGlue);
 my %sym;
 for my $o (@objs) {

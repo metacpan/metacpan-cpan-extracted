@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 ## Version
 
-Version 0.47
+Version 0.48
 
 ## Synopsis
 
@@ -383,6 +383,32 @@ The current supported variables are
 
     Setting this to 0 disables timeout testing.
 
+- `check_files`, assert the routine leaves no files in the working
+ directory (default: 1)
+
+    Every call is checked for files it created.  They are removed afterwards
+    whatever the setting, so a routine that writes a file cannot break the cases
+    that follow it; set this to 0 for a routine whose purpose is to write one.
+
+- `check_fds`, assert the routine leaks no file descriptors
+ (default: 1)
+
+    Only checked where `/proc/self/fd` exists.  Set this to 0 for a routine that
+    returns a filehandle to its caller, which still holds a descriptor.
+
+- `check_accessors`, assert an accessor leaves the object it was called
+ on alone (default: 1)
+
+    The object is deep copied before each call and the state it was handed
+    compared afterwards.  A getter that overwrites or deletes that state fails
+    "getter leaves its object unmodified"; a getset that changes anything but the
+    property it is named for fails "setter changes nothing but its property".
+    Values the call fills in where it was handed undef, and keys it adds, are
+    ignored, so a getter that memoises what it computed is not reported.  Set this
+    to 0 for an accessor whose purpose is to change state, such as an iterator's
+    `next()`; a getter that declares no input is called with no arguments either
+    way.
+
 - `dedup`, fuzzing can create duplicate tests, go some way to remove duplicates (default: 1)
 - `properties`, enable [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) Property tests (default: 0)
 
@@ -576,7 +602,9 @@ cases:
     _STATUS: DIES
 ```
 
-#### `$yaml_cases` - Optional Path to a YAML File With the Same Shape as `%Cases`.
+#### `$yaml_cases`
+
+An optional path to a YAML file with the same shape as `%cases`.
 
 #### `$Seed`
 
@@ -636,7 +664,7 @@ edge_case_array:
   - "<script>alert('xss')</script>"
   - "'; DROP TABLE users; --"
   - "\0null\0byte"
-  - "emoji😊test"
+  - "emoji\U0001F60Atest"
   - ""
   - " "
 
@@ -687,6 +715,13 @@ input:
 - `base64` - Base64-encoded strings
 - `md5` - MD5 hashes (32 hex chars)
 - `sha256` - SHA-256 hashes (64 hex chars)
+- `directory` - The path of an existing, writable directory
+
+    The harness creates a temporary directory and passes its path, because no
+    pattern can describe "a directory that exists".
+    [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) sets this for a parameter that the
+    routine tests with `-d`.
+
 - `unix_timestamp`
 
 ### Edge Case Generation
@@ -844,10 +879,10 @@ jobs:
     name: Fuzz testing with perl ${{ matrix.perl }} on ${{ matrix.os }}
 
     steps:
-      - uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7
 
       - name: Set up Perl
-        uses: shogo82148/actions-setup-perl@a198315ec4e9244f206879ea7b63078003aec8a6 # v1.41.1
+        uses: shogo82148/actions-setup-perl@8b574cdc2dffdae49f803204a4f2b716a2fa1db7 # v1.44.2
         with:
           perl-version: ${{ matrix.perl }}
 
@@ -1328,6 +1363,16 @@ The generated test:
 - Uses edge cases (per-field and per-type) with configurable probability
 - Runs `$iterations` fuzz cases plus appended edge-case runs
 - Validates inputs with Params::Get / Params::Validate::Strict
+- Asserts that a wrong-typed argument dies, where the type is enforced
+
+    Passing a reference where a string is declared is only expected to die for a
+    parameter whose input spec sets `_type_checked: 1`.
+    [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) sets that key when the routine checks
+    its arguments with a validator such as [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
+    A type taken from POD, or inferred from the code, documents intent but does not
+    promise rejection, so no such case is generated for it.
+    Add the key by hand to a schema whose routine does check its argument types.
+
 - Validates outputs with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
 - Runs static `is(... )` corpus tests from Perl and/or YAML corpus
 - Runs [Test::LectroTest](https://metacpan.org/pod/Test%3A%3ALectroTest) tests
@@ -1349,7 +1394,7 @@ App::Test::Generator->generate(
 App::Test::Generator->generate($schema_file, $test_file);
 ```
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -1366,6 +1411,8 @@ App::Test::Generator->generate($schema_file, $test_file);
 ```perl
 { type => 'string' }
 ```
+
+The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
 
 ### Render\_Fallback
 
@@ -1401,7 +1448,7 @@ The output is always a single line with no trailing newline. Suitable
 for embedding in generated test code where readability is secondary to
 correctness.
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -1414,6 +1461,8 @@ correctness.
 ```perl
 { type => 'string' }
 ```
+
+The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
 
 ### Render\_Hash
 
@@ -1447,7 +1496,7 @@ Returns an empty string if `$href` is undef, empty, or not a hashref.
 
 #### Notes
 
-The `matches` and `nomatch` sub-keys are treated specially — their
+The `matches` and `nomatch` sub-keys are treated specially - their
 values are compiled to `Regexp` objects via `eval { qr/.../ }` and
 then rendered using `perl_quote` so they appear as `qr{...}` in the
 generated test. This prevents unmatched bracket characters in the
@@ -1455,7 +1504,7 @@ pattern from causing compilation failures.
 
 Other sub-keys are rendered via `perl_quote`.
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -1468,6 +1517,8 @@ Other sub-keys are rendered via `perl_quote`.
 ```perl
 { type => 'string' }
 ```
+
+The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
 
 ### Render\_Args\_Hash
 
@@ -1485,7 +1536,7 @@ my $code = render_args_hash({ type => 'string', min => 1 });
 - `$href`
 
     A flat hashref of key-value pairs. Values may be scalars, arrayrefs,
-    or Regexp objects — all are handled by `perl_quote`.
+    or Regexp objects - all are handled by `perl_quote`.
 
 #### Returns
 
@@ -1499,7 +1550,7 @@ Keys and values are both rendered via `perl_quote`. In particular,
 [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict) and [Return::Set](https://metacpan.org/pod/Return%3A%3ASet) schema arguments in
 the generated test.
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -1512,6 +1563,8 @@ the generated test.
 ```perl
 { type => 'string' }
 ```
+
+The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
 
 ### Render\_Arrayref\_Map
 
@@ -1533,17 +1586,18 @@ my $code = render_arrayref_map({ name => ['', 'a' x 100] });
 
 A comma-separated string of `'key' =` \[ val, ... \]> entries, one per
 qualifying key, sorted alphabetically. Returns the string `'()'` if
-`$href` is undef, empty, or not a hashref — this produces an empty
+`$href` is undef or not a hashref - this produces an empty
 hash assignment in the generated test rather than a syntax error.
+Returns an empty string if `$href` is a hashref with no arrayref values.
 
 #### Notes
 
 Array element values are rendered via `perl_quote` which handles
 scalars, arrayrefs, and Regexp objects. Non-arrayref values are
-skipped without warning — this is intentional since callers may pass
+skipped without warning - this is intentional since callers may pass
 mixed-value hashes and only want the arrayref entries rendered.
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -1557,6 +1611,8 @@ mixed-value hashes and only want the arrayref entries rendered.
 { type => 'string' }
 ```
 
+The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
+
 ### Perl\_Quote
 
 Convert any Perl value into a source-code fragment that reproduces that value
@@ -1567,13 +1623,13 @@ when evaluated in a generated test file.
 - `$v`
 
     Any Perl value. May be undef, a scalar, an arrayref, a Regexp, or a blessed
-    object. All types are handled — undef becomes `'undef'`, the strings
+    object. All types are handled - undef becomes `'undef'`, the strings
     `'true'`/`'false'` become the Perl boolean constants `!!1`/`!!0`,
     numbers are unquoted, other strings are single-quoted, arrayrefs recurse,
     Regexps become `qr{...}`, and anything else (including hashrefs and
     blessed objects) falls through to `render_fallback`.
 
-#### API Specification
+#### Api Specification
 
 ##### Input
 
@@ -1586,6 +1642,8 @@ when evaluated in a generated test file.
 ```perl
 { type => 'string' }
 ```
+
+The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
 
 ## Notes
 
@@ -1641,6 +1699,165 @@ You can also look for information at:
 - CPAN Testers Dependencies
 
     [http://deps.cpantesters.org/?module=App::Test::Generator](http://deps.cpantesters.org/?module=App::Test::Generator)
+
+## Formal Specification
+
+This section describes the documented routines in Z notation.  It is for
+readers who want an exact, mathematical statement.  You do not need it to use
+the module.
+
+How to read it: a name ending in `?` is an input and a name ending in `!` is
+an output.  None of these routines keeps any state between calls, so there is
+no state schema.  `quote(v)` stands for the result of `perl_quote(v)`.
+
+### Generate
+
+```
+┌─ Generate ────────────────────────────────────────
+│ schema_file? : STRING
+│ output_file? : STRING ∪ { undef }
+│ test : STRING
+├───────────────────────────────────────────────────
+│ pre   schema_file? names a readable schema
+│       the schema defines function
+│       every name in the schema is an identifier
+│ post  test is a complete Perl test file for function
+│       output_file? ≠ undef ⇒ file output_file? holds test
+│       output_file? = undef ⇒ test is printed on STDOUT
+└───────────────────────────────────────────────────
+
+no arguments                     ⇒ croak 'Usage: generate(...)'
+output_file? cannot be written   ⇒ croak 'Cannot open ...'
+```
+
+### Render\_Fallback
+
+```
+┌─ RenderFallback ──────────────────────────────────
+│ v? : VALUE
+│ result! : STRING
+├───────────────────────────────────────────────────
+│ post  v? = undef ⇒ result! = 'undef'
+│       v? ≠ undef ⇒ result! is one line of Perl source
+│                     ∧ eval(result!) is a copy of v?
+└───────────────────────────────────────────────────
+```
+
+### Render\_Hash
+
+```perl
+┌─ RenderHash ──────────────────────────────────────
+│ href? : VALUE
+│ result! : STRING
+│ kept : ℙ STRING
+├───────────────────────────────────────────────────
+│ post  ref(href?) ≠ 'HASH' ∨ href? = ∅ ⇒ result! = ''
+│       ref(href?) = 'HASH' ⇒
+│           kept = { k : dom href? | href?(k) is a hashref
+│                    ∨ href?(k) is a type name }
+│           result! has one "'k' => { ... }" entry for each
+│           k in kept, in sorted order
+└───────────────────────────────────────────────────
+```
+
+### Render\_Args\_Hash
+
+```perl
+┌─ RenderArgsHash ──────────────────────────────────
+│ href? : VALUE
+│ result! : STRING
+├───────────────────────────────────────────────────
+│ post  ref(href?) ≠ 'HASH' ∨ href? = ∅ ⇒ result! = ''
+│       ref(href?) = 'HASH' ⇒
+│           result! = join(', ', ⟨ k : sort(dom href?) •
+│                       quote(k) . ' => ' . quote(href?(k)) ⟩)
+└───────────────────────────────────────────────────
+```
+
+### Render\_Arrayref\_Map
+
+```perl
+┌─ RenderArrayrefMap ───────────────────────────────
+│ href? : VALUE
+│ result! : STRING
+│ kept : ℙ STRING
+├───────────────────────────────────────────────────
+│ post  href? is false ∨ ref(href?) ≠ 'HASH' ⇒ result! = '()'
+│       ref(href?) = 'HASH' ⇒
+│           kept = { k : dom href? | ref(href?(k)) = 'ARRAY' }
+│           kept = ∅ ⇒ result! = ''
+│           result! has one "'k' => [ ... ]" entry for each
+│           k in kept, in sorted order
+└───────────────────────────────────────────────────
+```
+
+### Perl\_Quote
+
+```
+┌─ PerlQuote ───────────────────────────────────────
+│ v? : VALUE
+│ result! : STRING
+├───────────────────────────────────────────────────
+│ pre   v? is nested no more than 100 levels deep
+│ post  v? = undef            ⇒ result! = 'undef'
+│       v? = 'true'           ⇒ result! = '!!1'
+│       v? = 'false'          ⇒ result! = '!!0'
+│       v? looks like a number ⇒ result! = v?
+│       v? is any other string ⇒ result! = v? in single quotes,
+│                                with ' and \ escaped
+│       ref(v?) = 'ARRAY'     ⇒ result! = '[ ' . join(', ',
+│                                ⟨ e : v? • quote(e) ⟩) . ' ]'
+│       ref(v?) = 'Regexp'    ⇒ result! = 'qr{...}'
+│       otherwise             ⇒ result! = render_fallback(v?)
+└───────────────────────────────────────────────────
+
+nested more than 100 levels deep ⇒ croak 'structure too deeply nested'
+```
+
+## State Diagram
+
+`generate` is a class method and keeps no state.  One call runs from start
+to finish through these stages, and any stage may stop it by croaking.
+
+```
+            +-------------+
+            |    START    |
+            +-------------+
+                   |
+                   | generate(schema_file, output_file)
+                   v
+            +-------------+   no arguments, file not readable
+            | LOAD SCHEMA |--------------------------------------+
+            +-------------+                                      |
+                   |                                             |
+                   | schema parsed                               |
+                   v                                             |
+            +-------------+   missing function, bad name,        |
+            |  VALIDATE   |   contradictory input spec           |
+            +-------------+--------------------------------------+
+                   |                                             |
+                   | schema is good                              |
+                   v                                             v
+            +-------------+                               +-------------+
+            |   RENDER    |                               |   CROAKED   |
+            +-------------+                               +-------------+
+                   |                                             ^
+                   | test source built                           |
+                   v                                             |
+            +-------------+   output_file cannot be opened       |
+            |    WRITE    |--------------------------------------+
+            +-------------+
+                   |
+                   | file written, or source printed on STDOUT
+                   v
+            +-------------+
+            |    DONE     |
+            +-------------+
+```
+
+Side effects: `generate` writes `output_file` and prints one line saying so,
+or prints the test source when no output file is given.  The `render_*`
+routines and `perl_quote` write no files and print nothing.
 
 ## Licence and Copyright
 

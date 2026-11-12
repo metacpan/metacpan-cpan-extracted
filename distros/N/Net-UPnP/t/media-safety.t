@@ -7,6 +7,10 @@ use Encode qw(encode_utf8);
 use File::Temp qw(tempdir);
 use Cwd qw(abs_path);
 use POSIX qw(_exit);
+
+# Overflows to infinity on every perl, including -Duselongdouble and
+# -Dusequadmath builds whose largest finite number is about 1e4932 (RT #182942).
+my $HUGE = "9" x 5000;
 use Net::UPnP::AV::MediaServer;
 use Net::UPnP::AV::RSS;
 use Net::UPnP::ControlPoint;
@@ -108,7 +112,7 @@ for my $graph (
     $server->walkcontent(callback => sub {});
     is(scalar(@{$service->{calls}}), 3, 'empty directory retains metadata fallback');
     ok(!grep(!defined($_->[2]), @{$service->{calls}}), 'fallback and retry retain deadline');
-    for my $options ({max_nodes => 0}, {max_depth => '9' x 400}, {timeout => '9' x 400}) {
+    for my $options ({max_nodes => 0}, {max_depth => $HUGE}, {timeout => $HUGE}) {
         my $ok = eval { $server->walkcontent(callback => sub {}, %$options); 1; };
         ok(!$ok, 'invalid traversal budget rejected');
     }

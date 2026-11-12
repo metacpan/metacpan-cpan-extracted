@@ -2,6 +2,8 @@ package Web::VWF::Display::captcha;
 
 use strict;
 use warnings;
+
+use version; our $VERSION = version->declare('0.002.0');
 use parent 'Web::VWF::Display';
 
 sub html {

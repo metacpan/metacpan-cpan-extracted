@@ -1,5 +1,13 @@
 Revision history for Perl extension Cookie-Baker
 
+0.14 2026-11-12T09:32:20Z
+
+   - fix use of hex #23
+
+0.13 2026-11-08T07:54:40Z
+
+   - add validations for some values
+
 0.12 2024-01-05T08:27:56Z
 
    - Support CHIPS #20

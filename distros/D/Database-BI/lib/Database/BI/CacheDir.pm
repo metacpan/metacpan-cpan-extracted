@@ -3,7 +3,7 @@ package Database::BI::CacheDir;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.023.0');
+use version; our $VERSION = version->declare('0.023.1');
 
 use Carp	qw(carp);
 use Mojo::File	();
@@ -22,7 +22,7 @@ Database::BI::CacheDir - Where a cache keeps its files
 
 =head1 VERSION
 
-0.023.0
+0.023.1
 
 =head1 SYNOPSIS
 

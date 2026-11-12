@@ -1,5 +1,16 @@
 Revision history for Map::Tube::CLI
 
+v1.2.0 Wed Nov 11 2026
+      This release entirely belongs to @GWS.
+      - Removed concept of "supported maps"; all locally installed and
+        loadable tube maps are now "supported".
+      - This also removes the necessity for --force, which has now been
+        deprecated (but kept for compatibility).
+      - In the process changed tube map loading from Module::Pluggable
+        to Map::Tube::Generic, thus shortening and simplifying code.
+      - Added unit test: t/03-load-on-demand.t
+      - Adapted documentation.
+
 v1.1.0 Sat Nov 07 2026
       This release entirely belongs to @GWS.
       - Added option --fuzzy/-F for fuzzy station name matching (on by default

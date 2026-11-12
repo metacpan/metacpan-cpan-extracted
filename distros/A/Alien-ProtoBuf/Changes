@@ -1,5 +1,9 @@
 Revision history for Alien-ProtoBuf
 
+0.10      2026-11-12 09:13:49 CET
+
+    - Add minimum Alien::Base version
+
 0.09      2019-09-11 20:46:38 CEST
 
     - Compilation fix for Perl 5.8

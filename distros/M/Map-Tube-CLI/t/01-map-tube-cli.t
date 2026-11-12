@@ -63,7 +63,7 @@ eval { Map::Tube::CLI->new };
 like($@, qr/Missing Map Name/, 'Missing map argument');
 
 eval { Map::Tube::CLI->new({ map => 'X' }) };
-like($@, qr/ERROR: Unsupported Map/, 'Non-existent map');
+like($@, qr/ERROR: Missing Map/, 'Non-existent map');
 
 eval { Map::Tube::CLI->new({ map => 'London', start => 'Y', end => 'Baker Streeet' }) };
 like($@, qr/Invalid Station Name/, 'Non-existent start station');

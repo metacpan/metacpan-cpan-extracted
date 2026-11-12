@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+# Stands in for smartctl. For --scan-open -j it prints the scan in the
+# file SMART_TEST_SCAN names, scan.json by default. Otherwise it prints
+# the file for the device, /dev/bus/0 being bus_0.json, and exits with
+# the exit_status in it, as smartctl does.
+use strict;
+use warnings;
+use FindBin;
+
+my $file;
+if ( "@ARGV" eq '--scan-open -j' ) {
+	$file = $FindBin::Bin . '/' . ( $ENV{SMART_TEST_SCAN} // 'scan.json' );
+} else {
+	my $device = pop(@ARGV);
+	die( 'wanted -j -a -n standby, got ' . "@ARGV" . "\n" ) if "@ARGV" !~ /\A-j -a -n standby(?: -d (\S+))?\z/;
+	my $type = $1;
+	$file = $FindBin::Bin . '/' . ( $device =~ s{\A/dev/}{}r =~ s{/}{_}gr ) . '.json';
+	open( my $fh, '<', $file ) or die( 'no ' . $file . "\n" );
+	my $saved = do { local $/; <$fh> };
+	my ($saved_type) = $saved =~ /"type":\s*"([^"]+)"/;
+	die( 'wanted -d ' . $saved_type . ', got -d ' . $type . "\n" )
+		if defined($type) && defined($saved_type) && $type ne $saved_type;
+} ## end else [ if ( "@ARGV" eq '--scan-open -j' ) ]
+open( my $fh, '<', $file ) or die( 'no ' . $file . "\n" );
+my $output = do { local $/; <$fh> };
+print $output;
+exit( $output =~ /"exit_status":\s*([0-9]+)/ ? $1 : 0 );

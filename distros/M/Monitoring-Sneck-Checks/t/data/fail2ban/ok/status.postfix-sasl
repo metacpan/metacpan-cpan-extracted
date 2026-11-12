@@ -1,0 +1,9 @@
+Status for the jail: postfix-sasl
+|- Filter
+|  |- Currently failed:	0
+|  |- Total failed:	4
+|  `- File list:	/var/log/mail.log
+`- Actions
+   |- Currently banned:	0
+   |- Total banned:	1
+   `- Banned IP list:	

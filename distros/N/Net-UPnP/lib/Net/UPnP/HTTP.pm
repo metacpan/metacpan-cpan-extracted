@@ -11,7 +11,7 @@ use Socket;
 use IO::Select;
 use Fcntl qw(F_GETFL F_SETFL O_NONBLOCK);
 use Errno qw(EINPROGRESS EWOULDBLOCK EAGAIN EINTR);
-use POSIX qw(_exit isfinite);
+use POSIX qw(_exit);
 use Time::HiRes qw(clock_gettime CLOCK_MONOTONIC);
 use Carp qw(croak);
 
@@ -39,11 +39,11 @@ sub new {
 	foreach my $key (qw(timeout max_header_bytes max_line_bytes max_body_bytes)) {
 		croak "Invalid HTTP $key" unless defined($this->{$key})
 			&& $this->{$key} =~ ($key eq 'timeout' ? qr/\A\d+(?:\.\d+)?\z/ : qr/\A\d+\z/)
-			&& isfinite(0 + $this->{$key}) && $this->{$key} > 0;
+			&& _isfinite(0 + $this->{$key}) && $this->{$key} > 0;
 	}
 	if (exists $this->{deadline}) {
 		croak 'Invalid HTTP deadline' unless defined($this->{deadline})
-			&& $this->{deadline} =~ /\A\d+(?:\.\d+)?\z/ && isfinite(0 + $this->{deadline});
+			&& $this->{deadline} =~ /\A\d+(?:\.\d+)?\z/ && _isfinite(0 + $this->{deadline});
 	}
 	$this->{allowed_addresses} = _address_list($this->{allowed_addresses})
 		if exists $this->{allowed_addresses};
@@ -66,6 +66,14 @@ sub _address_list {
 }
 
 sub _now { clock_gettime(CLOCK_MONOTONIC) }
+
+# True when the number is neither an infinity nor a NaN. POSIX::isfinite needs
+# perl 5.22, so this stays pure Perl: inf * 0 and NaN * 0 are both NaN, and
+# NaN never compares equal to anything (RT #182943).
+sub _isfinite {
+	my $number = 0 + shift;
+	return ($number * 0 == 0) ? 1 : 0;
+}
 
 sub geterror { $_[0]->{error} || '' }
 

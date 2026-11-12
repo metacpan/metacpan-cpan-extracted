@@ -1,5 +1,18 @@
 Revision history for Map::Tube
 
+v5.2.0  2026-11-12
+        - Calling a method that does not exist on a Map::Tube object (for
+          example a typo such as get_Iines()) now dies with the standard
+          Perl error "Can't locate object method ..." instead of being
+          silently ignored. Previously, AUTOLOAD only handled the known
+          plugin methods (as_image, fuzzy_find, to_xml etc.) and returned
+          quietly for everything else.
+        - AUTOLOAD now ignores DESTROY explicitly.
+        - get_map_data() no longer relies on AUTOLOAD swallowing calls to
+          the optional "xml" and "json" attributes; it now checks can()
+          first.
+        - Added unit test: t/ok_map_unknown_method.t
+
 v5.1.1  2026-10-31
         - Documented Map::Tube::Hannover by Gisbert W. Selke.
         - Tidied up pod and removed link for CPAN Ratings.

@@ -256,6 +256,21 @@ static void dds_set_names(pTHX_ HV *object, I32 count, SV **args)
     hv_stores(object, "unames", newRV_inc((SV *)names));
 }
 
+/* Match class policies to the byte names used by pre-5.16 stashes without
+ * changing the caller's class-name scalar. Newer stashes retain UTF-8 flags.
+ */
+static SV *dds_policy_class(pTHX_ SV *value)
+{
+#if PERL_VERSION < 16
+    SV *name = DDS_TEMP(newSVsv(value));
+
+    SvUTF8_off(name);
+    return name;
+#else
+    return value;
+#endif
+}
+
 /* Build a mortal policy key: an address key for a reference, or a Unicode-
  * preserving class/default key for a string.
  */
@@ -268,7 +283,7 @@ static SV *dds_policy_key(pTHX_ SV *value)
 
     key = DDS_TEMP(newSVpvs("."));
     if (SvOK(value))
-        sv_catsv(key, value);
+        sv_catsv(key, dds_policy_class(aTHX_ value));
     return key;
 }
 
@@ -335,7 +350,7 @@ static SV *dds_key_order(pTHX_ SV *self, I32 count, SV **args)
 /* Implement the public constructor, returning a newly initialized dumper for
  * the requested class.
  */
-static XS(dds_xs_new)
+XS_INTERNAL(dds_xs_new)
 {
     dXSARGS;
     if (!items)
@@ -347,7 +362,7 @@ static XS(dds_xs_new)
 /* Normalize the invocant and, for the working-self variant, isolate a
  * reentrant operation before returning it to Perl.
  */
-static XS(dds_xs_safe_self)
+XS_INTERNAL(dds_xs_safe_self)
 {
     dXSARGS;
     SV *self;
@@ -364,7 +379,7 @@ static XS(dds_xs_safe_self)
 /* Implement Data and Out, forwarding arguments and Perl context and unpacking
  * list-context output chunks.
  */
-static XS(dds_xs_io)
+XS_INTERNAL(dds_xs_io)
 {
     dXSARGS;
     SV *self, *result;
@@ -393,7 +408,7 @@ static XS(dds_xs_io)
 /* Implement the capture-only entry points, replacing roots and returning the
  * working dumper for chaining.
  */
-static XS(dds_xs_capture)
+XS_INTERNAL(dds_xs_capture)
 {
     dXSARGS;
     SV *self;
@@ -416,7 +431,7 @@ typedef enum {
 /* Dispatch Dump, Dumper, DumpVars and DumpLex, handling invocants, naming,
  * scalar capture and context-sensitive output.
  */
-static XS(dds_xs_dump)
+XS_INTERNAL(dds_xs_dump)
 {
     dXSARGS;
     I32 first = 0, gimme = GIMME_V;
@@ -557,7 +572,7 @@ static const char *dds_option_keys[] = {
 /* Implement option getters and setters, including context-sensitive list
  * results and options with specialized validation or storage.
  */
-static XS(dds_xs_option)
+XS_INTERNAL(dds_xs_option)
 {
     dXSARGS;
     I32 ix = CvXSUBANY(cv).any_i32;
@@ -648,7 +663,8 @@ static XS(dds_xs_option)
         hv_stores(style, "freezer", newSVpvs("DDS_freeze"));
         hv_stores(style, "freeze_class", newRV_noinc((SV *)newHV()));
     } else if (ix == DDS_OPT_FREEZER && items == 3) {
-        hv_store_ent(dds_hash(aTHX_ style, "freeze_class", TRUE), ST(1), newSVsv(ST(2)), 0);
+        hv_store_ent(dds_hash(aTHX_ style, "freeze_class", TRUE), dds_policy_class(aTHX_ ST(1)),
+                     newSVsv(ST(2)), 0);
     } else if (ix == DDS_OPT_FREEZER && items == 1 && GIMME_V == G_ARRAY) {
         HV *classes = dds_hash(aTHX_ style, "freeze_class", TRUE);
         HE *he;
@@ -711,7 +727,7 @@ static XS(dds_xs_option)
 /* Provide the non-pure output placeholder by returning its first argument, or
  * undef when none was supplied.
  */
-static XS(dds_xs_alias_to)
+XS_INTERNAL(dds_xs_alias_to)
 {
     dXSARGS;
     ST(0) = items ? ST(0) : &PL_sv_undef;
@@ -721,7 +737,7 @@ static XS(dds_xs_alias_to)
 /* Exclude dumper objects from ithread cloning because their native traversal
  * state belongs to one interpreter.
  */
-static XS(dds_xs_clone_skip)
+XS_INTERNAL(dds_xs_clone_skip)
 {
     dXSARGS;
     PERL_UNUSED_VAR(items);

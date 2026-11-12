@@ -4,7 +4,7 @@
       "Masahiro Nagano <kazeburo@gmail.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.23",
+   "generated_by" : "Minilla/v3.3.2",
    "license" : [
       "perl_5"
    ],
@@ -60,7 +60,7 @@
    "provides" : {
       "Cookie::Baker" : {
          "file" : "lib/Cookie/Baker.pm",
-         "version" : "0.12"
+         "version" : "0.14"
       }
    },
    "release_status" : "stable",
@@ -75,8 +75,9 @@
          "web" : "https://github.com/kazeburo/Cookie-Baker"
       }
    },
-   "version" : "0.12",
+   "version" : "0.14",
    "x_contributors" : [
+      "Adriaan Dens <adriaan.dens@gmail.com>",
       "David Romano <unobe@cpan.org>",
       "Ichinose Shogo <shogo82148@gmail.com>",
       "Olaf Alders <olaf@wundersolutions.com>",
@@ -84,6 +85,6 @@
       "kwry <kwrkwrr@gmail.com>",
       "yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>"
    ],
-   "x_serialization_backend" : "JSON::PP version 4.07",
+   "x_serialization_backend" : "JSON::PP version 4.16",
    "x_static_install" : 1
 }

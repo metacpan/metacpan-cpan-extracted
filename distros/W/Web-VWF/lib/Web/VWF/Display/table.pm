@@ -3,6 +3,8 @@ package Web::VWF::Display::table;
 use strict;
 use warnings;
 
+use version; our $VERSION = version->declare('0.002.0');
+
 use CGI::Info;
 use Config::Auto;
 use File::Spec;
@@ -52,28 +54,28 @@ sub new {
 }
 
 sub get_file_path {
-        my $self = shift;
+	my $self = shift;
 
-        my $dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
-        $dir .= '/databases';
+	my $dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
+	$dir .= '/databases';
 
-        my $filename;
+	my $filename;
 
-        if($self->{_table}) {
-                $filename = $self->{_table};
-        } else {
-                $filename = ref($self);
-        }
-        $filename =~ s/::/\//g;
+	if($self->{_table}) {
+		$filename = $self->{_table};
+	} else {
+		$filename = ref($self);
+	}
+	$filename =~ s/::/\//g;
 
-        # The table name becomes part of a path, so it must stay inside databases/
-        die "Invalid table name '$filename'" if(($filename =~ m{(?:\A|/)\.\.(?:/|\z)}) || ($filename =~ m{\A/}));
+	# The table name becomes part of a path, so it must stay inside databases/
+	die "Invalid table name '$filename'" if(($filename =~ m{(?:\A|/)\.\.(?:/|\z)}) || ($filename =~ m{\A/}));
 
-        my $rc = "$dir/$filename";
-        if((!-f $rc) || (!-r $rc)) {
-                die "Can't open $rc";
-        }
-        return $rc;
+	my $rc = "$dir/$filename";
+	if((!-f $rc) || (!-r $rc)) {
+		die "Can't open $rc";
+	}
+	return $rc;
 }
 
 sub columns {

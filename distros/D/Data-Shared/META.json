@@ -1,0 +1,168 @@
+{
+   "abstract" : "Path-addressed facade over the Data-*-Shared family",
+   "author" : [
+      "vividsnow"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Shared",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "xt",
+         "eg",
+         "bench"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::BitSet::Shared" : "0.08",
+            "Data::BloomFilter::Shared" : "0.07",
+            "Data::Buffer::Shared" : "0.09",
+            "Data::CountMinSketch::Shared" : "0.06",
+            "Data::CountingBloomFilter::Shared" : "0.05",
+            "Data::CuckooFilter::Shared" : "0.06",
+            "Data::DDSketch::Shared" : "0.05",
+            "Data::Deque::Shared" : "0.11",
+            "Data::DisjointSet::Shared" : "0.06",
+            "Data::Fenwick2D::Shared" : "0.05",
+            "Data::Fenwick::Shared" : "0.06",
+            "Data::Graph::Shared" : "0.08",
+            "Data::HashMap::Shared" : "0.23",
+            "Data::Heap::Shared" : "0.10",
+            "Data::HierTimingWheel::Shared" : "0.05",
+            "Data::Histogram::Shared" : "0.06",
+            "Data::HyperLogLog::Shared" : "0.06",
+            "Data::Intern::Shared" : "0.06",
+            "Data::IntervalTree::Shared" : "0.05",
+            "Data::KDTree::Shared" : "0.05",
+            "Data::Log::Shared" : "0.08",
+            "Data::MinHash::Shared" : "0.06",
+            "Data::NDArray::Shared" : "0.06",
+            "Data::PerfectHash::Shared" : "0.05",
+            "Data::Pool::Shared" : "0.10",
+            "Data::PubSub::Shared" : "0.11",
+            "Data::Queue::Shared" : "0.10",
+            "Data::RadixTree::Shared" : "0.06",
+            "Data::ReqRep::Shared" : "0.09",
+            "Data::Reservoir::Shared" : "0.06",
+            "Data::RingBuffer::Shared" : "0.07",
+            "Data::RoaringBitmap::Shared" : "0.06",
+            "Data::SegmentTree::Shared" : "0.07",
+            "Data::SortedSet::Shared" : "0.07",
+            "Data::SpatialHash::Shared" : "0.06",
+            "Data::Stack::Shared" : "0.09",
+            "Data::Sync::Shared" : "0.10",
+            "Data::TimingWheel::Shared" : "0.05",
+            "Data::TopK::Shared" : "0.07"
+         },
+         "requires" : {
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "JSON::PP" : "0",
+            "perl" : "5.022"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Path" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Shared" : {
+         "file" : "lib/Data/Shared.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter" : {
+         "file" : "lib/Data/Shared/Adapter.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Indexed" : {
+         "file" : "lib/Data/Shared/Adapter/Indexed.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Keyed" : {
+         "file" : "lib/Data/Shared/Adapter/Keyed.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Map" : {
+         "file" : "lib/Data/Shared/Adapter/Map.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Queue" : {
+         "file" : "lib/Data/Shared/Adapter/Queue.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Set" : {
+         "file" : "lib/Data/Shared/Adapter/Set.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Sketch" : {
+         "file" : "lib/Data/Shared/Adapter/Sketch.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Adapter::Sync" : {
+         "file" : "lib/Data/Shared/Adapter/Sync.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Compiled" : {
+         "file" : "lib/Data/Shared/Compiled.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Composite" : {
+         "file" : "lib/Data/Shared/Composite.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Manifest" : {
+         "file" : "lib/Data/Shared/Manifest.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Node" : {
+         "file" : "lib/Data/Shared/Node.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Registry" : {
+         "file" : "lib/Data/Shared/Registry.pm",
+         "version" : "0.01"
+      },
+      "Data::Shared::Storage" : {
+         "file" : "lib/Data/Shared/Storage.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vividsnow/perl5-data-shared/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vividsnow/perl5-data-shared.git",
+         "web" : "https://github.com/vividsnow/perl5-data-shared"
+      }
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

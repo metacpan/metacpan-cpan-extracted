@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App::Test::Generator — fuzz testing, mutation testing and test dashboards for Perl</title>
+<meta name="description" content="App::Test::Generator generates runnable fuzz and property tests from a formal input/output schema, extracts schemas from Perl source, runs mutation testing, measures LCSAJ path coverage and publishes an HTML test dashboard.">
+<link rel="canonical" href="index.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="App::Test::Generator — tests that are generated, not typed">
+<meta property="og:description" content="Describe a routine once. Get a fuzz harness, boundary tests, property tests, a mutation report and a path-coverage dashboard.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+<script type="application/ld+json">
+{
+	"@context": "https://schema.org",
+	"@type": "SoftwareApplication",
+	"name": "App::Test::Generator",
+	"alternateName": "ATG",
+	"description": "A Perl toolkit that generates fuzz and property test suites from formal schemas, extracts schemas from Perl source, runs mutation testing and builds an HTML test dashboard.",
+	"applicationCategory": "DeveloperApplication",
+	"operatingSystem": "Linux, macOS, Windows",
+	"programmingLanguage": "Perl",
+	"softwareVersion": "0.47",
+	"license": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.html",
+	"url": "https://metacpan.org/dist/App-Test-Generator",
+	"sameAs": [
+		"https://github.com/nigelhorne/App-Test-Generator",
+		"https://nigelhorne.github.io/App-Test-Generator/coverage/"
+	],
+	"author": { "@type": "Person", "name": "Nigel Horne" },
+	"offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html" class="current" aria-current="page">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Describe a routine once. Get the tests you would not write by hand.</h1>
+	<p class="lead">
+		App::Test::Generator takes a formal input/output specification for one
+		routine and emits a runnable test file: random fuzzing shaped by the
+		declared types, deterministic boundary cases for every <code>min</code>,
+		<code>max</code> and <code>len</code>, the static cases you list, and
+		optional property-based tests. The same schemas then feed mutation
+		testing, benchmarks and an HTML dashboard.
+	</p>
+
+	<ul class="facts">
+		<li>version 0.47</li>
+		<li>Perl 5.036+</li>
+		<li>GPL-2.0</li>
+		<li>ten commands</li>
+		<li>no runtime service</li>
+	</ul>
+
+<pre><code>cpanm App::Test::Generator
+
+<span class="comment"># a schema for one routine: Perl's abs()</span>
+cat &gt; t/conf/abs.yml &lt;&lt;'EOF'
+---
+module: builtin
+function: abs
+input:
+  number:
+    type: number
+    position: 0
+output:
+  type: number
+  min: 0
+EOF
+
+<span class="comment"># generate the harness, run it, print the TAP result</span>
+fuzz-harness-generator -r t/conf/abs.yml
+</code></pre>
+
+	<p>
+		The output is an ordinary <code>.t</code> file built on
+		<a href="https://metacpan.org/pod/Test::Most">Test::Most</a>. It validates
+		its own generated inputs with
+		<a href="https://metacpan.org/pod/Params::Validate::Strict">Params::Validate::Strict</a>
+		and the routine's return value with
+		<a href="https://metacpan.org/pod/Return::Set">Return::Set</a>, so a test
+		fails when the routine returns the wrong type or breaks a documented
+		bound — not only when it dies.
+	</p>
+
+	<h2>Six subsystems, one schema format</h2>
+	<ul class="cards">
+		<li class="card">
+			<h3><a href="fuzzing.html">Fuzz tester</a></h3>
+			<p>Random and boundary inputs by declared type, with configurable
+			iterations, edge-case pools and a reproducible seed.</p>
+		</li>
+		<li class="card">
+			<h3><a href="extraction.html">Schema extraction</a></h3>
+			<p>Reads a <code>.pm</code> file and infers parameter schemas from
+			signatures, validation calls, POD and formal spec blocks.</p>
+		</li>
+		<li class="card">
+			<h3><a href="mutation.html">Mutation testing</a></h3>
+			<p>Four operators, per-file survivors, and a feedback loop that turns
+			surviving mutants into new boundary tests.</p>
+		</li>
+		<li class="card">
+			<h3><a href="dashboard.html">Test dashboard</a></h3>
+			<p>Coverage, LCSAJ path metrics, mutation results, duplication and CPAN
+			Testers failures in one static HTML report.</p>
+		</li>
+		<li class="card">
+			<h3><a href="commands.html#benchmark-generator">Benchmarks</a></h3>
+			<p>Turns each transform in a schema into one timed variant of a
+			<code>Benchmark::cmpthese</code> script.</p>
+		</li>
+		<li class="card">
+			<h3><a href="dashboard.html#deploying-the-workflows">Workflow deployment</a></h3>
+			<p>Copies the dashboard and mutation GitHub Actions workflows into any
+			CPAN module's <code>.github/workflows/</code>.</p>
+		</li>
+	</ul>
+
+	<h2>How the pieces fit</h2>
+	<ol>
+		<li>You write a schema — in YAML, or extracted from the module by
+		<code>extract-schemas</code>.</li>
+		<li><code>fuzz-harness-generator</code> renders a <code>.t</code> file that
+		contains a corpus, a random generator, boundary cases and assertions.</li>
+		<li><code>test-generator-mutate</code> mutates the module and runs your
+		suite once per mutant, writing <code>mutation.json</code>.</li>
+		<li><code>test-generator-index</code> combines that with Devel::Cover and
+		LCSAJ runtime data into <code>cover_html/index.html</code>.</li>
+		<li>Surviving mutants feed back into new schemas under <code>t/conf/</code>,
+		which the next run picks up automatically.</li>
+	</ol>
+
+<pre><code>t/conf/*.yml ──▶ fuzz-harness-generator ──▶ t/*.t ──▶ prove
+                                │
+mutation survivors ─────────────┴──▶ augmented schema ──▶ next run kills them
+</code></pre>
+
+	<h2>It does not only test the happy path</h2>
+	<p>
+		Every constrained parameter gets three deterministic cases: just inside
+		the bound, exactly on it, and just outside it — the last marked as
+		expected to die. <code>memberof</code> lists are enumerated including one
+		rejected value, booleans are probed with <code>0</code>/<code>1</code>,
+		<code>true</code>/<code>false</code> and a string that should be refused,
+		and strings are also tried with NUL bytes, non-ASCII and empty values
+		unless the schema turns those probes off.
+	</p>
+
+	<p>
+		Because the assertions come from the schema rather than from the
+		implementation, the tests stay valid when the code changes shape. That is
+		the point: black-box tests that say what a routine promises, next to the
+		white-box tests you already write.
+	</p>
+
+	<div class="note">
+		<span class="note-title">Start here</span>
+		<p>
+			<a href="install.html">Install</a> it, then follow the
+			<a href="quickstart.html">quick start</a> to get from an empty
+			<code>t/conf</code> to a passing harness in four commands. The
+			<a href="schema.html">schema reference</a> is the page you will come back
+			to.
+		</p>
+	</div>
+
+	<div class="pager">
+		<span></span>
+		<a href="install.html">Install →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

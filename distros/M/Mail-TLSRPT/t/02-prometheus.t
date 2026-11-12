@@ -61,9 +61,9 @@ my $json = '
 ';
 my $expected_metrics = '# HELP tlsrpt_failures_total TLSRPT failures
 # TYPE tlsrpt_failures_total counter
-tlsrpt_failures_total{organization_name="Company-X",policy_domain="company-y.example",policy_mx_host="*.mail.company-y.example",policy_type="sts",receiving_ip="",receiving_mx_helo="",receiving_mx_hostname="mx1.mail.company-y.example",result_type="certificate-expired",sending_mta_ip="3"} 100
-tlsrpt_failures_total{organization_name="Company-X",policy_domain="company-y.example",policy_mx_host="*.mail.company-y.example",policy_type="sts",receiving_ip="203.0.113.56",receiving_mx_helo="",receiving_mx_hostname="mx2.mail.company-y.example",result_type="starttls-not-supported",sending_mta_ip="3"} 200
-tlsrpt_failures_total{organization_name="Company-X",policy_domain="company-y.example",policy_mx_host="*.mail.company-y.example",policy_type="sts",receiving_ip="203.0.113.58",receiving_mx_helo="",receiving_mx_hostname="mx-backup.mail.company-y.example",result_type="validation-failure",sending_mta_ip="3"} 3
+tlsrpt_failures_total{organization_name="Company-X",policy_domain="company-y.example",policy_mx_host="*.mail.company-y.example",policy_type="sts",receiving_ip="",receiving_mx_helo="",receiving_mx_hostname="mx1.mail.company-y.example",result_type="certificate-expired",sending_mta_ip="2001:0db8:abcd:0012:0000:0000:0000:0001"} 100
+tlsrpt_failures_total{organization_name="Company-X",policy_domain="company-y.example",policy_mx_host="*.mail.company-y.example",policy_type="sts",receiving_ip="203.0.113.56",receiving_mx_helo="",receiving_mx_hostname="mx2.mail.company-y.example",result_type="starttls-not-supported",sending_mta_ip="2001:0db8:abcd:0013:0000:0000:0000:0001"} 200
+tlsrpt_failures_total{organization_name="Company-X",policy_domain="company-y.example",policy_mx_host="*.mail.company-y.example",policy_type="sts",receiving_ip="203.0.113.58",receiving_mx_helo="",receiving_mx_hostname="mx-backup.mail.company-y.example",result_type="validation-failure",sending_mta_ip="198.51.100.62"} 3
 # HELP tlsrpt_reports_processed_total TLSRPT reports processed
 # TYPE tlsrpt_reports_processed_total counter
 tlsrpt_reports_processed_total{organization_name="Company-X",policies="1"} 1

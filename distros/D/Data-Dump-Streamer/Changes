@@ -1,3 +1,9 @@
+3.002 - 2026-11-11
+
+Fix compilation on Cygwin by declaring private XSUBs with XS_INTERNAL.
+Remove compiler warnings in the XS helpers and add Cygwin CI coverage.
+Support Perl 5.12 and newer, with CI coverage for 5.12, 5.14 and 5.16.
+
 3.001 - 2026-11-10
 
 Fix version assignments so PAUSE can index the distribution.

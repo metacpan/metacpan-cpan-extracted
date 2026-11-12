@@ -1,0 +1,8 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {"version": [7, 4], "argv": ["smartctl", "--scan-open", "-j"], "exit_status": 0},
+  "devices": [
+    {"name": "/dev/sda", "info_name": "/dev/sda [SAT]", "type": "sat", "protocol": "ATA"},
+    {"name": "/dev/sdz", "info_name": "/dev/sdz", "type": "scsi", "protocol": "SCSI", "open_error": "Permission denied"}
+  ]
+}

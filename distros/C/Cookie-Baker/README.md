@@ -38,6 +38,8 @@ There is no XS implementation of bake\_cookie yet.
     can contain keys such as `value`, `domain`, `expires`, `path`, `httponly`, `secure`,
     `max-age`, `samesite`.
 
+    domain, path and max-age should be validated to not include \`;\` and other special characters.
+
     - value
 
         Cookie's value.
@@ -55,7 +57,7 @@ There is no XS implementation of bake\_cookie yet.
 
         Cookie's expires date time. Several formats are supported:
 
-            expires => time + 24 * 60 * 60 # epoch time
+            expires => time + 24 * 60 * 60 # epoch time (without subseconds)
             expires => 'Wed, 03-Nov-2010 20:54:16 GMT'
             expires => '+30s' # 30 seconds from now
             expires => '+10m' # ten minutes from now
@@ -93,6 +95,12 @@ There is no XS implementation of bake\_cookie yet.
 
         my $cookies_hashref = crush_cookie($headers->header('Cookie'));
         my $cookie_value = $cookies_hashref->{cookie_name}
+
+    If multiple cookies have the same name, the first one is used.
+
+    If you want to retrieve uri\_decoded cookie name, you can pass the second argument as true.
+
+        my $cookies_hashref = crush_cookie($headers->header('Cookie'), 1); # no uri_decoded cookie names
 
 # SEE ALSO
 

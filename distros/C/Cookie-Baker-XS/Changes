@@ -1,5 +1,13 @@
 Revision history for Perl extension Cookie-Baker-XS
 
+0.14 2026-11-11T13:24:44Z
+
+  - just bump up version. PP requires newer version number
+
+0.13 2026-11-11T13:24:22Z
+
+  - Add raw key support to crush_cookie function
+
 0.12 2022-03-31T04:24:47Z
 
   - Rewrite XS code to fix bug #4. Thank youk goess.

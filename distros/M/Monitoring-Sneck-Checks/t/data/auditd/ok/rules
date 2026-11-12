@@ -1,0 +1,4 @@
+-w /etc/passwd -p wa -k identity
+-w /etc/shadow -p wa -k identity
+-w /etc/sudoers -p wa -k scope
+-a always,exit -F arch=b64 -S execve -F euid=0 -F key=rootcmd

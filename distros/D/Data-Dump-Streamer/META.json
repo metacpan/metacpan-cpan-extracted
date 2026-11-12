@@ -4,7 +4,7 @@
       "Yves Orton <yves@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "generated_by" : "ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -47,7 +47,7 @@
             "Hash::Util" : "0",
             "IO::Handle" : "0",
             "Symbol" : "0",
-            "perl" : "5.018",
+            "perl" : "5.012",
             "re" : "0",
             "strict" : "0",
             "vars" : "0",
@@ -77,6 +77,6 @@
          "web" : "https://github.com/demerphq/Data-Dump-Streamer"
       }
    },
-   "version" : "3.001",
-   "x_serialization_backend" : "JSON::PP version 4.16"
+   "version" : "3.002",
+   "x_serialization_backend" : "JSON::PP version 4.07"
 }

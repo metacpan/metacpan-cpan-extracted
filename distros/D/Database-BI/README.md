@@ -4,7 +4,7 @@ Database::BI - Web-based Business Intelligence viewer for data files
 
 ## Version
 
-0.023.0
+0.023.1
 
 ## Description
 
@@ -732,7 +732,8 @@ perl Makefile.PL
     max_zoom=N     tile layer maxZoom 0..28 (default: map_max_zoom, if set)
     tiles=<name>   named tile source from the tile_sources config key
     heat=1         add a heatmap layer over the markers
-    bounds=county  draw the outline of the county around each marker
+    bounds=<level> draw the outline of the area around each marker: country,
+                   state, county, city, town or neighbourhood
     weight=<col>   numeric heatmap intensity column (normalised to 0..1)
     size=<col>     numeric bubble-radius column; markers become circles
     color=<col>    colour markers from a column
@@ -747,25 +748,49 @@ perl Makefile.PL
     f=            result filters (repeatable)
     ```
 
-    With `bounds=county` (the map panel's "Show county boundaries"), the map draws
-    the outline of the county each marker is in, with a checkbox on the map to hide
-    them.  The outlines come from Nominatim's reverse lookup, which is sent each
-    marker's position rounded to three decimal places (about 110 metres), and only
-    when `map_geocode_online` allows it.  Each outline is remembered under
-    `model_dir` (`boundary-cache`), with the points found in it, so a point inside
-    an outline already known costs no lookup.  A county is the division of a
-    country below its states, whose place rank in Nominatim depends on the country:
-    12 (a US county or independent city, an English county, a German Landkreis), or
-    10 for India, Bangladesh, China and Spain (district, prefecture, province), or 8
-    for Kenya.  Australia, Brazil and Japan have nothing at that level.  Config
-    `map_bounds_ranks` (`{ lk => 10 }`: two-letter codes, ranks 8, 10 or 12)
-    adds or changes countries; startup refuses anything else.  Each reply names its
-    country, so a point is asked at the rank of the last country seen, and again
-    at its own when that differs.
-    Outlines not known yet are looked up as places are: by the progress bar, through
-    `POST /geo/boundary`, or in the request for `geocode=wait`; at most
-    `map_geocode_online_max` in one request.  The checkbox needs [HTML::OSM](https://metacpan.org/pod/HTML%3A%3AOSM) 0.15;
-    with 0.14 the outlines are always shown.
+    With `bounds=` (the map panel's "Show boundaries"), the map draws the outline
+    of the area each marker is in, with a checkbox on the map to hide them.  The
+    level says how large an area:
+
+    ```
+    country        the country
+    state          a US or Indian state, a Canadian province, a New Zealand
+                   region, England or Scotland
+    county         the division below a state; see below
+    city           a city, or the district named after it: Toronto, Manchester,
+                   the district of Canterbury, Hamilton City in New Zealand.
+                   Where OpenStreetMap has no city round a point, or has it only
+                   as a point (York, Pune), the authority at the county's rank
+    town           a town or a city ward: Margate, Toronto Centre
+    neighbourhood  a neighbourhood, suburb or civil parish
+    ```
+
+    OpenStreetMap has a shape for every country, state and county, but not for
+    every smaller place: many towns and most suburbs are mapped as a single point
+    (Cliftonville and Garlinge in Margate are), and a marker there has no outline at
+    that level.  The list under the map says which markers those are.  Larger areas
+    are simplified more, so an outline is a few kilobytes at any level.
+
+    ```perl
+    The outlines come from Nominatim's reverse lookup, which is sent each
+      marker's position rounded to three decimal places (about 110 metres), and only
+      when C<map_geocode_online> allows it.  Each outline is remembered under
+      C<model_dir> (C<boundary-cache>), with the points found in it, so a point inside
+      an outline already known costs no lookup; each level is remembered apart.  A
+      county is the division of a
+      country below its states, whose place rank in Nominatim depends on the country:
+      12 (a US county or independent city, an English county, a German Landkreis), or
+      10 for India, Bangladesh, China and Spain (district, prefecture, province), or 8
+      for Kenya.  Australia, Brazil and Japan have nothing at that level.  Config
+      C<map_bounds_ranks> (C<< { lk => 10 } >>: two-letter codes, ranks 8, 10 or 12)
+      adds or changes countries for the county level; startup refuses anything else.  Each reply names its
+      country, so a point is asked at the rank of the last country seen, and again
+      at its own when that differs.
+      Outlines not known yet are looked up as places are: by the progress bar, through
+      C<POST /geo/boundary>, or in the request for C<geocode=wait>; at most
+      C<map_geocode_online_max> in one request.  The checkbox needs L<HTML::OSM> 0.15;
+      with 0.14 the outlines are always shown.
+    ```
 
     With `heat=1` as well, each outline is coloured by what is in it: the
     `weight=` column summed over every row inside it (or its rows counted, with no
@@ -1132,12 +1157,13 @@ perl Makefile.PL
 
 - `POST /geo/boundary`
 
-    Finds the outline of the county around one point, for the map page's progress
-    bar, and remembers it at once.  Body: `point=&level=county&sig=`, where
+    Finds the outline of the area around one point, for the map page's progress
+    bar, and remembers it at once.  Body: `point=&level=&sig=`, where `level` is
+    one that `bounds=` takes,
     `point` is `lat,lon` rounded to three places and `sig` the signature the map
     page gave it (any other point is refused with 403), plus `online=0` to ask
     nothing.  Returns `{ point, status, stored, online_failed, name }`, where
-    `status` is `found`, `nowhere` (no county there, such as the sea) or `held`
+    `status` is `found`, `nowhere` (no such area there, such as the sea) or `held`
     (not settled now, and not remembered).
 
 - `GET /insights`
@@ -1786,7 +1812,7 @@ so nothing typed on a map page is sent anywhere.
 Map-specific config keys: `map_geocode_max` (new geocoder lookups per request,
 default 500), `map_geocode_online` (0 keeps geocoding on this machine: a place
 the local data does not know is not sent to OpenStreetMap's Nominatim, nor a
-marker's position for its county outline; default 1), `map_geocode_online_max`
+marker's position for its outline; default 1), `map_geocode_online_max`
 (places, and outlines, asked of Nominatim per request, default 20;
 at one a second, the rest are left for the next request or for
 `script/bi-geocode`; the map page's progress bar asks one place a request, so

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use version;
 
-our $VERSION   = qv('v1.1.0');
+our $VERSION   = qv('v1.2.0');
 our $AUTHORITY = 'cpan:MANWAR';
 
 =head1 NAME
@@ -13,100 +13,23 @@ Map::Tube::CLI - Command Line Interface for Map::Tube::* map.
 
 =head1 VERSION
 
-Version v1.1.0
+Version v1.2.0
 
 =cut
 
 use 5.014;
 use utf8::all;
-use Map::Tube::Utils qw(is_valid_color);
+use Map::Tube::CLI::Option;
+use Map::Tube::Generic;
 use Map::Tube::Exception::FoundUnsupportedMap;
 use Map::Tube::Exception::InvalidBackgroundColor;
 use Map::Tube::Exception::InvalidLineName;
 use Map::Tube::Exception::InvalidStationName;
-use Map::Tube::Exception::MissingStationName;
 use Map::Tube::Exception::MissingMapName;
+use Map::Tube::Exception::MissingStationName;
 use Map::Tube::Exception::MissingSupportedMap;
-use Map::Tube::CLI::Option;
-# Defined in a BEGIN block because Module::Pluggable's 'only' option below is
-# evaluated at compile time, i.e. before any ordinary sub further down this file
-# would exist.
-BEGIN {
-    my %SUPPORTED_MAPS = (
-        'ATHENS'          => 'Map::Tube::Athens',
-        'BARCELONA'       => 'Map::Tube::Barcelona',
-        'BEIJING'         => 'Map::Tube::Beijing',
-        'BERLIN'          => 'Map::Tube::Berlin',
-        'BIELEFELD'       => 'Map::Tube::Bielefeld',
-        'BUCHAREST'       => 'Map::Tube::Bucharest',
-        'BRUSSELS'        => 'Map::Tube::Brussels',
-        'BUDAPEST'        => 'Map::Tube::Budapest',
-        'CHICAGO'         => 'Map::Tube::Chicago',
-        'COPENHAGEN'      => 'Map::Tube::Copenhagen',
-        'DELHI'           => 'Map::Tube::Delhi',
-        'DNIPROPETROVSK'  => 'Map::Tube::Dnipropetrovsk',
-        'FRANKFURT'       => 'Map::Tube::Frankfurt',
-        'GLASGOW'         => 'Map::Tube::Glasgow',
-        'HAMBURG'         => 'Map::Tube::Hamburg',
-        'HANNOVER'        => 'Map::Tube::Hannover',
-        'HONGKONG'        => 'Map::Tube::Hongkong',
-        'KAZAN'           => 'Map::Tube::Kazan',
-        'KHARKIV'         => 'Map::Tube::Kharkiv',
-        'KIEV'            => 'Map::Tube::Kiev',
-        'KOELNBONN'       => 'Map::Tube::KoelnBonn',
-        'KOLKATTA'        => 'Map::Tube::Kolkatta',
-        'KUALALUMPUR'     => 'Map::Tube::KualaLumpur',
-        'LEIPZIG'         => 'Map::Tube::Leipzig',
-        'LONDON'          => 'Map::Tube::London',
-        'LYON'            => 'Map::Tube::Lyon',
-        'MADRID'          => 'Map::Tube::Madrid',
-        'MALAGA'          => 'Map::Tube::Malaga',
-        'MILAN'           => 'Map::Tube::Milan',
-        'MINSK'           => 'Map::Tube::Minsk',
-        'MOSCOW'          => 'Map::Tube::Moscow',
-        'MUENCHEN'        => 'Map::Tube::Muenchen',
-        'NAPOLI'          => 'Map::Tube::Napoli',
-        'NUREMBERG'       => 'Map::Tube::Nuremberg',
-        'NYC'             => 'Map::Tube::NYC',
-        'NANJING'         => 'Map::Tube::Nanjing',
-        'NIZHNYNOVGOROD'  => 'Map::Tube::NizhnyNovgorod',
-        'NOVOSIBIRSK'     => 'Map::Tube::Novosibirsk',
-        'OSLO'            => 'Map::Tube::Oslo',
-        'PARIS'           => 'Map::Tube::Paris',
-        'PRAGUE'          => 'Map::Tube::Prague',
-        'RHEINRUHR'       => 'Map::Tube::RheinRuhr',
-        'ROME'            => 'Map::Tube::Rome',
-        'SAINTPETERSBURG' => 'Map::Tube::SaintPetersburg',
-        'SAMARA'          => 'Map::Tube::Samara',
-        'SANFRANCISCO'    => 'Map::Tube::SanFrancisco',
-        'SINGAPORE'       => 'Map::Tube::Singapore',
-        'SOFIA'           => 'Map::Tube::Sofia',
-        'STOCKHOLM'       => 'Map::Tube::Stockholm',
-        'STUTTGART'       => 'Map::Tube::Stuttgart',
-        'SYDNEY'          => 'Map::Tube::Sydney',
-        'TBILISI'         => 'Map::Tube::Tbilisi',
-        'TOKYO'           => 'Map::Tube::Tokyo',
-        'TOULOUSE'        => 'Map::Tube::Toulouse',
-        'VIENNA'          => 'Map::Tube::Vienna',
-        'WARSAW'          => 'Map::Tube::Warsaw',
-        'YEKATERINBURG'   => 'Map::Tube::Yekaterinburg',
-    );
+use Map::Tube::Utils qw(is_valid_color);
 
-    sub supported_maps { return { %SUPPORTED_MAPS } }
-
-}
-
-# Only the officially supported maps are scanned and loaded. Everything else
-# under Map::Tube::* (Map::Tube::Server, Map::Tube::Node, ...) is skipped, so a
-# missing dependency of an unrelated module cannot produce warnings here.
-use Module::Pluggable
-    search_path => [ 'Map::Tube' ],
-    only        => [ values %{ supported_maps() } ],
-    require     => 1,
-    inner       => 0,
-    max_depth   => 3;
-
-# use Path::Tiny;
 use Text::ASCIITable;
 use Try::Tiny;
 use Moo;
@@ -145,7 +68,7 @@ You can list all command line options by giving the C<-h> flag.
                              needed; switch off with --no-fuzzy)
         -P --penalty=Real    Change hop count penalty for line changes (default: 0.5)
         -t --tabular         Show routes and notes in tabular format
-        -f --force           Force unsupported map (map name becomes case sensitive)
+        -f --force           Obsolete. Does nothing. Kept for compatibility only.
         -D --debug           Run in debug mode
         -V --version         Show version information
 
@@ -345,205 +268,71 @@ It can also be displayed in tabular form:
 
 =head3 List all Supported Maps
 
-This will show you a list of all officially supported maps. It will also show you
-which of these maps are not currently installed on your machine.
+This will show you a list of all tube maps installed on your computer. Faulty
+maps that cannot be loaded will not be displayed.
 
     $ map-tube --list_maps
 
-=head2 Using a Map that is Not Officially Supported
-
-It is also possible to use tube maps that are not officially supported, e.g.,
-privately created maps: (This is also helpful while developing a new map.)
-
-    $ map-tube --map 'Slippery Rock' --start 'College Park' --end 'Greyhound station' --force
+Note that many more maps may be available on CPAN for you to download and use.
+See also the documentation of the current version of Map::Tube on CPAN.
+You could also use L<Task::Map::Tube::Bundle> to install many of the maps.
+Please make sure you have the latest maps when you install.
 
 =head2 Error Handling
 
-If encountering an invalid map or a missing map (i.e not installed), you get an error
-message like below:
-
-    $ map-tube --map xYz --start 'Baker Street' --end 'Euston Square'
-    ERROR: Unsupported Map [xYz].
-
-The following will produce a similar message if you do not have the tube map of Kazan installed;
-if you do have it, it will notify you that the starting station does not exist in this map:
+If encountering an invalid map or a missing map (i.e., not installed), you get an error
+message like below, if you do not have the tube map of Kazan installed; if you do have it,
+it will instead notify you that the starting station does not exist in this map:
 
     $ map-tube --map Kazan --start 'Baker Street' --end 'Euston Square'
     ERROR: Missing Map [Kazan].
 
-=head1 SUPPORTED MAPS
-
-The command line parameter C<map> can take one of the following map names. It is
-case insensitive, i.e. 'London' and 'lOndOn' are the same.
-Use the C<--list_maps> option described above to get an up-to-date version of this list.
-Use the C<--force> option described above to use locally installed maps that are not on
-that list.
-
-Note that not all officially supported maps might be available at your site. The
-C<--list-maps> option will show which aren't. You can either install any missing map
-from CPAN, or you could use L<Task::Map::Tube::Bundle> to install the supported maps.
-Please make sure you have the latest maps when you install.
-
-=over 4
-
-=item * L<Athens|Map::Tube::Athens>
-
-=item * L<Barcelona|Map::Tube::Barcelona>
-
-=item * L<Beijing|Map::Tube::Beijing>
-
-=item * L<Berlin|Map::Tube::Berlin>
-
-=item * L<Bielefeld|Map::Tube::Bielefeld>
-
-=item * L<Brussels|Map::Tube::Brussels>
-
-=item * L<Bucharest|Map::Tube::Bucharest>
-
-=item * L<Budapest|Map::Tube::Budapest>
-
-=item * L<Chicago|Map::Tube::Chicago>
-
-=item * L<Copenhagen|Map::Tube::Copenhagen>
-
-=item * L<Delhi|Map::Tube::Delhi>
-
-=item * L<Dnipropetrovsk|Map::Tube::Dnipropetrovsk>
-
-=item * L<Frankfurt|Map::Tube::Frankfurt>
-
-=item * L<Glasgow|Map::Tube::Glasgow>
-
-=item * L<Hamburg|Map::Tube::Hamburg>
-
-=item * L<Hongkong|Map::Tube::Hongkong>
-
-=item * L<Kazan|Map::Tube::Kazan>
-
-=item * L<Kharkiv|Map::Tube::Kharkiv>
-
-=item * L<Kiev|Map::Tube::Kiev>
-
-=item * L<KoelnBonn|Map::Tube::KoelnBonn>
-
-=item * L<Kolkatta|Map::Tube::Kolkatta>
-
-=item * L<KualaLumpur|Map::Tube::KualaLumpur>
-
-=item * L<Leipzig|Map::Tube::Leipzig>
-
-=item * L<London|Map::Tube::London>
-
-=item * L<Lyon|Map::Tube::Lyon>
-
-=item * L<Madrid|Map::Tube::Madrid>
-
-=item * L<Malaga|Map::Tube::Malaga>
-
-=item * L<Milan|Map::Tube::Milan>
-
-=item * L<Minsk|Map::Tube::Minsk>
-
-=item * L<Moscow|Map::Tube::Moscow>
-
-=item * L<Muenchen|Map::Tube::Muenchen>
-
-=item * L<Napoli|Map::Tube::Napoli>
-
-=item * L<Nuremberg|Map::Tube::Nuremberg>
-
-=item * L<NYC|Map::Tube::NYC>
-
-=item * L<Nanjing|Map::Tube::Nanjing>
-
-=item * L<NizhnyNovgorod|Map::Tube::NizhnyNovgorod>
-
-=item * L<Novosibirsk|Map::Tube::Novosibirsk>
-
-=item * L<Oslo|Map::Tube::Oslo>
-
-=item * L<Paris|Map::Tube::Paris>
-
-=item * L<Prague|Map::Tube::Prague>
-
-=item * L<RheinRuhr|Map::Tube::RheinRuhr>
-
-=item * L<Rome|Map::Tube::Rome>
-
-=item * L<SaintPetersburg|Map::Tube::SaintPetersburg>
-
-=item * L<Samara|Map::Tube::Samara>
-
-=item * L<SanFrancisco|Map::Tube::SanFrancisco>
-
-=item * L<Singapore|Map::Tube::Singapore>
-
-=item * L<Sofia|Map::Tube::Sofia>
-
-=item * L<Stockholm|Map::Tube::Stockholm>
-
-=item * L<Stuttgart|Map::Tube::Stuttgart>
-
-=item * L<Sydney|Map::Tube::Sydney>
-
-=item * L<Tbilisi|Map::Tube::Tbilisi>
-
-=item * L<Toulouse|Map::Tube::Toulouse>
-
-=item * L<Tokyo|Map::Tube::Tokyo>
-
-=item * L<Vienna|Map::Tube::Vienna>
-
-=item * L<Warsaw|Map::Tube::Warsaw>
-
-=item * L<Yekaterinburg|Map::Tube::Yekaterinburg>
-
-=back
-
 =cut
+
+# Load a map class on demand. Returns true on success. On failure it warns
+# (like Module::Pluggable's require option used to) and returns false.
+sub _load_map_class {
+    my ($class) = @_;
+
+    (my $file = "$class.pm") =~ s{::}{/}g;
+    return 1 if eval { require $file; 1 };
+
+    my $error = $@ || 'unknown error';
+    $error =~ s/\s+\z//;
+    warn "Couldn't require $class : $error\n";
+    return 0;
+}
 
 sub BUILD {
     my ($self) = @_;
 
-    my $plugins     = [ plugins ];
+    my @caller = caller(0);
+    @caller = caller(2) if $caller[3] eq '(eval)';
+
     my $map_name    = $self->{map};
     my $map_uc_name = uc($map_name//'');
-    my $all_maps    = supported_maps();
-    if (defined $map_name && exists $all_maps->{$map_uc_name}) {
-        my $map_full_name = $all_maps->{$map_uc_name};
-        $self->{maps}->{$map_uc_name} = $_->new for ( grep { defined($_) && ($_ eq $map_full_name)} @$plugins);
+    # if ($map_uc_name) {
+    #     # Load only the requested map (if it is supported and installed)
+    #     # rather than every installed map.
+    #     my $class = supported_maps()->{uc($map_uc_name)};
+    #     if (defined $class) {
+    #         my %installed = map { $_ => 1 } plugins;
+    #         if ($installed{$class} && _load_map_class($class)) {
+    #             $self->{maps}->{$map_uc_name} = $class->new;
+    #         }
+    #     }
+    # }
+    try {
+        $self->{maps}->{$map_uc_name} = Map::Tube::Generic->new(location=>$map_name) if $map_name;
     }
-
-    if ($self->force) {
-        if ($map_name =~ /^[-_A-Za-z0-9]+$/) {
-            # Unsupported maps are not loaded by Module::Pluggable, so load it here.
-            my $class = "Map::Tube::$map_name";
-            (my $file = "$class.pm") =~ s{::}{/}g;
-            unless (eval { require $file; 1 }) {
-                my $error  = $@ || 'unknown error';
-                $error =~ s/\s+\z//;
-                my @caller = caller(0);
-                @caller = caller(2) if $caller[3] eq '(eval)';
-
-                Map::Tube::Exception::FoundUnsupportedMap->throw({
-                    method      => __PACKAGE__."::BUILD",
-                    message     => "ERROR: Can't load forced map [$map_name]: $error",
-                    filename    => $caller[1],
-                    line_number => $caller[2] });
-            }
-            $self->{maps}->{$map_uc_name} = $class->new;
-        }
-        else {
-            my @caller = caller(0);
-            @caller = caller(2) if $caller[3] eq '(eval)';
-
-            Map::Tube::Exception::FoundUnsupportedMap->throw({
-                method      => __PACKAGE__."::BUILD",
-                message     => "ERROR: Can't force invalid map name [$map_name].",
-                filename    => $caller[1],
-                line_number => $caller[2] });
-        }
-    }
+    catch {
+        # Could not load map. Either we didn't find it, or we found it but it doesn't load.
+        Map::Tube::Exception::MissingSupportedMap->throw({
+            method      => __PACKAGE__."::BUILD",
+            message     => "ERROR: Missing Map [$map_name].",
+            filename    => $caller[1],
+            line_number => $caller[2] });
+    };
 
     $self->_validate_param;
 
@@ -575,17 +364,18 @@ sub run {
     }
     if ($self->list_maps) {
         my $map_list = _prepare_map_list();
+        print "Locally Available Metro Maps\n\n";
         if ($self->tabular) {
             my $map_table = Text::ASCIITable->new;
             $map_table->setCols('Map Name','Description');
             $map_table->addRow(@$_) for @$map_list;
-            print "Supported Metro Maps\n\n";
             no warnings;
             print $map_table;
         } else {
             no warnings;
             print join(', ', @$_), "\n" for @$map_list;
         }
+        print "(More maps may be available for downlaod and installation on CPAN.)\n";
         return;
     }
     if (defined $self->penalty) {
@@ -665,19 +455,22 @@ sub run {
     }
 }
 
+
 =head2 supported_maps()
 
-This method will produce information on the maps that are generally
-recognized by the package L<Map::Tube::CLI>.  It does not expect any
-parameter.  It will return a reference to a hash whose keys are plain
-text city names (in ALL-CAPS) and whose values are the names of the
-modules that implement the maps.
-
-Note that "generally recognized" does not imply that the city/module in question
-is actually available on your machine.
+This method will produce information on the maps that are installed and can be loaded.
+(More tube maps may be available at CPAN; cf. also the documentaion of Map::Tube.)
+It does not expect any parameter. It will return a reference to a hash whose keys are plain
+text city names (in ALL-CAPS) and whose values are the names of the modules that
+implement the maps.
 
 =cut
 
+sub supported_maps {
+    my $maps_found = Map::Tube::Generic::list_maps( );
+    my %existing_maps = map { uc($maps_found->{$_}->{location}) => $_ } keys %$maps_found;
+    return \%existing_maps;
+}
 
 #
 #
@@ -757,23 +550,10 @@ sub _prepare_version_info {
 }
 
 sub _prepare_map_list {
-    my $supported_maps  = supported_maps();
-    my %plugins = map { $_ => 1 } plugins;
-    my @map_list;
-    for my $map ( sort values %$supported_maps ) {
-        my $map_name = '(not installed or not loadable)';
-        if (exists $plugins{$map}) {
-            try {
-                $map_name = $map->new->name();
-            } catch {
-                $map_name = '(not loadable)';
-            }
-        }
-        $map =~ s/^.*:://;
-        push(@map_list, [$map, $map_name]);
-    }
-
-    return \@map_list;
+    return [  map     { [ $_->{location}, $_->{name} ] }
+              sort    { uc($a->{location}) cmp uc($b->{location}) }
+              values %{ Map::Tube::Generic->list_maps( verify => 1 ) }
+           ] ;
 }
 
 sub _prepare_station_list {
@@ -895,23 +675,6 @@ sub _validate_param {
         filename    => $caller[1],
         line_number => $caller[2] })
         unless (defined $map);
-
-    my $supported_maps = supported_maps();
-    $supported_maps->{uc($map)} //= 'Map::Tube::'. $map if $self->force;
-
-    Map::Tube::Exception::FoundUnsupportedMap->throw({
-        method      => __PACKAGE__."::_validate_param",
-        message     => "ERROR: Unsupported Map [$map].",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless (exists $supported_maps->{uc($map)});
-
-    Map::Tube::Exception::MissingSupportedMap->throw({
-        method      => __PACKAGE__."::_validate_param",
-        message     => "ERROR: Missing Map [$map].",
-        filename    => $caller[1],
-        line_number => $caller[2] })
-        unless (exists $self->{maps}->{uc($map)});
 
     if ($self->generate_map) {
         if (defined $bgcolor && !(is_valid_color($bgcolor))) {

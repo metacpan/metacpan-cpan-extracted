@@ -12,6 +12,9 @@ my @tests = (
     [ 'foo', { value => 'foo bar baz' }, 'foo=foo%20bar%20baz'],
     [ 'foo', { value => 'val',expires => undef }, 'foo=val'],
     [ 'foo', { value => 'val',path => '/' }, 'foo=val; path=/'],
+    [ 'foo', { value => 'val2',path => '/;a' }, 'foo=val2'],
+    [ 'foo', { value => 'val',domain => 'example.com' }, 'foo=val; domain=example.com'],
+    [ 'foo', { value => 'val',domain => 'invalid domain' }, 'foo=val'],
     [ 'foo', { value => 'val',path => '/', secure => 0, httponly => 0, partitioned => 0 }, 'foo=val; path=/'],
     [ 'foo', { value => 'val',path => '/', secure => 1, httponly => 0, partitioned => 0 }, 'foo=val; path=/; secure'],
     [ 'foo', { value => 'val',path => '/', secure => 0, httponly => 1, partitioned => 0 }, 'foo=val; path=/; HttpOnly'],
@@ -31,12 +34,15 @@ my @tests = (
     [ 'foo', { value => 'val',expires => 'foo' }, 'foo=val; expires=foo'],
     [ 'foo', { value => 'val','max-age' => '1000' }, 'foo=val; max-age=1000'],
     [ 'foo', { value => 'val','max-age' => '0' }, 'foo=val; max-age=0'],
+    [ 'foo', { value => 'val','max-age' => 'a' }, 'foo=val'],
     [ 'foo', { value => 'val', samesite => 'lax' }, 'foo=val; SameSite=Lax'],
     [ 'foo', { value => 'val', samesite => 'strict' }, 'foo=val; SameSite=Strict'],
     [ 'foo', { value => 'val', samesite => 'none' }, 'foo=val; SameSite=None; secure'],
     [ 'foo', { value => 'val', samesite => 'none', secure => 0 }, 'foo=val; SameSite=None; secure'],
     [ 'foo', { value => 'val', samesite => 'invalid value' }, 'foo=val'],
+    [ 'foo', { value => 'val', samesite => 'lax42' }, 'foo=val'],
     [ 'foo', { value => 'val', samesite => 'strict', partitioned => 1 }, 'foo=val; SameSite=None; secure; Partitioned'],
+    [ 'foo', { value => 'bar', path => '/cgi-bin', domain => '.example.com' }, 'foo=bar; domain=.example.com; path=/cgi-bin'],
 );
 
 for my $test (@tests) {

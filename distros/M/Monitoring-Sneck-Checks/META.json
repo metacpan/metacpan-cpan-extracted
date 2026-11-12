@@ -31,6 +31,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Net::LDAP" : "0"
+         },
          "requires" : {
             "BSD::Sysctl" : "0",
             "Data::Validate::Domain" : "0",
@@ -69,6 +72,6 @@
          "web" : "https://github.com/VVelox/Monitoring-Sneck-Checks"
       }
    },
-   "version" : "v0.1.1",
+   "version" : "v0.2.0",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

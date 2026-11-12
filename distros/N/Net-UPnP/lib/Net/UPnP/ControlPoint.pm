@@ -41,10 +41,10 @@ sub search {
 	$this->{error} = '';
 	my $extra_addresses = Net::UPnP::HTTP::_address_list($args{allowed_addresses});
 	croak 'Invalid discovery mx' unless defined($args{mx}) && $args{mx} =~ /\A\d+(?:\.\d+)?\z/;
-	croak 'Invalid discovery mx' unless POSIX::isfinite(0 + $args{mx}) && POSIX::isfinite(2 * $args{mx});
+	croak 'Invalid discovery mx' unless Net::UPnP::HTTP::_isfinite(0 + $args{mx}) && Net::UPnP::HTTP::_isfinite(2 * $args{mx});
 	foreach my $key (qw(max_packets max_devices)) {
 		croak "Invalid discovery $key" unless defined($args{$key})
-			&& $args{$key} =~ /\A\d+\z/ && POSIX::isfinite(0 + $args{$key}) && $args{$key} > 0;
+			&& $args{$key} =~ /\A\d+\z/ && Net::UPnP::HTTP::_isfinite(0 + $args{$key}) && $args{$key} > 0;
 	}
 	return () unless $args{mx} > 0;
 	my $deadline = Net::UPnP::HTTP::_now() + $args{mx} * 2;

@@ -20,7 +20,7 @@ use File::Spec;
 use Log::Abstraction 0.10;
 use Net::CIDR;
 use Params::Get 0.13;
-use Params::Validate::Strict 0.35;
+use Params::Validate::Strict 0.40;
 use Return::Set;
 use Sys::Path;
 use Sub::Protected;
@@ -89,17 +89,19 @@ Readonly my $CRAWLER_REFERER_RE => do {
 
 sub _sanitise_input;
 
+=encoding utf-8
+
 =head1 NAME
 
 CGI::Info - Information about the CGI environment
 
 =head1 VERSION
 
-Version 1.16
+Version 1.17
 
 =cut
 
-our $VERSION = '1.16';
+our $VERSION = '1.17';
 
 =head1 SYNOPSIS
 
@@ -490,7 +492,9 @@ sub _find_paths :Protected {
 
 	$self->_trace(__PACKAGE__ . ': entering _find_paths');
 
-	require File::Basename && File::Basename->import() unless File::Basename->can('basename');
+	# Called fully-qualified rather than imported: a runtime import would
+	# bypass namespace::clean and shadow AUTOLOAD for a field named 'basename'
+	require File::Basename;
 
 	# Determine script name
 	my $script_name = $self->_get_env('SCRIPT_NAME') // $0;
@@ -931,6 +935,51 @@ Advanced features:
         die 'Hacking attempt!' if $_[1] =~ /DROP TABLE/;
         return 1;
     }
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    allow => { type => 'hashref', optional => 1 },	# name => regex | coderef | undef
+    upload_dir => { type => 'string', optional => 1 },	# must be inside a temporary area
+    logger => { type => 'object|string|coderef|arrayref', optional => 1 },
+    limits => { type => 'hashref', optional => 1 },
+    max_body_size => { type => 'integer', min => 0, optional => 1 },
+    max_params => { type => 'integer', min => 0, optional => 1 },
+    max_parts => { type => 'integer', min => 0, optional => 1 },
+    max_part_headers => { type => 'integer', min => 0, optional => 1 },
+    max_nesting_depth => { type => 'integer', min => 0, optional => 1 },
+  }
+
+=head4 OUTPUT
+
+A hash reference of sanitised parameters, or undef.
+When undef is returned, L</status($status)> gives the reason:
+
+=over 4
+
+=item * 200 - no parameters were given
+
+=item * 403 - the WAF blocked the request, or an XML body contained a DOCTYPE/ENTITY declaration (unless C<allow_dtd> is set)
+
+=item * 405 - the request method was OPTIONS
+
+=item * 411 - a POST arrived without a valid CONTENT_LENGTH
+
+=item * 413 - a request-complexity limit was exceeded
+
+=item * 422 - a parameter failed its C<allow> rule (the parameter is dropped; the others are still returned)
+
+=item * 500 - C<upload_dir> is not absolute, does not exist, is not writable, or is outside every temporary area
+
+=item * 501 - unsupported method, multipart GET, or a file upload without C<upload_dir>
+
+=back
+
+  {
+    type => 'hashref|undef',
+  }
+
 =cut
 
 # Validate one per-call limit.  Undef means "no override" so that
@@ -1414,9 +1463,8 @@ sub params {
 
 			return \%FORM;
 		} elsif($content_type =~ /application\/json/i) {
-			require JSON::MaybeXS && JSON::MaybeXS->import() unless JSON::MaybeXS->can('parse_json');
-			# require JSON::MaybeXS;
-			# JSON::MaybeXS->import();
+			# Not imported: see the comment in _find_paths
+			require JSON::MaybeXS;
 
 			my $buffer;
 
@@ -1432,7 +1480,7 @@ sub params {
 			}
 			# JSON::Parse::assert_valid_json($buffer);
 			# my $paramref = JSON::Parse::parse_json($buffer);
-			my $paramref = decode_json($buffer);
+			my $paramref = JSON::MaybeXS::decode_json($buffer);
 			foreach my $key(keys(%{$paramref})) {
 				push @pairs, "$key=" . $paramref->{$key};
 			}
@@ -1478,7 +1526,6 @@ sub params {
 	}
 
 	require String::Clean::XSS;
-	String::Clean::XSS->import();
 	# require String::EscapeCage;
 	# String::EscapeCage->import();
 
@@ -1822,7 +1869,9 @@ sub _sanitise_input :Protected {
 
 	# return $arg;
 	# return String::EscapeCage->new(convert_XSS($arg))->escapecstring();
-	return convert_XSS($arg);
+	# Loaded here (cheap once cached) so direct calls work before params()
+	require String::Clean::XSS;
+	return String::Clean::XSS::convert_XSS($arg);
 }
 
 sub _multipart_data :Protected {
@@ -2238,6 +2287,26 @@ Tmpdir allows a reference of the options to be passed.
 	# or
 
 	my $dir = CGI::Info->tmpdir();
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    default => { type => 'string', optional => 1 },
+  }
+
+May be called as a class or an instance method.
+
+=head4 OUTPUT
+
+An untainted directory path.  A C<default> that is used is returned
+without any sanity checks.
+
+  {
+    type => 'string',
+    min => 1,
+  }
+
 =cut
 
 sub tmpdir {
@@ -2285,12 +2354,14 @@ sub tmpdir {
 # decoding so that an encoded '%5C' cannot hide a traversal from the segment
 # resolution.
 sub _tidy_path :Protected {
-	my ($self, $path, $windows) = @_;
+	my ($self, $path, $windows, $decoded) = @_;
 
 	return unless defined($path);
 
 	# Decoding first means '%2e%2e' is treated like '..' and '%2F' like '/'.
-	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	# $decoded says the caller has already done so, and decoding twice would
+	# turn a literal '%2e' in a real directory name into '.'.
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge unless($decoded);
 	$path =~ tr{\\}{/} if($windows);
 	$path =~ s{/+}{/}g;
 
@@ -2319,21 +2390,46 @@ sub _temp_path :Protected {
 	my $path = shift;
 
 	return unless(defined($path) && length($path));
+
+	# Decode before asking the filesystem, so that an encoded spelling of an
+	# existing directory resolves its symlinks just as the plain one does
+	# (on macOS /tmp and /var are symlinks into /private).
+	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
 	if(-d $path) {
 		my $real = Cwd::abs_path($path);
 		$path = $real if(defined($real) && length($real));
 	}
 	my $windows = ($^O eq 'MSWin32');
-	$path = lc($path) if($windows);
+	if($windows) {
+		$path = $self->_win32_long_path($path);
+		$path = lc($path);
+	}
 
-	return $self->_tidy_path($path, $windows);
+	return $self->_tidy_path($path, $windows, 1);
+}
+
+# Expand any 8.3 short names in an existing Windows path to their long forms,
+# so that 'C:\Users\RUNNER~1\...' is judged as 'C:\Users\runneradmin\...'.
+# Windows commonly sets TEMP to a short spelling like that, so without this
+# every directory File::Temp creates would be refused.  Cwd::abs_path does not
+# do the expansion.  The path is returned unchanged when it does not exist or
+# Win32::GetLongPathName is unavailable (not running on Windows).
+sub _win32_long_path :Protected {
+	my ($self, $path) = @_;
+
+	return $path unless(defined($path) && length($path) && (-e $path));
+	return $path unless(eval { require Win32; 1 } && defined(&Win32::GetLongPathName));
+
+	my $long = Win32::GetLongPathName($path);
+	return (defined($long) && length($long)) ? $long : $path;
 }
 
 # Windows spellings that cannot be checked by comparing strings.  A
 # drive-relative path (C:foo) starts from the per-drive current directory
 # rather than from the drive root, so it can point anywhere; and an 8.3 short
-# name (PROGRA~1) is an alias for a long name that cannot be expanded without
-# asking the filesystem.  Both are refused rather than guessed at, so
+# name (PROGRA~1) is an alias for a long name.  Short names in a path that
+# exists are expanded first; anything still ambiguous after that is refused
+# rather than guessed at, so
 # upload_dir is always judged by an unambiguous path.  A tilde that is not
 # followed by digits is an ordinary character, not an alias.
 sub _win32_path_problem :Protected {
@@ -2343,6 +2439,10 @@ sub _win32_path_problem :Protected {
 
 	my $path = $dir;
 	$path =~ s/%([0-9A-Fa-f]{2})/chr(hex($1))/ge;
+	# A short name the filesystem can expand is not ambiguous.  What is left
+	# afterwards is either a name that really is spelt that way or a path that
+	# does not exist, and both are still refused.
+	$path = $self->_win32_long_path($path);
 	$path =~ tr{\\}{/};
 
 	# 'C:foo', and a bare 'C:', are relative to the working directory on that
@@ -2373,19 +2473,26 @@ sub _temp_areas :Protected {
 	push(@areas, @ENV{qw(TMPDIR TEMP TMP)});
 	if($^O eq 'MSWin32') {
 		push(@areas, map { File::Spec->catdir($_, 'Temp') } grep { defined($_) } @ENV{qw(SYSTEMROOT WINDIR)});
-	} elsif($^O eq 'darwin') {
-		# Core Perl has no confstr(_CS_DARWIN_USER_TEMP_DIR), but the whole of
-		# /var/folders is the per-user temporary tree.
-		push(@areas, '/var/folders', '/private/var/folders');
 	} else {
 		push(@areas, qw(/tmp /var/tmp /usr/tmp));
+		if($^O eq 'darwin') {
+			# Core Perl has no confstr(_CS_DARWIN_USER_TEMP_DIR), but the whole
+			# of /var/folders is the per-user temporary tree.
+			push(@areas, '/var/folders', '/private/var/folders');
+		}
 	}
 
+	# Each area is listed both as spelt and with its symlinks resolved.  An
+	# upload_dir that exists is resolved by _temp_path, one that does not yet
+	# exist is not, and on macOS the two spellings differ (/var/folders is
+	# really /private/var/folders).
+	my $windows = ($^O eq 'MSWin32');
 	my %seen;
 	# The filesystem root is never a temporary area: accepting it would defeat
 	# the point of the check.
 	return grep { defined($_) && (length($_) > 1) && !$seen{$_}++ }
-		map { $self->_temp_path($_) } @areas;
+		map { ($self->_tidy_path($windows ? lc($_) : $_, $windows), $self->_temp_path($_)) }
+		grep { defined($_) && length($_) } @areas;
 }
 
 # Is $dir a directory inside one of the temporary areas?  Compared on
@@ -2521,6 +2628,29 @@ Path to the directory where logs will be stored.
 
 =back
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    dir => { type => 'string', optional => 1 },	# an existing, writable directory
+  }
+
+May be called as a class or an instance method.
+An undefined or empty C<$dir> is treated as a get.
+
+=head4 OUTPUT
+
+The log directory, chosen in order from the value previously set,
+C<$ENV{LOGDIR}>, L<Sys::Path/logdir> and L</tmpdir>.
+Returns undef, and logs a warning, if none of those is a writable directory.
+Croaks C<Invalid logdir: $dir> if C<$dir> is given but is not a writable
+directory.
+
+  {
+    type => 'string|undef',
+  }
+
 =cut
 
 sub logdir {
@@ -2531,15 +2661,20 @@ sub logdir {
 		$self = __PACKAGE__->new();
 	}
 
-	if($dir) {
-		if(length($dir) && (-d $dir) && (-w $dir)) {
+	# defined + length rather than truthiness, so a directory called "0" can be set
+	if(defined($dir) && length($dir)) {
+		if((-d $dir) && (-w $dir)) {
 			return $self->{'logdir'} = $dir;
 		}
 		$self->_warn("Invalid logdir: $dir");
 		Carp::croak("Invalid logdir: $dir");
 	}
 
-	foreach my $rc($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir()) {
+	# Copy the candidates into an array first: aliasing a %ENV element in a
+	# foreach list vivifies that key, so the loop below would leave LOGDIR set
+	# to undef in the caller's environment.
+	my @candidates = ($self->{logdir}, $ENV{'LOGDIR'}, Sys::Path->logdir(), $self->tmpdir());
+	foreach my $rc(@candidates) {
 		if(defined($rc) && length($rc) && (-d $rc) && (-w $rc)) {
 			$dir = $rc;
 			last;
@@ -2565,6 +2700,23 @@ Is the visitor a real person or a robot?
 If the client is seen to be attempting an SQL injection,
 set the HTTP status to 403,
 and return 1.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+A true value if the client is a robot (including AI crawlers and clients
+whose User-Agent contains SQL injection), otherwise 0.
+Returns 0 when C<REMOTE_ADDR> or C<HTTP_USER_AGENT> is not set.
+When a SQL injection attempt is detected the status is also set to 403.
+
+  {
+    type => 'boolean',
+  }
 
 =cut
 
@@ -2701,6 +2853,22 @@ Is the visitor a search engine?
     }
 
 Can be overridden by the IS_SEARCH_ENGINE environment setting
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+A true value if the client is a search engine, otherwise 0.
+C<$ENV{IS_SEARCH_ENGINE}> overrides detection.
+Returns 0 when C<REMOTE_ADDR> or C<HTTP_USER_AGENT> is not set.
+
+  {
+    type => 'boolean',
+  }
 
 =cut
 
@@ -2961,6 +3129,21 @@ Returns a string classifying the visitor's client.  The possible values are:
     my $template = Template->new();
     $template->process($filename, {}) or croak $template->error();
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None.
+
+=head4 OUTPUT
+
+The first matching type, checked in this order: mobile, ai, search, robot.
+
+  {
+    type => 'string',
+    memberof => [ 'mobile', 'ai', 'search', 'robot', 'web' ],
+  }
+
 =cut
 
 sub browser_type {
@@ -3064,21 +3247,9 @@ sub cookie
 		}
 	});
 
+	# validate_strict() above enforces type => string, min => 1 and croaks for
+	# undef/ref inputs, so $field is always a non-empty string here
 	my $field = $params->{'cookie_name'};
-
-	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	# validate_strict() above enforces type=>string, min=>1 and croaks for undef/ref
-	# inputs before control ever reaches these two guards.
-	if(!defined($field)) {
-		$self->_error('what cookie do you want?');
-		Carp::croak('what cookie do you want?');
-		return;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	}
-	if(ref($field)) {
-		$self->_error('Cookie name should be a string');
-		Carp::croak('Cookie name should be a string');
-		return;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	}
 
 	# Load cookies if not already loaded
 	unless($self->{jar}) {
@@ -3121,6 +3292,25 @@ If omitted, the value is retrieved.
 
 =back
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    status => { type => 'integer', optional => 1 },
+  }
+
+Croaks C<status must be an integer> if a non-integer is given.
+
+=head4 OUTPUT
+
+The status that was set or, if none has been set, 405 for OPTIONS and DELETE
+requests, 411 for a POST without CONTENT_LENGTH, otherwise 200.
+
+  {
+    type => 'integer',
+  }
+
 =cut
 
 sub status
@@ -3128,8 +3318,16 @@ sub status
 	my $self = shift;
 	my $status = shift;
 
-	# Set status if provided
-	return $self->{status} = $status if(defined($status));
+	# Set status if provided.
+	# So reject anything non-integer here rather than storing it
+	# and having the next read fail validation.
+	if(defined($status)) {
+		croak(__PACKAGE__, ': status must be an integer')
+			if(ref($status) || !Scalar::Util::looks_like_number($status)
+			   || (($status - $status) != 0) || ($status != int($status)));
+
+		return $self->{status} = $status;
+	}
 
 	# Determine status based on request method if status is not set
 	unless (defined $self->{status}) {
@@ -3141,8 +3339,9 @@ sub status
 		return 200;
 	}
 
-	# Return current status or 200 by default
-	return $self->{status} || 200;
+	# Return current status or 200 by default. // rather than || so that a
+	# status of 0 is returned as set rather than replaced by the default.
+	return $self->{status} // 200;
 }
 
 =head2 messages
@@ -3202,6 +3401,25 @@ returns the current cache object.
 
 =back
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    cache => { type => 'object', can => [ 'get', 'set' ], optional => 1 },
+  }
+
+Croaks if C<$cache> is not a blessed object, or lacks a C<get()> or C<set()>
+method.
+
+=head4 OUTPUT
+
+The current cache object, or undef if none has been set.
+
+  {
+    type => 'object|undef',
+  }
+
 =cut
 
 sub cache
@@ -3224,6 +3442,28 @@ Sets the class, array, code reference, or file that will be used for logging.
 
 Sometimes you don't know what the logger is until you've instantiated the class.
 This function fixes the catch-22 situation.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    logger => { type => 'object|string|coderef|arrayref|undef' },
+  }
+
+The C<logger> argument is required; C<set_logger()> with no arguments croaks.
+A blessed object is stored as-is; anything else is passed to
+C<< Log::Abstraction->new() >>; undef installs a default
+L<Log::Abstraction> logger.
+
+=head4 OUTPUT
+
+The object, to allow chaining.
+
+  {
+    type => 'object',
+    isa => 'CGI::Info',
+  }
 
 =cut
 
@@ -3325,6 +3565,17 @@ Class method to reset the class.
 You should do this in an FCGI environment before instantiating,
 but nowhere else.
 
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None. Must be called as C<< CGI::Info->reset() >>; any other invocant carps
+C<Reset is a class method> and does nothing.
+
+=head4 OUTPUT
+
+None.
+
 =cut
 
 sub reset {
@@ -3360,9 +3611,8 @@ sub AUTOLOAD
 	# Ensure the method is called on the correct package object or a subclass
 	return unless((ref($self) eq __PACKAGE__) || (UNIVERSAL::isa((caller)[0], __PACKAGE__)));
 
-	# TODO: Unreachable code detected during path analysis. Investigate for removal.
-	# $method is captured via /::(\w+)$/ which only yields \w+ chars; a digit-leading
-	# name is possible in theory but Perl's method dispatch never generates one.
+	# Reachable: a symbolic call with a digit-leading name ($info->$m) dispatches
+	# here, and /::(\w+)$/ above still captures that name
 	Carp::croak(__PACKAGE__, ": Invalid method name: $method") unless $method =~ /^[a-zA-Z_][a-zA-Z0-9_]*$/;
 
 	# Delegate to the param method
@@ -3433,11 +3683,12 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
 
 =back
 
-=encoding utf-8
+=head1 FORMAL SPECIFICATION
 
-=head2 FORMAL SPECIFICATION
+The following Z-style specifications describe the intended behaviour of
+selected methods.
 
-=head3 new
+=head2 Specification of new()
 
   -- CGI::Info construction
   new : ClassName x Params --> CGIInfo
@@ -3467,7 +3718,7 @@ L<http://deps.cpantesters.org/?module=CGI::Info>
     let merged == (self (+) params) \ {paramref}
     in  CGIInfo { ...merged }
 
-=head3 param
+=head2 Specification of param()
 
 Let F be the set of all possible CGI field names, V be the set of all
 possible (sanitised) scalar values, and allow : F -> Regex | undef be the
@@ -3484,7 +3735,7 @@ current allow-list schema (undef means all fields are permitted).
 
 Safety invariant: for all f, param(f) /= undef => f in dom(allow) \/ allow = undef.
 
-=head2 is_ai
+=head2 Specification of is_ai()
 
     -- is_ai ---------------------------------------------------------
     -- Given CGIInfo state i, returns a boolean result.

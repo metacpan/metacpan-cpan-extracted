@@ -1,0 +1,28 @@
+#!/usr/bin/env perl
+# Stands in for keepalived. Writes its PID to the PID file, then on
+# each USR1 copies the .data file here that the set file names to the
+# data file, as keepalived writes its state out. A set that has no
+# .data file writes nothing, as a keepalived that never answers.
+#
+#     keepalived $pid_file $set_file $data_file
+use strict;
+use warnings;
+use FindBin;
+use File::Copy qw(copy);
+
+my ( $pid_file, $set_file, $data_file ) = @ARGV;
+my $asked = 0;
+$SIG{USR1} = sub { $asked = 1 };
+$SIG{TERM} = sub { exit(0) };
+open( my $pid_fh, '>', $pid_file ) or die( 'can not write ' . $pid_file . "\n" );
+print $pid_fh $$ . "\n";
+close($pid_fh);
+while (1) {
+	sleep(1);
+	next if !$asked;
+	$asked = 0;
+	open( my $set_fh, '<', $set_file ) or next;
+	my $set = <$set_fh>;
+	chomp($set);
+	copy( $FindBin::Bin . '/' . $set . '.data', $data_file );
+}

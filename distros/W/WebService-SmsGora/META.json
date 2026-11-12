@@ -1,5 +1,5 @@
 {
-   "abstract" : "Perl client for the SMS Gora SMS Gateway API",
+   "abstract" : "SMS Gora SMS Gateway: official Perl client by Tekservix (send and receive SMS through your own Android phones)",
    "author" : [
       "Tekservix <support@tekservix.com>"
    ],
@@ -8,6 +8,7 @@
    "keywords" : [
       "sms",
       "sms-gateway",
+      "sms-api-gateway",
       "bulk-sms",
       "android",
       "tekservix"
@@ -66,6 +67,6 @@
          "web" : "https://github.com/TekservixHQ/smsgora-perl"
       }
    },
-   "version" : "1.000",
+   "version" : "1.001",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

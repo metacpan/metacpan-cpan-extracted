@@ -11,12 +11,13 @@ package Spreadsheet::Edit::Log;
 
 # Allow "use <thismodule> VERSION ..." in development sandbox to not bomb
 { no strict 'refs'; ${__PACKAGE__."::VER"."SION"} = 1999.999; }
-our $VERSION = '1001.004'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
-our $DATE = '2026-05-30'; # DATE from Dist::Zilla::Plugin::OurDate
+our $VERSION = '1001.005'; # VERSION from Dist::Zilla::Plugin::OurPkgVersion
+our $DATE = '2026-11-11'; # DATE from Dist::Zilla::Plugin::OurDate
 
 use Carp;
-use Scalar::Util qw/reftype refaddr blessed weaken openhandle/;
+use Scalar::Util qw/reftype refaddr blessed weaken openhandle looks_like_number/;
 use List::Util qw/first any all/;
+use Time::HiRes ();
 use File::Basename qw/dirname basename/;
 use Data::Dumper::Interp ':DEFAULT', qw/avisl addrvis u/;
 
@@ -24,8 +25,10 @@ use Exporter 5.57 ();
 our @EXPORT = qw/fmt_call log_call fmt_methcall log_methcall
                  nearest_call abbrev_call_fn_ln_subname/;
 
-our @EXPORT_OK = qw/btw btwN btwbt btwN_str btwpad oops set_logdest
-                    colorize ERROR_COLOR WARN_COLOR BOLD_COLOR SUCCESS_COLOR
+our @EXPORT_OK = qw/btw btwN btwbt btwN_str btwpad btw_rjust_prefix
+                    oops set_logdest get_logdest
+                    colorize color_warn get_colorize_startend
+                    ERROR_COLOR WARN_COLOR BOLD_COLOR SUCCESS_COLOR
                     _can_colorize/;
 
 my %backup_defaults = (
@@ -38,7 +41,11 @@ my %backup_defaults = (
 );
 
 sub set_logdest(*) {
+#Carp::cluck(ivis '## set_logdest $_[0]\n');
   $backup_defaults{logdest} = $_[0];
+}
+sub get_logdest() {
+  $backup_defaults{logdest}
 }
 
 use constant ERROR_COLOR => "error";
@@ -54,32 +61,36 @@ sub _getcode($) {
     $colorcodes->{$tput_args} = `tput $tput_args 2>/dev/null`;
     $colorcodes->{$tput_args} = undef if $? != 0;
   }
-  return $colorcodes->{$tput_args} // die "FAILED: tput $tput_args (export NO_COLOR=1 to bypass)";
+  return $colorcodes->{$tput_args} // die "FAILED: tput $tput_args (export NO_COLOR=1 to bypass)";  # trapped in eval below
 }
-sub colorize($$) {
-  my ($str, $colortype) = @_;
+sub get_colorize_startend($) {
+  my ($colortype) = @_;
   if (! exists $ENV{NO_COLOR}) {
      $ENV{NO_COLOR} = ! -t &get_effective_logdest();
   }
-  return $str
-    if $ENV{NO_COLOR};  # check every time
-  my ($color_start, $color_end);
-  eval {
-    # The basic colors 0-7 => black,red,green,yellow,blue,magenta,cyan,white
-    # ("white" is often really light grey)
-    $color_start =
-      $colortype eq BOLD_COLOR    ? _getcode("bold") :
-      $colortype eq WARN_COLOR    ? _getcode("setaf 3 bold") :   # bold yellow
-      $colortype eq ERROR_COLOR   ? _getcode("setaf 1 bold") :   # bold red
-      $colortype eq SUCCESS_COLOR ? _getcode("setaf 2 bold") :   # bold green
-      croak "unknown message type '$colortype'"
-      ;
-    $color_end = _getcode("sgr0");
-  };
-  if ($@) {
-    return $str if $@ =~ /FAILED: tput/; # disabled or TERM does not support it.
-    die $@;
+  my ($color_start, $color_end) = ("", "");
+  unless ($ENV{NO_COLOR}) {  # check every time
+    eval {
+      # The basic colors 0-7 => black,red,green,yellow,blue,magenta,cyan,white
+      # ("white" is often really light grey)
+      $color_start =
+        $colortype eq BOLD_COLOR    ? _getcode("bold") :
+        $colortype eq WARN_COLOR    ? _getcode("setaf 3 bold") :   # bold yellow
+        $colortype eq ERROR_COLOR   ? _getcode("setaf 1 bold") :   # bold red
+        $colortype eq SUCCESS_COLOR ? _getcode("setaf 2 bold") :   # bold green
+        croak "unknown message type '$colortype'"
+        ;
+      $color_end = _getcode("sgr0");
+    };
+    if ($@) {
+      die $@ unless $@ =~ /FAILED: tput/; # disabled or TERM does not support it.
+    }
   }
+  return ($color_start, $color_end);
+}
+sub colorize($$) {
+  my ($str, $colortype) = @_;
+  my ($color_start, $color_end) = get_colorize_startend($colortype);
   my @chunks = map{ $_ eq "" ? "" : $color_start.$_.$color_end }
                split /\R/s, $str, -1;
   return join "\n", @chunks;
@@ -91,6 +102,9 @@ sub _can_colorize() {  # used by test scripts
   };
 }
 
+sub color_warn(@) {
+  warn colorize(join(" ",@_), WARN_COLOR);
+}
 sub oops(@) {
   my @args = @_;
   foreach (@args) { $_ = colorize($_, ERROR_COLOR); }
@@ -110,7 +124,7 @@ sub oops(@) {
   goto &Carp::confess;
 }
 
-our (%btw_importing_pkgs, $multiple_btw_importers);
+our (%btw_importing_pkgs, $multiple_btw_importers, $start_time);
 sub import {
   my $class = shift;
   my $pkg = caller;
@@ -124,9 +138,14 @@ sub import {
         if keys(%btw_importing_pkgs) && !$btw_importing_pkgs{$pkg};
       $btw_importing_pkgs{$pkg}++;
       if (/^:btw$/) {
-        push @remaining_args, qw/btw btwN btwbt btwpad btwN_str/;
+        push @remaining_args, qw/btw btwN btwbt btwN_str
+                                 btwpad btw_rjust_prefix/;
         next;
       }
+    }
+    if (/^:time/) {
+      $start_time = Time::HiRes::time();
+      next;
     }
     push @remaining_args, $_;
   }
@@ -137,20 +156,34 @@ sub import {
 
 our $btw_prefix = "";
 sub btwpad {
-  my $prev = $btw_prefix;
+  # ??? 8/1/26: This used to update $btw_prefix but return its previous value,
+  # which now seems incorrect.
+  ##my $prev = $btw_prefix;
   if (defined (my $new = $_[0])) {
     if ($new =~ /^([-+]?)\d+$/) {
+      # NUMSPACES or  ±INCR
       $btw_prefix = " " x ($1 ? (length($btw_prefix) + $new) : $new);
     } else {
       $btw_prefix = $new; # literal string
     }
   }
-  return $prev;
+  ##return $prev;
+  return $btw_prefix;
+}
+
+# Right-justify btw prefixes to widest seen?
+# Optional argument is a boolean to enable/disable (no arg:enable)
+our $keep_pfx_width = undef;
+if ($threads::shared) { &threads::shared::share(\$keep_pfx_width); }
+sub btw_rjust_prefix {
+  my $enable = @_==0 ? 1 : $_[0];
+  $keep_pfx_width = $enable ? 0 : undef;
 }
 
 sub _btwN_str_back1($@) { # does not show top call frame
   my ($N, @strings) = @_;
   local ($@, $!, $^E, $., $,, $/, $\, $?, $^W);
+  my $nskip = 1;
   my (@frames, $pkg_obvious);
   #my $framesep = ">";
   #my $framesep = " → ";
@@ -158,30 +191,47 @@ sub _btwN_str_back1($@) { # does not show top call frame
   #my $framesep = " » "; # « exists in both Unicode and latin1
   #my $framesep = " ⇒ ";
   my $framesep = "»";
-  my @levels;
+  my ($firstN, $lastN, @custom_levels);
   if (ref($N) eq "") {
-    @levels = ($N);
+    $firstN = $lastN = $N;
   }
-  elsif (ref($N) eq 'SCALAR' && defined($$N) && $$N >= 1) {
-    @levels = 0..($$N-1); # mini-traceback for N levels
+  elsif (ref($N) eq 'SCALAR' && defined($$N)) {
+    if ($$N < 0) {
+      # mini-traceback excluding N most recent frames
+      $firstN = -$$N;
+      $lastN  = 99999;
+    } else {
+      # mini-traceback of N most recent frames
+      $firstN = 0;
+      $lastN  = $$N-1;
+    }
   }
-  elsif (ref($N) eq 'ARRAY' && @$N > 0 && all{defined} @$N) {
-    @levels = sort { $a <=> $b } @$N;  # arbitrary list of levels
-    $framesep = "," unless $#levels == ($levels[-1] - $levels[0]);
+  elsif (ref($N) eq 'ARRAY') {
+    @custom_levels = sort { $a <=> $b } @$N;  # arbitrary list of levels
+    $firstN = $custom_levels[0];
+    $lastN = $custom_levels[-1];
+    $framesep = "," unless $#custom_levels == ($custom_levels[-1] - $custom_levels[0]);
   }
-  else {
-    carp "Invalid N arg to btwN: ${\vis($N)}\n";
-    @levels = 0..99; # mini-traceback
+  # $firstN & $lastN are now always set and possibly @custom_levels
+
+  if (any{ !looks_like_number($_) or $_ < 0 } ($firstN, $lastN, @custom_levels)) {
+    carp "Invalid N arg to btwN: ${\vis($N)} ";
+    ($firstN, $lastN) = (0, 99999);
+    @custom_levels = ();
   }
-  if (!caller($levels[0])) {
-    carp "INVALID stack frame level ",avisl(@levels)," (too far back) ";
-    @levels = 0..99; # mini-traceback instead
+  if (!caller($firstN + $nskip)) {
+    carp "Frame level $firstN starts too far back ";
+    ($firstN, $lastN) = (0, 99999);
+    @custom_levels = ();
   }
 
   { my (%pkgtail2full, %fname2full, $prev_package);
     my ($uniq_pkgtails, $uniq_fnames, $all_same_package) = (1, 1, 1);
-    foreach (@levels) {
-      my $n = $_ + 1; # hide call to this helper func
+    for (my $ix=0; ;++$ix) {
+      my $lev = scalar(@custom_levels) ? $custom_levels[$ix] : $firstN+$ix;
+      last if !defined($lev); # exhausted @custom_levels;
+      last if $lev > $lastN; # exhausted range
+      my $n = $lev + $nskip; # hide call to this helper func
       my @c = caller($n);
       my ($package, $path) = @c[0,1];
       last if !defined $package;
@@ -202,11 +252,13 @@ sub _btwN_str_back1($@) { # does not show top call frame
       foreach (@frames) { $_->{fname} = $_->{caller}->[1]; } # fname = path
     }
     $pkg_obvious = ($all_same_package && !$multiple_btw_importers);
+#warn dvis '### $pkg_obvious $all_same_package $multiple_btw_importers\n';
   }
 
-  ##FIXME: Use only ASCII characters if terminal is not UTF enabled? Cf DDI
-  ## --or-- provide an environment variable?
+  #FIXME: Use only ASCII characters if terminal is not UTF enabled?
+  ##Cf DDI ## --or-- provide an environment variable?
   ## (for when output must go through tools which barf on "wide" chars)
+
 
   my $pfx = "";
   my ($prev_pkg, $prev_n);
@@ -214,11 +266,17 @@ sub _btwN_str_back1($@) { # does not show top call frame
     my ($n, $caller, $pkg, $fname) = @$_{qw/n caller pkg fname/};
     my $lno = $caller->[2];
     my $path = $caller->[1];
+#warn dvis '#YY $n $pkg $fname @$caller[0..3]\n';
     my $s;
-    # Show the filename if it does not correspond to the package e.g. "eval..."
+    # Show the filename if it does not correspond to the package
+    # e.g. if Foo.pm defines code in packages other than "Foo".
+    # Also eval...
     if ($fname ne "${pkg}.pm" && $path ne $0) {
-      $pkg = $path;
+      $pkg .= "[$fname]";
     }
+    #if (substr($fname,0,6) eq "(eval " && index($pkg,"/") < 0) {
+    #  $pkg = "${pkg}$fname";  # "Modname(eval 42)"
+    #}
     if ($pkg_obvious || (defined($prev_pkg) && $pkg eq $prev_pkg)) {
       $s = $lno;
     } else {
@@ -237,13 +295,27 @@ sub _btwN_str_back1($@) { # does not show top call frame
     $prev_pkg = $pkg;
     $prev_n = $n;
   }
+  if ($start_time) {
+    my $secs = Time::HiRes::time() - $start_time; # floating point
+    $pfx = "et=".sprintf("%-5.1f", $secs)." ".$pfx;
+  }
+  if (defined $keep_pfx_width) {
+    my $got = length($pfx);
+    if ((my $shortness = $keep_pfx_width - $got) > 0) {
+      $pfx = (" " x $shortness).$pfx; # right-align
+    } else {
+      $keep_pfx_width = $got;
+    }
+  }
 
+  foreach (@strings) { oops "undef arg to btw*" unless defined; }
   my $s = join("", @strings);
+  my $pad = btwpad();
   $s =~ s/\R\z//s;
-  $s =~ s/(\R)(?=.)/$1 . btwpad() /esg;
+  $s =~ s/(\R)(?=.)/${1}${pad}/sg;
   $s = colorize($s, WARN_COLOR);
 
-  btwpad."${pfx}> ${s}";
+  "${pad}${pfx}> ${s}";
 }#_btwN_str_back1
 
 sub btwN_str($@) { # Just the message string, sans final newline
@@ -462,7 +534,7 @@ Spreadsheet::Edit::Log - log method/function calls, args, and return values
 
 =head1 SYNOPSIS
 
-  use Spreadsheet::Edit::Log qw/:DEFAULT btw btwN oops/;
+  use Spreadsheet::Edit::Log qw/:DEFAULT btw btwN btwbt oops/;
 
   sub public_method {
     my $self = shift;
@@ -536,8 +608,8 @@ and complex structures are serialized
 =item 1.
 
 If an item is a reference to a string then the string is inserted
-as-is without quote,
-and adjacent commas are suppressed (unless the string is empty).
+as-is without quotes,
+and adjacent commas are suppressed unless the string is empty.
 This allows pasting arbitrary text between values.
 
 =item 2.
@@ -645,10 +717,12 @@ only during the current C<fmt_call> invocation.
 
 =back
 
-The "logdest" option may also be set globally (affects all pacakges)
+The "logdest" option may also be set or retrieved globally (affects all pacakges)
 by calling
 
 =head3 B<set_logdest($filehandle or *FILEHANDLE)>
+
+=head3 $fh = B<get_logdest()>
 
 Z<>
 
@@ -661,14 +735,14 @@ NOTE: None of these are exported by default.
 
 =head2 btw STRING,STRING,...
 
-=head2 btwN LEVELSBACK,STRING,STRING,...
+=head2 btwN LEVELSBACK, STRING,STRING,...
 
 =head2 btwbt STRING,STRING,...
 
 Print debug trace messages.  I<btw> stands for "by the way...".
 
 B<btw> prints a message to STDERR
-(or "logdest" - see "Default OPTIONS").
+(or "logdest" if set)
 preceeded by "package:linenum> "
 giving the location I<of the call to btw>.
 A newline is appended to the message unless the last STRING already
@@ -699,7 +773,7 @@ For example, to indicate recursion level:
 
   use Guard qw/scope_guard/;
 
-  sub recursive_func {
+  sub recursive_func
     ...
     my $inner_result = do{
       btwpad("+1"); scope_guard{ btwpad("-1") };
@@ -742,7 +816,7 @@ default foreground color.
 
 =item NO_COLOR
 
-If set, a true value disables colorization and false ("0" or "") unconditionally enables.  If not set, colorizes if the I<logdest> handle is a terminal.
+If set, a true value disables colorization and false ("0" or "") unconditionally enables.  If not set, colorizes if the I<logdest> handle is a terminal which supports it.
 
 =back
 
@@ -754,8 +828,7 @@ If set, a true value disables colorization and false ("0" or "") unconditionally
 =item Import tag ':btw=evalstring' no longer supported
 
 This used to allow customizing the prefix part of
-messages from C<btw>, but the code grew too complicated with
-only imagined real benefits.
+messages from C<btw>, but the code was too complicated for the imagined benefits.
 
 =item Import tags ':color' and ':nocolor' no longer supported.
 
@@ -775,7 +848,7 @@ Jim Avera (jim.avera gmail)
 
 Public Domain or CC0
 
-=for Pod::Coverage oops btwN_str
+=for Pod::Coverage btwN_str btw_rjust_prefix get_colorize_startend color_warn
 
 =cut
 

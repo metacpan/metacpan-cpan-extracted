@@ -1,0 +1,1 @@
+ERROR   Permission denied to socket: /var/run/fail2ban/fail2ban.sock, (you must be root)

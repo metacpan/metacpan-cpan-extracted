@@ -96,11 +96,42 @@ C<R> on the root and C<N> on the numerator the first element is
 The rest of the list represents the contents of the block in the same
 form as the top-level dump, with exception for inter-leaf separators.
 
-The inter-leaf separators are dumped as on object of class
+The inter-leaf separators are dumped as an object of class
 C<Tk::Text::BlockSeparator>, with I<id> C<|>, the contents being the
-"depth" of the separator. Note that the minimal possible depth is 0,
-for separators between leaves of the same parent; 1 is a separator
-between leaves whose parents are siblings, and so on.
+"depth" of the separator: the level of the lowest node that holds the
+leaves on both sides of it, counted up from the nodes directly above
+the leaves.  The minimal possible depth is 0, for separators between
+leaves of the same parent; in a tree whose leaves are equally deep, 1
+is a separator between leaves whose parents are siblings, and so on.
+The I<depth> in the first element is that of the root on the same
+scale (0 for a fraction C<{num|den}>).
+
+In a tree whose leaves are at different depths (a "ragged" tree, see
+L<Ragged trees>) the depths are those of a uniform tree that the
+widget keeps: every leaf is as deep as the deepest one, a shallower
+leaf hanging from its parent through I<padding> nodes, which are not
+nodes of the tree (no command names them).  The header's depth and
+the depths of the separators count these too.  The separator before
+a leaf with padding is a pair instead of a number: a reference to an
+array (blessed into the same class, Perl only) of the depth and the
+number of padding nodes directly above the leaf (its I<defect>).  A
+first leaf with padding, which has no separator before it, gets the
+pair C<[undef, defect]> in front of it.  Separators before leaves
+without padding stay numbers, so the list of a tree whose leaves are
+equally deep is as before.  With C<{x|2|3}> on line 2, the C<2|3> made
+the leaves of a node S (C<R( x | S( 2 | 3 ) )>):
+
+  [['F', 1], [undef, 1], 'x', 1, '2', 0, '3']   # R( x | S( 2 | 3 ) )
+  [['F', 1], '2', 0, '3', [1, 1], 'x']          # R( S( 2 | 3 ) | x )
+
+(the separators shown as their contents).  A program reads both
+forms with
+
+  my ($d, $defect) = UNIVERSAL::isa($sep, 'ARRAY') ? @$sep : ($$sep, 0);
+
+At a separator of depth I<s>, both leaves next to it have defects of
+at most I<s>.  A block that is a single leaf (see C<block flatten>)
+has the depth -1, and no pair: C<[['F', -1], 'numden']>.
 
 =back
 
@@ -124,8 +155,84 @@ leaves can contain anything that can be in a row in a text widget
 (including other blocks). I<Block instance data> can be arbitrary data
 as in a language variable.
 
-I<Current implementation allows only trees with the distance from root
-to leaves being the same for all the leaves.>
+The leaves of the tree may be at different distances from the root (a
+"ragged" tree, since 2.06, see L<Ragged trees>).
+
+=head2 Ragged trees
+
+Until 2.05 every leaf of a block was at the same distance from the
+root.  Since 2.06 the leaves may be at different depths: C<block
+sprout> gives a part of a leaf (or a whole leaf) a node of its own,
+C<block flatten> makes a node one leaf again, and the editing commands
+keep the depths.  For example C<R( x | S( 2 | 3 ) )>, a root R whose
+children are a leaf C<x> and a node S with the leaves C<2> and C<3>
+(this notation is used below: C<|> separates siblings).
+
+=over 5
+
+=item *
+
+I<Levels.>  The commands that name nodes count the I<real> ancestors
+of a leaf: C<block nodedata index level> (and C<block flatten>) take
+the leaf the index names as level 0, its parent as 1, and so on, and
+a negative level counts down from the root (-1 the root, -2 its child
+on the way to the leaf).  So the number of levels depends on the leaf:
+in the example, C<x> has one level above it, C<2> has two.  C<block
+at> and C<block of> give the structure of the real tree (a list of
+lists, with a number for each leaf: C<[1, [1, 1]]> above), and so do
+the arguments of the layout callback.  The places of node values
+(L<Values>, L<Telling the program: -valuecommand>) are given the same
+way: where the node's first leaf starts, and the node's level counted
+from that leaf.
+
+=item *
+
+I<Padding.>  Internally the widget keeps the tree uniform: a leaf
+shallower than the deepest one hangs from its parent through
+I<padding> nodes, which are not nodes of the tree: no command names
+them and they hold no values.  The user sees them in two places only:
+in C<block list>, whose depths are those of the uniform tree (the
+separator before a leaf with padding is a pair of the depth and the
+number of padding nodes above the leaf, its I<defect>, see L<What else
+is in the widget?>), and in the levels of C<block split>, which are
+those of the uniform tree (in a leaf with padding, the lowest levels
+cut only padding, see C<block split>).  The same real tree can have
+several lists (consecutive leaves of the same parent may share their
+padding or not); the undo gives back the padding exactly.
+
+=item *
+
+I<Editing.>  A newline typed in a leaf, or C<block split> at level 0,
+makes a sibling of the leaf, at its depth.  A deletion that joins two
+leaves of different depths first gives the shallower one nodes of its
+own, one above the other, until both are equally deep, and then joins
+them as in a tree whose leaves are equally deep (see L<Deletion of
+text in blocks>): deleting from inside C<a> to inside C<y> in
+C<C( a | B( y | z ) )> gives C<C( W( ay | z ) )>, the new node W
+taking the value of B.  C<block insert> across leaves of different
+depths makes the leaves of its range children of the new block's
+single node, as for any range.  Every change is undone exactly: the
+tree, the padding and the values come back.
+
+=item *
+
+I<Single leaves.>  C<block flatten> at the root makes the block a
+single leaf, without nodes: its depth in C<block list> is -1, C<block
+at> gives its structure as one number, C<block nodedata> at level 0
+and -1 names the leaf, and the layout callback gets the leaf as its
+single argument.  A change that gives it a second leaf gives it a root
+again (see C<block flatten>).
+
+=item *
+
+I<Temporary choices.>  Which sequence of steps an edit uses (a
+deletion wraps the shallower leaf, C<block flatten> follows a fixed
+recipe), which values survive (C<block sprout> shares the former
+leaf's value, the joins keep the start side's), and the
+C<-valuecommand> events of these commands (C<copy>, C<new>, the
+events told step by step) are provisional; see F<BUGS> 28.
+
+=back
 
 =head2 Examples of blocks
 
@@ -202,8 +309,10 @@ If inserted text contains no newlines, it is added to the leaf of tree
 the insertion point is in (i.e., at or after the start of, and before
 the end of). If it contains newlines, then the resulting leaf is split
 into several at the inserted newlines. All the new leaves have the
-same parent node as the initial leaf. Registered callback will be
-called on insertion of newlines I<(not implemented)>.
+same parent node as the initial leaf, and its depth (in a block that
+is a single leaf, the block gets a root, the parent of the leaves).
+The C<-valuecommand> callback is told C<new> for each new leaf (see
+L<Telling the program: -valuecommand>).
 
 =head2 Destruction of blocks
 
@@ -247,8 +356,15 @@ If the range contains leaves separators, two survived leaves are
 merged together. If their parents were different, they are also merged
 together, and the process continues until the common parent is
 met. This is exact opposite to the C<block split ??> subcommand that
-would create this separator. Registered callbacks are called I<(not
-implemented)>.
+would create this separator.  If the two leaves are not equally deep
+below their common ancestor (a ragged tree, see L<Ragged trees>), the
+shallower one first gets new nodes above it, one level at a time (as
+C<block sprout> with one index would give it), until both are equally
+deep; then the nodes are merged in pairs as above.  (Leaves and nodes
+that the range holds whole are deleted first, see L<Node values and
+editing>.)  The C<-valuecommand> callback is told what the deletion
+detaches and the nodes it makes (see L<Telling the program:
+-valuecommand>).
 
 =back
 
@@ -311,7 +427,9 @@ change.> No clipping is performed.
 =item *
 
 Layout callback can also specify which leaves I<should not> be shown
-at all, and what additional details to show in the rectangle.
+at all, and what additional details to show in the rectangle: stolen
+lines (see C<block addline>) and ornaments (see L<Ornaments of
+blocks>).
 
 =item * I<(Not implemented)>
 
@@ -334,7 +452,11 @@ of the block inside the ambient line (it can be different from the
 absolute horizontal position if the block is inside some other
 block). The I<remaining elements> specify the tree structure of the block and the
 layout details of the leaves. Any child of the root node of the tree
-provides one argument of the function. All the arguments are lists,
+provides one argument of the function (in a block that is a single
+leaf, the leaf is the only argument).  In a ragged tree (see
+L<Ragged trees>) the arguments follow the tree of the block: a node's
+list holds the lists of its leaves and of its nodes side by side, in
+their order.  All the arguments are lists,
 and
 
 =over 5
@@ -385,9 +507,9 @@ leaves plus one. The first element of the list specifies the layout
 information on the block as a whole, the others specify layout
 information for the leaves and (possibly) additional elements to show.
 
-There are three possible formats of the elements in this list. All
-are lists of numbers (and should be of the form C<{dd ... dd}>)
-of lengths 1, 7, or 13. The first number is either I<repeat count>, or
+There are three possible formats of the elements in this list that
+are lists of numbers (and should be of the form C<{dd ... dd}>), of
+lengths 1, 7, or 13, and a fourth one, an ornament (see below). The first number is either I<repeat count>, or
 I<id> of additional line to show (i.e., the same data as returned by
 C<textWidget block addline index> command). Lists of different length have
 the following meaning:
@@ -433,6 +555,26 @@ and baseline.
 The I<total width> above is the width of the leaf including the space
 reserved for showing the background of the leaf terminator.
 
+Any element but the first may also be an I<ornament> of the block
+(I<new in 2.08, provisional>): a list whose first element is the name
+of a type of ornament (C<line>, C<polygon>, C<rectangle>, C<oval>,
+C<arc>, C<text>), followed by numbers, the coordinates of its points
+(pairs I<x y>, in pixels from the top left corner of the block), and
+then options and their values, as for C<ornament create> (see
+L<Ornament subcommands>):
+
+  ['line', 0,14, 3,20, 8,2, 30,2, -width => 1]     # a radical's stroke
+
+An ornament is not a leaf (it is not counted among them) and may come
+anywhere after the first element.  It is drawn with the block, every
+time the block is drawn: with C<-layer under> (before the text of the
+leaves, after the stolen lines returned before it in the list), or
+over the text (the default, after the leaves).  See L<Ornaments of
+blocks>.  A bad ornament (a coordinate that is not a number, an odd
+number of coordinates, a wrong number of points for its type, a bad
+option) is reported as other bad results are: a background error, and
+the block is laid out as if it had no layout callback.
+
 
 B<Summary:>
 
@@ -466,6 +608,11 @@ Show Additional Elements - C<{bi xo yo w tw h b}>
 
 (C<w> is not very important), put after leaves.
 
+=item
+
+Ornament - C<{type x1 y1 ... ?-option value ...?}>, anywhere after the
+block layout.
+
 =back
 
 =item Abbreviations:
@@ -475,8 +622,9 @@ Repeat Count, Block Id
 
 =back
 
-None of the returned date is used for clipping. However, it is used in
-directing the mouse events and reporting bounding boxes.
+None of the returned data is used for clipping. However, it is used in
+directing the mouse events and reporting bounding boxes (not that of
+ornaments).
 
 =head2 Lying to layout callback
 
@@ -493,6 +641,10 @@ If C<-layoutdepth> is set, the depth of the tree is modified to be the
 given number. If the true depth of the tree is too small, tree is
 extended from the root side, if it too deep, the subtrees on the
 maximal allowed depth level are mocked as lines with I<repeat count>.
+In a ragged tree (see L<Ragged trees>) the true depth is that of the
+deepest leaf, and a shallower leaf is presented inside lists of one
+element down to the given depth, so that the callback sees every leaf
+at that depth.
 
 If C<-layoutwidths> is set, this can restrict the number of branches
 going out of any node of the modified tree. The value of this option
@@ -537,6 +689,15 @@ callback. Default C<{}>.
 Boolean value that specifies that the blocks of this type contain no
 leaves (I<empty> blocks).
 
+=item B<-ornaments>
+
+A list of ornaments drawn for every displayed block of this type
+(I<templates>; new in 2.08, provisional), each C<{type point point
+... ?-option value ...?}> as the arguments of C<ornament create>,
+whose points are computed from the boxes of the block and of its
+leaves: see L<Ornaments of blocks>.  Default C<{}> (none).  A value
+that does not parse is an error, and the old value stays.
+
 =back
 
 =item B<cget>
@@ -549,7 +710,10 @@ Returns information in the block that starts at the given index or
 "nothing" if there is no such block. Returned information is a list
 consisting of block start index, block length in index space, block
 name, block instance data, structure of the block. The latter is a
-list (possibly of lists) with leaves being lengths of block leaves.
+list (possibly of lists) with leaves being lengths of block leaves:
+a node is a list of its children, in a ragged tree leaves and nodes
+side by side (C<[1, [1, 1]]> for C<R( x | S( 2 | 3 ) )>); a block that
+is a single leaf gives one number (see L<Ragged trees>).
 
 =item B<of> I<index>
 
@@ -650,17 +814,154 @@ split into two marked B<x>):
 =item *
 
 If I<level> is too big to proceed with the above procedure, the tree is
-extended to the left first. The added nodes have one child each.
+extended first: a new node is inserted between the root and all its
+children (one for each level missing), so that the root, which stays
+the root and keeps its value, has one child; the new node is then
+split as above.
 
 =back
+
+=item *
+
+In a ragged tree (see L<Ragged trees>) the levels are those of the
+uniform tree the widget keeps, padding nodes included (as the depths
+of C<block list>): a leaf with I<d> padding nodes above it (its
+defect) has I<d> levels that cut only its padding, so C<block split>
+at a level up to I<d> makes the new leaf a sibling of the leaf, as a
+newline does, and each level above I<d> cuts one real node (its
+parent, then the parent of that node, and so on).  For C<ax> in
+C<R( ax | N( b | c ) )> on line 2 (one padding node above C<ax>),
+C<block split 2.2 1> gives C<R( a | x | N( b | c ) )>, as C<block
+split 2.2 0> does, and C<block split 2.2 2> inserts a node R1 between C<R> and its children
+and splits it: C<R( R1( a ) | Y( x | N( b | c ) ) )>.  In a block
+that is a single leaf, C<split> at level 0 gives the block a root
+again, and at level 1 or more adds a root above the leaf first (see
+C<block flatten>).
 
 =back
 
 Returns the number of levels added above the root (-1 outside of
-blocks).  Recorded for undo; see L<Undo and redo of block and tag
+blocks).  The new nodes and the new leaf have no values (the root keeps its
+value when levels are added: they are inserted below it, see L<Node
+values and editing>); the C<-valuecommand> callback is told C<new> for
+each.  Recorded for undo; see L<Undo and redo of block and tag
 changes>.  An I<index> on the last (dummy) line is taken as the end
 of the line before it, as for C<insert>.
 
+
+=item B<sprout> I<index1 ?index2?>
+
+With one index, the leaf that I<index1> names (as C<block nodedata
+index1 0> names it, see L<Which node, which run>) gets a new node
+above it, whose only child it is (a I<wrap>):
+
+  P( ... | L | ... )   ->   P( ... | N( L ) | ... )
+
+With C<{num}> on line 2 (head 2.0, C<num> 2.1-2.3, the tail 2.4),
+C<.t block sprout 2.1> gives C<R( N( num ) )> and returns 0.  It works
+on any leaf, the only leaf of a block included, in nested blocks too
+(the innermost block holding the index), and in a block that is a
+single leaf (see C<block flatten>), which first gets a root:
+C<R( N( leaf ) )>.  It is the same as the two-index form from the
+delimiter before the leaf to just after the one after it, which
+cannot name the only leaf of a block (that range belongs to the
+enclosing structure).  The value of the leaf moves to the new node;
+the leaf has none afterwards.  I<(Since 2.06; decision O8.)>
+
+With two indices, the leaf that holds the range from I<index1> to
+I<index2> gets a node of its own for that range: the leaf L, a child of the node P, becomes
+three children of P, the text before the range (the I<start> piece),
+a new node N holding the range as its only leaf (the I<middle> piece),
+and the text after the range (the I<end> piece):
+
+  P( ... | L | ... )   ->   P( ... | start | N( middle ) | end | ... )
+
+So the leaves of the tree are no longer all at the same depth.  A
+range that begins at the start of the leaf's text makes an empty start
+piece; one that begins one position earlier, on the delimiter before
+the leaf (the head of the block, or the separator before the leaf),
+makes none.  In the same way a range that ends at the end of the
+leaf's text makes an empty end piece, and one that ends just after the
+separator (or the tail) after the leaf makes none: with both
+delimiters, the leaf just gets a node above it.  With C<{num|den}> on
+line 2 (head 2.0, C<num> 2.1-2.3, the separator 2.4, C<den> 2.5-2.7,
+the tail 2.8):
+
+  .t block sprout 2.2 2.3   ;# {n|u|m|den}: R( n | N( u ) | m | den )
+  .t block sprout 2.1 2.4   ;# R( | N( num ) | | den ): two empty leaves
+  .t block sprout 2.0 2.5   ;# R( N( num ) | den )
+  .t block sprout 2.0 2.3   ;# R( N( nu ) | m | den )
+  .t block sprout 2.2 2.2   ;# R( n | N( ) | um | den ): an empty middle
+
+(C<R( a | N( b ) )> is a root R with a leaf a and a node N whose only
+leaf is b.)  Where the range could be read with either of two leaves
+(it holds just the separator between them), the leaf before the
+separator is taken.  The range must not hold a separator (other than
+the two delimiters), must not be reversed, and its ends must be in the
+same block (a block nested wholly in the range moves into the middle
+piece).  The separators go in as with C<block split> at level 0 (marks
+and tags at the cuts behave the same).  Returns the number of
+separators put in (0, 1 or 2).
+
+The value of the former leaf (see L<Values>) goes to the start piece,
+the new node and the end piece (those that are made) as the same
+value: a reference shared, not a copy; the middle leaf gets none.
+I<(These choices are temporary.)>
+
+How the other commands work on such trees is in L<Ragged trees>.
+
+Recorded for undo; see L<Undo and redo of block and tag changes>.
+Refused while the C<-valuecommand> callback runs.
+
+=item B<flatten> I<index level>
+
+Flattens a node of the innermost block containing I<index> into one
+leaf: the node I<level> levels above the leaf I<index> names, counted
+as for C<nodedata> (0 the leaf itself, 1 its parent, and so on; -1
+the root, -2 a child of the root on the way to the leaf).  Every
+separator inside the node is deleted, and where the leaves on its two
+sides are not equally deep, the deeper one loses the nodes that hold
+it alone; then the node itself goes, its only leaf taking its place.
+As steps: until the node's only child is a leaf, the separator inside
+it farthest to the right whose two leaves are equally deep below their
+common ancestor is deleted (the I<join> of L<Deletion of text in
+blocks>, the nodes on the two sides merged in pairs); if there is
+none, the deepest node inside it whose only child is a leaf (the one
+farthest to the right among equally deep ones) is replaced by that
+leaf (a I<pull out>); then the node itself is pulled out.  With
+C<{num|den}> on line 2:
+
+  .t block sprout 2.2 2.5    ;# {n|um|den}: R( n | N( um ) | den )
+  .t block flatten 2.3 1     ;# R( n | um | den ), returns 0
+  .t block flatten 2.3 -1    ;# {numden}: the block is one leaf, returns 2
+
+Level 0 does nothing (and is not recorded for undo); a level beyond
+the leaf's root is an error, worded as for C<nodedata> ("... has 1
+level above this leaf").  Blocks nested in the text flattened stay as
+they are.  Returns the number of separators deleted.
+
+The values (see L<Values>): a join keeps the start side's value of
+each pair merged, or takes the end side's if the start side has none
+(as a deletion does); a pull out gives the leaf the node's value if
+the node has one (the leaf's own goes), else the leaf keeps its own
+(as C<block trim> does).  The values that go are kept in the undo
+step.  I<(The choice of the steps and these rules are temporary.)>
+
+Flattening at the root makes the block a single leaf, which is then
+its own root: C<block at> gives its structure as one number (the
+leaf's length), C<nodedata> at level 0 and at -1 names the leaf, the
+layout callback gets the leaf as its single argument, C<block list>
+gives the depth -1, and C<block trim> refuses it.  A newline in the
+leaf (or C<block split> at level 0) gives the block a real root again,
+with the two leaves as its children; C<block split> at level 1 or more
+adds a real root above the leaf, as when a level reaches past the root
+(the pieces are leaves of the new root; each level more adds one more
+level, as before); C<block sprout> first gives the block a real root,
+so that the result is C<R( start | N( middle ) | end )>.  The undo of
+each of these makes the block a single leaf again.
+
+Recorded for undo, one step (see L<Undo and redo of block and tag
+changes>).  Refused while the C<-valuecommand> callback runs.
 
 =item B<trim> I<index>
 
@@ -679,7 +980,10 @@ Returns or sets I<instance data> information for the block at C<index>.
 Returns or sets the value kept with a node of the tree of the block
 containing I<index>: the leaf I<index> names if I<level> is 0, its
 parent if it is 1, and so on; the root if I<level> is -1, a child of
-the root on the way to the leaf if it is -2, and so on.  Returns the
+the root on the way to the leaf if it is -2, and so on (down to the
+leaf itself).  The levels are counted for the leaf I<index> names:
+in a tree whose leaves are at different depths (see L<Ragged trees>) the
+number of levels above a leaf depends on the leaf.  Returns the
 value (an empty result, C<undef> in Perl, if the node has none); with
 I<value>, sets it and returns nothing, C<undef> removing the value.
 See L<Values>, which tells which leaf a position names.
@@ -693,6 +997,13 @@ additional elements used in drawing of the block. I<Beware that the
 behaviour is undefined if the line contains something more complicated
 than tagged characters.>
 
+A stolen line is a picture: it keeps the size it had, stretched or
+cut to the box the callback gives it.  Strokes that must follow the
+size of what they decorate (the sign of a radical, the bar of a
+fraction, the rules of a table) are simpler as ornaments of the block
+(see L<Ornaments of blocks>); the demo uses stolen lines only for
+glyphs (the delimiters of its C<LR> block) and backgrounds.
+
 =item B<deletelines>
 
 Deletes all the "stolen" lines.
@@ -700,6 +1011,361 @@ Deletes all the "stolen" lines.
 =item B<list> I<from> I<to>
 
 See L<What else is in the widget?>.
+
+=back
+
+=head1 Ornaments
+
+I<(New in 2.08, provisional: the names, the forms of points and the
+behaviour may change.)>
+
+An I<ornament> is a drawing primitive of the kind a canvas has (a
+line, a polygon, a rectangle, an oval, an arc, a text) whose
+coordinates are not
+numbers but I<reference points>: points computed from the places where
+the characters of the text are drawn.  The ornament is computed anew
+whenever the text is redrawn, so it follows the text it refers to.  It
+takes no room: the text is laid out as if it were not there, and it is
+drawn over the text, or under it (over the backgrounds of tags).
+
+=head2 Points
+
+A point is a list whose first element says how it is computed:
+
+=over 5
+
+=item B<at> I<index> ?I<anchor>?
+
+A place on the box of the character at I<index> (as C<bbox> would give
+it, but not clipped to the window, and for the last character of a
+display line only its own width, where C<bbox> gives it the rest of the
+line; inside a block, the box of the character in its leaf).
+
+=item B<range> I<index1> I<index2> ?I<anchor>?
+
+A place on the smallest box that holds the boxes of the characters
+from I<index1> up to, not including, I<index2> (for an empty range, the
+box of I<index1> with no width).  Its baseline is that of its first
+character.
+
+=item B<line> I<index1> I<index2> I<n> ?I<anchor>?
+
+A place on the piece of the range from I<index1> up to I<index2> that
+is in its I<n>-th display line: the smallest box that holds the boxes
+of the range's characters on that display line.  I<n> counts from 0
+for the first display line of the range, and from -1 for the last; a
+number beyond the range's display lines gives the nearest one.  Inside
+a block, the display lines are those of its leaves.  The display lines
+are taken in the order of the text (top-level lines from the top
+down).  Only the display lines in the window are known: the part of
+the range above the window is one piece (the stand-in of
+I<index1>), the part below it another (the stand-in of I<index2>).
+
+=item B<outline> I<index1> I<index2>
+
+Allowed only as a point of a C<line> or a C<polygon> (an error
+elsewhere, in C<ornament point> or inside another point): it stands for
+all the corners of the outline of the range, the union of the pieces
+of its display lines (see C<line>), clockwise from the top left corner
+of the first piece.  For a range over several display lines that is
+the shape a selection has: the first piece from its first character to
+its right end, the middle lines whole, the last piece up to its last
+character (8 corners; more when the middle lines differ in width).  The
+pieces are taken as bands from the top down: a band reaches down to the
+next one (the space between lines is inside), and pieces side by side
+(the leaves of a block) make one band, their bounding box.
+C<ornament coords> gives every corner.
+
+=item B<mix> I<weight> I<point> ?I<weight> I<point> ...?
+
+The weighted mean of the points (the weights must not add up to 0).
+
+=item B<offset> I<point> I<dx> I<dy>
+
+The point moved by I<dx> to the right and I<dy> down: screen distances
+(such as C<3> or C<2p>), or numbers with the unit C<em> or C<ex> (such
+as C<0.5em> or C<-1ex>), measured at every redisplay in the font of
+I<point>: an I<em> is the width of C<M> in that font, an I<ex> half its
+ascent.  The font of an C<at> point is that of the character at its
+index (the one after the position; with a C<leftward> wrapper, the one
+before it); that of a C<range> or C<line> point, the largest font in
+it (the one with the largest em), or with the units C<emmin>,
+C<emmid>, C<emmax>, C<exmin>, C<exmid>, C<exmax>, its smallest font,
+the mean of its smallest and largest, or its largest; that of C<mix>,
+C<min>, C<max>, C<xy>, C<yx> and C<offset>, the font of their first
+point.  A position that is not displayed has the widget's font.
+
+=item B<xy> I<point1> I<point2>
+
+The x coordinate of I<point1> with the y coordinate of I<point2>.
+
+=item B<yx> I<point1> I<point2>
+
+The y coordinate of I<point1> with the x coordinate of I<point2> (its
+font is that of I<point1>).
+
+=item B<min> I<point> ?I<point> ...?, B<max> I<point> ?I<point> ...?
+
+The smallest (largest) x and the smallest (largest) y of the points.
+
+=item B<leaf> I<k> ?I<anchor>?, B<block> ?I<anchor>?
+
+Only in the ornaments of a block type: see L<Ornaments of blocks>.
+
+=back
+
+The I<anchor> is one of C<nw>, C<n>, C<ne>, C<w>, C<center> (or C<c>),
+C<e>, C<sw>, C<s>, C<se> (as in Tk), C<bw>, C<b>, C<be>: the left end,
+the middle and the right end of the baseline, or C<mw>, C<m>, C<me>:
+the same on the mid line, half an x-height above the baseline (the
+x-height is half the ascent of the font of the point: that of its
+character; for a range, of the largest font in it; the widget's font
+for a stand-in).  It may also be a list of two numbers I<fx> I<fy>: the
+place at the fraction I<fx> of the width from the left and I<fy> of the
+height from the top (C<[0.5, 0.5]> is C<center>).  The default is
+C<bw>.
+
+An index that names no mark and no tag (such as C<2.5>, C<2.5+3c> or
+C<2.0 lineend>) is resolved when the ornament is created (or its
+points replaced), and the ornament keeps the position as a I<private
+mark> of its own: the point stays on its character whatever is
+inserted or deleted before it.  A private mark has right gravity (text
+inserted at it goes before it), except the end of a range, which has
+left gravity (text inserted at the end of a range stays outside it).
+An index that names a mark or a tag (C<insert>, C<mymark+3c>,
+C<sel.first>), C<end>, C<@x,y>, or the name of an embedded image or
+window, is kept as it is written and computed again at every
+redisplay.  An ornament whose index no longer exists (its mark was
+unset, its tag removed) is not drawn.
+
+Wherever an index goes, a I<wrapper> makes a private mark of a given
+gravity, of any index (resolved now, even if it names a mark):
+
+=over 5
+
+=item B<leftward> I<index>
+
+A private mark with left gravity (text inserted at it goes after it).
+
+=item B<rightward> I<index>
+
+A private mark with right gravity.
+
+=back
+
+In Perl a wrapper is an array reference too: C<< [at => [leftward =>
+'insert']] >>.  The program never sees the private marks: they are not
+in C<mark names>, C<mark next>, C<mark previous>, C<dump> or C<block
+list>, cannot be named (the names of marks starting with the character
+C<\001> are reserved: C<mark set> refuses them), and never have a
+value.  Deleting an ornament, replacing its points or destroying the
+widget removes them.  C<ornament points> gives the index of each
+private mark as it is now (a wrapped one as the wrapper:
+C<[leftward =E<gt> '2.7']>).  When a deletion moved a private mark, its
+undo puts it back, as it does with the program's marks.
+
+A position that is not displayed (above or below the window) gets a
+stand-in place: where it would be if every text line between it and
+the window took one line height (that of the top or bottom display
+line), with no width.  Its x is the one the position had when it was
+last displayed (each index of each point remembers it, as a place in
+its display line: it follows horizontal scrolling); if it has not been
+displayed since the point was given, the middle of the text area, or,
+with the widget option C<-ornamentproportional>, the place proportional
+to its offset in its text line (relative to the line's length) across
+the text area.  No line is laid out for a stand-in.  A position hidden
+by C<-elide> between displayed lines gets the place of the next
+displayed character.  An ornament none of whose positions is displayed
+is not drawn (even a shape whose ends are above and below the window).
+
+When a deletion removes all the text an ornament refers to, the
+ornament is deleted with it (unless its option C<-keep> is set).  Only
+an ornament all of whose indices are private marks qualifies (one that
+uses a mark of the program, a tag, C<end> or C<@x,y> is never deleted
+this way); it is deleted if the character of each C<at> point (the
+character after its mark, or before it for a mark of left gravity)
+is deleted, and the range of each range point is inside the deleted
+text.
+
+Ornaments are not part of the text: they are temporary.  Undo does not
+create or delete them (the undo of a deletion does not bring back an
+ornament it deleted), and neither C<dump> nor C<block list> shows them.
+
+In Perl a point is an array reference, nested ones for the points it
+is made of:
+
+  $text->markSet(from => '1.4');
+  $text->markSet(to => '1.12');
+  # A light box under a range, and an arched arrow between two words.
+  $text->ornamentCreate('rectangle', [range => 'from', 'to', 'nw'],
+      [range => 'from', 'to', 'se'], -fill => '#ffe9a8', -layer => 'under');
+  $text->ornamentCreate('line', [at => 'from', 's'],
+      [offset => [mix => 1, [at => 'from', 's'], 1, [at => 'to', 's']], 0, 20],
+      [at => 'to', 's'], -smooth => 1, -arrow => 'last', -fill => 'red');
+
+=head2 Ornaments of blocks
+
+A block may have ornaments of its own, drawn with it: the layout
+callback may return them among its lists (see L<Layout callback>),
+with coordinates in pixels from the top left corner of the block.
+They take no room and are not leaves; they are drawn every time the
+block is drawn, under its text (C<-layer under>: before the text of
+the leaves, and among the stolen lines in the order the callback
+returned them) or over it (the default: after the leaves), and only
+where the block's line is drawn (as the rest of what the block draws,
+they are not clipped to the block, but to its display line).  The
+options are those of C<ornament create> (C<-keep> has no effect;
+C<-state hidden> hides it).  They are not listed by C<ornament names>,
+have no id and cannot be configured: the callback gives them anew at
+every layout of the block (their options are read then, once per
+layout).
+
+A block type may also have ornaments drawn for every block of the type
+that is displayed: the option C<-ornaments> of C<block configure>, a
+list of ornament specifications (I<templates>) such as
+
+  $text->blockConfigure('Fraction', -ornaments => [
+      ['line', [xy => [block => 'w'], [leaf => 0, 's']],
+               [xy => [block => 'e'], [leaf => 0, 's']]],   # the bar
+  ]);
+
+each a type, its points and options, as the arguments of C<ornament
+create>.  The points of a template are computed for each block when it
+is laid out, from two forms of point that exist only there:
+
+=over 5
+
+=item B<leaf> I<k> ?I<anchor>?
+
+A place on the box of the I<k>-th leaf of the block (from 0, in the
+order of the arguments of the layout callback, which is the order of
+the leaves in the block's tree, depth first): the smallest box that
+holds its display lines as they are laid out in the block.  Its
+baseline is that of the leaf's first display line, its font that of
+the leaf's first character (for an empty leaf, the font of the
+block).
+
+=item B<block> ?I<anchor>?
+
+A place on the box of the whole block: its width, and its height and
+baseline (the ascent and descent the layout gave it).  Its font is
+that of the text the block stands in (the tags at the block's
+position).
+
+=back
+
+and from C<mix>, C<offset>, C<xy>, C<yx>, C<min> and C<max> of such
+points (an offset in C<em> or C<ex> uses the font of its point, as
+above).  Points with indices (C<at>, C<range>, C<line>, C<outline>) are
+refused there, and C<leaf> and C<block> are refused everywhere else.
+The anchors are those of L<Points> (the baseline, the mid line and
+fractions included; the default is C<bw>).  A template that names a
+leaf beyond the last one, or a leaf the layout callback does not show
+(a C<{1}> list), is not drawn for that block.  Templates are drawn
+before the ornaments the layout callback returned, in each layer, and
+in their order; under the text they come before the stolen lines too.
+C<block cget> gives the list as it was given.
+
+=head2 Ornament subcommands
+
+=over 5
+
+=item B<ornament create> I<type> I<point> ?I<point> ...? ?I<option> I<value> ...?
+
+Creates an ornament and returns its I<id> (a number).  I<type> is
+C<line> (2 points or more), C<polygon> (3 or more), C<rectangle>,
+C<oval> or C<arc> (2: opposite corners of the box), or C<text> (1).
+Ornaments are drawn in the order they were created.
+
+=item B<ornament delete> I<id> ?I<id> ...?
+
+=item B<ornament names>
+
+The ids of the ornaments.
+
+=item B<ornament configure> I<id> ?I<option>? ?I<value> I<option> I<value> ...?
+
+=item B<ornament cget> I<id> I<option>
+
+=item B<ornament points> I<id> ?I<point> I<point> ...?
+
+Returns the points of the ornament (as lists, with the indices of its
+private marks as they are now), or replaces them.
+
+=item B<ornament coords> I<id>
+
+The points as they are now (x1 y1 x2 y2 ..., in pixels from the
+top left corner of the window, before smoothing and arrowheads), or
+an empty list if the ornament is not drawn.
+
+=item B<ornament point> I<point>
+
+Computes a point now: returns its x and y, and 1 if a position it uses
+is displayed (0 if only stand-ins were used).
+
+=back
+
+The options (each type has those that apply to it):
+
+=over 5
+
+=item B<-fill> I<color>
+
+The color of a line or a text; the inside of the other types (by
+default none; black for a polygon, a line and a text).
+
+=item B<-outline> I<color>
+
+The outline of a polygon, rectangle, oval or arc (by default black,
+for a polygon none).
+
+=item B<-width> I<distance>
+
+Of the line or outline (1).
+
+=item B<-dash> I<list>
+
+A dash pattern: lengths in pixels of the dashes and the gaps, such as
+C<4 2> (by default a solid line).
+
+=item B<-capstyle>, B<-joinstyle>
+
+As for a canvas line (C<butt>, C<round>).
+
+=item B<-smooth> I<boolean>
+
+A line or polygon becomes a curve, as on a canvas: quadratic splines
+through the midpoints of its segments, bent toward the points between
+them (an open line still starts and ends at its end points).
+
+=item B<-arrow> C<none>|C<first>|C<last>|C<both>, B<-arrowshape> I<{a b c}>
+
+Arrowheads of a line, as on a canvas (C<8 10 3>).
+
+=item B<-start> I<degrees>, B<-extent> I<degrees>, B<-style> C<pieslice>|C<chord>|C<arc>
+
+Of an arc, as on a canvas: the part of the oval in the box from the
+angle I<-start> (0 by default: from the right, counterclockwise) over
+I<-extent> degrees (90 by default; at most 360 either way), drawn as a
+pie slice (the default), a chord (the arc closed by a straight line),
+or the arc alone (not filled).
+
+=item B<-text> I<string>, B<-font> I<font>, B<-anchor> I<anchor>
+
+Of a text: what it says (one line), its font (by default the widget's)
+and the place of its box (a Tk anchor) at its point (C<center> by
+default).
+
+=item B<-keep> I<boolean>
+
+Keep the ornament when its text is deleted (by default it is deleted
+with it, see above).
+
+=item B<-layer> C<over>|C<under>
+
+Over the text (the default) or under it.
+
+=item B<-state> C<normal>|C<hidden>
 
 =back
 
@@ -760,7 +1426,8 @@ C<undef>.  Without C<-values> the dump is as before.
 =head1 Undo and redo of block and tag changes
 
 With C<-undo> on, C<block insert>, C<block split>, C<block trim>,
-C<tag add> and C<tag remove> are recorded for C<edit undo>, as
+C<block sprout>, C<block flatten>, C<tag add> and C<tag remove> are
+recorded for C<edit undo>, as
 insertions and deletions are (Tk's text widget records neither tags
 nor, of course, blocks).  The undo reverses each of them, the redo
 does it again:
@@ -790,12 +1457,41 @@ in L<Block subcommands>), the undo also gives every separator of the
 range, and the one after it, the level it had, so that the nodes of
 the enclosing block are those before the block insert, and the values
 of the nodes block insert emptied, or left on the end side, come back
-to them.  No text moves for that, and the undo is one step, as
-always.
+to them; in a tree whose leaves are at different depths (see L<Ragged
+trees>) the leaves of the range get back their depths too.  No text
+moves for that, and the undo is one step, as always.
 
 =item *
 
 C<block trim>: the undo adds the root again, with the value it had.
+
+=item *
+
+C<block flatten>: the undo does the steps back in reverse order (each
+separator deleted comes back with the nodes it joined, each node
+pulled out gets its leaf and value back); the tree and the values are
+exactly those before the flatten.  The redo flattens again.
+
+=item *
+
+C<block sprout> (either form): the undo takes the new node out again
+(the middle leaf takes its value, if it has one), then deletes the separators the
+sprout put in (the start piece keeps its value, those of the middle
+and end pieces go into the undo step); the tree and the values are
+exactly those before the sprout.  The redo sprouts again, and gives
+back the values the undo took.
+
+=item *
+
+A deletion that joined two leaves of different depths (see L<Ragged
+trees>): the undo puts the text back with its structure (every leaf
+at its depth), gives the values back, and then takes out again, in
+reverse order, the nodes the deletion gave the shallower leaf before
+joining; the tree and the values are exactly those before the
+deletion (C<C( a | B( y | z ) )> again in the example of L<Ragged
+trees>).  A value set on such a node after the deletion goes into the
+undo step meanwhile, and comes back with the redo, which joins as the
+deletion did.
 
 =item *
 
@@ -827,7 +1523,7 @@ another kind than the last one, so that a run of changes of the same
 kind (several C<tag add> in a row, as typing is a run of insertions)
 is one undo step, and a change of another kind starts a new one
 (C<tag add> and C<tag remove> are two kinds, as insertion and deletion
-are).  To make one step of several changes of different kinds, switch
+are; C<block sprout> and C<block flatten> are kinds of their own).  To make one step of several changes of different kinds, switch
 C<-autoseparators> off and put in C<edit separator> yourself.  A
 program that uses tags for display only (highlighting found text, say)
 can switch C<-undo> off around those calls: tags do not move text, so
@@ -897,7 +1593,16 @@ parent of the leaf, 2 the parent of that node, and so on.  A negative
 level counts down from the root: -1 is the root, -2 the child of the
 root on the way to the leaf, and so on.  A node is reached from every
 position in it, the root from every position in the block.  A level
-beyond the root, or a negative level below the leaf, is an error.
+beyond the root, or a negative level below the leaf, is an error,
+which gives the number of levels above that leaf.  The levels are
+those of the leaf the position names: in a ragged tree (see L<Ragged
+trees>) the same node can have different levels from different
+leaves, and the padding the widget keeps is never counted.  In
+C<R( x | S( 2 | 3 ) )> on line 2 (C<x> 2.1, C<2> 2.3, C<3> 2.5),
+C<nodedata 2.1 1> and C<nodedata 2.3 2> both name the root, which is
+C<nodedata 2.1 -1> and C<nodedata 2.5 -1> too, and C<nodedata 2.1 2>
+is an error ("... has 1 level above this leaf").  In a block that is a
+single leaf, level 0 and level -1 both name the leaf.
 With a fraction C<{num|den}> on line 2 (head 2.0, C<num> 2.1-2.3, the
 separator 2.4, C<den> 2.5-2.7, the tail 2.8):
 
@@ -908,7 +1613,7 @@ separator 2.4, C<den> 2.5-2.7, the tail 2.8):
   .t block nodedata 2.2 -2	;# N: down from the root, the leaf
   .t block nodedata 2.0 0	;# bad index "2.0": not inside a block
   .t block nodedata 2.2 2	;# bad level "2": the block containing
-				;#   2.2 has 1 level above its leaves
+				;#   2.2 has 1 level above this leaf
 
 A I<run> of a tag is a maximal stretch of characters carrying it.  It
 continues over line ends, interleaf separators, and heads and tails
@@ -938,9 +1643,13 @@ Insertion inside a leaf does not change values.  A newline inserted in
 a leaf (or C<block split> at level 0) splits it: the first part keeps
 the value, the new leaf starts without one.  C<block split> at a
 higher level does the same on each level: the node before the cut
-keeps its value, the new node after it starts without one.  Nodes it
-adds above the root start without values, except that the value of
-the root moves to the new root, so that level -1 keeps naming it.
+keeps its value, the new node after it starts without one (in a leaf
+with padding, see L<Ragged trees>, the lowest levels cut only
+padding, which holds no values).  Where the level reaches the root,
+it first inserts a new node between the root and all its children
+(one for each level missing): the root stays the root and keeps its
+value, the new node starts without one and is then cut as any other
+node.
 
 =item *
 
@@ -954,7 +1663,11 @@ after it need not be in the range), and a node if it holds all of its
 leaves in this way.  Otherwise the leaf where the range starts and the
 leaf where it ends are joined, and if they have different parents,
 their ancestors are joined on each level up to the common ancestor
-(see L<Deletion of text in blocks>).  On each level the joined node
+(see L<Deletion of text in blocks>); if one of the two is less deep
+below the common ancestor than the other, it is first given new nodes
+above it, without values, until both are equally deep (the new node
+next to a node of the other side then takes that node's value by the
+rule that follows).  On each level the joined node
 keeps the value of the node on the start side if it has one, else it
 takes the value of the node on the end side; the other value is freed.
 The starting leaf always survives a join, even when all of its text is
@@ -981,6 +1694,16 @@ blocks nested in what is left stay with those blocks.
 C<block trim> removes the root: the new root (its only child) keeps
 the value of the old root if it had one, else its own; the other value
 is freed.
+
+=item *
+
+C<block sprout> shares the value of the former leaf between the start
+piece, the new node and the end piece (with one index, or a range from
+delimiter to delimiter, the value moves to the new node); the middle
+leaf has none.  C<block flatten> keeps, on each join, the start side's
+value (else the end side's), and on each pull out the node's value
+(else the leaf's); the others are freed (kept in the undo step).
+I<(Temporary choices, see F<BUGS> 28.)>
 
 =item *
 
@@ -1234,8 +1957,13 @@ the values a join moved.  C<edit redo> takes them into the step again.  The undo
 an insertion and its redo do the same.  A value the undo finds on the
 node or run it gives a value back to (one set after the edit, or of a
 run made since and merged with the restored one) is not freed either:
-it waits in the step, and the redo gives it back.  If the undo finds
-no node at an address, the value is freed.
+it waits in the step, and the redo gives it back.  So does a value
+set after a deletion on a leaf made of what was left of a block the
+deletion dissolved, also when that block was nested in another one:
+the undo re-creates the block, and the value waits in the step with
+the place the leaf has in the text without the deleted range, where
+the redo gives it back (eText/BUGS 26, 31).  If the undo finds no node
+at an address otherwise, the value is freed.
 
 The values in an undo step are freed when the step is discarded: by
 C<edit reset>, when the history grows beyond C<-maxundo> steps, when
@@ -1272,7 +2000,8 @@ list> sets no values unless it does so itself.
 
 With the option C<-valuecommand>, the widget tells the program, before
 a change is made, which values the change will detach and where they
-are, while the widget is not changed yet; and afterwards which values
+are, while the widget is not changed yet (and, provisionally, which
+nodes it will create without a value, C<new>); and afterwards which values
 an undo or a redo gave back and which a discarded undo step frees.
 For most commands this is before the command changes anything; the
 commands that make several changes in a row tell before each of them
@@ -1295,8 +2024,9 @@ The owner of the value and its place, an array reference:
   block   [index]              the head of the block (block data)
 
 A node (the leaves included) is named by the position where its first
-leaf starts and its level counted from the leaves (0 for a leaf), as
-in L<Undo and redo>.  A block is named by its head; C<block data> at
+leaf starts and its level counted from that leaf (0 for a leaf), as
+in L<Undo and redo>: C<blockNodedata(@$where)> returns the value
+whatever the depths of the other leaves (see L<Ragged trees>).  A block is named by its head; C<block data> at
 the head returns the value for an I<empty> block, and for another
 block at a position inside it that is not inside a block nested in it
 (its tail, for one).
@@ -1337,6 +2067,52 @@ command, just before the value is freed, with the place the step
 recorded, which may not exist any more (a run's is C<[tag, start]>, a
 position on a line that is gone is given as recorded);
 
+=item C<copy>
+
+I<(Temporary.)> before C<block sprout> puts the value of a leaf on
+another owner too (the new node, the end piece): the value is shared,
+nothing is detached.  C<$where> is the place of the value, and its
+last element names the receiving owner as it is I<after> the change.
+
+=item C<new>
+
+I<(Provisional, decision O5.)> before the change: the change will
+create a node or a leaf without a value; C<$where> is the place it
+will have I<after> the change, C<[index, level]> (the level counted
+from the node's first leaf, as for the other events), and C<$value>
+is C<undef>.  Told once for each such node or leaf: the new leaf of a
+newline typed in a block (or of C<block split>), the second halves of
+the nodes C<block split> cuts and the nodes it adds (see below), the
+root and the leaves of a new block (C<block insert>) and the leaf of
+the enclosing block left when a whole leaf moves into the new block,
+the leaves that the separators of a block a deletion dissolves make
+in the block around it, the new node and the pieces of C<block
+sprout> that do not receive a copy of the former leaf's value (its
+middle leaf always), the nodes a deletion gives the shallower of two
+leaves before joining them, and the root of a block that was a single
+leaf and gets a second one.  Nodes and leaves that an undo or a redo
+re-creates are not told (they get back the values they had,
+C<restore>), nor is the disappearance of a node without a value: a
+program that wants to follow every node can set a value on each node
+it is told about.  With C<{num|den}> on line 2, the value C<R> on the
+root and C<N> on C<num>:
+
+  .t block split 2.2 1    ;# R( X( n ) | Y( um | den ) )
+
+The split reaches the root, so it first inserts a new node C<R1>
+between the root C<R> and all its children; C<R> stays the root and
+keeps its value, but its address grows by one level, since a node was
+inserted below it (as for a wrap, see C<block sprout>); then C<R1> is
+split into C<X( n )> and C<Y( um | den )>.  This tells C<new> three
+times, before the change: C<R1> (that is, C<X>) at C<[2.1 1]>, C<Y> at
+C<[2.3 1]> and the leaf C<um> at C<[2.3 0]>; then the value C<R> is
+told C<move> from C<[2.1 1]> to C<[2.1 2]> as C<R1> is inserted below
+it.  C<blockNodedata(@$where)> after the
+change names the node, unless a later step of the same command gives
+it a value (a deletion's join, telling C<move> to that place).  The
+ready-made C<DETACH> callback passes C<new> on to no value (there is
+none).
+
 =item C<late>
 
 a value was detached that the widget did not foresee: called at the
@@ -1351,7 +2127,8 @@ it.
 =item C<$cause>
 
 The command: C<delete>, C<insert>, C<tag add>, C<tag remove>, C<tag
-delete>, C<block insert>, C<block trim>, C<block split>, C<undo>,
+delete>, C<block insert>, C<block trim>, C<block split>, C<block sprout>,
+C<block flatten>, C<undo>,
 C<redo>, C<reset> (C<edit reset>), C<separator> (C<edit separator>),
 C<configure> (C<-maxundo>); C<set> for the commands that set a value
 (C<block nodedata>, C<tag data>, C<mark data>, C<block data>, undef
@@ -1362,6 +2139,30 @@ included) and C<unset> for C<mark unset>.
 The calls before a change are made once the command has checked its
 arguments, before it changes anything, for a command that makes one
 change.
+
+I<(Temporary.)> In a tree whose leaves are at different depths, the
+steps of C<block sprout>, and of a deletion that joins leaves of
+different depths, are told each just before it is made: giving a leaf
+a node above it changes the address of the nodes above the leaf of
+which it is the first leaf (their level grows by one), told as
+C<move> with the new place as it is I<after> the change; taking such a
+node out again (the undo of C<block sprout>, or of such a deletion,
+after the values have come back) the same way back; the
+value of a leaf that moves to the node made above it is a C<move>;
+the copies are told C<copy>; the separators C<block sprout> puts in
+are told nothing, as for C<block split>.  C<block flatten> tells each
+of its steps just before it is made: a join as a deletion's join
+(C<move>, C<drop> or C<stash>), a pull out as C<move> of the node's
+value to the leaf, C<drop> or C<stash> of the leaf's own if both have
+one, and C<move> of the nodes above whose address changes (their
+level shrinks by one).  The nodes these steps create without a value
+are told C<new> (see above): C<block sprout> tells them all before its
+first step, with their places after the command; a deletion tells the
+nodes it gives the start leaf before giving them, with their places
+once all are made (the join then keeps them; those it gives the end
+leaf are merged into the start side's at once and are not told).
+Nothing is told when a root becomes padding again (the undo of these
+commands, C<block flatten> at the root).
 
 B<Postponed: telling everything before a command that makes several
 changes starts; today these commands tell before each of their
@@ -1393,7 +2194,13 @@ before it is tagged or untagged;
 =item *
 
 a deletion through the end of the text, which first takes the tags
-off the final newline (told then), and then deletes (told then).
+off the final newline (told then), and then deletes (told then);
+
+=item *
+
+C<block flatten>, C<block sprout>, and a deletion that joins leaves of
+different depths (see above): each step is told just before it is
+made.
 
 =back
 
@@ -1502,8 +2309,8 @@ C<DESTROY> method, is the case above.
 
 =item C<-valuecommand>
 
-A callback told before a command detaches values, see L<Telling the
-program: -valuecommand>; C<'DETACH'> passes the notification on to
+A callback told before a command detaches values (or creates nodes
+without values), see L<Telling the program: -valuecommand>; C<'DETACH'> passes the notification on to
 values that are objects with a C<DETACH> method.  Empty (or undef) by
 default.
 
@@ -1521,7 +2328,18 @@ empty string in the standard representation, it is represented as an
 appropriate number of C<*>s if this bit is set. Currently this
 concerns embedded windows only, which are represented as C<*>.
 
-All undocumented bits are reserved and should be 0.
+All undocumented bits are reserved and should be 0; since 2.06 the
+widget ignores them (before, some of them changed what the widget's
+own extractions, C<block list> and the undo's records, contained).
+
+=item C<-ornamentproportional>
+
+A boolean (0 by default; new in 2.08, provisional).  The x of the
+stand-in of a position of an ornament that is not displayed, and was
+never displayed since the ornament got it: when set, proportional to
+the position's offset in its text line (relative to the line's length)
+across the width of the text area; else the middle of the text area.
+See L<Ornaments>.
 
 =back
 

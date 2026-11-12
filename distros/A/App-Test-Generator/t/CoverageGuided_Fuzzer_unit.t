@@ -628,4 +628,147 @@ subtest 'minimize_corpus() handles all no-coverage corpus' => sub {
 	is($stats->{after},    2, 'after = 2 (dup removed)');
 };
 
+# --------------------------------------------------
+# Regression: bugs on hashref inputs described with 'properties'
+# --------------------------------------------------
+
+subtest 'run() records bugs for a hashref input with properties' => sub {
+	my $f = _fuzzer(
+		schema => {
+			input => {
+				type       => 'hashref',
+				properties => { n => { type => 'integer', min => 0, max => 3 } },
+			},
+		},
+		target_sub => sub { die "boom\n" },
+		iterations => 40,
+	);
+	my $report = $f->run();
+	cmp_ok($report->{bugs_found}, '>', 0, 'a die on valid hashref input is recorded');
+	is(ref($report->{bugs}[0]{input}), 'HASH', 'recorded input is the hashref');
+};
+
+subtest '_input_is_valid() checks the properties of a hashref input' => sub {
+	my $f = _fuzzer(schema => {
+		input => {
+			type       => 'hashref',
+			properties => {
+				n    => { type => 'integer', min => 0, max => 3 },
+				note => { type => 'string', optional => 1 },
+			},
+		},
+	});
+	ok( $f->_input_is_valid({ n => 2 }),              'in range, optional absent');
+	ok( $f->_input_is_valid({ n => 0, note => 'x' }), 'in range, optional present');
+	ok(!$f->_input_is_valid({ n => 9 }),              'out of range');
+	ok(!$f->_input_is_valid({}),                      'required property missing');
+	ok(!$f->_input_is_valid('scalar'),                'not a hashref');
+};
+
+subtest '_input_is_valid() still accepts a named-parameter map' => sub {
+	my $f = _fuzzer(schema => {
+		input => {
+			type => { type => 'string' },    # a parameter that is itself called "type"
+			n    => { type => 'integer', min => 1 },
+		},
+	});
+	ok( $f->_input_is_valid({ type => 'a', n => 1 }), 'both parameters valid');
+	ok(!$f->_input_is_valid({ type => 'a', n => 0 }), 'n below min');
+	ok(!$f->_input_is_valid({ n => 1 }),              'parameter "type" missing');
+};
+
+# --------------------------------------------------
+# Regression: warnings count as soft bugs on both call paths
+# --------------------------------------------------
+
+subtest 'a matching warning is recorded as a bug with and without Devel::Cover' => sub {
+	for my $cover (0, 1) {
+		my $f = _fuzzer(
+			target_sub => sub { warn "Use of uninitialized value\n"; 1 },
+			iterations => 3,
+		);
+		$f->{_cover_available} = $cover;
+		my $report = $f->run();
+		is($report->{bugs_found}, 3, "_cover_available=$cover: every warning recorded");
+		like($report->{bugs}[0]{error}, qr/^warning: Use of uninitialized/,
+			"_cover_available=$cover: error text carries the warning");
+	}
+};
+
+subtest 'a warning that matches no pattern is not a bug' => sub {
+	my $f = _fuzzer(target_sub => sub { warn "just chatting\n"; 1 }, iterations => 3);
+	is($f->run()->{bugs_found}, 0, 'harmless warning ignored');
+};
+
+# --------------------------------------------------
+# Regression: _snapshot_cover reads Devel::Cover's live counters
+# --------------------------------------------------
+
+subtest '_snapshot_cover() reads branch and condition slots' => sub {
+	my $counters = {
+		branch    => { "\x01\x02" => [ 1, 0 ] },
+		condition => { "\x0a"     => [ 0, 2, 0 ] },
+		statement => { "\x0b"     => 5 },
+	};
+	no warnings qw(redefine once);
+	local *Devel::Cover::coverage = sub { $counters };
+
+	my $f = _fuzzer();
+	is_deeply(
+		$f->_snapshot_cover(),
+		{ 'branch:0102:0' => 1, 'condition:0a:1' => 1 },
+		'only hit branch/condition slots are reported',
+	);
+
+	$f->{_cover_available} = 1;
+	my $report = $f->run();
+	is($report->{branches_covered}, 2, 'run() reports the hit slots');
+
+	$counters->{branch}{"\x01\x02"}[1] = 1;
+	$f->_run_one('x');
+	ok($f->{covered}{'branch:0102:1'}, 'a newly hit slot is added to the covered set');
+	is($f->corpus->[-1]{input}, 'x', 'the input that hit it joins the corpus');
+};
+
+# --------------------------------------------------
+# Regression: corpus files are UTF-8 and round-trip any character
+# --------------------------------------------------
+
+SKIP: {
+	skip 'no JSON module', 2 unless $have_json;
+
+	subtest 'save_corpus()/load_corpus() round-trip non-ASCII inputs' => sub {
+		my $path   = File::Spec->catfile(tempdir(CLEANUP => 1), 'corpus.json');
+		my @inputs = ('plain', "caf\x{e9}", "smile \x{263a}", "mix \x{e9}\x{1f600}", undef);
+
+		my @warnings;
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+
+		my $f = _fuzzer();
+		push @{ $f->{corpus} }, map { { input => $_, coverage => {} } } @inputs;
+		$f->save_corpus($path);
+
+		my $g = _fuzzer();
+		$g->load_corpus($path);
+		is_deeply([ map { $_->{input} } @{ $g->corpus } ], \@inputs, 'every input comes back unchanged');
+		is(scalar(grep { /Wide character/ } @warnings), 0, 'no "Wide character" warning');
+
+		open my $fh, '<:raw', $path or die $!;
+		my $bytes = do { local $/; <$fh> };
+		close $fh;
+		ok(utf8::decode($bytes), 'file content is valid UTF-8');
+	};
+
+	subtest 'load_corpus() still reads a Latin-1 corpus written by 0.47' => sub {
+		my $path = File::Spec->catfile(tempdir(CLEANUP => 1), 'old.json');
+		open my $fh, '>:raw', $path or die $!;
+		print $fh qq({"seed":1,"corpus":[{"input":"caf\xe9"}],"bugs":[]});
+		close $fh;
+
+		my $f = _fuzzer();
+		lives_ok { $f->load_corpus($path) } 'old file loads';
+		is($f->corpus->[0]{input}, "caf\x{e9}", 'Latin-1 byte read as the same character');
+	};
+}
+
 done_testing();

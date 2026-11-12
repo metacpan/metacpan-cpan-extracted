@@ -1,5 +1,57 @@
 Revision history for App-Test-Generator
 
+0.48	Wed Nov 11 09:42:47 AM EST 2026
+	[Enhancements]
+	- Generated harnesses check that each call leaves the caller's globals
+	  ($_, $/, $, and $;) unmodified
+	- Generated harnesses report files left in the working directory and leaked
+	  file descriptors (new config keys check_files and check_fds)
+	- Getter and getset accessors are checked for unwanted changes to their
+	  object's state (new config key check_accessors)
+	- extract-schemas marks classes whose constructor refuses (e.g. abstract
+	  base classes) as unbuildable, so their routines are skipped, not FAILED
+	- New "directory" semantic: a parameter tested with -d is given a real
+	  temporary directory rather than an invented string
+
+	[Bug fixes]
+	- CoverageGuidedFuzzer: coverage guidance now works; the program must be
+	  started under Devel::Cover
+	- CoverageGuidedFuzzer: a die on a hashref input with properties is now
+	  recorded as a bug
+	- CoverageGuidedFuzzer: corpus files are read and written as UTF-8
+	- CoverageGuidedFuzzer: soft-bug warnings are also caught under Devel::Cover
+	- BenchmarkGenerator: names and constructor values are quoted and escaped,
+	  so the generated script always compiles
+	- BenchmarkGenerator: no longer dies on input: undef, and an undef parameter
+	  spec is passed as undef
+	- SchemaExtractor: recognise get/set accessors that guard on defined($arg)
+	  rather than on @_
+	- SchemaExtractor: a getter driven by %ENV is no longer typed as a getset
+	  accessor
+	- SchemaExtractor: a setter that wraps its argument before storing it is
+	  typed "any", not "string"
+	- SchemaExtractor: a return built from a regex capture ($1) is no longer
+	  typed as an integer
+	- SchemaExtractor: a wrapper that forwards @_ inherits the target's input
+	  schema and is no longer typed as returning an arrayref
+	- SchemaExtractor: matches patterns are emitted as Regexp objects, not
+	  slash-delimited strings
+	- SchemaExtractor: a parameter used only in a truthiness test is optional
+	- SchemaExtractor: ignore validator schemas built from runtime lexicals,
+	  which gave "Empty input parameter name"
+	- Harness: scalar _input cases are now passed to a positional routine
+	- Harness: integer edge cases no longer expect very large "floats" to die
+	  or "0x10" and "1_000" to be accepted
+	- Harness: numeric getset round trips are compared with ==, not eq
+	- Harness: a getter that declares no input is called with no arguments
+	- Harness: wrong-type cases are only generated when the routine's own
+	  validator enforces the type
+	- deploy-workflows: the embedded dashboard.yml and mutate.yml had fallen
+	  behind the master copies
+	- Modules needed by a generated harness (Test::Most, Test::Returns,
+	  Test::LectroTest) are now runtime prerequisites; added Capture::Tiny
+	  to the test prerequisites
+
 0.47	Wed Oct  7 09:29:14 PM EDT 2026
 	[Enhancements]
 	- Bump actions-setup-perl to 1.44.0

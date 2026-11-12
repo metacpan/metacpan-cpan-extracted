@@ -1,0 +1,3 @@
+lo0: flags=1008049<UP,LOOPBACK,RUNNING,MULTICAST,LOWER_UP> metric 0 mtu 16384
+	inet 127.0.0.1 netmask 0xff000000
+	groups: lo

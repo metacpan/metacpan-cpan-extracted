@@ -22,10 +22,12 @@ tkTextTag.c
 tkTextWind.c
 tkTextImage.c
 tkTextUndo.c
+tkTextOrn.c
 demo/etext.pl
 demo/save.tsf
 t/basic.t
 t/leak.t
+t/ornament.t
 t/regress.t
 t/utf8.t
 t/tex.t
@@ -41,11 +43,18 @@ t/values-runs.t
 utils/FreezeThaw.pm
 utils/Text/TeX.pm
 t/freeing.t
+t/getflags.t
 t/destroymult.t
 t/dying.t
 t/undo-block.t
 t/data-slots.t
 t/valuecommand.t
 t/valuecommand-random.t
+t/ragged.t
+t/flatten.t
+t/demo-oplimits.t
+t/demo-table.t
+t/demo-ornaments.t
+t/display-random.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,17 @@
+Data::Shared scaling benchmark notes
+
+Command for a fresh measurement against the installed backends:
+  perl bench/scaling.pl
+
+Controls: DS_BENCH_SIZES, DS_BENCH_WORKING_SET, DS_BENCH_ITERATIONS,
+DS_BENCH_WORKERS.
+
+The historical 2026-10-17 baseline/revised tables and derived comparisons
+have been removed. The baseline required a saved pre-hardening source tree
+that is not in this distribution, and neither sample identified an exact
+source revision. Running the shipped script cannot reproduce that comparison.
+
+Record the source revision, Perl/backend versions, commands and environment
+with new output. Working-set timings use warm filesystem pages and include
+instrumentation and scheduling. RSS includes the interpreter and allocator
+history. Repeat measurements on an idle host for workload-specific conclusions.

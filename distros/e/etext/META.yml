@@ -36,5 +36,5 @@ resources:
   bugtracker: https://github.com/ilyaz-ai/etext/issues
   homepage: https://github.com/ilyaz-ai/etext
   repository: https://github.com/ilyaz-ai/etext.git
-version: '2.05'
+version: '2.08'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

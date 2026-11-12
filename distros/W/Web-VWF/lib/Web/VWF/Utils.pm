@@ -16,11 +16,11 @@ Provides cross-driver cache initialization and Haversine formula implementation.
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.002.0
 
 =cut
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.002.0');
 
 use v5.20;
 use strict;
@@ -30,6 +30,7 @@ no warnings qw(experimental::signatures);
 
 use Exporter qw(import);
 our @EXPORT = qw(create_disc_cache create_memory_cache distance);
+our @EXPORT_OK = qw(redact_config);
 
 use CHI;
 use DBI;
@@ -38,7 +39,8 @@ use Module::Runtime qw(require_module);	# Safe dynamic loading; avoids string ev
 use Params::Get 0.13;
 use Try::Tiny;
 use Carp qw(croak carp);
-use Scalar::Util qw(looks_like_number);
+use Readonly;
+use Scalar::Util qw(looks_like_number reftype);
 use Math::Trig qw(deg2rad rad2deg asin great_circle_distance);
 
 # Constants for distance calculations
@@ -396,6 +398,48 @@ sub _parse_server_config($config, $logger) {
 	}
 
 	return @servers;
+}
+
+=head2 redact_config
+
+A copy of a configuration, safe to write to a log: the value of any key whose
+name contains C<secret>, C<password>, C<passwd>, C<key>, C<token> or
+C<credential> is replaced by C<[REDACTED]>, at any depth.  The original is not
+changed.  Debug logs get pasted into bug reports, and the configuration holds
+the CSRF secret, the reCAPTCHA secret and the DKIM key path.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ config => { type => [ 'hashref', 'arrayref', 'string', 'undef' ] } }
+
+=head4 OUTPUT
+
+	{ type => [ 'hashref', 'arrayref', 'string', 'undef' ] }	# a plain, unblessed copy
+
+=cut
+
+Readonly::Scalar my $REDACTED => '[REDACTED]';
+Readonly::Scalar my $MAX_REDACT_DEPTH => 20;	# Stops a self-referencing configuration looping forever
+
+sub redact_config($config, $depth = 0) {
+	return '[TOO DEEP]' if($depth > $MAX_REDACT_DEPTH);
+
+	if(ref($config) eq 'ARRAY') {
+		return [ map { redact_config($_, $depth + 1) } @{$config} ];
+	}
+	if((reftype($config) // '') eq 'HASH') {
+		my %copy;
+		foreach my $key (keys %{$config}) {
+			$copy{$key} = ($key =~ /secret|passw(?:or)?d|key|token|credential/i)
+				? $REDACTED
+				: redact_config($config->{$key}, $depth + 1);
+		}
+		return \%copy;
+	}
+
+	return $config;
 }
 
 =head2 distance

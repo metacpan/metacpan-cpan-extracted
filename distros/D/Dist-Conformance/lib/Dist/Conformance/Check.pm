@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.004;
+package Dist::Conformance::Check 0.005;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -91,7 +91,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 
@@ -268,7 +268,7 @@ F<CLAUDE.md> exists and names the skills that it must.
 =item L<Dist::Conformance::Check::CriticProfile>
 
 The perlcritic profile enables or turns off every policy that its template
-enables.
+enables, and enables none that the standards retired.
 
 =item L<Dist::Conformance::Check::ToolConfiguration>
 

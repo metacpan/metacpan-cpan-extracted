@@ -8,7 +8,7 @@
       make install
 ```
 
-Perl 5.18 or newer and a functional C compiler are required.
+Perl 5.12 or newer and a functional C compiler are required.
 Graph analysis and Perl source emission use a mandatory XS engine.
 Construction, options, entry points, and callback dispatch also use XS.
 Perl supplies loading/export glue and integration with B::Deparse,
@@ -29,7 +29,7 @@ Optional dependencies:
 - Algorithm::Diff and Cpanel::JSON::XS enable additional test coverage.
 - Compress::Zlib and MIME::Base64 enable compressed scalar output.
 
-CI tests every stable Perl series from 5.18 through 5.44, plus a development
+CI tests every stable Perl series from 5.12 through 5.44, plus a development
 Perl built with the refcounted stack and a separate threaded build.
 
 ## DEVELOPMENT

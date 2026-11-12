@@ -363,7 +363,7 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			<td><code>1</code></td>
 			<td>
 				Ask OpenStreetMap's Nominatim about places the local data does not
-				know, and for county outlines. Only the place name is sent, or, for
+				know, and for the outlines of counties and other areas. Only the place name is sent, or, for
 				an outline, the marker's position rounded to about 100 metres. Set it
 				to <code>0</code> to keep every lookup on this machine.
 			</td>
@@ -372,7 +372,7 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			<td><code>map_geocode_online_max</code></td>
 			<td><code>20</code></td>
 			<td>
-				Places, and county outlines, asked of Nominatim each time a map opens. Nominatim allows one
+				Places, and outlines, asked of Nominatim each time a map opens. Nominatim allows one
 				request a second, so this is roughly how long a page can wait for it.
 				The rest are asked next time, or by <code>script/bi-geocode</code>.
 			</td>
@@ -382,7 +382,7 @@ BI_OPEN=/full/path/store.db hypnotoad script/database-bi</code></pre>
 			<td>none</td>
 			<td>
 				Which of Nominatim's place ranks is a county, country by country,
-				for the county outlines on a map: <code>{ lk =&gt; 10 }</code>.
+				for <code>bounds=county</code> on a map (it changes the county level only): <code>{ lk =&gt; 10 }</code>.
 				Codes are two letters; ranks are 8 (a state), 10 or 12. Countries not
 				listed use the built-in choice: 12, or 10 for India, Bangladesh,
 				China and Spain, and 8 for Kenya.

@@ -2,7 +2,8 @@
 # 	$rcs = ' $Id: etext.t,v 1.8 1996/10/30 20:04:30 ilya Exp ilya $ ';
 #
 # Interactive demonstration of Tk::eText: editable fractions, radicals,
-# super/subscripts, equations, tables, with a mini TeX import/export.
+# super/subscripts, equations, tables, big operators with limits, tables
+# with cells spanning columns and rows, with a mini TeX import/export.
 # Run it as
 #	perl -Mblib demo/etext.pl		(from the build directory)
 # or	perl demo/etext.pl			(after "make install")
@@ -291,6 +292,33 @@ print "server: `$server', not_X: `$not_X'\n";
   $mb->command(-button => ['Insert', underline => 0],
 	       -label => 'Case', -underline => 1, 
 	       -command => [ $text, 'insertBlockWithData', 'LR', '{ ' ] );
+  $mb->command(-button => ['Insert', underline => 0],
+	       -accelerator => "<${prefix}o>",
+	       -label => 'Big operator', -underline => 4,
+	       -command => [ $text, 'insertOpLimits', 'insert' ] );
+  $mb->command(-button => ['Insert', underline => 0],
+	       -accelerator => "<${prefix}g>",
+	       -label => 'Span table', -underline => 5,
+	       -command => [ $text, 'insertSpanTable', 'insert', 2, 2 ] );
+
+  $mb->command(-button => ['Cell', underline => 0],
+	       -accelerator => "<${prefix}h>",
+	       -label => 'Span one more column', -underline => 9,
+	       -command => [ $text, 'growSpan', 'insert', 1, 0 ] );
+  $mb->command(-button => ['Cell', underline => 0],
+	       -accelerator => "<${prefix}j>",
+	       -label => 'Span one more row', -underline => 9,
+	       -command => [ $text, 'growSpan', 'insert', 0, 1 ] );
+  $mb->command(-button => ['Cell', underline => 0],
+	       -label => 'Span one column less', -underline => 5,
+	       -command => [ $text, 'growSpan', 'insert', -1, 0 ] );
+  $mb->command(-button => ['Cell', underline => 0],
+	       -label => 'Span one row less', -underline => 9,
+	       -command => [ $text, 'growSpan', 'insert', 0, -1 ] );
+  $mb->command(-button => ['Cell', underline => 0],
+	       -accelerator => "<${prefix}k>",
+	       -label => 'No span', -underline => 0,
+	       -command => [ $text, 'setSpan', 'insert', 1, 1 ] );
 
   $mb->command(-button => ['Split', underline => 0],
 	       -accelerator => "<Control-Return>",
@@ -327,6 +355,12 @@ print "server: `$server', not_X: `$not_X'\n";
   $mb->command(-button => ['Examples', underline => 0],
 	       -label => 'Empty Tree', -underline => 1,  -accelerator => '<F10>',
 	       -command => [ $text, 'example10', 'insert' ] );
+  $mb->command(-button => ['Examples', underline => 0],
+	       -label => 'Big operators', -underline => 0,  -accelerator => '<F6>',
+	       -command => [ $text, 'exampleOpLimits', 'insert' ] );
+  $mb->command(-button => ['Examples', underline => 0],
+	       -label => 'Span tables', -underline => 1,  -accelerator => '<F7>',
+	       -command => [ $text, 'exampleSpanTables', 'insert' ] );
 
   $mb->command(-button => ['Tag', underline => 0],
 	       -label => 'VerbTeX', -underline => 0, # -accelerator => '<F1>',
@@ -378,6 +412,20 @@ print "server: `$server', not_X: `$not_X'\n";
 	       -label => 'Italic', -underline => 0, # -accelerator => '<F1>',
 	       -command => [ $text, 'remTag', 'italic' ] );
 
+  # Ornaments (2.08): drawings over or under the text that follow it.
+  $mb->command(-button => ['Ornaments', underline => 0],
+	       -label => 'Box under selection', -underline => 0,
+	       -command => [ $text, 'ornBoxSelection' ] );
+  $mb->command(-button => ['Ornaments', underline => 0],
+	       -label => 'Arrow from mark', -underline => 0,
+	       -command => [ $text, 'ornArrowFromMark' ] );
+  $mb->command(-button => ['Ornaments', underline => 0],
+	       -label => 'Brace under selection', -underline => 1,
+	       -command => [ $text, 'ornBraceSelection' ] );
+  $mb->command(-button => ['Ornaments', underline => 0],
+	       -label => 'Remove all', -underline => 0,
+	       -command => [ $text, 'ornRemoveAll' ] );
+
   #$top->AddScrollbars($text);
   #my %args;
   #$top->ConfigDefault(\%args);
@@ -410,6 +458,7 @@ if ($not_X) {
   $msbmfont = 'msbm10<144>';
   $smallfont = '-*-Tms Rmn-*-*-*-*-12-*-*-*-*-*-*-*';
   $symbolfont = '-*-Tms Rmn-*-*-*-*-20-*-*-*-*-*-*-*';
+  $bigopfont = '-*-Tms Rmn-*-*-*-*-34-*-*-*-*-*-*-*';
 } else {
   $mainfont = '10x20';
   $italicfont = '-*-Courier-*-O-*-*-20-*-*-*-*-*-*-*';
@@ -422,6 +471,7 @@ if ($not_X) {
   # The symbols are Unicode characters now, so any font with the glyphs
   # will do (Tk falls back to other fonts for missing glyphs anyway).
   $symbolfont = '-*-Times-*-*-*-*-20-*-*-*-*-*-*-*';
+  $bigopfont = '-*-Times-Medium-R-*-*-34-*-*-*-*-*-*-*'; # Big operators.
 }
 
 destroy $popupString if Exists $popupString;
@@ -460,9 +510,17 @@ $text->block('configure', 'Std', "-layoutcmd" => \&recursiveLayout,
 	     '-layoutdepth' => -1, 
 	     '-layoutwidths' => [[1,12]]);
 
+# The bar of a fraction follows from the boxes alone: a template
+# (-ornaments), drawn for every Fraction, 2 pixels thick just under the
+# numerator (leaf 0), from the left to the right of the block, 1 pixel
+# in from each side.
 $text->block('configure', 'Fraction', "-layoutcmd" => \&layoutFraction,
 	     '-layoutdepth' => 1, 
-	     '-layoutwidths' => [2]);
+	     '-layoutwidths' => [2],
+	     -ornaments =>
+	     [['line', [offset => [xy => [block => 'w'], [leaf => 0, 's']], 1, 1],
+	       [offset => [xy => [block => 'e'], [leaf => 0, 's']], -1, 1],
+	       -width => 2]]);
 
 $text->block('configure', 'SuperSub', "-layoutcmd" => \&layoutSuperSub,
 	     '-layoutdepth' => 1, 
@@ -490,6 +548,14 @@ $text->block('configure', 'Table',
 $text->block('configure', 'LR', 
 	     -layoutcmd => \&layoutLR,
 	     -layoutdepth => 1, -layoutwidths => [1]);
+
+# A big operator with limits, R( op | Lower( l1 | l2 ... ) | upper | index ):
+# a ragged tree, given to the callback as it is (no -layoutdepth).
+$text->block('configure', 'OpLimits', -layoutcmd => \&layoutOpLimits);
+
+# A table whose cells may span columns and rows, R( Row( c | c ...) | ...):
+# the spans are the values of the cells (see layoutSpanTable).
+$text->block('configure', 'SpanTable', -layoutcmd => \&layoutSpanTable);
 
 #$text->block('configure', 'Tab', "-layoutcmd" => sub {layoutTab(5, 35, @_)},
 #	     -empty => 'on');
@@ -531,6 +597,11 @@ $text->bind( "<${prefix}l>",
 $text->bind( "<${prefix}w>",
 	    sub {$text->window( 'create', 'insert', -window => $testbutton);
 	         $text->break});
+$text->bind( "<${prefix}o>", ['insertOpLimits', 'insert', 1]);
+$text->bind( "<${prefix}g>", ['insertSpanTable', 'insert', 2, 2, 1]);
+$text->bind( "<${prefix}h>", ['growSpan', 'insert', 1, 0, 1]);
+$text->bind( "<${prefix}j>", ['growSpan', 'insert', 0, 1, 1]);
+$text->bind( "<${prefix}k>", ['setSpan', 'insert', 1, 1, 1]);
 
 my $default_bindtags = [$text, ref $text, $text->toplevel,'all'];
 my $busy_bindtags = ['Tk::ROText', $text->toplevel,'all'];
@@ -628,6 +699,65 @@ sub Tk::eText::example5 {
 		     (bless ['Tab'], Tk::Text::Block), "|");
 }
 
+# The owner's notation OpLimits{\x{2211}|(p=17|p is prime)|1000|*}: the
+# operator, the lower limit (a node of two lines), the upper limit and
+# the index, here a starred sum.
+sub opLimitsPrimes {
+  mkBlock('OpLimits', mkTagged("\x{2211}", 'bigop'),
+	  mkNode('p=17', 'p is prime'), '1000', '*');
+}
+
+sub Tk::eText::exampleOpLimits {
+  shift->blockInsert(shift, 
+		     opLimitsPrimes(), " f(p) + ",
+		     # \int_0^{1/2}: a leaf (not a node) as the lower limit,
+		     # a fraction in the upper one, no index.
+		     mkBlock('OpLimits', mkTagged("\x{222B}", 'bigop'), '0',
+			     [mkBlock('Fraction', '1', '2')]),
+		     " g + ",
+		     # Three lines below, empty upper limit and index.
+		     mkBlock('OpLimits', mkTagged("\x{220F}", 'bigop'),
+			     mkNode('i=1', 'i odd', 'i<n'), '', ''),
+		     " h");
+}
+
+# What editing can leave: the operator alone (a single leaf), an empty
+# operator and lower limit, a lower limit with nodes in it, children
+# after the index.
+sub Tk::eText::exampleOpLimitsOdd {
+  my ($widget, $pos) = @_;
+  $widget->blockInsert($pos,
+		       mkBlock('OpLimits', mkTagged("\x{2211}", 'bigop')), " ",
+		       mkBlock('OpLimits', '', mkNode(''), 'n'), " ",
+		       mkBlock('OpLimits', mkTagged("\x{22C3}", 'bigop'),
+			       mkNode('k', mkNode('a', 'b')), 'N', '2',
+			       'extra', mkNode('more', 'lines')),
+		       " ");
+}
+
+# Two tables.  The first has a header of two rows: "Name" spans them,
+# "Results" spans the two columns of "A" and "B" (the second row lists
+# only "A" and "B": "Name" covers its first slot).  In the second, the
+# note spans two short rows and is taller than both: they grow.
+sub Tk::eText::exampleSpanTables {
+  my ($widget, $pos) = @_;
+  $widget->blockInsert($pos,
+    mkBlock(['SpanTable', newSpanTableKey()],
+	    mkNode(mkValued('Name', { rows => 2 }),
+		   mkValued('Results', { cols => 2 })),
+	    mkNode('A', 'B'),
+	    mkNode('alpha', '1', '2'),
+	    mkNode('beta', '3', [mkBlock('Fraction', '1', '2')])),
+    "  ",
+    mkBlock(['SpanTable', newSpanTableKey()],
+	    mkNode('Item', 'Note'),
+	    mkNode('x', mkValued(mkNode('This note', 'is four lines',
+					'tall: the rows', 'it spans grow'),
+				 '1x2')),
+	    mkNode('y'),
+	    mkNode('z', 'short')));
+}
+
 sub Tk::eText::example10 {
   shift->blockInsert(shift, 
 		     (bless ['Std'], Tk::Text::Block));
@@ -638,6 +768,8 @@ $text->bind( "<F2>", ['example2', 'insert']);
 $text->bind( "<F3>", ['example3', 'insert']);
 $text->bind( "<F4>", ['example4', 'insert']);
 $text->bind( "<F5>", ['example5', 'insert']);
+$text->bind( "<F6>", ['exampleOpLimits', 'insert']);
+$text->bind( "<F7>", ['exampleSpanTables', 'insert']);
 $text->bind( "<F10>", ['example10', 'insert']);
 
 $text->tag('configure', 'commentTeX', -foreground => 'red');
@@ -658,6 +790,7 @@ $text->tag('configure', 'operatorname', -foreground => 'green');
 $text->tag('configure', 'operatornamewithlimits', -foreground => 'blue');
 $text->tag('configure', 'raised', -border => 2, -relief => 'raised');
 $text->tag('configure', 'small', -font => $smallfont);
+$text->tag('configure', 'bigop', -font => $bigopfont);
 $text->tag('configure', 'lmargin1', -lmargin1 => 30);
 $text->tag('configure', 'black', -background => 'black');
 eval {
@@ -683,20 +816,12 @@ $text->tag('configure', 'backgr3', -background => 'lightblue',
 sub init_ornaments {
   $text->block('deletelines');
   
-  $text->insert('1.0', "\n", [qw(black)]);
-  $blackLine = $text->block('addline', '1.0');
-  $text->delete('1.0', '2.0');	# whole ornament line (indices count bytes)
-  
-  #$text->insert('1.0', "v\n", [qw(blue red)]);
-  #$fractionLine =  $text->block('addline', '1.0');
-  #$text->delete('1.0', '2.0');	# whole ornament line (indices count bytes)
-  
-  # Ornaments used by the layout procedures below.  (Originally these
-  # were glyph codes of the X11 "symbol" font; Perl/Tk 804 wants Unicode.)
-  $text->insert('1.0', "\x{221A}\n", [qw(symbol)]);	# radical sign
-  $radicalCheck = $text->block('addline', '1.0');
-  $text->delete('1.0', '2.0');	# whole ornament line (indices count bytes)
-  
+  # "Stolen" lines (block addline) used by the layout procedures below
+  # as pictures: the delimiters of LR and the backgrounds.  (Originally
+  # glyph codes of the X11 "symbol" font; Perl/Tk 804 wants Unicode.)
+  # The strokes (the radical sign, the bars of fractions, the rules of
+  # tables, the lines of Std) are ornaments since 2.08: see rule() and
+  # layoutRadical, and the -ornaments of Fraction.
   foreach $symb (split '', ' {}[]()<>|') {
     $text->insert('1.0', "$symb\n", [qw()]);
     $LR{$symb} = $text->block('addline', '1.0');
@@ -743,6 +868,16 @@ sub init_contents {
   $text->insert('1.0', "\x{239C}\x{239C}\n", [qw(backgr3 symbol)]);
 }
 
+# The examples of the big operators and the tables, below the rest.
+sub init_contents2 {
+  $text->insert('end', "\nA starred sum over primes: ");
+  $text->blockInsert('end - 1 c', opLimitsPrimes());
+  $text->insert('end', ".\nMore: ");
+  $text->exampleOpLimits('end - 1 c');
+  $text->insert('end', "\nTables:\n");
+  $text->exampleSpanTables('end - 1 c');
+}
+
 sub init_contents1 {
   my @abc;
   splice @abc, 0,0, ();		# To be able to set a breakpoint
@@ -750,6 +885,7 @@ sub init_contents1 {
 }
 
 init_contents1();
+init_contents2();
 
 $fractionWidth = 2;
 $fractionWidthHalf = $fractionWidth + 1/2;
@@ -843,12 +979,34 @@ sub dumpVar {local %dumpvar::address; dumpvar::unwrap(shift,0);}
 # internal blocks, the third of additional blocks, and 3 others are just
 # copies of what it got.
 
+# A rule: a black box (x, y, width, height), as an ornament returned
+# by a layout callback (a filled rectangle, in block coordinates).
+sub rule {
+  my ($x, $y, $w, $h) = map int, @_;	# Whole pixels, as stolen lines.
+  ['rectangle', $x, $y, $x + $w, $y + $h, -fill => 'black', -outline => undef];
+}
+
+# Moves an additional element of a layout result: an ornament (its
+# coordinates, up to its options) or a stolen line (its x and y).
+sub shiftEntry {
+  my ($e, $dx, $dy) = @_;
+  if ($e->[0] =~ /^[a-z]/) {
+    for (my $i = 1; $i + 1 < @$e and $e->[$i] !~ /^-[a-z]/; $i += 2) {
+      $e->[$i] += $dx;
+      $e->[$i + 1] += $dy;
+    }
+  } else {
+    $e->[1] += $dx;
+    $e->[2] += $dy;
+  }
+  $e;
+}
+
 sub descendTree {
   my ($dx, $dy, $res, $add, @tree) = @_;
   #dumpValue (\@_);
   for (@$add) {
-    $_->[1] += $dx;
-    $_->[2] += $dy;
+    shiftEntry($_, $dx, $dy);
     push( @addlines, $_ );
   }
   my $i = 0;
@@ -903,11 +1061,9 @@ sub stdTree {			# Example Layout: makes almost the same as
     $trow->[1] -= $y;		# Make relative.
     splice(@$trow, 1, 0, $treelineLen); # Insert $tl after the first element - x coord
     push(@out, $trow);
-    push(@addl,[$blackLine,0,$trow->[2] + $trow->[5]/2,
-		$treelineLen,$treelineLen,$treeline,0]);
+    push(@addl, rule(0, $trow->[2] + $trow->[5]/2, $treelineLen, $treeline));
   }
-  push(@addl,
-       [$blackLine,0,$uppermid,$treeline,$treeline,$lowermid - $uppermid,0]);
+  push(@addl, rule(0, $uppermid, $treeline, $lowermid - $uppermid));
   #print "X";
   #dumpVar \@out;
   return [\@block,\@out,\@addl,@_];
@@ -965,8 +1121,7 @@ sub layoutFraction {		#block x super sub
 	      $super->[2], $super->[4], $super->[5]],
 	     [$sub->[0], $shift2, $sub->[1] + $fractionWidth, $sub->[2],
 	      $sub->[2], $sub->[4], $sub->[5]],
-	     [$blackLine, 1, $super->[4], $w - 2, $w - 2, 2, 1],
-	    );
+	    );			# The bar: the -ornaments of Fraction.
   #dumpValue( \@out );
   return @out;
 }
@@ -1005,40 +1160,32 @@ sub layoutSuperSub {		#block x super sub
   return @out;
 }
 
+# The radical sign is a broken line drawn by the callback (ornaments):
+# a short tick rising to the right, a stroke down to the bottom of the
+# block (thicker), a long one up to the top left of the contents, and
+# the bar over them.  It grows with the contents: the tick stays near
+# the bottom, the sign gets a little wider with the height.
 sub layoutRadical {		# block x row
   my ($block, $x, $row) = (shift, shift, shift);
-  my $h = $row->[4];
-  my $vlx = 9;
-  my $hlw = 2;
-  my $vlw = 1;
-  my $addxoff = 1;
-  my $rcYoff = 1;
-  my $xoff = $vlx + $hlw + $addxoff;
-  my $checkH = 20;
-  my $checkB = 15;
-  my $addHeight = 3;
-  $addHeight = $checkB - $h + $addHeight - 1 if $h < $checkB;
-  my $vlH = 0;
-  my $vrow = [];
-  if ($h > $checkB) {
-    $vlH = $h - $checkB;
-    $vrow = [$blackLine, $vlx, 0, $vlw, $vlw, $vlH, 0];
-  }
+  my ($w, $h) = @$row[2, 4];
+  my $addHeight = 3;		# Room above the contents for the bar.
+  my $H = $h + $addHeight + 1;	# The block; the stroke ends at $H - 1.
+  my $sw = 8 + int($H / 12);	# The width of the sign.
+  my $xoff = $sw + 2;		# The contents.
+  my $wtot = $xoff + $w + 1;
   my $b = $row->[5] + $addHeight;
-  my $h_ = $h + $addHeight;
-  my $wtot = $row->[2] + $xoff;
-  my $hll = $row->[2] + $vlw + $addxoff;
+  my $tickY = $H - 1 - ($H * 0.45 < 9 ? int($H * 0.45) : 9);
+  my @tick = (0, $tickY + 3);
+  my @peak = (int($sw * 0.3), $tickY);
+  my @bottom = (int($sw * 0.55), $H - 1);
+  my @top = ($sw, 1);
   $row->[1] = $xoff;
   splice @$row, 2, 0, $addHeight;
   $#$row = 6;
-  my $hrow = [$blackLine, $vlx, 0, $hll, $hll, $hlw, $hlw];
-  my $totblock = [-1, 0, 0, $wtot, $wtot, $h_, $b];
-  my $check = [$radicalCheck, 0, $vlH + $rcYoff, 0, 0, $checkH, $checkB];
-  if ( @$vrow ) {
-    return ($totblock, $row, $hrow, $vrow, $check);
-  } else {
-    return ($totblock, $row, $hrow, $check);
-  }
+  ([-1, 0, 0, $wtot, $wtot, $H, $b],
+   $row,
+   ['line', @tick, @peak, @bottom, @top, $wtot - 1, 1, -width => 1],
+   ['line', @peak, @bottom, -width => 2]);
 }
 
 sub layoutEquation {		# block x row
@@ -1162,15 +1309,14 @@ sub layoutTable {		# xgap ygap xborder yborder linew block x rows
   my $h = $baselines[-1] + $rowdec[-1] + $yborder;
   my @outrows;
   my @addrows;
-  if ($linew) {
-    push @addrows, [$blackLine, 0, 0, $tw, $tw, $linew, 0];
-    push @addrows, [$blackLine, 0, $h - $linew, $tw, $tw, $linew, 0];
-    push @addrows, [$blackLine, 0, 0, $linew, $linew, $h, 0];
-    push @addrows, [$blackLine, $tw - $linew, 0, $linew, $linew, $h, 0];
+  if ($linew) {			# The rules: ornaments.
+    push @addrows, rule(0, 0, $tw, $linew);
+    push @addrows, rule(0, $h - $linew, $tw, $linew);
+    push @addrows, rule(0, 0, $linew, $h);
+    push @addrows, rule($tw - $linew, 0, $linew, $h);
     foreach $col (0 .. $#colw - 1) {
-      push @addrows, [$blackLine, 
-		      $xmiddles[$col] + ($colw[$col] + $xgap - $linew)/2, 
-		      0, $linew, $linew, $h, 0];
+      push @addrows, rule($xmiddles[$col] + ($colw[$col] + $xgap - $linew)/2,
+			  0, $linew, $h);
     }
   }
   foreach $row (0 .. $#rows) {
@@ -1181,13 +1327,370 @@ sub layoutTable {		# xgap ygap xborder yborder linew block x rows
       $baselines[$row] - $rows[$row]->[$col][5];
       push @outrows, \@{$rows[$row]->[$col]};
     }
-    if ($linew) {
-      push @addrows, [$blackLine, 0, 
-		      $baselines[$row] + $rowdec[$row] + ($ygap - $linew)/2, 
-		      $tw, $tw, $linew, 0];
+    if ($linew and $row < $#rows) {
+      push @addrows, rule(0, $baselines[$row] + $rowdec[$row] + ($ygap - $linew)/2,
+			  $tw, $linew);
     }
   }
   ([-1, 0, 0, $tw, $tw, $h, $h/2 + $stdAscentHalf], @outrows, @addrows);
+}
+
+# Boxes, for the layouts of OpLimits and SpanTable, which get the tree
+# as it is (ragged, a single leaf, any number of children).  A box is
+# { w => width, h => height, b => baseline (from its top),
+#   leaves => [[1, x, y, w, w, h, b], ...]	# its leaves, in order
+#   add => [[id, x, y, w, w, h, b], ...] }	# lines and ornaments
+# with the coordinates relative to its upper-left corner.
+
+sub leafBox {			# An argument of a layout callback: a leaf.
+  my $l = shift;
+  my ($w, $h, $b) = map { int($_ || 0) } @$l[2, 4, 5];
+  { w => $w, h => $h, b => $b, leaves => [[1, 0, 0, $w, $w, $h, $b]],
+    add => [], leaf => 1 };
+}
+
+sub moveBox {
+  my ($box, $dx, $dy) = @_;
+  for (@{$box->{leaves}}, @{$box->{add}}) {
+    shiftEntry($_, $dx, $dy);
+  }
+  $box;
+}
+
+sub stackBox {			# One under another, centered; the
+				# baseline is the first one's.
+  my @kids = @_;
+  my $w = 0;
+  for (@kids) { $w = $_->{w} if $w < $_->{w} }
+  my $y = 0;
+  my $box = { w => $w, b => (@kids ? $kids[0]{b} : 0),
+	      leaves => [], add => [] };
+  for (@kids) {
+    moveBox($_, int(($w - $_->{w})/2), $y);
+    $y += $_->{h};
+    push @{$box->{leaves}}, @{$_->{leaves}};
+    push @{$box->{add}}, @{$_->{add}};
+  }
+  $box->{h} = $y;
+  $box;
+}
+
+# An argument: a leaf, or a node (a list); with $empty, its empty
+# leaves get squares of this size (see placeholder).
+sub argBox {
+  my ($arg, $empty) = @_;
+  return placeholder(leafBox($arg), $empty) unless ref $arg->[0];
+  stackBox(map argBox($_, $empty), @$arg);
+}
+
+sub mergeBox {			# Add the leaves and ornaments of boxes
+  my $box = shift;		# placed inside $box.
+  for (@_) {
+    push @{$box->{leaves}}, @{$_->{leaves}};
+    push @{$box->{add}}, @{$_->{add}};
+  }
+  $box;
+}
+
+# An empty leaf gets a small raised square of $size pixels, to see
+# where to type.
+sub placeholder {
+  my ($box, $size) = @_;
+  return $box unless $size and $box->{leaf} and $box->{w} == 0;
+  my $h = $size + 2;
+  $h = $box->{h} if $h > $box->{h};
+  $box->{w} = $size;
+  my $y = int(($box->{h} - $h)/2);
+  push @{$box->{add}}, [$backgrId2, 0, $y, $size, $size, $h, $h];
+  $box;
+}
+
+# OpLimits: R( op | lower | upper | index | extra ... ).  The operator is
+# centered in a column, the upper limit above it, the lower limit below
+# it (a node: its lines stacked, centered), the index to the right of
+# the operator at superscript height; children after the fourth go to
+# the right, on the baseline.  Missing children are not drawn, a node
+# where a leaf is expected is a stack of its leaves, an empty limit is
+# a small square.  The baseline is on the operator's axis.
+sub layoutOpLimits {
+  my ($data, $x, @kids) = @_;
+  my $gap = 2;
+  my ($op, $lower, $upper, $index, @extra) = map argBox($_, 8), @kids;
+  $op = argBox($kids[0], 14);
+  my $colw = 0;
+  for (grep defined, $op, $lower, $upper) { $colw = $_->{w} if $colw < $_->{w} }
+  my $y = 0;
+  if ($upper) {
+    moveBox($upper, int(($colw - $upper->{w})/2), 0);
+    $y = $upper->{h} + $gap;
+  }
+  my $opy = $y;
+  my $opx = int(($colw - $op->{w})/2);
+  moveBox($op, $opx, $opy);
+  $y += $op->{h};
+  if ($lower) {
+    $y += $gap;
+    moveBox($lower, int(($colw - $lower->{w})/2), $y);
+    $y += $lower->{h};
+  }
+  my ($top, $bottom, $right) = (0, $y, $colw);
+  if ($index) {
+    my $ix = $opx + $op->{w} + $gap;
+    # Its baseline at 2/5 of the ascent of the operator, but not into
+    # an upper limit that reaches over it.
+    my $iy = $opy + int($op->{b} * 2/5) - $index->{b};
+    $iy = $opy if $upper and $iy < $opy
+      and int(($colw - $upper->{w})/2) + $upper->{w} > $ix;
+    moveBox($index, $ix, $iy);
+    $top = $iy if $top > $iy;
+    $bottom = $iy + $index->{h} if $bottom < $iy + $index->{h};
+    $right = $ix + $index->{w} if $right < $ix + $index->{w};
+  }
+  my $base = $opy + int($op->{h}/2) + $stdAscentHalf;	# The axis.
+  for (@extra) {
+    my ($ex, $ey) = ($right + $gap + 2, $base - $_->{b});
+    moveBox($_, $ex, $ey);
+    $right = $ex + $_->{w};
+    $top = $ey if $top > $ey;
+    $bottom = $ey + $_->{h} if $bottom < $ey + $_->{h};
+  }
+  my $all = mergeBox({ leaves => [], add => [] },
+		     grep defined, $op, $lower, $upper, $index, @extra);
+  moveBox($all, 0, -$top) if $top;
+  $base -= $top;
+  $bottom -= $top;
+  $bottom = $base if $bottom < $base;
+  ([-1, 0, 0, $right, $right, $bottom, $base],
+   @{$all->{leaves}}, @{$all->{add}});
+}
+
+# SpanTable: R( Row( cell | cell ... ) | Row( ... ) ... ).  A cell may
+# span columns and rows: its value (block nodedata, at level 0 for a
+# cell that is a leaf) is { cols => 2, rows => 3 } or the string "2x3"
+# (columns x rows).  As in HTML, a slot covered by a cell spanning from
+# above is not in the later rows: the cells of a row take the next
+# free slots from the left, and a row may be shorter than others (the
+# slots left are holes, without rules).  A span reaching past the last
+# row stops there.  The columns are as wide and the rows as tall as
+# their widest and tallest cell, and a cell spanning several of them
+# that does not fit makes them wider (taller), equally.  The cells of
+# a row share its baseline; a cell spanning rows is centered in them.
+# Rules go between the cells and around the table, not across a cell.
+# Degenerate trees: a row that is a leaf is a row of one cell; a cell
+# that is a node (block sprout) is a cell of its leaves stacked (its
+# span is the node's value); a block that is a single leaf is a table
+# of one cell.
+#
+# The layout callback gets no values: it finds them in "block list" of
+# the text, as the node values of the SpanTable block whose instance
+# data is the very reference it got (insertSpanTable gives every table
+# a hash of its own; a table without instance data has no spans).  And
+# setting a value does not redisplay: setSpan sets the instance data
+# again, which does.
+
+sub spanTableValues {
+  my $data = shift;
+  my ($widget, $key) = @$data[1, 2];
+  return undef unless ref $key;
+  my @todo = $widget->block('list', '1.0', 'end');
+  while (@todo) {
+    my $e = shift @todo;
+    next unless ref $e eq 'Tk::Text::Block';
+    my $head = $e->[0];
+    return $head->[3] if $head->[0] eq 'SpanTable' and ref $head->[2]
+      and $head->[2] == $key;	# The same reference.
+    push @todo, @$e[1 .. $#$e];
+  }
+  undef;
+}
+
+sub cellSpan {			# An element of the tree of values.
+  my $v = shift;
+  my $s = ref $v eq 'ARRAY' ? $v->[0] : undef;
+  my ($c, $r) = (1, 1);
+  if (ref $s eq 'HASH') {
+    ($c, $r) = ($s->{cols}, $s->{rows});
+  } elsif (defined $s and !ref $s and $s =~ /^\s*(\d+)\s*x\s*(\d+)\s*$/) {
+    ($c, $r) = ($1, $2);
+  }
+  map { (defined $_ and /^\d+$/ and $_ >= 1) ? ($_ > 100 ? 100 : $_) : 1 }
+    $c, $r;
+}
+
+sub layoutSpanTable {
+  my ($data, $x, @rows) = @_;
+  my ($padx, $pady, $lw) = (4, 2, 1);
+  my $values = spanTableValues($data);
+  # A single leaf has the tree of values [value].
+  $values = [undef, $values] if $values and @$values == 1;
+  my (@cells, @owner);
+  my $nrows = @rows;
+  my $ncols = 0;
+  foreach my $r (0 .. $#rows) {
+    my $row = $rows[$r];
+    my $rv = $values ? $values->[$r + 1] : undef;
+    my @kids = ref $row->[0] ? @$row : ($row);
+    my @kv = ref $row->[0] ? (ref $rv ? @$rv[1 .. $#$rv] : ()) : ($rv);
+    my $c = 0;
+    foreach my $k (0 .. $#kids) {
+      $c++ while defined $owner[$r][$c];
+      my ($cs, $rs) = cellSpan($kv[$k]);
+      $rs = $nrows - $r if $r + $rs > $nrows;
+      my $cell = { box => argBox($kids[$k]), r => $r, c => $c,
+		   cs => $cs, rs => $rs, n => scalar @cells };
+      push @cells, $cell;
+      foreach my $rr ($r .. $r + $rs - 1) {
+	foreach my $cc ($c .. $c + $cs - 1) {
+	  $owner[$rr][$cc] = $cell->{n};
+	}
+      }
+      $c += $cs;
+      $ncols = $c if $ncols < $c;
+    }
+  }
+  # Sizes: first the cells in one column (row), then the others, the
+  # narrow (short) spans first.
+  my (@colw, @rowa, @rowd);
+  $colw[$_] = 0 for 0 .. $ncols - 1;
+  $rowa[$_] = $rowd[$_] = 0 for 0 .. $nrows - 1;
+  my $sep = $lw + 2*$padx;	# Between two columns' contents.
+  foreach my $cell (sort { $a->{cs} <=> $b->{cs} } @cells) {
+    my ($c, $cs, $w) = (@$cell{qw(c cs)}, $cell->{box}{w});
+    my $have = ($cs - 1) * $sep;
+    $have += $colw[$_] for $c .. $c + $cs - 1;
+    next if $have >= $w;
+    my $more = $w - $have;
+    $colw[$_] += int($more/$cs) for $c .. $c + $cs - 1;
+    $colw[$c + $cs - 1] += $more % $cs;
+  }
+  foreach my $cell (grep $_->{rs} == 1, @cells) {
+    my ($r, $b) = ($cell->{r}, $cell->{box}{b});
+    my $d = $cell->{box}{h} - $b;
+    $rowa[$r] = $b if $rowa[$r] < $b;
+    $rowd[$r] = $d if $rowd[$r] < $d;
+  }
+  my $vsep = $lw + 2*$pady;
+  foreach my $cell (sort { $a->{rs} <=> $b->{rs} } grep $_->{rs} > 1, @cells) {
+    my ($r, $rs, $h) = (@$cell{qw(r rs)}, $cell->{box}{h});
+    my $have = ($rs - 1) * $vsep;
+    $have += $rowa[$_] + $rowd[$_] for $r .. $r + $rs - 1;
+    next if $have >= $h;
+    my $more = $h - $have;
+    $rowd[$_] += int($more/$rs) for $r .. $r + $rs - 1;
+    $rowd[$r + $rs - 1] += $more % $rs;
+  }
+  # The grid lines (their left or upper edges).
+  my (@xl, @yl) = (0);
+  $xl[$_ + 1] = $xl[$_] + $sep + $colw[$_] for 0 .. $ncols - 1;
+  $yl[0] = 0;
+  $yl[$_ + 1] = $yl[$_] + $vsep + $rowa[$_] + $rowd[$_] for 0 .. $nrows - 1;
+  my ($tw, $th) = ($xl[$ncols] + $lw, $yl[$nrows] + $lw);
+  my $table = { leaves => [], add => [] };
+  foreach my $cell (@cells) {
+    my ($r, $c, $rs, $cs, $box) = @$cell{qw(r c rs cs box)};
+    my $aw = $xl[$c + $cs] - $xl[$c] - $sep;
+    my $ah = $yl[$r + $rs] - $yl[$r] - $vsep;
+    my $cx = $xl[$c] + $lw + $padx + int(($aw - $box->{w})/2);
+    my $cy = $yl[$r] + $lw + $pady
+      + ($rs == 1 ? $rowa[$r] - $box->{b} : int(($ah - $box->{h})/2));
+    mergeBox($table, moveBox($box, $cx, $cy));
+  }
+  # Rules: where the slots on the two sides of a grid line belong to
+  # different cells (outside the table: 'o', a hole: 'h').
+  my $slot = sub {
+    my ($r, $c) = @_;
+    return 'o' if $r < 0 or $c < 0 or $r >= $nrows or $c >= $ncols;
+    defined $owner[$r][$c] ? $owner[$r][$c] : 'h';
+  };
+  foreach my $i (0 .. $nrows) {	# Horizontal rules, in runs.
+    my $from;
+    foreach my $c (0 .. $ncols) {
+      my $draw = $c < $ncols && $slot->($i - 1, $c) ne $slot->($i, $c);
+      if ($draw and !defined $from) {
+	$from = $c;
+      } elsif (!$draw and defined $from) {
+	my $len = $xl[$c] + $lw - $xl[$from];
+	push @{$table->{add}}, rule($xl[$from], $yl[$i], $len, $lw);
+	undef $from;
+      }
+    }
+  }
+  foreach my $j (0 .. $ncols) {	# Vertical rules, in runs.
+    my $from;
+    foreach my $r (0 .. $nrows) {
+      my $draw = $r < $nrows && $slot->($r, $j - 1) ne $slot->($r, $j);
+      if ($draw and !defined $from) {
+	$from = $r;
+      } elsif (!$draw and defined $from) {
+	push @{$table->{add}}, rule($xl[$j], $yl[$from], $lw,
+				    $yl[$r] + $lw - $yl[$from]);
+	undef $from;
+      }
+    }
+  }
+  ([-1, 0, 0, $tw, $tw, $th, int($th/2) + $stdAscentHalf],
+   @{$table->{leaves}}, @{$table->{add}});
+}
+
+# The Ornaments menu.  The indices are plain ones (the selection's
+# ends resolved now): each becomes a private mark of the ornament, so
+# that it follows its characters, and goes with them when they are
+# deleted.
+
+sub Tk::eText::ornSelection {	# The ends of the selection, or ().
+  my $w = shift;
+  my @r = $w->tagRanges('sel');
+  @r ? ($w->index($r[0]), $w->index($r[-1])) : ();
+}
+
+# A light box under the selected text, a little larger than its range.
+sub Tk::eText::ornBoxSelection {
+  my $w = shift;
+  my ($f, $l) = $w->ornSelection or return $w->bell;
+  $w->ornamentCreate('rectangle', [offset => [range => $f, $l, 'nw'], -2, -1],
+		     [offset => [range => $f, $l, 'se'], 2, 1],
+		     -fill => '#fff2a8', -outline => undef, -layer => 'under');
+}
+
+# First use: the start of the selection becomes the origin of an arrow
+# (the mark ornArrowFrom).  Second use: an arched red arrow from there
+# to the top of the selection; the origin is forgotten.
+sub Tk::eText::ornArrowFromMark {
+  my $w = shift;
+  my ($f, $l) = $w->ornSelection or return $w->bell;
+  unless (grep { $_ eq 'ornArrowFrom' } $w->markNames) {
+    $w->markSet(ornArrowFrom => $f);
+    return;
+  }
+  my $from = $w->index('ornArrowFrom');
+  $w->markUnset('ornArrowFrom');
+  my ($a, $b) = ([at => $from, 'n'], [range => $f, $l, 'n']);
+  $w->ornamentCreate('line', $a, [offset => [mix => 1, $a, 1, $b], 0, '-1.5em'], $b,
+		     -smooth => 1, -arrow => 'last', -fill => 'red', -width => 2);
+}
+
+# An underbrace under the selection: a smoothed line from its left end
+# down and across to the middle, a point down there, and back up to its
+# right end; the sizes in em of the largest font of the selection.
+sub Tk::eText::ornBraceSelection {
+  my $w = shift;
+  my ($f, $l) = $w->ornSelection or return $w->bell;
+  my $p = sub { [offset => [range => $f, $l, $_[0]], $_[1], $_[2]] };
+  # A point twice: the line passes through it (a corner).
+  $w->ornamentCreate('line',
+		     $p->('sw', 0, '0.1em'), $p->('sw', 0, '0.5em'),
+		     $p->('sw', '0.5em', '0.5em'), $p->('s', '-0.5em', '0.5em'),
+		     $p->('s', 0, '0.5em'), $p->('s', 0, '1em'), $p->('s', 0, '1em'),
+		     $p->('s', 0, '0.5em'), $p->('s', '0.5em', '0.5em'),
+		     $p->('se', '-0.5em', '0.5em'), $p->('se', 0, '0.5em'),
+		     $p->('se', 0, '0.1em'),
+		     -smooth => 1, -fill => 'blue', -width => 1);
+}
+
+sub Tk::eText::ornRemoveAll {
+  my $w = shift;
+  $w->ornamentDelete($w->ornamentNames);
+  $w->markUnset('ornArrowFrom') if grep { $_ eq 'ornArrowFrom' } $w->markNames;
 }
 
 sub Tk::eText::insertBlock {
@@ -1214,6 +1717,83 @@ sub Tk::eText::insertBlockWithData {
     $widget->SetCursor('insert-1c');
   }
   $widget->break if shift;
+}
+
+# A big operator with empty limits and index (or, with a selection, an
+# OpLimits block around it, as the other types).
+sub Tk::eText::insertOpLimits {
+  my ($widget, $pos, $break) = @_;
+  if ($widget->tag('nextrange','sel','0.0')) {
+    $widget->insertBlock('OpLimits');
+  } else {
+    $widget->mark('set', 'opLimits', $pos);
+    $widget->mark('gravity', 'opLimits', 'left');
+    $widget->blockInsert($pos, mkBlock('OpLimits', mkTagged("\x{2211}", 'bigop'),
+				       mkNode(''), '', ''));
+    $widget->SetCursor('opLimits + 3 c');	# In the lower limit.
+    $widget->mark('unset', 'opLimits');
+  }
+  $widget->break if $break;
+}
+
+$spanTables = 0;
+sub newSpanTableKey { { table => ++$spanTables } }
+
+# An empty table of $rows rows and $cols columns.
+sub Tk::eText::insertSpanTable {
+  my ($widget, $pos, $rows, $cols, $break) = @_;
+  $widget->blockInsert($pos, mkBlock(['SpanTable', newSpanTableKey()],
+				     map mkNode(('') x $cols), 1 .. $rows));
+  $widget->break if $break;
+}
+
+# The cell of a SpanTable at an index (or around the block holding the
+# index): the index of a position naming it and its level, or ().
+sub Tk::eText::spanCell {
+  my ($widget, $index) = @_;
+  my $at = $widget->index($index);
+  while (1) {
+    my ($start, $len, $name) = $widget->block('of', $at);
+    return () unless defined $start;
+    if ($name eq 'SpanTable') {
+      # The child of a row (-3), a row that is a leaf (-2), a table
+      # that is a leaf (-1).
+      for my $level (-3, -2, -1) {
+	return ($at, $level)
+	  if eval { $widget->block('nodedata', $at, $level); 1 };
+      }
+      return ();
+    }
+    $at = $start;		# The head of a nested block: in its leaf.
+  }
+}
+
+# Sets the span of the cell at $index: $cols columns, $rows rows (1 and
+# 1: no span), and redisplays the table.
+sub Tk::eText::setSpan {
+  my ($widget, $index, $cols, $rows, $break) = @_;
+  my ($at, $level) = $widget->spanCell($index);
+  if (defined $at) {
+    $widget->block('nodedata', $at, $level,
+		   ($cols > 1 || $rows > 1) ? { cols => $cols, rows => $rows }
+		   : undef);
+    # The callback finds the values by the instance data; setting it
+    # again redisplays the block.
+    my $key = $widget->block('data', $at);
+    $widget->block('data', $at, ref $key ? $key : newSpanTableKey());
+  }
+  $widget->break if $break;
+}
+
+sub Tk::eText::growSpan {
+  my ($widget, $index, $dcols, $drows, $break) = @_;
+  my ($at, $level) = $widget->spanCell($index);
+  if (defined $at) {
+    my ($c, $r) = cellSpan([$widget->block('nodedata', $at, $level)]);
+    $c += $dcols; $r += $drows;
+    $widget->setSpan($at, ($c < 1 ? 1 : $c), ($r < 1 ? 1 : $r));
+  }
+  $widget->break if $break;
 }
 
 sub Tk::eText::insTag {
@@ -1281,16 +1861,36 @@ sub Tk::eText::range2TeX {
     flashTags($state);		# Depends on order of evaluation :-(
 }
 
-# Takes widget, position, and a list reference. The elements of the
-# list may be:
+# Takes widget, position, and a list of elements to insert there one
+# after another.  An element may be:
 # 
-# a) strings to insert;
+# a) a string to insert;
+#
+# b) a tagged string: bless [string, [tags...]], 'Tk::Text::Tagged';
 # 
-# b) blessed references to blocks
-# 
-# A block object is a list: name, array of arrays of contents
+# c) a block: bless [type, child, child...], 'Tk::Text::Block', where
+#    type is a block name or [name, instance data], and a child (a
+#    child of the root) is
+#    - a string, a tagged string or a block: one leaf;
+#    - an array of such elements: one leaf holding all of them;
+#    - a node: bless [child, child...], 'Tk::Text::Node', whose
+#      children are children as here (so trees of any shape, ragged
+#      trees included, can be written down);
+#    - a child with a value (block nodedata): bless [child, value],
+#      'Tk::Text::Valued'.
+#
+# The tree is built as a user would: newlines make the siblings of a
+# leaf, and a node is a leaf given a node of its own by "block
+# sprout" and then split by newlines.
 
 $biMark = 0;
+$bfMark = 0;
+
+# Constructors for the elements above.
+sub mkBlock { my $type = shift; bless [$type, @_], 'Tk::Text::Block' }
+sub mkNode { bless [@_], 'Tk::Text::Node' }
+sub mkValued { bless [@_[0, 1]], 'Tk::Text::Valued' }
+sub mkTagged { my $s = shift; bless [$s, [@_]], 'Tk::Text::Tagged' }
 
 sub Tk::eText::blockInsert {
   my ($widget, $pos) = (shift,shift);
@@ -1299,19 +1899,14 @@ sub Tk::eText::blockInsert {
   foreach $elt (@_) {
     if (!ref $elt) {	# String to insert
       $widget->insert($mark, $elt);
+    } elsif (ref $elt eq 'Tk::Text::Tagged') {
+      $widget->insert($mark, $elt->[0], $elt->[1]);
     } elsif (ref $elt eq 'Tk::Text::Block') {
-      my $cnt = 1;
-      $widget->block('insert',$elt->[0],$mark);
-      my @what;
-      while ($cnt <= $#$elt) {
-	if (ref $elt->[$cnt]) {
-	  @what = @{$elt->[$cnt]};
-	} else {
-	  @what = $elt->[$cnt];
-	}
-	$widget->blockInsert("$mark -1 c", @what);
-	$widget->insert("$mark -1 c", "\n") if $cnt++ < $#$elt;
-      }
+      my ($type, $data) = ref $elt->[0] ? @{$elt->[0]} : ($elt->[0]);
+      $widget->block('insert', $type, $mark);
+      $widget->block('data', "$mark -1 c", $data) if defined $data;
+      # The block has one empty leaf; its tail is just before $mark.
+      fillLeaf($widget, "$mark -1 c", @$elt[1 .. $#$elt]) if @$elt > 1;
     } else {
       warn "Unknown data type `" . (ref $elt) . "' given to blockInsert";
     }
@@ -1319,6 +1914,59 @@ sub Tk::eText::blockInsert {
   $biMark--;
   $widget->mark('unset',$mark);
   return;
+}
+
+# Fills the empty leaf at $pos (where the leaf ends) with the children
+# (see blockInsert), one leaf for each, siblings of that leaf.
+sub fillLeaf {
+  my ($widget, $pos, @kids) = @_;
+  my $at = "bif" . $bfMark++;		# Moves on with what is inserted.
+  $widget->mark('set', $at, $pos);
+  my (@nodes, @values);
+  my $first = 1;
+  for my $kid (@kids) {
+    $widget->insert($at, "\n") unless $first;	# A sibling leaf.
+    $first = 0;
+    my ($what, $value, $valued) = ($kid);
+    if (ref $what eq 'Tk::Text::Valued') {
+      ($what, $value) = @$what;
+      $valued = 1;
+    }
+    my $here;
+    if ($valued or ref $what eq 'Tk::Text::Node') {
+      $here = "bif" . $bfMark++;	# Stays at the start of this leaf.
+      $widget->mark('set', $here, $at);
+      $widget->mark('gravity', $here, 'left');
+    }
+    if (ref $what eq 'Tk::Text::Node') {
+      push @nodes, [$here, $what];	# An empty leaf, a node later.
+    } else {
+      $widget->blockInsert($at, ref $what eq 'ARRAY' ? @$what : ($what));
+    }
+    if ($valued) {
+      # A node's value goes to the node: as many levels up from its
+      # first leaf as there are nodes on the way down to that leaf.
+      my ($level, $n) = (0, $what);
+      while (ref $n eq 'Tk::Text::Node' and @$n) {
+	$level++;
+	$n = $n->[0];
+	$n = $n->[0] if ref $n eq 'Tk::Text::Valued';
+      }
+      push @values, [$here, $level, $value];
+    }
+  }
+  for my $node (@nodes) {
+    my ($here, $n) = @$node;
+    # The leaf is empty: $here is at the separator (or the tail) after
+    # it, which names it.
+    $widget->block('sprout', $here);
+    fillLeaf($widget, $widget->index($here), @$n) if @$n;
+  }
+  for my $v (@values) {
+    my ($here, $level, $value) = @$v;
+    $widget->block('nodedata', $here, $level, $value);
+  }
+  $widget->mark('unset', $at, map $_->[0], @nodes, @values);
 }
 
 sub listdepth {
@@ -1507,7 +2155,7 @@ sub superSub2TeX {
   }
   my $c = 1;
   my $next = $self->[1];
-  unless (ref $next eq 'Tk::Text::BlockSeparator' and $$next >= $depth) {
+  unless (ref $next eq 'Tk::Text::BlockSeparator' and sepDepth($next) >= $depth) {
     # Have SuperScript
     push @out, ($depth ? '\Sp{' : '^{');
     push @ {$state->{blocks}}, ($depth == 0 ? 0 : 4);
@@ -1518,7 +2166,7 @@ sub superSub2TeX {
     $state->{atBeg} = 1;
     $state->{need_space} = 0;
     until ($c > $#$self
-	   or ref $next eq 'Tk::Text::BlockSeparator' and $$next >= $depth) {
+	   or ref $next eq 'Tk::Text::BlockSeparator' and sepDepth($next) >= $depth) {
       push @out, $next->insertSelfTeX($state);
       $next = $self->[++$c];
     }
@@ -1624,9 +2272,18 @@ sub Eq2TeX {
   @out;
 }
 
+# The stored depth of a separator of "block list": a number, or the
+# pair [depth, defect] before a leaf with padding (a ragged tree), where
+# [undef, defect] stands before a padded first leaf (no separator).
+sub sepDepth {
+  my ($d, $defect) = UNIVERSAL::isa($_[0], 'ARRAY') ? @{$_[0]} : (${$_[0]}, 0);
+  $d // -1;
+}
+
 sub Tk::Text::BlockSeparator::insertSelfTeX {
   my ($self, $state) = (shift, shift);
-  my $level = $ {$state->{depths}}[-1] - $$self;
+  return () if sepDepth($self) < 0;	# Not a separator: [undef, defect].
+  my $level = $ {$state->{depths}}[-1] - sepDepth($self);
   if ($level) {			# Sublevel
     # $ {$state->{level1}}[-1]++;
   } else {
@@ -1803,6 +2460,45 @@ sub Tk::Text::Block::insertSelf {
   }
   $widget->mark('unset', $mark);
   --$widget->{markc};
+  # The header [type, depth, instance data, node values] (block list,
+  # in the manual under dump): give the values back, then the instance
+  # data (setting it redisplays the block, as setSpan relies on).
+  setNodeValues($widget, $pos, $type->[3]) if @$type > 3 and ref $type->[3];
+  $widget->block('data', "$pos + 1c", $type->[2])
+    if @$type > 2 and defined $type->[2];
+}
+
+# Give the node values of a block's header back to the block whose head
+# is at $pos.  The values are the nested form of "block list" (a node as
+# a list of its value followed by its children, a leaf as a list of its
+# value); "block at" gives the same tree as nested lists of leaf lengths,
+# from which each leaf's start follows (a separator or the tail after
+# each leaf).  A node is set at the start of its first leaf, with its
+# distance up from that leaf as the level (as "block nodedata" counts).
+sub setNodeValues {
+  my ($widget, $pos, $vals) = @_;
+  my $struct = ($widget->block('at', $pos))[4];
+  my $first = $widget->index("$pos + 1c");
+  my $off = 0;
+  my $walk;
+  $walk = sub {
+    my ($s, $v) = @_;
+    my ($start, $height);
+    if (!ref $s) {			# A leaf of $s positions.
+      ($start, $height) = ($off, 0);
+      $off += $s + 1;
+    } else {
+      for my $i (0 .. $#$s) {
+	my @r = $walk->($s->[$i], ref $v ? $v->[$i + 1] : undef);
+	($start, $height) = ($r[0], $r[1] + 1) if $i == 0;
+      }
+    }
+    $widget->block('nodedata', "$first + $start c", $height, $v->[0])
+      if ref $v and defined $v->[0];
+    return ($start, $height);
+  };
+  $walk->($struct, $vals);
+  undef $walk;
 }
 
 sub Tk::Text::Empty::insertSelf {	# [type, ?instance data?]
@@ -1817,8 +2513,10 @@ sub Tk::Text::BlockSeparator::insertSelf {
   my $self = shift;
   my $widget = shift;
   my $pos = shift || 'insert';
-  if ($$self) {
-    $widget->block('split', $pos, $$self);
+  my $depth = sepDepth($self);
+  return if $depth < 0;			# [undef, defect]: no separator.
+  if ($depth) {
+    $widget->block('split', $pos, $depth);
   } else {
     $widget->insert($pos, "\n");	# Good for depth 0 only.
   }

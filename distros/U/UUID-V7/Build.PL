@@ -2,7 +2,8 @@
 use strict;
 use warnings;
 
-
+use Config;
+die 'OS unsupported' if $Config{ivsize} < 8;
 use 5.006;
 use Module::Build::Tiny 0.034;
 Build_PL();

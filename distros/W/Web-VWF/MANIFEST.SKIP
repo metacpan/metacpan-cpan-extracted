@@ -83,3 +83,8 @@ CLAUDE.md
 # Super-linter tuning files - not for distribution
 ^\.prettierignore$
 ^\.textlintrc$
+
+# Files the example site writes when it is run (Berkeley DB caches)
+\b__db\.\d+$
+CGI\+3a\+3aInfo\.db
+CGI\+3a\+3aLingua

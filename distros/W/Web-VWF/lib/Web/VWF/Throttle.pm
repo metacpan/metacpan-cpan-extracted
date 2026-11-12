@@ -24,7 +24,7 @@ use warnings;
 
 use Data::Throttler ();	# For Data::Throttler::Backend::YAML, which this extends
 
-use version; our $VERSION = version->declare('0.001.0');
+use version; our $VERSION = version->declare('0.002.0');
 
 =encoding utf8
 
@@ -34,7 +34,7 @@ Web::VWF::Throttle - persistent request throttling that works on Windows too
 
 =head1 VERSION
 
-Version 0.001.0
+Version 0.002.0
 
 =head1 SYNOPSIS
 

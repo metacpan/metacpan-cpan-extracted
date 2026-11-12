@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie.pm
-## Version v0.3.11
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v0.4.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2026/04/01
+## Modified 2026/11/12
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -16,8 +16,8 @@ BEGIN
     use warnings::register;
     use parent qw( Module::Generic );
     use vars qw( $VERSION $SUBS $COOKIE_DEBUG );
-    use DateTime;
-    use DateTime::Format::Strptime;
+    use DateTime::Lite;
+    use DateTime::Format::Lite;
     use Module::Generic::DateTime;
     use URI::Escape ();
     use overload (
@@ -28,7 +28,7 @@ BEGIN
         '=='     => \&same_as,
         fallback => 1,
     );
-    our $VERSION = 'v0.3.11';
+    our $VERSION = 'v0.4.1';
     our $SUBS;
     our $COOKIE_DEBUG = 0;
     use constant CRYPTX_VERSION => '0.074';
@@ -133,7 +133,7 @@ sub apply
     {
         $SUBS = [grep( /^(?!apply|as_hash|as_string|can|fields|import|init|reset)(?:[a-z][a-z\_]+)$/, keys( %Cookie:: ) )];
     }
-    
+
     foreach( @$SUBS )
     {
         # Value could be undef
@@ -144,7 +144,7 @@ sub apply
             $self->{ $_ } = $hash->{ $_ };
             next;
         }
-        
+
         if( CORE::exists( $hash->{ $_ } ) )
         {
             if( !defined( $hash->{ $_ } ) )
@@ -187,7 +187,7 @@ sub as_string
         $name = URI::Escape::uri_escape( $name );
     }
     my $value = $self->value;
-    
+
     if( $self->sign || $self->encrypt )
     {
         my $key = $self->key ||
@@ -227,7 +227,7 @@ sub as_string
             $value = Crypt::Misc::encode_b64( $encrypted );
         }
     }
-    
+
     # Not necessary to encode, but customary and practical
     if( CORE::length( $value ) )
     {
@@ -334,17 +334,16 @@ sub expires
         $self->reset(1);
         my $exp = shift( @_ );
         my $tz;
-        # DateTime::TimeZone::Local will die ungracefully if the local timezone is not set with the error:
-        # "Cannot determine local time zone"
+        # DateTime::Lite::TimeZone::Local will return an error if the local timezone is not set.
         # try-catch
         local $@;
         $tz = eval
         {
-            DateTime::TimeZone->new( name => 'local' );
+            DateTime::Lite::TimeZone->new( name => 'local' );
         };
-        if( $@ )
+        if( $@ || !defined( $tz ) )
         {
-            $tz = DateTime::TimeZone->new( name => 'UTC' );
+            $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
         }
         my $dt;
         # unsets the value
@@ -358,23 +357,42 @@ sub expires
             local $@;
             $dt = eval
             {
-                # Unexpectedly, DateTime sets the time zone ONLY after having instantiated the
+                # Warning: DateTime::Lite sets the time zone ONLY after having instantiated the
                 # object and set its time zone to UTC.
                 # Thus, here setting to 'local' (e.g. corresponding to Asia/Tokyo) would
                 # actually set the epoch to GMT+9 instead of treating the epoch time provided
-                # to being in Asia/Tokyo time zone!
-                # Issue #126
-                # <https://github.com/houseabsolute/DateTime.pm/issues/126>
-                DateTime->from_epoch( epoch => $exp, time_zone => $tz );
+                # to being in Asia/Tokyo time zone.
+                DateTime::Lite->from_epoch( epoch => $exp, time_zone => $tz );
             };
             if( $@ )
             {
                 return( $self->error( "An error occurred while setting the cookie expiration date time based on the unix timestamp '$exp': $@" ) );
             }
+            elsif( !defined( $dt ) )
+            {
+                return( $self->pass_error( DateTime::Lite->error ) );
+            }
         }
-        elsif( $self->_is_object( $exp ) && ( $exp->isa( 'DateTime' ) || $exp->isa( 'Module::Generic::Datetime' ) ) )
+        elsif( $self->_is_a( $exp => [qw( DateTime::Lite DateTime Module::Generic::DateTime )] ) )
         {
-            $dt = $exp;
+            if( $exp->isa( 'DateTime' ) )
+            {
+                $dt = DateTime::Lite->from_object( object => $exp ) ||
+                    return( $self->pass_error( DateTime::Lite->error ) );
+            }
+            elsif( $exp->isa( 'Module::Generic::DateTime' ) )
+            {
+                $dt = $exp->datetime;
+                if( $self->_is_a( $dt => [qw( DateTime )] ) )
+                {
+                    $dt = DateTime::Lite->from_object( object => $dt ) ||
+                        return( $self->pass_error( DateTime::Lite->error ) );
+                }
+            }
+            else
+            {
+                $dt = $exp;
+            }
         }
         elsif( $exp =~ /^([\+\-]?\d+)([YyMDdhms])?$/ )
         {
@@ -393,11 +411,13 @@ sub expires
             };
             my $offset = ( $interval->{ $unit } || 1 ) * int( $num );
             my $ts = time() + $offset;
-            $dt = DateTime->from_epoch( epoch => $ts, time_zone => $tz );
+            $dt = DateTime::Lite->from_epoch( epoch => $ts, time_zone => $tz ) ||
+                return( $self->pass_error( DateTime::Lite->error ) );
         }
         elsif( lc( $exp ) eq 'now' )
         {
-            $dt = DateTime->now( time_zone => $tz );
+            $dt = DateTime::Lite->now( time_zone => $tz ) ||
+                return( $self->pass_error( DateTime::Lite->error ) );
         }
         elsif( defined( $exp ) && CORE::length( $exp ) )
         {
@@ -409,10 +429,10 @@ sub expires
         {
             # Don't know what to do with '$exp'.
         }
-        
+
         if( defined( $dt ) )
         {
-            $dt = $self->_header_datetime( $dt ) if( $self->_is_a( $dt, 'DateTime' ) );
+            $dt = $self->_header_datetime( $dt ) if( $self->_is_a( $dt, [qw( DateTime::Lite DateTime )] ) );
             $self->{expires} = $dt->isa( 'Module::Generic::DateTime' ) ? $dt : Module::Generic::DateTime->new( $dt );
         }
     }
@@ -440,12 +460,13 @@ sub is_expired
     my $exp = $self->expires;
     my $max_age = $self->max_age;
     return( $self->false ) if( !defined( $exp ) && !defined( $max_age ) );
-    if( ( defined( $exp ) && !$self->_is_a( $exp, 'Module::Generic::DateTime' ) && !$self->_is_a( $exp, 'DateTime' ) ) ||
+    if( ( defined( $exp ) && !$self->_is_a( $exp, 'Module::Generic::DateTime' ) && !$self->_is_a( $exp, [qw( DateTime::Lite DateTime )] ) ) ||
         ( defined( $max_age ) && $max_age !~ /\-?\d+$/ ) )
     {
         return( $self->false );
     }
-    my $now = DateTime->now;
+    my $now = DateTime::Lite->now ||
+        return( $self->pass_error( DateTime::Lite->error ) );
     if( ( defined( $max_age ) && $max_age <= 0 ) || 
         ( defined( $exp ) && $exp < $now ) )
     {
@@ -550,7 +571,7 @@ sub max_age
             my $exp;
             if( $v <= 0 )
             {
-                $exp = DateTime->new(
+                $exp = DateTime::Lite->new(
                     year   => 1970,
                     month  => 1,
                     day    => 1,
@@ -563,19 +584,19 @@ sub max_age
             else
             {
                 my $tz;
-                # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
-                # "Cannot determine local time zone"
+                # DateTime::Lite::TimeZone::Local will return an error if the local timezone is not set.
                 # try-catch
                 local $@;
                 $tz = eval
                 {
-                    DateTime::TimeZone->new( name => 'local' );
+                    DateTime::Lite::TimeZone->new( name => 'local' );
                 };
-                if( $@ )
+                if( $@ || !defined( $tz ) )
                 {
-                    $tz = DateTime::TimeZone->new( name => 'UTC' );
+                    $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
                 }
-                $exp = DateTime->now( time_zone => $tz );
+                $exp = DateTime::Lite->now( time_zone => $tz ) ||
+                    return( $self->pass_error( DateTime::Lite->error ) );
                 $exp->add( seconds => $v );
             }
             $self->expires( $exp );
@@ -743,14 +764,22 @@ sub _header_datetime
     if( @_ )
     {
         return( $self->error( "Date time provided ($dt) is not an object." ) ) if( !$self->_is_object( $_[0] ) );
-        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime object." ) ) if( !$_[0]->isa( 'DateTime' ) );
+        return( $self->error( "Object provided (", ref( $_[0] ), ") is not a DateTime::Lite or DateTime object." ) ) if( !$self->_is_a( $_[0] => [qw( DateTime::Lite DateTime )] ) );
         $dt = shift( @_ );
     }
-    $dt = DateTime->now if( !defined( $dt ) );
+    if( !defined( $dt ) )
+    {
+        $dt = DateTime::Lite->now;
+    }
+    elsif( $self->_is_a( $dt => [qw( DateTime )] ) )
+    {
+        $dt = DateTime::Lite->from_object( object => $dt ) ||
+            return( $self->pass_error( DateTime::Lite->error ) );
+    }
     $dt->set_time_zone( 'GMT' );
-    my $fmt = DateTime::Format::Strptime->new(
-        pattern => '%a, %d %b %Y %H:%M:%S GMT',
-        locale  => 'en_GB',
+    my $fmt = DateTime::Format::Lite->new(
+        pattern   => '%a, %d %b %Y %H:%M:%S GMT',
+        locale    => 'en_GB',
         time_zone => 'GMT',
     );
     $dt->set_formatter( $fmt );
@@ -804,8 +833,8 @@ Cookie - Cookie Object with Encryption or Signature
     print $c->as_string, "\n";
     # or
     print "$c\n";
-    # If expires is set, we can use its underlying DateTime object
-    my $now = DateTime->now;
+    # If expires is set, we can use its underlying DateTime::Lite object
+    my $now = DateTime::Lite->now;
     if( $c->expires && $c->expires > $now )
     {
         # ok, we're good
@@ -870,7 +899,7 @@ Cookie - Cookie Object with Encryption or Signature
 
 =head1 VERSION
 
-    v0.3.11
+    v0.4.1
 
 =head1 DESCRIPTION
 
@@ -951,7 +980,7 @@ See also L</domain>
 
 =item * C<expires>
 
-Datetime str | DateTime object | integer
+DateTime::Lite str | DateTime::Lite object | integer
 
 See also L</expires>
 
@@ -1011,7 +1040,7 @@ Other extra parameters not directly related to the cookie standard:
 
 =item * C<accessed_on>
 
-Datetime.
+DateTime::Lite.
 
 See also L</accessed_on>
 
@@ -1023,7 +1052,7 @@ See also L</algo>
 
 =item * C<created_on>
 
-Datetime.
+DateTime::Lite.
 
 See also L</created_on>
 
@@ -1228,9 +1257,9 @@ Special keyword
 
 =back
 
-Ultimately, a L<DateTime> will be derived from those values, or C<undef> will be returned and an error will be set.
+Ultimately, a L<DateTime::Lite> will be derived from those values, or C<undef> will be returned and an error will be set.
 
-The L<DateTime> object will be set with a formatter to allow a stringification that is compliant with rfc6265.
+The L<DateTime::Lite> object will be set with a formatter to allow a stringification that is compliant with rfc6265.
 
 And you can use L</max_age> alternatively.
 
@@ -1488,7 +1517,7 @@ Returns a L<Module::Generic::Number> object.
 
 =head2 _header_datetime
 
-Given a L<DateTime> object, or by default will instantiate a new one, and this will set its formatter to L<DateTime::Format::Strptime> with the appropriate format to ensure the stringification produces a rfc6265 compliant datetime string.
+Given a L<DateTime::Lite> object, or by default will instantiate a new one, and this will set its formatter to L<DateTime::Format::Lite> with the appropriate format to ensure the stringification produces a rfc6265 compliant datetime string.
 
 =head2 TO_JSON
 

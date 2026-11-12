@@ -5,7 +5,7 @@ use warnings;
 use Carp    qw(croak);
 use Readonly;
 
-our $VERSION = '0.47';
+our $VERSION = '0.48';
 
 # --------------------------------------------------
 # Validation constants — centralised so that changes
@@ -26,7 +26,7 @@ App::Test::Generator::Sample::Module - Example module for schema extraction test
 
 =head1 VERSION
 
-Version 0.46
+Version 0.48
 
 =head1 SYNOPSIS
 
@@ -288,7 +288,7 @@ String (C<$MIN_NAME_LEN>-C<$MAX_NAME_LEN> chars). Required.
 
 =item * C<$greeting>
 
-String. Optional — defaults to C<"Hello">.
+String. Optional - defaults to C<"Hello">.
 
 =back
 

@@ -1,6 +1,6 @@
 =pod
 
-=for literate target:Literate.pm
+=for literate:command target=Literate.pm
 
 =head1 NAME
 
@@ -12,7 +12,7 @@ This specification describes
 
 =for literate Literate Version
 
-	our $VERSION='0.0.2';
+	our $VERSION='0.0.3';
 
 =for literate .
 
@@ -44,7 +44,7 @@ Unused sections may become failures, warnings, etc.
 
 =item Commands
 
-Commands like C<literate target:name> might change.  Considering C<:literate> for these.
+Commands are specified using the augmented format identifier C<literate:command>.
 
 =item Weave
 
@@ -58,7 +58,8 @@ The module, C<Pod::Literate>, is implemented using the formatting features of L<
 
 =for literate Set the mode
 
-	$$self{$cache}{mode}=$$attribute{'~really'};
+	if($target eq 'literate:command') { $$self{$cache}{mode}='command' }
+	else { $$self{$cache}{mode}=$$attribute{'~really'} }
 
 =for literate .
 
@@ -76,7 +77,7 @@ When processing the start of these blocks, a title attribute is set with the "De
 
 =for literate Set target from begin
 
-	if($$attribute{title}) { $self->targetSet($$attribute{title}=~s/^\+//r) }
+	if($$attribute{title}) { my $s=$$attribute{title}; $s=~s/^\+//; $self->targetSet($s) }
 	$self->initCollection();
 
 =for literate .
@@ -119,7 +120,8 @@ The C<for> paragraph behaves slightly differently from begin/end.  In the case o
 
 =for literate Set target from for
 
-	$self->targetSet($collected=~s/^\+//r);
+	my $s=$collected; $s=~s/^\+//;
+	$self->targetSet($s);
 	$self->initCollection();
 
 =for literate .
@@ -268,7 +270,12 @@ The output filename is chosen by specifying the target filename in a C<=for> com
 
 =for literate Handle tangle target
 
-	if(($mode eq '=for')&&($collected=~/^target:(.+)$/)) {
+	if(($mode eq 'command')&&($collected=~/^target=(.+)$/)) {
+		$$self{$cache}{ofn}=$1;
+		$self->clearCollection();
+	}
+	elsif(($mode eq '=for')&&($collected=~/^target:(.+)$/)) {
+		print STDERR "=for literate target: is deprecated; use =for literate:command\n";
 		$$self{$cache}{ofn}=$1;
 		$self->clearCollection();
 	}
@@ -312,14 +319,15 @@ The C<perlpod> format is provided in a basic module, C<Pod::Literate>:
 
 =head2 POD Methods
 
-A subclass of L<Pod::Simple> must implement handlers for the start and end of command paragraphs, specifically C<=begin>, C<=end>, and C<=for>, as well as a mechanism to gather text.  When an element starts, its attributes identify if it matches this module.  Because POD enforces begin/end balancing, the ending element has no similar attribute
+A subclass of L<Pod::Simple> must implement handlers for the start and end of command paragraphs, specifically C<=begin>, C<=end>, and C<=for>, as well as a mechanism to gather text.  When an element starts, its attributes identify if it matches this module.  Because POD enforces begin/end balancing, the ending element has no similar attribute.
 
 =begin literate POD Handlers
 
 	sub _handle_element_start {
 		my ($self,$element,$attribute)=@_;
 		my $target=$$attribute{target}//'';
-		if($target ne 'literate') { return }
+		#< Fail for non-data paragraphs >#
+		if($target!~/^literate(?::command)?$/) { return }
 		#< Handle a start element >#
 	}
 
@@ -401,8 +409,6 @@ When the end element is reached, the section can be populated.
 
 =for literate .
 
-=head3 End elements
-
 =head3 Text collection
 
 The only task to perform when basic text is read is to populate the collector.
@@ -410,6 +416,16 @@ The only task to perform when basic text is read is to populate the collector.
 =for literate Handle a text element
 
 	if(defined($$self{$cache}{collector})) { $$self{$cache}{collector}.=$text."\n" }
+
+=for literate .
+
+=head3 Data paragraphs
+
+At this time, only data paragraphs are supported in C<=begin> and C<=for> blocks.  A non-data paragraph, that is a "plain paragraph", may contain normal POD commands and additional plain documentation.  Only data/code paragraphs are supported at this point.  In the future, the C<:literate> type might be used to support embedding actual POD in the result, but this requires additional parsing/handling not yet available.  If it is encountered, fail:
+
+=for literate Fail for non-data paragraphs
+
+	if($target eq ':literate') { die 'Non-data paragraphs are not currently supported via ":literate"' }
 
 =for literate .
 
@@ -639,15 +655,15 @@ Documents may appear in sections, and one large POD can become difficult to mana
 
 =item todo Handle multiple output filenames
 
-The C<target:filename> can simmply set the output and all subsequent sections will be collected therein.  If another filename is encountered, the scanner will start putting sections there.  With an C<import> statement, the filenames would be fairly well scoped, and perhaps C<import> should explicitly scope any set filename.
+The C<target=filename> can simmply set the output and all subsequent sections will be collected therein.  If another filename is encountered, the scanner will start putting sections there.  With an C<import> statement, the filenames would be fairly well scoped, and perhaps C<import> should explicitly scope any set filename.
 
 =item done First line indentation is removed, to match indentation at the point of reference
 
 =item done First line indentation applies to every line in the reference
 
-=item todo Inline references
+=item done Inline references
 
-Most work has been focused on standalone references.  What is the behavior of C<{ named reference }> when the reference is a single line?  Multiline?
+A reference within a line is handled correctly.  C<if(#E<lt> ref E<gt>#)> expands properly if C<ref> is a single line, with no additional spaces.  If ref is a multiline, it's still inserted at that spot, with its inner newlines, but with no terminal newline.
 
 =item todo Inline declaration
 

@@ -48,6 +48,7 @@ my %WriteMakefileArgs = (
     "Text::CSV" => "1.90_01",
     "Tie::Array" => 0,
     "Tie::Indirect" => 0,
+    "Time::HiRes" => 0,
     "URI::file" => 0,
     "bytes" => 0,
     "constant" => 0,
@@ -77,14 +78,13 @@ my %WriteMakefileArgs = (
     "Test2::Tools::Subtest" => 0,
     "Test2::V0" => "1.302214",
     "Test::Deep::NoTest" => 0,
-    "Time::HiRes" => 0,
     "autovivification" => 0,
     "indirect" => 0,
     "lib" => 0,
     "multidimensional" => 0,
     "open" => 0
   },
-  "VERSION" => "1001.004",
+  "VERSION" => "1001.005",
   "test" => {
     "TESTS" => "t/*.t"
   }

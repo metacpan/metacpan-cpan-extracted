@@ -6437,25 +6437,25 @@ sub _coverage_for_file {
 
 	my $base = basename($file);
 
-    # 2. basename match (what worked before)
-    for my $k (keys %$summary) {
-        next if $k eq 'Total';
-        if(basename($k) eq $base) {
-            return $summary->{$k};
-        }
-    }
+	# 2. basename match (what worked before)
+	for my $k (keys %$summary) {
+		next if $k eq 'Total';
+		if(basename($k) eq $base) {
+			return $summary->{$k};
+		}
+	}
 
-    # 3. try lib/ relative path
-    my $rel = $file;
-    $rel =~ s{.*?/lib/}{lib/};
+	# 3. try lib/ relative path
+	my $rel = $file;
+	$rel =~ s{.*?/lib/}{lib/};
 
-    return $summary->{$rel} if exists $summary->{$rel};
+	return $summary->{$rel} if exists $summary->{$rel};
 
-    # 4. NEW: try blib/lib version
-    my $blib = "blib/$rel";
-    return $summary->{$blib} if exists $summary->{$blib};
+	# 4. NEW: try blib/lib version
+	my $blib = "blib/$rel";
+	return $summary->{$blib} if exists $summary->{$blib};
 
-    return;
+	return;
 }
 
 # --------------------------------------------------

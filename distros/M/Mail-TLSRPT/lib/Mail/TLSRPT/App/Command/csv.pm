@@ -1,6 +1,6 @@
 package Mail::TLSRPT::App::Command::csv;
 # ABSTRACT: Process tlsrpt reports into csv
-our $VERSION = '2.20261104'; # VERSION
+our $VERSION = '2.20261112'; # VERSION
 use 5.20.0;
 use Mail::TLSRPT::Pragmas;
 use Mail::TLSRPT::App -command;
@@ -53,7 +53,7 @@ sub execute($self,$opt,$args) {
   my $output= join("\n",@all_output);
 
   if ( $opt->output ) {
-    open my $fh, '>', $opt->output or die 'Could not open output file';
+    open my $fh, '>:encoding(UTF-8)', $opt->output or die 'Could not open output file';
     print $fh $output;
     close $fh;
   }
@@ -77,7 +77,7 @@ Mail::TLSRPT::App::Command::csv - Process tlsrpt reports into csv
 
 =head1 VERSION
 
-version 2.20261104
+version 2.20261112
 
 =head1 DESCRIPTION
 

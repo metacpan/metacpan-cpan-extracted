@@ -1,0 +1,22 @@
+#!/usr/bin/env perl
+# Stands in for zpool. Prints list or status from the directory
+# ZFS_TEST_SET names, ok by default, with {{days_ago:N}} swapped for
+# the time N days ago, as zpool status prints it.
+use strict;
+use warnings;
+use FindBin;
+
+my $set = $FindBin::Bin . '/' . ( $ENV{ZFS_TEST_SET} // 'ok' );
+my $file;
+if ( "@ARGV" eq 'list -Hp -o name,health,capacity,fragmentation' ) {
+	$file = $set . '/list';
+} elsif ( "@ARGV" eq 'status -p' ) {
+	$file = $set . '/status';
+} else {
+	die( 'unexpected args ' . "@ARGV" . "\n" );
+}
+open( my $fh, '<', $file ) or die( 'no ' . $file . "\n" );
+my $output = do { local $/; <$fh> };
+$output =~ s/\{\{days_ago:([0-9]+)\}\}/scalar( localtime( time - $1 * 86400 ) )/ge;
+print $output;
+exit( -e $set . '/exit' ? 1 : 0 );

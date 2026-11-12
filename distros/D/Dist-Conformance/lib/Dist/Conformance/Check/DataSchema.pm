@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::DataSchema 0.004;
+package Dist::Conformance::Check::DataSchema 0.005;
 
 # ABSTRACT: A JSON, YAML or INI file parses and matches a schema
 
@@ -69,7 +69,7 @@ Dist::Conformance::Check::DataSchema - A JSON, YAML or INI file parses and match
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 DESCRIPTION
 

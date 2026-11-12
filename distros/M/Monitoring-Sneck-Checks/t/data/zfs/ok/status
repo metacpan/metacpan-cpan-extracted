@@ -1,0 +1,39 @@
+  pool: boot
+ state: ONLINE
+  scan: scrub in progress since {{days_ago:0}}
+	2.10G / 4.60G scanned at 210M/s, 2.10G / 4.60G issued at 210M/s
+	0B repaired, 45.67% done, 00:00:12 to go
+config:
+
+	NAME                                        STATE     READ WRITE CKSUM
+	boot                                        ONLINE       0     0     0
+	  mirror-0                                  ONLINE       0     0     0
+	    ata-Samsung_SSD_870_EVO_1TB_S6PTNX0T100001-part3  ONLINE       0     0     0
+	    pci-0000:00:17.0-ata-2-part3            ONLINE       0     0     0
+
+errors: No known data errors
+
+  pool: tank
+ state: ONLINE
+status: Some supported and requested features are not enabled on the pool.
+	The pool can still be used, but some features are unavailable.
+action: Enable all features using 'zpool upgrade'. Once this is done,
+	the pool may no longer be accessible by software that does not support
+	the features. See zpool-features(7) for details.
+  scan: scrub repaired 0B in 05:12:44 with 0 errors on {{days_ago:3}}
+config:
+
+	NAME        STATE     READ WRITE CKSUM
+	tank        ONLINE       0     0     0
+	  raidz1-0  ONLINE       0     0     0
+	    sda     ONLINE       0     0     0
+	    sdb     ONLINE       0     0     0
+	    sdc     ONLINE       0     0     0
+	logs
+	  nvme0n1p4  ONLINE       0     0     0
+	cache
+	  nvme0n1p5  ONLINE       0     0     0
+	spares
+	  sdd       AVAIL
+
+errors: No known data errors

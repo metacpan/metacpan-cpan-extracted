@@ -1,10 +1,10 @@
 ##----------------------------------------------------------------------------
 ## Cookies API for Server & Client - ~/lib/Cookie/Jar.pm
-## Version v0.3.4
+## Version v0.4.0
 ## Copyright(c) 2025 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2019/10/08
-## Modified 2025/07/19
+## Modified 2026/11/12
 ## You can use, copy, modify and  redistribute  this  package  and  associated
 ## files under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -15,7 +15,7 @@ BEGIN
     use warnings;
     use warnings::register;
     use parent qw( Module::Generic );
-    use vars qw( $VERSION $COOKIES_DEBUG $MOD_PERL $MOD_PERL_VERSION );
+    use vars qw( $VERSION $COOKIES_DEBUG $MOD_PERL $MOD_PERL_VERSION $LIVE_JARS );
     our( $MOD_PERL, $MOD_PERL_VERSION );
     if( exists( $ENV{MOD_PERL} )
         &&
@@ -33,14 +33,18 @@ BEGIN
     }
     use Cookie;
     use Cookie::Domain;
-    use DateTime;
+    use DateTime::Lite;
+    use DateTime::Format::Lite;
     use JSON;
     use Module::Generic::HeaderValue;
     use Scalar::Util;
     use URI::Escape ();
-    our $VERSION = 'v0.3.4';
+    our $VERSION = 'v0.4.0';
     # This flag to allow extensive debug message to be enabled
     our $COOKIES_DEBUG = 0;
+    # Global registry of cookies stored with a weak reference to avoid interfering with their destruction.
+    # This is used to autosave cookie jars during the END phase, before global destruction.
+    our $LIVE_JARS = {};
     use constant CRYPTX_VERSION => '0.074';
 };
 
@@ -70,6 +74,10 @@ sub init
     $self->{_init_strict_use_sub} = 1;
     $self->SUPER::init( @_ );
     $self->{request} = $req if( $req );
+    # Flag to ensure we are ready to autosave cookies, when the init phase has succeeded.
+    $self->{_autosave_ready} = 0;
+    # Flag to avoid repeat of autosave upon global destruction.
+    $self->{_autosaved}      = 0;
     # Repository of all objects
     $self->{_cookies} = [];
     # Index by host, path, name
@@ -87,7 +95,7 @@ sub init
         };
         return( $self->error( "Unknown cookie jar type '$type'. This can be either json, lwp or netscape" ) ) if( !CORE::exists( $type2sub->{ $type } ) );
         my $loader = $type2sub->{ $type };
-        
+
         if( $encrypt )
         {
             $loader->( $self, $file,
@@ -100,6 +108,12 @@ sub init
             $loader->( $self, $file ) || return( $self->pass_error );
         }
     }
+    # Cookies are now safe to autosave. Without this protection, the autosave would
+    # potentially overwrite the file with an empty jar.
+    $self->{_autosave_ready} = 1;
+    my $addr = Scalar::Util::refaddr( $self );
+    $LIVE_JARS->{ $addr } = $self;
+    Scalar::Util::weaken( $LIVE_JARS->{ $addr } );
     return( $self );
 }
 
@@ -119,7 +133,7 @@ sub add
     {
         return( $self->error( "No data was provided to add a cookie in the repository." ) );
     }
-    
+
     if( ref( $this ) eq 'HASH' )
     {
         $this = $self->make( $this );
@@ -200,7 +214,7 @@ sub add_request_header
     $path = '/' unless( CORE::length( $path ) );
     $port = $uri->port if( !defined( $port ) || !CORE::length( $port ) );
     # my $now = time();
-    my $now = DateTime->now;
+    my $now = DateTime::Lite->now;
     $path = $self->_normalize_path( $path ) if( CORE::index( $path, '%' ) != -1 );
     my $root;
     if( $self->_is_ip( $host ) )
@@ -259,7 +273,7 @@ sub add_request_header
         }
         push( @ok_cookies, $c );
     }
-    
+
     # sort cookies by path and by creation date.
     # Ref: rfc6265, section 5.4.2:
     # "Cookies with longer paths are listed before cookies with shorter paths."
@@ -306,7 +320,7 @@ sub add_response_header
         {
             next;
         }
-        
+
         if( $resp )
         {
             $resp->headers->push_header( 'Set-Cookie' => "$c" );
@@ -496,7 +510,7 @@ sub extract
     {
         $host = lc( $uri->host );
     }
-    
+
     # URI::URL method
     if( $uri->can( 'epath' ) )
     {
@@ -525,7 +539,7 @@ sub extract
         # Possibly empty
         $root = $res ? $res->domain : '';
     }
-    
+
     foreach my $o ( @$all )
     {
         my( $name, $value ) = $o->value->list;
@@ -547,7 +561,7 @@ sub extract
         {
             $c->max_age( $o->param( 'max-age' ) );
         }
-        
+
         if( $o->param( 'domain' ) )
         {
             # rfc6265, section 5.2.3:
@@ -584,7 +598,7 @@ sub extract
             {
             }
         }
-        
+
         # rfc6265: "If the server omits the Path attribute, the user agent will use the "directory" of the request-uri's path component as the default value."
         if( defined( $o->param( 'path' ) ) && CORE::length( $o->param( 'path' ) ) )
         {
@@ -608,7 +622,7 @@ sub extract
         $c->http_only(1) if( $o->param( 'httponly' ) );
         $c->secure(1) if( $o->param( 'secure' ) );
         $c->same_site(1) if( $o->param( 'samesite' ) );
-        
+
         my @old = $self->get({ name => $c->name, host => $c->domain, path => $c->path });
         if( scalar( @old ) )
         {
@@ -638,7 +652,7 @@ sub extract_one
     my $opts = $self->_get_args_as_hash( @_ );
     $opts->{path} //= '/';
     return( $self->error( "No cookie data was provided." ) ) if( !length( "$str" ) );
-    
+
     my( $host, $root );
     if( defined( $opts->{host} ) && CORE::length( $opts->{host} ) )
     {
@@ -681,7 +695,7 @@ sub extract_one
     {
         $c->max_age( $o->param( 'max-age' ) );
     }
-    
+
     if( $o->param( 'domain' ) )
     {
         # rfc6265, section 5.2.3:
@@ -707,7 +721,7 @@ sub extract_one
         {
         }
     }
-    
+
     # rfc6265: "If the server omits the Path attribute, the user agent will use the "directory" of the request-uri's path component as the default value."
     if( defined( $o->param( 'path' ) ) && CORE::length( $o->param( 'path' ) ) )
     {
@@ -863,16 +877,16 @@ sub get
         my $c_name = $c->name;
         my $c_host = $c->domain;
         my $c_path = $c->path;
-        
+
         next unless( $c_name eq $name );
-        
+
 
         if( !defined( $host ) || !CORE::length( $host ) )
         {
             push( @found, $c );
             next;
         }
-        
+
         if( defined( $c_host ) && 
             ( $host eq $c_host || index( reverse( $host ), reverse( ".${c_host}" ) ) == 0 ) )
         {
@@ -889,12 +903,12 @@ sub get
             }
         }
     }
-    
+
     if( scalar( @found ) )
     {
         return( wantarray() ? @found : $found[0] );
     }
-    
+
     # Ultimately, check if there is a cookie entry with just the cookie name and no host
     # which happens for cookies repository on server side
     if( CORE::exists( $idx->{ $name } ) )
@@ -980,7 +994,7 @@ sub load
     {
         return( $self );
     }
-    
+
     if( $opts->{decrypt} )
     {
         my $key = $opts->{key};
@@ -1002,7 +1016,7 @@ sub load
             return( $self->error( "An error occurred while trying to decrypt cookies file \"$file\": $@" ) );
         }
     }
-    
+
     my $j = JSON->new->relaxed->utf8;
     my $hash;
     # try-catch
@@ -1066,7 +1080,7 @@ sub load_as_lwp
             # Line does not match regep.
         }
     };
-    
+
     if( $opts->{decrypt} )
     {
         my $raw = $f->load;
@@ -1211,7 +1225,7 @@ EOT
             }
         }
     }
-    
+
     # If there is no cookies found yet; and
     # the user did not require exclusively the use of DBI, but required the use of sqlite3 binary
     # the user did not require the use of DBI nor the use of sqlite3 binary
@@ -1240,7 +1254,7 @@ EOT
             }
             $sqlite_bin = $bin;
         }
-        
+
         $sql =~ s/\n/ /gs;
         open( my $fh, '-|', $sqlite_bin, '-noheader', '-separator', '|', "${sqldb}", $sql ) ||
             return( $self->error( "Failed to execute sqlite3 binary with sql query to get all mozilla cookies from database ${sqldb}: $!" ) );
@@ -1521,20 +1535,19 @@ sub save
         push( @$all, $c->as_hash );
     }
     my $tz;
-    # DateTime::TimeZone::Local will die ungracefully if the local timezeon is not set with the error:
-    # "Cannot determine local time zone"
+    # DateTime::Lite::TimeZone::Local will return an error if the local timezone is not set.
     # try-catch
     local $@;
     eval
     {
-        $tz = DateTime::TimeZone->new( name => 'local' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'local' );
     };
-    if( $@ )
+    if( $@ || !defined( $tz ) )
     {
-        $tz = DateTime::TimeZone->new( name => 'UTC' );
+        $tz = DateTime::Lite::TimeZone->new( name => 'UTC' );
     }
-    my $today = DateTime->now( time_zone => $tz );
-    my $dt_fmt = DateTime::Format::Strptime->new(
+    my $today = DateTime::Lite->now( time_zone => $tz );
+    my $dt_fmt = DateTime::Format::Lite->new(
         pattern => '%FT%T%z',
         # Unnecessary
         # locale => 'en_GB',
@@ -1542,7 +1555,7 @@ sub save
     );
     $today->set_formatter( $dt_fmt );
     my $data = { cookies => $all, updated_on => "$today" };
-    
+
     my $f = $self->new_file( $file ) || return( $self->pass_error );
     my $j = JSON->new->allow_nonref->pretty->canonical->convert_blessed;
     my $json;
@@ -1590,7 +1603,7 @@ sub save_as_lwp
     $opts->{skip_expired} //= 0;
     return( $self->error( "No file to write cookies was specified." ) ) if( !$file );
     my $f = $self->new_file( $file ) || return( $self->pass_error );
-    
+
     my $raw = '';
     my $p = {};
     if( $opts->{encrypt} )
@@ -1598,7 +1611,7 @@ sub save_as_lwp
         $self->_load_class( 'Crypt::Misc', { version => CRYPTX_VERSION } ) || return( $self->pass_error );
         $p = $self->_encrypt_objects( @$opts{qw( key algo iv )} ) || return( $self->pass_error );
     }
-    
+
     my $io = $f->open( '>', { binmode => ( $opts->{encrypt} ? 'raw' : 'utf-8' ) }) || 
         return( $self->error( "Unable to write cookies to file \"$file\": ", $f->error ) );
     if( $opts->{encrypt} )
@@ -1609,7 +1622,7 @@ sub save_as_lwp
     {
         $io->print( "#LWP-Cookies-1.0\n" ) || return( $self->error( "Unable to write to cookie file \"$file\": $!" ) );
     }
-    my $now = DateTime->now;
+    my $now = DateTime::Lite->now;
     $self->scan(sub
     {
         my $c = shift( @_ );
@@ -1711,7 +1724,7 @@ EOT
     };
     # To hold the cookies data to be saved
     my $cookies = [];
-    my $now = DateTime->now;
+    my $now = DateTime::Lite->now;
     my $can_do_upsert = 0;
     my $get_cookies = sub
     {
@@ -1761,7 +1774,7 @@ EOT
 INSERT OR REPLACE INTO moz_cookies (name, value, host, path, expiry, isSecure, sameSite, isHttpOnly, lastAccessed, creationTime)
 VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 EOT
-    
+
     # Required version for upsert
     my $req_v = version->parse( '3.24.0' );
     my $log_file;
@@ -1795,7 +1808,7 @@ EOT
                     die( "Invalid data type '", $core_fields->{ $f }->{constant}, "' for DBI." );
                 $core_fields->{ $f }->{constant} = $code->();
             }
-            
+
             # try-catch;
             local $@;
             my $err;
@@ -1825,7 +1838,7 @@ EOT
                 my $sqlite_version = $version_sth->fetchrow;
                 $version_sth->finish;
                 my $sql_v = version->parse( $sqlite_version );
-                
+
                 if( $db_file_exists )
                 {
                     # my $tbl_check = $dbh->table_info( undef, undef, 'moz_cookies', 'TABLE' ) ||
@@ -1885,7 +1898,7 @@ EOT
                         }
                     }
                 }
-                
+
                 my $errors = [];
                 my $insert_sth;
                 # Create the table if it does not exist
@@ -1915,15 +1928,15 @@ EOT
                             die( "Error preparing the sql query to add/replace cookies to 'moz_cookies' in SQLite database file ${sqldb}: ", $dbh->errstr, "\nSQL query was: ${insert_replace_sql}" );
                     }
                 }
-                
+
                 # NOTE: call to scan() must be after setting $can_do_upsert
                 $self->scan( $get_cookies );
-                
+
                 if( $opts->{rollback} )
                 {
                     $dbh->begin_work;
                 }
-                
+
                 foreach my $c ( @$cookies )
                 {
                     eval
@@ -1965,7 +1978,7 @@ EOT
             return( $self->pass_error( $err ) ) if( defined( $err ) );
         }
     }
-    
+
     # If the user did not require exclusively the use of DBI, but required the use of sqlite3 binary
     # the user did not require the use of DBI nor the use of sqlite3 binary
     if( ( defined( $dbi_error ) && !$requires_dbi ) ||
@@ -1994,7 +2007,7 @@ EOT
             }
             $sqlite_bin = $bin;
         }
-        
+
         my $fh;
         # Get SQLite version
         # open( $fh, '-|', $sqlite_bin, "SELECT sqlite_version()" ) ||
@@ -2009,7 +2022,7 @@ EOT
             $sql_v = version->parse( $sqlite_version );
             close( $fh );
         }
-        
+
         # Check if table moz_cookies exists
         open( $fh, '-|', $sqlite_bin, "${sqldb}", "SELECT name FROM sqlite_master WHERE type IN ('table') AND name IS 'moz_cookies'" ) ||
             return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to check if table moz_cookies exists: $!" ) );
@@ -2018,7 +2031,7 @@ EOT
         $table_moz_cookies_exists //= '';
         chomp( $table_moz_cookies_exists );
         close( $fh );
-        
+
         # Now, get the data to save
         open( $fh, '|-', $sqlite_bin, '--bail', "${sqldb}" ) ||
             return( $self->error( "Failed to execute sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
@@ -2034,7 +2047,7 @@ EOT
                 return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: $!" ) );
             $table_moz_cookies_exists = 0;
         }
-        
+
         if( $opts->{rollback} )
         {
             print( $fh "BEGIN TRANSACTION;\n" ) ||
@@ -2077,7 +2090,7 @@ EOT
                 $template =~ s/\?/'%s'/;
             }
         }
-        
+
         foreach my $row ( @$cookies )
         {
             my $sql = sprintf( $template, map( $_->[0], @$row ) );
@@ -2091,7 +2104,7 @@ EOT
                 return( $self->error( "Failed to print sql commands to sqlite3 binary ${sqlite_bin} to save all mozilla cookies to database ${sqldb}: ${err}" ) );
             };
         }
-        
+
         if( $opts->{rollback} )
         {
             print( $fh "END TRANSACTION;\n" ) ||
@@ -2121,7 +2134,7 @@ sub save_as_netscape
     my $io = $f->open( '>', { binmode => 'utf-8' }) || 
         return( $self->error( "Unable to write cookies to file \"$opts->{file}\": ", $f->error ) );
     $io->print( "# Netscape HTTP Cookie File:\n" );
-    my $now = DateTime->now;
+    my $now = DateTime::Lite->now;
     $self->scan(sub
     {
         my $c = shift( @_ );
@@ -2174,6 +2187,53 @@ sub set
 # NOTE: cookie jar file type, e.g.: json, lwp or netscape
 sub type { return( shift->_set_get_scalar( 'type', @_ ) ); }
 
+# This is used to autosave cookie jar when called before global destruction phase in END.
+sub _autosave
+{
+    my $self = shift( @_ );
+    return if( $self->{_autosaved} || !$self->{_autosave_ready} );
+    my $file = $self->file;
+    if( $self->autosave && $file )
+    {
+        my $encrypt = $self->encrypt;
+        my $type = $self->type;
+        my $type2sub =
+        {
+            json     => \&save,
+            lwp      => \&save_as_lwp,
+            mozilla  => \&save_as_mozilla,
+            netscape => \&save_as_netscape,
+        };
+        if( !CORE::exists( $type2sub->{ $type } ) )
+        {
+            warn( "Unknown cookie jar type '$type'. This can be either json, lwp or netscape\n" ) if( $self->_warnings_is_enabled );
+            return;
+        }
+
+        my $unloader = $type2sub->{ $type };
+        my $saved;
+        if( $encrypt )
+        {
+            $saved = $unloader->( $self, $file,
+                algo => $self->algo,
+                key  => $self->secret,
+            );
+        }
+        else
+        {
+            $saved = $unloader->( $self, $file );
+        }
+        if( !$saved )
+        {
+            warn( $self->error, "\n" ) if( $self->_warnings_is_enabled );
+            return;
+        }
+        # Mark it as saved to prevent DESTROY from saving it again.
+        $self->{_autosaved} = 1;
+    }
+    return( $self );
+}
+
 sub _cookies { return( shift->_set_get_array_as_object( '_cookies', @_ ) ); }
 
 sub _domain_match
@@ -2208,7 +2268,7 @@ sub _encrypt_objects
 
     my $class = "Crypt::Cipher::${algo}";
     $self->_load_class( $class ) || return( $self->pass_error );
-    
+
     my( $key_len, $block_len );
     eval
     {
@@ -2270,45 +2330,24 @@ sub _normalize_path  # so that plain string compare can be used
 sub DESTROY
 {
     my $self = shift( @_ );
-    my $file = $self->file;
-    if( $self->autosave && $file )
-    {
-        my $encrypt = $self->encrypt;
-        my $type = $self->type;
-        my $type2sub = 
-        {
-            json     => \&save,
-            lwp      => \&save_as_lwp,
-            mozilla  => \&save_as_mozilla,
-            netscape => \&save_as_netscape,
-        };
-        if( !CORE::exists( $type2sub->{ $type } ) )
-        {
-            warn( "Unknown cookie jar type '$type'. This can be either json, lwp or netscape\n" ) if( $self->_warnings_is_enabled );
-            return;
-        }
-        
-        my $unloader = $type2sub->{ $type };
-        
-        if( $encrypt )
-        {
-            $unloader->( $self, $file,
-                algo => $self->algo,
-                key  => $self->secret,
-            ) || do
-            {
-                warn( $self->error, "\n" ) if( $self->_warnings_is_enabled );
-            };
-        }
-        else
-        {
-            $unloader->( $self, $file ) || do
-            {
-                warn( $self->error, "\n" ) if( $self->_warnings_is_enabled );
-            };
-        }
-    }
+    # <https://perldoc.perl.org/perlobj#Destructors>
+    local( $., $@, $!, $^E, $? );
+    # Remove the entry, so the registry does not grow indefinitely especially under mod_perl.
+    CORE::delete( $LIVE_JARS->{ Scalar::Util::refaddr( $self ) } ) if( $LIVE_JARS );
+    return if( Module::Generic::_in_global_destruction() );
+    $self->_autosave;
 };
+
+# NOTE: END
+END
+{
+    # Save live jars before global destruction, without keeping them alive in the registry.
+    foreach my $jar ( values( %$LIVE_JARS ) )
+    {
+        next unless( defined( $jar ) );
+        $jar->_autosave;
+    }
+}
 
 1;
 # NOTE: POD
@@ -2414,7 +2453,7 @@ Cookie::Jar - Cookie Jar Class for Server & Client
 
     # Merge repository
     $jar->merge( $jar2 ) || die( $jar->error );
-    
+
     # For autosave
     my $jar = Cookie::Jar->new(
         file => '/some/where/cookies.json',
@@ -2426,13 +2465,13 @@ Cookie::Jar - Cookie Jar Class for Server & Client
     ) || die( Cookie::Jar->error );
 
     say "There are ", $jar->length, " cookies in the repository.";
-    
+
     # Take a string from a Set-Cookie header and get a Cookie object
     my $c = $jar->extract_one( $cookie_string );
 
 =head1 VERSION
 
-    v0.3.4
+    v0.4.0
 
 =head1 DESCRIPTION
 
@@ -2448,7 +2487,7 @@ This module is also compatible with L<LWP::UserAgent>, so you can use like this:
 
     use LWP::UserAgent;
     use Cookie::Jar;
- 
+
     my $ua = LWP::UserAgent->new(
         cookie_jar => Cookie::Jar->new
     );
@@ -2475,7 +2514,7 @@ This is an optional parameter to provide a L<Apache2::RequestRec> object. When p
     package MyApacheHandler;
     use Apache2::Request ();
     use Cookie::Jar;
-    
+
     sub handler : method
     {
         my( $class, $r ) = @_;
@@ -2580,6 +2619,10 @@ String. Sets or gets the algorithm to use when loading or saving the cookie jar.
 =head2 autosave
 
 Boolean. Sets or gets the boolean value for automatically saving the cookie jar to the given file specified with L</file>
+
+The cookie jar is saved upon object destruction, or, if it still exists, when the program exits, in an C<END> block, before the Perl global destruction. This ensures that all the cookie objects are still intact when they are saved.
+
+If the cookie jar file could not be loaded upon instantiation, such as when the decryption key was wrong, the cookie jar will B<not> be automatically saved, to avoid overwriting the existing file with an empty cookie jar.
 
 =head2 delete
 

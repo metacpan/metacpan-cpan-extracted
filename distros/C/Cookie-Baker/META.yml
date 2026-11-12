@@ -8,7 +8,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.23, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -27,7 +27,7 @@ no_index:
 provides:
   Cookie::Baker:
     file: lib/Cookie/Baker.pm
-    version: '0.12'
+    version: '0.14'
 requires:
   Exporter: '0'
   URI::Escape: '0'
@@ -36,13 +36,14 @@ resources:
   bugtracker: https://github.com/kazeburo/Cookie-Baker/issues
   homepage: https://github.com/kazeburo/Cookie-Baker
   repository: https://github.com/kazeburo/Cookie-Baker.git
-version: '0.12'
+version: '0.14'
 x_contributors:
+  - 'Adriaan Dens <adriaan.dens@gmail.com>'
   - 'David Romano <unobe@cpan.org>'
   - 'Ichinose Shogo <shogo82148@gmail.com>'
   - 'Olaf Alders <olaf@wundersolutions.com>'
   - 'Shoichi Kaji <skaji@cpan.org>'
   - 'kwry <kwrkwrr@gmail.com>'
   - 'yoshikazusawa <883514+yoshikazusawa@users.noreply.github.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

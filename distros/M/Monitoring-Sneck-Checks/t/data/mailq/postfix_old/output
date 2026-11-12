@@ -1,0 +1,1 @@
+{"queue_name": "deferred", "queue_id": "7EAC2D4567", "arrival_time": {{ago:180000}}, "message_size": 5000, "forced_expire": false, "sender": "alice@example.org", "recipients": [{"address": "heidi@example.net", "delay_reason": "host mx.example.net[192.0.2.26] said: 451 4.7.1 Greylisted (in reply to RCPT TO command)"}]}

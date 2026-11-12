@@ -11,6 +11,9 @@ t/00-pod.t
 t/01-replication.t
 t/02-tex_escape.t
 t/03-REase.t
+t/04-AGLkit.t
+t/05-font_metrics.t
+t/06-onecell.t
 t/10-pod-coverage.t
 t/11-code_coverage.t
 t/12-kwalitee.t
@@ -18,5 +21,12 @@ t/13-critic.t
 t/14-manifest.t
 t/template_good.tex
 t/template_test.tex
+t/glyphlist.txt
+t/glyphlist.dump
+t/PTC55F.afm
+t/PTC55F_undef.dump
+t/PTC55F_glyph.dump
+t/PTC55F_symbol.dump
+t/PTC55F_hex.dump
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

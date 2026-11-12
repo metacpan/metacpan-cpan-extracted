@@ -1,0 +1,34 @@
+------< Global definitions >------
+ Router ID = fw1
+ Default interface = eth0
+------< VRRP Topology >------
+ VRRP Instance = VI_WEB
+   VRRP Version = 2
+   State = FAULT
+   Wantstate = MASTER
+   Last transition = 1762700000.123456 (Sun Nov  9 14:53:20.123456 2025)
+   Interface = eth0
+   Virtual Router ID = 51
+   Priority = 150
+   Effective priority = 150
+   Advert interval = 1 sec
+   Virtual IP (1):
+     192.0.2.100/24 dev eth0 scope global set
+ VRRP Instance = VI_DB
+   VRRP Version = 2
+   State = BACKUP
+   Master router = 192.0.2.12
+   Master priority = 150
+   Wantstate = BACKUP
+   Last transition = 1762700001.654321 (Sun Nov  9 14:53:21.654321 2025)
+   Interface = eth1
+   Virtual Router ID = 52
+   Priority = 100
+   Effective priority = 100
+   Advert interval = 1 sec
+   Virtual IP (1):
+     198.51.100.100/24 dev eth1 scope global
+------< VRRP Sync groups >------
+ VRRP Sync Group = G1, MASTER
+   Num member fault 0, num member init 0
+   monitor = VI_WEB

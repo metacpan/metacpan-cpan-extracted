@@ -1,4 +1,4 @@
-package Dist::Conformance::Snapshot::Tree 0.004;
+package Dist::Conformance::Snapshot::Tree 0.005;
 
 # ABSTRACT: A snapshot from a tree listing and a callback that fetches one file
 
@@ -39,7 +39,7 @@ Dist::Conformance::Snapshot::Tree - A snapshot from a tree listing and a callbac
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

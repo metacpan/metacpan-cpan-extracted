@@ -7,7 +7,7 @@ package Tk::eText;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '2.05';
+$VERSION = '2.08';
 
 use Tk qw(Ev);
 use Tk::Text;
@@ -25,8 +25,8 @@ sub Tk_cmd { \&Tk::etext }
 
 sub Tk::Widget::ScrleText { shift->Scrolled('eText' => @_) }
 
-# Everything Tk::Text has, plus the "block" subcommand.
-Tk::Methods('block');
+# Everything Tk::Text has, plus the "block" and "ornament" subcommands.
+Tk::Methods('block', 'ornament');
 
 # Keyboard undo and redo (MainWindow maps Control-z and friends to the
 # <<Undo>> and <<Redo>> virtual events; Tk::Text itself binds neither).
@@ -90,9 +90,11 @@ sub DETACH {
 # (Tk::Text's versions call Tk::Text::edit and Tk::Text::image directly,
 # which would bypass an override here); markData and tagData are new.
 use Tk::Submethods ( 'block' => [qw(at addline cget configure data delete
-				    deletelines insert list names nodedata of
-				    split trim)],
+				    deletelines flatten insert list names nodedata of
+				    split sprout trim)],
 		     'edit'  => [qw(modified redo reset separator undo)],
+		     'ornament' => [qw(cget configure coords create delete names
+				       point points)],
 		     'mark'  => [qw(data)],
 		     'tag'   => [qw(data)],
 		     'image' => [qw(cget configure create names)],

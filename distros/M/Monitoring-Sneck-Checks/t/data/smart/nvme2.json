@@ -1,0 +1,23 @@
+{
+  "json_format_version": [1, 0],
+  "smartctl": {
+    "version": [7, 4],
+    "messages": [{"string": "SMART overall-health self-assessment test result: FAILED!", "severity": "error"}],
+    "exit_status": 8
+  },
+  "device": {"name": "/dev/nvme2", "info_name": "/dev/nvme2", "type": "nvme", "protocol": "NVMe"},
+  "model_name": "INTEL SSDPEKNW010T8",
+  "serial_number": "BTNH000000011P0B",
+  "smart_support": {"available": true, "enabled": true},
+  "smart_status": {"passed": false, "nvme": {"value": 4, "reliability": true}},
+  "nvme_smart_health_information_log": {
+    "critical_warning": 4,
+    "temperature": 41,
+    "available_spare": 100,
+    "available_spare_threshold": 10,
+    "percentage_used": 12,
+    "media_errors": 3,
+    "num_err_log_entries": 40
+  },
+  "temperature": {"current": 41}
+}

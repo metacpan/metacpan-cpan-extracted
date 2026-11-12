@@ -21,6 +21,12 @@ WriteMakefile(
 	EXE_FILES	=> [qw(script/database-bi script/bi-extract script/bi-geocode script/bi-alert)],	# each has POD, so each gets a man page
 	PREREQ_PM => {
 		'Carp'		=> 0,
+		'Exporter'	=> 0,		# Core
+		'File::Temp'	=> 0,		# Core
+		'FindBin'	=> 0,		# Core; the scripts' lib path
+		'Getopt::Long'	=> 0,		# Core; the scripts' options
+		'Hash::Util'	=> 0,		# Core; locked rows
+		'Time::HiRes'	=> 0,		# Core
 		'Cwd'		=> 0,		# For realpath() in the data_dir guard (Dashboard.pm)
 		'CHI'			=> 0,
 		'CGI::Info'	=> 0,
@@ -75,6 +81,7 @@ WriteMakefile(
 		'Test::Most' => 0,
 		'Test::Mojo' => 0,
 		'Test::Needs' => 0,
+		'Test::NoShadow' => 0,	# t/noshadow.t
 		'Test::Permissions' => '0.001.2',
 		'Test::Returns' => 0.005,
 		'Test::Without::Module' => 0,

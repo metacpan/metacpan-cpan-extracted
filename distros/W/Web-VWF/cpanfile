@@ -18,7 +18,9 @@ requires 'DBD::CSV';
 requires 'DBI';
 requires 'Data::Dumper';
 requires 'Data::Throttler';
+requires 'Data::Validate::URI';   # Allow.pm and Display.pm, to check Referer URLs
 requires 'Database::Abstraction';
+requires 'DateTime';   # Allow.pm, for the DShield feed date
 requires 'Digest::MD5';
 requires 'Digest::SHA';
 requires 'Error';
@@ -34,6 +36,7 @@ requires 'HTML::SocialMedia';
 requires 'HTTP::Date';   # For the Last-Modified header
 requires 'HTTP::Status';
 requires 'JSON::MaybeXS';
+requires 'LWP::Simple::WithCache';   # Allow.pm, the DShield feed
 requires 'LWP::UserAgent';
 requires 'Log::Abstraction';
 requires 'Log::WarnDie', '0.09';
@@ -53,29 +56,30 @@ requires 'Template::Plugin::EnvHash';
 requires 'Template::Plugin::JSON';
 requires 'Template::Plugin::Math';
 requires 'Text::xSV::Slurp';
+requires 'Time::Duration::Parse';   # VWF.pm, rate-limit durations such as '5 minutes'
 requires 'Time::HiRes';
 requires 'Time::Piece';
 requires 'Time::Seconds';
 requires 'Timer::Simple';
 requires 'Try::Tiny';
+requires 'XML::LibXML';   # Allow.pm, parses the DShield feed
+requires 'YAML';   # Throttle.pm, Allow.pm and Display.pm
 requires 'version', '0.77';
 recommends 'Filesys::Df';
+recommends 'Mail::DKIM';
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 };
 
 on 'test' => sub {
-	requires 'Data::Validate::URI';
-	requires 'DateTime';
+	requires 'File::Copy::Recursive';   # t/example-site.t, to run the example from a copy
 	requires 'HTTP::Response';
-	requires 'LWP::Simple::WithCache';
+	requires 'Test::DescribeMe';
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird';
 	requires 'Test::Most';
 	requires 'Test::Returns';
-	requires 'XML::LibXML';   # t/function.t builds and parses test documents
-	requires 'YAML';
 };
 
 on 'develop' => sub {

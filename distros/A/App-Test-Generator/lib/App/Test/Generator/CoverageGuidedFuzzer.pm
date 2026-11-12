@@ -52,7 +52,15 @@ Readonly my $TYPE_STRING  => 'string';
 # --------------------------------------------------
 Readonly my @JSON_MODULES => qw(JSON::MaybeXS JSON);
 
-our $VERSION = '0.47';
+# Devel::Cover files a branch with no else/elsif, and every && / ||,
+# under 'condition' rather than 'branch', so both must be read.
+Readonly my @COVER_CRITERIA => qw(branch condition);
+
+Readonly my $SOFT_BUG_WARNING_RE => qr/uninitialized|undefined|blessed|invalid/i;
+
+our $VERSION = '0.48';
+
+=encoding utf8
 
 =head1 NAME
 
@@ -60,26 +68,68 @@ App::Test::Generator::CoverageGuidedFuzzer - AFL-style coverage-guided fuzzing f
 
 =head1 VERSION
 
-Version 0.47
+Version 0.48
 
 =head1 SYNOPSIS
+
+"Fuzzing" means calling a function many times with machine-made input,
+to find input that makes it fail.  The "corpus" is the list of inputs
+that the fuzzer decided to keep.
+
+Pattern 1: fuzz a function that takes one number, then show the failures.
+The C<input> key of the schema describes the one argument.
 
     use App::Test::Generator::CoverageGuidedFuzzer;
 
     my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
-        schema     => $yaml_schema,
+        schema     => { input => { type => 'integer', min => 0, max => 100 } },
         target_sub => \&My::Module::validate,
         iterations => 200,
         seed       => 42,
     );
 
     my $report = $fuzzer->run();
+    printf "%d failures in %d calls\n",
+        $report->{bugs_found}, $report->{total_iterations};
+    print "  failed with: $_->{error}" for @{ $report->{bugs} };
+
+Pattern 2: keep what was learned between two runs of your program.
+
+    my $file = 't/corpus/validate.json';
+    $fuzzer->load_corpus($file) if -e $file;   # start from the last run
+    $fuzzer->run();
 
     # Optional: trim corpus to minimum branch-covering subset before saving
     my $stats = $fuzzer->minimize_corpus();
     printf "corpus %d -> %d entries\n", $stats->{before}, $stats->{after};
 
-    $fuzzer->save_corpus('t/corpus/validate.json');
+    $fuzzer->save_corpus($file);
+
+Pattern 3: fuzz a method of an object.  The object is passed first and
+the generated input second.
+
+    my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
+        schema     => { input => { type => 'string', max => 20 } },
+        target_sub => \&My::Parser::parse,
+        instance   => My::Parser->new(),
+    );
+    $fuzzer->run();
+
+Pattern 4: test with your own special values, here with non-ASCII text.
+About 4 in 10 new inputs are taken from C<edge_case_array>.
+
+    use utf8;
+    my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
+        schema => {
+            input => {
+                type            => 'string',
+                edge_case_array => [ '', 'na\x{EF}ve', "\x{1F600}" ],
+            },
+        },
+        target_sub => sub { length $_[0] },
+        timeout    => 2,
+    );
+    $fuzzer->run();
 
 =head1 DESCRIPTION
 
@@ -123,7 +173,11 @@ Construct a new coverage-guided fuzzer.
 =item * C<schema>
 
 A hashref representing the parsed YAML schema for the target function.
-Required.
+Required.  Only two keys are used: C<input>, which describes the single
+argument that will be generated, and C<input_style>.  Inside C<input> the
+keys C<type>, C<min>, C<max>, C<matches>, C<items>, C<properties>,
+C<optional> and C<edge_case_array> are used.  For a string, C<min> and
+C<max> are lengths counted in characters.
 
 =item * C<target_sub>
 
@@ -154,7 +208,13 @@ to disable the timeout (e.g. for target subs that legitimately block).
 
 A blessed hashref. Croaks if C<schema> or C<target_sub> is missing.
 
-=head3 API specification
+=head3 Side effects
+
+Calls Perl's C<srand> with the seed.  This restarts the random number
+sequence for the whole program, not only for this object.
+Prints one warning per program if L<Devel::Cover> cannot be loaded.
+
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -177,7 +237,7 @@ A blessed hashref. Croaks if C<schema> or C<target_sub> is missing.
 =head3 EXAMPLE
 
     my $fuzzer = App::Test::Generator::CoverageGuidedFuzzer->new(
-        schema     => { name => { type => 'string' } },
+        schema     => { input => { type => 'string' } },
         target_sub => sub { length($_[0]) },
         iterations => 50,
         seed       => 1234,
@@ -197,13 +257,7 @@ C<target_sub> was not supplied or was falsy.
 
 =back
 
-=head3 FORMAL SPECIFICATION
-
-Pre:  C<defined schema ∧ ref(target_sub) eq 'CODE'>
-
-Post: C<ref(result) eq 'App::Test::Generator::CoverageGuidedFuzzer'>
-      ∧ C<result-E<gt>{seed}> passed to C<srand()>
-      ∧ C<result-E<gt>{corpus} eq []>
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -263,7 +317,23 @@ None beyond C<$self>.
 A hashref with keys C<total_iterations>, C<interesting_inputs>,
 C<corpus_size>, C<branches_covered>, C<bugs_found>, and C<bugs>.
 
+The numbers are totals for the life of the object.  If you call C<run>
+twice, C<total_iterations> is twice the C<iterations> value.
+
+=head3 Side effects
+
+Calls C<target_sub> once per iteration.  Adds five new random inputs to
+the corpus at the start of every call.  Uses C<alarm> and the C<ALRM>
+signal for the timeout, so any alarm that your own program had set is
+cancelled.
+
 =head3 Notes
+
+A call that takes longer than C<timeout> seconds is stopped and recorded
+as a bug with the error C<target_sub timed out after Ns>.
+
+The same failing input can be recorded more than once.  The C<bugs> list
+is not checked for duplicates.
 
 A C<target_sub> call that dies is only recorded in C<bugs> when the
 input that triggered it is valid per C<schema>. A die triggered by an
@@ -271,7 +341,7 @@ input the schema itself marks invalid (e.g. out of the declared
 C<min>/C<max> range) is expected behaviour, not a bug, and is silently
 discarded.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -303,13 +373,7 @@ discarded.
         printf "  input=%s  error=%s\n", $bug->{input}, $bug->{error};
     }
 
-=head3 FORMAL SPECIFICATION
-
-Pre:  C<self-E<gt>{schema}> and C<self-E<gt>{target_sub}> are set
-
-Post: C<result-E<gt>{total_iterations} == self-E<gt>{iterations}>
-      ∧ C<result-E<gt>{corpus_size} == scalar @{self-E<gt>{corpus}}>
-      ∧ C<result-E<gt>{bugs_found} == scalar @{self-E<gt>{bugs}}>
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =head3 PSEUDOCODE
 
@@ -358,7 +422,10 @@ C<input> and C<coverage>.
 
     my $corpus = $fuzzer->corpus();
 
-=head3 API specification
+The arrayref is the fuzzer's own list, not a copy.  Do not change it.
+The list is empty until C<run> or C<load_corpus> has been called.
+
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -385,7 +452,10 @@ C<error>.
 
     my $bugs = $fuzzer->bugs();
 
-=head3 API specification
+The arrayref is the fuzzer's own list, not a copy.  Do not change it.
+C<error> is always text.  C<input> can be C<undef>.
+
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -425,14 +495,16 @@ Path to write the JSON corpus file. Required.
 
 =head3 Returns
 
-Nothing. Croaks if the file cannot be written or no JSON module is
+Nothing useful. Croaks if the file cannot be written or no JSON module is
 available.
 
 =head3 Side effects
 
-Writes a JSON file to C<$path>.
+Writes a JSON file to C<$path>.  An existing file is replaced.
+The file holds the seed, the corpus inputs and the bugs.
+Branch data is not saved.  The file is UTF-8.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -467,7 +539,15 @@ The file could not be opened for writing (permissions, missing directory, etc.).
 
 Neither C<JSON::MaybeXS> nor C<JSON> is installed.
 
+=item C<encountered object ...> or C<encountered CODE ...>
+
+Raised by the JSON module.  A corpus input or bug input holds an object
+or a code reference, which JSON cannot store.  This check happens after
+the file has been opened, so the file is left empty.
+
 =back
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -478,10 +558,10 @@ sub save_corpus {
 
 	my $json = _load_json_module();
 
-	open my $fh, '>', $path
+	open my $fh, '>:raw', $path
 		or croak "Cannot write corpus to $path: $!";
 
-	print $fh $json->new->pretty->encode({
+	print $fh $json->new->utf8->pretty->encode({
 		seed   => $self->{seed},
 		corpus => [ map { { input => $_->{input} } } @{ $self->{corpus} } ],
 		bugs   => $self->{bugs},
@@ -509,14 +589,16 @@ Path to the JSON corpus file to load. Required.
 
 =head3 Returns
 
-Nothing. Croaks if the file cannot be read or no JSON module is
+Nothing useful. Croaks if the file cannot be read or no JSON module is
 available.
 
 =head3 Side effects
 
-Appends loaded entries to C<< $self->{corpus} >>.
+Appends loaded entries to C<< $self->{corpus} >>.  Entries already in the
+corpus are kept, so loading the same file twice gives every entry twice.
+C<minimize_corpus> removes such copies.
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -550,14 +632,20 @@ No path argument was supplied.
 
 The file could not be opened for reading (missing file, permissions, etc.).
 
+=item C<malformed JSON string ...> and similar
+
+Raised by the JSON module.  The file is not valid JSON.
+
 =back
 
-=head3 FORMAL SPECIFICATION
+=head3 Notes
 
-Note: C<load_corpus> does B<not> restore C<bugs> from the JSON file —
-the C<bugs> array in the JSON is written by C<save_corpus> but ignored on load.
+C<load_corpus> does B<not> restore C<bugs> from the JSON file.
+The C<bugs> array in the JSON is written by C<save_corpus> but ignored on load.
 The loaded fuzzer starts with an empty C<bugs> list.  Seed values are also not
 restored; the constructor-supplied seed is retained.
+
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
@@ -568,11 +656,16 @@ sub load_corpus {
 
 	my $json = _load_json_module();
 
-	open my $fh, '<', $path
+	open my $fh, '<:raw', $path
 		or croak "Cannot read corpus from $path: $!";
 
-	my $data = $json->new->decode(do { local $/; <$fh> });
+	my $text = do { local $/; <$fh> };
 	close $fh;
+
+	# Files written before 0.48 hold Latin-1 bytes rather than UTF-8;
+	# those fail the UTF-8 decode and are read the old way instead.
+	my $data = eval { $json->new->utf8->decode($text) }
+		// $json->new->decode($text);
 
 	# Load corpus entries with empty coverage — coverage state from a
 	# previous process cannot be restored, only the inputs themselves
@@ -591,7 +684,7 @@ branch hit by the full corpus, using a greedy set-cover algorithm.
 
 Entries without branch data (loaded from a previous run, or kept by
 random sampling when Devel::Cover is unavailable) are deduplicated by
-input fingerprint and retained in full — they cannot be evaluated for
+input fingerprint and retained in full.  They cannot be evaluated for
 coverage contribution without re-running them.  Bug-triggering inputs
 are always kept regardless of coverage contribution.
 
@@ -604,7 +697,7 @@ are always kept regardless of coverage contribution.
 A hashref with keys C<before> (corpus size before), C<after> (corpus
 size after), and C<branches> (total unique branches still covered).
 
-=head3 API specification
+=head3 API SPECIFICATION
 
 =head4 input
 
@@ -625,14 +718,7 @@ size after), and C<branches> (total unique branches still covered).
         $stats->{before}, $stats->{after}, $stats->{branches};
     $fuzzer->save_corpus('t/corpus/my_func.json');
 
-=head3 FORMAL SPECIFICATION
-
-Post: C<result-E<gt>{before}> == pre corpus size
-      ∧ C<result-E<gt>{after}> ≤ C<result-E<gt>{before}>
-      ∧ C<scalar @{self-E<gt>{corpus}}> == C<result-E<gt>{after}>
-      ∧ every branch covered by the original corpus is still covered
-        by the minimized corpus
-      ∧ every bug-triggering input survives minimization
+The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =head3 PSEUDOCODE
 
@@ -796,32 +882,7 @@ sub _run_one {
 		$coverage = $self->_run_with_cover($input, \$result, \$error);
 	} else {
 		$coverage = {};
-
-		# Include instance as invocant for method calls
-		my @call_args = defined($self->{instance})
-			? ($self->{instance}, $input)
-			: ($input);
-
-		my @warnings;
-		eval {
-			local $SIG{__WARN__} = sub { push @warnings, @_ };
-			local $SIG{__DIE__};
-			# A hanging target_sub call would otherwise hang the
-			# whole fuzzing run — alarm() bounds it and surfaces
-			# the timeout as a recorded bug instead.
-			local $SIG{ALRM} = sub { die "target_sub timed out after $self->{timeout}s\n" };
-			alarm($self->{timeout}) if $self->{timeout};
-			$result = $self->{target_sub}->(@call_args);
-		};
-		alarm(0) if $self->{timeout};
-		$error = $@ if $@;
-
-		# Treat unexpected warnings matching known bad patterns as soft bugs
-		if(!defined($error) && @warnings) {
-			my $w = join '', @warnings;
-			$error = "warning: $w"
-				if $w =~ /uninitialized|undefined|blessed|invalid/i;
-		}
+		($result, $error) = $self->_call_target($input);
 	}
 
 	# Record bugs — only when the input was valid per the schema.
@@ -837,6 +898,51 @@ sub _run_one {
 		$self->_update_covered($coverage);
 		$self->{stats}{interesting}++;
 	}
+}
+
+# --------------------------------------------------
+# _call_target
+#
+# Purpose:    Call the target sub once with a single
+#             input, bounded by the timeout.
+#
+# Entry:      $input - value to pass to target_sub.
+#
+# Exit:       Returns ($result, $error). $error is undef
+#             when the call neither died nor warned in
+#             a way that counts as a soft bug.
+#
+# Side effects: Calls target_sub. Uses alarm().
+#
+# Notes:      A hanging target_sub would otherwise hang
+#             the whole fuzzing run; alarm() bounds it
+#             and surfaces the timeout as an error.
+# --------------------------------------------------
+sub _call_target {
+	my ($self, $input) = @_;
+
+	# Include instance as invocant for method calls
+	my @call_args = defined($self->{instance})
+		? ($self->{instance}, $input)
+		: ($input);
+
+	my ($result, $error, @warnings);
+	eval {
+		local $SIG{__WARN__} = sub { push @warnings, @_ };
+		local $SIG{__DIE__};
+		local $SIG{ALRM} = sub { die "target_sub timed out after $self->{timeout}s\n" };
+		alarm($self->{timeout}) if $self->{timeout};
+		$result = $self->{target_sub}->(@call_args);
+	};
+	alarm(0) if $self->{timeout};
+	$error = $@ if $@;
+
+	if(!defined($error) && @warnings) {
+		my $w = join '', @warnings;
+		$error = "warning: $w" if $w =~ $SOFT_BUG_WARNING_RE;
+	}
+
+	return ($result, $error);
 }
 
 # --------------------------------------------------
@@ -873,21 +979,8 @@ sub _run_with_cover {
 	my $before_ref = $self->{_last_cover_snapshot} || {};
 	my %before = %{$before_ref};
 
-	# Include instance as invocant for method calls
-	my @call_args = defined($self->{instance})
-		? ($self->{instance}, $input)
-		: ($input);
-
-	eval {
-		local $SIG{__DIE__};
-		# See _run_one() — bound the call so a hanging target_sub
-		# cannot hang the whole fuzzing run.
-		local $SIG{ALRM} = sub { die "target_sub timed out after $self->{timeout}s\n" };
-		alarm($self->{timeout}) if $self->{timeout};
-		$$result_ref = $self->{target_sub}->(@call_args);
-	};
-	alarm(0) if $self->{timeout};
-	$$error_ref = $@ if $@;
+	($$result_ref, my $error) = $self->_call_target($input);
+	$$error_ref = $error if defined $error;
 
 	my $after = $self->_snapshot_cover();
 	$self->{_last_cover_snapshot} = $after;
@@ -909,7 +1002,7 @@ sub _run_with_cover {
 #             currently hit branches from Devel::Cover.
 #
 # Entry:      None beyond $self.
-# Exit:       Returns a hash of "file:line:branch" keys.
+# Exit:       Returns a hashref of "criterion:op:slot" keys.
 #
 # Side effects: Reads Devel::Cover internal state.
 #
@@ -923,15 +1016,23 @@ sub _snapshot_cover {
 	my %snap;
 
 	eval {
-		my $cover = Devel::Cover::get_coverage();
-		return unless $cover;
+		# coverage() is the XS accessor for the live counters. It only
+		# exists when the program was started under Devel::Cover; a
+		# late require leaves it undefined and nothing is collected.
+		# (get_coverage() returns the criteria names, not the data.)
+		return unless defined &Devel::Cover::coverage;
+		my $cover = Devel::Cover::coverage(0) or return;
 
-		for my $file (keys %{$cover}) {
-			my $branch = $cover->{$file}{branch} or next;
-			for my $line (keys %{$branch}) {
-				for my $b (0 .. $#{ $branch->{$line} }) {
-					$snap{"$file:$line:$b"} = 1
-						if $branch->{$line}[$b];
+		for my $criterion (@COVER_CRITERIA) {
+			my $data = $cover->{$criterion} or next;
+			for my $key (keys %{$data}) {
+				my $counts = $data->{$key};
+				next unless ref($counts) eq 'ARRAY';
+
+				# Keys are packed op addresses; hex keeps them printable
+				my $id = unpack('H*', $key);
+				for my $i (0 .. $#{$counts}) {
+					$snap{"$criterion:$id:$i"} = 1 if $counts->[$i];
 				}
 			}
 		}
@@ -1188,9 +1289,15 @@ sub _input_is_valid {
 	# No schema means we cannot judge validity
 	return 1 unless defined $spec && ref($spec);
 
+	# A scalar 'type' makes $spec the description of one value. Without
+	# it $spec is a map of named parameters, where a parameter may
+	# itself be called 'type' (its spec is then a hashref).
+	my $is_value_spec = ref($spec) eq 'HASH'
+		&& defined($spec->{type}) && !ref($spec->{type});
+
 	my $input_style = $self->{schema}{input_style} // '';
 
-	if($input_style eq 'hash' || ref($input) eq 'HASH') {
+	if(!$is_value_spec && ($input_style eq 'hash' || ref($input) eq 'HASH')) {
 		return $self->_validate_hash_input($input, $spec);
 	}
 
@@ -1301,6 +1408,9 @@ sub _validate_value {
 	}
 	elsif($type eq $TYPE_HASH || $type eq 'hash') {
 		return 0 unless ref($value) eq 'HASH';
+		if(ref($spec->{properties}) eq 'HASH') {
+			return 0 unless $self->_validate_hash_input($value, $spec->{properties});
+		}
 	}
 
 	return 1;
@@ -1591,6 +1701,139 @@ hung target_sub will hang the whole fuzzing run indefinitely.  Use a
 process-level timeout (e.g. C<Sys::AlarmCall>) if you need a safety net for
 blocking code.
 
+=item A C<timeout> below one second turns the timeout off
+
+C<timeout> is passed to Perl's C<alarm>, which works in whole seconds.
+A value such as C<0.5> becomes C<0>, and C<0> means "no timeout".
+
+=item A schema without an C<input> key
+
+The generator reads only C<< $schema->{input} >>.  If that key is missing,
+every generated input is C<undef>, and C<target_sub> is called with
+C<undef> each time.  No error is raised.
+
+    schema => { name => { type => 'string' } }             # wrong
+    schema => { input => { type => 'string' } }            # right
+
+=item C<target_sub> always gets exactly one generated argument
+
+C<input> describes B<one> value.  If C<input> is a list of named
+parameters without a C<type> key of its own, one random string is
+generated, not a hash.  To pass a hashref, describe it:
+
+    input => {
+        type       => 'hashref',
+        properties => { age => { type => 'integer', min => 0 } },
+    }
+
+=item How C<undef> and other false values are handled
+
+=over 4
+
+=item * C<schema> and C<target_sub> must be B<true> values, not only
+defined.  An empty hashref C<{}> is true and is accepted.
+
+=item * C<target_sub> is not checked to be a code reference.  A wrong
+value is accepted by C<new>, and then every call in C<run> fails.
+
+=item * C<iterations>, C<seed> and C<timeout> use their default only when
+they are missing or C<undef>.  The value C<0> is kept: C<< iterations => 0 >>
+runs no calls, C<< seed => 0 >> is a valid fixed seed, C<< timeout => 0 >>
+means no time limit.
+
+=item * An C<undef> input can be generated (see above) and can be saved.
+It is written to the JSON file as C<null> and comes back as C<undef>.
+
+=item * An C<undef> value for a required field makes an input invalid.
+An C<undef> value for a field marked C<optional> is valid.
+
+=item * C<save_corpus(undef)> and C<load_corpus(undef)> croak with
+C<path required>.
+
+=back
+
+=item Nested data is copied only one level deep
+
+When a hashref or arrayref input is mutated, only the top level is copied.
+Deeper hashes and arrays are shared between the old and the new corpus
+entry.  If your C<target_sub> changes its argument in place, it can
+silently change other corpus entries too.  Write C<target_sub> so that it
+only reads its argument, or make it take a deep copy first.
+
+=item C<load_corpus> adds entries. It does not merge or replace.
+
+Loaded entries are put after the entries already in the corpus.  Nothing
+is compared and nothing is overwritten.  Load a file twice and you have
+two copies of each entry.
+
+=item Every C<run> adds five more random seed inputs
+
+The corpus grows by at least five entries per C<run> call.  Call
+C<minimize_corpus> before C<save_corpus> if the object is used for many
+runs.
+
+=item Some warnings are recorded as bugs
+
+A warning from C<target_sub> that contains the word C<uninitialized>,
+C<undefined>, C<blessed> or C<invalid> is recorded as a bug, even though
+the call did not die.  Warnings are caught during the call, so they are
+not printed.  Other warnings are thrown away.
+
+=item C<branches_covered> is 0
+
+This means that no branch data was received.  Branch data is only
+available when the whole program is started under C<Devel::Cover>, for
+example with C<perl -MDevel::Cover script.pl>.  Having the module
+installed is not enough.  Without it the run is random-only.  Do not read
+a value of 0 as "the target has no branches".
+
+=item Branch counts include more than your target
+
+C<Devel::Cover> counts every branch in the program.  A few of the
+branches counted in C<branches_covered> belong to the fuzzer and to other
+modules, not to C<target_sub>.  Use the number to compare two runs, not
+as an exact size.
+
+=back
+
+=head1 ENCODING
+
+=over 4
+
+=item * Inputs given to C<target_sub>
+
+All strings are Perl character strings.  Strings made by the fuzzer use
+ASCII letters, digits, space, tab, newline and the NUL character.
+Mutation can also produce any character from 0 to 255.  The fuzzer never
+invents characters above 255 (for example emojis) by itself.
+
+=item * C<edge_case_array> and C<matches> in the schema
+
+Full Unicode is supported, including non-ASCII letters and emojis.  Give
+them as decoded character strings (C<use utf8> in your source, or a YAML
+file loaded with L<YAML::XS>).  Such values are passed to C<target_sub>
+unchanged and are mutated one character at a time.
+
+=item * String C<min> and C<max>
+
+Lengths are counted in characters, not bytes.
+
+=item * C<save_corpus> and C<load_corpus>
+
+Full Unicode is supported.  The file is written as UTF-8 JSON, and every
+string, including non-ASCII letters and emojis, is loaded back exactly as
+it was saved.  A corpus file written by version 0.47 or earlier, which
+could hold Latin-1 bytes, is still read correctly.
+
+=item * The C<path> argument
+
+Passed to the operating system unchanged.  ASCII paths always work.
+
+=item * Error text in C<bugs>
+
+The C<error> value is whatever C<target_sub> died with, turned into a
+string.  It is not encoded or decoded.
+
 =back
 
 =head1 LIMITATIONS
@@ -1607,7 +1850,7 @@ their corpora.
 =item Coverage granularity is branch-level
 
 Branch coverage is the finest granularity Devel::Cover exposes via its public
-API.  Path coverage (distinct sequences of branches) is not tracked — two
+API.  Path coverage (distinct sequences of branches) is not tracked.  Two
 inputs that cover the same branches but exercise different call orders are
 treated as equivalent.
 
@@ -1637,6 +1880,238 @@ Nigel Horne, C<< <njh at nigelhorne.com> >>
 
 Portions of this module's initial design and documentation were created
 with the assistance of AI.
+
+=head1 FORMAL SPECIFICATION
+
+This section describes each method in Z notation.  It is for readers who
+want an exact, mathematical statement.  You do not need it to use the module.
+
+How to read it: a name ending in C<?> is an input, a name ending in C<!> is
+an output, and a name ending in C<'> is the value after the call.
+E<0x0394> before the state name means "this call may change the object".
+E<0x039E> means "this call does not change the object".
+C<#> is the number of items in a list or set.
+
+    Entry == [ input : VALUE ; coverage : ℙ BRANCH ]
+    Bug   == [ input : VALUE ; error : STRING ]
+
+    ┌─ Fuzzer ──────────────────────────────────────────
+    │ schema : VALUE
+    │ target_sub : VALUE
+    │ instance : VALUE
+    │ iterations, seed, timeout : NUMBER
+    │ corpus : seq Entry
+    │ bugs : seq Bug
+    │ covered : ℙ BRANCH
+    │ total, interesting : ℕ
+    ├───────────────────────────────────────────────────
+    │ schema and target_sub are true values
+    │ ⋃ { e : ran corpus • e.coverage } ⊆ covered
+    │ interesting ≤ #corpus
+    └───────────────────────────────────────────────────
+
+=head2 new
+
+    ┌─ New ─────────────────────────────────────────────
+    │ Fuzzer′
+    │ schema?, target_sub?, instance? : VALUE
+    │ iterations?, seed?, timeout? : NUMBER ∪ { undef }
+    │ result! : Fuzzer
+    ├───────────────────────────────────────────────────
+    │ pre   schema? is true ∧ target_sub? is true
+    │ post  schema′ = schema? ∧ target_sub′ = target_sub?
+    │       instance′ = instance?
+    │       iterations′ = if iterations? = undef then 100 else iterations?
+    │       seed′ = if seed? = undef then time() else seed?
+    │       timeout′ = if timeout? = undef then 5 else timeout?
+    │       corpus′ = ⟨⟩ ∧ bugs′ = ⟨⟩ ∧ covered′ = ∅
+    │       total′ = 0 ∧ interesting′ = 0
+    │       srand(seed′) has been called
+    │       result! = θ Fuzzer′
+    └───────────────────────────────────────────────────
+
+    schema? is false      ⇒ croak 'schema required'
+    target_sub? is false  ⇒ croak 'target_sub required'
+
+=head2 run
+
+    ┌─ Run ─────────────────────────────────────────────
+    │ Δ Fuzzer
+    │ result! : REPORT
+    ├───────────────────────────────────────────────────
+    │ post  total′ = total + iterations
+    │       corpus prefix corpus′
+    │       #corpus′ ≥ #corpus + 5
+    │       #corpus′ − #corpus − 5 = interesting′ − interesting
+    │       bugs prefix bugs′
+    │       covered ⊆ covered′
+    │       ∀ b : ran bugs′ ∖ ran bugs •
+    │           b.input is valid for schema.input
+    │       result!.total_iterations = total′
+    │       result!.interesting_inputs = interesting′
+    │       result!.corpus_size = #corpus′
+    │       result!.branches_covered = #covered′
+    │       result!.bugs_found = #bugs′
+    │       result!.bugs = bugs′
+    │       schema′ = schema ∧ seed′ = seed
+    └───────────────────────────────────────────────────
+
+=head2 corpus
+
+    ┌─ Corpus ──────────────────────────────────────────
+    │ Ξ Fuzzer
+    │ result! : seq Entry
+    ├───────────────────────────────────────────────────
+    │ post  result! = corpus      (the same list, not a copy)
+    └───────────────────────────────────────────────────
+
+=head2 bugs
+
+    ┌─ Bugs ────────────────────────────────────────────
+    │ Ξ Fuzzer
+    │ result! : seq Bug
+    ├───────────────────────────────────────────────────
+    │ post  result! = bugs        (the same list, not a copy)
+    └───────────────────────────────────────────────────
+
+=head2 save_corpus
+
+    ┌─ SaveCorpus ──────────────────────────────────────
+    │ Ξ Fuzzer
+    │ path? : PATH
+    ├───────────────────────────────────────────────────
+    │ pre   path? ≠ undef ∧ path? can be written
+    │       every input in corpus and bugs is plain data
+    │ post  content′(path?) = JSON of
+    │           [ seed   ↦ seed,
+    │             corpus ↦ ⟨ e : corpus • [ input ↦ e.input ] ⟩,
+    │             bugs   ↦ bugs ]
+    └───────────────────────────────────────────────────
+
+    path? = undef             ⇒ croak 'path required'
+    path? cannot be written   ⇒ croak 'Cannot write corpus to ...'
+
+=head2 load_corpus
+
+    ┌─ LoadCorpus ──────────────────────────────────────
+    │ Δ Fuzzer
+    │ path? : PATH
+    │ loaded : seq VALUE
+    ├───────────────────────────────────────────────────
+    │ pre   path? ≠ undef ∧ path? holds valid JSON
+    │ post  loaded = the inputs under the 'corpus' key of the file
+    │       corpus′ = corpus ⁀ ⟨ v : loaded • [ input ↦ v, coverage ↦ ∅ ] ⟩
+    │       bugs′ = bugs ∧ seed′ = seed ∧ covered′ = covered
+    │       total′ = total ∧ interesting′ = interesting
+    └───────────────────────────────────────────────────
+
+    path? = undef          ⇒ croak 'path required'
+    path? cannot be read   ⇒ croak 'Cannot read corpus from ...'
+
+=head2 minimize_corpus
+
+    fp(v) == the canonical JSON text of v   (the "fingerprint")
+
+    ┌─ MinimizeCorpus ──────────────────────────────────
+    │ Δ Fuzzer
+    │ result! : [ before, after, branches : ℕ ]
+    │ with, without : seq Entry
+    ├───────────────────────────────────────────────────
+    │ post  with = corpus filtered to entries with coverage ≠ ∅
+    │       without = corpus filtered to entries with coverage = ∅
+    │       result!.before = #corpus
+    │       result!.after = #corpus′
+    │       result!.branches = # ⋃ { e : ran with • e.coverage }
+    │       ⋃ { e : ran corpus′ • e.coverage }
+    │           = ⋃ { e : ran corpus • e.coverage }
+    │       ∀ e : ran without • ∃ k : ran corpus′ •
+    │           fp(k.input) = fp(e.input)
+    │       ∀ b : ran bugs • ∃ k : ran corpus′ •
+    │           fp(k.input) = fp(b.input)
+    │       corpus′ is a new list (old references are stale)
+    │       bugs′ = bugs ∧ covered′ = covered
+    │       total′ = total ∧ interesting′ = interesting
+    └───────────────────────────────────────────────────
+
+    Calling it a second time changes nothing:
+    result!.before = result!.after on the second call.
+
+=head1 STATE DIAGRAM
+
+The state of a fuzzer is the state of its corpus.
+
+      new(schema or target_sub missing or false)
+    +--------------------------------------------------+
+    |  action: croak, no object                        |
+    v                                                  |
+  +-------------+                                      |
+  |  NO OBJECT  |--------------------------------------+
+  +-------------+
+        |
+        | new(schema, target_sub, ...)
+        | action: store settings, call srand(seed),
+        |         try to load Devel::Cover
+        v
+  +---------------------+  minimize_corpus()
+  |                     |-----------------------------------------+
+  |        EMPTY        |  action: returns 0 / 0 / 0              |
+  |  (corpus is empty)  |<----------------------------------------+
+  |                     |
+  |                     |  save_corpus(path)
+  |                     |-----------------------------------------+
+  |                     |  action: write a file with no entries   |
+  |                     |<----------------------------------------+
+  +---------------------+
+        |
+        | run()
+        |   action: add 5 random inputs, call target_sub
+        |           'iterations' times, keep interesting inputs,
+        |           record bugs, return the report
+        | load_corpus(path)
+        |   action: add the inputs from the file (no branch data)
+        v
+  +---------------------+  run()
+  |                     |-----------------------------------------+
+  |       GROWING       |  action: as above; corpus gets bigger,  |
+  |  (corpus may hold   |  totals are added to the old totals     |
+  |   copies and spare  |<----------------------------------------+
+  |   entries)          |
+  |                     |  load_corpus(path)
+  |                     |-----------------------------------------+
+  |                     |  action: add the file's inputs again    |
+  |                     |<----------------------------------------+
+  |                     |
+  |                     |  save_corpus(path)
+  |                     |-----------------------------------------+
+  |                     |  action: write the file, no change      |
+  |                     |<----------------------------------------+
+  +---------------------+
+        |            ^
+        |            | run()  or  load_corpus(path)
+        |            | action: as above
+        | minimize_corpus()
+        | action: replace the corpus with a new, smaller list;
+        |         keep every covered branch and every bug input;
+        |         return before / after / branches
+        v            |
+  +---------------------+  minimize_corpus()
+  |                     |-----------------------------------------+
+  |      MINIMIZED      |  action: nothing changes (before=after) |
+  |  (no spare entries) |<----------------------------------------+
+  |                     |
+  |                     |  save_corpus(path)
+  |                     |-----------------------------------------+
+  |                     |  action: write the smallest file        |
+  |                     |<----------------------------------------+
+  +---------------------+
+
+  In every state: corpus() and bugs() return the current lists and
+  change nothing.  A call that croaks (bad path, unwritable file,
+  unreadable file) changes nothing.
+
+The usual order of calls in one program run is:
+
+    new -> load_corpus -> run -> minimize_corpus -> save_corpus
 
 =head1 LICENCE AND COPYRIGHT
 

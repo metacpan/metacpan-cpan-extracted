@@ -42,6 +42,29 @@ subtest sections => sub {
     );
 };
 
+subtest without_sections => sub {
+    my $without = \&Dist::Conformance::Check::CriticProfile::without_sections;
+    my $profile = "# Header of the file\nseverity = 1\n[Keep::Me]\nk = v\n\n# Why Old::One was here\n; and more\n[Perl::Critic::Policy::Old::One] ; inline\nmax = 3\n# between\n  min = 1\n\n# About Keep::Too\n[Keep::Too]\n";
+    is( $without->( $profile,                                'Old::One' ),            "# Header of the file\nseverity = 1\n[Keep::Me]\nk = v\n\n\n# About Keep::Too\n[Keep::Too]\n", 'the section, its parameters and the comment directly above go; the comment that ends it and the next section stay' );
+    is( $without->( $profile,                                'Absent::One' ),         $profile,                                                                                      'a policy that the profile does not have changes nothing' );
+    is( $without->( "# Header\n[Old::One]\nx = 1\n[Mine]\n", 'Old::One' ),            "# Header\n[Mine]\n",                                                                          'a comment block that starts the file is its header, and stays' );
+    is( $without->( "[A]\n# about A\n[Old::One]\n",          'Old::One' ),            "[A]\n",                                                                                       'a comment between two sections belongs to the one below it' );
+    is( $without->( "[-Old::One]\n[Old::One]\nx = 1",        'Old::One' ),            "[-Old::One]\n",                                                                               'a section that turns it off stays, and a last section without a newline goes' );
+    is( $without->( "[Old::One]\n[A]\n[Old::Two]\ny = 2\n",  qw{Old::One Old::Two} ), "[A]\n",                                                                                       'each policy of the list' );
+};
+
+subtest retired => sub {
+    is( [ profile( retired => [qw{Perl::Critic::Policy::Old::One Old::Two}] )->retired ], [qw{Old::One Old::Two}],                       'by the short name, in order' );
+    is( [ profile( retired => ['Subroutines::ProhibitSubroutinePrototypes'] )->retired ], ['Subroutines::ProhibitSubroutinePrototypes'], 'a policy that the template turns off can be retired' );
+    is(
+        dies { profile( retired => [qw{Old::One Variables::ProhibitReusedNames}] )->retired },
+        "templates/perlcriticrc enables Variables::ProhibitReusedNames, which retired names too: a policy is either in the template or retired\n",
+        'a policy that the template enables cannot be retired'
+    );
+    like( dies { profile( retired => ['-Old::One'] ) },           qr{/retired/0}, 'a name with the prefix of a section that turns a policy off is refused' );
+    like( dies { profile( retired => [qw{Old::One Old::One}] ) }, qr{/retired},   'and a name given twice' );
+};
+
 subtest check => sub {
     is( check_of( Fixture::checkout() ),     [ 'fail', '.perlcriticrc is missing' ],                   'a missing profile fails' );
     is( check_of( checkout_with($CURRENT) ), [ 'pass', 'has every policy of templates/perlcriticrc' ], 'a profile with every policy passes, with no header at all' );
@@ -58,8 +81,20 @@ subtest check => sub {
         check_of( checkout_with($CURRENT), template => 'templates/perlcriticrc.compat' ),
         [ 'fail', 'lacks the policy TestingAndDebugging::RequireUseStrict of templates/perlcriticrc.compat' ], 'the strict profile lacks what the compat flavor adds'
     );
-    is( check_of( checkout_with("junk\n") ),                                             [ 'fail', '.perlcriticrc does not parse as a perlcritic profile: Syntax error at line 1: \'junk\'' ], 'a profile that does not parse fails' );
-    is( check_of( checkout_with($CURRENT), header => '# Other', outdated => ['# Old'] ), [ 'pass', 'has every policy of templates/perlcriticrc' ],                                             'the deprecated header and outdated still load, and decide nothing' );
+    is( check_of( checkout_with("junk\n") ), [ 'fail', '.perlcriticrc does not parse as a perlcritic profile: Syntax error at line 1: \'junk\'' ], 'a profile that does not parse fails' );
+    my %retire = ( retired => [qw{Old::One Old::Two}] );
+    is(
+        check_of( checkout_with("$CURRENT\[Old::One]\nmax = 3\n[-Old::Two]\n[Mine]\n"), %retire ),
+        [ 'fail', 'enables the retired policy Old::One, which conformance update removes' ], 'a retired policy that the profile enables fails, by name; one that it turns off does not'
+    );
+    is(
+        check_of( checkout_with("[Old::Two]\n[Old::One]\n[Variables::ProhibitReusedNames]\n"), %retire ),
+        [ 'fail', 'lacks the policy RegularExpressions::RequireDefault of templates/perlcriticrc; enables the retired policies Old::One, Old::Two, which conformance update removes' ],
+        'and with a missing policy, both'
+    );
+    is( check_of( checkout_with("$CURRENT\[Mine]\n"), %retire ), [ 'pass', 'has every policy of templates/perlcriticrc' ], 'a profile without a retired policy passes' );
+    like( dies { profile( retired => ['Variables::ProhibitReusedNames'] )->check( Dist::Conformance::Snapshot::Directory->new( root => checkout_with($CURRENT) ) ) }, qr/which\ retired\ names\ too/, 'a template that enables a retired policy dies' );
+    is( check_of( checkout_with($CURRENT), header => '# Other', outdated => ['# Old'] ), [ 'pass', 'has every policy of templates/perlcriticrc' ], 'the deprecated header and outdated still load, and decide nothing' );
 };
 
 subtest update => sub {
@@ -107,6 +142,42 @@ subtest update => sub {
         'a profile that does not parse is left for a person'
     );
     is( Fixture::run_update( profile( replace => 1 ), checkout_with("junk\n") )->changes, [ { action => 'replace', path => '.perlcriticrc' } ], 'unless replace says to overwrite it' );
+};
+
+subtest 'update: a retired policy' => sub {
+    my %retire = ( retired => [qw{Old::One Old::Two}] );
+    my $root   = checkout_with("$CURRENT\n# Old::One, because\n[Old::One]\nmax = 3\n\n# mine, on purpose\n[Mine]\nx = 1\n");
+    my $update = Fixture::run_update( profile(%retire), $root );
+    is( $update->changes,                                        [ { action => 'replace', path => '.perlcriticrc' } ],     'a profile that enables a retired policy is edited' );
+    is( $update->manual,                                         [],                                                       'with nothing left for a person' );
+    is( $root->child('.perlcriticrc')->slurp,                    "$CURRENT\n\n# mine, on purpose\n[Mine]\nx = 1\n",        'its section, its parameters and its comment go, and a policy of its own stays' );
+    is( check_of( $root, %retire ),                              [ 'pass', 'has every policy of templates/perlcriticrc' ], 'and then it passes' );
+    is( Fixture::run_update( profile(%retire), $root )->changes, [],                                                       'so a second update has nothing to do' );
+
+    my $both = checkout_with("[Old::Two]\nk = v\n[Variables::ProhibitReusedNames]\n");
+    is( Fixture::run_update( profile(%retire), $both )->changes, [ { action => 'replace', path => '.perlcriticrc' } ],                                   'a retired policy and a missing one are one change' );
+    is( $both->child('.perlcriticrc')->slurp,                    "[Variables::ProhibitReusedNames]\n[RegularExpressions::RequireDefault]\nstrict = 1\n", 'the one goes and the other is appended' );
+
+    my $own = "$CURRENT\[Mine]\n[-Old::One]\n";
+    is( Fixture::run_update( profile(%retire), checkout_with($own) )->changes, [], 'a profile without a retired policy is left alone' );
+
+    my $placeholder_standards = Fixture::checkout( 'perlcriticrc' => "[A::B]\nmax = {{MAX}}\n" );
+    my $placeholder           = Dist::Conformance::Check::CriticProfile->from_config(
+        name   => 'CriticProfile',
+        config => { %CONFIG, template => 'perlcriticrc', %retire },
+        source => Dist::Conformance::Source::Directory->new( directory => "$placeholder_standards" ),
+    );
+    my $unfilled_root = checkout_with("[Old::One]\n");
+    my $unfilled      = Fixture::run_update( $placeholder, $unfilled_root );
+    is( $unfilled_root->child('.perlcriticrc')->slurp, q{}, 'a template with a placeholder still lets the retired policy go' );
+    is( scalar @{ $unfilled->manual },                 1,   'and leaves what it cannot append for a person' );
+
+    like( dies { Fixture::run_update( profile( retired => ['RegularExpressions::RequireDefault'] ), checkout_with($OLD) ) }, qr/which\ retired\ names\ too/, 'a template that enables a retired policy dies, rather than removing it' );
+
+    my $dry    = checkout_with("[Old::One]\n$CURRENT");
+    my $before = Fixture::tree_of($dry);
+    is( Fixture::run_update( profile(%retire), $dry, 1 )->changes, [ { action => 'replace', path => '.perlcriticrc' } ], 'a dry run says that it would remove it' );
+    is( Fixture::tree_of($dry),                                    $before,                                              'and removes nothing' );
 };
 
 subtest 'update: a dry run' => sub {

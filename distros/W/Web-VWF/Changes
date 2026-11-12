@@ -1,4 +1,23 @@
 Revision history for Web-VWF
 
-0.01	Tue Nov 10 09:00:49 PM EST 2026
+0.002.0	Wed Nov 11 08:54:17 PM EST 2026
+	[ Enhancements ]
+	- Added Web::VWF::Mail: sends mail through sendmail(1), signed with DKIM when
+	the site configures DKIMSelector and DKIMKey.  Mail::DKIM is recommended,
+	not required; without it, or without a key, mail is sent unsigned.
+	Web::VWF::Display::index now sends through it.
+	- Mail rejects a sender that could be read as a sendmail option or a header.
+	- Declared the dependencies that were only loaded lazily and so were missing
+	from the build files: Data::Validate::URI, DateTime, LWP::Simple::WithCache,
+	Time::Duration::Parse, XML::LibXML and YAML.
+	- Debug logging of the configuration now redacts secrets, keys and tokens
+	(Web::VWF::Utils::redact_config).
+	- Every module now carries the distribution's $VERSION.
+	- Documented the API of new(), and of Web::VWF::Mail.
+	- Corrected the README and POD, which described a site layout that is not in
+	the distribution, and fixed 8-space indentation in two modules.
+	- Declared the licence as GPL2 in the metadata, and kept example/ and t/ out
+	of the CPAN index.
+
+0.001.0	Tue Nov 10 09:00:49 PM EST 2026
 	First draft

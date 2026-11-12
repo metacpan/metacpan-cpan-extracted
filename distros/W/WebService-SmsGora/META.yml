@@ -1,5 +1,5 @@
 ---
-abstract: 'Perl client for the SMS Gora SMS Gateway API'
+abstract: 'SMS Gora SMS Gateway: official Perl client by Tekservix (send and receive SMS through your own Android phones)'
 author:
   - 'Tekservix <support@tekservix.com>'
 build_requires:
@@ -12,6 +12,7 @@ generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2
 keywords:
   - sms
   - sms-gateway
+  - sms-api-gateway
   - bulk-sms
   - android
   - tekservix
@@ -36,5 +37,5 @@ resources:
   bugtracker: https://github.com/TekservixHQ/smsgora-perl/issues
   homepage: https://tekservix.com/smsgora/
   repository: https://github.com/TekservixHQ/smsgora-perl.git
-version: '1.000'
+version: '1.001'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

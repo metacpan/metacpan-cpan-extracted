@@ -1,6 +1,6 @@
 package Pod::Literate;
 use parent 'Pod::Simple';
-our $VERSION='0.0.2';
+our $VERSION='0.0.3';
 use strict;
 use warnings;
 my $cache='--PODLITERATECACHE--';
@@ -74,15 +74,17 @@ sub indent {
 sub _handle_element_start {
 	my ($self,$element,$attribute)=@_;
 	my $target=$$attribute{target}//'';
-	if($target ne 'literate') { return }
+	if($target eq ':literate') { die 'Non-data paragraphs are not currently supported via ":literate"' }
+	if($target!~/^literate(?::command)?$/) { return }
 	if(my $name=$self->target()) {
 		$self->sectionAppend($name, $self->collected());
 		$self->clearCollection()->initCollection();
 		return;
 	}
 	if($element eq 'for') {
-		$$self{$cache}{mode}=$$attribute{'~really'};
-		if($$attribute{title}) { $self->targetSet($$attribute{title}=~s/^\+//r) }
+		if($target eq 'literate:command') { $$self{$cache}{mode}='command' }
+		else { $$self{$cache}{mode}=$$attribute{'~really'} }
+		if($$attribute{title}) { my $s=$$attribute{title}; $s=~s/^\+//; $self->targetSet($s) }
 		$self->initCollection();
 	}
 }
@@ -92,7 +94,12 @@ sub _handle_element_end {
 	if($element eq 'for') {
 		my ($mode,$collected)=@{$$self{$cache}}{qw/mode collector/};
 		$collected=~s/\n$//s;
-		if(($mode eq '=for')&&($collected=~/^target:(.+)$/)) {
+		if(($mode eq 'command')&&($collected=~/^target=(.+)$/)) {
+			$$self{$cache}{ofn}=$1;
+			$self->clearCollection();
+		}
+		elsif(($mode eq '=for')&&($collected=~/^target:(.+)$/)) {
+			print STDERR "=for literate target: is deprecated; use =for literate:command\n";
 			$$self{$cache}{ofn}=$1;
 			$self->clearCollection();
 		}
@@ -100,7 +107,8 @@ sub _handle_element_end {
 			$self->clearCollection();
 		}
 		elsif($mode eq '=for') {
-			$self->targetSet($collected=~s/^\+//r);
+			my $s=$collected; $s=~s/^\+//;
+			$self->targetSet($s);
 			$self->initCollection();
 		}
 		elsif($self->target()) {
@@ -194,7 +202,7 @@ Pod::Literate - Literate programming through POD, for general applications or sp
 
 =head1 VERSION
 
-Version 0.0.2
+Version 0.0.3
 
 =head1 SYNOPSIS
 
@@ -230,7 +238,7 @@ Unused sections may become failures, warnings, etc.
 
 =item Commands
 
-Commands like C<literate target:name> might change.  Considering C<:literate> for these.
+Commands will likely migrate to the following syntax:  C<=for literate:command target=name> or similar.
 
 =item Weave
 
@@ -288,9 +296,11 @@ Leading and trailing spaces are ignored, but otherwise only the sequence C<E<gt>
 
 At this time, a single output file is supported per specification:
 
-  =for literate target:Module.pm
+  =for literate:command target=Module.pm
 
 Relative and full path specifications are permitted.  (Expect this to support multiple file output in the future).
+
+The previous syntax will be deprecated:  C<=for literate target:Module.pm>
 
 =head1 TODO
 
@@ -307,21 +317,21 @@ The names are clear within the specification, but the generated POD doesn't cont
 
 Basic functionality is provided in C<weave>, but functionality is still being decided.
 
-=item todo Support C<=for literate import:filename>
+=item todo Support C<=for literate:command import=filename>
 
 Documents may appear in sections, and one large POD can become difficult to manage.  With a specialized weave command, it would be sensible to support imports.
 
 =item todo Handle multiple output filenames
 
-The C<target:filename> can simmply set the output and all subsequent sections will be collected therein.  If another filename is encountered, the scanner will start putting sections there.  With an C<import> statement, the filenames would be fairly well scoped, and perhaps C<import> should explicitly scope any set filename.
+The C<target=filename> can simmply set the output and all subsequent sections will be collected therein.  If another filename is encountered, the scanner will start putting sections there.  With an C<import> statement, the filenames would be fairly well scoped, and perhaps C<import> should explicitly scope any set filename.
 
 =item done First line indentation is removed, to match indentation at the point of reference
 
 =item done First line indentation applies to every line in the reference
 
-=item todo Inline references
+=item done Inline references
 
-Most work has been focused on standalone references.  What is the behavior of C<{ named reference }> when the reference is a single line?  Multiline?
+A reference within a line is handled correctly.  C<if(#E<lt> ref E<gt>#)> expands properly if C<ref> is a single line, with no additional spaces.  If ref is a multiline, it's still inserted at that spot, with its inner newlines, but with no terminal newline.
 
 =item todo Inline declaration
 
@@ -329,7 +339,9 @@ Support for C<XE<lt>nameE<gt>code> to declare single lines of code within a para
 
 =item todo Detect/reject invalid sequences like begin/for, begin/begin, for title/for title
 
-=item todo Investigate colon-prefixed C<=for :literate command> for the command strings.
+=item done Investigate colon-prefixed C<=for :literate command> for the command strings.
+
+These are now explicitly rejected.  These are meant to denote plain/POD paragraphs according to L<perlpodspec>, which will require additional parsers.  This syntax may be used to emit POD into the tangled result in the future.
 
 =item todo Blank code lines
 
@@ -343,7 +355,7 @@ Lexicographic index of all section names etc.  (Page numbers seem irrelevant, is
 
 =item todo Module pod
 
-How to denote pod that belongs with the output module?
+How to denote pod that belongs with the output module?  This may be supported via the C<:literate> format identifier.
 
 =item todo Tests
 

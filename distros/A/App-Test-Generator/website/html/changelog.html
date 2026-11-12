@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Changes — App::Test::Generator</title>
+<meta name="description" content="Release history for App::Test::Generator 0.47: the --function flag, a clearer self-fuzz summary, invocant fixes, CPD drill-downs, sortable persistent dashboard tables and the domain, path, data-flow and transaction test suites.">
+<link rel="canonical" href="changelog.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Changes — App::Test::Generator">
+<meta property="og:description" content="What changed in 0.47 and 0.46, and where to find the rest.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html" class="current" aria-current="page">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Changes</h1>
+	<p class="lead">
+		The two most recent releases in full, then the version history. The
+		distribution's <code>Changes</code> file is the authoritative record.
+	</p>
+
+	<h2 id="v0-47">0.47 — 7 October 2026</h2>
+
+	<h3>Enhancements</h3>
+	<ul>
+		<li><strong><code>extract-schemas --function NAME</code> (<code>-F</code>)</strong> —
+		extracts everything, then deletes every schema except <code>NAME.yml</code>
+		and limits the fuzz run and the summary table to that one routine. Built
+		for isolating a single failure in the self-fuzz suite; if the name is not
+		found, the available routine names are printed and the command exits 1.</li>
+		<li><strong>A clearer self-fuzz summary.</strong> The end-of-run table now
+		lists every processed routine, not only the ones that fuzzed successfully,
+		with the module name, the routine and either a test count or a plain
+		reason for skipping: internal helper, excluded from the fuzz list, instance
+		method needing an object, mandatory object parameter without a
+		<code>can</code> hint, or FAILED.</li>
+	</ul>
+
+	<h3>Documentation</h3>
+	<ul>
+		<li>Expanded the <code>MUTANT_SKIP</code> examples.</li>
+	</ul>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li><strong><code>$pkg</code> was extracted as a parameter.</strong> The
+		invocant filter only knew <code>$self</code> and <code>$class</code>, so
+		<code>$pkg</code> in <code>import()</code>, <code>$proto</code> in older
+		constructors and <code>$klass</code> were emitted as position-0 string
+		parameters — giving modules that use <code>use Module key =&gt; value</code>
+		a spurious <code>pkg: {type: string}</code> entry. All extraction loops,
+		the POD/code agreement check and the inline body guard now share the full
+		<code>self|class|pkg|proto|klass</code> set. Three regression tests cover
+		it.</li>
+	</ul>
+
+	<h2 id="v0-46">0.46 — 18 August 2026</h2>
+
+	<h3>Dashboard</h3>
+	<ul>
+		<li><strong>CPD drill-down pages.</strong> A per-file page shows the source
+		with duplicated lines highlighted, and ◆ markers linking to the other copy
+		of each block. Dup% badges link to it, and the mutation page's legend does
+		too.</li>
+		<li><strong>One visual style for per-file pages.</strong> Duplication pages
+		now use the same header, footer, CSS variables and dark-mode toggle as
+		mutation pages.</li>
+		<li><strong>Sortable mutation and duplication tables.</strong> Any column
+		header sorts; arrows show the active column and direction. Sorting detects
+		numbers versus text, honours <code>data-sort-type="date"</code>, and
+		respects a <code>data-value</code> attribute where the displayed text is
+		not the sort key.</li>
+		<li><strong>Fixed a column-alignment bug.</strong> The TER column appeared
+		in data rows but only in the header when LCSAJ data existed, shifting the
+		Dup% index. TER is now always in the header.</li>
+		<li><strong>Drag to reorder columns</strong>, with the active sort column
+		following its column to its new position.</li>
+		<li><strong>Persistent sort and column order</strong> for all four tables,
+		stored in <code>localStorage</code> and restored on load. Columns are
+		identified by their original index, so a saved order survives a new column
+		being added.</li>
+	</ul>
+
+	<h3>Tests</h3>
+	<ul>
+		<li><strong><code>t/domain.t</code></strong> — equivalence partitioning and
+		boundary value analysis across six modules: confidence thresholds at
+		19/20/39/40, the signal-to-bucket mappings and their alphabetical
+		tie-breaks, numeric <code>min</code>/<code>max</code> boundaries where the
+		code uses strict comparisons, the
+		<code>exists</code>-versus-<code>defined</code> distinction in required
+		attributes, cyclomatic and early-return thresholds, nesting depth, purity
+		classes and mutation-field deduplication.</li>
+		<li><strong><code>t/data-flow.t</code></strong> — define-use chains:
+		corpus staleness after minimisation, evidence isolation between objects,
+		<code>weight =&gt; 0</code> stored as zero rather than defaulted to one,
+		YAML export/import round trips, file handles closed inside <code>export()</code>,
+		and string literals not mistaken for IO.</li>
+		<li>Plus the path, transaction and path-coverage suites described in the
+		repository's <code>CLAUDE.md</code>.</li>
+	</ul>
+
+	<h2 id="earlier">Earlier releases</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Version</th><th>Date</th><th>Highlights</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>0.45</td><td>10 August 2026</td><td>Bug fixes and test-suite work.</td></tr>
+				<tr><td>0.44</td><td>21 July 2026</td><td>Schema extraction and dashboard refinements.</td></tr>
+				<tr><td>0.43</td><td>11 July 2026</td><td>The version required by <code>t/fuzz.t</code>'s <code>Test::Needs</code> guard.</td></tr>
+				<tr><td>0.42</td><td>7 July 2026</td><td>POD example extraction, benchmark generation, portable workflow deployment, CPAN Testers reproduction scripts, corpus minimisation.</td></tr>
+				<tr><td>0.41</td><td>28 June 2026</td><td>In-place mutation strategy: mutants are written to the project's own <code>lib/</code> so <code>use lib</code> in test files cannot load the original code.</td></tr>
+				<tr><td>0.40</td><td>25 June 2026</td><td>A large release; see <code>Changes</code>.</td></tr>
+				<tr><td>0.39</td><td>24 May 2026</td><td>See <code>Changes</code>.</td></tr>
+				<tr><td>0.38</td><td>18 May 2026</td><td>See <code>Changes</code>.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Full history:
+		<a href="https://metacpan.org/dist/App-Test-Generator/changes">MetaCPAN's
+		changelog</a>, or the <code>Changes</code> file in
+		<a href="https://github.com/nigelhorne/App-Test-Generator/blob/master/Changes">the repository</a>.
+	</p>
+
+	<h2>Upgrading</h2>
+<pre><code>cpanm App::Test::Generator
+</code></pre>
+	<p>
+		Schemas are compatible across releases: a schema that works with 0.47 has
+		worked since the transform syntax settled. Generated harnesses are
+		regenerated by tooling, so a stale one is replaced rather than migrated.
+		If you keep generated <code>.t</code> files in version control, regenerate
+		them after upgrading — an older harness may not know about a type or a
+		config key that the new version accepts.
+	</p>
+
+	<p>
+		<a href="index.html">Back to the overview</a> ·
+		<a href="quickstart.html">Quick start</a> ·
+		<a href="schema.html">Schema reference</a>
+	</p>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

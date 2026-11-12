@@ -65,7 +65,7 @@ sub dies_like { my ($code, $re, $name) = @_;
   is(nv($t, '2.2', -1), 'root', 'level -1: the root');
   is(nv($t, '2.2', -2), 'num', 'level -2: down from the root, the leaf');
   dies_like(sub { $t->blockNodedata('2.2', 2) },
-	    qr/^bad level "2": the block containing 2\.2 has 1 level above its leaves/,
+	    qr/^bad level "2": the block containing 2\.2 has 1 level above this leaf/,
 	    'a level beyond the root');
   dies_like(sub { $t->blockNodedata('2.2', -3) }, qr/^bad level "-3"/,
 	    'a negative level below the leaf');

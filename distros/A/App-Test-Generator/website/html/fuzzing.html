@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fuzzing and property tests — App::Test::Generator</title>
+<meta name="description" content="What a generated fuzz harness contains, how corpora are saved and replayed, how coverage-guided fuzzing with Devel::Cover finds new branches, and how property-based tests verify invariants with Test::LectroTest.">
+<link rel="canonical" href="fuzzing.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Fuzzing and property tests — App::Test::Generator">
+<meta property="og:description" content="Generated harnesses, corpora, coverage-guided fuzzing and property-based tests.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html" class="current" aria-current="page">Fuzzing</a>
+			<a href="mutation.html">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Fuzzing and property tests</h1>
+	<p class="lead">
+		A generated harness is not a black box. It is a Test::Most file you can
+		read, with a corpus you can extend, random generation you can seed, and an
+		optional property-test layer for invariants that example-based tests
+		cannot reach.
+	</p>
+
+	<h2>What is in a generated harness</h2>
+	<ol>
+		<li><strong>The static corpus</strong> — every case from <code>cases</code>, <code>yaml_cases</code>, POD examples and the generated boundary list.</li>
+		<li><strong>Boundary cases</strong> — three per declared constraint, the outer one expected to die.</li>
+		<li><strong>The fuzz loop</strong> — <code>iterations</code> cases (30 by default) built from the declared types, with edge-case pools mixed in.</li>
+		<li><strong>Input validation</strong> — each argument spec is re-expressed as a <code>Params::Validate::Strict</code> schema, so a case that should die is checked for dying for the right reason.</li>
+		<li><strong>Output validation</strong> — the return value goes through <code>Return::Set</code>, which is what makes "returns an integer" a testable claim.</li>
+		<li><strong>Housekeeping</strong> — <code>srand</code> when a seed is set, an alarm-based timeout, and cleanup of files a routine writes into the working directory.</li>
+	</ol>
+
+<pre><code><span class="comment"># what a run looks like</span>
+$ fuzz-harness-generator -r t/conf/validate.yml
+Generated: /tmp/S7Ql2m.t
+Result: PASS
+Files=1, Tests=118,  0 wallclock secs
+</code></pre>
+	<p>
+		If it fails, the TAP output names the case: the parameter, the value, and
+		whether it was expected to live or die. Turn the failing value into an
+		<code>edge_cases</code> entry so it is retested forever, not just until
+		the next random seed.
+	</p>
+
+	<h2 id="switches">Turning probes on and off</h2>
+	<p>
+		The <a href="schema.html#config">config section</a> controls the default
+		probes: NUL bytes, <code>undef</code>, empty values, non-ASCII strings,
+		deduplication, the timeout, and the security-string set. All of them are
+		on by default except the last two, because a routine that accepts
+		<code>undef</code> is unusual — but not rare enough to be a safe
+		assumption.
+	</p>
+<pre><code>config:
+  test_undef: no
+  test_nuls: no
+  timeout: 30
+</code></pre>
+
+	<h2 id="corpora">Corpora</h2>
+	<p>
+		Random inputs are worth keeping. The coverage-guided fuzzer records the
+		inputs that reached a branch nobody had reached before, plus every input
+		that made the code die, in a corpus file. That corpus can be replayed:
+	</p>
+<pre><code><span class="comment"># fuzz as schemas are extracted, keeping the corpus</span>
+extract-schemas --fuzz --corpus-dir schemas/corpus lib/My/Module.pm
+
+<span class="comment"># turn a corpus into a deterministic regression test</span>
+fuzz-harness-generator --replay-corpus schemas/corpus/translate.json \
+    -o t/fuzz_replay.t
+</code></pre>
+	<p>
+		A replay harness runs the recorded inputs in a fixed order. It is the
+		right thing to commit: no randomness, no coverage tooling, and a failure
+		that reproduces on every machine.
+	</p>
+
+	<h2 id="coverage-guided">Coverage-guided fuzzing</h2>
+	<p>
+		With <code>Devel::Cover</code> installed, the fuzzer does not just
+		generate — it measures. Each iteration is scored by which branches it
+		executed; an input that adds coverage is kept and becomes a seed for
+		mutation, so later iterations are variations on inputs that already got
+		deep into the code rather than fresh random values.
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Method</th><th>Does</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>run()</code></td><td>Fuzzes, and returns a report with <code>total_iterations</code>, <code>interesting_inputs</code>, <code>corpus_size</code>, <code>branches_covered</code>, <code>bugs_found</code> and the bug inputs.</td></tr>
+				<tr><td><code>minimize_corpus()</code></td><td>Greedy set-cover: repeatedly keeps the input that covers the most still-uncovered branches, until every branch is covered. Returns the size before and after, and the branch count.</td></tr>
+				<tr><td><code>save_corpus()</code> / <code>load_corpus()</code></td><td>Persist and restore across processes. Coverage data cannot travel with it, so loaded entries are deduplicated by fingerprint instead.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Two invariants make the minimiser safe to run in CI. Bug inputs are always
+		retained, whether or not they add coverage — they are the most valuable
+		thing the fuzzer produces. And minimisation is idempotent: a second pass
+		finds nothing left to remove.
+	</p>
+	<p>
+		Without Devel::Cover the fuzzer still runs; it simply has no branch
+		feedback, so it degrades to random generation with corpus retention.
+	</p>
+
+	<h2 id="properties">Property-based tests</h2>
+	<p>
+		Example-based tests check the cases you thought of. Property tests check
+		that a statement holds for a thousand generated inputs. Turn them on in
+		the schema:
+	</p>
+<pre><code>config:
+  properties:
+    enable: true
+    trials: 1000
+</code></pre>
+	<p>
+		Properties come from two places. The generator derives some automatically
+		from each transform's output spec — range bounds, type preservation,
+		definedness, exact values — and you can list more by name, or write them
+		as Perl. See
+		<a href="schema.html#transforms">transforms and properties</a> for the
+		full syntax and the list of built-in names.
+	</p>
+	<p>
+		Generated property tests need
+		<a href="https://metacpan.org/pod/Test::LectroTest">Test::LectroTest</a>
+		and
+		<a href="https://metacpan.org/pod/Test::LectroTest::Compat">Test::LectroTest::Compat</a>.
+		Both are test requirements of the distribution, so <code>make test</code>
+		installs them; a generated file that cannot load them skips its property
+		section with a diagnostic instead of failing.
+	</p>
+<pre><code>ok 123 - negative property holds (1000 trials)
+ok 124 - positive property holds (1000 trials)
+</code></pre>
+	<p>
+		On failure LectroTest shrinks the counterexample to a small one and prints
+		the inputs that broke the property. Those belong in the static corpus.
+	</p>
+
+	<h2>Properties worth asserting</h2>
+	<p>
+		The properties that pay for themselves are the ones an example-based test
+		cannot express:
+	</p>
+	<ul>
+		<li><strong>Idempotence</strong> — normalising twice changes nothing.</li>
+		<li><strong>Round trips</strong> — <code>decode(encode($x)) eq $x</code>.</li>
+		<li><strong>Order</strong> — output of a sort is non-decreasing, and is a permutation of the input.</li>
+		<li><strong>Invariants across inputs</strong> — a total is never less than any of its parts; a length never grows.</li>
+	</ul>
+
+	<h2>Keeping fuzz runs finite</h2>
+	<p>
+		Fuzzing multiplies: every schema is a harness, every harness is a
+		<code>prove</code> run, and property tests add their trials on top. Two
+		practical rules keep <code>make test</code> quick:
+	</p>
+	<ul>
+		<li>Keep the aggressive schemas in <code>t/conf/</code> and the
+		extended-test guard on the runner, so a normal test run does the cheap
+		part and CI does the rest.</li>
+		<li>Set <code>iterations</code> low (or <code>0</code>, with properties
+		only) for a schema whose random generation is slow, and rely on the
+		corpus for depth.</li>
+	</ul>
+
+	<div class="note">
+		<span class="note-title">Randomness is the feature</span>
+		<p>
+			A fuzz test that never fails is still doing work: it is sampling the
+			space the schema describes. The failure rate should be near zero, and
+			when it is not, the value is in what the failures tell you — not in
+			raising the iteration count until they stop.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="extraction.html">← Extraction</a>
+		<a href="mutation.html">Mutation testing →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

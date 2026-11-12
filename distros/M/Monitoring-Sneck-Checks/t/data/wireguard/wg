@@ -1,0 +1,20 @@
+#!/usr/bin/env perl
+# Stands in for wg show all dump. Prints the output file from the
+# directory WIREGUARD_TEST_SET names, with {{ago:N}} swapped for the
+# epoch N seconds ago, and exits with what is in its exit file, if any.
+use strict;
+use warnings;
+use FindBin;
+
+die( 'unexpected args ' . "@ARGV" . "\n" ) if "@ARGV" ne 'show all dump';
+my $set = $FindBin::Bin . '/' . $ENV{WIREGUARD_TEST_SET};
+open( my $fh, '<', $set . '/output' ) or die( 'no ' . $set . '/output' . "\n" );
+my $output = do { local $/; <$fh> };
+$output =~ s/\{\{ago:([0-9]+)\}\}/time - $1/ge;
+print $output;
+my $exit = 0;
+if ( open( my $exit_fh, '<', $set . '/exit' ) ) {
+	$exit = <$exit_fh>;
+	chomp($exit);
+}
+exit($exit);

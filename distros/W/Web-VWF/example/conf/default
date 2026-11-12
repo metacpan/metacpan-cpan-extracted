@@ -31,6 +31,18 @@
 		<enabled>1</enabled>
 	</recaptcha>
 
+	<!--
+		DKIM signing for the mail the contact page sends.  That mail goes out as
+		webmaster@<domain>, so the key must be published for the same domain:
+		openssl genrsa -out 202611.private 2048, then the public half at
+		202611._domainkey.<domain>.  Without both settings the mail is sent
+		unsigned, which is what happened before signing was supported.
+	-->
+	<!--
+	<DKIMSelector>202611</DKIMSelector>
+	<DKIMKey>/home/site/dkim/202611.private</DKIMKey>
+	-->
+
 	<security>
 		<rate_limiting>
 			<!--  Hard limit - block completely -->

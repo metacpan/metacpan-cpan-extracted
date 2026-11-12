@@ -3,7 +3,7 @@ package Database::BI::I18N::en_us;
 use strict;
 use warnings;
 
-our $VERSION = '0.023.0';
+our $VERSION = '0.023.1';
 
 use Readonly;
 
@@ -18,6 +18,7 @@ Readonly our %MESSAGES => (
 		warn_measure_fallback  => 'Measure "%s" on column "%s" is not uniformly numeric; totaled in Perl',
 		error_text_card_colour => 'A color must be written #rrggbb',
 		error_insights_no_data => 'No data available to analyze',
+		map_bounds_noun_neighbourhood => 'neighborhood',
 	},
 	'Database::BI::Model::DataSource' => {
 		error_backend_init => 'DataSource: failed to initialize database backend for table "%s": %s',
@@ -34,7 +35,7 @@ Database::BI::I18N::en_us - The application's messages in American English
 
 =head1 VERSION
 
-0.023.0
+0.023.1
 
 =head1 DESCRIPTION
 
