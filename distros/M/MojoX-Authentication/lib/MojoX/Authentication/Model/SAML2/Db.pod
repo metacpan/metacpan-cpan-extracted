@@ -55,7 +55,8 @@ to C<logged_in>.
    $cache->set($data, $key, $expiration_time);
 
 Set an element in the cache, with expiration time (expressed as an
-epoch).
+epoch). Every call also removes the entries that have already
+expired, so that abandoned logins do not pile up.
 
 =head2 B<< table >>
 

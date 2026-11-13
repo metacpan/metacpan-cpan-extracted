@@ -23,6 +23,10 @@ t/10_lvalue.t
 t/11_prefix.t
 t/12_control.t
 t/13_osc8.t
+t/14_csi.t
+t/15_grapheme.t
+t/16_trim.t
+t/17_progress.t
 tool/fix-w3c.pl
 META.yml
 MANIFEST

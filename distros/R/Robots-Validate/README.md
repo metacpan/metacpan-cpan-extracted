@@ -22,18 +22,16 @@ This module allows one to validate a robot user-agent string against the IP addr
 
 # RECENT CHANGES
 
-Changes for version v0.4.14 (2026-11-06)
+Changes for version v0.4.15 (2026-11-12)
 
 - Enhancements
     - Added or updated the robot rules for the following:
-        - BakenBot
-        - BitMoversBot
-        - cl0q-crawler
-        - dns-crawler
-        - GetAgentsRadar
-        - PactMeshBot
-        - RicciutiBot
-        - YioopBot
+        - ethicrawl (updated agents and network)
+        - GenomeCrawler
+        - GlintscoutBot
+        - MorsillaBot
+- Documentation
+    - Fixed incorrect type for the networks attribute: it has been using Net::IP::LPM since v0.4.3.
 
 See the `Changes` file for more details.
 

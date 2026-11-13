@@ -1,5 +1,5 @@
 package UUID::V7;
-$UUID::V7::VERSION = '0.004';
+$UUID::V7::VERSION = '0.005';
 use strict;
 use warnings;
 
@@ -11,7 +11,7 @@ use Carp;
 use Crypt::SysRandom 'random_bytes';
 use POSIX::RT::Clock 0.024;
 
-use constant HAS_NANO => POSIX::RT::Clock->new('realtime')->get_resolution->nsec < 1000;
+use constant RESOLUTION => POSIX::RT::Clock->new('realtime')->get_resolution->nsec;
 
 my $clock = POSIX::RT::Clock->new('realtime');
 my $nano_per_milli = 1_000_000;
@@ -28,7 +28,7 @@ sub generate_uuid_v7 {
 
 	my $high = ($milliseconds << 16) + $sub_milliseconds | $uuid_v7_marker;
 	my $result = pack 'Q>A8', $high, random_bytes(8);
-	vec($result, 28, 2) = vec($result, 35, 2) if not HAS_NANO; # lowest two bits of timestamp set to unused randomness.
+	vec($result, 28, 2) ^= vec($result, 35, 2) if RESOLUTION >= 1000; # lowest two bits of timestamp set to unused randomness.
 	vec($result, 35, 2) = 2; # RFC 9562 variant
 
 	return join '-', unpack $format, $result;
@@ -79,7 +79,7 @@ UUID::V7 - A precise UUIDv7 implementation
 
 =head1 VERSION
 
-version 0.004
+version 0.005
 
 =head1 SYNOPSIS
 

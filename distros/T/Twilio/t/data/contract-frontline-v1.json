@@ -1,0 +1,172 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "avatar" : "a_avatar",
+     "friendly_name" : "a_friendly_name",
+     "identity" : "a_identity",
+     "is_available" : true,
+     "sid" : "a_sid",
+     "state" : "deactivated",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "avatar",
+      "avatar",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "is_available",
+      "is_available",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "state",
+      "state",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "frontline_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "users",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchUser",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://frontline-api.twilio.com/v1/Users/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "avatar" : "a_avatar",
+     "friendly_name" : "a_friendly_name",
+     "identity" : "a_identity",
+     "is_available" : true,
+     "sid" : "a_sid",
+     "state" : "deactivated",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "avatar",
+      "avatar",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "is_available",
+      "is_available",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "state",
+      "state",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "frontline_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "users",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Avatar",
+    "v_avatar"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "IsAvailable",
+    "true"
+   ],
+   [
+    "State",
+    "deactivated"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateUser",
+  "method" : "update",
+  "options" : {
+   "avatar" : "v_avatar",
+   "friendly_name" : "v_friendly_name",
+   "is_available" : 1,
+   "state" : "deactivated"
+  },
+  "required" : [],
+  "url" : "https://frontline-api.twilio.com/v1/Users/id1"
+ }
+]

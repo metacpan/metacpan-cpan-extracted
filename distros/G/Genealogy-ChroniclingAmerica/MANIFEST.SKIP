@@ -65,3 +65,6 @@
 \.releaserc
 Genealogy-.*
 t/online.enabled
+coverage_history/
+mutation\.json
+bin/new_api

@@ -2,20 +2,29 @@ requires 'perl', '5.024000';
 requires 'Crypt::Passphrase', '0.023';
 requires 'Crypt::Passphrase::Argon2', '0.010';
 requires 'Module::Runtime', '0.018';
+requires 'Mojolicious', '9.20';
+requires 'Mojolicious::Plugin::Authentication', '1.39';
 requires 'Moo', '2.005005';
 requires 'namespace::clean', '0.27';
-requires 'Net::SAML2', '0.88';
 requires 'Ouch', '0.0501';
 requires 'Try::Catch', '1.1.0';
 
+recommends 'MojoX::MojoDbWrap', '0.100';   # for Model::Db and SAML2::Db
+recommends 'Net::SAML2',        '0.88';    # for SAML2-related stuff
+
 on test => sub {
-   requires 'Path::Tiny',      '0.084';
-   requires 'Test::Exception', '0.43';
+   requires 'Path::Tiny',          '0.084';
+   requires 'Test::Exception',     '0.43';
+   recommends 'MojoX::MojoDbWrap', '0.100';
+   recommends 'Mojo::SQLite',      '3.000';
 };
 
 on develop => sub {
+   requires 'Mojo::SQLite',        '3.000';
+   requires 'MojoX::MojoDbWrap',   '0.100';
+   requires 'Net::SAML2',          '0.88';
    requires 'Path::Tiny',          '0.084';
    requires 'Template::Perlish',   '1.52';
-   requires 'Test::Pod::Coverage', '1.04';
    requires 'Test::Pod',           '1.51';
+   requires 'Test::Pod::Coverage', '1.04';
 };

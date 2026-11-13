@@ -24,6 +24,6 @@ The example supports the following credentials:
 
 - User `foo` password `123`, local hardcoded
 - User `bar` password `456`, local hardcoded
-- User 'baz` password `123`, local database `testdb.sqlite`
+- User `baz` password `123`, local database `testdb.sqlite`
 - Anything coming from the SAML2 Identity Provider when you click on link
   `Login (SAML2)`.

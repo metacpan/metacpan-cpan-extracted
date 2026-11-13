@@ -2,14 +2,14 @@
 
 PRAXO-CORE is an embeddable, MIT-licensed agent framework. This distribution is
 its native Perl Core: an agent loop with tool registration and dispatch, policy
-hooks, typed events, memory, checkpoints, context budgets, middleware, JSON
+hooks, typed events, memory, checkpoints, context budgets, middleware, OTel and Harmovela sinks, MCP, retriever and synchronous delegation seams, JSON
 Schema validation, and plugin manifest parsing.
 
 The normative contract is [`spec/`](../../spec/README.md); Go remains the
 reference implementation.
 
 - `SPEC_VERSION`: `0.2.0`
-- Core version: `0.1.1`
+- Core version: `0.4.0`
 - Tier: core
 - License: MIT
 - Dependencies: Perl core modules only (`JSON::PP`, `File::Spec`, `Cwd`)
@@ -138,6 +138,6 @@ delivery. Use HTTPS and filter sensitive event data first.
 
 ## Release
 
-Tag shape: `perl/v0.1.1`. The tag targets `SPEC_VERSION` `0.2.0`. CPAN
+Tag shape: `perl/v0.4.0`. The tag targets `SPEC_VERSION` `0.2.0`. CPAN
 publication uses `.github/workflows/perl-release.yml`; see
 [PUBLISHING.md](PUBLISHING.md).

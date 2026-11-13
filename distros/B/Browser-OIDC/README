@@ -116,8 +116,9 @@ METHODS
 
      my $keyset = $oidc->jwks;
 
-    This returns a JSON Web Key Set as a hash, with keys as a arrayref of
-    JWK entries.
+    This fetches JSON Web Key Set for this OIDC provider, and returns it as
+    a hash, with keys as a arrayref of JWK entries. This value will be
+    cached.
 
 TODO
 

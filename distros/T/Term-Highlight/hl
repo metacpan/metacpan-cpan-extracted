@@ -3,7 +3,7 @@
 use Term::Highlight ();
 
 ( $PROGNAME = $0 ) =~ s/.*\///;
-$VERSION = "2.3.0";
+$VERSION = "2.3.1";
 $TAGTYPE = "term";
 $RC_FILE = "$ENV{ HOME }/.hlrc";
 $SNIPPET_PTN = qr/^\s*snippet\s+(\S+)\s+(.*)/;
@@ -228,7 +228,9 @@ while ( defined ( my $arg = shift ) )
         }
         if ( $arg eq "-gi" || $arg eq "-gitignore" )
         {
-            $Gitignore = 1; last SWITCH_ARGS;
+            require File::Which;
+            $Gitexe = File::Which::which( 'git' );
+            $Gitignore = defined( $Gitexe ); last SWITCH_ARGS;
         }
         if ( $arg =~ $CTX_OPT_PTN )
         {
@@ -328,23 +330,67 @@ if ( exists $ENV{ HL_CTXDELIM } && ! $GrepList && $CheckCtx )
     $hl_ctx->Process( \$CtxDelim );
 }
 
-if ( $GrepRecursively && $Gitignore )
-{
-    if ( open ( my $GIT_STATUS, '-|', 'git status --ignored -s 2>/dev/null' ) )
-    {
-        require Cwd;
-        while ( <$GIT_STATUS> )
-        {
-            my ( $mode, $file ) = split;
-            $GitignoreList{ Cwd::abs_path( $file ) } = 1
-                                            if $mode eq '??' || $mode eq '!!';
-        }
-        close $GIT_STATUS;
-    }
-}
-
 my $Location = '';
 my $PrintCtx = 0;
+my %GitignoreList = ();
+
+
+sub SetGitignoreList
+{
+    %GitignoreList = ();
+    my ( $dir ) = @_;
+    return unless -d $dir;
+
+    open( my $OLD_STDERR, '>&', \*STDERR );
+    open( STDERR, '>', '/dev/null' );
+    my $ok = open( my $GIT_STATUS, '-|', $Gitexe, '-C', $dir,
+                   '-c', 'status.relativePaths=false',
+                   'status', '--ignored', '-s', '-z' );
+    my $GIT_INFO;
+    $ok = open( $GIT_INFO, '-|', $Gitexe, '-C', $dir,
+                'rev-parse', '--show-toplevel', '--absolute-git-dir') if $ok;
+    open( STDERR, '>&', $OLD_STDERR );
+    close $OLD_STDERR;
+    unless ( $ok )
+    {
+        close $GIT_STATUS if $GIT_STATUS;
+        close $GIT_INFO if $GIT_INFO;
+        return;
+    }
+    my $top_gitdir = <$GIT_INFO> // '';
+    chomp $top_gitdir;
+    my $gitdir = <$GIT_INFO> // '';
+    chomp $gitdir;
+    close $GIT_INFO;
+
+    if ( length $gitdir )
+    {
+        my $abs_gitdir = Cwd::abs_path( $gitdir ) // $gitdir;
+        $GitignoreList{ $abs_gitdir } = 1;
+    }
+    unless ( length $top_gitdir )
+    {
+        close $GIT_STATUS;
+        return;
+    }
+
+    local $/ = "\0";
+    while ( my $entry = <$GIT_STATUS> )
+    {
+        chomp $entry;
+        next unless length($entry) > 3;
+
+        my $mode = substr( $entry, 0, 2 );
+        my $file = substr( $entry, 3 );
+
+        if ( $mode eq '??' || $mode eq '!!' )
+        {
+            my $abs_file = Cwd::abs_path( "$top_gitdir/$file" );
+            $GitignoreList{ $abs_file } = 1 if defined( $abs_file );
+        }
+    }
+    close $GIT_STATUS;
+}
 
 
 sub InitCtx
@@ -507,8 +553,8 @@ sub VisitNode
     my $top = $abs_cur_file eq $AbsTopPath;
     unless ( $top )
     {
-        if ( ! $GrepAll && $CurFile =~ $HIDDEN_FILE_PTN ||
-                                    exists $GitignoreList{ $abs_cur_file } )
+        if ( ! $GrepAll && $CurFile =~ $HIDDEN_FILE_PTN && ! %GitignoreList
+                                    || exists $GitignoreList{ $abs_cur_file } )
         {
             $File::Find::prune = 1;
             return;
@@ -538,6 +584,7 @@ sub VisitNode
 #process file list or STDIN line by line
 if ( $GrepRecursively )
 {
+    require Cwd;
     require File::Find;
     @Files || push @Files, './';
     for my $File ( @Files )
@@ -549,6 +596,7 @@ if ( $GrepRecursively )
             next;
         }
         $AbsTopPath = Cwd::abs_path( $File );
+        SetGitignoreList $AbsTopPath if $Gitignore;
         File::Find::find( \&VisitNode, $File );
     }
 }
@@ -831,11 +879,11 @@ Term::Highlight(3), tput(1)
 
 =head1 AUTHOR
 
-Alexey Radkov <alexey.radkov@gmail.com> 
+A. Radkov, E<lt>alexey.radkov@gmail.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008-2025 by A. Radkov.
+Copyright (C) 2008-2026 by A. Radkov.
 
 This is free software; you can redistribute it and/or modify it
 under the same terms as the Perl 5 programming language system itself.

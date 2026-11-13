@@ -15,7 +15,7 @@ use warnings;
 use utf8;
 use version 0.77 ( );
 
-our $VERSION = version->declare('v0.2.1');
+our $VERSION = version->declare('v0.2.2');
 
 =encoding utf8
 
@@ -253,8 +253,8 @@ around can => sub {
   # module, to which almost everything is delegated, "can".
   my( $orig, $self, @args ) = @_;
   if ( ref($self) && $self->map( ) ) {
-    return if ( $args[0] eq 'xml'  && $self->map( )->xml()  eq '' );
-    return if ( $args[0] eq 'json' && $self->map( )->json() eq '' );
+    return if ( $args[0] eq 'xml'  && ( !$self->map( )->can('xml')  || $self->map( )->xml()  eq '' ) );
+    return if ( $args[0] eq 'json' && ( !$self->map( )->can('json') || $self->map( )->json() eq '' ) );
   }
   return $self->$orig(@args) if $self->$orig(@args);
   return $self->map( )->can(@args) if ref($self) && $self->map( );

@@ -12,17 +12,16 @@ use POSIX::RT::Clock;
 my $clock = POSIX::RT::Clock->new('realtime');
 my $resolution = $clock->get_resolution * 1_000_000_000;
 diag "Clock resolution is: $resolution ns";
+my $significance = $resolution < 1000 ? 18 : 17; # Can't test full length without sufficient precision.
 
-my @unsorted  = map { generate_uuid_v7() } 0..999_999;
-if ($resolution > 1) { # Can't test full length without sufficient precision.
-	$_ = substr $_, 0, 18 for @unsorted;
-}
+my @unsorted  = map { substr generate_uuid_v7(), 0, $significance } 0..999_999;
 my @sorted = sort @unsorted;
-is(join('|', @sorted), join('|', @unsorted), 'UUIDs came in sorted order');
+is_deeply(\@unsorted, \@sorted, 'UUID heads came in sorted order');
 
 my $now = time;
 my $uuid = generate_uuid_v7;
 my $time = extract_uuid_v7_time($uuid);
+ok($time - $now > 0.0, 'Times are equivalentish');
 ok($time - $now < 0.1, 'Times are equivalentish');
 
 my $binary = uuid_string_to_binary($uuid);

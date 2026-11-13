@@ -1,0 +1,192 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "access_token" : "a_access_token",
+     "expires_in" : 1078,
+     "id_token" : "a_id_token",
+     "refresh_token" : "a_refresh_token",
+     "token_type" : "a_token_type"
+    },
+    "fields" : [
+     [
+      "access_token",
+      "access_token",
+      "plain"
+     ],
+     [
+      "expires_in",
+      "expires_in",
+      "plain"
+     ],
+     [
+      "id_token",
+      "id_token",
+      "plain"
+     ],
+     [
+      "refresh_token",
+      "refresh_token",
+      "plain"
+     ],
+     [
+      "token_type",
+      "token_type",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "oauth",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "token",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "grant_type",
+    "v_grant_type"
+   ],
+   [
+    "audience",
+    "v_audience"
+   ],
+   [
+    "client_id",
+    "v_client_id"
+   ],
+   [
+    "client_secret",
+    "v_client_secret"
+   ],
+   [
+    "code",
+    "v_code"
+   ],
+   [
+    "code_verifier",
+    "v_code_verifier"
+   ],
+   [
+    "redirect_uri",
+    "v_redirect_uri"
+   ],
+   [
+    "refresh_token",
+    "v_refresh_token"
+   ],
+   [
+    "scope",
+    "v_scope"
+   ],
+   [
+    "account_sid",
+    "v_account_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateOauth2Token",
+  "method" : "create",
+  "options" : {
+   "account_sid" : "v_account_sid",
+   "audience" : "v_audience",
+   "client_id" : "v_client_id",
+   "client_secret" : "v_client_secret",
+   "code" : "v_code",
+   "code_verifier" : "v_code_verifier",
+   "redirect_uri" : "v_redirect_uri",
+   "refresh_token" : "v_refresh_token",
+   "scope" : "v_scope"
+  },
+  "required" : [
+   "v_grant_type"
+  ],
+  "url" : "https://oauth.twilio.com/v2/token"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "redirect_to" : "a_redirect_to"
+    },
+    "fields" : [
+     [
+      "redirect_to",
+      "redirect_to",
+      "plain"
+     ]
+    ],
+    "status" : 302
+   }
+  ],
+  "chain" : [
+   [
+    "oauth",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "authorize",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "response_type",
+    "v_response_type"
+   ],
+   [
+    "client_id",
+    "v_client_id"
+   ],
+   [
+    "redirect_uri",
+    "v_redirect_uri"
+   ],
+   [
+    "scope",
+    "v_scope"
+   ],
+   [
+    "state",
+    "v_state"
+   ],
+   [
+    "code_challenge",
+    "v_code_challenge"
+   ],
+   [
+    "code_challenge_method",
+    "S256"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchOauth2Authorize",
+  "method" : "fetch",
+  "options" : {
+   "client_id" : "v_client_id",
+   "code_challenge" : "v_code_challenge",
+   "code_challenge_method" : "S256",
+   "redirect_uri" : "v_redirect_uri",
+   "response_type" : "v_response_type",
+   "scope" : "v_scope",
+   "state" : "v_state"
+  },
+  "required" : [],
+  "url" : "https://oauth.twilio.com/v2/authorize"
+ }
+]

@@ -23,15 +23,21 @@ ESC ] 8 ; params ; URI ST  text  ESC ] 8 ; ; ST
 
 ## 現状の Text::ANSI::Fold
 
-### OSC 正規表現 (65-70行目)
+### OSC 正規表現 (64-70行目)
 
 ```perl
 our $osc_re = qr{
-    (?: \e\] | \x9d )           # OSC 開始
-    [\x08-\x0d\x20-\x7e]*+      # コマンド部 (ECMA-48 準拠に修正済み)
-    (?: \e\\ | \x9c | \a )      # 終端 (ST)
+    (?: \e\] | \x9d )                    # OSC 開始
+    [^\x00-\x07\x0e-\x1f\x7f-\x9f]*+    # コマンド部 (non-ASCII 許容)
+    (?: \e\\ | \x9c | \a )              # 終端 (ST)
 }x;
 ```
+
+非 ASCII 文字を許容するよう拡張済み（v2.3304）。
+ECMA-48 の仕様上、コマンド文字列に使えるのは `0x08-0x0D` と `0x20-0x7E` だが、
+受信側として防御的に非 ASCII 文字も受け入れるようにしている。
+C0 制御文字 (`\x00-\x07`, `\x0e-\x1f`)、DEL (`\x7f`)、C1 制御文字 (`\x80-\x9f`) を
+除外する否定クラスで定義することで、非 ASCII を受け入れつつ制御文字を排除している。
 
 ### OSC 処理
 
@@ -57,21 +63,21 @@ if (s/\A($osc_re)//) {
 ### SGR（色）の処理方法 (参考)
 
 ```perl
-# カラーシーケンスをスタックに追加 (376-380行)
+# カラーシーケンスをスタックに追加 (388-391行)
 if (s/\A($color_re)//) {
     $folded .= $1;
     push @color_stack, $1;
     next;
 }
 
-# リセットでスタッククリア (361-364行)
+# リセットでスタッククリア (372-375行)
 if (s/\A($reset_re+($erase_re*))//) {
     put_reset($1);
     @bg_stack = () if $2;
     next;
 }
 
-# 折り返し時の処理 (511-514行)
+# 折り返し時の処理 (523-526行)
 if (@color_stack) {
     $folded .= SGR_RESET;                        # 前の行を閉じる
     $_ = join '', @color_stack, $_ if $_ ne '';  # 次の行で復元
@@ -109,6 +115,20 @@ OSC Ps ST
 これで `https://example.com/~user` のような URL も正しく認識される。
 
 コミット: `5f4b40c Fix OSC regex to conform to ECMA-48 specification`
+
+### 2. non-ASCII 文字の許容 ✅
+
+ECMA-48 では OSC コマンド文字列は `0x08-0x0D` と `0x20-0x7E` に限定される。
+OSC 8 仕様でも 32〜126 範囲外のバイトは URI エンコードすべきとしている。
+ただし、本モジュールでは受信側として防御的に非 ASCII 文字も受け入れるようにした。
+UTF-8 環境であれば非 ASCII 文字が制御文字と衝突することはなく、
+実用上問題はない。
+
+正規表現を許可リスト方式 (`[\x08-\x0d\x20-\x7e]`) から
+除外リスト方式 (`[^\x00-\x07\x0e-\x1f\x7f-\x9f]`) に変更し、
+C0/C1 制御文字以外のすべての文字を受け入れるようにした。
+
+コミット: `210bba2 Accept non-ASCII characters in OSC command string`
 
 ## 折り返し時の OSC 8 状態管理
 
@@ -155,4 +175,5 @@ if (defined $osc8_link) {
 ## 実装状況
 
 1. ✅ **完了**: 正規表現の修正（URL の `~` 対応、ECMA-48 準拠）
-2. ✅ **完了**: OSC 8 状態管理（fold 切断時にリンクを閉じて再開）
+2. ✅ **完了**: non-ASCII 文字の許容（URL の日本語パス等に対応）
+3. ✅ **完了**: OSC 8 状態管理（fold 切断時にリンクを閉じて再開）

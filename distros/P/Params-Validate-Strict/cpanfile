@@ -5,7 +5,6 @@ requires 'perl', '5.026';
 requires 'Carp';
 requires 'Encode';
 requires 'Exporter';
-requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
 requires 'IO::Handle';
 requires 'List::Util', '1.33';   # Minimum version for any()
 requires 'Readonly::Values::Boolean';
@@ -19,12 +18,6 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
-	requires 'File::Glob';
-	requires 'File::Slurp';
-	requires 'File::stat';
-	requires 'IPC::Run3';
-	requires 'IPC::System::Simple';
-	requires 'JSON::MaybeXS';
 	requires 'POSIX';
 	requires 'Readonly';
 	requires 'Test::Compile';
@@ -33,7 +26,6 @@ on 'test' => sub {
 	requires 'Test::Mockingbird', '0.13';
 	requires 'Test::Most';
 	requires 'Test::Needs';
-	requires 'Test::Warnings';
 };
 
 on 'develop' => sub {

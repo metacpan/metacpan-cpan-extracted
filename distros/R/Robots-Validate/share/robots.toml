@@ -4031,11 +4031,11 @@ network=[
 ]
 
 [ethicrawl]
-## Date: 2026-10-21
+## Date: 2026-11-12
 ## About: http://ethicrawl.ai/crawler
-
-agents="ethicrawl.ai"
-network="3.217.175.180"
+## Network: https://ethicrawl.ai/crawler-ips.json
+agents="ethicrawl"
+network="135.225.129.103/32"
 
 [facebook]
 ## About: https://developers.facebook.com/docs/sharing/webmasters/web-crawlers
@@ -4093,10 +4093,76 @@ network=[
 ]
 
 
+[genomecrawler]
+## Date: 2026-11-09
+## About: https://www.nokia.com/genomecrawler/
+## Network: https://genome.deepfield.net/crawlers.txt
+
+agents="GenomeCrawler"
+network=[
+  "51.159.125.104/32",
+  "51.159.125.199/32",
+  "51.159.125.200/32",
+  "51.159.125.208/32",
+  "62.210.142.21/32",
+  "62.210.142.39/32",
+  "62.210.142.61/32",
+  "62.210.142.62/32",
+  "62.210.142.64/31",
+  "62.210.142.148/32",
+  "62.210.142.159/32",
+  "62.210.142.160/28",
+  "62.210.142.176/30",
+  "216.180.246.0/24",
+  "2001:bc8:702:1f2::/128",
+  "2001:bc8:702:4a2::/128",
+  "2001:bc8:702:4aa::/128",
+  "2001:bc8:702:5ad::/128",
+  "2001:bc8:702:6c1::/128",
+  "2001:bc8:702:70a::/128",
+  "2001:bc8:702:9ad::/128",
+  "2001:bc8:702:b17::/128",
+  "2001:bc8:702:b9b::/128",
+  "2001:bc8:702:eec::/128",
+  "2001:bc8:702:10ba::/128",
+  "2001:bc8:702:11ad::/128",
+  "2001:bc8:702:11f3::/128",
+  "2001:bc8:702:1209::/128",
+  "2001:bc8:702:1215::/128",
+  "2001:bc8:702:13ac::/128",
+  "2001:bc8:702:13b2::/128",
+  "2001:bc8:702:14b6::/128",
+  "2001:bc8:702:14c6::/128",
+  "2001:bc8:702:1697::/128",
+  "2001:bc8:702:16b8::/128",
+  "2001:bc8:702:1769::/128",
+  "2001:bc8:702:17b3::/128",
+  "2001:bc8:702:185e::/128",
+  "2001:bc8:702:1a26::/128",
+  "2001:bc8:702:1aa9::/128",
+  "2001:bc8:702:1ac8::/128",
+  "2001:bc8:702:1c06::/128",
+  "2001:bc8:702:1cb2::/128",
+  "2001:bc8:702:1e36::/128",
+  "2001:bc8:702:1ece::/128",
+  "2001:bc8:702:1ef0::/128",
+  "2620:ce:e001::/48"
+]
+
 [getagentsradar]
 ## About: https://getagents.io
 agents="GetAgentsRadar"
 domain=".getagents.io"
+
+[glintscoutbot]
+## Date: 2026-11-12
+## About: https://glintscout.com/bot
+agents="GlintscoutBot"
+domain=".glintscout.com"
+network=[
+  "67.233.187.89",
+  "77.42.10.240"
+]
 
 [google]
 ## Date: 2026-09-25
@@ -6867,6 +6933,11 @@ network=[
   "130.211.65.55",
   "35.189.0.46",
 ]
+
+[morsillabot]
+## About: https://morsilla.com/about
+agents="MorsillaBot"
+domain=".morsilla.com."
 
 [netapi]
 ## Date: 2026-10-18

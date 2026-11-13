@@ -294,9 +294,11 @@ typedef struct IBTreeInfo {
     DLine **addDlPtrs;		/* Additional array of lines to display. */
     int numAddLines;		/* Length of the additional array. */
     struct TkTextBlockOrns *ornsPtr;
-				/* Ornaments of the block (its type's
-				 * templates and those the layout callback
-				 * returned, tkTextOrn.c), or NULL. */
+				/* Ornaments of the block (its split lines
+				 * and frames, its type's templates and
+				 * those the layout callback returned,
+				 * tkTextOrn.c), or NULL. */
+    TkTextSegment *segPtr;	/* The block (for TkTextBlockOrnsAt). */
 } IBTreeInfo;
 
 /*
@@ -5605,6 +5607,222 @@ IBTreeBboxProc(chunkPtr, index, y, lineHeight, baseline, xPtr, yPtr,
 /*
  *--------------------------------------------------------------
  *
+ * LayoutSplits --
+ *
+ *	Where the core lays leaves of a block out one under another,
+ *	it shows the structure of the tree that is hidden there.  A
+ *	"stack" is a run of consecutive leaves laid out that way: all
+ *	the leaves of a block in the default layout, or the leaves that
+ *	one element of the result of the layout callback describes with
+ *	a box (a leaf, or a group that the callback saw as one child
+ *	with a repeat count).  This procedure adds to the ornaments of
+ *	the block (tkTextOrn.c: TkTextOrnLayoutSplits), for each stack:
+ *
+ *	- between two consecutive leaves, at the top of the lower one's
+ *	  first display line and across the box of the stack, lines that
+ *	  show the depth s of the separator between them in the stored
+ *	  tree (as "block list" gives it); with leaves of different
+ *	  depths, the left half shows s less the defect of the upper
+ *	  leaf, the right half s less that of the lower one;
+ *
+ *	- around the box of the stack, frames that show the number of
+ *	  nodes with a single child from the node that the stack is
+ *	  expected to be (the one at the distance depth from the root,
+ *	  on the way to its first leaf) down, if the stack is all the
+ *	  leaves of that node (TkIBTreeStackChain).
+ *
+ *	The box of a stack is the smallest one that holds the boxes of
+ *	its display lines as they are laid out (as "bbox" gives them).
+ *
+ * Results:
+ *	None.
+ *
+ * Side effects:
+ *	Ornaments may be added to infoPtr->ornsPtr.
+ *
+ *--------------------------------------------------------------
+ */
+
+static void
+LayoutSplits(textPtr, segPtr, chunkX, infoPtr, stacks, numStacks, depth)
+    TkText *textPtr;
+    TkTextSegment *segPtr;	/* The block. */
+    int chunkX;			/* The x of its chunk: the x of the display
+				 * lines of its leaves count from the same
+				 * origin. */
+    IBTreeInfo *infoPtr;	/* Its layout. */
+    int *stacks;		/* For each stack, in the order of the
+				 * leaves: its first leaf, the number of its
+				 * leaves. */
+    int numStacks;
+    int depth;			/* The distance from the root of the nodes
+				 * that the stacks are expected to be;
+				 * negative: no frames. */
+{
+    TkTextOrnSplit *splits, *sPtr;
+    TkTextLine *linePtr = TkBTreeFindLine(segPtr->body.itree.tree, 0);
+    DLine *dlPtr;
+    int line = 0, i, k, first, count;
+    int x0, y0, x1, y1, s, defect, nextDefect, half, n;
+
+    /*
+     * At most a picture of frames for each stack, and two of lines (the
+     * two halves) for each leaf.
+     */
+
+    splits = sPtr = (TkTextOrnSplit *) ckalloc((numStacks
+	    + 2 * infoPtr->numLines) * sizeof(TkTextOrnSplit));
+    for (i = 0; (i < numStacks) && (linePtr != NULL); i++) {
+	first = stacks[2*i];
+	count = stacks[2*i + 1];
+	for ( ; (line < first) && (linePtr != NULL); line++) {
+	    linePtr = TkBTreeNextLine(linePtr);
+	}
+	if (linePtr == NULL) {
+	    break;
+	}
+	x0 = y0 = INT_MAX;
+	x1 = y1 = INT_MIN;
+	for (k = first; k < first + count; k++) {
+	    for (dlPtr = infoPtr->lines[k]; dlPtr != NULL;
+		    dlPtr = dlPtr->nextPtr) {
+		if (dlPtr->x - chunkX < x0) {
+		    x0 = dlPtr->x - chunkX;
+		}
+		if (dlPtr->x - chunkX + dlPtr->length > x1) {
+		    x1 = dlPtr->x - chunkX + dlPtr->length;
+		}
+		if (dlPtr->y < y0) {
+		    y0 = dlPtr->y;
+		}
+		if (dlPtr->y + dlPtr->height > y1) {
+		    y1 = dlPtr->y + dlPtr->height;
+		}
+	    }
+	}
+	if (x1 < x0) {
+	    x1 = x0;		/* A callback may give a negative width. */
+	}
+	if (y1 < y0) {
+	    y1 = y0;
+	}
+	n = TkIBTreeStackChain(linePtr, count, depth);
+	if (n > 0) {
+	    sPtr->frame = 1;
+	    sPtr->value = n;
+	    sPtr->x = x0;
+	    sPtr->y = y0;
+	    sPtr->width = x1 - x0;
+	    sPtr->height = y1 - y0;
+	    sPtr++;
+	}
+	for (k = first + 1; (k < first + count) && (linePtr != NULL); k++) {
+	    /*
+	     * The separator before the leaf k; on each side of it the
+	     * depth is counted from the real parent of the leaf there.
+	     */
+
+	    s = TkIBTreeLeafSplit(linePtr, &defect, &nextDefect);
+	    linePtr = TkBTreeNextLine(linePtr);
+	    line++;
+	    if (s <= 0) {
+		continue;
+	    }
+	    half = (defect == nextDefect) ? x1 - x0 : (x1 - x0) / 2;
+	    if ((s > defect) && (half > 0)) {
+		sPtr->frame = 0;
+		sPtr->value = s - defect;
+		sPtr->x = x0;
+		sPtr->y = infoPtr->lines[k]->y;
+		sPtr->width = half;
+		sPtr->height = 0;
+		sPtr++;
+	    }
+	    if ((s > nextDefect) && (defect != nextDefect)
+		    && (x1 - x0 > half)) {
+		sPtr->frame = 0;
+		sPtr->value = s - nextDefect;
+		sPtr->x = x0 + half;
+		sPtr->y = infoPtr->lines[k]->y;
+		sPtr->width = x1 - x0 - half;
+		sPtr->height = 0;
+		sPtr++;
+	    }
+	}
+    }
+    if (sPtr > splits) {
+	TkTextOrnLayoutSplits(textPtr, splits, (int) (sPtr - splits),
+		&infoPtr->ornsPtr);
+    }
+    ckfree((char *) splits);
+}
+
+/*
+ *--------------------------------------------------------------
+ *
+ * TkTextBlockOrnsAt --
+ *
+ *	The ornaments of a block as it is displayed now (for "ornament
+ *	_splitlines", a hook for the tests).
+ *
+ * Results:
+ *	The list of the block's layout, or NULL if it has none or the
+ *	block is not displayed.
+ *
+ * Side effects:
+ *	The display lines are brought up to date.
+ *
+ *--------------------------------------------------------------
+ */
+
+static IBTreeInfo *
+FindIBTreeInfo(dlPtr, segPtr)
+    DLine *dlPtr;		/* A chain of display lines. */
+    TkTextSegment *segPtr;	/* The block looked for. */
+{
+    TkTextDispChunk *chunkPtr;
+    IBTreeInfo *biPtr, *foundPtr;
+    int line;
+
+    for ( ; dlPtr != NULL; dlPtr = dlPtr->nextPtr) {
+	for (chunkPtr = dlPtr->chunkPtr; chunkPtr != NULL;
+		chunkPtr = chunkPtr->nextPtr) {
+	    if (chunkPtr->displayProc != IBTreeDisplayProc) {
+		continue;
+	    }
+	    biPtr = (IBTreeInfo *) chunkPtr->clientData;
+	    if (biPtr->segPtr == segPtr) {
+		return biPtr;
+	    }
+	    for (line = 0; line < biPtr->numLines; line++) {
+		foundPtr = FindIBTreeInfo(biPtr->lines[line], segPtr);
+		if (foundPtr != NULL) {
+		    return foundPtr;
+		}
+	    }
+	}
+    }
+    return NULL;
+}
+
+struct TkTextBlockOrns *
+TkTextBlockOrnsAt(textPtr, segPtr)
+    TkText *textPtr;
+    TkTextSegment *segPtr;	/* The block. */
+{
+    TextDInfo *dInfoPtr = textPtr->dInfoPtr;
+    IBTreeInfo *biPtr;
+
+    if (dInfoPtr->flags & DINFO_OUT_OF_DATE) {
+	UpdateDisplayInfo(textPtr);
+    }
+    biPtr = FindIBTreeInfo(dInfoPtr->dLinePtr, segPtr);
+    return (biPtr != NULL) ? biPtr->ornsPtr : NULL;
+}
+
+/*
+ *--------------------------------------------------------------
+ *
  * TkTextIBTreeLayoutProc --
  *
  *	This procedure is the "layoutProc" for IBTree segments.
@@ -5654,6 +5872,13 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     TkTextIndex index;
     TkTextBlock *blockPtr = segPtr->body.itree.blockPtr;
     Arg resultArg = NULL;
+    int *stacks = NULL;		/* The stacks of leaves (see LayoutSplits):
+				 * for each, its first leaf and the number
+				 * of its leaves. */
+    int numStacks = 0;
+    int stackDepth = blockPtr->layoutCmd ? blockPtr->depth : 0;
+				/* The distance from the root of the nodes
+				 * that the stacks are expected to be. */
 
     if (segPtr->body.itree.tree) {
       linePtr = TkBTreeFindLine(segPtr->body.itree.tree, 0);
@@ -5673,6 +5898,10 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
     infoPtr->addDlPtrs = NULL;
     infoPtr->numAddLines = 0;
     infoPtr->ornsPtr = NULL;
+    infoPtr->segPtr = segPtr;
+    if (blockPtr->splitLines && (infoPtr->numLines > 0)) {
+      stacks = (int *) ckalloc(2 * infoPtr->numLines * sizeof(int));
+    }
 
     index.tree = segPtr->body.itree.tree;
 
@@ -5811,6 +6040,23 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
 	  goto finishCall;
 	}
 	count = LangInt(args1[0]);
+	if ((i != 0) && (count < 0)
+		&& ((argc1 == 1) || (line >= infoPtr->numLines))) {
+	  /*
+	   * A negative number of leaves to hide, or a negative ordinal
+	   * of a stolen line: refused.  (Both went on to index arrays
+	   * with it: a crash, BUGS 38.)  With 7 or 13 elements and
+	   * leaves left, a negative count still means all of them.
+	   */
+
+	  if (args != NULL && freeProc) (*freeProc)(argc,args);
+	  if (args1 != NULL && freeProc1) (*freeProc1)(argc1,args1);
+	  Tcl_AppendResult(textPtr->interp, "Negative count in return ",
+			   "from LayoutProc for block \"", blockPtr->name,
+			   "\".", NULL);
+	  Tcl_BackgroundError(textPtr->interp);
+	  goto finishCall;
+	}
 	if (i == 0) {
 	  chunkPtr->minAscent = LangInt(args1[6]);
 	  chunkPtr->minDescent = LangInt(args1[5]) - LangInt(args1[6]);
@@ -5858,6 +6104,7 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
 	  int singleLine = (count == 1) 
 	    && (infoPtr->lines[line]->nextPtr == NULL);
 	  DLine *intLine;
+	  int firstLine = line;
 
 	  while (count-- && line < infoPtr->numLines) {
 	    intLine = infoPtr->lines[line];
@@ -5873,6 +6120,16 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
 	      intLine = intLine->nextPtr;
 	    }
 	    line++;
+	  }
+
+	  /*
+	   * These leaves are laid out one under another: a stack.
+	   */
+
+	  if (stacks != NULL) {
+	    stacks[2*numStacks] = firstLine;
+	    stacks[2*numStacks + 1] = line - firstLine;
+	    numStacks++;
 	  }
 	} else if (count > infoPtr->numLines - line) {
 	    if (args != NULL && freeProc) (*freeProc)(argc,args);
@@ -5897,6 +6154,19 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
   finishCall:
       TkTextOrnFreeBlock(textPtr, infoPtr->ornsPtr);
       infoPtr->ornsPtr = NULL;
+
+      /*
+       * The default layout: all the leaves are one stack, and the node
+       * it is expected to be is the root.
+       */
+
+      numStacks = 0;
+      stackDepth = 0;
+      if (stacks != NULL) {
+	stacks[0] = 0;
+	stacks[1] = infoPtr->numLines;
+	numStacks = 1;
+      }
       for (line=0; line < infoPtr->numLines; line++) {
 	DLine *dlPtr = infoPtr->lines[line];
 	while (dlPtr) {
@@ -5958,6 +6228,19 @@ TkTextIBTreeLayoutProc(textPtr, indexPtr, segPtr, offset, maxX, maxChars,
 			       &infoPtr->ornsPtr);
       ckfree((char *) boxes.leaves);
       ckfree((char *) boxes.shown);
+    }
+
+    /*
+     * The split lines and frames of the stacks, under all the other
+     * ornaments.
+     */
+
+    if (stacks != NULL) {
+      if (numStacks > 0) {
+	LayoutSplits(textPtr, segPtr, chunkPtr->x, infoPtr, stacks, numStacks,
+		     stackDepth);
+      }
+      ckfree((char *) stacks);
     }
   
     /*

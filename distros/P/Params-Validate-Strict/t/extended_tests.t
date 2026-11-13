@@ -13,9 +13,9 @@ use Params::Validate::Strict qw(validate_strict);
 
 # ── Test-support classes ──────────────────────────────────────────────────────
 { package Ext::Logger; sub new { bless {e=>[],w=>[]}, shift }
-  sub error { push @{$_[0]{e}}, join('',@_[1..$#_]) }
-  sub warn  { push @{$_[0]{w}}, join('',@_[1..$#_]) }
-  sub errors { $_[0]{e} } sub warns { $_[0]{w} } }
+	sub error { push @{$_[0]{e}}, join('',@_[1..$#_]) }
+	sub warn  { push @{$_[0]{w}}, join('',@_[1..$#_]) }
+	sub errors { $_[0]{e} } sub warns { $_[0]{w} } }
 { package Ext::Base; sub new { bless {}, shift } }
 { package Ext::Child; our @ISA = ('Ext::Base'); sub new { bless {}, shift } }
 

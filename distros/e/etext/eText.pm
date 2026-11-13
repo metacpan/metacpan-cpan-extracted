@@ -7,7 +7,7 @@ package Tk::eText;
 
 use strict;
 use vars qw($VERSION);
-$VERSION = '2.08';
+$VERSION = '2.09';
 
 use Tk qw(Ev);
 use Tk::Text;
@@ -86,12 +86,94 @@ sub DETACH {
   return;
 }
 
+# Cut, copy and paste with structure.  The clipboard gets the string, as
+# from Tk::Text (other programs see the text, with the delimiters of the
+# blocks as characters).  The MainWindow also keeps the list of "block
+# list -values" (or of "block cut") of the selection beside that string,
+# and clipboardPaste pastes the list with "block paste" while the
+# clipboard still holds the same string: the separators come back at
+# their depths with the values of what they begin, whole blocks with
+# their data, runs with their values.  When the clipboard holds
+# something else (another program, or another widget, has set it), the
+# string is inserted as text, as Tk::Text does.  A selection of several
+# ranges is handled by Tk::Text, as text.
+sub clipboardCopy {
+  my $w = shift;
+  my @sel = $w->tagRanges('sel');
+  my $val = $w->SUPER::clipboardCopy(@_);
+  my $mw = $w->MainWindow;
+  delete $mw->{'_eTextClipboard'};
+  $mw->{'_eTextClipboard'} = [$val, [$w->blockList('-values', @sel)]]
+    if defined $val and @sel == 2;
+  return $val;
+}
+
+sub clipboardCut {
+  my $w = shift;
+  my @sel = $w->tagRanges('sel');
+  return $w->SUPER::clipboardCut(@_) unless @sel == 2;
+  my $val = $w->SUPER::clipboardCopy(@_);
+  return $val unless defined $val;
+  $w->MainWindow->{'_eTextClipboard'} = [$val, [$w->blockCut(@sel)]];
+  return $val;
+}
+
+sub clipboardPaste {
+  my $w = shift;
+  my $kept = $w->MainWindow->{'_eTextClipboard'};
+  my $string = $kept ? Tk::catch { $w->clipboardGet } : undef;
+  return $w->SUPER::clipboardPaste(@_)
+    unless $kept and defined $string and $string eq $kept->[0];
+  # As Tk::Text::Insert: a selection that covers the insertion cursor
+  # is replaced; the deletion and the paste are one undo step.
+  my @sel = $w->tagRanges('sel');
+  $w->editStep(sub {
+    while (my ($first, $last) = splice @sel, 0, 2) {
+      next unless $w->compare($first, '<=', 'insert')
+	and $w->compare($last, '>=', 'insert');
+      $w->blockCut($first, $last);	# Its values go with it.
+      last;
+    }
+    my @range = $w->blockPaste('insert', $kept->[1]);
+    $w->markSet('insert', $range[1]) if @range == 2;
+  });
+  $w->see('insert');
+  return;
+}
+
+# Several changes as one undo step.  $w->editStep(sub { ... }, @args)
+# runs the code between "edit step begin" and "edit step end" (the end
+# also when the code dies) and returns what the code returns.  Inside,
+# no separator goes into the undo history, and the values set (block
+# nodedata, tag data, mark data, block data) are recorded, so that one
+# editUndo takes everything back.  Steps nest: the outermost one is the
+# undo step.  Without code it is the subcommand: editStep('begin'),
+# editStep('end'), and editStep() for the number of steps open.
+sub editStep {
+  my $w = shift;
+  return $w->edit('step', @_) unless @_ and ref $_[0] eq 'CODE';
+  my $code = shift;
+  my $want = wantarray;
+  my @result;
+  $w->edit('step', 'begin');
+  my $ok = eval {
+    if ($want) { @result = $code->(@_) }
+    elsif (defined $want) { $result[0] = $code->(@_) }
+    else { $code->(@_) }
+    1;
+  };
+  my $error = $@;
+  eval { $w->edit('step', 'end') } if Tk::Exists($w);
+  die $error unless $ok;
+  return $want ? @result : $result[0];
+}
+
 # The editXxx and imageXxx spellings are generated in this package too
 # (Tk::Text's versions call Tk::Text::edit and Tk::Text::image directly,
 # which would bypass an override here); markData and tagData are new.
-use Tk::Submethods ( 'block' => [qw(at addline cget configure data delete
-				    deletelines flatten insert list names nodedata of
-				    split sprout trim)],
+use Tk::Submethods ( 'block' => [qw(at addline cget configure cut data delete
+				    deletelines flatten insert level list names nodedata
+				    of paste split sprout trim)],
 		     'edit'  => [qw(modified redo reset separator undo)],
 		     'ornament' => [qw(cget configure coords create delete names
 				       point points)],
@@ -156,6 +238,31 @@ C<[name, value]> instead of a reference to the name, and a mark with a
 value is a C<Tk::Text::MarkLeft> or C<Tk::Text::MarkRight> holding
 C<[name, value]>.  See "Values" in
 F<doc/etext.pod>.
+
+A piece of a block can be taken out and put in elsewhere with its
+structure and its values: C<blockList('-values', $from, $to)> lists a
+range with the values of the leaves and nodes that begin in it,
+C<blockCut($from, $to)> returns that list and deletes the range, and
+C<blockPaste($index, \@list)> puts such a list in as one command
+(see "Cut and paste with structure" in F<doc/etext.pod>).  The methods
+C<clipboardCopy>, C<clipboardCut> and C<clipboardPaste> use them: the
+clipboard gets the string of the selection, as from L<Tk::Text> (the
+delimiters of blocks are characters in it), and the MainWindow keeps
+the list beside it; C<clipboardPaste> pastes the list while the
+clipboard still holds that string, so that a piece cut from a table
+comes back as rows and cells, and inserts the string as text when the
+clipboard was set by something else.  A selection that covers the
+insertion cursor is replaced, as L<Tk::Text> does it.
+
+C<< $text->editStep(sub { ... }, @args) >> runs the code as one undo
+step: one C<editUndo> takes back all its changes, the values it set
+with C<blockNodedata>, C<tagData>, C<markData> and C<blockData>
+included (outside such a step the setting of a value is not
+recorded).  The step is ended also when the code dies, and the method
+returns what the code returns.  It uses the subcommands C<edit step
+begin> and C<edit step end>, which C<editStep('begin')> and
+C<editStep('end')> call directly; see "Several changes as one undo
+step" in F<doc/etext.pod>.
 
 The complete documentation of the widget, of blocks and of the
 C<-layoutcmd> protocol is in F<doc/etext.pod> of this distribution

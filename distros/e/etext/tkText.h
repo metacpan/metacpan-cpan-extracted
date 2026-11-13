@@ -576,6 +576,28 @@ typedef struct TkTextTabArray {
 					 * The JOINs of block flatten are
 					 * deletions of separators
 					 * (_DELETE), in the same step. */
+#define TK_TEXT_UNDO_SETVALUE   10	/* A value set inside an edit step
+					 * ("edit step begin"): block
+					 * nodedata, tag data, mark data or
+					 * block data.  added: the kind of
+					 * place (TK_TEXT_VC_NODE, _RUN, _MARK
+					 * or _BLOCK); list: the place as the
+					 * -valuecommand gets it ([index,
+					 * level], [tag, start, end], [name,
+					 * index], [head]); data: the Lang
+					 * part the place had before the set
+					 * (after an undo: the one that was
+					 * set).  Undo and redo exchange it
+					 * with the Lang part at the place. */
+#define TK_TEXT_UNDO_LEVEL      9	/* block level: the separator at
+					 * index1 was given the depth "level";
+					 * levels[0]: the depth it had; added:
+					 * the levels this added above the
+					 * root.  Undone by giving it the old
+					 * depth and taking those levels away;
+					 * the values a lowering drops or
+					 * moves come back as for a
+					 * deletion. */
 
 /*
  * Values ("block nodedata") that leave the text.  Freeing a value can
@@ -723,7 +745,17 @@ typedef struct TkTextUndoAtom {
     int added;				/* _SPLIT: the levels the split added
 					 * above the root; _TRIM: non-zero if
 					 * the root had a value; _TAG: 1 for
-					 * add, 0 for remove. */
+					 * add, 0 for remove; _INSERT of
+					 * "block paste": the levels its
+					 * separators added above the root of
+					 * the block it pasted into, which its
+					 * undo takes away again. */
+    int cutJoin;			/* _DELETE of "block cut", _INSERT of
+					 * "block paste": the deletion (done
+					 * again by the redo of the cut, or as
+					 * the undo of the paste) never gives a
+					 * joined node the end side's value
+					 * (see TkText.cutJoin). */
     int numRanges;			/* _TAG: the number of ranges, */
     char *ranges;			/* and their ends, 2 * numRanges index
 					 * strings of TK_POS_CHARS each
@@ -832,7 +864,9 @@ typedef struct TkTextUndoStack {
 #define TK_TEXT_EDIT_TAGADD	6	/* kind starts a new undo step. */
 #define TK_TEXT_EDIT_TAGREMOVE	7
 #define TK_TEXT_EDIT_SPROUT	8
-#define TK_TEXT_EDIT_FLATTEN	9
+#define TK_TEXT_EDIT_FLATTEN    9
+#define TK_TEXT_EDIT_LEVEL      10
+#define TK_TEXT_EDIT_SETVALUE   11
 
 /*
  * A data structure of the following type is kept for each text widget that
@@ -1074,6 +1108,28 @@ typedef struct TkText {
 				 * ...] of their heads, or NULL; reset and
 				 * taken by the changes recorded for undo
 				 * (TkTextRootLogReset, TkTextRootLogTake). */
+    int stepDepth;		/* How many "edit step begin" are open: while
+				 * it is not 0, no separator goes into the
+				 * undo history (neither by -autoseparators
+				 * nor by "edit separator"), so that the
+				 * changes are one undo step, and the
+				 * setting of values is recorded
+				 * (TK_TEXT_UNDO_SETVALUE). */
+    int rootLogHold;		/* Non-zero while "block paste" inserts
+				 * its pieces: TkTextRootLogReset does
+				 * nothing, so that the log is that of the
+				 * whole paste. */
+    int cutJoin;		/* Non-zero while a deletion runs as "block
+				 * cut" does it (the cut, its redo, the undo
+				 * of "block paste"): where two leaves or
+				 * nodes of a block are joined and the start
+				 * side has no value, the end side's value
+				 * is dropped (into the undo atom, with its
+				 * address) instead of moving to the joined
+				 * node: it travels with the separator that
+				 * began its owner (the list of "block cut"
+				 * has it), and the node at the place keeps
+				 * what it had (MergeValues, VcContainer). */
     int freeingValues;		/* Non-zero while FlushValues frees values
 				 * (a DESTROY method may be running): the
 				 * round (see FlushValues); a command that
@@ -1159,6 +1215,14 @@ typedef struct TkText {
  * now: */
 #define TKT_GET_PRIVATE		0x100	/* Keep the private marks in a
 					 * list (the undo's own lists). */
+#define TKT_GET_SEPVALUES	0x80	/* "block list -values", "block
+					 * cut": a separator of a block that
+					 * is not listed whole is [depth,
+					 * defect, value of the leaf it
+					 * begins, values of the real nodes it
+					 * begins, from the lowest up]; and a
+					 * run that is on where the range
+					 * starts gets a TagOn there. */
 
 /*
  * Records of the following type define segment types in terms of
@@ -1271,6 +1335,9 @@ typedef struct TkTextBlock {
     struct TkTextOrnTemplates *ornTemplates;
 					/* -ornaments parsed (tkTextOrn.c),
 					 * or NULL. */
+    int splitLines;			/* -splitlines: draw the split
+					 * lines and frames of the stacks of
+					 * leaves (TkTextIBTreeLayoutProc). */
 } TkTextBlock;
 
 /*
@@ -1479,6 +1546,23 @@ extern void		TkBTreeSetValue _ANSI_ARGS_((TkText *textPtr,
 extern int		TkBTreeRunValue _ANSI_ARGS_((TkText *textPtr,
 			    TkTextTag *tagPtr, TkTextIndex *indexPtr,
 			    char *indexString, TkTextData **dataPtrPtr));
+extern int		TkIBTreeSetBeginValue _ANSI_ARGS_((TkText *textPtr,
+			    TkTextLine *linePtr, int k, Arg value));
+extern void		TkIBTreeSetNodeValues _ANSI_ARGS_((TkText *textPtr,
+			    TkTextSegment *segPtr, Arg values));
+extern int		TkBTreeSetRunValueAt _ANSI_ARGS_((TkText *textPtr,
+			    TkTextTag *tagPtr, TkTextIndex *indexPtr,
+			    Arg value));
+extern void		TkBTreeListRunsOn _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, void *listFactoryPtr));
+extern int              TkIBTreeRootLevel _ANSI_ARGS_((TkTextSegment *segPtr));
+extern int              TkTextRecordSet _ANSI_ARGS_((TkText *textPtr,
+			    int kind, Tcl_Obj *where, TkTextData *dataPtr,
+			    Arg value));
+extern int              TkIBTreeSeparatorLevel _ANSI_ARGS_((TkText *textPtr,
+			    TkTextIndex *indexPtr, char *indexString,
+			    int set, int level, int tell, int *oldPtr,
+			    int *addedPtr));
 extern int		TkTextUndoRevert _ANSI_ARGS_((TkText *textPtr));
 extern int		TkTextUndoApply _ANSI_ARGS_((TkText *textPtr));
 extern void		TkTextIndexForwChars _ANSI_ARGS_((TkTextIndex *srcPtr,
@@ -1548,6 +1632,22 @@ typedef struct TkTextOrnBlockBoxes {
 struct TkTextBlockOrns;
 struct TkTextOrnTemplates;
 
+/*
+ * A picture of the structure hidden in a stack of leaves of a block
+ * (the split lines and frames of TkTextIBTreeLayoutProc), in block
+ * coordinates: a number shown in binary, one stroke per bit set.
+ */
+
+typedef struct TkTextOrnSplit {
+    int frame;			/* 0: horizontal lines, one under another
+				 * from the row y down, over the columns x
+				 * to x + width - 1.  1: frames around the
+				 * box x, y, width, height, one outside
+				 * another. */
+    int value;			/* The number shown. */
+    int x, y, width, height;	/* (height: of a box only.) */
+} TkTextOrnSplit;
+
 extern int		TkTextOrnIsType _ANSI_ARGS_((char *string));
 extern int		TkTextOrnLayoutItem _ANSI_ARGS_((TkText *textPtr,
 			    Tcl_Interp *interp, int argc, Arg *args,
@@ -1563,6 +1663,11 @@ extern void		TkTextOrnLayoutTemplates _ANSI_ARGS_((
 			    struct TkTextOrnTemplates *templPtr,
 			    TkTextOrnBlockBoxes *boxesPtr,
 			    struct TkTextBlockOrns **listPtrPtr));
+extern void		TkTextOrnLayoutSplits _ANSI_ARGS_((TkText *textPtr,
+			    TkTextOrnSplit *splits, int num,
+			    struct TkTextBlockOrns **listPtrPtr));
+extern struct TkTextBlockOrns *	TkTextBlockOrnsAt _ANSI_ARGS_((
+			    TkText *textPtr, TkTextSegment *segPtr));
 extern void		TkTextOrnDrawBlock _ANSI_ARGS_((TkText *textPtr,
 			    struct TkTextBlockOrns *listPtr, Drawable d,
 			    int under, int addIndex, int x, int y));
@@ -1690,6 +1795,10 @@ void			TkIBTreeSetSeparatorLevels _ANSI_ARGS_((
 void			TkIBTreePrint _ANSI_ARGS_((
 			    TkTextSegment *segPtr, ListFactory *listFactoryPtr,
 			    void **linePtrs));
+int			TkIBTreeLeafSplit _ANSI_ARGS_((TkTextLine *linePtr,
+			    int *defectPtr, int *nextDefectPtr));
+int			TkIBTreeStackChain _ANSI_ARGS_((TkTextLine *linePtr,
+			    int count, int depth));
 void			TkTextPrintDLines _ANSI_ARGS_((ListFactory *listFactoryPtr,
 			    struct DLine **dlPtr, int count));
 TkTextSegment *		TkIBTreeAt _ANSI_ARGS_((TkTextIndex *indexPtr, 

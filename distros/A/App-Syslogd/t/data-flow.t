@@ -103,7 +103,25 @@ sub read_csv {
 }
 
 # Where this system lists the open descriptors, if anywhere
-my ($FD_DIR) = grep { opendir(my $dh, $_) } @{$CONFIG{fd_dirs}};
+# It must also list descriptors as they are opened: FreeBSD without fdescfs
+# has a /dev/fd that shows only 0, 1 and 2, whatever is open
+my ($FD_DIR) = grep { fd_dir_tracks_opens($_) } @{$CONFIG{fd_dirs}};
+
+# Does $dir show a descriptor when one is opened?
+sub fd_dir_tracks_opens {
+	my ($dir) = @_;
+	my $count = sub {
+		opendir(my $dh, $dir) or return undef;
+		my @fds = grep { /\A\d+\z/ } readdir($dh);
+		closedir($dh);
+		return scalar(@fds);
+	};
+	my $before = $count->() // return 0;
+	open(my $probe, '<', $0) or return 0;
+	my $after = $count->();
+	close($probe);
+	return defined($after) && $after > $before;
+}
 
 # How many descriptors this process has open, or undef if unknown
 sub open_fds {

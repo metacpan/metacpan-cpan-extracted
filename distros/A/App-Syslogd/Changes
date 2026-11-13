@@ -1,5 +1,37 @@
 Revision history for App-Syslogd
 
+0.002.1	Thu Nov 12 11:35:14 AM EST 2026
+	There are no changes to the program or the module's behaviour; this
+	release fixes the test suite on FreeBSD and Alpine Linux, and
+	corrects the documentation and the list of dependencies.
+
+	[ Bug Fixes ]
+	- Test suite: t/data-flow.t no longer fails on FreeBSD, where
+	  /dev/fd lists only descriptors 0 to 2 unless fdescfs is mounted
+	  (https://github.com/nigelhorne/syslogd/issues/1)
+	- Test suite: t/edge_cases.t no longer fails when a device file is
+	  refused when it is opened, instead of after: /dev/urandom is a
+	  symbolic link on FreeBSD, and an ordinary user may not open it for
+	  writing on Alpine Linux
+	- Test suite: t/server.t no longer prints "used only once" warnings
+
+	[ Documentation ]
+	- reopen_log(): the MESSAGES table now says what happens with a
+	  device file
+	- DEPENDENCIES lists every module the code uses
+
+	[ Dependencies ]
+	- Config and overload are declared as run-time requirements, and
+	  English as a test requirement
+	- Devel::Cover and Perl::Critic are declared as development
+	  requirements
+
+	[ Tests ]
+	- New t/extended_tests.t reaches the guards in the cache, new(),
+	  run() and the message handle that no other test reaches, and checks
+	  that warnings other than "Too late to run CHECK block" still get
+	  through when the module is loaded
+
 0.002.0	Fri Oct  2 08:49:35 AM EDT 2026
 	First CPAN release.  The logic of the syslogd program
 	(https://github.com/nigelhorne/syslogd) moves into the module

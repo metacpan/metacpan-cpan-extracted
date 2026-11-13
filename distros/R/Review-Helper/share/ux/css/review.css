@@ -1,0 +1,1816 @@
+/* Colors, borders and panel shapes follow Test2-Harness-UI's theme. */
+
+:root {
+    --header-h: 48px;
+    /* The fixed height of a stuck card head. */
+    --head-h: 34px;
+    /* The guide bar's height, 0 while it is hidden. */
+    --guide-h: 0px;
+    --bg: white;
+    --tree-w: 280px;
+    /* The tab that opens or closes the tree, beside the main column. */
+    --tab-w: 16px;
+    --link: #000080;
+    --hover: #D0E0F0;
+    --active-bg: #DDEEFF;
+    --active-border: #AABBFF;
+    /* The header's controls: one height, one outline. */
+    --ctl-h: 28px;
+    --ctl-border: #C4CAD4;
+    --accent-text: #0A2A80;
+    --added: #007000;
+    --deleted: #D02020;
+    --changed: #0060D0;
+    /* The ~changed line counts, apart from the changed file blue. */
+    --n-chg: #902090;
+    --add-bg: #E0FFE0;
+    --del-bg: #FFE0E0;
+    --hunk-bg: #F0F0FF;
+    --hunk: #006A6A;
+    --mark-bg: #FFFFC0;
+    --muted: #707070;
+    --yellow: #C89600;
+    /* Flag colors: a reviewer may object; probably a problem. */
+    --flag-yellow: #E5B000;
+    --flag-red: #C62828;
+    --hl-bg: #E4EEFF;
+    --hl-bar: #3060D0;
+    /* Guide highlights on code: a warm tint laid over the row's own color, so
+       added and removed lines stay distinct under it. */
+    --hl-line-tint: rgba(255, 170, 0, 0.42);
+    --hl-line-bar: #C05800;
+    /* Each level of the page has its own hue: a tinted header strip and a
+       guide line of the same hue down the left of what it holds. */
+    --lv-summary-tint: #EEF1F5;
+    --lv-summary-line: #8E99AB;
+    --lv-merge-tint: #F6EEF6;
+    --lv-merge-line: #B48AB4;
+    --lv-commit-tint: #F0F0FF;
+    --lv-commit-line: #9A9ADC;
+    --lv-file-tint: #E8F4F5;
+    --lv-file-line: #74AEB8;
+    --lv-section-tint: #FAF3E4;
+    --lv-section-line: #CDAE72;
+    --lv-note-tint: #F7F7FC;
+    --lv-note-line: #B8B8CC;
+    /* Every level's title, merge to section, rows and heads alike. */
+    --title-size: 1.1em;
+}
+
+[hidden] {
+    display: none !important;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: black;
+    font-family: system-ui, sans-serif;
+}
+
+button {
+    font: inherit;
+    color: inherit;
+}
+
+code, pre, table.diff, table.code-view {
+    font-family: monospace;
+}
+
+.added,   .link.added   { color: var(--added); }
+.deleted, .link.deleted { color: var(--deleted); }
+.changed, .link.changed { color: var(--changed); }
+
+/* ---- header ---- */
+
+#header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    box-sizing: border-box;
+    min-height: 48px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+    padding: 4px 10px;
+    background: white;
+    border-bottom: 1px solid var(--ctl-border);
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* Two groups: whose review and its title, then the controls. Each asks
+   for its whole width, so when both do not fit on one line the controls
+   wrap to a second one. The controls fill their line, so Close review sits
+   at its far end. */
+#head_id {
+    flex: 0 1 auto;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px 12px;
+}
+
+#head_controls {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 12px;
+}
+
+/* The controls by purpose: going through the review (guide, walks), then
+   how it shows (iteration, speech, order, diff layout), a line between. */
+.hgroup {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+.hgroup + .hgroup {
+    border-left: 1px solid var(--ctl-border);
+    padding-left: 12px;
+}
+
+/* Alone on its row (syncHeaderHeight), it has no line to draw; with the
+   first group hidden, no indent either. */
+.hgroup + .hgroup.lead {
+    border-left-color: transparent;
+}
+
+.hgroup[hidden] + .hgroup {
+    border-left: none;
+    padding-left: 0;
+}
+
+/* Every header control is one height and outline. */
+#header .play, #header .switch, .head-btn, .head-menu > summary, #iteration {
+    box-sizing: border-box;
+    height: var(--ctl-h);
+    border: 1px solid var(--ctl-border);
+    border-radius: 6px;
+}
+
+.head-btn {
+    background: white;
+    color: #303030;
+    padding: 0 10px;
+    font-size: 0.9em;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.head-btn:hover {
+    background: var(--hover);
+}
+
+#close_review {
+    margin-left: auto;
+}
+
+#iteration_wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.9em;
+}
+
+#iteration {
+    background: white;
+    font: inherit;
+}
+
+/* Alone on a line too narrow for them, the identity and the title are cut
+   short, each keeping some room. */
+#identity {
+    flex: 0 1 auto;
+    min-width: 6em;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#identity::after {
+    content: " \00b7";
+}
+
+#header h1 {
+    margin: 0;
+    font-size: 1.3em;
+    flex: 0 1 auto;
+    min-width: 4em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.switch {
+    display: inline-flex;
+    border: 1px solid #b0b0b0;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.switch button {
+    border: none;
+    background: white;
+    padding: 2px 8px;
+    cursor: pointer;
+    color: var(--link);
+}
+
+#header .switch button {
+    padding: 0 10px;
+    font-size: 0.9em;
+}
+
+.switch button + button {
+    border-left: 1px solid #b0b0b0;
+}
+
+.switch button:hover {
+    background: var(--hover);
+}
+
+.switch button.active {
+    background: var(--active-bg);
+    color: var(--accent-text);
+    font-weight: bold;
+}
+
+/* A commit's or file's tabs, sized to its one-line head like its tools. */
+.head .tabs {
+    align-self: center;
+    font-size: 0.85em;
+}
+
+.head .tabs button {
+    padding: 0 6px;
+    font-size: inherit;
+}
+
+/* ---- tree ---- */
+
+#tree {
+    position: fixed;
+    top: var(--header-h);
+    bottom: 0;
+    left: 0;
+    width: var(--tree-w);
+    box-sizing: border-box;
+    overflow: auto;
+    padding: 8px 4px 30px 6px;
+    background: white;
+    z-index: 5;
+}
+
+#tree_grip {
+    position: fixed;
+    top: var(--header-h);
+    bottom: 0;
+    left: var(--tree-w);
+    width: 6px;
+    cursor: col-resize;
+    border-left: 1px solid #d0d0d0;
+    z-index: 6;
+    touch-action: none;
+}
+
+#tree_grip:hover {
+    background: var(--hover);
+}
+
+body.tree-hidden #tree,
+body.tree-hidden #tree_grip,
+body.tree-hidden #tree_close,
+body:not(.tree-hidden) #tree_open {
+    display: none;
+}
+
+/* A tall tab on the tree's right edge, or on the page's left edge when the
+   tree is closed, in the gap left of the main column so it covers nothing,
+   centred between the header and the guide bar. */
+.tree-tab {
+    position: fixed;
+    top: calc((100vh + var(--header-h) - var(--guide-h)) / 2);
+    transform: translateY(-50%);
+    left: 0;
+    width: var(--tab-w);
+    height: 120px;
+    padding: 0;
+    border: 1px solid var(--active-border);
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    background: var(--active-bg);
+    color: var(--link);
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 7;
+}
+
+.tree-tab:hover {
+    background: var(--hover);
+}
+
+#tree_close {
+    left: calc(var(--tree-w) + 1px);
+}
+
+#tree ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+}
+
+#tree ul ul {
+    padding-left: 14px;
+}
+
+#tree li.commit > ul {
+    display: none;
+}
+
+#tree li.commit.current > ul {
+    display: block;
+}
+
+/* Within the current merge, the commits open in its section expand too. */
+#tree li.commit.current li.commit.open > ul {
+    display: block;
+}
+
+#tree .node {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border-radius: 6px;
+    padding: 1px 2px;
+}
+
+#tree .node:hover {
+    background: var(--hover);
+}
+
+#tree li.current > .node {
+    border: 1px solid var(--active-border);
+    background: var(--active-bg);
+}
+
+/* A merge's and a commit's node carry their level's line, as their cards do. */
+#tree li.commit > .node {
+    border-left: 3px solid var(--lv-commit-line);
+}
+
+#tree li.merge > .node {
+    border-left-color: var(--lv-merge-line);
+}
+
+#tree li.open > .node > .link {
+    font-weight: bold;
+}
+
+#tree li.added   > .node > .link { color: var(--added); }
+#tree li.deleted > .node > .link { color: var(--deleted); }
+#tree li.changed > .node > .link { color: var(--changed); }
+
+#tree .widgets {
+    visibility: hidden;
+}
+
+#tree .node:hover .widgets,
+#tree .node:focus-within .widgets,
+#tree li.open > .node .widgets {
+    visibility: visible;
+}
+
+@media (hover: none) {
+    #tree .widgets {
+        visibility: visible;
+    }
+}
+
+/* ---- buttons that act as links and tools ---- */
+
+.link {
+    border: none;
+    background: none;
+    padding: 0;
+    cursor: pointer;
+    color: var(--link);
+    text-align: left;
+}
+
+.link:hover {
+    text-decoration: underline;
+}
+
+.tool {
+    border: 1px solid transparent;
+    border-radius: 4px;
+    background: none;
+    padding: 0 4px;
+    font-size: 0.85em;
+    cursor: pointer;
+    color: var(--link);
+}
+
+.tool:hover {
+    background: var(--hover);
+}
+
+.tool.active {
+    border-color: var(--active-border);
+    background: var(--active-bg);
+    color: #000060;
+}
+
+.tool.close {
+    color: var(--deleted);
+    font-weight: bold;
+}
+
+/* Entry to the guide and the flag walks: tinted, so they stand out from
+   the tools without shouting. */
+.play {
+    border: 1px solid var(--active-border);
+    border-radius: 6px;
+    background: var(--active-bg);
+    color: var(--accent-text);
+    font-weight: bold;
+    padding: 2px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+#header .play {
+    padding: 0 10px;
+    font-size: 0.9em;
+}
+
+.play:hover {
+    background: var(--hover);
+}
+
+/* ---- main column ---- */
+
+#main {
+    margin-top: calc(var(--header-h) + 10px);
+    margin-left: calc(var(--tree-w) + var(--tab-w) + 6px);
+    margin-right: 10px;
+    padding-bottom: 40vh;
+    min-width: 0;
+    /* A long URL or identifier must not widen the page on a phone. */
+    overflow-wrap: break-word;
+    /* Keeps the sticky heads' z-indexes under the fixed bars and tree. */
+    isolation: isolate;
+}
+
+body.tree-hidden #main {
+    margin-left: calc(var(--tab-w) + 6px);
+}
+
+/* While the page waits to place itself again, a fill landing above does not
+   move the scroll: the page places itself, and a scroll is the reader's. */
+#main.placing {
+    overflow-anchor: none;
+}
+
+/* This tab showed another review: the port may now be another server's. */
+#stale {
+    border: 2px solid var(--yellow);
+    background: #FFF8E0;
+    border-radius: 10px;
+    padding: 6px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+#error {
+    border: 1px solid #FF0000;
+    background: #FFF0F0;
+    color: #C00000;
+    border-radius: 10px;
+    padding: 6px;
+    margin-bottom: 10px;
+}
+
+.card {
+    --lv-tint: var(--lv-commit-tint);
+    --lv-line: var(--lv-commit-line);
+    border-left: 3px solid var(--lv-line);
+    border-top-left-radius: 10px;
+    padding: 0 6px 6px 10px;
+    margin-bottom: 10px;
+    min-width: 0;
+}
+
+#summary.card, #journal.card {
+    --lv-tint: var(--lv-summary-tint);
+    --lv-line: var(--lv-summary-line);
+}
+
+/* Each level of the page (levelNode in app.js) takes its kind's color. */
+[data-kind="merge"] {
+    --lv-tint: var(--lv-merge-tint);
+    --lv-line: var(--lv-merge-line);
+}
+
+[data-kind="commit"] {
+    --lv-tint: var(--lv-commit-tint);
+    --lv-line: var(--lv-commit-line);
+}
+
+[data-kind="file"], [data-kind="blob"] {
+    --lv-tint: var(--lv-file-tint);
+    --lv-line: var(--lv-file-line);
+}
+
+[data-kind="section"] {
+    --lv-tint: var(--lv-section-tint);
+    --lv-line: var(--lv-section-line);
+}
+
+/* The header strip runs from the guide line to the right edge. */
+.card > .head {
+    margin: 0 -6px 4px -10px;
+    padding: 2px 10px;
+    background: var(--lv-tint);
+    border-top-left-radius: 7px;
+}
+
+#summary h2, #journal h2 {
+    margin: 4px 0;
+    font-size: var(--title-size);
+}
+
+.card h3 {
+    margin: 10px 0 2px;
+    font-size: 1em;
+}
+
+.card .head {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+}
+
+#summary .head h2, #journal .head h2 {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+/* ---- stuck headers ---- */
+
+/* Each open level's header sticks under the page header and the levels
+   above it while its level is on screen: merges, the commit, the file, then
+   the section. --cards counts the card heads above; it inherits, so a
+   header's top is the stack over it. Commit and file heads are one line of
+   fixed height so the stack is exact; the section head, the last level,
+   keeps its own height. A merge in a merge in a merge, down to a section,
+   is six levels. */
+#commits .card > :not(.head) { --cards: 1; }
+#commits .card .card > :not(.head) { --cards: 2; }
+#commits .card .card .card > :not(.head) { --cards: 3; }
+#commits .card .card .card .card > :not(.head) { --cards: 4; }
+#commits .card .card .card .card .card > :not(.head) { --cards: 5; }
+#commits .card .card .card .card .card .card > :not(.head) { --cards: 6; }
+
+#commits .card > .head {
+    position: sticky;
+    top: calc(var(--header-h) + var(--cards, 0) * var(--head-h));
+    box-sizing: border-box;
+}
+
+/* A header leaving with its level slides under the headers above it. */
+#commits .card > .head { z-index: 8; }
+#commits .card .card > .head { z-index: 7; }
+#commits .card .card .card > .head { z-index: 6; }
+#commits .card .card .card .card > .head { z-index: 5; }
+#commits .card .card .card .card .card > .head { z-index: 4; }
+#commits .card .card .card .card .card .card > .head { z-index: 3; }
+
+/* A target scrolled to lands below the headers stuck over it. */
+#main [id] {
+    scroll-margin-top: calc(var(--header-h) + var(--cards, 0) * var(--head-h) + 10px);
+}
+
+#main section.commit {
+    scroll-margin-top: calc(var(--header-h) + 4px);
+}
+
+#commits .card > .head {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+
+/* A section's head is the last level, so its height stacks nothing and its
+   row stays where the collapsed row was. */
+#commits .card:not([data-kind="section"]) > .head {
+    height: var(--head-h);
+    align-items: center;
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+#commits .card > .head > .row {
+    flex: 1 1 0;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#commits .card > .head .title,
+#commits .card > .head .title > .toggle {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    overflow-wrap: normal;
+}
+
+/* A long name ends in an ellipsis: the toggle, a box of its own, is cut
+   short too. */
+#commits .card > .head .title > .toggle {
+    max-width: 100%;
+    vertical-align: top;
+}
+
+/* On a narrow screen the name keeps room to be read: the tabs and links
+   give way first, scrolling sideways inside the one-line head. */
+#commits .card > .head > .row {
+    min-width: min(11em, 50%);
+}
+
+#commits .card > .head .title {
+    flex: 0 1 auto;
+    min-width: min(6em, 100%);
+}
+
+#commits .card > .head > .tabs,
+#commits .card > .head > .widgets {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+}
+
+/* A focused button's outline stays inside the scrolling box. */
+#commits .card > .head > :is(.tabs, .widgets) :focus-visible {
+    outline-offset: -2px;
+}
+
+/* On touch, a swipe scrolls them; the bar would only take room. */
+@media (hover: none) {
+    #commits .card > .head > .tabs,
+    #commits .card > .head > .widgets {
+        scrollbar-width: none;
+    }
+}
+
+.meta {
+    color: var(--muted);
+    font-size: 0.9em;
+}
+
+.prose p {
+    margin: 4px 0;
+}
+
+.prose ul {
+    margin: 4px 0;
+    padding-left: 22px;
+}
+
+.missing {
+    color: var(--muted);
+    font-style: italic;
+}
+
+.pending {
+    color: #0000A0;
+    font-size: 0.85em;
+    font-weight: normal;
+    font-style: italic;
+}
+
+pre.message {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    background: #F8F8F8;
+    border-radius: 6px;
+    padding: 6px;
+    margin: 4px 0;
+}
+
+/* A merge's commits, a commit's files and a file's sections: one row each,
+   expanding in place into a card. An expanded item's head, or a collapsed
+   row, toggles on a click anywhere but its widgets. */
+.commit-list, .files, .sections {
+    margin: 4px 0;
+}
+
+.head.collapsible, .level:not(.card) > .row {
+    cursor: pointer;
+}
+
+.head.collapsible .widgets {
+    cursor: auto;
+}
+
+.level .row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.level .title {
+    margin: 0;
+    font-size: var(--title-size);
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.level .toggle {
+    font-weight: bold;
+}
+
+/* A commit row's summary takes the rest of its line, cut short. */
+.level .gist {
+    flex: 1 1 12em;
+    min-width: 0;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* A closed level is its strip, one row high, outlined in its line with
+   every corner rounded; open, it is the strip and left line. Its name sits
+   at the same spot either way, so it stays under the pointer. */
+.level:not(.card) {
+    border: 1px solid var(--lv-line);
+    border-left-width: 3px;
+    border-radius: 7px;
+    background: var(--lv-tint);
+    padding: 0 10px;
+    margin: 3px 0;
+}
+
+:is(.commit-list, .files, .sections) > .level.card {
+    margin: 3px 0 10px;
+}
+
+/* Its row stays where the collapsed row was. */
+[data-kind="section"].card > .head {
+    padding-top: 1px;
+}
+
+
+.counts {
+    font-family: monospace;
+    font-size: 0.9em;
+    white-space: nowrap;
+}
+
+.n-add { color: var(--added); }
+.n-del { color: var(--deleted); }
+.n-chg { color: var(--n-chg); }
+
+dl.facts {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 2px 12px;
+    margin: 6px 0;
+}
+
+dl.facts dt {
+    font-weight: bold;
+}
+
+dl.facts dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+}
+
+/* The review summary, then one commit per page. */
+#summary {
+    break-after: page;
+}
+
+section.commit {
+    break-before: page;
+    margin-top: 24px;
+    padding-top: 14px;
+    border-top: 3px double #b0b0b0;
+}
+
+.section-body.with-docs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 12px;
+}
+
+/* ---- diff and file panels ---- */
+
+/* Diffs and docs grow with the page and scroll only sideways, so the wheel
+   always scrolls the page. Only a whole-file view is a window with its own
+   scroll, opened at the lines it marks. */
+.panel {
+    position: relative;
+    margin: 8px 0 4px;
+    overflow-x: auto;
+    border: 1px solid #d4d4d4;
+    border-radius: 4px;
+}
+
+.panel.view {
+    max-height: 56vh;
+    overflow: auto;
+}
+
+.docs {
+    overflow-x: auto;
+    min-width: 0;
+}
+
+.docs .pod h1, .docs .pod h2, .docs .pod h3, .docs .pod h4 {
+    font-size: 1em;
+    margin: 0.5em 0 0.25em;
+}
+
+.docs .pod dt {
+    font-family: monospace;
+    font-weight: bold;
+}
+
+.docs .pod pre {
+    background: #F8F8F8;
+    padding: 4px 6px;
+}
+
+.file-diff h4 {
+    margin: 0;
+    padding: 4px 6px;
+    background: #F8F8F8;
+    border-bottom: 1px solid #d0d0d0;
+    position: sticky;
+    left: 0;
+}
+
+table.diff, table.code-view {
+    border-collapse: collapse;
+    font-size: 0.95em;
+    width: 100%;
+}
+
+table.diff td, table.code-view td {
+    padding: 0 6px;
+    vertical-align: top;
+}
+
+td.ln {
+    text-align: right;
+    color: var(--muted);
+    user-select: none;
+    width: 1%;
+    white-space: nowrap;
+    border-right: 1px solid #e0e0e0;
+}
+
+td.code {
+    white-space: pre;
+}
+
+table.unified tr.add td, table.split td.add { background: var(--add-bg); }
+table.unified tr.del td, table.split td.del { background: var(--del-bg); }
+table.split td.none { background: #F4F4F4; }
+
+table.unified tr.add td.code::before { content: '+'; }
+table.unified tr.del td.code::before { content: '-'; }
+table.unified tr.ctx td.code::before { content: ' '; }
+
+table.split td.code {
+    width: 49%;
+}
+
+tr.hunk td {
+    background: var(--hunk-bg);
+    color: var(--hunk);
+    padding: 2px 6px;
+}
+
+/* A unit's diff: its code and its documentation, wherever each lives. */
+tr.part td {
+    font-family: system-ui, sans-serif;
+    font-weight: bold;
+    padding: 6px 6px 2px;
+    border-top: 2px solid #b0b0b0;
+}
+
+table.code-view tr.mark td {
+    background: var(--mark-bg);
+}
+
+table.code-view tr.gap td {
+    height: 6px;
+    border-top: 1px dashed #c0c0c0;
+}
+
+.images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 6px;
+}
+
+.panel img, .images img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* An SVG's picture above its source on its file tab: kept small. */
+.images.preview img {
+    max-height: 300px;
+}
+
+/* A merge that resolved conflicts; a renamed file. */
+.resolved, .tag {
+    display: inline-block;
+    padding: 0 5px;
+    border: 1px solid var(--hunk);
+    border-radius: 8px;
+    color: var(--hunk);
+    font-size: 0.75em;
+    white-space: nowrap;
+}
+
+figure {
+    margin: 0;
+}
+
+/* ---- syntax highlighting ---- */
+
+.hljs-comment, .hljs-quote { color: #707070; font-style: italic; }
+.hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-literal { color: #000080; font-weight: bold; }
+.hljs-string, .hljs-regexp, .hljs-symbol, .hljs-template-string { color: #007000; }
+.hljs-number { color: #b55d05; }
+.hljs-variable, .hljs-template-variable, .hljs-params { color: #902090; }
+.hljs-title, .hljs-section, .hljs-name, .hljs-selector-id, .hljs-selector-class { color: #12539e; font-weight: bold; }
+.hljs-attr, .hljs-attribute, .hljs-property { color: #0f6989; }
+.hljs-meta, .hljs-doctag, .hljs-subst { color: #b26521; }
+.hljs-emphasis { font-style: italic; }
+.hljs-strong { font-weight: bold; }
+
+/* ---- flags ---- */
+
+/* --flag is the color of whatever carries a flag color class or a flagged
+   line's data-flagged. */
+.flag-yellow, [data-flagged="flag-yellow"] { --flag: var(--flag-yellow); --flag-text: black; }
+.flag-red, [data-flagged="flag-red"]       { --flag: var(--flag-red); --flag-text: white; }
+
+.flag-slot {
+    display: contents;
+}
+
+.badge {
+    position: relative;
+    display: inline-block;
+    min-width: 1.2em;
+    padding: 0 3px;
+    border-radius: 8px;
+    font-size: 0.75em;
+    font-weight: bold;
+    text-align: center;
+    background: var(--flag);
+    color: var(--flag-text);
+}
+
+/* Some of a badge's flags are unseen by you. */
+.badge .unseen-dot {
+    position: absolute;
+    top: -2px;
+    right: -3px;
+    width: 6px;
+    height: 6px;
+    border: 1px solid white;
+    border-radius: 50%;
+    background: var(--link);
+}
+
+.flag-icon {
+    position: relative;
+    color: var(--flag);
+}
+
+.flag-icon[data-flag] {
+    margin-right: 3px;
+    cursor: pointer;
+    font-family: system-ui, sans-serif;
+}
+
+/* An eye on a flag you have seen, a speech mark on one with comments. */
+.flag-icon > .flag-mark {
+    position: absolute;
+    width: 0.62em;
+    height: 0.62em;
+    fill: #303030;
+    stroke: white;
+    stroke-width: 1.2px;
+    paint-order: stroke;
+}
+
+.flag-icon > .flag-mark.eye  { right: -0.35em; bottom: -0.1em; }
+.flag-icon > .flag-mark.talk { right: -0.35em; top: -0.2em; }
+
+td.ln[data-flagged] { box-shadow: inset 3px 0 0 var(--flag); }
+
+/* Comments not shown where the page stops short of them (a closed row, a
+   tab that leaves their line out): a speech mark and their count. */
+.cmt-badge {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    margin-left: 6px;
+    padding: 0 5px;
+    font: bold 0.75em system-ui, sans-serif;
+    line-height: 1.5;
+    color: #0000A0;
+    background: var(--lv-note-tint);
+    border: 1px solid var(--lv-note-line);
+    border-radius: 8px;
+    cursor: pointer;
+    vertical-align: middle;
+}
+
+.cmt-badge:hover {
+    background: var(--hover);
+}
+
+.cmt-badge > .flag-mark {
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+}
+
+.flag-popup {
+    position: absolute;
+    overflow-wrap: anywhere;
+    z-index: 20;
+    max-width: min(460px, 90vw);
+    box-sizing: border-box;
+    background: white;
+    border: 1px solid black;
+    border-left: 6px solid var(--flag);
+    border-radius: 10px;
+    padding: 4px 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* The head: the title wraps in the room left by its buttons, which stay on
+   one row at the right. */
+.flag-popup > .fb-head {
+    flex-wrap: nowrap;
+    align-items: flex-start;
+}
+
+.flag-popup .flag-title {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.flag-popup .flag-tools {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    white-space: nowrap;
+}
+
+.flag-popup .flag-tools .speak {
+    margin-left: 0;
+}
+
+.flag-popup p {
+    margin: 4px 0;
+}
+
+.flag-popup .flag-sentence {
+    font-weight: bold;
+}
+
+.flag-popup .flag-pending {
+    color: var(--muted);
+}
+
+.flag-popup .flag-state {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 0;
+}
+
+.flag-popup .flag-comments {
+    border-top: 1px solid #d0d0d0;
+    padding-top: 4px;
+}
+
+.flag-popup .flag-comment textarea {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* The header's speech settings: a small menu, to keep the header short. */
+.head-menu > summary::-webkit-details-marker {
+    display: none;
+}
+
+.head-menu {
+    position: relative;
+    align-self: center;
+    font-size: 0.9em;
+}
+
+.head-menu > summary {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    cursor: pointer;
+    padding: 0 8px;
+    color: #303030;
+}
+
+.head-menu > summary:hover {
+    background: var(--hover);
+}
+
+.head-menu > .menu {
+    position: absolute;
+    left: 0;
+    max-width: calc(100vw - 20px);
+    box-sizing: border-box;
+    z-index: 11;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 4px;
+    padding: 6px 8px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.head-menu label {
+    white-space: nowrap;
+}
+
+ul.flag-list {
+    margin: 4px 0;
+    padding-left: 4px;
+    list-style: none;
+}
+
+ul.flag-list li {
+    margin: 2px 0;
+}
+
+details.flag-group {
+    margin: 2px 0;
+}
+
+details.flag-group > summary {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+details.flag-group > summary .meta {
+    font-weight: normal;
+}
+
+/* A walk's two starts, new and all, side by side. */
+.walk-start {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+
+details.flag-group > summary .walk-start {
+    margin-left: 6px;
+    font-weight: normal;
+}
+
+.play:disabled,
+.tool.walk:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.play:disabled:hover {
+    background: var(--active-bg);
+}
+
+details.flag-group > ul.flag-list {
+    padding-left: 20px;
+}
+
+/* The flag a flag link or the walker jumped to: its lines, its line on its
+   card, or its card's head, in its color with a thick bar, clearly stronger
+   than a guide highlight, and a callout with its sentence. */
+[data-flag-focus="flag-yellow"] { --focus: var(--flag-yellow); }
+[data-flag-focus="flag-red"]    { --focus: var(--flag-red); }
+[data-flag-focus] { --focus-tint: color-mix(in srgb, var(--focus) 30%, transparent); }
+
+/* Its tint and bar on lines are with the guide's below, after them. */
+
+#main .card > .head[data-flag-focus] {
+    background: linear-gradient(var(--focus-tint), var(--focus-tint)), var(--lv-tint);
+    box-shadow: inset 10px 0 0 var(--focus);
+}
+
+/* The flags a commit's or file's card shows itself, a line each. */
+ul.card-flags {
+    margin: 6px 0;
+    padding-left: 4px;
+    list-style: none;
+}
+
+ul.card-flags li {
+    margin: 2px 0;
+    padding: 2px 4px;
+    border-radius: 4px;
+    overflow-wrap: anywhere;
+}
+
+/* The second, empty shadow is the one its arrival pulse grows, so the bar
+   stays while it pulses. */
+ul.card-flags li[data-flag-focus] {
+    padding-left: 14px;
+    background: var(--focus-tint);
+    box-shadow: inset 10px 0 0 var(--focus), 0 0 0 0 var(--focus);
+}
+
+.flag-callout {
+    --focus: var(--flag);
+    margin: 4px 0;
+    padding: 4px 8px;
+    border: 2px solid var(--focus);
+    border-left-width: 10px;
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--focus) 14%, white);
+    font-family: system-ui, sans-serif;
+    font-size: 1rem;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+table tr.flag-callout-row > td {
+    padding: 2px 4px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    .flag-callout.flag-arrive {
+        animation: flag-arrive 0.5s ease-in-out 4 alternate;
+    }
+
+    ul.card-flags li.flag-arrive {
+        animation: flag-arrive-line 0.5s ease-in-out 4 alternate;
+    }
+}
+
+@keyframes flag-arrive {
+    to { box-shadow: 0 0 0 6px var(--focus); }
+}
+
+@keyframes flag-arrive-line {
+    to { box-shadow: inset 10px 0 0 var(--focus), 0 0 0 6px var(--focus); }
+}
+
+/* ---- feedback and requests ---- */
+
+.notes:empty {
+    display: none;
+}
+
+.notes {
+    margin: 6px 0;
+}
+
+.fb {
+    border-left: 3px solid var(--lv-note-line);
+    padding: 2px 8px;
+    margin: 4px 0;
+    background: var(--lv-note-tint);
+    font-family: system-ui, sans-serif;
+    white-space: normal;
+}
+
+.fb-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 8px;
+}
+
+.fb-head .reviewer {
+    font-size: 0.9em;
+    font-weight: bold;
+    overflow-wrap: anywhere;
+}
+
+.fb-head .tool:last-child {
+    margin-left: auto;
+}
+
+.status {
+    font-size: 0.8em;
+    font-weight: bold;
+    border-radius: 6px;
+    padding: 0 5px;
+    border: 1px solid currentColor;
+}
+
+.status.open      { color: #0000A0; }
+.status.addressed,
+.status.done      { color: var(--added); }
+.status.declined  { color: var(--muted); }
+
+.response {
+    border-left: 3px solid #b0b0b0;
+    padding-left: 8px;
+    margin: 4px 0;
+}
+
+.response .who {
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+.debate {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    margin: 4px 0;
+}
+
+.case {
+    border-radius: 6px;
+    padding: 2px 8px;
+}
+
+.case h4 {
+    margin: 4px 0;
+}
+
+.case.for     { background: var(--add-bg); }
+.case.against { background: var(--del-bg); }
+
+form.form {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 6px 0;
+    max-width: 50em;
+    font-family: system-ui, sans-serif;
+    white-space: normal;
+}
+
+form.form textarea {
+    font: inherit;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+form.form select {
+    align-self: flex-start;
+}
+
+form.form .buttons {
+    display: flex;
+    gap: 6px;
+}
+
+tr.fb-row > td, tr.fb-form > td {
+    padding: 2px 8px 4px 40px;
+    background: white;
+}
+
+td.ln[data-side] {
+    cursor: pointer;
+}
+
+td.ln[data-side]:hover {
+    color: var(--link);
+    text-decoration: underline;
+}
+
+/* ---- guide ---- */
+
+/* Selectors as specific as the diff's add/del rules, and later, so the tint
+   layers over their color instead of replacing it. */
+table.diff tr.hl > td, table.code-view tr.hl > td, table.split td.hl {
+    background-image: linear-gradient(var(--hl-line-tint), var(--hl-line-tint));
+}
+
+table tr.hl > td:first-child, table td.ln.hl {
+    box-shadow: inset 6px 0 0 var(--hl-line-bar);
+    color: black;
+    font-weight: bold;
+}
+
+/* A flagged line keeps its flag bar beside the highlight bar. */
+table tr.hl > td.ln[data-flagged],
+table td.ln.hl[data-flagged] {
+    box-shadow: inset 6px 0 0 var(--hl-line-bar), inset 9px 0 0 var(--flag);
+}
+
+/* The flag jumped to (see "The flag a flag link or the walker jumped to"):
+   as specific as the add/del and guide rules above, or more, and later, so
+   its tint layers over the line's add/del color in place of a guide tint,
+   and its bar replaces the guide's bar and a flagged line's. */
+table.diff tr[data-flag-focus] > td, table.code-view tr[data-flag-focus] > td, table.split td[data-flag-focus] {
+    background-image: linear-gradient(var(--focus-tint), var(--focus-tint));
+}
+
+table tr[data-flag-focus] > td.ln:first-child, table td.ln[data-flag-focus], table td.ln.hl[data-flag-focus] {
+    box-shadow: inset 10px 0 0 var(--focus);
+    color: black;
+    font-weight: bold;
+}
+
+/* Large and accented, so it is not missed. */
+#guide_bar {
+    position: fixed;
+    bottom: 0;
+    left: calc(var(--tree-w) + 10px);
+    right: 10px;
+    z-index: 8;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 20px;
+    padding: 14px 20px;
+    font-size: 1.25em;
+    background: var(--hl-bg);
+    border: 2px solid var(--hl-bar);
+    border-left-width: 8px;
+    border-bottom: none;
+    border-top-left-radius: 12px;
+    border-top-right-radius: 12px;
+    box-shadow: 0 -4px 16px rgba(32, 72, 168, 0.35);
+}
+
+body.tree-hidden #guide_bar {
+    left: 10px;
+}
+
+#guide_text {
+    flex: 1 1 12em;
+    overflow-wrap: anywhere;
+    margin: 0;
+    font-size: 1.15em;
+    line-height: 1.4;
+}
+
+/* The controls stack in a compact block at the right, a row each: reading
+   and the count, the topic jumps (or the walk's seen mark), back and next,
+   then replay, speech and exit. The text takes the rest of the width. */
+#guide_bar {
+    container-type: inline-size;
+}
+
+#guide_bar .controls {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+#guide_bar .crow {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 1fr;
+    gap: 6px;
+}
+
+#guide_bar #guide_play_row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Each jump keeps its side when the other has nowhere to go. */
+#guide_topics {
+    grid-template-columns: 1fr 1fr;
+}
+
+#guide_prev_topic { grid-column: 1; }
+#guide_next_topic { grid-column: 2; }
+
+#guide_bar .crow > .tool {
+    padding: 2px 10px;
+    white-space: nowrap;
+}
+
+/* Too narrow a bar for the block beside the text (a phone, a folded
+   phone, a narrow window): the controls flow in wrapped rows under it. */
+@container (max-width: 760px) {
+    #guide_bar .controls {
+        flex: 1 1 100%;
+        flex-flow: row wrap;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #guide_bar .crow:not([hidden]),
+    #guide_bar #guide_play_row,
+    #guide_bar #walk_opts:not([hidden]) {
+        display: contents;
+    }
+}
+
+#guide_bar .tool {
+    font-size: 1em;
+    padding: 4px 12px;
+    border-color: var(--active-border);
+    background: white;
+}
+
+#guide_bar .tool:hover {
+    background: var(--hover);
+}
+
+#guide_bar .tool.active {
+    background: var(--active-bg);
+}
+
+#guide_count {
+    font-family: monospace;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+#guide_bar .tool:disabled {
+    color: var(--muted);
+    cursor: default;
+    background: none;
+}
+
+#guide_bar #walk_opts {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+#walk_opts label {
+    font-size: 0.8em;
+    white-space: nowrap;
+}
+
+#walk_marks, .flag-marks {
+    color: var(--muted);
+    font-size: 0.75em;
+}
+
+/* Who else has seen the flag takes a line of its own, as wide as the
+   buttons and no wider, wrapping there: names never widen the controls'
+   block. */
+#guide_bar #walk_marks {
+    flex: 1 1 100%;
+    contain: inline-size;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+
+#guide_bar #walk_marks:empty {
+    display: none;
+}
+
+#speech_hint {
+    color: var(--muted);
+}
+
+#speech_opts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+}
+
+#speech_voice {
+    max-width: 16em;
+}
+
+#speech_menu .speaker {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.12em;
+    fill: currentColor;
+}
+
+/* The speech menu sits at the header's right: its menu opens leftward. */
+#speech_menu > .menu {
+    left: auto;
+    right: 0;
+}
+
+/* A block's buttons to read it aloud: small, beside its heading. */
+.speak {
+    display: inline-flex;
+    gap: 2px;
+    margin-left: 8px;
+    vertical-align: middle;
+    font-size: 0.8rem;
+    font-weight: normal;
+}
+
+.speak .tool,
+#guide_bar .speak .tool {
+    padding: 0 5px;
+    line-height: 1.4;
+    border-color: #b0b0b0;
+}
+
+/* Drawn, not the stop and pause characters: phones show those as colored
+   emoji. */
+.stop-mark, .pause-mark {
+    display: inline-block;
+    width: 0.65em;
+    height: 0.65em;
+}
+
+.stop-mark {
+    background: currentColor;
+}
+
+.pause-mark {
+    box-sizing: border-box;
+    border-left: 0.22em solid currentColor;
+    border-right: 0.22em solid currentColor;
+}
+
+.speak .tool:disabled {
+    color: var(--muted);
+    cursor: default;
+}
+
+.speak-row {
+    margin-top: 6px;
+}
+
+.prose-head {
+    display: flex;
+    align-items: baseline;
+}
+
+#speech_rate {
+    width: 6em;
+    vertical-align: middle;
+}
+
+#source {
+    text-decoration: none;
+}
+
+/* ---- the journal ---- */
+
+/* Each entry's disclosure arrow marks it; a list bullet beside it would
+   only repeat that. */
+ul.journal-list {
+    margin: 6px 0;
+    padding-left: 0;
+    list-style: none;
+}
+
+ul.journal-list li {
+    margin: 4px 0;
+    overflow-wrap: anywhere;
+}
+
+ul.journal-list summary {
+    cursor: pointer;
+}
+
+/* ---- small screens ---- */
+
+@media (max-width: 700px) {
+    /* The header's menus span the screen under the header, wherever the
+       wrapped header put their buttons. */
+    .head-menu > .menu,
+    #speech_menu > .menu {
+        position: fixed;
+        top: var(--header-h);
+        left: 10px;
+        right: 10px;
+        max-width: none;
+    }
+
+    #tree {
+        width: min(85vw, 360px);
+        border-right: 1px solid black;
+        box-shadow: 4px 0 12px rgba(0, 0, 0, 0.2);
+    }
+
+    #tree_grip {
+        display: none;
+    }
+
+    #tree_close {
+        left: min(85vw, 360px);
+    }
+
+    /* Room for the tab whether the tree overlay is open or not, so opening
+       it does not shift the page. */
+    #main,
+    body.tree-hidden #main {
+        margin-left: calc(var(--tab-w) + 6px);
+        margin-right: 6px;
+    }
+
+    .card {
+        padding-left: 6px;
+    }
+
+    .card > .head {
+        margin-left: -6px;
+        padding-left: 6px;
+    }
+
+    .section-body.with-docs {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .switch button,
+    #header .switch button,
+    #header .play,
+    .head-btn {
+        padding: 0 6px;
+    }
+
+    /* Wrapped onto several rows, the groups need no line between them. */
+    .hgroup + .hgroup {
+        border-left: none;
+        padding-left: 0;
+    }
+
+    /* The walk pair compact, so it shares a row with another control. */
+    #walk_start {
+        gap: 3px;
+    }
+
+    #walk_start .play {
+        font-size: 0.85em;
+    }
+
+    #guide_bar {
+        left: 0;
+        right: 0;
+    }
+
+    /* The topic buttons show only their arrows, so the bar stays short. */
+    #guide_bar .wide {
+        display: none;
+    }
+
+    .debate {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+@media print {
+    #header, #tree, #tree_grip, .tree-tab, #guide_bar {
+        display: none;
+    }
+
+    #main {
+        margin: 0;
+    }
+
+    .panel.view {
+        max-height: none;
+    }
+
+    #commits .card > .head {
+        position: static;
+    }
+}

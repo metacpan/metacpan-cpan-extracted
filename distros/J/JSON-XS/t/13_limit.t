@@ -1,4 +1,4 @@
-BEGIN { $| = 1; print "1..11\n"; }
+BEGIN { $| = 1; print "1..12\n"; }
 
 use JSON::XS;
 
@@ -26,4 +26,7 @@ ok (!eval { $js->encode ([[{}]]), 1 });
 
 ok (eval { ref $js->max_size (8)->decode ("[      ]") });
 eval { $js->max_size (8)->decode ("[       ]") }; ok ($@ =~ /max_size/);
+
+eval { JSON::XS->new->allow_tags->max_depth (4)->decode ("(" x 100) };
+ok ($@ =~ /maximum nesting/);
 

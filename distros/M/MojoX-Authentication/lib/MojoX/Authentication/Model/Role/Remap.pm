@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::Role::Remap;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo::Role;
@@ -7,7 +7,27 @@ use Ouch qw< :trytiny_var >;
 use experimental qw< signatures >;
 use namespace::clean;
 
+sub _remove_protected_keys ($self, $record) {
+   return [] unless $self->can('protected_keys_list');
+   return [
+      map {
+         my $has_key = exists($record->{$_});
+         [ $_, $has_key, delete($record->{$_}) ];
+      } $self->protected_keys_list
+   ];
+}
+
+sub _restore_protected_keys ($self, $record, $list) {
+   for my $item (reverse($list->@*)) {
+      my ($key, $restore, $value) = $item->@*;
+      delete($record->{$key});
+      $record->{$key} = $value if $restore;
+   }
+   return;
+}
+
 sub remap ($self, $record, $mappings, $backwards = 0) {
+   my $to_restore = $self->_remove_protected_keys($record);
    for my $remap ($backwards ? reverse($mappings->@*) : $mappings->@*) {
       if (ref($remap) eq 'CODE') {
          $remap->($record, $backwards);
@@ -34,6 +54,7 @@ sub remap ($self, $record, $mappings, $backwards = 0) {
          ouch 400, 'unsupported remapping', $remap;
       }
    }
+   $self->_restore_protected_keys($record, $to_restore);
    return $record;
 }
 

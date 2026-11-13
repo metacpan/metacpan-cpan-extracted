@@ -155,6 +155,19 @@ subtest 'integer: "1e3" accepted (scientific notation for a whole number)' => su
 	ok($r->{n} == 1000, 'coerced value is 1000');
 };
 
+subtest 'integer: "1e20" and "-1e20" accepted (large finite whole numbers)' => sub {
+	# 1e20 is far beyond 64-bit range but is finite and has no fractional
+	# part, so it must be accepted, as both a string and a numeric literal.
+	for my $case (['1e20', 1e20], ['-1e20', -1e20], [1e20, 1e20], [-1e20, -1e20]) {
+		my ($in, $want) = @{$case};
+		my $r;
+		lives_ok {
+			$r = validate_strict(schema => { n => { type => 'integer' } }, input => { n => $in })
+		} "'$in' accepted as integer";
+		ok($r->{n} == $want, "'$in' coerced to $want");
+	}
+};
+
 subtest 'integer: "42.0" accepted (whole number with trailing .0)' => sub {
 	# 42.0 == 42; the fractional part is zero, so this is a valid integer.
 	my $r;

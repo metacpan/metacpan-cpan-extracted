@@ -1,5 +1,17 @@
 Revision history for XML-MyXML
 
+1.11 2026-11-13T05:40:25Z
+
+    - fix attributes with newlines were dropped
+    - fix attributes on: <a v="x=" h="y"/>
+    - fix spaces were not allowed between attribute name and its value
+
+1.10 2026-11-13T04:19:08Z
+
+    - removed an unsafe string-eval
+    - fixed bug where <something>0</something> object's ->text would return an empty string
+    - fixed bug where '!as_is' in simple_to_xml would always fail
+
 1.09 2025-10-31T14:03:49Z
 
     - important bugfix: &#<decimal number>; wouldn't decode

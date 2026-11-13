@@ -1,0 +1,122 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "add_ons" : {
+      "a_add_ons" : 1
+     },
+     "caller_name" : {
+      "a_caller_name" : 1
+     },
+     "carrier" : {
+      "a_carrier" : 1
+     },
+     "country_code" : "a_country_code",
+     "national_format" : "a_national_format",
+     "phone_number" : "a_phone_number",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "add_ons",
+      "add_ons",
+      "plain"
+     ],
+     [
+      "caller_name",
+      "caller_name",
+      "plain"
+     ],
+     [
+      "carrier",
+      "carrier",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "national_format",
+      "national_format",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "CountryCode",
+    "v_country_code"
+   ],
+   [
+    "Type",
+    "v_type_1"
+   ],
+   [
+    "Type",
+    "v_type_2"
+   ],
+   [
+    "AddOns",
+    "v_add_ons_1"
+   ],
+   [
+    "AddOns",
+    "v_add_ons_2"
+   ],
+   [
+    "AddOns.one.two",
+    "v_add_ons_data"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchPhoneNumber",
+  "method" : "fetch",
+  "options" : {
+   "add_ons" : [
+    "v_add_ons_1",
+    "v_add_ons_2"
+   ],
+   "add_ons_data" : {
+    "one" : {
+     "two" : "v_add_ons_data"
+    }
+   },
+   "country_code" : "v_country_code",
+   "type" : [
+    "v_type_1",
+    "v_type_2"
+   ]
+  },
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v1/PhoneNumbers/id1"
+ }
+]

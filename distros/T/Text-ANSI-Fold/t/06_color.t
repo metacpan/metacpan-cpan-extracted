@@ -1,7 +1,7 @@
 use strict;
+use open IO => 'utf8', ':std';
 use Test::More 0.98;
 use utf8;
-use open IO => 'utf8', ':std';
 use Data::Dumper;
 
 use Text::ANSI::Fold qw(:constants);
@@ -147,6 +147,18 @@ sub right { (fold @_)[1] }
     is(right($_, width => 3), g("緑").b("青"), "multicolor: 3 (right)");
     is( left($_, width => 4), r("赤").g("緑"), "multicolor: 4");
     is(right($_, width => 4), b("青"), "multicolor: 4");
+}
+
+{
+    # SGR with subparameters, as in curly underline
+    my $u = "\e[4:3m";
+    is(left("${u}abcdefgh\e[m", width => 4), "${u}abcd\e[m", "colon: left");
+    is(right("${u}abcdefgh\e[m", width => 4), "${u}efgh\e[m", "colon: color goes on");
+    is(left("ab${u}cdefgh\e[m", width => 4), "ab${u}cd\e[m", "colon: in the middle");
+    is(right("abcd${u}efgh\e[m", width => 4), "${u}efgh\e[m", "colon: at the fold");
+    is(right("\e[4:3;31mabcdefgh\e[m", width => 4), "\e[4:3;31mefgh\e[m", "colon: with a semicolon");
+    is(right("\e[38:2::255:0:0mabcdefgh\e[m", width => 4), "\e[38:2::255:0:0mefgh\e[m", "colon: 24bit color");
+    is(left("ab\e[0:Kcdefgh", width => 4), "ab\e[0:Kcd\e[m", "colon: erase line");
 }
 
 done_testing;

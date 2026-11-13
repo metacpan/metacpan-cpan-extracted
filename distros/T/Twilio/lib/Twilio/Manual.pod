@@ -1,0 +1,565 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Twilio::Manual - How to send messages, make calls and answer them with the Twilio library for Perl
+
+=head1 DESCRIPTION
+
+This guide follows Twilio's own quickstarts for
+L<messaging|https://www.twilio.com/docs/messaging/quickstart> and
+L<voice|https://www.twilio.com/docs/voice/quickstart>, in Perl. It shows how to
+send an SMS, receive and reply to one, make a call, and answer one, and then the
+rest of what you need day to day: lists, errors, other Twilio products, and how
+to turn any example from Twilio's documentation into Perl.
+
+Every example here is run by the distribution's tests, against a fake HTTP
+client, so what you read is what the library does.
+
+=head1 INSTALLATION
+
+  cpanm Twilio
+
+It needs Perl 5.16 or later, and modules that most installations already have,
+such as L<HTTP::Tiny> and L<IO::Socket::SSL>. Two modules are optional:
+L<Cpanel::JSON::XS> makes JSON faster, and L<Crypt::OpenSSL::RSA> is needed only
+for L</"Public Key Client Validation">.
+
+=head1 CREDENTIALS
+
+Every request needs your Account SID and a secret. Find the Account SID and the
+Auth Token in the L<Twilio Console|https://console.twilio.com/>.
+
+Keep them out of your code. With no arguments, the client reads them from the
+C<TWILIO_ACCOUNT_SID> and C<TWILIO_AUTH_TOKEN> environment variables:
+
+=for test credentials-from-environment
+
+  use Twilio;
+
+  my $client = Twilio->new;
+
+You can also pass them, from wherever you keep them:
+
+=for test credentials-given
+
+  my $client = Twilio->new($account_sid, $auth_token);
+
+For applications, Twilio recommends an API key instead of the Auth Token: you
+can limit what a key may do, and revoke it without changing the token. Create
+one in the Console, and give the account with C<account_sid>:
+
+=for test credentials-api-key
+
+  my $client = Twilio->new($api_key_sid, $api_key_secret, { account_sid => $account_sid });
+
+C<< Twilio->new >> returns a L<Twilio::Rest::Client>, and takes the same
+arguments as C<< Twilio::Rest::Client->new >>.
+
+=head1 SEND AN SMS
+
+=for test send-sms
+
+  my $message = $client->messages->create(
+    '+15558675310',
+    {
+      from => '+15017122661',
+      body => q{Join Earth's mightiest heroes. Like Kevin Bacon.},
+    }
+  );
+
+  print $message->sid, "\n";
+
+The first value is the recipient, in E.164 form. C<from> is one of your Twilio
+numbers. A trial account can only send to numbers you have verified.
+
+The message is queued, not yet delivered. Its C<status> changes as it goes, and
+you can fetch it again, or have Twilio call a URL of yours at each change:
+
+=for test message-status
+
+  my $message = $client->messages->create(
+    '+15558675310',
+    {
+      from            => '+15017122661',
+      body            => 'Hello',
+      status_callback => 'https://example.com/status',
+    }
+  );
+
+  my $latest = $client->messages($message->sid)->fetch;
+  print $latest->status, "\n";    # such as queued, sent, delivered or failed
+
+To send a picture, add C<media_url> with one or more public URLs. For WhatsApp,
+put C<whatsapp:> before both numbers:
+
+=for test send-mms-and-whatsapp
+
+  $client->messages->create(
+    '+15558675310',
+    {
+      from      => '+15017122661',
+      body      => 'An owl',
+      media_url => ['https://demo.twilio.com/owl.png'],
+    }
+  );
+
+  $client->messages->create('whatsapp:+15558675310',
+    { from => 'whatsapp:+14155238886', body => 'Hello from WhatsApp' });
+
+=head1 RECEIVE AND REPLY TO AN SMS
+
+When someone texts your Twilio number, Twilio makes an HTTP request to a URL of
+yours, a I<webhook>, with the message in form parameters such as C<From> and
+C<Body>. Your answer is TwiML, an XML document that tells Twilio what to do, here
+to reply. So receiving needs a small web application.
+
+With L<Mojolicious::Lite>, the closest thing in Perl to the Flask and Express
+apps of Twilio's quickstarts, a whole application is one file:
+
+=for test reply-sms-mojolicious
+
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
+  use Twilio::TwiML::MessagingResponse;
+
+  post '/reply_sms' => sub {
+    my ($c) = @_;
+
+    my $response = Twilio::TwiML::MessagingResponse->new;
+    $response->message('The Robots are coming! Head for the hills!');
+
+    $c->res->headers->content_type('text/xml');
+    $c->render(data => "$response");
+  };
+
+  app->start;
+
+Run it with C<perl app.pl daemon>, and it listens on port 3000. Twilio needs a
+public URL, so in development use a tunnel such as
+L<ngrok|https://ngrok.com/>: C<ngrok http 3000> gives you a public HTTPS URL
+that reaches your port 3000. In the Console, open your phone number, and under
+I<A message comes in> set the webhook to that URL followed by C</reply_sms>,
+with C<HTTP POST>. Then text your number.
+
+Under a web server that runs CGI scripts, such as Apache, the same is a script
+like this one, with the L<CGI> module:
+
+=for test reply-sms-cgi
+
+  #!/usr/bin/perl
+  use strict;
+  use warnings;
+
+  use CGI;
+  use Twilio::TwiML::MessagingResponse;
+
+  my $query = CGI->new;
+  my $from  = $query->param('From');
+  my $body  = $query->param('Body');
+
+  my $response = Twilio::TwiML::MessagingResponse->new;
+  $response->message("Thanks for your message, $from. You said: $body");
+
+  print $query->header(-type => 'text/xml', -charset => 'UTF-8'), $response;
+
+A TwiML object writes itself as UTF-8 bytes, ready to send, so print it as it
+is, without an encoding layer on the handle.
+
+To answer with no reply at all, return an empty C<MessagingResponse>. See
+L<Twilio::TwiML::MessagingResponse> and L<Twilio::TwiML::Messaging::Message>
+for everything a reply can hold.
+
+=head1 MAKE A CALL
+
+A call needs a number to call, a Twilio number to call from, and instructions
+for when it is answered: a URL that returns TwiML, or the TwiML itself.
+
+=for test make-call-url
+
+  my $call = $client->calls->create('+15558675310', '+15017122661',
+    { url => 'http://demo.twilio.com/docs/voice.xml' });
+
+  print $call->sid, "\n";
+
+=for test make-call-twiml
+
+  use Twilio::TwiML::VoiceResponse;
+
+  my $twiml = Twilio::TwiML::VoiceResponse->new;
+  $twiml->say('Ahoy, World!');
+
+  my $call = $client->calls->create('+15558675310', '+15017122661', { twiml => $twiml });
+
+A call in progress can be changed, for example to hang it up:
+
+=for test end-call
+
+  $client->calls($call_sid)->update({ status => 'completed' });
+
+=head1 ANSWER A CALL
+
+Answering is the same as replying to a message: Twilio calls the voice webhook of
+your number, set in the Console under I<A call comes in>, and your application
+returns TwiML. This one greets the caller and asks for a choice, and C<< <Gather> >>
+sends the key pressed to a second URL:
+
+=for test answer-call-mojolicious
+
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
+  use Twilio::TwiML::VoiceResponse;
+
+  post '/voice' => sub {
+    my ($c) = @_;
+
+    my $response = Twilio::TwiML::VoiceResponse->new;
+    my $gather   = $response->gather({ num_digits => 1, action => '/gather' });
+    $gather->say('For sales, press 1. For support, press 2.');
+    $response->redirect('/voice');    # nothing was pressed: ask again
+
+    reply_with($c, $response);
+  };
+
+  post '/gather' => sub {
+    my ($c) = @_;
+
+    my %department = (1 => 'sales', 2 => 'support');
+    my $choice     = $department{ $c->param('Digits') // q{} };
+
+    my $response = Twilio::TwiML::VoiceResponse->new;
+    if ($choice) {
+      $response->say("You chose $choice. Goodbye.");
+    }
+    else {
+      $response->say('Sorry, I did not understand that choice.');
+      $response->redirect('/voice');
+    }
+    reply_with($c, $response);
+  };
+
+  sub reply_with {
+    my ($c, $twiml) = @_;
+    $c->res->headers->content_type('text/xml');
+    return $c->render(data => "$twiml");
+  }
+
+  app->start;
+
+L<Twilio::TwiML::VoiceResponse> lists every verb, such as C<dial>, C<play>,
+C<record> and C<enqueue>, and each verb's module lists its attributes.
+
+=head1 CHECK THAT A REQUEST COMES FROM TWILIO
+
+Anyone who learns the URL of a webhook can call it. Twilio signs each request
+with your Auth Token, in the C<X-Twilio-Signature> header, and
+L<Twilio::Security::RequestValidator> checks it. The URL must be the one Twilio
+called, including any query string. Behind a proxy or a load balancer, build it
+from what Twilio sees, not from what your server sees.
+
+In Mojolicious, check every request before its route runs:
+
+=for test validate-mojolicious
+
+  #!/usr/bin/env perl
+  use Mojolicious::Lite;
+  use Twilio::Security::RequestValidator;
+  use Twilio::TwiML::MessagingResponse;
+
+  my $validator = Twilio::Security::RequestValidator->new($ENV{TWILIO_AUTH_TOKEN});
+
+  under sub {
+    my ($c) = @_;
+    my $signature = $c->req->headers->header('X-Twilio-Signature') // q{};
+    my $url       = $c->req->url->to_abs->to_string;
+    return 1 if $validator->validate($signature, $url, $c->req->body_params->to_hash);
+
+    $c->render(text => 'Forbidden', status => 403);
+    return undef;
+  };
+
+  post '/reply_sms' => sub {
+    my ($c) = @_;
+    my $response = Twilio::TwiML::MessagingResponse->new;
+    $response->message('Checked, and from Twilio.');
+    $c->res->headers->content_type('text/xml');
+    $c->render(data => "$response");
+  };
+
+  app->start;
+
+In a CGI script:
+
+=for test validate-cgi
+
+  use CGI;
+  use Twilio::Security::RequestValidator;
+
+  my $query  = CGI->new;
+  my $url    = "https://$ENV{HTTP_HOST}$ENV{REQUEST_URI}";
+  my %params = map { $_ => [ $query->multi_param($_) ] } $query->param;
+
+  my $validator = Twilio::Security::RequestValidator->new($ENV{TWILIO_AUTH_TOKEN});
+  if (!$validator->validate($ENV{HTTP_X_TWILIO_SIGNATURE} // q{}, $url, \%params)) {
+    print $query->header(-status => '403 Forbidden');
+    exit;
+  }
+
+C<multi_param> keeps every value of a parameter sent more than once, and needs
+L<CGI> 4.08 or later. A webhook that receives JSON is validated with its raw
+body in place of the parameters; see L<Twilio::Security::RequestValidator>.
+
+=head1 READ LISTS
+
+C<read> returns records as a list, fetching as many pages as it needs. Filters
+go in the first hash, then a limit, and optionally a page size:
+
+=for test read-list
+
+  for my $message ($client->messages->read({ to => '+15558675310' }, 20)) {
+    printf "%s %s %s\n", $message->date_sent // q{-}, $message->from, $message->body;
+  }
+
+Without a limit, C<read> fetches every record. For long lists, C<stream> fetches
+one page at a time, as you go:
+
+=for test stream-list
+
+  my $stream = $client->messages->stream({}, 500);
+  while (my $message = $stream->next) {
+    print $message->sid, "\n";
+  }
+
+Dates come back as L<Time::Piece> objects in UTC, and dates you send can be
+L<Time::Piece> or C<DateTime> objects, or ISO 8601 text. C<page> fetches one page
+at a time, if you want to handle paging yourself; see L<Twilio::Page>.
+
+=head1 ERRORS
+
+When Twilio answers with an error, the method dies with a
+L<Twilio::Exceptions::RestException>, which has Twilio's error code, the HTTP
+status, and a link to the error's documentation:
+
+=for test errors
+
+  use Scalar::Util qw(blessed);
+
+  my $message = eval { $client->messages->create('+15005550001', { from => $from, body => 'Hi' }) };
+  if (!$message) {
+    my $error = $@;
+    die $error if !(blessed($error) && $error->isa('Twilio::Exceptions::RestException'));
+
+    warn sprintf "Twilio error %d (HTTP %d): %s\nSee %s\n",
+      $error->get_code, $error->get_status_code, $error->get_message, $error->get_more_info;
+  }
+
+Newer APIs describe errors in more detail, with
+L<Twilio::Exceptions::RestExceptionV1> or
+L<Twilio::Exceptions::TwilioServiceException>, which also has the fields at
+fault. Both are a C<RestException>, so the code above catches them too.
+Problems that are not Twilio's answer, such as missing credentials or a network
+failure, are other L<Twilio::Exceptions::TwilioException> subclasses.
+
+An exception turns into its message as text, so C<die> and C<warn> show
+something useful without any of this.
+
+=head1 OTHER TWILIO PRODUCTS
+
+Messages and calls belong to Twilio's main API, and the client has a shortcut to
+each resource of it. Every other product is reached through its name and
+version, the same path as in Twilio's documentation. Verify, for example:
+
+=for test verify
+
+  my $verification = $client->verify->v2->services($verify_service_sid)
+    ->verifications->create('+15558675310', 'sms');
+
+  # later, with the code the user typed
+  my $check = $client->verify->v2->services($verify_service_sid)
+    ->verification_checks->create({ to => '+15558675310', code => $code });
+  print $check->status, "\n";    # approved
+
+Each resource is documented in its own module, with every value it takes, in
+Twilio's words: C<< $client->messages >> is
+L<Twilio::Rest::Api::V2010::Account::Message>, and C<< $client->verify->v2->services >>
+is L<Twilio::Rest::Verify::V2::Service>. L<Twilio::Rest::Client> lists the
+products.
+
+=head1 TRANSLATING TWILIO'S EXAMPLES
+
+Twilio's documentation has examples in several languages, and the library
+follows the official libraries closely, twilio-php most of all, so any of them
+can become Perl with a few rules.
+
+=over
+
+=item The client
+
+C<new Client($sid, $token)> in PHP and C<Client(account_sid, auth_token)> in
+Python are C<< Twilio->new($sid, $token) >>.
+
+=item The path to a resource
+
+It is the same chain, with C<< -> >>, and names in snake_case: PHP's
+C<< $twilio->incomingPhoneNumbers >> and Python's
+C<client.incoming_phone_numbers> are C<< $client->incoming_phone_numbers >>. An
+id goes in the call that names the resource, as in
+C<< $client->messages($sid) >>.
+
+=item Required values
+
+They come first, as plain arguments, in the order twilio-php uses. The module of
+each resource lists them in that order under its method. Python passes them by
+name, so check the order there.
+
+=item Optional values
+
+They go in one hash reference, with snake_case names: PHP's
+C<["statusCallback" =E<gt> $url]> is C<< { status_callback => $url } >>, and
+Python's C<from_> is just C<from>.
+
+=item Values of a record
+
+They are methods with snake_case names: PHP's C<< $message->dateCreated >> and
+Python's C<message.date_created> are C<< $message->date_created >>.
+
+=item Kinds of values
+
+A list is an array reference, a JSON object a hash reference, a boolean any
+Perl true or false value, and a date a L<Time::Piece> or C<DateTime> object, or
+ISO 8601 text.
+
+=item Lists
+
+PHP's C<read([], 20)> is the same. Python's C<list(limit=20)> is
+C<< read({}, 20) >>, with any filters in that first hash.
+
+=item Errors
+
+C<try> and C<catch> become C<eval>, and the class to look for is
+L<Twilio::Exceptions::RestException>.
+
+=item TwiML
+
+C<new VoiceResponse()> is C<< Twilio::TwiML::VoiceResponse->new >>, and
+attributes are a hash reference with snake_case names: PHP's
+C<< $response->gather(['numDigits' => 1]) >> is
+C<< $response->gather({ num_digits => 1 }) >>.
+
+=back
+
+Here is the call from Twilio's voice quickstart, in PHP:
+
+  $call = $twilio->calls->create(
+    "+15558675310",
+    "+15017122661",
+    ["url" => "http://demo.twilio.com/docs/voice.xml"]
+  );
+  print($call->sid);
+
+and in Perl:
+
+=for test translate-php
+
+  my $call = $twilio->calls->create(
+    '+15558675310',
+    '+15017122661',
+    { url => 'http://demo.twilio.com/docs/voice.xml' }
+  );
+  print $call->sid, "\n";
+
+And a message from the messaging quickstart, in Python:
+
+  message = client.messages.create(
+      body="Join Earth's mightiest heroes. Like Kevin Bacon.",
+      from_="+15017122661",
+      to="+15558675310",
+  )
+  print(message.body)
+
+which in Perl takes C<to> first, as twilio-php does:
+
+=for test translate-python
+
+  my $message = $client->messages->create(
+    '+15558675310',
+    {
+      body => q{Join Earth's mightiest heroes. Like Kevin Bacon.},
+      from => '+15017122661',
+    }
+  );
+  print $message->body, "\n";
+
+=head1 MORE
+
+=head2 The status code and headers of an answer
+
+C<with_metadata> runs an operation and returns its result together with the
+status code and headers of Twilio's answer; see L<Twilio::Metadata>.
+
+=for test metadata
+
+  my $answer = $client->messages->with_metadata(create => '+15558675310',
+    { from => '+15017122661', body => 'Hello' });
+
+  print $answer->get_status_code, "\n";                  # 201
+  print $answer->get_header('Twilio-Request-Id'), "\n";
+  my $message = $answer->get_data;
+
+=head2 Regions and edges
+
+To keep traffic in one of Twilio's regions, set both the region and the edge,
+with these options or the C<TWILIO_REGION> and C<TWILIO_EDGE> environment
+variables:
+
+=for test region-edge
+
+  my $client = Twilio->new($account_sid, $auth_token, { region => 'au1', edge => 'sydney' });
+
+=head2 Retries
+
+Twilio answers HTTP 429 when there are too many requests. With C<max_retries>,
+those requests are sent again, after the wait Twilio asks for. Other failures
+are never repeated, so a message is never sent twice. See
+L<Twilio::Base::BaseClient/Retries>.
+
+=head2 Seeing the requests
+
+Setting the C<TWILIO_LOG_LEVEL> environment variable to C<debug>, or calling
+C<< $client->set_log_level('debug') >>, prints each request and answer on
+STDERR, without the credentials.
+
+=head2 OAuth
+
+Twilio's OAuth client credentials work through
+L<Twilio::CredentialProvider::ClientCredentialProvider>, given as the client's
+C<credential_provider>, with the account in C<account_sid>.
+
+=head2 Public Key Client Validation
+
+Accounts that enforce Public Key Client Validation, a setting in the Console,
+accept only requests signed with the account's private key.
+L<Twilio::Http::ValidationClient> signs them. Use it only for such accounts:
+Twilio refuses signed requests to others.
+
+=head2 Access tokens
+
+Twilio's client SDKs, such as Voice, Video and Conversations in a browser or an
+app, connect with an access token that your server makes; see
+L<Twilio::Jwt::AccessToken>.
+
+=head2 Testing your code
+
+L<Twilio::Http::FakeClient> answers requests from a queue of responses and
+records what would have been sent, so your tests need no account and no network.
+
+=head1 SEE ALSO
+
+L<Twilio>, L<Twilio::Rest::Client>, L<Twilio::Base::BaseClient>, and Twilio's
+documentation at L<https://www.twilio.com/docs>.
+
+=head1 LICENSE
+
+Copyright (c) 2026 Francisco Zarabozo. Released under the MIT License.
+
+=cut

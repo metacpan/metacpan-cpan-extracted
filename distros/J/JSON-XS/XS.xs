@@ -180,7 +180,7 @@ static char *
 json_sv_grow (SV *sv, size_t len1, size_t len2)
 {
   len1 = strlen_sum (len1, len2);
-  len1 = strlen_sum (len1, len1 >> 1);
+  len1 = strlen_sum (len1, (len1 >> 1) + 1);
 
   if (len1 > 4096 - 24)
     len1 = (len1 | 4095) - 24;
@@ -820,11 +820,16 @@ encode_rv (enc_t *enc, SV *sv)
 
               for (i = 0; i < count - 1; ++i)
                 {
+                  PUTBACK;
                   encode_sv (enc, SP[i + 1 - count]);
+                  SPAGAIN;
                   encode_ch (enc, ',');
                 }
 
+              PUTBACK;
               encode_sv (enc, TOPs);
+              SPAGAIN;
+
               SP -= count;
             }
 
@@ -1235,6 +1240,7 @@ decode_str (dec_t *dec)
   return sv;
 
 fail:
+  SvREFCNT_dec (sv);
   dec->cur = dec_cur;
   return 0;
 }
@@ -1444,7 +1450,15 @@ decode_hv (dec_t *dec)
                   if (!key)
                     goto fail;
 
-                  decode_ws (dec); EXPECT_CH (':');
+                  decode_ws (dec);
+
+                  if (*dec->cur != ':') // expect ':'
+                    {
+                      SvREFCNT_dec_NN (key);
+                      ERR (":" " expected");
+                    }
+
+                  ++dec->cur;
 
                   decode_ws (dec);
                   value = decode_sv (dec);
@@ -1593,6 +1607,8 @@ decode_tag (dec_t *dec)
   if (!(dec->json.flags & F_ALLOW_TAGS))
     ERR ("malformed JSON string, neither array, object, number, string or atom");
 
+  DEC_INC_DEPTH;
+
   ++dec->cur;
 
   decode_ws (dec);
@@ -1658,6 +1674,7 @@ decode_tag (dec_t *dec)
 
     FREETMPS; LEAVE;
 
+    DEC_DEC_DEPTH;
     return sv;
   }
 
@@ -1881,7 +1898,7 @@ incr_parse (JSON *self)
                       }
                   }
                 else if (!*p)
-                  goto interrupt;
+                  goto nul;
 
                 ++p;
               }
@@ -1889,7 +1906,7 @@ incr_parse (JSON *self)
           // skip a single char inside a string (for \\-processing)
           case INCR_M_BS:
             if (!*p)
-              goto interrupt;
+              goto nul;
 
             ++p;
             self->incr_mode = INCR_M_STR;
@@ -1907,7 +1924,7 @@ incr_parse (JSON *self)
                     break;
                   }
                 else if (!*p)
-                  goto interrupt;
+                  goto nul;
 
                 ++p;
               }
@@ -1965,11 +1982,11 @@ incr_parse (JSON *self)
                     if (!*p) // if at end of string we have to switch modes
                       {
                         self->incr_mode = INCR_M_BS;
-                        goto interrupt;
+                        goto nul;
                       }
                   }
                 else if (!*p)
-                  goto interrupt;
+                  goto nul;
 
                 ++p;
               }
@@ -1983,7 +2000,7 @@ incr_parse (JSON *self)
                   {
                     case 0:
                       --p;
-                      goto interrupt;
+                      goto nul;
 
                     case 0x09:
                     case 0x0a:
@@ -2043,8 +2060,16 @@ incr_parse (JSON *self)
         ;
     }
 
+nul: // nul character found
+  if (!*p && p != SvEND (self->incr_text))
+    {
+      self->incr_pos = p - SvPVX (self->incr_text) + 1; // skip 0 byte for incr_skip
+      croak ("invalid NUL character in JSON text");
+    }
+
 interrupt:
   self->incr_pos = p - SvPVX (self->incr_text);
+
   //printf ("interrupt<%.*s>\n", self->incr_pos, SvPVX(self->incr_text));//D
   //printf ("return pos %d mode %d nest %d\n", self->incr_pos, self->incr_mode, self->incr_nest);//D
 }
@@ -2306,6 +2331,7 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
                         {
                           self->incr_pos = 0;
                           SvCUR_set (self->incr_text, 0);
+                          *SvEND (self->incr_text) = 0;
                         }
 
                       break;
@@ -2315,7 +2341,7 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
               PUTBACK; sv = decode_json (self->incr_text, self, &offset); SPAGAIN;
               XPUSHs (sv);
 
-              self->incr_pos -= offset;
+              self->incr_pos  = 0;
               self->incr_nest = 0;
               self->incr_mode = 0;
 

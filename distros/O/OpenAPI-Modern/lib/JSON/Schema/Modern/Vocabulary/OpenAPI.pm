@@ -3,7 +3,7 @@ package JSON::Schema::Modern::Vocabulary::OpenAPI;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema OpenAPI vocabulary
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 
 use 5.020;
 use utf8;
@@ -161,7 +161,7 @@ JSON::Schema::Modern::Vocabulary::OpenAPI - Implementation of the JSON Schema Op
 
 =head1 VERSION
 
-version 0.152
+version 0.153
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -178,8 +178,8 @@ or C<https://spec.openapis.org/oas/3.2/vocab/base>
 and formally specified in L<https://spec.openapis.org/oas/latest#schema-object>.
 
 This vocabulary is normally made available by using the default OpenAPI metaschema
-(currently L<https://spec.openapis.org/oas/3.1/schema/2026-08-03> and
-L<https://spec.openapis.org/oas/3.2/schema/2026-08-30>).
+(currently L<https://spec.openapis.org/oas/3.1/schema/2026-11-05> and
+L<https://spec.openapis.org/oas/3.2/schema/2026-11-12>).
 
 =head1 SEE ALSO
 

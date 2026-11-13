@@ -1,13 +1,15 @@
 package MojoX::Authentication::Model;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo;
 use experimental qw< signatures >;
 use Ouch qw< :trytiny_var >;
+use Try::Catch;
 use Scalar::Util qw< blessed refaddr >;
+use Storable qw< dclone >;
 use Module::Runtime qw< use_module >;
-use constant MISSING => [];
+use MojoX::Authentication::Util qw< decode_name encode_name >;
 
 use namespace::clean;
 
@@ -21,9 +23,33 @@ has providers => (is => 'ro', default => sub { return [] });
 # providers in case they were not object already
 has _providers => (is => 'lazy', init_arg => undef);
 
+sub BUILD ($self, $args) {
+   $self->_providers; # trigger _build__providers to fail fast
+   return;
+}
+
 sub _build__providers ($self) {
    my $config = $self->config;
-   my (%by_name, @by_sequence, @unnamed);
+
+   my $name_setter = sub ($provider, $name) {
+      # the following check is mostly paranoia
+      ouch 400, 'undefined name for a provider' unless defined($name);
+
+      return unless $provider->can('name');
+      my $pname;
+      try {
+         $pname = $provider->name; # in case ->name() fails below
+         $provider->name($name);
+         $pname = $provider->name; # for double checking
+         die '' if (! defined($pname)) || ($pname ne $name);
+      }
+      catch {
+         $pname = defined($pname) ? qq{'$pname'} : 'undef';
+         ouch 400, "cannot change provider name from $pname to '$name'";
+      };
+   };
+
+   my (%by_name, @by_sequence, @unnamed, %seen);
    for my $candidate ($self->providers->@*) {
       next unless defined($candidate);
 
@@ -39,7 +65,7 @@ sub _build__providers ($self) {
       else { # $candidate has "means" for getting the $provider
          if (defined(my $instance = $candidate->{instance})) {
             $provider = $instance;
-            $provider->update_from_config($config)
+            $provider->update_from_config($config, $candidate)
                if $provider->can('update_from_config');
          }
          else {
@@ -56,20 +82,35 @@ sub _build__providers ($self) {
 
       next unless defined($provider);
 
+      ouch 400, 'cannot use the same provider instance twice'
+         if $seen{refaddr($provider)}++;
+
       $name //= $provider->name if $provider->can('name');
       ouch 400, 'two providers are named the same', $name
          if defined($name) && exists($by_name{$name});
+
+      # fail fast: do not accept providers that have load_user but do not
+      # have tamed_user_record
+      ouch 400, 'provider with load_user must also have tamed_user_record'
+         if $provider->can('load_user')
+         && ! $provider->can('tamed_user_record');
 
       my $item = {
          name => $name,
          provider => $provider,
       };
       push @by_sequence, $item;
-      $by_name{$name} = $provider if defined($name);
-      push @unnamed, $item unless defined($name);
+
+      if (defined($name)) { # make sure $name sticks in the instance too
+         $by_name{$name} = $provider;
+         $name_setter->($provider, $name);
+      }
+      else {
+         push @unnamed, $item;
+      }
    }
 
-   # give 'em all a name
+   # give 'em all a name, make sure it sticks
    my $n = 0;
    ITEM:
    for my $item (@unnamed) {
@@ -77,7 +118,8 @@ sub _build__providers ($self) {
          my $name = 'unnamed-' . $n++;
          next if exists($by_name{$name});
          $item->{name} = $name;
-         $by_name{$name} = $item->{provider};
+         my $provider = $by_name{$name} = $item->{provider};
+         $name_setter->($provider, $name);
          next ITEM;
       }
    }
@@ -92,39 +134,64 @@ sub provider_named ($self, $name) {
    return $self->_providers->{by_name}{$name} // undef;
 }
 
-# iterate a call over providers, in the order they were set upon
-# construction. Stop when one of them handles the call.
-sub _iterate ($self, $method_name, @args) {
-   $method_name ||= (caller(1))[3] =~ s{\A .* ::}{}rmxs;
+sub euid_join ($self, $provider_name, $uid) {
+   return join('/', encode_name($provider_name), $uid);
+}
+
+sub euid_split ($self, $euid) {
+   my ($encoded_name, $uid) = split m{/}mxs, $euid, 2;
+   return unless defined($uid);
+   return (decode_name($encoded_name), $uid);
+}
+
+sub run_fake_validation ($self) {
    for my $item ($self->_providers->{sequence}->@*) {
       my $provider = $item->{provider};
-      my $method = $provider->can($method_name) or next;
-      my $retval = $provider->$method(@args);
-      next unless defined($retval);
-      return ($retval, $item->{name}) if defined($retval);
+      next unless $provider->can('run_fake_validation');
+      return $provider->run_fake_validation;
    }
-   return;
+   ouch 401, 'Unauthorized';
+}
+
+sub _item_for ($self, $controller, $username) {
+   for my $item ($self->_providers->{sequence}->@*) {
+      my $provider = $item->{provider};
+      return $item if $provider->handles_username($controller, $username);
+   }
+   return undef;
+}
+
+sub provider_for ($self, $controller, $username) {
+   my $item = $self->_item_for($controller, $username) or return;
+   return $item->@{qw< name provider >} if wantarray();
+   return $item->{provider};
 }
 
 sub provider_name_for ($self, $controller, $username) {
-   my (undef, $provider_name) =
-      $self->_iterate(handles_username => $controller, $username);
-   return $provider_name;
+   my $item = $self->_item_for($controller, $username) or return undef;
+   return $item->{name};
 }
 
-sub load_user ($self, $app, $uid) {
-   my ($user, $provider_name) = $self->_iterate(undef, $app, $uid);
+sub load_user ($self, $app, $euid) {
+   my ($provider_name, $uid) = $self->euid_split($euid) or return;
+   my $provider = $self->provider_named($provider_name) or return;
+   ouch 401, 'cannot load user' unless $provider->can('load_user');
+   my $user = $provider->load_user($app, $uid) // return;
+   ouch 500, 'invalid user' unless ref($user) eq 'HASH';
    return {
       provider => $provider_name,
       uid      => $uid,
-      data     => $user,
+      data     => dclone($provider->tamed_user_record($user)),
    };
 }
 
 sub validate_user ($self, $ctr, $username, $secret, $extra) {
-   my ($uid) = $self->_iterate(undef, $ctr, $username, $secret, $extra);
-   return $uid if defined($uid);
-   return;
+   my ($provider_name, $provider) = $self->provider_for($ctr, $username);
+   return $self->run_fake_validation
+      unless ($provider && $provider->can('validate_user'));
+   my $uid = $provider->validate_user($ctr, $username, $secret, $extra);
+   return undef unless defined($uid); # can it ever happen now?
+   return $self->euid_join($provider_name, $uid);
 }
 
 1;

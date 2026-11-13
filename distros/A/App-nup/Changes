@@ -1,5 +1,21 @@
 Revision history for Perl extension App-nup
 
+1.14 2026-11-13T07:02:52Z
+
+    - Add --lateral (-L) to put all the pages in one row, however
+      wide it becomes, and to scroll it sideways in the pager: the
+      screen shows as many panes as fit, or as -C tells, and less
+      gets "-S --shift=N --rscroll=-" with the width of a pane, so
+      that the arrow keys move by one page, h and l as well, and H
+      and L go to the ends (less 661 or later, by LESSKEY_CONTENT);
+      l stops at the right end with less 710 or later, and a less
+      with --align-shift (tecolicom/tap) gets it, so that search and
+      the right end keep the panes at the edge of the screen
+
+    - Gather what depends on less into a new LESS section of the
+      manual: the environment variables, the versions, and the build
+      of less in tecolicom/tap with --align-record and --align-shift
+
 1.13 2026-11-11T05:11:57Z
 
     - Add --geometry to print the size of the device in columns and

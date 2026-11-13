@@ -1,0 +1,2462 @@
+---
+abstract: Community Perl library for the Twilio API
+author:
+- Francisco Zarabozo <zarabozo@cpan.org>
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  Module::Metadata: '1.000009'
+dynamic_config: 0
+generated_by: ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Twilio
+no_index:
+  directory:
+  - t
+  - inc
+  - t
+  - xt
+provides:
+  Twilio:
+    file: lib/Twilio.pm
+    version: '2.001'
+  Twilio::ApiV1Version:
+    file: lib/Twilio/ApiV1Version.pm
+    version: '2.001'
+  Twilio::AuthStrategy::AuthStrategy:
+    file: lib/Twilio/AuthStrategy/AuthStrategy.pm
+    version: '2.001'
+  Twilio::AuthStrategy::NoAuthStrategy:
+    file: lib/Twilio/AuthStrategy/NoAuthStrategy.pm
+    version: '2.001'
+  Twilio::AuthStrategy::TokenAuthStrategy:
+    file: lib/Twilio/AuthStrategy/TokenAuthStrategy.pm
+    version: '2.001'
+  Twilio::Base::BaseClient:
+    file: lib/Twilio/Base/BaseClient.pm
+    version: '2.001'
+  Twilio::Base::PhoneNumberCapabilities:
+    file: lib/Twilio/Base/PhoneNumberCapabilities.pm
+    version: '2.001'
+  Twilio::CredentialProvider::ClientCredentialProvider:
+    file: lib/Twilio/CredentialProvider/ClientCredentialProvider.pm
+    version: '2.001'
+  Twilio::CredentialProvider::CredentialProvider:
+    file: lib/Twilio/CredentialProvider/CredentialProvider.pm
+    version: '2.001'
+  Twilio::CredentialProvider::NoAuthCredentialProvider:
+    file: lib/Twilio/CredentialProvider/NoAuthCredentialProvider.pm
+    version: '2.001'
+  Twilio::CredentialProvider::OrgsCredentialProvider:
+    file: lib/Twilio/CredentialProvider/OrgsCredentialProvider.pm
+    version: '2.001'
+  Twilio::Deserialize:
+    file: lib/Twilio/Deserialize.pm
+    version: '2.001'
+  Twilio::Domain:
+    file: lib/Twilio/Domain.pm
+    version: '2.001'
+  Twilio::Exceptions::ConfigurationException:
+    file: lib/Twilio/Exceptions/ConfigurationException.pm
+    version: '2.001'
+  Twilio::Exceptions::DeserializeException:
+    file: lib/Twilio/Exceptions/DeserializeException.pm
+    version: '2.001'
+  Twilio::Exceptions::EnvironmentException:
+    file: lib/Twilio/Exceptions/EnvironmentException.pm
+    version: '2.001'
+  Twilio::Exceptions::RestException:
+    file: lib/Twilio/Exceptions/RestException.pm
+    version: '2.001'
+  Twilio::Exceptions::RestExceptionV1:
+    file: lib/Twilio/Exceptions/RestExceptionV1.pm
+    version: '2.001'
+  Twilio::Exceptions::TwilioException:
+    file: lib/Twilio/Exceptions/TwilioException.pm
+    version: '2.001'
+  Twilio::Exceptions::TwilioServiceException:
+    file: lib/Twilio/Exceptions/TwilioServiceException.pm
+    version: '2.001'
+  Twilio::Http::BearerToken::ApiTokenManager:
+    file: lib/Twilio/Http/BearerToken/ApiTokenManager.pm
+    version: '2.001'
+  Twilio::Http::BearerToken::OrgsTokenManager:
+    file: lib/Twilio/Http/BearerToken/OrgsTokenManager.pm
+    version: '2.001'
+  Twilio::Http::BearerToken::TokenManager:
+    file: lib/Twilio/Http/BearerToken/TokenManager.pm
+    version: '2.001'
+  Twilio::Http::Client:
+    file: lib/Twilio/Http/Client.pm
+    version: '2.001'
+  Twilio::Http::FakeClient:
+    file: lib/Twilio/Http/FakeClient.pm
+    version: '2.001'
+  Twilio::Http::File:
+    file: lib/Twilio/Http/File.pm
+    version: '2.001'
+  Twilio::Http::Response:
+    file: lib/Twilio/Http/Response.pm
+    version: '2.001'
+  Twilio::Http::TinyClient:
+    file: lib/Twilio/Http/TinyClient.pm
+    version: '2.001'
+  Twilio::Http::ValidationClient:
+    file: lib/Twilio/Http/ValidationClient.pm
+    version: '2.001'
+  Twilio::InstanceContext:
+    file: lib/Twilio/InstanceContext.pm
+    version: '2.001'
+  Twilio::InstanceResource:
+    file: lib/Twilio/InstanceResource.pm
+    version: '2.001'
+  Twilio::Json:
+    file: lib/Twilio/Json.pm
+    version: '2.001'
+  Twilio::Jwt::AccessToken:
+    file: lib/Twilio/Jwt/AccessToken.pm
+    version: '2.001'
+  Twilio::Jwt::Client::ScopeURI:
+    file: lib/Twilio/Jwt/Client/ScopeURI.pm
+    version: '2.001'
+  Twilio::Jwt::ClientToken:
+    file: lib/Twilio/Jwt/ClientToken.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::ChatGrant:
+    file: lib/Twilio/Jwt/Grants/ChatGrant.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::Grant:
+    file: lib/Twilio/Jwt/Grants/Grant.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::PlaybackGrant:
+    file: lib/Twilio/Jwt/Grants/PlaybackGrant.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::SyncGrant:
+    file: lib/Twilio/Jwt/Grants/SyncGrant.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::TaskRouterGrant:
+    file: lib/Twilio/Jwt/Grants/TaskRouterGrant.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::VideoGrant:
+    file: lib/Twilio/Jwt/Grants/VideoGrant.pm
+    version: '2.001'
+  Twilio::Jwt::Grants::VoiceGrant:
+    file: lib/Twilio/Jwt/Grants/VoiceGrant.pm
+    version: '2.001'
+  Twilio::Jwt::JWT:
+    file: lib/Twilio/Jwt/JWT.pm
+    version: '2.001'
+  Twilio::Jwt::TaskRouter::CapabilityToken:
+    file: lib/Twilio/Jwt/TaskRouter/CapabilityToken.pm
+    version: '2.001'
+  Twilio::Jwt::TaskRouter::Policy:
+    file: lib/Twilio/Jwt/TaskRouter/Policy.pm
+    version: '2.001'
+  Twilio::Jwt::TaskRouter::TaskQueueCapability:
+    file: lib/Twilio/Jwt/TaskRouter/TaskQueueCapability.pm
+    version: '2.001'
+  Twilio::Jwt::TaskRouter::WorkerCapability:
+    file: lib/Twilio/Jwt/TaskRouter/WorkerCapability.pm
+    version: '2.001'
+  Twilio::Jwt::TaskRouter::WorkspaceCapability:
+    file: lib/Twilio/Jwt/TaskRouter/WorkspaceCapability.pm
+    version: '2.001'
+  Twilio::Jwt::Validation::ClientValidationJwt:
+    file: lib/Twilio/Jwt/Validation/ClientValidationJwt.pm
+    version: '2.001'
+  Twilio::ListResource:
+    file: lib/Twilio/ListResource.pm
+    version: '2.001'
+  Twilio::Metadata:
+    file: lib/Twilio/Metadata.pm
+    version: '2.001'
+  Twilio::Page:
+    file: lib/Twilio/Page.pm
+    version: '2.001'
+  Twilio::Rest::Accounts:
+    file: lib/Twilio/Rest/Accounts.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1:
+    file: lib/Twilio/Rest/Accounts/V1.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::AuthTokenPromotion:
+    file: lib/Twilio/Rest/Accounts/V1/AuthTokenPromotion.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::BulkConsents:
+    file: lib/Twilio/Rest/Accounts/V1/BulkConsents.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::BulkContacts:
+    file: lib/Twilio/Rest/Accounts/V1/BulkContacts.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::Credential:
+    file: lib/Twilio/Rest/Accounts/V1/Credential.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::Credential::Aws:
+    file: lib/Twilio/Rest/Accounts/V1/Credential/Aws.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::Credential::PublicKey:
+    file: lib/Twilio/Rest/Accounts/V1/Credential/PublicKey.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::MessagingGeopermissions:
+    file: lib/Twilio/Rest/Accounts/V1/MessagingGeopermissions.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::Safelist:
+    file: lib/Twilio/Rest/Accounts/V1/Safelist.pm
+    version: '2.001'
+  Twilio::Rest::Accounts::V1::SecondaryAuthToken:
+    file: lib/Twilio/Rest/Accounts/V1/SecondaryAuthToken.pm
+    version: '2.001'
+  Twilio::Rest::Api:
+    file: lib/Twilio/Rest/Api.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010:
+    file: lib/Twilio/Rest/Api/V2010.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account:
+    file: lib/Twilio/Rest/Api/V2010/Account.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Address:
+    file: lib/Twilio/Rest/Api/V2010/Account/Address.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Address::DependentPhoneNumber:
+    file: lib/Twilio/Rest/Api/V2010/Account/Address/DependentPhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Application:
+    file: lib/Twilio/Rest/Api/V2010/Account/Application.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AuthorizedConnectApp:
+    file: lib/Twilio/Rest/Api/V2010/Account/AuthorizedConnectApp.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::Local:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/Local.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::MachineToMachine:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/MachineToMachine.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::Mobile:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/Mobile.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::National:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/National.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::SharedCost:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/SharedCost.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::TollFree:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/TollFree.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::AvailablePhoneNumberCountry::Voip:
+    file: lib/Twilio/Rest/Api/V2010/Account/AvailablePhoneNumberCountry/Voip.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Balance:
+    file: lib/Twilio/Rest/Api/V2010/Account/Balance.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Event:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Event.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Notification:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Notification.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Payment:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Payment.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Recording:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Recording.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Siprec:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Siprec.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Stream:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Stream.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::Transcription:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/Transcription.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::UserDefinedMessage:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/UserDefinedMessage.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Call::UserDefinedMessageSubscription:
+    file: lib/Twilio/Rest/Api/V2010/Account/Call/UserDefinedMessageSubscription.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Conference:
+    file: lib/Twilio/Rest/Api/V2010/Account/Conference.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Conference::Participant:
+    file: lib/Twilio/Rest/Api/V2010/Account/Conference/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Conference::Recording:
+    file: lib/Twilio/Rest/Api/V2010/Account/Conference/Recording.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::ConnectApp:
+    file: lib/Twilio/Rest/Api/V2010/Account/ConnectApp.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::IncomingPhoneNumber:
+    file: lib/Twilio/Rest/Api/V2010/Account/IncomingPhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::IncomingPhoneNumber::AssignedAddOn:
+    file: lib/Twilio/Rest/Api/V2010/Account/IncomingPhoneNumber/AssignedAddOn.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::IncomingPhoneNumber::AssignedAddOn::AssignedAddOnExtension:
+    file: lib/Twilio/Rest/Api/V2010/Account/IncomingPhoneNumber/AssignedAddOn/AssignedAddOnExtension.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::IncomingPhoneNumber::Local:
+    file: lib/Twilio/Rest/Api/V2010/Account/IncomingPhoneNumber/Local.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::IncomingPhoneNumber::Mobile:
+    file: lib/Twilio/Rest/Api/V2010/Account/IncomingPhoneNumber/Mobile.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::IncomingPhoneNumber::TollFree:
+    file: lib/Twilio/Rest/Api/V2010/Account/IncomingPhoneNumber/TollFree.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Key:
+    file: lib/Twilio/Rest/Api/V2010/Account/Key.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Message:
+    file: lib/Twilio/Rest/Api/V2010/Account/Message.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Message::Feedback:
+    file: lib/Twilio/Rest/Api/V2010/Account/Message/Feedback.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Message::Media:
+    file: lib/Twilio/Rest/Api/V2010/Account/Message/Media.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::NewKey:
+    file: lib/Twilio/Rest/Api/V2010/Account/NewKey.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::NewSigningKey:
+    file: lib/Twilio/Rest/Api/V2010/Account/NewSigningKey.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Notification:
+    file: lib/Twilio/Rest/Api/V2010/Account/Notification.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::OutgoingCallerId:
+    file: lib/Twilio/Rest/Api/V2010/Account/OutgoingCallerId.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Queue:
+    file: lib/Twilio/Rest/Api/V2010/Account/Queue.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Queue::Member:
+    file: lib/Twilio/Rest/Api/V2010/Account/Queue/Member.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Recording:
+    file: lib/Twilio/Rest/Api/V2010/Account/Recording.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Recording::AddOnResult:
+    file: lib/Twilio/Rest/Api/V2010/Account/Recording/AddOnResult.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Recording::AddOnResult::Payload:
+    file: lib/Twilio/Rest/Api/V2010/Account/Recording/AddOnResult/Payload.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Recording::AddOnResult::Payload::Data:
+    file: lib/Twilio/Rest/Api/V2010/Account/Recording/AddOnResult/Payload/Data.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Recording::Transcription:
+    file: lib/Twilio/Rest/Api/V2010/Account/Recording/Transcription.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::ShortCode:
+    file: lib/Twilio/Rest/Api/V2010/Account/ShortCode.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::SigningKey:
+    file: lib/Twilio/Rest/Api/V2010/Account/SigningKey.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::CredentialList:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/CredentialList.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::CredentialList::Credential:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/CredentialList/Credential.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::AuthTypes:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/AuthTypes.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::AuthTypes::AuthTypeCalls:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/AuthTypes/AuthTypeCalls.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::AuthTypes::AuthTypeCalls::AuthCallsCredentialListMapping:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/AuthTypes/AuthTypeCalls/AuthCallsCredentialListMapping.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::AuthTypes::AuthTypeCalls::AuthCallsIpAccessControlListMapping:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/AuthTypes/AuthTypeCalls/AuthCallsIpAccessControlListMapping.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::AuthTypes::AuthTypeRegistrations:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/AuthTypes/AuthTypeRegistrations.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::AuthTypes::AuthTypeRegistrations::AuthRegistrationsCredentialListMapping:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/AuthTypes/AuthTypeRegistrations/AuthRegistrationsCredentialListMapping.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::CredentialListMapping:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/CredentialListMapping.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::Domain::IpAccessControlListMapping:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/Domain/IpAccessControlListMapping.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::IpAccessControlList:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/IpAccessControlList.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Sip::IpAccessControlList::IpAddress:
+    file: lib/Twilio/Rest/Api/V2010/Account/Sip/IpAccessControlList/IpAddress.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Token:
+    file: lib/Twilio/Rest/Api/V2010/Account/Token.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Transcription:
+    file: lib/Twilio/Rest/Api/V2010/Account/Transcription.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::AllTime:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/AllTime.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::Daily:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/Daily.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::LastMonth:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/LastMonth.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::Monthly:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/Monthly.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::ThisMonth:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/ThisMonth.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::Today:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/Today.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::Yearly:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/Yearly.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Record::Yesterday:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Record/Yesterday.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::Usage::Trigger:
+    file: lib/Twilio/Rest/Api/V2010/Account/Usage/Trigger.pm
+    version: '2.001'
+  Twilio::Rest::Api::V2010::Account::ValidationRequest:
+    file: lib/Twilio/Rest/Api/V2010/Account/ValidationRequest.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports:
+    file: lib/Twilio/Rest/Bulkexports.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports::V1:
+    file: lib/Twilio/Rest/Bulkexports/V1.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports::V1::Export:
+    file: lib/Twilio/Rest/Bulkexports/V1/Export.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports::V1::Export::Day:
+    file: lib/Twilio/Rest/Bulkexports/V1/Export/Day.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports::V1::Export::ExportCustomJob:
+    file: lib/Twilio/Rest/Bulkexports/V1/Export/ExportCustomJob.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports::V1::Export::Job:
+    file: lib/Twilio/Rest/Bulkexports/V1/Export/Job.pm
+    version: '2.001'
+  Twilio::Rest::Bulkexports::V1::ExportConfiguration:
+    file: lib/Twilio/Rest/Bulkexports/V1/ExportConfiguration.pm
+    version: '2.001'
+  Twilio::Rest::Chat:
+    file: lib/Twilio/Rest/Chat.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1:
+    file: lib/Twilio/Rest/Chat/V1.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Credential:
+    file: lib/Twilio/Rest/Chat/V1/Credential.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service:
+    file: lib/Twilio/Rest/Chat/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::Channel:
+    file: lib/Twilio/Rest/Chat/V1/Service/Channel.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::Channel::Invite:
+    file: lib/Twilio/Rest/Chat/V1/Service/Channel/Invite.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::Channel::Member:
+    file: lib/Twilio/Rest/Chat/V1/Service/Channel/Member.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::Channel::Message:
+    file: lib/Twilio/Rest/Chat/V1/Service/Channel/Message.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::Role:
+    file: lib/Twilio/Rest/Chat/V1/Service/Role.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::User:
+    file: lib/Twilio/Rest/Chat/V1/Service/User.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V1::Service::User::UserChannel:
+    file: lib/Twilio/Rest/Chat/V1/Service/User/UserChannel.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2:
+    file: lib/Twilio/Rest/Chat/V2.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Credential:
+    file: lib/Twilio/Rest/Chat/V2/Credential.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service:
+    file: lib/Twilio/Rest/Chat/V2/Service.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Binding:
+    file: lib/Twilio/Rest/Chat/V2/Service/Binding.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Channel:
+    file: lib/Twilio/Rest/Chat/V2/Service/Channel.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Channel::Invite:
+    file: lib/Twilio/Rest/Chat/V2/Service/Channel/Invite.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Channel::Member:
+    file: lib/Twilio/Rest/Chat/V2/Service/Channel/Member.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Channel::Message:
+    file: lib/Twilio/Rest/Chat/V2/Service/Channel/Message.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Channel::Webhook:
+    file: lib/Twilio/Rest/Chat/V2/Service/Channel/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::Role:
+    file: lib/Twilio/Rest/Chat/V2/Service/Role.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::User:
+    file: lib/Twilio/Rest/Chat/V2/Service/User.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::User::UserBinding:
+    file: lib/Twilio/Rest/Chat/V2/Service/User/UserBinding.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V2::Service::User::UserChannel:
+    file: lib/Twilio/Rest/Chat/V2/Service/User/UserChannel.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V3:
+    file: lib/Twilio/Rest/Chat/V3.pm
+    version: '2.001'
+  Twilio::Rest::Chat::V3::Channel:
+    file: lib/Twilio/Rest/Chat/V3/Channel.pm
+    version: '2.001'
+  Twilio::Rest::Client:
+    file: lib/Twilio/Rest/Client.pm
+    version: '2.001'
+  Twilio::Rest::Content:
+    file: lib/Twilio/Rest/Content.pm
+    version: '2.001'
+  Twilio::Rest::Content::V1:
+    file: lib/Twilio/Rest/Content/V1.pm
+    version: '2.001'
+  Twilio::Rest::Content::V1::Content:
+    file: lib/Twilio/Rest/Content/V1/Content.pm
+    version: '2.001'
+  Twilio::Rest::Content::V1::Content::ApprovalCreate:
+    file: lib/Twilio/Rest/Content/V1/Content/ApprovalCreate.pm
+    version: '2.001'
+  Twilio::Rest::Content::V1::Content::ApprovalFetch:
+    file: lib/Twilio/Rest/Content/V1/Content/ApprovalFetch.pm
+    version: '2.001'
+  Twilio::Rest::Content::V1::ContentAndApprovals:
+    file: lib/Twilio/Rest/Content/V1/ContentAndApprovals.pm
+    version: '2.001'
+  Twilio::Rest::Content::V1::LegacyContent:
+    file: lib/Twilio/Rest/Content/V1/LegacyContent.pm
+    version: '2.001'
+  Twilio::Rest::Content::V2:
+    file: lib/Twilio/Rest/Content/V2.pm
+    version: '2.001'
+  Twilio::Rest::Content::V2::Content:
+    file: lib/Twilio/Rest/Content/V2/Content.pm
+    version: '2.001'
+  Twilio::Rest::Content::V2::ContentAndApprovals:
+    file: lib/Twilio/Rest/Content/V2/ContentAndApprovals.pm
+    version: '2.001'
+  Twilio::Rest::Conversations:
+    file: lib/Twilio/Rest/Conversations.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1:
+    file: lib/Twilio/Rest/Conversations/V1.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::AddressConfiguration:
+    file: lib/Twilio/Rest/Conversations/V1/AddressConfiguration.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Configuration:
+    file: lib/Twilio/Rest/Conversations/V1/Configuration.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Configuration::Webhook:
+    file: lib/Twilio/Rest/Conversations/V1/Configuration/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Conversation:
+    file: lib/Twilio/Rest/Conversations/V1/Conversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Conversation::Message:
+    file: lib/Twilio/Rest/Conversations/V1/Conversation/Message.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Conversation::Message::DeliveryReceipt:
+    file: lib/Twilio/Rest/Conversations/V1/Conversation/Message/DeliveryReceipt.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Conversation::Participant:
+    file: lib/Twilio/Rest/Conversations/V1/Conversation/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Conversation::Webhook:
+    file: lib/Twilio/Rest/Conversations/V1/Conversation/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::ConversationWithParticipants:
+    file: lib/Twilio/Rest/Conversations/V1/ConversationWithParticipants.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Credential:
+    file: lib/Twilio/Rest/Conversations/V1/Credential.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::ParticipantConversation:
+    file: lib/Twilio/Rest/Conversations/V1/ParticipantConversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Role:
+    file: lib/Twilio/Rest/Conversations/V1/Role.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service:
+    file: lib/Twilio/Rest/Conversations/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Binding:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Binding.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Configuration:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Configuration.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Configuration::Notification:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Configuration/Notification.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Configuration::Webhook:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Configuration/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Conversation:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Conversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Conversation::Message:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Conversation/Message.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Conversation::Message::DeliveryReceipt:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Conversation/Message/DeliveryReceipt.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Conversation::Participant:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Conversation/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Conversation::Webhook:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Conversation/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::ConversationWithParticipants:
+    file: lib/Twilio/Rest/Conversations/V1/Service/ConversationWithParticipants.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::ParticipantConversation:
+    file: lib/Twilio/Rest/Conversations/V1/Service/ParticipantConversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::Role:
+    file: lib/Twilio/Rest/Conversations/V1/Service/Role.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::User:
+    file: lib/Twilio/Rest/Conversations/V1/Service/User.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::Service::User::UserConversation:
+    file: lib/Twilio/Rest/Conversations/V1/Service/User/UserConversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::User:
+    file: lib/Twilio/Rest/Conversations/V1/User.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V1::User::UserConversation:
+    file: lib/Twilio/Rest/Conversations/V1/User/UserConversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2:
+    file: lib/Twilio/Rest/Conversations/V2.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2::Action:
+    file: lib/Twilio/Rest/Conversations/V2/Action.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2::Communication:
+    file: lib/Twilio/Rest/Conversations/V2/Communication.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2::Configuration:
+    file: lib/Twilio/Rest/Conversations/V2/Configuration.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2::Conversation:
+    file: lib/Twilio/Rest/Conversations/V2/Conversation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2::Operation:
+    file: lib/Twilio/Rest/Conversations/V2/Operation.pm
+    version: '2.001'
+  Twilio::Rest::Conversations::V2::Participant:
+    file: lib/Twilio/Rest/Conversations/V2/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Events:
+    file: lib/Twilio/Rest/Events.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1:
+    file: lib/Twilio/Rest/Events/V1.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::EventType:
+    file: lib/Twilio/Rest/Events/V1/EventType.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Schema:
+    file: lib/Twilio/Rest/Events/V1/Schema.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Schema::SchemaVersion:
+    file: lib/Twilio/Rest/Events/V1/Schema/SchemaVersion.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Sink:
+    file: lib/Twilio/Rest/Events/V1/Sink.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Sink::SinkTest:
+    file: lib/Twilio/Rest/Events/V1/Sink/SinkTest.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Sink::SinkValidate:
+    file: lib/Twilio/Rest/Events/V1/Sink/SinkValidate.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Subscription:
+    file: lib/Twilio/Rest/Events/V1/Subscription.pm
+    version: '2.001'
+  Twilio::Rest::Events::V1::Subscription::SubscribedEvent:
+    file: lib/Twilio/Rest/Events/V1/Subscription/SubscribedEvent.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi:
+    file: lib/Twilio/Rest/FlexApi.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1:
+    file: lib/Twilio/Rest/FlexApi/V1.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Assessments:
+    file: lib/Twilio/Rest/FlexApi/V1/Assessments.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Channel:
+    file: lib/Twilio/Rest/FlexApi/V1/Channel.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Configuration:
+    file: lib/Twilio/Rest/FlexApi/V1/Configuration.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::FlexFlow:
+    file: lib/Twilio/Rest/FlexApi/V1/FlexFlow.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsAssessmentsComment:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsAssessmentsComment.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsConversations:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsConversations.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsQuestionnaires:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsQuestionnaires.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsQuestionnairesCategory:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsQuestionnairesCategory.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsQuestionnairesQuestion:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsQuestionnairesQuestion.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsSegments:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsSegments.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsSession:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsSession.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsSettingsAnswerSets:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsSettingsAnswerSets.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsSettingsComment:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsSettingsComment.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::InsightsUserRoles:
+    file: lib/Twilio/Rest/FlexApi/V1/InsightsUserRoles.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Interaction:
+    file: lib/Twilio/Rest/FlexApi/V1/Interaction.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Interaction::InteractionChannel:
+    file: lib/Twilio/Rest/FlexApi/V1/Interaction/InteractionChannel.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Interaction::InteractionChannel::InteractionChannelInvite:
+    file: lib/Twilio/Rest/FlexApi/V1/Interaction/InteractionChannel/InteractionChannelInvite.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Interaction::InteractionChannel::InteractionChannelParticipant:
+    file: lib/Twilio/Rest/FlexApi/V1/Interaction/InteractionChannel/InteractionChannelParticipant.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Interaction::InteractionChannel::InteractionTransfer:
+    file: lib/Twilio/Rest/FlexApi/V1/Interaction/InteractionChannel/InteractionTransfer.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Plugin:
+    file: lib/Twilio/Rest/FlexApi/V1/Plugin.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::Plugin::PluginVersions:
+    file: lib/Twilio/Rest/FlexApi/V1/Plugin/PluginVersions.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::PluginArchive:
+    file: lib/Twilio/Rest/FlexApi/V1/PluginArchive.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::PluginConfiguration:
+    file: lib/Twilio/Rest/FlexApi/V1/PluginConfiguration.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::PluginConfiguration::ConfiguredPlugin:
+    file: lib/Twilio/Rest/FlexApi/V1/PluginConfiguration/ConfiguredPlugin.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::PluginConfigurationArchive:
+    file: lib/Twilio/Rest/FlexApi/V1/PluginConfigurationArchive.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::PluginRelease:
+    file: lib/Twilio/Rest/FlexApi/V1/PluginRelease.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::PluginVersionArchive:
+    file: lib/Twilio/Rest/FlexApi/V1/PluginVersionArchive.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::ProvisioningStatus:
+    file: lib/Twilio/Rest/FlexApi/V1/ProvisioningStatus.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V1::WebChannel:
+    file: lib/Twilio/Rest/FlexApi/V1/WebChannel.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V2:
+    file: lib/Twilio/Rest/FlexApi/V2.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V2::FlexUser:
+    file: lib/Twilio/Rest/FlexApi/V2/FlexUser.pm
+    version: '2.001'
+  Twilio::Rest::FlexApi::V2::WebChannels:
+    file: lib/Twilio/Rest/FlexApi/V2/WebChannels.pm
+    version: '2.001'
+  Twilio::Rest::FrontlineApi:
+    file: lib/Twilio/Rest/FrontlineApi.pm
+    version: '2.001'
+  Twilio::Rest::FrontlineApi::V1:
+    file: lib/Twilio/Rest/FrontlineApi/V1.pm
+    version: '2.001'
+  Twilio::Rest::FrontlineApi::V1::User:
+    file: lib/Twilio/Rest/FrontlineApi/V1/User.pm
+    version: '2.001'
+  Twilio::Rest::Iam:
+    file: lib/Twilio/Rest/Iam.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1:
+    file: lib/Twilio/Rest/Iam/V1.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1::ApiKey:
+    file: lib/Twilio/Rest/Iam/V1/ApiKey.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1::GetApiKeys:
+    file: lib/Twilio/Rest/Iam/V1/GetApiKeys.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1::NewApiKey:
+    file: lib/Twilio/Rest/Iam/V1/NewApiKey.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1::OAuthApp:
+    file: lib/Twilio/Rest/Iam/V1/OAuthApp.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1::RolePermission:
+    file: lib/Twilio/Rest/Iam/V1/RolePermission.pm
+    version: '2.001'
+  Twilio::Rest::Iam::V1::Token:
+    file: lib/Twilio/Rest/Iam/V1/Token.pm
+    version: '2.001'
+  Twilio::Rest::Insights:
+    file: lib/Twilio/Rest/Insights.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1:
+    file: lib/Twilio/Rest/Insights/V1.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Call:
+    file: lib/Twilio/Rest/Insights/V1/Call.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Call::Annotation:
+    file: lib/Twilio/Rest/Insights/V1/Call/Annotation.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Call::CallSummary:
+    file: lib/Twilio/Rest/Insights/V1/Call/CallSummary.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Call::Event:
+    file: lib/Twilio/Rest/Insights/V1/Call/Event.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Call::Metric:
+    file: lib/Twilio/Rest/Insights/V1/Call/Metric.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::CallSummaries:
+    file: lib/Twilio/Rest/Insights/V1/CallSummaries.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Conference:
+    file: lib/Twilio/Rest/Insights/V1/Conference.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Conference::ConferenceParticipant:
+    file: lib/Twilio/Rest/Insights/V1/Conference/ConferenceParticipant.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Room:
+    file: lib/Twilio/Rest/Insights/V1/Room.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Room::Participant:
+    file: lib/Twilio/Rest/Insights/V1/Room/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V1::Setting:
+    file: lib/Twilio/Rest/Insights/V1/Setting.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V2:
+    file: lib/Twilio/Rest/Insights/V2.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V2::Inbound:
+    file: lib/Twilio/Rest/Insights/V2/Inbound.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V2::InboundReport:
+    file: lib/Twilio/Rest/Insights/V2/InboundReport.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V2::Outbound:
+    file: lib/Twilio/Rest/Insights/V2/Outbound.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V2::OutboundReport:
+    file: lib/Twilio/Rest/Insights/V2/OutboundReport.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V2::Report:
+    file: lib/Twilio/Rest/Insights/V2/Report.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3:
+    file: lib/Twilio/Rest/Insights/V3.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3::CustomFieldMapping:
+    file: lib/Twilio/Rest/Insights/V3/CustomFieldMapping.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3::CustomFieldMappingsCapacity:
+    file: lib/Twilio/Rest/Insights/V3/CustomFieldMappingsCapacity.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3::Metadata:
+    file: lib/Twilio/Rest/Insights/V3/Metadata.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3::Query:
+    file: lib/Twilio/Rest/Insights/V3/Query.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3::QueryJob:
+    file: lib/Twilio/Rest/Insights/V3/QueryJob.pm
+    version: '2.001'
+  Twilio::Rest::Insights::V3::Result:
+    file: lib/Twilio/Rest/Insights/V3/Result.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence:
+    file: lib/Twilio/Rest/Intelligence.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2:
+    file: lib/Twilio/Rest/Intelligence/V2.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::CustomOperator:
+    file: lib/Twilio/Rest/Intelligence/V2/CustomOperator.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Operator:
+    file: lib/Twilio/Rest/Intelligence/V2/Operator.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::OperatorAttachment:
+    file: lib/Twilio/Rest/Intelligence/V2/OperatorAttachment.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::OperatorAttachments:
+    file: lib/Twilio/Rest/Intelligence/V2/OperatorAttachments.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::OperatorType:
+    file: lib/Twilio/Rest/Intelligence/V2/OperatorType.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::PrebuiltOperator:
+    file: lib/Twilio/Rest/Intelligence/V2/PrebuiltOperator.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Service:
+    file: lib/Twilio/Rest/Intelligence/V2/Service.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Transcript:
+    file: lib/Twilio/Rest/Intelligence/V2/Transcript.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Transcript::EncryptedOperatorResults:
+    file: lib/Twilio/Rest/Intelligence/V2/Transcript/EncryptedOperatorResults.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Transcript::EncryptedSentences:
+    file: lib/Twilio/Rest/Intelligence/V2/Transcript/EncryptedSentences.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Transcript::Media:
+    file: lib/Twilio/Rest/Intelligence/V2/Transcript/Media.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Transcript::OperatorResult:
+    file: lib/Twilio/Rest/Intelligence/V2/Transcript/OperatorResult.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V2::Transcript::Sentence:
+    file: lib/Twilio/Rest/Intelligence/V2/Transcript/Sentence.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3:
+    file: lib/Twilio/Rest/Intelligence/V3.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3::Configuration:
+    file: lib/Twilio/Rest/Intelligence/V3/Configuration.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3::Conversation:
+    file: lib/Twilio/Rest/Intelligence/V3/Conversation.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3::Operator:
+    file: lib/Twilio/Rest/Intelligence/V3/Operator.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3::OperatorResult:
+    file: lib/Twilio/Rest/Intelligence/V3/OperatorResult.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3::RuleExecution:
+    file: lib/Twilio/Rest/Intelligence/V3/RuleExecution.pm
+    version: '2.001'
+  Twilio::Rest::Intelligence::V3::Version:
+    file: lib/Twilio/Rest/Intelligence/V3/Version.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging:
+    file: lib/Twilio/Rest/IpMessaging.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1:
+    file: lib/Twilio/Rest/IpMessaging/V1.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Credential:
+    file: lib/Twilio/Rest/IpMessaging/V1/Credential.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::Channel:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/Channel.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::Channel::Invite:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/Channel/Invite.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::Channel::Member:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/Channel/Member.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::Channel::Message:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/Channel/Message.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::Role:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/Role.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::User:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/User.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V1::Service::User::UserChannel:
+    file: lib/Twilio/Rest/IpMessaging/V1/Service/User/UserChannel.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2:
+    file: lib/Twilio/Rest/IpMessaging/V2.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Credential:
+    file: lib/Twilio/Rest/IpMessaging/V2/Credential.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Binding:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Binding.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Channel:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Channel.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Channel::Invite:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Channel/Invite.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Channel::Member:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Channel/Member.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Channel::Message:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Channel/Message.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Channel::Webhook:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Channel/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::Role:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/Role.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::User:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/User.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::User::UserBinding:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/User/UserBinding.pm
+    version: '2.001'
+  Twilio::Rest::IpMessaging::V2::Service::User::UserChannel:
+    file: lib/Twilio/Rest/IpMessaging/V2/Service/User/UserChannel.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge:
+    file: lib/Twilio/Rest/Knowledge.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V1:
+    file: lib/Twilio/Rest/Knowledge/V1.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V1::Knowledge:
+    file: lib/Twilio/Rest/Knowledge/V1/Knowledge.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V1::Knowledge::Chunk:
+    file: lib/Twilio/Rest/Knowledge/V1/Knowledge/Chunk.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V1::Knowledge::KnowledgeStatus:
+    file: lib/Twilio/Rest/Knowledge/V1/Knowledge/KnowledgeStatus.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V2:
+    file: lib/Twilio/Rest/Knowledge/V2.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V2::Chunk:
+    file: lib/Twilio/Rest/Knowledge/V2/Chunk.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V2::Knowledge:
+    file: lib/Twilio/Rest/Knowledge/V2/Knowledge.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V2::KnowledgeBasis:
+    file: lib/Twilio/Rest/Knowledge/V2/KnowledgeBasis.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V2::Operation:
+    file: lib/Twilio/Rest/Knowledge/V2/Operation.pm
+    version: '2.001'
+  Twilio::Rest::Knowledge::V2::Search:
+    file: lib/Twilio/Rest/Knowledge/V2/Search.pm
+    version: '2.001'
+  Twilio::Rest::Lookups:
+    file: lib/Twilio/Rest/Lookups.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V1:
+    file: lib/Twilio/Rest/Lookups/V1.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V1::PhoneNumber:
+    file: lib/Twilio/Rest/Lookups/V1/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V2:
+    file: lib/Twilio/Rest/Lookups/V2.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V2::Bucket:
+    file: lib/Twilio/Rest/Lookups/V2/Bucket.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V2::LookupOverride:
+    file: lib/Twilio/Rest/Lookups/V2/LookupOverride.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V2::PhoneNumber:
+    file: lib/Twilio/Rest/Lookups/V2/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V2::Query:
+    file: lib/Twilio/Rest/Lookups/V2/Query.pm
+    version: '2.001'
+  Twilio::Rest::Lookups::V2::RateLimit:
+    file: lib/Twilio/Rest/Lookups/V2/RateLimit.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace:
+    file: lib/Twilio/Rest/Marketplace.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1:
+    file: lib/Twilio/Rest/Marketplace/V1.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::AvailableAddOn:
+    file: lib/Twilio/Rest/Marketplace/V1/AvailableAddOn.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::AvailableAddOn::AvailableAddOnExtension:
+    file: lib/Twilio/Rest/Marketplace/V1/AvailableAddOn/AvailableAddOnExtension.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::InstalledAddOn:
+    file: lib/Twilio/Rest/Marketplace/V1/InstalledAddOn.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::InstalledAddOn::InstalledAddOnExtension:
+    file: lib/Twilio/Rest/Marketplace/V1/InstalledAddOn/InstalledAddOnExtension.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::InstalledAddOn::InstalledAddOnUsage:
+    file: lib/Twilio/Rest/Marketplace/V1/InstalledAddOn/InstalledAddOnUsage.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::ModuleData:
+    file: lib/Twilio/Rest/Marketplace/V1/ModuleData.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::ModuleDataManagement:
+    file: lib/Twilio/Rest/Marketplace/V1/ModuleDataManagement.pm
+    version: '2.001'
+  Twilio::Rest::Marketplace::V1::ReferralConversion:
+    file: lib/Twilio/Rest/Marketplace/V1/ReferralConversion.pm
+    version: '2.001'
+  Twilio::Rest::Memory:
+    file: lib/Twilio/Rest/Memory.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1:
+    file: lib/Twilio/Rest/Memory/V1.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Bulk:
+    file: lib/Twilio/Rest/Memory/V1/Bulk.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::ConversationSummary:
+    file: lib/Twilio/Rest/Memory/V1/ConversationSummary.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::DataMapping:
+    file: lib/Twilio/Rest/Memory/V1/DataMapping.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Identifier:
+    file: lib/Twilio/Rest/Memory/V1/Identifier.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::IdentityResolutionSetting:
+    file: lib/Twilio/Rest/Memory/V1/IdentityResolutionSetting.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Import:
+    file: lib/Twilio/Rest/Memory/V1/Import.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Lookup:
+    file: lib/Twilio/Rest/Memory/V1/Lookup.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Observation:
+    file: lib/Twilio/Rest/Memory/V1/Observation.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Operation:
+    file: lib/Twilio/Rest/Memory/V1/Operation.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Profile:
+    file: lib/Twilio/Rest/Memory/V1/Profile.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Recall:
+    file: lib/Twilio/Rest/Memory/V1/Recall.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Revision:
+    file: lib/Twilio/Rest/Memory/V1/Revision.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Store:
+    file: lib/Twilio/Rest/Memory/V1/Store.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::Trait:
+    file: lib/Twilio/Rest/Memory/V1/Trait.pm
+    version: '2.001'
+  Twilio::Rest::Memory::V1::TraitGroup:
+    file: lib/Twilio/Rest/Memory/V1/TraitGroup.pm
+    version: '2.001'
+  Twilio::Rest::Messaging:
+    file: lib/Twilio/Rest/Messaging.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1:
+    file: lib/Twilio/Rest/Messaging/V1.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::BrandRegistration:
+    file: lib/Twilio/Rest/Messaging/V1/BrandRegistration.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::BrandRegistration::BrandRegistrationOtp:
+    file: lib/Twilio/Rest/Messaging/V1/BrandRegistration/BrandRegistrationOtp.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::BrandRegistration::BrandVetting:
+    file: lib/Twilio/Rest/Messaging/V1/BrandRegistration/BrandVetting.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Deactivations:
+    file: lib/Twilio/Rest/Messaging/V1/Deactivations.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::DomainCerts:
+    file: lib/Twilio/Rest/Messaging/V1/DomainCerts.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::DomainConfig:
+    file: lib/Twilio/Rest/Messaging/V1/DomainConfig.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::DomainConfigMessagingService:
+    file: lib/Twilio/Rest/Messaging/V1/DomainConfigMessagingService.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::DomainValidateDn:
+    file: lib/Twilio/Rest/Messaging/V1/DomainValidateDn.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::ExternalCampaign:
+    file: lib/Twilio/Rest/Messaging/V1/ExternalCampaign.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::LinkshorteningMessagingService:
+    file: lib/Twilio/Rest/Messaging/V1/LinkshorteningMessagingService.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::LinkshorteningMessagingServiceDomainAssociation:
+    file: lib/Twilio/Rest/Messaging/V1/LinkshorteningMessagingServiceDomainAssociation.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::RequestManagedCert:
+    file: lib/Twilio/Rest/Messaging/V1/RequestManagedCert.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service:
+    file: lib/Twilio/Rest/Messaging/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::AlphaSender:
+    file: lib/Twilio/Rest/Messaging/V1/Service/AlphaSender.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::ChannelSender:
+    file: lib/Twilio/Rest/Messaging/V1/Service/ChannelSender.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::DestinationAlphaSender:
+    file: lib/Twilio/Rest/Messaging/V1/Service/DestinationAlphaSender.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::PhoneNumber:
+    file: lib/Twilio/Rest/Messaging/V1/Service/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::ShortCode:
+    file: lib/Twilio/Rest/Messaging/V1/Service/ShortCode.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::UsAppToPerson:
+    file: lib/Twilio/Rest/Messaging/V1/Service/UsAppToPerson.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Service::UsAppToPersonUsecase:
+    file: lib/Twilio/Rest/Messaging/V1/Service/UsAppToPersonUsecase.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::TollfreeVerification:
+    file: lib/Twilio/Rest/Messaging/V1/TollfreeVerification.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V1::Usecase:
+    file: lib/Twilio/Rest/Messaging/V1/Usecase.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V2:
+    file: lib/Twilio/Rest/Messaging/V2.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V2::ChannelsSender:
+    file: lib/Twilio/Rest/Messaging/V2/ChannelsSender.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V2::DomainCerts:
+    file: lib/Twilio/Rest/Messaging/V2/DomainCerts.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V2::TypingIndicator:
+    file: lib/Twilio/Rest/Messaging/V2/TypingIndicator.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V3:
+    file: lib/Twilio/Rest/Messaging/V3.pm
+    version: '2.001'
+  Twilio::Rest::Messaging::V3::TypingIndicator:
+    file: lib/Twilio/Rest/Messaging/V3/TypingIndicator.pm
+    version: '2.001'
+  Twilio::Rest::Monitor:
+    file: lib/Twilio/Rest/Monitor.pm
+    version: '2.001'
+  Twilio::Rest::Monitor::V1:
+    file: lib/Twilio/Rest/Monitor/V1.pm
+    version: '2.001'
+  Twilio::Rest::Monitor::V1::Alert:
+    file: lib/Twilio/Rest/Monitor/V1/Alert.pm
+    version: '2.001'
+  Twilio::Rest::Monitor::V1::Event:
+    file: lib/Twilio/Rest/Monitor/V1/Event.pm
+    version: '2.001'
+  Twilio::Rest::Notify:
+    file: lib/Twilio/Rest/Notify.pm
+    version: '2.001'
+  Twilio::Rest::Notify::V1:
+    file: lib/Twilio/Rest/Notify/V1.pm
+    version: '2.001'
+  Twilio::Rest::Notify::V1::Credential:
+    file: lib/Twilio/Rest/Notify/V1/Credential.pm
+    version: '2.001'
+  Twilio::Rest::Notify::V1::Service:
+    file: lib/Twilio/Rest/Notify/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Notify::V1::Service::Binding:
+    file: lib/Twilio/Rest/Notify/V1/Service/Binding.pm
+    version: '2.001'
+  Twilio::Rest::Notify::V1::Service::Notification:
+    file: lib/Twilio/Rest/Notify/V1/Service/Notification.pm
+    version: '2.001'
+  Twilio::Rest::Numbers:
+    file: lib/Twilio/Rest/Numbers.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1:
+    file: lib/Twilio/Rest/Numbers/V1.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::BulkEligibility:
+    file: lib/Twilio/Rest/Numbers/V1/BulkEligibility.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::Eligibility:
+    file: lib/Twilio/Rest/Numbers/V1/Eligibility.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::EmbeddedSession:
+    file: lib/Twilio/Rest/Numbers/V1/EmbeddedSession.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::PortingAllPortIn:
+    file: lib/Twilio/Rest/Numbers/V1/PortingAllPortIn.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::PortingPortIn:
+    file: lib/Twilio/Rest/Numbers/V1/PortingPortIn.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::PortingPortInPhoneNumber:
+    file: lib/Twilio/Rest/Numbers/V1/PortingPortInPhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::PortingPortability:
+    file: lib/Twilio/Rest/Numbers/V1/PortingPortability.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::PortingWebhookConfiguration:
+    file: lib/Twilio/Rest/Numbers/V1/PortingWebhookConfiguration.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::PortingWebhookConfigurationDelete:
+    file: lib/Twilio/Rest/Numbers/V1/PortingWebhookConfigurationDelete.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::SenderIdRegistration:
+    file: lib/Twilio/Rest/Numbers/V1/SenderIdRegistration.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::SigningRequestConfiguration:
+    file: lib/Twilio/Rest/Numbers/V1/SigningRequestConfiguration.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::SmsVerification:
+    file: lib/Twilio/Rest/Numbers/V1/SmsVerification.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::SmsVerificationCheck:
+    file: lib/Twilio/Rest/Numbers/V1/SmsVerificationCheck.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::VoiceVerification:
+    file: lib/Twilio/Rest/Numbers/V1/VoiceVerification.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V1::Webhook:
+    file: lib/Twilio/Rest/Numbers/V1/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2:
+    file: lib/Twilio/Rest/Numbers/V2.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::Application:
+    file: lib/Twilio/Rest/Numbers/V2/Application.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::AuthorizationDocument:
+    file: lib/Twilio/Rest/Numbers/V2/AuthorizationDocument.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::AuthorizationDocument::DependentHostedNumberOrder:
+    file: lib/Twilio/Rest/Numbers/V2/AuthorizationDocument/DependentHostedNumberOrder.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::BulkHostedNumberOrder:
+    file: lib/Twilio/Rest/Numbers/V2/BulkHostedNumberOrder.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::BundleClone:
+    file: lib/Twilio/Rest/Numbers/V2/BundleClone.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::HostedNumberOrder:
+    file: lib/Twilio/Rest/Numbers/V2/HostedNumberOrder.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::Bundle:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/Bundle.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::Bundle::BundleCopy:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/Bundle/BundleCopy.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::Bundle::Evaluation:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/Bundle/Evaluation.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::Bundle::ItemAssignment:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/Bundle/ItemAssignment.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::Bundle::ReplaceItems:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/Bundle/ReplaceItems.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::EndUser:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/EndUser.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::EndUserType:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/EndUserType.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::Regulation:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/Regulation.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::SupportingDocument:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/SupportingDocument.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V2::RegulatoryCompliance::SupportingDocumentType:
+    file: lib/Twilio/Rest/Numbers/V2/RegulatoryCompliance/SupportingDocumentType.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V3:
+    file: lib/Twilio/Rest/Numbers/V3.pm
+    version: '2.001'
+  Twilio::Rest::Numbers::V3::HostedNumberOrder:
+    file: lib/Twilio/Rest/Numbers/V3/HostedNumberOrder.pm
+    version: '2.001'
+  Twilio::Rest::Oauth:
+    file: lib/Twilio/Rest/Oauth.pm
+    version: '2.001'
+  Twilio::Rest::Oauth::V1:
+    file: lib/Twilio/Rest/Oauth/V1.pm
+    version: '2.001'
+  Twilio::Rest::Oauth::V1::Authorize:
+    file: lib/Twilio/Rest/Oauth/V1/Authorize.pm
+    version: '2.001'
+  Twilio::Rest::Oauth::V1::Token:
+    file: lib/Twilio/Rest/Oauth/V1/Token.pm
+    version: '2.001'
+  Twilio::Rest::Oauth::V2:
+    file: lib/Twilio/Rest/Oauth/V2.pm
+    version: '2.001'
+  Twilio::Rest::Oauth::V2::Authorize:
+    file: lib/Twilio/Rest/Oauth/V2/Authorize.pm
+    version: '2.001'
+  Twilio::Rest::Oauth::V2::Token:
+    file: lib/Twilio/Rest/Oauth/V2/Token.pm
+    version: '2.001'
+  Twilio::Rest::Preview:
+    file: lib/Twilio/Rest/Preview.pm
+    version: '2.001'
+  Twilio::Rest::Preview::HostedNumbers:
+    file: lib/Twilio/Rest/Preview/HostedNumbers.pm
+    version: '2.001'
+  Twilio::Rest::Preview::HostedNumbers::AuthorizationDocument:
+    file: lib/Twilio/Rest/Preview/HostedNumbers/AuthorizationDocument.pm
+    version: '2.001'
+  Twilio::Rest::Preview::HostedNumbers::AuthorizationDocument::DependentHostedNumberOrder:
+    file: lib/Twilio/Rest/Preview/HostedNumbers/AuthorizationDocument/DependentHostedNumberOrder.pm
+    version: '2.001'
+  Twilio::Rest::Preview::HostedNumbers::HostedNumberOrder:
+    file: lib/Twilio/Rest/Preview/HostedNumbers/HostedNumberOrder.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Marketplace:
+    file: lib/Twilio/Rest/Preview/Marketplace.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Marketplace::AvailableAddOn:
+    file: lib/Twilio/Rest/Preview/Marketplace/AvailableAddOn.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Marketplace::AvailableAddOn::AvailableAddOnExtension:
+    file: lib/Twilio/Rest/Preview/Marketplace/AvailableAddOn/AvailableAddOnExtension.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Marketplace::InstalledAddOn:
+    file: lib/Twilio/Rest/Preview/Marketplace/InstalledAddOn.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Marketplace::InstalledAddOn::InstalledAddOnExtension:
+    file: lib/Twilio/Rest/Preview/Marketplace/InstalledAddOn/InstalledAddOnExtension.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Wireless:
+    file: lib/Twilio/Rest/Preview/Wireless.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Wireless::Command:
+    file: lib/Twilio/Rest/Preview/Wireless/Command.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Wireless::RatePlan:
+    file: lib/Twilio/Rest/Preview/Wireless/RatePlan.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Wireless::Sim:
+    file: lib/Twilio/Rest/Preview/Wireless/Sim.pm
+    version: '2.001'
+  Twilio::Rest::Preview::Wireless::Sim::Usage:
+    file: lib/Twilio/Rest/Preview/Wireless/Sim/Usage.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam:
+    file: lib/Twilio/Rest/PreviewIam.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::V1:
+    file: lib/Twilio/Rest/PreviewIam/V1.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::V1::Authorize:
+    file: lib/Twilio/Rest/PreviewIam/V1/Authorize.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::V1::Token:
+    file: lib/Twilio/Rest/PreviewIam/V1/Token.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::Versionless:
+    file: lib/Twilio/Rest/PreviewIam/Versionless.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::Versionless::Organization:
+    file: lib/Twilio/Rest/PreviewIam/Versionless/Organization.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::Versionless::Organization::Account:
+    file: lib/Twilio/Rest/PreviewIam/Versionless/Organization/Account.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::Versionless::Organization::RoleAssignment:
+    file: lib/Twilio/Rest/PreviewIam/Versionless/Organization/RoleAssignment.pm
+    version: '2.001'
+  Twilio::Rest::PreviewIam::Versionless::Organization::User:
+    file: lib/Twilio/Rest/PreviewIam/Versionless/Organization/User.pm
+    version: '2.001'
+  Twilio::Rest::Pricing:
+    file: lib/Twilio/Rest/Pricing.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1:
+    file: lib/Twilio/Rest/Pricing/V1.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::Messaging:
+    file: lib/Twilio/Rest/Pricing/V1/Messaging.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::Messaging::Country:
+    file: lib/Twilio/Rest/Pricing/V1/Messaging/Country.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::PhoneNumber:
+    file: lib/Twilio/Rest/Pricing/V1/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::PhoneNumber::Country:
+    file: lib/Twilio/Rest/Pricing/V1/PhoneNumber/Country.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::Voice:
+    file: lib/Twilio/Rest/Pricing/V1/Voice.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::Voice::Country:
+    file: lib/Twilio/Rest/Pricing/V1/Voice/Country.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V1::Voice::Number:
+    file: lib/Twilio/Rest/Pricing/V1/Voice/Number.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V2:
+    file: lib/Twilio/Rest/Pricing/V2.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V2::Country:
+    file: lib/Twilio/Rest/Pricing/V2/Country.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V2::Number:
+    file: lib/Twilio/Rest/Pricing/V2/Number.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V2::Voice:
+    file: lib/Twilio/Rest/Pricing/V2/Voice.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V2::Voice::Country:
+    file: lib/Twilio/Rest/Pricing/V2/Voice/Country.pm
+    version: '2.001'
+  Twilio::Rest::Pricing::V2::Voice::Number:
+    file: lib/Twilio/Rest/Pricing/V2/Voice/Number.pm
+    version: '2.001'
+  Twilio::Rest::Proxy:
+    file: lib/Twilio/Rest/Proxy.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1:
+    file: lib/Twilio/Rest/Proxy/V1.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1::Service:
+    file: lib/Twilio/Rest/Proxy/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1::Service::PhoneNumber:
+    file: lib/Twilio/Rest/Proxy/V1/Service/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1::Service::Session:
+    file: lib/Twilio/Rest/Proxy/V1/Service/Session.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1::Service::Session::Interaction:
+    file: lib/Twilio/Rest/Proxy/V1/Service/Session/Interaction.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1::Service::Session::Participant:
+    file: lib/Twilio/Rest/Proxy/V1/Service/Session/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Proxy::V1::Service::Session::Participant::MessageInteraction:
+    file: lib/Twilio/Rest/Proxy/V1/Service/Session/Participant/MessageInteraction.pm
+    version: '2.001'
+  Twilio::Rest::Routes:
+    file: lib/Twilio/Rest/Routes.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V2:
+    file: lib/Twilio/Rest/Routes/V2.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V2::PhoneNumber:
+    file: lib/Twilio/Rest/Routes/V2/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V2::SipDomain:
+    file: lib/Twilio/Rest/Routes/V2/SipDomain.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V2::Trunk:
+    file: lib/Twilio/Rest/Routes/V2/Trunk.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V3:
+    file: lib/Twilio/Rest/Routes/V3.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V3::IsoCountryCode:
+    file: lib/Twilio/Rest/Routes/V3/IsoCountryCode.pm
+    version: '2.001'
+  Twilio::Rest::Routes::V3::PhoneNumber:
+    file: lib/Twilio/Rest/Routes/V3/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Serverless:
+    file: lib/Twilio/Rest/Serverless.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1:
+    file: lib/Twilio/Rest/Serverless/V1.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service:
+    file: lib/Twilio/Rest/Serverless/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Asset:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Asset.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Asset::AssetVersion:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Asset/AssetVersion.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Build:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Build.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Build::BuildStatus:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Build/BuildStatus.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Environment:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Environment.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Environment::Deployment:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Environment/Deployment.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Environment::Log:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Environment/Log.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Environment::Variable:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Environment/Variable.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Function:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Function.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Function::FunctionVersion:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Function/FunctionVersion.pm
+    version: '2.001'
+  Twilio::Rest::Serverless::V1::Service::Function::FunctionVersion::FunctionVersionContent:
+    file: lib/Twilio/Rest/Serverless/V1/Service/Function/FunctionVersion/FunctionVersionContent.pm
+    version: '2.001'
+  Twilio::Rest::Studio:
+    file: lib/Twilio/Rest/Studio.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1:
+    file: lib/Twilio/Rest/Studio/V1.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow:
+    file: lib/Twilio/Rest/Studio/V1/Flow.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Engagement:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Engagement.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Engagement::EngagementContext:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Engagement/EngagementContext.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Engagement::Step:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Engagement/Step.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Engagement::Step::StepContext:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Engagement/Step/StepContext.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Execution:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Execution.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Execution::ExecutionContext:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Execution/ExecutionContext.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Execution::ExecutionStep:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Execution/ExecutionStep.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V1::Flow::Execution::ExecutionStep::ExecutionStepContext:
+    file: lib/Twilio/Rest/Studio/V1/Flow/Execution/ExecutionStep/ExecutionStepContext.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2:
+    file: lib/Twilio/Rest/Studio/V2.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow:
+    file: lib/Twilio/Rest/Studio/V2/Flow.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow::Execution:
+    file: lib/Twilio/Rest/Studio/V2/Flow/Execution.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow::Execution::ExecutionContext:
+    file: lib/Twilio/Rest/Studio/V2/Flow/Execution/ExecutionContext.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow::Execution::ExecutionStep:
+    file: lib/Twilio/Rest/Studio/V2/Flow/Execution/ExecutionStep.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow::Execution::ExecutionStep::ExecutionStepContext:
+    file: lib/Twilio/Rest/Studio/V2/Flow/Execution/ExecutionStep/ExecutionStepContext.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow::FlowRevision:
+    file: lib/Twilio/Rest/Studio/V2/Flow/FlowRevision.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::Flow::FlowTestUser:
+    file: lib/Twilio/Rest/Studio/V2/Flow/FlowTestUser.pm
+    version: '2.001'
+  Twilio::Rest::Studio::V2::FlowValidate:
+    file: lib/Twilio/Rest/Studio/V2/FlowValidate.pm
+    version: '2.001'
+  Twilio::Rest::Supersim:
+    file: lib/Twilio/Rest/Supersim.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1:
+    file: lib/Twilio/Rest/Supersim/V1.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::EsimProfile:
+    file: lib/Twilio/Rest/Supersim/V1/EsimProfile.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::Fleet:
+    file: lib/Twilio/Rest/Supersim/V1/Fleet.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::IpCommand:
+    file: lib/Twilio/Rest/Supersim/V1/IpCommand.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::Network:
+    file: lib/Twilio/Rest/Supersim/V1/Network.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::NetworkAccessProfile:
+    file: lib/Twilio/Rest/Supersim/V1/NetworkAccessProfile.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::NetworkAccessProfile::NetworkAccessProfileNetwork:
+    file: lib/Twilio/Rest/Supersim/V1/NetworkAccessProfile/NetworkAccessProfileNetwork.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::SettingsUpdate:
+    file: lib/Twilio/Rest/Supersim/V1/SettingsUpdate.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::Sim:
+    file: lib/Twilio/Rest/Supersim/V1/Sim.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::Sim::BillingPeriod:
+    file: lib/Twilio/Rest/Supersim/V1/Sim/BillingPeriod.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::Sim::SimIpAddress:
+    file: lib/Twilio/Rest/Supersim/V1/Sim/SimIpAddress.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::SmsCommand:
+    file: lib/Twilio/Rest/Supersim/V1/SmsCommand.pm
+    version: '2.001'
+  Twilio::Rest::Supersim::V1::UsageRecord:
+    file: lib/Twilio/Rest/Supersim/V1/UsageRecord.pm
+    version: '2.001'
+  Twilio::Rest::Sync:
+    file: lib/Twilio/Rest/Sync.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1:
+    file: lib/Twilio/Rest/Sync/V1.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service:
+    file: lib/Twilio/Rest/Sync/V1/Service.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::Document:
+    file: lib/Twilio/Rest/Sync/V1/Service/Document.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::Document::DocumentPermission:
+    file: lib/Twilio/Rest/Sync/V1/Service/Document/DocumentPermission.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncList:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncList.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncList::SyncListItem:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncList/SyncListItem.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncList::SyncListPermission:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncList/SyncListPermission.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncMap:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncMap.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncMap::SyncMapItem:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncMap/SyncMapItem.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncMap::SyncMapPermission:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncMap/SyncMapPermission.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncStream:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncStream.pm
+    version: '2.001'
+  Twilio::Rest::Sync::V1::Service::SyncStream::StreamMessage:
+    file: lib/Twilio/Rest/Sync/V1/Service/SyncStream/StreamMessage.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter:
+    file: lib/Twilio/Rest/Taskrouter.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1:
+    file: lib/Twilio/Rest/Taskrouter/V1.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Activity:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Activity.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Event:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Event.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Task:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Task.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Task::Reservation:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Task/Reservation.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskChannel:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskChannel.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskQueue:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskQueue.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskQueue::TaskQueueBulkRealTimeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskQueue/TaskQueueBulkRealTimeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskQueue::TaskQueueCumulativeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskQueue/TaskQueueCumulativeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskQueue::TaskQueueRealTimeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskQueue/TaskQueueRealTimeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskQueue::TaskQueueStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskQueue/TaskQueueStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::TaskQueue::TaskQueuesStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/TaskQueue/TaskQueuesStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker::Reservation:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker/Reservation.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker::WorkerChannel:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker/WorkerChannel.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker::WorkerStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker/WorkerStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker::WorkersCumulativeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker/WorkersCumulativeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker::WorkersRealTimeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker/WorkersRealTimeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Worker::WorkersStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Worker/WorkersStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Workflow:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Workflow.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Workflow::WorkflowCumulativeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Workflow/WorkflowCumulativeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Workflow::WorkflowRealTimeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Workflow/WorkflowRealTimeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::Workflow::WorkflowStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/Workflow/WorkflowStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::WorkspaceCumulativeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/WorkspaceCumulativeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::WorkspaceRealTimeStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/WorkspaceRealTimeStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Taskrouter::V1::Workspace::WorkspaceStatistics:
+    file: lib/Twilio/Rest/Taskrouter/V1/Workspace/WorkspaceStatistics.pm
+    version: '2.001'
+  Twilio::Rest::Trunking:
+    file: lib/Twilio/Rest/Trunking.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1:
+    file: lib/Twilio/Rest/Trunking/V1.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1::Trunk:
+    file: lib/Twilio/Rest/Trunking/V1/Trunk.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1::Trunk::CredentialList:
+    file: lib/Twilio/Rest/Trunking/V1/Trunk/CredentialList.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1::Trunk::IpAccessControlList:
+    file: lib/Twilio/Rest/Trunking/V1/Trunk/IpAccessControlList.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1::Trunk::OriginationUrl:
+    file: lib/Twilio/Rest/Trunking/V1/Trunk/OriginationUrl.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1::Trunk::PhoneNumber:
+    file: lib/Twilio/Rest/Trunking/V1/Trunk/PhoneNumber.pm
+    version: '2.001'
+  Twilio::Rest::Trunking::V1::Trunk::Recording:
+    file: lib/Twilio/Rest/Trunking/V1/Trunk/Recording.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub:
+    file: lib/Twilio/Rest/Trusthub.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1:
+    file: lib/Twilio/Rest/Trusthub/V1.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::A2PBrandRegistration:
+    file: lib/Twilio/Rest/Trusthub/V1/A2PBrandRegistration.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::A2PBrandRegistrationEmbeddedSession:
+    file: lib/Twilio/Rest/Trusthub/V1/A2PBrandRegistrationEmbeddedSession.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::A2PCampaignRegistration:
+    file: lib/Twilio/Rest/Trusthub/V1/A2PCampaignRegistration.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::A2PCampaignRegistrationEmbeddedSession:
+    file: lib/Twilio/Rest/Trusthub/V1/A2PCampaignRegistrationEmbeddedSession.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::ComplianceInquiries:
+    file: lib/Twilio/Rest/Trusthub/V1/ComplianceInquiries.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::ComplianceRegistrationInquiries:
+    file: lib/Twilio/Rest/Trusthub/V1/ComplianceRegistrationInquiries.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::ComplianceTollfreeInquiries:
+    file: lib/Twilio/Rest/Trusthub/V1/ComplianceTollfreeInquiries.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::CustomerProfiles:
+    file: lib/Twilio/Rest/Trusthub/V1/CustomerProfiles.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::CustomerProfiles::CustomerProfilesChannelEndpointAssignment:
+    file: lib/Twilio/Rest/Trusthub/V1/CustomerProfiles/CustomerProfilesChannelEndpointAssignment.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::CustomerProfiles::CustomerProfilesEntityAssignments:
+    file: lib/Twilio/Rest/Trusthub/V1/CustomerProfiles/CustomerProfilesEntityAssignments.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::CustomerProfiles::CustomerProfilesEvaluations:
+    file: lib/Twilio/Rest/Trusthub/V1/CustomerProfiles/CustomerProfilesEvaluations.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::CustomerProfilesProvisionalCopy:
+    file: lib/Twilio/Rest/Trusthub/V1/CustomerProfilesProvisionalCopy.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::EndUser:
+    file: lib/Twilio/Rest/Trusthub/V1/EndUser.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::EndUserType:
+    file: lib/Twilio/Rest/Trusthub/V1/EndUserType.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::Policies:
+    file: lib/Twilio/Rest/Trusthub/V1/Policies.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::SupportingDocument:
+    file: lib/Twilio/Rest/Trusthub/V1/SupportingDocument.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::SupportingDocumentType:
+    file: lib/Twilio/Rest/Trusthub/V1/SupportingDocumentType.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::TrustProducts:
+    file: lib/Twilio/Rest/Trusthub/V1/TrustProducts.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::TrustProducts::TrustProductsChannelEndpointAssignment:
+    file: lib/Twilio/Rest/Trusthub/V1/TrustProducts/TrustProductsChannelEndpointAssignment.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::TrustProducts::TrustProductsEntityAssignments:
+    file: lib/Twilio/Rest/Trusthub/V1/TrustProducts/TrustProductsEntityAssignments.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::TrustProducts::TrustProductsEvaluations:
+    file: lib/Twilio/Rest/Trusthub/V1/TrustProducts/TrustProductsEvaluations.pm
+    version: '2.001'
+  Twilio::Rest::Trusthub::V1::TrustProductsProvisionalCopy:
+    file: lib/Twilio/Rest/Trusthub/V1/TrustProductsProvisionalCopy.pm
+    version: '2.001'
+  Twilio::Rest::Verify:
+    file: lib/Twilio/Rest/Verify.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2:
+    file: lib/Twilio/Rest/Verify/V2.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Form:
+    file: lib/Twilio/Rest/Verify/V2/Form.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Safelist:
+    file: lib/Twilio/Rest/Verify/V2/Safelist.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service:
+    file: lib/Twilio/Rest/Verify/V2/Service.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::AccessToken:
+    file: lib/Twilio/Rest/Verify/V2/Service/AccessToken.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::ApproveChallenge:
+    file: lib/Twilio/Rest/Verify/V2/Service/ApproveChallenge.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Entity:
+    file: lib/Twilio/Rest/Verify/V2/Service/Entity.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Entity::Challenge:
+    file: lib/Twilio/Rest/Verify/V2/Service/Entity/Challenge.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Entity::Challenge::Notification:
+    file: lib/Twilio/Rest/Verify/V2/Service/Entity/Challenge/Notification.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Entity::Factor:
+    file: lib/Twilio/Rest/Verify/V2/Service/Entity/Factor.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Entity::NewFactor:
+    file: lib/Twilio/Rest/Verify/V2/Service/Entity/NewFactor.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::MessagingConfiguration:
+    file: lib/Twilio/Rest/Verify/V2/Service/MessagingConfiguration.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::NewChallenge:
+    file: lib/Twilio/Rest/Verify/V2/Service/NewChallenge.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::NewFactor:
+    file: lib/Twilio/Rest/Verify/V2/Service/NewFactor.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::NewVerifyFactor:
+    file: lib/Twilio/Rest/Verify/V2/Service/NewVerifyFactor.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::RateLimit:
+    file: lib/Twilio/Rest/Verify/V2/Service/RateLimit.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::RateLimit::Bucket:
+    file: lib/Twilio/Rest/Verify/V2/Service/RateLimit/Bucket.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Verification:
+    file: lib/Twilio/Rest/Verify/V2/Service/Verification.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::VerificationCheck:
+    file: lib/Twilio/Rest/Verify/V2/Service/VerificationCheck.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Service::Webhook:
+    file: lib/Twilio/Rest/Verify/V2/Service/Webhook.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::Template:
+    file: lib/Twilio/Rest/Verify/V2/Template.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::VerificationAttempt:
+    file: lib/Twilio/Rest/Verify/V2/VerificationAttempt.pm
+    version: '2.001'
+  Twilio::Rest::Verify::V2::VerificationAttemptsSummary:
+    file: lib/Twilio/Rest/Verify/V2/VerificationAttemptsSummary.pm
+    version: '2.001'
+  Twilio::Rest::Video:
+    file: lib/Twilio/Rest/Video.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1:
+    file: lib/Twilio/Rest/Video/V1.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Composition:
+    file: lib/Twilio/Rest/Video/V1/Composition.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::CompositionHook:
+    file: lib/Twilio/Rest/Video/V1/CompositionHook.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::CompositionSettings:
+    file: lib/Twilio/Rest/Video/V1/CompositionSettings.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Recording:
+    file: lib/Twilio/Rest/Video/V1/Recording.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::RecordingSettings:
+    file: lib/Twilio/Rest/Video/V1/RecordingSettings.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room:
+    file: lib/Twilio/Rest/Video/V1/Room.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::Participant:
+    file: lib/Twilio/Rest/Video/V1/Room/Participant.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::Participant::Anonymize:
+    file: lib/Twilio/Rest/Video/V1/Room/Participant/Anonymize.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::Participant::PublishedTrack:
+    file: lib/Twilio/Rest/Video/V1/Room/Participant/PublishedTrack.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::Participant::SubscribeRules:
+    file: lib/Twilio/Rest/Video/V1/Room/Participant/SubscribeRules.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::Participant::SubscribedTrack:
+    file: lib/Twilio/Rest/Video/V1/Room/Participant/SubscribedTrack.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::RecordingRules:
+    file: lib/Twilio/Rest/Video/V1/Room/RecordingRules.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::RoomRecording:
+    file: lib/Twilio/Rest/Video/V1/Room/RoomRecording.pm
+    version: '2.001'
+  Twilio::Rest::Video::V1::Room::Transcriptions:
+    file: lib/Twilio/Rest/Video/V1/Room/Transcriptions.pm
+    version: '2.001'
+  Twilio::Rest::Voice:
+    file: lib/Twilio/Rest/Voice.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1:
+    file: lib/Twilio/Rest/Voice/V1.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::ArchivedCall:
+    file: lib/Twilio/Rest/Voice/V1/ArchivedCall.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::ByocTrunk:
+    file: lib/Twilio/Rest/Voice/V1/ByocTrunk.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::ConnectionPolicy:
+    file: lib/Twilio/Rest/Voice/V1/ConnectionPolicy.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::ConnectionPolicy::ConnectionPolicyTarget:
+    file: lib/Twilio/Rest/Voice/V1/ConnectionPolicy/ConnectionPolicyTarget.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::DialingPermissions:
+    file: lib/Twilio/Rest/Voice/V1/DialingPermissions.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::DialingPermissions::BulkCountryUpdate:
+    file: lib/Twilio/Rest/Voice/V1/DialingPermissions/BulkCountryUpdate.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::DialingPermissions::Country:
+    file: lib/Twilio/Rest/Voice/V1/DialingPermissions/Country.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::DialingPermissions::Country::HighriskSpecialPrefix:
+    file: lib/Twilio/Rest/Voice/V1/DialingPermissions/Country/HighriskSpecialPrefix.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::DialingPermissions::Settings:
+    file: lib/Twilio/Rest/Voice/V1/DialingPermissions/Settings.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::IpRecord:
+    file: lib/Twilio/Rest/Voice/V1/IpRecord.pm
+    version: '2.001'
+  Twilio::Rest::Voice::V1::SourceIpMapping:
+    file: lib/Twilio/Rest/Voice/V1/SourceIpMapping.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks:
+    file: lib/Twilio/Rest/Webhooks.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1:
+    file: lib/Twilio/Rest/Webhooks/V1.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::AuthProfile:
+    file: lib/Twilio/Rest/Webhooks/V1/AuthProfile.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::EdgeZone:
+    file: lib/Twilio/Rest/Webhooks/V1/EdgeZone.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::Operation:
+    file: lib/Twilio/Rest/Webhooks/V1/Operation.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::Rule:
+    file: lib/Twilio/Rest/Webhooks/V1/Rule.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::Setting:
+    file: lib/Twilio/Rest/Webhooks/V1/Setting.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::SharedKey:
+    file: lib/Twilio/Rest/Webhooks/V1/SharedKey.pm
+    version: '2.001'
+  Twilio::Rest::Webhooks::V1::Test:
+    file: lib/Twilio/Rest/Webhooks/V1/Test.pm
+    version: '2.001'
+  Twilio::Rest::Wireless:
+    file: lib/Twilio/Rest/Wireless.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1:
+    file: lib/Twilio/Rest/Wireless/V1.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1::Command:
+    file: lib/Twilio/Rest/Wireless/V1/Command.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1::RatePlan:
+    file: lib/Twilio/Rest/Wireless/V1/RatePlan.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1::Sim:
+    file: lib/Twilio/Rest/Wireless/V1/Sim.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1::Sim::DataSession:
+    file: lib/Twilio/Rest/Wireless/V1/Sim/DataSession.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1::Sim::UsageRecord:
+    file: lib/Twilio/Rest/Wireless/V1/Sim/UsageRecord.pm
+    version: '2.001'
+  Twilio::Rest::Wireless::V1::UsageRecord:
+    file: lib/Twilio/Rest/Wireless/V1/UsageRecord.pm
+    version: '2.001'
+  Twilio::Security::RequestValidator:
+    file: lib/Twilio/Security/RequestValidator.pm
+    version: '2.001'
+  Twilio::Serialize:
+    file: lib/Twilio/Serialize.pm
+    version: '2.001'
+  Twilio::Stream:
+    file: lib/Twilio/Stream.pm
+    version: '2.001'
+  Twilio::TokenPaginationPage:
+    file: lib/Twilio/TokenPaginationPage.pm
+    version: '2.001'
+  Twilio::TwiML::Fax::Receive:
+    file: lib/Twilio/TwiML/Fax/Receive.pm
+    version: '2.001'
+  Twilio::TwiML::FaxResponse:
+    file: lib/Twilio/TwiML/FaxResponse.pm
+    version: '2.001'
+  Twilio::TwiML::GenericNode:
+    file: lib/Twilio/TwiML/GenericNode.pm
+    version: '2.001'
+  Twilio::TwiML::Messaging::Body:
+    file: lib/Twilio/TwiML/Messaging/Body.pm
+    version: '2.001'
+  Twilio::TwiML::Messaging::Media:
+    file: lib/Twilio/TwiML/Messaging/Media.pm
+    version: '2.001'
+  Twilio::TwiML::Messaging::Message:
+    file: lib/Twilio/TwiML/Messaging/Message.pm
+    version: '2.001'
+  Twilio::TwiML::Messaging::Redirect:
+    file: lib/Twilio/TwiML/Messaging/Redirect.pm
+    version: '2.001'
+  Twilio::TwiML::MessagingResponse:
+    file: lib/Twilio/TwiML/MessagingResponse.pm
+    version: '2.001'
+  Twilio::TwiML::TwiML:
+    file: lib/Twilio/TwiML/TwiML.pm
+    version: '2.001'
+  Twilio::TwiML::Video::Room:
+    file: lib/Twilio/TwiML/Video/Room.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::AiSession:
+    file: lib/Twilio/TwiML/Voice/AiSession.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Application:
+    file: lib/Twilio/TwiML/Voice/Application.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::ApplicationSid:
+    file: lib/Twilio/TwiML/Voice/ApplicationSid.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Autopilot:
+    file: lib/Twilio/TwiML/Voice/Autopilot.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Client:
+    file: lib/Twilio/TwiML/Voice/Client.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Conference:
+    file: lib/Twilio/TwiML/Voice/Conference.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Config:
+    file: lib/Twilio/TwiML/Voice/Config.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Connect:
+    file: lib/Twilio/TwiML/Voice/Connect.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Conversation:
+    file: lib/Twilio/TwiML/Voice/Conversation.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::ConversationRelay:
+    file: lib/Twilio/TwiML/Voice/ConversationRelay.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::ConversationRelaySession:
+    file: lib/Twilio/TwiML/Voice/ConversationRelaySession.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Dial:
+    file: lib/Twilio/TwiML/Voice/Dial.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Echo:
+    file: lib/Twilio/TwiML/Voice/Echo.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Enqueue:
+    file: lib/Twilio/TwiML/Voice/Enqueue.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Gather:
+    file: lib/Twilio/TwiML/Voice/Gather.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Hangup:
+    file: lib/Twilio/TwiML/Voice/Hangup.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Header:
+    file: lib/Twilio/TwiML/Voice/Header.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Headers:
+    file: lib/Twilio/TwiML/Voice/Headers.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Identity:
+    file: lib/Twilio/TwiML/Voice/Identity.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Language:
+    file: lib/Twilio/TwiML/Voice/Language.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Leave:
+    file: lib/Twilio/TwiML/Voice/Leave.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Number:
+    file: lib/Twilio/TwiML/Voice/Number.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Parameter:
+    file: lib/Twilio/TwiML/Voice/Parameter.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Pause:
+    file: lib/Twilio/TwiML/Voice/Pause.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Pay:
+    file: lib/Twilio/TwiML/Voice/Pay.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Play:
+    file: lib/Twilio/TwiML/Voice/Play.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Prompt:
+    file: lib/Twilio/TwiML/Voice/Prompt.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Queue:
+    file: lib/Twilio/TwiML/Voice/Queue.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Record:
+    file: lib/Twilio/TwiML/Voice/Record.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Recording:
+    file: lib/Twilio/TwiML/Voice/Recording.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Redirect:
+    file: lib/Twilio/TwiML/Voice/Redirect.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Refer:
+    file: lib/Twilio/TwiML/Voice/Refer.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::ReferSip:
+    file: lib/Twilio/TwiML/Voice/ReferSip.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Reject:
+    file: lib/Twilio/TwiML/Voice/Reject.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Room:
+    file: lib/Twilio/TwiML/Voice/Room.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Say:
+    file: lib/Twilio/TwiML/Voice/Say.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Sim:
+    file: lib/Twilio/TwiML/Voice/Sim.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Sip:
+    file: lib/Twilio/TwiML/Voice/Sip.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SipUri:
+    file: lib/Twilio/TwiML/Voice/SipUri.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Siprec:
+    file: lib/Twilio/TwiML/Voice/Siprec.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Sms:
+    file: lib/Twilio/TwiML/Voice/Sms.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlBreak:
+    file: lib/Twilio/TwiML/Voice/SsmlBreak.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlEmphasis:
+    file: lib/Twilio/TwiML/Voice/SsmlEmphasis.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlLang:
+    file: lib/Twilio/TwiML/Voice/SsmlLang.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlP:
+    file: lib/Twilio/TwiML/Voice/SsmlP.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlPhoneme:
+    file: lib/Twilio/TwiML/Voice/SsmlPhoneme.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlProsody:
+    file: lib/Twilio/TwiML/Voice/SsmlProsody.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlS:
+    file: lib/Twilio/TwiML/Voice/SsmlS.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlSayAs:
+    file: lib/Twilio/TwiML/Voice/SsmlSayAs.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlSub:
+    file: lib/Twilio/TwiML/Voice/SsmlSub.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::SsmlW:
+    file: lib/Twilio/TwiML/Voice/SsmlW.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Start:
+    file: lib/Twilio/TwiML/Voice/Start.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Stop:
+    file: lib/Twilio/TwiML/Voice/Stop.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Stream:
+    file: lib/Twilio/TwiML/Voice/Stream.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Task:
+    file: lib/Twilio/TwiML/Voice/Task.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::Transcription:
+    file: lib/Twilio/TwiML/Voice/Transcription.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::VirtualAgent:
+    file: lib/Twilio/TwiML/Voice/VirtualAgent.pm
+    version: '2.001'
+  Twilio::TwiML::Voice::WhatsApp:
+    file: lib/Twilio/TwiML/Voice/WhatsApp.pm
+    version: '2.001'
+  Twilio::TwiML::VoiceResponse:
+    file: lib/Twilio/TwiML/VoiceResponse.pm
+    version: '2.001'
+  Twilio::Version:
+    file: lib/Twilio/Version.pm
+    version: '2.001'
+recommends:
+  Cpanel::JSON::XS: '0'
+  Crypt::OpenSSL::RSA: '0.38'
+requires:
+  Carp: '0'
+  Digest::SHA: '0'
+  HTTP::Tiny: '0.076'
+  IO::Socket::SSL: '1.968'
+  JSON::PP: '0'
+  MIME::Base64: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Time::Local: '0'
+  Time::Piece: '0'
+  overload: '0'
+  parent: '0'
+  perl: '5.016'
+resources:
+  bugtracker: https://github.com/Zarabozo/Twilio/issues
+  homepage: https://github.com/Zarabozo/Twilio
+  license: https://opensource.org/license/mit
+  repository: https://github.com/Zarabozo/Twilio.git
+version: '2.001'
+x_serialization_backend: YAML::XS version v0.902.0

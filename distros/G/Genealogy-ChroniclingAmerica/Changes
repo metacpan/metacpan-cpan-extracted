@@ -1,5 +1,32 @@
 Revision history for Genealogy-ChroniclingAmerica
 
+0.08	Thu Nov 12 20:33:11 EST 2026
+	[ Bug fixes ]
+	- Catch JSON decoding errors
+	- The L.O.C. moved the page text and PDF link in the item JSON,
+		so read the text from resource.fulltext_file and the PDF from resource.pdf
+	- Match names literally, not as regular expressions
+	- Load Time::HiRes, which was used but not loaded
+	- Retry a search once if the L.O.C. returns no results, since it
+		sometimes answers an identical search inconsistently
+	[ Tests ]
+	- Use Test::Mockingbird instead of Test::MockObject in t/30-basics.t
+	- Skip, rather than fail, PDF link checks when tile.loc.gov refuses
+		the request (403) or is unavailable (5xx)
+	- Don't fail the rate-limiting test when no results are returned
+	- Skip, rather than fail, the match-count checks in t/chronicling.t when
+		the L.O.C. returns no results
+	- Dropped the Test::HTTPStatus dependency
+	- Added t/mocked.t, tests of the new API layout which don't need the network
+	[ Documentation ]
+	- Added API SPECIFICATION to the POD
+	- Corrected the documented defaults of host and min_interval
+	[ Packaging ]
+	- Minimum Perl is now 5.10
+	- Declare Time::HiRes
+	- Licence is declared as gpl_2
+	- Removed debugging code
+
 0.07	Thu Aug 14 20:42:35 EDT 2025
 	New API at the L.O.C.
 	Added caching support

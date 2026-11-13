@@ -1,0 +1,2055 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "address" : "a_address",
+     "binding_type" : "a_binding_type",
+     "credential_sid" : "a_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "endpoint" : "a_endpoint",
+     "identity" : "a_identity",
+     "links" : {
+      "a_links" : 1
+     },
+     "notification_protocol_version" : "a_notification_protocol_version",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "tags" : [
+      "a_tags"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "address",
+      "address",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "notification_protocol_version",
+      "notification_protocol_version",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "tags",
+      "tags",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Identity",
+    "v_identity"
+   ],
+   [
+    "BindingType",
+    "gcm"
+   ],
+   [
+    "Address",
+    "v_address"
+   ],
+   [
+    "CredentialSid",
+    "v_credential_sid"
+   ],
+   [
+    "Endpoint",
+    "v_endpoint"
+   ],
+   [
+    "NotificationProtocolVersion",
+    "v_notification_protocol_version"
+   ],
+   [
+    "Tag",
+    "v_tag_1"
+   ],
+   [
+    "Tag",
+    "v_tag_2"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateBinding",
+  "method" : "create",
+  "options" : {
+   "credential_sid" : "v_credential_sid",
+   "endpoint" : "v_endpoint",
+   "notification_protocol_version" : "v_notification_protocol_version",
+   "tag" : [
+    "v_tag_1",
+    "v_tag_2"
+   ]
+  },
+  "required" : [
+   "v_identity",
+   "gcm",
+   "v_address"
+  ],
+  "url" : "https://notify.twilio.com/v1/Services/id1/Bindings"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sandbox" : "a_sandbox",
+     "sid" : "a_sid",
+     "type" : "gcm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Type",
+    "apn"
+   ],
+   [
+    "ApiKey",
+    "v_api_key"
+   ],
+   [
+    "Certificate",
+    "v_certificate"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "PrivateKey",
+    "v_private_key"
+   ],
+   [
+    "Sandbox",
+    "true"
+   ],
+   [
+    "Secret",
+    "v_secret"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCredential",
+  "method" : "create",
+  "options" : {
+   "api_key" : "v_api_key",
+   "certificate" : "v_certificate",
+   "friendly_name" : "v_friendly_name",
+   "private_key" : "v_private_key",
+   "sandbox" : 1,
+   "secret" : "v_secret"
+  },
+  "required" : [
+   "apn"
+  ],
+  "url" : "https://notify.twilio.com/v1/Credentials"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "action" : "a_action",
+     "alexa" : {
+      "a_alexa" : 1
+     },
+     "apn" : {
+      "a_apn" : 1
+     },
+     "body" : "a_body",
+     "data" : {
+      "a_data" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "facebook_messenger" : {
+      "a_facebook_messenger" : 1
+     },
+     "fcm" : {
+      "a_fcm" : 1
+     },
+     "gcm" : {
+      "a_gcm" : 1
+     },
+     "identities" : [
+      "a_identities"
+     ],
+     "priority" : "high",
+     "segments" : [
+      "a_segments"
+     ],
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "sms" : {
+      "a_sms" : 1
+     },
+     "sound" : "a_sound",
+     "tags" : [
+      "a_tags"
+     ],
+     "title" : "a_title",
+     "ttl" : 340
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "action",
+      "action",
+      "plain"
+     ],
+     [
+      "alexa",
+      "alexa",
+      "plain"
+     ],
+     [
+      "apn",
+      "apn",
+      "plain"
+     ],
+     [
+      "body",
+      "body",
+      "plain"
+     ],
+     [
+      "data",
+      "data",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "facebook_messenger",
+      "facebook_messenger",
+      "plain"
+     ],
+     [
+      "fcm",
+      "fcm",
+      "plain"
+     ],
+     [
+      "gcm",
+      "gcm",
+      "plain"
+     ],
+     [
+      "identities",
+      "identities",
+      "plain"
+     ],
+     [
+      "priority",
+      "priority",
+      "plain"
+     ],
+     [
+      "segments",
+      "segments",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms",
+      "sms",
+      "plain"
+     ],
+     [
+      "sound",
+      "sound",
+      "plain"
+     ],
+     [
+      "tags",
+      "tags",
+      "plain"
+     ],
+     [
+      "title",
+      "title",
+      "plain"
+     ],
+     [
+      "ttl",
+      "ttl",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "notifications",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Action",
+    "v_action"
+   ],
+   [
+    "Alexa",
+    "{\"v_alexa\":16}"
+   ],
+   [
+    "Apn",
+    "{\"v_apn\":8}"
+   ],
+   [
+    "Body",
+    "v_body"
+   ],
+   [
+    "Data",
+    "{\"v_data\":15}"
+   ],
+   [
+    "DeliveryCallbackUrl",
+    "v_delivery_callback_url"
+   ],
+   [
+    "FacebookMessenger",
+    "{\"v_facebook_messenger\":24}"
+   ],
+   [
+    "Fcm",
+    "{\"v_fcm\":27}"
+   ],
+   [
+    "Gcm",
+    "{\"v_gcm\":28}"
+   ],
+   [
+    "Identity",
+    "v_identity_1"
+   ],
+   [
+    "Identity",
+    "v_identity_2"
+   ],
+   [
+    "Priority",
+    "high"
+   ],
+   [
+    "Segment",
+    "v_segment_1"
+   ],
+   [
+    "Segment",
+    "v_segment_2"
+   ],
+   [
+    "Sms",
+    "{\"v_sms\":28}"
+   ],
+   [
+    "Sound",
+    "v_sound"
+   ],
+   [
+    "Tag",
+    "v_tag_1"
+   ],
+   [
+    "Tag",
+    "v_tag_2"
+   ],
+   [
+    "Title",
+    "v_title"
+   ],
+   [
+    "ToBinding",
+    "v_to_binding_1"
+   ],
+   [
+    "ToBinding",
+    "v_to_binding_2"
+   ],
+   [
+    "Ttl",
+    "308"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateNotification",
+  "method" : "create",
+  "options" : {
+   "action" : "v_action",
+   "alexa" : {
+    "v_alexa" : 16
+   },
+   "apn" : {
+    "v_apn" : 8
+   },
+   "body" : "v_body",
+   "data" : {
+    "v_data" : 15
+   },
+   "delivery_callback_url" : "v_delivery_callback_url",
+   "facebook_messenger" : {
+    "v_facebook_messenger" : 24
+   },
+   "fcm" : {
+    "v_fcm" : 27
+   },
+   "gcm" : {
+    "v_gcm" : 28
+   },
+   "identity" : [
+    "v_identity_1",
+    "v_identity_2"
+   ],
+   "priority" : "high",
+   "segment" : [
+    "v_segment_1",
+    "v_segment_2"
+   ],
+   "sms" : {
+    "v_sms" : 28
+   },
+   "sound" : "v_sound",
+   "tag" : [
+    "v_tag_1",
+    "v_tag_2"
+   ],
+   "title" : "v_title",
+   "to_binding" : [
+    "v_to_binding_1",
+    "v_to_binding_2"
+   ],
+   "ttl" : 308
+  },
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1/Notifications"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alexa_skill_id" : "a_alexa_skill_id",
+     "apn_credential_sid" : "a_apn_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "default_alexa_notification_protocol_version" : "a_default_alexa_notification_protocol_version",
+     "default_apn_notification_protocol_version" : "a_default_apn_notification_protocol_version",
+     "default_fcm_notification_protocol_version" : "a_default_fcm_notification_protocol_version",
+     "default_gcm_notification_protocol_version" : "a_default_gcm_notification_protocol_version",
+     "delivery_callback_enabled" : true,
+     "delivery_callback_url" : "a_delivery_callback_url",
+     "facebook_messenger_page_id" : "a_facebook_messenger_page_id",
+     "fcm_credential_sid" : "a_fcm_credential_sid",
+     "friendly_name" : "a_friendly_name",
+     "gcm_credential_sid" : "a_gcm_credential_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "log_enabled" : true,
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alexa_skill_id",
+      "alexa_skill_id",
+      "plain"
+     ],
+     [
+      "apn_credential_sid",
+      "apn_credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_alexa_notification_protocol_version",
+      "default_alexa_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_apn_notification_protocol_version",
+      "default_apn_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_fcm_notification_protocol_version",
+      "default_fcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_gcm_notification_protocol_version",
+      "default_gcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "delivery_callback_enabled",
+      "delivery_callback_enabled",
+      "plain"
+     ],
+     [
+      "delivery_callback_url",
+      "delivery_callback_url",
+      "plain"
+     ],
+     [
+      "facebook_messenger_page_id",
+      "facebook_messenger_page_id",
+      "plain"
+     ],
+     [
+      "fcm_credential_sid",
+      "fcm_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "gcm_credential_sid",
+      "gcm_credential_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "log_enabled",
+      "log_enabled",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "AlexaSkillId",
+    "v_alexa_skill_id"
+   ],
+   [
+    "ApnCredentialSid",
+    "v_apn_credential_sid"
+   ],
+   [
+    "DefaultAlexaNotificationProtocolVersion",
+    "v_default_alexa_notification_protocol_version"
+   ],
+   [
+    "DefaultApnNotificationProtocolVersion",
+    "v_default_apn_notification_protocol_version"
+   ],
+   [
+    "DefaultFcmNotificationProtocolVersion",
+    "v_default_fcm_notification_protocol_version"
+   ],
+   [
+    "DefaultGcmNotificationProtocolVersion",
+    "v_default_gcm_notification_protocol_version"
+   ],
+   [
+    "DeliveryCallbackEnabled",
+    "true"
+   ],
+   [
+    "DeliveryCallbackUrl",
+    "v_delivery_callback_url"
+   ],
+   [
+    "FacebookMessengerPageId",
+    "v_facebook_messenger_page_id"
+   ],
+   [
+    "FcmCredentialSid",
+    "v_fcm_credential_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "GcmCredentialSid",
+    "v_gcm_credential_sid"
+   ],
+   [
+    "LogEnabled",
+    "true"
+   ],
+   [
+    "MessagingServiceSid",
+    "v_messaging_service_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateService",
+  "method" : "create",
+  "options" : {
+   "alexa_skill_id" : "v_alexa_skill_id",
+   "apn_credential_sid" : "v_apn_credential_sid",
+   "default_alexa_notification_protocol_version" : "v_default_alexa_notification_protocol_version",
+   "default_apn_notification_protocol_version" : "v_default_apn_notification_protocol_version",
+   "default_fcm_notification_protocol_version" : "v_default_fcm_notification_protocol_version",
+   "default_gcm_notification_protocol_version" : "v_default_gcm_notification_protocol_version",
+   "delivery_callback_enabled" : 1,
+   "delivery_callback_url" : "v_delivery_callback_url",
+   "facebook_messenger_page_id" : "v_facebook_messenger_page_id",
+   "fcm_credential_sid" : "v_fcm_credential_sid",
+   "friendly_name" : "v_friendly_name",
+   "gcm_credential_sid" : "v_gcm_credential_sid",
+   "log_enabled" : 1,
+   "messaging_service_sid" : "v_messaging_service_sid"
+  },
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteBinding",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1/Bindings/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCredential",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Credentials/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteService",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "address" : "a_address",
+     "binding_type" : "a_binding_type",
+     "credential_sid" : "a_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "endpoint" : "a_endpoint",
+     "identity" : "a_identity",
+     "links" : {
+      "a_links" : 1
+     },
+     "notification_protocol_version" : "a_notification_protocol_version",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "tags" : [
+      "a_tags"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "address",
+      "address",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "notification_protocol_version",
+      "notification_protocol_version",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "tags",
+      "tags",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBinding",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1/Bindings/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sandbox" : "a_sandbox",
+     "sid" : "a_sid",
+     "type" : "gcm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCredential",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Credentials/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alexa_skill_id" : "a_alexa_skill_id",
+     "apn_credential_sid" : "a_apn_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "default_alexa_notification_protocol_version" : "a_default_alexa_notification_protocol_version",
+     "default_apn_notification_protocol_version" : "a_default_apn_notification_protocol_version",
+     "default_fcm_notification_protocol_version" : "a_default_fcm_notification_protocol_version",
+     "default_gcm_notification_protocol_version" : "a_default_gcm_notification_protocol_version",
+     "delivery_callback_enabled" : true,
+     "delivery_callback_url" : "a_delivery_callback_url",
+     "facebook_messenger_page_id" : "a_facebook_messenger_page_id",
+     "fcm_credential_sid" : "a_fcm_credential_sid",
+     "friendly_name" : "a_friendly_name",
+     "gcm_credential_sid" : "a_gcm_credential_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "log_enabled" : true,
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alexa_skill_id",
+      "alexa_skill_id",
+      "plain"
+     ],
+     [
+      "apn_credential_sid",
+      "apn_credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_alexa_notification_protocol_version",
+      "default_alexa_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_apn_notification_protocol_version",
+      "default_apn_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_fcm_notification_protocol_version",
+      "default_fcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_gcm_notification_protocol_version",
+      "default_gcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "delivery_callback_enabled",
+      "delivery_callback_enabled",
+      "plain"
+     ],
+     [
+      "delivery_callback_url",
+      "delivery_callback_url",
+      "plain"
+     ],
+     [
+      "facebook_messenger_page_id",
+      "facebook_messenger_page_id",
+      "plain"
+     ],
+     [
+      "fcm_credential_sid",
+      "fcm_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "gcm_credential_sid",
+      "gcm_credential_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "log_enabled",
+      "log_enabled",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchService",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "bindings" : [
+      {
+       "account_sid" : "a_account_sid",
+       "address" : "a_address",
+       "binding_type" : "a_binding_type",
+       "credential_sid" : "a_credential_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "endpoint" : "a_endpoint",
+       "identity" : "a_identity",
+       "links" : {
+        "a_links" : 1
+       },
+       "notification_protocol_version" : "a_notification_protocol_version",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "tags" : [
+        "a_tags"
+       ],
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "address",
+      "address",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "notification_protocol_version",
+      "notification_protocol_version",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "tags",
+      "tags",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "StartDate",
+    "2026-01-13"
+   ],
+   [
+    "EndDate",
+    "2026-01-18"
+   ],
+   [
+    "Identity",
+    "v_identity_1"
+   ],
+   [
+    "Identity",
+    "v_identity_2"
+   ],
+   [
+    "Tag",
+    "v_tag_1"
+   ],
+   [
+    "Tag",
+    "v_tag_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListBinding",
+  "method" : "page",
+  "options" : {
+   "end_date" : {
+    "epoch" : 1768705445
+   },
+   "identity" : [
+    "v_identity_1",
+    "v_identity_2"
+   ],
+   "start_date" : {
+    "epoch" : 1768273445
+   },
+   "tag" : [
+    "v_tag_1",
+    "v_tag_2"
+   ]
+  },
+  "records_key" : "bindings",
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1/Bindings"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "credentials" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sandbox" : "a_sandbox",
+       "sid" : "a_sid",
+       "type" : "gcm",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListCredential",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "credentials",
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Credentials"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "services" : [
+      {
+       "account_sid" : "a_account_sid",
+       "alexa_skill_id" : "a_alexa_skill_id",
+       "apn_credential_sid" : "a_apn_credential_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "default_alexa_notification_protocol_version" : "a_default_alexa_notification_protocol_version",
+       "default_apn_notification_protocol_version" : "a_default_apn_notification_protocol_version",
+       "default_fcm_notification_protocol_version" : "a_default_fcm_notification_protocol_version",
+       "default_gcm_notification_protocol_version" : "a_default_gcm_notification_protocol_version",
+       "delivery_callback_enabled" : true,
+       "delivery_callback_url" : "a_delivery_callback_url",
+       "facebook_messenger_page_id" : "a_facebook_messenger_page_id",
+       "fcm_credential_sid" : "a_fcm_credential_sid",
+       "friendly_name" : "a_friendly_name",
+       "gcm_credential_sid" : "a_gcm_credential_sid",
+       "links" : {
+        "a_links" : 1
+       },
+       "log_enabled" : true,
+       "messaging_service_sid" : "a_messaging_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alexa_skill_id",
+      "alexa_skill_id",
+      "plain"
+     ],
+     [
+      "apn_credential_sid",
+      "apn_credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_alexa_notification_protocol_version",
+      "default_alexa_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_apn_notification_protocol_version",
+      "default_apn_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_fcm_notification_protocol_version",
+      "default_fcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_gcm_notification_protocol_version",
+      "default_gcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "delivery_callback_enabled",
+      "delivery_callback_enabled",
+      "plain"
+     ],
+     [
+      "delivery_callback_url",
+      "delivery_callback_url",
+      "plain"
+     ],
+     [
+      "facebook_messenger_page_id",
+      "facebook_messenger_page_id",
+      "plain"
+     ],
+     [
+      "fcm_credential_sid",
+      "fcm_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "gcm_credential_sid",
+      "gcm_credential_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "log_enabled",
+      "log_enabled",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListService",
+  "method" : "page",
+  "options" : {
+   "friendly_name" : "v_friendly_name"
+  },
+  "records_key" : "services",
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sandbox" : "a_sandbox",
+     "sid" : "a_sid",
+     "type" : "gcm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "ApiKey",
+    "v_api_key"
+   ],
+   [
+    "Certificate",
+    "v_certificate"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "PrivateKey",
+    "v_private_key"
+   ],
+   [
+    "Sandbox",
+    "true"
+   ],
+   [
+    "Secret",
+    "v_secret"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateCredential",
+  "method" : "update",
+  "options" : {
+   "api_key" : "v_api_key",
+   "certificate" : "v_certificate",
+   "friendly_name" : "v_friendly_name",
+   "private_key" : "v_private_key",
+   "sandbox" : 1,
+   "secret" : "v_secret"
+  },
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Credentials/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alexa_skill_id" : "a_alexa_skill_id",
+     "apn_credential_sid" : "a_apn_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "default_alexa_notification_protocol_version" : "a_default_alexa_notification_protocol_version",
+     "default_apn_notification_protocol_version" : "a_default_apn_notification_protocol_version",
+     "default_fcm_notification_protocol_version" : "a_default_fcm_notification_protocol_version",
+     "default_gcm_notification_protocol_version" : "a_default_gcm_notification_protocol_version",
+     "delivery_callback_enabled" : true,
+     "delivery_callback_url" : "a_delivery_callback_url",
+     "facebook_messenger_page_id" : "a_facebook_messenger_page_id",
+     "fcm_credential_sid" : "a_fcm_credential_sid",
+     "friendly_name" : "a_friendly_name",
+     "gcm_credential_sid" : "a_gcm_credential_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "log_enabled" : true,
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alexa_skill_id",
+      "alexa_skill_id",
+      "plain"
+     ],
+     [
+      "apn_credential_sid",
+      "apn_credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_alexa_notification_protocol_version",
+      "default_alexa_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_apn_notification_protocol_version",
+      "default_apn_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_fcm_notification_protocol_version",
+      "default_fcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "default_gcm_notification_protocol_version",
+      "default_gcm_notification_protocol_version",
+      "plain"
+     ],
+     [
+      "delivery_callback_enabled",
+      "delivery_callback_enabled",
+      "plain"
+     ],
+     [
+      "delivery_callback_url",
+      "delivery_callback_url",
+      "plain"
+     ],
+     [
+      "facebook_messenger_page_id",
+      "facebook_messenger_page_id",
+      "plain"
+     ],
+     [
+      "fcm_credential_sid",
+      "fcm_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "gcm_credential_sid",
+      "gcm_credential_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "log_enabled",
+      "log_enabled",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "notify",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "AlexaSkillId",
+    "v_alexa_skill_id"
+   ],
+   [
+    "ApnCredentialSid",
+    "v_apn_credential_sid"
+   ],
+   [
+    "DefaultAlexaNotificationProtocolVersion",
+    "v_default_alexa_notification_protocol_version"
+   ],
+   [
+    "DefaultApnNotificationProtocolVersion",
+    "v_default_apn_notification_protocol_version"
+   ],
+   [
+    "DefaultFcmNotificationProtocolVersion",
+    "v_default_fcm_notification_protocol_version"
+   ],
+   [
+    "DefaultGcmNotificationProtocolVersion",
+    "v_default_gcm_notification_protocol_version"
+   ],
+   [
+    "DeliveryCallbackEnabled",
+    "true"
+   ],
+   [
+    "DeliveryCallbackUrl",
+    "v_delivery_callback_url"
+   ],
+   [
+    "FacebookMessengerPageId",
+    "v_facebook_messenger_page_id"
+   ],
+   [
+    "FcmCredentialSid",
+    "v_fcm_credential_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "GcmCredentialSid",
+    "v_gcm_credential_sid"
+   ],
+   [
+    "LogEnabled",
+    "true"
+   ],
+   [
+    "MessagingServiceSid",
+    "v_messaging_service_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateService",
+  "method" : "update",
+  "options" : {
+   "alexa_skill_id" : "v_alexa_skill_id",
+   "apn_credential_sid" : "v_apn_credential_sid",
+   "default_alexa_notification_protocol_version" : "v_default_alexa_notification_protocol_version",
+   "default_apn_notification_protocol_version" : "v_default_apn_notification_protocol_version",
+   "default_fcm_notification_protocol_version" : "v_default_fcm_notification_protocol_version",
+   "default_gcm_notification_protocol_version" : "v_default_gcm_notification_protocol_version",
+   "delivery_callback_enabled" : 1,
+   "delivery_callback_url" : "v_delivery_callback_url",
+   "facebook_messenger_page_id" : "v_facebook_messenger_page_id",
+   "fcm_credential_sid" : "v_fcm_credential_sid",
+   "friendly_name" : "v_friendly_name",
+   "gcm_credential_sid" : "v_gcm_credential_sid",
+   "log_enabled" : 1,
+   "messaging_service_sid" : "v_messaging_service_sid"
+  },
+  "required" : [],
+  "url" : "https://notify.twilio.com/v1/Services/id1"
+ }
+]

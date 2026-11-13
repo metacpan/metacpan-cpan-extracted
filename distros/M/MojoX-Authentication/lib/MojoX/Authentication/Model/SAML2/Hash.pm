@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::SAML2::Hash;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo;
@@ -17,7 +17,14 @@ sub get ($self, $key) {
 }
 
 sub set ($self, $data, $key, $expire) {
-   $self->_store->{$key} = {
+   my $store = $self->_store;
+
+   # cleanup everything that already expired
+   my $now = time();
+   my @expired = grep { $store->{$_}{expire} <= $now } keys($store->%*);
+   delete $store->@{@expired};
+
+   $store->{$key} = {
       expire => $expire,
       data   => $data,
    };

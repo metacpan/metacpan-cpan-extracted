@@ -7,35 +7,31 @@ use experimental qw/signatures postderef lexical_subs/;
 use Browser::Open 'open_browser';
 use Carp;
 use Digest::SHA 'sha256';
-use Crypt::SysRandom 0.008 'random_base64url';
-use HTML::Entities 'encode_entities';
-use HTTP::Daemon;
-use HTTP::Headers;
-use HTTP::Response;
-use HTTP::Tiny;
-use JSON::MaybeXS;
 use List::Util 1.33 qw/first none/;
 use MIME::Base64 qw/encode_base64 encode_base64url decode_base64url/;
-use URI;
-use URI::Escape 'uri_escape_utf8';
+use Mojo::JSON 'decode_json';
+use Mojo::Server::Daemon;
+use Mojo::URL;
+use Mojo::UserAgent;
+use Mojo::Util qw/encode random_bytes url_escape xml_escape/;
 
 use Browser::OIDC::TokenResponse;
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
-my $tiny = HTTP::Tiny->new(verify_SSL => 1);
+my $ua = Mojo::UserAgent->new;
 
 my sub validate_url($name, $url) {
 	croak "$name is undefined" unless defined $url;
-	my $uri = URI->new($url);
+	my $uri = Mojo::URL->new($url);
 	croak "Invalid URL for $name" unless ($uri->scheme // '') eq 'https' && length $uri->host;
 }
 
 sub new_from_discovery($class, $target_base) {
 	validate_url('target_base', $target_base);
-	my $response = $tiny->get("$target_base/.well-known/openid-configuration");
-	croak "Error: $response->{status}" if $response->{status} != 200;
-	my $config = decode_json($response->{content});
+	my $response = $ua->get("$target_base/.well-known/openid-configuration")->result;
+	croak "Error: ". $response->code if not $response->is_success;
+	my $config = $response->json;
 	croak "Error: non-matching issuer" if $config->{issuer} ne $target_base;
 	return $class->new_from_config($config);
 }
@@ -56,12 +52,12 @@ sub new_from_config($class, $config) {
 		$config->%{qw/issuer authorization_endpoint token_endpoint userinfo_endpoint claims_supported scopes_supported jwks_uri/},
 		auth_method  => $auth_method,
 		response_iss => !!$config->{authorization_response_iss_parameter_supported},
-		tiny         => $tiny,
+		ua           => $ua,
 	}, $class;
 }
 
 my sub form_escape($input) {
-	return uri_escape_utf8($input) =~ s/%20/+/gr;
+	return url_escape(encode('UTF-8', $input))  =~ s/%20/+/gr;
 }
 
 my sub term_escape($input) {
@@ -71,96 +67,107 @@ my sub term_escape($input) {
 sub get_token($self, %options) {
 	my $client_id = $options{client_id} // croak 'No client id given';
 
-	my $daemon = HTTP::Daemon->new(LocalAddr => 'localhost', Timeout => $options{timeout} // 60);
-	my $port = $daemon->sockport;
-	my $redirect_uri = "http://localhost:$port/auth/callback";
-	my $full_target = URI->new($self->{authorization_endpoint});
-	$full_target->query_param_append(response_type => 'code');
-	$full_target->query_param_append(redirect_uri => $redirect_uri);
-	$full_target->query_param_append(client_id => $client_id);
-	my $code_verifier = random_base64url(32);
-	$full_target->query_param_append(code_challenge => encode_base64url(sha256($code_verifier)));
-	$full_target->query_param_append(code_challenge_method => 'S256');
-	my @scope = 'openid';
-	push @scope, $options{scope}->@*  if $options{scope};
-	$full_target->query_param_append(scope => join ' ', @scope);
-	my $state = random_base64url(16);
-	$full_target->query_param_append(state => $state);
-	my $nonce = exists $options{nonce} ? $options{nonce} : random_base64url(32);
-	$full_target->query_param_append(nonce => $nonce) if defined $nonce;
-	for my $name (qw/display max_age/) {
-		if (defined $options{$name}) {
-			$full_target->query_param_append($name => $options{$name});
-		}
-	}
-	if ($options{prompt}) {
-		$full_target->query_param_append(prompt => join ' ', $options{prompt}->@*);
-	}
+	my $state = encode_base64url(random_bytes(16));
 
-	my $url = $full_target->canonical;
-	my $ok = open_browser($url);
-	say "Could not open browser: please open $url manually" if not defined $ok or $ok != 0;
-	while (1) {
-		my $sock = $daemon->accept or croak "Could not accept connection: $!";
-		my $request = $sock->get_request or croak "Could not receive request";
+	my $loop = Mojo::IOLoop->new;
+	my $daemon = Mojo::Server::Daemon->new(ioloop => $loop, listen => ['http://localhost:0'], silent => 1);
+	my $ioloop = $daemon->ioloop;
+	my ($code, $exception);
+	$daemon->on(request => sub ($daemon, $tx) {
+		my $request = $tx->req;
 
-		if ($request->uri->path eq '/auth/callback') {
-			my $received_state = $request->uri->query_param('state');
+		if ($request->url->path eq '/auth/callback') {
+			my $received_state = $request->url->query->param('state');
 			if ($received_state ne $state) {
-				$sock->send_error(400, 'Invalid state');
-				next;
-			}
-
-			if (my $error = $request->uri->query_param('error')) {
-				my $message = $request->uri->query_param('error_description') // $error;
-				$sock->send_error(400, encode_entities($message));
-				croak term_escape($message);
-			}
-
-			my $code = $request->uri->query_param('code');
-			if (not defined $code) {
-				$sock->send_error(400, 'Missing code');
-				croak 'Missing code';
-			}
-
-			if ($self->{response_iss} and $request->uri->query_param('iss') ne $self->{issuer}) {
-				$sock->send_error(400, 'Incorrect issuer');
-				croak 'Incorrect issuer';
-			}
-
-			my $message = $options{message} // 'Authorization token received, you can close this now';
-			my $headers = HTTP::Headers->new;
-			$headers->header('content-type', $options{message_type}) if $options{message_type};
-			$sock->send_response(HTTP::Response->new(200, 'OK', $headers, $message));
-			close $sock;
-
-			my %arguments = (
-				grant_type    => 'authorization_code',
-				redirect_uri  => $redirect_uri,
-				code          => $code,
-				code_verifier => $code_verifier,
-			);
-			my %headers;
-			my $client_secret = $options{client_secret} // '';
-			if ($self->{auth_method} eq 'client_secret_post') {
-				$arguments{client_id} = $client_id;
-				$arguments{client_secret} = $client_secret;
-			}
-			elsif ($self->{auth_method} eq 'client_secret_post') {
-				my $auth = join ':', form_escape($client_id), form_escape($client_secret);
-				$headers{Authorization} = 'Basic ' . encode_base64($auth, '');
-			}
-			my $response = $tiny->post_form($self->{token_endpoint}, \%arguments, { headers => \%headers });
-			if ($response->{status} == 200) {
-				my $value = decode_json($response->{content});
-				return Browser::OIDC::TokenResponse->new(parent => $self, value => $value, nonce => $nonce);
+				$tx->res->code(400);
+				$tx->res->body('Invalid state');
+				$tx->resume;
+			} elsif ($self->{response_iss} and $request->url->query->param('iss') ne $self->{issuer}) {
+				$tx->res->code(400);
+				$tx->res->body('Incorrect issuer');
+				$tx->resume;
+			} elsif (my $error = $request->url->query->param('error')) {
+				my $message = $request->url->query->param('error_description') // $error;
+				$tx->res->code(400);
+				$tx->res->body(xml_escape($message));
+				$exception = term_escape($message);
+				$tx->on(finish => sub { $ioloop->stop });
+				$tx->resume;
+			} elsif (defined($code = $request->url->query->param('code'))) {
+				$tx->res->code(200);
+				$tx->res->headers->content_type($options{message_type}) if $options{message_type};
+				$tx->res->body($options{message} // 'Authorization token received, you can close this now');
+				$tx->on(finish => sub { $ioloop->stop });
+				$tx->resume;
 			} else {
-				croak "Could not get token ($response->{status}): " , term_escape($response->{content});
+				$tx->res->code(400);
+				$tx->res->body('Missing code');
+				$tx->resume;
+				return;
 			}
 		} else {
-			$sock->send_error(404);
-			close $sock;
+			$tx->res->code(400);
+			$tx->resume;
 		}
+	});
+	$daemon->start;
+
+	my ($port) = $daemon->ports->@*;
+	my $redirect_uri = "http://localhost:$port/auth/callback";
+	my $full_target = Mojo::URL->new($self->{authorization_endpoint});
+	$full_target->query->append(response_type => 'code');
+	$full_target->query->append(redirect_uri => $redirect_uri);
+	$full_target->query->append(client_id => $client_id);
+	my $code_verifier = encode_base64url(random_bytes(32));
+	$full_target->query->append(code_challenge => encode_base64url(sha256($code_verifier)));
+	$full_target->query->append(code_challenge_method => 'S256');
+	my @scope = 'openid';
+	push @scope, $options{scope}->@*  if $options{scope};
+	$full_target->query->append(scope => join ' ', @scope);
+	$full_target->query->append(state => $state);
+	my $nonce = exists $options{nonce} ? $options{nonce} : encode_base64url(random_bytes(32));
+	$full_target->query->append(nonce => $nonce) if defined $nonce;
+	for my $name (qw/display max_age/) {
+		$full_target->query->append($name => $options{$name}) if defined $options{$name};
+	}
+	$full_target->query->append(prompt => join ' ', $options{prompt}->@*) if defined $options{prompt};
+
+	my $timeout = $options{timeout} // 60;
+	my $timer = $ioloop->timer($timeout, sub {
+		$exception = 'Timeout';
+		$ioloop->stop;
+	});
+
+	my $ok = open_browser($full_target);
+	say "Could not open browser: please open $full_target manually" if not defined $ok or $ok != 0;
+
+	$ioloop->start;
+	$ioloop->remove($timer);
+	croak $exception if $exception;
+	croak 'No authorization code received' unless defined $code;
+
+	my %arguments = (
+		grant_type    => 'authorization_code',
+		redirect_uri  => $redirect_uri,
+		code          => $code,
+		code_verifier => $code_verifier,
+	);
+	my %headers;
+	my $client_secret = $options{client_secret} // '';
+	if ($self->{auth_method} eq 'client_secret_post') {
+		$arguments{client_id} = $client_id;
+		$arguments{client_secret} = $client_secret;
+	} elsif ($self->{auth_method} eq 'client_secret_basic') {
+		my $auth = join ':', form_escape($client_id), form_escape($client_secret);
+		$headers{Authorization} = 'Basic ' . encode_base64($auth, '');
+	} else {
+		$arguments{client_id} = $client_id;
+	}
+	my $response = $ua->post($self->{token_endpoint}, \%headers, form => \%arguments)->result;
+	if ($response->is_success) {
+		return Browser::OIDC::TokenResponse->new(parent => $self, value => $response->json, nonce => $nonce);
+	} else {
+		croak sprintf "Could not get token (%s): %s", $response->code , term_escape($response->body);
 	}
 }
 
@@ -169,17 +176,19 @@ sub issuer($self) {
 }
 
 sub claims_supported($self) {
-	return $self->{claims_supported}->@*;
+	return ($self->{claims_supported} // [])->@*;
 }
 
 sub scopes_supported($self) {
-	return $self->{scopes_supported}->@*;
+	return ($self->{scopes_supported} // [])->@*;
 }
 
 sub jwks($self) {
-	my $response = $tiny->get($self->{jwks_uri});
-	croak "Could not fetch JSON Web Key Set" if $response->{status} != 200;
-	return decode_json($response->{content});
+	return $self->{jwks} //= do {
+		my $response = $ua->get($self->{jwks_uri})->result;
+		croak "Could not fetch JSON Web Key Set" if not $response->is_success;
+		$response->json;
+	};
 }
 
 1;
@@ -294,7 +303,7 @@ This returns the list of supported scopes.
 
  my $keyset = $oidc->jwks;
 
-This returns a JSON Web Key Set as a hash, with keys as a arrayref of JWK entries.
+This fetches JSON Web Key Set for this OIDC provider, and returns it as a hash, with keys as a arrayref of JWK entries. This value will be cached.
 
 =head1 TODO
 

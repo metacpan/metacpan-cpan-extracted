@@ -1,5 +1,25 @@
 Revision history for Net-CardDAVTalk
 
+0.14    Thu Nov 12 2026
+  - INCOMPATIBLE: hrefs and paths are now returned unescaped, as
+    Net::CalDAVTalk's always have been (GetAddressBooks, GetContactLinks,
+    GetContactsMulti, GetContacts, SyncContactLinks, SyncContacts, and a
+    card's href and CPath).  Every method takes paths unescaped and
+    escapes them itself, so an href with a % in it came back as a 404 when
+    passed back; and the same resource no longer has two hrefs because a
+    server wrote '@' in one response and %40 in another (Google does).
+    Callers that stored hrefs should unescape them once.
+  - multiget bodies carry the escaped absolute href (GetContactsMulti,
+    GetContactAndProps, which sent a relative path as it was given)
+  - SyncContactLinks uses Net::DAVTalk's SyncCollection (requires
+    Net::DAVTalk 0.26), so a server's truncated sync results (RFC 6578
+    section 3.6) are followed to the end instead of one page being taken
+    for everything, with the truncation marker reported as an error
+  - SyncContactLinks dies on a response without a sync-token, as
+    SyncEventLinks does, instead of returning an undefined token
+  - in scalar context SyncContactLinks returns Added, as documented
+  - Makefile.PL listed Net::DAVTalk twice, so 0.08 was what it required
+  - no more bare "ODD STATUS" warnings: odd statuses are in Errors
 0.13    Thu Oct 15 2026
   - GetContactLinks: parse props inside DAV:propstat, so etags are
     returned and non-vCard resources and collections are skipped

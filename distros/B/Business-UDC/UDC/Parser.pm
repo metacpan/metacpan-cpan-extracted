@@ -13,7 +13,7 @@ use Readonly;
 
 Readonly::Array our @EXPORT_OK => qw(parse);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 sub parse {
 	my $input = shift;
@@ -305,7 +305,7 @@ sub _parse_expression {
 	while (my $tok = _peek($state_hr)) {
 		if (! is_operator_token($tok->{'type'})) {
 			if ($tok->{'type'} eq 'NUMBER') {
-				if (_time_ended_notation($left)) {
+				if (_term_ends_with_auxiliary($left)) {
 					err 'Missing operator.',
 					'position' => $tok->{'pos'},
 				;
@@ -400,7 +400,7 @@ sub _parse_expression {
 	return $left;
 }
 
-sub _time_ended_notation {
+sub _term_ends_with_auxiliary {
 	my $node = shift;
 
 	while ($node && $node->{'type'} eq 'BINARY_OP') {
@@ -408,7 +408,8 @@ sub _time_ended_notation {
 	}
 	return if ! $node || $node->{'type'} ne 'TERM';
 	return if ! $node->{'modifiers'} || ! @{$node->{'modifiers'}}
-		|| $node->{'modifiers'}[-1]{'type'} ne 'AUX_TIME';
+		|| $node->{'modifiers'}[-1]{'type'} ne 'AUX_TIME'
+		&& $node->{'modifiers'}[-1]{'type'} ne 'AUX_GROUP';
 
 	return 1;
 }

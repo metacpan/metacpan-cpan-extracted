@@ -1,0 +1,221 @@
+[
+    {
+        "description": "an empty response",
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response/>\n"
+    },
+    {
+        "description": "text in an element",
+        "children": [
+            {
+                "name": "Say",
+                "value": "Hello"
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say>Hello</Say></Response>\n"
+    },
+    {
+        "description": "attributes",
+        "children": [
+            {
+                "name": "Say",
+                "value": "Hola",
+                "attributes": {
+                    "voice": "alice",
+                    "language": "es-MX",
+                    "loop": "2"
+                }
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say language=\"es-MX\" loop=\"2\" voice=\"alice\">Hola</Say></Response>\n"
+    },
+    {
+        "description": "attributes are sorted",
+        "children": [
+            {
+                "name": "Dial",
+                "attributes": {
+                    "timeout": "20",
+                    "action": "/a",
+                    "Zed": "1"
+                }
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Dial Zed=\"1\" action=\"/a\" timeout=\"20\"/></Response>\n"
+    },
+    {
+        "description": "an element with no content",
+        "children": [
+            {
+                "name": "Hangup"
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Hangup/></Response>\n"
+    },
+    {
+        "description": "empty text",
+        "children": [
+            {
+                "name": "Say",
+                "value": ""
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say></Say></Response>\n"
+    },
+    {
+        "description": "nesting",
+        "children": [
+            {
+                "name": "Gather",
+                "attributes": {
+                    "input": "dtmf"
+                },
+                "children": [
+                    {
+                        "name": "Say",
+                        "value": "Press one"
+                    },
+                    {
+                        "name": "Pause",
+                        "attributes": {
+                            "length": "1"
+                        }
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Gather input=\"dtmf\"><Say>Press one</Say><Pause length=\"1\"/></Gather></Response>\n"
+    },
+    {
+        "description": "text between elements",
+        "children": [
+            {
+                "name": "Say",
+                "value": "Before ",
+                "children": [
+                    {
+                        "name": "emphasis",
+                        "value": "this"
+                    },
+                    " after"
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say>Before <emphasis>this</emphasis> after</Say></Response>\n"
+    },
+    {
+        "description": "text beside the response",
+        "children": [
+            "Plain text",
+            {
+                "name": "Hangup"
+            },
+            "More"
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response>Plain text<Hangup/>More</Response>\n"
+    },
+    {
+        "description": "escaping in text",
+        "children": [
+            {
+                "name": "Say",
+                "value": "a & b < c > d \"e\" 'f'"
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say>a &amp; b &lt; c &gt; d \"e\" 'f'</Say></Response>\n"
+    },
+    {
+        "description": "entities are not read in text",
+        "children": [
+            {
+                "name": "Say",
+                "value": "&amp; &#10; &lt;"
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say>&amp;amp; &amp;#10; &amp;lt;</Say></Response>\n"
+    },
+    {
+        "description": "escaping in attributes",
+        "children": [
+            {
+                "name": "Redirect",
+                "attributes": {
+                    "url": "https://a.test/?a=1&b=<2>",
+                    "note": "\"q\" 'r'"
+                }
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Redirect note=\"&quot;q&quot; 'r'\" url=\"https://a.test/?a=1&amp;b=&lt;2&gt;\"/></Response>\n"
+    },
+    {
+        "description": "white space in text",
+        "children": [
+            {
+                "name": "Say",
+                "value": " a\tb\nc\rd "
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say> a\tb\nc&#13;d </Say></Response>\n"
+    },
+    {
+        "description": "white space in attributes",
+        "children": [
+            {
+                "name": "Say",
+                "attributes": {
+                    "note": " a\tb\nc\rd "
+                }
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say note=\" a&#9;b&#10;c&#13;d \"/></Response>\n"
+    },
+    {
+        "description": "non-ASCII text",
+        "children": [
+            {
+                "name": "Say",
+                "value": "código ñandú 日本語 😀",
+                "attributes": {
+                    "note": "acción"
+                }
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Say note=\"acción\">código ñandú 日本語 😀</Say></Response>\n"
+    },
+    {
+        "description": "deep nesting",
+        "children": [
+            {
+                "name": "A",
+                "children": [
+                    {
+                        "name": "B",
+                        "children": [
+                            {
+                                "name": "C",
+                                "children": [
+                                    {
+                                        "name": "D"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><A><B><C><D/></C></B></A></Response>\n"
+    },
+    {
+        "description": "names with punctuation",
+        "children": [
+            {
+                "name": "ns:Thing",
+                "attributes": {
+                    "xml:lang": "es",
+                    "interpret-as": "date"
+                }
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><ns:Thing interpret-as=\"date\" xml:lang=\"es\"/></Response>\n"
+    }
+]

@@ -25,7 +25,7 @@ Version 0.13
 
 =cut
 
-our $VERSION = '0.13';
+our $VERSION = '0.14';
 
 our $BATCHSIZE = 100;
 
@@ -232,7 +232,7 @@ sub GetAddressBooks {
   my $NS_D = $Self->ns('D');
   my $NS_CY = $Self->ns('CY');
   foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-    my $HRef = $Response->{"{$NS_D}href"}{content}
+    my $HRef = uri_unescape($Response->{"{$NS_D}href"}{content} // '')
       || next;
     my $Path = $Self->_unrequest_url($HRef);
 
@@ -428,7 +428,7 @@ sub GetContactAndProps {
         x('C:address-data'),
         map { x(join ":", @$_) } @$Props,
       ),
-      x('D:href', $CPath),
+      x('D:href', $Self->request_href($CPath)),
     ),
     Depth => '0',
   );
@@ -506,7 +506,7 @@ sub GetContactLinks {
   my $NS_C = $Self->ns('C');
   my $NS_D = $Self->ns('D');
   foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-    my $href = $Response->{"{$NS_D}href"}{content};
+    my $href = uri_unescape($Response->{"{$NS_D}href"}{content} // '');
     next unless $href;
 
     # Gather all the properties the server found, which may be split
@@ -562,7 +562,7 @@ sub GetContactsMulti {
           x('C:address-data'),
           map { x(join ":", @$_) } @$Props,
         ),
-        map { x('D:href', $_) } @urls,
+        map { x('D:href', $Self->request_href($_)) } @urls,
       ),
       Depth => '0',
     );
@@ -570,7 +570,7 @@ sub GetContactsMulti {
     my $NS_C = $Self->ns('C');
     my $NS_D = $Self->ns('D');
     foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-      my $href = $Response->{"{$NS_D}href"}{content};
+      my $href = uri_unescape($Response->{"{$NS_D}href"}{content} // '');
       next unless $href;
       foreach my $Propstat (@{$Response->{"{$NS_D}propstat"} || []}) {
         my $etag = $Propstat->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content} || '';
@@ -615,14 +615,18 @@ sub SyncContacts {
 =head2 $self->SyncContactLinks($Path, %Args)
 
 uses the argument 'syncToken' to find newly added and removed
-cards from the server.
+cards from the server (without one, every card is reported as added).
 
 Returns a list of:
 
-* Hash of href to etag for added/changed cargs
+* Hash of href to etag for added/changed cards
 * List of href of removed cards
 * List of errors
 * Scalar value of new syncToken
+
+and in scalar context just the hash.  See Net::DAVTalk's SyncCollection,
+which follows a server's truncated responses (RFC 6578 section 3.6), so
+one call gets every change, and dies if the server gives no sync-token.
 
 =cut
 
@@ -631,66 +635,7 @@ sub SyncContactLinks {
 
   $Path || confess "Sync contacts path required";
 
-  # WebDAV Collection Synchronization (RFC6578)
-  my $Response = $Self->Request(
-    'REPORT',
-    "$Path/",
-    x('D:sync-collection', $Self->NS(),
-      x('D:sync-token', ($Args{syncToken} ? ($Args{syncToken}) : ())),
-      x('D:sync-level', 1),
-      x('D:prop',
-        x('D:getetag'),
-      ),
-    ),
-  );
-
-  my (%Added, @Removed, @Errors);
-
-  my $NS_C = $Self->ns('C');
-  my $NS_D = $Self->ns('D');
-  foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-    my $href = $Response->{"{$NS_D}href"}{content}
-      || next;
-
-    # For members that have been removed, the DAV:response MUST
-    # contain one DAV:status with a value set to '404 Not Found' and
-    # MUST NOT contain any DAV:propstat element
-    if (!$Response->{"{$NS_D}propstat"}) {
-      my $Status = $Response->{"{$NS_D}status"}{content} // '';
-      if ($Status =~ m/ 404 /) {
-        push @Removed, $href;
-      } else {
-        warn "ODD STATUS";
-        push @Errors, "Odd status in non-propstat response $href: $Status";
-      }
-      next;
-    }
-
-    # For members that have changed (i.e., are new or have had their
-    # mapped resource modified), the DAV:response MUST contain at
-    # least one DAV:propstat element and MUST NOT contain any
-    # DAV:status element.
-    foreach my $Propstat (@{$Response->{"{$NS_D}propstat"} || []}) {
-      my $Status = $Propstat->{"{$NS_D}status"}{content} // '';
-
-      if ($Status =~ m/ 200 /) {
-        my $etag = $Propstat->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content};
-        $Added{$href} = $etag;
-      }
-      elsif ($Status =~ m/ 404 /) {
-        # Missing properties return 404 status response, ignore
-
-      }
-      else {
-        warn "ODD STATUS";
-        push @Errors, "Odd status in propstat response $href: $Status";
-      }
-    }
-  }
-
-  my $SyncToken = $Response->{"{$NS_D}sync-token"}{content};
-
-  return (\%Added, \@Removed, \@Errors, $SyncToken);
+  return $Self->SyncCollection($Path, %Args);
 }
 
 =head2 $self->MoveContact($Path, $NewPath)
@@ -726,6 +671,7 @@ sub _ParseReportData {
 
   my $HRef = $Response->{"{$NS_D}href"}{content}
     // return;
+  $HRef = uri_unescape($HRef);
   my $CPath = $Self->_unrequest_url($HRef);
 
   my $Data = $Propstat->{"{$NS_D}prop"}{"{$NS_C}address-data"}{content}

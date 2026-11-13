@@ -1,3 +1,127 @@
+0.100  2026-11-12 20:03:07 CET
+   - Release after 54 PASSes in CPAN Testers (thanks!).
+
+0.099001  2026-11-12 08:40:12 CET
+   - Same as 0.099-TRIAL, plus:
+   - Model::SAML2 requires Net::SAML2 0.86: older versions silently
+     skip the check on the Issuer of the assertion. SAML2 tests skip
+     with older versions
+   - Tests use the cheapest Argon2 settings where the cost of password
+     checks is not under test (slow testers hit timeouts), and no
+     longer warn about experimental signatures on perl < 5.36
+
+0.099  2026-11-11 22:35:17 CET
+   BREAKING CHANGES
+   - Account records use key "username" instead of "name" (Model::Hash
+     input and save_user, Model::Db default username_column), and
+     load_user_by_name is now load_user_by_username (Role::Local)
+   - The user identifier kept in the session is now "provider/uid", so
+     that users stay tied to the provider that authenticated them;
+     sessions from previous versions are considered logged out
+   - Every provider must implement handles_username. The first provider
+     (in the order given) that claims a username owns it, and only the
+     owner validates credentials for it. A SAML2 provider with default
+     settings claims every username, so it shadows any provider after it
+   - Every refused credentials login throws the same 401 (wrong
+     password, unknown username, owner taking no credentials), instead
+     of letting later providers try
+   - Every provider with load_user must implement tamed_user_record,
+     returning what may reach current_user; the Model checks this at
+     construction and gives out a deep copy (records must be plain
+     data). Role::Local leaves out key_for_secret ("secret" by default)
+     and protected_keys; providers' own load_user still return them
+   - Remaps can neither read nor change the protected keys: to keep the
+     hash in a column not named "secret", set key_for_secret instead of
+     remapping it
+   - Model::SAML2 has no validate_user any more: SAML2 users only log
+     in through the IdP
+   - encode_name and decode_name are functions in
+     MojoX::Authentication::Util, no longer Model methods
+   - Model::SAML2 cache keys include the provider name: users cached by
+     a previous version must log in again
+   - The Model writes each provider's name (the one given in the hash
+     form, or unnamed-N) into the provider, so name is now read-write in
+     Model::Hash, Model::Db and Model::SAML2. A custom provider with a
+     name method must accept being renamed, or the Model throws a 400
+   - ctr_credentials_login and ctr_logout require a valid CSRF token
+     (csrf_token parameter, e.g. %= csrf_field in the form, or the
+     X-CSRF-Token header): forms without it can no longer log in or out
+   - Require Mojolicious 9.20 and Mojolicious::Plugin::Authentication
+     1.39. Net::SAML2 and MojoX::MojoDbWrap are now optional
+     (recommended), the latter in version 0.100 or later
+
+   SECURITY
+   - With secrets_are_cleartext, records without a secret got the hash
+     of an empty password, so anyone could log in with an empty one
+   - The same uid in two providers (e.g. local and SAML2) gave whoever
+     came first, on every request
+   - SAML2 request ids are single use, so a SAMLResponse cannot be
+     replayed
+   - Response times no longer tell known usernames from unknown ones:
+     every attempt costs one password check
+   - Accounts without a secret (or with an empty one) were refused at
+     once, without checking any password, so response times told that
+     they exist: they now cost one password check too. To disable an
+     account, empty its secret instead of writing a marker (e.g. "!")
+   - The stored password hash is no longer written to the log (trace
+     level) after a successful login
+   - Remaps could leave the password hash under another key (e.g. the
+     "userpass" column remapped to "secret"), or copy it out of
+     "secret", and so expose it in current_user, templates and logs
+   - Two SAML2 providers sharing a cache (e.g. the same database table)
+     shared its entries: a user of one IdP could get the attributes of
+     a user with the same NameID at the other, and a logout through one
+     wiped the other's user
+   - SAML2 assertions are refused unless their Issuer is the IdP's
+     entityID: only the signature was checked, so another issuer holding
+     the same signing key (e.g. another tenant of a multi-tenant IdP
+     platform) could log anybody in
+   - SAML2 assertions without a NameID (or with an empty one) are
+     refused: all such users shared one session id and one cache entry,
+     each seeing the data of whoever logged in last
+   - Usernames from the login form and user identifiers from the IdP
+     were logged verbatim, so a newline in them could forge log lines:
+     characters outside printable ASCII are now logged as \x{..}
+   - Refused SAML2 responses were logged with the error that refused
+     them, verbatim: text outside the part signed by the IdP (e.g. the
+     status) could forge log lines, and a stack trace could write the
+     whole response (megabytes) to the log at the error level. The
+     error line is now escaped and cut; the full message goes to trace
+   - The credentials login and the logout had no CSRF protection: a
+     hostile page could log the user in as somebody else (login CSRF)
+     or log them out
+   - SAML2 caches purge expired entries, so abandoned logins (or anybody
+     looping over the login route) no longer grow memory or tables
+     without limit
+
+   FIXES
+   - The default "not_ok" route was misspelled
+   - Use the object's provider_name; ctr_logout logs the user and always
+     redirects when asked to
+   - Model::load_user returns nothing for unknown users
+   - Model::Hash never modifies the db it is given and rejects invalid
+     input; Model::Db works with MojoX::MojoDbWrap 0.100
+   - SAML2: request_ttl is honoured, cache keys use user_key, logout
+     wipes the right user, no temporary file is leaked
+   - SAML2: error statuses from the IdP are reported as 403 naming the
+     status, and the idp can be given as an XML string
+   - The SAML2 welcome message falls back to the uid
+   - Fix the example application; its comments warn that its secret and
+     SP key are public, so real applications must set their own
+
+   OTHER
+   - A provider given as { instance => ... } gets that hash as second
+     argument of update_from_config, to pick parameters meant for it
+   - Model::Hash and Model::Db save_user share Role::Local's user_for_save
+   - Documentation: fix the op/backwards_op names in Role::Remap's
+     example; owner rules, user identifiers, rate limiting of the
+     credentials login route, SAML2::Hash only suiting single-process
+     applications (use a shared cache with hypnotoad or prefork),
+     the format of SAML2 remaps (the one of Role::Remap)
+   - Many more tests, including offline signed SAML2 responses and an
+     optional live round trip against mocksaml.com (MOCKSAML=1)
+   - Remove dead code and unused imports
+
 0.010  2026-11-01 21:53:32 CET
    - Minor housekeeping
    - Make sure to set the name if it's in the candidate provider hashref

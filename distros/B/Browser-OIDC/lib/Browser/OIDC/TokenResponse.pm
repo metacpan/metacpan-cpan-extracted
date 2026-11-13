@@ -5,9 +5,9 @@ use warnings;
 use experimental qw/signatures postderef lexical_subs/;
 
 use Carp;
-use MIME::Base64 'decode_base64';
+use Mojo::Util 'term_escape';
 
-our $VERSION = '0.003';
+our $VERSION = '0.004';
 
 sub new($class, %options) {
 	return bless {
@@ -31,9 +31,9 @@ sub userinfo($self) {
 	my $parent = $self->{parent};
 	my $url = $parent->{userinfo_endpoint} // croak 'No userinfo URL';
 	my $authorization = join ' ', $self->{value}{token_type}, $self->{value}{access_token};
-	my $response = $parent->{tiny}->get($parent->{userinfo_endpoint}, { headers => { Authorization => $authorization }});
-	croak "Could not fetch userinfo ($response->{status})" if $response->{status} != 200;
-	return $response->{content};
+	my $response = $parent->{ua}->get($parent->{userinfo_endpoint}, { Authorization => $authorization })->result;
+	croak "Could not fetch userinfo " . term_escape($response->message) if not $response->is_success;
+	return $response->json;
 }
 
 1;
@@ -69,3 +69,7 @@ The type of the token. This will usually be C<'bearer'>.
 =head2 nonce
 
 The nonce used for the token request.
+
+=head2 userinfo
+
+This fetches the userinfo associated with the access token.

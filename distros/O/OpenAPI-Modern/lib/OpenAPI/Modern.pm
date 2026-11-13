@@ -1,10 +1,10 @@
 use strictures 2;
-package OpenAPI::Modern; # git description: v0.151-8-g59a8302e
+package OpenAPI::Modern; # git description: v0.152-3-gf1035867
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate HTTP requests and responses against an OpenAPI v3.0, v3.1 or v3.2 document
 # KEYWORDS: validation evaluation JSON Schema OpenAPI v3.0 v3.1 v3.2 Swagger HTTP request response
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 
 use 5.020;
 use utf8;
@@ -2513,7 +2513,7 @@ OpenAPI::Modern - Validate HTTP requests and responses against an OpenAPI v3.0, 
 
 =head1 VERSION
 
-version 0.152
+version 0.153
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2725,7 +2725,7 @@ C<< ->entry_document->schema >>.
 Ignored if L</documents> is provided, otherwise required.
 
 The use of this as an accessor is B<deprecated>; instead use C<< $openapi->entry_document->schema >>
-(See L<JSON::Schema::Modern::Document::OpenAPI/schema>.)
+(See L<JSON::Schema::Modern::Document::OpenAPI/schema>).
 
 =head2 openapi_document
 
@@ -2741,11 +2741,12 @@ L</entry_document> as an accessor.
 =head2 openapi_documents
 
 The list of OpenAPI documents that was provided to the constructor in L</documents>.
+See also L</documents> for the list of all documents, including JSON Schemas.
 
 =head2 entry_document
 
 The OpenAPI document used to search for APIs (under C</paths>); this is the first item in the
-L</openapi_documents> list.
+L</openapi_documents> and L</documents> lists.
 
 =head2 validate_request
 
@@ -2787,7 +2788,7 @@ C<instanceLocation>s in errors in the Result object):
     request => {
       uri => {
         server => {
-          <server variable name> => <value from the scheme, host or path portion of the URI>,
+          <server variable name> => <value from part of the URI scheme, host or path>,
           ...,
         },
         path => {
@@ -2795,17 +2796,17 @@ C<instanceLocation>s in errors in the Result object):
           ...,
         },
         query => {
-          <query parameter name> => <deserialized data from part of the querystring portion of the URI>,
+          <query parameter name> => <deserialized data from part of the URI querystring>,
           ...,
           OR
-          <deserialized data from the entire querystring portion of the URI>,
+          <deserialized data from the entire URI querystring>,
         },
       },
       header => {
-        <header name> => <deserialized data from header(s)>,
+        <header name> => <deserialized data from request header(s)>,
         ...,
         Cookie => {
-          <cookie parameter name> => <deserialized data from (a portion of) the Cookie header>,
+          <cookie parameter name> => <deserialized data from (a portion of) the Cookie request header>,
           ...,
         },
       },
@@ -2814,7 +2815,7 @@ C<instanceLocation>s in errors in the Result object):
           <for multipart media-types, an arrayref of headers, one element per part, possibly nested,
           in the same order as the body parts from the original message>
         ],
-        content => <deserialized data from body; can be any type>,
+        content => <deserialized data from the request body; can be any type>,
       },
     },
   }
@@ -2867,15 +2868,15 @@ C<instanceLocation>s in errors in the Result object):
   {
     response => {
       header => {
-        <header name> => <deserialized data from header(s)>,
+        <header name> => <deserialized data from response header(s)>,
         ...,
       },
       body => {
         header => [
-          <for multipart media-types, an arrayref of headers, one element per part, possibly nested,
-          in the same order as the body parts from the original message>
+          <for multipart media-types, an arrayref of message part headers, one element per part,
+          possibly nested, in the same order as the body parts from the original message>
         ],
-        content => <deserialized data from body; can be any type>,
+        content => <deserialized data from the response body; can be any type>,
       },
     },
   }
@@ -2925,14 +2926,15 @@ C<path_captures>: a hashref mapping placeholders in the path template to their l
 =back
 
 All values are optional, and will be derived from each other as needed (albeit less
-efficiently than if they were provided). All passed-in values MUST be consistent with each other and
+efficiently than if they were provided). All provided values MUST be consistent with each other and
 the request or the return value from this method is false and appropriate errors will be included
 in the C<$options> hash.
 
-When successful, the options hash will be populated (or updated) with all the above keys,
+When successful, the options hash will be populated (or updated) with all the above values,
 and the return value is true.
 When not successful, the options hash will be populated with key C<errors>, an arrayref containing
-a L<JSON::Schema::Modern::Error> object, and the return value is false.
+a L<JSON::Schema::Modern::Error> object, and the return value is false (as well as any other values
+that were able to be determined from the originally-provided values).
 
 In addition, these values are also populated in the options hash (when available):
 
@@ -2961,11 +2963,13 @@ C<debug>: when C<$OpenAPI::Modern::DEBUG> or L</debug> is set on the OpenAPI::Mo
 
 =over 4
 
-=item *
 
-C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI, in match order
 
 =back
+
+=item *
+
+C<uri_patterns>: an arrayref of patterns that were attempted to be matched against the URI, in order of application
 
 =back
 
@@ -2996,7 +3000,9 @@ prepending C<#> and url-encoding it, e.g. C<< Mojo::URL->new->fragment($jsonp) >
 
 =head2 document_get
 
-  my $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}~1bar~1%7Bbar_id%7D/post/parameters/0');
+  $parameter_data = $openapi->document_get('/paths/~1foo~1{foo_id}~1bar~1{bar_id}/post/parameters/0');
+  # or:
+  $parameter_data = $openapi->document_get(jsonp(qw(/paths/ foo/{foo_id} bar/{bar_id} post parameters 0)));
 
 Fetches the portion of the main OpenAPI document located at the provided JSON pointer.
 Proxies to L<JSON::Schema::Modern::Document::OpenAPI/get>.

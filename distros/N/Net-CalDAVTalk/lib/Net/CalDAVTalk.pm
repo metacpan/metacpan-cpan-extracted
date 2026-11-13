@@ -317,7 +317,7 @@ Version 0.16
 
 =cut
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 
 =head1 SYNOPSIS
@@ -923,7 +923,7 @@ sub GetEventsMulti {
           x('D:getetag'),
           @Annotations,
         ),
-        map { x('D:href', $_) } @urls,
+        map { x('D:href', $Self->request_href($_)) } @urls,
 
       ),
       Depth => 1,
@@ -1182,11 +1182,13 @@ fetch changes since that token (obtained from an earlier GetCalendars
 or SyncEvent* call).
 
 In scalar context still just returns Added, in list context returns
-Added, Removed, Errors and new token:
+Added, Removed, Errors and new token (see Net::DAVTalk's SyncCollection,
+which follows a server's truncated responses, RFC 6578 section 3.6, so
+one call gets every change):
 
 * Added: hash of href to etag - added or changed
 * Removed: array of href
-* Errors: array of descritive string
+* Errors: array of descriptive strings
 * NewToken: scalar opaque DAV:sync-token
 
 e.g.
@@ -1201,48 +1203,7 @@ sub SyncEventLinks {
 
   confess "Need a calendarId" unless $calendarId;
 
-  my $Response = $Self->Request(
-    'REPORT',
-    "$calendarId/",
-    x('D:sync-collection', $Self->NS(),
-      x('D:sync-token', ($Args{syncToken} ? ($Args{syncToken}) : ())),
-      x('D:sync-level', 1),
-      x('D:prop',
-        x('D:getetag'),
-      ),
-    ),
-  );
-
-  my $NS_A = $Self->ns('A');
-  my $NS_C = $Self->ns('C');
-  my $NS_D = $Self->ns('D');
-
-  my $SyncToken = $Response->{"{$NS_D}sync-token"}{content};
-  confess "NO SYNC TOKEN RETURNED " . Dumper($Response) unless $SyncToken;
-
-  my (%Added, @Removed, @Errors);
-  foreach my $Response (@{$Response->{"{$NS_D}response"} || []}) {
-    my $href = uri_unescape($Response->{"{$NS_D}href"}{content} // '');
-    next unless $href;
-
-    unless ($Response->{"{$NS_D}propstat"}) {
-      push @Removed, $href;
-      next;
-    }
-
-    foreach my $Propstat (@{$Response->{"{$NS_D}propstat"} || []}) {
-      my $status = $Propstat->{"{$NS_D}status"}{content};
-      if ($status =~ m/ 200 /) {
-        my $etag = $Propstat->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content};
-        $Added{$href} = $etag;
-      }
-      else {
-        push @Errors, "Odd status $status";
-      }
-    }
-  }
-
-  return (\%Added, \@Removed, \@Errors, $SyncToken);
+  return $Self->SyncCollection($calendarId, %Args);
 }
 
 =head2 $self->NewEvent($calendarId, $Args)

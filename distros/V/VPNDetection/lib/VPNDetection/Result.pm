@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.13.1';
+our $VERSION = '3.13.2';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
@@ -36,8 +36,11 @@ my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKE
 sub from_wire {
     my ($class, $body) = @_;
     my %answer = (ip => $body->{ip}, is_bogon => 0);
+    # A served null stays undef, as a detail's does: read as 0 it would say the
+    # address is no hosting server, or that the trial lasts, when nothing was said.
     for my $flag (@FLAGS, @MARKERS) {
-        $answer{$flag} = $body->{$flag} ? 1 : 0 if exists $body->{$flag};
+        next unless exists $body->{$flag};
+        $answer{$flag} = defined $body->{$flag} ? ($body->{$flag} ? 1 : 0) : undef;
     }
     for my $detail (@DETAILS, @OBJECTS) {
         $answer{$detail} = $body->{$detail} if exists $body->{$detail};

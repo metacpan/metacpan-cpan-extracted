@@ -1,3 +1,72 @@
+Thu Nov 12 11:46:02 2026  Rob Lauer  <rclauer@gmail.com>
+	[2.1.3]:
+	* VERSION: bump
+	* lib/Amazon/S3/Constants.pm.in
+	(%CHECKSUM_TYPES)
+	- crc32 digest: wrap raw integer with `pack 'L>'` to return four big-endian bytes
+	* t/08-checksums.t
+	- add subtest 'verify crc32 checksum': confirms digest returns `cbf43926` for '123456789' and that `_verify_checksums` accepts the matching base64 value
+	* requires
+	- -CLI::Simple::Constants 2.2.3
+	- -CLI::Simple::Utils 2.2.3
+	- -URI::Escape 5.37
+	* cpanfile
+	- -CLI::Simple::Constants 2.2.3
+	- -CLI::Simple::Utils 2.2.3
+	- -URI::Escape 5.37
+	* Makefile: updated by CPAN::Maker::Bootstrapper
+	- add GNU Make 4.3 grouped-target guard
+	- introduce `build-config.mk` via `cmb create-build-config`; include after bootstrap check
+	- add `lc` function; lowercase CMB_UPDATE_CHECK/CMB_VERSION_DRIFT for case-insensitive comparison
+	- add `RENDERED_SOURCE_FILES`, `TARBALL_ORDER_ONLY_PREREQS`, `DARKPAN_REQUIRES/URL` variables
+	- syntax-check and POD-check sentinels (`PERL_CHECKED_FILES`) added as order-only tarball prereqs
+	- `cpanfile.runtime` avoids rewriting unchanged file via `cmp -s`
+	- dependency scan writes to tmpdir and skips rewrite if unchanged
+	- `provides` avoids rewriting unchanged file
+	- `requires.reconciled` grouped target replaces per-file `%: %.raw` pattern
+	- `quick` target also disables PODCHECKER; add `real-quick` target (also disables SYNTAX_CHECKING)
+	- remove `workflow`, `build-ci`, `test`, `check` targets from Makefile; builder script now takes project dir
+	- `extra-files`: skip git ls-files check when not in a git repo
+	- `CLEANFILES` adds `*.reconciled`, `*.rendered`, `build-config.mk`, individual `cpanfile.*` entries
+	- `include extra-files.mk` changed to `-include`
+	* .includes/perl.mk: updated by CPAN::Maker::Bootstrapper
+	- remove per-tool variable resolution via `CPAN::Maker::ConfigReader`; `SYNTAX_CHECKING` defaults to `on`
+	- `tidy_on`/`critic_on` simplified: enabled when LINT not off and tool binary found
+	- `scan_on` added; `scan_on` guards `requires.raw` grouped recipe
+	- POD extraction split into static `ifeq` pattern rules (`%.pm: %.pm.rendered`) replacing shell `run_podextract`
+	- syntax check and POD check separated into `%.pm.checked`/`%.pl.checked` sentinel rules; `check_pod` defined as named snippet
+	- `check_syntax_pm`/`check_syntax_pl` now reference `$<` instead of `$@`
+	- tidy and critic rules converted to grouped targets (`&:`) over all modules at once, delegating to `$(BOOTSTRAPPER) perltidy/perlcritic --file-list`
+	- `%.pm` rendered via grouped `&:` rule calling `$(BOOTSTRAPPER) resolve-vars --vars-file --file-list` on stale sources only
+	- `deps.mk` changed from `-include` to `include`; self-remake rule moved from Makefile to perl.mk
+	* .includes/local.mk: updated by CPAN::Maker::Bootstrapper
+	- add `CPM_CONFIG`/`CPM_CONFIG_ARGS` for optional `cpm --experimental-config`
+	- carton branch installs both runtime and test cpanfiles
+	- `mkdir -p local` added before `touch $@`
+	* .includes/update.mk: updated by CPAN::Maker::Bootstrapper
+	- `MANAGED_FILES` replaced by `MANAGED_MK_FILES` (glob from dist dir) and `MANAGED_SOURCE_FILES`
+	- `post-update` errors if managed file missing; copies Makefile from dist; `pre-update` hook added
+	- `update-available`: CMB_UPDATE_CHECK/CMB_VERSION_DRIFT comparison uses lowercased vars; delegates to `$(BOOTSTRAPPER) update-available` and `$(BOOTSTRAPPER) --path-only dist-file cmb_md5sums.txt`; invalid values now produce errors
+	* .includes/git.mk
+	- add `suggests`, `recommends` to `RECOMMENDED_ARTIFACTS`
+	- `git` target: prune `local/` directory in addition to `.git` during file enumeration
+	* .includes/help.mk
+	- SCAN help text: "disable distribution dependency scanning"
+	* .includes/release-notes.mk: deleted
+	* .includes/add-plugin.mk: new
+	* .includes/build-init.mk: new
+	* .includes/builder.mk: new
+	* .includes/test.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.mk: new
+	* .roles/CPAN-Maker-Bootstrapper-Role-LLM/role.yml: new
+	* builder: updated
+	- accept project directory as first argument (or use `pwd`); remove git clone/checkout logic
+	- source `builder.env` via `set -a`; auto-discover `.perltidyrc`/`.perlcriticrc` with `-quit`
+	- lint tool installation gated on `LINT=on` and presence of respective rc file
+	- build summary now includes `PROJECT_DIR` and `LINT`; output redirected to stderr
+	- run `make clean`, `make builder-pre`, `make`, `make builder-post` instead of single `make` with flags
+	* .gitignore
+	- add `!cpanfile.darkpan`, `*.reconciled`, `*.rendered`, `build-config.mk`, `deps.mk`, `release-*.{diffs,gz,lst,status}`
 Sun Sep 27 14:11:57 2026  Rob Lauer  <rclauer@gmail.com>
 
 	[2.1.2]:

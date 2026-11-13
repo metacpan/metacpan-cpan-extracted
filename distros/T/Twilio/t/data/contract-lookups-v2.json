@@ -1,0 +1,762 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "phone_numbers" : [
+      "a_phone_numbers"
+     ]
+    },
+    "fields" : [
+     [
+      "phone_numbers",
+      "phone_numbers",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "phone_numbers" : [
+    "v_phone_numbers"
+   ]
+  },
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "query",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateBulkLookup",
+  "json" : {
+   "phone_numbers" : [
+    "v_phone_numbers"
+   ]
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/batch/query"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "original_line_type" : "uan",
+     "overridden_by_account_sid" : "a_overridden_by_account_sid",
+     "overridden_line_type" : "tollFree",
+     "override_reason" : "a_override_reason",
+     "override_timestamp" : "2026-01-08T03:04:05Z",
+     "phone_number" : "a_phone_number"
+    },
+    "fields" : [
+     [
+      "original_line_type",
+      "original_line_type",
+      "plain"
+     ],
+     [
+      "overridden_by_account_sid",
+      "overridden_by_account_sid",
+      "plain"
+     ],
+     [
+      "overridden_line_type",
+      "overridden_line_type",
+      "plain"
+     ],
+     [
+      "override_reason",
+      "override_reason",
+      "plain"
+     ],
+     [
+      "override_timestamp",
+      "override_timestamp",
+      "date",
+      1767841445
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "line_type" : "uan",
+   "reason" : "v_reason"
+  },
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "lookup_overrides",
+    2
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateLookupPhoneNumberOverrides",
+  "json" : {
+   "line_type" : "uan",
+   "reason" : "v_reason"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/PhoneNumbers/id1/Overrides/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "lookup_overrides",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteLookupPhoneNumberOverrides",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/PhoneNumbers/id1/Overrides/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "bucket",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteLookupRateLimit",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/RateLimits/Fields/id1/Bucket/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "rate_limits" : [
+      "a_rate_limits"
+     ]
+    },
+    "fields" : [
+     [
+      "rate_limits",
+      "rate_limits",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "rate_limits",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Fields",
+    "v_fields_1"
+   ],
+   [
+    "Fields",
+    "v_fields_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchLookupAccountRateLimits",
+  "method" : "fetch",
+  "options" : {
+   "fields" : [
+    "v_fields_1",
+    "v_fields_2"
+   ]
+  },
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/RateLimits"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "original_line_type" : "uan",
+     "overridden_by_account_sid" : "a_overridden_by_account_sid",
+     "overridden_line_type" : "tollFree",
+     "override_reason" : "a_override_reason",
+     "override_timestamp" : "2026-01-08T03:04:05Z",
+     "phone_number" : "a_phone_number"
+    },
+    "fields" : [
+     [
+      "original_line_type",
+      "original_line_type",
+      "plain"
+     ],
+     [
+      "overridden_by_account_sid",
+      "overridden_by_account_sid",
+      "plain"
+     ],
+     [
+      "overridden_line_type",
+      "overridden_line_type",
+      "plain"
+     ],
+     [
+      "override_reason",
+      "override_reason",
+      "plain"
+     ],
+     [
+      "override_timestamp",
+      "override_timestamp",
+      "date",
+      1767841445
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "lookup_overrides",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchLookupPhoneNumberOverrides",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/PhoneNumbers/id1/Overrides/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "bucket" : "a_bucket",
+     "field" : "a_field",
+     "limit" : 543,
+     "owner" : "a_owner",
+     "ttl" : 340
+    },
+    "fields" : [
+     [
+      "bucket",
+      "bucket",
+      "plain"
+     ],
+     [
+      "field",
+      "field",
+      "plain"
+     ],
+     [
+      "limit",
+      "limit",
+      "plain"
+     ],
+     [
+      "owner",
+      "owner",
+      "plain"
+     ],
+     [
+      "ttl",
+      "ttl",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "bucket",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchLookupRateLimit",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/RateLimits/Fields/id1/Bucket/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "call_forwarding" : {
+      "a_call_forwarding" : 1
+     },
+     "caller_name" : {
+      "a_caller_name" : 1
+     },
+     "calling_country_code" : "a_calling_country_code",
+     "country_code" : "a_country_code",
+     "identity_match" : {
+      "a_identity_match" : 1
+     },
+     "line_status" : {
+      "a_line_status" : 1
+     },
+     "line_type_intelligence" : {
+      "a_line_type_intelligence" : 1
+     },
+     "national_format" : "a_national_format",
+     "phone_number" : "a_phone_number",
+     "phone_number_quality_score" : {
+      "a_phone_number_quality_score" : 1
+     },
+     "pre_fill" : {
+      "a_pre_fill" : 1
+     },
+     "reassigned_number" : {
+      "a_reassigned_number" : 1
+     },
+     "sim_swap" : {
+      "a_sim_swap" : 1
+     },
+     "sms_pumping_risk" : {
+      "a_sms_pumping_risk" : 1
+     },
+     "url" : "a_url",
+     "valid" : true,
+     "validation_errors" : [
+      "a_validation_errors"
+     ]
+    },
+    "fields" : [
+     [
+      "call_forwarding",
+      "call_forwarding",
+      "plain"
+     ],
+     [
+      "caller_name",
+      "caller_name",
+      "plain"
+     ],
+     [
+      "calling_country_code",
+      "calling_country_code",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "identity_match",
+      "identity_match",
+      "plain"
+     ],
+     [
+      "line_status",
+      "line_status",
+      "plain"
+     ],
+     [
+      "line_type_intelligence",
+      "line_type_intelligence",
+      "plain"
+     ],
+     [
+      "national_format",
+      "national_format",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "phone_number_quality_score",
+      "phone_number_quality_score",
+      "plain"
+     ],
+     [
+      "pre_fill",
+      "pre_fill",
+      "plain"
+     ],
+     [
+      "reassigned_number",
+      "reassigned_number",
+      "plain"
+     ],
+     [
+      "sim_swap",
+      "sim_swap",
+      "plain"
+     ],
+     [
+      "sms_pumping_risk",
+      "sms_pumping_risk",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid",
+      "valid",
+      "plain"
+     ],
+     [
+      "validation_errors",
+      "validation_errors",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Fields",
+    "v_fields"
+   ],
+   [
+    "CountryCode",
+    "v_country_code"
+   ],
+   [
+    "FirstName",
+    "v_first_name"
+   ],
+   [
+    "LastName",
+    "v_last_name"
+   ],
+   [
+    "AddressLine1",
+    "v_address_line1"
+   ],
+   [
+    "AddressLine2",
+    "v_address_line2"
+   ],
+   [
+    "City",
+    "v_city"
+   ],
+   [
+    "State",
+    "v_state"
+   ],
+   [
+    "PostalCode",
+    "v_postal_code"
+   ],
+   [
+    "AddressCountryCode",
+    "v_address_country_code"
+   ],
+   [
+    "NationalId",
+    "v_national_id"
+   ],
+   [
+    "DateOfBirth",
+    "v_date_of_birth"
+   ],
+   [
+    "LastVerifiedDate",
+    "v_last_verified_date"
+   ],
+   [
+    "VerificationSid",
+    "v_verification_sid"
+   ],
+   [
+    "PartnerSubId",
+    "v_partner_sub_id"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchPhoneNumber",
+  "method" : "fetch",
+  "options" : {
+   "address_country_code" : "v_address_country_code",
+   "address_line1" : "v_address_line1",
+   "address_line2" : "v_address_line2",
+   "city" : "v_city",
+   "country_code" : "v_country_code",
+   "date_of_birth" : "v_date_of_birth",
+   "fields" : "v_fields",
+   "first_name" : "v_first_name",
+   "last_name" : "v_last_name",
+   "last_verified_date" : "v_last_verified_date",
+   "national_id" : "v_national_id",
+   "partner_sub_id" : "v_partner_sub_id",
+   "postal_code" : "v_postal_code",
+   "state" : "v_state",
+   "verification_sid" : "v_verification_sid"
+  },
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/PhoneNumbers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "original_line_type" : "uan",
+     "overridden_by_account_sid" : "a_overridden_by_account_sid",
+     "overridden_line_type" : "tollFree",
+     "override_reason" : "a_override_reason",
+     "override_timestamp" : "2026-01-08T03:04:05Z",
+     "phone_number" : "a_phone_number"
+    },
+    "fields" : [
+     [
+      "original_line_type",
+      "original_line_type",
+      "plain"
+     ],
+     [
+      "overridden_by_account_sid",
+      "overridden_by_account_sid",
+      "plain"
+     ],
+     [
+      "overridden_line_type",
+      "overridden_line_type",
+      "plain"
+     ],
+     [
+      "override_reason",
+      "override_reason",
+      "plain"
+     ],
+     [
+      "override_timestamp",
+      "override_timestamp",
+      "date",
+      1767841445
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "line_type" : "uan",
+   "reason" : "v_reason"
+  },
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "lookup_overrides",
+    2
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PUT",
+  "id" : "UpdateLookupPhoneNumberOverrides",
+  "json" : {
+   "line_type" : "uan",
+   "reason" : "v_reason"
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/PhoneNumbers/id1/Overrides/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "bucket" : "a_bucket",
+     "field" : "a_field",
+     "limit" : 543,
+     "owner" : "a_owner",
+     "ttl" : 340
+    },
+    "fields" : [
+     [
+      "bucket",
+      "bucket",
+      "plain"
+     ],
+     [
+      "field",
+      "field",
+      "plain"
+     ],
+     [
+      "limit",
+      "limit",
+      "plain"
+     ],
+     [
+      "owner",
+      "owner",
+      "plain"
+     ],
+     [
+      "ttl",
+      "ttl",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "limit" : 543,
+   "ttl" : 340
+  },
+  "chain" : [
+   [
+    "lookups",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "bucket",
+    2
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PUT",
+  "id" : "UpdateLookupRateLimit",
+  "json" : {
+   "limit" : 543,
+   "ttl" : 340
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://lookups.twilio.com/v2/RateLimits/Fields/id1/Bucket/id2"
+ }
+]

@@ -10,7 +10,28 @@ TODO: https://github.com/ulfjack/ryu https://lemire.me/blog/2020/03/10/fast-floa
 
 TODO: validate_utf8, apparewntly some people confuse themselves.
 TODO: security considerations
+TODO: decode_av/hv can leak memory when exceptions through through.
 TODO: perl 5.36 has builtin::true/false/is_bool. Not sure how to integrate those.
+
+4.05 Fri 13 Nov 2026 05:21:06 CET
+	- the incremental parser would not properly reset parsing offset
+	  after removing a top-level number json number, causing memory
+	  corruption. this is potentially a very serious vulnerability.
+	  (reported by Albert Gierlach).
+	- the ignore initial whitespace optimisation in the incremental
+	  parser could result in the parser reading beyond the end of string,
+	  potentially leading to parsing errors or skipping json texts.
+        - FREEZE method calls could move the stack and cause a use-after-free.
+          requires allow_tags and a suitable FREEZE method to be exploited
+          (reported by Albert Gierlach).
+        - json_sv_grow would not allocate space for the trailing 0 byte.
+          possibly exploitable. (reported by Albert Gierlach).
+	- the incremental parser did not properly detect embedded NUL
+	  characters as an error (reported by Peter Juhasz and his LLM).
+	- string and object decoding failures could leak a partially
+	  constructed perl scalar (reported by Peter Juhasz).
+	- tag decoding ("(tag)value") ignored the recursion limit,
+	  potentially causing stack overflow (reported by Peter Juhasz).
 
 4.04 Fri 05 Sep 2025 23:59:48 CEST
         - fix heap overflow causing crashes, possibly information

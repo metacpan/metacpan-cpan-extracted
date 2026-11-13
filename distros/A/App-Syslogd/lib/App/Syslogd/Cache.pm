@@ -17,7 +17,7 @@ use Params::Get;
 use Params::Validate::Strict;
 use Readonly;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # Bytes charged for each entry on top of its key and value: a rough figure
 # for Perl's own bookkeeping (the hash entry, the small array, the queue
@@ -39,7 +39,7 @@ App::Syslogd::Cache - A small, fast in-memory cache with expiry and a size limit
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.002.1
 
 =head1 SYNOPSIS
 

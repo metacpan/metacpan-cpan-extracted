@@ -1,7 +1,7 @@
 use strict;
+use open IO => 'utf8', ':std';
 use Test::More 0.98;
 use utf8;
-use open IO => 'utf8', ':std';
 
 use Text::ANSI::Fold ':constants';
 
@@ -62,5 +62,15 @@ is(folded($_, width => 24), "「吾輩は猫である。」    ",       "[4]norm
 is(folded($_, width => 26), "「吾輩は猫である。」      ",       "[4]run-out(2)");
 is(folded($_, width => 28), "「吾輩は猫である。」        ",       "[4]run-out(4)");
 is(folded($_, width => 30), "「吾輩は猫である。」「（名    ", "[4]normal");
+
+# the third value of fold is the width of the folded text, including
+# what runs in to the margin
+{
+    my $f = Text::ANSI::Fold->new(width => 6, margin => 2,
+				  linebreak => LINEBREAK_ALL, runin => 2);
+    is(($f->fold("aaa"))[2], 3, "width with margin");
+    is(($f->fold("aaaaaaaa"))[2], 4, "width with margin (folded)");
+    is(($f->fold("ああ。いい"))[2], 6, "width with margin (run-in)");
+}
 
 done_testing;

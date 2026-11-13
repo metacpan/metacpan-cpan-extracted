@@ -363,6 +363,8 @@ subtest 'open_socket() failure' => sub {
 };
 
 subtest 'encapsulation is enforced outside the test harness' => sub {
+	# These package variables are set only here, which draws "used only once"
+	no warnings 'once';
 	local $Sub::Private::BYPASS = 0;
 	local $Sub::Protected::BYPASS = 0;
 	local $Sub::Private::config{harness_bypass} = 0;

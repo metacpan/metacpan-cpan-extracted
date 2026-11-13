@@ -218,23 +218,23 @@
    "provides" : {
       "JSON::Schema::Modern::Document::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Document/OpenAPI.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       },
       "JSON::Schema::Modern::Vocabulary::OpenAPI_3_0" : {
          "file" : "lib/JSON/Schema/Modern/Vocabulary/OpenAPI_3_0.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       },
       "OpenAPI::Modern" : {
          "file" : "lib/OpenAPI/Modern.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       },
       "OpenAPI::Modern::Utilities" : {
          "file" : "lib/OpenAPI/Modern/Utilities.pm",
-         "version" : "0.152"
+         "version" : "0.153"
       }
    },
    "release_status" : "stable",
@@ -249,7 +249,7 @@
          "web" : "https://github.com/karenetheridge/OpenAPI-Modern"
       }
    },
-   "version" : "0.152",
+   "version" : "0.153",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.045004"
@@ -1151,7 +1151,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.152",
+                  "tag" : "v0.153",
                   "tag_format" : "v%V",
                   "tag_message" : "v%v%t%n%n%c"
                },
@@ -1484,7 +1484,7 @@
       "Test::Mojo::Role::OpenAPI::Modern" : "< 0.007"
    },
    "x_generated_by_perl" : "v5.45.4",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.80",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.81",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later",
    "x_static_install" : 1,
    "x_use_unsafe_inc" : 0

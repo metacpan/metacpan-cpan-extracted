@@ -1,0 +1,136 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "created_by" : "a_created_by",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "members_count" : 1395,
+     "messages_count" : 1504,
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "public",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "members_count",
+      "members_count",
+      "plain"
+     ],
+     [
+      "messages_count",
+      "messages_count",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "chat",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "channels",
+    2
+   ]
+  ],
+  "expected" : [
+   [
+    "MessagingServiceSid",
+    "v_messaging_service_sid"
+   ],
+   [
+    "Type",
+    "public"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "UpdateChannel",
+  "method" : "update",
+  "options" : {
+   "messaging_service_sid" : "v_messaging_service_sid",
+   "type" : "public",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://chat.twilio.com/v3/Services/id1/Channels/id2"
+ }
+]

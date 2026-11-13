@@ -25,7 +25,6 @@ WriteMakefile(
 		'Carp' => 0,
 		'Encode' => 0,
 		'Exporter' => 0,
-		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 		'IO::Handle' => 0,
 		'List::Util' => 1.33,	# Minimum version for any()
 		'overload' => 0,
@@ -34,12 +33,6 @@ WriteMakefile(
 		'strict' => 0,
 		'warnings' => 0
 	}, TEST_REQUIRES => {
-		'File::Glob' => 0,
-		'File::Slurp' => 0,
-		'File::stat' => 0,
-		'IPC::Run3' => 0,
-		'IPC::System::Simple' => 0,
-		'JSON::MaybeXS' => 0,
 		'POSIX' => 0,
 		'Readonly' => 0,
 		'Test::Compile' => 0,
@@ -48,7 +41,6 @@ WriteMakefile(
 		'Test::Mockingbird' => 0.13,
 		'Test::Most' => 0,
 		'Test::Needs' => 0,
-		'Test::Warnings' => 0,
 	}, dist => $dist,
 	clean => { FILES => 'Params-Validate-Strict-*' },	# Clean up distribution files
 	META_MERGE => {	# https://perldoc.perl.org/CPAN::Meta::Spec

@@ -1,0 +1,305 @@
+{
+    "token": "12345",
+    "signatures": [
+        {
+            "description": "parameters",
+            "url": "https://mycompany.com/myapp.php?foo=1&bar=2",
+            "data": {
+                "CallSid": "CA1234567890ABCDE",
+                "Caller": "+14158675309",
+                "Digits": "1234",
+                "From": "+14158675309",
+                "To": "+18005551212"
+            },
+            "expected": "RSOYDt4T1cUTdK1PDd93/VVr8B8="
+        },
+        {
+            "description": "no parameters",
+            "url": "https://mycompany.com/myapp.php",
+            "data": {},
+            "expected": "ZEVhNTf/+0VuA9ofUWb9iscKI5Y="
+        },
+        {
+            "description": "keys are sorted",
+            "url": "https://a.test/x",
+            "data": {
+                "b": "1",
+                "a": "2",
+                "Z": "3",
+                "aa": "4"
+            },
+            "expected": "4xn9l2kpBs9ANE+GV5sbwPCJTgU="
+        },
+        {
+            "description": "several values, with a repeat",
+            "url": "https://a.test/x",
+            "data": {
+                "Tag": [
+                    "pear",
+                    "apple",
+                    "pear"
+                ],
+                "A": "1"
+            },
+            "expected": "r40aR3MtyWmPCjw6hQ0HLUJHsS8="
+        },
+        {
+            "description": "an empty value",
+            "url": "https://a.test/x",
+            "data": {
+                "A": "",
+                "B": "1"
+            },
+            "expected": "bko8pwYtP3rgl/Isp1qhz1oIZnw="
+        },
+        {
+            "description": "non-ASCII values",
+            "url": "https://a.test/é",
+            "data": {
+                "Body": "código 日本語 😀"
+            },
+            "expected": "ro7EsNMIOaa0RpUGo+bOnVuW0JY="
+        },
+        {
+            "description": "SHA-256",
+            "algorithm": "HMAC_SHA256",
+            "url": "https://mycompany.com/myapp.php?foo=1&bar=2",
+            "data": {
+                "From": "+14158675309",
+                "To": "+18005551212"
+            },
+            "expected": "ninjtKcKLHfrGF42TP88dBKFxs0dkR7Nv0K9z9dhlvc="
+        },
+        {
+            "description": "lower case algorithm",
+            "algorithm": "hmac_sha256",
+            "url": "https://a.test/x",
+            "data": {},
+            "expected": "ZlCLVkBzIkrn3RACGNXG1kCOFzlB9iuoDzZx3TILcvg="
+        }
+    ],
+    "validations": [
+        {
+            "description": "the same URL",
+            "signed": "https://mycompany.com/myapp.php?foo=1&bar=2",
+            "url": "https://mycompany.com/myapp.php?foo=1&bar=2",
+            "signature": "zYQTYrRWXE7LtzbG4PfP7/bkkGo=",
+            "expected": true
+        },
+        {
+            "description": "the request has a port and the signature does not",
+            "signed": "https://mycompany.com/myapp.php?foo=1&bar=2",
+            "url": "https://mycompany.com:1234/myapp.php?foo=1&bar=2",
+            "signature": "zYQTYrRWXE7LtzbG4PfP7/bkkGo=",
+            "expected": true
+        },
+        {
+            "description": "the same with http",
+            "signed": "http://mycompany.com/myapp.php?foo=1&bar=2",
+            "url": "http://mycompany.com:1234/myapp.php?foo=1&bar=2",
+            "signature": "Krz76qtZkHWPW2JOW2GXdAz6VQc=",
+            "expected": true
+        },
+        {
+            "description": "the signature has the default https port",
+            "signed": "https://mycompany.com:443/myapp.php?foo=1&bar=2",
+            "url": "https://mycompany.com/myapp.php?foo=1&bar=2",
+            "signature": "jXVB0bvuDtuuetr1sO+gqzen4fo=",
+            "expected": true
+        },
+        {
+            "description": "the signature has the default http port",
+            "signed": "http://mycompany.com:80/myapp.php?foo=1&bar=2",
+            "url": "http://mycompany.com/myapp.php?foo=1&bar=2",
+            "signature": "0uUCx7ak5PvF5kpZ38j80pisNjM=",
+            "expected": true
+        },
+        {
+            "description": "a custom port on both",
+            "signed": "https://mycompany.com:8443/x",
+            "url": "https://mycompany.com:8443/x",
+            "signature": "ufjXBYyDmYCud3bnEeV9pfn5f+U=",
+            "expected": true
+        },
+        {
+            "description": "a different port does not match",
+            "signed": "https://mycompany.com:8443/x",
+            "url": "https://mycompany.com:9443/x",
+            "signature": "ufjXBYyDmYCud3bnEeV9pfn5f+U=",
+            "expected": false
+        },
+        {
+            "description": "a user and password",
+            "signed": "https://user:pass@mycompany.com/myapp.php?foo=1&bar=2",
+            "url": "https://user:pass@mycompany.com/myapp.php?foo=1&bar=2",
+            "signature": "knQv2C9D2obcIdw01S0XQUta3qM=",
+            "expected": true
+        },
+        {
+            "description": "a user",
+            "signed": "https://user@mycompany.com/myapp.php?foo=1&bar=2",
+            "url": "https://user@mycompany.com/myapp.php?foo=1&bar=2",
+            "signature": "13lt/9NA11Xrj6U+JLf43tZg8h8=",
+            "expected": true
+        },
+        {
+            "description": "a password and an added port",
+            "signed": "https://user:pass@mycompany.com:443/myapp.php?foo=1&bar=2",
+            "url": "https://user:pass@mycompany.com/myapp.php?foo=1&bar=2",
+            "signature": "uKwetQoRuV41OkuBHf18Yct5yC8=",
+            "expected": true
+        },
+        {
+            "description": "a fragment",
+            "signed": "https://mycompany.com:443/x?a=1#top",
+            "url": "https://mycompany.com/x?a=1#top",
+            "signature": "+lRqwbfvNksYWPgxgK0IFQjMprc=",
+            "expected": true
+        },
+        {
+            "description": "another URL",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/y",
+            "signature": "9zpyJEAR6WfqDyUS/00mWUGSPEA=",
+            "expected": false
+        },
+        {
+            "description": "another query",
+            "signed": "https://a.test/x?a=1",
+            "url": "https://a.test/x?a=2",
+            "signature": "MBR7I9URo15V7vNKD0cOxensOt8=",
+            "expected": false
+        },
+        {
+            "description": "another scheme",
+            "signed": "http://a.test/x",
+            "url": "https://a.test/x",
+            "signature": "FV/L8CmwNUr0nYl6RMyo6+fjA2k=",
+            "expected": false
+        },
+        {
+            "description": "changed parameters",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/x",
+            "signed_data": {
+                "Body": "one"
+            },
+            "data": {
+                "Body": "two"
+            },
+            "signature": "ZorjRWYQpM0QCjZt/CSnbCrHSRw=",
+            "expected": false
+        },
+        {
+            "description": "the same parameters",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/x",
+            "signed_data": {
+                "Body": "one"
+            },
+            "data": {
+                "Body": "one"
+            },
+            "signature": "ZorjRWYQpM0QCjZt/CSnbCrHSRw=",
+            "expected": true
+        },
+        {
+            "description": "another token",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/x",
+            "signed_token": "other",
+            "signature": "jUuIilyi84J15PEiwfrRmDWal5Y=",
+            "expected": false
+        },
+        {
+            "description": "SHA-256 used for both",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/x",
+            "signed_algorithm": "HMAC_SHA256",
+            "algorithm": "HMAC_SHA256",
+            "signature": "ZlCLVkBzIkrn3RACGNXG1kCOFzlB9iuoDzZx3TILcvg=",
+            "expected": true
+        },
+        {
+            "description": "SHA-256 checked as SHA-1",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/x",
+            "signed_algorithm": "HMAC_SHA256",
+            "signature": "ZlCLVkBzIkrn3RACGNXG1kCOFzlB9iuoDzZx3TILcvg=",
+            "expected": false
+        },
+        {
+            "description": "SHA-1 checked as SHA-256",
+            "signed": "https://a.test/x",
+            "url": "https://a.test/x",
+            "algorithm": "HMAC_SHA256",
+            "signature": "9zpyJEAR6WfqDyUS/00mWUGSPEA=",
+            "expected": false
+        }
+    ],
+    "bodies": [
+        {
+            "description": "a body",
+            "body": "{\"property\": \"value\", \"boolean\": true}",
+            "expected": "0a1ff7634d9ab3b95db5c9a2dfe9416e41502b283a80c7cf19632632f96e6620"
+        },
+        {
+            "description": "non-ASCII",
+            "body": "{\"text\":\"código\"}",
+            "expected": "3d341c4ffe3b0c45c28cda26e91b1add56a122c8d05161f7dddea179d40c591b"
+        },
+        {
+            "description": "an empty body",
+            "body": "",
+            "expected": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+    ],
+    "body_validations": [
+        {
+            "description": "the right body",
+            "body": "{\"a\":1}",
+            "url_body": "{\"a\":1}",
+            "url": "https://a.test/x?foo=1&bodySHA256=015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+            "signature": "lWEpig51DQ4Yu4WwxBR4K3cyVfI=",
+            "expected": true
+        },
+        {
+            "description": "a changed body",
+            "body": "{\"a\":2}",
+            "url_body": "{\"a\":1}",
+            "url": "https://a.test/x?foo=1&bodySHA256=015abd7f5cc57a2dd94b7590f04ad8084273905ee33ec5cebeae62276a97f862",
+            "signature": "lWEpig51DQ4Yu4WwxBR4K3cyVfI=",
+            "expected": false
+        }
+    ],
+    "settings_headers": [
+        {
+            "header": "key=webhooks_sharedkey_abc,algorithm=HMAC_SHA256",
+            "expected": "HMAC_SHA256"
+        },
+        {
+            "header": "algorithm=HMAC_SHA256,key=x",
+            "expected": "HMAC_SHA256"
+        },
+        {
+            "header": " key = x , algorithm = HMAC_SHA256 ",
+            "expected": "HMAC_SHA256"
+        },
+        {
+            "header": "key=x",
+            "expected": "HMAC_SHA1"
+        },
+        {
+            "header": "algorithm=",
+            "expected": "HMAC_SHA1"
+        },
+        {
+            "header": "",
+            "expected": "HMAC_SHA1"
+        },
+        {
+            "header": "algorithm",
+            "expected": "HMAC_SHA1"
+        }
+    ]
+}

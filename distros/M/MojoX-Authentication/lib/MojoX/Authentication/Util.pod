@@ -13,9 +13,11 @@ MojoX::Authentication::Util
 =head1 SYNOPSIS
 
    use Moo;
-   use MojoX::Authentication::Util qw< coercer_for >;
-   
+   use MojoX::Authentication::Util qw< coercer_for encode_name >;
+
    has foo => (is => 'ro', coerce => coercer_for(foo => 'Some::Class'));
+
+   my $id = join '/', encode_name($provider_name), $uid;
 
 
 =head1 DESCRIPTION
@@ -65,6 +67,26 @@ As the last resort, the I<class> is C<require>d and its C<new> method
 called, passing the input as the only parameter.
 
 =back
+
+=head2 B<< decode_name >>
+
+   my $name = decode_name($encoded);
+
+Reverse of L</encode_name>.
+
+=head2 B<< encode_name >>
+
+   my $encoded = encode_name($name);
+
+Encode a provider name so that it never contains a slash, e.g. to put it
+before a slash in an identifier: characters C<%> and C</> are replaced
+by C<%> followed by their code in two hexadecimal digits. Different
+names always give different encodings.
+
+It is used for the user identifiers kept in the session (see
+L<MojoX::Authentication::Model/User identifiers>) and for the keys of
+L<MojoX::Authentication::Model::SAML2>'s cache, so that providers
+sharing a cache never share entries.
 
 =head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
 

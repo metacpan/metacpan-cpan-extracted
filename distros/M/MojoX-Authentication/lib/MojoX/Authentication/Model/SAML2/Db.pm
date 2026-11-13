@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::SAML2::Db;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo;
@@ -14,8 +14,7 @@ has table => (is => 'ro', default => DEFAULT_TABLE);
 
 sub get ($self, $key) {
    my $res = $self->wmdb->db->select($self->table, '*', { k => $key });
-   return unless $res->size;
-   my $record = $res->hash;
+   my $record = $res->hash // return;
    return decode_json($record->{data}) if $record->{expire} > time();
    $self->wipe($key);
    return;
@@ -23,7 +22,11 @@ sub get ($self, $key) {
 
 sub set ($self, $data, $key, $expire) {
    $self->wipe($key);
-   $self->wmdb->db->insert($self->table,
+   my $db = $self->wmdb->db;
+   my $table = $self->table;
+   my $now = time();
+   $db->delete($table, { expire => { '<=', $now } });
+   $db->insert($table,
       {
          k => $key,
          expire => $expire,

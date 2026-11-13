@@ -19,7 +19,7 @@ use Data::Walk;
 use Try::Tiny;
 use Data::Dumper;
 
-our $VERSION = 1.17;
+our $VERSION = 1.18;
 
 our $override;
 my $JSON_OBJ   = Cpanel::JSON::XS->new()->utf8->pretty();

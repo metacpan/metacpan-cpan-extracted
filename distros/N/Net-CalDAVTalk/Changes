@@ -1,5 +1,20 @@
 Revision history for Net-CalDAVTalk
 
+0.19    Thu Nov 12 2026
+   - SyncEventLinks uses Net::DAVTalk's SyncCollection (requires
+     Net::DAVTalk 0.26), so a server's truncated sync results (RFC 6578
+     section 3.6) are followed to the end instead of one page being taken
+     for everything, with the truncation marker reported as a removed
+     event: Google pages a calendar's sync about 230 events at a time
+   - only a 404 response marks an event removed; a 404 for a missing
+     property is no longer an error
+   - a response without a sync-token dies with a message again (it died
+     calling Dumper, which was never imported); a token of "0" (SOGo, on
+     an empty calendar) is a token
+   - in scalar context SyncEventLinks returns Added, as documented
+   - GetEventsMulti escapes the hrefs it puts in the multiget body: they
+     are unescaped, so one with a space, a % or an @ was sent as an
+     invalid URI
 0.18    Mon Aug 31 2026
    - relicensed from Artistic License 2.0 to the same terms as Perl
      itself (Artistic License 1.0 or GPL version 1 or later)

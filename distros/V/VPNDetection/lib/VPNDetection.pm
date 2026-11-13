@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.13.1';
+our $VERSION = '3.13.2';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -898,9 +898,10 @@ each chunk.
 
 There is no cap on how many addresses one call takes: everything not answered
 locally goes out in chunks of up to 1000, the most one request carries. The batch
-endpoint needs a paid plan: without a key every address sent to it carries an
-C<unauthorized> L<VPNDetection::Error>, and a free-plan key's batch of two or
-more a C<bad_request> one (HTTP 402).
+endpoint needs a paid plan: without a key every address in a request of two
+or more carries an C<unauthorized> L<VPNDetection::Error>, and a free-plan
+key's request of two or more a C<bad_request> one (HTTP 402). A request of
+one address is answered as its lookup would be.
 
 Perl hashes have no insertion order, so iterate your own list if order matters:
 

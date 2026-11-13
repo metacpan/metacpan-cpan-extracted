@@ -27,6 +27,7 @@ WriteMakefile(
 	PREREQ_PM => {
 		'autodie'      => 0,
 		'Carp'         => 0,
+		'Config'       => 0,
 		'Fcntl'        => 0,
 		'FindBin'      => 0,
 		'Getopt::Long' => 0,
@@ -35,6 +36,7 @@ WriteMakefile(
 		'IPC::System::Simple' => 0,	# needed by autodie qw(:all)
 		'Locale::Maketext' => 0,
 		'Object::Configure' => 0.24,
+		'overload'     => 0,
 		'Params::Get'  => 0.17,
 		'Params::Validate::Strict' => 0.40,
 		'parent'       => 0,
@@ -44,8 +46,8 @@ WriteMakefile(
 		'Sub::Protected' => 0.02,
 		'Text::CSV'    => 0,
 	}, TEST_REQUIRES => {
-		'Config'       => 0,
 		'Cwd'          => 0,
+		'English'      => 0,
 		'Errno'        => 0,
 		'File::Spec'   => 0,
 		'IPC::Open3'   => 0,
@@ -87,7 +89,13 @@ WriteMakefile(
 				recommends => { 'IP::Country::Fast' => 0, 'CGI::ACL' => 0, 'CHI' => 0 },
 			}, develop => {
 				# The author tests
-				requires => { 'Test::Perl::Critic' => 0, 'Test::Pod' => 0, 'Test::Pod::Coverage' => 0 },
+				requires => {
+					'Devel::Cover' => 0,	# coverage runs
+					'Perl::Critic' => 0,
+					'Test::Perl::Critic' => 0,
+					'Test::Pod' => 0,
+					'Test::Pod::Coverage' => 0,
+				},
 			},
 		},
 		# Keep the bundled web viewer out of the PAUSE index

@@ -423,3 +423,85 @@ into a tree, MarkFindPrev searches a line with the contents of its
 blocks in their place (LastMarkInLine in tkTextMark.c).  t/regress.t
 compares both with the order of "dump" at every mark and index of a
 line with a nested block. *)
+36) (2.09: cut and paste with structure) What is provisional in "block
+list -values", "block cut" and "block paste" (the design note
+STRICTURES.md, sections 8 and 9, on the branch strictures-design):
+- The rule for the values is fixed: a value travels with the delimiter
+  that begins its owner, so a piece carries the values of the leaves
+  and nodes that begin in it.  A cell that the end of a piece divides
+  keeps its value on the first part, in the piece or in the block
+  (STRICTURES.md 8.7: a span then goes with the first half of its
+  cell).  No fixed rule is right for every type: the block type should
+  be asked at each join and split, with both values at hand.  That
+  call-out is not designed.
+- A pasted separator keeps its depth counted from the leaves (as "block
+  split" takes it).  The other choice, its place counted from the root
+  (the list would carry the height of the tree it was cut from), is
+  not made; the owner has not decided.
+- A range that cuts a block: both commands delete as "delete" does (the
+  block is dissolved), and the list has the part as a block of its own
+  without the values of what begins with the block.  What a list should
+  hold of a cut block is open (STRICTURES.md 8.4).
+- Leaves of different depths: a cut that joins a leaf with a deeper one
+  gives the shallower leaf nodes first (as every deletion); pasting the
+  piece back does not take them out, so the leaf in which the range
+  started can be deeper than before (172 of 3070 random ranges that cut
+  no block, in trees made with block sprout).  The list has no place
+  for the depth of the leaf before its first separator (STRICTURES.md
+  8.9: the two halves of a separator).  The undo of the cut and of the
+  paste is exact there too.
+- -valuecommand: "block paste" tells nothing: the leaves and nodes it
+  makes are not told "new", and the values it sets are not told (as
+  for "block nodedata").
+- Representation B: the lists carry the Lang parts of the values only
+  (as "block list" always did); the other slots of a container do not
+  travel through a list.
+- "block level" to a lower depth joins nodes by the rule of "delete"
+  (the start side's value, else the end side's); the type is not asked
+  there either.  In a ragged tree it refuses to join a leaf's padding
+  with a node (block sprout first), where "delete" gives the leaf nodes
+  itself.
+- A list is not checked against the place: a separator of a depth the
+  tree does not have adds levels below the root; a defect the place
+  does not allow is left out; the values of a separator pasted outside
+  blocks are not used.
+37) (2.09) The frames of split lines are drawn outside the box of
+their stack and take no room, so they are clipped as all ornaments of
+blocks are: to the display line and to the text area.  Seen under Xvfb
+with a block {qq} in the default layout and the default font: the top
+side of the frame is one row above the display line and is not drawn;
+the bottom side is drawn (the line is a pixel higher than the block);
+at the start of a line the left side is not drawn either.  With space
+above and below the line (-spacing1, -spacing3, or a callback that
+leaves room around the group) all four sides show.  From the report of
+the session that wrote the feature, not checked again: the frame of a
+block nested in a leaf falls on the frame of the stack around it where
+the two boxes share an edge, and the two patterns mix; the split lines
+are on the top rows of the lower leaf, under its text, so letters that
+reach the top of their line cross them (lines for depths of 8 and more
+take 3 rows and more); the placement of dashes on the right, bottom
+and left sides of a frame depends on the X server.
+38)* (all versions) Found while adding the stacks to the loop over the
+result of a layout callback (2.09): a count that is negative was not
+refused.  A list of one element with a negative count ("hide -1
+leaves") ran "while (count--)" over the array of leaves and beyond it,
+and a list of 7 elements after the last leaf (a stolen line) with a
+negative ordinal indexed the array of stolen lines with it: the widget
+crashed (SIGSEGV).  With "x aaaa\nbbbb y\n", "block insert P 1.2 2.4"
+and a callback returning ([0,0,0,50,50,40,20], [-1]), the first update
+was enough.  (* 2.09: fixed; both are refused with a background error,
+"Negative count in return from LayoutProc", and the block gets the
+default layout.  t/regress.t.  A list of 7 or 13 elements with a
+negative count while leaves are left still describes all the remaining
+leaves, which no document says: not changed. *)
+39) (all versions) Found the same way: when an element of the result of
+a layout callback is refused, the elements before it have already been
+applied and stay.  The manual says that the block is then laid out as
+if it had no callback, but a leaf that an earlier element moved stays
+moved (outside the box of the block, which is the default one), and a
+leaf that an earlier element hid stays hidden.  With "xx aa\nbb\ncc
+yy\n", "block insert P 1.3 3.2" and a callback returning
+([0,0,0,90,90,80,20], [1,30,30,40,40,19,14], [1,2,3]): one background
+error, the block's bbox is the default one (25 4 14 42), and the first
+leaf is drawn at (55,38), over the next line of the text.  The split
+lines of such a block follow the display lines as they are.  Not fixed.

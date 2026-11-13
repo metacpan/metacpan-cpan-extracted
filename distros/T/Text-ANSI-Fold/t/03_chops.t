@@ -92,4 +92,16 @@ is_deeply(chops($fold),
 	  [ "01: 111", "02: 222", "03: 333", "04: 444", "05: 555", ],
 	  "prefix sub");
 
+# length: visual width of each chop
+{
+    my $f = Text::ANSI::Fold->new;
+    my @c = $f->text("aaあい\e[31mb\e[m")->chops(width => 4, length => \my @l);
+    is_deeply([ \@c, \@l ], [ [ "aaあ", "い\e[31mb\e[m" ], [ 4, 3 ] ], "chops length");
+    @c = $f->text("1223334444")->chops(width => [ 1, 0, -2, 3 ], length => \my @m);
+    is_deeply(\@m, [ 1, 0, 9 ], "chops length (multiple width)");
+    $f->configure(padding => 1);
+    @c = $f->text("aaa bbbb")->chops(width => 6, length => \my @n);
+    is_deeply([ \@c, \@n ], [ [ "aaa bb", "bb    " ], [ 6, 2 ] ], "chops length (padding is not included)");
+}
+
 done_testing;

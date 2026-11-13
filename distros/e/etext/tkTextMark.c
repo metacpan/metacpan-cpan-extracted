@@ -152,8 +152,14 @@ TkTextMarkCmd(textPtr, interp, argc, args)
 	    }
 	} else {
 	    Arg old;
+	    TkTextIndex at;
 
-	    if (TkTextVcOn(textPtr)
+	    TkTextMarkSegToIndex(textPtr, markPtr, &at);
+	    if (TkTextRecordSet(textPtr, TK_TEXT_VC_MARK,
+		    TkTextVcMarkPlace(textPtr, LangString(args[3]), &at),
+		    &markPtr->body.mark.value, args[4])) {
+		/* Inside an edit step: the old value is in the step. */
+	    } else if (TkTextVcOn(textPtr)
 		    && (TkTextDataGetLang(markPtr->body.mark.value) != NULL)) {
 		TkTextIndex index;
 

@@ -1,0 +1,3176 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "author" : "a_author",
+     "availability" : "retired",
+     "config" : {
+      "a_config" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "operator_type" : "a_operator_type",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "custom_operators",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "OperatorType",
+    "v_operator_type"
+   ],
+   [
+    "Config",
+    "{\"v_config\":11}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCustomOperator",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_friendly_name",
+   "v_operator_type",
+   {
+    "v_config" : 11
+   }
+  ],
+  "url" : "https://intelligence.twilio.com/v2/Operators/Custom"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "operator_sid" : "a_operator_sid",
+     "service_sid" : "a_service_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "operator_sid",
+      "operator_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operator_attachment",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateOperatorAttachment",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services/id1/Operators/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auto_redaction" : true,
+     "auto_transcribe" : true,
+     "data_logging" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "encryption_credential_sid" : "a_encryption_credential_sid",
+     "friendly_name" : "a_friendly_name",
+     "language_code" : "a_language_code",
+     "media_redaction" : true,
+     "read_only_attached_operator_sids" : [
+      "a_read_only_attached_operator_sids"
+     ],
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "version" : 774,
+     "webhook_http_method" : "NULL",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auto_redaction",
+      "auto_redaction",
+      "plain"
+     ],
+     [
+      "auto_transcribe",
+      "auto_transcribe",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "media_redaction",
+      "media_redaction",
+      "plain"
+     ],
+     [
+      "read_only_attached_operator_sids",
+      "read_only_attached_operator_sids",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ],
+     [
+      "webhook_http_method",
+      "webhook_http_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "AutoRedaction",
+    "true"
+   ],
+   [
+    "AutoTranscribe",
+    "true"
+   ],
+   [
+    "DataLogging",
+    "true"
+   ],
+   [
+    "EncryptionCredentialSid",
+    "v_encryption_credential_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "LanguageCode",
+    "v_language_code"
+   ],
+   [
+    "MediaRedaction",
+    "true"
+   ],
+   [
+    "WebhookHttpMethod",
+    "POST"
+   ],
+   [
+    "WebhookUrl",
+    "v_webhook_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateService",
+  "method" : "create",
+  "options" : {
+   "auto_redaction" : 1,
+   "auto_transcribe" : 1,
+   "data_logging" : 1,
+   "encryption_credential_sid" : "v_encryption_credential_sid",
+   "friendly_name" : "v_friendly_name",
+   "language_code" : "v_language_code",
+   "media_redaction" : 1,
+   "webhook_http_method" : "POST",
+   "webhook_url" : "v_webhook_url"
+  },
+  "required" : [
+   "v_unique_name"
+  ],
+  "url" : "https://intelligence.twilio.com/v2/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel" : {
+      "a_channel" : 1
+     },
+     "customer_key" : "a_customer_key",
+     "data_logging" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "duration" : 870,
+     "encryption_credential_sid" : "a_encryption_credential_sid",
+     "language_code" : "a_language_code",
+     "links" : {
+      "a_links" : 1
+     },
+     "media_start_time" : "2026-01-12T03:04:05Z",
+     "redaction" : true,
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "status" : "failed",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel",
+      "channel",
+      "plain"
+     ],
+     [
+      "customer_key",
+      "customer_key",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "duration",
+      "duration",
+      "plain"
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media_start_time",
+      "media_start_time",
+      "date",
+      1768187045
+     ],
+     [
+      "redaction",
+      "redaction",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ServiceSid",
+    "v_service_sid"
+   ],
+   [
+    "Channel",
+    "{\"v_channel\":26}"
+   ],
+   [
+    "CustomerKey",
+    "v_customer_key"
+   ],
+   [
+    "MediaStartTime",
+    "2026-01-06T03:04:05Z"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTranscript",
+  "method" : "create",
+  "options" : {
+   "customer_key" : "v_customer_key",
+   "media_start_time" : {
+    "epoch" : 1767668645
+   }
+  },
+  "required" : [
+   "v_service_sid",
+   {
+    "v_channel" : 26
+   }
+  ],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "custom_operators",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCustomOperator",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators/Custom/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operator_attachment",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteOperatorAttachment",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services/id1/Operators/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteService",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteTranscript",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "author" : "a_author",
+     "availability" : "retired",
+     "config" : {
+      "a_config" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "operator_type" : "a_operator_type",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "custom_operators",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCustomOperator",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators/Custom/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "locations" : [
+      "a_locations"
+     ],
+     "transcript_sid" : "a_transcript_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "locations",
+      "locations",
+      "plain"
+     ],
+     [
+      "transcript_sid",
+      "transcript_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ],
+   [
+    "encrypted_operator_results",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Redacted",
+    "true"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchEncryptedOperatorResults",
+  "method" : "fetch",
+  "options" : {
+   "redacted" : 1
+  },
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1/OperatorResults/Encrypted"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "location" : "a_location",
+     "transcript_sid" : "a_transcript_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "location",
+      "location",
+      "plain"
+     ],
+     [
+      "transcript_sid",
+      "transcript_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ],
+   [
+    "encrypted_sentences",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Redacted",
+    "true"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchEncryptedSentences",
+  "method" : "fetch",
+  "options" : {
+   "redacted" : 1
+  },
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1/Sentences/Encrypted"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "media_url" : "a_media_url",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "media_url",
+      "media_url",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ],
+   [
+    "media",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Redacted",
+    "true"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchMedia",
+  "method" : "fetch",
+  "options" : {
+   "redacted" : 1
+  },
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1/Media"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "author" : "a_author",
+     "availability" : "deprecated",
+     "config" : {
+      "a_config" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "operator_type" : "a_operator_type",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operators",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchOperator",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "operator_sids" : [
+      "a_operator_sids"
+     ],
+     "service_sid" : "a_service_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "operator_sids",
+      "operator_sids",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operator_attachments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchOperatorAttachments",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services/id1/Operators"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "extract_match" : true,
+     "extract_results" : {
+      "a_extract_results" : 1
+     },
+     "json_results" : {
+      "a_json_results" : 1
+     },
+     "label_probabilities" : {
+      "a_label_probabilities" : 1
+     },
+     "match_probability" : 1805.5,
+     "name" : "a_name",
+     "normalized_result" : "a_normalized_result",
+     "operator_sid" : "a_operator_sid",
+     "operator_type" : "conversation-classify",
+     "predicted_label" : "a_predicted_label",
+     "predicted_probability" : 2228.5,
+     "text_generation_results" : {
+      "a_text_generation_results" : 1
+     },
+     "transcript_sid" : "a_transcript_sid",
+     "url" : "a_url",
+     "utterance_match" : true,
+     "utterance_results" : [
+      "a_utterance_results"
+     ]
+    },
+    "fields" : [
+     [
+      "extract_match",
+      "extract_match",
+      "plain"
+     ],
+     [
+      "extract_results",
+      "extract_results",
+      "plain"
+     ],
+     [
+      "json_results",
+      "json_results",
+      "plain"
+     ],
+     [
+      "label_probabilities",
+      "label_probabilities",
+      "plain"
+     ],
+     [
+      "match_probability",
+      "match_probability",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "normalized_result",
+      "normalized_result",
+      "plain"
+     ],
+     [
+      "operator_sid",
+      "operator_sid",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "predicted_label",
+      "predicted_label",
+      "plain"
+     ],
+     [
+      "predicted_probability",
+      "predicted_probability",
+      "plain"
+     ],
+     [
+      "text_generation_results",
+      "text_generation_results",
+      "plain"
+     ],
+     [
+      "transcript_sid",
+      "transcript_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "utterance_match",
+      "utterance_match",
+      "plain"
+     ],
+     [
+      "utterance_results",
+      "utterance_results",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ],
+   [
+    "operator_results",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Redacted",
+    "true"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchOperatorResult",
+  "method" : "fetch",
+  "options" : {
+   "redacted" : 1
+  },
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1/OperatorResults/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "availability" : "internal",
+     "config_schema" : {
+      "a_config_schema" : 1
+     },
+     "configurable" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "docs_link" : "a_docs_link",
+     "friendly_name" : "a_friendly_name",
+     "name" : "a_name",
+     "output_type" : "json",
+     "provider" : "openai",
+     "sid" : "a_sid",
+     "supported_languages" : [
+      "a_supported_languages"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config_schema",
+      "config_schema",
+      "plain"
+     ],
+     [
+      "configurable",
+      "configurable",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "docs_link",
+      "docs_link",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "output_type",
+      "output_type",
+      "plain"
+     ],
+     [
+      "provider",
+      "provider",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "supported_languages",
+      "supported_languages",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operator_type",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchOperatorType",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/OperatorTypes/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "author" : "a_author",
+     "availability" : "internal",
+     "config" : {
+      "a_config" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "operator_type" : "a_operator_type",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "prebuilt_operators",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPrebuiltOperator",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators/PreBuilt/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auto_redaction" : true,
+     "auto_transcribe" : true,
+     "data_logging" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "encryption_credential_sid" : "a_encryption_credential_sid",
+     "friendly_name" : "a_friendly_name",
+     "language_code" : "a_language_code",
+     "media_redaction" : true,
+     "read_only_attached_operator_sids" : [
+      "a_read_only_attached_operator_sids"
+     ],
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "version" : 774,
+     "webhook_http_method" : "NULL",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auto_redaction",
+      "auto_redaction",
+      "plain"
+     ],
+     [
+      "auto_transcribe",
+      "auto_transcribe",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "media_redaction",
+      "media_redaction",
+      "plain"
+     ],
+     [
+      "read_only_attached_operator_sids",
+      "read_only_attached_operator_sids",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ],
+     [
+      "webhook_http_method",
+      "webhook_http_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchService",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel" : {
+      "a_channel" : 1
+     },
+     "customer_key" : "a_customer_key",
+     "data_logging" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "duration" : 870,
+     "encryption_credential_sid" : "a_encryption_credential_sid",
+     "language_code" : "a_language_code",
+     "links" : {
+      "a_links" : 1
+     },
+     "media_start_time" : "2026-01-12T03:04:05Z",
+     "redaction" : true,
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "status" : "failed",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel",
+      "channel",
+      "plain"
+     ],
+     [
+      "customer_key",
+      "customer_key",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "duration",
+      "duration",
+      "plain"
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media_start_time",
+      "media_start_time",
+      "date",
+      1768187045
+     ],
+     [
+      "redaction",
+      "redaction",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTranscript",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "operators" : [
+      {
+       "account_sid" : "a_account_sid",
+       "author" : "a_author",
+       "availability" : "retired",
+       "config" : {
+        "a_config" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "friendly_name" : "a_friendly_name",
+       "operator_type" : "a_operator_type",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "version" : 774
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "custom_operators",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Availability",
+    "beta"
+   ],
+   [
+    "LanguageCode",
+    "v_language_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListCustomOperator",
+  "method" : "page",
+  "options" : {
+   "availability" : "beta",
+   "language_code" : "v_language_code"
+  },
+  "records_key" : "operators",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators/Custom"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "operators" : [
+      {
+       "account_sid" : "a_account_sid",
+       "author" : "a_author",
+       "availability" : "deprecated",
+       "config" : {
+        "a_config" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "friendly_name" : "a_friendly_name",
+       "operator_type" : "a_operator_type",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "version" : 774
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operators",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Availability",
+    "beta"
+   ],
+   [
+    "LanguageCode",
+    "v_language_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListOperator",
+  "method" : "page",
+  "options" : {
+   "availability" : "beta",
+   "language_code" : "v_language_code"
+  },
+  "records_key" : "operators",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "operator_results" : [
+      {
+       "extract_match" : true,
+       "extract_results" : {
+        "a_extract_results" : 1
+       },
+       "json_results" : {
+        "a_json_results" : 1
+       },
+       "label_probabilities" : {
+        "a_label_probabilities" : 1
+       },
+       "match_probability" : 1805.5,
+       "name" : "a_name",
+       "normalized_result" : "a_normalized_result",
+       "operator_sid" : "a_operator_sid",
+       "operator_type" : "conversation-classify",
+       "predicted_label" : "a_predicted_label",
+       "predicted_probability" : 2228.5,
+       "text_generation_results" : {
+        "a_text_generation_results" : 1
+       },
+       "transcript_sid" : "a_transcript_sid",
+       "url" : "a_url",
+       "utterance_match" : true,
+       "utterance_results" : [
+        "a_utterance_results"
+       ]
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "extract_match",
+      "extract_match",
+      "plain"
+     ],
+     [
+      "extract_results",
+      "extract_results",
+      "plain"
+     ],
+     [
+      "json_results",
+      "json_results",
+      "plain"
+     ],
+     [
+      "label_probabilities",
+      "label_probabilities",
+      "plain"
+     ],
+     [
+      "match_probability",
+      "match_probability",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "normalized_result",
+      "normalized_result",
+      "plain"
+     ],
+     [
+      "operator_sid",
+      "operator_sid",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "predicted_label",
+      "predicted_label",
+      "plain"
+     ],
+     [
+      "predicted_probability",
+      "predicted_probability",
+      "plain"
+     ],
+     [
+      "text_generation_results",
+      "text_generation_results",
+      "plain"
+     ],
+     [
+      "transcript_sid",
+      "transcript_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "utterance_match",
+      "utterance_match",
+      "plain"
+     ],
+     [
+      "utterance_results",
+      "utterance_results",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ],
+   [
+    "operator_results",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Redacted",
+    "true"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListOperatorResult",
+  "method" : "page",
+  "options" : {
+   "redacted" : 1
+  },
+  "records_key" : "operator_results",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1/OperatorResults"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "operator_types" : [
+      {
+       "availability" : "internal",
+       "config_schema" : {
+        "a_config_schema" : 1
+       },
+       "configurable" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "docs_link" : "a_docs_link",
+       "friendly_name" : "a_friendly_name",
+       "name" : "a_name",
+       "output_type" : "json",
+       "provider" : "openai",
+       "sid" : "a_sid",
+       "supported_languages" : [
+        "a_supported_languages"
+       ],
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config_schema",
+      "config_schema",
+      "plain"
+     ],
+     [
+      "configurable",
+      "configurable",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "docs_link",
+      "docs_link",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "output_type",
+      "output_type",
+      "plain"
+     ],
+     [
+      "provider",
+      "provider",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "supported_languages",
+      "supported_languages",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operator_type",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "LanguageCode",
+    "v_language_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListOperatorType",
+  "method" : "page",
+  "options" : {
+   "language_code" : "v_language_code"
+  },
+  "records_key" : "operator_types",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/OperatorTypes"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "operators" : [
+      {
+       "account_sid" : "a_account_sid",
+       "author" : "a_author",
+       "availability" : "internal",
+       "config" : {
+        "a_config" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "friendly_name" : "a_friendly_name",
+       "operator_type" : "a_operator_type",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "version" : 774
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "prebuilt_operators",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Availability",
+    "retired"
+   ],
+   [
+    "LanguageCode",
+    "v_language_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListPrebuiltOperator",
+  "method" : "page",
+  "options" : {
+   "availability" : "retired",
+   "language_code" : "v_language_code"
+  },
+  "records_key" : "operators",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Operators/PreBuilt"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "sentences" : [
+      {
+       "confidence" : "a_confidence",
+       "end_time" : "a_end_time",
+       "media_channel" : 1336,
+       "sentence_index" : 1484,
+       "sid" : "a_sid",
+       "start_time" : "a_start_time",
+       "transcript" : "a_transcript",
+       "words" : [
+        "a_words"
+       ]
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "confidence",
+      "confidence",
+      "plain"
+     ],
+     [
+      "end_time",
+      "end_time",
+      "plain"
+     ],
+     [
+      "media_channel",
+      "media_channel",
+      "plain"
+     ],
+     [
+      "sentence_index",
+      "sentence_index",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "start_time",
+      "start_time",
+      "plain"
+     ],
+     [
+      "transcript",
+      "transcript",
+      "plain"
+     ],
+     [
+      "words",
+      "words",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    1
+   ],
+   [
+    "sentences",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Redacted",
+    "true"
+   ],
+   [
+    "WordTimestamps",
+    "true"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListSentence",
+  "method" : "page",
+  "options" : {
+   "redacted" : 1,
+   "word_timestamps" : 1
+  },
+  "records_key" : "sentences",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts/id1/Sentences"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "services" : [
+      {
+       "account_sid" : "a_account_sid",
+       "auto_redaction" : true,
+       "auto_transcribe" : true,
+       "data_logging" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "encryption_credential_sid" : "a_encryption_credential_sid",
+       "friendly_name" : "a_friendly_name",
+       "language_code" : "a_language_code",
+       "media_redaction" : true,
+       "read_only_attached_operator_sids" : [
+        "a_read_only_attached_operator_sids"
+       ],
+       "sid" : "a_sid",
+       "unique_name" : "a_unique_name",
+       "url" : "a_url",
+       "version" : 774,
+       "webhook_http_method" : "NULL",
+       "webhook_url" : "a_webhook_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auto_redaction",
+      "auto_redaction",
+      "plain"
+     ],
+     [
+      "auto_transcribe",
+      "auto_transcribe",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "media_redaction",
+      "media_redaction",
+      "plain"
+     ],
+     [
+      "read_only_attached_operator_sids",
+      "read_only_attached_operator_sids",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ],
+     [
+      "webhook_http_method",
+      "webhook_http_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListService",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "services",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "transcripts" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel" : {
+        "a_channel" : 1
+       },
+       "customer_key" : "a_customer_key",
+       "data_logging" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "duration" : 870,
+       "encryption_credential_sid" : "a_encryption_credential_sid",
+       "language_code" : "a_language_code",
+       "links" : {
+        "a_links" : 1
+       },
+       "media_start_time" : "2026-01-12T03:04:05Z",
+       "redaction" : true,
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "status" : "failed",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel",
+      "channel",
+      "plain"
+     ],
+     [
+      "customer_key",
+      "customer_key",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "duration",
+      "duration",
+      "plain"
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media_start_time",
+      "media_start_time",
+      "date",
+      1768187045
+     ],
+     [
+      "redaction",
+      "redaction",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "transcripts",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ServiceSid",
+    "v_service_sid"
+   ],
+   [
+    "BeforeStartTime",
+    "v_before_start_time"
+   ],
+   [
+    "AfterStartTime",
+    "v_after_start_time"
+   ],
+   [
+    "BeforeDateCreated",
+    "v_before_date_created"
+   ],
+   [
+    "AfterDateCreated",
+    "v_after_date_created"
+   ],
+   [
+    "Status",
+    "v_status"
+   ],
+   [
+    "LanguageCode",
+    "v_language_code"
+   ],
+   [
+    "SourceSid",
+    "v_source_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListTranscript",
+  "method" : "page",
+  "options" : {
+   "after_date_created" : "v_after_date_created",
+   "after_start_time" : "v_after_start_time",
+   "before_date_created" : "v_before_date_created",
+   "before_start_time" : "v_before_start_time",
+   "language_code" : "v_language_code",
+   "service_sid" : "v_service_sid",
+   "source_sid" : "v_source_sid",
+   "status" : "v_status"
+  },
+  "records_key" : "transcripts",
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Transcripts"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "author" : "a_author",
+     "availability" : "retired",
+     "config" : {
+      "a_config" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "operator_type" : "a_operator_type",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "availability",
+      "availability",
+      "plain"
+     ],
+     [
+      "config",
+      "config",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "operator_type",
+      "operator_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "custom_operators",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Config",
+    "{\"v_config\":11}"
+   ]
+  ],
+  "headers" : {
+   "If-Match" : "v_if_match"
+  },
+  "http" : "POST",
+  "id" : "UpdateCustomOperator",
+  "method" : "update",
+  "options" : {
+   "if_match" : "v_if_match"
+  },
+  "required" : [
+   "v_friendly_name",
+   {
+    "v_config" : 11
+   }
+  ],
+  "url" : "https://intelligence.twilio.com/v2/Operators/Custom/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auto_redaction" : true,
+     "auto_transcribe" : true,
+     "data_logging" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "encryption_credential_sid" : "a_encryption_credential_sid",
+     "friendly_name" : "a_friendly_name",
+     "language_code" : "a_language_code",
+     "media_redaction" : true,
+     "read_only_attached_operator_sids" : [
+      "a_read_only_attached_operator_sids"
+     ],
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "version" : 774,
+     "webhook_http_method" : "NULL",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auto_redaction",
+      "auto_redaction",
+      "plain"
+     ],
+     [
+      "auto_transcribe",
+      "auto_transcribe",
+      "plain"
+     ],
+     [
+      "data_logging",
+      "data_logging",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "encryption_credential_sid",
+      "encryption_credential_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language_code",
+      "language_code",
+      "plain"
+     ],
+     [
+      "media_redaction",
+      "media_redaction",
+      "plain"
+     ],
+     [
+      "read_only_attached_operator_sids",
+      "read_only_attached_operator_sids",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ],
+     [
+      "webhook_http_method",
+      "webhook_http_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "intelligence",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "AutoRedaction",
+    "true"
+   ],
+   [
+    "AutoTranscribe",
+    "true"
+   ],
+   [
+    "DataLogging",
+    "true"
+   ],
+   [
+    "EncryptionCredentialSid",
+    "v_encryption_credential_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "MediaRedaction",
+    "true"
+   ],
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "WebhookHttpMethod",
+    "POST"
+   ],
+   [
+    "WebhookUrl",
+    "v_webhook_url"
+   ]
+  ],
+  "headers" : {
+   "If-Match" : "v_if_match"
+  },
+  "http" : "POST",
+  "id" : "UpdateService",
+  "method" : "update",
+  "options" : {
+   "auto_redaction" : 1,
+   "auto_transcribe" : 1,
+   "data_logging" : 1,
+   "encryption_credential_sid" : "v_encryption_credential_sid",
+   "friendly_name" : "v_friendly_name",
+   "if_match" : "v_if_match",
+   "media_redaction" : 1,
+   "unique_name" : "v_unique_name",
+   "webhook_http_method" : "POST",
+   "webhook_url" : "v_webhook_url"
+  },
+  "required" : [],
+  "url" : "https://intelligence.twilio.com/v2/Services/id1"
+ }
+]

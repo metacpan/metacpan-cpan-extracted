@@ -2,11 +2,11 @@ package Params::Validate::Strict::BNF;
 
 use strict;
 use warnings;
-use Carp qw(croak);
+use Carp ();
 use Exporter qw(import);
 use Params::Validate::Strict qw(validate_strict);
 
-our $VERSION = '0.41';
+our $VERSION = '0.42';
 our @EXPORT_OK = qw(bnf_to_matcher);
 
 my %_cache;
@@ -212,7 +212,7 @@ sub bnf_to_matcher {
 	}
 	$flush->();
 
-	croak 'bnf_to_matcher: no rules found in grammar' unless @rule_order;
+	Carp::croak 'bnf_to_matcher: no rules found in grammar' unless @rule_order;
 
 	my $start    = $rule_order[0];
 	my $regex_str = _rule_to_regex($start, \%rules, {});
@@ -244,9 +244,9 @@ sub _parse_rhs {
 
 sub _rule_to_regex {
 	my ($rule_name, $rules, $seen) = @_;
-	croak "bnf_to_matcher: undefined rule '$rule_name' referenced in grammar"
+	Carp::croak "bnf_to_matcher: undefined rule '$rule_name' referenced in grammar"
 		unless exists $rules->{$rule_name};
-	croak "bnf_to_matcher: recursive rule '$rule_name' is not supported"
+	Carp::croak "bnf_to_matcher: recursive rule '$rule_name' is not supported"
 		if $seen->{$rule_name};
 
 	local $seen->{$rule_name} = 1;

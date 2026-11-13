@@ -1,0 +1,2546 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "credentials_lists",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CredentialListSid",
+    "v_credential_list_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCredentialList",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_credential_list_sid"
+  ],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/CredentialLists"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "ip_access_control_lists",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "IpAccessControlListSid",
+    "v_ip_access_control_list_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateIpAccessControlList",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_ip_access_control_list_sid"
+  ],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/IpAccessControlLists"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "enabled" : true,
+     "friendly_name" : "a_friendly_name",
+     "priority" : 898,
+     "sid" : "a_sid",
+     "sip_url" : "a_sip_url",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url",
+     "weight" : 648
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "priority",
+      "priority",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_url",
+      "sip_url",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "origination_urls",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Weight",
+    "616"
+   ],
+   [
+    "Priority",
+    "866"
+   ],
+   [
+    "Enabled",
+    "true"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "SipUrl",
+    "v_sip_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateOriginationUrl",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   616,
+   866,
+   1,
+   "v_friendly_name",
+   "v_sip_url"
+  ],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/OriginationUrls"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "address_requirements" : "any",
+     "api_version" : "a_api_version",
+     "beta" : true,
+     "capabilities" : {
+      "MMS" : false,
+      "SMS" : true,
+      "fax" : false,
+      "voice" : true
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "phone_number" : "a_phone_number",
+     "sid" : "a_sid",
+     "sms_application_sid" : "a_sms_application_sid",
+     "sms_fallback_method" : "GET",
+     "sms_fallback_url" : "a_sms_fallback_url",
+     "sms_method" : "POST",
+     "sms_url" : "a_sms_url",
+     "status_callback" : "a_status_callback",
+     "status_callback_method" : "GET",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url",
+     "voice_application_sid" : "a_voice_application_sid",
+     "voice_caller_id_lookup" : true,
+     "voice_fallback_method" : "POST",
+     "voice_fallback_url" : "a_voice_fallback_url",
+     "voice_method" : "GET",
+     "voice_url" : "a_voice_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "address_requirements",
+      "address_requirements",
+      "plain"
+     ],
+     [
+      "api_version",
+      "api_version",
+      "plain"
+     ],
+     [
+      "beta",
+      "beta",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "capabilities"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms_application_sid",
+      "sms_application_sid",
+      "plain"
+     ],
+     [
+      "sms_fallback_method",
+      "sms_fallback_method",
+      "plain"
+     ],
+     [
+      "sms_fallback_url",
+      "sms_fallback_url",
+      "plain"
+     ],
+     [
+      "sms_method",
+      "sms_method",
+      "plain"
+     ],
+     [
+      "sms_url",
+      "sms_url",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "status_callback_method",
+      "status_callback_method",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_application_sid",
+      "voice_application_sid",
+      "plain"
+     ],
+     [
+      "voice_caller_id_lookup",
+      "voice_caller_id_lookup",
+      "plain"
+     ],
+     [
+      "voice_fallback_method",
+      "voice_fallback_method",
+      "plain"
+     ],
+     [
+      "voice_fallback_url",
+      "voice_fallback_url",
+      "plain"
+     ],
+     [
+      "voice_method",
+      "voice_method",
+      "plain"
+     ],
+     [
+      "voice_url",
+      "voice_url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "phone_numbers",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PhoneNumberSid",
+    "v_phone_number_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreatePhoneNumber",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_phone_number_sid"
+  ],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/PhoneNumbers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auth_type" : "a_auth_type",
+     "auth_type_set" : [
+      "a_auth_type_set"
+     ],
+     "cnam_lookup_enabled" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "disaster_recovery_method" : "POST",
+     "disaster_recovery_url" : "a_disaster_recovery_url",
+     "domain_name" : "a_domain_name",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "recording" : {
+      "a_recording" : 1
+     },
+     "secure" : true,
+     "sid" : "a_sid",
+     "symmetric_rtp_enabled" : true,
+     "transfer_caller_id" : "from-transferor",
+     "transfer_mode" : "sip-only",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auth_type",
+      "auth_type",
+      "plain"
+     ],
+     [
+      "auth_type_set",
+      "auth_type_set",
+      "plain"
+     ],
+     [
+      "cnam_lookup_enabled",
+      "cnam_lookup_enabled",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disaster_recovery_method",
+      "disaster_recovery_method",
+      "plain"
+     ],
+     [
+      "disaster_recovery_url",
+      "disaster_recovery_url",
+      "plain"
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "recording",
+      "recording",
+      "plain"
+     ],
+     [
+      "secure",
+      "secure",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "symmetric_rtp_enabled",
+      "symmetric_rtp_enabled",
+      "plain"
+     ],
+     [
+      "transfer_caller_id",
+      "transfer_caller_id",
+      "plain"
+     ],
+     [
+      "transfer_mode",
+      "transfer_mode",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CnamLookupEnabled",
+    "true"
+   ],
+   [
+    "DisasterRecoveryMethod",
+    "POST"
+   ],
+   [
+    "DisasterRecoveryUrl",
+    "v_disaster_recovery_url"
+   ],
+   [
+    "DomainName",
+    "v_domain_name"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Secure",
+    "true"
+   ],
+   [
+    "TransferCallerId",
+    "from-transferor"
+   ],
+   [
+    "TransferMode",
+    "sip-only"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTrunk",
+  "method" : "create",
+  "options" : {
+   "cnam_lookup_enabled" : 1,
+   "disaster_recovery_method" : "POST",
+   "disaster_recovery_url" : "v_disaster_recovery_url",
+   "domain_name" : "v_domain_name",
+   "friendly_name" : "v_friendly_name",
+   "secure" : 1,
+   "transfer_caller_id" : "from-transferor",
+   "transfer_mode" : "sip-only"
+  },
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "credentials_lists",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCredentialList",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/CredentialLists/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "ip_access_control_lists",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteIpAccessControlList",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/IpAccessControlLists/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "origination_urls",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteOriginationUrl",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/OriginationUrls/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeletePhoneNumber",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/PhoneNumbers/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteTrunk",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "credentials_lists",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCredentialList",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/CredentialLists/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "ip_access_control_lists",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchIpAccessControlList",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/IpAccessControlLists/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "enabled" : true,
+     "friendly_name" : "a_friendly_name",
+     "priority" : 898,
+     "sid" : "a_sid",
+     "sip_url" : "a_sip_url",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url",
+     "weight" : 648
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "priority",
+      "priority",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_url",
+      "sip_url",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "origination_urls",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchOriginationUrl",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/OriginationUrls/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "address_requirements" : "any",
+     "api_version" : "a_api_version",
+     "beta" : true,
+     "capabilities" : {
+      "MMS" : false,
+      "SMS" : true,
+      "fax" : false,
+      "voice" : true
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "phone_number" : "a_phone_number",
+     "sid" : "a_sid",
+     "sms_application_sid" : "a_sms_application_sid",
+     "sms_fallback_method" : "GET",
+     "sms_fallback_url" : "a_sms_fallback_url",
+     "sms_method" : "POST",
+     "sms_url" : "a_sms_url",
+     "status_callback" : "a_status_callback",
+     "status_callback_method" : "GET",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url",
+     "voice_application_sid" : "a_voice_application_sid",
+     "voice_caller_id_lookup" : true,
+     "voice_fallback_method" : "POST",
+     "voice_fallback_url" : "a_voice_fallback_url",
+     "voice_method" : "GET",
+     "voice_url" : "a_voice_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "address_requirements",
+      "address_requirements",
+      "plain"
+     ],
+     [
+      "api_version",
+      "api_version",
+      "plain"
+     ],
+     [
+      "beta",
+      "beta",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "capabilities"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms_application_sid",
+      "sms_application_sid",
+      "plain"
+     ],
+     [
+      "sms_fallback_method",
+      "sms_fallback_method",
+      "plain"
+     ],
+     [
+      "sms_fallback_url",
+      "sms_fallback_url",
+      "plain"
+     ],
+     [
+      "sms_method",
+      "sms_method",
+      "plain"
+     ],
+     [
+      "sms_url",
+      "sms_url",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "status_callback_method",
+      "status_callback_method",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_application_sid",
+      "voice_application_sid",
+      "plain"
+     ],
+     [
+      "voice_caller_id_lookup",
+      "voice_caller_id_lookup",
+      "plain"
+     ],
+     [
+      "voice_fallback_method",
+      "voice_fallback_method",
+      "plain"
+     ],
+     [
+      "voice_fallback_url",
+      "voice_fallback_url",
+      "plain"
+     ],
+     [
+      "voice_method",
+      "voice_method",
+      "plain"
+     ],
+     [
+      "voice_url",
+      "voice_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPhoneNumber",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/PhoneNumbers/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "mode" : "record-from-ringing",
+     "trim" : "trim-silence"
+    },
+    "fields" : [
+     [
+      "mode",
+      "mode",
+      "plain"
+     ],
+     [
+      "trim",
+      "trim",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "recordings",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchRecording",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/Recording"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auth_type" : "a_auth_type",
+     "auth_type_set" : [
+      "a_auth_type_set"
+     ],
+     "cnam_lookup_enabled" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "disaster_recovery_method" : "POST",
+     "disaster_recovery_url" : "a_disaster_recovery_url",
+     "domain_name" : "a_domain_name",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "recording" : {
+      "a_recording" : 1
+     },
+     "secure" : true,
+     "sid" : "a_sid",
+     "symmetric_rtp_enabled" : true,
+     "transfer_caller_id" : "from-transferor",
+     "transfer_mode" : "sip-only",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auth_type",
+      "auth_type",
+      "plain"
+     ],
+     [
+      "auth_type_set",
+      "auth_type_set",
+      "plain"
+     ],
+     [
+      "cnam_lookup_enabled",
+      "cnam_lookup_enabled",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disaster_recovery_method",
+      "disaster_recovery_method",
+      "plain"
+     ],
+     [
+      "disaster_recovery_url",
+      "disaster_recovery_url",
+      "plain"
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "recording",
+      "recording",
+      "plain"
+     ],
+     [
+      "secure",
+      "secure",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "symmetric_rtp_enabled",
+      "symmetric_rtp_enabled",
+      "plain"
+     ],
+     [
+      "transfer_caller_id",
+      "transfer_caller_id",
+      "plain"
+     ],
+     [
+      "transfer_mode",
+      "transfer_mode",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrunk",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "credential_lists" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sid" : "a_sid",
+       "trunk_sid" : "a_trunk_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "credentials_lists",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListCredentialList",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "credential_lists",
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/CredentialLists"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "ip_access_control_lists" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sid" : "a_sid",
+       "trunk_sid" : "a_trunk_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "ip_access_control_lists",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListIpAccessControlList",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "ip_access_control_lists",
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/IpAccessControlLists"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "origination_urls" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "enabled" : true,
+       "friendly_name" : "a_friendly_name",
+       "priority" : 898,
+       "sid" : "a_sid",
+       "sip_url" : "a_sip_url",
+       "trunk_sid" : "a_trunk_sid",
+       "url" : "a_url",
+       "weight" : 648
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "priority",
+      "priority",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_url",
+      "sip_url",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "origination_urls",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListOriginationUrl",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "origination_urls",
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/OriginationUrls"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "phone_numbers" : [
+      {
+       "account_sid" : "a_account_sid",
+       "address_requirements" : "any",
+       "api_version" : "a_api_version",
+       "beta" : true,
+       "capabilities" : {
+        "MMS" : false,
+        "SMS" : true,
+        "fax" : false,
+        "voice" : true
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "phone_number" : "a_phone_number",
+       "sid" : "a_sid",
+       "sms_application_sid" : "a_sms_application_sid",
+       "sms_fallback_method" : "GET",
+       "sms_fallback_url" : "a_sms_fallback_url",
+       "sms_method" : "POST",
+       "sms_url" : "a_sms_url",
+       "status_callback" : "a_status_callback",
+       "status_callback_method" : "GET",
+       "trunk_sid" : "a_trunk_sid",
+       "url" : "a_url",
+       "voice_application_sid" : "a_voice_application_sid",
+       "voice_caller_id_lookup" : true,
+       "voice_fallback_method" : "POST",
+       "voice_fallback_url" : "a_voice_fallback_url",
+       "voice_method" : "GET",
+       "voice_url" : "a_voice_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "address_requirements",
+      "address_requirements",
+      "plain"
+     ],
+     [
+      "api_version",
+      "api_version",
+      "plain"
+     ],
+     [
+      "beta",
+      "beta",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "capabilities"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms_application_sid",
+      "sms_application_sid",
+      "plain"
+     ],
+     [
+      "sms_fallback_method",
+      "sms_fallback_method",
+      "plain"
+     ],
+     [
+      "sms_fallback_url",
+      "sms_fallback_url",
+      "plain"
+     ],
+     [
+      "sms_method",
+      "sms_method",
+      "plain"
+     ],
+     [
+      "sms_url",
+      "sms_url",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "status_callback_method",
+      "status_callback_method",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_application_sid",
+      "voice_application_sid",
+      "plain"
+     ],
+     [
+      "voice_caller_id_lookup",
+      "voice_caller_id_lookup",
+      "plain"
+     ],
+     [
+      "voice_fallback_method",
+      "voice_fallback_method",
+      "plain"
+     ],
+     [
+      "voice_fallback_url",
+      "voice_fallback_url",
+      "plain"
+     ],
+     [
+      "voice_method",
+      "voice_method",
+      "plain"
+     ],
+     [
+      "voice_url",
+      "voice_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "phone_numbers",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListPhoneNumber",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "phone_numbers",
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/PhoneNumbers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "trunks" : [
+      {
+       "account_sid" : "a_account_sid",
+       "auth_type" : "a_auth_type",
+       "auth_type_set" : [
+        "a_auth_type_set"
+       ],
+       "cnam_lookup_enabled" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "disaster_recovery_method" : "POST",
+       "disaster_recovery_url" : "a_disaster_recovery_url",
+       "domain_name" : "a_domain_name",
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "recording" : {
+        "a_recording" : 1
+       },
+       "secure" : true,
+       "sid" : "a_sid",
+       "symmetric_rtp_enabled" : true,
+       "transfer_caller_id" : "from-transferor",
+       "transfer_mode" : "sip-only",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auth_type",
+      "auth_type",
+      "plain"
+     ],
+     [
+      "auth_type_set",
+      "auth_type_set",
+      "plain"
+     ],
+     [
+      "cnam_lookup_enabled",
+      "cnam_lookup_enabled",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disaster_recovery_method",
+      "disaster_recovery_method",
+      "plain"
+     ],
+     [
+      "disaster_recovery_url",
+      "disaster_recovery_url",
+      "plain"
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "recording",
+      "recording",
+      "plain"
+     ],
+     [
+      "secure",
+      "secure",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "symmetric_rtp_enabled",
+      "symmetric_rtp_enabled",
+      "plain"
+     ],
+     [
+      "transfer_caller_id",
+      "transfer_caller_id",
+      "plain"
+     ],
+     [
+      "transfer_mode",
+      "transfer_mode",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListTrunk",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "trunks",
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "enabled" : true,
+     "friendly_name" : "a_friendly_name",
+     "priority" : 898,
+     "sid" : "a_sid",
+     "sip_url" : "a_sip_url",
+     "trunk_sid" : "a_trunk_sid",
+     "url" : "a_url",
+     "weight" : 648
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "priority",
+      "priority",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_url",
+      "sip_url",
+      "plain"
+     ],
+     [
+      "trunk_sid",
+      "trunk_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "origination_urls",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Enabled",
+    "true"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Priority",
+    "866"
+   ],
+   [
+    "SipUrl",
+    "v_sip_url"
+   ],
+   [
+    "Weight",
+    "616"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateOriginationUrl",
+  "method" : "update",
+  "options" : {
+   "enabled" : 1,
+   "friendly_name" : "v_friendly_name",
+   "priority" : 866,
+   "sip_url" : "v_sip_url",
+   "weight" : 616
+  },
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/OriginationUrls/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "mode" : "record-from-ringing",
+     "trim" : "trim-silence"
+    },
+    "fields" : [
+     [
+      "mode",
+      "mode",
+      "plain"
+     ],
+     [
+      "trim",
+      "trim",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ],
+   [
+    "recordings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Mode",
+    "record-from-answer-dual"
+   ],
+   [
+    "Trim",
+    "trim-silence"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateRecording",
+  "method" : "update",
+  "options" : {
+   "mode" : "record-from-answer-dual",
+   "trim" : "trim-silence"
+  },
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1/Recording"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auth_type" : "a_auth_type",
+     "auth_type_set" : [
+      "a_auth_type_set"
+     ],
+     "cnam_lookup_enabled" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "disaster_recovery_method" : "POST",
+     "disaster_recovery_url" : "a_disaster_recovery_url",
+     "domain_name" : "a_domain_name",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "recording" : {
+      "a_recording" : 1
+     },
+     "secure" : true,
+     "sid" : "a_sid",
+     "symmetric_rtp_enabled" : true,
+     "transfer_caller_id" : "from-transferor",
+     "transfer_mode" : "sip-only",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auth_type",
+      "auth_type",
+      "plain"
+     ],
+     [
+      "auth_type_set",
+      "auth_type_set",
+      "plain"
+     ],
+     [
+      "cnam_lookup_enabled",
+      "cnam_lookup_enabled",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disaster_recovery_method",
+      "disaster_recovery_method",
+      "plain"
+     ],
+     [
+      "disaster_recovery_url",
+      "disaster_recovery_url",
+      "plain"
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "recording",
+      "recording",
+      "plain"
+     ],
+     [
+      "secure",
+      "secure",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "symmetric_rtp_enabled",
+      "symmetric_rtp_enabled",
+      "plain"
+     ],
+     [
+      "transfer_caller_id",
+      "transfer_caller_id",
+      "plain"
+     ],
+     [
+      "transfer_mode",
+      "transfer_mode",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trunking",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "CnamLookupEnabled",
+    "true"
+   ],
+   [
+    "DisasterRecoveryMethod",
+    "POST"
+   ],
+   [
+    "DisasterRecoveryUrl",
+    "v_disaster_recovery_url"
+   ],
+   [
+    "DomainName",
+    "v_domain_name"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Secure",
+    "true"
+   ],
+   [
+    "TransferCallerId",
+    "from-transferor"
+   ],
+   [
+    "TransferMode",
+    "sip-only"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateTrunk",
+  "method" : "update",
+  "options" : {
+   "cnam_lookup_enabled" : 1,
+   "disaster_recovery_method" : "POST",
+   "disaster_recovery_url" : "v_disaster_recovery_url",
+   "domain_name" : "v_domain_name",
+   "friendly_name" : "v_friendly_name",
+   "secure" : 1,
+   "transfer_caller_id" : "from-transferor",
+   "transfer_mode" : "sip-only"
+  },
+  "required" : [],
+  "url" : "https://trunking.twilio.com/v1/Trunks/id1"
+ }
+]

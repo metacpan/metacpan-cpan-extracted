@@ -43,7 +43,7 @@
    "provides" : {
       "Praxo::Core" : {
          "file" : "lib/Praxo/Core.pm",
-         "version" : "v0.3.0"
+         "version" : "v0.4.0"
       }
    },
    "release_status" : "stable",
@@ -56,6 +56,6 @@
          "url" : "https://github.com/axisvela/praxo-core"
       }
    },
-   "version" : "v0.3.0",
+   "version" : "v0.4.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

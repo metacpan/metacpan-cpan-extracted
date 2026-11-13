@@ -22,6 +22,9 @@ use Praxo::Adapters::Gemini ();
 use Praxo::Adapters::MCP ();
 use Praxo::Adapters::MCPHTTP ();
 use Praxo::Adapters::Harmovela ();
+use Praxo::Adapters::Otel ();
+use Praxo::Adapters::Retriever ();
+use Praxo::Adapters::Delegation ();
 
 my $call = Praxo::Toolcall::parse_toolcall('{"name":"echo","input":{"text":"hi"}}');
 ok(defined $call, 'toolcall parsed');
@@ -441,6 +444,113 @@ is(
     Praxo::Errors::error_code($http_rejected),
     'MCP_TRANSPORT',
     'http mcp https required'
+);
+
+my $otel_captured;
+my $otel = Praxo::Adapters::Otel->new(
+    endpoint => 'https://otel.test/v1/traces',
+    allowed_data_keys => ['name'],
+    clock => sub { return 1794294000000000000 },
+    transport => sub {
+        my ($url, $body, $headers) = @_;
+        $otel_captured = { url => $url, body => $body, headers => $headers };
+        return { status => 200, body => '' };
+    },
+);
+my $otel_event = Praxo::Models::event(
+    type => 'tool.call', session_id => 's1', run_id => 'run-123',
+    data => { name => 'echo', secret => 'hidden' },
+);
+$otel->emit($otel_event);
+is($otel_captured->{url}, 'https://otel.test/v1/traces', 'otel url');
+is($otel_captured->{headers}{'content-type'}, 'application/json',
+    'otel content type');
+my $otel_payload = Praxo::Json::parse($otel_captured->{body});
+my $otel_span = $otel_payload->{resourceSpans}[0]{scopeSpans}[0]{spans}[0];
+is($otel_span->{name}, 'praxo.tool.call', 'otel span name');
+is(length($otel_span->{traceId}), 32, 'otel trace id');
+is(length($otel_span->{spanId}), 16, 'otel span id');
+is($otel_span->{startTimeUnixNano}, '1794294000000000000',
+    'otel timestamp');
+my %otel_keys = map { $_->{key} => 1 } @{ $otel_span->{attributes} };
+ok($otel_keys{'praxo.event.data.name'}, 'otel allowed data');
+ok(!$otel_keys{'praxo.event.data.secret'}, 'otel hidden data');
+
+my $otel_failed = Praxo::Adapters::Otel->new(
+    endpoint => 'https://otel.test/v1/traces',
+    transport => sub { return { status => 503, body => 'unavailable' } },
+);
+my $otel_error;
+eval {
+    $otel_failed->emit($otel_event);
+    1;
+} or $otel_error = $@;
+is(
+    Praxo::Errors::error_code($otel_error),
+    'OTEL_HTTP',
+    'otel non-2xx code',
+);
+
+my $retriever = Praxo::Adapters::Retriever::func_retriever(sub {
+    my ($query, $limit) = @_;
+    return [Praxo::Adapters::Retriever::document(
+        id => 'doc-1',
+        content => "$query:$limit",
+    )];
+});
+my $documents =
+    Praxo::Adapters::Retriever::retrieve_documents($retriever, 'hello', 3);
+is(scalar @$documents, 1, 'retriever count');
+is($documents->[0]{content}, 'hello:3', 'retriever query');
+my $retriever_error;
+eval {
+    Praxo::Adapters::Retriever::retrieve_documents($retriever, 'hello', -1);
+    1;
+} or $retriever_error = $@;
+is(
+    Praxo::Errors::error_code($retriever_error),
+    'RETRIEVER_INVALID',
+    'retriever invalid limit',
+);
+
+my $request = {
+    parentSessionId => 'parent',
+    agentId => 'child',
+    prompt => 'look up',
+    mode => 'fork',
+};
+my $task = Praxo::Adapters::Delegation::subagent_run(
+    sub {
+        my ($request) = @_;
+        return {
+            taskId => 'task-1',
+            agentId => $request->{agentId},
+            output => 'done',
+        };
+    },
+    $request,
+);
+is($task->{status}, 'completed', 'delegate completed');
+is($task->{mode}, 'fork', 'delegate mode');
+is($task->{output}, 'done', 'delegate output');
+my $failed_task = Praxo::Adapters::Delegation::subagent_run(
+    sub { Praxo::Errors::praxo_error('BOOM', 'boom') },
+    $request,
+);
+is($failed_task->{status}, 'failed', 'delegate failed status');
+is($failed_task->{error}, 'BOOM', 'delegate failed code');
+my $delegate_error;
+eval {
+    Praxo::Adapters::Delegation::subagent_run(
+        sub { return { output => 'never' } },
+        { parentSessionId => '', agentId => 'child', prompt => 'look up' },
+    );
+    1;
+} or $delegate_error = $@;
+is(
+    Praxo::Errors::error_code($delegate_error),
+    'SUBAGENT_INVALID',
+    'delegate invalid',
 );
 
 done_testing();

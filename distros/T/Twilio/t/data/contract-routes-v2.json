@@ -1,0 +1,530 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "phone_number" : "a_phone_number",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "voice_region" : "a_voice_region"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voice_region",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPhoneNumber",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://routes.twilio.com/v2/PhoneNumbers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "sip_domain" : "a_sip_domain",
+     "url" : "a_url",
+     "voice_region" : "a_voice_region"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_domain",
+      "sip_domain",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voice_region",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "sip_domains",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSipDomain",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://routes.twilio.com/v2/SipDomains/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "sip_trunk_domain" : "a_sip_trunk_domain",
+     "url" : "a_url",
+     "voice_region" : "a_voice_region"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_trunk_domain",
+      "sip_trunk_domain",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voice_region",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrunks",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://routes.twilio.com/v2/Trunks/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "phone_number" : "a_phone_number",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "voice_region" : "a_voice_region"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voice_region",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "VoiceRegion",
+    "v_voice_region"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdatePhoneNumber",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "voice_region" : "v_voice_region"
+  },
+  "required" : [],
+  "url" : "https://routes.twilio.com/v2/PhoneNumbers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "sip_domain" : "a_sip_domain",
+     "url" : "a_url",
+     "voice_region" : "a_voice_region"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_domain",
+      "sip_domain",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voice_region",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "sip_domains",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "VoiceRegion",
+    "v_voice_region"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateSipDomain",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "voice_region" : "v_voice_region"
+  },
+  "required" : [],
+  "url" : "https://routes.twilio.com/v2/SipDomains/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "sip_trunk_domain" : "a_sip_trunk_domain",
+     "url" : "a_url",
+     "voice_region" : "a_voice_region"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sip_trunk_domain",
+      "sip_trunk_domain",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voice_region",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "trunks",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "VoiceRegion",
+    "v_voice_region"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateTrunks",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "voice_region" : "v_voice_region"
+  },
+  "required" : [],
+  "url" : "https://routes.twilio.com/v2/Trunks/id1"
+ }
+]

@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use constant {
-    DT_TZ_MIN => 2.16,
+    DT_TZ_MIN => 2.71,
     SECONDS_PER_HOUR => 60 * 60,
     MINUTES_PER_HOUR => 60,
 };
@@ -123,8 +123,12 @@ sub get_dt_by_week_and_day {
         );
     };
     if ($@ =~ /^Invalid local time/) {
-        $hour++;
-
+        # The transition time falls in the hour skipped when daylight time
+        # starts. Move forward one hour in floating time so that a transition
+        # at 23:00 (e.g. Greenland) rolls over to 00:00 the next day instead
+        # of trying to set hour 24.
+        my $time_zone = $dt->time_zone();
+        $dt->set_time_zone('floating');
         $dt->set(
             day => $day,
             hour => $hour,
@@ -132,29 +136,27 @@ sub get_dt_by_week_and_day {
             second => $second,
             nanosecond => $millisecond * 1000
         );
+        $dt->add( hours => 1 );
+        $dt->set_time_zone($time_zone);
     }
 
     return $dt;
 }
 
 sub get_windows_timezone_offsets {
-    my $dt = shift;
-    my $feb_dt = shift;
-    my $aug_dt = shift;
-    my $windows_tz_info = shift;
-
-    # Daylight Savings Time not configured for this time zone
-    if ( $windows_tz_info->{'standardMonth'} == 0 ) {
-        return (
-            $windows_tz_info->{'bias'} * -1,
-            $windows_tz_info->{'bias'} * -1,
-            $windows_tz_info->{'bias'} * -1
-        );
-    }
+    my $windows_tz_name = shift;
+    my @dates = @_;
 
     my @offsets;
 
-    foreach my $date ( $dt, $feb_dt, $aug_dt ) {
+    foreach my $date ( @dates ) {
+        my $windows_tz_info = get_windows_tz_info( $windows_tz_name, $date->year() );
+
+        # Daylight Savings Time not configured for this time zone in this year
+        if ( $windows_tz_info->{'standardMonth'} == 0 ) {
+            push @offsets, $windows_tz_info->{'bias'} * -1;
+            next;
+        }
 
         # standard time
         my $standard_date = get_dt_by_week_and_day(
@@ -212,6 +214,85 @@ sub get_windows_timezone_offsets {
     return @offsets;
 }
 
+sub get_windows_tz_info {
+    my $windows_tz_name = shift;
+    my $year = shift;
+
+    # TZI holds a single rule. In a year when a time zone changes, it can
+    # describe only that year, so prefer the rule Windows keeps for each year
+    # under "Dynamic DST" (FirstEntry to LastEntry). Years before or after that
+    # range use the first or last entry. Use TZI when there is no Dynamic DST.
+    my $tzi = $WindowsTZKey->{"${windows_tz_name}/TZI"};
+
+    my $dynamic_dst = $WindowsTZKey->{"${windows_tz_name}/Dynamic DST/"};
+    if (   $dynamic_dst
+        && defined $dynamic_dst->{'/FirstEntry'}
+        && defined $dynamic_dst->{'/LastEntry'} ) {
+        my $first_entry = registry_dword( $dynamic_dst->{'/FirstEntry'} );
+        my $last_entry  = registry_dword( $dynamic_dst->{'/LastEntry'} );
+
+        $year = $first_entry if $year < $first_entry;
+        $year = $last_entry  if $year > $last_entry;
+
+        # use the closest earlier year if a year has no entry of its own
+        for ( my $entry = $year; $entry >= $first_entry; $entry-- ) {
+            if ( defined $dynamic_dst->{"/$entry"} ) {
+                $tzi = $dynamic_dst->{"/$entry"};
+                last;
+            }
+        }
+    }
+
+    # Windows time zone offsets are defined in a structure defined here and offsets are in minutes):
+    #     https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=vs.85).aspx
+    my $windows_tz_info = {};
+    @{$windows_tz_info}{
+            'bias',
+            'standardBias',
+            'daylightBias',
+            'standardYear',
+            'standardMonth',
+            'standardDayOfWeek',
+            'standardWeekOfMonth',
+            'standardHour',
+            'standardMinute',
+            'standardSecond',
+            'standardMilliseconds',
+            'daylightYear',
+            'daylightMonth',
+            'daylightDayOfWeek',
+            'daylightWeekOfMonth',
+            'daylightHour',
+            'daylightMinute',
+            'daylightSecond',
+            'daylightMilliseconds'
+        } = unpack("lllvvvvvvvvvvvvvvvv", $tzi);
+
+    return $windows_tz_info;
+}
+
+# Win32::TieRegistry returns REG_DWORD values as hex strings, e.g. "0x000007EB"
+sub registry_dword {
+    my $value = shift;
+
+    return $value =~ /^0x/i ? hex $value : $value;
+}
+
+sub get_next_first_of_month {
+    my $now = shift;
+    my $month = shift;
+
+    my $dt = DateTime->new(
+        time_zone => $now->time_zone(),
+        year => $now->year(),
+        month => $month,
+        day => 1,
+    );
+    $dt->add( years => 1 ) if DateTime->compare( $dt, $now ) < 0;
+
+    return $dt;
+}
+
 sub windows_tz_names {
     $WindowsTZKey = $Registry->Open(
         'LMachine/SOFTWARE/Microsoft/Windows NT/CurrentVersion/Time Zones/',
@@ -263,7 +344,7 @@ sub test_windows_zone {
     my $windows_tz_name = shift;
     my $iana_name      = shift;
     my $registry_writable = shift;
-    my %KnownBad = map { $_ => 1 } ( 'Samoa Standard Time', 'Central Asia Standard Time' );
+    my %KnownBad = map { $_ => 1 } ();
 
 
     my $tz;
@@ -317,46 +398,13 @@ sub test_windows_zone {
 
             # typical times always Winter or Summer time depending on hemisphere if daylight savings in use
             # and attempting to avoid Ramadan as Morocco suspends daylight savings during Ramadan
-            my $feb_dt = DateTime->new(
-                time_zone => $tz->name(),
-                year => $dt->year(),
-                month => 2,
-                day => 1,
-            );
-            my $aug_dt = DateTime->new(
-                time_zone => $tz->name(),
-                year => $dt->year(),
-                month => 8,
-                day => 1,
-            );
-
-            # Windows time zone offsets are defined in a structure defined here and offsets are in minutes):
-            #     https://msdn.microsoft.com/en-us/library/windows/desktop/ms725481(v=vs.85).aspx
-            my $windows_tz_info = {};
-            @{$windows_tz_info}{
-                    'bias',
-                    'standardBias',
-                    'daylightBias',
-                    'standardYear',
-                    'standardMonth',
-                    'standardDayOfWeek',
-                    'standardWeekOfMonth',
-                    'standardHour',
-                    'standardMinute',
-                    'standardSecond',
-                    'standardMilliseconds',
-                    'daylightYear',
-                    'daylightMonth',
-                    'daylightDayOfWeek',
-                    'daylightWeekOfMonth',
-                    'daylightHour',
-                    'daylightMinute',
-                    'daylightSecond',
-                    'daylightMilliseconds'
-                } = unpack("lllvvvvvvvvvvvvvvvv", $WindowsTZKey->{"${windows_tz_name}/TZI"});
+            # Windows doesn't keep a history of its rules, so test the next
+            # February 1 and August 1 rather than dates that may be in the past.
+            my $feb_dt = get_next_first_of_month( $dt, 2 );
+            my $aug_dt = get_next_first_of_month( $dt, 8 );
 
             my ($windows_offset, $windows_feb_offset, $windows_aug_offset) =
-                get_windows_timezone_offsets( $dt, $feb_dt, $aug_dt, $windows_tz_info );
+                get_windows_timezone_offsets( $windows_tz_name, $dt, $feb_dt, $aug_dt );
 
             # offsets in DateTime::TimeZone are in seconds
             my $dt_offset = $dt->offset();

@@ -1,0 +1,36 @@
+---
+abstract: 'Web app for reviewing changes written by AI agents.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Test2::V0: '0.000060'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.039, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Review-Helper
+requires:
+  Capture::Tiny: '0'
+  Cpanel::JSON::XS: '0'
+  DBD::SQLite: '1.68'
+  DBI: '0'
+  File::ShareDir: '0'
+  Getopt::Yath: '2.000009'
+  Object::HashBase: '0'
+  Plack: '0'
+  Role::Tiny: '0'
+  Router::Simple: '0'
+  UUID: '0.39'
+  perl: '5.036000'
+resources:
+  bugtracker: https://github.com/exodist/Review-Helper/issues
+  repository: https://github.com/exodist/Review-Helper/
+version: '0.001'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
+x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

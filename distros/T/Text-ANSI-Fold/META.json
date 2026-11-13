@@ -43,7 +43,7 @@
       "runtime" : {
          "requires" : {
             "List::Util" : "1.45",
-            "Text::VisualWidth::PP" : "0.08",
+            "Text::VisualWidth::PP" : "0.09",
             "perl" : "v5.14.0"
          }
       },
@@ -56,7 +56,7 @@
    "provides" : {
       "Text::ANSI::Fold" : {
          "file" : "lib/Text/ANSI/Fold.pm",
-         "version" : "2.3305"
+         "version" : "2.3901"
       },
       "Text::ANSI::Fold::Japanese::W3C" : {
          "file" : "lib/Text/ANSI/Fold/Japanese/W3C.pm"
@@ -77,7 +77,7 @@
          "web" : "https://github.com/tecolicom/Text-ANSI-Fold"
       }
    },
-   "version" : "2.3305",
+   "version" : "2.3901",
    "x_authority" : "cpan:UTASHIRO",
    "x_contributors" : [
       "Kazumasa Utashiro <kaz@utashiro.com>"

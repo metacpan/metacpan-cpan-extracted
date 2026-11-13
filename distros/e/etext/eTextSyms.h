@@ -34,6 +34,7 @@
 #define TkBTreeLineIndex                 eText_TkBTreeLineIndex
 #define TkBTreeLineTextAppend            eText_TkBTreeLineTextAppend
 #define TkBTreeLinkSegment               eText_TkBTreeLinkSegment
+#define TkBTreeListRunsOn                eText_TkBTreeListRunsOn
 #define TkBTreeMakeBlock                 eText_TkBTreeMakeBlock
 #define TkBTreeNextLine                  eText_TkBTreeNextLine
 #define TkBTreeNextTag                   eText_TkBTreeNextTag
@@ -44,6 +45,7 @@
 #define TkBTreeReleaseRunValues          eText_TkBTreeReleaseRunValues
 #define TkBTreeRestoreValues             eText_TkBTreeRestoreValues
 #define TkBTreeRunValue                  eText_TkBTreeRunValue
+#define TkBTreeSetRunValueAt             eText_TkBTreeSetRunValueAt
 #define TkBTreeSetValue                  eText_TkBTreeSetValue
 #define TkBTreeSnapshotValues            eText_TkBTreeSnapshotValues
 #define TkBTreeStartSearch               eText_TkBTreeStartSearch
@@ -77,6 +79,7 @@
 #define TkIBTreeLastLine                 eText_TkIBTreeLastLine
 #define TkIBTreeLeafAt                   eText_TkIBTreeLeafAt
 #define TkIBTreeLeafDefects              eText_TkIBTreeLeafDefects
+#define TkIBTreeLeafSplit                eText_TkIBTreeLeafSplit
 #define TkIBTreeNode2seg                 eText_TkIBTreeNode2seg
 #define TkIBTreePrint                    eText_TkIBTreePrint
 #define TkIBTreePullOut                  eText_TkIBTreePullOut
@@ -85,16 +88,21 @@
 #define TkIBTreeRepadRootIn              eText_TkIBTreeRepadRootIn
 #define TkIBTreeRepadRoots               eText_TkIBTreeRepadRoots
 #define TkIBTreeRootHasValue             eText_TkIBTreeRootHasValue
+#define TkIBTreeRootLevel                eText_TkIBTreeRootLevel
 #define TkIBTreeRootOverPadding          eText_TkIBTreeRootOverPadding
+#define TkIBTreeSeparatorLevel           eText_TkIBTreeSeparatorLevel
 #define TkIBTreeSeparatorLevels          eText_TkIBTreeSeparatorLevels
+#define TkIBTreeSetBeginValue            eText_TkIBTreeSetBeginValue
 #define TkIBTreeSetDefect                eText_TkIBTreeSetDefect
 #define TkIBTreeSetLeafDefects           eText_TkIBTreeSetLeafDefects
+#define TkIBTreeSetNodeValues            eText_TkIBTreeSetNodeValues
 #define TkIBTreeSetSeparatorLevels       eText_TkIBTreeSetSeparatorLevels
 #define TkIBTreeSingleLeaf               eText_TkIBTreeSingleLeaf
 #define TkIBTreeSplit                    eText_TkIBTreeSplit
 #define TkIBTreeSproutLeaf               eText_TkIBTreeSproutLeaf
 #define TkIBTreeSproutRange              eText_TkIBTreeSproutRange
 #define TkIBTreeSproutValues             eText_TkIBTreeSproutValues
+#define TkIBTreeStackChain               eText_TkIBTreeStackChain
 #define TkIBTreeStartIndex               eText_TkIBTreeStartIndex
 #define TkIBTreeTextAppend               eText_TkIBTreeTextAppend
 #define TkIBTreeTogglesElide             eText_TkIBTreeTogglesElide
@@ -103,6 +111,7 @@
 #define TkIBTreeWrap                     eText_TkIBTreeWrap
 #define TkTextBindProc                   eText_TkTextBindProc
 #define TkTextBlockCmd                   eText_TkTextBlockCmd
+#define TkTextBlockOrnsAt                eText_TkTextBlockOrnsAt
 #define TkTextChanged                    eText_TkTextChanged
 #define TkTextCharBbox                   eText_TkTextCharBbox
 #define TkTextCharLayoutProc             eText_TkTextCharLayoutProc
@@ -158,6 +167,7 @@
 #define TkTextOrnFreeBlock               eText_TkTextOrnFreeBlock
 #define TkTextOrnIsType                  eText_TkTextOrnIsType
 #define TkTextOrnLayoutItem              eText_TkTextOrnLayoutItem
+#define TkTextOrnLayoutSplits            eText_TkTextOrnLayoutSplits
 #define TkTextOrnLayoutTemplates         eText_TkTextOrnLayoutTemplates
 #define TkTextOrnTemplatesParse          eText_TkTextOrnTemplatesParse
 #define TkTextOrnTemplatesRelease        eText_TkTextOrnTemplatesRelease
@@ -169,6 +179,7 @@
 #define TkTextPixelIndex                 eText_TkTextPixelIndex
 #define TkTextPrintDLines                eText_TkTextPrintDLines
 #define TkTextPrintIndex                 eText_TkTextPrintIndex
+#define TkTextRecordSet                  eText_TkTextRecordSet
 #define TkTextRedrawRegion               eText_TkTextRedrawRegion
 #define TkTextRedrawTag                  eText_TkTextRedrawTag
 #define TkTextRelayoutWindow             eText_TkTextRelayoutWindow

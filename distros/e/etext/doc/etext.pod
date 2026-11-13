@@ -15,7 +15,7 @@ The other difference with the stock Text widget is the object oriented
 dump. It dumps a list of objects which represent the contents of the
 widget in the given range. The temporary position for this command is
 
-   .widget block list from to
+   .widget block list ?-values? from to
 
 An object is a real object in Perl, and a list with a first element
 being the I<class id> in TCL (the rest being the contests, in what
@@ -54,6 +54,13 @@ copy of the value, C<[name, value]>, instead of a reference to the
 name; code that reads the name should accept both forms:
 
   my $name = UNIVERSAL::isa($elt, 'ARRAY') ? $elt->[0] : $$elt;
+
+A run that is already on where the range starts has its
+C<Tk::Text::TagOn> before the range, so the list mentions it only by
+the C<Tk::Text::TagOff> at its end, or not at all.  With C<-values>
+the list starts with a C<Tk::Text::TagOn> for each such run (with a
+copy of the value if the run has one, the tag C<sel> excepted), so
+that the list alone says which tags its text has.
 
 =item Window
 
@@ -132,6 +139,26 @@ forms with
 At a separator of depth I<s>, both leaves next to it have defects of
 at most I<s>.  A block that is a single leaf (see C<block flatten>)
 has the depth -1, and no pair: C<[['F', -1], 'numden']>.
+
+With C<-values>, a separator of a block that is not listed whole (the
+range is inside the block, or cuts it) carries the values of what
+I<begins> after it: it is a reference to an array (of the same class)
+of its depth, the defect of the leaf after it (0 where the leaves are
+equally deep), a copy of the value of that leaf, and copies of the
+values of the nodes that begin with that leaf, from the lowest up: as
+many as the depth says, less the defect.  C<undef> stands for a node
+without a value.  In a table C<{a|b||c|d}> (rows of cells) with the
+values C<B>, C<C>, C<D> on the cells and C<ROW2> on the second row,
+the range from C<b> to C<c> is listed as
+
+  'b', [1, 0, 'C', 'ROW2'], 'c'
+
+and that of C<|b> as C<[0, 0, 'B'], 'b'>.  The code above that reads
+the depth and the defect reads these too.  A block listed whole has
+all its values in its header, as without C<-values>, and its
+separators stay as they are.  The root, the first leaf and the nodes
+that begin with the first leaf begin with the block: no separator
+carries their values.  See L<Cut and paste with structure>.
 
 =back
 
@@ -368,6 +395,129 @@ detaches and the nodes it makes (see L<Telling the program:
 
 =back
 
+=head2 Cut and paste with structure
+
+The string of a range (C<get>, the selection) has the delimiters of
+blocks as characters: inserted again it is text, and makes no block
+and no leaf.  The list of a range (C<block list>) has them as
+elements: C<block paste> puts such a list in at an index, with one
+command, and C<block cut> takes a range out as a list.
+
+  my @piece = $text->blockCut('sel.first', 'sel.last');
+  ...
+  $text->blockPaste('insert', \@piece);
+
+B<What a piece carries.>  A value travels with the delimiter that
+begins its owner.  A separator of depth I<k> begins a leaf and I<k>
+nodes (in a table of rows of cells, a cell separator begins a cell, a
+row separator a cell and a row), and C<block list -values> puts their
+values into its element; the head of a block begins the block, its
+root, its first leaf and the nodes above that leaf, and a block that
+is whole in the range has all its values in its header; the start of
+a run carries the run's value.  So a piece of a block carries the
+values of the leaves and nodes that begin in it, and no others: not
+that of the leaf in which it starts.
+
+B<block cut> returns that list and deletes the range as C<delete>
+does (see L<Deletion of text in blocks>), but for one rule.  Where
+C<delete> joins two leaves, or two nodes, the joined one keeps the
+value of the start side if it has one, and else takes that of the end
+side.  After C<block cut> it never takes the end side's: that value
+is in the piece, with the separator that began its owner, and the
+leaf and the nodes in which the range started are left as they were,
+with or without a value.  (The values C<block cut> takes out go into
+its undo step, as those a deletion drops.)
+
+B<block paste> does what the undo of a deletion does with the list it
+kept, at any place:
+
+=over 5
+
+=item *
+
+Strings are inserted; the text gets the tags the list switches on for
+it, and of the tags the list does not mention those of the place (as
+text typed there would).  A run started in the list by C<[name,
+value]> gets that value if it does not join a run that was there.
+
+=item *
+
+A separator is put in as C<block split> at its depth would put it:
+the leaf at the place is cut, and so is every node above it up to
+that depth, the tree getting more levels below its root if it has too
+few.  The leaf after the separator gets the defect the element gives
+(see L<Ragged trees>) where the tree at the place allows it.  Then
+the new leaf and the new nodes get the values of the element.
+Outside blocks a separator is a newline, and its values are not used.
+
+=item *
+
+A block is created with its type, its instance data, its contents
+and, if the header has them, the values of its nodes.  If the widget
+has no block type of that name the contents are put in without the
+block.  An embedded image is created again under a new name; a window
+given with C<-window> can only be in one place.
+
+=item *
+
+Marks are moved to where the list has them only with C<-marks>.
+
+=back
+
+What was at the place stays as it was: the leaf pasted into keeps its
+value for its first part, and what followed the place in that leaf is
+now the end of the last leaf the piece began.
+
+B<Cut, then paste at the same place,> gives back the text, the trees
+and the values, if the range cuts no block and the leaves of the
+block around it are equally deep (F<t/cutpaste.t> checks it on random
+documents); the marks come back with C<-marks>.  Two pieces of two
+blocks can be exchanged in this way, also with no third place to keep
+one of them: the second block may hold both for a moment.  A
+separator keeps its depth, which is counted from the leaves: a row
+separator of a table of rows of cells, pasted into a block with one
+level, gives that block a second level.  A piece kept on a line
+outside blocks loses the depths (its separators are newlines there);
+a variable or a block keeps them.
+
+What is not given back:
+
+=over 5
+
+=item *
+
+A range that holds the head of a block without its tail, or the tail
+without the head, cuts the block, and both commands delete as
+C<delete> does: the block is dissolved.  The list has the part in the
+range as a block of its own (of the same type, with a copy of the
+instance data, without the values of the root and of the first leaf),
+and pasting it makes that block.  C<edit undo> restores a cut block.
+
+=item *
+
+Where the leaves of the block are at different depths and the cut
+joins a leaf with a deeper one, the shallower leaf first gets nodes
+above it, as for any deletion; the paste does not take them out
+again.  I<(Temporary, see F<BUGS> 36.)>
+
+=back
+
+The undo of C<block paste> deletes what the paste put in, as C<block
+cut> would (so the leaf pasted into keeps what it had and gets back no
+value of the piece), and takes away the levels the paste gave the
+tree; the values of the piece wait in the undo step for the redo.
+
+The C<-valuecommand> callback is told what C<block cut> detaches, as
+for a deletion, but never C<move> for a join.  C<block paste> detaches
+nothing, and the leaves and nodes it makes are not told C<new>,
+whether they get a value from the list or not.  I<(Temporary: the
+block type is not asked at the joins and splits of these commands;
+which value a cell should keep when a piece ends in the middle of it
+is a question for the type.  See F<BUGS> 36.)>
+
+The methods C<clipboardCopy>, C<clipboardCut> and C<clipboardPaste>
+of the Perl widget use these commands: see L<Tk::eText>.
+
 =head2 Tags and blocks
 
 Characters inside leaves can be tagged in the usual way. Interleaf
@@ -414,6 +564,9 @@ structure is ignored, all the leaves are drawn on the display one
 under another, left justified, with wrap enabled, and the resulting
 object is vertically centered about the middle of the ascent of the
 default font. In what follows we refer to this behavior as I<default layout>.
+(The tree structure does not change the places of the leaves, but
+lines between the leaves and frames around them show it: see L<Split
+lines and frames>.)
 
 =item *
 
@@ -436,6 +589,179 @@ blocks>).
 Block can also specify that some leaves have some additional tags.
 
 =back
+
+=head2 Split lines and frames
+
+I<(Since 2.09.)>
+
+Where the widget itself puts leaves of a block one under another, the
+places of the leaves do not show the tree they are leaves of.  The
+widget then draws what is hidden: between two leaves, lines that show
+how deep in the tree the split between them is; around the leaves,
+frames that show how many nodes with a single child are above them.
+
+A I<stack> is a run of consecutive leaves of one block that the widget
+lays out one under another:
+
+=over 5
+
+=item *
+
+In a block that is laid out by default (its type has no layout
+callback, or the result of the callback was refused), all the leaves
+of the block are one stack.
+
+=item *
+
+In a block that is laid out by its callback, each element of the
+result that describes leaves with a box (a list of 7 or 13 elements
+whose I<repeat count> is at least 1, see L<Layout callback>) makes one
+stack of the leaves it describes.  That may be one leaf, or a group of
+leaves that the callback saw as one child with a I<repeat count> (see
+L<Lying to layout callback>).  Leaves hidden with a list of one
+element are in no stack.
+
+=back
+
+The I<box> of a stack is the smallest box that holds the boxes of the
+display lines of its leaves, as C<bbox> gives them.  In the default
+layout it is the box of the block.
+
+B<Numbers.>  A number is drawn in binary, as one I<stroke> for each
+bit that is set:
+
+=over 5
+
+=item *
+
+bit 0 (the value 1): a dotted line, 1 pixel wide (1 pixel drawn, 2
+left out);
+
+=item *
+
+bit 1 (the value 2): a dashed line, 1 pixel wide (4 pixels drawn, 3
+left out);
+
+=item *
+
+bit 2 (the value 4): a solid line, 1 pixel wide;
+
+=item *
+
+bit 3 (the value 8): a solid line, 3 pixels wide;
+
+=item *
+
+each higher bit: one more solid line, 3 pixels wide.
+
+=back
+
+So 1 is a dotted line, 2 a dashed line, 3 a dotted line and a dashed
+line, 4 a solid line.  The strokes of one number never touch: one row
+(or column) of pixels is left free between two of them, so that two
+strokes 1 pixel wide are 2 pixels apart.  All strokes have the colour
+C<gray50>.
+
+B<Split lines.>  For two consecutive leaves of the same stack, let
+I<s> be the depth of the separator between them, as C<block list>
+reports it (see L<What else is in the widget?>): 0 if both leaves have
+the same parent, 1 if their parents are different children of one
+node, and so on.  If I<s> is 0, nothing is drawn.  Otherwise I<s> is
+drawn as horizontal lines across the box of the stack, from its left
+side to its right side.  The lines start on the top row of pixels of
+the lower leaf, that is, of its first display line, and go down: the
+stroke of the lowest bit that is set comes first, and the strokes of
+the higher bits follow one under another.
+
+In a ragged tree (see L<Ragged trees>) I<s> is the depth in the
+uniform tree that the widget keeps, and the two leaves may have
+different I<defects> (the number of padding nodes directly above a
+leaf, as C<block list> reports it).  If the upper leaf has the defect
+I<dA> and the lower leaf the defect I<dB>, the left half of the width
+of the box shows I<s> - I<dA> and the right half shows I<s> - I<dB>: on
+each side, the depth of the separator counted from the parent of the
+leaf that is on that side.  A half whose number is 0 draws nothing.
+(A defect is never larger than I<s>.)  When the two numbers are equal,
+as in a tree whose leaves are equally deep, the two halves are one
+line across the whole width.  The left half is the first half of the
+pixels of the width, rounded down.  In C<R( x | S( 2 | 3 ) )>, laid out
+by default, the separator between C<x> and C<2> has the depth 1, C<x>
+the defect 1 and C<2> the defect 0: a dotted line is drawn on the
+right half only (C<2> is one level below the node where the two
+leaves part, C<x> is a child of that node), and nothing between C<2>
+and C<3>.
+
+B<Frames.>  For each stack the widget looks for the node that the
+stack is I<expected> to be: the node I<E> at the distance I<D> from
+the root of the tree of the block, on the way from the root to the
+first leaf of the stack.  I<D> is 0, so that I<E> is the root, in a
+block that is laid out by default.  In a block that is laid out by its
+callback, I<D> is the C<-layoutdepth> of the type: the nodes at that
+distance from the root are the ones that the callback sees as children
+with a I<repeat count> (with C<-layoutdepth 1>, the children of the
+root; with C<-layoutdepth 0>, the root).  The stack has no frame
+
+=over 5
+
+=item *
+
+if the type has a layout callback and no C<-layoutdepth> (the value
+-1), or
+
+=item *
+
+if the first leaf of the stack is not deeper than I<D> (I<E> would be
+that leaf itself), or
+
+=item *
+
+if the leaves of the stack are not exactly all the leaves below I<E>
+(as when C<-layoutwidths> made the callback see several children as
+one).
+
+=back
+
+Otherwise let I<n> be the number of nodes in the chain that starts at
+I<E> and goes down for as long as the node has exactly one child (a
+node or a leaf): I<E> if it has one child, that child if it is a node
+with one child, and so on.  Padding nodes (see L<Ragged trees>) are
+not nodes of the tree and are not counted.  For blocks that are laid
+out by default:
+
+  R( a | b )                  n = 0
+  R( a )                      n = 1
+  R( N( a | b ) )             n = 1
+  R( N( a ) )                 n = 2
+  R( N( a | b ) | M( c ) )    n = 0
+
+A block that is a single leaf (see C<block flatten>) has no nodes:
+I<n> is 0.  If I<n> is 0, nothing is drawn.  Otherwise I<n> is drawn as
+frames around the box of the stack: for each stroke the outline of a
+rectangle.  The frames start with the pixels next to the box, 1 pixel
+outside it, and go outwards: the stroke of the lowest bit that is set
+is the innermost frame, and the strokes of the higher bits are further
+out, so that two frames 1 pixel wide are 2 pixels apart.  The dots or
+dashes of a frame start at its top left corner.
+
+B<What they are not.>  The lines and frames take no room: the block
+and its leaves are laid out exactly as without them, and C<bbox>,
+C<dlineinfo> and the pointer do not see them.  They are made anew at
+every layout of the block.  They are drawn under the text of the
+block, as the ornaments of the block with C<-layer under> are (see
+L<Ornaments of blocks>), and before all of those.  As those, they are
+clipped to the display line of the block and to the text area of the
+widget: where a stack reaches the top, the bottom, the left end or the
+right end of its display line, that side of its frames is outside and
+is not drawn.  (A block that is as high as its line reaches the top
+and the bottom of the line, unless the line has space above and below
+it: C<-spacing1>, C<-spacing3>.)  They are not ornaments of the
+program: C<ornament names> does not list them.
+
+The option C<-splitlines> of the type of the block (see C<block
+configure>), true by default, switches the lines and the frames off
+for the blocks of that type:
+
+  $text->blockConfigure('Fraction', -splitlines => 0);
 
 =head1 Layout callback
 
@@ -698,6 +1024,13 @@ whose points are computed from the boxes of the block and of its
 leaves: see L<Ornaments of blocks>.  Default C<{}> (none).  A value
 that does not parse is an error, and the old value stays.
 
+=item B<-splitlines>
+
+Boolean value that specifies whether the split lines and frames are
+drawn for the blocks of this type (since 2.09): see L<Split
+lines and frames>.  Default true.  Changing it lays the blocks out
+again.
+
 =back
 
 =item B<cget>
@@ -848,6 +1181,50 @@ each.  Recorded for undo; see L<Undo and redo of block and tag
 changes>.  An I<index> on the last (dummy) line is taken as the end
 of the line before it, as for C<insert>.
 
+
+=item B<level> I<index ?level?>
+
+I<index> must name a separator of a block (the innermost block that
+holds it).  Without I<level>, returns the depth of the separator, as
+C<block list> shows it: 0 between two leaves of the same lowest node,
+1 between leaves whose lowest nodes are siblings, and so on.  With
+I<level>, gives the separator that depth and returns nothing.  No text
+moves, and no leaf changes; the nodes above the two leaves do:
+
+=over 5
+
+=item *
+
+A higher depth cuts the nodes that hold both leaves, from the lowest
+up, as C<block split> at that depth would have cut them when it put
+the separator in: the part before the separator keeps the node's
+value, the part after it is a new node without one.  If the tree has
+too few levels, new nodes are inserted below the root first, as for
+C<block split>.  In a table of rows of cells this makes a cell
+separator a row separator: the row is cut in two.
+
+=item *
+
+A lower depth joins, on each level down to the new depth, the node
+that ends before the separator with the node that begins after it, as
+the deletion of the separator would join them: the joined node keeps
+the value of the first if it has one, else it takes that of the
+second, and the other value is freed (kept in the undo step).  The
+two leaves stay two leaves, with their values.  The tree keeps its
+number of levels (see C<block trim>).  In a tree whose leaves are at
+different depths (see L<Ragged trees>) both leaves must have nodes of
+their own down to the new depth: else the command fails, and C<block
+sprout> can first give the shallower leaf a node.
+
+=back
+
+Deleting a separator and putting it in again with C<block split> at
+another level gives the same tree, but joins the two leaves in
+between, so that the value of the second leaf is lost; C<block level>
+keeps it.  Recorded for undo (see L<Undo and redo of block and tag
+changes>); the C<-valuecommand> callback is told C<new> for the nodes
+a higher depth makes, and what a lower depth does to the values of
+the nodes it joins, as for a deletion.
 
 =item B<sprout> I<index1 ?index2?>
 
@@ -1008,9 +1385,31 @@ glyphs (the delimiters of its C<LR> block) and backgrounds.
 
 Deletes all the "stolen" lines.
 
-=item B<list> I<from> I<to>
+=item B<list> ?B<-values>? I<from> I<to>
 
-See L<What else is in the widget?>.
+See L<What else is in the widget?>.  With B<-values> the list holds
+what C<block paste> needs to put the range in again with its values:
+the separators carry the values of the leaves and nodes that begin
+after them, and the runs that are on where the range starts are
+listed.
+
+=item B<cut> I<index1 index2>
+
+Returns the list of C<block list -values> for the range and deletes
+the range.  See L<Cut and paste with structure> for how this deletion
+differs from C<delete>.  An undo step of its own.  In a disabled
+widget only the list is returned.
+
+=item B<paste> I<index list> ?B<-marks>?
+
+Puts the contents of I<list> in at I<index>, as one command.  I<list>
+is a reference to an array of the elements of C<block list>, as
+C<block list>, C<block list -values> and C<block cut> return them
+(or made by the program).  Returns the indices of the start and of
+the end of what was put in.  An undo step of its own; nothing is done
+in a disabled widget.  With B<-marks> the marks the list names are
+moved to their places in what is put in (C<insert> and C<current>
+never are).  See L<Cut and paste with structure>.
 
 =back
 
@@ -1426,7 +1825,8 @@ C<undef>.  Without C<-values> the dump is as before.
 =head1 Undo and redo of block and tag changes
 
 With C<-undo> on, C<block insert>, C<block split>, C<block trim>,
-C<block sprout>, C<block flatten>, C<tag add> and C<tag remove> are
+C<block sprout>, C<block flatten>, C<block cut>, C<block paste>,
+C<block level>, C<tag add> and C<tag remove> are
 recorded for C<edit undo>, as
 insertions and deletions are (Tk's text widget records neither tags
 nor, of course, blocks).  The undo reverses each of them, the redo
@@ -1495,6 +1895,23 @@ deletion did.
 
 =item *
 
+C<block level>: the undo gives the separator the depth it had, takes
+away the levels a higher depth added below the root, and gives back
+the values a lower depth dropped or moved; the redo changes the depth
+again.
+
+=item *
+
+C<block cut>: undone and redone as a deletion; the redo joins by the
+rule of C<block cut> again.  C<block paste>: the undo deletes the
+range the paste filled, by the same rule, and then takes away the
+levels the paste added below the root (and, in a block that was a
+single leaf, makes the root padding again); the redo inserts what the
+undo deleted, as for any insertion, with the values.  With
+C<-autoseparators> each is a step of its own.
+
+=item *
+
 C<tag add> and C<tag remove> over a range: the undo gives the tag in
 that range exactly the ranges it had there before, the run values
 included (a run that tag add extended keeps its value on the part that
@@ -1523,8 +1940,9 @@ another kind than the last one, so that a run of changes of the same
 kind (several C<tag add> in a row, as typing is a run of insertions)
 is one undo step, and a change of another kind starts a new one
 (C<tag add> and C<tag remove> are two kinds, as insertion and deletion
-are; C<block sprout> and C<block flatten> are kinds of their own).  To make one step of several changes of different kinds, switch
-C<-autoseparators> off and put in C<edit separator> yourself.  A
+are; C<block sprout>, C<block flatten> and C<block level> are kinds of
+their own).  To make one step of several changes of different kinds, use
+an edit step (see L<Several changes as one undo step>).  A
 program that uses tags for display only (highlighting found text, say)
 can switch C<-undo> off around those calls: tags do not move text, so
 the history stays valid.  These changes also count for C<edit
@@ -1535,8 +1953,67 @@ calls.
 
 Not recorded (so not undone, and what they drop is freed when they
 return): C<tag delete>, C<tag configure>, C<mark set>, C<mark unset>,
-C<block delete>, C<block configure>, and the setting of values
-(C<block data>, C<block nodedata>, C<mark data>, C<tag data>).
+C<block delete>, C<block configure>, and, outside an edit step, the
+setting of values (C<block data>, C<block nodedata>, C<mark data>,
+C<tag data>).
+
+=head2 Several changes as one undo step
+
+One edit of the user is often several commands: a block is made with
+C<block insert>, then gets its instance data, its separators and the
+values of its nodes; a selection is replaced by a deletion and an
+insertion; two pieces are exchanged by two cuts and two pastes.  With
+C<-autoseparators> each change of another kind is an undo step, and a
+value set is not recorded at all.
+
+  .t edit step begin
+  ...
+  .t edit step end
+
+makes one undo step of everything between the two: C<edit undo> takes
+all of it back, C<edit redo> does all of it again.  Between them
+
+=over 5
+
+=item *
+
+no separator goes into the undo history: C<-autoseparators> puts none,
+and C<edit separator> does nothing;
+
+=item *
+
+the setting of a value (C<block nodedata>, C<tag data>, C<mark data>,
+C<block data>) is recorded, with C<-undo> on: the value the place had
+goes into the undo step instead of being freed, the undo gives it back
+and takes the value that was set into the step, and the redo
+exchanges them again.  A set that changes nothing (no value there and
+none given) is not recorded.
+
+=back
+
+Steps nest: C<edit step begin> inside a step only counts, and the
+C<edit step end> that matches the first C<begin> ends the undo step.
+C<edit step begin> and C<edit step end> return the number of steps
+open then, and so does C<edit step> alone; C<edit step end> with no
+step open is an error.  The change after a step starts a step of its
+own.  A program must not leave a step open: until its C<end> all
+changes are one undo step.  In Perl the method C<editStep> takes care
+of that:
+
+  $text->editStep(sub {
+    $text->blockInsert('Fraction', '2.1', '2.3');
+    $text->blockSplit('2.3', 0);
+    $text->blockData('2.2', $data);
+    $text->blockNodedata('2.2', 1, $value);
+  });
+
+runs the code inside a step, ends the step also when the code dies
+(the error is passed on), and returns what the code returns.
+
+The C<-valuecommand> callback is told C<stash> for the value a
+recorded set replaces (C<drop> for an unrecorded one), then C<stash>
+and C<restore> as the undo and the redo exchange the two values, and
+C<discard> for the one the step holds when the step is discarded.
 
 =head1 Values
 
@@ -1680,6 +2157,22 @@ removes it whole (nor its ancestors below the root, which hold the
 tail too): when all its leaves are deleted, it is joined to the node
 before it, and its value follows the rule for joined nodes: it moves
 to that node if that node has no value, and is dropped otherwise.
+
+=item *
+
+C<block level> changes the depth of a separator without joining the
+two leaves beside it: they keep their values.  A higher depth cuts
+nodes as C<block split> does (the part before the cut keeps the
+value); a lower depth joins nodes by the rule of a deletion (the
+start side's value, else the end side's).
+
+=item *
+
+C<block cut> deletes in the same way, but a joined leaf or node never
+takes the value of the end side: it keeps what the start side had,
+and the end side's value leaves with the list C<block cut> returns
+(see L<Cut and paste with structure>).  C<block paste> gives the
+leaves and nodes it makes the values its list has for them.
 
 =item *
 
@@ -1975,7 +2468,9 @@ value.  C<block insert>, C<block split>, C<block trim>, C<tag add> and
 C<tag remove> keep what they drop in their undo steps in the same way
 (see L<Undo and redo of block and tag changes>).  C<tag delete>,
 C<mark unset> and the setting of values are not undoable, so the
-values they drop are freed when they return.
+values they drop are freed when they return; but a value set inside
+an edit step is recorded, and the value it replaces waits in the undo
+step (see L<Several changes as one undo step>).
 
 The redo of an insertion re-inserts it exactly: when the insertion is
 undone, the inserted range is recorded in block-list form, as a
@@ -1994,7 +2489,8 @@ the deleted text leaves them out (the instance data of blocks
 included, and those of marks, which the undo never needs: it moves an
 existing mark back with its value), so that it holds no extra
 reference to them.  A program re-creating text from the elements of C<block
-list> sets no values unless it does so itself.
+list> sets no values unless it does so itself; C<block paste> sets
+those its list has (see L<Cut and paste with structure>).
 
 =head2 Telling the program: -valuecommand
 
@@ -2128,7 +2624,7 @@ it.
 
 The command: C<delete>, C<insert>, C<tag add>, C<tag remove>, C<tag
 delete>, C<block insert>, C<block trim>, C<block split>, C<block sprout>,
-C<block flatten>, C<undo>,
+C<block flatten>, C<block cut>, C<block paste>, C<block level>, C<undo>,
 C<redo>, C<reset> (C<edit reset>), C<separator> (C<edit separator>),
 C<configure> (C<-maxundo>); C<set> for the commands that set a value
 (C<block nodedata>, C<tag data>, C<mark data>, C<block data>, undef

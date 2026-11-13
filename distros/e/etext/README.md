@@ -16,7 +16,7 @@ tk4.0b3 text widget and the Perl/Tk b9 glue.  The first commit of the Git
 repository (https://github.com/ilyaz-ai/etext) is that release, untouched.
 Everything after it is the modernization described below.
 
-## Status (version 2.08, 2026)
+## Status (version 2.09, 2026)
 
 * **The Perl extension `Tk::eText` builds and works with Perl 5.38 and
   Perl/Tk 804.036**, as a standalone module.  The widget is the
@@ -45,6 +45,15 @@ Everything after it is the modernization described below.
   computed from where characters are drawn; they follow the text, and
   block types draw theirs too (the demo's radicals, fraction bars and
   table rules).  See the manual's "Ornaments".
+* **Since 2.09 a piece of a block moves with its structure and its
+  values.**  `block list -values`, `block cut` and
+  `block paste` (the clipboard methods use them), `block level` (the
+  depth of a separator changed in place), `edit step` (several commands
+  as one undo step, the values set in it included), and lines and frames
+  that show the tree where the widget itself stacks leaves.  See the
+  manual's "Cut and paste with structure", "Several changes as one undo
+  step" and "Split lines and frames", and `BUGS` 36 for what is
+  provisional.
 * The Tcl/Tk flavour (in the Git repository only: `eText/pTk/mTk/`,
   `Makefile.etext`, `demo/etext.tcl`) is kept for reference: it replaces
   core files of tk4.0b3 and cannot be built against a current Tcl/Tk.

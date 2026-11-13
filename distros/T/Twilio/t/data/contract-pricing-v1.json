@@ -1,0 +1,484 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "country" : "a_country",
+     "inbound_sms_prices" : [
+      "a_inbound_sms_prices"
+     ],
+     "iso_country" : "a_iso_country",
+     "outbound_sms_prices" : [
+      "a_outbound_sms_prices"
+     ],
+     "price_unit" : "a_price_unit",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "inbound_sms_prices",
+      "inbound_sms_prices",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "outbound_sms_prices",
+      "outbound_sms_prices",
+      "plain"
+     ],
+     [
+      "price_unit",
+      "price_unit",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "messaging",
+    0
+   ],
+   [
+    "countries",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchMessagingCountry",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/Messaging/Countries/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "country" : "a_country",
+     "iso_country" : "a_iso_country",
+     "phone_number_prices" : [
+      "a_phone_number_prices"
+     ],
+     "price_unit" : "a_price_unit",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "phone_number_prices",
+      "phone_number_prices",
+      "plain"
+     ],
+     [
+      "price_unit",
+      "price_unit",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "phone_numbers",
+    0
+   ],
+   [
+    "countries",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPhoneNumberCountry",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/PhoneNumbers/Countries/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "country" : "a_country",
+     "inbound_call_prices" : [
+      "a_inbound_call_prices"
+     ],
+     "iso_country" : "a_iso_country",
+     "outbound_prefix_prices" : [
+      "a_outbound_prefix_prices"
+     ],
+     "price_unit" : "a_price_unit",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "inbound_call_prices",
+      "inbound_call_prices",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "outbound_prefix_prices",
+      "outbound_prefix_prices",
+      "plain"
+     ],
+     [
+      "price_unit",
+      "price_unit",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "voice",
+    0
+   ],
+   [
+    "countries",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchVoiceCountry",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/Voice/Countries/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "country" : "a_country",
+     "inbound_call_price" : {
+      "a_inbound_call_price" : 1
+     },
+     "iso_country" : "a_iso_country",
+     "number" : "a_number",
+     "outbound_call_price" : {
+      "a_outbound_call_price" : 1
+     },
+     "price_unit" : "a_price_unit",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "inbound_call_price",
+      "inbound_call_price",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "number",
+      "number",
+      "plain"
+     ],
+     [
+      "outbound_call_price",
+      "outbound_call_price",
+      "plain"
+     ],
+     [
+      "price_unit",
+      "price_unit",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "voice",
+    0
+   ],
+   [
+    "numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchVoiceNumber",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/Voice/Numbers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "countries" : [
+      {
+       "country" : "a_country",
+       "iso_country" : "a_iso_country",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "messaging",
+    0
+   ],
+   [
+    "countries",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListMessagingCountry",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "countries",
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/Messaging/Countries"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "countries" : [
+      {
+       "country" : "a_country",
+       "iso_country" : "a_iso_country",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "phone_numbers",
+    0
+   ],
+   [
+    "countries",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListPhoneNumberCountry",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "countries",
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/PhoneNumbers/Countries"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "countries" : [
+      {
+       "country" : "a_country",
+       "iso_country" : "a_iso_country",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "iso_country",
+      "iso_country",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "pricing",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "voice",
+    0
+   ],
+   [
+    "countries",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListVoiceCountry",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "countries",
+  "required" : [],
+  "url" : "https://pricing.twilio.com/v1/Voice/Countries"
+ }
+]

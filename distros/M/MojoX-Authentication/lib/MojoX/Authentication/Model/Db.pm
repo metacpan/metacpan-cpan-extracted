@@ -1,16 +1,15 @@
 package MojoX::Authentication::Model::Db;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo;
 use experimental qw< signatures >;
-use English;
 use Ouch qw< :trytiny_var >;
 
 use constant DEFAULT_FOR => {
    name => 'dby',
    table => 'account',
-   username_column => 'name',
+   username_column => 'username',
 };
 
 use namespace::clean;
@@ -20,7 +19,7 @@ with 'MojoX::Authentication::Model::Role::Local';
 with 'MojoX::Authentication::Model::Role::MojoDbWrap';
 with 'MojoX::Authentication::Model::Role::Remap';
 
-has name => (is => 'ro', default => DEFAULT_FOR->{name});
+has name => (is => 'rw', default => DEFAULT_FOR->{name});
 has username_column
    => (is => 'ro', default => DEFAULT_FOR->{username_column});
 has remaps => (is => 'ro', default => sub { return [] });
@@ -41,27 +40,25 @@ sub load_user ($self, $ignored, $uid) {
 # this method is required for compositing
 # MojoX::Authentication::Model::Role::Local
 BEGIN {
-   *{load_user_by_name} = \&load_user;
+   *{load_user_by_username} = \&load_user;
 }
 
 sub save_user ($self, $user, $is_secret_cleartext = 0) {
-   my $wmdb = $self->wmdb;
-   ouch 500, 'your MojoX::MojoDbWrap does not support upsert!!!'
-      unless $wmdb->can('upsert');
-   $user = { $user->%* }; # shallow copy for fiddling
-   $user->{secret} = $self->hash_secret($user->{secret})
-      if $is_secret_cleartext;
+   my $u = $self->user_for_save($user, $is_secret_cleartext);
+   my $data  = $self->remap($u, $self->remaps, 'backwards');
 
-   $wmdb->upsert($self->table_name =>
-      $self->remap($user, $self->remaps, 'backwards'));
+   my $table = $self->table;
+   my $id_column = $self->username_column;
+
+   $self->wmdb->upsert($table, $data, { conflicting => $id_column });
 
    return $self;
 }
 
 sub _select ($self, %condition) {
-   my $record = $self->wmdb->select($self->table, '*', \%condition)->hash;
-   return unless defined($record);
-   return $self->remap($record, $self->remaps);
+   my $r = $self->wmdb->db->select($self->table, '*', \%condition)->hash;
+   return unless defined($r);
+   return $self->remap($r, $self->remaps);
 }
 
 1;

@@ -66,6 +66,6 @@
          "web" : "https://github.com/ilyaz-ai/etext"
       }
    },
-   "version" : "2.08",
+   "version" : "2.09",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

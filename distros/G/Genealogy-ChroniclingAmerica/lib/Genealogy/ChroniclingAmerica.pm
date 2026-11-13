@@ -18,6 +18,7 @@ use JSON::MaybeXS;
 use Object::Configure;
 use Params::Get 0.13;
 use Scalar::Util;
+use Time::HiRes qw(time);
 use Return::Set 0.02;
 use URI;
 
@@ -27,11 +28,11 @@ Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of C
 
 =head1 VERSION
 
-Version 0.07
+Version 0.08
 
 =cut
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 =head1 SYNOPSIS
 
@@ -120,16 +121,43 @@ an in-memory cache is created with a default expiration of one hour.
 
 =item * C<date_of_death>
 
-=item * C<host> - The domain of the site to search, the default is L<https://chroniclingamerica.loc.gov>.
+=item * C<host> - The domain of the site to search, the default is C<www.loc.gov>.
 
 =item * C<ua> - An object that understands get and env_proxy messages,
 such as L<LWP::UserAgent::Throttled>.
 
 =item * C<min_interval> - Amount to rate limit.
-Defaults to 3 seconds,
+Defaults to 4 seconds,
 inline with L<https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/README.html#rate-limits>
 
 =back
+
+If a search finds nothing it is repeated once,
+since the Library of Congress sometimes answers an identical search inconsistently.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+  {
+    firstname => { type => 'string', min => 1, matches => qr/\D/ },
+    lastname => { type => 'string', min => 1, matches => qr/\D/ },
+    state => { type => 'string', min => 3, matches => qr/^\D+$/ },	# Full name, not an abbreviation
+    middlename => { type => 'string', optional => 1 },
+    date_of_birth => { type => 'integer', optional => 1 },	# A year
+    date_of_death => { type => 'integer', optional => 1 },	# A year
+    host => { type => 'string', optional => 1 },
+    ua => { type => 'object', can => 'get', optional => 1 },
+    cache => { type => 'object', can => ['get', 'set'], optional => 1 },
+    min_interval => { type => 'number', optional => 1 },
+  }
+
+The constructor croaks if a mandatory argument is missing or invalid.
+
+=head4 OUTPUT
+
+A blessed C<Genealogy::ChroniclingAmerica> object.
+Called on an existing object it returns a clone with the new arguments.
 
 =cut
 
@@ -148,7 +176,6 @@ sub new {
 
 	unless($params->{'firstname'}) {
 		Carp::croak('Firstname is not optional');
-		return;	# Don't know why this is needed, but it is
 	}
 
 	# Fail when the input is just a set of numbers
@@ -184,6 +211,8 @@ sub new {
 		return;
 	}
 
+	$params = Object::Configure::configure($class, $params);
+
 	my $ua = $params->{'ua'};
 	if(!defined($ua)) {
 		my $ssl_opts;
@@ -206,8 +235,6 @@ sub new {
 		);
 		$ua->env_proxy(1);
 	}
-
-	$params = Object::Configure::configure($class, $params);
 
 	# Set up caching (default to an in-memory cache if none provided)
 	my $cache = $params->{cache} || CHI->new(
@@ -268,6 +295,12 @@ sub new {
 
 	my $items = _get_items($ua, $url);
 
+	# loc.gov sometimes answers an identical search with no results, so try once more
+	unless(scalar(@{$items})) {
+		Time::HiRes::sleep($min_interval);
+		$items = _get_items($ua, $url);
+	}
+
 	# Update last_request timestamp
 	$rc->{'last_request'} = time();
 
@@ -292,7 +325,31 @@ sub new {
 
 =head2 get_next_entry
 
-Returns the next match as a URL.
+Returns the next match as a URL of a PDF of the newspaper page,
+or undef when there are no more matches.
+
+Each call may make up to two requests of the Library of Congress:
+one for the item and one for the OCR text of its page.
+Items whose text doesn't contain the person's name are skipped.
+Both requests honour C<min_interval>.
+
+The URL is not checked,
+the Library of Congress may refuse (HTTP 403) requests for the PDF from some automated clients.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+None, other than the object.
+
+=head4 OUTPUT
+
+  {
+    type => 'string',
+    min => 5,
+    matches => qr/\.pdf$/,	# A URL
+    optional => 1,	# undef when no more matches
+  }
 
 =cut
 
@@ -305,8 +362,6 @@ sub get_next_entry
 
 	# Retrieve the next entry and increment index
 	my $entry = $self->{'items'}->[$self->{'index'}++];
-
-	# ::diag(Data::Dumper->new([$entry])->Dump());
 
 	# Create a cache key based on the location, date and time zone (might want to use a stronger hash function if needed)
 	my $cache_key = "loc:$entry->{id}";
@@ -322,19 +377,13 @@ sub get_next_entry
 	}
 
 	# Make the API request
-	# ::diag(__LINE__);
-	# ::diag(Data::Dumper->new([$entry])->Dump());
-	# ::diag($entry->{'id'});
 	my $resp = $self->{'ua'}->get($entry->{'id'});
-	# ::diag(__LINE__);
-	# ::diag(Data::Dumper->new([$resp])->Dump());
 
 	# Update last_request timestamp
 	$self->{last_request} = time();
 
 	# Handle error responses
 	if($resp->is_error()) {
-		# print 'got: ', $resp->content(), "\n";
 		Carp::carp("get_next_entry: API returned error on $entry->{id}: ", $resp->status_line()) unless($resp->code() == 404);
 		return;
 	}
@@ -343,20 +392,35 @@ sub get_next_entry
 		Carp::croak($resp->status_line());
 	}
 
-	my $data = decode_json($resp->decoded_content());
+	my $data;
+	eval {
+		$data = decode_json($resp->decoded_content())
+	};
+	if($@) {
+		Carp::carp("$@: ", $resp->decoded_content());
+		return;
+	}
 
 	my $full_text = $data->{'full_text'};
+	if(!defined($full_text)) {
+		# loc.gov now serves the text from a separate service
+		$full_text = $self->_fetch_full_text($data);
+	}
 	if(!defined($full_text)) {
 		return $self->get_next_entry();
 	}
 
 	$full_text =~ s/[\r\n]/ /g;
-        if($full_text !~ /$self->{'name'}/ims) {
-                return $self->get_next_entry();
-        }
+	if($full_text !~ /\Q$self->{'name'}\E/ims) {
+		return $self->get_next_entry();
+	}
 
-	# ::diag(__LINE__);
-	# ::diag($data->{full_text});
+	# The PDF is now given in the 'resource' section
+	if(ref($data->{'resource'}) eq 'HASH' && (my $pdf = $data->{'resource'}->{'pdf'})) {
+		$self->{'cache'}->set($cache_key, $pdf);
+		return Return::Set::set_return($pdf, { type => 'string', 'min' => 5, matches => qr/\.pdf$/ });
+	}
+
 	foreach my $page(@{$data->{'page'}}) {
 		if($page->{'mimetype'} eq 'application/pdf') {
 			# Cache the result before returning it
@@ -366,10 +430,37 @@ sub get_next_entry
 	}
 }
 
+# Fetch the OCR text of a page from the 'fulltext_file' service, returns undef on any failure
+sub _fetch_full_text
+{
+	my ($self, $data) = @_;
+
+	my $url = (ref($data->{'resource'}) eq 'HASH' && $data->{'resource'}->{'fulltext_file'}) || $data->{'fulltext_service'};
+	return unless($url);
+
+	my $now = time();
+	my $elapsed = $now - $self->{'last_request'};
+	if($elapsed < $self->{'min_interval'}) {
+		Time::HiRes::sleep($self->{'min_interval'} - $elapsed);
+	}
+	my $resp = $self->{'ua'}->get($url);
+	$self->{'last_request'} = time();
+
+	return unless($resp->is_success());
+
+	my $json;
+	eval { $json = decode_json($resp->decoded_content()) };
+	return if($@ || ref($json) ne 'HASH');
+
+	# Keyed by segment name
+	return join(' ', map { ref($_) eq 'HASH' ? ($_->{'full_text'} // ()) : () } values %{$json});
+}
+
 # This is the sample code at https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/ChronAm-download_results.html
 #	translated into Perl
 
 # Run P1 search and get a list of results
+
 sub _get_items
 {
 	my ($ua, $url, $items_ref, $conditional, $depth) = @_;
@@ -467,11 +558,15 @@ it should search again without the middle name.
 
 =head1 SEE ALSO
 
+=over 4
+
 =item * L<https://github.com/nigelhorne/gedcom>
 
 =item * L<https://chroniclingamerica.loc.gov>
 
 =item * L<https://github.com/LibraryOfCongress/data-exploration>
+
+=back
 
 =head1 SUPPORT
 
@@ -503,7 +598,7 @@ L<https://metacpan.org/release/Genealogy-ChroniclingAmerica>
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2018-2025 Nigel Horne.
+Copyright 2018-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
 

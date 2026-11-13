@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.06';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.07';
 use 5.006;
 
 use strict;
@@ -22,6 +22,7 @@ sub EnvVars { return 'TZ' }
         'Afghanistan Standard Time'       => 'Asia/Kabul',
         'Alaskan'                         => 'America/Anchorage',
         'Alaskan Standard Time'           => 'America/Anchorage',
+        'Alberta Standard Time'           => 'America/Edmonton',
         'Aleutian Standard Time'          => 'America/Adak',
         'Altai Standard Time'             => 'Asia/Barnaul',
         'Arab'                            => 'Asia/Riyadh',
@@ -49,6 +50,7 @@ sub EnvVars { return 'TZ' }
         'Beijing'                         => 'Asia/Shanghai',
         'Belarus Standard Time'           => 'Europe/Minsk',
         'Bougainville Standard Time'      => 'Pacific/Bougainville',
+        'British Columbia Standard Time'  => 'America/Vancouver',
         'Canada Central'                  => 'America/Regina',
         'Canada Central Standard Time'    => 'America/Regina',
         'Cape Verde Standard Time'        => 'Atlantic/Cape_Verde',
@@ -59,7 +61,7 @@ sub EnvVars { return 'TZ' }
         'Central'                         => 'America/Chicago',
         'Central America Standard Time'   => 'America/Tegucigalpa',
         'Central Asia'                    => 'Asia/Almaty',
-        'Central Asia Standard Time'      => 'Asia/Almaty',
+        'Central Asia Standard Time'      => 'Asia/Bishkek',
         'Central Brazilian Standard Time' => 'America/Cuiaba',
         'Central Europe'                  => 'Europe/Prague',
         'Central Europe Standard Time'    => 'Europe/Prague',
@@ -124,6 +126,7 @@ sub EnvVars { return 'TZ' }
         'Lord Howe Standard Time'         => 'Australia/Lord_Howe',
         'Magadan Standard Time'           => 'Asia/Magadan',
         'Magallanes Standard Time'        => 'America/Punta_Arenas',
+        'Manitoba Standard Time'          => 'America/Winnipeg',
         'Marquesas Standard Time'         => 'Pacific/Marquesas',
         'Mauritius Standard Time'         => 'Indian/Mauritius',
         'Mexico'                          => 'America/Mexico_City',
@@ -323,7 +326,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.06
+version 2.07
 
 =head1 SYNOPSIS
 
@@ -401,7 +404,7 @@ Dave Rolsky <autarch@urth.org>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2024 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2026 by David Pinkowitz <dapink@cpan.org>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

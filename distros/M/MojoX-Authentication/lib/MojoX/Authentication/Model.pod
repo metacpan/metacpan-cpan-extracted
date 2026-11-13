@@ -22,9 +22,10 @@ MojoX::Authentication::Model
             name => 'memory-hash', # override default in class
             args  => {
                db => [
-                  { name => foo => secret => 12345 },
-                  { name => bar => secret => 67890 },
+                  { username => foo => secret => 12345 },
+                  { username => bar => secret => 67890 },
                ],
+               secrets_are_cleartext => 1,
             }
          },
          {
@@ -59,15 +60,15 @@ competing <identity providers> of different nature.
 As an example, you might want to support holding users in a hash
 (possibly configured in a development environment) as well as in a
 database or externally in a SAML 2.0 identity provider. This module lets
-you set all of them in the order they should be tried, and will dispatch
-the requests from L<Mojolicious::Plugin::Authentication> to each of them
-in the same order, until one of them provides a defined response.
+you set all of them in order of priority: for each username, the
+I<first> provider that claims it (see L</Owner of a username>) owns it,
+and is the only one asked to validate credentials for it.
 
 Let's take the example in the L</SYNOPSIS> and change it a bit:
 
    my $development_users = [
-      { name => foo => secret => '12345' },
-      { name => bar => secret => '67890' },
+      { username => foo => secret => '12345' },
+      { username => bar => secret => '67890' },
    ];
    my $am = MojoX::Authentication::Model->new(
       config => {}, # might contain stuff useful for specific providers
@@ -75,7 +76,10 @@ Let's take the example in the L</SYNOPSIS> and change it a bit:
          {
             class => 'MojoX::Authentication::Model::Hash',
             name => 'memory-hash', # override default in class
-            args  => { db => ( $ENV{DEVEL} ? $development_users : [] ) }
+            args  => {
+               db => ( $ENV{DEVEL} ? $development_users : [] ),
+               secrets_are_cleartext => 1,
+            },
          },
          {
             class => 'MojoX::Authentication::Model::Db',
@@ -114,7 +118,10 @@ a robust manner.
 The third provider lets us plug into an external identity provider using
 SAML 2.0. It is set as the last option so that we can override it in
 case of need (e.g. if we decide to handle a user locally instead, or
-even with the hash in case we are in development).
+even with the hash in case we are in development). This is also the
+I<only> sensible place for a SAML2 provider with default settings: it
+claims I<every> username, so if it came first it would shadow all the
+providers after it (see L<MojoX::Authentication::Model::SAML2/username_validator>).
 
 The final goal is simple: code the L<Mojolicious> application with the
 sequence of providers that are anticipated and supported, allowing for
@@ -133,14 +140,23 @@ methods that deal with the object itself, e.g. the constructor;
 
 =item *
 
-methods that are iterated over the different providers, until one of
-them provides a non-undefined response.
+methods that dispatch requests to the providers, either to the owner of
+a username or to the provider recorded in a user identifier.
 
 =back
 
+=begin hidden
+
+=head2 BUILD
+
+Used to set up the providers at construction, so that configuration
+errors show up right away.
+
+=end hidden
+
 =head2 Methods for the object
 
-=head2 B<< config >>
+=head3 B<< config >>
 
    my $config = $am->config;
 
@@ -148,7 +164,7 @@ Accessor to the C<config> set during construction. It's supposed to hold
 a hash reference with configurations that apply to specific providers,
 by name.
 
-=head2 B<< new >>
+=head3 B<< new >>
 
    my $am = MojoX::Authentication::Model->new(%args); # OR
    my $am = MojoX::Authentication::Model->new(\%args);
@@ -201,13 +217,20 @@ getting a provider instance and the following keys are supported:
 =item *
 
 C<name>: the name of the provider. If present, it overrides any name
-that might be set in the provider instance itself.
+that might be set in the provider instance itself, and it is written
+into the instance (see L</Provider names>).
 
 =item *
 
 C<instance>: the instance as an already formed object. This is taken at
 face value. If it has a method named C<update_from_config> it will be
-called passing the C<config> as the only parameter.
+called passing the C<config> and this hash reference, so that the
+instance can pick parameters meant for it alone:
+
+   $instance->update_from_config($config, $hash_ref);
+
+The name is written into the instance afterwards anyway (see
+L</Provider names>).
 
 When this key is present, other keys might be ignored (e.g. C<class>).
 
@@ -226,6 +249,30 @@ hash reference.
 
 =back
 
+=head4 Provider names
+
+Every provider ends up with a name: the C<name> key of the hash form if
+present, else the provider's own C<name>, else C<unnamed-0>,
+C<unnamed-1> and so on. This is the name sessions carry (see
+L</User identifiers>) and the one L</provider_named> answers to.
+
+The Model is the authority on it: it writes this name into every
+provider that has a C<name> method, calling C<< $provider->name($name) >>,
+so that a provider scoping anything by its own name (e.g.
+L<MojoX::Authentication::Model::SAML2> cache keys) uses the same one.
+Hence, a provider with a C<name> method must accept being renamed
+(e.g. C<< is => 'rw' >> with L<Moo>): if the call dies, or the provider
+keeps answering another name afterwards, the construction of the Model
+fails with a 400 exception. For the same reason, the same instance
+cannot be given twice (it would answer to the last name only): this is
+a 400 exception too. Two providers with the same name are a 400
+exception as well. Sharing one instance between two Models is not
+supported either, although nothing checks it: the last Model to set
+its name wins.
+
+A provider without a C<name> method only has a name in the Model, so
+it must not scope anything by name on its own.
+
 =head3 B<< provider_named >>
 
    my $provider = $am->provider_named($name);
@@ -234,19 +281,80 @@ Get the provider associated to C<$name>, if any.
 
 =head2 Methods for the providers
 
-The following methods all implement the mechanism to call the same-named
-method on each provider, in order of priority, until one of them
-provides a non-undefined return value, which then becomes the return
-value of the method itself.
+=head3 Owner of a username
 
-Providers might choose to I<not> implement any of these methods; in this
-case they will be skipped.
+Every provider B<MUST> implement C<handles_username>:
+
+   my $bool = $provider->handles_username($controller, $username);
+
+The I<owner> of a username is the first provider, in the order they
+were passed upon construction, whose C<handles_username> returns a true
+value. The order is entirely up to the consumer and it is preserved:
+put first the providers that should win. A provider that claims every
+username (like a SAML2 provider with default settings) shadows all the
+providers after it.
+
+L</validate_user> asks I<only> the owner, so a wrong password ends the
+login: other providers with the same username do not get a chance.
+L</load_user> asks I<only> the provider that authenticated the user,
+which is recorded in the user identifier kept in the session (see
+L</User identifiers>).
+
+All refused logins look the same from the outside: an unknown
+username, a wrong password, an account without a password (see
+L<MojoX::Authentication::Model::Role::Local/validate_user>) and a
+username whose owner does not accept credentials (e.g. a SAML2
+provider) all end with the same exception
+(code 401), after the same amount of work (one password check, see
+L</run_fake_validation>). This avoids telling which usernames exist,
+by message or by timing.
+
+=head3 What reaches current_user
+
+Every provider that implements C<load_user> B<MUST> also implement
+C<tamed_user_record>:
+
+   my $safe = $provider->tamed_user_record($user);
+
+It receives the hash reference returned by the provider's C<load_user>
+and returns a hash reference with what can be exposed: this is what
+becomes C<data> in L</load_user>, hence in C<current_user>, the stash,
+templates, JSON and logs. A provider that keeps secret material in its
+records (password hashes, tokens, seeds...) B<MUST> leave it out; one
+that keeps none can return C<$user> as it is (like
+L<MojoX::Authentication::Model::SAML2>). Providers built on
+L<MojoX::Authentication::Model::Role::Local> get it from the role.
+
+A provider with C<load_user> and without C<tamed_user_record> is a
+configuration error: an exception (code 400) is thrown when the
+providers are set up.
+
+The result is deep-copied (with L<Storable/dclone>), so that changing
+C<current_user> never changes what the provider keeps. For this reason,
+user records B<MUST> be plain data: no code references, file handles
+and the like.
 
 =head3 B<< load_user >>
 
-   my $user = $am->load_user($app, $uid);
+   my $user = $am->load_user($app, $euid);
 
-Load the user's data from the provider.
+Load the user's data from the provider named in C<$euid>, which is the
+identifier returned by L</validate_user> (see L</User identifiers>).
+
+Returns a hash reference with keys C<provider> (the name of the
+provider), C<uid> (the identifier within the provider) and C<data> (a
+deep copy of what the provider's C<tamed_user_record> returned, see
+L</What reaches current_user>). To get the full record, e.g. to save it
+back, call C<load_user> on the provider itself.
+
+Returns nothing if C<$euid> is malformed, names a provider that is not
+configured or a user that the provider does not know. In these cases,
+L<Mojolicious::Plugin::Authentication> considers the user as not
+authenticated.
+
+Throws an exception if the provider has no C<load_user> method, or if it
+returns something that is not a hash reference: both are configuration
+errors.
 
 The interface is compatible with L<Mojolicious::Plugin::Authentication>
 like this:
@@ -262,15 +370,45 @@ like this:
 
    my $name = $am->provider_name_for($controller, $username);
 
-Retrieve the name of the provider that is capable of handling the user
-identified by C<$username>.
+Retrieve the name of the owner of C<$username> (see
+L</Owner of a username>), or C<undef> if no provider claims it.
+
+=head3 B<< provider_for >>
+
+   my $provider = $am->provider_for($controller, $username);
+   my ($name, $provider) = $am->provider_for($controller, $username);
+
+Retrieve the owner of C<$username> (see L</Owner of a username>). In
+scalar context, returns the provider object (or C<undef> if no provider
+claims C<$username>); in list context, returns its name and the
+provider object (or an empty list).
+
+=head3 B<< run_fake_validation >>
+
+   $am->run_fake_validation;   # always throws
+
+Make a refused login cost the same as checking a real password, then
+throw the same exception as a wrong password (code 401). The fake
+check is delegated to the first provider supporting
+C<run_fake_validation> (e.g. those composing
+L<MojoX::Authentication::Model::Role::Local>); if there is none, the
+exception is thrown right away. Used by L</validate_user> when no
+provider claims the username, or when its owner does not support
+C<validate_user>.
 
 
 =head3 B<< validate_user >>
 
-   my $uid = $am->validate_user($controller, $username, $secret, $extra);
+   my $euid = $am->validate_user($controller, $username, $secret, $extra);
 
 Perform validation of credentials for C<$username>.
+
+Only the owner of C<$username> is asked (see L</Owner of a username>).
+Returns the user identifier as built by L</euid_join>, i.e. the name of
+the owner and the identifier it returned. Throws an exception (code
+401) if the login is refused: the owner refuses the credentials, no
+provider claims C<$username> or the owner does not support
+C<validate_user>. Exceptions from the owner are not caught.
 
 The interface is compatible with L<Mojolicious::Plugin::Authentication>
 like this:
@@ -280,6 +418,32 @@ like this:
       ...
       validate_user => sub (@args) { $am->validate_user(@args) },
    });
+
+
+=head2 User identifiers
+
+The identifier kept in the session (and returned by L</validate_user>)
+is the name of the provider, followed by a slash C</>, followed by the
+identifier of the user within the provider. The provider name is
+encoded (see L<MojoX::Authentication::Util/encode_name>) so that it
+never contains a slash: the
+first slash is always the separator and the user identifier can
+contain anything. For SAML2, the same form must be passed in
+C<auto_validate>.
+
+=head3 B<< euid_join >>
+
+   my $euid = $am->euid_join($provider_name, $uid);
+
+Build a user identifier from the provider name and the user identifier
+within the provider.
+
+=head3 B<< euid_split >>
+
+   my ($provider_name, $uid) = $am->euid_split($euid);
+
+Reverse of L</euid_join>. Returns nothing (an empty list) if C<$euid>
+has no slash.
 
 
 =head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)

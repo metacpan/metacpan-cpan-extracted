@@ -24,8 +24,8 @@ WriteMakefile(
     },
     PREREQ_PM                  => {
         'Map::Tube::Exception' => '3.25',
-        'Map::Tube'            => '5.1.0',
-        'Map::Tube::Generic'   => '0.2.1',
+        'Map::Tube'            => '5.2.0',
+        'Map::Tube::Generic'   => '0.2.2',
         'Moo'                  => '2.000000',
         'MooX::Options'        => '4.023',
         'namespace::autoclean' => '0.28',

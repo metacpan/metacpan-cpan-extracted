@@ -517,13 +517,19 @@ subtest 'presence is exists, not defined' => sub {
     my $origin = VPNDetectionTest::Origin->new(sub {
         my ($c) = @_;
         $c->res->headers->content_type('application/json');
-        $c->render(data => '{"ip":"9.9.9.10","is_vpn":false,"vpn":null}');
+        $c->render(data => '{"ip":"9.9.9.10","is_vpn":false,"vpn":null,"is_hosting":null,"trial_expired":null}');
     });
     my $result = VPNDetection->new(base_url => $origin->url)->lookup('9.9.9.10');
 
     is($result->has('vpn'), 1, 'a served null is still a served field');
     ok(!defined $result->vpn, 'even though its value is undef');
     is($result->has('hosting'), 0, 'an unserved field is still absent');
+    # Through 3.13.1 a null flag or marker read as 0: no hosting server, and a
+    # trial that lasts, which nothing served said.
+    for my $flag (qw(is_hosting trial_expired)) {
+        is($result->has($flag), 1, "a served null $flag is a served field");
+        ok(!defined $result->$flag, "and reads as undef, never 0");
+    }
 };
 
 subtest 'an IPv6 address reaches the API with its colons intact' => sub {

@@ -1,5 +1,14 @@
 Revision history for Browser-OIDC
 
+0.004     2026-11-12 15:22:01+0100
+          - Switch to using Mojolicious
+          - Check iss response parameter before checking error/code
+          - Correctly trigger basic authentication
+          - Add client_id when client_auth_method=none
+          - Handle absent claims_supported and scopes_supported more gracefully
+          - Decode JSON in userinfo
+          - Cache JWKS
+
 0.003     2026-11-07 20:31:29+0100
           - Split new into new_from_discovery and new_from_config (BREAKING)
           - Always add nonce to authorization request

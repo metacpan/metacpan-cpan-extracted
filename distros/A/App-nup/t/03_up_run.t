@@ -83,6 +83,103 @@ subtest 'pager environment' => sub {
     }
 };
 
+# Test --lateral: all the pages in one row, however wide it becomes
+subtest 'lateral' => sub {
+    use File::Temp ();
+    my @cmd = ('--', 'perl', '-e', 'print "$_\n" for 1..40');
+    my @opt = ('--no-pager', '--bs=none', '-S20', '-P8');
+    my $out = optex('-Mup', '--lateral', @opt, @cmd)->run->stdout;
+    is(($out =~ tr/\n//), 8, 'five pages of 8 lines are one row of 8 lines');
+    like($out, qr/^.*\b1\b.*\b9\b.*\b17\b.*\b25\b.*\b33\b.*$/m,
+         'the first lines of all pages are on the same line');
+
+    # less is told not to wrap the lines and to shift by the pane width
+    my $bin = File::Temp->newdir;
+    open my $fh, '>', "$bin/less" or die;
+    # FAKE_LESS tells the version, and "align-shift" if it has the option
+    print $fh <<'SH';
+#!/bin/sh
+case "$*" in *--version*)
+    case "$FAKE_LESS" in *align-shift*) ;;
+        *) echo 'There is no --align-shift option ("less --help" for help)' ;;
+    esac
+    echo "less ${FAKE_LESS%% *} (fake)"
+    exit 0 ;;
+esac
+echo "ARGS: $*"
+echo "KEYS: $LESSKEY_CONTENT"
+cat >/dev/null
+SH
+    close $fh;
+    chmod 0755, "$bin/less";
+    local $ENV{PATH} = "$bin:$ENV{PATH}";
+    local %ENV = %ENV;
+    delete $ENV{NUP_PAGE_PAGER};
+    delete $ENV{LESSKEY_CONTENT};
+    $ENV{NUP_PAGER} = 'less --file-size';
+    # The screen shows as many panes as without --lateral: as many
+    # as fit, or the number given by -C, in the width of the screen
+    my($width) = run('-Mup --geometry -- true')->stdout =~ /^(\d+) /
+        or die 'no geometry';
+    my $pane = sub { my $c = shift; int($width / $c) };
+    my $fit  = sub { my $w = shift; $pane->(int($width / $w) || 1) };
+    like(optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout,
+         qr/^ARGS: --file-size -S --shift=@{[ $fit->(20) ]} --rscroll=-$/m,
+         'less shifts by the width of a pane');
+    unlike(optex('-Mup', '-S20', @cmd)->run->stdout, qr/--shift/,
+           'no shift without --lateral');
+
+    # h and l of less scroll to the left and to the right
+    like(optex('-Mup', '--lateral', @cmd)->run->stdout,
+         qr/^KEYS: h left-scroll;l right-scroll;H no-scroll;L end-scroll$/m,
+         'h, l, H and L are given to less');
+    like(optex('-Mup', @cmd)->run->stdout,
+         qr/^KEYS: $/m, 'no keys without --lateral');
+    {
+        local $ENV{LESSKEY_CONTENT} = 'x quit';
+        like(optex('-Mup', '--lateral', @cmd)->run->stdout,
+             qr/^KEYS: x quit$/m, 'LESSKEY_CONTENT of the user is kept');
+    }
+    # A less of 710 or later stops l at the right end, and one that has
+    # --align-shift keeps the shift at the boundaries of the panes
+    my $keys = sub { "h left-scroll;l $_[0];H no-scroll;L end-scroll" };
+    for (['709x',             'right-scroll',       ''],
+         ['710',              'right-limit-scroll', ''],
+         ['713x align-shift', 'right-limit-scroll', ' --align-shift']) {
+        my($less, $right, $align) = @$_;
+        local $ENV{FAKE_LESS} = $less;
+        my $out = optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout;
+        like($out, qr/^ARGS: --file-size -S --shift=@{[ $fit->(20) ]} --rscroll=-\Q$align\E$/m,
+             "less $less: options");
+        like($out, qr/^KEYS: \Q@{[ $keys->($right) ]}\E$/m, "less $less: l is $right");
+    }
+    like(optex('-Mup', '-L', "--pager=$bin/less -R", @cmd)->run->stdout,
+         qr/^ARGS: -R -S --shift=@{[ $fit->(85) ]} --rscroll=-$/m,
+         '-L, less given by --pager with a path, default pane width');
+    like(optex('-Mup', '--lateral', '-C4', @cmd)->run->stdout,
+         qr/^ARGS: --file-size -S --shift=@{[ $pane->(4) ]} --rscroll=-$/m,
+         '-C4 shows four panes on the screen');
+    {
+        my $row = optex('-Mup', '--lateral', '-C4', '-P8', '--no-pager', @cmd)->run->stdout;
+        my($top) = $row =~ /\A(.*)\n/;
+        $top =~ s/\e\[[\d;]*[mK]//g;
+        utf8::decode($top) unless utf8::is_utf8($top);
+        # a page of 8 lines has 6 lines of text inside the border
+        is(length $top, $pane->(4) * 7, 'seven panes, each a quarter of the screen');
+    }
+    $ENV{NUP_PAGER} = q(perl -pe s/^/OTHER:/);
+    my $other = optex('-Mup', '--lateral', '-S20', @cmd)->run;
+    like($other->stdout, qr/^OTHER:/m, 'another pager is used as it is');
+    is($other->status, 0, 'another pager gets no option of less');
+
+    # what makes no sense with one row of pages
+    for my $with ('-R2', '-C2,2', '-G2x2', '--no-paginate', '-T a4', '-o out.pdf') {
+        isnt(run("-Mup --lateral $with --no-pager -- true")->status, 0,
+             "--lateral with $with fails");
+    }
+    ok(!-e 'out.pdf', 'no file is written');
+};
+
 # Test PDF output: a device other than tty is a paper, printed by ansi2pdf
 subtest 'device and output' => sub {
     plan skip_all => 'ansi2pdf is not available'

@@ -16,7 +16,7 @@ our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(tidy_xml object_to_xml xml_to_object simple_to_xml xml_to_simple check_xml xml_escape);
 our %EXPORT_TAGS = (all => [@EXPORT_OK]);
 
-our $VERSION = "1.09";
+our $VERSION = "1.11";
 
 my $DEFAULT_INDENTSTRING = ' ' x 4;
 
@@ -114,6 +114,7 @@ sub _encode {
     return $string;
 }
 
+sub check_xml;
 
 =head2 xml_escape($string)
 
@@ -257,12 +258,12 @@ sub xml_to_object {
             defined $el_name or croak encode_utf8("Error: Strange tag: '$item'");
             $item =~ s/^\<\Q$el_name\E//;
             $item =~ s/\/>\z//;
-            my @attrs = $item =~ /\s+(\S+=(['"]).*?\2)/g;
+            my @attrs = $item =~ /\s+([^\s=]+\s*=\s*(['"]).*?\2)/sg;
             my $i = 0;
             @attrs = grep {++$i % 2} @attrs;
             my %attr;
             foreach my $attr (@attrs) {
-                my ($attr_name, undef, $attr_value) = $attr =~ /^(\S+?)=(['"])(.*?)\2\z/;
+                my ($attr_name, undef, $attr_value) = $attr =~ /^(\S+?)\s*=\s*(['"])(.*?)\2\z/s;
                 defined $attr_name or croak encode_utf8("Error: Strange attribute: '$attr'");
                 $attr{$attr_name} = _decode($attr_value, $entities);
             }

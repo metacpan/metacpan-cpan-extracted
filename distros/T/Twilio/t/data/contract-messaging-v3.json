@@ -1,0 +1,45 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "success" : true
+    },
+    "fields" : [
+     [
+      "success",
+      "success",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "typing_indicator",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateV3TypingIndicator",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v3/Indicators/Typing.json"
+ }
+]

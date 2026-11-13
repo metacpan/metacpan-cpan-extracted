@@ -1,0 +1,8039 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alpha_sender" : "a_alpha_sender",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alpha_sender",
+      "alpha_sender",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "alpha_senders",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "AlphaSender",
+    "v_alpha_sender"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateAlphaSender",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_alpha_sender"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/AlphaSenders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "brand_registration_sid" : "a_brand_registration_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_registration_sid",
+      "brand_registration_sid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    1
+   ],
+   [
+    "brand_registration_otps",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateBrandRegistrationOtp",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations/id1/SmsOtp"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "a2p_profile_bundle_sid" : "a_a2p_profile_bundle_sid",
+     "account_sid" : "a_account_sid",
+     "brand_feedback" : [
+      "a_brand_feedback"
+     ],
+     "brand_score" : 1154,
+     "brand_type" : "a_brand_type",
+     "customer_profile_bundle_sid" : "a_customer_profile_bundle_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "errors" : [
+      "a_errors"
+     ],
+     "failure_reason" : "a_failure_reason",
+     "government_entity" : true,
+     "identity_status" : "UNVERIFIED",
+     "links" : {
+      "a_links" : 1
+     },
+     "mock" : true,
+     "russell_3000" : true,
+     "sid" : "a_sid",
+     "skip_automatic_sec_vet" : true,
+     "status" : "DELETION_PENDING",
+     "tax_exempt_status" : "a_tax_exempt_status",
+     "tcr_id" : "a_tcr_id",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "a2p_profile_bundle_sid",
+      "a2p_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_feedback",
+      "brand_feedback",
+      "plain"
+     ],
+     [
+      "brand_score",
+      "brand_score",
+      "plain"
+     ],
+     [
+      "brand_type",
+      "brand_type",
+      "plain"
+     ],
+     [
+      "customer_profile_bundle_sid",
+      "customer_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "failure_reason",
+      "failure_reason",
+      "plain"
+     ],
+     [
+      "government_entity",
+      "government_entity",
+      "plain"
+     ],
+     [
+      "identity_status",
+      "identity_status",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "russell_3000",
+      "russell_3000",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "skip_automatic_sec_vet",
+      "skip_automatic_sec_vet",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "tax_exempt_status",
+      "tax_exempt_status",
+      "plain"
+     ],
+     [
+      "tcr_id",
+      "tcr_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CustomerProfileBundleSid",
+    "v_customer_profile_bundle_sid"
+   ],
+   [
+    "A2PProfileBundleSid",
+    "v_a2p_profile_bundle_sid"
+   ],
+   [
+    "BrandType",
+    "v_brand_type"
+   ],
+   [
+    "Mock",
+    "true"
+   ],
+   [
+    "SkipAutomaticSecVet",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateBrandRegistrations",
+  "method" : "create",
+  "options" : {
+   "brand_type" : "v_brand_type",
+   "mock" : 1,
+   "skip_automatic_sec_vet" : 1
+  },
+  "required" : [
+   "v_customer_profile_bundle_sid",
+   "v_a2p_profile_bundle_sid"
+  ],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "brand_sid" : "a_brand_sid",
+     "brand_vetting_sid" : "a_brand_vetting_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "url" : "a_url",
+     "vetting_class" : "a_vetting_class",
+     "vetting_id" : "a_vetting_id",
+     "vetting_provider" : "aegis",
+     "vetting_status" : "a_vetting_status"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_sid",
+      "brand_sid",
+      "plain"
+     ],
+     [
+      "brand_vetting_sid",
+      "brand_vetting_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "vetting_class",
+      "vetting_class",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ],
+     [
+      "vetting_status",
+      "vetting_status",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   },
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "brand_sid" : "a_brand_sid",
+     "brand_vetting_sid" : "a_brand_vetting_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "url" : "a_url",
+     "vetting_class" : "a_vetting_class",
+     "vetting_id" : "a_vetting_id",
+     "vetting_provider" : "aegis",
+     "vetting_status" : "a_vetting_status"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_sid",
+      "brand_sid",
+      "plain"
+     ],
+     [
+      "brand_vetting_sid",
+      "brand_vetting_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "vetting_class",
+      "vetting_class",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ],
+     [
+      "vetting_status",
+      "vetting_status",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    1
+   ],
+   [
+    "brand_vettings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "VettingProvider",
+    "campaign-verify"
+   ],
+   [
+    "VettingId",
+    "v_vetting_id"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateBrandVetting",
+  "method" : "create",
+  "options" : {
+   "vetting_id" : "v_vetting_id"
+  },
+  "required" : [
+   "campaign-verify"
+  ],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations/id1/Vettings"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "sender" : "a_sender",
+     "sender_type" : "a_sender_type",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sender",
+      "sender",
+      "plain"
+     ],
+     [
+      "sender_type",
+      "sender_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channel_senders",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Sid",
+    "v_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateChannelSender",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_sid"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ChannelSenders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alpha_sender" : "a_alpha_sender",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "iso_country_code" : "a_iso_country_code",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alpha_sender",
+      "alpha_sender",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "iso_country_code",
+      "iso_country_code",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "destination_alpha_senders",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "AlphaSender",
+    "v_alpha_sender"
+   ],
+   [
+    "IsoCountryCode",
+    "v_iso_country_code"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateDestinationAlphaSender",
+  "method" : "create",
+  "options" : {
+   "iso_country_code" : "v_iso_country_code"
+  },
+  "required" : [
+   "v_alpha_sender"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/DestinationAlphaSenders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "campaign_id" : "a_campaign_id",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "sid" : "a_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "campaign_id",
+      "campaign_id",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "external_campaign",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CampaignId",
+    "v_campaign_id"
+   ],
+   [
+    "MessagingServiceSid",
+    "v_messaging_service_sid"
+   ],
+   [
+    "CnpMigration",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateExternalCampaign",
+  "method" : "create",
+  "options" : {
+   "cnp_migration" : 1
+  },
+  "required" : [
+   "v_campaign_id",
+   "v_messaging_service_sid"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/PreregisteredUsa2p"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "domain_sid" : "a_domain_sid",
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "linkshortening_messaging_service",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateLinkshorteningMessagingService",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/MessagingServices/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "phone_number" : "a_phone_number",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "phone_number" : "a_phone_number",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "phone_numbers",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PhoneNumberSid",
+    "v_phone_number_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreatePhoneNumber",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_phone_number_sid"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/PhoneNumbers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "area_code_geomatch" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "fallback_method" : "GET",
+     "fallback_to_long_code" : true,
+     "fallback_url" : "a_fallback_url",
+     "friendly_name" : "a_friendly_name",
+     "inbound_method" : "POST",
+     "inbound_request_url" : "a_inbound_request_url",
+     "links" : {
+      "a_links" : 1
+     },
+     "mms_converter" : true,
+     "scan_message_content" : "inherit",
+     "sid" : "a_sid",
+     "smart_encoding" : true,
+     "status_callback" : "a_status_callback",
+     "sticky_sender" : true,
+     "synchronous_validation" : true,
+     "url" : "a_url",
+     "us_app_to_person_registered" : true,
+     "use_inbound_webhook_on_number" : true,
+     "usecase" : "a_usecase",
+     "validity_period" : 1608
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "area_code_geomatch",
+      "area_code_geomatch",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "fallback_method",
+      "fallback_method",
+      "plain"
+     ],
+     [
+      "fallback_to_long_code",
+      "fallback_to_long_code",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "inbound_method",
+      "inbound_method",
+      "plain"
+     ],
+     [
+      "inbound_request_url",
+      "inbound_request_url",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mms_converter",
+      "mms_converter",
+      "plain"
+     ],
+     [
+      "scan_message_content",
+      "scan_message_content",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "smart_encoding",
+      "smart_encoding",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "sticky_sender",
+      "sticky_sender",
+      "plain"
+     ],
+     [
+      "synchronous_validation",
+      "synchronous_validation",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_registered",
+      "us_app_to_person_registered",
+      "plain"
+     ],
+     [
+      "use_inbound_webhook_on_number",
+      "use_inbound_webhook_on_number",
+      "plain"
+     ],
+     [
+      "usecase",
+      "usecase",
+      "plain"
+     ],
+     [
+      "validity_period",
+      "validity_period",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "AreaCodeGeomatch",
+    "true"
+   ],
+   [
+    "FallbackMethod",
+    "POST"
+   ],
+   [
+    "FallbackToLongCode",
+    "true"
+   ],
+   [
+    "FallbackUrl",
+    "v_fallback_url"
+   ],
+   [
+    "InboundMethod",
+    "GET"
+   ],
+   [
+    "InboundRequestUrl",
+    "v_inbound_request_url"
+   ],
+   [
+    "MmsConverter",
+    "true"
+   ],
+   [
+    "ScanMessageContent",
+    "disable"
+   ],
+   [
+    "SmartEncoding",
+    "true"
+   ],
+   [
+    "StatusCallback",
+    "v_status_callback"
+   ],
+   [
+    "StickySender",
+    "true"
+   ],
+   [
+    "SynchronousValidation",
+    "true"
+   ],
+   [
+    "UseInboundWebhookOnNumber",
+    "true"
+   ],
+   [
+    "Usecase",
+    "v_usecase"
+   ],
+   [
+    "ValidityPeriod",
+    "1449"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateService",
+  "method" : "create",
+  "options" : {
+   "area_code_geomatch" : 1,
+   "fallback_method" : "POST",
+   "fallback_to_long_code" : 1,
+   "fallback_url" : "v_fallback_url",
+   "inbound_method" : "GET",
+   "inbound_request_url" : "v_inbound_request_url",
+   "mms_converter" : 1,
+   "scan_message_content" : "disable",
+   "smart_encoding" : 1,
+   "status_callback" : "v_status_callback",
+   "sticky_sender" : 1,
+   "synchronous_validation" : 1,
+   "use_inbound_webhook_on_number" : 1,
+   "usecase" : "v_usecase",
+   "validity_period" : 1449
+  },
+  "required" : [
+   "v_friendly_name"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "short_code" : "a_short_code",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "short_code",
+      "short_code",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "short_code" : "a_short_code",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "short_code",
+      "short_code",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "short_codes",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ShortCodeSid",
+    "v_short_code_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateShortCode",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_short_code_sid"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ShortCodes"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "additional_information" : "a_additional_information",
+     "age_gated_content" : true,
+     "business_city" : "a_business_city",
+     "business_contact_email" : "a_business_contact_email",
+     "business_contact_first_name" : "a_business_contact_first_name",
+     "business_contact_last_name" : "a_business_contact_last_name",
+     "business_contact_phone" : "a_business_contact_phone",
+     "business_country" : "a_business_country",
+     "business_name" : "a_business_name",
+     "business_postal_code" : "a_business_postal_code",
+     "business_registration_authority" : "SIREN",
+     "business_registration_country" : "a_business_registration_country",
+     "business_registration_number" : "a_business_registration_number",
+     "business_registration_phone_number" : "a_business_registration_phone_number",
+     "business_state_province_region" : "a_business_state_province_region",
+     "business_street_address" : "a_business_street_address",
+     "business_street_address2" : "a_business_street_address2",
+     "business_type" : "PUBLIC_PROFIT",
+     "business_website" : "a_business_website",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "doing_business_as" : "a_doing_business_as",
+     "edit_allowed" : true,
+     "edit_expiration" : "2026-01-13T03:04:05Z",
+     "error_code" : 1060,
+     "external_reference_id" : "a_external_reference_id",
+     "help_message_sample" : "a_help_message_sample",
+     "message_volume" : "a_message_volume",
+     "notification_email" : "a_notification_email",
+     "opt_in_confirmation_message" : "a_opt_in_confirmation_message",
+     "opt_in_image_urls" : [
+      "a_opt_in_image_urls"
+     ],
+     "opt_in_keywords" : [
+      "a_opt_in_keywords"
+     ],
+     "opt_in_type" : "MOBILE_QR_CODE",
+     "privacy_policy_url" : "a_privacy_policy_url",
+     "production_message_sample" : "a_production_message_sample",
+     "regulated_item_sid" : "a_regulated_item_sid",
+     "rejection_reason" : "a_rejection_reason",
+     "rejection_reasons" : [
+      "a_rejection_reasons"
+     ],
+     "resource_links" : {
+      "a_resource_links" : 1
+     },
+     "sid" : "a_sid",
+     "status" : "PENDING_REVIEW",
+     "terms_and_conditions_url" : "a_terms_and_conditions_url",
+     "tollfree_phone_number" : "a_tollfree_phone_number",
+     "tollfree_phone_number_sid" : "a_tollfree_phone_number_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url",
+     "use_case_categories" : [
+      "a_use_case_categories"
+     ],
+     "use_case_summary" : "a_use_case_summary",
+     "vetting_id" : "a_vetting_id",
+     "vetting_id_expiration" : "2026-01-16T03:04:05Z",
+     "vetting_provider" : "CAMPAIGN_VERIFY"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "additional_information",
+      "additional_information",
+      "plain"
+     ],
+     [
+      "age_gated_content",
+      "age_gated_content",
+      "plain"
+     ],
+     [
+      "business_city",
+      "business_city",
+      "plain"
+     ],
+     [
+      "business_contact_email",
+      "business_contact_email",
+      "plain"
+     ],
+     [
+      "business_contact_first_name",
+      "business_contact_first_name",
+      "plain"
+     ],
+     [
+      "business_contact_last_name",
+      "business_contact_last_name",
+      "plain"
+     ],
+     [
+      "business_contact_phone",
+      "business_contact_phone",
+      "plain"
+     ],
+     [
+      "business_country",
+      "business_country",
+      "plain"
+     ],
+     [
+      "business_name",
+      "business_name",
+      "plain"
+     ],
+     [
+      "business_postal_code",
+      "business_postal_code",
+      "plain"
+     ],
+     [
+      "business_registration_authority",
+      "business_registration_authority",
+      "plain"
+     ],
+     [
+      "business_registration_country",
+      "business_registration_country",
+      "plain"
+     ],
+     [
+      "business_registration_number",
+      "business_registration_number",
+      "plain"
+     ],
+     [
+      "business_registration_phone_number",
+      "business_registration_phone_number",
+      "plain"
+     ],
+     [
+      "business_state_province_region",
+      "business_state_province_region",
+      "plain"
+     ],
+     [
+      "business_street_address",
+      "business_street_address",
+      "plain"
+     ],
+     [
+      "business_street_address2",
+      "business_street_address2",
+      "plain"
+     ],
+     [
+      "business_type",
+      "business_type",
+      "plain"
+     ],
+     [
+      "business_website",
+      "business_website",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "doing_business_as",
+      "doing_business_as",
+      "plain"
+     ],
+     [
+      "edit_allowed",
+      "edit_allowed",
+      "plain"
+     ],
+     [
+      "edit_expiration",
+      "edit_expiration",
+      "date",
+      1768273445
+     ],
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "external_reference_id",
+      "external_reference_id",
+      "plain"
+     ],
+     [
+      "help_message_sample",
+      "help_message_sample",
+      "plain"
+     ],
+     [
+      "message_volume",
+      "message_volume",
+      "plain"
+     ],
+     [
+      "notification_email",
+      "notification_email",
+      "plain"
+     ],
+     [
+      "opt_in_confirmation_message",
+      "opt_in_confirmation_message",
+      "plain"
+     ],
+     [
+      "opt_in_image_urls",
+      "opt_in_image_urls",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_type",
+      "opt_in_type",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "production_message_sample",
+      "production_message_sample",
+      "plain"
+     ],
+     [
+      "regulated_item_sid",
+      "regulated_item_sid",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "rejection_reasons",
+      "rejection_reasons",
+      "plain"
+     ],
+     [
+      "resource_links",
+      "resource_links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number",
+      "tollfree_phone_number",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number_sid",
+      "tollfree_phone_number_sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "use_case_categories",
+      "use_case_categories",
+      "plain"
+     ],
+     [
+      "use_case_summary",
+      "use_case_summary",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_id_expiration",
+      "vetting_id_expiration",
+      "date",
+      1768532645
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "tollfree_verifications",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "BusinessName",
+    "v_business_name"
+   ],
+   [
+    "BusinessWebsite",
+    "v_business_website"
+   ],
+   [
+    "NotificationEmail",
+    "v_notification_email"
+   ],
+   [
+    "UseCaseCategories",
+    "v_use_case_categories_1"
+   ],
+   [
+    "UseCaseCategories",
+    "v_use_case_categories_2"
+   ],
+   [
+    "UseCaseSummary",
+    "v_use_case_summary"
+   ],
+   [
+    "ProductionMessageSample",
+    "v_production_message_sample"
+   ],
+   [
+    "OptInImageUrls",
+    "v_opt_in_image_urls_1"
+   ],
+   [
+    "OptInImageUrls",
+    "v_opt_in_image_urls_2"
+   ],
+   [
+    "OptInType",
+    "IMPORT"
+   ],
+   [
+    "MessageVolume",
+    "v_message_volume"
+   ],
+   [
+    "TollfreePhoneNumberSid",
+    "v_tollfree_phone_number_sid"
+   ],
+   [
+    "AdditionalInformation",
+    "v_additional_information"
+   ],
+   [
+    "AgeGatedContent",
+    "true"
+   ],
+   [
+    "BusinessCity",
+    "v_business_city"
+   ],
+   [
+    "BusinessContactEmail",
+    "v_business_contact_email"
+   ],
+   [
+    "BusinessContactFirstName",
+    "v_business_contact_first_name"
+   ],
+   [
+    "BusinessContactLastName",
+    "v_business_contact_last_name"
+   ],
+   [
+    "BusinessContactPhone",
+    "v_business_contact_phone"
+   ],
+   [
+    "BusinessCountry",
+    "v_business_country"
+   ],
+   [
+    "BusinessPostalCode",
+    "v_business_postal_code"
+   ],
+   [
+    "BusinessRegistrationAuthority",
+    "NZBN"
+   ],
+   [
+    "BusinessRegistrationCountry",
+    "v_business_registration_country"
+   ],
+   [
+    "BusinessRegistrationNumber",
+    "v_business_registration_number"
+   ],
+   [
+    "BusinessRegistrationPhoneNumber",
+    "v_business_registration_phone_number"
+   ],
+   [
+    "BusinessStateProvinceRegion",
+    "v_business_state_province_region"
+   ],
+   [
+    "BusinessStreetAddress",
+    "v_business_street_address"
+   ],
+   [
+    "BusinessStreetAddress2",
+    "v_business_street_address2"
+   ],
+   [
+    "BusinessType",
+    "SOLE_PROPRIETOR"
+   ],
+   [
+    "CustomerProfileSid",
+    "v_customer_profile_sid"
+   ],
+   [
+    "DoingBusinessAs",
+    "v_doing_business_as"
+   ],
+   [
+    "ExternalReferenceId",
+    "v_external_reference_id"
+   ],
+   [
+    "HelpMessageSample",
+    "v_help_message_sample"
+   ],
+   [
+    "OptInConfirmationMessage",
+    "v_opt_in_confirmation_message"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_1"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_2"
+   ],
+   [
+    "PrivacyPolicyUrl",
+    "v_privacy_policy_url"
+   ],
+   [
+    "TermsAndConditionsUrl",
+    "v_terms_and_conditions_url"
+   ],
+   [
+    "VettingId",
+    "v_vetting_id"
+   ],
+   [
+    "VettingProvider",
+    "CAMPAIGN_VERIFY"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTollfreeVerification",
+  "method" : "create",
+  "options" : {
+   "additional_information" : "v_additional_information",
+   "age_gated_content" : 1,
+   "business_city" : "v_business_city",
+   "business_contact_email" : "v_business_contact_email",
+   "business_contact_first_name" : "v_business_contact_first_name",
+   "business_contact_last_name" : "v_business_contact_last_name",
+   "business_contact_phone" : "v_business_contact_phone",
+   "business_country" : "v_business_country",
+   "business_postal_code" : "v_business_postal_code",
+   "business_registration_authority" : "NZBN",
+   "business_registration_country" : "v_business_registration_country",
+   "business_registration_number" : "v_business_registration_number",
+   "business_registration_phone_number" : "v_business_registration_phone_number",
+   "business_state_province_region" : "v_business_state_province_region",
+   "business_street_address" : "v_business_street_address",
+   "business_street_address2" : "v_business_street_address2",
+   "business_type" : "SOLE_PROPRIETOR",
+   "customer_profile_sid" : "v_customer_profile_sid",
+   "doing_business_as" : "v_doing_business_as",
+   "external_reference_id" : "v_external_reference_id",
+   "help_message_sample" : "v_help_message_sample",
+   "opt_in_confirmation_message" : "v_opt_in_confirmation_message",
+   "opt_in_keywords" : [
+    "v_opt_in_keywords_1",
+    "v_opt_in_keywords_2"
+   ],
+   "privacy_policy_url" : "v_privacy_policy_url",
+   "terms_and_conditions_url" : "v_terms_and_conditions_url",
+   "vetting_id" : "v_vetting_id",
+   "vetting_provider" : "CAMPAIGN_VERIFY"
+  },
+  "required" : [
+   "v_business_name",
+   "v_business_website",
+   "v_notification_email",
+   [
+    "v_use_case_categories_1",
+    "v_use_case_categories_2"
+   ],
+   "v_use_case_summary",
+   "v_production_message_sample",
+   [
+    "v_opt_in_image_urls_1",
+    "v_opt_in_image_urls_2"
+   ],
+   "IMPORT",
+   "v_message_volume",
+   "v_tollfree_phone_number_sid"
+  ],
+  "url" : "https://messaging.twilio.com/v1/Tollfree/Verifications"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "age_gated" : true,
+     "brand_registration_sid" : "a_brand_registration_sid",
+     "campaign_id" : "a_campaign_id",
+     "campaign_status" : "a_campaign_status",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "direct_lending" : true,
+     "errors" : [
+      "a_errors"
+     ],
+     "has_embedded_links" : true,
+     "has_embedded_phone" : true,
+     "help_keywords" : [
+      "a_help_keywords"
+     ],
+     "help_message" : "a_help_message",
+     "is_externally_registered" : true,
+     "message_flow" : "a_message_flow",
+     "message_samples" : [
+      "a_message_samples"
+     ],
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "mock" : true,
+     "opt_in_keywords" : [
+      "a_opt_in_keywords"
+     ],
+     "opt_in_message" : "a_opt_in_message",
+     "opt_out_keywords" : [
+      "a_opt_out_keywords"
+     ],
+     "opt_out_message" : "a_opt_out_message",
+     "privacy_policy_url" : "a_privacy_policy_url",
+     "rate_limits" : {
+      "a_rate_limits" : 1
+     },
+     "sid" : "a_sid",
+     "subscriber_opt_in" : true,
+     "terms_and_conditions_url" : "a_terms_and_conditions_url",
+     "url" : "a_url",
+     "us_app_to_person_usecase" : "a_us_app_to_person_usecase"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "age_gated",
+      "age_gated",
+      "plain"
+     ],
+     [
+      "brand_registration_sid",
+      "brand_registration_sid",
+      "plain"
+     ],
+     [
+      "campaign_id",
+      "campaign_id",
+      "plain"
+     ],
+     [
+      "campaign_status",
+      "campaign_status",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "direct_lending",
+      "direct_lending",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "has_embedded_links",
+      "has_embedded_links",
+      "plain"
+     ],
+     [
+      "has_embedded_phone",
+      "has_embedded_phone",
+      "plain"
+     ],
+     [
+      "help_keywords",
+      "help_keywords",
+      "plain"
+     ],
+     [
+      "help_message",
+      "help_message",
+      "plain"
+     ],
+     [
+      "is_externally_registered",
+      "is_externally_registered",
+      "plain"
+     ],
+     [
+      "message_flow",
+      "message_flow",
+      "plain"
+     ],
+     [
+      "message_samples",
+      "message_samples",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_message",
+      "opt_in_message",
+      "plain"
+     ],
+     [
+      "opt_out_keywords",
+      "opt_out_keywords",
+      "plain"
+     ],
+     [
+      "opt_out_message",
+      "opt_out_message",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "rate_limits",
+      "rate_limits",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "subscriber_opt_in",
+      "subscriber_opt_in",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_usecase",
+      "us_app_to_person_usecase",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "us_app_to_person",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "BrandRegistrationSid",
+    "v_brand_registration_sid"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "MessageFlow",
+    "v_message_flow"
+   ],
+   [
+    "MessageSamples",
+    "v_message_samples_1"
+   ],
+   [
+    "MessageSamples",
+    "v_message_samples_2"
+   ],
+   [
+    "UsAppToPersonUsecase",
+    "v_us_app_to_person_usecase"
+   ],
+   [
+    "HasEmbeddedLinks",
+    "true"
+   ],
+   [
+    "HasEmbeddedPhone",
+    "true"
+   ],
+   [
+    "AgeGated",
+    "true"
+   ],
+   [
+    "DirectLending",
+    "true"
+   ],
+   [
+    "HelpKeywords",
+    "v_help_keywords_1"
+   ],
+   [
+    "HelpKeywords",
+    "v_help_keywords_2"
+   ],
+   [
+    "HelpMessage",
+    "v_help_message"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_1"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_2"
+   ],
+   [
+    "OptInMessage",
+    "v_opt_in_message"
+   ],
+   [
+    "OptOutKeywords",
+    "v_opt_out_keywords_1"
+   ],
+   [
+    "OptOutKeywords",
+    "v_opt_out_keywords_2"
+   ],
+   [
+    "OptOutMessage",
+    "v_opt_out_message"
+   ],
+   [
+    "PrivacyPolicyUrl",
+    "v_privacy_policy_url"
+   ],
+   [
+    "SubscriberOptIn",
+    "true"
+   ],
+   [
+    "TermsAndConditionsUrl",
+    "v_terms_and_conditions_url"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Api-Version" : "v_x_twilio_api_version"
+  },
+  "http" : "POST",
+  "id" : "CreateUsAppToPerson",
+  "method" : "create",
+  "options" : {
+   "age_gated" : 1,
+   "direct_lending" : 1,
+   "help_keywords" : [
+    "v_help_keywords_1",
+    "v_help_keywords_2"
+   ],
+   "help_message" : "v_help_message",
+   "opt_in_keywords" : [
+    "v_opt_in_keywords_1",
+    "v_opt_in_keywords_2"
+   ],
+   "opt_in_message" : "v_opt_in_message",
+   "opt_out_keywords" : [
+    "v_opt_out_keywords_1",
+    "v_opt_out_keywords_2"
+   ],
+   "opt_out_message" : "v_opt_out_message",
+   "privacy_policy_url" : "v_privacy_policy_url",
+   "subscriber_opt_in" : 1,
+   "terms_and_conditions_url" : "v_terms_and_conditions_url",
+   "x_twilio_api_version" : "v_x_twilio_api_version"
+  },
+  "required" : [
+   "v_brand_registration_sid",
+   "v_description",
+   "v_message_flow",
+   [
+    "v_message_samples_1",
+    "v_message_samples_2"
+   ],
+   "v_us_app_to_person_usecase",
+   1,
+   1
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/Compliance/Usa2p"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "alpha_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteAlphaSender",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/AlphaSenders/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channel_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteChannelSender",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ChannelSenders/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "destination_alpha_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteDestinationAlphaSender",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/DestinationAlphaSenders/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_certs",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteDomainCertV4",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/Certificate"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "linkshortening_messaging_service",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteLinkshorteningMessagingService",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/MessagingServices/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeletePhoneNumber",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/PhoneNumbers/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteService",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "short_codes",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteShortCode",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ShortCodes/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "tollfree_verifications",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteTollfreeVerification",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Tollfree/Verifications/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "us_app_to_person",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteUsAppToPerson",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/Compliance/Usa2p/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alpha_sender" : "a_alpha_sender",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alpha_sender",
+      "alpha_sender",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "alpha_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchAlphaSender",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/AlphaSenders/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "a2p_profile_bundle_sid" : "a_a2p_profile_bundle_sid",
+     "account_sid" : "a_account_sid",
+     "brand_feedback" : [
+      "a_brand_feedback"
+     ],
+     "brand_score" : 1154,
+     "brand_type" : "a_brand_type",
+     "customer_profile_bundle_sid" : "a_customer_profile_bundle_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "errors" : [
+      "a_errors"
+     ],
+     "failure_reason" : "a_failure_reason",
+     "government_entity" : true,
+     "identity_status" : "UNVERIFIED",
+     "links" : {
+      "a_links" : 1
+     },
+     "mock" : true,
+     "russell_3000" : true,
+     "sid" : "a_sid",
+     "skip_automatic_sec_vet" : true,
+     "status" : "DELETION_PENDING",
+     "tax_exempt_status" : "a_tax_exempt_status",
+     "tcr_id" : "a_tcr_id",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "a2p_profile_bundle_sid",
+      "a2p_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_feedback",
+      "brand_feedback",
+      "plain"
+     ],
+     [
+      "brand_score",
+      "brand_score",
+      "plain"
+     ],
+     [
+      "brand_type",
+      "brand_type",
+      "plain"
+     ],
+     [
+      "customer_profile_bundle_sid",
+      "customer_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "failure_reason",
+      "failure_reason",
+      "plain"
+     ],
+     [
+      "government_entity",
+      "government_entity",
+      "plain"
+     ],
+     [
+      "identity_status",
+      "identity_status",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "russell_3000",
+      "russell_3000",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "skip_automatic_sec_vet",
+      "skip_automatic_sec_vet",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "tax_exempt_status",
+      "tax_exempt_status",
+      "plain"
+     ],
+     [
+      "tcr_id",
+      "tcr_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBrandRegistrations",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "brand_sid" : "a_brand_sid",
+     "brand_vetting_sid" : "a_brand_vetting_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "url" : "a_url",
+     "vetting_class" : "a_vetting_class",
+     "vetting_id" : "a_vetting_id",
+     "vetting_provider" : "aegis",
+     "vetting_status" : "a_vetting_status"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_sid",
+      "brand_sid",
+      "plain"
+     ],
+     [
+      "brand_vetting_sid",
+      "brand_vetting_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "vetting_class",
+      "vetting_class",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ],
+     [
+      "vetting_status",
+      "vetting_status",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    1
+   ],
+   [
+    "brand_vettings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBrandVetting",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations/id1/Vettings/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "sender" : "a_sender",
+     "sender_type" : "a_sender_type",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sender",
+      "sender",
+      "plain"
+     ],
+     [
+      "sender_type",
+      "sender_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channel_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchChannelSender",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ChannelSenders/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "redirect_to" : "a_redirect_to"
+    },
+    "fields" : [
+     [
+      "redirect_to",
+      "redirect_to",
+      "plain"
+     ]
+    ],
+    "status" : 307
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "deactivations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Date",
+    "2026-01-19"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchDeactivation",
+  "method" : "fetch",
+  "options" : {
+   "date" : {
+    "epoch" : 1768791845
+   }
+  },
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Deactivations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "alpha_sender" : "a_alpha_sender",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "iso_country_code" : "a_iso_country_code",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alpha_sender",
+      "alpha_sender",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "iso_country_code",
+      "iso_country_code",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "destination_alpha_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDestinationAlphaSender",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/DestinationAlphaSenders/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "cert_in_validation" : {
+      "a_cert_in_validation" : 1
+     },
+     "certificate_sid" : "a_certificate_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_expires" : "2026-01-18T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_sid" : "a_domain_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "cert_in_validation",
+      "cert_in_validation",
+      "plain"
+     ],
+     [
+      "certificate_sid",
+      "certificate_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_expires",
+      "date_expires",
+      "date",
+      1768705445
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_certs",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDomainCertV4",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/Certificate"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "callback_url" : "a_callback_url",
+     "config_sid" : "a_config_sid",
+     "continue_on_failure" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "disable_https" : true,
+     "domain_sid" : "a_domain_sid",
+     "fallback_url" : "a_fallback_url",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "callback_url",
+      "callback_url",
+      "plain"
+     ],
+     [
+      "config_sid",
+      "config_sid",
+      "plain"
+     ],
+     [
+      "continue_on_failure",
+      "continue_on_failure",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disable_https",
+      "disable_https",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_config",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDomainConfig",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/Config"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "callback_url" : "a_callback_url",
+     "config_sid" : "a_config_sid",
+     "continue_on_failure" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_sid" : "a_domain_sid",
+     "fallback_url" : "a_fallback_url",
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "callback_url",
+      "callback_url",
+      "plain"
+     ],
+     [
+      "config_sid",
+      "config_sid",
+      "plain"
+     ],
+     [
+      "continue_on_failure",
+      "continue_on_failure",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_config_messaging_service",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDomainConfigMessagingService",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/MessagingService/id1/DomainConfig"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "domain_sid" : "a_domain_sid",
+     "is_valid" : true,
+     "reason" : "a_reason",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "is_valid",
+      "is_valid",
+      "plain"
+     ],
+     [
+      "reason",
+      "reason",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_validate_dns",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDomainDnsValidation",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/ValidateDns"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "domain_sid" : "a_domain_sid",
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "linkshortening_messaging_service_domain_association",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchLinkshorteningMessagingServiceDomainAssociation",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/MessagingServices/id1/Domain"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "phone_number" : "a_phone_number",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPhoneNumber",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/PhoneNumbers/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "area_code_geomatch" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "fallback_method" : "GET",
+     "fallback_to_long_code" : true,
+     "fallback_url" : "a_fallback_url",
+     "friendly_name" : "a_friendly_name",
+     "inbound_method" : "POST",
+     "inbound_request_url" : "a_inbound_request_url",
+     "links" : {
+      "a_links" : 1
+     },
+     "mms_converter" : true,
+     "scan_message_content" : "inherit",
+     "sid" : "a_sid",
+     "smart_encoding" : true,
+     "status_callback" : "a_status_callback",
+     "sticky_sender" : true,
+     "synchronous_validation" : true,
+     "url" : "a_url",
+     "us_app_to_person_registered" : true,
+     "use_inbound_webhook_on_number" : true,
+     "usecase" : "a_usecase",
+     "validity_period" : 1608
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "area_code_geomatch",
+      "area_code_geomatch",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "fallback_method",
+      "fallback_method",
+      "plain"
+     ],
+     [
+      "fallback_to_long_code",
+      "fallback_to_long_code",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "inbound_method",
+      "inbound_method",
+      "plain"
+     ],
+     [
+      "inbound_request_url",
+      "inbound_request_url",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mms_converter",
+      "mms_converter",
+      "plain"
+     ],
+     [
+      "scan_message_content",
+      "scan_message_content",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "smart_encoding",
+      "smart_encoding",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "sticky_sender",
+      "sticky_sender",
+      "plain"
+     ],
+     [
+      "synchronous_validation",
+      "synchronous_validation",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_registered",
+      "us_app_to_person_registered",
+      "plain"
+     ],
+     [
+      "use_inbound_webhook_on_number",
+      "use_inbound_webhook_on_number",
+      "plain"
+     ],
+     [
+      "usecase",
+      "usecase",
+      "plain"
+     ],
+     [
+      "validity_period",
+      "validity_period",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchService",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "capabilities" : [
+      "a_capabilities"
+     ],
+     "country_code" : "a_country_code",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "short_code" : "a_short_code",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "short_code",
+      "short_code",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "short_codes",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchShortCode",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ShortCodes/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "additional_information" : "a_additional_information",
+     "age_gated_content" : true,
+     "business_city" : "a_business_city",
+     "business_contact_email" : "a_business_contact_email",
+     "business_contact_first_name" : "a_business_contact_first_name",
+     "business_contact_last_name" : "a_business_contact_last_name",
+     "business_contact_phone" : "a_business_contact_phone",
+     "business_country" : "a_business_country",
+     "business_name" : "a_business_name",
+     "business_postal_code" : "a_business_postal_code",
+     "business_registration_authority" : "SIREN",
+     "business_registration_country" : "a_business_registration_country",
+     "business_registration_number" : "a_business_registration_number",
+     "business_registration_phone_number" : "a_business_registration_phone_number",
+     "business_state_province_region" : "a_business_state_province_region",
+     "business_street_address" : "a_business_street_address",
+     "business_street_address2" : "a_business_street_address2",
+     "business_type" : "PUBLIC_PROFIT",
+     "business_website" : "a_business_website",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "doing_business_as" : "a_doing_business_as",
+     "edit_allowed" : true,
+     "edit_expiration" : "2026-01-13T03:04:05Z",
+     "error_code" : 1060,
+     "external_reference_id" : "a_external_reference_id",
+     "help_message_sample" : "a_help_message_sample",
+     "message_volume" : "a_message_volume",
+     "notification_email" : "a_notification_email",
+     "opt_in_confirmation_message" : "a_opt_in_confirmation_message",
+     "opt_in_image_urls" : [
+      "a_opt_in_image_urls"
+     ],
+     "opt_in_keywords" : [
+      "a_opt_in_keywords"
+     ],
+     "opt_in_type" : "MOBILE_QR_CODE",
+     "privacy_policy_url" : "a_privacy_policy_url",
+     "production_message_sample" : "a_production_message_sample",
+     "regulated_item_sid" : "a_regulated_item_sid",
+     "rejection_reason" : "a_rejection_reason",
+     "rejection_reasons" : [
+      "a_rejection_reasons"
+     ],
+     "resource_links" : {
+      "a_resource_links" : 1
+     },
+     "sid" : "a_sid",
+     "status" : "PENDING_REVIEW",
+     "terms_and_conditions_url" : "a_terms_and_conditions_url",
+     "tollfree_phone_number" : "a_tollfree_phone_number",
+     "tollfree_phone_number_sid" : "a_tollfree_phone_number_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url",
+     "use_case_categories" : [
+      "a_use_case_categories"
+     ],
+     "use_case_summary" : "a_use_case_summary",
+     "vetting_id" : "a_vetting_id",
+     "vetting_id_expiration" : "2026-01-16T03:04:05Z",
+     "vetting_provider" : "CAMPAIGN_VERIFY"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "additional_information",
+      "additional_information",
+      "plain"
+     ],
+     [
+      "age_gated_content",
+      "age_gated_content",
+      "plain"
+     ],
+     [
+      "business_city",
+      "business_city",
+      "plain"
+     ],
+     [
+      "business_contact_email",
+      "business_contact_email",
+      "plain"
+     ],
+     [
+      "business_contact_first_name",
+      "business_contact_first_name",
+      "plain"
+     ],
+     [
+      "business_contact_last_name",
+      "business_contact_last_name",
+      "plain"
+     ],
+     [
+      "business_contact_phone",
+      "business_contact_phone",
+      "plain"
+     ],
+     [
+      "business_country",
+      "business_country",
+      "plain"
+     ],
+     [
+      "business_name",
+      "business_name",
+      "plain"
+     ],
+     [
+      "business_postal_code",
+      "business_postal_code",
+      "plain"
+     ],
+     [
+      "business_registration_authority",
+      "business_registration_authority",
+      "plain"
+     ],
+     [
+      "business_registration_country",
+      "business_registration_country",
+      "plain"
+     ],
+     [
+      "business_registration_number",
+      "business_registration_number",
+      "plain"
+     ],
+     [
+      "business_registration_phone_number",
+      "business_registration_phone_number",
+      "plain"
+     ],
+     [
+      "business_state_province_region",
+      "business_state_province_region",
+      "plain"
+     ],
+     [
+      "business_street_address",
+      "business_street_address",
+      "plain"
+     ],
+     [
+      "business_street_address2",
+      "business_street_address2",
+      "plain"
+     ],
+     [
+      "business_type",
+      "business_type",
+      "plain"
+     ],
+     [
+      "business_website",
+      "business_website",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "doing_business_as",
+      "doing_business_as",
+      "plain"
+     ],
+     [
+      "edit_allowed",
+      "edit_allowed",
+      "plain"
+     ],
+     [
+      "edit_expiration",
+      "edit_expiration",
+      "date",
+      1768273445
+     ],
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "external_reference_id",
+      "external_reference_id",
+      "plain"
+     ],
+     [
+      "help_message_sample",
+      "help_message_sample",
+      "plain"
+     ],
+     [
+      "message_volume",
+      "message_volume",
+      "plain"
+     ],
+     [
+      "notification_email",
+      "notification_email",
+      "plain"
+     ],
+     [
+      "opt_in_confirmation_message",
+      "opt_in_confirmation_message",
+      "plain"
+     ],
+     [
+      "opt_in_image_urls",
+      "opt_in_image_urls",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_type",
+      "opt_in_type",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "production_message_sample",
+      "production_message_sample",
+      "plain"
+     ],
+     [
+      "regulated_item_sid",
+      "regulated_item_sid",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "rejection_reasons",
+      "rejection_reasons",
+      "plain"
+     ],
+     [
+      "resource_links",
+      "resource_links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number",
+      "tollfree_phone_number",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number_sid",
+      "tollfree_phone_number_sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "use_case_categories",
+      "use_case_categories",
+      "plain"
+     ],
+     [
+      "use_case_summary",
+      "use_case_summary",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_id_expiration",
+      "vetting_id_expiration",
+      "date",
+      1768532645
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "tollfree_verifications",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTollfreeVerification",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Tollfree/Verifications/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "age_gated" : true,
+     "brand_registration_sid" : "a_brand_registration_sid",
+     "campaign_id" : "a_campaign_id",
+     "campaign_status" : "a_campaign_status",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "direct_lending" : true,
+     "errors" : [
+      "a_errors"
+     ],
+     "has_embedded_links" : true,
+     "has_embedded_phone" : true,
+     "help_keywords" : [
+      "a_help_keywords"
+     ],
+     "help_message" : "a_help_message",
+     "is_externally_registered" : true,
+     "message_flow" : "a_message_flow",
+     "message_samples" : [
+      "a_message_samples"
+     ],
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "mock" : true,
+     "opt_in_keywords" : [
+      "a_opt_in_keywords"
+     ],
+     "opt_in_message" : "a_opt_in_message",
+     "opt_out_keywords" : [
+      "a_opt_out_keywords"
+     ],
+     "opt_out_message" : "a_opt_out_message",
+     "privacy_policy_url" : "a_privacy_policy_url",
+     "rate_limits" : {
+      "a_rate_limits" : 1
+     },
+     "sid" : "a_sid",
+     "subscriber_opt_in" : true,
+     "terms_and_conditions_url" : "a_terms_and_conditions_url",
+     "url" : "a_url",
+     "us_app_to_person_usecase" : "a_us_app_to_person_usecase"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "age_gated",
+      "age_gated",
+      "plain"
+     ],
+     [
+      "brand_registration_sid",
+      "brand_registration_sid",
+      "plain"
+     ],
+     [
+      "campaign_id",
+      "campaign_id",
+      "plain"
+     ],
+     [
+      "campaign_status",
+      "campaign_status",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "direct_lending",
+      "direct_lending",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "has_embedded_links",
+      "has_embedded_links",
+      "plain"
+     ],
+     [
+      "has_embedded_phone",
+      "has_embedded_phone",
+      "plain"
+     ],
+     [
+      "help_keywords",
+      "help_keywords",
+      "plain"
+     ],
+     [
+      "help_message",
+      "help_message",
+      "plain"
+     ],
+     [
+      "is_externally_registered",
+      "is_externally_registered",
+      "plain"
+     ],
+     [
+      "message_flow",
+      "message_flow",
+      "plain"
+     ],
+     [
+      "message_samples",
+      "message_samples",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_message",
+      "opt_in_message",
+      "plain"
+     ],
+     [
+      "opt_out_keywords",
+      "opt_out_keywords",
+      "plain"
+     ],
+     [
+      "opt_out_message",
+      "opt_out_message",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "rate_limits",
+      "rate_limits",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "subscriber_opt_in",
+      "subscriber_opt_in",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_usecase",
+      "us_app_to_person_usecase",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "us_app_to_person",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "X-Twilio-Api-Version" : "v_x_twilio_api_version"
+  },
+  "http" : "GET",
+  "id" : "FetchUsAppToPerson",
+  "method" : "fetch",
+  "options" : {
+   "x_twilio_api_version" : "v_x_twilio_api_version"
+  },
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/Compliance/Usa2p/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "us_app_to_person_usecases" : [
+      "a_us_app_to_person_usecases"
+     ]
+    },
+    "fields" : [
+     [
+      "us_app_to_person_usecases",
+      "us_app_to_person_usecases",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "us_app_to_person_usecases",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "BrandRegistrationSid",
+    "v_brand_registration_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchUsAppToPersonUsecase",
+  "method" : "fetch",
+  "options" : {
+   "brand_registration_sid" : "v_brand_registration_sid"
+  },
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/Compliance/Usa2p/Usecases"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "usecases" : [
+      "a_usecases"
+     ]
+    },
+    "fields" : [
+     [
+      "usecases",
+      "usecases",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "usecases",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchUsecase",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/Usecases"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "alpha_senders" : [
+      {
+       "account_sid" : "a_account_sid",
+       "alpha_sender" : "a_alpha_sender",
+       "capabilities" : [
+        "a_capabilities"
+       ],
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alpha_sender",
+      "alpha_sender",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "alpha_senders",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListAlphaSender",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "alpha_senders",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/AlphaSenders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "data" : [
+      {
+       "a2p_profile_bundle_sid" : "a_a2p_profile_bundle_sid",
+       "account_sid" : "a_account_sid",
+       "brand_feedback" : [
+        "a_brand_feedback"
+       ],
+       "brand_score" : 1154,
+       "brand_type" : "a_brand_type",
+       "customer_profile_bundle_sid" : "a_customer_profile_bundle_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "errors" : [
+        "a_errors"
+       ],
+       "failure_reason" : "a_failure_reason",
+       "government_entity" : true,
+       "identity_status" : "UNVERIFIED",
+       "links" : {
+        "a_links" : 1
+       },
+       "mock" : true,
+       "russell_3000" : true,
+       "sid" : "a_sid",
+       "skip_automatic_sec_vet" : true,
+       "status" : "DELETION_PENDING",
+       "tax_exempt_status" : "a_tax_exempt_status",
+       "tcr_id" : "a_tcr_id",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "a2p_profile_bundle_sid",
+      "a2p_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_feedback",
+      "brand_feedback",
+      "plain"
+     ],
+     [
+      "brand_score",
+      "brand_score",
+      "plain"
+     ],
+     [
+      "brand_type",
+      "brand_type",
+      "plain"
+     ],
+     [
+      "customer_profile_bundle_sid",
+      "customer_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "failure_reason",
+      "failure_reason",
+      "plain"
+     ],
+     [
+      "government_entity",
+      "government_entity",
+      "plain"
+     ],
+     [
+      "identity_status",
+      "identity_status",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "russell_3000",
+      "russell_3000",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "skip_automatic_sec_vet",
+      "skip_automatic_sec_vet",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "tax_exempt_status",
+      "tax_exempt_status",
+      "plain"
+     ],
+     [
+      "tcr_id",
+      "tcr_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListBrandRegistrations",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "data",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "data" : [
+      {
+       "account_sid" : "a_account_sid",
+       "brand_sid" : "a_brand_sid",
+       "brand_vetting_sid" : "a_brand_vetting_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "url" : "a_url",
+       "vetting_class" : "a_vetting_class",
+       "vetting_id" : "a_vetting_id",
+       "vetting_provider" : "aegis",
+       "vetting_status" : "a_vetting_status"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_sid",
+      "brand_sid",
+      "plain"
+     ],
+     [
+      "brand_vetting_sid",
+      "brand_vetting_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "vetting_class",
+      "vetting_class",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ],
+     [
+      "vetting_status",
+      "vetting_status",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    1
+   ],
+   [
+    "brand_vettings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "VettingProvider",
+    "campaign-verify"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListBrandVetting",
+  "method" : "page",
+  "options" : {
+   "vetting_provider" : "campaign-verify"
+  },
+  "records_key" : "data",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations/id1/Vettings"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "senders" : [
+      {
+       "account_sid" : "a_account_sid",
+       "country_code" : "a_country_code",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "messaging_service_sid" : "a_messaging_service_sid",
+       "sender" : "a_sender",
+       "sender_type" : "a_sender_type",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "sender",
+      "sender",
+      "plain"
+     ],
+     [
+      "sender_type",
+      "sender_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channel_senders",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListChannelSender",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "senders",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ChannelSenders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "alpha_senders" : [
+      {
+       "account_sid" : "a_account_sid",
+       "alpha_sender" : "a_alpha_sender",
+       "capabilities" : [
+        "a_capabilities"
+       ],
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "iso_country_code" : "a_iso_country_code",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "alpha_sender",
+      "alpha_sender",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "iso_country_code",
+      "iso_country_code",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "destination_alpha_senders",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "IsoCountryCode",
+    "v_iso_country_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListDestinationAlphaSender",
+  "method" : "page",
+  "options" : {
+   "iso_country_code" : "v_iso_country_code"
+  },
+  "records_key" : "alpha_senders",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/DestinationAlphaSenders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "phone_numbers" : [
+      {
+       "account_sid" : "a_account_sid",
+       "capabilities" : [
+        "a_capabilities"
+       ],
+       "country_code" : "a_country_code",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "phone_number" : "a_phone_number",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "phone_numbers",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListPhoneNumber",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "phone_numbers",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/PhoneNumbers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "services" : [
+      {
+       "account_sid" : "a_account_sid",
+       "area_code_geomatch" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "fallback_method" : "GET",
+       "fallback_to_long_code" : true,
+       "fallback_url" : "a_fallback_url",
+       "friendly_name" : "a_friendly_name",
+       "inbound_method" : "POST",
+       "inbound_request_url" : "a_inbound_request_url",
+       "links" : {
+        "a_links" : 1
+       },
+       "mms_converter" : true,
+       "scan_message_content" : "inherit",
+       "sid" : "a_sid",
+       "smart_encoding" : true,
+       "status_callback" : "a_status_callback",
+       "sticky_sender" : true,
+       "synchronous_validation" : true,
+       "url" : "a_url",
+       "us_app_to_person_registered" : true,
+       "use_inbound_webhook_on_number" : true,
+       "usecase" : "a_usecase",
+       "validity_period" : 1608
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "area_code_geomatch",
+      "area_code_geomatch",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "fallback_method",
+      "fallback_method",
+      "plain"
+     ],
+     [
+      "fallback_to_long_code",
+      "fallback_to_long_code",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "inbound_method",
+      "inbound_method",
+      "plain"
+     ],
+     [
+      "inbound_request_url",
+      "inbound_request_url",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mms_converter",
+      "mms_converter",
+      "plain"
+     ],
+     [
+      "scan_message_content",
+      "scan_message_content",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "smart_encoding",
+      "smart_encoding",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "sticky_sender",
+      "sticky_sender",
+      "plain"
+     ],
+     [
+      "synchronous_validation",
+      "synchronous_validation",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_registered",
+      "us_app_to_person_registered",
+      "plain"
+     ],
+     [
+      "use_inbound_webhook_on_number",
+      "use_inbound_webhook_on_number",
+      "plain"
+     ],
+     [
+      "usecase",
+      "usecase",
+      "plain"
+     ],
+     [
+      "validity_period",
+      "validity_period",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListService",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "services",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "short_codes" : [
+      {
+       "account_sid" : "a_account_sid",
+       "capabilities" : [
+        "a_capabilities"
+       ],
+       "country_code" : "a_country_code",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "service_sid" : "a_service_sid",
+       "short_code" : "a_short_code",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "plain"
+     ],
+     [
+      "country_code",
+      "country_code",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "short_code",
+      "short_code",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "short_codes",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListShortCode",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "short_codes",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/ShortCodes"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "verifications" : [
+      {
+       "account_sid" : "a_account_sid",
+       "additional_information" : "a_additional_information",
+       "age_gated_content" : true,
+       "business_city" : "a_business_city",
+       "business_contact_email" : "a_business_contact_email",
+       "business_contact_first_name" : "a_business_contact_first_name",
+       "business_contact_last_name" : "a_business_contact_last_name",
+       "business_contact_phone" : "a_business_contact_phone",
+       "business_country" : "a_business_country",
+       "business_name" : "a_business_name",
+       "business_postal_code" : "a_business_postal_code",
+       "business_registration_authority" : "SIREN",
+       "business_registration_country" : "a_business_registration_country",
+       "business_registration_number" : "a_business_registration_number",
+       "business_registration_phone_number" : "a_business_registration_phone_number",
+       "business_state_province_region" : "a_business_state_province_region",
+       "business_street_address" : "a_business_street_address",
+       "business_street_address2" : "a_business_street_address2",
+       "business_type" : "PUBLIC_PROFIT",
+       "business_website" : "a_business_website",
+       "customer_profile_sid" : "a_customer_profile_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "doing_business_as" : "a_doing_business_as",
+       "edit_allowed" : true,
+       "edit_expiration" : "2026-01-13T03:04:05Z",
+       "error_code" : 1060,
+       "external_reference_id" : "a_external_reference_id",
+       "help_message_sample" : "a_help_message_sample",
+       "message_volume" : "a_message_volume",
+       "notification_email" : "a_notification_email",
+       "opt_in_confirmation_message" : "a_opt_in_confirmation_message",
+       "opt_in_image_urls" : [
+        "a_opt_in_image_urls"
+       ],
+       "opt_in_keywords" : [
+        "a_opt_in_keywords"
+       ],
+       "opt_in_type" : "MOBILE_QR_CODE",
+       "privacy_policy_url" : "a_privacy_policy_url",
+       "production_message_sample" : "a_production_message_sample",
+       "regulated_item_sid" : "a_regulated_item_sid",
+       "rejection_reason" : "a_rejection_reason",
+       "rejection_reasons" : [
+        "a_rejection_reasons"
+       ],
+       "resource_links" : {
+        "a_resource_links" : 1
+       },
+       "sid" : "a_sid",
+       "status" : "PENDING_REVIEW",
+       "terms_and_conditions_url" : "a_terms_and_conditions_url",
+       "tollfree_phone_number" : "a_tollfree_phone_number",
+       "tollfree_phone_number_sid" : "a_tollfree_phone_number_sid",
+       "trust_product_sid" : "a_trust_product_sid",
+       "url" : "a_url",
+       "use_case_categories" : [
+        "a_use_case_categories"
+       ],
+       "use_case_summary" : "a_use_case_summary",
+       "vetting_id" : "a_vetting_id",
+       "vetting_id_expiration" : "2026-01-16T03:04:05Z",
+       "vetting_provider" : "CAMPAIGN_VERIFY"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "additional_information",
+      "additional_information",
+      "plain"
+     ],
+     [
+      "age_gated_content",
+      "age_gated_content",
+      "plain"
+     ],
+     [
+      "business_city",
+      "business_city",
+      "plain"
+     ],
+     [
+      "business_contact_email",
+      "business_contact_email",
+      "plain"
+     ],
+     [
+      "business_contact_first_name",
+      "business_contact_first_name",
+      "plain"
+     ],
+     [
+      "business_contact_last_name",
+      "business_contact_last_name",
+      "plain"
+     ],
+     [
+      "business_contact_phone",
+      "business_contact_phone",
+      "plain"
+     ],
+     [
+      "business_country",
+      "business_country",
+      "plain"
+     ],
+     [
+      "business_name",
+      "business_name",
+      "plain"
+     ],
+     [
+      "business_postal_code",
+      "business_postal_code",
+      "plain"
+     ],
+     [
+      "business_registration_authority",
+      "business_registration_authority",
+      "plain"
+     ],
+     [
+      "business_registration_country",
+      "business_registration_country",
+      "plain"
+     ],
+     [
+      "business_registration_number",
+      "business_registration_number",
+      "plain"
+     ],
+     [
+      "business_registration_phone_number",
+      "business_registration_phone_number",
+      "plain"
+     ],
+     [
+      "business_state_province_region",
+      "business_state_province_region",
+      "plain"
+     ],
+     [
+      "business_street_address",
+      "business_street_address",
+      "plain"
+     ],
+     [
+      "business_street_address2",
+      "business_street_address2",
+      "plain"
+     ],
+     [
+      "business_type",
+      "business_type",
+      "plain"
+     ],
+     [
+      "business_website",
+      "business_website",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "doing_business_as",
+      "doing_business_as",
+      "plain"
+     ],
+     [
+      "edit_allowed",
+      "edit_allowed",
+      "plain"
+     ],
+     [
+      "edit_expiration",
+      "edit_expiration",
+      "date",
+      1768273445
+     ],
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "external_reference_id",
+      "external_reference_id",
+      "plain"
+     ],
+     [
+      "help_message_sample",
+      "help_message_sample",
+      "plain"
+     ],
+     [
+      "message_volume",
+      "message_volume",
+      "plain"
+     ],
+     [
+      "notification_email",
+      "notification_email",
+      "plain"
+     ],
+     [
+      "opt_in_confirmation_message",
+      "opt_in_confirmation_message",
+      "plain"
+     ],
+     [
+      "opt_in_image_urls",
+      "opt_in_image_urls",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_type",
+      "opt_in_type",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "production_message_sample",
+      "production_message_sample",
+      "plain"
+     ],
+     [
+      "regulated_item_sid",
+      "regulated_item_sid",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "rejection_reasons",
+      "rejection_reasons",
+      "plain"
+     ],
+     [
+      "resource_links",
+      "resource_links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number",
+      "tollfree_phone_number",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number_sid",
+      "tollfree_phone_number_sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "use_case_categories",
+      "use_case_categories",
+      "plain"
+     ],
+     [
+      "use_case_summary",
+      "use_case_summary",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_id_expiration",
+      "vetting_id_expiration",
+      "date",
+      1768532645
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "tollfree_verifications",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "TollfreePhoneNumberSid",
+    "v_tollfree_phone_number_sid"
+   ],
+   [
+    "Status",
+    "PENDING_REVIEW"
+   ],
+   [
+    "ExternalReferenceId",
+    "v_external_reference_id"
+   ],
+   [
+    "IncludeSubAccounts",
+    "true"
+   ],
+   [
+    "TrustProductSid",
+    "v_trust_product_sid_1"
+   ],
+   [
+    "TrustProductSid",
+    "v_trust_product_sid_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListTollfreeVerification",
+  "method" : "page",
+  "options" : {
+   "external_reference_id" : "v_external_reference_id",
+   "include_sub_accounts" : 1,
+   "status" : "PENDING_REVIEW",
+   "tollfree_phone_number_sid" : "v_tollfree_phone_number_sid",
+   "trust_product_sid" : [
+    "v_trust_product_sid_1",
+    "v_trust_product_sid_2"
+   ]
+  },
+  "records_key" : "verifications",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Tollfree/Verifications"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "compliance" : [
+      {
+       "account_sid" : "a_account_sid",
+       "age_gated" : true,
+       "brand_registration_sid" : "a_brand_registration_sid",
+       "campaign_id" : "a_campaign_id",
+       "campaign_status" : "a_campaign_status",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "direct_lending" : true,
+       "errors" : [
+        "a_errors"
+       ],
+       "has_embedded_links" : true,
+       "has_embedded_phone" : true,
+       "help_keywords" : [
+        "a_help_keywords"
+       ],
+       "help_message" : "a_help_message",
+       "is_externally_registered" : true,
+       "message_flow" : "a_message_flow",
+       "message_samples" : [
+        "a_message_samples"
+       ],
+       "messaging_service_sid" : "a_messaging_service_sid",
+       "mock" : true,
+       "opt_in_keywords" : [
+        "a_opt_in_keywords"
+       ],
+       "opt_in_message" : "a_opt_in_message",
+       "opt_out_keywords" : [
+        "a_opt_out_keywords"
+       ],
+       "opt_out_message" : "a_opt_out_message",
+       "privacy_policy_url" : "a_privacy_policy_url",
+       "rate_limits" : {
+        "a_rate_limits" : 1
+       },
+       "sid" : "a_sid",
+       "subscriber_opt_in" : true,
+       "terms_and_conditions_url" : "a_terms_and_conditions_url",
+       "url" : "a_url",
+       "us_app_to_person_usecase" : "a_us_app_to_person_usecase"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "age_gated",
+      "age_gated",
+      "plain"
+     ],
+     [
+      "brand_registration_sid",
+      "brand_registration_sid",
+      "plain"
+     ],
+     [
+      "campaign_id",
+      "campaign_id",
+      "plain"
+     ],
+     [
+      "campaign_status",
+      "campaign_status",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "direct_lending",
+      "direct_lending",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "has_embedded_links",
+      "has_embedded_links",
+      "plain"
+     ],
+     [
+      "has_embedded_phone",
+      "has_embedded_phone",
+      "plain"
+     ],
+     [
+      "help_keywords",
+      "help_keywords",
+      "plain"
+     ],
+     [
+      "help_message",
+      "help_message",
+      "plain"
+     ],
+     [
+      "is_externally_registered",
+      "is_externally_registered",
+      "plain"
+     ],
+     [
+      "message_flow",
+      "message_flow",
+      "plain"
+     ],
+     [
+      "message_samples",
+      "message_samples",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_message",
+      "opt_in_message",
+      "plain"
+     ],
+     [
+      "opt_out_keywords",
+      "opt_out_keywords",
+      "plain"
+     ],
+     [
+      "opt_out_message",
+      "opt_out_message",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "rate_limits",
+      "rate_limits",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "subscriber_opt_in",
+      "subscriber_opt_in",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_usecase",
+      "us_app_to_person_usecase",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "us_app_to_person",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "X-Twilio-Api-Version" : "v_x_twilio_api_version"
+  },
+  "http" : "GET",
+  "id" : "ListUsAppToPerson",
+  "method" : "page",
+  "options" : {
+   "x_twilio_api_version" : "v_x_twilio_api_version"
+  },
+  "records_key" : "compliance",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/Compliance/Usa2p"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "a2p_profile_bundle_sid" : "a_a2p_profile_bundle_sid",
+     "account_sid" : "a_account_sid",
+     "brand_feedback" : [
+      "a_brand_feedback"
+     ],
+     "brand_score" : 1154,
+     "brand_type" : "a_brand_type",
+     "customer_profile_bundle_sid" : "a_customer_profile_bundle_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "errors" : [
+      "a_errors"
+     ],
+     "failure_reason" : "a_failure_reason",
+     "government_entity" : true,
+     "identity_status" : "UNVERIFIED",
+     "links" : {
+      "a_links" : 1
+     },
+     "mock" : true,
+     "russell_3000" : true,
+     "sid" : "a_sid",
+     "skip_automatic_sec_vet" : true,
+     "status" : "DELETION_PENDING",
+     "tax_exempt_status" : "a_tax_exempt_status",
+     "tcr_id" : "a_tcr_id",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "a2p_profile_bundle_sid",
+      "a2p_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "brand_feedback",
+      "brand_feedback",
+      "plain"
+     ],
+     [
+      "brand_score",
+      "brand_score",
+      "plain"
+     ],
+     [
+      "brand_type",
+      "brand_type",
+      "plain"
+     ],
+     [
+      "customer_profile_bundle_sid",
+      "customer_profile_bundle_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "failure_reason",
+      "failure_reason",
+      "plain"
+     ],
+     [
+      "government_entity",
+      "government_entity",
+      "plain"
+     ],
+     [
+      "identity_status",
+      "identity_status",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "russell_3000",
+      "russell_3000",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "skip_automatic_sec_vet",
+      "skip_automatic_sec_vet",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "tax_exempt_status",
+      "tax_exempt_status",
+      "plain"
+     ],
+     [
+      "tcr_id",
+      "tcr_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "brand_registrations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "UpdateBrandRegistrations",
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/a2p/BrandRegistrations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "cert_in_validation" : {
+      "a_cert_in_validation" : 1
+     },
+     "certificate_sid" : "a_certificate_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_expires" : "2026-01-18T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_sid" : "a_domain_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "cert_in_validation",
+      "cert_in_validation",
+      "plain"
+     ],
+     [
+      "certificate_sid",
+      "certificate_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_expires",
+      "date_expires",
+      "date",
+      1768705445
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "cert_in_validation" : {
+      "a_cert_in_validation" : 1
+     },
+     "certificate_sid" : "a_certificate_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_expires" : "2026-01-18T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_sid" : "a_domain_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "cert_in_validation",
+      "cert_in_validation",
+      "plain"
+     ],
+     [
+      "certificate_sid",
+      "certificate_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_expires",
+      "date_expires",
+      "date",
+      1768705445
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_certs",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "TlsCert",
+    "v_tls_cert"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateDomainCertV4",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   "v_tls_cert"
+  ],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/Certificate"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "callback_url" : "a_callback_url",
+     "config_sid" : "a_config_sid",
+     "continue_on_failure" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "disable_https" : true,
+     "domain_sid" : "a_domain_sid",
+     "fallback_url" : "a_fallback_url",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "callback_url",
+      "callback_url",
+      "plain"
+     ],
+     [
+      "config_sid",
+      "config_sid",
+      "plain"
+     ],
+     [
+      "continue_on_failure",
+      "continue_on_failure",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disable_https",
+      "disable_https",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "callback_url" : "a_callback_url",
+     "config_sid" : "a_config_sid",
+     "continue_on_failure" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "disable_https" : true,
+     "domain_sid" : "a_domain_sid",
+     "fallback_url" : "a_fallback_url",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "callback_url",
+      "callback_url",
+      "plain"
+     ],
+     [
+      "config_sid",
+      "config_sid",
+      "plain"
+     ],
+     [
+      "continue_on_failure",
+      "continue_on_failure",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "disable_https",
+      "disable_https",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "domain_config",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "CallbackUrl",
+    "v_callback_url"
+   ],
+   [
+    "ContinueOnFailure",
+    "true"
+   ],
+   [
+    "DisableHttps",
+    "true"
+   ],
+   [
+    "FallbackUrl",
+    "v_fallback_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateDomainConfig",
+  "method" : "update",
+  "options" : {
+   "callback_url" : "v_callback_url",
+   "continue_on_failure" : 1,
+   "disable_https" : 1,
+   "fallback_url" : "v_fallback_url"
+  },
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/Config"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "certificate_sid" : "a_certificate_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_expires" : "2026-01-18T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_sid" : "a_domain_sid",
+     "managed" : true,
+     "requesting" : true,
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "certificate_sid",
+      "certificate_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_expires",
+      "date_expires",
+      "date",
+      1768705445
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "managed",
+      "managed",
+      "plain"
+     ],
+     [
+      "requesting",
+      "requesting",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "certificate_sid" : "a_certificate_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_expires" : "2026-01-18T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_sid" : "a_domain_sid",
+     "managed" : true,
+     "requesting" : true,
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "certificate_sid",
+      "certificate_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_expires",
+      "date_expires",
+      "date",
+      1768705445
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "managed",
+      "managed",
+      "plain"
+     ],
+     [
+      "requesting",
+      "requesting",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "request_managed_cert",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "UpdateRequestManagedCert",
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/LinkShortening/Domains/id1/RequestManagedCert"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "area_code_geomatch" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "fallback_method" : "GET",
+     "fallback_to_long_code" : true,
+     "fallback_url" : "a_fallback_url",
+     "friendly_name" : "a_friendly_name",
+     "inbound_method" : "POST",
+     "inbound_request_url" : "a_inbound_request_url",
+     "links" : {
+      "a_links" : 1
+     },
+     "mms_converter" : true,
+     "scan_message_content" : "inherit",
+     "sid" : "a_sid",
+     "smart_encoding" : true,
+     "status_callback" : "a_status_callback",
+     "sticky_sender" : true,
+     "synchronous_validation" : true,
+     "url" : "a_url",
+     "us_app_to_person_registered" : true,
+     "use_inbound_webhook_on_number" : true,
+     "usecase" : "a_usecase",
+     "validity_period" : 1608
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "area_code_geomatch",
+      "area_code_geomatch",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "fallback_method",
+      "fallback_method",
+      "plain"
+     ],
+     [
+      "fallback_to_long_code",
+      "fallback_to_long_code",
+      "plain"
+     ],
+     [
+      "fallback_url",
+      "fallback_url",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "inbound_method",
+      "inbound_method",
+      "plain"
+     ],
+     [
+      "inbound_request_url",
+      "inbound_request_url",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "mms_converter",
+      "mms_converter",
+      "plain"
+     ],
+     [
+      "scan_message_content",
+      "scan_message_content",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "smart_encoding",
+      "smart_encoding",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "sticky_sender",
+      "sticky_sender",
+      "plain"
+     ],
+     [
+      "synchronous_validation",
+      "synchronous_validation",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_registered",
+      "us_app_to_person_registered",
+      "plain"
+     ],
+     [
+      "use_inbound_webhook_on_number",
+      "use_inbound_webhook_on_number",
+      "plain"
+     ],
+     [
+      "usecase",
+      "usecase",
+      "plain"
+     ],
+     [
+      "validity_period",
+      "validity_period",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "AreaCodeGeomatch",
+    "true"
+   ],
+   [
+    "FallbackMethod",
+    "POST"
+   ],
+   [
+    "FallbackToLongCode",
+    "true"
+   ],
+   [
+    "FallbackUrl",
+    "v_fallback_url"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "InboundMethod",
+    "GET"
+   ],
+   [
+    "InboundRequestUrl",
+    "v_inbound_request_url"
+   ],
+   [
+    "MmsConverter",
+    "true"
+   ],
+   [
+    "ScanMessageContent",
+    "disable"
+   ],
+   [
+    "SmartEncoding",
+    "true"
+   ],
+   [
+    "StatusCallback",
+    "v_status_callback"
+   ],
+   [
+    "StickySender",
+    "true"
+   ],
+   [
+    "SynchronousValidation",
+    "true"
+   ],
+   [
+    "UseInboundWebhookOnNumber",
+    "true"
+   ],
+   [
+    "Usecase",
+    "v_usecase"
+   ],
+   [
+    "ValidityPeriod",
+    "1449"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateService",
+  "method" : "update",
+  "options" : {
+   "area_code_geomatch" : 1,
+   "fallback_method" : "POST",
+   "fallback_to_long_code" : 1,
+   "fallback_url" : "v_fallback_url",
+   "friendly_name" : "v_friendly_name",
+   "inbound_method" : "GET",
+   "inbound_request_url" : "v_inbound_request_url",
+   "mms_converter" : 1,
+   "scan_message_content" : "disable",
+   "smart_encoding" : 1,
+   "status_callback" : "v_status_callback",
+   "sticky_sender" : 1,
+   "synchronous_validation" : 1,
+   "use_inbound_webhook_on_number" : 1,
+   "usecase" : "v_usecase",
+   "validity_period" : 1449
+  },
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "additional_information" : "a_additional_information",
+     "age_gated_content" : true,
+     "business_city" : "a_business_city",
+     "business_contact_email" : "a_business_contact_email",
+     "business_contact_first_name" : "a_business_contact_first_name",
+     "business_contact_last_name" : "a_business_contact_last_name",
+     "business_contact_phone" : "a_business_contact_phone",
+     "business_country" : "a_business_country",
+     "business_name" : "a_business_name",
+     "business_postal_code" : "a_business_postal_code",
+     "business_registration_authority" : "SIREN",
+     "business_registration_country" : "a_business_registration_country",
+     "business_registration_number" : "a_business_registration_number",
+     "business_registration_phone_number" : "a_business_registration_phone_number",
+     "business_state_province_region" : "a_business_state_province_region",
+     "business_street_address" : "a_business_street_address",
+     "business_street_address2" : "a_business_street_address2",
+     "business_type" : "PUBLIC_PROFIT",
+     "business_website" : "a_business_website",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "doing_business_as" : "a_doing_business_as",
+     "edit_allowed" : true,
+     "edit_expiration" : "2026-01-13T03:04:05Z",
+     "error_code" : 1060,
+     "external_reference_id" : "a_external_reference_id",
+     "help_message_sample" : "a_help_message_sample",
+     "message_volume" : "a_message_volume",
+     "notification_email" : "a_notification_email",
+     "opt_in_confirmation_message" : "a_opt_in_confirmation_message",
+     "opt_in_image_urls" : [
+      "a_opt_in_image_urls"
+     ],
+     "opt_in_keywords" : [
+      "a_opt_in_keywords"
+     ],
+     "opt_in_type" : "MOBILE_QR_CODE",
+     "privacy_policy_url" : "a_privacy_policy_url",
+     "production_message_sample" : "a_production_message_sample",
+     "regulated_item_sid" : "a_regulated_item_sid",
+     "rejection_reason" : "a_rejection_reason",
+     "rejection_reasons" : [
+      "a_rejection_reasons"
+     ],
+     "resource_links" : {
+      "a_resource_links" : 1
+     },
+     "sid" : "a_sid",
+     "status" : "PENDING_REVIEW",
+     "terms_and_conditions_url" : "a_terms_and_conditions_url",
+     "tollfree_phone_number" : "a_tollfree_phone_number",
+     "tollfree_phone_number_sid" : "a_tollfree_phone_number_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url",
+     "use_case_categories" : [
+      "a_use_case_categories"
+     ],
+     "use_case_summary" : "a_use_case_summary",
+     "vetting_id" : "a_vetting_id",
+     "vetting_id_expiration" : "2026-01-16T03:04:05Z",
+     "vetting_provider" : "CAMPAIGN_VERIFY"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "additional_information",
+      "additional_information",
+      "plain"
+     ],
+     [
+      "age_gated_content",
+      "age_gated_content",
+      "plain"
+     ],
+     [
+      "business_city",
+      "business_city",
+      "plain"
+     ],
+     [
+      "business_contact_email",
+      "business_contact_email",
+      "plain"
+     ],
+     [
+      "business_contact_first_name",
+      "business_contact_first_name",
+      "plain"
+     ],
+     [
+      "business_contact_last_name",
+      "business_contact_last_name",
+      "plain"
+     ],
+     [
+      "business_contact_phone",
+      "business_contact_phone",
+      "plain"
+     ],
+     [
+      "business_country",
+      "business_country",
+      "plain"
+     ],
+     [
+      "business_name",
+      "business_name",
+      "plain"
+     ],
+     [
+      "business_postal_code",
+      "business_postal_code",
+      "plain"
+     ],
+     [
+      "business_registration_authority",
+      "business_registration_authority",
+      "plain"
+     ],
+     [
+      "business_registration_country",
+      "business_registration_country",
+      "plain"
+     ],
+     [
+      "business_registration_number",
+      "business_registration_number",
+      "plain"
+     ],
+     [
+      "business_registration_phone_number",
+      "business_registration_phone_number",
+      "plain"
+     ],
+     [
+      "business_state_province_region",
+      "business_state_province_region",
+      "plain"
+     ],
+     [
+      "business_street_address",
+      "business_street_address",
+      "plain"
+     ],
+     [
+      "business_street_address2",
+      "business_street_address2",
+      "plain"
+     ],
+     [
+      "business_type",
+      "business_type",
+      "plain"
+     ],
+     [
+      "business_website",
+      "business_website",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "doing_business_as",
+      "doing_business_as",
+      "plain"
+     ],
+     [
+      "edit_allowed",
+      "edit_allowed",
+      "plain"
+     ],
+     [
+      "edit_expiration",
+      "edit_expiration",
+      "date",
+      1768273445
+     ],
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "external_reference_id",
+      "external_reference_id",
+      "plain"
+     ],
+     [
+      "help_message_sample",
+      "help_message_sample",
+      "plain"
+     ],
+     [
+      "message_volume",
+      "message_volume",
+      "plain"
+     ],
+     [
+      "notification_email",
+      "notification_email",
+      "plain"
+     ],
+     [
+      "opt_in_confirmation_message",
+      "opt_in_confirmation_message",
+      "plain"
+     ],
+     [
+      "opt_in_image_urls",
+      "opt_in_image_urls",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_type",
+      "opt_in_type",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "production_message_sample",
+      "production_message_sample",
+      "plain"
+     ],
+     [
+      "regulated_item_sid",
+      "regulated_item_sid",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "rejection_reasons",
+      "rejection_reasons",
+      "plain"
+     ],
+     [
+      "resource_links",
+      "resource_links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number",
+      "tollfree_phone_number",
+      "plain"
+     ],
+     [
+      "tollfree_phone_number_sid",
+      "tollfree_phone_number_sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "use_case_categories",
+      "use_case_categories",
+      "plain"
+     ],
+     [
+      "use_case_summary",
+      "use_case_summary",
+      "plain"
+     ],
+     [
+      "vetting_id",
+      "vetting_id",
+      "plain"
+     ],
+     [
+      "vetting_id_expiration",
+      "vetting_id_expiration",
+      "date",
+      1768532645
+     ],
+     [
+      "vetting_provider",
+      "vetting_provider",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "tollfree_verifications",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "AdditionalInformation",
+    "v_additional_information"
+   ],
+   [
+    "AgeGatedContent",
+    "true"
+   ],
+   [
+    "BusinessCity",
+    "v_business_city"
+   ],
+   [
+    "BusinessContactEmail",
+    "v_business_contact_email"
+   ],
+   [
+    "BusinessContactFirstName",
+    "v_business_contact_first_name"
+   ],
+   [
+    "BusinessContactLastName",
+    "v_business_contact_last_name"
+   ],
+   [
+    "BusinessContactPhone",
+    "v_business_contact_phone"
+   ],
+   [
+    "BusinessCountry",
+    "v_business_country"
+   ],
+   [
+    "BusinessName",
+    "v_business_name"
+   ],
+   [
+    "BusinessPostalCode",
+    "v_business_postal_code"
+   ],
+   [
+    "BusinessRegistrationAuthority",
+    "NZBN"
+   ],
+   [
+    "BusinessRegistrationCountry",
+    "v_business_registration_country"
+   ],
+   [
+    "BusinessRegistrationNumber",
+    "v_business_registration_number"
+   ],
+   [
+    "BusinessRegistrationPhoneNumber",
+    "v_business_registration_phone_number"
+   ],
+   [
+    "BusinessStateProvinceRegion",
+    "v_business_state_province_region"
+   ],
+   [
+    "BusinessStreetAddress",
+    "v_business_street_address"
+   ],
+   [
+    "BusinessStreetAddress2",
+    "v_business_street_address2"
+   ],
+   [
+    "BusinessType",
+    "SOLE_PROPRIETOR"
+   ],
+   [
+    "BusinessWebsite",
+    "v_business_website"
+   ],
+   [
+    "DoingBusinessAs",
+    "v_doing_business_as"
+   ],
+   [
+    "EditReason",
+    "v_edit_reason"
+   ],
+   [
+    "HelpMessageSample",
+    "v_help_message_sample"
+   ],
+   [
+    "MessageVolume",
+    "v_message_volume"
+   ],
+   [
+    "NotificationEmail",
+    "v_notification_email"
+   ],
+   [
+    "OptInConfirmationMessage",
+    "v_opt_in_confirmation_message"
+   ],
+   [
+    "OptInImageUrls",
+    "v_opt_in_image_urls_1"
+   ],
+   [
+    "OptInImageUrls",
+    "v_opt_in_image_urls_2"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_1"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_2"
+   ],
+   [
+    "OptInType",
+    "IMPORT"
+   ],
+   [
+    "PrivacyPolicyUrl",
+    "v_privacy_policy_url"
+   ],
+   [
+    "ProductionMessageSample",
+    "v_production_message_sample"
+   ],
+   [
+    "TermsAndConditionsUrl",
+    "v_terms_and_conditions_url"
+   ],
+   [
+    "UseCaseCategories",
+    "v_use_case_categories_1"
+   ],
+   [
+    "UseCaseCategories",
+    "v_use_case_categories_2"
+   ],
+   [
+    "UseCaseSummary",
+    "v_use_case_summary"
+   ],
+   [
+    "VettingId",
+    "v_vetting_id"
+   ],
+   [
+    "VettingProvider",
+    "CAMPAIGN_VERIFY"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateTollfreeVerification",
+  "method" : "update",
+  "options" : {
+   "additional_information" : "v_additional_information",
+   "age_gated_content" : 1,
+   "business_city" : "v_business_city",
+   "business_contact_email" : "v_business_contact_email",
+   "business_contact_first_name" : "v_business_contact_first_name",
+   "business_contact_last_name" : "v_business_contact_last_name",
+   "business_contact_phone" : "v_business_contact_phone",
+   "business_country" : "v_business_country",
+   "business_name" : "v_business_name",
+   "business_postal_code" : "v_business_postal_code",
+   "business_registration_authority" : "NZBN",
+   "business_registration_country" : "v_business_registration_country",
+   "business_registration_number" : "v_business_registration_number",
+   "business_registration_phone_number" : "v_business_registration_phone_number",
+   "business_state_province_region" : "v_business_state_province_region",
+   "business_street_address" : "v_business_street_address",
+   "business_street_address2" : "v_business_street_address2",
+   "business_type" : "SOLE_PROPRIETOR",
+   "business_website" : "v_business_website",
+   "doing_business_as" : "v_doing_business_as",
+   "edit_reason" : "v_edit_reason",
+   "help_message_sample" : "v_help_message_sample",
+   "message_volume" : "v_message_volume",
+   "notification_email" : "v_notification_email",
+   "opt_in_confirmation_message" : "v_opt_in_confirmation_message",
+   "opt_in_image_urls" : [
+    "v_opt_in_image_urls_1",
+    "v_opt_in_image_urls_2"
+   ],
+   "opt_in_keywords" : [
+    "v_opt_in_keywords_1",
+    "v_opt_in_keywords_2"
+   ],
+   "opt_in_type" : "IMPORT",
+   "privacy_policy_url" : "v_privacy_policy_url",
+   "production_message_sample" : "v_production_message_sample",
+   "terms_and_conditions_url" : "v_terms_and_conditions_url",
+   "use_case_categories" : [
+    "v_use_case_categories_1",
+    "v_use_case_categories_2"
+   ],
+   "use_case_summary" : "v_use_case_summary",
+   "vetting_id" : "v_vetting_id",
+   "vetting_provider" : "CAMPAIGN_VERIFY"
+  },
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v1/Tollfree/Verifications/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "age_gated" : true,
+     "brand_registration_sid" : "a_brand_registration_sid",
+     "campaign_id" : "a_campaign_id",
+     "campaign_status" : "a_campaign_status",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "direct_lending" : true,
+     "errors" : [
+      "a_errors"
+     ],
+     "has_embedded_links" : true,
+     "has_embedded_phone" : true,
+     "help_keywords" : [
+      "a_help_keywords"
+     ],
+     "help_message" : "a_help_message",
+     "is_externally_registered" : true,
+     "message_flow" : "a_message_flow",
+     "message_samples" : [
+      "a_message_samples"
+     ],
+     "messaging_service_sid" : "a_messaging_service_sid",
+     "mock" : true,
+     "opt_in_keywords" : [
+      "a_opt_in_keywords"
+     ],
+     "opt_in_message" : "a_opt_in_message",
+     "opt_out_keywords" : [
+      "a_opt_out_keywords"
+     ],
+     "opt_out_message" : "a_opt_out_message",
+     "privacy_policy_url" : "a_privacy_policy_url",
+     "rate_limits" : {
+      "a_rate_limits" : 1
+     },
+     "sid" : "a_sid",
+     "subscriber_opt_in" : true,
+     "terms_and_conditions_url" : "a_terms_and_conditions_url",
+     "url" : "a_url",
+     "us_app_to_person_usecase" : "a_us_app_to_person_usecase"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "age_gated",
+      "age_gated",
+      "plain"
+     ],
+     [
+      "brand_registration_sid",
+      "brand_registration_sid",
+      "plain"
+     ],
+     [
+      "campaign_id",
+      "campaign_id",
+      "plain"
+     ],
+     [
+      "campaign_status",
+      "campaign_status",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "direct_lending",
+      "direct_lending",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "has_embedded_links",
+      "has_embedded_links",
+      "plain"
+     ],
+     [
+      "has_embedded_phone",
+      "has_embedded_phone",
+      "plain"
+     ],
+     [
+      "help_keywords",
+      "help_keywords",
+      "plain"
+     ],
+     [
+      "help_message",
+      "help_message",
+      "plain"
+     ],
+     [
+      "is_externally_registered",
+      "is_externally_registered",
+      "plain"
+     ],
+     [
+      "message_flow",
+      "message_flow",
+      "plain"
+     ],
+     [
+      "message_samples",
+      "message_samples",
+      "plain"
+     ],
+     [
+      "messaging_service_sid",
+      "messaging_service_sid",
+      "plain"
+     ],
+     [
+      "mock",
+      "mock",
+      "plain"
+     ],
+     [
+      "opt_in_keywords",
+      "opt_in_keywords",
+      "plain"
+     ],
+     [
+      "opt_in_message",
+      "opt_in_message",
+      "plain"
+     ],
+     [
+      "opt_out_keywords",
+      "opt_out_keywords",
+      "plain"
+     ],
+     [
+      "opt_out_message",
+      "opt_out_message",
+      "plain"
+     ],
+     [
+      "privacy_policy_url",
+      "privacy_policy_url",
+      "plain"
+     ],
+     [
+      "rate_limits",
+      "rate_limits",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "subscriber_opt_in",
+      "subscriber_opt_in",
+      "plain"
+     ],
+     [
+      "terms_and_conditions_url",
+      "terms_and_conditions_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "us_app_to_person_usecase",
+      "us_app_to_person_usecase",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "us_app_to_person",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "HasEmbeddedLinks",
+    "true"
+   ],
+   [
+    "HasEmbeddedPhone",
+    "true"
+   ],
+   [
+    "MessageSamples",
+    "v_message_samples_1"
+   ],
+   [
+    "MessageSamples",
+    "v_message_samples_2"
+   ],
+   [
+    "MessageFlow",
+    "v_message_flow"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "AgeGated",
+    "true"
+   ],
+   [
+    "DirectLending",
+    "true"
+   ],
+   [
+    "PrivacyPolicyUrl",
+    "v_privacy_policy_url"
+   ],
+   [
+    "TermsAndConditionsUrl",
+    "v_terms_and_conditions_url"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Api-Version" : "v_x_twilio_api_version"
+  },
+  "http" : "POST",
+  "id" : "UpdateUsAppToPerson",
+  "method" : "update",
+  "options" : {
+   "privacy_policy_url" : "v_privacy_policy_url",
+   "terms_and_conditions_url" : "v_terms_and_conditions_url",
+   "x_twilio_api_version" : "v_x_twilio_api_version"
+  },
+  "required" : [
+   1,
+   1,
+   [
+    "v_message_samples_1",
+    "v_message_samples_2"
+   ],
+   "v_message_flow",
+   "v_description",
+   1,
+   1
+  ],
+  "url" : "https://messaging.twilio.com/v1/Services/id1/Compliance/Usa2p/id2"
+ }
+]

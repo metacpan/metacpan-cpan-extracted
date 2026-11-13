@@ -61,18 +61,21 @@ WriteMakefile(
     ABSTRACT_FROM   => 'lib/Genealogy/ChroniclingAmerica.pm',
     ((defined($ExtUtils::MakeMaker::VERSION) &&
      ($ExtUtils::MakeMaker::VERSION >= 6.3002))
-      ? ('LICENSE'=> 'GPL')
+      ? ('LICENSE'=> 'gpl_2')
       : ()),
     PL_FILES	=> {},
 	CONFIGURE_REQUIRES => {
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
     }, TEST_REQUIRES => {
+	'CHI' => 0,
+	'HTTP::Response' => 0,
+	'JSON::MaybeXS' => 0,
+	'LWP::UserAgent' => 0,
+	'parent' => 0,
 	'Test::DescribeMe' => 0,
-	'Test::HTTPStatus' => 0,
-	'Test::MockObject' => 0,
+	'Test::Mockingbird' => 0,
 	'Test::Most' => 0,
 	'Test::Needs' => 0,
-	'Test::NoWarnings' => 0,
 	'Test::RequiresInternet' => 0,
 	'Test::URI' => 0,
 	# 'Test::Kwalitee' => 0,
@@ -80,13 +83,13 @@ WriteMakefile(
 	'Carp' => 0,
 	'CHI' => 0,
 	'JSON::MaybeXS' => 0,
-	'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	'LWP::Protocol::https' => 0,
 	'LWP::UserAgent' => 0,
 	'Object::Configure' => 0,
 	'Params::Get' => 0.13,
 	'Return::Set' => 0,
 	'Scalar::Util' => 0,
+	'Time::HiRes' => 0,
 	'URI' => 0
     }, dist => $dist,
     clean		=> { FILES => 'Genealogy-ChroniclingAmerica-*' },
@@ -107,7 +110,7 @@ WriteMakefile(
 		}, homepage => 'https://chroniclingamerica.loc.gov',
 	},
     },
-    MIN_PERL_VERSION	=> '5.6.2'	# Probably would work, but never tested on earlier versions than this
+    MIN_PERL_VERSION	=> '5.10.0'	# Uses the // operator
 );
 
 sub are_online

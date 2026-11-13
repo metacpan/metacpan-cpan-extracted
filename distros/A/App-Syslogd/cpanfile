@@ -3,6 +3,7 @@
 requires 'perl', '5.014';
 
 requires 'Carp';
+requires 'Config';
 requires 'Fcntl';
 requires 'FindBin';
 requires 'Getopt::Long';
@@ -19,11 +20,12 @@ requires 'Sub::Private', '0.05';   # first version with enforce mode
 requires 'Sub::Protected', '0.02';
 requires 'Text::CSV';
 requires 'autodie';
+requires 'overload';
 requires 'parent';
 
 on 'test' => sub {
-	requires 'Config';
 	requires 'Cwd';
+	requires 'English';
 	requires 'Errno';
 	requires 'File::Spec';
 	requires 'File::Temp';
@@ -47,7 +49,7 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
-	requires 'Devel::Cover';
+	requires 'Devel::Cover';   # coverage runs
 	requires 'Perl::Critic';
 	requires 'Test::Perl::Critic';
 	requires 'Test::Pod';

@@ -511,6 +511,37 @@ subtest 'multipart sha256 completion includes part checksum' => sub {
   like( $xml, qr/<ChecksumSHA256>test-checksum<\/ChecksumSHA256>/, 'sha256 part checksum included', );
 };
 
+########################################################################
+subtest 'verify crc32 checksum' => sub {
+########################################################################
+  my $s3 = Amazon::S3->new(
+    { aws_access_key_id     => 'test',
+      aws_secret_access_key => 'test',
+    }
+  );
+
+  my $checksum_types = $s3->checksum_types;
+
+  if ( !exists $checksum_types->{crc32} ) {
+    plan skip_all => 'Digest::CRC is not available';
+  }
+
+  my $digest = $checksum_types->{crc32}->( data => '123456789', );
+
+  is( unpack( 'H*', $digest ), 'cbf43926', 'crc32 returns four big-endian bytes', );
+
+  my $bucket = $s3->bucket('test-bucket');
+
+  ok(
+    $bucket->_verify_checksums(
+      checksums     => { crc32 => 'y/Q5Jg==', },
+      checksum_type => 'FULL_OBJECT',
+      data          => '123456789',
+    ),
+    'matching crc32 checksum verifies',
+  );
+};
+
 done_testing;
 
 1;

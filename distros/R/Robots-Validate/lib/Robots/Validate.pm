@@ -30,7 +30,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.14';
+our $VERSION = 'v0.4.15';
 
 
 has resolver => (
@@ -608,7 +608,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.4.14
+version v0.4.15
 
 =head1 SYNOPSIS
 
@@ -648,7 +648,7 @@ This was added in version v0.3.11.
 
 =head2 networks
 
-This is a L<Net::Patricia> object used for matching networks.
+This is a L<Net::IP::LPM> object used for matching networks..
 
 This can only be set via the constructor.
 

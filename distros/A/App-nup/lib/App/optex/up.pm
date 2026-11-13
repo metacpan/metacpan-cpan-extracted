@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 
 =encoding utf-8
 
@@ -105,6 +105,24 @@ command does this automatically).
 
 Automatically disable page mode when only one column fits the
 terminal.
+
+=item B<-L>, B<--lateral>
+
+Put all the pages in one row, however wide it becomes.  The screen
+shows as many panes as without this option, as many as fit or the
+number given by C<-C>, and the row goes on to the right: the panes
+are given to C<ansicolumn> by their width (C<-S>), the width of the
+screen divided by that number, in a very large output width.  When
+the pager is C<less>, C<< -S --shift=I<N> --rscroll=- >> is added to
+it, where I<N> is the width of a pane, so that the lines are not
+wrapped and the arrow keys move by one page; C<h> and C<l> do the
+same, and C<H> and C<L> go to the left and the right end, by the
+C<LESSKEY_CONTENT> environment variable, when it is not set.  With
+less 710 or later, C<l> stops at the right end, and C<--align-shift>
+is added when the less has it; see L<nup/LESS>.  It cannot be used
+with
+rows (C<-R>, C<-C2,2>, C<-G>), C<--no-paginate> or PDF output, and
+C<--auto-paginate> is ignored.
 
 =item B<--pager>=I<COMMAND>
 
@@ -292,6 +310,7 @@ my $config = Getopt::EX::Config->new(
     'border-style' => 'heavy-box',
     'paginate'     => 1,
     'auto-paginate' => undef,
+    'lateral'      => undef,
     'pager'        => undef,
     'no-pager'     => undef,
     'device'       => undef,
@@ -299,6 +318,27 @@ my $config = Getopt::EX::Config->new(
     'pdf-opts'     => '',
     'geometry'     => undef,
 );
+
+# The number of panes that the row of --lateral has room for.
+our $LATERAL_PANES = 10000;
+
+# What the less command knows: its version, and whether it has the
+# --align-shift option of the build in tecolicom/tap.  Both are told by
+# one run with --version, since an unknown option does not make less
+# fail, but only gives a message.
+sub less_features {
+    my $less = shift;
+    my $pid = open(my $fh, '-|') // return (0, 0);
+    if ($pid == 0) {
+        open STDERR, '>&', \*STDOUT;
+        open STDIN, '<', '/dev/null';
+        exec $less, '--align-shift', '--version' or exit 1;
+    }
+    my $out = do { local $/; <$fh> } // '';
+    close $fh;
+    my($version) = $out =~ /^less (\d+)/m or return (0, 0);
+    ($version, $out !~ /There is no -*align-shift option/);
+}
 
 # Size of a sheet of paper in columns and lines, asked to ansi2pdf.
 sub pdf_size {
@@ -315,6 +355,7 @@ sub finalize {
         'grid|G=s', 'pane-width|S=i', 'pane|C=s', 'row|R=i',
         'border-style|bs=s', 'paginate!',
         'auto-paginate|autopaginate|A',
+        'lateral|L',
         'pager:s', 'no-pager|nopager',
         'device|T=s', 'output|o=s',
         'pdf-opts=s', 'geometry');
@@ -350,6 +391,17 @@ sub finalize {
     if (defined $output and $device eq 'tty' and not $config->{geometry}) {
         $config->{pager} = 'cat > ' . shell_escape($output);
         $config->{'no-pager'} = undef;
+    }
+    # --lateral: all the pages in one row, as wide as it becomes, to be
+    # scrolled sideways by the pager.  There are no rows and no sheet
+    # of paper in it, and it is made of pages.
+    my $lateral = $config->{lateral};
+    if ($lateral) {
+        my $with = defined $config->{row}  ? 'the number of rows (-R, -C, -G)'
+                 : !$config->{paginate}    ? '--no-paginate'
+                 : $device ne 'tty'        ? 'PDF output (-T, -o)'
+                 : undef;
+        die "--lateral cannot be used with $with.\n" if $with;
     }
     my $ansi2pdf;
     if ($device ne 'tty') {
@@ -396,15 +448,42 @@ sub finalize {
 
     my $border_style = $config->{'border-style'};
     my $no_page      = !$config->{paginate}
-        || ($config->{'auto-paginate'} && $cols <= 1);
+        || ($config->{'auto-paginate'} && $cols <= 1 && !$lateral);
     # +Gg makes less read all input first, so that -F and the percentage
     # work.  less 590 and later have --file-size for this, but the less
     # 581 of macOS does not, so keep +Gg as the default.
     my $pager        = $config->{pager} //
         ((!$no_page && $ENV{NUP_PAGE_PAGER}) || $ENV{NUP_PAGER} || 'less -F +Gg');
 
-    # Build default ansicolumn options
-    my @ac_opts = ("-w$term_width", "--bs=$border_style", "--cm=BORDER=L13", "-DBP", "-C$cols");
+    # With --lateral, the screen shows the same number of panes, and
+    # the row goes on to the right of it.  less shows the row without
+    # wrapping the lines, and shifts it by a pane.  --rscroll=- is to
+    # show the last column, where less puts a mark for the lines that
+    # go on.  h and l shift it as the arrow keys do, and H and L go
+    # to the left and the right end, unless the user has keys of their
+    # own in LESSKEY_CONTENT; a less older than 661 does not know the
+    # variable, and h and H are the help there as usual.  less 710 and
+    # later stop l at the right end (right-limit-scroll); an older one
+    # takes the name for an error, so it shifts with no limit.  A less
+    # with --align-shift keeps the shift at the boundaries of the panes,
+    # in a search and at the right end as well.
+    my $lateral_width = max(1, int($term_width / $cols));
+    if ($lateral and $pager =~ m{^\s*((?:\S*/)?less)(?:\s|$)}) {
+        my($version, $align_shift) = less_features($1);
+        $pager .= " -S --shift=$lateral_width --rscroll=-";
+        $pager .= " --align-shift" if $align_shift;
+        my $right = $version >= 710 ? 'right-limit-scroll' : 'right-scroll';
+        $ENV{LESSKEY_CONTENT} //=
+            "h left-scroll;l $right;H no-scroll;L end-scroll";
+    }
+
+    # Build default ansicolumn options.  With --lateral, the panes are
+    # given by their width, not by their number, in a width that has
+    # room for any number of them: ansicolumn puts all the pages in
+    # one row, which is as wide as the pages are.
+    my @ac_opts = ("--bs=$border_style", "--cm=BORDER=L13", "-DBP",
+                   $lateral ? ("-w" . $lateral_width * $LATERAL_PANES, "-S$lateral_width")
+                            : ("-w$term_width", "-C$cols"));
     push @ac_opts, "--height=$height" if defined $height;
     push @ac_opts, "--no-page"        if $no_page;
     push @ac_opts, @passthru;

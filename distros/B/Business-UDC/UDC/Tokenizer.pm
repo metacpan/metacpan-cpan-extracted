@@ -10,7 +10,7 @@ use Unicode::UTF8 qw(decode_utf8);
 
 Readonly::Array our @EXPORT_OK => qw(tokenize);
 
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 
 sub tokenize {
 	my ($input, $position_offset) = @_;
@@ -26,7 +26,12 @@ sub tokenize {
 	while (pos($input) < length($input)) {
 		my $start = pos($input);
 
-		if ($input =~ /\G( +(?=\p{L})\p{L}(?:[\p{L}\p{N}._#,]|\[[^\]]+\]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._\[]))* *)/gcu) {
+		if ($input =~ /\G( +(?=\p{L})\p{L}[\p{L}\p{N}]*(?:-\d+\/\p{L}[\p{L}\p{N}]*-\d+)+)/gcu) {
+			_push_token(\@tokens, 'ALPHA_SPEC', $1, $start, 1);
+			next;
+		}
+
+		if ($input =~ /\G( +(?=\p{L})\p{L}(?:[\p{L}\p{N}._#,'']|\[[^\]]+\]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._\[]))* *)/gcu) {
 			_push_token(\@tokens, 'ALPHA_SPEC', $1, $start, 1);
 			next;
 		}
@@ -46,7 +51,13 @@ sub tokenize {
 			next;
 		}
 
-		if (substr($input, $start, 2) eq './') {
+		if (substr($input, $start, 2) eq './'
+			|| substr($input, $start, 2) eq '.('
+			|| substr($input, $start, 2) eq '.:'
+			|| substr($input, $start, 2) eq '..'
+			|| substr($input, $start, 1) eq '.'
+			&& $start + 1 >= length($input)) {
+			_check_pending_whitespace(\@tokens);
 			err "Extra dot '.'.",
 				'position' => $position_offset + $start,
 				'character' => '.',
@@ -102,6 +113,12 @@ sub tokenize {
 			my $end = _find_parenthesis_end($input, $start);
 			if (defined $end) {
 				my $value = substr($input, $start, $end - $start);
+				if ($value eq '(...)') {
+					err 'Invalid geographic auxiliary notation.',
+						'position' => $position_offset + $start,
+						'character' => $value,
+					;
+				}
 				my $inner = substr($value, 1, length($value) - 2);
 				my $inner_tokens = tokenize($inner, $position_offset + $start + 1);
 				_offset_token_positions($inner_tokens, $start + 1);
@@ -160,7 +177,7 @@ sub tokenize {
 			next;
 		}
 
-		if ($input =~ /\G(\p{L}(?:[\p{L}\p{N}._#,]|\[[^\]]+\]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._\[]))* *)/gcu) {
+		if ($input =~ /\G(\p{L}(?:[\p{L}\p{N}._#,'']|\[[^\]]+\]|\+(?! )|\/(?! )|-(?!\d)| +(?=[\p{L}\p{N}._\[]))* *)/gcu) {
 			_push_token(\@tokens, 'ALPHA_SPEC', $1, $start, 1);
 			next;
 		}
@@ -175,6 +192,30 @@ sub tokenize {
 		if ($input =~ /\G((?:'|`|&apos;|$a|$acute)\d+(?:\.\d+)*)/gc) {
 			_push_token(\@tokens, 'APOS_AUX', $1, $start);
 			next;
+		}
+
+		if (substr($input, $start, 1) eq "'"
+			&& substr($input, $start + 1, 1) eq '-') {
+			err 'Bad quotation mark character.',
+				'position' => $position_offset + $start,
+				'character' => "'",
+			;
+		}
+
+		if (substr($input, $start, 2) eq ',,'
+			&& substr($input, $start + 2, 1) =~ /\d/) {
+			err 'Bad quotation mark character.',
+				'position' => $position_offset + $start,
+				'character' => ',,',
+			;
+		}
+
+		if (substr($input, $start, 1) eq ','
+			&& substr($input, $start + 1, 1) =~ /\d/) {
+			err 'Bad dot character in number.',
+				'position' => $position_offset + $start,
+				'character' => ',',
+			;
 		}
 
 		my $nonbreaking_hyphen = decode_utf8('‑');
@@ -265,6 +306,37 @@ sub _check_whitespace {
 	}
 
 	return;
+}
+
+sub _check_pending_whitespace {
+	my $tokens_ar = shift;
+
+	foreach my $token (@{$tokens_ar}) {
+		if ($token->{'type'} eq 'WHITESPACE') {
+			my $message = _has_alpha_spec($tokens_ar)
+				? 'Whitespace is not allowed in UDC string with alphabetical specification.'
+				: 'Whitespace is not allowed in UDC string.';
+			err $message,
+				'position' => $token->{'pos'},
+				'character' => substr($token->{'value'}, 0, 1),
+			;
+		}
+	}
+
+	return;
+}
+
+sub _has_alpha_spec {
+	my $tokens_ar = shift;
+
+	foreach my $token (@{$tokens_ar}) {
+		return 1 if $token->{'type'} eq 'ALPHA_SPEC';
+		if ($token->{'tokens'} && _has_alpha_spec($token->{'tokens'})) {
+			return 1;
+		}
+	}
+
+	return 0;
 }
 
 sub _push_token {

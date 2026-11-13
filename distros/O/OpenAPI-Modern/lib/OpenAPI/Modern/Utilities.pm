@@ -3,7 +3,7 @@ package OpenAPI::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities and common definitions for OpenAPI::Modern
 
-our $VERSION = '0.152';
+our $VERSION = '0.153';
 
 use 5.020;
 use strictures 2;
@@ -77,8 +77,8 @@ use constant OAS_VERSIONS => [ map s/^\d+\.\d+\K\.\d+\z//ar, SUPPORTED_OAD_VERSI
 # the main OpenAPI document schema, with permissive (unvalidated) JSON Schemas
 use constant DEFAULT_METASCHEMA => {
   '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18',
-  '3.1' => 'https://spec.openapis.org/oas/3.1/schema/2026-08-03',
-  '3.2' => 'https://spec.openapis.org/oas/3.2/schema/2026-08-30',
+  '3.1' => 'https://spec.openapis.org/oas/3.1/schema/2026-11-05',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/schema/2026-11-12',
 };
 
 # metaschema for JSON Schemas contained within OpenAPI documents:
@@ -93,8 +93,8 @@ use constant DEFAULT_DIALECT => {
 # permitted)
 use constant DEFAULT_BASE_METASCHEMA => {
   '3.0' => 'https://spec.openapis.org/oas/3.0/schema/2024-10-18', # same as standard
-  '3.1' => 'https://spec.openapis.org/oas/3.1/schema-base/2026-08-03',
-  '3.2' => 'https://spec.openapis.org/oas/3.2/schema-base/2026-08-30',
+  '3.1' => 'https://spec.openapis.org/oas/3.1/schema-base/2026-11-05',
+  '3.2' => 'https://spec.openapis.org/oas/3.2/schema-base/2026-11-12',
 };
 
 # OpenAPI vocabulary definition
@@ -505,7 +505,7 @@ OpenAPI::Modern::Utilities - Internal utilities and common definitions for OpenA
 
 =head1 VERSION
 
-version 0.152
+version 0.153
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

@@ -27,8 +27,6 @@ WriteMakefile(
 ,
   PREREQ_PM        => {
       'CLI::Simple' => '2.2.3',
-      'CLI::Simple::Constants' => '2.2.3',
-      'CLI::Simple::Utils' => '2.2.3',
       'Class::Accessor::Fast' => '0.51',
       'Digest::CRC' => '0.24',
       'Digest::HMAC_SHA1' => '1.05',
@@ -41,7 +39,6 @@ WriteMakefile(
       'Net::Amazon::Signature::V4' => '0.22',
       'Readonly' => '2.05',
       'URI' => '5.37',
-      'URI::Escape' => '5.37',
       'XML::Simple' => '2.25'
     },
   BUILD_REQUIRES   => {
@@ -82,15 +79,15 @@ WriteMakefile(
       'provides'=>{
                       'Amazon::S3'=>{
                                         'file'=>'lib/Amazon/S3.pm',
-                                        'version'=>'2.1.2'
+                                        'version'=>'2.1.3'
                                       },
                       'Amazon::S3::Bucket'=>{
                                                 'file'=>'lib/Amazon/S3/Bucket.pm',
-                                                'version'=>'2.1.2'
+                                                'version'=>'2.1.3'
                                               },
                       'Amazon::S3::BucketV2'=>{
                                                   'file'=>'lib/Amazon/S3/BucketV2.pm',
-                                                  'version'=>'2.1.2'
+                                                  'version'=>'2.1.3'
                                                 },
                       'Amazon::S3::CLI'=>{
                                              'file'=>'lib/Amazon/S3/CLI.pm',
@@ -98,19 +95,19 @@ WriteMakefile(
                                            },
                       'Amazon::S3::Constants'=>{
                                                    'file'=>'lib/Amazon/S3/Constants.pm',
-                                                   'version'=>'2.1.2'
+                                                   'version'=>'2.1.3'
                                                  },
                       'Amazon::S3::Logger'=>{
                                                 'file'=>'lib/Amazon/S3/Logger.pm',
-                                                'version'=>'2.1.2'
+                                                'version'=>'2.1.3'
                                               },
                       'Amazon::S3::Signature::V4'=>{
                                                        'file'=>'lib/Amazon/S3/Signature/V4.pm',
-                                                       'version'=>'2.1.2'
+                                                       'version'=>'2.1.3'
                                                      },
                       'Amazon::S3::Util'=>{
                                               'file'=>'lib/Amazon/S3/Util.pm',
-                                              'version'=>'2.1.2'
+                                              'version'=>'2.1.3'
                                             },
                       'Digest::CRC64NVME'=>{
                                                'file'=>'lib/Digest/CRC64NVME.pm',

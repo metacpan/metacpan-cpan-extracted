@@ -3,19 +3,21 @@ use v5.24;
 use warnings;
 use English qw< -no_match_vars >;
 use experimental qw< signatures >;
-use Data::Dumper;
 
 use FindBin '$RealBin';
 use lib
    "$RealBin/../lib",
-   "$RealBin/../local/lib/perl5",
    "$RealBin/local/lib/perl5";
 use Mojolicious::Lite;
 use MojoX::Authentication;
 
+# This example runs with the Mojolicious default secret, so anyone can
+# forge its session cookies. A real application must set its own, e.g.:
+#   app->secrets([ $ENV{MOJO_SECRET} // die "set MOJO_SECRET\n" ]);
+# Likewise, server.key is public: generate your own SP key.
+
 my $mauth = MojoX::Authentication->new(
-   app => app(),
-   saml2_provider_name => 'my-saml2',
+   provider_name => 'my-saml2',
    model => {
       config => {},
       providers => [
@@ -41,9 +43,8 @@ my $mauth = MojoX::Authentication->new(
                wmdb => {
                   db_url => 'sqlite:testdb.sqlite',
                },
-               username_column => 'username',
+               key_for_secret => 'userpass',   # column with the hash
                remaps => [
-                  [ secret => 'userpass' ],
                   sub ($r, $backwards) {
                      if ($backwards) {
                         $r->{groups} = join ' ', $r->{groups}->@*;
@@ -78,7 +79,7 @@ my $mauth = MojoX::Authentication->new(
          },
       ]
    },
-   -startup => 1,
+   -startup => app(),
 );
 
 get '/public' => sub ($c) {
@@ -98,13 +99,11 @@ post '/public/login' => sub ($c) {
 } => 'login';
 
 post '/public/logout' => sub ($c) {
-   $mauth->ctr_logout($c);
-   return $c->redirect_to('protected'); # let's try...
+   $mauth->ctr_logout($c, 'protected');
 } => 'logout';
 
 under '/' => sub ($c) {
    if ($c->is_user_authenticated) {
-      $c->log->trace('user: ' . Dumper($c->current_user));
       return 1;
    }
    $c->log->info('NOT authenticated, deal with it');
@@ -131,11 +130,13 @@ __DATA__
 % if (defined($user)) {
       <p>Welcome, <strong><%= $user->{data}{fullname} // $user->{uid} %></strong></p>
       <form method="POST" action="/public/logout">
+         %= csrf_field
          <input type="submit" value="logout">
       </form>
 % } else {
       <p><a href="/public/login">Login (SAML2)</a></p>
       <form method="POST" action="/public/login">
+         %= csrf_field
          <input type="text" name="username" placeholder="username" />
          <input type="password" name="password" placeholder="password" />
          <input type="submit" value="login" />
@@ -153,6 +154,7 @@ __DATA__
 % if (defined($user)) {
       <p>Welcome, <strong><%= $user->{data}{fullname} // $user->{uid} %></strong></p>
       <form method="POST" action="/public/logout">
+         %= csrf_field
          <input type="submit" value="logout">
       </form>
 % }

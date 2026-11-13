@@ -1,0 +1,73 @@
+# ExtUtils::MakeMaker's default list, written out instead of #!include_default: its
+# unanchored \bBuild$ matches lib/Twilio/Rest/Serverless/V1/Service/Build/, which CPANTS
+# reports as a file that should have been skipped. Module::Build's files are anchored here.
+
+# Version control
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\B\.git\b
+^\.github\b
+\B\.gitignore\b
+\b_darcs\b
+\B\.cvsignore$
+\B\.bzr\b
+\B\.bzrignore$
+
+# MakeMaker's generated and utility files
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$
+\b_eumm/
+^MYMETA\.
+^META_new\.(?:json|yml)
+
+# Module::Build's and Module::Build::Tiny's generated files
+^Build$
+^Build\.bat$
+^Build\.COM$
+^BUILD\.COM$
+^build\.com$
+^_build/
+^_build_params$
+
+# Temporary and backup files
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+\.#
+\.rej$
+\..*\.sw.?$
+\.~\d+~$
+
+# Operating system metadata
+\B\.DS_Store
+\B\._
+\.i[cC]loud$
+
+# Devel::Cover and prove
+\bcover_db\b
+\bcovered\b
+\B\.prove$
+
+# CI files of other services
+^\.travis\.yml
+^\.?appveyor.yml
+
+# This repository: git and author settings, the generator and its inputs, and built dists
+^\.git
+^\.perlcriticrc$
+^\.perltidyrc$
+^Twilio-
+^spec/
+^tools/
+^xt/generator/

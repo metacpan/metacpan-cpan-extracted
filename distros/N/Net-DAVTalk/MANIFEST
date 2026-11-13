@@ -11,7 +11,9 @@ t/manifest.t
 t/parser.t
 t/pod-coverage.t
 t/pod.t
+t/sync.t
 t/testdata/numeric.xml
 t/testdata/unicode.xml
+t/url.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,5 +1,53 @@
 Revision history for Params-Validate-Strict
 
+0.42	Thu Nov 12 01:14:48 PM EST 2026
+	[Enhancements]
+	- The 'callback' rule now passes the parameter name as a fourth argument
+	  (after the value, the argument hash and the schema), so one callback can be
+	  shared between several parameters.  The name is the canonical one, even when
+	  the value was supplied under an alias.  Existing callbacks are unaffected.
+	- New 'needs' rule key: a parameter name, or arrayref of names, that must
+	  also be given whenever this parameter is.  Shorthand for 'dependency'
+	  relationships, inspired by Params::Smart.
+	- New 'element_isa' rule key: every element of an arrayref must be an
+	  object that passes ->isa of the given class.
+	- New 'classcan' rule key: a class-name string must be a class that
+	  understands the given method(s); symmetric with 'classisa'/'classdoes'.
+	- New semantic value 'filename': validates a single path component (non-empty,
+	  not '.' or '..', no '/' or NUL, at most 255 bytes), rejecting path traversal.
+	- The 'can' rule now also accepts type => 'invocant' (object or class name).
+
+	[Dependencies]
+	- ExtUtils::MakeMaker is no longer a runtime requirement (it remains a
+	  configure requirement).
+	- Removed test requirements that no test uses: File::Glob, File::Slurp,
+	  File::stat, IPC::Run3, IPC::System::Simple, JSON::MaybeXS, Test::Warnings.
+
+	[Internal]
+	- Carp is now loaded with an empty import list, so croak/carp/confess are
+	  no longer left behind as methods of Params::Validate::Strict.
+	- Replaced non-ASCII characters in comments and in the maximum-call-depth
+	  error message with plain ASCII.
+	- The unreachable statements that follow _error() are annotated again.
+
+	[Tests]
+	- Test spies now target Carp::croak / Carp::carp instead of the
+	  no-longer-imported Params::Validate::Strict::croak / carp.
+	- New t/consistency.t checks that $VERSION is identical in both modules and
+	  matches the top Changes entry, and that either module can be loaded first.
+	- Test files are indented with tabs throughout.
+
+	[Documentation]
+	- Removed a stray, unimplemented 'schematic' placeholder from the POD
+	  ('semantic' is the implemented rule) and moved its orphaned sentence,
+	  "All cross-validations must pass", into the cross_validation section.
+	- Documented that the callback receives the parameter name, and the new
+	  'needs', 'element_isa', 'classcan' and 'filename' rules.
+	- Added API SPECIFICATION sections for validate_strict and compile_schema,
+	  and filled in the empty BUGS section with the known limitations.
+	- Added a GitHub Actions workflow that runs the tests on perls built with
+	  -Duselongdouble and -Dusequadmath.
+
 0.41	Sat Oct  3 12:58:28 PM EDT 2026
 	[Enhancements]
 	- New types 'regex', 'handle', 'arraylike', 'hashlike', 'codelike', 'invocant'

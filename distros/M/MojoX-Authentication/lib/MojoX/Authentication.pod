@@ -13,7 +13,7 @@ authentication in Mojolicious applications (local and SAML2)
 
 =head1 VERSION
 
-This document describes MojoX::Authentication version 0.010.
+This document describes MojoX::Authentication version 0.100.
 
 =begin html
 
@@ -77,36 +77,73 @@ C<before_render> hook to inject the user data in the stash, if present
 
 =head2 B<< ctr_credentials_login >>
 
-   $ma->ctr_credentals_login($controller, $routes_for); # OR
-   $ma->ctr_credentals_login($controller);
+   $ma->ctr_credentials_login($controller, $routes_for); # OR
+   $ma->ctr_credentials_login($controller);
 
 Opinionated way of handling the login through credentials, practically
 acting as a wrapper around the C<$controller>. Assumes that username and
 secret can be retrieved via C<param()> with keys C<username> and
 C<password> respectively.
 
+The request B<MUST> also carry a valid CSRF token, as checked by
+L<Mojolicious::Validator::Validation/csrf_protect>: parameter
+C<csrf_token> (put C<%= csrf_field> inside the login form) or, for
+scripts, header C<X-CSRF-Token>. Otherwise the login is refused (and
+logged) before any password check, like any other failed login. This
+protects against login CSRF, i.e. a hostile page silently logging the
+user in as somebody else:
+
+   <form method="POST" action="/public/login">
+      %= csrf_field
+      <input type="text" name="username">
+      <input type="password" name="password">
+      <input type="submit" value="login">
+   </form>
+
 The C<$routes_for>, if present, is supposed to be a hash reference
 holding the routes to redirect the client for key C<ok> (in case the
 interaction is successful) and key C<not_ok> (otherwise). They default
 to C<protected_root> and C<public_root> respectively.
+
+Every attempt costs one password check, whatever the outcome (see
+L<MojoX::Authentication::Model/Owner of a username>), and with the
+default settings of L<Crypt::Passphrase::Argon2> a check takes
+considerable time and memory (256 MiB). The route calling this method
+should be rate limited (e.g. per client address, in the application or
+in a reverse proxy), both against guessing passwords and against
+exhausting the server.
+
+Each attempt is logged through C<< $controller->log >> with the
+username: C<info> on success, C<error> otherwise. Characters outside
+printable ASCII (newlines included) are written as C<\x{..}> (e.g.
+C<\x{0a}>, C<\x{e9}>), so that a username cannot forge log lines.
 
 =head2 B<< ctr_logout >>
 
    $ma->ctr_logout($controller, $redirect_route); # OR
    $ma->ctr_logout($controller);
 
-Perform the logout. If the provider supports the C<logout> method, this
-totally delegates to it; otherwise, it calls the C<logout> method over
-the C<$controller>.
+Perform the logout, if a user is authenticated. If the user's provider
+supports the C<logout> method, this delegates the logout to it;
+otherwise, it calls the C<logout> method over the C<$controller>.
 
-If provided, C<$redirect_route> will also call the C<redirect_to> method
-over the C<$controller>.
+If provided, C<$redirect_route> is then used to call the C<redirect_to>
+method over the C<$controller>, whether a user was authenticated or
+not.
+
+The request B<MUST> carry a valid CSRF token, like for
+L</ctr_credentials_login> (e.g. C<%= csrf_field> inside the logout form,
+or a C<csrf_button_to> button). Otherwise the user stays logged in, and
+the redirection to C<$redirect_route> (if provided) still happens.
+
+The logout is logged with the user identifier, escaped as in
+L</ctr_credentials_login>.
 
 =head2 B<< ctr_saml2_login >>
 
    $ma->ctr_saml2_login($controller, $route_for);
 
-Opinionated way of handling the login through credentials, practically
+Opinionated way of handling the login through SAML 2.0, practically
 acting as a wrapper around the C<$controller>. This is the initial
 request where the user is then sent to the Identity Provider.
 
@@ -119,11 +156,25 @@ Identity Provider.
    $ma->ctr_saml2_sso_post($controller, $route_for); # OR
    $ma->ctr_saml2_sso_post($controller);
 
-Opinionated way of handling the login through credentials, practically
+Opinionated way of handling the login through SAML 2.0, practically
 acting as a wrapper around the C<$controller>. This is the final
 request where the user comes back from the Identity Provider.
 
-The C<$routes_for> works like for L</ctr_credentials_login>.
+The C<$routes_for> works like for L</ctr_credentials_login>. No CSRF
+token is needed here, as the request is posted by the Identity
+Provider's page: the signed C<saml-id> cookie set by
+L</ctr_saml2_login> ties it to a login started by the same browser. A
+successful login is logged with the user identifier from the Identity
+Provider, escaped as in L</ctr_credentials_login>.
+
+A refused login is logged at the C<error> level with the reason,
+escaped the same way and cut to about 500 characters: the reason can
+carry text from the response, which is not necessarily what the
+Identity Provider signed (e.g. its status), so anybody can put text
+there. The whole message, with any data of the exception (sometimes a
+full stack trace including the response), is logged as it is at the
+C<trace> level, for troubleshooting: don't run production at that
+level.
 
 
 =head2 B<< model >>
@@ -133,9 +184,25 @@ The C<$routes_for> works like for L</ctr_credentials_login>.
 Accessor to the I<model>, most probably an instance of
 L<MojoX::Authentication::Model>.
 
-If it is not set at creation, it is expected that L</app> is set and
-that it can be called like C<< $app->model->authentication >> to
-retrieve the correct value for this member.
+It is mandatory at creation, where it can be:
+
+=over
+
+=item *
+
+an object: if it has an C<authentication_model> method, its return
+value is used, otherwise the object itself;
+
+=item *
+
+a sub reference, called without arguments to get the model;
+
+=item *
+
+the arguments for creating a new L<MojoX::Authentication::Model>
+instance (e.g. a hash reference with C<config> and C<providers>).
+
+=back
 
 =head2 B<< new >>
 
@@ -144,8 +211,16 @@ retrieve the correct value for this member.
 
 Constructor.
 
-Accepts initialization values for L</app>, L</model>,
+Accepts initialization values for L</model> (mandatory),
 L</provider_name>, and L</user_stash_key>.
+
+It also accepts key C<-startup> with a L<Mojolicious> application, in
+which case L</app_startup> is called on it:
+
+   my $ma = MojoX::Authentication->new(
+      model    => { providers => [ ... ] },
+      -startup => $app,
+   );
 
 =head2 B<< provider_name >>
 
@@ -155,8 +230,9 @@ Accessor to the (default) provider name, mainly used for SAML 2.0. This
 works under the assumption that there will only be one identity
 provider; otherwise you will have to do some more coding on your side.
 
-If defined, it takes the precedence over the C<provider> parameter, this
-behaviour is subject to change.
+If defined, it takes the precedence over the C<provider> parameter; if
+neither is present, C<saml2> is used. This behaviour is subject to
+change.
 
 =head2 B<< user_stash_key >>
 
@@ -168,10 +244,42 @@ to use the C<$user> variable. See L</app_startup> for its usage.
 
 =head1 BUGS AND LIMITATIONS
 
-Minimul perl version 5.24.
+Minimum perl version 5.24.
 
+Please report any bug or feature request through the repository of the
+project, available at
+L<https://codeberg.org/polettix/MojoX-Authentication>.
 
+=head1 AI ASSISTANCE
 
+This module was developed with the assistance of artificial intelligence
+(Anthropic Claude Opus 5.5, through Claude Code). The AI was used to:
+
+=over
+
+=item *
+
+Write and run new tests.
+
+=item *
+
+Conduct code and security reviews, assisting in understanding the issues
+and checking the fixes.
+
+=item *
+
+Write most of the documentation (POD, Changes, and many commit
+messages), some parts together with the L</AUTHOR>.
+
+=back
+
+Code has generally been written by the L</AUTHOR> or, in small parts, by
+the AI, then reviewed and corrected by the L</AUTHOR>, who is
+responsible for the module, under the terms of L</COPYRIGHT AND LICENSE>.
+
+Contributions by the AI can be found in the code repository, where
+AI-assisted commits carry a Co-Authored-By trailer; see L</BUGS AND
+LIMITATIONS>.
 
 =head1 AUTHOR
 

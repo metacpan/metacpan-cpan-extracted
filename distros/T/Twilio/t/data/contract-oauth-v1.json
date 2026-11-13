@@ -1,0 +1,172 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "access_token" : "a_access_token",
+     "expires_in" : 1078,
+     "id_token" : "a_id_token",
+     "refresh_token" : "a_refresh_token",
+     "token_type" : "a_token_type"
+    },
+    "fields" : [
+     [
+      "access_token",
+      "access_token",
+      "plain"
+     ],
+     [
+      "expires_in",
+      "expires_in",
+      "plain"
+     ],
+     [
+      "id_token",
+      "id_token",
+      "plain"
+     ],
+     [
+      "refresh_token",
+      "refresh_token",
+      "plain"
+     ],
+     [
+      "token_type",
+      "token_type",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "oauth",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "token",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "GrantType",
+    "v_grant_type"
+   ],
+   [
+    "ClientId",
+    "v_client_id"
+   ],
+   [
+    "Audience",
+    "v_audience"
+   ],
+   [
+    "ClientSecret",
+    "v_client_secret"
+   ],
+   [
+    "Code",
+    "v_code"
+   ],
+   [
+    "RedirectUri",
+    "v_redirect_uri"
+   ],
+   [
+    "RefreshToken",
+    "v_refresh_token"
+   ],
+   [
+    "Scope",
+    "v_scope"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateToken",
+  "method" : "create",
+  "options" : {
+   "audience" : "v_audience",
+   "client_secret" : "v_client_secret",
+   "code" : "v_code",
+   "redirect_uri" : "v_redirect_uri",
+   "refresh_token" : "v_refresh_token",
+   "scope" : "v_scope"
+  },
+  "required" : [
+   "v_grant_type",
+   "v_client_id"
+  ],
+  "url" : "https://oauth.twilio.com/v1/token"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "redirect_to" : "a_redirect_to"
+    },
+    "fields" : [
+     [
+      "redirect_to",
+      "redirect_to",
+      "plain"
+     ]
+    ],
+    "status" : 302
+   }
+  ],
+  "chain" : [
+   [
+    "oauth",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "authorize",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ResponseType",
+    "v_response_type"
+   ],
+   [
+    "ClientId",
+    "v_client_id"
+   ],
+   [
+    "RedirectUri",
+    "v_redirect_uri"
+   ],
+   [
+    "Scope",
+    "v_scope"
+   ],
+   [
+    "State",
+    "v_state"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchAuthorize",
+  "method" : "fetch",
+  "options" : {
+   "client_id" : "v_client_id",
+   "redirect_uri" : "v_redirect_uri",
+   "response_type" : "v_response_type",
+   "scope" : "v_scope",
+   "state" : "v_state"
+  },
+  "required" : [],
+  "url" : "https://oauth.twilio.com/v1/authorize"
+ }
+]

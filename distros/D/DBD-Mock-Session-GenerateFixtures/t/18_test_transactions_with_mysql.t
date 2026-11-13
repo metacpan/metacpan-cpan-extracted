@@ -103,7 +103,7 @@ subtest 'failled singe trans data' => sub {
     $obj->get_dbh()->commit() if $ok;
     ok( $error, 'rollback is ok' );
     is( $error,     '1062',                                  'err code is ok' );
-    is( $error_msg, "Duplicate entry '1' for key 'PRIMARY'", 'err mesaage is ok' );
+    like($error_msg, qr/Duplicate entry '1' for key '(?:user_login_history\.)?PRIMARY'/, "err message is ok");
 };
 
 subtest 'upsert generate mock data for nested transactions both are ok' => sub {
@@ -162,7 +162,7 @@ subtest 'upsert generate mock data for nested transactions - big trans is not ok
 
     ok( $error_big, 'error in the big try/catch is ok' );
     is( $error_big,     '1062',                                  'err code is ok' );
-    is( $error_big_msg, "Duplicate entry '3' for key 'PRIMARY'", 'err mesaage is ok' );
+    like($error_big_msg, qr/Duplicate entry '3' for key '(?:user_login_history\.)?PRIMARY'/, "err message is ok");
 };
 
 subtest 'upsert generate mock data for nested transactions - small trans is not ok' => sub {
@@ -195,7 +195,7 @@ subtest 'upsert generate mock data for nested transactions - small trans is not 
 
     $dbh->commit() if $ok;
     ok( $error_small, 'error in the small try/catch is ok' );
-    is( $error_small,      "Duplicate entry '4' for key 'PRIMARY'", 'err mesage is ok' );
+    like($error_small, qr/Duplicate entry '4' for key '(?:user_login_history\.)?PRIMARY'/, "err message is ok");
     is( $error_code_small, 1062,                                    'erro code is ok' );
 };
 

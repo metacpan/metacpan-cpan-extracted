@@ -1,0 +1,278 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountSid" : "a_accountSid",
+     "addressSid" : "a_addressSid",
+     "callDelay" : 907,
+     "capabilities" : {
+      "MMS" : false,
+      "SMS" : true,
+      "fax" : false,
+      "voice" : true
+     },
+     "ccEmails" : [
+      "a_ccEmails"
+     ],
+     "dateCreated" : "2026-01-19T03:04:05Z",
+     "dateUpdated" : "2026-01-06T03:04:05Z",
+     "email" : "a_email",
+     "extension" : "a_extension",
+     "failureReason" : "a_failureReason",
+     "friendlyName" : "a_friendlyName",
+     "incomingPhoneNumberSid" : "a_incomingPhoneNumberSid",
+     "phoneNumber" : "a_phoneNumber",
+     "sid" : "a_sid",
+     "signingDocumentSid" : "a_signingDocumentSid",
+     "status" : "testing",
+     "uniqueName" : "a_uniqueName",
+     "url" : "a_url",
+     "verificationAttempts" : 2133,
+     "verificationCallSids" : [
+      "a_verificationCallSids"
+     ],
+     "verificationCode" : "a_verificationCode",
+     "verificationDocumentSid" : "a_verificationDocumentSid",
+     "verificationType" : "phone-bill"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "accountSid",
+      "plain"
+     ],
+     [
+      "address_sid",
+      "addressSid",
+      "plain"
+     ],
+     [
+      "call_delay",
+      "callDelay",
+      "plain"
+     ],
+     [
+      "capabilities",
+      "capabilities",
+      "capabilities"
+     ],
+     [
+      "cc_emails",
+      "ccEmails",
+      "plain"
+     ],
+     [
+      "date_created",
+      "dateCreated",
+      "date",
+      1768791845
+     ],
+     [
+      "date_updated",
+      "dateUpdated",
+      "date",
+      1767668645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "extension",
+      "extension",
+      "plain"
+     ],
+     [
+      "failure_reason",
+      "failureReason",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "incoming_phone_number_sid",
+      "incomingPhoneNumberSid",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phoneNumber",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "signing_document_sid",
+      "signingDocumentSid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "uniqueName",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "verification_attempts",
+      "verificationAttempts",
+      "plain"
+     ],
+     [
+      "verification_call_sids",
+      "verificationCallSids",
+      "plain"
+     ],
+     [
+      "verification_code",
+      "verificationCode",
+      "plain"
+     ],
+     [
+      "verification_document_sid",
+      "verificationDocumentSid",
+      "plain"
+     ],
+     [
+      "verification_type",
+      "verificationType",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "hosted_number_orders",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "phoneNumber",
+    "v_phone_number"
+   ],
+   [
+    "smsCapability",
+    "true"
+   ],
+   [
+    "accountSid",
+    "v_account_sid"
+   ],
+   [
+    "addressSid",
+    "v_address_sid"
+   ],
+   [
+    "ccEmails",
+    "v_cc_emails_1"
+   ],
+   [
+    "ccEmails",
+    "v_cc_emails_2"
+   ],
+   [
+    "email",
+    "v_email"
+   ],
+   [
+    "friendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "smsApplicationSid",
+    "v_sms_application_sid"
+   ],
+   [
+    "smsFallbackMethod",
+    "GET"
+   ],
+   [
+    "smsFallbackUrl",
+    "v_sms_fallback_url"
+   ],
+   [
+    "smsMethod",
+    "GET"
+   ],
+   [
+    "smsUrl",
+    "v_sms_url"
+   ],
+   [
+    "statusCallbackMethod",
+    "GET"
+   ],
+   [
+    "statusCallbackUrl",
+    "v_status_callback_url"
+   ],
+   [
+    "uniqueName",
+    "v_unique_name"
+   ],
+   [
+    "verificationDocumentSid",
+    "v_verification_document_sid"
+   ],
+   [
+    "verificationType",
+    "phone-bill"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateHostedNumbersHostedNumberOrder",
+  "method" : "create",
+  "options" : {
+   "account_sid" : "v_account_sid",
+   "address_sid" : "v_address_sid",
+   "cc_emails" : [
+    "v_cc_emails_1",
+    "v_cc_emails_2"
+   ],
+   "email" : "v_email",
+   "friendly_name" : "v_friendly_name",
+   "sms_application_sid" : "v_sms_application_sid",
+   "sms_fallback_method" : "GET",
+   "sms_fallback_url" : "v_sms_fallback_url",
+   "sms_method" : "GET",
+   "sms_url" : "v_sms_url",
+   "status_callback_method" : "GET",
+   "status_callback_url" : "v_status_callback_url",
+   "unique_name" : "v_unique_name",
+   "verification_document_sid" : "v_verification_document_sid",
+   "verification_type" : "phone-bill"
+  },
+  "required" : [
+   "v_phone_number",
+   1
+  ],
+  "url" : "https://numbers.twilio.com/v3/HostedNumbers/HostedNumberOrders"
+ }
+]

@@ -1,0 +1,749 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "compliance" : {
+      "a_compliance" : 1
+     },
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "friendly_name" : "a_friendly_name",
+     "offline_reasons" : [
+      "a_offline_reasons"
+     ],
+     "pending_display_name" : "a_pending_display_name",
+     "pending_display_name_status" : "PENDING_REVIEW",
+     "pending_display_name_status_date" : "2026-01-27T03:04:05Z",
+     "profile" : {
+      "a_profile" : 1
+     },
+     "properties" : {
+      "a_properties" : 1
+     },
+     "sender_id" : "a_sender_id",
+     "sid" : "a_sid",
+     "status" : "ONLINE",
+     "url" : "a_url",
+     "webhook" : {
+      "a_webhook" : 1
+     }
+    },
+    "fields" : [
+     [
+      "compliance",
+      "compliance",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "offline_reasons",
+      "offline_reasons",
+      "plain"
+     ],
+     [
+      "pending_display_name",
+      "pending_display_name",
+      "plain"
+     ],
+     [
+      "pending_display_name_status",
+      "pending_display_name_status",
+      "plain"
+     ],
+     [
+      "pending_display_name_status_date",
+      "pending_display_name_status_date",
+      "date",
+      1769483045
+     ],
+     [
+      "profile",
+      "profile",
+      "plain"
+     ],
+     [
+      "properties",
+      "properties",
+      "plain"
+     ],
+     [
+      "sender_id",
+      "sender_id",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook",
+      "webhook",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "friendly_name" : "v_friendly_name",
+   "profile" : {
+    "v_profile" : 1
+   },
+   "sender_id" : "v_sender_id",
+   "webhook" : {
+    "v_webhook" : 1
+   }
+  },
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "channels_senders",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateChannelsSender",
+  "json" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "friendly_name" : "v_friendly_name",
+   "profile" : {
+    "v_profile" : 1
+   },
+   "sender_id" : "v_sender_id",
+   "webhook" : {
+    "v_webhook" : 1
+   }
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v2/Channels/Senders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "success" : true
+    },
+    "fields" : [
+     [
+      "success",
+      "success",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "typing_indicator",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "channel",
+    "whatsapp"
+   ],
+   [
+    "messageId",
+    "v_message_id"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTypingIndicator",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "whatsapp",
+   "v_message_id"
+  ],
+  "url" : "https://messaging.twilio.com/v2/Indicators/Typing.json"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "channels_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteChannelsSender",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v2/Channels/Senders/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "compliance" : {
+      "a_compliance" : 1
+     },
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "friendly_name" : "a_friendly_name",
+     "offline_reasons" : [
+      "a_offline_reasons"
+     ],
+     "pending_display_name" : "a_pending_display_name",
+     "pending_display_name_status" : "PENDING_REVIEW",
+     "pending_display_name_status_date" : "2026-01-27T03:04:05Z",
+     "profile" : {
+      "a_profile" : 1
+     },
+     "properties" : {
+      "a_properties" : 1
+     },
+     "sender_id" : "a_sender_id",
+     "sid" : "a_sid",
+     "status" : "ONLINE",
+     "url" : "a_url",
+     "webhook" : {
+      "a_webhook" : 1
+     }
+    },
+    "fields" : [
+     [
+      "compliance",
+      "compliance",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "offline_reasons",
+      "offline_reasons",
+      "plain"
+     ],
+     [
+      "pending_display_name",
+      "pending_display_name",
+      "plain"
+     ],
+     [
+      "pending_display_name_status",
+      "pending_display_name_status",
+      "plain"
+     ],
+     [
+      "pending_display_name_status_date",
+      "pending_display_name_status_date",
+      "date",
+      1769483045
+     ],
+     [
+      "profile",
+      "profile",
+      "plain"
+     ],
+     [
+      "properties",
+      "properties",
+      "plain"
+     ],
+     [
+      "sender_id",
+      "sender_id",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook",
+      "webhook",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "channels_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchChannelsSender",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v2/Channels/Senders/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "cert_in_validation" : {
+      "a_cert_in_validation" : 1
+     },
+     "certificate_sid" : "a_certificate_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_expires" : "2026-01-18T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_sid" : "a_domain_sid",
+     "managed" : true,
+     "requesting" : true,
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "cert_in_validation",
+      "cert_in_validation",
+      "plain"
+     ],
+     [
+      "certificate_sid",
+      "certificate_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_expires",
+      "date_expires",
+      "date",
+      1768705445
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_sid",
+      "domain_sid",
+      "plain"
+     ],
+     [
+      "managed",
+      "managed",
+      "plain"
+     ],
+     [
+      "requesting",
+      "requesting",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "domain_certs",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDomainCertV4",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v2/LinkShortening/Domains/id1/Certificate"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "senders" : [
+      {
+       "compliance" : {
+        "a_compliance" : 1
+       },
+       "configuration" : {
+        "a_configuration" : 1
+       },
+       "friendly_name" : "a_friendly_name",
+       "offline_reasons" : [
+        "a_offline_reasons"
+       ],
+       "pending_display_name" : "a_pending_display_name",
+       "pending_display_name_status" : "PENDING_REVIEW",
+       "pending_display_name_status_date" : "2026-01-27T03:04:05Z",
+       "profile" : {
+        "a_profile" : 1
+       },
+       "properties" : {
+        "a_properties" : 1
+       },
+       "sender_id" : "a_sender_id",
+       "sid" : "a_sid",
+       "status" : "ONLINE",
+       "url" : "a_url",
+       "webhook" : {
+        "a_webhook" : 1
+       }
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "compliance",
+      "compliance",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "offline_reasons",
+      "offline_reasons",
+      "plain"
+     ],
+     [
+      "pending_display_name",
+      "pending_display_name",
+      "plain"
+     ],
+     [
+      "pending_display_name_status",
+      "pending_display_name_status",
+      "plain"
+     ],
+     [
+      "pending_display_name_status_date",
+      "pending_display_name_status_date",
+      "date",
+      1769483045
+     ],
+     [
+      "profile",
+      "profile",
+      "plain"
+     ],
+     [
+      "properties",
+      "properties",
+      "plain"
+     ],
+     [
+      "sender_id",
+      "sender_id",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook",
+      "webhook",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "channels_senders",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Channel",
+    "v_channel"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListChannelsSender",
+  "method" : "page",
+  "options" : {
+   "channel" : "v_channel"
+  },
+  "records_key" : "senders",
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v2/Channels/Senders"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "compliance" : {
+      "a_compliance" : 1
+     },
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "display_name_status" : "no_change",
+     "friendly_name" : "a_friendly_name",
+     "offline_reasons" : [
+      "a_offline_reasons"
+     ],
+     "profile" : {
+      "a_profile" : 1
+     },
+     "properties" : {
+      "a_properties" : 1
+     },
+     "sender_id" : "a_sender_id",
+     "sid" : "a_sid",
+     "status" : "ONLINE",
+     "url" : "a_url",
+     "webhook" : {
+      "a_webhook" : 1
+     }
+    },
+    "fields" : [
+     [
+      "compliance",
+      "compliance",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "display_name_status",
+      "display_name_status",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "offline_reasons",
+      "offline_reasons",
+      "plain"
+     ],
+     [
+      "profile",
+      "profile",
+      "plain"
+     ],
+     [
+      "properties",
+      "properties",
+      "plain"
+     ],
+     [
+      "sender_id",
+      "sender_id",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook",
+      "webhook",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "friendly_name" : "v_friendly_name",
+   "profile" : {
+    "v_profile" : 1
+   },
+   "webhook" : {
+    "v_webhook" : 1
+   }
+  },
+  "chain" : [
+   [
+    "messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "channels_senders",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "UpdateChannelsSender",
+  "json" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "friendly_name" : "v_friendly_name",
+   "profile" : {
+    "v_profile" : 1
+   },
+   "webhook" : {
+    "v_webhook" : 1
+   }
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://messaging.twilio.com/v2/Channels/Senders/id1"
+ }
+]

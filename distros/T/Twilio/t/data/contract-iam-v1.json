@@ -1,0 +1,809 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "Tue, 06 Jan 2026 03:04:05 +0000",
+     "date_updated" : "Wed, 21 Jan 2026 03:04:05 +0000",
+     "friendly_name" : "a_friendly_name",
+     "policy" : {
+      "a_policy" : 1
+     },
+     "secret" : "a_secret",
+     "sid" : "a_sid"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy",
+      "policy",
+      "plain"
+     ],
+     [
+      "secret",
+      "secret",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "new_api_key",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "AccountSid",
+    "v_account_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "KeyType",
+    "v_key_type"
+   ],
+   [
+    "Policy",
+    "{\"v_policy\":9}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateNewKey",
+  "method" : "create",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "key_type" : "v_key_type",
+   "policy" : {
+    "v_policy" : 9
+   }
+  },
+  "required" : [
+   "v_account_sid"
+  ],
+  "url" : "https://iam.twilio.com/v1/Keys"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "access_token_ttl" : 1701,
+     "created_by" : "a_created_by",
+     "creator_sid" : "a_creator_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "policy" : {
+      "a_policy" : 1
+     },
+     "secret" : "a_secret",
+     "sid" : "a_sid",
+     "status" : "a_status",
+     "type" : "a_type"
+    },
+    "fields" : [
+     [
+      "access_token_ttl",
+      "access_token_ttl",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "creator_sid",
+      "creator_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy",
+      "policy",
+      "plain"
+     ],
+     [
+      "secret",
+      "secret",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "access_token_ttl" : 1701,
+   "client_sid" : "v_client_sid",
+   "description" : "v_description",
+   "friendly_name" : "v_friendly_name",
+   "owner_sid" : "v_owner_sid",
+   "policy" : {
+    "v_policy" : 1
+   },
+   "token_endpoint_auth_method" : "client_secret_basic",
+   "type" : "v_type"
+  },
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "oauth_apps",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateOauthAppAccount",
+  "json" : {
+   "access_token_ttl" : 1701,
+   "client_sid" : "v_client_sid",
+   "description" : "v_description",
+   "friendly_name" : "v_friendly_name",
+   "owner_sid" : "v_owner_sid",
+   "policy" : {
+    "v_policy" : 1
+   },
+   "token_endpoint_auth_method" : "client_secret_basic",
+   "type" : "v_type"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Account/OAuthApps"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "access_token" : "a_access_token",
+     "expires_in" : 1078,
+     "id_token" : "a_id_token",
+     "refresh_token" : "a_refresh_token",
+     "token_type" : "a_token_type"
+    },
+    "fields" : [
+     [
+      "access_token",
+      "access_token",
+      "plain"
+     ],
+     [
+      "expires_in",
+      "expires_in",
+      "plain"
+     ],
+     [
+      "id_token",
+      "id_token",
+      "plain"
+     ],
+     [
+      "refresh_token",
+      "refresh_token",
+      "plain"
+     ],
+     [
+      "token_type",
+      "token_type",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "token",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "grant_type",
+    "v_grant_type"
+   ],
+   [
+    "client_id",
+    "v_client_id"
+   ],
+   [
+    "audience",
+    "v_audience"
+   ],
+   [
+    "client_secret",
+    "v_client_secret"
+   ],
+   [
+    "code",
+    "v_code"
+   ],
+   [
+    "redirect_uri",
+    "v_redirect_uri"
+   ],
+   [
+    "refresh_token",
+    "v_refresh_token"
+   ],
+   [
+    "scope",
+    "v_scope"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateToken",
+  "method" : "create",
+  "options" : {
+   "audience" : "v_audience",
+   "client_secret" : "v_client_secret",
+   "code" : "v_code",
+   "redirect_uri" : "v_redirect_uri",
+   "refresh_token" : "v_refresh_token",
+   "scope" : "v_scope"
+  },
+  "required" : [
+   "v_grant_type",
+   "v_client_id"
+  ],
+  "url" : "https://iam.twilio.com/v1/token"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "api_key",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteKey",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Keys/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "oauth_apps",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteOauthAppAccount",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Account/OAuthApps/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "Tue, 06 Jan 2026 03:04:05 +0000",
+     "date_updated" : "Wed, 21 Jan 2026 03:04:05 +0000",
+     "friendly_name" : "a_friendly_name",
+     "policy" : {
+      "a_policy" : 1
+     },
+     "sid" : "a_sid"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy",
+      "policy",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "api_key",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchKey",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Keys/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "keys" : [
+      {
+       "date_created" : "Tue, 06 Jan 2026 03:04:05 +0000",
+       "date_updated" : "Wed, 21 Jan 2026 03:04:05 +0000",
+       "flags" : [
+        "a_flags"
+       ],
+       "friendly_name" : "a_friendly_name",
+       "sid" : "a_sid"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flags",
+      "flags",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "get_api_keys",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "AccountSid",
+    "v_account_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListGetKeys",
+  "method" : "page",
+  "options" : {
+   "account_sid" : "v_account_sid"
+  },
+  "records_key" : "keys",
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Keys"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "permissions" : [
+      {
+       "action" : "a_action",
+       "externalDescription" : "a_externalDescription",
+       "namespace" : "a_namespace",
+       "product" : "a_product",
+       "resource" : "a_resource",
+       "sid" : "a_sid"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "action",
+      "action",
+      "plain"
+     ],
+     [
+      "external_description",
+      "externalDescription",
+      "plain"
+     ],
+     [
+      "namespace",
+      "namespace",
+      "plain"
+     ],
+     [
+      "product",
+      "product",
+      "plain"
+     ],
+     [
+      "resource",
+      "resource",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "role_permission",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListRolePermission",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "permissions",
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Roles/id1/Permissions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "Tue, 06 Jan 2026 03:04:05 +0000",
+     "date_updated" : "Wed, 21 Jan 2026 03:04:05 +0000",
+     "friendly_name" : "a_friendly_name",
+     "policy" : {
+      "a_policy" : 1
+     },
+     "sid" : "a_sid"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy",
+      "policy",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "api_key",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Policy",
+    "{\"v_policy\":9}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateKey",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "policy" : {
+    "v_policy" : 9
+   }
+  },
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Keys/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "access_token_ttl" : 1701,
+     "created_by" : "a_created_by",
+     "creator_sid" : "a_creator_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "policy" : {
+      "a_policy" : 1
+     },
+     "secret" : "a_secret",
+     "sid" : "a_sid",
+     "status" : "a_status",
+     "type" : "a_type"
+    },
+    "fields" : [
+     [
+      "access_token_ttl",
+      "access_token_ttl",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "creator_sid",
+      "creator_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy",
+      "policy",
+      "plain"
+     ],
+     [
+      "secret",
+      "secret",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "access_token_ttl" : 1701,
+   "description" : "v_description",
+   "friendly_name" : "v_friendly_name",
+   "policy" : {
+    "v_policy" : 1
+   },
+   "type" : "v_type"
+  },
+  "chain" : [
+   [
+    "iam",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "oauth_apps",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PUT",
+  "id" : "UpdateOauthAppAccount",
+  "json" : {
+   "access_token_ttl" : 1701,
+   "description" : "v_description",
+   "friendly_name" : "v_friendly_name",
+   "policy" : {
+    "v_policy" : 1
+   },
+   "type" : "v_type"
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://iam.twilio.com/v1/Account/OAuthApps/id1"
+ }
+]

@@ -2,6 +2,14 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.13.2 - 2026-11-13
+
+### Fixes
+
+- Read a served null flag or trial_expired as undef, never 0 ([`0c2100d`](https://github.com/vpndetection-io/sdk-perl/commit/0c2100da57e7daaefbdec5623c1dcf627c4dcefc))
+- Re-pin the spec to 2026.11.12: plainer words on the 401 and the batch rate limit ([`2eefa6e`](https://github.com/vpndetection-io/sdk-perl/commit/2eefa6e21398eafec1aaebf0c6d5ff053d66065b))
+- Say that a batch request of one address is answered as its lookup ([`2e99c67`](https://github.com/vpndetection-io/sdk-perl/commit/2e99c67135a9d8d78ffe9bac9f8a91c65877aceb))
+
 ## 3.13.1 - 2026-11-11
 
 ### Fixes

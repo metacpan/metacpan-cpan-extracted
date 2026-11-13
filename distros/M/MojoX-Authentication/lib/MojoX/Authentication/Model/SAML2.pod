@@ -20,9 +20,14 @@ MojoX::Authentication::Model::SAML2
 Manage the model for the interaction with an Identity Provider in SAML
 2.0.
 
-Outstanding requests are cached for some time, based on a time-to-live
-that can be provided (either set in the object as L</ttl> or when
-caching a user) and defaults to 5 minutes.
+Outstanding requests are cached for L</request_ttl> seconds (30 by
+default), users parsed from a valid response for L</user_ttl> seconds
+(5 minutes by default).
+
+This module needs L<Net::SAML2> 0.86 or later, and refuses to load
+with older versions: they silently skip the check on the Issuer of the
+assertion. L<Net::SAML2> is an optional dependency of this
+distribution, so install it to use SAML2 providers.
 
 =head1 INTERFACE
 
@@ -31,6 +36,11 @@ caching a user) and defaults to 5 minutes.
    my $cache = $provider->cache;
 
 Accessor to the cache management object. You're not supposed to need this.
+
+Every key the provider uses in the cache starts with its encoded
+L</name> (see L<MojoX::Authentication::Util/encode_name>), so several
+SAML2 providers can share one cache (e.g. the same table) without
+seeing each other's requests or users.
 
 =head2 B<< create >>
 
@@ -73,8 +83,47 @@ either as hash or array reference if present).
 
 =back
 
-The value for key L</idp> is turned into a L<Net::SAML2::IdP> if not
-blessed (in this case it's supposed to support that interface anyway).
+If no L</cache> is given, L<MojoX::Authentication::Model::SAML2::Hash>
+is used. It keeps everything in the memory of the process, so it only
+works when the application runs as a I<single> process (e.g. with
+C<morbo> or the C<daemon> command). With more than one process (e.g.
+C<hypnotoad> or the C<prefork> command), a login request stored by one
+worker is unknown to the worker receiving the response from the
+Identity Provider, and a user logged in by one worker is unknown to the
+others: logins fail at random and users appear logged out. In this case
+pass a L<MojoX::MojoDbWrap> object (or any cache shared among the
+processes) instead.
+
+The value for key L</idp> is the identity provider's metadata, in one of
+these forms:
+
+=over
+
+=item *
+
+an object, used as-is: it is supposed to be a L<Net::SAML2::IdP> or to
+support the same interface. Build it yourself when you need control over
+how the metadata is fetched (e.g. C<ssl_opts> for
+L<Net::SAML2::IdP/new_from_url>);
+
+=item *
+
+a URL (anything starting with C<scheme://>), fetched with
+L<Net::SAML2::IdP/new_from_url>. Note that this uses L<LWP::UserAgent>
+with its default settings, including its User-Agent string, which some
+sites refuse;
+
+=item *
+
+a string with the XML metadata itself, recognized by starting with C<<
+< >> (possibly after some whitespace);
+
+=item *
+
+anything else is taken as the path to a file holding the XML metadata.
+An exception is thrown if it cannot be read.
+
+=back
 
 The value for key L</remaps> is an array reference, see the accessor
 documentation for its format.
@@ -83,9 +132,9 @@ documentation for its format.
 
    my $bool = $provider->handles_username($controller, $username);
 
-Returns a true value if the provider handles the provided username,
-false otherwise. Useful to figure out what provider supports a username,
-especially if there can be multiple SAML 2.0 providers.
+Returns a true value if the provider claims the provided username,
+false otherwise, by calling L</username_validator>. With default
+settings it claims I<every> username (see L</username_validator>).
 
 =head2 B<< idp >>
 
@@ -116,57 +165,95 @@ expected by L<Mojolicious::Plugin::Authentication>.
 
    $provider->logout($controller, $user);
 
-Do the logout. It's currently just a thin wrapper around the C<logout>
-provided by L<Mojolicious::Plugin::Authentication> but it should be
-enhanced in the future to support proper remote logout.
+Do the logout. The C<$user> is what L<MojoX::Authentication::Model>
+provides as the current user (a hash reference with the user identifier
+in key C<uid>): the user is removed from the cache, then the C<logout>
+provided by L<Mojolicious::Plugin::Authentication> is called.
+
+It should be enhanced in the future to support proper remote logout.
 
 =head2 B<< name >>
 
    my $string = $provider->name;
+   $provider->name($new_name);
 
-Accessor to the name of the provider.
+Accessor to the name of the provider, which also scopes the keys in the
+L</cache>. It is read-write: L<MojoX::Authentication::Model> sets it to
+the name it registers the provider under (see
+L<MojoX::Authentication::Model/Provider names>), so that two SAML2
+providers sharing a cache never share its entries.
 
 =head2 B<< parse_assertion >>
 
-   $provider->parse_assertion($request_id, $response);
+   my $user = $provider->parse_assertion($request_id, $response);
 
-Parse an incoming C<$response>, arguably associated to an ongoing
-request with identifier C<$request_id>. In case the parsing is
-successful, the user is considered logged in and saved in the case for
-L</user_ttl> seconds.
+Parse an incoming C<$response> (the base64-encoded C<SAMLResponse> as
+posted by the client), arguably associated to an ongoing request with
+identifier C<$request_id>. In case the parsing is successful, the user
+is considered logged in, saved in the cache for L</user_ttl> seconds and
+returned (after applying L</remaps>).
 
-=head2 B<< remaps >>
+The request identifier can be used only once: it is removed from the
+cache as soon as a response for it is processed, whatever the outcome,
+so the same response cannot be replayed.
 
-   my $aref = $provider->remaps;
-
-Array holding the mappings applied by L</normalize_user> over the passed
-C<$user> hashref.
-
-Items in the array can be:
+Exceptions are thrown when any of the following happen; they are L<Ouch>
+exceptions where a code is indicated, plain ones coming from L<Net::SAML2>
+otherwise:
 
 =over
 
 =item *
 
-code reference: the sub is called passing the user hashref to be
-normalized.
+there is no C<$response> or no C<$request_id>, or the request is unknown
+(never issued, already used) or older than L</request_ttl> seconds (code
+400);
 
 =item *
 
-hash reference: all key/value pairs are iterated. Each key is
-interpreted as a key to be found in the user hashref (it is skipped if
-not present) and the corresponding value a target key. As an example:
+the signature of the response cannot be verified against the identity
+provider's signing certificate;
 
-   user hashref   { foo => 'hello!', bar => 'not for much...' }
+=item *
 
-   mapping        { bar => 'foo' }
+the identity provider answered with a status other than success, e.g.
+because the user could not be authenticated (code 403). The message
+names the status and, if present, the sub-status, e.g.
+C<IdP refused with urn:oasis:names:tc:SAML:2.0:status:Responder/urn:oasis:names:tc:SAML:2.0:status:AuthnFailed>;
 
-   { foo => 'bar' }
+=item *
 
-looks for key C<foo> in the user hashref and, if found, sets the same
-value for key C<bar> in the same hashref.
+the assertion was issued by somebody other than the identity provider,
+i.e. its C<Issuer> is not the C<entityID> in the metadata of L</idp>,
+even if signed with the right key (as when several issuers share one
+signing key, e.g. the tenants of a multi-tenant platform);
+
+=item *
+
+the assertion is not valid for this service provider, i.e. for the
+C<identifier> in L</sp_configuration> and C<$request_id> (code 400);
+
+=item *
+
+the assertion has no C<NameID>, or an empty one (code 400): the
+C<NameID> is the user identifier, so it is required. Nothing is cached
+in this case.
 
 =back
+
+=head2 B<< remaps >>
+
+   my $aref = $provider->remaps;
+
+Array holding the mappings applied over the user's data, when it is
+extracted from the response in L</parse_assertion>. Their format is
+the one of L<MojoX::Authentication::Model::Role::Remap/remap> (code,
+array or hash references), applied forward only.
+
+The default copies the C<givenname> and C<surname> claims
+(C<http://schemas.xmlsoap.org/ws/2005/05/identity/claims/...>) to keys
+C<givenname> and C<surname>, joining multiple values with C<, >, then
+sets C<fullname> to the two joined by a space.
 
 
 =head2 B<< request_ttl >>
@@ -210,12 +297,23 @@ when building the request in L</idp_login>.
 
 =back
 
+=head2 B<< tamed_user_record >>
+
+   my $safe = $provider->tamed_user_record($user);
+
+Returns C<$user> as it is: records built from SAML2 assertions hold no
+secret material (see
+L<MojoX::Authentication::Model/What reaches current_user>). If the IdP
+sends attributes that must not reach C<current_user>, override this
+method in a subclass.
+
 =head2 B<< user_key >>
 
    my $key = $provider->user_key;
 
 Accessor to the key that is set in the user's data with the user
-identifier.
+identifier. It is also used to find the user identifier when caching
+users. Defaults to C<key>.
 
 =head2 B<< user_ttl >>
 
@@ -232,21 +330,25 @@ Identity Provider.
 Accessor for the username validation function. This is wrapped by
 L</handles_username> behind the scenes, so it should be set to some
 validation mechanism that allows figuring out if the specific SAML2
-Identity Provider is the right one for the username.
+Identity Provider is the right one for the username, e.g.:
 
-=head2 B<< validate_user >>
+   username_validator => sub ($name) { $name =~ m{\@example\.com\z}mxs },
 
-   my $uid = $provider->validate_user($ctr, $user, $secret, $extra);
-
-Do the user validation, compatibly with
-L<Mojolicious::Plugin::Authentication>.
-   
+The default validator accepts I<every> username. As the first provider
+claiming a username owns it (see
+L<MojoX::Authentication::Model/Owner of a username>), a SAML2 provider
+with the default validator shadows all the providers after it: put it
+last, or set a validator. A SAML2 provider never accepts credentials,
+so a login with username and password for a username it owns is always
+refused.
 
 =head2 B<< wipe_user >>
 
+   $provider->wipe_user($uid);   # OR
    $provider->wipe_user($user);
 
-Remove the user from the cache.
+Remove the user from the cache. The input can be the user identifier,
+or a hash reference holding it in key L</user_key>.
 
 
 =head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)

@@ -219,4 +219,71 @@ subtest 'SyncContactLinks' => sub {
     or diag explain $Errors;
 };
 
+subtest 'SyncContactLinks follows a truncated response' => sub {
+  my ($talk, $ua) = new_talk();
+  my $trunc = "<d:response><d:href>$Base/</d:href><d:status>HTTP/1.1 507 Insufficient Storage</d:status></d:response>";
+  $ua->queue(
+    multistatus(response("$Base/a%40b.vcf", propstat('200 OK', '<d:getetag>"ea"</d:getetag>')),
+                $trunc, '<d:sync-token>tok-1</d:sync-token>'),
+    multistatus(response("$Base/two.vcf", propstat('200 OK', '<d:getetag>"e2"</d:getetag>')),
+                '<d:sync-token>tok-2</d:sync-token>'),
+  );
+
+  my ($Added, $Removed, $Errors, $SyncToken) = $talk->SyncContactLinks('Default');
+
+  is(scalar @{$ua->requests}, 2, 'asked again from the token it was given');
+  like($ua->requests->[1]{content}, qr{<D:sync-token>tok-1</D:sync-token>}, 'with that token');
+  is_deeply($Added, { "$Base/a\@b.vcf" => '"ea"', "$Base/two.vcf" => '"e2"' },
+    'both pages, hrefs unescaped');
+  is_deeply($Removed, [], 'the collection is not reported removed');
+  is_deeply($Errors, [], 'nor is the 507 an error');
+  is($SyncToken, 'tok-2', 'the last token');
+};
+
+subtest 'hrefs are unescaped, and escaped once on the way back' => sub {
+  my ($talk, $ua) = new_talk();
+  my $card = "BEGIN:VCARD\r\nVERSION:3.0\r\nUID:ab\r\nFN:A B\r\nN:B;A;;;\r\nEND:VCARD\r\n";
+
+  # Google's CardDAV writes '@' as is in a PROPFIND, its CalDAV as %40:
+  # either way the caller gets the same href
+  $ua->queue(multistatus(
+    response("$Base/a%40b.vcf", propstat('200 OK', '<d:getetag>"e1"</d:getetag>')),
+    response("$Base/c d.vcf",   propstat('200 OK', '<d:getetag>"e2"</d:getetag>')),
+  ));
+  my $Links = $talk->GetContactLinks($Base);
+  is_deeply([sort keys %$Links], ["$Base/a\@b.vcf", "$Base/c d.vcf"], 'GetContactLinks: unescaped');
+
+  $ua->queue(multistatus(
+    response("$Base/a%40b.vcf",
+      propstat('200 OK', qq{<d:getetag>"e1"</d:getetag><card:address-data>$card</card:address-data>})),
+  ));
+  my ($Contacts, $Errors, $MLinks) = $talk->GetContactsMulti('Default', ["$Base/a\@b.vcf"]);
+  like($ua->requests->[-1]{content}, qr{<D:href>/addressbooks/user/Default/a%40b\.vcf</D:href>},
+    'GetContactsMulti: the href goes out escaped');
+  is_deeply([keys %$MLinks], ["$Base/a\@b.vcf"], 'GetContactsMulti: links unescaped');
+  is($Contacts->[0]{href}, "$Base/a\@b.vcf", 'and so is the card\'s href');
+  is($Contacts->[0]{CPath}, 'Default/a@b.vcf', 'and its path');
+
+  $ua->queue($card);
+  $talk->GetContact("$Base/a\@b.vcf");
+  is($ua->requests->[-1]{uri}, 'http://dav.example.com:80/addressbooks/user/Default/a%40b.vcf',
+    'an href passed back is escaped once, not twice');
+
+  $ua->queue(multistatus(
+    response("$Base/a%40b.vcf",
+      propstat('200 OK', qq{<d:getetag>"e1"</d:getetag><card:address-data>$card</card:address-data>})),
+  ));
+  $talk->GetContactAndProps('Default/a@b.vcf');
+  like($ua->requests->[-1]{content}, qr{<D:href>/addressbooks/user/Default/a%40b\.vcf</D:href>},
+    'GetContactAndProps: a relative path goes out as the escaped absolute href');
+
+  $ua->queue(multistatus(
+    response('/addressbooks/user/My%20Book/',
+      propstat('200 OK', '<d:resourcetype><d:collection/><card:addressbook/></d:resourcetype><d:displayname>Mine</d:displayname>')),
+  ));
+  my $Books = $talk->GetAddressBooks();
+  is($Books->[0]{href}, '/addressbooks/user/My Book/', 'GetAddressBooks: href unescaped');
+  is($Books->[0]{path}, 'My Book', 'and path');
+};
+
 done_testing;

@@ -1,0 +1,517 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "report_id" : "a_report_id",
+     "request_meta" : {
+      "a_request_meta" : 1
+     },
+     "status" : "running",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "report_id",
+      "report_id",
+      "plain"
+     ],
+     [
+      "request_meta",
+      "request_meta",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "filters" : [
+    "v_filters"
+   ],
+   "time_range" : {
+    "v_time_range" : 1
+   }
+  },
+  "chain" : [
+   [
+    "insights",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "reports",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateAccountReport",
+  "json" : {
+   "filters" : [
+    "v_filters"
+   ],
+   "time_range" : {
+    "v_time_range" : 1
+   }
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://insights.twilio.com/v2/Voice/Reports"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "report_id" : "a_report_id",
+     "request_meta" : {
+      "a_request_meta" : 1
+     },
+     "status" : "running",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "report_id",
+      "report_id",
+      "plain"
+     ],
+     [
+      "request_meta",
+      "request_meta",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "filters" : [
+    "v_filters"
+   ],
+   "size" : 443,
+   "time_range" : {
+    "v_time_range" : 1
+   }
+  },
+  "chain" : [
+   [
+    "insights",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "inbound_reports",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateInboundPhoneNumbersReport",
+  "json" : {
+   "filters" : [
+    "v_filters"
+   ],
+   "size" : 443,
+   "time_range" : {
+    "v_time_range" : 1
+   }
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://insights.twilio.com/v2/Voice/Reports/PhoneNumbers/Inbound"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "report_id" : "a_report_id",
+     "request_meta" : {
+      "a_request_meta" : 1
+     },
+     "status" : "running",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "report_id",
+      "report_id",
+      "plain"
+     ],
+     [
+      "request_meta",
+      "request_meta",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "filters" : [
+    "v_filters"
+   ],
+   "size" : 443,
+   "time_range" : {
+    "v_time_range" : 1
+   }
+  },
+  "chain" : [
+   [
+    "insights",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "outbound_reports",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateOutboundPhoneNumbersReport",
+  "json" : {
+   "filters" : [
+    "v_filters"
+   ],
+   "size" : 443,
+   "time_range" : {
+    "v_time_range" : 1
+   }
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://insights.twilio.com/v2/Voice/Reports/PhoneNumbers/Outbound"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "report" : {
+      "a_report" : 1
+     },
+     "report_id" : "a_report_id",
+     "request_meta" : {
+      "a_request_meta" : 1
+     },
+     "status" : "running",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "report",
+      "report",
+      "plain"
+     ],
+     [
+      "report_id",
+      "report_id",
+      "plain"
+     ],
+     [
+      "request_meta",
+      "request_meta",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "insights",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "reports",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchAccountReport",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://insights.twilio.com/v2/Voice/Reports/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "reports" : [
+      {
+       "call_answer_score" : 1798.5,
+       "call_state_percentage" : {
+        "a_call_state_percentage" : 1
+       },
+       "handle" : "a_handle",
+       "silent_calls_percentage" : 2426.5,
+       "total_calls" : 1170
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "call_answer_score",
+      "call_answer_score",
+      "plain"
+     ],
+     [
+      "call_state_percentage",
+      "call_state_percentage",
+      "plain"
+     ],
+     [
+      "handle",
+      "handle",
+      "plain"
+     ],
+     [
+      "silent_calls_percentage",
+      "silent_calls_percentage",
+      "plain"
+     ],
+     [
+      "total_calls",
+      "total_calls",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "insights",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "inbound",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListInboundPhoneNumbersReport",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "reports",
+  "required" : [],
+  "url" : "https://insights.twilio.com/v2/Voice/Reports/PhoneNumbers/Inbound/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "reports" : [
+      {
+       "answer_rate_device_type" : {
+        "a_answer_rate_device_type" : 1
+       },
+       "answering_machine_detection" : {
+        "a_answering_machine_detection" : 1
+       },
+       "blocked_calls_by_carrier" : [
+        "a_blocked_calls_by_carrier"
+       ],
+       "call_answer_score" : 1798.5,
+       "call_state_percentage" : {
+        "a_call_state_percentage" : 1
+       },
+       "calls_by_device_type" : {
+        "a_calls_by_device_type" : 1
+       },
+       "handle" : "a_handle",
+       "long_duration_calls_percentage" : 3168.5,
+       "potential_robocalls_percentage" : 3181.5,
+       "short_duration_calls_percentage" : 3296.5,
+       "silent_calls_percentage" : 2426.5,
+       "total_calls" : 1170
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "answer_rate_device_type",
+      "answer_rate_device_type",
+      "plain"
+     ],
+     [
+      "answering_machine_detection",
+      "answering_machine_detection",
+      "plain"
+     ],
+     [
+      "blocked_calls_by_carrier",
+      "blocked_calls_by_carrier",
+      "plain"
+     ],
+     [
+      "call_answer_score",
+      "call_answer_score",
+      "plain"
+     ],
+     [
+      "call_state_percentage",
+      "call_state_percentage",
+      "plain"
+     ],
+     [
+      "calls_by_device_type",
+      "calls_by_device_type",
+      "plain"
+     ],
+     [
+      "handle",
+      "handle",
+      "plain"
+     ],
+     [
+      "long_duration_calls_percentage",
+      "long_duration_calls_percentage",
+      "plain"
+     ],
+     [
+      "potential_robocalls_percentage",
+      "potential_robocalls_percentage",
+      "plain"
+     ],
+     [
+      "short_duration_calls_percentage",
+      "short_duration_calls_percentage",
+      "plain"
+     ],
+     [
+      "silent_calls_percentage",
+      "silent_calls_percentage",
+      "plain"
+     ],
+     [
+      "total_calls",
+      "total_calls",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "insights",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "outbound",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListOutboundPhoneNumbersReport",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "reports",
+  "required" : [],
+  "url" : "https://insights.twilio.com/v2/Voice/Reports/PhoneNumbers/Outbound/id1"
+ }
+]

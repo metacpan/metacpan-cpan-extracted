@@ -2,7 +2,7 @@ use strict;
 use warnings;
 
 use Business::UDC::Tokenizer qw(tokenize);
-use Test::More 'tests' => 37;
+use Test::More 'tests' => 40;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -225,6 +225,78 @@ is_deeply(
 		},
 	],
 	'Tokenize nested parentheses in group (913((6-11)+(5-13)+(9-15))).',
+);
+
+# Test.
+$ret_ar = tokenize("32-051Bil'ak,V.");
+is_deeply(
+	$ret_ar,
+	[
+		{
+			'pos' => 0,
+			'type' => 'NUMBER',
+			'value' => '32',
+		},
+		{
+			'pos' => 2,
+			'type' => 'FORM',
+			'value' => '-051',
+		},
+		{
+			'pos' => 6,
+			'type' => 'ALPHA_SPEC',
+			'value' => "Bil'ak,V.",
+		},
+	],
+	"Tokenize alphabetical specification after form (32-051Bil'ak,V.).",
+);
+
+# Test.
+$ret_ar = tokenize("929 Cch'-si, J.");
+is_deeply(
+	$ret_ar,
+	[
+		{
+			'pos' => 0,
+			'type' => 'NUMBER',
+			'value' => '929',
+		},
+		{
+			'pos' => 3,
+			'type' => 'ALPHA_SPEC',
+			'value' => " Cch'-si, J.",
+		},
+	],
+	"Tokenize alphabetical specification with apostrophe (929 Cch'-si, J.).",
+);
+
+# Test.
+$ret_ar = tokenize('681.3 TI-59/TI-58(075)');
+is_deeply(
+	$ret_ar,
+	[
+		{
+			'pos' => 0,
+			'type' => 'NUMBER',
+			'value' => '681.3',
+		},
+		{
+			'pos' => 5,
+			'type' => 'ALPHA_SPEC',
+			'value' => ' TI-59/TI-58',
+		},
+		{
+			'pos' => 17,
+			'type' => 'AUX_GROUP',
+			'value' => '(075)',
+			'tokens' => [{
+				'pos' => 18,
+				'type' => 'NUMBER',
+				'value' => '075',
+			}],
+		},
+	],
+	'Tokenize alpha specification with slash (681.3 TI-59/TI-58(075)).',
 );
 
 # Test.

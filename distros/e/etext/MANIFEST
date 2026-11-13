@@ -56,5 +56,9 @@ t/demo-oplimits.t
 t/demo-table.t
 t/demo-ornaments.t
 t/display-random.t
+t/splitlines.t
+t/cutpaste.t
+t/level.t
+t/step.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

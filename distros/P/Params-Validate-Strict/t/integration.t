@@ -956,7 +956,7 @@ subtest 'Scalar::Util + type scalar: plain values have no ref type and are all a
 # Spy on the imported croak in Params::Validate::Strict to verify the exact
 # error path — the spy still calls the original so throws_ok still fires.
 subtest 'spy: croak called with must-be-a-scalar message when arrayref supplied' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	throws_ok {
 		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => [1, 2, 3] })
 	} qr/must be a scalar/;
@@ -970,7 +970,7 @@ subtest 'spy: croak called with must-be-a-scalar message when arrayref supplied'
 };
 
 subtest 'spy: croak called with HASH type name when hashref supplied' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	throws_ok {
 		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => {} })
 	} qr/must be a scalar/;
@@ -982,7 +982,7 @@ subtest 'spy: croak called with HASH type name when hashref supplied' => sub {
 };
 
 subtest 'spy: croak called with CODE type name when coderef supplied' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	throws_ok {
 		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => sub {} })
 	} qr/must be a scalar/;
@@ -993,7 +993,7 @@ subtest 'spy: croak called with CODE type name when coderef supplied' => sub {
 };
 
 subtest 'spy: croak not called when valid scalar supplied' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	lives_ok {
 		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => 'hello' })
 	} 'no croak for valid scalar';
@@ -1003,7 +1003,7 @@ subtest 'spy: croak not called when valid scalar supplied' => sub {
 };
 
 subtest 'spy: croak arguments include module name and line number' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	throws_ok {
 		validate_strict(schema => { x => { type => 'scalar' } }, input => { x => [] })
 	} qr/must be a scalar/;
@@ -1200,7 +1200,7 @@ subtest 'Scalar::Util + type scalarref: blessed scalar ref rejected with class n
 };
 
 subtest 'spy: croak called with must-be-a-scalar-reference message when plain scalar supplied' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	throws_ok {
 		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => 'hello' })
 	} qr/must be a scalar reference/;
@@ -1213,7 +1213,7 @@ subtest 'spy: croak called with must-be-a-scalar-reference message when plain sc
 };
 
 subtest 'spy: croak called with ARRAY type name when arrayref supplied to scalarref' => sub {
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	throws_ok {
 		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => [] })
 	} qr/must be a scalar reference/;
@@ -1226,7 +1226,7 @@ subtest 'spy: croak called with ARRAY type name when arrayref supplied to scalar
 
 subtest 'spy: croak not called when valid scalarref supplied' => sub {
 	my $s = 'ok';
-	my $spy = spy('Params::Validate::Strict::croak');
+	my $spy = spy('Carp::croak');
 	lives_ok {
 		validate_strict(schema => { x => { type => 'scalarref' } }, input => { x => \$s })
 	} 'no croak for valid scalarref';

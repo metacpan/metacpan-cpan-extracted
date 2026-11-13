@@ -1,0 +1,2333 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "author" : {
+      "a_author" : 1
+     },
+     "channelId" : "a_channelId",
+     "content" : {
+      "a_content" : 1
+     },
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "occurredAt" : "2026-01-01T03:04:05Z",
+     "recipients" : [
+      "a_recipients"
+     ],
+     "resourceId" : "a_resourceId",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "channel_id",
+      "channelId",
+      "plain"
+     ],
+     [
+      "content",
+      "content",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "occurred_at",
+      "occurredAt",
+      "date",
+      1767236645
+     ],
+     [
+      "recipients",
+      "recipients",
+      "plain"
+     ],
+     [
+      "resource_id",
+      "resourceId",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "author" : {
+    "v_author" : 1
+   },
+   "channelId" : "v_channelId",
+   "content" : {
+    "v_content" : 1
+   },
+   "occurredAt" : {
+    "epoch" : 1767236645
+   },
+   "recipients" : [
+    "v_recipients"
+   ],
+   "resourceId" : "v_resourceId"
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "communications",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateCommunicationInConversation",
+  "json" : {
+   "author" : {
+    "v_author" : 1
+   },
+   "channelId" : "v_channelId",
+   "content" : {
+    "v_content" : 1
+   },
+   "occurredAt" : "2026-01-01T03:04:05Z",
+   "recipients" : [
+    "v_recipients"
+   ],
+   "resourceId" : "v_resourceId"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Communications"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "related" : {
+      "a_related" : 1
+     },
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "channelSettings" : {
+    "v_channelSettings" : 1
+   },
+   "conversationGroupingType" : "GROUP_BY_PROFILE",
+   "conversationsV1Bridge" : {
+    "v_conversationsV1Bridge" : 1
+   },
+   "description" : "v_description",
+   "displayName" : "v_displayName",
+   "intelligenceConfigurationIds" : [
+    "v_intelligenceConfigurationIds"
+   ],
+   "memoryExtractionEnabled" : 1,
+   "memoryStoreId" : "v_memoryStoreId",
+   "statusCallbacks" : [
+    "v_statusCallbacks"
+   ]
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "configurations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json",
+   "Idempotency-Key" : "v_idempotency_key"
+  },
+  "http" : "POST",
+  "id" : "CreateConfiguration",
+  "json" : {
+   "channelSettings" : {
+    "v_channelSettings" : 1
+   },
+   "conversationGroupingType" : "GROUP_BY_PROFILE",
+   "conversationsV1Bridge" : {
+    "v_conversationsV1Bridge" : 1
+   },
+   "description" : "v_description",
+   "displayName" : "v_displayName",
+   "intelligenceConfigurationIds" : [
+    "v_intelligenceConfigurationIds"
+   ],
+   "memoryExtractionEnabled" : true,
+   "memoryStoreId" : "v_memoryStoreId",
+   "statusCallbacks" : [
+    "v_statusCallbacks"
+   ]
+  },
+  "method" : "create",
+  "options" : {
+   "idempotency_key" : "v_idempotency_key"
+  },
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Configurations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "completedAt" : "2026-01-19T03:04:05Z",
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "failureReason" : "a_failureReason",
+     "id" : "a_id",
+     "related" : {
+      "a_related" : 1
+     },
+     "status" : "COMPLETED",
+     "type" : "a_type",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "completed_at",
+      "completedAt",
+      "date",
+      1768791845
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "failure_reason",
+      "failureReason",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "actions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateConversationAction",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Actions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "actionId" : "a_actionId",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "configurationId" : "a_configurationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "metadata" : {
+      "a_metadata" : 1
+     },
+     "name" : "a_name",
+     "participants" : [
+      "a_participants"
+     ],
+     "status" : "INACTIVE",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "action_id",
+      "actionId",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "configuration_id",
+      "configurationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "metadata",
+      "metadata",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "participants",
+      "participants",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "configurationId" : "v_configurationId",
+   "metadata" : {
+    "v_metadata" : 1
+   },
+   "name" : "v_name",
+   "participants" : [
+    "v_participants"
+   ]
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "conversations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateConversationWithConfig",
+  "json" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "configurationId" : "v_configurationId",
+   "metadata" : {
+    "v_metadata" : 1
+   },
+   "name" : "v_name",
+   "participants" : [
+    "v_participants"
+   ]
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "addresses" : [
+      "a_addresses"
+     ],
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "name" : "a_name",
+     "profileId" : "a_profileId",
+     "type" : "HUMAN_AGENT",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "addresses",
+      "addresses",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "profile_id",
+      "profileId",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "addresses" : [
+    "v_addresses"
+   ],
+   "name" : "v_name",
+   "profileId" : "v_profileId",
+   "type" : "HUMAN_AGENT"
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "participants",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateParticipantInConversation",
+  "json" : {
+   "addresses" : [
+    "v_addresses"
+   ],
+   "name" : "v_name",
+   "profileId" : "v_profileId",
+   "type" : "HUMAN_AGENT"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Participants"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "related" : {
+      "a_related" : 1
+     },
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "configurations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Idempotency-Key" : "v_idempotency_key"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteConfiguration",
+  "method" : "delete",
+  "options" : {
+   "idempotency_key" : "v_idempotency_key"
+  },
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Configurations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "related" : {
+      "a_related" : 1
+     },
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "conversations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Idempotency-Key" : "v_idempotency_key"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteConversationAsync",
+  "method" : "delete",
+  "options" : {
+   "idempotency_key" : "v_idempotency_key"
+  },
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "author" : {
+      "a_author" : 1
+     },
+     "channelId" : "a_channelId",
+     "content" : {
+      "a_content" : 1
+     },
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "occurredAt" : "2026-01-01T03:04:05Z",
+     "recipients" : [
+      "a_recipients"
+     ],
+     "resourceId" : "a_resourceId",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "channel_id",
+      "channelId",
+      "plain"
+     ],
+     [
+      "content",
+      "content",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "occurred_at",
+      "occurredAt",
+      "date",
+      1767236645
+     ],
+     [
+      "recipients",
+      "recipients",
+      "plain"
+     ],
+     [
+      "resource_id",
+      "resourceId",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "communications",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCommunication",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Communications/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channelSettings" : {
+      "a_channelSettings" : 1
+     },
+     "conversationGroupingType" : "GROUP_BY_PROFILE",
+     "conversationsV1Bridge" : {
+      "a_conversationsV1Bridge" : 1
+     },
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "description" : "a_description",
+     "displayName" : "a_displayName",
+     "id" : "a_id",
+     "intelligenceConfigurationIds" : [
+      "a_intelligenceConfigurationIds"
+     ],
+     "memoryExtractionEnabled" : true,
+     "memoryStoreId" : "a_memoryStoreId",
+     "observationExtractionStrategyIds" : [
+      "a_observationExtractionStrategyIds"
+     ],
+     "redactionConfigurationId" : "a_redactionConfigurationId",
+     "statusCallbacks" : [
+      "a_statusCallbacks"
+     ],
+     "traitExtractionStrategyIds" : [
+      "a_traitExtractionStrategyIds"
+     ],
+     "updatedAt" : "2026-01-01T03:04:05Z",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "channel_settings",
+      "channelSettings",
+      "plain"
+     ],
+     [
+      "conversation_grouping_type",
+      "conversationGroupingType",
+      "plain"
+     ],
+     [
+      "conversations_v1_bridge",
+      "conversationsV1Bridge",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "display_name",
+      "displayName",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "intelligence_configuration_ids",
+      "intelligenceConfigurationIds",
+      "plain"
+     ],
+     [
+      "memory_extraction_enabled",
+      "memoryExtractionEnabled",
+      "plain"
+     ],
+     [
+      "memory_store_id",
+      "memoryStoreId",
+      "plain"
+     ],
+     [
+      "observation_extraction_strategy_ids",
+      "observationExtractionStrategyIds",
+      "plain"
+     ],
+     [
+      "redaction_configuration_id",
+      "redactionConfigurationId",
+      "plain"
+     ],
+     [
+      "status_callbacks",
+      "statusCallbacks",
+      "plain"
+     ],
+     [
+      "trait_extraction_strategy_ids",
+      "traitExtractionStrategyIds",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "configurations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchConfiguration",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Configurations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "actionId" : "a_actionId",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "configurationId" : "a_configurationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "metadata" : {
+      "a_metadata" : 1
+     },
+     "name" : "a_name",
+     "participants" : [
+      "a_participants"
+     ],
+     "status" : "INACTIVE",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "action_id",
+      "actionId",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "configuration_id",
+      "configurationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "metadata",
+      "metadata",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "participants",
+      "participants",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "conversations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchConversation",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "completedAt" : "2026-01-19T03:04:05Z",
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "failureReason" : "a_failureReason",
+     "id" : "a_id",
+     "related" : {
+      "a_related" : 1
+     },
+     "status" : "COMPLETED",
+     "type" : "a_type",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "completed_at",
+      "completedAt",
+      "date",
+      1768791845
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "failure_reason",
+      "failureReason",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "actions",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchConversationAction",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Actions/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "completedAt" : "2026-01-19T03:04:05Z",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "error" : {
+      "a_error" : 1
+     },
+     "operationId" : "a_operationId",
+     "related" : {
+      "a_related" : 1
+     },
+     "status" : "COMPLETED",
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "completed_at",
+      "completedAt",
+      "date",
+      1768791845
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "error",
+      "error",
+      "plain"
+     ],
+     [
+      "operation_id",
+      "operationId",
+      "plain"
+     ],
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchOperationStatus",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Operations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "addresses" : [
+      "a_addresses"
+     ],
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "name" : "a_name",
+     "profileId" : "a_profileId",
+     "type" : "HUMAN_AGENT",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "addresses",
+      "addresses",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "profile_id",
+      "profileId",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "participants",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchParticipant",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Participants/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "communications" : [
+      {
+       "accountId" : "a_accountId",
+       "author" : {
+        "a_author" : 1
+       },
+       "channelId" : "a_channelId",
+       "content" : {
+        "a_content" : 1
+       },
+       "conversationId" : "a_conversationId",
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "id" : "a_id",
+       "occurredAt" : "2026-01-01T03:04:05Z",
+       "recipients" : [
+        "a_recipients"
+       ],
+       "resourceId" : "a_resourceId",
+       "updatedAt" : "2026-01-01T03:04:05Z"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "author",
+      "author",
+      "plain"
+     ],
+     [
+      "channel_id",
+      "channelId",
+      "plain"
+     ],
+     [
+      "content",
+      "content",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "occurred_at",
+      "occurredAt",
+      "date",
+      1767236645
+     ],
+     [
+      "recipients",
+      "recipients",
+      "plain"
+     ],
+     [
+      "resource_id",
+      "resourceId",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "communications",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "channelId",
+    "v_channel_id"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListCommunicationByConversation",
+  "method" : "page",
+  "options" : {
+   "channel_id" : "v_channel_id"
+  },
+  "records_key" : "communications",
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Communications"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "configurations" : [
+      {
+       "channelSettings" : {
+        "a_channelSettings" : 1
+       },
+       "conversationGroupingType" : "GROUP_BY_PROFILE",
+       "conversationsV1Bridge" : {
+        "a_conversationsV1Bridge" : 1
+       },
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "description" : "a_description",
+       "displayName" : "a_displayName",
+       "id" : "a_id",
+       "intelligenceConfigurationIds" : [
+        "a_intelligenceConfigurationIds"
+       ],
+       "memoryExtractionEnabled" : true,
+       "memoryStoreId" : "a_memoryStoreId",
+       "observationExtractionStrategyIds" : [
+        "a_observationExtractionStrategyIds"
+       ],
+       "redactionConfigurationId" : "a_redactionConfigurationId",
+       "statusCallbacks" : [
+        "a_statusCallbacks"
+       ],
+       "traitExtractionStrategyIds" : [
+        "a_traitExtractionStrategyIds"
+       ],
+       "updatedAt" : "2026-01-01T03:04:05Z",
+       "version" : 774
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "channel_settings",
+      "channelSettings",
+      "plain"
+     ],
+     [
+      "conversation_grouping_type",
+      "conversationGroupingType",
+      "plain"
+     ],
+     [
+      "conversations_v1_bridge",
+      "conversationsV1Bridge",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "display_name",
+      "displayName",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "intelligence_configuration_ids",
+      "intelligenceConfigurationIds",
+      "plain"
+     ],
+     [
+      "memory_extraction_enabled",
+      "memoryExtractionEnabled",
+      "plain"
+     ],
+     [
+      "memory_store_id",
+      "memoryStoreId",
+      "plain"
+     ],
+     [
+      "observation_extraction_strategy_ids",
+      "observationExtractionStrategyIds",
+      "plain"
+     ],
+     [
+      "redaction_configuration_id",
+      "redactionConfigurationId",
+      "plain"
+     ],
+     [
+      "status_callbacks",
+      "statusCallbacks",
+      "plain"
+     ],
+     [
+      "trait_extraction_strategy_ids",
+      "traitExtractionStrategyIds",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "configurations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "memoryStoreId",
+    "v_memory_store_id"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListConfiguration",
+  "method" : "page",
+  "options" : {
+   "memory_store_id" : "v_memory_store_id"
+  },
+  "records_key" : "configurations",
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Configurations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "conversations" : [
+      {
+       "accountId" : "a_accountId",
+       "actionId" : "a_actionId",
+       "configuration" : {
+        "a_configuration" : 1
+       },
+       "configurationId" : "a_configurationId",
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "id" : "a_id",
+       "metadata" : {
+        "a_metadata" : 1
+       },
+       "name" : "a_name",
+       "participants" : [
+        "a_participants"
+       ],
+       "status" : "INACTIVE",
+       "updatedAt" : "2026-01-01T03:04:05Z"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "action_id",
+      "actionId",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "configuration_id",
+      "configurationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "metadata",
+      "metadata",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "participants",
+      "participants",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "conversations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "status",
+    "v_status_1"
+   ],
+   [
+    "status",
+    "v_status_2"
+   ],
+   [
+    "channelId",
+    "v_channel_id"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListConversationByAccount",
+  "method" : "page",
+  "options" : {
+   "channel_id" : "v_channel_id",
+   "status" : [
+    "v_status_1",
+    "v_status_2"
+   ]
+  },
+  "records_key" : "conversations",
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "participants" : [
+      {
+       "accountId" : "a_accountId",
+       "addresses" : [
+        "a_addresses"
+       ],
+       "conversationId" : "a_conversationId",
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "id" : "a_id",
+       "name" : "a_name",
+       "profileId" : "a_profileId",
+       "type" : "HUMAN_AGENT",
+       "updatedAt" : "2026-01-01T03:04:05Z"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "addresses",
+      "addresses",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "profile_id",
+      "profileId",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "participants",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListParticipantByConversation",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "participants",
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Participants"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "related" : {
+      "a_related" : 1
+     },
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "channelSettings" : {
+    "v_channelSettings" : 1
+   },
+   "conversationGroupingType" : "GROUP_BY_PROFILE",
+   "conversationsV1Bridge" : {
+    "v_conversationsV1Bridge" : 1
+   },
+   "description" : "v_description",
+   "displayName" : "v_displayName",
+   "intelligenceConfigurationIds" : [
+    "v_intelligenceConfigurationIds"
+   ],
+   "memoryExtractionEnabled" : 1,
+   "memoryStoreId" : "v_memoryStoreId",
+   "statusCallbacks" : [
+    "v_statusCallbacks"
+   ]
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "configurations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json",
+   "Idempotency-Key" : "v_idempotency_key"
+  },
+  "http" : "PATCH",
+  "id" : "PatchConfiguration",
+  "json" : {
+   "channelSettings" : {
+    "v_channelSettings" : 1
+   },
+   "conversationGroupingType" : "GROUP_BY_PROFILE",
+   "conversationsV1Bridge" : {
+    "v_conversationsV1Bridge" : 1
+   },
+   "description" : "v_description",
+   "displayName" : "v_displayName",
+   "intelligenceConfigurationIds" : [
+    "v_intelligenceConfigurationIds"
+   ],
+   "memoryExtractionEnabled" : true,
+   "memoryStoreId" : "v_memoryStoreId",
+   "statusCallbacks" : [
+    "v_statusCallbacks"
+   ]
+  },
+  "method" : "patch",
+  "options" : {
+   "idempotency_key" : "v_idempotency_key"
+  },
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Configurations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "actionId" : "a_actionId",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "configurationId" : "a_configurationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "metadata" : {
+      "a_metadata" : 1
+     },
+     "name" : "a_name",
+     "participants" : [
+      "a_participants"
+     ],
+     "status" : "INACTIVE",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "action_id",
+      "actionId",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "configuration_id",
+      "configurationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "metadata",
+      "metadata",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "participants",
+      "participants",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "metadata" : {
+    "v_metadata" : 1
+   },
+   "name" : "v_name",
+   "status" : "INACTIVE"
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "conversations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PATCH",
+  "id" : "PatchConversationById",
+  "json" : {
+   "configuration" : {
+    "v_configuration" : 1
+   },
+   "metadata" : {
+    "v_metadata" : 1
+   },
+   "name" : "v_name",
+   "status" : "INACTIVE"
+  },
+  "method" : "patch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "related" : {
+      "a_related" : 1
+     },
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "related",
+      "related",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "channelSettings" : {
+    "v_channelSettings" : 1
+   },
+   "conversationGroupingType" : "GROUP_BY_PROFILE",
+   "conversationsV1Bridge" : {
+    "v_conversationsV1Bridge" : 1
+   },
+   "description" : "v_description",
+   "displayName" : "v_displayName",
+   "intelligenceConfigurationIds" : [
+    "v_intelligenceConfigurationIds"
+   ],
+   "memoryExtractionEnabled" : 1,
+   "memoryStoreId" : "v_memoryStoreId",
+   "statusCallbacks" : [
+    "v_statusCallbacks"
+   ]
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "configurations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json",
+   "Idempotency-Key" : "v_idempotency_key"
+  },
+  "http" : "PUT",
+  "id" : "UpdateConfiguration",
+  "json" : {
+   "channelSettings" : {
+    "v_channelSettings" : 1
+   },
+   "conversationGroupingType" : "GROUP_BY_PROFILE",
+   "conversationsV1Bridge" : {
+    "v_conversationsV1Bridge" : 1
+   },
+   "description" : "v_description",
+   "displayName" : "v_displayName",
+   "intelligenceConfigurationIds" : [
+    "v_intelligenceConfigurationIds"
+   ],
+   "memoryExtractionEnabled" : true,
+   "memoryStoreId" : "v_memoryStoreId",
+   "statusCallbacks" : [
+    "v_statusCallbacks"
+   ]
+  },
+  "method" : "update",
+  "options" : {
+   "idempotency_key" : "v_idempotency_key"
+  },
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/ControlPlane/Configurations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "actionId" : "a_actionId",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "configurationId" : "a_configurationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "metadata" : {
+      "a_metadata" : 1
+     },
+     "name" : "a_name",
+     "participants" : [
+      "a_participants"
+     ],
+     "status" : "INACTIVE",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "action_id",
+      "actionId",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "configuration_id",
+      "configurationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "metadata",
+      "metadata",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "participants",
+      "participants",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "metadata" : {
+    "v_metadata" : 1
+   },
+   "name" : "v_name",
+   "status" : "INACTIVE"
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "conversations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PUT",
+  "id" : "UpdateConversationById",
+  "json" : {
+   "metadata" : {
+    "v_metadata" : 1
+   },
+   "name" : "v_name",
+   "status" : "INACTIVE"
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountId" : "a_accountId",
+     "addresses" : [
+      "a_addresses"
+     ],
+     "conversationId" : "a_conversationId",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "id" : "a_id",
+     "name" : "a_name",
+     "profileId" : "a_profileId",
+     "type" : "HUMAN_AGENT",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_id",
+      "accountId",
+      "plain"
+     ],
+     [
+      "addresses",
+      "addresses",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversationId",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "profile_id",
+      "profileId",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "addresses" : [
+    "v_addresses"
+   ],
+   "name" : "v_name",
+   "profileId" : "v_profileId",
+   "type" : "HUMAN_AGENT"
+  },
+  "chain" : [
+   [
+    "conversations",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "participants",
+    2
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PUT",
+  "id" : "UpdateParticipantInConversation",
+  "json" : {
+   "addresses" : [
+    "v_addresses"
+   ],
+   "name" : "v_name",
+   "profileId" : "v_profileId",
+   "type" : "HUMAN_AGENT"
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://conversations.twilio.com/v2/Conversations/id1/Participants/id2"
+ }
+]

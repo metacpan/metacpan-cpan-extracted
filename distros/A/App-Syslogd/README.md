@@ -4,7 +4,7 @@ App::Syslogd - A small UDP syslog receiver that writes a CSV file
 
 ## Version
 
-Version 0.002.0
+Version 0.002.1
 
 ## Synopsis
 
@@ -419,14 +419,132 @@ Monit's UDP port test is not used: syslog never answers, so a port test
 cannot show that messages are being recorded.  The timestamp check does:
 change `1 hour` to suit how often your hosts send messages.
 
+## Cookbook
+
+### Look at the Log With Database::BI
+
+[Database::BI](https://metacpan.org/pod/Database%3A%3ABI) is a separate program (install it from CPAN) that shows a
+data file as a table in your web browser.  You can sort, filter and count the
+rows without writing any code.  It reads the file again for every page, so
+it always shows the messages that have arrived so far, and the two programs
+do not need to know about each other.
+
+The log has four columns: `Host`, `facility`, `severity` and `msg`.
+`facility` and `severity` are numbers; see ["What syslog is"](#what-syslog-is).  These
+severity numbers are the ones you will use most:
+
+```
+    0 emergency   1 alert   2 critical   3 error
+    4 warning     5 notice  6 info       7 debug
+```
+
+The examples below use the web addresses that Database::BI shows in its
+browser.  Replace `syslog` in each address with the name of your log file
+without `.csv`.  Database::BI names a table after its file, so
+`/var/log/syslog/syslog.csv` is the table `syslog`, and `remote.csv`
+would be the table `remote`.  The file name must be in lower case
+(`remote.csv`, not `Remote.csv`), because Database::BI looks the table up
+in lower case.
+
+#### Recipe 1: Show the Log
+
+Create `database_bi.conf` in the folder that holds Database::BI's
+`script/` directory.  Point `data_dir` at the directory that holds the log:
+
+```perl
+    { data_dir => '/var/log/syslog' }
+```
+
+Start Database::BI as the same user that runs the syslog server, then open
+`http://127.0.0.1:3000/view/syslog` in a browser:
+
+```
+    script/database-bi
+```
+
+The same user is needed because the server keeps the log private (mode
+0600): nobody else can read it.  Do not make the log readable by everyone
+to get around this; it holds other machines' messages.  Database::BI
+listens on this machine only until you change its `listen` setting, and it
+will not listen on other machines unless you also set a password (see its
+manual).  Keep it that way unless you have a reason not to.
+
+#### Recipe 2: Which Machine Sends the Most Messages?
+
+Open this address.  It counts the messages from each host and adds a total:
+
+```
+    http://127.0.0.1:3000/pivot?l=table:syslog&rows=Host&m=msg:count:messages&totals=1
+```
+
+To count by how serious the messages are, use `rows=severity`.  To see
+hosts and severities together, use `rows=Host,severity`.
+
+#### Recipe 3: Show Only the Serious Messages
+
+A filter is written `f=column:operator:value`.  Severity 3 (error) and
+below are the serious ones, so keep every row whose severity is at most 3:
+
+```
+    http://127.0.0.1:3000/view/syslog?f=severity:le:3
+```
+
+The same filter also works on a pivot, so you can count only the serious
+messages by host:
+
+```
+    http://127.0.0.1:3000/pivot?l=table:syslog&rows=Host&m=msg:count:errors&f=severity:le:3
+```
+
+#### Recipe 4: Find a Word From One Machine
+
+Give `f=` more than once to apply every condition.  This keeps the rows
+from host 192.0.2.1 whose message contains "disk":
+
+```
+    http://127.0.0.1:3000/view/syslog?f=Host:eq:192.0.2.1&f=msg:contains:disk
+```
+
+If the server runs with `--no-resolve`, `Host` holds an address, as above.
+Otherwise it holds the host name, so use that name in the filter.
+
+#### Recipe 5: Summarise Every Column
+
+This shows one row for each column: how many rows, how many different
+values, and the first and last value.  It is a quick way to see which
+severities occur at all:
+
+```
+    http://127.0.0.1:3000/stats?l=table:syslog
+```
+
+#### Recipe 6: Log Rotation
+
+You do not need to change anything.  The syslog server reopens the log on
+SIGHUP (see ["Log rotation"](#log-rotation)), and Database::BI reads whatever file has the
+name at the time of each request.  Right after a rotation the new file holds
+only the header line, so the table is empty until a message arrives.
+
+A rotated copy has a different name, such as `remote.csv.1`, which
+Database::BI does not recognise.  To look at it, make an uncompressed copy
+whose name ends in `.csv` in a directory that Database::BI reads.
+
+#### What This Cannot Do
+
+The log has no time column: the server does not write the time a message
+arrived, so Database::BI cannot draw a graph over time or limit the rows to
+"the last hour".  Use the order of the rows, which is the order of arrival,
+or add a time stamp at the sender if you need one.
+
 ## Dependencies
 
 Perl 5.14 or later, and these modules: [autodie](https://metacpan.org/pod/autodie) (which needs
-[IPC::System::Simple](https://metacpan.org/pod/IPC%3A%3ASystem%3A%3ASimple)), [IO::Socket::IP](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AIP), [Locale::Maketext](https://metacpan.org/pod/Locale%3A%3AMaketext),
-[Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure), [Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict),
-[Readonly](https://metacpan.org/pod/Readonly), [Socket](https://metacpan.org/pod/Socket),
-[Sub::Private](https://metacpan.org/pod/Sub%3A%3APrivate), [Sub::Protected](https://metacpan.org/pod/Sub%3A%3AProtected) and [Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV).  `Makefile.PL` lists
-the minimum versions.
+[IPC::System::Simple](https://metacpan.org/pod/IPC%3A%3ASystem%3A%3ASimple)), [Carp](https://metacpan.org/pod/Carp), [Config](https://metacpan.org/pod/Config), [Fcntl](https://metacpan.org/pod/Fcntl), [IO::Handle](https://metacpan.org/pod/IO%3A%3AHandle),
+[IO::Socket::IP](https://metacpan.org/pod/IO%3A%3ASocket%3A%3AIP), [Locale::Maketext](https://metacpan.org/pod/Locale%3A%3AMaketext), [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure), [overload](https://metacpan.org/pod/overload),
+[parent](https://metacpan.org/pod/parent), [Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict), [Readonly](https://metacpan.org/pod/Readonly),
+[Socket](https://metacpan.org/pod/Socket), [Sub::Private](https://metacpan.org/pod/Sub%3A%3APrivate), [Sub::Protected](https://metacpan.org/pod/Sub%3A%3AProtected) and [Text::CSV](https://metacpan.org/pod/Text%3A%3ACSV).  The
+program `etc/syslogd` also uses [FindBin](https://metacpan.org/pod/FindBin) and [Getopt::Long](https://metacpan.org/pod/Getopt%3A%3ALong).  Most of
+these come with Perl.  `Makefile.PL` lists the minimum versions.
 
 ## Files
 
@@ -951,7 +1069,16 @@ Usage:
     |   ERROR                       |   file.  ERROR is the system's |   its permissions.  Remove a  |
     |                               |   reason.  A symbolic link, a  |   symbolic link or FIFO; give |
     |                               |   directory or a FIFO (named   |   a file name, not a          |
-    |                               |   pipe) also gives this        |   directory                   |
+    |                               |   pipe) also gives this        |   directory.  Give a regular  |
+    |                               |   message.  So does a device   |   file for a device           |
+    |                               |   file such as /dev/urandom    |                               |
+    |                               |   when the system will not     |                               |
+    |                               |   open it for writing (an      |                               |
+    |                               |   ordinary user may not; on    |                               |
+    |                               |   FreeBSD it is a symbolic     |                               |
+    |                               |   link).  Otherwise a device   |                               |
+    |                               |   gets the "Refusing" message  |                               |
+    |                               |   below                        |                               |
     | Refusing to log to F: it must | F is a hard link or another    | Remove F and let the server   |
     |   be a regular file, owned by |   user's file                  |   create it again             |
     |   this user, with exactly one |                                |                               |

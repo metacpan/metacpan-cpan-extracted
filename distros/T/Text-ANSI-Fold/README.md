@@ -5,7 +5,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 # VERSION
 
-Version 2.3305
+Version 2.3901
 
 # SYNOPSIS
 
@@ -45,10 +45,23 @@ OSC 8 hyperlink sequences are also handled properly.  If the text is
 divided in the middle of a hyperlink, the link is closed at the end of
 the former text and reopened at the beginning of the latter string.
 
+Other control sequences (CSI), such as cursor movement, are passed
+through with no width.  The movement of the cursor is not taken into
+account: text written over by moving the cursor back is counted as
+it is.
+
+At the folding point, a sequence goes to the next line with the text
+after it.  When no visible text follows up to the end of the line, it
+stays on the line, even if the line has no room left.
+
 This module also support Unicode Asian full-width and non-spacing
-combining characters properly.  Japanese text formatting with
-head-or-end of line prohibition character is also supported.  Set
-the linebreak mode to enable it.
+combining characters properly.  Text is divided between grapheme
+clusters, so that a character with combining marks or an emoji
+sequence stays in one line, as far as the grapheme rules of the perl
+in use go; before perl 5.22, a grapheme in a long paragraph may
+rarely be split.  Japanese text formatting with head-or-end of line
+prohibition character is also supported.  Set the linebreak mode to
+enable it.
 
 Since the overhead of ANSI escape sequence handling is not significant
 when the data does not include them, this module can be used for
@@ -93,6 +106,12 @@ using default width with additional parameter:
 
 Some other easy-to-use interfaces are provided by sister module
 [Text::ANSI::Fold::Util](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AFold%3A%3AUtil).
+
+# REGULAR EXPRESSIONS
+
+Import-tag `:regex` gives the regular expressions `$reset_re`,
+`$color_re`, `$erase_re`, `$csi_re` and `$osc_re`, which match the
+ANSI sequences this module recognizes.
 
 # OBJECT INTERFACE
 
@@ -194,6 +213,15 @@ The padding operation is performed only on the last non-empty element,
 and no elements corresponding to subsequent items are returned.  Also,
 of course, padding is not performed for negative widths.
 
+## **chops** with length
+
+Give an array reference by `length` parameter, and it is set to the
+visual width of each element returned (not the number of characters).
+It is the width that the fold counted, so the strings need not be
+measured again.  The padding is not included.
+
+    my @list = $fold->text($text)->chops(length => \my @length);
+
 # OPTIONS
 
 Option parameter can be specified as name-value list for **ansi\_fold**
@@ -257,7 +285,24 @@ function as well as **new** and **configure** method.
 
     The **fold** function does not complain if the result of adding a
     prefix string is longer than the original text.  The caller must be
-    very careful because of the possibility of an infinite loop.
+    very careful because of the possibility of an infinite loop, when the
+    prefix is as wide as the width or longer, or given by a subroutine.
+
+    A line has at least one character after the prefix, even if it does
+    not fit.  A wide character after the prefix may make the line one
+    column longer than the width.
+
+- **trim** => _bool_
+
+    If **trim** option is given with true value, spaces at the end of a
+    folded line are removed, including those brought there by the run-in
+    operation, so that they do not make the line longer than the width.
+    Only ASCII spaces are removed; other spaces, such as full-width spaces
+    and the no-break space that **splitwide** uses, are kept.  Default is 0.
+
+    Spaces at the end of the original line are left as they are, because
+    the line is not folded there.  Colored spaces are also left, because
+    their background color may be visible.
 
 - **ambiguous** => `narrow` or `wide`
 
@@ -444,6 +489,10 @@ These characters are handled as follows:
     returned.  If it is found at the beginning of a string, it is added to
     the folded text and processing continues.
 
+    The beginning is where no text is before it: a form feed after
+    nothing but ANSI sequences, as in a form feed with a color, is at the
+    beginning, and is kept in the place where it is.
+
 # OSC 8 HYPERLINKS
 
 This module handles OSC 8 hyperlink sequences.  The OSC (Operating
@@ -519,7 +568,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright ©︎ 2018-2025 Kazumasa Utashiro.
+Copyright ©︎ 2018-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

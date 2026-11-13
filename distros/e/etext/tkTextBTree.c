@@ -6136,6 +6136,11 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
     int firstLeaf;			/* Whether the leaf reached is the
 					 * block's first, listed from its
 					 * start. */
+    int sepValues = 0;			/* Whether the separators carry the
+					 * values of what they begin
+					 * (TKT_GET_SEPVALUES, and the block
+					 * is not listed whole: then its
+					 * header has the values). */
 
     if (!(flags & (TKT_GET_DSTRING | TKT_GET_LIST)) && *offsetPtr <= 0) {
       return res;
@@ -6169,6 +6174,8 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
     if (start < 0) {
       start = 0;
     }
+    sepValues = (flags & TKT_GET_LIST) && (flags & TKT_GET_SEPVALUES)
+	    && !(flags & TKT_GET_NOVALUES) && !((start == 0) && doend);
     if (flags & TKT_GET_LIST && (start == 0 || doend)) {
         /* The requested interval touches start or end of the
 	 * chunk. */
@@ -6280,6 +6287,38 @@ TkIBTreeTextAppend(textPtr, segPtr, start, end, targetPtr, flags, offsetPtr)
 			level++;
 		    }
 		}
+		/*
+		 * With the values (TKT_GET_SEPVALUES): [level, defect, the
+		 * value of the leaf that begins here, the values of the real
+		 * nodes that begin here, from the lowest up].  The nodes
+		 * that begin with the leaf after a separator of stored depth
+		 * "level" are its ancestors of levels 0 to level - 1, of
+		 * which "defect" are padding.
+		 */
+		if (sepValues && (TkBTreeNextLine(linePtr) != NULL)
+			&& !IsLastLine(TkBTreeNextLine(linePtr))) {
+		    TkTextLine *afterPtr = TkBTreeNextLine(linePtr);
+		    int defect = LineDefect(afterPtr), k;
+		    ListFactory *pairPtr = ListFactoryNewLevelWithType(lfPtr,
+			    IdType("|", "Tk::Text::BlockSeparator"));
+
+		    LangSetInt(&arg, level);
+		    ListFactoryAppendCopy(pairPtr, arg);
+		    LangSetInt(&arg, defect);
+		    ListFactoryAppendCopy(pairPtr, arg);
+		    ListFactoryAppendPure(pairPtr,
+			    TkTextDataLangSV(afterPtr->value));
+		    for (k = 1; k <= level - defect; k++) {
+			Node *realPtr = RealAncestor(afterPtr, k);
+
+			if (realPtr == NULL) {
+			    break;
+			}
+			ListFactoryAppendPure(pairPtr,
+				TkTextDataLangSV(realPtr->value));
+		    }
+		    lfPtr = ListFactoryEndLevel(pairPtr);
+		} else
 		/*
 		 * Before a padded leaf, the pair [level, defect] (its
 		 * defect: the number of padding nodes directly above it).
@@ -7031,6 +7070,142 @@ TkIBTreeSetSeparatorLevels(textPtr, indexPtr, levels, num, defects,
 /*
  *------------------------------------------------------------------
  *
+ * TkIBTreeSeparatorLevel --
+ *
+ *      "block level index ?level?": the depth of the separator at an
+ *      index (as "block list" shows it: the level of the lowest node
+ *      that holds the leaves on both sides), and its change, which
+ *      moves no text and keeps the values: raising it cuts the nodes
+ *      that hold both leaves, from the lowest up to the depth asked
+ *      for, as "block split" at that depth would have cut them (the
+ *      part before the cut keeps the node's value, the part after it
+ *      starts without one; where the tree has too few levels, nodes are
+ *      inserted below the root first, see TkIBTreeDeepen); lowering it
+ *      joins, on each level down to the depth asked for, the node that
+ *      ends before the separator with the one that begins after it, as
+ *      the deletion of a separator joins them (the joined node keeps
+ *      the start side's value if it has one, else takes the end
+ *      side's, see MergeValues).  A lowering never joins padding: both
+ *      leaves must have nodes of their own down to the depth asked for
+ *      (see "Ragged trees"), else it is refused.
+ *
+ * Results:
+ *      A standard Tcl result (a message is left in the interpreter if
+ *      indexString is not NULL).  *oldPtr is the depth before; *addedPtr
+ *      the number of levels added above the root.
+ *
+ * Side effects:
+ *      The tree of the block may change.  With "tell", -valuecommand is
+ *      told the nodes a raise makes ("new"); it is always told what a
+ *      lowering does to the values (VcJoinNodes).
+ *
+ *------------------------------------------------------------------
+ */
+
+static void             VcNewAtHead _ANSI_ARGS_((TkText *textPtr,
+			    TkTextSegment *segPtr, int level));
+
+int
+TkIBTreeSeparatorLevel(textPtr, indexPtr, indexString, set, level, tell,
+	oldPtr, addedPtr)
+    TkText *textPtr;			/* The widget. */
+    TkTextIndex *indexPtr;		/* The separator (outermost tree). */
+    char *indexString;			/* As given, for error messages; NULL
+					 * for none. */
+    int set;				/* Whether to change the depth. */
+    int level;				/* The new depth. */
+    int tell;				/* Whether "new" is told. */
+    int *oldPtr;			/* Filled with the depth before. */
+    int *addedPtr;			/* Filled with the levels added
+					 * above the root. */
+{
+    TkTextIndex intIndex;
+    TkTextLine *linePtr, *nextPtr = NULL;
+    TkTextSegment *segPtr;
+    BTree *treePtr;
+    int cur = -1, da, db, lev, line, byteIndex;
+    char buffer[TCL_INTEGER_SPACE * 2];
+
+    *oldPtr = -1;
+    *addedPtr = 0;
+    TkTextIndexToInternalSeg(indexPtr, &intIndex, NULL);
+    linePtr = intIndex.linePtr;
+    segPtr = linePtr->parentPtr->segPtr;
+    if ((segPtr != NULL) && !IsLastLine(linePtr)
+	    && (intIndex.byteIndex == TkBTreeCharsInLine(linePtr) - 1)) {
+	cur = SeparatorLevel(linePtr, &nextPtr);
+    }
+    if (cur < 0) {
+	if (indexString != NULL) {
+	    Tcl_AppendResult(textPtr->interp, "bad index \"", indexString,
+		    "\": no separator of a block there", NULL);
+	}
+	return TCL_ERROR;
+    }
+    *oldPtr = cur;
+    if (!set || (level == cur)) {
+	return TCL_OK;
+    }
+    treePtr = (BTree *) segPtr->body.itree.tree;
+    da = LineDefect(linePtr);
+    db = LineDefect(nextPtr);
+    if (level < 0) {
+	if (indexString != NULL) {
+	    sprintf(buffer, "%d", level);
+	    Tcl_AppendResult(textPtr->interp, "bad level \"", buffer,
+		    "\": must not be negative", NULL);
+	}
+	return TCL_ERROR;
+    }
+    if ((level < cur) && (level < ((da > db) ? da : db))) {
+	if (indexString != NULL) {
+	    sprintf(buffer, "%d", level);
+	    Tcl_AppendResult(textPtr->interp, "bad level \"", buffer,
+		    "\": a leaf beside the separator at ", indexString,
+		    " has no node of its own below level ", NULL);
+	    sprintf(buffer, "%d", (da > db) ? da : db);
+	    Tcl_AppendResult(textPtr->interp, buffer,
+		    " (block sprout gives it one)", NULL);
+	}
+	return TCL_ERROR;
+    }
+    if (level > cur) {
+	int rootLevel = treePtr->rootPtr->level;
+
+	if (tell && TkTextVcNewOn(textPtr)) {
+	    /*
+	     * As for "block split" (TkBTreeVcNewSplit): the nodes
+	     * inserted below the root, then the second halves of the
+	     * nodes cut, whose first leaf is the one after the
+	     * separator.
+	     */
+
+	    int dF = LineDefect(TkBTreeFindLine((TkTextBTree) treePtr, 0));
+
+	    for (lev = rootLevel; lev < level; lev++) {
+		VcNewAtHead(textPtr, segPtr, lev - dF + 1);
+	    }
+	    LineStart(textPtr, nextPtr, &line, &byteIndex);
+	    for (lev = cur; lev < level; lev++) {
+		TkTextVcNew(textPtr, TkTextVcCharPlace(textPtr, line,
+			byteIndex, 0, lev - db + 1));
+	    }
+	}
+	if (level > rootLevel) {
+	    *addedPtr = level - rootLevel;
+	    TkIBTreeDeepen(segPtr, level);
+	}
+    }
+    SetSeparatorLevel(textPtr, linePtr, level);
+    if (tkBTreeDebug) {
+	TkBTreeCheck((TkTextBTree) treePtr);
+    }
+    return TCL_OK;
+}
+
+/*
+ *------------------------------------------------------------------
+ *
  * NodePrint
  * 	Given an node and an array of pointers, calls the
  * report procedure on the lines in the node, grouping the results
@@ -7411,6 +7586,142 @@ TkIBTreePrint(segPtr, listFactoryPtr, linePtrs)
       listFactoryPtr = ListFactoryEndLevel(listFactoryPtr);
     }
   }
+}
+
+/*
+ *------------------------------------------------------------------
+ *
+ * TkIBTreeLeafSplit, TkIBTreeStackChain --
+ *
+ *	What the display shows of the structure hidden in a stack of
+ *	leaves: leaves that the core lays out one under another (the
+ *	default layout, or a group of leaves that a layout callback saw
+ *	as one child with a repeat count); see the split lines and
+ *	frames of TkTextIBTreeLayoutProc (tkTextDisp.c).
+ *
+ *	TkIBTreeLeafSplit: the separator between a leaf of a block and
+ *	the next one.
+ *
+ *	TkIBTreeStackChain: for the stack of count leaves that starts
+ *	with the leaf linePtr, the "expected node" E is the real node at
+ *	the distance depth from the root on the path to that leaf (the
+ *	nodes at that distance are what NodePrint and RealNodePrint show
+ *	as one child when the block's -layoutdepth is depth; 0: the
+ *	root).  If the leaves of the stack are exactly the leaves below
+ *	E, the chain of the stack is E, its child, and so on down, as
+ *	long as the node has exactly one child (a node or a leaf).
+ *
+ * Results:
+ *	TkIBTreeLeafSplit: the depth of the separator in the stored tree,
+ *	as "block list" gives it (0: both leaves in the same lowest
+ *	node; 1: in different children of one node; and so on), with
+ *	*defectPtr and *nextDefectPtr set to the defects of the leaf and
+ *	of the next one (the padding nodes directly above each); or -1
+ *	if the leaf is the last of its block.
+ *
+ *	TkIBTreeStackChain: the number of real nodes in the chain
+ *	(padding nodes are not nodes of the tree); 0 if there is no E
+ *	(depth is negative, or the leaf is not deeper than depth: E
+ *	would be the leaf itself) or the stack is not all of E's leaves.
+ *
+ * Side effects:
+ *	None.
+ *
+ *------------------------------------------------------------------
+ */
+
+int
+TkIBTreeLeafSplit(linePtr, defectPtr, nextDefectPtr)
+     TkTextLine *linePtr;		/* A leaf of a block. */
+     int *defectPtr;			/* Filled with its defect. */
+     int *nextDefectPtr;		/* Filled with the next leaf's. */
+{
+  TkTextLine *nextPtr;
+  int level = SeparatorLevel(linePtr, &nextPtr);
+
+  if (level < 0) {
+    return -1;
+  }
+  *defectPtr = LineDefect(linePtr);
+  *nextDefectPtr = LineDefect(nextPtr);
+  return level;
+}
+
+int
+TkIBTreeStackChain(linePtr, count, depth)
+     TkTextLine *linePtr;		/* The first leaf of the stack. */
+     int count;				/* The number of its leaves. */
+     int depth;				/* The distance of E from the
+					 * root. */
+{
+  Node *ePtr, *nodePtr;
+  TkTextLine *lastPtr;
+  int real = LineRealDepth(linePtr), leaves, kids, n = 0;
+
+  if ((depth < 0) || (depth >= real)) {
+    return 0;
+  }
+  ePtr = RealAncestor(linePtr, real - depth);
+  if (ePtr == NULL) {
+    return 0;
+  }
+
+  /*
+   * The stack must start with the first leaf below E, and hold as
+   * many leaves as E does (the dummy line at the end of the tree is
+   * not a leaf: it is the last line of the nodes on the way to it).
+   */
+
+  for (nodePtr = ePtr; nodePtr->level > 0;
+       nodePtr = nodePtr->children.nodePtr) {
+    /* Empty. */
+  }
+  if (nodePtr->children.linePtr != linePtr) {
+    return 0;
+  }
+  for (nodePtr = ePtr; nodePtr->level > 0; ) {
+    for (nodePtr = nodePtr->children.nodePtr; nodePtr->nextPtr != NULL;
+	 nodePtr = nodePtr->nextPtr) {
+      /* Empty. */
+    }
+  }
+  for (lastPtr = nodePtr->children.linePtr; lastPtr->nextPtr != NULL;
+       lastPtr = lastPtr->nextPtr) {
+    /* Empty. */
+  }
+  leaves = ePtr->numLines - (IsLastLine(lastPtr) ? 1 : 0);
+  if (leaves != count) {
+    return 0;
+  }
+
+  /*
+   * A padding node has one child (the one above the last leaf also
+   * holds the dummy line), so the children of a real node in the
+   * stored tree are as many as its children in the real tree.
+   */
+
+  for (nodePtr = ePtr; ; nodePtr = nodePtr->children.nodePtr) {
+    kids = nodePtr->numChildren;
+    if (nodePtr->level == 0) {
+      for (lastPtr = nodePtr->children.linePtr; lastPtr->nextPtr != NULL;
+	   lastPtr = lastPtr->nextPtr) {
+	/* Empty. */
+      }
+      if (IsLastLine(lastPtr)) {
+	kids--;
+      }
+    }
+    if (kids != 1) {
+      break;
+    }
+    if (!nodePtr->padding) {
+      n++;
+    }
+    if (nodePtr->level == 0) {
+      break;
+    }
+  }
+  return n;
 }
 
 /*
@@ -8947,6 +9258,9 @@ void
 TkTextRootLogReset(textPtr)
     TkText *textPtr;
 {
+    if (textPtr->rootLogHold) {
+	return;				/* "block paste": one log for all. */
+    }
     if (textPtr->rootLog != NULL) {
 	ckfree((char *) textPtr->rootLog);
 	textPtr->rootLog = NULL;
@@ -9890,6 +10204,16 @@ MergeValues(textPtr, keepObjPtr, keepPtr, loseObjPtr, losePtr)
 {
     Tcl_HashEntry *keepEntry, *loseEntry;
 
+    if ((textPtr != NULL) && textPtr->cutJoin && TkTextDataIsEmpty(*keepPtr)) {
+	/*
+	 * A deletion done as "block cut" does it: the end side's value
+	 * does not move to the joined node, it goes (into the undo atom,
+	 * with its address), as when the start side has a value.
+	 */
+
+	DropValue(textPtr, loseObjPtr, losePtr);
+	return;
+    }
     switch (TkTextDataMerge(keepPtr, losePtr)) {
     case TK_TEXT_DATA_MERGE_NONE:
 	return;
@@ -11080,6 +11404,179 @@ TkBTreeSetValue(textPtr, dataPtr, value)
 /*
  *----------------------------------------------------------------------
  *
+ * TkIBTreeSetBeginValue, TkIBTreeSetNodeValues, TkIBTreeRootLevel,
+ * TkBTreeSetRunValueAt, TkBTreeListRunsOn --
+ *
+ *      What "block list -values" and "block paste" need besides the
+ *      list of TkIBTreeTextAppend and InsertList (tkText.c).
+ *
+ *      TkIBTreeSetBeginValue: the values of a separator element with
+ *      values ([depth, defect, v0, v1, ...], see TkIBTreeTextAppend) go
+ *      to what begins with the leaf after the separator: k = 0 names
+ *      that leaf, k >= 1 its real ancestor number k, if that node begins
+ *      with the leaf (else nothing is done: the tree at the place did
+ *      not get such a node).  An undefined value sets nothing (the node
+ *      is new and has none).
+ *
+ *      TkIBTreeSetNodeValues: the node values of the header of a whole
+ *      block (its fourth element, as NodeValuesList makes it: [value,
+ *      child, child...] for a node, [value] for a leaf) go to the nodes
+ *      of the block just re-created, as far as the two trees agree.
+ *
+ *      TkIBTreeRootLevel: the stored level of the root of a block's
+ *      tree, -1 for a block that is a single leaf (as in the header of
+ *      its list), -2 for an -empty block or no block.
+ *
+ *      TkBTreeSetRunValueAt: the value of a TagOn element [name, value]
+ *      goes to the run of the tag that starts exactly at the index, if
+ *      that run has no value (a run that started earlier is another
+ *      run, joined with the pasted one: it keeps what it has).
+ *
+ *      TkBTreeListRunsOn: for every tag that the character at an index
+ *      has and whose run started before the index, a TagOn element is
+ *      appended to a list (with a copy of the run's value, if any): the
+ *      runs "already on" where a range starts.
+ *
+ * Results:
+ *      TkIBTreeSetBeginValue, TkBTreeSetRunValueAt: 1 if there is such
+ *      a node or run, else 0.
+ *
+ * Side effects:
+ *      Values are set (their Lang parts, copies); a value replaced is
+ *      freed when the widget command ends.
+ *
+ *----------------------------------------------------------------------
+ */
+
+int
+TkIBTreeSetBeginValue(textPtr, linePtr, k, value)
+    TkText *textPtr;                    /* The widget. */
+    TkTextLine *linePtr;                /* A leaf of a block. */
+    int k;                              /* 0: the leaf; else the number of
+					 * its real ancestor. */
+    Arg value;                          /* The value (copied), or NULL. */
+{
+    Node *nodePtr, *childPtr;
+
+    if ((linePtr == NULL) || (linePtr->parentPtr->segPtr == NULL)
+	    || IsLastLine(linePtr) || (k < 0)) {
+	return 0;
+    }
+    if (k == 0) {
+	if ((value != NULL) && SvOK((SV *) value)) {
+	    TkBTreeSetValue(textPtr, &linePtr->value, value);
+	}
+	return 1;
+    }
+    nodePtr = RealAncestor(linePtr, k);
+    if (nodePtr == NULL) {
+	return 0;
+    }
+
+    /*
+     * The node must begin with this leaf.
+     */
+
+    for (childPtr = nodePtr; childPtr->level > 0;
+	 childPtr = childPtr->children.nodePtr) {
+	/* Empty. */
+    }
+    if (childPtr->children.linePtr != linePtr) {
+	return 0;
+    }
+    if ((value != NULL) && SvOK((SV *) value)) {
+	TkBTreeSetValue(textPtr, &nodePtr->value, value);
+    }
+    return 1;
+}
+
+static void
+SetNodeValues(textPtr, nodePtr, linePtr, sv)
+    TkText *textPtr;
+    Node *nodePtr;                      /* A node, or NULL: */
+    TkTextLine *linePtr;                /* a leaf. */
+    SV *sv;                             /* Its element of the header. */
+{
+    AV *av;
+    SV **svp;
+    int i = 1;
+
+    if ((sv == NULL) || !SvROK(sv) || (SvTYPE(SvRV(sv)) != SVt_PVAV)) {
+	return;
+    }
+    av = (AV *) SvRV(sv);
+    while ((nodePtr != NULL) && nodePtr->padding) {
+	/*
+	 * Padding: the leaf below (the real tree).
+	 */
+
+	if (nodePtr->level == 0) {
+	    linePtr = nodePtr->children.linePtr;
+	    nodePtr = NULL;
+	} else {
+	    nodePtr = nodePtr->children.nodePtr;
+	}
+    }
+    svp = av_fetch(av, 0, 0);
+    if ((svp != NULL) && SvOK(*svp)) {
+	TkBTreeSetValue(textPtr, (nodePtr != NULL) ? &nodePtr->value
+		: &linePtr->value, (Arg) *svp);
+    }
+    if (nodePtr == NULL) {
+	return;
+    }
+    if (nodePtr->level == 0) {
+	for (linePtr = nodePtr->children.linePtr; linePtr != NULL;
+	     linePtr = linePtr->nextPtr) {
+	    if (IsLastLine(linePtr)) {
+		break;
+	    }
+	    svp = av_fetch(av, i++, 0);
+	    SetNodeValues(textPtr, (Node *) NULL, linePtr,
+		    (svp != NULL) ? *svp : NULL);
+	}
+    } else {
+	Node *childPtr;
+
+	for (childPtr = nodePtr->children.nodePtr; childPtr != NULL;
+	     childPtr = childPtr->nextPtr) {
+	    svp = av_fetch(av, i++, 0);
+	    SetNodeValues(textPtr, childPtr, (TkTextLine *) NULL,
+		    (svp != NULL) ? *svp : NULL);
+	}
+    }
+}
+
+void
+TkIBTreeSetNodeValues(textPtr, segPtr, values)
+    TkText *textPtr;                    /* The widget. */
+    TkTextSegment *segPtr;              /* The block. */
+    Arg values;                         /* The fourth element of its header. */
+{
+    if ((segPtr == NULL) || (segPtr->body.itree.tree == NULL)
+	    || (values == NULL)) {
+	return;
+    }
+    SetNodeValues(textPtr, ((BTree *) segPtr->body.itree.tree)->rootPtr,
+	    (TkTextLine *) NULL, (SV *) values);
+}
+
+int
+TkIBTreeRootLevel(segPtr)
+    TkTextSegment *segPtr;              /* A block, or NULL. */
+{
+    Node *rootPtr;
+
+    if ((segPtr == NULL) || (segPtr->body.itree.tree == NULL)) {
+	return -2;
+    }
+    rootPtr = ((BTree *) segPtr->body.itree.tree)->rootPtr;
+    return rootPtr->padding ? -1 : rootPtr->level;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * NodeHasValues, NodeValuesList --
  *
  *	The node values of a block for its header in a "block list":
@@ -12068,6 +12565,74 @@ TkBTreeRunValue(textPtr, tagPtr, indexPtr, indexString, dataPtrPtr)
     return TCL_OK;
 }
 
+int
+TkBTreeSetRunValueAt(textPtr, tagPtr, indexPtr, value)
+    TkText *textPtr;                    /* The widget. */
+    TkTextTag *tagPtr;                  /* The tag. */
+    TkTextIndex *indexPtr;              /* Where the run must start. */
+    Arg value;                          /* The value (copied). */
+{
+    TkTextIndex start;
+    TkTextSegment *onPtr = RunAt(textPtr, tagPtr, indexPtr, &start);
+
+    if ((onPtr == NULL) || (TkTextIndexCmp(&start, indexPtr) != 0)
+	    || !TkTextDataIsEmpty(onPtr->body.toggle.value)) {
+	return 0;
+    }
+    if ((value != NULL) && SvOK((SV *) value)) {
+	TkBTreeSetValue(textPtr, &onPtr->body.toggle.value, value);
+	if (!TkTextDataIsEmpty(onPtr->body.toggle.value)) {
+	    tagPtr->hasRunValues = 1;
+	}
+    }
+    return 1;
+}
+
+void
+TkBTreeListRunsOn(textPtr, indexPtr, listFactoryPtr)
+    TkText *textPtr;                    /* The widget. */
+    TkTextIndex *indexPtr;              /* Where a range starts. */
+    void *listFactoryPtr;               /* The list (a ListFactory). */
+{
+    ListFactory *lfPtr = (ListFactory *) listFactoryPtr;
+    TkTextTag **tags;
+    TkTextIndex start;
+    TkTextSegment *onPtr;
+    Arg arg = NULL;
+    int n = 0, i;
+
+    tags = TkBTreeGetTags(indexPtr, &n);
+    if (tags == NULL) {
+	return;
+    }
+    for (i = 0; i < n; i++) {
+	if (tags[i] == textPtr->selTagPtr) {
+	    continue;
+	}
+	onPtr = RunAt(textPtr, tags[i], indexPtr, &start);
+	if ((onPtr == NULL) || (TkTextIndexCmp(&start, indexPtr) >= 0)) {
+	    continue;                   /* It starts here: listed anyway. */
+	}
+	if (TkTextDataGetLang(onPtr->body.toggle.value) != NULL) {
+	    lfPtr = ListFactoryNewLevelWithType(lfPtr,
+		    IdType("T", "Tk::Text::TagOn"));
+	    LangSetString(&arg, tags[i]->name);
+	    ListFactoryAppendCopy(lfPtr, arg);
+	    ListFactoryAppendPure(lfPtr,
+		    TkTextDataLangSV(onPtr->body.toggle.value));
+	    lfPtr = ListFactoryEndLevelWithType(lfPtr);
+	} else {
+	    LangSetString(&arg, tags[i]->name);
+	    ListFactoryAppendCopyWithType(lfPtr, arg,
+		    IdType("T", "Tk::Text::TagOn"));
+	}
+    }
+    if (arg != NULL) {
+	LangFreeArg(arg, LANG_DYNAMIC);
+    }
+    ckfree((char *) tags);
+}
+
 /*
  * The run of a tag at an address (see TkTextValue): its toggle-on,
  * or NULL if the character there does not have the tag; *startPtr is
@@ -12531,7 +13096,7 @@ VcContainer(sPtr, segPtr, pos)
 	VcNode(sPtr->textPtr, &eLinePtr->value, sPtr->event, sPtr->line,
 		sPtr->leaves[e].ls, 0, (Tcl_Obj *) NULL);
     } else if (!TkTextDataIsEmpty(eLinePtr->value)) {
-	if (TkTextDataIsEmpty(sLinePtr->value)) {
+	if (TkTextDataIsEmpty(sLinePtr->value) && !sPtr->textPtr->cutJoin) {
 	    VcNode(sPtr->textPtr, &eLinePtr->value, TK_TEXT_VC_MOVE,
 		    sPtr->line, sPtr->leaves[e].ls, 0,
 		    TkTextVcNodePlace(sPtr->textPtr, sPtr->line,
@@ -12559,8 +13124,9 @@ VcContainer(sPtr, segPtr, pos)
 
 	if (nPtr->padding) {
 	    /* No value. */
-	} else if (gone || (!TkTextDataIsEmpty(mPtr->value)
-		&& !TkTextDataIsEmpty(nPtr->value))) {
+	} else if (gone || (!TkTextDataIsEmpty(nPtr->value)
+		&& (!TkTextDataIsEmpty(mPtr->value)
+		    || sPtr->textPtr->cutJoin))) {
 	    VcNode(sPtr->textPtr, &nPtr->value, sPtr->event, sPtr->line,
 		    nStart, NodeRealLevel(nPtr), (Tcl_Obj *) NULL);
 	} else if (!TkTextDataIsEmpty(nPtr->value)) {

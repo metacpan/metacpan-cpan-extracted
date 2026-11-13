@@ -1,5 +1,15 @@
 Revision history for Robots-Validate:
 
+v0.4.15   2026-11-12 16:27:37+00:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - ethicrawl (updated agents and network)
+    - GenomeCrawler
+    - GlintscoutBot
+    - MorsillaBot
+  [Documentation]
+  - Fixed incorrect type for the networks attribute: it has been using Net::IP::LPM since v0.4.3.
+
 v0.4.14   2026-11-06 17:42:12+00:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:

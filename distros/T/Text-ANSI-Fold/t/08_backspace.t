@@ -1,10 +1,10 @@
 use v5.14;
 use warnings;
+use open IO => ':utf8', ':std';
 use Test::More 0.98;
 use utf8;
 
 use Data::Dumper;
-use open IO => ':utf8', ':std';
 use Text::ANSI::Fold qw(ansi_fold);
 
 sub folded {

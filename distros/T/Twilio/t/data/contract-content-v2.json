@@ -1,0 +1,352 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "contents" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "language" : "a_language",
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "types" : {
+        "a_types" : 1
+       },
+       "url" : "a_url",
+       "variables" : {
+        "a_variables" : 1
+       }
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "contents",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SortByDate",
+    "v_sort_by_date"
+   ],
+   [
+    "SortByContentName",
+    "v_sort_by_content_name"
+   ],
+   [
+    "DateCreatedAfter",
+    "2026-01-09T03:04:05Z"
+   ],
+   [
+    "DateCreatedBefore",
+    "2026-01-22T03:04:05Z"
+   ],
+   [
+    "ContentName",
+    "v_content_name"
+   ],
+   [
+    "Content",
+    "v_content"
+   ],
+   [
+    "Language",
+    "v_language_1"
+   ],
+   [
+    "Language",
+    "v_language_2"
+   ],
+   [
+    "ContentType",
+    "v_content_type_1"
+   ],
+   [
+    "ContentType",
+    "v_content_type_2"
+   ],
+   [
+    "ChannelEligibility",
+    "v_channel_eligibility_1"
+   ],
+   [
+    "ChannelEligibility",
+    "v_channel_eligibility_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListContent",
+  "method" : "page",
+  "options" : {
+   "channel_eligibility" : [
+    "v_channel_eligibility_1",
+    "v_channel_eligibility_2"
+   ],
+   "content" : "v_content",
+   "content_name" : "v_content_name",
+   "content_type" : [
+    "v_content_type_1",
+    "v_content_type_2"
+   ],
+   "date_created_after" : {
+    "epoch" : 1767927845
+   },
+   "date_created_before" : {
+    "epoch" : 1769051045
+   },
+   "language" : [
+    "v_language_1",
+    "v_language_2"
+   ],
+   "sort_by_content_name" : "v_sort_by_content_name",
+   "sort_by_date" : "v_sort_by_date"
+  },
+  "records_key" : "contents",
+  "required" : [],
+  "url" : "https://content.twilio.com/v2/Content"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "contents" : [
+      {
+       "account_sid" : "a_account_sid",
+       "approval_requests" : {
+        "a_approval_requests" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "language" : "a_language",
+       "sid" : "a_sid",
+       "types" : {
+        "a_types" : 1
+       },
+       "variables" : {
+        "a_variables" : 1
+       }
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "approval_requests",
+      "approval_requests",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "content_and_approvals",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SortByDate",
+    "v_sort_by_date"
+   ],
+   [
+    "SortByContentName",
+    "v_sort_by_content_name"
+   ],
+   [
+    "DateCreatedAfter",
+    "2026-01-09T03:04:05Z"
+   ],
+   [
+    "DateCreatedBefore",
+    "2026-01-22T03:04:05Z"
+   ],
+   [
+    "ContentName",
+    "v_content_name"
+   ],
+   [
+    "Content",
+    "v_content"
+   ],
+   [
+    "Language",
+    "v_language_1"
+   ],
+   [
+    "Language",
+    "v_language_2"
+   ],
+   [
+    "ContentType",
+    "v_content_type_1"
+   ],
+   [
+    "ContentType",
+    "v_content_type_2"
+   ],
+   [
+    "ChannelEligibility",
+    "v_channel_eligibility_1"
+   ],
+   [
+    "ChannelEligibility",
+    "v_channel_eligibility_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListContentAndApprovals",
+  "method" : "page",
+  "options" : {
+   "channel_eligibility" : [
+    "v_channel_eligibility_1",
+    "v_channel_eligibility_2"
+   ],
+   "content" : "v_content",
+   "content_name" : "v_content_name",
+   "content_type" : [
+    "v_content_type_1",
+    "v_content_type_2"
+   ],
+   "date_created_after" : {
+    "epoch" : 1767927845
+   },
+   "date_created_before" : {
+    "epoch" : 1769051045
+   },
+   "language" : [
+    "v_language_1",
+    "v_language_2"
+   ],
+   "sort_by_content_name" : "v_sort_by_content_name",
+   "sort_by_date" : "v_sort_by_date"
+  },
+  "records_key" : "contents",
+  "required" : [],
+  "url" : "https://content.twilio.com/v2/ContentAndApprovals"
+ }
+]

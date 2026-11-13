@@ -1,5 +1,9 @@
 Revision history for UUID-V7
 
+0.005     2026-11-12 20:13:13+01:00 Europe/Brussels
+          - Xor additional random crumb into timestamp
+          - Make test more resiliant on low-precision platforms
+
 0.004     2026-11-12 01:56:27+01:00 Europe/Brussels
           - Use Postgresql's calculation method for submilliseconds.
           - Check ivsize instead of use64bitint in Build.PL

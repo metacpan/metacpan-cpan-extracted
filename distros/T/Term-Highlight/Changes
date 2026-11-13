@@ -1,25 +1,32 @@
 Revision history for Perl module Term::Highlight and script hl.
 
 
+2026/11/13 - Version 2.3.1 - with option '-gitignore', track the location of
+                the current file entry rather than simply rely on the global
+                working directory, no longer ignore hidden files if they are
+                tracked by git.
+
 2025/08/08 - Version 2.3.0 - add option '-ra' in the head of snippet arguments
                 to enable seamless usage of multiple snippets simultaneously.
 
-2023/05/09 - Version 2.2.0 - a new hl option -gitignore to skip not tracked or
-                ignored files in git repositories, effective in recursive grep.
+2023/05/09 - Version 2.2.0 - a new hl option '-gitignore' to skip not tracked
+                or ignored files in git repositories, effective in recursive
+                grep.
 
 2020/01/20 - Version 2.1.2 - performance improvements.
 
 2020/01/15 - Version 2.1.1 - corrected and faster line endings split.
 
-2020/01/15 - Version 2.1.0 - no longer grep hidden files and descend into hidden
-                directories by default. A new option '-a' was added to do so.
+2020/01/15 - Version 2.1.0 - no longer grep hidden files and descend into
+                hidden directories by default. A new option '-a' was added to
+                do so.
 
 2018/11/13 - Version 2.0.4 - license update, explicitly licensed by the Perl 5
                 license.
 
-2018/05/20 - Version 2.0.3 - added new global option '-f' to build the file list
-                from the trailing arguments automatically when option '-' is not
-                specified, fixed handling of option '0'.
+2018/05/20 - Version 2.0.3 - added new global option '-f' to build the file
+                list from the trailing arguments automatically when option '-'
+                is not specified, fixed handling of option '0'.
 
 2018/04/01 - Version 2.0.2 - better treatment of the trailing highlight options
                 not followed by a pattern.

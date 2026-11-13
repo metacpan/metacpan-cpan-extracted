@@ -1,0 +1,359 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountSid" : "a_accountSid",
+     "dateCreated" : "2026-01-19T03:04:05Z",
+     "dateUpdated" : "2026-01-06T03:04:05Z",
+     "friendlyName" : "a_friendlyName",
+     "messagingRegion" : "a_messagingRegion",
+     "phoneNumber" : "a_phoneNumber",
+     "url" : "a_url",
+     "voiceRegion" : "a_voiceRegion"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "accountSid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "dateCreated",
+      "date",
+      1768791845
+     ],
+     [
+      "date_updated",
+      "dateUpdated",
+      "date",
+      1767668645
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "messaging_region",
+      "messagingRegion",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phoneNumber",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voiceRegion",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPhoneNumber",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://routes.twilio.com/v3/PhoneNumbers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountSid" : "a_accountSid",
+     "dateCreated" : "2026-01-19T03:04:05Z",
+     "dateUpdated" : "2026-01-06T03:04:05Z",
+     "friendlyName" : "a_friendlyName",
+     "isoCountryCode" : "a_isoCountryCode",
+     "messagingRegion" : "a_messagingRegion",
+     "shortCode" : "a_shortCode",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "accountSid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "dateCreated",
+      "date",
+      1768791845
+     ],
+     [
+      "date_updated",
+      "dateUpdated",
+      "date",
+      1767668645
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "iso_country_code",
+      "isoCountryCode",
+      "plain"
+     ],
+     [
+      "messaging_region",
+      "messagingRegion",
+      "plain"
+     ],
+     [
+      "short_code",
+      "shortCode",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "iso_country_code",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchShortCode",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://routes.twilio.com/v3/ShortCodes/id1/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountSid" : "a_accountSid",
+     "dateCreated" : "2026-01-19T03:04:05Z",
+     "dateUpdated" : "2026-01-06T03:04:05Z",
+     "friendlyName" : "a_friendlyName",
+     "messagingRegion" : "a_messagingRegion",
+     "phoneNumber" : "a_phoneNumber",
+     "url" : "a_url",
+     "voiceRegion" : "a_voiceRegion"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "accountSid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "dateCreated",
+      "date",
+      1768791845
+     ],
+     [
+      "date_updated",
+      "dateUpdated",
+      "date",
+      1767668645
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "messaging_region",
+      "messagingRegion",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phoneNumber",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_region",
+      "voiceRegion",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "phone_numbers",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "friendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "messagingRegion",
+    "v_messaging_region"
+   ],
+   [
+    "voiceRegion",
+    "v_voice_region"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdatePhoneNumber",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "messaging_region" : "v_messaging_region",
+   "voice_region" : "v_voice_region"
+  },
+  "required" : [],
+  "url" : "https://routes.twilio.com/v3/PhoneNumbers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountSid" : "a_accountSid",
+     "dateCreated" : "2026-01-19T03:04:05Z",
+     "dateUpdated" : "2026-01-06T03:04:05Z",
+     "friendlyName" : "a_friendlyName",
+     "isoCountryCode" : "a_isoCountryCode",
+     "messagingRegion" : "a_messagingRegion",
+     "shortCode" : "a_shortCode",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "accountSid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "dateCreated",
+      "date",
+      1768791845
+     ],
+     [
+      "date_updated",
+      "dateUpdated",
+      "date",
+      1767668645
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "iso_country_code",
+      "isoCountryCode",
+      "plain"
+     ],
+     [
+      "messaging_region",
+      "messagingRegion",
+      "plain"
+     ],
+     [
+      "short_code",
+      "shortCode",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "routes",
+    0
+   ],
+   [
+    "v3",
+    0
+   ],
+   [
+    "iso_country_code",
+    2
+   ]
+  ],
+  "expected" : [
+   [
+    "friendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "messagingRegion",
+    "v_messaging_region"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateShortCode",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "messaging_region" : "v_messaging_region"
+  },
+  "required" : [],
+  "url" : "https://routes.twilio.com/v3/ShortCodes/id1/id2"
+ }
+]

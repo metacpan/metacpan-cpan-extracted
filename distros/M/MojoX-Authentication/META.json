@@ -32,6 +32,9 @@
       "develop" : {
          "requires" : {
             "Dist::Milla" : "v1.0.22",
+            "Mojo::SQLite" : "3.000",
+            "MojoX::MojoDbWrap" : "0.100",
+            "Net::SAML2" : "0.88",
             "Path::Tiny" : "0.084",
             "Template::Perlish" : "1.52",
             "Test::Pod" : "1.51",
@@ -39,12 +42,17 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "MojoX::MojoDbWrap" : "0.100",
+            "Net::SAML2" : "0.88"
+         },
          "requires" : {
             "Crypt::Passphrase" : "0.023",
             "Crypt::Passphrase::Argon2" : "0.010",
             "Module::Runtime" : "0.018",
+            "Mojolicious" : "9.20",
+            "Mojolicious::Plugin::Authentication" : "1.39",
             "Moo" : "2.005005",
-            "Net::SAML2" : "0.88",
             "Ouch" : "0.0501",
             "Try::Catch" : "v1.1.0",
             "namespace::clean" : "0.27",
@@ -52,14 +60,79 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Mojo::SQLite" : "3.000",
+            "MojoX::MojoDbWrap" : "0.100"
+         },
          "requires" : {
             "Path::Tiny" : "0.084",
             "Test::Exception" : "0.43"
          }
       }
    },
+   "provides" : {
+      "MojoX::Authentication" : {
+         "file" : "lib/MojoX/Authentication.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model" : {
+         "file" : "lib/MojoX/Authentication/Model.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::Db" : {
+         "file" : "lib/MojoX/Authentication/Model/Db.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::Hash" : {
+         "file" : "lib/MojoX/Authentication/Model/Hash.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::Role::Creator" : {
+         "file" : "lib/MojoX/Authentication/Model/Role/Creator.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::Role::Local" : {
+         "file" : "lib/MojoX/Authentication/Model/Role/Local.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::Role::MojoDbWrap" : {
+         "file" : "lib/MojoX/Authentication/Model/Role/MojoDbWrap.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::Role::Remap" : {
+         "file" : "lib/MojoX/Authentication/Model/Role/Remap.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::SAML2" : {
+         "file" : "lib/MojoX/Authentication/Model/SAML2.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::SAML2::Db" : {
+         "file" : "lib/MojoX/Authentication/Model/SAML2/Db.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Model::SAML2::Hash" : {
+         "file" : "lib/MojoX/Authentication/Model/SAML2/Hash.pm",
+         "version" : "0.100"
+      },
+      "MojoX::Authentication::Util" : {
+         "file" : "lib/MojoX/Authentication/Util.pm",
+         "version" : "0.100"
+      }
+   },
    "release_status" : "stable",
-   "version" : "0.010",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://codeberg.org/polettix/MojoX-Authentication/issues"
+      },
+      "homepage" : "https://codeberg.org/polettix/MojoX-Authentication",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://codeberg.org/polettix/MojoX-Authentication.git",
+         "web" : "https://codeberg.org/polettix/MojoX-Authentication"
+      }
+   },
+   "version" : "0.100",
    "x_contributors" : [
       "Flavio Poletti <flavio@polettix.it>"
    ],

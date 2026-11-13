@@ -62,6 +62,12 @@ is(folded($_, 12, boundary => 'word'), "사용하지 ", "boundary: check Hangul"
 is(folded($_, 13, boundary => 'word'), "사용하지 않은", "boundary: check Hangul");
 is(folded($_, 14, boundary => 'word'), "사용하지 않은 ", "boundary: check Hangul");
 
+# CJK punctuation is Hangul by Script_Extensions, but not a word character
+$_ = "地区」78、「extractor」";
+is(folded($_, 14, boundary => 'word'), "地区」78、「", "boundary: CJK punctuation");
+$_ = "地区。extractor";
+is(folded($_, 10, boundary => 'word'), "地区。", "boundary: CJK full stop");
+
 configure Text::ANSI::Fold width => 0, boundary => '';
 $_ = "__________aaa bbb/ccc ddd";
 

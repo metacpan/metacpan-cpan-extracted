@@ -15,7 +15,7 @@ MojoX::Authentication::Model::Role::Local
    package Some::Class;
    use Moo;
    with 'MojoX::Authentication::Model::Role::Local';
-   sub load_user_by_name ($self, $controller, $name) { ... }
+   sub load_user_by_username ($self, $controller, $name) { ... }
    ...
 
 =head1 DESCRIPTION
@@ -24,16 +24,23 @@ Role to manage local accounts, ensuring the usage of
 L<Crypt::Passphrase> compatible ways of managing secrets.
 
 This role I<demands> that the class implements method
-C<load_user_by_name> with the following signature:
+C<load_user_by_username> with the following signature:
 
-   sub load_user_by_name ($self, $controller, $name);
+   sub load_user_by_username ($self, $controller, $name);
 
 where C<$controller> is a L<Mojolicious::Controller> compatible class.
 The return value from this method B<MUST> be a hash reference holding
 the secret associated to the user identified by C<$name> in the value
-corresponding to key C<secret>; this value is supposed to be a valid
-value previously hashed with L<Crypt::Passphrase> or anything compatible
-with it.
+corresponding to key L</key_for_secret> (C<secret> by default); this
+value is supposed to be a valid value previously hashed with
+L<Crypt::Passphrase> or anything compatible with it, or missing or
+empty for an account that cannot log in with a password (see
+L</validate_user>).
+
+The key for the secret and the L</protected_keys> are kept out of what
+reaches C<current_user> (see L</tamed_user_record>) and, in classes that
+also compose L<MojoX::Authentication::Model::Role::Remap>, out of reach
+of the remaps.
 
 =head1 INTERFACE
 
@@ -47,14 +54,68 @@ Accessor for the L<Crypt::Passphrase> object passed during construction.
 
    my $bool = $provider->handles_username($controller, $username);
 
-Returns a true value if the provider handles the provided username,
-false otherwise. Useful to figure out what provider supports a username.
+Returns a true value if the provider knows the provided username,
+false otherwise. The first provider returning true owns the username
+(see L<MojoX::Authentication::Model/Owner of a username>).
 
 =head2 B<< hash_secret >>
 
    my $hashed = $provider->hash_secret($secret);
 
 Wrapper for C<< $provider->crypt_passphrase->hash_password($secret) >>.
+
+=head2 B<< key_for_secret >>
+
+   my $key = $provider->key_for_secret;
+
+The key holding the (hashed) secret in user records, e.g. the name of
+the column in a database. Defaults to C<secret>; it can be set at
+construction and B<MUST> be defined.
+
+=head2 B<< protected_keys >>
+
+   my $aref = $provider->protected_keys;
+
+Array reference with keys holding secret material besides
+L</key_for_secret>, e.g. a seed for one-time passwords. Empty by
+default; it can be set at construction.
+
+=head2 B<< protected_keys_list >>
+
+   my @keys = $provider->protected_keys_list;
+
+The list of all protected keys: L</key_for_secret> first, then the
+L</protected_keys>. Used by L</tamed_user_record> and by
+L<MojoX::Authentication::Model::Role::Remap>.
+
+=head2 B<< run_fake_validation >>
+
+   $provider->run_fake_validation;   # always throws
+
+Check a password against a hash that was made up for the purpose, then
+throw the same exception as a wrong password (code 401). It makes
+refused logins for unknown users cost the same as real ones (see
+L<MojoX::Authentication::Model/run_fake_validation>). The made-up hash
+is computed the first time it is needed.
+
+=head2 B<< tamed_user_record >>
+
+   my $safe = $provider->tamed_user_record($user);
+
+Returns a shallow copy of C<$user> without the keys in
+L</protected_keys_list>. See
+L<MojoX::Authentication::Model/What reaches current_user>.
+
+=head2 B<< user_for_save >>
+
+   my $record = $provider->user_for_save($user, $is_secret_cleartext);
+
+Prepare C<$user> for saving: returns a shallow copy, where the value for
+L</key_for_secret> is hashed with L</hash_secret> if
+C<$is_secret_cleartext> is true. A missing or empty secret is never
+hashed, so that it cannot turn into
+the hash of an empty password. Used by C<save_user> in the classes
+compositing the role.
 
 =head2 B<< validate_user >>
 
@@ -64,7 +125,24 @@ Validate the user identified by C<$name> against the provided
 C<$secret>. Parameter C<$extra> is ignored and only present to support
 the right signature.
 
-This method calls method C<load_user_by_name> that must be provided by
+Returns C<$name> if the secret is right, nothing if the provider does
+not know C<$name> (so that other providers can be tried). If the
+provider knows C<$name> but the secret is wrong, it throws an exception
+(401): the login ends there, without trying other providers.
+
+A missing or empty secret means that the account cannot log in with a
+password (e.g. it logs in through SAML2 only, or it is disabled): it is
+refused in the same way, after a fake password check, so that response
+times do not tell it from an unknown username.
+
+To disable an account, B<empty its secret> instead of writing a marker
+in it (e.g. C<!> or C<*>, as in F</etc/shadow>): L<Crypt::Passphrase>
+refuses at once, without hashing anything, a hash that none of its
+validators accepts, so the faster answer would tell that the account
+exists. For the same reason, every format of the stored hashes needs a
+validator in L</crypt_passphrase>.
+
+This method calls method C<load_user_by_username> that must be provided by
 the class compositing the role.
 
 

@@ -56,4 +56,32 @@ is_deeply(chops($fold),
 	  [ "a", "\fb" ],
 	  "formfeed in the middle");
 
+# a form feed after nothing but sequences is at the beginning
+$fold->configure(text => "\e[31m\f\e[m", width => 10);
+is_deeply(chops($fold),
+	  [ "\e[31m\f\e[m" ],
+	  "formfeed in a color");
+
+$fold->configure(text => "\e[31m\fb\e[m", width => 10);
+is_deeply(chops($fold),
+	  [ "\e[31m\fb\e[m" ],
+	  "formfeed in a color, with text");
+
+$fold->configure(text => "a\e[31mb\fc\e[m", width => 10);
+is_deeply(chops($fold),
+	  [ "a\e[31mb\e[m", "\e[31m\fc\e[m" ],
+	  "formfeed in the middle of a color");
+
+$fold->configure(text => "a\e[31m\e[m\fb", width => 10);
+is_deeply(chops($fold),
+	  [ "a\e[31m\e[m", "\fb" ],
+	  "formfeed after text and sequences");
+
+{
+    use Text::ANSI::Fold qw(ansi_fold);
+    my @r = ansi_fold "\e[31m\f\e[m", -1, expand => 1;
+    is_deeply([ @r[0,1] ], [ "\e[31m\f\e[m", "" ],
+	      "formfeed in a color, unlimited width");
+}
+
 done_testing;

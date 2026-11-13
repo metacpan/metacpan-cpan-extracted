@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.3305";
+our $VERSION = "2.3901";
 
 use Data::Dumper;
 {
@@ -47,11 +47,12 @@ sub ansi_fold {
 }
 ######################################################################
 
-our $alphanum_re = qr{ [_\d\p{Latin}\p{Greek}\p{Cyrillic}\p{Hangul}] }x;
+# \p{Hangul} is Script_Extensions, which takes CJK punctuation as well
+our $alphanum_re = qr{ [_\d\p{Latin}\p{Greek}\p{Cyrillic}\p{sc=Hangul}] }x;
 our $nonspace_re = qr{ \p{IsPrintableLatin} }x;
 our $reset_re    = qr{ \e \[ [0;]* m }x;
-our $color_re    = qr{ \e \[ [\d;]* m }x;
-our $erase_re    = qr{ \e \[ [\d;]* K }x;
+our $color_re    = qr{ \e \[ [\d:;]* m }x;
+our $erase_re    = qr{ \e \[ [\d:;]* K }x;
 
 # see ECMA-48 5.4 Control sequences
 my  $csi_start       = qr{ (?: \e\[ | \x9b ) }x;
@@ -60,6 +61,8 @@ my  $csi_itermidiate = qr/[\x20-\x2f]*+/;
 my  $csi_final       = qr/[\x40-\x7e]/;
 our $csi_body_re     = qr/${csi_start}${csi_parameter}${csi_itermidiate}/;
 our $csi_re          = qr/${csi_start}${csi_parameter}${csi_itermidiate}${csi_final}/;
+# CSI other than SGR (cursor movement and the like)
+my  $csi_other_re    = qr/${csi_body_re}[\x40-\x6c\x6e-\x7e]/;
 
 our $osc_re          = qr{
     # see ECMA-48 8.3.89 OSC - OPERATING SYSTEM COMMAND
@@ -72,7 +75,7 @@ our $osc_re          = qr{
 use constant SGR_RESET  => "\e[m";
 use constant OSC8_RESET => "\e]8;;\e\\";
 
-sub pwidth { vwidth $_[0] =~ s/\X\cH{1,2}//gr =~ s/${osc_re}//gr }
+sub pwidth { vwidth $_[0] =~ s/\X\cH{1,2}//gr =~ s/${osc_re}|${csi_re}//gr }
 
 sub IsPrintableLatin {
     return <<"END";
@@ -176,6 +179,7 @@ my @default = (
     text      => '',
     width     => undef,
     padding   => 0,
+    trim      => 0,
     boundary  => '',
     padchar   => ' ',
     prefix    => '',
@@ -283,6 +287,9 @@ sub pop_reset {
 
 use constant MAX_INT => ~0 >> 1;
 
+# grapheme cluster boundary, from perl 5.22
+my $gcb = $] >= 5.022 ? '\b{gcb}' : '';
+
 sub IsEOL {
     <<"END";
 0000\t0000
@@ -304,7 +311,8 @@ sub fold {
     looks_like_number $width and $width == int($width)
 	or croak "$width: invalid width";
     $opt->{padding} = 0 if $width <= 0;
-    $width = MAX_INT    if $width <  0;
+    my $unlimited = $width < 0;
+    $width = MAX_INT if $unlimited;
     ($width -= $opt->{margin}) > 0 or croak "margin too big";
 
     my $word_char_re =
@@ -313,14 +321,24 @@ sub fold {
 
     local $Text::VisualWidth::PP::EastAsian = $opt->{ambiguous} eq 'wide';
 
+    # The prefix put at the head of this text by the previous call does
+    # not count as progress: there must be something after it.
+    my $prefix_width = $opt->{prefix} eq '' ? 0 : pwidth($opt->{prefix});
+    my $head_width = (not ref $opt->{prefix} and index($_, $opt->{prefix}) == 0)
+	? $prefix_width : 0;
+    # the room of a line with nothing after the prefix yet
+    my $head_room = $width > $head_width ? $width - $head_width : $width;
+
     my $folded = '';
     my $eol = '';
     my $room = $width;
+    my $split = 0;
     @bg_stack = @color_stack = @reset = ();
     $osc8_link = undef;
+    # a character with no special handling, and not overstruck
     my $unremarkable_re =
-	$opt->{expand} ? qr/[^\p{IsEOL}\e\t]/
-		       : qr/[^\p{IsEOL}\e]/;
+	$opt->{expand} ? qr/[^\p{IsEOL}\e\t](?!\cH)/
+		       : qr/[^\p{IsEOL}\e](?!\cH)/;
 
   FOLD:
     while (length) {
@@ -333,9 +351,13 @@ sub fold {
 	    last;
 	}
 	# form feed
+	# It is at the beginning when no text is before it: sequences
+	# such as colors do not count, or a form feed in a color would
+	# stay in the rest forever.
 	if (m/\A(\f+)/p) {
-	    last if length $folded;
-	    ($folded, $_) = ($1, ${^POSTMATCH});
+	    my($ff, $post) = ($1, ${^POSTMATCH});
+	    last if $folded =~ s/(?:${csi_re}|${osc_re}|\f)//gr ne '';
+	    ($folded, $_) = ($folded . $ff, $post);
 	    next;
 	}
 	# carriage return
@@ -375,9 +397,11 @@ sub fold {
 	    next;
 	}
 
-	last if $room < 1;
+	# sequences with no visible text after them stay on this line
+	last if $room < 1
+	    and not /\A(?:${csi_re}|${osc_re})*+(?:\z|\p{IsEOL})/;
 	if ($room < 2 and !$opt->{splitwide}) {
-	    last if $room != $width and &_startWideSpacing;
+	    last if $room != $head_room and &_startWideSpacing;
 	}
 
 	if (@reset) {
@@ -388,6 +412,13 @@ sub fold {
 	if (s/\A($color_re)//) {
 	    $folded .= $1;
 	    push @color_stack, $1;
+	    next;
+	}
+
+	# other CSI: no width, the cursor movement is not counted; at
+	# the folding point it goes with the text after it, as color does
+	if (s/\A($csi_other_re)//) {
+	    $folded .= $1;
 	    next;
 	}
 
@@ -419,27 +450,49 @@ sub fold {
 	next if $bs;
 
 	# consume unremarkable characters
-	if (s/\A(\e+|(?:${unremarkable_re}(?!\cH))+)//) {
+	# no more than the room can take, so as not to scan the rest of
+	# a long paragraph for every line; no limit for an unlimited
+	# width, or beyond what a regex quantifier allows
+	my $max = do {
+	    if ($unlimited) {
+		'';
+	    } elsif ((my $n = $room * 2 + 8) > 32766) {
+		'';
+	    } else {
+		$n;
+	    }
+	};
+	if (s{\A(
+		\e+					# escapes
+	      |						# or
+		${unremarkable_re}{1,$max}+		# up to the limit
+		${unremarkable_re}*? $gcb		# and to the end of the grapheme
+	    )}{}x) {
 	    my $s = $1;
-	    if ((my $w = vwidth($s)) <= $room) {
+	    # simple_fold looks only as far as the room, while vwidth
+	    # would measure the whole run, which can be the rest of a
+	    # long paragraph
+	    my($a, $b, $w) = simple_fold($s, $room);
+	    if ($b eq '' and $w <= $room) {
 		$folded .= $s;
 		$room -= $w;
 		next;
 	    }
-	    my($a, $b, $w) = simple_fold($s, $room);
 	    if ($opt->{splitwide}) {
 		if ($w == $room - 1 && $b =~ /\A\p{IsWideSpacing}/p) {
 		    $a .= $opt->{lefthalf};
 		    $b  = $opt->{righthalf} . ${^POSTMATCH};
 		    $w++;
+		    $split = 1;
 		}
 		elsif ($w > $room) {
 		    $a = $opt->{lefthalf};
 		    $b = $opt->{righthalf} . $b;
 		    $w--;
+		    $split = 1;
 		}
 	    }
-	    if ($w > $room && $room != $width) {
+	    if ($w > $room && $room != $head_room) {
 		$_ = $s . $_;
 		last;
 	    }
@@ -464,10 +517,9 @@ sub fold {
 	## Break line before word only when enough space will be
 	## provided for the word in the next turn.
 	my $l = pwidth($w1);
-	## prefix length
-	my $p = $opt->{prefix} eq '' ? 0 : vwidth($opt->{prefix});
-	if ($room + $l < $width - $p and $l + pwidth($w2) <= $width - $p
-	    and pwidth($lead) > 0) {
+	my $next = $width - $prefix_width;
+	if ($room + $l < $next and $l + pwidth($w2) <= $next
+	    and pwidth($lead) > $head_width) {
 	    $folded = $lead;
 	    $_ = $w1 . pop_reset() . $_;
 	    $room += $l;
@@ -483,7 +535,7 @@ sub fold {
 			    (?: ($prohibition_re{end}) (?: \cH{1,2} \g{-1})* )+
 			  ) \z
 			}xp
-	    and ${^PREMATCH} ne '' and pwidth(${^PREMATCH}) > 0
+	    and ${^PREMATCH} ne '' and pwidth(${^PREMATCH}) > $head_width
 	    and (my $w = pwidth $+{runout}) <= $opt->{runout}) {
 
 	    $folded = ${^PREMATCH};
@@ -500,7 +552,7 @@ sub fold {
     ##
     ## RUN-IN
     ##
-    if ($opt->do_runin) {
+    if ($opt->do_runin and not $split) {
 	my @runin;
 	my $m = $opt->{runin};
 	while ($m > 0 and
@@ -518,6 +570,15 @@ sub fold {
 	    $_ = ${^POSTMATCH};
 	}
 	$folded .= join '', @runin if @runin;
+    }
+
+    ##
+    ## TRIM: spaces at the end of a folded line, unless they are colored
+    ##
+    if ($opt->{trim} and $eol eq '' and length and not /\A\p{IsEOL}/
+	and not @color_stack and not defined $osc8_link
+	and $folded =~ s/(\N{SPACE}+)\z//) {
+	$room += vwidth(my $spaces = $1);
     }
 
     if (@color_stack) {
@@ -542,7 +603,7 @@ sub fold {
 	$_ = $s . $_;
     }
 
-    ($folded . $eol, $_, $width - $room);
+    ($folded . $eol, $_, $width + $opt->{margin} - $room);
 }
 
 ##
@@ -553,19 +614,54 @@ sub simple_fold {
     my $width = shift;
     $width <= 0 and croak "parameter error";
 
-    my($left, $right) = $orig =~ m/^(\X{0,$width}+)(.*)/
-	or croak "$width: unexpected width";
-
-    my $w = vwidth $left;
-    while ($w > $width) {
-	use integer;
-	my $trim = ($w - $width + 1) / 2;
-	$left =~ s/\X \K ( \X{$trim} ) \z//x or last;
-	$right = $1 . $right;
-	$w -= vwidth $1;
+    # Printable ASCII is as wide as its length.  The character after
+    # the width is checked too, as it may be a mark on the last one.
+    if (substr($orig, 0, $width + 1) !~ /[^\x20-\x7e]/) {
+	return ($orig, '', length $orig) if length $orig <= $width;
+	return (substr($orig, 0, $width), substr($orig, $width), $width);
     }
 
-    ($left, $right, $w);
+    my $left = _trim($orig, $width);
+    $left = $orig =~ /^(\X)/ ? $1 : '' if $left eq '';	# at least one
+    ($left, substr($orig, length $left), vwidth $left);
+}
+
+##
+## The longest leading part of a string within a width, in graphemes.
+## This is trim of Text::VisualWidth::PP, which counts a zero-width
+## character as 1.  The classes are those of Text::VisualWidth::PP, so
+## that the result agrees with vwidth.
+##
+sub _trim {
+    my($str, $limit) = @_;
+
+    my $cnt = 0;
+    my $ret = '';
+    my $fullwidth = $Text::VisualWidth::PP::EastAsian
+	? qr/\p{Text::VisualWidth::PP::InVWPP1Fullwidth}/
+	: qr/\p{Text::VisualWidth::PP::InVWPP0Fullwidth}/;
+    my $halfwidth = $Text::VisualWidth::PP::EastAsian
+	? qr/\p{Text::VisualWidth::PP::InVWPP1Halfwidth}/
+	: qr/\p{Text::VisualWidth::PP::InVWPP0Halfwidth}/;
+    while ($str =~ /\G(\X)/g) {
+	my $ch = $1;
+	# a zero-width character is in neither class, and vwidth gives 0
+	my $w = do {
+	    if ($ch =~ /\A[\x00-\x7f]\z/) {
+		1;
+	    } elsif ($ch =~ /\A$fullwidth\z/) {
+		2;
+	    } elsif ($ch =~ /\A$halfwidth\z/) {
+		1;
+	    } else {
+		vwidth($ch);
+	    }
+	};
+	last if $cnt + $w > $limit;
+	$ret .= $ch;
+	$cnt += $w;
+    }
+    $ret;
 }
 
 ######################################################################
@@ -583,14 +679,19 @@ sub text :lvalue {
 }
 
 sub retrieve {
+    (shift->_retrieve(@_))[0];
+}
+
+# returns the folded string and its width
+sub _retrieve {
     my $obj = shift;
     local *_ = \$obj->{text};
-    return '' if not defined $_;
-    (my $folded, my $rest) = $obj->fold($_, @_);
+    return ('', 0) if not defined $_;
+    my($folded, $rest, $width) = $obj->fold($_, @_);
     die "panic: retrieve: no progress in fold"
 	if length $rest and $rest eq $_;
     $_ = length $rest ? $rest : undef;
-    $folded;
+    ($folded, $width);
 }
 
 sub chops {
@@ -598,15 +699,17 @@ sub chops {
     my %opt = @_;
     my $width = $opt{width} // $obj->{width};
 
-    my @chops;
+    my(@chops, @length);
 
     if (ref $width eq 'ARRAY') {
 	for my $w (@{$width}) {
 	    if ($w == 0) {
 		push @chops, '';
+		push @length, 0;
 	    }
-	    elsif ((my $chop = $obj->retrieve(width => $w)) ne '') {
+	    elsif ((my($chop, $l) = $obj->_retrieve(width => $w))[0] ne '') {
 		push @chops, $chop;
+		push @length, $l;
 	    }
 	    else {
 		last;
@@ -614,11 +717,13 @@ sub chops {
 	}
     }
     else {
-	while ((my $chop = $obj->retrieve(width => $width)) ne '') {
+	while ((my($chop, $l) = $obj->_retrieve(width => $width))[0] ne '') {
 	    push @chops, $chop;
+	    push @length, $l;
 	}
     }
 
+    @{$opt{length}} = @length if $opt{length};
     @chops;
 }
 
@@ -634,7 +739,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.3305
+Version 2.3901
 
 =head1 SYNOPSIS
 
@@ -674,10 +779,23 @@ OSC 8 hyperlink sequences are also handled properly.  If the text is
 divided in the middle of a hyperlink, the link is closed at the end of
 the former text and reopened at the beginning of the latter string.
 
+Other control sequences (CSI), such as cursor movement, are passed
+through with no width.  The movement of the cursor is not taken into
+account: text written over by moving the cursor back is counted as
+it is.
+
+At the folding point, a sequence goes to the next line with the text
+after it.  When no visible text follows up to the end of the line, it
+stays on the line, even if the line has no room left.
+
 This module also support Unicode Asian full-width and non-spacing
-combining characters properly.  Japanese text formatting with
-head-or-end of line prohibition character is also supported.  Set
-the linebreak mode to enable it.
+combining characters properly.  Text is divided between grapheme
+clusters, so that a character with combining marks or an emoji
+sequence stays in one line, as far as the grapheme rules of the perl
+in use go; before perl 5.22, a grapheme in a long paragraph may
+rarely be split.  Japanese text formatting with head-or-end of line
+prohibition character is also supported.  Set the linebreak mode to
+enable it.
 
 Since the overhead of ANSI escape sequence handling is not significant
 when the data does not include them, this module can be used for
@@ -722,6 +840,12 @@ using default width with additional parameter:
 
 Some other easy-to-use interfaces are provided by sister module
 L<Text::ANSI::Fold::Util>.
+
+=head1 REGULAR EXPRESSIONS
+
+Import-tag C<:regex> gives the regular expressions C<$reset_re>,
+C<$color_re>, C<$erase_re>, C<$csi_re> and C<$osc_re>, which match the
+ANSI sequences this module recognizes.
 
 =head1 OBJECT INTERFACE
 
@@ -823,6 +947,15 @@ The padding operation is performed only on the last non-empty element,
 and no elements corresponding to subsequent items are returned.  Also,
 of course, padding is not performed for negative widths.
 
+=head2 B<chops> with length
+
+Give an array reference by C<length> parameter, and it is set to the
+visual width of each element returned (not the number of characters).
+It is the width that the fold counted, so the strings need not be
+measured again.  The padding is not included.
+
+    my @list = $fold->text($text)->chops(length => \my @length);
+
 =head1 OPTIONS
 
 Option parameter can be specified as name-value list for B<ansi_fold>
@@ -888,7 +1021,24 @@ prefix string.
 
 The B<fold> function does not complain if the result of adding a
 prefix string is longer than the original text.  The caller must be
-very careful because of the possibility of an infinite loop.
+very careful because of the possibility of an infinite loop, when the
+prefix is as wide as the width or longer, or given by a subroutine.
+
+A line has at least one character after the prefix, even if it does
+not fit.  A wide character after the prefix may make the line one
+column longer than the width.
+
+=item B<trim> => I<bool>
+
+If B<trim> option is given with true value, spaces at the end of a
+folded line are removed, including those brought there by the run-in
+operation, so that they do not make the line longer than the width.
+Only ASCII spaces are removed; other spaces, such as full-width spaces
+and the no-break space that B<splitwide> uses, are kept.  Default is 0.
+
+Spaces at the end of the original line are left as they are, because
+the line is not folded there.  Colored spaces are also left, because
+their background color may be visible.
 
 =item B<ambiguous> => C<narrow> or C<wide>
 
@@ -1089,6 +1239,10 @@ processing stops and the string up to the point immediately before is
 returned.  If it is found at the beginning of a string, it is added to
 the folded text and processing continues.
 
+The beginning is where no text is before it: a form feed after
+nothing but ANSI sequences, as in a form feed with a color, is at the
+beginning, and is kept in the place where it is.
+
 =back
 
 =head1 OSC 8 HYPERLINKS
@@ -1171,7 +1325,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright ©︎ 2018-2025 Kazumasa Utashiro.
+Copyright ©︎ 2018-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

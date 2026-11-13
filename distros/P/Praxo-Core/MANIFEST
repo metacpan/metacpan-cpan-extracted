@@ -9,6 +9,7 @@ llms.md
 PUBLISHING.md
 api/0.1.0.txt
 api/0.3.0.txt
+api/0.4.0.txt
 api-snapshot.pl
 conformance/run.pl
 tests/run.pl
@@ -17,6 +18,9 @@ lib/Praxo/Adapters/Anthropic.pm
 lib/Praxo/Adapters/Gemini.pm
 lib/Praxo/Adapters/MCP.pm
 lib/Praxo/Adapters/Harmovela.pm
+lib/Praxo/Adapters/Otel.pm
+lib/Praxo/Adapters/Retriever.pm
+lib/Praxo/Adapters/Delegation.pm
 lib/Praxo/Adapters/OpenAICompatible.pm
 lib/Praxo/Agent.pm
 lib/Praxo/Core.pm

@@ -8,7 +8,7 @@ sub new {
     my ($class, %args) = @_;
     return bless {
         transport => $args{transport},
-        client_version => $args{client_version} // '0.3.0',
+        client_version => $args{client_version} // '0.4.0',
         protocol_version => $args{protocol_version} // '2024-11-05',
         connected => 0,
         closed => 0,

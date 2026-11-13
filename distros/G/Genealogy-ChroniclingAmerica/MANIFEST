@@ -1,5 +1,5 @@
-bin/new_api
 Changes
+cpanfile
 ignore.txt
 lib/Genealogy/ChroniclingAmerica.pm
 LICENCE
@@ -18,6 +18,7 @@ t/eof.t
 t/eol.t
 t/kwalitee.t
 t/limiting.t
+t/mocked.t
 t/manifest.t
 t/modules-used.t
 t/no404s.t

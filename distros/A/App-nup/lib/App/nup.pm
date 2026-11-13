@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.13";
+our $VERSION = "1.14";
 
 1;
 =encoding utf-8
@@ -24,6 +24,7 @@ nup - n-up, multi-column paged output for commands and files
      -D  --document         document mode (default: on)
      -F  --no-paginate      disable page mode
      -A  --auto-paginate    auto disable page mode for single column
+     -L  --lateral          all pages in one row, scrolled sideways
      -H  --filename         show filename headers (default: on)
      -C  --pane=#[,#]       number of columns, and rows (e.g., 2,2)
      -P  --page=#           page height in lines
@@ -51,7 +52,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.13
+Version 1.14
 
 =cut
 =head1 DESCRIPTION
@@ -156,6 +157,44 @@ B<--paginate> to re-enable if needed.
 Automatically disable page mode when only one column fits the
 terminal.  This is useful when using C<nup> as C<MANPAGER>,
 where single-column page splitting wastes space.
+
+=item B<-L>, B<--lateral>
+
+Put all the pages in one row, however wide it becomes, instead of
+filling the screen with as many panes as fit and going on below.
+The row is as high as the screen, and it is seen by scrolling
+sideways in the pager.
+
+The screen shows the same number of panes as without this option:
+as many as fit, or the number given by C<-C>.  With C<-C4>, four
+pages are on the screen at a time, each a quarter of it wide.
+
+When the pager is C<less>, C<nup> adds C<< -S --shift=I<N> --rscroll=- >>
+to it, where I<N> is the width of a pane: the lines are
+not wrapped, and the right and left arrow keys move by one page.
+C<h> and C<l> move to the left and to the right as well, and C<H>
+and C<L> go to the left end and to the right end of the row: C<nup>
+sets the C<LESSKEY_CONTENT> environment variable to
+
+    h left-scroll;l right-scroll;H no-scroll;L end-scroll
+
+when it is not set.  C<h> and C<H> are the help of C<less>, which
+is not on a key then: set C<LESSKEY_CONTENT> yourself to keep it.  The
+options are added to C<NUP_PAGER>, C<NUP_PAGE_PAGER> and C<--pager>
+as well when the command is C<less>; another pager is used as it is,
+and has to be told not to wrap the lines.
+
+What works depends on the version of C<less>, and the build of
+C<less> in tecolicom/tap keeps the panes at the edge of the screen in
+a search as well; see L</LESS>.
+
+    nup -L man perlfunc
+    nup -L -C4 README.md
+
+This is for the pages of one input.  It cannot be used with more
+than one file, C<--parallel>, C<--no-paginate>, rows (C<-R>,
+C<-C2,2>, C<-G>) or PDF output (C<-T>, C<-o> with C<.pdf>).  C<--auto-paginate> is ignored.  The pages are laid out
+once, for the height of the terminal at that time.
 
 =item B<-H>, B<--filename>
 
@@ -274,11 +313,7 @@ and C<NUP_PAGE_PAGER> is not used there.
 The C<PAGER> variable is not used to avoid an infinite loop when
 C<PAGER> is set to C<nup>.
 C<+Gg> makes C<less> read all input before displaying, so that C<-F>
-and the percentage work; C<--file-size> of C<less> 590 and later does
-the same, but the C<less> 581 of macOS does not have it, so C<+Gg>
-is the default.  Set C<NUP_PAGER> to use it:
-
-    export NUP_PAGER="less --file-size"
+and the percentage work; see L</LESS> for the settings of C<less>.
 
 Use C<--pager=> (empty) or C<--no-pager> to disable pager.
 
@@ -376,7 +411,14 @@ to split the screen when the number of rows is set, as in C<-C2,2>:
 
     COLUMNS=170 nup -C2 file1.txt file2.txt
 
-=head2 Less Environment Variables
+=head1 LESS
+
+C<nup> is made to be used with C<less>.  It sets environment
+variables for C<less>, and adds options to it for C<-L>.  Some of them
+need a recent version, and a patched build of C<less> does more for
+the pages of C<nup>.
+
+=head2 Environment Variables
 
 C<nup> sets the following environment variables when they are not
 already defined, to ensure proper display with C<less>:
@@ -394,6 +436,71 @@ sequences.
 
 =back
 
+=head2 Versions
+
+=over 4
+
+=item C<less> 590
+
+C<--file-size> makes C<less> read all input before displaying, as
+C<+Gg> of the default pager does.  The C<less> 581 of macOS does not
+have it, so C<+Gg> is the default.  Set C<NUP_PAGER> to use it:
+
+    export NUP_PAGER="less --file-size"
+
+=item C<less> 661
+
+C<LESSKEY_CONTENT> is read, which C<-L> uses to put the keys C<h>,
+C<l>, C<H> and C<L>.  An older C<less> ignores it.
+
+=item C<less> 710
+
+C<right-limit-scroll> stops at the right end of the lines.  C<-L>
+puts it on C<l>, in place of C<right-scroll>, which goes on past the
+end.
+
+=back
+
+C<-L> runs C<less --align-shift --version> to see the version of
+C<less>, and whether it has the option below.
+
+=head2 The Build in tecolicom/tap
+
+L<tecolicom/tap|https://github.com/tecolicom/homebrew-tap> has a build
+of C<less> with patches for the pages of C<nup>
+(L<kaz-utashiro/less|https://github.com/kaz-utashiro/less>).  It adds
+two options:
+
+=over 4
+
+=item B<--align-record>=I<N>
+
+A search shows the whole record (page) that has the match from the
+top of the screen, instead of the matching line, so that the pages
+stay in place.  I<N> is the lines of a record; C<-1> is the height
+of the screen less the prompt line, which is the height of the pages
+of C<nup>.  A repeated search goes on from the next record.
+
+=item B<--align-shift>
+
+The horizontal shift stays at a multiple of the C<--shift> amount, the
+width of a pane with C<-L>.  A search, and the right end, keep the
+panes at the edge of the screen, and C<n> and C<N> go through the
+panes that have a match, one by one.  C<-L> adds this option when the
+C<less> has it.
+
+=back
+
+Install it with Homebrew.  It cannot be installed together with the
+C<less> of Homebrew itself, which has the same command name:
+
+    brew install tecolicom/tap/less
+
+Then use C<--align-record> for the pages:
+
+    export NUP_PAGER="less --file-size"
+    export NUP_PAGE_PAGER="less --file-size --align-record=-1"
+
 =head1 EXAMPLES
 
 Typical n-up usage:
@@ -402,6 +509,8 @@ Typical n-up usage:
     nup -C2 man perl           # 2 columns
     nup -C2,2 man perl         # 2x2 grid (4-up layout)
     nup -F man perl            # no pagination
+    nup -L man perl            # one row of pages, scrolled sideways
+    nup -L -C4 man perl        # four pages on the screen at a time
     nup file1.txt file2.txt    # view files side by side
     nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
     nup -e ./script.sh         # force command mode for a file
@@ -420,6 +529,8 @@ Use L<tecolicom/tap|https://github.com/tecolicom/homebrew-tap>:
 
     brew tap tecolicom/tap
     brew install app-nup
+
+See L</LESS> for the build of C<less> in the same tap.
 
 =head2 CPAN
 

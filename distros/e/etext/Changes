@@ -1,3 +1,91 @@
+2.09 (2026-11-12):
+	Split lines and frames (the manual's "Split lines and frames",
+	in "Display of blocks"; the owner's design, STRICTURES.md 8.8 to
+	8.11): where the widget itself lays leaves of a block out one
+	under another (a "stack": all the leaves in the default layout,
+	or the leaves that a layout callback gave one box, such as a
+	group it saw as one child with a repeat count), it draws the
+	structure of the tree that is hidden there.  Between two leaves
+	of a stack, lines across the stack show the depth of the
+	separator between them (as "block list" reports it) in binary:
+	bit 0 a dotted line, bit 1 a dashed line, bit 2 a solid line,
+	bit 3 and each higher bit a solid line 3 pixels wide; depth 0
+	has no line; with leaves of different depths the left half shows
+	the depth less the defect of the upper leaf, the right half the
+	depth less the defect of the lower one.  Around a stack, frames
+	show the same way the number of nodes with a single child from
+	the node the stack is expected to be: the root in the default
+	layout, the node at the distance -layoutdepth from the root
+	under a callback (no frames without -layoutdepth, or when the
+	stack is not all the leaves of that node).  The lines and frames
+	take no room, are drawn in gray50 under the text and before the
+	other ornaments of the block, and are clipped to the display
+	line.  New boolean option -splitlines of block types, true by
+	default: "block configure TYPE -splitlines 0" switches them off.
+	Blocks that have such structure are drawn differently from 2.08
+	unless the option is switched off.  Test t/splitlines.t.
+	A negative count in the result of a layout callback (leaves to
+	hide, or the ordinal of a stolen line) crashed the widget; it
+	is refused now, as other bad results (BUGS 38).
+	Cut and paste with structure (the manual's new section "Cut and
+	paste with structure"; the design note doc-design/STRICTURES.md
+	on the branch strictures-design, sections 8 and 9):
+	"block list -values index1 index2": the separators of a block
+	that is not listed whole are [depth, defect, the value of the
+	leaf that begins after the separator, the values of the nodes
+	that begin there, from the lowest up], and the list starts with
+	a TagOn (with a copy of the value) for every run that is already
+	on where the range starts.
+	"block cut index1 index2" returns that list and deletes the
+	range; where this deletion joins two leaves or nodes, the joined
+	one never takes the end side's value (it is in the list, with
+	the separator that began its owner): the leaf and the nodes in
+	which the range starts are left as they were.
+	"block paste index list ?-marks?" puts a list in as one command
+	(the insertion the undo of a deletion makes, made public): text
+	with its tags, separators at their depths (levels are added
+	below the root where the tree has too few), whole blocks with
+	instance data and node values, images and windows, and the
+	values of the separators and of the runs; marks only with
+	-marks.  It returns the range it filled.  Its undo deletes that
+	range as "block cut" does and takes the added levels away.
+	Cut then paste at the same place gives the text, the trees and
+	the values back for every range that cuts no block, in a block
+	whose leaves are equally deep; two pieces of two blocks can be
+	exchanged, with or without a third place for one of them.  Both
+	commands are undo steps of their own; -valuecommand gets the
+	causes "block cut" and "block paste".  Test t/cutpaste.t.
+	Perl: clipboardCopy, clipboardCut and clipboardPaste keep the
+	list of the selection beside the string they put on the
+	clipboard, and paste the list (with "block paste") while the
+	clipboard still holds that string; else the string, as before.
+	Provisional (BUGS 36): the type of the block is not asked at the
+	joins and splits; in a tree with leaves of different depths a
+	cut can leave the leaf it started in one level deeper.
+	"block level index ?level?": the depth of the separator at an
+	index, or its change, without moving text: a higher depth cuts
+	the nodes that hold both leaves as "block split" at that depth
+	would have (levels are added below the root where needed), a
+	lower one joins them as the deletion of the separator would;
+	the two leaves and their values stay, where deleting the
+	separator and splitting again loses the value of the second
+	leaf.  Recorded for undo (the core had this for the undo of
+	"block insert" only: TkIBTreeSetSeparatorLevels); -valuecommand
+	gets the cause "block level".  Test t/level.t.
+	Several commands as one undo step: "edit step begin" ... "edit
+	step end" (they nest; "edit step" tells how many are open).
+	Between them no separator goes into the undo history
+	(-autoseparators puts none, "edit separator" does nothing), and
+	the setting of a value (block nodedata, tag data, mark data,
+	block data) is recorded: the value the place had goes into the
+	step, the undo and the redo exchange the two (-valuecommand:
+	"stash" where an unrecorded set tells "drop", then "stash" and
+	"restore", "discard" with the step).  Outside a step setting a
+	value stays unrecorded, as before.  Perl: $w->editStep(CODE,
+	ARGS) runs the code in a step and ends the step also when the
+	code dies.  clipboardPaste over a selection (a cut and a paste)
+	is one step.  Test t/step.t.
+
 2.08 (2026-11-12):
 	Ornaments (the manual's new section "Ornaments"; provisional):
 	lines, polygons, rectangles and ovals drawn over or under the

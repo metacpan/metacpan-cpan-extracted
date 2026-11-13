@@ -9,7 +9,7 @@ use Encode;
 use Carp;
 use Scalar::Util 'weaken';
 
-our $VERSION = "1.09";
+our $VERSION = "1.11";
 
 sub new {
     my $class = shift;
@@ -21,13 +21,9 @@ sub new {
 my $ch0 = chr(0);
 sub _string_unescape {
     my $string = shift;
-
     defined $string or return undef;
-
-    my $ret = eval "qq${ch0}$string${ch0}";
-    defined $ret or croak "Can't unescape this string: $string";
-
-    return $ret;
+    $string =~ s/\\(.)/$1/gs;
+    return $string;
 }
 
 sub _parse_description {
@@ -234,7 +230,7 @@ sub text {
         if ($self->{content}) {
             $value .= $_->text($flags) foreach @{ $self->{content} };
         }
-        if ($self->{text}) {
+        if (defined $self->{text} and length $self->{text}) {
             my $temp_value = $self->{text};
             $temp_value = trim $temp_value if $flags->{strip};
             $value .= $temp_value;

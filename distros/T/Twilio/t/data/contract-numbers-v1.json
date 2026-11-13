@@ -1,0 +1,1719 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_completed" : "2026-01-11T03:04:05Z",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "request_id" : "a_request_id",
+     "results" : [
+      "a_results"
+     ],
+     "status" : "a_status",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_completed",
+      "date_completed",
+      "date",
+      1768100645
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "request_id",
+      "request_id",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "bulk_eligibilities",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateBulkEligibility",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/HostedNumber/Eligibility/Bulk"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "results" : [
+      "a_results"
+     ]
+    },
+    "fields" : [
+     [
+      "results",
+      "results",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "eligibilities",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateEligibility",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/HostedNumber/Eligibility"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auto_cancel_approval_numbers" : "a_auto_cancel_approval_numbers",
+     "bundle_sid" : "a_bundle_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "documents" : [
+      "a_documents"
+     ],
+     "losing_carrier_information" : {
+      "a_losing_carrier_information" : 1
+     },
+     "notification_emails" : [
+      "a_notification_emails"
+     ],
+     "order_cancellation_reason" : "a_order_cancellation_reason",
+     "phone_numbers" : [
+      "a_phone_numbers"
+     ],
+     "port_in_request_sid" : "a_port_in_request_sid",
+     "port_in_request_status" : "a_port_in_request_status",
+     "portability_advance_carrier" : "a_portability_advance_carrier",
+     "signature_request_url" : "a_signature_request_url",
+     "support_ticket_id" : 1836,
+     "target_port_in_date" : "2026-01-27",
+     "target_port_in_time_range_end" : "a_target_port_in_time_range_end",
+     "target_port_in_time_range_start" : "a_target_port_in_time_range_start",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auto_cancel_approval_numbers",
+      "auto_cancel_approval_numbers",
+      "plain"
+     ],
+     [
+      "bundle_sid",
+      "bundle_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "documents",
+      "documents",
+      "plain"
+     ],
+     [
+      "losing_carrier_information",
+      "losing_carrier_information",
+      "plain"
+     ],
+     [
+      "notification_emails",
+      "notification_emails",
+      "plain"
+     ],
+     [
+      "order_cancellation_reason",
+      "order_cancellation_reason",
+      "plain"
+     ],
+     [
+      "phone_numbers",
+      "phone_numbers",
+      "plain"
+     ],
+     [
+      "port_in_request_sid",
+      "port_in_request_sid",
+      "plain"
+     ],
+     [
+      "port_in_request_status",
+      "port_in_request_status",
+      "plain"
+     ],
+     [
+      "portability_advance_carrier",
+      "portability_advance_carrier",
+      "plain"
+     ],
+     [
+      "signature_request_url",
+      "signature_request_url",
+      "plain"
+     ],
+     [
+      "support_ticket_id",
+      "support_ticket_id",
+      "plain"
+     ],
+     [
+      "target_port_in_date",
+      "target_port_in_date",
+      "date",
+      1769472000
+     ],
+     [
+      "target_port_in_time_range_end",
+      "target_port_in_time_range_end",
+      "plain"
+     ],
+     [
+      "target_port_in_time_range_start",
+      "target_port_in_time_range_start",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "account_sid" : "v_account_sid",
+   "auto_cancel_approval_numbers" : "v_auto_cancel_approval_numbers",
+   "bundle_sid" : "v_bundle_sid",
+   "documents" : [
+    "v_documents"
+   ],
+   "losing_carrier_information" : {
+    "v_losing_carrier_information" : 1
+   },
+   "notification_emails" : [
+    "v_notification_emails"
+   ],
+   "phone_numbers" : [
+    "v_phone_numbers"
+   ],
+   "portability_advance_carrier" : "v_portability_advance_carrier",
+   "target_port_in_date" : {
+    "epoch" : 1769483045
+   },
+   "target_port_in_time_range_end" : "v_target_port_in_time_range_end",
+   "target_port_in_time_range_start" : "v_target_port_in_time_range_start"
+  },
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_port_ins",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreatePortingPortIn",
+  "json" : {
+   "account_sid" : "v_account_sid",
+   "auto_cancel_approval_numbers" : "v_auto_cancel_approval_numbers",
+   "bundle_sid" : "v_bundle_sid",
+   "documents" : [
+    "v_documents"
+   ],
+   "losing_carrier_information" : {
+    "v_losing_carrier_information" : 1
+   },
+   "notification_emails" : [
+    "v_notification_emails"
+   ],
+   "phone_numbers" : [
+    "v_phone_numbers"
+   ],
+   "portability_advance_carrier" : "v_portability_advance_carrier",
+   "target_port_in_date" : "2026-01-27",
+   "target_port_in_time_range_end" : "v_target_port_in_time_range_end",
+   "target_port_in_time_range_start" : "v_target_port_in_time_range_start"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/PortIn"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "notifications_of" : [
+      "a_notifications_of"
+     ],
+     "port_in_target_url" : "a_port_in_target_url",
+     "port_out_target_url" : "a_port_out_target_url",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "notifications_of",
+      "notifications_of",
+      "plain"
+     ],
+     [
+      "port_in_target_url",
+      "port_in_target_url",
+      "plain"
+     ],
+     [
+      "port_out_target_url",
+      "port_out_target_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_webhook_configurations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreatePortingWebhookConfiguration",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/Configuration/Webhook"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "comments" : "a_comments",
+     "data" : {
+      "a_data" : 1
+     },
+     "dateCreated" : "2026-01-19T03:04:05Z",
+     "dateUpdated" : "2026-01-06T03:04:05Z",
+     "embeddedSession" : {
+      "a_embeddedSession" : 1
+     },
+     "friendlyName" : "a_friendlyName",
+     "id" : "a_id",
+     "regulationId" : "a_regulationId",
+     "regulationVersion" : 1824,
+     "status" : "a_status",
+     "statusCallbackUrl" : "a_statusCallbackUrl",
+     "statusNotificationEmail" : "a_statusNotificationEmail"
+    },
+    "fields" : [
+     [
+      "comments",
+      "comments",
+      "plain"
+     ],
+     [
+      "data",
+      "data",
+      "plain"
+     ],
+     [
+      "date_created",
+      "dateCreated",
+      "date",
+      1768791845
+     ],
+     [
+      "date_updated",
+      "dateUpdated",
+      "date",
+      1767668645
+     ],
+     [
+      "embedded_session",
+      "embeddedSession",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "regulation_id",
+      "regulationId",
+      "plain"
+     ],
+     [
+      "regulation_version",
+      "regulationVersion",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback_url",
+      "statusCallbackUrl",
+      "plain"
+     ],
+     [
+      "status_notification_email",
+      "statusNotificationEmail",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "comments" : "v_comments",
+   "data" : {
+    "v_data" : 1
+   },
+   "friendlyName" : "v_friendlyName",
+   "regulationId" : "v_regulationId",
+   "regulationVersion" : 1824,
+   "statusCallbackUrl" : "v_statusCallbackUrl",
+   "statusNotificationEmail" : "v_statusNotificationEmail",
+   "themeSetId" : "v_themeSetId"
+  },
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sender_id_registrations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateSenderIdRegistration",
+  "json" : {
+   "comments" : "v_comments",
+   "data" : {
+    "v_data" : 1
+   },
+   "friendlyName" : "v_friendlyName",
+   "regulationId" : "v_regulationId",
+   "regulationVersion" : 1824,
+   "statusCallbackUrl" : "v_statusCallbackUrl",
+   "statusNotificationEmail" : "v_statusNotificationEmail",
+   "themeSetId" : "v_themeSetId"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/SenderIdRegistrations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "id" : "a_id",
+     "sessionId" : "a_sessionId",
+     "sessionToken" : "a_sessionToken"
+    },
+    "fields" : [
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "session_id",
+      "sessionId",
+      "plain"
+     ],
+     [
+      "session_token",
+      "sessionToken",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "themeSetId" : "v_themeSetId"
+  },
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "embedded_sessions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateSenderIdRegistrationEmbeddedSession",
+  "json" : {
+   "themeSetId" : "v_themeSetId"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/SenderIdRegistrations/id1/EmbeddedSessions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "country" : "a_country",
+     "email_message" : "a_email_message",
+     "email_subject" : "a_email_subject",
+     "friendly_name" : "a_friendly_name",
+     "logo_sid" : "a_logo_sid",
+     "product" : "a_product",
+     "url" : "a_url",
+     "url_redirection" : "a_url_redirection"
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "email_message",
+      "email_message",
+      "plain"
+     ],
+     [
+      "email_subject",
+      "email_subject",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "logo_sid",
+      "logo_sid",
+      "plain"
+     ],
+     [
+      "product",
+      "product",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "url_redirection",
+      "url_redirection",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "signing_request_configurations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateSigningRequestConfiguration",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/SigningRequest/Configuration"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "sendCodeAttempts" : [
+      "a_sendCodeAttempts"
+     ],
+     "to" : "a_to",
+     "verificationSid" : "a_verificationSid"
+    },
+    "fields" : [
+     [
+      "send_code_attempts",
+      "sendCodeAttempts",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "verification_sid",
+      "verificationSid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "friendly_name" : "v_friendly_name",
+   "locale" : "v_locale",
+   "to" : "v_to"
+  },
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sms_verifications",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateSmsVerification",
+  "json" : {
+   "friendly_name" : "v_friendly_name",
+   "locale" : "v_locale",
+   "to" : "v_to"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/CallerIds/SmsVerifications"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "callerIdSid" : "a_callerIdSid",
+     "status" : "a_status",
+     "to" : "a_to",
+     "verificationSid" : "a_verificationSid"
+    },
+    "fields" : [
+     [
+      "caller_id_sid",
+      "callerIdSid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "verification_sid",
+      "verificationSid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "friendly_name" : "v_friendly_name",
+   "to" : "v_to",
+   "verification_code" : "v_verification_code"
+  },
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sms_verification_checks",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateSmsVerificationCheck",
+  "json" : {
+   "friendly_name" : "v_friendly_name",
+   "to" : "v_to",
+   "verification_code" : "v_verification_code"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/CallerIds/SmsVerificationChecks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "accountSid" : "a_accountSid",
+     "callSid" : "a_callSid",
+     "friendlyName" : "a_friendlyName",
+     "phoneNumber" : "a_phoneNumber",
+     "validationCode" : "a_validationCode"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "accountSid",
+      "plain"
+     ],
+     [
+      "call_sid",
+      "callSid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendlyName",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phoneNumber",
+      "plain"
+     ],
+     [
+      "validation_code",
+      "validationCode",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "call_delay" : "v_call_delay",
+   "custom_code" : "v_custom_code",
+   "custom_success_message" : "v_custom_success_message",
+   "extension" : "v_extension",
+   "friendly_name" : "v_friendly_name",
+   "phone_number" : "v_phone_number",
+   "status_callback" : "v_status_callback",
+   "status_callback_method" : "PUT"
+  },
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "voice_verifications",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateVoiceVerification",
+  "json" : {
+   "call_delay" : "v_call_delay",
+   "custom_code" : "v_custom_code",
+   "custom_success_message" : "v_custom_success_message",
+   "extension" : "v_extension",
+   "friendly_name" : "v_friendly_name",
+   "phone_number" : "v_phone_number",
+   "status_callback" : "v_status_callback",
+   "status_callback_method" : "PUT"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/CallerIds/VoiceVerifications"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_port_ins",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeletePortingPortIn",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/PortIn/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_port_in_phone_number",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeletePortingPortInPhoneNumber",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/PortIn/id1/PhoneNumber/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_webhook_configurations_delete",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeletePortingWebhookConfigurationDelete",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/Configuration/Webhook/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_completed" : "2026-01-11T03:04:05Z",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "request_id" : "a_request_id",
+     "results" : [
+      "a_results"
+     ],
+     "status" : "a_status",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_completed",
+      "date_completed",
+      "date",
+      1768100645
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "request_id",
+      "request_id",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "bulk_eligibilities",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBulkEligibility",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/HostedNumber/Eligibility/Bulk/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auto_cancel_approval_numbers" : "a_auto_cancel_approval_numbers",
+     "bundle_sid" : "a_bundle_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "documents" : [
+      "a_documents"
+     ],
+     "losing_carrier_information" : {
+      "a_losing_carrier_information" : 1
+     },
+     "notification_emails" : [
+      "a_notification_emails"
+     ],
+     "order_cancellation_reason" : "a_order_cancellation_reason",
+     "phone_numbers" : [
+      "a_phone_numbers"
+     ],
+     "port_in_request_sid" : "a_port_in_request_sid",
+     "port_in_request_status" : "a_port_in_request_status",
+     "portability_advance_carrier" : "a_portability_advance_carrier",
+     "signature_request_url" : "a_signature_request_url",
+     "support_ticket_id" : 1836,
+     "target_port_in_date" : "2026-01-27",
+     "target_port_in_time_range_end" : "a_target_port_in_time_range_end",
+     "target_port_in_time_range_start" : "a_target_port_in_time_range_start",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auto_cancel_approval_numbers",
+      "auto_cancel_approval_numbers",
+      "plain"
+     ],
+     [
+      "bundle_sid",
+      "bundle_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "documents",
+      "documents",
+      "plain"
+     ],
+     [
+      "losing_carrier_information",
+      "losing_carrier_information",
+      "plain"
+     ],
+     [
+      "notification_emails",
+      "notification_emails",
+      "plain"
+     ],
+     [
+      "order_cancellation_reason",
+      "order_cancellation_reason",
+      "plain"
+     ],
+     [
+      "phone_numbers",
+      "phone_numbers",
+      "plain"
+     ],
+     [
+      "port_in_request_sid",
+      "port_in_request_sid",
+      "plain"
+     ],
+     [
+      "port_in_request_status",
+      "port_in_request_status",
+      "plain"
+     ],
+     [
+      "portability_advance_carrier",
+      "portability_advance_carrier",
+      "plain"
+     ],
+     [
+      "signature_request_url",
+      "signature_request_url",
+      "plain"
+     ],
+     [
+      "support_ticket_id",
+      "support_ticket_id",
+      "plain"
+     ],
+     [
+      "target_port_in_date",
+      "target_port_in_date",
+      "date",
+      1769472000
+     ],
+     [
+      "target_port_in_time_range_end",
+      "target_port_in_time_range_end",
+      "plain"
+     ],
+     [
+      "target_port_in_time_range_start",
+      "target_port_in_time_range_start",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_port_ins",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPortingPortIn",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/PortIn/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "country" : "a_country",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "last_updated" : "2026-01-15T03:04:05Z",
+     "missing_required_fields" : true,
+     "not_portability_reason" : "a_not_portability_reason",
+     "not_portability_reason_code" : 2884,
+     "phone_number" : "a_phone_number",
+     "phone_number_sid" : "a_phone_number_sid",
+     "phone_number_type" : "a_phone_number_type",
+     "port_date" : "2026-01-11T03:04:05Z",
+     "port_in_phone_number_status" : "a_port_in_phone_number_status",
+     "port_in_request_sid" : "a_port_in_request_sid",
+     "port_out_pin" : 1314,
+     "portable" : true,
+     "rejection_reason" : "a_rejection_reason",
+     "rejection_reason_code" : 2212,
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "last_updated",
+      "last_updated",
+      "date",
+      1768446245
+     ],
+     [
+      "missing_required_fields",
+      "missing_required_fields",
+      "plain"
+     ],
+     [
+      "not_portability_reason",
+      "not_portability_reason",
+      "plain"
+     ],
+     [
+      "not_portability_reason_code",
+      "not_portability_reason_code",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "phone_number_sid",
+      "phone_number_sid",
+      "plain"
+     ],
+     [
+      "phone_number_type",
+      "phone_number_type",
+      "plain"
+     ],
+     [
+      "port_date",
+      "port_date",
+      "date",
+      1768100645
+     ],
+     [
+      "port_in_phone_number_status",
+      "port_in_phone_number_status",
+      "plain"
+     ],
+     [
+      "port_in_request_sid",
+      "port_in_request_sid",
+      "plain"
+     ],
+     [
+      "port_out_pin",
+      "port_out_pin",
+      "plain"
+     ],
+     [
+      "portable",
+      "portable",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "rejection_reason_code",
+      "rejection_reason_code",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_port_in_phone_number",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPortingPortInPhoneNumber",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/PortIn/id1/PhoneNumber/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "country" : "a_country",
+     "not_portable_reason" : "a_not_portable_reason",
+     "not_portable_reason_code" : 2538,
+     "number_type" : "MOBILE",
+     "phone_number" : "a_phone_number",
+     "pin_and_account_number_required" : true,
+     "portable" : true,
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "not_portable_reason",
+      "not_portable_reason",
+      "plain"
+     ],
+     [
+      "not_portable_reason_code",
+      "not_portable_reason_code",
+      "plain"
+     ],
+     [
+      "number_type",
+      "number_type",
+      "plain"
+     ],
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "pin_and_account_number_required",
+      "pin_and_account_number_required",
+      "plain"
+     ],
+     [
+      "portable",
+      "portable",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_portabilities",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "TargetAccountSid",
+    "v_target_account_sid"
+   ],
+   [
+    "AddressSid",
+    "v_address_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchPortingPortability",
+  "method" : "fetch",
+  "options" : {
+   "address_sid" : "v_address_sid",
+   "target_account_sid" : "v_target_account_sid"
+  },
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/Portability/PhoneNumber/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "notifications_of" : [
+      "a_notifications_of"
+     ],
+     "port_in_target_date_created" : "2026-01-10T03:04:05Z",
+     "port_in_target_url" : "a_port_in_target_url",
+     "port_out_target_date_created" : "2026-01-27T03:04:05Z",
+     "port_out_target_url" : "a_port_out_target_url",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "notifications_of",
+      "notifications_of",
+      "plain"
+     ],
+     [
+      "port_in_target_date_created",
+      "port_in_target_date_created",
+      "date",
+      1768014245
+     ],
+     [
+      "port_in_target_url",
+      "port_in_target_url",
+      "plain"
+     ],
+     [
+      "port_out_target_date_created",
+      "port_out_target_date_created",
+      "date",
+      1769483045
+     ],
+     [
+      "port_out_target_url",
+      "port_out_target_url",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "webhook",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPortingWebhookConfigurationFetch",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/Configuration/Webhook"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "port_in_requests" : [
+      {
+       "phone_numbers_ported" : 2146,
+       "phone_numbers_requested" : 2470,
+       "port_in_request_sid" : "a_port_in_request_sid",
+       "port_in_request_status" : "a_port_in_request_status",
+       "status_last_updated_timestamp" : "a_status_last_updated_timestamp",
+       "suggested_action" : "a_suggested_action"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "phone_numbers_ported",
+      "phone_numbers_ported",
+      "plain"
+     ],
+     [
+      "phone_numbers_requested",
+      "phone_numbers_requested",
+      "plain"
+     ],
+     [
+      "port_in_request_sid",
+      "port_in_request_sid",
+      "plain"
+     ],
+     [
+      "port_in_request_status",
+      "port_in_request_status",
+      "plain"
+     ],
+     [
+      "status_last_updated_timestamp",
+      "status_last_updated_timestamp",
+      "plain"
+     ],
+     [
+      "suggested_action",
+      "suggested_action",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "porting_all_port_ins",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Token",
+    "v_token"
+   ],
+   [
+    "Size",
+    "411"
+   ],
+   [
+    "PortInRequestSid",
+    "v_port_in_request_sid"
+   ],
+   [
+    "PortInRequestStatus",
+    "v_port_in_request_status"
+   ],
+   [
+    "CreatedBefore",
+    "v_created_before"
+   ],
+   [
+    "CreatedAfter",
+    "v_created_after"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListPortInRequests",
+  "method" : "page",
+  "options" : {
+   "created_after" : "v_created_after",
+   "created_before" : "v_created_before",
+   "port_in_request_sid" : "v_port_in_request_sid",
+   "port_in_request_status" : "v_port_in_request_status",
+   "size" : 411,
+   "token" : "v_token"
+  },
+  "records_key" : "port_in_requests",
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/Porting/PortIn/PortInRequests"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "configurations" : [
+      {
+       "country" : "a_country",
+       "email_message" : "a_email_message",
+       "email_subject" : "a_email_subject",
+       "friendly_name" : "a_friendly_name",
+       "logo_sid" : "a_logo_sid",
+       "product" : "a_product",
+       "url" : "a_url",
+       "url_redirection" : "a_url_redirection"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "country",
+      "country",
+      "plain"
+     ],
+     [
+      "email_message",
+      "email_message",
+      "plain"
+     ],
+     [
+      "email_subject",
+      "email_subject",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "logo_sid",
+      "logo_sid",
+      "plain"
+     ],
+     [
+      "product",
+      "product",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "url_redirection",
+      "url_redirection",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "numbers",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "signing_request_configurations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Country",
+    "v_country"
+   ],
+   [
+    "Product",
+    "v_product"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListSigningRequestConfiguration",
+  "method" : "page",
+  "options" : {
+   "country" : "v_country",
+   "product" : "v_product"
+  },
+  "records_key" : "configurations",
+  "required" : [],
+  "url" : "https://numbers.twilio.com/v1/SigningRequest/Configuration"
+ }
+]

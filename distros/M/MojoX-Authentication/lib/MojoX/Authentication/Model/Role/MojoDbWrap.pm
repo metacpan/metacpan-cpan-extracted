@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::Role::MojoDbWrap;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo::Role;

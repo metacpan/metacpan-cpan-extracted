@@ -43,6 +43,16 @@ The C<$record> argument is the hash reference where remapping will be
 applied. It is changed, so make sure to copy it if you need to preserve
 the original.
 
+If the class composing the role has a C<protected_keys_list> method
+(e.g. from L<MojoX::Authentication::Model::Role::Local>), the keys it
+returns are I<protected>: they are taken out of C<$record> before the
+mappings run and put back, unchanged, after them. No mapping, code
+references included, can read, change, add or remove them; whatever a
+mapping sets for a protected key is discarded. To keep a secret in a
+column with another name, set the key for the secret (e.g.
+C<key_for_secret> in L<MojoX::Authentication::Model::Role::Local>)
+instead of remapping it.
+
 The C<$mappings> argument is an array reference that can contain three
 kind of items:
 
@@ -116,8 +126,8 @@ different way to copy one value from the C<ikey> to the C<okey>.
 Examples:
 
    $map    = { okey => 'bar', ikey => 'foo',
-               fwd_op => sub ($x) { join(', ', $x->@*) },
-               bwd_op => sub ($x) { [ split m{,\ }mxs, $x ] },
+               op           => sub ($x) { join(', ', $x->@*) },
+               backwards_op => sub ($x) { [ split m{,\ }mxs, $x ] },
              };
 
    # forward direction

@@ -18,6 +18,7 @@ nup - n-up, multi-column paged output for commands and files
      -D  --document         document mode (default: on)
      -F  --no-paginate      disable page mode
      -A  --auto-paginate    auto disable page mode for single column
+     -L  --lateral          all pages in one row, scrolled sideways
      -H  --filename         show filename headers (default: on)
      -C  --pane=#[,#]       number of columns, and rows (e.g., 2,2)
      -P  --page=#           page height in lines
@@ -45,7 +46,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.12
+Version 1.13
 
 # DESCRIPTION
 
@@ -142,6 +143,44 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
     Automatically disable page mode when only one column fits the
     terminal.  This is useful when using `nup` as `MANPAGER`,
     where single-column page splitting wastes space.
+
+- **-L**, **--lateral**
+
+    Put all the pages in one row, however wide it becomes, instead of
+    filling the screen with as many panes as fit and going on below.
+    The row is as high as the screen, and it is seen by scrolling
+    sideways in the pager.
+
+    The screen shows the same number of panes as without this option:
+    as many as fit, or the number given by `-C`.  With `-C4`, four
+    pages are on the screen at a time, each a quarter of it wide.
+
+    When the pager is `less`, `nup` adds `-S --shift=_N_ --rscroll=-`
+    to it, where _N_ is the width of a pane: the lines are
+    not wrapped, and the right and left arrow keys move by one page.
+    `h` and `l` move to the left and to the right as well, and `H`
+    and `L` go to the left end and to the right end of the row: `nup`
+    sets the `LESSKEY_CONTENT` environment variable to
+
+        h left-scroll;l right-scroll;H no-scroll;L end-scroll
+
+    when it is not set.  `h` and `H` are the help of `less`, which
+    is not on a key then: set `LESSKEY_CONTENT` yourself to keep it.  The
+    options are added to `NUP_PAGER`, `NUP_PAGE_PAGER` and `--pager`
+    as well when the command is `less`; another pager is used as it is,
+    and has to be told not to wrap the lines.
+
+    What works depends on the version of `less`, and the build of
+    `less` in tecolicom/tap keeps the panes at the edge of the screen in
+    a search as well; see ["LESS"](#less).
+
+        nup -L man perlfunc
+        nup -L -C4 README.md
+
+    This is for the pages of one input.  It cannot be used with more
+    than one file, `--parallel`, `--no-paginate`, rows (`-R`,
+    `-C2,2`, `-G`) or PDF output (`-T`, `-o` with `.pdf`).  `--auto-paginate` is ignored.  The pages are laid out
+    once, for the height of the terminal at that time.
 
 - **-H**, **--filename**
 
@@ -244,11 +283,7 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
     The `PAGER` variable is not used to avoid an infinite loop when
     `PAGER` is set to `nup`.
     `+Gg` makes `less` read all input before displaying, so that `-F`
-    and the percentage work; `--file-size` of `less` 590 and later does
-    the same, but the `less` 581 of macOS does not have it, so `+Gg`
-    is the default.  Set `NUP_PAGER` to use it:
-
-        export NUP_PAGER="less --file-size"
+    and the percentage work; see ["LESS"](#less) for the settings of `less`.
 
     Use `--pager=` (empty) or `--no-pager` to disable pager.
 
@@ -340,7 +375,14 @@ to split the screen when the number of rows is set, as in `-C2,2`:
 
     COLUMNS=170 nup -C2 file1.txt file2.txt
 
-## Less Environment Variables
+# LESS
+
+`nup` is made to be used with `less`.  It sets environment
+variables for `less`, and adds options to it for `-L`.  Some of them
+need a recent version, and a patched build of `less` does more for
+the pages of `nup`.
+
+## Environment Variables
 
 `nup` sets the following environment variables when they are not
 already defined, to ensure proper display with `less`:
@@ -354,6 +396,63 @@ already defined, to ensure proper display with `less`:
     Default: `mK`.  Recognizes SGR (`m`) and erase line (`K`)
     sequences.
 
+## Versions
+
+- `less` 590
+
+    `--file-size` makes `less` read all input before displaying, as
+    `+Gg` of the default pager does.  The `less` 581 of macOS does not
+    have it, so `+Gg` is the default.  Set `NUP_PAGER` to use it:
+
+        export NUP_PAGER="less --file-size"
+
+- `less` 661
+
+    `LESSKEY_CONTENT` is read, which `-L` uses to put the keys `h`,
+    `l`, `H` and `L`.  An older `less` ignores it.
+
+- `less` 710
+
+    `right-limit-scroll` stops at the right end of the lines.  `-L`
+    puts it on `l`, in place of `right-scroll`, which goes on past the
+    end.
+
+`-L` runs `less --align-shift --version` to see the version of
+`less`, and whether it has the option below.
+
+## The Build in tecolicom/tap
+
+[tecolicom/tap](https://github.com/tecolicom/homebrew-tap) has a build
+of `less` with patches for the pages of `nup`
+([kaz-utashiro/less](https://github.com/kaz-utashiro/less)).  It adds
+two options:
+
+- **--align-record**=_N_
+
+    A search shows the whole record (page) that has the match from the
+    top of the screen, instead of the matching line, so that the pages
+    stay in place.  _N_ is the lines of a record; `-1` is the height
+    of the screen less the prompt line, which is the height of the pages
+    of `nup`.  A repeated search goes on from the next record.
+
+- **--align-shift**
+
+    The horizontal shift stays at a multiple of the `--shift` amount, the
+    width of a pane with `-L`.  A search, and the right end, keep the
+    panes at the edge of the screen, and `n` and `N` go through the
+    panes that have a match, one by one.  `-L` adds this option when the
+    `less` has it.
+
+Install it with Homebrew.  It cannot be installed together with the
+`less` of Homebrew itself, which has the same command name:
+
+    brew install tecolicom/tap/less
+
+Then use `--align-record` for the pages:
+
+    export NUP_PAGER="less --file-size"
+    export NUP_PAGE_PAGER="less --file-size --align-record=-1"
+
 # EXAMPLES
 
 Typical n-up usage:
@@ -362,6 +461,8 @@ Typical n-up usage:
     nup -C2 man perl           # 2 columns
     nup -C2,2 man perl         # 2x2 grid (4-up layout)
     nup -F man perl            # no pagination
+    nup -L man perl            # one row of pages, scrolled sideways
+    nup -L -C4 man perl        # four pages on the screen at a time
     nup file1.txt file2.txt    # view files side by side
     nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
     nup -e ./script.sh         # force command mode for a file
@@ -380,6 +481,8 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
 
     brew tap tecolicom/tap
     brew install app-nup
+
+See ["LESS"](#less) for the build of `less` in the same tap.
 
 ## CPAN
 

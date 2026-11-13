@@ -17,6 +17,7 @@ t/critic.t
 t/data-flow.t
 t/domain.t
 t/edge_cases.t
+t/extended_tests.t
 t/function.t
 t/i18n.t
 t/integration.t

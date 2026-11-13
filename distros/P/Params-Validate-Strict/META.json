@@ -35,7 +35,6 @@
             "Carp" : "0",
             "Encode" : "0",
             "Exporter" : "0",
-            "ExtUtils::MakeMaker" : "6.64",
             "IO::Handle" : "0",
             "List::Util" : "1.33",
             "Readonly::Values::Boolean" : "0",
@@ -48,12 +47,6 @@
       },
       "test" : {
          "requires" : {
-            "File::Glob" : "0",
-            "File::Slurp" : "0",
-            "File::stat" : "0",
-            "IPC::Run3" : "0",
-            "IPC::System::Simple" : "0",
-            "JSON::MaybeXS" : "0",
             "POSIX" : "0",
             "Readonly" : "0",
             "Test::Compile" : "0",
@@ -61,8 +54,7 @@
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.13",
             "Test::Most" : "0",
-            "Test::Needs" : "0",
-            "Test::Warnings" : "0"
+            "Test::Needs" : "0"
          }
       }
    },
@@ -81,6 +73,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.41",
+   "version" : "0.42",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

@@ -1,0 +1,698 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "details" : [
+      "a_details"
+     ],
+     "email" : "a_email",
+     "end_day" : "a_end_day",
+     "estimated_completion_time" : "a_estimated_completion_time",
+     "friendly_name" : "a_friendly_name",
+     "job_queue_position" : "a_job_queue_position",
+     "job_sid" : "a_job_sid",
+     "resource_type" : "a_resource_type",
+     "start_day" : "a_start_day",
+     "webhook_method" : "a_webhook_method",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "details",
+      "details",
+      "plain"
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "end_day",
+      "end_day",
+      "plain"
+     ],
+     [
+      "estimated_completion_time",
+      "estimated_completion_time",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "job_queue_position",
+      "job_queue_position",
+      "plain"
+     ],
+     [
+      "job_sid",
+      "job_sid",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "start_day",
+      "start_day",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    1
+   ],
+   [
+    "export_custom_jobs",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "StartDay",
+    "v_start_day"
+   ],
+   [
+    "EndDay",
+    "v_end_day"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Email",
+    "v_email"
+   ],
+   [
+    "WebhookMethod",
+    "v_webhook_method"
+   ],
+   [
+    "WebhookUrl",
+    "v_webhook_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateExportCustomJob",
+  "method" : "create",
+  "options" : {
+   "email" : "v_email",
+   "webhook_method" : "v_webhook_method",
+   "webhook_url" : "v_webhook_url"
+  },
+  "required" : [
+   "v_start_day",
+   "v_end_day",
+   "v_friendly_name"
+  ],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1/Jobs"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    0
+   ],
+   [
+    "jobs",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteJob",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/Jobs/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "redirect_to" : "a_redirect_to"
+    },
+    "fields" : [
+     [
+      "redirect_to",
+      "redirect_to",
+      "plain"
+     ]
+    ],
+    "status" : 307
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    1
+   ],
+   [
+    "days",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDay",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1/Days/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "links" : {
+      "a_links" : 1
+     },
+     "resource_type" : "a_resource_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchExport",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "enabled" : true,
+     "resource_type" : "a_resource_type",
+     "url" : "a_url",
+     "webhook_method" : "a_webhook_method",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "export_configuration",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchExportConfiguration",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1/Configuration"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "details" : [
+      "a_details"
+     ],
+     "email" : "a_email",
+     "end_day" : "a_end_day",
+     "estimated_completion_time" : "a_estimated_completion_time",
+     "friendly_name" : "a_friendly_name",
+     "job_queue_position" : "a_job_queue_position",
+     "job_sid" : "a_job_sid",
+     "resource_type" : "a_resource_type",
+     "start_day" : "a_start_day",
+     "url" : "a_url",
+     "webhook_method" : "a_webhook_method",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "details",
+      "details",
+      "plain"
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "end_day",
+      "end_day",
+      "plain"
+     ],
+     [
+      "estimated_completion_time",
+      "estimated_completion_time",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "job_queue_position",
+      "job_queue_position",
+      "plain"
+     ],
+     [
+      "job_sid",
+      "job_sid",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "start_day",
+      "start_day",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    0
+   ],
+   [
+    "jobs",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchJob",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/Jobs/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "days" : [
+      {
+       "create_date" : "a_create_date",
+       "day" : "a_day",
+       "friendly_name" : "a_friendly_name",
+       "resource_type" : "a_resource_type",
+       "size" : 443
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "create_date",
+      "create_date",
+      "plain"
+     ],
+     [
+      "day",
+      "day",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "size",
+      "size",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    1
+   ],
+   [
+    "days",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListDay",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "days",
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1/Days"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "jobs" : [
+      {
+       "details" : [
+        "a_details"
+       ],
+       "email" : "a_email",
+       "end_day" : "a_end_day",
+       "estimated_completion_time" : "a_estimated_completion_time",
+       "friendly_name" : "a_friendly_name",
+       "job_queue_position" : "a_job_queue_position",
+       "job_sid" : "a_job_sid",
+       "resource_type" : "a_resource_type",
+       "start_day" : "a_start_day",
+       "webhook_method" : "a_webhook_method",
+       "webhook_url" : "a_webhook_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "details",
+      "details",
+      "plain"
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "end_day",
+      "end_day",
+      "plain"
+     ],
+     [
+      "estimated_completion_time",
+      "estimated_completion_time",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "job_queue_position",
+      "job_queue_position",
+      "plain"
+     ],
+     [
+      "job_sid",
+      "job_sid",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "start_day",
+      "start_day",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "exports",
+    1
+   ],
+   [
+    "export_custom_jobs",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListExportCustomJob",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "jobs",
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1/Jobs"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "enabled" : true,
+     "resource_type" : "a_resource_type",
+     "url" : "a_url",
+     "webhook_method" : "a_webhook_method",
+     "webhook_url" : "a_webhook_url"
+    },
+    "fields" : [
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "resource_type",
+      "resource_type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ],
+     [
+      "webhook_url",
+      "webhook_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "bulkexports",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "export_configuration",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Enabled",
+    "true"
+   ],
+   [
+    "WebhookMethod",
+    "v_webhook_method"
+   ],
+   [
+    "WebhookUrl",
+    "v_webhook_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateExportConfiguration",
+  "method" : "update",
+  "options" : {
+   "enabled" : 1,
+   "webhook_method" : "v_webhook_method",
+   "webhook_url" : "v_webhook_url"
+  },
+  "required" : [],
+  "url" : "https://bulkexports.twilio.com/v1/Exports/id1/Configuration"
+ }
+]

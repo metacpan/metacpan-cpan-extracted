@@ -1,0 +1,946 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "allow_category_change" : true,
+     "bid_amount" : 1058,
+     "category" : "a_category",
+     "content_type" : "a_content_type",
+     "name" : "a_name",
+     "rejection_reason" : "a_rejection_reason",
+     "send_ttl_seconds" : 1707,
+     "status" : "a_status"
+    },
+    "fields" : [
+     [
+      "allow_category_change",
+      "allow_category_change",
+      "plain"
+     ],
+     [
+      "bid_amount",
+      "bid_amount",
+      "plain"
+     ],
+     [
+      "category",
+      "category",
+      "plain"
+     ],
+     [
+      "content_type",
+      "content_type",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "send_ttl_seconds",
+      "send_ttl_seconds",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "bid_amount" : 1058,
+   "category" : "v_category",
+   "name" : "v_name",
+   "send_ttl_seconds" : 1707
+  },
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    1
+   ],
+   [
+    "approval_create",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateApprovalCreate",
+  "json" : {
+   "bid_amount" : 1058,
+   "category" : "v_category",
+   "name" : "v_name",
+   "send_ttl_seconds" : 1707
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content/id1/ApprovalRequests/whatsapp"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "language" : "a_language",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "types" : {
+      "a_types" : 1
+     },
+     "url" : "a_url",
+     "variables" : {
+      "a_variables" : 1
+     }
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "friendly_name" : "v_friendly_name",
+   "language" : "v_language",
+   "types" : {
+    "v_types" : 1
+   },
+   "variables" : {
+    "v_variables" : 1
+   }
+  },
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateContent",
+  "json" : {
+   "friendly_name" : "v_friendly_name",
+   "language" : "v_language",
+   "types" : {
+    "v_types" : 1
+   },
+   "variables" : {
+    "v_variables" : 1
+   }
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteContent",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "whatsapp" : {
+      "a_whatsapp" : 1
+     }
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "whatsapp",
+      "whatsapp",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    1
+   ],
+   [
+    "approval_fetch",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchApprovalFetch",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content/id1/ApprovalRequests"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "language" : "a_language",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "types" : {
+      "a_types" : 1
+     },
+     "url" : "a_url",
+     "variables" : {
+      "a_variables" : 1
+     }
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchContent",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "contents" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "language" : "a_language",
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "types" : {
+        "a_types" : 1
+       },
+       "url" : "a_url",
+       "variables" : {
+        "a_variables" : 1
+       }
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListContent",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "contents",
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "contents" : [
+      {
+       "account_sid" : "a_account_sid",
+       "approval_requests" : {
+        "a_approval_requests" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "language" : "a_language",
+       "sid" : "a_sid",
+       "types" : {
+        "a_types" : 1
+       },
+       "variables" : {
+        "a_variables" : 1
+       }
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "approval_requests",
+      "approval_requests",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "content_and_approvals",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListContentAndApprovals",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "contents",
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/ContentAndApprovals"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "contents" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "language" : "a_language",
+       "legacy_body" : "a_legacy_body",
+       "legacy_template_name" : "a_legacy_template_name",
+       "sid" : "a_sid",
+       "types" : {
+        "a_types" : 1
+       },
+       "url" : "a_url",
+       "variables" : {
+        "a_variables" : 1
+       }
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "legacy_body",
+      "legacy_body",
+      "plain"
+     ],
+     [
+      "legacy_template_name",
+      "legacy_template_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "legacy_contents",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListLegacyContent",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "contents",
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/LegacyContent"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "allow_category_change" : true,
+     "bid_amount" : 1058,
+     "category" : "a_category",
+     "content_type" : "a_content_type",
+     "name" : "a_name",
+     "rejection_reason" : "a_rejection_reason",
+     "send_ttl_seconds" : 1707,
+     "status" : "a_status"
+    },
+    "fields" : [
+     [
+      "allow_category_change",
+      "allow_category_change",
+      "plain"
+     ],
+     [
+      "bid_amount",
+      "bid_amount",
+      "plain"
+     ],
+     [
+      "category",
+      "category",
+      "plain"
+     ],
+     [
+      "content_type",
+      "content_type",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "rejection_reason",
+      "rejection_reason",
+      "plain"
+     ],
+     [
+      "send_ttl_seconds",
+      "send_ttl_seconds",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "bid_amount" : 1058
+  },
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    1
+   ],
+   [
+    "approval_create",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PATCH",
+  "id" : "UpdateApprovalCreate",
+  "json" : {
+   "bid_amount" : 1058
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content/id1/ApprovalRequests/whatsapp"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "language" : "a_language",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "types" : {
+      "a_types" : 1
+     },
+     "url" : "a_url",
+     "variables" : {
+      "a_variables" : 1
+     }
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "language",
+      "language",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "types",
+      "types",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "variables",
+      "variables",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "friendly_name" : "v_friendly_name",
+   "language" : "v_language",
+   "types" : {
+    "v_types" : 1
+   },
+   "variables" : {
+    "v_variables" : 1
+   }
+  },
+  "chain" : [
+   [
+    "content",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "contents",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PUT",
+  "id" : "UpdateContent",
+  "json" : {
+   "friendly_name" : "v_friendly_name",
+   "language" : "v_language",
+   "types" : {
+    "v_types" : 1
+   },
+   "variables" : {
+    "v_variables" : 1
+   }
+  },
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://content.twilio.com/v1/Content/id1"
+ }
+]

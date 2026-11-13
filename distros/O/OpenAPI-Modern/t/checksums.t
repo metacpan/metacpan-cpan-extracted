@@ -28,16 +28,16 @@ done_testing;
 
 __DATA__
 share/3.1/strict-dialect.json d13df15c1f7475a477cdff7c3dfa0bca
-share/3.1/strict-schema.json 53fe3e859d9ea5a665f2a288f9258395
+share/3.1/strict-schema.json 7f1ae73d4137d4b53cc1191afe488cc6
 share/3.2/strict-dialect.json 96d61636ddd9c6bf7e95e13e3ece731f
-share/3.2/strict-schema.json 1aa955923954d26a96994efbdd22d686
+share/3.2/strict-schema.json 82fb13c375a4a8c29332d3c3e6e7a09b
 share/oas/3.0/schema.json bd82d5fc176d386ce85d0e8d5836aa32
 share/oas/3.1/dialect.json 06cea984f8807c13e2916914251e22c3
-share/oas/3.1/schema-base.json 0468e9797fd7d282cea218ff40f37d82
-share/oas/3.1/schema.json f951af39c408588aa47a10bcfc0d139a
+share/oas/3.1/schema-base.json df92fb0d5bb44cc6ab487c14cb35dcf3
+share/oas/3.1/schema.json c70602883e5622be69f512e9430aab71
 share/oas/3.1/vocabulary.json ecd6e7cbcc29cdabd9c445a2752fc394
 share/oas/3.2/dialect.json 1058187136a6625bdecca7bab876ae17
-share/oas/3.2/schema-base.json 888078cc42327bfe69cd5a954f56be98
-share/oas/3.2/schema.json 6e382b7e7d5b4ba822689ffcb239d190
+share/oas/3.2/schema-base.json c1a6c2455f5dfaff6e6a154685b7cc21
+share/oas/3.2/schema.json 02d5067521665ea6b2abee278d951bce
 share/oas/3.2/vocabulary.json 0eab1bf3ab4570c94adda602535b68f0
 share/oas/LICENSE 7a3f5fcd4ca489b5555f5f92ec054a0a

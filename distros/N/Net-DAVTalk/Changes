@@ -1,5 +1,22 @@
 Revision history for Net-DAVTalk
 
+0.26    Thu Nov 12 2026
+  - add SyncCollection: an RFC 6578 sync-collection REPORT, shared by
+    Net::CalDAVTalk's SyncEventLinks and Net::CardDAVTalk's
+    SyncContactLinks, so the two no longer disagree
+  - SyncCollection follows truncated results (a 507 on the collection,
+    RFC 6578 section 3.6) by asking again from the token that came with
+    them: Google pages a calendar's sync about 230 events at a time
+  - only a 404 marks a member removed; a sync-token of "0" is a token
+  - a collection (an href ending in /) is never reported as a member:
+    iCloud lists the collection itself, with an etag, among the changes
+  - SyncCollection returns hrefs unescaped, as every path this module
+    takes and returns is (raw => 1 for them as the server wrote them)
+  - add request_href: the escaped absolute path for an href in a request
+    body (e.g. a multiget), which an unescaped href is not
+  - request_url takes a full http(s) URL as a string, not only as a
+    reference: some servers give hrefs that way
+  - document request_url (its POD described auth_header)
 0.25    Mon Aug 31 2026
   - relicensed from Artistic License 2.0 to the same terms as Perl
     itself (Artistic License 1.0 or GPL version 1 or later)

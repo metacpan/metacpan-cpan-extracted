@@ -18,11 +18,10 @@ WriteMakefile(
         'Test::More' => 0,
     },
     PREREQ_PM => {
-        'Net::DAVTalk'      => '0.24',
+        'Net::DAVTalk'      => '0.26',
         'List::Pairwise'    => '1.00',
         'List::MoreUtils'   => '0.01',
         'XML::Spice'        => '0.04',
-        'Net::DAVTalk'      => '0.08',
         'Text::VCardFast'   => '0.07',
         'Text::JSContact'   => '0.01',
         'File::MMagic'      => '1.30',

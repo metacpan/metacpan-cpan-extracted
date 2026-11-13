@@ -25,7 +25,7 @@ Version 0.24
 
 =cut
 
-our $VERSION = '0.25';
+our $VERSION = '0.26';
 
 =head1 SYNOPSIS
 
@@ -488,6 +488,136 @@ sub GetPropsArray {
   return wantarray ? @Results : $Results[0];
 }
 
+=head2 $Self->SyncCollection($Path, %Args)
+
+WebDAV Collection Synchronization (RFC 6578): a sync-collection REPORT
+on the collection at $Path, at sync-level 1, from $Args{syncToken} or,
+without one, from nothing (every member is reported as added).
+
+Returns, in list context:
+
+* Added: hash of href to etag - members added or changed
+* Removed: array of href - members removed
+* Errors: array of descriptive strings
+* SyncToken: the new opaque DAV:sync-token
+
+and in scalar context just Added.
+
+A server may truncate the results (RFC 6578 section 3.6), marking the
+response with a 507 status on the collection itself.  The REPORT is then
+repeated from the token that came with it until the results are whole,
+so one call always reports every change; a member reported again in a
+later round counts as what that round says.  If a truncated response
+comes back with the token it was asked from, the server is not moving
+on: what has arrived so far is returned with an error.
+
+Dies if the server gives no sync-token: such a response cannot be
+synced from again.
+
+Arguments:
+
+* syncToken - the token to sync from (none, undef or '' for a full sync)
+* raw - return hrefs as the server wrote them, instead of unescaped as
+  every other href from this module is (see request_url)
+* MaxRounds - give up (die) after this many truncated responses
+  (default 1000)
+
+=cut
+
+sub SyncCollection {
+  my ($Self, $Path, %Args) = @_;
+
+  confess "Need a collection path" unless defined $Path and length $Path;
+  $Path =~ s{/$}{};
+
+  my $NS_D = $Self->ns('D');
+  my $Token = $Args{syncToken};
+  my $MaxRounds = defined $Args{MaxRounds} ? $Args{MaxRounds} : 1000;
+  my (%Added, %Removed, @Errors);
+
+  for (my $Round = 1; ; $Round++) {
+    my $Response = $Self->Request(
+      'REPORT',
+      "$Path/",
+      x('D:sync-collection', $Self->NS(),
+        x('D:sync-token', ((defined $Token and length $Token) ? ($Token) : ())),
+        x('D:sync-level', 1),
+        x('D:prop',
+          x('D:getetag'),
+        ),
+      ),
+    );
+
+    my $NewToken = $Response->{"{$NS_D}sync-token"}{content};
+    confess "No sync-token in the sync-collection response for $Path"
+      unless defined $NewToken and length $NewToken;
+
+    my $Truncated;
+    foreach my $Item (@{$Response->{"{$NS_D}response"} || []}) {
+      my $href = $Item->{"{$NS_D}href"}{content};
+      next unless defined $href and length $href;
+      $href = uri_unescape($href) unless $Args{raw};
+
+      # For members that have been removed, the DAV:response MUST
+      # contain one DAV:status with a value set to '404 Not Found' and
+      # MUST NOT contain any DAV:propstat element.  A 507 there is on the
+      # request-URI itself, and says the results were truncated.
+      unless ($Item->{"{$NS_D}propstat"}) {
+        my $Status = $Item->{"{$NS_D}status"}{content};
+        $Status = '' unless defined $Status;
+        if ($Status =~ m/ 404 /) {
+          delete $Added{$href};
+          $Removed{$href} = 1;
+        }
+        elsif ($Status =~ m/ 507 /) {
+          $Truncated = 1;
+        }
+        else {
+          push @Errors, "Odd status in non-propstat response $href: $Status";
+        }
+        next;
+      }
+
+      # iCloud lists the collection itself, with an etag, among the
+      # changes (and refuses its URL in a multiget): a collection is not
+      # a member to sync
+      next if $href =~ m{/$};
+
+      # For members that have changed (i.e., are new or have had their
+      # mapped resource modified), the DAV:response MUST contain at
+      # least one DAV:propstat element and MUST NOT contain any
+      # DAV:status element.
+      foreach my $Propstat (@{$Item->{"{$NS_D}propstat"}}) {
+        my $Status = $Propstat->{"{$NS_D}status"}{content};
+        $Status = '' unless defined $Status;
+        if ($Status =~ m/ 200 /) {
+          $Added{$href} = $Propstat->{"{$NS_D}prop"}{"{$NS_D}getetag"}{content};
+          delete $Removed{$href};
+        }
+        elsif ($Status =~ m/ 404 /) {
+          # a property the server does not have: not an error
+        }
+        else {
+          push @Errors, "Odd status in propstat response $href: $Status";
+        }
+      }
+    }
+
+    my $Stuck = (defined $Token and $NewToken eq $Token);
+    $Token = $NewToken;
+    last unless $Truncated;
+    if ($Stuck) {
+      push @Errors, "sync-collection of $Path truncated without a new sync-token";
+      last;
+    }
+    confess "sync-collection of $Path still truncated after $Round rounds"
+      if $Round >= $MaxRounds;
+  }
+
+  my @Removed = sort keys %Removed;
+  return wantarray ? (\%Added, \@Removed, \@Errors, $Token) : \%Added;
+}
+
 =head2 $Self->GetCurrentUserPrincipal()
 =head2 $class->GetCurrentUserPrincipal(%Args)
 
@@ -600,13 +730,18 @@ sub auth_header {
   croak "Need a method to authenticate user (password or access_token)";
 }
 
-=head2 $Self->request_url()
+=head2 $Self->request_url($Path)
 
-Generate the authentication header to use on requests:
+The URL to request for $Path.  Paths are unescaped, as every href this
+module and its subclasses return is: each segment is URI-escaped here.
+A path starting with / is on the server of the connection's URL, one
+starting with http:// or https:// (or a reference to such a string) is
+absolute, and anything else is relative to the connection's URL.
 
 e.g:
 
-    $Headers{'Authorization'} = $Self->auth_header();
+    my $URL = $Self->request_url('/dav/calendars/user/a@b.com/Default/');
+    # https://dav.example.com/dav/calendars/user/a%40b.com/Default/
 
 =cut
 
@@ -616,9 +751,13 @@ sub request_url {
 
   my $URL = $Self->{url};
 
-  # If a reference, assume absolute
+  # A reference, or a full URL (some servers give hrefs as those), is
+  # absolute
   if (ref $Path) {
     ($URL, $Path) = $$Path =~ m{(^https?://[^/]+)(.*)$};
+  }
+  elsif (defined $Path and $Path =~ m{^https?://}i) {
+    ($URL, $Path) = $Path =~ m{(^https?://[^/]+)(.*)$}i;
   }
 
   if ($Path) {
@@ -633,6 +772,22 @@ sub request_url {
   }
 
   return $URL;
+}
+
+=head2 $Self->request_href($Path)
+
+The href for $Path to put in a request body (e.g. the DAV:href elements
+of a multiget): the escaped absolute path of request_url($Path).  Hrefs
+the module returns are unescaped, so one sent back as it came would not
+be a valid URI wherever it has a space, a % or the like.
+
+=cut
+
+sub request_href {
+  my ($Self, $Path) = @_;
+  my $URL = $Self->request_url($Path);
+  $URL =~ s{^https?://[^/]+}{}i;
+  return length $URL ? $URL : '/';
 }
 
 =head2 $Self->NS()

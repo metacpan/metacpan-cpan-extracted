@@ -1,0 +1,2567 @@
+[
+    {
+        "class": "Fax::Receive",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "media_type": "v_media_type",
+            "method": "v_method",
+            "page_size": "v_page_size",
+            "store_media": 1
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_media_type": "v_media_type",
+            "set_method": "v_method",
+            "set_page_size": "v_page_size",
+            "set_store_media": 1
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Receive action=\"v_action\" mediaType=\"v_media_type\" method=\"v_method\" pageSize=\"v_page_size\" storeMedia=\"true\"/>\n"
+    },
+    {
+        "class": "FaxResponse",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "receive",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Receive extra=\"one\"/></Response>\n"
+    },
+    {
+        "class": "Messaging::Body",
+        "arguments": [
+            "text of Messaging::Body"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Body>text of Messaging::Body</Body>\n"
+    },
+    {
+        "class": "Messaging::Media",
+        "arguments": [
+            "text of Messaging::Media"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Media>text of Messaging::Media</Media>\n"
+    },
+    {
+        "class": "Messaging::Message",
+        "arguments": [
+            "text of Messaging::Message"
+        ],
+        "attributes": {
+            "action": "v_action",
+            "from": "v_from",
+            "method": "v_method",
+            "status_callback": "v_status_callback",
+            "to": "v_to"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_from": "v_from",
+            "set_method": "v_method",
+            "set_status_callback": "v_status_callback",
+            "set_to": "v_to"
+        },
+        "children": [
+            {
+                "method": "body",
+                "arguments": [
+                    "text of body"
+                ]
+            },
+            {
+                "method": "media",
+                "arguments": [
+                    "text of media"
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Message action=\"v_action\" from=\"v_from\" method=\"v_method\" statusCallback=\"v_status_callback\" to=\"v_to\">text of Messaging::Message<Body>text of body</Body><Media>text of media</Media></Message>\n"
+    },
+    {
+        "class": "Messaging::Redirect",
+        "arguments": [
+            "text of Messaging::Redirect"
+        ],
+        "attributes": {
+            "method": "v_method"
+        },
+        "setters": {
+            "set_method": "v_method"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Redirect method=\"v_method\">text of Messaging::Redirect</Redirect>\n"
+    },
+    {
+        "class": "MessagingResponse",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "message",
+                "arguments": [
+                    "text of message",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "redirect",
+                "arguments": [
+                    "text of redirect",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Message extra=\"one\">text of message</Message><Redirect extra=\"one\">text of redirect</Redirect></Response>\n"
+    },
+    {
+        "class": "Video::Room",
+        "arguments": [
+            "text of Video::Room"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Room>text of Video::Room</Room>\n"
+    },
+    {
+        "class": "Voice::AiSession",
+        "arguments": [],
+        "attributes": {
+            "ai_connector": "v_ai_connector",
+            "ai_session_configuration": "v_ai_session_configuration"
+        },
+        "setters": {
+            "set_ai_connector": "v_ai_connector",
+            "set_ai_session_configuration": "v_ai_session_configuration"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<AiSession aiConnector=\"v_ai_connector\" aiSessionConfiguration=\"v_ai_session_configuration\"/>\n"
+    },
+    {
+        "class": "Voice::Application",
+        "arguments": [
+            "text of Voice::Application"
+        ],
+        "attributes": {
+            "copy_parent_to": 1,
+            "customer_id": "v_customer_id",
+            "method": "v_method",
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_copy_parent_to": 1,
+            "set_customer_id": "v_customer_id",
+            "set_method": "v_method",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_url": "v_url"
+        },
+        "children": [
+            {
+                "method": "application_sid",
+                "arguments": [
+                    "text of application_sid"
+                ]
+            },
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Application copyParentTo=\"true\" customerId=\"v_customer_id\" method=\"v_method\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" url=\"v_url\">text of Voice::Application<ApplicationSid>text of application_sid</ApplicationSid><Parameter extra=\"one\"/></Application>\n"
+    },
+    {
+        "class": "Voice::ApplicationSid",
+        "arguments": [
+            "text of Voice::ApplicationSid"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ApplicationSid>text of Voice::ApplicationSid</ApplicationSid>\n"
+    },
+    {
+        "class": "Voice::Autopilot",
+        "arguments": [
+            "text of Voice::Autopilot"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Autopilot>text of Voice::Autopilot</Autopilot>\n"
+    },
+    {
+        "class": "Voice::Client",
+        "arguments": [
+            "text of Voice::Client"
+        ],
+        "attributes": {
+            "method": "v_method",
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_method": "v_method",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_url": "v_url"
+        },
+        "children": [
+            {
+                "method": "identity",
+                "arguments": [
+                    "text of identity"
+                ]
+            },
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Client method=\"v_method\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" url=\"v_url\">text of Voice::Client<Identity>text of identity</Identity><Parameter extra=\"one\"/></Client>\n"
+    },
+    {
+        "class": "Voice::Conference",
+        "arguments": [
+            "text of Voice::Conference"
+        ],
+        "attributes": {
+            "beep": "v_beep",
+            "coach": "v_coach",
+            "end_conference_on_exit": 1,
+            "event_callback_url": "v_event_callback_url",
+            "jitter_buffer_size": "v_jitter_buffer_size",
+            "max_participants": "v_max_participants",
+            "muted": 1,
+            "participant_label": "v_participant_label",
+            "record": "v_record",
+            "recording_configuration_id": "v_recording_configuration_id",
+            "recording_status_callback": "v_recording_status_callback",
+            "recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "recording_status_callback_method": "v_recording_status_callback_method",
+            "region": "v_region",
+            "start_conference_on_enter": 1,
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "trim": "v_trim",
+            "wait_method": "v_wait_method",
+            "wait_url": "v_wait_url"
+        },
+        "setters": {
+            "set_beep": "v_beep",
+            "set_coach": "v_coach",
+            "set_end_conference_on_exit": 1,
+            "set_event_callback_url": "v_event_callback_url",
+            "set_jitter_buffer_size": "v_jitter_buffer_size",
+            "set_max_participants": "v_max_participants",
+            "set_muted": 1,
+            "set_participant_label": "v_participant_label",
+            "set_record": "v_record",
+            "set_recording_configuration_id": "v_recording_configuration_id",
+            "set_recording_status_callback": "v_recording_status_callback",
+            "set_recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "set_recording_status_callback_method": "v_recording_status_callback_method",
+            "set_region": "v_region",
+            "set_start_conference_on_enter": 1,
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_trim": "v_trim",
+            "set_wait_method": "v_wait_method",
+            "set_wait_url": "v_wait_url"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Conference beep=\"v_beep\" coach=\"v_coach\" endConferenceOnExit=\"true\" eventCallbackUrl=\"v_event_callback_url\" jitterBufferSize=\"v_jitter_buffer_size\" maxParticipants=\"v_max_participants\" muted=\"true\" participantLabel=\"v_participant_label\" record=\"v_record\" recordingConfigurationId=\"v_recording_configuration_id\" recordingStatusCallback=\"v_recording_status_callback\" recordingStatusCallbackEvent=\"v_recording_status_callback_event second\" recordingStatusCallbackMethod=\"v_recording_status_callback_method\" region=\"v_region\" startConferenceOnEnter=\"true\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" trim=\"v_trim\" waitMethod=\"v_wait_method\" waitUrl=\"v_wait_url\">text of Voice::Conference</Conference>\n"
+    },
+    {
+        "class": "Voice::Config",
+        "arguments": [],
+        "attributes": {
+            "name": "v_name",
+            "value": "v_value"
+        },
+        "setters": {
+            "set_name": "v_name",
+            "set_value": "v_value"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Config name=\"v_name\" value=\"v_value\"/>\n"
+    },
+    {
+        "class": "Voice::Connect",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "method": "v_method"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_method": "v_method"
+        },
+        "children": [
+            {
+                "method": "ai_session",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "autopilot",
+                "arguments": [
+                    "text of autopilot"
+                ]
+            },
+            {
+                "method": "conversation",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "conversation_relay",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "conversation_relay_session",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "room",
+                "arguments": [
+                    "text of room",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "stream",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "virtual_agent",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Connect action=\"v_action\" method=\"v_method\"><AiSession extra=\"one\"/><Autopilot>text of autopilot</Autopilot><Conversation extra=\"one\"/><ConversationRelay extra=\"one\"/><ConversationRelaySession extra=\"one\"/><Room extra=\"one\">text of room</Room><Stream extra=\"one\"/><VirtualAgent extra=\"one\"/></Connect>\n"
+    },
+    {
+        "class": "Voice::Conversation",
+        "arguments": [],
+        "attributes": {
+            "inbound_autocreation": 1,
+            "inbound_timeout": "v_inbound_timeout",
+            "method": "v_method",
+            "record": "v_record",
+            "recording_status_callback": "v_recording_status_callback",
+            "recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "recording_status_callback_method": "v_recording_status_callback_method",
+            "routing_assignment_timeout": "v_routing_assignment_timeout",
+            "service_instance_sid": "v_service_instance_sid",
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "trim": "v_trim",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_inbound_autocreation": 1,
+            "set_inbound_timeout": "v_inbound_timeout",
+            "set_method": "v_method",
+            "set_record": "v_record",
+            "set_recording_status_callback": "v_recording_status_callback",
+            "set_recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "set_recording_status_callback_method": "v_recording_status_callback_method",
+            "set_routing_assignment_timeout": "v_routing_assignment_timeout",
+            "set_service_instance_sid": "v_service_instance_sid",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_trim": "v_trim",
+            "set_url": "v_url"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Conversation inboundAutocreation=\"true\" inboundTimeout=\"v_inbound_timeout\" method=\"v_method\" record=\"v_record\" recordingStatusCallback=\"v_recording_status_callback\" recordingStatusCallbackEvent=\"v_recording_status_callback_event second\" recordingStatusCallbackMethod=\"v_recording_status_callback_method\" routingAssignmentTimeout=\"v_routing_assignment_timeout\" serviceInstanceSid=\"v_service_instance_sid\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" trim=\"v_trim\" url=\"v_url\"/>\n"
+    },
+    {
+        "class": "Voice::ConversationRelay",
+        "arguments": [],
+        "attributes": {
+            "application_reconnect": 1,
+            "asr_smart_format": 1,
+            "backgroundnoisereduction": "v_backgroundnoisereduction",
+            "customer_name": "v_customer_name",
+            "debug": "v_debug",
+            "deepgramsmartformat": "v_deepgramsmartformat",
+            "dtmf_detection": 1,
+            "eager_eot_threshold": "v_eager_eot_threshold",
+            "echo_prompt_filtering": 1,
+            "elevenlabs_language_text_normalization": 1,
+            "elevenlabs_text_normalization": "v_elevenlabs_text_normalization",
+            "events": "v_events",
+            "hints": "v_hints",
+            "ignorebackchannel": "v_ignorebackchannel",
+            "include_in_prompt": "v_include_in_prompt",
+            "intelligence_service": "v_intelligence_service",
+            "interrupt_sensitivity": "v_interrupt_sensitivity",
+            "interruptible": "v_interruptible",
+            "language": "v_language",
+            "partial_prompt_on_hangup": 1,
+            "partial_prompts": 1,
+            "preemptible": 1,
+            "profanity_filter": 1,
+            "report_input_during_agent_speech": 1,
+            "speech_model": "v_speech_model",
+            "speechtimeout": "v_speechtimeout",
+            "transcription_language": "v_transcription_language",
+            "transcription_provider": "v_transcription_provider",
+            "tts_language": "v_tts_language",
+            "tts_language_text_normalization": 1,
+            "tts_provider": "v_tts_provider",
+            "tts_text_normalization": "v_tts_text_normalization",
+            "turn_detection": 1,
+            "url": "v_url",
+            "voice": "v_voice",
+            "welcome_greeting": "v_welcome_greeting",
+            "welcome_greeting_interruptible": "v_welcome_greeting_interruptible"
+        },
+        "setters": {
+            "set_application_reconnect": 1,
+            "set_asr_smart_format": 1,
+            "set_backgroundnoisereduction": "v_backgroundnoisereduction",
+            "set_customer_name": "v_customer_name",
+            "set_debug": "v_debug",
+            "set_deepgramsmartformat": "v_deepgramsmartformat",
+            "set_dtmf_detection": 1,
+            "set_eager_eot_threshold": "v_eager_eot_threshold",
+            "set_echo_prompt_filtering": 1,
+            "set_elevenlabs_language_text_normalization": 1,
+            "set_elevenlabs_text_normalization": "v_elevenlabs_text_normalization",
+            "set_events": "v_events",
+            "set_hints": "v_hints",
+            "set_ignorebackchannel": "v_ignorebackchannel",
+            "set_include_in_prompt": "v_include_in_prompt",
+            "set_intelligence_service": "v_intelligence_service",
+            "set_interrupt_sensitivity": "v_interrupt_sensitivity",
+            "set_interruptible": "v_interruptible",
+            "set_language": "v_language",
+            "set_partial_prompt_on_hangup": 1,
+            "set_partial_prompts": 1,
+            "set_preemptible": 1,
+            "set_profanity_filter": 1,
+            "set_report_input_during_agent_speech": 1,
+            "set_speech_model": "v_speech_model",
+            "set_speechtimeout": "v_speechtimeout",
+            "set_transcription_language": "v_transcription_language",
+            "set_transcription_provider": "v_transcription_provider",
+            "set_tts_language": "v_tts_language",
+            "set_tts_language_text_normalization": 1,
+            "set_tts_provider": "v_tts_provider",
+            "set_tts_text_normalization": "v_tts_text_normalization",
+            "set_turn_detection": 1,
+            "set_url": "v_url",
+            "set_voice": "v_voice",
+            "set_welcome_greeting": "v_welcome_greeting",
+            "set_welcome_greeting_interruptible": "v_welcome_greeting_interruptible"
+        },
+        "children": [
+            {
+                "method": "language",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ConversationRelay applicationReconnect=\"true\" asrSmartFormat=\"true\" backgroundnoisereduction=\"v_backgroundnoisereduction\" customerName=\"v_customer_name\" debug=\"v_debug\" deepgramsmartformat=\"v_deepgramsmartformat\" dtmfDetection=\"true\" eagerEotThreshold=\"v_eager_eot_threshold\" echoPromptFiltering=\"true\" elevenlabsLanguageTextNormalization=\"true\" elevenlabsTextNormalization=\"v_elevenlabs_text_normalization\" events=\"v_events\" hints=\"v_hints\" ignorebackchannel=\"v_ignorebackchannel\" includeInPrompt=\"v_include_in_prompt\" intelligenceService=\"v_intelligence_service\" interruptSensitivity=\"v_interrupt_sensitivity\" interruptible=\"v_interruptible\" language=\"v_language\" partialPromptOnHangup=\"true\" partialPrompts=\"true\" preemptible=\"true\" profanityFilter=\"true\" reportInputDuringAgentSpeech=\"true\" speechModel=\"v_speech_model\" speechtimeout=\"v_speechtimeout\" transcriptionLanguage=\"v_transcription_language\" transcriptionProvider=\"v_transcription_provider\" ttsLanguage=\"v_tts_language\" ttsLanguageTextNormalization=\"true\" ttsProvider=\"v_tts_provider\" ttsTextNormalization=\"v_tts_text_normalization\" turnDetection=\"true\" url=\"v_url\" voice=\"v_voice\" welcomeGreeting=\"v_welcome_greeting\" welcomeGreetingInterruptible=\"v_welcome_greeting_interruptible\"><Language extra=\"one\"/><Parameter extra=\"one\"/></ConversationRelay>\n"
+    },
+    {
+        "class": "Voice::ConversationRelaySession",
+        "arguments": [],
+        "attributes": {
+            "connector": "v_connector",
+            "session_configuration": "v_session_configuration"
+        },
+        "setters": {
+            "set_connector": "v_connector",
+            "set_session_configuration": "v_session_configuration"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<ConversationRelaySession connector=\"v_connector\" sessionConfiguration=\"v_session_configuration\"/>\n"
+    },
+    {
+        "class": "Voice::Dial",
+        "arguments": [
+            "text of Voice::Dial"
+        ],
+        "attributes": {
+            "action": "v_action",
+            "answer_on_bridge": 1,
+            "caller_id": "v_caller_id",
+            "events": "v_events",
+            "hangup_on_star": 1,
+            "method": "v_method",
+            "passports": "v_passports",
+            "record": "v_record",
+            "recording_configuration_id": "v_recording_configuration_id",
+            "recording_status_callback": "v_recording_status_callback",
+            "recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "recording_status_callback_method": "v_recording_status_callback_method",
+            "recording_track": "v_recording_track",
+            "refer_method": "v_refer_method",
+            "refer_url": "v_refer_url",
+            "ring_tone": "v_ring_tone",
+            "sequential": 1,
+            "time_limit": "v_time_limit",
+            "timeout": "v_timeout",
+            "trim": "v_trim"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_answer_on_bridge": 1,
+            "set_caller_id": "v_caller_id",
+            "set_events": "v_events",
+            "set_hangup_on_star": 1,
+            "set_method": "v_method",
+            "set_passports": "v_passports",
+            "set_record": "v_record",
+            "set_recording_configuration_id": "v_recording_configuration_id",
+            "set_recording_status_callback": "v_recording_status_callback",
+            "set_recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "set_recording_status_callback_method": "v_recording_status_callback_method",
+            "set_recording_track": "v_recording_track",
+            "set_refer_method": "v_refer_method",
+            "set_refer_url": "v_refer_url",
+            "set_ring_tone": "v_ring_tone",
+            "set_sequential": 1,
+            "set_time_limit": "v_time_limit",
+            "set_timeout": "v_timeout",
+            "set_trim": "v_trim"
+        },
+        "children": [
+            {
+                "method": "application",
+                "arguments": [
+                    "text of application",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "client",
+                "arguments": [
+                    "text of client",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "conference",
+                "arguments": [
+                    "text of conference",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "number",
+                "arguments": [
+                    "text of number",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "queue",
+                "arguments": [
+                    "text of queue",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sim",
+                "arguments": [
+                    "text of sim"
+                ]
+            },
+            {
+                "method": "sip",
+                "arguments": [
+                    "text of sip",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "whats_app",
+                "arguments": [
+                    "text of whats_app",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Dial action=\"v_action\" answerOnBridge=\"true\" callerId=\"v_caller_id\" events=\"v_events\" hangupOnStar=\"true\" method=\"v_method\" passports=\"v_passports\" record=\"v_record\" recordingConfigurationId=\"v_recording_configuration_id\" recordingStatusCallback=\"v_recording_status_callback\" recordingStatusCallbackEvent=\"v_recording_status_callback_event second\" recordingStatusCallbackMethod=\"v_recording_status_callback_method\" recordingTrack=\"v_recording_track\" referMethod=\"v_refer_method\" referUrl=\"v_refer_url\" ringTone=\"v_ring_tone\" sequential=\"true\" timeLimit=\"v_time_limit\" timeout=\"v_timeout\" trim=\"v_trim\">text of Voice::Dial<Application extra=\"one\">text of application</Application><Client extra=\"one\">text of client</Client><Conference extra=\"one\">text of conference</Conference><Number extra=\"one\">text of number</Number><Queue extra=\"one\">text of queue</Queue><Sim>text of sim</Sim><Sip extra=\"one\">text of sip</Sip><WhatsApp extra=\"one\">text of whats_app</WhatsApp></Dial>\n"
+    },
+    {
+        "class": "Voice::Echo",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Echo/>\n"
+    },
+    {
+        "class": "Voice::Enqueue",
+        "arguments": [
+            "text of Voice::Enqueue"
+        ],
+        "attributes": {
+            "action": "v_action",
+            "max_queue_size": "v_max_queue_size",
+            "method": "v_method",
+            "wait_url": "v_wait_url",
+            "wait_url_method": "v_wait_url_method",
+            "workflow_sid": "v_workflow_sid"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_max_queue_size": "v_max_queue_size",
+            "set_method": "v_method",
+            "set_wait_url": "v_wait_url",
+            "set_wait_url_method": "v_wait_url_method",
+            "set_workflow_sid": "v_workflow_sid"
+        },
+        "children": [
+            {
+                "method": "task",
+                "arguments": [
+                    "text of task",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Enqueue action=\"v_action\" maxQueueSize=\"v_max_queue_size\" method=\"v_method\" waitUrl=\"v_wait_url\" waitUrlMethod=\"v_wait_url_method\" workflowSid=\"v_workflow_sid\">text of Voice::Enqueue<Task extra=\"one\">text of task</Task></Enqueue>\n"
+    },
+    {
+        "class": "Voice::Gather",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "action_on_empty_result": 1,
+            "barge_in": 1,
+            "debug": 1,
+            "enhanced": 1,
+            "finish_on_key": "v_finish_on_key",
+            "hints": "v_hints",
+            "input": [
+                "v_input",
+                "second"
+            ],
+            "language": "v_language",
+            "max_speech_time": "v_max_speech_time",
+            "method": "v_method",
+            "num_digits": "v_num_digits",
+            "partial_result_callback": "v_partial_result_callback",
+            "partial_result_callback_method": "v_partial_result_callback_method",
+            "profanity_filter": 1,
+            "speech_model": "v_speech_model",
+            "speech_timeout": "v_speech_timeout",
+            "timeout": "v_timeout"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_action_on_empty_result": 1,
+            "set_barge_in": 1,
+            "set_debug": 1,
+            "set_enhanced": 1,
+            "set_finish_on_key": "v_finish_on_key",
+            "set_hints": "v_hints",
+            "set_input": [
+                "v_input",
+                "second"
+            ],
+            "set_language": "v_language",
+            "set_max_speech_time": "v_max_speech_time",
+            "set_method": "v_method",
+            "set_num_digits": "v_num_digits",
+            "set_partial_result_callback": "v_partial_result_callback",
+            "set_partial_result_callback_method": "v_partial_result_callback_method",
+            "set_profanity_filter": 1,
+            "set_speech_model": "v_speech_model",
+            "set_speech_timeout": "v_speech_timeout",
+            "set_timeout": "v_timeout"
+        },
+        "children": [
+            {
+                "method": "pause",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "play",
+                "arguments": [
+                    "text of play",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "say",
+                "arguments": [
+                    "text of say",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Gather action=\"v_action\" actionOnEmptyResult=\"true\" bargeIn=\"true\" debug=\"true\" enhanced=\"true\" finishOnKey=\"v_finish_on_key\" hints=\"v_hints\" input=\"v_input second\" language=\"v_language\" maxSpeechTime=\"v_max_speech_time\" method=\"v_method\" numDigits=\"v_num_digits\" partialResultCallback=\"v_partial_result_callback\" partialResultCallbackMethod=\"v_partial_result_callback_method\" profanityFilter=\"true\" speechModel=\"v_speech_model\" speechTimeout=\"v_speech_timeout\" timeout=\"v_timeout\"><Pause extra=\"one\"/><Play extra=\"one\">text of play</Play><Say extra=\"one\">text of say</Say></Gather>\n"
+    },
+    {
+        "class": "Voice::Hangup",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Hangup><Parameter extra=\"one\"/></Hangup>\n"
+    },
+    {
+        "class": "Voice::Header",
+        "arguments": [],
+        "attributes": {
+            "name": "v_name",
+            "value": "v_value"
+        },
+        "setters": {
+            "set_name": "v_name",
+            "set_value": "v_value"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Header name=\"v_name\" value=\"v_value\"/>\n"
+    },
+    {
+        "class": "Voice::Headers",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "header",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Headers><Header extra=\"one\"/></Headers>\n"
+    },
+    {
+        "class": "Voice::Identity",
+        "arguments": [
+            "text of Voice::Identity"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Identity>text of Voice::Identity</Identity>\n"
+    },
+    {
+        "class": "Voice::Language",
+        "arguments": [],
+        "attributes": {
+            "asr_smart_format": 1,
+            "code": "v_code",
+            "hints": "v_hints",
+            "speech_model": "v_speech_model",
+            "transcription_provider": "v_transcription_provider",
+            "tts_language_text_normalization": 1,
+            "tts_provider": "v_tts_provider",
+            "tts_text_normalization": "v_tts_text_normalization",
+            "voice": "v_voice"
+        },
+        "setters": {
+            "set_asr_smart_format": 1,
+            "set_code": "v_code",
+            "set_hints": "v_hints",
+            "set_speech_model": "v_speech_model",
+            "set_transcription_provider": "v_transcription_provider",
+            "set_tts_language_text_normalization": 1,
+            "set_tts_provider": "v_tts_provider",
+            "set_tts_text_normalization": "v_tts_text_normalization",
+            "set_voice": "v_voice"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Language asrSmartFormat=\"true\" code=\"v_code\" hints=\"v_hints\" speechModel=\"v_speech_model\" transcriptionProvider=\"v_transcription_provider\" ttsLanguageTextNormalization=\"true\" ttsProvider=\"v_tts_provider\" ttsTextNormalization=\"v_tts_text_normalization\" voice=\"v_voice\"/>\n"
+    },
+    {
+        "class": "Voice::Leave",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Leave/>\n"
+    },
+    {
+        "class": "Voice::Number",
+        "arguments": [
+            "text of Voice::Number"
+        ],
+        "attributes": {
+            "amd_status_callback": "v_amd_status_callback",
+            "amd_status_callback_method": "v_amd_status_callback_method",
+            "byoc": "v_byoc",
+            "machine_detection": "v_machine_detection",
+            "machine_detection_silence_timeout": "v_machine_detection_silence_timeout",
+            "machine_detection_speech_end_threshold": "v_machine_detection_speech_end_threshold",
+            "machine_detection_speech_threshold": "v_machine_detection_speech_threshold",
+            "machine_detection_timeout": "v_machine_detection_timeout",
+            "method": "v_method",
+            "send_digits": "v_send_digits",
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_amd_status_callback": "v_amd_status_callback",
+            "set_amd_status_callback_method": "v_amd_status_callback_method",
+            "set_byoc": "v_byoc",
+            "set_machine_detection": "v_machine_detection",
+            "set_machine_detection_silence_timeout": "v_machine_detection_silence_timeout",
+            "set_machine_detection_speech_end_threshold": "v_machine_detection_speech_end_threshold",
+            "set_machine_detection_speech_threshold": "v_machine_detection_speech_threshold",
+            "set_machine_detection_timeout": "v_machine_detection_timeout",
+            "set_method": "v_method",
+            "set_send_digits": "v_send_digits",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_url": "v_url"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Number amdStatusCallback=\"v_amd_status_callback\" amdStatusCallbackMethod=\"v_amd_status_callback_method\" byoc=\"v_byoc\" machineDetection=\"v_machine_detection\" machineDetectionSilenceTimeout=\"v_machine_detection_silence_timeout\" machineDetectionSpeechEndThreshold=\"v_machine_detection_speech_end_threshold\" machineDetectionSpeechThreshold=\"v_machine_detection_speech_threshold\" machineDetectionTimeout=\"v_machine_detection_timeout\" method=\"v_method\" sendDigits=\"v_send_digits\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" url=\"v_url\">text of Voice::Number</Number>\n"
+    },
+    {
+        "class": "Voice::Parameter",
+        "arguments": [],
+        "attributes": {
+            "name": "v_name",
+            "value": "v_value"
+        },
+        "setters": {
+            "set_name": "v_name",
+            "set_value": "v_value"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Parameter name=\"v_name\" value=\"v_value\"/>\n"
+    },
+    {
+        "class": "Voice::Pause",
+        "arguments": [],
+        "attributes": {
+            "length": "v_length"
+        },
+        "setters": {
+            "set_length": "v_length"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Pause length=\"v_length\"/>\n"
+    },
+    {
+        "class": "Voice::Pay",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "bank_account_type": "v_bank_account_type",
+            "charge_amount": "v_charge_amount",
+            "currency": "v_currency",
+            "description": "v_description",
+            "input": "v_input",
+            "language": "v_language",
+            "max_attempts": "v_max_attempts",
+            "min_postal_code_length": "v_min_postal_code_length",
+            "payment_connector": "v_payment_connector",
+            "payment_method": "v_payment_method",
+            "postal_code": "v_postal_code",
+            "security_code": 1,
+            "status_callback": "v_status_callback",
+            "status_callback_method": "v_status_callback_method",
+            "timeout": "v_timeout",
+            "token_type": "v_token_type",
+            "valid_card_types": [
+                "v_valid_card_types",
+                "second"
+            ]
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_bank_account_type": "v_bank_account_type",
+            "set_charge_amount": "v_charge_amount",
+            "set_currency": "v_currency",
+            "set_description": "v_description",
+            "set_input": "v_input",
+            "set_language": "v_language",
+            "set_max_attempts": "v_max_attempts",
+            "set_min_postal_code_length": "v_min_postal_code_length",
+            "set_payment_connector": "v_payment_connector",
+            "set_payment_method": "v_payment_method",
+            "set_postal_code": "v_postal_code",
+            "set_security_code": 1,
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_method": "v_status_callback_method",
+            "set_timeout": "v_timeout",
+            "set_token_type": "v_token_type",
+            "set_valid_card_types": [
+                "v_valid_card_types",
+                "second"
+            ]
+        },
+        "children": [
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prompt",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Pay action=\"v_action\" bankAccountType=\"v_bank_account_type\" chargeAmount=\"v_charge_amount\" currency=\"v_currency\" description=\"v_description\" input=\"v_input\" language=\"v_language\" maxAttempts=\"v_max_attempts\" minPostalCodeLength=\"v_min_postal_code_length\" paymentConnector=\"v_payment_connector\" paymentMethod=\"v_payment_method\" postalCode=\"v_postal_code\" securityCode=\"true\" statusCallback=\"v_status_callback\" statusCallbackMethod=\"v_status_callback_method\" timeout=\"v_timeout\" tokenType=\"v_token_type\" validCardTypes=\"v_valid_card_types second\"><Parameter extra=\"one\"/><Prompt extra=\"one\"/></Pay>\n"
+    },
+    {
+        "class": "Voice::Play",
+        "arguments": [
+            "text of Voice::Play"
+        ],
+        "attributes": {
+            "digits": "v_digits",
+            "loop": "v_loop"
+        },
+        "setters": {
+            "set_digits": "v_digits",
+            "set_loop": "v_loop"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Play digits=\"v_digits\" loop=\"v_loop\">text of Voice::Play</Play>\n"
+    },
+    {
+        "class": "Voice::Prompt",
+        "arguments": [],
+        "attributes": {
+            "attempt": [
+                "v_attempt",
+                "second"
+            ],
+            "card_type": [
+                "v_card_type",
+                "second"
+            ],
+            "error_type": [
+                "v_error_type",
+                "second"
+            ],
+            "for": "v_for",
+            "require_matching_inputs": 1
+        },
+        "setters": {
+            "set_attempt": [
+                "v_attempt",
+                "second"
+            ],
+            "set_card_type": [
+                "v_card_type",
+                "second"
+            ],
+            "set_error_type": [
+                "v_error_type",
+                "second"
+            ],
+            "set_for": "v_for",
+            "set_require_matching_inputs": 1
+        },
+        "children": [
+            {
+                "method": "pause",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "play",
+                "arguments": [
+                    "text of play",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "say",
+                "arguments": [
+                    "text of say",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Prompt attempt=\"v_attempt second\" cardType=\"v_card_type second\" errorType=\"v_error_type second\" for=\"v_for\" requireMatchingInputs=\"true\"><Pause extra=\"one\"/><Play extra=\"one\">text of play</Play><Say extra=\"one\">text of say</Say></Prompt>\n"
+    },
+    {
+        "class": "Voice::Queue",
+        "arguments": [
+            "text of Voice::Queue"
+        ],
+        "attributes": {
+            "method": "v_method",
+            "post_work_activity_sid": "v_post_work_activity_sid",
+            "reservation_sid": "v_reservation_sid",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_method": "v_method",
+            "set_post_work_activity_sid": "v_post_work_activity_sid",
+            "set_reservation_sid": "v_reservation_sid",
+            "set_url": "v_url"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Queue method=\"v_method\" postWorkActivitySid=\"v_post_work_activity_sid\" reservationSid=\"v_reservation_sid\" url=\"v_url\">text of Voice::Queue</Queue>\n"
+    },
+    {
+        "class": "Voice::Record",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "finish_on_key": "v_finish_on_key",
+            "max_length": "v_max_length",
+            "method": "v_method",
+            "play_beep": 1,
+            "recording_configuration_id": "v_recording_configuration_id",
+            "recording_status_callback": "v_recording_status_callback",
+            "recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "recording_status_callback_method": "v_recording_status_callback_method",
+            "timeout": "v_timeout",
+            "transcribe": 1,
+            "transcribe_callback": "v_transcribe_callback",
+            "trim": "v_trim"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_finish_on_key": "v_finish_on_key",
+            "set_max_length": "v_max_length",
+            "set_method": "v_method",
+            "set_play_beep": 1,
+            "set_recording_configuration_id": "v_recording_configuration_id",
+            "set_recording_status_callback": "v_recording_status_callback",
+            "set_recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "set_recording_status_callback_method": "v_recording_status_callback_method",
+            "set_timeout": "v_timeout",
+            "set_transcribe": 1,
+            "set_transcribe_callback": "v_transcribe_callback",
+            "set_trim": "v_trim"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Record action=\"v_action\" finishOnKey=\"v_finish_on_key\" maxLength=\"v_max_length\" method=\"v_method\" playBeep=\"true\" recordingConfigurationId=\"v_recording_configuration_id\" recordingStatusCallback=\"v_recording_status_callback\" recordingStatusCallbackEvent=\"v_recording_status_callback_event second\" recordingStatusCallbackMethod=\"v_recording_status_callback_method\" timeout=\"v_timeout\" transcribe=\"true\" transcribeCallback=\"v_transcribe_callback\" trim=\"v_trim\"/>\n"
+    },
+    {
+        "class": "Voice::Recording",
+        "arguments": [],
+        "attributes": {
+            "channels": "v_channels",
+            "recording_configuration_id": "v_recording_configuration_id",
+            "recording_status_callback": "v_recording_status_callback",
+            "recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "recording_status_callback_method": "v_recording_status_callback_method",
+            "track": "v_track",
+            "trim": "v_trim"
+        },
+        "setters": {
+            "set_channels": "v_channels",
+            "set_recording_configuration_id": "v_recording_configuration_id",
+            "set_recording_status_callback": "v_recording_status_callback",
+            "set_recording_status_callback_event": [
+                "v_recording_status_callback_event",
+                "second"
+            ],
+            "set_recording_status_callback_method": "v_recording_status_callback_method",
+            "set_track": "v_track",
+            "set_trim": "v_trim"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Recording channels=\"v_channels\" recordingConfigurationId=\"v_recording_configuration_id\" recordingStatusCallback=\"v_recording_status_callback\" recordingStatusCallbackEvent=\"v_recording_status_callback_event second\" recordingStatusCallbackMethod=\"v_recording_status_callback_method\" track=\"v_track\" trim=\"v_trim\"/>\n"
+    },
+    {
+        "class": "Voice::Redirect",
+        "arguments": [
+            "text of Voice::Redirect"
+        ],
+        "attributes": {
+            "method": "v_method"
+        },
+        "setters": {
+            "set_method": "v_method"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Redirect method=\"v_method\">text of Voice::Redirect</Redirect>\n"
+    },
+    {
+        "class": "Voice::Refer",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "method": "v_method"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_method": "v_method"
+        },
+        "children": [
+            {
+                "method": "sip",
+                "arguments": [
+                    "text of sip"
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Refer action=\"v_action\" method=\"v_method\"><Sip>text of sip</Sip></Refer>\n"
+    },
+    {
+        "class": "Voice::ReferSip",
+        "arguments": [
+            "text of Voice::ReferSip"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Sip>text of Voice::ReferSip</Sip>\n"
+    },
+    {
+        "class": "Voice::Reject",
+        "arguments": [],
+        "attributes": {
+            "reason": "v_reason"
+        },
+        "setters": {
+            "set_reason": "v_reason"
+        },
+        "children": [
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Reject reason=\"v_reason\"><Parameter extra=\"one\"/></Reject>\n"
+    },
+    {
+        "class": "Voice::Room",
+        "arguments": [
+            "text of Voice::Room"
+        ],
+        "attributes": {
+            "participant_identity": "v_participant_identity"
+        },
+        "setters": {
+            "set_participant_identity": "v_participant_identity"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Room participantIdentity=\"v_participant_identity\">text of Voice::Room</Room>\n"
+    },
+    {
+        "class": "Voice::Say",
+        "arguments": [
+            "text of Voice::Say"
+        ],
+        "attributes": {
+            "language": "v_language",
+            "loop": "v_loop",
+            "voice": "v_voice"
+        },
+        "setters": {
+            "set_language": "v_language",
+            "set_loop": "v_loop",
+            "set_voice": "v_voice"
+        },
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "lang",
+                "arguments": [
+                    "text of lang",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "p",
+                "arguments": [
+                    "text of p"
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "s",
+                "arguments": [
+                    "text of s"
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "w",
+                "arguments": [
+                    "text of w",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Say language=\"v_language\" loop=\"v_loop\" voice=\"v_voice\">text of Voice::Say<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><lang extra=\"one\">text of lang</lang><p>text of p</p><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><s>text of s</s><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub><w extra=\"one\">text of w</w></Say>\n"
+    },
+    {
+        "class": "Voice::Sim",
+        "arguments": [
+            "text of Voice::Sim"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Sim>text of Voice::Sim</Sim>\n"
+    },
+    {
+        "class": "Voice::Sip",
+        "arguments": [
+            "text of Voice::Sip"
+        ],
+        "attributes": {
+            "amd_status_callback": "v_amd_status_callback",
+            "amd_status_callback_method": "v_amd_status_callback_method",
+            "machine_detection": "v_machine_detection",
+            "machine_detection_silence_timeout": "v_machine_detection_silence_timeout",
+            "machine_detection_speech_end_threshold": "v_machine_detection_speech_end_threshold",
+            "machine_detection_speech_threshold": "v_machine_detection_speech_threshold",
+            "machine_detection_timeout": "v_machine_detection_timeout",
+            "method": "v_method",
+            "password": "v_password",
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "url": "v_url",
+            "username": "v_username"
+        },
+        "setters": {
+            "set_amd_status_callback": "v_amd_status_callback",
+            "set_amd_status_callback_method": "v_amd_status_callback_method",
+            "set_machine_detection": "v_machine_detection",
+            "set_machine_detection_silence_timeout": "v_machine_detection_silence_timeout",
+            "set_machine_detection_speech_end_threshold": "v_machine_detection_speech_end_threshold",
+            "set_machine_detection_speech_threshold": "v_machine_detection_speech_threshold",
+            "set_machine_detection_timeout": "v_machine_detection_timeout",
+            "set_method": "v_method",
+            "set_password": "v_password",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_url": "v_url",
+            "set_username": "v_username"
+        },
+        "children": [
+            {
+                "method": "headers",
+                "arguments": []
+            },
+            {
+                "method": "uri",
+                "arguments": [
+                    "text of uri",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Sip amdStatusCallback=\"v_amd_status_callback\" amdStatusCallbackMethod=\"v_amd_status_callback_method\" machineDetection=\"v_machine_detection\" machineDetectionSilenceTimeout=\"v_machine_detection_silence_timeout\" machineDetectionSpeechEndThreshold=\"v_machine_detection_speech_end_threshold\" machineDetectionSpeechThreshold=\"v_machine_detection_speech_threshold\" machineDetectionTimeout=\"v_machine_detection_timeout\" method=\"v_method\" password=\"v_password\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" url=\"v_url\" username=\"v_username\">text of Voice::Sip<Headers/><Uri extra=\"one\">text of uri</Uri></Sip>\n"
+    },
+    {
+        "class": "Voice::SipUri",
+        "arguments": [
+            "text of Voice::SipUri"
+        ],
+        "attributes": {
+            "password": "v_password",
+            "priority": "v_priority",
+            "username": "v_username",
+            "weight": "v_weight"
+        },
+        "setters": {
+            "set_password": "v_password",
+            "set_priority": "v_priority",
+            "set_username": "v_username",
+            "set_weight": "v_weight"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Uri password=\"v_password\" priority=\"v_priority\" username=\"v_username\" weight=\"v_weight\">text of Voice::SipUri</Uri>\n"
+    },
+    {
+        "class": "Voice::Siprec",
+        "arguments": [],
+        "attributes": {
+            "connector_name": "v_connector_name",
+            "name": "v_name",
+            "status_callback": "v_status_callback",
+            "status_callback_method": "v_status_callback_method",
+            "track": "v_track"
+        },
+        "setters": {
+            "set_connector_name": "v_connector_name",
+            "set_name": "v_name",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_method": "v_status_callback_method",
+            "set_track": "v_track"
+        },
+        "children": [
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Siprec connectorName=\"v_connector_name\" name=\"v_name\" statusCallback=\"v_status_callback\" statusCallbackMethod=\"v_status_callback_method\" track=\"v_track\"><Parameter extra=\"one\"/></Siprec>\n"
+    },
+    {
+        "class": "Voice::Sms",
+        "arguments": [
+            "text of Voice::Sms"
+        ],
+        "attributes": {
+            "action": "v_action",
+            "from": "v_from",
+            "method": "v_method",
+            "status_callback": "v_status_callback",
+            "to": "v_to"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_from": "v_from",
+            "set_method": "v_method",
+            "set_status_callback": "v_status_callback",
+            "set_to": "v_to"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Sms action=\"v_action\" from=\"v_from\" method=\"v_method\" statusCallback=\"v_status_callback\" to=\"v_to\">text of Voice::Sms</Sms>\n"
+    },
+    {
+        "class": "Voice::SsmlBreak",
+        "arguments": [],
+        "attributes": {
+            "strength": "v_strength",
+            "time": "v_time"
+        },
+        "setters": {
+            "set_strength": "v_strength",
+            "set_time": "v_time"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<break strength=\"v_strength\" time=\"v_time\"/>\n"
+    },
+    {
+        "class": "Voice::SsmlEmphasis",
+        "arguments": [
+            "text of Voice::SsmlEmphasis"
+        ],
+        "attributes": {
+            "level": "v_level"
+        },
+        "setters": {
+            "set_level": "v_level"
+        },
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "lang",
+                "arguments": [
+                    "text of lang",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "w",
+                "arguments": [
+                    "text of w",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<emphasis level=\"v_level\">text of Voice::SsmlEmphasis<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><lang extra=\"one\">text of lang</lang><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub><w extra=\"one\">text of w</w></emphasis>\n"
+    },
+    {
+        "class": "Voice::SsmlLang",
+        "arguments": [
+            "text of Voice::SsmlLang"
+        ],
+        "attributes": {
+            "xml_lang": "v_xml_lang"
+        },
+        "setters": {
+            "set_xml_lang": "v_xml_lang"
+        },
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "lang",
+                "arguments": [
+                    "text of lang",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "p",
+                "arguments": [
+                    "text of p"
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "s",
+                "arguments": [
+                    "text of s"
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "w",
+                "arguments": [
+                    "text of w",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<lang xml:lang=\"v_xml_lang\">text of Voice::SsmlLang<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><lang extra=\"one\">text of lang</lang><p>text of p</p><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><s>text of s</s><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub><w extra=\"one\">text of w</w></lang>\n"
+    },
+    {
+        "class": "Voice::SsmlP",
+        "arguments": [
+            "text of Voice::SsmlP"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "lang",
+                "arguments": [
+                    "text of lang",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "s",
+                "arguments": [
+                    "text of s"
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "w",
+                "arguments": [
+                    "text of w",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<p>text of Voice::SsmlP<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><lang extra=\"one\">text of lang</lang><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><s>text of s</s><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub><w extra=\"one\">text of w</w></p>\n"
+    },
+    {
+        "class": "Voice::SsmlPhoneme",
+        "arguments": [
+            "text of Voice::SsmlPhoneme"
+        ],
+        "attributes": {
+            "alphabet": "v_alphabet",
+            "ph": "v_ph"
+        },
+        "setters": {
+            "set_alphabet": "v_alphabet",
+            "set_ph": "v_ph"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<phoneme alphabet=\"v_alphabet\" ph=\"v_ph\">text of Voice::SsmlPhoneme</phoneme>\n"
+    },
+    {
+        "class": "Voice::SsmlProsody",
+        "arguments": [
+            "text of Voice::SsmlProsody"
+        ],
+        "attributes": {
+            "pitch": "v_pitch",
+            "rate": "v_rate",
+            "volume": "v_volume"
+        },
+        "setters": {
+            "set_pitch": "v_pitch",
+            "set_rate": "v_rate",
+            "set_volume": "v_volume"
+        },
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "lang",
+                "arguments": [
+                    "text of lang",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "p",
+                "arguments": [
+                    "text of p"
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "s",
+                "arguments": [
+                    "text of s"
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "w",
+                "arguments": [
+                    "text of w",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<prosody pitch=\"v_pitch\" rate=\"v_rate\" volume=\"v_volume\">text of Voice::SsmlProsody<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><lang extra=\"one\">text of lang</lang><p>text of p</p><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><s>text of s</s><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub><w extra=\"one\">text of w</w></prosody>\n"
+    },
+    {
+        "class": "Voice::SsmlS",
+        "arguments": [
+            "text of Voice::SsmlS"
+        ],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "lang",
+                "arguments": [
+                    "text of lang",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "w",
+                "arguments": [
+                    "text of w",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<s>text of Voice::SsmlS<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><lang extra=\"one\">text of lang</lang><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub><w extra=\"one\">text of w</w></s>\n"
+    },
+    {
+        "class": "Voice::SsmlSayAs",
+        "arguments": [
+            "text of Voice::SsmlSayAs"
+        ],
+        "attributes": {
+            "format": "v_format",
+            "interpret_as": "v_interpret_as"
+        },
+        "setters": {
+            "set_format": "v_format",
+            "set_interpret_as": "v_interpret_as"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<say-as format=\"v_format\" interpret-as=\"v_interpret_as\">text of Voice::SsmlSayAs</say-as>\n"
+    },
+    {
+        "class": "Voice::SsmlSub",
+        "arguments": [
+            "text of Voice::SsmlSub"
+        ],
+        "attributes": {
+            "alias": "v_alias"
+        },
+        "setters": {
+            "set_alias": "v_alias"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<sub alias=\"v_alias\">text of Voice::SsmlSub</sub>\n"
+    },
+    {
+        "class": "Voice::SsmlW",
+        "arguments": [
+            "text of Voice::SsmlW"
+        ],
+        "attributes": {
+            "role": "v_role"
+        },
+        "setters": {
+            "set_role": "v_role"
+        },
+        "children": [
+            {
+                "method": "break",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "emphasis",
+                "arguments": [
+                    "text of emphasis",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "phoneme",
+                "arguments": [
+                    "text of phoneme",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prosody",
+                "arguments": [
+                    "text of prosody",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "say_as",
+                "arguments": [
+                    "text of say_as",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sub",
+                "arguments": [
+                    "text of sub",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<w role=\"v_role\">text of Voice::SsmlW<break extra=\"one\"/><emphasis extra=\"one\">text of emphasis</emphasis><phoneme extra=\"one\">text of phoneme</phoneme><prosody extra=\"one\">text of prosody</prosody><say-as extra=\"one\">text of say_as</say-as><sub extra=\"one\">text of sub</sub></w>\n"
+    },
+    {
+        "class": "Voice::Start",
+        "arguments": [],
+        "attributes": {
+            "action": "v_action",
+            "method": "v_method"
+        },
+        "setters": {
+            "set_action": "v_action",
+            "set_method": "v_method"
+        },
+        "children": [
+            {
+                "method": "recording",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "siprec",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "stream",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "transcription",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Start action=\"v_action\" method=\"v_method\"><Recording extra=\"one\"/><Siprec extra=\"one\"/><Stream extra=\"one\"/><Transcription extra=\"one\"/></Start>\n"
+    },
+    {
+        "class": "Voice::Stop",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "siprec",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "stream",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "transcription",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Stop><Siprec extra=\"one\"/><Stream extra=\"one\"/><Transcription extra=\"one\"/></Stop>\n"
+    },
+    {
+        "class": "Voice::Stream",
+        "arguments": [],
+        "attributes": {
+            "audio_format": "v_audio_format",
+            "connector_name": "v_connector_name",
+            "name": "v_name",
+            "sample_rate": "v_sample_rate",
+            "status_callback": "v_status_callback",
+            "status_callback_method": "v_status_callback_method",
+            "track": "v_track",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_audio_format": "v_audio_format",
+            "set_connector_name": "v_connector_name",
+            "set_name": "v_name",
+            "set_sample_rate": "v_sample_rate",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_method": "v_status_callback_method",
+            "set_track": "v_track",
+            "set_url": "v_url"
+        },
+        "children": [
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Stream audioFormat=\"v_audio_format\" connectorName=\"v_connector_name\" name=\"v_name\" sampleRate=\"v_sample_rate\" statusCallback=\"v_status_callback\" statusCallbackMethod=\"v_status_callback_method\" track=\"v_track\" url=\"v_url\"><Parameter extra=\"one\"/></Stream>\n"
+    },
+    {
+        "class": "Voice::Task",
+        "arguments": [
+            "text of Voice::Task"
+        ],
+        "attributes": {
+            "priority": "v_priority",
+            "timeout": "v_timeout"
+        },
+        "setters": {
+            "set_priority": "v_priority",
+            "set_timeout": "v_timeout"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Task priority=\"v_priority\" timeout=\"v_timeout\">text of Voice::Task</Task>\n"
+    },
+    {
+        "class": "Voice::Transcription",
+        "arguments": [],
+        "attributes": {
+            "enable_automatic_punctuation": 1,
+            "hints": "v_hints",
+            "inbound_track_label": "v_inbound_track_label",
+            "intelligence_service": "v_intelligence_service",
+            "language_code": "v_language_code",
+            "name": "v_name",
+            "outbound_track_label": "v_outbound_track_label",
+            "partial_results": 1,
+            "profanity_filter": 1,
+            "speech_model": "v_speech_model",
+            "status_callback_method": "v_status_callback_method",
+            "status_callback_url": "v_status_callback_url",
+            "track": "v_track",
+            "transcription_engine": "v_transcription_engine"
+        },
+        "setters": {
+            "set_enable_automatic_punctuation": 1,
+            "set_hints": "v_hints",
+            "set_inbound_track_label": "v_inbound_track_label",
+            "set_intelligence_service": "v_intelligence_service",
+            "set_language_code": "v_language_code",
+            "set_name": "v_name",
+            "set_outbound_track_label": "v_outbound_track_label",
+            "set_partial_results": 1,
+            "set_profanity_filter": 1,
+            "set_speech_model": "v_speech_model",
+            "set_status_callback_method": "v_status_callback_method",
+            "set_status_callback_url": "v_status_callback_url",
+            "set_track": "v_track",
+            "set_transcription_engine": "v_transcription_engine"
+        },
+        "children": [
+            {
+                "method": "config",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Transcription enableAutomaticPunctuation=\"true\" hints=\"v_hints\" inboundTrackLabel=\"v_inbound_track_label\" intelligenceService=\"v_intelligence_service\" languageCode=\"v_language_code\" name=\"v_name\" outboundTrackLabel=\"v_outbound_track_label\" partialResults=\"true\" profanityFilter=\"true\" speechModel=\"v_speech_model\" statusCallbackMethod=\"v_status_callback_method\" statusCallbackUrl=\"v_status_callback_url\" track=\"v_track\" transcriptionEngine=\"v_transcription_engine\"><Config extra=\"one\"/><Parameter extra=\"one\"/></Transcription>\n"
+    },
+    {
+        "class": "Voice::VirtualAgent",
+        "arguments": [],
+        "attributes": {
+            "connector_name": "v_connector_name",
+            "language": "v_language",
+            "sentiment_analysis": 1,
+            "status_callback": "v_status_callback",
+            "status_callback_method": "v_status_callback_method"
+        },
+        "setters": {
+            "set_connector_name": "v_connector_name",
+            "set_language": "v_language",
+            "set_sentiment_analysis": 1,
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_method": "v_status_callback_method"
+        },
+        "children": [
+            {
+                "method": "config",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "parameter",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<VirtualAgent connectorName=\"v_connector_name\" language=\"v_language\" sentimentAnalysis=\"true\" statusCallback=\"v_status_callback\" statusCallbackMethod=\"v_status_callback_method\"><Config extra=\"one\"/><Parameter extra=\"one\"/></VirtualAgent>\n"
+    },
+    {
+        "class": "Voice::WhatsApp",
+        "arguments": [
+            "text of Voice::WhatsApp"
+        ],
+        "attributes": {
+            "method": "v_method",
+            "status_callback": "v_status_callback",
+            "status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "status_callback_method": "v_status_callback_method",
+            "url": "v_url"
+        },
+        "setters": {
+            "set_method": "v_method",
+            "set_status_callback": "v_status_callback",
+            "set_status_callback_event": [
+                "v_status_callback_event",
+                "second"
+            ],
+            "set_status_callback_method": "v_status_callback_method",
+            "set_url": "v_url"
+        },
+        "children": [],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<WhatsApp method=\"v_method\" statusCallback=\"v_status_callback\" statusCallbackEvent=\"v_status_callback_event second\" statusCallbackMethod=\"v_status_callback_method\" url=\"v_url\">text of Voice::WhatsApp</WhatsApp>\n"
+    },
+    {
+        "class": "VoiceResponse",
+        "arguments": [],
+        "attributes": {},
+        "setters": {},
+        "children": [
+            {
+                "method": "connect",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "dial",
+                "arguments": [
+                    "text of dial",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "echo",
+                "arguments": []
+            },
+            {
+                "method": "enqueue",
+                "arguments": [
+                    "text of enqueue",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "gather",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "hangup",
+                "arguments": []
+            },
+            {
+                "method": "leave",
+                "arguments": []
+            },
+            {
+                "method": "pause",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "pay",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "play",
+                "arguments": [
+                    "text of play",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "prompt",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "queue",
+                "arguments": [
+                    "text of queue",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "record",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "redirect",
+                "arguments": [
+                    "text of redirect",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "refer",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "reject",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "say",
+                "arguments": [
+                    "text of say",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "sms",
+                "arguments": [
+                    "text of sms",
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "start",
+                "arguments": [
+                    {
+                        "extra": "one"
+                    }
+                ]
+            },
+            {
+                "method": "stop",
+                "arguments": []
+            }
+        ],
+        "expected": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<Response><Connect extra=\"one\"/><Dial extra=\"one\">text of dial</Dial><Echo/><Enqueue extra=\"one\">text of enqueue</Enqueue><Gather extra=\"one\"/><Hangup/><Leave/><Pause extra=\"one\"/><Pay extra=\"one\"/><Play extra=\"one\">text of play</Play><Prompt extra=\"one\"/><Queue extra=\"one\">text of queue</Queue><Record extra=\"one\"/><Redirect extra=\"one\">text of redirect</Redirect><Refer extra=\"one\"/><Reject extra=\"one\"/><Say extra=\"one\">text of say</Say><Sms extra=\"one\">text of sms</Sms><Start extra=\"one\"/><Stop/></Response>\n"
+    }
+]

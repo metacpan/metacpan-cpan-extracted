@@ -1,0 +1,6221 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "created_by" : "a_created_by",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "members_count" : 1395,
+     "messages_count" : 1504,
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "public",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "members_count",
+      "members_count",
+      "plain"
+     ],
+     [
+      "messages_count",
+      "messages_count",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "CreatedBy",
+    "v_created_by"
+   ],
+   [
+    "DateCreated",
+    "2026-01-15T03:04:05Z"
+   ],
+   [
+    "DateUpdated",
+    "2026-01-02T03:04:05Z"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Type",
+    "public"
+   ],
+   [
+    "UniqueName",
+    "v_unique_name"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "CreateChannel",
+  "method" : "create",
+  "options" : {
+   "attributes" : "v_attributes",
+   "created_by" : "v_created_by",
+   "date_created" : {
+    "epoch" : 1768446245
+   },
+   "date_updated" : {
+    "epoch" : 1767323045
+   },
+   "friendly_name" : "v_friendly_name",
+   "type" : "public",
+   "unique_name" : "v_unique_name",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "webhooks",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Type",
+    "trigger"
+   ],
+   [
+    "Configuration.Filters",
+    "v_configuration_filters_1"
+   ],
+   [
+    "Configuration.Filters",
+    "v_configuration_filters_2"
+   ],
+   [
+    "Configuration.FlowSid",
+    "v_configuration_flow_sid"
+   ],
+   [
+    "Configuration.Method",
+    "POST"
+   ],
+   [
+    "Configuration.RetryCount",
+    "2469"
+   ],
+   [
+    "Configuration.Triggers",
+    "v_configuration_triggers_1"
+   ],
+   [
+    "Configuration.Triggers",
+    "v_configuration_triggers_2"
+   ],
+   [
+    "Configuration.Url",
+    "v_configuration_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateChannelWebhook",
+  "method" : "create",
+  "options" : {
+   "configuration_filters" : [
+    "v_configuration_filters_1",
+    "v_configuration_filters_2"
+   ],
+   "configuration_flow_sid" : "v_configuration_flow_sid",
+   "configuration_method" : "POST",
+   "configuration_retry_count" : 2469,
+   "configuration_triggers" : [
+    "v_configuration_triggers_1",
+    "v_configuration_triggers_2"
+   ],
+   "configuration_url" : "v_configuration_url"
+  },
+  "required" : [
+   "trigger"
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Webhooks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sandbox" : "a_sandbox",
+     "sid" : "a_sid",
+     "type" : "gcm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Type",
+    "apn"
+   ],
+   [
+    "ApiKey",
+    "v_api_key"
+   ],
+   [
+    "Certificate",
+    "v_certificate"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "PrivateKey",
+    "v_private_key"
+   ],
+   [
+    "Sandbox",
+    "true"
+   ],
+   [
+    "Secret",
+    "v_secret"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCredential",
+  "method" : "create",
+  "options" : {
+   "api_key" : "v_api_key",
+   "certificate" : "v_certificate",
+   "friendly_name" : "v_friendly_name",
+   "private_key" : "v_private_key",
+   "sandbox" : 1,
+   "secret" : "v_secret"
+  },
+  "required" : [
+   "apn"
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Credentials"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "created_by" : "a_created_by",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "identity" : "a_identity",
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "invites",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Identity",
+    "v_identity"
+   ],
+   [
+    "RoleSid",
+    "v_role_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateInvite",
+  "method" : "create",
+  "options" : {
+   "role_sid" : "v_role_sid"
+  },
+  "required" : [
+   "v_identity"
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Invites"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "identity" : "a_identity",
+     "last_consumed_message_index" : 2860,
+     "last_consumption_timestamp" : "2026-01-22T03:04:05Z",
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "last_consumption_timestamp",
+      "last_consumption_timestamp",
+      "date",
+      1769051045
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "members",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Identity",
+    "v_identity"
+   ],
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "DateCreated",
+    "2026-01-15T03:04:05Z"
+   ],
+   [
+    "DateUpdated",
+    "2026-01-02T03:04:05Z"
+   ],
+   [
+    "LastConsumedMessageIndex",
+    "2447"
+   ],
+   [
+    "LastConsumptionTimestamp",
+    "2026-01-16T03:04:05Z"
+   ],
+   [
+    "RoleSid",
+    "v_role_sid"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "CreateMember",
+  "method" : "create",
+  "options" : {
+   "attributes" : "v_attributes",
+   "date_created" : {
+    "epoch" : 1768446245
+   },
+   "date_updated" : {
+    "epoch" : 1767323045
+   },
+   "last_consumed_message_index" : 2447,
+   "last_consumption_timestamp" : {
+    "epoch" : 1768532645
+   },
+   "role_sid" : "v_role_sid",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [
+   "v_identity"
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Members"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "body" : "a_body",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "from" : "a_from",
+     "index" : 536,
+     "last_updated_by" : "a_last_updated_by",
+     "media" : {
+      "a_media" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "to" : "a_to",
+     "type" : "a_type",
+     "url" : "a_url",
+     "was_edited" : true
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "body",
+      "body",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "index",
+      "index",
+      "plain"
+     ],
+     [
+      "last_updated_by",
+      "last_updated_by",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "was_edited",
+      "was_edited",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "messages",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "Body",
+    "v_body"
+   ],
+   [
+    "DateCreated",
+    "2026-01-15T03:04:05Z"
+   ],
+   [
+    "DateUpdated",
+    "2026-01-02T03:04:05Z"
+   ],
+   [
+    "From",
+    "v_from"
+   ],
+   [
+    "LastUpdatedBy",
+    "v_last_updated_by"
+   ],
+   [
+    "MediaSid",
+    "v_media_sid"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "CreateMessage",
+  "method" : "create",
+  "options" : {
+   "attributes" : "v_attributes",
+   "body" : "v_body",
+   "date_created" : {
+    "epoch" : 1768446245
+   },
+   "date_updated" : {
+    "epoch" : 1767323045
+   },
+   "from" : "v_from",
+   "last_updated_by" : "v_last_updated_by",
+   "media_sid" : "v_media_sid",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Messages"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "permissions" : [
+      "a_permissions"
+     ],
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "channel",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "permissions",
+      "permissions",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "roles",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Type",
+    "channel"
+   ],
+   [
+    "Permission",
+    "v_permission_1"
+   ],
+   [
+    "Permission",
+    "v_permission_2"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateRole",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_friendly_name",
+   "channel",
+   [
+    "v_permission_1",
+    "v_permission_2"
+   ]
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Roles"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "consumption_report_interval" : 2942,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "default_channel_creator_role_sid" : "a_default_channel_creator_role_sid",
+     "default_channel_role_sid" : "a_default_channel_role_sid",
+     "default_service_role_sid" : "a_default_service_role_sid",
+     "friendly_name" : "a_friendly_name",
+     "limits" : {
+      "a_limits" : 1
+     },
+     "links" : {
+      "a_links" : 1
+     },
+     "media" : {
+      "a_media" : 1
+     },
+     "notifications" : {
+      "a_notifications" : 1
+     },
+     "post_webhook_retry_count" : 2609,
+     "post_webhook_url" : "a_post_webhook_url",
+     "pre_webhook_retry_count" : 2482,
+     "pre_webhook_url" : "a_pre_webhook_url",
+     "reachability_enabled" : true,
+     "read_status_enabled" : true,
+     "sid" : "a_sid",
+     "typing_indicator_timeout" : 2589,
+     "url" : "a_url",
+     "webhook_filters" : [
+      "a_webhook_filters"
+     ],
+     "webhook_method" : "a_webhook_method"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "consumption_report_interval",
+      "consumption_report_interval",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_channel_creator_role_sid",
+      "default_channel_creator_role_sid",
+      "plain"
+     ],
+     [
+      "default_channel_role_sid",
+      "default_channel_role_sid",
+      "plain"
+     ],
+     [
+      "default_service_role_sid",
+      "default_service_role_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "limits",
+      "limits",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "notifications",
+      "notifications",
+      "plain"
+     ],
+     [
+      "post_webhook_retry_count",
+      "post_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "post_webhook_url",
+      "post_webhook_url",
+      "plain"
+     ],
+     [
+      "pre_webhook_retry_count",
+      "pre_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "pre_webhook_url",
+      "pre_webhook_url",
+      "plain"
+     ],
+     [
+      "reachability_enabled",
+      "reachability_enabled",
+      "plain"
+     ],
+     [
+      "read_status_enabled",
+      "read_status_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "typing_indicator_timeout",
+      "typing_indicator_timeout",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_filters",
+      "webhook_filters",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateService",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_friendly_name"
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "identity" : "a_identity",
+     "is_notifiable" : true,
+     "is_online" : true,
+     "joined_channels_count" : 2220,
+     "links" : {
+      "a_links" : 1
+     },
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "is_notifiable",
+      "is_notifiable",
+      "plain"
+     ],
+     [
+      "is_online",
+      "is_online",
+      "plain"
+     ],
+     [
+      "joined_channels_count",
+      "joined_channels_count",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Identity",
+    "v_identity"
+   ],
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "RoleSid",
+    "v_role_sid"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "CreateUser",
+  "method" : "create",
+  "options" : {
+   "attributes" : "v_attributes",
+   "friendly_name" : "v_friendly_name",
+   "role_sid" : "v_role_sid",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [
+   "v_identity"
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteBinding",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Bindings/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteChannel",
+  "method" : "delete",
+  "options" : {
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "webhooks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteChannelWebhook",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Webhooks/id3"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "credentials",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCredential",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Credentials/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "invites",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteInvite",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Invites/id3"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "members",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteMember",
+  "method" : "delete",
+  "options" : {
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Members/id3"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "messages",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteMessage",
+  "method" : "delete",
+  "options" : {
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Messages/id3"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "roles",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteRole",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Roles/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteService",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteUser",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_bindings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteUserBinding",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Bindings/id3"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_channels",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteUserChannel",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Channels/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "binding_type" : "apn",
+     "credential_sid" : "a_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "endpoint" : "a_endpoint",
+     "identity" : "a_identity",
+     "links" : {
+      "a_links" : 1
+     },
+     "message_types" : [
+      "a_message_types"
+     ],
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "message_types",
+      "message_types",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBinding",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Bindings/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "created_by" : "a_created_by",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "members_count" : 1395,
+     "messages_count" : 1504,
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "public",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "members_count",
+      "members_count",
+      "plain"
+     ],
+     [
+      "messages_count",
+      "messages_count",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchChannel",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "webhooks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchChannelWebhook",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Webhooks/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sandbox" : "a_sandbox",
+     "sid" : "a_sid",
+     "type" : "gcm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "credentials",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCredential",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Credentials/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "created_by" : "a_created_by",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "identity" : "a_identity",
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "invites",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchInvite",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Invites/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "identity" : "a_identity",
+     "last_consumed_message_index" : 2860,
+     "last_consumption_timestamp" : "2026-01-22T03:04:05Z",
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "last_consumption_timestamp",
+      "last_consumption_timestamp",
+      "date",
+      1769051045
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "members",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchMember",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Members/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "body" : "a_body",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "from" : "a_from",
+     "index" : 536,
+     "last_updated_by" : "a_last_updated_by",
+     "media" : {
+      "a_media" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "to" : "a_to",
+     "type" : "a_type",
+     "url" : "a_url",
+     "was_edited" : true
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "body",
+      "body",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "index",
+      "index",
+      "plain"
+     ],
+     [
+      "last_updated_by",
+      "last_updated_by",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "was_edited",
+      "was_edited",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "messages",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchMessage",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Messages/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "permissions" : [
+      "a_permissions"
+     ],
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "channel",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "permissions",
+      "permissions",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "roles",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchRole",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Roles/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "consumption_report_interval" : 2942,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "default_channel_creator_role_sid" : "a_default_channel_creator_role_sid",
+     "default_channel_role_sid" : "a_default_channel_role_sid",
+     "default_service_role_sid" : "a_default_service_role_sid",
+     "friendly_name" : "a_friendly_name",
+     "limits" : {
+      "a_limits" : 1
+     },
+     "links" : {
+      "a_links" : 1
+     },
+     "media" : {
+      "a_media" : 1
+     },
+     "notifications" : {
+      "a_notifications" : 1
+     },
+     "post_webhook_retry_count" : 2609,
+     "post_webhook_url" : "a_post_webhook_url",
+     "pre_webhook_retry_count" : 2482,
+     "pre_webhook_url" : "a_pre_webhook_url",
+     "reachability_enabled" : true,
+     "read_status_enabled" : true,
+     "sid" : "a_sid",
+     "typing_indicator_timeout" : 2589,
+     "url" : "a_url",
+     "webhook_filters" : [
+      "a_webhook_filters"
+     ],
+     "webhook_method" : "a_webhook_method"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "consumption_report_interval",
+      "consumption_report_interval",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_channel_creator_role_sid",
+      "default_channel_creator_role_sid",
+      "plain"
+     ],
+     [
+      "default_channel_role_sid",
+      "default_channel_role_sid",
+      "plain"
+     ],
+     [
+      "default_service_role_sid",
+      "default_service_role_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "limits",
+      "limits",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "notifications",
+      "notifications",
+      "plain"
+     ],
+     [
+      "post_webhook_retry_count",
+      "post_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "post_webhook_url",
+      "post_webhook_url",
+      "plain"
+     ],
+     [
+      "pre_webhook_retry_count",
+      "pre_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "pre_webhook_url",
+      "pre_webhook_url",
+      "plain"
+     ],
+     [
+      "reachability_enabled",
+      "reachability_enabled",
+      "plain"
+     ],
+     [
+      "read_status_enabled",
+      "read_status_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "typing_indicator_timeout",
+      "typing_indicator_timeout",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_filters",
+      "webhook_filters",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchService",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "identity" : "a_identity",
+     "is_notifiable" : true,
+     "is_online" : true,
+     "joined_channels_count" : 2220,
+     "links" : {
+      "a_links" : 1
+     },
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "is_notifiable",
+      "is_notifiable",
+      "plain"
+     ],
+     [
+      "is_online",
+      "is_online",
+      "plain"
+     ],
+     [
+      "joined_channels_count",
+      "joined_channels_count",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchUser",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "binding_type" : "apn",
+     "credential_sid" : "a_credential_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "endpoint" : "a_endpoint",
+     "identity" : "a_identity",
+     "message_types" : [
+      "a_message_types"
+     ],
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "user_sid" : "a_user_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "message_types",
+      "message_types",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_bindings",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchUserBinding",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Bindings/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "last_consumed_message_index" : 2860,
+     "links" : {
+      "a_links" : 1
+     },
+     "member_sid" : "a_member_sid",
+     "notification_level" : "default",
+     "service_sid" : "a_service_sid",
+     "status" : "invited",
+     "unread_messages_count" : 2238,
+     "url" : "a_url",
+     "user_sid" : "a_user_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "member_sid",
+      "member_sid",
+      "plain"
+     ],
+     [
+      "notification_level",
+      "notification_level",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unread_messages_count",
+      "unread_messages_count",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_channels",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchUserChannel",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Channels/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "bindings" : [
+      {
+       "account_sid" : "a_account_sid",
+       "binding_type" : "apn",
+       "credential_sid" : "a_credential_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "endpoint" : "a_endpoint",
+       "identity" : "a_identity",
+       "links" : {
+        "a_links" : 1
+       },
+       "message_types" : [
+        "a_message_types"
+       ],
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "message_types",
+      "message_types",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "bindings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "BindingType",
+    "v_binding_type_1"
+   ],
+   [
+    "BindingType",
+    "v_binding_type_2"
+   ],
+   [
+    "Identity",
+    "v_identity_1"
+   ],
+   [
+    "Identity",
+    "v_identity_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListBinding",
+  "method" : "page",
+  "options" : {
+   "binding_type" : [
+    "v_binding_type_1",
+    "v_binding_type_2"
+   ],
+   "identity" : [
+    "v_identity_1",
+    "v_identity_2"
+   ]
+  },
+  "records_key" : "bindings",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Bindings"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channels" : [
+      {
+       "account_sid" : "a_account_sid",
+       "attributes" : "a_attributes",
+       "created_by" : "a_created_by",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "members_count" : 1395,
+       "messages_count" : 1504,
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "type" : "public",
+       "unique_name" : "a_unique_name",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "members_count",
+      "members_count",
+      "plain"
+     ],
+     [
+      "messages_count",
+      "messages_count",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Type",
+    "v_type_1"
+   ],
+   [
+    "Type",
+    "v_type_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListChannel",
+  "method" : "page",
+  "options" : {
+   "type" : [
+    "v_type_1",
+    "v_type_2"
+   ]
+  },
+  "records_key" : "channels",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "webhooks" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel_sid" : "a_channel_sid",
+       "configuration" : {
+        "a_configuration" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "type" : "a_type",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "webhooks",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListChannelWebhook",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "webhooks",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Webhooks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "credentials" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sandbox" : "a_sandbox",
+       "sid" : "a_sid",
+       "type" : "gcm",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListCredential",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "credentials",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Credentials"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "invites" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel_sid" : "a_channel_sid",
+       "created_by" : "a_created_by",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "identity" : "a_identity",
+       "role_sid" : "a_role_sid",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "invites",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Identity",
+    "v_identity_1"
+   ],
+   [
+    "Identity",
+    "v_identity_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListInvite",
+  "method" : "page",
+  "options" : {
+   "identity" : [
+    "v_identity_1",
+    "v_identity_2"
+   ]
+  },
+  "records_key" : "invites",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Invites"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "members" : [
+      {
+       "account_sid" : "a_account_sid",
+       "attributes" : "a_attributes",
+       "channel_sid" : "a_channel_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "identity" : "a_identity",
+       "last_consumed_message_index" : 2860,
+       "last_consumption_timestamp" : "2026-01-22T03:04:05Z",
+       "role_sid" : "a_role_sid",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "last_consumption_timestamp",
+      "last_consumption_timestamp",
+      "date",
+      1769051045
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "members",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Identity",
+    "v_identity_1"
+   ],
+   [
+    "Identity",
+    "v_identity_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListMember",
+  "method" : "page",
+  "options" : {
+   "identity" : [
+    "v_identity_1",
+    "v_identity_2"
+   ]
+  },
+  "records_key" : "members",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Members"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "messages" : [
+      {
+       "account_sid" : "a_account_sid",
+       "attributes" : "a_attributes",
+       "body" : "a_body",
+       "channel_sid" : "a_channel_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "from" : "a_from",
+       "index" : 536,
+       "last_updated_by" : "a_last_updated_by",
+       "media" : {
+        "a_media" : 1
+       },
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "to" : "a_to",
+       "type" : "a_type",
+       "url" : "a_url",
+       "was_edited" : true
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "body",
+      "body",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "index",
+      "index",
+      "plain"
+     ],
+     [
+      "last_updated_by",
+      "last_updated_by",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "was_edited",
+      "was_edited",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "messages",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Order",
+    "asc"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListMessage",
+  "method" : "page",
+  "options" : {
+   "order" : "asc"
+  },
+  "records_key" : "messages",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Messages"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "roles" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "permissions" : [
+        "a_permissions"
+       ],
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "type" : "channel",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "permissions",
+      "permissions",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "roles",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListRole",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "roles",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Roles"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "services" : [
+      {
+       "account_sid" : "a_account_sid",
+       "consumption_report_interval" : 2942,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "default_channel_creator_role_sid" : "a_default_channel_creator_role_sid",
+       "default_channel_role_sid" : "a_default_channel_role_sid",
+       "default_service_role_sid" : "a_default_service_role_sid",
+       "friendly_name" : "a_friendly_name",
+       "limits" : {
+        "a_limits" : 1
+       },
+       "links" : {
+        "a_links" : 1
+       },
+       "media" : {
+        "a_media" : 1
+       },
+       "notifications" : {
+        "a_notifications" : 1
+       },
+       "post_webhook_retry_count" : 2609,
+       "post_webhook_url" : "a_post_webhook_url",
+       "pre_webhook_retry_count" : 2482,
+       "pre_webhook_url" : "a_pre_webhook_url",
+       "reachability_enabled" : true,
+       "read_status_enabled" : true,
+       "sid" : "a_sid",
+       "typing_indicator_timeout" : 2589,
+       "url" : "a_url",
+       "webhook_filters" : [
+        "a_webhook_filters"
+       ],
+       "webhook_method" : "a_webhook_method"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "consumption_report_interval",
+      "consumption_report_interval",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_channel_creator_role_sid",
+      "default_channel_creator_role_sid",
+      "plain"
+     ],
+     [
+      "default_channel_role_sid",
+      "default_channel_role_sid",
+      "plain"
+     ],
+     [
+      "default_service_role_sid",
+      "default_service_role_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "limits",
+      "limits",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "notifications",
+      "notifications",
+      "plain"
+     ],
+     [
+      "post_webhook_retry_count",
+      "post_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "post_webhook_url",
+      "post_webhook_url",
+      "plain"
+     ],
+     [
+      "pre_webhook_retry_count",
+      "pre_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "pre_webhook_url",
+      "pre_webhook_url",
+      "plain"
+     ],
+     [
+      "reachability_enabled",
+      "reachability_enabled",
+      "plain"
+     ],
+     [
+      "read_status_enabled",
+      "read_status_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "typing_indicator_timeout",
+      "typing_indicator_timeout",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_filters",
+      "webhook_filters",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListService",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "services",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "users" : [
+      {
+       "account_sid" : "a_account_sid",
+       "attributes" : "a_attributes",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "identity" : "a_identity",
+       "is_notifiable" : true,
+       "is_online" : true,
+       "joined_channels_count" : 2220,
+       "links" : {
+        "a_links" : 1
+       },
+       "role_sid" : "a_role_sid",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "is_notifiable",
+      "is_notifiable",
+      "plain"
+     ],
+     [
+      "is_online",
+      "is_online",
+      "plain"
+     ],
+     [
+      "joined_channels_count",
+      "joined_channels_count",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListUser",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "users",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "bindings" : [
+      {
+       "account_sid" : "a_account_sid",
+       "binding_type" : "apn",
+       "credential_sid" : "a_credential_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "endpoint" : "a_endpoint",
+       "identity" : "a_identity",
+       "message_types" : [
+        "a_message_types"
+       ],
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "user_sid" : "a_user_sid"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "binding_type",
+      "binding_type",
+      "plain"
+     ],
+     [
+      "credential_sid",
+      "credential_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "endpoint",
+      "endpoint",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "message_types",
+      "message_types",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_bindings",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "BindingType",
+    "v_binding_type_1"
+   ],
+   [
+    "BindingType",
+    "v_binding_type_2"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListUserBinding",
+  "method" : "page",
+  "options" : {
+   "binding_type" : [
+    "v_binding_type_1",
+    "v_binding_type_2"
+   ]
+  },
+  "records_key" : "bindings",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Bindings"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channels" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel_sid" : "a_channel_sid",
+       "last_consumed_message_index" : 2860,
+       "links" : {
+        "a_links" : 1
+       },
+       "member_sid" : "a_member_sid",
+       "notification_level" : "default",
+       "service_sid" : "a_service_sid",
+       "status" : "invited",
+       "unread_messages_count" : 2238,
+       "url" : "a_url",
+       "user_sid" : "a_user_sid"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "member_sid",
+      "member_sid",
+      "plain"
+     ],
+     [
+      "notification_level",
+      "notification_level",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unread_messages_count",
+      "unread_messages_count",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_channels",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListUserChannel",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "channels",
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Channels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "created_by" : "a_created_by",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "members_count" : 1395,
+     "messages_count" : 1504,
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "public",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "created_by",
+      "created_by",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "members_count",
+      "members_count",
+      "plain"
+     ],
+     [
+      "messages_count",
+      "messages_count",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "CreatedBy",
+    "v_created_by"
+   ],
+   [
+    "DateCreated",
+    "2026-01-15T03:04:05Z"
+   ],
+   [
+    "DateUpdated",
+    "2026-01-02T03:04:05Z"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "UniqueName",
+    "v_unique_name"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "UpdateChannel",
+  "method" : "update",
+  "options" : {
+   "attributes" : "v_attributes",
+   "created_by" : "v_created_by",
+   "date_created" : {
+    "epoch" : 1768446245
+   },
+   "date_updated" : {
+    "epoch" : 1767323045
+   },
+   "friendly_name" : "v_friendly_name",
+   "unique_name" : "v_unique_name",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "configuration" : {
+      "a_configuration" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "configuration",
+      "configuration",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "webhooks",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Configuration.Filters",
+    "v_configuration_filters_1"
+   ],
+   [
+    "Configuration.Filters",
+    "v_configuration_filters_2"
+   ],
+   [
+    "Configuration.FlowSid",
+    "v_configuration_flow_sid"
+   ],
+   [
+    "Configuration.Method",
+    "POST"
+   ],
+   [
+    "Configuration.RetryCount",
+    "2469"
+   ],
+   [
+    "Configuration.Triggers",
+    "v_configuration_triggers_1"
+   ],
+   [
+    "Configuration.Triggers",
+    "v_configuration_triggers_2"
+   ],
+   [
+    "Configuration.Url",
+    "v_configuration_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateChannelWebhook",
+  "method" : "update",
+  "options" : {
+   "configuration_filters" : [
+    "v_configuration_filters_1",
+    "v_configuration_filters_2"
+   ],
+   "configuration_flow_sid" : "v_configuration_flow_sid",
+   "configuration_method" : "POST",
+   "configuration_retry_count" : 2469,
+   "configuration_triggers" : [
+    "v_configuration_triggers_1",
+    "v_configuration_triggers_2"
+   ],
+   "configuration_url" : "v_configuration_url"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Webhooks/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sandbox" : "a_sandbox",
+     "sid" : "a_sid",
+     "type" : "gcm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sandbox",
+      "sandbox",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "credentials",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "ApiKey",
+    "v_api_key"
+   ],
+   [
+    "Certificate",
+    "v_certificate"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "PrivateKey",
+    "v_private_key"
+   ],
+   [
+    "Sandbox",
+    "true"
+   ],
+   [
+    "Secret",
+    "v_secret"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateCredential",
+  "method" : "update",
+  "options" : {
+   "api_key" : "v_api_key",
+   "certificate" : "v_certificate",
+   "friendly_name" : "v_friendly_name",
+   "private_key" : "v_private_key",
+   "sandbox" : 1,
+   "secret" : "v_secret"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Credentials/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "identity" : "a_identity",
+     "last_consumed_message_index" : 2860,
+     "last_consumption_timestamp" : "2026-01-22T03:04:05Z",
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "last_consumption_timestamp",
+      "last_consumption_timestamp",
+      "date",
+      1769051045
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "members",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "DateCreated",
+    "2026-01-15T03:04:05Z"
+   ],
+   [
+    "DateUpdated",
+    "2026-01-02T03:04:05Z"
+   ],
+   [
+    "LastConsumedMessageIndex",
+    "2447"
+   ],
+   [
+    "LastConsumptionTimestamp",
+    "2026-01-16T03:04:05Z"
+   ],
+   [
+    "RoleSid",
+    "v_role_sid"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "UpdateMember",
+  "method" : "update",
+  "options" : {
+   "attributes" : "v_attributes",
+   "date_created" : {
+    "epoch" : 1768446245
+   },
+   "date_updated" : {
+    "epoch" : 1767323045
+   },
+   "last_consumed_message_index" : 2447,
+   "last_consumption_timestamp" : {
+    "epoch" : 1768532645
+   },
+   "role_sid" : "v_role_sid",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Members/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "body" : "a_body",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "from" : "a_from",
+     "index" : 536,
+     "last_updated_by" : "a_last_updated_by",
+     "media" : {
+      "a_media" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "to" : "a_to",
+     "type" : "a_type",
+     "url" : "a_url",
+     "was_edited" : true
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "body",
+      "body",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "index",
+      "index",
+      "plain"
+     ],
+     [
+      "last_updated_by",
+      "last_updated_by",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "was_edited",
+      "was_edited",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "messages",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "Body",
+    "v_body"
+   ],
+   [
+    "DateCreated",
+    "2026-01-15T03:04:05Z"
+   ],
+   [
+    "DateUpdated",
+    "2026-01-02T03:04:05Z"
+   ],
+   [
+    "From",
+    "v_from"
+   ],
+   [
+    "LastUpdatedBy",
+    "v_last_updated_by"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "UpdateMessage",
+  "method" : "update",
+  "options" : {
+   "attributes" : "v_attributes",
+   "body" : "v_body",
+   "date_created" : {
+    "epoch" : 1768446245
+   },
+   "date_updated" : {
+    "epoch" : 1767323045
+   },
+   "from" : "v_from",
+   "last_updated_by" : "v_last_updated_by",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Channels/id2/Messages/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "permissions" : [
+      "a_permissions"
+     ],
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "type" : "channel",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "permissions",
+      "permissions",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "roles",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Permission",
+    "v_permission_1"
+   ],
+   [
+    "Permission",
+    "v_permission_2"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateRole",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   [
+    "v_permission_1",
+    "v_permission_2"
+   ]
+  ],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Roles/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "consumption_report_interval" : 2942,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "default_channel_creator_role_sid" : "a_default_channel_creator_role_sid",
+     "default_channel_role_sid" : "a_default_channel_role_sid",
+     "default_service_role_sid" : "a_default_service_role_sid",
+     "friendly_name" : "a_friendly_name",
+     "limits" : {
+      "a_limits" : 1
+     },
+     "links" : {
+      "a_links" : 1
+     },
+     "media" : {
+      "a_media" : 1
+     },
+     "notifications" : {
+      "a_notifications" : 1
+     },
+     "post_webhook_retry_count" : 2609,
+     "post_webhook_url" : "a_post_webhook_url",
+     "pre_webhook_retry_count" : 2482,
+     "pre_webhook_url" : "a_pre_webhook_url",
+     "reachability_enabled" : true,
+     "read_status_enabled" : true,
+     "sid" : "a_sid",
+     "typing_indicator_timeout" : 2589,
+     "url" : "a_url",
+     "webhook_filters" : [
+      "a_webhook_filters"
+     ],
+     "webhook_method" : "a_webhook_method"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "consumption_report_interval",
+      "consumption_report_interval",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "default_channel_creator_role_sid",
+      "default_channel_creator_role_sid",
+      "plain"
+     ],
+     [
+      "default_channel_role_sid",
+      "default_channel_role_sid",
+      "plain"
+     ],
+     [
+      "default_service_role_sid",
+      "default_service_role_sid",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "limits",
+      "limits",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "notifications",
+      "notifications",
+      "plain"
+     ],
+     [
+      "post_webhook_retry_count",
+      "post_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "post_webhook_url",
+      "post_webhook_url",
+      "plain"
+     ],
+     [
+      "pre_webhook_retry_count",
+      "pre_webhook_retry_count",
+      "plain"
+     ],
+     [
+      "pre_webhook_url",
+      "pre_webhook_url",
+      "plain"
+     ],
+     [
+      "reachability_enabled",
+      "reachability_enabled",
+      "plain"
+     ],
+     [
+      "read_status_enabled",
+      "read_status_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "typing_indicator_timeout",
+      "typing_indicator_timeout",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_filters",
+      "webhook_filters",
+      "plain"
+     ],
+     [
+      "webhook_method",
+      "webhook_method",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "ConsumptionReportInterval",
+    "2656"
+   ],
+   [
+    "DefaultChannelCreatorRoleSid",
+    "v_default_channel_creator_role_sid"
+   ],
+   [
+    "DefaultChannelRoleSid",
+    "v_default_channel_role_sid"
+   ],
+   [
+    "DefaultServiceRoleSid",
+    "v_default_service_role_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Limits.ChannelMembers",
+    "2084"
+   ],
+   [
+    "Limits.UserChannels",
+    "1899"
+   ],
+   [
+    "Media.CompatibilityMessage",
+    "v_media_compatibility_message"
+   ],
+   [
+    "Notifications.AddedToChannel.Enabled",
+    "true"
+   ],
+   [
+    "Notifications.AddedToChannel.Sound",
+    "v_notifications_added_to_channel_sound"
+   ],
+   [
+    "Notifications.AddedToChannel.Template",
+    "v_notifications_added_to_channel_template"
+   ],
+   [
+    "Notifications.InvitedToChannel.Enabled",
+    "true"
+   ],
+   [
+    "Notifications.InvitedToChannel.Sound",
+    "v_notifications_invited_to_channel_sound"
+   ],
+   [
+    "Notifications.InvitedToChannel.Template",
+    "v_notifications_invited_to_channel_template"
+   ],
+   [
+    "Notifications.LogEnabled",
+    "true"
+   ],
+   [
+    "Notifications.NewMessage.BadgeCountEnabled",
+    "true"
+   ],
+   [
+    "Notifications.NewMessage.Enabled",
+    "true"
+   ],
+   [
+    "Notifications.NewMessage.Sound",
+    "v_notifications_new_message_sound"
+   ],
+   [
+    "Notifications.NewMessage.Template",
+    "v_notifications_new_message_template"
+   ],
+   [
+    "Notifications.RemovedFromChannel.Enabled",
+    "true"
+   ],
+   [
+    "Notifications.RemovedFromChannel.Sound",
+    "v_notifications_removed_from_channel_sound"
+   ],
+   [
+    "Notifications.RemovedFromChannel.Template",
+    "v_notifications_removed_from_channel_template"
+   ],
+   [
+    "PostWebhookRetryCount",
+    "2196"
+   ],
+   [
+    "PostWebhookUrl",
+    "v_post_webhook_url"
+   ],
+   [
+    "PreWebhookRetryCount",
+    "2069"
+   ],
+   [
+    "PreWebhookUrl",
+    "v_pre_webhook_url"
+   ],
+   [
+    "ReachabilityEnabled",
+    "true"
+   ],
+   [
+    "ReadStatusEnabled",
+    "true"
+   ],
+   [
+    "TypingIndicatorTimeout",
+    "2303"
+   ],
+   [
+    "WebhookFilters",
+    "v_webhook_filters_1"
+   ],
+   [
+    "WebhookFilters",
+    "v_webhook_filters_2"
+   ],
+   [
+    "WebhookMethod",
+    "GET"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateService",
+  "method" : "update",
+  "options" : {
+   "consumption_report_interval" : 2656,
+   "default_channel_creator_role_sid" : "v_default_channel_creator_role_sid",
+   "default_channel_role_sid" : "v_default_channel_role_sid",
+   "default_service_role_sid" : "v_default_service_role_sid",
+   "friendly_name" : "v_friendly_name",
+   "limits_channel_members" : 2084,
+   "limits_user_channels" : 1899,
+   "media_compatibility_message" : "v_media_compatibility_message",
+   "notifications_added_to_channel_enabled" : 1,
+   "notifications_added_to_channel_sound" : "v_notifications_added_to_channel_sound",
+   "notifications_added_to_channel_template" : "v_notifications_added_to_channel_template",
+   "notifications_invited_to_channel_enabled" : 1,
+   "notifications_invited_to_channel_sound" : "v_notifications_invited_to_channel_sound",
+   "notifications_invited_to_channel_template" : "v_notifications_invited_to_channel_template",
+   "notifications_log_enabled" : 1,
+   "notifications_new_message_badge_count_enabled" : 1,
+   "notifications_new_message_enabled" : 1,
+   "notifications_new_message_sound" : "v_notifications_new_message_sound",
+   "notifications_new_message_template" : "v_notifications_new_message_template",
+   "notifications_removed_from_channel_enabled" : 1,
+   "notifications_removed_from_channel_sound" : "v_notifications_removed_from_channel_sound",
+   "notifications_removed_from_channel_template" : "v_notifications_removed_from_channel_template",
+   "post_webhook_retry_count" : 2196,
+   "post_webhook_url" : "v_post_webhook_url",
+   "pre_webhook_retry_count" : 2069,
+   "pre_webhook_url" : "v_pre_webhook_url",
+   "reachability_enabled" : 1,
+   "read_status_enabled" : 1,
+   "typing_indicator_timeout" : 2303,
+   "webhook_filters" : [
+    "v_webhook_filters_1",
+    "v_webhook_filters_2"
+   ],
+   "webhook_method" : "GET"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : "a_attributes",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "identity" : "a_identity",
+     "is_notifiable" : true,
+     "is_online" : true,
+     "joined_channels_count" : 2220,
+     "links" : {
+      "a_links" : 1
+     },
+     "role_sid" : "a_role_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "identity",
+      "identity",
+      "plain"
+     ],
+     [
+      "is_notifiable",
+      "is_notifiable",
+      "plain"
+     ],
+     [
+      "is_online",
+      "is_online",
+      "plain"
+     ],
+     [
+      "joined_channels_count",
+      "joined_channels_count",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "role_sid",
+      "role_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "v_attributes"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "RoleSid",
+    "v_role_sid"
+   ]
+  ],
+  "headers" : {
+   "X-Twilio-Webhook-Enabled" : "false"
+  },
+  "http" : "POST",
+  "id" : "UpdateUser",
+  "method" : "update",
+  "options" : {
+   "attributes" : "v_attributes",
+   "friendly_name" : "v_friendly_name",
+   "role_sid" : "v_role_sid",
+   "x_twilio_webhook_enabled" : "false"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "last_consumed_message_index" : 2860,
+     "links" : {
+      "a_links" : 1
+     },
+     "member_sid" : "a_member_sid",
+     "notification_level" : "default",
+     "service_sid" : "a_service_sid",
+     "status" : "invited",
+     "unread_messages_count" : 2238,
+     "url" : "a_url",
+     "user_sid" : "a_user_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "last_consumed_message_index",
+      "last_consumed_message_index",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "member_sid",
+      "member_sid",
+      "plain"
+     ],
+     [
+      "notification_level",
+      "notification_level",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unread_messages_count",
+      "unread_messages_count",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "ip_messaging",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "users",
+    1
+   ],
+   [
+    "user_channels",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "LastConsumedMessageIndex",
+    "2447"
+   ],
+   [
+    "LastConsumptionTimestamp",
+    "2026-01-16T03:04:05Z"
+   ],
+   [
+    "NotificationLevel",
+    "muted"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateUserChannel",
+  "method" : "update",
+  "options" : {
+   "last_consumed_message_index" : 2447,
+   "last_consumption_timestamp" : {
+    "epoch" : 1768532645
+   },
+   "notification_level" : "muted"
+  },
+  "required" : [],
+  "url" : "https://ip-messaging.twilio.com/v2/Services/id1/Users/id2/Channels/id3"
+ }
+]

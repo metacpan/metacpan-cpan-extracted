@@ -1,0 +1,1715 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "sink_configuration" : {
+      "a_sink_configuration" : 1
+     },
+     "sink_type" : "segment",
+     "status" : "initialized",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_configuration",
+      "sink_configuration",
+      "plain"
+     ],
+     [
+      "sink_type",
+      "sink_type",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "SinkConfiguration",
+    "{\"v_sink_configuration\":10}"
+   ],
+   [
+    "SinkType",
+    "email"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSink",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_description",
+   {
+    "v_sink_configuration" : 10
+   },
+   "email"
+  ],
+  "url" : "https://events.twilio.com/v1/Sinks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "result" : "a_result"
+    },
+    "fields" : [
+     [
+      "result",
+      "result",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "result" : "a_result"
+    },
+    "fields" : [
+     [
+      "result",
+      "result",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    1
+   ],
+   [
+    "sink_test",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateSinkTest",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Sinks/id1/Test"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "result" : "a_result"
+    },
+    "fields" : [
+     [
+      "result",
+      "result",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    1
+   ],
+   [
+    "sink_validate",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "TestId",
+    "v_test_id"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSinkValidate",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_test_id"
+  ],
+  "url" : "https://events.twilio.com/v1/Sinks/id1/Validate"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "schema_version" : 1494,
+     "subscription_sid" : "a_subscription_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "subscription_sid",
+      "subscription_sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "schema_version" : 1494,
+     "subscription_sid" : "a_subscription_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "subscription_sid",
+      "subscription_sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ],
+   [
+    "subscribed_events",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Type",
+    "v_type"
+   ],
+   [
+    "SchemaVersion",
+    "1335"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSubscribedEvent",
+  "method" : "create",
+  "options" : {
+   "schema_version" : 1335
+  },
+  "required" : [
+   "v_type"
+  ],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1/SubscribedEvents"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "sink_sid" : "a_sink_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_sid",
+      "sink_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "SinkSid",
+    "v_sink_sid"
+   ],
+   [
+    "Types",
+    "{\"v_types\":1}"
+   ],
+   [
+    "Types",
+    "{\"v_types\":2}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSubscription",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_description",
+   "v_sink_sid",
+   [
+    {
+     "v_types" : 1
+    },
+    {
+     "v_types" : 2
+    }
+   ]
+  ],
+  "url" : "https://events.twilio.com/v1/Subscriptions"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteSink",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Sinks/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ],
+   [
+    "subscribed_events",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteSubscribedEvent",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1/SubscribedEvents/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteSubscription",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "documentation_url" : "a_documentation_url",
+     "links" : {
+      "a_links" : 1
+     },
+     "schema_id" : "a_schema_id",
+     "status" : "a_status",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "documentation_url",
+      "documentation_url",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "schema_id",
+      "schema_id",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "event_types",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchEventType",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Types/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "id" : "a_id",
+     "latest_version" : 1522,
+     "latest_version_date_created" : "2026-01-27T03:04:05Z",
+     "links" : {
+      "a_links" : 1
+     },
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "latest_version",
+      "latest_version",
+      "plain"
+     ],
+     [
+      "latest_version_date_created",
+      "latest_version_date_created",
+      "date",
+      1769483045
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "schemas",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSchema",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Schemas/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "2026-01-06T03:04:05Z",
+     "id" : "a_id",
+     "raw" : "a_raw",
+     "schema_version" : 1494,
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "raw",
+      "raw",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "schemas",
+    1
+   ],
+   [
+    "versions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSchemaVersion",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Schemas/id1/Versions/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "sink_configuration" : {
+      "a_sink_configuration" : 1
+     },
+     "sink_type" : "segment",
+     "status" : "initialized",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_configuration",
+      "sink_configuration",
+      "plain"
+     ],
+     [
+      "sink_type",
+      "sink_type",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSink",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Sinks/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "schema_version" : 1494,
+     "subscription_sid" : "a_subscription_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "subscription_sid",
+      "subscription_sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ],
+   [
+    "subscribed_events",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSubscribedEvent",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1/SubscribedEvents/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "sink_sid" : "a_sink_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_sid",
+      "sink_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSubscription",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "types" : [
+      {
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "documentation_url" : "a_documentation_url",
+       "links" : {
+        "a_links" : 1
+       },
+       "schema_id" : "a_schema_id",
+       "status" : "a_status",
+       "type" : "a_type",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "documentation_url",
+      "documentation_url",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "schema_id",
+      "schema_id",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "event_types",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SchemaId",
+    "v_schema_id"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListEventType",
+  "method" : "page",
+  "options" : {
+   "schema_id" : "v_schema_id"
+  },
+  "records_key" : "types",
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Types"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "schema_versions" : [
+      {
+       "date_created" : "2026-01-06T03:04:05Z",
+       "id" : "a_id",
+       "raw" : "a_raw",
+       "schema_version" : 1494,
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "raw",
+      "raw",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "schemas",
+    1
+   ],
+   [
+    "versions",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListSchemaVersion",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "schema_versions",
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Schemas/id1/Versions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "sinks" : [
+      {
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "sink_configuration" : {
+        "a_sink_configuration" : 1
+       },
+       "sink_type" : "segment",
+       "status" : "initialized",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_configuration",
+      "sink_configuration",
+      "plain"
+     ],
+     [
+      "sink_type",
+      "sink_type",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "InUse",
+    "true"
+   ],
+   [
+    "Status",
+    "v_status"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListSink",
+  "method" : "page",
+  "options" : {
+   "in_use" : 1,
+   "status" : "v_status"
+  },
+  "records_key" : "sinks",
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Sinks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "types" : [
+      {
+       "account_sid" : "a_account_sid",
+       "schema_version" : 1494,
+       "subscription_sid" : "a_subscription_sid",
+       "type" : "a_type",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "subscription_sid",
+      "subscription_sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ],
+   [
+    "subscribed_events",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListSubscribedEvent",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "types",
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1/SubscribedEvents"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "subscriptions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "sink_sid" : "a_sink_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_sid",
+      "sink_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SinkSid",
+    "v_sink_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListSubscription",
+  "method" : "page",
+  "options" : {
+   "sink_sid" : "v_sink_sid"
+  },
+  "records_key" : "subscriptions",
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "sink_configuration" : {
+      "a_sink_configuration" : 1
+     },
+     "sink_type" : "segment",
+     "status" : "initialized",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_configuration",
+      "sink_configuration",
+      "plain"
+     ],
+     [
+      "sink_type",
+      "sink_type",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sinks",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Description",
+    "v_description"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateSink",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   "v_description"
+  ],
+  "url" : "https://events.twilio.com/v1/Sinks/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "schema_version" : 1494,
+     "subscription_sid" : "a_subscription_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "schema_version",
+      "schema_version",
+      "plain"
+     ],
+     [
+      "subscription_sid",
+      "subscription_sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ],
+   [
+    "subscribed_events",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "SchemaVersion",
+    "1335"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateSubscribedEvent",
+  "method" : "update",
+  "options" : {
+   "schema_version" : 1335
+  },
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1/SubscribedEvents/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "sink_sid" : "a_sink_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sink_sid",
+      "sink_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "events",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "subscriptions",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Description",
+    "v_description"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateSubscription",
+  "method" : "update",
+  "options" : {
+   "description" : "v_description"
+  },
+  "required" : [],
+  "url" : "https://events.twilio.com/v1/Subscriptions/id1"
+ }
+]

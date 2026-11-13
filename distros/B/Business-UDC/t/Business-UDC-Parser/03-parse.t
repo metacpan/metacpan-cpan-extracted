@@ -4,7 +4,7 @@ use warnings;
 use Business::UDC::Parser qw(parse);
 use English;
 use Error::Pure::Utils qw(clean err_msg_hr);
-use Test::More 'tests' => 95;
+use Test::More 'tests' => 128;
 use Test::NoWarnings;
 use Unicode::UTF8 qw(decode_utf8);
 
@@ -70,6 +70,122 @@ is($ret_hr->{'ast'}{'type'}, 'APOS_RANGE',
 	'Parse apostrophe auxiliary range.');
 is($ret_hr->{'ast'}{'modifiers'}[0]{'value'}, '-022.212',
 	'Parse form after apostrophe auxiliary range.');
+
+# Test.
+$ret_hr = parse('681.3 TI-59/TI-58(075)');
+is($ret_hr->{'ast'}{'modifiers'}[0]{'value'}, 'TI-59/TI-58',
+	'Parse slash-separated alphabetical specification.');
+is($ret_hr->{'tokens'}[1]{'type'}, 'ALPHA_SPEC',
+	'Tokenize slash-separated alphabetical specification as ALPHA_SPEC.');
+
+# Test.
+$ret_hr = parse("929 Cch'-si, J.");
+is($ret_hr->{'ast'}{'modifiers'}[0]{'value'}, "Cch'-si, J.",
+	'Parse alphabetical specification with apostrophe.');
+is($ret_hr->{'tokens'}[1]{'type'}, 'ALPHA_SPEC',
+	'Tokenize alphabetical specification with apostrophe as ALPHA_SPEC.');
+
+# Test.
+eval {
+	parse('533.6..01');
+};
+is($EVAL_ERROR, "Extra dot '.'.\n",
+	"Extra dot '.' (533.6..01).");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 5, 'Get extra dot position (position = 5).');
+is($err_msg_hr->{'character'}, '.', "Get extra dot character (character = '.').");
+
+# Test.
+eval {
+	parse('069(437.11) :62](082) +621.(437)(091) +62(437)');
+};
+is($EVAL_ERROR, "Whitespace is not allowed in UDC string.\n",
+	'Whitespace is reported before extra dot.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 11, 'Get whitespace position before extra dot (position = 11).');
+is($err_msg_hr->{'character'}, ' ', "Get whitespace character before extra dot (character = ' ').");
+clean();
+
+# Test.
+eval {
+	parse('94(...)');
+};
+is($EVAL_ERROR, "Invalid geographic auxiliary notation.\n",
+	'Invalid geographic auxiliary notation (94(...)).');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 2, 'Get invalid geographic auxiliary position (position = 2).');
+is($err_msg_hr->{'character'}, '(...)', "Get invalid geographic auxiliary character (character = '(...)').");
+clean();
+
+# Test.
+eval {
+	parse('001.5:664.(437)"1978"(082)');
+};
+is($EVAL_ERROR, "Extra dot '.'.\n",
+	"Extra dot '.' before auxiliary group.");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 9, 'Get extra dot position (position = 9).');
+is($err_msg_hr->{'character'}, '.', "Get extra dot character (character = '.').");
+
+# Test.
+eval {
+	parse('016.:654.19-053.7"1964/1965');
+};
+is($EVAL_ERROR, "Extra dot '.'.\n",
+	"Extra dot '.' before relation operator.");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 3, 'Get extra dot position (position = 3).');
+is($err_msg_hr->{'character'}, '.', "Get extra dot character (character = '.').");
+
+# Test.
+eval {
+	parse('027.5(437.22),,1970');
+};
+is($EVAL_ERROR, "Bad quotation mark character.\n",
+	'Bad quotation mark character (double comma).');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 13, 'Get bad quotation mark position (position = 13).');
+is($err_msg_hr->{'character'}, ',,', "Get bad quotation mark character (character = ',,').");
+
+# Test.
+eval {
+	parse('311.3(083.1):69.');
+};
+is($EVAL_ERROR, "Extra dot '.'.\n",
+	"Extra dot '.' at end of UDC string.");
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 15, 'Get extra dot position (position = 15).');
+is($err_msg_hr->{'character'}, '.', "Get extra dot character (character = '.').");
+
+# Test.
+eval {
+	parse('3KDS(42)1');
+};
+is($EVAL_ERROR, "Missing operator.\n",
+	'Missing operator after auxiliary group.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 8, 'Get missing operator position (position = 8).');
+clean();
+
+# Test.
+eval {
+	parse('539.3/,4(075.8)');
+};
+is($EVAL_ERROR, "Bad dot character in number.\n",
+	'Bad dot character in number after operator.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 6, 'Get bad dot position (position = 6).');
+is($err_msg_hr->{'character'}, ',', "Get bad dot character (character = ',').");
+
+# Test.
+eval {
+	parse("327(=81)(437.1:497.1)(091)'-/1918");
+};
+is($EVAL_ERROR, "Bad quotation mark character.\n",
+	'Bad quotation mark character before time auxiliary.');
+$err_msg_hr = err_msg_hr();
+is($err_msg_hr->{'position'}, 26, 'Get bad quotation mark position (position = 26).');
+is($err_msg_hr->{'character'}, "'", "Get bad quotation mark character (character = ').");
 
 # Test.
 eval {

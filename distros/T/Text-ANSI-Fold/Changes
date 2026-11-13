@@ -1,5 +1,56 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.3901 2026-11-12T10:44:04Z
+
+    - A form feed after nothing but ANSI sequences, as in a form feed
+      with a color ("\e[31m\f\e[m"), is taken as at the beginning of
+      the text and is kept where it is.  It was taken as in the middle,
+      and the same text was given back as the rest forever: ansifold
+      died with "no progress in fold", and ansicolumn did not end
+
+2.39 2026-11-06T10:11:59Z
+
+    - CJK punctuation is not a word character with boundary => "word":
+      \p{Hangul} took 、。「」 and others, so 」78、「extractor was taken as one word and
+      the line was broken before it
+
+2.38 2026-11-05T05:30:44Z
+
+    - Take a colon in SGR and EL parameters: ESC[4:3m was cut in the middle when folded
+
+2.37 2026-11-03T08:07:06Z
+
+    - Do not die with "no progress" or hang when a line has only the prefix:
+      a wide character after the prefix may make the line one column too
+      long instead
+    - Do not count sequences such as erase line as visible text in the
+      word boundary and run-out checks, and in the width of the prefix
+    - Do not run in the filler of splitwide, which made the line too wide
+    - Keep a sequence with no visible text after it on a line of exactly
+      the width, instead of making an extra line for it
+    - Require Text::VisualWidth::PP 0.09, which gives the right width of
+      new emoji on perl 5.30 or later
+
+2.36 2026-11-03T01:17:52Z
+
+    - Add trim option, which removes ASCII spaces at the end of folded
+      lines, so that a space brought there by run-in does not make the
+      line longer than the width
+    - Fold long paragraphs and wide characters faster.  The time for a
+      line no longer depends on the length of the paragraph
+    - Keep a grapheme in one line as far as the perl in use supports it;
+      before perl 5.22, one in a long paragraph may rarely be split
+    - Do not make a line too wide with an emoji ZWJ sequence
+
+2.35 2026-10-29T05:09:39Z
+
+    - Fix the width returned by fold when margin is given
+    - Add length parameter to chops to get the width of each chop
+
+2.34 2026-10-28T10:01:35Z
+
+    - Give no width to CSI other than SGR, such as cursor movement
+
 2.3305 2026-02-07T09:03:57Z
 
     - Fix boundary=word regex to exclude C1 control characters

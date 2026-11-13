@@ -180,6 +180,19 @@ subtest 'combined options' => sub {
     like $out, qr/-- date$/, 'command at end';
 };
 
+subtest 'lateral option' => sub {
+    like nup('--lateral date'), qr/-Mup .*--lateral .*-- date$/, 'lateral, command';
+    like nup('--lateral cpanfile'), qr/--lateral .*-- ansicolumn cpanfile$/, 'lateral, file';
+    like nup('-L -C4 date'), qr/-Mup .* -L .*-C 4 .*-- date$/, '-L with -C';
+    ok system("$script -n -L cpanfile Changes >/dev/null 2>&1") != 0, '-L with two files fails';
+    unlike nup('--lateral cpanfile'), qr/--no-paginate/, 'page mode is kept';
+    my $fail = sub { system("$script -n @_ >/dev/null 2>&1") != 0 };
+    ok  $fail->('--lateral cpanfile Changes'), 'lateral with two files fails';
+    ok  $fail->('--lateral -V cpanfile'), 'lateral with -V fails';
+    ok !$fail->('--lateral cpanfile -w 100'), 'an option after the file is not a file';
+    like nup('--lateral cpanfile Changes'), qr/lateral/, 'the message tells the option';
+};
+
 subtest 'pdf options' => sub {
     like nup(q(-o out.pdf --pdf-opts="-m 15 -l 80" date)),
         qr/--pdf-opts -m 15 -l 80 /, 'pdf-opts';

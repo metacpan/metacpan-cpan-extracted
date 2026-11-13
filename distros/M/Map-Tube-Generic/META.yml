@@ -21,7 +21,7 @@ no_index:
 provides:
   Map::Tube::Generic:
     file: lib/Map/Tube/Generic.pm
-    version: v0.2.1
+    version: v0.2.2
 requires:
   Map::Tube: '4.09'
   Moo: '0'
@@ -30,5 +30,5 @@ requires:
 resources:
   bugtracker: https://github.com/gwselke/Map-Tube-Generic/issues
   repository: https://github.com/gwselke/Map-Tube-Generic.git
-version: v0.2.1
+version: v0.2.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -20,6 +20,7 @@ t/bnf.t
 t/comment-spelling.t
 t/conf/validate_strict.yml
 t/cross_validation.t
+t/consistency.t
 t/custom_types.t
 t/custom_validation.t
 t/default.t
@@ -35,6 +36,7 @@ t/lib/TestLogger.pm
 t/logic_reducer.t
 t/memberof.t
 t/mutant_killers.t
+t/names.t
 t/nested.t
 t/notmemberof.t
 t/path.t
@@ -45,6 +47,7 @@ t/pod-synopsis.t
 t/pod.t
 t/positional.t
 t/prereq.t
+t/semantic_filename.t
 t/strict.t
 t/string.t
 t/t_union_type.t

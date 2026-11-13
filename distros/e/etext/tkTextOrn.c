@@ -248,6 +248,10 @@ typedef struct Ornament {
 typedef struct TkTextOrnInfo {
     Ornament *firstPtr;
     int nextId;
+    struct TkTextOrnTemplates *strokesPtr;
+				/* The strokes of the split lines and frames
+				 * of blocks (GetStrokes), made when first
+				 * needed, or NULL. */
 } TkTextOrnInfo;
 
 #define DEF_ORN_WIDTH	"1"
@@ -395,6 +399,9 @@ static int		SetPoints _ANSI_ARGS_((Tcl_Interp *interp,
 			    Arg *args, int template));
 static Arg		PrintPoint _ANSI_ARGS_((TkText *textPtr,
 			    OrnPoint *ptPtr));
+static TkTextOrnInfo *	GetOrnInfo _ANSI_ARGS_((TkText *textPtr));
+static int		SplitsList _ANSI_ARGS_((Tcl_Interp *interp,
+			    struct TkTextBlockOrns *listPtr));
 
 /*
  *----------------------------------------------------------------------
@@ -3006,8 +3013,32 @@ TkTextOrnFreeAll(textPtr)
 	nextPtr = ornPtr->nextPtr;
 	FreeOrnament(textPtr, ornPtr);
     }
+
+    /*
+     * The strokes of split lines: the layouts of the blocks still
+     * displayed hold references of their own (TkTextOrnFreeBlock).
+     */
+
+    TkTextOrnTemplatesRelease(textPtr, infoPtr->strokesPtr);
     ckfree((char *) infoPtr);
     textPtr->ornInfoPtr = NULL;
+}
+
+/*
+ * The ornaments of a widget, made when first needed.
+ */
+
+static TkTextOrnInfo *
+GetOrnInfo(textPtr)
+    TkText *textPtr;
+{
+    if (textPtr->ornInfoPtr == NULL) {
+	textPtr->ornInfoPtr = (TkTextOrnInfo *) ckalloc(sizeof(TkTextOrnInfo));
+	textPtr->ornInfoPtr->firstPtr = NULL;
+	textPtr->ornInfoPtr->nextId = 1;
+	textPtr->ornInfoPtr->strokesPtr = NULL;
+    }
+    return textPtr->ornInfoPtr;
 }
 
 /*
@@ -3049,13 +3080,36 @@ TkTextOrnamentCmd(textPtr, interp, argc, args)
     }
     cmd = LangString(args[2]);
     length = strlen(cmd);
-    if (textPtr->ornInfoPtr == NULL) {
-	textPtr->ornInfoPtr = (TkTextOrnInfo *) ckalloc(sizeof(TkTextOrnInfo));
-	textPtr->ornInfoPtr->firstPtr = NULL;
-	textPtr->ornInfoPtr->nextId = 1;
-    }
-    infoPtr = textPtr->ornInfoPtr;
+    infoPtr = GetOrnInfo(textPtr);
 
+    if (strcmp(cmd, "_splitlines") == 0) {
+	/*
+	 * A hook for the tests (t/splitlines.t), not an interface, and
+	 * not documented in the manual: the split lines and frames
+	 * generated for the block that starts at an index, as it is
+	 * displayed now (see SplitsList).
+	 */
+
+	TkTextIndex index;
+	TkTextSegment *segPtr;
+
+	if (argc != 4) {
+	    Tcl_AppendResult(interp, "wrong # args: should be \"",
+		    LangString(args[0]), " ornament _splitlines index\"", NULL);
+	    return TCL_ERROR;
+	}
+	if (TkTextGetIndex(interp, textPtr, LangString(args[3]), &index)
+		!= TCL_OK) {
+	    return TCL_ERROR;
+	}
+	segPtr = TkIBTreeAt(&index, 0);
+	if (segPtr == NULL) {
+	    Tcl_AppendResult(interp, "no block starts at \"",
+		    LangString(args[3]), "\"", NULL);
+	    return TCL_ERROR;
+	}
+	return SplitsList(interp, TkTextBlockOrnsAt(textPtr, segPtr));
+    }
     if ((length >= 2) && (strncmp(cmd, "create", length) == 0)) {
 	int type, numPoints;
 
@@ -3295,7 +3349,15 @@ typedef struct BlockOrnItem {
 				 * lines) before it in the callback's list:
 				 * under the text, it is drawn after them. */
     OrnGeom geom;		/* In block coordinates. */
+    int split;			/* SPLIT_LINE or SPLIT_FRAME for a stroke of
+				 * a split line or frame (ornPtr is a stroke
+				 * of the widget: GetStrokes), else 0; ... */
+    int value, bit;		/* ... the number its picture shows, and the
+				 * bit of it that this stroke stands for. */
 } BlockOrnItem;
+
+#define SPLIT_LINE	1
+#define SPLIT_FRAME	2
 
 typedef struct TkTextBlockOrns {
     int num, size;
@@ -3303,6 +3365,9 @@ typedef struct TkTextBlockOrns {
     struct TkTextOrnTemplates *templPtr;
 				/* The templates used (a reference held), or
 				 * NULL. */
+    struct TkTextOrnTemplates *strokesPtr;
+				/* The strokes of split lines used (a
+				 * reference held), or NULL. */
 } TkTextBlockOrns;
 
 typedef struct TkTextOrnTemplates {
@@ -3369,9 +3434,15 @@ NewOrnament(type)
     return ornPtr;
 }
 
+/*
+ * Makes room for count more items in a block's list (made if NULL),
+ * before the others or after them; returns the first of them.
+ */
+
 static BlockOrnItem *
-AddItem(listPtrPtr, front)
+AddItems(listPtrPtr, count, front)
     TkTextBlockOrns **listPtrPtr;
+    int count;
     int front;			/* Before the others. */
 {
     TkTextBlockOrns *listPtr = *listPtrPtr;
@@ -3383,23 +3454,29 @@ AddItem(listPtrPtr, front)
 	listPtr->num = listPtr->size = 0;
 	listPtr->items = NULL;
 	listPtr->templPtr = NULL;
+	listPtr->strokesPtr = NULL;
     }
-    if (listPtr->num == listPtr->size) {
+    if (listPtr->num + count > listPtr->size) {
 	listPtr->size = listPtr->size ? 2 * listPtr->size : 4;
+	if (listPtr->size < listPtr->num + count) {
+	    listPtr->size = listPtr->num + count;
+	}
 	listPtr->items = (BlockOrnItem *) ckrealloc((char *) listPtr->items,
 		listPtr->size * sizeof(BlockOrnItem));
     }
     if (front) {
-	memmove(listPtr->items + 1, listPtr->items,
+	memmove(listPtr->items + count, listPtr->items,
 		listPtr->num * sizeof(BlockOrnItem));
 	itemPtr = listPtr->items;
     } else {
 	itemPtr = listPtr->items + listPtr->num;
     }
-    listPtr->num++;
-    memset(itemPtr, 0, sizeof(BlockOrnItem));
+    listPtr->num += count;
+    memset(itemPtr, 0, count * sizeof(BlockOrnItem));
     return itemPtr;
 }
+
+#define AddItem(listPtrPtr, front)	AddItems(listPtrPtr, 1, front)
 
 /*
  *----------------------------------------------------------------------
@@ -3642,6 +3719,259 @@ TkTextOrnLayoutTemplates(textPtr, templPtr, boxesPtr, listPtrPtr)
 /*
  *----------------------------------------------------------------------
  *
+ * Split lines and frames.
+ *
+ *	Where the core lays leaves of a block out one under another (a
+ *	"stack": TkTextIBTreeLayoutProc), it shows the structure of the
+ *	tree hidden in the stack: between two leaves, the depth of the
+ *	separator; around the stack, the number of nodes with a single
+ *	child above it.  Each number is shown in binary, a stroke per bit
+ *	set: bit 0 a dotted line, bit 1 a dashed line, bit 2 a solid line
+ *	(all one pixel wide), bit 3 and every bit above it a solid line
+ *	three pixels wide.  The strokes of a number do not touch: one row
+ *	of pixels is left between two of them (so the one-pixel strokes
+ *	are 2 pixels apart), the lowest bit first: on top for the lines
+ *	between leaves, innermost for the frames.
+ *
+ *	The strokes are ornaments (lines and rectangles) of the layer
+ *	under the text, which the widget makes once and all its blocks
+ *	share; a stroke drawn for a block is an item of the block's list,
+ *	before all the others.
+ *
+ *----------------------------------------------------------------------
+ */
+
+#define NUM_STROKES	4
+#define SPLIT_COLOR	"gray50"
+
+static struct {
+    char *name;			/* For "ornament _splitlines". */
+    int width;			/* Pixels. */
+    char *widthString;
+    char *dash;			/* The value of -dash, or NULL: solid. */
+} strokes[NUM_STROKES] = {
+    {"dotted", 1, "1", "1 2"},
+    {"dashed", 1, "1", "4 3"},
+    {"solid", 1, "1", NULL},
+    {"thick", 3, "3", NULL},
+};
+
+/*
+ * The strokes of a widget: NUM_STROKES lines, then as many rectangles;
+ * NULL if they cannot be made.
+ */
+
+static TkTextOrnTemplates *
+GetStrokes(textPtr)
+    TkText *textPtr;
+{
+    TkTextOrnInfo *infoPtr = GetOrnInfo(textPtr);
+    TkTextOrnTemplates *strokesPtr;
+    Ornament *ornPtr;
+    Arg args[8];
+    int frame, bit, argc, i, code = TCL_OK;
+
+    if (infoPtr->strokesPtr != NULL) {
+	return infoPtr->strokesPtr;
+    }
+    strokesPtr = (TkTextOrnTemplates *) ckalloc(sizeof(TkTextOrnTemplates));
+    strokesPtr->refCount = 1;
+    strokesPtr->num = 0;
+    strokesPtr->orns = (Ornament **)
+	    ckalloc(2 * NUM_STROKES * sizeof(Ornament *));
+    for (frame = 0; frame < 2; frame++) {
+	for (bit = 0; bit < NUM_STROKES; bit++) {
+	    argc = 0;
+	    args[argc++] = Tcl_NewStringObj(frame ? "-outline" : "-fill", -1);
+	    args[argc++] = Tcl_NewStringObj(SPLIT_COLOR, -1);
+	    args[argc++] = Tcl_NewStringObj("-layer", -1);
+	    args[argc++] = Tcl_NewStringObj("under", -1);
+	    args[argc++] = Tcl_NewStringObj("-width", -1);
+	    args[argc++] = Tcl_NewStringObj(strokes[bit].widthString, -1);
+	    if (strokes[bit].dash != NULL) {
+		args[argc++] = Tcl_NewStringObj("-dash", -1);
+		args[argc++] = Tcl_NewStringObj(strokes[bit].dash, -1);
+	    }
+	    ornPtr = NewOrnament(frame ? ORN_RECTANGLE : ORN_LINE);
+	    if (ConfigureOrnament(textPtr->interp, textPtr, ornPtr, argc, args,
+		    0) != TCL_OK) {
+		code = TCL_ERROR;
+	    }
+	    for (i = 0; i < argc; i++) {
+		Tcl_DecrRefCount(args[i]);
+	    }
+	    strokesPtr->orns[strokesPtr->num++] = ornPtr;
+	}
+    }
+    if (code != TCL_OK) {
+	Tcl_ResetResult(textPtr->interp);
+	TkTextOrnTemplatesRelease(textPtr, strokesPtr);
+	return NULL;
+    }
+    infoPtr->strokesPtr = strokesPtr;
+    return strokesPtr;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TkTextOrnLayoutSplits --
+ *
+ *	Puts the strokes of the given pictures (see TkTextOrnSplit in
+ *	tkText.h) before the other ornaments of a block's list (made if
+ *	NULL), in the order of the pictures, and in each the lowest bit
+ *	first.  A picture whose value is not positive has no strokes.
+ *
+ *	The lines of a picture go down from the row y: a stroke takes
+ *	as many rows as it is wide, and one row is left before the next
+ *	stroke.  The first frame is around the pixels of the box, next
+ *	to them; one pixel is left before the next frame, further out.
+ *
+ *----------------------------------------------------------------------
+ */
+
+void
+TkTextOrnLayoutSplits(textPtr, splits, num, listPtrPtr)
+    TkText *textPtr;
+    TkTextOrnSplit *splits;
+    int num;
+    TkTextBlockOrns **listPtrPtr;
+{
+    TkTextOrnTemplates *strokesPtr;
+    BlockOrnItem *itemPtr;
+    int i, bit, count = 0, stroke, width, pos, mid;
+    double *pts;
+
+    for (i = 0; i < num; i++) {
+	for (bit = 0; (splits[i].value >> bit) > 0; bit++) {
+	    if ((splits[i].value >> bit) & 1) {
+		count++;
+	    }
+	}
+    }
+    if (count == 0) {
+	return;
+    }
+    strokesPtr = GetStrokes(textPtr);
+    if (strokesPtr == NULL) {
+	return;
+    }
+    itemPtr = AddItems(listPtrPtr, count, 1);
+    if ((*listPtrPtr)->strokesPtr == NULL) {
+	strokesPtr->refCount++;
+	(*listPtrPtr)->strokesPtr = strokesPtr;
+    }
+    for (i = 0; i < num; i++) {
+	TkTextOrnSplit *sPtr = &splits[i];
+
+	/*
+	 * pos: the first row of the next line; for a frame, how far
+	 * outside the box its inner edge is.  mid: the middle of the
+	 * stroke, where the coordinates of the ornament are.
+	 */
+
+	pos = sPtr->frame ? 1 : sPtr->y;
+	for (bit = 0; (sPtr->value >> bit) > 0; bit++) {
+	    if (!((sPtr->value >> bit) & 1)) {
+		continue;
+	    }
+	    stroke = (bit < NUM_STROKES) ? bit : NUM_STROKES - 1;
+	    width = strokes[stroke].width;
+	    mid = pos + (width - 1) / 2;
+	    pts = (double *) ckalloc(4 * sizeof(double));
+	    if (sPtr->frame) {
+		pts[0] = sPtr->x - mid;
+		pts[1] = sPtr->y - mid;
+		pts[2] = sPtr->x + sPtr->width - 1 + mid;
+		pts[3] = sPtr->y + sPtr->height - 1 + mid;
+	    } else {
+		/*
+		 * A line with butt caps ends before the pixel of its end
+		 * point.
+		 */
+
+		pts[0] = sPtr->x;
+		pts[1] = mid;
+		pts[2] = sPtr->x + sPtr->width;
+		pts[3] = mid;
+	    }
+	    itemPtr->ornPtr = strokesPtr->orns[(sPtr->frame ? NUM_STROKES : 0)
+		    + stroke];
+	    itemPtr->owned = 0;
+	    itemPtr->addIndex = 0;
+	    itemPtr->split = sPtr->frame ? SPLIT_FRAME : SPLIT_LINE;
+	    itemPtr->value = sPtr->value;
+	    itemPtr->bit = bit;
+	    ShapeGeom(textPtr, itemPtr->ornPtr, pts, 2, &itemPtr->geom);
+	    itemPtr++;
+	    pos += width + 1;
+	}
+    }
+}
+
+/*
+ * The result of "ornament _splitlines index" (a hook for the tests):
+ * for each stroke of the split lines and frames in a block's list, in
+ * the order they are drawn, a list
+ *
+ *	kind value stroke x0 y0 x1 y1
+ *
+ * kind is "line" or "frame"; value, the number its picture shows;
+ * stroke, "dotted", "dashed", "solid" or "thick"; and the pixels it
+ * covers, from the top left corner of the block: for a line, the
+ * columns x0 to x1 of the rows y0 to y1; for a frame, the border (one
+ * pixel wide, three for "thick") of the box of the columns x0 to x1 and
+ * the rows y0 to y1.  Dots and dashes start at x0 (a frame's at its top
+ * left corner, clockwise).
+ */
+
+static int
+SplitsList(interp, listPtr)
+    Tcl_Interp *interp;
+    TkTextBlockOrns *listPtr;
+{
+    Tcl_Obj *resultPtr = Tcl_NewListObj(0, NULL), *elPtr;
+    int i, k, half, box[4];
+
+    for (i = 0; (listPtr != NULL) && (i < listPtr->num); i++) {
+	BlockOrnItem *itemPtr = &listPtr->items[i];
+	double *xy = itemPtr->geom.coords;
+
+	if (!itemPtr->split || !itemPtr->geom.valid) {
+	    continue;
+	}
+	half = (itemPtr->ornPtr->width - 1) / 2;
+	if (itemPtr->split == SPLIT_FRAME) {
+	    /* The corners of a rectangle, clockwise from the top left. */
+	    box[0] = (int) xy[0] - half;
+	    box[1] = (int) xy[1] - half;
+	    box[2] = (int) xy[4] + half;
+	    box[3] = (int) xy[5] + half;
+	} else {
+	    box[0] = (int) xy[0];
+	    box[1] = (int) xy[1] - half;
+	    box[2] = (int) xy[2] - 1;
+	    box[3] = (int) xy[3] + half;
+	}
+	elPtr = Tcl_NewListObj(0, NULL);
+	Tcl_ListObjAppendElement(NULL, elPtr, Tcl_NewStringObj(
+		(itemPtr->split == SPLIT_FRAME) ? "frame" : "line", -1));
+	Tcl_ListObjAppendElement(NULL, elPtr, Tcl_NewIntObj(itemPtr->value));
+	Tcl_ListObjAppendElement(NULL, elPtr, Tcl_NewStringObj(
+		strokes[(itemPtr->bit < NUM_STROKES) ? itemPtr->bit
+			: NUM_STROKES - 1].name, -1));
+	for (k = 0; k < 4; k++) {
+	    Tcl_ListObjAppendElement(NULL, elPtr, Tcl_NewIntObj(box[k]));
+	}
+	Tcl_ListObjAppendElement(NULL, resultPtr, elPtr);
+    }
+    Tcl_SetObjResult(interp, resultPtr);
+    return TCL_OK;
+}
+
+/*
+ *----------------------------------------------------------------------
+ *
  * TkTextOrnDrawBlock --
  *
  *	Draws the ornaments of a block's list of a layer (under or over
@@ -3711,5 +4041,6 @@ TkTextOrnFreeBlock(textPtr, listPtr)
 	ckfree((char *) listPtr->items);
     }
     TkTextOrnTemplatesRelease(textPtr, listPtr->templPtr);
+    TkTextOrnTemplatesRelease(textPtr, listPtr->strokesPtr);
     ckfree((char *) listPtr);
 }

@@ -1,5 +1,5 @@
 package MojoX::Authentication::Model::Hash;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo;
@@ -7,6 +7,7 @@ use experimental qw< signatures >;
 use English;
 use JSON::PP qw< decode_json >;
 use Ouch qw< :trytiny_var >;
+use Storable qw< dclone >;
 
 sub slurp ($path) {
    open my $fh, '<:raw', $path
@@ -25,7 +26,7 @@ with 'MojoX::Authentication::Model::Role::Local';
 with 'MojoX::Authentication::Model::Role::Creator';
 
 has db => (is => 'rwp', required => 1);
-has name => (is => 'ro', default => DEFAULT_NAME);
+has name => (is => 'rw', default => DEFAULT_NAME);
 has _secrets_are_cleartext => (is => 'ro', default => 0,
    init_arg => 'secrets_are_cleartext');
 
@@ -45,15 +46,31 @@ sub _adjust_db ($self) {
       $db = decode_json($db);
    }
 
-   # normalize to hash reference name => record
-   $db = { map { $_->{name} => $_ } $db->@* } if ref($db) eq 'ARRAY';
-
-   # work on shallow copies of the provided records
-   $db->{$_} = { $db->{$_}->%*, username => $_ } for keys($db->%*);
+   $db = dclone($db);
+   my $ref = ref($db);
+   if ($ref eq 'ARRAY') {
+      my %new_db;
+      for my $item ($db->@*) {
+         ouch 400, 'missing/undefined "username" in Hash db input record'
+            unless defined($item->{username});
+         $new_db{$item->{username}} = $item;
+      }
+      $db = \%new_db;
+   }
+   elsif ($ref eq 'HASH') {
+      $db->{$_}{username} = $_ for keys($db->%*);
+   }
+   else {
+      ouch 400, 'invalid input for Hash db';
+   }
 
    if ($self->_secrets_are_cleartext) {  # need hashing?
+      my $key = $self->key_for_secret;
       my $cp = $self->crypt_passphrase;
-      $_->{secret} = $cp->hash_password($_->{secret}) for values($db->%*);
+      for my $item (values($db->%*)) {
+         next unless length($item->{$key} // '');
+         $item->{$key} = $cp->hash_password($item->{$key});
+      }
    }
 
    $self->_set_db($db);
@@ -70,13 +87,12 @@ sub load_user ($self, $ignored, $uid) {
 # this method is required for compositing
 # MojoX::Authentication::Model::Role::Local
 BEGIN {
-   *{load_user_by_name} = \&load_user;
+   *{load_user_by_username} = \&load_user;
 }
 
 sub save_user ($self, $user, $is_secret_cleartext = 0) {
-   my %u = $user->%*;
-   $u{secret} = $self->hash_secret($u{secret}) if $is_secret_cleartext;
-   $self->db->{$u{name}} = \%u;
+   $self->db->{$user->{username}}
+      = $self->user_for_save($user, $is_secret_cleartext);
    return $self;
 }
 

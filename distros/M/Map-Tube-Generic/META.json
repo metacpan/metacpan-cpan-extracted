@@ -63,7 +63,7 @@
    "provides" : {
       "Map::Tube::Generic" : {
          "file" : "lib/Map/Tube/Generic.pm",
-         "version" : "v0.2.1"
+         "version" : "v0.2.2"
       }
    },
    "release_status" : "stable",
@@ -77,6 +77,6 @@
          "web" : "https://github.com/gwselke/Map-Tube-Generic"
       }
    },
-   "version" : "v0.2.1",
+   "version" : "v0.2.2",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

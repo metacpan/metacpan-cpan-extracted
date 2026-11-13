@@ -17,7 +17,7 @@ use parent 'Locale::Maketext';
 use Carp qw(croak);
 use Readonly;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # Language used when nothing in the environment matches a lexicon we ship
 Readonly::Scalar my $FALLBACK_LANGUAGE => 'en';
@@ -52,7 +52,7 @@ App::Syslogd::I18N - Localised messages for App::Syslogd
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.002.1
 
 =head1 SYNOPSIS
 

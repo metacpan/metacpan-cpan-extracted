@@ -87,6 +87,7 @@ InsertSeparator(stackPtr)
     atomPtr->wraps = NULL;
     atomPtr->roots = NULL;
     atomPtr->level = atomPtr->added = atomPtr->numRanges = 0;
+    atomPtr->cutJoin = 0;
     atomPtr->ranges = NULL;
     TkTextDataInit(atomPtr->data);
     atomPtr->values = NULL;
@@ -102,9 +103,6 @@ FreeAtom(undoPtr, atomPtr)
 {
     if (atomPtr->string != NULL) {
 	Tcl_DecrRefCount(atomPtr->string);
-    }
-    if (atomPtr->list != NULL) {
-	Tcl_DecrRefCount(atomPtr->list);
     }
     if (atomPtr->cuts != NULL) {
 	ckfree((char *) atomPtr->cuts);
@@ -124,7 +122,22 @@ FreeAtom(undoPtr, atomPtr)
     if (atomPtr->ranges != NULL) {
 	ckfree(atomPtr->ranges);
     }
-    if (!TkTextDataIsEmpty(atomPtr->data)) {
+    if (!TkTextDataIsEmpty(atomPtr->data)
+	    && (atomPtr->type == TK_TEXT_UNDO_SETVALUE)) {
+	/*
+	 * The value a set inside an edit step replaced (or, after its
+	 * undo, the one it set): discarded with its place.
+	 */
+
+	Tcl_Obj *where = NULL;
+
+	if (TkTextVcOn(undoPtr->textPtr) && (atomPtr->list != NULL)) {
+	    where = atomPtr->list;
+	    Tcl_IncrRefCount(where);
+	}
+	TkTextDiscardValueAt(undoPtr->textPtr, atomPtr->data, atomPtr->added,
+		where);
+    } else if (!TkTextDataIsEmpty(atomPtr->data)) {
 	/*
 	 * The instance data of a block insert's block (its head is at
 	 * index1), kept by the undo for the redo.
@@ -139,6 +152,10 @@ FreeAtom(undoPtr, atomPtr)
 	}
 	TkTextDiscardValueAt(undoPtr->textPtr, atomPtr->data,
 		TK_TEXT_VC_BLOCK, where);
+    }
+    if (atomPtr->list != NULL) {
+	Tcl_DecrRefCount(atomPtr->list);	/* After the data: a set value's
+					 * place. */
     }
     if (atomPtr->values != NULL) {
 	TkTextDiscardValueList(undoPtr->textPtr, atomPtr->values);
@@ -349,6 +366,7 @@ TkTextUndoPushAction(stackPtr, type, index1, index2, string, list, listIndex,
     atomPtr->wraps = NULL;
     atomPtr->roots = NULL;
     atomPtr->level = atomPtr->added = atomPtr->numRanges = 0;
+    atomPtr->cutJoin = 0;
     atomPtr->ranges = NULL;
     TkTextDataInit(atomPtr->data);
     atomPtr->values = NULL;

@@ -1,0 +1,3614 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateAsset",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_friendly_name"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "asset_versions" : [
+      "a_asset_versions"
+     ],
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "dependencies" : [
+      "a_dependencies"
+     ],
+     "function_versions" : [
+      "a_function_versions"
+     ],
+     "links" : {
+      "a_links" : 1
+     },
+     "runtime" : "node22",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "status" : "completed",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "asset_versions",
+      "asset_versions",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "dependencies",
+      "dependencies",
+      "plain"
+     ],
+     [
+      "function_versions",
+      "function_versions",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "runtime",
+      "runtime",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "builds",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "AssetVersions",
+    "v_asset_versions_1"
+   ],
+   [
+    "AssetVersions",
+    "v_asset_versions_2"
+   ],
+   [
+    "Dependencies",
+    "v_dependencies"
+   ],
+   [
+    "FunctionVersions",
+    "v_function_versions_1"
+   ],
+   [
+    "FunctionVersions",
+    "v_function_versions_2"
+   ],
+   [
+    "Runtime",
+    "v_runtime"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateBuild",
+  "method" : "create",
+  "options" : {
+   "asset_versions" : [
+    "v_asset_versions_1",
+    "v_asset_versions_2"
+   ],
+   "dependencies" : "v_dependencies",
+   "function_versions" : [
+    "v_function_versions_1",
+    "v_function_versions_2"
+   ],
+   "runtime" : "v_runtime"
+  },
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Builds"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "build_sid" : "a_build_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "environment_sid" : "a_environment_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "deployments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "BuildSid",
+    "v_build_sid"
+   ],
+   [
+    "IsPlugin",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateDeployment",
+  "method" : "create",
+  "options" : {
+   "build_sid" : "v_build_sid",
+   "is_plugin" : 1
+  },
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Deployments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "build_sid" : "a_build_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_suffix" : "a_domain_suffix",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_suffix",
+      "domain_suffix",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "DomainSuffix",
+    "v_domain_suffix"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateEnvironment",
+  "method" : "create",
+  "options" : {
+   "domain_suffix" : "v_domain_suffix"
+  },
+  "required" : [
+   "v_unique_name"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateFunction",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_friendly_name"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_base" : "a_domain_base",
+     "friendly_name" : "a_friendly_name",
+     "include_credentials" : true,
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "ui_editable" : true,
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_base",
+      "domain_base",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "include_credentials",
+      "include_credentials",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "ui_editable",
+      "ui_editable",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "IncludeCredentials",
+    "true"
+   ],
+   [
+    "UiEditable",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateService",
+  "method" : "create",
+  "options" : {
+   "include_credentials" : 1,
+   "ui_editable" : 1
+  },
+  "required" : [
+   "v_unique_name",
+   "v_friendly_name"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "environment_sid" : "a_environment_sid",
+     "key" : "a_key",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "value" : "a_value"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "key",
+      "key",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "value",
+      "value",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "variables",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Key",
+    "v_key"
+   ],
+   [
+    "Value",
+    "v_value"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateVariable",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_key",
+   "v_value"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Variables"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteAsset",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "builds",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteBuild",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Builds/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteEnvironment",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteFunction",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteService",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "variables",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteVariable",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Variables/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchAsset",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "asset_sid" : "a_asset_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "path" : "a_path",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "visibility" : "private"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "asset_sid",
+      "asset_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "path",
+      "path",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "visibility",
+      "visibility",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    1
+   ],
+   [
+    "asset_versions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchAssetVersion",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets/id2/Versions/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "asset_versions" : [
+      "a_asset_versions"
+     ],
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "dependencies" : [
+      "a_dependencies"
+     ],
+     "function_versions" : [
+      "a_function_versions"
+     ],
+     "links" : {
+      "a_links" : 1
+     },
+     "runtime" : "node22",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "status" : "completed",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "asset_versions",
+      "asset_versions",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "dependencies",
+      "dependencies",
+      "plain"
+     ],
+     [
+      "function_versions",
+      "function_versions",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "runtime",
+      "runtime",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "builds",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBuild",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Builds/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "status" : "completed",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "builds",
+    1
+   ],
+   [
+    "build_status",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchBuildStatus",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Builds/id2/Status"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "build_sid" : "a_build_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "environment_sid" : "a_environment_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "deployments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchDeployment",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Deployments/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "build_sid" : "a_build_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_name" : "a_domain_name",
+     "domain_suffix" : "a_domain_suffix",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_suffix",
+      "domain_suffix",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchEnvironment",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchFunction",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "function_sid" : "a_function_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "path" : "a_path",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "visibility" : "private"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "function_sid",
+      "function_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "path",
+      "path",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "visibility",
+      "visibility",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    1
+   ],
+   [
+    "function_versions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchFunctionVersion",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions/id2/Versions/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "content" : "a_content",
+     "function_sid" : "a_function_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "content",
+      "content",
+      "plain"
+     ],
+     [
+      "function_sid",
+      "function_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    1
+   ],
+   [
+    "function_versions",
+    1
+   ],
+   [
+    "function_version_content",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchFunctionVersionContent",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions/id2/Versions/id3/Content"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "build_sid" : "a_build_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "deployment_sid" : "a_deployment_sid",
+     "environment_sid" : "a_environment_sid",
+     "function_sid" : "a_function_sid",
+     "level" : "a_level",
+     "message" : "a_message",
+     "request_sid" : "a_request_sid",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "deployment_sid",
+      "deployment_sid",
+      "plain"
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "function_sid",
+      "function_sid",
+      "plain"
+     ],
+     [
+      "level",
+      "level",
+      "plain"
+     ],
+     [
+      "message",
+      "message",
+      "plain"
+     ],
+     [
+      "request_sid",
+      "request_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "logs",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchLog",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Logs/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_base" : "a_domain_base",
+     "friendly_name" : "a_friendly_name",
+     "include_credentials" : true,
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "ui_editable" : true,
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_base",
+      "domain_base",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "include_credentials",
+      "include_credentials",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "ui_editable",
+      "ui_editable",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchService",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "environment_sid" : "a_environment_sid",
+     "key" : "a_key",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "value" : "a_value"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "key",
+      "key",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "value",
+      "value",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "variables",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchVariable",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Variables/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "assets" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListAsset",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "assets",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "asset_versions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "asset_sid" : "a_asset_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "path" : "a_path",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "visibility" : "private"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "asset_sid",
+      "asset_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "path",
+      "path",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "visibility",
+      "visibility",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    1
+   ],
+   [
+    "asset_versions",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListAssetVersion",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "asset_versions",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets/id2/Versions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "builds" : [
+      {
+       "account_sid" : "a_account_sid",
+       "asset_versions" : [
+        "a_asset_versions"
+       ],
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "dependencies" : [
+        "a_dependencies"
+       ],
+       "function_versions" : [
+        "a_function_versions"
+       ],
+       "links" : {
+        "a_links" : 1
+       },
+       "runtime" : "node22",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "status" : "completed",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "asset_versions",
+      "asset_versions",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "dependencies",
+      "dependencies",
+      "plain"
+     ],
+     [
+      "function_versions",
+      "function_versions",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "runtime",
+      "runtime",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "builds",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListBuild",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "builds",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Builds"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "deployments" : [
+      {
+       "account_sid" : "a_account_sid",
+       "build_sid" : "a_build_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "environment_sid" : "a_environment_sid",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "deployments",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListDeployment",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "deployments",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Deployments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "environments" : [
+      {
+       "account_sid" : "a_account_sid",
+       "build_sid" : "a_build_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "domain_name" : "a_domain_name",
+       "domain_suffix" : "a_domain_suffix",
+       "links" : {
+        "a_links" : 1
+       },
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "unique_name" : "a_unique_name",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_name",
+      "domain_name",
+      "plain"
+     ],
+     [
+      "domain_suffix",
+      "domain_suffix",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListEnvironment",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "environments",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "functions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListFunction",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "functions",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "function_versions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "function_sid" : "a_function_sid",
+       "links" : {
+        "a_links" : 1
+       },
+       "path" : "a_path",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "visibility" : "private"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "function_sid",
+      "function_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "path",
+      "path",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "visibility",
+      "visibility",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    1
+   ],
+   [
+    "function_versions",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListFunctionVersion",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "function_versions",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions/id2/Versions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "logs" : [
+      {
+       "account_sid" : "a_account_sid",
+       "build_sid" : "a_build_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "deployment_sid" : "a_deployment_sid",
+       "environment_sid" : "a_environment_sid",
+       "function_sid" : "a_function_sid",
+       "level" : "a_level",
+       "message" : "a_message",
+       "request_sid" : "a_request_sid",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "build_sid",
+      "build_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "deployment_sid",
+      "deployment_sid",
+      "plain"
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "function_sid",
+      "function_sid",
+      "plain"
+     ],
+     [
+      "level",
+      "level",
+      "plain"
+     ],
+     [
+      "message",
+      "message",
+      "plain"
+     ],
+     [
+      "request_sid",
+      "request_sid",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "logs",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FunctionSid",
+    "v_function_sid"
+   ],
+   [
+    "StartDate",
+    "2026-01-13T03:04:05Z"
+   ],
+   [
+    "EndDate",
+    "2026-01-18T03:04:05Z"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListLog",
+  "method" : "page",
+  "options" : {
+   "end_date" : {
+    "epoch" : 1768705445
+   },
+   "function_sid" : "v_function_sid",
+   "start_date" : {
+    "epoch" : 1768273445
+   }
+  },
+  "records_key" : "logs",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Logs"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "services" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "domain_base" : "a_domain_base",
+       "friendly_name" : "a_friendly_name",
+       "include_credentials" : true,
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "ui_editable" : true,
+       "unique_name" : "a_unique_name",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_base",
+      "domain_base",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "include_credentials",
+      "include_credentials",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "ui_editable",
+      "ui_editable",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListService",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "services",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "variables" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "environment_sid" : "a_environment_sid",
+       "key" : "a_key",
+       "service_sid" : "a_service_sid",
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "value" : "a_value"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "key",
+      "key",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "value",
+      "value",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "variables",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListVariable",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "variables",
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Variables"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "assets",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateAsset",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   "v_friendly_name"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Assets/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "functions",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateFunction",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   "v_friendly_name"
+  ],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Functions/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "domain_base" : "a_domain_base",
+     "friendly_name" : "a_friendly_name",
+     "include_credentials" : true,
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "ui_editable" : true,
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "domain_base",
+      "domain_base",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "include_credentials",
+      "include_credentials",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "ui_editable",
+      "ui_editable",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "IncludeCredentials",
+    "true"
+   ],
+   [
+    "UiEditable",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateService",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "include_credentials" : 1,
+   "ui_editable" : 1
+  },
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "environment_sid" : "a_environment_sid",
+     "key" : "a_key",
+     "service_sid" : "a_service_sid",
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "value" : "a_value"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "environment_sid",
+      "environment_sid",
+      "plain"
+     ],
+     [
+      "key",
+      "key",
+      "plain"
+     ],
+     [
+      "service_sid",
+      "service_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "value",
+      "value",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "serverless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "services",
+    1
+   ],
+   [
+    "environments",
+    1
+   ],
+   [
+    "variables",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Key",
+    "v_key"
+   ],
+   [
+    "Value",
+    "v_value"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateVariable",
+  "method" : "update",
+  "options" : {
+   "key" : "v_key",
+   "value" : "v_value"
+  },
+  "required" : [],
+  "url" : "https://serverless.twilio.com/v1/Services/id1/Environments/id2/Variables/id3"
+ }
+]

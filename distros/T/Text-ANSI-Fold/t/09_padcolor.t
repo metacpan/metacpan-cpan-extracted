@@ -1,8 +1,8 @@
 use strict;
 use warnings;
+use open IO => 'utf8', ':std';
 use Test::More 0.98;
 use utf8;
-use open IO => 'utf8', ':std';
 use Data::Dumper;
 
 use Text::ANSI::Fold qw(:constants);

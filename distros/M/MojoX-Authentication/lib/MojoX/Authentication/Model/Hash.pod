@@ -28,7 +28,7 @@ and inherits its methods.
 
 =head2 B<< create >>
 
-   my $instance = MojoX::Authentication::Model::Hash->new(
+   my $instance = MojoX::Authentication::Model::Hash->create(
       $config, %args);
 
 Constructor. 
@@ -43,19 +43,63 @@ case a hash reference is found, its pairs override those on C<%args>,
 with the only exception of the key C<name> which is preserved if already
 present or set to the default otherwise.
 
-If the C<db> key is present, a new instance of the class is created and
-returned. Otherwise, the method returns C<undef>.
+Argument C<db> is mandatory (an exception is thrown otherwise) and holds
+the accounts, in one of the following forms:
 
-Also accepts parameters C<name> (from C<%args> only see above) and
-C<crypt_passphrase>, that can be either a L<Crypt::Passphrase> instance
-or arguments to instantate one.
+=over
+
+=item *
+
+a hash reference, whose keys are the usernames and whose values are hash
+references with the accounts' data;
+
+=item *
+
+an array reference of hash references with the accounts' data, each
+B<MUST> contain key C<username>;
+
+=item *
+
+a string holding JSON text for the array reference above (it B<MUST>
+start with C<[>, possibly preceded by spaces);
+
+=item *
+
+a path to a file holding JSON text for either of the two references
+above.
+
+=back
+
+The accounts' data hold the secret under its key (C<secret>, unless
+set otherwise with C<key_for_secret>); an account without it (or with
+an empty one) cannot log in with a password (see
+L<MojoX::Authentication::Model::Role::Local/validate_user>). Any other
+key/value pair is kept as-is. Key C<username> is always set to the account's
+username.
+
+The input data is copied and never modified: it is safe to use the same
+data for multiple instances. An exception is thrown if an account in an
+array lacks the C<username>, or if C<db> is a reference of any other
+type.
+
+Also accepts parameters C<name> (from C<%args> only see above),
+C<secrets_are_cleartext>, C<key_for_secret>, C<protected_keys> (see
+L<MojoX::Authentication::Model::Role::Local>) and C<crypt_passphrase>.
+The latter can be
+either a L<Crypt::Passphrase> instance or arguments to instantiate one
+(an L<Crypt::Passphrase::Argon2> encoder is used by default).
+
+When C<secrets_are_cleartext> is set to a true value, the secret in
+each account is assumed to be in cleartext and is hashed when the
+instance is created. This is only meant for development and testing, as
+it implies that cleartext passwords are kept somewhere.
 
 =head2 B<< db >>
 
    my $db_hash = $provider->db;
 
-Accessor to the hash holding the accounts database. Take extreme care to
-fiddle directly with its value.
+Accessor to the hash holding the accounts database, keyed by username.
+Take extreme care when fiddling directly with its value.
 
 =head2 B<< load_user >>
 
@@ -66,22 +110,27 @@ L<Mojolicious::Plugin::Authentication>'s interface for loading users.
 The first parameter (which is supposed to be a controller instance) is
 ignored.
 
-This class has no distiction between user identifiers and user names.
+This class has no distinction between user identifiers and usernames.
+Returns a (shallow) copy of the account's data, or nothing if the
+account is not present.
 
-=head2 B<< load_user_by_name >>
+=head2 B<< load_user_by_username >>
 
-   my $user = $provider->load_user_by_name($ignored, $name);
+   my $user = $provider->load_user_by_username($ignored, $username);
 
-Alias for L</load_user>, this class has no distiction between user
-identifiers and user names.
+Alias for L</load_user>, as this class has no distinction between user
+identifiers and usernames.
 
 =head2 B<< name >>
 
    my $name = $provider->name;
+   $provider->name($new_name);
 
 Name assigned to the provider (e.g. if you want to use different
 databases at the same time and hence want to instantiate this class
-multiple times).
+multiple times). It is read-write: L<MojoX::Authentication::Model> sets
+it to the name it registers the provider under (see
+L<MojoX::Authentication::Model/Provider names>).
 
 =head2 B<< save_user >>
 
@@ -91,10 +140,16 @@ multiple times).
 Save a user.
 
 The input C<$user> is supposed to be a hash reference with I<at least>
-keys C<name> (for the username/userid) and C<secret> (for the secret).
-it <MAY> contain other key/value pairs, which will be copied.
+key C<username> (for the username/userid) and, for an account that
+logs in with a password, the key for the secret (C<secret> by default,
+see C<key_for_secret>). It I<MAY> contain other key/value pairs, which
+will be copied.
+A user with the same C<username> is replaced.
 
-The C<secret> is supposed to be already hashed. It is possible to set
+A user returned by L</load_user> can be modified and passed to this
+method to save the changes.
+
+The secret is supposed to be already hashed. It is possible to set
 the optional additional parameter C<$is_secret_cleartext> to a true
 value to indicate that the hashing should be done by the function before
 saving the user.

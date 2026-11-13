@@ -1,0 +1,2081 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "command" : "a_command",
+     "command_mode" : "binary",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "delivery_receipt_requested" : true,
+     "direction" : "to_sim",
+     "sid" : "a_sid",
+     "sim_sid" : "a_sim_sid",
+     "status" : "sent",
+     "transport" : "ip",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "command",
+      "command",
+      "plain"
+     ],
+     [
+      "command_mode",
+      "command_mode",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "delivery_receipt_requested",
+      "delivery_receipt_requested",
+      "plain"
+     ],
+     [
+      "direction",
+      "direction",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sim_sid",
+      "sim_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "transport",
+      "transport",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "commands",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Command",
+    "v_command"
+   ],
+   [
+    "CallbackMethod",
+    "GET"
+   ],
+   [
+    "CallbackUrl",
+    "v_callback_url"
+   ],
+   [
+    "CommandMode",
+    "text"
+   ],
+   [
+    "DeliveryReceiptRequested",
+    "true"
+   ],
+   [
+    "IncludeSid",
+    "v_include_sid"
+   ],
+   [
+    "Sim",
+    "v_sim"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCommand",
+  "method" : "create",
+  "options" : {
+   "callback_method" : "GET",
+   "callback_url" : "v_callback_url",
+   "command_mode" : "text",
+   "delivery_receipt_requested" : 1,
+   "include_sid" : "v_include_sid",
+   "sim" : "v_sim"
+  },
+  "required" : [
+   "v_command"
+  ],
+  "url" : "https://wireless.twilio.com/v1/Commands"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "data_enabled" : true,
+     "data_limit" : 1048,
+     "data_metering" : "a_data_metering",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "international_roaming" : [
+      "a_international_roaming"
+     ],
+     "international_roaming_data_limit" : 3387,
+     "messaging_enabled" : true,
+     "national_roaming_data_limit" : 2841,
+     "national_roaming_enabled" : true,
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "voice_enabled" : true
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "data_enabled",
+      "data_enabled",
+      "plain"
+     ],
+     [
+      "data_limit",
+      "data_limit",
+      "plain"
+     ],
+     [
+      "data_metering",
+      "data_metering",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "international_roaming",
+      "international_roaming",
+      "plain"
+     ],
+     [
+      "international_roaming_data_limit",
+      "international_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "messaging_enabled",
+      "messaging_enabled",
+      "plain"
+     ],
+     [
+      "national_roaming_data_limit",
+      "national_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "national_roaming_enabled",
+      "national_roaming_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_enabled",
+      "voice_enabled",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "rate_plans",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "DataEnabled",
+    "true"
+   ],
+   [
+    "DataLimit",
+    "889"
+   ],
+   [
+    "DataLimitStrategy",
+    "block"
+   ],
+   [
+    "DataMetering",
+    "v_data_metering"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "InternationalRoaming",
+    "v_international_roaming_1"
+   ],
+   [
+    "InternationalRoaming",
+    "v_international_roaming_2"
+   ],
+   [
+    "InternationalRoamingDataLimit",
+    "2974"
+   ],
+   [
+    "MessagingEnabled",
+    "true"
+   ],
+   [
+    "NationalRoamingDataLimit",
+    "2428"
+   ],
+   [
+    "NationalRoamingEnabled",
+    "true"
+   ],
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "VoiceEnabled",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateRatePlan",
+  "method" : "create",
+  "options" : {
+   "data_enabled" : 1,
+   "data_limit" : 889,
+   "data_limit_strategy" : "block",
+   "data_metering" : "v_data_metering",
+   "friendly_name" : "v_friendly_name",
+   "international_roaming" : [
+    "v_international_roaming_1",
+    "v_international_roaming_2"
+   ],
+   "international_roaming_data_limit" : 2974,
+   "messaging_enabled" : 1,
+   "national_roaming_data_limit" : 2428,
+   "national_roaming_enabled" : 1,
+   "unique_name" : "v_unique_name",
+   "voice_enabled" : 1
+  },
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/RatePlans"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "commands",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCommand",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Commands/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "rate_plans",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteRatePlan",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/RatePlans/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sims",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteSim",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Sims/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "command" : "a_command",
+     "command_mode" : "binary",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "delivery_receipt_requested" : true,
+     "direction" : "to_sim",
+     "sid" : "a_sid",
+     "sim_sid" : "a_sim_sid",
+     "status" : "sent",
+     "transport" : "ip",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "command",
+      "command",
+      "plain"
+     ],
+     [
+      "command_mode",
+      "command_mode",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "delivery_receipt_requested",
+      "delivery_receipt_requested",
+      "plain"
+     ],
+     [
+      "direction",
+      "direction",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sim_sid",
+      "sim_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "transport",
+      "transport",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "commands",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCommand",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Commands/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "data_enabled" : true,
+     "data_limit" : 1048,
+     "data_metering" : "a_data_metering",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "international_roaming" : [
+      "a_international_roaming"
+     ],
+     "international_roaming_data_limit" : 3387,
+     "messaging_enabled" : true,
+     "national_roaming_data_limit" : 2841,
+     "national_roaming_enabled" : true,
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "voice_enabled" : true
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "data_enabled",
+      "data_enabled",
+      "plain"
+     ],
+     [
+      "data_limit",
+      "data_limit",
+      "plain"
+     ],
+     [
+      "data_metering",
+      "data_metering",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "international_roaming",
+      "international_roaming",
+      "plain"
+     ],
+     [
+      "international_roaming_data_limit",
+      "international_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "messaging_enabled",
+      "messaging_enabled",
+      "plain"
+     ],
+     [
+      "national_roaming_data_limit",
+      "national_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "national_roaming_enabled",
+      "national_roaming_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_enabled",
+      "voice_enabled",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "rate_plans",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchRatePlan",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/RatePlans/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "commands_callback_method" : "GET",
+     "commands_callback_url" : "a_commands_callback_url",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "e_id" : "a_e_id",
+     "friendly_name" : "a_friendly_name",
+     "iccid" : "a_iccid",
+     "ip_address" : "a_ip_address",
+     "links" : {
+      "a_links" : 1
+     },
+     "rate_plan_sid" : "a_rate_plan_sid",
+     "reset_status" : "resetting",
+     "sid" : "a_sid",
+     "sms_fallback_method" : "GET",
+     "sms_fallback_url" : "a_sms_fallback_url",
+     "sms_method" : "POST",
+     "sms_url" : "a_sms_url",
+     "status" : "deactivated",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "voice_fallback_method" : "POST",
+     "voice_fallback_url" : "a_voice_fallback_url",
+     "voice_method" : "GET",
+     "voice_url" : "a_voice_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "commands_callback_method",
+      "commands_callback_method",
+      "plain"
+     ],
+     [
+      "commands_callback_url",
+      "commands_callback_url",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "e_id",
+      "e_id",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "iccid",
+      "iccid",
+      "plain"
+     ],
+     [
+      "ip_address",
+      "ip_address",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "rate_plan_sid",
+      "rate_plan_sid",
+      "plain"
+     ],
+     [
+      "reset_status",
+      "reset_status",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms_fallback_method",
+      "sms_fallback_method",
+      "plain"
+     ],
+     [
+      "sms_fallback_url",
+      "sms_fallback_url",
+      "plain"
+     ],
+     [
+      "sms_method",
+      "sms_method",
+      "plain"
+     ],
+     [
+      "sms_url",
+      "sms_url",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_fallback_method",
+      "voice_fallback_method",
+      "plain"
+     ],
+     [
+      "voice_fallback_url",
+      "voice_fallback_url",
+      "plain"
+     ],
+     [
+      "voice_method",
+      "voice_method",
+      "plain"
+     ],
+     [
+      "voice_url",
+      "voice_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sims",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSim",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Sims/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "usage_records" : [
+      {
+       "account_sid" : "a_account_sid",
+       "commands" : {
+        "a_commands" : 1
+       },
+       "data" : {
+        "a_data" : 1
+       },
+       "period" : {
+        "a_period" : 1
+       }
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "commands",
+      "commands",
+      "plain"
+     ],
+     [
+      "data",
+      "data",
+      "plain"
+     ],
+     [
+      "period",
+      "period",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "usage_records",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "End",
+    "2026-01-28T03:04:05Z"
+   ],
+   [
+    "Start",
+    "2026-01-23T03:04:05Z"
+   ],
+   [
+    "Granularity",
+    "hourly"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListAccountUsageRecord",
+  "method" : "page",
+  "options" : {
+   "end" : {
+    "epoch" : 1769569445
+   },
+   "granularity" : "hourly",
+   "start" : {
+    "epoch" : 1769137445
+   }
+  },
+  "records_key" : "usage_records",
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/UsageRecords"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "commands" : [
+      {
+       "account_sid" : "a_account_sid",
+       "command" : "a_command",
+       "command_mode" : "binary",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "delivery_receipt_requested" : true,
+       "direction" : "to_sim",
+       "sid" : "a_sid",
+       "sim_sid" : "a_sim_sid",
+       "status" : "sent",
+       "transport" : "ip",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "command",
+      "command",
+      "plain"
+     ],
+     [
+      "command_mode",
+      "command_mode",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "delivery_receipt_requested",
+      "delivery_receipt_requested",
+      "plain"
+     ],
+     [
+      "direction",
+      "direction",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sim_sid",
+      "sim_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "transport",
+      "transport",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "commands",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Sim",
+    "v_sim"
+   ],
+   [
+    "Status",
+    "failed"
+   ],
+   [
+    "Direction",
+    "to_sim"
+   ],
+   [
+    "Transport",
+    "ip"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListCommand",
+  "method" : "page",
+  "options" : {
+   "direction" : "to_sim",
+   "sim" : "v_sim",
+   "status" : "failed",
+   "transport" : "ip"
+  },
+  "records_key" : "commands",
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Commands"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "data_sessions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "cell_id" : "a_cell_id",
+       "cell_location_estimate" : {
+        "a_cell_location_estimate" : 1
+       },
+       "end" : "2026-01-04T03:04:05Z",
+       "imei" : "a_imei",
+       "last_updated" : "2026-01-15T03:04:05Z",
+       "operator_country" : "a_operator_country",
+       "operator_mcc" : "a_operator_mcc",
+       "operator_mnc" : "a_operator_mnc",
+       "operator_name" : "a_operator_name",
+       "packets_downloaded" : 1899,
+       "packets_uploaded" : 1688,
+       "radio_link" : "a_radio_link",
+       "sid" : "a_sid",
+       "sim_sid" : "a_sim_sid",
+       "start" : "2026-01-27T03:04:05Z"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "cell_id",
+      "cell_id",
+      "plain"
+     ],
+     [
+      "cell_location_estimate",
+      "cell_location_estimate",
+      "plain"
+     ],
+     [
+      "end",
+      "end",
+      "date",
+      1767495845
+     ],
+     [
+      "imei",
+      "imei",
+      "plain"
+     ],
+     [
+      "last_updated",
+      "last_updated",
+      "date",
+      1768446245
+     ],
+     [
+      "operator_country",
+      "operator_country",
+      "plain"
+     ],
+     [
+      "operator_mcc",
+      "operator_mcc",
+      "plain"
+     ],
+     [
+      "operator_mnc",
+      "operator_mnc",
+      "plain"
+     ],
+     [
+      "operator_name",
+      "operator_name",
+      "plain"
+     ],
+     [
+      "packets_downloaded",
+      "packets_downloaded",
+      "plain"
+     ],
+     [
+      "packets_uploaded",
+      "packets_uploaded",
+      "plain"
+     ],
+     [
+      "radio_link",
+      "radio_link",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sim_sid",
+      "sim_sid",
+      "plain"
+     ],
+     [
+      "start",
+      "start",
+      "date",
+      1769483045
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sims",
+    1
+   ],
+   [
+    "data_sessions",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListDataSession",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "data_sessions",
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Sims/id1/DataSessions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "rate_plans" : [
+      {
+       "account_sid" : "a_account_sid",
+       "data_enabled" : true,
+       "data_limit" : 1048,
+       "data_metering" : "a_data_metering",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "international_roaming" : [
+        "a_international_roaming"
+       ],
+       "international_roaming_data_limit" : 3387,
+       "messaging_enabled" : true,
+       "national_roaming_data_limit" : 2841,
+       "national_roaming_enabled" : true,
+       "sid" : "a_sid",
+       "unique_name" : "a_unique_name",
+       "url" : "a_url",
+       "voice_enabled" : true
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "data_enabled",
+      "data_enabled",
+      "plain"
+     ],
+     [
+      "data_limit",
+      "data_limit",
+      "plain"
+     ],
+     [
+      "data_metering",
+      "data_metering",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "international_roaming",
+      "international_roaming",
+      "plain"
+     ],
+     [
+      "international_roaming_data_limit",
+      "international_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "messaging_enabled",
+      "messaging_enabled",
+      "plain"
+     ],
+     [
+      "national_roaming_data_limit",
+      "national_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "national_roaming_enabled",
+      "national_roaming_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_enabled",
+      "voice_enabled",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "rate_plans",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListRatePlan",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "rate_plans",
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/RatePlans"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "sims" : [
+      {
+       "account_sid" : "a_account_sid",
+       "commands_callback_method" : "GET",
+       "commands_callback_url" : "a_commands_callback_url",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "e_id" : "a_e_id",
+       "friendly_name" : "a_friendly_name",
+       "iccid" : "a_iccid",
+       "ip_address" : "a_ip_address",
+       "links" : {
+        "a_links" : 1
+       },
+       "rate_plan_sid" : "a_rate_plan_sid",
+       "reset_status" : "resetting",
+       "sid" : "a_sid",
+       "sms_fallback_method" : "GET",
+       "sms_fallback_url" : "a_sms_fallback_url",
+       "sms_method" : "POST",
+       "sms_url" : "a_sms_url",
+       "status" : "deactivated",
+       "unique_name" : "a_unique_name",
+       "url" : "a_url",
+       "voice_fallback_method" : "POST",
+       "voice_fallback_url" : "a_voice_fallback_url",
+       "voice_method" : "GET",
+       "voice_url" : "a_voice_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "commands_callback_method",
+      "commands_callback_method",
+      "plain"
+     ],
+     [
+      "commands_callback_url",
+      "commands_callback_url",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "e_id",
+      "e_id",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "iccid",
+      "iccid",
+      "plain"
+     ],
+     [
+      "ip_address",
+      "ip_address",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "rate_plan_sid",
+      "rate_plan_sid",
+      "plain"
+     ],
+     [
+      "reset_status",
+      "reset_status",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms_fallback_method",
+      "sms_fallback_method",
+      "plain"
+     ],
+     [
+      "sms_fallback_url",
+      "sms_fallback_url",
+      "plain"
+     ],
+     [
+      "sms_method",
+      "sms_method",
+      "plain"
+     ],
+     [
+      "sms_url",
+      "sms_url",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_fallback_method",
+      "voice_fallback_method",
+      "plain"
+     ],
+     [
+      "voice_fallback_url",
+      "voice_fallback_url",
+      "plain"
+     ],
+     [
+      "voice_method",
+      "voice_method",
+      "plain"
+     ],
+     [
+      "voice_url",
+      "voice_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sims",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Status",
+    "deactivated"
+   ],
+   [
+    "Iccid",
+    "v_iccid"
+   ],
+   [
+    "RatePlan",
+    "v_rate_plan"
+   ],
+   [
+    "EId",
+    "v_e_id"
+   ],
+   [
+    "SimRegistrationCode",
+    "v_sim_registration_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListSim",
+  "method" : "page",
+  "options" : {
+   "e_id" : "v_e_id",
+   "iccid" : "v_iccid",
+   "rate_plan" : "v_rate_plan",
+   "sim_registration_code" : "v_sim_registration_code",
+   "status" : "deactivated"
+  },
+  "records_key" : "sims",
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Sims"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "usage_records" : [
+      {
+       "account_sid" : "a_account_sid",
+       "commands" : {
+        "a_commands" : 1
+       },
+       "data" : {
+        "a_data" : 1
+       },
+       "period" : {
+        "a_period" : 1
+       },
+       "sim_sid" : "a_sim_sid"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "commands",
+      "commands",
+      "plain"
+     ],
+     [
+      "data",
+      "data",
+      "plain"
+     ],
+     [
+      "period",
+      "period",
+      "plain"
+     ],
+     [
+      "sim_sid",
+      "sim_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sims",
+    1
+   ],
+   [
+    "usage_records",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "End",
+    "2026-01-28T03:04:05Z"
+   ],
+   [
+    "Start",
+    "2026-01-23T03:04:05Z"
+   ],
+   [
+    "Granularity",
+    "hourly"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListUsageRecord",
+  "method" : "page",
+  "options" : {
+   "end" : {
+    "epoch" : 1769569445
+   },
+   "granularity" : "hourly",
+   "start" : {
+    "epoch" : 1769137445
+   }
+  },
+  "records_key" : "usage_records",
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Sims/id1/UsageRecords"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "data_enabled" : true,
+     "data_limit" : 1048,
+     "data_metering" : "a_data_metering",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "international_roaming" : [
+      "a_international_roaming"
+     ],
+     "international_roaming_data_limit" : 3387,
+     "messaging_enabled" : true,
+     "national_roaming_data_limit" : 2841,
+     "national_roaming_enabled" : true,
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "voice_enabled" : true
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "data_enabled",
+      "data_enabled",
+      "plain"
+     ],
+     [
+      "data_limit",
+      "data_limit",
+      "plain"
+     ],
+     [
+      "data_metering",
+      "data_metering",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "international_roaming",
+      "international_roaming",
+      "plain"
+     ],
+     [
+      "international_roaming_data_limit",
+      "international_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "messaging_enabled",
+      "messaging_enabled",
+      "plain"
+     ],
+     [
+      "national_roaming_data_limit",
+      "national_roaming_data_limit",
+      "plain"
+     ],
+     [
+      "national_roaming_enabled",
+      "national_roaming_enabled",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_enabled",
+      "voice_enabled",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "rate_plans",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "UniqueName",
+    "v_unique_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateRatePlan",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "unique_name" : "v_unique_name"
+  },
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/RatePlans/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "commands_callback_method" : "GET",
+     "commands_callback_url" : "a_commands_callback_url",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "e_id" : "a_e_id",
+     "friendly_name" : "a_friendly_name",
+     "iccid" : "a_iccid",
+     "ip_address" : "a_ip_address",
+     "links" : {
+      "a_links" : 1
+     },
+     "rate_plan_sid" : "a_rate_plan_sid",
+     "reset_status" : "resetting",
+     "sid" : "a_sid",
+     "sms_fallback_method" : "GET",
+     "sms_fallback_url" : "a_sms_fallback_url",
+     "sms_method" : "POST",
+     "sms_url" : "a_sms_url",
+     "status" : "deactivated",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "voice_fallback_method" : "POST",
+     "voice_fallback_url" : "a_voice_fallback_url",
+     "voice_method" : "GET",
+     "voice_url" : "a_voice_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "commands_callback_method",
+      "commands_callback_method",
+      "plain"
+     ],
+     [
+      "commands_callback_url",
+      "commands_callback_url",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "e_id",
+      "e_id",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "iccid",
+      "iccid",
+      "plain"
+     ],
+     [
+      "ip_address",
+      "ip_address",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "rate_plan_sid",
+      "rate_plan_sid",
+      "plain"
+     ],
+     [
+      "reset_status",
+      "reset_status",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "sms_fallback_method",
+      "sms_fallback_method",
+      "plain"
+     ],
+     [
+      "sms_fallback_url",
+      "sms_fallback_url",
+      "plain"
+     ],
+     [
+      "sms_method",
+      "sms_method",
+      "plain"
+     ],
+     [
+      "sms_url",
+      "sms_url",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "voice_fallback_method",
+      "voice_fallback_method",
+      "plain"
+     ],
+     [
+      "voice_fallback_url",
+      "voice_fallback_url",
+      "plain"
+     ],
+     [
+      "voice_method",
+      "voice_method",
+      "plain"
+     ],
+     [
+      "voice_url",
+      "voice_url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "wireless",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "sims",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "AccountSid",
+    "v_account_sid"
+   ],
+   [
+    "CallbackMethod",
+    "GET"
+   ],
+   [
+    "CallbackUrl",
+    "v_callback_url"
+   ],
+   [
+    "CommandsCallbackMethod",
+    "GET"
+   ],
+   [
+    "CommandsCallbackUrl",
+    "v_commands_callback_url"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "RatePlan",
+    "v_rate_plan"
+   ],
+   [
+    "ResetStatus",
+    "resetting"
+   ],
+   [
+    "SmsFallbackMethod",
+    "GET"
+   ],
+   [
+    "SmsFallbackUrl",
+    "v_sms_fallback_url"
+   ],
+   [
+    "SmsMethod",
+    "GET"
+   ],
+   [
+    "SmsUrl",
+    "v_sms_url"
+   ],
+   [
+    "Status",
+    "deactivated"
+   ],
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "VoiceFallbackMethod",
+    "POST"
+   ],
+   [
+    "VoiceFallbackUrl",
+    "v_voice_fallback_url"
+   ],
+   [
+    "VoiceMethod",
+    "POST"
+   ],
+   [
+    "VoiceUrl",
+    "v_voice_url"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateSim",
+  "method" : "update",
+  "options" : {
+   "account_sid" : "v_account_sid",
+   "callback_method" : "GET",
+   "callback_url" : "v_callback_url",
+   "commands_callback_method" : "GET",
+   "commands_callback_url" : "v_commands_callback_url",
+   "friendly_name" : "v_friendly_name",
+   "rate_plan" : "v_rate_plan",
+   "reset_status" : "resetting",
+   "sms_fallback_method" : "GET",
+   "sms_fallback_url" : "v_sms_fallback_url",
+   "sms_method" : "GET",
+   "sms_url" : "v_sms_url",
+   "status" : "deactivated",
+   "unique_name" : "v_unique_name",
+   "voice_fallback_method" : "POST",
+   "voice_fallback_url" : "v_voice_fallback_url",
+   "voice_method" : "POST",
+   "voice_url" : "v_voice_url"
+  },
+  "required" : [],
+  "url" : "https://wireless.twilio.com/v1/Sims/id1"
+ }
+]

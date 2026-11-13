@@ -1,0 +1,41 @@
+Revision history for Twilio
+
+2.001  2026-11-12
+    - Fixes PAUSE indexing, which failed for 2.000000: META now lists each
+      module in "provides", so PAUSE no longer stores file paths longer than
+      its database allows.
+    - The tarball holds normal file permissions (no executable files), and
+      MANIFEST.SKIP no longer matches the Serverless Build classes.
+    - Adds SECURITY.md, with how to report a vulnerability, and
+      CONTRIBUTING.md.
+    - Versions now have three decimals: 2.001 follows 2.000000.
+
+2.000000  2026-11-11
+    - Rewrite from scratch for the current Twilio API. Version 2 shares no
+      code or interface with 1.000.
+    - The REST API of Twilio's products: 58 API versions and 577 resources,
+      generated from Twilio's OpenAPI specifications (twilio-oai 2.11.0), with
+      the structure and names of Twilio's official libraries, and twilio-php's
+      where they differ. Each resource is documented in Twilio's words.
+    - Authentication with the Auth Token, API keys, OAuth client credentials
+      (Twilio::CredentialProvider::ClientCredentialProvider), and Public Key
+      Client Validation (Twilio::Http::ValidationClient, with the optional
+      module Crypt::OpenSSL::RSA).
+    - TwiML for voice, messaging and fax, with every verb and attribute.
+    - Validation of the signatures of Twilio's webhooks, for form and JSON
+      requests (Twilio::Security::RequestValidator).
+    - Access tokens for Twilio's client SDKs (Twilio::Jwt::AccessToken), and
+      the older capability tokens.
+    - Regions and edges, retries after HTTP 429 (and only then, so nothing is
+      sent twice), paging, and file uploads.
+    - Errors are exceptions with Twilio's code, message and more_info. Errors
+      in the RFC 9457 form throw Twilio::Exceptions::TwilioServiceException,
+      which keeps the title, detail, instance and field errors.
+    - with_metadata on every list and context returns a Twilio::Metadata with
+      the result and the status code and headers of Twilio's answer.
+    - Twilio->new is a shortcut for Twilio::Rest::Client->new, and refuses
+      1.000's named arguments with a clear error.
+    - Twilio::Manual, a guide that follows Twilio's messaging and voice
+      quickstarts and translates Twilio's documentation examples. The tests
+      run its examples.
+    - Needs Perl 5.16 or later.

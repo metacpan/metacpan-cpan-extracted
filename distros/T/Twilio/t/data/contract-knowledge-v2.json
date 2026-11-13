@@ -1,0 +1,949 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "description" : "a_description",
+     "id" : "a_id",
+     "name" : "a_name",
+     "source" : {
+      "a_source" : 1
+     },
+     "status" : "QUEUED",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "source",
+      "source",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "description" : "v_description",
+   "name" : "v_name",
+   "source" : {
+    "v_source" : 1
+   }
+  },
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateKnowledge",
+  "json" : {
+   "description" : "v_description",
+   "name" : "v_name",
+   "source" : {
+    "v_source" : 1
+   }
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Knowledge"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "message" : "a_message",
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "message",
+      "message",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "description" : "v_description",
+   "displayName" : "v_displayName"
+  },
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge_bases",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateKnowledgeBase",
+  "json" : {
+   "description" : "v_description",
+   "displayName" : "v_displayName"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/ControlPlane/KnowledgeBases"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "chunks" : [
+      "a_chunks"
+     ]
+    },
+    "fields" : [
+     [
+      "chunks",
+      "chunks",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {
+   "knowledgeIds" : [
+    "v_knowledgeIds"
+   ],
+   "query" : "v_query",
+   "top" : 339
+  },
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "search",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateKnowledgeSearch",
+  "json" : {
+   "knowledgeIds" : [
+    "v_knowledgeIds"
+   ],
+   "query" : "v_query",
+   "top" : 339
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Search"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteKnowledge",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Knowledge/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "message" : "a_message",
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "message",
+      "message",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge_bases",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteKnowledgeBase",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/ControlPlane/KnowledgeBases/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "description" : "a_description",
+     "id" : "a_id",
+     "name" : "a_name",
+     "source" : {
+      "a_source" : 1
+     },
+     "status" : "QUEUED",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "source",
+      "source",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchKnowledge",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Knowledge/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "description" : "a_description",
+     "displayName" : "a_displayName",
+     "id" : "a_id",
+     "status" : "PROVISIONING",
+     "updatedAt" : "2026-01-01T03:04:05Z",
+     "version" : 774
+    },
+    "fields" : [
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "display_name",
+      "displayName",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge_bases",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchKnowledgeBase",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/ControlPlane/KnowledgeBases/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "completedAt" : "2026-01-19T03:04:05Z",
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "error" : {
+      "a_error" : 1
+     },
+     "operationId" : "a_operationId",
+     "result" : {
+      "a_result" : 1
+     },
+     "resultUrl" : "a_resultUrl",
+     "status" : "RUNNING",
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "completed_at",
+      "completedAt",
+      "date",
+      1768791845
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "error",
+      "error",
+      "plain"
+     ],
+     [
+      "operation_id",
+      "operationId",
+      "plain"
+     ],
+     [
+      "result",
+      "result",
+      "plain"
+     ],
+     [
+      "result_url",
+      "resultUrl",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "operations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchOperation",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/ControlPlane/Operations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "knowledge" : [
+      {
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "description" : "a_description",
+       "id" : "a_id",
+       "name" : "a_name",
+       "source" : {
+        "a_source" : 1
+       },
+       "status" : "QUEUED",
+       "updatedAt" : "2026-01-01T03:04:05Z"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "source",
+      "source",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "page",
+    "413"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListKnowledge",
+  "method" : "page",
+  "options" : {
+   "page" : 413
+  },
+  "records_key" : "knowledge",
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Knowledge"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "knowledgeBases" : [
+      {
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "description" : "a_description",
+       "displayName" : "a_displayName",
+       "id" : "a_id",
+       "status" : "PROVISIONING",
+       "updatedAt" : "2026-01-01T03:04:05Z",
+       "version" : 774
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "display_name",
+      "displayName",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge_bases",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "orderBy",
+    "DESC"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListKnowledgeBases",
+  "method" : "page",
+  "options" : {
+   "order_by" : "DESC"
+  },
+  "records_key" : "knowledgeBases",
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/ControlPlane/KnowledgeBases"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "chunks" : [
+      {
+       "chunkIndex" : 1041,
+       "content" : "a_content",
+       "createdAt" : "2026-01-14T03:04:05Z",
+       "documentNumber" : 1480,
+       "documentTitle" : "a_documentTitle",
+       "documentUrl" : "a_documentUrl"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "chunk_index",
+      "chunkIndex",
+      "plain"
+     ],
+     [
+      "content",
+      "content",
+      "plain"
+     ],
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "document_number",
+      "documentNumber",
+      "plain"
+     ],
+     [
+      "document_title",
+      "documentTitle",
+      "plain"
+     ],
+     [
+      "document_url",
+      "documentUrl",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "chunks",
+    2
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListKnowledgeChunks",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "chunks",
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Knowledge/id2/Chunks"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "createdAt" : "2026-01-14T03:04:05Z",
+     "description" : "a_description",
+     "id" : "a_id",
+     "name" : "a_name",
+     "source" : {
+      "a_source" : 1
+     },
+     "status" : "QUEUED",
+     "updatedAt" : "2026-01-01T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "created_at",
+      "createdAt",
+      "date",
+      1768359845
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "source",
+      "source",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "updated_at",
+      "updatedAt",
+      "date",
+      1767236645
+     ]
+    ],
+    "status" : 200
+   },
+   {
+    "body" : {
+     "message" : "a_message"
+    },
+    "fields" : [
+     [
+      "message",
+      "message",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "description" : "v_description",
+   "name" : "v_name",
+   "source" : {
+    "v_source" : 1
+   }
+  },
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge",
+    2
+   ]
+  ],
+  "expected" : [
+   [
+    "refresh",
+    "true"
+   ]
+  ],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "PATCH",
+  "id" : "UpdateKnowledge",
+  "json" : {
+   "description" : "v_description",
+   "name" : "v_name",
+   "source" : {
+    "v_source" : 1
+   }
+  },
+  "method" : "update",
+  "options" : {
+   "refresh" : 1
+  },
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/KnowledgeBases/id1/Knowledge/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "message" : "a_message",
+     "statusUrl" : "a_statusUrl"
+    },
+    "fields" : [
+     [
+      "message",
+      "message",
+      "plain"
+     ],
+     [
+      "status_url",
+      "statusUrl",
+      "plain"
+     ]
+    ],
+    "status" : 202
+   }
+  ],
+  "body" : {
+   "description" : "v_description",
+   "displayName" : "v_displayName"
+  },
+  "chain" : [
+   [
+    "knowledge",
+    0
+   ],
+   [
+    "v2",
+    0
+   ],
+   [
+    "knowledge_bases",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json",
+   "If-Match" : "v_if_match"
+  },
+  "http" : "PATCH",
+  "id" : "UpdateKnowledgeBase",
+  "json" : {
+   "description" : "v_description",
+   "displayName" : "v_displayName"
+  },
+  "method" : "update",
+  "options" : {
+   "if_match" : "v_if_match"
+  },
+  "required" : [],
+  "url" : "https://knowledge.twilio.com/v2/ControlPlane/KnowledgeBases/id1"
+ }
+]

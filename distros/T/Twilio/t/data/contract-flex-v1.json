@@ -1,0 +1,7764 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "flex_flow_sid" : "a_flex_flow_sid",
+     "sid" : "a_sid",
+     "task_sid" : "a_task_sid",
+     "url" : "a_url",
+     "user_sid" : "a_user_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "task_sid",
+      "task_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "channel",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FlexFlowSid",
+    "v_flex_flow_sid"
+   ],
+   [
+    "Identity",
+    "v_identity"
+   ],
+   [
+    "ChatUserFriendlyName",
+    "v_chat_user_friendly_name"
+   ],
+   [
+    "ChatFriendlyName",
+    "v_chat_friendly_name"
+   ],
+   [
+    "ChatUniqueName",
+    "v_chat_unique_name"
+   ],
+   [
+    "LongLived",
+    "true"
+   ],
+   [
+    "PreEngagementData",
+    "v_pre_engagement_data"
+   ],
+   [
+    "Target",
+    "v_target"
+   ],
+   [
+    "TaskAttributes",
+    "v_task_attributes"
+   ],
+   [
+    "TaskSid",
+    "v_task_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateChannel",
+  "method" : "create",
+  "options" : {
+   "chat_unique_name" : "v_chat_unique_name",
+   "long_lived" : 1,
+   "pre_engagement_data" : "v_pre_engagement_data",
+   "target" : "v_target",
+   "task_attributes" : "v_task_attributes",
+   "task_sid" : "v_task_sid"
+  },
+  "required" : [
+   "v_flex_flow_sid",
+   "v_identity",
+   "v_chat_user_friendly_name",
+   "v_chat_friendly_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Channels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_type" : "facebook",
+     "chat_service_sid" : "a_chat_service_sid",
+     "contact_identity" : "a_contact_identity",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "enabled" : true,
+     "friendly_name" : "a_friendly_name",
+     "integration" : {
+      "a_integration" : 1
+     },
+     "integration_type" : "task",
+     "janitor_enabled" : true,
+     "long_lived" : true,
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_type",
+      "channel_type",
+      "plain"
+     ],
+     [
+      "chat_service_sid",
+      "chat_service_sid",
+      "plain"
+     ],
+     [
+      "contact_identity",
+      "contact_identity",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "integration",
+      "integration",
+      "plain"
+     ],
+     [
+      "integration_type",
+      "integration_type",
+      "plain"
+     ],
+     [
+      "janitor_enabled",
+      "janitor_enabled",
+      "plain"
+     ],
+     [
+      "long_lived",
+      "long_lived",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "flex_flow",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "ChatServiceSid",
+    "v_chat_service_sid"
+   ],
+   [
+    "ChannelType",
+    "custom"
+   ],
+   [
+    "ContactIdentity",
+    "v_contact_identity"
+   ],
+   [
+    "Enabled",
+    "true"
+   ],
+   [
+    "Integration.Channel",
+    "v_integration_channel"
+   ],
+   [
+    "Integration.CreationOnMessage",
+    "true"
+   ],
+   [
+    "Integration.FlowSid",
+    "v_integration_flow_sid"
+   ],
+   [
+    "Integration.Priority",
+    "2068"
+   ],
+   [
+    "Integration.RetryCount",
+    "2257"
+   ],
+   [
+    "Integration.Timeout",
+    "1945"
+   ],
+   [
+    "Integration.Url",
+    "v_integration_url"
+   ],
+   [
+    "Integration.WorkflowSid",
+    "v_integration_workflow_sid"
+   ],
+   [
+    "Integration.WorkspaceSid",
+    "v_integration_workspace_sid"
+   ],
+   [
+    "IntegrationType",
+    "task"
+   ],
+   [
+    "JanitorEnabled",
+    "true"
+   ],
+   [
+    "LongLived",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateFlexFlow",
+  "method" : "create",
+  "options" : {
+   "contact_identity" : "v_contact_identity",
+   "enabled" : 1,
+   "integration_channel" : "v_integration_channel",
+   "integration_creation_on_message" : 1,
+   "integration_flow_sid" : "v_integration_flow_sid",
+   "integration_priority" : 2068,
+   "integration_retry_count" : 2257,
+   "integration_timeout" : 1945,
+   "integration_type" : "task",
+   "integration_url" : "v_integration_url",
+   "integration_workflow_sid" : "v_integration_workflow_sid",
+   "integration_workspace_sid" : "v_integration_workspace_sid",
+   "janitor_enabled" : 1,
+   "long_lived" : 1
+  },
+  "required" : [
+   "v_friendly_name",
+   "v_chat_service_sid",
+   "custom"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/FlexFlows"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "agent_id" : "a_agent_id",
+     "answer_id" : "a_answer_id",
+     "answer_text" : "a_answer_text",
+     "assessment" : {
+      "a_assessment" : 1
+     },
+     "assessment_sid" : "a_assessment_sid",
+     "offset" : "a_offset",
+     "report" : true,
+     "segment_id" : "a_segment_id",
+     "timestamp" : "a_timestamp",
+     "url" : "a_url",
+     "user_email" : "a_user_email",
+     "user_name" : "a_user_name",
+     "weight" : "a_weight"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_id",
+      "agent_id",
+      "plain"
+     ],
+     [
+      "answer_id",
+      "answer_id",
+      "plain"
+     ],
+     [
+      "answer_text",
+      "answer_text",
+      "plain"
+     ],
+     [
+      "assessment",
+      "assessment",
+      "plain"
+     ],
+     [
+      "assessment_sid",
+      "assessment_sid",
+      "plain"
+     ],
+     [
+      "offset",
+      "offset",
+      "plain"
+     ],
+     [
+      "report",
+      "report",
+      "plain"
+     ],
+     [
+      "segment_id",
+      "segment_id",
+      "plain"
+     ],
+     [
+      "timestamp",
+      "timestamp",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_email",
+      "user_email",
+      "plain"
+     ],
+     [
+      "user_name",
+      "user_name",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "assessments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CategorySid",
+    "v_category_sid"
+   ],
+   [
+    "CategoryName",
+    "v_category_name"
+   ],
+   [
+    "SegmentId",
+    "v_segment_id"
+   ],
+   [
+    "AgentId",
+    "v_agent_id"
+   ],
+   [
+    "Offset",
+    615.5
+   ],
+   [
+    "MetricId",
+    "v_metric_id"
+   ],
+   [
+    "MetricName",
+    "v_metric_name"
+   ],
+   [
+    "AnswerText",
+    "v_answer_text"
+   ],
+   [
+    "AnswerId",
+    "v_answer_id"
+   ],
+   [
+    "QuestionnaireSid",
+    "v_questionnaire_sid"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "CreateInsightsAssessments",
+  "method" : "create",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [
+   "v_category_sid",
+   "v_category_name",
+   "v_segment_id",
+   "v_agent_id",
+   615.5,
+   "v_metric_id",
+   "v_metric_name",
+   "v_answer_text",
+   "v_answer_id",
+   "v_questionnaire_sid"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Assessments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "agent_id" : "a_agent_id",
+     "assessment_sid" : "a_assessment_sid",
+     "comment" : {
+      "a_comment" : 1
+     },
+     "offset" : "a_offset",
+     "report" : true,
+     "segment_id" : "a_segment_id",
+     "timestamp" : "a_timestamp",
+     "url" : "a_url",
+     "user_email" : "a_user_email",
+     "user_name" : "a_user_name",
+     "weight" : "a_weight"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_id",
+      "agent_id",
+      "plain"
+     ],
+     [
+      "assessment_sid",
+      "assessment_sid",
+      "plain"
+     ],
+     [
+      "comment",
+      "comment",
+      "plain"
+     ],
+     [
+      "offset",
+      "offset",
+      "plain"
+     ],
+     [
+      "report",
+      "report",
+      "plain"
+     ],
+     [
+      "segment_id",
+      "segment_id",
+      "plain"
+     ],
+     [
+      "timestamp",
+      "timestamp",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_email",
+      "user_email",
+      "plain"
+     ],
+     [
+      "user_name",
+      "user_name",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_assessments_comment",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CategoryId",
+    "v_category_id"
+   ],
+   [
+    "CategoryName",
+    "v_category_name"
+   ],
+   [
+    "Comment",
+    "v_comment"
+   ],
+   [
+    "SegmentId",
+    "v_segment_id"
+   ],
+   [
+    "AgentId",
+    "v_agent_id"
+   ],
+   [
+    "Offset",
+    615.5
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "CreateInsightsAssessmentsComment",
+  "method" : "create",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [
+   "v_category_id",
+   "v_category_name",
+   "v_comment",
+   "v_segment_id",
+   "v_agent_id",
+   615.5
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Assessments/Comments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "active" : true,
+     "description" : "a_description",
+     "name" : "a_name",
+     "questionnaire_sid" : "a_questionnaire_sid",
+     "questions" : [
+      "a_questions"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "active",
+      "active",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "questionnaire_sid",
+      "questionnaire_sid",
+      "plain"
+     ],
+     [
+      "questions",
+      "questions",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Name",
+    "v_name"
+   ],
+   [
+    "Active",
+    "true"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "QuestionSids",
+    "v_question_sids_1"
+   ],
+   [
+    "QuestionSids",
+    "v_question_sids_2"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "CreateInsightsQuestionnaires",
+  "method" : "create",
+  "options" : {
+   "active" : 1,
+   "authorization" : "v_authorization",
+   "description" : "v_description",
+   "question_sids" : [
+    "v_question_sids_1",
+    "v_question_sids_2"
+   ]
+  },
+  "required" : [
+   "v_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questionnaires"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "category_sid" : "a_category_sid",
+     "name" : "a_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "category_sid",
+      "category_sid",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_category",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Name",
+    "v_name"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "CreateInsightsQuestionnairesCategory",
+  "method" : "create",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [
+   "v_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Categories"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "allow_na" : true,
+     "answer_set" : {
+      "a_answer_set" : 1
+     },
+     "answer_set_id" : "a_answer_set_id",
+     "category" : {
+      "a_category" : 1
+     },
+     "description" : "a_description",
+     "question" : "a_question",
+     "question_sid" : "a_question_sid",
+     "url" : "a_url",
+     "usage" : 533
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "allow_na",
+      "allow_na",
+      "plain"
+     ],
+     [
+      "answer_set",
+      "answer_set",
+      "plain"
+     ],
+     [
+      "answer_set_id",
+      "answer_set_id",
+      "plain"
+     ],
+     [
+      "category",
+      "category",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "question",
+      "question",
+      "plain"
+     ],
+     [
+      "question_sid",
+      "question_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "usage",
+      "usage",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_question",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CategorySid",
+    "v_category_sid"
+   ],
+   [
+    "Question",
+    "v_question"
+   ],
+   [
+    "AnswerSetId",
+    "v_answer_set_id"
+   ],
+   [
+    "AllowNa",
+    "true"
+   ],
+   [
+    "Description",
+    "v_description"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "CreateInsightsQuestionnairesQuestion",
+  "method" : "create",
+  "options" : {
+   "authorization" : "v_authorization",
+   "description" : "v_description"
+  },
+  "required" : [
+   "v_category_sid",
+   "v_question",
+   "v_answer_set_id",
+   1
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "base_url" : "a_base_url",
+     "session_expiry" : "a_session_expiry",
+     "session_id" : "a_session_id",
+     "url" : "a_url",
+     "workspace_id" : "a_workspace_id"
+    },
+    "fields" : [
+     [
+      "base_url",
+      "base_url",
+      "plain"
+     ],
+     [
+      "session_expiry",
+      "session_expiry",
+      "plain"
+     ],
+     [
+      "session_id",
+      "session_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "workspace_id",
+      "workspace_id",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_session",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "CreateInsightsSession",
+  "method" : "create",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/Session"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channel" : {
+      "a_channel" : 1
+     },
+     "interaction_context_sid" : "a_interaction_context_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "routing" : {
+      "a_routing" : 1
+     },
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "webhook_ttid" : "a_webhook_ttid"
+    },
+    "fields" : [
+     [
+      "channel",
+      "channel",
+      "plain"
+     ],
+     [
+      "interaction_context_sid",
+      "interaction_context_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "routing",
+      "routing",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_ttid",
+      "webhook_ttid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Channel",
+    "{\"v_channel\":26}"
+   ],
+   [
+    "InteractionContextSid",
+    "v_interaction_context_sid"
+   ],
+   [
+    "Routing",
+    "{\"v_routing\":17}"
+   ],
+   [
+    "WebhookTtid",
+    "v_webhook_ttid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateInteraction",
+  "method" : "create",
+  "options" : {
+   "interaction_context_sid" : "v_interaction_context_sid",
+   "routing" : {
+    "v_routing" : 17
+   },
+   "webhook_ttid" : "v_webhook_ttid"
+  },
+  "required" : [
+   {
+    "v_channel" : 26
+   }
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Interactions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channel_sid" : "a_channel_sid",
+     "interaction_sid" : "a_interaction_sid",
+     "routing" : {
+      "a_routing" : 1
+     },
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "routing",
+      "routing",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "invites",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Routing",
+    "{\"v_routing\":17}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateInteractionChannelInvite",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   {
+    "v_routing" : 17
+   }
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Invites"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channel_sid" : "a_channel_sid",
+     "interaction_sid" : "a_interaction_sid",
+     "routing_properties" : {
+      "a_routing_properties" : 1
+     },
+     "sid" : "a_sid",
+     "type" : "supervisor",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "routing_properties",
+      "routing_properties",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "participants",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Type",
+    "agent"
+   ],
+   [
+    "MediaProperties",
+    "{\"v_media_properties\":10}"
+   ],
+   [
+    "RoutingProperties",
+    "{\"v_routing_properties\":22}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateInteractionChannelParticipant",
+  "method" : "create",
+  "options" : {
+   "routing_properties" : {
+    "v_routing_properties" : 22
+   }
+  },
+  "required" : [
+   "agent",
+   {
+    "v_media_properties" : 10
+   }
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Participants"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "execution_sid" : "a_execution_sid",
+     "from" : "a_from",
+     "instance_sid" : "a_instance_sid",
+     "interaction_sid" : "a_interaction_sid",
+     "note_sid" : "a_note_sid",
+     "sid" : "a_sid",
+     "status" : "failed",
+     "summary_sid" : "a_summary_sid",
+     "to" : "a_to",
+     "type" : "warm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "execution_sid",
+      "execution_sid",
+      "plain"
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "instance_sid",
+      "instance_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "note_sid",
+      "note_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "summary_sid",
+      "summary_sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "transfers",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateInteractionTransfer",
+  "json" : {},
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Transfers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "UniqueName",
+    "v_unique_name"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "CreatePlugin",
+  "method" : "create",
+  "options" : {
+   "description" : "v_description",
+   "flex_metadata" : "v_flex_metadata",
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [
+   "v_unique_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "name" : "a_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_configurations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Name",
+    "v_name"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "Plugins",
+    "{\"v_plugins\":1}"
+   ],
+   [
+    "Plugins",
+    "{\"v_plugins\":2}"
+   ]
+  ],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "CreatePluginConfiguration",
+  "method" : "create",
+  "options" : {
+   "description" : "v_description",
+   "flex_metadata" : "v_flex_metadata",
+   "plugins" : [
+    {
+     "v_plugins" : 1
+    },
+    {
+     "v_plugins" : 2
+    }
+   ]
+  },
+  "required" : [
+   "v_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Configurations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "configuration_sid" : "a_configuration_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "configuration_sid",
+      "configuration_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_releases",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ConfigurationId",
+    "v_configuration_id"
+   ]
+  ],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "CreatePluginRelease",
+  "method" : "create",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [
+   "v_configuration_id"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Releases"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "changelog" : "a_changelog",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "plugin_sid" : "a_plugin_sid",
+     "plugin_url" : "a_plugin_url",
+     "private" : true,
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "validated" : true,
+     "version" : "a_version"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "changelog",
+      "changelog",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "plugin_sid",
+      "plugin_sid",
+      "plain"
+     ],
+     [
+      "plugin_url",
+      "plugin_url",
+      "plain"
+     ],
+     [
+      "private",
+      "private",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "validated",
+      "validated",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    1
+   ],
+   [
+    "plugin_versions",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Version",
+    "v_version"
+   ],
+   [
+    "PluginUrl",
+    "v_plugin_url"
+   ],
+   [
+    "Changelog",
+    "v_changelog"
+   ],
+   [
+    "CliVersion",
+    "v_cli_version"
+   ],
+   [
+    "Private",
+    "true"
+   ],
+   [
+    "ValidateStatus",
+    "v_validate_status"
+   ]
+  ],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "CreatePluginVersion",
+  "method" : "create",
+  "options" : {
+   "changelog" : "v_changelog",
+   "cli_version" : "v_cli_version",
+   "flex_metadata" : "v_flex_metadata",
+   "private" : 1,
+   "validate_status" : "v_validate_status"
+  },
+  "required" : [
+   "v_version",
+   "v_plugin_url"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1/Versions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "flex_flow_sid" : "a_flex_flow_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "web_channel",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FlexFlowSid",
+    "v_flex_flow_sid"
+   ],
+   [
+    "Identity",
+    "v_identity"
+   ],
+   [
+    "CustomerFriendlyName",
+    "v_customer_friendly_name"
+   ],
+   [
+    "ChatFriendlyName",
+    "v_chat_friendly_name"
+   ],
+   [
+    "ChatUniqueName",
+    "v_chat_unique_name"
+   ],
+   [
+    "PreEngagementData",
+    "v_pre_engagement_data"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateWebChannel",
+  "method" : "create",
+  "options" : {
+   "chat_unique_name" : "v_chat_unique_name",
+   "pre_engagement_data" : "v_pre_engagement_data"
+  },
+  "required" : [
+   "v_flex_flow_sid",
+   "v_identity",
+   "v_customer_friendly_name",
+   "v_chat_friendly_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/WebChannels"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "channel",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteChannel",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Channels/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "flex_flow",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteFlexFlow",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/FlexFlows/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteInsightsQuestionnaires",
+  "method" : "delete",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questionnaires/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_category",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteInsightsQuestionnairesCategory",
+  "method" : "delete",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Categories/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_question",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "DELETE",
+  "id" : "DeleteInsightsQuestionnairesQuestion",
+  "method" : "delete",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questions/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "web_channel",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteWebChannel",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/WebChannels/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "flex_flow_sid" : "a_flex_flow_sid",
+     "sid" : "a_sid",
+     "task_sid" : "a_task_sid",
+     "url" : "a_url",
+     "user_sid" : "a_user_sid"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "task_sid",
+      "task_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "channel",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchChannel",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Channels/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "agent_conv_end_methods" : {
+      "a_agent_conv_end_methods" : 1
+     },
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "call_recording_enabled" : true,
+     "call_recording_webhook_url" : "a_call_recording_webhook_url",
+     "channel_configs" : [
+      "a_channel_configs"
+     ],
+     "chat_service_instance_sid" : "a_chat_service_instance_sid",
+     "citrix_voice_vdi" : {
+      "a_citrix_voice_vdi" : 1
+     },
+     "crm_attributes" : {
+      "a_crm_attributes" : 1
+     },
+     "crm_callback_url" : "a_crm_callback_url",
+     "crm_enabled" : true,
+     "crm_fallback_url" : "a_crm_fallback_url",
+     "crm_type" : "a_crm_type",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "debugger_integration" : {
+      "a_debugger_integration" : 1
+     },
+     "flex_insights_drilldown" : true,
+     "flex_insights_hr" : {
+      "a_flex_insights_hr" : 1
+     },
+     "flex_instance_sid" : "a_flex_instance_sid",
+     "flex_service_instance_sid" : "a_flex_service_instance_sid",
+     "flex_ui_status_report" : {
+      "a_flex_ui_status_report" : 1
+     },
+     "flex_url" : "a_flex_url",
+     "integrations" : [
+      "a_integrations"
+     ],
+     "markdown" : {
+      "a_markdown" : 1
+     },
+     "messaging_service_instance_sid" : "a_messaging_service_instance_sid",
+     "notifications" : {
+      "a_notifications" : 1
+     },
+     "offline_config" : {
+      "a_offline_config" : 1
+     },
+     "outbound_call_flows" : {
+      "a_outbound_call_flows" : 1
+     },
+     "plugin_service_attributes" : {
+      "a_plugin_service_attributes" : 1
+     },
+     "plugin_service_enabled" : true,
+     "public_attributes" : {
+      "a_public_attributes" : 1
+     },
+     "queue_stats_configuration" : {
+      "a_queue_stats_configuration" : 1
+     },
+     "runtime_domain" : "a_runtime_domain",
+     "serverless_service_sids" : [
+      "a_serverless_service_sids"
+     ],
+     "service_version" : "a_service_version",
+     "status" : "inprogress",
+     "taskrouter_offline_activity_sid" : "a_taskrouter_offline_activity_sid",
+     "taskrouter_skills" : [
+      "a_taskrouter_skills"
+     ],
+     "taskrouter_target_taskqueue_sid" : "a_taskrouter_target_taskqueue_sid",
+     "taskrouter_target_workflow_sid" : "a_taskrouter_target_workflow_sid",
+     "taskrouter_taskqueues" : [
+      "a_taskrouter_taskqueues"
+     ],
+     "taskrouter_worker_attributes" : {
+      "a_taskrouter_worker_attributes" : 1
+     },
+     "taskrouter_worker_channels" : {
+      "a_taskrouter_worker_channels" : 1
+     },
+     "taskrouter_workspace_sid" : "a_taskrouter_workspace_sid",
+     "ui_attributes" : {
+      "a_ui_attributes" : 1
+     },
+     "ui_dependencies" : {
+      "a_ui_dependencies" : 1
+     },
+     "ui_language" : "a_ui_language",
+     "ui_version" : "a_ui_version",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_conv_end_methods",
+      "agent_conv_end_methods",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "call_recording_enabled",
+      "call_recording_enabled",
+      "plain"
+     ],
+     [
+      "call_recording_webhook_url",
+      "call_recording_webhook_url",
+      "plain"
+     ],
+     [
+      "channel_configs",
+      "channel_configs",
+      "plain"
+     ],
+     [
+      "chat_service_instance_sid",
+      "chat_service_instance_sid",
+      "plain"
+     ],
+     [
+      "citrix_voice_vdi",
+      "citrix_voice_vdi",
+      "plain"
+     ],
+     [
+      "crm_attributes",
+      "crm_attributes",
+      "plain"
+     ],
+     [
+      "crm_callback_url",
+      "crm_callback_url",
+      "plain"
+     ],
+     [
+      "crm_enabled",
+      "crm_enabled",
+      "plain"
+     ],
+     [
+      "crm_fallback_url",
+      "crm_fallback_url",
+      "plain"
+     ],
+     [
+      "crm_type",
+      "crm_type",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "debugger_integration",
+      "debugger_integration",
+      "plain"
+     ],
+     [
+      "flex_insights_drilldown",
+      "flex_insights_drilldown",
+      "plain"
+     ],
+     [
+      "flex_insights_hr",
+      "flex_insights_hr",
+      "plain"
+     ],
+     [
+      "flex_instance_sid",
+      "flex_instance_sid",
+      "plain"
+     ],
+     [
+      "flex_service_instance_sid",
+      "flex_service_instance_sid",
+      "plain"
+     ],
+     [
+      "flex_ui_status_report",
+      "flex_ui_status_report",
+      "plain"
+     ],
+     [
+      "flex_url",
+      "flex_url",
+      "plain"
+     ],
+     [
+      "integrations",
+      "integrations",
+      "plain"
+     ],
+     [
+      "markdown",
+      "markdown",
+      "plain"
+     ],
+     [
+      "messaging_service_instance_sid",
+      "messaging_service_instance_sid",
+      "plain"
+     ],
+     [
+      "notifications",
+      "notifications",
+      "plain"
+     ],
+     [
+      "offline_config",
+      "offline_config",
+      "plain"
+     ],
+     [
+      "outbound_call_flows",
+      "outbound_call_flows",
+      "plain"
+     ],
+     [
+      "plugin_service_attributes",
+      "plugin_service_attributes",
+      "plain"
+     ],
+     [
+      "plugin_service_enabled",
+      "plugin_service_enabled",
+      "plain"
+     ],
+     [
+      "public_attributes",
+      "public_attributes",
+      "plain"
+     ],
+     [
+      "queue_stats_configuration",
+      "queue_stats_configuration",
+      "plain"
+     ],
+     [
+      "runtime_domain",
+      "runtime_domain",
+      "plain"
+     ],
+     [
+      "serverless_service_sids",
+      "serverless_service_sids",
+      "plain"
+     ],
+     [
+      "service_version",
+      "service_version",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "taskrouter_offline_activity_sid",
+      "taskrouter_offline_activity_sid",
+      "plain"
+     ],
+     [
+      "taskrouter_skills",
+      "taskrouter_skills",
+      "plain"
+     ],
+     [
+      "taskrouter_target_taskqueue_sid",
+      "taskrouter_target_taskqueue_sid",
+      "plain"
+     ],
+     [
+      "taskrouter_target_workflow_sid",
+      "taskrouter_target_workflow_sid",
+      "plain"
+     ],
+     [
+      "taskrouter_taskqueues",
+      "taskrouter_taskqueues",
+      "plain"
+     ],
+     [
+      "taskrouter_worker_attributes",
+      "taskrouter_worker_attributes",
+      "plain"
+     ],
+     [
+      "taskrouter_worker_channels",
+      "taskrouter_worker_channels",
+      "plain"
+     ],
+     [
+      "taskrouter_workspace_sid",
+      "taskrouter_workspace_sid",
+      "plain"
+     ],
+     [
+      "ui_attributes",
+      "ui_attributes",
+      "plain"
+     ],
+     [
+      "ui_dependencies",
+      "ui_dependencies",
+      "plain"
+     ],
+     [
+      "ui_language",
+      "ui_language",
+      "plain"
+     ],
+     [
+      "ui_version",
+      "ui_version",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "configuration",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "UiVersion",
+    "v_ui_version"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchConfiguration",
+  "method" : "fetch",
+  "options" : {
+   "ui_version" : "v_ui_version"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Configuration"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "changelog" : "a_changelog",
+     "configuration_sid" : "a_configuration_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "phase" : 529,
+     "plugin_archived" : true,
+     "plugin_sid" : "a_plugin_sid",
+     "plugin_url" : "a_plugin_url",
+     "plugin_version_archived" : true,
+     "plugin_version_sid" : "a_plugin_version_sid",
+     "private" : true,
+     "unique_name" : "a_unique_name",
+     "url" : "a_url",
+     "version" : "a_version"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "changelog",
+      "changelog",
+      "plain"
+     ],
+     [
+      "configuration_sid",
+      "configuration_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "phase",
+      "phase",
+      "plain"
+     ],
+     [
+      "plugin_archived",
+      "plugin_archived",
+      "plain"
+     ],
+     [
+      "plugin_sid",
+      "plugin_sid",
+      "plain"
+     ],
+     [
+      "plugin_url",
+      "plugin_url",
+      "plain"
+     ],
+     [
+      "plugin_version_archived",
+      "plugin_version_archived",
+      "plain"
+     ],
+     [
+      "plugin_version_sid",
+      "plugin_version_sid",
+      "plain"
+     ],
+     [
+      "private",
+      "private",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_configurations",
+    1
+   ],
+   [
+    "plugins",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "FetchConfiguredPlugin",
+  "method" : "fetch",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Configurations/id1/Plugins/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_type" : "facebook",
+     "chat_service_sid" : "a_chat_service_sid",
+     "contact_identity" : "a_contact_identity",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "enabled" : true,
+     "friendly_name" : "a_friendly_name",
+     "integration" : {
+      "a_integration" : 1
+     },
+     "integration_type" : "task",
+     "janitor_enabled" : true,
+     "long_lived" : true,
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_type",
+      "channel_type",
+      "plain"
+     ],
+     [
+      "chat_service_sid",
+      "chat_service_sid",
+      "plain"
+     ],
+     [
+      "contact_identity",
+      "contact_identity",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "integration",
+      "integration",
+      "plain"
+     ],
+     [
+      "integration_type",
+      "integration_type",
+      "plain"
+     ],
+     [
+      "janitor_enabled",
+      "janitor_enabled",
+      "plain"
+     ],
+     [
+      "long_lived",
+      "long_lived",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "flex_flow",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchFlexFlow",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/FlexFlows/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "active" : true,
+     "description" : "a_description",
+     "name" : "a_name",
+     "questionnaire_sid" : "a_questionnaire_sid",
+     "questions" : [
+      "a_questions"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "active",
+      "active",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "questionnaire_sid",
+      "questionnaire_sid",
+      "plain"
+     ],
+     [
+      "questions",
+      "questions",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "FetchInsightsQuestionnaires",
+  "method" : "fetch",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questionnaires/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "answer_set_categories" : {
+      "a_answer_set_categories" : 1
+     },
+     "answer_sets" : {
+      "a_answer_sets" : 1
+     },
+     "not_applicable" : {
+      "a_not_applicable" : 1
+     },
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "answer_set_categories",
+      "answer_set_categories",
+      "plain"
+     ],
+     [
+      "answer_sets",
+      "answer_sets",
+      "plain"
+     ],
+     [
+      "not_applicable",
+      "not_applicable",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_settings_answer_sets",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "FetchInsightsSettingsAnswersets",
+  "method" : "fetch",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Settings/AnswerSets"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "comments" : {
+      "a_comments" : 1
+     },
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "comments",
+      "comments",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_settings_comment",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "FetchInsightsSettingsComment",
+  "method" : "fetch",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Settings/CommentTags"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "roles" : [
+      "a_roles"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "roles",
+      "roles",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_user_roles",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "FetchInsightsUserRoles",
+  "method" : "fetch",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/UserRoles"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channel" : {
+      "a_channel" : 1
+     },
+     "interaction_context_sid" : "a_interaction_context_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "routing" : {
+      "a_routing" : 1
+     },
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "webhook_ttid" : "a_webhook_ttid"
+    },
+    "fields" : [
+     [
+      "channel",
+      "channel",
+      "plain"
+     ],
+     [
+      "interaction_context_sid",
+      "interaction_context_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "routing",
+      "routing",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_ttid",
+      "webhook_ttid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchInteraction",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "error_code" : 1060,
+     "error_message" : "a_error_message",
+     "interaction_sid" : "a_interaction_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "status" : "inactive",
+     "type" : "email",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "error_message",
+      "error_message",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchInteractionChannel",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "execution_sid" : "a_execution_sid",
+     "from" : "a_from",
+     "instance_sid" : "a_instance_sid",
+     "interaction_sid" : "a_interaction_sid",
+     "note_sid" : "a_note_sid",
+     "sid" : "a_sid",
+     "status" : "failed",
+     "summary_sid" : "a_summary_sid",
+     "to" : "a_to",
+     "type" : "warm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "execution_sid",
+      "execution_sid",
+      "plain"
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "instance_sid",
+      "instance_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "note_sid",
+      "note_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "summary_sid",
+      "summary_sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "transfers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchInteractionTransfer",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Transfers/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "FetchPlugin",
+  "method" : "fetch",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "description" : "a_description",
+     "links" : {
+      "a_links" : 1
+     },
+     "name" : "a_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_configurations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "FetchPluginConfiguration",
+  "method" : "fetch",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Configurations/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "configuration_sid" : "a_configuration_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "configuration_sid",
+      "configuration_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_releases",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "FetchPluginRelease",
+  "method" : "fetch",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Releases/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "changelog" : "a_changelog",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "plugin_sid" : "a_plugin_sid",
+     "plugin_url" : "a_plugin_url",
+     "private" : true,
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "validated" : true,
+     "version" : "a_version"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "changelog",
+      "changelog",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "plugin_sid",
+      "plugin_sid",
+      "plain"
+     ],
+     [
+      "plugin_url",
+      "plugin_url",
+      "plain"
+     ],
+     [
+      "private",
+      "private",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "validated",
+      "validated",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    1
+   ],
+   [
+    "plugin_versions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "FetchPluginVersion",
+  "method" : "fetch",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1/Versions/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "status" : "active",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "provisioning_status",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchProvisioningStatus",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/account/provision/status"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "flex_flow_sid" : "a_flex_flow_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "web_channel",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchWebChannel",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/WebChannels/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "flex_chat_channels" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "flex_flow_sid" : "a_flex_flow_sid",
+       "sid" : "a_sid",
+       "task_sid" : "a_task_sid",
+       "url" : "a_url",
+       "user_sid" : "a_user_sid"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "task_sid",
+      "task_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_sid",
+      "user_sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "channel",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListChannel",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "flex_chat_channels",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Channels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "plugins" : [
+      {
+       "account_sid" : "a_account_sid",
+       "changelog" : "a_changelog",
+       "configuration_sid" : "a_configuration_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "description" : "a_description",
+       "friendly_name" : "a_friendly_name",
+       "phase" : 529,
+       "plugin_archived" : true,
+       "plugin_sid" : "a_plugin_sid",
+       "plugin_url" : "a_plugin_url",
+       "plugin_version_archived" : true,
+       "plugin_version_sid" : "a_plugin_version_sid",
+       "private" : true,
+       "unique_name" : "a_unique_name",
+       "url" : "a_url",
+       "version" : "a_version"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "changelog",
+      "changelog",
+      "plain"
+     ],
+     [
+      "configuration_sid",
+      "configuration_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "phase",
+      "phase",
+      "plain"
+     ],
+     [
+      "plugin_archived",
+      "plugin_archived",
+      "plain"
+     ],
+     [
+      "plugin_sid",
+      "plugin_sid",
+      "plain"
+     ],
+     [
+      "plugin_url",
+      "plugin_url",
+      "plain"
+     ],
+     [
+      "plugin_version_archived",
+      "plugin_version_archived",
+      "plain"
+     ],
+     [
+      "plugin_version_sid",
+      "plugin_version_sid",
+      "plain"
+     ],
+     [
+      "private",
+      "private",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_configurations",
+    1
+   ],
+   [
+    "plugins",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "ListConfiguredPlugin",
+  "method" : "page",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "records_key" : "plugins",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Configurations/id1/Plugins"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "flex_flows" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel_type" : "facebook",
+       "chat_service_sid" : "a_chat_service_sid",
+       "contact_identity" : "a_contact_identity",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "enabled" : true,
+       "friendly_name" : "a_friendly_name",
+       "integration" : {
+        "a_integration" : 1
+       },
+       "integration_type" : "task",
+       "janitor_enabled" : true,
+       "long_lived" : true,
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_type",
+      "channel_type",
+      "plain"
+     ],
+     [
+      "chat_service_sid",
+      "chat_service_sid",
+      "plain"
+     ],
+     [
+      "contact_identity",
+      "contact_identity",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "integration",
+      "integration",
+      "plain"
+     ],
+     [
+      "integration_type",
+      "integration_type",
+      "plain"
+     ],
+     [
+      "janitor_enabled",
+      "janitor_enabled",
+      "plain"
+     ],
+     [
+      "long_lived",
+      "long_lived",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "flex_flow",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListFlexFlow",
+  "method" : "page",
+  "options" : {
+   "friendly_name" : "v_friendly_name"
+  },
+  "records_key" : "flex_flows",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/FlexFlows"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "assessments" : [
+      {
+       "account_sid" : "a_account_sid",
+       "agent_id" : "a_agent_id",
+       "answer_id" : "a_answer_id",
+       "answer_text" : "a_answer_text",
+       "assessment" : {
+        "a_assessment" : 1
+       },
+       "assessment_sid" : "a_assessment_sid",
+       "offset" : "a_offset",
+       "report" : true,
+       "segment_id" : "a_segment_id",
+       "timestamp" : "a_timestamp",
+       "url" : "a_url",
+       "user_email" : "a_user_email",
+       "user_name" : "a_user_name",
+       "weight" : "a_weight"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_id",
+      "agent_id",
+      "plain"
+     ],
+     [
+      "answer_id",
+      "answer_id",
+      "plain"
+     ],
+     [
+      "answer_text",
+      "answer_text",
+      "plain"
+     ],
+     [
+      "assessment",
+      "assessment",
+      "plain"
+     ],
+     [
+      "assessment_sid",
+      "assessment_sid",
+      "plain"
+     ],
+     [
+      "offset",
+      "offset",
+      "plain"
+     ],
+     [
+      "report",
+      "report",
+      "plain"
+     ],
+     [
+      "segment_id",
+      "segment_id",
+      "plain"
+     ],
+     [
+      "timestamp",
+      "timestamp",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_email",
+      "user_email",
+      "plain"
+     ],
+     [
+      "user_name",
+      "user_name",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "assessments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SegmentId",
+    "v_segment_id"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsAssessments",
+  "method" : "page",
+  "options" : {
+   "authorization" : "v_authorization",
+   "segment_id" : "v_segment_id"
+  },
+  "records_key" : "assessments",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Assessments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "comments" : [
+      {
+       "account_sid" : "a_account_sid",
+       "agent_id" : "a_agent_id",
+       "assessment_sid" : "a_assessment_sid",
+       "comment" : {
+        "a_comment" : 1
+       },
+       "offset" : "a_offset",
+       "report" : true,
+       "segment_id" : "a_segment_id",
+       "timestamp" : "a_timestamp",
+       "url" : "a_url",
+       "user_email" : "a_user_email",
+       "user_name" : "a_user_name",
+       "weight" : "a_weight"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_id",
+      "agent_id",
+      "plain"
+     ],
+     [
+      "assessment_sid",
+      "assessment_sid",
+      "plain"
+     ],
+     [
+      "comment",
+      "comment",
+      "plain"
+     ],
+     [
+      "offset",
+      "offset",
+      "plain"
+     ],
+     [
+      "report",
+      "report",
+      "plain"
+     ],
+     [
+      "segment_id",
+      "segment_id",
+      "plain"
+     ],
+     [
+      "timestamp",
+      "timestamp",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_email",
+      "user_email",
+      "plain"
+     ],
+     [
+      "user_name",
+      "user_name",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_assessments_comment",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SegmentId",
+    "v_segment_id"
+   ],
+   [
+    "AgentId",
+    "v_agent_id"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsAssessmentsComment",
+  "method" : "page",
+  "options" : {
+   "agent_id" : "v_agent_id",
+   "authorization" : "v_authorization",
+   "segment_id" : "v_segment_id"
+  },
+  "records_key" : "comments",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Assessments/Comments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "conversations" : [
+      {
+       "account_id" : "a_account_id",
+       "conversation_id" : "a_conversation_id",
+       "segment_count" : 1403,
+       "segments" : [
+        "a_segments"
+       ]
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_id",
+      "account_id",
+      "plain"
+     ],
+     [
+      "conversation_id",
+      "conversation_id",
+      "plain"
+     ],
+     [
+      "segment_count",
+      "segment_count",
+      "plain"
+     ],
+     [
+      "segments",
+      "segments",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_conversations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SegmentId",
+    "v_segment_id"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsConversations",
+  "method" : "page",
+  "options" : {
+   "authorization" : "v_authorization",
+   "segment_id" : "v_segment_id"
+  },
+  "records_key" : "conversations",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/Conversations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "questionnaires" : [
+      {
+       "account_sid" : "a_account_sid",
+       "active" : true,
+       "description" : "a_description",
+       "name" : "a_name",
+       "questionnaire_sid" : "a_questionnaire_sid",
+       "questions" : [
+        "a_questions"
+       ],
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "active",
+      "active",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "questionnaire_sid",
+      "questionnaire_sid",
+      "plain"
+     ],
+     [
+      "questions",
+      "questions",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "IncludeInactive",
+    "true"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsQuestionnaires",
+  "method" : "page",
+  "options" : {
+   "authorization" : "v_authorization",
+   "include_inactive" : 1
+  },
+  "records_key" : "questionnaires",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questionnaires"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "categories" : [
+      {
+       "account_sid" : "a_account_sid",
+       "category_sid" : "a_category_sid",
+       "name" : "a_name",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "category_sid",
+      "category_sid",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_category",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsQuestionnairesCategory",
+  "method" : "page",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "records_key" : "categories",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Categories"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "questions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "allow_na" : true,
+       "answer_set" : {
+        "a_answer_set" : 1
+       },
+       "answer_set_id" : "a_answer_set_id",
+       "category" : {
+        "a_category" : 1
+       },
+       "description" : "a_description",
+       "question" : "a_question",
+       "question_sid" : "a_question_sid",
+       "url" : "a_url",
+       "usage" : 533
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "allow_na",
+      "allow_na",
+      "plain"
+     ],
+     [
+      "answer_set",
+      "answer_set",
+      "plain"
+     ],
+     [
+      "answer_set_id",
+      "answer_set_id",
+      "plain"
+     ],
+     [
+      "category",
+      "category",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "question",
+      "question",
+      "plain"
+     ],
+     [
+      "question_sid",
+      "question_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "usage",
+      "usage",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_question",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CategorySid",
+    "v_category_sid_1"
+   ],
+   [
+    "CategorySid",
+    "v_category_sid_2"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsQuestionnairesQuestion",
+  "method" : "page",
+  "options" : {
+   "authorization" : "v_authorization",
+   "category_sid" : [
+    "v_category_sid_1",
+    "v_category_sid_2"
+   ]
+  },
+  "records_key" : "questions",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "segments" : [
+      {
+       "account_id" : "a_account_id",
+       "agent_id" : "a_agent_id",
+       "agent_link" : "a_agent_link",
+       "agent_name" : "a_agent_name",
+       "agent_phone" : "a_agent_phone",
+       "agent_team_name" : "a_agent_team_name",
+       "agent_team_name_in_hierarchy" : "a_agent_team_name_in_hierarchy",
+       "assessment_percentage" : {
+        "a_assessment_percentage" : 1
+       },
+       "assessment_type" : {
+        "a_assessment_type" : 1
+       },
+       "customer_link" : "a_customer_link",
+       "customer_name" : "a_customer_name",
+       "customer_phone" : "a_customer_phone",
+       "date" : "a_date",
+       "external_contact" : "a_external_contact",
+       "external_id" : "a_external_id",
+       "external_segment_link" : "a_external_segment_link",
+       "external_segment_link_id" : "a_external_segment_link_id",
+       "media" : {
+        "a_media" : 1
+       },
+       "queue" : "a_queue",
+       "segment_id" : "a_segment_id",
+       "segment_recording_offset" : "a_segment_recording_offset",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_id",
+      "account_id",
+      "plain"
+     ],
+     [
+      "agent_id",
+      "agent_id",
+      "plain"
+     ],
+     [
+      "agent_link",
+      "agent_link",
+      "plain"
+     ],
+     [
+      "agent_name",
+      "agent_name",
+      "plain"
+     ],
+     [
+      "agent_phone",
+      "agent_phone",
+      "plain"
+     ],
+     [
+      "agent_team_name",
+      "agent_team_name",
+      "plain"
+     ],
+     [
+      "agent_team_name_in_hierarchy",
+      "agent_team_name_in_hierarchy",
+      "plain"
+     ],
+     [
+      "assessment_percentage",
+      "assessment_percentage",
+      "plain"
+     ],
+     [
+      "assessment_type",
+      "assessment_type",
+      "plain"
+     ],
+     [
+      "customer_link",
+      "customer_link",
+      "plain"
+     ],
+     [
+      "customer_name",
+      "customer_name",
+      "plain"
+     ],
+     [
+      "customer_phone",
+      "customer_phone",
+      "plain"
+     ],
+     [
+      "date",
+      "date",
+      "plain"
+     ],
+     [
+      "external_contact",
+      "external_contact",
+      "plain"
+     ],
+     [
+      "external_id",
+      "external_id",
+      "plain"
+     ],
+     [
+      "external_segment_link",
+      "external_segment_link",
+      "plain"
+     ],
+     [
+      "external_segment_link_id",
+      "external_segment_link_id",
+      "plain"
+     ],
+     [
+      "media",
+      "media",
+      "plain"
+     ],
+     [
+      "queue",
+      "queue",
+      "plain"
+     ],
+     [
+      "segment_id",
+      "segment_id",
+      "plain"
+     ],
+     [
+      "segment_recording_offset",
+      "segment_recording_offset",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_segments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SegmentId",
+    "v_segment_id"
+   ],
+   [
+    "ReservationId",
+    "v_reservation_id_1"
+   ],
+   [
+    "ReservationId",
+    "v_reservation_id_2"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "GET",
+  "id" : "ListInsightsSegments",
+  "method" : "page",
+  "options" : {
+   "authorization" : "v_authorization",
+   "reservation_id" : [
+    "v_reservation_id_1",
+    "v_reservation_id_2"
+   ],
+   "segment_id" : "v_segment_id"
+  },
+  "records_key" : "segments",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Insights/Segments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channels" : [
+      {
+       "error_code" : 1060,
+       "error_message" : "a_error_message",
+       "interaction_sid" : "a_interaction_sid",
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "status" : "inactive",
+       "type" : "email",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "error_message",
+      "error_message",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListInteractionChannel",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "channels",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "invites" : [
+      {
+       "channel_sid" : "a_channel_sid",
+       "interaction_sid" : "a_interaction_sid",
+       "routing" : {
+        "a_routing" : 1
+       },
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "routing",
+      "routing",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "invites",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListInteractionChannelInvite",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "invites",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Invites"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "participants" : [
+      {
+       "channel_sid" : "a_channel_sid",
+       "interaction_sid" : "a_interaction_sid",
+       "routing_properties" : {
+        "a_routing_properties" : 1
+       },
+       "sid" : "a_sid",
+       "type" : "supervisor",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "routing_properties",
+      "routing_properties",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "participants",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListInteractionChannelParticipant",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "participants",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Participants"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "plugins" : [
+      {
+       "account_sid" : "a_account_sid",
+       "archived" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "description" : "a_description",
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "sid" : "a_sid",
+       "unique_name" : "a_unique_name",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "ListPlugin",
+  "method" : "page",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "records_key" : "plugins",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "configurations" : [
+      {
+       "account_sid" : "a_account_sid",
+       "archived" : true,
+       "date_created" : "2026-01-06T03:04:05Z",
+       "description" : "a_description",
+       "links" : {
+        "a_links" : 1
+       },
+       "name" : "a_name",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_configurations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "ListPluginConfiguration",
+  "method" : "page",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "records_key" : "configurations",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Configurations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "releases" : [
+      {
+       "account_sid" : "a_account_sid",
+       "configuration_sid" : "a_configuration_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "configuration_sid",
+      "configuration_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_releases",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "ListPluginRelease",
+  "method" : "page",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "records_key" : "releases",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Releases"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "plugin_versions" : [
+      {
+       "account_sid" : "a_account_sid",
+       "archived" : true,
+       "changelog" : "a_changelog",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "plugin_sid" : "a_plugin_sid",
+       "plugin_url" : "a_plugin_url",
+       "private" : true,
+       "sid" : "a_sid",
+       "url" : "a_url",
+       "validated" : true,
+       "version" : "a_version"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "changelog",
+      "changelog",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "plugin_sid",
+      "plugin_sid",
+      "plain"
+     ],
+     [
+      "plugin_url",
+      "plugin_url",
+      "plain"
+     ],
+     [
+      "private",
+      "private",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "validated",
+      "validated",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    1
+   ],
+   [
+    "plugin_versions",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "GET",
+  "id" : "ListPluginVersion",
+  "method" : "page",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "records_key" : "plugin_versions",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1/Versions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "flex_chat_channels" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "flex_flow_sid" : "a_flex_flow_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "web_channel",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListWebChannel",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "flex_chat_channels",
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/WebChannels"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "agent_conv_end_methods" : {
+      "a_agent_conv_end_methods" : 1
+     },
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "call_recording_enabled" : true,
+     "call_recording_webhook_url" : "a_call_recording_webhook_url",
+     "channel_configs" : [
+      "a_channel_configs"
+     ],
+     "chat_service_instance_sid" : "a_chat_service_instance_sid",
+     "citrix_voice_vdi" : {
+      "a_citrix_voice_vdi" : 1
+     },
+     "crm_attributes" : {
+      "a_crm_attributes" : 1
+     },
+     "crm_callback_url" : "a_crm_callback_url",
+     "crm_enabled" : true,
+     "crm_fallback_url" : "a_crm_fallback_url",
+     "crm_type" : "a_crm_type",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "debugger_integration" : {
+      "a_debugger_integration" : 1
+     },
+     "flex_insights_drilldown" : true,
+     "flex_insights_hr" : {
+      "a_flex_insights_hr" : 1
+     },
+     "flex_instance_sid" : "a_flex_instance_sid",
+     "flex_service_instance_sid" : "a_flex_service_instance_sid",
+     "flex_ui_status_report" : {
+      "a_flex_ui_status_report" : 1
+     },
+     "flex_url" : "a_flex_url",
+     "integrations" : [
+      "a_integrations"
+     ],
+     "markdown" : {
+      "a_markdown" : 1
+     },
+     "messaging_service_instance_sid" : "a_messaging_service_instance_sid",
+     "notifications" : {
+      "a_notifications" : 1
+     },
+     "offline_config" : {
+      "a_offline_config" : 1
+     },
+     "outbound_call_flows" : {
+      "a_outbound_call_flows" : 1
+     },
+     "plugin_service_attributes" : {
+      "a_plugin_service_attributes" : 1
+     },
+     "plugin_service_enabled" : true,
+     "public_attributes" : {
+      "a_public_attributes" : 1
+     },
+     "queue_stats_configuration" : {
+      "a_queue_stats_configuration" : 1
+     },
+     "runtime_domain" : "a_runtime_domain",
+     "serverless_service_sids" : [
+      "a_serverless_service_sids"
+     ],
+     "service_version" : "a_service_version",
+     "status" : "inprogress",
+     "taskrouter_offline_activity_sid" : "a_taskrouter_offline_activity_sid",
+     "taskrouter_skills" : [
+      "a_taskrouter_skills"
+     ],
+     "taskrouter_target_taskqueue_sid" : "a_taskrouter_target_taskqueue_sid",
+     "taskrouter_target_workflow_sid" : "a_taskrouter_target_workflow_sid",
+     "taskrouter_taskqueues" : [
+      "a_taskrouter_taskqueues"
+     ],
+     "taskrouter_worker_attributes" : {
+      "a_taskrouter_worker_attributes" : 1
+     },
+     "taskrouter_worker_channels" : {
+      "a_taskrouter_worker_channels" : 1
+     },
+     "taskrouter_workspace_sid" : "a_taskrouter_workspace_sid",
+     "ui_attributes" : {
+      "a_ui_attributes" : 1
+     },
+     "ui_dependencies" : {
+      "a_ui_dependencies" : 1
+     },
+     "ui_language" : "a_ui_language",
+     "ui_version" : "a_ui_version",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_conv_end_methods",
+      "agent_conv_end_methods",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "call_recording_enabled",
+      "call_recording_enabled",
+      "plain"
+     ],
+     [
+      "call_recording_webhook_url",
+      "call_recording_webhook_url",
+      "plain"
+     ],
+     [
+      "channel_configs",
+      "channel_configs",
+      "plain"
+     ],
+     [
+      "chat_service_instance_sid",
+      "chat_service_instance_sid",
+      "plain"
+     ],
+     [
+      "citrix_voice_vdi",
+      "citrix_voice_vdi",
+      "plain"
+     ],
+     [
+      "crm_attributes",
+      "crm_attributes",
+      "plain"
+     ],
+     [
+      "crm_callback_url",
+      "crm_callback_url",
+      "plain"
+     ],
+     [
+      "crm_enabled",
+      "crm_enabled",
+      "plain"
+     ],
+     [
+      "crm_fallback_url",
+      "crm_fallback_url",
+      "plain"
+     ],
+     [
+      "crm_type",
+      "crm_type",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "debugger_integration",
+      "debugger_integration",
+      "plain"
+     ],
+     [
+      "flex_insights_drilldown",
+      "flex_insights_drilldown",
+      "plain"
+     ],
+     [
+      "flex_insights_hr",
+      "flex_insights_hr",
+      "plain"
+     ],
+     [
+      "flex_instance_sid",
+      "flex_instance_sid",
+      "plain"
+     ],
+     [
+      "flex_service_instance_sid",
+      "flex_service_instance_sid",
+      "plain"
+     ],
+     [
+      "flex_ui_status_report",
+      "flex_ui_status_report",
+      "plain"
+     ],
+     [
+      "flex_url",
+      "flex_url",
+      "plain"
+     ],
+     [
+      "integrations",
+      "integrations",
+      "plain"
+     ],
+     [
+      "markdown",
+      "markdown",
+      "plain"
+     ],
+     [
+      "messaging_service_instance_sid",
+      "messaging_service_instance_sid",
+      "plain"
+     ],
+     [
+      "notifications",
+      "notifications",
+      "plain"
+     ],
+     [
+      "offline_config",
+      "offline_config",
+      "plain"
+     ],
+     [
+      "outbound_call_flows",
+      "outbound_call_flows",
+      "plain"
+     ],
+     [
+      "plugin_service_attributes",
+      "plugin_service_attributes",
+      "plain"
+     ],
+     [
+      "plugin_service_enabled",
+      "plugin_service_enabled",
+      "plain"
+     ],
+     [
+      "public_attributes",
+      "public_attributes",
+      "plain"
+     ],
+     [
+      "queue_stats_configuration",
+      "queue_stats_configuration",
+      "plain"
+     ],
+     [
+      "runtime_domain",
+      "runtime_domain",
+      "plain"
+     ],
+     [
+      "serverless_service_sids",
+      "serverless_service_sids",
+      "plain"
+     ],
+     [
+      "service_version",
+      "service_version",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "taskrouter_offline_activity_sid",
+      "taskrouter_offline_activity_sid",
+      "plain"
+     ],
+     [
+      "taskrouter_skills",
+      "taskrouter_skills",
+      "plain"
+     ],
+     [
+      "taskrouter_target_taskqueue_sid",
+      "taskrouter_target_taskqueue_sid",
+      "plain"
+     ],
+     [
+      "taskrouter_target_workflow_sid",
+      "taskrouter_target_workflow_sid",
+      "plain"
+     ],
+     [
+      "taskrouter_taskqueues",
+      "taskrouter_taskqueues",
+      "plain"
+     ],
+     [
+      "taskrouter_worker_attributes",
+      "taskrouter_worker_attributes",
+      "plain"
+     ],
+     [
+      "taskrouter_worker_channels",
+      "taskrouter_worker_channels",
+      "plain"
+     ],
+     [
+      "taskrouter_workspace_sid",
+      "taskrouter_workspace_sid",
+      "plain"
+     ],
+     [
+      "ui_attributes",
+      "ui_attributes",
+      "plain"
+     ],
+     [
+      "ui_dependencies",
+      "ui_dependencies",
+      "plain"
+     ],
+     [
+      "ui_language",
+      "ui_language",
+      "plain"
+     ],
+     [
+      "ui_version",
+      "ui_version",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "configuration",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "UpdateConfiguration",
+  "json" : {},
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Configuration"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_type" : "facebook",
+     "chat_service_sid" : "a_chat_service_sid",
+     "contact_identity" : "a_contact_identity",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "enabled" : true,
+     "friendly_name" : "a_friendly_name",
+     "integration" : {
+      "a_integration" : 1
+     },
+     "integration_type" : "task",
+     "janitor_enabled" : true,
+     "long_lived" : true,
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_type",
+      "channel_type",
+      "plain"
+     ],
+     [
+      "chat_service_sid",
+      "chat_service_sid",
+      "plain"
+     ],
+     [
+      "contact_identity",
+      "contact_identity",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "enabled",
+      "enabled",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "integration",
+      "integration",
+      "plain"
+     ],
+     [
+      "integration_type",
+      "integration_type",
+      "plain"
+     ],
+     [
+      "janitor_enabled",
+      "janitor_enabled",
+      "plain"
+     ],
+     [
+      "long_lived",
+      "long_lived",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "flex_flow",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "ChannelType",
+    "custom"
+   ],
+   [
+    "ChatServiceSid",
+    "v_chat_service_sid"
+   ],
+   [
+    "ContactIdentity",
+    "v_contact_identity"
+   ],
+   [
+    "Enabled",
+    "true"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Integration.Channel",
+    "v_integration_channel"
+   ],
+   [
+    "Integration.CreationOnMessage",
+    "true"
+   ],
+   [
+    "Integration.FlowSid",
+    "v_integration_flow_sid"
+   ],
+   [
+    "Integration.Priority",
+    "2068"
+   ],
+   [
+    "Integration.RetryCount",
+    "2257"
+   ],
+   [
+    "Integration.Timeout",
+    "1945"
+   ],
+   [
+    "Integration.Url",
+    "v_integration_url"
+   ],
+   [
+    "Integration.WorkflowSid",
+    "v_integration_workflow_sid"
+   ],
+   [
+    "Integration.WorkspaceSid",
+    "v_integration_workspace_sid"
+   ],
+   [
+    "IntegrationType",
+    "task"
+   ],
+   [
+    "JanitorEnabled",
+    "true"
+   ],
+   [
+    "LongLived",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateFlexFlow",
+  "method" : "update",
+  "options" : {
+   "channel_type" : "custom",
+   "chat_service_sid" : "v_chat_service_sid",
+   "contact_identity" : "v_contact_identity",
+   "enabled" : 1,
+   "friendly_name" : "v_friendly_name",
+   "integration_channel" : "v_integration_channel",
+   "integration_creation_on_message" : 1,
+   "integration_flow_sid" : "v_integration_flow_sid",
+   "integration_priority" : 2068,
+   "integration_retry_count" : 2257,
+   "integration_timeout" : 1945,
+   "integration_type" : "task",
+   "integration_url" : "v_integration_url",
+   "integration_workflow_sid" : "v_integration_workflow_sid",
+   "integration_workspace_sid" : "v_integration_workspace_sid",
+   "janitor_enabled" : 1,
+   "long_lived" : 1
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/FlexFlows/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "agent_id" : "a_agent_id",
+     "answer_id" : "a_answer_id",
+     "answer_text" : "a_answer_text",
+     "assessment" : {
+      "a_assessment" : 1
+     },
+     "assessment_sid" : "a_assessment_sid",
+     "offset" : "a_offset",
+     "report" : true,
+     "segment_id" : "a_segment_id",
+     "timestamp" : "a_timestamp",
+     "url" : "a_url",
+     "user_email" : "a_user_email",
+     "user_name" : "a_user_name",
+     "weight" : "a_weight"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "agent_id",
+      "agent_id",
+      "plain"
+     ],
+     [
+      "answer_id",
+      "answer_id",
+      "plain"
+     ],
+     [
+      "answer_text",
+      "answer_text",
+      "plain"
+     ],
+     [
+      "assessment",
+      "assessment",
+      "plain"
+     ],
+     [
+      "assessment_sid",
+      "assessment_sid",
+      "plain"
+     ],
+     [
+      "offset",
+      "offset",
+      "plain"
+     ],
+     [
+      "report",
+      "report",
+      "plain"
+     ],
+     [
+      "segment_id",
+      "segment_id",
+      "plain"
+     ],
+     [
+      "timestamp",
+      "timestamp",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "user_email",
+      "user_email",
+      "plain"
+     ],
+     [
+      "user_name",
+      "user_name",
+      "plain"
+     ],
+     [
+      "weight",
+      "weight",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "assessments",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Offset",
+    615.5
+   ],
+   [
+    "AnswerText",
+    "v_answer_text"
+   ],
+   [
+    "AnswerId",
+    "v_answer_id"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "UpdateInsightsAssessments",
+  "method" : "update",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [
+   615.5,
+   "v_answer_text",
+   "v_answer_id"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Assessments/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "active" : true,
+     "description" : "a_description",
+     "name" : "a_name",
+     "questionnaire_sid" : "a_questionnaire_sid",
+     "questions" : [
+      "a_questions"
+     ],
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "active",
+      "active",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "questionnaire_sid",
+      "questionnaire_sid",
+      "plain"
+     ],
+     [
+      "questions",
+      "questions",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Active",
+    "true"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "Name",
+    "v_name"
+   ],
+   [
+    "QuestionSids",
+    "v_question_sids_1"
+   ],
+   [
+    "QuestionSids",
+    "v_question_sids_2"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "UpdateInsightsQuestionnaires",
+  "method" : "update",
+  "options" : {
+   "authorization" : "v_authorization",
+   "description" : "v_description",
+   "name" : "v_name",
+   "question_sids" : [
+    "v_question_sids_1",
+    "v_question_sids_2"
+   ]
+  },
+  "required" : [
+   1
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questionnaires/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "category_sid" : "a_category_sid",
+     "name" : "a_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "category_sid",
+      "category_sid",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_category",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Name",
+    "v_name"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "UpdateInsightsQuestionnairesCategory",
+  "method" : "update",
+  "options" : {
+   "authorization" : "v_authorization"
+  },
+  "required" : [
+   "v_name"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Categories/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "allow_na" : true,
+     "answer_set" : {
+      "a_answer_set" : 1
+     },
+     "answer_set_id" : "a_answer_set_id",
+     "category" : {
+      "a_category" : 1
+     },
+     "description" : "a_description",
+     "question" : "a_question",
+     "question_sid" : "a_question_sid",
+     "url" : "a_url",
+     "usage" : 533
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "allow_na",
+      "allow_na",
+      "plain"
+     ],
+     [
+      "answer_set",
+      "answer_set",
+      "plain"
+     ],
+     [
+      "answer_set_id",
+      "answer_set_id",
+      "plain"
+     ],
+     [
+      "category",
+      "category",
+      "plain"
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "question",
+      "question",
+      "plain"
+     ],
+     [
+      "question_sid",
+      "question_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "usage",
+      "usage",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "insights_questionnaires_question",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "AllowNa",
+    "true"
+   ],
+   [
+    "AnswerSetId",
+    "v_answer_set_id"
+   ],
+   [
+    "CategorySid",
+    "v_category_sid"
+   ],
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "Question",
+    "v_question"
+   ]
+  ],
+  "headers" : {
+   "Authorization" : "v_authorization"
+  },
+  "http" : "POST",
+  "id" : "UpdateInsightsQuestionnairesQuestion",
+  "method" : "update",
+  "options" : {
+   "answer_set_id" : "v_answer_set_id",
+   "authorization" : "v_authorization",
+   "category_sid" : "v_category_sid",
+   "description" : "v_description",
+   "question" : "v_question"
+  },
+  "required" : [
+   1
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Insights/QualityManagement/Questions/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channel" : {
+      "a_channel" : 1
+     },
+     "interaction_context_sid" : "a_interaction_context_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "routing" : {
+      "a_routing" : 1
+     },
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "webhook_ttid" : "a_webhook_ttid"
+    },
+    "fields" : [
+     [
+      "channel",
+      "channel",
+      "plain"
+     ],
+     [
+      "interaction_context_sid",
+      "interaction_context_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "routing",
+      "routing",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "webhook_ttid",
+      "webhook_ttid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "WebhookTtid",
+    "v_webhook_ttid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateInteraction",
+  "method" : "update",
+  "options" : {
+   "webhook_ttid" : "v_webhook_ttid"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "error_code" : 1060,
+     "error_message" : "a_error_message",
+     "interaction_sid" : "a_interaction_sid",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "status" : "inactive",
+     "type" : "email",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "error_code",
+      "error_code",
+      "plain"
+     ],
+     [
+      "error_message",
+      "error_message",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Status",
+    "closed"
+   ],
+   [
+    "Routing",
+    "{\"v_routing\":17}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateInteractionChannel",
+  "method" : "update",
+  "options" : {
+   "routing" : {
+    "v_routing" : 17
+   }
+  },
+  "required" : [
+   "closed"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "channel_sid" : "a_channel_sid",
+     "interaction_sid" : "a_interaction_sid",
+     "routing_properties" : {
+      "a_routing_properties" : 1
+     },
+     "sid" : "a_sid",
+     "type" : "supervisor",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "routing_properties",
+      "routing_properties",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "participants",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Status",
+    "closed"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateInteractionChannelParticipant",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   "closed"
+  ],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Participants/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_sid" : "a_channel_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "execution_sid" : "a_execution_sid",
+     "from" : "a_from",
+     "instance_sid" : "a_instance_sid",
+     "interaction_sid" : "a_interaction_sid",
+     "note_sid" : "a_note_sid",
+     "sid" : "a_sid",
+     "status" : "failed",
+     "summary_sid" : "a_summary_sid",
+     "to" : "a_to",
+     "type" : "warm",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_sid",
+      "channel_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "execution_sid",
+      "execution_sid",
+      "plain"
+     ],
+     [
+      "from",
+      "from",
+      "plain"
+     ],
+     [
+      "instance_sid",
+      "instance_sid",
+      "plain"
+     ],
+     [
+      "interaction_sid",
+      "interaction_sid",
+      "plain"
+     ],
+     [
+      "note_sid",
+      "note_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "summary_sid",
+      "summary_sid",
+      "plain"
+     ],
+     [
+      "to",
+      "to",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "body" : {},
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "interaction",
+    1
+   ],
+   [
+    "channels",
+    1
+   ],
+   [
+    "transfers",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "UpdateInteractionTransfer",
+  "json" : {},
+  "method" : "update",
+  "options" : {},
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/Interactions/id1/Channels/id2/Transfers/id3"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugins",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Description",
+    "v_description"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "UpdatePlugin",
+  "method" : "update",
+  "options" : {
+   "description" : "v_description",
+   "flex_metadata" : "v_flex_metadata",
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "description" : "a_description",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "unique_name" : "a_unique_name",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "unique_name",
+      "unique_name",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_archive",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "UpdatePluginArchive",
+  "method" : "update",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1/Archive"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "date_created" : "2026-01-06T03:04:05Z",
+     "description" : "a_description",
+     "name" : "a_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "description",
+      "description",
+      "plain"
+     ],
+     [
+      "name",
+      "name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_configuration_archive",
+    1
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "UpdatePluginConfigurationArchive",
+  "method" : "update",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Configurations/id1/Archive"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "archived" : true,
+     "changelog" : "a_changelog",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "plugin_sid" : "a_plugin_sid",
+     "plugin_url" : "a_plugin_url",
+     "private" : true,
+     "sid" : "a_sid",
+     "url" : "a_url",
+     "version" : "a_version"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "archived",
+      "archived",
+      "plain"
+     ],
+     [
+      "changelog",
+      "changelog",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "plugin_sid",
+      "plugin_sid",
+      "plain"
+     ],
+     [
+      "plugin_url",
+      "plugin_url",
+      "plain"
+     ],
+     [
+      "private",
+      "private",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "version",
+      "version",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "plugin_version_archive",
+    2
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Flex-Metadata" : "v_flex_metadata"
+  },
+  "http" : "POST",
+  "id" : "UpdatePluginVersionArchive",
+  "method" : "update",
+  "options" : {
+   "flex_metadata" : "v_flex_metadata"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/PluginService/Plugins/id1/Versions/id2/Archive"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "flex_flow_sid" : "a_flex_flow_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "flex_flow_sid",
+      "flex_flow_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "flex_api",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "web_channel",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "ChatStatus",
+    "inactive"
+   ],
+   [
+    "PostEngagementData",
+    "v_post_engagement_data"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateWebChannel",
+  "method" : "update",
+  "options" : {
+   "chat_status" : "inactive",
+   "post_engagement_data" : "v_post_engagement_data"
+  },
+  "required" : [],
+  "url" : "https://flex-api.twilio.com/v1/WebChannels/id1"
+ }
+]

@@ -1,5 +1,9 @@
 Revision history for Map::Tube::CLI
 
+v1.2.1 Fri Nov 13 2026
+      - Upgraded dependency on Map::Tube v5.2.0.
+      - Upgraded dependency on Map::Tube::Generic v0.2.2.
+
 v1.2.0 Wed Nov 11 2026
       This release entirely belongs to @GWS.
       - Removed concept of "supported maps"; all locally installed and

@@ -1,22 +1,20 @@
 package MojoX::Authentication::Model::SAML2;
-{ our $VERSION = '0.010' }
+{ our $VERSION = '0.100' }
 
 use v5.24;
 use Moo;
 use experimental qw< signatures >;
-use Net::SAML2;
+use Net::SAML2 0.86; # refuse anything lower, they changed interface!
 use Net::SAML2::Protocol::AuthnRequest;
+use Net::SAML2::Object::Response;
 use Net::SAML2::Binding::Redirect;
 use Net::SAML2::Binding::POST;
 use Net::SAML2::Protocol::Assertion;
-use Net::SAML2::XML::Sig;
 use Ouch qw< :trytiny_var >;
-use Try::Catch;
-use JSON::PP qw< encode_json decode_json >;
-use Storable qw< dclone >;
-use File::Temp qw< tempfile >;
+use File::Temp ();
 use Scalar::Util qw< blessed >;
 use Module::Runtime qw< use_module >;
+use MojoX::Authentication::Util qw< encode_name >;
 
 use constant DEFAULT_FOR => {
    name => 'saml2',
@@ -77,15 +75,13 @@ sub coerce_idp ($x) {
    require Net::SAML2::IdP;
    return Net::SAML2::IdP->new_from_url(url => $x)
       if $x =~ m{\A (?: \w+) :// }imxs;
-   if (-e $x) {
+   if ($x !~ m{\A \s* < }mxs) {
       open my $fh, '<:raw', $x or ouch 400, 'cannot read file', $x;
       local $/;
       $x = <$fh>;
    }
    return Net::SAML2::IdP->new_from_xml(xml => $x);
 }
-
-sub __key ($prefix, $x) { join '-', $prefix, (ref($x) ? $x->{key} : $x) }
 
 use namespace::clean;
 
@@ -94,7 +90,7 @@ with 'MojoX::Authentication::Model::Role::Remap';
 
 has cache => (is => 'ro', coerce => \&coerce_cache, default => undef);
 has idp => (is => 'ro', required => 1, coerce => \&coerce_idp);
-has name => (is => 'ro', default => DEFAULT_FOR->{name});
+has name => (is => 'rw', default => DEFAULT_FOR->{name});
 has remaps => (is => 'ro', default => sub { DEFAULT_FOR->{remaps} });
 has request_ttl => (is => 'ro', default => DEFAULT_FOR->{request_ttl});
 has sig_hash => (is => 'ro', default => DEFAULT_FOR->{sig_hash});
@@ -107,8 +103,14 @@ sub _build_username_validator ($self) {
    return sub ($name) { return 'by all means' };
 };
 
+sub _key ($self, $prefix, $x) {
+   my $bare = ref($x) eq 'HASH' ? $x->{$self->user_key} : $x;
+   my $ename = encode_name($self->name);
+   return "$prefix-$ename/$bare";
+}
+
 sub _cache_user ($self, $user, $ttl = undef) {
-   my $key = __key(user => $user);
+   my $key = $self->_key(user => $user);
    my $expire = time() + ($ttl //= $self->user_ttl);
    $self->cache->set($user, $key, $expire);
    return $self;
@@ -144,7 +146,7 @@ sub idp_login ($self) {
 
    # Store the request's id for later verification
    my $id = $authnreq->id;
-   my $key = __key(authnreq_id => $id);
+   my $key = $self->_key(authnreq_id => $id);
    my $ts = time();
    my $expire = $ts + $self->request_ttl;
    $self->cache->set({ ts => $ts }, $key, $expire);
@@ -161,14 +163,22 @@ sub idp_login ($self) {
    return ($id, $url);
 }
 
-sub load_user ($s, $A, $key) { return $s->cache->get(__key(user => $key)) }
+sub load_user ($self, $A, $key) {
+   return $self->cache->get($self->_key(user => $key));
+}
+
+sub tamed_user_record ($self, $user) {
+   # the SAML2 user record does not have any secret material inside, so
+   # we can pass $user through
+   return $user;
+}
 
 # TODO FIXME this is an occasion to implement some clever redirection in
 # the Controller to implement the logout properly (i.e. forwarding to the
 # server, not just "consider this user gone here"). But we're not there
 # yet, sorry!
 sub logout ($self, $controller, $user) {
-   $self->wipe_user($user);
+   $self->wipe_user($user->{uid});
    $controller->logout;
    return;
 }
@@ -179,34 +189,50 @@ sub parse_assertion ($self, $id, $response) {
    defined($response) or ouch 400, 'No SAMLResponse';
    defined($id)
       or ouch 400, 'Not expecting anything SAML-related', 'undefined id';
-   my $reqts = $self->cache->get(__key(authnreq_id => $id))
+   my $req_key = $self->_key(authnreq_id => $id);
+   my $reqts = $self->cache->get($req_key)
       or ouch 400, 'Not expecting anything SAML-related', 'unknown id';
-   time() <= $reqts->{ts} + 30
+   $self->cache->wipe($req_key);   # single use: no replays
+   time() <= $reqts->{ts} + $self->request_ttl
       or ouch 400, 'Not expecting anything SAML-related', 'expired id';
+
+   my $idp = $self->idp;
 
    # the module for Assertion insists on a file-based CA certificate so we
    # save it in a temporary file. It is also useful for the POST module
    # since Net::SAML 0.88
-   my ($fh, $cacert_path) = tempfile();
-   print {$fh} join "\n\n", $self->idp->cert('signing')->@*;
-   close $fh;
+   my $tmp = File::Temp->new;
+   print {$tmp} join "\n\n", $idp->cert('signing')->@*;
+   close $tmp;
 
    my $xml_response = Net::SAML2::Binding::POST
-      ->new(cacert => $cacert_path)
+      ->new(cacert => $tmp->filename)
       ->handle_response($response);
+
+   my $saml_response = Net::SAML2::Object::Response->new_from_xml(
+      xml => $xml_response,
+      cacert => $tmp->filename,
+   );
+   if (! $saml_response->success) {
+      my $status = $saml_response->status;
+      my $substatus = $saml_response->substatus;
+      $status .= '/' . $substatus if defined($substatus);
+      ouch 403, "IdP refused with $status";
+   }
 
    my $sp_conf = $self->sp_configuration;
    my $assertion = Net::SAML2::Protocol::Assertion->new_from_xml(
       xml => $xml_response,
       key_file => $sp_conf->{key},
-      cacert => $cacert_path,
+      cacert => $tmp->filename,
+      issuer => $idp->entityid,
    );
-   unlink $cacert_path;
 
-   $assertion->valid($sp_conf->{identifier}, $id)
+   $assertion->valid($sp_conf->{identifier}, $id, $idp->entityid)
      or ouch 400, 'Invalid SAMLResponse';
 
    my $uid = $assertion->nameid;
+   ouch 400, 'no NameID in assertion' unless length($uid // '') > 0;
    my $user = $self->_normalize_user(
       { $assertion->attributes->%*, $self->user_key => $uid, });
    $self->_cache_user($user);
@@ -214,13 +240,6 @@ sub parse_assertion ($self, $id, $response) {
    return $user;
 }
 
-# this should never (arguably) be called if "auto_validate" in
-# Mojolicious::Plugin::Authentication is used. Anyway...
-sub validate_user ($self, $controller, $name, $secret, $extra) {
-   ...;
-   return defined($self->load_user($name)) ? $name : undef;
-}
-
-sub wipe_user ($self, $user) { $self->cache->wipe(__key(user => $user)) }
+sub wipe_user ($self, $user) { $self->cache->wipe($self->_key(user => $user)) }
 
 1;

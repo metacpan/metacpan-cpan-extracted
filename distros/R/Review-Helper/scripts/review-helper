@@ -1,0 +1,82 @@
+#!/bin/sh
+# review-helper: run an implementation of the Review Helper standard.
+#
+# Implementations are executables named review-helper-<impl> on PATH.
+# REVIEW_HELPER_IMPL names the one to run; otherwise the first found walking
+# PATH in order runs. Every argument is passed on unchanged.
+#
+# review-helper --which lists every implementation found, marking the one it
+# runs, then prints the versions that one reports (its `version`
+# subcommand).
+
+set -u
+
+me=review-helper
+
+# True when $1 is an implementation name: letters, digits, _ and -.
+valid_name() {
+    case $1 in
+        '' | *[!A-Za-z0-9_-]*) return 1 ;;
+    esac
+    return 0
+}
+
+if [ -n "${REVIEW_HELPER_IMPL:-}" ] && ! valid_name "$REVIEW_HELPER_IMPL"; then
+    printf '%s\n' "$me: REVIEW_HELPER_IMPL must be an implementation name such as perl, not '$REVIEW_HELPER_IMPL'" >&2
+    exit 2
+fi
+
+# Walk PATH in order. Each executable regular file named $me-<impl>, with a
+# valid <impl>, is an implementation; the first of each name counts. Sets
+# chosen and chosen_path to the one to run (the first, or the one named by
+# REVIEW_HELPER_IMPL), and found to one line per implementation, the chosen
+# one marked. Empty PATH entries are skipped, and so is a directory that
+# cannot be read (its pattern does not expand).
+chosen=
+chosen_path=
+found=
+seen=' '
+old_ifs=$IFS
+IFS=:
+set -f
+for dir in $PATH; do
+    [ -n "$dir" ] || continue
+    IFS=$old_ifs
+    set +f
+    for file in "$dir/$me"-*; do
+        impl=${file##*/}
+        impl=${impl#"$me"-}
+        valid_name "$impl" || continue
+        case $seen in *" $impl "*) continue ;; esac
+        [ -f "$file" ] && [ -x "$file" ] || continue
+        seen="$seen$impl "
+        mark=' '
+        if [ -z "$chosen" ] && { [ -z "${REVIEW_HELPER_IMPL:-}" ] || [ "$impl" = "$REVIEW_HELPER_IMPL" ]; }; then
+            chosen=$impl
+            chosen_path=$file
+            mark='*'
+        fi
+        found="$found$mark $impl $file
+"
+    done
+    IFS=:
+    set -f
+done
+IFS=$old_ifs
+set +f
+
+if [ -z "$chosen" ]; then
+    if [ -n "${REVIEW_HELPER_IMPL:-}" ]; then
+        printf '%s\n' "$me: REVIEW_HELPER_IMPL is '$REVIEW_HELPER_IMPL', but $me-$REVIEW_HELPER_IMPL is not on PATH" >&2
+    else
+        printf '%s\n' "$me: no implementation found: no executable $me-<impl> is on PATH" >&2
+    fi
+    exit 127
+fi
+
+if [ "${1:-}" = "--which" ]; then
+    printf '%s' "$found"
+    exec "$chosen_path" version
+fi
+
+exec "$chosen_path" "$@"

@@ -1,0 +1,10 @@
+A key pair made only for these tests, with:
+
+  openssl genpkey -algorithm RSA -pkeyopt rsa_keygen_bits:2048 -out test-private-key.pem
+  openssl pkey -in test-private-key.pem -pubout -out test-public-key.pem
+
+It signs nothing real and is registered nowhere. openssl-rs256-signature.txt is
+the RS256 signature openssl made of the text "header.payload", in the URL-safe
+Base64 of JWTs:
+
+  printf 'header.payload' | openssl dgst -sha256 -sign test-private-key.pem

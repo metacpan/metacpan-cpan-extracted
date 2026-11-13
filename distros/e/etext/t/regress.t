@@ -11,7 +11,7 @@ use Tk::eText;
 
 my $mw = eval { MainWindow->new };
 plan skip_all => "no X display available ($@)" unless $mw;
-plan tests => 92;
+plan tests => 96;
 $mw->geometry('+10+10');
 
 # Collect background errors (Tk::Error) instead of printing them.
@@ -275,7 +275,7 @@ SKIP: {
 
 # A wrong block subcommand: the error lists every valid one.
 ok(!eval { $t->block('nosuch'); 1 }, 'a wrong block subcommand is an error');
-like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, data, delete, deletelines, flatten, insert, list, names, nodedata, of, split, sprout or trim/,
+like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, cut, data, delete, deletelines, flatten, insert, level, list, names, nodedata, of, paste, split, sprout or trim/,
      'which lists all the subcommands, data included');
 
 # After an undo, the next edit starts an undo step of its own: a second
@@ -708,6 +708,28 @@ like($@, qr/^bad block option "nosuch":  must be at, addline, cget, configure, d
   is(scalar(grep { $_->[0] =~ /^n/ } @all), scalar(@idx), 'every mark is in dump');
   $w->destroy;
 }
+
+# BUGS 38: a negative count in the result of a layout callback (leaves
+# to hide, or the ordinal of a stolen line) indexed arrays with it: a
+# crash.  It is refused, as other bad results are: a background error
+# and the default layout.
+for my $case ([ 'leaves to hide', [0,0,0,50,50,40,20], [-1] ],
+	      [ 'the ordinal of a stolen line', [0,0,0,50,50,40,20], [1,0,0,20,20,20,15],
+		[1,0,20,20,20,20,15], [-1,0,0,10,10,10,8] ]) {
+  my ($what, @result) = @$case;
+  my $w = $mw->eText(-width => 30, -height => 5)->pack;
+  $w->blockConfigure('P', -layoutcmd => sub { @result });
+  $w->insert('end', "x aaaa\nbbbb y\n");
+  $w->blockInsert('P', '1.2', '2.4');
+  @bgerrors = ();
+  $mw->update;
+  like($bgerrors[0] // 'no error', qr/^Negative count in return from LayoutProc for block "P"\./,
+       "a negative count ($what) is refused");
+  my @box = $w->bbox('1.2');
+  cmp_ok($box[3], '<', 40, 'and the block has the default layout');
+  $w->destroy;
+}
+@bgerrors = ();
 
 $t->destroy;
 $mw->destroy;

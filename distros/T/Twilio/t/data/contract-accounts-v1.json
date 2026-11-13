@@ -1,0 +1,1255 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "items" : {
+      "a_items" : 1
+     }
+    },
+    "fields" : [
+     [
+      "items",
+      "items",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "bulk_consents",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Items",
+    "{\"v_items\":1}"
+   ],
+   [
+    "Items",
+    "{\"v_items\":2}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateBulkConsents",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   [
+    {
+     "v_items" : 1
+    },
+    {
+     "v_items" : 2
+    }
+   ]
+  ],
+  "url" : "https://accounts.twilio.com/v1/Consents/Bulk"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "items" : {
+      "a_items" : 1
+     }
+    },
+    "fields" : [
+     [
+      "items",
+      "items",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "bulk_contacts",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Items",
+    "{\"v_items\":1}"
+   ],
+   [
+    "Items",
+    "{\"v_items\":2}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateBulkContacts",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   [
+    {
+     "v_items" : 1
+    },
+    {
+     "v_items" : 2
+    }
+   ]
+  ],
+  "url" : "https://accounts.twilio.com/v1/Contacts/Bulk"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "aws",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Credentials",
+    "v_credentials"
+   ],
+   [
+    "AccountSid",
+    "v_account_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCredentialAws",
+  "method" : "create",
+  "options" : {
+   "account_sid" : "v_account_sid",
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [
+   "v_credentials"
+  ],
+  "url" : "https://accounts.twilio.com/v1/Credentials/AWS"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "public_key",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PublicKey",
+    "v_public_key"
+   ],
+   [
+    "AccountSid",
+    "v_account_sid"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCredentialPublicKey",
+  "method" : "create",
+  "options" : {
+   "account_sid" : "v_account_sid",
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [
+   "v_public_key"
+  ],
+  "url" : "https://accounts.twilio.com/v1/Credentials/PublicKeys"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "phone_number" : "a_phone_number",
+     "sid" : "a_sid"
+    },
+    "fields" : [
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "safelist",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PhoneNumber",
+    "v_phone_number"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSafelist",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_phone_number"
+  ],
+  "url" : "https://accounts.twilio.com/v1/SafeList/Numbers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "secondary_auth_token" : "a_secondary_auth_token",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "secondary_auth_token",
+      "secondary_auth_token",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "secondary_auth_token",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SuppressEmailNotification",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSecondaryAuthToken",
+  "method" : "create",
+  "options" : {
+   "suppress_email_notification" : 1
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/AuthTokens/Secondary"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "aws",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCredentialAws",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/AWS/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "public_key",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCredentialPublicKey",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/PublicKeys/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "safelist",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PhoneNumber",
+    "v_phone_number"
+   ]
+  ],
+  "http" : "DELETE",
+  "id" : "DeleteSafelist",
+  "method" : "delete",
+  "options" : {
+   "phone_number" : "v_phone_number"
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/SafeList/Numbers"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "secondary_auth_token",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SuppressEmailNotification",
+    "true"
+   ]
+  ],
+  "http" : "DELETE",
+  "id" : "DeleteSecondaryAuthToken",
+  "method" : "delete",
+  "options" : {
+   "suppress_email_notification" : 1
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/AuthTokens/Secondary"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "aws",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCredentialAws",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/AWS/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "public_key",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCredentialPublicKey",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/PublicKeys/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "permissions" : {
+      "a_permissions" : 1
+     }
+    },
+    "fields" : [
+     [
+      "permissions",
+      "permissions",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "messaging_geopermissions",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "CountryCode",
+    "v_country_code"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchMessagingGeopermissions",
+  "method" : "fetch",
+  "options" : {
+   "country_code" : "v_country_code"
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Messaging/GeoPermissions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "phone_number" : "a_phone_number",
+     "sid" : "a_sid"
+    },
+    "fields" : [
+     [
+      "phone_number",
+      "phone_number",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "safelist",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PhoneNumber",
+    "v_phone_number"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "FetchSafelist",
+  "method" : "fetch",
+  "options" : {
+   "phone_number" : "v_phone_number"
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/SafeList/Numbers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "credentials" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "aws",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListCredentialAws",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "credentials",
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/AWS"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "credentials" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "public_key",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListCredentialPublicKey",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "credentials",
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/PublicKeys"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "auth_token" : "a_auth_token",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "auth_token",
+      "auth_token",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "auth_token_promotion",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "SuppressEmailNotification",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateAuthTokenPromotion",
+  "method" : "update",
+  "options" : {
+   "suppress_email_notification" : 1
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/AuthTokens/Promote"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "aws",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateCredentialAws",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/AWS/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "credentials",
+    0
+   ],
+   [
+    "public_key",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateCredentialPublicKey",
+  "method" : "update",
+  "options" : {
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [],
+  "url" : "https://accounts.twilio.com/v1/Credentials/PublicKeys/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "permissions" : {
+      "a_permissions" : 1
+     }
+    },
+    "fields" : [
+     [
+      "permissions",
+      "permissions",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "accounts",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "messaging_geopermissions",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Permissions",
+    "{\"v_permissions\":1}"
+   ],
+   [
+    "Permissions",
+    "{\"v_permissions\":2}"
+   ]
+  ],
+  "http" : "PATCH",
+  "id" : "UpdateMessagingGeopermissions",
+  "method" : "update",
+  "options" : {},
+  "required" : [
+   [
+    {
+     "v_permissions" : 1
+    },
+    {
+     "v_permissions" : 2
+    }
+   ]
+  ],
+  "url" : "https://accounts.twilio.com/v1/Messaging/GeoPermissions"
+ }
+]

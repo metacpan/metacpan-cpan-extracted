@@ -89,7 +89,7 @@ package JSON::XS;
 
 use common::sense;
 
-our $VERSION = '4.04';
+our $VERSION = '4.05';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_json decode_json);

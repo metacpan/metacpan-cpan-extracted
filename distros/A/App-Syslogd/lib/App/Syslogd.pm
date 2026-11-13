@@ -20,6 +20,9 @@ BEGIN {
 	# reads it when it wraps the subs, at CHECK time.  Needs a per-package mode in
 	# Sub::Private (e.g. "use Sub::Private { mode => 'enforce' }").
 	$Sub::Private::config{mode} = 'enforce';
+	# The text matched here is Perl's own.  If a later Perl words it differently
+	# the warning shows again, which is harmless; t/extended_tests.t checks that
+	# every other warning still gets through.
 	local $SIG{__WARN__} = sub { warn(@_) unless($_[0] =~ /\AToo late to run CHECK block /) };
 	require Sub::Private;
 	require Sub::Protected;
@@ -41,7 +44,7 @@ use Text::CSV;
 use App::Syslogd::Cache;
 use App::Syslogd::I18N;
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 # Every tunable lives here, so it can be overridden from new() and so
 # nothing in the code below is a magic number
@@ -127,7 +130,7 @@ App::Syslogd - A small UDP syslog receiver that writes a CSV file
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.002.1
 
 =head1 SYNOPSIS
 
@@ -540,14 +543,116 @@ Monit's UDP port test is not used: syslog never answers, so a port test
 cannot show that messages are being recorded.  The timestamp check does:
 change C<1 hour> to suit how often your hosts send messages.
 
+=head1 COOKBOOK
+
+=head2 Look at the log with Database::BI
+
+L<Database::BI> is a separate program (install it from CPAN) that shows a
+data file as a table in your web browser.  You can sort, filter and count the
+rows without writing any code.  It reads the file again for every page, so
+it always shows the messages that have arrived so far, and the two programs
+do not need to know about each other.
+
+The log has four columns: C<Host>, C<facility>, C<severity> and C<msg>.
+C<facility> and C<severity> are numbers; see L</What syslog is>.  These
+severity numbers are the ones you will use most:
+
+	0 emergency   1 alert   2 critical   3 error
+	4 warning     5 notice  6 info       7 debug
+
+The examples below use the web addresses that Database::BI shows in its
+browser.  Replace C<syslog> in each address with the name of your log file
+without C<.csv>.  Database::BI names a table after its file, so
+C</var/log/syslog/syslog.csv> is the table C<syslog>, and F<remote.csv>
+would be the table C<remote>.  The file name must be in lower case
+(F<remote.csv>, not F<Remote.csv>), because Database::BI looks the table up
+in lower case.
+
+=head3 Recipe 1: show the log
+
+Create F<database_bi.conf> in the folder that holds Database::BI's
+F<script/> directory.  Point C<data_dir> at the directory that holds the log:
+
+	{ data_dir => '/var/log/syslog' }
+
+Start Database::BI as the same user that runs the syslog server, then open
+C<http://127.0.0.1:3000/view/syslog> in a browser:
+
+	script/database-bi
+
+The same user is needed because the server keeps the log private (mode
+0600): nobody else can read it.  Do not make the log readable by everyone
+to get around this; it holds other machines' messages.  Database::BI
+listens on this machine only until you change its C<listen> setting, and it
+will not listen on other machines unless you also set a password (see its
+manual).  Keep it that way unless you have a reason not to.
+
+=head3 Recipe 2: which machine sends the most messages?
+
+Open this address.  It counts the messages from each host and adds a total:
+
+	http://127.0.0.1:3000/pivot?l=table:syslog&rows=Host&m=msg:count:messages&totals=1
+
+To count by how serious the messages are, use C<rows=severity>.  To see
+hosts and severities together, use C<rows=Host,severity>.
+
+=head3 Recipe 3: show only the serious messages
+
+A filter is written C<f=column:operator:value>.  Severity 3 (error) and
+below are the serious ones, so keep every row whose severity is at most 3:
+
+	http://127.0.0.1:3000/view/syslog?f=severity:le:3
+
+The same filter also works on a pivot, so you can count only the serious
+messages by host:
+
+	http://127.0.0.1:3000/pivot?l=table:syslog&rows=Host&m=msg:count:errors&f=severity:le:3
+
+=head3 Recipe 4: find a word from one machine
+
+Give C<f=> more than once to apply every condition.  This keeps the rows
+from host 192.0.2.1 whose message contains "disk":
+
+	http://127.0.0.1:3000/view/syslog?f=Host:eq:192.0.2.1&f=msg:contains:disk
+
+If the server runs with C<--no-resolve>, C<Host> holds an address, as above.
+Otherwise it holds the host name, so use that name in the filter.
+
+=head3 Recipe 5: summarise every column
+
+This shows one row for each column: how many rows, how many different
+values, and the first and last value.  It is a quick way to see which
+severities occur at all:
+
+	http://127.0.0.1:3000/stats?l=table:syslog
+
+=head3 Recipe 6: log rotation
+
+You do not need to change anything.  The syslog server reopens the log on
+SIGHUP (see L</Log rotation>), and Database::BI reads whatever file has the
+name at the time of each request.  Right after a rotation the new file holds
+only the header line, so the table is empty until a message arrives.
+
+A rotated copy has a different name, such as F<remote.csv.1>, which
+Database::BI does not recognise.  To look at it, make an uncompressed copy
+whose name ends in C<.csv> in a directory that Database::BI reads.
+
+=head3 What this cannot do
+
+The log has no time column: the server does not write the time a message
+arrived, so Database::BI cannot draw a graph over time or limit the rows to
+"the last hour".  Use the order of the rows, which is the order of arrival,
+or add a time stamp at the sender if you need one.
+
 =head1 DEPENDENCIES
 
 Perl 5.14 or later, and these modules: L<autodie> (which needs
-L<IPC::System::Simple>), L<IO::Socket::IP>, L<Locale::Maketext>,
-L<Object::Configure>, L<Params::Get>, L<Params::Validate::Strict>,
-L<Readonly>, L<Socket>,
-L<Sub::Private>, L<Sub::Protected> and L<Text::CSV>.  F<Makefile.PL> lists
-the minimum versions.
+L<IPC::System::Simple>), L<Carp>, L<Config>, L<Fcntl>, L<IO::Handle>,
+L<IO::Socket::IP>, L<Locale::Maketext>, L<Object::Configure>, L<overload>,
+L<parent>, L<Params::Get>, L<Params::Validate::Strict>, L<Readonly>,
+L<Socket>, L<Sub::Private>, L<Sub::Protected> and L<Text::CSV>.  The
+program F<etc/syslogd> also uses L<FindBin> and L<Getopt::Long>.  Most of
+these come with Perl.  F<Makefile.PL> lists the minimum versions.
 
 =head1 FILES
 
@@ -1191,7 +1296,16 @@ Usage:
 	|   ERROR                       |   file.  ERROR is the system's |   its permissions.  Remove a  |
 	|                               |   reason.  A symbolic link, a  |   symbolic link or FIFO; give |
 	|                               |   directory or a FIFO (named   |   a file name, not a          |
-	|                               |   pipe) also gives this        |   directory                   |
+	|                               |   pipe) also gives this        |   directory.  Give a regular  |
+	|                               |   message.  So does a device   |   file for a device           |
+	|                               |   file such as /dev/urandom    |                               |
+	|                               |   when the system will not     |                               |
+	|                               |   open it for writing (an      |                               |
+	|                               |   ordinary user may not; on    |                               |
+	|                               |   FreeBSD it is a symbolic     |                               |
+	|                               |   link).  Otherwise a device   |                               |
+	|                               |   gets the "Refusing" message  |                               |
+	|                               |   below                        |                               |
 	| Refusing to log to F: it must | F is a hard link or another    | Remove F and let the server   |
 	|   be a regular file, owned by |   user's file                  |   create it again             |
 	|   this user, with exactly one |                                |                               |
@@ -1604,6 +1718,8 @@ sub run
 			if(!$socket_was_open && (my $socket = delete $self->{socket})) {
 				eval { $socket->close() };	# the open error matters more
 			}
+			# A rethrow of the error already caught, so die, not croak: croak
+			# would add this line's location and hide where it really failed
 			die $error;
 		};
 	}
@@ -1873,6 +1989,7 @@ sub _open_log
 		eval { $self->_write_header($fh); 1 } or do {
 			my $error = $@;
 			_discard($fh);
+			# A rethrow of the error already caught, so die, not croak
 			die $error;
 		};
 	}
@@ -2013,6 +2130,7 @@ sub _shutdown
 	my $ok = eval { $socket->close() if($socket); 1 };
 	my $error = $@;
 	$self->_close_log();
+	# A rethrow of the error already caught, so die, not croak
 	die $error unless($ok);
 
 	return $self;

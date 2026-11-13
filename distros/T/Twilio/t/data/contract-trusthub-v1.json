@@ -1,0 +1,5542 @@
+[
+ {
+  "answers" : [
+   {
+    "body" : {
+     "id" : "a_id",
+     "sessionId" : "a_sessionId",
+     "sessionToken" : "a_sessionToken"
+    },
+    "fields" : [
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "session_id",
+      "sessionId",
+      "plain"
+     ],
+     [
+      "session_token",
+      "sessionToken",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "authorizedContactMobilePhoneNumberE164" : "v_authorizedContactMobilePhoneNumberE164",
+   "authorizedContactVerificationEmail" : "v_authorizedContactVerificationEmail",
+   "brandExternalVettingToken" : "v_brandExternalVettingToken",
+   "brandType" : "SOLE_PROPRIETOR",
+   "businessCity" : "v_businessCity",
+   "businessContactEmail" : "v_businessContactEmail",
+   "businessContactFirstName" : "v_businessContactFirstName",
+   "businessContactLastName" : "v_businessContactLastName",
+   "businessContactPhone" : "v_businessContactPhone",
+   "businessCountry" : "v_businessCountry",
+   "businessIndustry" : "v_businessIndustry",
+   "businessName" : "v_businessName",
+   "businessPostalCode" : "v_businessPostalCode",
+   "businessRegistrationAuthority" : "v_businessRegistrationAuthority",
+   "businessRegistrationNumber" : "v_businessRegistrationNumber",
+   "businessStateProvinceRegion" : "v_businessStateProvinceRegion",
+   "businessStockExchange" : "v_businessStockExchange",
+   "businessStockSymbol" : "v_businessStockSymbol",
+   "businessStreetAddress" : "v_businessStreetAddress",
+   "businessStreetAddress2" : "v_businessStreetAddress2",
+   "businessTaxExemptStatus" : "v_businessTaxExemptStatus",
+   "businessType" : "v_businessType",
+   "businessWebsite" : "v_businessWebsite",
+   "friendlyName" : "v_friendlyName",
+   "isTest" : 1,
+   "notificationEmail" : "v_notificationEmail",
+   "skipAutomaticSecVet" : 1,
+   "themeSetId" : "v_themeSetId"
+  },
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "a2p_brand_registrations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateA2pBrandRegistration",
+  "json" : {
+   "authorizedContactMobilePhoneNumberE164" : "v_authorizedContactMobilePhoneNumberE164",
+   "authorizedContactVerificationEmail" : "v_authorizedContactVerificationEmail",
+   "brandExternalVettingToken" : "v_brandExternalVettingToken",
+   "brandType" : "SOLE_PROPRIETOR",
+   "businessCity" : "v_businessCity",
+   "businessContactEmail" : "v_businessContactEmail",
+   "businessContactFirstName" : "v_businessContactFirstName",
+   "businessContactLastName" : "v_businessContactLastName",
+   "businessContactPhone" : "v_businessContactPhone",
+   "businessCountry" : "v_businessCountry",
+   "businessIndustry" : "v_businessIndustry",
+   "businessName" : "v_businessName",
+   "businessPostalCode" : "v_businessPostalCode",
+   "businessRegistrationAuthority" : "v_businessRegistrationAuthority",
+   "businessRegistrationNumber" : "v_businessRegistrationNumber",
+   "businessStateProvinceRegion" : "v_businessStateProvinceRegion",
+   "businessStockExchange" : "v_businessStockExchange",
+   "businessStockSymbol" : "v_businessStockSymbol",
+   "businessStreetAddress" : "v_businessStreetAddress",
+   "businessStreetAddress2" : "v_businessStreetAddress2",
+   "businessTaxExemptStatus" : "v_businessTaxExemptStatus",
+   "businessType" : "v_businessType",
+   "businessWebsite" : "v_businessWebsite",
+   "friendlyName" : "v_friendlyName",
+   "isTest" : true,
+   "notificationEmail" : "v_notificationEmail",
+   "skipAutomaticSecVet" : true,
+   "themeSetId" : "v_themeSetId"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/A2PBrandRegistrations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "id" : "a_id",
+     "sessionId" : "a_sessionId",
+     "sessionToken" : "a_sessionToken"
+    },
+    "fields" : [
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "session_id",
+      "sessionId",
+      "plain"
+     ],
+     [
+      "session_token",
+      "sessionToken",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "a2p_brand_registration_embedded_sessions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateA2pBrandRegistrationEmbeddedSession",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/A2PBrandRegistrations/id1/EmbeddedSessions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "id" : "a_id",
+     "sessionId" : "a_sessionId",
+     "sessionToken" : "a_sessionToken"
+    },
+    "fields" : [
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "session_id",
+      "sessionId",
+      "plain"
+     ],
+     [
+      "session_token",
+      "sessionToken",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "body" : {
+   "a2pBrandRegistrationSid" : "v_a2pBrandRegistrationSid",
+   "ageGated" : 1,
+   "directLending" : 1,
+   "embeddedUrlSample" : "v_embeddedUrlSample",
+   "hasEmbeddedLinks" : 1,
+   "hasEmbeddedPhone" : 1,
+   "helpKeywords" : [
+    "v_helpKeywords"
+   ],
+   "helpMessageSample" : "v_helpMessageSample",
+   "messagingServiceSid" : "v_messagingServiceSid",
+   "optInKeywords" : [
+    "v_optInKeywords"
+   ],
+   "optInMessageSample" : "v_optInMessageSample",
+   "optOutKeywords" : [
+    "v_optOutKeywords"
+   ],
+   "optOutMessageSample" : "v_optOutMessageSample",
+   "privacyPolicyUrl" : "v_privacyPolicyUrl",
+   "termsAndConditionsUrl" : "v_termsAndConditionsUrl",
+   "themeSetId" : "v_themeSetId",
+   "useCaseCategories" : [
+    "v_useCaseCategories"
+   ],
+   "useCaseDescription" : "v_useCaseDescription",
+   "useCaseOptInDescription" : "v_useCaseOptInDescription",
+   "useCaseOptInTypes" : [
+    "v_useCaseOptInTypes"
+   ],
+   "useCaseSampleMessage1" : "v_useCaseSampleMessage1",
+   "useCaseSampleMessage2" : "v_useCaseSampleMessage2",
+   "useCaseSampleMessage3" : "v_useCaseSampleMessage3",
+   "useCaseSampleMessage4" : "v_useCaseSampleMessage4",
+   "useCaseSampleMessage5" : "v_useCaseSampleMessage5"
+  },
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "a2p_campaign_registrations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "headers" : {
+   "Content-Type" : "application/json"
+  },
+  "http" : "POST",
+  "id" : "CreateA2pCampaignRegistration",
+  "json" : {
+   "a2pBrandRegistrationSid" : "v_a2pBrandRegistrationSid",
+   "ageGated" : true,
+   "directLending" : true,
+   "embeddedUrlSample" : "v_embeddedUrlSample",
+   "hasEmbeddedLinks" : true,
+   "hasEmbeddedPhone" : true,
+   "helpKeywords" : [
+    "v_helpKeywords"
+   ],
+   "helpMessageSample" : "v_helpMessageSample",
+   "messagingServiceSid" : "v_messagingServiceSid",
+   "optInKeywords" : [
+    "v_optInKeywords"
+   ],
+   "optInMessageSample" : "v_optInMessageSample",
+   "optOutKeywords" : [
+    "v_optOutKeywords"
+   ],
+   "optOutMessageSample" : "v_optOutMessageSample",
+   "privacyPolicyUrl" : "v_privacyPolicyUrl",
+   "termsAndConditionsUrl" : "v_termsAndConditionsUrl",
+   "themeSetId" : "v_themeSetId",
+   "useCaseCategories" : [
+    "v_useCaseCategories"
+   ],
+   "useCaseDescription" : "v_useCaseDescription",
+   "useCaseOptInDescription" : "v_useCaseOptInDescription",
+   "useCaseOptInTypes" : [
+    "v_useCaseOptInTypes"
+   ],
+   "useCaseSampleMessage1" : "v_useCaseSampleMessage1",
+   "useCaseSampleMessage2" : "v_useCaseSampleMessage2",
+   "useCaseSampleMessage3" : "v_useCaseSampleMessage3",
+   "useCaseSampleMessage4" : "v_useCaseSampleMessage4",
+   "useCaseSampleMessage5" : "v_useCaseSampleMessage5"
+  },
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/A2PCampaignRegistrations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "id" : "a_id",
+     "sessionId" : "a_sessionId",
+     "sessionToken" : "a_sessionToken"
+    },
+    "fields" : [
+     [
+      "id",
+      "id",
+      "plain"
+     ],
+     [
+      "session_id",
+      "sessionId",
+      "plain"
+     ],
+     [
+      "session_token",
+      "sessionToken",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "a2p_campaign_registration_embedded_sessions",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateA2pCampaignRegistrationEmbeddedSession",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/A2PCampaignRegistrations/id1/EmbeddedSessions"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "customer_id" : "a_customer_id",
+     "inquiry_id" : "a_inquiry_id",
+     "inquiry_session_token" : "a_inquiry_session_token",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "customer_id",
+      "customer_id",
+      "plain"
+     ],
+     [
+      "inquiry_id",
+      "inquiry_id",
+      "plain"
+     ],
+     [
+      "inquiry_session_token",
+      "inquiry_session_token",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "compliance_inquiries",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "NotificationEmail",
+    "v_notification_email"
+   ],
+   [
+    "PrimaryProfileSid",
+    "v_primary_profile_sid"
+   ],
+   [
+    "ThemeSetId",
+    "v_theme_set_id"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateComplianceInquiry",
+  "method" : "create",
+  "options" : {
+   "notification_email" : "v_notification_email",
+   "primary_profile_sid" : "v_primary_profile_sid",
+   "theme_set_id" : "v_theme_set_id"
+  },
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/ComplianceInquiries/Customers/Initialize"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "inquiry_id" : "a_inquiry_id",
+     "inquiry_session_token" : "a_inquiry_session_token",
+     "registration_id" : "a_registration_id",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "inquiry_id",
+      "inquiry_id",
+      "plain"
+     ],
+     [
+      "inquiry_session_token",
+      "inquiry_session_token",
+      "plain"
+     ],
+     [
+      "registration_id",
+      "registration_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "compliance_registration_inquiries",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "EndUserType",
+    "Individual"
+   ],
+   [
+    "PhoneNumberType",
+    "national"
+   ],
+   [
+    "AcceptedNotificationReceipt",
+    "true"
+   ],
+   [
+    "AddressCity",
+    "v_address_city"
+   ],
+   [
+    "AddressCountryCode",
+    "v_address_country_code"
+   ],
+   [
+    "AddressPostalCode",
+    "v_address_postal_code"
+   ],
+   [
+    "AddressStreet",
+    "v_address_street"
+   ],
+   [
+    "AddressStreetSecondary",
+    "v_address_street_secondary"
+   ],
+   [
+    "AddressSubdivision",
+    "v_address_subdivision"
+   ],
+   [
+    "AuthorizedRepresentative1DateOfBirth",
+    "v_authorized_representative1_date_of_birth"
+   ],
+   [
+    "AuthorizedRepresentative1Email",
+    "v_authorized_representative1_email"
+   ],
+   [
+    "AuthorizedRepresentative1FirstName",
+    "v_authorized_representative1_first_name"
+   ],
+   [
+    "AuthorizedRepresentative1LastName",
+    "v_authorized_representative1_last_name"
+   ],
+   [
+    "AuthorizedRepresentative1Phone",
+    "v_authorized_representative1_phone"
+   ],
+   [
+    "BusinessIdentityType",
+    "isv_reseller_or_partner"
+   ],
+   [
+    "BusinessLegalName",
+    "v_business_legal_name"
+   ],
+   [
+    "BusinessRegistrationAuthority",
+    "AU:ACN"
+   ],
+   [
+    "BusinessRegistrationNumber",
+    "v_business_registration_number"
+   ],
+   [
+    "BusinessWebsiteUrl",
+    "v_business_website_url"
+   ],
+   [
+    "DateOfBirth",
+    "v_date_of_birth"
+   ],
+   [
+    "EmergencyAddressCity",
+    "v_emergency_address_city"
+   ],
+   [
+    "EmergencyAddressCountryCode",
+    "v_emergency_address_country_code"
+   ],
+   [
+    "EmergencyAddressPostalCode",
+    "v_emergency_address_postal_code"
+   ],
+   [
+    "EmergencyAddressStreet",
+    "v_emergency_address_street"
+   ],
+   [
+    "EmergencyAddressStreetSecondary",
+    "v_emergency_address_street_secondary"
+   ],
+   [
+    "EmergencyAddressSubdivision",
+    "v_emergency_address_subdivision"
+   ],
+   [
+    "File",
+    "v_file"
+   ],
+   [
+    "FileName",
+    "v_file_name"
+   ],
+   [
+    "FirstName",
+    "v_first_name"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "IndividualEmail",
+    "v_individual_email"
+   ],
+   [
+    "IndividualPhone",
+    "v_individual_phone"
+   ],
+   [
+    "IsIsvEmbed",
+    "true"
+   ],
+   [
+    "IsvRegisteringForSelfOrTenant",
+    "v_isv_registering_for_self_or_tenant"
+   ],
+   [
+    "LastName",
+    "v_last_name"
+   ],
+   [
+    "NotificationEmail",
+    "v_notification_email"
+   ],
+   [
+    "StatusCallbackUrl",
+    "v_status_callback_url"
+   ],
+   [
+    "ThemeSetId",
+    "v_theme_set_id"
+   ],
+   [
+    "UseAddressAsEmergencyAddress",
+    "true"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateComplianceRegistration",
+  "method" : "create",
+  "options" : {
+   "accepted_notification_receipt" : 1,
+   "address_city" : "v_address_city",
+   "address_country_code" : "v_address_country_code",
+   "address_postal_code" : "v_address_postal_code",
+   "address_street" : "v_address_street",
+   "address_street_secondary" : "v_address_street_secondary",
+   "address_subdivision" : "v_address_subdivision",
+   "authorized_representative1_date_of_birth" : "v_authorized_representative1_date_of_birth",
+   "authorized_representative1_email" : "v_authorized_representative1_email",
+   "authorized_representative1_first_name" : "v_authorized_representative1_first_name",
+   "authorized_representative1_last_name" : "v_authorized_representative1_last_name",
+   "authorized_representative1_phone" : "v_authorized_representative1_phone",
+   "business_identity_type" : "isv_reseller_or_partner",
+   "business_legal_name" : "v_business_legal_name",
+   "business_registration_authority" : "AU:ACN",
+   "business_registration_number" : "v_business_registration_number",
+   "business_website_url" : "v_business_website_url",
+   "date_of_birth" : "v_date_of_birth",
+   "emergency_address_city" : "v_emergency_address_city",
+   "emergency_address_country_code" : "v_emergency_address_country_code",
+   "emergency_address_postal_code" : "v_emergency_address_postal_code",
+   "emergency_address_street" : "v_emergency_address_street",
+   "emergency_address_street_secondary" : "v_emergency_address_street_secondary",
+   "emergency_address_subdivision" : "v_emergency_address_subdivision",
+   "file" : "v_file",
+   "file_name" : "v_file_name",
+   "first_name" : "v_first_name",
+   "friendly_name" : "v_friendly_name",
+   "individual_email" : "v_individual_email",
+   "individual_phone" : "v_individual_phone",
+   "is_isv_embed" : 1,
+   "isv_registering_for_self_or_tenant" : "v_isv_registering_for_self_or_tenant",
+   "last_name" : "v_last_name",
+   "notification_email" : "v_notification_email",
+   "status_callback_url" : "v_status_callback_url",
+   "theme_set_id" : "v_theme_set_id",
+   "use_address_as_emergency_address" : 1
+  },
+  "required" : [
+   "Individual",
+   "national"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/ComplianceInquiries/Registration/RegulatoryCompliance/GB/Initialize"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "inquiry_id" : "a_inquiry_id",
+     "inquiry_session_token" : "a_inquiry_session_token",
+     "registration_id" : "a_registration_id",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "inquiry_id",
+      "inquiry_id",
+      "plain"
+     ],
+     [
+      "inquiry_session_token",
+      "inquiry_session_token",
+      "plain"
+     ],
+     [
+      "registration_id",
+      "registration_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "compliance_tollfree_inquiries",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "TollfreePhoneNumber",
+    "v_tollfree_phone_number"
+   ],
+   [
+    "NotificationEmail",
+    "v_notification_email"
+   ],
+   [
+    "AdditionalInformation",
+    "v_additional_information"
+   ],
+   [
+    "AgeGatedContent",
+    "true"
+   ],
+   [
+    "BusinessCity",
+    "v_business_city"
+   ],
+   [
+    "BusinessContactEmail",
+    "v_business_contact_email"
+   ],
+   [
+    "BusinessContactFirstName",
+    "v_business_contact_first_name"
+   ],
+   [
+    "BusinessContactLastName",
+    "v_business_contact_last_name"
+   ],
+   [
+    "BusinessContactPhone",
+    "v_business_contact_phone"
+   ],
+   [
+    "BusinessCountry",
+    "v_business_country"
+   ],
+   [
+    "BusinessName",
+    "v_business_name"
+   ],
+   [
+    "BusinessPostalCode",
+    "v_business_postal_code"
+   ],
+   [
+    "BusinessRegistrationAuthority",
+    "v_business_registration_authority"
+   ],
+   [
+    "BusinessRegistrationCountry",
+    "v_business_registration_country"
+   ],
+   [
+    "BusinessRegistrationNumber",
+    "v_business_registration_number"
+   ],
+   [
+    "BusinessStateProvinceRegion",
+    "v_business_state_province_region"
+   ],
+   [
+    "BusinessStreetAddress",
+    "v_business_street_address"
+   ],
+   [
+    "BusinessStreetAddress2",
+    "v_business_street_address2"
+   ],
+   [
+    "BusinessType",
+    "NON_PROFIT"
+   ],
+   [
+    "BusinessWebsite",
+    "v_business_website"
+   ],
+   [
+    "CustomerProfileSid",
+    "v_customer_profile_sid"
+   ],
+   [
+    "DoingBusinessAs",
+    "v_doing_business_as"
+   ],
+   [
+    "ExternalReferenceId",
+    "v_external_reference_id"
+   ],
+   [
+    "HelpMessageSample",
+    "v_help_message_sample"
+   ],
+   [
+    "MessageVolume",
+    "v_message_volume"
+   ],
+   [
+    "OptInConfirmationMessage",
+    "v_opt_in_confirmation_message"
+   ],
+   [
+    "OptInImageUrls",
+    "v_opt_in_image_urls_1"
+   ],
+   [
+    "OptInImageUrls",
+    "v_opt_in_image_urls_2"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_1"
+   ],
+   [
+    "OptInKeywords",
+    "v_opt_in_keywords_2"
+   ],
+   [
+    "OptInType",
+    "VIA_TEXT"
+   ],
+   [
+    "PrivacyPolicyUrl",
+    "v_privacy_policy_url"
+   ],
+   [
+    "ProductionMessageSample",
+    "v_production_message_sample"
+   ],
+   [
+    "SkipMessagingUseCase",
+    "true"
+   ],
+   [
+    "TermsAndConditionsUrl",
+    "v_terms_and_conditions_url"
+   ],
+   [
+    "ThemeSetId",
+    "v_theme_set_id"
+   ],
+   [
+    "UseCaseCategories",
+    "v_use_case_categories_1"
+   ],
+   [
+    "UseCaseCategories",
+    "v_use_case_categories_2"
+   ],
+   [
+    "UseCaseSummary",
+    "v_use_case_summary"
+   ],
+   [
+    "VettingId",
+    "v_vetting_id"
+   ],
+   [
+    "VettingProvider",
+    "v_vetting_provider"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateComplianceTollfreeInquiry",
+  "method" : "create",
+  "options" : {
+   "additional_information" : "v_additional_information",
+   "age_gated_content" : 1,
+   "business_city" : "v_business_city",
+   "business_contact_email" : "v_business_contact_email",
+   "business_contact_first_name" : "v_business_contact_first_name",
+   "business_contact_last_name" : "v_business_contact_last_name",
+   "business_contact_phone" : "v_business_contact_phone",
+   "business_country" : "v_business_country",
+   "business_name" : "v_business_name",
+   "business_postal_code" : "v_business_postal_code",
+   "business_registration_authority" : "v_business_registration_authority",
+   "business_registration_country" : "v_business_registration_country",
+   "business_registration_number" : "v_business_registration_number",
+   "business_state_province_region" : "v_business_state_province_region",
+   "business_street_address" : "v_business_street_address",
+   "business_street_address2" : "v_business_street_address2",
+   "business_type" : "NON_PROFIT",
+   "business_website" : "v_business_website",
+   "customer_profile_sid" : "v_customer_profile_sid",
+   "doing_business_as" : "v_doing_business_as",
+   "external_reference_id" : "v_external_reference_id",
+   "help_message_sample" : "v_help_message_sample",
+   "message_volume" : "v_message_volume",
+   "opt_in_confirmation_message" : "v_opt_in_confirmation_message",
+   "opt_in_image_urls" : [
+    "v_opt_in_image_urls_1",
+    "v_opt_in_image_urls_2"
+   ],
+   "opt_in_keywords" : [
+    "v_opt_in_keywords_1",
+    "v_opt_in_keywords_2"
+   ],
+   "opt_in_type" : "VIA_TEXT",
+   "privacy_policy_url" : "v_privacy_policy_url",
+   "production_message_sample" : "v_production_message_sample",
+   "skip_messaging_use_case" : 1,
+   "terms_and_conditions_url" : "v_terms_and_conditions_url",
+   "theme_set_id" : "v_theme_set_id",
+   "use_case_categories" : [
+    "v_use_case_categories_1",
+    "v_use_case_categories_2"
+   ],
+   "use_case_summary" : "v_use_case_summary",
+   "vetting_id" : "v_vetting_id",
+   "vetting_provider" : "v_vetting_provider"
+  },
+  "required" : [
+   "v_tollfree_phone_number",
+   "v_notification_email"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/ComplianceInquiries/Tollfree/Initialize"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "errors" : [
+      "a_errors"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "policy_sid" : "a_policy_sid",
+     "sid" : "a_sid",
+     "status" : "pending-review",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Email",
+    "v_email"
+   ],
+   [
+    "PolicySid",
+    "v_policy_sid"
+   ],
+   [
+    "StatusCallback",
+    "v_status_callback"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCustomerProfile",
+  "method" : "create",
+  "options" : {
+   "status_callback" : "v_status_callback"
+  },
+  "required" : [
+   "v_friendly_name",
+   "v_email",
+   "v_policy_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_endpoint_sid" : "a_channel_endpoint_sid",
+     "channel_endpoint_type" : "a_channel_endpoint_type",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_sid",
+      "channel_endpoint_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_type",
+      "channel_endpoint_type",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_channel_endpoint_assignment",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ChannelEndpointType",
+    "v_channel_endpoint_type"
+   ],
+   [
+    "ChannelEndpointSid",
+    "v_channel_endpoint_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCustomerProfileChannelEndpointAssignment",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_channel_endpoint_type",
+   "v_channel_endpoint_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/ChannelEndpointAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "object_sid" : "a_object_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "object_sid",
+      "object_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_entity_assignments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ObjectSid",
+    "v_object_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCustomerProfileEntityAssignment",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_object_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/EntityAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "policy_sid" : "a_policy_sid",
+     "results" : [
+      "a_results"
+     ],
+     "sid" : "a_sid",
+     "status" : "compliant",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_evaluations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PolicySid",
+    "v_policy_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateCustomerProfileEvaluation",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_policy_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/Evaluations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "friendly_name" : "a_friendly_name",
+     "policy_sid" : "a_policy_sid",
+     "status" : "a_status",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles_provisional_copy",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateCustomerProfileProvisionalCopy",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/ProvisionalCopy"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_users",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Type",
+    "v_type"
+   ],
+   [
+    "Attributes",
+    "{\"v_attributes\":28}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateEndUser",
+  "method" : "create",
+  "options" : {
+   "attributes" : {
+    "v_attributes" : 28
+   }
+  },
+  "required" : [
+   "v_friendly_name",
+   "v_type"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/EndUsers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "mime_type" : "a_mime_type",
+     "sid" : "a_sid",
+     "status" : "EXPIRED",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "mime_type",
+      "mime_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_documents",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Type",
+    "v_type"
+   ],
+   [
+    "Attributes",
+    "{\"v_attributes\":28}"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateSupportingDocument",
+  "method" : "create",
+  "options" : {
+   "attributes" : {
+    "v_attributes" : 28
+   }
+  },
+  "required" : [
+   "v_friendly_name",
+   "v_type"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocuments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "errors" : [
+      "a_errors"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "policy_sid" : "a_policy_sid",
+     "sid" : "a_sid",
+     "status" : "pending-review",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Email",
+    "v_email"
+   ],
+   [
+    "PolicySid",
+    "v_policy_sid"
+   ],
+   [
+    "StatusCallback",
+    "v_status_callback"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTrustProduct",
+  "method" : "create",
+  "options" : {
+   "status_callback" : "v_status_callback"
+  },
+  "required" : [
+   "v_friendly_name",
+   "v_email",
+   "v_policy_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_endpoint_sid" : "a_channel_endpoint_sid",
+     "channel_endpoint_type" : "a_channel_endpoint_type",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "sid" : "a_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_sid",
+      "channel_endpoint_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_type",
+      "channel_endpoint_type",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_channel_endpoint_assignment",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ChannelEndpointType",
+    "v_channel_endpoint_type"
+   ],
+   [
+    "ChannelEndpointSid",
+    "v_channel_endpoint_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTrustProductChannelEndpointAssignment",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_channel_endpoint_type",
+   "v_channel_endpoint_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/ChannelEndpointAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "object_sid" : "a_object_sid",
+     "sid" : "a_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "object_sid",
+      "object_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_entity_assignments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ObjectSid",
+    "v_object_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTrustProductEntityAssignment",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_object_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/EntityAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "policy_sid" : "a_policy_sid",
+     "results" : [
+      "a_results"
+     ],
+     "sid" : "a_sid",
+     "status" : "compliant",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_evaluations",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "PolicySid",
+    "v_policy_sid"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "CreateTrustProductEvaluation",
+  "method" : "create",
+  "options" : {},
+  "required" : [
+   "v_policy_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/Evaluations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "friendly_name" : "a_friendly_name",
+     "policy_sid" : "a_policy_sid",
+     "status" : "a_status",
+     "status_callback" : "a_status_callback",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 201
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products_provisional_copy",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "POST",
+  "id" : "CreateTrustProductProvisionalCopy",
+  "method" : "create",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/ProvisionalCopy"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCustomerProfile",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_channel_endpoint_assignment",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCustomerProfileChannelEndpointAssignment",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/ChannelEndpointAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_entity_assignments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteCustomerProfileEntityAssignment",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/EntityAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_users",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteEndUser",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/EndUsers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_documents",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteSupportingDocument",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocuments/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteTrustProduct",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_channel_endpoint_assignment",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteTrustProductChannelEndpointAssignment",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/ChannelEndpointAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "status" : 204
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_entity_assignments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "DELETE",
+  "id" : "DeleteTrustProductEntityAssignment",
+  "method" : "delete",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/EntityAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "errors" : [
+      "a_errors"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "policy_sid" : "a_policy_sid",
+     "sid" : "a_sid",
+     "status" : "pending-review",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCustomerProfile",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_endpoint_sid" : "a_channel_endpoint_sid",
+     "channel_endpoint_type" : "a_channel_endpoint_type",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_sid",
+      "channel_endpoint_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_type",
+      "channel_endpoint_type",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_channel_endpoint_assignment",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCustomerProfileChannelEndpointAssignment",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/ChannelEndpointAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "object_sid" : "a_object_sid",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "object_sid",
+      "object_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_entity_assignments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCustomerProfileEntityAssignment",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/EntityAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "policy_sid" : "a_policy_sid",
+     "results" : [
+      "a_results"
+     ],
+     "sid" : "a_sid",
+     "status" : "compliant",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_evaluations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCustomerProfileEvaluation",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/Evaluations/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "customer_profile_sid" : "a_customer_profile_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "friendly_name" : "a_friendly_name",
+     "policy_sid" : "a_policy_sid",
+     "status" : "a_status",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles_provisional_copy",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchCustomerProfileProvisionalCopy",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/ProvisionalCopy"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_users",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchEndUser",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/EndUsers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "fields" : [
+      "a_fields"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "machine_name" : "a_machine_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "fields",
+      "fields",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "machine_name",
+      "machine_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_user_types",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchEndUserType",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/EndUserTypes/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "friendly_name" : "a_friendly_name",
+     "requirements" : {
+      "a_requirements" : 1
+     },
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "requirements",
+      "requirements",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "policies",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchPolicies",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/Policies/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "mime_type" : "a_mime_type",
+     "sid" : "a_sid",
+     "status" : "EXPIRED",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "mime_type",
+      "mime_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_documents",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSupportingDocument",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocuments/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "fields" : [
+      "a_fields"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "machine_name" : "a_machine_name",
+     "sid" : "a_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "fields",
+      "fields",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "machine_name",
+      "machine_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_document_types",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchSupportingDocumentType",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocumentTypes/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "errors" : [
+      "a_errors"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "policy_sid" : "a_policy_sid",
+     "sid" : "a_sid",
+     "status" : "pending-review",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrustProduct",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "channel_endpoint_sid" : "a_channel_endpoint_sid",
+     "channel_endpoint_type" : "a_channel_endpoint_type",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "sid" : "a_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_sid",
+      "channel_endpoint_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_type",
+      "channel_endpoint_type",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_channel_endpoint_assignment",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrustProductChannelEndpointAssignment",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/ChannelEndpointAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "object_sid" : "a_object_sid",
+     "sid" : "a_sid",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "object_sid",
+      "object_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_entity_assignments",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrustProductEntityAssignment",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/EntityAssignments/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "policy_sid" : "a_policy_sid",
+     "results" : [
+      "a_results"
+     ],
+     "sid" : "a_sid",
+     "status" : "compliant",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_evaluations",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrustProductEvaluation",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/Evaluations/id2"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "friendly_name" : "a_friendly_name",
+     "policy_sid" : "a_policy_sid",
+     "status" : "a_status",
+     "status_callback" : "a_status_callback",
+     "trust_product_sid" : "a_trust_product_sid",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products_provisional_copy",
+    1
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "FetchTrustProductProvisionalCopy",
+  "method" : "fetch",
+  "options" : {},
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/ProvisionalCopy"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "email" : "a_email",
+       "errors" : [
+        "a_errors"
+       ],
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "policy_sid" : "a_policy_sid",
+       "sid" : "a_sid",
+       "status" : "pending-review",
+       "status_callback" : "a_status_callback",
+       "url" : "a_url",
+       "valid_until" : "2026-01-04T03:04:05Z"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Status",
+    "twilio-approved"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "PolicySid",
+    "v_policy_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListCustomerProfile",
+  "method" : "page",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "policy_sid" : "v_policy_sid",
+   "status" : "twilio-approved"
+  },
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel_endpoint_sid" : "a_channel_endpoint_sid",
+       "channel_endpoint_type" : "a_channel_endpoint_type",
+       "customer_profile_sid" : "a_customer_profile_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_sid",
+      "channel_endpoint_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_type",
+      "channel_endpoint_type",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_channel_endpoint_assignment",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ChannelEndpointSid",
+    "v_channel_endpoint_sid"
+   ],
+   [
+    "ChannelEndpointSids",
+    "v_channel_endpoint_sids"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListCustomerProfileChannelEndpointAssignment",
+  "method" : "page",
+  "options" : {
+   "channel_endpoint_sid" : "v_channel_endpoint_sid",
+   "channel_endpoint_sids" : "v_channel_endpoint_sids"
+  },
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/ChannelEndpointAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "customer_profile_sid" : "a_customer_profile_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "object_sid" : "a_object_sid",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "object_sid",
+      "object_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_entity_assignments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ObjectType",
+    "v_object_type"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListCustomerProfileEntityAssignment",
+  "method" : "page",
+  "options" : {
+   "object_type" : "v_object_type"
+  },
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/EntityAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "customer_profile_sid" : "a_customer_profile_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "policy_sid" : "a_policy_sid",
+       "results" : [
+        "a_results"
+       ],
+       "sid" : "a_sid",
+       "status" : "compliant",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "customer_profile_sid",
+      "customer_profile_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ],
+   [
+    "customer_profiles_evaluations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListCustomerProfileEvaluation",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1/Evaluations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "attributes" : {
+        "a_attributes" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "sid" : "a_sid",
+       "type" : "a_type",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_users",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListEndUser",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/EndUsers"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "end_user_types" : [
+      {
+       "fields" : [
+        "a_fields"
+       ],
+       "friendly_name" : "a_friendly_name",
+       "machine_name" : "a_machine_name",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ],
+     "meta" : {}
+    },
+    "fields" : [
+     [
+      "fields",
+      "fields",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "machine_name",
+      "machine_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_user_types",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListEndUserType",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "end_user_types",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/EndUserTypes"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "friendly_name" : "a_friendly_name",
+       "requirements" : {
+        "a_requirements" : 1
+       },
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "requirements",
+      "requirements",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "policies",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListPolicies",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/Policies"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "attributes" : {
+        "a_attributes" : 1
+       },
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "friendly_name" : "a_friendly_name",
+       "mime_type" : "a_mime_type",
+       "sid" : "a_sid",
+       "status" : "EXPIRED",
+       "type" : "a_type",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "mime_type",
+      "mime_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_documents",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListSupportingDocument",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocuments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "supporting_document_types" : [
+      {
+       "fields" : [
+        "a_fields"
+       ],
+       "friendly_name" : "a_friendly_name",
+       "machine_name" : "a_machine_name",
+       "sid" : "a_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "fields",
+      "fields",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "machine_name",
+      "machine_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_document_types",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListSupportingDocumentType",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "supporting_document_types",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocumentTypes"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "date_updated" : "2026-01-21T03:04:05Z",
+       "email" : "a_email",
+       "errors" : [
+        "a_errors"
+       ],
+       "friendly_name" : "a_friendly_name",
+       "links" : {
+        "a_links" : 1
+       },
+       "policy_sid" : "a_policy_sid",
+       "sid" : "a_sid",
+       "status" : "pending-review",
+       "status_callback" : "a_status_callback",
+       "url" : "a_url",
+       "valid_until" : "2026-01-04T03:04:05Z"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "Status",
+    "twilio-approved"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "PolicySid",
+    "v_policy_sid"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListTrustProduct",
+  "method" : "page",
+  "options" : {
+   "friendly_name" : "v_friendly_name",
+   "policy_sid" : "v_policy_sid",
+   "status" : "twilio-approved"
+  },
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "channel_endpoint_sid" : "a_channel_endpoint_sid",
+       "channel_endpoint_type" : "a_channel_endpoint_type",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "sid" : "a_sid",
+       "trust_product_sid" : "a_trust_product_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_sid",
+      "channel_endpoint_sid",
+      "plain"
+     ],
+     [
+      "channel_endpoint_type",
+      "channel_endpoint_type",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_channel_endpoint_assignment",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ChannelEndpointSid",
+    "v_channel_endpoint_sid"
+   ],
+   [
+    "ChannelEndpointSids",
+    "v_channel_endpoint_sids"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListTrustProductChannelEndpointAssignment",
+  "method" : "page",
+  "options" : {
+   "channel_endpoint_sid" : "v_channel_endpoint_sid",
+   "channel_endpoint_sids" : "v_channel_endpoint_sids"
+  },
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/ChannelEndpointAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "object_sid" : "a_object_sid",
+       "sid" : "a_sid",
+       "trust_product_sid" : "a_trust_product_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "object_sid",
+      "object_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_entity_assignments",
+    0
+   ]
+  ],
+  "expected" : [
+   [
+    "ObjectType",
+    "v_object_type"
+   ]
+  ],
+  "http" : "GET",
+  "id" : "ListTrustProductEntityAssignment",
+  "method" : "page",
+  "options" : {
+   "object_type" : "v_object_type"
+  },
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/EntityAssignments"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "meta" : {},
+     "results" : [
+      {
+       "account_sid" : "a_account_sid",
+       "date_created" : "2026-01-06T03:04:05Z",
+       "policy_sid" : "a_policy_sid",
+       "results" : [
+        "a_results"
+       ],
+       "sid" : "a_sid",
+       "status" : "compliant",
+       "trust_product_sid" : "a_trust_product_sid",
+       "url" : "a_url"
+      }
+     ]
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "results",
+      "results",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "trust_product_sid",
+      "trust_product_sid",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ],
+   [
+    "trust_products_evaluations",
+    0
+   ]
+  ],
+  "expected" : [],
+  "http" : "GET",
+  "id" : "ListTrustProductEvaluation",
+  "method" : "page",
+  "options" : {},
+  "records_key" : "results",
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1/Evaluations"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "customer_id" : "a_customer_id",
+     "inquiry_id" : "a_inquiry_id",
+     "inquiry_session_token" : "a_inquiry_session_token",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "customer_id",
+      "customer_id",
+      "plain"
+     ],
+     [
+      "inquiry_id",
+      "inquiry_id",
+      "plain"
+     ],
+     [
+      "inquiry_session_token",
+      "inquiry_session_token",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "compliance_inquiries",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "PrimaryProfileSid",
+    "v_primary_profile_sid"
+   ],
+   [
+    "ThemeSetId",
+    "v_theme_set_id"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateComplianceInquiry",
+  "method" : "update",
+  "options" : {
+   "theme_set_id" : "v_theme_set_id"
+  },
+  "required" : [
+   "v_primary_profile_sid"
+  ],
+  "url" : "https://trusthub.twilio.com/v1/ComplianceInquiries/Customers/id1/Initialize"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "inquiry_id" : "a_inquiry_id",
+     "inquiry_session_token" : "a_inquiry_session_token",
+     "registration_id" : "a_registration_id",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "inquiry_id",
+      "inquiry_id",
+      "plain"
+     ],
+     [
+      "inquiry_session_token",
+      "inquiry_session_token",
+      "plain"
+     ],
+     [
+      "registration_id",
+      "registration_id",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "compliance_registration_inquiries",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "IsIsvEmbed",
+    "true"
+   ],
+   [
+    "ThemeSetId",
+    "v_theme_set_id"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateComplianceRegistration",
+  "method" : "update",
+  "options" : {
+   "is_isv_embed" : 1,
+   "theme_set_id" : "v_theme_set_id"
+  },
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/ComplianceInquiries/Registration/id1/RegulatoryCompliance/GB/Initialize"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "errors" : [
+      "a_errors"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "policy_sid" : "a_policy_sid",
+     "sid" : "a_sid",
+     "status" : "pending-review",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "customer_profiles",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Email",
+    "v_email"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Status",
+    "twilio-approved"
+   ],
+   [
+    "StatusCallback",
+    "v_status_callback"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateCustomerProfile",
+  "method" : "update",
+  "options" : {
+   "email" : "v_email",
+   "friendly_name" : "v_friendly_name",
+   "status" : "twilio-approved",
+   "status_callback" : "v_status_callback"
+  },
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/CustomerProfiles/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "sid" : "a_sid",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "end_users",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "{\"v_attributes\":28}"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateEndUser",
+  "method" : "update",
+  "options" : {
+   "attributes" : {
+    "v_attributes" : 28
+   },
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/EndUsers/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "attributes" : {
+      "a_attributes" : 1
+     },
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "friendly_name" : "a_friendly_name",
+     "mime_type" : "a_mime_type",
+     "sid" : "a_sid",
+     "status" : "EXPIRED",
+     "type" : "a_type",
+     "url" : "a_url"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "attributes",
+      "attributes",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "mime_type",
+      "mime_type",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "type",
+      "type",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "supporting_documents",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Attributes",
+    "{\"v_attributes\":28}"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateSupportingDocument",
+  "method" : "update",
+  "options" : {
+   "attributes" : {
+    "v_attributes" : 28
+   },
+   "friendly_name" : "v_friendly_name"
+  },
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/SupportingDocuments/id1"
+ },
+ {
+  "answers" : [
+   {
+    "body" : {
+     "account_sid" : "a_account_sid",
+     "date_created" : "2026-01-06T03:04:05Z",
+     "date_updated" : "2026-01-21T03:04:05Z",
+     "email" : "a_email",
+     "errors" : [
+      "a_errors"
+     ],
+     "friendly_name" : "a_friendly_name",
+     "links" : {
+      "a_links" : 1
+     },
+     "policy_sid" : "a_policy_sid",
+     "sid" : "a_sid",
+     "status" : "pending-review",
+     "status_callback" : "a_status_callback",
+     "url" : "a_url",
+     "valid_until" : "2026-01-04T03:04:05Z"
+    },
+    "fields" : [
+     [
+      "account_sid",
+      "account_sid",
+      "plain"
+     ],
+     [
+      "date_created",
+      "date_created",
+      "date",
+      1767668645
+     ],
+     [
+      "date_updated",
+      "date_updated",
+      "date",
+      1768964645
+     ],
+     [
+      "email",
+      "email",
+      "plain"
+     ],
+     [
+      "errors",
+      "errors",
+      "plain"
+     ],
+     [
+      "friendly_name",
+      "friendly_name",
+      "plain"
+     ],
+     [
+      "links",
+      "links",
+      "plain"
+     ],
+     [
+      "policy_sid",
+      "policy_sid",
+      "plain"
+     ],
+     [
+      "sid",
+      "sid",
+      "plain"
+     ],
+     [
+      "status",
+      "status",
+      "plain"
+     ],
+     [
+      "status_callback",
+      "status_callback",
+      "plain"
+     ],
+     [
+      "url",
+      "url",
+      "plain"
+     ],
+     [
+      "valid_until",
+      "valid_until",
+      "date",
+      1767495845
+     ]
+    ],
+    "status" : 200
+   }
+  ],
+  "chain" : [
+   [
+    "trusthub",
+    0
+   ],
+   [
+    "v1",
+    0
+   ],
+   [
+    "trust_products",
+    1
+   ]
+  ],
+  "expected" : [
+   [
+    "Email",
+    "v_email"
+   ],
+   [
+    "FriendlyName",
+    "v_friendly_name"
+   ],
+   [
+    "Status",
+    "twilio-approved"
+   ],
+   [
+    "StatusCallback",
+    "v_status_callback"
+   ]
+  ],
+  "http" : "POST",
+  "id" : "UpdateTrustProduct",
+  "method" : "update",
+  "options" : {
+   "email" : "v_email",
+   "friendly_name" : "v_friendly_name",
+   "status" : "twilio-approved",
+   "status_callback" : "v_status_callback"
+  },
+  "required" : [],
+  "url" : "https://trusthub.twilio.com/v1/TrustProducts/id1"
+ }
+]

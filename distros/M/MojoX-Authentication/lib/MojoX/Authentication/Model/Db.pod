@@ -23,35 +23,34 @@ L<MojoX::Authentication::Model> instead.
 This class composes role L<MojoX::Authentication::Model::Role::Local>
 and inherits its methods.
 
+This class needs L<MojoX::MojoDbWrap> version 0.100 or later.
+
 =head1 INTERFACE
-
-=head2 B<< column_remaps >>
-
-   my $aref = $self->column_remaps;
 
 =head2 B<< create >>
 
-   my $instance = MojoX::Authentication::Model::Db->new($config, %args);
+   my $instance = MojoX::Authentication::Model::Db->create($config, %args);
 
 Constructor. 
 
 Can receive the configuration either from a more "generic" C<$config>
 hash as well as direct named arguments.
 
-First a name is determined, either from C<$args{name}> or C<hashy> by
+First a name is determined, either from C<$args{name}> or C<dby> by
 default. Then C<$config> is looked at for a corresponding value, which
 is either expected to be missing/C<undef> or be a hash reference. In
 case a hash reference is found, its pairs override those on C<%args>,
 with the only exception of the key C<name> which is preserved if already
 present or set to the default otherwise.
 
-If the C<wmdb> key is present, a new instance of the class is created and
-returned. Otherwise, the method returns C<undef>.
+Argument C<wmdb> is mandatory (an exception is thrown otherwise), see
+L</wmdb>.
 
 Also accepts parameters for the following accessors: L</name> (only from
-C<%args>, see above), L</table>, L</column_remaps>, L</crypt_passphrase>
-(inherited from role L<MojoX::Authentication::Model::Role::Local>),
-L</remaps>, and L</username_column>.
+C<%args>, see above), L</table>, C<crypt_passphrase>, C<key_for_secret>
+and C<protected_keys> (inherited from role
+L<MojoX::Authentication::Model::Role::Local>), L</remaps>, and
+L</username_column>.
 
 
 =head2 B<< load_user >>
@@ -59,25 +58,32 @@ L</remaps>, and L</username_column>.
    my $user = $provider->load_user($ignored, $uid);
 
 Load the user by its userid, compatibly with
-L<mojolicious::plugin::authentication>'s interface for loading users.
-the first parameter (which is supposed to be a controller instance) is
+L<Mojolicious::Plugin::Authentication>'s interface for loading users.
+The first parameter (which is supposed to be a controller instance) is
 ignored.
 
-See L</id_column>.
+This class has no distinction between user identifiers and usernames:
+the record is looked for in L</table>, using column
+L</username_column>. The record is then passed through L</remaps>.
+Returns nothing if the record is not present.
 
-=head2 B<< load_user_by_name >>
+=head2 B<< load_user_by_username >>
 
-   my $user = $provider->load_user_by_name($ignored, $username);
+   my $user = $provider->load_user_by_username($ignored, $username);
 
-Load the user by its username, according to L</name_column>.
+Alias for L</load_user>, as this class has no distinction between user
+identifiers and usernames.
 
 =head2 B<< name >>
 
    my $name = $provider->name;
+   $provider->name($new_name);
 
 Name assigned to the provider (e.g. if you want to use different
 databases at the same time and hence want to instantiate this class
-multiple times).
+multiple times). It is read-write: L<MojoX::Authentication::Model> sets
+it to the name it registers the provider under (see
+L<MojoX::Authentication::Model/Provider names>).
 
 =head2 B<< remaps >>
 
@@ -86,9 +92,11 @@ multiple times).
 Accessor for the list of remaps, handled by
 L<MojoX::Authentication::Model::Role::Remap>.
 
-Make sure that the mapping contains a way to map the column containing
-the secret to check in correspondence of key C<secret>, otherwise
-L<MojoX::Authentication::Model::Role::Local> will fail to check secrets.
+Remaps never see the column holding the secret, nor the other
+protected keys (see L<MojoX::Authentication::Model::Role::Remap>): if
+the hash is not in a column named C<secret>, set C<key_for_secret> to
+the column's name (e.g. C<< key_for_secret => 'userpass' >>) instead of
+remapping it.
 
 =head2 B<< save_user >>
 
@@ -98,10 +106,16 @@ L<MojoX::Authentication::Model::Role::Local> will fail to check secrets.
 Save a user.
 
 The input C<$user> is supposed to be a hash reference with I<at least>
-keys C<name> (for the username/userid) and C<secret> (for the secret).
-it <MAY> contain other key/value pairs, which will be copied.
+key C<username> (for the username/userid) and, for an account that
+logs in with a password, the key for the secret (C<secret> by default,
+see C<key_for_secret>), after L</remaps> are applied backwards. It I<MAY> contain other
+key/value pairs, which will be copied.
 
-The C<secret> is supposed to be already hashed. It is possible to set
+The record is inserted, or updated if a record with the same value in
+column L</username_column> is already present; for this reason, the
+column B<MUST> have a C<UNIQUE> constraint (or be the primary key).
+
+The secret is supposed to be already hashed. It is possible to set
 the optional additional parameter C<$is_secret_cleartext> to a true
 value to indicate that the hashing should be done by the function before
 saving the user.
@@ -111,17 +125,16 @@ saving the user.
    my $string = $provider->table;
 
 Returns the name of the table where user accounts are kept. Defaults to
-C<accounts>.
+C<account>.
 
-The names of the columns with I<interesting> values are accessible
-through L</id_column>, L</name_column> and L</secret_column>.
+See also L</username_column> and L</remaps>.
 
 =head2 B<< username_column >>
 
-   my $string = $provider->name_column;
+   my $string = $provider->username_column;
 
 Returns the name of the column where the username is kept. Defaults to
-C<name>.
+C<username>.
 
 See also L</table>.
 
@@ -132,6 +145,10 @@ See also L</table>.
 Accessor to the L<MojoX::MojoDbWrap> object wrapping the relevant
 database access object (most probably an object of either
 L<Mojo::SQLite> or L<Mojo::Pg> class).
+
+At construction it can be a L<MojoX::MojoDbWrap> object, an object with
+a C<wmdb> method returning one, a sub reference returning one, or the
+arguments for creating one (e.g. C<< { db_url => 'sqlite:accounts.db' } >>).
 
 =head1 ANYTHING ELSE (INCLUDING AUTHOR, COPYRIGHT AND LICENSE)
 

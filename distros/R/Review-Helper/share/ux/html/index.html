@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Review Helper</title>
+<link rel="stylesheet" href="static/css/review.css">
+<script type="module" src="static/js/app.js"></script>
+</head>
+<body>
+<div id="header">
+    <span id="head_id">
+        <span id="identity" title="Whose review, and which repository" hidden></span>
+        <h1 id="title">Review</h1>
+        <a id="source" class="tool" target="_blank" rel="noopener noreferrer" title="The pull or merge request under review" hidden>source</a>
+    </span>
+    <span id="head_controls">
+        <span class="hgroup" id="head_nav" role="group" aria-label="Go through the review">
+            <button id="guide_play" class="play" title="Play the guide from the first step" hidden>&#9654; Play guide</button>
+            <span id="walk_start" class="walk-start" hidden>
+                <button id="walk_new" class="play" title="Step through the flags you have not seen, from the first of them">&#9873; Walk new</button>
+                <button id="walk_all" class="play" title="Step through every flag, seen ones too, from the first">Walk all</button>
+            </span>
+        </span>
+        <span class="hgroup" id="head_view" role="group" aria-label="View">
+            <span id="iteration_wrap" hidden>
+                <label for="iteration">Iteration</label>
+                <select id="iteration"></select>
+            </span>
+            <details id="speech_menu" class="head-menu">
+                <summary title="Speech: the voice and speed for reading aloud" aria-label="Speech settings"><svg class="speaker" viewBox="0 0 12 12" aria-hidden="true"><path d="M0.5 4 H3 L6.5 1 V11 L3 8 H0.5 Z"/><path d="M8.2 3.6 Q9.6 6 8.2 8.4 M9.8 2 Q12.4 6 9.8 10" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>&#9662;</summary>
+                <span class="menu">
+                    <span id="speech_hint" hidden>No voices: your browser reports none (on Linux, install speech-dispatcher)</span>
+                    <span id="speech_opts" hidden>
+                        <select id="speech_voice" title="Voice" aria-label="Voice"></select>
+                        <label title="Speed">speed <input id="speech_rate" type="range" min="0.75" max="1.5" step="0.05" aria-label="Speed"></label>
+                        <span id="speech_rate_val"></span>
+                    </span>
+                </span>
+            </details>
+            <span class="switch" id="order_toggle" title="File order" role="radiogroup" aria-label="File order">
+                <button data-value="reading" role="radio">Reading order</button><button data-value="az" role="radio">A&ndash;Z</button>
+            </span>
+            <span class="switch" id="diff_toggle" title="Diff layout" role="radiogroup" aria-label="Diff layout">
+                <button data-value="unified" role="radio">Unified</button><button data-value="split" role="radio">Side by side</button>
+            </span>
+        </span>
+        <button id="close_review" class="head-btn" title="Mark this review closed">Close review</button>
+    </span>
+</div>
+<nav id="tree" aria-label="Navigation"></nav>
+<button id="tree_open" class="tree-tab" title="Show navigation" aria-label="Show navigation" aria-controls="tree" aria-expanded="false">&rsaquo;</button>
+<button id="tree_close" class="tree-tab" title="Hide navigation" aria-label="Hide navigation" aria-controls="tree" aria-expanded="true">&lsaquo;</button>
+<div id="tree_grip" title="Drag to resize the index"></div>
+<main id="main">
+    <div id="stale" hidden>
+        <span id="stale_text"></span>
+        <button id="stale_accept" class="tool">Continue with this review</button>
+    </div>
+    <div id="error" hidden></div>
+    <section id="summary" class="card"></section>
+    <div id="commits"></div>
+    <section id="journal" class="card" hidden></section>
+    <div id="room"></div>
+</main>
+<div id="guide_bar" hidden>
+    <p id="guide_text"></p>
+    <div class="controls">
+        <div class="crow" id="guide_play_row">
+            <span id="guide_speak"></span>
+            <span id="guide_count"></span>
+        </div>
+        <div class="crow" id="guide_topics" hidden>
+            <button id="guide_prev_topic" class="tool" hidden>&laquo; previous topic</button>
+            <button id="guide_next_topic" class="tool" hidden>next topic &raquo;</button>
+        </div>
+        <div class="crow" id="walk_opts" hidden>
+            <button id="walk_mark" class="tool" title="Whether you have seen this flag">Mark seen</button>
+            <span id="walk_marks"></span>
+        </div>
+        <div class="crow" id="guide_steps">
+            <button id="guide_back" class="tool" title="Previous step">&#9664; back</button>
+            <button id="guide_next" class="tool" title="Next step">next &#9654;</button>
+        </div>
+        <div class="crow" id="guide_more">
+            <button id="guide_replay" class="tool" title="Show this step again">&#8634; replay</button>
+            <button id="speech_toggle" class="tool" title="Read each step aloud as it shows">speech</button>
+            <button id="guide_exit" class="tool close" title="Leave the guide">exit</button>
+        </div>
+    </div>
+</div>
+</body>
+</html>

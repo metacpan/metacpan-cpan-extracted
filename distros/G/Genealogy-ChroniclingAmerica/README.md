@@ -1,31 +1,33 @@
-# NAME
+## Name
 
 Genealogy::ChroniclingAmerica - Find URLs for a given person on the Library of Congress Newspaper Records
 
-# VERSION
+## Version
 
-Version 0.07
+Version 0.08
 
-# SYNOPSIS
+## Synopsis
 
-    use HTTP::Cache::Transparent;  # be nice
-    use Genealogy::ChroniclingAmerica;
+```perl
+use HTTP::Cache::Transparent;  # be nice
+use Genealogy::ChroniclingAmerica;
 
-    HTTP::Cache::Transparent::init({
-        BasePath => '/tmp/cache'
-    });
-    my $loc = Genealogy::ChroniclingAmerica->new({
-        firstname => 'John',
-        lastname => 'Smith',
-        state => 'Indiana',
-        date_of_death => 1862
-    });
+HTTP::Cache::Transparent::init({
+    BasePath => '/tmp/cache'
+});
+my $loc = Genealogy::ChroniclingAmerica->new({
+    firstname => 'John',
+    lastname => 'Smith',
+    state => 'Indiana',
+    date_of_death => 1862
+});
 
-    while(my $url = $loc->get_next_entry()) {
-        print "$url\n";
-    }
+while(my $url = $loc->get_next_entry()) {
+    print "$url\n";
+}
+```
 
-# DESCRIPTION
+## Description
 
 The **Genealogy::ChroniclingAmerica** module allows users to search for historical newspaper records from the **Chronicling America** archive,
 maintained by the Library of Congress.
@@ -54,9 +56,9 @@ this module streamlines access to historical newspaper archives with an easy-to-
     if necessary,
     sleeps for the remaining time.
 
-# SUBROUTINES/METHODS
+## Subroutines/Methods
 
-## new
+### New
 
 Creates a Genealogy::ChroniclingAmerica object.
 
@@ -78,33 +80,88 @@ Accepts the following optional arguments:
 - `middlename`
 - `date_of_birth`
 - `date_of_death`
-- `host` - The domain of the site to search, the default is [https://chroniclingamerica.loc.gov](https://chroniclingamerica.loc.gov).
+- `host` - The domain of the site to search, the default is `www.loc.gov`.
 - `ua` - An object that understands get and env\_proxy messages,
 such as [LWP::UserAgent::Throttled](https://metacpan.org/pod/LWP%3A%3AUserAgent%3A%3AThrottled).
 - `min_interval` - Amount to rate limit.
-Defaults to 3 seconds,
+Defaults to 4 seconds,
 inline with [https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling\_America/README.html#rate-limits](https://libraryofcongress.github.io/data-exploration/loc.gov%20JSON%20API/Chronicling_America/README.html#rate-limits)
 
-## get\_next\_entry
+If a search finds nothing it is repeated once,
+since the Library of Congress sometimes answers an identical search inconsistently.
 
-Returns the next match as a URL.
+#### Api Specification
 
-# AUTHOR
+##### Input
+
+```perl
+{
+  firstname => { type => 'string', min => 1, matches => qr/\D/ },
+  lastname => { type => 'string', min => 1, matches => qr/\D/ },
+  state => { type => 'string', min => 3, matches => qr/^\D+$/ },      # Full name, not an abbreviation
+  middlename => { type => 'string', optional => 1 },
+  date_of_birth => { type => 'integer', optional => 1 },      # A year
+  date_of_death => { type => 'integer', optional => 1 },      # A year
+  host => { type => 'string', optional => 1 },
+  ua => { type => 'object', can => 'get', optional => 1 },
+  cache => { type => 'object', can => ['get', 'set'], optional => 1 },
+  min_interval => { type => 'number', optional => 1 },
+}
+```
+
+The constructor croaks if a mandatory argument is missing or invalid.
+
+##### Output
+
+A blessed `Genealogy::ChroniclingAmerica` object.
+Called on an existing object it returns a clone with the new arguments.
+
+### Get\_Next\_Entry
+
+Returns the next match as a URL of a PDF of the newspaper page,
+or undef when there are no more matches.
+
+Each call may make up to two requests of the Library of Congress:
+one for the item and one for the OCR text of its page.
+Items whose text doesn't contain the person's name are skipped.
+Both requests honour `min_interval`.
+
+The URL is not checked,
+the Library of Congress may refuse (HTTP 403) requests for the PDF from some automated clients.
+
+#### Api Specification
+
+##### Input
+
+None, other than the object.
+
+##### Output
+
+```perl
+{
+  type => 'string',
+  min => 5,
+  matches => qr/\.pdf$/,      # A URL
+  optional => 1,      # undef when no more matches
+}
+```
+
+## Author
 
 Nigel Horne, `<njh at nigelhorne.com>`
 
-# BUGS
+## Bugs
 
 If a middle name is given and no match is found,
 it should search again without the middle name.
 
-# SEE ALSO
+## See Also
 
 - [https://github.com/nigelhorne/gedcom](https://github.com/nigelhorne/gedcom)
 - [https://chroniclingamerica.loc.gov](https://chroniclingamerica.loc.gov)
 - [https://github.com/LibraryOfCongress/data-exploration](https://github.com/LibraryOfCongress/data-exploration)
 
-# SUPPORT
+## Support
 
 This module is provided as-is without any warranty.
 
@@ -116,7 +173,9 @@ automatically be notified of progress on your bug as I make changes.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc Genealogy::ChroniclingAmerica
+```
+perldoc Genealogy::ChroniclingAmerica
+```
 
 You can also look for information at:
 
@@ -128,20 +187,8 @@ You can also look for information at:
 
     [https://metacpan.org/release/Genealogy-ChroniclingAmerica](https://metacpan.org/release/Genealogy-ChroniclingAmerica)
 
-# LICENSE AND COPYRIGHT
+## License and Copyright
 
-Copyright 2018-2025 Nigel Horne.
+Copyright 2018-2026 Nigel Horne.
 
 This program is released under the following licence: GPL2
-
-# POD ERRORS
-
-Hey! **The above document had some coding errors, which are explained below:**
-
-- Around line 470:
-
-    '=item' outside of any '=over'
-
-- Around line 476:
-
-    You forgot a '=back' before '=head1'

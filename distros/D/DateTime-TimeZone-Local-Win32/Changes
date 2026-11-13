@@ -1,3 +1,21 @@
+2.07    2026-11-12
+
+    - Add new time zones for Alberta Standard Time, British Columbia Standard Time
+      and Manitoba Standard Time.
+
+    - Map Central Asia Standard Time to Asia/Bishkek. Kazakhstan moved to UTC+5 in
+      2024 and Windows now uses this time zone for Bishkek.
+
+    - Remove Samoa Standard Time and Central Asia Standard Time from the known bad
+      time zones for testing as both now match.
+
+    - Test Windows offsets for the next February 1 and August 1 using the Windows
+      rule for each year (Dynamic DST) rather than dates that may be in the past.
+
+    - Fix test failure when a time change happens at 23:00 (Greenland Standard Time).
+
+    - Change minimum version of DateTime::TimeZone for testing.
+
 2.06    2024-03-07
 
     - Fix Mountain Standard Time (Mexico).

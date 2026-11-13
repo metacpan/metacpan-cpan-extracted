@@ -12,7 +12,7 @@ use autodie qw(:all);
 # documentation recommends) may be loaded before App::Syslogd::I18N is
 use parent 'App::Syslogd::I18N';
 
-our $VERSION = '0.002.0';
+our $VERSION = '0.002.1';
 
 our %Lexicon = (
 	usage => 'Usage: [_1] ~[--port <port_number>~] ~[--address <address>~] ~[--file <CSV file>~] ~[--no-resolve~] ~[--language <tag>~]',
@@ -39,7 +39,7 @@ App::Syslogd::I18N::en - English messages for App::Syslogd
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.002.1
 
 =head1 SYNOPSIS
 

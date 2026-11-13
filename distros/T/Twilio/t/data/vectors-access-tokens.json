@@ -1,0 +1,575 @@
+{
+    "tokens": [
+        {
+            "description": "no grants",
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {}
+            }
+        },
+        {
+            "description": "an identity",
+            "identity": "alice",
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "identity": "alice"
+                }
+            }
+        },
+        {
+            "description": "a region",
+            "region": "foo",
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1",
+                "twr": "foo"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {}
+            }
+        },
+        {
+            "description": "another lifetime",
+            "ttl": 60,
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {}
+            }
+        },
+        {
+            "description": "not valid before",
+            "nbf": 1700000500,
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {},
+                "nbf": 1700000500
+            }
+        },
+        {
+            "description": "custom claims",
+            "claims": {
+                "foo": "bar",
+                "number": "7"
+            },
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "foo": "bar",
+                "number": "7",
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {}
+            }
+        },
+        {
+            "description": "a claim cannot replace the issuer",
+            "claims": {
+                "iss": "someone else"
+            },
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {}
+            }
+        },
+        {
+            "description": "non-ASCII",
+            "identity": "José Ñandú",
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "identity": "José Ñandú"
+                }
+            }
+        },
+        {
+            "description": "HS384",
+            "algorithm": "HS384",
+            "header": {
+                "typ": "JWT",
+                "alg": "HS384",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {}
+            }
+        },
+        {
+            "description": "HS512",
+            "algorithm": "HS512",
+            "identity": "alice",
+            "header": {
+                "typ": "JWT",
+                "alg": "HS512",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "identity": "alice"
+                }
+            }
+        },
+        {
+            "description": "chat",
+            "identity": "alice",
+            "grants": [
+                {
+                    "class": "ChatGrant",
+                    "calls": [
+                        [
+                            "set_service_sid",
+                            "IS123"
+                        ],
+                        [
+                            "set_endpoint_id",
+                            "Endpoint"
+                        ],
+                        [
+                            "set_deployment_role_sid",
+                            "RL123"
+                        ],
+                        [
+                            "set_push_credential_sid",
+                            "CR123"
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "identity": "alice",
+                    "chat": {
+                        "service_sid": "IS123",
+                        "endpoint_id": "Endpoint",
+                        "deployment_role_sid": "RL123",
+                        "push_credential_sid": "CR123"
+                    }
+                }
+            }
+        },
+        {
+            "description": "sync",
+            "grants": [
+                {
+                    "class": "SyncGrant",
+                    "calls": [
+                        [
+                            "set_service_sid",
+                            "IS123"
+                        ],
+                        [
+                            "set_endpoint_id",
+                            "Endpoint"
+                        ],
+                        [
+                            "set_deployment_role_sid",
+                            "RL123"
+                        ],
+                        [
+                            "set_push_credential_sid",
+                            "CR123"
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "data_sync": {
+                        "service_sid": "IS123",
+                        "endpoint_id": "Endpoint",
+                        "deployment_role_sid": "RL123",
+                        "push_credential_sid": "CR123"
+                    }
+                }
+            }
+        },
+        {
+            "description": "video",
+            "grants": [
+                {
+                    "class": "VideoGrant",
+                    "calls": [
+                        [
+                            "set_room",
+                            "RM123"
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "video": {
+                        "room": "RM123"
+                    }
+                }
+            }
+        },
+        {
+            "description": "task router",
+            "grants": [
+                {
+                    "class": "TaskRouterGrant",
+                    "calls": [
+                        [
+                            "set_workspace_sid",
+                            "WS123"
+                        ],
+                        [
+                            "set_worker_sid",
+                            "WK123"
+                        ],
+                        [
+                            "set_role",
+                            "worker"
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "task_router": {
+                        "workspace_sid": "WS123",
+                        "worker_sid": "WK123",
+                        "role": "worker"
+                    }
+                }
+            }
+        },
+        {
+            "description": "playback",
+            "grants": [
+                {
+                    "class": "PlaybackGrant",
+                    "calls": [
+                        [
+                            "set_grant",
+                            {
+                                "requestCredentials": null,
+                                "playbackUrl": "https://a.test/x",
+                                "playerStreamerSid": "VJ1"
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "player": {
+                        "requestCredentials": null,
+                        "playbackUrl": "https://a.test/x",
+                        "playerStreamerSid": "VJ1"
+                    }
+                }
+            }
+        },
+        {
+            "description": "voice",
+            "grants": [
+                {
+                    "class": "VoiceGrant",
+                    "calls": [
+                        [
+                            "set_incoming_allow",
+                            true
+                        ],
+                        [
+                            "set_outgoing_application_sid",
+                            "AP123"
+                        ],
+                        [
+                            "set_push_credential_sid",
+                            "CR123"
+                        ],
+                        [
+                            "set_endpoint_id",
+                            "Endpoint"
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "voice": {
+                        "incoming": {
+                            "allow": true
+                        },
+                        "outgoing": {
+                            "application_sid": "AP123"
+                        },
+                        "push_credential_sid": "CR123",
+                        "endpoint_id": "Endpoint"
+                    }
+                }
+            }
+        },
+        {
+            "description": "voice with parameters",
+            "grants": [
+                {
+                    "class": "VoiceGrant",
+                    "calls": [
+                        [
+                            "set_outgoing_application",
+                            "AP123",
+                            {
+                                "foo": "bar",
+                                "n": "1"
+                            }
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "voice": {
+                        "outgoing": {
+                            "application_sid": "AP123",
+                            "params": {
+                                "foo": "bar",
+                                "n": "1"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "description": "voice with incoming not allowed",
+            "grants": [
+                {
+                    "class": "VoiceGrant",
+                    "calls": [
+                        [
+                            "set_incoming_allow",
+                            false
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "voice": {}
+                }
+            }
+        },
+        {
+            "description": "an empty grant",
+            "grants": [
+                {
+                    "class": "VideoGrant",
+                    "calls": []
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "video": {}
+                }
+            }
+        },
+        {
+            "description": "several grants",
+            "identity": "alice",
+            "region": "ie1",
+            "grants": [
+                {
+                    "class": "VideoGrant",
+                    "calls": [
+                        [
+                            "set_room",
+                            "RM123"
+                        ]
+                    ]
+                },
+                {
+                    "class": "ChatGrant",
+                    "calls": [
+                        [
+                            "set_service_sid",
+                            "IS123"
+                        ]
+                    ]
+                }
+            ],
+            "header": {
+                "typ": "JWT",
+                "alg": "HS256",
+                "cty": "twilio-fpa;v=1",
+                "twr": "ie1"
+            },
+            "payload": {
+                "iss": "SKxxxx",
+                "sub": "ACxxxx",
+                "grants": {
+                    "identity": "alice",
+                    "video": {
+                        "room": "RM123"
+                    },
+                    "chat": {
+                        "service_sid": "IS123"
+                    }
+                }
+            }
+        }
+    ],
+    "signatures": [
+        {
+            "message": "header.payload",
+            "key": "secret",
+            "algorithm": "HS256",
+            "expected": "Z6i9S6ZA2aIWif9sETeqAT86NRYSiUvBz2wzPI7aP0s"
+        },
+        {
+            "message": "header.payload",
+            "key": "secret",
+            "algorithm": "HS384",
+            "expected": "OuijnvR5iGGGVXskLrCcBr8dG9P74cp9f9UBwTGCjU_NGmYq18vepeCFNlpjP4sq"
+        },
+        {
+            "message": "header.payload",
+            "key": "secret",
+            "algorithm": "HS512",
+            "expected": "xqPcnYviV0ucJ2Xk912fqPZp6iE9dYXSRJ2JhKLsGkQhC8YlflgirkSantYBkoWfm4fIE89IdLhauSScHwdFmA"
+        },
+        {
+            "message": "other",
+            "key": "another",
+            "algorithm": "HS256",
+            "expected": "RFZiaw4gSruFC3jl9tad4VPg018gMNx4csfGAaQjyAM"
+        }
+    ],
+    "base64": [
+        {
+            "text": "",
+            "expected": ""
+        },
+        {
+            "text": "f",
+            "expected": "Zg"
+        },
+        {
+            "text": "fo",
+            "expected": "Zm8"
+        },
+        {
+            "text": "foo",
+            "expected": "Zm9v"
+        },
+        {
+            "text": "foob",
+            "expected": "Zm9vYg"
+        },
+        {
+            "text": "ûÿþ",
+            "expected": "-__-"
+        }
+    ]
+}
