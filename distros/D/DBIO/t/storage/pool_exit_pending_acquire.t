@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp ();
+use lib 't/lib';
+use TestDBIO::Child;
 
 use DBIO::Storage::PoolBase;
 use DBIO::Test::Future ();
@@ -90,7 +92,6 @@ my %shapes = (
   'an acquire waiting for readiness' => [ 'K254::ColdPool', 1 ],
 );
 
-my @inc = map { "-I$_" } grep { !ref } @INC;
 for my $fc (@future_classes) {
   for my $shape (sort keys %shapes) {
     my ($class, $acquires) = @{ $shapes{$shape} };
@@ -133,11 +134,9 @@ print((grep { !\$_->isa('DBIO::Storage::PoolBase') && !\$_->is_ready } \@K)
 PERL
     close $script;
 
-    open my $child, '-|', $^X, @inc, $script->filename
-      or die "cannot run $^X: $!";
-    my $output = do { local $/; <$child> } // '';
-    close $child;
-    my $status = $? >> 8;
+    my $run    = TestDBIO::Child::run_perl(script => $script->filename);
+    my $output = $run->{output};
+    my $status = $run->{exit};
 
     like $output, qr/^pending$/m, "$fc, $shape: the acquire is pending when the process exits";
     is $status, 0, "$fc, $shape: the process exits with status 0";

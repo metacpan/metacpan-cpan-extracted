@@ -30,12 +30,13 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO",
   "PREREQ_PM" => {
+    "Carp" => "1.38",
     "Carp::Clan" => "6.08",
     "Class::Accessor::Grouped" => "0.10014",
     "Class::C3::Componentised" => "1.001002",
     "Context::Preserve" => "0.03",
     "Crypt::URandom" => 0,
-    "DBI" => "1.57",
+    "DBI" => "1.634",
     "DateTime::Tiny" => "1.08",
     "Devel::GlobalDestruction" => "0.14",
     "Digest::SHA" => 0,
@@ -64,20 +65,21 @@ my %WriteMakefileArgs = (
     "Test::More" => "1.302222",
     "Test::Warn" => "0.37"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900005",
   "test" => {
     "TESTS" => "t/*.t t/access_broker/*.t t/carp/*.t t/changelog/*.t t/composed/*.t t/count/*.t t/debug/*.t t/exception/*.t t/extension/*.t t/generate/*.t t/helpers/*.t t/introspect/*.t t/kubernetes/*.t t/maint/*.t t/pager/data_page_compat/*.t t/prefetch/*.t t/relationship/*.t t/replicated/*.t t/resultset/*.t t/resultsource/*.t t/row/*.t t/schema/*.t t/search/*.t t/serialize/*.t t/sqlmaker/*.t t/sqlmaker/limit_dialects/*.t t/storage/*.t t/test/*.t t/util/*.t"
   }
 );
 
 my %FallbackPrereqs = (
+  "Carp" => "1.38",
   "Carp::Clan" => "6.08",
   "Class::Accessor::Grouped" => "0.10014",
   "Class::C3::Componentised" => "1.001002",
   "Context::Preserve" => "0.03",
   "Crypt::URandom" => 0,
   "DBD::SQLite" => "1.29",
-  "DBI" => "1.57",
+  "DBI" => "1.634",
   "DateTime::Tiny" => "1.08",
   "Devel::GlobalDestruction" => "0.14",
   "Digest::SHA" => 0,

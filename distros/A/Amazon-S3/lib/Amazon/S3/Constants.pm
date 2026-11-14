@@ -11,7 +11,7 @@ use parent qw(Exporter);
 
 use Readonly;
 
-our $VERSION = '2.1.3'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.4'; ## no critic (RequireInterpolation)
 
 # defaults
 Readonly our $AMAZON_HEADER_PREFIX            => 'x-amz-';

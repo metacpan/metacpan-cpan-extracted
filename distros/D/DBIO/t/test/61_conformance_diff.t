@@ -22,7 +22,7 @@ my $MOCK = 'MockConformanceServer';
 
 my $cases = DBIO::Test::Conformance::Cases::Diff->cases;
 is scalar(@$cases), 23, 'the Diff list holds 23 cases: U1..U17, U19, U20, U13 split in two, three deploy cases';
-is(DBIO::Test::Conformance->table_version('Diff'), 4, 'table version 4 for Diff (the deploy cases, karr k399)');
+is(DBIO::Test::Conformance->table_version('Diff'), 4, 'table version 4 for Diff (the deploy cases)');
 is(DBIO::Test::Conformance->table_version, 2, 'DDL (version 2, D15 split) without an argument');
 is(DBIO::Test::Conformance->table_version, DBIO::Test::Conformance->table_version('DDL'),
   'no argument means DDL');
@@ -58,7 +58,7 @@ is_deeply [ map { $_->{name} } @$cases ], [qw(
       unless ($c->{since} // '') eq ($since{$n} // 1);
     push @bad, "$n: since is newer than the table version"
       if ($c->{since} // 0) > DBIO::Test::Conformance->table_version('Diff');
-    push @bad, "$n: no cards" unless ref $c->{cards} eq 'ARRAY' && @{ $c->{cards} };
+    push @bad, "$n: carries a cards field" if exists $c->{cards};
     push @bad, "$n: no expect" unless ref $c->{expect} eq 'ARRAY' && @{ $c->{expect} };
     push @bad, "$n: no subject source" unless ref $c->{subject} eq 'HASH' && $c->{subject}{source};
 
@@ -290,7 +290,7 @@ my $refuse = sub {
       map { @{ $case->{input}{$_}{sources} } } qw(to from);
     return $def->{table} . (defined $case->{subject}{column} ? "', column '$case->{subject}{column}" : '');
   };
-  $MockConformanceServer::AREAS{Diff} = { kind => 'pending', card => 'k36', reason => qr/diff is not built yet/ };
+  $MockConformanceServer::AREAS{Diff} = { kind => 'pending', reason => qr/diff is not built yet/ };
   $MockConformanceServer::QUIRK{throw_upgrade_any} = sub {
     my ($schema, $case) = @_;
     $schema->throw_exception("upgrade refused for table '" . $subject_table->($case) . "': diff is not built yet");
@@ -299,8 +299,8 @@ my $refuse = sub {
   my @r = $MOCK->results('Diff');
   is_deeply [ map { $_->{status} } @r ], [ ('pending') x 23 ],
     'a driver that refuses the Diff area is green: every case is pending';
-  is $r[0]{card}, 'k36', '... with the area\'s card';
-  is(MockConformanceServer->summary_line(\@r), 'Diff area pending (karr k36): 23 cases',
+  ok !exists $r[0]{card}, '... with no card';
+  is(MockConformanceServer->summary_line(\@r), 'Diff area pending: 23 cases',
     'the summary line is one entry for the area, not one per case');
   is $MockConformanceServer::CALLS{upgrade}, 20, '... every case was driven and refused by the seam';
 
@@ -415,12 +415,12 @@ my $refuse = sub {
   MockConformanceServer::reset_state();
   $MockConformanceServer::REFUSALS{'diff-no-such-case'} = { kind => 'server', reason => qr/x/ };
   $MockConformanceServer::REFUSALS{'diff-fk-dropped'}   = { kind => 'pending', reason => qr/x/ };
-  $MockConformanceServer::REFUSALS{'ddl-foreign-key'}   = { kind => 'pending', reason => qr/x/ };
+  $MockConformanceServer::REFUSALS{'ddl-foreign-key'}   = { kind => 'pending', reason => 'not a regex' };
   $p = join "\n", MockConformanceServer->check_declarations('Diff');
   like $p, qr/diff-no-such-case.*unknown case/s, 'a refusal naming no Diff case is a problem';
-  like $p, qr/diff-fk-dropped.*card/s, 'pending needs a card';
+  unlike $p, qr/diff-fk-dropped'?: /, 'pending needs no card';
   unlike $p, qr/ddl-foreign-key/, 'a refusal of the DDL list is not judged by the Diff check';
-  like join("\n", MockConformanceServer->check_declarations('DDL')), qr/ddl-foreign-key.*card/s,
+  like join("\n", MockConformanceServer->check_declarations('DDL')), qr/ddl-foreign-key.*reason/s,
     '... it is judged by the DDL check';
   unlike join("\n", MockConformanceServer->check_declarations('DDL')), qr/diff-/, '... and the DDL check does not see Diff names';
 }
@@ -429,7 +429,7 @@ my $refuse = sub {
 {
   local $ENV{AUTHOR_TESTING} = 1;
   MockConformanceServer::reset_state();
-  $MockConformanceServer::REFUSALS{'diff-constraint-changed'} = { kind => 'pending', card => 'k72', reason => qr/not applied/ };
+  $MockConformanceServer::REFUSALS{'diff-constraint-changed'} = { kind => 'pending', reason => qr/not applied/ };
   $MockConformanceServer::QUIRK{throw_upgrade}{'diff-constraint-changed'} = $refuse->(
     "upgrade refused for table 'child', column 'code': constraint changes are not applied yet"
   );

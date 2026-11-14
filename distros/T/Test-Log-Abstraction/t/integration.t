@@ -28,7 +28,8 @@ use Readonly;
 use Errno qw(EACCES ENOENT);
 use File::Spec;
 use File::Temp qw(tempdir);
-use JSON::PP ();
+use JSON::MaybeXS ();
+use Encode ();
 use Time::HiRes ();
 use Capture qw(capture_diag run_perl_script);
 
@@ -143,7 +144,7 @@ sub os_text {
 			$log->warn("upstream failed for $id: ", $error);
 			return;
 		}
-		my $data = eval { JSON::PP->new()->decode($raw) };
+		my $data = eval { JSON::MaybeXS->new()->decode($raw) };
 		if(ref($data) ne 'HASH') {
 			$log->error("malformed payload for $id", { payload => substr($raw, 0, $PAYLOAD_PREVIEW) });
 			return;
@@ -529,6 +530,148 @@ subtest 'an upstream exception whose text form dies' => sub {
 		$logger{$name}->like(qr/\Arun complete: 2 of 3\z/, "$name: and the run completed");
 	}
 	like($printed, qr/upstream failed for broken: Local::Error=HASH/, 'the loud logger printed it too');
+};
+
+# What a hostile upstream might put in its error text and payloads: a
+# clipboard write (OSC 52), a screen clear and a carriage return.  Printed
+# raw, these would act on the terminal of whoever reads the test output
+Readonly::Scalar my $OSC52 => "\e]52;c;cHduZWQ=\a";
+Readonly::Scalar my $CLEAR => "\e[2J";
+# A control character that is not tab or newline, anywhere in output
+Readonly::Scalar my $ANY_CONTROL => qr/[\x00-\x08\x0B-\x1F\x7F]/;
+
+# An upstream whose every failure carries terminal control sequences, and
+# one exception whose text is a character string with broken UTF-8, as
+# buggy XS code can produce
+sub hostile_service {
+	my $broken = "bad\xff\xfe$CLEAR";
+	Encode::_utf8_on($broken);
+	return service(
+		ok => sub { '{"id":"ok"}' },
+		down => sub { die "503$OSC52$CLEAR\rforged\n" },
+		rubbish => sub { "<html>$OSC52</html>" },
+		broken => sub { die "$broken\n" },
+	);
+}
+
+# Strategy: run the importer against the hostile upstream with a logger
+# that prints everything, beside a quiet one.  The POD (Which messages are
+# printed) promises the stored record is exactly what was logged - so a
+# test can match the raw text - while the printed copy shows each control
+# character as \xNN.  The run must not die, and the two loggers must
+# store the same record: printing must not leak into what is stored
+subtest 'hostile upstream text: stored exactly, printed safely' => sub {
+	my %logger = (loud => new_ok($CLASS => [diag => 'all', verbose => 1]), quiet => quiet_logger());
+	my %ok;
+	my $printed = capture_diag {
+		foreach my $name (sort keys %logger) {
+			my $importer = Local::Importer->new(logger => $logger{$name}, service => hostile_service(), timeout => ($CAN_TIME_OUT ? $TIMEOUT : undef));
+			lives_ok { $ok{$name} = $importer->run(qw(ok down rubbish broken)) } "$name: the run does not die";
+		}
+	};
+	state_diag(printed => $printed);
+	state_diag(stored => $logger{'loud'}->messages());
+
+	is($ok{'loud'}, 1, 'the good record was still fetched');
+	is_deeply($logger{'loud'}->messages(), $logger{'quiet'}->messages(), 'printing or not, both stored the same record');
+	$logger{'quiet'}->like(qr/\Aupstream failed for down: 503\Q$OSC52$CLEAR\E\rforged\z/, 'the stored error is the raw text');
+	my ($rubbish) = grep { $_->{'level'} eq 'error' } @{$logger{'quiet'}->messages()};
+	is($rubbish->{'fields'}->{'payload'}, "<html>$OSC52</html>", 'the stored payload is the raw text');
+
+	ok($printed !~ $ANY_CONTROL, 'nothing printed is a control character, but tab and newline') or diag(explain($printed));
+	ok(index($printed, 'upstream failed for down: 503\x1B]52;c;cHduZWQ=\x07\x1B[2J\x0Dforged') >= 0, 'the error is printed with its controls escaped');
+	ok(index($printed, 'upstream failed for broken: bad') >= 0, 'the broken UTF-8 error is printed, not dropped');
+	$logger{'loud'}->like(qr/\Arun complete: 1 of 4\z/, 'and the run completed');
+};
+
+# A subclass that keeps its lines instead of printing them, as the POD's
+# _emit EXAMPLE suggests
+{
+	package Local::Collecting;
+	our @ISA = ('Test::Log::Abstraction');
+	sub _emit { my ($self, $text) = @_; push @{$self->{'collected'}}, $text; return $self }
+}
+
+# Strategy: the POD for _emit says text from a logged message is escaped
+# before it is passed there, so a replacement _emit gets safe text too.
+# Run the hostile workflow through such a subclass: its lines must be
+# escaped, nothing must reach the TAP output, and a failing assertion's
+# list must go through it the same way
+subtest 'a subclass that collects its lines gets them escaped' => sub {
+	my $logger = new_ok('Local::Collecting' => [diag => 'all', verbose => 0]);
+	my $importer = Local::Importer->new(logger => $logger, service => hostile_service(), timeout => ($CAN_TIME_OUT ? $TIMEOUT : undef));
+	my $printable = spy "${CLASS}::_printable";
+	my $printed = capture_diag { $importer->run(qw(ok down rubbish)) };
+	my @escaped = $printable->();
+	restore_all();
+	state_diag(collected => $logger->{'collected'});
+
+	is($printed, '', 'nothing went to the TAP output');
+	is(scalar(@{$logger->{'collected'}}), scalar(@{$logger->messages()}), 'every stored message reached the subclass');
+	is(scalar(@escaped), scalar(@{$logger->messages()}), '... each through _printable, once');
+	ok(!grep({ $_ =~ $ANY_CONTROL } @{$logger->{'collected'}}), '... and none holds a control character');
+
+	@{$logger->{'collected'}} = ();
+	Test::Builder->new()->todo_start('expected to fail: checking what it lists');
+	$logger->unlike(qr/503/, 'unlike, listing the hostile error');
+	Test::Builder->new()->todo_end();
+	ok((grep { index($_, '503\x1B]52;') >= 0 } @{$logger->{'collected'}}), 'a failing assertion lists it through the subclass, escaped');
+};
+
+# Strategy: _assert's comment and every assertion's Side Effects promise a
+# failure is reported at the line that called the assertion.  Real test
+# files call them inside subtests, often nested, so make each assertion
+# fail (as a TODO) at three depths after a real workflow, and check the
+# reported file and line.  A wrong $Test::Builder::Level once looked right
+# at the top level of a file but pointed into Test::Builder in a subtest
+subtest 'a failure is reported at the line that called the assertion' => sub {
+	my $logger = quiet_logger();
+	Local::Importer->new(logger => $logger, service => service(ok => sub { '{"id":"ok"}' }))->run('ok');
+	my $file = __FILE__;
+	my $tb = Test::Builder->new();
+	my %line;
+	my $assert = sub {
+		my $depth = shift;
+		$tb->todo_start('expected to fail: checking where it is reported');
+		$logger->like(qr/absent/, "like $depth"); $line{"like $depth"} = __LINE__;
+		$logger->unlike(qr/fetched/, "unlike $depth"); $line{"unlike $depth"} = __LINE__;
+		$logger->has_level('emergency', "has_level $depth"); $line{"has_level $depth"} = __LINE__;
+		$logger->empty("empty $depth"); $line{"empty $depth"} = __LINE__;
+		$tb->todo_end();
+	};
+	my $printed = capture_diag {
+		$assert->('depth 1');
+		subtest 'depth 2' => sub { $assert->('depth 2') };
+		subtest 'depth 3' => sub { subtest 'inner' => sub { $assert->('depth 3') } };
+	};
+	state_diag(printed => $printed);
+
+	foreach my $name (sort keys %line) {
+		ok($printed =~ /\Q$name'\E\s*#\s+at \Q$file\E line \Q$line{$name}\E\./, "$name: reported at $file line $line{$name}")
+			or diag(explain($printed));
+	}
+	unlike($printed, qr/at \S*Test.Builder\.pm line/, 'never inside Test::Builder');
+};
+
+# Strategy: COMMON PITFALLS says the double prints control characters
+# escaped where Log::Abstraction prints them as they are, but that the
+# stored message is not changed.  So with hostile text the two must still
+# store identical records
+subtest 'hostile text is stored as the real Log::Abstraction stores it' => sub {
+	my $have_real = eval { require Log::Abstraction; 1 };
+	plan(skip_all => 'Log::Abstraction is not installed') if(!$have_real);
+
+	my %record;
+	foreach my $which ('real', 'double') {
+		my $logger = ($which eq 'real') ? Log::Abstraction->new(logger => [], level => 'debug') : quiet_logger();
+		# The broken-UTF-8 upstream is left out: what the real logger does
+		# with it is not this module's promise
+		my $upstream = service(ok => sub { '{"id":"ok"}' }, down => sub { die "503$OSC52$CLEAR\rforged\n" }, rubbish => sub { "<html>$OSC52</html>" });
+		Local::Importer->new(logger => $logger, service => $upstream, timeout => ($CAN_TIME_OUT ? $TIMEOUT : undef))->run(qw(ok down rubbish));
+		$record{$which} = $logger->messages();
+	}
+	state_diag(record => \%record);
+	is_deeply($record{'double'}, $record{'real'}, 'identical records, control characters and all');
 };
 
 # Strategy: logrotate moves the files and sends SIGHUP; the handler calls

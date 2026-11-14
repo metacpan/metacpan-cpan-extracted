@@ -7,7 +7,7 @@ package DBIO::Relationship::BelongsTo;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Try::Tiny;
 use namespace::clean;
@@ -124,7 +124,7 @@ DBIO::Relationship::BelongsTo - Declare a foreign-key relationship to a parent r
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 METHODS
 

@@ -22,12 +22,10 @@ use mro 'c3';
 The role modules are plain packages (no `Exporter`); they define methods and
 document in a comment what the consuming class must provide.
 
-**Do NOT compose roles via Exporter import** (`use Role qw(method)`). An
-imported sub's CV still reports the *role* as its package, and the role is in
-no MRO -- so any role method that calls `$self->next::method(...)` cannot find
-the next implementation and dies ("No next::method 'X' found"). This is latent
-for the live driver and fatal under the offline `DBIO::Test::Storage` hybrid
-(it bit Oracle's `_prep_for_execute`).
+Roles are plain packages composed with `use base` and `use mro 'c3'`, so `next::method`
+finds the next implementation: the package of a role's method is the role, and the role
+sits in the class's MRO. (A sub imported by `use Role qw(method)` reports the role as its
+package while the role is in no MRO; `$self->next::method(...)` then finds nothing.)
 
 **Ordering matters:** a role that *overrides* a `DBIO::Storage::DBI` method
 (e.g. an `_prep_for_execute` that adds behaviour then calls `next::method`)

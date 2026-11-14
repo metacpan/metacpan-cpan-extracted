@@ -4,7 +4,7 @@ package DBIO::SQLMaker::ClassicExtensions;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 
 # to pull in CAG and the frame-boundary-markers
@@ -1364,7 +1364,7 @@ DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 
@@ -1445,7 +1445,7 @@ builder splices both in where its grammar wants them.
 
 C<$table> is the target table the statement inserts into. Pass it and every
 bare (stored-side) column in the condition is qualified with it (see below); it
-is optional, and omitting it renders the pre-k205 unqualified condition.
+is optional; without it the condition renders unqualified.
 
 Two vocabularies, both engine-neutral:
 

@@ -95,6 +95,11 @@ Input continuations expire after 30 minutes, are bound to the original call
 and are consumed once. These results use C<structuredContent> and matching
 JSON text; see L<AnyEvent::MCP::Server::Request/result>.
 
+As a spawned multibroker stdio child, the server requests idle shutdown after
+five minutes without MCP requests. Outstanding input continuations prevent
+shutdown until consumed or expired; the idle request is retried afterward.
+Directly connected clients and HTTP listeners are unaffected.
+
 =head1 ASK-FORM TOOL
 
 C<ask-form> exposes the form interface directly when you need several fields
@@ -147,18 +152,19 @@ C<ask-user>.
 
 Shared switches are documented in
 L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
-HTTP is the default transport. The following switch is application-specific.
+HTTP is the default transport. The following shared switch controls form prompting.
 
 =over
 
 =item --ask MODE
 
 Choose human prompting mode: C<helper> (default standalone), C<tty>,
-C<yad>, C<mcp> or C<auto>. C<helper> launches
+C<yad>, C<mcp>, C<auto> or C<none>. C<helper> launches
 C<anyevent-mcp-form-elicitation> or
 C<PERL_ANYEVENT_MCP_ELICITATION_HELPER>; C<tty>/C<yad> force that local
 interface without fallback. C<mcp> asks client; C<auto> uses client
-forms when advertised, otherwise local helper. Declines never retry
+forms when advertised, otherwise local helper; C<none> automatically
+declines. Declines never retry
 via another interface. Explicit C<--ask> overrides inherited
 C<PERL_ANYEVENT_MCP_PERMISSION_ASK>; spawned multibroker instances
 default to client mode. Clients that advertise but silently decline
@@ -178,15 +184,20 @@ use AnyEvent::MCP::Helper ();
 
 use AnyEvent::MCP::Server::Simple;
 
-my $options = mcp_getoptions ({
-   usage       => "Usage: $0 [OPTION]...\n",
-   description => "Ask a human question or display an MCP form, locally or through native elicitation.",
-   options     => [["--ask MODE", "Ask via helper (default), tty, yad, mcp, or auto"]],
-   examples    => "  $0 --stdio\n  $0 --ask mcp --name questions --print-url",
-}, "ask=s" => \my $ask_mode);
+mcp_permissions undef; # human-input tools do not use application permissions
+
+my $options = mcp_getoptions
+   {
+      usage       => "Usage: $0 [OPTION]...\n",
+      description => "Ask a human question or display an MCP form, locally or through native elicitation.",
+      examples    => "  $0 --stdio\n  $0 --ask mcp --name questions --print-url",
+   }
+;
+
+my $ask_mode = delete $options->{ask};
 $ask_mode //= $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio"
    ? "mcp" : $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
-$ask_mode =~ /\A(?:helper|tty|yad|auto|mcp)\z/ or die "--ask must be helper, tty, yad, auto, or mcp\n";
+$ask_mode =~ /\A(?:helper|tty|yad|auto|mcp|none)\z/ or die "--ask must be helper, tty, yad, auto, mcp, or none\n";
 
 my %pending;
 
@@ -245,6 +256,8 @@ sub elicit_form {
 
       return $done->($req, $req->{params}{inputResponses}{$key});
    }
+
+   return $done->($req, { action => "decline" }) if $ask_mode eq "none";
 
    my $caps = $req->{params}{_meta}{"io.modelcontextprotocol/clientCapabilities"};
    my $native = $req->{protocol_version} ge "2026"
@@ -424,8 +437,10 @@ mcp_tool ask_form =>
    \&ask_form;
 
 mcp_config
-   server_name    => "mcp-ask-user",
-   server_version => $AnyEvent::MCP::VERSION,
+   idle_exit        => 300,
+   on_idle_shutdown => sub { !%pending },
+   server_name      => "mcp-ask-user",
+   server_version   => $AnyEvent::MCP::VERSION,
    short_instructions => "Ask human when input needed: ask-user for question, ask-form for fields. Decline/cancel are not answers.",
    instructions => "Use only when human input needed. ask-user: question, choices, free text. ask-form: MCP form schema. Decline/cancel are not answers.";
 

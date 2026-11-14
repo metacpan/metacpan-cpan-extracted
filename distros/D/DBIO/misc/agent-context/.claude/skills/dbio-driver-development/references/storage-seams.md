@@ -31,7 +31,7 @@ class before the first connection (`DBIO::X::Storage->_use_X(1)`) or `set_use_db
 | `_set_connection_schema($name)` | engine has namespaces; connect key `schema` (ADR 0065). Default throws; set the namespace via `_do_query` so it reaches pool connections |
 | `_dbio_storage_option_names` (+ `_dbio_storage_option_accessor_map`) | the driver adds connect options of its own: extend the SUPER list, register an accessor per name (ADR 0048) |
 | `connect_call_*` / `disconnect_call_*` | session setup; send statements through `_do_query` so pool connections get them (ADR 0049). Examples: `connect_call_set_strict_mode` (MySQL), `connect_call_use_foreign_keys` (SQLite) |
-| `_explain_query($sql, \@bind)` → `\@rows` | EXPLAIN is not "`EXPLAIN $sql` returns rows" (ADR 0040). `_explain_sql` is no longer called. Run statements through `_execute_rendered` / `_prepare_rendered` |
+| `_explain_query($sql, \@bind)` → `\@rows` | EXPLAIN is not "`EXPLAIN $sql` returns rows" (ADR 0040). Run statements through `_execute_rendered` / `_prepare_rendered` |
 | `_prep_rendered_for_execute($sql, $bind)` | the driver rewrites statements in `_prep_for_execute`; mirror it for the rendered path |
 | `_set_operation_keyword($op)` | engine spells or lacks `union_all`/`intersect(_all)`/`except(_all)` (ADR 0039); spell it, or throw naming engine and version, else `next::method` |
 | `supports_exists_query` + `_exists_value_sql($inner)` | `results_exist*` throws without the declaration; override the SQL when FROM-less SELECT is refused (ADR 0037) |
@@ -51,4 +51,10 @@ Text carrying connect info goes through `DBIO::Util::mask_connect_secrets`; stac
 through `masked_longmess` / `masked_confess` / `masked_cluck`, not Carp's. Core test
 frames: `DBIO::Test::Storage` (mock), `DBIO::Test::Conformance`, `DBIO::Test::StorageLayer`
 (structural check for extension dists), `DBIO::Test::AsyncHarness` (live harness for
-transports), `DBIO::Test::Future`.
+transports), `DBIO::Test::AsyncParity` (sync-vs-async parity cases; a transport's test class
+inherits it and declares deviations and capabilities, POD section *WRITING A TRANSPORT'S
+CLASS*), `DBIO::Test::Future`.
+
+Error text names keys, columns and options, never values; engine text runs through
+`_mask_error_values($text, \@values, $statement)`, which a driver overrides (with
+`next::method`) for a value form of its own.

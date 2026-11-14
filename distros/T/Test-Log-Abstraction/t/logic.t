@@ -453,6 +453,9 @@ subtest 'invariant: before, during and after each operation' => sub {
 		'set verbose' => sub { $logger->verbose(1); $logger->verbose(0) },
 		'clone' => sub { $logger = $logger->new(lang => 'de') },
 		'failing assertion' => sub { my $tb = Test::Builder->new(); $tb->todo_start('expected'); printed { $logger->like(qr/never/) }; $tb->todo_end() },
+		'log an argument that dies when read' => sub { tie my $dying, 'Local::Slot', 1; $logger->info('a', $dying) },
+		'log a reference that claims another type' => sub { $logger->info(bless({}, 'ARRAY')) },
+		'misspelt method with a malformed name' => sub { my $name = malformed("\xff\xfe"); printed { $logger->$name('x') } },
 		'clear' => sub { $logger->clear() },
 	);
 	foreach my $name (sort keys %operation) {
@@ -493,6 +496,8 @@ subtest 'contradictions are refused before any effect' => sub {
 		['a test name is text', sub { $logger->empty({}) }, q{invalid argument: Parameter 'name' must be a string}],
 		['a clone obeys the rules of new()', sub { $logger->new(level => 'LOUD') }, q{invalid syslog level 'LOUD'}],
 		['undef is not a level name, even in a list', sub { $CLASS->new(diag => [undef]) }, q{invalid diag level 'undef'}],
+		['a diag list is an array, not an object that claims to be one', sub { $CLASS->new(diag => bless({}, 'ARRAY')) }, 'diag must be a level name, "all", "none" or an array reference of level names'],
+		['a pattern is valid text', sub { $logger->like(malformed("\xff\xfe")) }, undef],
 	);
 	my $test = Test::Builder->new();
 	foreach my $case (@cases) {
@@ -710,5 +715,318 @@ subtest 'reduction: _object needs no defined() or ref() before isa()' => sub {
 		throws_ok { Test::Log::Abstraction::_object($self, 'm') } qr/\A\Q$named: m() must be called on an object, not on the class\E at /, "$name: names $named";
 	}
 };
+
+# level() decides "get" from the argument alone, before making a key.
+#   Premise 1: _string() returns a defined string for any defined value,
+#              even a false one, and even an object whose "" dies.
+#   Premise 2: so the key is undefined exactly when the argument is.
+#   Conclusion: only undef gets.  Every defined value, false ones
+#   included, is looked up and, if not a level, warned about; and the get
+#   path never calls _string().
+subtest 'reduction: level() decides get from the argument alone' => sub {
+	my $dies = bless {}, 'Local::DiesLevel';
+	{
+		package Local::DiesLevel;
+		use overload '""' => sub { die "no\n" }, fallback => 1;
+	}
+	ok(defined(Test::Log::Abstraction::_string($_)), 'premise 1: ' . (ref($_) || "'$_'") . ' gives a defined string') foreach ('', '0', 0, $dies);
+
+	my $logger = quiet(level => 'info');
+	my $strings = spy "${CLASS}::_string";
+	my $got = $logger->level(undef);
+	my @calls = $strings->();
+	restore_all();
+	is($got, $SEVERITY{'info'}, 'undef: get');
+	is(scalar(@calls), 0, 'undef: no key is made');
+
+	# The boundary: false but defined values are not the get case
+	foreach my $false ('', '0', 0) {
+		my $result = 'unset';
+		like(warning { $result = $logger->level($false) }, at_caller("invalid syslog level '$false'"), "'$false': looked up, and warned about");
+		ok(!defined($result), "'$false': returns undef");
+	}
+	like(warning { $logger->level($dies) }, qr/\A\Q$CLASS: invalid syslog level 'Local::DiesLevel=HASH(0x\E/, 'an object whose "" dies: looked up in plain form');
+	is($logger->level(), $SEVERITY{'info'}, '... and none of them changed the level');
+
+	# The warn case returns undef as a value, so list context sees one
+	my @list;
+	warning { @list = $logger->level('bogus') };
+	is_deeply(\@list, [undef], 'warn in list context: (undef), not ()');
+	is_deeply([$logger->level('ERROR')], [$logger], 'set in list context: (the logger)');
+};
+
+# _plural() returns at the first answer it is sure of.
+#   Premise 1: without a numeric count the answer is 'other', whatever the
+#              template holds.
+#   Premise 2: 'zero' is chosen only after finding it in the template.
+#   Conclusion: the first needs no lookup in the template and the second
+#   only one.  Only a form named by the language rule is looked for and
+#   may still fall back to 'other'.  Counted with a tied template.
+subtest 'reduction: _plural() returns at the first answer it is sure of' => sub {
+	{
+		package Local::CountingForms;
+		our $lookups = 0;
+		sub TIEHASH { my ($class, %forms) = @_; return bless { %forms }, $class }
+		sub EXISTS { $lookups++; return exists($_[0]->{$_[1]}) }
+		sub FETCH { return $_[0]->{$_[1]} }
+	}
+	my %rows = (
+		# name => [forms, count, wanted, lookups]
+		'not numeric, no other form' => [[one => 1], 'many', 'other', 0],
+		'undef count' => [[one => 1, other => 1], undef, 'other', 0],
+		'zero, has zero' => [[zero => 1, other => 1], 0, 'zero', 1],
+		'zero, no zero: the rule decides' => [[one => 1, other => 1], 0, 'other', 2],
+		'rule names a form it has' => [[one => 1, other => 1], 1, 'one', 1],
+		'rule names a form it lacks' => [[other => 1], 1, 'other', 1],
+		'not zero: zero is not looked for' => [[zero => 1, other => 1], 2, 'other', 1],
+	);
+	foreach my $row (sort keys %rows) {
+		my ($forms, $count, $want, $lookups) = @{$rows{$row}};
+		tie my %template, 'Local::CountingForms', @{$forms};
+		$Local::CountingForms::lookups = 0;
+		is(Test::Log::Abstraction::_plural(\%template, $count, 'en'), $want, "$row: $want");
+		is($Local::CountingForms::lookups, $lookups, "$row: $lookups lookup" . (($lookups == 1) ? '' : 's'));
+	}
+};
+
+# ===========================================================================
+# The defences added in 0.002.2: hostile names, references and arguments
+# ===========================================================================
+
+# A character string whose bytes are not valid UTF-8
+sub malformed {
+	my $text = shift;
+
+	Encode::_utf8_on($text);
+	return $text;
+}
+
+{
+	package Local::Slot;
+	# A tied scalar that counts its reads; it dies on each read if asked to
+	sub TIESCALAR { my ($class, $dies) = @_; return bless { dies => $dies, reads => 0 }, $class }
+	sub FETCH { my $self = shift; $self->{'reads'}++; die "unreadable\n" if($self->{'dies'}); return 'ok' }
+}
+
+# Is_a = (ref eq T) AND (reftype eq T); so, by De Morgan, not a T =
+# (ref ne T) OR (reftype ne T).  2 x 2 rows for each T, plus the two rows
+# where there is no reference at all, which must give false without a
+# warning (Test::Warnings checks).
+subtest 'truth table: _is_a, all rows for HASH and ARRAY' => sub {
+	my %other = (HASH => 'ARRAY', ARRAY => 'HASH');
+	foreach my $type ('HASH', 'ARRAY') {
+		my $make = sub { ($_[0] eq 'HASH') ? {} : [] };
+		my %value = (
+			'11' => $make->($type),
+			'10' => bless($make->($other{$type}), $type),
+			'01' => bless($make->($type), 'Local::Other'),
+			'00' => bless($make->($other{$type}), 'Local::Other'),
+		);
+		foreach my $key (sort keys %value) {
+			my ($ref, $reftype) = split(//, $key);
+			is(((ref($value{$key}) eq $type) ? 1 : 0) . ((Scalar::Util::reftype($value{$key}) eq $type) ? 1 : 0), $key, "$type $key: the row is what it says");
+			my $want = ($ref && $reftype) ? 1 : 0;
+			my $de_morgan = (!$ref || !$reftype) ? 0 : 1;
+			is($want, $de_morgan, "$type ref=$ref reftype=$reftype: De Morgan holds");
+			is(Test::Log::Abstraction::_is_a($value{$key}, $type) ? 1 : 0, $want, "$type ref=$ref reftype=$reftype: $want");
+		}
+		ok(!Test::Log::Abstraction::_is_a(undef, $type), "$type: undef is not one");
+		ok(!Test::Log::Abstraction::_is_a('HASH', $type), "$type: a plain string is not one, even the type's name");
+	}
+};
+
+# _is_a() calls reftype() with no defined() test.
+#   Premise 1: ref() is a non-empty type name only for a reference.
+#   Premise 2: reftype() is defined for every reference.
+#   Conclusion: when ref() eq T has passed, reftype() is defined; when it
+#   has failed, reftype() is never called.
+subtest 'reduction: _is_a needs no defined() before reftype()' => sub {
+	foreach my $value (undef, '', 0, 'HASH', 'ARRAY') {
+		my $label = defined($value) ? "'$value'" : 'undef';
+		is(ref($value), '', "premise 1: $label is no reference");
+	}
+	foreach my $value ({}, [], \1, sub { 1 }, qr/x/, \*STDOUT, bless({}, 'ARRAY')) {
+		ok(defined(Scalar::Util::reftype($value)), 'premise 2: ' . ref($value) . ' has a reftype');
+	}
+	my $reftypes = spy 'Scalar::Util::reftype';
+	Test::Log::Abstraction::_is_a($_, 'HASH') foreach (undef, 'HASH', []);
+	my @calls = $reftypes->();
+	restore_all();
+	is(scalar(@calls), 0, 'conclusion: reftype() is not reached when ref() already fails');
+};
+
+# Unchanged = NOT character string OR valid.  Of the 4 rows only 3 exist:
+#   Premise: a byte string is always valid, so (bytes, invalid) is empty.
+# Each row that exists gives its answer, and a repaired string is valid.
+subtest 'truth table: _repaired, every possible row' => sub {
+	my $all_bytes = join('', map { chr($_) } 0 .. 255);
+	ok(utf8::valid($all_bytes), 'premise: a byte string with every byte value is valid');
+	my %row = (
+		'bytes, valid' => ["\xff\xfe abc", 0, 1],
+		'characters, valid' => ["\x{263a} abc", 1, 1],
+		'characters, not valid' => [malformed("\xff\xfe abc"), 1, 0],
+	);
+	foreach my $name (sort keys %row) {
+		my ($text, $flagged, $valid) = @{$row{$name}};
+		is((utf8::is_utf8($text) ? 1 : 0) . (utf8::valid($text) ? 1 : 0), "$flagged$valid", "$name: the row is what it says");
+		my $unchanged = (!$flagged || $valid) ? 1 : 0;
+		my $got = Test::Log::Abstraction::_repaired($text);
+		is(($got eq $text) && (utf8::is_utf8($got) == utf8::is_utf8($text)) ? 1 : 0, $unchanged, "$name: " . ($unchanged ? 'returned as it is' : 'repaired'));
+		ok(utf8::valid($got), "$name: the result is valid");
+	}
+};
+
+# The syllogism behind _lc() and every level lookup:
+#   Major premise: every level name is ASCII letters.
+#   Minor premise: lc() makes ASCII of exactly one non-ASCII character,
+#                  the Kelvin sign (U+212A to 'k'), and acts on each
+#                  character alone; and no level name has a 'k'.
+#   Conclusion: no name with a non-ASCII character, and so no repaired
+#   malformed name (which holds U+FFFD), is ever a level name.
+# Proved over every code point, not sampled.
+subtest 'syllogism: no non-ASCII name is a level name' => sub {
+	my @names = keys %SEVERITY;
+	push @names, qw(emerg panic crit fatal err warning informational);
+	ok(!grep({ !/\A[a-z]+\z/ } @names), 'major premise: every level name is ASCII letters');
+
+	my @to_ascii;
+	{
+		no warnings 'utf8';	## no critic (ProhibitNoWarnings): lc() of a non-character is part of the proof
+		foreach my $code (0x80 .. 0x10FFFF) {
+			next if(($code >= 0xD800) && ($code <= 0xDFFF));	# surrogates: tested below, through _lc()
+			push @to_ascii, $code if(lc(chr($code)) =~ /\A[\x00-\x7f]+\z/);
+		}
+	}
+	is_deeply(\@to_ascii, [0x212A], 'minor premise: only the Kelvin sign lower-cases to ASCII');
+	is(lc("ERR\x{212A}OR"), lc('ERR') . lc("\x{212A}") . lc('OR'), 'minor premise: lc() acts on each character alone');
+	ok(!grep({ /k/ } @names), "minor premise: no level name has a 'k'");
+
+	# The conclusion, through the code: the Kelvin sign makes 'k', which
+	# is in no name; U+FFFD, a surrogate and a dotted capital I stay
+	# non-ASCII
+	foreach my $name ("\x{212A}", "\x{130}NFO", "error\x{D800}", malformed("\xff error"), Test::Log::Abstraction::_repaired(malformed("err\xffor"))) {
+		my $key = Test::Log::Abstraction::_lc($name);
+		ok(!grep({ $_ eq $key } @names), 'conclusion: ' . join('', map { sprintf('\\x{%X}', ord($_)) } split(//, $key)) . ' is no level name');
+	}
+};
+
+# _entry() reads each argument once, and goes on past one that dies.
+#   Premise 1: push() appends nothing when the value it reads dies.
+#   Premise 2: each pass of the loop either ends it or appends one plain
+#              form, so @args grows on every pass.
+#   Conclusion: the loop ends after at most one pass per argument, and
+#   every argument is read exactly once.  All 2 x 2 x 2 rows of three
+#   arguments, each readable or dying.
+subtest 'truth table: _entry reads, all 8 rows of three arguments' => sub {
+	my @pushed = ('kept');
+	tie my $dying, 'Local::Slot', 1;
+	eval { push @pushed, $dying };
+	is_deeply(\@pushed, ['kept'], 'premise 1: a push whose read dies appends nothing');
+	untie $dying;
+
+	foreach my $row (0 .. 7) {
+		my @dies = map { ($row >> $_) & 1 } 0 .. 2;
+		my @slots;
+		tie $slots[$_], 'Local::Slot', $dies[$_] foreach 0 .. 2;
+		my $entry = Test::Log::Abstraction::_entry('info', \@slots);
+		my $label = join('', @dies);
+		is_deeply([map { tied($_)->{'reads'} } @slots], [1, 1, 1], "dies=$label: each argument read once");
+		like($entry->{'message'}, qr/\A${\ join('', map { $_ ? 'Local::Slot=HASH\(0x[0-9a-f]+\)' : 'ok' } @dies)}\z/, "dies=$label: each part in its place");
+		untie $_ foreach @slots;
+	}
+};
+
+# Render = 'undef' if undefined; the text of a value that is not really a
+# hash or an array; (cycle) for one already on the path; else written out.
+# One row per outcome, the claimed types included.
+subtest 'truth table: _stringify, every outcome' => sub {
+	my $loop = [];
+	push @{$loop}, $loop;
+	my $shared = ['y'];
+	my %row = (
+		'undef' => [undef, qr/\Aundef\z/],
+		'plain value' => ['v', qr/\Av\z/],
+		'hash' => [{ k => 'v' }, qr/\A\{k => v\}\z/],
+		'array' => [['a', 'b'], qr/\A\[a, b\]\z/],
+		'array claiming HASH' => [bless([], 'HASH'), qr/\AHASH=ARRAY\(0x[0-9a-f]+\)\z/],
+		'hash claiming ARRAY' => [bless({}, 'ARRAY'), qr/\AARRAY=HASH\(0x[0-9a-f]+\)\z/],
+		'cycle' => [$loop, qr/\A\[\(cycle\)\]\z/],
+		'the same array twice: no cycle' => [[$shared, $shared], qr/\A\[\[y\], \[y\]\]\z/],
+	);
+	foreach my $name (sort keys %row) {
+		my ($value, $want) = @{$row{$name}};
+		like(Test::Log::Abstraction::_stringify($value, {}), $want, $name);
+	}
+	@{$loop} = ();
+};
+
+# Overrides = the i18n option if it is really a hash, else none; then a
+# table is searched only if it is really a hash.  2 x 2 rows.
+subtest 'truth table: _template with claimed hashes, all 4 rows' => sub {
+	my $builtin = Test::Log::Abstraction::_template(quiet(), 'en', 'needs_level');
+	foreach my $option (0, 1) { foreach my $table (0, 1) {
+		my $tables = { en => $table ? { needs_level => 'own' } : bless(['x'], 'HASH') };
+		my $logger = quiet(i18n => $option ? $tables : bless([], 'HASH'));
+		my $want = ($option && $table) ? 'own' : $builtin;
+		is(Test::Log::Abstraction::_template($logger, 'en', 'needs_level'), $want, "option a hash=$option table a hash=$table: " . (($option && $table) ? 'the override' : 'the built-in'));
+	} }
+};
+
+# Known = defined code AND (a built-in catalogue OR (the option really a
+# hash AND it has the code)).  For a code with no built-in: 2 x 2 rows.
+subtest 'truth table: _resolve_lang with a claimed hash, all 4 rows' => sub {
+	foreach my $is_hash (0, 1) { foreach my $has (0, 1) {
+		my $i18n = $is_hash ? ($has ? { xx => {} } : { yy => {} }) : bless($has ? ['xx'] : [], 'HASH');
+		my $want = ($is_hash && $has) ? 'xx' : 'en';
+		is(Test::Log::Abstraction::_resolve_lang({ lang => 'xx', i18n => $i18n }), $want, "option a hash=$is_hash has xx=$has: $want");
+	} }
+	is(Test::Log::Abstraction::_resolve_lang({ lang => 'de', i18n => bless([], 'HASH') }), 'de', 'a built-in language needs no option at all');
+};
+
+# Gender decides = gender defined AND the template has a form named by its
+# text.  An object's text is its overloaded form, or its plain form when
+# that dies.  One row per kind of gender value, against one template.
+subtest 'truth table: _variant gender values' => sub {
+	my $template = { male => 'M', other => 'X' };
+	my %row = (
+		'undef' => [undef, 'X'],
+		'a form name' => ['male', 'M'],
+		'not a form name' => ['female', 'X'],
+		'an object whose text is a form name' => [Local::Text->new('male'), 'M'],
+		'an object whose text is not' => [Local::Text->new('female'), 'X'],
+		'an object whose text form dies' => [Local::Text->new(undef, 1), 'X'],
+	);
+	foreach my $name (sort keys %row) {
+		my ($gender, $want) = @{$row{$name}};
+		is(Test::Log::Abstraction::_variant($template, { gender => $gender }, 'en'), $want, "$name: $want");
+	}
+	like(Test::Log::Abstraction::_variant(Local::Text->new(undef, 1), {}, 'en'), qr/\ALocal::Text=HASH/, 'a template whose text form dies: its plain form');
+};
+
+# _croak() and level()'s carp let Carp format none of the caller's
+# arguments.
+#   Premise 1: a short message (croak, carp) shows no arguments.
+#   Premise 2: so suppressing them cannot change what it says.
+#   Conclusion: the message is the same with and without the setting, and
+#   a malformed argument can no longer break it.
+subtest 'reduction: Carp need not format the caller\'s arguments' => sub {
+	my %said;
+	foreach my $setting ('default', 'none') {
+		local $Carp::MaxArgNums = ($setting eq 'none') ? -1 : $Carp::MaxArgNums;
+		$said{$setting} = Local::Croaker::croak_with('one', 'two', 'three');
+	}
+	like($said{'default'}, qr/\Aboom at \Q$FILE\E line \d+\.\n\z/, 'premise 1: no arguments in a short message');
+	is($said{'none'}, $said{'default'}, 'premise 2: the same message with none formatted');
+	my $bad = malformed("\xff\xfe");
+	throws_ok { quiet(level => $bad) } qr/\A\Q$CLASS: invalid syslog level\E/, 'conclusion: croak with a malformed argument gives our error';
+	like(warning { quiet()->level($bad) }, qr/\A\Q$CLASS: invalid syslog level\E/, 'conclusion: so does carp');
+};
+
+{
+	package Local::Croaker;
+	# Croak from another package, as the module does, and return the text
+	sub croak_with { return eval { Local::Croaker::thrower(@_) } ? '' : $@ }
+	sub thrower { Carp::croak('boom') }
+}
 
 done_testing();

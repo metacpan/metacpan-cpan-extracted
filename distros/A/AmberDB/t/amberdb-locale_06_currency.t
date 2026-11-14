@@ -20,12 +20,12 @@ subtest 'Master Registry (AmberDB::Locale::Currency)' => sub {
     is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('GBP')), '£', 'GBP symbol is £' );
     is( $loc->utf_decode(AmberDB::Locale::Currency->cur_symbol('AZN')), '₼', 'AZN symbol is ₼' );
 
-    my $try_data = AmberDB::Locale::Currency->by_code('TRY');
+    my $try_data = AmberDB::Locale::Currency->cur_code('TRY');
     is( $try_data->{num}, '949', 'TRY ISO num is 949' );
     is( $try_data->{name}, 'Turkish Lira', 'TRY name' );
 
-    my @all = AmberDB::Locale::Currency->all();
-    ok( scalar(@all) >= 4, 'Currency->all returns list' );
+    my @all = AmberDB::Locale::Currency->cur_all();
+    ok( scalar(@all) >= 4, 'Currency->cur_all returns list' );
     is( $all[0]->[0], 'TRY', 'First currency code is TRY' );
 };
 

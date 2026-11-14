@@ -4,7 +4,7 @@ package DBIO::Storage::PoolBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Storage::Pool';
 
@@ -206,7 +206,7 @@ sub _hand_over_when_ready {
   my $handover = $self->{_ready_handovers}{$key} = [ $caller ];
   Scalar::Util::weaken( $handover->[2] = $conn );
   @$handover[ 3, 4 ] = ($state, $ready);
-  $handover->[1] = $ready->then(
+  $handover->[1] = my $chain = $ready->then(
     sub {
       my ($caller, $conn) = delete @$state{qw(caller conn)};
       _forget_hand_over($pool, $key);
@@ -237,6 +237,15 @@ sub _hand_over_when_ready {
       return $answer->done;
     },
   );
+
+  # The callbacks above forget the hand-over, and with it the only reference
+  # the pool has to $chain, while $chain's own callback is running. Future::XS
+  # does not hold a Future during its callback itself, so the chain is kept
+  # here until it has settled -- after its callback returned.
+  if ($chain->can('on_ready')) {
+    $self->{_hand_over_chains}{$key} = $chain;
+    $chain->on_ready(sub { delete $pool->{_hand_over_chains}{$key} if $pool });
+  }
   return $caller;
 }
 
@@ -1463,7 +1472,7 @@ DBIO::Storage::PoolBase - Shared connection pool mechanics for async DBIO driver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

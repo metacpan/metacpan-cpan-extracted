@@ -7,6 +7,7 @@ Set(%Lifecycles,
         ],
         active   => [ 
             'running', # loc
+            'stopped', # loc
             'not-found', # loc
         ],
         inactive => [ 
@@ -19,12 +20,13 @@ Set(%Lifecycles,
         },
 
         transitions => {
-            ''        => [qw(new running)],
-            new       => [qw(running not-found removed deleted)],
-            running   => [qw(new not-found removed deleted)],
-            'not-found' => [qw(new running removed deleted)],
-            removed   => [qw(new running deleted)],
-            deleted   => [qw(new running removed)],
+            ''        => [qw(new running stopped)],
+            new       => [qw(running stopped not-found removed deleted)],
+            running   => [qw(new stopped not-found removed deleted)],
+            stopped   => [qw(new running not-found removed deleted)],
+            'not-found' => [qw(new running stopped removed deleted)],
+            removed   => [qw(new running stopped deleted)],
+            deleted   => [qw(new running stopped removed)],
         },
         rights => {
             '* -> *'        => 'ModifyAsset',
@@ -32,6 +34,9 @@ Set(%Lifecycles,
         actions => [
             '* -> running' => { 
                 label => "Running" # loc
+            },
+            '* -> stopped' => {
+                label => "Stopped" # loc
             },
             '* -> not-found'    => { 
                 label => "Not Found" # loc

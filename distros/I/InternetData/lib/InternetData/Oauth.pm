@@ -9,6 +9,7 @@ use Digest::SHA ();
 use Encode ();
 use MIME::Base64 ();
 use Mojo::Promise;
+use Mojo::URL;
 use Mojo::Util ();
 use Net::SSLeay ();
 use Scalar::Util ();
@@ -16,7 +17,7 @@ use Scalar::Util ();
 use InternetData::Error;
 use InternetData::OauthError;
 
-our $VERSION = '1.12.1';
+our $VERSION = '1.13.1';
 
 use constant DEVICE_CODE_GRANT => 'urn:ietf:params:oauth:grant-type:device_code';
 # The only PKCE method the server accepts.
@@ -204,7 +205,7 @@ sub authorization_url {
     while (my ($name, $value) = splice @params, 0, 2) {
         push @query, "$name=" . _percent_encode('authorization_url', $name, $value);
     }
-    return $self->{client}->_url('/oauth/authorize')->to_string . '?' . join('&', @query);
+    return $self->_url('/oauth/authorize')->to_string . '?' . join('&', @query);
 }
 
 # Trades the code a sign-in's redirect brought back for tokens. Never retried: the
@@ -270,10 +271,27 @@ sub _new {
     my ($class, $client) = @_;
     return bless {
         client => $client,
+        base_url => _issuer_base($client->{base_url}),
         # The poll's clock and its wait, replaced together in tests.
         now => \&Mojo::Util::steady_time,
         sleep_p => sub { Mojo::Promise->timer(shift) },
     }, $class;
+}
+
+# The authorization server is mounted on the apex, not on the API host: `api.`
+# is dropped and `api-<env>.` becomes `<env>.`, so https://api.internetdata.io
+# signs in at https://internetdata.io, and any other base URL is used as given.
+sub _issuer_base {
+    my ($base) = @_;
+    my $url = Mojo::URL->new($base);
+    my $host = $url->host;
+    return $base unless defined $host && ($host =~ s/\Aapi\.//i || $host =~ s/\Aapi-([^.]+)\./$1./i);
+    return $url->host($host)->to_unsafe_string;
+}
+
+sub _url {
+    my ($self, $path) = @_;
+    return Mojo::URL->new($self->{base_url} . $path);
 }
 
 # One wait, then one exchange. Recurses through $self rather than a
@@ -326,7 +344,7 @@ sub _exchange_p {
 sub _send_p {
     my ($self, $path, $form, $retries, $options, $members, $json) = @_;
     my $client = $self->{client};
-    my $url = $client->_url($path);
+    my $url = $self->_url($path);
     return $client->_retry_p($retries, sub {
         my $ua = $client->{ua};
         my %headers = (Accept => 'application/json');
@@ -462,6 +480,11 @@ and pick one of their API keys, instead of asking them to paste it: the device
 flow. An app that can take a browser redirect signs them in there instead: the
 authorization code flow, with a PKCE pair made for that one sign-in. Reached
 through L<InternetData/oauth>.
+
+It signs in at the apex, wherever the API is: a client on the default
+C<https://api.internetdata.io> signs in at C<https://internetdata.io>. Of a base
+URL's host, C<api.> is dropped and C<api-E<lt>envE<gt>.> becomes C<E<lt>envE<gt>.>,
+and any other base URL is used as given.
 
 Every method takes a client ID, issued on request from support@internetdata.io;
 for the authorization code flow it can also be the https URL of a client

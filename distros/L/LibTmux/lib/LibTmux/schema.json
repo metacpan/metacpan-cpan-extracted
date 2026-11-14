@@ -1,0 +1,1180 @@
+{
+  "schema": 1,
+  "minimum_tmux": "3.3a",
+  "wire_schema": "libtmux.where/v1",
+  "integer_range": [
+    -9007199254740991,
+    9007199254740991
+  ],
+  "aliases": {},
+  "entities": {
+    "session": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "wire": "id",
+          "source": "session_id",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "wire": "name",
+          "source": "session_name",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "attached": {
+          "type": "integer",
+          "wire": "attached",
+          "source": "session_attached",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "created": {
+          "type": "integer",
+          "wire": "created",
+          "source": "session_created",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "path": {
+          "type": "bytes",
+          "wire": "path",
+          "source": "session_path",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "window_links": {
+          "type": "relation",
+          "wire": "windowLinks",
+          "entity": "window_link",
+          "many": true,
+          "nullable": false,
+          "operators": [
+            "some",
+            "every",
+            "none"
+          ]
+        }
+      }
+    },
+    "window": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "wire": "id",
+          "source": "window_id",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "wire": "name",
+          "source": "window_name",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "wire": "width",
+          "source": "window_width",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "height": {
+          "type": "integer",
+          "wire": "height",
+          "source": "window_height",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "layout": {
+          "type": "string",
+          "wire": "layout",
+          "source": "window_layout",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "panes": {
+          "type": "relation",
+          "wire": "panes",
+          "entity": "pane",
+          "many": true,
+          "nullable": false,
+          "operators": [
+            "some",
+            "every",
+            "none"
+          ]
+        },
+        "links": {
+          "type": "relation",
+          "wire": "links",
+          "entity": "window_link",
+          "many": true,
+          "nullable": false,
+          "operators": [
+            "some",
+            "every",
+            "none"
+          ]
+        },
+        "active_pane": {
+          "type": "relation",
+          "wire": "activePane",
+          "entity": "pane",
+          "many": false,
+          "nullable": true,
+          "operators": [
+            "is",
+            "is_not"
+          ]
+        }
+      }
+    },
+    "window_link": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "wire": "id",
+          "source": null,
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "index": {
+          "type": "integer",
+          "wire": "index",
+          "source": "window_index",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "active": {
+          "type": "boolean",
+          "wire": "active",
+          "source": "window_active",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in"
+          ]
+        },
+        "session": {
+          "type": "relation",
+          "wire": "session",
+          "entity": "session",
+          "many": false,
+          "nullable": false,
+          "operators": [
+            "is",
+            "is_not"
+          ]
+        },
+        "window": {
+          "type": "relation",
+          "wire": "window",
+          "entity": "window",
+          "many": false,
+          "nullable": false,
+          "operators": [
+            "is",
+            "is_not"
+          ]
+        }
+      }
+    },
+    "pane": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "wire": "id",
+          "source": "pane_id",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "index": {
+          "type": "integer",
+          "wire": "index",
+          "source": "pane_index",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "wire": "width",
+          "source": "pane_width",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "height": {
+          "type": "integer",
+          "wire": "height",
+          "source": "pane_height",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "active": {
+          "type": "boolean",
+          "wire": "active",
+          "source": "pane_active",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in"
+          ]
+        },
+        "current_command": {
+          "type": "string",
+          "wire": "currentCommand",
+          "source": "pane_current_command",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "current_path": {
+          "type": "bytes",
+          "wire": "currentPath",
+          "source": "pane_current_path",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "wire": "title",
+          "source": "pane_title",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "pid": {
+          "type": "integer",
+          "wire": "pid",
+          "source": "pane_pid",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "dead": {
+          "type": "boolean",
+          "wire": "dead",
+          "source": "pane_dead",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in"
+          ]
+        },
+        "exit_status": {
+          "type": "integer",
+          "wire": "exitStatus",
+          "source": "pane_dead_status",
+          "nullable": true,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "cursor_shape": {
+          "type": "string",
+          "wire": "cursorShape",
+          "source": "cursor_shape",
+          "nullable": false,
+          "minimum": "3.6",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "window": {
+          "type": "relation",
+          "wire": "window",
+          "entity": "window",
+          "many": false,
+          "nullable": false,
+          "operators": [
+            "is",
+            "is_not"
+          ]
+        }
+      }
+    },
+    "client": {
+      "fields": {
+        "id": {
+          "type": "string",
+          "wire": "id",
+          "source": "client_name",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "wire": "name",
+          "source": "client_name",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "tty": {
+          "type": "bytes",
+          "wire": "tty",
+          "source": "client_tty",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "contains",
+            "starts_with",
+            "ends_with"
+          ]
+        },
+        "pid": {
+          "type": "integer",
+          "wire": "pid",
+          "source": "client_pid",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "width": {
+          "type": "integer",
+          "wire": "width",
+          "source": "client_width",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "height": {
+          "type": "integer",
+          "wire": "height",
+          "source": "client_height",
+          "nullable": false,
+          "minimum": "3.3a",
+          "operators": [
+            "eq",
+            "ne",
+            "in",
+            "not_in",
+            "lt",
+            "lte",
+            "gt",
+            "gte"
+          ]
+        },
+        "session": {
+          "type": "relation",
+          "wire": "session",
+          "entity": "session",
+          "many": false,
+          "nullable": true,
+          "operators": [
+            "is",
+            "is_not"
+          ]
+        }
+      }
+    }
+  },
+  "availability": "Absent keys are unloaded; nullable keys with null are known null. Live capture requires all baseline fields and adjacency, with unavailable version fields omitted.",
+  "bytes_wire": "UTF-8 representable byte operands encode as JSON text; invalid UTF-8 raises UnsupportedValue. Unicode local operands encode to UTF-8 octets; unflagged local scalars are octets.",
+  "operations": {
+    "execute": {
+      "parameters": {
+        "argv": {
+          "type": "argv",
+          "required": true
+        },
+        "stdin": {
+          "type": "bytes",
+          "required": false
+        },
+        "timeout": {
+          "type": "seconds",
+          "required": false
+        },
+        "max_output": {
+          "type": "positive",
+          "required": false
+        },
+        "cancel_fh": {
+          "type": "handle",
+          "required": false
+        }
+      }
+    },
+    "cmd": {
+      "parameters": {
+        "argv": {
+          "type": "argv",
+          "required": true
+        }
+      }
+    },
+    "snapshot": {
+      "parameters": {}
+    },
+    "clients": {
+      "parameters": {}
+    },
+    "kill_server": {
+      "parameters": {}
+    },
+    "listings": {
+      "parameters": {
+        "kind": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "new_session": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "command": {
+          "type": "argv",
+          "required": false
+        },
+        "shell_command": {
+          "type": "text",
+          "required": false
+        },
+        "width": {
+          "type": "positive",
+          "required": false
+        },
+        "height": {
+          "type": "positive",
+          "required": false
+        },
+        "cwd": {
+          "type": "text",
+          "required": false
+        },
+        "environment": {
+          "type": "environment",
+          "required": false
+        }
+      }
+    },
+    "new_window": {
+      "parameters": {
+        "session": {
+          "type": "target",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "required": false
+        },
+        "command": {
+          "type": "argv",
+          "required": false
+        },
+        "shell_command": {
+          "type": "text",
+          "required": false
+        },
+        "cwd": {
+          "type": "text",
+          "required": false
+        },
+        "environment": {
+          "type": "environment",
+          "required": false
+        }
+      }
+    },
+    "split_pane": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        },
+        "horizontal": {
+          "type": "boolean",
+          "required": false
+        },
+        "command": {
+          "type": "argv",
+          "required": false
+        },
+        "shell_command": {
+          "type": "text",
+          "required": false
+        },
+        "cwd": {
+          "type": "text",
+          "required": false
+        },
+        "environment": {
+          "type": "environment",
+          "required": false
+        }
+      }
+    },
+    "link_window": {
+      "parameters": {
+        "window": {
+          "type": "target",
+          "required": true
+        },
+        "session": {
+          "type": "target",
+          "required": true
+        },
+        "index": {
+          "type": "nonnegative",
+          "required": false
+        }
+      }
+    },
+    "move_window": {
+      "parameters": {
+        "link": {
+          "type": "target",
+          "required": true
+        },
+        "session": {
+          "type": "target",
+          "required": true
+        },
+        "index": {
+          "type": "nonnegative",
+          "required": false
+        }
+      }
+    },
+    "rename_session": {
+      "parameters": {
+        "session": {
+          "type": "target",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "rename_window": {
+      "parameters": {
+        "window": {
+          "type": "target",
+          "required": true
+        },
+        "name": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "unlink_window": {
+      "parameters": {
+        "link": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "select_window": {
+      "parameters": {
+        "link": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "select_pane": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "select_layout": {
+      "parameters": {
+        "window": {
+          "type": "target",
+          "required": true
+        },
+        "layout": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "resize_pane": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        },
+        "width": {
+          "type": "positive",
+          "required": false
+        },
+        "height": {
+          "type": "positive",
+          "required": false
+        }
+      }
+    },
+    "set_title": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        },
+        "title": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "send_keys": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        },
+        "keys": {
+          "type": "keys",
+          "required": true
+        }
+      }
+    },
+    "send_text": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        },
+        "text": {
+          "type": "text",
+          "required": true
+        },
+        "enter": {
+          "type": "boolean",
+          "required": false
+        }
+      }
+    },
+    "capture_pane": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        },
+        "start": {
+          "type": "integer",
+          "required": false
+        },
+        "end": {
+          "type": "integer",
+          "required": false
+        }
+      }
+    },
+    "kill_pane": {
+      "parameters": {
+        "pane": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "kill_window": {
+      "parameters": {
+        "window": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "kill_session": {
+      "parameters": {
+        "session": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "detach_client": {
+      "parameters": {
+        "client": {
+          "type": "target",
+          "required": true
+        }
+      }
+    },
+    "set_option": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": true
+        },
+        "scope": {
+          "type": "text",
+          "required": false
+        },
+        "target": {
+          "type": "text",
+          "required": false
+        },
+        "global": {
+          "type": "boolean",
+          "required": false
+        }
+      }
+    },
+    "get_option": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "scope": {
+          "type": "text",
+          "required": false
+        },
+        "target": {
+          "type": "text",
+          "required": false
+        },
+        "global": {
+          "type": "boolean",
+          "required": false
+        },
+        "inherited": {
+          "type": "boolean",
+          "required": false
+        }
+      }
+    },
+    "unset_option": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "scope": {
+          "type": "text",
+          "required": false
+        },
+        "target": {
+          "type": "text",
+          "required": false
+        },
+        "global": {
+          "type": "boolean",
+          "required": false
+        }
+      }
+    },
+    "set_hook": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "command": {
+          "type": "text",
+          "required": true
+        },
+        "target": {
+          "type": "text",
+          "required": false
+        },
+        "global": {
+          "type": "boolean",
+          "required": false
+        }
+      }
+    },
+    "show_hooks": {
+      "parameters": {
+        "target": {
+          "type": "text",
+          "required": false
+        },
+        "global": {
+          "type": "boolean",
+          "required": false
+        }
+      }
+    },
+    "set_environment": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "value": {
+          "type": "text",
+          "required": true
+        },
+        "session": {
+          "type": "target",
+          "required": false
+        }
+      }
+    },
+    "get_environment": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "session": {
+          "type": "target",
+          "required": false
+        }
+      }
+    },
+    "unset_environment": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "session": {
+          "type": "target",
+          "required": false
+        }
+      }
+    },
+    "set_buffer": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        },
+        "data": {
+          "type": "bytes",
+          "required": true
+        }
+      }
+    },
+    "show_buffer": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "delete_buffer": {
+      "parameters": {
+        "name": {
+          "type": "text",
+          "required": true
+        }
+      }
+    },
+    "batch": {
+      "parameters": {
+        "requests": {
+          "type": "requests",
+          "required": true
+        }
+      }
+    },
+    "query_panes": {
+      "parameters": {
+        "on_verification": {
+          "type": "callback",
+          "required": false
+        },
+        "where": {
+          "type": "criteria",
+          "required": false
+        },
+        "pushdown": {
+          "type": "text",
+          "required": false
+        },
+        "native_filter": {
+          "type": "text",
+          "required": false
+        }
+      }
+    },
+    "explain_panes": {
+      "parameters": {
+        "where": {
+          "type": "criteria",
+          "required": false
+        },
+        "pushdown": {
+          "type": "text",
+          "required": false
+        },
+        "native_filter": {
+          "type": "text",
+          "required": false
+        }
+      }
+    },
+    "attach_argv": {
+      "parameters": {
+        "session": {
+          "type": "text",
+          "required": true
+        }
+      }
+    }
+  }
+}

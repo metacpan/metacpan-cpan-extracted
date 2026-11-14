@@ -16,6 +16,18 @@
 # subroutine (Devel::Cover).
 # It did find one redundant iteration: _template() searched English twice
 # for an English logger; it now searches once.
+#
+# The paths added in 0.002.2 were mapped the same way.  The new loops run
+# 0 to N times: the argument-reading loop in _entry() once per argument
+# that dies plus one pass that ends it, _render()'s loops once per key or
+# item, so none is marked.  No new code is unreachable.  _printable()'s
+# undef branch is taken by no caller unless a stored entry was changed
+# through messages(), which the POD allows, so it is kept and tested that
+# way.  Mapping the fallback of the reading loop found two bugs, now fixed:
+# an element of a tied array or hash whose FETCH dies has no tie object,
+# so it vanished from the message and overload::StrVal(undef) warned; and
+# an argument such as substr($s, 10), evaluated only when read, warned at
+# the module's line.
 
 use strict;
 use warnings;
@@ -99,7 +111,7 @@ subtest '_args: 6 paths' => sub {
 	is_deeply(Test::Log::Abstraction::_args([undef, 1]), {}, 'P3 undefined key');
 	is_deeply(Test::Log::Abstraction::_args([1, 2, 3]), {}, 'P4 odd list');
 	is_deeply(Test::Log::Abstraction::_args([]), {}, 'P5 empty');
-	mock_return "${CLASS}::get_params" => undef;
+	mock_return "Params::Get::get_params" => undef;
 	is_deeply(Test::Log::Abstraction::_args([a => 1]), {}, 'P6 Params::Get returns undef');
 	restore_all();
 };
@@ -156,7 +168,7 @@ subtest '_validate: 3 paths' => sub {
 	my $schema = { a => { type => 'string' } };
 	is_deeply(Test::Log::Abstraction::_validate($CLASS, $schema, { a => 'x' }), { a => 'x' }, 'P1 valid');
 	throws_ok { Test::Log::Abstraction::_validate($CLASS, $schema, { a => [] }) } qr/\A\Q$CLASS: invalid argument: Parameter 'a'\E/, 'P2 invalid';
-	mock_return "${CLASS}::validate_strict" => undef;
+	mock_return "Params::Validate::Strict::validate_strict" => undef;
 	is_deeply(Test::Log::Abstraction::_validate($CLASS, $schema, {}), {}, 'P3 nothing returned');
 	restore_all();
 };
@@ -235,8 +247,9 @@ subtest '_string: 3 paths' => sub {
 
 # _shown: undef or a value (2) x byte or character string, which decides
 # whether the C1 step runs (2) x cut or not (2).  undef is short ASCII, so
-# it takes one combination: 5 paths.
-subtest '_shown: 5 paths' => sub {
+# it takes one combination: 5 paths.  P6: a bidi control, which only a
+# character string can hold, is escaped as \x{HHHH}.
+subtest '_shown: 6 paths' => sub {
 	is(Test::Log::Abstraction::_shown(undef), 'undef', 'P1 undef');
 	my $bytes = "a\x{9b}";
 	utf8::downgrade($bytes);
@@ -247,6 +260,7 @@ subtest '_shown: 5 paths' => sub {
 	is(Test::Log::Abstraction::_shown('x' x ($MAX_REASON + 1)), ('x' x $MAX_REASON) . '...', 'P4 byte string, long: cut');
 	my $long = "\x{263a}" x ($MAX_REASON + 1);
 	is(Test::Log::Abstraction::_shown($long), ("\x{263a}" x $MAX_REASON) . '...', 'P5 character string, long: cut in characters');
+	is(Test::Log::Abstraction::_shown("a\x{202E}b"), 'a\x{202E}b', 'P6 a bidi control: escaped as \x{HHHH}');
 };
 
 # ===========================================================================
@@ -658,6 +672,204 @@ subtest 'DESTROY: 1 path' => sub {
 # _croak: one path, always ending in croak.
 subtest '_croak: 1 path' => sub {
 	throws_ok { $CLASS->_croak('no_method', { method => 'm' }) } at_caller(q{no method 'm'}), 'P1 croak';
+};
+
+# ===========================================================================
+# Paths added in 0.002.2: hostile names, references and arguments
+# ===========================================================================
+
+# A character string whose bytes are not valid UTF-8
+sub malformed {
+	my $text = shift;
+
+	Encode::_utf8_on($text);
+	return $text;
+}
+
+{
+	package Local::DyingScalar;
+	sub TIESCALAR { return bless {}, shift }
+	sub FETCH { die "unreadable\n" }
+
+	package Local::DyingElements;
+	# A one-element array, and a hash, whose elements die when read
+	sub TIEARRAY { return bless {}, shift }
+	sub TIEHASH { return bless {}, shift }
+	sub FETCHSIZE { return 1 }
+	sub EXISTS { return 1 }
+	sub FETCH { die "unreadable\n" }
+
+	package Local::DyingSize;
+	sub TIEARRAY { return bless {}, shift }
+	sub FETCHSIZE { die "unreadable\n" }
+}
+
+# _repaired: P1 a byte string (the first test decides).  P2 a valid
+# character string (the second decides).  P3 a malformed one: repaired.
+subtest '_repaired: 3 paths' => sub {
+	my $decodes = spy 'Encode::decode';
+	is(Test::Log::Abstraction::_repaired("\xff\xfe"), "\xff\xfe", 'P1 bytes: returned as they are');
+	is(Test::Log::Abstraction::_repaired("\x{263a}"), "\x{263a}", 'P2 valid characters: returned as they are');
+	my $got = Test::Log::Abstraction::_repaired(malformed("\xff\xfe x"));
+	my $calls = scalar(my @calls = $decodes->());
+	restore_all();
+	like($got, qr/\A\x{FFFD}+ x\z/, 'P3 malformed: each bad part is U+FFFD');
+	is($calls, 1, 'P1 and P2 decode nothing; P3 decodes once');
+};
+
+# _lc: one path, through _repaired().
+subtest '_lc: 1 path' => sub {
+	is(Test::Log::Abstraction::_lc('ERROR'), 'error', 'P1 lower case');
+	is(calls_to('_repaired', sub { Test::Log::Abstraction::_lc('X') }), 1, 'P1 always through _repaired()');
+};
+
+# _is_a: P1 ref() is not the type (the second test is not reached).  P2
+# ref() is the type, the underlying type is not.  P3 both are.
+subtest '_is_a: 3 paths' => sub {
+	my $reftypes = spy 'Scalar::Util::reftype';
+	ok(!Test::Log::Abstraction::_is_a([], 'HASH'), 'P1 another type: false');
+	my $after_p1 = scalar(my @calls = $reftypes->());
+	ok(!Test::Log::Abstraction::_is_a(bless([], 'HASH'), 'HASH'), 'P2 claims HASH, is an array: false');
+	ok(Test::Log::Abstraction::_is_a({}, 'HASH'), 'P3 a hash: true');
+	restore_all();
+	is($after_p1, 0, 'P1 does not reach reftype()');
+};
+
+# The arguments of a call, still aliased to the caller's variables as
+# @_ is: an anonymous array [...] would copy, and so read, them
+sub aliased {
+	return \@_;
+}
+
+# _entry, reading the arguments.  The loop runs once per argument that
+# dies, plus one pass that ends it, so 0 to N times:
+#   P1 no arguments: the loop runs 0 times.
+#   P2 all readable: 1 pass, ending at 'last'.
+#   P3 one in the middle dies: 2 passes, the second ending at 'last'.
+#   P4 the last one dies: 1 pass, ending at the loop's own test.
+#   P5 a tied element dies: no tie object, so a reference's plain form.
+#   P6 a substr() out of range: read as undef, with no warning.
+subtest '_entry: argument reads, 6 paths' => sub {
+	tie my $scalar, 'Local::DyingScalar';
+	tie my @array, 'Local::DyingElements';
+	my $object = qr/Local::DyingScalar=HASH\(0x[0-9a-f]+\)/;
+	my $string = 'ab';
+	my %path = (
+		'P1 no arguments' => [aliased(), qr/\A\z/, 0],
+		'P2 all readable' => [aliased('a', 'b'), qr/\Aab\z/, 0],
+		'P3 one in the middle dies' => [aliased('a', $scalar, 'b'), qr/\Aa${object}b\z/, 1],
+		'P4 the last one dies' => [aliased('a', $scalar), qr/\Aa$object\z/, 1],
+		'P5 a tied element dies' => [aliased('a', $array[0], 'b'), qr/\AaSCALAR\(0x[0-9a-f]+\)b\z/, 1],
+		'P6 substr out of range' => [aliased('a', substr($string, 10, 1), 'b'), qr/\Aaundefb\z/, 0],
+	);
+	foreach my $name (sort keys %path) {
+		my ($args, $want, $failed) = @{$path{$name}};
+		my $plain = spy 'overload::StrVal';
+		my $entry = Test::Log::Abstraction::_entry('i', $args);
+		my $calls = scalar(my @calls = $plain->());
+		restore_all();
+		like($entry->{'message'}, $want, "$name: message");
+		is($calls, $failed, "$name: $failed unreadable part" . (($failed == 1) ? '' : 's') . ' shown in plain form');
+	}
+	untie $scalar;
+	untie @array;
+};
+
+# _entry, a lone array reference: P1 its parts are read.  P2 reading it
+# dies (a tied array whose size dies): it stays one part.  P3 it only
+# claims to be an array: it stays one part.
+subtest '_entry: lone array, 3 paths' => sub {
+	tie my @size, 'Local::DyingSize';
+	is(Test::Log::Abstraction::_entry('i', [['a', 'b']])->{'message'}, 'ab', 'P1 parts');
+	like(Test::Log::Abstraction::_entry('i', [\@size])->{'message'}, qr/\AARRAY\(0x[0-9a-f]+\)\z/, 'P2 unreadable: plain form');
+	like(Test::Log::Abstraction::_entry('i', [bless({}, 'ARRAY')])->{'message'}, qr/\AARRAY=HASH\(0x[0-9a-f]+\)\z/, 'P3 claimed: plain form');
+	untie @size;
+};
+
+# _render: P1 undef.  P2 a plain value.  P3 a reference that only claims
+# HASH (neither test passes).  P4 a cycle.  P5 a hash with no keys (the
+# loop runs 0 times).  P6 a hash with two (it runs twice: separator).
+# P7 an empty array.  P8 an array with two.
+subtest '_render: 8 paths' => sub {
+	my @loop;
+	push @loop, \@loop;
+	my %path = (
+		'P1 undef' => [undef, 'undef'],
+		'P2 plain value' => ['v', 'v'],
+		'P4 cycle' => [\@loop, '[(cycle)]'],
+		'P5 empty hash' => [{}, '{}'],
+		'P6 hash, two keys' => [{ a => 1, b => 2 }, '{a => 1, b => 2}'],
+		'P7 empty array' => [[], '[]'],
+		'P8 array, two items' => [[1, 2], '[1, 2]'],
+	);
+	foreach my $name (sort keys %path) {
+		my ($value, $want) = @{$path{$name}};
+		my $out = '';
+		Test::Log::Abstraction::_render($value, {}, \$out);
+		is($out, $want, $name);
+	}
+	my $out = 'kept|';
+	Test::Log::Abstraction::_render(bless([], 'HASH'), {}, \$out);
+	like($out, qr/\Akept\|HASH=ARRAY\(0x[0-9a-f]+\)\z/, 'P3 claimed type: its text, appended to what was there');
+	@loop = ();
+};
+
+# _copy_tree, _build and _diag_rule with references that claim a type:
+# P1 a claimed hash or array is not copied.  P2 a claimed array as diag is
+# refused as a type, by _diag_rule().
+subtest '_copy_tree and _diag_rule: claimed types, 2 paths' => sub {
+	my $claimed = bless([], 'HASH');
+	is(Test::Log::Abstraction::_copy_tree($claimed, {}), $claimed, 'P1 not copied: the same reference back');
+	throws_ok { quiet(diag => bless({}, 'ARRAY')) } at_caller('diag must be a level name, "all", "none" or an array reference of level names'), 'P2 refused';
+};
+
+# _template and _resolve_lang with an i18n option that claims HASH: P1 no
+# overrides are searched.  P2 the language is not taken from it.
+subtest '_template and _resolve_lang: claimed option, 2 paths' => sub {
+	my $logger = quiet(lang => 'xx', i18n => bless([], 'HASH'));
+	is(Test::Log::Abstraction::_template($logger, 'en', 'needs_level'), Test::Log::Abstraction::_template(quiet(), 'en', 'needs_level'), 'P1 the built-in template');
+	is($logger->lang(), 'en', 'P2 English');
+};
+
+# _variant with objects: P1 a gender object is used by its text.  P2 a
+# template whose text form dies is shown in plain form.
+subtest '_variant: object paths' => sub {
+	{
+		package Local::Male;
+		use overload '""' => sub { 'male' }, fallback => 1;
+	}
+	is(Test::Log::Abstraction::_variant({ male => 'M', other => 'X' }, { gender => bless({}, 'Local::Male') }, 'en'), 'M', 'P1 gender by its text');
+	like(Test::Log::Abstraction::_variant(bless({}, 'Local::Bomb'), {}, 'en'), qr/\ALocal::Bomb=HASH/, 'P2 template in plain form');
+};
+
+# _plural: a count that is a reference takes the not-numeric path
+subtest '_plural: a reference count' => sub {
+	is(Test::Log::Abstraction::_plural({ one => 1, other => 1 }, [1], 'en'), 'other', 'P1 not numeric: other');
+};
+
+# _regex and AUTOLOAD with malformed text: P1 a malformed pattern croaks.
+# P2 a malformed method name is repaired, then stored.
+subtest '_regex and AUTOLOAD: malformed text, 2 paths' => sub {
+	throws_ok { quiet()->like(malformed("\xff")) } qr/\A\Q$CLASS: invalid argument: Malformed UTF-8 character\E/, 'P1 croak';
+	my $logger = quiet();
+	my $name = malformed("\xff x");
+	is(calls_to('_repaired', sub { printed { $logger->$name() } }) >= 1 ? 1 : 0, 1, 'P2 repaired');
+	like($logger->messages()->[0]->{'level'}, qr/\A\x{FFFD} x\z/, 'P2 stored repaired');
+};
+
+# _printable: P1 text.  P2 undef, which no caller passes unless a stored
+# entry was changed through messages() (the POD warns against it, but it
+# is possible); then a failing assertion lists it as 'undef', with no
+# warning (Test::Warnings checks).  has_level() fails here because it
+# lists the entries without matching their text: like() and unlike() would
+# match against the undef, and warn.
+subtest '_printable: 2 paths' => sub {
+	is(Test::Log::Abstraction::_printable("a\eb"), 'a\x1Bb', 'P1 escaped');
+	my $logger = quiet();
+	$logger->info('x');
+	$logger->messages()->[0]->{'message'} = undef;
+	my (undef, $out) = failing(sub { $logger->has_level('nosuch') });
+	like($out, qr/\[info\] undef$/m, 'P2 undef: listed as undef');
 };
 
 done_testing();

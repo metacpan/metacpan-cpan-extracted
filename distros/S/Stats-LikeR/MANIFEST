@@ -32,6 +32,7 @@ t/agg.R.pandas.R
 t/agg.R.pandas.py
 t/agg.R.pandas.t
 t/agg.t
+t/alloc.guards.t
 t/anova.R.R
 t/anova.R.t
 t/anova.t
@@ -88,6 +89,7 @@ t/concat.t
 t/cor.R.scipy.R
 t/cor.R.scipy.py
 t/cor.R.scipy.t
+t/cor.ragged.t
 t/cor.t
 t/cor_test.call_forms.t
 t/cor_test.kendall.R.R
@@ -99,6 +101,8 @@ t/cor_test.spearman.R.t
 t/cor_test.spearman_continuity.R.R
 t/cor_test.spearman_continuity.R.t
 t/cor_test.tails.t
+t/cor_test.validation.t
+t/cov.croak_leak.t
 t/coxph.R.R
 t/coxph.R.t
 t/coxph_extended.R.R
@@ -110,6 +114,7 @@ t/csort.AoA.t
 t/csort.HoH.t
 t/csort.cmp.undef.t
 t/csort.fastpath.t
+t/csort.int64.t
 t/csort.rowname.t
 t/csort.t
 t/density.R.scipy.R
@@ -125,6 +130,8 @@ t/distributions.limits.R.R
 t/distributions.limits.R.t
 t/distributions.limits.mpmath.py
 t/distributions.mpmath.py
+t/distributions.q.ends.R.R
+t/distributions.q.ends.R.t
 t/dnorm.nv_width.t
 t/docvis.csv
 t/drop_duplicates.t
@@ -146,6 +153,8 @@ t/fisher_test.R.scipy.t
 t/fisher_test.rxc.R
 t/fisher_test.rxc.exact.py
 t/fisher_test.t
+t/fisher_test.window.R.scipy.t
+t/formula.utf8_names.t
 t/friedman_mcnemar_prop_cmh.R.R
 t/friedman_mcnemar_prop_cmh.R.t
 t/friedman_test.t
@@ -162,6 +171,7 @@ t/glm_vcov.R.R
 t/glm_vcov.R.t
 t/griliches76.csv
 t/group_by.HoH.filter.t
+t/group_by.tmps.t
 t/h2aoh_aoh2h.t
 t/help.t
 t/hist.R.R
@@ -197,6 +207,7 @@ t/lm.collinear.R.R
 t/lm.collinear.R.t
 t/lm.edge.R.R
 t/lm.edge.R.t
+t/lm.formula_parens.R.t
 t/lm_glm_shared.t
 t/lm_read_rows.order.t
 t/lme00.csv
@@ -213,6 +224,10 @@ t/lme10.csv
 t/lme11.csv
 t/lmer.R.R
 t/lmer.R.t
+t/lmer.nested3.R.R
+t/lmer.nested3.R.t
+t/logrank_test.many_groups.R.t
+t/mcnemar_test.exact.R.t
 t/mcnemar_test.t
 t/mean.t
 t/median.t
@@ -224,6 +239,7 @@ t/merge.t
 t/min.max.signed_zero.t
 t/min.max.sum.ListUtil.t
 t/minmax.nan.R.t
+t/mode.scipy.t
 t/model_pvalue_tails.t
 t/morley.tab
 t/morley.tab.bgz
@@ -235,10 +251,12 @@ t/numeric.validation.t
 t/nv_width.t
 t/oneway_test.R.scipy.t
 t/oneway_test.bugs.t
+t/options.dangling_key.t
 t/p_adjust.R.R
 t/p_adjust.R.t
 t/p_adjust.frames.t
 t/parse_read.t
+t/pbinom.huge_size.R.t
 t/pf_pt_tails.R.R
 t/pf_pt_tails.R.mpmath.t
 t/pf_pt_tails.mpmath.py
@@ -253,8 +271,10 @@ t/portability.bugs.t
 t/power_t_test.R.scipy.t
 t/prcomp.R.R
 t/prcomp.R.t
+t/prcomp.small_scale.R.t
 t/prcomp.t
 t/predict.long_names.t
+t/predict.svyglm_quasi.R.t
 t/predict.t
 t/predict2.t
 t/prop_test.R.statsmodels.t
@@ -267,6 +287,7 @@ t/pt_qt.tails.R.t
 t/qcut.nan.pandas.py
 t/qcut.nan.pandas.t
 t/qcut.t
+t/qnorm.central.R.t
 t/qnorm.crit.R.scipy.t
 t/quantile.R.R
 t/quantile.R.t
@@ -286,6 +307,7 @@ t/read_table.colClasses.t
 t/read_table.comments.t
 t/read_table.compressed.R
 t/read_table.compressed.R.t
+t/read_table.compressed.stream.t
 t/read_table.cr_eol.R.pandas.t
 t/read_table.cr_eol.pandas.py
 t/read_table.fast_path.t
@@ -293,6 +315,7 @@ t/read_table.filter.t
 t/read_table.header_quote.R
 t/read_table.header_quote.R.pandas.t
 t/read_table.input_record_separator.t
+t/read_table.int_cells.t
 t/read_table.na_strings.t
 t/read_table.quote.R
 t/read_table.quote.R.pandas.t
@@ -303,6 +326,7 @@ t/read_table.regex_sep.t
 t/read_table.regressions.t
 t/read_table.sep_unicode.pl
 t/read_table.sep_unicode.t
+t/read_table.shared_cells.t
 t/read_table.t
 t/read_table.vcf.htslib.pl
 t/read_table.vcf.htslib.t
@@ -317,6 +341,7 @@ t/roc.R.R
 t/roc.R.t
 t/roc.t
 t/rownames.utf8.t
+t/sample.threshold.t
 t/scale.R.R
 t/scale.R.t
 t/scale.keywords.t
@@ -325,6 +350,7 @@ t/seq.R.R
 t/seq.R.t
 t/set_ops.ListCompare.t
 t/set_ops.t
+t/sets.no_upgrade.t
 t/shapiro_test.R.scipy.R
 t/shapiro_test.R.scipy.py
 t/shapiro_test.R.scipy.t
@@ -334,6 +360,7 @@ t/smd.R.R
 t/smd.R.t
 t/srand.stream.t
 t/std_qnorm.mpmath.py
+t/sum.overflow.R.t
 t/summary.t
 t/survey_fpc.csv
 t/survival.R.R
@@ -343,6 +370,7 @@ t/survival.status_rho.R.t
 t/survival.t
 t/svyglm.R.R
 t/svyglm.R.t
+t/svyglm.many_strata.t
 t/t_test.R.R
 t/t_test.R.scipy.t
 t/t_test.t
@@ -352,6 +380,7 @@ t/table_one.t
 t/tied.fetch.once.t
 t/tied.frames.t
 t/tied.hashes.t
+t/tied_cell.double_fetch.t
 t/tied_cell.filter_clears_row.t
 t/tied_cell.free_mid_read.t
 t/tied_cell.magic_order.t
@@ -383,6 +412,7 @@ t/vif.R.t
 t/vif_hoslem.t
 t/wilcox_test.R.scipy.R
 t/wilcox_test.R.scipy.t
+t/wilcox_test.exact_refusal.t
 t/wilcox_test.t
 t/write_table.announce.t
 t/write_table.compressed.pandas.t
@@ -392,11 +422,15 @@ t/write_table.t
 t/write_table.tex.comment.t
 t/write_table.tex.escape.t
 t/write_table.tex.rownames.t
+t/write_table.tex.stream.t
 t/write_table.tex.t
 t/write_table.xlsx.book.t
 t/write_table.xlsx.escape.t
 t/write_table.xlsx.t
+t/xlsx.entity_scan.t
 t/xlsx_col_idx.t
+t/zerotrunc.large_counts.R.R
+t/zerotrunc.large_counts.R.t
 t/zerotrunc_hurdle.R.R
 t/zerotrunc_hurdle.R.t
 t/zerotrunc_hurdle.mpmath.py

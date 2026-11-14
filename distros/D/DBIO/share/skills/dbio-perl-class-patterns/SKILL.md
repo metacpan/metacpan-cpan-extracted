@@ -6,67 +6,67 @@ allowed-tools: Read, Grep, Glob
 model: sonnet
 ---
 
-# DBIO Class Patterns mit CAG
+# DBIO Class Patterns with CAG
 
-DBIO nutzt **kein Moo, kein Moops, keine Role::Tiny**. Alles CAG (`Class::Accessor::Grouped`): kleines Interface, tiefe Implementation.
+Everything in DBIO is CAG (`Class::Accessor::Grouped`): a small interface over a deep implementation.
 
-Pure-Perl-Syntax/Style (Modul-Loading, Whitespace, cpanfile) → [[dbio-perl-syntax]]. Die seltenen Moo/Moose-Bridges → [[dbio-moo-moose]].
+Pure-Perl syntax and style (module loading, whitespace, cpanfile) → [[dbio-perl-syntax]]. The rare Moo/Moose bridges → [[dbio-moo-moose]].
 
 ```perl
-# Statt: has 'host' => (is => 'rw', isa => 'Str');
+# in place of: has 'host' => (is => 'rw', isa => 'Str');
 __PACKAGE__->mk_group_accessors(simple => qw/host port user password/);
 ```
 
-Generierte Accessoren rufen intern `get_simple('host')` / `set_simple('host', $v)` auf — Logik steckt in `get_*`/`set_*` Hooks.
+Generated accessors call `get_simple('host')` / `set_simple('host', $v)` internally — logic lives in the `get_*` / `set_*` hooks.
 
-## Accessor-Gruppen
+## Accessor groups
 
-### `simple` — Instanzdaten
+### `simple` — instance data
 
 ```perl
 __PACKAGE__->mk_group_accessors(simple => qw(_storage _credentials _read_index));
 ```
 
-Speichert direkt im Objekt-Hash. `$obj->host(1)` → `set_simple('host', 1)`.
+Stores directly in the object hash. `$obj->host(1)` → `set_simple('host', 1)`.
 
-### `inherited` — vererbbare Klassendaten
+### `inherited` — inheritable class data
 
 ```perl
 __PACKAGE__->mk_group_accessors(inherited => qw(sql_name_sep sql_quote_char));
 __PACKAGE__->sql_name_sep('.');
 ```
 
-Wenn Subklasse nichts setzt, sucht via `mro::get_linear_isa` in Elternklassen. DBIO nutzt das für SQL-Defaults in `Storage::DBI`.
+When a subclass sets nothing, the lookup walks the parent classes via `mro::get_linear_isa`. DBIO uses this for the SQL defaults in `Storage::DBI`.
 
-Falle: der Instanz-Slot wird mit `exists` gelesen, nicht `defined` — ein `undef` auf der Instanz bleibt als Tombstone stehen und überdeckt die Klassen-Deklaration. Die Capability-Accessoren (`set_use_dbms_capability`) löschen den Slot deshalb bei `undef` (ADR 0041).
+The instance slot is read with `exists`, not `defined`: an `undef` on the instance stays as a tombstone and covers the class declaration. The capability accessors (`set_use_dbms_capability`) therefore delete the slot on `undef` (ADR 0041).
 
-### `component_class` — lazy ladende Klassen
+### `component_class` — lazily loaded classes
 
 ```perl
 __PACKAGE__->mk_group_accessors(component_class => qw(cursor_class resultset_class));
 __PACKAGE__->cursor_class('DBIO::Cursor');
 ```
 
-`DBIO::Base` überschreibt `get_component_class`: holt Wert via `get_inherited`, lädt via `ensure_class_loaded`, gibt Klasse zurück. Danach normale Methodenaufrufe:
+`DBIO::Base` overrides `get_component_class`: it fetches the value via `get_inherited`, loads it via `ensure_class_loaded` and returns the class name. Ordinary method calls follow:
 
 ```perl
 $self->cursor_class->new($self, \@_, $attrs);
 $self->resultset_class->new($self, ...);
 ```
 
-**Keine automatische Delegation** — gibt nur die Klasse zurück.
+The accessor returns the class and delegates nothing.
 
-### Eigene Gruppen (Domänenlogik)
+### Own groups (domain logic)
 
 ```perl
 __PACKAGE__->mk_group_accessors(column => 'title');
 ```
 
-Capabilities eines Storage laufen über die Gruppen `dbms_capability` (`_supports_X`) und `use_dbms_capability` (`_use_X`), siehe [[dbio-driver-development]].
+A storage's capabilities run through the groups `dbms_capability` (`_supports_X`) and `use_dbms_capability` (`_use_X`), see [[dbio-driver-development]].
 
-Eigene `get_column`/`set_column` Hooks. `DBIO::Row` nutzt das für dynamische Spaltenaccessoren mit Inflation/Dirty-Tracking.
+Own `get_column` / `set_column` hooks. `DBIO::Row` uses this for dynamic column accessors with inflation and dirty tracking.
 
-## Konstruktor — pure Perl
+## Constructor — pure Perl
 
 ```perl
 sub new {
@@ -77,59 +77,45 @@ sub new {
 }
 ```
 
-**Immer** `bless {}`, nie `bless []`. Keine `Moo::Object`.
+Objects are always `bless {}`.
 
-## base vs. Role::Tiny
+## Extending a class
 
-```perl
-# Falsch:
-use Role::Tiny;
-with 'SomeRole';
+A class extends a base class: `use base qw/DBIO::Base Class::Accessor::Grouped/`.
 
-# Richtig — Basisklasse (Rolle würde requires() brauchen, CAG kann das nicht):
-use base qw/DBIO::Base Class::Accessor::Grouped/;
-```
-
-## load_components — Result- und Schema-Klassen
-
-DBIO-spezifisches System: lazy-load + `mk_group_accessors` + in `$class` ablegen. **Nur** für Result-Klassen (Basis `DBIO::Core`) und Schema-Klassen (Treiber-Komponenten) — nicht für Storage, nicht für AccessBroker. Ein Storage wird über Storage-Layer und C3-Komposition erweitert (`register_storage_layer`, ADR 0032) → [[dbio-driver-development]].
+`load_components` is the DBIO system for result and schema classes — lazy loading, `mk_group_accessors`, filed under `$class`. It applies to result classes (base `DBIO::Core`) and schema classes (driver components). A storage is extended through storage layers and C3 composition (`register_storage_layer`, ADR 0032) → [[dbio-driver-development]]; an AccessBroker is a plain subclass.
 
 ```perl
-# Richtig:
 package MyApp::Schema::Result::Artist;
 use base qw/DBIO::Core/;
 __PACKAGE__->load_components('InflateColumn::DateTime');
-
-# Falsch:
-package MyApp::Credentials;
-__PACKAGE__->load_components('Role::Tiny');  # NEIN
 ```
 
-## Deep Module Pattern
+## Deep module pattern
 
-Sauberer Schnitt zwischen kleinem Interface und tiefer Semantik:
+A clean cut between a small interface and deep semantics:
 
 ```perl
 # Interface:
 $row->title;
 $row->title('New');
 
-# Deklaration:
+# Declaration:
 __PACKAGE__->mk_group_accessors(column => 'title');
 
-# Semantik tief im Hook:
+# Semantics deep in the hook:
 sub get_column {
   my ($self, $col) = @_;
   # inflation cache, validation, lazy load ...
 }
 ```
 
-Erlaubt:
-- `InflateColumn` ersetzt `column`-Handler durch `inflated_column` für bestimmte Spalten
-- `FilterColumn` ersetzt für skalare Filter
-- `Row` erzeugt dynamische Accessoren pro DB-Spalte
+This allows:
+- `InflateColumn` replaces the `column` handler with `inflated_column` for chosen columns
+- `FilterColumn` replaces it for scalar filters
+- `Row` generates dynamic accessors per DB column
 
-Faustregel:
+Rule of thumb:
 
 ```perl
 __PACKAGE__->mk_group_accessors(simple          => qw/runtime_state/);
@@ -137,11 +123,11 @@ __PACKAGE__->mk_group_accessors(inherited       => qw/config_knob/);
 __PACKAGE__->mk_group_accessors(component_class => qw/strategy_class/);
 ```
 
-`simple` für Objektzustand, `inherited` für vererbbare Konfig, `component_class` für austauschbare Implementationen.
+`simple` for object state, `inherited` for inheritable configuration, `component_class` for exchangeable implementations.
 
-## Keine Magie — explizit
+## Explicit by design
 
-Kein `has`, kein `with`, kein `requires`. `_build_*` (private Builder) statt `BUILD`.
+The declaration is `mk_group_accessors`, construction is `new`, private builders are `_build_*`.
 
 ```perl
 package MyApp::Credentials;
@@ -153,7 +139,7 @@ __PACKAGE__->mk_group_accessors(simple => qw(
 sub new {
   my ($class, %args) = @_;
   my $self = bless {}, $class;
-  # ... direkt arbeiten
+  # ... work directly
   return $self;
 }
 ```
@@ -161,21 +147,18 @@ sub new {
 ## Composition seams — `@ISA` is not a bugfix surface
 
 Changing `@ISA` / `use base` on a component, a storage layer, or a storage class is an
-architecture change, whatever prompted it. It never lands as an undiscussed one-liner
-inside a fix, and never on the strength of "the suite is green afterwards". It needs a
-ticket and an ADR (skill `dbio-adr`).
+architecture change, whatever prompted it. It lands with a ticket and an ADR (skill
+`dbio-adr`), never as a one-liner inside a fix and never on the strength of "the suite is
+green afterwards".
 
-The recurring case this rule exists for: **an extension never determines the driver.**
-Not via `storage_type`, not by inheriting a driver component, not by a role. The
-extension component registers a storage layer and inherits no driver component's
-`connection()` hook; the schema declares the driver and core composes the layer over it.
-The rule is about the connect path, not a mandated base class — what the component
-derives from otherwise is style. This has been broken twice with
-two different tools (karr dbio-mysql-ev k14, karr dbio-postgresql-age k8) — ADR 0032 §7
-plus its 2026-08-07 addendum is the full rule, and core carries a structural test for it.
+The recurring case: **an extension never determines the driver** — not via `storage_type`, not by inheriting a
+driver component, not by a role. The extension component registers a storage layer and
+inherits no driver component's `connection()` hook; the schema declares the driver and core
+composes the layer over it. The rule is about the connect path, not a mandated base class;
+what the component derives from otherwise is style. ADR 0032 §7 and its addendum are the
+full rule, and core carries a structural test for it.
 
 Corollary when you assert on a layered storage: **driver resolution is lazy.** The schema
 declares its driver, so from `connect` on the composed base is the declared driver
-storage; resolution — adapting it to its access path — runs on the first `dbh` access,
-not on `connect`. Connect before asserting the specialised class — sampling the
-intermediate state and "fixing" it is exactly how both violations above started.
+storage; resolution — adapting it to its access path — runs on the first `dbh` access, not
+on `connect`. Connect first, then assert the specialised class.

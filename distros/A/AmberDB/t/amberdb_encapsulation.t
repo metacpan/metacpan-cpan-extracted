@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 12;
+use Test::More tests => 13;
 use File::Temp qw(tempdir);
 use AmberDB;
 
@@ -38,7 +38,7 @@ subtest "1. config() getter and setter tests" => sub {
     # 1.5 db_ext hook execution (non-db triggers simple mode)
     $adb->config( db_ext => 'dat' );
     is( $adb->config('db_ext'), 'dat', "config(db_ext => 'dat') sets db_ext" );
-    is( $adb->config('simple'), 1, "config(db_ext => 'dat') automatically triggers simple => 1" );
+    is( $adb->config('simple'), 1, "config(db_ext => 'dat') automatically triggers use_simple => 1" );
 
     # 1.6 Method chaining
     my $ret = $adb->config( no_write => 0 );
@@ -96,7 +96,7 @@ subtest "4. table_attr() shallow copy immutability" => sub {
 subtest "5. table_attr() path invalidation on path-affecting attributes" => sub {
     plan tests => 3;
 
-    $adb->config( simple => 0, db_ext => 'db', use_section => 1 );
+    $adb->config( use_simple => 0, db_ext => 'db', use_section => 1 );
     my $path1 = $adb->table_path("demo_table");
     ok( length($path1) > 0, "Initial table path resolved: $path1" );
 
@@ -220,4 +220,32 @@ subtest "11. Default engine configuration" => sub {
     is( $adb_def->config('language'), 'gb', "default config('language') is 'gb'" );
     is( $adb_def->{_lang}, 'gb', "default internal _lang is 'gb'" );
     is( $adb_def->language, 'gb', "default language() accessor is 'gb'" );
+};
+
+subtest "12. Shared master engine (srv) request-scoped session" => sub {
+    plan tests => 10;
+
+    my $master = AmberDB->new(
+        path => { dbase_dir => $tmpdir },
+        cfg  => { user => "master_user", language => "tr" },
+    );
+    is( $master->srv(), undef, "Master instance srv() returns undef" );
+
+    my $req = AmberDB->new(
+        srv => $master,
+        cfg => { user => "req_user" },
+    );
+    is( $req->srv(), $master, "Request instance srv() returns master reference" );
+    is( $req->{_dbase}, $master->{_dbase}, "_dbase cache reference is shared with master" );
+    is( $req->{_table}, $master->{_table}, "_table cache reference is shared with master" );
+    is( $req->{_norm},  $master->{_norm},  "_norm cache reference is shared with master" );
+    is( $req->{_locale}, $master->{_locale}, "_locale reference is shared with master" );
+    is( $req->config('language'), 'tr', "Request session inherits language from master" );
+    is( $req->config('user'), 'req_user', "Request session overrides user without mutating master" );
+    is( $master->config('user'), 'master_user', "Master user remains unchanged after request override" );
+
+    eval {
+        $req->{_srv} = {};
+    };
+    like( $@, qr/read-only/i, "Attempting to overwrite \$req->{_srv} throws read-only error" );
 };

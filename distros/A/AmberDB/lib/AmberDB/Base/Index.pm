@@ -4,7 +4,7 @@ use 5.016;
 use warnings;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2021-05-24';
 
 # =====================================================================
@@ -53,7 +53,7 @@ sub _resolve_field_value {
 
             if ($ref_table) {
                 my $ref_info = $self->table_info($ref_table);
-                if ( $self->config('simple') || ( $ref_info && $ref_info->{use_simple} ) ) {
+                if ( $self->config('use_simple') || ( $ref_info && $ref_info->{use_simple} ) ) {
                     cluck "[AMBERDB_SCHEMA] Cannot resolve RDBM relation to simple table '$ref_table'\n";
                     return '';
                 }
@@ -163,7 +163,7 @@ sub set_fieldlist {
 # ------------------------------------------------
 sub rdbm_target {
     my ( $self, $table_info, $blk ) = @_;
-    return if $self->config('simple');
+    return if $self->config('use_simple');
     return unless ref($table_info) eq 'HASH' && $table_info->{blocks};
     return if $table_info->{use_simple};
     return unless $blk;
@@ -1820,7 +1820,7 @@ sub sort_by_block {
 
     # If target block is ID (block 0 or 'id'), sort by primary key ID via array_sort
     if ( !$blk || $blk eq '0' || $blk eq 'id' ) {
-        my $id_sort_type = ( $self->config('simple') || ( $tableid && $self->table_attr( $tableid, 'use_simple' ) ) ) ? 'ascii' : 'num';
+        my $id_sort_type = ( $self->config('use_simple') || ( $tableid && $self->table_attr( $tableid, 'use_simple' ) ) ) ? 'ascii' : 'num';
         return $self->array_sort( $id_sort_type, $dir, undef, @$ids_ref );
     }
 
@@ -1903,7 +1903,7 @@ sub sort_by_block_records {
             $type = 'num' if $bt =~ /^(num|number|int|float|decimal)$/;
         }
     }
-    $type //= ( $blk == 0 ) ? ( ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num' ) : 'auto';
+    $type //= ( $blk == 0 ) ? ( ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num' ) : 'auto';
 
     return $self->array_sort( $type, $dir, $blk, @$recs_ref );
 }

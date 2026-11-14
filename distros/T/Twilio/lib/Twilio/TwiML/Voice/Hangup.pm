@@ -6,7 +6,7 @@ use warnings;
 
 use parent 'Twilio::TwiML::TwiML';
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class) = @_;

@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp ();
+use lib 't/lib';
+use TestDBIO::Child;
 
 use DBIO::Test::Future ();
 
@@ -63,7 +65,6 @@ PERL
 PERL
 );
 
-my @inc = map { "-I$_" } grep { !ref } @INC;
 for my $shape (sort keys %shapes) {
   my $script = File::Temp->new(SUFFIX => '.pl');
   print {$script} <<"PERL";
@@ -104,11 +105,9 @@ print((grep { !\$_->isa('K257::Holder') && !\$_->is_ready } \@K)
 PERL
   close $script;
 
-  open my $child, '-|', $^X, @inc, $script->filename
-    or die "cannot run $^X: $!";
-  my $output = do { local $/; <$child> } // '';
-  close $child;
-  my $status = $? >> 8;
+  my $run    = TestDBIO::Child::run_perl(script => $script->filename);
+  my $output = $run->{output};
+  my $status = $run->{exit};
 
   like $output, qr/^pending$/m, "$shape: the chain is pending when the process exits";
   is $status, 0, "$shape: the process exits with status 0";

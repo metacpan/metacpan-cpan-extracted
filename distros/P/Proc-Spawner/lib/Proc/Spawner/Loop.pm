@@ -9,7 +9,7 @@ package Proc::Spawner::Loop;
 # a backend may take process-wide state only while wait_until runs (D3: SIGCHLD on POSIX).
 use strict; use warnings;
 use Scalar::Util qw(weaken);
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 our $TRACE;          # undef, or a code ref given one line per operation (Proc::Spawner's $TRACE is this one)
 our $CAUSE;          # the caller's: a queued call keeps the value current when it was queued, and runs with it

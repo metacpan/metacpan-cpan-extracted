@@ -1,0 +1,16 @@
+--perl-best-practices                 # Start with Perl Best Practices
+--nostandard-output                   # ... but don't insist on output to stdout
+--warning-output                      # Show all warnings
+--ignore-old-breakpoints              # Ignore old breakpoints
+--maximum-line-length=132             # 132 characters per line
+--maximum-consecutive-blank-lines=2   # No more than 2 blank lines
+--indent-columns=4                    # Indentation is 4 columns
+--continuation-indentation=2          # Continuation indentation is 2 columns
+--vertical-tightness=0                # Less vertical tightness
+--indent-spaced-block-comments        # Don't indent comments without leading space
+--cuddled-else                        # Cuddled else
+--opening-sub-brace-on-new-line       # Open sub brace on new line
+
+# Restore wba and wbb back to the defaults which pbp above overrides
+--want-break-after="% + - * / x != == >= <= =~ !~ < >  | & = **= += *= &= <<= &&= -= /= |= >>= ||= //= .= %= ^= x="
+--want-break-before=". << >> -> && || //"

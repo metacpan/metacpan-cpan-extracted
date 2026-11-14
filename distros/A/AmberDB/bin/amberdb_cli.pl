@@ -1703,7 +1703,7 @@ if ( !defined $opt_action || $opt_action eq '' || $opt_action eq 'list' || $opt_
         $total_records += $cnt;
         $total_bytes   += $size;
 
-        my $has_schema = ( -f "$tpath.table" || -f "$db_dir/schema/$tbl.table" ) ? "OK" : ( $adb->config('simple') ? "Simple" : "None" );
+        my $has_schema = ( -f "$tpath.table" || -f "$db_dir/schema/$tbl.table" ) ? "OK" : ( $adb->config('use_simple') ? "Simple" : "None" );
 
         my @indexes;
         push @indexes, "inx" if -f "$tpath.inx";

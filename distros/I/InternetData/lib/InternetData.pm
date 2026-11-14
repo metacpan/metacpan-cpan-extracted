@@ -4,19 +4,31 @@ use strict;
 use warnings;
 
 use Carp ();
+use Exporter 'import';
 use Mojo::IOLoop;
 use Mojo::Promise;
 use Mojo::URL;
 use Mojo::UserAgent;
+use Mojo::Util ();
 use Scalar::Util ();
 
+use InternetData::AsnResult;
+use InternetData::Bogon ();
+use InternetData::Cache;
 use InternetData::Database;
+use InternetData::DomainResult;
 use InternetData::Error;
 use InternetData::Oauth;
+use InternetData::Result;
 
-our $VERSION = '1.12.1';
+our $VERSION = '1.13.1';
+our @EXPORT_OK = ('is_bogon');
 
-use constant DEFAULT_BASE_URL => 'https://internetdata.io';
+use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
+
+# The most addresses POST /batch takes in one call; a larger batch is sent in
+# chunks of this size.
+use constant BATCH_MAX => 1000;
 
 # Seconds before the first retry; each later one waits twice the one before.
 use constant BACKOFF_BASE => 0.25;
@@ -25,15 +37,155 @@ use constant BACKOFF_BASE => 0.25;
 # the same bound as the .NET SDK's.
 use constant LONGEST_WAIT => 2_147_483.647;
 
-my %OPTIONS = map { $_ => 1 } qw(api_key base_url retries timeout ua);
+my %OPTIONS = map { $_ => 1 } qw(
+    api_key base_url cache_size cache_ttl concurrency retries timeout ua
+);
+
+# The shapes of the answers, from the pinned spec's schemas: a member it requires
+# and never sends as null is required, a nullable or optional one may be absent
+# or null, and every one present has the spec's type at every depth. A detail
+# requires no member, so `{}`, its answer under a false flag, is one.
+my $CLASS_DETAIL = [fields => [map { [$_ => ['string']] } qw(provider provider_name confidence last_seen)]];
+my $PROXY_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider provider_name first_seen last_seen)),
+    (map { [$_ => ['integer']] } qw(hits hits_days_pct providers_num)),
+]];
+my $PUBPROXY_DETAIL = [fields => [
+    [entry => ['boolean']], [exit => ['boolean']], [protocols => [list => ['string']]],
+    [num_ports => ['integer']], [num_proxies => ['integer']],
+    (map { [$_ => ['string']] } qw(last_seen last_usable)),
+]];
+my $CARRIER_DETAIL = [fields => [map { [$_ => ['string']] } qw(name mcc mnc country confidence)]];
+my $SATELLITE_DETAIL = [fields => [
+    (map { [$_ => ['string']] } qw(provider provider_name orbit segment country)),
+    [asn => ['integer']], [confidence => ['string']],
+]];
+my $SSH_DETAIL = [fields => [
+    [port => ['integer']], (map { [$_ => ['string']] } qw(banner host_key_fp)),
+    [session_ok => ['boolean']], (map { [$_ => ['string']] } qw(first_seen last_seen)),
+]];
+my $SMTP_DETAIL = [fields => [
+    [port => ['integer']], [banner => ['string']], [session_ok => ['boolean']],
+    (map { [$_ => ['string']] } qw(first_seen last_seen)),
+]];
+# Web IP's detail is a list of the web servers found, each one whole.
+my $WEB_SERVER = [fields => [
+    [port => ['integer'], 1], (map { [$_ => ['boolean'], 1] } qw(tls_ok session_ok)),
+    [status_code => ['integer'], 1],
+    (map { [$_ => ['string'], 1] } qw(server location title cert_subject_cn cert_subject_o cert_issuer_dn)),
+    [cert_browser_trusted => ['boolean'], 1],
+    (map { [$_ => ['string'], 1] } qw(tls_version first_seen last_seen)),
+]];
+my $DNS_RESOLVER_DETAIL = [fields => [
+    [port => ['integer']], [recursion_available => ['boolean']], [rcode => ['integer']],
+    [answer_correct => ['boolean']], (map { [$_ => ['string']] } qw(first_seen last_seen)),
+]];
+my $BITTORRENT_DETAIL = [fields => [
+    (map { [$_ => ['boolean']] } qw(verified id_matches_ip)),
+    (map { [$_ => ['string']] } qw(first_seen last_seen last_reachable)),
+    (map { [$_ => ['integer']] } qw(days_seen num_ports peak_num_ports)),
+    [indexer => ['boolean']], [clients => [list => ['string']]],
+]];
+# The shared objects, whose members past the required ones are paid.
+my $LOCATION = [fields => [
+    (map { [$_ => ['string'], 1] } qw(
+        continent continent_name country country_name timezone currency_code currency_name
+        currency_symbol flag_emoji flag_unicode
+    )),
+    (map { [$_ => ['string']] } qw(region region_code city postal_code)),
+    (map { [$_ => ['number']] } qw(latitude longitude)), [accuracy_radius => ['integer']],
+    (map { [$_ => ['string']] } qw(geoname_id dma_code last_changed)),
+]];
+my $ASN = [fields => [
+    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name domain type prefix)),
+    (map { [$_ => ['string']] } qw(country rpki_status)),
+]];
+my $COMPANY = [fields => [
+    (map { [$_ => ['string'], 1] } qw(name domain)), (map { [$_ => ['string']] } qw(type country)),
+]];
+my $ABUSE = [fields => [
+    [email => ['string'], 1], (map { [$_ => ['string']] } qw(name phone address country network)),
+    [validated => ['boolean']], [unvalidated_since => ['string']],
+]];
+my $WHOIS = [fields => [
+    (map { [$_ => ['string'], 1] } qw(id name org country status source domain abuse_email)),
+    [asn => ['integer'], 1],
+]];
+my $RWHOIS = [fields => [map { [$_ => ['string'], 1] } qw(id name country source domain abuse_email)]];
+our $LOOKUP = [fields => [
+    [ip => ['string'], 1], [is_bogon => ['boolean'], 1], [is_vpn => ['boolean']],
+    (map { [$_ => ['boolean'], 1] } qw(is_tor is_relay)),
+    (map { [$_ => ['boolean']] } qw(is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn)),
+    (map { [$_ => ['boolean'], 1] } qw(
+        is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver is_bittorrent
+    )),
+    [vpn => $CLASS_DETAIL], (map { [$_ => $CLASS_DETAIL, 1] } qw(tor relay)),
+    (map { [$_ => $PROXY_DETAIL] } qw(resproxy dcproxy mobproxy)), [pubproxy => $PUBPROXY_DETAIL],
+    (map { [$_ => $CLASS_DETAIL] } qw(hosting cdn)), [carrier => $CARRIER_DETAIL],
+    [satellite => $SATELLITE_DETAIL], [ssh => $SSH_DETAIL], [smtp => $SMTP_DETAIL],
+    [web => [list => $WEB_SERVER]], [dns_resolver => $DNS_RESOLVER_DETAIL], [bittorrent => $BITTORRENT_DETAIL],
+    [location => $LOCATION, 1], [asn => $ASN, 1], [company => $COMPANY, 1], [hostname => ['string'], 1],
+    [abuse => $ABUSE, 1], [whois => $WHOIS], [rwhois => $RWHOIS],
+    [hosted_domains => [fields => [[total => ['integer'], 1]]]],
+    [trial_expired => ['boolean']],
+]];
+my $AS_PREFIX = [fields => [
+    [prefix => ['string'], 1], [peer_count => ['integer'], 1],
+    (map { [$_ => ['string'], 1] } qw(rpki_status first_seen country)),
+    [size => ['integer'], 1], [other_origins => [list => ['integer']], 1],
+]];
+our $ASN_LOOKUP = [fields => [
+    [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name country registry allocated domain)),
+    [type => ['string']],
+    (map { [$_ => ['integer']] } qw(num_ips num_prefixes4 num_prefixes6 rpki_valid rpki_invalid rpki_not_found)),
+    [whois => [map_of => ['string']]], [prefixes => [list => $AS_PREFIX]], [trial_expired => ['boolean']],
+]];
+my $DNS_ADDRESS = [fields => [map { [$_ => ['string'], 1] } qw(ip last_seen)]];
+my $DOMAIN_DNS = [fields => [
+    (map { [$_ => [list => $DNS_ADDRESS], 1] } qw(a aaaa)),
+    [mx => [list => [fields => [[priority => ['integer'], 1], map { [$_ => ['string'], 1] } qw(host last_seen)]]], 1],
+    [ns => [list => [fields => [map { [$_ => ['string'], 1] } qw(host last_seen)]]], 1],
+    [cname => [list => [fields => [map { [$_ => ['string'], 1] } qw(target last_seen)]]], 1],
+]];
+my $DOMAIN_IP_RANGES = [fields => [
+    (map { [$_ => ['string'], 1] } qw(domain redirects_to)), (map { [$_ => ['integer'], 1] } qw(total ipv4)),
+    [ranges => [list => [fields => [map { [$_ => ['string'], 1] } qw(range name country)]]], 1],
+]];
+our $DOMAIN_LOOKUP = [fields => [
+    [domain => ['string'], 1], [is_registered => ['boolean'], 1], [is_disposable => ['boolean']],
+    (map { [$_ => ['boolean'], 1] } qw(has_a has_aaaa has_mx has_ns has_cname)),
+    [dns => $DOMAIN_DNS], [ip_ranges => $DOMAIN_IP_RANGES],
+    [disposable => [fields => [
+        [confidence => ['string']], [providers => [list => ['string']]],
+        (map { [$_ => ['string']] } qw(first_seen last_seen)),
+    ]]],
+    [trial_expired => ['boolean']],
+]];
+our $BATCH_ERROR = [fields => [[status => ['integer'], 1], [error => ['string'], 1]]];
+# Each entry is judged alone, by _lookup_chunk_p.
+our $BATCH = [fields => [[results => [map_of => ['any']], 1], [errors => [map_of => ['any']], 1]]];
+our $ENTITLEMENT = [fields => [
+    [org_id => ['string'], 1],
+    [apikey => [fields => [
+        [id => ['string'], 1], [expires => ['date-time']], [allowed_cidrs => [list => ['string']], 1],
+    ]], 1],
+    [plan => [fields => [[key => ['string'], 1], [tier => ['string'], 1]]], 1],
+    [usage => [fields => [
+        [requests => ['integer'], 1], [quota => ['integer'], 1], [hard_limit => ['integer']],
+        [window_start => ['date-time'], 1], [window_end => ['date-time'], 1],
+    ]], 1],
+]];
 
 sub new {
     my ($class, %args) = @_;
     my @unknown = sort grep { !$OPTIONS{$_} } keys %args;
     Carp::croak("InternetData->new: unknown option(s): @unknown") if @unknown;
 
+    my $concurrency = defined $args{concurrency} ? $args{concurrency} : 8;
     my $retries = defined $args{retries} ? $args{retries} : 2;
-    Carp::croak('InternetData->new: retries must be a whole number, 0 or more') unless _is_count($retries);
+    my $cache_size = defined $args{cache_size} ? $args{cache_size} : 10_000;
+    Carp::croak('InternetData->new: concurrency must be a whole number, 1 or more') unless _is_count($concurrency, 1);
+    Carp::croak('InternetData->new: retries must be a whole number, 0 or more') unless _is_count($retries, 0);
     # Mojo arms a negative or non-numeric bound as a timer that fires at once, so
     # every call would fail as a network error after reaching the server.
     my $timeout = defined $args{timeout} ? $args{timeout} : 30;
@@ -59,11 +211,19 @@ sub new {
     my $self = bless {
         api_key => $api_key,
         base_url => _base_url($args{base_url}),
+        concurrency => 0 + $concurrency,
         retries => 0 + $retries,
         # Held as a number: Mojo tests the bound for truth before arming it, and a
         # string such as '0.0' is true, so it would be a timer that fires at once
         # rather than no bound.
         timeout => 0 + $timeout,
+        cache => $cache_size > 0 ? InternetData::Cache->new(
+            max => $cache_size,
+            ttl => defined $args{cache_ttl} ? $args{cache_ttl} : 3600,
+        ) : undef,
+        # The addresses with a request in flight, each a promise its waiters
+        # take the answer from (see _board).
+        flights => {},
         ua => $args{ua} || Mojo::UserAgent->new,
     }, $class;
 
@@ -77,6 +237,246 @@ sub new {
     return $self;
 }
 
+# Both a method and an exportable function, so the address is the LAST argument
+# either way: is_bogon($ip) and $client->is_bogon($ip) reach the same code.
+sub is_bogon {
+    my $ip = pop;
+    Carp::croak('is_bogon: expected an IP address') if !defined $ip || ref $ip;
+    return InternetData::Bogon::is_bogon($ip);
+}
+
+# What every database says about one address. A bogon is answered locally and
+# never reaches the network; everything else is served, then cached for this
+# client.
+sub lookup {
+    my $self = shift;
+    $self->_assert_blocking_ok('lookup');
+    return $self->_wait($self->lookup_p(@_));
+}
+
+sub lookup_p {
+    my ($self, $ip, %options) = @_;
+    Carp::croak('lookup: expected an IP address') if !defined $ip || !length $ip;
+    $self->_check_options('lookup', \%options, 'retries', 'timeout');
+    # Judged, cached and sent as the IPv4 address it carries, if it is mapped.
+    $ip = InternetData::Bogon::unmapped($ip);
+    # This API answers an AS or a domain at the same path, as an answer this call
+    # cannot read, so one sent here would come back as three retried server_errors.
+    return Mojo::Promise->reject(InternetData::Error->new(
+        kind => 'bad_request',
+        message => "'$ip' is not an IP address: look up an AS with lookup_asn, and a domain with lookup_domain",
+    )) unless InternetData::Bogon::is_ip($ip);
+
+    return Mojo::Promise->resolve(InternetData::Bogon::bogon_result($ip))
+        if InternetData::Bogon::is_bogon($ip);
+
+    if ($self->{cache}) {
+        my $hit = $self->{cache}->get($ip);
+        return Mojo::Promise->resolve($hit) if $hit;
+        # A miss for an address already in flight, for a lookup or a batch,
+        # takes that request's answer rather than sending its own.
+        return $self->{flights}{$ip}->then(sub { shift }) if $self->{flights}{$ip};
+    }
+
+    my $flight = $self->_board($ip);
+    my $url = $self->_url('/' . Mojo::Util::url_escape($ip, '^A-Za-z0-9\-._~:'));
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    # Anything that dies before a request is under way lands the flight too, or
+    # every later lookup of the address would wait on it forever.
+    my $sent = eval { $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $LOOKUP) }) };
+    if (!$sent) {
+        my $error = $@;
+        $self->_land($ip, $flight, 0, $error);
+        die $error;
+    }
+    return $sent->then(
+        sub {
+            my $result = InternetData::Result->from_wire(shift);
+            # Only a served answer is cached, and before it lands, so a miss
+            # after the flight is gone finds it. Errors never are, and bogons
+            # never reach this far.
+            $self->{cache}->set($ip, $result) if $self->{cache};
+            $self->_land($ip, $flight, 1, $result);
+            return $result;
+        },
+        sub {
+            my $error = shift;
+            $self->_land($ip, $flight, 0, $error);
+            return Mojo::Promise->reject($error);
+        },
+    );
+}
+
+# Concurrent misses for one address share ONE request. The first miss boards the
+# address, and every miss after it, a batch's included, waits for that request
+# instead. The request runs under the options of the call that led it; a failure
+# reaches every waiter and is cached for none. Nothing is shared without a cache,
+# since every lookup is then served. A Mojo::Promise cannot be canceled, so no
+# waiter is ever left behind by a leader that gave up.
+sub _board {
+    my ($self, $ip) = @_;
+    return undef unless $self->{cache};
+    my $flight = Mojo::Promise->new;
+    # Handled even when no waiter joined, so a failure is not warned about.
+    $flight->catch(sub { });
+    return $self->{flights}{$ip} = $flight;
+}
+
+# Takes an address off the board and settles its flight for every waiter.
+sub _land {
+    my ($self, $ip, $flight, $ok, $value) = @_;
+    return unless $flight;
+    delete $self->{flights}{$ip}
+        if $self->{flights}{$ip} && $self->{flights}{$ip} == $flight;
+    return $ok ? $flight->resolve($value) : $flight->reject($value);
+}
+
+# What every database says about one AS. Not cached and not batched: only an
+# address is.
+sub lookup_asn {
+    my $self = shift;
+    $self->_assert_blocking_ok('lookup_asn');
+    return $self->_wait($self->lookup_asn_p(@_));
+}
+
+sub lookup_asn_p {
+    my ($self, $asn, %options) = @_;
+    Carp::croak('lookup_asn: expected an AS number') if !defined $asn || !length $asn;
+    $self->_check_options('lookup_asn', \%options, 'retries', 'timeout');
+
+    my $url = $self->_url('/asn/' . _path_segment($asn));
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $ASN_LOOKUP) })
+        ->then(sub { InternetData::AsnResult->from_wire(shift) });
+}
+
+# What every database says about one domain, neither cached nor batched.
+sub lookup_domain {
+    my $self = shift;
+    $self->_assert_blocking_ok('lookup_domain');
+    return $self->_wait($self->lookup_domain_p(@_));
+}
+
+sub lookup_domain_p {
+    my ($self, $domain, %options) = @_;
+    Carp::croak('lookup_domain: expected a domain') if !defined $domain || !length $domain;
+    $self->_check_options('lookup_domain', \%options, 'retries', 'timeout');
+
+    my $url = $self->_url('/domain/' . _path_segment($domain));
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $DOMAIN_LOOKUP) })
+        ->then(sub { InternetData::DomainResult->from_wire(shift) });
+}
+
+# The address our edge observed this client calling from. Deliberately not
+# cached: the cache is keyed by address, and which address this is IS the
+# question.
+sub my_ip {
+    my $self = shift;
+    $self->_assert_blocking_ok('my_ip');
+    return $self->_wait($self->my_ip_p(@_));
+}
+
+sub my_ip_p {
+    my ($self, %options) = @_;
+    $self->_check_options('my_ip', \%options, 'retries', 'timeout');
+
+    my $url = $self->_url('/myip');
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $LOOKUP) })
+        ->then(sub { InternetData::Result->from_wire(shift) });
+}
+
+# What this key is entitled to and what it has spent. Deliberately not cached:
+# the whole point is the number, and a cached one is wrong within seconds.
+sub my_entitlement {
+    my $self = shift;
+    $self->_assert_blocking_ok('my_entitlement');
+    return $self->_wait($self->my_entitlement_p(@_));
+}
+
+sub my_entitlement_p {
+    my ($self, %options) = @_;
+    $self->_check_options('my_entitlement', \%options, 'retries', 'timeout');
+
+    my $url = $self->_url('/api/v1/entitlement');
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+    return $self->_retry_p($retries, sub { $self->_json_p($url, undef, $options{timeout}, undef, $ENTITLEMENT) });
+}
+
+# Look up many addresses concurrently, keyed by address rather than positional,
+# so duplicates collapse to one request and the caller never lines two lists up.
+sub lookup_batch {
+    my $self = shift;
+    $self->_assert_blocking_ok('lookup_batch');
+    return $self->_wait($self->lookup_batch_p(@_));
+}
+
+sub lookup_batch_p {
+    my ($self, $ips, %options) = @_;
+    Carp::croak('lookup_batch: expected an array reference of addresses')
+        if ref $ips ne 'ARRAY';
+    $self->_check_options('lookup_batch', \%options, 'retries', 'concurrency', 'timeout');
+
+    my $limit = defined $options{concurrency} ? $options{concurrency} : $self->{concurrency};
+    my $retries = defined $options{retries} ? $options{retries} : $self->{retries};
+
+    # Bogons are answered locally and cached answers are reused; everything else
+    # goes to the batch endpoint in chunks of up to 1000 addresses, with at most
+    # `limit` chunks in flight. An IPv4-mapped address is sent as the address it
+    # carries, once however many of its spellings were asked, and answered under
+    # each one asked.
+    my @asked = grep { defined && length } @$ips;
+    my %seen;
+    my @unique = grep { !$seen{$_}++ } map { InternetData::Bogon::unmapped($_) } @asked;
+    my %answers;
+    my @pending;
+    my %joined;
+    for my $ip (@unique) {
+        if (InternetData::Bogon::is_bogon($ip)) {
+            $answers{$ip} = InternetData::Bogon::bogon_result($ip);
+            next;
+        }
+        my $hit = $self->{cache} ? $self->{cache}->get($ip) : undef;
+        if ($hit) {
+            $answers{$ip} = $hit;
+            next;
+        }
+        # Already in flight, for a lookup or another batch: this batch takes
+        # that request's answer rather than sending the address again.
+        if ($self->{cache} && $self->{flights}{$ip}) {
+            $joined{$ip} = $self->{flights}{$ip};
+            next;
+        }
+        push @pending, $ip;
+    }
+    # Boarded before any chunk is built, so a lookup of one of these arriving
+    # meanwhile waits for this batch's answer.
+    my %boarded = map { ($_ => $self->_board($_)) } @pending;
+    my @queue;
+    push @queue, [splice @pending, 0, BATCH_MAX] while @pending;
+
+    my $batch = {
+        queue => \@queue, answers => \%answers, active => 0, limit => $limit,
+        retries => $retries, timeout => $options{timeout}, promise => Mojo::Promise->new,
+        boarded => \%boarded,
+    };
+    $self->_dispatch($batch);
+    my $done = %joined ? Mojo::Promise->all(
+        $batch->{promise},
+        map {
+            my $ip = $_;
+            $joined{$ip}->then(
+                sub { $answers{$ip} = shift },
+                sub { $answers{$ip} = InternetData::Error->wrap(shift) },
+            );
+        } sort keys %joined,
+    ) : $batch->{promise};
+    return $done->then(sub {
+        return { map { ($_ => $answers{ InternetData::Bogon::unmapped($_) }) } @asked };
+    });
+}
+
 # The licensed database downloads. Built per call rather than held, so the
 # client and its sub-API never form a reference cycle.
 sub database {
@@ -88,6 +488,85 @@ sub database {
 sub oauth {
     my ($self) = @_;
     return InternetData::Oauth->_new($self);
+}
+
+# Keeps exactly `limit` chunks in flight: every answer starts the next one, so a
+# per-call concurrency is a real ceiling rather than an option that was accepted
+# and ignored. A failing address carries its error as its value, so one bad
+# entry cannot lose the rest of the answers: the API reports a per-entry failure
+# with the status the single lookup would have answered, and a chunk that fails
+# as a whole marks every address in it.
+sub _dispatch {
+    my ($self, $batch) = @_;
+    if (!@{$batch->{queue}} && !$batch->{active}) {
+        $batch->{promise}->resolve($batch->{answers});
+        return;
+    }
+    while ($batch->{active} < $batch->{limit} && @{$batch->{queue}}) {
+        my $chunk = shift @{$batch->{queue}};
+        $batch->{active}++;
+        $self->_lookup_chunk_p($chunk, $batch->{retries}, $batch->{timeout})->then(sub {
+            my $answers = shift;
+            for my $ip (keys %$answers) {
+                my $answer = $answers->{$ip};
+                $batch->{answers}{$ip} = $answer;
+                my $failed = Scalar::Util::blessed($answer) && $answer->isa('InternetData::Error');
+                $self->_land($ip, $batch->{boarded}{$ip}, !$failed, $answer);
+            }
+            $self->_settled($batch);
+        });
+    }
+}
+
+# One POST /batch, mapped back onto the addresses it was asked about. A
+# chunk-level failure - the call refused, the transport failing, the retries
+# exhausted - becomes every address's error, exactly as it would have been had
+# each been looked up alone. Never rejects: the failure is the value.
+sub _lookup_chunk_p {
+    my ($self, $chunk, $retries, $timeout) = @_;
+    my $url = $self->_url('/batch');
+    return $self->_retry_p($retries, sub { $self->_json_p($url, { ips => $chunk }, $timeout, undef, $BATCH) })->then(
+        sub {
+            my $body = shift;
+            my $results = $body->{results};
+            my $errors = $body->{errors};
+            my %answers;
+            # An entry is judged alone: one that is not an answer is that
+            # address's error, and the rest of the chunk keeps its answers.
+            for my $ip (@$chunk) {
+                if (defined $results->{$ip} && !defined _nonconforming($LOOKUP, $results->{$ip}, [])) {
+                    my $result = InternetData::Result->from_wire($results->{$ip});
+                    $self->{cache}->set($ip, $result) if $self->{cache};
+                    $answers{$ip} = $result;
+                }
+                elsif (defined $errors->{$ip} && !defined _nonconforming($BATCH_ERROR, $errors->{$ip}, [])) {
+                    $answers{$ip} = InternetData::Error->from_entry(
+                        $errors->{$ip}{status}, $errors->{$ip}{error},
+                    );
+                }
+                else {
+                    $answers{$ip} = InternetData::Error->new(
+                        kind => 'server_error', status => 200,
+                        message => "the batch answer did not include $ip",
+                    );
+                }
+            }
+            return \%answers;
+        },
+        sub {
+            my $error = InternetData::Error->wrap(shift);
+            return { map { $_ => $error } @$chunk };
+        },
+    );
+}
+
+# Releasing the slot happens in the SAME handler that records the answer. A
+# second `then` would leave a gap in which a dying handler strands the slot, and
+# a batch that never releases one never finishes.
+sub _settled {
+    my ($self, $batch) = @_;
+    $batch->{active}--;
+    $self->_dispatch($batch);
 }
 
 # One file transfer. Every chunk is handed to $on_chunk and none is kept, so a
@@ -226,37 +705,40 @@ sub _retry_delay {
     return BACKOFF_BASE * 2**($tries < 6 ? $tries : 6);
 }
 
-# $timeout is the call's own bound, or undef for the client's. $shape is the
-# whole answer's, and $member, when given, the one member of it the call returns.
-# An answer without the shape is no answer at all, so it fails inside the attempt
-# as a retried server_error, like any other 2xx that cannot be read, rather than
-# reaching the caller as undef.
+# $body, when given, is POSTed as JSON, and $timeout is the call's own bound, or
+# undef for the client's. $shape is the whole answer's, and $member, when given,
+# the one member of it the call returns. An answer without the shape is no answer
+# at all, so it fails inside the attempt as a retried server_error, like any
+# other 2xx that cannot be read, rather than reaching the caller as undef.
 sub _json_p {
-    my ($self, $url, $timeout, $member, $shape) = @_;
-    return $self->_get_p($url, $timeout)->then(sub {
+    my ($self, $url, $body, $timeout, $member, $shape) = @_;
+    my $sent = defined $body ? $self->_post_p($url, $body, $timeout) : $self->_get_p($url, $timeout);
+    return $sent->then(sub {
         my $res = shift->res;
         die InternetData::Error->from_response($res->code, $res->headers, $res->json)
             unless $res->is_success;
-        my $body = $res->json;
+        my $decoded = $res->json;
         my $unreadable = sub {
             die InternetData::Error->new(kind => 'server_error', status => $res->code, message => shift);
         };
-        $unreadable->('the API did not answer with a JSON object') unless ref $body eq 'HASH';
-        return $body unless $shape;
-        my $wrong = _nonconforming($shape, $body, []);
+        $unreadable->('the API did not answer with a JSON object') unless ref $decoded eq 'HASH';
+        return $decoded unless $shape;
+        my $wrong = _nonconforming($shape, $decoded, []);
         $unreadable->($wrong) if defined $wrong;
-        return defined $member ? $body->{$member} : $body;
+        return defined $member ? $decoded->{$member} : $decoded;
     });
 }
 
 # undef when the value has the shape, else what the API answered wrong, naming
 # the member by its path. A string is told from a number by the scalar Mojo::JSON
 # decoded it into, as InternetData::Oauth does, since nothing else in Perl tells
-# `"7"` from `7`.
+# `"7"` from `7`. No list entry or map value may be null.
 sub _nonconforming {
     my ($shape, $value, $at) = @_;
     my ($kind, $inner) = @$shape;
     my $wrong = sub { 'the API answered ' . (@$at ? join('.', @$at) : 'the answer') . ' of the wrong type' };
+    return $wrong->() unless defined $value;
+    return undef if $kind eq 'any';
     if ($kind eq 'string') {
         return InternetData::Oauth::_is_string($value) ? undef : $wrong->();
     }
@@ -265,8 +747,12 @@ sub _nonconforming {
             : 'the API answered ' . join('.', @$at) . ' that is no RFC 3339 ' . $kind;
     }
     if ($kind eq 'integer') {
-        return defined $value && !ref $value && !InternetData::Oauth::_is_string($value)
-            && $value =~ /\A-?[0-9]+\z/ ? undef : $wrong->();
+        return !ref $value && !InternetData::Oauth::_is_string($value) && $value =~ /\A-?[0-9]+\z/
+            ? undef : $wrong->();
+    }
+    if ($kind eq 'number') {
+        return !ref $value && !InternetData::Oauth::_is_string($value) && Scalar::Util::looks_like_number($value)
+            ? undef : $wrong->();
     }
     if ($kind eq 'boolean') {
         return Scalar::Util::blessed($value) && $value->isa('JSON::PP::Boolean') ? undef : $wrong->();
@@ -335,6 +821,14 @@ sub _get_p {
     return $self->_start_p($self->{ua}->build_tx(GET => $url => $self->_headers), $timeout);
 }
 
+# The one request with a body: the batch. Mojo encodes the JSON and sets the
+# content type.
+sub _post_p {
+    my ($self, $url, $body, $timeout) = @_;
+    my $tx = $self->{ua}->build_tx(POST => $url => $self->_headers => json => $body);
+    return $self->_start_p($tx, $timeout);
+}
+
 sub _headers {
     my ($self) = @_;
     my %headers = (Accept => 'application/json');
@@ -353,6 +847,13 @@ sub _url {
     my $url = Mojo::URL->new($self->{base_url} . $path);
     $url->query(%query) if %query;
     return $url;
+}
+
+# One path segment as given: its UTF-8 bytes, everything but the unreserved
+# characters escaped, so a `/`, `?` or `#` in it cannot reach another route.
+sub _path_segment {
+    my ($value) = @_;
+    return Mojo::Util::url_escape(Mojo::Util::encode('UTF-8', $value), '^A-Za-z0-9\-._~');
 }
 
 sub _wait {
@@ -386,14 +887,18 @@ sub _check_options {
     Carp::croak("InternetData::$method: timeout must be a number of seconds, 0 or more")
         if defined $timeout && !(Scalar::Util::looks_like_number($timeout) && $timeout >= 0);
     Carp::croak("InternetData::$method: retries must be a whole number, 0 or more")
-        if defined $options->{retries} && !_is_count($options->{retries});
+        if defined $options->{retries} && !_is_count($options->{retries}, 0);
+    Carp::croak("InternetData::$method: concurrency must be a whole number, 1 or more")
+        if defined $options->{concurrency} && !_is_count($options->{concurrency}, 1);
 }
 
-# A whole number from 0, or Inf for no limit. NaN compares false with 0, so it
-# would retry for good; a word reads as 0, and 1.5 as two retries.
+# A whole number from $least, or Inf for no limit. NaN compares false with
+# anything, so a NaN count retried a failing call for good and a NaN concurrency
+# put no chunk in flight, spinning the loop forever; a word reads as 0, and 1.5
+# as two retries.
 sub _is_count {
-    my ($n) = @_;
-    return !ref $n && Scalar::Util::looks_like_number($n) && $n >= 0 && $n == int $n;
+    my ($n, $least) = @_;
+    return !ref $n && Scalar::Util::looks_like_number($n) && $n >= $least && $n == int $n;
 }
 
 sub _base_url {
@@ -415,59 +920,67 @@ InternetData - the official Perl client for the InternetData API
 
     use InternetData;
 
-    my $client = InternetData->new(api_key => $ENV{INTERNETDATA_API_KEY});
+    my $client = InternetData->new;
+    my $result = $client->lookup('146.70.116.130');
 
-    for my $db (@{ $client->database->list }) {
-        next unless $db->{standing} eq 'licensed';
-        my $id = $db->{versions}[-1]{id};
-        $client->database->download($id, 'csvgz', "./$id.csv.gz");
-    }
+    say $result->company->{name};
+    say 'anycast' if $result->is_anycast;
 
 =head1 DESCRIPTION
 
-Downloads InternetData's licensed IP and network databases, and reads what the
-API publishes about them: the catalog, per-database metadata, checksums, and
-your organization's recent download attempts.
+Answers what every InternetData database says about an IP address, an AS or a
+domain, and downloads the databases your organization is licensed for.
 
-Every database endpoint published today needs a key carrying the
-C<db.download> scope. L</new> takes one as an option rather than requiring it: a
-client built without a key sends no C<Authorization> header at all, which is what
-a database served without a license would need, and what L</oauth> needs anyway.
+Which fields a lookup answers is decided by the plan behind your key. An absent
+field means "not in your plan" and is B<not> the same as false; see
+L<InternetData::Result/ABSENT IS NOT FALSE>, which is the one thing to read
+before writing an C<if>.
 
 =head1 METHODS
 
-The seven database calls live on L<InternetData::Database>, reached as
-L</database>. Each has a C<_p> twin returning a L<Mojo::Promise> and takes a
-per-call C<retries> option, and all but the two transfers a per-call C<timeout>.
-Failures die with an L<InternetData::Error>. The OAuth sign-in lives on
-L<InternetData::Oauth>, reached as L</oauth>.
-
 =head2 new
 
-    my $client = InternetData->new(api_key => '...', %options);
+    my $client = InternetData->new(%options);
 
 =over 4
 
 =item api_key
 
-A console-issued key carrying the C<db.download> scope. Keys are default-deny,
-so an existing key does not reach these endpoints until the scope is added to
-it. Optional: omit it, or pass an empty or blank one, and no C<Authorization>
-header is sent. Every database endpoint published today answers C<401> without
-one. The key is trimmed, so one read from a file with its newline works; a key
-still holding a control character, or a character past U+00FF, croaks here.
+Your API key. Without one a lookup is on Unlimited, the free plan: C<ip>,
+C<is_bogon>, the Tor, relay, anycast, carrier, satellite and service flags,
+C<location> to the country, C<asn>, C<company>, C<hostname> and the abuse email,
+with no daily or monthly cap. Every paid plan answers every field, and a batch
+needs one. The database calls need a key carrying the C<db.download> scope, and
+keys are default-deny, so an existing key reaches them only once the scope is
+added to it. An empty or blank key is the same as none, and sends no
+C<Authorization> header.
+The key is trimmed, so one read from a file with its newline works; a key still
+holding a control character, or a character past U+00FF, croaks here.
 
 =item base_url
 
-Defaults to C<https://internetdata.io>.
+Defaults to C<https://api.internetdata.io>, where the lookups and the database
+calls both answer. L</oauth> signs in at the apex, C<https://internetdata.io>.
+
+=item cache_size
+
+Addresses held in this client's cache. Defaults to 10000; B<0 disables caching>.
+
+=item cache_ttl
+
+How long an answer stays fresh, in seconds. Defaults to 3600.
+
+=item concurrency
+
+Requests in flight during a batch, a whole number from 1. Defaults to 8, and is
+overridable per call.
 
 =item retries
 
 Attempts after a retryable failure, a whole number from 0. Defaults to 2, and is
-overridable per call.
-Each retry waits the server's C<Retry-After> when it sent one, otherwise a
-backoff of 250 ms that doubles per retry, up to 16 seconds. A C<Retry-After>
-longer than about 24.8 days is waited out on that backoff instead.
+overridable per call. Each retry waits the server's C<Retry-After> when it sent
+one, otherwise a backoff of 250 ms that doubles per retry, up to 16 seconds. A
+C<Retry-After> longer than about 24.8 days is waited out on that backoff instead.
 
 =item timeout
 
@@ -485,11 +998,113 @@ multi-gigabyte file into memory.
 
 =back
 
+The cache belongs to the client instance and is never shared. Two clients
+holding different keys are on different plans and entitled to different fields,
+so a shared cache would serve one of them the other's shape.
+
+=head2 lookup
+
+    my $result = $client->lookup($ip, %options);
+
+Returns an L<InternetData::Result>, or dies with an L<InternetData::Error>.
+C<retries> and C<timeout> are the per-call options, as they are on C<lookup_asn>,
+C<lookup_domain>, C<my_ip> and C<my_entitlement>.
+
+C<$ip> is an IPv4 or IPv6 address. Anything else is refused before it is sent,
+as a C<bad_request> naming C<lookup_asn> and C<lookup_domain>.
+
+=head2 lookup_asn
+
+    my $as = $client->lookup_asn(9009);
+
+What every database says about one AS, as an L<InternetData::AsnResult>. The AS
+number is sent as given, so C<'AS9009'> works too. Not cached and not batched.
+
+=head2 lookup_domain
+
+    my $domain = $client->lookup_domain('example.com');
+
+What every database says about one domain, as an L<InternetData::DomainResult>.
+Not cached and not batched.
+
+=head2 my_ip
+
+    my $me = $client->my_ip;
+
+Looks up the address this client is calling from, returning an
+L<InternetData::Result>.
+
+The same answer C<lookup> would give for that address, at the same cost against
+your allowance. The address is the one our edge observed, so a call made through
+a proxy or a VPN reports the exit it left through - usually the point of asking.
+
+Deliberately B<not cached>. The cache is keyed by address, and which address this
+is IS the question: a machine that moves between networks would otherwise be told
+where it used to be.
+
+=head2 my_entitlement
+
+    my $ent = $client->my_entitlement;
+    printf "%d of %d\n", $ent->{usage}{requests}, $ent->{usage}{quota};
+
+What this client's API key is entitled to, and how much of it has been used, as a
+hash reference with C<org_id>, C<apikey>, C<plan> and C<usage> keys.
+
+Named for what it answers rather than C<me>, which sits one letter from C<my_ip>
+and means something quite different: one is which address you are calling FROM,
+the other is what the key you are calling WITH may spend.
+
+Unlike a lookup there is no useful unauthenticated answer, so a client built
+without an API key gets an unauthorized error rather than a partial one.
+
+Usage counts against the allowance window - on a paid plan the anniversary of
+the subscription, not the calendar month and not the billing period, and on a
+free plan the UTC day - and it is the same number a lookup is gated on.
+C<hard_limit> is C<undef> when we never stop serving, which is not the same as a
+limit of zero.
+
+Deliberately B<not cached>: the whole point is what has been spent, and a cached
+answer is a wrong one within seconds of the next request.
+
+=head2 lookup_batch
+
+    my $answers = $client->lookup_batch(\@ips, %options);
+
+Returns a hash reference keyed by address. Duplicates in C<@ips> collapse to one
+request, bogons never reach the network, and an address that failed carries its
+L<InternetData::Error> as its value instead of failing the batch. C<retries>,
+C<concurrency> and C<timeout> are the per-call options, and the timeout bounds
+each chunk.
+
+There is no cap on how many addresses one call takes: everything not answered
+locally goes out in chunks of up to 1000, the most one request carries. The batch
+endpoint needs a paid plan: without a key every address in a request of two
+or more carries an C<unauthorized> L<InternetData::Error>, and a free-plan
+key's request of two or more a C<bad_request> one (HTTP 402). A request of
+one address is answered as its lookup would be.
+
+Perl hashes have no insertion order, so iterate your own list if order matters:
+
+    for my $ip (@ips) {
+        my $answer = $answers->{$ip};
+    }
+
+=head2 is_bogon
+
+    $client->is_bogon('10.0.0.1');    # 1
+
+Also exportable, for code with no client to hand:
+
+    use InternetData 'is_bogon';
+    is_bogon('10.0.0.1');
+
 =head2 database
 
     my $databases = $client->database->list;
 
-The licensed database downloads. See L<InternetData::Database>.
+The licensed database downloads. Each of the seven calls takes a per-call
+C<retries> option, and all but the two transfers a per-call C<timeout>. See
+L<InternetData::Database>.
 
 =head2 oauth
 
@@ -501,23 +1116,24 @@ L<InternetData::Oauth>.
 
 =head1 NON-BLOCKING USE
 
-Every call has a C<_p> twin returning a L<Mojo::Promise>, on
-L<InternetData::Database> and L<InternetData::Oauth> alike, so the library drops
-into a Mojolicious application without a worker. The blocking forms are those
-promises plus a C<wait>, so nothing is duplicated and both paths retry
-identically.
+Every call has a C<_p> twin returning a L<Mojo::Promise>: C<lookup_p>,
+C<lookup_asn_p>, C<lookup_domain_p>, C<lookup_batch_p>, and the same on
+L<InternetData::Database> and L<InternetData::Oauth>. The blocking forms are
+those promises plus a C<wait>, so nothing is duplicated and both paths retry,
+cache and short-circuit identically.
 
-    $client->database->list_p
-        ->then(sub { say $_->{base} for @{ shift() } })
+    $client->lookup_p('146.70.116.130')
+        ->then(sub { say shift->company->{name} })
         ->catch(sub { warn shift })
         ->wait;
 
-Inside an already running L<Mojo::IOLoop> the blocking forms cannot work and
-croak saying so. Use the C<_p> forms there.
+Inside an already running L<Mojo::IOLoop> - a Mojolicious application, say - the
+blocking forms cannot work and croak saying so. Use the C<_p> forms there.
 
 =head1 SEE ALSO
 
-L<InternetData::Database>, L<InternetData::Error>, L<InternetData::Oauth>.
+L<InternetData::Result>, L<InternetData::AsnResult>, L<InternetData::DomainResult>,
+L<InternetData::Error>, L<InternetData::Database>, L<InternetData::Oauth>.
 
 =head1 LICENSE
 

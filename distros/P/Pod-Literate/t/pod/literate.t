@@ -61,13 +61,16 @@ subtest 'indentation'=>sub {
 };
 
 subtest 'Tangling'=>sub {
-	plan tests=>1;
-	my ($tfh,$tfn)=tempfile(undef,UNLINK => 1);
-	close($tfh);
+	plan tests=>2;
+	my ($tfha,$tfna)=tempfile(undef,UNLINK => 1);
+	my ($tfhb,$tfnb)=tempfile(undef,UNLINK => 1);
+	close($tfha); close($tfhb);
 	my $doc=qq|
 =pod
 
-=for literate:command target=$tfn
+=for literate:command target=$tfna
+
+=head1 First target
 
 Some text.
 
@@ -84,11 +87,16 @@ Some text.
 
 =for literate .
 
-=begin literate $tfn
+=begin literate $tfna
 
 	#< Header >#
 	#< Inline conditional >#
 	#< Say something in2resting >#
+	# test blank lines begin
+	#< Test Blank Lines begin >#
+	# test blank lines for
+	#< Test Blank Lines for >#
+	# test blank lines end
 
 =end literate
 
@@ -102,11 +110,52 @@ The conditional will check inline behavior.
 
 This will be true fifty percent of the time.
 
-=begin literate Fifty percent chance
+=for literate Fifty percent chance
 
 	rand()>0.5
 
+=for literate .
+
+=head2 Testing blank line behavior
+
+The goal here is to show that begin/for has slightly different behavior with terminal newline handling.
+
+=begin literate Test Blank Lines begin
+
+	# first
+
 =end literate
+
+=begin literate Test Blank Lines begin
+
+	# second
+
+=end literate
+
+=for literate Test Blank Lines for
+
+	# first
+
+=for literate .
+
+=for literate Test Blank Lines for
+
+	# second
+
+=for literate .
+
+=head1 Second target
+
+=for literate:command target=$tfnb
+
+=for literate $tfnb
+
+	#!/usr/bin/perl
+	use strict; use warnings;
+	print "Second output!\\n";
+	#< Say something in2resting >#
+
+=for literate .
 
 =cut
 |;
@@ -117,12 +166,32 @@ This will be true fifty percent of the time.
 	$literate->parse_string_document($doc);
 	#
 	my $result;
-	{ open(my $fh,'<',$tfn); local($/); $result=<$fh>; close($fh); }
+	{ open(my $fh,'<',$tfna); local($/); $result=<$fh>; close($fh); }
 	is($result,
 q|#!/usr/bin/perl
 use strict; use warnings;
+
 if(rand()>0.5) { print "Greetings!\n" }
-print "Hello world!\n";|,'Generated script');
+print "Hello world!\n";
+# test blank lines begin
+# first
+
+# second
+
+# test blank lines for
+# first
+# second
+# test blank lines end
+
+|,'Generated script');
+	#
+	{ open(my $fh,'<',$tfnb); local($/); $result=<$fh>; close($fh); }
+	is($result,
+q|#!/usr/bin/perl
+use strict; use warnings;
+print "Second output!\n";
+print "Hello world!\n";
+|,'Generated second script');
 };
 
 subtest 'invalid declarations'=>sub {

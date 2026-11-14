@@ -99,7 +99,7 @@ sub parse_ispdb {
       push @methods, "oauth2" if grep $_ eq "OAuth2", @auth;
       push @methods, "password" if grep $_ eq "password-cleartext", @auth;
       next unless @methods;
-      $info{tls} = $info{tls} eq "SSL" ? "ssl" : $info{tls} eq "STARTTLS" ? "starttls" : next;
+      $info{tls} = $info{tls} eq "SSL" ? "connect" : $info{tls} eq "STARTTLS" ? "starttls" : next;
       $info{port} =~ /^\d+$/ && $info{port} >= 1 && $info{port} <= 65535 or next;
       if (defined $email) {
          my ($local, $domain) = split /\@/, $email, 2;

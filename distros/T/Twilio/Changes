@@ -1,5 +1,10 @@
 Revision history for Twilio
 
+2.002  2026-11-13
+    - The tests run the manual's Mojolicious examples only with Mojolicious
+      7.93 or later, and skip them with an older one, which failed them.
+      The library itself is unchanged.
+
 2.001  2026-11-12
     - Fixes PAUSE indexing, which failed for 2.000000: META now lists each
       module in "provides", so PAUSE no longer stores file paths longer than

@@ -54,7 +54,7 @@ use strict; use warnings;
 use POSIX (); use File::Spec ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Config;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 require XSLoader; XSLoader::load(__PACKAGE__, $VERSION);   # __posix_spawn, fpe_at_exec, chld_to_fd, chld_restore
 our %UNSUPPORTED = ('*' => 'fail');   # the defaults for spawn's UNSUPPORTED (EXPERIMENTAL: '*' => 'fail')
 

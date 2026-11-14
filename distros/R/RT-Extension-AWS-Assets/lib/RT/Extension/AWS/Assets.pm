@@ -5,7 +5,7 @@ package RT::Extension::AWS::Assets;
 use Paws;
 use Paws::Credential::Explicit;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 =head1 NAME
 
@@ -150,6 +150,20 @@ AWS Value: "Lease ID"
 RT Asset CF: "AWS Reserved Instance ID"
 
 =back
+
+=head2 EC2 Instance Status
+
+When EC2 instances are imported or updated from AWS, the asset Status is
+set to the instance state, like C<running> or C<stopped>. The state name
+is used as the status, so only states that are also statuses in the
+asset's lifecycle are synced. The C<aws-assets> lifecycle includes
+C<running> and C<stopped>. For any other state, like C<pending> or
+C<terminated>, an error is logged and the Status is left unchanged.
+To sync more states, add them as statuses to the lifecycle.
+
+A C<removed> asset whose instance is found again in AWS gets its status
+back. To keep such assets C<removed>, take the C<running> and C<stopped>
+transitions out of C<removed> in the lifecycle.
 
 =head1 METHODS
 
@@ -454,7 +468,48 @@ sub UpdateAWSAsset {
         }
     }
 
+    SyncEC2Status( AssetObj => $asset, PawsObj => $paws_obj ) if $service eq 'EC2' && !$reserved;
+
     return;
+}
+
+=head2 SyncEC2Status
+
+Sets the asset's Status to the EC2 instance state. The EC2 state name is
+used as the status as is, so any state that is also a status in the
+asset's lifecycle is synced, and the lifecycle decides which states are
+allowed. States that are not valid statuses are logged as errors and the
+asset's Status is left unchanged.
+
+Takes a paramhash with C<AssetObj> and C<PawsObj>, a L<Paws::EC2::Instance>.
+
+=cut
+
+sub SyncEC2Status {
+    my %args     = @_;
+    my $asset    = $args{'AssetObj'};
+    my $instance = $args{'PawsObj'};
+
+    my $state = $instance->State ? $instance->State->Name : undef;
+    unless ( defined $state && length $state ) {
+        RT->Logger->error( "RT-Extension-AWS-Assets: No state found for EC2 instance "
+                . $instance->InstanceId
+                . " on asset "
+                . $asset->Id );
+        return;
+    }
+
+    return if lc $state eq lc $asset->Status;
+
+    my ( $ret, $msg ) = $asset->SetStatus($state);
+    unless ($ret) {
+        RT->Logger->error( "RT-Extension-AWS-Assets: On asset "
+                . $asset->Id
+                . " unable to set status to EC2 state '$state' of instance "
+                . $instance->InstanceId
+                . ": $msg" );
+    }
+    return $ret;
 }
 
 sub InsertAWSAssets {
@@ -541,6 +596,19 @@ sub InsertAWSAssets {
             next;
         }
 
+        # Create EC2 assets with the instance state as status if the
+        # lifecycle allows it. Otherwise the asset gets the default status
+        # and UpdateAWSAsset below logs the error.
+        my @status;
+        if ( $args{'ServiceType'} eq 'EC2' && !$args{'ReservedInstances'} && $instance->State ) {
+            my $state       = lc $instance->State->Name;
+            my $catalog_obj = RT::Catalog->new( RT->SystemUser );
+            $catalog_obj->Load($catalog);
+            if ( $catalog_obj->Id && $catalog_obj->LifecycleObj->IsTransition( '' => $state ) ) {
+                @status = ( Status => $state );
+            }
+        }
+
         my $created = 0;
         while ( $created < $count ) {
             # Try to create a new asset with AWS ID, Region, Service Type
@@ -551,6 +619,7 @@ sub InsertAWSAssets {
                 'CustomField-' . $aws_id_cf->Id => $resource_id,
                 'CustomField-' . $region_cf->Id => $args{'Region'},
                 'CustomField-' . $service_type_cf->Id => $args{'ServiceType'},
+                @status,
             );
             $created++;
 

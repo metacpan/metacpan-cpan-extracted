@@ -30,10 +30,22 @@
 #                 (a tied hash that dies, an object whose     form; the entries either side are
 #                 text form dies, a cycle), between good ones untouched; nothing dies
 #
-# And one check of time-of-check to time-of-use: a value that changes each
+#   misspelt      repair name -> check invocant -> store ->    before the store: nothing stored;
+#   method        print -> print a notice                     after it: stored exactly once
+#   unreadable    a log call whose arguments die as they are  one entry, each argument once and
+#   arguments     read (tied scalars, tied elements, an       in order, the unreadable ones in
+#                 out-of-range substr)                        plain form; no warning
+#
+# And two checks of time-of-check to time-of-use.  A value that changes each
 # time it is read (a tied scalar) is read exactly once, so the value used is
-# always the value that was checked.  The module has no files, so this is
-# its only check-then-use.
+# always the value that was checked.  And, as the module runs in one
+# thread, the "second writer" that can act part way through a log call is
+# code run while an argument is read: a tied FETCH that logs, clears,
+# clones or changes the level of the same logger.  The logger stays
+# consistent, and the outer entry is stored once, after what the intruder
+# did.  The module has no files, clock or locks, so these are its only
+# check-then-use windows (Test::Mockingbird::TimeTravel and flock() have
+# nothing to act on).  Test::Warnings checks that no sequence warns.
 #
 # Logging is deliberately not idempotent: logging the same message twice
 # stores it twice, as the code under test did log it twice.  Everything
@@ -46,10 +58,12 @@ use warnings;
 
 use lib 't/lib';
 use Test::Most;
+use Test::Warnings;
 use Test::Mockingbird;
 use Test::Returns;
 use Test::Memory::Cycle;
 use Readonly;
+use Encode ();
 use Scalar::Util qw(weaken refaddr);
 use Capture qw(failing printed);
 
@@ -83,7 +97,9 @@ sub quiet {
 sub state_diag {
 	my ($label, $value) = @_;
 
-	diag(explain({ $label => $value })) if($SHOW_STATE);
+	# Test::More's explain() returns the dump; Test::Most's prints it
+	# and returns 0, which diag() then printed as a stray "# 0"
+	diag(Test::More::explain({ $label => $value })) if($SHOW_STATE);
 	return;
 }
 
@@ -216,7 +232,9 @@ subtest 'new: a failure after the logger was blessed leaves nothing behind' => s
 subtest 'new: a failure injected at each step is all or nothing' => sub {
 	# Every step of _build, failed in turn: each must leave no logger and
 	# no change to what the caller passed
-	foreach my $step (qw(_validate _copy_tree _resolve_lang _diag_rule)) {
+	# _is_a copies the diag list and _lc checks the level: the first and the
+	# last steps after validation
+	foreach my $step (qw(_validate _is_a _copy_tree _resolve_lang _diag_rule _lc)) {
 		my %options = (diag => 'all', i18n => { en => {} }, lang => 'en', level => 'warn');
 		my $copy = { %options, i18n => { en => {} } };
 		mock "${CLASS}::$step" => sub { die $INJECTED };
@@ -527,6 +545,166 @@ subtest 'TOCTOU: a value that changes when read is read once, checked and used' 
 	invariant_holds($logger, 'after the TOCTOU checks');
 };
 
+# ===========================================================================
+# Phase 10: a log call whose arguments die when read
+# ===========================================================================
+
+# The arguments of a call, still aliased to the caller's variables as @_
+# is: an anonymous array would copy, and so read, them
+sub aliased {
+	return \@_;
+}
+
+subtest 'log call: arguments that die part way through the read' => sub {
+	# The read goes argument by argument.  When one dies, the read resumes
+	# after it rather than starting again, so the call must still be all or
+	# nothing: one entry, every argument in it once and in order, the
+	# unreadable ones in plain form, and the entries either side untouched
+	my $logger = $CLASS->new(diag => 'all', verbose => 0);
+	tie my $dying, 'Local::Dying';
+	tie my @elements, 'Local::Dying';
+	my $text = 'ab';
+	my $tie = qr/Local::Dying=HASH\(0x[0-9a-f]+\)/;
+	my $results = results();
+
+	my $out = printed {
+		$logger->info('first');
+		$logger->info('a', $dying, 'b', $dying, 'c');
+		$logger->warn('element ', $elements[0]);
+		$logger->error('range ', substr($text, 10, 1));
+		$logger->nosuch('misspelt ', $dying);
+		$logger->info('last');
+	};
+	is(results(), $results, 'no test result was recorded by the calls');
+	my @message = map { $_->{'message'} } @{$logger->messages()};
+	is(scalar(@message), 6, 'six calls, six entries: none lost, none doubled');
+	is($message[0], 'first', 'the entry before is untouched');
+	like($message[1], qr/\Aa${tie}b${tie}c\z/, 'two dying arguments: each part once, in order');
+	like($message[2], qr/\Aelement SCALAR\(0x[0-9a-f]+\)\z/, 'a tied element that dies: a reference to it, in plain form');
+	is($message[3], 'range undef', 'a substr() out of range: undef');
+	like($message[4], qr/\Amisspelt $tie\z/, 'through a misspelt method too');
+	is($message[5], 'last', 'the entry after is untouched');
+	is(tied($dying)->{'reads'}, 3, 'the dying scalar was tried once per place it appeared');
+	is(scalar(() = $out =~ /^# (?!\Q$CLASS\E)/mg), 6, 'every entry was echoed once');
+	invariant_holds($logger, 'after arguments that die');
+	untie $dying;
+	untie @elements;
+};
+
+subtest 'misspelt method: a failure injected at each step' => sub {
+	# A misspelt method repairs its name, checks the invocant, stores the
+	# entry, prints it, then prints a notice.  A failure before the store
+	# stores nothing; one after it leaves the entry stored exactly once
+	my %step = (
+		'_repaired' => 0,
+		'_object' => 0,
+		'_entry' => 0,
+		'_emit' => 1,
+		'i18n' => 1,
+	);
+	foreach my $name (sort keys %step) {
+		my $logger = quiet();
+		$logger->info('before');
+		mock "${CLASS}::$name" => sub { die $INJECTED };
+		my $ok = eval { $logger->nosuch('x'); 1 };
+		my $error = $@;
+		restore_all();
+		ok(!$ok && ($error eq $INJECTED), "$name fails: the error reaches the caller unchanged");
+		is($logger->count(), 1 + $step{$name}, "$name fails: " . ($step{$name} ? 'stored once' : 'nothing stored'));
+		is($logger->messages()->[0]->{'message'}, 'before', "$name fails: the earlier entry is untouched");
+		printed { $logger->nosuch('again') };
+		is($logger->count('nosuch'), 1 + $step{$name}, "$name fails: the next call works");
+		invariant_holds($logger, "after $name failed");
+	}
+};
+
+subtest 'clone: a failure injected at the level check' => sub {
+	my $logger = quiet(level => 'notice');
+	$logger->info('kept', { k => 1 });
+	my $before = snapshot($logger);
+	mock "${CLASS}::_lc" => sub { die $INJECTED };
+	throws_ok { $logger->new() } qr/\A\Q$INJECTED\E\z/, 'the last step of the build fails';
+	restore_all();
+	is_deeply(snapshot($logger), $before, 'the original is unchanged');
+	is_deeply(snapshot($logger->new()), $before, 'and the next clone is faithful');
+};
+
+# ===========================================================================
+# Phase 11: another writer acts on the logger in the middle of a log call
+# ===========================================================================
+
+# The module runs in one thread, so the second writer that can act part
+# way through a log call is code that runs while an argument is read: a
+# tied argument's FETCH.  It runs after the call has started and before
+# the entry is stored - between check and use.  Whatever it does to the
+# logger must leave the logger consistent, and the outer entry stored once,
+# after everything the intruder did
+subtest 'concurrency: an argument changes the logger while it is read' => sub {
+	my %case = (
+		'logs to the same logger' => [sub { $_[0]->warn('intruder') }, ['before', 'intruder', 'outer value'], $TRACE],
+		'clears the logger' => [sub { $_[0]->clear() }, ['outer value'], $TRACE],
+		'changes the level' => [sub { $_[0]->level('warning') }, ['before', 'outer value'], $WARNING],
+		'logs, then dies' => [sub { $_[0]->warn('intruder'); die "intruder died\n" }, ['before', 'intruder', qr/\Aouter Local::Intruder=HASH/], $TRACE],
+	);
+	foreach my $name (sort keys %case) {
+		my ($action, $want, $level) = @{$case{$name}};
+		my $logger = quiet();
+		$logger->info('before');
+		tie my $intruder, 'Local::Intruder', $logger, $action;
+		my $lived = eval { $logger->info('outer ', $intruder); 1 };
+		ok($lived, "$name: the outer call lives") or diag($@);
+		my @got = map { $_->{'message'} } @{$logger->messages()};
+		is(scalar(@got), scalar(@{$want}), "$name: " . scalar(@{$want}) . ' entries');
+		foreach my $i (0 .. $#{$want}) {
+			if(ref($want->[$i])) {
+				like($got[$i], $want->[$i], "$name: entry $i");
+			} else {
+				is($got[$i], $want->[$i], "$name: entry $i");
+			}
+		}
+		is($logger->level(), $level, "$name: the level is what the intruder left");
+		is(tied($intruder)->{'reads'}, 1, "$name: the intruder ran once");
+		invariant_holds($logger, "after an intruder that $name");
+		untie $intruder;
+	}
+
+	# A clone taken by the intruder sees the history up to that moment,
+	# without the entry being logged, and is independent afterwards
+	my $logger = quiet();
+	$logger->info('before');
+	my $clone;
+	tie my $intruder, 'Local::Intruder', $logger, sub { $clone = $_[0]->new() };
+	$logger->info('outer ', $intruder);
+	is_deeply([map { $_->{'message'} } @{$clone->messages()}], ['before'], 'a clone taken mid-read has the history up to then');
+	is($logger->count(), 2, 'and the original stored the outer entry after it');
+	untie $intruder;
+};
+
+# ===========================================================================
+# Phase 12: repeating a hostile call
+# ===========================================================================
+
+subtest 'idempotent: a hostile call gives the same result every time' => sub {
+	my $logger = quiet();
+	tie my $dying, 'Local::Dying';
+	$logger->info('x', $dying) foreach 1 .. $REPEATS;
+	my @message = map { $_->{'message'} } @{$logger->messages()};
+	is(scalar(grep { $_ eq $message[0] } @message), $REPEATS, 'the same unreadable argument: the same entry each time');
+	is(tied($dying)->{'reads'}, $REPEATS, '... read once per call');
+	untie $dying;
+
+	my $bad = "\xff\xfe";
+	Encode::_utf8_on($bad);
+	my @errors;
+	foreach (1 .. $REPEATS) {
+		eval { quiet(level => $bad) };
+		push @errors, $@;
+	}
+	is(scalar(grep { $_ eq $errors[0] } @errors), $REPEATS, 'a malformed level name: the same error each time');
+	like($errors[0], qr/\A\Q$CLASS: invalid syslog level '\E\x{FFFD}+'/, '... the documented one');
+	ok(quiet()->empty(), 'and nothing is left behind for the next logger');
+};
+
 done_testing();
 
 # A tied hash that dies as soon as it is read
@@ -556,4 +734,30 @@ sub FETCH {
 
 	my $index = $self->{'reads'}++;
 	return $self->{'values'}->[($index > $#{$self->{'values'}}) ? -1 : $index];
+}
+
+# A tied scalar, or array, that counts its reads and dies on every one
+package Local::Dying;
+
+sub TIESCALAR { return bless { reads => 0 }, shift }
+sub TIEARRAY { return bless { reads => 0 }, shift }
+sub FETCHSIZE { return 1 }
+sub FETCH { $_[0]->{'reads'}++; die "unreadable\n" }
+
+# A tied scalar that, when read, runs code against a logger first: a second
+# writer acting part way through a log call
+package Local::Intruder;
+
+sub TIESCALAR {
+	my ($class, $logger, $action) = @_;
+
+	return bless { logger => $logger, action => $action, reads => 0 }, $class;
+}
+
+sub FETCH {
+	my $self = shift;
+
+	$self->{'reads'}++;
+	$self->{'action'}->($self->{'logger'});
+	return 'value';
 }

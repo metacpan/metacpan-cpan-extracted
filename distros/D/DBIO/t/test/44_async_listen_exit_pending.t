@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp ();
+use lib 't/lib';
+use TestDBIO::Child;
 use Scalar::Util ();
 
 use DBIO::Test::Future ();
@@ -117,17 +119,14 @@ print((grep { $_->can('is_ready') && $_->is_ready } grep { !$_->isa('K237::Child
 PERL
 );
 
-my @inc = map { "-I$_" } grep { !ref } @INC;
 for my $shape (sort keys %shapes) {
   my $script = File::Temp->new(SUFFIX => '.pl');
   print {$script} $preamble, $shapes{$shape};
   close $script;
 
-  open my $child, '-|', $^X, @inc, $script->filename
-    or die "cannot run $^X: $!";
-  my $output = do { local $/; <$child> } // '';
-  close $child;
-  my $status = $? >> 8;
+  my $run    = TestDBIO::Child::run_perl(script => $script->filename);
+  my $output = $run->{output};
+  my $status = $run->{exit};
 
   like $output, qr/^pending$/m, "$shape: the listens are pending when the process exits";
   is $status, 0, "$shape: the process exits with status 0";

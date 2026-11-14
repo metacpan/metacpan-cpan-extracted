@@ -36,6 +36,8 @@
             "AnyEvent::WebSocket::Message" : "0",
             "AnyEvent::WebSocket::Server" : "0",
             "Authen::SASL" : "2.18",
+            "Crypt::AuthEnc::GCM" : "0",
+            "HTML::Parser" : "0",
             "HTTP::Tiny" : "0",
             "IO::Socket::SSL" : "0",
             "Mail::IMAPTalk" : "4.07",
@@ -52,6 +54,11 @@
             "Scalar::Util" : "0",
             "common::sense" : "3.3",
             "parent" : "0"
+         },
+         "suggests" : {
+            "Encode::EUCJPASCII" : "0",
+            "Encode::HanExtra" : "0",
+            "Encode::JIS2K" : "0"
          }
       },
       "test" : {
@@ -65,6 +72,6 @@
       }
    },
    "release_status" : "stable",
-   "version" : 0.82,
+   "version" : 0.91,
    "x_serialization_backend" : "JSON::PP version 2.27300"
 }

@@ -7,7 +7,7 @@ package Proc::Spawner::Loop::Win32;
 use strict; use warnings;
 use POSIX ();
 use Proc::Spawner ();   # (its XSUBs __wl_io, __wl_child, __wl_cancel, __wl_wait, __wl_pipe)
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $CTRL = 1;   # wake up for Ctrl-C (and the other console control events) while wait_until runs
 
 sub new { bless { kid => {}, now => [] }, shift }

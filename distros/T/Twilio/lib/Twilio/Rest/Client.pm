@@ -6,7 +6,7 @@ use warnings;
 
 use parent 'Twilio::Base::BaseClient';
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 # twilio-php caches these objects. Here each is built on demand: a child holds its parent, so
 # a parent that also held its child would be a reference cycle, which Perl never frees, and

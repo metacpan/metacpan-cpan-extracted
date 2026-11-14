@@ -55,12 +55,41 @@ sub connect {
 1;
 PM
 
+# An argument with a double quote in it (the JSON of --connect) does not
+# survive the command line of every OS: Windows hands a program the line as one
+# string and its parser takes the quotes for its own. Such a call goes through a
+# launcher that has the arguments from a file, one per line, and runs the tool
+# as its script; everything the tool does after that is its own.
+write_file(file_path($lib->dirname, 'launch.pl'), <<'PL');
+use strict;
+use warnings;
+use File::Spec;
+open my $fh, '<', $ENV{K392_ARGS} or die "K392_ARGS: $!";
+chomp(my @args = <$fh>);
+close $fh;
+my $script = File::Spec->rel2abs(shift @args);
+@ARGV = @args;
+$0 = $script;
+my $rv = do $script;
+die $@ if $@;
+die "$script: $!" unless defined $rv;
+PL
+
+my $argfile = file_path($lib->dirname, 'args');
+
 sub run {
   my (%a) = @_;
   unlink $rec;
-  local %ENV = (%ENV, K392_RECORD => $rec, %{ $a{env} || {} });
+  my @argv = @{ $a{argv} };
+  my %launch;
+  if (grep { /"/ } @argv) {
+    write_file($argfile, join('', map { "$_\n" } @argv));
+    %launch = (K392_ARGS => $argfile);
+    @argv = (file_path($lib->dirname, 'launch.pl'));
+  }
+  local %ENV = (%ENV, K392_RECORD => $rec, %launch, %{ $a{env} || {} });
   my $pid = IPC::Open3::open3(my $in, my $out = Symbol::gensym, my $err = Symbol::gensym,
-    $^X, '-Ilib', '-I' . $lib->dirname, @{ $a{argv} });
+    $^X, '-Ilib', '-I' . $lib->dirname, @argv);
   print {$in} $a{stdin} if defined $a{stdin};
   close $in;
   my $stdout = do { local $/; <$out> } // '';

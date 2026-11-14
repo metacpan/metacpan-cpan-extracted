@@ -115,7 +115,7 @@ for my $class (sort keys %ctx_class) {
   my $ctx   = make_ctx($class, $owner);
 
   lives_ok { $ctx->_assert_context_active }
-    "$class: standalone ownership check runs (no pre-loaded DBIO::Storage::Async) and accepts a same-generation context (k209)";
+    "$class: standalone ownership check runs (no pre-loaded DBIO::Storage::Async) and accepts a same-generation context";
   is $owner->{asserted}, 1,
     "$class: ownership was PROVEN against the owner token, not skipped or waved through";
   is $owner->{refused}, 0,

@@ -1,5 +1,5 @@
 ---
-abstract: 'LTE EARFCN Channel to Frequency Converter'
+abstract: 'LTE EARFCN Channel Converter to Band and Frequency'
 author:
   - 'Michael R. Davis <mrdvt92@yahoo.com>'
 build_requires:
@@ -20,10 +20,9 @@ no_index:
 requires:
   Carp: '0'
   Package::New: '0'
-  Scalar::Util: '0'
 resources:
   bugtracker: https://github.com/mrdvt92/perl-RF-LTE-EARFCN/issues
   homepage: https://github.com/mrdvt92/perl-RF-LTE-EARFCN
   repository: https://github.com/mrdvt92/perl-RF-LTE-EARFCN.git
-version: '0.02'
+version: '0.03'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

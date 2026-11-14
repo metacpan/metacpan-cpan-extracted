@@ -6,6 +6,7 @@ use Test::Exception;
 use lib 't/lib';
 use DBIO::Extension::List;
 use TestDBIO::Extension::Deploy;
+use TestDBIO::Child;
 
 # ADR 0066 section 3: the protocol runs inside DBIO::Deploy::Base around
 # _introspect_current, _build_target_model and diff. An empty list changes
@@ -161,9 +162,9 @@ sub deploy {
     print "loaded=$_\n" for grep { exists $INC{ s{::}{/}gr . ".pm" } }
       qw(DBIO::Extension::Protocol DBIO::Extension::List JSON JSON::MaybeXS Data::Dumper Hash::Util);
   };
-  open my $fh, "-|", $^X, (map { "-I$_" } @INC), "-e", $probe or die "probe: $!";
-  my @out = <$fh>; close $fh;
-  is $?, 0, "the probe ran";
+  my $run = TestDBIO::Child::run_perl(code => $probe);
+  my @out = split /(?<=\n)/, $run->{output};
+  is $run->{status}, 0, "the probe ran";
   is_deeply \@out, [], "an empty extension list loads neither the protocol nor JSON nor Data::Dumper"
     or diag @out;
 }

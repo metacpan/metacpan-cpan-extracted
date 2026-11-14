@@ -1,5 +1,15 @@
 Revision history for Perl extension RF::LTE::EARFCN.
 
+0.03 2026-11-13
+  - Dropped use of Scalar::Util::dualvar instead of undef - API BREAK
+  - Dropped FS_TABLE in favor of calculating fs from BAND_TABLE
+  - Updated BAND_TABLE from array to array reference
+  - Added channel_offset property
+  - Dropped band_note2 property - API BREAK
+  - Updated fdl and ful calculations to use channel_offset value
+  - Added tests
+  - Added test cases for Band 24 optional frequency separation
+
 0.02 2026-11-08
   - Added meta merge data for CPAN
 

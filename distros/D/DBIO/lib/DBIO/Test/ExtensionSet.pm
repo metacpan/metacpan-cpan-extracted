@@ -4,9 +4,9 @@ package DBIO::Test::ExtensionSet;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
+use DBIO::Util ();
 use Test::More ();
 use DBIO::Exception;
 use DBIO::Extension;
@@ -51,12 +51,7 @@ sub extension_set_orders {
   return @out;
 }
 
-sub _frozen {
-  local $Storable::canonical = 1;
-  return Storable::nfreeze(\$_[0]);
-}
-
-sub _dump { local $Storable::canonical = 1; require Data::Dumper; local $Data::Dumper::Sortkeys = 1; local $Data::Dumper::Indent = 0; local $Data::Dumper::Terse = 1; Data::Dumper::Dumper($_[0]) }
+sub _dump { require Data::Dumper; local $Data::Dumper::Sortkeys = 1; local $Data::Dumper::Indent = 0; local $Data::Dumper::Terse = 1; Data::Dumper::Dumper($_[0]) }
 
 # The driver is handed over as a class name and loaded here; an object is used
 # as it is. A class that cannot be loaded is an exception, not a violation.
@@ -176,7 +171,7 @@ sub extension_set_violations {
         next;
       }
       for my $part (sort keys %$result) {
-        next if _frozen($result->{$part}) eq _frozen($reference->{$part});
+        next if DBIO::Util::canonical_text($result->{$part}) eq DBIO::Util::canonical_text($reference->{$part});
         push @out, "$here differs from $reference_label in $part: "
           . _dump($result->{$part}) . ' versus ' . _dump($reference->{$part});
       }
@@ -210,7 +205,7 @@ DBIO::Test::ExtensionSet - Commutativity test for a set of database extension cl
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

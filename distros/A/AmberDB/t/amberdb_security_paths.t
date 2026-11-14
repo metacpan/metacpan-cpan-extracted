@@ -14,7 +14,7 @@ use AmberDB;
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $adb = AmberDB->new(
     path => { dbase_dir => $tmpdir },
-    cfg  => { simple => 0 }
+    cfg  => { use_simple => 0 }
 );
 
 # ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ subtest '3. Simple Mode Arbitrary String ID Length' => sub {
     plan tests => 4;
 
     # Standard mode: only numeric positive integer allowed
-    $adb->config( simple => 0 );
+    $adb->config( use_simple => 0 );
     $adb->table_attr( test_table => { use_simple => 0 } );
     
     my $valid_num = $adb->id_check("test_table", "12345");

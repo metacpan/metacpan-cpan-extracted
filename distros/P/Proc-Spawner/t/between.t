@@ -11,4 +11,9 @@ my $at; while (time - $t0 < 4) { sleep 0.05; $at //= time - $t0 if -s "$d/b" }  
 ok defined $at && $at < 2.5, sprintf 'the chain went on while Perl was busy (b after %.1f s)', $at // -1;
 my $t1 = time; Proc::ShellSpawn::run('sleep 1 &'); my $slept = CORE::sleep 3;
 ok time - $t1 < 2.5, sprintf "Perl's own sleep 3 returned early when the job ended (after %.1f s)", time - $t1;
+# X55: the deferred SIGCHLD handler leaves the program's $? and $! as they were (it reaped the job, waitpid set $?)
+{ my $bad = 0;
+  for (1 .. 5) { Proc::ShellSpawn::run('sh -c "sleep 0.05; exit 3" &'); $? = 42 << 8; $! = 0;
+    select undef, undef, undef, 0.3; my $x = 1; $bad++ if $? != 42 << 8 }   # ($!: select itself says EINTR)
+  is $bad, 0, "a job ending between calls leaves \$? alone (X55)" }
 done_testing;

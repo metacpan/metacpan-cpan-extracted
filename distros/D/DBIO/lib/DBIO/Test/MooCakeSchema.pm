@@ -4,7 +4,7 @@ package DBIO::Test::MooCakeSchema;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Moo;
 extends 'DBIO::Schema';
@@ -27,7 +27,7 @@ DBIO::Test::MooCakeSchema - Test schema with Moo + DBIO::Cake result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

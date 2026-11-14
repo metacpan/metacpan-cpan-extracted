@@ -3,7 +3,7 @@ package Twilio::Base::PhoneNumberCapabilities;
 use 5.016;
 use warnings;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my @CAPABILITIES = qw(fax mms sms voice);
 

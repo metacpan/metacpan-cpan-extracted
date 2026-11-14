@@ -274,7 +274,7 @@ for my $case (
   my $undef = view_over([ undef, 'u', 'p' ])->connect_info_for;
   ok !defined $undef->[0], 'an undef DSN is handed on as it came';
   my $empty = view_over({})->connect_info_for;
-  is_deeply $empty, {}, 'an empty hash is handed on as it came (karr k253)';
+  is_deeply $empty, {}, 'an empty hash is handed on as it came';
 }
 
 # ---------------------------------------------------------------------------

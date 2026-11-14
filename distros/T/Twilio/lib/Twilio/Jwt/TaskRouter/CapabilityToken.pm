@@ -7,7 +7,7 @@ use Twilio::Exceptions::TwilioException;
 use Twilio::Jwt::JWT;
 use Twilio::Jwt::TaskRouter::Policy;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $BASE_URL    = 'https://taskrouter.twilio.com/v1';
 my $BASE_WS_URL = 'https://event-bridge.twilio.com/v1/wschannels';

@@ -1,5 +1,5 @@
 {
-	"version" : "0.0.3",
+	"version" : "0.0.4",
 	"name"    : "Pod-Literate",
 	"author"  : ["Brian Blackmore <BBLACKM@cpan.org>"],
 	"abstract": "Literate programming in POD",

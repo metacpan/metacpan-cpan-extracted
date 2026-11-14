@@ -182,9 +182,13 @@ refused_ok(
 );
 
 # The CPU half of the promise, read back from cpu.max like the memory half.
+# What cpu.max then says depends on the host: where the cpu controller is on
+# for the scope anyway it reads "max 100000"; where only a CPUQuota would have
+# turned it on there is no cpu.max in the scope at all. Both are a quota that
+# is not in force, and both are refused.
 refused_ok(
   capped({ %fake, CAPPED_TEST_FAKE => 'drop:CPUQuota' }, @ran),
-  qr/cpu\.max of dbio-capped-test-\d+\.scope is max 100000, not 200000 100000/,
+  qr/cpu\.max of dbio-capped-test-\d+\.scope is (?:max 100000|not readable), not 200000 100000/,
   'a scope without the CPU quota',
 );
 

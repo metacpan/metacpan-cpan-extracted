@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/libtmux/assets",
+  "revision": "b4c5d4a83eb54de90119ec402b41d706211a2716",
+  "language": "perl",
+  "variant": "workspace",
+  "files": [
+    {
+      "file": "logo.svg",
+      "source": "assets/perl/workspace/logo.svg",
+      "bytes": 2402,
+      "sha256": "afa5d2f90be083a47108fa6bcbd125a8a59dca4bd7bcaa379e1a4d9fb039f12f"
+    },
+    {
+      "file": "logo.png",
+      "source": "assets/perl/workspace/logo-512.png",
+      "bytes": 5396,
+      "sha256": "9849bf69cd73c12805c4a5682420eba8efab87e45e3fc22269172c020c163996"
+    }
+  ]
+}

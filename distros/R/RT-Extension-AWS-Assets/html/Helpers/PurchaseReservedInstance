@@ -19,8 +19,24 @@ my $credentials = RT::Extension::AWS::Assets::AWSCredentials();
 my $service = Paws->service( $type, credentials => $credentials, region => $region );
 
 my $checks_failure;
+my $purchase_failed;
 my @results;
 my $resource;
+
+# Only a 4xx from AWS means the purchase was rejected; connection errors
+# (no http_status) and 5xx leave the outcome unknown.
+my $failure_message = sub {
+    my $error = shift;
+
+    if (   Scalar::Util::blessed($error)
+        && $error->isa('Paws::Exception')
+        && ( $error->http_status // 0 ) =~ /^4\d\d$/ )
+    {
+        return loc( 'Purchase failed: [_1]', $error->message );
+    }
+    return loc('Purchase might have failed, please confirm manually');
+};
+
 if ( $type eq 'EC2' ) {
     if ( $ARGS{ReservedInstancesOfferingId} ) {
         my $result;
@@ -41,8 +57,10 @@ if ( $type eq 'EC2' ) {
 
         }
         else {
-            push @results, loc('Purchase might have failed, please confirm manually');
-            RT->Logger->error("Purchase reserved EC2 $ARGS{ReservedInstancesOfferingId} failed: $@");
+            my $error = $@;
+            RT->Logger->error("Purchase reserved EC2 $ARGS{ReservedInstancesOfferingId} failed: $error");
+            $purchase_failed = 1;
+            push @results, $failure_message->($error);
         }
     }
     else {
@@ -52,11 +70,13 @@ if ( $type eq 'EC2' ) {
 }
 else {
     if ( $ARGS{ReservedDBInstancesOfferingId} ) {
+        ( my $reserved_db_instance_id = $ARGS{ReservedDBInstanceId} // '' ) =~ s/^\s+|\s+$//g;
         my $result;
         eval {
             $result = $service->PurchaseReservedDBInstancesOffering(
                 DBInstanceCount               => 1,
                 ReservedDBInstancesOfferingId => $ARGS{ReservedDBInstancesOfferingId},
+                length $reserved_db_instance_id ? ( ReservedDBInstanceId => $reserved_db_instance_id ) : (),
             );
         };
 
@@ -72,8 +92,10 @@ else {
             # );
         }
         else {
-            push @results, loc('Purchase might have failed, please confirm manually');
-            RT->Logger->error("Purchase reserved DB $ARGS{ReservedDBInstancesOfferingId} failed: $@");
+            my $error = $@;
+            RT->Logger->error("Purchase reserved DB $ARGS{ReservedDBInstancesOfferingId} failed: $error");
+            $purchase_failed = 1;
+            push @results, $failure_message->($error);
         }
     }
     else {
@@ -99,12 +121,12 @@ if ( $resource ) {
         push @results, loc('Could not insert new reserved instance to RT');
     }
 }
-else {
+elsif ( !$purchase_failed ) {
     push @results, loc('Could not fetch new reserved instance');
 }
 
 $r->headers_out->{'HX-Trigger'} = JSON(
-    {   actionsChanged => { messages => \@results, isWarning => $checks_failure },
+    {   actionsChanged => { messages => \@results, isWarning => $checks_failure || $purchase_failed },
         $checks_failure
         ? ( validationFailed => [] )
         : ( requestSucceeded => 1, collectionsChanged => { class => 'RT::Asset', id => $Asset->Id } ),

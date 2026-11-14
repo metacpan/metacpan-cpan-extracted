@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.14.0 - 2026-11-14
+
+### Features
+
+- Re-pin the spec to 2026.11.14: is_bogon on every answer, and provider_name beside each provider ([`3d970a5`](https://github.com/vpndetection-io/sdk-perl/commit/3d970a57d4af0655e8a793f94c8c245c1a6e1f61))
+
 ## 3.13.2 - 2026-11-13
 
 ### Fixes

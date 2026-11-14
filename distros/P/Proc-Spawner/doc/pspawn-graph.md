@@ -2,7 +2,7 @@
 
 **Status: experimental, free to change without ceremony** (your notes on N7–N10 and W1–W3 of the page "Spawn Graph Notation", 2026-11-01). Decided there: N2, N3, N5–N10 and W1 Go; W2 option C; W3 Go, as part of `Proc::Spawner`. N1 has a note with a question and no mark; N4 is unmarked. Written 2026-11-01.
 
-**Correction, 2026-11-01 13:22:** the first version of this doc described a graph that only mirrored and drew the executor. The user wanted the graph, with on-exit information per node, to be what is executed. **Done 2026-11-02:** the graph is now [`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm), and it is what runs; the design is in [`claude/pspawn-spawner.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-spawner.md). Sections 2, 5 and 6 below are updated; sections 1, 3 and 4 still hold.
+**Correction, 2026-11-01 13:22:** the first version of this doc described a graph that only mirrored and drew the executor. The user wanted the graph, with on-exit information per node, to be what is executed. **Done 2026-11-02:** the graph is now [`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm), and it is what runs; the design is in [`pspawn-spawner.md`](pspawn-spawner.md). Sections 2, 5 and 6 below are updated; sections 1, 3 and 4 still hold.
 
 The graph sits between the shell layer (the executor `ShellSpawn`, which runs ShellSubset parse trees) and the future module `Proc::Spawner`. It is not limited to topologies that sh can make (R1).
 
@@ -18,7 +18,7 @@ In code a process node is exactly the per-child "handout list" (its final fd tab
 
 ## 2. Code
 
-[`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm) (since 2026-11-02; it replaces `lib/SpawnGraph.pm`). The full list of calls is in [`claude/pspawn-spawner.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-spawner.md), section 2. In short: `new_pipe`, `file_end`, `parent_end`, `hold`, `release` for ends; `start(…, on_exit => HANDLER)` for processes; `perl_read`, `perl_write` for Perl's own use of ends; `parse(TEXT)` for the notation of N7 (section 4); `to_dot(GRAPH, CAPTION)` for pictures (N8, N9); `run(GRAPH, bin => DIR)` for hand-written graphs (section 5). The translation of a fd table into posix_spawn file actions is in [`lib/Proc/Spawner.pm`](../lib/Proc/Spawner.pm).
+[`lib/Proc/Spawner/Graph.pm`](../lib/Proc/Spawner/Graph.pm) (since 2026-11-02; it replaces `lib/SpawnGraph.pm`). The full list of calls is in [`pspawn-spawner.md`](pspawn-spawner.md), section 2. In short: `new_pipe`, `file_end`, `parent_end`, `hold`, `release` for ends; `start(…, on_exit => HANDLER)` for processes; `perl_read`, `perl_write` for Perl's own use of ends; `parse(TEXT)` for the notation of N7 (section 4); `to_dot(GRAPH, CAPTION)` for pictures (N8, N9); `run(GRAPH, bin => DIR)` for hand-written graphs (section 5). The translation of a fd table into posix_spawn file actions is in [`lib/Proc/Spawner.pm`](../lib/Proc/Spawner.pm).
 
 In the executor (`lib/ShellSpawn.pm`):
 
@@ -60,4 +60,4 @@ Result, 2026-11-01, and again 2026-11-02 on the new engine: Examples 1–6 of th
 
 - N4 (`keep` edges), unmarked.
 - Windows (W1–W3), in `Proc::Spawner` now that it exists; none of it can be tested here. W2 is option C: fds 3 and up go through the C runtime's reserved field, and a program on a list of names known to ignore that field (starting with `java`, `javaw`; changeable through the API) is refused such an fd at once.
-- Corpus testing with the reporter (X12 in [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md)): the reporter exists now; the corpora are still to be restored.
+- Corpus testing with the reporter (X12 in [`pspawn-known-issues.md`](pspawn-known-issues.md)): the reporter exists now; the corpora are still to be restored.

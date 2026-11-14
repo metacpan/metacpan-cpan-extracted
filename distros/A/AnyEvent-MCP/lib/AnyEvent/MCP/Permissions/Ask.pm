@@ -159,6 +159,14 @@ use AnyEvent ();
 use JSON::XS ();
 use parent "AnyEvent::MCP::Helper";
 
+sub dimension_names {
+   my ($request) = @_;
+   my %remaining = map { $_ => 1 } keys %{$request->{dimensions} || {}};
+   my @first = @{$request->{dimension_order} || []};
+   delete @remaining{@first};
+   (@first, sort keys %remaining)
+}
+
 sub schema {
    my ($request, $stage, $previous) = @_;
 
@@ -203,7 +211,7 @@ sub schema {
             default => $paths[0],
          } if @paths;
       }
-      for my $name (sort keys %{$request->{dimensions} || {}}) {
+      for my $name (dimension_names $request) {
          my $dim = $request->{dimensions}{$name};
          next if @{$dim->{choices}} == 1;
          $schema->{properties}{"dim_$name"} = {
@@ -266,7 +274,7 @@ sub message {
       (map {
          my $dim = $request->{dimensions}{$_};
          "$dim->{label}: " . $json->encode ($dim->{value})
-      } sort keys %{$request->{dimensions} || {}}),
+      } dimension_names ($request)),
       (map { detail_text ($_, $request->{details}{$_}) } sort keys %{$request->{details} || {}}),
       ($stage && $stage eq "rule" ? (
          "Available sandbox grants:",
@@ -278,7 +286,7 @@ sub message {
             my $dim = $request->{dimensions}{$_};
             map { "  " . $json->encode ($_->{label}) . ": " . $json->encode ($_->{match}) }
                @{$dim->{choices}}
-         } sort keys %{$request->{dimensions} || {}})
+         } dimension_names ($request))
       ) : ())
 }
 

@@ -3,7 +3,7 @@ package DBIO::Test::Schema::BooksInLibrary;
 
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -56,7 +56,7 @@ DBIO::Test::Schema::BooksInLibrary - Test result class for the books table
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

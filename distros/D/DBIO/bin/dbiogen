@@ -58,9 +58,16 @@ if (my $style = $opts{style}) {
 # Connect to the database
 # The connect failure is reported once, below, through the one masking of
 # connect info.
-my $dbh = DBI->connect(@connect_info[0 .. 2], { PrintError => 0 })
-  or die "Could not connect to database: "
-    . DBIO::Util::mask_connect_secrets(DBI->errstr, \@connect_info) . "\n";
+# DBI->connect returns undef on a refused connection but dies on a data source
+# it cannot work out a driver for, quoting the whole DSN: either way the
+# report goes through the same masking.
+my $dbh = eval { DBI->connect(@connect_info[0 .. 2], { PrintError => 0 }) };
+unless ($dbh) {
+  my $why = $@ || DBI->errstr;
+  $why =~ s/\n+\z// if defined $why;
+  die "Could not connect to database: "
+    . DBIO::Util::mask_connect_secrets($why, \@connect_info) . "\n";
+}
 
 # Pick the introspector: the installed driver's own if there is one, so the
 # generated classes get information_schema-grade accuracy and driver extras
@@ -100,7 +107,7 @@ dbiogen - Dump a database schema to DBIO Result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

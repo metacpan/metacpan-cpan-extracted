@@ -98,7 +98,7 @@ use AmberDB;
 use Time::HiRes qw(usleep);
 
 my ($w, $tmpdir, $tbl_name, $recs_per_proc) = @ARGV;
-my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
 $db->{_table}->{$tbl_name} = {
     name         => "Concurrent Writers Table",
     record_index => 1,
@@ -132,7 +132,7 @@ PERL
     ok( $clean, "All $num_workers writer processes completed with exit code 0" );
 
     # Parent inspects final database consistency
-    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
     $parent_db->{_table}->{$tbl_name} = $table_schema;
 
     my $total_count = $parent_db->table_count($tbl_name);
@@ -174,7 +174,7 @@ use AmberDB;
 use Time::HiRes qw(usleep);
 
 my ($w, $tmpdir, $tbl_name, $writes_each) = @ARGV;
-my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
 $db->{_table}->{$tbl_name} = {
     name         => "Interleave Table",
     record_index => 1,
@@ -202,7 +202,7 @@ use Time::HiRes qw(usleep);
 my ($r, $tmpdir, $tbl_name) = @ARGV;
 my $read_success = 1;
 for ( 1 .. 8 ) {
-    my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+    my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
     $db->{_table}->{$tbl_name} = {
         name         => "Interleave Table",
         record_index => 1,
@@ -265,7 +265,7 @@ use lib 'lib';
 use AmberDB;
 
 my ($action, $tmpdir, $tbl_name) = @ARGV;
-my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
 $db->{_table}->{$tbl_name} = {
     name         => "Transaction Table",
     record_index => 1,
@@ -308,7 +308,7 @@ PERL
     waitpid( $pid_commit, 0 );
     is( $?, 0, "Worker A transaction committed cleanly" );
 
-    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
     $parent_db->{_table}->{$tbl_name} = $table_schema;
 
     # Verify committed records exist
@@ -351,7 +351,7 @@ use AmberDB;
 use Time::HiRes qw(usleep);
 
 my ($w, $tmpdir, $tbl_name, $recs_each) = @ARGV;
-my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
 $db->{_table}->{$tbl_name} = {
     name         => "Slug Table",
     record_index => 1,
@@ -377,7 +377,7 @@ PERL
     my $clean = run_workers( $tmpdir, "worker_slug.pl", $slug_worker_code, $num_workers, $tmpdir, $tbl_name, $recs_each );
     ok( $clean, "All $num_workers slug worker processes finished cleanly" );
 
-    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
     $parent_db->{_table}->{$tbl_name} = $table_schema;
 
     # Fetch all records and verify slug map bijection
@@ -416,7 +416,7 @@ subtest '5. High-Concurrency Inventory Update with Record Locks (flock_open)' =>
     my $table_schema = make_schema("Lock Table", "num");
     my $shared_id = 9999;
 
-    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+    my $parent_db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
     $parent_db->{_table}->{$tbl_name} = $table_schema;
     $parent_db->insert_id( $tbl_name, $shared_id, "5", "5", "Limited Edition Book", 50, 500 );
 
@@ -431,7 +431,7 @@ use AmberDB;
 use Time::HiRes qw(usleep);
 
 my ($w, $tmpdir, $tbl_name, $shared_id, $decrements_each) = @ARGV;
-my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { simple => 0 } );
+my $db = AmberDB->new( path => { dbase_dir => $tmpdir }, cfg => { use_simple => 0 } );
 $db->{_table}->{$tbl_name} = {
     name         => "Lock Table",
     record_index => 1,

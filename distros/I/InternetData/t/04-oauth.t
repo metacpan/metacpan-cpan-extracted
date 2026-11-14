@@ -6,6 +6,7 @@ use lib 't/lib';
 use Data::Dumper ();
 use Mojo::JSON ();
 use Mojo::URL ();
+use Mojo::UserAgent;
 use Mojo::Util ();
 use Scalar::Util ();
 use Test::More;
@@ -439,6 +440,42 @@ subtest 'the authorization URL is built exactly, with no request' => sub {
     }
     client()->oauth->authorization_url('internetdata-cli', 'http://127.0.0.1:8765/cb', 'c');
     is(scalar @requests, 0, 'building the URL sent nothing');
+};
+
+# The authorization server is mounted on the apex rather than on the API host,
+# so the accessor derives its host from the base URL: `api.` dropped and
+# `api-<env>.` becoming `<env>.`, and any other base URL used as given.
+subtest 'OAuth signs in at the apex, wherever the API is' => sub {
+    for my $case (
+        [undef, 'https://internetdata.io'],
+        ['https://api.internetdata.io', 'https://internetdata.io'],
+        ['https://api-eu.example.com/', 'https://eu.example.com'],
+        ['https://API.internetdata.io', 'https://internetdata.io'],
+        ['https://api.internetdata.io:8443/base', 'https://internetdata.io:8443/base'],
+        ['https://internetdata.io', 'https://internetdata.io'],
+        ['https://eu.example.com', 'https://eu.example.com'],
+        ['http://127.0.0.1:8080', 'http://127.0.0.1:8080'],
+        ['https://apis.example.com', 'https://apis.example.com'],
+        ['https://myapi.example.com', 'https://myapi.example.com'],
+        ['https://api-.example.com', 'https://api-.example.com'],
+    ) {
+        my ($base, $apex) = @$case;
+        my $url = InternetData->new(defined $base ? (base_url => $base) : ())->oauth
+            ->authorization_url('c', 'https://app.example/cb', 'x');
+        like($url, qr{\A\Q$apex\E/oauth/authorize\?}, ($base // 'the default base URL') . " signs in at $apex");
+    }
+
+    my @urls;
+    my $ua = Mojo::UserAgent->new;
+    $ua->on(start => sub { push @urls, $_[1]->req->url->to_string; die "recorded\n" });
+    my $oauth = InternetData->new(base_url => 'https://api-eu.example.com', ua => $ua, retries => 0)->oauth;
+    eval { $oauth->metadata };
+    eval { $oauth->device_authorization('c') };
+    eval { $oauth->exchange_device_code('c', 'd') };
+    eval { $oauth->revoke('c', 't') };
+    is_deeply(\@urls, [map { "https://eu.example.com$_" }
+        qw(/.well-known/oauth-authorization-server /oauth/device_authorization /oauth/token /oauth/revoke)],
+        'and so does every request it sends');
 };
 
 subtest 'an empty option is left out, and an empty or unencodable value refused' => sub {

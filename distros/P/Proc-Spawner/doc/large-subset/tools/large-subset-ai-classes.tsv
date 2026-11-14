@@ -1,0 +1,104 @@
+# large-subset-ai-classes.tsv (X27, step 3; post-0.11, 2026-11-13): undecided samples classified by reading, by Claude
+# (AI-), not by large-subset-blocks.pl's rules nor by a ruling of the user: the 93 that step 3's setups left out
+# (large-subset-environment.md, section 12).  The user's categories (2026-11-13): AI- and the name of a category used
+# before (AI-strict: one run is enough, the sample depends only on an unmovable stone or on a device working as
+# expected; AI-values passed on unchanged, AI-values passed on split, AI-names with an expansion, AI-A5, AI-glob,
+# AI-tilde, AI-shells' own variables, AI-noise), and AI-PATH-twister (the text changes PATH, which decides what the
+# shell finds afterwards).  large-subset-blocks.pl -p -ai THIS writes the category as the sample's class in
+# large-subset-step3.tsv.  A new case: one more line.  Columns (tab): id; category; kind (AI-strict: stone or device;
+# AI-names with an expansion: where the value comes from); outcome (AI-strict: whether the command on it succeeds in the
+# run); the class by the rules; what it depends on; why.
+id	category	kind	outcome	class by the rules	depends on	why
+BC:ch06/checkfile	AI-names with an expansion	a value the text sets	-	control	a name from an assignment or a for list of fixed words	the value is in the text; follow it (TODO B)
+BC:ch15/email_sample_css	AI-names with an expansion	a value the text sets	-	affects-shell	a name from an assignment or a for list of fixed words	the value is in the text; follow it (TODO B)
+BC:ch16/inputrc	AI-noise	-	-	affects-shell	-	readline's settings file (inputrc), not shell text
+BC:ch17/ff-sessions	AI-names with an expansion	a value the text sets	-	affects-shell	a name from an assignment or a for list of fixed words	the value is in the text; follow it (TODO B)
+NB:10576	AI-values passed on split	-	-	control	$HOME	unquoted into find's or echo's words
+NB:10817	AI-A5	-	-	affects-shell	a redirection's file or a cd target outside the run's directory (..), or cd into a name of the run	absent, a file, a directory, read-only: A5 covers the failures
+NB:10847	AI-A5	-	-	control	a redirection's file or a cd target outside the run's directory (..), or cd into a name of the run	absent, a file, a directory, read-only: A5 covers the failures
+NB:10936	AI-strict	device	fails	control	/dev/fd0, /dev/rfd0 (a floppy drive)	output redirected to a device absent here
+NB:11174	AI-strict	device	fails	control	/dev/fd0, /dev/rfd0 (a floppy drive)	output redirected to a device absent here
+NB:11297	AI-tilde	-	-	affects-shell	~user (the user database)	that user absent, present with its home, present without it (the run's own /etc/passwd)
+NB:1144	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:11908	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+NB:12249	AI-strict	device	fails	control	/dev/nul (a typo of /dev/null)	2> makes a file in /dev, which the run's user may not
+NB:1226	AI-values passed on unchanged	-	-	control	$TMPDIR	quoted into mktemp's words (${TMPDIR:-/tmp/})
+NB:1227	AI-values passed on unchanged	-	-	affects-shell	$TMPDIR	quoted into mktemp's words (${TMPDIR:-/tmp/})
+NB:1248	AI-values passed on unchanged	-	-	affects-shell	$TMPDIR	quoted into mktemp's words (${TMPDIR:-/tmp/})
+NB:1848	AI-strict	stone	succeeds	control	/ (a directory, searchable)	cd / goes where / always is
+NB:195	AI-glob	-	-	control	a glob pattern's matches	none, one, two matching names; the setup tool made no name the pattern matches
+NB:2356	AI-values passed on split	-	-	control	$HOME	unquoted into find's or echo's words
+NB:2521	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:261	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:262	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:2756	AI-values passed on unchanged	-	-	control	$USER	quoted into find's words ("$USER.*")
+NB:2812	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:2828	AI-noise	-	-	affects-shell	-	placeholders, not shell text: find ~/ [опция_поиска] ...
+NB:2948	AI-noise	-	-	control	-	placeholders, not shell text: find ~/ [опция_поиска] ...
+NB:356	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+NB:367	AI-names with an expansion	$HOME	-	control	a file under $HOME	$HOME as ~ is: the run's home/
+NB:368	AI-names with an expansion	$HOME	-	control	a file under $HOME	$HOME as ~ is: the run's home/
+NB:369	AI-names with an expansion	a program at a fixed path	-	affects-shell	a program not on PATH, by its path	a stand-in placed at that path answers x1
+NB:3871	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:4579	AI-strict	device	succeeds	control	/dev/urandom (the run's fixed file, -env random)	read from /dev/urandom; in NB:6728 head -c N then fails on its placeholder N, in all three
+NB:4727	AI-shells' own variables	-	-	affects-shell	OLDPWD (cd -)	OLDPWD inherited: unset, a directory, not a directory
+NB:4734	AI-strict	stone	succeeds	control	/tmp (the run's fresh /tmp, searchable)	cd /tmp; in NB:7995 the command after it is not found, in all three
+NB:4742	AI-names with an expansion	$HOME	-	affects-shell	a file under $HOME	$HOME as ~ is: the run's home/
+NB:49	AI-names with an expansion	a value the text sets	-	control	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:4911	AI-values passed on split	-	-	affects-shell	$PATH	unquoted into echo's words
+NB:503	AI-names with an expansion	$HOME	-	affects-shell	a file under $HOME	$HOME as ~ is: the run's home/
+NB:510	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+NB:5277	AI-strict	stone	succeeds	control	/lib64/ld-linux-x86-64.so.2 (the loader every program needs; matches the pattern)	ls -l of the loader; more matches (/lib/ld-linux.so.2) could be added in the run's own root, the one match cannot go
+NB:5788	AI-values passed on split	-	-	affects-shell	$PATH	unquoted into echo's words
+NB:5813	AI-values passed on split	-	-	control	$USER	unquoted into finger's or echo's words
+NB:5906	AI-strict	device	succeeds	control	/dev/zero	read from /dev/zero
+NB:6274	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a program's output (read, for, $( ))	the values are a stand-in's answer, as x1
+NB:6275	AI-values passed on unchanged	-	-	affects-shell	$PATH	quoted into echo's words, or a here-document
+NB:6303	AI-shells' own variables	-	-	affects-shell	OLDPWD (cd -)	OLDPWD inherited: unset, a directory, not a directory
+NB:6728	AI-strict	device	succeeds	control	/dev/urandom (the run's fixed file, -env random)	read from /dev/urandom; in NB:6728 head -c N then fails on its placeholder N, in all three
+NB:700	AI-strict	device	fails	control	/dev/to/overwrite (a placeholder)	output redirected into a directory of /dev that does not exist
+NB:7601	AI-PATH-twister	-	-	affects-shell	PATH, changed by the text	the inherited PATH and the change decide which programs are found afterwards
+NB:7625	AI-glob	-	-	control	a glob pattern's matches	none, one, two matching names; the setup tool made no name the pattern matches
+NB:7626	AI-glob	-	-	control	a glob pattern's matches	none, one, two matching names; the setup tool made no name the pattern matches
+NB:7910	AI-strict	stone	succeeds	control	. (the run's directory, searchable)	cd to the directory the shell is in
+NB:7995	AI-strict	stone	succeeds	control	/tmp (the run's fresh /tmp, searchable)	cd /tmp; in NB:7995 the command after it is not found, in all three
+NB:8020	AI-names with an expansion	a program at a fixed path	-	affects-shell	a program not on PATH, by its path	a stand-in placed at that path answers x1
+NB:8375	AI-tilde	-	-	affects-shell	~user (the user database)	that user absent, present with its home, present without it (the run's own /etc/passwd)
+NB:847	AI-strict	stone	fails	control	/ (a directory)	the placeholder ./<SOURCE_DIR>/ makes the redirection >/, into a directory
+NB:896	AI-tilde	-	-	affects-shell	~user (the user database)	that user absent, present with its home, present without it (the run's own /etc/passwd)
+NB:9797	AI-A5	-	-	control	a redirection's file or a cd target outside the run's directory (..), or cd into a name of the run	absent, a file, a directory, read-only: A5 covers the failures
+NB:9919	AI-strict	device	fails	control	/dev/fd0, /dev/rfd0 (a floppy drive)	output redirected to a device absent here
+PS:README.md:659	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a for list over a glob	the values are the glob's matches: the run's files
+SC:Analytics.hs:prop_checkCdAndBack1	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a for list over a glob	the values are the glob's matches: the run's files
+SC:Analytics.hs:prop_checkCdAndBack2	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a for list over a glob	the values are the glob's matches: the run's files
+SC:Analytics.hs:prop_checkCdAndBack4	AI-shells' own variables	-	-	affects-shell	OLDPWD (cd -)	OLDPWD inherited: unset, a directory, not a directory
+SC:Analytics.hs:prop_checkCdAndBack5	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+SC:Analytics.hs:prop_checkCdAndBack6	AI-names with an expansion	a value the text sets	-	control	a name from a for list over a glob	the values are the glob's matches: the run's files
+SC:Analytics.hs:prop_checkCdAndBack7	AI-names with an expansion	a value the text sets	-	affects-shell	a name from a for list over a glob	the values are the glob's matches: the run's files
+SC:Analytics.hs:prop_checkCdAndBack8	AI-A5	-	-	control	a redirection's file or a cd target outside the run's directory (..), or cd into a name of the run	absent, a file, a directory, read-only: A5 covers the failures
+SC:Analytics.hs:prop_checkCommandWithTrailingSymbol9	AI-glob	-	-	affects-shell	a glob pattern's matches	none, one, two matching names; the setup tool made no name the pattern matches
+SC:Analytics.hs:prop_checkLonelyDotDash1	AI-strict	stone	fails	control	./ (the run's directory)	./ as a command: a directory, never runnable (126)
+SC:Analytics.hs:prop_checkModifiedArithmeticInRedirection6	AI-names with an expansion	a value the text sets	-	affects-shell	a name from an assignment or a for list of fixed words	the value is in the text; follow it (TODO B)
+SC:Analytics.hs:prop_checkOverridingPath8	AI-PATH-twister	-	-	affects-shell	PATH, changed by the text	the inherited PATH and the change decide which programs are found afterwards
+SC:Analytics.hs:prop_checkSpacefulnessCfg30	AI-names with an expansion	a value the text sets	-	control	a name from an assignment or a for list of fixed words	the value is in the text; follow it (TODO B)
+SC:Analytics.hs:prop_checkSshHereDoc1	AI-values passed on unchanged	-	-	affects-shell	$PATH	quoted into echo's words, or a here-document
+SC:Analytics.hs:prop_checkTildeInPath1	AI-PATH-twister	-	-	affects-shell	PATH, changed by the text	the inherited PATH and the change decide which programs are found afterwards
+SC:Analytics.hs:prop_checkUnassignedReferences17	AI-values passed on split	-	-	control	$USER	unquoted into finger's or echo's words
+SC:Analytics.hs:prop_checkUncheckedCd6	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+SC:Analytics.hs:prop_checkUncheckedPopd10	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+SC:Analytics.hs:prop_checkUncheckedPopd11	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+SC:Analytics.hs:prop_checkUncheckedPopd12	AI-strict	stone	succeeds	control	/ (a directory, searchable)	cd / goes where / always is
+SC:Analytics.hs:prop_checkUncheckedPopd13	AI-A5	-	-	control	a redirection's file or a cd target outside the run's directory (..), or cd into a name of the run	absent, a file, a directory, read-only: A5 covers the failures
+SC:Checks/ShellSupport.hs:prop_checkBashisms66	AI-strict	stone	succeeds	control	. (the run's directory, searchable)	cd to the directory the shell is in
+TL:common/cat.md:20	AI-strict	device	fails	control	/dev/tty13 (a console)	output redirected to a console the run's user may not write
+TL:common/cd.md:12	AI-strict	stone	succeeds	control	.. (the parent of the run's directory, searchable)	cd up from the run's directory
+TL:common/cd.md:20	AI-tilde	-	-	affects-shell	~user (the user database)	that user absent, present with its home, present without it (the run's own /etc/passwd)
+TL:common/cd.md:24	AI-shells' own variables	-	-	affects-shell	OLDPWD (cd -)	OLDPWD inherited: unset, a directory, not a directory
+TL:common/cd.md:28	AI-strict	stone	succeeds	control	/ (a directory, searchable)	cd / goes where / always is
+TL:common/echo.md:13	AI-values passed on unchanged	-	-	affects-shell	$PATH	quoted into echo's words, or a here-document
+TL:common/export.md:12	AI-PATH-twister	-	-	affects-shell	PATH, changed by the text	the inherited PATH and the change decide which programs are found afterwards
+TL:common/for.md:28	AI-names with an expansion	a value the text sets	-	control	a name from a for list over a glob	the values are the glob's matches: the run's files
+TL:common/newsboat.md:12	AI-names with an expansion	$HOME	-	control	a file under $HOME	$HOME as ~ is: the run's home/
+TL:common/{.md:8	AI-values passed on split	-	-	control	$HOME	unquoted into find's or echo's words
+TL:common/~.md:12	AI-tilde	-	-	affects-shell	~user (the user database)	that user absent, present with its home, present without it (the run's own /etc/passwd)
+TL:linux/bspc.md:25	AI-tilde	-	-	affects-shell	~user (the user database)	that user absent, present with its home, present without it (the run's own /etc/passwd)

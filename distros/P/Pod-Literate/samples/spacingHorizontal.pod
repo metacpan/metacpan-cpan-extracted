@@ -1,0 +1,29 @@
+=pod
+
+=for literate:command target=spacingHorizontal.pl
+
+=for literate spacingHorizontal.pl
+
+  #<example>#
+
+=for literate .
+
+=begin literate example
+
+  if(#< begin inline >#) { #< for inline ># }
+
+=end literate
+
+=begin literate begin inline
+
+  begin line
+
+=end literate
+
+=for literate for inline
+
+  for line
+
+=for literate .
+
+=cut

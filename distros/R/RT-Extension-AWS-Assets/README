@@ -111,8 +111,30 @@ CONFIGURATION
     RDS Reserved Instance
         AWS Value: "Lease ID" RT Asset CF: "AWS Reserved Instance ID"
 
+  EC2 Instance Status
+    When EC2 instances are imported or updated from AWS, the asset Status is
+    set to the instance state, like running or stopped. The state name is
+    used as the status, so only states that are also statuses in the asset's
+    lifecycle are synced. The aws-assets lifecycle includes running and
+    stopped. For any other state, like pending or terminated, an error is
+    logged and the Status is left unchanged. To sync more states, add them
+    as statuses to the lifecycle.
+
+    A removed asset whose instance is found again in AWS gets its status
+    back. To keep such assets removed, take the running and stopped
+    transitions out of removed in the lifecycle.
+
 METHODS
     Accept a loaded RT::Asset object and a Paws Instance object.
+
+  SyncEC2Status
+    Sets the asset's Status to the EC2 instance state. The EC2 state name is
+    used as the status as is, so any state that is also a status in the
+    asset's lifecycle is synced, and the lifecycle decides which states are
+    allowed. States that are not valid statuses are logged as errors and the
+    asset's Status is left unchanged.
+
+    Takes a paramhash with AssetObj and PawsObj, a Paws::EC2::Instance.
 
 AUTHOR
     All bugs should be reported via email to

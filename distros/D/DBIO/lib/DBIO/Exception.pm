@@ -4,7 +4,7 @@ package DBIO::Exception;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 # load Carp early to prevent tickling of the ::Internal stash being
 # interpreted as "Carp is already loaded" by some braindead loader
@@ -69,7 +69,7 @@ DBIO::Exception - Exception objects for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

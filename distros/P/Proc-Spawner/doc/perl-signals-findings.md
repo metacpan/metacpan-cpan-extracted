@@ -23,7 +23,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - Tested (`stress.pl`): children end continuously, while the main program allocates and frees memory. The handler only writes one byte to a pipe and counts.
   - Immediate: 4 runs out of 4 aborted after a few seconds. glibc reported "malloc(): unaligned fastbin chunk detected", or a failed assertion in `sysmalloc`. Exit status 134 (SIGABRT).
   - Deferred: 4 runs out of 4 finished normally, each after about 24,000 children.
-- Consequence: the executor `ShellSpawn` installed exactly such a handler (`POSIX::sigaction` without `safe`) while its loop ran. Tested (`exec-stress.pl`, the executor running loops of short pipelines for 20 s): it died with a segmentation fault in 4 runs out of 4. Its known issue X8 (a stray "Undefined value assigned to typeglob" once, at the line that restores the old SIGCHLD action) is very likely this. Recorded as X14 in [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md). Interim fix (B1 on the page "Child Exit Wake-up", applied 2026-11-01): a deferred handler, with a 50 ms timeout on `select` against S3; then 4 runs out of 4 finished normally, and the dash comparisons and speed did not change.
+- Consequence: the executor `ShellSpawn` installed exactly such a handler (`POSIX::sigaction` without `safe`) while its loop ran. Tested (`exec-stress.pl`, the executor running loops of short pipelines for 20 s): it died with a segmentation fault in 4 runs out of 4. Its known issue X8 (a stray "Undefined value assigned to typeglob" once, at the line that restores the old SIGCHLD action) is very likely this. Recorded as X14 in [`pspawn-known-issues.md`](pspawn-known-issues.md). Interim fix (B1 on the page "Child Exit Wake-up", applied 2026-11-01): a deferred handler, with a 50 ms timeout on `select` against S3; then 4 runs out of 4 finished normally, and the dash comparisons and speed did not change.
 
 **S3. A deferred handler that becomes due just before a blocking call runs only after that call returns: a lost wake-up.**
 - Perl checks for pending signals only at certain points between operations. A signal that arrives after the last check, but before the system call (`select`, `sleep`, `read`, …) starts waiting, does not interrupt that call: the kernel delivered it already, to Perl's C handler, which only took a note.
@@ -87,7 +87,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 
 **I1. SIGFPE: Perl ignores it for itself, and restores the original setting only in its own `exec`.**
 - Perl ignores SIGFPE at startup (`PERL_FPU_INIT`) and puts back the setting it found then only in its own ways of starting programs (`exec`, and the child side of `system`, backticks and piped `open`) (`PERL_FPU_PRE_EXEC`, the global `PL_sigfpe_saved`). Children started any other way (posix_spawn, XS code) get SIGFPE ignored.
-- Tested: every child of the executor had SIGFPE ignored, until we read `PL_sigfpe_saved` from XS (`PosixSpawn::fpe_at_exec()`; fixed issue E1 in [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md)).
+- Tested: every child of the executor had SIGFPE ignored, until we read `PL_sigfpe_saved` from XS (`PosixSpawn::fpe_at_exec()`; fixed issue E1 in [`pspawn-known-issues.md`](pspawn-known-issues.md)).
 - Perl could: expose that saved setting (for example in `POSIX`), so that other ways of starting programs can do the same without XS.
 
 **I2. Signals the Perl program ignores are ignored in its children too.**
@@ -101,7 +101,7 @@ Each finding says what happens, how we know (tested here, or reasoned), what it 
 - This session's tests: `when.pl` (S1), `stress.pl` (S2), `window2.pl` (S3), `facts.pl` (S4, S5, S6, C1, C3), `checks2.pl` (S5, C1, and `select` on fd 1100, which works), `exec-stress.pl` (S2 in the executor), `chandler.pl` and `rate.pl` (the C handler of S3 (a)), `pidfd.pl` (a pidfd from `pidfd_spawn` becomes readable when the child exits: `select` returned after 0.30 s for `sleep 0.3`, with no signal handler).
 - The chat "Overriding waitpid in Perl" (2026-10-30) and its page "unwaitpid Design" (https://claude.ai/artifact/BsyqPKCyFpYSCH2aiZvFHw): C2, C3, S7, and the `waitid`/`WNOWAIT` technique. Its planned docs (`claude/unwaitpid-investigation.md`, `claude/unwaitpid-upstream-reports.md`) were never written; their Perl findings are here now.
 - The page "Run Graph API" (https://claude.ai/artifact/NGmE3geAjdC6bfTaGn3Kv3), items R4, R11, L4, L5, L6: S5, S6, C1, C2.
-- [`claude/pspawn-run-shortcomings.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-run-shortcomings.md) (in Proc-Spawner 0.03), section 3, and [`claude/pspawn-design.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-design.md), sections 2 and 9: I1, I2, C1.
+- [`pspawn-run-shortcomings.md` (0.03)](https://metacpan.org/release/ILYAZ/Proc-Spawner-0.03/view/doc/pspawn-run-shortcomings.md) (in Proc-Spawner 0.03), section 3, and [`pspawn-design.md`](pspawn-design.md), sections 2 and 9: I1, I2, C1.
 
 ## 5. Candidates for reports to Perl (perlbug), none filed yet
 

@@ -4,7 +4,7 @@ package DBIO::Carp;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 # load Carp early to prevent tickling of the ::Internal stash being
 # interpreted as "Carp is already loaded" by some braindead loader
@@ -23,15 +23,18 @@ sub __find_caller {
 
   my $fr_num = 1; # skip us and the calling carp*
 
-  my (@f, $origin);
+  my (@f, $origin, @skipped);
   while (@f = caller($fr_num++)) {
 
     # A finally block runs from the DESTROY of Try::Tiny's guard object: that
     # frame, like the blocks, is no origin -- the sub around the try is.
-    next if
+    if
       ( $f[3] eq '(eval)'
         or $f[3] eq 'Try::Tiny::ScopeGuard::DESTROY'
-        or $f[3] =~ /::(?:__ANON__|(?:try|catch|finally) \{\.\.\.\}\s*)$/ );
+        or $f[3] =~ /::(?:__ANON__|(?:try|catch|finally) \{\.\.\.\}\s*)$/ ) {
+      push @skipped, [ @f ];
+      next;
+    }
 
     $origin ||= (
       $f[3] =~ /^ (.+) :: ([^\:]+) $/x
@@ -55,6 +58,15 @@ sub __find_caller {
     }
 
     last if $f[0] !~ $skip_pattern;
+  }
+
+  # Nothing matched: the frames between the raiser and the program were all
+  # skipped ones (a callback, an eval). Name the first of them called from
+  # outside the skip pattern, as extended by the frames walked; only without
+  # such a frame is the full stack the answer.
+  unless (@f) {
+    my ($hit) = grep { $_->[0] !~ $skip_pattern } @skipped;
+    @f = @$hit if $hit;
   }
 
   my $site = @f # if empty - nothing matched - full stack
@@ -154,7 +166,7 @@ DBIO::Carp - Error reporting utilities for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

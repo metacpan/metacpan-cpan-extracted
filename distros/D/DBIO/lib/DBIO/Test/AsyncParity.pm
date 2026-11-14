@@ -4,7 +4,7 @@ package DBIO::Test::AsyncParity;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Scalar::Util ();
 use Test::More ();
@@ -148,8 +148,6 @@ sub check_declarations {
       unless $KIND{$kind};
     push @problem, "$label: reason must be a regex (qr//)"
       unless ref $decl->{reason} eq 'Regexp';
-    push @problem, "$label: a pending deviation needs a card of the transport's board (k58)"
-      if $kind eq 'pending' and ($decl->{card} // '') !~ /\Ak[0-9]+\z/;
     push @problem, "$label: the table already marks this case absent"
       if $case{$name} and $case{$name}{absent};
   }
@@ -224,8 +222,7 @@ sub summary_line {
 
   push @part, scalar(@dev) . ' deviation' . (@dev == 1 ? '' : 's') . ': '
     . join(', ', map {
-        sprintf '%02d %s (%s%s)', $_->{no}, $_->{case}, $_->{deviation},
-          ($_->{deviation} eq 'pending' ? ", karr $_->{card}" : '')
+        sprintf '%02d %s (%s)', $_->{no}, $_->{case}, $_->{deviation}
       } @dev)
     if @dev;
   push @part, scalar(@absent) . ' absent: '
@@ -307,7 +304,6 @@ sub _run_case {
     my $declared = $deviation->{kind};
     return { %r, status => 'fail',
              message => "stale deviation: declared $declared"
-                      . ($deviation->{card} ? " ($deviation->{card})" : '')
                       . ' but the case passes' }
       unless defined $verdict;
     return { %r, status => 'fail',
@@ -319,7 +315,6 @@ sub _run_case {
       status    => $declared eq 'absent' ? 'absent' : 'deviation',
       deviation => $declared,
       message   => $verdict,
-      ($declared eq 'pending' ? (card => $deviation->{card}) : ()),
     };
   }
 
@@ -481,7 +476,7 @@ DBIO::Test::AsyncParity - The same ResultSet operations, synchronous and asynchr
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 
@@ -491,7 +486,6 @@ version 0.900004
   sub parity_deviations {{
     'upsert' => {
       kind   => 'pending',                  # not built yet
-      card   => 'k58',                      # required for pending
       reason => qr/upsert/,
     },
     'row-copy' => {
@@ -647,7 +641,7 @@ Seam with a working default, see L</WRITING A TRANSPORT'S CLASS>.
 
 What can be checked without a server: every declared deviation names a case of
 the table, has kind C<unsupported>, C<pending> or C<absent>, a regex C<reason>,
-a card for C<pending>, and does not redeclare a case the table itself marks
+and does not redeclare a case the table itself marks
 absent. Returns the problems as strings, none when the declaration is whole.
 L</run> makes it the first test.
 
@@ -658,7 +652,7 @@ L</run> makes it the first test.
 
 Drive every case against the harness's schema and return one hashref per case:
 C<< { no, case, kind, status, message } >> and, for C<deviation>, the
-C<deviation> kind and for C<pending> the C<card>. It does not touch
+C<deviation> kind. It does not touch
 L<Test::More>. C<status> is C<pass>, C<deviation>, C<absent> or C<fail>.
 C<only> restricts the run to the named cases.
 
@@ -670,7 +664,7 @@ missing when the connected schema lacks a source the table needs.
 
   my $line = $class->summary_line(\@results);
 
-The one line that closes a run: the declared deviations with their cards and
+The one line that closes a run: the declared deviations with their kinds and
 the absent operations. C<undef> when there is nothing to say.
 
 =head2 run
@@ -730,18 +724,17 @@ Disconnected when the run ends.
 C<parity_deviations> returns a hashref keyed by case name:
 
   { case_name => { kind => 'unsupported' | 'pending' | 'absent',
-                   reason => qr/.../, card => 'k58' } }
+                   reason => qr/.../ } }
 
 =over 4
 
 =item kind C<unsupported>
 
-The transport cannot do it, by design. Permanent; needs no card.
+The transport cannot do it, by design. Permanent.
 
 =item kind C<pending>
 
-The transport does not do it yet. C<card> is required: a card of the
-transport's own board, in the form C<k58>.
+The transport does not do it yet. The C<reason> says why.
 
 =item kind C<absent>
 
@@ -759,7 +752,7 @@ difference between the two ways.
 The run ends with one line, printed by L</run> and returned by
 L</summary_line>:
 
-  2 deviations: 34 upsert (pending, karr k58), 27 row-copy (unsupported); 1 absent: 41 populate
+  2 deviations: 34 upsert (pending), 27 row-copy (unsupported); 1 absent: 41 populate
 
 =head1 Capabilities
 

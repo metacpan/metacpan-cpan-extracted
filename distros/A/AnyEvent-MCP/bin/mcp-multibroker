@@ -56,8 +56,9 @@ an existing HTTP server by URL; see L</DOWNSTREAM SERVERS>.
 
 For HTTP clients, omit C<--stdio>, leave the broker running, and obtain
 its upstream URL with C<--print-url> using the same listener settings.
-For missing tools, try C<discover-brokers> for connection errors and
-C<list-tools> to refresh discovery; your MCP client may also need to
+For missing tools, try C<search-tools> with keywords, or
+C<discover-brokers> for connection errors and C<list-tools> to refresh
+discovery; your MCP client may also need to
 refresh its cached list. C<--tool-help> only shows the broker's own
 tools, not those of its children. Ordinary children start lazily. Use C<--eager>
 after the child specification for services that accept independent
@@ -65,7 +66,7 @@ connections, such as Vim or browser brokers.
 
 =head1 TOOLS
 
-The broker exposes three tools of its own:
+The broker exposes four tools of its own:
 
 =over
 
@@ -75,6 +76,16 @@ Lists the configured downstream servers and their instructions by prefix.
 An entry is a string of instructions, C<null> for a reachable server with
 no instructions, or C<{error: MESSAGE}> for an unreachable server.
 Hidden servers are listed, with instructions on how to discover their tools.
+
+=item search-tools
+
+Search complete tool definitions from all reachable downstream servers,
+including hidden ones, but not the broker's own tools. Uses BM25 keyword
+relevance, searching names, descriptions and argument names and
+descriptions. Returns up to 25 full tool definitions, ranked by relevance.
+For example, search for C<edit lines in vim buffer> to find an editor
+operation without knowing its broker. Call a returned C<PREFIX.TOOL>
+via C<call-tool>.
 
 =item list-tools
 
@@ -142,8 +153,13 @@ C<--hidden> after a server keeps its tools out of normal MCP C<tools/list>
 and unfiltered C<list-tools> results. This reduces the initial tool list
 for large or rarely used servers. C<discover-brokers> still lists it;
 C<list-tools broker=PREFIX>
-returns its definitions, and C<call-tool> still works. Hiding reduces the
-advertised tool set, not the permissions or availability of the server.
+returns its definitions; C<search-tools> includes hidden tools, and
+C<call-tool> still works. Hiding affects advertisement, not permissions.
+C<--disable> after a server excludes it entirely: no child is started,
+no HTTP connection is made, and its tools cannot be discovered or called.
+The prefix stays reserved so a reverse connection cannot take its place.
+This takes precedence over C<--eager> and C<--required>; remove the flag
+to re-enable the server.
 
 C<--eager> after either stdio form starts that child at
 multibroker startup rather than waiting for its first MCP use. This is useful
@@ -234,6 +250,8 @@ C<PERL_ANYEVENT_MCP_ELICITATION_HELPER> to replace the form helper and
 C<PERL_ANYEVENT_MCP_PERMISSION_HELPER> to replace the permission helper.
 Cancelling a tool call cancels its downstream operation and pending local
 prompt.
+Downstream C<notifications/progress> are forwarded to the corresponding
+upstream request by its progress token, including through HTTP children.
 
 =head1 CLIENT CONNECTION
 
@@ -274,8 +292,9 @@ Applies to the broker, not its downstream servers.
 =item --ask MODE
 
 Select how downstream permission prompts are presented:
-C<helper> (default), C<tty>, C<yad>, C<mcp>, or C<auto>.
-This also supplies the default asking mode to spawned stdio children.
+C<helper> (default), C<tty>, C<yad>, C<mcp>, C<auto>, or C<none>.
+C<none> replies with a standard decline without invoking any UI.
+Spawned stdio children delegate to the broker with their own default C<mcp>.
 See L</PERMISSION PROMPTS>.
 
 =back
@@ -296,6 +315,12 @@ Omit the preceding child's tools from ordinary tool discovery,
 including unfiltered C<list-tools>. Discover its definitions with
 C<list-tools> specifying its C<broker> prefix. Its tools remain
 callable by name. Applies to HTTP and stdio children.
+
+=item --disable
+
+Ignore the preceding downstream entry without removing it from the command
+line. No startup, discovery or calls; the prefix remains reserved.
+Overrides C<--eager> and C<--required>. Applies to HTTP and stdio children.
 
 =item --eager
 
@@ -351,43 +376,46 @@ use AnyEvent::MCP::Server::Toolset ();
 
 use AnyEvent::MCP::Server::Simple;
 
-AnyEvent::detect; # Initialise child watchers before starting subprocesses.
+AnyEvent::detect; # initialise child watchers before starting subprocesses.
 $| = 1;
 
 my $usage = "Usage: $0 [OPTION]... PREFIX (URL | --- PROGRAM ARG... ---) [CHILD-OPTION] ...\n";
 Getopt::Long::Configure ("require_order");
-my $server_options = mcp_getoptions ({
-   usage => $usage,
-   path => "/",
-   description => "Combine MCP servers behind one endpoint, with tools named PREFIX.TOOL.\n"
-      . "Each server is HTTP(S), stdio:COMMAND, or --- PROGRAM ARG... ---; downstream options follow its entry.",
-   options => [
-      "Broker-wide options:",
-      ["--ask MODE", "Before server entries: prompt locally (helper, default; tty; yad), upstream (mcp), or by capability (auto)"],
-      ["--listen", "Keep the upstream HTTP listener active alongside stdio or --connect"],
-      "Downstream options (after the URL or closing ---):",
-      ["--eager", "Start the preceding stdio child at broker startup"],
-      ["--required", "Require stdio child; implies --eager, exit on failure"],
-      ["--bearer TOKEN", "Authenticate to the preceding HTTP child"],
-      ["--hidden", "Hide child's tools from default discovery; explicit list-tools and calls still work"],
-   ],
-   examples => "  $0 --ask auto files 'stdio:mcp-fs /home/alice/src/project'\n"
-      . "  $0 files --- mcp-fs /home/alice/src/project --- --eager\n"
-      . "  $0 vim --- mcp-vim --bind :: --- --required\n"
-      . "  $0 remote https://example.org/mcp/ --bearer TOKEN\n"
-      . "  $0 --name tools --print-url",
-},
-   "ask=s" => \my $ask_mode,
+my $server_options = mcp_getoptions
+   {
+      usage       => $usage,
+      path        => "/",
+      description => "Combine MCP servers behind one endpoint, with tools named PREFIX.TOOL.\n"
+         . "Each server is HTTP(S), stdio:COMMAND, or --- PROGRAM ARG... ---; downstream options follow its entry.",
+      options     => [
+         "Broker-wide options:",
+         ["--listen", "Keep the upstream HTTP listener active alongside stdio or --connect"],
+         "Downstream options (after the URL or closing ---):",
+         ["--eager", "Start the preceding stdio child at broker startup"],
+         ["--required", "Require stdio child; implies --eager, exit on failure"],
+         ["--bearer TOKEN", "Authenticate to the preceding HTTP child"],
+         ["--hidden", "Hide child's tools from default discovery; explicit list-tools and calls still work"],
+         ["--disable", "Exclude the preceding child entirely, keeping its prefix reserved"],
+      ],
+      examples    => "  $0 --ask auto files 'stdio:mcp-fs /home/alice/src/project'\n"
+         . "  $0 files --- mcp-fs /home/alice/src/project --- --eager\n"
+         . "  $0 vim --- mcp-vim --bind :: --- --required\n"
+         . "  $0 remote https://example.org/mcp/ --bearer TOKEN\n"
+         . "  $0 --name tools --print-url",
+   },
    "listen" => \my $listen,
-);
+;
+
+my $ask_mode = delete $server_options->{ask};
+
 $AnyEvent::Log::FILTER->level ("debug")
    unless defined $ENV{PERL_ANYEVENT_VERBOSE}
       || ($ENV{PERL_ANYEVENT_LOG} // "") =~ /(?:\A|\s)filter=/;
 $ask_mode //= $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
-die "--ask must be helper, tty, yad, auto, or mcp\n"
-   if defined $ask_mode && $ask_mode !~ /\A(?:helper|tty|yad|auto|mcp)\z/;
+$ask_mode =~ /\A(?:helper|tty|yad|auto|mcp|none)\z/
+   or die "--ask must be helper, tty, yad, auto, mcp, or none\n";
 
-my (%broker, %stdio, %eager, %required, %hidden);
+my (%broker, %disabled, %stdio, %eager, %required, %hidden, %progress);
 my $shutting_down;
 my @prompts;
 my $prompt;
@@ -453,6 +481,8 @@ sub on_input {
 
    return $req->error (-32601, "Only form elicitation is supported locally")
       unless $req->{method} eq "elicitation/create";
+   return $req->reply ({ action => "decline" }) if $ask_mode eq "none";
+
    my $meta = $req->{params}{_meta}{"anyevent-mcp/permission"};
    unless (defined $meta) {
       return $req->error (-32602, "Only form elicitation is supported locally")
@@ -520,7 +550,16 @@ sub on_input {
 }
 
 sub on_child_notification {
-   my ($prefix, $client, $method) = @_;
+   my ($prefix, $client, $method, $params) = @_;
+
+   if ($method eq "notifications/progress" && ref $params eq "HASH") {
+      my $token = $params->{progressToken};
+      return unless defined $token && !ref $token;
+      my $req = $progress{$prefix}{$token} or return;
+      $req->progress ($params->{progress}, $params->{total}, $params->{message})
+         unless $req->{finished};
+      return;
+   }
 
    return unless $stdio{$prefix} && $method eq "anyevent-mcp/idle-exit";
    return if $client->{idle_shutdown_pending};
@@ -593,7 +632,7 @@ sub accept_extension {
       && defined $hello->[2] && !ref $hello->[2] && $hello->[2] =~ /\A[A-Za-z0-9_-]+\z/
       or die "Invalid reverse MCP hello\n";
    my $prefix = $hello->[2];
-   !exists $broker{$prefix} or die "Broker alias '$prefix' is occupied\n";
+   !exists $broker{$prefix} && !$disabled{$prefix} or die "Broker alias '$prefix' is occupied\n";
 
    my $client = AnyEvent::MCP::Client::JSONL->new (
       broker_config ($prefix),
@@ -619,7 +658,7 @@ while (@ARGV) {
    @ARGV >= 2 or die $usage;
    my ($prefix, $url) = splice @ARGV, 0, 2;
    $prefix =~ /\A[A-Za-z0-9_-]+\z/ or die "Invalid broker prefix '$prefix'\n";
-   exists $broker{$prefix} and die "Duplicate broker prefix '$prefix'\n";
+   (exists $broker{$prefix} || $disabled{$prefix}) and die "Duplicate broker prefix '$prefix'\n";
 
    my $command;
 
@@ -637,16 +676,12 @@ while (@ARGV) {
    }
 
    my %config = broker_config $prefix;
+   my ($hide, $disable, $eager, $require);
    Getopt::Long::GetOptionsFromArray (\@ARGV,
-      "eager" => sub {
-         defined $command or die "--eager requires a stdio broker ('$prefix')\n";
-         $eager{$prefix} = 1;
-      },
-      "hidden" => sub { $hidden{$prefix} = 1 },
-      "required" => sub {
-         defined $command or die "--required requires a stdio broker ('$prefix')\n";
-         $eager{$prefix} = $required{$prefix} = 1;
-      },
+      "eager" => sub { $eager = 1 },
+      "hidden" => sub { $hide = 1 },
+      "disable" => sub { $disable = 1 },
+      "required" => sub { $eager = $require = 1 },
       "bearer=s" => sub {
          !defined $command && $url =~ m{\Ahttps?://} or die "Authentication options require an HTTP broker\n";
          length $_[1] or die "Missing bearer token for '$prefix'\n";
@@ -654,9 +689,19 @@ while (@ARGV) {
       },
    ) or die $usage;
 
-   if (!defined $command && $url =~ m{\Ahttps?://}) {
-      $broker{$prefix} = AnyEvent::MCP::Client::HTTP->new (%config, url => $url);
-   } elsif (defined $command) {
+   defined $command || $url =~ m{\Ahttps?://} or die "Invalid broker URL '$url'\n";
+   if ($disable) {
+      $disabled{$prefix} = 1;
+      mcp_log "$prefix: disabled";
+      next;
+   }
+   defined $command || !$require or die "--required requires a stdio broker ('$prefix')\n";
+   defined $command || !$eager or die "--eager requires a stdio broker ('$prefix')\n";
+   $hidden{$prefix} = 1 if $hide;
+   $eager{$prefix} = 1 if $eager;
+   $required{$prefix} = 1 if $require;
+
+   if (defined $command) {
       $broker{$prefix} = AnyEvent::MCP::Client::JSONL->new (
          %config, command => $command,
          env => {
@@ -667,7 +712,7 @@ while (@ARGV) {
       );
       $stdio{$prefix} = 1;
    } else {
-      die "Invalid broker URL '$url'\n";
+      $broker{$prefix} = AnyEvent::MCP::Client::HTTP->new (%config, url => $url);
    }
 }
 
@@ -675,16 +720,16 @@ my $toolset = AnyEvent::MCP::Server::Toolset->new;
 
 sub broker_alias {
    my ($name) = @_;
-   return $name if exists $broker{$name};
+   return $name if exists $broker{$name} || $disabled{$name};
    $name =~ tr/_/-/;
    $name
 }
 
 sub all_tools {
-   my ($req, $done, $name) = @_;
+   my ($req, $done, $name, $include_hidden) = @_;
 
    my @tools = defined $name ? () : map @{$_->list}, @{$req->{server}{toolsets}};
-   my @prefix = defined $name ? ($name) : grep !$hidden{$_}, sort keys %broker;
+   my @prefix = defined $name ? ($name) : grep $include_hidden || !$hidden{$_}, sort keys %broker;
    my @results;
    my %pending = map { $_ => 1 } @prefix;
    my $remaining = @prefix;
@@ -719,6 +764,94 @@ sub all_tools {
    }
 }
 
+# Tool definitions are small enough to score directly on each search.
+# Flatten argument names and descriptions recursively, ignoring schema mechanics.
+sub schema_search_text {
+   my ($value, $text) = @_;
+   if (ref $value eq "HASH") {
+      push @$text, $value->{description} if defined $value->{description} && !ref $value->{description};
+      push @$text, keys %{$value->{properties}} if ref $value->{properties} eq "HASH";
+      schema_search_text ($_, $text) for values %$value;
+   } elsif (ref $value eq "ARRAY") {
+      schema_search_text ($_, $text) for @$value;
+   }
+}
+
+sub search_tools {
+   my ($tools, $query) = @_;
+
+   my $words = sub {
+      my ($text) = @_;
+      $text =~ s/([a-z0-9])([A-Z])/$1 $2/g; # inputSchema -> input Schema
+      grep length, split /[^[:alnum:]]+/, lc $text;
+   };
+
+   # Query terms are a set: repeating a word in the request has no extra weight.
+   my %query = map { $_ => 1 } $words->($query);
+   return ([], 0) unless %query;
+
+   # Build per-tool term frequencies (tf), document lengths and the number
+   # of tools containing each query term (df). No persistent index needed.
+   my (@documents, %df, $total_length);
+   for my $tool (@$tools) {
+      # The broker's own tools are already exposed. Search qualified
+      # downstream names (PREFIX.TOOL) only.
+      next unless $tool->{name} =~ /\./;
+      my @text = ($tool->{name}, $tool->{description});
+      schema_search_text ($tool->{inputSchema}, \@text) if $tool->{inputSchema};
+      my @words = $words->(join " ", grep defined && !ref, @text);
+      my %tf;
+      ++$tf{$_} for @words;
+      ++$df{$_} for grep exists $tf{$_}, keys %query;
+      $total_length += @words;
+      push @documents, [$tool, \%tf, scalar @words];
+   }
+
+   # Okapi BM25, with positive IDF, k1=1.2 for frequency saturation and
+   # b=0.75 for length normalization. Thus 2.2 = k1+1 and .25 = 1-b.
+   # Sum each matching query term's contribution; nonmatches score zero.
+   my $n = @documents;
+   my $avg = $total_length / ($n || 1);
+   my @scored;
+   for my $doc (@documents) {
+      my ($tool, $tf, $length) = @$doc;
+      my $score = 0;
+      for my $term (keys %query) {
+         my $f = $tf->{$term} || next;
+         my $idf = log (1 + ($n - $df{$term} + .5) / ($df{$term} + .5));
+         $score += $idf * $f * 2.2 / ($f + 1.2 * (.25 + .75 * $length / ($avg || 1)));
+      }
+      push @scored, [$score, $tool] if $score > 0;
+   }
+   @scored = sort { $b->[0] <=> $a->[0] || $a->[1]{name} cmp $b->[1]{name} } @scored;
+   my @ranked = map $_->[1], @scored[0 .. ($#scored < 24 ? $#scored : 24)];
+   my (@found, @sizes);
+   # Reserve room for all ranked summaries first, then upgrade to complete
+   # definitions in relevance order while the 64 KiB budget permits.
+   for my $tool (@ranked) {
+      my ($broker, $name) = $tool->{name} =~ /\A([^.]+)\.(.+)\z/;
+      my $description = $tool->{description} // "";
+      $description = substr ($description, 0, 1024) . "..."
+         if length $description > 1024;
+      my $summary = {
+         name => $tool->{name},
+         description => $description,
+         schema_omitted => JSON::XS::true,
+         retrieve => { tool => "list-tools", arguments => { broker => $broker, name => $name } },
+      };
+      push @found, $summary;
+      push @sizes, length JSON::XS::encode_json ($summary);
+   }
+   my $bytes = length JSON::XS::encode_json ({ tools => \@found, total_matches => scalar @scored });
+   for my $i (0 .. $#ranked) {
+      my $size = length JSON::XS::encode_json ($ranked[$i]);
+      next if $size > 8192 || $bytes + $size - $sizes[$i] > 65536;
+      $bytes += $size - $sizes[$i];
+      $found[$i] = $ranked[$i];
+   }
+   (\@found, scalar @scored)
+}
+
 sub call_tool {
    my ($req, $name, $args) = @_;
 
@@ -743,7 +876,7 @@ sub call_tool {
    my $native_forms = $req->{protocol_version} ge "2026"
       && ref $caps->{elicitation} eq "HASH"
       && (!keys %{$caps->{elicitation}} || ref $caps->{elicitation}{form} eq "HASH");
-   my $local_forms = $ask_mode =~ /\A(?:helper|tty|yad)\z/ || $ask_mode eq "auto" && !$native_forms;
+   my $local_forms = $ask_mode =~ /\A(?:helper|tty|yad|none)\z/ || $ask_mode eq "auto" && !$native_forms;
    if ($local_forms) {
       $caps->{elicitation} = { form => {} };
    } elsif ($req->{protocol_version} lt "2026") {
@@ -754,14 +887,18 @@ sub call_tool {
       "anyevent-mcp/multibroker" => { version => 1 },
    };
    $params{_meta}{"io.modelcontextprotocol/clientCapabilities"} = $caps;
+   my $token = $params{_meta}{progressToken};
+   $progress{$prefix}{$token} = $req if defined $token && !ref $token;
    my $id;
    my $old_cancel = $req->{on_cancel};
    $req->{on_cancel} = sub {
+      delete $progress{$prefix}{$token} if defined $token && !ref $token;
       $client->cancel ($id, $_[1]) if defined $id;
       $old_cancel->(@_) if $old_cancel;
    };
    my $done = sub {
       my ($success, $result) = @_;
+      delete $progress{$prefix}{$token} if defined $token && !ref $token;
 
       return if $req->{finished};
       return $req->error ($result->{message}) unless $success;
@@ -814,12 +951,37 @@ $toolset->tool (discover_brokers =>
       }
    },
 );
+$toolset->tool (search_tools =>
+   "Search all brokers by BM25 relevance; returns up to 25 ranked tools within 64 KiB. Large schemas are summarized; fetch one using list-tools broker=NAME name=TOOL, then invoke with call-tool.",
+   {
+      type => "object",
+      required => ["query"],
+      properties => {
+         query => { type => "string", description => "Keywords describing the desired operation" },
+      },
+      additionalProperties => JSON::XS::false,
+   },
+   sub {
+      my ($req, $args) = @_;
+      for (keys %$args) {
+         $_ eq "query" or return $req->error ("Unknown search-tools argument '$_'");
+      }
+      defined $args->{query} && !ref $args->{query} && $args->{query} =~ /[[:alnum:]]/
+         or return $req->error ("search-tools requires a nonempty keyword query");
+
+      all_tools $req, sub {
+         my ($tools, $matches) = search_tools $_[0], $args->{query};
+         $req->result ({ tools => $tools, total_matches => $matches });
+      }, undef, 1;
+   },
+);
 $toolset->tool (list_tools =>
-   "Refresh tools; broker selects one downstream, including hidden ones. Omit for local + visible brokers.",
+   "List tools; broker selects one downstream, including hidden ones; name selects one tool in that broker. Omit both for local + visible brokers.",
    {
       type => "object",
       properties => {
          broker => { type => "string", description => "Downstream broker, including hidden; underscores may replace hyphens. Omit for visible brokers + local tools." },
+         name => { type => "string", description => "One downstream tool's unqualified name; requires broker. Omit to list all tools." },
       },
       additionalProperties => JSON::XS::false,
    },
@@ -827,13 +989,21 @@ $toolset->tool (list_tools =>
       my ($req, $args) = @_;
 
       for (keys %$args) {
-         $_ eq "broker" or return $req->error ("Unknown list-tools argument '$_'");
+         $_ eq "broker" || $_ eq "name" or return $req->error ("Unknown list-tools argument '$_'");
       }
       my $name = $args->{broker};
       $name = broker_alias $name if defined $name;
       return $req->error ("Unknown broker '$name'") if defined $name && !exists $broker{$name};
 
-      all_tools $req, sub { $req->result ({ tools => $_[0] }) }, $name;
+      my $tool = $args->{name};
+      return $req->error ("name requires broker") if defined $tool && !defined $name;
+      return $req->error ("Invalid tool name") if defined $tool && (ref $tool || !length $tool);
+
+      all_tools $req, sub {
+         my $tools = $_[0];
+         $tools = [grep $_->{name} eq "$name.$tool", @$tools] if defined $tool;
+         $req->result ({ tools => $tools });
+      }, $name;
    },
 );
 $toolset->tool (call_tool =>
@@ -863,14 +1033,16 @@ sub log_request {
    mcp_log_request $server, $req;
 }
 
+mcp_permissions undef; # downstream permission elicitation is handled by the broker
+
 mcp_config
    server_name    => "mcp-multibroker",
    server_version => $AnyEvent::MCP::VERSION,
    on_request => \&log_request,
    on_error => sub { AE::log error => "MCP dispatch $_[1]{method}: $_[2]" },
-   short_instructions => "MCP tool router. discover-brokers lists servers including hidden ones; list-tools broker=NAME finds their tools.",
+   short_instructions => "MCP tool router. search-tools ranks visible and hidden tools; large schemas are summarized. list-tools broker=NAME name=TOOL retrieves one complete definition. call-tool invokes a match.",
    instructions => <<'EOF';
-Proxy MCP servers as PREFIX.TOOL. discover-brokers lists servers, including hidden ones; list-tools broker=NAME retrieves a server's tools. list-tools without a broker returns visible tools; call-tool invokes by prefixed name, even when hidden. Tools may change.
+Proxy MCP servers as PREFIX.TOOL. search-tools ranks tools across all brokers, including hidden ones, returning up to 25 definitions within 64 KiB; oversized schemas are summarized with retrieval instructions. list-tools broker=NAME name=TOOL retrieves one complete definition; omit name to retrieve all tools for a broker. call-tool invokes a returned prefixed tool name. discover-brokers lists servers. Tools may change.
 EOF
 
 # start selected stdio children now, before the upstream event loop starts.

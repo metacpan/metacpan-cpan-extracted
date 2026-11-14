@@ -24,6 +24,8 @@ recommends:
   AnyEvent::WebSocket::Message: '0'
   AnyEvent::WebSocket::Server: '0'
   Authen::SASL: '2.18'
+  Crypt::AuthEnc::GCM: '0'
+  HTML::Parser: '0'
   HTTP::Tiny: '0'
   IO::Socket::SSL: '0'
   Mail::IMAPTalk: '4.07'
@@ -39,5 +41,5 @@ requires:
   Scalar::Util: '0'
   common::sense: '3.3'
   parent: '0'
-version: 0.82
+version: 0.91
 x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

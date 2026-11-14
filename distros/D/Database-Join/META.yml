@@ -55,5 +55,5 @@ requires:
 resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Database-Join
   repository: https://github.com/nigelhorne/Database-Join.git
-version: 0.011.1
+version: 0.011.2
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

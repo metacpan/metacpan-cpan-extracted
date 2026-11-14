@@ -8,7 +8,7 @@ use strict; use warnings;
 use POSIX ();
 use Fcntl qw(F_SETFD FD_CLOEXEC F_GETFL F_SETFL O_NONBLOCK);
 use Proc::Spawner ();   # (its XS: chld_to_fd, chld_restore)
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $CHLD_C = defined &Proc::Spawner::chld_to_fd;
 our $TICK = $CHLD_C ? undef : 0.05;   # the longest wait without a wake-up for SIGCHLD

@@ -1,0 +1,13 @@
+^\.(?!perltidyrc)
+\.tar(\.gz)?$
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^MANIFEST\.bak
+^Dockerfile
+^blib/
+pm_to_blib
+^local
+^cover_db/
+\.DS_Store$
+^mise\..+

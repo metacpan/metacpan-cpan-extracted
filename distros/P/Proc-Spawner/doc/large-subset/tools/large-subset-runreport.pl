@@ -12,6 +12,9 @@
 #   -b BASEDIR (post-0.09, X27): OUTDIR is a run with -env (large-subset-runcompare.pl), BASEDIR one of the same samples
 #   without: a table of each sample's class in BASEDIR against its class in OUTDIR, and every sample whose class changed
 #   or whose result changed (status, out, err, rec, files, in any of the three shells: "same class, other result").
+#   -bl LIST.tsv -tag VARIANT [-noise BASE2DIR] (with -b; post-0.11): append every changed sample to LIST.tsv (made
+#   with its header if missing), in the columns of large-subset-env-variants.tsv: VARIANT, id, base class, class, what
+#   changed, noisy (1 if the sample's result also changed between BASEDIR and BASE2DIR, a second run of the base), text.
 #   -c FILE: every sample's class, one line each (id, class).
 #   -ours-from DIR (post-0.10): take ours' results from DIR (large-subset-runcompare.pl -shells ours, best with
 #   -workers-from OUTDIR and the same -env), for the samples DIR has; dash's and bash's stay OUTDIR's.  So after a change
@@ -33,10 +36,10 @@
 #           =dash, =bash, neither: dash and bash differ beyond the messages; ours agrees with dash, with bash, or
 #                     with neither (messages ignored here)
 #           timeout   a shell ran out of time (5 s); not compared
-use strict; use warnings; use JSON::PP; use Getopt::Long; binmode STDOUT, ':utf8';
-my ($LIST, $QD, $X, $BD, $CF, $OF, $OV); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF,
-  'ours-from=s' => \$OF, 'ours-vs=s' => \$OV) && @ARGV == 1
-  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR] [-c CLASSES.tsv] [-ours-from DIR] [-ours-vs DIR] OUTDIR\n";
+use strict; use warnings; use JSON::PP; use Encode (); use Getopt::Long; binmode STDOUT, ':utf8';
+my ($LIST, $QD, $X, $BD, $CF, $OF, $OV, $BL, $TAG, $NOISE); GetOptions('l=s' => \$LIST, 'q=s' => \$QD, 'x' => \$X, 'b=s' => \$BD, 'c=s' => \$CF,
+  'ours-from=s' => \$OF, 'ours-vs=s' => \$OV, 'bl=s' => \$BL, 'tag=s' => \$TAG, 'noise=s' => \$NOISE) && @ARGV == 1 && (!$BL || $BD && $TAG)
+  or die "usage: $0 [-l LIST.tsv] [-q QDIR] [-x] [-b BASEDIR [-bl LIST.tsv -tag VARIANT [-noise BASE2DIR]]] [-c CLASSES.tsv] [-ours-from DIR] [-ours-vs DIR] OUTDIR\n";
 my %OURS;   # -ours-from: sample id => ours' result from that run
 if ($OF) { for my $f (glob "$OF/run-*.jsonl") { open my $in, '<', $f or die;
     while (<$in>) { my $s = eval { decode_json($_) } or next; $OURS{$s->{id}} = $s->{ours} if $s->{ours} } }
@@ -124,7 +127,9 @@ if ($OV) {   # ours here against ours in another run
   print "  (id, parts, ours' status there->here, shells too, text)\n", map "  $_\n", sort @ch }
 if ($CF) { open my $o, '>', $CF or die; print $o "id\tclass\n", map "$_\t$cls{$_}\n", sort keys %cls }
 if ($BD) {   # base run against this (-env) run, sample by sample
-  my (%tr, @chg, $nb); my @C2 = (@C, 'not in base');
+  my (%tr, @chg, $nb, @bl, %n2); my @C2 = (@C, 'not in base');
+  if ($NOISE) { for my $f (glob "$NOISE/run-*.jsonl") { open my $in, '<', $f or die;   # -noise: the second base run
+      while (<$in>) { my $b = eval { decode_json($_) } or next; $n2{$b->{id}} = { map +($_ => norm($b->{$_}, $_)), qw(dash bash ours) } } } }
   for my $f (glob "$BD/run-*.jsonl") { open my $in, '<', $f or die;
     while (<$in>) { my $b = eval { decode_json($_) } or next; my $v = $res{$b->{id}} or next; $nb++;
       my ($bc) = classify($b); my $vc = $cls{$b->{id}};
@@ -132,7 +137,22 @@ if ($BD) {   # base run against this (-env) run, sample by sample
       my @what = grep { my $p = $_; grep { $nb{$_}{$p} ne $nv{$_}{$p} } qw(dash bash ours) } @P, 'err';   # as compared: rec sorted, err a multiset
       $tr{$bc}{$vc}++; delete $res{$b->{id}};
       (my $x = $v->{text} // '') =~ s/\s+/ /g;
-      push @chg, join "\t", $b->{id}, $bc, $vc, join('+', @what), substr($x, 0, 120) if $bc ne $vc || @what } }
+      push @chg, join "\t", $b->{id}, $bc, $vc, join('+', @what), substr($x, 0, 120) if $bc ne $vc || @what;
+      if ($BL && ($bc ne $vc || @what)) { my $n = $n2{$b->{id}};
+        my $noisy = $n && grep({ my $p = $_; grep { $nb{$_}{$p} ne $n->{$_}{$p} } qw(dash bash ours) } @P, 'err') ? 1 : 0;
+        push @bl, join "\t", $TAG, $b->{id}, $bc, $vc, join('+', @what), $noisy, substr(Encode::encode_utf8($x), 0, 100) } } }   # 100 bytes
+  if ($BL) { my $new = !-e $BL; open my $o, '>>', $BL or die "$BL: $!"; print $o <<'H' if $new; print $o map "$_\n", sort @bl }
+# large-subset-env-variants.tsv (post-0.09, 2026-11-08; known issue X27): every sample whose result changed when the run's
+# environment changed (large-subset-runcompare.pl -env VARIANT, on the samples whose code in large-subset-provenance.tsv the
+# variant is for), against a base run of the same samples (large-subset-runreport.pl -b).  How it was made and what it says:
+# large-subset-environment.md, section 9.  Columns: variant; snippet ID; class in the base run; class in the variant's run;
+# what changed, as compared (status, out, rec, files, err), in any of the three shells; noisy: 1 if the sample's result also
+# changed between two runs of the base environment (time, chance), so the change need not be the variant's; the text, cut.
+# The stand-in variants fail, output and mtime ran with the defaults (STANDIN_STATUS=1, STANDIN_OUTPUT="one  two\n*\n\nlast",
+# FIXTURE_MTIME=1577836800) against base runs of their own 1,248 samples; the others against base runs of 7,003.
+variant	id	base	variant_class	changed	noisy	text
+H
+
   $tr{'not in base'}{$cls{$_}}++ for keys %res;
   print "\nAgainst the base run $BD ($nb samples in both): rows the base run's class, columns this run's\n";
   printf "%-12s %s\n", '', join ' ', map sprintf('%8s', $_), @C;

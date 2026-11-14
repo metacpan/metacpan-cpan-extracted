@@ -9,7 +9,7 @@ use MIME::Base64 qw(decode_base64url);
 
 use Twilio::Json;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 # A token that is about to expire could expire on its way to Twilio, so it is replaced this
 # many seconds early, as the official libraries do.

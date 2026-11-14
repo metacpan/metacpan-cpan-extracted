@@ -6,7 +6,7 @@ use utf8;
 use Encode qw(decode encode);
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2017-07-22';
 
 my %LOCALE_CACHE;
@@ -1619,11 +1619,11 @@ Supported helper methods:
 
 =item * C<AmberDB::Locale::Currency-E<gt>cur_code($iso_code)> - Returns the currency definition hash reference for the given 3-letter ISO 4217 code (case-insensitive), containing C<num>, C<name>, C<symbol>, and C<digits>.
 
-=item * C<AmberDB::Locale::Currency-E<gt>symbol($iso_code)> - Returns the currency symbol for the given ISO code (e.g. C<'₺'>, C<'$'>, C<'€'>, C<'£'>, C<'₽'>, C<'¥'>). If the code is unknown, returns the uppercase code itself.
+=item * C<AmberDB::Locale::Currency-E<gt>cur_symbol($iso_code)> - Returns the currency symbol for the given ISO code (e.g. C<'₺'>, C<'$'>, C<'€'>, C<'£'>, C<'₽'>, C<'¥'>). If the code is unknown, returns the uppercase code itself.
 
-=item * C<AmberDB::Locale::Currency-E<gt>name($iso_code)> - Returns the English currency name for the given ISO code.
+=item * C<AmberDB::Locale::Currency-E<gt>cur_name($iso_code)> - Returns the English currency name for the given ISO code.
 
-=item * C<AmberDB::Locale::Currency-E<gt>all()> - Returns a list of 2-element array references C<[ $code, $name ]> ordered by priority, suitable for rendering HTML C<E<lt>selectE<gt>> form dropdowns.
+=item * C<AmberDB::Locale::Currency-E<gt>cur_all()> - Returns a list of 2-element array references C<[ $code, $name ]> ordered by priority, suitable for rendering HTML C<E<lt>selectE<gt>> form dropdowns.
 
 =item * C<AmberDB::Locale::Currency-E<gt>active_codes()> - Returns the list of active 3-letter ISO 4217 currency codes supported by the dictionary.
 

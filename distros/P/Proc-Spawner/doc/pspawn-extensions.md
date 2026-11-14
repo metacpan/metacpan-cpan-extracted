@@ -13,16 +13,16 @@
   - ARGV and ENV: the expanded words and the settings written before the command;
   - DATA: what the command table stored with the name.
 - IDs from other documents:
-  - A4, A5 and U2: the run-time rules and a parser rule of [`claude/large-subset-spec.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/large-subset-spec.md);
+  - A4, A5 and U2: the run-time rules and a parser rule of [`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md);
   - B1, D1–D3 and R2: items of the page "Child Exit Wake-up";
-  - E21, X2 and X15: [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md).
+  - E21, X2 and X15: [`pspawn-known-issues.md`](pspawn-known-issues.md).
 - Files named in section 7 are in the bundle's top directory.
 
 Code: `lib/ShellSpawn.pm` (the executor, also `claude/pspawn-ShellSpawn.pm`) and the new `lib/ShellSpawn/Large.pm` (also `claude/pspawn-ShellSpawn-Large.pm`), in the bundle `claude/pspawn-tree.tar.gz-base64.txt`. The bundle's `parser/` now holds `ShellSubsetLarge.pm` too.
 
 ## 1. What the executor runs now
 
-`ShellSpawn::run(STRING, parser => CODE)` parses STRING with CODE, which returns a tree or an error hash; the same CODE reads the text of `eval`, `.` and trap actions. `run(TREE)` takes a ready tree. The user's decision of 2026-11-01 (19:39): the caller passes the parser, with a reasonable default. The default (Claude's choice, EXPERIMENTAL): the largest of `ShellSubsetLarge`, `ShellSubset`, `ShellSubsetSmall` that the caller has already loaded; if none is, `ShellSubset` is loaded. The executor loads no parser otherwise, and none of the three parsers needs a larger one (`ShellSubsetLarge` builds on `ShellSubset`). [`try.pl`](../t/try.pl) takes `PARSER=small`, `base` or `large` (default `large`). The large subset is [`claude/large-subset-spec.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/large-subset-spec.md): functions, `local`, `return`, `export`, `readonly`, `exec` anywhere and with redirections only, here-documents, positional parameters, `$#`, `$@`, `$*`, `$$`, the `${N=w} ${N?w} ${N%p} ${N#p}` forms, assignments in `$(( ))`, and the builtins `set shift eval . trap wait umask command getopts unset`, `cd -`, `kill … $$`.
+`ShellSpawn::run(STRING, parser => CODE)` parses STRING with CODE, which returns a tree or an error hash; the same CODE reads the text of `eval`, `.` and trap actions. `run(TREE)` takes a ready tree. The user's decision of 2026-11-01 (19:39): the caller passes the parser, with a reasonable default. The default (Claude's choice, EXPERIMENTAL): the largest of `ShellSubsetLarge`, `ShellSubset`, `ShellSubsetSmall` that the caller has already loaded; if none is, `ShellSubset` is loaded. The executor loads no parser otherwise, and none of the three parsers needs a larger one (`ShellSubsetLarge` builds on `ShellSubset`). [`try.pl`](../t/try.pl) takes `PARSER=small`, `base` or `large` (default `large`). The large subset is [`large-subset/large-subset-spec.md`](large-subset/large-subset-spec.md): functions, `local`, `return`, `export`, `readonly`, `exec` anywhere and with redirections only, here-documents, positional parameters, `$#`, `$@`, `$*`, `$$`, the `${N=w} ${N?w} ${N%p} ${N#p}` forms, assignments in `$(( ))`, and the builtins `set shift eval . trap wait umask command getopts unset`, `cd -`, `kill … $$`.
 
 ## 2. The extension points
 
@@ -108,15 +108,15 @@ To reject one of these, say which. D1 falls back to B1's stop-gap by removing th
 - **Other checks:**
   - `hyg.pl`: parent fds unchanged, no zombies.
   - `mem.pl`: flat.
-  - [`sigprobe/mem-large.pl`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-tree/sigprobe/mem-large.pl): 1,500 runs of functions, `local`, traps, here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB). This found the arithmetic leak E21 of [`claude/pspawn-known-issues.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-known-issues.md).
-  - [`sigprobe/exec-stress.pl`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-tree/sigprobe/exec-stress.pl): passes.
+  - [`sigprobe/mem-large.pl, now t/memory.t`](../t/memory.t): 1,500 runs of functions, `local`, traps, here-documents, `eval`, `getopts`, `wait` and arithmetic assignment, with RSS flat (12,176 → 12,196 kB). This found the arithmetic leak E21 of [`pspawn-known-issues.md`](pspawn-known-issues.md).
+  - [`sigprobe/exec-stress.pl, now t/stress.t`](../t/stress.t): passes.
   - `large-subset-difffuzz.pl` (the ShellSubsetLarge session's random strings, run under dash and the executor): 1,800 strings, 1,636 in the subset, 7 differ. Five differ only in the order of lines from parallel pipeline elements (X13), one only in a message prefix in the middle of a line (the script strips prefixes only at line starts), and one is X2 (`$!` of a job that starts no process).
   - Parser tests (pre-0.01): 222/0, 612/0, 142/0.
 
 ## 8. Not done, limits
 
 - **Reference cycles broken by hand.** The executor still breaks some of its own cycles by hand at the end of a run (`release_all`, `%$c = ()` in `run`), against the user's rule (known issue X15). They go away in the restructuring below.
-- **The restructuring:** a minimal `Proc::Spawner` with the executable graph in a companion module (page "Child Exit Wake-up", R2). Done 2026-11-02: [`claude/pspawn-spawner.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/pspawn-spawner.md).
+- **The restructuring:** a minimal `Proc::Spawner` with the executable graph in a companion module (page "Child Exit Wake-up", R2). Done 2026-11-02: [`pspawn-spawner.md`](pspawn-spawner.md).
 - **Word-part handlers** return one string (section 2).
 - **`exec` with redirections only,** inside a group or `if` that has redirections of its own, changes only that group's fds; in dash it changes the shell's.
 - **`$!`** is empty when a background job starts no process before the `&` returns (X2). So `(exit 3) & wait $!` differs from dash.

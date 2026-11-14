@@ -28,6 +28,7 @@ my %WriteMakefileArgs = (
     "Digest::MD5" => 0,
     "Digest::SHA" => 0,
     "Exporter" => 0,
+    "File::Basename" => 0,
     "File::Find" => 0,
     "File::Path" => 0,
     "File::Slurper" => 0,
@@ -52,7 +53,6 @@ my %WriteMakefileArgs = (
   },
   "TEST_REQUIRES" => {
     "Capture::Tiny" => 0,
-    "File::Basename" => 0,
     "File::Spec" => 0,
     "FindBin" => 0,
     "FindBin::libs" => 0,
@@ -65,7 +65,7 @@ my %WriteMakefileArgs = (
     "Test::MockModule" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "0.002",
+  "VERSION" => "0.003",
   "test" => {
     "TESTS" => "t/*.t"
   }

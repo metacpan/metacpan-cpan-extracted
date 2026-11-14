@@ -21,12 +21,13 @@ use Travel::Status::DE::DBRIS::JourneyAtStop;
 use Travel::Status::DE::DBRIS::Journey;
 use Travel::Status::DE::DBRIS::Location;
 
-our $VERSION = '0.39';
+our $VERSION = '0.40';
 
 # bahn.de employs Akamai BMP, whose fingerprinting includes the advertised
 # TLS options. So we gotta work around that, too.
 my %tls_options = (
-	SSL_ciphersuites => 'TLS_AES_256_GCM_SHA384:TLS_CHACHA20_POLY1305_SHA256',
+	SSL_ciphersuites =>
+'TLS_AES_128_GCM_SHA256:TLS_CHACHA20_POLY1305_SHA256:TLS_AES_256_GCM_SHA384:TLS_AES_128_CCM_SHA256:TLS_AES_128_CCM_8_SHA256',
 );
 
 # {{{ Constructors
@@ -527,7 +528,7 @@ Non-blocking variant;
 
 =head1 VERSION
 
-version 0.39
+version 0.40
 
 =head1 DESCRIPTION
 

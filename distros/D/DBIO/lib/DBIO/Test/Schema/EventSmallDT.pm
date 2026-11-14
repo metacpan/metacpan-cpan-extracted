@@ -4,7 +4,7 @@ package DBIO::Test::Schema::EventSmallDT;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base qw/DBIO::Test::BaseResult/;
 
@@ -33,7 +33,7 @@ DBIO::Test::Schema::EventSmallDT - Test result class for the event_small_dt tabl
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

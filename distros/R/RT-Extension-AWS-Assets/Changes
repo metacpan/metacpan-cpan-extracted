@@ -1,5 +1,11 @@
 Revision history for RT-Extension-AWS-Assets
 
+0.10 2026-11-13
+ - Sync EC2 instance state to asset status
+ - Add a stopped status to the aws-assets lifecycle
+ - Allow custom ID on RDS reservation purchase
+ - Show AWS's error when it rejects a reservation purchase
+
 0.09 2026-09-04
  - Set Region on reservations purchased from the web UI
 

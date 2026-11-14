@@ -1,0 +1,117 @@
+#!/usr/bin/env perl
+use v5.44;
+use Getopt::Long qw(GetOptionsFromArray);
+use JSON::PP     ();
+use Scalar::Util qw(blessed);
+use LibTmux::Workspace;
+use LibTmux::Server;
+my $usage = <<'USAGE';
+Usage: libtmux-workspace validate|plan|load FILE [options]
+
+  --socket-path PATH    Explicit tmux socket path
+  --socket-name NAME    Explicit tmux socket name (exclusive with path)
+  --tmux PROGRAM        tmux executable (default: tmux)
+  --existing error|skip Conflict policy (default: error)
+  --dry-run             Print the validated plan without tmux I/O
+  --help                Show this help
+
+JSON format: libtmux.workspace/v1. Each pane declares command (literal argv)
+or shell_command (explicit shell text). Existing skip leaves whole sessions.
+Exit: 0 success; 2 usage/configuration; 3 load failure; 4 existing conflict.
+USAGE
+my (@arguments) = @ARGV;
+my (%options, $help, $dry_run);
+Getopt::Long::Configure(qw(no_auto_abbrev no_ignore_case));
+my $valid = GetOptionsFromArray(
+    \@arguments,
+    'socket-path=s' => \$options{socket_path},
+    'socket-name=s' => \$options{socket_name},
+    'tmux=s'        => \$options{executable},
+    'existing=s'    => \$options{existing},
+    'dry-run'       => \$dry_run,
+    'help'          => \$help
+);
+if ($help) { print $usage; exit 0 }
+my ($action, $file) = @arguments;
+
+if (!$valid || @arguments != 2 || $action !~ /\A(?:validate|plan|load)\z/) {
+    print STDERR $usage;
+    exit 2;
+}
+my $json = JSON::PP->new->utf8->canonical->pretty;
+my $exit = 0;
+try {
+    open my $in, '<:raw', $file
+        or LibTmux::Workspace::X::Config->throw(
+        message => "open configuration: $!");
+    my $bytes = '';
+    while (1) {
+        my $n = read($in, my $chunk, 65536);
+        LibTmux::Workspace::X::Config->throw(
+            message => "read configuration: $!")
+            unless defined $n;
+        last unless $n;
+        $bytes .= $chunk;
+        LibTmux::Workspace::X::Config->throw(
+            message => 'configuration exceeds 1 MiB')
+            if length($bytes) > 1024 * 1024;
+    }
+    close $in
+        or LibTmux::Workspace::X::Config->throw(
+        message => "close configuration: $!");
+    my $workspace = LibTmux::Workspace->from_json($bytes);
+    my $existing  = delete($options{existing}) // 'error';
+    my $result;
+    if ($action eq 'validate') {
+        $workspace->plan(existing => $existing);
+        $result = {valid => true, schema => 'libtmux.workspace/v1'};
+    }
+    elsif ($action eq 'plan' || $dry_run) {
+        $result = $workspace->plan(existing => $existing);
+    }
+    else {
+        delete $options{$_} for grep { !defined $options{$_} } keys %options;
+        my $server = LibTmux::Server->new(%options);
+        $result = $workspace->load(server => $server, existing => $existing);
+    }
+    print $json->encode($result);
+}
+catch ($error) {
+    print STDERR "$error\n";
+    if (blessed($error) && $error->isa('LibTmux::Workspace::X::Load')) {
+        print STDERR $json->encode($error->report_data);
+        $exit = 3;
+    }
+    elsif (blessed($error) && $error->isa('LibTmux::Workspace::X::Conflict')) {
+        $exit = 4;
+    }
+    elsif (
+        blessed($error)
+        && (   $error->isa('LibTmux::Workspace::X::Config')
+            || $error->isa('LibTmux::X::InvalidArgument'))
+        )
+    {
+        $exit = 2;
+    }
+    else { $exit = 3 }
+}
+exit $exit;
+
+=head1 NAME
+
+libtmux-workspace - Validate, plan, or load a JSON workspace
+
+=head1 SYNOPSIS
+
+    libtmux-workspace plan workspace.json
+    libtmux-workspace load workspace.json --socket-name example
+
+=head1 DESCRIPTION
+
+Uses L<LibTmux::Workspace/plan> for side-effect-free dry-runs and
+L<LibTmux::Workspace/load> for explicit orchestration. C<--help> documents
+options and exit statuses. Standard output contains JSON results; standard
+error contains failures and partial-load reports. No async dependency or
+shell wrapper is loaded by this consumer.
+
+=cut

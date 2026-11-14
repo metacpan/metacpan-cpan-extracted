@@ -10,6 +10,32 @@ The distribution has two pools of shell strings taken from public collections ("
 
 The hand-written tests ([`t/parser/shell-subset-tests.pl`](../t/parser/shell-subset-tests.pl), [`t/parser/large-subset-tests.pl`](../t/parser/large-subset-tests.pl)) are not borrowed. Their IDs are `OWN:n` and `LS:n`.
 
+## 0. With make
+
+`perl Makefile.PL` puts targets for all of this into the `Makefile` (from [`corpus.mk`](corpus.mk)); `make corpus-help` lists them. They are not part of building, installing or `make test`. Linux only; the runs need root (they make the users `rc0`…`rc3` and mount, each run in a namespace of its own), no network (`unshare -n`), dash and bash; `make` first. Work files go to `CORPUS` (default `corpus-work`, ignored by git); the targets marked *(record)* rewrite the shipped file they name, so `git diff` shows what changed. Each takes what it needs from the earlier ones, and the long runs are restartable (a run skips the samples its directory has).
+
+| Target | Does | Time |
+|---|---|---|
+| `corpora` | section 1: the sources at their pinned commits, and the book ([`large-subset-corpora.pl`](large-subset/tools/large-subset-corpora.pl)) | 1 minute |
+| `corpus-pool-a-check`, `corpus-pool-a` | section 2: pool A against the sources; its texts again, into `CORPUS/pool` | seconds |
+| `corpus-samples`, `corpus-scan`, `corpus-figures` | section 3: pool B, the scan (`OLDSCAN=FILE SCCACHE=FILE`: a stored scan reparsed instead), the parse figures | 25 minutes (15 seconds with `OLDSCAN`) |
+| `corpus-digest` | the digest the parse figures depend on ([`large-subset-state.md`](large-subset/large-subset-state.md), section 3) | |
+| `corpus-shells` | section 4 *(record)* | seconds |
+| `corpus-provenance` | the levels, [`large-subset-provenance.tsv`](large-subset/large-subset-provenance.tsv) *(record)* | 8 seconds |
+| `corpus-run`, `corpus-qrun` | the behaviour run; ours alone with its calls logged | 55 minutes each |
+| `corpus-runreport`, `corpus-threeway`, `corpus-builtins` | the tables of [`large-subset-state.md`](large-subset/large-subset-state.md), section 7, and their records | minutes; 45 minutes |
+| `corpus-env-variants` | [`large-subset-environment.md`](large-subset/large-subset-environment.md), section 9: [`large-subset-env-variants.tsv`](large-subset/tools/large-subset-env-variants.tsv) *(record)* | hours |
+| `corpus-step2`, `corpus-step3`, `corpus-races`, `corpus-match` | sections 10, 12 and 11 there: their records; the match over every environment a snippet ran in (the base run, step 2's and step 3's), its report (`CORPUS/match.txt`) and the former comparison of messages (`CORPUS/match-raw.txt`, for [`large-subset-match-raw.md`](large-subset/large-subset-match-raw.md)) | 35 minutes, about an hour, 20 minutes, 10 minutes |
+| `corpus-html` | [`large-subset-state.md.html`](large-subset/large-subset-state.md.html) from the `.md` *(record)* | |
+| `corpus-all`, `corpus-clean` | everything in order, step 3 and its races included; remove `CORPUS` | many hours |
+| `probe-fuzz`, `probe-stress`, `probe-memory` | not the corpus: random strings of large-subset pieces in dash, `bash --posix` and ours ([`large-subset-difffuzz.pl`](large-subset/tools/large-subset-difffuzz.pl); `FUZZ="-n 300 -seed 1"`), children ending while our Perl code runs ([`t/stress.t`](../t/stress.t)), the resident size over 1,500 runs ([`t/memory.t`](../t/memory.t)); the two tests also run with `RELEASE_TESTING=1` | 25 s per 300 strings; 20 s; 10 s |
+
+Variables: `CORPUS`, `CJ` (workers, 4), `CBASE` (the runs' base directory, `/runcompare`), `CENV` (the environment of the main runs). Checked (post-0.11, 2026-11-11): the targets up to `corpus-provenance`, `corpus-shells` and `corpus-html` ran and gave the shipped files (the samples, the figures' digest, the provenance, the shells' verdicts); `corpus-env-variants`, `corpus-step2` and `corpus-match` ran over the runs of 2026-11-08 to 11 (a run skips what it has) and gave the shipped records byte for byte (section 11's match: but for the 34 samples rerun with files compared without messages, and two calls more, of timeouts). The full runs themselves were not repeated through `make` then; they were on 2026-11-13 (post-0.11): `make corpus-all` as root from an empty `CORPUS` in a fresh container, then the variants again for the samples [`large-subset-ids.pl`](large-subset/tools/large-subset-ids.pl) had missed; about 4½ hours with 4 workers (the scan 25 minutes, the two full runs together under an hour here, step 2 to the match about an hour and a half), and the parse records (samples, figures, provenance, step 3, the shells' verdicts) came out byte for byte the same.
+
+**When to run again.** The run results depend on ours (`lib/`), on the runner ([`large-subset-runcompare.pl`](large-subset/tools/large-subset-runcompare.pl)) and on the shells. After a change of ours, or of the runner, `make docs-check` names the parts out of line; run `corpus-all` again (about 4½ hours): all three shells, not ours alone (a change of the runner, as its waiting for background jobs, -after, changes dash's and bash's results too), and step 3 with them (section 11's trees count each snippet over the base run and the setups of steps 2 and 3; the user, 2026-11-13).
+
+**The documents in line.** [`docs-sync.tsv`](docs-sync.tsv) maps each part of a document that shows such results (section 11 of [`large-subset-environment.md`](large-subset/large-subset-environment.md), section 7 of [`large-subset-state.md`](large-subset/large-subset-state.md), the figures in [`README`](../README), ...) to the records, reports and scripts it draws on, with their SHA-256 when the part was last brought in line. `make docs-check` ([`docs-sync.pl`](docs-sync.pl)) names every part whose inputs changed since, and what to redo by hand; `make docs-synced DOC=FILE [PART=...]` records the new hashes once it is done; `make docs-map` shows the map. Hashes, not file times: Git keeps no times. With `RELEASE_TESTING=1`, [`t/docs-sync.t`](../t/docs-sync.t) fails while a part is not in line.
+
 ## 1. The sources
 
 All pools use the same pinned sources: six Git repositories at fixed commits, plus a PDF of a book. The list, with the licences, is in [`doc/parsers/shell-subset-test-provenance.md`](parsers/shell-subset-test-provenance.md), section 3. A shallow fetch of each commit is enough:
@@ -88,7 +114,7 @@ perl $T/large-subset-yardsticks.pl -v -c sc-cache.jsonl -o samples.tsv samples.j
 - After a change of a verdict ([`large-subset-verdicts.txt`](large-subset/tools/large-subset-verdicts.txt)) or of the detector ([`large-subset-features.pl`](large-subset/tools/large-subset-features.pl)), rerun only [`large-subset-yardsticks.pl`](large-subset/tools/large-subset-yardsticks.pl). With `-c sc-cache.jsonl` it needs no ShellCheck (about 15 seconds).
 - [`large-subset-remeasure.pl`](large-subset/tools/large-subset-remeasure.pl) `-d drops.tsv large-scan.jsonl` prints the older single ceiling, for comparison.
 
-The figures and what they mean: [`doc/large-subset/large-subset-state.md`](large-subset/large-subset-state.md). The history of the filters: [`doc/large-subset/large-subset-ceiling.md`](https://github.com/ilyaz-ai/Proc-Spawner/blob/project-2026-11-03/claude/large-subset-ceiling.md) (in Proc-Spawner 0.03).
+The figures and what they mean: [`doc/large-subset/large-subset-state.md`](large-subset/large-subset-state.md). The history of the filters: [`large-subset-ceiling.md` (0.03)](https://metacpan.org/release/ILYAZ/Proc-Spawner-0.03/view/doc/large-subset/large-subset-ceiling.md) (in Proc-Spawner 0.03).
 
 **Behaviour** (post4-0.04, run again post-0.09; [`doc/large-subset/large-subset-state.md`](large-subset/large-subset-state.md), section 7): run every accepted sample in dash, `bash --posix` and ours, about 55 minutes (each run in a mount namespace of its own: a fresh `/tmp`, a fixed `/dev/urandom`, fixed file times; without `-env`, 21 minutes, as post4-0.04). As root (it makes the users `rc0`…`rc3` and runs the samples as them), with no network, after `make`:
 

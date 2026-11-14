@@ -1,5 +1,5 @@
 This archive contains the distribution Perl-Tests-Covering,
-version 0.002:
+version 0.003:
 
   Which tests run the file you just changed, from coverage kept on disk.
 

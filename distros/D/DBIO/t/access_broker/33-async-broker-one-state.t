@@ -606,7 +606,7 @@ for my $class (qw( T::FakeDriver::Storage T::C3Driver::Storage )) {
   $storage->clear_access_broker;
   ok !$storage->access_broker, 'clear_access_broker on the sync storage detaches the broker';
   is $storage->{_dbi_connect_info}, undef,
-    '... and no DBI connect info of its answer is stored (karr k266), '
+    '... and no DBI connect info of its answer is stored, '
     . 'whatever the method resolution order of the driver class';
   ok !$async->access_broker, '... and detaches it from the embedded backend built before';
   is $storage->async, $async, '... which stays the storage\'s backend';

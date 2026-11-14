@@ -10,7 +10,7 @@ use HTTP::Tiny;
 use Twilio::Exceptions::EnvironmentException;
 use Twilio::Http::Response;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $STATUS_INTERNAL_ERROR = 599;
 

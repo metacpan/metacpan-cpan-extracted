@@ -4,7 +4,7 @@ package DBIO::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use DBIO::Test::Schema;
 use Carp;
@@ -507,7 +507,7 @@ DBIO::Test - Test utilities for DBIO and DBIO driver distributions
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 
@@ -527,6 +527,14 @@ version 0.900004
   my $schema = DBIO::Test->init_schema(no_deploy => 1);
 
 See F<t/test/06_init_schema.t> for a runnable example.
+
+=head2 Environment variables
+
+C<DBIO_TEST_PG_DSN>, C<DBIO_TEST_PG_USER> and C<DBIO_TEST_PG_PASS> are
+examples of the C<DBIO_TEST_*> variables a driver dist reads for its live
+tests. C<DBIO_TEST_FAST> is read by core's test files: when true, the files
+marked with L<DBIO::Test::Slow> are skipped, unless C<RELEASE_TESTING> or
+C<AUTOMATED_TESTING> is true.
 
 =head1 DESCRIPTION
 

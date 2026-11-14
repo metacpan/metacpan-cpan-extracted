@@ -1,19 +1,16 @@
 #!/usr/bin/perl
 use strict;
 use warnings;
-
-# Dumb weave, just attach the titles.
-
 my ($title);
 while(<>) {
-	if   (/^=begin +literate +\+?(\S.*?)\s*$/) { $title=$1 }
+	if(0) { 1 }
 	elsif(/^=for +literate:command +target=/)  { 1 }
-	elsif(/^=for +literate +target:/)          { 1 }
-	elsif(/^=for +literate +\.\s*$/)           { 1 }
-	elsif(/^=for +literate +\+?(\S.*?)\s*$/)   { $title=$1 }
-	elsif(/^=end +literate/)                   { 1 }
-	elsif(/^\s*$/) { print }
-	elsif($title&&/^(\s*)\S/) { print "$1< $title >=\n$_"; undef($title) }
+	elsif(/^=for +literate +target:/)          { 1 } # deprecated
+	elsif(/^=end\h+literate/)                   { undef($title) }
+	elsif(/^=for\h+literate\h+\.\h*$/)          { undef($title) }
+	elsif(/^=begin\h+literate\h+\+?(\H.*?)\h*$/) { $title=$1 }
+	elsif(/^=for\h+literate\h+\+?(\H.*?)\h*$/)   { $title=$1 }
+	elsif($title&&/^(\h*)\S/) { print "$1< $title >=\n$_"; undef($title) }
 	else { print }
 }
 

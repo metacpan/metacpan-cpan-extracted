@@ -228,16 +228,16 @@ for my $case (
   # plain $storage->insert_async outside a txn, so it cannot be the storage.
   my $f = $held_ctx->insert_async($schema->source('Artist'), { name => 'Late' });
   ok !$f->is_failed,
-    'IST-STAND k331 (8b): the held context\'s insert_async after the transaction is accepted';
+    'IST-STAND (8b): the held context\'s insert_async after the transaction is accepted';
   is_deeply synced($schema), [ 'INSERT' ],
-    'IST-STAND k331 (8b): ... and runs as one bare INSERT, no BEGIN/COMMIT';
+    'IST-STAND (8b): ... and runs as one bare INSERT, no BEGIN/COMMIT';
 
   $storage->reset_captured;
   my $s = $held_ctx->select_async($schema->source('Artist'), [ 'me.name' ], {}, {});
   ok !$s->is_failed,
-    'IST-STAND k331 (8b): select_async on the held context after the transaction is accepted';
+    'IST-STAND (8b): select_async on the held context after the transaction is accepted';
   is_deeply synced($schema), [ 'SELECT' ],
-    'IST-STAND k331 (8b): ... and runs as one bare SELECT';
+    'IST-STAND (8b): ... and runs as one bare SELECT';
 
   # And: a later transaction on the same storage re-activates the same
   # context (it is the storage), so an object bound in transaction 1 is
@@ -245,9 +245,9 @@ for my $case (
   $storage->reset_captured;
   my $again = $storage->txn_do_async(sub { $held_rs->all_async });
   ok !$again->is_failed,
-    'IST-STAND k331 (8b): a ResultSet bound in transaction 1 is accepted inside transaction 2';
+    'IST-STAND (8b): a ResultSet bound in transaction 1 is accepted inside transaction 2';
   is_deeply synced($schema), [ qw( BEGIN SELECT COMMIT ) ],
-    'IST-STAND k331 (8b): ... and runs there';
+    'IST-STAND (8b): ... and runs there';
 }
 
 # ---------------------------------------------------------------------------
@@ -263,19 +263,19 @@ for my $case (
   # out of txn_do_async or a pipeline coderef -- so with_context refuses it,
   # naming that, instead of running the statements on whatever pool
   # connection is free while the caller believes them pinned.
-  ok !$bound, 'SOLL k331 (8c): with_context($pooled_backend) is refused';
+  ok !$bound, 'SOLL (8c): with_context($pooled_backend) is refused';
   like $err, qr/pooled async backend is not a pinned context/,
-    'SOLL k331 (8c): ... naming the backend and where a context comes from';
-  like $err, qr/txn_do_async/, 'SOLL k331 (8c): ... and txn_do_async';
+    'SOLL (8c): ... naming the backend and where a context comes from';
+  like $err, qr/txn_do_async/, 'SOLL (8c): ... and txn_do_async';
   is scalar @{ $backend->{captured} }, 0,
-    'SOLL k331 (8c): ... and nothing went to the pool';
+    'SOLL (8c): ... and nothing went to the pool';
 
   # A Row too.
   my $row = eval {
     stored($schema, Artist => { artistid => 1, name => 'Miles' })->with_context($backend)
   };
-  ok !$row, 'SOLL k331 (8c): Row->with_context($pooled_backend) is refused';
-  like $@, qr/not a pinned context/, 'SOLL k331 (8c): ... with the same message';
+  ok !$row, 'SOLL (8c): Row->with_context($pooled_backend) is refused';
+  like $@, qr/not a pinned context/, 'SOLL (8c): ... with the same message';
 }
 
 done_testing;

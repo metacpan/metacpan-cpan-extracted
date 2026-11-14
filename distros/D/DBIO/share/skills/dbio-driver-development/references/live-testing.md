@@ -10,8 +10,7 @@ things need protecting: a database from two runs at once, and that machine from 
 that takes more than its share (rule 9).
 
 1. **One run per database at a time.** Several databases may be up and under test at
-   once, and one session may start several suites at the same time (maintainer's
-   decision 2026-10-09) — the resource caps bound that (rule 4), not a count, and every run
+   once, and one session may start several suites at the same time — the resource caps bound that (rule 4), not a count, and every run
    goes through `capped-test` (rule 9). What must not overlap is two runs against the
    *same* database: a suite works in the one database it is given, so a second run
    against it fails both, with errors that read like driver bugs. A pod can hold
@@ -47,10 +46,8 @@ that takes more than its share (rule 9).
    It reads only; every finding names the command that deals with it.
 8. **Fan-out of background agents across repos is bounded too, for non-DB work.**
    Many parallel `Agent` calls, each ending in its own `karr move`/`karr handoff`/
-   `karr sync` (or any other mutating git/network operation) at roughly the same time,
-   OOM-rebooted the host (confirmed 2026-07-14: 8 concurrent cross-repo fix agents each
-   calling `karr move ... review`). The single command is cheap (`karr handoff` alone:
-   ~46MB RSS, ~18s); N of them landing together is not — concurrency is the danger.
+   `karr sync` (or any other mutating git/network operation) at roughly the same time
+   exhaust the host: the single command is cheap, N of them landing together are not.
    When a task fans out across repos (e.g. rolling one fix out to every DBIO driver),
    keep the *implementation* parallel if you like, but serialize the `karr` mutation
    step afterward: collect the results, then call `karr move`/`handoff`/`sync` for
@@ -73,21 +70,14 @@ that takes more than its share (rule 9).
    maint/live-preflight && maint/capped-test prove -lr t/    # live run: both
    ```
 
-   The reason is not that the suites are heavy — measured 2026-08-21, core's full
-   226 files / 28021 tests peak at **183 MB**, under a third of one agent process.
-   It is that "the tests are innocent" is enforced by the kernel rather than
-   re-established by forensics after every freeze. The host has 15 GB RAM
-   **and ~14 GB swap** (part of it zram), so the cap covers both. RAM alone is
-   not a cap here: a runaway run is then not killed at its limit but paged out —
-   on 2026-10-07 one sat at exactly its 2G while 2.9G of it went to swap, zram
-   filled to 98% and the whole machine stalled until the run was killed by hand
-   (karr k323). With swap at 0 the kernel's OOM killer ends the offending process
-   at the limit; under `prove` that is the one test file, which fails with wait
-   status 9 while the rest of the suite runs on, and the closing line of
-   capped-test says the run hit the cap. A run that needs more room gets it as RAM
-   (`DBIO_TEST_MEMMAX`), never as swap. Each run also prints its own peak. The freeze
-   on 2026-08-21 14:19 was an rke2 crash-loop (1663 restarts, 2.7 GB peak each) plus
-   six concurrent agent sessions (rule 8); no DBIO test was running at all.
+   The kernel enforces the cap (`MemoryMax`, `MemorySwapMax=0`, `CPUQuota=200%`), so a
+   run's footprint is a fact the system holds, not one anybody re-establishes after a
+   freeze. RAM alone is no cap on a host with swap: a runaway run is paged out instead of
+   killed. With swap at 0 the kernel's OOM killer ends the offending process at the limit;
+   under `prove` that is the one test file, which fails with wait status 9 while the rest
+   of the suite runs on, and the closing line of capped-test says the run hit the cap. A
+   run that needs more room gets it as RAM (`DBIO_TEST_MEMMAX`), never as swap. Each run
+   also prints its own peak.
 
 ## Maintainer-only live infrastructure
 
@@ -104,6 +94,8 @@ manifests the driver repos carry, and hands a suite its `DBIO_TEST_*`:
 <cihq-ocp>/umgebungen/dbio/dbio-db list | up <db>… | env <db> | down <db>…
 eval "$(<cihq-ocp>/umgebungen/dbio/dbio-db env <db>)"
 ```
+
+The driver skills write it short: `dbio-db env <db>` is the last line above.
 
 The access is `~/.kube/cihq-dev-dbio.yaml`; its token lasts seven days and is renewed
 with `<cihq-ocp>/bin/cihq-dev token dbio`. It is confined to the namespace — role

@@ -1,7 +1,7 @@
 # What `make manifest` must leave OUT of the released tarball. MANIFEST itself is
 # generated from this, so this file is the reviewable one.
 
-^\.git/
+^\.git(/|$)
 ^\.github/
 ^\.gitignore$
 ^scripts/

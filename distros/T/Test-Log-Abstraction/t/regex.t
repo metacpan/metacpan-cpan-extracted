@@ -43,6 +43,7 @@ Readonly::Scalar my $OLD_THIS_FILE => qr/\s+at \Q$FILE\E line \d+\.?/;
 Readonly::Scalar my $OLD_PLACEHOLDER => qr/%(?:(%)|\{(\w+)\}([-+ 0#]*\d{0,3}(?:\.\d{1,3})?[sdiufeEgGxXobc]))/;
 Readonly::Scalar my $OLD_LANG => qr/\A(?:(?i:auto)|[A-Za-z]{2,3}(?:[_.\@-][\w.\@-]*)?)\z/;
 Readonly::Scalar my $OLD_DIGITS => qr/\A([+-]?)0*(\d+)\z/;
+Readonly::Scalar my $OLD_VALIDATOR => qr/\A.*validate_strict:\s*/s;
 
 # The forms after the audit, as the module now writes them
 Readonly::Scalar my $NEW_TRAILING => qr/(?<!\s)\s++at\ \S++\ line\ \d++\.?\s*+\z/sx;
@@ -50,6 +51,9 @@ Readonly::Scalar my $NEW_THIS_FILE => qr/(?<!\s)\s++at\ \Q$FILE\E\ line\ \d++\.?
 Readonly::Scalar my $NEW_PLACEHOLDER => qr/%(?:(%)|\{(\w+)\}([-+\ 0\#]*+\d{0,3}(?:\.\d{1,3})?[sdiufeEgGxXobc]))/x;
 Readonly::Scalar my $NEW_LANG => qr/\A(?:(?i:auto)|[A-Za-z]{2,3}(?:[_.\@-][\w.\@-]*+)?)\z/;
 Readonly::Scalar my $NEW_DIGITS => qr/\A([+-]?+)(?>0*(?=\d))(\d++)\z/a;
+Readonly::Scalar my $NEW_VALIDATOR => qr/\A.*Params::Validate::Strict\ line\ \d++:\ validate_strict:\s*+/sx;
+# The prefix Params::Validate::Strict puts on each of its messages
+Readonly::Scalar my $PREFIX => q{Params::Validate::Strict line 2503: validate_strict: };
 
 # Deterministic random strings made of the given pieces
 sub corpus {
@@ -136,6 +140,28 @@ subtest 'integer digits: old and new give the same sign and digits' => sub {
 	ok(!Scalar::Util::looks_like_number("\x{661}\x{662}"), 'Arabic-Indic digits are not a number, so never reach it');
 };
 
+# This one changed on purpose, so the two forms are compared only on
+# messages as the validator writes them: every 'validate_strict:' in them
+# is part of its prefix.  There they must agree.  Where a caller's value
+# holds 'validate_strict:' on its own, the old form cut the message there;
+# the new one must not
+subtest 'validator prefix: same on real messages, and no longer cut by a value' => sub {
+	my @strings = corpus($PREFIX, "Parameter 'lang' ", '(x) ', 'regex ', 'error: ', 'must match ', ' ', "\n", 'at x line 3.');
+	my $differ = 0;
+	foreach my $string (@strings) {
+		(my $old = $string) =~ s/$OLD_VALIDATOR//;
+		(my $new = $string) =~ s/$NEW_VALIDATOR//;
+		$differ++ if($old ne $new);
+	}
+	is($differ, 0, "$SAMPLES generated messages: no difference");
+
+	my $nested = "${PREFIX}Parameter 'lang' regex 'p' error: ${PREFIX}Parameter 'lang' (A1) must match";
+	(my $innermost = $nested) =~ s/$NEW_VALIDATOR//;
+	is($innermost, "Parameter 'lang' (A1) must match", 'a nested message: only the innermost is kept');
+
+	throws_ok { Test::Log::Abstraction->new(lang => 'x validate_strict: y') } qr/invalid argument: Parameter 'lang' \(x validate_strict: y\) must match/, 'a value holding validate_strict: is shown whole, with the name';
+};
+
 # ===========================================================================
 # 2. Linear on hostile input, through the module's public behaviour
 # ===========================================================================
@@ -177,6 +203,15 @@ subtest 'lang: a long tail that fails at the end' => sub {
 	within_budget('de_ + a million letters + !', sub { eval { Test::Log::Abstraction->new(lang => 'de_' . ('a' x $HUGE) . '!') } });
 	within_budget('de_ + a million separators + !', sub { eval { Test::Log::Abstraction->new(lang => 'de_' . ('.-@' x ($HUGE / 3)) . '!') } });
 	is(Test::Log::Abstraction->new(lang => 'de_DE.UTF-8@euro')->lang(), 'de', 'and still accepts a full locale name');
+};
+
+subtest 'validator prefix: values built to make it backtrack' => sub {
+	# The value is quoted in the validator's message, so each of these
+	# reaches the prefix pattern through a rejected country
+	within_budget('a million almost-prefixes', sub { eval { Test::Log::Abstraction->new(country => 'Params::Validate::Strict line ' x ($HUGE / 30)) } });
+	within_budget('a prefix with a million digits and no colon', sub { eval { Test::Log::Abstraction->new(country => 'Params::Validate::Strict line ' . ('9' x $HUGE)) } });
+	within_budget(q{a million bare 'validate_strict:'}, sub { eval { Test::Log::Abstraction->new(country => 'validate_strict: ' x ($HUGE / 17)) } });
+	throws_ok { Test::Log::Abstraction->new(country => 'XYZ') } qr/invalid argument: Parameter 'country' \(XYZ\) must match/, 'and a plain bad value is still reported in full';
 };
 
 done_testing();

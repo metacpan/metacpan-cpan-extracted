@@ -7,7 +7,7 @@ use parent 'Twilio::CredentialProvider::ClientCredentialProvider';
 
 use Twilio::Http::BearerToken::OrgsTokenManager;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub token_manager_class { return 'Twilio::Http::BearerToken::OrgsTokenManager' }
 

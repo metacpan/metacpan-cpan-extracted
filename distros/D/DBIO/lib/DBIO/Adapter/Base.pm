@@ -4,7 +4,7 @@ package DBIO::Adapter::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Carp qw/croak/;
 use namespace::clean;
@@ -34,7 +34,7 @@ DBIO::Adapter::Base - per-driver base->native column type resolver (one-way)
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 METHODS
 

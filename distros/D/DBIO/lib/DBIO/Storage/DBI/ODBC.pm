@@ -3,7 +3,7 @@ package DBIO::Storage::DBI::ODBC;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -85,7 +85,7 @@ DBIO::Storage::DBI::ODBC - Base class for ODBC drivers
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

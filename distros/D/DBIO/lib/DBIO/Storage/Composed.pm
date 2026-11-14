@@ -4,7 +4,7 @@ package DBIO::Storage::Composed;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use mro;
 use B ();
@@ -161,7 +161,7 @@ DBIO::Storage::Composed - Runtime C3 composition of storage extension layers ove
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::Deploy::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 our $CONTRACT_VERSION = '1.3';
 
@@ -565,7 +565,7 @@ DBIO::Deploy::Base - Base class for DBIO driver deploy orchestrators
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

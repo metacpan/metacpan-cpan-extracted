@@ -14,9 +14,9 @@ foreach my $test (@tests) {
   my $freq    = $test->[1];
   $rf->channel($channel);
   if ($rf->channel_type eq 'dl') {
-    is($freq, $rf->fdl, 'downlink');
+    is($freq, $rf->fdl, "Channel: $channel (downlink), Freq: $freq");
   } elsif ($rf->channel_type eq 'ul') {
-    is($freq, $rf->ful, 'uplink');
+    is($freq, $rf->ful, "Channel: $channel (uplink), Freq: $freq");
   } else {
     ok(0, $rf->channel_type);
   }

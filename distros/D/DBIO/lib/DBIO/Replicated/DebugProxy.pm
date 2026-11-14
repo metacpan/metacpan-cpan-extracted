@@ -4,7 +4,7 @@ package DBIO::Replicated::DebugProxy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Scalar::Util 'reftype';
 use DBIO::Util ();
@@ -86,7 +86,7 @@ DBIO::Replicated::DebugProxy - Prefix trace output with replicated backend ident
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

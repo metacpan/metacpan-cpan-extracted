@@ -161,7 +161,7 @@ for my $case (
   is_deeply $backend->{captured}, [ qw(BEGIN INSERT ROLLBACK) ],
     "$label statement, ROLLBACK fails: ROLLBACK was sent, COMMIT was not";
   is_deeply $backend->pool->{release_log} || [], [],
-    "$label statement, ROLLBACK fails: the connection is retired, never handed back (karr k395)";
+    "$label statement, ROLLBACK fails: the connection is retired, never handed back";
 }
 
 # ---------------------------------------------------------------------------
@@ -195,7 +195,7 @@ for my $case (
     is_deeply $backend->{captured}, [ qw(BEGIN ROLLBACK) ],
       "$label: ROLLBACK was sent, COMMIT was not";
     is_deeply $backend->pool->{release_log} || [], [],
-      "$label: the connection is retired, never handed back (karr k395)";
+      "$label: the connection is retired, never handed back";
   }
 }
 

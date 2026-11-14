@@ -303,7 +303,7 @@ for my $kind (qw(longmess confess)) {
   __PACKAGE__->storage_type('+T::K311::NoSuchStorage');
   __PACKAGE__->exception_action(sub { no warnings 'exiting'; last K311_JUMPED });
 
-  package DBIO::K311Probe::Carping;
+  package DBIO::StackProbe::Carping;
   use base 'DBIO::Base';
   use DBIO::Carp;
   sub connection {
@@ -312,9 +312,9 @@ for my $kind (qw(longmess confess)) {
     return $self->next::method(@_);
   }
 
-  package DBIO::K311Probe::Schema;
+  package DBIO::StackProbe::Schema;
   use base 'DBIO::Schema';
-  __PACKAGE__->load_components('+DBIO::K311Probe::Carping');
+  __PACKAGE__->load_components('+DBIO::StackProbe::Carping');
   __PACKAGE__->storage_type('+DBIO::Test::Storage');
 }
 
@@ -375,9 +375,9 @@ my %SITES = (
   'DBIO::Carp with the whole stack as callsite' => sub {
     my @warned;
     {
-      package DBIO::K311Probe;
+      package DBIO::StackProbe;
       local $SIG{__WARN__} = sub { push @warned, @_ };
-      DBIO::K311Probe::Schema->connect(@DBI);
+      DBIO::StackProbe::Schema->connect(@DBI);
     }
     join '', @warned;
   },
@@ -387,7 +387,10 @@ for my $verbose (0, 1) {
   for my $site (sort keys %SITES) {
     my $what = "$site, \$Carp::Verbose = $verbose";
     local $Carp::Verbose = $verbose;
-    my $trace = $SITES{$site}->();
+    # The sites are called from a DBIO package: a carp names the place of the
+    # caller outside DBIO, and only where there is none does it write the whole
+    # stack. A call from main would be that place.
+    my $trace = do { package DBIO::StackProbe; $SITES{$site}->() };
 
     ok defined $trace && $trace =~ /\bcalled at\b/, "$what: there is a stack trace" or diag $trace;
     unlike $trace, $SECRET, "$what: ... without the password";

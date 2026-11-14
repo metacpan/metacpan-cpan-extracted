@@ -1,0 +1,5 @@
+#!include_default
+\.tar(?:\.gz)?$
+^LibTmux-[0-9]
+^LibTmux-(?:Async|Workspace)-[0-9]
+^t/integration/

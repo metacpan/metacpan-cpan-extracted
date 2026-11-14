@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Lyrics;
 
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -42,7 +42,7 @@ DBIO::Test::Schema::Lyrics - Test result class for the lyrics table
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

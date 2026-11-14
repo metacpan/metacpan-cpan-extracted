@@ -150,4 +150,20 @@ sub mentions { my ($v, $re, $what) = @_; ok(scalar(grep { /$re/ } @$v), $what) o
   like $err, qr/mutator2.*changed its input/s, 'with the violation as diagnostics';
 }
 
+# --- results holding a code reference or a regexp are compared, not frozen ----------
+{
+  my %ext = (extensions => [qw(TestDBIO::Extension::Age TestDBIO::Extension::PostGIS)]);
+  my $sub = sub { 1 };
+  is_deeply [ extension_set_violations(%base, %ext, diff => sub { [ $sub, qr/a/i ] }) ], [],
+    'the same code reference and an equal regexp in every result are no violation';
+
+  my $n = 0;
+  my @bad = extension_set_violations(%base, %ext, diff => sub { [ $n++ % 2 ? qr/a/ : qr/b/ ] });
+  ok scalar(@bad), 'a regexp that differs between runs is a violation';
+  like $bad[0], qr/differs from .* in statements/, 'in the statements';
+
+  my @subs = extension_set_violations(%base, %ext, diff => sub { my $m = $n++; [ sub { $m } ] });
+  ok scalar(@subs), 'a code reference that differs between runs is a violation';
+}
+
 done_testing;

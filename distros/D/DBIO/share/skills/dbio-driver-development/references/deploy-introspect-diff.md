@@ -52,13 +52,14 @@ Split DDL with `DBIO::SQL::Util::_split_statements`, never a private `split /;/`
   index and attribute — never silently simplified. Optional `index_type` (ADR 0052) is
   filled on both sides (introspect and desired model) or not at all.
 - **Conformance** (ADR 0060): `DBIO::Test::Conformance` is the shared case table for the
-  areas DDL, Diff and Bind (the DDL list ships; Diff and Bind follow). The driver ships
-  `DBIO::<X>::Test::Conformance`, a subclass, with `conformance_refusals`
-  (`kind => 'server'|'pending'`, pending carries a card) and `conformance_answered_through`
-  (the `table_version` its answers were written against; newer cases are red only under
+  areas DDL, Diff and Bind. The driver ships `DBIO::<X>::Test::Conformance`, a subclass,
+  which declares `conformance_refusals` (per case: `kind => 'server'|'pending'` and a
+  `reason` regex; pending: the driver cannot do it yet), `conformance_refused_areas` (an area the driver does not do, `Diff` or
+  `Bind`, with the same `kind`) and `conformance_answered_through` (per area, the
+  `table_version` its answers were written against; newer cases are red only under
   `AUTHOR_TESTING`/`RELEASE_TESTING`). Every case ends *correct* or *refuses*; there is no
-  declared deviation. Test files call `->run('DDL')`. The async transport dists run the
-  Bind list over their transport.
+  declared deviation. Test files call `->run('DDL')`, `->run('Diff')` and `->run('Bind')`;
+  the async transport dists run `Bind` over their transport.
 
 ## Errors
 

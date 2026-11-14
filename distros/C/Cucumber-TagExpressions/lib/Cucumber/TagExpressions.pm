@@ -1,6 +1,6 @@
 
 package Cucumber::TagExpressions;
-$Cucumber::TagExpressions::VERSION = '11.0.1';
+$Cucumber::TagExpressions::VERSION = '11.1.0';
 =head1 NAME
 
 Cucumber::TagExpressions - Tag expression parser

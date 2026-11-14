@@ -68,8 +68,8 @@ Both bridges enable `strict` and `warnings` in the caller themselves — do not 
 
 ## Boundaries
 
-- ❌ Don't use Moo/Moose for core/storage/broker classes → CAG, [[dbio-perl-class-patterns]].
-- ✅ Cpanfile: Moo/Moose/MooX::NonMoose/MooseX::* are `suggests`, never `requires`.
+- Core, storage and broker classes are CAG → [[dbio-perl-class-patterns]].
+- Cpanfile: Moo/Moose/MooX::NonMoose/MooseX::* are `suggests`, never `requires`.
 - Pure-Perl/style rules still apply → [[dbio-perl-syntax]].
 
 Source of truth: `lib/DBIO/Moo.pm`, `lib/DBIO/Moose.pm`,

@@ -4,7 +4,7 @@ package DBIO::Ordered;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base qw( DBIO::Base );
 
@@ -486,7 +486,7 @@ DBIO::Ordered - Maintain a position column over an ordered list of rows
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

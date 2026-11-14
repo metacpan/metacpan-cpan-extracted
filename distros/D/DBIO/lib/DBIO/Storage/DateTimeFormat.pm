@@ -4,7 +4,7 @@ package DBIO::Storage::DateTimeFormat;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Base';
 
@@ -125,7 +125,7 @@ DBIO::Storage::DateTimeFormat - Strptime-backed datetime format base for driver 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 
@@ -188,8 +188,10 @@ Optional strptime patterns backing L</parse_date> and L</format_date>.
 
     my $parser = $class->_strptime_for($slot, $accessor);
 
-Internal: builds (and caches) the L<DateTime::Format::Strptime> object that
-backs the public C<parse_*> / C<format_*> helpers.
+Builds (and caches) the L<DateTime::Format::Strptime> object that backs the
+public C<parse_*> / C<format_*> helpers. A driver format class calls it from a
+C<parse_E<lt>typeE<gt>> / C<format_E<lt>typeE<gt>> pair of its own, as in
+L</Offering a type of its own>.
 
 The strptime dependency is loaded B<lazily>, not at compile time: a bare
 DBIO install that never inflates a DateTime column carries no
@@ -230,6 +232,43 @@ C<date_parse_pattern> to be set.
 Like L</format_datetime> for plain dates. Delegates to the preferred format
 class only when it implements C<format_date>; otherwise requires
 C<date_format_pattern> to be set.
+
+=head2 Offering a type of its own
+
+L<DBIO::InflateColumn::DateTime> sends a column of type C<datetime2> to
+C<parse_datetime2> and C<format_datetime2> of the storage's parser when the
+parser has them (see L<DBIO::InflateColumn::DateTime/One channel per column type>
+for how the type name is formed). A format class offers such a type by
+defining the two methods. They may read their strptime patterns from class data
+of their own, through the same helper the base class uses:
+
+  __PACKAGE__->mk_group_accessors('inherited' =>
+    qw/datetime2_parse_pattern datetime2_format_pattern/);
+  __PACKAGE__->datetime2_parse_pattern('%Y-%m-%d %H:%M:%S.%7N');
+  __PACKAGE__->datetime2_format_pattern('%Y-%m-%d %H:%M:%S.%7N');
+
+  sub parse_datetime2 {
+    my ($class, $value) = @_;
+    return $class->_strptime_for(datetime2_parse => 'datetime2_parse_pattern')
+      ->parse_datetime($value);
+  }
+
+  sub format_datetime2 {
+    my ($class, $dt) = @_;
+    return $class->_strptime_for(datetime2_format => 'datetime2_format_pattern')
+      ->format_datetime($dt);
+  }
+
+A time of day is offered the same way: C<parse_time> and C<format_time> serve a
+C<time> and a C<time without time zone> column, C<parse_timetz> and
+C<format_timetz> (or the pair of the type's own channel) a type with a time zone.
+Whatever date the parser returns, the inflating component stands the value on
+1970-01-01; the pair needs to carry only the time (and the offset).
+
+The base class does not create these methods or their pattern accessors; it
+only provides the pair for C<datetime> and the pair for C<date>. A class that
+defines C<parse_datetime2> without C<format_datetime2> is read on the
+C<datetime2> channel and written through C<format_datetime>.
 
 =head1 AUTHOR
 

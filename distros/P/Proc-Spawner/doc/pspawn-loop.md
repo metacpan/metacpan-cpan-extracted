@@ -62,7 +62,7 @@ completion port receives every event.
 | Wine | `alarm 1` during a wait | `%SIG{ALRM}` handler at 1.02 s |
 | Wine, with a console | `%SIG{INT}` at its default; `IGNORE` | the process ends with Perl's "Terminating on signal SIGINT(2)"; the loop goes on |
 | Wine | [`t/loop.t`](../t/loop.t)'s Ctrl-C test | 18 of 18 with a console; skipped without one |
-| Wine | `perl Makefile.PL`, `gmake`, `gmake test` of `t/loop.t`, `t/windows.t`, `t/parsers.t`, `t/programs.t` with Strawberry Perl's own gcc | pass, no warning |
+| Wine | `perl Makefile.PL`, `gmake`, `gmake test` of [`t/loop.t`](../t/loop.t), [`t/windows.t`](../t/windows.t), [`t/parsers.t`](../t/parsers.t), [`t/programs.t`](../t/programs.t) with Strawberry Perl's own gcc | pass, no warning |
 
 Wine has a console only on a terminal: these runs used a pseudo-terminal (`script`), and ran Perl directly, since
 `cmd.exe` gets the Ctrl-C too and ends (the tricks repository's Wine topic has the details).

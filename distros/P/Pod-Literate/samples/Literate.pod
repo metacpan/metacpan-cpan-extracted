@@ -11,7 +11,7 @@ This specification describes
 
 
 	< Literate Version >=
-	our $VERSION='0.0.3';
+	our $VERSION='0.0.4';
 
 
 =head1 DESCRIPTION
@@ -114,7 +114,7 @@ The C<for> paragraph behaves slightly differently from begin/end.  In the case o
 
 
 	< Set target from for >=
-	my $s=$collected; $s=~s/^\+//;
+	my $s=$collected; $s=~s/^\+//; $s=~s/\n$//s;
 	$self->targetSet($s);
 	$self->initCollection();
 
@@ -131,7 +131,7 @@ Leading and trailing spaces are ignored, but otherwise only the sequence C<E<gt>
 	< The section name regexp >=
 	my $tagL='#<';
 	my $tagR='>#';
-	my $reSection=qr/$tagL\s*(.+?)\s*$tagR/;
+	my $reSection=qr/$tagL\h*(.+?)\h*$tagR/;
 
 
 =head1 TANGLE
@@ -160,10 +160,10 @@ Building a single section requires replacing the section name references with th
 		my $section=$$self{$cache}{section}{$name};
 		foreach my $import (keys %{$$self{$cache}{dep}{$name}}) {
 			my $re=sectionRegexp($import);
-			my $code=$$self{$cache}{section}{$import}; $code=~s/\n+$//s;
-			while($section=~/^(\s*)$re\s*$/m) {
+			my $code=$$self{$cache}{section}{$import}; $code=~s/\n$//s;
+			while($section=~/^(\h*)$re\h*$/m) {
 				my $icode=indent($code,$1);
-				$section=~s/^\s*$re\s*$/$icode/em;
+				$section=~s/^\h*$re\h*$/$icode/em;
 			}
 			$section=~s/$re/$code/ge;
 		}
@@ -255,21 +255,21 @@ The output filename is chosen by specifying the target filename in a C<=for> com
 
 	< Handle tangle target >=
 	if(($mode eq 'command')&&($collected=~/^target=(.+)$/)) {
-		$$self{$cache}{ofn}=$1;
+		push @{$$self{$cache}{ofn}},$1;
 		$self->clearCollection();
 	}
 	elsif(($mode eq '=for')&&($collected=~/^target:(.+)$/)) {
 		print STDERR "=for literate target: is deprecated; use =for literate:command\n";
-		$$self{$cache}{ofn}=$1;
+		push @{$$self{$cache}{ofn}},$1;
 		$self->clearCollection();
 	}
 
 
-As the output filename is itself a named section, creating the output file is a simple matter of writing that section.
+An output filename is itself a named section, so creating the output file is a simple matter of writing that section.  Moreover, multiple targets may be specified to write multiple files.
 
 
 	< Write the output file >=
-	if(my $ofn=$$self{$cache}{ofn}) {
+	foreach my $ofn (@{$$self{$cache}{ofn}}) {
 	if(my $oft=$self->section($ofn)) {
 		open(my $fh,'>',$ofn) or die "open: $!";
 		print $fh $oft;
@@ -288,13 +288,16 @@ The C<perlpod> format is provided in a basic module, C<Pod::Literate>:
 	#< Literate Version >#
 	use strict;
 	use warnings;
+
 	#< Name the cache          >#
 	#< The section name regexp >#
+
 	#< Constructor             >#
 	#< Accessors and Setters   >#
 	#< POD Handlers            >#
 	#< Tangle Methods          >#
 	1;
+
 	__END__
 
 
@@ -316,7 +319,6 @@ A subclass of L<Pod::Simple> must implement handlers for the start and end of co
 		my ($self,$element,$attribute)=@_;
 		if($element eq 'for') {
 			my ($mode,$collected)=@{$$self{$cache}}{qw/mode collector/};
-			$collected=~s/\n$//s;
 			#< Handle tangle target  >#
 			#< Handle an end element >#
 		}
@@ -348,7 +350,7 @@ After the period is grabbed, the end event will need to clear the collector.
 
 
 	< Handle an end element >=
-	elsif(($mode eq '=for')&&($collected eq '.')) {
+	elsif(($mode eq '=for')&&($collected eq ".\n")) {
 		$self->clearCollection();
 	}
 
@@ -431,7 +433,7 @@ It is checked during initialization just in case:
 	< Initialize the cache >=
 	if(exists($$self{$cache})) { die 'Basic Pod::Simple object unexpectedly contains the Pod::Literate cache key' }
 	$$self{$cache}={
-		ofn      =>{},    # the output filename for the tangled application
+		ofn      =>[],    # the output filenames for the tangled application
 		section  =>{},    # the collection of named sections
 		mode     =>'',    # scanning mode, to distinguish begin/for tags
 		target   =>undef, # defined and destroyed while scanning
@@ -508,7 +510,7 @@ Also during tangle operations, it is important to exactly match section referenc
 	< A regular expression for a specific section >=
 	sub sectionRegexp {
 		my ($name)=@_;
-		return qr/$tagL\s*\Q$name\E\s*$tagR/;
+		return qr/$tagL\h*\Q$name\E\h*$tagR/;
 	}
 
 
@@ -537,7 +539,7 @@ Text is collected in an instance variable
 	}
 
 
-The collected text can be retrieved in a form suitable for inclusion in a section reference.
+The collected text can be retrieved in a form suitable for inclusion in a section reference.  Notice that each collected data paragraph necessarily contains a blank line prior to the C<=end> or C<=for literate .> command, but that extra newline is only removed during tangling.
 
 
 	< A method to format collected text >=
@@ -566,7 +568,7 @@ The first line of a section defines the indent level.
 	< A method to remove leading indents >=
 	sub unindent {
 		my ($s)=@_;
-		if($s=~/^(\s+)/) {
+		if($s=~/^(\h+)/) {
 			my $indent=$1;
 			$s=~s/^\Q$indent\E//mg;
 		}
@@ -594,6 +596,92 @@ The element end C<attr> does contain really=for, but no information during the e
 
 =end NOTE
 
+=head1 SCRIPTS
+
+=head2 Tangle
+
+A straightforward script provides for parsing files containing C<literate> format specifiers.
+
+
+
+	< podtangle.pl >=
+	#< Perl script header >#
+	use Pod::Literate;
+	## No options at this time
+	#< Tangle from file >#
+
+
+As L<Pod::Literate> extends L<Pod::Simple>, it is straightforward to declare acceptable format names and pass to the existing file parser.
+
+
+	< Tangle from file >=
+	my $parser=Pod::Literate->new();
+	$parser->accept_targets('literate','literate:command');
+	$parser->expand_verbatim_tabs(0);
+	$parser->parse_from_file(shift(@ARGV));
+
+
+=head2 Weave
+
+A more complex C<weave> command may be provided in the future.  At this time, however, it is a simple matter to strip any unneeded literate format specifiers and include titling for named sections.
+
+
+
+	< podweave.pl >=
+	#< Perl script header >#
+	my ($title);
+	while(<>) {
+		if(0) { 1 }
+		#< Weave ignores target commands >#
+		#< Weave ignores ending commands >#
+		#< Weave captures section names >#
+		#< Weave appends section names >#
+		else { print }
+	}
+
+
+The section names are gathered either from C<begin> or C<for> commands to be added to the code in the following data paragraph.
+
+
+	< Weave captures section names >=
+	elsif(/^=begin\h+literate\h+\+?(\H.*?)\h*$/) { $title=$1 }
+	elsif(/^=for\h+literate\h+\+?(\H.*?)\h*$/)   { $title=$1 }
+
+
+If a section name has been declared and a code line is encountered, the title is appended before the data paragraph
+
+
+	< Weave appends section names >=
+	elsif($title&&/^(\h*)\S/) { print "$1< $title >=\n$_"; undef($title) }
+
+
+Any target commands can be removed.
+
+
+	< Weave ignores target commands >=
+	elsif(/^=for +literate:command +target=/)  { 1 }
+	elsif(/^=for +literate +target:/)          { 1 } # deprecated
+
+
+The ending indicates can both be removed, since the end of the associated code sections currently clearly identify the end of the data paragraphs.
+
+
+	< Weave ignores ending commands >=
+	elsif(/^=end\h+literate/)                   { undef($title) }
+	elsif(/^=for\h+literate\h+\.\h*$/)          { undef($title) }
+
+
+=head2 Common functionality
+
+Basic Perl scripts all start the same way
+
+
+	< Perl script header >=
+	#!/usr/bin/perl
+	use strict;
+	use warnings;
+
+
 =head1 TODO
 
 The following are being considered.  No particular priority order here.
@@ -611,9 +699,9 @@ The names are clear within the specification, but the generated POD doesn't cont
 
 Documents may appear in sections, and one large POD can become difficult to manage.  With a specialized weave command, it would be sensible to support imports.
 
-=item todo Handle multiple output filenames
+=item done Handle multiple output filenames
 
-The C<target=filename> can simmply set the output and all subsequent sections will be collected therein.  If another filename is encountered, the scanner will start putting sections there.  With an C<import> statement, the filenames would be fairly well scoped, and perhaps C<import> should explicitly scope any set filename.
+The C<target=filename> may be called multiple times to specify separate output filenames.  Each target must have a section with a matching name.  During tangling, the sections are written in turn.
 
 =item done First line indentation is removed, to match indentation at the point of reference
 

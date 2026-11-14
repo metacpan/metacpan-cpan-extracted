@@ -45,7 +45,10 @@ my $XML_DECLARATION = qr{<[?]xml version="1[.]0" encoding="UTF-8"[?]>};
 my %EXAMPLE         = examples('lib/Twilio/Manual.pod');
 my %MESSAGE = (sid => 'SM123', account_sid => 'ACxx', from => '+15017122661', to => '+15558675310');
 my %CHECK   = checks();
-my $has_mojo = eval { require Mojolicious; require Test::Mojo; 1 };
+
+# Test::Mojo takes the Mojo::File of an application script, as mojo_app passes it, since
+# Mojolicious 7.93; an older one takes it for an application and dies.
+my $has_mojo = eval { require Mojolicious; Mojolicious->VERSION('7.93'); require Test::Mojo; 1 };
 
 # multi_param, which the manual uses, came in CGI 4.08; Perl 5.16 ships CGI 3.59.
 my $has_cgi = eval { require CGI; CGI->VERSION('4.08'); 1 };
@@ -391,7 +394,7 @@ sub run_cgi {
 sub mojo_app {
   my ($code) = @_;
   if (!$has_mojo) {
-    plan skip_all => 'Mojolicious is not installed';
+    plan skip_all => 'Mojolicious 7.93 or later is not installed';
     return;
   }
   my $file = File::Spec->catfile(tempdir(CLEANUP => 1), 'app.pl');

@@ -174,6 +174,75 @@ chdir $dir;
   local $ENV{PROC_SHELLSPAWN_ECHO} = 'zsh';
   like $try_sh->('echo x'), qr/^PROC_SHELLSPAWN_ECHO: 'zsh' is none of coreutils, dash, bash$/m, 'PROC_SHELLSPAWN_ECHO: an unknown value dies' }
 
+# X44: cd into a directory without search permission fails, as both shells (root may enter any; Windows: no such bit)
+SKIP: { skip 'root may enter any directory, Windows has no search bit', 1 if $> == 0 || $WIN;
+  mkdir "$dir/x44" or die; chmod 0, "$dir/x44";
+  my $f = "$dir/x44-cmd"; open my $h, '>', $f or die; print $h 'cd x44; echo "st=$?"'; close $h;
+  local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), "sh: cd: can't cd to x44\nst=2\n", 'cd into a directory not searchable (X44)';
+  chmod 0755, "$dir/x44" }
+
+# X48: return outside a function is an error, as bash --posix (rule E): where its status is tested (&&, ||, !, if, while)
+# status 2 and the shell goes on; elsewhere the shell ends, status 2 (found by large-subset-difffuzz.pl)
+{ my $m = "sh: return: can only `return' from a function or sourced script\n";
+  for (['return || echo o; echo n', "${m}o\nn\n", 0], ['if return; then :; fi; echo n', "${m}n\n", 0],
+       ['return 3 && echo a; echo "n $?"', "${m}n 2\n", 0], ['! return; echo "n $?"', "${m}n 0\n", 0],
+       ['return; echo n', $m, 2], ['echo a && return; echo n', "a\n$m", 2]) {
+    my ($s, $out, $st) = @$_; my $f = "$dir/x48-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    local $ENV{TRY_FILE} = $f; my $got = `"$^X" "$try" 2>&1`;
+    is "$got|" . ($? >> 8), "$out|$st", "return outside a function, as bash (X48): $s" } }
+
+# X49: a signal ignored on entry cannot be trapped or reset, and kill ... $$ with it does nothing (POSIX; both shells)
+SKIP: { skip 'no SIGINT to ignore on Windows', 2 if $WIN;
+  for (['trap "echo int" INT; kill -INT $$; echo after', "after\n"], ['kill -INT $$; echo after', "after\n"]) {
+    my ($s, $out) = @$_; my $f = "$dir/x49-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    local $ENV{TRY_FILE} = $f; open my $p, '-|', $^X, '-e', '$SIG{INT} = "IGNORE"; exec $^X, @ARGV', $try or die;
+    my $got = do { local $/; <$p> } // ''; close $p;
+    is $got, $out, "SIGINT ignored on entry (X49): $s" } }
+
+# X50: an expansion error inside a here-document (set -u, ${x:?}, arithmetic) fails that redirection, as dash: the
+# command does not run, status 2, the shell goes on; the message and a $( ) in it go through the redirections so far;
+# with a special builtin (:) the shell ends (found by large-subset-difffuzz.pl)
+{ my $m = "sh: x: parameter not set\n";
+  for (["set -u; cat <<E\n\$x\nE\necho after:\$?", "${m}after:2\n", 0], ["set -u; f() { echo ran; }; f <<E\n\$x\nE\necho after:\$?", "${m}after:2\n", 0],
+       ["set -u; cat 2>/dev/null <<E\n\$x\nE\necho after:\$?", "after:2\n", 0], ["cat 2>/dev/null <<E\n\$((1/0))\nE\necho after:\$?", "after:2\n", 0],
+       ["cat <<E 2>/dev/null\n\${x:?boom}\nE\necho after:\$?", "sh: x: boom\nafter:2\n", 0], ["set -u; : <<E\n\$x\nE\necho after", $m, 2],
+       ["x=1; cat <<E\na \$x\nE\necho after:\$?", "a 1\nafter:0\n", 0]) {
+    my ($s, $out, $st) = @$_; my $f = "$dir/x50-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    local $ENV{TRY_FILE} = $f; my $got = `"$^X" "$try" 2>&1`;
+    is "$got|" . ($? >> 8), "$out|$st", "expansion error in a here-document, as dash (X50): " . ($s =~ s/\n/|/gr) } }
+
+# X51: a trapped signal's action runs after the foreground command, also when the command runs in this process (a
+# pipeline of builtins); a trap set in a subshell does not replace the main shell's (both shells: another process)
+for (['trap "echo int" INT; kill -INT $$ | while getopts ab: o -a -b v; do echo $o; done', "a\nb\nint\n"],
+     ['trap "echo int" INT; kill -INT $$ | trap "echo int" INT; kill -INT $$ | true; echo end', "int\nint\nend\n"],
+     ['trap "echo main" INT; (trap "echo sub" INT; kill -INT $$; echo in-sub); echo after', "in-sub\nmain\nafter\n"],
+     ['trap "echo int" INT; x=$(kill -INT $$); echo after', "int\nafter\n"], ['trap "echo int" INT; { kill -INT $$; echo grp; }', "int\ngrp\n"]) {
+  my ($s, $out) = @$_; my $f = "$dir/x51-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+  local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "a trap after the foreground command (X51): $s" }
+
+# X52: a word from an unquoted expansion whose only pattern characters are escaped by a backslash is not matched
+# against files (x\* stays x\*, as both shells), with a file x* there (found by the split-and-glob probe, X27)
+{ mkdir "$dir/x52"; open my $t, '>', "$dir/x52/x*" or die; close $t;
+  for (['x="x\\*"; echo $x', "x\\*\n"], ['x="[x]\\*"; echo $x', "x*\n"], ['x="\\?"; echo $x', "\\?\n"], ['echo x\\*', "x*\n"]) {
+    my ($s, $out) = @$_; my $f = "$dir/x52-cmd"; open my $h, '>', $f or die; print $h "cd x52; $s"; close $h;
+    local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "an escaped pattern character from an expansion (X52): $s" } }
+
+# X53: a form of command the parser refuses, made only by expansions at run time: outside the subset (A4), status 248
+{ my $m = 'Proc::ShellSubset::Large: ';
+  for (['x=-n; command $x; echo no', "${m}'command -n' is not supported\n", 248], ['x="-v ls cat"; command $x', "${m}'command -v' with 2 names is not supported\n", 248],
+       ['x="-p -x"; command $x', "${m}'command -p -x' is not supported\n", 248], ['x="-p true"; command $x; echo "st=$?"', "st=0\n", 0]) {
+    my ($s, $out, $st) = @$_; my $f = "$dir/x53-cmd"; open my $h, '>', $f or die; print $h $s; close $h;
+    local $ENV{TRY_FILE} = $f; my $got = `"$^X" "$try" 2>&1`;
+    is "$got|" . ($? >> 8), "$out|$st", "command's form from expansions (X53): $s" } }
+
+# X54: cd with more operands from an expansion at run time: "too many arguments", status 1, as with them in the text (as
+# bash, rule E); dash takes the first
+{ mkdir "$dir/x54"; mkdir "$dir/x54/d";
+  for (['x="d e"; cd $x; echo "st=$?"', "sh: cd: too many arguments\nst=1\n"], ['cd d e; echo "st=$?"', "sh: cd: too many arguments\nst=1\n"],
+       ['cd $(echo d e) && pwd', "sh: cd: too many arguments\n"], ['x=d; cd $x && echo in', "in\n"], ['x=-n; cd $x; echo "st=$?"', "sh: cd: bad argument\nst=2\n"]) {
+    my ($s, $out) = @$_; my $f = "$dir/x54-cmd"; open my $h, '>', $f or die; print $h "cd x54; $s"; close $h;
+    local $ENV{TRY_FILE} = $f; is scalar(`"$^X" "$try" 2>&1`), $out, "cd with more operands from an expansion (X54): $s" } }
+
 # The shell layer: the same strings with the programs (PROC_SHELLSPAWN_INPROC=none) and with these (all, the default), where
 # the programs exist
 SKIP: {

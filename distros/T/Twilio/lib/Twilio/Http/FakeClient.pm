@@ -10,7 +10,7 @@ use Carp qw(croak);
 use Twilio::Http::Response;
 use Twilio::Json;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $options) = @_;

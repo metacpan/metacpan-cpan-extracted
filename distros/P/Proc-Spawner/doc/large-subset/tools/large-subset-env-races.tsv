@@ -1,0 +1,2 @@
+# large-subset-repeat.pl: id, environment, runs, results of dash, bash, ours, verdict (same, race, ours), runs with ours' own result
+TL:linux/zenity.md:25	base	20	2	1	1	ours	20

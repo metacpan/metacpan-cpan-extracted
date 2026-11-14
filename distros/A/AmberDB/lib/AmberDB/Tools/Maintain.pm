@@ -6,7 +6,7 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2018-10-08';
 
 sub new {
@@ -260,7 +260,7 @@ sub all_tables {
     my $schema_dir = $adb->path('schema_dir') || "";
 
     # 1. Simple Mode: Single flat directory scan for files matching configured db_ext
-    if ( $adb->config('simple') ) {
+    if ( $adb->config('use_simple') ) {
         my $ext = $adb->{db_ext} || "db";
         my @files = $adb->dir_files( $dbase_dir, "*.$ext", full_path => 0 );
         @all_tables = map { /^([a-z0-9_]+)\.\Q$ext\E$/i ? $1 : () } @files;
@@ -384,7 +384,7 @@ sub _get_key_validator {
     my $adb = $self->{_adb};
 
     my $table_info = $adb->table_info($tid);
-    my $is_simple  = $adb->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $is_simple  = $adb->config('use_simple') || ( $table_info && $table_info->{use_simple} );
     my $id_type    = $table_info ? ( $table_info->{id_type} || 'num' ) : 'num';
 
     if ($is_simple) {

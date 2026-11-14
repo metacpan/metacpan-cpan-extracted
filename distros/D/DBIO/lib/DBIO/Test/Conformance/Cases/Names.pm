@@ -4,9 +4,9 @@ package DBIO::Test::Conformance::Cases::Names;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
+use DBIO::Util ();
 
 
 my @NAMES = (
@@ -24,13 +24,12 @@ my @CASES = map {
     +{
       name  => "name-$kind-$_->[0]",
       since => 1,
-      cards => [ 'core k391' ],
       input => { kind => $kind, name => $_->[1] },
     };
   } @NAMES;
 } qw(schema extension library);
 
-sub cases { return Storable::dclone(\@CASES) }
+sub cases { return DBIO::Util::deep_copy(\@CASES) }
 
 1;
 
@@ -46,7 +45,7 @@ DBIO::Test::Conformance::Cases::Names - The shared cases for names a driver writ
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 
@@ -63,7 +62,6 @@ A case is a hash:
   {
     name  => 'name-schema-quote',      # stable id, name- prefix
     since => 1,                        # table version that added it
-    cards => [ 'core k391' ],
     input => { kind => 'schema', name => 'a"b' },
   }
 

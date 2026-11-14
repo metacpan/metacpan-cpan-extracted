@@ -3,7 +3,7 @@ package DBIO::Test::Schema::ArtistGUID;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Test::BaseResult';
 
@@ -49,7 +49,7 @@ DBIO::Test::Schema::ArtistGUID - Test result class for the artist_guid table (UN
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

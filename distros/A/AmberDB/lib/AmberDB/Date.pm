@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Encode;         # Encoding management if needed
 use Time::Local;    # Core module for time operations
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2008-02-07';
 
 # Default English Month Names
@@ -34,9 +34,6 @@ sub new {
 
     if ( $args{locale} ) {
         $self->{locale} = $args{locale};
-    }
-    elsif ( $self->can('months') && $self->can('days') ) {
-        # Already a Locale mixin (e.g. AmberDB instance)
     }
     else {
         require AmberDB::Locale;
@@ -247,9 +244,6 @@ sub date_short {
     return $self->{date_short} = $self->{date}->{short} if ref $self && $self->{date} && defined $self->{date}->{short};
     return $self->{date_short} = ( $self->day . "/" . $self->month . "/" . $self->year );
 }
-
-*str   = \&date_str;
-*short = \&date_short;
 
 sub only_time {
     my ( $self, $t ) = @_;
@@ -742,15 +736,15 @@ Returns 4-digit year, 2-digit zero-padded month (C<01..12>), or 2-digit day (C<0
 
 Returns 2-digit zero-padded hour (C<00..23>), minute (C<00..59>), or second (C<00..59>).
 
-=head2 str([$epoch]) / short([$epoch]) / only_time([$epoch])
+=head2 date_str([$epoch]) / date_short([$epoch]) / only_time([$epoch])
 
 =over 4
 
-=item * C<short>: Returns C<"DD/MM/YYYY"> format.
+=item * C<date_short>: Returns C<"DD/MM/YYYY"> format.
 
 =item * C<only_time>: Returns C<"HH:MM:SS"> format.
 
-=item * C<str>: Returns combined C<"DD/MM/YYYY - HH:MM:SS"> format.
+=item * C<date_str>: Returns combined C<"DD/MM/YYYY - HH:MM:SS"> format.
 
 =back
 

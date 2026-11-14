@@ -19,6 +19,19 @@ use VPNDetectionTest::Origin;
 # The Perl-specific surface, as distinct from the shared corpus in
 # t/02-conformance.t.
 
+subtest 'a served is_bogon reaches the result' => sub {
+    my $origin = VPNDetectionTest::Origin->new(sub {
+        my ($c) = @_;
+        my $ip = substr $c->req->url->path->to_string, 1;
+        $c->render(json => {ip => $ip, is_bogon => ($ip eq '8.8.8.8' ? \1 : \0), is_vpn => \0});
+    });
+    my $client = VPNDetection->new(base_url => $origin->url, cache_size => 0);
+
+    is($client->lookup('8.8.8.8')->is_bogon, 1, 'a served true is read');
+    is($client->lookup('8.8.4.4')->is_bogon, 0, 'a served false is read');
+    is($origin->count, 2, 'both were served, neither computed');
+};
+
 subtest 'a batch honors the per-call concurrency, measured as peak in flight' => sub {
     # Peak in flight is the only measurement that separates a real ceiling from
     # an option that was accepted and ignored: counting total requests passes

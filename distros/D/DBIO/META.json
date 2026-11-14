@@ -42,6 +42,11 @@
             "File::ShareDir::Install" : "0.06"
          }
       },
+      "develop" : {
+         "recommends" : {
+            "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
+         }
+      },
       "runtime" : {
          "recommends" : {
             "DateTime" : "0.55",
@@ -49,12 +54,13 @@
             "Lingua::EN::Inflect" : "0"
          },
          "requires" : {
+            "Carp" : "1.38",
             "Carp::Clan" : "6.08",
             "Class::Accessor::Grouped" : "0.10014",
             "Class::C3::Componentised" : "1.001002",
             "Context::Preserve" : "0.03",
             "Crypt::URandom" : "0",
-            "DBI" : "1.57",
+            "DBI" : "1.634",
             "DateTime::Tiny" : "1.08",
             "Devel::GlobalDestruction" : "0.14",
             "Digest::SHA" : "0",
@@ -105,735 +111,739 @@
    "provides" : {
       "DBIO" : {
          "file" : "lib/DBIO.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::AccessBroker" : {
          "file" : "lib/DBIO/AccessBroker.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::AccessBroker::HostBound" : {
          "file" : "lib/DBIO/AccessBroker/HostBound.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::AccessBroker::Static" : {
          "file" : "lib/DBIO/AccessBroker/Static.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::AccessBroker::Vault" : {
          "file" : "lib/DBIO/AccessBroker/Vault.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Adapter::Base" : {
          "file" : "lib/DBIO/Adapter/Base.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Admin" : {
          "file" : "lib/DBIO/Admin.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Base" : {
          "file" : "lib/DBIO/Base.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Cake" : {
          "file" : "lib/DBIO/Cake.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Candy" : {
          "file" : "lib/DBIO/Candy.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Candy::Exports" : {
          "file" : "lib/DBIO/Candy/Exports.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Carp" : {
          "file" : "lib/DBIO/Carp.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ChangeLog" : {
          "file" : "lib/DBIO/ChangeLog.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ChangeLog::Entry" : {
          "file" : "lib/DBIO/ChangeLog/Entry.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ChangeLog::Schema" : {
          "file" : "lib/DBIO/ChangeLog/Schema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ChangeLog::Set" : {
          "file" : "lib/DBIO/ChangeLog/Set.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ChangeLog::Table" : {
          "file" : "lib/DBIO/ChangeLog/Table.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Componentised" : {
          "file" : "lib/DBIO/Componentised.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Core" : {
          "file" : "lib/DBIO/Core.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Cursor" : {
          "file" : "lib/DBIO/Cursor.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Deploy::Base" : {
          "file" : "lib/DBIO/Deploy/Base.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Deploy::Base::TempDatabase" : {
          "file" : "lib/DBIO/Deploy/Base/TempDatabase.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler" : {
          "file" : "lib/DBIO/DeploymentHandler.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::Dad" : {
          "file" : "lib/DBIO/DeploymentHandler/Dad.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::DeployMethod::Native" : {
          "file" : "lib/DBIO/DeploymentHandler/DeployMethod/Native.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::HandlesDeploy" : {
          "file" : "lib/DBIO/DeploymentHandler/HandlesDeploy.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::HandlesVersionStorage" : {
          "file" : "lib/DBIO/DeploymentHandler/HandlesVersionStorage.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::HandlesVersioning" : {
          "file" : "lib/DBIO/DeploymentHandler/HandlesVersioning.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::VersionHandler::Monotonic" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionHandler/Monotonic.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard::Component" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard/Component.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard::VersionResult" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard/VersionResult.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::DeploymentHandler::VersionStorage::Standard::VersionResultSet" : {
          "file" : "lib/DBIO/DeploymentHandler/VersionStorage/Standard/VersionResultSet.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Diff::Base" : {
          "file" : "lib/DBIO/Diff/Base.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Diff::Compare" : {
          "file" : "lib/DBIO/Diff/Compare.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Diff::Op" : {
          "file" : "lib/DBIO/Diff/Op.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::EncodedColumn" : {
          "file" : "lib/DBIO/EncodedColumn.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Exception" : {
          "file" : "lib/DBIO/Exception.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Exception::Server" : {
          "file" : "lib/DBIO/Exception/Server.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Extension" : {
          "file" : "lib/DBIO/Extension.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Extension::List" : {
          "file" : "lib/DBIO/Extension/List.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Extension::Protocol" : {
          "file" : "lib/DBIO/Extension/Protocol.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::FilterColumn" : {
          "file" : "lib/DBIO/FilterColumn.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Future" : {
          "file" : "lib/DBIO/Future.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Future::Immediate" : {
          "file" : "lib/DBIO/Future/Immediate.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate" : {
          "file" : "lib/DBIO/Generate.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Relationships" : {
          "file" : "lib/DBIO/Generate/Relationships.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Style::Cake" : {
          "file" : "lib/DBIO/Generate/Style/Cake.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Style::Candy" : {
          "file" : "lib/DBIO/Generate/Style/Candy.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Style::Moo" : {
          "file" : "lib/DBIO/Generate/Style/Moo.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Style::Moose" : {
          "file" : "lib/DBIO/Generate/Style/Moose.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Style::Vanilla" : {
          "file" : "lib/DBIO/Generate/Style/Vanilla.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Generate::Util" : {
          "file" : "lib/DBIO/Generate/Util.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::HashAccessor" : {
          "file" : "lib/DBIO/HashAccessor.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::InflateColumn" : {
          "file" : "lib/DBIO/InflateColumn.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::InflateColumn::DateTime" : {
          "file" : "lib/DBIO/InflateColumn/DateTime.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::InflateColumn::Serializer" : {
          "file" : "lib/DBIO/InflateColumn/Serializer.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::InflateColumn::Serializer::JSON" : {
          "file" : "lib/DBIO/InflateColumn/Serializer/JSON.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::InflateColumn::Serializer::MessagePack" : {
          "file" : "lib/DBIO/InflateColumn/Serializer/MessagePack.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::InflateColumn::Serializer::YAML" : {
          "file" : "lib/DBIO/InflateColumn/Serializer/YAML.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Introspect::Base" : {
          "file" : "lib/DBIO/Introspect/Base.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Introspect::DBI" : {
          "file" : "lib/DBIO/Introspect/DBI.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Moo" : {
          "file" : "lib/DBIO/Moo.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Moose" : {
          "file" : "lib/DBIO/Moose.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Optional::Dependencies" : {
          "file" : "lib/DBIO/Optional/Dependencies.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Ordered" : {
          "file" : "lib/DBIO/Ordered.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::PK" : {
          "file" : "lib/DBIO/PK.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::PK::Auto" : {
          "file" : "lib/DBIO/PK/Auto.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::PopulateMore" : {
          "file" : "lib/DBIO/PopulateMore.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship" : {
          "file" : "lib/DBIO/Relationship.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::Base" : {
          "file" : "lib/DBIO/Relationship/Base.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::BelongsTo" : {
          "file" : "lib/DBIO/Relationship/BelongsTo.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::CascadeActions" : {
          "file" : "lib/DBIO/Relationship/CascadeActions.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::Codegen" : {
          "file" : "lib/DBIO/Relationship/Codegen.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::HasMany" : {
          "file" : "lib/DBIO/Relationship/HasMany.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::HasOne" : {
          "file" : "lib/DBIO/Relationship/HasOne.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::Helpers" : {
          "file" : "lib/DBIO/Relationship/Helpers.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Relationship::ManyToMany" : {
          "file" : "lib/DBIO/Relationship/ManyToMany.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated" : {
          "file" : "lib/DBIO/Replicated.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Backend" : {
          "file" : "lib/DBIO/Replicated/Backend.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Backend::Master" : {
          "file" : "lib/DBIO/Replicated/Backend/Master.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Backend::Replicant" : {
          "file" : "lib/DBIO/Replicated/Backend/Replicant.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Balancer" : {
          "file" : "lib/DBIO/Replicated/Balancer.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Balancer::First" : {
          "file" : "lib/DBIO/Replicated/Balancer/First.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Balancer::Random" : {
          "file" : "lib/DBIO/Replicated/Balancer/Random.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::DebugProxy" : {
          "file" : "lib/DBIO/Replicated/DebugProxy.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Pool" : {
          "file" : "lib/DBIO/Replicated/Pool.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Replicated::Storage" : {
          "file" : "lib/DBIO/Replicated/Storage.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultClass::HashRefInflator" : {
          "file" : "lib/DBIO/ResultClass/HashRefInflator.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSet" : {
          "file" : "lib/DBIO/ResultSet.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSet::Pager" : {
          "file" : "lib/DBIO/ResultSet/Pager.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSetColumn" : {
          "file" : "lib/DBIO/ResultSetColumn.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSource" : {
          "file" : "lib/DBIO/ResultSource.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSource::RowParser" : {
          "file" : "lib/DBIO/ResultSource/RowParser.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSource::RowParser::Util" : {
          "file" : "lib/DBIO/ResultSource/RowParser/Util.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSource::Table" : {
          "file" : "lib/DBIO/ResultSource/Table.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSource::View" : {
          "file" : "lib/DBIO/ResultSource/View.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::ResultSourceProxy" : {
          "file" : "lib/DBIO/ResultSourceProxy.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Row" : {
          "file" : "lib/DBIO/Row.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::SQL::Util" : {
          "file" : "lib/DBIO/SQL/Util.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::SQLMaker" : {
          "file" : "lib/DBIO/SQLMaker.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::SQLMaker::ClassicExtensions" : {
          "file" : "lib/DBIO/SQLMaker/ClassicExtensions.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Schema" : {
          "file" : "lib/DBIO/Schema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Schema::ModelCompiler" : {
          "file" : "lib/DBIO/Schema/ModelCompiler.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Schema::Type" : {
          "file" : "lib/DBIO/Schema/Type.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Skills" : {
          "file" : "lib/DBIO/Skills.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage" : {
          "file" : "lib/DBIO/Storage.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Async" : {
          "file" : "lib/DBIO/Storage/Async.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Async::PipelineContext" : {
          "file" : "lib/DBIO/Storage/Async/PipelineContext.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Async::TransactionContext" : {
          "file" : "lib/DBIO/Storage/Async/TransactionContext.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::BlockRunner" : {
          "file" : "lib/DBIO/Storage/BlockRunner.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Composed" : {
          "file" : "lib/DBIO/Storage/Composed.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI" : {
          "file" : "lib/DBIO/Storage/DBI.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::AccessBroker" : {
          "file" : "lib/DBIO/Storage/DBI/AccessBroker.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::AutoCast" : {
          "file" : "lib/DBIO/Storage/DBI/AutoCast.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::Capabilities" : {
          "file" : "lib/DBIO/Storage/DBI/Capabilities.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::Cursor" : {
          "file" : "lib/DBIO/Storage/DBI/Cursor.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::DataTypeClassifier" : {
          "file" : "lib/DBIO/Storage/DBI/DataTypeClassifier.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::IdentityInsert" : {
          "file" : "lib/DBIO/Storage/DBI/IdentityInsert.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::NoBindVars" : {
          "file" : "lib/DBIO/Storage/DBI/NoBindVars.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::NoBindVars::Interpolated" : {
          "file" : "lib/DBIO/Storage/DBI/NoBindVars.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::ODBC" : {
          "file" : "lib/DBIO/Storage/DBI/ODBC.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DBI::UniqueIdentifier" : {
          "file" : "lib/DBIO/Storage/DBI/UniqueIdentifier.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::DateTimeFormat" : {
          "file" : "lib/DBIO/Storage/DateTimeFormat.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Debug::PrettyTrace" : {
          "file" : "lib/DBIO/Storage/Debug/PrettyTrace.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Pool" : {
          "file" : "lib/DBIO/Storage/Pool.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::PoolBase" : {
          "file" : "lib/DBIO/Storage/PoolBase.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::QueryRewrite" : {
          "file" : "lib/DBIO/Storage/QueryRewrite.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::Statistics" : {
          "file" : "lib/DBIO/Storage/Statistics.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Storage::TxnScopeGuard" : {
          "file" : "lib/DBIO/Storage/TxnScopeGuard.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test" : {
          "file" : "lib/DBIO/Test.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::AsyncHarness" : {
          "file" : "lib/DBIO/Test/AsyncHarness.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::AsyncParity" : {
          "file" : "lib/DBIO/Test/AsyncParity.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::AsyncParity::Cases" : {
          "file" : "lib/DBIO/Test/AsyncParity/Cases.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::BaseResult" : {
          "file" : "lib/DBIO/Test/BaseResult.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::BaseResultSet" : {
          "file" : "lib/DBIO/Test/BaseResultSet.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Conformance" : {
          "file" : "lib/DBIO/Test/Conformance.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Conformance::Cases::Bind" : {
          "file" : "lib/DBIO/Test/Conformance/Cases/Bind.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Conformance::Cases::DDL" : {
          "file" : "lib/DBIO/Test/Conformance/Cases/DDL.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Conformance::Cases::Diff" : {
          "file" : "lib/DBIO/Test/Conformance/Cases/Diff.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Conformance::Cases::Names" : {
          "file" : "lib/DBIO/Test/Conformance/Cases/Names.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Cursor" : {
          "file" : "lib/DBIO/Test/Cursor.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::DateTimeParser" : {
          "file" : "lib/DBIO/Test/DateTimeParser.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::DeployComponent" : {
          "file" : "lib/DBIO/Test/DeployComponent.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::ErrorComponent" : {
          "file" : "lib/DBIO/Test/ErrorComponent.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::ExtensionSet" : {
          "file" : "lib/DBIO/Test/ExtensionSet.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::FakeComponent" : {
          "file" : "lib/DBIO/Test/FakeComponent.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::ForeignComponent" : {
          "file" : "lib/DBIO/Test/ForeignComponent.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Future" : {
          "file" : "lib/DBIO/Test/Future.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Kubernetes" : {
          "file" : "lib/DBIO/Test/Kubernetes.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooCakeSchema" : {
          "file" : "lib/DBIO/Test/MooCakeSchema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooCakeSchema::Result::Artist" : {
          "file" : "lib/DBIO/Test/MooCakeSchema/Result/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooCakeSchema::Result::CD" : {
          "file" : "lib/DBIO/Test/MooCakeSchema/Result/CD.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooCakeSchema::ResultSet::Artist" : {
          "file" : "lib/DBIO/Test/MooCakeSchema/ResultSet/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooSchema" : {
          "file" : "lib/DBIO/Test/MooSchema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooSchema::Result::Artist" : {
          "file" : "lib/DBIO/Test/MooSchema/Result/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooSchema::Result::CD" : {
          "file" : "lib/DBIO/Test/MooSchema/Result/CD.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooSchema::ResultSet::Artist" : {
          "file" : "lib/DBIO/Test/MooSchema/ResultSet/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSchema" : {
          "file" : "lib/DBIO/Test/MooseSchema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSchema::Result::Artist" : {
          "file" : "lib/DBIO/Test/MooseSchema/Result/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSchema::Result::CD" : {
          "file" : "lib/DBIO/Test/MooseSchema/Result/CD.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSchema::ResultSet::Artist" : {
          "file" : "lib/DBIO/Test/MooseSchema/ResultSet/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSugarSchema" : {
          "file" : "lib/DBIO/Test/MooseSugarSchema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSugarSchema::Result::Artist" : {
          "file" : "lib/DBIO/Test/MooseSugarSchema/Result/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSugarSchema::Result::CD" : {
          "file" : "lib/DBIO/Test/MooseSugarSchema/Result/CD.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::MooseSugarSchema::ResultSet::Artist" : {
          "file" : "lib/DBIO/Test/MooseSugarSchema/ResultSet/Artist.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::OptionalComponent" : {
          "file" : "lib/DBIO/Test/OptionalComponent.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::ResultSetManager" : {
          "file" : "lib/DBIO/Test/ResultSetManager.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::SQLMRebase" : {
          "file" : "lib/DBIO/Test/SQLMRebase.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Schema" : {
          "file" : "lib/DBIO/Test/Schema.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
+      },
+      "DBIO::Test::Slow" : {
+         "file" : "lib/DBIO/Test/Slow.pm",
+         "version" : "0.900005"
       },
       "DBIO::Test::Storage" : {
          "file" : "lib/DBIO/Test/Storage.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::StorageLayer" : {
          "file" : "lib/DBIO/Test/StorageLayer.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::SyntaxErrorComponent1" : {
          "file" : "lib/DBIO/Test/SyntaxErrorComponent1.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::SyntaxErrorComponent2" : {
          "file" : "lib/DBIO/Test/SyntaxErrorComponent2.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::SyntaxErrorComponent3" : {
          "file" : "lib/DBIO/Test/SyntaxErrorComponent3.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Util" : {
          "file" : "lib/DBIO/Test/Util.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Util::LeakTracer" : {
          "file" : "lib/DBIO/Test/Util/LeakTracer.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Util::OverrideRequire" : {
          "file" : "lib/DBIO/Test/Util/OverrideRequire.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Test::Util::UmaskGuard" : {
          "file" : "lib/DBIO/Test/Util/UmaskGuard.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Timestamp" : {
          "file" : "lib/DBIO/Timestamp.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::UUIDColumns" : {
          "file" : "lib/DBIO/UUIDColumns.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIO::Util" : {
          "file" : "lib/DBIO/Util.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       },
       "DBIOx" : {
          "file" : "lib/DBIOx.pm",
-         "version" : "0.900004"
+         "version" : "0.900005"
       }
    },
    "release_status" : "stable",
@@ -849,7 +859,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dbio"
    },
-   "version" : "0.900004",
+   "version" : "0.900005",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -858,7 +868,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::SetMeta",
             "name" : "@DBIO/DBIO::SetMeta",
-            "version" : "0.900004"
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -888,12 +898,12 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::LicenseFile",
             "name" : "@DBIO/DBIO::LicenseFile",
-            "version" : "0.900004"
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::DBIO::GatherSkills",
             "name" : "@DBIO/DBIO::GatherSkills",
-            "version" : "0.900004"
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
@@ -953,15 +963,148 @@
             "version" : "0.08"
          },
          {
-            "class" : "Dist::Zilla::Plugin::VersionFromMainModule",
+            "class" : "Dist::Zilla::Plugin::Prereqs",
             "config" : {
-               "Dist::Zilla::Role::ModuleMetadata" : {
-                  "Module::Metadata" : "1.000038",
-                  "version" : "0.006"
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "develop",
+                  "type" : "recommends"
                }
             },
-            "name" : "@DBIO/VersionFromMainModule",
-            "version" : "0.04"
+            "name" : "@DBIO/@Git::VersionManager/pluginbundle version",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
+            "config" : {
+               "Dist::Zilla::Plugin::PkgVersion" : {},
+               "Dist::Zilla::Plugin::RewriteVersion" : {
+                  "add_tarball_name" : 0,
+                  "finders" : [
+                     ":InstallModules"
+                  ],
+                  "global" : 1,
+                  "skip_version_provider" : 0
+               },
+               "Dist::Zilla::Plugin::RewriteVersion::Transitional" : {}
+            },
+            "name" : "@DBIO/@Git::VersionManager/RewriteVersion::Transitional",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Update",
+            "name" : "@DBIO/@Git::VersionManager/MetaProvides::Update",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromRelease",
+            "config" : {
+               "Dist::Zilla::Plugin::CopyFilesFromRelease" : {
+                  "filename" : [
+                     "Changes"
+                  ],
+                  "match" : []
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/CopyFilesFromRelease",
+            "version" : "0.007"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "v%V%n%n%c",
+                  "signoff" : 0
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Changes"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/release snapshot",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "changelog" : "Changes",
+                  "signed" : 0,
+                  "tag" : "v0.900005",
+                  "tag_format" : "v%V",
+                  "tag_message" : "v%V"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/Git::Tag",
+            "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional",
+            "config" : {
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+                  "finders" : [
+                     ":InstallModules"
+                  ],
+                  "global" : 0,
+                  "munge_makefile_pl" : 1
+               },
+               "Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional" : {}
+            },
+            "name" : "@DBIO/@Git::VersionManager/BumpVersionAfterRelease::Transitional",
+            "version" : "0.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@DBIO/@Git::VersionManager/NextRelease",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "increment $VERSION after %v release",
+                  "signoff" : 0
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Build.PL",
+                     "Changes",
+                     "Makefile.PL"
+                  ],
+                  "allow_dirty_match" : [
+                     "(?^:^lib/.*\\.pm$)"
+                  ],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "git_version" : "2.47.3",
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@DBIO/@Git::VersionManager/post-release commit",
+            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodWeaver",
@@ -1067,23 +1210,23 @@
             "version" : "4.010"
          },
          {
-            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
-            "name" : "@DBIO/DBIO::CoverageTest",
-            "version" : "0.900004"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::DBIO::PodCheckerTest",
             "name" : "@DBIO/DBIO::PodCheckerTest",
-            "version" : "0.900004"
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::DBIO::VersionLockstepTest",
             "name" : "@DBIO/DBIO::VersionLockstepTest",
-            "version" : "0.900004"
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@DBIO/ExtraTests",
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@DBIO/ExecDir",
             "version" : "6.040"
          },
          {
@@ -1094,7 +1237,7 @@
                   "version" : "6.040"
                },
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1,
+                  "default_jobs" : "8",
                   "version" : "6.040"
                }
             },
@@ -1102,9 +1245,14 @@
             "version" : "0.49"
          },
          {
-            "class" : "Dist::Zilla::Plugin::ExecDir",
-            "name" : "@DBIO/ExecDir",
-            "version" : "6.040"
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageGate",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : "8"
+               }
+            },
+            "name" : "@DBIO/DBIO::CoverageGate",
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
@@ -1124,7 +1272,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::CodebergMeta",
             "name" : "@DBIO/DBIO::CodebergMeta",
-            "version" : "0.900004"
+            "version" : "0.900005"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -1166,11 +1314,6 @@
             "version" : "0.015"
          },
          {
-            "class" : "Dist::Zilla::Plugin::NextRelease",
-            "name" : "@DBIO/NextRelease",
-            "version" : "6.040"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@DBIO/TestRelease",
             "version" : "6.040"
@@ -1194,56 +1337,6 @@
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@DBIO/UploadToCPAN",
             "version" : "6.040"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Git::Commit",
-            "config" : {
-               "Dist::Zilla::Plugin::Git::Commit" : {
-                  "add_files_in" : [],
-                  "commit_msg" : "v%V%n%n%c",
-                  "signoff" : 0
-               },
-               "Dist::Zilla::Role::Git::DirtyFiles" : {
-                  "allow_dirty" : [
-                     "Changes",
-                     "cpanfile",
-                     "dist.ini"
-                  ],
-                  "allow_dirty_match" : [],
-                  "changelog" : "Changes"
-               },
-               "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.3",
-                  "repo_root" : "."
-               },
-               "Dist::Zilla::Role::Git::StringFormatter" : {
-                  "time_zone" : "local"
-               }
-            },
-            "name" : "@DBIO/Git::Commit",
-            "version" : "2.052"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::Git::Tag",
-            "config" : {
-               "Dist::Zilla::Plugin::Git::Tag" : {
-                  "branch" : null,
-                  "changelog" : "Changes",
-                  "signed" : 0,
-                  "tag" : "v0.900004",
-                  "tag_format" : "v%V",
-                  "tag_message" : "v%V"
-               },
-               "Dist::Zilla::Role::Git::Repo" : {
-                  "git_version" : "2.47.3",
-                  "repo_root" : "."
-               },
-               "Dist::Zilla::Role::Git::StringFormatter" : {
-                  "time_zone" : "local"
-               }
-            },
-            "name" : "@DBIO/Git::Tag",
-            "version" : "2.052"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Push",

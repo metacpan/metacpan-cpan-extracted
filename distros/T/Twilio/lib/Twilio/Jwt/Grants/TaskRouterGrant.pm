@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Twilio::Jwt::Grants::Grant';
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub get_grant_key { return 'task_router' }
 

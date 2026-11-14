@@ -6,7 +6,7 @@ use warnings;
 
 use parent 'Twilio::TwiML::TwiML';
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my %ATTRIBUTES = (
   'language' => { name => 'language' },

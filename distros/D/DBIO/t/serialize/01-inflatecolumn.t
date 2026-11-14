@@ -107,7 +107,7 @@ subtest 'JSON backend' => sub {
 
 subtest 'YAML backend' => sub {
     SKIP: {
-        eval { require YAML; 1 }
+        eval { require YAML; YAML->VERSION(1.25); 1 }
             or skip "YAML not available: $@", 10;
         require DBIO::InflateColumn::Serializer::YAML;
 

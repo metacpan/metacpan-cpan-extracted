@@ -25,6 +25,7 @@ EOS
 }
 
 use Test::More;
+use DBIO::Test::Slow;
 
 use DBIO::Test;
 use File::Find;

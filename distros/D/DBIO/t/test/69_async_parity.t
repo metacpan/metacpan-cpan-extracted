@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 use DBIO::Test;
 use DBIO::Test::AsyncHarness;
@@ -528,7 +529,7 @@ my %status;
     return +{
       %{ Parity::Suite->parity_deviations },
       'search-all' => { kind => 'unsupported', reason => qr/ways differ in the result/ },
-      'count'      => { kind => 'pending', card => 'k77', reason => qr/never matches/ },
+      'count'      => { kind => 'pending', reason => qr/never matches/ },
       'find-pk'    => { kind => 'unsupported', reason => qr/anything/ },
     };
   }
@@ -551,8 +552,8 @@ my %status;
   is $by{'search-all'}{deviation}, 'unsupported', 'it keeps its declared kind';
 
   is $by{'count'}{status}, 'fail', 'a declared deviation of a case that passes fails';
-  like $by{'count'}{message}, qr/\Astale deviation: declared pending \(k77\) but the case passes\z/,
-    'it says it is stale, with the card';
+  like $by{'count'}{message}, qr/\Astale deviation: declared pending but the case passes\z/,
+    'it says it is stale, with no card';
 
   is $by{'find-pk'}{status}, 'fail', 'a stale declaration fails also where the case is untouched';
 
@@ -627,8 +628,8 @@ my %status;
   like "@p", qr/'count': kind must be 'unsupported', 'pending' or 'absent', not 'sometimes'/,
     'an unknown kind is refused';
   like "@p", qr/'first': reason must be a regex/, 'a reason that is no regex is refused';
-  like "@p", qr/'single': a pending deviation needs a card/, 'pending without a card is refused';
-  like "@p", qr/'find-pk': a pending deviation needs a card/, 'a card must be of the form k58';
+  unlike "@p", qr/'single':/, 'pending without a card is accepted';
+  unlike "@p", qr/'find-pk':/, 'a card still named in a declaration is ignored, whatever its form';
   like "@p", qr/'populate': the table already marks this case absent/,
     'a case the table marks absent is not redeclared';
   like "@p", qr/'upsert': not a hash/, 'a deviation that is no hash is refused';

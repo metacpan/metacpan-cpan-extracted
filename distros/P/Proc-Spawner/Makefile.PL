@@ -44,3 +44,7 @@ WriteMakefile(
   META_MERGE       => { 'meta-spec' => { version => 2 },   # Run: only where there is neither posix_spawn nor fork (M2)
                         prereqs => { runtime => { recommends => { Run => '0.07' } } } },
 );
+
+# The corpus analysis (post-0.11): its targets, from doc/corpus.mk, into the Makefile (make corpus-help).  Not used by
+# building, installing or testing.
+sub MY::postamble { open my $f, '<', 'doc/corpus.mk' or return ''; local $/; scalar <$f> }

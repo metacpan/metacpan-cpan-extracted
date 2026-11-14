@@ -16,7 +16,7 @@ use AmberDB::Tools;
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $adb = AmberDB->new(
     path => { dbase_dir => $tmpdir },
-    cfg  => { simple => 0 }
+    cfg  => { use_simple => 0 }
 );
 
 # Schema definition via official table_attr API

@@ -19,6 +19,7 @@ door; depth is in `references/` — load the file the task needs.
 | Async adapter (`future_io`), ev backend, AccessBroker, LISTEN/NOTIFY | `references/async-transport.md` |
 | Extension (AGE, PostGIS, tenant add-on): declared list, extension class, storage layer | `references/extension-layers.md` |
 | Live suites, `capped-test`, `live-preflight`, resource caps, the maintainer's cluster (`dbio-db`) | `references/live-testing.md` |
+| Skipping a test on a missing capability or platform | `references/platform-skips.md` |
 
 ```
 User → DBIO::Schema → declared driver (component / -shortcut pins storage_type)
@@ -58,7 +59,7 @@ __PACKAGE__->register_driver('Pg' => __PACKAGE__);
   `_adapt_to_access_path` to handle; `DBIO->driver_for` throws on it.
 - `$dbd` is the live handle's DBD, else the DSN's; `undef` for a connection coderef that
   has not run. `$ENV{DBI_DRIVER}` never stands in; a DSN with an empty driver part
-  (`dbi::…`) and a connect-info without DSN, broker or coderef throw (ADR 0057, karr k340).
+  (`dbi::…`) and a connect-info without DSN, broker or coderef throw (ADR 0057).
   A schema that only generates SQL connects with `connect('dbi:Pg:')`.
 - A DBD that is a foreign driver's transport: `register_access_path_dbd(@dbd)`.
 - The driver is declared (ADR 0067): core detects nothing from the DSN and no registry
@@ -98,6 +99,12 @@ reads 0 and its core method throws — declare every one the engine has (`transa
 Any text carrying connect info goes through `DBIO::Util::mask_connect_secrets`; own stack
 traces through `masked_longmess` / `masked_confess` / `masked_cluck` (ADR 0025 addendum).
 
+## Messages never quote values
+
+A message names the key, column or option, never the value. Engine error text runs through
+`$storage->_mask_error_values($text, \@values, $statement)`; a driver whose engine writes
+values in a form of its own overrides it, calls `next::method` and masks that form.
+
 ## Distribution layout
 
 ```
@@ -122,11 +129,38 @@ Naming: dist `DBIO-X`; `DBIO::X`, `DBIO::X::Storage`, `DBIO::X::SQLMaker`; async
   `DBIO::Test::Schema` declares no driver. The driver's own test helper
   (`DBIO::X::Test`) declares its driver by default.
 - Live: DSN env vars from `dbio-db env <db>` (`references/live-testing.md`).
+- A test skips on the capability it needs, found by trying it, with the reason in the skip
+  (`references/platform-skips.md`).
 - **Every suite runs through `../dbio/maint/capped-test`** (live-testing rule 9); before a live
   suite `maint/live-preflight`.
 - Driver tests run against the *installed* core: `dzil install` in core after a finished
   core ticket.
 - Extensions assert structure with `DBIO::Test::StorageLayer`, their declared set with
-  `DBIO::Test::ExtensionSet` (ADR 0066); async transports build their
-  live harness on `DBIO::Test::AsyncHarness`; the shared case table is
+  `DBIO::Test::ExtensionSet` (ADR 0066); async transports build their live harness on
+  `DBIO::Test::AsyncHarness` and run `DBIO::Test::AsyncParity` over it (their test class
+  inherits it and declares deviations and capabilities); the shared case table is
   `DBIO::Test::Conformance`.
+
+## Conventions a reviewer checks
+
+Each has an ADR; read it before deviating.
+
+- **Contract version on base classes** (ADR 0024): a change that shifts the public shape of
+  `Introspect::Base`, `Diff::Base`, `Deploy::Base`, `SQLMaker` or
+  `Storage::DBI::Capabilities` bumps `$CONTRACT_VERSION` and updates the tripwire
+  `t/test/12_contract_version.t`.
+- **Trace redaction** (ADR 0025): the `redact_bind_value` hook on `DBIO::Storage::DBI` is the
+  one seam for bind values in trace output; install it once on the storage class, trace
+  callbacks carry no redaction logic.
+- **DDL transactional safety** (ADR 0026): DDL runs in `$storage->txn_do` only after probing
+  `$storage->_use_transactional_ddl`. A driver that declares nothing is non-transactional,
+  which is right for MySQL, Oracle, DB2, Sybase, Informix and for SQLite, whose rebuild path
+  needs `AutoCommit=on`.
+- **IF EXISTS** (ADR 0026): the IF-EXISTS question is answered by
+  `should_emit_if_exists($storage)` alone; it is the only emit site in Diff.
+- **Mock storage cursor** (ADR 0046): the SQL the fake cursor captures equals the SQL a real
+  cursor would have run, so new test infrastructure on the fake storage goes through
+  `$storage->_select_args`.
+- **Exceptions**: throw `DBIO::Exception->throw(...)` or a typed subclass.
+- **Capability declarations**: `mk_group_accessors(use_dbms_capability => …)`, the shape of
+  `DBIO::Storage::DBI::Capabilities`; one capability system.

@@ -2,7 +2,7 @@ package mayhaps;
 
 use v5.14;
 
-our $VERSION = 'v0.1.1';
+our $VERSION = 'v0.1.2';
 
 sub AUTOLOAD {
     my ($caller, $cond, @args) = @_;
@@ -29,17 +29,17 @@ mayhaps - call methods conditionally for any class or object
 
 =head1 VERSION
 
-version v0.1.1
+version v0.1.2
 
 =head1 SYNOPSIS
 
     use mayhaps;
 
-    $obj->mayhaps::frobnicate( $has_hands, 'foo' );
+    $obj->mayhaps::frobnicate( $bool, @args );
 
 is equivalent to
 
-    ($has_hands) ? $obj->frobnicate('foo') : $obj;
+    ($bool) ? $obj->frobnicate(@args) : $obj;
 
 =head1 DESCRIPTION
 
@@ -64,6 +64,10 @@ There is already a module called L<maybe> with a different function.
 =head1 EXPORTS
 
 None.
+
+=head1 SECURITY CONSIDERATIONS
+
+There is no validation of the object or the calling method.
 
 =head1 SOURCE
 

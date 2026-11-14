@@ -75,9 +75,15 @@ use Text::ParseWords ();
 
 use AnyEvent::MCP ();
 
-Getopt::Long::GetOptions ("tty" => \my $tty_only, "yad" => \my $yad_only, "help" => \my $help) or exit 2;
-die "Unexpected arguments\n" if @ARGV;
-die "--tty and --yad are mutually exclusive\n" if $tty_only && $yad_only;
+Getopt::Long::GetOptions
+   "tty"  => \my $tty_only,
+   "yad"  => \my $yad_only,
+   "help" => \my $help,
+   or exit 2;
+
+!@ARGV or die "Unexpected arguments\n";
+!($tty_only && $yad_only) or die "--tty and --yad are mutually exclusive\n";
+
 if ($help) {
    print "usage: $0 [--tty | --yad] <request.json >response.json\n";
    exit;
@@ -91,6 +97,7 @@ while (read STDIN, my $chunk, 8192) {
    $input .= $chunk;
    length $input <= 1 << 20 or die "Form request exceeds 1 MiB\n";
 }
+
 my $params = JSON::XS::decode_json $input;
 
 sub value {

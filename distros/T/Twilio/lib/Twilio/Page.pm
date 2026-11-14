@@ -7,7 +7,7 @@ use Carp qw(croak);
 
 use Twilio::Exceptions::DeserializeException;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $PAGING_END_CODE = '20006';
 

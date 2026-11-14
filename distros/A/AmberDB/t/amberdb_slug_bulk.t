@@ -14,7 +14,7 @@ use AmberDB;
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $adb = AmberDB->new(
     path => { dbase_dir => $tmpdir },
-    cfg  => { simple => 0 }
+    cfg  => { use_simple => 0 }
 );
 
 $adb->table_attr( 'articles', {

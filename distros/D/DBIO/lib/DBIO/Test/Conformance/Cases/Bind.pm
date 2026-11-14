@@ -4,15 +4,15 @@ package DBIO::Test::Conformance::Cases::Bind;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
+use DBIO::Util ();
 
 
 my $id = sub { +{ data_type => 'integer', is_nullable => 0 } };
 
 # the table most cases bind into: a key and one nullable column of a base type,
-# or varchar(n) for a short string a case searches by value (karr k368)
+# or varchar(n) for a short string a case searches by value
 my $val = sub {
   my ($type, %extra) = @_;
   return {
@@ -44,7 +44,6 @@ my @CASES = (
   {
     name  => 'bind-empty-string',
     since => 1,
-    cards => [ 'dbio-mssql k55', 'dbio-mssql k63' ],
     subject => { source => 'Val', column => 's' },
     input => { sources => [ {
       name => 'Val', table => 'val',
@@ -64,7 +63,6 @@ my @CASES = (
   {
     name  => 'bind-digit-string-leading-zero',
     since => 1,
-    cards => [ 'dbio-sqlite k61', 'dbio-sqlite k55 (done)' ],
     subject => { source => 'Val', column => 'v' },
     input => { sources => [ $val->('varchar', size => 20) ] },
     expect => [
@@ -79,7 +77,6 @@ my @CASES = (
   {
     name  => 'bind-integer-string-in-expression',
     since => 1,
-    cards => [ 'dbio-sqlite k62' ],
     subject => { source => 'Val', column => 'v' },
     input => { sources => [ $val->('varchar', size => 20) ] },
     expect => [
@@ -93,7 +90,6 @@ my @CASES = (
   {
     name  => 'bind-long-string',
     since => 1,
-    cards => [ 'dbio-mssql k47', 'dbio-mssql k40 (done)' ],
     subject => { source => 'Val', column => 'v' },
     input => { sources => [ $val->('text') ] },
     expect => [
@@ -106,7 +102,6 @@ my @CASES = (
   {
     name  => 'bind-non-ascii',
     since => 1,
-    cards => [ 'dbio-mssql k49', 'dbio-mssql k58', 'dbio-postgresql t/85utf8' ],
     subject => { source => 'Val', column => 'v' },
     input => { sources => [ $val->('text') ] },
     expect => [
@@ -125,8 +120,6 @@ my @CASES = (
   {
     name  => 'bind-binary',
     since => 1,
-    cards => [ 'dbio-mssql k59', 'dbio-mssql k61', 'dbio-mssql k50 (done)',
-               'dbio-mssql k56 (done)', 'dbio-postgresql t/11' ],
     subject => { source => 'Val', column => 'v' },
     input => { sources => [ $val->('blob') ] },
     expect => [
@@ -139,7 +132,6 @@ my @CASES = (
   {
     name  => 'bind-lob-empty-and-large',
     since => 1,
-    cards => [ 'dbio-mssql k60', 'dbio-mssql k61', 'dbio-sybase k72 (done)' ],
     subject => { source => 'Lob', column => 't' },
     input => { sources => [ {
       name => 'Lob', table => 'lob',
@@ -162,8 +154,6 @@ my @CASES = (
   {
     name  => 'bind-lob-row-operations',
     since => 1,
-    cards => [ 'dbio-sybase k80', 'dbio-sybase k81', 'dbio-sybase k82',
-               'dbio-sybase k83', 'dbio-sybase k84', 'dbio-sybase k79 (done)' ],
     subject => { source => 'Doc', column => 'body' },
     input => { sources => [ {
       name => 'Doc', table => 'doc',
@@ -183,7 +173,6 @@ my @CASES = (
   {
     name  => 'bind-question-mark-in-literal',
     since => 1,
-    cards => [ 'dbio-postgresql-ev k84' ],
     subject => { source => 'Note', column => 'txt' },
     input => { sources => [ {
       name => 'Note', table => 'note',
@@ -204,7 +193,6 @@ my @CASES = (
   {
     name  => 'bind-numeric-exact',
     since => 1,
-    cards => [ 'dbio-postgresql-postgis k22' ],
     subject => { source => 'Num', column => 'v' },
     input => { sources => [ {
       name => 'Num', table => 'num',
@@ -225,7 +213,7 @@ my @CASES = (
 );
 
 sub cases {
-  return Storable::dclone([ @CASES ]);
+  return DBIO::Util::deep_copy([ @CASES ]);
 }
 
 1;
@@ -242,7 +230,7 @@ DBIO::Test::Conformance::Cases::Bind - The shared Bind cases every DBIO driver a
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 
@@ -257,7 +245,6 @@ A case is a hash:
   {
     name    => 'bind-long-string',                # stable id, bind- prefix
     since   => 1,                                 # table version that added it
-    cards   => [ 'dbio-mssql k47', ... ],         # where it came from; documentation
     subject => { source => 'Val', column => 'v' },
     input   => { sources => [ { ... } ] },
     expect  => [ { bind_roundtrip => { ... } }, ... ],

@@ -4,7 +4,7 @@ package DBIO::Generate::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use B ();
 use Carp::Clan qw/^DBIO/;
@@ -105,7 +105,7 @@ DBIO::Generate::Util - Safe Perl-literal emission helpers for DBIO::Generate sty
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 METHODS
 

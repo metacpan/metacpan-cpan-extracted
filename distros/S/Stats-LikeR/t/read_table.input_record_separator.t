@@ -26,7 +26,9 @@ my $dir = File::Temp::tempdir(CLEANUP => 1);
 sub fixture {
 	my ($name, $text) = @_;
 	my $path = File::Spec->catfile($dir, $name);
-	open my $fh, '>', $path or die "cannot write \"$path\": $!\n";
+	# binary: on MSWin32 a text-mode open writes each "\n" as CR LF, and
+	# read_table() keeps a quoted line end as the bytes the file holds
+	open my $fh, '>:raw', $path or die "cannot write \"$path\": $!\n";
 	print {$fh} $text;
 	close $fh or die "cannot close \"$path\": $!\n";
 	return $path;

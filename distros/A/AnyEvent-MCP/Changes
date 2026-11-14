@@ -1,5 +1,181 @@
 Revision history for AnyEvent::MCP
 
+0.91  Fri 13 Nov 2026 18:09:55 CET
+	- add multibroker search-tools: BM25-ranked keyword search of tool
+	  names, descriptions and input schemas across visible and hidden
+	  brokers, returning up to 25 complete tool definitions.
+	- add mcp-fs --exec-prefix and --sudo[=USER] for noninteractive
+	  worker elevation, locally or over SSH, independently of bubblewrap.
+	  Add --host-dac for privileged bubblewrap workers that need access
+	  to other users' DAC-protected files inside approved filesystem mounts.
+	- add per-request verify_tls boolean to mcp-http (default true);
+	  false disables TLS certificate checking without changing permissions.
+	- give the real multibroker elicitation round-trip test 30 seconds
+	  instead of 10 and honor PERL_TEST_TIME_OUT_FACTOR for the
+	  ask-user test's internal deadlines on slow CPAN Testers hosts.
+	- identify the last explicitly allowed browser tab and a separately
+	  marked tab in mcp-webbrowser discovery. Add a userscript Mark/Unmark
+	  menu; reconnects and navigations do not change either selection.
+	  Marking a tab does not grant execution permission. Extend the
+	  private browser protocol to 1.2 without breaking older clients.
+	- add mcp-multibroker downstream --disable: exclude the subbroker from
+	  startup, discovery and calls while reserving its prefix. Overrides
+	  --eager and --required; no changes to other broker entries.
+	- repeat the requested action prominently above permission-rule scope
+	  selectors, so GET and POST are distinguishable while saving a rule.
+	- add mcp-sctl: direct ScriptCat and sctl Browser WebSocket bridge
+	  with pairing/HMAC/AES-GCM, live capability discovery and generic
+	  permission-scoped RPC calls. Cache protocol metadata in XDG cache;
+	  share the usual MCP HTTP --bind listener with the extensions' WebSocket
+	  connections, with a default port of 8643 to match ScriptCat, even when
+	  --bind supplies only an address (e.g. ::). Add an optional mcp_getoptions
+	  default_port and URL-printer callback so
+	  mcp-sctl --print-url also reports the token-free browser WebSocket URL.
+	  No Go daemon or high-level CDP/Playwright implementation.
+	- allow permission requests to specify a display-only dimension_order,
+	  preserving matcher names and old rules. mcp-sctl presents the target
+	  instance first, then RPC method and argument scope in permission dialogs.
+	- give mcp-sctl the regular operator activity logging: abbreviated
+	  per-instance connection/pairing events, method and parameter previews,
+	  discovery counts, compact call results and timings, without logging
+	  userscript source or pairing credentials.
+	- show the selected host, workdir, mailbox, user, URL, browser tab,
+	  origin and command in permission-rule scope choices; abbreviate
+	  long command and URL labels without changing rule matchers.
+
+0.9   Tue 10 Nov 2026 17:21:58 CET
+	- build mcp-fs host mounts parent-first and restore protected private
+	  mounts afterward: support / and /etc as workdirs without writing
+	  host passwd, keep root-write writable, and handle symlinked /var/tmp
+	  mount destinations locally and remotely.
+	- retire mcp-webbrowser tab-specific saved permission rules when tabs
+	  explicitly disconnect or stay disconnected for five minutes;
+	  retain site-wide and all-tab rules.
+	- split mcp-webbrowser exec permissions into independent tab,
+	  JavaScript/operation and origin dimensions. Default persistent JS
+	  approvals to this tab, any JavaScript, and this origin. Old combined
+	  match.subject execution grants no longer match and must be approved
+	  again; they cannot silently broaden authority.
+	- fix Vim stdio core test when "." is absent from Perl's @INC by
+	  explicitly do-loading ./bin/mcp-vim (seen in CPAN Testers reports).
+	- raise mcp-imap messages page and explicit UID batch limits from 100
+	  to 1000, with page size default 100 and matching tool schemas.
+	- refuse mcp-imap mailbox DELETE when STATUS reports messages;
+	  expunge first or explicitly pass force to delete a nonempty mailbox.
+	- move INI parsing from AnyEvent::MCP into Config, add canonical
+	  serializer and merge_sections utility. Shared grammar now handles
+	  global settings, IMAP accounts and ordered permission rules; replace
+	  create-user/revoke-user's independent line-editing parser with
+	  Config load/modify/save under the existing lock. Rewrites normalize
+	  formatting and discard comments; master-secret append is unchanged.
+	- split Config construction from loading and secret initialization;
+	  global_config() is the initialized cached singleton, while new
+	  has no file side effects and load/ensure_secret are explicit.
+	  Make anyevent-mcp init idempotent and fail on secret persistence errors.
+	- send 30-second elapsed-time progress for outstanding tool calls,
+	  forward downstream progress through mcp-multibroker, and stream
+	  request-scoped notifications over modern HTTP POST/SSE before the
+	  final result, retaining plain JSON for calls without notifications.
+	- make mcp-imap messages.more indicate any remaining search work,
+	  including sparse UID ranges; document next_cursor as authoritative
+	  and recommend threads for targeted whole-mailbox lookups.
+	- eliminate the last utf8::is_utf8-based encoding decision in OAuth2:
+	  form values are Unicode text encoded to UTF-8 before percent escaping;
+	  decode redirect and persisted refresh-token bytes explicitly.
+	- centralize UTF-8 configuration file I/O in file_load/file_save:
+	  files contain UTF-8 bytes, parse_ini handles Unicode text, and all
+	  config, rules and IMAP callers share the same conversion boundary.
+	  Keep the atomic byte-oriented file_replace for JSON and raw streams;
+	  preserve raw passwords and Base64/hex-encoded binary secrets.
+	- load Encode::MIME::Header explicitly in the mcp-imap worker; only
+	  mcp-imap requires it, not other AnyEvent::MCP components.
+	- decode RFC 2047 encoded subject and address display fields in
+	  mcp-imap ENVELOPE summaries; include attachment names, MIME types,
+	  sizes and part numbers in read-only previews without extra FETCHes.
+	- make mcp-fs remote subprocess framing byte-only: explicitly UTF-8
+	  encode MCP argv and Unicode paths at their source, preserve raw OS
+	  executable/env paths and binary stdin, reject non-octet frame fields;
+	  add remote and VCS Unicode path/argv regressions.
+	- log idle IMAP keepalive failure details at trace and suppress only
+	  IMAPTalk's raw warning for our expected timeout exception.
+	- register installed optional Encode::HanExtra, Encode::JIS2K and
+	  Encode::EUCJPASCII charsets for mcp-imap MIME decoding; advertise
+	  them as runtime suggestions, not dependencies.
+	- split distribution tests into core cNN_ files run by default and
+	  extended eNN_ files skipped without PERL_ANYEVENT_MCP_TESTS=1;
+	  add independent core filesystem smoke tests while retaining the full
+	  integration and failure-injection suite for development and releases.
+	- include mailbox, destination, operation, batch size, paging position
+	  and bounded SEARCH criteria in mcp-imap request logs, without
+	  logging message bodies or UID lists.
+	- keep remote filesystem tests valid with long CPAN tester Perl paths:
+	  the mock rsh checks the short loader overhead without imposing
+	  an artificial 256-byte limit on the executable pathname.
+	- shorten mcp-fs remote bootstrap: embed the launcher byte length with
+	  sprintf and append source directly via sysread without extra argv.
+	- raise sort_create/sort_page UID page maximum from 100 to 1000,
+	  keeping the default at 100 and leaving message fetching and MOVE
+	  batches capped at 100.
+	- enable multibroker-managed idle exit in mcp-http and mcp-ask-user
+	  after 300 seconds, and mcp-imap after 3600 seconds (mcp-fs already
+	  supported 300 seconds). Retain ask-user continuations; disposable
+	  IMAP SORT snapshots are lost on idle exit. Retry declined idle
+	  shutdown after the interval.
+	- add worker-local immutable UID SORT (SUBJECT DATE) snapshots for
+	  subject-grouped classification: sort_create returns the first 100
+	  UIDs, sort_page pages without re-sorting, sort_discard frees the
+	  snapshot; one snapshot per worker, invalidated on restart.
+	- expose read-only UID THREAD ORDEREDSUBJECT through mcp-imap:
+	  group by base subject with optional SEARCH filter and UID range,
+	  retaining the complete nested server order without pagination.
+	- keep mcp-imap connections alive with an idle NOOP (250 seconds by
+	  default, configurable via --keepalive, 0 disables); stop pinging
+	  on failure, and reconnect on the next tool call without retrying
+	  interrupted operations.
+	- allow shell-friendly instance names (ASCII alphanumerics, underscore,
+	  hyphen, dot, @ and +), with separate strict managed-user names.
+	- fold small state-file locking and atomic replacement helper into
+	  MCP.pm instead of a separate AnyEvent::MCP::File module.
+	- make --ask a shared common option, with per-option exclusion;
+	  add --ask none to deny unresolved permissions and decline
+	  downstream elicitation without prompting.
+	- document mcp-imap login keys individually in --help and manpage;
+	  support tls connect/starttls/none (including explicit unencrypted IMAP)
+	  and reset default ports on TLS mode changes.
+	- report LOGINDISABLED with no supported SASL mechanism cleanly on
+	  IMAP password login, without obscure Authen::SASL warnings.
+	- add mcp_permissions to Simple: default permission engine, explicit
+	  object or explicit undef; apply --ask and automatic rule overrides
+	  centrally without dropping application-supplied automatic rules.
+	- give mcp-fs writable private /tmp and /var/tmp (mode 1777) even
+	  with world-read; only shared-tmp or world-write exposes host
+	  temporary directories. Make world-write formally imply shared-tmp
+	  for permission checks; document the private/host lifetime distinction.
+	- add read-only mcp-imap previews for 25 UIDs, with bounded partial
+	  MIME decoding, HTML link preservation and grouped IMAP FETCH calls.
+	- allow mcp-imap messages to fetch selected UIDs without SEARCH.
+	- actually truncate bounded IMAP part/raw responses to max_bytes,
+	  not just flag them as truncated.
+	- use a 15-second HTTP read-inactivity timeout by default, suspended
+	  while processing complete requests; respect explicit handle rtimeout.
+	- load MIME::Base64 in the HTTP server itself for encoded modern
+	  Mcp-Name headers, without depending on the HTTP client loading it.
+	- log ordinary HTTP 404 responses at trace rather than warn,
+	  including GET /; keep other HTTP rejection warnings.
+	- return 404 to GET / even when / is the MCP POST endpoint; drop
+	  the unhelpful connection object address from HTTP rejection logs
+	  while retaining the remote address and sanitized URI.
+	- reuse the latest saved per-dimension scope as the next permission
+	  rule editor's default where offered, otherwise keep the original
+	  conservative choice; native, YAD and terminal forms agree.
+	- handle the common token-only HTTP endpoint in warning logs:
+	  redact known tokens without misclassifying unrelated paths.
+	- include bounded, JSON-escaped request paths in rejected HTTP request
+	  warnings; omit queries and redact configured and attempted URL tokens.
+	- show captured helper status, stderr and stdout when the permission
+	  UI test fails, and report remote file-patch results and file content
+	  when the mock remote filesystem test fails (CPAN Testers diagnostics).
+
 0.82  Fri 06 Nov 2026 15:53:46 CET
 	- add a first-permission-dialog walkthrough to Intro.pod, explaining
 	  one-time versus persistent grants, rule scopes and exec stdin risks;

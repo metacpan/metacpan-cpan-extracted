@@ -2,6 +2,7 @@ use v5.36;
 use strict;
 use warnings;
 use Test::More;
+use Scalar::Util ();
 use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 
 use Linux::Event::Loop;
@@ -51,6 +52,36 @@ use Linux::Event::_ByteStream;
         $stream->data->{close_calls}++;
         die "synthetic on_close exception\n";
     }
+}
+
+{
+    package T::UnwindMessageBase;
+    use parent 'Linux::Event::_ByteStream';
+    BEGIN {
+        Linux::Event::_ByteStream->_declare_consumer(
+            __PACKAGE__,
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_definition,
+        );
+    }
+    sub on_close ($stream) { $stream->data->{close_calls}++ }
+}
+
+{
+    package T::UnwindMessageLine;
+    use parent -norequire, 'T::UnwindMessageBase';
+    use Linux::Event::Framer 'Delimiter', "\n";
+}
+
+{
+    package T::UnwindRaw;
+    use parent 'Linux::Event::_ByteStream';
+    BEGIN {
+        Linux::Event::_ByteStream->_declare_consumer(
+            __PACKAGE__,
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_definition('raw-input'),
+        );
+    }
+    sub on_close ($stream) { $stream->data->{close_calls}++ }
 }
 
 sub socket_stream ($class) {
@@ -196,5 +227,59 @@ subtest 'on_close exception occurs after ownership teardown' => sub {
         'on_close failure');
     close $peer;
 };
+
+for my $case (
+    ['framed message', 'T::UnwindMessageLine', "message\n"],
+    ['raw input',      'T::UnwindRaw',         "message\n"],
+) {
+    my ($kind, $class, $payload) = @$case;
+
+    subtest "$kind callback exception clears pending flush while Stream lives" => sub {
+        my ($loop, $stream, $peer, $fh, $data) = socket_stream($class);
+        $stream->{xs_state}->_test_consumer_arm(sub {
+            die "synthetic $kind callback exception\n";
+        });
+        is(syswrite($peer, $payload), length($payload),
+            "$kind input submitted");
+        my $ok = eval { $loop->run_for(0.05); 1 };
+        ok(!$ok, "$kind exception propagates");
+        like($@, qr/synthetic .* callback exception/,
+            "$kind original diagnostic is preserved");
+        is($stream->{xs_state}->stats->{consumer_flush_pending}, 0,
+            "$kind incomplete flush marker is cleared");
+        $stream->close;
+        close $peer;
+    };
+
+    subtest "$kind close and exception release final Stream ownership" => sub {
+        my ($loop, $stream, $peer, $fh, $data) = socket_stream($class);
+        my $weak = $stream;
+        Scalar::Util::weaken($weak);
+        my $before =
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count;
+        $stream->{xs_state}->_test_consumer_arm(sub {
+            my $closing = $stream;
+            undef $stream;
+            $closing->close;
+            die "synthetic $kind close exception\n";
+        });
+        is(syswrite($peer, $payload), length($payload),
+            "$kind input submitted");
+        my $ok = eval { $loop->run_for(0.05); 1 };
+        ok(!$ok, "$kind close exception propagates");
+        like($@, qr/synthetic .* close exception/,
+            "$kind original close diagnostic is preserved");
+        is($loop->resources->{registered_fds}, 0,
+            "$kind releases the Loop registration");
+        ok(!defined(fileno($fh)), "$kind closes the owned descriptor");
+        is($data->{close_calls}, 1, "$kind invokes on_close once");
+        ok(!defined($weak), "$kind drops the final Stream reference");
+        cmp_ok(
+            Linux::Event::_ByteStream::TestSupport->_test_consumer_destroy_count,
+            '>', $before, "$kind destroys the native consumer"
+        );
+        close $peer;
+    };
+}
 
 done_testing;

@@ -1,3 +1,8 @@
+Travel::Status::DE::DBRIS 0.40 - Sat Nov 14 2026
+
+    * Work around latest Akamai BMP adjustments
+    * Update rolling stock models and train names
+
 Travel::Status::DE::DBRIS 0.39 - Sun Nov 08 2026
 
     * Automatically set TLS options when used with Mojo::UserAgent

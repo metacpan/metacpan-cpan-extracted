@@ -100,7 +100,7 @@ sub run_crud {
   like $out, qr/'\*\*\*'/, 'level 2: the bind of an encode_column column is traced as ***';
   unlike $out, qr/hunter2/, 'level 2: the encoded column value is not traced';
   is_deeply $seen->{bind}, [ 'alice', 'hunter2-secret' ],
-    'the wire binds are bare values (karr k342)';
+    'the wire binds are bare values';
   is_deeply [ map { $_->{dbic_colname} } @{ $seen->{attrs} } ], [ 'name', 'password' ],
     'the attributes are a second list parallel to the binds, naming the columns';
   ok $seen->{attrs}[1]{redact}, 'the attribute of an encoded column carries redact';

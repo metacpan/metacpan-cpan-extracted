@@ -16,13 +16,15 @@ reinvent it**.
 - File: `docs/adr/NNNN-kebab-title.md` — `NNNN` zero-padded 4 digits, monotonic **per repo**
 - H1: `# ADR NNNN — Title` (em-dash)
 - Metadata as a bullet list, directly under H1:
-  - `- Status: proposed | accepted | superseded | deprecated`, optionally followed by ` — <qualifier>` (e.g. `accepted — superseded in part by ADR 0030`)
+  - `- Status: proposed | accepted | superseded | deprecated`, optionally followed by ` — <qualifier>` (e.g. `accepted — superseded in part by ADR 0030`) or by a parenthesis naming who decided and when (e.g. `accepted (maintainer decision of YYYY-MM-DD)`)
   - `- Date: YYYY-MM-DD`
   - `- Tags: a, b, c` (optional)
 - Sections (`##`): `Context` · `Decision` · `Rationale` (optional — may fold into Decision) · `Consequences`
 - Optional last section: `## Future architecture work (tracked cross-repo, not here)` — when a
-  related change is owned by another repo, name the karr ticket and stop. Don't do that work here.
-- **Reference code by module path + sub/method name, never by line number.** Line numbers drift on every refactor (the ADR 0034 refs moved twice in two days); write `_resolve_find_query` in `lib/DBIO/ResultSet.pm`, not `lib/DBIO/ResultSet.pm:804`.
+  related change is owned by another repo, name that repo and the change and stop; the work
+  is not done here and the card is filed on that repo's board.
+- ADRs refer to ADRs, modules and repos; a card number lives in the commit, not in the ADR.
+- **Reference code by module path + sub/method name, never by line number.** Line numbers drift on every refactor; write `_resolve_find_query` in `lib/DBIO/ResultSet.pm`, not `lib/DBIO/ResultSet.pm:804`.
 
 ## What counts as ADR-worthy
 
@@ -41,8 +43,8 @@ Deploy/Introspect/Diff, the driver pattern, type mapping, async, or cross-driver
 
 ## Where ADRs come from — two directions
 
-- **Forward** (a decision crystallising now): `improve-codebase-architecture` /
-  `grill-with-docs` write the ADR as the decision is made. They presuppose `docs/adr/`.
+- **Forward** (a decision is made now): the ADR is written as soon as the decision falls;
+  `docs/adr/` must exist.
 - **Backward** (this skill's archaeology — recover decisions already in the structure):
   1. **Structure first** — walk the `DBIO::` namespaces: what's renamed, removed, added.
   2. **Upstream diff** — hold `DBIO::X` against `DBIx::Class::X`; the divergence *is* the
@@ -61,7 +63,7 @@ Deploy/Introspect/Diff, the driver pattern, type mapping, async, or cross-driver
 ## Cross-repo ownership (critical)
 
 A decision owned by **core** gets a **core** ADR — never duplicated in a driver. When a driver
-review surfaces a core-owned consolidation, file a karr ticket to core and record it under
+review surfaces a core-owned consolidation, file a karr ticket to core and record the change under
 `## Future architecture work (tracked cross-repo, not here)` (see `dbio-duckdb/docs/adr/0001`).
 Who owns what → [[dbio-coordination]].
 
@@ -79,10 +81,10 @@ An accepted ADR is not rewritten silently. Two cases:
   became wrong): correct it **inline**. No trace is needed; the ADR states what is true.
 - **A consequence that was true when the ADR was written** and was overtaken later: leave
   the text, and add a **dated addendum**. At the affected passage put an
-  `**Amended YYYY-MM-DD (kNN):**` pointer saying what changed in one or two sentences and
-  naming the addendum; at the end of the ADR add a `## Addendum YYYY-MM-DD — <what changed> (karr kNN)`
-  section with the detail. Examples in core: ADR 0032 (amended 2026-07-27 and 2026-09-25)
-  and ADR 0053 (addendum 2026-10-04). A decision that is replaced as a whole is not an
+  `**Amended YYYY-MM-DD:**` pointer saying what changed in one or two sentences and
+  naming the addendum; at the end of the ADR add a `## Addendum YYYY-MM-DD — <what changed>`
+  section with the detail. Examples in core: ADR 0032
+  and ADR 0053. A decision that is replaced as a whole is not an
   amendment: write a new ADR and set the old one's Status to `superseded`.
 
 ## Numbering

@@ -543,7 +543,7 @@ print "Ürün 5001 toplam $okunma_sayisi kez görüntülendi.\n";
 
 ## 5. Basit Mod ve İndekssiz Doğrudan Erişim (Simple Mode)
 
-AmberDB'de **Basit Mod (`simple => 1`)**, tabloya ait hiçbir şema dosyasının (`.table` / `.dbase`) ve ikincil indeks dosyalarının (`.inx`, `.src`, `.fld`, `.fac`, `.slg`, `.aut`, `.del`) kullanılmadığı; veritabanının tamamen **şemasız (schemaless), hafif ve doğrudan düz dosya NoSQL anahtar-değer deposu** olarak çalıştığı işletim biçimidir.
+AmberDB'de **Basit Mod (`use_simple => 1`)**, tabloya ait hiçbir şema dosyasının (`.table` / `.dbase`) ve ikincil indeks dosyalarının (`.inx`, `.src`, `.fld`, `.fac`, `.slg`, `.aut`, `.del`) kullanılmadığı; veritabanının tamamen **şemasız (schemaless), hafif ve doğrudan düz dosya NoSQL anahtar-değer deposu** olarak çalıştığı işletim biçimidir.
 
 Basit modda kayıtlar iç içe dizi ve sözlük referansları (`ARRAY`/`HASH`) dahil zengin veri yapılarını doğrudan saklayabilir. İkincil indeks bakım maliyeti ortadan kalkar; tekil anahtar okuma ve yazma işlemleri (`read_id`, `insert_id`) maksimum disk/bellek hızında $O(1)$ olarak gerçekleşir.
 
@@ -557,7 +557,7 @@ Basit mod 4 farklı şekilde etkinleştirilebilir:
    ```perl
    my $adb = AmberDB->new(
        path => { dbase_dir => "/var/data/sessions" },
-       cfg  => { simple    => 1 },
+       cfg  => { use_simple => 1 },
    );
    ```
 
@@ -570,7 +570,7 @@ Basit mod 4 farklı şekilde etkinleştirilebilir:
 
 3. **Çalışma Zamanında Dinamik Geçiş (`config`):**
    ```perl
-   $adb->config( simple => 1 );
+   $adb->config( use_simple => 1 );
    ```
 
 4. **Özel Dosya Uzantısı ile Otomatik Basit Mod:**  
@@ -578,7 +578,7 @@ Basit mod 4 farklı şekilde etkinleştirilebilir:
    ```perl
    my $adb = AmberDB->new(
        path => { dbase_dir => "/var/data/cache" },
-       cfg  => { db_ext    => "dat" },  # Farklı uzantı tanımlamak, otomatik simple => 1 tetikler
+       cfg  => { db_ext    => "dat" },  # Farklı uzantı tanımlamak, otomatik use_simple => 1 tetikler
    );
    ```
 
@@ -708,14 +708,14 @@ Basit mod şemaya ihtiyaç duymadığından, yüksek performanslı bir bellek ö
 # 1. Kalıcı disk nesnesi (Kalıcı veriler için)
 my $db_kalici = AmberDB->new(
     path => { dbase_dir => "/var/data/eticaret/dbstore/table" },
-    cfg  => { simple => 1 },
+    cfg  => { use_simple => 1 },
 );
 
 # 2. RAM-Disk nesnesi (Sıfır gecikmeli hızlı oturum/önbellek tabloları için)
 # (Linux: /dev/shm veya tmpfs, Windows: ImDisk, macOS: APFS RAM-Disk /Volumes/AmberDB_RAM)
 my $db_ramdisk = AmberDB->new(
     path => { dbase_dir => "/dev/shm/amberdb_cache" },
-    cfg  => { simple => 1, no_backup => 1 }, # Önbellek için yedekleme kapatılabilir
+    cfg  => { use_simple => 1, no_backup => 1 }, # Önbellek için yedekleme kapatılabilir
 );
 
 # RAM üzerinde nanosaniye hızında oturum okuma/yazma:
@@ -732,7 +732,7 @@ Bu çift nesneli mimari sayesinde:
 
 ### 5.8 Basit Mod: Yetenekler ve Kısıtlamalar Karşılaştırması
 
-| Özellik / Mekanizma | Standart Mod (`simple => 0`) | Basit Mod (`simple => 1`) |
+| Özellik / Mekanizma | Standart Mod (`use_simple => 0`) | Basit Mod (`use_simple => 1`) |
 | :--- | :---: | :---: |
 | **Şema Dosyaları (`.table`, `.dbase`)** | Zorunlu / Kullanılır | Yok / Şemasız |
 | **Özel ve Uzun ID'ler (UUID, E-posta, vb.)** | 8 Bayt / ASCII Kısıtlı | **Tamamen Serbest** |
@@ -1352,7 +1352,7 @@ AmberDB, veri tutarlılığını sağlamak için iki yönlü şema doğrulama ve
    - `array` alanları boşsa `[]`, `hash` alanları `{}` olarak garanti edilir.
 
 3. **Simple Mod Uyumu:**
-   - Şemasız (`simple => 1`) modda veya `blocks` tanımlanmamış tablolarda `enc_validate` ve `dec_validate` hiçbir ek döngü çalıştırmadan veriyi doğrudan döndürür (sıfır ek maliyet).
+   - Şemasız (`use_simple => 1`) modda veya `blocks` tanımlanmamış tablolarda `enc_validate` ve `dec_validate` hiçbir ek döngü çalıştırmadan veriyi doğrudan döndürür (sıfır ek maliyet).
 
 ### 9.9 Çalışma Zamanında Dinamik Şema Manipülasyonu (`table_attr`)
 
@@ -1416,7 +1416,7 @@ Her `insert_id`, `update_id`, `insert_list` veya `update_list` çağrısında mo
 
 > [!NOTE]
 > **Basit Modda (Şemasız) Tekrarlayan Bloklar:**  
-> Tekrarlayan blokların otomatik olarak derlenip `repeat_ids` özet alanına virgülle yazılması (`repeat_fields`), şema dosyasındaki `repeat_start` ve `repeat_ids` tanımlarına bağlıdır. Şemasız basit modda (`simple => 1`) şema yüklenmediği için bu otomatik derleme yapılmaz; kayıtlar ham Perl listesi olarak diske kaydedilir. Eğer basit modda çalışan bir tabloda bu tür bir özet alanına ihtiyaç varsa, bu alanın geliştirici tarafından manuel olarak doldurulması gerekir.
+> Tekrarlayan blokların otomatik olarak derlenip `repeat_ids` özet alanına virgülle yazılması (`repeat_fields`), şema dosyasındaki `repeat_start` ve `repeat_ids` tanımlarına bağlıdır. Şemasız basit modda (`use_simple => 1`) şema yüklenmediği için bu otomatik derleme yapılmaz; kayıtlar ham Perl listesi olarak diske kaydedilir. Eğer basit modda çalışan bir tabloda bu tür bir özet alanına ihtiyaç varsa, bu alanın geliştirici tarafından manuel olarak doldurulması gerekir.
 
 #### 9.10.3 Kodlama ve Sorgulama Örneği
 ```perl
@@ -1759,7 +1759,7 @@ AmberDB'nin çalışma modunu değiştirmek ve yapılandırma bayraklarını gü
 $adb->config(
     no_write     => 1,            # Bakım modu: Tüm yazma işlemlerini engelle
     no_backup    => 1,            # Tüm tablolar için günlük CSV denetim yedeklerini kapat
-    simple       => 1,            # İndekssiz doğrudan yazım modu (İkincil indeksler devre dışı bırakılır)
+    use_simple   => 1,            # İndekssiz doğrudan yazım modu (İkincil indeksler devre dışı bırakılır)
     keys_only    => 1,            # read_all çağrılarında sadece ID'leri döndür
     ramdisk_size => '1024M',      # RAM-Disk (tmpfs/APFS/ImDisk) boyutu (Varsayılan: 512M)
 );

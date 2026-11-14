@@ -4,7 +4,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 ## Version
 
-Version 0.011.1
+Version 0.011.2
 
 ## Synopsis
 
@@ -195,6 +195,29 @@ a single SQL JOIN there, keeping peak RAM to roughly one times the source data
 size instead of three.  You can also force either path unconditionally with
 `backend => 'sqlite'` or `backend => 'array'`.
 
+**Key pushdown (array backend)**
+
+Under a `left` or `inner` join, only secondary rows whose key is one of the
+primary's can appear in the result.  So once the primary has been read, each
+secondary that has no criterion on its join column is asked for just those
+keys, as `{ -in => [ ... ] }` on its local join column, instead of being
+read in full.  Joining a few hundred primary rows to a large secondary table
+then costs a few hundred rows, not the whole table.  Pushdown is skipped when:
+
+- the join is `outer`, which needs every secondary key;
+- the primary has no rows, or more than 999 keys (the bind-parameter
+limit of older SQLite builds; past that, reading the whole table is no worse);
+- the query already has a criterion on the join column, which then
+stands as given;
+- the secondary's `selectall_arrayref` is not
+`Database::Abstraction`'s own.  A subclass that overrides it, or another
+object implementing the interface, may not understand `-in`.
+
+If the secondary croaks on the `-in` query, it is read in full instead.  The
+result is the same either way.  Pushdown only narrows what is fetched; it never
+counts as the secondary's own criterion, so it can't turn a `left` join into
+an `inner` one.
+
 ### Join Semantics
 
 The `join_type` parameter controls what happens when a particular key value
@@ -250,7 +273,10 @@ preserve both values under distinct names instead.
 - Memory usage (array backend)
 
     When `backend` is `'array'` (or `'auto'` and the dataset is small), all
-    matching rows are fetched into Perl memory.  Peak RAM is roughly three times
+    matching rows are fetched into Perl memory.  Key pushdown (see
+    ["DESCRIPTION"](#description)) limits a secondary to the primary's keys under `left` and
+    `inner` joins, but an `outer` join, or a primary with more than 999 keys,
+    still reads every secondary row.  Peak RAM is roughly three times
     the source data size.  For large datasets use `backend => 'sqlite'`, or
     leave `backend => 'auto'` and set `max_array_rows` appropriately.
 
@@ -1425,6 +1451,8 @@ databases, optionally filtered by the given criteria.
 Criteria for columns that live in different databases are routed
 automatically: each database is queried with only the criteria that apply to
 its own columns.  The results are combined in memory using `join_column`.
+Under a `left` or `inner` join, a secondary database is also limited to the
+primary's keys (see "Key pushdown" in ["DESCRIPTION"](#description)).
 
 Accepts the same criteria syntax as `Database::Abstraction::selectall_arrayref`.
 A single plain scalar argument is interpreted as the `join_column` value

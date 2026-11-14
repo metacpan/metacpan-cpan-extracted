@@ -621,6 +621,16 @@ The table version of the Diff list is 3, the list holds 20 cases.
   to 3 and declares the outcome of the case: applied, or refused naming table
   `wide` and column `drop_idx_col`.
 
+## Addendum 2026-11-10 — a refusal is explained by kind and reason
+
+A `pending` refusal is declared with `kind => 'pending'` and a `reason`; it
+names no card. `pending` means the driver cannot do it yet, the reason says why.
+The `card` field of a declaration and the `cards` field of a case no longer exist:
+the closing line of a run names each refused case or area and its kind, and a
+case carries no list of cards. Where the sections above name `card` or `cards`,
+this addendum replaces them. The same holds for `DBIO::Test::AsyncParity` and
+its `pending` deviation.
+
 ## Open
 
 What the draft left open and the answers do not cover; not decided, not built.

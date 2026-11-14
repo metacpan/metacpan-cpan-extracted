@@ -56,4 +56,10 @@ is $o->beep, 11, 'true: ran';
 $o->mayhaps::bop(1);
 is $o->beep, 10, 'true: ran';
 
+my $method = "mayhaps::bop";
+
+$o->$method(1);
+
+is $o->beep, 9, 'true: ran';
+
 done_testing;

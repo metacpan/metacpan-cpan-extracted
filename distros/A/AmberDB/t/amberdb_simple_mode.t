@@ -259,7 +259,7 @@ subtest '8. Daily Backup Logs (recs_back) in Simple Mode' => sub {
     mkdir($db_dir);
     my $adb = AmberDB->new(
         path => { dbase_dir => $db_dir },
-        cfg  => { simple => 1, user => 'simple_admin' },
+        cfg  => { use_simple => 1, user => 'simple_admin' },
     );
 
     my $sid = 'sess_token_99999_xyz_extra_long';
@@ -310,7 +310,7 @@ subtest '8. Daily Backup Logs (recs_back) in Simple Mode' => sub {
     mkdir($db_dir_noback);
     my $adb_noback = AmberDB->new(
         path => { dbase_dir => $db_dir_noback },
-        cfg  => { simple => 1, no_backup => 1 },
+        cfg  => { use_simple => 1, no_backup => 1 },
     );
     $adb_noback->insert_id( 'tbl', 'id1', 'val1' );
     my $noback_csv = "$db_dir_noback/$date_iso.csv";
@@ -346,6 +346,43 @@ subtest '9. Simple Mode Key Sanitization and Reference Rejection' => sub {
     is( $adb->id_check( 'test', $long_key ), undef, '>255 byte key rejected in Simple Mode' );
     my $ok_key = 'x' x 255;
     is( $adb->id_check( 'test', $ok_key ), $ok_key, '255 byte key accepted in Simple Mode' );
+};
+
+# ============================================================
+# 10. Simple Mode Configuration Interoperability (simple <-> use_simple)
+# ============================================================
+subtest '10. Configuration Interoperability (simple <-> use_simple)' => sub {
+    # 1. new with simple => 1 (normalized to use_simple, no simple key kept in hash)
+    my $db1 = AmberDB->new( cfg => { simple => 1 } );
+    is( $db1->config('simple'),     1, "new(cfg => { simple => 1 }): config('simple') is 1" );
+    is( $db1->config('use_simple'), 1, "new(cfg => { simple => 1 }): config('use_simple') is 1 (fallback)" );
+    ok( !exists $db1->{_cfg}->{simple}, "hash contains only use_simple, no {simple} key in _cfg" );
+    is( $db1->{_cfg}->{use_simple}, 1,  "{use_simple} is 1 in _cfg" );
+
+    # 2. new with use_simple => 1
+    my $db2 = AmberDB->new( cfg => { use_simple => 1 } );
+    is( $db2->config('use_simple'), 1, "new(cfg => { use_simple => 1 }): config('use_simple') is 1" );
+    is( $db2->config('simple'),     1, "new(cfg => { use_simple => 1 }): config('simple') is 1 (fallback)" );
+    ok( !exists $db2->{_cfg}->{simple}, "hash contains only use_simple, no {simple} key in _cfg" );
+    is( $db2->{_cfg}->{use_simple}, 1,  "{use_simple} is 1 in _cfg" );
+
+    # 3. Dynamic setter with use_simple
+    my $db3 = AmberDB->new();
+    $db3->config( use_simple => 1 );
+    is( $db3->config('use_simple'), 1, "setter use_simple => 1: config('use_simple') is 1" );
+    is( $db3->config('simple'),     1, "setter use_simple => 1: config('simple') is 1" );
+    ok( !exists $db3->{_cfg}->{simple}, "hash still contains only use_simple" );
+
+    # 4. Dynamic setter with simple (stores into use_simple only)
+    $db3->config( simple => 0 );
+    is( $db3->config('simple'),     0, "setter simple => 0: config('simple') is 0" );
+    is( $db3->config('use_simple'), 0, "setter simple => 0: config('use_simple') is 0" );
+    ok( !exists $db3->{_cfg}->{simple}, "setter simple => 0 stores into use_simple only" );
+
+    $db3->config( simple => 1 );
+    is( $db3->config('simple'),     1, "setter simple => 1: config('simple') is 1" );
+    is( $db3->config('use_simple'), 1, "setter simple => 1: config('use_simple') is 1" );
+    ok( !exists $db3->{_cfg}->{simple}, "setter simple => 1 stores into use_simple only" );
 };
 
 done_testing();

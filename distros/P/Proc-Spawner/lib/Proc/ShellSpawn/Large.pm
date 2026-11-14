@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Large;
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 # EXPERIMENTAL, awaiting approval: what Proc::ShellSpawn needs to run Proc::ShellSubset::Large trees
 # (doc/large-subset/large-subset-spec.md, sections 4 and 5), as handlers named in Proc::ShellSpawn's tables:
 #   x_NAME(CONTEXT, NODE, TAIL, K)         command nodes { func | export | readonly | local | exec => ... }
@@ -57,9 +57,14 @@ sub restore {   # put back variables a function changed with local, or settings 
     if ($had) { $sh->{vars}{$n} = $v } else { delete $sh->{vars}{$n} }
     if ($exp) { $sh->{exp}{$n} = 1 } else { delete $sh->{exp}{$n} } } }
 sub b_return {
-  my ($c, $argv) = @_; my $st = $argv->[1] // $c->{sh}{q};
+  my ($c, $argv, $env, $k) = @_; my $st = $argv->[1] // $c->{sh}{q};
+  return Proc::ShellSpawn::fail($c, 2, "return: Illegal number: $st")   # NV1 (X42): known only at run time, as the shells
+    if defined $argv->[1] && !Proc::ShellSpawn::ok_num($st, 0);
+  $st += 0;
   my $fr = $c->{frame} or return $c->{sh}{intext} ? leave($c, $st)   # outside a function, in eval or . text: as exit
-    : Proc::ShellSpawn::fail($c, 2, "return: can only `return' from a function or sourced script");   # else an error, as bash (rule E)
+    : $c->{cond} ? Proc::ShellSpawn::msg($c, "return: can only `return' from a function or sourced script", sub { $k->(2) })   # X48:
+    : Proc::ShellSpawn::fail($c, 2, "return: can only `return' from a function or sourced script");   # tested (&&, ||, !, if,
+    # while): status 2, the shell goes on; else the shell ends, status 2: both as bash --posix (rule E)
   release_ctx($c); release_all(map $_->{scope}, @{$c->{loops}}); $fr->{ret}->($st) }
 
 # ------------------------------------------------------------------ declarations
@@ -97,6 +102,8 @@ sub x_exec {
 # ------------------------------------------------------------------ builtins
 sub b_shift {
   my ($c, $argv, $env, $k) = @_; my $n = $argv->[1] // 1; my $a = $c->{sh}{args};
+  return fail($c, 2, "shift: Illegal number: $n") unless Proc::ShellSpawn::ok_num($n, 0);   # NV1 (X46): -1, x1 at run time
+  $n += 0;
   return fail($c, 2, "shift: can't shift that many") if $n > @$a;
   splice @$a, 0, $n; defer($k, 0) }
 
@@ -110,7 +117,12 @@ sub b_set {
     last unless $x =~ /^([-+])(.+)/; shift @a; my ($on, $f) = ($1 eq '-', $2);
     return fail($c, 2, "set: Illegal option -o history")   # B2: as dash, when the caller asked for dash's interactive builtins
       if $f eq 'o' && ($a[0] // '') eq 'history' && $c->{sh}{interactive} eq 'dash';
-    for my $l ($f eq 'o' ? $OPT{shift @a // ''} // '' : split //, $f) { $on ? ($o->{$l} = 1) : delete $o->{$l} } }
+    if ($f eq 'o') {   # NV1 (X43): a name known only at run time; none: it lists (A4, as the parser has it)
+      return unsupported($c, "'set -o' without a name (it lists)") unless @a;
+      my $n = shift @a; exists $OPT{$n} || $n =~ /^(?:vi|emacs|history)\z/ or return Proc::ShellSpawn::fail($c, 2, "set: Illegal option -o $n");
+      my $l = $OPT{$n} // ''; $on ? ($o->{$l} = 1) : delete $o->{$l}; next }
+    for my $l (split //, $f) { $l =~ /^[eufCab]\z/ || $l eq 'm' && !$on or return Proc::ShellSpawn::fail($c, 2, "set: Illegal option $1$l");
+      $on ? ($o->{$l} = 1) : delete $o->{$l} } }
   $c->{sh}{args} = [@a] if $ops || @a;
   defer($k, 0) }
 
@@ -121,7 +133,8 @@ sub b_dot {
     Proc::ShellSpawn::path_list(var($c, 'PATH'));
   $p = Proc::ShellSpawn::path_in($c, $p) if defined $p;
   open my $fh, '<', $p // '' or return fail($c, 2, ".: cannot open $f: No such file");
-  run_text($c, do { local $/; <$fh> }, "the text of '. $f'", $k) }
+  my $text = do { local $/; <$fh> } // '';   # (X39: in list context an empty file, or a directory, gave no argument at all)
+  run_text($c, $text, "the text of '. $f'", $k) }
 
 my %SIGNAME; { my @n = split ' ', $Config::Config{sig_name}; @SIGNAME{split ' ', $Config::Config{sig_num}} = @n; $SIGNAME{0} = 'EXIT' }
 my %SIGNUM; @SIGNUM{split ' ', $Config::Config{sig_name}} = split ' ', $Config::Config{sig_num};
@@ -129,14 +142,18 @@ sub b_trap {   # names in any case, or numbers (P6); KILL and STOP cannot be cau
   my ($c, $argv, $env, $k) = @_; my ($act, @sigs) = @$argv[1 .. $#$argv]; my $sh = $c->{sh};
   for my $s (map /^[0-9]+\z/ ? $SIGNAME{$_} // $_ : uc, @sigs) {
     next if $s eq 'KILL' || $s eq 'STOP';
+    next if $Proc::ShellSpawn::IGN0{$s};   # X49: ignored on entry: cannot be trapped or reset (POSIX; both shells)
     if ($act eq '-') { delete $sh->{trap}{$s} } else { $sh->{trap}{$s} = $act }
     next if $s eq 'EXIT';
+    next if $sh->{main};   # X51: a subshell runs in this process; a signal sent to it ($$, the group) is the main shell's,
+                           #   as in dash, where the subshell is another process (its trap: recorded, for 'trap' and its programs)
     my $w = $c; weaken $w;
-    my $h = $sh->{tsub}{$s} = sub { return unless $w; push @{$w->{sh}{pend}}, $s; defer(\&run_pending, $w) };
+    my $h = $sh->{tsub}{$s} = sub { return unless $w; push @{$w->{sh}{pend}}, $s };   # X51: run by the list, before its
+                           #   next command (X19): after the foreground command, as POSIX and both shells
     next unless exists $SIGNUM{$s};   # a signal Perl does not have here (Windows: USR1, ...): only kill ... $$ sends it
     $Proc::ShellSpawn::TRAPSAVE{$s} //= $SIG{$s} // 'DEFAULT';
-    $SIG{$s} = $act eq '-' ? $Proc::ShellSpawn::TRAPSAVE{$s} : $act eq '' ? 'IGNORE' : $h }   # deferred: the action runs between
-  # two reactions, and at the latest before the next command of a list (X19: as dash, before what follows the command)
+    $SIG{$s} = $act eq '-' ? $Proc::ShellSpawn::TRAPSAVE{$s} : $act eq '' ? 'IGNORE' : $h }   # queued: the action runs before the
+  # main shell's next command (X19: as dash, before what follows the command; X51: not while the command still runs)
   defer($k, 0) }
 sub run_pending {   # the actions of the signals caught since the last time, in order; then $k (and every other waiter)
   my ($c, $k) = @_; my $sh = $c->{sh};
@@ -195,6 +212,7 @@ sub b_test {   # rule F (post2-0.04): 's1 < s2', 's1 > s2' (also after '!'), whi
 sub b_command {
   my ($c, $argv, $env, $k) = @_; my (undef, @a) = @$argv;
   if (($a[0] // '') eq '-v') {
+    return unsupported($c, "'command -v' with " . (@a - 1) . " names") if @a != 2;   # X53: as the parser (one name)
     my $n = $a[1] // ''; my $sh = $c->{sh};
     return put($c, 1, "$n\n", sub { $k->(0) })
       if $sh->{cmd}{$n} || (Proc::ShellSpawn::cmd_of($n) // ['unsupported'])->[0] !~ /unsupported/ || $Proc::ShellSpawn::SPECIAL{$n} || $ASPROG{$n} || $Proc::ShellSubset::BI{$n};
@@ -203,6 +221,9 @@ sub b_command {
     return defer($k, 127) unless defined $p;
     return put($c, 1, "$p\n", sub { $k->(0) }) }
   return defer($k, 0) unless @a;
+  # X53: the forms the parser refuses (another option, -v with more than one name, -p with an option after it), when
+  # only expansions make them: outside the subset at run time (A4), not a program named -n
+  return unsupported($c, "'command " . ($a[0] eq '-p' ? "-p $a[1]" : $a[0]) . "'") if $a[0] =~ /^-/ && $a[0] ne '-p' || $a[0] eq '-p' && ($a[1] // '') =~ /^-/;
   if ($a[0] eq '-p') {   # command -p PROGRAM ... (parser item P4): looked up in a default PATH, run with the PATH it has
     shift @a; return (Proc::ShellSpawn::cmd_of($a[0]) // [''])->[0] !~ /b_test\z|^\z/ || $c->{sh}{cmd}{$a[0]} ? unsupported($c, "'command -p $a[0]'")
       : spawn($c, $c->{map}, \@a, $env, $k, $DEFPATH) }
@@ -269,6 +290,7 @@ sub b_kill {   # kill ... $$: the shell takes the signal itself (F9); other proc
     my $t = $m->{trap}{$s};
     return defer($k, 0) if $s eq 'EXIT' || $harmless && !defined $t;   # kill -0 $$ only tests; as both shells, status 0
     return defer($k, 0) if defined $t && $t eq '';            # ignored
+    return defer($k, 0) if $Proc::ShellSpawn::IGN0{$s};       # X49: ignored on entry, so no trap: nothing, as both shells
     return run_trap($c, $s, sub { defer($k, 0) }) if defined $t && $m == $sh;
     if (defined $t) { my $h = $m->{tsub}{$s}; $h->($s) if $h; return defer($k, 0) }   # as a real signal: the trap runs in the main shell
     $m->{trap}{EXIT} = '' if exists $m->{trap}{EXIT};         # a death by the signal runs no EXIT trap

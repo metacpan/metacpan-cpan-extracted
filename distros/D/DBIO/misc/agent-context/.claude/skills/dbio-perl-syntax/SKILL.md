@@ -1,6 +1,6 @@
 ---
 name: dbio-perl-syntax
-description: Load before editing any .pm, .pl or .t in a DBIO distribution — module loading, file preamble, per-module $VERSION, whitespace, idioms, cpanfile versioning.
+description: Use when editing any .pm, .pl or .t in a DBIO distribution — module loading, file preamble, $VERSION, whitespace, idioms, cpanfile versioning.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -43,8 +43,8 @@ use base 'DBIO::AccessBroker';
 **Every shipped `.pm` under `lib/` carries a literal `our $VERSION = '...'`** — not
 only the main module, and all of them the *same* version. Canonical placement is
 right after `use warnings;`; some main modules carry it directly under `package` /
-`# ABSTRACT:` — both are fine, don't churn existing files just to move the line. Do
-NOT remove a `$VERSION`, and do NOT flag one in a sub-module as a violation.
+`# ABSTRACT:` — both are fine, and an existing file keeps the line where it is. A
+`$VERSION` in a sub-module is the rule.
 
 ## Module loading
 
@@ -57,27 +57,21 @@ NOT remove a `$VERSION`, and do NOT flag one in a sub-module as a violation.
   ...
   Scalar::Util::blessed($class);
   ```
-- **For new code:** existing `require`s in core (some in method bodies) are heritage, not the model.
-- **`require` is forbidden as a "lazy optimization".** Never use it to shave
-  startup. If you write `require Foo;` inside a method body, stop — hoist it to a
-  top-level `use`.
-- **`require` is allowed ONLY when essential** — true runtime plugin loading (the
+- **For new code** the model is the top-level `use`; existing `require`s in core (some in
+  method bodies) are not the pattern to copy.
+- **`require` is no startup optimisation.** A `require Foo;` inside a method body
+  becomes a top-level `use`.
+- **`require` appears only when essential** — true runtime plugin loading (the
   class is determined from config/DB at runtime, e.g.
   `ensure_class_loaded($class_from_db)`, `Module::Runtime::use_module($x)`), a
   documented **optional** dependency probed at runtime, or inside a `::Util`
-  class. `::Util` classes are the exception: they wrap the things that are
-  otherwise forbidden (see File I/O). If the class name is known at write-time
+  class. `::Util` classes are the exception: they wrap what app code
+  does not do directly (see File I/O). If the class name is known at write-time
   and the dep is required, `use` it.
-- **`require Foo; Foo->new` inside a controller action** is a red flag. Hoist to `use`.
-
-## Singletons
-
-- **`->instance`** for `MooseX::Singleton` / `MooX::Singleton` classes. Never `->new` a singleton.
-- **`->new`** for everything else.
 
 ## Whitespace & idioms
 
-- **2-space indentation.** Not 4. Not tabs. Heritage 4-space files stay as-is
+- **2-space indentation**, no tabs. Existing 4-space files stay as they are
   until they are touched; new code is 2-space.
 - **Trailing commas are the standard** on multi-line lists — preferred, not just
   allowed. Single-line lists stay comma-free.
@@ -91,18 +85,19 @@ NOT remove a `$VERSION`, and do NOT flag one in a sub-module as a violation.
 - POD is **inline** next to the code it documents (`=method`, `=attr`), not in a block at EOF.
 - `=encoding` depends on whether the file is valid POD before weaving. PodWeaver
   (`-SingleEncoding` in `@DBIO`) strips every source `=encoding` and emits exactly one at
-  build time, `.pod` files included, so the build never needs the source line (core k217).
+  build time, `.pod` files included, so the build never needs the source line.
   - A file using `=method`/`=attr` carries **no `=encoding` line**, even with
     non-ASCII (em-dashes, `§`) in the POD. It is not valid POD until the weaver runs, and
-    `xt/pod.t` skips it, so the line serves nothing (core k167).
+    `xt/pod.t` skips it, so the line serves nothing.
   - A file with **only plain POD** (`=head1`/`=item`, no weaver directives; every `.pod`
     manual) **keeps `=encoding UTF-8`** at the head of its first POD block. `xt/pod.t`
     checks these files raw and fails on "Non-ASCII character seen before =encoding"
-    (core k115). Keep the line even while the file is pure ASCII, so the first em-dash
+    Keep the line even while the file is pure ASCII, so the first em-dash
     does not break it.
   - Check woven POD on the `dzil build` output; `podchecker` on a raw directive file
     measures nothing.
 - End every module with a lone `1;`.
+- Debug output uses `DDP`/`Data::Printer` (stripped before commit) or `DBIO::Util::dump_value`, the sanctioned debug helper; shipped code carries no `Data::Dumper`.
 
 ## File I/O
 
@@ -115,9 +110,9 @@ NOT remove a `$VERSION`, and do NOT flag one in a sub-module as a violation.
   my $src = slurp_file_utf8(file_path($tmpdir, 'Result', 'User.pm'));
   ```
 - **`File::Temp`** for temporary files/dirs (mostly tests). Core module, fine as-is.
-- No `Path::Tiny`. No direct `File::Spec`. No bare `open` in app code — `::Util`
-  classes are the wrapper for the forbidden things: they may `require` and
-  bare-`open` internally, app code never does.
+- App code reaches files through the `DBIO::Util` helpers, not `Path::Tiny`, `File::Spec`
+  or a bare `open`; the `::Util` classes are the wrapper and may `require` and
+  bare-`open` internally.
 
 ## JSON
 
@@ -125,19 +120,12 @@ NOT remove a `$VERSION`, and do NOT flag one in a sub-module as a violation.
 
 ## cpanfile versioning — DBIO-authored deps
 
-The family is developed against the **staged, unreleased** version: every repo's `$VERSION`
-is the number the family is released as, ahead of the last CPAN tag.
-
-1. **Pin a DBIO-family dep to the staged family version** — the dep repo's own
-   `$VERSION` (`grep VERSION dbio/lib/DBIO.pm`), the same number in every repo's
-   cpanfile. A pin equal to the dep repo's `$VERSION` is correct, not a defect; do
-   **not** "correct" it back to the last released number.
-2. **Consistency is the check:** `grep "'DBIO'" */cpanfile` shows one number everywhere.
-   A repo still on the previous number was missed by the sweep — bring it forward.
-3. Never `'0'` and never a stale number for a DBIO-authored dep.
-4. A non-DBIO dep pinned to a specific version is checked with `cpanm --info Module::Name`.
-5. Staging pins are set deliberately, as part of a release run, never in passing.
-   Cross-repo development installs happen via `dzil install` in the dependency's repo.
+1. **A DBIO-family dep is pinned to the dep repo's own `$VERSION`** (`grep VERSION
+   dbio/lib/DBIO.pm`), the same number in every cpanfile (`grep "'DBIO'" */cpanfile`
+   shows one number everywhere). Never `'0'`, never a stale number.
+2. Pins change as part of a release run; cross-repo development installs happen via
+   `dzil install` in the dependency's repo.
+3. A non-DBIO dep pinned to a specific version is checked with `cpanm --info Module::Name`.
 
 ## Testing
 
@@ -149,15 +137,9 @@ is the number the family is released as, ahead of the last CPAN tag.
   ```perl
   BEGIN { eval { require Moo; 1 } or plan skip_all => 'Moo not installed' }
   ```
-
-## Forbidden / anti-patterns
-
-- ❌ `require Foo` inside a method to "speed up startup" (exception: `::Util` classes)
-- ❌ Using a `$VERSION` from a DBIO repo as a cpanfile requirement
-- ❌ 4-space indent or tabs in new Perl files (heritage 4-space files stay until touched)
-- ❌ `Path::Tiny`, direct `File::Spec`, or bare `open` in app code — use the `DBIO::Util` file helpers (`::Util` classes may wrap them)
-- ❌ `||` where `//` is meant (clobbers legitimate `0`/`''`)
-- ❌ `Data::Dumper` in shipped code (use `DDP`/`Data::Printer` for debug, strip before commit; `DBIO::Util::dump_value` is the sanctioned debug helper)
+- A test skips on the capability it needs, found by trying it, with the reason in the
+  skip; `$^O` only where the platform itself is the reason. Detail: skill
+  `dbio-driver-development`, `references/platform-skips.md`.
 
 ## When in doubt
 

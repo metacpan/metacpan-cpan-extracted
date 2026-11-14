@@ -25,11 +25,11 @@ C<anyevent-mcp manage-rules fs-default> manages the default filesystem
 server's rules. The corresponding C<*-file> commands accept a pathname
 when an application stores its rules elsewhere.
 
-C<init> creates the private global configuration and its master secret,
-from which servers can derive their connection credentials. You normally
-do not need to run it: a server creates a missing secret when it loads its
-configuration. Use C<init> when you want to create the configuration
-explicitly; it refuses to overwrite an existing file.
+C<init> ensures the private global configuration contains a persistent
+master secret, from which servers derive their connection credentials.
+You normally do not need to run it: servers initialize their global
+configuration automatically. Repeating C<init> leaves an existing secret
+unchanged.
 
 See L<AnyEvent::MCP::Intro> for setting up and connecting to the servers,
 L<AnyEvent::MCP/GLOBAL CONFIGURATION> for the configuration file format,
@@ -41,8 +41,8 @@ and L<AnyEvent::MCP::Server::Permissions/RULE FILES> for permission rules.
 
 =item init
 
-Create the private global configuration and master secret. Unlike ordinary
-configuration loading, this fails rather than overwriting an existing file.
+Ensure that the private global configuration and master secret exist.
+An existing secret is preserved; missing secrets are generated and saved.
 C<--config FILE> selects a different configuration file for this command.
 
 =item manage-rules NAME
@@ -74,6 +74,9 @@ Disable a user, preserving the generation for later rotation. In a narrower
 scope, a negative definition also blocks inherited credentials. Implicit
 global:default is revocable. Restart affected servers after changes; these
 commands do not print secrets. Use server --print-url[=USER] for URLs.
+
+User commands rewrite the selected INI file in canonical form. Existing
+settings are retained, but comments and formatting are not preserved.
 
 =back
 
@@ -116,7 +119,6 @@ use Getopt::Long ();
 
 use AnyEvent::MCP ();
 use AnyEvent::MCP::Config ();
-use AnyEvent::MCP::File ();
 
 sub usage {
    print <<'EOF';
@@ -167,32 +169,15 @@ EOF
 sub change_user {
    my ($file, $section, $user, $command) = @_;
 
-   my $lock = AnyEvent::MCP::File::lock $file;
-   open my $fh, "<:raw", $file or die "$file: $!\n";
-   local $/;
-   my $body = <$fh>;
-   close $fh or die "$file: $!\n";
-
-   my @lines = split /(?<=\n)/, $body;
-   my ($current, $found, $position, $value);
+   my $lock = AnyEvent::MCP::file_lock $file;
+   my $config = AnyEvent::MCP::Config->new (file => $file)->load ($lock);
+   my $values = $config->{section}{$section} ||= {};
    my $key = "user.$user";
-
-   for my $i (0 .. $#lines) {
-      if ($lines[$i] =~ /^\s*\[([^\]\r\n]+)\]\s*(?:[;#][^\r\n]*)?\r?\n?\z/) {
-         $current = $1;
-         $position = $i + 1 if $current eq $section;
-      } elsif ($current eq $section && $lines[$i] =~ /^\s*\Q$key\E\s*=\s*([^\r\n;#]*)(?:[;#][^\r\n]*)?\r?\n?\z/) {
-         die "Duplicate $key in [$section]\n" if defined $found;
-         ($found, $value) = ($i, $1);
-         $value =~ s/\s+\z//;
-      }
-   }
-
-   my $generation;
-   if (defined $found) {
-      $value =~ /\A-?[1-9][0-9]*\z/ && length $value < 18
-         or die "Invalid $key generation '$value'\n";
-      $generation = 0 + $value;
+   my $generation = $values->{$key};
+   if (defined $generation) {
+      $generation =~ /\A-?[1-9][0-9]*\z/ && length $generation < 18
+         or die "Invalid $key generation '$generation'\n";
+      $generation = 0 + $generation;
    }
 
    if ($command eq "create-user") {
@@ -210,22 +195,19 @@ sub change_user {
       }
    }
 
-   if (defined $found) {
-      $lines[$found] = "$key = $generation\n";
-   } elsif (defined $position) {
-      splice @lines, $position, 0, "$key = $generation\n";
-   } else {
-      push @lines, "\n[$section]\n$key = $generation\n";
-   }
-   AnyEvent::MCP::File::replace $file, join "", @lines;
-   close $lock;
+   $values->{$key} = $generation;
+   $config->save;
+   close $lock or die "$file: $!\n";
    print "$section: $user generation " . abs ($generation)
       . ($generation > 0 ? " enabled\n" : " revoked\n");
 }
 
 Getopt::Long::Configure ("no_auto_abbrev", "no_ignore_case", "require_order");
-Getopt::Long::GetOptions ("config=s" => \my $file, "program=s" => \my $program,
-                         "instance=s" => \my $instance, "help" => \my $help)
+Getopt::Long::GetOptions
+   "config=s"   => \my $file,
+   "program=s"  => \my $program,
+   "instance=s" => \my $instance,
+   "help"       => \my $help,
    or exit 2;
 
 if ($help) {
@@ -255,16 +237,16 @@ eval {
       exec "anyevent-mcp-askpermission", $action, AnyEvent::MCP::utf8enc $path;
       die "Cannot start permission rule tool: $!\n";
    } elsif ($command eq "init" && !@ARGV) {
-      my $config = AnyEvent::MCP::Config->init (defined $file ? (file => $file) : ());
-      print "Created $config->{file}\n";
+      my $config = AnyEvent::MCP::Config::global_config (defined $file ? (file => $file) : ());
+      print "Initialized $config->{file}\n";
    } elsif ($command =~ /\A(?:create-user|revoke-user)\z/ && @ARGV == 1) {
       !defined $program || !defined $instance or die "--program and --instance are exclusive\n";
-      my $user = AnyEvent::MCP::Config::server_name ($ARGV[0]);
-      my $scope = defined $program ? "program " . AnyEvent::MCP::Config::server_name ($program)
-                : defined $instance ? "instance " . AnyEvent::MCP::Config::server_name ($instance)
+      my $user = AnyEvent::MCP::Config::user_name ($ARGV[0]);
+      my $scope = defined $program ? "program " . AnyEvent::MCP::instance_name ($program)
+                : defined $instance ? "instance " . AnyEvent::MCP::instance_name ($instance)
                 : "global";
       my $config_file = $file // AnyEvent::MCP::Config::_file ();
-      AnyEvent::MCP::Config->new (file => $config_file);
+      AnyEvent::MCP::Config->new (file => $config_file)->load->ensure_secret;
       change_user $config_file, $scope, $user, $command;
    } else {
       die "Invalid command or arguments; use --help\n";

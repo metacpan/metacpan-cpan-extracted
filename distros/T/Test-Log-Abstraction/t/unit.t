@@ -20,6 +20,7 @@ use Test::Mockingbird;
 use Test::Returns;
 use Readonly;
 use Errno qw(ENOENT);
+use Encode ();
 use Capture qw(capture_diag);
 
 use Test::Log::Abstraction;
@@ -137,6 +138,15 @@ my %ledger = (
 	'DIAGNOSTICS: a repeated value is cut to 200 characters' => 'DIAGNOSTICS',
 	'DIAGNOSTICS: control characters are shown as \\xNN' => 'DIAGNOSTICS',
 	'DIAGNOSTICS: an object whose text form dies is shown in plain form' => 'DIAGNOSTICS',
+	'DIAGNOSTICS: C1 controls are \\xNN in a character string, kept in a byte string' => 'DIAGNOSTICS',
+	'DIAGNOSTICS: bidi controls are shown as \\x{NNNN}' => 'DIAGNOSTICS',
+	'DIAGNOSTICS: invalid argument shows the value that was given' => 'DIAGNOSTICS',
+
+	'printed: control characters are \\xNN, except tab and newline' => 'Which messages are printed',
+	q{printed: a message's level is shown the same way} => 'Which messages are printed',
+	'printed: the stored message is not changed' => 'Which messages are printed',
+	'printed: C1 controls are \\xNN in a character string, kept in a byte string' => 'ENCODING',
+	'printed: a character string that is not valid UTF-8 has U+FFFD for each bad part' => 'ENCODING',
 );
 
 # Mark a documented state as proven.  A name that is not in the ledger is
@@ -771,6 +781,93 @@ subtest 'DIAGNOSTICS: an object whose text form dies is shown in plain form' => 
 	warning_like { $result = logger()->level($bomb) } qr/\A\Q$CLASS: invalid syslog level '\E$plain'/, 'level(object) warns with its own message';
 	is($result, undef, '... and returns undef, as for any bad name');
 	proven('DIAGNOSTICS: an object whose text form dies is shown in plain form');
+};
+
+# Strategy: DIAGNOSTICS draws the line for 0x80 to 0x9F by the kind of
+# string, because in a byte string they are pieces of UTF-8.  Show one C1
+# control each way, through an error and a warning
+subtest 'DIAGNOSTICS: C1 controls depend on the kind of string' => sub {
+	throws_ok { $CLASS->new(level => "a\x{9B}b\x{263A}") } at_caller("invalid syslog level 'a\\x9Bb\x{263A}'"), 'a character string: escaped';
+	my $euro = Encode::encode('UTF-8', "\x{20AC}");	# its bytes include 0x82
+	warning_like { logger()->level("a$euro") } at_caller("invalid syslog level 'a$euro'"), 'a byte string: UTF-8 kept whole';
+	proven('DIAGNOSTICS: C1 controls are \\xNN in a character string, kept in a byte string');
+};
+
+# Strategy: DIAGNOSTICS lists the bidi controls by range; check the first
+# and last of each range in an error, and that the warning path agrees
+subtest 'DIAGNOSTICS: bidi controls are shown as \\x{NNNN}' => sub {
+	foreach my $code (0x200E, 0x200F, 0x202A, 0x202E, 0x2066, 0x2069) {
+		my $name = 'a' . chr($code) . 'b';
+		my $shown = sprintf('a\\x{%X}b', $code);
+		throws_ok { $CLASS->new(level => $name) } at_caller("invalid syslog level '$shown'"), sprintf('U+%04X in an error', $code);
+	}
+	warning_like { logger()->level("\x{202E}x") } at_caller(q{invalid syslog level '\x{202E}x'}), 'and in a warning';
+	throws_ok { $CLASS->new(level => "a\x{202F}b") } at_caller("invalid syslog level 'a\x{202F}b'"), 'U+202F, outside the ranges: shown as it is';
+	proven('DIAGNOSTICS: bidi controls are shown as \\x{NNNN}');
+};
+
+# Strategy: DIAGNOSTICS says the text after "invalid argument:" may show the
+# value given.  Give a value that holds the validator's own words, which
+# must not cut the explanation short
+subtest 'DIAGNOSTICS: invalid argument shows the value that was given' => sub {
+	throws_ok { $CLASS->new(lang => 'x validate_strict: y') } qr/\A\Q$CLASS: invalid argument: Parameter 'lang' (x validate_strict: y) must match\E/, 'the parameter and the whole value are shown';
+	throws_ok { $CLASS->new(country => 'XYZ') } qr/\A\Q$CLASS: invalid argument: Parameter 'country' (XYZ) must match\E/, 'an ordinary bad value too';
+	proven('DIAGNOSTICS: invalid argument shows the value that was given');
+};
+
+# ---------------------------------------------------------------------------
+# What is printed (POD: Which messages are printed, ENCODING)
+# ---------------------------------------------------------------------------
+
+# A message as hostile text from a fixture might be: tab and newline to lay
+# it out, then a clipboard write (OSC 52), a screen clear, a carriage
+# return and DEL
+Readonly::Scalar my $FIXTURE => "a\tb\nc\e]52;c;eA==\a\e[2J\rd\x7F";
+# How the POD says it is printed: one '#' line per line of the message
+Readonly::Scalar my $FIXTURE_PRINTED => "# a\tb\n# c" . '\x1B]52;c;eA==\x07\x1B[2J\x0Dd\x7F' . "\n";
+
+# Strategy: "Which messages are printed" promises the escaping in both
+# places a message is printed - verbose mode and a failing assertion's
+# list - and that the stored message is untouched
+subtest 'printed: control characters escaped, the stored message kept' => sub {
+	my $logger = logger(verbose => 1);
+	is(printed { $logger->warn($FIXTURE) }, $FIXTURE_PRINTED, 'verbose mode: escaped, tab and newline kept');
+
+	$logger->verbose(0);
+	my (undef, $out) = failing(sub { $logger->unlike(qr/c/) });
+	ok(index($out, "#     [warn] a\tb\n# c" . '\x1B]52;c;eA==') >= 0, 'a failing assertion lists it escaped too');
+	proven('printed: control characters are \\xNN, except tab and newline');
+
+	is($logger->messages()->[0]->{'message'}, $FIXTURE, 'messages() returns it exactly as logged');
+	ok($logger->like(qr/\e\[2J/, 'like() sees the raw escape'), '... and like() matches the raw text');
+	proven('printed: the stored message is not changed');
+
+	# A misspelt method becomes the level, so a level is caller text too
+	my $method = "lvl\e[31m";
+	printed { $logger->$method('m') };
+	(undef, $out) = failing(sub { $logger->unlike(qr/\Am\z/) });
+	ok(index($out, '[lvl\x1B[31m] m') >= 0, 'a level made from a method name is escaped');
+	is($logger->count("lvl\e[31m"), 1, '... and stored as it was');
+	proven(q{printed: a message's level is shown the same way});
+};
+
+# Strategy: ENCODING says how printed text is encoded.  Prove the C1 rule
+# (character string versus bytes) and the U+FFFD promise for a character
+# string whose bytes are broken
+subtest 'printed: encodings' => sub {
+	my $logger = logger(verbose => 1);
+	my $out = Encode::decode('UTF-8', printed { $logger->warn("x\x{9B}2J\x{263A}") });
+	is($out, "# x\\x9B2J\x{263A}\n", 'a C1 control in a character string: escaped');
+	my $euro = Encode::encode('UTF-8', "\x{20AC}");
+	is(printed { $logger->warn("x$euro") }, "# x$euro\n", 'UTF-8 bytes in a byte string: printed unchanged');
+	proven('printed: C1 controls are \\xNN in a character string, kept in a byte string');
+
+	my $malformed = "\e[2J\xff\xfe tail";
+	Encode::_utf8_on($malformed);
+	lives_ok { $out = Encode::decode('UTF-8', printed { $logger->warn($malformed) }) } 'a character string that is not valid UTF-8 is printed';
+	state_diag(malformed => $out);
+	ok(index($out, "# \\x1B[2J\x{FFFD}") == 0 && ($out =~ / tail\n\z/), '... escaped, with U+FFFD for the bad part');
+	proven('printed: a character string that is not valid UTF-8 has U+FFFD for each bad part');
 };
 
 # ---------------------------------------------------------------------------

@@ -139,7 +139,7 @@ SKIP: {
 
 # freeze panes
 SKIP: {
-	skip 'IO::Uncompress::Unzip (core) not available', 8 unless $have_unzip;
+	skip 'IO::Uncompress::Unzip (core) not available', 11 unless $have_unzip;
 
 	my @aoh = map { { a => $_, b => $_ * 2, c => $_ * 3 } } 1 .. 5;
 
@@ -161,16 +161,38 @@ SKIP: {
 
 	# freezing only columns: xSplit=1, ySplit absent, anchor B1, topRight
 	my $f3 = xlsx_path();
-	write_table(\@aoh, $f3, 'row_names' => 0, 'xlsx_freeze_cols' => 1);
+	# The header row is frozen by default, so rows are switched off to get
+	# columns alone.
+	write_table(\@aoh, $f3, 'row_names' => 0, 'xlsx_freeze_rows' => 0, 'xlsx_freeze_cols' => 1);
 	like( member($f3, 'xl/worksheets/sheet1.xml'),
 		qr{<pane xSplit="1" topLeftCell="B1" activePane="topRight" state="frozen"/>},
-		'freeze.cols => 1 writes a left-column frozen pane anchored at B1' );
+		'freeze.rows => 0, freeze.cols => 1 writes a left-column frozen pane anchored at B1' );
 
-	# no freeze options: no <sheetViews> block at all
+	# freeze.cols beside the default frozen header row: anchor B2, bottomRight
+	my $f4 = xlsx_path();
+	write_table(\@aoh, $f4, 'row_names' => 0, 'xlsx_freeze_cols' => 1);
+	like( member($f4, 'xl/worksheets/sheet1.xml'),
+		qr{<pane xSplit="1" ySplit="1" topLeftCell="B2" activePane="bottomRight" state="frozen"/>},
+		'freeze.cols => 1 alone keeps the default frozen header row' );
+
+	# no freeze options: the header row is frozen, exactly as freeze.rows => 1
 	my $f0 = xlsx_path();
 	write_table(\@aoh, $f0, 'row_names' => 0);
-	unlike( member($f0, 'xl/worksheets/sheet1.xml'), qr{<sheetViews>},
-		'no freeze options leaves the worksheet without a <sheetViews> block' );
+	is( member($f0, 'xl/worksheets/sheet1.xml'), $ws1,
+		'no freeze options writes the same worksheet as freeze.rows => 1' );
+
+	# an undef count is "not given", so it also takes the default
+	my $fu = xlsx_path();
+	write_table(\@aoh, $fu, 'row_names' => 0, 'xlsx_freeze_rows' => undef);
+	is( member($fu, 'xl/worksheets/sheet1.xml'), $ws1,
+		'freeze.rows => undef takes the default' );
+
+	# freeze.rows => 0: no <sheetViews> block at all
+	my $fz = xlsx_path();
+	write_table(\@aoh, $fz, 'row_names' => 0, 'xlsx_freeze_rows' => 0);
+	unlike( member($fz, 'xl/worksheets/sheet1.xml'), qr{<sheetViews>},
+		'freeze.rows => 0 leaves the worksheet without a <sheetViews> block' );
+	is( read_table($fz)->[0]{a}, '1', 'data still round-trips with nothing frozen' );
 
 	throws_ok { write_table(\@aoh, xlsx_path(), 'xlsx_freeze_rows' => -1) }
 		qr/'xlsx_freeze_rows' must be a non-negative integer/,

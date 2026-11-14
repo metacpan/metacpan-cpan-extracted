@@ -82,4 +82,40 @@ $ENV{'VERBOSE'} = 0;
 		'unknown class method croaks at the caller';
 }
 
+# Regression (0.002.2): carp, croak, get_params, validate_strict, qv and
+# Readonly were imported into the package, so they were methods too.
+# $logger->croak('x') died with a raw HASH(0x...) message and
+# $logger->carp('x') warned, instead of reaching AUTOLOAD.  Now every name
+# reaches AUTOLOAD, as a misspelt level would, and nothing leaks.
+{
+	my @imported = qw(carp croak confess cluck get_params validate_strict qv Readonly);
+	foreach my $name (@imported) {
+		ok(!Test::Log::Abstraction->can($name), "$name is not a method");
+		my $logger = Test::Log::Abstraction->new(diag => 'none', verbose => 0);
+		my $warnings = '';
+		my $ok;
+		my $out = capture_diag {
+			local $SIG{'__WARN__'} = sub { $warnings .= $_[0] };
+			$ok = eval { $logger->$name('x'); 1 };
+		};
+		ok($ok, "$name: does not die") or diag($@);
+		is($warnings, '', "$name: does not warn");
+		is_deeply($logger->messages(), [{ level => lc($name), message => 'x' }], "$name: captured, as an unknown method");
+		like($out, qr/no method '\Q$name\E'/, "$name: noticed");
+	}
+
+	# Every sub in the package is either private or a documented method,
+	# so a new import cannot quietly become a method again
+	my %public = map { $_ => 1 } qw(
+		new AUTOLOAD DESTROY messages clear count like unlike has_level empty
+		verbose level flush reopen lang i18n
+		trace debug info informational notice warn warning error err fatal
+		critical crit alert emergency emerg panic
+		is_trace is_debug is_info is_notice is_warn is_error is_critical is_alert is_emergency
+	);
+	no strict 'refs';	## no critic (ProhibitNoStrict)
+	my @subs = grep { !/^_/ && defined(&{"Test::Log::Abstraction::$_"}) } keys %Test::Log::Abstraction::;
+	is_deeply([ sort grep { !$public{$_} } @subs ], [], 'no sub in the package but the documented methods');
+}
+
 done_testing();

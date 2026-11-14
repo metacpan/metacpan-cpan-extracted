@@ -17,6 +17,7 @@ principle and lane are in `.claude/rules/dbio-rules.md`. Agents in this repo:
 | Write/extend tests (mock storage) | `dbio-test-mock-writer` |
 | Commits, `Changes`, card → done, pre-release audit | `dbio-release-manager` |
 | Cross-repo routing, push tickets to other DBIO repos | `karr-coordinator` |
+| Gap audit of the ADRs | `dbio-adr-auditor` |
 
 The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main agent
 delegates rather than loading them. Skill sources live under `.claude/skills/`.
@@ -41,7 +42,8 @@ Skill: `dbio-driver-development` (`references/extension-layers.md`).
 ## Core build specifics
 
 `[@DBIO] core = 1` enables: VersionFromMainModule (version from `$VERSION` in `lib/DBIO.pm`),
-MakeMaker::Awesome, ExecDir, extra GatherDir excludes. Beyond that, core's `dist.ini` sets
+MakeMaker::Awesome, ExecDir and DBIO::VersionLockstepTest (`xt/author/version-lockstep.t`:
+every module carries the main module's `$VERSION`). Beyond that, core's `dist.ini` sets
 `heritage = 1` and the `share_skill` lines, and adds a `[MetaNoIndex]` block for the
 internal test helpers.
 
@@ -59,9 +61,13 @@ for a `heritage = 1` dist).
 
 ## Testing — mock only
 
-Core tests MUST use `DBIO::Test::Storage` (fake storage), NEVER `dbi:SQLite` or any real DB.
+Core tests run on `DBIO::Test::Storage` (fake storage) only, with no `dbi:SQLite` and no real DB.
 `DBIO::Test->init_schema` without DSN arguments. Mock: `$storage->mock(qr/.../, \@rows)`.
 Real DB testing belongs in the driver dists. Details: skill `dbio-core`.
+
+`DBIO_TEST_FAST=1` skips the slow files, those marked `use DBIO::Test::Slow;` after
+`use Test::More;`; `RELEASE_TESTING` or `AUTOMATED_TESTING` overrides it. Marking rule: POD of
+`DBIO::Test::Slow`.
 
 **Verify recursively.** `t/` has subdirectories (`t/sqlmaker/`, `t/search/`, `t/prefetch/`,
 `t/count/`, `t/resultset/`, `t/test/`, …) holding the bulk of the suite. `prove -l t/` is
@@ -80,11 +86,11 @@ per-subdir registration is needed; just verify your own manual runs with `-r`.
 
 Skill sources live under `.claude/skills/` (shipped in the tarball like every tracked file) and are packaged
 into the sharedir by `Dist::Zilla::Plugin::DBIO::GatherSkills`; reachable at runtime via
-`DBIO->skill('name')` / `DBIO::Skills`. Do NOT duplicate skill content here — reference it.
+`DBIO->skill('name')` / `DBIO::Skills`. Skill content lives in the skills; this file references it.
 
 Core owns the `dbio-*` skills (tracked here, shipped via `share_skill` in `dist.ini`) and
-installs the rest through skilletor (`.claude/skilletor.json`: the commit-style skill from
-`getty`, the two karr skills from `karr`). Those are git-ignored: a fresh clone or worktree
+installs the rest through skilletor (`.claude/skilletor.json`: `getty-git-commit-style` and
+`claude-headless` from `getty`, the two karr skills from `karr`). Those are git-ignored: a fresh clone or worktree
 has them only after `skilletor sync`, and `skilletor sync` runs before `dzil build` (ADR 0058).
 
 ## Family distribution — core is the skilletor source

@@ -336,7 +336,7 @@ This file is separate from the global configuration.
 
 =item Location of permission prompts
 
-Use C<--ask helper>, C<--ask tty>, C<--ask yad>, C<--ask auto> or C<--ask mcp>, or set
+Use C<--ask helper>, C<--ask tty>, C<--ask yad>, C<--ask auto>, C<--ask mcp> or C<--ask none>, or set
 C<PERL_ANYEVENT_MCP_PERMISSION_ASK> in the server's environment.
 
 =item Combined server connections
@@ -476,6 +476,10 @@ rule, and removing a necessary grant may make it insufficient.
 
 Each offered scope controls where or to whom the rule applies.
 For example, a workdir scope may match this workdir or any workdir.
+The first rule defaults to the application's narrowest choice. Future
+rule editors reuse the most recently saved matcher for each dimension if
+still offered; otherwise they fall back to the first choice. This does not
+approve the operation or change existing rules.
 In mcp-fs, the independent host scope defaults to this host, including for
 local execution. Choose all hosts only when intended. Older saved rules
 without C<match.host> continue to apply across hosts.
@@ -626,6 +630,11 @@ C<auto> uses the client's form support when advertised for that request,
 otherwise the local helper. C<mcp> requires that support and fails when
 unavailable. It does not silently fall back. Use client-side permission
 approval only when that client is a trusted authority to grant access.
+
+C<--ask none> automatically declines anything that would otherwise need
+human input, without launching a helper or eliciting through MCP. Saved
+and automatic allow/deny permission rules continue to apply. The multibroker
+returns an ordinary decline to requesting downstream servers.
 
 To set the default for servers using the shared permission engine:
 
@@ -872,7 +881,7 @@ be usable by unrelated applications. For ordinary password or app-password
 authentication, a manual login looks like:
 
    mcp-imap --name personal login method password \
-      server imap.example.net user alice@example.net tls ssl port 993
+      server imap.example.net user alice@example.net tls connect port 993
 
 The password is requested on the terminal, never as a command argument.
 For OAuth2, use a provider-approved registration and the suggested
@@ -916,8 +925,11 @@ To search, pass a C<filter> to C<messages>, for example:
    }
 
 Filter keys are ANDed; C<any> adds OR, C<all> groups AND, and C<not>
-negates a group. Searches scan bounded UID windows. If the result says
-C<incomplete>, continue with C<next_cursor>, even for an empty page.
+negates a group. Searches scan at most 20000 UID values per call, not
+20000 existing messages. Whenever C<next_cursor> is present, continue
+with it as C<cursor> and preserve C<filter>, even on an empty page.
+C<more> means continuation is needed; C<incomplete> means the scan limit
+was reached. For targeted whole-mailbox lookups, use C<threads>.
 Use the returned mailbox, UIDVALIDITY and UID together for later operations.
 Read tools never mark messages Seen.
 

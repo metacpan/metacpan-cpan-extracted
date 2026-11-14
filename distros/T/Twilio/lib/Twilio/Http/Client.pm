@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 
 use Twilio::Json;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $DEFAULT_TIMEOUT = 60;
 

@@ -1,5 +1,5 @@
 package Perl::Tests::Covering;
-$Perl::Tests::Covering::VERSION = '0.002';
+$Perl::Tests::Covering::VERSION = '0.003';
 # ABSTRACT: Which tests run the file you just changed, from coverage kept on disk.
 
 use 5.014;
@@ -19,6 +19,7 @@ use Devel::Cover::DB                 ();
 use Devel::Cover::DB::IO             ();
 use Digest::MD5                      ();
 use Digest::SHA                      ();
+use File::Basename                   ();
 use File::Find                       ();
 use File::Path                       ();
 use File::Slurper                    ();
@@ -139,7 +140,7 @@ sub refresh {
         $after{$test} = $ran->{$test};
     }
 
-    my $changed = @stale || grep { !$after{$_} } keys %$before;
+    my $changed = $cache->{borrowed} || @stale || grep { !$after{$_} } keys %$before;
     $self->_write_cache( \%after, $versions ) if $changed;
 
     $self->{before}   = $before;
@@ -838,10 +839,11 @@ sub _last_line {
     return $token->line_number() + ( $content =~ tr/\n// ) - ( $content =~ m/\n\z/ ? 1 : 0 );
 }
 
+# The cache file of $root, by default the root of this object.
 sub _cache_path {
-    my ($self) = @_;
+    my ( $self, $root ) = @_;
     return if !defined $self->{cache_dir};
-    return File::Spec->catfile( $self->{cache_dir}, Digest::SHA::sha1_hex( $self->{root} ) . '.json.gz' );
+    return File::Spec->catfile( $self->{cache_dir}, Digest::SHA::sha1_hex( $root // $self->{root} ) . '.json.gz' );
 }
 
 # The format of the cache, the stamp of this file, the perl, and the
@@ -854,12 +856,27 @@ sub _cache_key {
 }
 
 # The records in the cache, under tests and keyed by test, and the layouts of
-# the files they name, under versions and keyed by blob.  Both are empty when
-# there is no cache to use.
+# the files they name, under versions and keyed by blob.  Without a usable cache
+# of its own, a root takes the first usable one of its other checkouts, marked
+# borrowed.  Both are empty when there is none.
 sub _read_cache {
     my ($self) = @_;
 
     my $path = $self->_cache_path() or return {};
+    my $own  = $self->_usable_cache($path);
+    return $own if $own;
+
+    foreach my $root ( $self->_other_checkouts() ) {
+        my $cache = $self->_usable_cache( $self->_cache_path($root) );
+        return { %$cache, borrowed => 1 } if $cache;
+    }
+    return { tests => {}, versions => {} };
+}
+
+# The cache in the file $path, or undef when it does not read, or was made
+# under another key.
+sub _usable_cache {
+    my ( $self, $path ) = @_;
 
     # A cache that is not there fails to read, like one that is unreadable.
     my $cache = eval {
@@ -868,7 +885,55 @@ sub _read_cache {
         Cpanel::JSON::XS->new->decode($json);
     };
     my $usable = ref $cache eq 'HASH' && ( $cache->{key} // q{} ) eq $self->_cache_key() && ref $cache->{tests} eq 'HASH' && ref $cache->{versions} eq 'HASH';
-    return $usable ? $cache : { tests => {}, versions => {} };
+    return $usable ? $cache : undef;
+}
+
+# The root of this distribution in each other checkout of its git repository:
+# the main checkout first, then each linked worktree.  Empty when the root is in
+# no checkout, or in one whose repository has no other.
+sub _other_checkouts {
+    my ($self) = @_;
+
+    my $top = $self->{root};
+    until ( -e File::Spec->catfile( $top, '.git' ) ) {
+        my $up = File::Basename::dirname($top);
+        return if $up eq $top;
+        $top = $up;
+    }
+    my $common = _git_common_dir( File::Spec->catfile( $top, '.git' ) ) // return;
+
+    # The directory above the common directory is a checkout unless the
+    # repository is bare.
+    my @tops = grep { -e File::Spec->catfile( $_, '.git' ) } File::Basename::dirname($common);
+    my $list = File::Spec->catdir( $common, 'worktrees' );
+    if ( opendir( my $dh, $list ) ) {
+        foreach my $name ( sort grep { !m/\A[.]/ } readdir $dh ) {
+            my $dotgit = _first_line( File::Spec->catfile( $list, $name, 'gitdir' ) ) // next;
+            chomp $dotgit;
+            push @tops, File::Basename::dirname($dotgit);
+        }
+        closedir $dh;
+    }
+
+    my $rel  = File::Spec->abs2rel( $self->{root}, $top );
+    my %seen = ( $self->{root} => 1 );
+    return grep { -d && !$seen{$_}++ } map { Cwd::abs_path( File::Spec->catdir( $_, $rel ) ) // () } @tops;
+}
+
+# The common directory of the repository of a checkout whose .git is $dotgit.
+# The main checkout has the directory itself.  A linked worktree has a file
+# that names its own directory, which names the common one in commondir.
+# Undef for anything else, such as the .git file of a submodule.
+sub _git_common_dir {
+    my ($dotgit) = @_;
+    return Cwd::abs_path($dotgit) if -d $dotgit;
+
+    my ($gitdir) = ( _first_line($dotgit) // q{} ) =~ m/\Agitdir:\s*(.+?)\s*\z/ or return;
+    $gitdir = File::Spec->rel2abs( $gitdir, File::Basename::dirname($dotgit) );
+
+    my $common = _first_line( File::Spec->catfile( $gitdir, 'commondir' ) ) // return;
+    chomp $common;
+    return Cwd::abs_path( File::Spec->rel2abs( $common, $gitdir ) );
 }
 
 # Replaces the file whole, so a reader never sees half of it.  Keeps only the
@@ -935,7 +1000,7 @@ Perl::Tests::Covering - Which tests run the file you just changed, from coverage
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -1181,6 +1246,15 @@ The cache also records the stamp of this module's file, the version of perl,
 and the configured test and library directories.  If any of them changes, all
 of the records are stale.
 
+If a root has no usable cache of its own, it reads the cache of the same
+distribution in another checkout of its git repository.  It reads the main
+checkout first, and then each linked worktree that F<.git/worktrees> lists.  So a
+new worktree starts from the records of the checkout that it came from, and
+does not run every test.  A record holds the blob ids of the files that its
+test loaded.  So a record from another checkout counts only where those files
+are the same.  The first refresh writes what it took to the cache file of the
+root.  After that, the root reads only its own cache.
+
 A cache that cannot be read is treated as empty.  A cache that cannot be
 written costs the next run the coverage runs again, and nothing else.
 
@@ -1423,6 +1497,12 @@ Current Maintainers:
 George S. Baugh <george@troglodyne.net>
 
 =back
+
+=head1 CONTRIBUTOR
+
+=for stopwords troglodyne-robot
+
+troglodyne-robot <trogbot@troglodyne.net>
 
 =head1 COPYRIGHT AND LICENSE
 

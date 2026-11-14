@@ -56,16 +56,17 @@ subtest 'dropping a guard without commit rolls back (implicit DESTROY)' => sub {
   $storage->reset_captured;
 
   my @warnings;
-  {
-    local $SIG{__WARN__} = sub { push @warnings, "@_" };
-    local $@;
+  # The handler stays for the whole subtest: how soon DESTROY runs after the
+  # last reference is gone is up to perl (older perls run it a statement
+  # later), the warning must be caught either way.
+  local $SIG{__WARN__} = sub { push @warnings, "@_" };
+  local $@;
 
-    my $guard = $schema->txn_scope_guard;
-    ok((grep { $_ eq 'txn_begin' } ops()), 'BEGIN was issued');
+  my $guard = $schema->txn_scope_guard;
+  ok((grep { $_ eq 'txn_begin' } ops()), 'BEGIN was issued');
 
-    # no commit -- drop the last reference, DESTROY fires synchronously
-    undef $guard;
-  }
+  # no commit -- drop the last reference
+  undef $guard;
 
   ok((grep { $_ eq 'txn_rollback' } ops()),
     'ROLLBACK was issued when the guard went out of scope uncommitted');

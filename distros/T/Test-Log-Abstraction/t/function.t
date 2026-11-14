@@ -22,6 +22,7 @@ use Test::Memory::Cycle;
 use Readonly;
 use Scalar::Util qw(weaken);
 use Errno qw(ENOENT);
+use Encode ();
 use Capture qw(capture_diag);
 
 use Test::Log::Abstraction;
@@ -166,7 +167,7 @@ subtest '_args: normalises good shapes' => sub {
 };
 
 subtest '_args: hostile shapes become an empty hash' => sub {
-	my $get_params = spy "${CLASS}::get_params";
+	my $get_params = spy "Params::Get::get_params";
 	is_deeply(Test::Log::Abstraction::_args(['odd']), {}, 'single scalar');
 	is_deeply(Test::Log::Abstraction::_args([1, 2, 3]), {}, 'odd list');
 	is_deeply(Test::Log::Abstraction::_args([undef, 1]), {}, 'undefined key');
@@ -181,11 +182,11 @@ subtest '_args: hostile shapes become an empty hash' => sub {
 };
 
 subtest '_args: Params::Get failures are reported, not hidden' => sub {
-	mock "${CLASS}::get_params" => sub { die "Params::Get exploded\n" };
+	mock "Params::Get::get_params" => sub { die "Params::Get exploded\n" };
 	throws_ok { Test::Log::Abstraction::_args([a => 1]) } qr/\AParams::Get exploded\n\z/, 'die propagates';
 	restore_all();
 
-	mock_return "${CLASS}::get_params" => undef;
+	mock_return "Params::Get::get_params" => undef;
 	is_deeply(Test::Log::Abstraction::_args([a => 1]), {}, 'undef from Params::Get becomes {}');
 	restore_all();
 };
@@ -301,15 +302,15 @@ subtest '_validate: success and unknown keys' => sub {
 };
 
 subtest '_validate: every failure becomes invalid_argument' => sub {
-	mock "${CLASS}::validate_strict" => sub { die "Params::Validate::Strict line 9: validate_strict: Parameter 'x' is bad at /elsewhere/Foo.pm line 3.\n" };
+	mock "Params::Validate::Strict::validate_strict" => sub { die "Params::Validate::Strict line 9: validate_strict: Parameter 'x' is bad at /elsewhere/Foo.pm line 3.\n" };
 	throws_ok { Test::Log::Abstraction::_validate($CLASS, {}, {}) } croaked(q{invalid argument: Parameter 'x' is bad}), 'prefix and location stripped';
 	restore_all();
 
-	mock "${CLASS}::validate_strict" => sub { die { code => 42 } };
+	mock "Params::Validate::Strict::validate_strict" => sub { die { code => 42 } };
 	throws_ok { Test::Log::Abstraction::_validate($CLASS, {}, {}) } qr/\A\Q$CLASS: invalid argument: HASH(0x\E/, 'non-string exception still reported';
 	restore_all();
 
-	mock_return "${CLASS}::validate_strict" => undef;
+	mock_return "Params::Validate::Strict::validate_strict" => undef;
 	is_deeply(Test::Log::Abstraction::_validate($CLASS, {}, {}), {}, 'undef from the validator becomes {}');
 	restore_all();
 
@@ -884,7 +885,10 @@ subtest '_assert: reports through Test::Builder at the right level' => sub {
 
 	is_deeply(\@results, [1, 0], 'result of ok() returned');
 	is_deeply($seen[0]->{'args'}, [1, 'passes'], 'value and name given to ok()');
-	is($seen[0]->{'level'}, $outer + 2, 'Level raised by two frames');
+	# One frame, the public assertion's: Test::Builder's $Level is counted
+	# for a call through Test::More::ok(), and _assert calls ok() directly.
+	# The reported line itself is checked end to end in t/integration.t
+	is($seen[0]->{'level'}, $outer + 1, 'Level raised by one frame');
 	is($level_after[0], $outer, 'Level restored afterwards');
 	is($explained_on_pass, 0, 'nothing explained on a pass');
 	is($explained_on_fail, 1, 'failure explained once');
@@ -1254,7 +1258,10 @@ subtest '_format: integers at the limits are still formatted' => sub {
 
 subtest 'i18n: an enormous count in a template is not turned into -1' => sub {
 	my $self = logger(i18n => { en => { n => { other => '%{count}d items, %{count}x in hex' } } });
-	is($self->i18n('n', { count => 1e30 }), '1e+30 items, 1e+30 in hex', 'a number beyond 64 bits is shown as written');
+	# How perl writes 1e30 depends on the float: '1e+30' with doubles, all
+	# 31 digits with quad-precision long doubles
+	my $written = '' . 1e30;
+	is($self->i18n('n', { count => 1e30 }), "$written items, $written in hex", 'a number beyond 64 bits is shown as written');
 	is($self->i18n('n', { count => 255 }), '255 items, ff in hex', 'an ordinary count is formatted');
 };
 
@@ -1345,6 +1352,179 @@ subtest '_shown: hostile values' => sub {
 		Test::Log::Abstraction::_shown(bless({}, 'Local::Bomb'));
 		is($@, $SENTINEL, '$@ untouched');
 	}
+};
+
+# The bidi controls _shown must escape, as [first, last] of each range
+Readonly::Array my @BIDI_RANGES => ([0x200E, 0x200F], [0x202A, 0x202E], [0x2066, 0x2069]);
+# Characters just outside those ranges, which are ordinary text
+Readonly::Array my @NOT_BIDI => (0x200D, 0x2010, 0x2029, 0x202F, 0x2065, 0x206A);
+# The C1 controls, escaped only in a character string
+Readonly::Array my @C1 => (0x80 .. 0x9F);
+# What a bad UTF-8 sequence becomes when a malformed string is printed
+Readonly::Scalar my $REPLACEMENT => "\x{FFFD}";
+# The two classes _escape is given by the module, rebuilt here: _escape
+# must escape exactly what the class it is handed matches
+Readonly::Scalar my $ALL_C0 => qr/[\x00-\x1F\x7F]/;
+Readonly::Scalar my $C0_NOT_LAYOUT => qr/[\x00-\x08\x0B-\x1F\x7F]/;
+
+# A character string whose bytes are not valid UTF-8, as buggy XS code
+# can make: an escape sequence, bad bytes, then ordinary text
+sub malformed {
+	my $text = "\e[2J\xff\xfe tail";
+	Encode::_utf8_on($text);
+	return $text;
+}
+
+# Strategy: _escape is the one place that decides how a control character
+# is shown.  Prove it escapes exactly the class it is handed, plus the C1
+# controls in a character string only; that it survives a string perl
+# cannot read as characters; and that it leaves the caller's data and
+# capture variables alone
+subtest '_escape: exactly the given class, and C1 only in characters' => sub {
+	foreach my $code (0x00 .. 0x1F, 0x7F) {
+		my $want = (chr($code) =~ $C0_NOT_LAYOUT) ? sprintf('a\\x%02Xb', $code) : 'a' . chr($code) . 'b';
+		is(Test::Log::Abstraction::_escape('a' . chr($code) . 'b', $C0_NOT_LAYOUT), $want, sprintf('0x%02X with the layout class: %s', $code, ($want =~ /\\x/) ? 'escaped' : 'kept'));
+	}
+	is(Test::Log::Abstraction::_escape("a\tb\nc", $ALL_C0), 'a\x09b\x0Ac', 'the full class: tab and newline escaped too');
+
+	foreach my $code (@C1) {
+		my $character = 'a' . chr($code) . "\x{263A}";	# a wide character makes it a character string
+		is(Test::Log::Abstraction::_escape($character, $ALL_C0), sprintf("a\\x%02X\x{263A}", $code), sprintf('C1 U+%04X in a character string: escaped', $code));
+	}
+	# In a byte string 0x80 to 0x9F are pieces of UTF-8: the euro sign's
+	# bytes include 0x82, and must survive whole
+	my $euro = Encode::encode('UTF-8', "\x{20AC}");
+	is(Test::Log::Abstraction::_escape($euro, $ALL_C0), $euro, 'UTF-8 bytes in a byte string: kept');
+	is(Test::Log::Abstraction::_escape("\x{A0}\x{263A}", $ALL_C0), "\x{A0}\x{263A}", 'U+00A0, just past the C1 controls: kept');
+	is(Test::Log::Abstraction::_escape('', $ALL_C0), '', 'empty string');
+
+	# Mid-flight hazard: a malformed character string kills a regex that
+	# reads it.  It must come back valid, escaped, with U+FFFD for each bad
+	# part (Test::Warnings fails the file on any warning)
+	my $result;
+	lives_ok { $result = Test::Log::Abstraction::_escape(malformed(), $ALL_C0) } 'malformed UTF-8: no exception';
+	ok(utf8::valid($result), '... the result is valid');
+	ok(index($result, '\x1B[2J') == 0, '... its C0 controls are escaped');
+	ok(index($result, $REPLACEMENT) > 0, '... bad bytes became U+FFFD');
+	ok($result =~ / tail\z/, '... and the good text is kept');
+	state_diag(malformed => $result);
+
+	# Its argument and the caller's capture variables are its caller's
+	my $input = "x\ey";
+	'outer' =~ /(out)/;
+	returns_ok(Test::Log::Abstraction::_escape($input, $ALL_C0), { type => 'string' }, 'returns a string');
+	is($input, "x\ey", "the caller's string is not changed");
+	is($1, 'out', "the caller's \$1 survives the substitutions");
+
+	# Resource exhaustion: every character escaped grows it fourfold, and
+	# the work must stay linear.  ok(), not is(): a failure must not print
+	# four million characters
+	my $flood = Test::Log::Abstraction::_escape("\e" x $HUGE, $ALL_C0);
+	ok(length($flood) == 4 * $HUGE, "$HUGE escape characters: all escaped");
+};
+
+# Strategy: _printable is the gate between a captured message and the
+# terminal.  It must delegate to _escape with the class that keeps tab and
+# newline, pass undef through untouched, and never change its argument
+subtest '_printable: delegates with the layout class; undef passes' => sub {
+	my $escape = spy "${CLASS}::_escape";
+	my $text = "a\tb\nc\e[2J\x7F";
+	my $printed = Test::Log::Abstraction::_printable($text);
+	my $undef = Test::Log::Abstraction::_printable(undef);
+	my @calls = $escape->();
+	restore_all();
+	state_diag(calls => \@calls);
+
+	is($printed, "a\tb\nc" . '\x1B[2J\x7F', 'tab and newline kept, ESC and DEL escaped');
+	is($text, "a\tb\nc\e[2J\x7F", '... and the caller\'s text is unchanged');
+	ok(!defined($undef), 'undef is returned as undef');
+	is(scalar(@calls), 1, '_escape is not called for undef');
+	ok("\t" !~ $calls[0]->[2] && "\n" !~ $calls[0]->[2] && "\e" =~ $calls[0]->[2], 'the class it hands _escape keeps tab and newline only');
+
+	is(Test::Log::Abstraction::_printable(''), '', 'empty string');
+	is(Test::Log::Abstraction::_printable("\x{202E}x"), "\x{202E}x", 'bidi controls are text in a message, not escaped');
+	lives_ok { $printed = Test::Log::Abstraction::_printable(malformed()) } 'malformed UTF-8: no exception';
+	ok(utf8::valid($printed) && (index($printed, '\x1B[2J') == 0), '... valid and escaped');
+
+	mock_exception "${CLASS}::_escape" => 'escape failed';
+	throws_ok { Test::Log::Abstraction::_printable('x') } qr/escape failed/, 'a failing _escape is not hidden';
+	restore_all();
+};
+
+# Strategy: a bidi control makes an error read differently on screen from
+# what it says.  Check both ends of every range and the characters just
+# outside it, that the cut is counted after the escapes, and that a string
+# perl cannot read as characters is still shown
+subtest '_shown: bidi controls, boundaries and malformed text' => sub {
+	foreach my $range (@BIDI_RANGES) {
+		foreach my $code (@{$range}) {
+			is(Test::Log::Abstraction::_shown('a' . chr($code) . 'b'), sprintf('a\\x{%X}b', $code), sprintf('U+%04X escaped', $code));
+		}
+	}
+	foreach my $code (@NOT_BIDI) {
+		is(Test::Log::Abstraction::_shown('a' . chr($code) . 'b'), 'a' . chr($code) . 'b', sprintf('U+%04X, outside the ranges: kept', $code));
+	}
+	# Each override becomes 8 characters; the cut must still hold
+	my $escaped = Test::Log::Abstraction::_shown("\x{202E}" x $MAX_REASON);
+	ok(length($escaped) == $MAX_REASON + length($ELLIPSIS), 'escaping bidi controls cannot push the text past the cut');
+	ok($escaped !~ /\x{202E}/, '... and none survives');
+
+	my $shown;
+	lives_ok { $shown = Test::Log::Abstraction::_shown(malformed()) } 'malformed UTF-8: no exception (nor warning)';
+	ok(index($shown, '\x1B[2J') == 0 && utf8::valid($shown), '... escaped and valid');
+
+	my $escape = spy "${CLASS}::_escape";
+	Test::Log::Abstraction::_shown("x\ny");
+	my @calls = $escape->();
+	restore_all();
+	ok(("\n" =~ $calls[0]->[2]) && ("\t" =~ $calls[0]->[2]), 'it hands _escape the class that escapes newline and tab too');
+};
+
+# Strategy: the stored entry is evidence for the test and must be exactly
+# what was logged; only the printed copy goes through _printable
+subtest '_record: prints through _printable, stores the original' => sub {
+	my $self = logger(verbose => 1);
+	my @printed;
+	mock "${CLASS}::_printable" => sub { return "<printable:$_[0]>" };
+	mock "${CLASS}::_emit" => sub { push @printed, $_[1]; return $_[0] };
+	$self->_record('warn', ["x\e[2J"]);
+	restore_all();
+	is_deeply(\@printed, ["<printable:x\e[2J>"], 'what _printable returns is what is printed');
+	is($self->messages()->[0]->{'message'}, "x\e[2J", 'the stored message is the original');
+
+	# Mid-flight failure: the entry was stored before printing began
+	$self->clear();
+	mock_exception "${CLASS}::_printable" => 'printable failed';
+	throws_ok { $self->_record('warn', ['y']) } qr/printable failed/, 'a failing _printable is not hidden';
+	restore_all();
+	is($self->count(), 1, '... and the entry was already stored');
+
+	# Not printed, not escaped: no work for a message nobody sees
+	my $quiet = logger();
+	my $printable = spy "${CLASS}::_printable";
+	$quiet->_record('debug', ["z\e"]);
+	my @calls = $printable->();
+	restore_all();
+	is(scalar(@calls), 0, 'a message that is not printed is not escaped');
+};
+
+# Strategy: both fields of a listed entry come from the caller (AUTOLOAD
+# stores any method name as the level), so both go through _printable
+subtest '_explain: lists each entry through _printable' => sub {
+	my $self = logger();
+	my @lines;
+	mock "${CLASS}::_emit" => sub { push @lines, $_[1]; return $_[0] };
+	my $printable = spy "${CLASS}::_printable";
+	$self->_explain('captured', [{ level => "lvl\e[31m", message => "m\e]52;c;eA==\a" }, { level => undef, message => undef }]);
+	my @calls = $printable->();
+	restore_all();
+	state_diag(lines => \@lines);
+
+	is(scalar(@calls), 4, 'level and message of each entry');
+	is($lines[1], '    [lvl\x1B[31m] m\x1B]52;c;eA==\x07', 'both escaped in the listing');
+	is($lines[2], '    [undef] undef', 'undefined level and message still listed, without warnings');
+	ok(!grep({ /[\x00-\x08\x0B-\x1F\x7F]/ } @lines), 'no line holds a control character');
+	memory_cycle_ok($self, 'listing leaves no cycle behind');
 };
 
 # Strategy: the copy must equal the original, share nothing that could be

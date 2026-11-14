@@ -235,7 +235,7 @@ is_deeply [ map { $_->{name} } grep { $_->{since} == 2 } @$cases ],
       unless ref $c->{expect} eq 'ARRAY' && @{ $c->{expect} };
     push @bad, "$c->{name}: no input sources"
       unless ref $c->{input}{sources} eq 'ARRAY' && @{ $c->{input}{sources} };
-    push @bad, "$c->{name}: no cards" unless ref $c->{cards} eq 'ARRAY';
+    push @bad, "$c->{name}: carries a cards field" if exists $c->{cards};
     push @bad, "$c->{name}: an expect entry is not a one-key hash"
       if grep { ref $_ ne 'HASH' or keys(%$_) != 1 } @{ $c->{expect} || [] };
   }
@@ -457,7 +457,6 @@ my $fk_case = 'ddl-foreign-key';
   like join("\n", MockConf->check_declarations('DDL')), qr/\Q$case\E.*fact/s,
     'a deviation without a fact is rejected';
   $MockConf::REFUSALS{$case} = $dev->();
-  delete $MockConf::REFUSALS{$case}{card};
   $MockConf::AREAS{Diff} = $dev->();
   like join("\n", MockConf->check_declarations('DDL')), qr/refused area Diff.*kind/s,
     'an area cannot be a deviation';
@@ -476,10 +475,10 @@ my $fk_case = 'ddl-foreign-key';
   local $ENV{AUTHOR_TESTING} = 1;
   MockConf::reset_state();
   $MockConf::REFUSALS{$fk_case} = {
-    kind => 'pending', card => 'k34', reason => qr/not emitted yet/,
+    kind => 'pending', reason => qr/not emitted yet/,
   };
   $MockConf::REFUSALS{'ddl-fk-actions'} = {
-    kind => 'pending', card => 'k35', reason => qr/not emitted yet/,
+    kind => 'pending', reason => qr/not emitted yet/,
   };
   for my $c ($fk_case, 'ddl-fk-actions') {
     $MockConf::QUIRK{throw}{$c} = $refuse->(
@@ -491,10 +490,10 @@ my $fk_case = 'ddl-foreign-key';
   my @r = MockConf->results(q(DDL), only => [$fk_case, q(ddl-fk-actions), q(ddl-unique-constraint)]);
   is_deeply [ map { $_->{status} } @r ], [qw(pass pending pending)],
     'pending refusals are their own status';
-  is $r[1]{card}, q(k34), 'the result carries the card';
+  ok !exists $r[1]{card}, 'the result carries no card';
   is(MockConf->summary_line(\@r),
-    '2 pending refusals: ddl-foreign-key (karr k34), ddl-fk-actions (karr k35)',
-    'one summary line, case and card');
+    '2 pending refusals: ddl-foreign-key, ddl-fk-actions',
+    'one summary line, case and kind');
   is(MockConf->summary_line([ $r[0] ]), undef, 'no line when nothing is pending');
 }
 
@@ -574,34 +573,32 @@ my $fk_case = 'ddl-foreign-key';
 
   $MockConf::REFUSALS{'ddl-no-such-case'} = { kind => 'server', reason => qr/x/ };
   $MockConf::REFUSALS{$fk_case}           = { kind => 'pending', reason => qr/x/ };
-  $MockConf::REFUSALS{'ddl-fk-actions'}   = { kind => 'maybe', reason => qr/x/, card => 'k1' };
+  $MockConf::REFUSALS{'ddl-fk-actions'}   = { kind => 'maybe', reason => qr/x/ };
   $MockConf::REFUSALS{'ddl-auto-increment'} = { kind => 'server', reason => 'not a regex' };
   $MockConf::REFUSALS{'ddl-foreign-key-x'}  = 'not a hash';
   my $p = join "\n", MockConf->check_declarations('DDL');
   like $p, qr/ddl-no-such-case.*unknown case/s, 'a refusal naming no case is a problem';
-  like $p, qr/ddl-foreign-key\b.*card/s, 'pending needs a card';
+  unlike $p, qr/ddl-foreign-key'?: /, 'pending without a card is accepted';
   like $p, qr/ddl-fk-actions.*kind/s, 'kind is server or pending';
   like $p, qr/ddl-auto-increment.*reason/s, 'reason is a regex';
   like $p, qr/ddl-foreign-key-x/, 'a refusal is a hash';
 
   MockConf::reset_state();
-  $MockConf::REFUSALS{$fk_case} = { kind => 'pending', card => 'k34', reason => qr/x/ };
+  $MockConf::REFUSALS{$fk_case} = { kind => 'pending', reason => qr/x/ };
   $MockConf::AREAS{Diff} = { kind => 'pending', reason => qr/x/ };
-  like join("\n", MockConf->check_declarations('DDL')), qr/refused area Diff.*card/s,
+  is_deeply [ MockConf->check_declarations('DDL') ], [],
+    'a pending refusal and a pending area need no card';
+  $MockConf::AREAS{Diff} = { kind => 'pending', reason => 'not a regex' };
+  like join("\n", MockConf->check_declarations('DDL')), qr/refused area Diff.*reason/s,
     'a refused area is checked the same way';
 }
 
-# a card on another board is Board#kNN; other shapes stay a problem
+# a declaration that still names a card (whatever its form) is not refused
 {
-  for my $ok ('k34', 'dbio-mssql#k71', 'dbio-async#k7') {
+  for my $card ('soon', 'dbio-mssql#7', '', 'junk') {
     MockConf::reset_state();
-    $MockConf::REFUSALS{$fk_case} = { kind => 'pending', card => $ok, reason => qr/x/ };
-    is_deeply [ MockConf->check_declarations('DDL') ], [], "card '$ok' is accepted";
-  }
-  for my $bad ('', 'dbio-mssql#71', '#k5', 'k', 'dbio-mssql#k', '#k71', 'dbio mssql#k1') {
-    MockConf::reset_state();
-    $MockConf::REFUSALS{$fk_case} = { kind => 'pending', card => $bad, reason => qr/x/ };
-    like join("\n", MockConf->check_declarations('DDL')), qr/card/, "card '$bad' is a problem";
+    $MockConf::REFUSALS{$fk_case} = { kind => 'pending', card => $card, reason => qr/x/ };
+    is_deeply [ MockConf->check_declarations('DDL') ], [], "card '$card' is ignored";
   }
   MockConf::reset_state();
 }
@@ -610,7 +607,7 @@ my $fk_case = 'ddl-foreign-key';
 {
   local $ENV{AUTHOR_TESTING} = 1;
   MockConf::reset_state();
-  $MockConf::REFUSALS{$fk_case} = { kind => 'pending', card => 'k34', reason => qr/not emitted/ };
+  $MockConf::REFUSALS{$fk_case} = { kind => 'pending', reason => qr/not emitted/ };
   $MockConf::QUIRK{throw}{$fk_case} = $refuse->(
     "refused for table 'child', column 'parent_id': not emitted yet"
   );

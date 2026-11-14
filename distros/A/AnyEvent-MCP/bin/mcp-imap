@@ -10,7 +10,7 @@ mcp-imap - inspect and manage one IMAP account through MCP
 
    mcp-imap [OPTION]...
    mcp-imap [OPTION]... login [method password|oauth2] [server HOST]
-       [user USER] [tls ssl|starttls] [port PORT] [oauth-KEY VALUE]...
+       [user USER] [tls connect|starttls|none] [port PORT] [oauth-KEY VALUE]...
    mcp-imap [OPTION]... providers [SEARCH]
 
 =head1 DESCRIPTION
@@ -30,7 +30,8 @@ authorization URL and accepts the resulting redirect URL from the terminal,
 without listening on a callback port. The private file stores the refresh
 token; later IMAP sessions refresh access tokens automatically. Neither
 passwords nor OAuth tokens are accepted as command-line values.
-Unencrypted IMAP authentication is not supported.
+Unencrypted IMAP authentication is available only when explicitly selected
+with C<login tls none>. This exposes credentials and message contents on the connection.
 
 C<providers> searches Thunderbird's ISPDB domain index and OAuth provider
 definitions. With no argument it lists known domains. A domain, substring,
@@ -44,14 +45,8 @@ be usable by unrelated applications. OAuth authorization requests need
 registered redirect URIs and may require provider-specific optional
 C<oauth-auth-NAME VALUE> arguments (e.g. C<oauth-auth-access_type offline>).
 
-OAuth2 login accepts C<oauth-client-id>, optional C<oauth-client-secret>,
-C<oauth-authorization-endpoint>, C<oauth-token-endpoint>, C<oauth-scope>,
-and C<oauth-redirect-uri>. Optional C<oauth-client-auth> selects
-C<none>, C<client_secret_post> (default when a secret is supplied) or
-C<client_secret_basic>. C<oauth-pkce> defaults to C<1> (S256), or C<0>
-when a provider registration does not support PKCE. C<oauth-sasl> selects
-C<xoauth2> (default) or C<oauthbearer>, depending on the IMAP server.
-Additional authorization query parameters use C<oauth-auth-NAME VALUE>.
+See L</LOGIN KEYS> for an individually documented list of accepted
+connection and OAuth2 settings, including their defaults.
 Successful OAuth2 login requires a refresh token; provider-specific offline
 access parameters may be necessary. Authorization is human-initiated only,
 never exposed through an MCP tool. After authorization, the browser will
@@ -62,14 +57,131 @@ redirect registrations and other browsers may differ.
 
 IMAP runs in a separate persistent synchronous worker, so an IMAP command
 does not block the MCP event loop. One request at a time is processed by the
-worker. A dropped connection during a write can leave an unknown outcome;
-do not blindly retry such writes.
+worker. While it is blocked, the frontend can send 30-second elapsed-time
+progress notifications to clients that supply a progress token. These report
+frontend liveness, not progress within Dovecot. A dropped connection during
+a write can leave an unknown outcome; do not blindly retry such writes.
+An idle connection is kept alive with IMAP NOOP (250-second default). A
+failed keepalive (including a 30-second timeout) closes the connection
+until the next tool call, which reconnects and authenticates. A connection
+lost during an operation is not retried automatically.
+
+When spawned as a multibroker stdio child, the server can exit after one
+hour without MCP requests, discarding any SORT snapshot. The caller must
+create a new snapshot if needed. Directly connected clients and HTTP
+listeners are unaffected.
 
 Message references consist of mailbox, UIDVALIDITY and UID. Read operations
 use BODY.PEEK, never mark messages Seen. Deleted flags do not automatically
 expunge. EXPUNGE is explicit. Selecting another mailbox or logging out does
 not expunge. Search is bounded by UID windows, potentially returning a
 partial/empty page with a continuation cursor when matches are sparse.
+MCP mail processing requires C<Encode::MIME::Header> for RFC 2047
+subject and address display-name decoding.
+Additional character encodings are supported when optional Encode extensions
+(C<Encode::HanExtra>, C<Encode::JIS2K>, C<Encode::EUCJPASCII>) are installed;
+the IMAP worker loads available extensions without requiring them. An
+unsupported charset yields a decoding error, not a silent empty message.
+
+=head1 LOGIN KEYS
+
+C<login> accepts C<KEY VALUE> pairs (without leading dashes).
+Values not supplied are inherited from the saved account when available.
+Changing authentication methods retains only the connection settings.
+Passwords and OAuth tokens are never accepted on the command line.
+
+=head2 Connection and authentication
+
+=over
+
+=item C<method password|oauth2>
+
+Login method. Defaults to the saved method, or C<password> for a new account.
+
+=item C<server HOST>
+
+IMAP hostname. Read from standard input if unset.
+
+=item C<user USER>
+
+IMAP username, often a complete email address. Read from standard input
+if unset.
+
+=item C<tls connect|starttls|none>
+
+C<connect> (default) negotiates TLS immediately, typically on port 993.
+C<starttls> upgrades an initially cleartext connection before authenticating,
+typically on port 143. C<none> skips TLS entirely, typically on port 143:
+the username, password or OAuth token, and mail contents travel unencrypted.
+Use C<none> only when the connection is otherwise protected, such as by a
+trusted local transport. Some IMAP servers advertise C<LOGINDISABLED>
+before TLS negotiation; if they also offer no supported SASL authentication
+mechanism, C<tls none> cannot authenticate until the server's policy
+permits cleartext authentication.
+
+=item C<port PORT>
+
+IMAP TCP port, default 993 for C<connect>, and 143 for
+C<starttls> or C<none>. Changing C<tls> without specifying C<port>
+selects that TLS mode's default port.
+
+=back
+
+=head2 OAuth2 keys (C<method oauth2>)
+
+=over
+
+=item C<oauth-client-id ID>
+
+OAuth client ID registered with the provider (required).
+
+=item C<oauth-authorization-endpoint URL>
+
+Provider authorization endpoint, HTTPS (required).
+
+=item C<oauth-token-endpoint URL>
+
+Provider token endpoint, HTTPS (required).
+
+=item C<oauth-scope TEXT>
+
+Space-separated OAuth scopes (required).
+
+=item C<oauth-redirect-uri URI>
+
+Registered callback URI, HTTPS or HTTP loopback without query or fragment
+(required). The program does not listen on this URI; copy the full URL
+from the browser address bar after authorization.
+
+=item C<oauth-client-secret SECRET>
+
+Optional client secret for confidential OAuth clients. Supplied as a login
+setting, not as an IMAP password.
+
+=item C<oauth-client-auth none|client_secret_post|client_secret_basic>
+
+OAuth token-endpoint authentication. Default C<none> without a client
+secret, otherwise C<client_secret_post>. Non-C<none> modes require
+C<oauth-client-secret>.
+
+=item C<oauth-pkce 0|1>
+
+Use PKCE S256, enabled by default (C<1>). Disable (C<0>) only if the
+provider registration does not support PKCE.
+
+=item C<oauth-sasl xoauth2|oauthbearer>
+
+IMAP SASL mechanism for OAuth, default C<xoauth2>.
+
+=item C<oauth-auth-NAME VALUE>
+
+Add a provider-specific authorization query parameter, for example
+C<oauth-auth-access_type offline> to request a refresh token.
+NAME consists of ASCII letters, digits or underscores. Protocol-defined
+parameters such as C<client_id>, C<redirect_uri> and C<state> cannot
+be overridden.
+
+=back
 
 =head1 FIRST USE
 
@@ -83,7 +195,7 @@ restricted to their original application. For a password-based provider,
 for example:
 
    mcp-imap --name personal login method password \
-      server imap.example.net user alice@example.net tls ssl port 993
+      server imap.example.net user alice@example.net tls connect port 993
 
 The password is read interactively. For OAuth2, run C<login method oauth2>
 with your provider-approved client ID, authorization/token endpoints,
@@ -91,7 +203,7 @@ scope and redirect URI. For example, the structure of such a command
 (the provider URLs and registration below are placeholders) is:
 
    mcp-imap --name personal login method oauth2 \
-      server imap.example.net user alice@example.net tls ssl port 993 \
+      server imap.example.net user alice@example.net tls connect port 993 \
       oauth-client-id REGISTERED_CLIENT_ID \
       oauth-authorization-endpoint https://login.example.net/authorize \
       oauth-token-endpoint https://login.example.net/token \
@@ -156,10 +268,22 @@ List subscribed mailboxes (IMAP LSUB). Uses the same result format as C<mailboxe
 
 =item messages
 
-List at most 100 message summaries, newest UID first. Optional SEARCH
-filter, summary fields, header names and UIDVALIDITY-aware cursor.
-C<incomplete> means the search reached its 20000-UID scan budget:
-continue with C<next_cursor> even if the page contains no messages.
+List at most 1000 message summaries (default 100), newest UID first. Optional SEARCH
+filter, summary fields, header names and UIDVALIDITY-aware cursor. Alternatively
+pass C<uids> (1..1000) and C<uidvalidity> to retrieve those exact summaries in
+requested order, without SEARCH. C<missing_uids> reports vanished messages;
+do not combine explicit UIDs with cursor, filter or limit.
+RFC 2047 encoded words in subject and address display fields are decoded
+for display; explicitly requested arbitrary headers remain unchanged.
+Searches at most 20000 UID values per call, not 20000 existing messages.
+Sparse mailboxes may return an empty page with C<incomplete: true>.
+Always continue with C<cursor: next_cursor> when C<next_cursor> is present,
+preserving the original C<filter>. Repeating without the cursor rescans
+the same UID interval. C<more> is true whenever continuation is needed,
+even if no further match is guaranteed; false means the search is exhausted.
+C<incomplete> specifically means the scan budget was reached. For targeted
+whole-mailbox searches, use C<threads> with a selective filter.
+
 
 C<filter> combines its keys with AND. Text search keys are C<from>, C<to>,
 C<cc>, C<bcc>, C<subject>, C<body> and C<text> (headers and body).
@@ -192,9 +316,70 @@ excluding flagged mail. Filter nesting and size are bounded; search
 values are explicitly quoted as IMAP arguments, never interpolated into
 raw SEARCH commands.
 
+=item threads
+
+Use C<UID THREAD ORDEREDSUBJECT UTF-8> (RFC 5256) on all messages in
+the selected mailbox, or restrict candidates with C<filter> (the same
+SEARCH criteria as C<messages>) and/or an inclusive C<uid_range> such
+as C<1:5000>. Returns the server's nested UID thread arrays, ordered by
+the oldest sent Date header within each subject group. Unlike C<messages>,
+it searches the entire selected mailbox without the 20000-UID scan cap.
+Useful for targeted lookups and uncertain MOVE destination verification;
+fetch matching message details with C<messages> using explicit C<uids>
+and C<uidvalidity>. A UID range is not a message count; gaps in assigned
+UIDs reduce the matching population.
+Optional C<uidvalidity> rejects references from a different mailbox
+generation. The server must advertise C<THREAD=ORDEREDSUBJECT>. This
+command does not fetch message summaries or mark mail as Seen. Thread
+results are not paginated: the entire matching population is threaded
+and returned, potentially expensive on large mailboxes. Restrict with
+SEARCH criteria (e.g. C<before>) or C<uid_range> when appropriate.
+
+=item sort_create
+
+Run C<UID SORT (SUBJECT DATE) UTF-8> (RFC 5256) once, optionally with
+the same C<filter> as C<messages>. Retain the complete ordered UID array
+as one immutable snapshot in the worker; replace any previous snapshot
+only after a successful sort. Return a random C<snapshot_id>, C<uidvalidity>,
+C<count>, and the first page (default 100, maximum 1000 UIDs).
+Subject groups are alphabetical,
+with messages sorted by sent date inside each group, B<not> oldest group first.
+The sort covers the entire matching mailbox and may be expensive.
+
+=item sort_page
+
+Retrieve a page from the current SORT snapshot using C<snapshot_id>,
+C<mailbox>, zero-based C<offset> and C<limit> (default 100, maximum 1000).
+Returns C<uids> and C<next_offset>, or null when exhausted. The page is
+not recomputed when mail arrives, moves or disappears; fetch the returned
+UIDs through C<messages> with C<uidvalidity> and tolerate C<missing_uids>.
+A mailbox UIDVALIDITY change, replaced snapshot or worker restart fails
+clearly. No disk persistence or automatic reconstruction.
+
+=item sort_discard
+
+Release the current SORT snapshot using its C<snapshot_id> and C<mailbox>.
+Only one snapshot exists per worker; it is also discarded at worker exit.
+These snapshot tools are read-only as far as IMAP messages are concerned.
+
+=item previews
+
+Fetch decoded text previews for 1..25 selected UIDs (C<uidvalidity> required).
+Uses bounded C<BODY.PEEK> without setting Seen; C<max_bytes> defaults to 2048
+and is capped at 4096 raw bytes per message. Returns selected MIME part,
+content type, text and truncation status, or an individual error. Prefers
+C<text/plain> when useful; falls back to C<text/html> if plain text is absent
+or mostly a stub. HTML is converted to plain text while preserving link URLs.
+When present, C<attachments> lists MIME part numbers, types, filenames,
+transfer-encoded sizes in octets, and dispositions. Includes inline non-text
+parts; uses the already-fetched BODYSTRUCTURE without downloading attachments.
+Needs C<HTML::Parser> only when HTML text is selected. This is approximate
+triage text, not full MIME rendering. Use C<message>/C<part> for complete mail.
+
 =item message
 
 Read ENVELOPE, flags, dates, size and MIME BODYSTRUCTURE for a UID.
+RFC 2047 encoded words in ENVELOPE subjects and display names are decoded.
 Use the C<uidvalidity> and C<uid> returned by C<messages> for the selected
 mailbox. For example, if the current UIDVALIDITY is 13 and the UID is 42:
 
@@ -236,6 +421,10 @@ Never fall back from UID EXPUNGE to whole-mailbox EXPUNGE.
 =item mailbox
 
 Create, rename, delete, subscribe or unsubscribe a mailbox.
+Deletion first checks C<STATUS MESSAGES> and refuses mailboxes containing
+any messages, including messages flagged C<\Deleted>. Expunge those
+messages first, or use C<force> to bypass the check. The check is not
+atomic with IMAP DELETE.
 
 =back
 
@@ -252,7 +441,8 @@ permissions authorize operations, not OS-level confinement.
 
 Shared switches are documented in
 L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
-The following switches are specific to C<mcp-imap>.
+The C<--ask> switch is shared but has the following permission behavior;
+the other switches below are specific to C<mcp-imap>.
 
 =over
 
@@ -262,8 +452,16 @@ Choose where permission prompts appear: C<helper> (default when run
 independently) uses a local helper; C<tty> and C<yad> force those
 local interfaces without fallback. C<mcp> delegates prompts to the
 MCP client; C<auto> uses client elicitation when advertised and
-otherwise falls back to the helper. A server spawned by a multibroker
-defaults to C<mcp> so the broker can present its prompts.
+otherwise falls back to the helper. C<none> denies unmatched requests
+without prompting. A server spawned by a multibroker defaults to C<mcp>
+so the broker can present its prompts.
+
+=item --keepalive SECONDS
+
+Send an IMAP NOOP after this many seconds without a tool call, to keep
+the connection alive across NAT and server idle timeouts. Default 250.
+Set to 0 to disable idle keepalives. The next tool call reconnects
+automatically if the IMAP connection has closed.
 
 =item --allow-mbox-from
 
@@ -286,19 +484,20 @@ C<providers> command. Invalid for normal server startup or C<login>.
 =cut
 
 use common::sense;
+
 use MIME::Base64 ();
 use AnyEvent ();
 
 use AnyEvent::Fork::Early;
 
 use Term::ReadKey ();
+use JSON::XS ();
+
 use AnyEvent::Fork ();
 use AnyEvent::Fork::RPC ();
 use AnyEvent::MCP ();
-use AnyEvent::MCP::File ();
 use AnyEvent::MCP::Config ();
 use AnyEvent::MCP::Server::Permissions ();
-use JSON::XS ();
 
 use AnyEvent::MCP::Server::Simple;
 
@@ -306,19 +505,48 @@ my $options = mcp_getoptions
    {
       usage       => "Usage: mcp-imap [OPTION]... [login [key value ...] | providers [SEARCH]]\n",
       description => "Serve one named IMAP account; 'login' configures password or OAuth2; 'providers' discovers mail setup.",
-      options     => [["--ask MODE", "Permission prompts: helper (default), tty, yad, mcp, auto"],
-                      ["--allow-mbox-from", "Allow potentially unsafe unescaped mbox From_ lines in APPEND"],
-                      ["--provider-file FILE", "Use local Thunderbird OAuth source with providers"],
-                      ["--ispdb-file FILE", "Use local autoconfig XML with providers"]],
-      examples    => "  mcp-imap --name doom login server doom user root tls starttls\n"
-                   . "  mcp-imap --name gmail providers gmail\n"
-                   . "  mcp-imap --name doom --stdio",
+      options     => [
+         ["--allow-mbox-from", "Allow potentially unsafe unescaped mbox From_ lines in APPEND"],
+         ["--keepalive SECONDS", "Idle IMAP NOOP interval (default 250; 0 disables)"],
+         ["--provider-file FILE", "Use local Thunderbird OAuth source with providers"],
+         ["--ispdb-file FILE", "Use local autoconfig XML with providers"],
+
+         "Commands:",
+         ["login [KEY VALUE]...", "Configure or update an account; credentials entered interactively"],
+         ["providers [SEARCH]", "Discover providers and suggested login commands"],
+
+         "Login keys (KEY VALUE, not --options):",
+         ["method password|oauth2", "Authentication method (default password)"],
+         ["server HOST", "IMAP hostname (prompts if missing)"],
+         ["user USER", "IMAP username (prompts if missing)"],
+         ["tls connect|starttls|none", "TLS from connection (default), STARTTLS upgrade, or explicitly no encryption"],
+         ["port PORT", "Defaults: 993 for connect; 143 for starttls or none"],
+
+         "OAuth2 login keys (method oauth2):",
+         ["oauth-client-id ID", "Required OAuth client ID"],
+         ["oauth-authorization-endpoint URL", "Required HTTPS authorization endpoint"],
+         ["oauth-token-endpoint URL", "Required HTTPS token endpoint"],
+         ["oauth-scope TEXT", "Required scope string"],
+         ["oauth-redirect-uri URI", "Required registered HTTPS or loopback URI"],
+         ["oauth-client-secret SECRET", "Optional OAuth client secret"],
+         ["oauth-client-auth MODE", "none, client_secret_post, client_secret_basic"],
+         ["oauth-pkce 0|1", "PKCE S256 (default 1)"],
+         ["oauth-sasl MODE", "xoauth2 (default), oauthbearer"],
+         ["oauth-auth-NAME VALUE", "Additional authorization parameter, e.g. access_type offline"],
+      ],
+      examples    => "  mcp-imap --name personal providers alice\@example.net\n"
+         . "  mcp-imap --name personal login server imap.example.net user alice\@example.net tls connect\n"
+         . "  mcp-imap --name local login server localhost user alice tls none\n"
+         . "  mcp-imap --name personal --stdio",
    },
-   "ask=s" => \my $ask,
    "allow-mbox-from!" => \my $allow_mbox_from,
-   "provider-file=s" => \my $provider_file,
-   "ispdb-file=s" => \my $ispdb_file,
+   "keepalive=i"       => \my $keepalive,
+   "provider-file=s"   => \my $provider_file,
+   "ispdb-file=s"      => \my $ispdb_file,
 ;
+
+$keepalive //= 250;
+$keepalive >= 0 or die "--keepalive must be nonnegative\n";
 
 my $name = $options->{name};
 if (@ARGV && $ARGV[0] eq "providers") {
@@ -337,17 +565,13 @@ my $file = "$directory/imap-$name.ini";
 sub load_account {
    return {} unless -e $file;
 
-   open my $fh, "<:raw", $file or die "$file: $!\n";
-   local $/;
-   my $text = <$fh>;
-   close $fh;
-   my %kv;
-   AnyEvent::MCP::parse_ini $text, sub {
-      my ($section, $values) = @_;
-      $section eq "" || $section eq "account"
-         or die "$file: unexpected section $section\n";
-      %kv = (%kv, %$values);
-   }, $file;
+   my $sections = AnyEvent::MCP::Config::parse_ini (AnyEvent::MCP::file_load ($file), $file);
+
+   for (@$sections) {
+      $_->[0] eq "" || $_->[0] eq "account"
+         or die "$file: unexpected section $_->[0]\n";
+   }
+   my %kv = %{AnyEvent::MCP::Config::merge_sections ($sections, "account")->{account}};
 
    \%kv
 }
@@ -358,7 +582,8 @@ sub settings {
    for (qw(server user tls port)) {
       defined $kv->{$_} && length $kv->{$_} or die "$file: missing $_; run mcp-imap --name $name login\n";
    }
-   $kv->{tls} =~ /\A(?:ssl|starttls)\z/ or die "$file: invalid tls mode\n";
+   $kv->{tls} =~ /\A(?:connect|starttls|none)\z/
+      or die "$file: invalid tls mode (expected connect, starttls, or none)\n";
    $kv->{port} =~ /\A[0-9]+\z/ && $kv->{port} >= 1 && $kv->{port} <= 65535
       or die "$file: invalid port\n";
    $kv->{server} !~ /[\s\x00-\x1f]/ && length $kv->{server} <= 255
@@ -397,6 +622,7 @@ sub login {
       my ($key, $value) = splice @ARGV, 0, 2;
       $key =~ /\A(?:method|server|user|tls|port|oauth-(?:client-id|client-secret|client-auth|authorization-endpoint|token-endpoint|scope|pkce|redirect-uri|sasl|auth-[A-Za-z0-9_]+))\z/
          or die "Unknown login key '$key' (passwords and tokens cannot be given on argv)\n";
+      $value = AnyEvent::MCP::utf8dec $value;
       $value !~ /[\r\n\x00]/ or die "Invalid $key\n";
       $input{$key} = $value;
    }
@@ -408,6 +634,7 @@ sub login {
    %kv = map +(exists $old->{$_} ? ($_ => $old->{$_}) : ()), qw(server user tls port)
       if ($old->{method} || "password") ne $method;
    %kv = (%kv, %input);
+   delete $kv{port} if exists $input{tls} && !exists $input{port} && ($old->{tls} // "") ne $input{tls};
    $kv{method} = $method;
    delete $kv{"password-base64"} if $method eq "oauth2";
    delete @kv{grep /^oauth-/, keys %kv} if $method eq "password";
@@ -416,9 +643,10 @@ sub login {
       next if defined $kv{$key} && length $kv{$key};
       print STDERR "$key: ";
       chomp ($kv{$key} = <STDIN> // "");
+      $kv{$key} = AnyEvent::MCP::utf8dec $kv{$key};
    }
-   $kv{tls} ||= "ssl";
-   $kv{port} ||= $kv{tls} eq "ssl" ? 993 : 143;
+   $kv{tls} ||= "connect";
+   $kv{port} ||= $kv{tls} eq "connect" ? 993 : 143;
 
    my $account;
    if ($method eq "oauth2") {
@@ -438,11 +666,12 @@ sub login {
       print {$tty} "\n";
       close $tty;
       defined $redirect or die "No OAuth redirect URL supplied\n";
+      $redirect = AnyEvent::MCP::utf8dec $redirect;
       $redirect =~ s/\r?\n\z//;
       my $tokens = AnyEvent::MCP::IMAP::OAuth2::finish (\%kv, $state, $verifier, $redirect);
       my $refresh = $tokens->{refresh_token}
          or die "OAuth provider returned no refresh token; configure offline access and try again\n";
-      $kv{"oauth-refresh-token-base64"} = MIME::Base64::encode_base64 ($refresh, "");
+      $kv{"oauth-refresh-token-base64"} = MIME::Base64::encode_base64 (AnyEvent::MCP::utf8enc $refresh, "");
       $account = settings (\%kv);
       $account->{access_token} = $tokens->{access_token};
    } else {
@@ -464,9 +693,9 @@ sub login {
    require AnyEvent::MCP::Worker::IMAP;
    AnyEvent::MCP::Worker::IMAP::imap_connect ($account);
 
-   my $lock = AnyEvent::MCP::File::lock $file;
-   AnyEvent::MCP::File::replace $file, "[account]\n"
-      . (join "", map "$_ = $kv{$_}\n", sort keys %kv);
+   my $lock = AnyEvent::MCP::file_lock $file;
+   AnyEvent::MCP::file_save $file,
+      AnyEvent::MCP::Config::serialize_ini [["account", \%kv]];
    close $lock;
 
    print STDERR "Authenticated and saved account '$name' in $file\n";
@@ -480,11 +709,7 @@ if (@ARGV && $ARGV[0] eq "login") {
 
 @ARGV and die "Unexpected arguments (try 'login')\n";
 
-$ask //= $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio"
-   ? "mcp" : $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK} || "helper";
-$ask =~ /\A(?:helper|tty|yad|mcp|auto)\z/ or die "Invalid --ask mode\n";
-
-my $permissions = AnyEvent::MCP::Server::Permissions->new (
+mcp_permissions +AnyEvent::MCP::Server::Permissions->new (
    name       => "imap-$name",
    actions    => {
       read    => "Read mailboxes and messages",
@@ -492,11 +717,40 @@ my $permissions = AnyEvent::MCP::Server::Permissions->new (
       manage  => "Create, rename, delete or subscribe mailboxes",
       expunge => "Permanently remove messages marked Deleted",
    },
-   ask        => $ask,
 );
 
+sub imap_log_request {
+   my ($server, $req) = @_;
+
+   return unless $req->{method} eq "tools/call";
+   my $args = $req->{args};
+   my $json = JSON::XS->new->ascii->canonical;
+   my %details;
+
+   for my $key (qw(mailbox destination operation limit offset max_bytes uid_range part)) {
+      $details{$key} = $json->encode (substr $args->{$key}, 0, 96)
+         if defined $args->{$key} && !ref $args->{$key};
+   }
+   $details{count} = @{$args->{uids}} if ref $args->{uids} eq "ARRAY";
+   $details{flags} = $json->encode ($args->{flags})
+      if ref $args->{flags} eq "ARRAY";
+   $details{before_uid} = $args->{cursor}{before_uid}
+      if ref $args->{cursor} eq "HASH" && defined $args->{cursor}{before_uid}
+         && !ref $args->{cursor}{before_uid};
+   if (ref $args->{filter} eq "HASH") {
+      my $search = $json->encode ($args->{filter});
+      $details{search} = substr ($search, 0, 150) . (length $search > 150 ? "..." : "");
+   } elsif (!exists $args->{filter} && !exists $args->{uids}
+            && $req->{tool} =~ /\A(?:messages|threads|sort-create)\z/) {
+      $details{search} = "ALL";
+   }
+
+   mcp_log_request $server, $req, %details;
+}
+
 mcp_config
-   permissions        => $permissions,
+   idle_exit          => 3600,
+   on_request         => \&imap_log_request,
    server_name        => "mcp-imap",
    server_version     => $AnyEvent::MCP::VERSION,
    short_instructions => "Inspect and manage IMAP mail, by mailbox/UIDVALIDITY/UID. Reads do not set Seen; deletion requires explicit expunge.",
@@ -506,8 +760,24 @@ mcp_config
                       . "An IMAP write interrupted by a disconnect has unknown outcome: never blindly repeat.";
 
 my ($rpc, $rpc_dead, $connected);
+my $idle_timer;
 my %pending;
 my $seq = 0;
+
+sub arm_keepalive {
+   undef $idle_timer;
+   return unless $keepalive && $rpc && $connected && !%pending;
+   $idle_timer = AnyEvent->timer (after => $keepalive, cb => sub {
+      undef $idle_timer;
+      return unless $rpc && !%pending;
+      $rpc->("ping", {}, sub {
+         my ($ok, $result) = @_;
+         AE::log trace => "IMAP keepalive failed: $result" unless $ok;
+         $connected = $ok ? 1 : undef;
+         arm_keepalive () if $ok;
+      });
+   });
+}
 
 sub start_worker {
    return if $rpc;
@@ -521,6 +791,7 @@ sub start_worker {
          serialiser => $AnyEvent::Fork::RPC::JSON_SERIALISER,
          on_error => sub {
             $rpc_dead = $_[0];
+            undef $idle_timer;
             undef $rpc;
             $connected = undef;
             for my $id (keys %pending) {
@@ -536,19 +807,23 @@ sub start_worker {
    $account->{allow_mbox_from} = $allow_mbox_from ? JSON::XS::true : JSON::XS::false;
    $rpc->("connect", $account, sub {
       my ($ok, $result) = @_;
-      $connected = $ok ? 1 : $result;
+      $connected = $ok ? 1 : undef;
+      arm_keepalive () if $ok;
    });
 }
 
 sub perform {
    my ($req, $cmd, $args) = @_;
+   undef $idle_timer;
 
    start_worker ();
    my $id = ++$seq;
    $pending{$id} = $req;
    $rpc->($cmd, $args, sub {
       delete $pending{$id} or return;
-      my ($ok, $result) = @_;
+      my ($ok, $result, $alive) = @_;
+      $connected = $ok || $alive ? 1 : undef;
+      arm_keepalive ();
       return if $req->{finished};
       $ok ? $req->result ($result)
           : $req->error ($result);
@@ -568,8 +843,8 @@ sub require_mail_permission {
             label   => "Mailbox",
             value   => "mailbox:$mailbox",
             choices => [
-               { label => "this mailbox", match => "mailbox:$mailbox" },
-               { label => "all mailboxes", match => "^mailbox:" },
+               { label => "This mailbox: $mailbox", match => "mailbox:$mailbox" },
+               { label => "All mailboxes", match => "^mailbox:" },
             ],
          },
       }) : ()),
@@ -587,7 +862,7 @@ sub property {
 my $mailbox = property ("string", "IMAP mailbox name, e.g. INBOX");
 my $validity = property ("string", "Current UIDVALIDITY from messages or message");
 my $uid = property ("integer", "Message UID");
-my $uids = { type => "array", items => $uid, minItems => 1, maxItems => 100 };
+my $uids = { type => "array", items => $uid, minItems => 1, maxItems => 1000 };
 
 sub expose {
    my ($cmd, $description, $required, $properties, $action) = @_;
@@ -633,11 +908,13 @@ expose lsub => "List subscribed IMAP mailboxes (LSUB).", [],
    {}, "read";
 
 expose messages =>
-   "Page UID summaries, newest first. SEARCH filter; cursor anchors UIDVALIDITY. Continue on incomplete pages.",
+   "Read up to 1000 summaries or explicit UIDs (default page size 100). 20000-UID scan budget: follow next_cursor even for empty pages. For targeted whole-mailbox lookup use threads.",
    ["mailbox"],
    {
       mailbox => $mailbox,
-      limit   => { type => "integer", minimum => 1, maximum => 100 },
+      uidvalidity => $validity,
+      uids => $uids,
+      limit   => { type => "integer", minimum => 1, maximum => 1000 },
       cursor  => { type => "object", description => "{uidvalidity, before_uid} from previous page" },
       fields  => { type => "array", items => property ("string", "Summary field") },
       headers => { type => "array", items => property ("string", "RFC 5322 header name"), maxItems => 20 },
@@ -649,6 +926,49 @@ expose messages =>
                       . "deleted/undeleted/draft/undraft/recent/old/new booleans; "
                       . "all:[filter,...], any:[filter,...], not:filter (recursive Boolean grouping)",
       },
+   }, "read";
+
+expose threads =>
+   "Full-mailbox targeted SEARCH without messages' 20000-UID scan limit. Returns matching UIDs grouped by subject; no paging, can be expensive. Requires THREAD=ORDEREDSUBJECT.",
+   ["mailbox"],
+   {
+      mailbox => $mailbox,
+      uid_range => property ("string", "Optional inclusive START:END UID interval; e.g. 1:5000"),
+      uidvalidity => $validity,
+      filter => property ("object", "Optional SEARCH criteria, same as messages.filter; AND/OR/NOT allowed"),
+   }, "read";
+
+expose sort_create =>
+   "UID SORT (SUBJECT DATE), save immutable worker-local UID snapshot, return first page. Replaces prior snapshot; expensive on large mailboxes.",
+   ["mailbox"],
+   {
+      mailbox => $mailbox,
+      filter => property ("object", "Optional SEARCH criteria, same as messages.filter"),
+      limit => { type => "integer", minimum => 1, maximum => 1000 },
+   }, "read";
+
+expose sort_page =>
+   "Read next UIDs from SORT snapshot by offset; no re-sort, no mail changes. Fetch summaries using messages(uids,uidvalidity).",
+   [qw(mailbox snapshot_id)],
+   {
+      mailbox => $mailbox,
+      snapshot_id => property ("string", "Opaque snapshot_id returned by sort_create"),
+      offset => { type => "integer", minimum => 0 },
+      limit => { type => "integer", minimum => 1, maximum => 1000 },
+   }, "read";
+
+expose sort_discard =>
+   "Discard worker-local SORT snapshot without modifying mail.",
+   [qw(mailbox snapshot_id)],
+   { mailbox => $mailbox, snapshot_id => property ("string", "Opaque snapshot_id returned by sort_create") }, "read";
+
+expose previews =>
+   "Read up to 25 UID text previews using MIME-aware BODY.PEEK; keep URLs from HTML links. Never sets Seen.",
+   [qw(mailbox uidvalidity uids)],
+   {
+      mailbox => $mailbox, uidvalidity => $validity,
+      uids => { type => "array", items => $uid, minItems => 1, maxItems => 25 },
+      max_bytes => { type => "integer", minimum => 1, maximum => 4096 },
    }, "read";
 
 expose message => "Read one message's envelope, flags, size and MIME BODYSTRUCTURE; no Seen change.",
@@ -698,12 +1018,13 @@ expose expunge =>
    [qw(mailbox uidvalidity)],
    { mailbox => $mailbox, uidvalidity => $validity, uids => $uids }, "expunge";
 
-expose mailbox => "Create, rename, delete, subscribe or unsubscribe a mailbox.",
+expose mailbox => "Create, rename, delete, subscribe or unsubscribe a mailbox; delete requires zero messages (even Deleted) unless force is true.",
    [qw(operation mailbox)],
    {
       operation => { type => "string", enum => [qw(create rename delete subscribe unsubscribe)] },
       mailbox => $mailbox,
       destination => property ("string", "New mailbox name for rename"),
+      force => property ("boolean", "Delete mailbox even if it contains messages (delete only)"),
    }, "manage";
 
 mcp_start %$options;

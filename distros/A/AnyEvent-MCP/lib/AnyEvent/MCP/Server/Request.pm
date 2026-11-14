@@ -137,6 +137,9 @@ Calls after completion are ignored.
 Sends a progress notification if the client supplied a progress token in
 C<< $req->{params}{_meta}{progressToken} >>. C<$progress> is the amount
 completed; C<$total> and C<$message> can be omitted or undefined.
+While an asynchronous tool call remains outstanding, Server automatically
+reports elapsed-time liveness every 30 seconds when the client supplied
+a progress token and the transport delivers notifications.
 
 Uses C<notify>, with the same best-effort delivery. Calls after completion
 are ignored.
@@ -201,6 +204,7 @@ sub reply {
 
    $self->{finished} = 1;
 
+   delete $self->{progress_timer};
    my $reply = delete $self->{on_reply};
    delete @$self{qw(on_notify on_cancel _reply)};
 
@@ -263,6 +267,7 @@ sub cancel {
    return if $self->{finished};
    $self->{finished} = $self->{cancelled} = 1;
 
+   delete $self->{progress_timer};
    delete $self->{peer}{requests}{$self->{id}}
       if $self->{peer};
 

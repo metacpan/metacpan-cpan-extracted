@@ -7,16 +7,24 @@ use Mojo::IOLoop;
 use Mojo::Server::Daemon;
 use Mojolicious;
 
+use InternetDataTest;
+
 # A real HTTP origin on an ephemeral port, sharing the singleton event loop with
 # the client under test.
 #
 # A stub user agent would be cheaper and would prove less: it cannot show that a
-# redirect was NOT followed, that a refusal was asked for exactly once, or that
-# the request reaching object storage carried no credential.
+# redirect was NOT followed, that a refusal was asked for exactly once, that the
+# request reaching object storage carried no credential, or how many requests
+# were genuinely in flight at once.
 sub new {
     my ($class, $handler) = @_;
 
-    my $self = bless { handler => $handler, requests => [] }, $class;
+    my $self = bless {
+        handler => $handler,
+        requests => [],
+        in_flight => 0,
+        peak_in_flight => 0,
+    }, $class;
 
     my $app = Mojolicious->new;
     $app->log->level('fatal');
@@ -29,6 +37,9 @@ sub new {
             query => $c->req->url->query->to_hash,
             headers => $c->req->headers->to_hash,
         };
+        $self->{in_flight}++;
+        $self->{peak_in_flight} = $self->{in_flight} if $self->{in_flight} > $self->{peak_in_flight};
+        $c->on(finish => sub { $self->{in_flight}-- });
         $self->{handler}->($c, $self);
     });
 
@@ -55,10 +66,38 @@ sub paths {
     return map { $_->{path} } @{ $_[0]{requests} };
 }
 
+sub peak_in_flight {
+    return $_[0]{peak_in_flight};
+}
+
 sub reset {
     my ($self) = @_;
     @{ $self->{requests} } = ();
+    $self->{peak_in_flight} = 0;
     return $self;
+}
+
+# Renders after a delay, so requests genuinely overlap and the peak in flight
+# measures something. An immediate render would let a serial client look
+# concurrent.
+sub slow_json {
+    my ($c, $body, $delay) = @_;
+    $c->render_later;
+    Mojo::IOLoop->timer($delay || 0.05 => sub { $c->render(json => $body) });
+}
+
+# The answer a batch gets from an origin that has nothing to say about any
+# address: every address in the body, answered as Unlimited would, with
+# `is_anycast` as given. A POST /batch carries its addresses in the body rather
+# than the path, so this is where they are read.
+sub batch_body {
+    my ($c, $is_anycast) = @_;
+    my $json = $c->req->json;
+    my $ips = ref $json eq 'HASH' && ref $json->{ips} eq 'ARRAY' ? $json->{ips} : [];
+    return {
+        results => { map { $_ => InternetDataTest::lookup(ip => $_, is_anycast => $is_anycast ? \1 : \0) } @$ips },
+        errors => {},
+    };
 }
 
 # Sends the headers and the start of a body, then nothing, for longer than any

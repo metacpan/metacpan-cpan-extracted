@@ -9,7 +9,7 @@ use Scalar::Util qw(blessed);
 
 use Twilio::Json;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub boolean_to_string {
   my ($value) = @_;

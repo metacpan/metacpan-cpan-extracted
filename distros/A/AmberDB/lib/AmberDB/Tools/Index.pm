@@ -6,7 +6,7 @@ use strict;
 use Carp qw(croak cluck);
 use File::Spec;
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2018-10-08';
 
 sub new {
@@ -39,7 +39,6 @@ sub new {
 }
 
 # my $ok = $tools->set_index($tableid, @records);
-# my $ok = $tools->reindex($tableid, @records);
 # ------------------------------------------------
 sub set_index {
 
@@ -47,7 +46,7 @@ sub set_index {
     my $adb = $self->{_adb} or return;
 
     my $table_info = $adb->table_info($tableid) or return;
-    if ( $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' ) ) {
+    if ( $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' ) ) {
         $self->{say} .= "    - Table '$tableid' is in simple mode, skipping index generation.\n";
         return 1;
     }
@@ -166,7 +165,6 @@ sub set_index {
 
     return 1;
 }
-*reindex = \&set_index;
 
 # Rebuilds Read All index.
 # my $ok = $tools->set_readall($tableid);
@@ -187,7 +185,7 @@ sub set_readall {
 
     my $table_info = $adb->table_info($tableid);
     return unless $table_info;
-    return 1 if $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    return 1 if $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
 
     # Read records from table if absent
     if ( !scalar @records ) {
@@ -303,7 +301,7 @@ sub set_search {
     my $table_path = $adb->table_path($tableid);
     my $table_info = $adb->table_info($tableid);
     return unless $table_info;
-    return 1 if $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    return 1 if $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     return unless exists( $table_info->{search_block} );
 
     # Read records from table if absent
@@ -465,7 +463,7 @@ sub set_fields {
     my $table_path = $adb->table_path($tableid);
     my $table_info = $adb->table_info($tableid);
     return unless $table_info;
-    return 1 if $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    return 1 if $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     return unless exists( $table_info->{match_block} );
     return unless -e "$table_path.$adb->{db_ext}";
 
@@ -622,7 +620,7 @@ sub set_filters {
 
     my $table_info = $adb->table_info($tableid);
     return unless $table_info;
-    return 1 if $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    return 1 if $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     return unless exists( $table_info->{match_block} );
     return unless exists( $table_info->{use_facet} );
 
@@ -723,7 +721,7 @@ sub set_rwlnkall {
 
     my $table_info = $adb->table_info($tableid);
     return unless $table_info;
-    return 1 if $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    return 1 if $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     return unless $table_info->{slug_block};
 
     # Read records from table if input is empty
@@ -798,7 +796,7 @@ sub set_sort {
     my $table_path = $adb->table_path($tableid);
     my $table_info = $adb->table_info($tableid);
     return unless $table_info;
-    return 1 if $adb->config('simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    return 1 if $adb->config('use_simple') || $table_info->{use_simple} || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     return unless exists $table_info->{sort_block};
 
     if ( !@records ) {
@@ -920,7 +918,13 @@ sub index_alltables {
     my @tables;
 
     # 1. Locate tables.
-    my $tables_hash = ($self->can('all_tables') ? $self->all_tables() : do { require AmberDB::Tools::Maintain; AmberDB::Tools::Maintain->new($self->{_adb})->all_tables(); });
+    my $tables_hash = ( $self->can('all_tables') ? 
+                        $self->all_tables() : 
+                        do { 
+                            require AmberDB::Tools::Maintain; 
+                            AmberDB::Tools::Maintain->new($self->{_adb})->all_tables(); 
+                        }
+                      );
     foreach my $dbase ( keys %$tables_hash ) {
         $dbase =~ /^[a-z0-9]+$/ or next;
         foreach my $tableid ( keys %{ $tables_hash->{$dbase} } ) {

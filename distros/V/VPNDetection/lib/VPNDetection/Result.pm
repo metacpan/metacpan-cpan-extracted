@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '3.13.2';
+our $VERSION = '3.14.0';
 
 our @FLAGS = qw(
     is_vpn is_hosting is_relay is_tor is_cdn is_resproxy is_dcproxy is_mobproxy
@@ -35,7 +35,7 @@ my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKE
 # missing key are all false.
 sub from_wire {
     my ($class, $body) = @_;
-    my %answer = (ip => $body->{ip}, is_bogon => 0);
+    my %answer = (ip => $body->{ip}, is_bogon => $body->{is_bogon} ? 1 : 0);
     # A served null stays undef, as a detail's does: read as 0 it would say the
     # address is no hosting server, or that the trial lasts, when nothing was said.
     for my $flag (@FLAGS, @MARKERS) {
@@ -130,8 +130,9 @@ false. A populated one always carries every one of its keys.
 
 =head2 ip, is_vpn, is_bogon
 
-Always present. C<is_bogon> is set when the answer was computed locally rather
-than served.
+Always present. C<is_bogon> is C<1> for reserved space (private, loopback,
+documentation and the like), which this module answers locally without a request;
+a served answer carries the API's own C<is_bogon>, which this reads.
 
 =head2 is_hosting, is_relay, is_tor, is_cdn, is_resproxy, is_dcproxy, is_mobproxy, is_pubproxy
 
@@ -144,7 +145,7 @@ its traffic out from it.
 =head2 vpn, hosting, relay, tor, cdn, resproxy, dcproxy, mobproxy, pubproxy
 
 The detail objects, as plain hash references, or C<undef> when your plan omits
-them. C<vpn> carries C<provider>, C<last_seen> and C<confidence>; its C<method>
+them. C<vpn> carries C<provider>, C<provider_name>, C<last_seen> and C<confidence>; its C<method>
 is deprecated, since no plan is answered with it from 2026-10-20. C<pubproxy> carries C<entry>, C<exit>, C<protocols> (an array
 reference), C<num_ports>, C<num_proxies>, C<last_seen> and C<last_usable>.
 C<num_ports> is 0 when the address is only an exit and C<num_proxies> 0 when it

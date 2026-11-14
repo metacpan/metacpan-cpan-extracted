@@ -5,7 +5,7 @@ use warnings;
 
 use Twilio::Json;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $status_code, $content, $headers) = @_;

@@ -18,8 +18,17 @@
 \blogs\b
 \.log$
 \bscratch\b
-^scratch.*
+^\.backup\b
+\b\.backup/
+\b\.backup\b
 \.rar$
+\.zip$
+\.7z$
+^nul$
+^NUL$
+\bnul$
+\bNUL$
+[{}]
 -scc_.*\.md$
 ^AGENTS\.md$
 ^wiki/
@@ -45,7 +54,7 @@
 \.tgz$
 \.zip$
 \bINDEX_KEY_MAP\.md$
-\bdocs/General_Rules\.md$
+(?:^|/)General_Rules\.md$
 
 # Database runtime stores and temp files
 ^\.amberdb\b

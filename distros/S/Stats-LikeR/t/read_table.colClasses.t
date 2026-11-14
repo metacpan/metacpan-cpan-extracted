@@ -26,7 +26,9 @@ my $n = 0;
 sub fixture {
 	my ($text, $ext) = @_;
 	my $path = File::Spec->catfile($dir, 'c' . $n++ . ($ext // '.csv'));
-	open my $fh, '>', $path or die "cannot write $path: $!";
+	# binary: on MSWin32 a text-mode open writes each "\n" as CR LF, and
+	# read_table() keeps a quoted line end as the bytes the file holds
+	open my $fh, '>:raw', $path or die "cannot write $path: $!";
 	print {$fh} $text;
 	close $fh or die "cannot write $path: $!";
 	return $path;
@@ -96,7 +98,7 @@ for my $shape (qw(aoh hoa hoh aoa)) {
 	is_deeply(typed(read_table($f, colClasses => 'numeric')),
 	          [ { a => [1, 'NV'], b => [2, 'NV'], c => [3, 'NV'] } ], 'one class for every column');
 	is_deeply(typed(read_table($f, colClasses => ['integer', undef])),
-	          [ { a => [1, 'IV'], b => [2, 'PV'], c => [3, 'IV'] } ], 'a short list is recycled, undef leaving a column as read');
+	          [ { a => [1, 'IV'], b => [2, 'IV'], c => [3, 'IV'] } ], 'a short list is recycled, undef leaving a column with no class: an integer\'s text is its IV (t/read_table.int_cells.t)');
 	is_deeply(typed(read_table($f, colClasses => [qw(double real character)])),
 	          [ { a => [1, 'NV'], b => [2, 'NV'], c => [3, 'PV'] } ], "'double' and 'real' are 'numeric', as R maps them");
 	eval { read_table($f, colClasses => [qw(numeric numeric numeric numeric)]) };
@@ -212,7 +214,7 @@ for my $shape (qw(aoh hoa hoh aoa)) {
 	          'the rows it keeps are stored converted');
 	$g = both($f, colClasses => { v => 'integer' }, filter => { v => sub { $_ = $_ * 2; 1 } });
 	same($g, 'filter writes a number back');
-	is_deeply(typed($g->{parser}{r}), [ { id => ['007', 'PV'], v => [3, 'IV'] }, { id => ['8', 'PV'], v => [4, 'IV'] } ],
+	is_deeply(typed($g->{parser}{r}), [ { id => ['007', 'PV'], v => [3, 'IV'] }, { id => [8, 'IV'], v => [4, 'IV'] } ],	# id has no class: "8" is an integer's text, "007" is not
 	          'a number a filter writes back is stored as the class asks, when it is one');
 	$g = both($f, colClasses => { v => 'numeric' }, filter => { v => sub { $_ = 'none' if $_ == 2; 1 } });
 	same($g, 'filter writes text back');

@@ -11,10 +11,9 @@ use warnings;
 use File::Find ();
 use Test::More;
 
-# Every module under lib/ carries the version of the main module. Core is
-# versioned from its main module only (VersionFromMainModule) and nothing
-# rewrites the other modules on a version bump, so this is what notices one
-# left behind. Paths are relative to the distribution root.
+# Every module under lib/ carries the version of the main module. The
+# release rewrites all of them; this checks the result. Paths are relative to
+# the distribution root.
 my $main = 'lib/DBIO.pm';
 
 # The literal $VERSION assignment of a file, or undef when it has none.

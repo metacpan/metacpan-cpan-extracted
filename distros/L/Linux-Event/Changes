@@ -1,5 +1,17 @@
 Revision history for Linux-Event
 
+0.119  2026-11-13
+    - Fix a native Stream consumer use-after-free when a raw-input or framed
+      message callback throws during Loop dispatch and watcher cleanup drops
+      the final reference to the Stream. Run callback depth restoration and
+      exceptional pending-flush cleanup on Perl's save stack, before outer
+      watcher/XS-state teardown can release the native state.
+    - Add regression coverage for both native-consumer paths, including
+      reentrant Stream close and exception propagation with final-reference
+      teardown. Add an AddressSanitizer/UndefinedBehaviorSanitizer full-suite
+      CI job alongside the ordinary Perl matrix and performance checks.
+      No public API or native consumer ABI changes.
+
 0.118  2026-11-01
     - Add Stream->sendfile($file, offset => ..., length => ...) for
       established plain TCP and Unix-domain socket Streams. File ranges share

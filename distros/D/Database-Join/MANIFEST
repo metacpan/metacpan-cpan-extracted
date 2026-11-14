@@ -57,6 +57,7 @@ t/mariadb.t
 t/mariadb_live.t
 t/path.t
 t/pod.t
+t/pushdown.t
 t/redis.t
 t/redis_live.t
 t/remote.t

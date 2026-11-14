@@ -1,7 +1,7 @@
 package DBIO::Test::MooseSugarSchema::Result::Artist;
 # ABSTRACT: Moose + Cake test result class for the artist table
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use DBIO::Moose;
 use DBIO::Cake;
@@ -43,7 +43,7 @@ DBIO::Test::MooseSugarSchema::Result::Artist - Moose + Cake test result class fo
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

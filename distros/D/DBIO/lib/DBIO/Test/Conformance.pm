@@ -4,7 +4,7 @@ package DBIO::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Scalar::Util ();
 use Test::More ();
@@ -157,8 +157,6 @@ sub check_declarations {
       unless $kind eq 'server' or $kind eq 'pending';
     push @p, "$label: reason must be a regex (qr//)"
       unless ref $decl->{reason} eq 'Regexp';
-    push @p, "$label: a pending refusal needs a card of the driver's board (k34)"
-      if $kind eq 'pending' and ($decl->{card} // '') !~ /\A(?:[A-Za-z0-9][A-Za-z0-9_-]*\#)?k[0-9]+\z/;
     return @p;
   };
 
@@ -269,7 +267,7 @@ sub summary_line {
     my $n = scalar @cases;
     my $count = $n . ' case' . ($n == 1 ? '' : 's');
     if ($first->{status} eq 'pending') {
-      push @part, "$area area pending (karr $first->{card}): $count";
+      push @part, "$area area pending: $count";
     }
     else {
       my $reason = ref $first->{reason} eq 'Regexp'
@@ -278,7 +276,7 @@ sub summary_line {
     }
   }
   push @part, scalar(@pending) . ' pending refusal' . (@pending == 1 ? '' : 's') . ': '
-    . join(', ', map { "$_->{case} (karr $_->{card})" } @pending)
+    . join(', ', map { $_->{case} } @pending)
     if @pending;
   push @part, scalar(@dev) . ' deviation' . (@dev == 1 ? '' : 's') . ': '
     . join(', ', map { "$_->{case} ($_->{reason})" } @dev)
@@ -415,14 +413,12 @@ sub _run_case {
       if @missing;
     my $status = $refusal->{kind} eq 'pending' ? 'pending' : 'refused';
     my $text = "$exception"; $text =~ s/\s+\z//;
-    return { %r, status => $status, message => $text,
-             ($status eq 'pending' ? (card => $refusal->{card}) : ()) };
+    return { %r, status => $status, message => $text };
   }
 
   if ($refusal) {
     return { %r, status => 'fail',
              message => "stale refusal: declared $refusal->{kind}"
-                      . ($refusal->{card} ? " ($refusal->{card})" : '')
                       . ' but the case succeeded' . (@{ $state->{errors} }
                           ? ' with wrong results: ' . join('; ', @{ $state->{errors} }) : '') };
   }
@@ -1032,7 +1028,7 @@ DBIO::Test::Conformance - Shared case table runner: a driver answers every case:
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 
@@ -1057,7 +1053,6 @@ version 0.900004
   sub conformance_refusals {{
     'ddl-foreign-key' => {
       kind   => 'pending',                       # not built yet
-      card   => 'k34',                           # required for pending
       reason => qr/foreign keys are not emitted yet/,
     },
     'ddl-ident-special-chars' => {
@@ -1284,8 +1279,8 @@ the runner checks that it still holds the values afterwards.
   my @problems = $class->check_declarations('DDL');
 
 What can be checked without a server: every declared refusal names a known
-case, has kind C<server>, C<pending> or C<deviation>; a regex C<reason> and a card for
-C<pending>; a regex C<fact> and a non-empty string C<reason> for
+case, has kind C<server>, C<pending> or C<deviation>; a regex C<reason>;
+a regex C<fact> and a non-empty string C<reason> for
 C<deviation> (not allowed for an area); the same for every refused area; C<conformance_answered_through>
 is a non-negative integer. Returns the problems as strings, none when the
 declaration is whole. L</run> makes it the first test.
@@ -1296,7 +1291,7 @@ declaration is whole. L</run> makes it the first test.
   my @results = $class->results('DDL', only => [ 'ddl-foreign-key' ]);
 
 Drive every case of the area and return one hashref per case:
-C<< { case, status, message } >> and, for C<pending>, C<card>, for C<deviation>, C<reason>. It does not
+C<< { case, status, message } >> and, for C<deviation>, C<reason>. It does not
 touch L<Test::More>. C<status> is
 
 =over 4
@@ -1340,9 +1335,9 @@ C<only> restricts the run to the named cases.
 
   my $line = $class->summary_line(\@results);
 
-The one line that closes a run: a refused area once (area, kind, the card of a
-pending one or the reason of a server one, and the number of its cases), the
-other pending refusals with their cards, the deviations with their reasons, and
+The one line that closes a run: a refused area once (area, kind, the reason of a
+server one, and the number of its cases), the
+other pending refusals, the deviations with their reasons, and
 the cases still newer than the answered table version. A case is named only
 where it was refused by itself (L</conformance_refusals>), never once per case
 of a refused area. C<undef> when there is nothing to say.
@@ -1508,14 +1503,14 @@ The hashref of areas the driver does not do at all, default C<{}>. C<Diff> and
 C<Bind> are known: a driver without a Diff declares
 
   sub conformance_refused_areas {{
-    Diff => { kind => 'pending', card => 'k36', reason => qr/diff is not built yet/ },
+    Diff => { kind => 'pending', reason => qr/diff is not built yet/ },
   }}
 
 and the diff postcondition of the DDL list is then not asked of it. The
 declaration is checked like any other (L</check_declarations>).
 
 The runner treats every case of the refused area as a declared refusal of that
-kind, with that card and reason, unless the case has a refusal of its own: the
+kind and reason, unless the case has a refusal of its own: the
 case is driven, the driver's seam has to throw a refusal that meets L</The
 refusal convention> (stem C<refus>, the table of the case's C<subject>, the
 reason), and the result is C<refused> or C<pending>. A case of the area that
@@ -1581,20 +1576,19 @@ an answer.
 
 C<conformance_refusals> returns a hashref keyed by case name:
 
-  { case_name => { kind => 'server' | 'pending', reason => qr/.../, card => 'k34' } }
+  { case_name => { kind => 'server' | 'pending', reason => qr/.../ } }
   { case_name => { kind => 'deviation', fact => qr/.../, reason => 'why' } }
 
 =over 4
 
 =item kind C<server>
 
-The engine cannot do it. Permanent; needs no card.
+The engine cannot do it. Permanent.
 
 =item kind C<pending>
 
-The driver does not do it yet. C<card> is required: a card of the driver's own
-board, in the form C<k34>. That line separates "not built" from "does not
-exist on this server" and makes the backlog readable from the declaration.
+The driver does not do it yet. The C<reason> says why. That line separates
+"not built" from "does not exist on this server".
 
 =item reason
 
@@ -1627,14 +1621,14 @@ deviation.
 
 =back
 
-C<pending> is green. The run ends with one line, per refusal and its card,
+C<pending> is green. The run ends with one line, per refusal and its kind,
 printed by L</run> and returned by L</summary_line>:
 
-  3 pending refusals: ddl-foreign-key (karr k34), ddl-fk-actions (karr k35), ...
+  3 pending refusals: ddl-foreign-key, ddl-fk-actions, ...
 
 A refused area (L</conformance_refused_areas>) is one entry, not one per case:
 
-  Diff area pending (karr k36): 20 cases
+  Diff area pending: 20 cases
 
 and, for a server-kind area, C<Diff area refused by the server (reason): 20 cases>.
 A case is named in the line only where it carries a refusal of its own.
@@ -1685,7 +1679,7 @@ complete, deliberately, in the same change.
 
 A case is a hash (see L<DBIO::Test::Conformance::Cases::DDL>):
 
-  { name, since, cards, subject, input => { sources => [ ... ] }, expect => [ ... ] }
+  { name, since, subject, input => { sources => [ ... ] }, expect => [ ... ] }
 
 The input of a Diff case has two declarations and rows
 (L<DBIO::Test::Conformance::Cases::Diff>):

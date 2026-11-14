@@ -8,7 +8,7 @@ use Digest::SHA qw(sha256_hex);
 use Twilio::Exceptions::ConfigurationException;
 use Twilio::Jwt::JWT;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $CONTENT_TYPE = 'twilio-pkrv;v=1';
 my $ALGORITHM    = 'RS256';

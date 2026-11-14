@@ -4,7 +4,7 @@ Test::Log::Abstraction - Capture log output in tests and assert on it
 
 ## Version
 
-0.002.1
+0.002.2
 
 ## Synopsis
 
@@ -157,6 +157,14 @@ So a misspelt level (caught by ["AUTOLOAD"](#autoload)) is printed only by rules
 When a test method fails, the messages that explain the failure are printed
 under it.  So you can see why it failed without running the test again.
 
+A printed message may hold text that your test did not write, such as data
+from a fixture.  So when a message is printed, its control characters are
+shown as `\xNN`, except tab and newline, which lay it out.  The escape
+character that starts a terminal control sequence, for example, is shown
+as `\x1B`.  A message's level is shown the same way.  The stored message
+is not changed: `like`, `unlike` and `messages()` see it exactly as it
+was logged.
+
 ### Global Variables Are Left Alone
 
 No method changes `$@`, `$!` or `$_`, and none of them touches an
@@ -292,6 +300,25 @@ A misspelt level name given to `count()` is not caught either: see
 printed, set `verbose => 0` or `$ENV{TEST_VERBOSE} = 0`.
 - **`level()` does not hide messages.**  It only changes the answers
 of the `is_*` methods.  Every message is still stored.
+- **Printed messages are escaped.**  When a message is printed, its
+control characters (except tab and newline) are shown as `\xNN`, so text
+from a fixture cannot control your terminal.  [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction) prints
+them as they are.  The stored message is not changed, so this matters only
+if your test checks what is printed.
+- **A very big number is not always written the same way.**  In a
+message template, a number too big for an integer format (such as
+`%{count}d` of `1e30`) is shown as Perl writes it.  Most Perls write
+`1e30` as `1e+30`.  A Perl built with `-Duselongdouble` may write all
+31 digits, `1000000000000000000000000000000`.  So in a test, do not type
+the expected text.  Let Perl make it:
+
+    ```perl
+    my $written = '' . 1e30;    # '1e+30' or all 31 digits
+    is($self->i18n('n', { count => 1e30 }), "$written items");
+    ```
+
+    A string, such as `'1e30'` in quotes, is always shown exactly as you
+    typed it.
 
 ## Encoding
 
@@ -307,8 +334,11 @@ file).
 against the stored text as it is.  So the pattern and the message must be
 the same kind of string.  A pattern with a character, such as
 `qr/\x{1F600}/`, does not match the same emoji stored as UTF-8 bytes.
-- **Printed messages.**  A Perl character string that has any
-character above ASCII is printed as UTF-8.  A byte string is printed
+- **Printed messages.**  Control characters, except tab and
+newline, are printed as `\xNN` (see ["Which messages are printed"](#which-messages-are-printed)).  A
+Perl character string that has any character above ASCII is printed as
+UTF-8.  A character string whose bytes are not valid UTF-8 is printed
+with U+FFFD in place of each bad part.  A byte string is printed
 unchanged.  Perl cannot always see the difference: a string that was not
 decoded, and has no character above 255 (such as `"caf\x{e9}"`), is
 treated as bytes.  If the output already has an encoding layer (for example, set
@@ -429,11 +459,16 @@ diag      valid: 'all' or 'none' (any case); a level name (any case),
           once; absent or undef: $config{diag}.  Invalid: any other
           string, including '' and numbers such as '4'; a list
           element that is not a level name (or is 'all'); a hash,
-          code or scalar reference.
+          code or scalar reference; any object, including one that
+          only claims to be an array, such as bless({}, 'ARRAY').
+          (An array blessed into the class ARRAY is still an array
+          of names, and valid.)
 level     valid: the 16 level names, any case, setting 0 (emergency)
           to 7 (trace); absent or undef: $config{level}.  Invalid:
           '', numbers (even 0 to 7), any other name.  The error shows
-          the name as it was given ('LOUD', not 'loud').
+          the name as it was given ('LOUD', not 'loud').  Level names are
+          ASCII: a non-ASCII letter ('\x{130}NFO', a dotted
+          capital I) makes another name, even after lower-casing.
 lang      valid: 'auto' (any case); 2 or 3 ASCII letters, then
           optionally one of _ . @ - and anything else ('de',
           'eng', 'de_DE.UTF-8', 'zh-Hant').  A code with no catalogue
@@ -444,12 +479,18 @@ country   valid: exactly 2 ASCII letters, any case; one with no
           mapping ('JP') gives 'en'.  Invalid: 1 or 3 letters, '',
           digits, non-ASCII letters.
 i18n      valid: a hash reference (even empty).  Invalid: any other
-          type.
+          type.  A reference that only claims to be a hash, such
+          as bless([], 'HASH'), passes the type check and is then
+          ignored, as is a language table or a form that is not
+          really a hash.  Tables may be nested to any depth; a part
+          of a table that contains itself is left out of the copy.
 ```
 
 An "invalid argument" explanation, and a level or diag name repeated in an
 error, is at most 200 characters; one longer is cut to 200 and ends with
-"...".  Control characters in it are shown as `\xNN`.
+"...".  Control characters in it are shown as `\xNN`.  A level or diag name that is a
+character string but not valid UTF-8 is never a level name, and is shown
+with U+FFFD in place of each bad part.
 
 ##### Output
 
@@ -573,7 +614,14 @@ one is dropped; a blessed hash is part of the message.  Text may be ASCII,
 decoded text in any script (accents, CJK, emoji and emoji sequences,
 combining marks, right-to-left text, zero-width characters) or bytes; it
 is stored with its length unchanged.  See ["ENCODING"](#encoding) for how it is
-printed.
+printed.  Hashes and arrays are rendered to any depth, in time linear in
+their size.  A part that cannot be read (a tied value whose FETCH dies) is
+shown as its tie object's plain form; an element of a tied array or hash
+has no tie object of its own, so it is shown as the plain form of a
+reference to it, such as SCALAR(0x...).  An argument such as
+substr($s, 10) that is out of range is undef, with no warning.  A
+reference that is not really the type it claims, such as
+bless({}, 'ARRAY'), is shown in Perl's plain form.
 
 ##### Output
 
@@ -697,7 +745,10 @@ Domains: any method name, including '', non-ASCII names and very long
 names.  The message is stored under the name in lower case, in full.  The
 notice shows the name escaped and cut: up to 200 characters it is shown
 whole, and from 201 on it is cut to 200 followed by '...' (see
-["DIAGNOSTICS"](#diagnostics)).  The length is counted in characters, not bytes.
+["DIAGNOSTICS"](#diagnostics)).  The length is counted in characters, not bytes.  A
+name that is a character string but not valid UTF-8 is stored with U+FFFD
+in place of each bad part, and is found again by count() and has\_level()
+under the same name.
 
 ##### Output
 
@@ -878,7 +929,9 @@ is($logger->count('error'), 1, 'one of them is an error');
 
 Domains: undef counts every message; a string counts messages at that
 level, any case ('', '0' and unknown names give 0; aliases are separate
-names).  Invalid: any reference.
+names).  Invalid: any reference.  A name may be any string, including non-ASCII text and a
+character string that is not valid UTF-8, which is matched as the same
+repaired name AUTOLOAD stores.
 
 ##### Output
 
@@ -940,7 +993,10 @@ $logger->like(qr/^Cannot open/i, 'the open error was logged');
 
 Domains: pattern - a qr// or a string, which is compiled as a regular
 expression ('' matches every message).  Invalid: undef, any other
-reference, a string that does not compile or can never match.  name -
+reference, a string that does not compile or can never match, and a
+character string that is not valid UTF-8.  A character pattern (such as
+qr/\\x{1F600}/) matches text logged as characters, and not the same text
+logged as UTF-8 bytes; a byte pattern matches bytes only.  name -
 undef, or any string (including '' and non-ASCII text).  Invalid: a
 reference.
 
@@ -1073,6 +1129,7 @@ $logger->has_level('error', 'the failure was logged');
 
 Domains: level - a string, any case ('' and unknown names match
 nothing; aliases are separate names).  Invalid: undef, any reference.
+Any string is valid, as for ["count"](#count).
 name - as for ["like"](#like).
 
 ##### Output
@@ -1258,7 +1315,9 @@ such as '0' or '8', unknown names - warns and returns undef.  A reference
 is treated as its text form: a plain reference such as ARRAY(0x...) is
 never a level name, so it warns; an object whose overloaded text form is
 a level name sets that level; an object whose text form dies is shown in
-plain form in the warning.
+plain form in the warning.  A character string that is not valid
+UTF-8, or holds a surrogate, is never a level name: it warns, with no
+other warning.
 
 ##### Output
 
@@ -1469,9 +1528,16 @@ The logger.
 #### Side Effects
 
 Prints the line as a TAP comment, with ["diag" in Test::Builder](https://metacpan.org/pod/Test%3A%3ABuilder#diag).  This works
-even if the test did not load [Test::More](https://metacpan.org/pod/Test%3A%3AMore).  A Perl character string is
+even if the test did not load [Test::More](https://metacpan.org/pod/Test%3A%3AMore).  Text that came from a logged
+message has its control characters escaped before it is passed here (see
+["Which messages are printed"](#which-messages-are-printed)), so a replacement `_emit` gets safe text
+too.  A Perl character string is
 encoded as UTF-8 first, unless the output already has an encoding layer
 (see ["ENCODING"](#encoding)).
+
+A level method stores its message before it calls `_emit`.  So if a
+replacement `_emit` dies, the message is still captured, and the error
+reaches the code that logged.
 
 #### Example
 
@@ -1601,13 +1667,25 @@ $self->i18n('logged', { gender => 'male', count => 2 });    # 'He logged 2 lines
 Domains: key - any string; undef renders as '', a reference as its
 string form, and an unknown key is returned as it is.  args - a hash
 reference; anything else is ignored.  count - a number selects a plural
-form (0 uses 'zero' when present); anything else uses 'other'.
+form; anything else (text, '', undef, a reference) uses 'other'.  A
+count equal to 0 (0, '0.0', '-0') uses 'zero' when the template has
+it.  Otherwise: in English and German 'one' is exactly 1 (0.999, 1.001,
+\-1 and 0 are 'other'); in French 'one' is any count above -2 and below 2
+(-2 and 2 are 'other', -1.999 and 1.999 are 'one'); in Chinese it is
+always 'other'.  A form the template lacks becomes 'other'.  gender - a
+value naming a form of the template selects it; any other value,
+including undef and '' when there is no such form, falls through to the
+plural forms.  A gender that is an object is matched by its text form.  A
+template or form that is not a string or a hash is shown as its text form.
 Placeholder values: any value.  With an integer format, `%d` and `%i`
 show -2\*\*63 to 2\*\*63-1, and `%u`, `%o`, `%x`, `%X`, `%b` and `%c`
 show 0 to 2\*\*64-1 (a negative number down to -2\*\*63 in two's
 complement).  Leading zeros and a leading `+` are allowed, and '-0' is 0.
 A value outside these ranges, text, infinity and NaN are shown as written.
-(These limits are for a Perl with 64-bit integers.)
+(These limits are for a Perl with 64-bit integers.)  "As written" means
+the text that Perl makes when it prints the value, `"$value"`.  For a
+number (not a string) this text depends on how Perl was built: see
+["COMMON PITFALLS"](#common-pitfalls).
 
 ##### Output
 
@@ -1662,9 +1740,8 @@ with `_`, and the subclass methods `_emit` and `i18n`, can be called by
 any code.  Nothing checks the caller: a test helper should not need
 compiled modules to do that.  Do not rely on them outside a subclass.
 - **Many modules are needed.**  [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict),
-[Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Readonly](https://metacpan.org/pod/Readonly), [Readonly::Values::Syslog](https://metacpan.org/pod/Readonly%3A%3AValues%3A%3ASyslog), and [autodie](https://metacpan.org/pod/autodie)
-(with [IPC::System::Simple](https://metacpan.org/pod/IPC%3A%3ASystem%3A%3ASimple)) must be installed, for what is a small test
-helper.  [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) is not used, because it loads
+[Params::Get](https://metacpan.org/pod/Params%3A%3AGet), [Readonly](https://metacpan.org/pod/Readonly) and [Readonly::Values::Syslog](https://metacpan.org/pod/Readonly%3A%3AValues%3A%3ASyslog) must be
+installed, for what is a small test helper.  [Object::Configure](https://metacpan.org/pod/Object%3A%3AConfigure) is not used, because it loads
 [Log::Abstraction](https://metacpan.org/pod/Log%3A%3AAbstraction), and a test logger should not need that.
 - **Simple translation system.**  [Locale::Maketext](https://metacpan.org/pod/Locale%3A%3AMaketext) uses numbered
 placeholders and has no gender forms.  Modules based on gettext need
@@ -1698,9 +1775,12 @@ like this is cut to 200 characters, and control characters in it (such as
 a newline, or the escape character that starts a terminal control
 sequence) are shown as `\xNN`.  In a character string, the C1 controls
 U+0080 to U+009F are shown as `\xNN` too; in a byte string those bytes
-are kept, because they are usually part of UTF-8 text.  So a hostile value cannot make an error
-message enormous, add a forged `ok` line to the output, or control your
-terminal.  An object whose text form (overloaded `""`) dies is shown in
+are kept, because they are usually part of UTF-8 text.  The bidi controls
+(U+200E, U+200F, U+202A to U+202E and U+2066 to U+2069), which change the
+order in which text is shown, are shown as `\x{NNNN}`.  So a hostile
+value cannot make an error message enormous, add a forged `ok` line to
+the output, control your terminal, or make the message read differently
+on screen from what it says.  An object whose text form (overloaded `""`) dies is shown in
 Perl's plain form, such as `My::Class=HASH(0x55d0c8a1e2f8)`: the error
 or warning you get is this module's, not the object's.
 
@@ -2081,6 +2161,7 @@ Read-only calls in BOTH states (the state stays the same):
   count, messages, lang, is_trace ... is_emergency, flush, reopen,
   i18n
                             [return a value only]
+  _emit                     [print the text; return the logger]
   DESTROY() called directly [does nothing; the logger stays]
   like(undef), has_level(undef), a bad argument, or any method
   called on something that is not a logger (the class name, undef,

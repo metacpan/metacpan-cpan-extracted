@@ -3,7 +3,7 @@ package Twilio::ListResource;
 use 5.016;
 use warnings;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $version) = @_;

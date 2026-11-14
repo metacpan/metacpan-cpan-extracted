@@ -1,7 +1,7 @@
 Name:           perl-RF-LTE-EARFCN
-Version:        0.02
+Version:        0.03
 Release:        1%{?dist}
-Summary:        LTE EARFCN Channel to Frequency Converter
+Summary:        LTE EARFCN Channel Converter to Band and Frequency
 License:        MIT
 Group:          Development/Libraries
 URL:            http://search.cpan.org/dist/RF-LTE-EARFCN/
@@ -11,17 +11,15 @@ BuildArch:      noarch
 BuildRequires:  perl(Carp)
 BuildRequires:  perl(ExtUtils::MakeMaker)
 BuildRequires:  perl(Package::New)
-BuildRequires:  perl(Scalar::Util)
 Requires:       perl(Carp)
 Requires:       perl(Package::New)
-Requires:       perl(Scalar::Util)
 Requires:       perl(:MODULE_COMPAT_%(eval "`%{__perl} -V:version`"; echo $version))
 
 %description
-This LTE EARFCN Channel to Frequency Converter uses the functions and
-tables in sections 5.7.3 and 5.7.4 of ETSI TS 136 101 V17.6.0 (2022-08) to
-convert EARFCN Channel to Frequency Downlink (fdl), Frequency Uplink (ful),
-and Frequency Separation (fs).
+This LTE EARFCN Channel to Band and Frequency Converter uses the
+functions and tables in sections 5.7.3 of ETSI TS 136 101 V17.6.0
+(2022-08) to convert EARFCN Channel to Band (band), Frequency Downlink
+(fdl), Frequency Uplink (ful), and Frequency Separation (fs).
 
 %prep
 %setup -q -n RF-LTE-EARFCN-%{version}
@@ -53,6 +51,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_mandir}/man3/*
 
 %changelog
+* Fri Nov 13 2026 Michael R. Davis <mrdvt92@yahoo.com> 0.03-1
+- Update
+
 * Sun Nov 08 2026 Michael R. Davis <mrdvt92@yahoo.com> 0.02-1
 - Update
 

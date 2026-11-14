@@ -19,6 +19,7 @@ my $mm = MM->new({
        "bin/mcp-fs",
        "bin/mcp-vim",
        "bin/mcp-webbrowser",
+       "bin/mcp-sctl",
        "bin/mcp-ask-user",
        "bin/mcp-imap",
        "bin/mcp-http",
@@ -40,13 +41,19 @@ my $mm = MM->new({
           runtime => { recommends => {
              AnyEvent::WebSocket::Server  => 0,
              AnyEvent::WebSocket::Message => 0,
+             Crypt::AuthEnc::GCM          => 0,
              AnyEvent::Fork::RPC          => 2.0,
              Mail::IMAPTalk               => 4.07,
              Authen::SASL                 => 2.1800,
              IO::Socket::SSL              => 0,
+             HTML::Parser                 => 0,
              Term::ReadKey                => 0,
              HTTP::Tiny                   => 0,
              XML::LibXML                  => 0,
+          }, suggests => {
+             Encode::HanExtra             => 0,
+             Encode::JIS2K                => 0,
+             Encode::EUCJPASCII           => 0,
           } },
           test => { recommends => {
              Protocol::WebSocket::Frame => 0,

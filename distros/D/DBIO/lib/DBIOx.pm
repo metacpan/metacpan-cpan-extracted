@@ -4,7 +4,7 @@ package DBIOx;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 1;
 
@@ -20,7 +20,7 @@ DBIOx - Bring your own database magic!
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

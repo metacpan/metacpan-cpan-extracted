@@ -120,7 +120,7 @@ sub next_conninfo {
   # offen: whether this is intended (a pool follows its storage's broker) or
   # incidental.
   is_deeply $conninfo, { dbname => 'db-B', user => 'user-B' },
-    'k331 (4) (i-a): after set_access_broker(B) the built pool\'s next connection is opened from B';
+    '(4) (i-a): after set_access_broker(B) the built pool\'s next connection is opened from B';
   is $A->{calls}, $a_calls, '... A is not asked again';
   is $B->{calls}, 1, '... B is asked once';
 }
@@ -143,7 +143,7 @@ sub next_conninfo {
   # k331 (4): the built pool is handed the provider and drops the static
   # conninfo, so B answers for its next connection.
   is_deeply $conninfo, { dbname => 'db-B', user => 'user-B' },
-    'k331 (4) (i-b): the built pool\'s next connection is opened from B, not the static conninfo';
+    '(4) (i-b): the built pool\'s next connection is opened from B, not the static conninfo';
   is $B->{calls}, 1, '... B is asked once';
   ok !exists $backend->pool->{conninfo}, '... the pool no longer holds the static conninfo';
   is scalar(@{ $backend->pool->{_connections} }), 2,
@@ -174,7 +174,7 @@ sub owner {
 
   # k331 (4): the attach reaches the built backend, whose pool follows B.
   is $backend->access_broker, $B,
-    'k331 (4) (ii-a): the embedded backend holds broker B';
+    '(4) (ii-a): the embedded backend holds broker B';
   is $storage->async, $backend, '... and is still the storage\'s backend (not rebuilt)';
   is_deeply next_conninfo($backend), { dbname => 'db-B', user => 'user-B' },
     '... its next pool connection is opened from B';
@@ -197,7 +197,7 @@ sub owner {
 
   # k331 (4): same as (ii-a); the pool built from the static DSN follows B.
   is_deeply next_conninfo($backend), { dbname => 'db-B', user => 'user-B' },
-    'k331 (4) (ii-b): the backend\'s next connection comes from B, not the static DSN';
+    '(4) (ii-b): the backend\'s next connection comes from B, not the static DSN';
   is $B->{calls}, 1, '... B is asked once';
 }
 

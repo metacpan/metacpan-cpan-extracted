@@ -4,7 +4,7 @@ package DBIO::Test::MooseSchema::Result::Artist;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use DBIO::Moose;
 
@@ -49,7 +49,7 @@ DBIO::Test::MooseSchema::Result::Artist - Moose-enabled test result class for th
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

@@ -4,9 +4,9 @@ package DBIO::InflateColumn::Serializer::YAML;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use YAML;
+use YAML 1.25;
 use Carp;
 use namespace::clean;
 
@@ -53,7 +53,7 @@ DBIO::InflateColumn::Serializer::YAML - YAML Inflator
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 
@@ -121,7 +121,10 @@ over-long payloads throw.
 
 L<YAML> 1.25 or newer. Not a hard dependency of DBIO; install separately.
 The stored value is loaded as plain data: C<$YAML::LoadBlessed> and
-C<$YAML::LoadCode> are 0 while it is read.
+C<$YAML::LoadCode> are 0 while it is read. C<$YAML::LoadBlessed> exists
+from YAML 1.25 on; with an older YAML this module does not load and dies
+with Perl's "YAML version 1.25 required" instead of returning blessed
+objects.
 
 =head1 AUTHOR
 

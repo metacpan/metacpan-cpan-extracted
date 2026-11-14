@@ -6,7 +6,14 @@ use IO::Socket::SSL ();
 use MIME::Base64 ();
 use MIME::QuotedPrint ();
 use Encode ();
+use Encode::MIME::Header ();
+# Extra charsets register with Encode only when their modules are loaded.
+# They're optional: missing modules must not prevent IMAP from starting.
+eval { require Encode::HanExtra };
+eval { require Encode::JIS2K };
+eval { require Encode::EUCJPASCII };
 use JSON::XS ();
+use AnyEvent::MCP ();
 
 # mboxo stores raw messages without reliably escaping From_ lines.
 # check the original bytes, not decoded MIME parts; never rewrite the message.
@@ -21,7 +28,7 @@ sub mbox_from {
    1 + ((substr $bytes, 0, $-[0]) =~ tr/\n//)
 }
 
-my ($imap, $config);
+my ($imap, $config, $sort_snapshot);
 
 sub imap_connect {
    my ($settings) = @_;
@@ -29,13 +36,15 @@ sub imap_connect {
    $config = $settings;
    undef $imap;
 
+   $config->{tls} =~ /\A(?:connect|starttls|none)\z/ or die "Invalid IMAP TLS mode\n";
+
    my %tls = (
       SSL_verify_mode     => IO::Socket::SSL::SSL_VERIFY_PEER (),
       SSL_verifycn_name   => $config->{server},
       SSL_verifycn_scheme => "http", # DNS names and IP addresses, not a web protocol
    );
 
-   if ($config->{tls} eq "ssl") {
+   if ($config->{tls} eq "connect") {
       $imap = Mail::IMAPTalk->new (
          Server => $config->{server}, Port => $config->{port},
          UseSSL => 1, UseBlocking => 1, PreserveINBOX => 1, %tls,
@@ -46,12 +55,14 @@ sub imap_connect {
       );
 
       $imap or die "IMAP connection failed: $@\n";
-      $imap->_imap_cmd ("starttls", 0, "")
-         or die "IMAP STARTTLS rejected: " . $imap->get_last_error . "\n";
-      IO::Socket::SSL->start_SSL ($imap->{Socket}, %tls)
-         or die "IMAP TLS handshake failed: " . IO::Socket::SSL::errstr () . "\n";
+      if ($config->{tls} eq "starttls") {
+         $imap->_imap_cmd ("starttls", 0, "")
+            or die "IMAP STARTTLS rejected: " . $imap->get_last_error . "\n";
+         IO::Socket::SSL->start_SSL ($imap->{Socket}, %tls)
+            or die "IMAP TLS handshake failed: " . IO::Socket::SSL::errstr () . "\n";
+         delete $imap->{Cache}{capability}; # TLS changes advertised mechanisms
+      }
       $imap->{UseBlocking} = 1;
-      delete $imap->{Cache}{capability}; # TLS changes advertised mechanisms
    }
 
    $imap or die "IMAP connection failed: $@\n";
@@ -70,8 +81,18 @@ sub imap_connect {
       $imap->authenticate ($sasl)
          or die "IMAP OAuth authentication failed: " . $imap->get_last_error . "\n";
    } else {
+      my $caps = $imap->capability;
+      my $sasl = grep /^auth=(?:plain|login|digest-md5)\z/, keys %$caps;
+      if (!$sasl && $caps->{logindisabled}) {
+         die "IMAP server advertises LOGINDISABLED and no supported AUTH mechanism. "
+           . "Use tls connect/starttls, or allow cleartext authentication on the IMAP server.\n";
+      }
+      if (!$sasl && $config->{password} =~ /[^\x00-\x7f]/) {
+         die "IMAP server offers no supported AUTH mechanism for a non-ASCII password.\n";
+      }
       $imap->login ($config->{user}, $config->{password})
-         or die "IMAP authentication failed: " . $imap->get_last_error . "\n";
+         or die "IMAP authentication failed: " .
+            ($imap->get_last_error || $@ || "server supplied no error details") . "\n";
    }
 
    $imap->uid (1);
@@ -112,8 +133,8 @@ sub same_validity {
 sub uids {
    my ($args) = @_;
 
-   ref $args->{uids} eq "ARRAY" && @{$args->{uids}} && @{$args->{uids}} <= 100
-      or die "uids must contain 1..100 message UIDs\n";
+   ref $args->{uids} eq "ARRAY" && @{$args->{uids}} && @{$args->{uids}} <= 1000
+      or die "uids must contain 1..1000 message UIDs\n";
    for (@{$args->{uids}}) {
       defined $_ && !ref $_ && /\A[1-9][0-9]*\z/
          or die "Invalid UID\n";
@@ -129,8 +150,16 @@ sub message {
    my $uid = $args->{uid};
    my $f = checked ($imap->fetch ($uid, "(envelope flags internaldate rfc822.size bodystructure)"), "Fetch $uid")->{$uid}
       or die "Message $uid vanished\n";
-
+   for my $key (qw(Subject From To Cc Bcc Reply-To Sender)) {
+      $f->{envelope}{$key} = mime_header ($f->{envelope}{$key}) if exists $f->{envelope}{$key};
+   }
    +{ uid => 0 + $uid, uidvalidity => $validity, %$f }
+}
+
+sub mime_header {
+   my ($value) = @_;
+   return $value unless defined $value && $value =~ /=\?[^?]+\?[bq]\?/i;
+   (eval { Encode::decode ("MIME-Header", $value) }) // $value
 }
 
 sub search_filter {
@@ -198,19 +227,25 @@ sub messages {
    my ($args) = @_;
 
    my $validity = mailbox ($args->{mailbox}, 0);
-   my $limit = $args->{limit} || 25;
-   $limit =~ /\A[1-9][0-9]*\z/ && $limit <= 100 or die "limit must be 1..100\n";
-
-   my $cursor = $args->{cursor};
-   if (defined $cursor) {
-      ref $cursor eq "HASH" && defined $cursor->{uidvalidity}
-         && "$cursor->{uidvalidity}" eq "$validity"
-         && defined $cursor->{before_uid} && $cursor->{before_uid} =~ /\A[1-9][0-9]*\z/
-         or die "Stale or invalid UID cursor\n";
+   my $explicit = exists $args->{uids};
+   if ($explicit) {
+      defined $args->{uidvalidity} && "$args->{uidvalidity}" eq "$validity"
+         or die "UIDVALIDITY mismatch (current $validity); refresh message references\n";
+      !exists $args->{cursor} && !exists $args->{filter} && !exists $args->{limit}
+         or die "Explicit UIDs cannot be combined with cursor, filter or limit\n";
+      uids ($args);
+   } else {
+      my $cursor = $args->{cursor};
+      if (defined $cursor) {
+         ref $cursor eq "HASH" && defined $cursor->{uidvalidity}
+            && "$cursor->{uidvalidity}" eq "$validity"
+            && defined $cursor->{before_uid} && $cursor->{before_uid} =~ /\A[1-9][0-9]*\z/
+            or die "Stale or invalid UID cursor\n";
+      }
    }
 
    my $nodes = 0;
-   my @criteria = search_filter ($args->{filter} // {}, 0, \$nodes);
+   my @criteria = $explicit ? () : search_filter ($args->{filter} // {}, 0, \$nodes);
 
    my @fields = @{$args->{fields} || [qw(subject from date flags size)]};
    my %valid = map +($_ => 1), qw(uid from to subject date cc reply-to message-id flags size internaldate);
@@ -224,26 +259,33 @@ sub messages {
    # search in descending UID windows: ordinary UID SEARCH can otherwise return
    # millions of matches even when only one summary page was requested.
    # Mail::IMAPTalk caches SELECT, so UIDNEXT from that SELECT becomes stale.
-   my $status = checked ($imap->status ($args->{mailbox}, "(UIDNEXT UIDVALIDITY)"), "STATUS");
-   "$status->{uidvalidity}" eq "$validity"
-      or die "Mailbox UIDVALIDITY changed; restart mcp-imap\n";
-   my $uidnext = $status->{uidnext};
-   defined $uidnext && $uidnext =~ /\A[1-9][0-9]*\z/
-      or die "Server did not provide UIDNEXT\n";
-   my $hi = $cursor ? $cursor->{before_uid} - 1 : $uidnext - 1;
    my @found;
-   my $scanned = 0;
-   while ($hi > 0 && $scanned < 20000 && @found <= $limit) {
-      my $lo = $hi > 999 ? $hi - 999 : 1;
-      my $matches = checked ($imap->search ("$lo:$hi", @criteria), "UID SEARCH");
-      push @found, sort { $b <=> $a } @$matches;
-      $scanned += $hi - $lo + 1;
-      $hi = $lo - 1;
+   my ($more, $incomplete, $hi);
+   if ($explicit) {
+      @found = @{$args->{uids}};
+   } else {
+      my $limit = $args->{limit} // 100;
+      $limit =~ /\A[1-9][0-9]*\z/ && $limit <= 1000 or die "limit must be 1..1000\n";
+      my $status = checked ($imap->status ($args->{mailbox}, "(UIDNEXT UIDVALIDITY)"), "STATUS");
+      "$status->{uidvalidity}" eq "$validity"
+         or die "Mailbox UIDVALIDITY changed; restart mcp-imap\n";
+      my $uidnext = $status->{uidnext};
+      defined $uidnext && $uidnext =~ /\A[1-9][0-9]*\z/
+         or die "Server did not provide UIDNEXT\n";
+      $hi = $args->{cursor} ? $args->{cursor}{before_uid} - 1 : $uidnext - 1;
+      my $scanned = 0;
+      while ($hi > 0 && $scanned < 20000 && @found <= $limit) {
+         my $lo = $hi > 999 ? $hi - 999 : 1;
+         my $matches = checked ($imap->search ("$lo:$hi", @criteria), "UID SEARCH");
+         push @found, sort { $b <=> $a } @$matches;
+         $scanned += $hi - $lo + 1;
+         $hi = $lo - 1;
+      }
+      $more = @found > $limit;
+      splice @found, $limit if $more;
+      $incomplete = $hi > 0 && !$more;
    }
 
-   my $more = @found > $limit;
-   splice @found, $limit if $more;
-   my $incomplete = $hi > 0 && !$more;
    my %selected = map +($_ => 1), @fields;
    my @items = ("uid");
    push @items, "envelope" if grep $selected{$_}, qw(from to subject date cc reply-to message-id);
@@ -271,6 +313,7 @@ sub messages {
          my $key = $env{$field};
          $row{$field} = $key ? $item->{envelope}{$key}
                       : $field eq "size" ? $item->{"rfc822.size"} : $item->{$field};
+         $row{$field} = mime_header ($row{$field}) if $field =~ /\A(?:subject|from|to|cc|reply-to)\z/;
       }
       if (@headers) {
          $row{headers} = $item->{headers} || {};
@@ -280,15 +323,276 @@ sub messages {
       push @messages, \%row;
    }
 
-   my $before = $incomplete ? $hi + 1 : @found ? $found[-1] : undef;
+   my $before = $explicit ? undef : $incomplete ? $hi + 1 : @found ? $found[-1] : undef;
 
    +{
       uidvalidity => $validity,
       messages    => \@messages,
-      more        => $more ? JSON::XS::true : JSON::XS::false,
+      more        => $more || $incomplete ? JSON::XS::true : JSON::XS::false,
       incomplete  => $incomplete ? JSON::XS::true : JSON::XS::false,
+      ($explicit ? (missing_uids => [grep !$data->{$_}, @found]) : ()),
       next_cursor => ($more || $incomplete) && $before
          ? { uidvalidity => $validity, before_uid => $before } : undef,
+   }
+}
+
+sub threads {
+   my ($args) = @_;
+   my $validity = mailbox ($args->{mailbox}, 0);
+   if (defined $args->{uidvalidity}) {
+      "$args->{uidvalidity}" eq "$validity"
+         or die "UIDVALIDITY mismatch (current $validity); refresh message references\n";
+   }
+   $imap->capability->{"thread=orderedsubject"}
+      or die "IMAP server does not advertise THREAD=ORDEREDSUBJECT\n";
+
+   my $nodes = 0;
+   my @criteria = search_filter ($args->{filter} // {}, 0, \$nodes);
+   my $range = $args->{uid_range};
+   if (defined $range) {
+      !ref $range && $range =~ /\A([1-9][0-9]{0,9}):([1-9][0-9]{0,9})\z/
+         or die "uid_range must be START:END (positive UIDs)\n";
+      my ($lo, $hi) = ($1, $2);
+      $lo <= $hi && $hi <= 4294967295
+         or die "uid_range must be ascending with 32-bit UIDs\n";
+      unshift @criteria, "UID", $range;
+   }
+   @criteria = ("ALL") unless @criteria;
+
+   my $threads = checked ($imap->thread ("ORDEREDSUBJECT", "UTF-8", @criteria), "UID THREAD");
+   +{
+      uidvalidity => $validity,
+      (defined $range ? (uid_range => $range) : ()),
+      threads     => $threads,
+   }
+}
+
+sub sort_page {
+   my ($args, $validity) = @_;
+   my $snap = $sort_snapshot
+      or die "No SORT snapshot (worker restarted or snapshot discarded); create a new one\n";
+   defined $args->{snapshot_id} && $args->{snapshot_id} eq $snap->{id}
+      && $args->{mailbox} eq $snap->{mailbox}
+      or die "Unknown or stale SORT snapshot ID\n";
+
+   $validity = mailbox ($args->{mailbox}, 0) unless defined $validity;
+   "$validity" eq "$snap->{uidvalidity}"
+      or die "SORT snapshot UIDVALIDITY changed; discard and recreate it\n";
+
+   my $offset = $args->{offset} // 0;
+   defined $offset && !ref $offset && $offset =~ /\A(?:0|[1-9][0-9]*)\z/
+      or die "SORT offset must be nonnegative\n";
+   my $limit = $args->{limit} // 100;
+   defined $limit && !ref $limit && $limit =~ /\A[1-9][0-9]*\z/ && $limit <= 1000
+      or die "SORT limit must be 1..1000\n";
+
+   my $count = @{$snap->{uids}};
+   $offset <= $count or die "SORT offset beyond snapshot\n";
+   my $end = $offset + $limit < $count ? $offset + $limit : $count;
+   +{
+      snapshot_id => $snap->{id},
+      uidvalidity => $validity,
+      count       => $count,
+      offset      => 0 + $offset,
+      uids        => [@{$snap->{uids}}[$offset .. $end - 1]],
+      next_offset => $end < $count ? $end : undef,
+   }
+}
+
+sub sort_create {
+   my ($args) = @_;
+   my $validity = mailbox ($args->{mailbox}, 0);
+   $imap->capability->{sort}
+      or die "IMAP server does not advertise SORT\n";
+   my $limit = $args->{limit} // 100;
+   defined $limit && !ref $limit && $limit =~ /\A[1-9][0-9]*\z/ && $limit <= 1000
+      or die "SORT limit must be 1..1000\n";
+   my $nodes = 0;
+   my @criteria = search_filter ($args->{filter} // {}, 0, \$nodes);
+   @criteria = ("ALL") unless @criteria;
+
+   my $uids = checked ($imap->sort ("(SUBJECT DATE)", "UTF-8", @criteria), "UID SORT");
+   ref $uids eq "ARRAY" or die "Invalid UID SORT result\n";
+   my $id = unpack "H*", AnyEvent::MCP::random_bytes 16;
+   $sort_snapshot = {
+      id => $id, mailbox => $args->{mailbox}, uidvalidity => $validity, uids => $uids,
+   };
+   sort_page ({ mailbox => $args->{mailbox}, snapshot_id => $id, limit => $limit }, $validity)
+}
+
+sub sort_discard {
+   my ($args) = @_;
+   my $snap = $sort_snapshot
+      or die "No SORT snapshot (worker restarted or snapshot discarded)\n";
+   defined $args->{snapshot_id} && $args->{snapshot_id} eq $snap->{id}
+      && $args->{mailbox} eq $snap->{mailbox}
+      or die "Unknown or stale SORT snapshot ID\n";
+   undef $sort_snapshot;
+   +{ ok => JSON::XS::true }
+}
+
+sub preview_parts {
+   my ($node) = @_;
+   return unless ref $node eq "HASH";
+   return if lc ($node->{"Disposition-Type"} || "") eq "attachment";
+   return $node
+      if lc ($node->{"MIME-Type"} || "") eq "text"
+         && lc ($node->{"MIME-Subtype"} || "") =~ /\A(?:plain|html)\z/
+         && ($node->{"IMAP-Partnum"} // "") =~ /\A[1-9][0-9]*(?:\.[1-9][0-9]*)*\z/;
+   map preview_parts ($_), @{$node->{"MIME-Subparts"} || []}
+}
+
+sub preview_attachments {
+   my ($node) = @_;
+   return unless ref $node eq "HASH";
+   my $type = lc ($node->{"MIME-TxtType"} || "");
+   my $disposition = lc ($node->{"Disposition-Type"} || "");
+   my $name = $node->{"Content-Disposition"}{filename} // $node->{"Content-Type"}{name};
+   if ($node->{"IMAP-Partnum"}
+       && ($disposition eq "attachment" || defined $name
+           || $type =~ m!\A(?:image|audio|video|application|message)/!
+           || $type =~ m{\Atext/(?!plain\z|html\z)})) {
+      my $size = $node->{Size};
+      return +{
+         part => $node->{"IMAP-Partnum"},
+         type => $type,
+         (defined $name ? (name => mime_header ($name)) : ()),
+         (defined $size && $size =~ /\A\d+\z/ ? (size => 0 + $size) : ()),
+         ($disposition ? (disposition => $disposition) : ()),
+      };
+   }
+   map preview_attachments ($_), @{$node->{"MIME-Subparts"} || []}
+}
+
+sub preview_html {
+   my ($html) = @_;
+   require HTML::Parser;
+
+   my ($text, $skip, @links) = ("", 0);
+   my $parser = HTML::Parser->new (
+      api_version => 3,
+      start_h => [sub {
+         my ($tag, $attr) = @_;
+         if ($tag =~ /\A(?:head|script|style|title)\z/) { ++$skip; return }
+         return if $skip;
+         $text .= "\n" if $tag =~ /\A(?:br|p|div|li|tr|h[1-6])\z/;
+         push @links, [$attr->{href} // "", length $text] if $tag eq "a";
+      }, "tagname,attr"],
+      end_h => [sub {
+         my ($tag) = @_;
+         if ($tag =~ /\A(?:head|script|style|title)\z/) { --$skip if $skip; return }
+         return if $skip;
+         if ($tag eq "a" && @links) {
+            my ($url, $start) = @{pop @links};
+            $text .= " ($url)" if $url =~ /\A(?:https?:\/\/|mailto:)/i
+               && substr ($text, $start) !~ /\Q$url\E/;
+         }
+         $text .= "\n" if $tag =~ /\A(?:p|div|li|tr|h[1-6])\z/;
+      }, "tagname"],
+      text_h => [sub { $text .= $_[0] unless $skip }, "dtext"],
+   );
+   $parser->parse ($html);
+   $parser->eof;
+   $text =~ s/[\t \x{a0}]+/ /g;
+   $text =~ s/ *\n */\n/g;
+   $text =~ s/\n{3,}/\n\n/g;
+   $text =~ s/\A\s+|\s+\z//g;
+   $text
+}
+
+sub preview_decode {
+   my ($part, $bytes, $max) = @_;
+   defined $bytes && !ref $bytes or die "Missing MIME part data\n";
+   my $truncated = length $bytes > $max;
+   substr ($bytes, $max) = "" if $truncated;
+   my $encoding = uc ($part->{"Content-Transfer-Encoding"} || "7BIT");
+   if ($encoding eq "BASE64") {
+      $bytes =~ s/\s+//g;
+      substr ($bytes, length ($bytes) - length ($bytes) % 4) = "" if $truncated;
+      $bytes = MIME::Base64::decode_base64 ($bytes);
+   } elsif ($encoding eq "QUOTED-PRINTABLE") {
+      $bytes =~ s/=(?:[0-9A-Fa-f]|\r)?\z// if $truncated;
+      $bytes = MIME::QuotedPrint::decode_qp ($bytes);
+   } elsif ($encoding !~ /\A(?:7BIT|8BIT|BINARY)\z/) {
+      die "Unsupported transfer encoding $encoding\n";
+   }
+
+   my $charset = $part->{"Content-Type"}{charset} || "us-ascii";
+   my $text = Encode::decode ($charset, $bytes, Encode::FB_QUIET ());
+   my $error = length $bytes && !$truncated ? "Invalid $charset text encoding" : undef;
+   my $type = lc $part->{"MIME-Subtype"};
+   $text = preview_html ($text) if $type eq "html";
+   +{
+      text => $text,
+      content_type => "text/$type",
+      part => $part->{"IMAP-Partnum"},
+      truncated => $truncated ? JSON::XS::true : JSON::XS::false,
+      (defined $error ? (error => $error) : ()),
+   }
+}
+
+# One UID FETCH per distinct MIME part number, never per message.
+sub preview_fetch {
+   my ($parts, $max) = @_;
+   my %group;
+   push @{$group{$parts->{$_}{"IMAP-Partnum"}}}, $_ for keys %$parts;
+   my %result;
+   for my $part (keys %group) {
+      my $f = checked ($imap->fetch ($group{$part},
+         "body.peek[$part]<0." . ($max + 1) . ">"), "Fetch preview $part");
+      for my $uid (@{$group{$part}}) {
+         $result{$uid} = eval { preview_decode ($parts->{$uid}, $f->{$uid}{body}, $max) }
+            || { error => "$@" || "Unable to decode preview" };
+      }
+   }
+   \%result
+}
+
+sub previews {
+   my ($args) = @_;
+   my $validity = same_validity ($args, 0);
+   my $uids = $args->{uids};
+   uids ($args);
+   @$uids <= 25 or die "previews limited to 25 UIDs\n";
+   my $max = $args->{max_bytes} // 2048;
+   $max =~ /\A[1-9][0-9]*\z/ && $max <= 4096 or die "max_bytes must be 1..4096\n";
+   my $f = checked ($imap->fetch ($uids, "bodystructure"), "Fetch MIME structures");
+   my (%primary, %fallback, %missing, %attachments);
+   for my $uid (@$uids) {
+      my $item = $f->{$uid};
+      my @parts = preview_parts ($item ? $item->{bodystructure} : undef);
+      $attachments{$uid} = [preview_attachments ($item->{bodystructure})] if $item;
+      my ($plain) = grep lc ($_ ->{"MIME-Subtype"}) eq "plain", @parts;
+      my ($html)  = grep lc ($_ ->{"MIME-Subtype"}) eq "html", @parts;
+      $primary{$uid} = $plain || $html if $plain || $html;
+      $fallback{$uid} = $html if $plain && $html;
+      $missing{$uid} = $item ? "No text MIME part" : "Message vanished"
+         unless $plain || $html;
+   }
+   my $result = preview_fetch (\%primary, $max);
+   my %retry;
+   for my $uid (keys %fallback) {
+      my $text = $result->{$uid}{text} // "";
+      $retry{$uid} = $fallback{$uid}
+         if length ($text) < 120
+            || $text =~ /(?:view (?:this |the )?(?:mail|message|email) (?:on|in) (?:the )?(?:web|browser)|click here)/i;
+   }
+   if (%retry) {
+      my $html = preview_fetch (\%retry, $max);
+      for my $uid (keys %retry) {
+         my $new = $html->{$uid};
+         my $old = $result->{$uid};
+         $result->{$uid} = $new if defined $new->{text}
+            && (!defined $old->{text} || length ($new->{text}) > length ($old->{text}));
+      }
+   }
+   +{
+      uidvalidity => $validity,
+      previews => [map +{
+         uid => 0 + $_,
+         %{$result->{$_} || { error => $missing{$_} || "No preview" }},
+         (@{$attachments{$_} || []} ? (attachments => $attachments{$_}) : ()),
+      }, @$uids],
    }
 }
 
@@ -309,7 +613,7 @@ sub part {
    my $bytes = $item->{body};
    defined $bytes && !ref $bytes or die "Invalid part data\n";
    my $truncated = length $bytes > $max;
-   substr $bytes, $max, "" if $truncated;
+   substr ($bytes, $max) = "" if $truncated;
    my $result = {
       uid => 0 + $uid, uidvalidity => $validity, part => $part,
       data_base64 => MIME::Base64::encode_base64 ($bytes, ""),
@@ -345,16 +649,40 @@ sub run {
 
    my $result = eval {
       if ($cmd eq "connect") {
+         undef $sort_snapshot;
          return (1, imap_connect ($args));
       }
+      return (1, sort_discard ($args)) if $cmd eq "sort_discard";
 
-      $imap && $imap->is_open or die "IMAP connection closed; restart mcp-imap\n";
+      if ($cmd eq "ping") {
+         $imap && $imap->is_open or die "IMAP connection closed during keepalive\n";
+         eval {
+            my $timeout = "IMAP keepalive timed out\n";
+            local $SIG{__WARN__} = sub { CORE::warn @_ unless $_[0] eq $timeout };
+            local $SIG{ALRM} = sub { die $timeout };
+            alarm 30;
+            checked ($imap->noop, "NOOP");
+         };
+         my $error = $@;
+         alarm 0;
+         die $error if $error;
+         return (1, { ok => JSON::XS::true });
+      }
+      $imap && $imap->is_open or imap_connect $config;
 
       if ($cmd eq "mailboxes" || $cmd eq "lsub") {
          my $method = $cmd eq "lsub" ? "lsub" : "list";
          return (1, { mailboxes => checked ($imap->$method ("", "*"), uc $method) });
       } elsif ($cmd eq "messages") {
          return (1, messages ($args));
+      } elsif ($cmd eq "threads") {
+         return (1, threads ($args));
+      } elsif ($cmd eq "sort_create") {
+         return (1, sort_create ($args));
+      } elsif ($cmd eq "sort_page") {
+         return (1, sort_page ($args));
+      } elsif ($cmd eq "previews") {
+         return (1, previews ($args));
       } elsif ($cmd eq "message") {
          return (1, message ($args));
       } elsif ($cmd eq "part" || $cmd eq "raw") {
@@ -423,6 +751,15 @@ sub run {
          my $op = $args->{operation};
          defined $op && $op =~ /\A(?:create|rename|delete|subscribe|unsubscribe)\z/
             or die "Invalid mailbox operation\n";
+
+         if ($op eq "delete" && !$args->{force}) {
+            my $count = checked ($imap->status ($args->{mailbox}, "(MESSAGES)"), "STATUS")->{messages};
+            defined $count && $count =~ /\A[0-9]+\z/
+               or die "Server did not report mailbox message count\n";
+            $count == 0
+               or die "Mailbox contains $count messages; use force to delete it\n";
+         }
+
          my @params = $op eq "rename" ? @{$args}{qw(mailbox destination)} : ($args->{mailbox});
          checked ($imap->$op (@params), uc $op);
          return (1, { ok => JSON::XS::true });
@@ -431,7 +768,12 @@ sub run {
       die "Unknown IMAP operation\n";
    };
    my $error = $@;
-   $result ? (1, $result) : (0, $error || "IMAP operation failed\n")
+   if (!$result && ($cmd eq "connect" || $cmd eq "ping" || !eval { $imap && $imap->is_open })) {
+      # do not let IMAPTalk's destructor issue a blocking LOGOUT on a dead socket
+      $imap->state (Mail::IMAPTalk::Unconnected) if $imap;
+      undef $imap;
+   }
+   $result ? (1, $result) : (0, $error || "IMAP operation failed\n", $imap ? 1 : 0)
 }
 
 1;

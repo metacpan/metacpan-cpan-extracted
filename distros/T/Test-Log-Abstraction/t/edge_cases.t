@@ -40,6 +40,9 @@ Readonly::Scalar my $BUDGET => 5;	# seconds any single hostile call may take
 Readonly::Scalar my $RANDOM_BYTES => 256;
 Readonly::Scalar my $FD_SPARE => 32;	# descriptors left free above those already open
 Readonly::Scalar my $BIG_NUMBER => 1e30;	# finite, but too big for any integer format
+Readonly::Scalar my $DEEP => 100_000;	# levels of nesting in one logged structure
+Readonly::Scalar my $ALARM => 60;	# seconds on a timer the module must leave alone
+Readonly::Scalar my $LOWEST_LEVEL => 7;	# the syslog number of debug and trace
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 
 # Paths that would do damage if anything opened or ran them
@@ -53,7 +56,9 @@ Readonly::Array my @HOSTILE_PATHS => (
 sub state_diag {
 	my ($label, $value) = @_;
 
-	diag(explain({ $label => $value })) if($SHOW_STATE);
+	# Test::More's explain() returns the dump; Test::Most's prints it
+	# and returns 0, which diag() then printed as a stray "# 0"
+	diag(Test::More::explain({ $label => $value })) if($SHOW_STATE);
 	return;
 }
 
@@ -113,6 +118,20 @@ sub within_budget {
 	alarm(0);
 	ok($ok, sprintf('%s: finished in %.2fs', $name, Time::HiRes::time() - $started)) or diag($@);
 	return;
+}
+
+# A character string whose bytes are not valid UTF-8, as Encode::_utf8_on()
+# makes from bytes that were never UTF-8
+sub malformed {
+	my $text = shift;
+
+	Encode::_utf8_on($text);
+	return $text;
+}
+
+# The first captured message's text
+sub first_message {
+	return $_[0]->messages()->[0]->{'message'};
 }
 
 {
@@ -390,6 +409,53 @@ subtest 'errors that repeat a name escape it and cut it short' => sub {
 	throws_ok { $CLASS->new(level => "x\ny") } qr/\Q'x\x0Ay'\E/, 'the escape shows what the character was';
 };
 
+subtest 'printed messages cannot control the terminal' => sub {
+	# A logged message may hold text the test did not write.  It is printed
+	# when verbose, and listed under a failing assertion; both must show
+	# terminal controls as escapes.  Tab and newline lay the message out,
+	# and Test::Builder starts every line with '#', so they are kept
+	my $hostile = "a\tb\nc\e]52;c;cHduZWQ=\a\e[2J\rd";
+	# The tab and the line break are real; the rest is the escapes' text
+	my $escaped = "a\tb\n# c" . q{\x1B]52;c;cHduZWQ=\x07\x1B[2J\x0Dd};
+	my $logger = quiet(verbose => 1);
+	my $out = printed { $logger->warn($hostile) };
+	ok(index($out, "# $escaped") >= 0, 'verbose: controls escaped, tab and newline kept') or state_diag(verbose => $out);
+	is($logger->messages()->[0]->{'message'}, $hostile, '... and the stored message is unchanged');
+
+	$logger->verbose(0);
+	my $method = "lvl\e[31m";	# AUTOLOAD stores any method name as the level
+	printed { $logger->$method('m') };
+	(undef, $out) = failing(sub { $logger->unlike(qr/./) });
+	ok(index($out, "[warn] $escaped") >= 0, 'a failing assertion: the listed message is escaped') or state_diag(listed => $out);
+	ok(index($out, '[lvl\x1B[31m] m') >= 0, '... and so is a level made from a method name') or state_diag(listed => $out);
+	ok($out !~ /[\x00-\x08\x0B-\x1F\x7F]/, '... and nothing in the output is a control but tab and newline');
+
+	# The C1 controls are escaped in a character string, and kept in a byte
+	# string, where they are usually part of UTF-8 text
+	$out = Encode::decode('UTF-8', printed { quiet(verbose => 1)->warn("x\x{9b}2J\x{263a}") });
+	ok(index($out, "x\\x9B2J\x{263a}") >= 0, 'a C1 control in a character string: escaped') or state_diag(c1 => $out);
+	my $euro = Encode::encode('UTF-8', "\x{20ac}");	# its bytes include 0x82
+	$out = printed { quiet(verbose => 1)->warn("x$euro") };
+	ok(index($out, "x$euro") >= 0, 'UTF-8 bytes in a byte string: kept');
+
+	# A character string whose bytes are not valid UTF-8 cannot be read as
+	# characters; it must still be logged, printed and escaped, never die
+	my $malformed = "\e[2J\xff\xfe tail";
+	Encode::_utf8_on($malformed);
+	my $lived = eval { $out = printed { quiet(verbose => 1)->warn($malformed) }; 1 };
+	ok($lived, 'malformed UTF-8: logging does not die') or diag($@);
+	ok(index($out, '\x1B[2J') >= 0 && $out =~ /tail$/m, '... and its C0 controls are escaped') or state_diag(malformed => $out);
+	# A value repeated in an error goes through _shown(), which also looks
+	# for bidi controls and measures the length; it must not die or warn
+	# there either (Test::Warnings checks the warnings).  (Called directly,
+	# to test _shown() alone; the public paths that repeat a name are
+	# tested under 'names and patterns that are not valid UTF-8')
+	my $shown;
+	$lived = eval { $shown = Test::Log::Abstraction::_shown($malformed); 1 };
+	ok($lived, 'malformed UTF-8 repeated in an error: does not die') or diag($@);
+	ok(defined($shown) && (index($shown, '\x1B[2J') == 0), '... and its C0 controls are escaped');
+};
+
 subtest 'patterns cannot run code' => sub {
 	my $logger = quiet();
 	$logger->info('x');
@@ -401,7 +467,7 @@ subtest 'patterns cannot run code' => sub {
 };
 
 # The module takes no paths and should never touch the filesystem or a
-# shell, whatever it is given.  Prove it in a child process with the
+# shell, or read a clock or set a timer, whatever it is given.  Prove it in a child process with the
 # builtins that could do so replaced by spies: they must be installed
 # before the module is compiled, which a child process allows.  (The child
 # itself opens nothing after installing them: Test::Mockingbird 0.14's
@@ -423,7 +489,7 @@ use autodie ();
 use Test::Mockingbird;
 my \%touched;
 BEGIN {
-	foreach my \$name (qw(open sysopen opendir unlink mkdir rmdir rename system exec readpipe chdir symlink link chmod truncate)) {
+	foreach my \$name (qw(open sysopen opendir unlink mkdir rmdir rename system exec readpipe chdir symlink link chmod truncate time sleep alarm localtime gmtime)) {
 		mock_core \$name => sub {
 			my (\$call, \@args) = \@_;
 			foreach my \$depth (0 .. 5) {
@@ -461,7 +527,7 @@ SCRIPT
 	my $output = run_perl_script($script);
 	state_diag(child => $output);
 	like($output, qr/^CONTROL: unlink$/m, 'the spies do catch a call from the module (control)');
-	like($output, qr/^TOUCHED: $/m, 'no file, directory or shell builtin was called by the module');
+	like($output, qr/^TOUCHED: $/m, 'no file, directory, shell, clock or timer builtin was called by the module');
 };
 
 # ===========================================================================
@@ -643,7 +709,7 @@ subtest 'PerlIO and Encode returning failure values' => sub {
 subtest 'validators returning failure values' => sub {
 	foreach my $failure (undef, 0, '') {
 		my $label = defined($failure) ? "'$failure'" : 'undef';
-		mock_return "${CLASS}::validate_strict" => $failure;
+		mock_return "Params::Validate::Strict::validate_strict" => $failure;
 		my $logger = eval { $CLASS->new(diag => 'none', lang => 'fr') };
 		restore_all();
 		isa_ok($logger, $CLASS, "validate_strict returning $label: still a logger");
@@ -651,12 +717,12 @@ subtest 'validators returning failure values' => sub {
 	}
 	foreach my $failure (undef, 0, '') {
 		my $label = defined($failure) ? "'$failure'" : 'undef';
-		mock_return "${CLASS}::get_params" => $failure;
+		mock_return "Params::Get::get_params" => $failure;
 		my $logger = eval { $CLASS->new(diag => 'none') };
 		restore_all();
 		isa_ok($logger, $CLASS, "get_params returning $label: still a logger, with defaults");
 	}
-	mock_exception "${CLASS}::validate_strict" => 'validator crashed';
+	mock_exception "Params::Validate::Strict::validate_strict" => 'validator crashed';
 	throws_ok { $CLASS->new() } qr/\A\Q$CLASS: invalid argument: validator crashed\E/, 'a validator that dies becomes our documented error';
 	restore_all();
 };
@@ -755,6 +821,347 @@ subtest 'a broken %config' => sub {
 			is($logger->lang(), 'en', '... and an unusable language falls back to English') if($logger && ($key eq 'lang'));
 		}
 	}
+};
+
+subtest "the caller's punctuation variables" => sub {
+	# Strategy: code under test may have changed $/, $, $\ $" or $; when it
+	# logs.  The stored message must not depend on any of them, and each
+	# must be as the caller left it afterwards.  Results are collected
+	# first and checked outside the block, so that Test::Builder's own
+	# printing is not run with them changed
+	my $logger = quiet();
+	my %got;
+	{
+		local $/ = 'c';
+		local $, = '<ofs>';
+		local $\ = '<ors>';
+		local $" = '<sep>';
+		local $; = '<subsep>';
+		$logger->info('abc', [1, 2], "\n");
+		$got{'joined'} = first_message($logger);
+		$logger->clear()->info('ends in c');
+		$got{'record separator'} = first_message($logger);
+		$got{'after'} = join('|', $/, $,, $\, $", $;);
+	}
+	is($got{'joined'}, 'abc[1, 2]', 'parts joined with nothing, lists with ", ", whatever $, and $" say');
+	is($got{'record separator'}, 'ends in c', '$/ = "c": only a trailing newline is removed, never a "c"');
+	is($got{'after'}, 'c|<ofs>|<ors>|<sep>|<subsep>', 'all five variables as the caller set them');
+
+	foreach my $separator (undef, \2, '') {
+		my ($message, $after);
+		{
+			local $/ = $separator;
+			$logger->clear()->info("x\n");
+			($message, $after) = (first_message($logger), $/);
+		}
+		my $label = defined($separator) ? (ref($separator) ? 'a record length' : 'paragraph mode') : 'slurp mode';
+		is($message, 'x', "\$/ in $label: the newline is still removed");
+		is($after, $separator, "\$/ in $label: left as it was");
+	}
+};
+
+# ===========================================================================
+# Unreadable and lying references
+# ===========================================================================
+
+# Strategy: a value can die merely by being read.  A tied scalar or array
+# whose FETCH dies is the plainest case; an argument list is read when it
+# is copied, so this attacks the very first line of every log call.  The
+# message must still be stored, with the unreadable part shown in a form
+# that says what it was, and the caller's $@ and $! must survive
+subtest 'arguments that die when read' => sub {
+	my $logger = quiet();
+	tie my $scalar, 'Local::DyingScalar';
+	tie my @size, 'Local::DyingArray';
+	tie my @elements, 'Local::DyingElements';
+	my %calls = (
+		'alone' => sub { $logger->info($scalar) },
+		'between parts' => sub { $logger->info('a', $scalar, 'b') },
+		'before fields' => sub { $logger->info('m', $scalar, { k => 'v' }) },
+		'array whose size dies' => sub { $logger->info(\@size) },
+		'array whose elements die' => sub { $logger->info(\@elements) },
+		'inside a hash' => sub { $logger->info({ list => \@elements }) },
+		'level method with a dying name' => sub { $logger->debug($scalar, $scalar) },
+	);
+	my %result;
+	foreach my $name (sort keys %calls) {
+		$logger->clear();
+		$@ = $SENTINEL;
+		$! = EIO;
+		my $lived = eval { $calls{$name}->(); 1 };
+		$result{$name} = { lived => $lived, error => $@, errno => $! + 0, entry => $logger->messages()->[0] };
+	}
+	# eval {} itself clears $@ on success, so whether the call kept it is
+	# measured with $! only; the 'keeps $@' cases elsewhere check $@
+	foreach my $name (sort keys %result) {
+		ok($result{$name}->{'lived'}, "$name: the log call lives") or diag($result{$name}->{'error'});
+		is($result{$name}->{'errno'}, EIO, "$name: \$! as the caller left it");
+		state_diag($name => $result{$name}->{'entry'});
+	}
+	my $tie = qr/Local::DyingScalar=HASH\(0x[0-9a-f]+\)/;
+	like($result{'alone'}->{'entry'}->{'message'}, qr/\A$tie\z/, 'a dying scalar is shown as its tie object');
+	like($result{'between parts'}->{'entry'}->{'message'}, qr/\Aa${tie}b\z/, '... in its place among the readable parts');
+	like($result{'before fields'}->{'entry'}->{'message'}, qr/\Am$tie\z/, '... and before fields');
+	is_deeply($result{'before fields'}->{'entry'}->{'fields'}, { k => 'v' }, '... which are still stored as fields');
+	like($result{'level method with a dying name'}->{'entry'}->{'message'}, qr/\A$tie$tie\z/, 'two dying scalars: both shown');
+	foreach my $name ('array whose size dies', 'array whose elements die') {
+		like($result{$name}->{'entry'}->{'message'}, qr/\AARRAY\(0x[0-9a-f]+\)\z/, "$name: the whole array is shown in Perl's plain form");
+	}
+	like($result{'inside a hash'}->{'entry'}->{'message'}, qr/\AHASH\(0x[0-9a-f]+\)\z/, 'one inside a hash: the whole part is shown in plain form');
+};
+
+# Strategy: ref() reports an object's class, and a class may be called
+# ARRAY or HASH.  bless({}, 'ARRAY') passes every "ref() eq 'ARRAY'" test
+# and then dies with "Not an ARRAY reference" when used as one.  Put such
+# liars everywhere the module walks a hash or an array
+subtest 'references that are not what ref() says' => sub {
+	my $logger = quiet();
+	my $fake_array = bless({ k => 'v' }, 'ARRAY');
+	my $fake_hash = bless(['x'], 'HASH');
+	my $address = qr/\(0x[0-9a-f]+\)/;
+
+	lives_ok { $logger->info($fake_array) } 'a hash blessed into ARRAY, alone: logged';
+	like(first_message($logger), qr/\AARRAY=HASH$address\z/, '... as Perl writes it, not as a list of parts');
+	lives_ok { $logger->clear()->info('m', $fake_hash) } 'an array blessed into HASH, where fields go: logged';
+	like(first_message($logger), qr/\AmHASH=ARRAY$address\z/, '... as a message part');
+	ok(!exists($logger->messages()->[0]->{'fields'}), '... not as fields');
+	$logger->clear()->info({ inner => $fake_array, list => [$fake_hash] });
+	like(first_message($logger), qr/\A\{inner => ARRAY=HASH$address, list => \[HASH=ARRAY$address\]\}\z/,
+		'nested liars are shown in plain form, and the structure around them is still rendered');
+
+	throws_ok { $CLASS->new(diag => $fake_array) } at_caller('diag must be a level name, "all", "none" or an array reference of level names'),
+		'a hash blessed into ARRAY as diag: the usual diag error';
+	my $real = $CLASS->new(diag => bless(['error'], 'ARRAY'), verbose => 0);
+	is(printed { $real->error('shown')->warn('hidden') }, "# shown\n", 'an array that is blessed into ARRAY is still a diag list');
+
+	my $default = "$CLASS: m() needs a level name";
+	my %tables = (
+		'the i18n option' => $fake_hash,
+		'a language table' => { xx => $fake_hash, en => $fake_hash },
+	);
+	foreach my $where (sort keys %tables) {
+		my $translated;
+		lives_ok { $translated = quiet(lang => 'xx', i18n => $tables{$where}) } "an array blessed into HASH as $where: new() lives";
+		is($translated->lang(), ($where eq 'the i18n option') ? 'en' : 'xx', '... the language is chosen as for any table');
+		is($translated->i18n('needs_level', { method => 'm' }), $default, '... and the liar is ignored');
+	}
+	my $template = quiet(i18n => { en => { needs_level => $fake_hash } });
+	like($template->i18n('needs_level'), qr/\AHASH=ARRAY$address\z/, 'one as a template: shown as text, as any other non-string template');
+};
+
+# Strategy: names and patterns come from the caller, and may be character
+# strings that are not valid UTF-8.  lc() dies on those, a regex panics,
+# and Carp dies formatting them as arguments.  Every public path that
+# takes a name must answer with this module's own error or warning
+subtest 'names and patterns that are not valid UTF-8' => sub {
+	my $bad = malformed("\xff\xfe abc");
+	my $repaired = qr/\x{FFFD}+ abc/;
+	my $logger = quiet();
+	my $returned = 'not called';
+
+	warning_like { $returned = $logger->level($bad) } qr/\A\Q$CLASS: invalid syslog level '\E$repaired' at \Q$FILE\E line \d+\.?\n?\z/,
+		'level(): our warning, at the caller';
+	is($returned, undef, '... and undef');
+	is($logger->level(), $LOWEST_LEVEL, '... and the level unchanged');
+	is($logger->count($bad), 0, 'count(): no messages at that level');
+	my ($result) = failing(sub { $logger->has_level($bad, 'has_level with a malformed name') });
+	ok(!$result, 'has_level(): fails, as for any level with no messages');
+
+	throws_ok { $CLASS->new(level => $bad) } qr/\A\Q$CLASS: invalid syslog level '\E$repaired' at \Q$FILE\E/, 'new(level): our error';
+	throws_ok { $CLASS->new(diag => $bad) } qr/\A\Q$CLASS: invalid diag level '\E$repaired' at \Q$FILE\E/, 'new(diag): our error';
+	throws_ok { $CLASS->new(diag => ['error', $bad]) } qr/\A\Q$CLASS: invalid diag level '\E$repaired' at \Q$FILE\E/, 'new(diag list): our error';
+	foreach my $method ('like', 'unlike') {
+		throws_ok { $logger->$method($bad) } qr/\A\Q$CLASS: invalid argument: Malformed UTF-8 character\E[^\n]* at \Q$FILE\E/,
+			"$method(): a malformed pattern is an invalid argument";
+	}
+
+	my $out = printed { $logger->$bad('x') };
+	is($logger->count($bad), 1, 'a malformed method name: the message is stored, and found by the same name');
+	ok($logger->has_level($bad, 'has_level finds it too'), '... by has_level() as well');
+	is(scalar($out =~ tr/\n//), 1, '... with a one-line notice');
+	state_diag(notice => $out);
+};
+
+subtest 'surrogates in names and patterns' => sub {
+	# A UTF-16 surrogate is valid in a Perl string, but lc() warns on it;
+	# Test::Warnings fails this file on any warning
+	my $logger = quiet();
+	my $name = "lvl\x{D800}";
+	printed { $logger->$name('x') };
+	is($logger->count($name), 1, 'stored under a surrogate method name, with no warning');
+	ok($logger->has_level("LVL\x{D800}", 'has_level with a surrogate, any case'), 'found by has_level()');
+	warning_like { $logger->level($name) } qr/\A\Q$CLASS: invalid syslog level 'lvl\E/, 'level(): only our warning';
+	throws_ok { $CLASS->new(level => $name) } qr/\A\Q$CLASS: invalid syslog level 'lvl\E/, 'new(level): our error';
+	$logger->clear()->info("x\x{D800}y");
+	ok($logger->like("\x{D800}", 'a surrogate as a pattern'), 'a valid pattern with a surrogate still compiles and matches');
+};
+
+# Strategy: templates and their arguments come from the test writer
+# through the i18n option, and i18n() promises always to return a string.
+# Attack it with objects that die when made text, sprintf conversions
+# that write memory (%n) or read extra arguments (*, vectors), and
+# character codes that are not characters
+subtest 'hostile i18n templates and arguments' => sub {
+	my $bomb = bless({}, 'Local::Bomb');
+	my $plain = qr/\ALocal::Bomb=HASH\(0x[0-9a-f]+\)\z/;
+	my $spec = '%{v}n|%{v}*d|%{v}vd|%{v}9999s|%{v}.9999f|%{v}|%{}s|%{v v}s';
+	my $logger = quiet(i18n => { en => {
+		bomb => $bomb,
+		forms => { male => 'male form', other => 'other form', one => { other => $bomb } },
+		spec => $spec,
+	} });
+
+	like($logger->i18n('bomb'), $plain, 'a template whose "" dies: shown in plain form');
+	is($logger->i18n('forms', { gender => $bomb }), 'other form', 'a gender whose "" dies: matches no form, so the plural form is used');
+	like($logger->i18n('forms', { count => 1 }), $plain, 'a nested form whose "" dies: plain form');
+	is($logger->i18n('spec', { v => 5 }), $spec, '%n, *, vectors, over-long widths and bad names are left as text');
+
+	my $chars = quiet(i18n => { en => { c => '%{v}c' } });
+	foreach my $value (-1, 0xD800, 0x110000, 2**31, $BIG_NUMBER, 'NaN', 9**9**9, -9**9**9) {
+		my $text;
+		lives_ok { $text = $chars->i18n('c', { v => $value }) } "%c of $value: no death (and Test::Warnings: no warning)";
+		ok(defined($text), '... and a string');
+	}
+
+	my $broken = $CLASS->new(diag => 'none', verbose => 0, i18n => { en => { captured => $bomb, entry => $bomb } });
+	$broken->info('x');
+	my ($result, $out) = failing(sub { $broken->empty() });
+	ok(!$result, 'a failing assertion whose explanation templates die: still fails');
+	like($out, qr/Local::Bomb=HASH/, '... and explains itself in plain form');
+};
+
+# Strategy: the readable rendering of a structure is recursive.  Built by
+# returning strings, each level copied all the text below it: quadratic,
+# 11 seconds for a hash 80,000 deep.  Logging must stay linear
+subtest 'deep nesting is rendered in linear time' => sub {
+	my $logger = quiet();
+	my (%hash, @array);
+	my ($hash_tip, $array_tip) = (\%hash, \@array);
+	foreach (1 .. $DEEP) {
+		$hash_tip = $hash_tip->{'k'} = {};
+		push @{$array_tip}, [];
+		$array_tip = $array_tip->[0];
+	}
+
+	within_budget("a hash nested $DEEP deep", sub { $logger->info(\%hash) });
+	# ok() with eq: a failing is() would print a megabyte
+	ok(first_message($logger) eq ('{k => ' x $DEEP) . '{}' . ('}' x $DEEP), 'rendered exactly');
+	within_budget("an array nested $DEEP deep", sub { $logger->clear()->info('a', \@array) });
+	ok(first_message($logger) eq 'a' . ('[' x ($DEEP + 1)) . (']' x ($DEEP + 1)), 'rendered exactly');
+	within_budget("an i18n option nested $DEEP deep", sub { quiet(i18n => { en => \%hash }) });
+	within_budget("a template nested $DEEP deep", sub { quiet(i18n => { en => { k => \%hash } })->i18n('k') });
+};
+
+subtest 'loggers are freed: no reference cycles' => sub {
+	# Strategy: a logger that is never freed holds every message for the
+	# rest of the run.  Weaken a reference to each, drop the strong one,
+	# and the weak one must be gone
+	my %cases = (
+		'plain' => sub { quiet()->info('x') },
+		'cyclic i18n option' => sub {
+			my %loop = (other => 'x');
+			$loop{'self'} = \%loop;
+			my $logger = quiet(i18n => { en => { k => \%loop } });
+			delete $loop{'self'};	# the caller's own cycle is the caller's
+			return $logger;
+		},
+		'after a failing assertion' => sub {
+			my $logger = quiet()->info('x');
+			failing(sub { $logger->empty() });
+			return $logger;
+		},
+		'a clone' => sub { quiet()->info('x')->new(lang => 'de') },
+		'fields holding the logger, then clear()' => sub {
+			my $logger = quiet();
+			$logger->info('m', { logger => $logger });
+			return $logger->clear();
+		},
+		'after an error' => sub {
+			my $logger = quiet();
+			eval { $logger->like('(') };
+			return $logger;
+		},
+	);
+	foreach my $name (sort keys %cases) {
+		my $logger = $cases{$name}->();
+		Scalar::Util::weaken(my $weak = $logger);
+		undef $logger;
+		ok(!defined($weak), "$name: freed");
+	}
+};
+
+subtest 'forged invocants' => sub {
+	# Strategy: a hash shaped like a logger, another class's object, and
+	# false values, as the invocant of every kind of method.  None may be
+	# treated as a logger, and each must get the documented error
+	my @fakes = ({ messages => [], options => {}, lang => 'en' }, Local::Other->new(), undef, 0, '');
+	my %calls = (
+		info => sub { Test::Log::Abstraction::info($_[0], 'x') },
+		count => sub { Test::Log::Abstraction::count($_[0]) },
+		like => sub { Test::Log::Abstraction::like($_[0], qr/x/) },
+		messages => sub { Test::Log::Abstraction::messages($_[0]) },
+		level => sub { Test::Log::Abstraction::level($_[0], 'error') },
+	);
+	foreach my $method (sort keys %calls) {
+		foreach my $fake (@fakes) {
+			throws_ok { $calls{$method}->($fake) } at_caller("$method() must be called on an object, not on the class"),
+				"$method() on " . (ref($fake) || printable(defined($fake) ? $fake : 'undef'));
+		}
+	}
+	is_deeply($fakes[0], { messages => [], options => {}, lang => 'en' }, 'the forged hash was not written to');
+};
+
+# ===========================================================================
+# Time: the module reads no clock and touches no timer
+# ===========================================================================
+
+# Strategy: nothing in this module expires, so there is no timeout to
+# trigger and no cache to go stale; what can go wrong is that it reads or
+# resets a timer that belongs to the test.  The child-process spies above
+# show it calls no clock builtin; here a live alarm() must survive a whole
+# session, untouched
+subtest "the caller's alarm() timer is left alone" => sub {
+	plan(skip_all => 'alarm(0) cannot report the time left on Windows') if($^O eq 'MSWin32');
+	my $fired = 0;
+	local $SIG{'ALRM'} = sub { $fired++ };
+	alarm($ALARM);
+	my $logger = $CLASS->new(diag => 'all', verbose => 0, lang => 'fr');
+	printed { $logger->error('x')->nosuch('y') };
+	$logger->like(qr/x/, 'an assertion while a timer runs');
+	failing(sub { $logger->empty() });
+	$logger->i18n('captured', { count => 2 });
+	eval { $logger->like('(') };
+	my $left = alarm(0);
+	ok(($left > 0) && ($left <= $ALARM), "the timer still runs ($left of $ALARM seconds left)");
+	is($fired, 0, '... and has not fired');
+};
+
+# ===========================================================================
+# Return values under hostile input
+# ===========================================================================
+
+subtest 'return values keep their documented shape' => sub {
+	# Strategy: after every attack above, what comes back must still match
+	# the API SPECIFICATION's return schemas
+	my $bomb = bless({}, 'Local::Bomb');
+	my $logger = quiet(i18n => { en => { k => $bomb } });
+	tie my $scalar, 'Local::DyingScalar';
+	my $bad = malformed("\xff\xfe");
+
+	returns_ok($logger->info($scalar), { type => 'object', isa => $CLASS }, 'info() of a dying argument: the logger');
+	returns_ok($logger->count($bad), { type => 'integer', min => 0 }, 'count() of a malformed name: a count');
+	returns_ok($logger->count(), { type => 'integer', min => 1 }, 'count(): the message was stored');
+	returns_ok($logger->i18n('k'), { type => 'string' }, 'i18n() of a dying template: a string');
+	returns_ok($logger->i18n($bomb), { type => 'string' }, 'i18n() of a dying key: a string');
+	returns_ok($logger->i18n('captured', { count => $bomb }), { type => 'string' }, 'i18n() of a dying count: a string');
+	returns_ok($logger->messages(), { type => 'arrayref' }, 'messages(): an array reference');
+	returns_ok($logger->lang(), { type => 'string', matches => qr/\A[a-z]{2,3}\z/ }, 'lang(): a language tag');
+	{
+		local $SIG{'__WARN__'} = sub { };	# level($bad) warns; that is tested above
+		$logger->level($bad);
+	}
+	returns_ok($logger->level(), { type => 'integer', min => 0, max => $LOWEST_LEVEL }, 'level(): a syslog number, unchanged by a bad name');
+	returns_ok(quiet(lang => 'xx', i18n => bless([], 'HASH'))->lang(), { type => 'string', matches => qr/\Aen\z/ }, 'a lying i18n option: English');
 };
 
 # ===========================================================================
@@ -863,6 +1270,36 @@ subtest 'regressions fixed in 0.002.1' => sub {
 	is($out, '', '... and prints no "no method" notice');
 };
 
+# Strategy: the exact call that showed each bug fixed in 0.002.2, found by
+# this file; the subtests above try the variations
+subtest 'regressions fixed in 0.002.2' => sub {
+	my $logger = quiet();
+
+	# A tied scalar whose FETCH dies killed the log call
+	tie my $scalar, 'Local::DyingScalar';
+	lives_ok { $logger->info($scalar) } 'a tied argument that dies when read';
+
+	# bless({}, 'ARRAY') died with "Not an ARRAY reference" at three places
+	lives_ok { $logger->info(bless({}, 'ARRAY')) } 'bless({}, "ARRAY") as a message';
+	throws_ok { $CLASS->new(diag => bless({}, 'ARRAY')) } qr/\A\Q$CLASS: diag must be\E/, '... as diag';
+	lives_ok { $CLASS->new(lang => 'xx', i18n => bless([], 'HASH')) } 'bless([], "HASH") as i18n';
+
+	# lc() died with "Malformed UTF-8 character (fatal)", then Carp did
+	my $bad = malformed("\xff\xfe abc");
+	warning_like { $logger->level($bad) } qr/\A\Q$CLASS: invalid syslog level\E/, 'level() of a malformed name';
+	# The match on $AUTOLOAD panicked: "pp_match start/end pointers"
+	lives_ok { printed { $logger->$bad() } } 'a malformed method name';
+
+	# i18n() died with the object's own error
+	lives_ok { quiet(i18n => { en => { k => bless({}, 'Local::Bomb') } })->i18n('k') } 'a template whose "" dies';
+
+	# Quadratic rendering: 11 seconds at 80,000 deep
+	my $deep = {};
+	my $tip = $deep;
+	$tip = $tip->{'k'} = {} foreach 1 .. $DEEP;
+	within_budget('a deeply nested hash', sub { $logger->info($deep) });
+};
+
 # Each of these was a real bug, found in the wild or by this suite
 subtest 'regressions' => sub {
 	my $logger = quiet();
@@ -915,3 +1352,22 @@ package Local::UnreadableHash;
 sub TIEHASH { return bless {}, shift }
 sub FIRSTKEY { die "unreadable\n" }
 sub SCALAR { die "unreadable\n" }
+
+# A tied scalar that dies as soon as it is read
+package Local::DyingScalar;
+
+sub TIESCALAR { return bless {}, shift }
+sub FETCH { die "unreadable\n" }
+
+# A tied array that dies when asked its size
+package Local::DyingArray;
+
+sub TIEARRAY { return bless {}, shift }
+sub FETCHSIZE { die "unreadable\n" }
+
+# A tied array with two elements, each of which dies when read
+package Local::DyingElements;
+
+sub TIEARRAY { return bless {}, shift }
+sub FETCHSIZE { return 2 }
+sub FETCH { die "unreadable\n" }

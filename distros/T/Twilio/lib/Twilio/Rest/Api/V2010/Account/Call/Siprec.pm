@@ -4,7 +4,7 @@ package Twilio::Rest::Api::V2010::Account::Call::Siprec;
 use 5.016;
 use warnings;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 package Twilio::Rest::Api::V2010::Account::Call::SiprecList;
 

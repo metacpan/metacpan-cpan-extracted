@@ -13,7 +13,7 @@ use Scalar::Util qw(blessed);
 
 use Twilio::Jwt::JWT;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $DEFAULT_TTL  = 3600;
 my $CONTENT_TYPE = 'twilio-fpa;v=1';

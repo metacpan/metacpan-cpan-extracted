@@ -6,7 +6,7 @@
    "dynamic_config" : 1,
    "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150015",
    "license" : [
-      "open_source"
+      "gpl_2"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
@@ -35,7 +35,6 @@
             "Carp" : "0",
             "Encode" : "0",
             "Hash::Util" : "0",
-            "IPC::System::Simple" : "0",
             "List::Util" : "1.33",
             "Params::Get" : "0.17",
             "Params::Validate::Strict" : "0.41",
@@ -43,7 +42,7 @@
             "Readonly::Values::Syslog" : "0.04",
             "Scalar::Util" : "0",
             "Test::Builder" : "0",
-            "autodie" : "0",
+            "overload" : "0",
             "perl" : "5.026",
             "strict" : "0",
             "version" : "0",
@@ -51,17 +50,22 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Log::Abstraction" : "0.41"
+         },
          "requires" : {
             "B" : "0",
+            "Config" : "0",
             "Cwd" : "0",
             "Errno" : "0",
             "Exporter" : "0",
+            "File::Spec" : "0",
             "File::Temp" : "0",
-            "JSON::PP" : "0",
-            "Log::Abstraction" : "0.41",
+            "JSON::MaybeXS" : "0",
             "Test::Builder::Tester" : "0",
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0.14",
+            "Test::More" : "0",
             "Test::Most" : "0",
             "Test::Permissions" : "0",
             "Test::Returns" : "0.04",
@@ -86,6 +90,6 @@
          "x_repository" : "https://github.com/nigelhorne/Test-Log-Abstraction"
       }
    },
-   "version" : "0.002.1",
+   "version" : "0.002.2",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

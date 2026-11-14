@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use File::Spec;
 use parent 'AmberDB::Base';
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2026-09-06';
 
 # Whitelist of inheritable group-level configuration keys from .dbase to member tables
@@ -129,7 +129,7 @@ sub enc_validate {
 
     # Bypass in simple mode or when no tableid is given
     return wantarray ? @fields : \@fields
-        if $self->config('simple') || !defined $tableid || $tableid eq '';
+        if $self->config('use_simple') || !defined $tableid || $tableid eq '';
 
     my $table_info = $self->table_info($tableid);
     return wantarray ? @fields : \@fields
@@ -212,7 +212,7 @@ sub dec_validate {
 
     # Bypass in simple mode or when no tableid is given
     return wantarray ? @fields : \@fields
-        if $self->config('simple') || !defined $tableid || $tableid eq '';
+        if $self->config('use_simple') || !defined $tableid || $tableid eq '';
 
     my $table_info = $self->table_info($tableid);
     return wantarray ? @fields : \@fields
@@ -595,7 +595,7 @@ sub table_info {
     my ( $self, $arg ) = @_;
 
     return {} unless $arg;
-    return {} if $self->config('simple');
+    return {} if $self->config('use_simple');
 
     my ( $table, $table_path ) = $self->schema_arg( $arg, "table" );
     $table && $table_path or return {};
@@ -729,11 +729,11 @@ sub table_path {
 
     # set simple mode if DATADIR directory does not exist
     if ( !$self->dir_exist( $self->path('dbase_dir') ) ) {
-        $self->config( simple => 1 );
+        $self->config( use_simple => 1 );
     }
 
     # return table path if simple mode
-    if ( $self->config('simple') ) {
+    if ( $self->config('use_simple') ) {
         my $target = ( $self->path('dbase_dir') || "." ) . "/$table";
         my ($parent_dir) = $target =~ m{^(.+)[/\\][^/\\]+$};
         if ( $parent_dir && !$self->dir_exist($parent_dir) ) {
@@ -893,7 +893,7 @@ sub table_attr {
 sub table_infset {
     my ( $self, $table, $schema_data ) = @_;
 
-    $self->config('simple') and return 1;
+    $self->config('use_simple') and return 1;
     if ( ref($schema_data) eq 'HASH' ) {
         $self->normalize_blocks( $table, $schema_data );
         $self->{_table}->{$table} = $schema_data;
@@ -1044,7 +1044,7 @@ sub norm_info {
     my ( $self, $arg ) = @_;
 
     return {} unless $arg;
-    return {} if $self->config('simple');
+    return {} if $self->config('use_simple');
 
     my ( $table, $norm_path ) = $self->schema_arg( $arg, "norm" );
     $table && $norm_path or return {};

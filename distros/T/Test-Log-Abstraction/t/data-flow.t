@@ -18,6 +18,18 @@
 #                         or an unknown method       as given, escaped and cut       the caller's is untouched
 #   i18n arguments        caller                     read into a copy by i18n()      never written to
 #   output handle         Test::Builder (borrowed)   _emit: layers read, diag()      never: not ours to close
+#   a log argument        caller (may be tied)       read once, in order, by         never written to; the
+#                                                    _entry, inside an eval          caller's @_ is unchanged
+#   a name's lookup key   _lc(): a repaired copy     the level lookup                on return; the caller's
+#                                                                                    string is not repaired
+#   render buffer, $seen  _stringify (per call)      _render appends; $seen marks    on return: nothing carries
+#                                                    the structures above            over to the next message
+#
+# One DD is deliberate: a clone's verbose and level are computed by
+# _build() and then replaced by the original's, unread, so that verbose()
+# and level() calls made at run time carry over.  _build() must still
+# check the level option, and a level set at run time is a number with no
+# single name to put back into the options.
 #
 # Data-flow anomalies found while mapping these chains, all now fixed:
 # the caller's diag list and i18n tables were kept by reference, so the
@@ -26,12 +38,20 @@
 # level() overwrote its getter value unread on the setter path (DD); and
 # _resolve_lang, _plural and _format computed values some paths never
 # read (D~).  Later: level() computed its lookup key twice (a redundant
-# use, now made once).  reopen() defines, uses and kills nothing.
+# use, now made once).  Then, in 0.002.2: when one log argument died when
+# read, the arguments before it were read a second time (a volatile tied
+# value was stored as its second read, not as it was when logged); and
+# AUTOLOAD copied @_ into a lexical, reading every argument outside the
+# eval that protects the read.  Both now read each argument exactly once.
+# reopen() defines, uses and kills nothing.
 #
 # The module opens no files or sockets.  The only resource it touches is
 # the output handle it borrows from Test::Builder, so the resource tests
 # prove it never opens, closes or changes a handle - including while the
-# file behind that handle loses its permissions part way through.
+# file behind that handle loses its permissions part way through.  It
+# takes no file names and holds no locks, so there is no check-then-use
+# window on a file to race; the time-of-check races it does have are on
+# caller data (an i18n table, a log argument) and are tested as such.
 
 use strict;
 use warnings;
@@ -61,7 +81,9 @@ Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 sub state_diag {
 	my ($label, $value) = @_;
 
-	diag(explain({ $label => $value })) if($SHOW_STATE);
+	# Test::More's explain() returns the dump; Test::Most's prints it
+	# and returns 0, which diag() then printed as a stray "# 0"
+	diag(Test::More::explain({ $label => $value })) if($SHOW_STATE);
 	return;
 }
 
@@ -221,6 +243,114 @@ subtest 'each argument is read exactly once' => sub {
 	is($reads, 2, 'two arguments, two reads: none read twice');
 	is($logger->messages()->[0]->{'message'}, 'read 1 and read 2', 'the message is built from those reads');
 	untie $volatile;
+};
+
+{
+	package Local::Unreadable;
+	# A tied scalar that counts its reads, and dies on every one
+	sub TIESCALAR { my ($class, $count) = @_; return bless { count => $count }, $class }
+	sub FETCH { my $self = shift; ${$self->{'count'}}++; die "unreadable\n" }
+}
+
+# Strategy: the read-once rule must hold on the path where a read dies.
+# A volatile argument before the dying one, and one after it, must each be
+# read once; the dying one is tried once, and shown as its tie object.
+# Both the generated level methods and AUTOLOAD (a misspelt method) take
+# this path, so both are traced
+subtest 'each argument is read exactly once, even when one dies' => sub {
+	my ($reads, $failed_reads) = (0, 0);
+	tie my $volatile, 'Local::Counter', \$reads;
+	tie my $dying, 'Local::Unreadable', \$failed_reads;
+	my $logger = quiet();
+	my $tie = qr/Local::Unreadable=HASH\(0x[0-9a-f]+\)/;
+
+	my %paths = (
+		'a level method' => sub { $logger->info(@_) },
+		'a misspelt method (AUTOLOAD)' => sub { my $args = \@_; capture_diag { $logger->nosuch(@{$args}) } },
+	);
+	# capture_diag's block is a sub of its own: the arguments reach it
+	# through a reference to @_, which keeps them aliased, not copied (a
+	# copy would read them here)
+	foreach my $path (sort keys %paths) {
+		($reads, $failed_reads) = (0, 0);
+		$logger->clear();
+		my $lived = eval { $paths{$path}->($volatile, ' ', $dying, ' ', $volatile); 1 };
+		ok($lived, "$path: lives") or diag($@);
+		is($reads, 2, "$path: the volatile argument read once per place it appears");
+		is($failed_reads, 1, "$path: the dying argument tried once");
+		like($logger->messages()->[0]->{'message'}, qr/\Aread 1 $tie read 2\z/, "$path: the entry holds the first reads, in order");
+	}
+	untie $volatile;
+	untie $dying;
+};
+
+# Strategy: AUTOLOAD now passes its own @_ on, rather than a copy.  The
+# copy used to protect the caller's variables from anything done to the
+# list; check nothing is: a trailing fields hash is taken off a copy, and
+# the caller's array, hash and scalars are as they were
+subtest "the caller's arguments are read, never changed" => sub {
+	my $logger = quiet();
+	my @list = ('a', 'b', { k => 'v' });
+	my @before = @list;
+	my $text = 'text';
+	# capture_diag's block is a sub of its own, so the arguments reach it
+	# through a reference to @_, which keeps them aliased, not copied
+	foreach my $call (sub { $logger->info(@_) }, sub { my $args = \@_; capture_diag { $logger->nosuch(@{$args}) } }) {
+		$logger->clear();
+		$call->($text, @list);
+		is_deeply(\@list, \@before, 'the array passed in is unchanged, fields hash included');
+		is($text, 'text', '... and so is the scalar');
+		is_deeply($logger->messages()->[0]->{'fields'}, { k => 'v' }, '... while the entry has the fields');
+	}
+};
+
+# Strategy: a caller's malformed name flows into two uses - a lookup and a
+# stored level - through a repaired copy.  The copy must be the same each
+# time, so a name stored by a misspelt method is found again by the same
+# name; the caller's string must not be repaired in place
+subtest 'a malformed name is repaired in a copy, the same way each time' => sub {
+	my $name = "\xff\xfe lvl";
+	Encode::_utf8_on($name);
+	my $bytes = do { my $copy = $name; Encode::_utf8_off($copy); $copy };
+	my $logger = quiet();
+	capture_diag { $logger->$name('m') };
+	is($logger->count($name), 1, 'stored under the repaired name, and counted by the same name');
+	ok($logger->has_level($name, 'has_level finds it by the same name'), 'has_level agrees');
+	ok(utf8::is_utf8($name) && !utf8::valid($name), "the caller's string is still the malformed one");
+	my $now = do { my $copy = $name; Encode::_utf8_off($copy); $copy };
+	is($now, $bytes, '... byte for byte');
+	like($logger->messages()->[0]->{'level'}, qr/\A\x{FFFD}+ lvl\z/, 'the stored level is the repaired, valid text');
+};
+
+# Strategy: _render's buffer and $seen are defined per rendering and killed
+# on return.  If either outlived it, the next message would start with the
+# last one's text, or a structure met twice would wrongly be a cycle
+subtest 'rendering state does not outlive one rendering' => sub {
+	my $logger = quiet();
+	my $shared = [1, { k => 'v' }];
+	$logger->info({ a => $shared, b => $shared }, '|', $shared);
+	is($logger->messages()->[0]->{'message'}, '{a => [1, {k => v}], b => [1, {k => v}]}|[1, {k => v}]',
+		'a structure met twice, in one part and across parts, is rendered each time: only a real cycle is (cycle)');
+	my $loop = [];
+	push @{$loop}, $loop;
+	$logger->info('x', $loop);
+	$logger->info('y', $shared);
+	my @texts = map { $_->{'message'} } @{$logger->messages()};
+	is_deeply([@texts[1, 2]], ['x[(cycle)]', 'y[1, {k => v}]'], 'after a cycle, the next message starts clean and sees no cycle');
+	@{$loop} = ();
+};
+
+# Strategy: a reference that lies about its type is logged, so it is used;
+# being used must not define anything in it.  bless() and a hash lookup
+# would both be writes
+subtest 'a lying reference is shown, not changed' => sub {
+	my $fake = bless({ k => 'v' }, 'ARRAY');
+	my $logger = quiet();
+	$logger->info($fake);
+	$logger->info('m', bless(['x'], 'HASH'));
+	is(ref($fake), 'ARRAY', 'still blessed into ARRAY');
+	is_deeply({ %{$fake} }, { k => 'v' }, 'and holds what it held: nothing autovivified');
+	returns_ok($logger->messages(), { type => 'arrayref', min => 2 }, 'both entries stored');
 };
 
 # Strategy: an object's text is defined once, when it is logged.  Rebless

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use DBIO::Test::Slow;
 
 use File::Temp ();
 use FindBin ();
@@ -44,6 +45,23 @@ sub stand_in {
     . "sub answer { open my \$fh, '<', \"\$dir/\$_[0]\" or return; local \$/; <\$fh> }\n"
     . $body);
   chmod 0755, $path or die "chmod: $!";
+}
+
+# The stand-ins are scripts found through PATH by their shebang line. Where a
+# host does not start such a file (Windows: no shebang, no PATH lookup of a
+# file without an extension), kubectl and ip cannot be put in front of the
+# tool, and what it does there is not what this file tests. Asked by trying it.
+{
+  my $probe = file_path($bin, 'shebang-probe');
+  write_file($probe, "#!$^X\nprint qq{started\\n};\n");
+  chmod 0755, $probe or die "chmod: $!";
+  my $got = do {
+    local $ENV{PATH} = $bin;
+    my $out = `shebang-probe 2>&1`;
+    defined $out ? $out : '';
+  };
+  plan skip_all => 'the host does not start a script from PATH by its shebang line: the kubectl and ip stand-ins cannot be put in front of the tool'
+    unless $got eq "started\n";
 }
 
 # kubectl as the project account sees the cluster: one namespace, and nothing

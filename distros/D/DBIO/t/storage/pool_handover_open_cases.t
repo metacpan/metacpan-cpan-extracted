@@ -276,7 +276,7 @@ for my $fc ('DBIO::Test::Future', $have_future ? 'Future' : ()) {
     is_deeply $pool->{errors}, ["could not connect\n"], "$l: on_error gets the connect error";
     like failure_of($first), $RETIRED, "$l: which changes nothing for the first caller";
 
-    is $pool->{ids}[-1], $id + 1, "$l: the queued caller's slot gets a fresh spawn (the k260 hand-on)";
+    is $pool->{ids}[-1], $id + 1, "$l: the queued caller's slot gets a fresh spawn (the hand-on)";
     my $fresh = $pool->{built}{ $id + 1 };
     $fresh->fire_connect if $fresh;
     is resolved($second) && $second->get->{id}, $id + 1, "$l: which serves it";

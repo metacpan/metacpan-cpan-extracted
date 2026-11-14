@@ -329,6 +329,28 @@ les_consumer_apply_status(pTHX_ les_xsstate_t *st, int status,
     return LES_CONSUMER_ERROR;
 }
 
+/*
+ * A native consumer can croak through Perl. Its exception unwinds the Perl
+ * save stack (including the Loop's watcher batch) before an outer JMPENV
+ * handler can run. Register our cleanup on that stack instead, while the
+ * Stream's guarded XS state is still alive.
+ */
+typedef struct les_consumer_callback_scope_s {
+    les_xsstate_t *st;
+    int completed;
+} les_consumer_callback_scope_t;
+
+static void
+les_consumer_callback_scope_leave(pTHX_ void *opaque)
+{
+    les_consumer_callback_scope_t *scope =
+        (les_consumer_callback_scope_t *)opaque;
+    PERL_UNUSED_CONTEXT;
+
+    if (!scope->completed)
+        scope->st->consumer_flush_pending = 0;
+}
+
 int
 les_consumer_uses_raw_input(const les_xsstate_t *st)
 {
@@ -342,8 +364,7 @@ les_consumer_input(pTHX_ les_xsstate_t *st, const char *data, size_t length,
 {
     size_t consumed = 0;
     int status;
-    int jump_status;
-    dJMPENV;
+    les_consumer_callback_scope_t scope = { st, 0 };
 
     if (!st || !st->consumer_ops || !st->consumer_context
         || !(st->consumer_ops->flags & LES_CONSUMER_F_RAW_INPUT)
@@ -353,19 +374,14 @@ les_consumer_input(pTHX_ les_xsstate_t *st, const char *data, size_t length,
         croak("raw native Stream consumer requires a consumed output pointer");
     LES_STAT(st, consumer_input_calls)++;
     st->consumer_flush_pending = 1;
+    ENTER;
+    SAVEDESTRUCTOR_X(les_consumer_callback_scope_leave, &scope);
+    SAVEINT(st->consumer_call_depth);
     st->consumer_call_depth++;
-    JMPENV_PUSH(jump_status);
-    if (jump_status == 0) {
-        status = st->consumer_ops->input(aTHX_ st->consumer_context,
-            data, length, &consumed);
-        st->consumer_call_depth--;
-        JMPENV_POP;
-    } else {
-        st->consumer_call_depth--;
-        st->consumer_flush_pending = 0;
-        JMPENV_POP;
-        JMPENV_JUMP(jump_status);
-    }
+    status = st->consumer_ops->input(aTHX_ st->consumer_context,
+        data, length, &consumed);
+    scope.completed = 1;
+    LEAVE;
     if (consumed > length)
         croak("native Stream consumer '%s' consumed %llu of %llu raw input bytes",
             st->consumer_ops->name,
@@ -382,25 +398,19 @@ int
 les_consumer_message(pTHX_ les_xsstate_t *st, SV *message)
 {
     int status;
-    int jump_status;
-    dJMPENV;
+    les_consumer_callback_scope_t scope = { st, 0 };
 
     if (!st || !st->consumer_ops || !st->consumer_context)
         croak("native Stream consumer is not attached");
     LES_STAT(st, consumer_message_calls)++;
     st->consumer_flush_pending = 1;
+    ENTER;
+    SAVEDESTRUCTOR_X(les_consumer_callback_scope_leave, &scope);
+    SAVEINT(st->consumer_call_depth);
     st->consumer_call_depth++;
-    JMPENV_PUSH(jump_status);
-    if (jump_status == 0) {
-        status = st->consumer_ops->message(aTHX_ st->consumer_context, message);
-        st->consumer_call_depth--;
-        JMPENV_POP;
-    } else {
-        st->consumer_call_depth--;
-        st->consumer_flush_pending = 0;
-        JMPENV_POP;
-        JMPENV_JUMP(jump_status);
-    }
+    status = st->consumer_ops->message(aTHX_ st->consumer_context, message);
+    scope.completed = 1;
+    LEAVE;
     les_consumer_validate_status(aTHX_ st, status, NULL);
     if (st->closed || st->read_eof || st->consumer_terminal)
         return status;

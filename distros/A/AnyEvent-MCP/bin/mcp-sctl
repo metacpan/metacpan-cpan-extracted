@@ -1,0 +1,769 @@
+#!/opt/bin/perl
+
+=encoding utf8
+
+=head1 NAME
+
+mcp-sctl - ScriptCat and sctl Browser WebSocket bridge for MCP
+
+=head1 SYNOPSIS
+
+   mcp-sctl --stdio
+   mcp-sctl
+   mcp-sctl --bind 127.0.0.1:9000
+
+=head1 DESCRIPTION
+
+Speak the native sctl WebSocket protocol directly to ScriptCat and sctl
+Browser. No sctl daemon or control proxy. Both extensions initiate their own
+connections to the same listener used for authenticated MCP HTTP.
+The listener defaults to C<127.0.0.1:8643>, matching ScriptCat's default URL.
+Keep this server running with C<--eager> when started by mcp-multibroker.
+
+Pair a browser once using the C<pair> MCP tool, then enter the displayed
+eight-character code in that extension's External Access settings. The code
+expires after two minutes. Long-term keys are stored in a private JSON file
+under C<$XDG_CONFIG_HOME/anyevent-mcp/> (or C<~/.config/anyevent-mcp/>).
+A pairing code grants the extension access to the bridge; the MCP permissions
+independently control what an AI client may call.
+
+C<list> discovers connected instances and their advertised methods;
+C<search> looks up methods and, when available, parameter/result schemas;
+C<call> invokes a method with uninterpreted JSON input. Method permission
+is independent of instance permission. CDP uses the same C<call> tool with
+C<debugger.send>; there is no Playwright/CDP endpoint or high-level page
+automation here.
+
+Protocol metadata is advisory, not an authorization source. It is cached
+under C<$XDG_CACHE_HOME/anyevent-mcp/> and refreshed over HTTPS as needed.
+Only methods advertised by the live extension can be invoked, even if a
+downloaded description lists more.
+
+=head1 FIRST USE
+
+With C<mcp-multibroker>, add an eager child:
+
+   sctl --- mcp-sctl --- --eager
+
+Stop any running C<sctl serve> first; it normally owns that same port.
+Print both connection URLs:
+
+   mcp-sctl --print-urls
+
+The output includes the ordinary authenticated C<http://> MCP URL and a
+credential-free C<ws://127.0.0.1:8643/> URL for the browser extensions.
+Only the latter goes into ScriptCat's External Access or sctl Browser.
+The extension authenticates separately with the pairing HMAC.
+
+Call C<sctl.pair> from your MCP client, then enable External Access in
+ScriptCat's options and enter the returned code. The extension connects to
+C<ws://127.0.0.1:8643/>. Call C<sctl.list> to confirm it is online, then
+C<sctl.search> to find operations and C<sctl.call> to invoke them.
+
+Pair C<sctl Browser> separately, using its popup, only when browser-wide
+debugging/control is desired. ScriptCat userscript management does not
+require C<sctl Browser>.
+
+=head1 LOGGING
+
+The normal MCP operator log reports listener startup, pairing windows,
+authenticated instances, disconnects, tool requests and call outcomes.
+Calls include abbreviated arguments and elapsed time; script listings,
+source retrieval and searches report counts or ranges, never complete
+source bodies. Pairing codes and authentication keys are not logged.
+C<--quiet> suppresses operator activity logging; ordinary debug/trace
+diagnostics use the configured AnyEvent::Log verbosity.
+
+=head1 OPTIONS
+
+Use the shared C<--bind> option for both the extension WebSocket and MCP HTTP
+listener. C<--print-url> prints both the authenticated MCP endpoint and the
+token-free extension WebSocket endpoint.
+The shared switches are documented in
+L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
+
+=cut
+
+use common::sense;
+
+use JSON::XS ();
+use Time::HiRes qw(time);
+use Digest::SHA qw(hmac_sha256 hmac_sha256_hex sha256_hex);
+use MIME::Base64 ();
+use Scalar::Util qw(weaken);
+use File::Path ();
+
+use AnyEvent ();
+use AnyEvent::HTTP ();
+use Socket ();
+use AnyEvent::Socket ();
+use AnyEvent::WebSocket::Server ();
+use AnyEvent::WebSocket::Message ();
+use Crypt::AuthEnc::GCM ();
+
+use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
+use AnyEvent::MCP::Server::HTTP ();
+use AnyEvent::MCP::Server::JSONL ();
+use AnyEvent::MCP::Server::Permissions ();
+use AnyEvent::MCP::Server::Toolset ();
+use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
+
+my $options = mcp_getoptions
+   {
+      usage       => "Usage: mcp-sctl [OPTION]...\n",
+      default_port => 8643,
+      path        => "/",
+      description => "Bridge ScriptCat/sctl Browser WebSockets directly to MCP.",
+      examples    => "  mcp-sctl --stdio\n  mcp-sctl --print-urls",
+      print_url_extra => sub {
+         my $http = shift;
+         my $url = AnyEvent::MCP::Server::HTTP->new (
+            %$http, path => "/", url_scheme => "http",
+         )->url (0);
+         $url =~ s/\Ahttp:/ws:/;
+         print "$url  # ScriptCat / sctl Browser\n";
+      },
+   };
+@ARGV and die "Unexpected arguments\n";
+
+my $name = $options->{name};
+my $connect = $options->{connect};
+my $stdio = $options->{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
+!($stdio && defined $connect) or die "Cannot combine --stdio and --connect\n";
+
+my $config = AnyEvent::MCP::Config::global_config ();
+my %http = $config->http_settings ($name, $options->{bind}, $options->{default_port});
+$http{tokens} = $options->{tokens} if $options->{tokens};
+
+my $json = JSON::XS->new->utf8->max_depth (64);
+my $log_json = JSON::XS->new->allow_nonref;
+my $keys_file = ($ENV{XDG_CONFIG_HOME} || "$ENV{HOME}/.config") . "/anyevent-mcp/sctl-$name-keys.json";
+my $cache_file = ($ENV{XDG_CACHE_HOME} || "$ENV{HOME}/.cache") . "/anyevent-mcp/sctl-protocol.json";
+my $keys = -f $keys_file ? $json->decode (AnyEvent::MCP::utf8enc (AnyEvent::MCP::file_load ($keys_file))) : {};
+ref $keys eq "HASH" or die "Invalid sctl key registry\n";
+my ($schema, $fetching, @search_waiters);
+my (%connections, %online, $enrollment, $rpcid);
+my $done = AE::cv;
+
+# Authentication contexts from sctl protocol.json. They are transport
+# constants; business method definitions are deliberately not compiled in.
+my %context = (
+   sessionExt             => "scriptcat-rpc-v1/ext",
+   sessionDaemon          => "scriptcat-rpc-v1/daemon",
+   pairExt                => "scriptcat-rpc-v1/pair-ext",
+   pairDaemon             => "scriptcat-rpc-v1/pair-daemon",
+   scriptcatSessionExt    => "scriptcat-rpc-v1/instance-ext",
+   scriptcatSessionDaemon => "scriptcat-rpc-v1/instance-daemon",
+   scriptcatPairExt       => "scriptcat-rpc-v1/instance-pair-ext",
+   scriptcatPairDaemon    => "scriptcat-rpc-v1/instance-pair-daemon",
+   browserSessionExt      => "sctl-browser-rpc-v1/ext",
+   browserSessionDaemon   => "sctl-browser-rpc-v1/daemon",
+   browserPairExt         => "sctl-browser-rpc-v1/pair-ext",
+   browserPairDaemon      => "sctl-browser-rpc-v1/pair-daemon",
+   pairKdfSalt            => "scriptcat-rpc-v1/pair-salt",
+   pairKdfInfoMac         => "scriptcat-rpc-v1/pair-mac",
+   pairKdfInfoEnc         => "scriptcat-rpc-v1/pair-enc",
+);
+
+sub random_hex {
+   unpack "H*", AnyEvent::MCP::random_bytes ($_[0])
+}
+
+sub hkdf {
+   my ($ikm, $info) = @_;
+   my $prk = hmac_sha256 ($ikm, $context{pairKdfSalt});
+   substr hmac_sha256 ($info . "\1", $prk), 0, 32
+}
+
+sub key_id {
+   my ($peer) = @_;
+   $peer->{kind} . ":" . ($peer->{instance_id} || "legacy")
+}
+
+sub log_preview {
+   my ($value, $limit) = @_;
+   return "-" if !defined $value || ref $value;
+   $limit //= 80;
+   my $more = length $value > $limit;
+   $value = substr $value, 0, $limit;
+   $value =~ s/[\x00-\x1f\x7f-\x9f]/ /g;
+   $log_json->encode ($value) . ($more ? "..." : "")
+}
+
+sub peer_label {
+   my ($peer) = @_;
+   log_preview ($peer->{name} // $peer->{kind} // "unknown", 40)
+      . ($peer->{instance_id} ? "#" . substr ($peer->{instance_id}, 0, 8) : "")
+}
+
+sub args_preview {
+   my ($input) = @_;
+   return "{}" unless ref $input eq "HASH" && keys %$input;
+
+   my @items;
+   for my $key (qw(uuid query tabId method enable startLine endLine maxBytes maxMatches)) {
+      push @items, "$key=" . log_preview ($input->{$key}, $key eq "query" ? 50 : 35)
+         if exists $input->{$key} && !ref $input->{$key};
+   }
+   push @items, "edits=" . @{$input->{edits}} if ref $input->{edits} eq "ARRAY";
+   push @items, "code=" . length ($input->{code}) . " chars" if defined $input->{code} && !ref $input->{code};
+   push @items, "url=(supplied)" if exists $input->{url};
+   if (!@items) {
+      my @keys = sort keys %$input;
+      @items = ("keys=" . join (",", map log_preview ($_, 24), @keys[0 .. ($#keys < 5 ? $#keys : 5)])
+         . (@keys > 6 ? ",..." : ""));
+   }
+   join " ", @items
+}
+
+sub result_preview {
+   my ($method, $result) = @_;
+   return "ok" unless ref $result eq "HASH";
+   return "scripts=" . @{$result->{scripts}} if $method eq "scripts.list" && ref $result->{scripts} eq "ARRAY";
+   return "matches=" . ($result->{totalMatches} // @{$result->{matches}})
+      if $method eq "scripts.source.grep" && ref $result->{matches} eq "ARRAY";
+   return "lines=" . ($result->{startLine} // "?") . ".." . ($result->{endLine} // "?")
+      . " chars=" . length ($result->{code})
+      if $method eq "scripts.source.get" && defined $result->{code} && !ref $result->{code};
+   return "enabled=" . ($result->{enabled} ? "yes" : "no") if exists $result->{enabled};
+   return "deleted" if $result->{deleted};
+   "ok"
+}
+
+sub key_save {
+   File::Path::mkpath (($keys_file =~ m{\A(.*)/[^/]+\z})[0], 0, 0700);
+   my $lock = AnyEvent::MCP::file_lock ("$keys_file.lock");
+   # A second process must not silently overwrite registrations.
+   my $stored = -f $keys_file ? $json->decode (AnyEvent::MCP::utf8enc (AnyEvent::MCP::file_load ($keys_file))) : {};
+   %$stored = (%$stored, %$keys);
+   AnyEvent::MCP::file_replace ($keys_file, $json->encode ($stored));
+   $keys = $stored;
+}
+
+sub send_message {
+   my ($peer, $packet) = @_;
+   $peer->{conn}->send (AnyEvent::WebSocket::Message->new (opcode => 1, body => $json->encode ($packet)));
+}
+
+sub notify {
+   my ($peer, $method, $params) = @_;
+   send_message $peer, { jsonrpc => "2.0", method => $method, params => $params };
+}
+
+sub request {
+   my ($peer, $method, $params) = @_;
+   my $id = "sctl-" . ++$rpcid;
+   send_message $peer, { jsonrpc => "2.0", id => $id, method => $method, params => $params };
+   $id
+}
+
+sub respond {
+   my ($peer, $id, $result) = @_;
+   send_message $peer, { jsonrpc => "2.0", id => $id, result => $result };
+}
+
+sub close_peer {
+   my ($peer, $code, $reason) = @_;
+   return unless delete $connections{$peer+0};
+   delete $online{key_id ($peer)}
+      if $peer->{ready} && $online{key_id ($peer)} && $online{key_id ($peer)} == $peer;
+   delete @{$peer}{qw(auth_timer heartbeat ping_timer)};
+   for my $entry (values %{$peer->{pending}}) {
+      delete $entry->{timer};
+      $entry->{req}->error ($reason) unless $entry->{req}{finished};
+   }
+   $peer->{pending} = {};
+   $peer->{conn}->close ($code, "");
+   if ($peer->{ready}) {
+      mcp_log peer_label ($peer) . ": disconnected ($reason)";
+   } else {
+      AE::log debug => "sctl unauthenticated connection closed ($reason)";
+   }
+}
+
+sub auth_context {
+   my ($peer, $side, $mode) = @_;
+   my $prefix = $peer->{instance_id}
+      ? $peer->{kind} eq "browser" ? "browser" : "scriptcat"
+      : "";
+   my $which = $prefix
+      ? $prefix . ($mode eq "pairing" ? "Pair" : "Session") . $side
+      : ($mode eq "pairing" ? "pair" : "session") . $side;
+   $context{$which} . ($peer->{instance_id} || "")
+}
+
+sub auth_answer {
+   my ($peer, $response) = @_;
+   my $id = $peer->{auth_id};
+   $response->{id} eq $id && ref $response->{result} eq "HASH"
+      or die "Invalid authentication response\n";
+   my $r = $response->{result};
+   $r->{mode} =~ /\A(?:pairing|session)\z/
+      && $r->{nonceE} =~ /\A[0-9a-f]{64}\z/
+      && $r->{hmac} =~ /\A[0-9a-f]{64}\z/
+      or die "Invalid authentication fields\n";
+   my $p = $r->{peer};
+   if (defined $p) {
+      ref $p eq "HASH" && $p->{kind} =~ /\A(?:browser|scriptcat)\z/
+         && $p->{instanceId} =~ /\A[0-9a-f]{32}\z/
+         or die "Invalid extension peer\n";
+      ($peer->{kind}, $peer->{instance_id}) = @$p{qw(kind instanceId)};
+   } else {
+      $peer->{kind} = "scriptcat";
+      $peer->{instance_id} = "";
+   }
+
+   my ($mac_key, $enc_key, $long_key);
+   if ($r->{mode} eq "pairing") {
+      $enrollment && $enrollment->{expires} > time && $enrollment->{attempts} > 0
+         or die "No active pairing window\n";
+      $mac_key = hkdf ($enrollment->{code}, $context{pairKdfInfoMac});
+      $enc_key = hkdf ($enrollment->{code}, $context{pairKdfInfoEnc});
+   } else {
+      my $record = $keys->{key_id ($peer)} or die "Unknown paired extension\n";
+      $long_key = pack "H*", $record->{key};
+      $mac_key = $long_key;
+   }
+
+   my $check = hmac_sha256_hex (auth_context ($peer, "Ext", $r->{mode}) . $peer->{nonce} . $r->{nonceE}, $mac_key);
+   unless ($check eq $r->{hmac}) {
+      --$enrollment->{attempts} if $r->{mode} eq "pairing";
+      die "Authentication HMAC mismatch\n";
+   }
+
+   my $params = {
+      hmac => hmac_sha256_hex (auth_context ($peer, "Daemon", $r->{mode}) . $r->{nonceE} . $peer->{nonce}, $mac_key),
+   };
+   if ($r->{mode} eq "pairing") {
+      $long_key = AnyEvent::MCP::random_bytes (32);
+      my $iv = AnyEvent::MCP::random_bytes (12);
+      my ($ct, $tag) = Crypt::AuthEnc::GCM::gcm_encrypt_authenticate ("AES", $enc_key, $iv, "", $long_key);
+      my $check = Crypt::AuthEnc::GCM::gcm_decrypt_verify ("AES", $enc_key, $iv, "", $ct, $tag);
+      defined $check && $check eq $long_key
+         or die "AES-GCM internal roundtrip failed\n";
+      $params->{key} = {
+         ciphertext => MIME::Base64::encode_base64 ($ct . $tag, ""),
+         iv         => MIME::Base64::encode_base64 ($iv, ""),
+      };
+      $peer->{new_key} = unpack "H*", $long_key;
+      undef $enrollment;
+   }
+
+   notify $peer, '$session.authenticated', $params;
+   notify $peer, '$session.hello', { daemonVersion => "0.4.0" };
+   $peer->{phase} = "capabilities";
+   $peer->{auth_timer} = AE::timer 5, 0, sub { close_peer $peer, 1008, "Capabilities timeout" };
+}
+
+sub capabilities {
+   my ($peer, $packet) = @_;
+   $packet->{method} eq '$session.capabilities' && defined $packet->{id}
+      && ref $packet->{params} eq "HASH" && ref $packet->{params}{methods} eq "ARRAY"
+      or die "Invalid capabilities announcement\n";
+   my $p = $packet->{params};
+   my $meta = $p->{peer};
+   if ($peer->{instance_id}) {
+      ref $meta eq "HASH" && $meta->{name} =~ /\A[a-z0-9-]{1,32}\z/
+         or die "Invalid instance name\n";
+   } else {
+      $meta = { name => "scriptcat" };
+   }
+   my %methods = map { defined $_ && !ref $_ && length $_ ? ($_ => 1) : () } @{$p->{methods}};
+   my $id = key_id ($peer);
+   my $paired = !!$peer->{new_key};
+   if ($peer->{new_key}) {
+      $keys->{$id} = {
+         key => delete $peer->{new_key}, name => $meta->{name}, kind => $peer->{kind},
+      };
+      key_save ();
+   }
+   close_peer $online{$id}, 1000, "Replaced by reconnect" if $online{$id};
+   $peer->{ready} = 1;
+   $peer->{name} = $meta->{name};
+   $peer->{methods} = \%methods;
+   $peer->{schema_version} = $p->{schemaVersion};
+   $peer->{product} = $meta->{product};
+   $peer->{product_version} = $meta->{productVersion};
+   $peer->{extension_version} = $meta->{extensionVersion};
+   $online{$id} = $peer;
+   $peer->{phase} = "ready";
+   delete $peer->{auth_timer};
+   respond $peer, $packet->{id}, {};
+   mcp_log peer_label ($peer) . ": " . ($paired ? "paired and connected" : "connected")
+      . " (" . scalar (keys %methods) . " methods)";
+
+   weaken (my $weak = $peer);
+   $peer->{heartbeat} = AE::timer 30, 30, sub {
+      return unless $weak && $weak->{ready};
+      close_peer $weak, 1001, "Heartbeat timed out" and return if $weak->{ping_id};
+      $weak->{ping_id} = request ($weak, '$session.ping', {});
+   };
+}
+
+sub finish_call {
+   my ($peer, $id, $packet) = @_;
+   my $entry = delete $peer->{pending}{$id} or return;
+   delete $entry->{timer};
+   my $req = $entry->{req};
+   return if $req->{finished};
+   my $elapsed = sprintf "%.2fs", time - $entry->{started};
+   if (exists $packet->{error}) {
+      my $e = $packet->{error};
+      AE::log debug => peer_label ($peer) . ": $entry->{method} failed ($elapsed)";
+      $req->error (($e->{data}{code} // "RPC_ERROR") . ": " . ($e->{message} // "Unknown error"));
+   } else {
+      mcp_log peer_label ($peer) . ": $entry->{method} "
+         . result_preview ($entry->{method}, $packet->{result}) . " ($elapsed)";
+      $req->result ({ result => $packet->{result} });
+   }
+}
+
+sub receive_message {
+   my ($peer, $packet) = @_;
+   ref $packet eq "HASH" && $packet->{jsonrpc} eq "2.0"
+      or die "Invalid JSON-RPC frame\n";
+   if ($peer->{phase} eq "auth") {
+      auth_answer $peer, $packet;
+   } elsif ($peer->{phase} eq "capabilities") {
+      capabilities $peer, $packet;
+   } elsif (exists $packet->{method}) {
+      if ($packet->{method} eq '$session.ping' && defined $packet->{id}) {
+         respond $peer, $packet->{id}, {};
+      } elsif ($packet->{method} eq '$session.shutdown') {
+         close_peer $peer, 1000, "Extension shut down";
+      } elsif ($packet->{method} =~ /\Adebugger\./ || $packet->{method} eq '$/approvalPending') {
+         # Notifications are asynchronous; bounded history can be added here.
+         AE::log trace => "sctl notification $packet->{method}";
+      } else {
+         die "Unexpected extension request\n";
+      }
+   } elsif (defined $packet->{id}) {
+      if ($peer->{ping_id} && $packet->{id} eq $peer->{ping_id}) {
+         delete $peer->{ping_id};
+      } else {
+         finish_call $peer, $packet->{id}, $packet;
+      }
+   } else {
+      die "Invalid JSON-RPC message\n";
+   }
+}
+
+sub accept_extension {
+   my ($fh) = @_;
+   my $ws = AnyEvent::WebSocket::Server->new (
+      max_payload_size => 4194304,
+      handshake => sub {
+         my ($req, $res) = @_;
+         $req->{resource_name} eq "/" or die "Unexpected sctl path\n";
+         $res
+      },
+   );
+   $ws->establish ($fh)->cb (sub {
+      my $conn = eval { $_[0]->recv };
+      unless ($conn) {
+         AE::log warn => "sctl WebSocket rejected: $@";
+         return;
+      }
+      my $peer = { conn => $conn, phase => "auth", pending => {}, nonce => random_hex (32) };
+      $connections{$peer+0} = $peer;
+      weaken (my $weak = $peer);
+      $conn->on (finish => sub { close_peer $weak, 1000, "Disconnected" if $weak });
+      $conn->on (each_message => sub {
+         return unless $weak && $connections{$weak+0};
+         eval {
+            $_[1]->opcode == 1 or die "Expected text frame\n";
+            receive_message $weak, $json->decode ($_[1]->body);
+            1
+         } or do {
+            AE::log warn => "sctl protocol error: $@";
+            close_peer $weak, 1008, "Protocol error";
+         };
+      });
+      $peer->{auth_id} = request ($peer, '$session.authenticate', { nonceD => $peer->{nonce} });
+      $peer->{auth_timer} = AE::timer 5, 0, sub { close_peer $weak, 1008, "Authentication timeout" if $weak };
+   });
+}
+
+sub choose_peer {
+   my ($target, $method) = @_;
+   my $kind = $method =~ /\Ascripts\./ ? "scriptcat" : "browser";
+   my @peers = grep {
+      $_->{kind} eq $kind && $_->{methods}{$method}
+         && (!defined $target || $target eq "" || $target eq $_->{name} || $target eq key_id ($_) ||
+             $_->{instance_id} && index ($_-> {instance_id}, $target) == 0)
+   } values %online;
+   @peers == 1 or die @peers ? "Ambiguous target, specify instance\n" : "No connected $kind advertises $method\n";
+   $peers[0]
+}
+
+sub permission {
+   my ($req, $peer, $method, $input) = @_;
+   my $id = key_id ($peer);
+   my $payload = JSON::XS->new->canonical->encode ($input);
+   my $digest = sha256_hex ($payload);
+   $req->require_permission ({
+      tool => $req->{tool}, action => "call",
+      dimension_order => [qw(instance method input)],
+      dimensions => {
+         method => {
+            label => "RPC method", value => $method,
+            choices => [
+               { label => "This method: $method", match => $method },
+               { label => "All $peer->{kind} methods", match => $peer->{kind} eq "scriptcat" ? "^scripts\\." : "^(?!scripts\\.)" },
+            ],
+            default => $method,
+         },
+         instance => {
+            label => "Extension", value => $id,
+            choices => [
+               { label => "This instance: $peer->{name}", match => $id },
+               { label => "Any instance of this kind", match => "^$peer->{kind}:" },
+            ],
+            default => $id,
+         },
+         input => {
+            label => "RPC arguments", value => $digest,
+            choices => [
+               { label => "These exact arguments", match => $digest },
+               { label => "Any arguments (potentially any tab or CDP command)", match => "^" },
+            ],
+            default => $digest,
+         },
+      },
+      sandbox_grants => [],
+      reason => "Call $method on $peer->{name} ($id)\n\n"
+         . (length $payload > 500 ? substr ($payload, 0, 500) . "..." : $payload),
+   });
+}
+
+sub load_schema {
+   return $schema if $schema;
+   return unless -f $cache_file;
+   my $raw = eval { AnyEvent::MCP::utf8enc (AnyEvent::MCP::file_load ($cache_file)) };
+   return unless defined $raw;
+   my $decoded = eval { $json->decode ($raw) };
+   $schema = $decoded if ref $decoded eq "HASH" && ref $decoded->{methods} eq "HASH";
+   $schema
+}
+
+sub refresh_schema {
+   my ($cb) = @_;
+   push @search_waiters, $cb if $cb;
+   return if $fetching;
+   $fetching = 1;
+   AnyEvent::HTTP::http_get (
+      "https://raw.githubusercontent.com/scriptscat/sctl/main/internal/pkg/protocol/protocol.json",
+      timeout => 15, recurse => 0, persistent => 0, max_size => 524288,
+      sub {
+         my ($body, $hdr) = @_;
+         if ($hdr->{Status} == 200) {
+            my $decoded = eval { $json->decode ($body) };
+            if (ref $decoded eq "HASH" && ref $decoded->{methods} eq "HASH") {
+               $schema = $decoded;
+               eval {
+                  File::Path::mkpath (($cache_file =~ m{\A(.*)/[^/]+\z})[0], 0, 0700);
+                  AnyEvent::MCP::file_replace ($cache_file, $body);
+               };
+               AE::log warn => "sctl protocol cache write: $@" if $@;
+            }
+         }
+         $fetching = 0;
+         $_->() for splice @search_waiters;
+      }
+   );
+}
+
+sub search_results {
+   my ($query, $details) = @_;
+   my @found;
+   for my $peer (sort { $a->{name} cmp $b->{name} } values %online) {
+      for my $method (sort keys %{$peer->{methods}}) {
+         next unless index (lc $method, lc $query) >= 0;
+         my $entry = {
+            method => $method, instance => $peer->{name},
+            kind => $peer->{kind},
+         };
+         if ($schema && (my $spec = $schema->{methods}{$method})) {
+            @$entry{qw(effect level blocking)} = @$spec{qw(effect level blocking)};
+            if ($details) {
+               $entry->{params} = $schema->{types}{$spec->{params}};
+               $entry->{result} = $schema->{types}{$spec->{result}};
+            }
+         }
+         push @found, $entry;
+      }
+   }
+   \@found
+}
+
+my $permissions = AnyEvent::MCP::Server::Permissions->new (
+   name => "sctl-$name",
+   (defined $options->{ask} ? (ask => $options->{ask}) : ()),
+   auto_rules => [@{$options->{auto_rules} || []},
+      (AnyEvent::MCP::Config::global_config)->auto_rules ($name)],
+);
+my $tools = AnyEvent::MCP::Server::Toolset->new;
+
+$tools->tool (list => "List connected ScriptCat/sctl Browser instances. Set methods=true to list advertised method names.",
+   { type => "object", properties => { methods => { type => "boolean" } }, additionalProperties => JSON::XS::false },
+   sub {
+      my ($req, $args) = @_;
+      $req->require_permission ({
+         tool => "list", action => "read", sandbox_grants => [], reason => "List connected sctl extensions",
+      });
+      mcp_log "list: " . scalar (keys %online) . " connected instances";
+      $req->result ({ instances => [map {
+         +{ name => $_->{name}, kind => $_->{kind}, id => $_->{instance_id},
+            schema_version => $_->{schema_version}, extension_version => $_->{extension_version},
+            product => $_->{product}, product_version => $_->{product_version},
+            methods_count => scalar keys %{$_->{methods}},
+            ($args->{methods} ? (methods => [sort keys %{$_->{methods}}]) : ()),
+         }
+      } sort { $a->{name} cmp $b->{name} } values %online] });
+   },
+);
+
+$tools->tool (search => "Search live extension methods by substring; show schemas with details=true. Metadata updates from upstream when stale.",
+   { type => "object", properties => {
+      query => { type => "string", default => "" },
+      details => { type => "boolean", default => JSON::XS::false },
+   }, additionalProperties => JSON::XS::false },
+   sub {
+      my ($req, $args) = @_;
+      $req->require_permission ({
+         tool => "search", action => "read", sandbox_grants => [], reason => "Search advertised sctl methods",
+      });
+      my $cached = load_schema ();
+      my $finish = sub {
+         return if $req->{finished};
+         my $matches = search_results ($args->{query} // "", $args->{details});
+         mcp_log "search: " . @$matches . " matching methods";
+         $req->result ({ matches => $matches,
+            documentation => $schema ? "cached upstream protocol" : "live method names only" });
+      };
+      if (!$cached) {
+         refresh_schema ($finish);
+      } else {
+         refresh_schema () if time - (stat $cache_file)[9] > 86400;
+         $finish->();
+      }
+   },
+);
+
+$tools->tool (call => "Call one advertised sctl method on a connected extension. Discover parameters with search. Never retries failed writes.",
+   { type => "object", properties => {
+      method => { type => "string", minLength => 1 },
+      instance => { type => "string", description => "Extension name or instance ID prefix; optional when unambiguous" },
+      input => { type => "object", default => {} },
+      timeout => { type => "number", minimum => 1, maximum => 300, default => 60 },
+   }, required => ["method"], additionalProperties => JSON::XS::false },
+   sub {
+      my ($req, $args) = @_;
+      my $method = $args->{method};
+      $method =~ /\A[a-z][a-zA-Z0-9]*(?:\.[a-zA-Z0-9]+)+\z/
+         or die "Invalid sctl method name\n";
+      ref ($args->{input} // {}) eq "HASH" or die "input must be an object\n";
+      my $peer = choose_peer ($args->{instance}, $method);
+      permission $req, $peer, $method, $args->{input} || {};
+      $connections{$peer+0} && $online{key_id ($peer)} == $peer
+         or die "Extension disconnected while permission was pending\n";
+
+      my $id = request ($peer, $method, { clientId => "mcp-sctl", input => $args->{input} || {} });
+      my $entry = $peer->{pending}{$id} = { req => $req, method => $method, started => time };
+      AE::log debug => peer_label ($peer) . ": sent $method #$id";
+      weaken (my $weak = $peer);
+      $entry->{timer} = AE::timer $args->{timeout} // 60, 0, sub {
+         return unless $weak && delete $weak->{pending}{$id};
+         notify $weak, '$/cancelRequest', { id => $id };
+         $req->error ("sctl RPC timed out") unless $req->{finished};
+      };
+      $req->{on_cancel} = sub {
+         return unless $weak && delete $weak->{pending}{$id};
+         notify $weak, '$/cancelRequest', { id => $id };
+      };
+   },
+);
+
+$tools->tool (pair => "Open a two-minute pairing window; enter returned code in ScriptCat or sctl Browser External Access.",
+   { type => "object", properties => {}, additionalProperties => JSON::XS::false },
+   sub {
+      my ($req) = @_;
+      $req->require_permission ({
+         tool => "pair", action => "pair", sandbox_grants => [], reason => "Pair a new sctl browser extension",
+      });
+      my $alphabet = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+      my $bytes = AnyEvent::MCP::random_bytes (8);
+      my $code = join "", map { substr $alphabet, ord ($_) & 31, 1 } split //, $bytes;
+      $enrollment = { code => $code, expires => time + 120, attempts => 3 };
+      mcp_log "pairing window opened (120s, 3 attempts)";
+      $req->result ({ code => substr ($code, 0, 4) . "-" . substr ($code, 4), expires_seconds => 120 });
+   },
+);
+
+mcp_tool_help ($options->{tool_help}, $tools);
+
+sub log_request {
+   my ($server, $req) = @_;
+   my $args = $req->{args} || {};
+   my %details;
+   if ($req->{tool} eq "call") {
+      %details = (
+         method => log_preview ($args->{method}),
+         instance => log_preview ($args->{instance} // "auto"),
+         args => args_preview ($args->{input}),
+      );
+   } elsif ($req->{tool} eq "search") {
+      %details = (query => log_preview ($args->{query} // ""),
+         details => $args->{details} ? "yes" : "no");
+   } elsif ($req->{tool} eq "list") {
+      %details = (methods => $args->{methods} ? "yes" : "no");
+   }
+   mcp_log_request $server, $req, %details;
+}
+
+my %server = (
+   server_info => { name => "mcp-sctl", version => "0" },
+   toolsets => [$tools], permissions => $permissions,
+   short_instructions => "ScriptCat/sctl Browser bridge. list instances; search live methods; call method with JSON input.",
+   instructions => "Use list to find connected extension instances. search finds method names and optional input/result schemas. "
+      . "call forwards opaque JSON to a live peer, with permission checks. No automatic retries. "
+      . "Pairing requires the pair tool; browser and ScriptCat have separate connection credentials.",
+   on_request => \&log_request,
+);
+my $http = AnyEvent::MCP::Server::HTTP->new (%server, %http, path => "/");
+my $stream;
+if (defined $connect) {
+   require AnyEvent::MCP::Server::Connect;
+   $stream = AnyEvent::MCP::Server::Connect->new (
+      %server, connect => $connect, on_close => sub { $done->send },
+   );
+   $stream->start;
+} elsif ($stdio) {
+   binmode STDIN;
+   binmode STDOUT;
+   $stream = AnyEvent::MCP::Server::JSONL->new (
+      %server, on_connection_close => sub { $done->send },
+   );
+   $stream->accept (\*STDIN, \*STDOUT);
+}
+
+my $listener = AnyEvent::Socket::tcp_server $http{host}, $http{port}, sub {
+   my ($fh) = @_ or return;
+   my $watcher; $watcher = AE::io $fh, 0, sub {
+      undef $watcher;
+      defined recv $fh, my $magic, 1, Socket::MSG_PEEK or return;
+      if ($magic eq "G") {
+         accept_extension $fh;
+      } else {
+         $http->accept ($fh);
+      }
+   };
+};
+mcp_log "listening on $http{host}:$http{port} (MCP HTTP + sctl WebSocket)";
+my @signals = map { AE::signal $_, sub { $done->send } } qw(INT TERM);
+$done->recv;
+undef $listener;
+close_peer $_, 1000, "Server stopping" for values %connections;
+$stream->close if $stream;
+$http->close;

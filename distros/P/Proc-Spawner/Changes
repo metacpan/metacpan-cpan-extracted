@@ -1,5 +1,468 @@
 Revision history for Proc-Spawner (EXPERIMENTAL)
 
+0.12  2026-11-13
+      - Since 0.11: X27's steps 2 and 3 (large-subset-environment.md,
+        sections 10 to 12): every undecided sample's dependences named and
+        tried in example environments (2,902 samples of step 2; step 3's
+        classes: pass and split almost strict under passthrough and
+        splitglob, LV1 rows of their own; control and affects-shell run in
+        a root of their own; the 93 left out classified by reading, AI-);
+        the match of dash, bash and ours over every environment, messages
+        counted nowhere, each difference with the ruling that allows it
+        (section 11: alike 38,603, legalized 1,620, awaiting A12 88, chance
+        40, not legalized 45); the runner waits for background jobs (A18);
+        every run result redone from nothing on 2026-11-13.  Bugs of ours
+        fixed: X39 to X55 (. of an empty file, [[:digit:]] in pathnames,
+        "${v#$x}", exit, return, set -o, shift and cd with odd operands,
+        the message of a command that does not start, return outside a
+        function, ignored signals, expansion errors in here-documents and
+        when traps run, unquoted values with pattern characters, command
+        forms made at run time, the deferred SIGCHLD handler); X56 found,
+        open.  The documents kept in line with their records (make
+        docs-check, doc/docs-sync.tsv); the corpus analysis through make
+        (make corpus-help); MetaCPAN experiments (Proc::Spawner::Docs
+        links, doc/metacpan-tables.md; TODO A15).  The parse figures of
+        post4-0.04 hold (the measured files differ only in $VERSION); digest
+        of the code they depend on:
+        06885fddc5089202adf750a065bd3b393fe6906b1727a9d09d815a9a333ec8ab.
+      - The run results again (TODO B, done): every corpus run rebuilt from
+        nothing (make corpus-all; the parse figures' digest unchanged, the
+        scan and the figures the same), with the code of post-0.11 (X39 to
+        X55 fixed) and the runner waiting for background jobs (A18), which
+        changes dash's and bash's results too.  Section 7 of
+        large-subset-state.md and README's run table: ours differs 6 (was
+        3; with the programs inside Perl, 4): printf -v 2, the zenity
+        subshell, a race, ls -l of /, and exec command -with -flags (X56);
+        same 15,786, messages only 23,390, the shells differing 1,213;
+        post-0.09's table kept as a part of its own.  The atomic calls
+        again from this run: 650 calls of the six commands (757 from
+        post4-0.04's run), the builtins as before within one or two.
+        large-subset-environment.md: the variants (section 9; posix,
+        sigpipe, output as before in kind), step 2 (section 10: 2,902
+        samples, 1,550 unchanged, 1,348 changed, the same 4 neither), step 3
+        (section 12: both trees as before but for one race, NB:12523), the
+        races (section 12: only the zenity subshell left, persistent, not
+        a race: TODO A17).  The match (section 11) now counts every snippet
+        over all the environments it ran in: the base run, step 2's setups
+        and step 3's (large-subset-matchreport.pl -run FAMILY/LABEL=DIR,
+        -setups FAMILY=FILE; make corpus-match; corpus-all now runs
+        corpus-step3 and corpus-races too): alike 38,603, ours not as both
+        1,793: legalized 1,620, awaiting A12 88, chance 40, not legalized 45
+        (of them 30 cd with extra words and 2 new races, TODO A13).
+      - X56 (open): exec with a builtin's name runs ours' builtin; dash and
+        bash look only for a program (not found, 127).  The base grammar
+        refuses after exec only cd, : and exit.  Found by the run.
+      - The tables of levels count the samples classified by reading as
+        N+M=T (the user, 2026-11-13): N found by the programs, M by reading
+        (AI-strict with strict, AI-values passed on ... with those rows; the
+        other 52 stay undecided), T both; N alone where M is 0: strict
+        365+27=392, with values passed on unchanged 664+7=671, on split
+        1,476+7=1,483, undecided 3,508+52=3,560 (large-subset-blocks.pl and
+        -matchreport.pl -ai; make corpus-provenance, corpus-match).
+      - LV1 (the user, 2026-11-13): the samples almost strict only by step
+        3's assumptions are rows of their own in every table of levels:
+        "with values passed on unchanged, not in preceding rows" 664
+        (passthrough) and "with values passed on split, not in preceding
+        rows" 1,476 (passthrough and splitglob; none needs splitglob alone);
+        almost strict 34,302.  large-subset-blocks.pl and -matchreport.pl
+        print them; the record keeps A, its codes tell them apart.
+      - X27, step 3: the 93 undecided samples the setups left out,
+        classified by reading (the user's categories: AI- and a category
+        used before, AI-PATH-twister new; TODO A19): record
+        large-subset-ai-classes.tsv, large-subset-blocks.pl -ai writes the
+        category as the class in large-subset-step3.tsv (the levels and the
+        setups unchanged, checked).
+      - The tools: large-subset-threeway.pl and -matchreport.pl split the
+        builtins log right (a record starts with any handler's name; a
+        call of Proc::ShellSpawn::Large::b_... or "not found" had been glued
+        to the call before it); large-subset-ids.pl and the match report
+        read the codes inside passthrough(...) too (the variants had
+        missed 578 samples, the report 48 legalizations by B2 and $0);
+        large-subset-match-known.tsv marks X56's sample and the zenity
+        subshell open.
+      - X55 fixed (found by the races run many times): ours' deferred
+        SIGCHLD handler between run() calls (K3) did not keep the
+        program's $? and $!; its waitpid set $? (-1 when nothing had
+        ended), so a job ending while the program ran its own code changed
+        $?, seen as ours' status 255 without a message in about 1 run of
+        200 of samples with a background job.  Test in t/between.t.
+      - large-subset-runcompare.pl -after SECONDS (default 5; A18, the
+        user, 2026-11-12: the runner waits for every process of the run,
+        with a reasonable timeout): background jobs still running when the
+        shell ends get up to 5 s, then are killed ("after": "killed");
+        with -env pidns, process 1 of the namespace reaps and waits.
+        -after 0: as before.
+      - X27, step 3: the 33 races of the class affects-shell run 20 times
+        each in every environment where ours was not as both shells
+        (make corpus-races; large-subset-repeat.pl, record
+        large-subset-env-races.tsv).  First round: 14 were not races but a
+        background job still running when the text ends, which ours
+        finishes before it ends and the run killed in the shells (A18,
+        decided: the runner waits, -after).  Second round, with the wait
+        and X55 fixed: 27 the same in every run, 6 races (chance).  The
+        class affects-shell now: 584 alike in every environment (was 556),
+        chance 10, not legalized 33 ([^...] 3, cd with extra words 30).
+      - X27, step 3: setups for names with an expansion (a file or
+        directory whose name only an expansion gives at run time: cat <
+        "$fname", cd `dirname $f`, ~/.bashrc; the user: choose the value
+        and make the file of that name together).  large-subset-setups.pl
+        -step3 chooses every value in such a name (x1, or the run's own:
+        home/, the run's directory, $$ 2 in a PID namespace; a program in
+        it a stand-in answering x1) and makes the file of that name in
+        the states of its kind; the setups of every other sample are as
+        before.  119 of the 149 left out got setups (control 34,
+        affects-shell 85); left out 30 (18 from a variable the text sets:
+        TODO B).  Ran in step 3's two environments: 38 legalized by
+        rulings, A12 21, chance 1, not legalized 31 (cd with extra words
+        30, head ... 10> filename 1: TODO A13).  Records
+        large-subset-env-control.tsv, large-subset-env-affects-shell.tsv
+        and its calls.  Partially decided now 3,508 of the 3,601
+        undecided.
+      - X54 fixed (found by those setups): cd with more operands made by
+        an expansion at run time (x="d e"; cd $x) said "cd: bad
+        argument", status 2, neither shell; now "too many arguments",
+        status 1, as bash and as with the operands in the text (rule E).
+        The 54 samples of both classes whose cd operand holds an
+        expansion ran again.  Test in t/programs.t.
+      - X27, step 2 for the class affects-shell, done (section 12): 948
+        samples (-env samearg0, pidns); of the 410 where ours is not as
+        both shells: legalized 301, awaiting A12 67, chance 39 (33 races;
+        6 persistent results without a ruling: TODO A17), not
+        legalized 3 ([^...], A13).  Partially decided 3,389 of the 3,601
+        undecided.  Records large-subset-env-affects-shell.tsv and its
+        calls.  The match report knows A4 by ours' status 248 and its
+        message; NB:685 (two readers of one pipe) as chance.
+      - X53 fixed (found by step 2 on the class affects-shell): a form of
+        command the parser refuses, made only by expansions at run time
+        (x=-n; command $x), is outside the subset at run time (A4, status
+        248), no longer a program named -n.  large-subset-runcompare.pl
+        -env clock marked not to be used (libfaketime 0.9.10 opens its
+        shared memory as descriptors 3 and 4 in every process).
+      - large-subset-runcompare.pl: -env samearg0 (the three shells get
+        the same $0), pidns (every run in a PID namespace of its own: $$,
+        $PPID, $! the same in every run), clock (libfaketime: the shell's
+        clock stands at FIXTURE_MTIME; timeout keeps the real one); tried
+        on $$ $PPID, $0, date and $SECONDS, $!, env (the same in two runs).
+        large-subset-setups.pl -class affects-shell (with -step3): every
+        code under the run's control, the shells' own variables varied
+        too (not the run's).  For step 2 on the class affects-shell (the
+        user, 2026-11-12).
+      - X27, step 2 for step 3's control class, done (section 12;
+        make corpus-step3): 2,441 samples in 8,862 setups; where the
+        environment changed the class, only into a difference a ruling
+        legalizes (A5 1,066, builtin-vs-coreutils 49, rule E 3, Q2 2);
+        not legalized 1, the same in every environment (cd with extra
+        words, TODO A13).  Records large-subset-env-control.tsv,
+        large-subset-env-control-calls.jsonl.  Partially decided now 2,838
+        of the 3,601 undecided.  Tools: the call logs' records may span
+        lines (an argument with a newline): large-subset-threeway.pl and
+        large-subset-matchreport.pl join them, and the comparison of the
+        programs' calls keeps empty lines; matchreport -step3 (the
+        record's header); G2 by a setup's description in
+        large-subset-match-known.tsv; large-subset-setups.pl leaves out
+        setups that take what the run needs (the loader, /tmp itself);
+        the runner records a run whose environment cannot be made
+        instead of stopping, and makes a setup's absolute names after
+        its mounts.
+      - X27, step 2 for step 3's control class, prepared:
+        large-subset-blocks.pl -d names a redirection's or a test
+        operator's absolute target too (the levels and the step-3 record
+        unchanged); large-subset-setups.pl -step3: the control samples,
+        absolute names (made in the run's own root), the programs'
+        answer as one more dependence, the programs the record names as
+        stand-ins, a setup 0 for the base runs (2,444 samples, 8,862
+        setups; the step-2 mode makes step 2's setups byte for byte from
+        its stored dependences; from today's -d it adds NB:5285, whose
+        path-root was the '/' slip); make corpus-step3.
+      - large-subset-runcompare.pl: -standin LIST (programs it runs for
+        real become stand-ins too) and a setup's own "standin" list;
+        -env cowroot: every run gets a root of its own, a copy-on-write
+        overlay of /, so that a setup can make or remove files anywhere
+        (absolute names) and nothing a run writes stays.  Tried on
+        TL:linux/nologin.md:12 (> /etc/nologin.txt fails as A5 allows,
+        succeeds with the file there; the real /etc untouched) and
+        TL:common/ls.md:24 (ls as a stand-in answering x1).  For step 2
+        on the control class (the user, 2026-11-12).
+      - X27, step 3 (the user's four steps; large-subset-environment.md,
+        section 12): large-subset-blocks.pl follows every value a sample
+        takes from the environment to where it lands, and classes each
+        sample its codes leave undecided (-p; record
+        tools/large-subset-step3.tsv): pass 664, split 1,476, control
+        2,525, affects-shell 1,076.  Pass and split are almost strict now (the
+        user's (a)): code A:...,passthrough(r,s)[,splitglob], two new
+        assumptions in table 1, probed by large-subset-valueprobe.pl
+        (make probe-values).  Levels: almost strict 36,442 (was 34,291),
+        undecided 3,601 (was 5,752; partially decided 1,682 of them).
+        Checked against step 2's runs: pass 270 of 270 and split 948 of
+        949 kept their class in every setup, control 1,278 of 1,285
+        changed only within the ruling named (the rest explained).  The
+        tool's slips fixed: '/' as a delimiter (cut -d /, awk -F/) was
+        taken for the whole tree (11 samples); the codes of a command
+        after a $( ) in its words went to the command inside it (block
+        numbers of -d; the levels unaffected).  README and
+        large-subset-state.md quote the new figures.
+      - X52 fixed (found by a probe of splitting and globbing, X27): a word
+        from an unquoted expansion whose only pattern characters are
+        escaped by a backslash is not matched against files (x\* stays
+        x\*, as both shells).
+      - X50 fixed (found by large-subset-difffuzz.pl -j 4, seed 3, two
+        hours): an expansion error inside a here-document (set -u,
+        ${x:?}, arithmetic) fails that redirection, as dash (the command
+        does not run, status 2, the shell goes on; a special builtin's
+        still ends it), and the body is expanded with the redirections
+        made before it (its message, a $( ) in it).  X51 fixed: a trapped
+        signal's action runs after the foreground command, also when that
+        runs in this process (a pipeline of builtins), and a trap set in a
+        subshell no longer replaces the main shell's handler (a later
+        signal was lost).  Tests in t/programs.t (8 of the 12 new ones
+        fail before the fixes).  The fuzzer's run: 315,187 strings,
+        285,676 accepted; same 251,243, OURS 826, =dash 27,358, =bash
+        5,792, neither 456, timeout 1 (TODO B; return || shift, ours as
+        neither shell, joins the not legalized of section 11 and TODO A13).
+      - MetaCPAN experiments for 0.12 (TODO A15): Proc::Spawner::Docs links
+        each document twice: its name to the rendered file of the newest
+        release (/dist/Proc-Spawner/view/...), and, in HTML only, "The
+        same file in this release" relatively (../../../doc/...: works
+        from /release/.../view/ and /dist/.../view/, not from /pod/).
+        doc/metacpan-tables.md: one table in five forms (pipe table, raw
+        HTML, preformatted indented and fenced, a list), to choose the
+        form the documents will use.
+      - large-subset-difffuzz.pl: -j WORKERS (each makes the whole
+        sequence and runs every WORKERS-th string; the same output as
+        -j 1 apart from the shells' races, checked with seed 2, 300
+        strings, -j 1, 3, 4), -time SECONDS, -n 0 for no limit, a
+        progress line on stderr; each shell runs in run/work and the
+        files of run/ are compared ('cd /tmp; cd -' is now 'cd ..; cd -',
+        so no run leaves files in /tmp for the next); the worker's
+        directory in the output reads RUN.
+      - X27, step 2 for files, variables and standard input (the user's
+        four steps, 2026-11-10; TODO A1; large-subset-environment.md,
+        section 10): large-subset-blocks.pl -d records each undecided
+        sample's dependences exactly (the glob, the file read, written,
+        tested, sourced or run, the variable, the input; the levels and
+        large-subset-provenance.tsv unchanged); large-subset-setups.pl
+        gives three example setups each (a file with text, empty, a
+        directory, read-only; a glob with no match, one, two; a variable
+        empty, x1, "two  words *"; input of two lines, ...);
+        large-subset-runcompare.pl -setup applies one.  Run on the 2,478
+        samples that depend only on these by exact names, against two base
+        runs: 1,349 kept their class, 1,106 changed it with ours still on
+        a shell's side (nearly all the A5 status of a failed redirection
+        coming and going), 15 moved to where ours agrees with neither:
+        five bugs of ours and explained noise.  Record:
+        tools/large-subset-env-setups.tsv.
+      - X39 (ours, found by it; fixed): '.' of an empty file or a directory
+        printed "sh: the: not found", then Perl died (the file was read in
+        list context as a function's argument, so an empty text was no
+        argument at all).  Test: t/batteries/largebattery.txt.
+      - X40 (ours, found by it; fixed): a character class ([[:digit:]])
+        never matched in pathname expansion (Perl's bsd_glob has none): each
+        is now spelled out as its characters, the C locale's.  Test:
+        t/batteries/largebattery.txt.
+      - X41 (ours, found by it; fixed): in "${v#$x}" (and %, ##, %%) the
+        large parser marked $x quoted by the outer "...", so its value was
+        taken literally; POSIX and both shells take it as a pattern.  The
+        figures' digest is now
+        89075620df87ad8646ce8bc256843530dab5a2ff6a6e9dbcf6ff7dee86929a5f;
+        measured again (the stored scan reparsed): figures, samples.tsv,
+        the scan and large-subset-provenance.tsv identical.  Test:
+        t/batteries/largebattery.txt.
+      - NV1 (the user, 2026-11-10: "as the shells"; X42, X43, found by it):
+        an operand of exit, return, break, continue known only at run time
+        that is no number as dash takes it (digits, maybe after +, at most
+        2^31-1), and set -o or set -LETTER with no such option, are an
+        error with status 2 that ends the shell, as dash (before: exit 0
+        after Perl's warning, $? set to x1, nothing); arithmetic on such a
+        value no longer prints Perl's warning; set -o with no name at run
+        time: A4.  Tests: t/batteries/largebattery.txt.
+      - X27, step 2 extended (the user, 2026-11-10: "Continue"): also
+        positional parameters, cd's operand and HOME (~, cd alone), and
+        name, test-ops, eval, unquoted where a variable or argument of the
+        same command brings them: large-subset-blocks.pl -d records them
+        exactly; setups of arguments (one empty, x1, three), cd's target (a
+        directory, a file, mode 000) and HOME (missing, empty, unset);
+        large-subset-runcompare.pl -setup gives the shells arguments after
+        the text, with $0 as each has it, and unsets a variable given as
+        null; t/try.pl takes $0 and arguments after the text, as sh -c.
+        In all 2,901 samples, 1,549 unchanged, 1,307 changed with ours on a
+        shell's side, 25 moved to where ours agrees with neither, none a
+        bug (coreutils' messages, decided; known message prefixes; a
+        timeout).  The 267 samples with two dependences got every
+        combination of their states, 9 setups (large-subset-setups.pl
+        -full 2; the user: "3^m tries" as far as they add at most 25 %:
+        18 %); the six more found nothing of a new kind.
+      - X44 (ours, found by it; fixed): cd into a directory that may not be
+        searched (mode 000) succeeded; now dash's error, status 2.  Test:
+        t/programs.t (as a user other than root).
+      - X45 (ours, found by it; fixed): cd with HOME empty failed ("HOME not
+        set"); now nothing, status 0, as both shells (HOME unset: as
+        before, rule E).  Test: t/batteries/largebattery.txt.
+      - X46 (ours, found by the match report; fixed): shift with an operand
+        known only at run time that is no number (shift -1, shift '[n]')
+        did nothing or printed Perl's warning; now as NV1, dash's error.
+      - X47 (ours, found the same way; fixed): the message of a command
+        that does not start (not found, Permission denied) went to the
+        shell's standard error, not to the command's (nosuch 2>log left the
+        log empty); now as both shells.  Tests: t/batteries/largebattery.txt.
+      - large-subset-setups.pl -one: samples with more dependences than
+        -full covers get, after setups 1-3, each dependence alone in each
+        state (3 + 3m setups; the user: "3+3*m where 3^m is too large").
+      - large-subset-matchreport.pl (new) and large-subset-match-known.tsv:
+        the match of the three shells across the environments a sample ran
+        in (shells agree, some, differ; ours as them, with dash, bash,
+        neither; justified by a rule, presumed, or not), beside the
+        snippet's level, with the new level "partially decided" (the user,
+        2026-11-10): an undecided snippet whose every dependence was named
+        exactly and tried in example environments.
+      - With HOME empty, dash drops the word ~ (and ~/x loses its
+        prefix): ❰BUG❱ dash (POSIX: the result of ~ is as if quoted; bash
+        and ours give an empty field).
+      - X27, step 2 complete for the codes inside the run, and the match
+        across environments (large-subset-environment.md, sections 10 and
+        11, rewritten): every partially decided sample ran again with all
+        fixes, in 3, 9 or 3 + 3m setups (10,719 in all): 1,547 unchanged,
+        1,350 changed with ours on a shell's side, 4 to neither
+        (explained).  The whole library's ours ran again with the fixes
+        (ours changed in 82 samples: 33 by X43, X46, X47, the rest by
+        chance), joined with the full run's dash and bash.  The match:
+        every sample where ours is not as both shells has a rule (1,199
+        A5, 170 G16, 67 B2, ...), is unchecked (51: "the program beats"
+        not checked call by call), proposed (62: the ~ rule), chance (79)
+        or open (2: cd - with OLDPWD unset); none without.  Section 1's
+        level table has the partially decided (2,901).  The record
+        tools/large-subset-env-setups.tsv is now written by
+        large-subset-matchreport.pl -record (one column of setup classes,
+        what each setup did); the match per sample:
+        tools/large-subset-match.tsv.  TODO A12, A13: the ~ rule, the
+        unchecked cases.  The tables list every case, 0 included; N/A where
+        a level ran in one environment only (the user, 2026-11-11).
+      - X27, section 11: builtin-vs-coreutils (ours does echo, printf,
+        test, [, kill, pwd as coreutils, dash and bash by their builtins) is
+        now a checked reason, no longer guessed from the text (TODO A13;
+        the user, 2026-11-11: "do both").  large-subset-runcompare.pl -q
+        reran ours in every environment of the 1,635 samples where ours is
+        not as both shells (base and setups, about 5 minutes);
+        large-subset-threeway.pl takes several logging runs, the calls
+        made inside Perl (IP1: logged as builtin calls of
+        Proc::ShellSpawn::inproc; it read only the program calls before),
+        and -ours DIR, a fourth answer: ours alone.  All 156 distinct calls:
+        ours = coreutils in status and output.  large-subset-matchreport.pl
+        -calls DB -q LABEL=DIR: the reason holds in an environment when a
+        call there has coreutils' answer differing from the builtin of
+        each shell ours differs from, ours alone answering as coreutils; it
+        goes before chance by the snippet's codes (a guess from the text;
+        20 samples moved from chance to it); a column says per sample
+        whether it holds.  -o again lists only the samples where ours is
+        not as both shells everywhere (it listed all).  Draft figures:
+        the reason holds in 80 samples (64 by it alone); no reason in 7.
+      - X27, section 11: messages count nowhere now, wherever a
+        redirection sends them (the user, 2026-11-11: to be compensated
+        before the analysis).  large-subset-runcompare.pl records each
+        file also by its hash without message lines (files_nomsg: a line
+        starting with dash's, bash's or our prefix, the same pattern for
+        all three); large-subset-matchreport.pl drops such lines from
+        standard output and compares files by files_nomsg; the rules for
+        messages in the rule table apply only with -raw (the former
+        comparison).  The 34 samples whose files differ between the shells
+        reran in all their environments (3 minutes): 11 more where all
+        three agree, 5 from chance to A5; between the two runs 3 changed
+        by chance (a fifo, ls -a | tee output.file: a race; NB:1168).
+      - X27, section 11 rewritten in the user's layout (2026-11-11): two
+        trees of every snippet (the match; the same with each box split
+        by legalization: legalized by rulings, awaiting A12, chance, not
+        legalized), columns by builtin-vs-coreutils (R-program, checked
+        command by command); the commands' four answers; the rulings; the
+        9 not legalized (TODO A13, replacing the unchecked cases: 7 new,
+        to be decided with the rules).  large-subset-matchreport.pl prints
+        the trees itself (-raw: large-subset-match-raw.md, the former
+        comparison of messages, not part of the analysis).  Records:
+        tools/large-subset-match.tsv (a column for builtin-vs-coreutils),
+        tools/large-subset-match-calls.jsonl (155 commands of the table, 1
+        more of a snippet that now agrees).  README links section 11 and
+        gives its figures: 38,773 alike everywhere; of 1,622, 1,498
+        legalized, 62 awaiting A12, 53 chance, 9 not legalized.
+      - Corpus analysis through make (the user, 2026-11-11): Makefile.PL
+        copies doc/corpus.mk into the Makefile: make corpus-help lists a
+        target for every step (the sources, pools A and B, the scan and
+        figures, the digest, the provenance, the shells' verdicts, the
+        behaviour runs and their reports, the environment variants, step 2,
+        section 11's match, the Markdeep copy), each rewriting the record
+        it makes; doc/test-pools.md, section 0; README points there.  New:
+        large-subset-corpora.pl (fetch the pinned sources),
+        large-subset-ids.pl (the samples of some codes);
+        large-subset-runreport.pl -bl -tag -noise writes the lines of
+        large-subset-env-variants.tsv, which no script wrote before.
+        Checked: corpora, samples, figures (digest 89075620...),
+        provenance, shells' verdicts reproduce the shipped files; the
+        variants, step 2 and the match, over the existing runs, give the
+        shipped records byte for byte (but for explained differences).
+        large-subset-state.md.html regenerated (it lagged the .md).
+        MetaCPAN (checked by the author): .md files render under /view/,
+        relative links between them work, tables do not (TODO A15); 53
+        links into the private repository fail for others (TODO A14).
+      - The documents in line with what they show (the user's idea,
+        2026-11-11): doc/docs-sync.tsv maps each part of a document that
+        shows results (large-subset-environment.md sections 1/3, 9, 10,
+        11; large-subset-state.md sections 3 and 7; README's figures;
+        large-subset-match-raw.md; the Markdeep copy) to the records,
+        reports and scripts it draws on, with their SHA-256 (line ends as
+        LF) when last brought in line; make docs-check (doc/docs-sync.pl)
+        names every part whose inputs changed, and what to redo; make
+        docs-synced DOC=... records the new hashes; make docs-map.
+        Hashes, not times: Git keeps none.  t/docs-sync.t fails on a part
+        not in line, only with RELEASE_TESTING=1.  Checked: all 10 parts
+        are in line now (the digest, the records unchanged since 0.11,
+        every line of section 11's trees as the report prints it); a
+        changed input flags exactly the parts drawing on it.  TODO: A15
+        (the MetaCPAN experiments, in 0.12), A16 (large-subset-state.md to
+        rewrite, postponed), B (section 7 still counts messages outside
+        standard error).
+      - Section 11 of large-subset-environment.md reordered as the trees
+        were shown to the user (2026-11-11): a short opening, tree 1 and
+        its notes, tree 2, the totals, the commands, the rulings, the not
+        legalized; how it was measured at the end.  Nothing else changed
+        but the opening and a pointer to make corpus-match.
+      - Relative links where possible, to look for other defects on
+        MetaCPAN early (the user, 2026-11-11): 30 links to the old
+        Project's copies (branch project-2026-11-03, private) now go to the
+        shipped successor of the same document (every item they cite,
+        E1, X14, D1, G3, ..., is there); 40 file names in backticks
+        (outside code blocks and headings) that name a shipped file are
+        links now; 12 documents.  Every relative link resolves to a file
+        in MANIFEST.  The 22 links to files that are not shipped (old
+        reports, probe scripts) stay: TODO A14.
+      - The 14 links to old documents that 0.04 stopped shipping (the
+        upstream reports between the two sessions of the old Project, the
+        ceiling, the run shortcomings, the base parser's corpus statistics,
+        a decision page) go to MetaCPAN's view of 0.03, which shipped them
+        (each checked there through MetaCPAN's API), no longer to the
+        private repository; one more goes to the shipped known issues.  9
+        links are left to files never shipped (TODO A14).
+      - The last 9 links into the private repository (the user, 2026-11-11):
+        the 2 to the reports of bugs found in Run 0.04 go to Run's Changes
+        on MetaCPAN (its 0.05 and 0.06 entries); the 3 old tools behind
+        the others are shipped again, ported: large-subset-difffuzz.pl
+        (random strings of large-subset pieces; now also against bash --
+        posix, compared as section 11 compares: status, output, files,
+        messages nowhere; make probe-fuzz), t/stress.t (sigprobe/exec-
+        stress.pl: children ending while our Perl code runs; 589 runs,
+        88,350 children in 20 s, all status 0) and t/memory.t
+        (sigprobe/mem-large.pl: resident size 26,288 -> 26,380 kB over
+        1,500 runs), both only with RELEASE_TESTING=1 (make probe-stress,
+        probe-memory).  No link into the private repository is left.
+      - X48 (ours; found by the fuzzer, fixed): return outside a function
+        always ended the shell; as bash --posix (rule E), where its status
+        is tested (&&, ||, !, if, while) it is status 2 and the shell goes
+        on.  X49 (ours; found the same way, fixed): a signal ignored on
+        entry could still be trapped, and kill -INT $$ ended the string;
+        as POSIX and both shells, neither now.  X2: two more effects noted
+        (wait $! after a job of builtins; their output comes first).
+        Tests: t/programs.t.  The fuzzer, seed 2, 2,000 strings: where
+        dash and bash agree and ours not, or all differ, 14 before, 6
+        after (TODO B).  The map of make docs-check now has the executor's
+        modules as inputs of the parts that show run results: those 7
+        parts are not in line until ours is run again (TODO B).
+
 0.11  2026-11-10
       - Since 0.10: Proc::ShellSpawn on Windows (WS1: paths with drives,
         UNC names and \, PATH and PATHEXT, NUL, USERPROFILE and ~user, $PPID;

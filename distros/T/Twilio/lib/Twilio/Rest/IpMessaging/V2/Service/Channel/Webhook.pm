@@ -4,7 +4,7 @@ package Twilio::Rest::IpMessaging::V2::Service::Channel::Webhook;
 use 5.016;
 use warnings;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 package Twilio::Rest::IpMessaging::V2::Service::Channel::WebhookList;
 

@@ -95,7 +95,7 @@ sub owner {
   my $new = $storage->async;
   isnt $new, $old, '... the backend is built anew after disconnect';
   is_deeply next_conninfo($new), { dbname => 'db-B', user => 'user-B' },
-    'k331: the new pool opens from B, not from the static DSN';
+    'the new pool opens from B, not from the static DSN';
   ok $B->{calls}, '... B was asked for it';
 }
 

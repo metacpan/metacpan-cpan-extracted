@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "repository": "https://github.com/libtmux/assets",
+  "revision": "b4c5d4a83eb54de90119ec402b41d706211a2716",
+  "language": "perl",
+  "variant": "library",
+  "files": [
+    {
+      "file": "logo.svg",
+      "source": "assets/perl/library/logo.svg",
+      "bytes": 5879,
+      "sha256": "fb883566770f75fb14d24c7ff8d5191ead3eadc5ba33dbcd619ad09dd8cda066"
+    },
+    {
+      "file": "logo.png",
+      "source": "assets/perl/library/logo-512.png",
+      "bytes": 16073,
+      "sha256": "76b608882d9995577a0a89f8fe3ad61dd8f9e51d0cec2d9fdacbd410fa2cefe0"
+    }
+  ]
+}

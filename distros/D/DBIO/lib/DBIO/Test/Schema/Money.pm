@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Money;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Test::BaseResult';
 
@@ -34,7 +34,7 @@ DBIO::Test::Schema::Money - Test result class for the money_test table (MONEY co
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

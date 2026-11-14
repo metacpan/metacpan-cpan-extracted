@@ -4,6 +4,8 @@ use warnings;
 
 use Test::More;
 use File::Temp ();
+use IPC::Open3 qw(open3);
+use Config;
 
 use DBIO::Util qw(file_path mkpath write_file);
 
@@ -50,22 +52,40 @@ our $imp_data_size = 0;
 1;
 PM
 
-my $dsn = "dbi:K305Refuse:dbname=app;password=$IN_DSN;host=db.example";
-my $out = do {
-  local $ENV{PERL5LIB} = join ':', $lib->dirname, grep { defined } $ENV{PERL5LIB};
-  open my $fh, '-|', "$^X -Ilib bin/dbiogen -o quiet=1 My::Schema '$dsn' k305user $AS_ARG 2>&1"
-    or die "cannot run bin/dbiogen: $!";
-  local $/;
-  my $text = <$fh>;
-  close $fh;
-  $text;
-};
-my $status = $? >> 8;
+# Runs bin/dbiogen with the connect info as separate arguments (no shell, so
+# no quoting of the DSN), both streams into one pipe.
+sub run_dbiogen {
+  my @connect = @_;
+  local $ENV{PERL5LIB} = join $Config{path_sep}, $lib->dirname, grep { defined } $ENV{PERL5LIB};
+  my $pid = open3(my $in, my $fh, undef, $^X, '-Ilib', 'bin/dbiogen',
+    '-o', 'quiet=1', 'My::Schema', @connect);
+  close $in;
+  my $text = do { local $/; <$fh> };
+  waitpid $pid, 0;
+  return ($text, $? >> 8);
+}
 
-isnt $status, 0, 'dbiogen exits non-zero when the connect fails';
-like $out, qr/Could not connect to database/, '... and says so';
-unlike $out, qr/k305-secret/, '... with no password of the connect info in it';
-like $out, qr/dbname=app;password=\*\*\*;host=db\.example/,
-  '... naming the data source, password masked';
+# A refused connection: DBI->connect returns undef
+{
+  my $dsn = "dbi:K305Refuse:dbname=app;password=$IN_DSN;host=db.example";
+  my ($out, $status) = run_dbiogen($dsn, 'k305user', $AS_ARG);
+
+  isnt $status, 0, 'dbiogen exits non-zero when the connect fails';
+  like $out, qr/Could not connect to database/, '... and says so';
+  unlike $out, qr/k305-secret/, '... with no password of the connect info in it';
+  like $out, qr/dbname=app;password=\*\*\*;host=db\.example/,
+    '... naming the data source, password masked';
+}
+
+# A DSN without the "dbi:<driver>:" prefix: DBI->connect dies, quoting the DSN
+{
+  my $dsn = "dbname=app;password=$IN_DSN;host=db.example";
+  my ($out, $status) = run_dbiogen($dsn, 'k305user', $AS_ARG);
+
+  isnt $status, 0, 'a DSN without driver: dbiogen exits non-zero';
+  like $out, qr/Could not connect to database/, '... and says so, in the same words';
+  unlike $out, qr/k305-secret/, '... with no password, from the DSN or the argument, in it';
+  like $out, qr/password=\*\*\*/, '... the DSN named, password masked';
+}
 
 done_testing;

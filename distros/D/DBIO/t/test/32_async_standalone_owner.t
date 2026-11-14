@@ -106,7 +106,7 @@ sub standalone_backend {
   my @rows;
   lives_ok {
     @rows = $backend->select_async('artist', [ 'artistid', 'name' ], { name => { -like => '%' } })->get;
-  } 'standalone select_async does not die for lack of an owning sync storage (karr k204)';
+  } 'standalone select_async does not die for lack of an owning sync storage';
 
   is_deeply \@rows, [ [ 1, 'Miles Davis' ], [ 2, 'John Coltrane' ] ],
     'standalone select_async resolves with the raw result rows';
@@ -164,7 +164,7 @@ sub standalone_backend {
       my ($txn) = @_;
       return $txn->insert_async('artist', { name => 'commit-me' });
     })->get;
-  } 'standalone txn_do_async proves context ownership without a wired owner (karr k204)';
+  } 'standalone txn_do_async proves context ownership without a wired owner';
 
   is ref($result[0]), 'HASH',
     'insert_async inside the standalone txn resolved with a returned-columns HASHREF';
@@ -189,7 +189,7 @@ sub standalone_backend {
       my ($txn) = @_;
       return $txn->select_async('artist', [ 'artistid', 'name' ], { name => 'persisted' });
     })->get;
-  } 'standalone txn select_async prepares args through the effective owner (karr k204)';
+  } 'standalone txn select_async prepares args through the effective owner';
 
   is_deeply \@rows, [ [ 7, 'persisted' ] ],
     'standalone txn select_async resolves with the pinned-connection rows';
@@ -229,7 +229,7 @@ sub standalone_backend {
     storage => $mock, txn_conn => 'CONN',
   );
   lives_ok { $ctx->_assert_context_active }
-    'TransactionContext ownership check works over a bare _owner_storage-only mock (karr k204 backward-compat)';
+    'TransactionContext ownership check works over a bare _owner_storage-only mock (backward-compat)';
   ok $mock->{asserted},
     'ownership was proven against the mock owner, not skipped';
 }

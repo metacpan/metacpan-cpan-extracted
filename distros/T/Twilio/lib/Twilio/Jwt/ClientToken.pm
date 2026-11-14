@@ -7,7 +7,7 @@ use Twilio::Exceptions::TwilioException;
 use Twilio::Jwt::Client::ScopeURI;
 use Twilio::Jwt::JWT;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $DEFAULT_TTL = 3600;
 my $EVENTS_PATH = '/2010-04-01/Events';

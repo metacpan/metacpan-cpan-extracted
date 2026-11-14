@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3418';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3421';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -3546,8 +3546,14 @@ sub read_table {
 			: ($args{'na_strings'});
 		# _vcf_explode() in LikeR.xs; its comment says what the columns are
 		my %mode = (aoh => 0, hoa => 1, hoh => 2, aoa => 3);
+		# A sample's values have no column of their own to give a class to, so
+		# they follow the one spelling that speaks for every column:
+		# colClasses => 'character' keeps them text, and anything else stores
+		# an integer's text as its number, as the file's own columns are.
+		my $all_text = defined $args{colClasses} && !ref $args{colClasses}
+			&& $args{colClasses} eq 'character';
 		return _vcf_explode($raw, $mode{$otype}, $args{'row_names'}, $file,
-			%na ? \%na : undef);
+			%na ? \%na : undef, $all_text ? 0 : 1);
 	}
 
 	# A multi-worksheet .xlsx with no explicit 'sheet' is returned as a hash
@@ -3632,15 +3638,20 @@ sub read_table {
 # 47 bytes less for each of the 900,000 cells converted. R's spellings:
 # one class for every column, a list by position (recycled when short, as R
 # recycles it), or a hash by name, where a name that is no column is warned
-# about, in R's words, and otherwise ignored. undef (R's NA) and 'character'
-# leave a column as read. Each name is checked here, before the file is
-# opened; which field gets which class waits for the header.
-#   %cls_code: 1 = numeric (an NV), 2 = integer (an IV), 0 = as read
+# about, in R's words, and otherwise ignored. 'character' keeps a column as
+# the text the file holds. undef (R's NA), and any column with no class at
+# all, is code 3: a cell whose text is an integer exactly as perl would print
+# it ("42", "-7", not "007" or "4.0") is stored as that IV, 24 bytes where the
+# text took 72, and every other cell as its text; S_text_is_iv() in LikeR.xs
+# has the rule and what it measured. Each name is checked here, before the
+# file is opened; which field gets which class waits for the header.
+#   %cls_code: 0 = character (its text), 1 = numeric (an NV), 2 = integer (an
+#   IV), 3 = no class given
 	my %cls_code = (numeric => 1, double => 1, real => 1, integer => 2, character => 0);
 	my $cls_arg = $args{colClasses};
 	my $cls_of = sub {
 		my ($c) = @_;
-		return 0 unless defined $c;
+		return 3 unless defined $c;
 		_usage_error('read_table', "colClasses '$c' is not one read_table reads: it takes "
 		  . "'numeric' (or 'double' or 'real'), 'integer', 'character' or undef")
 			unless exists $cls_code{$c};
@@ -3877,7 +3888,7 @@ sub read_table {
 			my $r = ref $cls_arg;
 			if ($r eq 'HASH') {
 				my %by = map { _as_bytes($_) => $cls_of->( $cls_arg->{$_} ) } keys %$cls_arg;
-				@cls = map { $by{$_} // 0 } @header;
+				@cls = map { $by{$_} // 3 } @header;
 				my %have = map { $_ => 1 } @header;
 				warn "read_table: not all columns named in 'colClasses' exist\n"
 					if grep { !$have{$_} } keys %by;
@@ -3889,8 +3900,11 @@ sub read_table {
 			} else {
 				@cls = ( $cls_of->($cls_arg) ) x @header;
 			}
-			@cls = () unless grep { $_ } @cls;
+		} else {
+			@cls = (3) x @header;
 		}
+		# all 'character': nothing to convert, and the parser is told nothing
+		@cls = () unless grep { $_ } @cls;
 		# The column arrays are made once and held, so neither the fast path
 		# nor the row loop below has to fetch them out of %data (and
 		# autovivify them) once per column per row.
@@ -6894,7 +6908,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3418
+version 0.3421
 
 =head1 Synopsis
 
@@ -7551,7 +7565,11 @@ C<a * b * c> to the full factorial C<a + b + c + a:b + a:c + b:c + a:b:c>):
  my $res_2way = anova($data_2way, 'len ~ supp * dose');
 
 Bare string columns are treated as factors; numeric columns, C<I(x^2)> and
-C<log(x)> enter as single regressors. A factor is coded by treatment contrasts
+C<log(x)> enter as single regressors. Inside C<I()>, C<log()>, C<exp()>, C<sqrt()>,
+C<log2()>, C<log10()>, C<log1p()> and C<abs()> a term may use C<+ - * / ^>, numbers
+and nested parentheses with R's precedence, so C<log(x+1)>, C<I(x*2)> and
+C<I(x/z-1)> are each one regressor; a term that cannot be read is a fatal
+"cannot evaluate term" error. A factor is coded by treatment contrasts
 or by a full set of indicators exactly as R decides it (its "margin rule"), so
 nested and per-group-slope models come out as in R: C<y ~ a + a:b> gives C<a:b>
 C<levels(a) * (levels(b) - 1)> degrees of freedom, and C<y ~ g + g:x> fits a
@@ -10645,6 +10663,18 @@ C<qchisq($p, 0)> is 0, or C<Inf> at C<$p = 1>. R's own C<tests/d-p-q-r-tst-2.R>
 pins those values; up to 0.3217 both functions returned C<NaN> there. A negative
 C<df> is still C<NaN>.
 
+An invalid parameter — C<< sd E<lt> 0 >>, a non-positive C<df> in C<qt>, a negative one in
+C<qchisq> — is C<NaN>, with one exception that is R's: a probability at an end of
+its range is answered with the end of the support first. C<qnorm(0, 0, -1)> is
+C<-Inf> and C<qnorm(1, 0, -1)> is C<Inf>; C<qt(0, -1)> is C<-Inf>; C<qchisq(0, -1)>
+is C<0> and C<qchisq(1, -1)> is C<Inf>; and the same holds for a log probability
+of C<-Inf> or C<0> and for the upper tail. R's C<qnorm>, C<qt> and C<qgamma> test
+the ends before the parameter, and this module copies that order. C<qf> does not
+have the exception, because R's C<qf> tests C<df1> and C<df2> first: C<qf(0, -1, 2)>
+is C<NaN>. A C<NaN> parameter is C<NaN> everywhere. Up to 0.342 all four returned
+C<NaN> at the ends; SciPy still does (C<norm.ppf(0, 0, -1)> is C<nan>).
+C<t/distributions.q.ends.R.t> pins every combination against R.
+
 C<< df =E<gt> Inf >> (perl's C<9**9**9>, or the string C<"Inf">) is the limit R gives it:
 C<pt($q, Inf)> is C<pnorm($q)> and C<qt($p, Inf)> is C<qnorm($p)>;
 C<pf($x, $df1, Inf)> is C<pchisq($x * $df1, $df1)>, C<pf($x, Inf, $df2)> the upper
@@ -13650,7 +13680,8 @@ that C<lmerTest> adds to its summary.
 Random-effects terms are written as in C<lme4>: C<(1 | g)> a random intercept,
 C<(x | g)> a correlated intercept and slope, C<(0 + x | g)> a slope alone, so that
 C<(1 | g) + (0 + x | g)> is the uncorrelated pair; several grouping factors,
-crossed or nested, are allowed, and C<(1 | a/b)> expands to C<(1 | a) + (1 | a:b)>.
+crossed or nested, are allowed, and C<(1 | a/b)> expands to C<(1 | a) + (1 | a:b)>
+(and C<(1 | a/b/c)> to those two plus C<(1 | a:b:c)>).
 The fixed part is expanded as for L<C<lm>|/"lm">.
 
 As in C<lme4>, a model croaks when a grouping factor has only one level among
@@ -13794,6 +13825,7 @@ or
  max(@arr, 4, 5)
 
 max will die if any undefined values are provided. A C<NaN> anywhere in the input makes the answer C<NaN>, as it does in R.
+An integer answer above 2**53 is returned as that integer, not rounded to a floating-point value; elements of a tied array, and tied or overloaded elements, are still answered as a floating-point value.
 See L</"Compared with List::Util"> under C<sum> for the other ways it differs from List::Util's C<max>.
 
 =head2 mcnemar_test
@@ -14062,6 +14094,7 @@ or
  min(@arr, 4, 5)
 
 min will die if any undefined values are provided. A C<NaN> anywhere in the input makes the answer C<NaN>, as it does in R.
+An integer answer above 2**53 is returned as that integer, not rounded to a floating-point value; elements of a tied array, and tied or overloaded elements, are still answered as a floating-point value.
 See L</"Compared with List::Util"> under C<sum> for the other ways it differs from List::Util's C<min>.
 
 =head2 mode
@@ -15074,7 +15107,10 @@ interactions (C<x:z> → product) and transforms (C<I(x^2)> → power) behave
 identically to fitting. Coefficients that the fit marked aliased (stored as NaN)
 contribute nothing, just as they were excluded from the fitted values. For C<glm>
 with C<< family =E<gt> 'binomial' >> and C<< type =E<gt> 'response' >>, C<eta> is passed through the
-logistic function C<1 / (1 + exp(-eta))>; otherwise C<eta> is returned as is.
+logistic function C<1 / (1 + exp(-eta))>, and for the log-link families (poisson
+and negative binomial) through C<exp(eta)>; a C<svyglm> fit with family
+C<quasibinomial> or C<quasipoisson> is answered the same way as its plain
+family. Otherwise C<eta> is returned as is.
 
 A consequence worth noting: predicting on the I<training> data reproduces the
 model's C<fitted_values> for any model built from continuous terms, interactions,
@@ -15773,7 +15809,7 @@ minimal example:
 </tr>
 <tr>
   <td><code>colClasses</code></td>
-  <td>R's: store the columns you name as numbers rather than text, which takes about a third of the memory. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses)</td>
+  <td>R's: store the columns you name as numbers rather than text, which takes about a third of the memory, or as <code>character</code> to keep them text. A field that is plainly an integer is stored as one without being named. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses)</td>
   <td><code>colClasses =&gt; { age =&gt; 'integer', bmi =&gt; 'numeric' }</code></td>
 </tr>
 </tbody>
@@ -16050,8 +16086,11 @@ which the VCF spec allows (C<./.> under C<GT:AD:DP> is C<GT> alone). C<FORMAT>
 and the unsplit sample columns are not returned. A sample with I<more>
 values than its C<FORMAT> has keys is an error.
 
-=item * B<Values are text.> C<0/1>, C<34,7> and C<73,0,1043> are returned as
-written: C<AD>, C<PL> and C<INFO> are not split further, and C<.> is not
+=item * B<Values are as written.> C<0/1>, C<34,7> and C<73,0,1043> are returned as
+text: C<AD>, C<PL> and C<INFO> are not split further. A value that is an
+integer, such as a C<DP> of C<12>, is stored as that integer, as in any
+other read (see L<numeric columns|/"numeric columns (C<colClasses>)">);
+C<< colClasses =E<gt> 'character' >> keeps every value as text. C<.> is not
 missing unless you pass C<< 'na_strings' =E<gt> '.' >>, which then applies to the
 split values as well as to whole fields.
 
@@ -16090,11 +16129,21 @@ hoh, and an exploded aoa 8.4 s, against 7.0 s for the plain one.
 
 =head3 numeric columns (C<colClasses>)
 
-Every field is read as text unless you say otherwise. On a 64-bit perl a
-short number held as text costs about 70 bytes, and held as a number about
-24. C<colClasses> takes R's
-spelling and R's meaning: name the columns that are numbers, and they are
-stored as numbers as the file is read.
+A field is read as its text, with one exception: a field that is an integer
+written the way perl prints one (C<42>, C<-7>, C<0>) is stored as that integer.
+On a 64-bit perl a short number held as text costs about 70 bytes, and held
+as a number about 24, so a column of ids or counts takes a third of the
+memory; a 300,000 x 6 CSV of counts read as a hoa went from 140 MB to 57 MB,
+and from 0.110 s to 0.061 s. Such a cell reads exactly as its text did: it
+prints as the bytes the file held, so C<eq>, hash keys, regexes, C<sort> and
+C<write_table> see no difference. Only what looks at a scalar's type does: a
+JSON encoder writes C<5> rather than C<"5">. Anything an integer would not
+print back as stays text: C<007>, C<+5>, C<-0>, C<5.0>, C<1e3>, C<5>, and a number
+too big for perl's integer.
+
+C<colClasses> says more, in R's spelling and R's meaning: name the columns
+that are numbers, and they are stored as numbers as the file is read; or name
+a column C<character> to keep it as text whatever it holds.
 
  my $d = read_table('cohort.csv', colClasses => { age => 'integer', bmi => 'numeric' });
  my $d = read_table('cohort.csv', colClasses => [ 'character', 'integer', 'numeric' ]);
@@ -16120,8 +16169,13 @@ stored as numbers as the file is read.
   <td>an optional sign and digits, a leading blank allowed and nothing after them, within perl's integer range</td>
 </tr>
 <tr>
-  <td><code>character</code>, or <code>undef</code></td>
+  <td><code>character</code></td>
   <td>the text</td>
+  <td>anything</td>
+</tr>
+<tr>
+  <td><code>undef</code>, or a column not named</td>
+  <td>the text, or the integer when the field is one as perl prints it</td>
   <td>anything (the default)</td>
 </tr>
 </tbody>
@@ -16151,7 +16205,10 @@ have digits, where R reads C<1e> as C<1>.
 =back
 
 On a 300,000-row CSV with three of its five columns declared, the table took
-74 MB instead of 116 MB, and the read 0.095 s instead of 0.086 s.
+74 MB instead of 116 MB, and the read 0.095 s instead of 0.086 s. That was
+measured against every column held as text, which is what 0.3418 and earlier
+did with an undeclared column; an integer column now gets most of that saving
+without being declared, so declaring matters chiefly for decimals.
 
 =head3 missing values (C<na_strings> / C<na_values> / C<undef_val>)
 
@@ -18681,9 +18738,10 @@ C<lc>, which is what C<Excel::Writer::XLSX> uses. The sheets are streamed one af
 another, so only the sheet being written is held in memory. Up to 65530 sheets
 fit in a ZIP archive without ZIP64.
 
-C<xlsx_freeze_rows> and C<xlsx_freeze_cols> freeze that many leading rows/columns in place (Excel's I<freeze panes>), so they stay visible while scrolling — most often used to pin the header row. They go up to 1048575 and 16383, one short of the sheet's limits:
+C<xlsx_freeze_rows> and C<xlsx_freeze_cols> freeze that many leading rows/columns in place (Excel's I<freeze panes>), so they stay visible while scrolling. The header row is frozen by default (C<< xlsx_freeze_rows =E<gt> 1 >>); pass C<0> to leave the sheet unfrozen. They go up to 1048575 and 16383, one short of the sheet's limits:
 
- write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 1);                        # pin the header row
+ write_table(\@rows, 'report.xlsx');                                                # the header row is pinned
+ write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 0);                        # nothing is pinned
  write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 1, 'xlsx_freeze_cols' => 2); # pin header + first two columns
 
 C<tex> and C<xlsx> are mutually exclusive. Note: dates/times are written as their
@@ -18806,9 +18864,9 @@ C<read_table>.
 </tr>
 <tr>
   <td><code>xlsx_freeze_rows</code></td>
-  <td><code>0</code> (none)</td>
+  <td><code>1</code> (the header row)</td>
   <td>Excel</td>
-  <td>number of leading rows to freeze in place (freeze panes), e.g. <code>1</code> to pin the header row; at most 1048575</td>
+  <td>number of leading rows to freeze in place (freeze panes); <code>0</code> freezes none; at most 1048575</td>
 </tr>
 <tr>
   <td><code>xlsx_freeze_cols</code></td>

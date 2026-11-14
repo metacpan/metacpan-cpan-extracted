@@ -3,7 +3,7 @@ package DBIO::Test::SyntaxErrorComponent2;
 # ABSTRACT: Test component with intentional syntax error
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -23,7 +23,7 @@ DBIO::Test::SyntaxErrorComponent2 - Test component with intentional syntax error
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

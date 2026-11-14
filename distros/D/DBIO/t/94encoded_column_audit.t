@@ -320,8 +320,16 @@ subtest 'the class definition is refused for what the component would ignore' =>
     qr/Unknown encode_args key\(s\).*format/, 'unknown encode_args key');
   like(class_error({ encode_class => 'Digest', encode_args => 'SHA-256' }), qr/must be a hashref/, 'encode_args not a hash');
   like(class_error({ encode_class => 'Digest', encode_args => { salt_length => -1 } }), qr/non-negative integer/, 'negative salt');
-  is(class_error({ encode_class => 'Digest', encode_args => { algorithm => 'SHA3-256', salt_length => 0, accept_unencoded => 0 } }),
+  is(class_error({ encode_class => 'Digest', encode_args => { algorithm => 'SHA-256', salt_length => 0, accept_unencoded => 0 } }),
     undef, 'what is known is accepted');
+
+  # SHA3 is known where Digest::SHA3 is installed
+  SKIP: {
+    skip 'Digest::SHA3 is not installed, so SHA3-256 is not a known algorithm here', 1
+      unless eval { require Digest::SHA3; 1 };
+    is(class_error({ encode_class => 'Digest', encode_args => { algorithm => 'SHA3-256', salt_length => 0, accept_unencoded => 0 } }),
+      undef, 'SHA3-256 is accepted with Digest::SHA3 installed');
+  }
 };
 
 # ---------------------------------------------- value without a hash format --

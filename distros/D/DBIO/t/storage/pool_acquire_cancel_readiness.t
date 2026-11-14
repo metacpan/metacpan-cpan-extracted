@@ -315,7 +315,7 @@ for my $fc (@future_classes) {
 # A caller that gives up. That is a cancel, so Future.pm only.
 # ---------------------------------------------------------------------------
 SKIP: {
-  skip 'Future not installed: no caller can cancel, the k258 case is not checked', 1
+  skip 'Future not installed: no caller can cancel, the cancel case is not checked', 1
     unless $have_future;
   my $fc = 'Future';
 

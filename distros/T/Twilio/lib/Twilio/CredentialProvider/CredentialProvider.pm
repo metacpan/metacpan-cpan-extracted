@@ -5,7 +5,7 @@ use warnings;
 
 use Carp qw(croak);
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $auth_type) = @_;

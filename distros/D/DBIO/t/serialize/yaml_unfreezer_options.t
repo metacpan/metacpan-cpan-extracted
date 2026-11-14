@@ -5,7 +5,7 @@ use Test::More;
 use Test::Exception;
 
 BEGIN {
-  eval { require YAML; 1 } or plan skip_all => 'YAML not installed';
+  eval { require YAML; YAML->VERSION(1.25); 1 } or plan skip_all => "YAML 1.25 or newer needed: $@";
 }
 
 use DBIO::InflateColumn::Serializer::YAML;

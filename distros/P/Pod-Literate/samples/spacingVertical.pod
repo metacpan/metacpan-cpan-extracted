@@ -1,0 +1,39 @@
+=pod
+
+=for literate:command target=spacingVertical.pl
+
+=for literate spacingVertical.pl
+
+  #<subs>#
+
+=for literate .
+
+=begin literate subs
+
+  sub AAA {
+    #< for lines >#
+  }
+
+=end literate
+
+=begin literate subs
+
+  sub BBB {
+    #< for lines >#
+  }
+
+=end literate
+
+=for literate for lines
+
+  # comment 1
+
+=for literate .
+
+=for literate for lines
+
+  # comment 2
+
+=for literate .
+
+=cut

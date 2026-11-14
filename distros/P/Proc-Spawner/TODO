@@ -1,7 +1,7 @@
 Proc-Spawner: what is open, in one place
 ========================================
 
-0.10, 2026-11-08.  Every postponed thing, by who has to act.  The full
+0.12, 2026-11-13.  Every postponed thing, by who has to act.  The full
 records behind each line: doc/pspawn-known-issues.md (X..., section "Open"),
 doc/large-subset/large-subset-state.md (sections 4-6),
 doc/large-subset/large-subset-environment.md (X27), doc/pspawn-spawner.md
@@ -20,7 +20,8 @@ A. WAITING FOR THE USER'S DECISION
     Step 1, done (2026-11-07): the levels from the parse trees alone
     (doc/large-subset/large-subset-environment.md, sections 1-4): strict
     365, held 2, almost strict 34,291 (if programs behave alike in each
-    run), undecided 5,752.  Record per sample: large-subset-provenance.tsv.
+    run), undecided 5,752 (before step 3).  Record per sample:
+    large-subset-provenance.tsv.
     Step 2, done in part (2026-11-08; section 9): each undecided sample has
     codes naming what kind of thing it depends on (files, vars, path-tmp,
     ...: section 3, "At a glance"), not exactly how (files does not say
@@ -35,14 +36,65 @@ A. WAITING FOR THE USER'S DECISION
     such runs are footnotes to the level totals (EV1); the published table
     is the run with a fresh /tmp, a fixed /dev/urandom and fixed file
     times (A1(b)).
-    Not started: step 2 for the codes inside the run itself: files (2,285
-    samples), vars (1,038), unquoted, directory, args, input, tilde, ...;
-    steps 3 and 4.
-    Act: whether to go on, and how far.  The natural next piece: for files
-    and vars, record the exact file and variable names each sample uses,
-    and run the samples where only one command depends on them with a few
-    chosen setups (the file absent, empty, with content; the variable
-    unset, empty, set).
+    Step 2 for the codes inside the run, done (2026-11-10, 11; branch
+    x27-step2; large-subset-environment.md, section 10):
+    large-subset-blocks.pl -d names each undecided sample's dependences
+    exactly; the 2,901 samples that depend only on files, variables,
+    standard input, arguments, cd or HOME by exact names (the partially
+    decided) ran in example setups: 3 each, every combination (9) for two
+    dependences, 3 + 3m for more (the user's "3^m tries ... 3+3*m"):
+    1,547 kept their class, 1,350 changed it with ours still on the side
+    of a shell, 4 moved to where ours agrees with neither (explained).
+    Nine bugs of ours found on the way (X39-X47), all fixed.  Record:
+    tools/large-subset-env-setups.tsv.
+    The match across environments (the user, 2026-11-10 and 11; section
+    11): two trees (the user's layout): every snippet by whether dash and
+    bash agree and with which ours sides; columns by builtin-vs-coreutils,
+    checked command by command (every command ours ran, in every
+    environment, run alone by coreutils, dash's builtin, bash's builtin
+    and ours: ours = coreutils in all 155); the second tree splits each
+    box by legalization.  Messages count nowhere, wherever a redirection
+    sends them (the user: compensated before the analysis; the former
+    comparison: large-subset-match-raw.md).  Run again post-0.11
+    (2026-11-13: the code with X39 to X56 found, the runner waiting for
+    background jobs, step 3's environments counted too): of the 1,793
+    snippets where ours is not as both shells: legalized by rulings 1,620,
+    awaiting A12 88, chance 40, not legalized 45 (items 13 and 17; X56,
+    and cd -).  large-subset-matchreport.pl prints it all;
+    tools/large-subset-match.tsv per snippet.
+    Step 3, done (2026-11-12; section 12): large-subset-blocks.pl follows
+    every value from the environment to where it lands; of the 5,741 left
+    undecided by the codes: pass 664 and split 1,476 (only passing through
+    the shell, some split and globbed into a program's words) are almost
+    strict now (the user's (a): assumptions passthrough and splitglob,
+    probed by make probe-values), so almost strict 36,442, undecided
+    3,601; control 2,525 (only through what the run can set: a switch whose
+    other state a ruling covers, a program's answer, /tmp); affects-shell
+    1,076 (a value from the environment affects what the shell itself
+    does).
+    Checked against step 2's runs: no counterexample left unexplained.
+    Step 2 for the control class, done (2026-11-12; section 12; the user:
+    with any program a stand-in): 2,441 samples in 8,862 setups, each run
+    in a root of its own (-env cowroot), the programs' answer one more
+    dependence; where the environment changed the class, only into a
+    difference a ruling legalizes (the one not legalized, cd with extra
+    words, is the same in every environment).  Partially decided now
+    2,838 of the 3,601 undecided.  Record: large-subset-env-control.tsv.
+    Step 2 for the class affects-shell, done (2026-11-12; section 12): 948
+    samples, with the same $0 for the three and a PID namespace per run;
+    of the 410 where ours is not as both shells: legalized 301, awaiting
+    A12 67, chance 39 (33 races; 6 persistent results, item 17), not legalized 3
+    ([^...], item 13).  X53 found and fixed.  Names with an expansion
+    (the user: choose the value and make the file of that name together;
+    2026-11-12): 119 of 149 samples got setups (control 34, affects-shell
+    85); not legalized among them 31 (cd with extra words 30, a two-digit
+    descriptor 1: item 13); X54 found and fixed.  The 33 races, run 20 times
+    each (make corpus-races): 14 were a background job that ours finishes
+    before it ends and the run killed in the shells; decided (A18, the
+    user, 2026-11-12): the runner waits for them too, up to 5 s (-after).
+    Then 27 the same in every run, 6 races (chance); X55 found and fixed.  Partially decided now
+    3,508 of the 3,601 undecided; the other 93, which the setups left out,
+    are classified by reading (item 19).
  3. P2 and P4 (large-subset-state.md, sections 4-5): ${...} forms both
     shells refuse; messages with our name and line, and $-.
  5. X2: $! of a background job that starts no process (design question K4).
@@ -62,6 +114,73 @@ A. WAITING FOR THE USER'S DECISION
     end) is safe for the graph's pipes only (not the caller's fds, which
     the module never closes); measured: at most 2.5% even for a loop of
     builtins writing into a pipeline.  Act: do it, or leave it.
+12. X27, section 11: ~ with HOME empty.  dash 0.5.12 drops the word (and
+    ~/x loses its prefix): ❰BUG❱ dash, as POSIX treats the result of ~ as
+    quoted; bash and ours give an empty field.  The rule table marks ours'
+    way "proposed" (62 samples).  Act: confirm (then
+    also report it to dash, if wanted), or decide otherwise.
+13. X27, section 11: 7 snippets where bash = ours != dash and no ruling
+    legalizes it (and 2 with cd -, in B): [^...] in a pattern (2) and
+    return outside a function (1), as rule E but not yet listed under it;
+    echo foo 42>/dev/null (dash: one-digit fd numbers only; also, in
+    step 3, head -<$LINENUM + 10> filename, NB:6724); echo $LINENO
+    after a #! line (dash: empty); cd with extra words (dash ignores them;
+    in step 3 also 30 samples where a program's answer gives cd its
+    operands, cd $(find . -name config): bash and ours, since X54, "too
+    many arguments", status 1); [^...] also in step 3 (mv
+    /mnt/usbdisk/[^l]* ...);
+    races between the elements of a pipeline: ls -a | tee output.file,
+    and since the runs of post-0.11 cat lol | sed ... > lol (sed's
+    redirection empties lol before or after cat reads it) and NB:12523,
+    find $DiskName ... | sort ... >> $TMPFILE given "two  words *"
+    (find's pattern sees the file sort's redirection makes, or not); each
+    came out otherwise in another run; and, found by the fuzzer, not a
+    snippet (the user, 2026-11-12: join it to this list): return || shift
+    at the top level, where ours follows bash for return (X48) and dash
+    for the failed shift (A5) and so ends as neither shell (status 2; both
+    give 0).  Act: decide them one by one, with the rules (the user,
+    2026-11-11: later).
+15. MetaCPAN shows the .md files rendered (/view/doc/...; relative links
+    between them work, checked by the author 2026-11-11) but not their
+    tables; the POD's links to them (Proc::Spawner::Docs, to /source/:
+    the raw text) did not work.  The experiments for 0.12 (the user,
+    2026-11-11 and 12), written post-0.11: Proc::Spawner::Docs links
+    each document twice, its name to the rendered file of the newest
+    release (/dist/Proc-Spawner/view/doc/...) and, in an =for html
+    paragraph, the same file of the same release (../../../doc/... from
+    /release/.../view/lib/Proc/Spawner/Docs.pod; it works from
+    /release/.../view/ and /dist/.../view/, not from /pod/...); the test
+    page doc/metacpan-tables.md has one table as a pipe table, raw HTML,
+    preformatted text indented and fenced, and a list.  Act, after 0.12
+    is on MetaCPAN: look at Docs and the test page, check both kinds of
+    link, choose the table form.
+16. The documents: large-subset-state.md is a log grown by appending
+    (paragraphs of 2,000 characters, its history inside), hardly usable
+    (the user, 2026-11-11).  Rewrite it as the current state, its
+    history to Changes; links into the private repository (item 14) with
+    it.  Postponed (the user: not critical).
+17. X27, step 3: persistent results (the same in every run, which the
+    environment does not change), found in the class affects-shell,
+    that no ruling covers yet (section 12): the
+    environment env and printenv list (4 snippets: bash adds SHLVL and
+    _; ours as dash); /proc/$$/cmdline (1: each shell's own command line,
+    ours a Perl one); times (1: ours, Perl, has used CPU time where dash
+    shows 0); and, found post-0.11 (20 runs: ours' own result in each, so
+    not a race), (echo ...; sleep 1; echo ...) | zenity with zenity
+    missing: the shells' builtin echo dies of SIGPIPE and ends the
+    subshell, ours' echo (inside Perl, as the program before IP1) fails
+    alone and the subshell goes on (one sleep 1 more).  Act: rule on them
+    (they are built into the shells and into ours; the environment does
+    not change them).
+19. X27, step 3: the 93 undecided samples the setups left out, classified
+    by reading (2026-11-13; the user's categories: AI- and a category used
+    before, and AI-PATH-twister; large-subset-environment.md, section 12;
+    record doc/large-subset/tools/large-subset-ai-classes.tsv): AI-strict
+    27 (an unmovable stone 18, a device working as expected 9), AI-names
+    with an expansion 26, AI-values passed on unchanged 7, AI-values passed
+    on split 7, AI-tilde 6, AI-A5 5, AI-glob 4, AI-shells' own variables 4,
+    AI-PATH-twister 4, AI-noise 3.  Act: accept each category, or move a
+    sample (the work each takes: B).
 
 B. WORK (no decision needed)
 
@@ -95,7 +214,43 @@ B. WORK (no decision needed)
  - X32: without /proc, Perl's own writes into a pipe the caller gave can
    block if a child fills the pipe between select and the write (possible,
    not observed; no test yet).
+ - Messages: section 11 of large-subset-environment.md counts them nowhere
+   (post-0.11), section 7 of large-subset-state.md and README's run table
+   still count a message on standard output or in a file as a difference.
+   Bring section 7 in line: large-subset-runreport.pl as matchreport.pl
+   (drop the shells' message lines from standard output; files by
+   files_nomsg, which needs a new full run); then make docs-check.
+ - X56: exec with a builtin's name runs ours' builtin, where dash and bash
+   look only for a program (not found, 127).  Fix in the base grammar
+   (refuse after exec what the large one refuses); the parse figures are
+   then measured again.
+ - large-subset-difffuzz.pl, what is left after seed 3 (-j 4, two hours,
+   315,187 strings, 285,676 accepted; it found X50 and X51): of the 826
+   where dash and bash agree and ours not, 683 have a background job's
+   EXIT trap (its output comes after the shell ended, or not at all:
+   chance), 119 other strings with & (X2's effects: wait $! gives 0 for a
+   job started without a process), 24 without & (X50 and X51, fixed, and
+   return || shift, A13); a background job that sends a signal to $$
+   ends with the main shell in ours, while in the shells it is another
+   process and goes on (X2's kind).  Not looked at: the 456 where all three differ.
+ - X27, step 3, the 93 classified by reading (A19), what each category
+   takes in the setups (large-subset-setups.pl): AI-names with an
+   expansion, a value the text itself sets (a for or read variable, an
+   assignment: for f in */; do cd "$f"; find | while read d; do cd "$d";
+   tmpdir=$(mktemp -d) && cd $tmpdir; 19): follow the value through the
+   text (a glob's matches, a stand-in's answer, the fixed word); a program
+   at a fixed path not on PATH (2): a stand-in placed there; $HOME/... (5):
+   as ~/...; AI-tilde: users added to the run's own /etc/passwd; AI-A5:
+   names with .. in the run's own root; AI-shells' own variables: OLDPWD
+   varied; AI-PATH-twister: the inherited PATH varied (unset, empty, a
+   missing directory); AI-glob: example names for patterns with non-ASCII,
+   a / inside, system directories; AI-strict on a device: a private /dev
+   with the device absent, a file, not writable.
 
 C. WATCH (seen once, not reproduced)
 
+ - t/programs.t, SH1 (10 strings with sh), fails as a user other than root when
+   PATH has a directory that user may not search (here one under /root):
+   dash says "Permission denied" for a command found nowhere, ours "not
+   found" (seen 2026-11-10, branch x27-step2; not from its changes).
  - X8, X13, X20.

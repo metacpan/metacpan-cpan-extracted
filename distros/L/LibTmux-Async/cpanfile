@@ -1,0 +1,16 @@
+requires 'perl',                   '5.044000';
+requires 'LibTmux',                '0.003';
+requires 'Future',                 '0.54';
+requires 'IO::Async',              '0.805';
+requires 'IO::Async::Loop::Ppoll', '0.10';
+requires 'IO::Ppoll',              '0.14';
+
+on 'configure' => sub {
+    requires 'ExtUtils::MakeMaker',           '7.78';
+    requires 'ExtUtils::MakeMaker::CPANfile', '0.11';
+    requires 'Module::CPANfile',              '1.1004';
+};
+
+on 'test' => sub {
+    requires 'Test2::V1', '1.302226';
+};

@@ -31,6 +31,7 @@ use lib 't/lib';
 use Test::Most;
 use Test::Mockingbird;
 use Test::Returns;
+use Test::Mockingbird::TimeTravel ();	# its restore_all() would clash with Test::Mockingbird's
 use Readonly;
 use Errno qw(ENOENT);
 use Scalar::Util qw(weaken);
@@ -47,6 +48,11 @@ Readonly::Scalar my $TRACE => 7;	# the default level number
 Readonly::Scalar my $ERROR => 3;	# the level number of 'error'
 Readonly::Scalar my $MAX_SHOWN => 200;	# characters of a name repeated in a notice
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
+Readonly::Scalar my $MODULE_FILE => $INC{'Test/Log/Abstraction.pm'};
+Readonly::Scalar my $EPOCH => '2026-01-01T00:00:00Z';	# any fixed moment
+Readonly::Scalar my $DECADE => 3653;	# days, to jump far past any plausible timeout
+Readonly::Scalar my $INNER => 'inner';
+
 
 # Every level method, and whether the default diag rule ('warning' and
 # more severe) prints it
@@ -56,6 +62,28 @@ Readonly::Hash my %PRINTED_BY_DEFAULT => (
 	fatal => 1, alert => 1, emergency => 1, emerg => 1, panic => 1,
 );
 Readonly::Array my @PREDICATES => qw(is_trace is_debug is_info is_notice is_warn is_error is_critical is_alert is_emergency);
+
+# The part of the diagram each public method plays.  Every method the POD
+# documents must be here, and every one here must be in the POD: a method
+# added without a place in the diagram is an FSM discrepancy.
+#   store    EMPTY or CAPTURING -> CAPTURING, one more message
+#   clear    EMPTY or CAPTURING -> EMPTY
+#   setting  same state, same messages; a setting changes
+#   assert   same state; one TAP result
+#   read     same state; nothing printed, no TAP result
+#   print    same state; prints (the subclass hook _emit)
+#   copy     same state; a new logger in that state
+#   end      called directly: same state
+Readonly::Hash my %ROLE => (
+	(map { $_ => 'store' } qw(trace debug info notice warn error fatal critical alert emergency AUTOLOAD)),
+	clear => 'clear',
+	verbose => 'setting', level => 'setting',
+	(map { $_ => 'assert' } qw(like unlike has_level empty)),
+	(map { $_ => 'read' } qw(messages count lang flush reopen i18n), @PREDICATES),
+	_emit => 'print',
+	new => 'copy',
+	DESTROY => 'end',
+);
 
 # Out of the way of a developer's environment
 delete local $ENV{'TEST_VERBOSE'};
@@ -385,7 +413,10 @@ foreach my $state ($EMPTY, $CAPTURING) {
 	subtest "State: $state -> Trigger: DESTROY() called directly -> State: $state" => sub {
 		# Only the last reference going away ends a logger; calling DESTROY
 		# by hand does nothing, so the logger is still alive and usable
-		my $logger = ($state eq $EMPTY) ? fresh(diag => 'all') : capturing(diag => 'all');
+		# Made inside printed(): with diag 'all', capturing()'s own message
+		# would otherwise reach the TAP output
+		my $logger;
+		printed { $logger = ($state eq $EMPTY) ? fresh(diag => 'all') : capturing(diag => 'all') };
 		my $before = snapshot($logger);
 		my $out = printed { $logger->DESTROY() };
 		is($out, '', 'nothing printed');
@@ -511,6 +542,206 @@ foreach my $state ($EMPTY, $CAPTURING) {
 		ok(!defined($watch), 'destroyed');
 		is($out, '', 'nothing printed');
 		is(scalar(@recorded) + scalar(@emitted), 0, 'nothing stored or printed on the way');
+	};
+}
+
+# ===========================================================================
+# Diagram compliance: the POD, the diagram and the code must agree
+# ===========================================================================
+
+# The text of one =head1 section of the module's POD
+sub pod_section {
+	my $title = shift;
+
+	open(my $fh, '<', $MODULE_FILE) or die "$MODULE_FILE: $!";
+	my $text = do { local $/; <$fh> };
+	close($fh);
+	my ($section) = ($text =~ /^=head1 \Q$title\E\n(.*?)^=head1 /ms);
+	die "no '$title' section in $MODULE_FILE" if(!defined($section));
+	return $section;
+}
+
+# Every method the POD documents, as [ [names of one =head2], ... ]
+sub documented_methods {
+	return map { [ split /,\s*/ ] }
+		map { /^=head2 (\S.*)$/mg } (pod_section('METHODS'), pod_section('METHODS FOR SUBCLASSES'));
+}
+
+subtest 'Diagram compliance: the states in the diagram are the ones tested' => sub {
+	my $diagram = pod_section('STATE DIAGRAM');
+	my %boxes = map { $_ => 1 } ($diagram =~ /^\s*\|\s+([A-Z]+)\s+\|\s*(?:<|-|$)/mg);
+	is_deeply([ sort keys %boxes ], [ sort($EMPTY, $CAPTURING) ], 'two states, EMPTY and CAPTURING');
+};
+
+subtest 'Diagram compliance: every documented method has a place in the diagram' => sub {
+	my $diagram = pod_section('STATE DIAGRAM');
+	foreach my $group (documented_methods()) {
+		my ($first, $last) = ($group->[0], $group->[-1]);
+		# A group may be written as a range, e.g. "trace() ... emergency()"
+		my $ranged = (@{$group} > 1) && ($diagram =~ /(?<!\w)\Q$first\E\W*\.\.\.\s*\Q$last\E(?!\w)/);
+		foreach my $name (@{$group}) {
+			ok($ranged || ($diagram =~ /(?<!\w)\Q$name\E(?!\w)/), "$name: in the diagram")
+				or diag("TODO: FSM Discrepancy - $name is documented but has no edge in the STATE DIAGRAM");
+			ok(exists($ROLE{$name}), "$name: has a role in this file")
+				or diag("TODO: FSM Discrepancy - $name is documented, but no transition for it is tested");
+		}
+	}
+	# DESTROY has no =head2 of its own: the diagram is where it is documented
+	my %documented = map { $_ => 1 } (map { @{$_} } documented_methods()), ($diagram =~ /(?<![\w:])([A-Za-z_]\w*)\(/g);
+	foreach my $name (sort keys %ROLE) {
+		ok($documented{$name}, "$name: tested, and documented")
+			or diag("TODO: FSM Discrepancy - $name is tested here but no longer documented");
+	}
+};
+
+subtest 'Diagram compliance: every call in the diagram exists, except the misspelling' => sub {
+	my %called = map { $_ => 1 } (pod_section('STATE DIAGRAM') =~ /(?<![\w:])([A-Za-z_]\w*)\(/g);
+	ok(delete($called{$UNKNOWN}), "the diagram's unknown method is '$UNKNOWN'");
+	ok(!$CLASS->can($UNKNOWN), "... and it really is unknown");
+	foreach my $name (sort keys %called) {
+		ok($CLASS->can($name), "$name(): a real method")
+			or diag("TODO: FSM Discrepancy - the diagram calls $name(), which the code does not have");
+	}
+};
+
+subtest 'Diagram compliance: no temporal transitions exist to be tested' => sub {
+	# The diagram has no timeout, expiry or TTL edge.  If the code ever read
+	# the clock, that would be a transition the diagram does not show
+	my $code = do {
+		open(my $fh, '<', $MODULE_FILE) or die "$MODULE_FILE: $!";
+		local $/;
+		my $text = <$fh>;
+		close($fh);
+		$text =~ s/^=\w+.*?^=cut\n//msg;	# the POD may talk about time
+		$text =~ s/#.*$//mg;	# so may comments
+		$text;
+	};
+	unlike($code, qr/\b(?:time|localtime|gmtime|sleep|alarm|Time::\w+)\b/, 'the code never reads the clock')
+		or diag('TODO: FSM Discrepancy - the code reads the clock, but the STATE DIAGRAM has no temporal edge');
+};
+
+# ===========================================================================
+# Every documented method, from both states, by its role
+# ===========================================================================
+
+foreach my $state ($EMPTY, $CAPTURING) {
+	subtest "State: $state -> Trigger: each documented method -> the state its role says" => sub {
+		# Which assertions pass in this state, with the arguments used below
+		my %passes = ($EMPTY => { unlike => 1, empty => 1 }, $CAPTURING => { like => 1, has_level => 1 });
+		my %args = (
+			like => [qr/\Q$MESSAGE\E/], unlike => [qr/\Q$MESSAGE\E/], has_level => ['info'],
+			i18n => ['no_method', { method => $UNKNOWN }], _emit => [$MESSAGE], count => ['info'],
+		);
+		foreach my $name (sort map { @{$_} } documented_methods()) {
+			my $role = $ROLE{$name};
+			next if(!defined($role));	# reported by the compliance subtest
+			my $logger = ($state eq $EMPTY) ? fresh(diag => 'none') : capturing();
+			my $before = snapshot($logger);
+			my $results = results();
+			my ($returned, $out);
+
+			if($role eq 'assert') {
+				if($passes{$state}{$name}) {
+					$out = printed { $returned = $logger->$name(@{$args{$name} || []}) };
+					ok($returned, "$name: passes in $state");
+				} else {
+					($returned, $out) = failing(sub { $logger->$name(@{$args{$name} || []}) });
+					ok(!$returned, "$name: fails in $state");
+				}
+				is(results(), $results + 2, "$name: one TAP result (plus this file's own)");
+				is_deeply(snapshot($logger), $before, "$name: still $state, nothing changed");
+				next;
+			}
+
+			my $method = ($name eq 'AUTOLOAD') ? $UNKNOWN : $name;
+			$out = printed { $returned = $logger->$method(@{$args{$name} || ($role eq 'store' ? [$MESSAGE] : [])}) };
+			is(results(), $results, "$name: no TAP result");
+			if($role eq 'store') {
+				is(state_of($logger), $CAPTURING, "$name: $state -> CAPTURING");
+				is($logger->count(), scalar(@{$before->{'messages'}}) + 1, "$name: one more message");
+				is_deeply($logger->messages()->[-1], { level => $method, message => $MESSAGE }, "$name: the one logged");
+			} elsif($role eq 'clear') {
+				is(state_of($logger), $EMPTY, "$name: $state -> EMPTY");
+			} elsif($role eq 'copy') {
+				is(state_of($returned), $state, "$name: the copy is in $state");
+				isnt($returned, $logger, "$name: a different logger");
+				is_deeply(snapshot($logger), $before, "$name: the original is unchanged");
+			} else {
+				# setting (read back: no argument), read, print, end
+				is_deeply(snapshot($logger), $before, "$name ($role): still $state, nothing changed");
+				is($out, $role eq 'print' ? "# $MESSAGE\n" : '', "$name ($role): " . ($role eq 'print' ? 'prints' : 'prints nothing'));
+			}
+		}
+	};
+}
+
+# ===========================================================================
+# Failure part-way through a transition
+# ===========================================================================
+
+{
+	package Local::BrokenPrinter;	## no critic (ProhibitMultiplePackages)
+	use parent -norequire, 'Test::Log::Abstraction';
+	our $BROKEN = "printer broke\n";
+	sub _emit { die $BROKEN }	## no critic (RequireFinalReturn)
+}
+
+foreach my $state ($EMPTY, $CAPTURING) {
+	subtest "State: $state -> Trigger: level method whose print dies -> State: $CAPTURING, kept" => sub {
+		# The diagram's order is "store the message; print it".  A subclass
+		# _emit that dies is the subclass's error, and reaches the code that
+		# logged; but the message was already stored, so the capture is
+		# whole: one entry, not none and not two
+		my $logger = Local::BrokenPrinter->new(diag => 'all', verbose => 0);
+		eval { $logger->info($MESSAGE) } if($state eq $CAPTURING);
+		my $before = $logger->count();
+		throws_ok { $logger->error('broken') } qr/\A\Q$Local::BrokenPrinter::BROKEN\E\z/, 'the error reaches the caller';
+		is(state_of($logger), $CAPTURING, "$state -> CAPTURING");
+		is($logger->count(), $before + 1, 'stored exactly once');
+		is_deeply($logger->messages()->[-1], { level => 'error', message => 'broken' }, 'the message as logged');
+		# And the logger is still usable: the next call behaves the same
+		throws_ok { $logger->error('again') } qr/printer broke/, 'the next call: the same';
+		is($logger->count(), $before + 2, 'and is stored too');
+	};
+}
+
+subtest "State: $EMPTY -> Trigger: a message that logs while it is read -> State: $CAPTURING (+2)" => sub {
+	# A re-entrant transition: turning the message into text logs to the
+	# same logger.  The inner call completes first, so both are stored,
+	# inner first, and count() and messages() still agree
+	my $logger = fresh(diag => 'none');
+	my $calls = 0;
+	my $message = Local::Reentrant->new(sub { $calls++; $logger->info($INNER); return $MESSAGE });
+	$logger->warn($message);
+	is(state_of($logger), $CAPTURING, 'now CAPTURING');
+	is_deeply([ map { "$_->{level}:$_->{message}" } @{$logger->messages()} ], ["info:$INNER", "warn:$MESSAGE"], 'both stored, inner first');
+	is($calls, 1, 'the message was read once');
+};
+
+{
+	package Local::Reentrant;	## no critic (ProhibitMultiplePackages)
+	use overload '""' => sub { $_[0]->{'code'}->() }, fallback => 1;
+	sub new { my ($class, $code) = @_; return bless { code => $code }, $class }
+}
+
+# ===========================================================================
+# Time
+# ===========================================================================
+
+foreach my $state ($EMPTY, $CAPTURING) {
+	subtest "State: $state -> Trigger: a decade passes -> State: $state" => sub {
+		# No edge leaves a state because time passed: there is no expiry and
+		# no timeout.  The clock is frozen and warped forward instead of
+		# sleeping, and the stored entries carry no time to go stale
+		Test::Mockingbird::TimeTravel::with_frozen_time($EPOCH => sub {
+			my $logger = ($state eq $EMPTY) ? fresh(diag => 'none') : capturing();
+			my $before = snapshot($logger);
+			Test::Mockingbird::TimeTravel::advance_time($DECADE, 'days');
+			is_deeply(snapshot($logger), $before, "still $state, nothing expired");
+			$logger->info($INNER);
+			is_deeply([ sort keys %{$logger->messages()->[-1]} ], [qw(level message)], 'an entry has no time stamp');
+			ok($logger->like(qr/\Q$INNER\E/), 'and assertions still see it');
+		});
 	};
 }
 

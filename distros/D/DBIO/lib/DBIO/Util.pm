@@ -3,7 +3,7 @@ package DBIO::Util;
 
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -45,6 +45,7 @@ use DBIO::Carp '^DBIO';
 
 use B ();
 use overload ();
+use re ();
 use Carp 'croak';
 use Storable 'nfreeze';
 use Scalar::Util qw(blessed reftype refaddr);
@@ -56,7 +57,7 @@ our @EXPORT_OK = qw(
   fail_on_internal_call assert_no_list_context assert_function_name
   refdesc refcount hrefaddr
   scope_guard is_exception emit_loud_diag
-  quote_sub qsub perlstring serialize dump_value
+  quote_sub qsub perlstring serialize dump_value deep_copy canonical_text
   UNRESOLVABLE_CONDITION
   dir_path file_path parent_dir slurp_file slurp_file_utf8 write_file mkpath rmtree
   dumper_squashed eval_package_without_redefine_warnings class_path
@@ -112,6 +113,66 @@ sub refcount ($) {
 sub serialize ($) {
   local $Storable::canonical = 1;
   nfreeze($_[0]);
+}
+
+
+sub deep_copy {
+  my ($x, $seen) = @_;
+  return $x unless ref $x;
+  $seen ||= {};
+  return $seen->{ refaddr $x } if exists $seen->{ refaddr $x };
+
+  my $type  = reftype $x;
+  my $class = blessed $x;
+  my $copy;
+  if ($type eq 'HASH') {
+    $copy = {};
+    $seen->{ refaddr $x } = $copy;
+    $copy->{$_} = deep_copy($x->{$_}, $seen) for keys %$x;
+  }
+  elsif ($type eq 'ARRAY') {
+    $copy = [];
+    $seen->{ refaddr $x } = $copy;
+    @$copy = map { deep_copy($_, $seen) } @$x;
+  }
+  elsif ($type eq 'SCALAR' or $type eq 'REF') {
+    my $inner;
+    $copy = \$inner;
+    $seen->{ refaddr $x } = $copy;
+    $inner = deep_copy($$x, $seen);
+  }
+  else {
+    return $x;
+  }
+  bless $copy, $class if defined $class;
+  return $copy;
+}
+
+
+sub canonical_text { _canonical_text($_[0]) }
+
+sub _canonical_text {
+  my ($x, $seen) = @_;
+  return 'undef' unless defined $x;
+  unless (ref $x) {
+    (my $s = "$x") =~ s{(["\\])}{\\$1}g;
+    return qq{"$s"};
+  }
+
+  $seen ||= {};
+  my $addr = refaddr $x;
+  return '*' . $seen->{$addr} if exists $seen->{$addr};
+  $seen->{$addr} = scalar keys %$seen;
+
+  my $class = blessed $x;
+  my $type  = reftype $x;
+  my $text;
+  if    ($type eq 'HASH')  { $text = '{' . join(',', map { _canonical_text($_) . '=>' . _canonical_text($x->{$_}, $seen) } sort keys %$x) . '}' }
+  elsif ($type eq 'ARRAY') { $text = '[' . join(',', map { _canonical_text($_, $seen) } @$x) . ']' }
+  elsif ($type eq 'SCALAR' or $type eq 'REF') { $text = '\\' . _canonical_text($$x, $seen) }
+  elsif ($type eq 'REGEXP') { my ($pattern, $mods) = re::regexp_pattern($x); $text = 'qr' . _canonical_text("$pattern/$mods") }
+  else { $text = lc($type) . sprintf('(0x%x)', $addr) }
+  return defined $class ? "$class=$text" : $text;
 }
 
 sub dump_value ($) {
@@ -1263,8 +1324,11 @@ sub _trace_text {
 
   if ($.) {
     my $handle = ${^LAST_FH};
-    $mess .= sprintf( ', <%s> %s %d', *{$handle}{NAME}, ( $/ eq "\n" ? 'line' : 'chunk' ), $. )
-      if $handle;
+    # Carp up to 1.40 (perl 5.24 and older) names the handle only for a
+    # line read; from 1.42 on it names a chunk read as well
+    my $mode = $/ eq "\n" ? 'line' : 'chunk';
+    $mess .= sprintf( ', <%s> %s %d', *{$handle}{NAME}, $mode, $. )
+      if $handle and ( $mode eq 'line' or $Carp::VERSION >= 1.42 );
   }
   $mess .= ".\n";
 
@@ -1326,9 +1390,36 @@ DBIO::Util - Internal utility functions for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 METHODS
+
+=head2 deep_copy
+
+  my $copy = DBIO::Util::deep_copy($structure);
+
+A deep copy of hashes, arrays and scalar references (blessed ones keep their
+class; cycles stay cycles in the copy). Everything else a reference can point
+at, a C<qr//> object, a code reference, a glob, is B<shared>, not cloned: none
+of them is changed through a copy. L<Storable/dclone> does the same on a
+current Perl, but a Storable before 3.08 (Perl before 5.28) dies on a regular
+expression, so code that copies a structure which may hold one uses this.
+
+=head2 canonical_text
+
+  my $text = DBIO::Util::canonical_text($value);
+
+The canonical text of a value, for deciding whether two values are the same:
+equal text is an equal value. Hash keys are sorted, blessed hashes, arrays and
+scalar references carry their class and are written by content, a plain scalar
+reference by content, a C<qr//> object by pattern and flags, and a code
+reference (or a glob, a handle, any other reference) by identity, so the same
+sub is one value and two subs are two. C<undef> is told apart from the empty
+string. A string and a number of the same text are the same value: the
+internal flags Perl keeps beside a value (before 5.36 reading a string as a
+number sets some) are not part of it. A reference met again inside its own
+structure is written as C<*N>, N being the order of its first visit, so cycles
+end. Unlike L<Storable>, it never dies on a code reference.
 
 =head2 assert_class_name
 

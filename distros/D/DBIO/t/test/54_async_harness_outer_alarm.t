@@ -1,8 +1,17 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 use POSIX ();
 use Time::HiRes ();
+
+BEGIN {
+  # The claim is about fractions of a second; where Time::HiRes has no alarm
+  # (Windows: "unimplemented in this platform") there is nothing to measure.
+  my $hires = do { local $@; eval { Time::HiRes::alarm(0); 1 } };
+  plan skip_all => 'Time::HiRes::alarm is not implemented on this platform: no alarm in fractions of a second'
+    unless $hires;
+}
 
 use DBIO::Test::Future ();
 use DBIO::Test::AsyncHarness;
@@ -115,12 +124,16 @@ sub arm {
 # is. Read by taking it off the clock and putting it back at once.
 sub due {
   my $before = now();
-  my $left   = Time::HiRes::alarm(0) or return undef;
+  my $left   = Time::HiRes::alarm(0);
+  # Some systems keep perl's alarm apart from Time::HiRes's (Solaris), and
+  # some answer a timer that has fired with a negative time left (Cygwin).
+  $left = CORE::alarm(0) unless $left > 0;
+  return undef unless $left > 0;
   Time::HiRes::alarm($left);
   return [ $before + $left, now() + $left ];
 }
 
-sub disarm { Time::HiRes::alarm(0); return }
+sub disarm { Time::HiRes::alarm(0); CORE::alarm(0); return }
 
 sub is_due {
   my ($got, $want, $name) = @_;
@@ -174,6 +187,12 @@ sub death_of (&) {
   my $h = harness(timeout => 1);
   local $SIG{ALRM} = sub { };
   my $want = arm(3, 'builtin');
+  # Where perl's alarm and Time::HiRes's are two timers (Solaris), what is left
+  # of the first can only be had in whole seconds, rounded up: the claim of not
+  # rounding is about the one timer and cannot be made there.
+  my $one_timer = Time::HiRes::alarm(0);
+  Time::HiRes::alarm($one_timer) if $one_timer > 0;
+  $want->[1] += 1 unless $one_timer > 0;
   is $h->await(done_after($h, 25, 'value')), 'value', "$l: await returns the value";
   is_due(due(), $want, "$l: it is still running, due when it was due");
   disarm();

@@ -3,7 +3,7 @@ package DBIO::Test::Schema::NoSuchClass;
 
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -24,7 +24,7 @@ DBIO::Test::Schema::NoSuchClass - Test non-result class for load_classes error t
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

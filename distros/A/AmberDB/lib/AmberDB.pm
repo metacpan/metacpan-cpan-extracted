@@ -24,7 +24,7 @@ use parent qw(
 our $DB_HASH;
 our $hash_info;
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2005-01-28';
 
 
@@ -44,10 +44,21 @@ sub new {
     $self->{_cfg}     = delete $self->{cfg}     // delete $self->{config} // $self->{_cfg}     // {};
     $self->{_path}    = delete $self->{path}    // $self->{_path}    // {};
     $self->{_connect} = delete $self->{connect} // $self->{_connect} // {};
+    $self->{_srv}     = delete $self->{srv}     // delete $self->{_srv};
 
-    $self->{_dbase} ||= {};
-    $self->{_table} ||= {};
-    $self->{_norm}  ||= {};
+    if ( $self->{_srv} ) {
+        $self->{_dbase} = $self->{_srv}->{_dbase} ||= {};
+        $self->{_table} = $self->{_srv}->{_table} ||= {};
+        $self->{_norm}  = $self->{_srv}->{_norm}  ||= {};
+        $self->{_path}  = { %{ $self->{_srv}->{_path} || {} }, %{ $self->{_path} || {} } };
+        $self->{_cfg}   = { %{ $self->{_srv}->{_cfg}  || {} }, %{ $self->{_cfg}  || {} } };
+    }
+    else {
+        $self->{_dbase} ||= {};
+        $self->{_table} ||= {};
+        $self->{_norm}  ||= {};
+    }
+
     $self->{_cache} ||= {};
     $self->{_auth}  ||= {};
     $self->{_pid}   ||= {};
@@ -65,6 +76,9 @@ sub new {
 
     $self->{_cfg}->{user}     ||= $self->{_connect}->{username};
     $self->{_cfg}->{language} ||= "gb";
+    if ( exists $self->{_cfg}->{simple} ) {
+        $self->{_cfg}->{use_simple} //= delete $self->{_cfg}->{simple};
+    }
     if ( defined $self->{_cfg}->{use_ramdisk} ) {
         $self->{_cfg}->{use_ramdisk} = $self->_normalize_ramdisk_tier( $self->{_cfg}->{use_ramdisk} );
         if ( $self->{_cfg}->{use_ramdisk} == 3 ) {
@@ -103,7 +117,19 @@ sub new {
     bless $self, $class;
 
     # Initialise locale engine — reads _cfg->{language} (default "gb" - Global Base).
-    $self->_load_locale($self->config('language'));
+    my $lang = $self->config('language') || 'gb';
+    if ( $self->{_srv} && $self->{_srv}->{_locale} && ( $self->{_srv}->{_lang} || '' ) eq $lang ) {
+        for my $k ( qw(
+            _lang _locale _collator _uc_re _lc_re _sort_re _accent_re
+            _ascii_re _search_re _search_map _phonetic_rules _safe_re
+            _letter_re _splitter_re _html_entities _letter_chars
+        ) ) {
+            $self->{$k} = $self->{_srv}->{$k};
+        }
+    }
+    else {
+        $self->_load_locale($lang);
+    }
 
     $self->init_date();
     my %custom_paths = %{ $self->{_path} || {} };
@@ -130,7 +156,7 @@ sub new {
         qw(
             _dbase _table _norm _cache _date _auth _pid _txn _db _dbm _fd _tie
             _lock _lastid _error _adb _rdbm_memo say _connect
-            _path _cfg db_ext ext date locale slug_max_len _no_txn
+            _path _cfg db_ext ext date locale slug_max_len _no_txn _srv srv
             day day_id dayname days hour hour_id minute minute_id
             month month_id monthname months only_time second second_id
             date_short date_str time year year_dir
@@ -158,8 +184,14 @@ sub new {
     lock_value( %$self, '_path' );
     lock_value( %$self, '_cfg' );
     lock_value( %$self, '_connect' );
+    lock_value( %$self, '_srv' ) if exists $self->{_srv};
 
     return $self;
+}
+
+sub srv {
+    my $self = shift;
+    return $self->{_srv};
 }
 
 # When the object is destroyed, close all open DB files.
@@ -307,7 +339,7 @@ sub insert_id {
         $self->recs_back( "add", $tableid, \@record );
     }
 
-    if ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) {
+    if ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) {
         $self->_invalidate_child_ramdisk_tables($tableid);
         return $rid;
     }
@@ -390,7 +422,7 @@ sub insert_list {
       and do { cluck "[DB_TIE] No authority to write to the file.\n"; return; };
 
     my $table_info = $self->table_info($tableid);
-    my $is_simple  = $self->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $is_simple  = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} );
 
     my $table_path = $self->table_path($tableid);
     my $file_path  = "$table_path.$self->{db_ext}";
@@ -717,7 +749,7 @@ sub update_id {
           or cluck "[DB_TIE] Backup error (edit). $tableid\n";
     }
 
-    if ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) {
+    if ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) {
         $self->_invalidate_child_ramdisk_tables($tableid);
         return $rid;
     }
@@ -792,7 +824,7 @@ sub update_list {
       and do { cluck "[DB_TIE] No authority to write to the file.\n"; return; };
 
     my $table_info = $self->table_info($tableid);
-    my $is_simple  = $self->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $is_simple  = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} );
 
     my $table_path = $self->table_path($tableid);
     my $file_path  = "$table_path.$self->{db_ext}";
@@ -1151,7 +1183,7 @@ sub update_field {
     $self->ramdisk_delete( $tableid, $rid );
     $self->recs_back( "edit", $tableid, \@new_rec );
 
-    ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) and return 1;
+    ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) and return 1;
 
     my @pairs = ( [ $rid, \@old_rec, \@new_rec ] );
     if ( $table_info->{use_junk} ) {
@@ -1295,7 +1327,7 @@ sub insert_field {
     $self->ramdisk_delete( $tableid, $rid );
     $self->recs_back( "edit", $tableid, \@new_rec );
 
-    ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) and return 1;
+    ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) and return 1;
 
     my @pairs = ( [ $rid, \@old_rec, \@new_rec ] );
     if ( $table_info->{use_junk} ) {
@@ -1458,7 +1490,7 @@ sub delete_field {
         $self->recs_back( "edit", $tableid, \@new_rec );
     }
 
-    ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) and return 1;
+    ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) and return 1;
 
     my $idx_path = ( $use_ramdisk && $ramdisk_path ) ? $ramdisk_path : $table_path;
     my @pairs = ( [ $rid, \@old_rec, \@new_rec ] );
@@ -1589,7 +1621,7 @@ sub delete_id {
     $self->set_cache( $tableid, 'keys', undef );
     $self->set_cache( $tableid, 'count', undef );
 
-    ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) and return $rid;
+    ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) and return $rid;
 
     my @record = ( $rid, $self->db_decode($record) );
 
@@ -1642,7 +1674,7 @@ sub delete_list {
       and do { cluck "[DB_TIE] No authority to write to the file. $tableid\n"; return; };
 
     my $table_info = $self->table_info($tableid);
-    my $is_simple  = $self->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $is_simple  = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} );
 
     my $table_path = $self->table_path($tableid);
     my $file_path  = "$table_path.$self->{db_ext}";
@@ -3146,7 +3178,7 @@ sub read_all {
     }
 
     # 1. Primary record index (.inx binary key sequence)
-    my $is_simple = $self->config('simple') || ( $table_info->{use_simple} ) || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    my $is_simple = $self->config('use_simple') || ( $table_info->{use_simple} ) || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     if ( !$is_simple && $table_info->{record_index} && !$no_index ) {
         my $index_path = ( -e "$idx_path.inx" ) ? "$idx_path.inx" : "$table_path.inx";
         my $use_junk   = $table_info->{use_junk};
@@ -3253,7 +3285,7 @@ sub read_all {
         @records = $self->sort_by_block( $tableid, \@records, $opts{sort} );
     }
     else {
-        my $id_sort_type = ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
+        my $id_sort_type = ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
         @records = $self->array_sort( $id_sort_type, $dir, undef, @records );
     }
 
@@ -3810,7 +3842,7 @@ sub field_fetch {
             @records = $self->sort_by_block( $tableid, \@records, $opts{sort} );
         }
         elsif ( $jnkmode eq 'ALL' ) {
-            my $id_sort_type = ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
+            my $id_sort_type = ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
             @records = $self->array_sort( $id_sort_type, $dir, undef, @records );
         }
 
@@ -3865,7 +3897,7 @@ sub field_fetch {
             @records = $self->sort_by_block_records( $tableid, \@records, $opts{sort} );
         }
         else {
-            my $id_sort_type = ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
+            my $id_sort_type = ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
             @records = $self->array_sort( $id_sort_type, $dir, 0, @records );
         }
         $count = scalar @records;
@@ -4785,7 +4817,7 @@ sub search_table {
             my $dir    = $s_norm->{dir};
 
             if ( !$s_blk || $s_blk eq '0' || $s_blk eq 'id' ) {
-                my $id_sort_type = ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
+                my $id_sort_type = ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
                 @records = $self->array_sort( $id_sort_type, $dir, undef, @records );
             }
             else {
@@ -5110,7 +5142,7 @@ sub table_count {
     return $cached_count if defined $cached_count;
 
     my $count = 0;
-    my $is_simple = $self->config('simple') || ( $table_info && $table_info->{use_simple} ) || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    my $is_simple = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) || ( $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
 
     # Read from index file if record_index exists and table is not in simple mode, otherwise count all records
     if ( !$is_simple && $table_info->{record_index} ) {
@@ -5304,7 +5336,7 @@ sub table_keys {
     @keys = $self->recs_keys($scan_path);
     $self->table_close($scan_path);
 
-    my $id_sort_type = ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
+    my $id_sort_type = ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) ? 'ascii' : 'num';
     @keys = grep { defined $_ && $_ > 0 } @keys if $id_sort_type eq 'num';
     if ( $dir eq 'asc' ) {
         @keys = sort { $id_sort_type eq 'num' ? ( $a <=> $b ) : ( $a cmp $b ) } @keys;
@@ -5399,7 +5431,7 @@ sub id_check {
     return if ref $rid;
 
     my $table_info = $tableid ? $self->table_info($tableid) : {};
-    my $is_simple  = $self->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $is_simple  = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} );
 
     # 1. Simple Mode: Safe Key Sanitization (no binary control chars, max 255 bytes)
     if ($is_simple) {
@@ -5424,7 +5456,7 @@ sub table_autoid {
 
     $tableid or return;
     my $table_info = $self->table_info($tableid);
-    my $is_simple  = $self->config('simple') || ( $table_info && $table_info->{use_simple} );
+    my $is_simple  = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} );
 
     if ( defined $aid && $aid ne '' && $aid ne '0' ) {
         $aid = $self->id_check( $tableid, $aid );
@@ -6581,7 +6613,7 @@ sub recs_back {
     my $time_str = $self->date_str;
 
     my $backup_file;
-    if ( $self->config('simple') ) {
+    if ( $self->config('use_simple') ) {
         $backup_file = "$backup_base/$date_iso.csv";
     }
     else {
@@ -6938,7 +6970,7 @@ Furthermore, if the user truly wants to perform an operation on the list using t
 
 =head1 SIMPLE MODE (SCHEMA-LESS FLAT STORE)
 
-In addition to its schema-driven enterprise mode, AmberDB provides a lightweight B<Simple Mode> (C<simple =E<gt> 1>). In Simple Mode, the database operates as an ultra-fast, schemaless NoSQL key-value/document store directly on flat C<.db> (or custom extension) files without secondary binary indexes (C<.inx>, C<.src>, C<.fld>, C<.fac>, C<.slg>, C<.aut>, C<.del>).
+In addition to its schema-driven enterprise mode, AmberDB provides a lightweight B<Simple Mode> (C<use_simple =E<gt> 1>). In Simple Mode, the database operates as an ultra-fast, schemaless NoSQL key-value/document store directly on flat C<.db> (or custom extension) files without secondary binary indexes (C<.inx>, C<.src>, C<.fld>, C<.fac>, C<.slg>, C<.aut>, C<.del>).
 
 =head2 Key Characteristics of Simple Mode
 
@@ -6965,7 +6997,7 @@ In addition to its schema-driven enterprise mode, AmberDB provides a lightweight
   # 1. Initialize simple mode
   my $adb = AmberDB->new(
       path => { dbase_dir => "/var/data/sessions" },
-      cfg  => { simple    => 1, user => 'admin' },
+      cfg  => { use_simple    => 1, user => 'admin' },
   );
 
   # 2. Insert with arbitrary key
@@ -6980,7 +7012,7 @@ In addition to its schema-driven enterprise mode, AmberDB provides a lightweight
   # 5. Volatile in-memory simple store
   my $ram_db = AmberDB->new(
       path => { dbase_dir => "/dev/shm/amberdb_tokens" },
-      cfg  => { simple    => 1, no_backup => 1 },
+      cfg  => { use_simple    => 1, no_backup => 1 },
   );
   $ram_db->insert_id('tokens', $token_id, $user_id, time());
 
@@ -7060,12 +7092,19 @@ AmberDB provides standalone command-line utilities in its C<bin/> directory for 
 
 =head2 new(%options)
 
-Instantiates a new C<AmberDB> object.
+Instantiates a new C<AmberDB> object. Accepts C<cfg>, C<path>, C<connect>, and optional C<srv> (a shared master C<AmberDB> instance for lightweight request-scoped sessions that reuse compiled locale and schema caches).
 
     my $adb = AmberDB->new(
         cfg  => { language => "gb" },
         path => { dbase_dir => "./dbstore" },
     );
+
+    # Request-scoped session backed by a persistent master instance:
+    my $req_adb = AmberDB->new( srv => $adb );
+
+=head2 srv()
+
+Returns the shared master C<AmberDB> engine reference passed via C<< srv => $master >> at construction, or C<undef> if running as a standalone instance.
 
 =head2 config([$key], [%options])
 
@@ -7081,7 +7120,7 @@ Gets or sets runtime configuration flags deterministically with automatic hook/s
     $adb->config( language => 'gb', no_write => 1 );
 
     # Hashref setter
-    $adb->config({ simple => 1, ramdisk_size => '1024M' });
+    $adb->config({ use_simple => 1, ramdisk_size => '1024M' });
 
 =head2 insert_id($table_id, [$record_id], @record)
 

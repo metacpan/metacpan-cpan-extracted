@@ -4,17 +4,17 @@ use common::sense;
 use AnyEvent ();
 use AnyEvent::HTTP ();
 use AnyEvent::MCP ();
-use AnyEvent::MCP::File ();
+use AnyEvent::MCP::Config ();
 use Digest::SHA ();
 use MIME::Base64 ();
 use JSON::XS ();
-use Encode ();
 
+# OAuth form parameters are Unicode text; escape the UTF-8 bytes.
 sub encode {
    my ($str) = @_;
-   $str = Encode::encode_utf8 ($str) if utf8::is_utf8 ($str);
-   $str =~ s/([^A-Za-z0-9._~-])/sprintf "%%%02X", ord $1/ge;
-   $str
+   my $bytes = AnyEvent::MCP::utf8enc $str;
+   $bytes =~ s/([^A-Za-z0-9._~-])/sprintf "%%%02X", ord $1/ge;
+   $bytes
 }
 
 sub form {
@@ -27,7 +27,7 @@ sub decode {
    $str =~ /%(?![a-fA-F0-9]{2})/ and die "Invalid OAuth redirect URL encoding\n";
    $str =~ tr/+/ /;
    $str =~ s/%([a-fA-F0-9]{2})/chr hex $1/ge;
-   $str
+   AnyEvent::MCP::utf8dec $str
 }
 
 sub b64url {
@@ -199,17 +199,13 @@ sub finish {
 
 sub refresh {
    my ($file, $kv) = @_;
-   my $lock = AnyEvent::MCP::File::lock $file;
-   open my $fh, "<:raw", $file or die "$file: $!\n";
-   local $/;
-   my $data = <$fh>;
-   close $fh;
-   my %current;
-   AnyEvent::MCP::parse_ini $data, sub {
-      my ($section, $values) = @_;
-      $section eq "" || $section eq "account" or die "$file: invalid account section\n";
-      %current = (%current, %$values);
-   }, $file;
+   my $lock = AnyEvent::MCP::file_lock $file;
+   my $sections = AnyEvent::MCP::Config::parse_ini (AnyEvent::MCP::file_load ($file), $file);
+   for (@$sections) {
+      $_->[0] eq "" || $_->[0] eq "account"
+         or die "$file: invalid account section\n";
+   }
+   my %current = %{AnyEvent::MCP::Config::merge_sections ($sections, "account")->{account}};
    for my $key (qw(method server user tls port oauth-client-id oauth-client-secret
                    oauth-client-auth oauth-token-endpoint oauth-scope oauth-sasl)) {
       ($current{$key} // "") eq ($kv->{$key} // "")
@@ -218,13 +214,13 @@ sub refresh {
    my $encoded = $current{"oauth-refresh-token-base64"};
    defined $encoded && $encoded =~ /\A[A-Za-z0-9+\/]*={0,2}\z/
       or die "Missing OAuth refresh token; run mcp-imap login again\n";
-   my $old = MIME::Base64::decode_base64 ($encoded);
+   my $old = AnyEvent::MCP::utf8dec (MIME::Base64::decode_base64 $encoded);
    length $old or die "Empty OAuth refresh token\n";
    my $new = token ($kv, grant_type => "refresh_token", refresh_token => $old);
    if (defined $new->{refresh_token} && $new->{refresh_token} ne $old) {
-      $current{"oauth-refresh-token-base64"} = MIME::Base64::encode_base64 ($new->{refresh_token}, "");
-      AnyEvent::MCP::File::replace $file, "[account]\n"
-         . (join "", map "$_ = $current{$_}\n", sort keys %current);
+      $current{"oauth-refresh-token-base64"} = MIME::Base64::encode_base64 (AnyEvent::MCP::utf8enc $new->{refresh_token}, "");
+      AnyEvent::MCP::file_save $file,
+         AnyEvent::MCP::Config::serialize_ini [["account", \%current]];
    }
    close $lock;
    $new->{access_token}

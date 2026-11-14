@@ -27,7 +27,7 @@ Applications that do not expose workdirs do not need this module.
    $registry->refresh; # repeat periodically while the server runs
 
 See L<mcp-fs/SANDBOX GRANTS> for how the server interprets these IDs,
-and L<AnyEvent::MCP::File> for the locked state-file operations.
+and L<AnyEvent::MCP/SMALL UTILITIES> for the locked state-file operations.
 
 =head1 METHODS
 
@@ -59,7 +59,6 @@ package AnyEvent::MCP::Workdirs;
 
 use common::sense;
 use AnyEvent::MCP ();
-use AnyEvent::MCP::File ();
 use JSON::XS ();
 
 our @ISA = qw(AnyEvent::MCP::Base);
@@ -89,7 +88,7 @@ sub new {
    my ($class, %kv) = @_;
 
    my $self = $class->SUPER::new (expiry => 7 * 86400, %kv);
-   my $lock = AnyEvent::MCP::File::lock $self->{file};
+   my $lock = AnyEvent::MCP::file_lock $self->{file};
    my $entries = $self->_read ($lock);
    my $now = time;
    my %active = map { $_ => 1 } @{$self->{paths}};
@@ -114,7 +113,7 @@ sub new {
    }
 
    # reserve allocations before another server can choose the same IDs.
-   AnyEvent::MCP::File::replace $self->{file}, $json->encode ($entries);
+   AnyEvent::MCP::file_replace $self->{file}, $json->encode ($entries);
    $self->{ids} = \@ids;
 
    $self
@@ -123,7 +122,7 @@ sub new {
 sub refresh {
    my ($self) = @_;
 
-   my $lock = AnyEvent::MCP::File::lock $self->{file};
+   my $lock = AnyEvent::MCP::file_lock $self->{file};
    my $entries = $self->_read ($lock);
    my $now = time;
 
@@ -135,7 +134,7 @@ sub refresh {
       delete $entries->{$id} if $entries->{$id}[1] <= $now - $self->{expiry};
    }
 
-   AnyEvent::MCP::File::replace $self->{file}, $json->encode ($entries);
+   AnyEvent::MCP::file_replace $self->{file}, $json->encode ($entries);
 }
 
 1;

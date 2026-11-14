@@ -5,7 +5,7 @@ use warnings;
 use utf8;
 use Carp qw(croak cluck);
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2026-08-06';
 
 # Master ISO 4217 Currency Dictionary
@@ -57,9 +57,5 @@ sub cur_name {
 sub cur_all {
     return map { [ $_, $CURRENCIES{$_}->{name} ] } @CURRENCY_ORDER;
 }
-
-# Aliases
-*by_code = \&cur_code;
-*all     = \&cur_all;
 
 1;

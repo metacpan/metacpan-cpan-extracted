@@ -1,5 +1,48 @@
 Revision history for Test-Log-Abstraction
 
+0.002.2
+	[ Security ]
+	- Printed messages and levels show control characters (except tab and
+		newline) as \xNN, so fixture text cannot send terminal control
+		sequences.  The stored message is unchanged; see COMMON PITFALLS
+	- Values repeated in errors and warnings show Unicode bidi controls
+		as \x{NNNN}
+	- Printing a character string that is not valid UTF-8 no longer dies
+		or warns: each bad part is shown as U+FFFD
+	[ Bug Fixes ]
+	- carp, croak, get_params, validate_strict, qv and Readonly were
+		callable as logger methods, so $logger->croak('x') died and
+		$logger->carp('x') warned.  They now go to AUTOLOAD like any
+		other unknown method
+	- like() and unlike() no longer warn on Perl 5.42 for a pattern that
+		is not valid UTF-8; they croak with the same reason everywhere
+	- A failing like(), unlike(), has_level() or empty() inside a subtest
+		is reported at the caller's line, not inside Test::Builder
+	- Logging no longer dies or warns on hostile arguments: tied values
+		whose FETCH dies, references blessed into ARRAY or HASH, text
+		that is not valid UTF-8 or holds a surrogate, and arguments such
+		as substr($s, 10).  Each argument is read exactly once, in order
+	- i18n() no longer dies on a template or gender object whose
+		overloaded "" dies
+	- Rendering deeply nested data is linear: a hash nested 80,000 deep
+		took 11 seconds to log
+	- An invalid argument containing "validate_strict:" is reported in
+		full instead of being cut at those words
+	- With -Duselongdouble, a too-big integer placeholder such as %{v}d
+		of 1e19 is shown as written (1e+19).  Fixes GitHub#3
+	[ Packaging ]
+	- autodie and IPC::System::Simple are no longer needed
+	- Log::Abstraction is recommended for testing, not required
+	- The META licence is gpl_2, matching LICENSE and the POD
+	[ Documentation ]
+	- The API SPECIFICATION domains cover encodings, fake array and hash
+		references, nesting depth, unreadable arguments and the edges of
+		plural forms and gender
+	- STATE DIAGRAM lists _emit on a logger; the _emit POD says the
+		message is stored before _emit is called
+	- COMMON PITFALLS explains that how a number is "shown as written"
+		depends on how perl was built
+
 0.002.1	Tue Oct 27 02:56:03 PM EDT 2026
 	[ Enhancements ]
 	- The level names and severities now come from Readonly::Values::Syslog,

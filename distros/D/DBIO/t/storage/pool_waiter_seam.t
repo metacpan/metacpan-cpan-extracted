@@ -49,7 +49,8 @@ use DBIO::Test::Future ();
   our @ISA = ('DBIO::Test::Future');
 }
 
-my $have_future = eval { require Future; 1 };
+# set_udata/udata on real Futures need Future 0.50 or newer.
+my $have_future = eval { require Future; Future->VERSION('0.50'); 1 };
 if ($have_future) {
   package K256::FutureWaiter;
   our @ISA = ('Future');
@@ -64,7 +65,11 @@ if ($have_future) {
     my $class = $self->future_class eq 'Future'
       ? 'K256::FutureWaiter' : 'K256::TestWaiter';
     my $waiter = $class->new;
-    Scalar::Util::weaken( $waiter->{pool} = $self );
+    # Laid on the Future through udata, which Future::XS objects (no hashes)
+    # have as well; in a box, as a copy of a weak reference is a strong one.
+    my $box = \(my $pool = $self);
+    Scalar::Util::weaken($$box);
+    $waiter->set_udata(pool => $box);
     return $waiter;
   }
 }
@@ -104,7 +109,7 @@ sub failure {
 
 my @future_classes = ('DBIO::Test::Future');
 push @future_classes, 'Future' if $have_future;
-note 'Future.pm not installed: checked with DBIO::Test::Future only'
+note 'Future.pm 0.50 or newer not installed: checked with DBIO::Test::Future only'
   unless $have_future;
 
 
@@ -143,7 +148,7 @@ for my $fc (@future_classes) {
     isa_ok $slot, $waiter_class, "$fc, override: the queued Future";
     is Scalar::Util::refaddr($slot), Scalar::Util::refaddr($pool->{_waiters}[0]),
       "$fc, override: it is the one in the queue";
-    is Scalar::Util::refaddr($slot->{pool}), Scalar::Util::refaddr($pool),
+    is Scalar::Util::refaddr(${ $slot->udata('pool') }), Scalar::Util::refaddr($pool),
       "$fc, override: carrying what the transport marked it with";
 
     my $caller = $pool->acquire;

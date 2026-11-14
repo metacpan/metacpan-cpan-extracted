@@ -4,13 +4,13 @@ Reference for `dbio-driver-development`. Load when a driver ships an async adapt
 
 ## AccessBroker
 
-All drivers support AccessBroker. Pass broker to `Schema->connect($broker)` instead of raw DSN. **Broker interface and connect forms live in the dbio-core skill.**
+All drivers support AccessBroker. Pass broker to `Schema->connect($broker)` instead of raw DSN. **Broker interface and connect forms live in the dbio-core skill, `references/access-broker.md`.**
 
 - **Sync storage:** `DBIO::Storage::DBI` takes `[ $broker ]` / `[ $broker, \%options ]`, asks the broker on every connect, and builds the DSN of a connection-parameter answer (Static) for the DBD your storage class registered (`register_driver`). The schema declares your driver (ADR 0059, 0067), so the storage that builds it is yours.
 - **`_connect_params_dsn($driver, \%params)`** (ADR 0057): override it when your DBD does not take the default form `dbi:<DBD>:dbname=…;host=…;port=…`. It gets your registered DBD name and only the parts given (`dbname`/`host`/`port`, defined and non-empty, no `;`) and returns the DSN string — nothing else: core removes the parts from the DBI attributes, resolves the driver, refuses `;` and takes a `dbi:…` dbname as the DSN before asking. A DBD with no form these parts can fill throws here, naming what it needs (core's ODBC storage does).
 - **`_async_broker_conninfo($mode)`** (async transport; a direct `DBIO::Storage::Async` subclass such as an ev backend must provide it, the base croaks; `DBIO::Async::Storage` already provides it — a `future_io` adapter fills only `_normalize_conninfo`): turn the broker's current answer into one connection's conninfo. Core asks it anew for each new connection via `_conninfo_provider`, so rotated credentials reach the next one. The built-in brokers answer two shapes — connection parameters (Static, HostBound over it) and DBI form `[ $dsn, $user, $password, \%attrs ]` (Vault, HostBound over it). Take both; strip a DBI-form answer's attrs with `_strip_private_connect_attrs` (Vault selects the mode with `async` there, no DBD attribute); croak naming the shape, never the values. An empty answer is refused: read the answer through `current_access_broker_connect_info` (or `_current_async_connect_info`), which throws on `undef`, `{}`, `[]` or a false value, naming the broker class — never fall back to the conninfo `connect_info` stored.
 - **`broker_connect_options`** in `transport_capabilities`: declare it once the transport applies the options an owner hands it beside the broker, `[ $broker, \%options ]` — `pool_size` sizes the pool (core `connect_info` does this; a transport overriding `connect_info` reads them via `_access_broker_call_options`), and the DBD attributes (`_access_broker_call_attributes`) are merged into every conninfo built from the broker with `_merge_access_broker_settings`. Undeclared, a broker connection whose options carry DBD attributes or `pool_size` refuses the transport at first async use. Core's async `_is_access_broker_connect_info` stays single-element, so an overriding `connect_info` never takes `[ $broker, \%options ]` for the bare form.
-- **A broker comes and goes in one place** (karr core k273, k283, k293): `set_access_broker` attaches it on an async storage -- `_setup_access_broker` is the same call -- and forgets what the connect info before left (stored conninfo, pool size, options, what stood beside a broker). `clear_access_broker` detaches it and what came with it; the provider stays and refuses from then on, on the storage and in a pool built with it: the next spawn fails `<class> has no AccessBroker attached to ask for connect info`, and so does a listen connection opened through the provider. `_clear_access_broker` forgets the provider and the static slots too -- the state of a storage never given connect info. A transport overriding `connect_info` calls one of the two **before** it reads the new connect info, so a call that throws leaves nothing of the call before (ADR 0050). A detach on the owning sync storage detaches the embedded backend too; a backend not built yet is refused.
+- **A broker comes and goes in one place:** `set_access_broker` attaches it on an async storage -- `_setup_access_broker` is the same call -- and forgets what the connect info before left (stored conninfo, pool size, options, what stood beside a broker). `clear_access_broker` detaches it and what came with it; the provider stays and refuses from then on, on the storage and in a pool built with it: the next spawn fails `<class> has no AccessBroker attached to ask for connect info`, and so does a listen connection opened through the provider. `_clear_access_broker` forgets the provider and the static slots too -- the state of a storage never given connect info. A transport overriding `connect_info` calls one of the two **before** it reads the new connect info, so a call that throws leaves nothing of the call before (ADR 0050). A detach on the owning sync storage detaches the embedded backend too; a backend not built yet is refused.
 
 ## Async Drivers (ADR 0030/0031)
 
@@ -31,19 +31,19 @@ takes the first loadable `<class>::Async` (`DBIO::X::Storage` → `DBIO::X::Stor
 and stops before `DBIO::Storage::DBI`; an extension subclass without an adapter of its own
 inherits its nearest parent's. An explicit `register_async_mode(future_io => ...)` on a
 concrete class wins; a same-named class that is no `DBIO::Storage::Async` croaks; a driver
-that ships none croaks early (ADR 0030 refinement, karr core k65).
+that ships none croaks early (ADR 0030 refinement).
 
 **Async rides the same layers.** When a layered schema connects
 `{ async => $mode }`, core (1) resolves the transport off the composition
 **BASE** — the driver, never the layers (`_async_resolution_class` strips the
 layers back out of the linearised ISA, so a sync layer's plain `<Layer>::Async`
-mixin is never mistaken for the transport, karr core k70/k67) — then (2) mirrors each
+mixin is never mistaken for the transport) — then (2) mirrors each
 registered sync layer `L` onto its async counterpart: if `L` *defines*
 `async_layer_class($mode)`, its return value decides — a class name is loaded, `undef`
-**states** "deliberately sync-only" (ADR 0032 addendum 2026-09-25, karr core k159);
+**states** "deliberately sync-only" (ADR 0032 addendum);
 if `L` does not define the method, the convention sibling `${L}::Async` is used. A sync-only
 layer must declare itself that way — a layer with neither method nor sibling is refused
-(karr core k159, no silent skip). Core composes the mirrors **on top of** the transport. One behaviour, one transport: an extension's async behaviour
+(no silent skip). Core composes the mirrors **on top of** the transport. One behaviour, one transport: an extension's async behaviour
 rides every transport exactly as its sync behaviour rides every driver, with no
 hand-written extension×transport matrix. An async mirror that declares
 `required_transport_capabilities` the transport does not advertise croaks at
@@ -155,7 +155,7 @@ method; an async layer gates on it with `required_transport_capabilities`, and a
 shortfall croaks at compose time (a transport gap becomes *that transport's*
 ticket, never a silent feature loss).
 
-**Declaring nothing is not the unchecked case** (ADR 0032 addendum, karr core k118).
+**Declaring nothing is not the unchecked case** (ADR 0032 addendum).
 A layer with no `required_transport_capabilities` is taken to require the
 default async query seam `_query_async`, and a transport that does not provide
 it refuses the composition. Otherwise the protection worked by declaration
@@ -175,7 +175,7 @@ The two async transports for a driver carry different capability sets:
 
 | Feature | `future_io` (`DBIO::Async::Storage` base) | `ev` (`DBIO::X::EV::Storage`) |
 |---|---|---|
-| `on_connect_replay` (on_connect_do/call on pooled conns, karr core k68) | ✅ advertised | ✅ |
+| `on_connect_replay` (on_connect_do/call on pooled conns) | ✅ advertised | ✅ |
 | pooled CRUD + `txn_do_async` pinning | ✅ | ✅ |
 | LISTEN / NOTIFY (`listen`, `notify`) | ✅ Pg (native), MySQL (emulated) — declared by the adapter | ✅ Pg (native), MySQL (emulated) |
 | COPY | ❌ | ✅ Pg only |
@@ -187,7 +187,7 @@ adds `listen`, `notify` and `broker_connect_options` once it fills the driver ha
 needing those must select that mode (or the transport's dist grows the
 capability). `listen`/`notify` also gate core's own public methods; `pipeline`
 does not — core's `pipeline` works iff the transport overrides `_pipeline_enter`
-(seam probe, karr core k218), and the name matters only to layers.
+(seam probe), and the name matters only to layers.
 
 Implemented:
 - **DBIO::PostgreSQL::EV** (EV::Pg, libpq): the `ev` mode — native event-loop client: LISTEN/NOTIFY (native, on core's listen seams), COPY, pipeline (libpq pipeline mode), txn pinning. Sync methods block via `->get`.

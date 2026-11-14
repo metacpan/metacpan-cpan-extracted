@@ -1,5 +1,4 @@
-# The DBIO family standard is Perl 5.20 -- every driver dist already
-# requires it, core was the last holdout (karr k174).
+# The DBIO family standard is Perl 5.20, the same for core and every driver.
 #
 # This is a POLICY floor, set deliberately above the measured one. Core
 # carried 5.008001 verbatim from the DBIx::Class fork commit and the number
@@ -13,11 +12,9 @@ requires 'perl', '5.020';
 # mode. However it has never been tested yet, so consider XS for the time
 # being
 #
-# IMPORTANT - do not raise this dependency
-# even though many bugfixes are present in newer versions, the general DBIC
-# rule is to bend over backwards for available DBI versions (given upgrading
-# them is often *not* easy or even possible)
-requires 'DBI', '1.57';
+# 1.634, as the driver dists ask; older DBI releases such as 1.57 do not
+# build on current perls ('sv_undef' / 'sv_yes' undeclared).
+requires 'DBI', '1.634';
 
 # XS (or XS-dependent) libs
 requires 'Sub::Util', '1.70';
@@ -27,6 +24,7 @@ requires 'Sub::Quote', '2.006009';             # DBIO::Util (hard use)
 requires 'Class::Accessor::Grouped', '0.10014';
 requires 'File::ShareDir', '0';                 # DBIO::Skills sharedir lookup
 requires 'Class::C3::Componentised', '1.001002';
+requires 'Carp', '1.38';                        # DBIO::Util trace builder shows $Carp::MaxArgNums arguments, as Carp from 1.37_01 does
 requires 'Carp::Clan', '6.08';                  # DBIO::Generate schema loader (hard use)
 requires 'Context::Preserve', '0.03';
 requires 'Devel::GlobalDestruction', '0.14';
@@ -50,7 +48,7 @@ requires 'DateTime::Tiny', '1.08';
 #
 # No core module hard-`use`s DateTime or DateTime::Format::Strptime at compile
 # time any more. DateTime::Format::Strptime is loaded lazily, at first actual
-# parse/format inside DBIO::Storage::DateTimeFormat (karr k87), so a bare
+# parse/format inside DBIO::Storage::DateTimeFormat, so a bare
 # install that never inflates datetimes carries neither module. Both are needed
 # only for optional runtime paths — DateTime::Tiny's ->DateTime inflation,
 # DBIO::Timestamp with timestamp_class('DateTime'), InflateColumn::DateTime

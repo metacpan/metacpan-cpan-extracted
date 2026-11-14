@@ -1,0 +1,53 @@
+# large-subset-match-known.tsv (X27; post-0.11, 2026-11-10): why ours differs from a shell, where large-subset-matchreport.pl
+# cannot tell by itself (it knows A5: ours as dash where the shells differ at run time; messages on standard output with
+# each shell's prefix; and presumes "the program beats" where the text runs echo, printf, test, [, kill or pwd).  Columns (tab): WHO (a snippet ID; dep:CODE or
+# dep:CODE:KIND:NAME, as large-subset-env-setups.tsv writes the dependences: every sample with it; does:REGEX: every
+# setup whose description, what it did, matches); ENV (base, s1, s2, ..., or *; for does: *); RULE (a decision or rule
+# by name, with a few words; "(proposed)" at the end: not decided yet).  large-subset-environment.md, section 11.
+does:~\S*: HOME \[""\]	*	~ with HOME empty: an empty field, as bash and POSIX; dash drops it, ❰BUG❱ dash (proposed)
+does:~\S*: HOME unset	*	G16: ~ with HOME unset, the home from the password file, as bash
+does:cd: HOME unset	*	rule E (error): cd without HOME is an error, as bash
+NB:3199	*	rule E (harm): a pattern never matches . or .., as bash
+NB:5634	*	rule E (harm): a pattern never matches . or .., as bash
+NB:74	*	rule E (platform): [^...] negates, as bash and fnmatch(3)
+NB:9927	*	rule E (platform): [^...] negates, as bash and fnmatch(3)
+SC:Checks/Commands.hs:prop_checkReturn3	*	rule E (error): return outside a function is an error, as bash
+SC:Checks/Commands.hs:prop_checkReturn4	*	rule E (error): return outside a function is an error, as bash
+SC:Checks/Commands.hs:prop_checkExportedExpansions1	*	A4: export without a name lists the environment; outside the subset at run time, as the parser has it
+SC:Checks/Commands.hs:prop_checkExportedExpansions2	*	A4: export without a name lists the environment; outside the subset at run time, as the parser has it
+SC:Analytics.hs:prop_checkRedirectToSame5	base	messages: in a file with each shell's own prefix (the classes compare files byte by byte)
+SC:Analytics.hs:prop_checkRedirectToSame5	s1	messages: in a file with each shell's own prefix (the classes compare files byte by byte)
+NB:9721	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:9723	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:1757	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+TL:common/cppcheck.md:9	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+TL:linux/dialog.md:13	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+SC:Analytics.hs:prop_checkPipeToNowhere13	*	A5, and messages in a file with each shell's own prefix (2> bar before a redirection that fails)
+SC:Checks/Commands.hs:prop_checkSourceArgs2	*	the runner: . script sources its logger for the program script, which logs the shell's $0 (dash, bash, sh): no difference of the shells
+NB:2966	*	rule E (harm): a pattern never matches . or .., as bash ("${a}".*"${b}".*: the pattern .*.*)
+NB:9704	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:9707	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:9744	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:9745	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:9746	*	messages: in a file or a pipe with each shell's own prefix and wording (X47 fixed: ours writes them there too)
+NB:1523	*	chance: file times (find -printf %T@), which the assumption program does not cover
+NB:4355	*	chance: file times (ls -c), which the assumption program does not cover
+NB:5152	*	chance: inode numbers and times (ls -gilds), which the assumption program does not cover
+NB:8772	*	chance: the sizes of files the run writes meanwhile (find -printf %s), which the assumption program does not cover
+NB:1168	*	chance: the clock (/bin/date)
+NB:1871	*	A4: set without arguments (the program's output empty) lists the variables; outside the subset at run time, as the parser has it
+NB:1872	*	A4: set without arguments (the program's output empty) lists the variables; outside the subset at run time, as the parser has it
+NB:8235	*	A4: set without arguments (the program's output empty) lists the variables; outside the subset at run time, as the parser has it
+SC:Checks/Commands.hs:prop_checkReturn1	*	rule E (error): return outside a function is an error, as bash
+SC:Checks/Commands.hs:prop_checkReturn2	*	rule E (error): return outside a function is an error, as bash
+NB:1716	*	B2: interactive builtins do nothing here (set -o history)
+NB:4727	*	open: cd - with OLDPWD unset (dash prints the directory; ours prints nothing; TODO)
+TL:common/cd.md:24	*	open: cd - with OLDPWD unset (dash prints the directory; ours prints nothing; TODO)
+SC:Checks/Commands.hs:prop_checkPrintfVar3	*	Q2 (choice B): printf -v stays with the program
+SC:Checks/ShellSupport.hs:prop_checkBashisms30	*	Q2 (choice B): printf -v stays with the program
+does:glob (?:\S*/)?\.[^/\s]*[*?\[]\S*: \+	*	rule E (harm): a pattern never matches . or .., as bash (G2)
+NB:685	*	chance: two commands read one pipe in turn; how much the first takes depends on timing (10 runs each: dash, bash and ours all give both results)
+NB:5776	base	chance: tee truncates bar while cat reads it; how much is copied depends on timing (by hand, 200 runs each: dash and bash give both sizes, ours one of them)
+NB:6259	base	chance: xargs -P4 runs four echo at once; the order of their lines depends on timing (20 runs each: 17, 16 and 20 different orders; large-subset-env-races.tsv)
+TL:common/exec.md:8	*	open: X56 (ours): exec with a builtin's name runs the builtin; dash and bash look for a program (not found, 127); ours' status 248 is not A4 here (known issues, TODO)
+TL:linux/zenity.md:25	*	open: persistent, not a race (20 runs, post-0.11: ours' own result in every one): the shells' echo dies of SIGPIPE and ends the subshell, ours' fails alone and the subshell goes on (TODO A17)

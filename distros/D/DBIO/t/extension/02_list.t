@@ -137,4 +137,27 @@ ok !exists $by{citext}{installed} || !$by{citext}{installed}, 'no state for cite
 throws_ok { $list->set_installed({ nope => { installed => 1 } }) } 'DBIO::Exception',
   'state for an undeclared extension refuses (it is not in the list)';
 
+# --- option values compare by value, a code reference by identity -------------------
+{
+  my $sub = sub { 1 };
+  my $other = sub { 1 };
+  is_deeply(((build([ postgis => { on_load => $sub }, postgis => { on_load => $sub } ])->entries)[0]{options}),
+    { on_load => $sub }, 'the same code reference declared twice is one value');
+  throws_ok { build([ postgis => { on_load => $sub }, postgis => { on_load => $other } ]) }
+    'DBIO::Exception', 'two different subs are two values';
+  like "$@", qr/two values for option 'on_load'/, 'and say so';
+
+  my $text = '4326'; my $number = $text + 0;
+  lives_ok { build([ postgis => { srid => $text }, postgis => { srid => $number } ]) }
+    '4326 and the string 4326 (read as a number) are the same value';
+  lives_ok { build([ postgis => { srid => 4326 }, postgis => { srid => '4326' } ]) }
+    '4326 and the string 4326 are the same value';
+  throws_ok { build([ postgis => { srid => 4326 }, postgis => { srid => 4327 } ]) }
+    qr/two values for option 'srid'/, '4326 and 4327 stay two values';
+  lives_ok { build([ postgis => { re => qr/a/i }, postgis => { re => qr/a/i } ]) }
+    'the same pattern and flags are one value';
+  throws_ok { build([ postgis => { re => qr/a/i }, postgis => { re => qr/a/ } ]) }
+    qr/two values/, 'other flags are two values';
+}
+
 done_testing;

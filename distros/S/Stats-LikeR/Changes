@@ -1,5 +1,404 @@
 Revision history for Stats-LikeR
 
+0.3421 2026-11-13 CST (Claude Fable 5.2 helped)
+
+ [qnorm(), qt(), qchisq()]
+
+ - A probability at an end of its range is now answered before the
+   distribution parameter is validated, which is the order R takes
+   them in. qnorm(0, 0, -1) is -Inf and qnorm(1, 0, -1) is Inf;
+   qt(0, -1) is -Inf and qt(1, 0) is Inf; qchisq(0, -1) is 0 and
+   qchisq(1, -1) is Inf. The same holds for a log probability of -Inf
+   or 0 and for the upper tail. Up to 0.342 every one of these was
+   NaN, because the sd or df was checked first. R's qnorm.c, qt.c and
+   qgamma.c (which qchisq calls) run R_Q_P01_boundaries() ahead of the
+   parameter check; R 4.6.1's source was read for the order, and R
+   4.6.2 run for the values.
+ - Nothing else moves. An invalid parameter with a probability inside
+   the range is still NaN, as is a NaN parameter anywhere. qf() is
+   unchanged and has no such exception: R's qf.c checks df1 and df2
+   first, so qf(0, -1, 2) is NaN there and here. SciPy validates the
+   parameters first in all of these and returns nan; this module
+   follows R.
+ - t/distributions.q.ends.R.t is new: a frozen table of 388 R results
+   crossing both tails, both scales, the two ends and an interior p
+   with invalid, degenerate and NaN parameters, each called
+   positionally, by name and through an array reference (927
+   subtests). 104 of its rows fail against 0.342.
+
+ [mode()]
+
+ - mode() is faster and lighter where values repeat. Its counts are
+   now one array of integers in place of one perl scalar per distinct
+   value. On 1e6 values holding 100 distinct integers a call went
+   from 40.6 ms to 31.9 ms, and with 100 distinct strings from
+   29.7 ms to 22.3 ms; with every value distinct the gain is 3%. With
+   1e6 distinct integers the call's peak memory growth fell from
+   231 MB to 207 MB. The results are unchanged, ties still coming back
+   in first-seen order.
+ - t/mode.scipy.t is new: the one-dimensional cases of SciPy's own
+   TestMode, and inputs on both sides of each point where the count
+   array grows, with leak checks, one of them through a croak.
+
+0.342 2026-11-10 CST (Claude Fable 5.2 helped)
+
+ [Out-of-memory guards: 11 failing reports of 0.3419]
+
+ - 0.3419 failed on 11 of its 36 CPAN Testers reports, all in
+   t/alloc.guards.t and nowhere else: perl 5.24.4 and 5.44.0 on
+   x86_64 and aarch64 Linux (gcc 15.2 and 16.1), GNU/Hurd, NetBSD and
+   DragonFly, and 5.44.0 on aarch64-android (clang). The test exited
+   with "Out of memory!" or "Out of memory in
+   perl:util:safesyscalloc", or was killed, after its 15th or 16th
+   subtest. The module and the test were each at fault.
+
+ - The module: alloc_probe_ok(), which lets matrix(), runif(), rnorm(),
+   fisher_test(), mcnemar_test(), dunn_test() and the bw_*() selectors
+   croak when the memory they need is not there, asked malloc() for
+   the block and freed it untouched. A compiler may delete such a pair
+   and treat the request as granted, and the guard then never fires.
+   That is the reading that fits the Linux and Android reports, where
+   an allocation half the size of the one just "probed" was refused;
+   it was not observed directly, since gcc 13.3 and 14.2 keep the
+   call, but a build with the probe removed dies exactly as the
+   Android report does. The probe now writes one byte to the block
+   through a volatile lvalue, which a compiler has to keep.
+
+ - The test: three cases asked the machine for 16 GB, 320 GB and 22 TB
+   and assumed it would refuse. A system that overcommits grants the
+   request and kills the process when the pages are touched, which is
+   what NetBSD and DragonFly did, and where 16 GB was granted
+   bw_sj(nb => 2**31 - 1) alone ran 150 s. Those three cases now run
+   only under EXTENDED_TESTING or AUTHOR_TESTING. In their place
+   runif(2**48) and rnorm(n => 2**48) ask for more address space than
+   a process has, so the probe is exercised with the same answer on
+   every machine; against a probe that always says yes they exit with
+   "Out of memory". t/alloc.guards.t now has 23 subtests.
+
+0.3419 2026-11-10 CST (Claude Fable 5.2 helped)
+
+ [lm(), glm() and the formula models]
+
+ - A term whose name is UTF-8 now finds its column. `use utf8;
+   lm(formula => 'y ~ é', data => {y => [...], "é" => [...]})` died with
+   "0 degrees of freedom", because the formula's bytes were fetched as a
+   byte key. The name is now also tried as a UTF-8 key, for
+   hash-of-arrays and array-of-hashes data, in lm(), glm(), predict()
+   and the other models that read columns this way. The coefficient
+   names are still the formula's own bytes, without the UTF-8 flag.
+ - A tied scalar inside a data column was read as missing, because the
+   element's definedness was tested before its FETCH ran. It is now
+   fetched first, and once.
+ - Terms with arithmetic inside parentheses were split at the '+', '*'
+   or '/' inside them: `y ~ log(x+1)`, `I(x+z)`, `I(x*2)` and
+   `exp(x/10)` died with "0 degrees of freedom", and `log(x^2)` lost
+   its exponent. Terms are now split only at parenthesis depth 0, and
+   I(), log(), exp(), sqrt(), log2(), log10(), log1p() and abs()
+   evaluate + - * / ^ and nested parentheses with R's precedence.
+   Coefficients match R's lm(). A term that cannot be read now dies
+   with "lm: cannot evaluate term 'poly(x,2)'" instead of becoming an
+   all-NaN column; a column that is all undef keeps its old message.
+   A bare group of terms such as (a + b)*c is refused the same way: R
+   expands it to a + b + c + a:c + b:c, which is not done here.
+
+ [predict()]
+
+ - predict() on a svyglm() fit with family quasibinomial or
+   quasipoisson returned the linear predictor for type => 'response'.
+   It now applies the inverse link, matching R's survey::svyglm.
+
+ [zerotrunc(), hurdle()]
+
+ - A negative binomial fit whose counts are in the thousands never met
+   its convergence test: zerotrunc(dist => 'negbin') on 21 rows at mean
+   8000 ran 8.6 s and returned converged = 0 after 500 iterations, and
+   200 such rows did not finish in 100 s. The log-likelihood is a sum
+   of terms of order y log y, so its rounding noise (about 2e-10 there)
+   exceeded the 1e-12 * (|ll| + 1) bound used both to accept a Newton
+   step and to stop, and every step was halved and rejected. Both tests
+   now add a noise floor of 4 * NV_EPSILON times the sum of the terms'
+   sizes. The same fits converge in 5 or 6 iterations, with
+   coefficients, theta and loglik matching countreg and pscl.
+ - The lgamma, digamma and trigamma differences of the negative
+   binomial were summed term by term, O(y) per observation per
+   evaluation. For y >= 64 and theta <= 10 y they are now taken as
+   differences of the functions themselves, which agree with mpmath to
+   7e-15 relative; the term sum is kept for small y and for theta above
+   10 y, where those differences would cancel.
+
+ [lmer()]
+
+ - A nesting of three or more levels, as in (1 | a/b/c), was split at
+   the first '/' only, giving a and a:b/c; the second names no column,
+   every row was dropped, and the call died with "not enough complete
+   observations". It now expands to (1 | a) + (1 | a:b) + (1 | a:b:c),
+   as lme4 does, and (1 | a:b/c) gives a:b and a:b:c. Random slopes
+   work the same way. A trailing or leading '/' is refused with "empty
+   grouping factor".
+
+ [csort()]
+
+ - Integer columns above 2**53 now sort exactly. The sort keyed on an
+   NV, so 64-bit ids such as 1800000000000000003, ...001, ...002
+   compared equal and kept their input order, in AoH, AoA and HoA input
+   alike, as did numeric strings like '9223372036854775807'. Runs of
+   equal keys at or above 2**53 are now re-ordered by exact IV/UV
+   comparison, as perl's sort { $a <=> $b } orders them. Ordinary
+   columns sort at the same speed.
+
+ [min(), max()]
+
+ - An integer extreme above 2**53 is returned exactly.
+   max(9007199254740993, 9007199254740992, 12345678901234567) gave
+   1.23456789012346e+16 and now gives 12345678901234567. Ordinary
+   doubles take the same path as before, at the same speed. Tied
+   arrays and overloaded elements still return an NV.
+
+ [sum()]
+
+ - sum([1e308, 1e308, -1e308]) was Inf because the running total
+   overflowed; R, with its long double accumulator, gives 1e308. When
+   the total ends infinite a second pass scales each value by an exact
+   power of two, so the result is exact and a true overflow stays Inf.
+
+ [qnorm()]
+
+ - Near the median the quantile lost digits: qnorm(0.5 + 1e-10) was
+   2.5066284462393505e-10 where R gives 2.5066284820303544e-10. The
+   Newton residual pnorm(z) - p subtracted two numbers near 0.5 and
+   rounded to 0, leaving the start value, built on a truncated
+   sqrt(2*pi), uncorrected. For |p - 0.5| < 0.3 the residual is now
+   formed from the series for Phi(z) - 0.5 against the exact p - 0.5.
+   Results agree with R to 2 ulp across p = 0.5 +- 2^-k.
+
+ [pbinom()]
+
+ - A size above LONG_MAX (2147483647 where long is 32 bits, as on
+   Windows) was NaN. pbinom(5, 1e19, 1e-18) is now 0.0670859628790321,
+   as in R, in lower, upper and log form.
+
+ [mcnemar_test(), dunn_test()]
+
+ - mcnemar_test(exact => 1) now evaluates 2 * pbinom(min(b, c), b + c,
+   0.5) through the incomplete beta, as R's binom.test does, instead of
+   summing b + c terms. At b = 29990000, c = 30010000 the old sum was
+   off by 1.4e-7 relative and took 0.9 s; it now agrees with R to 1e-15
+   at once, and no longer casts the counts to long.
+ - A mcnemar_test() table of many distinct labels (r * r cells), and a
+   dunn_test() with more groups than its k * (k - 1) / 2 comparisons
+   can be allocated for, croak instead of aborting perl with "Out of
+   memory".
+
+ [bw_ucv(), bw_bcv(), bw_sj(), bw_nrd0(), bw_nrd()]
+
+ - nb is validated as R's as.integer() does: a value above 2147483647
+   is "invalid 'nb'" (an nb of 2**32 truncated to 0 on a perl with a
+   32-bit size_t and wrote out of bounds), and an nb whose tables
+   cannot be allocated croaks rather than aborting.
+ - bw_nrd0() and bw_nrd() refuse a trailing option name with no value.
+
+ [cor(), cov(), cor_test()]
+
+ - All three ran a tied or overloaded cell's get magic twice, and could
+   test one value and use another. It runs once now.
+ - cov() and cor_test() leaked their number buffers when a cell's FETCH
+   died (35 MB over 3000 calls at n = 1000 for cov()); they are now
+   freed with the save stack, as cor()'s are. cor_test() also read a
+   tied cell's definedness before its FETCH.
+ - cor_test() accepted a bogus alternative and echoed it back, and
+   conf_level 5, -1 or NaN returned nonsense limits. Both are refused
+   as R's cor.test and t_test() refuse them.
+ - cor() on a matrix with rows of unequal length took its width from
+   row 0, read a short row's missing cells as NaN and ignored a long
+   row's extra cells. It now croaks "x rows have unequal lengths", and
+   likewise for y, as prcomp() does.
+
+ [prcomp()]
+
+ - scale => 1 refused any column whose standard deviation was at most
+   an absolute 1e-15, so a column in small units (x * 1e-20) died with
+   "cannot rescale a constant/zero column" where R returns sdev 1.1632,
+   0.8043. Only an exactly-zero scale is refused now, as in R. A column
+   of equal values is centered on that value exactly, so its scale is
+   exactly 0 and it is still refused.
+
+ [epi_2x2(), cmh_test()]
+
+ - A trailing option name with no value was silently dropped, so
+   cmh_test($strata, 'correct') ran with the default. It is now refused
+   with "options must be key => value pairs", as in survfit().
+
+ [fisher_test()]
+
+ - A 2x2 table is handled in a window around the mode of the noncentral
+   hypergeometric rather than over its whole support, so time and
+   memory scale with the standard deviation, not the table total.
+   fisher_test([[n, 1.1n], [1.05n, n]]) took 0.09 s, 0.89 s and 10.7 s
+   at n = 1e5, 1e6 and 1e7 and now takes 0.011 s, 0.040 s and 0.20 s;
+   peak memory at 1e7 fell from 332 MB to 25 MB. The window is found
+   for every odds ratio the root-finders try, and its cutoff comes from
+   the NV's own range. Results are bit-identical on the tables checked.
+ - fisher_test([[5e8, 5e8], [5e8, 5e8]]) aborted the interpreter under
+   a memory limit; it now answers, and what is still allocated goes
+   through a croaking helper.
+ - An r x c table sorts a node's pasts with a stable merge sort of the
+   new tail and a linear merge into the sorted prefix, instead of
+   re-sorting the whole list with qsort(): a 5x5 table takes 0.59 s
+   instead of 0.79 s, with a bit-identical p-value.
+
+ [wilcox_test()]
+
+ - exact => 1 refuses up front a problem whose total count, C(m+n, m)
+   or 2^n, is past the largest NV, with the same message as before,
+   instead of running the recurrence first: 3000 against 3000 took
+   11.6 s to croak and now croaks at once. No input that succeeded
+   before is refused.
+
+ [sample()]
+
+ - The index array is used from n >= count/20 instead of count/4.
+   Between count/16 and count/4 the hash table was both slower and
+   larger (count = 2e6, n = 499999: 0.0685 s and 50.9 MB against
+   0.0447 s and 33.9 MB). Draws for a given srand seed are unchanged.
+
+ [svyglm()]
+
+ - The per-stratum variance loop scanned every PSU once per stratum:
+   32000 strata took 1.2 s and 100000 took 11 s. The PSUs are now
+   counting-sorted by stratum, giving 0.15 s and 0.5 s. The
+   accumulation order is unchanged, so results are bit-identical.
+
+ [logrank_test()]
+
+ - The variance matrix was updated for every group pair at every event
+   time: 20000 event times and 1000 groups took 10.6 s. An off-diagonal
+   term only changes when a group loses a subject, so each pair is now
+   settled against a running sum of c / n^2, in 0.46 s. Observed and
+   expected are unchanged; the statistic moves by rounding only, about
+   1e-15 relative.
+
+ [get_union(), intersection(), Lonly(), Ronly(), is_equivalent()]
+
+ - These keyed each element with SvPV() on the caller's own SV, which
+   formats a plain number and leaves the string cached on it for good:
+   Lonly() of two 1e6-element double arrays grew the process by 304 MB
+   that was never returned. They now use uniq()'s key table and render
+   a bare number into a stack buffer. On 1e6 doubles get_union() went
+   from 1.48 s and +466 MB to 0.41 s and +61 MB. Results are unchanged,
+   except that returned copies of numbers are plain IV/NV rather than
+   PVNV with a cached string.
+
+ [survfit()]
+
+ - A numeric group => column had a string cached on every cell, about
+   38 MB per million rows. The label is now rendered without touching
+   the cell.
+
+ [group_by()]
+
+ - The mortal key made for each filter of each row lived until the call
+   returned, about 16 bytes per row per filter. Each row now has its
+   own tmps scope.
+
+ [hoh2hoa()]
+
+ - The output column's array is found once per column instead of by a
+   hash lookup for every cell, about 7% on 200000 rows x 10 columns.
+
+ [read_table()]
+
+ - An .xlsx text node holding many '&' and no ';' was read in quadratic
+   time, because every '&' scanned the whole remainder for a ';'
+   (4e5 '&' in one cell took 0.84 s). The search now stops at the next
+   '&', in 0.007 s. What is decoded is unchanged.
+ - A .gz or .bz2 file is now read a block at a time, as documented. It
+   was not: each 64 KB block of decompressed text was left as a
+   temporary until the whole file had been parsed, so a compressed read
+   held the entire decompressed text on top of the table. A filtered
+   read that kept 20,475 of a 400 MB CSV's 7.8 million rows peaked at
+   30 MB from the plain file and at 422 MB from its .gz; a 13 MB CSV
+   keeping 300 rows peaked at 14.2 MB from its .gz and now peaks at
+   2.2 MB (17.4 MB to 5.1 MB from its .bz2). The blocks are freed as
+   each line is read. What is returned is unchanged.
+ - Cells of one column that hold the same text now share one string in
+   a CSV or TSV read, as an .xlsx's shared strings already did, so a
+   column of categories costs one buffer per value instead of one per
+   cell. A 300,000-row CSV with four category columns of six went from
+   233 MB to 197 MB as an aoh and from 140 MB to 103 MB as a hoa, and
+   about 10% faster (0.109 s to 0.092 s as a hoa). A column whose
+   cells do not repeat is noticed and left alone: a 30,000 x 50 file
+   of distinct numbers reads in the same time to within 2 ms. The
+   values are unchanged, and a write to one cell reaches no other;
+   on perls before 5.18 Internals::SvREADONLY() is true of a shared
+   cell, as it already was of an .xlsx's. Not for a read with a
+   'filter', whose rows are built as before.
+ - A field that is an integer written as perl prints one ("42", "-7",
+   "0") is now stored as that integer rather than as its text, in every
+   kind of read: delimited, .xlsx, filtered, and the values of an
+   exploded VCF. It takes 24 bytes where the text took about 72. A
+   300,000 x 6 CSV of counts read as a hoa went from 140 MB to 57 MB
+   and from 0.110 s to 0.061 s; a 300,000 x 5 CSV with one id column
+   from 106 MB to 92 MB. The cell prints as the bytes the file held, so
+   eq, hash keys, regexes, sort and write_table() see no difference.
+   What does change is anything that looks at a scalar's type: a JSON
+   encoder now writes 5 where it wrote "5". Text an integer would not
+   print back as is left alone: "007", "+5", "-0", "5.0", "1e3", " 5",
+   and a number outside perl's integer range, which is not made a
+   float. colClasses => 'character' keeps a column, or every column,
+   as text; until now 'character' and no class at all meant the same.
+
+ [write_table()]
+
+ - LaTeX output is written as the records arrive instead of being
+   copied into SVs first: a 20 x 200000 table of doubles peaked at
+   487 MB and now peaks at 153 MB, as csv does. The bytes written are
+   unchanged, and a table with no columns is still refused before the
+   file is opened. A croak from the data after the header (a tied cell
+   whose FETCH dies) now leaves the partial file, as csv and .xlsx
+   already did, where the old file was previously left untouched.
+ - An .xlsx sheet now has its top row frozen by default, so the header
+   stays in view while scrolling: xlsx_freeze_rows defaults to 1 where
+   it defaulted to 0. Pass xlsx_freeze_rows => 0 for a sheet with
+   nothing frozen. Giving xlsx_freeze_cols alone therefore freezes the
+   header row as well as those columns. This changes the bytes of every
+   workbook written without the option; what read_table() reads back
+   from it is unchanged.
+
+ [Tests]
+
+ - Each fix above has its own new test file, 29 in all: t/alloc.guards.t,
+   t/cor.ragged.t, t/cor_test.validation.t, t/cov.croak_leak.t,
+   t/csort.int64.t, t/fisher_test.window.R.scipy.t,
+   t/formula.utf8_names.t, t/group_by.tmps.t, t/lm.formula_parens.R.t,
+   t/lmer.nested3.R.t, t/logrank_test.many_groups.R.t,
+   t/mcnemar_test.exact.R.t, t/options.dangling_key.t,
+   t/pbinom.huge_size.R.t, t/prcomp.small_scale.R.t,
+   t/predict.svyglm_quasi.R.t, t/qnorm.central.R.t,
+   t/read_table.compressed.stream.t, t/read_table.int_cells.t,
+   t/read_table.shared_cells.t,
+   t/sample.threshold.t, t/sets.no_upgrade.t, t/sum.overflow.R.t,
+   t/svyglm.many_strata.t, t/tied_cell.double_fetch.t,
+   t/wilcox_test.exact_refusal.t, t/write_table.tex.stream.t,
+   t/xlsx.entity_scan.t and t/zerotrunc.large_counts.R.t.
+   Expected values are frozen from R 4.6.1, from the R packages named
+   in each header, or from the build before the change where a change
+   is to speed alone.
+ - Three expectations changed with the behavior they pinned:
+   t/lm_glm_shared.t expected I(x-1) to die, t/cor.R.scipy.t
+   expected a ragged matrix to give NaN cells, and
+   t/read_table.colClasses.t expected an integer in a column with no
+   class to be stored as text.
+ - t/parse_read.t, t/read_table.colClasses.t and
+   t/read_table.input_record_separator.t write their fixtures binary.
+   They opened them in text mode, so on MSWin32 a quoted "line1\nline2"
+   reached the file as "line1\r\nline2", and since 0.3418 read_table()
+   keeps a quoted line end as the bytes the file holds. 0.3418 failed 11
+   subtests across the three on its two MSWin32 smokers for this,
+   Strawberry Perl 5.24.4 and 5.42.3, the only failures among its 120
+   reports; the module itself was right. With PERLIO=:unix:crlf the
+   installed 0.3418 fails the same subtests, and with this change all
+   three pass.
+
 0.3418 2026-11-08 CST (Claude Opus 5.5 helped)
 
  [read_table(), write_table()]

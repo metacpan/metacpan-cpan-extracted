@@ -68,7 +68,7 @@ __PACKAGE__->mk_accessors(
   ),
 );
 
-our $VERSION = '2.1.3'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.4'; ## no critic (RequireInterpolation)
 
 our @EXPORT_OK = qw(is_domain_bucket);
 
@@ -2303,7 +2303,6 @@ settings permit the requested policy.
 Directory buckets have additional creation requirements. See
 L</DIRECTORY BUCKETS>.
 
-
   my $bucket = $s3->bucket('example-bucket');
 
 Calling C<bucket()> does not create the bucket and does not verify
@@ -2542,9 +2541,9 @@ most recent error on the C<Amazon::S3> object.
 
 The primary error accessors are:
 
-err()
-errstr()
-error()
+ err()
+ errstr()
+ error()
 
 C<err()> contains the S3 error code when one is available.
 
@@ -2556,19 +2555,19 @@ service returned one.
 Typical error handling using the historical interface therefore looks
 like:
 
-my $response = $s3->buckets;
+  my $response = $s3->buckets;
 
-if (!$response) {
-die $s3->err . ': ' . $s3->errstr;
-}
+  if (!$response) {
+    die $s3->err . ': ' . $s3->errstr;
+  }
 
 Applications that prefer request failures to throw exceptions can
 enable C<raise_error> when constructing the client:
 
-my $s3 = Amazon::S3->new(
-credentials => $credentials,
-raise_error => 1,
-);
+  my $s3 = Amazon::S3->new(
+    credentials => $credentials,
+    raise_error => 1,
+  );
 
 With C<raise_error> enabled, S3 request failures that would normally
 return a failure value instead throw an exception. The error state is
@@ -3396,9 +3395,9 @@ them.
 
 =head3 empty_bucket
 
-my $count = $s3->empty_bucket($bucket_name);
+  my $count = $s3->empty_bucket($bucket_name);
 
-my $count = $s3->empty_bucket($bucket_name, $headers);
+  my $count = $s3->empty_bucket($bucket_name, $headers);
 
 Deletes all object versions currently listed in the specified bucket.
 
@@ -3512,6 +3511,7 @@ On failure, returns C<undef> and records error information on the
 client.
 
 See L</LISTING OBJECTS>.
+
 =head3 list_bucket_all
 
   my $response = $s3->list_bucket_all(\%parameters);
@@ -3595,14 +3595,13 @@ Optional key after which S3 should begin the listing.
 
 For example:
 
-my $response = $s3->list_bucket_v2(
-{
-bucket     => 'example-bucket',
-prefix     => 'logs/',
-delimiter  => '/',
-'max-keys' => 100,
-}
-);
+  my $response = $s3->list_bucket_v2(
+    { bucket     => 'example-bucket',
+      prefix     => 'logs/',
+      delimiter  => '/',
+      'max-keys' => 100,
+    }
+  );
 
 On success, returns the normalized listing structure described in
 L</LISTING OBJECTS>.
@@ -3618,7 +3617,7 @@ See L</LISTING OBJECTS>.
 
 =head3 list_bucket_all_v2
 
-my $response = $s3->list_bucket_all_v2(%parameters);
+  my $response = $s3->list_bucket_all_v2(%parameters);
 
 Lists all matching objects in a bucket using the S3 ListObjectsV2 API.
 
@@ -3627,12 +3626,11 @@ C<list_bucket_v2()>. C<bucket> is required.
 
 For example:
 
-my $response = $s3->list_bucket_all_v2(
-{
-bucket => 'example-bucket',
-prefix => 'logs/',
-}
-);
+  my $response = $s3->list_bucket_all_v2(
+    { bucket => 'example-bucket',
+      prefix => 'logs/',
+    }
+  );
 
 Unlike C<list_bucket_v2()>, this method follows S3 pagination
 automatically. It repeatedly requests additional pages until all
@@ -3707,6 +3705,7 @@ client.
 
 See L</LISTING OBJECTS> and
 L<https://docs.aws.amazon.com/AmazonS3/latest/API/API_ListObjectVersions.html>.
+
 =head2 ADVANCED AND COMPATIBILITY METHODS
 
 =head3 turn_off_special_retry

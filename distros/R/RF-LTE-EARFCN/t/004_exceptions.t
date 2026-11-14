@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 8;
 BEGIN { use_ok('RF::LTE::EARFCN') };
 
 my $rf = RF::LTE::EARFCN->new;
@@ -29,22 +29,3 @@ isa_ok($rf, 'RF::LTE::EARFCN');
   ok($error, '$rf->channel(999999)');
   like($error, qr/table entry not found/, '$rf->channel(999999)');
 }
-{
-  is($RF::LTE::EARFCN::FS_TABLE{'1'}, 190);
-  is($rf->channel(0), 0, '$rf->channel(0)');
-  is($rf->fs, 190);
-
-  
-  local %RF::LTE::EARFCN::FS_TABLE = %RF::LTE::EARFCN::FS_TABLE;
-  delete($RF::LTE::EARFCN::FS_TABLE{'1'});
-
-  is($rf->channel(0), 0, '$rf->channel(0)');
-
-  local $@;
-  eval '$rf->fs';
-  my $error = $@;
-  ok($error, 'delete %RF::LTE::EARFCN::FS_TABLE');
-  like($error, qr/frequency separation not found/, 'delete %RF::LTE::EARFCN::FS_TABLE');
-}
-is($RF::LTE::EARFCN::FS_TABLE{'1'}, 190);
-

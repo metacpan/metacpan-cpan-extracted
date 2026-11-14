@@ -12,7 +12,7 @@ use Params::Validate::Strict qw(validate_strict);
 use Readonly;
 use Scalar::Util qw(blessed);
 
-use version; our $VERSION = version->declare('0.011.1');
+use version; our $VERSION = version->declare('0.011.2');
 
 # What a caller needs to know about a database before it opens a table of it
 # through Database::Abstraction, and the one write it may need: a table of
@@ -292,7 +292,7 @@ Database::Join::Catalog - List a database's tables and columns, and write a tabl
 
 =head1 VERSION
 
-0.011.1
+0.011.2
 
 =head1 SYNOPSIS
 

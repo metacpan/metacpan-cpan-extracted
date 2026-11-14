@@ -1,4 +1,4 @@
-Proc-Spawner version 0.11 (EXPERIMENTAL)
+Proc-Spawner version 0.12 (EXPERIMENTAL)
 ========================================
 
 Compiles and runs shell one-liners (or portable shell scripts) from Perl
@@ -20,7 +20,13 @@ WHAT IS OPEN: the file TODO lists every postponed thing in one place, first
 the decisions waiting for the author (with where to read and how to act),
 then the work, then what to watch.
 
-HOW CLOSE TO DASH AND BASH (0.11; doc/large-subset/large-subset-state.md)
+HOW CLOSE TO DASH AND BASH (0.12; doc/large-subset/large-subset-state.md)
+
+Snippet by snippet, across environments, with every difference of ours and
+the ruling that allows it: doc/large-subset/large-subset-environment.md,
+section 11 (post-0.11).
+To redo any of these measurements: make corpus-help (after perl Makefile.PL;
+Linux, root for the runs; doc/test-pools.md, section 0).
 
 Of 41,952 shell strings from six public collections (tldr, NL2Bash,
 ShellCheck's tests, the bash Cookbook, the pure sh and bash bibles), the
@@ -29,40 +35,53 @@ subset rejects on purpose; 44 are forms both shells run alike, the work list
 (section 4).  Each accepted string was then run by dash, by bash --posix and
 by Proc::ShellSpawn, isolated, with every program but the plain text tools
 replaced by a recorder of its arguments, each run with a fresh /tmp, a
-fixed /dev/urandom and fixed file times (section 7; the limits: known issue
-X27).  That run predates IP1: ours ran echo, printf, test, [, true and false
-as the coreutils programs, as PROC_SHELLSPAWN_INPROC=none does now.  With the
-default (inside Perl, 0.10) 2 samples come out otherwise: printf "\u20AC"
-(known issue X37, fixed since) and a race (section 7):
+fixed /dev/urandom and fixed file times, and background jobs still running
+when a shell ends given up to 5 seconds (section 7, the run of post-0.11;
+the limits: known issue X27).  Ours ran echo, printf, test, [, true, false
+and pwd inside Perl, its default since 0.10:
 
                        run   same   only the    dash and bash  dash and bash
                                     messages    agree, ours    differ
                                     differ      differs
-  coreutils involved  1,344    895     311            3            132
-  no coreutils       39,066 14,966  23,000            0          1,088
-  all                40,410 15,861  23,311            3          1,220
+  coreutils involved  1,333    887     310            4            129
+  no coreutils       39,077 14,899  23,080            2          1,084
+  all                40,410 15,786  23,390            6          1,213
   (and 15 strings that never end, or not in ours: section 7)
 
 "Coreutils involved": the string calls echo, printf, test, [, kill or pwd,
 which the subset runs as programs where the shells have builtins.  "Only the
 messages differ" is mostly dash's "x: not found" against bash's "x: command
-not found".  Where dash and bash differ, the subset follows dash in 960,
-bash in 104, and neither in 156 (mostly $0, process IDs, times, and the
-interactive builtins).  The 3 where ours differs: printf -v (2, decided),
-and echo into a broken pipe in a subshell (1).
-Of the 40,410, 365 are shown not to depend on that environment at all, and
-34,293 more not under named assumptions (mostly that a program does the same
-in each run), so their agreement is a real one; the other 5,752 may depend on
-files, variables, programs' output or status, /tmp and the like (known issue
-X27: doc/large-subset/large-subset-environment.md, and a record by snippet ID,
+not found".  Where dash and bash differ, the subset follows dash in 965,
+bash in 98, and neither in 150 (mostly $0, process IDs, times, and the
+interactive builtins).  The 6 where ours differs: printf -v (2, decided),
+echo into a broken pipe in a subshell (1), exec command (1: known issue X56,
+a bug of ours, open), a race (1), and ls -l of / (1: times outside the run).
+Of the 40,410, 365+27=392 are shown not to depend on that environment at
+all (N+M: N found by the programs, M by reading the snippets: section 1
+there), and 34,304 more not under named assumptions (mostly that a program
+does the same in each run), so their agreement is a real one; 2,140+14=2,154
+more if also every value they take from the environment only passes through
+the shell (664+7 unchanged, 1,476+7 split as well); the other 3,508+52=3,560
+may depend on files, variables, programs' output, /tmp and the
+like (known issue X27: doc/large-subset/large-subset-environment.md, and a
+record by snippet ID,
 doc/large-subset/large-subset-provenance.tsv).  Runs with the environment varied
 (a second case of POSIXLY_CORRECT, the locale, SIGPIPE, /proc; a fresh /tmp,
 a fixed /dev/urandom) are footnotes to these figures: of the samples tried,
 few came out otherwise (section 9 there).
+Across environments (post-0.11; section 11 there: two trees of every
+snippet, over the base run and the example environments of steps 2 and 3):
+with messages counted nowhere, wherever a redirection sends them,
+ours = dash = bash in every environment for 38,603; in 1,793 ours differs
+from a shell somewhere: 1,620 allowed by the author's rulings (mostly A5,
+ours with dash where the shells differ), 88 awaiting a decision, 40 chance,
+45 not yet allowed.  Each echo, printf, test, [, kill or pwd those snippets
+ran (341 distinct calls) was also run alone by coreutils, dash's builtin,
+bash's builtin and ours: ours = coreutils in all.
 
 For the programs alone, each call the strings make was also run as dash's
-builtin, as bash's builtin and as the program: of 757 calls (1,268 uses),
-620 (1,107) agree, 42 (46) differ in messages only, and 95 (115) differ:
+builtin, as bash's builtin and as the program: of 650 calls (1,154 uses),
+515 (995) agree, 41 (45) differ in messages only, and 94 (114) differ:
 mostly echo -e and backslashes (dash's builtin against bash and the
 program), unary -a -o -v in [ ] (bash's builtin against dash and the
 program), and kill with a word that is no process ID (dash against bash and

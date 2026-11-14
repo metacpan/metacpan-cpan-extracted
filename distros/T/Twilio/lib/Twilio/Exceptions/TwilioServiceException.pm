@@ -9,7 +9,7 @@ use parent 'Twilio::Exceptions::RestException';
 
 use Scalar::Util qw(looks_like_number);
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my @REQUIRED_TEXT    = qw(type title);
 my @REQUIRED_NUMBERS = qw(status code);

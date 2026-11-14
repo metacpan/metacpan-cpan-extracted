@@ -10,7 +10,7 @@ use File::Copy qw(move);
 use Cwd qw(abs_path getcwd);
 use version;
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2018-10-08';
 
 sub new {
@@ -327,7 +327,7 @@ sub update_table {
     }
 
     # 6. Indeksleri insa et (gerekliyse veya eksikse)
-    my $is_simple = $adb->config('simple') || ( $table_info && $table_info->{use_simple} ) || ( $table_info && $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
+    my $is_simple = $adb->config('use_simple') || ( $table_info && $table_info->{use_simple} ) || ( $table_info && $table_info->{id_type} && $table_info->{id_type} eq 'ascii' );
     if ( $is_simple ) {
         $self->{say} .= "  - Table '$tableid' is in simple mode, skipping index generation.\n";
     }
@@ -434,7 +434,7 @@ sub replace_tablename {
     my $dbase_dir = $adb->path('dbase_dir') || ".";
     my $year_dir  = $adb->path('year_dir') || "";
 
-    if ( $adb->config('simple') ) {
+    if ( $adb->config('use_simple') ) {
         @tables = glob "$dbase_dir/$find.*";
         push @tables, ( glob "$dbase_dir/${find}_*" );
     }
@@ -546,7 +546,7 @@ sub db_simple {
         ext  => { db        => $ext },
         path => { dbase_dir => $dir },
         cfg  => {
-            simple  => 1,
+            use_simple  => 1,
         }
     );
     return $db_obje;

@@ -90,7 +90,8 @@ controls its own process lifetime.
 C<on_idle_shutdown>, if supplied, is C<$callback->($server)> returning true
 to accept or false to decline a late shutdown request (for example, if
 application work has resumed). Outstanding MCP requests also prevent
-acceptance.
+acceptance. A declined shutdown clears the one-shot notification state,
+allowing a later idle-exit request.
 
 =back
 
@@ -216,6 +217,7 @@ sub dispatch {
          && (!$self->{on_idle_shutdown} || $self->{on_idle_shutdown}->($self));
 
       $req->reply ({ accepted => $accepted ? JSON::XS::true : JSON::XS::false });
+      $self->{idle_exit_requested} = 0 unless $accepted;
       if ($accepted) {
          $self->{_idle_shutting_down} = 1;
          my $out = $handle->{mcp_out} || $handle;

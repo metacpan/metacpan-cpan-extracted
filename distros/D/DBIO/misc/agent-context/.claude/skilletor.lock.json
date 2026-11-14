@@ -4,7 +4,7 @@
     "version": "local",
     "files": {
       "skills/claude-headless/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/claude-headless/SKILL.md": "sha256:b471d570b4339c9a427c4d0c812b6b76c9a45a7e6ba0215ced196086cc3e45bb"
+      "skills/claude-headless/SKILL.md": "sha256:bfcff18b872c41f22da55e9aa0a6deabe35109c7e65b1d893ff7b8a00cd087a5"
     }
   },
   "skills/getty-git-commit-style": {

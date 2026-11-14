@@ -13,7 +13,7 @@ DBIO::Manual::AsyncStorage - Writing an async-capable storage backend for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 WHO THIS IS FOR
 

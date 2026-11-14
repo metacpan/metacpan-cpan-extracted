@@ -1,5 +1,5 @@
 package Perl::Tests::Covering::Recorder;
-$Perl::Tests::Covering::Recorder::VERSION = '0.002';
+$Perl::Tests::Covering::Recorder::VERSION = '0.003';
 # ABSTRACT: Writes down every file a perl loaded, as it exits.
 
 use 5.014;
@@ -31,7 +31,7 @@ Perl::Tests::Covering::Recorder - Writes down every file a perl loaded, as it ex
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 DESCRIPTION
 

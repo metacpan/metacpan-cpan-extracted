@@ -6,7 +6,7 @@ use Carp qw(croak cluck);
 use Cwd qw(abs_path);
 use Digest::MD5 qw(md5_hex);
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2026-08-11';
 
 our %RAMDISK_TIERS = (
@@ -444,7 +444,7 @@ sub ramdisk_file_for {
     }
     else {
         my $table_info = $self->table_info($tableid);
-        my $is_simple  = $self->config('simple') || ( $table_info && $table_info->{use_simple} );
+        my $is_simple  = $self->config('use_simple') || ( $table_info && $table_info->{use_simple} );
 
         if ( $is_simple || ( defined $key && $key =~ /^\d+$/ ) ) {
             $ext = $self->{db_ext} // 'db';
@@ -898,7 +898,7 @@ sub ramdisk_sync {
                     }
 
                     # 2. Sync secondary index files on persistent disk
-                    unless ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) {
+                    unless ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) {
                         my @decoded = ( $rid, $self->db_decode($raw) );
                         my @batch   = ( \@decoded );
 
@@ -945,7 +945,7 @@ sub ramdisk_sync {
                 }
 
                 # 2. Delete from secondary indexes on persistent disk
-                unless ( $self->config('simple') || ( $table_info && $table_info->{use_simple} ) ) {
+                unless ( $self->config('use_simple') || ( $table_info && $table_info->{use_simple} ) ) {
                     $self->records_del( $table_path, $table_info, [$rid], $tableid );
                     $self->search_del( $table_path, $table_info, $tableid, [ [$rid] ] );
                     $self->match_del( $table_path, $table_info, [ [$rid] ] );

@@ -25,5 +25,10 @@ Workflow:
 
 Apply conventions above silently.
 
+Work the karr card you were handed: note progress on it, block it with a reason when
+stuck, hand it to `review` when done. Never `done`, never create cards — drift you
+find goes as a note on your card, not into scope. Downstream changes another DBIO repo
+needs go as a note on your card; the dispatcher routes them to that repo's board.
+
 Never `git commit`: leave the tree commit-ready and report what changed and why, plus a proposed commit subject and
 `Changes` entry -- commits belong to `dbio-release-manager`.

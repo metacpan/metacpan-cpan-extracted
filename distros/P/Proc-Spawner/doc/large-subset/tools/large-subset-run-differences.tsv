@@ -22,9 +22,7 @@ NB:1758	msg-own		-	exec 2 | tee ${LOG_FILE}
 NB:1859	neither	status	X	logout
 NB:1871	neither	out	-	set `od -j $o -N 8 -t u1 $pkg`
 NB:1872	neither	out	-	set `od -j $o -N 8 -t u1 $rpm`
-NB:1925	msg-own		-	crontab -u $user -l 2>/dev/null | grep -v '^#'
 NB:2649	neither	rec	-	find . -mount -type d -print0 | xargs -0 -n1 /tmp/count_em_$$ | sort -n
-NB:2773	msg-own		-	find . -mtime -1 | cpio -oa 2>/dev/null | ( cd $backup_dir && cpio -imd)
 NB:2952	neither	rec	-	find $1 -type f -not -regex '.*/\..*' -exec $0 hashmove '{}' \;
 NB:3177	neither	rec	-	find . -exec $0 {} +
 NB:3595	neither	rec	-	find /tmefndr/oravl01 -type f -newer /tmp/$$
@@ -47,6 +45,7 @@ NB:557	msg-own		-	kill -0 1
 NB:562	msg-own		-	[ $(find your/dir -prune -empty) = your/dir ]
 NB:571	neither	rec	-	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
 NB:5763	msg-own		-	cat somedata.txt | "$outfile"
+NB:5776	OURS	files	-	{ echo foo; cat bar; } | tee bar > /dev/null
 NB:5939	neither	out	-	seq 2000 65000 | sort -R | head -n 1
 NB:6081	neither	rec	-	ps -ef | grep $$ | grep -v grep
 NB:6082	neither	rec	-	ps -p $$
@@ -65,9 +64,9 @@ NB:6758	neither	rec	-	$(dirname $0)
 NB:6759	neither	rec	-	`dirname $0`
 NB:6765	neither	rec	-	echo "dirname: `dirname "$0"`"
 NB:6766	neither	rec	-	echo "dirname: `dirname $0`"
-NB:6799	neither	out	-	ls -l -- "$dir/$file"
+NB:6799	OURS	out	-	ls -l -- "$dir/$file"
 NB:6800	neither	out+rec	-	ls -l ${0}
-NB:6818	neither	out+files	-	ls -lR / | tee -a output.file
+NB:6818	neither	files	-	ls -lR / | tee -a output.file
 NB:6819	neither	out+files	-	ls -lR / | tee output.file
 NB:6820	neither	out+rec	-	echo "The script you are running has basename `basename $0`, dirname `dirname $0`"
 NB:6821	neither	out+rec	-	ls -l /proc/$$/exe | sed 's%.*/%%'
@@ -82,8 +81,6 @@ NB:6920	neither	status+out	X	bind -q complete
 NB:6925	neither	rec	-	head -c 10 "$0" | tr '\000-\377' '#'
 NB:7016	neither	status	X	history -r "$HISTFILE" #Alternative: exec bash
 NB:7017	neither	status	X	history -r
-NB:7296	neither	status+rec+files	X	{ time find / 2>/dev/null; } 2>time.txt
-NB:7564	msg-own		-	find . -type f -print0 | xargs -0 -n1 echo rm | sh -x
 NB:7890	neither	status+rec+files	X	{ time sleep 1 ; } 2> time.txt
 NB:7891	neither	status+rec+files	X	{ time sleep 1 2> sleep.stderr ; } 2> time.txt
 NB:8075	neither	rec	-	MY_PATH=$(readlink -f "$0")
@@ -103,13 +100,9 @@ NB:9033	msg-own		-	kill -9 16085
 NB:9034	msg-own		-	kill -9 18581 18582 18583
 NB:9162	neither	rec	-	me=`basename -- "$0"`
 NB:9163	neither	rec	-	me=`basename "$0"`
-NB:9212	neither	status	-	shift $(($#-1))
-NB:9213	neither	status	-	shift `expr $# - 1`
-NB:9215	neither	status	-	shift [n]
 NB:9459	neither	rec	-	basedir=$(cygpath -am "$(dirname "$0")")
 NB:9460	neither	rec	-	basedir=$(cygpath -m "$(dirname "$0")")
 NB:9461	neither	rec	-	basedir=$(dirname "$(echo "$0" | sed -e 's,\\,/,g')")
-NB:9501	msg-own		-	cat dbdump.sql.gz | gzip -cd | mysql
 NB:9582	neither	status+files	X	history -w
 NB:9583	neither	rec	-	touch -t `date +%m%d0000` /tmp/$$
 NB:9682	neither	out	-	echo foo | readlink /proc/self/fd/0
@@ -117,7 +110,6 @@ NB:9704	neither	out+files	-	ant 2>&1|tee build.log
 NB:9707	neither	out+files	-	update-client 2>&1 | tee my.log
 NB:9721	neither	out+files	-	./a.out 2>&1 | tee output
 NB:9723	neither	out+files	-	./aaa.sh 2>&1 | tee -a log
-NB:9736	msg-own		-	input_prog 2>&1 | tee /dev/tty | my_editor
 NB:9744	neither	out+files	-	progam.sh 2>&1 | tee -a log
 NB:9745	neither	out+files	-	someCommand 2>&1 | tee someFile
 NB:9746	neither	out+files	-	someCommand 2>&1 | tee -a someFile
@@ -143,7 +135,6 @@ SC:Analytics.hs:prop_checkComparisonWithLeadingX4	msg-own		-	test $foo = xbar
 SC:Analytics.hs:prop_checkConditionalAndOrs1	msg-own		-	[ foo && bar ]
 SC:Analytics.hs:prop_checkConstantIfs2a	msg-own		-	[ n -le 4 ]
 SC:Analytics.hs:prop_checkDollarQuoteParen3	msg-own		-	"$(foo)"
-SC:Analytics.hs:prop_checkExpansionWithRedirection5	msg-own		X	stderr=$(foo 2>&1 > /dev/null)
 SC:Analytics.hs:prop_checkNumberComparisons11	msg-own		-	[ $foo -eq 'N' ]
 SC:Analytics.hs:prop_checkNumberComparisons12	msg-own		-	[ x$foo -gt x${N} ]
 SC:Analytics.hs:prop_checkNumberComparisons16	msg-own		-	[ foo -eq 'y' ]
@@ -190,13 +181,14 @@ SC:Checks/ShellSupport.hs:prop_checkBashisms30	OURS	status+out	X	printf -v '%s' 
 SC:Checks/ShellSupport.hs:prop_checkBashisms51	neither	out	-	#!/bin/sh cmd 2>&1
 SC:Checks/ShellSupport.hs:prop_checkBashisms6c	msg-own		X	[ foo =~ bar ]
 SC:Checks/ShellSupport.hs:prop_checkBashisms6d	msg-own		X	test foo =~ bar
-SC:Checks/ShellSupport.hs:prop_checkBashisms90	neither	status+out	-	#!/bin/sh set -o "$opt"
 TL:common/[.md:18	msg-own		-	[ "$variable" -eq|ne|gt|lt|ge|le integer ]
-TL:common/arthas-trace.md:17	msg-own		-	trace -E class_pattern1|class_pattern2 method_pattern1|method_pattern2|method_pattern3
 TL:common/arthas.md:17	msg-own		X	exit|quit|logout|q
+TL:common/az-disk.md:21	msg-own		-	az disk grant-access -g resource_group -n disk_name --access Read|Write --duration-in-seconds seconds
 TL:common/bind.md:12	neither	status	X	bind -q command
 TL:common/bind.md:24	neither	status+out	X	help bind
 TL:common/bind.md:8	msg-own		X	bind -p|-P
+TL:common/boxes.md:32	msg-own		-	echo "string" | boxes -a jl|c|rvt
+TL:common/boxxy.md:20	msg-own		-	boxxy -r path/to/file_or_directory:path/to/redirection:file|directory program
 TL:common/case.md:24	neither	status+out	X	help case
 TL:common/cd.md:24	neither	status+out	-	cd -
 TL:common/compopt.md:10	neither	status	X	compopt command
@@ -205,15 +197,12 @@ TL:common/compopt.md:18	neither	status	X	compopt
 TL:common/conda-export.md:16	msg-own		-	conda export --format environment-json|environment-yaml|explicit|json|reqs|requirements|txt|yaml|yml
 TL:common/cppcheck.md:9	neither	files	-	cppcheck . 2>cppcheck.log
 TL:common/dmd.md:20	msg-own		X	dmd -check=h|help|?
-TL:common/dnsx.md:18	msg-own		-	echo example.com | dnsx -re -a|aaaa|cname|ns|txt|srv|ptr|mx|soa|any|axfr|caa
-TL:common/dotnet-restore.md:28	msg-own		-	dotnet restore -v quiet|minimal|normal|detailed|diagnostic
 TL:common/enable.md:24	neither	status+out	X	help enable
 TL:common/env.md:8	neither	out	-	env
-TL:common/exec.md:8	msg-own		-	exec command -with -flags
+TL:common/exec.md:8	OURS	status	-	exec command -with -flags
 TL:common/fc.md:33	neither	status	X	fc -s string1=string2
 TL:common/fc.md:37	neither	status+out	X	fc --help
 TL:common/function.md:21	neither	status+out	X	help function
-TL:common/greater-than.md:28	msg-own		-	command1 2>&1 | command2
 TL:common/help.md:12	neither	status+out	X	help while
 TL:common/help.md:16	neither	status+out	X	help for
 TL:common/help.md:20	neither	status+out	X	help [[
@@ -226,23 +215,21 @@ TL:common/history.md:28	neither	status	X	history -d offset
 TL:common/kill.md:13	neither	out	-	kill -l
 TL:common/logout.md:12	neither	status	X	logout exit_code
 TL:common/logout.md:8	neither	status	X	logout
-TL:common/mpg321.md:25	msg-own		-	mpg321 -z path/to/file1|url1 path/to/file2|url2
-TL:common/phpmd.md:24	msg-own		-	phpmd path/to/file_or_directory1,path/to/file_or_directory2,... xml|text|html ruleset1,ruleset2,... --exclude directory_
+TL:common/phive.md:28	msg-own		-	phive remove alias|url
 TL:common/printenv.md:8	neither	out	-	printenv
 TL:common/printf.md:29	neither	status	X	printf -v myvar "This is %s = %d\n" "a year" 2016
 TL:common/readarray.md:32	neither	status+out	X	help mapfile
 TL:common/shopt.md:25	neither	status+out	X	help shopt
 TL:common/test.md:34	neither	status+out	X	help test
+TL:common/texconfig.md:13	msg-own		-	texconfig paper a4|letter|...
 TL:common/times.md:10	neither	out	-	times
 TL:common/ulimit.md:29	neither	status+out	X	help ulimit
-TL:common/vboxmanage-modifyvm.md:12	msg-own		-	VBoxManage modifyvm uuid|vm_name --memory 2048 --cpus 2
 TL:common/volta.md:28	neither	status+out	X	volta help fetch|install|uninstall|pin|list|completions|which|setup|run|help
+TL:common/zoxide.md:29	msg-own		-	zoxide init bash|elvish|fish|nushell|posix|powershell|tcsh|xonsh|zsh
 TL:linux/dialog.md:13	neither	files	-	dialog --inputbox "Enter text:" 8 40 2>output.txt
-TL:linux/nixos-option.md:16	msg-own		-	nixos-option users.users.username.openssh.authorizedKeys.keyFiles|keys
-TL:linux/setterm.md:21	msg-own		-	setterm --foreground default|black|blue|red|...
-TL:linux/steamosctl.md:24	msg-own		-	steamosctl set-cpu-scheduler none|lavd|...
+TL:linux/hwinfo.md:13	msg-own		-	hwinfo --cpu|memory|disk|gfxcard|network|usb|pci|keyboard|mouse|monitor|sound|fingerprint|...
+TL:linux/rmpc.md:29	msg-own		-	rmpc next|prev|stop|consume|togglerepeat|pause|unpause
+TL:linux/screenkey.md:20	msg-own		-	screenkey -p top|center|bottom|fixed
+TL:linux/sio.md:24	msg-own		-	sio cpu|gpu|memory|storage|network|pci|pcie|audio|usb|battery|board
 TL:linux/trap.md:36	neither	status+out	X	help trap
-TL:linux/whiptail.md:21	msg-own		X	result_variable_name="$(whiptail --title "title" --inputbox "message" height_in_chars width_in_chars default_text 3>&1 1
-TL:linux/whiptail.md:25	msg-own		X	result_variable_name="$(whiptail --title "title" --passwordbox "message" height_in_chars width_in_chars 3>&1 1>&2 2>&3)"
-TL:linux/whiptail.md:29	msg-own		X	result_variable_name=$(whiptail --title "title" --menu "message" height_in_chars width_in_chars menu_display_height "val
 TL:linux/zenity.md:25	OURS	rec	-	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress

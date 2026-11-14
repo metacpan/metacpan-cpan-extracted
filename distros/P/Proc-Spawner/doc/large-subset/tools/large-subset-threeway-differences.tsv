@@ -1,8 +1,8 @@
 class	samples	call	dash	bash	program	examples
-all three differ	1	printf %(%s%s)T -1	2 |printf: %(: invalid directive\n	0 17938824051793882405|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar11
-all three differ	1	printf %(%s)T	2 |printf: %(: invalid directive\n	0 1793882405|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar19
-all three differ	1	printf %d %(%s)T	2 0 |printf: %(: invalid directive\n	0 0 1793882406|	1 0 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar21
-all three differ	1	printf %d %(%s)T 42	2 42 |printf: %(: invalid directive\n	0 42 1793882406|	1 42 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar20
+all three differ	1	printf %(%s%s)T -1	2 |printf: %(: invalid directive\n	0 17945457731794545773|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar11
+all three differ	1	printf %(%s)T	2 |printf: %(: invalid directive\n	0 1794545773|	1 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar19
+all three differ	1	printf %d %(%s)T	2 0 |printf: %(: invalid directive\n	0 0 1794545774|	1 0 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar21
+all three differ	1	printf %d %(%s)T 42	2 42 |printf: %(: invalid directive\n	0 42 1794545774|	1 42 |printf: %(: invalid conversion specification\n	SC:Checks/Commands.hs:prop_checkPrintfVar20
 all three differ	1	printf -v foo bar	2 |printf: Illegal option -v\n	0 |	0 -v|printf: warning: ignoring excess arguments, starting with 'foo'\n	SC:Analytics.hs:prop_checkUnassignedReferences20
 all three differ	1	printf -v myvar This is %s = %d\n a year 2016	2 |printf: Illegal option -v\n	0 |	0 -v|printf: warning: ignoring excess arguments, starting with 'myvar'	TL:common/printf.md:29
 all three differ	1	printf -vTODAY %(%Y)T	2 |printf: Illegal option -v\n	0 |	0 -vTODAY|printf: warning: ignoring excess arguments, starting with '%	SC:Checks/Commands.hs:prop_checkPrintfVar23
@@ -79,7 +79,6 @@ bash=program, dash differs	2	echo -ne foo	0 -ne foo\n|	0 foo|	0 foo|	SC:Checks/S
 bash=program, dash differs	2	echo Hello\nWorld!	0 Hello\nWorld!\n|	0 Hello\nWorld!\n|	0 Hello\nWorld!\n|	TL:common/pbmtext.md:13,TL:common/pbmtext.md:21
 bash=program, dash differs	4	echo -e red\ngreen\nblue	0 -e red\ngreen\nblue\n|	0 red\ngreen\nblue\n|	0 red\ngreen\nblue\n|	TL:linux/fuzzel.md:20,TL:linux/fuzzel.md:24,TL:linux/dmenu.md:13
 bash=program, dash differs	6	echo -ne 	0 -ne \n|	0 |	0 |	NB:7885,NB:5899,NB:7886
-dash=bash, program differs	1	printf %0.s- 1	0 -|	0 -|	1 |printf: %0.s: invalid conversion specification\n	NB:5904
 dash=bash, program differs	1	printf -v %s 	2 |printf: Illegal option -v\n	2 |printf: `%s': not a valid identifier\n	0 -v|printf: warning: ignoring excess arguments, starting with '%s'\n	SC:Checks/ShellSupport.hs:prop_checkBashisms30
 dash=bash, program differs	1	printf -v cow	2 |printf: Illegal option -v\n	2 |printf: usage: printf [-v var] format [arguments]\n	0 -v|printf: warning: ignoring excess arguments, starting with 'cow'\n	SC:Checks/Commands.hs:prop_checkPrintfVar3
 dash=program, bash differs	1	[ ! -a file ]	2 |[: -a: unexpected operator\n	0 |	2 |[: '-a': unary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkNegatedUnaryOps5
@@ -98,7 +97,7 @@ messages only	1	[  != lol	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']
 messages only	1	[  -eq	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	TL:common/[.md:18
 messages only	1	[  = lol	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkAndEq3
 messages only	1	[ ! -eq 0 ]	2 |[: Illegal number: !\n	2 |[: !: integer expression expected\n	2 |[: invalid integer '!'\n	SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest9
-messages only	1	[ != /bin /bin.usr-is-merged /boot /container_info.json /dev /etc /home /lib /lib.usr-is-merged /lib64 /lost+found /media /mnt /nix /old_root /opt /proc /root /run /sbin /srv /sys /tmp /usr /var ]	2 |[: !=: unexpected operator\n	2 |[: too many arguments\n	2 |[: extra argument '/bin'\n	SC:Analytics.hs:prop_checkComparisonAgainstGlob6
+messages only	1	[ != /bin /bin.usr-is-merged /boot /container_info.json /dev /etc /home /lib /lib.usr-is-merged /lib64 /lost+found /media /mnt /nix /old_root /opt /proc /root /run /runcompare /sbin /srv /sys /tmp /usr /var ]	2 |[: !=: unexpected operator\n	2 |[: too many arguments\n	2 |[: extra argument '/bin'\n	SC:Analytics.hs:prop_checkComparisonAgainstGlob6
 messages only	1	[ != foo ]	2 |[: !=: unexpected operator\n	2 |[: !=: unary operator expected\n	2 |[: missing argument after 'foo'\n	SC:Analytics.hs:prop_checkUnnecessarilyInvertedTest6
 messages only	1	[ -M a ]	2 |[: -M: unexpected operator\n	2 |[: -M: unary operator expected\n	2 |[: '-M': unary operator expected\n	SC:Analytics.hs:prop_checkValidCondOps2
 messages only	1	[ -eq 1 ]	2 |[: -eq: unexpected operator\n	2 |[: -eq: unary operator expected\n	2 |[: missing argument after '1'\n	SC:Analytics.hs:prop_checkAndEq11
@@ -115,7 +114,6 @@ messages only	1	[ ==  ]	2 |[: ==: unexpected operator\n	2 |[: ==: unary operator
 messages only	1	[ == cow ]	2 |[: ==: unexpected operator\n	2 |[: ==: unary operator expected\n	2 |[: missing argument after 'cow'\n	SC:Analytics.hs:prop_checkUnquotedExpansions3
 messages only	1	[ a !=	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkOrNeq4
 messages only	1	[ a =	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkAndEq4
-messages only	1	[ a.txt	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkLiteralBreakingTest4
 messages only	1	[ foo	2 |[: missing ]\n	2 |[: missing `]'\n	2 |[: missing ']'\n	SC:Analytics.hs:prop_checkConditionalAndOrs1
 messages only	1	[ foo -eq y ]	2 |[: Illegal number: foo\n	2 |[: foo: integer expression expected\n	2 |[: invalid integer 'foo'\n	SC:Analytics.hs:prop_checkNumberComparisons16
 messages only	1	[ foo =~ bar ]	2 |[: foo: unexpected operator\n	2 |[: =~: binary operator expected\n	2 |[: '=~': binary operator expected\n	SC:Checks/ShellSupport.hs:prop_checkBashisms6c

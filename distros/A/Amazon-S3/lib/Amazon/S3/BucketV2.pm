@@ -14,7 +14,7 @@ use Scalar::Util qw(reftype);
 
 use parent qw(Amazon::S3::Bucket);
 
-our $VERSION = '2.1.3'; ## no critic (RequireInterpolation)
+our $VERSION = '2.1.4'; ## no critic (RequireInterpolation)
 
 ######################################################################
 our @GET_OBJECT_METHODS = (

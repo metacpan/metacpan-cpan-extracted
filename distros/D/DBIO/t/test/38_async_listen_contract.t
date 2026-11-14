@@ -747,7 +747,7 @@ subtest 'reachable as $schema->storage->async, torn down by the sync disconnect'
 # pending future_class Future: "is not yet complete and does not provide
 # ->await" on Future.pm). Awaiting must not change WHEN it resolves: listen
 # still returns only once the channel is subscribed and watched.
-subtest 'k222: listen / unlisten / listen_reconnect ->get drive the transport loop' => sub {
+subtest 'listen / unlisten / listen_reconnect ->get drive the transport loop' => sub {
   @K222::Loop::queue = ();
   my $s = fresh('K222::Transport');
 
@@ -786,7 +786,7 @@ subtest 'k222: listen / unlisten / listen_reconnect ->get drive the transport lo
 # attempt fails on a later tick, ->get dies with the reason instead of hanging,
 # and the registration stays for self-healing (ADR 0056 Rationale: a daemon
 # awaiting listen at startup learns at once that the database is down).
-subtest 'k222: an awaited listen dies with the reason of the failed attempt' => sub {
+subtest 'an awaited listen dies with the reason of the failed attempt' => sub {
   @K222::Loop::queue = ();
   my $s = fresh('K222::Transport');
   $s->{fake}{open_mode} = 'fail';
@@ -805,7 +805,7 @@ subtest 'k222: an awaited listen dies with the reason of the failed attempt' => 
 # Claim: the same holds over the real Future.pm, which holds the Futures it
 # derives only weakly -- the Future handed out, and the link core settles it
 # through, must not get lost on the way ("lost a sequence Future").
-subtest 'k222: awaitable over real Future.pm' => sub {
+subtest 'awaitable over real Future.pm' => sub {
   plan skip_all => 'Future not installed' unless eval { require Future; 1 };
   @K222::Loop::queue = ();
   my @warned;
@@ -827,7 +827,7 @@ subtest 'k222: awaitable over real Future.pm' => sub {
 # unwatch the connection it closes -- otherwise the transport keeps watching a
 # closed connection. And the arm step must not then mark a torn-down or
 # replaced state as up.
-subtest 'k222: watching is marked before _listen_watch runs' => sub {
+subtest 'watching is marked before _listen_watch runs' => sub {
   # 1. A notification delivered inside _listen_watch unlistens the last channel.
   my $t = fresh();
   my $early = 1;
@@ -890,7 +890,7 @@ subtest 'k222: watching is marked before _listen_watch runs' => sub {
 # Claim: the error a transport reports reaches on_listen_error in the shape
 # core's own reports have -- storage first, the text verbatim without its
 # trailing newline -- so a consumer's handler cannot tell the two apart.
-subtest 'k227: _listen_error hands the error to on_listen_error' => sub {
+subtest '_listen_error hands the error to on_listen_error' => sub {
   my $s = fresh();
   $s->listen(a => sub {})->get;
   my @seen;
@@ -905,7 +905,7 @@ subtest 'k227: _listen_error hands the error to on_listen_error' => sub {
 
 # Claim: without a hook the error is warned, never dropped -- the rule core
 # applies to its own errors (ADR 0056 section 3), with core's own prefix.
-subtest 'k227: without a hook, a reported error is warned' => sub {
+subtest 'without a hook, a reported error is warned' => sub {
   my $s = K219::Transport->new(undef);
   $s->listen(a => sub {})->get;
   my @warned;
@@ -918,7 +918,7 @@ subtest 'k227: without a hook, a reported error is warned' => sub {
 # Claim: a hook that dies does not reach the transport -- its watch loop called
 # _listen_error and has to carry on -- and the death is not lost either: it is
 # warned.
-subtest 'k227: a dying on_listen_error hook is warned, not thrown' => sub {
+subtest 'a dying on_listen_error hook is warned, not thrown' => sub {
   my $s = fresh();
   $s->listen(a => sub {})->get;
   $s->on_listen_error(sub { die "log backend down\n" });
@@ -935,7 +935,7 @@ subtest 'k227: a dying on_listen_error hook is warned, not thrown' => sub {
 # why the transport did not call _listen_lost. So no seam runs at all, no
 # backoff is scheduled, a listen still in flight keeps waiting, delivery goes
 # on and listen_alive stays true.
-subtest 'k227: a reported error leaves the listen connection up' => sub {
+subtest 'a reported error leaves the listen connection up' => sub {
   my $s = fresh();
   my @got;
   $s->listen(a => sub { push @got, $_[1] })->get;
@@ -961,7 +961,7 @@ subtest 'k227: a reported error leaves the listen connection up' => sub {
 # not listening. A report cannot create listen state, and a straggler arriving
 # after listening ended -- about a connection core has already closed --
 # reaches no hook.
-subtest 'k227: a report while nothing is listened to is ignored' => sub {
+subtest 'a report while nothing is listened to is ignored' => sub {
   my $s = fresh();
   $s->_listen_error('before any listen');
   ok !exists $s->{_listen}, 'it creates no listen state';

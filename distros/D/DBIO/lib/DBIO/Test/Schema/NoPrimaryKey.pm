@@ -3,7 +3,7 @@ package DBIO::Test::Schema::NoPrimaryKey;
 
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -32,7 +32,7 @@ DBIO::Test::Schema::NoPrimaryKey - Test result class for a table with no primary
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

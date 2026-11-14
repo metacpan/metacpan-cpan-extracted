@@ -9,7 +9,7 @@ use Fcntl qw(:DEFAULT :flock);
 use Digest::SHA qw(sha256_hex);
 use parent qw(AmberDB::Locale AmberDB::Array);
 
-our $VERSION = '5.26.5';
+our $VERSION = '5.26.6';
 my $CREATED  = '2014-12-20';
 
 # ------------------------------------------------
@@ -241,7 +241,7 @@ sub db_sortid {
 
     scalar @records or return ();
 
-    my $is_simple = $table ? ( $self->table_attr( $table, 'use_simple' ) // $self->config('simple') ) : $self->config('simple');
+    my $is_simple = $self->config('use_simple') || ( $table && $self->table_attr( $table, 'use_simple' ) );
     my $field     = ( ref( $records[0] ) eq "ARRAY" ) ? 0 : undef;
     my $sort_type = $is_simple ? 'ascii' : 'num';
 
@@ -273,11 +273,11 @@ sub set_datadir {
     # db_ext tanımlı ve "db" değil ise simple moduna al
     my $db_ext = $self->config('db_ext');
     if ( length($db_ext) && $db_ext ne "db" ) {
-        $self->config( simple => 1 );
+        $self->config( use_simple => 1 );
     }
 
     # do not proceed if simple mode
-    if ( $self->config('simple') ) {
+    if ( $self->config('use_simple') ) {
         $self->{_path}->{backup_dir}  = $dbase_dir;
         $self->{_path}->{buffer_dir}  = $dbase_dir;
         $self->{_path}->{journal_dir} = $dbase_dir;
@@ -355,10 +355,14 @@ sub config {
 
     # 2. Single scalar argument: getter -> $adb->config('language')
     if ( @args == 1 && !ref( $args[0] ) ) {
-        if ( $args[0] eq 'user' ) {
+        my $key = $args[0];
+        if ( $key eq 'user' ) {
             return $self->{_connect}->{username} // $self->{_cfg}->{user} // 'user_system';
         }
-        return $self->{_cfg}->{ $args[0] } // '';
+        if ( $key eq 'simple' || $key eq 'use_simple' ) {
+            return $self->{_cfg}->{use_simple} // '';
+        }
+        return $self->{_cfg}->{ $key } // '';
     }
 
     # 3. Setter: key-value list or hashref
@@ -375,13 +379,18 @@ sub config {
             $self->{_cfg}->{db_ext} = $val;
             $self->{db_ext} = $val;
             if ( defined $val && $val ne "db" ) {
-                $self->{_cfg}->{simple} = 1;
+                $self->{_cfg}->{use_simple} = 1;
             }
+            $self->_invalidate_table_paths();
+        },
+        use_simple => sub {
+            my $val = shift;
+            $self->{_cfg}->{use_simple} = $val ? 1 : 0;
             $self->_invalidate_table_paths();
         },
         simple => sub {
             my $val = shift;
-            $self->{_cfg}->{simple} = $val ? 1 : 0;
+            $self->{_cfg}->{use_simple} = $val ? 1 : 0;
             $self->_invalidate_table_paths();
         },
         use_ramdisk => sub {

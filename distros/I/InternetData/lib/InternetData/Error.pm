@@ -3,6 +3,7 @@ package InternetData::Error;
 use strict;
 use warnings;
 
+use Mojo::Headers;
 use Scalar::Util ();
 use Time::Local ();
 
@@ -11,7 +12,7 @@ use overload
     'bool' => sub { 1 },
     fallback => 1;
 
-our $VERSION = '1.12.1';
+our $VERSION = '1.13.1';
 
 my %RETRYABLE = (rate_limited => 1, server_error => 1, network => 1);
 
@@ -39,11 +40,13 @@ sub throw {
 
 # Classifies one failed response.
 #
-# Every refusal this API writes carries `{"rc": "<CODE>"}`, and that code is more
-# use to a caller than the status alone: NOT_LICENSED and LICENSE_EXPIRED are
-# both 403 and mean different things to do next. $fallback names where a refusal
-# came from when there is no envelope to read, which is the case for object
-# storage on the other end of a presigned link.
+# The two APIs behind this host answer with different envelopes - a lookup's
+# refusal says why under `error`, a database's under `rc` - and both are read
+# here so a caller never has to know which was hit. A database code is more use
+# to a caller than the status alone: NOT_LICENSED and LICENSE_EXPIRED are both
+# 403 and mean different things to do next. $fallback names where a refusal came
+# from when there is no envelope to read, which is the case for object storage
+# on the other end of a presigned link.
 sub from_response {
     my ($class, $status, $headers, $body, $fallback) = @_;
     my $message = _message($body);
@@ -76,6 +79,14 @@ sub from_response {
     return $class->new(kind => 'server_error', message => $message, status => $status);
 }
 
+# A per-entry failure inside a successful batch: the status the single lookup
+# would have answered, and its message, with no headers at all - so a 429 here
+# is a spent allowance, which is the only kind the API puts in an entry.
+sub from_entry {
+    my ($class, $status, $message) = @_;
+    return $class->from_response($status, Mojo::Headers->new, { error => $message });
+}
+
 # Anything a promise can reject with becomes one of these. Mojo::UserAgent
 # rejects with a plain string when a connection never got far enough to have a
 # status, which is exactly the transport failure the retry rule wants.
@@ -96,13 +107,14 @@ sub retryable {
     return $RETRYABLE{ $_[0]->{kind} } ? 1 : 0;
 }
 
-# An empty code says nothing, so it gives way to the fallback rather than
-# reading as a message of nothing at all.
+# An empty field says nothing, so it gives way to the other envelope, then to
+# the fallback, rather than reading as a message of nothing at all.
 sub _message {
     my ($body) = @_;
     return undef unless ref $body eq 'HASH';
-    my $rc = $body->{rc};
-    return $rc if defined $rc && !ref $rc && length $rc;
+    for my $key (qw(error rc)) {
+        return $body->{$key} if defined $body->{$key} && !ref $body->{$key} && length $body->{$key};
+    }
     return undef;
 }
 
@@ -190,7 +202,8 @@ thing that separates them.
 
 =head2 message
 
-The API's own result code - C<UNAUTHORIZED>, C<NOT_LICENSED>,
+A lookup refusal's explanation (C<invalid API key>, C<POST /batch needs a paid
+plan>), a database call's result code - C<UNAUTHORIZED>, C<NOT_LICENSED>,
 C<LICENSE_EXPIRED>, C<UNKNOWN_DATASET>, C<INVALID_FORMAT>, C<NOT_AVAILABLE> and
 so on - or a fallback naming the status when the response carried no envelope.
 

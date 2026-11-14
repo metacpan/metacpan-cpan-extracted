@@ -16,7 +16,7 @@ use AmberDB;
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $adb = AmberDB->new(
     path => { dbase_dir => $tmpdir },
-    cfg  => { language => 'tr', simple => 0 },
+    cfg  => { language => 'tr', use_simple => 0 },
 );
 
 # ==============================================================================

@@ -221,7 +221,7 @@ local $SIG{__WARN__} = sub {
   # This is the guard the deploy's DDL (scenario 2) does not pass through.
   # Maintainer-Entscheidung offen.
   like outcome($f), qr/^failed: .*does not belong to this storage generation/s,
-    'IST-STAND k331 (1): a statement issued through the context after the disconnect is refused, and fails the transaction';
+    'IST-STAND (1): a statement issued through the context after the disconnect is refused, and fails the transaction';
   is_deeply $backend->{wire}, [ 'BEGIN@P1', 'ROLLBACK@P1' ],
     '... it never reaches the wire; the transaction is rolled back on P1';
 }

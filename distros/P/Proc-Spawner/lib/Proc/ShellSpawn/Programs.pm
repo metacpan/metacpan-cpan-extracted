@@ -13,7 +13,7 @@ package Proc::ShellSpawn::Programs;
 # Integers go through Perl's own sprintf, so a perl with 64-bit integers is assumed (ivsize 8: Strawberry, Linux).
 use strict; use warnings;
 use POSIX (); use File::Spec (); use Math::BigInt ();
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 
 my $IMAX = Math::BigInt->new('9223372036854775807'); my $IMIN = -$IMAX - 1;
 my $UMAX = Math::BigInt->new('18446744073709551615');

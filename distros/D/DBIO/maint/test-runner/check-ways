@@ -12,6 +12,11 @@
 # DBIO_TEST_MSSQL_ODBC_* variables). Db2 and anything else: set
 # DBIO_TEST_DB2_DSN/_USER/_PASS like the others.
 #
+# The connect lines and failure messages go through DBIO::Util::mask_connect_secrets
+# (this checkout's lib, mounted read-only into the container and put on PERL5LIB);
+# where that cannot be loaded, the connect part refuses to run rather than print a
+# password.
+#
 # Capped like run-suite (DBIO_TEST_MEMMAX, DBIO_TEST_CPUS); one container, serial.
 
 set -eu
@@ -19,13 +24,14 @@ here=$(cd "$(dirname "$0")" && pwd)
 . "$here/env.sh"      # -d DB loads `dbio-db env DB`, -n NAME see there
 export DOCKER_HOST=unix:///var/run/docker.sock
 image=${DBIO_TEST_IMAGE:-dbio-test-runner:local}
+core=$(cd "$here/../.." && pwd)
 
 envargs=()
 while IFS= read -r name; do envargs+=(-e "$name"); done < <(compgen -e | grep '^DBIO_TEST_' || true)
 
 exec nice -n 19 docker run --rm -i --network host \
   --memory "${DBIO_TEST_MEMMAX:-1g}" --memory-swap "${DBIO_TEST_MEMMAX:-1g}" --cpus "${DBIO_TEST_CPUS:-1}" \
-  -e HOME=/tmp "${envargs[@]}" "$image" perl - <<'PERL'
+  -e HOME=/tmp -e "PERL5LIB=$core/lib" -v "$core:$core:ro" "${envargs[@]}" "$image" perl - <<'PERL'
 use strict; use warnings; use DBI;
 
 print "== load\n";
@@ -40,12 +46,20 @@ printf "%-14s %s\n", 'clickhouse', (`clickhouse client --version 2>&1` =~ /versi
 
 print "== connect\n";
 my @try;
+my $masked = eval { require DBIO::Util; 1 };
+my $mask_why = $@;
+sub mask { DBIO::Util::mask_connect_secrets($_[0], [ @_[1 .. 3] ]) }
 for my $k (sort grep { /^DBIO_TEST_(.+)_DSN$/ } keys %ENV) {
   (my $p = $k) =~ s/_DSN$//;
   my @c = ($ENV{$k}, $ENV{"${p}_USER"}, $ENV{"${p}_PASS"});
   push @try, [ $p, @c ];
   my $alt = $c[0];
   push @try, [ "$p (MariaDB)", $alt, @c[1,2] ] if $alt =~ s/^dbi:mysql:/dbi:MariaDB:/i;
+}
+if (@try && !$masked) {
+  (my $why = $mask_why) =~ s/\s+/ /g;
+  print "FAIL DBIO::Util not loadable, connect part skipped (it would print secrets): $why\n";
+  exit 1;
 }
 for my $t (@try) {
   my ($name, $dsn, $u, $p) = @$t;
@@ -54,7 +68,7 @@ for my $t (@try) {
     my $sql = $dsn =~ /DB2|Oracle/i ? ($dsn =~ /Oracle/i ? 'SELECT 1 FROM dual' : 'SELECT 1 FROM sysibm.sysdummy1') : 'SELECT 1';
     my ($x) = $dbh->selectrow_array($sql);
     $dbh->disconnect; "ok ($x)";
-  } || do { (my $e = $@) =~ s/\s+/ /g; "FAIL $e" };
-  printf "%-26s %-40.40s %s\n", $name, $dsn, $res;
+  } || do { (my $e = $@) =~ s/\s+/ /g; "FAIL " . mask($e, $dsn, $u, $p) };
+  printf "%-26s %-40.40s %s\n", $name, mask($dsn, $dsn, $u, $p), $res;
 }
 PERL

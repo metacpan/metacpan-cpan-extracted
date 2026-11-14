@@ -411,7 +411,7 @@ Full comprehensive guides are available in the [`docs/`](docs/) and [`wiki/`](wi
 AmberDB includes an exhaustive test suite covering core operations, indexing, transactions, search, facets, locales, and backups, along with multi-process concurrency stress tests:
 
 ```bash
-# Run standard unit & integration test suite (51 test files, 470+ assertions)
+# Run standard unit & integration test suite (66 test files, 650+ assertions)
 prove -l t/
 
 # Run author & extended integration test suite (RAM-disk & multi-process stress)

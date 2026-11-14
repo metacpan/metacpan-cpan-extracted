@@ -3,7 +3,7 @@ package DBIO::Test::Schema::CD_to_Producer;
 
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use strict;
 
@@ -43,7 +43,7 @@ DBIO::Test::Schema::CD_to_Producer - Test result class for the cd_to_producer ta
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

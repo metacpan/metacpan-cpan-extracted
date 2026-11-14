@@ -118,3 +118,15 @@ f() { n=a.b; unset $n; echo in; }; f; echo after
 n=a.b; unset -f $n; echo "after $?"
 n=''; unset "$n"; echo after
 x=1; n=x; unset $n; echo "ok [$x] $?"
+: > e0.sh; . ./e0.sh; echo "after empty $?"; mkdir -p d0; . ./d0; echo "after dir $?"
+v=x1; exit $v
+v=+3; (exit $v); echo "st=$?"; v=1000; (exit $v); echo "st=$?"
+v=x1; f() { return $v; }; f; echo "st=$?"
+v=x1; set -o $v; echo after
+v=z; set -$v; echo after
+mkdir -p g40 && cd g40 && touch m0.jpg a.jpg B.jpg _x.jpg && echo *[[:digit:]].jpg [[:upper:]]* [[:punct:]]* [![:alnum:]]*.jpg [[:nosuch:]]*
+x="a*"; v=abcabc; q="?"; echo "${v#$x}" "${v##$x}" "${v%$x}" "${v#"$x"}" "${v%$q}" "${v%[$q]}"
+HOME=; cd; echo "st=$?"
+nosuch 2>log; echo "st=$?"; sed "s/.*nosuch/nosuch/" log; nosuch 2>&1 | sed "s/.*nosuch/nosuch/"; x=$(nosuch 2>&1); echo "[${x##*nosuch}]"
+shift $(($#-1)); echo after
+v="[n]"; shift $v; echo after

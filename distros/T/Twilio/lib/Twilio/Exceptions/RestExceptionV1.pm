@@ -7,7 +7,7 @@ use warnings;
 # RestException works with every API, and get_status_code answers on both.
 use parent 'Twilio::Exceptions::RestException';
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $code, $message, $http_status_code, $params, $user_error) = @_;

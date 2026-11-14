@@ -16,15 +16,14 @@ WriteMakefile(
 	VERSION_FROM => 'lib/Test/Log/Abstraction.pm',
 	ABSTRACT_FROM => 'lib/Test/Log/Abstraction.pm',
 	AUTHOR => 'Nigel Horne <njh@nigelhorne.com>',
-	LICENSE => 'GPL',
+	LICENSE => 'gpl_2',
 	MIN_PERL_VERSION => '5.026',	# Params::Validate::Strict needs 5.26
 	PREREQ_PM => {
-		'autodie' => 0,
 		'Carp' => 0,
 		'Encode' => 0,
 		'Hash::Util' => 0,
 		'List::Util' => 1.33,	# any()
-		'IPC::System::Simple' => 0,	# autodie qw(:all)
+		'overload' => 0,
 		'Params::Get' => 0.17,
 		'Params::Validate::Strict' => 0.41,	# union types
 		'Readonly' => 0,
@@ -36,18 +35,20 @@ WriteMakefile(
 		'warnings' => 0,
 	}, TEST_REQUIRES => {
 		'B' => 0,
+		'Config' => 0,
 		'Cwd' => 0,
 		'Errno' => 0,
 		'Exporter' => 0,
+		'File::Spec' => 0,
 		'File::Temp' => 0,
-		'Log::Abstraction' => 0.41,
-		'JSON::PP' => 0,
+		'JSON::MaybeXS' => 0,
 		'Test::Builder::Tester' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::Permissions' => 0,
 		'Test::Without::Module' => 0,
 		'Time::HiRes' => 0,
 		'Test::Mockingbird' => 0.14,
+		'Test::More' => 0,
 		'Test::Most' => 0,
 		'Test::Returns' => 0.04,
 		'Test::Warnings' => 0,
@@ -55,6 +56,13 @@ WriteMakefile(
 	clean	 => { FILES => 'Test-Log-Abstraction-*' },
 	META_MERGE => {
 		'meta-spec' => { version => 2 },
+		prereqs => {
+			test => {
+				# t/integration.t compares the two when it is installed,
+				# and skips that part otherwise
+				recommends => { 'Log::Abstraction' => '0.41' },
+			},
+		},
 		resources => {
 			homepage => 'https://metacpan.org/pod/Test::Log::Abstraction',
 			repository => {

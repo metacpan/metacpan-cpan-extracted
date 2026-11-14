@@ -1,0 +1,49 @@
+{
+   "abstract" : "Mojo::Pg migrations that replace environment placeholders in their sql, sponsored by Fibia",
+   "author" : [
+      "David Jack Wange Olrik <djo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "MojoX-Pg-Migrations-Env",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker::CPANfile" : "0.11"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mojo::Pg" : "4.04",
+            "Mojolicious" : "7.51",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Simple" : "1.302210"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.2.0",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

@@ -4,6 +4,8 @@ use warnings;
 
 use Test::More;
 use Test::Exception;
+use lib 't/lib';
+use TestDBIO::Child;
 
 use DBI;
 use DBIO::Util ();
@@ -616,10 +618,7 @@ for my $form (
     'eval { DBI->connect($ENV{K297_DSN}, q{u}, undef, { PrintError => 0, RaiseError => 0 }) };',
     'print qq{\ndone\n};';
 
-  open my $perl, '-|', $^X, (map { "-I$_" } grep { !ref } @INC), '-e', $code
-    or die "cannot run $^X: $!";
-  my $out = do { local $/; <$perl> };
-  close $perl;
+  my $out = TestDBIO::Child::run_perl(code => $code)->{output};
 
   like $out, qr/^done$/m, 'connect trace: the other perl ran to its end';
   like $out, qr/Connecting to dbi:K297Refuse:dbname=app;password=\*\*\*;host=db\.example/,

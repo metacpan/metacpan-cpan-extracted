@@ -193,8 +193,9 @@ C<mcp-fs> uses C<anyevent-mcp/rules/fs-NAME.ini>.
 
 =item ask => $method
 
-C<helper>, C<tty>, C<yad>, C<auto> or C<mcp>. When omitted, uses
+C<helper>, C<tty>, C<yad>, C<auto>, C<mcp> or C<none>. When omitted, uses
 C<PERL_ANYEVENT_MCP_PERMISSION_ASK>, defaulting to C<helper>.
+C<none> denies only otherwise-unresolved checks without prompting.
 C<helper> prompts locally using the configured helper. C<tty> and C<yad>
 run the built-in permission helper with only that interface, ignoring custom
 helper settings and without interface fallback. C<auto> uses modern MCP form elicitation when
@@ -276,6 +277,9 @@ value. A saved matcher for a missing dimension does not match. An omitted
 C<match.NAME> in a manually written rule matches any value, including absent
 dimensions; persistent prompts instead require a choice for every dimension.
 An empty choices array disables permanent approvals, not one-time approvals.
+An optional C<dimension_order> array lists dimension names in the preferred
+display order; unlisted dimensions follow alphabetically. This affects only
+the prompts, not rule matching or stored matcher names.
 Matchers are literal unless beginning with C<^>, which denotes a Perl regex.
 The caller must supply trustworthy dimension values, not untrusted tool arguments.
 The former C<subject>, C<subjects>, C<origin>, C<origins>, and C<workdir>
@@ -286,6 +290,12 @@ C<paths> may contain a list of affected filenames for display in permission
 prompts and for optional B<deny-only> exact-file rules. Such matching does
 not restrict sandbox authority and is not a substitute for sandboxing.
 Absent a C<path> matcher, the permission rule is not limited by paths.
+
+When prompting for a new rule, each scope defaults to the latest saved
+matcher for that dimension if it is still among the offered choices.
+Otherwise the application's first (usually narrowest) choice is selected.
+Application-specified C<default> values take precedence. This only affects
+the rule editor; it never grants permission by itself.
 
 Returns C<{decision =E<gt> "allow", sandbox_grants =E<gt> [...]}>,
 C<{decision =E<gt> "deny", sandbox_grants =E<gt> []}>, or
@@ -344,6 +354,8 @@ die. This expands authority names; it does not grant permission.
 
 Replace the ordered process-local rule chain. Parsing and validation
 occur once, at installation. An empty list disables automatic rules.
+With an optional true second argument, prepend the new rules before existing
+process-local rules instead of replacing them.
 
 =item $rules = $permissions->rules
 
@@ -363,10 +375,10 @@ package AnyEvent::MCP::Server::Permissions;
 
 use common::sense;
 use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
 use AnyEvent ();
 use AnyEvent::MCP::Permissions::Ask ();
 use JSON::XS ();
-use AnyEvent::MCP::File ();
 use Errno qw(ENOENT);
 use Scalar::Util qw(weaken);
 
@@ -378,8 +390,8 @@ sub new {
    my $auto_rules = delete $kv{auto_rules} || [];
    my $ask = exists $kv{ask} ? $kv{ask} : $ENV{PERL_ANYEVENT_MCP_PERMISSION_ASK};
    $ask = "helper" unless defined $ask && length $ask;
-   die "Invalid permission ask mode (expected helper, tty, yad, auto, or mcp)\n"
-      unless ref $ask eq "CODE" || !ref $ask && $ask =~ /\A(?:helper|tty|yad|auto|mcp)\z/;
+   die "Invalid permission ask mode (expected helper, tty, yad, auto, mcp, or none)\n"
+      unless ref $ask eq "CODE" || !ref $ask && $ask =~ /\A(?:helper|tty|yad|auto|mcp|none)\z/;
 
    my $self = $class->SUPER::new (sandbox_grants => {}, actions => {}, rules => [], ask => $ask, timeout => 300, %kv);
 
@@ -397,7 +409,7 @@ sub new {
 }
 
 sub auto_rules {
-   my ($self, $rules) = @_;
+   my ($self, $rules, $prepend) = @_;
 
    ref $rules eq "ARRAY" or die "Automatic permission rules must be an array\n";
    my @compiled;
@@ -419,6 +431,7 @@ sub auto_rules {
          closure    => $capability eq "*" ? undef : $self->closure ([$capability]),
       };
    }
+   push @compiled, @{$self->{auto_rules}} if $prepend;
    $self->{auto_rules} = \@compiled;
 }
 
@@ -520,20 +533,15 @@ sub _read_rules {
 
    return $self->{rules} unless defined $self->{file};
 
-   open my $fh, "<", $self->{file} or do {
+   open my $fh, "<:raw", $self->{file} or do {
       return [] if $! == ENOENT;
       die "$self->{file}: $!\n";
    };
 
-   local $/;
-   my $text = scalar (<$fh>);
-   close $fh or die "$self->{file}: $!\n";
-
    my @rules;
    my $valid = eval {
-      $text = AnyEvent::MCP::utf8dec $text;
-      AnyEvent::MCP::parse_ini $text, sub {
-         my ($name, $kv) = @_;
+      for (@{AnyEvent::MCP::Config::parse_ini (AnyEvent::MCP::file_load ($self->{file}, $fh), $self->{file})}) {
+         my ($name, $kv) = @$_;
          if ($name eq "") {
             %$kv and die "$self->{file}: permission rule outside [rule]\n";
          } elsif ($name eq "rule") {
@@ -541,10 +549,11 @@ sub _read_rules {
          } else {
             die "$self->{file}: invalid permission rule section '$name'\n";
          }
-      }, $self->{file};
+      }
       $self->_rule ($_) for @rules;
       1
    };
+   close $fh or die "$self->{file}: $!\n";
 
    $valid ? \@rules : []
 }
@@ -557,21 +566,14 @@ sub _write {
       return
    }
 
-   my $text = join "", map {
-      my $rule = $_;
-      "[rule]\n" . (join "", map {
-         die "Multiline permission rule value\n" if $rule->{$_} =~ /[\r\n]/;
-         "$_=$rule->{$_}\n"
-      } sort keys %$rule) . "\n"
-   } @$rules;
-
-   AnyEvent::MCP::File::replace $self->{file}, AnyEvent::MCP::utf8enc ($text);
+   AnyEvent::MCP::file_save $self->{file},
+      AnyEvent::MCP::Config::serialize_ini [map ["rule", $_], @$rules];
 }
 
 sub _lock {
    my ($self) = @_;
 
-   defined $self->{file} ? AnyEvent::MCP::File::lock ($self->{file}) : undef
+   defined $self->{file} ? AnyEvent::MCP::file_lock ($self->{file}) : undef
 }
 
 sub save {
@@ -593,6 +595,15 @@ sub check {
       if grep exists $request->{$_}, qw(subject subjects origin origins workdir workdir_scope);
    my $dimensions = exists $request->{dimensions} ? $request->{dimensions} : {};
    ref $dimensions eq "HASH" or die "Invalid permission dimensions\n";
+   if (exists $request->{dimension_order}) {
+      my $order = $request->{dimension_order};
+      ref $order eq "ARRAY" or die "Invalid permission dimension order\n";
+      my %seen;
+      for my $name (@$order) {
+         defined $name && !ref $name && exists $dimensions->{$name} && !$seen{$name}++
+            or die "Invalid permission dimension order\n";
+      }
+   }
    for my $name (keys %$dimensions) {
       $name =~ /\A[a-z][a-z0-9_-]*\z/ or die "Invalid permission dimension name\n";
       my $dim = $dimensions->{$name};
@@ -640,7 +651,8 @@ sub check {
       };
    }
 
-   my @rules = map { $self->_rule ($_) } @{$self->rules};
+   my $rules = $self->rules;
+   my @rules = map { $self->_rule ($_) } @$rules;
    for my $rule (@rules) {
       next unless $request->{action} =~ $rule->{action};
       next if grep {
@@ -675,10 +687,23 @@ sub check {
    die "Invalid sandbox grant descriptions\n"
       if defined $descriptions && ref $descriptions ne "HASH";
 
+   # Reuse the last saved choice for each dimension if it is still offered.
+   # This changes only the form default, not the authorization check.
+   my %prepared_dimensions = %$dimensions;
+   for my $name (keys %$dimensions) {
+      my $dim = $dimensions->{$name};
+      next if exists $dim->{default};
+      my ($selected) = map $_->{"match.$name"},
+         grep exists $_->{"match.$name"}, reverse @$rules;
+      $prepared_dimensions{$name} = { %$dim, default => $selected }
+         if defined $selected && grep $_->{match} eq $selected, @{$dim->{choices}};
+   }
+
    {
       decision => "ask",
       request  => {
          %$request,
+         dimensions                => \%prepared_dimensions,
          sandbox_grants             => $request->{sandbox_grants} || [],
          version                    => 1,
          name                       => $self->{name},
@@ -798,7 +823,7 @@ sub _user_request {
          label   => "User",
          value   => $user,
          choices => [
-            { label => "This user", match => $user },
+            { label => "This user: $user", match => $user },
             { label => "All users", match => "^" },
          ],
          default => $user,
@@ -987,6 +1012,8 @@ sub require {
 
    my $prepared = $grant->{request};
    my $ask = $self->{ask};
+   return $done->(0, "Permission denied") if !ref $ask && $ask eq "none";
+
    my $client_caps = $req->{params}{_meta}{"io.modelcontextprotocol/clientCapabilities"};
    my $mcp = $req->{protocol_version} ge "2026" && ref $client_caps eq "HASH"
       && ref $client_caps->{elicitation} eq "HASH"

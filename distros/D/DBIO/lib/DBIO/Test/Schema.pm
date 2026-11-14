@@ -4,7 +4,7 @@ package DBIO::Test::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 no warnings 'qw';
 
@@ -174,7 +174,7 @@ DBIO::Test::Schema - Standard test schema for the DBIO ecosystem
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

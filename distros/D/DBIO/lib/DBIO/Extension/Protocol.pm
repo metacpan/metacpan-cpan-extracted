@@ -4,22 +4,10 @@ package DBIO::Extension::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
 use DBIO::Exception;
 use DBIO::Util ();
-
-# Canonical text of a plain structure: sorted keys, no module beyond core Perl.
-sub _canon {
-  my ($x) = @_;
-  return 'undef' unless defined $x;
-  return '[' . join(',', map { _canon($_) } @$x) . ']' if ref $x eq 'ARRAY';
-  return '{' . join(',', map { _canon($_) . '=>' . _canon($x->{$_}) } sort keys %$x) . '}' if ref $x eq 'HASH';
-  return ref($x) . '()' if ref $x;
-  (my $s = "$x") =~ s{(["\\])}{\\$1}g;
-  return qq{"$s"};
-}
 
 
 sub new {
@@ -56,10 +44,10 @@ sub new {
 sub names { @{ $_[0]{names} } }
 
 
-sub trace { Storable::dclone($_[0]{trace}) }
+sub trace { DBIO::Util::deep_copy($_[0]{trace}) }
 
 
-sub states { Storable::dclone($_[0]{state}) }
+sub states { DBIO::Util::deep_copy($_[0]{state}) }
 
 
 sub models {
@@ -70,12 +58,7 @@ sub models {
 
 # --- internals ---------------------------------------------------------------
 
-sub _clone { ref $_[0] ? Storable::dclone($_[0]) : $_[0] }
-
-sub _frozen {
-  local $Storable::canonical = 1;
-  return Storable::nfreeze(\$_[0]);
-}
+sub _clone { ref $_[0] ? DBIO::Util::deep_copy($_[0]) : $_[0] }
 
 sub _entry_view {
   my ($self, $entry, $with_options) = @_;
@@ -114,7 +97,7 @@ sub _call {
 
   my @args = map { _clone($_) } @$input;
   my $ctx  = $self->_ctx($entry, %ctx_extra);
-  my @before = $self->{verify_input} ? (map { _frozen($_) } @args, _ctx_data($ctx)) : ();
+  my @before = $self->{verify_input} ? (map { DBIO::Util::canonical_text($_) } @args, _ctx_data($ctx)) : ();
 
   my $answer = $class->$method(@args, $ctx);
 
@@ -122,11 +105,11 @@ sub _call {
     for my $i (0 .. $#args) {
       DBIO::Exception->throw(
         "Extension '$name' changed its input in $method (extensions must not modify their arguments)"
-      ) if _frozen($args[$i]) ne $before[$i];
+      ) if DBIO::Util::canonical_text($args[$i]) ne $before[$i];
     }
     DBIO::Exception->throw(
       "Extension '$name' changed its context in $method (extensions must not modify their arguments)"
-    ) if _frozen(_ctx_data($ctx)) ne $before[-1];
+    ) if DBIO::Util::canonical_text(_ctx_data($ctx)) ne $before[-1];
   }
   push @{ $self->{trace}{$name}{$method} }, _clone($answer) if $self->{trace_on};
   return $answer;
@@ -135,7 +118,7 @@ sub _call {
 # The data part of a context: everything but the driver helpers and the handle.
 sub _ctx_data { my ($ctx) = @_; return { map { $_ => $ctx->{$_} } grep { $_ ne 'driver' && $_ ne 'dbh' } keys %$ctx } }
 
-sub _address_key { _canon($_[0]) }
+sub _address_key { DBIO::Util::canonical_text($_[0]) }
 
 sub _check_address {
   my ($name, $method, $address) = @_;
@@ -192,7 +175,7 @@ sub annotate {
         unless ref $triple eq 'ARRAY' && @$triple == 3 && defined $triple->[1] && !ref $triple->[1];
       _check_address($name, 'annotate', $triple->[0]);
       my $key = _address_key($triple->[0]) . "\0" . $triple->[1];
-      push @{ $by{$key} }, { name => $name, triple => _clone($triple), frozen => _frozen($triple->[2]) };
+      push @{ $by{$key} }, { name => $name, triple => _clone($triple), frozen => DBIO::Util::canonical_text($triple->[2]) };
     }
   }
 
@@ -204,7 +187,7 @@ sub annotate {
       my ($address, $attribute) = ($by{$key}[0]{triple}[0], $by{$key}[0]{triple}[1]);
       my @parts = sort map {
         my @who = sort map { $_->{name} } @{ $values{$_} };
-        join(', ', @who) . ' => ' . _canon($values{$_}[0]{triple}[2])
+        join(', ', @who) . ' => ' . DBIO::Util::canonical_text($values{$_}[0]{triple}[2])
       } keys %values;
       push @conflicts, _address_key($address) . ".$attribute: " . join('; ', @parts);
       next;
@@ -356,7 +339,7 @@ DBIO::Extension::Protocol - Runs the phases of the extension interface over the 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

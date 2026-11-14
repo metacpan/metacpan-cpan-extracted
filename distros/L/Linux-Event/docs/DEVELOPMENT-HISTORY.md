@@ -2,6 +2,22 @@
 
 This file preserves historical engineering decisions and the benchmark/optimization phase notes that previously occupied the project README. It is not public API documentation; current contracts are in module POD and the design guides.
 
+## 0.119 native-consumer exception hardening (2026-11-13)
+
+The 0.118 release was completed after the dated 2026-11-01 snapshot below.
+A separate correctness review found that native raw-input and framed-message
+consumer callbacks could throw while Perl save-stack unwinding released the
+final Stream watcher reference. The old exception handler then accessed freed
+XS state. [PR #41](https://github.com/haxmeister/perl-linux-event/pull/41)
+replaced that cleanup with save-stack cleanup ordered before Loop watcher
+reclamation. Full sanitizer and ordinary CI, targeted lifetime regressions,
+actual Stream sendfile testing and the performance gate passed before merge.
+
+Version 0.119 is a maintenance-release preparation containing this correction
+and the permanently installed sanitizer workflow. No additional features or
+public API changes were approved. Do not treat preparation as publication:
+GitHub tagging/release and CPAN upload are separate release steps.
+
 ## 0.118 release preparation and October 2026 research decisions
 
 **Snapshot: 2026-11-01.** `main` is Linux::Event **0.118**,

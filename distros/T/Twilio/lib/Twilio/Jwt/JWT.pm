@@ -10,7 +10,7 @@ use Twilio::Exceptions::TwilioException;
 use Twilio::Json;
 use Twilio::Security::RequestValidator;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $SEGMENTS = 3;
 

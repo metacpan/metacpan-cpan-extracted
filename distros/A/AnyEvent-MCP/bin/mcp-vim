@@ -313,15 +313,16 @@ loading behaviour; these permissions do not sandbox Vim.
 
 Shared switches are documented in
 L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
-The following switch is specific to C<mcp-vim>.
+The following shared switch has editor-specific behavior.
 
 =over
 
 =item --ask MODE
 
 Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp> or
-C<auto>. tty/yad force local interface; mcp delegates to client,
-auto prefers native elicitation when offered. See L</PERMISSIONS>.
+C<auto>, or C<none>. tty/yad force local interface; mcp delegates to
+client, auto prefers native elicitation when offered, and none denies
+unmatched requests. See L</PERMISSIONS>.
 
 =back
 
@@ -390,18 +391,20 @@ our $PORT;
 our $NICK;
 
 my $usage = "Usage: mcp-vim [OPTION]...\n";
-my $server_options = mcp_getoptions ({
-   usage => $usage,
-   path => "/",
-   description => "Bridge live Vim buffers to MCP and browser WebSocket clients.\n"
-      . "With --stdio, the broker also serves MCP on stdin/stdout; TCP stays active.",
-   options => [["--ask MODE", "Ask for permission via helper (default), tty, yad, mcp, or auto"]],
-   examples => "  mcp-vim --name editor --bind 127.0.0.1:20792\n"
-      . "  mcp-vim --name editor --print-url\n"
-      . "  mcp-vim --auto-allow '*,write'",
-}, "ask=s" => \my $ask);
+my $server_options = mcp_getoptions
+   {
+      usage       => $usage,
+      path        => "/",
+      description => "Bridge live Vim buffers to MCP and browser WebSocket clients.\n"
+         . "With --stdio, the broker also serves MCP on stdin/stdout; TCP stays active.",
+      examples    => "  mcp-vim --name editor --bind 127.0.0.1:20792\n"
+         . "  mcp-vim --name editor --print-url\n"
+         . "  mcp-vim --auto-allow '*,write'",
+   }
+;
 @ARGV and die $usage;
 
+my $ask = delete $server_options->{ask};
 my $name = $server_options->{name};
 my $bind = $server_options->{bind};
 my @tokens = @{$server_options->{tokens} || []};
@@ -413,15 +416,10 @@ my $stdio = $server_options->{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_
 my $vim_prot_major = 1;
 my $vim_prot_minor = 0;
 
-my $config = AnyEvent::MCP::Config->global;
+my $config = AnyEvent::MCP::Config::global_config ();
 my %http = $config->http_settings ($name, $bind);
 my $host = $http{host};
 $PORT = $http{port};
-
-# A URL credential must survive service restarts and --print-url.
-my $stored = AnyEvent::MCP::Config->new (file => $config->{file});
-$stored->{section}{global}{secret} eq $config->{section}{global}{secret}
-   or die "mcp-vim: MCP master secret is not persistently stored in $config->{file}\n";
 
 $http{tokens} = \@tokens if @tokens;
 $http{connect_tokens} = \@tokens if @tokens;
@@ -432,7 +430,6 @@ my @connect_tokens = @{$http{connect_tokens}};
 my %connect_token = map { $_ => 1 } @connect_tokens;
 
 $NICK //= (POSIX::uname)[1] || die "cannot determine mcp-vim hostname\n";
-
 
 our $JSON_CODER = JSON::XS->new->utf8;
 
@@ -575,7 +572,7 @@ sub vim::rpc_ {
 }
 
 sub vim::_on_reply {
-   my ($self, $id, $success, $result) = @_; # also backtrace, but we completelky ignore that
+   my ($self, $id, $success, $result) = @_; # also backtrace, but we completely ignore that
 
    my $cb = delete $self->{rpccb}{$id}
       or die "reply for id $id has no callback\n";
@@ -958,8 +955,10 @@ sub vim_permission {
       my $json = JSON::XS->new->allow_nonref;
       my $editor = "ex:" . $json->encode ($name) . ":";
       $subject = $editor . $json->encode ($command);
+      (my $preview = $command) =~ s/\s+/ /g;
+      $preview = substr ($preview, 0, 87) . "..." if length $preview > 90;
       @subjects = (
-         { label => "this exact command in editor '$name' (all buffers)", match => $subject },
+         { label => "This command: $preview (editor '$name', all buffers)", match => $subject },
          { label => "any Ex command in editor '$name' (all buffers)", match => "^" . (quotemeta $editor) },
          { label => "any Ex command in any Vim editor, including future connections", match => "^" },
       );

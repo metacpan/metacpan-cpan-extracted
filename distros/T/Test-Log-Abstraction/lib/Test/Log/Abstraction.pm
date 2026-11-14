@@ -6,7 +6,7 @@ Test::Log::Abstraction - Capture log output in tests and assert on it
 
 =head1 VERSION
 
-0.002.1
+0.002.2
 
 =cut
 
@@ -198,6 +198,14 @@ So a misspelt level (caught by L</AUTOLOAD>) is printed only by rules 1 to
 When a test method fails, the messages that explain the failure are printed
 under it.  So you can see why it failed without running the test again.
 
+A printed message may hold text that your test did not write, such as data
+from a fixture.  So when a message is printed, its control characters are
+shown as C<\xNN>, except tab and newline, which lay it out.  The escape
+character that starts a terminal control sequence, for example, is shown
+as C<\x1B>.  A message's level is shown the same way.  The stored message
+is not changed: C<like>, C<unlike> and C<messages()> see it exactly as it
+was logged.
+
 =head2 Global variables are left alone
 
 No method changes C<$@>, C<$!> or C<$_>, and none of them touches an
@@ -364,6 +372,25 @@ printed, set C<< verbose => 0 >> or C<$ENV{TEST_VERBOSE} = 0>.
 =item * B<C<level()> does not hide messages.>  It only changes the answers
 of the C<is_*> methods.  Every message is still stored.
 
+=item * B<Printed messages are escaped.>  When a message is printed, its
+control characters (except tab and newline) are shown as C<\xNN>, so text
+from a fixture cannot control your terminal.  L<Log::Abstraction> prints
+them as they are.  The stored message is not changed, so this matters only
+if your test checks what is printed.
+
+=item * B<A very big number is not always written the same way.>  In a
+message template, a number too big for an integer format (such as
+C<%{count}d> of C<1e30>) is shown as Perl writes it.  Most Perls write
+C<1e30> as C<1e+30>.  A Perl built with C<-Duselongdouble> may write all
+31 digits, C<1000000000000000000000000000000>.  So in a test, do not type
+the expected text.  Let Perl make it:
+
+    my $written = '' . 1e30;    # '1e+30' or all 31 digits
+    is($self->i18n('n', { count => 1e30 }), "$written items");
+
+A string, such as C<'1e30'> in quotes, is always shown exactly as you
+typed it.
+
 =back
 
 =head1 ENCODING
@@ -384,8 +411,11 @@ against the stored text as it is.  So the pattern and the message must be
 the same kind of string.  A pattern with a character, such as
 C<qr/\x{1F600}/>, does not match the same emoji stored as UTF-8 bytes.
 
-=item * B<Printed messages.>  A Perl character string that has any
-character above ASCII is printed as UTF-8.  A byte string is printed
+=item * B<Printed messages.>  Control characters, except tab and
+newline, are printed as C<\xNN> (see L</Which messages are printed>).  A
+Perl character string that has any character above ASCII is printed as
+UTF-8.  A character string whose bytes are not valid UTF-8 is printed
+with U+FFFD in place of each bad part.  A byte string is printed
 unchanged.  Perl cannot always see the difference: a string that was not
 decoded, and has no character above 255 (such as C<"caf\x{e9}">), is
 treated as bytes.  If the output already has an encoding layer (for example, set
@@ -412,21 +442,23 @@ unchanged.
 use 5.026;
 use strict;
 use warnings;
-use autodie qw(:all);
 
-use Carp qw(carp croak);
+# Nothing is imported as a function: anything defined in this package is a
+# method on every logger, and would answer a call that should reach
+# AUTOLOAD ($logger->croak('x') would croak, $logger->carp('x') warn)
+use Carp ();
 use Encode ();
 use Hash::Util ();
 use List::Util 1.33 ();
 use overload ();
-use Params::Get qw(get_params);
-use Params::Validate::Strict qw(validate_strict);
-use Readonly;
+use Params::Get ();
+use Params::Validate::Strict ();
+use Readonly ();
 use Readonly::Values::Syslog 0.04 qw(%SYSLOG_LEVELS);
 use Scalar::Util ();
 use Test::Builder ();
 
-use version; our $VERSION = version->declare('0.002.1');
+use version (); our $VERSION = version->declare('0.002.2');
 our $AUTOLOAD;
 
 # Routines whose names start with '_' are internal.  They are not checked
@@ -507,10 +539,11 @@ Readonly::Hash my %PLURAL => (
 # conversion may follow the name), and may be a hash keyed by gender or by
 # plural category instead of a string; see i18n().  Non-English text is
 # written with \x{} escapes to keep this source file ASCII.
-# Every i18n() call walks this table, so, like %SEVERITY, it is a plain hash
-# locked with Hash::Util, not a Readonly one, whose tie makes each of those
-# reads a method call; i18n() ran about a quarter faster.  Every lookup in it
-# is guarded with exists(), as a locked hash croaks on a missing key.
+# It is Readonly on purpose, as well as locked with Hash::Util below: a bug
+# that writes to it is caught at once.  The tie makes every read a method
+# call, so i18n() runs about a quarter slower than with a plain hash; that
+# is accepted.  Do not make it plain to gain speed.  Every lookup in it is
+# guarded with exists(), as a locked hash croaks on a missing key.
 Readonly::Hash my %MESSAGES => (
 	en => {
 		class_invocant => '%{class}s: %{method}s() must be called on an object, not on the class',
@@ -616,11 +649,13 @@ Hash::Util::lock_hash_recurse(%MESSAGES);
 # at every length.
 Readonly::Scalar my $LANG_FORMAT => qr/\A(?:(?i:auto)|[A-Za-z]{2,3}(?:[_.\@-][\w.\@-]*+)?)\z/;
 
-# The schemas below are plain hashes, neither Readonly nor locked.
-# Params::Validate::Strict reads every schema many times per call, and
-# through Readonly's tie that made new() three times slower.  It also reads
-# keys a schema does not have (such as 'members'), which a locked hash
-# refuses.  They are private to this file, and nothing writes to them.
+# The schemas below are Readonly on purpose: a bug that writes to one is
+# caught at once.  Params::Validate::Strict reads every schema many times
+# per call, and through Readonly's tie new() is about three times slower,
+# and like() and has_level() about a third slower, than with plain hashes;
+# that is accepted.  Do not make them plain to gain speed.  They are not
+# locked with Hash::Util: Params::Validate::Strict reads keys a schema does
+# not have (such as 'members'), which a locked hash refuses.
 
 # Schema for new()'s options.  diag is not listed: _diag_rule() validates it,
 # because its messages say what a valid diag is, which a type error cannot
@@ -768,11 +803,16 @@ Domains (valid / invalid / boundaries):
               once; absent or undef: $config{diag}.  Invalid: any other
               string, including '' and numbers such as '4'; a list
               element that is not a level name (or is 'all'); a hash,
-              code or scalar reference.
+              code or scalar reference; any object, including one that
+              only claims to be an array, such as bless({}, 'ARRAY').
+              (An array blessed into the class ARRAY is still an array
+              of names, and valid.)
     level     valid: the 16 level names, any case, setting 0 (emergency)
               to 7 (trace); absent or undef: $config{level}.  Invalid:
               '', numbers (even 0 to 7), any other name.  The error shows
-              the name as it was given ('LOUD', not 'loud').
+              the name as it was given ('LOUD', not 'loud').  Level names are
+              ASCII: a non-ASCII letter ('\x{130}NFO', a dotted
+              capital I) makes another name, even after lower-casing.
     lang      valid: 'auto' (any case); 2 or 3 ASCII letters, then
               optionally one of _ . @ - and anything else ('de',
               'eng', 'de_DE.UTF-8', 'zh-Hant').  A code with no catalogue
@@ -783,11 +823,17 @@ Domains (valid / invalid / boundaries):
               mapping ('JP') gives 'en'.  Invalid: 1 or 3 letters, '',
               digits, non-ASCII letters.
     i18n      valid: a hash reference (even empty).  Invalid: any other
-              type.
+              type.  A reference that only claims to be a hash, such
+              as bless([], 'HASH'), passes the type check and is then
+              ignored, as is a language table or a form that is not
+              really a hash.  Tables may be nested to any depth; a part
+              of a table that contains itself is left out of the copy.
 
 An "invalid argument" explanation, and a level or diag name repeated in an
 error, is at most 200 characters; one longer is cut to 200 and ends with
-"...".  Control characters in it are shown as C<\xNN>.
+"...".  Control characters in it are shown as C<\xNN>.  A level or diag name that is a
+character string but not valid UTF-8 is never a level name, and is shown
+with U+FFFD in place of each bad part.
 
 =head4 Output
 
@@ -859,7 +905,7 @@ sub _args {
 	my $count = scalar(@{$args});
 	my $usable = (($count == 1) && (ref($args->[0]) eq 'HASH'))
 		|| ($count && !($count % 2) && !grep { !defined($args->[$_]) } grep { !($_ % 2) } 0 .. $count - 1);
-	my $params = $usable ? get_params(undef, $args) : undef;
+	my $params = $usable ? Params::Get::get_params(undef, $args) : undef;
 
 	return { %{$params || {}} };
 }
@@ -885,7 +931,7 @@ sub _build {
 	# them, or changing them later would change this logger (and its
 	# clones).  A diag list holds names, so one level is enough, and keeps
 	# a bad element as it was for _diag_rule() to report.
-	$valid->{'diag'} = [ @{$valid->{'diag'}} ] if(ref($valid->{'diag'}) eq 'ARRAY');
+	$valid->{'diag'} = [ @{$valid->{'diag'}} ] if(_is_a($valid->{'diag'}, 'ARRAY'));
 	$valid->{'i18n'} = _copy_tree($valid->{'i18n'}, {}) if(exists($valid->{'i18n'}));
 
 	# Internal state is kept apart from options, so no option name can
@@ -907,7 +953,7 @@ sub _build {
 	# The name is looked up in lower case, but reported as it was given, as
 	# level() and every other error do
 	my $given = defined($valid->{'level'}) ? $valid->{'level'} : $config{'level'};
-	my $level = defined($given) ? lc($given) : 'undef';
+	my $level = defined($given) ? _lc($given) : 'undef';
 	$self->_croak('invalid_level', { level => _shown($given) }) if(!exists($SEVERITY{$level}));
 	$self->{'level'} = $SEVERITY{$level};
 
@@ -932,14 +978,16 @@ sub _copy_tree {
 	# Nested option tables are legitimate; Perl's warning at depth 100 is noise
 	no warnings 'recursion';	## no critic (ProhibitNoWarnings)
 
-	my $type = ref($value);
-	return $value if(($type ne 'HASH') && ($type ne 'ARRAY'));
+	# Through _is_a(): bless([], 'HASH') says 'HASH' but cannot be walked
+	# as one, and would kill new() with Perl's "Not a HASH reference"
+	my $hash = _is_a($value, 'HASH');
+	return $value if(!$hash && !_is_a($value, 'ARRAY'));
 
 	my $address = Scalar::Util::refaddr($value);
 	return if($path->{$address});
 	local $path->{$address} = 1;
 
-	return { map { $_ => scalar(_copy_tree($value->{$_}, $path)) } keys %{$value} } if($type eq 'HASH');
+	return { map { $_ => scalar(_copy_tree($value->{$_}, $path)) } keys %{$value} } if($hash);
 
 	return [ map { scalar(_copy_tree($_, $path)) } @{$value} ];
 }
@@ -983,11 +1031,20 @@ sub _validate {
 	# The caller's $@ must survive a successful check
 	local $@;
 	my $valid;
-	if(!eval { $valid = validate_strict(schema => $schema, input => $input, unknown_parameter_handler => 'ignore'); 1 }) {
+	if(!eval { $valid = Params::Validate::Strict::validate_strict(schema => $schema, input => $input, unknown_parameter_handler => 'ignore'); 1 }) {
 		# Keep the validator's explanation, but not its file and line,
 		# which point inside Params::Validate::Strict, not at the caller
-		# The validator may nest its own messages; keep only the innermost
-		(my $reason = $@) =~ s/\A.*validate_strict:\s*//s;
+		# The validator may nest its own messages; keep only the innermost.
+		# Its prefix is matched whole: matching 'validate_strict:' alone
+		# would also stop inside the caller's value, which the message
+		# quotes, so lang => 'x validate_strict: y' lost the parameter's
+		# name and most of the value.  Linear: the start is anchored, and
+		# the digits are possessive
+		(my $reason = $@) =~ s{
+			\A .*			# everything up to the last prefix (greedy: the innermost message)
+			Params::Validate::Strict\ line\ \d++:\ validate_strict:
+			\s*+			# and the space after it
+		}{}sx;
 		$self->_croak('invalid_argument', { reason => _reason($reason) });
 	}
 
@@ -1039,6 +1096,122 @@ sub _string {
 	return defined($text) ? $text : overload::StrVal($value);
 }
 
+# _repaired - a character string made valid, so that Perl can read it
+#
+# Purpose:      A character string whose bytes are not valid UTF-8 kills a
+#               regex that reads it as characters ("Malformed UTF-8
+#               character (fatal)"); lc() dies on it too, and length() and
+#               substr() warn.  A caller can pass one (Encode::_utf8_on() on
+#               bytes makes one), and no method may die or warn with Perl's
+#               message because of it.
+# Entry:        $text - a defined, non-reference value.
+# Exit:         Returns the text unchanged if it is a byte string or a valid
+#               character string.  Otherwise returns a copy whose bytes have
+#               been decoded again, leniently: each bad sequence becomes
+#               U+FFFD, and the result is a valid character string.
+# Side effects: None; only the copy changes, never the caller's value or
+#               what was stored.
+sub _repaired {
+	my $text = shift;
+
+	# Cheap tests first: a byte string, or valid text, is returned as it is
+	return $text if(!utf8::is_utf8($text) || utf8::valid($text));
+
+	Encode::_utf8_off($text);
+	return Encode::decode('UTF-8', $text);
+}
+
+# _lc - a caller's name in lower case, for a lookup
+#
+# Purpose:      Level and diag names are matched without regard to case.  A
+#               name may be any string the caller passed: lc() dies on one
+#               that is not valid UTF-8, and warns on a UTF-16 surrogate.
+# Entry:        $text - a defined, non-reference value.
+# Exit:         Returns the text in lower case, repaired by _repaired()
+#               first if it had to be.  A repaired name is never a level
+#               name, so it fails the lookup, as it should.
+# Side effects: None.  Never dies or warns.
+sub _lc {
+	my $text = _repaired(shift);
+
+	# 'utf8' covers the surrogate warning; the name is only a lookup key
+	no warnings 'utf8';	## no critic (ProhibitNoWarnings)
+	return lc($text);
+}
+
+# _is_a - is a value really the plain reference type it claims to be?
+#
+# Purpose:      ref() reports the class of an object, so bless({}, 'ARRAY')
+#               says 'ARRAY' while it is a hash, and dereferencing it as an
+#               array dies with Perl's "Not an ARRAY reference".  Every
+#               option or template that is walked as a hash or an array is
+#               tested with this first.
+# Entry:        $value - any value, or undef.
+#               $type  - 'HASH' or 'ARRAY'.
+# Exit:         Returns true if ref($value) and its underlying type are both
+#               $type; false otherwise, including for undef.
+# Side effects: None.
+sub _is_a {
+	my ($value, $type) = @_;
+
+	# reftype() is only reached for a reference, so it is never undef here
+	return (ref($value) eq $type) && (Scalar::Util::reftype($value) eq $type);
+}
+
+# Characters that are written as escapes in printed text.  A terminal acts
+# on them instead of showing them: ESC (\x1B) starts a control sequence that
+# can clear the screen, hide lines or, on some terminals, set the clipboard;
+# a newline can start a forged TAP line; and the bidi controls reorder what
+# is shown, so the text on screen is not the text that was printed.
+Readonly::Scalar my $CONTROL => qr/[\x00-\x1F\x7F]/;
+# The same, without tab (\x09) and newline (\x0A), for a logged message:
+# they lay it out, and Test::Builder starts every line with '#'
+Readonly::Scalar my $CONTROL_NOT_LAYOUT => qr/[\x00-\x08\x0B-\x1F\x7F]/;
+# The C1 controls.  U+009B is a one-character CSI that some terminals obey
+Readonly::Scalar my $C1 => qr/[\x{80}-\x{9F}]/;
+# Bidi marks, embeddings, overrides and isolates
+Readonly::Scalar my $BIDI => qr/[\x{200E}\x{200F}\x{202A}-\x{202E}\x{2066}-\x{2069}]/;
+
+# _escape - write control characters as escapes
+#
+# Purpose:      The one place that decides how a control character is shown,
+#               for _shown() and _printable().
+# Entry:        $text     - a defined string.
+#               $controls - qr// matching the C0 controls to escape.
+# Exit:         Returns the text with those controls written as \xHH, and in
+#               a character string the C1 controls too.  In a byte string
+#               the bytes 0x80 to 0x9F are kept: they are usually part of
+#               UTF-8 text, which escaping them would mangle.  A character
+#               string that is not valid UTF-8 is returned valid, with
+#               U+FFFD for each bad sequence.
+# Side effects: None.
+sub _escape {
+	my ($text, $controls) = @_;
+
+	$text = _repaired($text);
+	$text =~ s/($controls)/sprintf('\\x%02X', ord($1))/ge;
+	$text =~ s/($C1)/sprintf('\\x%02X', ord($1))/ge if(utf8::is_utf8($text));
+
+	return $text;
+}
+
+# _printable - make captured text safe to print
+#
+# Purpose:      A logged message, or a level name (AUTOLOAD stores any method
+#               name), may hold text the test did not write, such as data
+#               from a fixture.  Printed raw, its control characters would
+#               reach the terminal.
+# Entry:        $text - the text, or undef.
+# Exit:         Returns the text with control characters other than tab and
+#               newline written as \xHH (see _escape()); undef is returned
+#               as undef.  The stored entry is not changed.
+# Side effects: None.
+sub _printable {
+	my $text = shift;
+
+	return defined($text) ? _escape($text, $CONTROL_NOT_LAYOUT) : $text;
+}
+
 # _shown - make a caller's value safe to repeat in an error message
 #
 # Purpose:      An error that repeats what the caller passed must not let
@@ -1048,20 +1221,21 @@ sub _string {
 #               error enormous.
 # Entry:        $value - the value to show; a string, a reference, or undef.
 # Exit:         Returns the value with control characters written as \xHH
-#               (C1 controls too, in a character string), cut to $MAX_REASON characters followed by '...' if longer;
-#               undef is shown as 'undef'.  An object whose overloaded ""
-#               dies is shown in plain form, as Class=HASH(0x...).
+#               (C1 controls too, in a character string; see _escape()) and
+#               bidi controls as \x{HHHH}, cut to $MAX_REASON characters
+#               followed by '...' if longer; undef is shown as 'undef'.  An
+#               object whose overloaded "" dies is shown in plain form, as
+#               Class=HASH(0x...).
 # Side effects: None.  Never dies.
 sub _shown {
 	my $value = shift;
 
-	my $text = defined($value) ? _string($value) : 'undef';
-	$text =~ s/([\x00-\x1F\x7F])/sprintf('\\x%02X', ord($1))/ge;
-	# In a character string, U+0080 to U+009F are the C1 controls, and
-	# U+009B is a one-character CSI that some terminals obey, so they are
-	# escaped too.  In a byte string those bytes are usually part of UTF-8
-	# text, which escaping them would mangle, so they are kept
-	$text =~ s/([\x{80}-\x{9F}])/sprintf('\\x%02X', ord($1))/ge if(utf8::is_utf8($text));
+	my $text = _escape(defined($value) ? _string($value) : 'undef', $CONTROL);
+	# A bidi override would make the error read differently on screen from
+	# what it says.  Unlike the C1 controls, these are above U+00FF, so
+	# they can only be in a character string, never in UTF-8 bytes.
+	# _escape() has made any character string valid, so this cannot die
+	$text =~ s/($BIDI)/sprintf('\\x{%X}', ord($1))/ge;
 
 	return (length($text) > $MAX_REASON) ? substr($text, 0, $MAX_REASON) . '...' : $text;
 }
@@ -1087,15 +1261,15 @@ sub _resolve_lang {
 	} else {
 		# lang => 'auto' given, or the configured default
 		my $wanted = defined($options->{'lang'}) ? $options->{'lang'} : $config{'lang'};
-		my $auto = defined($wanted) && (lc($wanted) eq $LANG_AUTO);
+		my $auto = defined($wanted) && (_lc($wanted) eq $LANG_AUTO);
 
 		# The first set variable wins, as in POSIX setlocale()
 		($tag) = $auto ? (grep { defined($_) && length($_) } map { $ENV{$_} } @LOCALE_VARS) : ($wanted);
 	}
 
 	# 'de_DE.UTF-8' -> 'de'; the C and POSIX locales are English
-	my ($lang) = (lc(defined($tag) ? $tag : '') =~ /\A([a-z]{2,3})(?![a-z])/);
-	my $known = defined($lang) && (exists($MESSAGES{$lang}) || ($options->{'i18n'} && $options->{'i18n'}->{$lang}));
+	my ($lang) = (_lc(defined($tag) ? $tag : '') =~ /\A([a-z]{2,3})(?![a-z])/);
+	my $known = defined($lang) && (exists($MESSAGES{$lang}) || (_is_a($options->{'i18n'}, 'HASH') && $options->{'i18n'}->{$lang}));
 
 	return $known ? $lang : $FALLBACK_LANG;
 }
@@ -1115,7 +1289,7 @@ sub _diag_rule {
 
 	$spec = $config{'diag'} if(!defined($spec));
 
-	return { levels => { map { $self->_diag_level($_) => 1 } @{$spec} } } if(ref($spec) eq 'ARRAY');
+	return { levels => { map { $self->_diag_level($_) => 1 } @{$spec} } } if(_is_a($spec, 'ARRAY'));
 
 	$self->_croak('invalid_diag_type') if(ref($spec));
 
@@ -1124,7 +1298,7 @@ sub _diag_rule {
 	#   Premise 1: '' is neither 'all' nor 'none'.
 	#   Premise 2: undef is compared as '', so it is neither either.
 	#   So: one comparison each, with no defined() test before it.
-	my $name = defined($spec) ? lc($spec) : '';
+	my $name = defined($spec) ? _lc($spec) : '';
 	return {} if($name eq $DIAG_NONE);
 	return { all => 1 } if($name eq $DIAG_ALL);
 
@@ -1146,7 +1320,7 @@ sub _diag_level {
 
 	# Through _string(), so that an object whose overloading dies is
 	# reported, not allowed to crash the constructor with its own error
-	my $name = lc(defined($level) ? _string($level) : 'undef');
+	my $name = defined($level) ? _lc(_string($level)) : 'undef';
 	$self->_croak('invalid_diag_level', { level => _shown($level) }) if(!exists($SEVERITY{$name}));
 
 	return $name;
@@ -1252,7 +1426,14 @@ one is dropped; a blessed hash is part of the message.  Text may be ASCII,
 decoded text in any script (accents, CJK, emoji and emoji sequences,
 combining marks, right-to-left text, zero-width characters) or bytes; it
 is stored with its length unchanged.  See L</ENCODING> for how it is
-printed.
+printed.  Hashes and arrays are rendered to any depth, in time linear in
+their size.  A part that cannot be read (a tied value whose FETCH dies) is
+shown as its tie object's plain form; an element of a tied array or hash
+has no tie object of its own, so it is shown as the plain form of a
+reference to it, such as SCALAR(0x...).  An argument such as
+substr($s, 10) that is out of range is undef, with no warning.  A
+reference that is not really the type it claims, such as
+bless({}, 'ARRAY'), is shown in Perl's plain form.
 
 =head4 Output
 
@@ -1383,9 +1564,11 @@ sub _record {
 	my ($self, $level, $args) = @_;
 
 	local ($@, $!);
-	my $entry = _entry(lc($level), $args);
+	my $entry = _entry(_lc($level), $args);
 	push @{$self->{'messages'}}, $entry;
-	$self->_emit($entry->{'message'}) if($self->_diags($entry->{'level'}));
+	# Printed through _printable(): the message may hold text the test did
+	# not write.  The stored entry keeps it as it was
+	$self->_emit(_printable($entry->{'message'})) if($self->_diags($entry->{'level'}));
 
 	return $self;
 }
@@ -1405,9 +1588,32 @@ sub _record {
 sub _entry {
 	my ($level, $args) = @_;
 
-	my @args = @{$args};
 	my $entry = { level => $level };
-	local $@;	# rendering below may fail, inside eval; the caller's $@ stays
+	local $@;	# reading and rendering below may fail, inside eval; the caller's $@ stays
+
+	# Copying the arguments reads them, and a tied scalar whose FETCH dies
+	# would kill the log call.  Each argument must also be read exactly
+	# once: a tied one may give a new value on every read, and the entry
+	# must hold the value at the moment it was logged.  So the copy goes
+	# one argument at a time, inside one eval for the usual case; push()
+	# appends nothing when the read dies, so after a failure @args holds
+	# exactly the arguments already read, and the copy resumes after the
+	# one that died, which is shown as its tie object's plain form.  An
+	# element of a tied array or hash has no tie object of its own, so it
+	# is shown as the plain form of a reference to it: undef would warn in
+	# overload::StrVal(), and the part would vanish from the message
+	# An argument such as substr($s, 10) is only evaluated when it is read,
+	# here, and warns "substr outside of string" at this line; the mistake
+	# is the caller's, and logging must not warn, so the read is silent and
+	# the part is undef, shown as 'undef'.  Nothing after this in the
+	# routine uses substr()
+	no warnings 'substr';	## no critic (ProhibitNoWarnings)
+	my @args;
+	while(@args < @{$args}) {
+		last if(eval { push @args, $args->[$_] foreach scalar(@args) .. $#{$args}; 1 });
+		my $tie = tied($args->[scalar(@args)]);
+		push @args, overload::StrVal(defined($tie) ? $tie : \$args->[scalar(@args)]);
+	}
 
 	# A trailing plain hash after the message is structured fields.  A tied
 	# hash can die when it is read, and logging must not; one that cannot
@@ -1423,8 +1629,14 @@ sub _entry {
 		}
 	}
 
-	# A lone array reference is a list of message parts
-	@args = @{$args[0]} if((@args == 1) && (ref($args[0]) eq 'ARRAY'));
+	# A lone array reference is a list of message parts.  Reading it may
+	# die: a tied array whose FETCHSIZE dies, or bless({}, 'ARRAY'), which
+	# says it is an array but is not.  Then it stays one part, which is
+	# shown in Perl's plain form below
+	if((@args == 1) && (ref($args[0]) eq 'ARRAY')) {
+		my @parts;
+		@args = @parts if(eval { @parts = @{$args[0]}; 1 });
+	}
 
 	# A part that cannot be rendered at all (a tied hash whose FETCH dies,
 	# say) is shown in Perl's plain form, so that logging never dies
@@ -1459,30 +1671,75 @@ sub _entry {
 #               hash, '[a, b]' for a plain array, $CYCLE for a reference
 #               that contains itself, and Perl's normal stringification
 #               otherwise (objects honour overloading).
-# Side effects: None.  $seen is restored on return.  Never dies or warns:
-#               an object whose overloaded "" dies is shown as Class=HASH(...).
+# Side effects: None.  $seen is restored on return.  Never warns, and an
+#               object whose overloaded "" dies is shown as Class=HASH(...).
+#               A tied container whose FETCH dies does die; the caller
+#               catches that and shows the whole part in plain form.
 sub _stringify {
 	my ($value, $seen) = @_;
+
+	# One buffer for the whole rendering.  Built by returning strings, each
+	# level copied everything below it into a new string: quadratic in the
+	# depth, 11 seconds for a hash nested 80,000 deep
+	my $text = '';
+	_render($value, $seen, \$text);
+
+	return $text;
+}
+
+# _render - append the rendering of one value to a buffer
+#
+# Purpose:      The recursive part of _stringify(), linear in the size of
+#               what it renders.
+# Entry:        $value - scalar, undef, or any reference.
+#               $seen  - as for _stringify().
+#               $out   - scalar reference to the buffer to append to.
+# Exit:         Returns nothing useful.
+# Side effects: Appends to ${$out}.  $seen is restored on return.
+sub _render {
+	my ($value, $seen, $out) = @_;
 
 	# Deeply nested data is legitimate; Perl's warning at depth 100 is noise
 	no warnings 'recursion';	## no critic (ProhibitNoWarnings)
 
-	return 'undef' if(!defined($value));
-
 	# Plain values, objects and other references: Perl's own form, through
 	# _string() so that an overloaded "" that dies cannot break a log call.
-	# Only plain hashes and arrays are written out as data
-	my $type = ref($value);
-	return _string($value) if(($type ne 'HASH') && ($type ne 'ARRAY'));
+	# Only plain hashes and arrays are written out as data; through _is_a(),
+	# as bless({}, 'ARRAY') says 'ARRAY' but cannot be walked as one
+	my $hash = _is_a($value, 'HASH');
+	if(!$hash && !_is_a($value, 'ARRAY')) {
+		${$out} .= defined($value) ? _string($value) : 'undef';
+		return;
+	}
 
 	# A structure that contains itself would otherwise recurse forever
 	my $address = Scalar::Util::refaddr($value);
-	return $CYCLE if($seen->{$address});
+	if($seen->{$address}) {
+		${$out} .= $CYCLE;
+		return;
+	}
 	local $seen->{$address} = 1;
 
-	return '{' . join(', ', map { "$_ => " . _stringify($value->{$_}, $seen) } sort keys %{$value}) . '}' if($type eq 'HASH');
+	my $separator = '';
+	if($hash) {
+		${$out} .= '{';
+		foreach my $key (sort keys %{$value}) {
+			${$out} .= "$separator$key => ";
+			_render($value->{$key}, $seen, $out);
+			$separator = ', ';
+		}
+		${$out} .= '}';
+	} else {
+		${$out} .= '[';
+		foreach my $item (@{$value}) {
+			${$out} .= $separator;
+			_render($item, $seen, $out);
+			$separator = ', ';
+		}
+		${$out} .= ']';
+	}
 
-	return '[' . join(', ', map { _stringify($_, $seen) } @{$value}) . ']';
+	return;
 }
 
 # _diags - should this level be printed?
@@ -1551,7 +1808,10 @@ Domains: any method name, including '', non-ASCII names and very long
 names.  The message is stored under the name in lower case, in full.  The
 notice shows the name escaped and cut: up to 200 characters it is shown
 whole, and from 201 on it is cut to 200 followed by '...' (see
-L</DIAGNOSTICS>).  The length is counted in characters, not bytes.
+L</DIAGNOSTICS>).  The length is counted in characters, not bytes.  A
+name that is a character string but not valid UTF-8 is stored with U+FFFD
+in place of each bad part, and is found again by count() and has_level()
+under the same name.
 
 =head4 Output
 
@@ -1571,14 +1831,20 @@ L</DIAGNOSTICS>).  The length is counted in characters, not bytes.
 =cut
 
 sub AUTOLOAD {
-	my ($self, @args) = @_;
+	# Only the invocant is taken off.  Copying the rest into a lexical
+	# would read each one here, outside the eval that _entry() reads them
+	# in, so a tied argument whose FETCH dies would kill the call; and it
+	# would read a tied argument twice
+	my $self = shift;
 
 	# A method name can be anything, even empty: $logger->$name() with ''.
 	#   Premise 1: Perl always sets $AUTOLOAD to "Package::name".
 	#   Premise 2: ([^:]*) matches any name after the last '::', even ''.
 	#   So: $name is always defined, and needs no fallback.
-	my ($name) = ($AUTOLOAD =~ /::([^:]*)\z/);
-	_object($self, $name)->_record($name, \@args);
+	# A name that is not valid UTF-8 panics the match ("pp_match start/end
+	# pointers"), so it is repaired first; its bad bytes become U+FFFD
+	my ($name) = (_repaired($AUTOLOAD) =~ /::([^:]*)\z/);
+	_object($self, $name)->_record($name, \@_);
 
 	# The name is the caller's, so it may hold control characters or be
 	# huge; the notice repeats it escaped and cut, as every error does
@@ -1756,7 +2022,9 @@ None.
 
 Domains: undef counts every message; a string counts messages at that
 level, any case ('', '0' and unknown names give 0; aliases are separate
-names).  Invalid: any reference.
+names).  Invalid: any reference.  A name may be any string, including non-ASCII text and a
+character string that is not valid UTF-8, which is matched as the same
+repaired name AUTOLOAD stores.
 
 =head4 Output
 
@@ -1829,7 +2097,10 @@ messages are printed under it (at most 20, then a count of the others).
 
 Domains: pattern - a qr// or a string, which is compiled as a regular
 expression ('' matches every message).  Invalid: undef, any other
-reference, a string that does not compile or can never match.  name -
+reference, a string that does not compile or can never match, and a
+character string that is not valid UTF-8.  A character pattern (such as
+qr/\x{1F600}/) matches text logged as characters, and not the same text
+logged as UTF-8 bytes; a byte pattern matches bytes only.  name -
 undef, or any string (including '' and non-ASCII text).  Invalid: a
 reference.
 
@@ -1981,6 +2252,7 @@ messages are printed under it, so you can see which levels were used.
 
 Domains: level - a string, any case ('' and unknown names match
 nothing; aliases are separate names).  Invalid: undef, any reference.
+Any string is valid, as for L</count>.
 name - as for L</like>.
 
 =head4 Output
@@ -2005,7 +2277,7 @@ sub has_level {
 	my ($self, $level, $name) = @_;
 
 	_checked($self, 'has_level', 'needs_level', \%LEVEL_SCHEMA, level => $level, $name);
-	my $wanted = lc($level);
+	my $wanted = _lc($level);
 
 	# Only whether one message is at that level matters, so stop at the first
 	return $self->_assert((List::Util::any { $_->{'level'} eq $wanted } @{$self->{'messages'}}) ? 1 : 0, $name, 'captured', $self->{'messages'});
@@ -2125,16 +2397,29 @@ sub _checked {
 #               $pattern - qr// or string.
 # Exit:         Returns the compiled regular expression.
 # Side effects: Croaks with 'invalid_argument' if the pattern does not
-#               compile, contains code, or can never match.  Leaves $@ alone
-#               otherwise.
+#               compile, contains code, can never match, or is a character
+#               string that is not valid UTF-8.  Never warns: a warning
+#               while compiling is the error.  Leaves $@ and
+#               $SIG{__WARN__} alone otherwise.
 sub _regex {
 	my ($self, $pattern) = @_;
 
 	# A string is compiled here, so that a malformed one, one with code in
 	# it (not allowed at run time), or one Perl warns can never match, is
-	# the caller's error and not a crash or a stray warning
+	# the caller's error and not a crash or a stray warning.  'utf8' makes a
+	# character string that is not valid UTF-8 the caller's error too, rather
+	# than a stream of warnings and a pattern with unknown meaning; valid
+	# text, even a surrogate or a non-character, compiles without a warning.
+	# Perl 5.42 reports malformed UTF-8 as plain warnings before the fatal
+	# one, whatever the lexical FATAL says; so any warning during the
+	# compile becomes the error too, and the first, most detailed, is the
+	# reason on every version
 	local $@;	# the caller's $@ must survive a good pattern
-	my $regex = eval { use warnings FATAL => 'regexp'; qr/$pattern/ };
+	my $regex = eval {
+		use warnings FATAL => qw(regexp utf8);
+		local $SIG{__WARN__} = \&CORE::die;
+		qr/$pattern/;
+	};
 	$self->_croak('invalid_argument', { reason => _reason($@) }) if(!defined($regex));
 
 	return $regex;
@@ -2150,7 +2435,7 @@ sub _regex {
 sub _at_level {
 	my ($self, $level) = @_;
 
-	my $wanted = lc($level);
+	my $wanted = _lc($level);
 
 	return [ grep { $_->{'level'} eq $wanted } @{$self->{'messages'}} ];
 }
@@ -2169,9 +2454,14 @@ sub _at_level {
 sub _assert {
 	my ($self, $ok, $name, $key, $entries) = @_;
 
-	# Skip this frame and the public assertion's; and keep the caller's
-	# $@ and $!, which reporting may change
-	local $Test::Builder::Level = $Test::Builder::Level + 2;
+	# Report at the line that called the public assertion.  $Level counts
+	# from a call through Test::More::ok(), which is itself one frame; this
+	# calls Test::Builder's ok() directly, so that frame is not there, and
+	# skipping the public assertion's frame is enough.  (+2 skipped one too
+	# many: at the top level of a test file there is nothing above, so it
+	# looked right, but inside a subtest it pointed into Test::Builder.)
+	# Keep the caller's $@ and $!, which reporting may change
+	local $Test::Builder::Level = $Test::Builder::Level + 1;
 	local ($@, $!);
 	my $result = Test::Builder->new()->ok($ok, $name);
 	$self->_explain($key, $entries) if(!$ok);
@@ -2195,7 +2485,8 @@ sub _explain {
 
 	my $last = ($total > $MAX_EXPLAIN) ? $MAX_EXPLAIN : $total;
 	foreach my $entry (@{$entries}[0 .. $last - 1]) {
-		$self->_emit($self->i18n('entry', { level => $entry->{'level'}, message => $entry->{'message'} }));
+		# Both may hold text the test did not write: see _printable()
+		$self->_emit($self->i18n('entry', { level => _printable($entry->{'level'}), message => _printable($entry->{'message'}) }));
 	}
 	$self->_emit($self->i18n('truncated', { count => $total - $last })) if($total > $last);
 
@@ -2321,7 +2612,9 @@ such as '0' or '8', unknown names - warns and returns undef.  A reference
 is treated as its text form: a plain reference such as ARRAY(0x...) is
 never a level name, so it warns; an object whose overloaded text form is
 a level name sets that level; an object whose text form dies is shown in
-plain form in the warning.
+plain form in the warning.  A character string that is not valid
+UTF-8, or holds a surrogate, is never a level name: it warns, with no
+other warning.
 
 =head4 Output
 
@@ -2344,23 +2637,29 @@ sub level {
 	_object($self, 'level');
 
 	# Exactly one of three cases holds: no name (get), a level name (set),
-	# or anything else (warn).  Each sets the result once; the last leaves
-	# it undef, as Log::Abstraction returns.
-	# The name as a lookup key, made once.  Through _string(): an object
-	# whose overloading dies is not a level name, so it is warned about
-	# below instead of crashing the call
-	my $key = defined($name) ? lc(_string($name)) : undef;
-	my $result;
-	if(!defined($key)) {
-		$result = $self->{'level'};
-	} elsif(exists($SEVERITY{$key})) {
+	# or anything else (warn, and return undef, as Log::Abstraction does).
+	# Premise 1: _string() returns a defined string for any defined value.
+	# Premise 2: so the lookup key is undefined exactly when $name is.
+	# Conclusion: the get case is decided by $name alone, before any key
+	# is made.
+	return $self->{'level'} if(!defined($name));
+
+	# The name as a lookup key.  Through _string(): an object whose
+	# overloading dies is not a level name, so it is warned about below
+	# instead of crashing the call
+	my $key = _lc(_string($name));
+	my $known = exists($SEVERITY{$key});
+	if($known) {
 		$self->{'level'} = $SEVERITY{$key};
-		$result = $self;
 	} else {
-		carp($self->i18n('invalid_level', { level => _shown($name) }));
+		# As in _croak(): Carp must not format the caller's arguments
+		local $Carp::MaxArgNums = -1;
+		Carp::carp($self->i18n('invalid_level', { level => _shown($name) }));
 	}
 
-	return $result;
+	# undef as a value, not an empty list, so it is undef in list context
+	# too
+	return $known ? $self : undef;
 }
 
 =head2 flush
@@ -2559,9 +2858,16 @@ The logger.
 =head3 Side Effects
 
 Prints the line as a TAP comment, with L<Test::Builder/diag>.  This works
-even if the test did not load L<Test::More>.  A Perl character string is
+even if the test did not load L<Test::More>.  Text that came from a logged
+message has its control characters escaped before it is passed here (see
+L</Which messages are printed>), so a replacement C<_emit> gets safe text
+too.  A Perl character string is
 encoded as UTF-8 first, unless the output already has an encoding layer
 (see L</ENCODING>).
+
+A level method stores its message before it calls C<_emit>.  So if a
+replacement C<_emit> dies, the message is still captured, and the error
+reaches the code that logged.
 
 =head3 EXAMPLE
 
@@ -2711,13 +3017,25 @@ None.
 Domains: key - any string; undef renders as '', a reference as its
 string form, and an unknown key is returned as it is.  args - a hash
 reference; anything else is ignored.  count - a number selects a plural
-form (0 uses 'zero' when present); anything else uses 'other'.
+form; anything else (text, '', undef, a reference) uses 'other'.  A
+count equal to 0 (0, '0.0', '-0') uses 'zero' when the template has
+it.  Otherwise: in English and German 'one' is exactly 1 (0.999, 1.001,
+-1 and 0 are 'other'); in French 'one' is any count above -2 and below 2
+(-2 and 2 are 'other', -1.999 and 1.999 are 'one'); in Chinese it is
+always 'other'.  A form the template lacks becomes 'other'.  gender - a
+value naming a form of the template selects it; any other value,
+including undef and '' when there is no such form, falls through to the
+plural forms.  A gender that is an object is matched by its text form.  A
+template or form that is not a string or a hash is shown as its text form.
 Placeholder values: any value.  With an integer format, C<%d> and C<%i>
 show -2**63 to 2**63-1, and C<%u>, C<%o>, C<%x>, C<%X>, C<%b> and C<%c>
 show 0 to 2**64-1 (a negative number down to -2**63 in two's
 complement).  Leading zeros and a leading C<+> are allowed, and '-0' is 0.
 A value outside these ranges, text, infinity and NaN are shown as written.
-(These limits are for a Perl with 64-bit integers.)
+(These limits are for a Perl with 64-bit integers.)  "As written" means
+the text that Perl makes when it prints the value, C<"$value">.  For a
+number (not a string) this text depends on how Perl was built: see
+L</COMMON PITFALLS>.
 
 =head4 Output
 
@@ -2767,7 +3085,10 @@ sub i18n {
 sub _template {
 	my ($self, $lang, $key) = @_;
 
-	my $overrides = (ref($self) && $self->{'options'}->{'i18n'}) || {};
+	# Through _is_a(): new() keeps an i18n option that only says it is a
+	# hash, such as bless([], 'HASH'), and it is ignored here
+	my $i18n = ref($self) ? $self->{'options'}->{'i18n'} : undef;
+	my $overrides = _is_a($i18n, 'HASH') ? $i18n : {};
 
 	# Overrides before built-ins, the logger's language before English
 	my $found;
@@ -2776,7 +3097,7 @@ sub _template {
 	SEARCH: foreach my $tag (($lang eq $FALLBACK_LANG) ? ($lang) : ($lang, $FALLBACK_LANG)) {
 		foreach my $source ($overrides, \%MESSAGES) {
 			my $table = exists($source->{$tag}) ? $source->{$tag} : undef;
-			next if((ref($table) ne 'HASH') || !exists($table->{$key}));
+			next if(!_is_a($table, 'HASH') || !exists($table->{$key}));
 			$found = $table->{$key};
 			last SEARCH;
 		}
@@ -2792,23 +3113,28 @@ sub _template {
 #               $args     - placeholder values; 'gender' and 'count' are
 #               consulted.
 #               $lang     - language, for its plural rules.
-# Exit:         Returns a string; '' if no form applies.
+# Exit:         Returns a string; '' if no form applies.  A form that is
+#               not a string is shown as Perl's text for it.
 # Side effects: None.  Each step descends one level, and a hash already
 #               visited ends the walk, so even a cyclic template terminates.
 sub _variant {
 	my ($template, $args, $lang) = @_;
 
 	my %visited;
-	while(ref($template) eq 'HASH') {
+	while(_is_a($template, 'HASH')) {
 		# A template from the i18n option may contain itself
 		return '' if($visited{Scalar::Util::refaddr($template)}++);
-		my $gender = $args->{'gender'};
+		# The gender is the caller's value, used as a key: through _string(),
+		# so an object whose overloaded "" dies cannot kill i18n()
+		my $gender = defined($args->{'gender'}) ? _string($args->{'gender'}) : undef;
 		my $form = (defined($gender) && exists($template->{$gender})) ? $gender : _plural($template, $args->{'count'}, $lang);
 		$template = exists($template->{$form}) ? $template->{$form} : '';
 	}
 
-	# A form given as undef in the i18n option renders as nothing
-	return defined($template) ? $template : '';
+	# A form given as undef in the i18n option renders as nothing.  Any
+	# other form is made text here, through _string(): an object whose
+	# overloaded "" dies would otherwise kill _interpolate()
+	return defined($template) ? _string($template) : '';
 }
 
 # _plural - choose a plural category for a count
@@ -2823,11 +3149,19 @@ sub _variant {
 sub _plural {
 	my ($template, $count, $lang) = @_;
 
-	# Without a numeric count there is nothing to pluralise on
-	my $numeric = defined($count) && !ref($count) && Scalar::Util::looks_like_number($count);
-	my $form = !$numeric ? 'other'
-		: (($count == 0) && exists($template->{'zero'})) ? 'zero'
-		: ((defined($lang) && exists($PLURAL{$lang})) ? $PLURAL{$lang} : $PLURAL{$FALLBACK_LANG})->($count);
+	# Without a numeric count there is nothing to pluralise on.  'other'
+	# is the answer whether or not the template has it, so it is returned
+	# without looking
+	return 'other' if(!(defined($count) && !ref($count) && Scalar::Util::looks_like_number($count)));
+
+	# Premise 1: 'zero' is chosen only when the template has it.
+	# Premise 2: a form the template has is returned as it is.
+	# Conclusion: 'zero' needs no second look.
+	return 'zero' if(($count == 0) && exists($template->{'zero'}));
+
+	# Only the language's rule can name a form the template lacks
+	my $rule = (defined($lang) && exists($PLURAL{$lang})) ? $PLURAL{$lang} : $PLURAL{$FALLBACK_LANG};
+	my $form = $rule->($count);
 
 	return exists($template->{$form}) ? $form : 'other';
 }
@@ -2890,7 +3224,13 @@ sub _format {
 	return '%' if(defined($percent));
 	return 'undef' if(!defined($value));
 
-	my $numeric = !ref($value) && Scalar::Util::looks_like_number($value) && ($value == $value) && (abs($value) != 9**9**9);
+	# Numbers are tested on a copy.  abs(), <, sprintf and int() cache an
+	# integer in their argument, and where a float holds that integer
+	# exactly (long doubles hold 64 bits) perl then writes the value from
+	# the integer: 1e19 would become 10000000000000000000, not be shown as
+	# written
+	my $number = $value;
+	my $numeric = !ref($number) && Scalar::Util::looks_like_number($number) && ($number == $number) && (abs($number) != 9**9**9);
 	# A finite number too big for an integer conversion would be cut to
 	# -1, ffffffffffffffff or the most negative integer, so it is shown as
 	# written unless sprintf reads it as itself.  Checking against Inf alone
@@ -2898,8 +3238,8 @@ sub _format {
 	# %d and %i read the value as signed; the others as unsigned, unless it
 	# is negative, which they print in two's complement
 	if($numeric && ($conversion =~ /[diuoxXbc]\z/)) {
-		my $as = (($conversion =~ /[di]\z/) || ($value < 0)) ? '%d' : '%u';
-		my $read = sprintf($as, $value);
+		my $as = (($conversion =~ /[di]\z/) || ($number < 0)) ? '%d' : '%u';
+		my $read = sprintf($as, $number);
 		# Compared as text, never as numbers: a number would first become a
 		# float, which rounds 2**64 down onto the largest integer and so
 		# hides that it does not fit.  A string of digits can hold more
@@ -2921,7 +3261,7 @@ sub _format {
 		}ax) {
 			$numeric = ($read eq ((($1 eq '-') && ($2 ne '0')) ? "-$2" : $2));
 		} else {
-			$numeric = ($read eq sprintf('%.0f', int($value)));
+			$numeric = ($read eq sprintf('%.0f', int($number)));
 		}
 	}
 	# An object whose overloaded "" dies is shown in plain form, as in
@@ -2948,7 +3288,12 @@ sub _format {
 sub _croak {
 	my ($self, $key, $args) = @_;
 
-	croak($self->i18n($key, $args));
+	# Carp formats every argument of the caller's frame, even for a croak
+	# that shows none of them, and its formatter dies on a character string
+	# that is not valid UTF-8: level($malformed) died inside Carp.  -1 tells
+	# it to format none, which changes nothing that a croak prints
+	local $Carp::MaxArgNums = -1;
+	Carp::croak($self->i18n($key, $args));
 }
 
 =head1 LIMITATIONS
@@ -2991,9 +3336,8 @@ any code.  Nothing checks the caller: a test helper should not need
 compiled modules to do that.  Do not rely on them outside a subclass.
 
 =item * B<Many modules are needed.>  L<Params::Validate::Strict>,
-L<Params::Get>, L<Readonly>, L<Readonly::Values::Syslog>, and L<autodie>
-(with L<IPC::System::Simple>) must be installed, for what is a small test
-helper.  L<Object::Configure> is not used, because it loads
+L<Params::Get>, L<Readonly> and L<Readonly::Values::Syslog> must be
+installed, for what is a small test helper.  L<Object::Configure> is not used, because it loads
 L<Log::Abstraction>, and a test logger should not need that.
 
 =item * B<Simple translation system.>  L<Locale::Maketext> uses numbered
@@ -3033,9 +3377,12 @@ like this is cut to 200 characters, and control characters in it (such as
 a newline, or the escape character that starts a terminal control
 sequence) are shown as C<\xNN>.  In a character string, the C1 controls
 U+0080 to U+009F are shown as C<\xNN> too; in a byte string those bytes
-are kept, because they are usually part of UTF-8 text.  So a hostile value cannot make an error
-message enormous, add a forged C<ok> line to the output, or control your
-terminal.  An object whose text form (overloaded C<"">) dies is shown in
+are kept, because they are usually part of UTF-8 text.  The bidi controls
+(U+200E, U+200F, U+202A to U+202E and U+2066 to U+2069), which change the
+order in which text is shown, are shown as C<\x{NNNN}>.  So a hostile
+value cannot make an error message enormous, add a forged C<ok> line to
+the output, control your terminal, or make the message read differently
+on screen from what it says.  An object whose text form (overloaded C<"">) dies is shown in
 Perl's plain form, such as C<My::Class=HASH(0x55d0c8a1e2f8)>: the error
 or warning you get is this module's, not the object's.
 
@@ -3385,6 +3732,7 @@ and so on) never change the state.
       count, messages, lang, is_trace ... is_emergency, flush, reopen,
       i18n
                                 [return a value only]
+      _emit                     [print the text; return the logger]
       DESTROY() called directly [does nothing; the logger stays]
       like(undef), has_level(undef), a bad argument, or any method
       called on something that is not a logger (the class name, undef,

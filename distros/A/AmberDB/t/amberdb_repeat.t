@@ -11,7 +11,7 @@ use AmberDB;
 
 # ---------------------------------------------------------------------------
 subtest 'order_active schema repeat_fields unit test' => sub {
-    my $db = AmberDB->new( cfg => { simple => 1 } );
+    my $db = AmberDB->new( cfg => { use_simple => 1 } );
 
     # Real-world schema structure from order_active.table
     my $table_info = {
@@ -83,7 +83,7 @@ subtest 'order_active schema repeat_fields unit test' => sub {
 
 # ---------------------------------------------------------------------------
 subtest 'repeat_fields skips empty / undef blocks without double commas' => sub {
-    my $db = AmberDB->new( cfg => { simple => 1 } );
+    my $db = AmberDB->new( cfg => { use_simple => 1 } );
 
     my $table_info = {
         repeat_ids   => 2,

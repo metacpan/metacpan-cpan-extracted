@@ -1,15 +1,14 @@
-"Pod::Literate" Version 0.0.3
+"Pod::Literate" Version 0.0.4
 
 Abstract:
 ---------
 This package provides a POD format mechanism that supports naming and referencing code embedded in Perl POD, automatically extracting and arranging that code into files, and generating associate literate programming documentation from that specification.
 
-What's new in version 0.0.3:
-----------------------------
+What's new in recent versions:
+------------------------------
+* Multiple output target support
+* Establish spacing behaviors
 * Switch to literate:command target=filename
-* Verify inline references
-* Reject :literate format request
-* Additional build specifications
 
 Copyright & License:
 --------------------

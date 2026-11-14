@@ -36,6 +36,20 @@
 #                                                                                           -1 | 0 .. 2**64-1 | 2**64 (%u)
 #   repeated values      printable characters                   C0 and C1 controls          U+007F | U+0080 .. U+009F
 #                                                                                           | U+00A0
+#   name encoding        ASCII, decoded text, bytes             -                           a non-ASCII letter in a
+#                        (malformed and surrogates: never a                                 level name: another name
+#                        level, never a crash or stray warning)
+#   pattern encoding     characters, bytes, surrogates          malformed character string  characters vs bytes: never
+#                                                                                           match each other
+#   claimed references   real arrays and hashes                 objects that only claim     -
+#                                                               ARRAY or HASH
+#   nesting depth        any depth                              -                           99 | 100 | 101 (perl's
+#                                                                                           recursion warning)
+#   i18n count           numbers                                text, '', undef, refs      en/de: 0.999 | 1 | 1.001;
+#                                                                                           fr: -2 | -1.999 .. 1.999 | 2;
+#                                                                                           0, '0.0', '-0' are zero
+#   i18n key, args,      strings; a hash; a form's name          undef, refs; non-hashes;    '' (empty key, empty gender)
+#   gender                                                      unknown gender
 #
 # Every rejection is checked against the exact message the POD documents.
 
@@ -45,8 +59,10 @@ use warnings;
 use lib 't/lib';
 use Test::Most;
 use Test::Warnings qw(warning);
+use Test::Returns;
 use Readonly;
 use Encode ();
+use Scalar::Util ();
 use Config;
 use Capture qw(capture_diag failing printed);
 
@@ -78,6 +94,7 @@ Readonly::Scalar my $UINT_MAX => '18446744073709551615';
 Readonly::Scalar my $BELOW_INT_MIN => '-9223372036854775809';
 Readonly::Scalar my $ABOVE_INT_MAX => '9223372036854775808';
 Readonly::Scalar my $ABOVE_UINT_MAX => '18446744073709551616';
+Readonly::Scalar my $RECURSION_WARNING => 100;	# depth at which perl warns of deep recursion
 Readonly::Scalar my $SHOW_STATE => $ENV{'TEST_VERBOSE'};
 
 # The level table from the POD
@@ -124,7 +141,9 @@ sub decoded {
 sub state_diag {
 	my ($label, $value) = @_;
 
-	diag(explain({ $label => $value })) if($SHOW_STATE);
+	# Test::More's explain() returns the dump; Test::Most's prints it
+	# and returns 0, which diag() then printed as a stray "# 0"
+	diag(Test::More::explain({ $label => $value })) if($SHOW_STATE);
 	return;
 }
 
@@ -571,13 +590,15 @@ subtest 'AUTOLOAD: notice name length boundary' => sub {
 			is($logger->count(lc($name)), 1, "$kind, $length characters: stored in full");
 		}
 	}
-	# Combining marks and direction overrides are not controls: they are
-	# shown, with the cut still counted in characters
-	foreach my $kind ('Zalgo (stacked combining marks)', 'right-to-left override') {
-		my $name = $TEXT{$kind};
-		my $out = Encode::decode('UTF-8', printed { quiet()->$name('m') });
-		ok(index($out, "no method '$name'") >= 0, "$kind: shown unchanged");
-	}
+	# Combining marks are not controls: they are shown unchanged
+	my $zalgo = $TEXT{'Zalgo (stacked combining marks)'};
+	my $out = Encode::decode('UTF-8', printed { quiet()->$zalgo('m') });
+	ok(index($out, "no method '$zalgo'") >= 0, 'Zalgo (stacked combining marks): shown unchanged');
+	# Direction overrides would make the notice read differently on screen
+	# from what it says, so they are escaped
+	my $override = $TEXT{'right-to-left override'};
+	$out = Encode::decode('UTF-8', printed { quiet()->$override('m') });
+	ok(index($out, q{no method '\x{202E}gnirts desrever\x{202C}'}) >= 0, 'right-to-left override: escaped');
 };
 
 subtest 'level: references' => sub {
@@ -642,7 +663,7 @@ subtest 'i18n: integer placeholder boundaries' => sub {
 	is($logger->i18n('x', { v => $BELOW_INT_MIN }), $BELOW_INT_MIN, '%x, below the signed minimum: shown as written');
 };
 
-subtest 'repeated values: C0 and C1 controls' => sub {
+subtest 'repeated values: C0, C1 and bidi controls' => sub {
 	# A level name is repeated in the warning, so it shows how a caller's
 	# value is escaped.  Character strings: U+007F and U+0080 to U+009F are
 	# escaped (U+009B starts a terminal sequence on its own); U+00A0 is
@@ -653,7 +674,18 @@ subtest 'repeated values: C0 and C1 controls' => sub {
 		'U+009B (one-character CSI)' => [decoded("a\x{9b}[2J"), 'a\x9B[2J'],
 		'U+009F, the last C1 control' => [decoded("a\x{9f}"), 'a\x9F'],
 		'U+00A0, just after the C1 controls' => [decoded("a\x{a0}"), decoded("a\x{a0}")],
-		'right-to-left override (not a control)' => [$TEXT{'right-to-left override'}, $TEXT{'right-to-left override'}],
+		# The bidi controls: the first and last of each range, and the marks
+		'U+200E, left-to-right mark' => ["a\x{200e}", 'a\x{200E}'],
+		'U+200F, right-to-left mark' => ["a\x{200f}", 'a\x{200F}'],
+		'U+202A, the first embedding' => ["a\x{202a}", 'a\x{202A}'],
+		'right-to-left override, U+202E' => [$TEXT{'right-to-left override'}, '\x{202E}gnirts desrever\x{202C}'],
+		'U+2066, the first isolate' => ["a\x{2066}", 'a\x{2066}'],
+		'U+2069, the last isolate' => ["a\x{2069}", 'a\x{2069}'],
+		# Just outside the ranges: shown as they are
+		'U+2029, just before the embeddings' => ["a\x{2029}", "a\x{2029}"],
+		'U+202F, just after them' => ["a\x{202f}", "a\x{202f}"],
+		'U+2065, just before the isolates' => ["a\x{2065}", "a\x{2065}"],
+		'U+206A, just after them' => ["a\x{206a}", "a\x{206a}"],
 		# The UTF-8 bytes of the euro sign include 0x82: a byte string's
 		# bytes are kept, or UTF-8 text would be mangled
 		'UTF-8 bytes in a byte string' => [Encode::encode('UTF-8', "\x{20ac}"), Encode::encode('UTF-8', "\x{20ac}")],
@@ -664,6 +696,221 @@ subtest 'repeated values: C0 and C1 controls' => sub {
 		my $text = warning { $logger->level($value) };
 		ok(index($text, "invalid syslog level '$shown'") >= 0, $name) or state_diag($name => $text);
 	}
+};
+
+# ===========================================================================
+# Encoding partitions of names and patterns
+# ===========================================================================
+
+# A character string whose bytes are not valid UTF-8, as Encode::_utf8_on()
+# makes from bytes that were never UTF-8
+sub malformed {
+	my $text = shift;
+
+	Encode::_utf8_on($text);
+	return $text;
+}
+
+# Strategy: a name reaches count(), has_level(), level(), new() and
+# AUTOLOAD as one of five kinds of string.  Valid level names are ASCII, so
+# decoded ASCII is still one; a non-ASCII letter that lower-cases to
+# something else is not; bytes, a malformed character string and a
+# surrogate are never level names, and must give the documented answer
+# with no crash and no stray warning (Test::Warnings checks)
+subtest 'names: encoding partitions' => sub {
+	my %partition = (
+		'decoded ASCII' => [decoded('ERROR'), 1],
+		'non-ASCII lookalike (dotted capital I)' => ["\x{130}NFO", 0],
+		'UTF-8 bytes of a non-ASCII name' => [Encode::encode('UTF-8', "err\x{f6}r"), 0],
+		'malformed character string' => [malformed("\xff\xfe error"), 0],
+		'surrogate' => ["error\x{D800}", 0],
+	);
+	foreach my $kind (sort keys %partition) {
+		my ($name, $is_level) = @{$partition{$kind}};
+		my $logger = quiet();
+		$logger->error('x');
+		if($is_level) {
+			is($logger->count($name), 1, "$kind: count() finds the level");
+			ok($logger->has_level($name, "$kind: has_level"), "$kind: has_level() finds it");
+			is($logger->level($name), $logger, "$kind: level() sets it");
+			is(quiet(level => $name)->level(), $LEVEL{'error'}, "$kind: new(level) accepts it");
+			lives_ok { quiet(diag => $name) } "$kind: new(diag) accepts it";
+			next;
+		}
+		is($logger->count($name), 0, "$kind: count() finds nothing");
+		my ($result) = failing(sub { $logger->has_level($name) });
+		ok(!$result, "$kind: has_level() fails");
+		like(warning { $logger->level($name) }, qr/\A\Q$CLASS: invalid syslog level '\E/, "$kind: level() gives only the documented warning");
+		throws_ok { quiet(level => $name) } qr/\A\Q$CLASS: invalid syslog level '\E[^\n]* at \Q$FILE\E/, "$kind: new(level) rejects it, from here";
+		throws_ok { quiet(diag => $name) } qr/\A\Q$CLASS: invalid diag level '\E[^\n]* at \Q$FILE\E/, "$kind: new(diag) rejects it";
+		throws_ok { quiet(diag => [$name]) } qr/\A\Q$CLASS: invalid diag level '\E[^\n]* at \Q$FILE\E/, "$kind: in a diag list too";
+
+		# The same name as a misspelt method: stored, and found by that name
+		printed { $logger->$name('m') };
+		is($logger->count($name), 1, "$kind: a method of that name is stored, and counted by the same name");
+	}
+	throws_ok { quiet(level => malformed("\xff LOUD")) } qr/\A\Q$CLASS: invalid syslog level '\E\x{FFFD}\Q LOUD'\E/, 'a malformed name is shown with U+FFFD, in its own case';
+};
+
+# Strategy: patterns are compiled from strings, so their encoding is a
+# partition of its own.  Characters match characters and bytes match
+# bytes, never each other (the POD's ENCODING section); valid text of any
+# kind compiles; a malformed character string is an invalid argument
+subtest 'like and unlike: pattern encoding' => sub {
+	my $logger = quiet();
+	my $text = decoded($TEXT{'emoji'});
+	my $bytes = Encode::encode('UTF-8', $text);
+	$logger->info($text);
+
+	ok($logger->like($text, 'character pattern, character text'), 'characters match characters');
+	ok($logger->unlike($bytes, 'byte pattern, character text'), 'bytes do not match characters');
+	$logger->clear()->info($bytes);
+	ok($logger->like($bytes, 'byte pattern, byte text'), 'bytes match bytes');
+	ok($logger->unlike($text, 'character pattern, byte text'), 'characters do not match bytes');
+
+	$logger->clear()->info("x\x{D800}y", $TEXT{'Zalgo (stacked combining marks)'}, $TEXT{'right-to-left override'});
+	foreach my $kind ('surrogate', 'Zalgo (stacked combining marks)', 'right-to-left override') {
+		my $pattern = ($kind eq 'surrogate') ? "\x{D800}" : quotemeta($TEXT{$kind});
+		ok($logger->like($pattern, "$kind pattern"), "$kind: compiles and matches");
+	}
+	foreach my $method (qw(like unlike)) {
+		throws_ok { $logger->$method(malformed("\xff\xfe")) } qr/\A\Q$CLASS: invalid argument: Malformed UTF-8 character\E[^\n]* at \Q$FILE\E/,
+			"$method: a malformed character string is an invalid argument";
+	}
+};
+
+# ===========================================================================
+# References that only claim a type
+# ===========================================================================
+
+# Strategy: for each parameter that takes an array or a hash, one value
+# that is really that type and one that only claims to be (an object
+# blessed into a class called ARRAY or HASH)
+subtest 'references: real and claimed types' => sub {
+	my $type = 'diag must be a level name, "all", "none" or an array reference of level names';
+	is_deeply(printed_levels($CLASS->new(diag => bless(['err'], 'ARRAY'), verbose => 0)), { err => 1 }, 'diag: an array blessed into ARRAY is a list of names');
+	foreach my $object (bless({}, 'ARRAY'), bless(['err'], 'Local::List')) {
+		throws_ok { quiet(diag => $object) } at_caller($type), 'diag: ' . ref($object) . ' object of type ' . Scalar::Util::reftype($object) . ' is invalid';
+	}
+
+	my $default = "$CLASS: m() needs a level name";
+	is(quiet(i18n => { en => { needs_level => 'own %{method}s' } })->i18n('needs_level', { method => 'm' }), 'own m', 'i18n: a real table is used');
+	foreach my $where ('the option', 'a language table') {
+		my $claim = bless(['x'], 'HASH');
+		my $logger = quiet(i18n => ($where eq 'the option') ? $claim : { en => $claim });
+		is($logger->i18n('needs_level', { method => 'm' }), $default, "i18n: an array claiming HASH as $where is ignored");
+	}
+	like(quiet(i18n => { en => { needs_level => bless(['x'], 'HASH') } })->i18n('needs_level'), qr/\AHASH=ARRAY\(0x[0-9a-f]+\)\z/, 'i18n: as a template, shown as its text');
+
+	my $logger = quiet();
+	$logger->info([bless({}, 'ARRAY')]);
+	like($logger->messages()->[0]->{'message'}, qr/\AARRAY=HASH\(0x[0-9a-f]+\)\z/, 'message: a hash claiming ARRAY is shown in plain form');
+	$logger->clear()->info([bless(['a', 'b'], 'ARRAY')]);
+	is($logger->messages()->[0]->{'message'}, '[a, b]', 'message: an array blessed into ARRAY is rendered as an array');
+};
+
+# ===========================================================================
+# Nesting depth
+# ===========================================================================
+
+# Build a structure nested $depth levels deep: [[[...]]] or {k => {k => ...}}
+sub nested {
+	my ($kind, $depth) = @_;
+
+	my $top = ($kind eq 'hash') ? {} : [];
+	my $tip = $top;
+	foreach (1 .. $depth) {
+		if($kind eq 'hash') {
+			$tip = $tip->{'k'} = {};
+		} else {
+			push @{$tip}, [];
+			$tip = $tip->[0];
+		}
+	}
+	return $top;
+}
+
+# Strategy: there is no depth limit, so the edge worth testing is perl's
+# own: it warns of deep recursion at 100 calls.  Rendering a message and
+# copying an i18n option both recurse, so each is tried just below, at,
+# and just above that depth, and must give exact text with no warning
+subtest 'nesting depth: either side of perl\'s recursion warning' => sub {
+	my $logger = quiet();
+	foreach my $depth (0, $RECURSION_WARNING - 1, $RECURSION_WARNING, $RECURSION_WARNING + 1) {
+		# The hash goes first: last, it would be the message's fields
+		$logger->clear()->info(nested('hash', $depth), 'h');
+		is($logger->messages()->[0]->{'message'}, ('{k => ' x $depth) . '{}' . ('}' x $depth) . 'h', "hash, depth $depth: exact");
+		$logger->clear()->info('a', nested('array', $depth));
+		is($logger->messages()->[0]->{'message'}, 'a' . ('[' x ($depth + 1)) . (']' x ($depth + 1)), "array, depth $depth: exact");
+		my $translated = quiet(i18n => { en => { t => nested('hash', $depth) } });
+		is($translated->i18n('t'), '', "i18n template, depth $depth: copied, and renders as no form applies");
+	}
+};
+
+# ===========================================================================
+# i18n(): count, gender, key and arguments
+# ===========================================================================
+
+# Strategy: the plural rules are numeric ranges, different per language.
+# Test the exact edges of 'one' in each, either side by the smallest step
+# that a template author would use, and each kind of non-number
+subtest 'i18n: plural boundaries by language' => sub {
+	my $forms = { zero => 'Z', one => 'O', other => 'X' };
+	my %want = (
+		en => { -1 => 'X', 0 => 'Z', '0.0' => 'Z', '-0' => 'Z', 0.999 => 'X', 1 => 'O', '1.0' => 'O', '1e0' => 'O', 1.001 => 'X', 2 => 'X' },
+		fr => { -2 => 'X', -1.999 => 'O', -1 => 'O', 0 => 'Z', 0.999 => 'O', 1 => 'O', 1.999 => 'O', 2 => 'X' },
+		zh => { 0 => 'Z', 1 => 'X', 2 => 'X' },
+	);
+	$want{'de'} = $want{'en'};
+	foreach my $lang (sort keys %want) {
+		my $logger = quiet(lang => $lang, i18n => { $lang => { t => $forms, bare => { one => 'O', other => 'X' } } });
+		foreach my $count (sort { $a <=> $b } keys %{$want{$lang}}) {
+			is($logger->i18n('t', { count => $count }), $want{$lang}->{$count}, "$lang, count $count: $want{$lang}->{$count}");
+		}
+		is($logger->i18n('bare', { count => 0 }), ($lang eq 'fr') ? 'O' : 'X', "$lang, count 0 with no zero form: the language's rule");
+		foreach my $count ('one', '', undef, [1], Local::Named->new('1')) {
+			my $label = defined($count) ? (ref($count) || "'$count'") : 'undef';
+			is($logger->i18n('t', { count => $count }), 'X', "$lang, count $label: not a number, so other");
+		}
+	}
+};
+
+subtest 'i18n: gender' => sub {
+	my $logger = quiet(i18n => { en => { t => { male => 'M', '' => 'E', other => 'X' }, plain => { male => 'M', other => 'X' } } });
+	my %partition = (
+		'a form name' => ['male', 'M'],
+		'an unknown name' => ['neuter', 'X'],
+		'undef' => [undef, 'X'],
+		'an object whose text is a form name' => [Local::Named->new('male'), 'M'],
+		'an object whose text form dies' => [Local::Dying->new(), 'X'],
+	);
+	foreach my $name (sort keys %partition) {
+		my ($gender, $want) = @{$partition{$name}};
+		is($logger->i18n('plain', { gender => $gender }), $want, "$name: $want");
+	}
+	is($logger->i18n('t', { gender => '' }), 'E', "boundary: '' selects a form named ''");
+	is($logger->i18n('plain', { gender => '' }), 'X', "boundary: '' with no such form falls through");
+};
+
+subtest 'i18n: key and arguments' => sub {
+	my $logger = quiet(i18n => { en => { k => 'v %{class}s' } });
+	my %key = (
+		'a known key' => ['k', "v $CLASS"],
+		'an unknown key' => ['nosuch', 'nosuch'],
+		'empty string' => ['', ''],
+		'undef' => [undef, ''],
+		'non-ASCII key' => [$TEXT{'German umlauts and sharp s'}, $TEXT{'German umlauts and sharp s'}],
+	);
+	foreach my $name (sort keys %key) {
+		my ($k, $want) = @{$key{$name}};
+		is($logger->i18n($k), $want, "key, $name");
+	}
+	like($logger->i18n([]), qr/\AARRAY\(0x[0-9a-f]+\)\z/, 'key, a reference: its text, as an unknown key');
+	foreach my $args (undef, [], 'text', \1, {}) {
+		my $label = defined($args) ? (ref($args) || "'$args'") : 'undef';
+		is($logger->i18n('k', $args), "v $CLASS", "args, $label: class is still filled in");
+	}
+	returns_ok($logger->i18n(Local::Dying->new()), { type => 'string' }, 'key, an object whose text form dies: still a string');
 };
 
 done_testing();

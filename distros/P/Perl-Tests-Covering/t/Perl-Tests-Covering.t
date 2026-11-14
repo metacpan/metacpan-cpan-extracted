@@ -84,9 +84,11 @@ sub sha1_of {
     return git_blob( File::Slurper::read_binary( File::Spec->catfile( $root, $rel ) ) );
 }
 
-# A distribution: two modules, a script, and three tests.
+# A distribution: two modules, a script, and three tests.  In $root, when it is
+# given, and otherwise in a new temporary directory.
 sub dist {
-    my $root = tempdir( CLEANUP => 1 );
+    my ($root) = @_;
+    $root //= tempdir( CLEANUP => 1 );
     write_file( $root, 'dist.ini',          "name = Bogus\n" );
     write_file( $root, 'lib/Foo.pm',        "package Foo; 1;\n" );
     write_file( $root, 'lib/Bar.pm',        "package Bar; 1;\n" );
@@ -97,6 +99,23 @@ sub dist {
     write_file( $root, 't/lib/Helper.pm',   "package Helper; 1;\n" );
     write_file( $root, 't/data/not-a-test', "1\n" );
     return Cwd::abs_path($root);
+}
+
+# A git repository with one linked worktree, laid out as git writes them, with
+# the same distribution in each, under $sub when it is given.  Returns the root
+# of the distribution in the main checkout, then in the worktree.
+sub checkouts {
+    my ($sub) = @_;
+    my $tmp   = Cwd::abs_path( tempdir( CLEANUP => 1 ) );
+    my $main  = "$tmp/main";
+    my $wt    = "$tmp/wt";
+
+    make_path("$main/.git/worktrees/wt");
+    write_file( $main, '.git/worktrees/wt/gitdir',    "$wt/.git\n" );
+    write_file( $main, '.git/worktrees/wt/commondir', "../..\n" );
+    write_file( $wt,   '.git',                        "gitdir: $main/.git/worktrees/wt\n" );
+
+    return map { Cwd::abs_path( dist( defined $sub ? "$_/$sub" : $_ ) ) } $main, $wt;
 }
 
 sub covering {
@@ -204,6 +223,53 @@ subtest refresh => sub {
 
     my $blocked = write_file( $root, 'cache-bogus-is-a-file', q{} );
     ok( lives { covering( $root, cache_dir => "$blocked/sub" )->refresh() }, 'A cache that cannot be written is not an error' ) or note($@);
+};
+
+subtest 'refresh, in another checkout of the same repository' => sub {
+    my ( $main, $wt ) = checkouts();
+    my $cache = tempdir( CLEANUP => 1 );
+
+    local @RAN;
+    covering( $main, cache_dir => $cache )->refresh();
+    @RAN = ();
+    is( [ covering( $wt, cache_dir => $cache )->refresh() ], [], 'A new worktree runs nothing, because the records of the main checkout hold there' );
+    is( \@RAN,                                               [], 'and asks for no coverage run' );
+    is( scalar( () = glob "$cache/*.json.gz" ),              2,  'and writes a cache of its own' );
+
+    write_file( $wt, 'lib/Foo.pm', "package Foo; our \$x = 1; 1;\n" );
+    is( [ covering( $wt, cache_dir => $cache )->refresh() ], [qw{t/a.t t/b.t}], 'A file that differs in the worktree runs again each test that loaded it' );
+
+    unlink glob "$cache/*.json.gz";
+    covering( $wt, cache_dir => $cache )->refresh();
+    is( [ covering( $main, cache_dir => $cache )->refresh() ], [qw{t/a.t t/b.t}], 'The main checkout takes the records of a worktree too, where they hold' );
+
+    unlink glob "$cache/*.json.gz";
+    write_file( $main, '.git/worktrees/gone/gitdir', "/nonexistent-bogus/.git\n" );
+    covering( $main, cache_dir => $cache )->refresh();
+    is( [ covering( $wt, cache_dir => $cache )->refresh() ], [qw{t/a.t t/b.t}], 'A worktree that git still lists but that is gone is passed over' );
+
+    my ( $sub_main, $sub_wt ) = checkouts('dist');
+    my $sub_cache = tempdir( CLEANUP => 1 );
+    covering( $sub_main, cache_dir => $sub_cache )->refresh();
+    is( [ covering( $sub_wt, cache_dir => $sub_cache )->refresh() ], [], 'A distribution in a directory of the repository finds itself in the other checkout' );
+
+    my $alone       = dist();
+    my $alone_cache = tempdir( CLEANUP => 1 );
+    covering( $main, cache_dir => $alone_cache )->refresh();
+    is( [ covering( $alone, cache_dir => $alone_cache )->refresh() ], [qw{t/a.t t/b.t t/deeper/c.t}], 'A root in no checkout takes no records but its own' );
+};
+
+subtest _git_common_dir => sub {
+    my ( $main, $wt ) = checkouts();
+    is( Perl::Tests::Covering::_git_common_dir("$main/.git"), "$main/.git", 'The main checkout has the directory itself' );
+    is( Perl::Tests::Covering::_git_common_dir("$wt/.git"),   "$main/.git", 'and a worktree reaches it through commondir' );
+
+    my $tmp = Cwd::abs_path( tempdir( CLEANUP => 1 ) );
+    write_file( $tmp, 'super/.git/modules/sub/HEAD', "ref: refs/heads/main\n" );
+    write_file( $tmp, 'super/sub/.git',              "gitdir: ../.git/modules/sub\n" );
+    is( Perl::Tests::Covering::_git_common_dir("$tmp/super/sub/.git"), undef, 'A submodule, whose directory has no commondir, has none' );
+    write_file( $tmp, 'odd/.git', "not a gitdir line\n" );
+    is( Perl::Tests::Covering::_git_common_dir("$tmp/odd/.git"), undef, 'and neither does a .git file that names no directory' );
 };
 
 subtest tests_covering => sub {

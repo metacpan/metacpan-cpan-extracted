@@ -76,7 +76,10 @@ my @bind = ([ { dbic_colname => 'name' }, 'plain-value' ], [ {}, $long ], [ {}, 
   open my $fh, '<', $file or die $!;
   my $trace = do { local $/; <$fh> };
   like $trace, qr/SELECT 1 WHERE a = \?: 'in-the-file'/, 'the file holds the statement and the bind';
-  is sprintf('%04o', (stat $file)[2] & 07777), '0600', 'the trace file is 0600';
+  SKIP: {
+    skip 'MSWin32 has no Unix file permissions', 1 if $^O eq 'MSWin32';
+    is sprintf('%04o', (stat $file)[2] & 07777), '0600', 'the trace file is 0600';
+  }
 }
 
 {

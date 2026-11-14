@@ -296,7 +296,7 @@
     }
   ],
   "bogonResponse": {
-    "why": "A bogon is answered locally in the full shape. Every flag is present and false, every detail object is present and empty, location and asn carry every key empty as the API answers a bogon (asn 0, strings empty), and is_bogon marks it as computed rather than served.",
+    "why": "A bogon is answered locally in the full shape. Every flag is present and false, every detail object is present and empty, location and asn carry every key empty as the API answers a bogon (asn 0, strings empty), and is_bogon is true, as the API answers reserved space; the SDK computes it rather than asking.",
     "flagsFalse": [
       "is_vpn",
       "is_hosting",
@@ -474,10 +474,11 @@
     },
     {
       "name": "max-full-shape",
-      "why": "Max adds confidence and method on vpn, plus the three proxy families and the public proxy detail.",
+      "why": "Max adds confidence and method on vpn, plus the three proxy families and the public proxy detail. A served answer carries is_bogon, and a detail with a provider carries provider_name, the catalog's name beside its ID.",
       "status": 200,
       "body": {
         "ip": "45.83.91.1",
+        "is_bogon": false,
         "is_vpn": true,
         "is_hosting": true,
         "is_relay": false,
@@ -489,12 +490,14 @@
         "is_pubproxy": true,
         "vpn": {
           "provider": "mullvad",
+          "provider_name": "Mullvad",
           "last_seen": "2026-09-02",
           "confidence": "high",
           "method": "scan"
         },
         "hosting": {
           "provider": "m247",
+          "provider_name": "M247",
           "confidence": "high",
           "last_seen": "2026-09-02"
         },
@@ -504,6 +507,7 @@
         "resproxy": {},
         "dcproxy": {
           "provider": "brightdata",
+          "provider_name": "Bright Data",
           "first_seen": "2026-06-14",
           "last_seen": "2026-09-02",
           "hits": 42,
@@ -536,12 +540,20 @@
         "absent": [],
         "vpn": {
           "provider": "mullvad",
+          "provider_name": "Mullvad",
           "last_seen": "2026-09-02",
           "confidence": "high",
           "method": "scan"
         },
+        "hosting": {
+          "provider": "m247",
+          "provider_name": "M247",
+          "confidence": "high",
+          "last_seen": "2026-09-02"
+        },
         "dcproxy": {
           "provider": "brightdata",
+          "provider_name": "Bright Data",
           "first_seen": "2026-06-14",
           "last_seen": "2026-09-02",
           "hits": 42,
@@ -564,13 +576,14 @@
     },
     {
       "name": "unattributed-range-keeps-empty-provider",
-      "why": "A populated object always carries every key. An unattributed range has an empty provider string, never a missing one.",
+      "why": "A populated object always carries every key. An unattributed range has an empty provider string, never a missing one, and an empty provider_name with it.",
       "status": 200,
       "body": {
         "ip": "185.199.1.1",
         "is_vpn": true,
         "vpn": {
           "provider": "",
+          "provider_name": "",
           "last_seen": "2026-08-30"
         }
       },
@@ -582,6 +595,7 @@
         },
         "vpn": {
           "provider": "",
+          "provider_name": "",
           "last_seen": "2026-08-30"
         }
       }

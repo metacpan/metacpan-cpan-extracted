@@ -110,13 +110,13 @@ use AnyEvent::HTTP ();
 use JSON::XS ();
 use MIME::Base64 ();
 use Scalar::Util qw(weaken);
+use AnyEvent::MCP::Config ();
 
 sub new {
    my ($class, %kv) = @_;
 
    if (defined $kv{name}) {
-      require AnyEvent::MCP::Config;
-      my $settings = AnyEvent::MCP::Config->global->{section}{"client $kv{name}"} || {};
+      my $settings = (AnyEvent::MCP::Config::global_config)->{section}{"client $kv{name}"} || {};
       %kv = (
          (map { exists $settings->{$_} ? ($_ => $settings->{$_}) : () }
             qw(url bearer timeout)),

@@ -9,6 +9,7 @@ use Mojo::Headers;
 use Mojo::IOLoop;
 use Mojo::JSON qw(false true);
 use Mojo::UserAgent;
+use Scalar::Util ();
 use Test::More;
 use Time::HiRes ();
 use InternetData;
@@ -20,18 +21,41 @@ use InternetDataTest::Origin;
 
 subtest 'the API key reaches the wire, and only one way' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
-        shift->render(json => { databases => [] });
+        my ($c) = @_;
+        my $path = $c->req->url->path->to_string;
+        return $c->render(json => InternetDataTest::Origin::batch_body($c)) if $path eq '/batch';
+        return $c->render(json => InternetDataTest::asn()) if $path =~ m{^/asn/};
+        return $c->render(json => InternetDataTest::domain()) if $path =~ m{^/domain/};
+        return $c->render(json => { databases => [] }) if $path eq '/api/v2/database/list';
+        $c->render(json => InternetDataTest::lookup());
     });
+    my %calls = (
+        list => sub { $_[0]->database->list },
+        lookup => sub { $_[0]->lookup('9.9.9.9') },
+        lookup_batch => sub { $_[0]->lookup_batch(['9.9.9.1', '9.9.9.2']) },
+        lookup_asn => sub { $_[0]->lookup_asn(9009) },
+        lookup_domain => sub { $_[0]->lookup_domain('example.com') },
+        my_ip => sub { $_[0]->my_ip },
+    );
 
-    InternetData->new(base_url => $origin->url, api_key => 'secret-key')->database->list;
+    for my $name (sort keys %calls) {
+        $origin->reset;
+        $calls{$name}->(InternetData->new(base_url => $origin->url, api_key => 'secret-key'));
+        my ($request) = $origin->requests;
+        is($request->{headers}{Authorization}, 'Bearer secret-key', "$name: sent as a bearer token");
+        # `?apikey=` belongs to v1 on the apex, with a different key vocabulary.
+        # Sending a v2 key that way would make it look plausible on the version it
+        # does not belong to, and query strings end up in logs.
+        is_deeply($request->{query}, {}, "$name: never as a query parameter");
+        ok(!exists $request->{headers}{'X-Api-Key'}, "$name: nor under a second header");
 
-    my ($request) = $origin->requests;
-    is($request->{headers}{Authorization}, 'Bearer secret-key', 'sent as a bearer token');
-    # `?apikey=` belongs to v1 on this same host, with a different key
-    # vocabulary. Sending a v2 key that way would make it look plausible on the
-    # version it does not belong to, and query strings end up in logs.
-    is_deeply($request->{query}, {}, 'never as a query parameter');
-    ok(!exists $request->{headers}{'X-Api-Key'}, 'nor under a second header');
+        # Without a key a lookup is Unlimited's answer, which an empty Bearer,
+        # an empty X-Api-Key or apikey= would turn into a 401.
+        $origin->reset;
+        $calls{$name}->(InternetData->new(base_url => $origin->url));
+        ($request) = $origin->requests;
+        ok(!exists $request->{headers}{Authorization}, "$name: no empty Authorization without a key");
+    }
 };
 
 subtest 'a keyless client builds and sends no credential at all' => sub {
@@ -112,16 +136,25 @@ subtest 'a key holding a character past U+00FF is refused where it is set' => su
     }
 };
 
-subtest 'an empty result code gives way to the status' => sub {
+# An empty field says nothing, so it gives way to the other envelope, then to
+# the status: a lookup's refusal says why under `error`, a database's under `rc`.
+subtest 'an empty envelope field gives way to the other, then to the status' => sub {
     for my $case ([{ rc => 'UNAUTHORIZED_ID' }, 'UNAUTHORIZED_ID'], [{ rc => '' }, 'request failed with status 403'],
-                  [{ rc => undef }, 'request failed with status 403'], [{}, 'request failed with status 403']) {
+                  [{ rc => undef }, 'request failed with status 403'], [{}, 'request failed with status 403'],
+                  [{ error => 'source address not allowed for this API key' }, 'source address not allowed for this API key'],
+                  [{ error => '', rc => 'NOT_LICENSED' }, 'NOT_LICENSED'], [{ rc => '', error => 'bad' }, 'bad'],
+                  [{ error => '', rc => '' }, 'request failed with status 403'],
+                  [{ rc => 'NOT_LICENSED', error => 'not licensed' }, 'not licensed']) {
         my ($body, $want) = @$case;
         my $origin = InternetDataTest::Origin->new(sub {
             shift->render(json => $body, status => 403);
         });
-        eval { InternetData->new(base_url => $origin->url, api_key => 'k')->database->list };
-        is($@->kind, 'forbidden', 'a 403');
-        is($@->message, $want, "reads as '$want'");
+        my $client = InternetData->new(base_url => $origin->url, api_key => 'k', cache_size => 0);
+        for my $call (['list', sub { $client->database->list }], ['lookup', sub { $client->lookup('9.9.9.9') }]) {
+            eval { $call->[1]->() };
+            is($@->kind, 'forbidden', "$call->[0]: a 403");
+            is($@->message, $want, "$call->[0]: reads as '$want'");
+        }
     }
 };
 
@@ -444,15 +477,34 @@ subtest 'retries are configurable per call' => sub {
     $origin->reset;
     eval { $client->database->list };
     is($origin->count, 1, 'the client default still applies without an override');
+
+    for my $call ([lookup => sub { $client->lookup('9.9.9.9', @_) }], [lookup_asn => sub { $client->lookup_asn(9009, @_) }],
+        [lookup_domain => sub { $client->lookup_domain('example.com', @_) }], [my_ip => sub { $client->my_ip(@_) }],
+        [my_entitlement => sub { $client->my_entitlement(@_) }]) {
+        $origin->reset;
+        eval { $call->[1]->(retries => 2) };
+        is($origin->count, 3, "$call->[0]: one attempt plus two retries");
+    }
 };
 
 for my $body (qw(stall_body trickle_body)) {
 subtest "a per-call timeout below the client one fires on a $body" => sub {
     my $origin = InternetDataTest::Origin->new(\&{"InternetDataTest::Origin::$body"});
-    my $db = InternetData->new(
-        base_url => $origin->url, api_key => 'k', retries => 0, timeout => 3,
-    )->database;
+    my $client = InternetData->new(
+        base_url => $origin->url, api_key => 'k', cache_size => 0, retries => 0, timeout => 3,
+    );
+    my $db = $client->database;
     my %calls = (
+        lookup => sub { $client->lookup('9.9.9.9', @_) },
+        lookup_asn => sub { $client->lookup_asn(9009, @_) },
+        lookup_domain => sub { $client->lookup_domain('example.com', @_) },
+        my_ip => sub { $client->my_ip(@_) },
+        my_entitlement => sub { $client->my_entitlement(@_) },
+        lookup_batch => sub {
+            my $answer = $client->lookup_batch(['9.9.9.9'], @_)->{'9.9.9.9'};
+            die $answer if Scalar::Util::blessed($answer) && $answer->isa('InternetData::Error');
+            return $answer;
+        },
         list => sub { $db->list(@_) },
         metadata => sub { $db->metadata('bogon_ip_v1', @_) },
         checksums => sub { $db->checksums('bogon_ip_v1', 'mmdb', @_) },
@@ -542,11 +594,21 @@ subtest 'a per-call timeout is refused where it cannot work' => sub {
     my $dir = File::Temp->newdir;
     my $path = $dir->dirname . '/bogon_ip_v1.mmdb';
 
+    my $client = InternetData->new(base_url => $origin->url, api_key => 'k');
     for my $bad (-1, 'soon') {
         eval { $db->list(timeout => $bad) };
         like($@, qr/timeout must be a number of seconds/, "list refuses timeout => $bad");
         eval { $db->download_url('bogon_ip_v1', 'mmdb', timeout => $bad) };
         like($@, qr/timeout must be a number of seconds/, "download_url refuses timeout => $bad");
+        for my $call ([lookup => sub { $client->lookup('9.9.9.9', @_) }],
+            [lookup_asn => sub { $client->lookup_asn(9009, @_) }],
+            [lookup_domain => sub { $client->lookup_domain('example.com', @_) }],
+            [my_ip => sub { $client->my_ip(@_) }], [my_entitlement => sub { $client->my_entitlement(@_) }],
+            [lookup_batch => sub { $client->lookup_batch(['9.9.9.9'], @_) }],
+            ['lookup of a bogon' => sub { $client->lookup('10.0.0.1', @_) }]) {
+            eval { $call->[1]->(timeout => $bad) };
+            like($@, qr/timeout must be a number of seconds/, "$call->[0] refuses timeout => $bad");
+        }
     }
     # A transfer runs as long as the file takes. A bound would cut it off, and
     # one spent on the link alone would read as bounding a transfer it does not.
@@ -615,7 +677,9 @@ subtest 'a client-wide timeout is refused where it cannot work' => sub {
 subtest 'a zero written as a string is no bound too' => sub {
     my $origin = InternetDataTest::Origin->new(sub {
         my $c = shift;
-        return $c->render(json => { databases => [] }) if $c->req->url->path->to_string eq '/api/v2/database/list';
+        my $path = $c->req->url->path->to_string;
+        return $c->render(json => { databases => [] }) if $path eq '/api/v2/database/list';
+        return $c->render(json => InternetDataTest::lookup()) if $path eq '/9.9.9.9';
         $c->render(json => { issuer => 'x', authorization_endpoint => 'x', token_endpoint => 'x' });
     });
     # Each is 0 as a number and true as a string, and Mojo tests the bound for
@@ -630,6 +694,10 @@ subtest 'a zero written as a string is no bound too' => sub {
         is_deeply($got, [], "and neither does list's") or diag $@;
         $got = eval { $keyless->oauth->metadata(timeout => $zero) };
         is($got && $got->{issuer}, 'x', "nor oauth->metadata's") or diag $@;
+        $got = eval { InternetData->new(base_url => $origin->url, retries => 0, cache_size => 0)->lookup('9.9.9.9', timeout => $zero) };
+        is($got && $got->ip, '9.9.9.9', "nor lookup's") or diag $@;
+        $got = eval { InternetData->new(base_url => $origin->url, retries => 0, timeout => $zero, cache_size => 0)->lookup('9.9.9.9') };
+        is($got && $got->ip, '9.9.9.9', "and a client built with it looks up") or diag $@;
     }
 };
 

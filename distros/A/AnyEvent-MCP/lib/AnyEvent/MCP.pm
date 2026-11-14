@@ -109,9 +109,10 @@ Private global configuration, named server settings and derived credentials.
 
 Asynchronous JSON exchange with an external form or permission helper.
 
-=item L<AnyEvent::MCP::Workdirs> and L<AnyEvent::MCP::File>
+=item L<AnyEvent::MCP::Workdirs>
 
-Persistent workdir identifiers and their locked state-file utilities.
+Persistent workdir identifiers; state-file locking and replacement are
+provided by this module.
 
 =item L<AnyEvent::MCP::Extension>
 
@@ -189,9 +190,9 @@ secret in the file.
 C<[program PROGRAM]> supplies settings for the invoked program basename;
 C<[instance NAME]> overrides them for a named instance.
 HTTP-capable executables use C<--name NAME> to select these settings, with
-C<default> as the default instance name. Names consist of an ASCII
-letter or underscore followed by ASCII letters, digits, underscores or
-hyphens. Their C<--bind ADDRESS[:PORT]> overrides the configured C<bind>.
+C<default> as the default instance name. Names start with an ASCII letter,
+digit or underscore and may then contain letters, digits, C<_>, C<->,
+C<.>, C<@> and C<+>. Their C<--bind ADDRESS[:PORT]> overrides the configured C<bind>.
 The default bind address is IPv4 loopback with a port derived from the program,
 instance name and master secret in the range 16384..32767; C<:0> requests an ephemeral
 port. C<--print-url> prints enabled user URLs, and C<--print-url=USER>
@@ -239,7 +240,7 @@ C<PERL_ANYEVENT_MCP_MULTIBROKER_ALIAS> names a multibroker routing prefix;
 it does not change the service-instance name.
 C<PERL_ANYEVENT_MCP_PERMISSION_HELPER> selects the external asking executable.
 C<PERL_ANYEVENT_MCP_PERMISSION_ASK> selects the permission engine's
-asking default: C<helper>, C<tty>, C<yad>, C<auto> or C<mcp>. See
+asking default: C<helper>, C<tty>, C<yad>, C<auto>, C<mcp> or C<none>. See
 L<AnyEvent::MCP::Intro/Choose where to ask> for the behavior and client
 requirements.
 Standard C<HOME> and C<XDG_CONFIG_HOME> keep their standard names.
@@ -262,14 +263,6 @@ Return a UTF-8 byte string for C<$text>, leaving the argument unchanged.
 Decode a UTF-8 byte string into characters, dying on invalid UTF-8.
 The argument is left unchanged. For intentional in-place conversions,
 use Perl's C<utf8::encode> or C<utf8::decode> directly.
-
-=item AnyEvent::MCP::parse_ini $text, $callback, $filename
-
-Parse INI text and call C<$callback-E<gt>($name, $kv)> for each section
-in file order, including the initial unnamed section (name C<"">).
-Repeated sections remain separate; duplicate keys within a section use
-their last value. The callback decides how to collect sections.
-C<$filename> is optional and used only for line-numbered errors.
 
 =item $bytes = AnyEvent::MCP::random_bytes $length
 
@@ -450,13 +443,52 @@ own sandbox.
 
 =back
 
+=head1 SMALL UTILITIES
+
+=over
+
+=item $name = AnyEvent::MCP::instance_name ($name)
+
+Validate an instance name, defaulting to C<default> if undefined. Names
+start with an ASCII letter, digit or underscore, followed by letters,
+digits, underscores, hyphens, dots, C<@> and C<+>. This intentionally
+small character set is convenient to use unquoted in a shell.
+
+=item $lock = AnyEvent::MCP::file_lock ($file)
+
+Create the parent directory and state file if necessary, and obtain an
+exclusive advisory lock. If another cooperating writer atomically replaced
+the pathname while waiting, retry on the new inode. Keep the handle alive
+through reading, modifying and replacing the file.
+
+=item AnyEvent::MCP::file_replace ($file, $bytes)
+
+With the C<file_lock> handle held by the caller, write a complete new version
+to a temporary file beside C<$file>, preserve the existing file mode and
+atomically rename it over C<$file>. Remove the temporary on failure.
+This provides atomic visibility, not crash durability; all writers must
+follow the locking protocol.
+
+=item $text = AnyEvent::MCP::file_load ($file, $fh)
+
+Load a UTF-8 text file as Unicode characters, rejecting invalid UTF-8.
+Optionally read from an already open filehandle C<$fh>, leaving it open
+and advancing its position. The caller retains responsibility for locking.
+
+=item AnyEvent::MCP::file_save ($file, $text)
+
+Encode Unicode text as UTF-8 and atomically replace C<$file> using
+C<file_replace>. As with C<file_replace>, the caller holds C<file_lock>.
+
+=back
+
 =cut
 
 package AnyEvent::MCP;
 
 use common::sense;
 
-our $VERSION = 0.82;
+our $VERSION = 0.91;
 
 sub json_class {
    our $JSON_CLASS ||= eval { require JSON::XS; "JSON::XS" }
@@ -478,28 +510,90 @@ sub utf8dec($) {
    $bytes
 }
 
-sub parse_ini {
-   my ($text, $cb, $file) = @_;
-   $file //= "INI";
-   my ($name, $kv, $line) = ("", {}, 0);
+sub instance_name {
+   my ($name) = @_;
 
-   for (split /\n/, $text) {
-      ++$line;
-      s/\r\z//;
-      next if /\A\s*(?:[#;]|\z)/;
-      if (/\A\s*\[([^\]\r\n]+)\]\s*\z/) {
-         my $next = $1;
-         $cb->($name, $kv);
-         ($name, $kv) = ($next, {});
-      } elsif (/\A\s*([^=\s]+)\s*=\s*(.*?)\s*\z/) {
-         $kv->{$1} = $2;
-      } else {
-         die "$file:$line: invalid INI line\n";
-      }
-   }
+   $name = "default" unless defined $name;
 
-   $cb->($name, $kv);
+   $name =~ /\A[A-Za-z0-9_][A-Za-z0-9_.@+-]*\z/
+      or die "Invalid MCP server name '$name'\n";
+
+   $name
 }
+
+sub file_lock {
+   my ($file) = @_;
+
+   require File::Path;
+   require File::Basename;
+   require Fcntl;
+   require Errno;
+
+   File::Path::mkpath (File::Basename::dirname ($file), 0, 0700);
+
+   while (1) {
+      my $fh;
+      sysopen $fh, $file, Fcntl::O_RDWR () | Fcntl::O_CREAT () | Fcntl::O_EXCL (), 0600 or do {
+         die "$file: $!\n" unless $! == Errno::EEXIST ();
+         sysopen $fh, $file, Fcntl::O_RDWR () or die "$file: $!\n";
+      };
+
+      my @stat = stat $fh;
+      flock $fh, Fcntl::LOCK_EX () or die "$file: $!\n";
+      my @current = stat $file;
+
+      return $fh if @current && $stat[0] == $current[0] && $stat[1] == $current[1];
+
+      die "$file: $!\n" unless @current || $! == Errno::ENOENT ();
+
+      close $fh;
+   }
+}
+
+sub file_replace {
+   my ($file, $bytes) = @_;
+
+   require Fcntl;
+   require Errno;
+
+   my @stat = stat $file;
+   die "$file: $!\n" unless @stat || $! == Errno::ENOENT ();
+   my $temporary = "$file.$$~";
+   sysopen my $fh, $temporary, Fcntl::O_WRONLY () | Fcntl::O_CREAT () | Fcntl::O_EXCL (), 0600
+      or die "$temporary: $!\n";
+   my $ok = eval {
+      print {$fh} $bytes or die "$temporary: $!\n";
+      if (@stat) {
+         my $mode = $stat[2] & 07777;
+         chmod $mode, $fh or die "$temporary: $!\n";
+      }
+      close $fh or die "$temporary: $!\n";
+      rename $temporary, $file or die "$file: $!\n";
+      1
+   };
+
+   my $error = $@;
+   unlink $temporary unless $ok;
+   die $error unless $ok;
+}
+
+sub file_load {
+   my ($file, $fh) = @_;
+   my $close = !defined $fh;
+   open $fh, "<:raw", $file or die "$file: $!\n" if $close;
+
+   local $/;
+   my $bytes = <$fh>;
+   defined $bytes or die "$file: $!\n";
+   close $fh or die "$file: $!\n" if $close;
+   utf8dec $bytes
+}
+
+sub file_save {
+   my ($file, $text) = @_;
+   file_replace $file, utf8enc $text
+}
+
 
 sub random_bytes($) {
    my ($length) = @_;

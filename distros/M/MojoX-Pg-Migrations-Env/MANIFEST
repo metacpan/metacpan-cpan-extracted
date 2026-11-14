@@ -1,0 +1,23 @@
+.perltidyrc
+CHANGELOG.md
+cpanfile
+lib/MojoX/Pg/Migrations/Env.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/00-load.t
+t/02-manifest.t
+t/03-perltidy.t
+t/10-sql.t
+t/20-migrate.t
+t/fixtures/placeholders.sql
+t/fixtures/plain.sql
+t/fixtures/plain/1/down.sql
+t/fixtures/plain/1/up.sql
+t/fixtures/plain/10/up.sql
+t/fixtures/plain/2/down.sql
+t/fixtures/plain/2/up.sql
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

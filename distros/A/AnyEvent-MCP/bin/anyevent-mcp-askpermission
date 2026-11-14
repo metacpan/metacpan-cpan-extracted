@@ -31,8 +31,12 @@ form also has a C<Denial reason (optional)> field above four choices:
 C<Deny once>, C<Deny always...>, C<Allow always...>, C<Allow once>.
 The persistent rule editor creates a selector for each named permission
 dimension with multiple offered scopes, using the server's labels and matchers.
+The action being authorized is repeated above the scope selectors.
 Single-choice scopes are applied automatically without a selector. For example,
 the workdir dimension may offer this workdir or any configured workdir.
+When a previously saved scope is still offered, the rule editor preselects it
+instead of the first choice. The user must still explicitly save every rule.
+The initial permission decision remains deny-once by default.
 The scopes affect saved rule matching, not the current call's sandbox grants.
 One-time decisions are on the outside; C<Deny once>
 uses YAD's default OK response. Closing the dialog also denies once.
@@ -122,15 +126,21 @@ use AnyEvent::MCP ();
 use AnyEvent::MCP::Permissions::Ask ();
 use AnyEvent::MCP::Server::Permissions ();
 
-Getopt::Long::GetOptions (
-   "manage-rules=s" => \my $rules_file, "edit-rules=s" => \my $edit_file,
-   "tty" => \my $tty_only, "yad" => \my $yad_only, "help" => \my $help,
-)
+Getopt::Long::GetOptions
+   "manage-rules=s" => \my $rules_file,
+   "edit-rules=s"   => \my $edit_file,
+   "tty"            => \my $tty_only,
+   "yad"            => \my $yad_only,
+   "help"           => \my $help,
    or exit 2;
-die "Unexpected arguments\n" if @ARGV || defined $rules_file && defined $edit_file;
-die "--tty and --yad are mutually exclusive\n" if $tty_only && $yad_only;
-die "--tty/--yad select permission prompts, not rule management\n"
-   if ($tty_only || $yad_only) && (defined $rules_file || defined $edit_file);
+
+@ARGV || defined $rules_file && defined $edit_file
+   and die "Unexpected arguments\n";
+$tty_only && $yad_only
+   and die "--tty and --yad are mutually exclusive\n";
+($tty_only || $yad_only) && (defined $rules_file || defined $edit_file)
+   and die "--tty/--yad select permission prompts, not rule management\n";
+
 if ($help) {
    print "usage: $0 [--tty | --yad | --manage-rules FILE | --edit-rules FILE]\n";
    exit;
@@ -195,7 +205,8 @@ sub manage_rules {
             (exists $rule->{expires} ? scalar localtime $rule->{expires} : "Indefinite")
          } 0 .. $#$rules,
       );
-      die "YAD rule editor unavailable\n" unless defined $status;
+      defined $status
+         or die "YAD rule editor unavailable\n";
       return unless grep $_ == $status, 2, 4, 6;
       my ($index) = $output =~ /\A([1-9][0-9]*)\x1f?\s*\z/;
       next unless $index && $index <= @$rules;
@@ -270,9 +281,11 @@ if (defined $edit_file) {
 }
 
 my $request = do { local $/; JSON::XS::decode_json (scalar <STDIN>) };
-die "Invalid permission request\n" unless $request->{version} == 1;
+$request->{version} == 1
+   or die "Invalid permission request\n";
+
 my $dimensions = $request->{dimensions} || {};
-my @dimensions = sort keys %$dimensions;
+my @dimensions = AnyEvent::MCP::Permissions::Ask::dimension_names $request;
 my @selectable_dimensions = grep @{$dimensions->{$_}{choices}} > 1, @dimensions;
 my %decisions = (d => "deny-once", n => "deny-always", o => "allow-once", a => "allow-always");
 my $persistent = !grep !@{$dimensions->{$_}{choices}}, @dimensions;
@@ -282,59 +295,82 @@ my $unsandboxed = ($request->{sandbox_implementation} || "") =~ /\ANONE/;
 sub rule_dialog {
    my ($choice, $message) = @_;
 
+   # Repeat the action above the scopes; YAD runs with --no-markup.
+   my $action = display_text ($request->{action});
+   $action =~ s/[\r\n\t]/ /g;
    my $allow = $choice eq "allow-always";
    my %selected = map { $_ => 1 } @{$request->{sandbox_grants}};
-   my ($status, $output) = yad (
-      "--form", "--title=Create MCP permission rule",
-      "--width=650", "--separator=\x1f", "--item-separator=\x1f",
-      "--num-output", "--always-print-result", "--buttons-layout=edge",
-      "--text=Configure which future requests this rule covers."
-         . (!$allow ? "\nDenial reason: " . (length $message ? $message : "(none)") : ""),
-      "--button=Back:10", "--button=Save rule:8",
-      ($allow ? (map {
+
+   my @fields;
+   if ($allow) {
+      push @fields, map {
          my $grant = $_;
          my $description = $request->{sandbox_grant_descriptions}{$grant};
          my $label = $grant . (defined $description && length $description ? " - $description" : "");
          $label =~ s/\\/\\\\/g;
          ("--field=$label:CHK", $selected{$grant} ? "TRUE" : "FALSE")
-      } @{$request->{sandbox_grant_choices}}) : ()),
-      (map {
-         my $dim = $dimensions->{$_};
-         ("--field=$dim->{label} scope:CB", join "\x1f",
-            map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) }
-               0 .. $#{$dim->{choices}})
-      } @selectable_dimensions),
-      (!$allow && @deny_paths ? ("--field=Deny file scope:CB", join "\x1f",
+      } @{$request->{sandbox_grant_choices}};
+   }
+
+   push @fields, map {
+      my $dim = $dimensions->{$_};
+      my $default = $dim->{default} // $dim->{choices}[0]{match};
+      ("--field=$dim->{label} scope:CB", join "\x1f",
+         map { ($dim->{choices}[$_]{match} eq $default ? "^" : "")
+            . ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) }
+            0 .. $#{$dim->{choices}})
+   } @selectable_dimensions;
+
+   if (!$allow && @deny_paths) {
+      push @fields, "--field=Deny file scope:CB", join "\x1f",
          (map { ($_ == 0 ? "^" : "") . ($_ + 1) . ": Exact file " . $json->encode ($deny_paths[$_]) }
             0 .. $#deny_paths),
-         (@deny_paths + 1) . ": All paths") : ()),
+         (@deny_paths + 1) . ": All paths";
+   }
+
+   my ($status, $output) = yad (
+      "--form", "--title=Create MCP permission rule",
+      "--width=650", "--separator=\x1f", "--item-separator=\x1f",
+      "--num-output", "--always-print-result", "--buttons-layout=edge",
+      "--text=Action: $action\n\nConfigure which future requests this rule covers."
+         . (!$allow ? "\nDenial reason: " . (length $message ? $message : "(none)") : ""),
+      "--button=Back:10", "--button=Save rule:8",
+      @fields,
       "--field=Rule lifetime:CB", "^Indefinite\x1f900 seconds\x1f16 hours",
    );
    return { decision => "back" } if $status == 10;
    return { decision => "deny-once" } unless $status == 8;
+
    my @values = split /\x1f/, $output, -1;
    my %answer = (decision => $choice, (!$allow && length $message ? (message => $message) : ()));
+
    if ($allow) {
       my @grants;
       for (@{$request->{sandbox_grant_choices}}) {
          my $value = shift @values;
-         die "Invalid YAD sandbox grant selection\n" unless defined $value && $value =~ /\A(?:TRUE|FALSE)\z/i;
+         defined $value && $value =~ /\A(?:TRUE|FALSE)\z/i
+            or die "Invalid YAD sandbox grant selection\n";
          push @grants, $_ if lc $value eq "true";
       }
       $answer{sandbox_grants} = \@grants;
    }
+
    for my $name (@selectable_dimensions) {
       my $index = shift @values;
-      die "Invalid YAD dimension scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
-         && $index <= @{$dimensions->{$name}{choices}};
+      defined $index && $index =~ /\A[1-9][0-9]*\z/
+         && $index <= @{$dimensions->{$name}{choices}}
+         or die "Invalid YAD dimension scope\n";
       $answer{"dim_$name"} = $dimensions->{$name}{choices}[$index - 1]{match};
    }
+
    if (!$allow && @deny_paths) {
       my $index = shift @values;
-      die "Invalid YAD denial file scope\n" unless defined $index && $index =~ /\A[1-9][0-9]*\z/
-         && $index <= @deny_paths + 1;
+      defined $index && $index =~ /\A[1-9][0-9]*\z/
+         && $index <= @deny_paths + 1
+         or die "Invalid YAD denial file scope\n";
       $answer{path} = $deny_paths[$index - 1] if $index <= @deny_paths;
    }
+
    my $lifetime = shift @values;
    defined $lifetime && $lifetime =~ /\A[123]\z/
       or die "Invalid YAD rule lifetime\n";
@@ -513,9 +549,12 @@ sub terminal {
          print {$tty} "$dim->{label} scope:\n",
             map { ($_ + 1) . ": " . $json->encode ($dim->{choices}[$_]{label}) . "\n" }
                0 .. $#{$dim->{choices}};
-         my $index = $ask->("$dim->{label} scope [1]: ");
+         my ($default) = map $_ + 1, grep {
+            $dim->{choices}[$_]{match} eq ($dim->{default} // $dim->{choices}[0]{match})
+         } 0 .. $#{$dim->{choices}};
+         my $index = $ask->("$dim->{label} scope [$default]: ");
          return { decision => "deny-once" } unless defined $index;
-         $index = 1 unless length $index;
+         $index = $default unless length $index;
          die "Invalid dimension scope\n" unless $index =~ /\A[1-9][0-9]*\z/ && $index <= @{$dim->{choices}};
          $answer{"dim_$name"} = $dim->{choices}[$index - 1]{match};
       }

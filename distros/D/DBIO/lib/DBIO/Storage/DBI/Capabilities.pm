@@ -4,7 +4,7 @@ package DBIO::Storage::DBI::Capabilities;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Storage';
 use mro 'c3';
@@ -176,7 +176,7 @@ DBIO::Storage::DBI::Capabilities - Three-tier capability probing for DBI storage
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

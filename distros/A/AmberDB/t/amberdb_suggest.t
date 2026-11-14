@@ -19,7 +19,7 @@ binmode( Test::More->builder->$_, ":utf8" ) for qw(output failure_output todo_ou
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $adb = AmberDB->new(
     path => { dbase_dir => $tmpdir },
-    cfg  => { simple => 0 }
+    cfg  => { use_simple => 0 }
 );
 
 $adb->table_attr( 'catalog_product', {

@@ -5,7 +5,7 @@ package DBIO::Storage::DBI;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base qw/DBIO::Storage::QueryRewrite DBIO::Storage::DBI::Capabilities DBIO::Storage::DBI::DataTypeClassifier DBIO::Storage::DBI::AccessBroker DBIO::Storage/;
 use mro 'c3';
@@ -122,6 +122,7 @@ for my $meth (keys %$storage_accessor_idx, qw(
   deployment_statements
 
   build_datetime_parser
+  datetime_date_carries_time
 
   txn_begin
 
@@ -4381,6 +4382,9 @@ sub build_datetime_parser {
 }
 
 
+sub datetime_date_carries_time { 0 }
+
+
 
 sub is_replicating {
     return;
@@ -4416,7 +4420,7 @@ DBIO::Storage::DBI - DBI storage handler
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 
@@ -6222,6 +6226,14 @@ Defines the datetime parser class - currently defaults to L<DateTime::Format::My
 =head2 build_datetime_parser
 
 See L</datetime_parser>
+
+=head2 datetime_date_carries_time
+
+False: the C<date> type of the database is a calendar day without a time of
+day, read at noon (see L<DBIO::InflateColumn::DateTime/A date stands at noon>).
+A storage whose C<date> type carries a time of day, as Oracle's C<DATE> does,
+returns true; a column read and written through the C<date> channel then keeps
+its time and follows the C<timezone> of the column like a C<datetime>.
 
 =head2 is_replicating
 

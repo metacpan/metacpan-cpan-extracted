@@ -167,6 +167,7 @@ package AnyEvent::MCP::Server;
 use common::sense;
 use AnyEvent::MCP ();
 use AnyEvent::MCP::Server::Request ();
+use AnyEvent ();
 use JSON::XS ();
 use Scalar::Util qw(weaken);
 
@@ -354,6 +355,8 @@ sub rpc {
 
          if ($req->{protocol_version} ge "2026") {
             $result = {
+               ($req->{method} =~ /\A(?:server\/discover|tools\/list|prompts\/list|resources\/(?:list|templates\/list|read))\z/
+                  ? (ttlMs => 0, cacheScope => "private") : ()),
                resultType => "complete",
                %$result,
                _meta => {
@@ -373,6 +376,17 @@ sub rpc {
 
          $notify->($req, { jsonrpc => "2.0", method => $method, params => $params });
       };
+   }
+
+   if ($method eq "tools/call" && $req->{on_notify} && exists $meta->{progressToken}) {
+      my $started = AE::now;
+      my $weak = $req;
+      weaken $weak;
+      $req->{progress_timer} = AnyEvent->timer (after => 30, interval => 30, cb => sub {
+         return unless $weak && !$weak->{finished};
+         my $elapsed = int (AE::now - $started);
+         $weak->progress ($elapsed, undef, "Working for ${elapsed}s");
+      });
    }
 
    $peer->{requests}{$key} = $req;
@@ -445,6 +459,7 @@ sub _reject {
    $req->{finished} = 1;
    my $key = $req->{id};
    delete $req->{peer}{requests}{$key};
+   delete $req->{progress_timer};
    delete @$req{qw(on_reply on_notify on_cancel _reply)};
 
    $self->_rpc_error ($reply, $req->{id}, $code, $message)

@@ -902,7 +902,8 @@ options:
   na_strings => STRS     a string or array ref of field texts read as undef;
                          also na_values or undef_val (default: none)
   colClasses => CLASSES  numeric, integer or character: one for all columns, an
-                         array ref by position or a hash ref by name
+                         array ref by position or a hash ref by name (default:
+                         text, with an integer such as 42 stored as a number)
   sheet => SHEET         .xlsx only: a sheet name or 1-based index (default: the
                          first sheet)
   explode => {0,1}       VCF only: split each sample column by its FORMAT keys
@@ -1118,7 +1119,8 @@ options:
   xlsx_sheet => NAME     the sheet name (default: 'Sheet1')
   xlsx_comment => TEXT   a string or array ref of lines for the provenance
                          comment
-  xlsx_freeze_rows => N  leading rows to freeze (default: 0)
+  xlsx_freeze_rows => N  leading rows to freeze (default: 1, the header row;
+                         0 for none)
   xlsx_freeze_cols => N  leading columns to freeze (default: 0)
 
 example:
@@ -3055,7 +3057,7 @@ Stats::LikeR::Usage
 
 =head1 VERSION
 
-version 0.3418
+version 0.3421
 
 =head1 AUTHOR
 

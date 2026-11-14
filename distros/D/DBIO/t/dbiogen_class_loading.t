@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use File::Spec;
 
 use DBIO::Util qw(file_path slurp_file);
 
@@ -17,6 +18,16 @@ unlike $src, qr/\beval\s*(?:"|'|qq|q\b|\$)/,
 like $src, qr/ensure_class_loaded\(\$introspect_class\)/,
   'the introspector class is loaded through ensure_class_loaded';
 
-is system("$^X -c -Ilib bin/dbiogen >/dev/null 2>&1"), 0, 'dbiogen compiles';
+{
+  open my $null_out, '>', File::Spec->devnull or die "cannot open devnull: $!";
+  open my $saved_out, '>&', \*STDOUT or die $!;
+  open my $saved_err, '>&', \*STDERR or die $!;
+  open STDOUT, '>&', $null_out or die $!;
+  open STDERR, '>&', $null_out or die $!;
+  my $rc = system $^X, '-c', '-Ilib', 'bin/dbiogen';
+  open STDOUT, '>&', $saved_out or die $!;
+  open STDERR, '>&', $saved_err or die $!;
+  is $rc, 0, 'dbiogen compiles';
+}
 
 done_testing;

@@ -1,0 +1,18 @@
+{
+  "schema": "libtmux.workspace/v1",
+  "environment": {"PROJECT": "api"},
+  "sessions": [{
+    "name": "perl-workspace",
+    "windows": [{
+      "name": "editor",
+      "layout": "even-horizontal",
+      "panes": [
+        {"command": ["perl", "-e", "while (<STDIN>) { print }"]},
+        {"command": ["perl", "-e", "while (<STDIN>) { print }"], "horizontal": true}
+      ]
+    }, {
+      "name": "logs",
+      "panes": [{"command": ["perl", "-e", "while (<STDIN>) { print }" ]}]
+    }]
+  }]
+}

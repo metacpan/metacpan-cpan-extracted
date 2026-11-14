@@ -2,7 +2,7 @@
 // @name         mcp-webbrowser support
 // @namespace    https://dist.schmorp.de/mcp-webbrowser
 // @description  AnyEvent::MCP's mcp-webbrowser support script
-// @version      1.1.20261028.1
+// @version      1.2.20261111.0
 // @updateURL    https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
 // @downloadURL  https://dist.schmorp.de/mcp-webbrowser/1/mcp-webbrowser.user.js
 // @match        *://*/*
@@ -50,6 +50,8 @@ function start (tab, allow_menu, allow) {
    let reconnect_timer;
    let active;
    let toggle_menu;
+   let mark_menu;
+   let marked = false;
    let indicator_menus = [];
    let indicators;
    let status = "connecting";
@@ -474,7 +476,7 @@ ${code}
             return;
 
          socket.send (JSON.stringify ([
-            "mcp-webbrowser", 1, 1, instance_id,
+            "mcp-webbrowser", 1, 2, instance_id,
             { url: location.href, title: plain_title (document.title) },
          ]));
       };
@@ -498,8 +500,17 @@ ${code}
          } else if (msg[0] === "welcome") {
             if (msg[2] !== instance_id)
                socket.close (4002, "Wrong document instance");
-            else
+            else {
                connected ();
+               if (tab.mcp_webbrowser.allow_pending) {
+                  socket.send (JSON.stringify (["allowed"]));
+                  delete tab.mcp_webbrowser.allow_pending;
+                  GM_saveTab (tab);
+               }
+            }
+         } else if (msg[0] === "marked" && typeof msg[1] === "boolean") {
+            marked = msg[1];
+            register_menu ();
          } else if (msg[0] === "call" && (msg[2] === "execute" || msg[2] === "navigate")
                     && typeof msg[3]?.code === "string") {
             if (msg[2] === "navigate") {
@@ -585,6 +596,8 @@ ${code}
    function register_menu () {
       if (toggle_menu !== undefined)
          GM_unregisterMenuCommand (toggle_menu);
+      if (mark_menu !== undefined)
+         GM_unregisterMenuCommand (mark_menu);
       for (const id of indicator_menus)
          GM_unregisterMenuCommand (id);
       indicator_menus = [];
@@ -598,10 +611,16 @@ ${code}
             GM_unregisterMenuCommand (toggle_menu);
             for (const id of indicator_menus)
                GM_unregisterMenuCommand (id);
+            GM_unregisterMenuCommand (mark_menu);
             GM_unregisterMenuCommand (configure_menu);
             allow ();
          }
       );
+
+      mark_menu = GM_registerMenuCommand (marked ? "Unmark this MCP tab" : "Mark this tab for MCP", () => {
+         if (ws?.readyState === WebSocket.OPEN)
+            ws.send (JSON.stringify (["mark", !marked]));
+      });
 
       for (const [key, label] of [["title", "Tab title"], ["toast", "Toast on tab activation"]])
          indicator_menus.push (GM_registerMenuCommand (
@@ -688,6 +707,7 @@ ${code}
 
       tab.mcp_webbrowser ??= { id: random_id () };
       tab.mcp_webbrowser.enabled = true;
+      tab.mcp_webbrowser.allow_pending = true;
       GM_saveTab (tab);
    }
 

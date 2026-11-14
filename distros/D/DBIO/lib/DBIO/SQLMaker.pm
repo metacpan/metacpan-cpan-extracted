@@ -4,7 +4,7 @@ package DBIO::SQLMaker;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 our $CONTRACT_VERSION = '1.3';
 
@@ -265,7 +265,7 @@ DBIO::SQLMaker - An SQL::Abstract-based SQL maker class
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 

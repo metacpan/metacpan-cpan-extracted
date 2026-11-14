@@ -27,9 +27,15 @@ matching a Perl regex; C<substitute> replaces regex matches with literal
 replacement text. C<max_bytes> bounds downloads and C<truncated> reports
 partial results.
 
-Redirects and retries are disabled. HTTPS verifies certificates.
+Redirects and retries are disabled. HTTPS verifies certificates by default.
+Set C<verify_tls> to false to skip certificate and hostname verification
+for an individual request.
 Network access is NOT sandboxed; permitted names can reach local or
 private hosts. HTTP failures do not prove that a write did not happen.
+
+When spawned as a multibroker stdio child, the server exits after five
+minutes without MCP requests and is restarted on demand. Directly connected
+clients and HTTP listeners are unaffected.
 
 =head1 FIRST USE
 
@@ -69,7 +75,8 @@ a failed modifying request can repeat its side effects.
 
 Required C<url>. Optional C<method> (GET), C<headers>, UTF-8 C<body>
 or C<body_base64>, C<cookie_jar>, C<timeout> (30s inactivity),
-C<max_bytes> (65536 default, 2097152 maximum), C<grep>, C<regex>,
+C<verify_tls> (true by default), C<max_bytes> (65536 default,
+2097152 maximum), C<grep>, C<regex>,
 and C<substitute> with C<pattern> and C<replacement>. Responses contain
 C<captured_bytes> and C<truncated>. Replacement text is literal.
 
@@ -80,12 +87,13 @@ C<captured_bytes> and C<truncated>. Replacement text is literal.
 Profile C<http-NAME>. Rules match HTTP method as C<action> and URL
 as C<match.url>. Hostname and subdomain scopes are textual DNS suffixes,
 not organizational or public-suffix boundaries. No sandbox grants.
+C<verify_tls> does not affect permission matching.
 
 =head1 OPTIONS
 
 Shared switches are documented in
 L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
-The following switch is specific to C<mcp-http>.
+The following shared switch has HTTP-permission-specific behavior.
 
 =over
 
@@ -94,7 +102,8 @@ The following switch is specific to C<mcp-http>.
 Select permission prompt handling: C<helper> (default) uses the local
 permission helper; C<tty> or C<yad> selects only that interface;
 C<mcp> forwards prompts to the MCP client; C<auto> uses client forms
-when advertised, otherwise the local helper.
+when advertised, otherwise the local helper; C<none> denies unmatched
+permission checks without prompting.
 
 =back
 
@@ -116,21 +125,17 @@ my $options = mcp_getoptions
    {
       usage       => "Usage: mcp-http [OPTION]...\n",
       description => "HTTP requests with URL/method permissions and caller-managed cookies.",
-      options     => [["--ask MODE", "Permission prompts: helper (default), tty, yad, mcp, auto"]],
       examples    => "  mcp-http --stdio\n",
-   },
-   "ask=s" => \my $ask,
-;
+   };
 
 @ARGV and die "Unexpected arguments\n";
 
-my $permissions = AnyEvent::MCP::Server::Permissions->new (
+mcp_permissions +AnyEvent::MCP::Server::Permissions->new (
    name => "http-$options->{name}",
-   (defined $ask ? (ask => $ask) : ()),
 );
 
 mcp_config
-   permissions        => $permissions,
+   idle_exit          => 300,
    server_name        => "mcp-http",
    server_version     => $AnyEvent::MCP::VERSION,
    short_instructions => "HTTP requests with URL/method permissions; pass cookie_jar between calls. No redirects.",
@@ -178,18 +183,21 @@ sub url_scopes {
    my $path = $rest;
    $path =~ s/\?.*//s;
    my $full = "$origin$rest";
+   my $short_url = length $full > 100 ? substr ($full, 0, 97) . "..." : $full;
+   my $short_path = "$origin$path";
+   $short_path = substr ($short_path, 0, 97) . "..." if length $short_path > 100;
    my @choices = (
-      { label => "Exact URL including query", match => $full },
-      { label => "This path, any query",
+      { label => "Exact URL: $short_url", match => $full },
+      { label => "This path: $short_path (any query)",
         match => "^" . (quotemeta "$origin$path") . "(?:\\?.*)?\\z" },
-      { label => "This origin (scheme, host, port)",
+      { label => "This origin: $origin",
         match => "^" . (quotemeta $origin) . "/" },
-      { label => "This hostname, any scheme or port",
+      { label => "This hostname: $host (any scheme or port)",
         match => "^https?://" . (quotemeta $host) . "(?::[0-9]+)?/" },
    );
    if ($host !~ /^\[/ && $host =~ /\./ && $host !~ /^[0-9.]+$/) {
       push @choices, {
-         label => "Hostname and subdomains, any scheme or port",
+         label => "This hostname and subdomains: $host (any scheme or port)",
          match => "^https?://(?:[a-z0-9-]+\\.)*" . (quotemeta $host) . "(?::[0-9]+)?/",
       };
    }
@@ -230,7 +238,7 @@ sub filter_text {
    $text
 }
 
-mcp_tool request => "HTTP request. Method and URL permissions. No redirects; caller-managed cookie_jar returned. "
+mcp_tool request => "HTTP request. Method and URL permissions. No redirects; verify_tls=false skips HTTPS certificate checks. Caller-managed cookie_jar returned. "
    . "UTF-8 body or Base64, bounded response, optional grep/regex/substitute.",
    {
       type => "object",
@@ -244,6 +252,7 @@ mcp_tool request => "HTTP request. Method and URL permissions. No redirects; cal
          body_base64 => { type => "string", description => "Raw request body, Base64" },
          cookie_jar  => { type => "object", description => "AnyEvent::HTTP cookie jar returned by an earlier call" },
          timeout     => { type => "number", minimum => 1, maximum => 300, default => 30 },
+         verify_tls  => { type => "boolean", default => JSON::XS::true },
          max_bytes   => { type => "integer", minimum => 1, maximum => 2097152, default => 65536 },
          grep        => { type => "string", description => "Keep lines containing this literal substring" },
          regex       => { type => "string", description => "Keep lines matching this Perl regex" },
@@ -266,6 +275,8 @@ mcp_tool request => "HTTP request. Method and URL permissions. No redirects; cal
          or die "Invalid HTTP method\n";
       exists $args->{body} && exists $args->{body_base64}
          and die "Specify body or body_base64, not both\n";
+      !exists $args->{verify_tls} || JSON::XS::is_bool ($args->{verify_tls})
+         or die "Invalid verify_tls\n";
       my ($url, $scopes) = url_scopes ($args->{url});
 
       my $headers = $args->{headers} || {};
@@ -316,7 +327,7 @@ mcp_tool request => "HTTP request. Method and URL permissions. No redirects; cal
          recurse    => 0,
          persistent => 0,
          proxy      => undef,
-         tls_ctx    => "high",
+         tls_ctx    => ($args->{verify_tls} // 1) ? "high" : "low",
          timeout    => $args->{timeout} // 30,
          headers    => $headers,
          (defined $data ? (body => $data) : ()),

@@ -4,7 +4,7 @@ package DBIO::InflateColumn::Serializer::MessagePack;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Data::MessagePack;
 use Carp;
@@ -55,7 +55,7 @@ DBIO::InflateColumn::Serializer::MessagePack - MessagePack Inflator
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

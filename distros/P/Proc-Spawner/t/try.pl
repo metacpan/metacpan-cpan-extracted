@@ -11,7 +11,8 @@ if (my $bl = $ENV{RECBUILTIN}) {   # measurement (large-subset-runcompare.pl -q)
   $Proc::ShellSpawn::ONBUILTIN = sub { my ($h, $a, $e) = @_;
     print $bh join("\035", $h, join("\036", map "$_=$e->{$_}", sort keys %$e), join("\037", @$a)), "\n" } }
 my $string = defined $ENV{TRY_FILE} ? do { open my $f, '<', delete $ENV{TRY_FILE} or die "TRY_FILE: $!"; binmode $f; local $/; <$f> } : shift;   # (Windows: Perl's
-my ($st, $err) = Proc::ShellSpawn::run($string);                                                                              #  spawn mangles arguments)
+my ($arg0, @args) = @ARGV;   # as sh -c TEXT [NAME [ARGS]]: $0 and $1 ... (X27, step 2)          #  spawn mangles arguments)
+my ($st, $err) = Proc::ShellSpawn::run($string, defined $arg0 ? (arg0 => $arg0) : (), args => \@args);
 defined $st or print(STDERR "outside the subset: $err->{error} at $err->{pos}\n"), exit 255;   # (as die did on Linux; die's status is $!, which varies)
 if (my $s = $Proc::ShellSpawn::SIGNALLED) { local $SIG{$s} = 'DEFAULT'; kill $s, $$; sleep 1 }   # die by it, as sh -c would
 exit $st;

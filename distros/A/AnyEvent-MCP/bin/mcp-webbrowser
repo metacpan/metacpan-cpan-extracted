@@ -93,16 +93,22 @@ The indicator prefix is omitted from titles reported to the broker.
 The permission remains granted during temporary disconnections and normally
 survives navigation or reload until explicitly revoked.
 
+The menu also offers B<Mark this tab for MCP> (or B<Unmark this MCP tab>).
+Only one connected tab is marked at a time. The C<tabs> result distinguishes
+the marked tab from the last tab explicitly allowed through the Allow command.
+Reconnections and navigation never update the last-allowed selection. Marking
+a tab does not grant additional permission to execute code.
+
 If a tab does not connect, check that the broker is running and its URL is
 correct. Depending on browser settings, you may also need to allow the page
 to access a local-loopback or local-network address; browser permission
 blocking can look like a WebSocket failure. The title and toast indicators
 report connectivity, not a trustworthy security boundary.
 
-B<Note:> ScriptCat currently loses the saved per-tab permission when
-Chromium replaces a discarded tab. After such a discard and restoration,
-you must choose Allow again. This is tracked in
-L<https://github.com/scriptscat/scriptcat/issues/1791>.
+B<Note:> ScriptCat versions before 1.5.0 could lose saved per-tab permissions
+when Chromium replaced a discarded tab. After such a discard and restoration,
+the user had to choose Allow again. This was reported in
+L<https://github.com/scriptscat/scriptcat/issues/1791> and fixed in 1.5.0.
 
 =head1 FIRST TOOL CALL
 
@@ -131,6 +137,10 @@ do not blindly retry JavaScript that changes page state.
 
 Return C<{tabs: [...]}> with each connected tab's C<target>, current document
 C<instance_id>, integer C<revision>, and client-reported C<url> and C<title>.
+Boolean C<last_allowed> identifies the most recent explicit Allow operation;
+boolean C<marked> identifies the tab chosen with the Mark menu command.
+Both selections are broker-local, survive ordinary reconnection, and are
+cleared when their tab session retires. Neither grants execution permission.
 The revision starts at 1 and advances on document replacement, not on an
 ordinary WebSocket reconnect or a same-document navigation. Disconnected tab
 identities are retained for up to 30 seconds. This is cached registration
@@ -225,14 +235,27 @@ C<read> covers tab and operation discovery; C<exec> covers arbitrary JavaScript
 and tab-operation calls. A userscript or extension may apply additional
 permissions for individual operations.
 
-JavaScript exec prompts offer this exact code in this target, any code in
-this target, or any code in all targets. Operation exec prompts offer
-corresponding scopes for browser operations. Independently, each exec request
-offers this origin, the same scheme and host on any port, or any origin.
+Persistent C<exec> permission prompts select three independent restrictions:
+Tab (this tab or any opted-in tab), JavaScript (this exact code or any
+JavaScript), and Site (this origin, this host and scheme on any port, or
+any origin). Browser operations offer their own exact/any operation choices
+instead of JavaScript choices. All restrictions must match.
+The defaults for JavaScript execution are this tab, any JavaScript, and
+this origin. Tab-specific grants apply across navigations within that tab
+until it is retired; they do not grant access to other opted-in tabs.
 Only HTTP(S) origins offer persistent scopes: opaque origins such as C<null>
 cannot distinguish different documents, so they allow one-time decisions only.
-Saved target grants also cover future tabs using the same target name.
-Saved rules use C<match.subject> and C<match.origin> as independent fields.
+Saved tab-specific grants survive navigation and reconnects within that
+tab's session; they are not bound to the current document instance.
+While the broker remains running, tab-specific saved rules are removed when
+that tab is explicitly disabled or has been disconnected for five minutes.
+This can revoke permissions for a suspended tab that later reconnects; it
+must be approved again. If the broker exits first, old tab-specific rules
+may remain on disk. Rules covering all opted-in tabs are unaffected.
+Execution rules now use independent C<match.tab>, C<match.code> and
+C<match.origin> fields. Old combined C<match.subject> execution rules no
+longer authorize executions and require reapproval; stale tab-specific
+rules are still removed on tab retirement.
 Rules without C<match.origin> match all origins, as do broad C<--auto-allow>
 overrides. The broker derives origins from the URL already reported by the
 userscript on connect, state changes and navigation, including older clients.
@@ -245,15 +268,16 @@ C<--ask> selects the same helper, tty, yad, mcp or auto modes as other servers.
 
 Shared switches are documented in
 L<AnyEvent::MCP::Server::Simple/COMMON COMMAND-LINE OPTIONS>.
-The following switch is specific to C<mcp-webbrowser>.
+The following shared switch has browser-specific behavior.
 
 =over
 
 =item --ask MODE
 
 Permission prompts: C<helper> (default), C<tty>, C<yad>, C<mcp> or
-C<auto>. tty/yad force local interface; mcp delegates to client,
-auto prefers native elicitation when offered. See L</PERMISSIONS>.
+C<auto>, or C<none>. tty/yad force local interface; mcp delegates to
+client, auto prefers native elicitation when offered, and none denies
+unmatched requests. See L</PERMISSIONS>.
 
 =back
 
@@ -284,11 +308,11 @@ has full authority within that page; use this only when intended.
 WebSocket authentication happens at C</TOKEN/TARGET>. C<TARGET> is one
 percent-encoded path component. Before ordinary messages, send:
 
-   ["mcp-webbrowser", 1, 1, INSTANCE_ID, {"url": URL, "title": TITLE}]
+   ["mcp-webbrowser", 1, 2, INSTANCE_ID, {"url": URL, "title": TITLE}]
 
 C<INSTANCE_ID> identifies one loaded document. Keep it across reconnects of that
 document and change it on navigation/reload. The private browser protocol is
-1.1, independent of MCP and the old xpcse browser-transfer protocol. Compatible
+1.2, independent of MCP and the old xpcse browser-transfer protocol. Compatible
 older/newer minor versions can connect. Version 1.0 clients support page
 execution but not additional tab operations; discovery returns an empty list
 and unsupported calls fail without disconnecting the browser.
@@ -317,6 +341,7 @@ Broker to browser:
    ["call", ID, "call_tab_operation", {"operation": NAME, "arguments": ARGS, "max_bytes": BYTES}]
    ["proceed", ID]
    ["cancel", ID]
+   ["marked", true|false]  (protocol 1.2)
 
 Browser to broker:
 
@@ -325,6 +350,8 @@ Browser to broker:
    ["ready", ID]
    ["navigated", ID, {"url": URL, "title": TITLE}]
    ["state", {"url": URL, "title": TITLE}]
+   ["allowed"]
+   ["mark", true|false]
    ["quit"]
 
 The browser replies C<ready> to a C<navigate> call without evaluating it.
@@ -370,26 +397,31 @@ use AnyEvent::MCP::Server::Toolset ();
 
 use AnyEvent::MCP::Server::Simple qw(mcp_getoptions mcp_tool_help mcp_log mcp_log_request);
 
-my $options = mcp_getoptions ({
-   usage => "Usage: mcp-webbrowser [OPTION]...\n",
-   path => "/",
-   description => "Expose connected browser tabs to MCP; HTTP/WebSocket stays active with stdio or --connect.",
-   options => [["--ask MODE", "Ask via helper (default), tty, yad, mcp, or auto"]],
-   examples => "  mcp-webbrowser --auto-allow '*,*' # all actions in opted-in tabs",
-}, "ask=s" => \my $ask);
+my $options = mcp_getoptions
+   {
+      usage       => "Usage: mcp-webbrowser [OPTION]...\n",
+      path        => "/",
+      description => "Expose connected browser tabs to MCP; HTTP/WebSocket stays active with stdio or --connect.",
+      examples    => "  mcp-webbrowser --auto-allow '*,*' # all actions in opted-in tabs",
+   }
+;
 @ARGV and die "Unexpected arguments\n";
+
+my $ask = delete $options->{ask};
 my $name = $options->{name};
 my $connect = $options->{connect};
 my $stdio = $options->{stdio} || !defined $connect && $ENV{PERL_ANYEVENT_MCP_MULTIBROKER_PROTOCOL} eq "stdio";
 !($stdio && defined $connect) or die "Cannot combine --stdio and --connect\n";
 
-my $config = AnyEvent::MCP::Config->global;
+my $config = AnyEvent::MCP::Config::global_config ();
 my %http = $config->http_settings ($name, $options->{bind});
+
 $http{tokens} = $options->{tokens} if $options->{tokens};
 $http{connect_tokens} = $options->{tokens} if $options->{tokens};
 my %token = map { $_ => 1 } @{$http{connect_tokens}};
 my $json = JSON::XS->new->utf8->max_depth (64);
 my (%connections, %pages, %tabs);
+my ($last_allowed, $marked);
 my $done = AE::cv;
 
 my $permissions = AnyEvent::MCP::Server::Permissions->new (
@@ -448,9 +480,7 @@ sub browser_state {
 sub permission {
    my ($req, $action, $target, $code, $kind) = @_;
 
-   my $subject = "tabs";
-   my @subjects = ({ label => "the list of connected browser tabs", match => $subject });
-   my ($origin, @origins);
+   my %dimensions;
 
    if (defined $target) {
       my $page = $pages{$target} or die "Browser page is not connected\n";
@@ -458,46 +488,59 @@ sub permission {
 
       my $coder = JSON::XS->new->allow_nonref;
       my $operation = defined $kind && $kind eq "operation";
-      my $prefix = ($operation ? "operation:" : "execute:") . $coder->encode ($target) . ":";
-      $subject = $prefix . $coder->encode ($code);
-      @subjects = (
-         {
-            label   => ($operation ? "this exact operation" : "this exact code") . " in page '$label'",
-            match => $subject,
-         },
-         {
-            label   => ($operation ? "any operation" : "any JavaScript") . " in page '$label'",
-            match => "^" . (quotemeta $prefix),
-         },
-         {
-            label   => ($operation ? "any operation" : "any JavaScript")
-               . " in all browser tabs, including future connections",
-            match => "^" . (quotemeta ($operation ? "operation:" : "execute:")),
-         },
-      );
+      my $prefix = $operation ? "operation:" : "execute:";
+      my $id = $coder->encode ($target);
+      my $command = $prefix . $coder->encode ($code);
+      (my $preview = $code) =~ s/\s+/ /g;
+      $preview = substr ($preview, 0, 87) . "..." if length $preview > 90;
+
+
+      $dimensions{tab} = {
+         label   => "Tab",
+         value   => $id,
+         choices => [
+            { label => "This tab: $label", match => $id },
+            { label => "Any opted-in tab, including future tabs", match => "^" },
+         ],
+         default => $id,
+      };
+      $dimensions{code} = {
+         label   => $operation ? "Operation" : "JavaScript",
+         value   => $command,
+         choices => [
+            { label => ($operation ? "This exact operation: " : "This exact code: ") . $preview,
+              match => $command },
+            { label => $operation ? "Any operation" : "Any JavaScript", match => "^$prefix" },
+         ],
+         default => $operation ? $command : "^$prefix",
+      };
+
       $target = $label;
-      $origin = $page->{state}{origin};
+      my $origin = $page->{state}{origin};
+      my @origins;
       if ($origin =~ m{\Ahttps?://}) {
-         @origins = ({ label => "This origin ($origin)", match => $origin });
+         @origins = ({ label => "This origin: $origin", match => $origin });
          (my $host_origin = $origin) =~ s/:[0-9]+\z//;
          push @origins, {
-            label  => "Same scheme and host, any port ($host_origin)",
+            label  => "This scheme and host: $host_origin (any port)",
             match => "^" . (quotemeta $host_origin) . "(?::[0-9]+)?\\z",
          };
-         push @origins, { label => "Any origin", match => "^" };
+         push @origins, { label => "Any origin, including after navigation", match => "^" };
       }
+      $dimensions{origin} = {
+         label => "Site", value => $origin, choices => \@origins,
+         (@origins ? (default => $origin) : ()),
+      };
+   } else {
+      $dimensions{subject} = {
+         label => "Tab discovery", value => "tabs",
+         choices => [{ label => "The list of connected browser tabs", match => "tabs" }],
+      };
    }
 
    $req->require_permission ({
       tool => $req->{tool}, action => $action,
-      dimensions => {
-         subject => {
-            label => "Code / tab", value => $subject, choices => \@subjects,
-            (defined $target && !(defined $kind && $kind eq "operation")
-               ? (default => $subjects[1]{match}) : ()),
-         },
-         (defined $origin ? (origin => { label => "Origin", value => $origin, choices => \@origins }) : ()),
-      },
+      dimensions => \%dimensions,
       sandbox_grants => [],
       reason => defined $target ? (defined $kind && $kind eq "operation"
          ? "Call browser operation in '$target'\n\n$code"
@@ -584,12 +627,39 @@ sub tab_operation {
    }];
 }
 
+sub prune_tab_rules {
+   my ($target) = @_;
+
+   my $id = JSON::XS->new->allow_nonref->encode ($target);
+   my @prefixes = map {
+      my $prefix = "$_:$id:";
+      ($prefix, "^" . quotemeta $prefix)
+   } qw(execute operation);
+
+   my $lock = $permissions->_lock;
+   my $rules = $permissions->rules;
+   my @keep = grep {
+      my $subject = $_->{"match.subject"} // "";
+      ($_->{"match.tab"} // "") ne $id
+         && !grep { index ($subject, $_) == 0 } @prefixes
+   } @$rules;
+
+   return 0 if @keep == @$rules;
+   $permissions->_write (\@keep);
+   @$rules - @keep
+}
+
 sub finish_tab {
    my ($tab, $reason) = @_;
 
    return unless $tabs{$tab->{requested}} && $tabs{$tab->{requested}} == $tab;
    delete $tab->{expiry};
    delete $tabs{$tab->{requested}};
+   undef $last_allowed if defined $last_allowed && $last_allowed eq $tab->{requested};
+   undef $marked if defined $marked && $marked eq $tab->{requested};
+   my $count = eval { prune_tab_rules ($tab->{requested}) };
+   AE::log warn => "$tab->{requested}: cannot clean up tab permissions: $@" if $@;
+   AE::log info => "$tab->{requested}: removed $count tab-specific permission rules" if $count;
    mcp_log "$tab->{requested}: session finished ($reason)";
 }
 
@@ -599,8 +669,8 @@ sub expire_tab {
    delete $tab->{expiry};
    return if $tab->{page} || $tab->{navigation};
 
-   $tab->{expiry} = AE::timer 30, 0, sub {
-      finish_tab $tab, "inactive for 30s"
+   $tab->{expiry} = AE::timer 300, 0, sub {
+      finish_tab $tab, "inactive for 300s"
          unless $tab->{page} || $tab->{navigation};
    };
 }
@@ -666,7 +736,7 @@ sub receive_message {
          && valid_state ($packet->[4])
          or die "Invalid browser hello\n";
       $packet->[1] eq "1" && $packet->[2] =~ /\A(?:0|[1-9][0-9]*)\z/
-         or die "Unsupported browser protocol $packet->[1].$packet->[2] (server 1.1)\n";
+         or die "Unsupported browser protocol $packet->[1].$packet->[2] (server 1.2)\n";
 
       my $new = !exists $tabs{$page->{requested}};
       my $tab = $tabs{$page->{requested}} ||= {
@@ -684,6 +754,8 @@ sub receive_message {
       delete $page->{hello_timer};
       $pages{$page->{target}} = $page;
       send_message $page, ["welcome", $page->{target}, $page->{instance_id}, $tab->{revision}*1];
+      send_message $page, ["marked", JSON::XS::true]
+         if $page->{minor} >= 2 && defined $marked && $marked eq $page->{target};
 
       if ($different && $tab->{navigation} && $tab->{navigation}{phase} eq "proceed") {
          finish_navigation $tab, "document";
@@ -737,6 +809,24 @@ sub receive_message {
    } elsif ($type eq "state") {
       @$packet == 2 && valid_state ($packet->[1]) or die "Invalid browser state\n";
       $page->{state} = browser_state ($packet->[1]);
+   } elsif ($type eq "allowed") {
+      @$packet == 1 or die "Invalid browser allowed event\n";
+      $last_allowed = $page->{target};
+   } elsif ($type eq "mark") {
+      @$packet == 2 && ($packet->[1] eq "0" || $packet->[1] eq "1")
+         or die "Invalid browser mark event\n";
+
+      if ($packet->[1]) {
+         $marked = $page->{target};
+      } elsif (defined $marked && $marked eq $page->{target}) {
+         undef $marked;
+      }
+
+      for my $other (values %pages) {
+         next if $other->{minor} < 2;
+         send_message $other, ["marked", defined $marked && $marked eq $other->{target}
+            ? JSON::XS::true : JSON::XS::false];
+      }
    } elsif ($type eq "quit") {
       @$packet == 1 or die "Invalid browser quit\n";
       close_page $page, 1000, "Page disconnected";
@@ -806,7 +896,8 @@ sub accept_browser {
 }
 
 my $toolset = AnyEvent::MCP::Server::Toolset->new;
-$toolset->tool (tabs => "List connected tabs; metadata client-reported.",
+$toolset->tool (tabs => "List connected tabs; last_allowed identifies the last explicit Allow action, "
+      . "marked identifies the tab selected with Mark. Neither changes execution permissions.",
    { type => "object", properties => {}, additionalProperties => JSON::XS::false },
    sub {
       my ($req) = @_;
@@ -815,7 +906,9 @@ $toolset->tool (tabs => "List connected tabs; metadata client-reported.",
       $req->result ({ tabs => [map {
          my $page = $pages{$_};
          +{ %{$page->{state}}, target => $_, instance_id => $page->{instance_id},
-            revision => $page->{tab}{revision}*1 }
+            revision => $page->{tab}{revision}*1,
+            last_allowed => defined $last_allowed && $last_allowed eq $_ ? JSON::XS::true : JSON::XS::false,
+            marked => defined $marked && $marked eq $_ ? JSON::XS::true : JSON::XS::false }
       } sort keys %pages] });
    },
 );

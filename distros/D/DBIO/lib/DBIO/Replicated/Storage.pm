@@ -4,7 +4,7 @@ package DBIO::Replicated::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Storage::DBI';
 
@@ -685,7 +685,7 @@ DBIO::Replicated::Storage - Replicated DBI storage coordinator
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

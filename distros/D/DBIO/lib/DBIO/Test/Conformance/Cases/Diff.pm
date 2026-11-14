@@ -4,9 +4,9 @@ package DBIO::Test::Conformance::Cases::Diff;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
+use DBIO::Util ();
 
 
 my $id = sub { +{ data_type => 'integer', is_nullable => 0 } };
@@ -49,8 +49,6 @@ my @CASES = (
   {
     name  => 'diff-view-added',
     since => 1,
-    cards => [ 'dbio-sqlite k67', 'dbio-postgresql k100', 'dbio-mysql k79',
-               'dbio-mssql k45', 'dbio-firebird k33', 'dbio-clickhouse k31' ],
     subject => { source => 'BaseView' },
     input => {
       from => { sources => [ $base->() ] },
@@ -72,8 +70,6 @@ my @CASES = (
   {
     name  => 'diff-view-dropped',
     since => 1,
-    cards => [ 'dbio-sqlite k67', 'dbio-postgresql k100', 'dbio-mysql k79',
-               'dbio-mssql k45', 'dbio-firebird k33', 'dbio-clickhouse k31' ],
     subject => { source => 'BaseView' },
     input => {
       from => { sources => [
@@ -94,7 +90,6 @@ my @CASES = (
   {
     name  => 'diff-view-definition-changed',
     since => 1,
-    cards => [ 'dbio-sqlite k67' ],
     subject => { source => 'BaseView' },
     input => {
       from => { sources => [
@@ -120,8 +115,6 @@ my @CASES = (
   {
     name  => 'diff-table-added-complete',
     since => 1,
-    cards => [ 'dbio-oracle k37', 'dbio-mysql k81', 'dbio-mysql k92',
-               'dbio-sqlite k56 (done)' ],
     subject => { source => 'Child', column => 'parent_id' },
     input => {
       from => { sources => [
@@ -171,7 +164,6 @@ my @CASES = (
   {
     name  => 'diff-column-added-not-null-populated',
     since => 1,
-    cards => [ 'dbio-sqlite k65' ],
     subject => { source => 'Base', column => 'code' },
     input => {
       from => { sources => [ $base->() ] },
@@ -195,7 +187,6 @@ my @CASES = (
   {
     name  => 'diff-column-added-expression-default',
     since => 1,
-    cards => [ 'dbio-sqlite k65' ],
     subject => { source => 'Base', column => 'created' },
     input => {
       from => { sources => [ $base->() ] },
@@ -219,7 +210,6 @@ my @CASES = (
   {
     name  => 'diff-default-changed-apostrophe',
     since => 1,
-    cards => [ 'dbio-oracle k47', 'dbio-mysql k78', 'dbio-sqlite k68' ],
     subject => { source => 'Note', column => 'note' },
     input => {
       from => { sources => [ {
@@ -249,7 +239,6 @@ my @CASES = (
   {
     name  => 'diff-default-expression-kept',
     since => 1,
-    cards => [ 'dbio-mysql k78' ],
     subject => { source => 'Stamp', column => 'created' },
     input => {
       from => { sources => [ {
@@ -284,7 +273,6 @@ my @CASES = (
   {
     name  => 'diff-default-removed',
     since => 1,
-    cards => [ 'dbio-mysql k95' ],
     subject => { source => 'Opt', column => 'c' },
     input => {
       from => { sources => [ {
@@ -314,7 +302,6 @@ my @CASES = (
   {
     name  => 'diff-indexed-column-dropped',
     since => 3,
-    cards => [ 'dbio-mysql k80' ],
     subject => { source => 'Wide', column => 'drop_idx_col' },
     input => {
       from => { sources => [ {
@@ -350,7 +337,6 @@ my @CASES = (
   {
     name  => 'diff-fk-dropped',
     since => 1,
-    cards => [ 'dbio-mysql k94' ],
     subject => { source => 'Child', column => 'parent_id' },
     input => {
       from => { sources => [
@@ -394,7 +380,6 @@ my @CASES = (
   {
     name  => 'diff-fk-added-to-new-unique',
     since => 1,
-    cards => [ 'dbio-mysql k81' ],
     subject => { source => 'Child', column => 'parent_code' },
     input => {
       from => { sources => [
@@ -440,8 +425,6 @@ my @CASES = (
   {
     name  => 'diff-constraint-changed',
     since => 1,
-    cards => [ 'dbio-sqlite k72', 'dbio-postgresql k101', 'dbio-firebird k34',
-               'dbio-oracle k37' ],
     subject => { source => 'Child', column => 'code' },
     input => {
       from => { sources => [
@@ -490,8 +473,6 @@ my @CASES = (
   {
     name  => 'diff-fk-action-changed',
     since => 2,
-    cards => [ 'dbio-sqlite k72', 'dbio-postgresql k101', 'dbio-firebird k34',
-               'dbio-oracle k37' ],
     subject => { source => 'Child', column => 'parent_id' },
     input => {
       from => { sources => [
@@ -539,7 +520,6 @@ my @CASES = (
   {
     name  => 'diff-ident-drop',
     since => 1,
-    cards => [ 'dbio-postgresql k110', 'dbio-mysql k88' ],
     subject => { source => 'MixedCase' },
     input => {
       from => { sources => [
@@ -567,7 +547,6 @@ my @CASES = (
   {
     name  => 'diff-not-null-over-nulls',
     since => 1,
-    cards => [ 'dbio-clickhouse k32' ],
     subject => { source => 'Opt', column => 'c' },
     input => {
       from => { sources => [ {
@@ -600,7 +579,6 @@ my @CASES = (
   {
     name  => 'diff-column-type-change',
     since => 1,
-    cards => [ 'dbio-firebird k38' ],
     subject => { source => 'Num', column => 'n' },
     input => {
       from => { sources => [ {
@@ -635,7 +613,6 @@ my @CASES = (
   {
     name  => 'diff-table-with-dependent-view',
     since => 1,
-    cards => [ 'dbio-sqlite k69' ],
     subject => { source => 'BaseView' },
     input => {
       from => { sources => [
@@ -662,7 +639,6 @@ my @CASES = (
   {
     name  => 'diff-auto-increment-kept',
     since => 1,
-    cards => [ 'dbio-mysql k93', 'dbio-db2 k45' ],
     subject => { source => 'Counter', column => 'id' },
     input => {
       from => { sources => [ {
@@ -693,7 +669,6 @@ my @CASES = (
   {
     name  => 'diff-primary-key-order',
     since => 1,
-    cards => [ 'dbio-sqlite k68' ],
     subject => { source => 'Pair' },
     input => {
       from => { sources => [ {
@@ -724,7 +699,6 @@ my @CASES = (
   {
     name  => 'diff-deploy-inherited',
     since => 4,
-    cards => [ 'dbio k399' ],
     subject => { source => 'Base' },
     input => {
       deploy => { check => 'inherited' },
@@ -743,7 +717,6 @@ my @CASES = (
   {
     name  => 'diff-deploy-dry-run',
     since => 4,
-    cards => [ 'dbio k399' ],
     subject => { source => 'Base' },
     input => {
       deploy => {
@@ -767,7 +740,6 @@ my @CASES = (
   {
     name  => 'diff-deploy-destructive-guard',
     since => 4,
-    cards => [ 'dbio k399' ],
     subject => { source => 'Gone' },
     input => {
       deploy => {
@@ -798,7 +770,7 @@ my @CASES = (
 );
 
 sub cases {
-  return Storable::dclone([ @CASES ]);
+  return DBIO::Util::deep_copy([ @CASES ]);
 }
 
 1;
@@ -815,7 +787,7 @@ DBIO::Test::Conformance::Cases::Diff - The shared Diff cases every DBIO driver a
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 
@@ -831,7 +803,6 @@ A case is a hash:
   {
     name    => 'diff-fk-dropped',                 # stable id, diff- prefix
     since   => 1,                                 # table version that added it
-    cards   => [ 'dbio-mysql k94' ],              # where it came from; documentation
     subject => { source => 'Child', column => 'parent_id' },   # optional
     input   => {
       from => { sources => [ { ... }, ... ] },

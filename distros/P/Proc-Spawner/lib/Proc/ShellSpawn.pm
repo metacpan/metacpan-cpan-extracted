@@ -23,7 +23,7 @@ use Proc::Spawner;
 use Proc::Spawner::Graph;
 use Scalar::Util qw(weaken);
 
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 our $TRACE; *TRACE = \$Proc::Spawner::TRACE;   # undef, or a code ref given one line per fd or process operation
 our %PARSE = map +($_ => 1), qw(assign param_ops if while for case read empty);   # options for Proc::ShellSubset and Proc::ShellSubset::Large
   # (empty, post4-0.04: a string with no command, or only comments, runs as nothing, status 0, as in both shells; also eval '')
@@ -184,7 +184,8 @@ sub idle {   # 1: install the handler (if jobs remain), 0: put the previous one 
   return if $WIN;   # (no SIGCHLD there: background jobs move on at the next run, wait or poll)
   if ($on && %JOBS && !$IDLE_ON) {
     $IDLE_OLD = POSIX::SigAction->new;
-    my $a = POSIX::SigAction->new(sub { idle_pass(); my $h = $IDLE_OLD && $IDLE_OLD->{HANDLER}; $h->(@_) if ref $h eq 'CODE' },
+    my $a = POSIX::SigAction->new(sub { local ($?, $!);   # (X55: the program's $? and $! stay as they were)
+                                    idle_pass(); my $h = $IDLE_OLD && $IDLE_OLD->{HANDLER}; $h->(@_) if ref $h eq 'CODE' },
                                   POSIX::SigSet->new, POSIX::SA_RESTART());
     $a->safe(1);   # deferred: runs between Perl operations, never inside the signal (S2)
     POSIX::sigaction(POSIX::SIGCHLD(), $a, $IDLE_OLD) and $IDLE_ON = 1 }
@@ -195,7 +196,7 @@ sub idle {   # 1: install the handler (if jobs remain), 0: put the previous one 
 # SIGFPE as Perl's own exec would pass it: Perl may ignore it for itself at startup, and puts back
 # the disposition it found then (PERL_FPU_PRE_EXEC, PL_sigfpe_saved; fpe_at_exec() reads it).
 my $FPE = Proc::Spawner::fpe_at_exec();
-my %IGN0 = map +($_ => 1), grep +($SIG{$_} // '') eq 'IGNORE' && ($_ ne 'FPE' || $FPE == 1), keys %SIG;
+our %IGN0 = map +($_ => 1), grep +($SIG{$_} // '') eq 'IGNORE' && ($_ ne 'FPE' || $FPE == 1), keys %SIG;
 
 sub put {   # Perl writes $t to the context's fd $fd, then $then->(); never waits (L10).  Callers go on only
   # in $then, so nothing started later overtakes the text.
@@ -298,10 +299,10 @@ sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns
   $c->{sh}{hash}{$argv->[0]} = $path if defined $path && !defined $search && !has_dir($argv->[0]);   # remembered, as dash (hash, type)
   if (!defined $path) {
     $ONBUILTIN->($st == 127 ? 'not found' : 'denied', $argv, {%$env}) if $ONBUILTIN;   # (measurement: no program runs)
-    return msg($c, $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: Permission denied", sub { $k->($st) }) }
+    return cmd_msg($c, $map, $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: Permission denied", sub { $k->($st) }) }
   if ($WIN && -e path_in($c, $path) && (-d _ || !-x _)) {   # Windows runs neither: as sh says it (CreateProcess: not found,
     $ONBUILTIN->('denied', $argv, {%$env}) if $ONBUILTIN;   # or "Exec format error")
-    return msg($c, "$argv->[0]: Permission denied", sub { $k->(126) }) }
+    return cmd_msg($c, $map, "$argv->[0]: Permission denied", sub { $k->(126) }) }
   my @envp = map "$_=$e{$_}", sort keys %e;
   my %def = map +($_ => 1), grep !$IGN0{$_} && ($SIG{$_} // '') eq 'IGNORE' && ($c->{sh}{trap}{$_} // 1) ne '',   # trap '' SIG: stays ignored
     keys %SIG, $FPE ? () : 'FPE';
@@ -315,7 +316,11 @@ sub spawn {   # starts @$argv with $map; $k->(STATUS) when it has ended; returns
   my $err = "$!";   # an fd of ours that is not open: the first one the child should have got
   my ($bad) = grep !is_open($_), map $map->{$_} ? $map->{$_}{fd} : (), sort { $a <=> $b } keys %$map;
   $st = $! == POSIX::ENOENT() ? 127 : 126;
-  msg($c, defined $bad ? "$bad: Bad file descriptor" : $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: $err", sub { $k->($st) }) }
+  return msg($c, "$bad: Bad file descriptor", sub { $k->($st) }) if defined $bad;   # (a redirection failed: the shell's own fd 2)
+  cmd_msg($c, $map, $st == 127 ? "$argv->[0]: not found" : "$argv->[0]: $err", sub { $k->($st) }) }
+sub cmd_msg {   # X47: a command that does not start: its message to the command's own fd 2 (2>log, 2>&1 | ...), as both shells
+  my ($c, $map, $text, $k) = @_; my @e = grep defined, values %$map; hold($_) for @e;
+  msg({ %$c, map => $map }, $text, sub { release($_) for @e; $k->() }) }
 sub inproc {   # a program of %INPROC, run here: its output and messages in the program's order, then $k->(STATUS).  A
   # write error on stdout, as coreutils: death by SIGPIPE (EPIPE, unless the shell ignores SIGPIPE for its children), else
   # no more output, the message "NAME: write error: ..." at the end and status 1.  Undef, as spawn for no process started.
@@ -359,7 +364,12 @@ sub redirect {
     my ($fd, $op, $w) = @{$redirs->[$i++]};
     if ($op eq '<<') {   # a here-document: Perl writes the expanded body into a pipe the command reads
       my $next = __SUB__;
-      return expand_str($c, $w, sub { my $body = shift;
+      # X50: expanded with the redirections so far (messages, $( )), and an error that would end the shell (set -u,
+      # ${x:?}, arithmetic) fails the redirection instead, as dash: the command does not run, status 2, the shell goes
+      # on (a special builtin's failed redirection still ends it)
+      my $hc = { %$c, map => \%m, held => 0, loops => [],
+        shell => { %{$c->{shell}}, exit => sub { release($_) for @opened; $k->() } } };
+      return expand_str($hc, $w, sub { my $body = shift;
         my ($r, $wr) = new_pipe() or return $fail->("pipe: $!");
         push @opened, $m{$fd} = $r; on_write($wr, $body, sub { release($wr) }); $next->() }) }
     if ($op eq '<&' or $op eq '>&') {
@@ -402,6 +412,8 @@ sub getvar {   # a value for $NAME, or undef after ending the shell (set -u)
   return fail($c, 2, "$n: parameter not set") if $c->{sh}{opt}{u} && $n !~ /^[@*!]\z/ && !isset($c, $n);
   var($c, $n) }
 
+sub active { $_[0] =~ /(?:^|[^\\])(?:\\\\)*[*?\[]/ }   # X52: an expansion's text has a pattern character no backslash escapes
+                                                     #   (else no pathname expansion: x\* stays x\*, as both shells)
 sub glob_quote { (my $s = shift) =~ s/([\\*?\[\]{}~!^-])/\\$1/g; $s }   # also ! ^ -: literal inside [...]
 sub slash_brackets {   # for bsd_glob: a bracket expression with a '/' is none, its '[' literal (both shells); [^...] as [!...]
   my $p = shift; my $o = '';
@@ -409,9 +421,19 @@ sub slash_brackets {   # for bsd_glob: a bracket expression with a '/' is none, 
     if (!defined $2) { $o .= $+; next }
     my $s = pos $p;
     if ($p =~ /\G([!^]?)(\]?(?:\\.|\[:[a-z]+:\]|[^\]\\])*)\]/gcs) { my ($n, $b) = ($1, $2);
-      if ("$n$b" =~ m{/}) { $o .= '\\['; pos($p) = $s } else { $o .= ($n ? '[!' : '[') . "$b]" } }   # [^...]: [!...] (rule E)
+      if ("$n$b" =~ m{/}) { $o .= '\\['; pos($p) = $s }
+      else { $b =~ s/\[:([a-z]+):\]/class_chars($1)/ge; $o .= ($n ? '[!' : '[') . "$b]" } }   # [^...]: [!...] (rule E)
     else { $o .= '['; pos($p) = $s } }
   $o }
+my %CLASS = (   # X40: the classes in the C locale, as ranges [FROM, TO] and single characters
+  alpha => [['a', 'z'], ['A', 'Z']], upper => [['A', 'Z']], lower => [['a', 'z']], digit => [['0', '9']],
+  alnum => [['a', 'z'], ['A', 'Z'], ['0', '9']], xdigit => [['0', '9'], ['A', 'F'], ['a', 'f']],
+  space => [" ", "\t", "\n", "\r", "\f", "\013"], blank => [" ", "\t"], cntrl => [["\x01", "\x1f"], "\x7f"],
+  print => [["\x20", "\x7e"]], graph => [["\x21", "\x7e"]], punct => [grep $_ ne "/" && /[[:punct:]]/, map chr, 33 .. 126]);   # (no / in a name)
+sub class_chars {   # X40: bsd_glob has no character classes: [:digit:] as its characters, in the C locale (as dash there;
+  my $n = shift; my $m = $CLASS{$n} or return "[:$n:]";   # in a UTF-8 locale other letters belong too, not here)
+  join '', map { ref $_ ? quote_bracket($_->[0]) . '-' . quote_bracket($_->[1]) : quote_bracket($_) } @$m }
+sub quote_bracket { my $c = shift; $c =~ /[A-Za-z0-9]/ ? $c : "\\$c" }   # a member of a bracket expression, for bsd_glob
 
 # A Word into fields: $k->([FIELD, ...]).  $how: 'argv' splits and globs; 'str' gives one string.
 # A field under construction is [TEXT, PATTERN, KEEP]: PATTERN is the text for globbing, with
@@ -431,8 +453,8 @@ sub expand {
       for my $j (0 .. $#p) {
         if ($j % 2) {   # a delimiter: one with a non-blank IFS character ends a field even if it is empty
           push @f, $cur if length $cur->[0] or $cur->[2] or $nw ne '' && $p[$j] =~ /[$nw]/; $cur = ['', '', 0, 0]; next }
-        $cur->[0] .= $p[$j]; $cur->[1] .= $p[$j]; $cur->[3] ||= $p[$j] =~ /[*?\[]/ } }
-    elsif ($split && $how eq 'argv') { $cur->[0] .= $t; $cur->[1] .= $t; $cur->[3] ||= $t =~ /[*?\[]/ }   # IFS empty: no splitting
+        $cur->[0] .= $p[$j]; $cur->[1] .= $p[$j]; $cur->[3] ||= active($p[$j]) } }
+    elsif ($split && $how eq 'argv') { $cur->[0] .= $t; $cur->[1] .= $t; $cur->[3] ||= active($t) }   # IFS empty: no splitting
     else { $cur->[0] .= $t; $cur->[1] .= $pat ? $t : glob_quote($t); $cur->[3] ||= $pat && $t =~ /[*?\[]/;
            $cur->[2] = 1 unless $pat } };
   my @parts = @$word; my $i = 0;
@@ -538,7 +560,8 @@ sub arith {
     if ($x eq '(') { my $v = $expr->(0); ($t[$p++] // '') eq ')' or $bad //= 'syntax error'; return $v }
     return do { no warnings 'portable'; $x =~ /^0[xX]/ ? hex $x : $x =~ /^0/ ? oct $x : $x } if $x =~ /^[0-9]/;   # 64-bit, as dash
     if ($x =~ /^[A-Za-z_]/) { my $v = var($c, $x); $v = 0 if $v =~ /^\s*\z/;
-      $v =~ /^\s*[-+]?[0-9]+\s*\z/ or $skip or $bad //= "$x: not a number"; return $v + 0 }
+      unless ($v =~ /^\s*[-+]?[0-9]+\s*\z/) { $bad //= "$x: not a number" unless $skip; return 0 }   # (X42: no Perl warning)
+      return $v + 0 }
     $bad //= 'syntax error'; 0 };
   my $dead;
   my $expr_s = $expr = sub {
@@ -723,16 +746,18 @@ sub x_cd {
     my $d = @f ? $f[0] : var($c, 'HOME');
     my $dash = @f == 1 && $d eq '-' and $d = var($c, 'OLDPWD');   # cd -: back, and print where
     return defer($k, 0) if @f == 1 && $d eq '';
-    return msg($c, "cd: too many arguments", sub { $k->(1) }) if $x->{cd_extra};   # as bash (rule E)
-    return msg($c, "cd: HOME not set", sub { $k->(1) }) if !@f && ($d // '') eq '';   # as bash (rule E; N4)
-    if (@f > 1 or $d =~ /^-/ && !$dash) { return msg($c, "cd: bad argument", sub { $k->(2) }) }
+    return msg($c, "cd: too many arguments", sub { $k->(1) }) if $x->{cd_extra} || @f > 1;   # as bash (rule E), also when
+      # an expansion gives the extra fields at run time (X54)
+    return msg($c, "cd: HOME not set", sub { $k->(1) }) if !@f && !isset($c, 'HOME');   # as bash (rule E; N4)
+    return defer($k, 0) if !@f && $d eq '';   # HOME empty: nothing, as both shells (X45)
+    if ($d =~ /^-/ && !$dash) { return msg($c, "cd: bad argument", sub { $k->(2) }) }
     my $new = path_in($c, $d);
     if ($x->{cd_p}) { $new = -d $new && Cwd::realpath($new) }   # cd -P: symbolic links resolved, '..' physical (P6)
     else {   # (Windows: the drive or the //server/share stays in front)
       my ($pre, $rest) = $WIN && $new =~ m{^([A-Za-z]:|[/\\]{2}[^/\\]+[/\\][^/\\]+)(.*)}s ? ($1 =~ tr{\\}{/}r, $2) : ('', $new);
       my @p; for (split $SEP, $rest) { next if $_ eq '' or $_ eq '.'; $_ eq '..' ? pop @p : push @p, $_ }
       $new = $pre . '/' . join '/', @p }
-    $new && -d $new or return msg($c, "cd: can't cd to $d", sub { $k->(2) });
+    $new && -d $new && ($WIN || -x _) or return msg($c, "cd: can't cd to $d", sub { $k->(2) });   # X44: and searchable, as both shells
     setvar($c, OLDPWD => $c->{sh}{cwd}) && setvar($c, PWD => $new) or return; $c->{sh}{cwd} = $new;
     $dash ? put($c, 1, "$new\n", sub { $k->(0) }) : defer($k, 0) };
   defined $x->{cd} ? expand($c, $x->{cd}, 'argv', sub { $go->(@{$_[0]}) }) : $go->() }
@@ -773,13 +798,20 @@ sub printf_zero {   # the 0 flag of %s, %c, %b dropped from printf's format, as 
     my ($all, $fl, $w, $p, $cv) = ($1, $2, $3, $4, $5);
     defined $cv && $cv =~ /^[scb]\z/ ? '%' . ($fl =~ tr/0//dr) . $w . $p . $cv : "%$all" }ge;
   @a }
+sub ok_num {   # NV1 (the user, 2026-11-10; X42): an operand of exit, return, break, continue known only at run time is a
+  # number as dash takes it: digits, maybe after +, at most 2^31-1, at least $min; else an error, status 2, as the shells
+  my ($v, $min) = @_; defined $v && $v =~ /^\+?[0-9]+\z/ && $v <= 2147483647 && $v >= $min }
 sub builtin {   # : exit break continue read
   my ($c, $argv, $env, $k) = @_; my $m = $c->{map};
   my ($n, @a) = @$argv;
   return defer($k, 0) if $n eq ':';
-  return leave($c, @a ? $a[0] % 256 : $c->{sh}{q}) if $n eq 'exit';   # exit 1000: 232, as both shells (parser item P4)
+  if ($n eq 'exit') { return leave($c, $c->{sh}{q}) unless @a;
+    return fail($c, 2, "exit: Illegal number: $a[0]") unless ok_num($a[0], 0);   # NV1 (X42): known only at run time, as the shells
+    return leave($c, $a[0] % 256) }   # exit 1000: 232, as both shells (parser item P4)
   if ($n eq 'break' || $n eq 'continue') {
     my $l = $c->{loops}; my $j = @a ? $a[0] : 1;
+    return fail($c, 2, "$n: Illegal number: $j") unless ok_num($j, 1);   # NV1: 0, -1, x1 (bash goes on after 0: dash's way)
+    $j += 0;
     return leave($c, 0) if $j > @$l;   # the loop is outside this subshell: it ends the subshell, as dash (rule E, post-0.04)
     release_all(map $_->{scope}, @$l[$#$l - $j + 1 .. $#$l]);
     return defer($l->[-$j]{$n eq 'break' ? 'brk' : 'cont'}) }

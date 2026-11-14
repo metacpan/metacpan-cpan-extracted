@@ -1,5 +1,12 @@
 Revision history for Perl-Tests-Covering
 
+0.003 2026-11-13 TEODESIAN
+    - A checkout with no cache of its own reads the cache of another
+      checkout of its git repository, the main checkout first.  So a new
+      worktree starts from the records of the checkout it came from, and
+      does not run every test.  A record still counts only where the blob
+      ids of what its test loaded are the same.
+
 0.002 2026-09-19 TEODESIAN
     - Let a distribution say which tests reach a file that no test loads,
       such as a template a test reads, through a map: a code reference, or

@@ -1,5 +1,5 @@
 package Proc::ShellSpawn::Builtins;   # builtins run by the large subset: one function per builtin (B1-B3 of "Shell Corpus Gaps")
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use strict; use warnings; use feature 'current_sub';
 use Proc::ShellSpawn;
 BEGIN { no strict 'refs'; *$_ = \&{"Proc::ShellSpawn::$_"} for qw(defer fail msg put var spawn find_cmd) }

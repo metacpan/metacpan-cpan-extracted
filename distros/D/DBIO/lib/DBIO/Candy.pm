@@ -4,7 +4,7 @@ package DBIO::Candy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use DBIO::Candy::Exports ();
 use DBIO::Util ();
@@ -361,7 +361,7 @@ DBIO::Candy - Sugar syntax for defining DBIO result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

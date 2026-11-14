@@ -488,7 +488,11 @@ the main effects alongside the interaction (`a * b` expands to `a + b + a:b`;
     my $res_2way = anova($data_2way, 'len ~ supp * dose');
 
 Bare string columns are treated as factors; numeric columns, `I(x^2)` and
-`log(x)` enter as single regressors. A factor is coded by treatment contrasts
+`log(x)` enter as single regressors. Inside `I()`, `log()`, `exp()`, `sqrt()`,
+`log2()`, `log10()`, `log1p()` and `abs()` a term may use `+ - * / ^`, numbers
+and nested parentheses with R's precedence, so `log(x+1)`, `I(x*2)` and
+`I(x/z-1)` are each one regressor; a term that cannot be read is a fatal
+"cannot evaluate term" error. A factor is coded by treatment contrasts
 or by a full set of indicators exactly as R decides it (its "margin rule"), so
 nested and per-group-slope models come out as in R: `y ~ a + a:b` gives `a:b`
 `levels(a) * (levels(b) - 1)` degrees of freedom, and `y ~ g + g:x` fits a
@@ -2817,6 +2821,18 @@ parameter: `pchisq($q, 0)` is 0 for `$q <= 0` and 1 above it, and
 pins those values; up to 0.3217 both functions returned `NaN` there. A negative
 `df` is still `NaN`.
 
+An invalid parameter — `sd < 0`, a non-positive `df` in `qt`, a negative one in
+`qchisq` — is `NaN`, with one exception that is R's: a probability at an end of
+its range is answered with the end of the support first. `qnorm(0, 0, -1)` is
+`-Inf` and `qnorm(1, 0, -1)` is `Inf`; `qt(0, -1)` is `-Inf`; `qchisq(0, -1)`
+is `0` and `qchisq(1, -1)` is `Inf`; and the same holds for a log probability
+of `-Inf` or `0` and for the upper tail. R's `qnorm`, `qt` and `qgamma` test
+the ends before the parameter, and this module copies that order. `qf` does not
+have the exception, because R's `qf` tests `df1` and `df2` first: `qf(0, -1, 2)`
+is `NaN`. A `NaN` parameter is `NaN` everywhere. Up to 0.342 all four returned
+`NaN` at the ends; SciPy still does (`norm.ppf(0, 0, -1)` is `nan`).
+`t/distributions.q.ends.R.t` pins every combination against R.
+
 `df => Inf` (perl's `9**9**9`, or the string `"Inf"`) is the limit R gives it:
 `pt($q, Inf)` is `pnorm($q)` and `qt($p, Inf)` is `qnorm($p)`;
 `pf($x, $df1, Inf)` is `pchisq($x * $df1, $df1)`, `pf($x, Inf, $df2)` the upper
@@ -4942,7 +4958,8 @@ that `lmerTest` adds to its summary.
 Random-effects terms are written as in `lme4`: `(1 | g)` a random intercept,
 `(x | g)` a correlated intercept and slope, `(0 + x | g)` a slope alone, so that
 `(1 | g) + (0 + x | g)` is the uncorrelated pair; several grouping factors,
-crossed or nested, are allowed, and `(1 | a/b)` expands to `(1 | a) + (1 | a:b)`.
+crossed or nested, are allowed, and `(1 | a/b)` expands to `(1 | a) + (1 | a:b)`
+(and `(1 | a/b/c)` to those two plus `(1 | a:b:c)`).
 The fixed part is expanded as for [`lm`](#lm).
 
 As in `lme4`, a model croaks when a grouping factor has only one level among
@@ -5061,6 +5078,7 @@ or
     max(@arr, 4, 5)
 
 max will die if any undefined values are provided. A `NaN` anywhere in the input makes the answer `NaN`, as it does in R.
+An integer answer above 2\*\*53 is returned as that integer, not rounded to a floating-point value; elements of a tied array, and tied or overloaded elements, are still answered as a floating-point value.
 See [Compared with List::Util](#compared-with-listutil) under `sum` for the other ways it differs from List::Util's `max`.
 
 ## mcnemar_test
@@ -5250,6 +5268,7 @@ or
     min(@arr, 4, 5)
 
 min will die if any undefined values are provided. A `NaN` anywhere in the input makes the answer `NaN`, as it does in R.
+An integer answer above 2\*\*53 is returned as that integer, not rounded to a floating-point value; elements of a tied array, and tied or overloaded elements, are still answered as a floating-point value.
 See [Compared with List::Util](#compared-with-listutil) under `sum` for the other ways it differs from List::Util's `min`.
 
 ## mode
@@ -5973,7 +5992,10 @@ interactions (`x:z` → product) and transforms (`I(x^2)` → power) behave
 identically to fitting. Coefficients that the fit marked aliased (stored as NaN)
 contribute nothing, just as they were excluded from the fitted values. For `glm`
 with `family => 'binomial'` and `type => 'response'`, `eta` is passed through the
-logistic function `1 / (1 + exp(-eta))`; otherwise `eta` is returned as is.
+logistic function `1 / (1 + exp(-eta))`, and for the log-link families (poisson
+and negative binomial) through `exp(eta)`; a `svyglm` fit with family
+`quasibinomial` or `quasipoisson` is answered the same way as its plain
+family. Otherwise `eta` is returned as is.
 
 A consequence worth noting: predicting on the *training* data reproduces the
 model's `fitted_values` for any model built from continuous terms, interactions,
@@ -6383,7 +6405,7 @@ minimal example:
 | `na_values` | pandas' spelling of `na_strings` | `na_values => ['NA', 'N/A']` |
 | `undef_val` | `write_table`'s spelling of `na_strings`, so a round trip can use one name on both halves | `'undef_val' => 'NA'` |
 | `explode` | VCF only. `1` (the default): split each sample column into one column per `FORMAT` key, and return a hoh keyed by `CHROM:POS:REF:ALT`; `0`: the file's own columns. See [VCF files](#vcf-files) | `explode => 0` |
-| `colClasses` | R's: store the columns you name as numbers rather than text, which takes about a third of the memory. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses) | `colClasses => { age => 'integer', bmi => 'numeric' }` |
+| `colClasses` | R's: store the columns you name as numbers rather than text, which takes about a third of the memory, or as `character` to keep them text. A field that is plainly an integer is stored as one without being named. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses) | `colClasses => { age => 'integer', bmi => 'numeric' }` |
 output types can be AOH (aoh), AOA (aoa), HOA (hoa), HOH (hoh)
 
     read_table($filename, 'output_type' => 'aoh');
@@ -6610,8 +6632,11 @@ with no options. Each sample's column is split ("exploded") into one column per
     which the VCF spec allows (`./.` under `GT:AD:DP` is `GT` alone). `FORMAT`
     and the unsplit sample columns are not returned. A sample with *more*
     values than its `FORMAT` has keys is an error.
-  - **Values are text.** `0/1`, `34,7` and `73,0,1043` are returned as
-    written: `AD`, `PL` and `INFO` are not split further, and `.` is not
+  - **Values are as written.** `0/1`, `34,7` and `73,0,1043` are returned as
+    text: `AD`, `PL` and `INFO` are not split further. A value that is an
+    integer, such as a `DP` of `12`, is stored as that integer, as in any
+    other read (see [numeric columns](#numeric-columns-colclasses));
+    `colClasses => 'character'` keeps every value as text. `.` is not
     missing unless you pass `'na_strings' => '.'`, which then applies to the
     split values as well as to whole fields.
   - **The key.** `CHROM:POS:REF:ALT` identifies a record in practice; `ID` is
@@ -6642,11 +6667,21 @@ the exploded hoh takes 11.7 s, against 9.1 s for the file's own columns as a
 hoh, and an exploded aoa 8.4 s, against 7.0 s for the plain one.
 
 ### numeric columns (`colClasses`)
-Every field is read as text unless you say otherwise. On a 64-bit perl a
-short number held as text costs about 70 bytes, and held as a number about
-24. `colClasses` takes R's
-spelling and R's meaning: name the columns that are numbers, and they are
-stored as numbers as the file is read.
+A field is read as its text, with one exception: a field that is an integer
+written the way perl prints one (`42`, `-7`, `0`) is stored as that integer.
+On a 64-bit perl a short number held as text costs about 70 bytes, and held
+as a number about 24, so a column of ids or counts takes a third of the
+memory; a 300,000 x 6 CSV of counts read as a hoa went from 140 MB to 57 MB,
+and from 0.110 s to 0.061 s. Such a cell reads exactly as its text did: it
+prints as the bytes the file held, so `eq`, hash keys, regexes, `sort` and
+`write_table` see no difference. Only what looks at a scalar's type does: a
+JSON encoder writes `5` rather than `"5"`. Anything an integer would not
+print back as stays text: `007`, `+5`, `-0`, `5.0`, `1e3`, ` 5`, and a number
+too big for perl's integer.
+
+`colClasses` says more, in R's spelling and R's meaning: name the columns
+that are numbers, and they are stored as numbers as the file is read; or name
+a column `character` to keep it as text whatever it holds.
 
     my $d = read_table('cohort.csv', colClasses => { age => 'integer', bmi => 'numeric' });
     my $d = read_table('cohort.csv', colClasses => [ 'character', 'integer', 'numeric' ]);
@@ -6656,7 +6691,8 @@ stored as numbers as the file is read.
 | --- | --- | --- |
 | `numeric` (also `double`, `real`) | a floating-point number | a decimal number with an optional sign and exponent, or `Inf`, `Infinity` or `NaN` in any case, with blanks either side allowed |
 | `integer` | an integer | an optional sign and digits, a leading blank allowed and nothing after them, within perl's integer range |
-| `character`, or `undef` | the text | anything (the default) |
+| `character` | the text | anything |
+| `undef`, or a column not named | the text, or the integer when the field is one as perl prints it | anything (the default) |
 
 - A hash names columns; one the file does not have is warned about, as R
   warns about it, and otherwise ignored. A list goes by position and is
@@ -6674,7 +6710,10 @@ stored as numbers as the file is read.
   have digits, where R reads `1e` as `1`.
 
 On a 300,000-row CSV with three of its five columns declared, the table took
-74 MB instead of 116 MB, and the read 0.095 s instead of 0.086 s.
+74 MB instead of 116 MB, and the read 0.095 s instead of 0.086 s. That was
+measured against every column held as text, which is what 0.3418 and earlier
+did with an undeclared column; an integer column now gets most of that saving
+without being declared, so declaring matters chiefly for decimals.
 
 ### missing values (`na_strings` / `na_values` / `undef_val`)
 An empty field is always read as `undef`. Any *other* text that a file uses to
@@ -8576,9 +8615,10 @@ well, because Excel cannot open such a workbook. Case is compared with perl's
 another, so only the sheet being written is held in memory. Up to 65530 sheets
 fit in a ZIP archive without ZIP64.
 
-`xlsx_freeze_rows` and `xlsx_freeze_cols` freeze that many leading rows/columns in place (Excel's *freeze panes*), so they stay visible while scrolling — most often used to pin the header row. They go up to 1048575 and 16383, one short of the sheet's limits:
+`xlsx_freeze_rows` and `xlsx_freeze_cols` freeze that many leading rows/columns in place (Excel's *freeze panes*), so they stay visible while scrolling. The header row is frozen by default (`xlsx_freeze_rows => 1`); pass `0` to leave the sheet unfrozen. They go up to 1048575 and 16383, one short of the sheet's limits:
 
-    write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 1);                        # pin the header row
+    write_table(\@rows, 'report.xlsx');                                                # the header row is pinned
+    write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 0);                        # nothing is pinned
     write_table(\@rows, 'report.xlsx', 'xlsx_freeze_rows' => 1, 'xlsx_freeze_cols' => 2); # pin header + first two columns
 
 `tex` and `xlsx` are mutually exclusive. Note: dates/times are written as their
@@ -8605,7 +8645,7 @@ raw values (no cell number formats), matching the round-trip behaviour of
 | `xlsx` | auto: `1` when `file` ends in `.xlsx`, else `0` | Excel | write a real `.xlsx` workbook (dependency-free, built in XS) instead of a delimited table; `xlsx => 0` forces delimited even for a `.xlsx` name. Mutually exclusive with `tex` |
 | `xlsx_sheet` | `'Sheet1'` | Excel | worksheet name; an error for a workbook, whose keys name its sheets |
 | `xlsx_comment` | *(none)* | Excel | extra line(s) appended after the provenance in the workbook's document *comments* property (`dc:description`): a string (an object is stringified), or an array ref of strings |
-| `xlsx_freeze_rows` | `0` (none) | Excel | number of leading rows to freeze in place (freeze panes), e.g. `1` to pin the header row; at most 1048575 |
+| `xlsx_freeze_rows` | `1` (the header row) | Excel | number of leading rows to freeze in place (freeze panes); `0` freezes none; at most 1048575 |
 | `xlsx_freeze_cols` | `0` (none) | Excel | number of leading columns to freeze in place (freeze panes); at most 16383 |
 
 # Numerical accuracy

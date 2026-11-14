@@ -10,9 +10,13 @@ If your application already parses HTTP, you can pass decoded requests to
 L<AnyEvent::MCP::Server> instead of running another HTTP implementation.
 
 Requests sharing one connection are dispatched in sequence, preserving their
-HTTP response order; requests on other connections are independent. This
-implementation returns JSON and drops notifications. It does not support
-SSE or subscriptions.
+HTTP response order; requests on other connections are independent.
+Ordinary requests return JSON. When a client accepts C<text/event-stream>,
+notifications from an outstanding request switch that POST response to
+chunked SSE, carrying the notifications followed by the JSON-RPC result.
+Without notifications the response remains JSON. SSE streams close after
+their final response. This implements request-scoped Streamable HTTP, not
+the old separate SSE endpoint. GET streams and subscriptions are unsupported.
 
 Request bodies need C<Content-Length>: chunked transfer encoding is not
 supported. The server does not assign protocol sessions. Legacy clients
@@ -136,6 +140,10 @@ require authentication; the subsequent POST still does.
 AnyEvent::Handle constructor options, such as C<tls>, C<tls_ctx>, C<timeout>
 or C<on_starttls>. The socket and the read/error/EOF handlers belong to this
 class.
+HTTP connections default to a 15-second read inactivity timeout, including
+idle keep-alive connections. It is suspended while the server processes a
+complete request and restored for the next request. Set C<rtimeout> in the
+handle options to override or disable it.
 
 =item tls_cert => $file
 
@@ -272,7 +280,8 @@ use AnyEvent::Log ();
 use AnyEvent::Handle ();
 use AnyEvent::Socket ();
 use JSON::XS ();
-use Scalar::Util qw(refaddr weaken);
+use MIME::Base64 ();
+use Scalar::Util qw(weaken);
 use POSIX ();
 
 sub new {
@@ -370,6 +379,7 @@ sub accept {
 
    my $handle = AnyEvent::Handle->new (
       rbuf_max => $self->{max_size} || 8 * 1024 * 1024,
+      rtimeout => 15,
       %{$self->{handle}},
       %handle,
       fh       => $socket,
@@ -381,13 +391,13 @@ sub accept {
       on_eof => sub { $self->_close ($_[0]) if $self },
    );
 
+   $handle->{mcp_read_timeout} = $handle->{rtimeout};
    $handle->{mcp_peer} = {};
    $self->{connections}{$handle} = $handle;
    $handle->push_read (tls_autostart => $self->_tls_context, "accept")
       if (defined $self->{tls_cert} || defined $self->{tls_key}) && !$handle->{tls};
 
    if ($self->{on_extension}) {
-      $handle->rtimeout (15);
       $handle->on_read (sub {
          my ($handle) = @_;
 
@@ -403,7 +413,6 @@ sub accept {
                $self->{on_extension}->($self, $handle, $hello);
             }, sub { $self->_close ($_[0]) if $self });
          } else {
-            $handle->rtimeout (0);
             $self->_read ($handle, 1);
          }
       });
@@ -443,11 +452,32 @@ sub _parse_request_headers {
    +{ %hdr, method => $method, uri => $uri, http_version => $version }
 }
 
+# Retain useful paths in rejection logs, without leaking URL credentials.
+sub _log_uri {
+   my ($self, $uri) = @_;
+
+   return '"[non-path URI]"' unless $uri =~ m{\A/};
+   $uri =~ s/[?#].*//s;
+
+   if ($self->{tokens}) {
+      (my $endpoint = $self->{path}) =~ s{/\z}{};
+      $endpoint = "/" unless length $endpoint;
+      $uri =~ s{\A/[^/]+(?=\Q$endpoint\E(?:/|\z))}{/<token>}
+         unless $endpoint eq "/";
+      $uri =~ s/\Q$_\E/<token>/g for @{$self->{tokens}};
+   }
+
+   $uri = substr ($uri, 0, 160) . "..." if length $uri > 160;
+   JSON::XS::encode_json $uri
+}
+
 sub _read {
    my ($self, $handle, $immediate) = @_;
 
    weaken $self;
 
+   $handle->rtimeout_reset;
+   $handle->rtimeout ($handle->{mcp_read_timeout});
    if ($immediate) {
       $handle->push_read (line => "\r\n\r\n", sub {
          my ($handle, $header) = @_;
@@ -456,7 +486,7 @@ sub _read {
 
          my $hdr = _parse_request_headers ($header);
          $handle->{mcp_method} = $hdr ? substr ($hdr->{method}, 0, 32) : "-";
-         $handle->{mcp_root_get} = $hdr && $hdr->{method} eq "GET" && $hdr->{uri} eq "/";
+         $handle->{mcp_uri} = $hdr ? $self->_log_uri ($hdr->{uri}) : undef;
          $handle->{mcp_close} = $self->{connection_close}
             || !$hdr || $hdr->{http_version} =~ m{\A1\.0+\z}
             || $hdr->{connection} =~ /\bclose\b/i;
@@ -481,6 +511,7 @@ sub _read {
          $handle->push_read (chunk => $hdr->{"content-length"}, sub {
             my ($handle, $body) = @_;
 
+            $handle->rtimeout (0);
             $self->_request ($handle, $hdr, $body) if $self;
          });
       });
@@ -509,6 +540,10 @@ sub _request {
 
       return if $hook->($self, { %$hdr, body => $body }, $reply);
    }
+
+   # ordinary root probes are not MCP requests, even when / is the endpoint
+   return $self->_respond ($handle, 404, "Not Found", "")
+      if $hdr->{method} eq "GET" && $hdr->{uri} eq "/";
 
    # some MCP clients strip a trailing slash from the configured URL.
    my $uri = $hdr->{uri};
@@ -599,10 +634,40 @@ sub _request {
 
    weaken $self;
 
+   my $streaming;
+   my $sse = sub {
+      my ($message) = @_;
+
+      return unless $self && !$handle->{mcp_closed};
+      unless ($streaming) {
+         $streaming = 1;
+         $handle->push_write (
+            "HTTP/1.1 200 OK\r\n"
+            . "Content-Type: text/event-stream\r\n"
+            . "Cache-Control: no-cache\r\n"
+            . "X-Accel-Buffering: no\r\n"
+            . "Transfer-Encoding: chunked\r\n"
+            . "Connection: close\r\n"
+            . (defined $handle->{mcp_origin} ? "Access-Control-Allow-Origin: $handle->{mcp_origin}\r\n"
+               . ($handle->{mcp_origin} ne "*" ? "Vary: Origin\r\n" : "") : "")
+            . "\r\n"
+         );
+      }
+      my $data = "data: " . JSON::XS::encode_json ($message) . "\r\n\r\n";
+      $handle->push_write (sprintf "%x\r\n%s\r\n", length $data, $data);
+   };
+
    $self->rpc ($message, sub {
       my ($response) = @_;
 
       return unless $self && !$handle->{mcp_closed};
+
+      if ($streaming) {
+         $sse->($response) if defined $response;
+         $handle->push_write ("0\r\n\r\n");
+         $handle->on_drain (sub { $self->_close ($_[0]) if $self });
+         return;
+      }
 
       my ($status, $reason) = defined $response ? (200, "OK") : (202, "Accepted");
 
@@ -616,6 +681,8 @@ sub _request {
       peer             => $handle->{mcp_peer},
       user             => defined $authenticated ? $self->{token_users}{$authenticated} : undef,
       protocol_version => $hdr->{"mcp-protocol-version"} || "2025-03-26",
+      (($hdr->{accept} || "") =~ m{\btext/event-stream\b}i
+         ? (on_notify => sub { $sse->($_[1]) }) : ()),
    );
 }
 
@@ -644,10 +711,12 @@ sub _respond {
       }
    }
 
-   if ($status >= 400 && !$handle->{mcp_root_get}) {
-      AE::log warn => "MCP HTTP id=" . sprintf ("%x", refaddr $handle)
+   if ($status >= 400) {
+      my $level = $status == 404 ? "trace" : "warn";
+      AE::log $level => "MCP HTTP"
          . (defined $handle->{mcp_remote} ? " remote=$handle->{mcp_remote}" : "")
-         . ": " . ($handle->{mcp_method} // "-") . " $status";
+         . ": " . ($handle->{mcp_method} // "-") . " $status"
+         . (defined $handle->{mcp_uri} ? " uri=$handle->{mcp_uri}" : "");
    }
 
    my $close = $handle->{mcp_close} || $status != 200 && $status != 202;

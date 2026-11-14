@@ -326,9 +326,9 @@ CONFIGURING YOUR SETUP
         dialogs. This file is separate from the global configuration.
 
     Location of permission prompts
-        Use "--ask helper", "--ask tty", "--ask yad", "--ask auto" or "--ask
-        mcp", or set "PERL_ANYEVENT_MCP_PERMISSION_ASK" in the server's
-        environment.
+        Use "--ask helper", "--ask tty", "--ask yad", "--ask auto", "--ask
+        mcp" or "--ask none", or set "PERL_ANYEVENT_MCP_PERMISSION_ASK" in
+        the server's environment.
 
     Combined server connections
         Put prefix/server pairs on the multibroker startup command. HTTP
@@ -458,12 +458,16 @@ PERMISSIONS IN PRACTICE
 
     Scope
         Each offered scope controls where or to whom the rule applies. For
-        example, a workdir scope may match this workdir or any workdir. In
-        mcp-fs, the independent host scope defaults to this host, including
-        for local execution. Choose all hosts only when intended. Older
-        saved rules without "match.host" continue to apply across hosts.
-        Choose the narrow scope you actually intend. Filesystem allow rules
-        generally do not bind to the particular displayed filename.
+        example, a workdir scope may match this workdir or any workdir. The
+        first rule defaults to the application's narrowest choice. Future
+        rule editors reuse the most recently saved matcher for each
+        dimension if still offered; otherwise they fall back to the first
+        choice. This does not approve the operation or change existing
+        rules. In mcp-fs, the independent host scope defaults to this host,
+        including for local execution. Choose all hosts only when intended.
+        Older saved rules without "match.host" continue to apply across
+        hosts. Choose the narrow scope you actually intend. Filesystem allow
+        rules generally do not bind to the particular displayed filename.
 
     Rule lifetime
         "Indefinite" is the default. "900 seconds" and "16 hours" limit how
@@ -606,6 +610,12 @@ PERMISSIONS IN PRACTICE
     otherwise the local helper. "mcp" requires that support and fails when
     unavailable. It does not silently fall back. Use client-side permission
     approval only when that client is a trusted authority to grant access.
+
+    "--ask none" automatically declines anything that would otherwise need
+    human input, without launching a helper or eliciting through MCP. Saved
+    and automatic allow/deny permission rules continue to apply. The
+    multibroker returns an ordinary decline to requesting downstream
+    servers.
 
     To set the default for servers using the shared permission engine:
 
@@ -853,7 +863,7 @@ MAIL AND HTTP TOOLS
     app-password authentication, a manual login looks like:
 
        mcp-imap --name personal login method password \
-          server imap.example.net user alice@example.net tls ssl port 993
+          server imap.example.net user alice@example.net tls connect port 993
 
     The password is requested on the terminal, never as a command argument.
     For OAuth2, use a provider-approved registration and the suggested
@@ -897,9 +907,12 @@ MAIL AND HTTP TOOLS
        }
 
     Filter keys are ANDed; "any" adds OR, "all" groups AND, and "not"
-    negates a group. Searches scan bounded UID windows. If the result says
-    "incomplete", continue with "next_cursor", even for an empty page. Use
-    the returned mailbox, UIDVALIDITY and UID together for later operations.
+    negates a group. Searches scan at most 20000 UID values per call, not
+    20000 existing messages. Whenever "next_cursor" is present, continue
+    with it as "cursor" and preserve "filter", even on an empty page. "more"
+    means continuation is needed; "incomplete" means the scan limit was
+    reached. For targeted whole-mailbox lookups, use "threads". Use the
+    returned mailbox, UIDVALIDITY and UID together for later operations.
     Read tools never mark messages Seen.
 
     Changing flags, moving messages and expunging require separate

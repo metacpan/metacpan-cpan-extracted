@@ -6,7 +6,7 @@
 
 The official Perl client library for the [InternetData](https://internetdata.io) API.
 
-The library helps you browse and download InternetData's licensed IP and ASN databases: geolocation, anonymity, ownership and network data, published as CSV.GZ and MMDB.
+It tells you what every InternetData database says about an IP address, an AS or a domain, and downloads the databases themselves: geolocation, anonymity, ownership and network data, published as CSV.GZ and MMDB.
 
 ## Getting Started
 
@@ -18,37 +18,217 @@ Requires Perl 5.22 or newer. [Mojolicious](https://metacpan.org/dist/Mojolicious
 
 ## Usage
 
-Every database endpoint published today is licensed, so you need a key with the `db.download` scope; create one in the console. `api_key` is nevertheless an OPTION rather than a requirement: a client built without one sends no `Authorization` header at all, ready for a database served without a license.
+**No API key needed to start.** Unlimited, the free plan, answers `ip`, `is_bogon`, the Tor, relay, anycast, carrier, satellite and service flags, `location` to the country, `asn`, `company`, `hostname` and the abuse email, with no daily or monthly cap, with a key or without one.
 
 ```perl
 use InternetData;
 
+my $client = InternetData->new;
+
+my $result = $client->lookup('146.70.116.130');
+print $result->company->{name};      # M247 LTD Vienna Infrastructure
+print $result->asn->{name};          # who runs the announcing network
+print $result->location->{country};  # the ISO 3166 country code
+print $result->is_anycast;           # 0
+```
+
+### With an API key
+
+Every paid plan answers every field: the VPN, proxy, hosting and CDN flags as well, the detail behind each flag, the city and coordinates, WHOIS and RWHOIS, and the domains hosted on the address. The plans differ only in how many lookups they include, and a free account tries every field, 100 lookups a day. Create a key in the [console](https://app.internetdata.io), then pass it in:
+
+```perl
 my $client = InternetData->new(api_key => $ENV{INTERNETDATA_API_KEY});
 
-for my $db (@{ $client->database->list }) {
-    print "$db->{base} $db->{standing}\n";
+my $result = $client->lookup('146.70.116.130');
+print $result->is_vpn;                # 1, on a paid plan
+print $result->vpn->{provider_name};  # Mullvad, on a paid plan
+print $result->location->{city};      # Vienna, on a paid plan
+```
+
+### An AS or a domain
+
+```perl
+my $as = $client->lookup_asn(9009);
+print $as->name;        # M247 Europe SRL
+print $as->registry;    # ripe
+print $as->type;        # hosting, on a paid plan
+
+my $domain = $client->lookup_domain('example.com');
+print $domain->is_registered;   # 1
+print $domain->has_mx;          # 1 or 0
+```
+
+The AS number is sent as given, so `9009` and `'AS9009'` both work. Neither call is cached or batched, and `lookup_asn_p` and `lookup_domain_p` are the non-blocking forms. They return an `InternetData::AsnResult` and an `InternetData::DomainResult`, which read like a lookup's result. `lookup` takes an address alone, and refuses anything else as a `bad_request` before sending it.
+
+### Your own address
+
+```perl
+my $result = $client->my_ip;
+print $result->ip;   # the address we saw this call come from
+```
+
+Same answer `lookup` would give for that address, and the same cost against your allowance. It is deliberately not cached: which address you are is the whole question, and a machine that moves between networks would otherwise be told where it used to be.
+
+### Your plan and usage
+
+```perl
+my $acct = $client->my_entitlement;
+print $acct->{plan}{key};          # free
+print $acct->{usage}{requests};    # 4
+print $acct->{usage}{window_end};  # when the allowance resets
+```
+
+Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period, and against the UTC day on the free plan; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
+
+`my_ip` returns an `InternetData::Result` like `lookup` does; `my_entitlement` returns the decoded hashref. `my_ip_p` and `my_entitlement_p` are the non-blocking forms.
+
+### Batch lookup
+
+Look up many addresses at once. Bogons and cached answers are handled locally, and everything else goes to the batch endpoint in chunks of up to 1000 addresses, in parallel. The batch endpoint needs a paid plan:
+
+```perl
+my $answers = $client->lookup_batch(['146.70.116.130', '8.8.8.8', '1.1.1.1']);
+
+for my $ip (keys %$answers) {
+    my $answer = $answers->{$ip};
+    if ($answer->isa('InternetData::Error')) {
+        warn "$ip: $answer";
+        next;
+    }
+    print "$ip: ", $answer->company->{name}, "\n";
 }
 ```
 
-Every call lives under `$client->database`. The downloads are the whole of this API today, but the sibling VPNDetection client spells the same seven calls the same way, so a program holding both does not have to remember which one is flat.
+Results are keyed by address, so duplicates in your list collapse into a single entry and one address failing never loses the rest: it carries its error as its value, with the status the API would have given that address on its own. Perl hashes carry no insertion order, so iterate your own list when order matters.
 
-### The catalog
+There's no limit on how many addresses you pass. How many chunks are in flight at once, how many times a failed chunk is retried, and how long each attempt may take are configurable per call:
 
-`list` returns the database *families* your organization may see. A license is held against a family, and the ID you download is the one hanging off its `versions`:
+```perl
+my $answers = $client->lookup_batch(\@many_ips, concurrency => 4, retries => 4, timeout => 10);
+```
+
+### Caching
+
+Address answers are cached by default, so repeat lookups of the same address are free:
+
+```perl
+my $client = InternetData->new;
+
+my $result = $client->lookup('146.70.116.130');   # API request
+my $again = $client->lookup('146.70.116.130');    # no API request, result was cached
+```
+
+You can change the default cache variables (max size, TTL in seconds) on initialization, or even disable it:
+
+```perl
+my $client = InternetData->new(cache_size => 50_000, cache_ttl => 6 * 60 * 60);
+my $uncached = InternetData->new(cache_size => 0);
+```
+
+The cache belongs to the client, never to the process. Two clients holding different keys are on different plans and entitled to different fields, so a shared cache would serve one of them the other's shape. Nothing else is cached: an AS or a domain answer, `my_ip`, `my_entitlement` and every database call go to the API each time.
+
+### Private and reserved addresses
+
+Private, loopback, link-local, documentation and multicast addresses (and their IPv6 equivalents, including the 6to4 and Teredo ranges) are in no database. The library answers them locally, so they cost no request and no quota:
+
+```perl
+my $result = $client->lookup('192.168.1.1');
+$result->is_bogon;    # 1
+$result->is_vpn;      # 0
+```
+
+That answer carries every field, empty, whatever your plan, so don't read your plan from it. The check is available on the client, which is handy when your inputs are addresses anyway:
+
+```perl
+$client->is_bogon('10.0.0.1');    # 1
+$client->is_bogon('8.8.8.8');     # 0
+```
+
+It is also importable on its own, if you want it without a client:
+
+```perl
+use InternetData 'is_bogon';
+
+is_bogon('10.0.0.1');    # 1
+```
+
+### Errors
+
+Failures die with an `InternetData::Error` carrying a `kind` and a `retryable` flag. It stringifies to its message, so it reads like an ordinary string exception where you do not care which it is:
+
+```perl
+my $result = eval { $client->lookup('146.70.116.130') };
+if (my $err = $@) {
+    die $err unless ref $err && $err->isa('InternetData::Error');
+    warn $err->kind, ' ', $err->status, ' ', $err->retryable, ' ', $err->message;
+}
+```
+
+`kind` is one of `bad_request`, `unauthorized`, `forbidden`, `rate_limited`, `quota_exceeded`, `server_error` or `network`. `message` is a lookup refusal's explanation, or a database call's own result code, so a 403 from a download tells you whether it was `NOT_LICENSED`, `LICENSE_EXPIRED` or `IP_NOT_ALLOWED`, a call from an address the key or its organization does not allow.
+
+Note that `rate_limited` and `quota_exceeded` both arrive as HTTP 429 and are not the same thing. A rate limit is when the API faces extreme traffic bursts and so retrying later works; but a spent quota needs your allowance raised or the window to roll over. The library retries rate limits for you, but not if your quota is exceeded. The database API has no quota, so you won't see `quota_exceeded` from it. Nothing else in the 4xx range is retried at all: a misspelled database ID is a 404, and asking for it three times gets the same answer three times.
+
+### Timeouts and retries
+
+Each attempt gives up after 30 seconds, and a transient failure is retried twice. Both can be changed for the client, and for a single call:
+
+```perl
+my $client = InternetData->new(timeout => 10, retries => 4);
+
+my $result = $client->lookup('146.70.116.130', timeout => 2.5, retries => 0);
+```
+
+The timeout is in seconds and applies to each attempt, so a retried call can take longer in total. An attempt that runs out of time fails as a retryable `network` error. A database download isn't bound by it, since a large file takes as long as it takes, so `download` and `download_bytes` refuse a per-call `timeout` rather than quietly ignoring it.
+
+### Non-blocking use
+
+Every call has a `_p` twin returning a [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise), so the library drops into a Mojolicious application without a worker or a thread:
+
+```perl
+$client->lookup_p('146.70.116.130')
+    ->then(sub { print shift->company->{name} })
+    ->catch(sub { warn shift })
+    ->wait;
+```
+
+The blocking calls are those same promises plus a `wait`, so both paths retry, cache and short-circuit identically. Inside an already running event loop the blocking calls cannot block, and say so rather than returning nothing.
+
+In a Mojolicious app, look the visitor up in an `under`:
+
+```perl
+use Mojolicious::Lite -signatures;
+use InternetData;
+
+my $internetdata = InternetData->new(api_key => $ENV{INTERNETDATA_API_KEY}, timeout => 2, retries => 0);
+
+under sub ($c) {
+    $internetdata->lookup_p($c->tx->remote_address)->then(sub ($result) {
+        $c->stash(country => $result->location->{country});
+        $c->continue;
+    })->catch(sub ($err) {
+        $c->app->log->warn("internetdata: $err");
+        $c->continue;
+    });
+    return undef;
+};
+```
+
+- **Bound the lookup.** The defaults (30 seconds an attempt, two retries) outlast Mojolicious's own 30-second inactivity timeout, so with the API unreachable the visitor gets an empty reply, or a 502 through a proxy, before the `catch` runs.
+- **Return `undef` and call `$c->continue`.** A promise returned from an `under` does not hold the route: it carries on at once, and anything you render then dies with "A response has already been rendered".
+
+### Database downloads
+
+The databases your organization is licensed for are under `$client->database`, which needs a key with the `db.download` scope. `list` returns the database *families* your organization may see. A license is held against a family, and the ID you download is the one hanging off its `versions`:
 
 ```perl
 my ($bogon) = grep { $_->{base} eq 'bogon_ip' } @{ $client->database->list };
 
 print $bogon->{standing};             # licensed, expired or unlicensed
-print $bogon->{license_type};       # evaluation, standard or redistribute
+print $bogon->{license_type};         # evaluation, standard or redistribute
 my $id = $bogon->{versions}[-1]{id};  # bogon_ip_v1, and this is what you download
 ```
 
-`standing` tells you where you stand against a database, so one you have not bought is still listed and you can see that it exists.
-
-`InternetData::Database::STANDINGS` and `InternetData::Database::LICENSE_TYPES` list every value the two fields take. A family you hold no license for has an undefined `license_type`.
-
-### Metadata
+`standing` tells you where you stand against a database, so one you have not bought is still listed and you can see that it exists. `InternetData::Database::STANDINGS` and `InternetData::Database::LICENSE_TYPES` list every value the two fields take. A family you hold no license for has an undefined `license_type`.
 
 `metadata` describes one database without transferring it - row count, build date, per-format schema, sample rows and exact sizes - so you can decide whether today's build is worth fetching and budget a transfer before starting it:
 
@@ -59,8 +239,6 @@ print $meta->{updated};          # 2026-09-04
 print $meta->{entries};          # rows in this build
 print $meta->{size}{csvgz};      # bytes
 ```
-
-### Downloading
 
 There are three ways to fetch one file: straight to disk, as bytes, or as a link you transfer yourself.
 
@@ -84,72 +262,20 @@ $client->database->download('vpn_ip_v1', 'mmdb', './vpn_ip_v1.mmdb', build => $e
 
 A build is kept 7 days. Past that the call dies with a `bad_request` whose message is `BUILD_GONE`, and downloading without `build` fetches the live one.
 
-The per-request timeout that bounds an API call is lifted for a transfer. `retries` covers the transfer only until its first byte reaches you: object storage failing before then is retried like any server error, but a transfer that dies part way is not repeated, since a second copy would append to the bytes already written.
+`retries` covers a transfer only until its first byte reaches you: object storage failing before then is retried like any server error, but a transfer that dies part way is not repeated, since a second copy would append to the bytes already written.
 
 A format is `csvgz` or `mmdb`, and `InternetData::Database::FORMATS` lists them. Anything else is refused before a request is made.
 
-### Verifying a download
-
-`checksums` publishes all four digests for one published file, so you can check the bytes you received:
+`checksums` publishes all four digests for one published file, so you can check the bytes you received, and `downloads` is your organization's recent attempts, newest first, refusals included. Without a limit the API applies its own default of 50, and it is clamped to 200.
 
 ```perl
-use Digest::SHA ();
-
 my $sums = $client->database->checksums($id, 'csvgz');
 print $sums->{sha256};
-```
 
-### Download history
-
-`downloads` is your organization's recent attempts, newest first, refusals included: a denial is what answers "it stopped working", and its absence answers nothing. Without a limit the API applies its own default of 50, and it is clamped to 200.
-
-```perl
 for my $attempt (@{ $client->database->downloads(limit => 20) }) {
     print "$attempt->{created} $attempt->{dataset_id} $attempt->{outcome}\n";
 }
 ```
-
-### Errors
-
-Failures die with an `InternetData::Error` carrying a `kind` and a `retryable` flag. It stringifies to its message, so it reads like an ordinary string exception where you do not care which it is:
-
-```perl
-my $databases = eval { $client->database->list };
-if (my $err = $@) {
-    die $err unless ref $err && $err->isa('InternetData::Error');
-    warn $err->kind, ' ', $err->status, ' ', $err->retryable, ' ', $err->message;
-}
-```
-
-`kind` is one of `bad_request`, `unauthorized`, `forbidden`, `rate_limited`, `quota_exceeded`, `server_error` or `network`. `message` is the API's own result code, so a 403 tells you whether it was `NOT_LICENSED`, `LICENSE_EXPIRED` or `IP_NOT_ALLOWED`, a call from an address the key or its organization does not allow.
-
-`rate_limited` is a 429 that carries `Retry-After`, and the library retries it for you. `quota_exceeded` is a 429 without one, which it never retries. InternetData's database API has no quota, so you won't see `quota_exceeded` from it. Nothing else in the 4xx range is retried at all: a misspelled database ID is a 404, and asking for it three times gets the same answer three times.
-
-Each attempt gives up after 30 seconds, and a transient failure is retried twice. Both can be changed for the client, and for a single call:
-
-```perl
-my $client = InternetData->new(api_key => $key, retries => 4, timeout => 60);
-my $databases = $client->database->list(retries => 0, timeout => 5);
-```
-
-The timeout is in seconds and applies to each attempt, so a retried call can take longer in total. A transfer isn't bound by it, so `download` and `download_bytes` refuse a per-call `timeout` rather than quietly ignoring it.
-
-### Non-blocking use
-
-Every call has a `_p` twin returning a [Mojo::Promise](https://metacpan.org/pod/Mojo::Promise), so the library drops into a Mojolicious application without a worker or a thread:
-
-```perl
-$client->database->download_p($id, 'csvgz', "./$id.csv.gz")
-    ->then(sub { print 'wrote ', shift, " bytes\n" })
-    ->catch(sub { warn shift })
-    ->wait;
-```
-
-The blocking calls are those same promises plus a `wait`, so both paths retry identically. Inside an already running event loop the blocking calls cannot block, and say so rather than returning nothing.
-
-### Nothing is cached
-
-The client caches nothing. What your organization may see depends on the key, so a listing held from one client is not an answer for another, and the catalog is small enough that re-reading it costs less than being wrong about whose it was.
 
 ### Sign in with OAuth (device flow)
 
@@ -200,13 +326,24 @@ my $registration = $client->oauth->register(
 
 Each redirect URI must be https on a public host name, or http on a loopback address, which then matches any port. Nothing is kept until a person approves the client, so an app with no client ID saved can simply register again.
 
+### Absent is not false
+
+Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its daily trial is spent. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+
+```perl
+if ($result->is_hosting // 0) { ... }          # absent counts as false
+if ($result->has('is_hosting')) { ... }        # is this field in my plan? Not without a key
+if (exists $result->location->{city}) { ... }  # and a member inside an object
+if ($result->trial_expired) { ... }            # a free-plan key's daily trial is spent
+```
+
 ## Other Libraries
 
 There are official InternetData client libraries available for many languages including PHP, Python, Go, Java, and Ruby. See our GitHub at https://github.com/internetdata for more.
 
 ## About InternetData
 
-Geolocation, anonymity, ownership and network databases for IP addresses and AS numbers, licensed as files you download and query yourself.
+Geolocation, anonymity, ownership and network data for IP addresses, AS numbers and domains, as an API and as databases you download and query yourself.
 
 [<img src="https://s3.internetdata.io/internetdata-public/brand/mark.svg" alt="InternetData" height="64"/>](https://internetdata.io/)
 

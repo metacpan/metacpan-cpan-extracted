@@ -11,7 +11,9 @@ my $n = 0;
 sub spit {
 	my ($content, $name) = @_;
 	my $f = $name ? "$dir/$name" : sprintf( "$dir/t%02d.csv", ++$n );
-	open my $fh, '>', $f or die "open $f: $!";
+	# binary: on MSWin32 a text-mode open writes each "\n" as CR LF, and
+	# read_table() keeps a quoted line end as the bytes the file holds
+	open my $fh, '>:raw', $f or die "open $f: $!";
 	print {$fh} $content;
 	close $fh;
 	return $f;

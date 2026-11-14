@@ -538,7 +538,7 @@ print "Product 5001 viewed $views times.\n";
 
 ## 5. Simple Mode and Direct Schemaless Access (Simple Mode)
 
-In AmberDB, **Simple Mode (`simple => 1`)** represents the entirely schemaless, lightweight, direct flat-file NoSQL operational mode where no `.table` or `.dbase` schema files and no secondary binary indexes (`.inx`, `.src`, `.fld`, `.fac`, `.slg`, `.aut`, `.del`) are generated or maintained.
+In AmberDB, **Simple Mode (`use_simple => 1`)** represents the entirely schemaless, lightweight, direct flat-file NoSQL operational mode where no `.table` or `.dbase` schema files and no secondary binary indexes (`.inx`, `.src`, `.fld`, `.fac`, `.slg`, `.aut`, `.del`) are generated or maintained.
 
 In Simple Mode, records can store rich, nested data structures directly, including array and hash references (`ARRAY`/`HASH`). The index generation and maintenance overhead is completely eliminated; single-key read and write operations (`read_id`, `insert_id`) execute at maximum hardware speed ($O(1)$).
 
@@ -552,7 +552,7 @@ Simple Mode can be activated in four distinct ways:
    ```perl
    my $adb = AmberDB->new(
        path => { dbase_dir => "/var/data/sessions" },
-       cfg  => { simple    => 1 },
+       cfg  => { use_simple => 1 },
    );
    ```
 
@@ -565,7 +565,7 @@ Simple Mode can be activated in four distinct ways:
 
 3. **Dynamic Runtime Switch via `config`:**
    ```perl
-   $adb->config( simple => 1 );
+   $adb->config( use_simple => 1 );
    ```
 
 4. **Automatic Simple Mode Trigger via Custom Extensions (`db_ext`):**  
@@ -573,7 +573,7 @@ Simple Mode can be activated in four distinct ways:
    ```perl
    my $adb = AmberDB->new(
        path => { dbase_dir => "/var/data/cache" },
-       cfg  => { db_ext    => "dat" },  # Automatically activates simple => 1
+       cfg  => { db_ext    => "dat" },  # Automatically activates use_simple => 1
    );
    ```
 
@@ -703,14 +703,14 @@ Since Simple Mode requires no schema files, creating a high-performance in-memor
 # 1. Persistent disk instance (For durable storage)
 my $db_disk = AmberDB->new(
     path => { dbase_dir => "/var/data/app/dbstore/table" },
-    cfg  => { simple => 1 },
+    cfg  => { use_simple => 1 },
 );
 
 # 2. RAM-Disk instance (Zero-latency in-memory cache/session store)
 # (Linux: /dev/shm or tmpfs, Windows: ImDisk, macOS: APFS RAM-Disk /Volumes/AmberDB_RAM)
 my $db_ramdisk = AmberDB->new(
     path => { dbase_dir => "/dev/shm/amberdb_cache" },
-    cfg  => { simple => 1, no_backup => 1 }, # Disable backup for pure transient cache
+    cfg  => { use_simple => 1, no_backup => 1 }, # Disable backup for pure transient cache
 );
 
 # In-memory reads and writes at nanosecond speed:
@@ -727,7 +727,7 @@ Benefits of this dual-instance design:
 
 ### 5.8 Feature Comparison: Standard vs. Simple Mode
 
-| Feature / Subsystem | Standard Mode (`simple => 0`) | Simple Mode (`simple => 1`) |
+| Feature / Subsystem | Standard Mode (`use_simple => 0`) | Simple Mode (`use_simple => 1`) |
 | :--- | :---: | :---: |
 | **Schema Files (`.table`, `.dbase`)** | Required & Enforced | None / Schemaless |
 | **Arbitrary & Long Record IDs** | 8-Byte / Strict ASCII Limits | **Completely Unrestricted** |
@@ -1318,7 +1318,7 @@ AmberDB enforces two-way data integrity between Perl runtime types and database 
    - Guarantees `array` fields return `[]` and `hash` fields return `{}` even when empty.
 
 3. **Simple Mode Performance:**
-   - In Schemaless (`simple => 1`) mode or for tables without block definitions, `enc_validate` and `dec_validate` return input data immediately with zero CPU overhead.
+   - In Schemaless (`use_simple => 1`) mode or for tables without block definitions, `enc_validate` and `dec_validate` return input data immediately with zero CPU overhead.
 
 ### 9.8.1 How Schemas Coordinate with CRUD Operations
 
@@ -1419,7 +1419,7 @@ During every `insert_id`, `modify_id`, `insert_list`, or `modify_list` call, the
 
 > [!NOTE]
 > **Repeating Blocks in Schemaless Simple Mode:**  
-> Automatic compilation and comma-joining of repeating child IDs into `repeat_ids` (`repeat_fields`) relies strictly on the `repeat_start` and `repeat_ids` attributes in the `.table` schema file. In schemaless Simple Mode (`simple => 1`), schema directives are inactive and this automatic aggregation does not execute; records are written as raw Perl arrays. If a summary ID list is needed in Simple Mode, it must be populated manually by the developer before writing.
+> Automatic compilation and comma-joining of repeating child IDs into `repeat_ids` (`repeat_fields`) relies strictly on the `repeat_start` and `repeat_ids` attributes in the `.table` schema file. In schemaless Simple Mode (`use_simple => 1`), schema directives are inactive and this automatic aggregation does not execute; records are written as raw Perl arrays. If a summary ID list is needed in Simple Mode, it must be populated manually by the developer before writing.
 
 #### 9.10.3 Code Example & Direct Querying
 ```perl
@@ -1760,7 +1760,7 @@ Runtime behavior can be tuned and safely configured via the `$adb->config()` met
 $adb->config(
     no_write     => 1,            # Read-only maintenance mode: block all writes
     no_backup    => 1,            # Disable daily CSV audit logging for all tables
-    simple       => 1,            # Direct unindexed mode: bypasses secondary index generation
+    use_simple   => 1,            # Direct unindexed mode: bypasses secondary index generation
     keys_only    => 1,            # read_all returns IDs only
     ramdisk_size => '1024M',      # RAM-Disk (tmpfs/APFS/ImDisk) size (Default: 512M)
 );

@@ -11,7 +11,7 @@ use Twilio::Exceptions::ConfigurationException;
 use Twilio::Exceptions::TwilioException;
 use Twilio::Http::TinyClient;
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 my $ENV_ACCOUNT_SID = 'TWILIO_ACCOUNT_SID';
 my $ENV_AUTH_TOKEN  = 'TWILIO_AUTH_TOKEN';

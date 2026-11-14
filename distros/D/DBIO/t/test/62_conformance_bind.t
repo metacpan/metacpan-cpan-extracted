@@ -42,7 +42,7 @@ my %OPS = map { $_ => 1 } qw(create find search update populate int_first);
     push @bad, "$n: not bind-kebab-case" unless $n =~ /^bind-[a-z0-9]+(?:-[a-z0-9]+)*$/;
     push @bad, "$n: duplicate" if $seen{$n}++;
     push @bad, "$n: since is not 1" unless ($c->{since} // '') eq '1';
-    push @bad, "$n: no cards" unless ref $c->{cards} eq 'ARRAY' && @{ $c->{cards} };
+    push @bad, "$n: carries a cards field" if exists $c->{cards};
     push @bad, "$n: no expect" unless ref $c->{expect} eq 'ARRAY' && @{ $c->{expect} };
 
     my $schema_class = eval { DBIO::Test::Conformance->_build_schema_class($c) };
@@ -231,7 +231,7 @@ for my $w (@WRONG) {
 {
   local $ENV{AUTHOR_TESTING} = 1;
   MockConformanceServer::reset_state();
-  $MockConformanceServer::AREAS{Bind} = { kind => 'pending', card => 'k99', reason => qr/bind is not built yet/ };
+  $MockConformanceServer::AREAS{Bind} = { kind => 'pending', reason => qr/bind is not built yet/ };
   $MockConformanceServer::QUIRK{throw} = {
     map {
       my $c = $_;
@@ -242,7 +242,7 @@ for my $w (@WRONG) {
   };
   my @r = $MOCK->results('Bind');
   is_deeply [ map { $_->{status} } @r ], [ ('pending') x 10 ], 'a driver that refuses the Bind area is green: every case pending';
-  is(MockConformanceServer->summary_line(\@r), 'Bind area pending (karr k99): 10 cases', '... with one summary entry for the area');
+  is(MockConformanceServer->summary_line(\@r), 'Bind area pending: 10 cases', '... with one summary entry for the area');
 
   delete $MockConformanceServer::QUIRK{throw}{'bind-binary'};
   my $s = statuses();

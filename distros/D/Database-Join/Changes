@@ -1,5 +1,15 @@
 Revision history for Database::Join
 
+0.011.2	Fri Nov 13 02:14:28 PM EST 2026
+	[ Enhancements ]
+	- Key pushdown on the array backend: under a left or inner join, a
+	  secondary database with no criterion on its join column is asked for
+	  only the primary's keys ({ -in => [...] }) instead of being read in
+	  full.  Joining 118 rows to a 3,800-row, 17 MB CSV went from 0.41s to
+	  0.09s.  Skipped for outer joins, past 999 keys, and for databases whose
+	  selectall_arrayref is not Database::Abstraction's own; a database that
+	  croaks on -in is read in full instead.
+
 0.011.1	Thu Nov  5 10:02:16 PM EST 2026
 	[ Bug fix ]
 	- Test a driver that fails without a reason

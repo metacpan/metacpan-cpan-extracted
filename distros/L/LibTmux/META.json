@@ -1,0 +1,250 @@
+{
+   "abstract" : "Captured tmux graph queries and explicit process execution",
+   "author" : [
+      "libtmux contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LibTmux",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.78",
+            "ExtUtils::MakeMaker::CPANfile" : "0.11",
+            "Module::CPANfile" : "1.1004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.044000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V1" : "1.302226"
+         }
+      }
+   },
+   "provides" : {
+      "LibTmux" : {
+         "file" : "lib/LibTmux.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Client" : {
+         "file" : "lib/LibTmux/Client.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::ClientSelection" : {
+         "file" : "lib/LibTmux/ClientSelection.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Codec" : {
+         "file" : "lib/LibTmux/Codec.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::CommandResult" : {
+         "file" : "lib/LibTmux/CommandResult.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Entity" : {
+         "file" : "lib/LibTmux/Entity.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Filter" : {
+         "file" : "lib/LibTmux/Filter.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Operation" : {
+         "file" : "lib/LibTmux/Operation.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Pane" : {
+         "file" : "lib/LibTmux/Pane.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::PaneSelection" : {
+         "file" : "lib/LibTmux/PaneSelection.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Platform::Linux" : {
+         "file" : "lib/LibTmux/Platform/Linux.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::ProcessJob" : {
+         "file" : "lib/LibTmux/ProcessJob.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::QueryPlan" : {
+         "file" : "lib/LibTmux/QueryPlan.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Schema" : {
+         "file" : "lib/LibTmux/Schema.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Selection" : {
+         "file" : "lib/LibTmux/Selection.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Selection::Iterator" : {
+         "file" : "lib/LibTmux/Selection/Iterator.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Server" : {
+         "file" : "lib/LibTmux/Server.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Session" : {
+         "file" : "lib/LibTmux/Session.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::SessionSelection" : {
+         "file" : "lib/LibTmux/SessionSelection.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Snapshot" : {
+         "file" : "lib/LibTmux/Snapshot.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Transport" : {
+         "file" : "lib/LibTmux/Transport.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Window" : {
+         "file" : "lib/LibTmux/Window.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::WindowLink" : {
+         "file" : "lib/LibTmux/WindowLink.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::WindowLinkSelection" : {
+         "file" : "lib/LibTmux/WindowLinkSelection.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::WindowSelection" : {
+         "file" : "lib/LibTmux/WindowSelection.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::AcquisitionRace" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Cancelled" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Codec" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Command" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Creation" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::InvalidArgument" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::InvalidFilter" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::InvalidSelection" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::MultipleMatches" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::NoMatch" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::NoServer" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::NoSuchTarget" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::OutputLimit" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::QueryMismatch" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Spawn" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::StaleReference" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Timeout" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Transport" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Unloaded" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::Unsupported" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::X::UnsupportedValue" : {
+         "file" : "lib/LibTmux/X.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/libtmux/libtmux-perl/issues"
+      },
+      "homepage" : "https://libtmux.org/en/perl/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/libtmux/libtmux-perl.git",
+         "web" : "https://github.com/libtmux/libtmux-perl/tree/master/packages/core"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

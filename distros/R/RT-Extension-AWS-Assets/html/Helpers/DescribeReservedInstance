@@ -60,6 +60,15 @@
           </div>
 %       }
         </div>
+%   if ( $type eq 'RDS' ) {
+        <div class="row">
+          <div class="col-12">
+            <&| /Elements/LabeledValue, Label => loc('ReservedDBInstanceId') &>
+              <input class="form-control" type="text" name="ReservedDBInstanceId" value="<% $reserved_db_instance_id %>" />
+            </&>
+          </div>
+        </div>
+%   }
         <div class="row mt-2">
           <div class="col-12 text-end">
             <input type="button" class="btn btn-primary submit" value="<&|/l&>Purchase</&>" data-bs-dismiss="modal" />
@@ -95,6 +104,7 @@ for my $link ( @{ $Asset->DependsOn->ItemsArrayRef || [] } ) {
 }
 
 my $offering;
+my $reserved_db_instance_id;
 
 my $credentials = RT::Extension::AWS::Assets::AWSCredentials();
 my $service = Paws->service( $type, credentials => $credentials, region => $Asset->FirstCustomFieldValue('Region') );
@@ -122,6 +132,10 @@ else {
         'OfferingType'       => 'No Upfront',
     );
     $offering = $result->ReservedDBInstancesOfferings->[0];
+
+    my $today = RT::Date->new( $session{CurrentUser} );
+    $today->SetToNow;
+    $reserved_db_instance_id = join '-', $Asset->Name, $today->Date( Timezone => 'UTC' );
 }
 
 my $title = loc( 'Purchase Reserved Instance for Asset [_1]', $Asset->Name );

@@ -1,5 +1,14 @@
 Revision history for mayhaps:
 
+v0.1.2    2026-11-13 19:34:11+00:00 Europe/London
+  [Documentation]
+  - Improved synopsis.
+
+  - Added a security considerations section.
+
+  [Tests]
+  - Added more test cases.
+
 v0.1.1    2026-11-13 08:04:18+00:00 Europe/London
   [Documentation]
   - Improved the description.

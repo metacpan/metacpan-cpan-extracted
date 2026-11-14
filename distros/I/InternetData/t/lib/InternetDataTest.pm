@@ -4,13 +4,71 @@ use strict;
 use warnings;
 
 use Mojo::File 'path';
-use Mojo::JSON qw(decode_json false);
+use Mojo::JSON qw(decode_json false true);
 
 # The language-neutral conformance corpus, generated into every InternetData SDK
 # so a binding that drifts fails its own suite.
 sub corpus {
     my $root = path(__FILE__)->to_abs->dirname->dirname->dirname;
     return decode_json($root->child('testdata', 'testdata.json')->slurp);
+}
+
+sub lookup_case {
+    my ($name) = @_;
+    my ($case) = grep { $_->{name} eq $name } @{ corpus()->{lookup} };
+    die "no lookup case named '$name'" unless $case;
+    return $case;
+}
+
+sub batch_case {
+    my ($name) = @_;
+    my ($case) = grep { $_->{name} eq $name } @{ corpus()->{batch} };
+    die "no batch case named '$name'" unless $case;
+    return $case;
+}
+
+# An address's answer on Unlimited, every member the spec requires and nothing
+# more, so a test can vary the one member it is about.
+sub lookup {
+    my (%overrides) = @_;
+    return {
+        ip => '9.9.9.9',
+        is_bogon => false,
+        (map { ($_ => false) } qw(
+            is_tor is_relay is_anycast is_carrier is_satellite is_ssh is_smtp is_web is_dns_resolver
+            is_bittorrent
+        )),
+        tor => {},
+        relay => {},
+        location => {
+            continent => 'EU', continent_name => 'Europe', country => 'AT', country_name => 'Austria',
+            timezone => 'Europe/Vienna', currency_code => 'EUR', currency_name => 'Euro',
+            currency_symbol => 'E', flag_emoji => 'AT', flag_unicode => 'U+1F1E6 U+1F1F9',
+        },
+        asn => { asn => 9009, name => 'M247 Europe SRL', domain => 'm247global.com', type => 'hosting', prefix => '9.9.9.0/24' },
+        company => { name => 'M247', domain => 'm247.ro' },
+        hostname => '',
+        abuse => { email => 'abuse@m247.ro' },
+        %overrides,
+    };
+}
+
+# An AS's answer and a domain's on Unlimited, in the same terms.
+sub asn {
+    my (%overrides) = @_;
+    return {
+        asn => 9009, name => 'M247 Europe SRL', country => 'RO', registry => 'ripe',
+        allocated => '2005-06-06', domain => 'm247global.com', %overrides,
+    };
+}
+
+sub domain {
+    my (%overrides) = @_;
+    return {
+        domain => 'example.com', is_registered => true,
+        (map { ($_ => false) } qw(has_a has_aaaa has_mx has_ns has_cname)),
+        %overrides,
+    };
 }
 
 # One licensed family in the shape /api/v2/database/list answers, so a test can

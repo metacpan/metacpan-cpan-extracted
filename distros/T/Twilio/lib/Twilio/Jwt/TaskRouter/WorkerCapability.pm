@@ -5,7 +5,7 @@ use warnings;
 
 use parent 'Twilio::Jwt::TaskRouter::CapabilityToken';
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $account_sid, $auth_token, $workspace_sid, $worker_sid, $base_url, $base_ws_url) = @_;

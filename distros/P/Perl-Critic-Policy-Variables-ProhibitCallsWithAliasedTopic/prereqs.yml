@@ -1,0 +1,11 @@
+# Read by [PrereqsFile] in dist.ini, for prerequisites [AutoPrereqs] cannot find
+# in the code.  The perl floor is here as well as on the use line of every file,
+# so the metadata states it even where one file leaves that line out.
+runtime:
+  requires:
+    perl: '5.014'
+  # The policy does not load them.  It leaves to them what they report, so that
+  # the three together cover a $_ that is an alias to the caller's data.
+  recommends:
+    Perl::Critic::Policy::ControlStructures::ProhibitMutatingListFunctionsStricter: '0.001'
+    Perl::Critic::Policy::Variables::ProhibitTopicIterator: '0.001004'

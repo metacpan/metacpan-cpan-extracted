@@ -175,7 +175,7 @@ sub dbi_connects {
     'DBI connect info: the same as with a DSN';
   is_deeply $beside->_dbi_connect_info->[3],
     { %DEFAULT_ATTRS, pg_enable_utf8 => 1, LongReadLen => 4096, pool_size => 3 },
-    '... the DBI attributes, pool_size among them on a sync connection (k211)';
+    '... the DBI attributes, pool_size among them on a sync connection';
   is $beside->on_connect_do, $on_connect, 'on_connect_do is the storage option';
   ok $beside->disable_sth_caching, 'disable_sth_caching is the storage option';
   is_deeply $beside->_sql_maker_opts, $dsn->_sql_maker_opts,
@@ -281,7 +281,7 @@ throws_ok {
   });
 
   is_deeply $storage->_dbi_connect_info->[3], { %DEFAULT_ATTRS, pg_enable_utf8 => 1 },
-    'the sync connection has the DBI attributes, without pool_size (k211)';
+    'the sync connection has the DBI attributes, without pool_size';
 
   throws_ok { $storage->async }
     qr/async mode 'k243plain': transport T::RecordingBackend does not take connection settings beside an AccessBroker \(it does not declare 'broker_connect_options'.*\), so pg_enable_utf8, pool_size would reach this connection but none of its pooled ones/s,

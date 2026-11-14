@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 package Perl::Tests::Covering::Script;
-$Perl::Tests::Covering::Script::VERSION = '0.002';
+$Perl::Tests::Covering::Script::VERSION = '0.003';
 # PODNAME: tests-covering
 # ABSTRACT: Print the tests that cover the files, subs or changes you name.
 
@@ -104,7 +104,7 @@ tests-covering - Print the tests that cover the files, subs or changes you name.
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 

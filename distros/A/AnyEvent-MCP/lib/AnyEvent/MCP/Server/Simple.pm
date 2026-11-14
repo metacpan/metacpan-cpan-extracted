@@ -300,7 +300,7 @@ Add this before registering the tools:
 
    my $note;
 
-   mcp_config permissions => AnyEvent::MCP::Server::Permissions->new (
+   mcp_permissions +AnyEvent::MCP::Server::Permissions->new (
       name    => "echo-notes",
       actions => {
          remember => "Replace the server's in-memory note",
@@ -478,9 +478,10 @@ handle that failure in its completion callback and report it with
 C<error> or C<reply>, provided the request is still active.
 
 C<progress> only sends when the caller supplied a progress token.
-Delivery is best effort; the HTTP server in this distribution does not
-deliver progress notifications. A client without progress display can
-still receive the final result.
+An outstanding tool request with a progress token emits an automatic
+elapsed-time heartbeat every 30 seconds. Delivery is best effort:
+stdio sends notifications directly, while Streamable HTTP sends them
+over the request's SSE response stream. Clients may ignore progress.
 
 =head2 When to use the object interfaces
 
@@ -571,12 +572,29 @@ The callback must not block.
 Optional positive idle time for spawned stdio servers. With a multibroker
 advertising C<anyevent-mcp/multibroker> version 1, Simple requests shutdown
 once no MCP requests have been active for that long. The broker can ignore
-the request. HTTP servers, ordinary clients and servers without this
-option are unaffected.
+the request. An application may veto shutdown with C<on_idle_shutdown>;
+Simple retries after the configured interval if it is declined. HTTP servers,
+ordinary clients and servers without this option are unaffected.
 
 =back
 
 See L<AnyEvent::MCP::Server> for further protocol options and events.
+
+=item mcp_permissions $object
+
+Select the L<AnyEvent::MCP::Server::Permissions> object used by the Simple
+starters. If never called (and no explicit C<permissions> option is supplied),
+Simple creates one automatically, named from the program and selected instance.
+C<mcp_permissions undef> explicitly disables the permission system:
+tool callbacks calling C<require_permission> then fail instead of prompting.
+Applications can still pass C<permissions> through C<mcp_config> or startup
+arguments when needed.
+
+The common C<--ask> option overrides the object's prompting mode, and CLI
+automatic permission rules precede configured rules and rules originally
+supplied with the object. Those rules are applied when starting the server,
+not when C<mcp_permissions> is called. No permission object is created when
+it is explicitly disabled.
 
 =item mcp_tool $name, $description, $input_schema, $callback->($req, $args)
 
@@ -640,6 +658,24 @@ Initial section heading, defaulting to C<Application options:>.
 =item examples => $text
 
 Preformatted examples.
+
+=item without => [OPTION...]
+
+Exclude selected common options by their long names, for example
+C<< without => ["ask"] >>. The parser rejects excluded switches, and
+C<--help> omits them. All common options are enabled by default.
+
+=item print_url_extra => $callback
+
+Append application-specific URLs to C<--print-url> output. Called once with
+the resolved HTTP settings after the normal MCP URLs have been printed.
+
+=item default_port => $port
+
+Choose an application-specific fallback port for C<--print-url>, without
+replacing the bind address or overriding ports explicitly specified by
+C<--bind> or configuration. The application must also pass it to
+C<http_settings> when starting its listener.
 
 =back
 
@@ -706,6 +742,9 @@ override these settings.
 
 The global secret is generated automatically when needed; see
 L<AnyEvent::MCP/GLOBAL CONFIGURATION>. No configuration is loaded for stdio.
+Unless explicitly disabled using C<mcp_permissions undef>, Simple constructs
+a default permission engine. C<--ask> and automatic permission rules configure
+it along with any application-supplied permission object.
 HTTP startup neither prints to stdout nor changes its buffering.
 C<mcp_start> does not parse C<@ARGV>; applications parse their own options.
 The bundled executables use C<mcp_getoptions>, which handles shared
@@ -761,13 +800,15 @@ requests. The signal watchers belong to the blocking call.
 C<mcp_getoptions> parses these options for executables using
 L<AnyEvent::MCP::Server::Simple>. The executable's own OPTIONS section
 documents any additional switches or differences in shared-option behavior.
+An application can exclude specific common switches via C<without>.
 
 =over
 
 =item --name NAME
 
-Select the instance (default C<default>). NAME starts with a letter or
-underscore, followed by letters, digits, underscores or hyphens.
+Select the instance (default C<default>). NAME starts with an ASCII letter,
+digit or underscore; subsequent characters may also contain C<.>, C<@>,
+C<+> and C<->.
 Selects C<[instance NAME]> configuration, derived HTTP port and credentials;
 does not change the advertised MCP implementation name.
 Example: C<--name project>.
@@ -846,6 +887,14 @@ Add a repeatable process-local deny rule with the same matching syntax
 and evaluation order as C<--auto-allow>.
 Example: C<--auto-deny '*,exec'>.
 
+=item --ask MODE
+
+Choose how permissions or other human input are requested: C<helper>,
+C<tty>, C<yad>, C<mcp>, or C<auto>. C<none> immediately declines requests
+that would otherwise require prompting; existing allow and deny rules
+still apply. Multibroker replies to downstream forms with a standard decline.
+The default depends on the application and its multibroker environment.
+
 =item --quiet
 
 Suppress routine tool activity and tool-failure logging. Warnings and
@@ -893,10 +942,11 @@ use Scalar::Util qw(refaddr);
 use AnyEvent ();
 use AnyEvent::Log ();
 use AnyEvent::MCP ();
+use AnyEvent::MCP::Config ();
 use AnyEvent::MCP::Server::Toolset ();
 
 our @ISA = qw(Exporter);
-our @EXPORT = qw(mcp_config mcp_tool mcp_getoptions mcp_tool_help mcp_log mcp_log_request mcp_start mcp_stdio mcp_http mcp_connect);
+our @EXPORT = qw(mcp_config mcp_permissions mcp_tool mcp_getoptions mcp_tool_help mcp_log mcp_log_request mcp_start mcp_stdio mcp_http mcp_connect);
 
 my %config = (
    auto_instructions => 1,
@@ -1016,6 +1066,11 @@ sub mcp_config {
    %config = (%config, %kv);
 }
 
+sub mcp_permissions {
+   @_ == 1 or die "mcp_permissions expects one argument (object or undef)\n";
+   $config{permissions} = $_[0];
+}
+
 sub mcp_tool {
    $toolset->tool (@_)
 }
@@ -1091,7 +1146,7 @@ sub _mcp_help_row {
 }
 
 sub _mcp_help {
-   my ($usage, $description, $options, $option_heading, $examples) = @_;
+   my ($usage, $description, $options, $option_heading, $examples, $without) = @_;
 
    $usage =~ s/\n*\z/\n/;
    my $help = $usage;
@@ -1110,12 +1165,16 @@ sub _mcp_help {
       ["--custom-instructions TEXT", "Describe when this server instance should be used"],
       ["--auto-allow TOOL[,ACTION[,CAPABILITY]]", "Add an ordered automatic allow rule (repeatable)"],
       ["--auto-deny TOOL[,ACTION[,CAPABILITY]]", "Add an ordered automatic deny rule (repeatable)"],
+      ["--ask MODE", "Prompt via helper, tty, yad, mcp, auto; none declines without prompting"],
       ["--quiet", "Suppress routine tool activity and tool-failure logging"],
       ["--print-url[=USER] (--print-urls)", "Print enabled user URLs, or one exact user"],
       ["--tool-help", "Print registered tool descriptions and arguments, then exit"],
       ["--help", "Display this help and exit"],
    );
-   $help .= _mcp_help_row (@$_) for @common;
+   $help .= _mcp_help_row (@$_) for grep {
+      my ($name) = $_->[0] =~ /--([a-z-]+)/;
+      !$without->{$name}
+   } @common;
 
    if ($options && @$options) {
       $help .= "\n" . ($option_heading // "Application options:") . "\n"
@@ -1144,18 +1203,19 @@ sub _mcp_help {
 
 sub mcp_getoptions {
    require Getopt::Long;
-   require AnyEvent::MCP::Config;
 
    my %settings = %{ref $_[0] eq "HASH" ? shift : {}};
+   my $print_url_extra = delete $settings{print_url_extra};
    my $usage = delete $settings{usage}
       // "Usage: $0 [OPTION]... [ARG]...\n";
    my @help = delete @settings{qw(description options option_heading examples)};
+   my %without = map { $_ => 1 } @{delete $settings{without} || []};
    my %url = (%config, %settings);
    delete @url{qw(name bind stdio)};
    my @auto_rules;
    my %set;
 
-   Getopt::Long::GetOptions (
+   my @common = (
       AnyEvent::MCP::Config::http_getopt (\my $name, \my $bind, \my $print_url, \my @tokens),
       "tls-cert=s" => \my $tls_cert,
       "tls-key=s" => \my $tls_key,
@@ -1171,18 +1231,34 @@ sub mcp_getoptions {
       },
       "tool-help" => \my $tool_help,
       "quiet" => \my $silent,
+      "ask=s" => \my $ask,
       "help" => \my $help,
+   );
+   my @enabled;
+   my %known;
+   while (@common) {
+      my ($option, $target) = splice @common, 0, 2;
+      my ($name) = $option =~ /\A([a-z-]+)/;
+      $known{$name} = 1;
+      push @enabled, $option => $target unless $without{$name};
+   }
+   die "Unknown common option: " . join (", ", sort grep !$known{$_}, keys %without) . "\n"
+      if grep !$known{$_}, keys %without;
+   Getopt::Long::GetOptions (
+      @enabled,
       @_,
    ) or die $usage;
+   die "--ask must be helper, tty, yad, mcp, auto, or none\n"
+      if defined $ask && $ask !~ /\A(?:helper|tty|yad|mcp|auto|none)\z/;
 
    if ($help) {
-      print _mcp_help $usage, @help;
+      print _mcp_help $usage, @help, \%without;
       exit;
    }
 
-   $name = AnyEvent::MCP::Config::server_name ($name // $settings{name} // $config{name});
+   $name = AnyEvent::MCP::instance_name ($name // $settings{name} // $config{name});
    if (%set) {
-      my $instance = AnyEvent::MCP::Config->global->{section}{"instance $name"} ||= {};
+      my $instance = (AnyEvent::MCP::Config::global_config)->{section}{"instance $name"} ||= {};
       %$instance = (%$instance, %set);
    }
 
@@ -1196,6 +1272,7 @@ sub mcp_getoptions {
       (@tokens ? (tokens => \@tokens) : ()),
       ($stdio ? (stdio => 1) : ()),
       (defined $connect ? (connect => $connect) : ()),
+      (defined $ask ? (ask => $ask) : ()),
       (defined $custom_instructions ? (custom_instructions => $custom_instructions) : ()),
       (@auto_rules ? (auto_rules => \@auto_rules) : ()),
       ($tool_help ? (tool_help => 1) : ()),
@@ -1208,14 +1285,14 @@ sub mcp_getoptions {
          (defined $tls_key ? (tls_key => $tls_key) : ()),
          (@tokens ? (tokens => \@tokens) : ()),
       );
-      my $global = AnyEvent::MCP::Config->global;
+      my $global = AnyEvent::MCP::Config::global_config;
       $options{path} //= $global->{section}{"instance $name"}{path}
          // $global->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{path} // "/";
       if (($options{auth} || "") eq "none") {
          !exists $options{tokens} or die "Cannot combine auth => none with tokens\n";
       }
       my $selected_bind = defined $bind ? $bind : ($settings{bind} // $config{bind});
-      my %http = ($global->http_settings ($name, $selected_bind), %options);
+      my %http = ($global->http_settings ($name, $selected_bind, $options{default_port}), %options);
       my @schemes = defined $http{tls_cert} || defined $http{tls_key}
          ? ("https", "http") : ($http{url_scheme} || "http");
       my $managed = ($http{auth} || "") ne "none"
@@ -1224,7 +1301,7 @@ sub mcp_getoptions {
          && !exists $global->{section}{"program " . AnyEvent::MCP::Config::program_name ()}{tokens};
 
       if ($managed) {
-         my $saved = (ref $global)->new (file => $global->{file});
+         my $saved = (ref $global)->new (file => $global->{file})->load;
          $saved->{section}{global}{secret} eq $global->{section}{global}{secret}
             or die "MCP master secret is not persistently stored in $global->{file}\n";
          my $credentials = $global->user_credentials ($name);
@@ -1248,6 +1325,7 @@ sub mcp_getoptions {
             print $global->http_url ($name, $selected_bind, %options, url_scheme => $scheme), "\n";
          }
       }
+      $print_url_extra->(\%http) if $print_url_extra;
       exit;
    }
 
@@ -1257,10 +1335,17 @@ sub mcp_getoptions {
 sub _permission_options {
    my %kv = @_;
 
-   if (my $rules = delete $kv{auto_rules}) {
+   my $rules = delete $kv{auto_rules};
+   my $ask = delete $kv{ask};
+   unless (exists $kv{permissions}) {
       require AnyEvent::MCP::Server::Permissions;
-      my $permissions = $kv{permissions} ||= AnyEvent::MCP::Server::Permissions->new;
-      $permissions->auto_rules ($rules);
+      $kv{permissions} = AnyEvent::MCP::Server::Permissions->new (
+         name => AnyEvent::MCP::Config::program_name () . "-" . AnyEvent::MCP::instance_name ($kv{name}),
+      );
+   }
+   if (my $permissions = $kv{permissions}) {
+      $permissions->{ask} = $ask if defined $ask;
+      $permissions->auto_rules ($rules, 1) if $rules && @$rules;
    }
 
    %kv
@@ -1285,13 +1370,11 @@ sub _server_options {
 }
 
 sub mcp_start {
-   require AnyEvent::MCP::Config;
-
    my %kv = (%config, @_);
    mcp_tool_help (delete $kv{tool_help}, @{$kv{toolsets} || [$toolset]});
-   my $name = AnyEvent::MCP::Config::server_name ($kv{name});
+   my $name = AnyEvent::MCP::instance_name ($kv{name});
    my $config_file = AnyEvent::MCP::Config::_file ();
-   my $global = -e $config_file ? AnyEvent::MCP::Config->global : undef;
+   my $global = -e $config_file ? AnyEvent::MCP::Config::global_config : undef;
    my %ini = $global ? (
       %{$global->{section}{"program " . AnyEvent::MCP::Config::program_name ()} || {}},
       %{$global->{section}{"instance $name"} || {}},
@@ -1316,7 +1399,7 @@ sub mcp_start {
       return mcp_stdio (%kv) if $stdio;
    }
 
-   my %http = ($global ||= AnyEvent::MCP::Config->global)->http_settings ($name, delete $kv{bind});
+   my %http = ($global ||= AnyEvent::MCP::Config::global_config)->http_settings ($name, delete $kv{bind});
    delete @http{qw(tokens connect_tokens token_users)} if ($kv{auth} || "") eq "none";
    my %options = (path => "/", %http, %kv);
    if (exists $kv{tokens}) {
@@ -1378,6 +1461,12 @@ sub mcp_stdio {
          };
          my $schedule = sub {
             $timer = AnyEvent->timer (after => $idle_exit, cb => $check);
+         };
+         my $on_idle_shutdown = $server->{on_idle_shutdown};
+         $server->{on_idle_shutdown} = sub {
+            my $allowed = !$on_idle_shutdown || $on_idle_shutdown->(@_);
+            $schedule->() unless $allowed;
+            $allowed
          };
          my $on_request = $server->{on_request};
          $server->{on_request} = sub {

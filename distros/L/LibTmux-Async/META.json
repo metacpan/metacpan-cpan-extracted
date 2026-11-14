@@ -1,0 +1,91 @@
+{
+   "abstract" : "Optional Future-based libtmux execution",
+   "author" : [
+      "libtmux contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LibTmux-Async",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.78",
+            "ExtUtils::MakeMaker::CPANfile" : "0.11",
+            "Module::CPANfile" : "1.1004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Future" : "0.54",
+            "IO::Async" : "0.805",
+            "IO::Async::Loop::Ppoll" : "0.10",
+            "IO::Ppoll" : "0.14",
+            "LibTmux" : "0.003",
+            "perl" : "5.044000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V1" : "1.302226"
+         }
+      }
+   },
+   "provides" : {
+      "LibTmux::Async" : {
+         "file" : "lib/LibTmux/Async.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Async::Server" : {
+         "file" : "lib/LibTmux/Async/Server.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Async::Transport" : {
+         "file" : "lib/LibTmux/Async/Transport.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Async::X" : {
+         "file" : "lib/LibTmux/Async/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Async::X::Closed" : {
+         "file" : "lib/LibTmux/Async/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Async::X::QueueFull" : {
+         "file" : "lib/LibTmux/Async/X.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/libtmux/libtmux-perl/issues"
+      },
+      "homepage" : "https://libtmux.org/en/perl/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/libtmux/libtmux-perl.git",
+         "web" : "https://github.com/libtmux/libtmux-perl/tree/master/packages/async"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

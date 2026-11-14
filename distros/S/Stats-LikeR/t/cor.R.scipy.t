@@ -647,14 +647,15 @@ scipy_ok(vcor('kendalltau gh6134', 'kendall'), undef, 'nan', 'C4 SciPy test_kend
 		ok(is_nan($r->[0][1]) && $r->[0][0] == 1, "C8 non-numeric matrix cell is NA ($m)");
 	}
 
-	# A row shorter than the first is NA in the cells it lacks; a longer one's
-	# extra cells are ignored, because the first row sets the width.
+	# A ragged matrix is refused (0.3419): R has no such thing, and prcomp()
+	# and scale() refuse it too.  This block used to pin the old reading, a
+	# short row's missing cells as NA and a long row's extra cells ignored,
+	# which only recorded what the code happened to do (see t/cor.ragged.t).
 	for my $m (@METHODS) {
-		my $short = cor([ [ 1, 1 ], [ 2 ], [ 3, 4 ], [ 4, 3 ] ], undef, $m);
-		ok(is_nan($short->[0][1]) && is_nan($short->[1][0]), "C8 short row reads as NA ($m)");
-		is_deeply(cor([ [ 1, 1 ], [ 2, 2, 99 ], [ 3, 4 ], [ 4, 3 ] ], undef, $m),
-		          cor([ [ 1, 1 ], [ 2, 2 ], [ 3, 4 ], [ 4, 3 ] ], undef, $m),
-		          "C8 cells past the first row's width are ignored ($m)");
+		eval { cor([ [ 1, 1 ], [ 2 ], [ 3, 4 ], [ 4, 3 ] ], undef, $m) };
+		like($@, qr/^cor: x rows have unequal lengths \(row 1 has 1, expected 2\)/, "C8 short row is refused ($m)");
+		eval { cor([ [ 1, 1 ], [ 2, 2, 99 ], [ 3, 4 ], [ 4, 3 ] ], undef, $m) };
+		like($@, qr/^cor: x rows have unequal lengths \(row 1 has 3, expected 2\)/, "C8 long row is refused ($m)");
 	}
 }
 

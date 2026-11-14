@@ -835,7 +835,7 @@ for my $case (
   is $backend->{release_context_states}[0], 0,
     "$name seam throw invalidates before its only release" unless $rolled;
   is scalar @{ $backend->pool->{released} }, ($rolled ? 0 : 1),
-    $rolled ? "$name seam throw does not release the connection (karr k395)"
+    $rolled ? "$name seam throw does not release the connection"
             : "$name seam throw releases exactly once";
 }
 
@@ -936,7 +936,7 @@ for my $case (
   is $backend->{release_context_states}[0], 0,
     "$name is inactive inside the throwing release" unless $rolled;
   is scalar @{ $backend->pool->{released} }, ($rolled ? 0 : 1),
-    $rolled ? "$name retires instead of releasing (karr k395)"
+    $rolled ? "$name retires instead of releasing"
             : "$name attempts its throwing release exactly once";
 }
 
@@ -1086,7 +1086,7 @@ for my $case (
     [ 'PIPELINE_ENTER', 'PIPELINE_EXIT' ],
     'a dying pipeline coderef still runs exit (no sync)';
   is $b3->{pool}{released}[0], undef,
-    'a failed pipeline does not release its connection, it retires it (karr k396)';
+    'a failed pipeline does not release its connection, it retires it';
 
   # A backend that overrides NONE of the three seams -- the
   # documented default for "cannot pipeline" -- must not leak a connection.

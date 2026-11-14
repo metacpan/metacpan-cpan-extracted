@@ -7,7 +7,7 @@ use Carp           qw(croak);
 use File::Basename qw(basename);
 use Scalar::Util   qw(openhandle);
 
-our $VERSION = '2.001';
+our $VERSION = '2.002';
 
 sub new {
   my ($class, $file_name, $contents, $content_type) = @_;

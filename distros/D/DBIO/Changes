@@ -1,5 +1,138 @@
 Revision history for DBIO
 
+0.900005  2026-11-13
+    * Added
+        - DBIO::Test::Slow marks a test file as slow: with it loaded after
+          Test::More, the file is skipped when DBIO_TEST_FAST is true, unless
+          RELEASE_TESTING or AUTOMATED_TESTING is true, which always runs the
+          full suite.
+    * Changed
+        - InflateColumn::DateTime gives every column type its own channel: a
+          column asking for inflation (inflate_datetime, inflate_timestamp,
+          inflate_date) whose data_type is not date, datetime, timestamp or one
+          of their listed variants goes to parse_<type>/format_<type> of the
+          storage's datetime parser (datetime2(7) to datetime2, time with time
+          zone to time_with_time_zone), each direction on its own. Where the
+          parser lacks the method, inflate_date uses parse_date/format_date and
+          any other request parse_datetime/format_datetime.
+        - InflateColumn::DateTime inflates a date read through the date channel
+          to the calendar day the parser read, floating at 12:00:00 instead of
+          midnight, whatever time and zone the parser returned, so that the
+          calendar day survives the conversion to the column's timezone. Writing through the date
+          channel does not convert to the column's timezone: the calendar day
+          of the value in its own time zone is written (2026-10-25 00:30
+          Europe/Berlin into a date column with timezone UTC writes
+          2026-10-25), and the caller's DateTime object is not changed.
+        - A storage whose date type carries a time of day, as Oracle's DATE
+          does, says so with datetime_date_carries_time
+          (DBIO::Storage::DBI); its date columns keep the time they are read
+          and written with and follow the column's timezone like a datetime.
+        - InflateColumn::DateTime leaves a time of day (time, time without time
+          zone, time with time zone, timetz) a string unless inflate_datetime
+          or inflate_timestamp asks for it. Asked for, the column goes to the
+          channel of its type, then to parse_time/format_time (for a type with
+          a zone to parse_timetz/format_timetz), then to the core's own reader
+          and writer for HH:MM:SS[.fraction] (with Z, +HH or +HH:MM for a type
+          with a zone); it never falls back to parse_datetime/format_datetime.
+          The inflated value stands on 1970-01-01, is floating without a zone
+          and keeps the offset it was read with as a fixed offset with one,
+          and is not converted to the column's timezone, neither read nor
+          written. Writing uses the time in the value's own zone and leaves the
+          caller's object as it is; a floating value in a column with a zone
+          is written without an offset.
+        - InflateColumn::DateTime converts a copy of a value to the column's
+          timezone when writing; the caller's DateTime object keeps its zone
+          and locale.
+        - A driver declares a pending refusal in DBIO::Test::Conformance
+          (conformance_refusals, conformance_refused_areas) and a transport a
+          pending deviation in DBIO::Test::AsyncParity (parity_deviations) with
+          kind => 'pending' and a reason regex saying why; the declaration has
+          no card field, the closing line of a run names each case or area and
+          its kind, and the cases carry no cards field.
+    * Fixes
+        - An exception or carp message raised from DBIO names the place of
+          the caller outside DBIO ("at FILE line N") also when only skipped
+          frames (eval, anonymous subs, Try::Tiny blocks) lie between that
+          caller and DBIO, e.g. a callback run by a future; the full stack
+          trace is given only when there is no such place.
+        - dbiogen never prints the connect info's password when the connect
+          itself dies, e.g. for a DSN without a dbi:<driver>: prefix; every
+          failed connect is reported as 'Could not connect to database' with
+          the password masked.
+        - DBIO::Test::AsyncHarness->await works where Time::HiRes::alarm is
+          not implemented (Windows), using perl's alarm in whole seconds
+          rounded up.
+        - DBIO::Test::AsyncHarness->await lets an outer alarm due before the
+          timeout fire on systems that deliver the signal late (BSD, macOS):
+          it takes the alarm off the clock only once it has fired (its
+          handler has run), with no fixed waiting time. A DEFAULT alarm is left
+          untouched, an IGNOREd one counts as fired when it is due, and a
+          ceiling ends the wait if the signal never comes. It also does not
+          take a negative remaining time (Cygwin) for a running alarm, and
+          sees an alarm set with perl's alarm where that is a separate timer
+          (Solaris).
+        - maint/test-runner/check-ways masks passwords in the DSNs and connect
+          errors it prints.
+        - DBIO::Test::Conformance copies its case lists without
+          Storable::dclone, so they load on Perl before 5.28 where Storable
+          cannot store a Regexp; new DBIO::Util::deep_copy.
+        - Extension input verification compares the value an extension can
+          see (including Regexp, code references and objects) instead of
+          Storable's byte image, so reading a value in another context no
+          longer reports a changed input.
+        - Stack traces built by DBIO::Util name the last-read handle of a
+          chunk read only where the running Carp does, so they match Carp's
+          own on older perls.
+        - InflateColumn::Serializer::YAML requires YAML 1.25 and dies at
+          load with an older YAML, instead of returning blessed objects.
+        - Extension option and result comparison share one value form,
+          DBIO::Util::canonical_text: the same code reference declared twice
+          no longer dies in Storable, a Regexp compares by pattern and flags,
+          and 4326 equals '4326'.
+        - Core requires Carp 1.38, so stack traces built by DBIO::Util show
+          the same number of arguments as Carp (older Carp shows one more
+          than $Carp::MaxArgNums).
+        - The async pool runs with Future::XS installed as it does with
+          Future::PP: the connection handed over once it is ready no longer
+          lets go of the Future whose callback is running.
+        - A transaction cancelled through its coderef's Future settles once
+          with Future::XS installed: a cancel does not cancel its own Future
+          a second time.
+        - DBIO::Test::Future has set_udata and udata like Future.pm, so tests
+          can lay data on a Future that is no hash.
+    * Tests
+        - TestDBIO::Child gives the child's output with \n as line end on
+          every platform, as on Linux.
+        - The dbiogen and dbioadmin script tests run without a shell, and the
+          execute-bit and 0600 trace-file checks skip on Windows, which has no
+          Unix file modes.
+        - The live-preflight test skips itself where the host does not start
+          PATH shebang scripts (the kubectl and ip stubs), and the
+          password-options test passes its JSON arguments through a launcher
+          that keeps their quotation marks (Windows).
+        - The capped-test test for a missing CPU quota accepts both host forms
+          of the message (cpu.max "is max 100000" or "is not readable").
+        - The test suite runs on Windows with Strawberry Perl from 5.20 like on
+          Linux: test child perls start through TestDBIO::Child (open3, script
+          file, output in a file, time limit by polling), with no list-form
+          pipe open, no timeout command and no multi-line -e.
+          DBIO::Test::AsyncHarness::await ends a wait by the clock in its own
+          loop where the platform delivers the alarm late; its POD says an
+          outer alarm cannot be borrowed where perl's alarm reports no time
+          left (Windows). The late-timer test is skipped where
+          Time::HiRes::alarm is unimplemented.
+    * Documentation
+        - The agent skills, house rules and agents state the current Conformance
+          areas (DDL, Diff, Bind), skipping a test on a missing capability,
+          value-free error texts, the coordinated version step, and that
+          release, tag and push wait for the maintainer's go; the
+          DBIO::SQLMaker::ClassicExtensions POD says how an upsert condition
+          renders without a table.
+        - The live-testing reference of the dbio-driver-development skill
+          names the short form dbio-db env <db> the driver skills use.
+    * Dependencies
+        - Requires DBI 1.634, the floor the driver dists ask for.
+
 0.900004  2026-11-08
     * Breaking Changes
         - The minimum Perl version is 5.020, in step with the driver dists.

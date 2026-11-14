@@ -6,7 +6,7 @@ AnyEvent::MCP::Config - named servers and derived MCP credentials
 
    use AnyEvent::MCP::Config;
 
-   my $config = AnyEvent::MCP::Config->global;
+   my $config = AnyEvent::MCP::Config::global_config;
    my $token = $config->user_credentials ("agni")->[0][2];
    my $url = $config->http_url ("agni", undef, path => "/");
 
@@ -20,15 +20,15 @@ C<[instance NAME]>, in that order of precedence. An absent global
 C<user.default> is implicitly enabled at generation 1.
 
 The shared file format is described in L<AnyEvent::MCP/GLOBAL CONFIGURATION>.
-Loading this module does not read any files. The first call to C<global>
-reads the configuration, ensures a master secret exists and caches the object
-for the process.
+Loading this module does not read any files. C<global_config> loads the
+configuration, ensures a persistent master secret exists and caches the
+initialized object for the process.
 
-A missing secret is generated using C<AnyEvent::MCP::random_bytes> and saved
-when possible. Saving failure produces a warning; the generated secret remains
-usable in this process, but another process might derive different credentials.
-A supplied invalid secret is an error. Changing or losing the master secret
-invalidates all credentials derived from it.
+A missing secret is generated using C<AnyEvent::MCP::random_bytes> and
+appended under a file lock. Failure to save the secret is fatal, rather
+than using a temporary secret that other processes cannot reproduce.
+A supplied invalid secret is an error. Changing or losing the master
+secret invalidates all credentials derived from it.
 
 Derivation uses C<derive_secret> with the random master key.
 The application namespace, purpose, program, instance name and username are
@@ -40,25 +40,39 @@ accept it: authentication still belongs to the server.
 
 =over
 
-=item $config = AnyEvent::MCP::Config->global (file => $file)
+=item $config = AnyEvent::MCP::Config::global_config (file => $file)
 
-Returns the cached global configuration. The first call accepts the same
-arguments as C<new>; later calls return the same object without rereading
-the file. Call this explicitly during program startup.
+Return the process-global configuration object, loaded and initialized.
+The first call accepts the same arguments as C<new>, and ensures that the
+master secret is persistently stored. Later calls return the same object
+without rereading or reinitializing it.
 
 =item $config = AnyEvent::MCP::Config->new (file => $file)
 
-Reads C<$file>, or the default file when omitted, and ensures a master
-secret exists. Unlike C<global>, each call creates an independent object.
-A missing file is allowed; other read errors are fatal. Sections are available
-as C<< $config->{section}{$section} >>, each a hash reference of string
-values. Named servers use C<[instance NAME]>.
+Construct an independent configuration object without reading or writing
+the file. C<$file> defaults to the global configuration path.
 
-=item $config = AnyEvent::MCP::Config->init (file => $file)
+=item $config->load
 
-Explicitly creates the configuration file with a random secret, mode 0600.
-Creates missing parent directories with mode 0700. Fails if the file already
-exists, so it cannot accidentally replace an existing secret.
+Reload the file, replacing the object's sections. A missing file yields an
+empty configuration; other read and parsing errors are fatal. Sections are
+available as C<< $config->{section}{$section} >>, each a hash reference of
+string values. Named servers use C<[instance NAME]>. An optional raw file
+handle can be supplied when the caller already holds the file lock.
+
+=item $config->save
+
+Write the loaded sections back as canonical UTF-8 INI text, sorting
+sections and keys. Comments and original formatting are not retained.
+The caller must hold C<AnyEvent::MCP::file_lock> through the update.
+Returns the configuration object.
+
+=item $config->ensure_secret
+
+Ensure that C<[global]> contains a valid persistent master secret. If
+missing, lock and reread the file, generate a secret only if still absent,
+and append it without changing other settings. Fail if it cannot be saved
+or is invalid. Returns the configuration object.
 
 =item $bytes = $config->derive_secret ($length, @info)
 
@@ -66,7 +80,7 @@ exists, so it cannot accidentally replace an existing secret.
 
 Derive C<$length> secret bytes from the configuration's master secret and
 an ordered list of context byte strings C<@info>. The class form uses
-C<global>, loading the default configuration on first use and reusing it
+C<global_config>, loading the default configuration on first use and reusing it
 thereafter. The object form uses that object's configuration, including
 one loaded from an explicit file.
 
@@ -137,11 +151,11 @@ Returns the invoked program basename, stripping C<.pl> or C<.perl>.
 An inline Perl invocation uses C<perl>. This identity also selects the
 C<[program PROGRAM]> configuration section; it is independent of routing aliases.
 
-=item $name = AnyEvent::MCP::Config::server_name ($name)
+=item $user = AnyEvent::MCP::Config::user_name ($user)
 
-Validate a service-instance name, or use C<default> if undefined.
-Names consist of an ASCII letter or underscore followed by letters, digits,
-underscores or hyphens.
+Validate a managed username (ASCII letter or underscore, followed by
+letters, digits, underscores or hyphens). Instance names are validated by
+L<AnyEvent::MCP/SMALL UTILITIES>.
 
 =item @options = AnyEvent::MCP::Config::http_getopt (\$name, \$bind, \$print_url, \@tokens)
 
@@ -152,10 +166,12 @@ Return standard C<Getopt::Long> options referring to the caller's scalars.
 Derive a stable default port in 16384..32767 from the master secret and
 program basename and service-instance name. Collisions produce ordinary listener bind errors.
 
-=item %settings = $config->http_settings ($name, $bind)
+=item %settings = $config->http_settings ($name, $bind, $default_port)
 
 Resolve HTTP settings from C<[instance NAME]> and an optional command-line
-C<bind> override. The default is IPv4 loopback and the name-derived port.
+C<bind> override. The default is IPv4 loopback and the name-derived port;
+an optional C<default_port> replaces the derived port when no bind port
+is specified.
 The bind setting accepts C<ADDRESS:PORT>, C<[IPv6]:PORT>, C<ADDRESS>,
 and C<:PORT> (which keeps the default loopback address).
 Hostnames are resolved once when settings are obtained; their original
@@ -181,6 +197,38 @@ C<auth =E<gt> "none"> do not require that persistence check.
 
 =back
 
+=head1 INI FUNCTIONS
+
+These functions work with Unicode character strings, not octets. Use
+L<AnyEvent::MCP/file_load> and L<AnyEvent::MCP/file_save> for UTF-8
+file I/O. Binary values belong in Base64 or hexadecimal form.
+
+=over
+
+=item $sections = AnyEvent::MCP::Config::parse_ini ($text, $filename)
+
+Parse Unicode INI text into C<[[NAME, {KEY =E<gt> VALUE}], ...]>.
+Sections retain file order, including repeated section names and the
+initial unnamed section C<"">. Duplicate keys within one section use
+the final value. C<$filename> is optional, for line-numbered errors.
+
+=item $merged = AnyEvent::MCP::Config::merge_sections ($sections, $default)
+
+Return a hash mapping section names to key/value hashes, with later
+sections overriding earlier ones. When C<$default> is given, unnamed
+sections use that name (C<global> for global configuration and
+C<account> for IMAP accounts). Use the original ordered list instead
+for files where repeated sections are meaningful, such as permission rules.
+
+=item $text = AnyEvent::MCP::Config::serialize_ini ($sections)
+
+Serialize an ordered section list to canonical INI text. Section order
+is preserved; keys within each section are sorted. Values must be
+single-line character strings. Comments and whitespace formatting
+are deliberately not preserved on rewrite.
+
+=back
+
 =cut
 
 package AnyEvent::MCP::Config;
@@ -190,14 +238,67 @@ use common::sense;
 use Digest::SHA ();
 use MIME::Base64 ();
 use File::Basename ();
-use File::Path ();
-use Fcntl qw(O_WRONLY O_RDWR O_CREAT O_EXCL LOCK_EX);
 use Errno qw(ENOENT);
 
 use AnyEvent::Socket ();
 use AnyEvent::MCP ();
 
 our @ISA = qw(AnyEvent::MCP::Base);
+
+sub parse_ini {
+   my ($text, $file) = @_;
+   $file //= "INI";
+   my @sections = (["", {}]);
+   my $line = 0;
+
+   for (split /\n/, $text) {
+      ++$line;
+      s/\r\z//;
+      next if /\A\s*(?:[#;]|\z)/;
+      if (/\A\s*\[([^\]\r\n]+)\]\s*\z/) {
+         push @sections, [$1, {}];
+      } elsif (/\A\s*([^=\s]+)\s*=\s*(.*?)\s*\z/) {
+         $sections[-1][1]{$1} = $2;
+      } else {
+         die "$file:$line: invalid INI line\n";
+      }
+   }
+
+   \@sections
+}
+
+sub merge_sections {
+   my ($sections, $default) = @_;
+   my %merged;
+
+   for (@$sections) {
+      my ($name, $kv) = @$_;
+      $name = $default if defined $default && $name eq "";
+      my $values = $merged{$name} ||= {};
+      %$values = (%$values, %$kv);
+   }
+
+   \%merged
+}
+
+sub serialize_ini {
+   my ($sections) = @_;
+
+   join "", map {
+      my ($name, $values) = @$_;
+      $name !~ /[\]\r\n]/ or die "Invalid INI section name\n";
+      (length $name ? "[$name]\n" : "")
+         . (join "", map {
+            length && !/[=\s]/ && !/\A[#;]/
+               or die "Invalid INI key\n";
+            my $value = $values->{$_};
+            defined $value && !ref $value && $value !~ /[\r\n]/
+               or die "Invalid INI value for $_\n";
+            "$_ = $value\n"
+         } sort keys %$values)
+         . "\n"
+   } @$sections
+}
 
 sub _file {
    my $dir = $ENV{XDG_CONFIG_HOME}
@@ -208,10 +309,8 @@ sub _file {
 
 my $global;
 
-sub global {
-   my $class = shift;
-
-   $global ||= $class->new (@_)
+sub global_config {
+   $global //= __PACKAGE__->new (@_)->load->ensure_secret
 }
 
 sub new {
@@ -219,85 +318,57 @@ sub new {
 
    my $self = $class->SUPER::new (section => {}, %kv);
    $self->{file} = _file unless exists $self->{file};
+   $self
+}
 
-   if (open my $fh, "<:encoding(UTF-8)", $self->{file}) {
-      $self->_read ($fh);
-      close $fh or die "$self->{file}: $!\n";
-   } else {
-      die "$self->{file}: $!\n" unless $! == ENOENT;
+sub load {
+   my ($self, $fh) = @_;
+   $self->{section} = {};
+
+   unless ($fh) {
+      open $fh, "<:raw", $self->{file} or do {
+         die "$self->{file}: $!\n" unless $! == ENOENT;
+         return $self
+      };
    }
 
-   $self->_ensure_secret;
-
-   $self->{section}{global}{secret} =~ /\A[0-9a-fA-F]{128}\z/
-      or die "$self->{file}: invalid secret; supply 128 hexadecimal digits\n";
+   seek $fh, 0, 0 or die "$self->{file}: $!\n";
+   $self->{section} = merge_sections (parse_ini (AnyEvent::MCP::file_load ($self->{file}, $fh), $self->{file}), "global");
+   close $fh or die "$self->{file}: $!\n" unless @_ > 1;
 
    $self
 }
 
-sub _read {
-   my ($self, $fh) = @_;
-
-   local $/;
-   AnyEvent::MCP::parse_ini scalar (<$fh>), sub {
-      my ($name, $kv) = @_;
-      my $section = $self->{section}{$name || "global"} ||= {};
-      %$section = (%$section, %$kv);
-   }, $self->{file};
-}
-
-sub _ensure_secret {
+sub save {
    my ($self) = @_;
 
-   return if exists $self->{section}{global}{secret};
-
-   my $secret = eval { unpack "H*", AnyEvent::MCP::random_bytes 64 };
-   die "$@Supply a securely generated 128-digit hexadecimal secret in $self->{file}\n"
-      if $@;
-
-   eval {
-      File::Path::mkpath (File::Basename::dirname ($self->{file}), 0, 0700);
-      sysopen my $fh, $self->{file}, O_RDWR | O_CREAT, 0600
-         or die "$self->{file}: $!\n";
-      flock $fh, LOCK_EX or die "$self->{file}: $!\n";
-      binmode $fh, ":encoding(UTF-8)";
-
-      my $disk = bless { file => $self->{file}, section => {} }, ref $self;
-      $disk->_read ($fh);
-
-      unless (exists $disk->{section}{global}{secret}) {
-         seek $fh, 0, 2 or die "$self->{file}: $!\n";
-         print {$fh} "\n[global]\nsecret = $secret\n"
-            or die "$self->{file}: $!\n";
-         $disk->{section}{global}{secret} = $secret;
-      }
-
-      close $fh or die "$self->{file}: $!\n";
-      $self->{section} = $disk->{section};
-      1
-   } or warn "Cannot save MCP master secret; credentials may only be stable for this process: $@";
-
-   $self->{section}{global}{secret} = $secret
-      unless exists $self->{section}{global}{secret};
+   AnyEvent::MCP::file_save $self->{file},
+      serialize_ini [map [$_, $self->{section}{$_}], sort keys %{$self->{section}}];
+   $self
 }
 
-sub init {
-   my ($class, %kv) = @_;
+sub ensure_secret {
+   my ($self) = @_;
 
-   my $file = exists $kv{file} ? $kv{file} : _file;
+   unless (exists $self->{section}{global}{secret}) {
+      my $lock = AnyEvent::MCP::file_lock $self->{file};
+      $self->load ($lock);
 
-   my $secret = AnyEvent::MCP::random_bytes 64;
+      unless (exists $self->{section}{global}{secret}) {
+         my $secret = eval { unpack "H*", AnyEvent::MCP::random_bytes 64 };
+         die "$@Supply a securely generated 128-digit hexadecimal secret in $self->{file}\n"
+            if $@;
+         seek $lock, 0, 2 or die "$self->{file}: $!\n";
+         print {$lock} "\n[global]\nsecret = $secret\n" or die "$self->{file}: $!\n";
+         $self->{section}{global}{secret} = $secret;
+      }
 
-   File::Path::mkpath (File::Basename::dirname ($file), 0, 0700);
+      close $lock or die "$self->{file}: $!\n";
+   }
 
-   sysopen my $fh, $file, O_WRONLY | O_CREAT | O_EXCL, 0600
-      or die "$file: $!\n";
-
-   print {$fh} "[global]\nsecret = ", unpack ("H*", $secret), "\n"
-      or die "$file: $!\n";
-   close $fh or die "$file: $!\n";
-
-   $class->new (file => $file)
+   $self->{section}{global}{secret} =~ /\A[0-9a-fA-F]{128}\z/
+      or die "$self->{file}: invalid secret; supply 128 hexadecimal digits\n";
+   $self
 }
 
 sub _prk_derive_secret($$@) {
@@ -324,7 +395,7 @@ sub _prk_derive_secret($$@) {
 sub derive_secret {
    my ($self, $length, @info) = @_;
 
-   $self = $self->global unless ref $self;
+   $self = global_config () unless ref $self;
 
    my $secret = $self->{section}{global}{secret};
    $secret =~ /\A[0-9a-fA-F]{128}\z/
@@ -339,13 +410,11 @@ sub program_name {
    $name eq "-e" ? "perl" : $name
 }
 
-sub server_name {
+sub user_name {
    my ($name) = @_;
 
-   $name = "default" unless defined $name;
-
-   $name =~ /\A[A-Za-z_][A-Za-z0-9_-]*\z/
-      or die "Invalid MCP server name '$name'\n";
+   defined $name && $name =~ /\A[A-Za-z_][A-Za-z0-9_-]*\z/
+      or die "Invalid MCP user name\n";
 
    $name
 }
@@ -375,7 +444,7 @@ sub credential {
 sub users {
    my ($self, $name, $program) = @_;
 
-   $name = server_name $name;
+   $name = AnyEvent::MCP::instance_name $name;
    $program //= program_name;
    my %users = (default => { scope => "global", generation => 1 });
 
@@ -403,7 +472,7 @@ sub users {
 sub user_credentials {
    my ($self, $name, $program) = @_;
 
-   $name = server_name $name;
+   $name = AnyEvent::MCP::instance_name $name;
    $program //= program_name;
    my $users = $self->users ($name, $program);
    my @credentials;
@@ -426,12 +495,12 @@ sub user_credentials {
 sub connect_user {
    my ($self, $name, $program) = @_;
 
-   $name = server_name $name;
+   $name = AnyEvent::MCP::instance_name $name;
    $program //= program_name;
    my $user = $self->{section}{"instance $name"}{connect_user}
       // $self->{section}{"program $program"}{connect_user}
       // $self->{section}{global}{connect_user} // "default";
-   server_name $user
+   user_name $user
 }
 
 sub http_getopt {
@@ -444,7 +513,7 @@ sub auto_rules {
    my ($self, $name) = @_;
    my %settings = (
       %{$self->{section}{"program " . program_name ()} || {}},
-      %{$self->{section}{"instance " . server_name ($name)} || {}},
+      %{$self->{section}{"instance " . AnyEvent::MCP::instance_name ($name)} || {}},
    );
    my @rules;
 
@@ -464,7 +533,7 @@ sub auto_rules {
 sub server_port {
    my ($self, $name) = @_;
 
-   $name = server_name $name;
+   $name = AnyEvent::MCP::instance_name $name;
 
    16384 + (
       (unpack "n", $self->derive_secret (
@@ -476,14 +545,14 @@ sub server_port {
 }
 
 sub http_settings {
-   my ($self, $name, $bind) = @_;
+   my ($self, $name, $bind, $default_port) = @_;
 
-   $name = server_name $name;
+   $name = AnyEvent::MCP::instance_name $name;
    my $settings = {
       %{ $self->{section}{"program " . program_name ()} },
       %{ $self->{section}{"instance $name"} },
    };
-   my $port = $self->server_port ($name);
+   my $port = $default_port // $self->server_port ($name);
    my $configured = $settings->{bind} // "127.0.0.1:$port";
    $configured = "127.0.0.1$configured" if $configured =~ /\A:[0-9]+\z/;
    my ($configured_host, $configured_port) = AnyEvent::Socket::parse_hostport $configured, $port;
@@ -534,7 +603,7 @@ sub http_settings {
 sub http_url {
    my ($self, $name, $bind, %options) = @_;
 
-   $name = server_name $name;
+   $name = AnyEvent::MCP::instance_name $name;
 
    # only a derived token depends on the master secret surviving this process.
    if (($options{auth} || "") ne "none"
@@ -542,13 +611,13 @@ sub http_url {
       && !exists $self->{section}{"instance $name"}{tokens}
       && !exists $self->{section}{"program " . program_name ()}{tokens}
       && !exists $self->{section}{global}{tokens}) {
-      my $stored = (ref $self)->new (file => $self->{file});
+      my $stored = (ref $self)->new (file => $self->{file})->load;
       $stored->{section}{global}{secret} eq $self->{section}{global}{secret}
          or die "MCP master secret is not persistently stored in $self->{file}\n";
    }
 
    require AnyEvent::MCP::Server::HTTP;
-   my %http = $self->http_settings ($name, $bind);
+   my %http = $self->http_settings ($name, $bind, delete $options{default_port});
    delete $http{tokens} if ($options{auth} || "") eq "none";
 
    AnyEvent::MCP::Server::HTTP->new (%http, %options)->url

@@ -4,7 +4,7 @@ package DBIO::Test::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Scalar::Util ();
 use DBIO::Exception ();
@@ -44,6 +44,19 @@ sub _settle {
 
 sub is_ready  { return $_[0]{state} ne 'pending' }
 sub is_failed { return $_[0]{state} eq 'failed' }
+
+# Data a test lays on a Future, as Future.pm's set_udata / udata (Future 0.50):
+# the way that works for Future::XS objects too, which are no hashes.
+sub set_udata {
+  my ($self, $name, $value) = @_;
+  $self->{"u_$name"} = $value;
+  return $self;
+}
+
+sub udata {
+  my ($self, $name) = @_;
+  return $self->{"u_$name"};
+}
 
 sub get {
   my ($self) = @_;
@@ -177,7 +190,7 @@ DBIO::Test::Future - Manually settled Future for deterministic DBIO tests
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

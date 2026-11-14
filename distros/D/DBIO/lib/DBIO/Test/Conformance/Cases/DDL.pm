@@ -4,9 +4,9 @@ package DBIO::Test::Conformance::Cases::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
+use DBIO::Util ();
 use DBIO::Schema::Type ();
 
 
@@ -17,8 +17,6 @@ my @CASES = (
   {
     name  => 'ddl-default-string-apostrophe',
     since => 1,
-    cards => [ 'dbio-sqlite k57', 'dbio-postgresql k117', 'dbio-mysql k78',
-               'dbio-firebird k47', 'dbio-oracle k47' ],
     subject => { source => 'Note', column => 'note' },
     input => { sources => [ {
       name => 'Note', table => 'note',
@@ -38,7 +36,6 @@ my @CASES = (
   {
     name  => 'ddl-default-digit-string',
     since => 1,
-    cards => [ 'dbio-db2 k46', 'dbio-sqlite measured 2026-10-08' ],
     subject => { source => 'Code', column => 'code' },
     input => { sources => [ {
       name => 'Code', table => 'code',
@@ -58,7 +55,6 @@ my @CASES = (
   {
     name  => 'ddl-default-expression',
     since => 1,
-    cards => [ 'dbio-mysql k78', 'dbio-sqlite k68', 'dbio-sqlite k56 (done)' ],
     subject => { source => 'Stamp', column => 'created' },
     input => { sources => [ {
       name => 'Stamp', table => 'stamp',
@@ -79,7 +75,6 @@ my @CASES = (
   {
     name  => 'ddl-enum-value-apostrophe',
     since => 1,
-    cards => [ 'dbio-postgresql k117' ],
     subject => { source => 'Pick', column => 'kind' },
     input => { sources => [ {
       name => 'Pick', table => 'pick',
@@ -99,9 +94,6 @@ my @CASES = (
   {
     name  => 'ddl-ident-reserved-word',
     since => 1,
-    cards => [ 'dbio-postgresql k115', 'dbio-oracle k42', 'dbio-mysql k88',
-               'dbio-mysql k77 (done)', 'dbio-firebird k32 (done)',
-               'dbio-sqlite measured 2026-10-08' ],
     subject => { source => 'Order', column => 'group' },
     input => { sources => [ {
       name => 'Order', table => 'order',
@@ -125,7 +117,6 @@ my @CASES = (
   {
     name  => 'ddl-ident-mixed-case',
     since => 1,
-    cards => [ 'dbio-postgresql k110', 'dbio-oracle k42' ],
     subject => { source => 'MixedCase', column => 'camelCol' },
     input => { sources => [ {
       name => 'MixedCase', table => 'MixedCase',
@@ -145,7 +136,6 @@ my @CASES = (
   {
     name  => 'ddl-ident-special-chars',
     since => 1,
-    cards => [ 'dbio-mysql k77 (done)' ],
     subject => { source => 'Odd', column => 'odd "c" `n`' },
     input => { sources => [ {
       name => 'Odd', table => 'odd "t" `n`',
@@ -168,7 +158,6 @@ my @CASES = (
   {
     name  => 'ddl-view-declared',
     since => 1,
-    cards => [ 'dbio-sqlite k67', 'dbio-postgresql k100', 'dbio-sqlite k56 (done)' ],
     subject => { source => 'BaseView' },
     input => { sources => [
       {
@@ -206,7 +195,6 @@ my @CASES = (
   {
     name  => 'ddl-unique-constraint',
     since => 1,
-    cards => [ 'dbio-db2 k39', 'dbio-firebird k34', 'dbio-oracle k46' ],
     subject => { source => 'Pair', column => 'a' },
     input => { sources => [ {
       name => 'Pair', table => 'pair',
@@ -228,7 +216,6 @@ my @CASES = (
   {
     name  => 'ddl-foreign-key',
     since => 1,
-    cards => [ 'dbio-firebird k34', 'dbio-oracle k42' ],
     subject => { source => 'Child', column => 'parent_id' },
     input => { sources => [
       {
@@ -257,7 +244,6 @@ my @CASES = (
   {
     name  => 'ddl-fk-actions',
     since => 1,
-    cards => [ 'dbio-sqlite k66 (done)' ],
     subject => { source => 'Child', column => 'parent_id' },
     input => { sources => [
       {
@@ -288,7 +274,6 @@ my @CASES = (
   {
     name  => 'ddl-fk-two-rels-one-column',
     since => 1,
-    cards => [ 'dbio-sqlite k74' ],
     subject => { source => 'Child', column => 'parent_id' },
     input => { sources => [
       {
@@ -317,7 +302,6 @@ my @CASES = (
   {
     name  => 'ddl-fk-table-order',
     since => 1,
-    cards => [ 'dbio-mysql k84' ],
     subject => { source => 'AChild', column => 'parent_id' },
     input => { sources => [
       {
@@ -346,7 +330,6 @@ my @CASES = (
   {
     name  => 'ddl-auto-increment',
     since => 1,
-    cards => [ 'dbio-firebird k46', 'dbio-oracle k41', 'dbio-db2 k45' ],
     subject => { source => 'Counter', column => 'id' },
     input => { sources => [ {
       name => 'Counter', table => 'counter',
@@ -366,7 +349,6 @@ my @CASES = (
   {
     name  => 'ddl-type-size-char',
     since => 2,
-    cards => [ 'dbio-postgresql k116', 'dbio-sybase k70' ],
     subject => { source => 'Sized', column => 'c' },
     input => { sources => [ {
       name => 'Sized', table => 'sized',
@@ -385,7 +367,6 @@ my @CASES = (
   {
     name  => 'ddl-type-size-bit',
     since => 2,
-    cards => [ 'dbio-postgresql k116', 'dbio-sybase k70' ],
     subject => { source => 'Sized', column => 'b' },
     input => { sources => [ {
       name => 'Sized', table => 'sized',
@@ -403,8 +384,6 @@ my @CASES = (
   {
     name  => 'ddl-base-types-roundtrip',
     since => 1,
-    cards => [ 'dbio-sqlite t/36', 'dbio-postgresql t/28', 'dbio-mysql t/53',
-               'dbio-firebird k36', 'dbio-sybase k52', 'dbio-db2 k45' ],
     subject => { source => 'Types' },
     input => { sources => [ {
       name => 'Types', table => 'types',
@@ -432,7 +411,6 @@ my @CASES = (
   {
     name  => 'ddl-index-on-unique-columns',
     since => 1,
-    cards => [ 'dbio-db2 k47', 'dbio-mysql k92' ],
     subject => { source => 'Child', column => 'a' },
     input => { sources => [
       {
@@ -468,7 +446,6 @@ my @CASES = (
   {
     name  => 'ddl-qualified-source-name',
     since => 1,
-    cards => [ 'dbio-mysql k89' ],
     subject => { source => 'Qualified' },
     input => { sources => [ {
       name => 'Qualified', table => 'other.t',
@@ -484,7 +461,6 @@ my @CASES = (
   {
     name  => 'ddl-unique-not-null-without-pk',
     since => 1,
-    cards => [ 'dbio-mysql k83' ],
     subject => { source => 'Loose', column => 'code' },
     input => { sources => [ {
       name => 'Loose', table => 'loose',
@@ -501,7 +477,7 @@ my @CASES = (
 );
 
 sub cases {
-  return Storable::dclone([ @CASES ]);
+  return DBIO::Util::deep_copy([ @CASES ]);
 }
 
 1;
@@ -518,7 +494,7 @@ DBIO::Test::Conformance::Cases::DDL - The shared DDL cases every DBIO driver ans
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 DESCRIPTION
 
@@ -532,7 +508,6 @@ A case is a hash:
   {
     name    => 'ddl-default-string-apostrophe',   # stable id, ddl- prefix
     since   => 1,                                 # table version that added it
-    cards   => [ 'dbio-sqlite k57', ... ],        # where it came from; documentation
     subject => { source => 'Note', column => 'note' },   # optional, see below
     input   => { sources => [ { ... }, ... ] },
     expect  => [ { read_back => { ... } }, ... ],
@@ -542,7 +517,7 @@ C<input> and C<expect> are documented in L<DBIO::Test::Conformance/CASES>.
 C<subject> names what a refusal must mention: the table of C<source> and, when
 given, the C<column>. Without it the first source and no column.
 
-The order is the order of the ADR appendix, so a card's C<D5> is the fifth
+The order is the order of the ADR appendix, so C<D5> is the fifth
 entry. Names never change once published; a case that turns out wrong is
 replaced by a new one with a higher C<since>.
 

@@ -1,5 +1,5 @@
 package Proc::ShellSubset::Large;  # The large subset (doc/large-subset/large-subset-spec.md): Proc::ShellSubset, and where it rejects, a wider grammar
-our $VERSION = '0.11';
+our $VERSION = '0.12';
 use strict; use warnings; use Proc::ShellSubset; use List::Util qw(pairs pairvalues);
 
 # Proc::ShellSubset::Large::parse($string, %opt) returns a List, or { error, pos, last, tree } as Proc::ShellSubset::parse does.
@@ -373,13 +373,14 @@ sub pword {   # the Word of ${NAME OP word}, up to its '}'; $pat: a % or # form,
     my $p = pos;
     next if /\G\\\n/gc;
     if    (/\G([^"'\\~*?\[{}\$`\n]+)/gc) { push @s, [u => $1] }
-    elsif (/\G([\$`])/gc) { my $x = $1; bqdq($p) if $x eq '`' && $q; push @s, [x => $EX{$x}->($q, $p)] }
+    elsif (/\G([\$`])/gc) { my $x = $1; bqdq($p) if $x eq '`' && $q;   # X41: in a pattern the outer "..." does not quote
+      push @s, [x => $EX{$x}->($pat ? '' : $q, $p)] }                    #   an expansion's characters (POSIX; both shells)
     elsif (/\G\\(.)/sgc) { my $c = $1; push @s, $q && !$pat && $c !~ /[\$`"\\}]/ ? [u => "\\$c"] : [q => $c] }
     elsif (/\G'/gc) { push @s, $q && !$pat ? [u => "'"] : /\G([^']*)'/gc ? [q => $1] : E('unterminated quote', $p) }
     elsif (/\G"/gc) { push @s, [q => '']; dq(\@s, $p) }
     elsif ($pat && /\G([*?])/gc) { push @s, [g => $1] }
     elsif ($pat && /\G\[/gc) { push @s, /\G(!?\]?[^\] \t\n;&|()<>'"\\\$`{}^\/,]*\])/gc ? [g => "[$1"]
-                                 : bracket(\@s, $p, $q) ? () : [u => '['] }   # quotes, expansions inside (post4-0.04)
+                                 : bracket(\@s, $p, '') ? () : [u => '['] }   # quotes, expansions inside (post4-0.04; X41: active)
     elsif (!$pat && /\G([*?\[])/gc) { push @s, [u => $1] }   # ${x:-a?}: active only where the ${...} is unquoted (post4-0.04)
     else  { E(/\G\z/ ? "unterminated '\${'" : 'unsupported character in a ${...} word', $p) } }
   my $k = join '', map $$_[0], @s; my @v;

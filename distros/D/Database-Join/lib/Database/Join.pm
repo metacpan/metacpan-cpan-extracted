@@ -39,6 +39,15 @@ Readonly::Hash my %SAFE_LIST_OPS => map { $_ => 1 } ('IN', 'NOT IN');
 # A bare undef criterion value (col => undef) also generates IS NULL.
 Readonly::Hash my %SAFE_NOARG_OPS => map { $_ => 1 } ('IS NULL', 'IS NOT NULL');
 
+# Key pushdown (array backend): the most primary keys that are passed to a
+# secondary database as one { -in => [...] } criterion.  Each key is a bind
+# parameter, and SQLite builds before 3.32 allow at most 999 in a statement.
+# Past this, reading the whole secondary is no worse than several queries.
+Readonly::Scalar my $MAX_PUSHDOWN_KEYS => 999;
+
+# Database::Abstraction's spelling of SQL IN.  It croaks on 'IN'.
+Readonly::Scalar my $DA_IN_OP => '-in';
+
 # Valid aggregate functions for aggregate().  Lower-cased at validation time.
 Readonly::Hash my %AGGREGATE_FNS => map { $_ => 1 } qw(sum avg min max count count_distinct);
 
@@ -58,7 +67,7 @@ Readonly::Hash my %MANDATORY_OP_SQL => (
 	contains => 'LIKE',
 );
 
-use version; our $VERSION = version->declare('0.011.1');
+use version; our $VERSION = version->declare('0.011.2');
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -111,7 +120,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.011.1
+Version 0.011.2
 
 =head1 SYNOPSIS
 
@@ -284,6 +293,36 @@ a single SQL JOIN there, keeping peak RAM to roughly one times the source data
 size instead of three.  You can also force either path unconditionally with
 C<backend =E<gt> 'sqlite'> or C<backend =E<gt> 'array'>.
 
+B<Key pushdown (array backend)>
+
+Under a C<left> or C<inner> join, only secondary rows whose key is one of the
+primary's can appear in the result.  So once the primary has been read, each
+secondary that has no criterion on its join column is asked for just those
+keys, as C<< { -in => [ ... ] } >> on its local join column, instead of being
+read in full.  Joining a few hundred primary rows to a large secondary table
+then costs a few hundred rows, not the whole table.  Pushdown is skipped when:
+
+=over 4
+
+=item * the join is C<outer>, which needs every secondary key;
+
+=item * the primary has no rows, or more than 999 keys (the bind-parameter
+limit of older SQLite builds; past that, reading the whole table is no worse);
+
+=item * the query already has a criterion on the join column, which then
+stands as given;
+
+=item * the secondary's C<selectall_arrayref> is not
+C<Database::Abstraction>'s own.  A subclass that overrides it, or another
+object implementing the interface, may not understand C<-in>.
+
+=back
+
+If the secondary croaks on the C<-in> query, it is read in full instead.  The
+result is the same either way.  Pushdown only narrows what is fetched; it never
+counts as the secondary's own criterion, so it can't turn a C<left> join into
+an C<inner> one.
+
 =head2 Join semantics
 
 The C<join_type> parameter controls what happens when a particular key value
@@ -345,7 +384,10 @@ preserve both values under distinct names instead.
 =item Memory usage (array backend)
 
 When C<backend> is C<'array'> (or C<'auto'> and the dataset is small), all
-matching rows are fetched into Perl memory.  Peak RAM is roughly three times
+matching rows are fetched into Perl memory.  Key pushdown (see
+L</DESCRIPTION>) limits a secondary to the primary's keys under C<left> and
+C<inner> joins, but an C<outer> join, or a primary with more than 999 keys,
+still reads every secondary row.  Peak RAM is roughly three times
 the source data size.  For large datasets use C<backend =E<gt> 'sqlite'>, or
 leave C<backend =E<gt> 'auto'> and set C<max_array_rows> appropriately.
 
@@ -1689,6 +1731,8 @@ databases, optionally filtered by the given criteria.
 Criteria for columns that live in different databases are routed
 automatically: each database is queried with only the criteria that apply to
 its own columns.  The results are combined in memory using C<join_column>.
+Under a C<left> or C<inner> join, a secondary database is also limited to the
+primary's keys (see "Key pushdown" in L</DESCRIPTION>).
 
 Accepts the same criteria syntax as C<Database::Abstraction::selectall_arrayref>.
 A single plain scalar argument is interpreted as the C<join_column> value
@@ -3371,22 +3415,115 @@ sub _partition_criteria :Protected {
 	return \@per_db;
 }
 
-# _fetch_indexed( $db_idx, \%criteria ) -> \%join_val_to_\@rows
+# _select_rows( $db, \%criteria, \%pushdown_or_undef ) -> \@rows
+# Purpose: Fetch a component database's rows, asking for only the primary's
+#          keys when key pushdown applies, and falling back to the plain
+#          criteria if the database can't answer that.
+# Entry:   $db is a component database; $criteria is its partitioned criteria;
+#          $pushdown is undef, or $criteria plus { local_jc => { -in => [...] } }.
+# Exit:    Returns an arrayref of row hashrefs (never undef).
+# Effects: Calls selectall_arrayref once, or twice when the pushdown query
+#          croaks or returns a non-arrayref.
+# Notes:   A plain function, not a :Protected method, because the parallel
+#          path calls it inside a thread closure that deliberately doesn't
+#          capture $self.  The fallback costs only time: rows for keys outside
+#          the primary's are never merged, so either query gives the same
+#          result.  A genuine error (e.g. a missing file) croaks again from the
+#          fallback query, so it isn't hidden.  local $@ keeps a failed
+#          pushdown from leaking into the caller's $@.
+sub _select_rows {
+	my ($db, $criteria, $pushdown) = @_;
+
+	if ($pushdown) {
+		my $rows = do { local $@; eval { $db->selectall_arrayref($pushdown) } };
+		return $rows if ref($rows) eq 'ARRAY';
+	}
+
+	return $db->selectall_arrayref($criteria) // [];
+}
+
+# _understands_in( $db ) -> $bool
+# Purpose: Whether a component database can be given a { -in => [...] }
+#          criterion, i.e. whether its selectall_arrayref is
+#          Database::Abstraction's own.
+# Entry:   $db is a component database (any object with the DA interface).
+# Exit:    True or false.
+# Effects: None.
+# Notes:   isa('Database::Abstraction') isn't enough: a subclass that overrides
+#          selectall_arrayref with plain equality matching would compare each
+#          row with the hashref and silently return nothing, losing rows from a
+#          left join.  Database::Abstraction->can() is undef when the module
+#          isn't loaded, so then nothing is pushed down.  Plain function, since
+#          it needs no object state.
+sub _understands_in {
+	my $db = shift;
+
+	my $da_select = Database::Abstraction->can('selectall_arrayref');
+	my $db_select = blessed($db) ? $db->can('selectall_arrayref') : undef;
+
+	return ($da_select && $db_select && $db_select == $da_select) ? 1 : 0;
+}
+
+# _pushdown_criteria( \@per_db, \%primary_index ) -> \@pushdown
+# Purpose: Decide which secondary databases can be asked for only the primary's
+#          keys, and build the criteria to ask them with.  Without this a
+#          secondary with no criteria is read in full: joining 118 rows to a
+#          3,800-row, 17 MB CSV read the whole CSV (0.32s of a 0.34s join;
+#          0.02s with pushdown).
+# Entry:   \@per_db is the partitioned criteria from _partition_criteria, with
+#          base filters already overlaid; \%primary_index is the primary's
+#          rows indexed by join key, from _fetch_indexed.
+# Exit:    Returns an arrayref indexed like _dbs.  Element $i is a new criteria
+#          hashref for secondary $i, or undef where pushdown doesn't apply:
+#          an outer join (every secondary key is wanted); no primary keys; more
+#          than $MAX_PUSHDOWN_KEYS keys; a secondary that already has a
+#          criterion on its join column (the caller's restriction stands); or a
+#          secondary whose query method isn't Database::Abstraction's own (see
+#          _understands_in).
+# Effects: None.  \@per_db is not modified, so the pushed-down key never
+#          counts as a secondary's own criterion in the key-set resolution.
+# Notes:   The keys are sorted so that the same primary gives the same query,
+#          which keeps Database::Abstraction's query cache useful.
+sub _pushdown_criteria :Protected {
+	my ($self, $per_db, $primary_index) = @_;
+
+	my @pushdown;
+	my @keys = $self->{_join_type} eq 'outer' ? () : sort keys %{$primary_index};
+
+	# An empty -in list is an SQL syntax error on some backends, and an empty
+	# primary under left/inner already produced an empty result upstream
+	if (@keys && @keys <= $MAX_PUSHDOWN_KEYS) {
+		for my $i (1 .. $#{ $self->{_dbs} }) {
+			my $db       = $self->{_dbs}[$i];
+			my $local_jc = $self->{_join_map}{$i} // $self->{_join_col};
+			next if exists $per_db->[$i]{$local_jc};
+			next unless _understands_in($db);
+
+			# A copy per database, as in _partition_criteria, so that one
+			# database mutating its criteria can't affect another
+			$pushdown[$i] = { %{ $per_db->[$i] }, $local_jc => { $DA_IN_OP => [ @keys ] } };
+		}
+	}
+
+	return \@pushdown;
+}
+
+# _fetch_indexed( $db_idx, \%criteria [, \%pushdown] ) -> \%join_val_to_\@rows
 # Purpose: Query one component database and index its rows by join-key value.
 # Entry:   $db_idx is the zero-based database index; $criteria is the
-#          pre-partitioned criteria hashref for this database.
+#          pre-partitioned criteria hashref for this database; $pushdown is
+#          the optional key-pushdown criteria (see _select_rows).
 # Exit:    Returns a hashref: join-key value => arrayref of row hashrefs.
 #          Multiple rows sharing the same join-key value are all preserved
 #          (important for the primary database when one key maps to many rows).
 # Effects: Calls selectall_arrayref on the component database.
 sub _fetch_indexed :Protected {
-	my ($self, $db_idx, $criteria) = @_;
+	my ($self, $db_idx, $criteria, $pushdown) = @_;
 
 	my $db        = $self->{_dbs}[$db_idx];
 	my $local_jc  = $self->{_join_map}{$db_idx} // $self->{_join_col};
 
-	my $rows = $db->selectall_arrayref($criteria);
-	$rows //= [];
+	my $rows = _select_rows($db, $criteria, $pushdown);
 
 	my %indexed;
 	for my $row (@{$rows}) {
@@ -3521,7 +3658,7 @@ sub _joined_query_array :Protected {
 	# so all secondaries are queried concurrently.  Total latency becomes
 	# max(DA latencies) instead of sum(DA latencies).  The primary was already
 	# fetched sequentially above (needed for the early-exit short-circuit).
-	# The thread closure captures only $db, $crit, and $local_jc (plain scalars
+	# The thread closure captures only $db, $crit, $push and $local_jc (plain scalars
 	# or in-memory data) — $self is intentionally not captured to avoid copying
 	# the full blessed hashref (including all DA refs) into each thread.
 	# Falls back to sequential when: threads module is unavailable, n <= 2, or
@@ -3535,13 +3672,24 @@ sub _joined_query_array :Protected {
 	# complete, preserving correctness on every platform.
 	$indexed[$_] = {} for 1 .. $n - 1;
 
+	# Key pushdown: a secondary with no criteria on its join column would
+	# otherwise be read in full, although only rows matching a primary key can
+	# be merged under a left or inner join.  Ask it for just those keys.  A
+	# separate criteria list is used for the fetch so that the pushed-down key
+	# can never count as the secondary's own criteria in the key-set
+	# resolution below (which would turn a left join into an inner one).
+	# Outer joins need every secondary key, so they are excluded.  Only
+	# databases using Database::Abstraction's own query method are asked,
+	# since other implementations of the interface may not know -in.
+	my @pushdown = @{ $self->_pushdown_criteria($per_db, $indexed[0]) };
+
 	if ($self->{_parallel} && $n > 2) {
 		$HAS_THREADS //= do { local $@; eval { require threads; 1 } ? 1 : 0 };
 		if ($HAS_THREADS) {
 			my @thr;
 			for my $i (1 .. $n - 1) {
-				my ($db, $crit, $local_jc) = (
-					$self->{_dbs}[$i], $per_db->[$i],
+				my ($db, $crit, $push, $local_jc) = (
+					$self->{_dbs}[$i], $per_db->[$i], $pushdown[$i],
 					$self->{_join_map}{$i} // $join_col,
 				);
 				# Wrap thread creation: it can fail if the DA cannot be cloned
@@ -3553,7 +3701,7 @@ sub _joined_query_array :Protected {
 						# eval inside the thread: prevents a DA exception from
 						# killing the thread and returning an empty list to join().
 						local $@;
-						my $rows = eval { $db->selectall_arrayref($crit) } // [];
+						my $rows = eval { _select_rows($db, $crit, $push) } // [];
 						my %idx;
 						for my $row (@{$rows}) {
 							my $key = $row->{$local_jc};
@@ -3583,14 +3731,14 @@ sub _joined_query_array :Protected {
 			# result that may indicate a non-thread-safe DA (e.g. DBI on Windows).
 			for my $i (1 .. $n - 1) {
 				next if $done{$i};
-				$indexed[$i] = $self->_fetch_indexed($i, $per_db->[$i]);
+				$indexed[$i] = $self->_fetch_indexed($i, $per_db->[$i], $pushdown[$i]);
 			}
 		} else {
 			carp 'Database::Join: parallel => 1 requires the threads module; falling back to sequential';
-			$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 1 .. $n - 1;
+			$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_], $pushdown[$_]) for 1 .. $n - 1;
 		}
 	} else {
-		$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_]) for 1 .. $n - 1;
+		$indexed[$_] = $self->_fetch_indexed($_, $per_db->[$_], $pushdown[$_]) for 1 .. $n - 1;
 	}
 
 	# Premise: the key-set resolution loop starts at i=1 (primary seeds %key_set).

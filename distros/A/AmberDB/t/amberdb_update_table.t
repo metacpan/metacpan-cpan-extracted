@@ -14,7 +14,7 @@ use AmberDB::Tools;
 my $tmpdir = tempdir( CLEANUP => 1 );
 my $adb = AmberDB->new(
     path => { dbase_dir => $tmpdir },
-    cfg  => { language => 'tr', simple => 1 },
+    cfg  => { language => 'tr', use_simple => 1 },
 );
 my $tools = AmberDB::Tools->new($adb);
 

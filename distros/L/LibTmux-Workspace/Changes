@@ -1,0 +1,11 @@
+Revision history for LibTmux-Workspace
+
+Unreleased
+
+0.003  2026-11-13
+    - Link CPAN installation, native POD and the shared workspace API reference.
+    - Set the documentation homepage and require LibTmux 0.003.
+
+0.002
+    - Initial JSON workspace planning, loading and packaged CLI.
+    - Requires Perl 5.44; qualifies Linux x86_64 LP64 and tmux 3.3a–3.8.

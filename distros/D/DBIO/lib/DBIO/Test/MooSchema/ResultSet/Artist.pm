@@ -1,7 +1,7 @@
 package DBIO::Test::MooSchema::ResultSet::Artist;
 # ABSTRACT: Custom Moo-based ResultSet for the artist source
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use Moo;
 extends 'DBIO::ResultSet';
@@ -36,7 +36,7 @@ DBIO::Test::MooSchema::ResultSet::Artist - Custom Moo-based ResultSet for the ar
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 AUTHOR
 

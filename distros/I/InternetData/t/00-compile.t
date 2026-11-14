@@ -5,10 +5,16 @@ use Test::More;
 
 my @modules = qw(
     InternetData
+    InternetData::AsnResult
+    InternetData::Bogon
+    InternetData::Bogons
+    InternetData::Cache
     InternetData::Database
+    InternetData::DomainResult
     InternetData::Error
     InternetData::Oauth
     InternetData::OauthError
+    InternetData::Result
 );
 
 use_ok($_) for @modules;
@@ -20,6 +26,7 @@ my $version = InternetData->VERSION;
 ok($version, "the distribution version is $version");
 # The two refusal subclasses live in OauthError.pm, so they are loaded, not used.
 my @packages = (@modules, qw(InternetData::OauthAccessDeniedError InternetData::OauthExpiredTokenError));
-is($_->VERSION, $version, "$_ is at $version") for @packages;
+# The bogon table is generated, and carries no version of its own.
+is($_->VERSION, $version, "$_ is at $version") for grep { $_ ne 'InternetData::Bogons' } @packages;
 
 done_testing();

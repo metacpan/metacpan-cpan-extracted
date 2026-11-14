@@ -154,7 +154,7 @@ my @PASSWORDS = (
   # [ what, the password, as the trace shows it, $Carp::MaxArgLen if not Carp's own ]
   [ 'a password Carp shows as it is',                        # control: this one never leaked
     $PLAIN, '"***"' ],
-  [ 'a password longer than Carp shows (k314)',
+  [ 'a password longer than Carp shows',
     'k314-head-' . 'x' x 30 . '-k314-mid-' . 'y' x 30 . '-k314-tail', '"***"...' ],
   [ 'a password with @ $ " and \\ in it',
     'k314-head@k314-mid$"\\k314-tail', '"***"' ],

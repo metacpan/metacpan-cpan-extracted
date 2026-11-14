@@ -157,7 +157,7 @@ sub trail { [ map { ($_->{sql} =~ /^INSERT/ ? 'INSERT' : $_->{sql}) . '@' . $_->
   ], 'the batch exits pipeline mode and the transaction rolls back on the same connection';
   is_deeply $backend->pool->{released}, [],
     'and the connection is not released: the failed batch marked it unusable, '
-    . 'the boundary retires it (karr k396)';
+    . 'the boundary retires it';
 }
 
 # ---------------------------------------------------------------------------

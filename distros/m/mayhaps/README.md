@@ -7,13 +7,13 @@ mayhaps - call methods conditionally for any class or object
 ```perl
 use mayhaps;
 
-$obj->mayhaps::frobnicate( $has_hands, 'foo' );
+$obj->mayhaps::frobnicate( $bool, @args );
 ```
 
 is equivalent to
 
 ```
-($has_hands) ? $obj->frobnicate('foo') : $obj;
+($bool) ? $obj->frobnicate(@args) : $obj;
 ```
 
 # DESCRIPTION
@@ -40,11 +40,13 @@ There is already a module called [maybe](https://metacpan.org/pod/maybe) with a 
 
 # RECENT CHANGES
 
-Changes for version v0.1.1 (2026-11-13)
+Changes for version v0.1.2 (2026-11-13)
 
 - Documentation
-    - Improved the description.
-    - Fixed typo in synopsis.
+    - Improved synopsis.
+    - Added a security considerations section.
+- Tests
+    - Added more test cases.
 
 See the `Changes` file for more details.
 
@@ -88,6 +90,10 @@ dzil install --install-command="cpan ."
 ```
 
 For more information, see [How to install CPAN modules](https://www.cpan.org/modules/INSTALL.html).
+
+# SECURITY CONSIDERATIONS
+
+There is no validation of the object or the calling method.
 
 # SUPPORT
 

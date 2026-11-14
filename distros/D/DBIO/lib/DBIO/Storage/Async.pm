@@ -4,7 +4,7 @@ package DBIO::Storage::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
 use base 'DBIO::Storage';
 
@@ -1311,20 +1311,29 @@ sub _txn_chain_cancelled_with {
   my $fc    = $self->future_class;
   my $guard = $self->_txn_guard($txn_ctx);
   my $gate  = $fc->new;
-  $gate->on_cancel($chained);
+  # A closure, not the Future itself: Future::XS calls the on_ready of a
+  # Future cancelled through ->on_cancel($future) with no Future as argument.
+  # And it marks a Future cancelled only after its on_cancel callbacks ran, so
+  # $gate is not ready yet while its own cancel cancels $chained; the flag
+  # keeps that from cancelling $gate again.
+  my $gate_cancelling;
+  $gate->on_cancel(sub { $gate_cancelling = 1; $chained->cancel });
   $chained->on_ready(sub {
     my $c = shift;
-    return if $gate->is_ready;
+    return if $gate->is_ready || $gate_cancelling;
     return $gate->cancel if $c->is_cancelled;
     return $c->is_failed ? $gate->fail($c->failure) : $gate->done($c->get);
   });
   $inner_future->on_cancel(sub {
-    return if $gate->is_ready;
+    return if $gate->is_ready || $gate_cancelling;
     $self->_txn_retire_on_cancel($txn_ctx, $conn, $guard) if $guard;
     $gate->fail($self->_txn_cancelled_error(
       q{the Future of the transaction's coderef was cancelled}
     ));
-    $chained->cancel unless $chained->is_ready;
+    # Cancelling $chained cancels $inner_future, the Future whose cancel is
+    # running here; Future::XS does not take that cancel for a no-op, so it
+    # waits until $inner_future is cancelled.
+    $inner_future->on_ready(sub { $chained->cancel unless $chained->is_ready });
   });
   return $gate;
 }
@@ -3158,7 +3167,7 @@ DBIO::Storage::Async - Base class for async storage implementations
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

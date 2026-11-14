@@ -1,0 +1,83 @@
+{
+   "abstract" : "Versioned workspace configuration for tmux",
+   "author" : [
+      "libtmux contributors"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.78, CPAN::Meta::Converter version 2.150013",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "LibTmux-Workspace",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.78",
+            "ExtUtils::MakeMaker::CPANfile" : "0.11",
+            "Module::CPANfile" : "1.1004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LibTmux" : "0.003",
+            "perl" : "5.044000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test2::V1" : "1.302226"
+         }
+      }
+   },
+   "provides" : {
+      "LibTmux::Workspace" : {
+         "file" : "lib/LibTmux/Workspace.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Workspace::X" : {
+         "file" : "lib/LibTmux/Workspace/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Workspace::X::Config" : {
+         "file" : "lib/LibTmux/Workspace/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Workspace::X::Conflict" : {
+         "file" : "lib/LibTmux/Workspace/X.pm",
+         "version" : "0.003"
+      },
+      "LibTmux::Workspace::X::Load" : {
+         "file" : "lib/LibTmux/Workspace/X.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/libtmux/libtmux-perl/issues"
+      },
+      "homepage" : "https://libtmux.org/en/perl/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/libtmux/libtmux-perl.git",
+         "web" : "https://github.com/libtmux/libtmux-perl/tree/master/packages/workspace"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 4.18"
+}

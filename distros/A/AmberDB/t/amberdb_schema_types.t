@@ -219,7 +219,7 @@ subtest '5. Simple Mode Bypasses enc_validate & dec_validate' => sub {
     mkdir($db_dir);
     my $adb = AmberDB->new(
         path => { dbase_dir => $db_dir },
-        cfg  => { simple => 1 },
+        cfg  => { use_simple => 1 },
     );
 
     # In simple mode, arbitrary data passes untouched without schema block casting

@@ -7,19 +7,41 @@
 #              subset runs in place of builtins (echo, printf, test, [, true, false; rule "the program beats", X21)
 #   held       no, under assumptions known to hold in every environment tested (Linux, Linux without /proc,
 #              Windows): devnull, heredoc
-#   almost     no, under the assumptions named by its reasons (below), each mild but not nothing
+#   almost     no, under the assumptions named by its reasons (below), each mild but not nothing; since step 3
+#              (post-0.11, 2026-11-12, the user's (a)) also a sample whose every value from the environment only
+#              passes through the shell (assumptions passthrough, and splitglob where a value is split and globbed
+#              into a program's words): large-subset-environment.md, section 12
 #   undecided  not shown either way: a reason names what the result may depend on
 # A sample's level is the lowest of its parts'.  Only forms argued safe pass; everything else is undecided, so a
 # pass is meant to be definite (under the stated assumptions), a non-pass is not a verdict.  Programs are taken as
 # real and opaque: nothing here knows what a program does, only what the shell does with it.
 #
-# Usage: perl -Ilib large-subset-blocks.pl [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] samples.jsonl samples.tsv
+# Usage: perl -Ilib large-subset-blocks.pl [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] [-d DEPS.jsonl] [-p STEP3.tsv] samples.jsonl samples.tsv
 #   -batch  first parse all the accepted samples one by one and joined into one text (one line apart), and compare
 #           each sample's part of the joined tree with its own tree; report what keeps them apart
 #   -o      one line per distinct block (with its place): its text (rebuilt from the tree), level, reasons, the samples
 #   -s      one line per sample: id, level, reasons, the text
 #   -e      every sample: its snippet ID and a short code (large-subset-provenance.tsv; the code is explained in the
 #           file's header and in doc/large-subset/large-subset-environment.md)
+#   -d      (X27, step 2, 2026-11-10) every undecided sample: exactly what its undecided codes come from, as far as the
+#           text says it, and in which blocks: {id, text, codes, blocks (how many blocks carry an undecided code),
+#           deps: [[CODE, KIND, NAME, LITERAL, BLOCK], ...], rest: [the undecided codes no dep names], bare: [[CODE,
+#           BLOCK], ...] (the same, by block)}.  KIND: for files glob (NAME the pattern word as text), < > >> <> >| (a
+#           redirection), test (NAME "OP OPERAND"), dot (the file . reads), exec (a relative program name); for vars
+#           read (NAME the variable); for input stdin; for args arg (NAME 1, @, # ...); for directory cd (NAME its
+#           operand, '' for none: HOME); for tilde tilde (NAME the word; LITERAL: ~ alone, not ~user).  LITERAL: 1 if
+#           NAME is all the text says (no expansion in it).  BLOCK: the block's number in the sample, from 1.  -d lists
+#           the samples undecided by the codes alone, before step 3 (so step 2's setups stay as they were).
+#   -p      (X27, step 3) every sample undecided by the codes alone: id, class, what keeps it undecided, what the run
+#           controls, its undecided codes, the text.  Class: pass (every value from the environment only passes
+#           through: into a program's words, an assignment, a case word, a here-document, a program's output going
+#           on, a status choosing between branches that are all alike); split (the same, some split and globbed into
+#           a program's words); control (it depends on the environment only through what the run can set: a
+#           redirection's or cd's target, a ./program, a value into echo, printf or test, a dot pattern, a program's
+#           answer, /tmp, /dev/urandom); affects-shell (a value from the environment affects what the shell itself does: a
+#           builtin other than echo, printf, test takes it, arithmetic, ${x:?}, set -u, set -e, the shells' own variables;
+#           process IDs and the clock: $$, $SECONDS, kill and wait with operands).  pass and
+#           split are almost strict (assumptions passthrough, splitglob); control and not stay undecided.
 #
 # A block is a simple command (with its settings and redirections), the word list of a 'for', the word and the
 # patterns of a 'case', the redirections of a compound command; a command inside $( ) is a block of its own.
@@ -28,14 +50,15 @@
 # doc/large-subset/large-subset-environment.md, section 3.  In short:
 #   held:      devnull heredoc
 #   almost:    program pipeline devfd locale echo path-system path-var path-home path-dev path-mnt path-absent
+#              passthrough splitglob (step 3)
 #   undecided: files directory vars unquoted args start status prog-output prog-status race pid time random input
 #              listing lookup limits fd tilde name test-ops eval interactive path-tmp path-random path-proc path-root
 # Compositions: $? takes the status of what ran just before (in a loop: of any command of the loop; at the start of a
 # function's body or a trap action it is unknown: status); after set -e (until set +e) every status decides but the
 # text's last command's.  A function's name is a call of it only after the walk has passed its definition.
 use strict; use warnings; use JSON::PP; use Getopt::Long; use Proc::ShellSubset::Large; use Time::HiRes 'time';
-my ($BATCH, $OUTB, $OUTS, $OUTE); GetOptions('batch' => \$BATCH, 'o=s' => \$OUTB, 's=s' => \$OUTS, 'e=s' => \$OUTE) && @ARGV == 2
-  or die "usage: $0 [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] samples.jsonl samples.tsv\n";
+my ($BATCH, $OUTB, $OUTS, $OUTE, $OUTD, $OUTP, $AIF); GetOptions('batch' => \$BATCH, 'o=s' => \$OUTB, 's=s' => \$OUTS, 'e=s' => \$OUTE, 'd=s' => \$OUTD, 'p=s' => \$OUTP, 'ai=s' => \$AIF) && @ARGV == 2
+  or die "usage: $0 [-batch] [-o BLOCKS.jsonl] [-s SAMPLES.tsv] [-e PROVENANCE.tsv] [-d DEPS.jsonl] samples.jsonl samples.tsv\n";
 $ENV{HOME} //= '/root'; delete $ENV{CDPATH};
 my $J = JSON::PP->new->canonical->utf8;
 my ($SJ, $ST) = @ARGV;
@@ -45,7 +68,7 @@ my @S; { open my $in, '<', $SJ or die "$SJ: $!"; my %seen; while (<$in>) { my $s
 if ($BATCH) { batch() }
 
 my @HELD = qw(devnull heredoc);   # assumptions known to hold in every environment tested (Linux, Linux without /proc, Windows)
-my @ALMOST = qw(program pipeline devfd locale echo path-system path-var path-home path-dev path-mnt path-absent);
+my @ALMOST = qw(program pipeline devfd locale echo path-system path-var path-home path-dev path-mnt path-absent passthrough splitglob);
 my @UNDEC = qw(files directory vars unquoted args start status prog-output prog-status race pid time random input listing
   lookup limits fd tilde name test-ops eval interactive path-tmp path-random path-proc path-root);
 my %LEVEL = ((map +($_ => 1), @HELD), (map +($_ => 2), @ALMOST), (map +($_ => 3), @UNDEC));
@@ -66,9 +89,18 @@ my %OWN = map +($_ => 1), qw(: true false echo printf test [ read getopts set sh
 
 # Per sample.
 our ($CUR, $LAST, @LOOPS, $FINAL); my ($ERREXIT, $ANYERR); my (%FDEF, %FNOW, @BLKS, $POS, %VSET, %VLIT, $ARGSET, $ARGSLIT, $FARGSOK, %OPENFD, @DEFER, %FOPQ);
-sub why { my ($r, $b) = @_; $b //= $CUR; $b->{r}{$r} = 1 if $b }
+our $PT = 0; our ($NOUNSET, %VALSINK, @SINKS);   # @SINKS: [BLOCK, MODE] where a value from the environment lands
+sub why { my ($r, $b) = @_; $b //= $CUR; return unless $b; $b->{r}{$r} = 1; if ($PT) { $b->{pt}{$r}{$PT} = 1 } else { $b->{np}{$r} = 1 } }
+my %OWNVAR = map +($_ => 1), qw(BASH BASHOPTS BASHPID BASH_ALIASES BASH_ARGC BASH_ARGV BASH_ARGV0 BASH_CMDS BASH_COMMAND BASH_EXECUTION_STRING
+  BASH_LINENO BASH_LOADABLES_PATH BASH_REMATCH BASH_SOURCE BASH_SUBSHELL BASH_VERSINFO BASH_VERSION COLUMNS COMP_CWORD COMP_LINE
+  COMP_POINT COMP_TYPE COMP_KEY COMP_WORDBREAKS COMP_WORDS DIRSTACK EPOCHREALTIME EPOCHSECONDS EUID FUNCNAME GROUPS HISTCMD HISTFILE
+  HISTSIZE HOSTNAME HOSTTYPE LINES MACHTYPE MAILCHECK OLDPWD OPTERR OSTYPE PATH PIPESTATUS POSIXLY_CORRECT PWD RANDOM SHELL SHELLOPTS
+  SHLVL SRANDOM TERM UID _);   # set by dash, bash or ours themselves (env -i ... set), or bash's own
+our @DEPS;   # -d: [CODE, KIND, NAME, LITERAL, BLOCK] (see the header)
+sub dep { my ($r, $kind, $name, $lit, $b) = @_; $b //= $CUR; why($r, $b); push @DEPS, [$r, $kind, $name, $lit ? 1 : 0, $b] if $b }
+sub wlit { my $w = shift; !ref $w || !grep { ref && $$_[0] !~ /^(?:\*|')\z/ } @$w }   # no expansion in it (patterns allowed)
 sub newblock { my ($text, $cx) = @_; my $b = { text => $text, cx => { %$cx }, r => {}, pos => ++$POS, errexit => $ERREXIT }; push @BLKS, $b; $b }
-sub consume { my $b = shift; why('prog-status', $b) if $b->{sopaque} }   # this block's status decides something
+sub consume { my $b = shift; local $PT = 1; why('prog-status', $b) if $b->{sopaque} }   # this block's status decides something
 sub safe_lit { my $w = shift; defined $w && !ref $w && $w !~ /[*?\[]/ }   # a literal word with no pattern characters
 sub vassign { my ($n, $cx, $safe) = @_; return if ref $n || !defined $n;
   my $p = $cx->{infunc} || $cx->{late} ? -1 : $POS; $VSET{$n} = $p if !defined $VSET{$n} || $p < $VSET{$n};
@@ -79,27 +111,27 @@ sub vassign { my ($n, $cx, $safe) = @_; return if ref $n || !defined $n;
 sub word { my ($w, $cx, $mode) = @_; return unless defined $w;
   if (!ref $w) { why('locale') if $mode eq 'pattern' && $w =~ /[^\x00-\x7f]/; return }
   for my $p (@$w) { next unless ref $p; my ($k, @a) = @$p; my $q = $k =~ s/^"// || $mode ne 'argv';
-    if ($k eq '*') { if ($mode eq 'argv') { why('files') } elsif ($mode eq 'pattern') { why('locale') if $a[0] =~ /\[|[^\x00-\x7f]/ } }
-    elsif ($k eq '~') { why('tilde') }
-    elsif ($k eq '$' || $k eq '${#') { var($a[0], $cx, $q || $k eq '${#') }
-    elsif ($k eq '${') { var($a[0], $cx, $q); my $op = $a[1] // '';
+    if ($k eq '*') { if ($mode eq 'argv') { my $wt = wtext($w); local $PT = $wt =~ /\[\^/ ? 0 : $wt =~ m{(?:^|/)\.[^/]*[*?\[]} ? 'g2' : $wt =~ m{[*?\[][^/]*//} ? 'a5' : 'split'; dep('files', 'glob', $wt, wlit($w)) } elsif ($mode eq 'pattern') { why('locale') if $a[0] =~ /\[|[^\x00-\x7f]/ } }
+    elsif ($k eq '~') { dep('tilde', 'tilde', wtext($w), $a[0] eq '') }   # (-d: ~ alone depends on HOME only; ~user on the user database)
+    elsif ($k eq '$' || $k eq '${#') { var($a[0], $cx, $q || $k eq '${#', $k eq '${#' ? 'length' : '', $mode) }
+    elsif ($k eq '${') { var($a[0], $cx, $q, ($a[1] // '') =~ /^:?\?\z/ ? 'check' : '', $mode); my $op = $a[1] // '';
       word($a[2], $cx, $op =~ /^[%#]/ ? 'pattern' : $q ? 'assign' : $mode) if defined $a[2];
       vassign($a[0], $cx, safe_lit($a[2])) if $op =~ /^:?=\z/ }
     elsif ($k eq '$((') { arith($a[0], $cx) }
-    elsif ($k eq '$(') { why('unquoted') if !$q; walk_list($a[0], { %$cx, out => 'sub', tested => 0, bg => 0 }) }
+    elsif ($k eq '$(') { push @SINKS, [$CUR, $mode] if $CUR; if (!$q) { local $PT = 'split'; why('unquoted') } my $save = $CUR; walk_list($a[0], { %$cx, out => 'sub', tested => 0, bg => 0 }); $CUR = $save }
     elsif ($k eq "'") { why('locale') if $mode eq 'pattern' && $a[0] =~ /[^\x00-\x7f]/ }
     elsif ($k eq '{' || $k eq '{..') { word($_, $cx, $mode) for grep ref, @a } } }
 sub arith { my ($e, $cx) = @_;
   while ($e =~ /\$?\b([A-Za-z_]\w*)\b(?=\s*(?:<<|>>|[-+*\/%&^|])?=(?!=))|\$\{?([A-Za-z_]\w*|[0-9]+|[#?\$!@*-])\}?|\b([A-Za-z_]\w*)\b/g) {
-    if (defined $1) { vassign($1, $cx, 1) } else { var($2 // $3, $cx, 1) } } }   # an arithmetic result is digits
-sub var { my ($n, $cx, $quoted) = @_;
+    if (defined $1) { vassign($1, $cx, 1) } else { var($2 // $3, $cx, 1, 'arith') } } }   # an arithmetic result is digits
+sub var { my ($n, $cx, $quoted, $how, $mode) = @_; $how //= ''; $mode //= 'argv';
   if ($n eq '?') {   # the status of what ran before: unknown at the start of a function's body or a trap action
     if (!defined $LAST) { why('status') } else { consume($_) for @$LAST; $_->{q} = 1 for @LOOPS } }
   elsif ($n eq '-' || $n eq '0') { why('start') }
-  elsif ($n =~ /^(?:\$|!|PPID)\z/) { why('pid') } elsif ($n eq 'SECONDS') { why('time') }
+  elsif ($n =~ /^(?:\$|!|PPID)\z/) { why('pid') } elsif ($n eq 'SECONDS') { why('time') }   # the kernel's process IDs, the clock
   elsif ($SHELLVAR{$n}) { }
-  elsif ($n =~ /^(?:[1-9]\d*|[@*#])\z/) { push @DEFER, ['args', $n, $POS, $quoted || $n eq '#', $cx->{infunc}, $CUR] }
-  else { push @DEFER, ['var', $n, $cx->{infunc} || $cx->{late} ? 1e9 : $POS, $quoted, $cx->{infunc}, $CUR] } }
+  elsif ($n =~ /^(?:[1-9]\d*|[@*#])\z/) { push @DEFER, ['args', $n, $POS, $quoted || $n eq '#', $cx->{infunc}, $CUR, $how, $mode] }
+  else { push @DEFER, ['var', $n, $cx->{infunc} || $cx->{late} ? 1e9 : $POS, $quoted, $cx->{infunc}, $CUR, $how, $mode] } }
 
 # Redirections.
 sub redir { my ($r, $cx) = @_; my ($fd, $op, $w) = @$r;
@@ -107,9 +139,9 @@ sub redir { my ($r, $cx) = @_; my ($fd, $op, $w) = @$r;
   if ($op =~ /&\z/) { if (ref $w) { word($w, $cx, 'redir'); why('fd') } elsif ($w ne '-' && $w > 2 && !$OPENFD{$w}) { why('fd') }
     $OPENFD{$fd} = 1 if $fd > 2; return }
   $OPENFD{$fd} = 1 if $fd > 2;
-  if (ref $w) { word($w, $cx, 'redir'); why('files'); return }
+  if (ref $w) { word($w, $cx, 'redir'); local $PT = 'a5'; dep('files', $op, wtext($w), 0); return }
   if ($w eq '/dev/null') { why('devnull'); return } if ($w =~ m{^/dev/(?:std(?:in|out|err)|fd/\d+)\z}) { why('devfd'); return }
-  why('files'); if ($w =~ m{^/}) { my $p = pclass($w); why($p) if $p } }
+  local $PT = 'a5'; dep('files', $op, $w, 1); if ($w =~ m{^/}) { my $p = pclass($w); why($p) if $p } }   # (absolute: named too, for step 3's setups)
 
 # The walk.  Context: out (run, next, sub, file), in (run, pipe, file, heredoc), tested, bg, infunc, late (a trap
 # action: runs at the end).
@@ -160,11 +192,11 @@ sub walk_cmd { my ($c, $cx) = @_;
     elsif ($c->{if}) { my @x = @{$c->{if}}; while (@x) { my $cond = shift @x; if (@x) { walk_list($cond, { %$cin, tested => 1 }); walk_list(shift @x, $cin) } else { walk_list($cond, $cin) } } }
     elsif ($c->{while} || $c->{until}) { loop(sub { walk_list($c->{while} // $c->{until}, { %$cin, tested => 1 }); walk_list($c->{do}, $cin) }) }
     elsif ($c->{for}) { $CUR = newblock('for ' . $c->{for} . ($c->{in} ? ' in ' . join(' ', map wtext($_), @{$c->{in}}) : ''), $cx);
-      why('race') if $cx->{bg};
+      why('race') if $cx->{bg}; $CUR->{kind} = 'for';
       if ($c->{in}) { word($_, $cx, 'argv') for @{$c->{in}}; vassign($c->{for}, $cx, !grep !safe_lit($_), @{$c->{in}}) }
       else { push @DEFER, ['args', '@', $POS, 1, $cx->{infunc}, $CUR]; vassign($c->{for}, $cx, 0) }
       loop(sub { walk_list($c->{do}, $cin) }) }
-    elsif ($c->{case}) { my @x = @{$c->{in} // []}; $CUR = newblock('case ' . wtext($c->{case}) . ' in', $cx); why('race') if $cx->{bg};
+    elsif ($c->{case}) { my @x = @{$c->{in} // []}; $CUR = newblock('case ' . wtext($c->{case}) . ' in', $cx); $CUR->{kind} = 'case'; why('race') if $cx->{bg};
       word($c->{case}, $cx, 'case'); for my $i (0 .. @x / 2 - 1) { word($_, $cx, 'pattern') for @{$x[2 * $i]} }
       while (@x) { shift @x; walk_list(shift @x, $cin) } }
     return }
@@ -181,7 +213,7 @@ sub simple { my ($c, $cx) = @_;
     if (!@e && $k ne 'local') { why('listing') }
     while (@e) { my ($n, $v) = splice @e, 0, 2; word($n, $cx, 'argv') if ref $n; word($v, $cx, 'assign') if defined $v;
       vassign($n, $cx, !defined $v || safe_lit($v)) } }
-  if (exists $c->{cd}) { why('directory'); word($c->{cd}, $cx, 'argv') if ref $c->{cd}; return }
+  if (exists $c->{cd}) { { local $PT = !defined $c->{cd} || (!ref $c->{cd} && $c->{cd} eq '-') ? 0 : 'a5'; dep('directory', 'cd', wtext($c->{cd}), !ref $c->{cd}) } $CUR->{kind} = 'cd'; word($c->{cd}, $cx, 'argv') if ref $c->{cd}; return }
   my @a = @{$c->{argv} // []}; return unless @a;
   word($_, $cx, 'argv') for @a;
   my $n = $a[0];
@@ -189,32 +221,36 @@ sub simple { my ($c, $cx) = @_;
     if ($n eq 'command' && !ref $a[1] && $a[1] =~ /^-[vV]/) { why('lookup'); return }
     shift @a; shift @a while @a > 1 && !ref $a[0] && $a[0] =~ /^-/; $n = $a[0] }
   if (ref $n) { why('name'); $CUR->{sopaque} = 1; consume($CUR) if $cx->{tested}; why('prog-output') if $cx->{out} eq 'sub'; return }
-  my @op = @a[1 .. $#a];
+  my @op = @a[1 .. $#a]; $CUR->{kind} = "builtin:$n";
   my $lit = !grep ref, @op;
   if ($n eq 'time') { why('time'); return }
   if ($n eq ':' || $n eq 'true' || $n eq 'false') { return }
+  $CUR->{kind} = 'echo' if $n eq 'echo' || $n eq 'printf';
   if ($n eq 'echo') { why('echo') if !$lit || grep(/\\/, @op) || (@op && $op[0] =~ /^-/); return }
   if ($n eq 'printf') { my @f = @op; splice @f, 0, ($f[0] eq '-v' ? 2 : 1) if @f && !ref $f[0] && $f[0] =~ /^-v/; shift @f if @f && !ref $f[0] && $f[0] eq '--';
     if (!@f || ref $f[0]) { why('locale') } else { my $f = $f[0];
       why('time') if $f =~ /%[-+ #0-9.*]*\(/; why('locale') if $f =~ /%[-+ #0-9.*']*'|%[-+ #0-9.*]*[feEgGaAq]/ }
     return }
-  if ($n eq 'test' || $n eq '[') { my @t = @op; pop @t if $n eq '[' && @t && !ref $t[-1] && $t[-1] eq ']';
-    for (grep !ref, @t) { why('files') if $FILEOPS{$_}; why('fd') if $_ eq '-t'; why('vars') if $_ eq '-v'; why('locale') if $_ eq '<' || $_ eq '>' }
+  if ($n eq 'test' || $n eq '[') { $CUR->{kind} = 'test'; my @t = @op; pop @t if $n eq '[' && @t && !ref $t[-1] && $t[-1] eq ']';
+    for my $i (0 .. $#t) { next if ref $t[$i]; local $_ = $t[$i];
+      if ($FILEOPS{$_}) { my @o = grep { $_ >= 0 && $_ <= $#t } $i + 1, (/^-(?:nt|ot|ef)\z/ ? $i - 1 : ());   # the operands it takes
+        local $PT = 'status'; if (@o) { dep('files', 'test', "$_ " . wtext($t[$o[0]]), wlit($t[$o[0]]) && !grep(ref, @t)) } else { why('files') } }
+      why('fd') if $_ eq '-t'; why('vars') if $_ eq '-v'; why('locale') if $_ eq '<' || $_ eq '>' }
     why('test-ops') if grep({ ref && unquoted($_) } @t) || (@t > 3 && grep ref, @t);
     return }
-  if ($n eq 'read') { why('input') if $cx->{in} eq 'run'; vassign($_, $cx, 0) for grep { !ref && !/^-/ } @op; return }
+  if ($n eq 'read') { dep('input', 'stdin', '', 1) if $cx->{in} eq 'run'; vassign($_, $cx, 0) for grep { !ref && !/^-/ } @op; return }
   if ($n eq 'getopts') { vassign($op[1], $cx, 0) if @op > 1; vassign('OPTARG', $cx, 0);
-    push @DEFER, ['args', '@', $POS, 1, $cx->{infunc}, $CUR] if @op < 3; return }
+    push @DEFER, ['args', '@', $POS, 1, $cx->{infunc}, $CUR, 'getopts'] if @op < 3; return }
   if ($n eq 'set') { if (!@op) { why('listing'); return }
     my $i = 0; while ($i < @op && !ref $op[$i] && $op[$i] =~ /^[-+]/ && $op[$i] ne '--' && $op[$i] ne '-') {
-      my $o = $op[$i]; why('fd') if $o =~ /^-\w*m/ || ($o eq '-o' && $i < $#op && !ref $op[$i + 1] && $op[$i + 1] eq 'monitor'); my $on = $o =~ /^-\w*e/ || ($o eq '-o' && $i < $#op && !ref $op[$i + 1] && $op[$i + 1] eq 'errexit');   # set -e: from here on
+      my $o = $op[$i]; why('fd') if $o =~ /^-\w*m/ || ($o eq '-o' && $i < $#op && !ref $op[$i + 1] && $op[$i + 1] eq 'monitor'); $NOUNSET = 1 if $o =~ /^-\w*u/ || ($o eq '-o' && $i < $#op && !ref $op[$i + 1] && $op[$i + 1] eq 'nounset'); my $on = $o =~ /^-\w*e/ || ($o eq '-o' && $i < $#op && !ref $op[$i + 1] && $op[$i + 1] eq 'errexit');   # set -e: from here on
       my $off = $o =~ /^\+\w*e/ || ($o eq '+o' && $i < $#op && !ref $op[$i + 1] && $op[$i + 1] eq 'errexit');   #   every status decides
       if ($on) { $ERREXIT = $ANYERR = 1 } elsif ($off) { $ERREXIT = 0 }
       $i += $o =~ /^[-+]o\z/ ? 2 : 1 }
     $i++ if $i < @op && !ref $op[$i] && ($op[$i] eq '--' || $op[$i] eq '-');
     if ($i < @op || grep { !ref && $_ eq '--' } @op) { if (!$cx->{infunc}) { $ARGSET //= $POS } $ARGSLIT &&= !grep !safe_lit($_), @op[$i .. $#op] }
     return }
-  if ($n eq 'shift') { push @DEFER, ['args', '@', $POS, 1, $cx->{infunc}, $CUR]; return }
+  if ($n eq 'shift') { push @DEFER, ['args', '@', $POS, 1, $cx->{infunc}, $CUR, 'shift']; return }
   if ($n =~ /^(?:unset|alias|unalias|return|break|continue|exit)\z/) { return }
   if ($n eq 'export' || $n eq 'readonly' || $n eq 'local') { my @o = grep { ref || !/^-/ } @op;
     if (!@o && $n ne 'local') { why('listing') } vassign(/^([^=]*)=(.*)\z/s ? ($1, $cx, $2 !~ /[*?\[]/) : ($_, $cx, 1)) for grep !ref, @o; return }
@@ -227,29 +263,34 @@ sub simple { my ($c, $cx) = @_;
     if (ref $tree ne 'ARRAY') { why('eval'); return }
     my $save = $CUR; if ($n eq 'eval') { walk_list($tree, $cx) } else { local ($LAST, @LOOPS); walk_list($tree, { %$cx, late => 1, tested => 0, out => 'run', in => 'run', bg => 0 }) }
     $CUR = $save; return }
-  if ($n eq '.' || $n eq 'source') { why('files'); return }
-  if ($n eq 'cd' || $n eq 'pwd') { why('directory'); return }
+  if ($n eq '.' || $n eq 'source') { if (@op) { dep('files', 'dot', wtext($op[0]), !ref $op[0]) } else { why('files') } return }
+  if ($n eq 'cd' || $n eq 'pwd') { local $PT = $n eq 'pwd' ? 1 : (!@op || grep { !ref && $_ eq '-' } @op) ? 0 : 'a5'; $CUR->{kind} = $n; why('directory'); return }
   if ($n =~ /^(?:wait|jobs|fg|bg|disown)\z/) { why('pid') if @op; return }
   if ($n eq 'kill') { why('pid') unless @op && !ref $op[0] && $op[0] =~ /^-[lL]/; return }
   if ($n eq 'times') { why('time'); return }
   if ($n eq 'hash' || $n eq 'type') { why('lookup'); return }
-  if ($INTER{$n}) { why('interactive'); return }
+  if ($INTER{$n}) { my @o = grep { !ref && /^-/ } @op; my $file = grep(ref, @op) || ($n eq 'history' && grep /[rawn]/, @o) || ($n eq 'bind' && grep /f/, @o) || ($n eq 'fc' && !grep /[ls]/, @o);
+    local $PT = $file ? 0 : 1; why('interactive'); return }
   $FARGSOK &&= !grep !safe_lit($_), @op if $FDEF{$n};
-  if ($FNOW{$n}) {
+  if ($FNOW{$n}) { $CUR->{kind} = 'function';
     $CUR->{sopaque} = 1 if opaque_status($n, {}); consume($CUR) if $cx->{tested};
     return }
   # an external program
   if ($n =~ /^(?:env|printenv)\z/ && !grep { ref || !/^-/ } @op) { why(q(listing)); return }   # they print the environment the shell passes
-  if ($n =~ m{/}) { if ($n =~ m{^/}) { my $p = pclass($n); why($p) if $p } else { why('files') } }
+  if ($n =~ m{/}) { if ($n =~ m{^/}) { my $p = pclass($n); why($p) if $p } else { local $PT = 'a5'; dep('files', 'exec', $n, 1) } }
   # programs known not to do the same in each run (a list of known cases, not complete): the assumption of "program" fails
+  { local $PT = 'control';
   if ($n =~ /^(?:date|shuf|mktemp|uuidgen)\z/) { why($n eq 'date' ? 'time' : 'random') }
   if ($n eq 'sort' && grep { !ref && /^-(?:[a-zA-Z]*R|-random)/ } @op) { why('random') }
-  if ($n eq 'stat' || ($n eq 'ls' && grep { !ref && /^-[a-zA-Z]*[ltcu]/ } @op)) { why('time') }   # each run's copy of the directory has new file times
+  if ($n eq 'stat' || ($n eq 'ls' && grep { !ref && /^-[a-zA-Z]*[ltcu]/ } @op)) { why('time') } }   # each run's copy of the directory has new file times
   if ($n eq 'xargs') { my $arg = ''; for (@op) { if ($arg) { why('race') if $arg eq 'P' && (ref || $_ ne '1'); $arg = ''; next }
       last if ref || !/^-/; why('race') if /^-(?:\w*P(?!1\z).|-max-procs(?!=1\z))/; $arg = $1 if /^-\w*([ILnPsdEa])\z/ } }
-  why('program'); $CUR->{sopaque} = 1;
-  for (grep !ref, @op) { my $p = m{^(/[^\s]*)} ? $1 : m{=(/[^\s]*)} ? $1 : next; my $k = pclass($p); why($k) if $k }   # absolute paths given to it
-  consume($CUR) if $cx->{tested}; why('prog-output') if $cx->{out} eq 'sub' }
+  why('program'); $CUR->{sopaque} = 1; $CUR->{kind} = 'program'; $CUR->{cmd} = $n;
+  my %prev; for my $i (1 .. $#op) { $prev{$op[$i]} //= $op[$i - 1] if !ref $op[$i] && !ref $op[$i - 1] }
+  for (grep !ref, @op) { my $p = m{^(/[^\s]*)} ? $1 : m{=(/[^\s]*)} ? $1 : m{^-[dFt](/)\z} ? $1 : next; my $k = pclass($p);
+    next if $p eq '/' && ($n =~ /^(?:tr|sed)\z/ || ($prev{$_} // '') =~ /^-(?:d|F|t|-delimiter|-field-separator)\z/ || /^-[dFt]\//);   # text (cut -d /, -F/), no path
+    local $PT = $k =~ /^path-(?:tmp|random|root|proc)\z/ ? 'control' : 0; why($k) if $k }   # absolute paths given to it
+  consume($CUR) if $cx->{tested}; if ($cx->{out} eq 'sub') { local $PT = 1; why('prog-output') } }
 sub unquoted { my $w = shift; grep { ref && $$_[0] =~ /^(?:\$|\$\{|\$\{#|\$\(|\*|~)\z/ } @$w }
 sub opaque_status { my ($n, $seen) = @_; return 0 if $seen->{$n}++; my $any = 0; my @todo = ($FDEF{$n});   # may a call's status be a program's?
   while (@todo) { my $x = shift @todo;
@@ -258,24 +299,63 @@ sub opaque_status { my ($n, $seen) = @_; return 0 if $seen->{$n}++; my $any = 0;
   $any }
 
 # Each sample.
-my (%B, %LV, %RS, %RSA, %RSONLY, %BYSRC, %SAMPLE); my $t0 = time;
+my (%B, %LV, %LV2, %DL, %RS, %RSA, %RSONLY, %BYSRC, %SAMPLE); my $t0 = time;
+my %AICAT;   # -ai: id => category (read again and checked under -p); the rows of the tables take them as N+M=T (2026-11-13)
+my %AIROW = ('AI-strict' => 0, 'AI-values passed on unchanged' => 3, 'AI-values passed on split' => 4);
+if ($AIF) { open my $a, '<:utf8', $AIF or die "$AIF: $!"; while (<$a>) { next if /^#/ || /^id\t/; chomp; my ($id, $cat) = split /\t/; $AICAT{$id} = $cat } }
 for my $s (@S) {
   my $tree = Proc::ShellSubset::Large::parse($s->{text}, empty => 1); if (ref $tree ne q(ARRAY)) { warn "$s->{id}: rejected alone, skipped\n"; next }
-  (%FDEF, %FNOW, @BLKS, %VSET, %VLIT, %OPENFD, @DEFER) = (); ($CUR, $POS, $ARGSET, $ARGSLIT, $FARGSOK) = (undef, 0, undef, 1, 1);
+  (%FDEF, %FNOW, @BLKS, %VSET, %VLIT, %OPENFD, @DEFER, @DEPS, %VALSINK, @SINKS) = (); $NOUNSET = 0; ($CUR, $POS, $ARGSET, $ARGSLIT, $FARGSOK) = (undef, 0, undef, 1, 1);
   { my @todo = ($tree); while (@todo) { my $x = shift @todo;   # the functions this text defines (3A: called by name anywhere)
       if (ref $x eq 'HASH') { $FDEF{$x->{func}} = $x->{body} if exists $x->{func}; push @todo, values %$x } elsif (ref $x eq 'ARRAY') { push @todo, @$x } } }
   ($LAST, @LOOPS, $ERREXIT, $ANYERR, $FINAL) = ([]);
   walk_list($tree, { out => 'run', in => 'run', tested => 0, bg => 0 });
   if ($ANYERR) { for my $b (@BLKS) { consume($b) if ($b->{errexit} || $b->{cx}{infunc} || $b->{cx}{late}) && !(defined $FINAL && $b == $FINAL) } }   # under set -e a failure stops the rest; the last command has no rest
-  for my $d (@DEFER) { my ($k, $n, $p, $q, $infunc, $b) = @$d;
-    if ($k eq 'var') { my $set = defined $VSET{$n} && $VSET{$n} < $p;
-      if (!$set) { why('vars', $b) } elsif (!$q && !$VLIT{$n}) { why('unquoted', $b) } }
-    elsif ($infunc) { why('unquoted', $b) if !$q && !$FARGSOK }
-    elsif (!defined $ARGSET || $ARGSET >= $p) { why('args', $b) } elsif (!$q && !$ARGSLIT) { why('unquoted', $b) } }
+  for my $d (@DEFER) { my ($k, $n, $p, $q, $infunc, $b, $how, $mode) = @$d; $how //= ''; $mode //= 'argv';
+    if ($k eq 'var') { my $set = defined $VSET{$n} && $VSET{$n} < $p; push @SINKS, [$b, $mode] if (!$set || !$VLIT{$n}) && $how ne 'length';
+      if (!$set) { local $PT = !$how && !$OWNVAR{$n} ? ($q ? 1 : 'split') : 0; dep('vars', 'read', $n, 1, $b) } elsif (!$q && !$VLIT{$n}) { local $PT = 'split'; why('unquoted', $b) }
+      elsif ($how eq 'arith' && !$VLIT{$n}) { $VALSINK{'arithmetic on a value'} = 1 } }
+    elsif ($infunc) { push @SINKS, [$b, $mode] if !$FARGSOK && $n ne '#'; if (!$q && !$FARGSOK) { local $PT = 'split'; why('unquoted', $b) } $VALSINK{'arithmetic on a value'} = 1 if $how eq 'arith' && !$FARGSOK }
+    elsif ((!defined $ARGSET || $ARGSET >= $p || !$ARGSLIT) && $n ne '#' && push(@SINKS, [$b, $mode]) && 0) { }
+    elsif (!defined $ARGSET || $ARGSET >= $p) { local $PT = !$how ? ($q ? 1 : 'split') : 0; dep('args', 'arg', $n, 1, $b) } elsif (!$q && !$ARGSLIT) { local $PT = 'split'; why('unquoted', $b) }
+    elsif ($how eq 'arith' && !$ARGSLIT) { $VALSINK{'arithmetic on a value'} = 1 } }
   my %r; $r{$_} = 1 for map keys %{$_->{r}}, @BLKS;
   my $lv = 0; $lv = $LEVEL{$_} > $lv ? $LEVEL{$_} : $lv for keys %r;
   my @rs = grep $r{$_}, @HELD, @ALMOST, @UNDEC; my @here = grep $LEVEL{$_} == $lv, @rs;
-  $SAMPLE{$s->{id}} = [$lv, \@rs, $s]; $LV{$lv}++; $BYSRC{$s->{src}}{$lv}++;
+  $SAMPLE{$s->{id}} = [$lv, \@rs, $s];
+  if ($lv == 3) {   # step 3 (X27): where each value from the environment lands; the class, its reasons
+    my (%np, %pa, %sp, %ct, %ST, %R, %CTP); for my $b (@BLKS) { for my $r (grep $LEVEL{$_} == 3, keys %{$b->{r}}) {
+        my $kd = $b->{pt}{$r} // {}; my $bk = $b->{kind} // '';
+        if ($b->{np}{$r} || ($kd->{split} || $kd->{g2}) && $bk !~ /^(?:program|echo|for)\z/
+            || $kd->{a5} && $bk !~ /^(?:program|echo|cd|pwd)\z/ && !($b->{text} =~ /^exec / && $r eq 'files')) { $np{$r} = 1; next }
+        if ($kd->{control}) { $ct{$r} = 1; $CTP{"$r:" . ($b->{cmd} // ($b->{text} =~ /^(\S+)/ ? $1 : '?'))} = 1 }
+        $sp{$r} = 1 if $kd->{split}; $pa{$r} = 1 if $kd->{1} || $kd->{status}; $ST{$r} = 1 if $kd->{status};
+        if ($kd->{a5}) { $ct{$r} = 1; $R{A5} = 1 } if ($kd->{g2}) { $ct{$r} = 1; $R{G2} = 1 } } }
+    for (@SINKS) { my ($b, $m) = @$_; next if $m =~ /^(?:assign|case|heredoc|redir)\z/; my $bk = $b->{kind} // '';
+      if ($m eq 'pattern') { $VALSINK{'a value as a pattern'} = 1 } elsif ($bk =~ /^(?:program|for|function|cd)\z/) { }
+      elsif ($bk =~ /^(?:echo|test)\z/) { $R{program} = 1 } else { $VALSINK{'a value into ' . ($bk =~ s/^builtin://r || 'a command')} = 1 } }
+    my @x = (sort(keys %np), sort(keys %VALSINK));
+    push @x, 'set -e' if $ANYERR && ($ct{'prog-status'} || $pa{'prog-status'} || %ST);
+    push @x, 'set -u' if $NOUNSET && grep { $ct{$_} || $pa{$_} || $sp{$_} } qw(vars args);
+    $SAMPLE{$s->{id}}[4] = [@x ? 'affects-shell' : (%ct || %R) ? 'control' : %sp ? 'split' : 'pass', join(',', @x),
+      join(',', (sort keys %CTP), map "ruling:$_", sort keys %R), [grep $LEVEL{$_} == 3, @rs]] }
+  if ($lv == 3 && $OUTD) {   # -d: what the undecided codes come from, block by block
+    my %bn; my $i = 0; $bn{$_} = ++$i for @BLKS;
+    my %ub; for my $b (@BLKS) { $ub{$bn{$b}} = 1 if grep $LEVEL{$_} == 3, keys %{$b->{r}} }
+    my %seen; my @d = grep !$seen{join "\0", @$_}++, map [@$_[0 .. 3], $bn{$_->[4]}], grep $LEVEL{$_->[0]} == 3, @DEPS;
+    my %bare;   # a code on a block that no dep of that block names (e.g. a test file operator with no operand)
+    my @bare;   # [CODE, BLOCK]: the same, by block
+    for my $b (@BLKS) { for my $r (sort grep $LEVEL{$_} == 3, keys %{$b->{r}}) { my $n = $bn{$b};
+        next if grep { $_->[0] eq $r && $_->[4] == $n } @d; $bare{$r} = 1; push @bare, [$r, $n] } }
+    $SAMPLE{$s->{id}}[3] = { id => $s->{id}, text => $s->{text}, codes => [grep $LEVEL{$_} == 3, @rs], blocks => scalar(keys %ub),
+      deps => \@d, rest => [grep $bare{$_}, @UNDEC], bare => \@bare } }
+  if ($lv == 3 && $SAMPLE{$s->{id}}[4][0] =~ /^(?:pass|split)\z/) {   # (a), the user 2026-11-12: almost strict, under passthrough
+    @rs = (grep($LEVEL{$_} < 3, @rs), 'passthrough', $SAMPLE{$s->{id}}[4][0] eq 'split' ? 'splitglob' : ());   # (and splitglob)
+    $lv = 2; @here = grep $LEVEL{$_} == 2, @rs; @{$SAMPLE{$s->{id}}}[0, 1] = ($lv, \@rs) }
+  $LV{$lv}++;
+  my $dl = $lv < 2 ? $lv : $lv == 3 ? 5 : (grep $_ eq 'splitglob', @rs) ? 4 : (grep $_ eq 'passthrough', @rs) ? 3 : 2;   # the rows (LV1)
+  my $ai = defined $AICAT{$s->{id}} ? 1 : 0; $dl = $AIROW{$AICAT{$s->{id}}} // $dl if $ai;   # found by the programs 0, by reading 1
+  $DL{$s->{id}} = $dl; $LV2{$dl}[$ai]++; $BYSRC{$s->{src}}{$dl}[$ai]++;
   if ($lv) { $RS{$lv}{$_}++ for @here; $RSONLY{$lv}{$here[0]}++ if @here == 1 }
   for my $b (@BLKS) { my $blv = 0; $blv = $LEVEL{$_} > $blv ? $LEVEL{$_} : $blv for keys %{$b->{r}};
     my $cx = $b->{cx}; my $ctx = join ',', grep $_, ($cx->{out} && $cx->{out} ne 'run' ? "out:$cx->{out}" : ''),
@@ -285,20 +365,48 @@ for my $s (@S) {
     $e->{n}++; push @{$e->{ids}}, $s->{id} unless @{$e->{ids}} && $e->{ids}[-1] eq $s->{id} } }
 printf STDERR "%d samples cut into blocks in %.1f s\n", scalar @S, time - $t0;
 
-# Tables.
+# Tables.  The rows (LV1, the user, 2026-11-13): almost strict apart from the samples that are so only by step 3's
+# assumptions, "values passed on unchanged" (passthrough) and "values passed on split" (passthrough and splitglob; none
+# needs splitglob alone): the user trusts those less.  The record (-e) keeps A for all three; its codes tell them apart.
 my @LN = qw(strict held almost undecided);
+my @LN2 = ('strict', 'held', 'almost strict', 'values passed on unchanged', 'values passed on split', 'undecided');
 my $nb = 0; $nb += $_->{n} for values %B; my %bl; $bl{$_->{level}}++ for values %B;
 printf "%d samples; %d blocks, %d distinct with their place: %s\n", scalar @S, $nb, scalar keys %B, join ', ', map "$_ $bl{$_}", grep $bl{$_}, @LN;
-printf "\nSamples by level:\n"; printf "  %-10s %6d  %5.1f %%\n", $LN[$_], $LV{$_} // 0, 100 * ($LV{$_} // 0) / @S for 0 .. 3;
-print "\nBy source (strict / held / almost / undecided):\n";
-for (sort keys %BYSRC) { my $t = 0; $t += $_ for values %{$BYSRC{$_}}; my $src = $_; printf "  %-16s %6d: %6d %6d %6d %6d\n", $src, $t, map $BYSRC{$src}{$_} // 0, 0 .. 3 }
+sub fmtn { my $x = reverse shift; $x =~ s/(\d{3})(?=\d)/$1,/g; scalar reverse $x }
+sub pm { my $v = $_[0] // []; my ($p, $a) = ($v->[0] // 0, $v->[1] // 0); $a ? sprintf('%s+%s=%s', fmtn($p), fmtn($a), fmtn($p + $a)) : fmtn($p) }   # N+M=T, or N
+sub tot { my $v = $_[0] // []; ($v->[0] // 0) + ($v->[1] // 0) }
+printf "\nSamples by level:\n"; printf "  %-28s %13s  %5.1f %%\n", $LN2[$_], pm($LV2{$_}), 100 * tot($LV2{$_}) / @S for 0 .. 5;
+print "  (N+M=T: N found by the programs, M classified by reading, -ai; AI-strict in strict, AI-values passed on ... in those rows,\n   the other categories undecided)\n" if $AIF;
+print "\nBy source (strict / held / almost strict / values passed on unchanged / values passed on split / undecided):\n";
+for (sort keys %BYSRC) { my $t = 0; $t += tot($_) for values %{$BYSRC{$_}}; my $src = $_; printf "  %-16s %6d: %s\n", $src, $t, join ' ', map sprintf('%10s', pm($BYSRC{$src}{$_})), 0 .. 5 }
 for my $lv (1, 2, 3) { print "\n$LN[$lv]: samples with each reason of that level / with that reason alone:\n";
   printf "  %-12s %6d %6d\n", $_, $RS{$lv}{$_} // 0, $RSONLY{$lv}{$_} // 0 for $lv == 1 ? @HELD : $lv == 2 ? @ALMOST : @UNDEC }
 { my %set; for (values %SAMPLE) { $set{join ' ', @{$_->[1]}}++ if $_->[0] == 1 || $_->[0] == 2 }
   print "\nheld and almost, by the set of assumptions a sample needs:\n"; printf "  %6d  %s\n", $set{$_}, $_ for sort { $set{$b} <=> $set{$a} || $a cmp $b } keys %set }
 if ($OUTB) { open my $o, '>', $OUTB or die; print $o $J->encode($_), "\n" for sort { $b->{n} <=> $a->{n} || $a->{text} cmp $b->{text} } values %B }
 if ($OUTS) { open my $o, '>:utf8', $OUTS or die; print $o "id\tlevel\treasons\ttext\n";
-  for my $s (grep $SAMPLE{$_->{id}}, @S) { my ($lv, $rs) = @{$SAMPLE{$s->{id}}}; (my $x = $s->{text}) =~ s/\s*\n\s*/\\n/g; print $o join("\t", $s->{id}, $LN[$lv], "@$rs", $x), "\n" } }
+  for my $s (grep $SAMPLE{$_->{id}}, @S) { my ($lv, $rs) = @{$SAMPLE{$s->{id}}}; (my $x = $s->{text}) =~ s/\s*\n\s*/\\n/g; print $o join("\t", $s->{id}, $LN2[$DL{$s->{id}}], "@$rs", $x), "\n" } }
+if ($OUTP) { open my $o, '>:utf8', $OUTP or die;   # step 3: every sample undecided before it
+  print $o <<'H', "id\tclass\twhat keeps it\tunder control through\tthe undecided codes before\ttext\n";
+# large-subset-step3.tsv (X27, step 3; post-0.11, 2026-11-12): every corpus sample undecided by its codes alone, with
+# where its values from the environment land; written by large-subset-blocks.pl -p.  Columns (tab): id; class (pass:
+# they only pass through the shell; split: the same, some split and globbed into a program's words; both are almost
+# strict in large-subset-provenance.tsv, assumptions passthrough and splitglob; control: it depends on the environment
+# only through what the run can set; affects-shell: a value from the environment affects what the shell itself does; AI-...: a
+# sample of those two classified by reading, large-subset-ai-classes.tsv, with -ai); what keeps it from pass (the
+# codes, or "a value into BUILTIN", "set -e", "set -u", "arithmetic on a value", "a value as a pattern"); what the run
+# controls (CODE:PROGRAM for a program's answer, /tmp, /dev/urandom, the tree; ruling:A5, G2, program for a switch whose
+# other state the named ruling covers); the undecided codes; the text.  large-subset-environment.md, section 12.
+H
+  my %AI;   # -ai (post-0.11, 2026-11-13): samples classified by reading (large-subset-ai-classes.tsv): their category is
+  if ($AIF) { open my $a, '<:utf8', $AIF or die "$AIF: $!";   # the class; each must be one the rules leave in control or affects-shell
+    while (<$a>) { next if /^#/ || /^id\t/; chomp; my ($id, $cat, undef, undef, $rc) = split /\t/;
+      my $c = $SAMPLE{$id} && $SAMPLE{$id}[4] && $SAMPLE{$id}[4][0];
+      defined $c && $c =~ /^(?:control|affects-shell)\z/ or die "$AIF: $id is not a sample of the class control or affects-shell\n";
+      $c eq $rc or die "$AIF: $id: the rules give $c, the file says $rc\n"; $AI{$id} = $cat } }
+  for my $s (grep { $SAMPLE{$_->{id}} && $SAMPLE{$_->{id}}[4] } @S) { my ($c, $why, $ctl, $u) = @{$SAMPLE{$s->{id}}[4]}; $c = $AI{$s->{id}} // $c;
+    (my $x = $s->{text}) =~ s/\s*\n\s*/\\n/g; print $o join("\t", $s->{id}, $c, $why, $ctl, join(',', @$u), $x), "\n" } }
+if ($OUTD) { open my $o, '>', $OUTD or die; print $o $J->encode($SAMPLE{$_->{id}}[3]), "\n" for grep { $SAMPLE{$_->{id}} && $SAMPLE{$_->{id}}[3] } @S }
 if ($OUTE) { open my $o, '>:utf8', $OUTE or die; print $o <<'H';
 # large-subset-provenance.tsv: every corpus sample the large parser accepts (40,410), one line each, by snippet ID.
 # Columns (tab): ID CODE
@@ -308,14 +416,16 @@ if ($OUTE) { open my $o, '>:utf8', $OUTE or die; print $o <<'H';
 #         section 7) come out otherwise in another environment?
 #           S                    strict: no; only how the shell is started is assumed
 #           H:a,b                held: no, under assumptions known to hold in every environment tested (devnull, heredoc)
-#           A:a,b                almost strict: no, if the assumptions a, b hold (program, pipeline, path-system, ...)
+#           A:a,b                almost strict: no, if the assumptions a, b hold (program, pipeline, path-system, ...);
+#                                passthrough(r,s): the values the undecided codes r, s name only pass through (step 3)
 #           U:r,s/a,b            undecided: may depend on r, s (files, vars, prog-status, path-tmp, ...); the
 #                                assumptions a, b would be needed besides
 #         Every code, how to remake this file and the findings: doc/large-subset/large-subset-environment.md
 H
   for my $id (sort keys %SAMPLE) { my ($lv, $rs) = @{$SAMPLE{$id}};
     my @u = grep $LEVEL{$_} == 3, @$rs; my @a = grep $LEVEL{$_} < 3, @$rs;
-    print $o "$id\t", $lv == 0 ? 'S' : $lv < 3 ? ('', 'H', 'A')[$lv] . ':' . join(',', @a) : 'U:' . join(',', @u) . (@a ? '/' . join(',', @a) : ''), "\n" } }
+    my $pt = $SAMPLE{$id}[4] && $lv < 3 ? '(' . join(',', @{$SAMPLE{$id}[4][3]}) . ')' : '';   # (a): the codes it passes through
+    print $o "$id\t", $lv == 0 ? 'S' : $lv < 3 ? ('', 'H', 'A')[$lv] . ':' . join(',', map $_ eq 'passthrough' ? "$_$pt" : $_, @a) : 'U:' . join(',', @u) . (@a ? '/' . join(',', @a) : ''), "\n" } }
 
 # Words.  A Word is a string or [Part, ...]; rebuilt as shell text for reading (approximately: quoting is not exact).
 sub wtext { my $w = shift; return '' unless defined $w; return lit($w) unless ref $w; join '', map ptext($_), @$w }

@@ -4,14 +4,12 @@ package DBIO::Extension::List;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900005';
 
-use Storable ();
 use DBIO::Exception;
 use DBIO::Util ();
 use DBIO::Extension;
 
-sub _frozen { local $Storable::canonical = 1; return Storable::nfreeze(\$_[0]) }
 
 
 sub new {
@@ -62,7 +60,7 @@ sub new {
         next unless exists $have->{options}{$key};
         DBIO::Exception->throw(
           "Extension '$name' is declared with two values for option '$key'"
-        ) if _frozen($have->{options}{$key}) ne _frozen($options{$key});
+        ) if DBIO::Util::canonical_text($have->{options}{$key}) ne DBIO::Util::canonical_text($options{$key});
       }
       %{ $have->{options} } = (%{ $have->{options} }, %options);
       next;
@@ -162,7 +160,7 @@ DBIO::Extension::List - The declared list of database extensions of a schema, re
 
 =head1 VERSION
 
-version 0.900004
+version 0.900005
 
 =head1 SYNOPSIS
 

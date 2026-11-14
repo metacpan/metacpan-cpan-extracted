@@ -11,25 +11,25 @@ posix	NB:109	=bash	=dash	out	0	echo -e "1\n2\n3" | sed 's/.*$/&<br\/>/'
 posix	NB:1132	=bash	=dash	rec	0	sudo ln -s /usr/bin/perl /usr/local/bin/perl`echo -e '\r'`
 posix	NB:1157	=bash	=dash	status+rec+files+err	0	echo -e "Icon\\r" | xargs touch
 posix	NB:1169	=bash	=dash	rec+err	0	echo -e "$correctFilePathAndName" | xargs touch
-posix	NB:11879	same	same	out	0	echo $(pwd)/$filename
-posix	NB:11892	same	same	out	0	echo $(cd $(dirname "$1") && pwd -P)/$(basename "$1")
+posix	NB:11879	same	same	out	1	echo $(pwd)/$filename
+posix	NB:11892	same	same	out	1	echo $(cd $(dirname "$1") && pwd -P)/$(basename "$1")
 posix	NB:1647	=bash	=dash	out	0	echo -e "Test\rTesting\r\nTester\rTested" | awk '{ print $0; }' | od -a
 posix	NB:1648	=bash	=dash	out	0	echo -e "line1\r\nline2" | awk '{ print $0; }' | od -a
 posix	NB:1649	=bash	=dash	out	0	echo -e "line1\r\nline2" | od -a
 posix	NB:4624	neither	neither	rec	1	ps | grep `echo $$` | awk '{ print $4 }'
-posix	NB:4742	same	same	rec	0	cd $(echo $somedir | sed "s#^~#$HOME#")
-posix	NB:5219	same	same	rec	0	echo $(ls $(pwd))
+posix	NB:4742	same	same	rec	1	cd $(echo $somedir | sed "s#^~#$HOME#")
+posix	NB:5219	same	same	rec	1	echo $(ls $(pwd))
 posix	NB:5820	=bash	=dash	out	0	echo -e "HTTP/1.1 200 OK\n\n $(date)"
 posix	NB:5824	=bash	=dash	out	0	echo -en '111 22 3\n4 555 66\n' | tr ' ' '\t'
 posix	NB:5970	=bash	=dash	out	0	echo -ne "Welcome $(whoami)!\n"
 posix	NB:5971	=bash	=dash	out	0	echo -ne "Welcome `whoami`!\n"
 posix	NB:6025	=bash	=dash	out	0	echo -e "ALERT - Shell Access on:' `date` `who` '\n\n' `whois $(who | cut -d'(' -f2 | cut -d')' -f1)
 posix	NB:6128	same	same	out	1	echo $(ls -l $(which bash))
-posix	NB:6389	same	same	rec	0	echo "$(basename $(pwd))"
-posix	NB:6442	same	same	out	0	echo "$(pwd)/$(basename "$1")"
-posix	NB:6443	same	same	out	0	echo pwd: `pwd`
-posix	NB:6445	same	same	out	0	echo -n $(pwd)
-posix	NB:6453	neither	neither	out+rec	0	echo "dirname/readlink: $(dirname $(readlink -f $0))"
+posix	NB:6389	same	same	rec	1	echo "$(basename $(pwd))"
+posix	NB:6442	same	same	out	1	echo "$(pwd)/$(basename "$1")"
+posix	NB:6443	same	same	out	1	echo pwd: `pwd`
+posix	NB:6445	same	same	out	1	echo -n $(pwd)
+posix	NB:6453	neither	neither	out+rec	1	echo "dirname/readlink: $(dirname $(readlink -f $0))"
 posix	NB:6664	neither	neither	rec	1	echo $(cat /proc/$$/cmdline)
 posix	NB:7326	=bash	=dash	out	0	echo -e "test1\ntest2\ntest3" |tr -d '\n' |grep "test1.*test3"
 posix	NB:7760	=bash	=dash	out	0	echo -e "Testing\r\nTested_Hello_World" | awk -v RS="_" '{ print $0; }' | od -a
@@ -41,8 +41,8 @@ posix	NB:7884	=bash	=dash	out	0	echo -e "length(FOO_NO_LEAD_SPACE)==$(echo -ne "
 posix	NB:7885	=bash	=dash	out	0	echo -e "length(FOO_NO_TRAIL_SPACE)==$(echo -ne "${FOO_NO_TRAIL_SPACE}" | wc -m)"
 posix	NB:7886	=bash	=dash	out	0	echo -e "length(FOO_NO_WHITESPACE)==$(echo -ne "${FOO_NO_WHITESPACE}" | wc -m)"
 posix	NB:7887	=bash	=dash	out	0	echo -e "length(FOO)==$(echo -ne "${FOO}" | wc -m)"
-posix	SC:Analytics.hs:prop_checkSpacefulnessCfg19	same	same	out	0	echo $PWD
-posix	SC:Analytics.hs:prop_checkUnassignedReferences17	same	same	out	0	USERS=foo; echo $USER
+posix	SC:Analytics.hs:prop_checkSpacefulnessCfg19	same	same	out	1	echo $PWD
+posix	SC:Analytics.hs:prop_checkUnassignedReferences17	same	same	out	1	USERS=foo; echo $USER
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes1	=bash	=dash	out	0	echo 'foo\nbar\n'
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes10	same	OURS	out	0	echo '\x4a'
 posix	SC:Checks/Commands.hs:prop_checkUnusedEchoEscapes11	same	OURS	out	0	echo '\xat'
@@ -69,23 +69,20 @@ sigpipe	NB:102	same	same	err	0	yes n | rm -ir dir1 dir2 dir3
 sigpipe	NB:103	same	same	err	0	yes | cp * /tmp
 sigpipe	NB:104	same	same	err	0	yes | rm -ri foo
 sigpipe	NB:105	same	same	err	0	yes y | rm -ir dir1 dir2 dir3
-sigpipe	NB:106	msg=dash	msg=dash	err	0	yes '| COUNTRY' | sed $(wc -l < file)q | paste -d ' ' file -
-sigpipe	NB:10761	same	same	rec	0	find $HOME -name '*.c' -print | xargs grep -l sprintf
-sigpipe	NB:1087	msg=dash	msg-own	err	0	echo -e 'y\n'|ssh-keygen -q -t rsa -N "" -f ~/.ssh/id_rsa
-sigpipe	NB:1104	same	same	rec	0	cat results2.txt | xargs -I{} ln -s {} ~/newlinks
-sigpipe	NB:1138	msg=dash	msg-own	err	0	echo -en '111 22 3\n4 555 66\n' | column -t | sed 's/ \([0-9]\)/\1/g'
-sigpipe	NB:11522	same	same	rec	0	find /tmp /var/tmp ~ -type f -size +10M -mtime +60 -ctime -100 -exec file -N -i -- {} + | sed -n 's!
-sigpipe	NB:11621	msg=dash	msg-own	err	0	printf 'password' | md5
-sigpipe	NB:11625	msg=dash	msg-own	err	0	echo -n hi | md5
-sigpipe	NB:11856	same	same	rec	0	find . -follow -iname '*.htm' -print0 | xargs -i -0 mv '{}' ~/webhome
+sigpipe	NB:1059	same	msg-own	err	0	seq 1 1000 | split -l 1 -a 3 -d - file
+sigpipe	NB:106	msg=dash	msg-own	err	0	yes '| COUNTRY' | sed $(wc -l < file)q | paste -d ' ' file -
+sigpipe	NB:10761	same	same	rec	1	find $HOME -name '*.c' -print | xargs grep -l sprintf
+sigpipe	NB:1104	same	same	rec	1	cat results2.txt | xargs -I{} ln -s {} ~/newlinks
+sigpipe	NB:11522	same	same	rec	1	find /tmp /var/tmp ~ -type f -size +10M -mtime +60 -ctime -100 -exec file -N -i -- {} + | sed -n 's!
+sigpipe	NB:11856	same	same	rec	1	find . -follow -iname '*.htm' -print0 | xargs -i -0 mv '{}' ~/webhome
 sigpipe	NB:11864	msg-own	msg-own	err	0	bind -P | grep --fixed-strings ' can be found on ' | perl -pe 's/((?<!\\)(?:\\\\)*)\\C/\1Ctrl/g;s/((
 sigpipe	NB:12196	same	same	files	1	find . -name "filename including space" -print0 | tee my_teed_file | xargs -0 ls -aldF > log.txt
-sigpipe	NB:12209	same	same	rec	0	find ~/tmp -type f -mtime 0 -exec du -ks {} \; | cut -f1 | awk '{total=total+$1}END{print total/1024
+sigpipe	NB:12209	same	same	rec	1	find ~/tmp -type f -mtime 0 -exec du -ks {} \; | cut -f1 | awk '{total=total+$1}END{print total/1024
 sigpipe	NB:12327	same	same	out	1	find . -name foo | xargs ls -tl
 sigpipe	NB:12419	msg=dash	msg-own	err	0	echo "* * * * * touch $(pwd)/washere1" | crontab
 sigpipe	NB:12420	msg=dash	msg-own	err	0	echo "30 * * * * touch $(pwd)/washere2" | crontab
-sigpipe	NB:1482	same	same	rec	0	who | grep $USER
-sigpipe	NB:1497	same	msg=dash	err	0	cat file.txt | perl -ne 's/foo/bar/g;' | less
+sigpipe	NB:1482	same	same	rec	1	who | grep $USER
+sigpipe	NB:1497	same	msg-own	err	0	cat file.txt | perl -ne 's/foo/bar/g;' | less
 sigpipe	NB:1505	same	msg-own	err	0	ls -l | more
 sigpipe	NB:1523	same	same	out	1	find /home/backups -printf "%T@ %p\n" | sort -n | head -1 | cut -d" " -f2- | xargs ls -al
 sigpipe	NB:1542	same	same	err	0	yes | more
@@ -95,90 +92,90 @@ sigpipe	NB:1580	same	same	err	0	yes 'printf \\u$[2571+RANDOM%2]'|bash
 sigpipe	NB:1635	same	same	err	0	od -t x1 -An /bin/ls | head
 sigpipe	NB:1654	msg=dash	msg=dash	err	0	ls | column -c 80
 sigpipe	NB:1689	msg=dash	msg=dash	err	0	seq 10000 | parallel -j100 wget https://www.example.com/page{}.html
-sigpipe	NB:1739	msg=dash	msg-own	err	0	echo "* * * * * script" | crontab -
-sigpipe	NB:1916	same	msg-own	err	0	echo -e "$(TZ=GMT+30 date +%Y-%m-%d)\n$(TZ=GMT+20 date +%Y-%m-%d)" | grep -v $(date +%Y-%m-%d) | tai
+sigpipe	NB:1916	same	msg=bash	err	0	echo -e "$(TZ=GMT+30 date +%Y-%m-%d)\n$(TZ=GMT+20 date +%Y-%m-%d)" | grep -v $(date +%Y-%m-%d) | tai
 sigpipe	NB:1920	same	same	out	1	ls -l --color=always "$@" | egrep --color=never '^d|^[[:digit:]]+ d'
 sigpipe	NB:1921	same	same	out	1	ls -l --color=always "$@" | grep --color=never '^d'
 sigpipe	NB:1922	same	same	out	1	ls -l | grep "^d"
-sigpipe	NB:1953	same	same	rec	0	find $HOME -name '*.c' -print | xargs grep -l sprintf
-sigpipe	NB:209	msg=dash	msg=dash	rec	0	find "$(pwd -P)" -type d \( -path '/path/to/dir1' -or -path '/path/to/dir2' \) -prune -or -not \( -p
-sigpipe	NB:2165	same	same	rec	0	find . -iname *.page -exec ~/t.sh {} \; | sort
-sigpipe	NB:2346	same	same	rec	0	find . -name "*.sh" -print0 | xargs -0 -I file mv file ~/back.scripts
-sigpipe	NB:2347	same	same	rec	0	find . -name "*.sh" -print0 | xargs -0 -I {} mv {} ~/back.scripts
+sigpipe	NB:1953	same	same	rec	1	find $HOME -name '*.c' -print | xargs grep -l sprintf
+sigpipe	NB:209	msg=dash	msg=dash	rec	1	find "$(pwd -P)" -type d \( -path '/path/to/dir1' -or -path '/path/to/dir2' \) -prune -or -not \( -p
+sigpipe	NB:2165	same	same	rec	1	find . -iname *.page -exec ~/t.sh {} \; | sort
+sigpipe	NB:2346	same	same	rec	1	find . -name "*.sh" -print0 | xargs -0 -I file mv file ~/back.scripts
+sigpipe	NB:2347	same	same	rec	1	find . -name "*.sh" -print0 | xargs -0 -I {} mv {} ~/back.scripts
 sigpipe	NB:244	same	same	err	0	yes | sudo rpm -Uvh https://mirror.webtatic.com/yum/el6/latest.rpm
 sigpipe	NB:245	same	same	err	0	yes 1 | script -c 'aspell check text.txt' /dev/null
 sigpipe	NB:246	same	same	err	0	yes 0 | script -c 'ispell text.txt' /dev/null
-sigpipe	NB:2464	same	same	rec	0	find "$HOME" -name '*.txt' -type f -not -path "$HOME/newdir/*" -print0 | xargs -0 cp -t "$HOME/newdi
-sigpipe	NB:2465	same	same	rec	0	find "$HOME" -name '*.txt' -type f -print0 | sort -zu | xargs -0 cp -t "$HOME/newdir"
-sigpipe	NB:2466	same	same	rec	0	find "$HOME" -name '*.txt' -type f -print0 | xargs -0 cp -ut "$HOME/newdir"
+sigpipe	NB:2464	same	same	rec	1	find "$HOME" -name '*.txt' -type f -not -path "$HOME/newdir/*" -print0 | xargs -0 cp -t "$HOME/newdi
+sigpipe	NB:2465	same	same	rec	1	find "$HOME" -name '*.txt' -type f -print0 | sort -zu | xargs -0 cp -t "$HOME/newdir"
+sigpipe	NB:2466	same	same	rec	1	find "$HOME" -name '*.txt' -type f -print0 | xargs -0 cp -ut "$HOME/newdir"
 sigpipe	NB:247	same	same	err	0	yes 0 | script -c 'ispell text.txt' out.txt
 sigpipe	NB:260	same	same	err	0	yes '' | ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
 sigpipe	NB:2649	neither	neither	rec+err	1	find . -mount -type d -print0 | xargs -0 -n1 /tmp/count_em_$$ | sort -n
-sigpipe	NB:2651	same	same	rec	0	find ~/code -type d | tr '\n' ':' | sed 's/:$//'
-sigpipe	NB:2652	same	same	rec	0	find ~/code -type d -name '[^\.]*' | tr '\n' ':' | sed 's/:$//'
-sigpipe	NB:2653	same	same	rec	0	find ~/code -type d | sed '/\/\\./d' | tr '\n' ':' | sed 's/:$//'
-sigpipe	NB:2812	same	same	rec	0	find $(pwd) -name YourProgram -exec dirname {} \; | while read d; do cd "$d" && ./YourPrgram; done
-sigpipe	NB:2861	same	same	rec	0	find `pwd` -name file.ext |xargs -l1 dirname
-sigpipe	NB:289	same	same	err	0	seq -s "*" 1 500 |bc
-sigpipe	NB:2999	same	same	out	1	find /path/to/dir -type f -mtime -7 -print0 | xargs -0 ls -lt | head
-sigpipe	NB:3107	same	same	rec	0	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -print | sed 's@/[^/]\+$@:@' | sort | uniq | 
-sigpipe	NB:3160	msg=dash	msg=dash	err	0	(cd ~/bin/FilesDvorak/; find . -maxdepth 1 | sort > b)
+sigpipe	NB:2651	same	same	rec	1	find ~/code -type d | tr '\n' ':' | sed 's/:$//'
+sigpipe	NB:2652	same	same	rec	1	find ~/code -type d -name '[^\.]*' | tr '\n' ':' | sed 's/:$//'
+sigpipe	NB:2653	same	same	rec	1	find ~/code -type d | sed '/\/\\./d' | tr '\n' ':' | sed 's/:$//'
+sigpipe	NB:2812	same	same	rec	1	find $(pwd) -name YourProgram -exec dirname {} \; | while read d; do cd "$d" && ./YourPrgram; done
+sigpipe	NB:2861	same	same	rec	1	find `pwd` -name file.ext |xargs -l1 dirname
+sigpipe	NB:288	msg=dash	msg-own	err	0	echo -n teststring | gzip -1 | tail -c 8 | head -c 4 | hexdump -e '1/4 "%08x" "\n"'
+sigpipe	NB:289	same	msg-own	err	0	seq -s "*" 1 500 |bc
+sigpipe	NB:2999	=dash	same	out	1	find /path/to/dir -type f -mtime -7 -print0 | xargs -0 ls -lt | head
+sigpipe	NB:3107	same	same	rec	1	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -print | sed 's@/[^/]\+$@:@' | sort | uniq | 
+sigpipe	NB:3160	msg=dash	msg=dash	err	1	(cd ~/bin/FilesDvorak/; find . -maxdepth 1 | sort > b)
 sigpipe	NB:321	msg=dash	msg=dash	err	0	<files.txt xargs stat -c %s | paste -sd+ - | bc
 sigpipe	NB:324	same	same	err	0	seq -5 10 | xargs printf "- - %s" | xargs | bc
 sigpipe	NB:325	same	same	err	0	seq -s+ -5 10 | bc
-sigpipe	NB:326	same	msg=bash	err	0	seq 10 | jq -s 'add'
+sigpipe	NB:326	same	msg=dash	err	0	seq 10 | jq -s 'add'
+sigpipe	NB:328	same	msg=bash	err	0	seq 10|jq -s add
 sigpipe	NB:329	same	same	err	0	seq 100000 | paste -sd+ | bc -l
-sigpipe	NB:3296	same	same	rec	0	find ~ -iname "screen*" | more
-sigpipe	NB:330	same	same	err	0	ipcs -mb | awk 'NR > 3 { print $7 }' | paste -sd+ | bc
-sigpipe	NB:333	same	same	rec	0	find "$PWD" / -iname '*.jpg' -exec du -s {} + | sed "s/^/$(hostname): /"
+sigpipe	NB:3296	same	same	rec	1	find ~ -iname "screen*" | more
+sigpipe	NB:330	same	msg-own	err	0	ipcs -mb | awk 'NR > 3 { print $7 }' | paste -sd+ | bc
+sigpipe	NB:333	same	same	rec	1	find "$PWD" / -iname '*.jpg' -exec du -s {} + | sed "s/^/$(hostname): /"
 sigpipe	NB:335	msg=dash	msg=dash	err	0	find . -type f -iname "*.jpg" -ls | awk 'BEGIN {print "0"}; {print $7, "+"}; END {print "p"}' | dc
-sigpipe	NB:3425	same	same	rec	0	find .|grep "FooBar"|xargs -I{} cp "{}" ~/foo/bar
-sigpipe	NB:3509	msg=dash	msg=dash	rec	0	find $HOME -type f | samefile -r
+sigpipe	NB:3425	same	same	rec	1	find .|grep "FooBar"|xargs -I{} cp "{}" ~/foo/bar
+sigpipe	NB:3439	same	=dash	status+rec+err	0	find /mnt/naspath -mtime 0 -print0 | du --files0-from=- -hc | tail -n1 >> /tmp/size.log
+sigpipe	NB:3440	=dash	same	status+rec+err	0	find /mnt/naspath -mtime 0 -name .snapshot -prune -o \( \! -name *~ -print0 \) | du --files0-from=- 
+sigpipe	NB:3509	msg=dash	msg=dash	rec	1	find $HOME -type f | samefile -r
 sigpipe	NB:351	msg=dash	msg=dash	err	0	echo ',s/foo/bar/g; w' | tr \; '\012' | ed -s file.txt
-sigpipe	NB:3518	same	same	rec	0	grep $USER file |nl
-sigpipe	NB:3587	same	same	rec	0	find ~/mail -type f | xargs grep "Linux"
-sigpipe	NB:3604	same	same	rec	0	find ~/container -mindepth 3 -type f | while read file; do mv "$file" "$(dirname "$file")/.."; done
-sigpipe	NB:3605	same	same	rec	0	find ~/container -mindepth 3 -type f | xargs -i bash -c 'mv "{}" $(dirname "{}")/..'
-sigpipe	NB:367	same	same	rec+err	0	cd "$(grep DOWNLOAD $HOME/.config/user-dirs.dirs | cut -f 2 -d "=" | tr "\"" "\n" | tr -d "\n")"
-sigpipe	NB:368	same	same	rec+err	0	cd "$(grep DOWNLOAD $HOME/.config/user-dirs.dirs | cut -f 2 -d "=" | tr "\"" "\n")"
-sigpipe	NB:3699	same	same	rec	0	find . -type l -exec sh -c 'echo $(readlink -f "{}") "<-- {}"' \; | grep -v "^$(readlink -f ${PWD})"
-sigpipe	NB:3712	same	same	rec	0	find . -type l -exec readlink -f '{}' \; | grep -v "^`readlink -f ${PWD}`"
-sigpipe	NB:4206	same	same	rec	0	find ~/Desktop -name “*.jpg” -o -name “*.gif” -o -name “*.png” -print0 | xargs -0 mv –
+sigpipe	NB:3518	same	same	rec	1	grep $USER file |nl
+sigpipe	NB:3587	same	same	rec	1	find ~/mail -type f | xargs grep "Linux"
+sigpipe	NB:3604	same	same	rec	1	find ~/container -mindepth 3 -type f | while read file; do mv "$file" "$(dirname "$file")/.."; done
+sigpipe	NB:3605	same	same	rec	1	find ~/container -mindepth 3 -type f | xargs -i bash -c 'mv "{}" $(dirname "{}")/..'
+sigpipe	NB:367	same	same	rec+err	1	cd "$(grep DOWNLOAD $HOME/.config/user-dirs.dirs | cut -f 2 -d "=" | tr "\"" "\n" | tr -d "\n")"
+sigpipe	NB:368	same	same	rec+err	1	cd "$(grep DOWNLOAD $HOME/.config/user-dirs.dirs | cut -f 2 -d "=" | tr "\"" "\n")"
+sigpipe	NB:3699	same	same	rec	1	find . -type l -exec sh -c 'echo $(readlink -f "{}") "<-- {}"' \; | grep -v "^$(readlink -f ${PWD})"
+sigpipe	NB:3712	same	same	rec	1	find . -type l -exec readlink -f '{}' \; | grep -v "^`readlink -f ${PWD}`"
+sigpipe	NB:4206	same	same	rec	1	find ~/Desktop -name “*.jpg” -o -name “*.gif” -o -name “*.png” -print0 | xargs -0 mv –
 sigpipe	NB:4253	same	same	out	1	find . -name "*zip" -type f | xargs ls -ltr | tail -1
-sigpipe	NB:4254	=dash	same	out	1	find . -type f -print0 | xargs -0 ls -ltr | tail -n 1
+sigpipe	NB:4254	same	same	out	1	find . -type f -print0 | xargs -0 ls -ltr | tail -n 1
 sigpipe	NB:4259	same	same	out	1	find . -type f -printf '%T@ %p\n' | sort -n | tail -1 | cut -f2- -d" " | sed 's/.*/"&"/' | xargs ls 
-sigpipe	NB:4263	=dash	same	out	1	find . -type f | xargs ls -ltr | tail -n 1
+sigpipe	NB:4263	same	same	out	1	find . -type f | xargs ls -ltr | tail -n 1
 sigpipe	NB:4313	same	same	out	1	find . -type l | xargs ls -ld
-sigpipe	NB:4355	same	=dash	out	1	find . -name \*.sql | xargs \ls -1rc | tail -7 | head -1
-sigpipe	NB:4364	neither	OURS	rec	1	find . -type d -print0 | xargs -0 -n1 du -sk | sort -rn > dir-sizes.txt&
-sigpipe	NB:4365	same	same	rec	0	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -printf ':%h\n' |sort |uniq |tr -d '\n' > ~/.
+sigpipe	NB:4355	=dash	=dash	out	1	find . -name \*.sql | xargs \ls -1rc | tail -7 | head -1
+sigpipe	NB:4365	same	same	rec	1	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -printf ':%h\n' |sort |uniq |tr -d '\n' > ~/.
 sigpipe	NB:4373	same	same	err	0	find . -iname '*.jpg' -type f -printf '%b\t%D:%i\n' | sort -u | cut -f1 | paste -sd+ - | bc
-sigpipe	NB:4377	same	msg-own	err	0	find /mnt/iso -name *.avi -printf "%s\n" | paste -sd+ - | bc
+sigpipe	NB:4377	same	same	err	0	find /mnt/iso -name *.avi -printf "%s\n" | paste -sd+ - | bc
 sigpipe	NB:4378	same	same	err	0	find -iname 'file*' -exec du -cb {} + | grep total$ | cut -f1 | paste -sd+ - | bc
-sigpipe	NB:4379	same	same	out	0	find /bin -type f -follow | xargs ls -al | awk ' NF==9 { print $3 }'|sort -u
-sigpipe	NB:4395	same	same	rec	0	find /tmp/ -ctime -1 -name 'x*' -print0 | xargs -r0 mv -t ~/play/
-sigpipe	NB:4440	=dash	=dash	out	0	{ time sleep 1; } 2>&1 | grep real
-sigpipe	NB:4534	msg=dash	msg-own	err	0	echo "$line" | column -t
+sigpipe	NB:4379	same	same	out	1	find /bin -type f -follow | xargs ls -al | awk ' NF==9 { print $3 }'|sort -u
+sigpipe	NB:4395	same	same	rec	1	find /tmp/ -ctime -1 -name 'x*' -print0 | xargs -r0 mv -t ~/play/
+sigpipe	NB:4440	=dash	=dash	out	1	{ time sleep 1; } 2>&1 | grep real
 sigpipe	NB:4535	msg=dash	msg=dash	err	0	cat file.txt | column -c 28 -s "\ "
 sigpipe	NB:4579	same	timeout	status	0	pass=$(LC_CTYPE=C < /dev/urandom tr -cd [:graph:] | tr -d '\n' | fold -w 32 | head -n 1)
 sigpipe	NB:4623	neither	neither	rec	1	ps -p $$ | awk '$1 == PP {print $4}' PP=$$
 sigpipe	NB:4624	neither	neither	rec	1	ps | grep `echo $$` | awk '{ print $4 }'
 sigpipe	NB:4722	same	same	out	1	find /home -xdev -samefile file1 | xargs ls -l
 sigpipe	NB:4723	same	same	err	0	find . -name '*.php' | xargs wc -l | sort -nr | egrep -v "libs|tmp|tests|vendor" | less
-sigpipe	NB:4742	same	same	rec	0	cd $(echo $somedir | sed "s#^~#$HOME#")
+sigpipe	NB:4742	same	same	rec	1	cd $(echo $somedir | sed "s#^~#$HOME#")
 sigpipe	NB:4754	same	same	err	0	yes n | gunzip file*.gz
 sigpipe	NB:4774	neither	neither	rec	1	ps -o pid= --ppid $PPID | xargs kill -9
 sigpipe	NB:4783	msg=bash	msg=bash	err	0	yes 0 | sed '1~2s/0/1/'
 sigpipe	NB:4785	msg=bash	timeout	status	0	yes 1 | nl | tee /tmp/to
-sigpipe	NB:4813	same	msg=dash	err	0	ls --color | less -r
-sigpipe	NB:4864	same	same	out	0	ls -1 | xargs readlink -f
-sigpipe	NB:4865	same	same	err	0	md5sum *.txt | sort | perl -ne '($y,$f)=split; print "$f\n" unless $y eq $x; $x=$y'
+sigpipe	NB:4813	same	same	err	0	ls --color | less -r
+sigpipe	NB:4864	same	same	out	1	ls -1 | xargs readlink -f
+sigpipe	NB:4865	same	msg=bash	err	0	md5sum *.txt | sort | perl -ne '($y,$f)=split; print "$f\n" unless $y eq $x; $x=$y'
 sigpipe	NB:4882	same	same	out	1	find /etc -name "*.txt" | xargs ls -l
 sigpipe	NB:4890	same	same	out	1	find . -name "*fink*" |xargs ls -l
-sigpipe	NB:4904	OURS	same	files	1	find . -name 'VPN_CALLRECORD_20140409*' -type f| xargs ls -lhrt |awk '{print $9}' > log.txt
-sigpipe	NB:4909	same	msg-own	err	0	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
+sigpipe	NB:4909	same	same	err	0	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
 sigpipe	NB:4919	same	same	err	0	cat /etc/passwd | sed 's/^\([^:]*\):.*$/crontab -u \1 -l 2>\&1/' | grep -v "no crontab for" | sh
-sigpipe	NB:4934	same	same	out	0	env | grep '^\(GO\|HOME=\|PATH=\)'
+sigpipe	NB:4934	same	same	out	1	env | grep '^\(GO\|HOME=\|PATH=\)'
 sigpipe	NB:4948	same	same	out	1	ls -l --time-style=long-iso | sort -k6
 sigpipe	NB:4976	same	same	out	1	find . -maxdepth 2 -type f -print0 | xargs -0 -n1 ls -l
 sigpipe	NB:4984	same	same	out	1	find . -type f -print | xargs ls -l
@@ -187,38 +184,36 @@ sigpipe	NB:5006	same	same	err	0	find . -type f -size +10000000 -print|xargs ls -
 sigpipe	NB:5065	same	same	err	0	find . -name '*.php' -print0 | xargs -0 wc -l | sort -nr | egrep -v "libs|tmp|tests|vendor" | less
 sigpipe	NB:5071	same	same	out	1	find . -mmin -60 -type f | xargs ls -l
 sigpipe	NB:5075	same	same	out+rec	1	find ~ -type f -mmin -90 | xargs ls -l
-sigpipe	NB:5076	same	same	rec	0	find ~ -type f -mtime +1825 |xargs -r ls -l
+sigpipe	NB:5076	same	same	rec	1	find ~ -type f -mtime +1825 |xargs -r ls -l
 sigpipe	NB:5077	same	same	out+rec	1	find ~ -type f -mtime +1825 |xargs ls -l
 sigpipe	NB:5080	same	same	out	1	find . -type f -print0 | xargs -0 ls -l
 sigpipe	NB:5081	same	same	out	1	find . -type f | xargs ls -l
-sigpipe	NB:5115	same	msg=bash	err	0	ls | more
-sigpipe	NB:5128	same	same	out	0	pwd | cut -b2- | tr '/' '\n'
+sigpipe	NB:5115	same	msg-own	err	0	ls | more
+sigpipe	NB:5128	same	same	out	1	pwd | cut -b2- | tr '/' '\n'
 sigpipe	NB:5137	neither	neither	out	1	env | sed 's/;/\\;/g'
-sigpipe	NB:5144	same	same	rec	0	find `pwd` -perm 111 -type f | sort -r | xargs -n1 -I{} sh -c "dirname {};basename {}" | awk '/^\// 
+sigpipe	NB:5144	same	same	rec	1	find `pwd` -perm 111 -type f | sort -r | xargs -n1 -I{} sh -c "dirname {};basename {}" | awk '/^\// 
 sigpipe	NB:5152	same	same	out	1	find . -print | xargs ls -gilds
 sigpipe	NB:5171	same	same	out	1	find /tmp /var/tmp -size +30M -mtime 31 -print0 | xargs -0 ls -l
-sigpipe	NB:5173	same	same	rec	0	find `pwd` -name "accepted_hits.bam" | xargs -i echo somecommand {}
+sigpipe	NB:5173	same	same	rec	1	find `pwd` -name "accepted_hits.bam" | xargs -i echo somecommand {}
 sigpipe	NB:5182	same	same	out	1	find . -type f |xargs ls -lS |head -20
 sigpipe	NB:5185	same	same	out	1	find -type f | grep -P '\w+-\d+x\d+\.\w+$' | sed -re 's/(\s)/\\\1/g' | xargs ls -l
 sigpipe	NB:5188	same	same	out	1	find /usr/pcapps/ -mount -type f -size +1000000c | perl -lpe ' s{ }{\\ }g ' | xargs ls -l | sort +4n
 sigpipe	NB:5212	same	same	err	0	ls /usr/bin | more
-sigpipe	NB:5268	same	msg=dash	err	0	ls -1 | perl -pe 's/\n$/some_delimiter/'
 sigpipe	NB:5272	same	msg=bash	err	0	ls | perl -F'\n' -0777 -anE 'say join ",", @F'
 sigpipe	NB:5276	same	msg=dash	err	0	ls -1 | perl -l40pe0
-sigpipe	NB:5344	msg=dash	msg-own	err	0	echo 'echo "Bash version: ${BASH_VERSION}"' | ssh -q localhost bash
-sigpipe	NB:539	same	same	rec	0	mount | grep -q ~/mnt/sdc1
+sigpipe	NB:539	same	same	rec	1	mount | grep -q ~/mnt/sdc1
 sigpipe	NB:5390	neither	timeout	status+rec+files	1	cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs mkdir
 sigpipe	NB:5391	neither	timeout	status+rec+files	1	mkdir $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-sigpipe	NB:5405	same	same	rec	0	mkdir "$@" |sed -e"s/mkdir: created directory /$USER created folder /"
+sigpipe	NB:5405	same	same	rec	1	mkdir "$@" |sed -e"s/mkdir: created directory /$USER created folder /"
 sigpipe	NB:5492	same	same	err	0	cat file.txt | xargs | sed -e 's/\ /+/g' | bc
 sigpipe	NB:5496	msg=dash	msg=dash	err	0	... | paste -sd+ - | bc
 sigpipe	NB:5505	=dash	=dash	err	1	time find /usr/src -name "*.html" -exec grep -H "foo" {} ';' | wc -l
 sigpipe	NB:5506	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs grep -l "foo" | wc -l
-sigpipe	NB:5508	same	same	err	0	sort -m *.txt | split -d -l 1000000 - output
+sigpipe	NB:5508	same	msg=bash	err	0	sort -m *.txt | split -d -l 1000000 - output
 sigpipe	NB:5509	same	same	err	0	sort --merge file*.txt | split -l 100000 - sorted_file
 sigpipe	NB:552	neither	neither	rec	1	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | wc -l
-sigpipe	NB:5592	same	same	rec	0	find . -name '*~' -print 0 | xargs -0 -I % cp % ~/backups
-sigpipe	NB:5632	same	same	rec	0	find . | xargs -I'{}' mv '{}' ~/play/
+sigpipe	NB:5592	same	same	rec	1	find . -name '*~' -print 0 | xargs -0 -I % cp % ~/backups
+sigpipe	NB:5632	same	same	rec	1	find . | xargs -I'{}' mv '{}' ~/play/
 sigpipe	NB:571	neither	neither	rec	1	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | grep screen | wc -l
 sigpipe	NB:5712	same	same	err	0	yes -- "-tcp" | head -n 2
 sigpipe	NB:5713	same	same	err	0	yes -- -tcp | head -n 2
@@ -236,7 +231,7 @@ sigpipe	NB:5849	same	same	err	0	yes | head -3
 sigpipe	NB:5850	same	same	err	0	echo $(yes % | head -n3)
 sigpipe	NB:5852	same	same	err	0	yes ' ' | head -7 | tr -d '\n'
 sigpipe	NB:5873	same	timeout	status	0	yes 'http://www.blabla.bla/forum-detail/?ft=72260&fid=34&&pgr=' | nl -ba | sed 786q | grep . | awk '
-sigpipe	NB:5884	same	same	rec	0	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -printf ':%h\n' | sort | uniq | tr -d '\n'
+sigpipe	NB:5884	same	same	rec	1	find ~/code -name '.*' -prune -o -type f -a -perm /u+x -printf ':%h\n' | sort | uniq | tr -d '\n'
 sigpipe	NB:5908	neither	timeout	status+out	1	cat /dev/urandom | tr -dc '. ' | fold -w 100 | head -1
 sigpipe	NB:5939	neither	neither	out+err	1	seq 2000 65000 | sort -R | head -n 1
 sigpipe	NB:5942	same	same	err	0	yes | head -n 10 | awk '{printf( "%03d ", NR )}'
@@ -244,74 +239,76 @@ sigpipe	NB:5943	same	same	err	0	yes | head -n 10 | awk '{printf( "%03d ", NR )}'
 sigpipe	NB:5944	same	same	err	0	yes | grep y | sed 100q | awk '{printf( "%03d ", NR )}'; echo
 sigpipe	NB:5945	same	same	err	0	yes | head -n 100 | awk '{printf( "%03d ", NR )}'
 sigpipe	NB:5946	same	same	err	0	yes | head -n 100 | awk '{printf( "%03d ", NR )}' ##for 001...100
-sigpipe	NB:5949	same	same	rec	0	find ~/Music/ -iname 'cover.*' -printf '%h\n' | sort -u
-sigpipe	NB:5959	same	same	rec	0	find ~/Music/ -maxdepth 2 -mindepth 2 -type d | sort
-sigpipe	NB:6003	same	msg=dash	err	0	seq 1 10 | perl -e '@x=("")x3;while(<>){print shift @x;push @x,$_}'
+sigpipe	NB:5949	same	same	rec	1	find ~/Music/ -iname 'cover.*' -printf '%h\n' | sort -u
+sigpipe	NB:5959	same	same	rec	1	find ~/Music/ -maxdepth 2 -mindepth 2 -type d | sort
+sigpipe	NB:6003	same	msg=bash	err	0	seq 1 10 | perl -e '@x=("")x3;while(<>){print shift @x;push @x,$_}'
 sigpipe	NB:6004	same	msg-own	err	0	seq 1 10 | perl -e'@x=<>;print@x[0..$#x-3]'
-sigpipe	NB:6005	same	msg-own	err	0	seq 1 10 | perl -ne 'print if ( !eof )' | perl -ne 'print if ( !eof )' | perl -ne 'print if ( !eof )
-sigpipe	NB:6020	same	same	rec	0	df -Ph $PWD | tail -1 | awk '{ print $3}'
-sigpipe	NB:6024	same	same	rec	0	df $PWD | awk '/[0-9]%/{print $(NF-2)}'
+sigpipe	NB:6006	same	msg-own	err	0	seq 1 10 | perl -ne 'push @l, $_; print shift @l if @l > 3'
+sigpipe	NB:6020	same	same	rec	1	df -Ph $PWD | tail -1 | awk '{ print $3}'
+sigpipe	NB:6024	same	same	rec	1	df $PWD | awk '/[0-9]%/{print $(NF-2)}'
 sigpipe	NB:6035	same	same	err	0	yes $1 | head -$number
 sigpipe	NB:6074	timeout	timeout	out	1	grep -ao "[/\\]" /dev/urandom|tr -d \\n
 sigpipe	NB:6075	timeout	timeout	out	1	cat /dev/urandom | tr -dc '. ' | fold -w 100
-sigpipe	NB:6077	same	msg=dash	err	0	cat /etc/passwd | sed 's/^\([^:]*\):.*$/crontab -u \1 -l 2>\&1/' | sh | grep -v "no crontab for"
+sigpipe	NB:6077	same	same	err	0	cat /etc/passwd | sed 's/^\([^:]*\):.*$/crontab -u \1 -l 2>\&1/' | sh | grep -v "no crontab for"
 sigpipe	NB:6081	neither	neither	rec	1	ps -ef | grep $$ | grep -v grep
 sigpipe	NB:6083	same	msg=bash	err	0	echo "( `date -d $B +%s` - `date -d $A +%s`) / (24*3600)" | bc -l
 sigpipe	NB:6119	same	same	err	0	yes | cat -n | head -10 | awk 'NR % 4 == 1'
 sigpipe	NB:6131	same	same	out	1	which studio | xargs ls -l
-sigpipe	NB:6198	same	msg=dash	err	0	cat /etc/passwd -n | grep `whoami` | cut -f1
+sigpipe	NB:617	same	msg-own	err	0	FOO=$(echo "Hello world" | gzip | base64)
+sigpipe	NB:6186	same	same	out	1	cat /proc/1/sched | head -n 1
+sigpipe	NB:6198	same	msg-own	err	0	cat /etc/passwd -n | grep `whoami` | cut -f1
 sigpipe	NB:6202	same	same	err	0	seq 1 100000 | tail -n +10000 | head -n 10
-sigpipe	NB:6228	=dash	=bash	rec+err	1	mount | grep -i "/dev/sd.*" | awk '{ print NR "\t" $1 "\t" $3 }' > mount_output &
 sigpipe	NB:6247	neither	neither	rec	1	ps -o user= -p $$ | awk '{print $1}'
 sigpipe	NB:6248	same	timeout	status+err	0	yes | nl -ba | tr ' ' 0 | sed 100q | cut -b 4-6
-sigpipe	NB:6255	same	same	out+rec	0	ls -d -1 $PWD/**/*/* | cat -n
+sigpipe	NB:6255	same	same	out+rec	1	ls -d -1 $PWD/**/*/* | cat -n
 sigpipe	NB:6257	same	same	err	0	yes | head -n10 | grep -n . | cut -d: -f1 | paste -sd:
 sigpipe	NB:6258	msg=dash	msg=dash	err	0	seq 10 | parallel -j4 echo '{}'
 sigpipe	NB:6259	neither	neither	out	1	seq 10 | xargs -P4 -I'{}' echo '{}'
-sigpipe	NB:6274	same	same	rec	0	find $(pwd) -name YourProgram -exec dirname {} \; | while read d; do cd "$d" && pwd; done
+sigpipe	NB:6274	same	same	rec	1	find $(pwd) -name YourProgram -exec dirname {} \; | while read d; do cd "$d" && pwd; done
 sigpipe	NB:6276	neither	neither	out+err	1	cat /dev/urandom | tr -dc 'a-zA-Z0-9'
 sigpipe	NB:6286	neither	neither	out+err	1	cat /dev/urandom | tr -dC '[:graph:]'
-sigpipe	NB:6297	same	same	rec	0	find ~ -name '*.txt' -print0 | xargs -0 cat
-sigpipe	NB:6308	msg=dash	msg=dash	err	0	~ $ . trap.sh | cat
+sigpipe	NB:6297	same	same	rec	1	find ~ -name '*.txt' -print0 | xargs -0 cat
+sigpipe	NB:6308	msg=dash	msg=dash	err	1	~ $ . trap.sh | cat
 sigpipe	NB:6326	same	timeout	status	0	yes '' | nl -ba | sed -n -e 11,24p -e 24q
-sigpipe	NB:6367	same	same	rec	0	find ~/bin/FilesDvorak/.* -maxdepth 0 | awk -F"/" '{ print $6 }'
-sigpipe	NB:6380	same	same	out+rec	0	ls -d -1 $PWD/**/*/* | nl
-sigpipe	NB:6390	same	same	rec	0	pwd | xargs basename
+sigpipe	NB:6349	same	msg=dash	err	0	seq 5 | perl -ne 'chomp; print "$_ "; END{print "\n"}'
+sigpipe	NB:6367	same	same	rec	1	find ~/bin/FilesDvorak/.* -maxdepth 0 | awk -F"/" '{ print $6 }'
+sigpipe	NB:6380	same	same	out+rec	1	ls -d -1 $PWD/**/*/* | nl
+sigpipe	NB:6390	same	same	rec	1	pwd | xargs basename
+sigpipe	NB:6397	same	msg-own	err	0	echo "$b" | grep -o "[$a]" | tr -d '\n'
 sigpipe	NB:6436	neither	neither	rec	1	ps -p $$ | tail -1 | awk '{print $NF}'
 sigpipe	NB:6487	neither	timeout	status+out	1	cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
 sigpipe	NB:6488	neither	neither	out+err	1	cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32
 sigpipe	NB:6489	neither	neither	out+err	1	cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f0-9' | head -c 32
-sigpipe	NB:6526	same	msg=bash	err	0	cat /proc/config.gz | gunzip
-sigpipe	NB:660	neither	=dash	rec	1	find "$1" -type f | egrep -v '\.bz2' | xargs bzip2 -9 &
-sigpipe	NB:6608	same	same	rec	0	find ~ -type f -exec file -i {} + | grep video
-sigpipe	NB:662	same	same	rec	0	find ~/ -name '*.txt' -print0 | xargs -0 wc -w | awk 'END { print $1/(NR-1) }'
-sigpipe	NB:663	same	same	rec	0	find ~/Journalism -name '*.txt' -print0 | xargs -0 wc -w | awk '$1 < 2000 {v += $1; c++} END {print 
+sigpipe	NB:6494	same	msg-own	err	0	seq 1 10000 | head -1
+sigpipe	NB:6526	same	msg-own	err	0	cat /proc/config.gz | gunzip
+sigpipe	NB:6608	same	same	rec	1	find ~ -type f -exec file -i {} + | grep video
+sigpipe	NB:662	same	same	rec	1	find ~/ -name '*.txt' -print0 | xargs -0 wc -w | awk 'END { print $1/(NR-1) }'
+sigpipe	NB:663	same	same	rec	1	find ~/Journalism -name '*.txt' -print0 | xargs -0 wc -w | awk '$1 < 2000 {v += $1; c++} END {print 
 sigpipe	NB:6643	same	same	out	1	ls -l | head -2 | tail -1
 sigpipe	NB:6644	same	same	out	1	ls -l | tail -n +2 | head -n1
-sigpipe	NB:6669	neither	neither	out+err	1	seq -f 'some line %g' 500 | nl | sort -R | cut -f2- | head -3
-sigpipe	NB:6672	same	msg=dash	err	0	df | tail -n +2 | tr -s ' ' | cut -d ' ' -f 2 | paste -s -d+ | bc
+sigpipe	NB:6669	neither	neither	out	1	seq -f 'some line %g' 500 | nl | sort -R | cut -f2- | head -3
+sigpipe	NB:6672	same	same	err	0	df | tail -n +2 | tr -s ' ' | cut -d ' ' -f 2 | paste -s -d+ | bc
 sigpipe	NB:6694	same	same	err	0	yes "$OPTARG" | head -$opt
-sigpipe	NB:6696	msg=dash	msg-own	err	0	echo $modules | column -t | fold | column -t
 sigpipe	NB:6728	same	same	err	0	tr -dc '1-65000' </dev/urandom | head -c N
-sigpipe	NB:6731	neither	neither	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
+sigpipe	NB:6731	OURS	neither	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
 sigpipe	NB:6732	same	same	err	0	head -200 /dev/urandom |cksum | cut -f1 -d " " | awk '{print $1%63000+2001}'
-sigpipe	NB:6757	same	msg=bash	err	0	echo `date +%s`/86400 | bc
-sigpipe	NB:6795	same	=dash	out+files	1	ls -a | tee output.file
+sigpipe	NB:6757	same	msg-own	err	0	echo `date +%s`/86400 | bc
+sigpipe	NB:6795	same	OURS	out+files	0	ls -a | tee output.file
 sigpipe	NB:6810	same	same	out	1	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
-sigpipe	NB:6818	timeout	neither	status+out+files	1	ls -lR / | tee -a output.file
-sigpipe	NB:6819	neither	neither	out+files	1	ls -lR / | tee output.file
+sigpipe	NB:6818	neither	neither	out+files+err	1	ls -lR / | tee -a output.file
+sigpipe	NB:6819	neither	neither	out+files+err	1	ls -lR / | tee output.file
 sigpipe	NB:682	same	same	err	0	yes | mv ...
 sigpipe	NB:6821	neither	neither	rec	1	ls -l /proc/$$/exe | sed 's%.*/%%'
 sigpipe	NB:683	msg=bash	msg=bash	err	0	yes a=\"20131202\" | sed -e :a -e 's/...\([0-9]\{4\}\)\([0-9]\{2\}\)\([0-9]\{2\}\)./\1 \2 \3/'
 sigpipe	NB:684	msg=dash	msg=dash	err	0	yes | pv --quiet --rate-limit 10
 sigpipe	NB:6844	neither	neither	rec	1	pstree --show-parents -p $$ | head -n 1 | sed 's/\(.*\)+.*/\1/' | less
-sigpipe	NB:685	same	OURS	out+err	1	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
+sigpipe	NB:685	same	=bash	out+err	1	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
 sigpipe	NB:6866	same	same	out	1	find . -type f -printf '%T@ %p\n' | sort -n -r | head -${numl} | cut -f2- -d" " | sed -e 's,^\./,,' 
 sigpipe	NB:6868	same	msg=dash	err	0	ls -1 | tail -n +N | head -n1
 sigpipe	NB:687	msg=dash	msg=dash	err	0	yes Y | command-that-asks-for-input
 sigpipe	NB:6876	same	msg=bash	err	0	echo `cat $FILE | head -n 100 | wc -c` / 1024 | bc -l
 sigpipe	NB:688	msg=dash	msg=dash	err	0	yes Yes | ./ittp-update.sh
-sigpipe	NB:6886	same	same	err	0	find ./ -type f -name "*.[mh]" -exec wc -l {} \; | sed -e 's/[ ]*//g' | cut -d"." -f1 | paste -sd+ -
+sigpipe	NB:6886	same	msg-own	err	0	find ./ -type f -name "*.[mh]" -exec wc -l {} \; | sed -e 's/[ ]*//g' | cut -d"." -f1 | paste -sd+ -
 sigpipe	NB:690	msg=dash	msg=dash	err	0	yes ok | recalcitrant.php
 sigpipe	NB:6915	msg=dash	msg-own	err	0	echo -n $(pwd) | pbcopy
 sigpipe	NB:6916	msg=dash	msg-own	err	0	printf $(pwd) | pbcopy
@@ -323,190 +320,126 @@ sigpipe	NB:697	same	same	err	0	yes "Hidden" | dd of=/dev/sdb
 sigpipe	NB:698	same	same	err	0	yes "Hidden" | tr '\n' '\0' | dd of=/dev/sdb
 sigpipe	NB:699	same	same	err	0	yes "Hidden" | paste -d' ' -s - | dd of=/dev/sdb
 sigpipe	NB:700	=dash	=dash	err	0	yes 'UUUUUUUUUUUUUUUUU' | tr -d '\n' > /dev/to/overwrite
-sigpipe	NB:706	msg=dash	msg-own	err	0	echo -ne 'some random\nbytes' | xxd -plain | tr -d '\n' | sed 's/\(..\)/%\1/g'
-sigpipe	NB:7123	same	same	rec	0	cp -r `ls -A | grep -v "c"` $HOME/
-sigpipe	NB:7185	=bash	=bash	rec	1	find . -type f | egrep -v '\.bz2' | xargs bzip2 -9 &
+sigpipe	NB:703	same	msg-own	err	0	echo 595a | awk -niord '$0=chr("0x"RT)' RS=.. ORS= | od -tx1c
+sigpipe	NB:7123	same	same	rec	1	cp -r `ls -A | grep -v "c"` $HOME/
 sigpipe	NB:7214	same	same	out	1	mount -v | grep smbfs | awk '{print $3}' | xargs ls -lsR
 sigpipe	NB:7233	same	same	err	0	yes n | rm -r *.txt
 sigpipe	NB:7234	same	same	err	0	yes | rm -r *.txt
 sigpipe	NB:7365	msg=dash	msg=dash	err	0	find dir -name \*~ | xargs echo rm | ksh -s
 sigpipe	NB:739	neither	neither	out	1	head /dev/random -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '
-sigpipe	NB:741	same	same	rec	0	find $(pwd) -type f | xargs -I xxx sed -i 's/\r//g' xxx
+sigpipe	NB:741	same	same	rec	1	find $(pwd) -type f | xargs -I xxx sed -i 's/\r//g' xxx
 sigpipe	NB:7418	same	same	err	0	yes | /bin/rm -i *
-sigpipe	NB:747	same	same	rec	0	find . -name '*FoooBar*' | sed 's/.*/"&"/' | xargs cp ~/foo/bar
-sigpipe	NB:752	same	same	rec	0	find -name '*FooBar*' -print0 | xargs -0 cp -t ~/foo/bar
+sigpipe	NB:747	same	same	rec	1	find . -name '*FoooBar*' | sed 's/.*/"&"/' | xargs cp ~/foo/bar
+sigpipe	NB:752	same	same	rec	1	find -name '*FooBar*' -print0 | xargs -0 cp -t ~/foo/bar
 sigpipe	NB:7522	msg=dash	msg=dash	err	0	echo '1/2 [3] (27/03/2012 19:32:54) word word word word 4/5' | sed -e 's/(.*)//' -e 's/[^0-9]/ /g' |
-sigpipe	NB:756	same	same	rec	0	find . | grep FooBar | xargs -I{} cp {} ~/foo/bar
+sigpipe	NB:756	same	same	rec	1	find . | grep FooBar | xargs -I{} cp {} ~/foo/bar
 sigpipe	NB:7564	same	same	err	0	find . -type f -print0 | xargs -0 -n1 echo rm | sh -x
-sigpipe	NB:7599	msg=dash	msg-own	err	0	echo | ssh-keygen -P ''
-sigpipe	NB:7601	same	msg=dash	err	0	PATH=$(echo $PATH | tr ":" "\n" | grep -v $1 | tr "\n" ":")
+sigpipe	NB:7601	same	msg-own	err	0	PATH=$(echo $PATH | tr ":" "\n" | grep -v $1 | tr "\n" ":")
 sigpipe	NB:7753	same	same	err	0	echo $(yes image.png | head -n10)
 sigpipe	NB:7754	same	same	err	0	yes image.png | head -n10 | xargs echo
+sigpipe	NB:7768	msg=bash	same	err	0	sort inputfile | uniq | sort -o inputfile
+sigpipe	NB:7781	msg-own	msg-own	err	1	sed s/STRING_TO_REPLACE/STRING_TO_REPLACE_IT/g index.html | tee index.html
 sigpipe	NB:7990	msg=dash	msg-own	err	0	echo "su whoami" |ssh remotehost
 sigpipe	NB:8063	same	timeout	status	0	foo=$(cat /dev/urandom | tr -dc '. ' | fold -w 100 | head -1)
-sigpipe	NB:8079	same	same	rec	0	FOLDERS=$(find $PWD -type d | paste -d, -s)
-sigpipe	NB:8127	msg=dash	msg=dash	rec+err	0	cat ~/.bashrc | pbcopy
-sigpipe	NB:8208	neither	neither	files	1	{ time ls; } 2>&1 | cat > time.txt
-sigpipe	NB:8287	same	same	rec	0	find ~/.personal/tips -type f -iname "*.pdf" -exec pdftotext '{}' - ';' | grep hot
-sigpipe	NB:829	same	same	rec	0	find . | grep "FooBar" | tr \\n \\0 | xargs -0 -I{} cp "{}" ~/foo/bar
-sigpipe	NB:8320	same	same	out	0	env | grep NAME
+sigpipe	NB:8079	same	same	rec	1	FOLDERS=$(find $PWD -type d | paste -d, -s)
+sigpipe	NB:8127	msg=dash	msg=dash	rec+err	1	cat ~/.bashrc | pbcopy
+sigpipe	NB:8287	same	same	rec	1	find ~/.personal/tips -type f -iname "*.pdf" -exec pdftotext '{}' - ';' | grep hot
+sigpipe	NB:829	same	same	rec	1	find . | grep "FooBar" | tr \\n \\0 | xargs -0 -I{} cp "{}" ~/foo/bar
+sigpipe	NB:8320	same	same	out	1	env | grep NAME
 sigpipe	NB:841	same	same	err	0	yes | cp -rf /zzz/zzz/* /xxx/xxx
 sigpipe	NB:842	msg=dash	msg=dash	err	0	pwd | tr -d '\n' | pbcopy
-sigpipe	NB:86	same	msg=dash	err	0	v=5 env|less
+sigpipe	NB:86	same	msg-own	err	0	v=5 env|less
 sigpipe	NB:8772	same	same	out	1	find . -type f -printf '%20s %p\n' | sort -n | cut -b22- | tr '\n' '\000' | xargs -0 ls -laSr
 sigpipe	NB:895	same	same	err	0	find ./ -type f -exec wc -l {} \; | cut -d' ' -f1 | paste -sd+ | bc
-sigpipe	NB:9016	same	same	rec	0	find ~/ -name '*.txt' -print0 | xargs -0 wc -w
-sigpipe	NB:9021	msg=dash	msg=dash	err	0	{ yes yes | sed 4q; yes no | sed 1q; } | ./script
-sigpipe	NB:9184	same	same	rec	0	path=$(basename $(pwd) | awk '{print tolower($0)}')
-sigpipe	NB:9185	same	same	rec	0	path=$(basename $(pwd) | tr 'A-Z' 'a-z' )
+sigpipe	NB:9016	same	same	rec	1	find ~/ -name '*.txt' -print0 | xargs -0 wc -w
+sigpipe	NB:9021	msg=dash	msg-own	err	0	{ yes yes | sed 4q; yes no | sed 1q; } | ./script
+sigpipe	NB:9184	same	same	rec	1	path=$(basename $(pwd) | awk '{print tolower($0)}')
+sigpipe	NB:9185	same	same	rec	1	path=$(basename $(pwd) | tr 'A-Z' 'a-z' )
 sigpipe	NB:9219	same	same	out	1	ls -lrt | tail -n1
-sigpipe	NB:9442	same	msg-own	err	0	tar tzvf archive.tar.gz | sed 's/ \+/ /g' | cut -f3 -d' ' | sed '2,$s/^/+ /' | paste -sd' ' | bc
+sigpipe	NB:9413	same	msg=bash	err	0	ls | split -l 500 - outputXYZ.
+sigpipe	NB:9442	same	same	err	0	tar tzvf archive.tar.gz | sed 's/ \+/ /g' | cut -f3 -d' ' | sed '2,$s/^/+ /' | paste -sd' ' | bc
 sigpipe	NB:9602	msg=dash	msg=dash	err	0	yes | tr \\n x | head -c $BYTES | pv | grep n
 sigpipe	NB:9603	same	same	err	0	yes | tr \\n x | head -c $BYTES | grep n
 sigpipe	NB:9623	msg=dash	msg=dash	err	0	yes | tr \\n x | head -c $((1024*1024*1024)) | pv -L $((1024*1024)) | grep n
-sigpipe	NB:9655	same	same	err	0	fold -w 76 -s file.txt | pr -T --indent=4
-sigpipe	NB:9672	same	same	err	0	echo 'ee' | tee /dev/stderr | foo
+sigpipe	NB:9655	same	msg-own	err	0	fold -w 76 -s file.txt | pr -T --indent=4
+sigpipe	NB:9672	same	msg=dash	err	0	echo 'ee' | tee /dev/stderr | foo
 sigpipe	NB:9680	same	msg-own	err	1	echo "fifo forever" | cat - fifo | tee fifo
-sigpipe	NB:9681	same	same	out	0	echo foo | readlink /proc/self/fd/1
+sigpipe	NB:9681	same	same	out	1	echo foo | readlink /proc/self/fd/1
 sigpipe	NB:9682	neither	neither	out	1	echo foo | readlink /proc/self/fd/0
 sigpipe	NB:9690	same	same	err	0	yes | head -n10 > 10lines.txt
 sigpipe	NB:9691	same	same	err	0	yes "this is the text I want to add to a file"|head -200>myFile.txt
-sigpipe	NB:9741	same	same	status+err	1	ls 2>&1 | tee /tmp/ls.txt
+sigpipe	NB:9741	same	same	status+err	0	ls 2>&1 | tee /tmp/ls.txt
 sigpipe	NB:9743	same	same	status+err	0	ls 2>&1 | tee -a /tmp/ls.txt
-sigpipe	NB:9763	same	same	rec	0	find ~/tmp -mtime 0 -exec du -ks {} \; | cut -f1
+sigpipe	NB:9763	same	same	rec	1	find ~/tmp -mtime 0 -exec du -ks {} \; | cut -f1
 sigpipe	NB:980	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs /usr/bin/grep -l "foo" | wc -l
-sigpipe	NB:9973	same	same	rec	0	tar cf - $PWD|tar tvf -
-sigpipe	NB:9974	same	same	rec	0	tar cf - $PWD|tar tvf -|awk '{print $6}'|grep -v "/$"
+sigpipe	NB:9973	same	same	rec	1	tar cf - $PWD|tar tvf -
+sigpipe	NB:9974	same	same	rec	1	tar cf - $PWD|tar tvf -|awk '{print $6}'|grep -v "/$"
+sigpipe	SC:Analytics.hs:prop_checkExtraMaskedReturns14	same	msg-own	err	0	echo asdf | false
 sigpipe	SC:Analytics.hs:prop_checkPipePitfalls5	msg=dash	msg=dash	err	0	ls -N | foo
 sigpipe	SC:Analytics.hs:prop_checkPipeToNowhere11	=dash	=dash	err	0	ls | grep foo < file
 sigpipe	SC:Analytics.hs:prop_checkPipeToNowhere17	same	msg-own	err	0	echo World | cat << 'EOF' hello $(cat) EOF 
 sigpipe	SC:Analytics.hs:prop_checkPipeToNowhere21	same	same	err	0	yes | cp -ri foo/* bar
 sigpipe	SC:Analytics.hs:prop_checkPipeToNowhere22	same	same	err	0	yes | rm --interactive *
 sigpipe	SC:Checks/Commands.hs:prop_checkExpr12	msg=dash	msg=dash	err	0	# shellcheck disable=SC2003 expr 1 | 2
-sigpipe	TL:common/$.md:16	msg=dash	msg-own	err	0	echo $!|$?
-sigpipe	TL:common/$.md:24	msg=dash	msg-own	err	0	echo $PS0|PS1|PS2|PS3|PS4
-sigpipe	TL:common/ajson.md:20	msg=dash	msg-own	err	0	echo '3' | ajson '2 * pi * $'
-sigpipe	TL:common/alex.md:9	msg=dash	msg-own	err	0	echo His network looks good | alex --stdin
-sigpipe	TL:common/argon2.md:12	msg=dash	msg-own	err	0	echo "password" | argon2 "salt_text" -d|i|id
-sigpipe	TL:common/argon2.md:20	msg=dash	msg-own	err	0	echo "password" | argon2 "salt_text" -t 5 -m 20 -p 7
-sigpipe	TL:common/attr.md:20	msg=dash	msg-own	err	0	echo "attribute_value" | attr -s attribute_name path/to/file
-sigpipe	TL:common/aws-sns.md:8	msg-own	msg=dash	err	1	aws sns list-origination-numbers|phone-numbers-opted-out|platform-applications|sms-sandbox-phone-num
-sigpipe	TL:common/b3sum.md:28	msg=dash	msg-own	err	0	echo known_blake3_checksum_of_the_file path/to/file | b3sum -c
-sigpipe	TL:common/batch.md:14	msg=dash	msg-own	err	0	echo "./make_db_backup.sh" | batch
-sigpipe	TL:common/bb.md:20	msg=dash	msg-own	err	0	echo "{:key 'val}" | bb -I "(:key (first *input*))"
+sigpipe	TL:common/airpaste.md:12	msg=dash	msg-own	err	0	echo text | airpaste
+sigpipe	TL:common/bb.md:16	msg=dash	msg-own	err	0	printf "first\nsecond" | bb -i "(map clojure.string/capitalize *input*)"
+sigpipe	TL:common/bc.md:17	same	msg-own	err	0	echo '5 / 3' | bc
+sigpipe	TL:common/bc.md:25	same	msg-own	err	0	echo 'scale = 10; 5 / 3' | bc
+sigpipe	TL:common/bc.md:29	same	msg-own	err	0	echo 's|c|a|l|e(1)' | bc -l
 sigpipe	TL:common/bind.md:8	msg-own	msg-own	err	0	bind -p|-P
-sigpipe	TL:common/blahaj.md:24	msg=dash	msg-own	err	0	echo "Hello, world" | blahaj -i
-sigpipe	TL:common/boxes.md:12	msg=dash	msg-own	err	0	echo "string" | boxes -r
-sigpipe	TL:common/boxes.md:16	msg=dash	msg-own	err	0	echo "string" | boxes -d parchment
-sigpipe	TL:common/boxes.md:20	msg=dash	msg-own	err	0	echo "string" | boxes -s 10x5
+sigpipe	TL:common/boxes.md:28	msg=dash	msg-own	err	0	echo "string" | boxes -a vt|c|b
 sigpipe	TL:common/bw.md:24	msg=dash	msg=dash	err	0	echo -n '{"name":"My Folder1"}' | base64 | bw create folder
-sigpipe	TL:common/colab-exec.md:8	msg=dash	msg-own	err	0	echo "print('Hello from Colab')" | colab exec
-sigpipe	TL:common/cowsay.md:12	msg=dash	msg-own	err	0	echo "hello, world" | cowsay
-sigpipe	TL:common/deno-fmt.md:28	msg=dash	msg-own	err	0	echo "markdown_text" | deno fmt --ext md -
+sigpipe	TL:common/circo.md:21	=dash	=dash	err	0	echo "digraph {this -> that} " | circo -T gif >path/to/image.gif
 sigpipe	TL:common/diffoscope.md:24	msg=dash	msg=dash	err	0	diffoscope --exclude-directory-metadata auto|yes|no|recursive path/to/directory1 path/to/directory2
-sigpipe	TL:common/distccd.md:16	msg-own	msg=dash	err	1	distccd --daemon -a ip_address|network_prefix
-sigpipe	TL:common/dnsx.md:10	msg=dash	msg-own	err	0	echo example.com | dnsx -a -re
-sigpipe	TL:common/dnsx.md:18	msg=dash	msg-own	err	0	echo example.com | dnsx -re -a|aaaa|cname|ns|txt|srv|ptr|mx|soa|any|axfr|caa
-sigpipe	TL:common/dnsx.md:22	msg=dash	msg-own	err	0	echo example.com | dnsx -ro
 sigpipe	TL:common/dot.md:21	=dash	=dash	err	0	echo "digraph {this -> that} " | dot -T gif >path/to/image.gif
-sigpipe	TL:common/echo.md:33	msg=dash	msg-own	err	0	echo "Hello World" | program
-sigpipe	TL:common/elasticsearch-keystore.md:20	msg=dash	msg-own	err	0	echo "setting_value" | elasticsearch-keystore add --stdin setting_name
-sigpipe	TL:common/espeak.md:13	msg=dash	msg-own	err	0	echo "text" | espeak
-sigpipe	TL:common/fakedata.md:24	msg=dash	msg-own	err	0	echo "\{\{Generator\}\}" | fakedata
-sigpipe	TL:common/filecheck.md:21	msg=dash	msg-own	err	0	echo "some_text" | FileCheck -v path/to/check_file
-sigpipe	TL:common/gemini.md:12	msg=dash	msg-own	err	0	echo "Summarize the history of Rome" | gemini -p -
-sigpipe	TL:common/gist.md:20	msg=dash	msg-own	err	0	echo "hello world" | gist
-sigpipe	TL:common/git-column.md:12	same	msg=dash	err	0	ls | git column --mode=column --width=100
-sigpipe	TL:common/git-column.md:8	same	msg-own	err	0	ls | git column --mode=column
-sigpipe	TL:common/jbang.md:25	msg=dash	msg-own	err	0	echo 'Files.list(Paths.get("/etc")).forEach(System.out::println);' | jbang -
-sigpipe	TL:common/kcat.md:20	msg=dash	msg-own	err	0	echo message | kcat -P -t topic -b brokers
-sigpipe	TL:common/kitty.md:24	msg=dash	msg=dash	err	0	echo example | kitty +kitten clipboard
-sigpipe	TL:common/lp.md:9	msg=dash	msg-own	err	0	echo "test" | lp
-sigpipe	TL:common/mailx.md:12	msg=dash	msg-own	err	0	echo "content" | mailx -s "subject" to_addr
+sigpipe	TL:common/entr.md:25	msg=dash	msg-own	err	0	echo my.sql | entr -cp psql -f /_
+sigpipe	TL:common/git-column.md:16	same	msg=bash	err	0	ls | git column --mode=column --padding=30
+sigpipe	TL:common/git-name-rev.md:36	same	msg-own	err	0	echo "commit-ish" | git name-rev --annotate-stdin
 sigpipe	TL:common/melt.md:12	msg=dash	msg=dash	rec+err	0	cat ~/.ssh/id_ed25519 | melt
-sigpipe	TL:common/mlr.md:12	msg=dash	msg-own	err	0	echo '{"key":"value"}' | mlr --ijson --opprint cat
-sigpipe	TL:common/msmtp.md:13	msg=dash	msg-own	err	0	echo "Hello world" | msmtp --account=account_name to@example.org
-sigpipe	TL:common/msmtp.md:17	msg=dash	msg-own	err	0	echo "Hello world" | msmtp --host=localhost --port=999 --from=from@example.org to@example.org
-sigpipe	TL:common/msmtp.md:9	msg=dash	msg-own	err	0	echo "Hello world" | msmtp to@example.org
-sigpipe	TL:common/neato.md:21	=dash	=dash	err	0	echo "graph {this -- that} " | neato -T gif >path/to/image.gif
-sigpipe	TL:common/newsboat.md:20	msg=dash	msg-own	err	0	newsboat -x reload|print-unread|...
 sigpipe	TL:common/nms.md:12	msg=dash	msg=dash	err	0	ls -la | nms -a
-sigpipe	TL:common/nms.md:8	msg=dash	msg-own	err	0	echo "Hello, World!" | nms
-sigpipe	TL:common/ntfyme.md:13	msg=dash	msg-own	err	0	echo command | ntfyme exec
 sigpipe	TL:common/ntfyme.md:17	msg=dash	msg-own	err	0	echo "command1; command2; command3" | ntfyme exec
-sigpipe	TL:common/osage.md:21	=dash	=dash	err	0	echo "digraph {this -> that} " | osage -T gif >path/to/image.gif
-sigpipe	TL:common/pamditherbw.md:21	=dash	=dash	err	1	pamditherbw -fs|atkinson|thresholding -va 0.3 path/to/image.pgm >path/to/file.pgm
+sigpipe	TL:common/numfmt.md:24	same	msg-own	err	0	ls -l | numfmt --header=1 --field 5 --to iec
+sigpipe	TL:common/nxc.md:17	msg=dash	msg-own	err	0	nxc smb|ssh|ldap|ftp|wmi|winrm|rdp|vnc|mssql -M module_name -o OPTION_NAME=option_value
 sigpipe	TL:common/parallel.md:13	msg=dash	msg=dash	err	0	ls *.txt | parallel -j 4 gzip
-sigpipe	TL:common/passage.md:14	msg=dash	msg-own	err	0	echo "password" | passage insert -e path/to/data
 sigpipe	TL:common/passwd.md:25	same	same	err	0	yes password | passwd
-sigpipe	TL:common/pbmtext.md:13	=dash	=dash	err	0	echo "Hello\nWorld!" | pbmtext >path/to/output.pbm
-sigpipe	TL:common/piper.md:17	msg=dash	msg-own	err	0	echo Warum? | piper -m de_DE-thorsten_emotional-medium.onnx --speaker 1 -f angry.wav
-sigpipe	TL:common/piper.md:21	msg=dash	msg-own	err	0	echo Hello world | piper -m en_GB-northern_english_male-medium.onnx --output-raw -f - | mpv -
-sigpipe	TL:common/qrencode.md:29	msg=dash	msg-own	err	0	echo string | qrencode -t utf8
-sigpipe	TL:common/rage.md:9	msg=dash	msg-own	err	0	echo "Your secret message" | rage --encrypt --recipient user --output path/to/message.age
-sigpipe	TL:common/sd.md:12	msg=dash	msg-own	err	0	echo 'cargo +nightly watch' | sd '(\w+)\s+\+(\w+)\s+(\w+)' 'cmd: $1, channel: $2, subcmd: $3'
+sigpipe	TL:common/piper.md:17	msg=dash	msg=dash	err	0	echo Warum? | piper -m de_DE-thorsten_emotional-medium.onnx --speaker 1 -f angry.wav
+sigpipe	TL:common/secrethub.md:20	msg=dash	msg-own	err	0	echo "secret_value" | secrethub write path/to/secret
 sigpipe	TL:common/sequin.md:13	msg=dash	msg=dash	err	0	ls -l --color=always | sequin
-sigpipe	TL:common/sfdp.md:21	=dash	=dash	err	0	echo "digraph {this -> that} " | sfdp -T gif >path/to/image.gif
-sigpipe	TL:common/socat.md:24	msg=dash	msg-own	err	0	echo "Hello Multicast" | socat - UDP4-DATAGRAM:224.0.0.1:5000
-sigpipe	TL:common/speak-ng.md:13	msg=dash	msg-own	err	0	echo "text" | speak-ng
-sigpipe	TL:common/sqlite-utils.md:20	msg=dash	msg-own	err	0	echo '[ {"id": 1, "name": "Linus Torvalds"}, {"id": 2, "name": "Steve Wozniak"}, {"id": 3, "name": "
-sigpipe	TL:common/tcsh.md:29	msg=dash	msg-own	err	0	echo "echo 'tcsh is executed'" | tcsh
-sigpipe	TL:common/terraform-console.md:16	msg=dash	msg-own	err	0	echo "expression" | terraform console
+sigpipe	TL:common/speak-ng.md:13	msg=dash	msg=dash	err	0	echo "text" | speak-ng
 sigpipe	TL:common/tqdm.md:12	msg=dash	msg=dash	err	0	seq 10000000 | tqdm --total 10000000 | command
 sigpipe	TL:common/tqdm.md:8	msg=dash	msg=dash	err	0	seq 10000000 | tqdm | command
 sigpipe	TL:common/tte.md:12	msg=dash	msg=dash	err	0	ls -la | tte matrix
-sigpipe	TL:common/tuc.md:17	msg=dash	msg-own	err	0	echo "foo bar baz" | tuc -d ' ' -f 2:
-sigpipe	TL:common/tuc.md:25	msg=dash	msg-own	err	0	echo "foo bar baz" | tuc -d ' ' --json
 sigpipe	TL:common/tv.fzf.md:13	msg=dash	msg=dash	err	0	tv files|env|git-repos|...
-sigpipe	TL:common/vegeta.md:9	msg=dash	msg-own	err	0	echo "GET https://example.com" | vegeta attack -duration=30s
-sigpipe	TL:common/waymore.md:21	msg=dash	msg-own	err	0	waymore -from YYYYMMDD|YYYYMM|YYYY -to YYYYMMDD|YYYYMM|YYYY -i example.com
-sigpipe	TL:common/wkhtmltopdf.md:20	msg=dash	msg-own	err	0	wkhtmltopdf --orientation Landscape|Portrait input.html output.pdf
-sigpipe	TL:common/xe.md:16	msg=dash	msg-own	err	0	echo -e 'a\nb' | xe -N2 -s 'echo $2 $1'
-sigpipe	TL:common/xml-format.md:12	=dash	=dash	err	1	xml fo -H -s 4 path/to/input.html|uri >path/to/output.html
 sigpipe	TL:common/xml-unescape.md:12	msg=dash	msg-own	err	0	echo "&lt;a1&gt;" | xml unesc
-sigpipe	TL:common/yank.md:16	msg=dash	msg-own	err	0	echo hello=world | yank -d =
 sigpipe	TL:common/yes.md:17	same	same	err	0	yes | sudo apt-get install program
-sigpipe	TL:common/zsh.md:25	msg=dash	msg-own	err	0	echo "echo 'zsh is executed'" | zsh
-sigpipe	TL:linux/cliphist.md:21	msg=dash	msg-own	err	0	echo entry_id | cliphist delete
-sigpipe	TL:linux/column.md:13	msg=dash	msg-own	err	0	printf "header1 header2\nbar foo\n" | column -t
-sigpipe	TL:linux/column.md:21	msg=dash	msg-own	err	0	printf "header1\nbar\nfoobar\n" | column -c 30 -x
-sigpipe	TL:linux/column.md:9	msg=dash	msg-own	err	0	printf "header1 header2\nbar foo\n" | column -c 30
+sigpipe	TL:common/zapier-init.md:12	msg-own	msg=dash	err	1	zapier init path/to/directory -t basic-auth|callback|custom-auth|digest-auth|dynamic-dropdown|files|
+sigpipe	TL:linux/chpasswd.md:21	msg=dash	msg-own	err	0	printf "username:new_password" | sudo chpasswd -c NONE|DES|MD5|SHA256|SHA512
 sigpipe	TL:linux/datamash.md:12	msg=dash	msg=dash	err	0	echo -e '1.0\n2.5\n3.1\n4.3\n5.6\n5.7' | tr '.' ',' | datamash mean 1
-sigpipe	TL:linux/datamash.md:16	msg=dash	msg-own	err	0	echo -e '1\n2\n3\n4\n5\n5' | datamash -R number_of_decimals_wanted mean 1
-sigpipe	TL:linux/datamash.md:20	msg=dash	msg-own	err	0	echo -e '1\n2\nNa\n3\nNaN' | datamash --narm mean 1
 sigpipe	TL:linux/datamash.md:8	msg=dash	msg=dash	err	0	seq 3 | datamash max 1 min 1 mean 1 median 1
-sigpipe	TL:linux/dmenu.md:13	msg=dash	msg-own	err	0	echo -e "red\ngreen\nblue" | dmenu
+sigpipe	TL:linux/dmenu.md:13	msg=dash	msg=dash	err	0	echo -e "red\ngreen\nblue" | dmenu
 sigpipe	TL:linux/dmenu.md:21	msg=dash	msg=dash	err	0	ls | dmenu -m 1
-sigpipe	TL:linux/dmenu.md:25	msg=dash	msg-own	err	0	ls | dmenu -b
-sigpipe	TL:linux/dmenu.md:9	msg=dash	msg-own	err	0	ls | dmenu
-sigpipe	TL:linux/fuzzel.md:16	msg=dash	msg=dash	err	0	ls | fuzzel -d
-sigpipe	TL:linux/fuzzel.md:20	msg=dash	msg-own	err	0	echo -e "red\ngreen\nblue" | fuzzel -d
-sigpipe	TL:linux/fuzzel.md:24	msg=dash	msg=dash	err	0	echo -e "red\ngreen\nblue" | fuzzel -d >color.txt
-sigpipe	TL:linux/keyctl.md:20	msg=dash	msg-own	err	0	echo -n key_value | keyctl padd type_keyring key_name target_keyring
-sigpipe	TL:linux/lsns.md:20	msg-own	msg=dash	err	1	lsns -t mnt|net|ipc|user|pid|uts|cgroup|time
-sigpipe	TL:linux/pridecat.md:24	msg=dash	msg-own	err	0	ls | pridecat --flag
-sigpipe	TL:linux/sm.md:28	msg=dash	msg-own	err	0	echo "Hello World!" | sm -
-sigpipe	TL:linux/spa-json-dump.md:12	msg=dash	msg-own	err	0	echo "spa_json_string" | spa-json-dump
-sigpipe	TL:linux/sxiv.md:16	msg=dash	msg-own	err	0	echo path/to/file | sxiv -i
-sigpipe	TL:linux/systemd-delta.md:12	msg=dash	msg-own	err	0	systemd-delta -t masked|equivalent|redirected|overridden|extended|unchanged
-sigpipe	TL:linux/ttyplot.md:12	msg=dash	msg=dash	err	0	{ echo 1 2 3; cat; } | ttyplot -t title -u unit
-sigpipe	TL:linux/walker.md:17	msg=dash	msg-own	err	0	printf "Choice1\nChoice2\nChoice3" | walker -d
+sigpipe	TL:linux/dmenu.md:25	msg=dash	msg=dash	err	0	ls | dmenu -b
+sigpipe	TL:linux/dmenu.md:9	msg=dash	msg=dash	err	0	ls | dmenu
+sigpipe	TL:linux/fprintd-verify.md:12	msg-own	msg=dash	err	1	fprintd-verify -f left-thumb|left-index-finger|left-middle-finger|left-ring-finger|left-little-finge
+sigpipe	TL:linux/fuzzel.md:16	msg=dash	msg-own	err	0	ls | fuzzel -d
+sigpipe	TL:linux/logger.md:12	same	msg-own	err	0	echo log_entry | logger
+sigpipe	TL:linux/pridecat.md:24	msg=dash	msg=dash	err	0	ls | pridecat --flag
+sigpipe	TL:linux/steamos-chroot.md:12	msg=dash	msg-own	err	0	steamos-chroot -d /dev/sdX -p A|B
+sigpipe	TL:linux/systemctl.md:17	msg-own	msg=dash	err	1	systemctl start|stop|restart|reload|status unit
+sigpipe	TL:linux/wine.md:36	msg=dash	msg-own	err	0	wine reg add 'path\to\registry_key' /v Value_name /t REG_SZ|REG_BINARY|REG_DWORD|... /d 'data'
 sigpipe	TL:linux/wl-copy.md:13	msg=dash	msg=dash	err	0	ls | wl-copy
-sigpipe	TL:linux/wtype.md:29	msg=dash	msg-own	err	0	echo "text" | wtype -
-sigpipe	TL:linux/xclip.md:10	msg=dash	msg-own	err	0	echo 123 | xclip
-sigpipe	TL:linux/xclip.md:14	msg=dash	msg-own	err	0	echo 123 | xclip -se primary|secondary|clipboard
-sigpipe	TL:linux/xcowsay.md:13	msg=dash	msg=dash	err	0	ls | xcowsay
-sigpipe	TL:linux/zenity.md:25	OURS	msg-own	rec+err	0	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
+sigpipe	TL:linux/wofi.md:16	msg=dash	msg=dash	err	0	printf "Choice1\nChoice2\nChoice3" | wofi -d
+sigpipe	TL:linux/xcowsay.md:13	msg=dash	msg-own	err	0	ls | xcowsay
+sigpipe	TL:linux/zenity.md:25	OURS	msg-own	rec+err	1	(echo "#1"; sleep 1; echo "50"; echo "#2"; sleep 1; echo "100") | zenity --progress
 noproc	NB:6335	same	same	status+err	0	zcat number.txt.gz | { zcat xxx.txt.gz | comm -12 /dev/fd/3 - ; } 3<&0
 noproc	NB:7825	=bash	same	status+out+err	0	echo "1\n2\n3\n4\n5" | paste -s -d, /dev/stdin
 noproc	NB:9672	same	msg=dash	err	0	echo 'ee' | tee /dev/stderr | foo
 noproc	SC:Analytics.hs:prop_checkPipeToNowhere9	same	=dash	status+rec+err	0	mv -i f . < /dev/stdin
-tmp	NB:10835	same	same	rec	0	find ~ -newer /tmp/timestamp
-tmp	NB:11515	msg=dash	=dash	rec	1	find /tmp -type f -name ‘*.txt*’ | sed -e ‘s/.*/\”&\”/’ |xargs -n 1 grep -l hello|sed -e
-tmp	NB:11522	same	same	rec	0	find /tmp /var/tmp ~ -type f -size +10M -mtime +60 -ctime -100 -exec file -N -i -- {} + | sed -n 's!
-tmp	NB:2756	same	same	rec	0	find /tmp -maxdepth 1 -name "$USER.*"
+tmp	NB:10835	same	same	rec	1	find ~ -newer /tmp/timestamp
+tmp	NB:11522	same	same	rec	1	find /tmp /var/tmp ~ -type f -size +10M -mtime +60 -ctime -100 -exec file -N -i -- {} + | sed -n 's!
+tmp	NB:2756	same	same	rec	1	find /tmp -maxdepth 1 -name "$USER.*"
 tmp	NB:3440	=dash	same	status+rec+err	0	find /mnt/naspath -mtime 0 -name .snapshot -prune -o \( \! -name *~ -print0 \) | du --files0-from=- 
-tmp	NB:3956	same	same	status+err	0	find . -type f -execdir /usr/bin/grep -iH '#!/bin/ksh' {} \; | tee /tmp/allfiles
+tmp	NB:3957	same	same	status+err	0	find . -type f -print | xargs /usr/bin/grep -il 'bin/ksh' | tee /tmp/allfiles
 tmp	NB:5171	same	same	out	1	find /tmp /var/tmp -size +30M -mtime 31 -print0 | xargs -0 ls -l
 tmp	NB:5408	=bash	same	status+err	0	mkdir /tmp/A /tmp/B /tmp/C "/tmp/ dir with spaces"
 tmp	NB:5437	=bash	same	out	0	mkdir -pv /tmp/boostinst
@@ -516,7 +449,7 @@ tmp	NB:5451	=bash	same	status+err	0	mkdir /tmp/new
 tmp	NB:6810	same	same	out	1	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
 tmp	NB:6811	same	same	out	1	ls -ld /tmp /tnt
 tmp	NB:8171	=dash	same	status+rec+err	0	find . -name '*2011*' -print0 > /tmp/allfiles
-tmp	NB:9742	same	same	status+err	1	ls 2>&1 | tee --append /tmp/ls.txt
+tmp	NB:9742	same	same	status+err	0	ls 2>&1 | tee --append /tmp/ls.txt
 tmp	NB:9743	same	same	status+err	0	ls 2>&1 | tee -a /tmp/ls.txt
 random	NB:5390	neither	same	rec+files	1	cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1 | xargs mkdir
 random	NB:5391	neither	same	rec+files	1	mkdir $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
@@ -531,21 +464,19 @@ random	NB:6286	neither	same	status+out+err	1	cat /dev/urandom | tr -dC '[:graph:
 random	NB:6487	neither	same	out	1	cat /dev/urandom | LC_ALL=C tr -dc 'a-zA-Z0-9' | fold -w 24 | head -n 1
 random	NB:6488	neither	same	out	1	cat /dev/urandom | tr -cd 'a-f0-9' | head -c 32
 random	NB:6489	neither	same	out	1	cat /dev/urandom | env LC_CTYPE=C tr -cd 'a-f0-9' | head -c 32
-random	NB:6731	neither	same	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
+random	NB:6731	OURS	same	out	1	grep -m1 -ao '[0-9]' /dev/urandom | sed s/0/10/ | head -n1
 random	NB:7019	neither	same	out	1	od -A n -N 2 -t u2 /dev/urandom
 random	NB:739	neither	same	out	1	head /dev/random -c16 | od -tx1 -w16 | head -n1 | cut -d' ' -f2- | tr -d ' '
 private	NB:10125	same	same	out	1	find /var -size +10000k -print0 | xargs -0 ls -lSh
 private	NB:1523	same	same	out	1	find /home/backups -printf "%T@ %p\n" | sort -n | head -1 | cut -d" " -f2- | xargs ls -al
-private	NB:3439	same	=dash	status+rec+err	0	find /mnt/naspath -mtime 0 -print0 | du --files0-from=- -hc | tail -n1 >> /tmp/size.log
-private	NB:3440	=dash	same	status+rec+err	0	find /mnt/naspath -mtime 0 -name .snapshot -prune -o \( \! -name *~ -print0 \) | du --files0-from=- 
 private	NB:4722	same	same	out	1	find /home -xdev -samefile file1 | xargs ls -l
+private	NB:4909	same	msg=dash	err	0	find /home/jassi/ -name "aliencoders.[0-9]+" | xargs ls -lrt | awk print '$9'
 private	NB:6438	same	same	out	0	echo `whoami` `stat -c %i "/home"`
 private	NB:6804	same	same	err	0	ls -hal /root/ | sudo tee /root/test.out
-private	NB:7085	same	same	rec	0	sudo chown -R $USER:$GROUP /var/lib/cassandra
-private	NB:7086	same	same	rec	0	sudo chown -R $USER:$GROUP /var/log/cassandra
+private	NB:7085	same	same	rec	1	sudo chown -R $USER:$GROUP /var/lib/cassandra
+private	NB:7086	same	same	rec	1	sudo chown -R $USER:$GROUP /var/log/cassandra
 private	NB:885	same	same	err	0	bash | tee /var/log/bash.out.log
 private	TL:linux/utmpdump.md:12	=dash	=dash	err	0	utmpdump -r dumpfile >/var/log/wtmp
-dev	NB:6228	=dash	same	rec	1	mount | grep -i "/dev/sd.*" | awk '{ print NR "\t" $1 "\t" $3 }' > mount_output &
 fail	NB:10564	same	same	status+out	0	find . -type f -name "*.ext" -exec grep -v "^{}$" list.txt && echo {} \;
 fail	NB:11378	same	same	status+rec	0	find . -name foo.txt 1> tmpfile && mv `cat tmpfile` path/to/some/dir && rm tmpfile
 fail	NB:1892	same	same	status	0	tar xvf "$myarchive" && cd "${myarchive%.tar.gz}"
@@ -591,11 +522,10 @@ output	NB:11364	same	same	out+rec	0	perl -p -i -e 's/oldstring/newstring/g' `fin
 output	NB:11378	same	same	out+rec+files	0	find . -name foo.txt 1> tmpfile && mv `cat tmpfile` path/to/some/dir && rm tmpfile
 output	NB:11380	=dash	=dash	rec+err	0	cat `find src/js -type f -name "*.js" -print0 | xargs -0 stat -f "%z %N" | sort -n | sed -e "s|[0-9]
 output	NB:1139	same	same	rec+files	0	tar cvf - `find . -mtime -1 -type f -print` > $archive.tar
-output	NB:1144	same	=dash	status+err	0	tmpdir=$(mktemp -d) && cd $tmpdir
+output	NB:1144	same	=bash	status+err	0	tmpdir=$(mktemp -d) && cd $tmpdir
 output	NB:1168	same	same	rec+files	1	touch filename_`/bin/date +%Y%m%d%H%M%S`.txt
 output	NB:11799	msg=dash	msg=dash	out	0	find `gen_root_dirs.sh` -type f -size 0 -ls
 output	NB:11876	msg=dash	msg=dash	out	0	nice -10 `alias list | sed "s/^\(alias \)\?[^=]\+='//; s/'$//;"`
-output	NB:11892	same	same	out	0	echo $(cd $(dirname "$1") && pwd -P)/$(basename "$1")
 output	NB:11931	same	same	out+rec	0	find . -type f -newermt "$(date '+%Y-%m-%d %H:%M:%S' -d @1494500000)"
 output	NB:11972	same	same	out	0	find -name "*.txt" -exec mv {} `basename {} .htm`.html \;
 output	NB:1205	same	same	out+rec	0	find /home/testuser/log/ -mtime +1 | xargs tar -czvPf /opt/older_log_$(date +%F).tar.gz
@@ -605,8 +535,8 @@ output	NB:12215	same	same	out	0	find -L /target -type l | while read -r file; do
 output	NB:12234	same	same	status+rec+err	0	find / -iname “*.mp3″ -type f -print0 | xargs -0 -I ‘{}’ mkdir -p /mnt/mp3/`basename {}`
 output	NB:1226	same	same	rec	0	TMPPS_PREFIX=$(mktemp "${TMPDIR:-/tmp/}${tempname}.XXXXXX")
 output	NB:1227	neither	neither	rec	0	tempFile="$(mktemp "${TMPDIR:-/tmp/}$(basename "$0")-XXXXX")"
-output	NB:12294	same	=dash	status+err	0	cd `find . -name "config"`
-output	NB:12295	same	=dash	status+err	0	cd $(find . -name config -type d | sed 1q)
+output	NB:12294	same	=bash	status+err	0	cd `find . -name "config"`
+output	NB:12295	same	=bash	status+err	0	cd $(find . -name config -type d | sed 1q)
 output	NB:1230	same	same	rec	0	tempfile=$(mktemp $(pwd)/templateXXXXXX)
 output	NB:12300	same	same	out+rec	0	find . -type d -name 'uploads' | while read d; do chmod -R 755 "$d"; done
 output	NB:12382	same	same	status+rec+err	0	grep -iH foo `find . -name "*.js"`
@@ -643,12 +573,12 @@ output	NB:1871	neither	neither	out	1	set `od -j $o -N 8 -t u1 $pkg`
 output	NB:1872	neither	neither	out	1	set `od -j $o -N 8 -t u1 $rpm`
 output	NB:19	same	same	out+rec	0	top -c -p $(pgrep -d',' -f string_to_match_in_cmd_line)
 output	NB:1916	same	same	out+rec+err	0	echo -e "$(TZ=GMT+30 date +%Y-%m-%d)\n$(TZ=GMT+20 date +%Y-%m-%d)" | grep -v $(date +%Y-%m-%d) | tai
-output	NB:1936	same	=dash	status+err	0	cd `find . -name file.xml -exec dirname {} \;`
-output	NB:1937	same	=dash	status+err	0	cd `find . -name file.xml -printf %h`
+output	NB:1936	same	=bash	status+err	0	cd `find . -name file.xml -exec dirname {} \;`
+output	NB:1937	same	=bash	status+err	0	cd `find . -name file.xml -printf %h`
 output	NB:1979	same	same	rec+err	0	find . -name "*.java" -exec grep -Hin TODO {} + | basename `cut -d ":" -f 1`
 output	NB:1998	same	same	out+rec	0	find -maxdepth 1 -type d | sort | while read -r dir; do n=$(find "$dir" -type f | wc -l); if [ $n -g
-output	NB:2029	same	neither	status+rec+err	0	cd $(dirname $(find . -name $1 | sed 1q))
-output	NB:2030	same	neither	status+rec+err	0	cd $(find . -name $1 | xargs dirname)
+output	NB:2029	same	=bash	status+rec+err	0	cd $(dirname $(find . -name $1 | sed 1q))
+output	NB:2030	same	=bash	status+rec+err	0	cd $(find . -name $1 | xargs dirname)
 output	NB:2081	same	same	status+out+rec+err	0	cat $(find . -name '*.foo')
 output	NB:2082	same	same	status+out+rec+err	0	cat `find . -name '*.foo' -print`
 output	NB:2087	same	same	rec+files	0	for file in $(find asia emea -name \*.gz -print0 | xargs -0); do echo -n $(basename $file); gunzip -
@@ -663,9 +593,9 @@ output	NB:2297	same	same	out+rec	0	mv $(find $(find . -name "*shp*" -printf "%h\
 output	NB:2298	same	same	out+rec	0	mv $(find . -name "*shp*" -printf "%h\n" | uniq)/* ../shp_all/
 output	NB:2358	same	same	out	0	find . -type f -name "*.txt" -exec mv {} `basename {} .html` .html \;
 output	NB:24	same	same	out+rec	0	top -b -p `pidof a.out`
-output	NB:2461	same	=dash	status+err	0	cd $(find . -name Subscription.java -printf '%h\n')
-output	NB:2462	same	neither	status+rec+err	0	cd $(find . -name Subscription.java | xargs dirname)
-output	NB:2463	same	neither	status+rec+err	0	cd `find . -name Subscription.java | xargs dirname`
+output	NB:2461	same	=bash	status+err	0	cd $(find . -name Subscription.java -printf '%h\n')
+output	NB:2462	same	=bash	status+rec+err	0	cd $(find . -name Subscription.java | xargs dirname)
+output	NB:2463	same	=bash	status+rec+err	0	cd `find . -name Subscription.java | xargs dirname`
 output	NB:25	same	same	out+rec	0	top -b -p `pidof a.out` -n 100
 output	NB:2521	same	same	out+rec	0	find . -type d ! -iname '*.*' | while read d; do mv $d/* .; done
 output	NB:2591	same	same	out+rec	0	chmod 755 $(find /path/to/base/dir -type d)
@@ -695,20 +625,20 @@ output	NB:333	same	same	status+rec+err	0	find "$PWD" / -iname '*.jpg' -exec du -
 output	NB:34	same	same	out+rec	0	find /lib/modules/`uname -r` -regex .*perf.*
 output	NB:3484	same	same	out+rec	0	find . -depth -name '* *' | while IFS= read -r f ; do mv -i "$f" "$(dirname "$f")/$(basename "$f"|tr
 output	NB:35	same	same	rec+err	0	grep “HIGHMEM” /boot/config-`uname -r`
-output	NB:354	=dash	=dash	err	0	cd /lib/modules/$(uname -r)/
-output	NB:357	same	neither	status+rec+err	0	cd $(dirname $(dirname $(which perl)))/lib
+output	NB:354	=dash	=bash	status+err	0	cd /lib/modules/$(uname -r)/
+output	NB:357	same	=bash	status+rec+err	0	cd $(dirname $(dirname $(which perl)))/lib
 output	NB:358	same	=dash	status+err	0	cd "$(find . -print0 | sort -z | tr '\0' '\n' | tail -1)"
 output	NB:36	same	same	out+rec+err	0	cat /proc/2671/maps | grep `which tail`
-output	NB:360	same	=dash	status+err	0	cd /home/`whoami`
+output	NB:360	same	=bash	status+err	0	cd /home/`whoami`
 output	NB:3603	same	same	out+rec	0	find ~/container -mindepth 3 -type f -execdir mv "{}" $(dirname "{}")/.. \;
 output	NB:3604	same	same	out+rec	0	find ~/container -mindepth 3 -type f | while read file; do mv "$file" "$(dirname "$file")/.."; done
 output	NB:362	same	=dash	status+rec+err	0	cd "$(dirname $(which oracle))"
-output	NB:363	same	neither	status+rec+err	0	cd $(dirname $(which oracle))
-output	NB:364	same	neither	status+rec+err	0	cd $(dirname `which oracle`)
+output	NB:363	same	=bash	status+rec+err	0	cd $(dirname $(which oracle))
+output	NB:364	same	=bash	status+rec+err	0	cd $(dirname `which oracle`)
 output	NB:3642	same	same	status+rec+err	0	sed -i '' -e 's/subdomainA/subdomainB/g' $(find /home/www/ -type f)
 output	NB:365	neither	neither	status+rec+err	0	cd $(dirname $(which $0) )
 output	NB:3652	same	same	out+rec	0	find dir/ -type f -exec mv {} $(echo {}.fix | iconv -f UTF8 -t ASCII//TRANSLIT ) \;
-output	NB:366	same	neither	status+rec+err	0	cd $(which oracle | xargs dirname)
+output	NB:366	same	=bash	status+rec+err	0	cd $(which oracle | xargs dirname)
 output	NB:367	same	same	rec+err	0	cd "$(grep DOWNLOAD $HOME/.config/user-dirs.dirs | cut -f 2 -d "=" | tr "\"" "\n" | tr -d "\n")"
 output	NB:368	same	same	rec+err	0	cd "$(grep DOWNLOAD $HOME/.config/user-dirs.dirs | cut -f 2 -d "=" | tr "\"" "\n")"
 output	NB:369	msg=dash	msg=dash	err	0	cd $( ~/marker.sh go "$@" )
@@ -745,28 +675,27 @@ output	NB:454	same	same	out	0	cp --remove-destination $(readlink $f) $f
 output	NB:4578	same	msg=dash	out+err	0	find . -printf "%P\n" | sort | while IFS= read -r f; do echo "$(uuid) $f"; done
 output	NB:4619	same	same	rec	0	pstree $(pgrep CID$client_id) -ap | sed -n 's/.*rsync,\([0-9]*\).*/\1/p'
 output	NB:4742	same	same	rec	0	cd $(echo $somedir | sed "s#^~#$HOME#")
-output	NB:4743	same	neither	status+rec+err	0	cd $(dirname $(which ls))
-output	NB:4747	same	=dash	status+err	0	cd $(git rev-parse --show-cdup)
+output	NB:4743	same	=bash	status+rec+err	0	cd $(dirname $(which ls))
+output	NB:4747	same	=bash	status+err	0	cd $(git rev-parse --show-cdup)
 output	NB:475	same	same	out	0	chown ${JBOSS_USER}: $(dirname $JBOSS_PIDFILE) || true
 output	NB:4776	msg=dash	=bash	status+err	0	kill -9 $(lsof -i:3000 -t)
 output	NB:4789	same	same	rec+err	0	sed -i "15i `hostname`" test.html
 output	NB:48	same	same	out+rec	0	perl -pi -e 'BEGIN { print "A new line" }' $(find . -name '*.py')
 output	NB:4840	same	same	out+rec	0	killall -u "$(whoami)" dropbox
-output	NB:4883	same	same	status+out+rec+err	1	ls -l $(find /etc -name "*.txt" )
+output	NB:4883	same	same	status+out+rec+err	0	ls -l $(find /etc -name "*.txt" )
 output	NB:49	same	msg=dash	out+rec+files+err	0	for a in `find . -name '*.py'` ; do cp "$a" "$a.cp" ; echo "Added line" > "$a" ; cat "$a.cp" >> "$a"
 output	NB:4900	same	same	out+rec+err	0	more /etc/hosts | grep '[[:space:]]*'`hostname`'[[:space:]]*' | awk '{print $1}'
 output	NB:4901	same	same	out+rec+err	0	more /etc/hosts | grep `hostname` | awk '{print $1}'
 output	NB:503	same	same	rec+err	0	cd `cat $HOME/.lastdir`
 output	NB:504	same	same	rec	0	cd "$(dirname "$(which oracle)")"
 output	NB:5099	same	same	status+out+rec	0	who | grep "$(tty | sed 's:/dev/::')"
-output	NB:513	same	neither	status+rec+err	0	cd `dirname $(which python)`
-output	NB:5150	same	same	status+out+rec+err	1	ls -ald `which c++`
+output	NB:513	same	=bash	status+rec+err	0	cd `dirname $(which python)`
+output	NB:5150	same	same	status+out+rec+err	0	ls -ald `which c++`
 output	NB:5192	same	same	out+rec	0	find . -maxdepth 1 -type d | while read -r dir; do printf "%s:\t" "$dir"; find "$dir" -type f | wc -
 output	NB:5219	same	same	rec	0	echo $(ls $(pwd))
-output	NB:529	same	neither	status+rec+err	0	cd $(dirname $(which ssh));
+output	NB:529	same	=bash	status+rec+err	0	cd $(dirname $(which ssh));
 output	NB:5327	same	same	out+rec	0	file -L $(python -c 'import sys; print(sys.executable)')
 output	NB:5332	same	same	status+rec+err	0	libdir=$(dirname $(dirname $(which gcc)))/lib
-output	NB:5377	same	same	rec+err	0	mkdir $(seq -f "$HOME/Labs/lab4a/folder%03g" 3)
 output	NB:5385	same	same	out+rec	0	wget --post-data="PiIP=$(hostname -I)" http://dweet.io/dweet/for/cycy42
 output	NB:5391	neither	neither	rec+files	1	mkdir $(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
 output	NB:5392	same	same	rec	0	for i in `find . -type d`; do mkdir -p /tmp/tar_root/`echo $i|sed 's/\.\///'`; done
@@ -807,11 +736,11 @@ output	NB:5974	same	same	status+out+rec+err	0	readlink -f $(which java)
 output	NB:6025	=bash	=bash	out	0	echo -e "ALERT - Shell Access on:' `date` `who` '\n\n' `whois $(who | cut -d'(' -f2 | cut -d')' -f1)
 output	NB:6083	same	same	out	0	echo "( `date -d $B +%s` - `date -d $A +%s`) / (24*3600)" | bc -l
 output	NB:6111	msg=dash	msg=dash	rec	0	ps -u $(whoami) --no-header -o vsz | dc -f - -e '[+z1<r]srz1<rp'
-output	NB:6128	same	same	out+rec+err	1	echo $(ls -l $(which bash))
-output	NB:6129	same	same	status+out+rec+err	1	ls -l `which passwd`
+output	NB:6128	same	same	out+rec+err	0	echo $(ls -l $(which bash))
+output	NB:6129	same	same	status+out+rec+err	0	ls -l `which passwd`
 output	NB:6130	same	same	rec+err	0	ls -l "$( which studio )"
-output	NB:6132	same	same	status+out+rec+err	1	ls `which g++` -al
-output	NB:6133	same	same	status+out+rec+err	1	ls `which gcc` -al
+output	NB:6132	same	same	status+out+rec+err	0	ls `which g++` -al
+output	NB:6133	same	same	status+out+rec+err	0	ls `which gcc` -al
 output	NB:6148	same	same	out+rec+err	0	cat `which java` | file -
 output	NB:6149	same	same	out+rec	0	file -L `which gcc`
 output	NB:6150	same	same	out+rec	0	file `which c++`
@@ -849,10 +778,12 @@ output	NB:6442	same	same	out	0	echo "$(pwd)/$(basename "$1")"
 output	NB:6446	same	same	out	0	echo `date` `hostname`
 output	NB:6447	same	same	out	0	echo `date +"%a %x %X"` `hostname`
 output	NB:6450	same	same	out+rec	0	date -d "$(date -d "2 months" +%Y-%m-1) -1 day" +%a
+output	NB:6453	neither	neither	out+rec	0	echo "dirname/readlink: $(dirname $(readlink -f $0))"
 output	NB:6462	same	same	status+out+rec+err	0	cat `find [whatever]`
 output	NB:6463	same	same	rec+err	0	cat "$(which f)"
 output	NB:6464	same	same	status+out+rec+err	0	cat `which f`
 output	NB:648	same	same	out	0	echo gzip. $( gzip | wc -c )
+output	NB:6627	neither	neither	out	0	echo `pwd`/`dirname $0`
 output	NB:665	same	same	out+rec	0	pdfunite `find . -name "*.pdf" | sort` all.pdf
 output	NB:6664	neither	neither	rec	1	echo $(cat /proc/$$/cmdline)
 output	NB:6666	same	same	out	0	echo `whoami`
@@ -863,8 +794,11 @@ output	NB:6794	same	same	out	0	echo "groups: [ $(groups myuser | sed -e 's/.\+\s
 output	NB:6841	same	same	out+rec	0	pstree $(pgrep -fn bash)
 output	NB:6842	same	same	out+rec	0	pstree -ap `pidof cron`
 output	NB:6846	same	same	out	0	pstree -aAp $(ps -ejH | awk -v v1=$mypid '$1==v1 {print $3}')
+output	NB:685	same	=bash	out	0	yes 123456789 | grep --line-buffered . | { head -n 1; head -n 1; }
+output	NB:6855	neither	neither	err	0	$(readlink -f $(dirname "$0"))
 output	NB:6876	same	same	out	0	echo `cat $FILE | head -n 100 | wc -c` / 1024 | bc -l
 output	NB:6887	same	same	out+rec+err	0	cat `find . -name "*.php"` | wc -l
+output	NB:6912	neither	neither	rec	0	MY_DIR=$(dirname $(readlink -f $0))
 output	NB:6913	same	same	status+rec	0	TTY=$(tty) WHOLINE=$(who | grep "${TTY#/dev/}")
 output	NB:6918	same	same	out+rec	0	getent `uname -n`
 output	NB:7015	same	same	status	0	du -s $i | read k
@@ -878,7 +812,7 @@ output	NB:7057	same	same	out+rec	0	sudo chown -R `whoami` /usr/local/lib/node_mo
 output	NB:7058	same	same	out+rec	0	sudo chown -R $(whoami) ~/.npm
 output	NB:7059	same	same	out+rec	0	sudo chown -R `whoami` ~/.npm
 output	NB:7122	same	same	out	0	cp -rv `ls -A | grep -vE "dirToExclude|targetDir"` targetDir
-output	NB:7123	same	same	out	0	cp -r `ls -A | grep -v "c"` $HOME/
+output	NB:7123	same	same	out+rec	0	cp -r `ls -A | grep -v "c"` $HOME/
 output	NB:7218	neither	neither	status+out+rec+err	1	stat --printf="%y %n\n" $(ls -tr $(find * -type f))
 output	NB:7219	same	same	status+out+rec+err	1	ls -ldt $(find .)
 output	NB:7220	same	same	status+out+rec+err	1	ls -ld $(find .)
@@ -917,7 +851,6 @@ output	NB:7961	same	same	out	0	HOSTNAME=$(hostname) make -e
 output	NB:7962	same	same	out+rec	0	make K_VERSION=`uname -r`
 output	NB:7966	same	same	out+rec	0	setarch `uname -m` -R ./yourProgram
 output	NB:798	same	same	out+rec	0	find /source_path -name \*.data | while read -r filename; do cp "${filename}" "$(printf "%s\n" "${fi
-output	NB:7982	same	same	rec+err	0	env - `cat ~/cronenv` /bin/sh
 output	NB:7988	same	msg=dash	status+err	0	for i in `find . -exec echo {} \;`; do cmd1 $i; cmd2 $i; done
 output	NB:7989	same	same	err	0	/usr/bin/sudo -u `whoami` `which program`
 output	NB:799	same	same	out+rec	0	find jcho -name '*.data' | while read -r f; do cp "$f" "$(echo "$f" | sed 's~\([^)]*\)/\([^()]*\)$~\
@@ -925,7 +858,7 @@ output	NB:8001	same	same	status+rec+err	0	sed -i "s#\(export\ PATH=\"\)\(.*\)#\1
 output	NB:8010	msg=dash	msg=dash	err	0	`which find` "$@" -print0;
 output	NB:8012	same	same	out	0	node -pe 'JSON.parse(process.argv[1]).foo' "$(cat foobar.json)"
 output	NB:8016	same	same	out+rec	0	vi $(find . -type f -name 'btree*.c')
-output	NB:8019	same	=dash	status+err	0	cd `script`
+output	NB:8019	same	=bash	status+err	0	cd `script`
 output	NB:802	same	same	out+rec	0	find . -name '*.txt' | while IFS= read -r FILE; do echo "Copying $FILE.."; cp "$FILE" /destination; 
 output	NB:8021	same	=dash	status+err	0	cd "$(node app)"
 output	NB:8023	same	same	out	0	true | echo `tty | sed 's:/dev/::'`
@@ -992,15 +925,15 @@ output	NB:9216	same	same	out+rec+err	0	ipcs -a | grep `whoami`
 output	NB:9234	same	same	out+rec	0	du -sk $(find . -type d) | sort -n -k 1
 output	NB:9241	same	same	out+rec	0	less `find -maxdepth 1 -type f -daystart -mtime -1`
 output	NB:9298	same	same	out+rec	0	ruby -e "$(curl -fsSL https://raw.github.com/Homebrew/homebrew/go/install)"
-output	NB:9318	same	=dash	status+err	0	cd $(find . -maxdepth 1 -type d -name "folder_*" | sort -t_ -k2 -n -r | head -1)
+output	NB:9318	same	=bash	status+err	0	cd $(find . -maxdepth 1 -type d -name "folder_*" | sort -t_ -k2 -n -r | head -1)
 output	NB:9464	msg=dash	=bash	status+err	0	kill -9 $(pgrep amarok)
-output	NB:9521	same	=bash	status+err	0	unset $(/usr/bin/env | /usr/bin/cut -d = -f 1 | /usr/bin/xargs)
-output	NB:9523	same	=bash	status+err	0	unset $(locale|cut -d= -f1)
-output	NB:956	same	same	out+rec+err	0	cat $(find /usr/share/doc/ -name '*.txt') | zegrep -ic '\<exception\>'
+output	NB:9521	same	=dash	status+err	0	unset $(/usr/bin/env | /usr/bin/cut -d = -f 1 | /usr/bin/xargs)
+output	NB:9523	same	=dash	status+err	0	unset $(locale|cut -d= -f1)
+output	NB:956	same	msg=dash	out+rec+err	0	cat $(find /usr/share/doc/ -name '*.txt') | zegrep -ic '\<exception\>'
 output	NB:9583	neither	neither	rec+err	1	touch -t `date +%m%d0000` /tmp/$$
 output	NB:9614	same	msg=dash	status+err	0	command $(zcat input1.txt.gz) $(zcat input2.txt)
-output	NB:9728	same	=bash	out+files	0	echo $(date) "0" | tee -a log.csv
-output	NB:9729	same	=bash	out+files	0	echo $(date) "1" | tee -a log.csv
+output	NB:9728	same	same	out+files	0	echo $(date) "0" | tee -a log.csv
+output	NB:9729	same	same	out+files	0	echo $(date) "1" | tee -a log.csv
 output	NB:9753	same	same	out+rec	0	tar czvf mytarfile.tgz `find . -mtime -30`
 output	NB:9789	same	same	out+rec	0	find /mydir -type f -name "*.txt" -print0 | xargs -0 chown root $(mktemp)
 output	NB:9793	same	same	out+rec	0	chmod 751 `find ./ -type d -print`
@@ -1049,46 +982,46 @@ output	TL:linux/unzipsfx.md:8	same	same	rec+files+err	0	cat $(which unzipsfx) pa
 output	TL:linux/urpmi.md:25	msg=dash	msg=dash	out	0	sudo urpmi $(urpmq --auto-orphans -f)
 mtime	NB:1304	same	same	rec	0	ls -tr | head -n -5 | xargs rm
 mtime	NB:1473	same	same	rec	0	ls -tr $(find /home/backups -name '*.gz' -o -name '*.tgz')|head -1|xargs rm -f
-mtime	NB:1920	same	same	out	1	ls -l --color=always "$@" | egrep --color=never '^d|^[[:digit:]]+ d'
-mtime	NB:1921	same	same	out	1	ls -l --color=always "$@" | grep --color=never '^d'
-mtime	NB:1922	same	same	out	1	ls -l | grep "^d"
-mtime	NB:4883	same	same	out	1	ls -l $(find /etc -name "*.txt" )
-mtime	NB:4945	=bash	same	out+rec	1	ls -alrt `pwd`/*
-mtime	NB:4948	same	same	out	1	ls -l --time-style=long-iso | sort -k6
-mtime	NB:5150	same	same	out	1	ls -ald `which c++`
+mtime	NB:1578	=dash	=dash	err	1	time find . -type f -exec stat {} + > /dev/null
+mtime	NB:1920	same	same	out	0	ls -l --color=always "$@" | egrep --color=never '^d|^[[:digit:]]+ d'
+mtime	NB:1921	same	same	out	0	ls -l --color=always "$@" | grep --color=never '^d'
+mtime	NB:1922	same	same	out	0	ls -l | grep "^d"
+mtime	NB:4883	same	same	out	0	ls -l $(find /etc -name "*.txt" )
+mtime	NB:4945	same	same	out+rec	0	ls -alrt `pwd`/*
+mtime	NB:4948	same	same	out	0	ls -l --time-style=long-iso | sort -k6
+mtime	NB:5150	same	same	out	0	ls -ald `which c++`
 mtime	NB:5293	neither	neither	out	1	ls -l /proc/self/fd/
 mtime	NB:5485	=dash	=dash	out+err	1	TIMEFORMAT=%R && time ls -l
 mtime	NB:5505	=dash	=dash	err	1	time find /usr/src -name "*.html" -exec grep -H "foo" {} ';' | wc -l
 mtime	NB:5506	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs grep -l "foo" | wc -l
-mtime	NB:6128	same	same	out	1	echo $(ls -l $(which bash))
-mtime	NB:6129	same	same	out	1	ls -l `which passwd`
-mtime	NB:6132	same	same	out	1	ls `which g++` -al
-mtime	NB:6133	same	same	out	1	ls `which gcc` -al
-mtime	NB:6643	same	same	out	1	ls -l | head -2 | tail -1
-mtime	NB:6644	same	same	out	1	ls -l | tail -n +2 | head -n1
-mtime	NB:6799	=bash	OURS	out	1	ls -l -- "$dir/$file"
-mtime	NB:6808	same	same	out	1	ls -lb
+mtime	NB:6128	same	same	out	0	echo $(ls -l $(which bash))
+mtime	NB:6129	same	same	out	0	ls -l `which passwd`
+mtime	NB:6132	same	same	out	0	ls `which g++` -al
+mtime	NB:6133	same	same	out	0	ls `which gcc` -al
+mtime	NB:6643	same	same	out	0	ls -l | head -2 | tail -1
+mtime	NB:6644	same	same	out	0	ls -l | tail -n +2 | head -n1
+mtime	NB:6799	same	=dash	out	1	ls -l -- "$dir/$file"
+mtime	NB:6808	same	same	out	0	ls -lb
 mtime	NB:6810	same	same	out	0	ls -ld /tmp /tnt | sed 's/^.*$/<-- & --->/'
 mtime	NB:6811	same	same	out	0	ls -ld /tmp /tnt
-mtime	NB:6818	neither	neither	out+files+err	1	ls -lR / | tee -a output.file
+mtime	NB:6818	neither	neither	out+files	1	ls -lR / | tee -a output.file
 mtime	NB:6819	neither	neither	out+files	1	ls -lR / | tee output.file
 mtime	NB:6821	neither	neither	rec	1	ls -l /proc/$$/exe | sed 's%.*/%%'
 mtime	NB:7218	neither	same	out+rec	1	stat --printf="%y %n\n" $(ls -tr $(find * -type f))
 mtime	NB:7219	same	same	out	1	ls -ldt $(find .)
 mtime	NB:7220	same	same	out	1	ls -ld $(find .)
-mtime	NB:7296	neither	neither	files	1	{ time find / 2>/dev/null; } 2>time.txt
+mtime	NB:7296	=dash	=dash	files	1	{ time find / 2>/dev/null; } 2>time.txt
 mtime	NB:7655	same	same	rec	0	ls -tQ | tail -n+4 | xargs rm
 mtime	NB:7659	same	same	rec	0	ls -C1 -t| awk 'NR>5'|xargs rm
 mtime	NB:7661	same	same	rec	0	rm `ls -t | awk 'NR>5'`
 mtime	NB:7890	neither	neither	files	1	{ time sleep 1 ; } 2> time.txt
-mtime	NB:7891	neither	neither	files	1	{ time sleep 1 2> sleep.stderr ; } 2> time.txt
 mtime	NB:7892	=dash	=dash	err	0	time sleep 1
-mtime	NB:7932	OURS	same	out	1	ls -t | head -n1
-mtime	NB:8207	neither	neither	files	0	(time ls) > ls_results 2> time_results
+mtime	NB:7932	same	same	out	0	ls -t | head -n1
+mtime	NB:8207	neither	neither	files	1	(time ls) > ls_results 2> time_results
 mtime	NB:8208	neither	neither	files	1	{ time ls; } 2>&1 | cat > time.txt
 mtime	NB:8214	neither	neither	files	0	(time ls) > outfile 2>&1
 mtime	NB:9219	same	same	out	1	ls -lrt | tail -n1
-mtime	NB:9246	OURS	same	out	1	ls -lt | tr -d 0-9
+mtime	NB:9246	same	same	out	0	ls -lt | tr -d 0-9
 mtime	NB:9583	neither	neither	rec+err	1	touch -t `date +%m%d0000` /tmp/$$
 mtime	NB:980	=dash	=dash	err	1	time find /usr/src -name "*.html" | xargs /usr/bin/grep -l "foo" | wc -l
 mtime	SC:Analytics.hs:prop_checkAssignAteCommand4	same	same	out	1	A=foo ls -l
@@ -1098,8 +1031,8 @@ mtime	SC:Checks/Commands.hs:prop_checkPrintfVar19	neither	neither	out	1	printf '
 mtime	SC:Checks/Commands.hs:prop_checkPrintfVar20	neither	neither	out	1	printf '%d %(%s)T' 42
 mtime	SC:Checks/Commands.hs:prop_checkPrintfVar21	neither	neither	out	1	printf '%d %(%s)T'
 mtime	SC:Checks/Commands.hs:prop_checkTimeParameters2	=dash	=dash	err	1	time sleep 10
+mtime	SC:Checks/Commands.hs:prop_checkTimedCommand3	=dash	=dash	err	1	#!/bin/sh time sleep 1
 mtime	TL:common/ls.md:20	same	same	out	1	ls -la
 mtime	TL:common/ls.md:24	same	same	out	1	ls -lh
 mtime	TL:common/ls.md:28	same	same	out	1	ls -lSR
-mtime	TL:common/ls.md:32	OURS	same	out	1	ls -ltr
-mtime	TL:common/times.md:10	neither	neither	out	1	times
+mtime	TL:common/ls.md:32	same	same	out	1	ls -ltr

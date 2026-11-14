@@ -120,13 +120,21 @@ for my $case (
 	}
 }
 
-# I(x-1) is not a term either function can build -- I() takes only ^power -- but
-# glm() used to read the '-1' as intercept suppression and quietly fit I(x)
-# instead.  Both must now refuse it rather than one of them guessing.
-throws_ok { lm(formula => 'y ~ I(x-1)', data => \%d) }
-	qr/0 degrees of freedom/, 'lm: I(x-1) is not silently rewritten';
-throws_ok { gaussian('y ~ I(x-1)', \%d) }
-	qr/0 degrees of freedom/, 'glm: I(x-1) is not silently rewritten';
+# I(x-1) is arithmetic inside I(), as in R: the column is x - 1, so its slope is
+# x's and the intercept moves by that slope (a + b*x = (a + b) + b*(x - 1)).
+# Until 0.3419 it was refused with "0 degrees of freedom", and glm() before
+# that read the '-1' as intercept suppression and fitted I(x); neither may
+# come back.  The tolerance covers rounding in two least-squares fits of the
+# same line (observed difference below 1e-12 on double).
+for my $fn (['lm', sub { lm(formula => $_[0], data => \%d) }], ['glm', sub { gaussian($_[0], \%d) }]) {
+	my $x  = $fn->[1]->('y ~ x');
+	my $ix = $fn->[1]->('y ~ I(x-1)');
+	cmp_ok(abs($ix->{coefficients}{'I(x-1)'} - $x->{coefficients}{x}), '<', 1e-9,
+		"$fn->[0]: I(x-1) has x's slope");
+	cmp_ok(abs($ix->{coefficients}{Intercept}
+		- ($x->{coefficients}{Intercept} + $x->{coefficients}{x})), '<', 1e-9,
+		"$fn->[0]: I(x-1) moves the intercept by the slope");
+}
 
 # row names
 # lm() used to label every row 1..n.  It now takes glm()'s labels, which is what
