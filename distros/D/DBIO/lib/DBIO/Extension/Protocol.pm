@@ -4,7 +4,7 @@ package DBIO::Extension::Protocol;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::Exception;
 use DBIO::Util ();
@@ -339,7 +339,7 @@ DBIO::Extension::Protocol - Runs the phases of the extension interface over the 
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

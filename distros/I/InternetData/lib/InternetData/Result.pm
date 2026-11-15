@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.13.1';
+our $VERSION = '1.14.0';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn
@@ -174,7 +174,8 @@ name, an empty string where there is none.
 =head2 whois, rwhois, hosted_domains
 
 Paid: the WHOIS and RWHOIS records for the range, and how many domains point at
-the address, or C<undef> when your plan omits them.
+the address with the 10 most popular (C<< {total => 4, domains => [...]} >>), or
+C<undef> when your plan omits them.
 
 =head2 trial_expired
 

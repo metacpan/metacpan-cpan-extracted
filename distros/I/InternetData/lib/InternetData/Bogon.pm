@@ -9,7 +9,7 @@ use Socket qw(AF_INET AF_INET6 inet_pton);
 use InternetData::Bogons;
 use InternetData::Result;
 
-our $VERSION = '1.13.1';
+our $VERSION = '1.14.0';
 
 # Whether an address is private, loopback, link-local, documentation, multicast
 # or otherwise not routable on the public internet, including the IPv6
@@ -55,10 +55,10 @@ sub unmapped {
 # The answer a bogon gets, in the full shape the API serves on a paid plan: every
 # flag present and false, every detail object present and empty (Web IP's list
 # empty), and location, asn, company, abuse, whois and rwhois with every member
-# empty, hostname empty and hosted_domains 0.
+# empty, hostname empty and hosted_domains 0 with no domains.
 sub bogon_result {
     my ($ip) = @_;
-    my %answer = (ip => $ip, is_bogon => 1, hostname => '', hosted_domains => { total => 0 });
+    my %answer = (ip => $ip, is_bogon => 1, hostname => '', hosted_domains => { total => 0, domains => [] });
     $answer{$_} = 0 for @InternetData::Result::FLAGS;
     $answer{$_} = $_ eq 'web' ? [] : {} for @InternetData::Result::DETAILS;
     my %numbers = map { $_ => 1 } qw(latitude longitude accuracy_radius asn);

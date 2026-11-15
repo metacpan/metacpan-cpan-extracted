@@ -1,3 +1,126 @@
+-   5.4.1 Sun Nov 15 01:32:20 EST 2026
+
+   Makefile.PL udpates to include File::Util::SecureDir as a 
+   dependency.
+
+-   5.4.0 Sun Nov 15 00:05:45 EST 2026
+
+    Bug fixes for FindBin::Bin, FindBin::Parents, and FindBin::libs;
+    the basic API is preserved.  The POD for all three is updated to
+    be consistent with their behavior, with notes added that specify
+    the outcomes of edge cases, useful to read when diagnosing a
+    failure.
+
+    FindBin::Bin v2.3.0
+    - pwd() warns and uses getcwd when $ENV{ PWD } is stale (e.g.,
+      after a builtin chdir), and dies if getcwd fails (e.g., the
+      working directory was removed).
+    - A $0 under /dev/ (perl /dev/stdin, bash process substitution)
+      is handled like '-'.
+    - import() takes the first abspath/noabspath flag.
+
+    FindBin::Parents v1.0.0
+    - dir_paths: $assume_dir overrides the -d test; without it a path
+      that does not exist croaks.  $path must be absolute or 'pwd'.
+    - The root is listed once; the cache is keyed on whether the path
+      is treated as a directory.
+
+    FindBin::libs v5.1.0
+    - Directory searches use -d instead of -e.
+    - scalar requires export, and croaks without it; noscalar no
+      longer implies subonly.
+    - The default ignore list is "/,/usr", which skips /lib and
+      /usr/lib as documented; ",usr" skipped only /lib.
+    - Documented options and behavior, see perldoc FindBin::libs:
+      - nofail: no warning when nothing is found ("Options").
+      - abspath, noabspath: walk up from $Bin_p or $Bin_l ("Options").
+      - VERBOSE_FINDBIN_LIBS, VERBOSE: default verbose and print
+        ("Options", verbose).
+      - noNAME negates any option ("General Use").
+      - File::Util::SecureDir check before use lib, PERL5LIB, and
+        LD_LIBRARY_PATH; exported variables are not checked
+        ("Directory security").
+
+    Tests
+    - Every test loads the module from the checkout, validating the
+      lib directory first (t/00-lib-check.t).
+    - New tests for dir_paths, pwd(), $0 under /dev/, and the libs.pm
+      nofail, ignore=, abspath, and scalar options and the default
+      ignore list.
+
+-   5.3.9 Sun Nov  8 18:30:00 EST 2026
+
+    Add nofail import option to FindBin::libs (libs.pm v5.0.8).
+    With nofail, the "Empty lib directory list" and "Empty list of usable
+    paths" carps are suppressed when no directories are found. Default
+    behavior (carp on empty results) is unchanged. Example scripts all
+    use nofail since they illustrate directory lookup patterns that may
+    find nothing in a given working tree.
+
+    Remove two unused use FindBin::libs calls from t/bin/install-tests.d/02-perl_t
+    (base=Dancer2 and base=.prove) that reliably found no directories and
+    emitted "Empty lib directory list" carps each time the stub ran.
+
+-   5.3.8 Sun Nov  8 17:30:00 EST 2026
+
+    Replace FindBin::DirFilter with File::Util::SecureDir in FindBin::libs.
+    libs.pm now uses a process-wide singleton (File::Util::SecureDir->new)
+    and $secure->filter_dirs(@libz) in place of the per-package apply_filter.
+    FindBin::DirFilter.pm and its four test files are removed; the module is
+    now a separate distribution. PREREQ_PM adds File::Util::SecureDir v0.1.0.
+
+    Fix three pre-existing warnings in libs.pm v5.0.7 exposed by -w under
+    Perl 5.42:
+    - catpath() in $append_dir and in the ignore-list builder was called
+      with two arguments; the missing $file argument defaulted to undef,
+      triggering "Use of uninitialized value $file" in File::Spec::Unix.
+      Fixed by passing '' as the third argument.
+    - In the scalar-search branch of $find_dirs, List::Util::first returns
+      undef when no existing directory is found; that undef propagated into
+      the taint-dodge regex. Fixed by returning () instead of undef when
+      first finds nothing.
+
+-   5.3.7 Sat Nov  8 14:00:00 EST 2026
+
+    Add t/10-Bin-path/15-Bin-utf8-chars.t: confirms that Unicode chars from
+    Latin-1 Supplement (U+00A0-U+00FF), Latin Extended-A/B (U+0100-U+024F),
+    Cyrillic (U+0400-U+04FF), and Cyrillic Supplement (U+0500-U+052F) do not
+    break the q#...# eval in Bin.pm. Filters to punctuation, symbol, and
+    separator categories via /[\p{P}\p{S}\p{Z}]/u. Uses encode('UTF-8', chr $cp)
+    for byte-string paths and the same subprocess pattern as 14-Bin-eval-chars.t
+    (list-form open, 6 assertions per codepoint).
+
+-   5.3.6 Sat Nov  8 13:11:00 EST 2026
+
+    Fix FindBin::Bin v2.1.1: backslash in directory path was not escaped
+    before the q#...# string literal in the eval at Bin.pm lines 201-202.
+    A lone '\' passed through correctly (since '\x' is literal in q#...# for
+    non-special x), but '\#' caused a syntax error and '\\' silently collapsed
+    to '\'. Fix: escape '\' first (s{\\}{\\\\}gr), then escape '#', so that
+    any combination of backslash and hash in a directory name is handled.
+
+    Add t/10-Bin-path/14-Bin-eval-chars.t: subprocess-based test that runs
+    FindBin::Bin from a driver script inside a temporary directory named with
+    each of the 32 ASCII printable non-word chars, plus explicit edge cases
+    for '\#', '\\', and trailing '\'. Verifies both the glob scalar and
+    constant sub for Bin_l, Bin_p, and Bin.
+
+-   5.1.6 Sun Nov  1 19:31:41 EST 2026
+
+    Dodge a security issue by dropping the trailing ':' used for LD_LIBRARY_PATH.
+
+    Remove FindBin::Security; superseded by FindBin::DirFilter.
+
+    Add FindBin::DirFilter: per-package and global directory filter table.
+    Predefined filters all/other_no_write/group_no_write/same_owner in
+    increasing restrictiveness order; each is cumulative (chains the previous).
+    Global default is immutable once set; read_dir_filter falls back to
+    other_no_write without assigning, so #! scripts can set the default after
+    modules have already read it. Win32 implementation uses GetFileSecurityA
+    with a pure-Perl self-relative SD parser (our $parse_sd for test access).
+    Unix/VMS implementation uses stat mode bits and UID comparison; VMS system
+    UIC root-equivalent check is unverified.
+
 -   5.1.5 Sat Oct 31 22:50:37 EDT 2026
 
     Makefile.PL postamble hooks pure_all instead of test so that

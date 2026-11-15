@@ -15,6 +15,8 @@ use DBIO::Test::Storage;
 
 BEGIN {
   eval { require Crypt::Bcrypt; 1 } or plan skip_all => 'Crypt::Bcrypt not installed';
+  eval { require Digest::SHA3; 1 }
+    or plan skip_all => 'Digest::SHA3 not installed (the token column of this file is SHA3-256)';
 }
 
 my $have_argon2 = eval { require Crypt::Argon2; 1 } ? 1 : 0;
@@ -256,7 +258,7 @@ subtest 'values go in as UTF-8 bytes, written and checked' => sub {
   my $tok = $schema->resultset('Token')->new_result({ token => $pw });
   ok($tok->check_token($pw), 'Digest: written and checked alike');
   my (undef, undef, $salt_b64, $digest_b64) = split /\$/, $tok->get_column('token');
-  my $ctx = Digest->new('SHA3-256');
+  my $ctx = Digest::SHA3->new(256);
   $ctx->add(MIME::Base64::decode_base64($salt_b64), $bytes);
   is(MIME::Base64::encode_base64($ctx->digest, ''), $digest_b64, 'Digest hashes the UTF-8 bytes');
 };

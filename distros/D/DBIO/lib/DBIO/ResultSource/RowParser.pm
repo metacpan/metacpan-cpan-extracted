@@ -4,7 +4,7 @@ package DBIO::ResultSource::RowParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Base';
 
@@ -474,7 +474,7 @@ DBIO::ResultSource::RowParser - Build row-inflating parsers from result source m
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 METHODS
 

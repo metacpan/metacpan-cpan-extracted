@@ -64,13 +64,16 @@ subtest 'gather checks it was given a code reference' => sub {
         "Expected a code reference at ${\ __FILE__ } line $line.\n";
 };
 
-subtest 'a stage made with gather is a code reference' => sub {
+subtest 'a stage made with gather can be called as a code reference' => sub {
     my $stage = gather {
         sub { $_ }
     };
-    isa_ok $stage, ['Ekorn::Pipeline::Gather'], 'a gather';
-    ok is_coderef($stage),            'and a code reference';
-    ok lives { $class->new($stage) }, 'which a pipeline takes';
+    isa_ok $stage, ['Ekorn::Pipeline::Gather', 'Ekorn::Pipeline::Element'],
+        'a gather';
+    ok !is_coderef($stage),               'an object, not a code reference';
+    ok is_coderef(\&$stage),              'but one it can be called as';
+    ok Ekorn::Pipeline::is_stage($stage), 'which goes where a stage goes';
+    ok lives { $class->new($stage) },     'and a pipeline takes';
 };
 
 subtest 'without an end, it is an ordinary stage, made for each run' => sub {
@@ -177,8 +180,8 @@ subtest 'an iterator calls the ends once, after the source runs out' => sub {
 
 subtest 'a block giving the wrong things croaks, naming the stage' => sub {
     my $msg
-        = 'Expected stage #2, made with gather, to return a code reference or a pipeline, and optionally an end function';
-    my @bad = ([], [sub { }, sub { }, sub { }], ['x'], [sub { }, 'x']);
+        = 'Expected stage #2, made with gather, to return a code reference or a pipeline, and optionally a flush and an end';
+    my @bad = ([], [sub { }, sub { }, sub { }, sub { }], ['x'], [sub { }, 'x']);
     for my $returns (@bad) {
         my $p    = $class->new(sub { $_ }, gather { @$returns });
         my $line = __LINE__ + 1;

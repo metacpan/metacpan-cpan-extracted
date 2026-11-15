@@ -4,7 +4,7 @@ package DBIO::ResultSource::View;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::ResultSet;
 
@@ -46,7 +46,7 @@ DBIO::ResultSource::View - ResultSource object representing a view
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

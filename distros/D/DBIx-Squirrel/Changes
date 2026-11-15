@@ -2,6 +2,175 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v3.0.2 2026-11-14
+
+    Version 3: a statement is a source for Ekorn::Pipeline, and a sink
+    given last turns it into a result.
+
+    An iterator is a source for Ekorn::Pipeline, reading only as many
+    rows as it needs, with Ekorn's | and @{}, and saying how its run
+    ended (roadmap 2026-0014). Its stages' Context, pluck and as_hash
+    work wherever a statement is read (roadmap 2026-0015). A call
+    taking stages, the Sugar's statements included, gives a sink's
+    result when a sink is last, and otherwise an iterator, and the
+    select methods take stages too (roadmap 2026-0016). first is new,
+    and single and all give what's left of a run. DBIx::Squirrel uses
+    Ekorn::Pipeline as it is, so its own Pipeline and Pipes modules
+    are no longer shipped (roadmap 2026-0017), and a Sugar statement's
+    definition can name Ekorn's named pipelines (roadmap 2026-0018).
+    DBIx::Squirrel::Stages::Flow passes on five more of Ekorn's
+    stages, and a gather has a flush and an end.
+    DBIx::Squirrel::Tooling exports every stage, sink and word a
+    caller uses, from one module (roadmap 2026-0025). Rows are fetched
+    in batches that grow, as in version 1, so reading one row of wide
+    rows is about 20 times quicker (roadmap 2026-0014), and next is
+    about 17% quicker (roadmap 2026-0022). An object given as a bind
+    value is bound as a value. The how-to is rewritten as a user guide
+    (roadmap 2026-0021), and the reference for version 3 (roadmap
+    2026-0023).
+
+    Most code written for 2.x runs as it did. It breaks where it uses
+    count, reads all for a count, relies on single croaking at a
+    second result or running the statement again, takes a stage for a
+    code reference, reads a Sugar statement given stages as a list or
+    a count, or uses DBIx::Squirrel::Pipeline, or DBIx::Squirrel::Stop
+    as a class. "Upgrading from 2.x", in
+    DBIx::Squirrel::Manual::Reference, lists each change and how to
+    move. To stay on 2.x, install its last version:
+    cpanm DBIx::Squirrel@2.1.0.
+
+    - DBIx::Squirrel::Tooling, new: everything a caller uses to do
+      work, from one module, by Ekorn::Pipeline::Tooling's tags, :core,
+      :flow, :batch, :taps, :stages, :sources, :sinks, :json
+      (from_json, from_jsonl, to_json, to_jsonl, from
+      Ekorn::Pipeline::JSON), :words and :all, with :rows (pluck,
+      as_hash) and :context (iterator, result_number, result_original)
+      besides, :stages including :rows. It exports nothing by default.
+      Where DBIx::Squirrel and Ekorn::Pipeline both export a name, it's
+      DBIx::Squirrel's, which today is the same sub. The README, the
+      reference and the user guide import from it, so their examples
+      carry no imports of their own, and each has a section on it
+      (roadmap 2026-0025).
+    - An iterator is a source, which a pipeline of Ekorn::Pipeline's can
+      read, passing on the statement's columns as the run's context. Its
+      stages are run by Ekorn::Pipeline.
+    - Rows are fetched 2 at first, then twice as many each time a fetch
+      fills its batch, up to 64, as in version 1, rather than 100 at a
+      time. Reading one row of wide rows is about 20 times quicker.
+    - first, new: the next result, or undef, finishing the statement.
+    - ended, new: how the last run ended, done, stopped or died.
+    - | and @{}, new, as Ekorn::Pipeline's sources have them, where
+      use Ekorn::Pipeline::Operators is in scope: $it | keep_all gives
+      an array reference of the results, $it | count_items a number,
+      and @$it every result. | always gives one value. Each use runs
+      the statement afresh, as the iterator's own run.
+    - iterate and results, on either handle, give a sink's result when
+      the last stage is one of Ekorn::Pipeline::Sinks' sinks:
+      keep_all a list, or an array reference for one value;
+      count_items, keep_first, keep_last and keep_single their value.
+      result_number counts in the stages before the sink, as it does
+      for all.
+    - A Sugar statement, or a database's function, given stages gives
+      an iterator, or, with a sink last, the sink's result, in place of
+      every result, or how many in scalar context.
+    - The select methods take stages after the bind values, and push
+      what the DBI gives through them: every value that comes out, or,
+      for one value, a sink's result, or how many. selectall_array
+      pushes each row.
+    - DBIx::Squirrel::Pipeline is no longer shipped: make a pipeline
+      with Ekorn::Pipeline->new. DBIx::Squirrel::Pipes is no longer
+      shipped: the handles take pipe and tap from
+      Ekorn::Pipeline::Pipes. Installing never removes a file, so a
+      copy that 2.x installed still loads until it's deleted, and code
+      using it runs as it did.
+    - DBIx::Squirrel::Stop still exports Stop, but is no longer a
+      class: throw with Ekorn::Pipeline::Stop->throw, and subclass
+      Ekorn::Pipeline::Stop.
+    - A Sugar statement's definition can give a pipeline's name, as
+      Ekorn::Pipeline's named names them, among its stages, looked up
+      as the statement is defined, in the package defining it. A
+      string given when the statement is called is a bind value, as
+      before. Its message for anything else is now "Expected only
+      stages after the statement for %s: code references, pipelines or
+      their names, or objects offering a stage's role method".
+    - The README, the user guide, the reference and the modules' POD
+      are swept, as Ekorn::Pipeline's were for its v0.3.0: the
+      reference names every function the modules document, older
+      terms are gone, paragraphs are filled to 70 columns, examples
+      give a pipeline a stage to a line, and the reference has a
+      section for developers, Making each kind of part, with worked
+      examples of a stage for rows and a sink into a table.
+    - The reference is rewritten for version 3, in the user guide's
+      order, with every example run, the protocols other code can rely
+      on, the run's context among them, and upgrading from 2.x
+      (roadmap 2026-0023).
+    - The README describes version 3: sinks given last, first,
+      take_if, |, a Sugar statement giving an iterator, and upgrading
+      from 2.x.
+    - The how-to is rewritten as a user guide, DBIx::Squirrel's
+      layers from the DBI up, with recipes that print what their
+      comments say, comparisons with the alternatives, and answers to
+      the questions people ask first, speed included (roadmap
+      2026-0021).
+    - pluck, as_hash and result_original work in any run reading a
+      statement: through |, or in a pipeline of your own, as well as
+      in an iterator's own stages. result_number and iterator are
+      undef there, as only an iterator's own stages are counted.
+    - next is about 17% quicker, and a stage or a sink 4 to 6%, as
+      less is done around each row (roadmap 2026-0022).
+    - single gives the next result, or undef, and finishes the
+      statement. At a second result, it warns "Expected only one item,
+      but there were more", and gives the first, rather than croak. It
+      no longer executes the statement again: reset first for that.
+    - all, asked for one value, gives an array reference of the
+      results, not how many there were.
+    - count is gone.
+    - take_first, take_last and take_single, from
+      DBIx::Squirrel::Stages::Flow on request: each passes on what the
+      sink of the same name, keep_first, keep_last or keep_single,
+      would give, so the stages after it go on. take_single warns at a
+      second value, for a SELECT that forgot LIMIT 1. They're
+      Ekorn::Pipeline's, which must have them.
+    - take_if and drop_if, from DBIx::Squirrel::Stages::Flow on
+      request: each passes on the values its block is true, or false,
+      of, testing every one, as grep does. They're Ekorn::Pipeline's.
+    - A gather's block returns the stage, and optionally a flush and an
+      end, as Ekorn::Pipeline v0.3.0 has them. The flush is what was
+      called the end function. The end, new, is called once the run has
+      ended, told how: done, stopped or died. A block returning
+      anything else croaks "Expected stage #%s, made with gather, to
+      return a code reference or a pipeline, and optionally a flush and
+      an end".
+    - A stage made with gather is an object that can go wherever a
+      stage can, and no longer a code reference.
+    - A gather's block can return its parts by name, as one hash
+      reference with the keys step, flush and end, giving only those
+      it has, as Ekorn::Pipeline v0.3.0 allows.
+    - An object given as a bind value is a value, as the DBI binds it,
+      whatever it's made of. A blessed hash first, such as a DateTime,
+      was taken for the attributes, so nothing was bound and the query
+      quietly found nothing; a blessed array was unwrapped as a list of
+      values; and a blessed scalar croaked "Expected a reference to a
+      HASH or ARRAY". In a Sugar statement's definition, an object
+      straight after the SQL is no longer taken for the attributes: one
+      that isn't a stage croaks, as anything else there does.
+    - Two of Ekorn::Pipeline's messages, which DBIx::Squirrel passes
+      on, say what a stage and a source are, as of Ekorn::Pipeline
+      v0.3.0: "Expected stage #%d to be a stage: a code reference, a
+      pipeline, or an object offering a stage's role method", for what
+      isn't a stage, and "Expected a source: a code reference, or an
+      object offering EKORN_SOURCE", from a pipeline's iterator. Code
+      matching the old wording needs updating.
+    - Three messages say what their conditions test: the iterator's
+      "Expected a DBIx::Squirrel statement handle", not "Expected a
+      statement handle"; pluck's and as_hash's "Expected a statement to
+      read, for the column names", not "Expected an iterator, ..."; and
+      the Sugar's "Expected a database named %s", not "Expected a
+      database defined as %s". Code matching the old wording needs
+      updating.
+    - Requires Ekorn::Pipeline v0.3.0 or later, below v0.4.0, for its
+      Tooling, a gather's flush and end, and the two messages' wording.
+
 v2.1.0 2026-11-10
 
     A pipeline goes wherever a stage goes, and the docs read plainly.

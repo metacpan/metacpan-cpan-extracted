@@ -218,4 +218,68 @@ my $allowed_cross_origin = HTTP::API::Core::Pagination->new(
 is_deeply(scalar($allowed_cross_origin->all), [1, 2],
     'cross-origin continuation can be explicitly enabled');
 
+
+dies_like(
+    sub { HTTP::API::Core::Pagination->new(client => $client, path => '/x', page_size => {}) },
+    qr/page_size must be a positive integer/,
+    'reference-valued page size rejected',
+);
+
+dies_like(
+    sub { HTTP::API::Core::Pagination->new(client => $client, path => '/x', start_page => []) },
+    qr/start_page must be a positive integer/,
+    'reference-valued start page rejected',
+);
+
+dies_like(
+    sub { HTTP::API::Core::Pagination->new(client => $client, path => []) },
+    qr/path must be a scalar/,
+    'reference-valued path rejected',
+);
+
+dies_like(
+    sub { HTTP::API::Core::Pagination->new(client => $client, path => '/x', mode => {}) },
+    qr/mode must be a scalar/,
+    'reference-valued mode rejected',
+);
+
+my $false_mode = bless {}, 'T::FalsePaginationMode';
+{
+    package T::FalsePaginationMode;
+    use overload bool => sub { 0 }, fallback => 1;
+}
+
+dies_like(
+    sub { HTTP::API::Core::Pagination->new(client => $client, path => '/x', mode => $false_mode) },
+    qr/mode must be a scalar/,
+    'false-overloaded reference-valued mode rejected before defaulting',
+);
+
+my $bad_next_client = T::PagerClient->new({
+    '/bad-next' => { items => [1], next => {} },
+});
+my $bad_next = HTTP::API::Core::Pagination->new(
+    client => $bad_next_client,
+    path   => '/bad-next',
+);
+dies_like(
+    sub { $bad_next->all },
+    qr/pagination next URL continuation must be a scalar/,
+    'reference-valued next URL continuation rejected',
+);
+
+my $bad_cursor_client = T::PagerClient->new({
+    '/bad-cursor' => { items => [1], next_cursor => [] },
+});
+my $bad_cursor = HTTP::API::Core::Pagination->new(
+    client => $bad_cursor_client,
+    path   => '/bad-cursor',
+    mode   => 'cursor',
+);
+dies_like(
+    sub { $bad_cursor->all },
+    qr/pagination cursor continuation must be a scalar/,
+    'reference-valued cursor continuation rejected',
+);
+
 done_testing;

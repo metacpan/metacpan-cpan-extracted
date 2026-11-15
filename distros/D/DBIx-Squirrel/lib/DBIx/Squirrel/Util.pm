@@ -4,7 +4,7 @@ package DBIx::Squirrel::Util;
 
 use Data::Dumper qw();
 use Exporter     qw(import);
-use Ref::Util    qw(is_arrayref is_hashref is_ref);
+use Ref::Util    qw(is_plain_arrayref is_plain_hashref is_plain_ref);
 use Sub::Util    qw(set_subname subname);
 
 use Ekorn::Pipeline qw(is_stage);
@@ -56,13 +56,14 @@ sub iterator_going ($sth) {
 
 # Take the attributes off the front of a list of arguments, if they're
 # there: a hash reference, or undef, as the DBI allows. An array reference
-# or a plain value there is a bind value, and is left in place.
+# or a plain value there is a bind value, and is left in place, and so is
+# an object, whatever it's made of, as the DBI binds one as a value.
 sub shift_attrs ($args) {
     return unless @$args;
     my $first = $args->[0];
-    return shift @$args if !defined $first || is_hashref($first);
+    return shift @$args if !defined $first || is_plain_hashref($first);
     croakf 'Expected a reference to a HASH or ARRAY'
-        if is_ref($first) && !is_arrayref($first);
+        if is_plain_ref($first) && !is_plain_arrayref($first);
     return;
 }
 
@@ -84,15 +85,16 @@ sub split_stages ($args) {
 }
 
 # Return the bind values given, or those in an array reference given
-# alone, unless it's a value itself: given to a statement taking one
-# value, it's that value if the statement takes a list, as a list
+# alone, unless it's a value itself. An object is a value, whatever it's
+# made of. Given to a statement taking one value, an array reference is
+# that value if the statement takes a list, as a list
 # placeholder does, or if the driver is DBD::Pg, which binds an array
 # reference as a PostgreSQL array, as it would with the DBI. The driver's
 # name is given, code returning how many values the statement takes, and
 # the statement's map of its list placeholders, if it has any.
 sub unwrap_values ($driver, $taken, $lists, @args) {
     return @args
-        unless @args == 1 && is_arrayref($args[0]);
+        unless @args == 1 && is_plain_arrayref($args[0]);
     return @args
         if ($lists || $driver eq 'Pg') && $taken->() == 1;
     return @{ $args[0] };
@@ -200,7 +202,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

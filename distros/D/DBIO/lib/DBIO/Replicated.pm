@@ -4,7 +4,7 @@ package DBIO::Replicated;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Base';
 
@@ -83,7 +83,7 @@ DBIO::Replicated - Replicated storage support for DBIO
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@ use Test::More;
 use Time::Keeper::Zone;
 
 # The TZ string evaluator on its own, with rules made up here: the forms
-# 2026e's zones do not use today (Jn, n, all-year daylight time, rule times
+# 2026f's zones do not use today (Jn, n, all-year daylight time, rule times
 # that cross into another year) as much as those they do.
 
 sub days {

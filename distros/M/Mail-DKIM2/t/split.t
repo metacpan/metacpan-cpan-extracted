@@ -58,14 +58,26 @@ ok(!$d->{'eve@e.com'},  'Bcc eve not disclosed');
     is(scalar(@{$_->{rcpts}}), 1, 'each copy has exactly one recipient') for @$copies;
 }
 
-# --- case-insensitive matching + bracket-agnostic ---------------------------
+# --- domain case-insensitive, local-part exact, bracket-agnostic ----------
 {
-    my $m2 = "To: Bob <BOB\@B.com>\r\nSubject: x\r\n\r\nb\r\n";
+    my $m2 = "To: Bob <bob\@B.COM>\r\nSubject: x\r\n\r\nb\r\n";
     my $copies = plan_copies($m2, ['<bob@b.com>', '<sneaky@s.com>']);
     my ($disc) = grep { grep { /bob/i } @{$_->{rcpts}} } @$copies;
-    is_deeply($disc->{rcpts}, ['<bob@b.com>'], 'case-insensitive: bob is disclosed (own group)');
+    is_deeply($disc->{rcpts}, ['<bob@b.com>'], 'domain case ignored: bob is disclosed (own group)');
     my ($bcc) = grep { grep { /sneaky/ } @{$_->{rcpts}} } @$copies;
     is_deeply($bcc->{rcpts}, ['<sneaky@s.com>'], 'sneaky (not in To/Cc) treated as Bcc');
+}
+
+# A local-part is case-sensitive (RFC 5321 2.4): User@ and user@ may be two
+# mailboxes, so a Bcc to one must not share a copy -- and an rt= -- with the
+# other. Splitting when they are in fact one mailbox only costs a copy.
+{
+    my $m3 = "To: User\@example.com\r\nSubject: x\r\n\r\nb\r\n";
+    my $copies = plan_copies($m3, ['<User@example.com>', '<user@example.com>']);
+    is(scalar(@$copies), 2, 'User@ and user@ go in separate copies');
+    my $co = cohorts($copies);
+    is(scalar(@{$co->{'<user@example.com>'}}), 1, 'Bcc user@ is alone in its copy');
+    ok(disclosed_addresses($m3)->{'User@example.com'}, 'disclosed key keeps local-part case');
 }
 
 done_testing;

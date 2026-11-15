@@ -9,10 +9,12 @@ use JSON qw(decode_json);
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Common qw(parse_dkim_pubkey);
 use DKIM2TestKeys;
+use UndoWalkVerifier;
 
-# StreamBody (the default): the Verifier hashes every instance's body as the body arrives
+# The Verifier hashes every instance's body as the body arrives
 # (Mail::DKIM2::BodyPlan) instead of keeping it and undoing each instance.
-# Same verdicts, same words, as the undo walk; and the body is not kept.
+# Same verdicts, same words, as the undo walk (t/lib/UndoWalkVerifier.pm);
+# and the body is not kept.
 
 my %dns = %{ decode_json(path(DKIM2TestKeys::dns_json())->slurp) };
 my $capture = path("$FindBin::Bin/../../corpus/results/capture");
@@ -26,9 +28,9 @@ my $pubkey = sub {
 };
 
 sub verify {
-    my ($raw, %opts) = @_;
-    my $v = Mail::DKIM2::Verifier->new(SkipTimestampCheck => 1,
-                                       PubkeyCallback => $pubkey, %opts);
+    my ($raw, $class) = @_;
+    my $v = ($class // 'Mail::DKIM2::Verifier')->new(SkipTimestampCheck => 1,
+                                                     PubkeyCallback => $pubkey);
     my $kept = 0;
     for my $chunk (unpack('(a4093)*', $raw)) {
         $v->PRINT($chunk);
@@ -67,12 +69,12 @@ for my $file (@files) {
                   ['tampered header ' . $file->basename, tamper_header($raw)]) {
         my ($name, $msg) = @$case;
         next unless defined $msg;
-        my ($want)        = verify($msg, StreamBody => 0);
+        my ($want)        = verify($msg, 'UndoWalkVerifier');
         my ($have, $kept) = verify($msg);
         is($have, $want, $name);
         $kept_max = $kept if !defined $kept_max || $kept > $kept_max;
     }
 }
-is($kept_max, 0, 'StreamBody keeps no body');
+is($kept_max, 0, 'the Verifier keeps no body');
 
 done_testing;

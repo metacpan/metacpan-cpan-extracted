@@ -584,9 +584,12 @@ subtest q(parallel option) => sub {
     like($two, qr/debug: nup .*-V .*--pane=2 .*- --pages/, q(--parallel runs nup -V with one pane per file));
     like($two, qr/fold_width=93\b/, q(--parallel folds to the pane width));
 
-    my $three = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md $test_md 2>&1`;
+    my $three = `COLUMNS=300 $mdee -ddn --parallel $test_md $test_md $test_md 2>&1`;
     like($three, qr/--pane=3/, q(three files give three panes));
-    like($three, qr/fold_width=59\b/, q(fold width follows the pane count));
+    # as many panes as fit, the rest going on below, as nup does
+    my $fit = `COLUMNS=200 $mdee -ddn --parallel $test_md $test_md $test_md 2>&1`;
+    like($fit, qr/-V --pane=2 /, q(three files on 200 columns give two panes));
+    like($three, qr/fold_width=93\b/, q(fold width follows the pane count));
 
     my $pane = `COLUMNS=200 $mdee -ddn --parallel -C1 $test_md $test_md 2>&1`;
     like($pane, qr/-V .*--pane=1 .*- --pages/, q(-C overrides the pane count));
@@ -799,9 +802,11 @@ subtest q(output width option) => sub {
     like($one, qr/debug: nup .*--pane=1 - --pages -w 100/, q(single column passes -w after --pages));
     like($one, qr/fold_width=93\b/, q(single column fold width is -w minus 7));
 
-    my $par = `COLUMNS=300 $mdee -ddn -V -w 140 $test_md $test_md 2>&1`;
-    like($par, qr/debug: nup .*-V --pane=2 - --pages -w 140/, q(--parallel passes -w to ansicolumn));
-    like($par, qr/fold_width=63\b/, q(--parallel fold width follows -w));
+    my $par = `COLUMNS=300 $mdee -ddn -V -w 180 $test_md $test_md 2>&1`;
+    like($par, qr/debug: nup .*-V --pane=2 - --pages -w 180/, q(--parallel passes -w to ansicolumn));
+    like($par, qr/fold_width=83\b/, q(--parallel fold width follows -w));
+    like(`COLUMNS=300 $mdee -ddn -V -w 140 $test_md $test_md 2>&1`, qr/-V --pane=1 /,
+         q(--parallel with -w 140 gives one pane));
 
     my $cat = `COLUMNS=300 $mdee -ddn -s cat -w 40 $test_md 2>&1`;
     like($cat, qr/fold_width=40\b/, q(without nup -w is the fold width));
@@ -814,6 +819,58 @@ subtest q(output width option) => sub {
     my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
     unlike($plain, qr/debug: nup .*-w /, q(without -w nup gets no width));
     like($plain, qr/fold_width=93\b/, q(without -w the fold width comes from the terminal));
+};
+
+# Test: --lateral (-L) gives nup --lateral
+subtest q(lateral option) => sub {
+    my $help = `$mdee --help 2>&1`;
+    like($help, qr/--\[no-\]lateral/, q(--help shows --lateral option));
+
+    my $short = `COLUMNS=300 $mdee -ddn -L $test_md 2>&1`;
+    like($short, qr/debug: nup .*--lateral/, q(-L gives nup --lateral));
+    my $long = `COLUMNS=300 $mdee -ddn --lateral $test_md 2>&1`;
+    like($long, qr/debug: nup .*--lateral/, q(--lateral gives nup --lateral));
+    my $plain = `COLUMNS=300 $mdee -ddn $test_md 2>&1`;
+    unlike($plain, qr/--lateral/, q(without it nup gets no --lateral));
+
+    # a single pane goes to nup as well, to be shifted page by page
+    my $one = `COLUMNS=100 $mdee -ddn -L $test_md 2>&1`;
+    like($one, qr/debug: nup .*--lateral/, q(-L with one pane runs nup));
+    unlike($one, qr/--no-paginate/, q(-L with one pane does not go to the pager directly));
+
+    # with --parallel, the screen shows as many files as fit, and the
+    # rest go on to the right; not more panes than files
+    my $pane = sub { `COLUMNS=$_[0] $mdee -ddn $_[1] 2>&1` =~ /debug: nup .* -V --pane=(\d+) / ? $1 : '' };
+    my @five = ($test_md) x 5;
+    is($pane->(200, "-LV @five"), 2, q(-LV with five files shows the panes that fit));
+    is($pane->(300, "-LV $test_md $test_md"), 2, q(-LV shows no more panes than files));
+    is($pane->(200, "-LV -C3 @five"), 3, q(-LV with -C3 shows three));
+    is($pane->(200, "-V @five"), 2, q(-V without -L shows as many, the rest below));
+
+    my $width = `COLUMNS=300 $mdee -ddn -L -w 180 $test_md 2>&1`;
+    like($width, qr/--lateral cannot be used with --width/, q(-L with -w is an error));
+
+    my $tmpdir = File::Temp->newdir;
+    my $config_dir = "$tmpdir/mdee";
+    mkdir $config_dir or die;
+    my $config = sub {
+        open my $fh, '>', "$config_dir/config.sh" or die;
+        print $fh @_;
+        close $fh;
+    };
+    my $run = sub { `COLUMNS=300 XDG_CONFIG_HOME=$tmpdir $mdee -ddn --mode=light $_[0] 2>&1` };
+
+    $config->("default[lateral]=1\n");
+    like($run->($test_md), qr/debug: nup .*--lateral/, q(default[lateral]=1 gives nup --lateral));
+    unlike($run->("--no-lateral $test_md"), qr/--lateral/, q(--no-lateral overrides default[lateral]));
+    unlike($run->("-w 180 $test_md"), qr/--lateral/, q(default[lateral] is left out with -w));
+    unlike($run->("-C2,2 $test_md"), qr/--lateral/, q(default[lateral] is left out with rows));
+    like($run->("-V $test_md $test_md"), qr/debug: nup .*--lateral/, q(default[lateral] is used with --parallel));
+
+    $config->("default[lateral]=1\ndefault[width]=180\n");
+    my $both = $run->($test_md);
+    like($both, qr/debug: nup .*--lateral/, q(default[lateral] wins over default[width]));
+    unlike($both, qr/debug: nup .*-w 180/, q(default[width] is not used with --lateral));
 };
 
 # Test: output device (-T) and output file (-o)

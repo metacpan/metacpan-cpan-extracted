@@ -217,8 +217,12 @@ max(class)
             t.nsec = 0;
         }
         else {
+#ifdef TK_LEAP_EXPIRES
             t.sec = TK_LEAP_EXPIRES;
             t.nsec = 0;
+#else
+            XSRETURN_UNDEF;
+#endif
         }
         tk_value_init(aTHX_ &v, &t, &z);
         RETVAL = tk_value_new_sv(aTHX_ tk_stash_for(aTHX_ class), &v);

@@ -15,6 +15,21 @@ there will be two cursors, the original one whose location corresponds to the
 current location within the logical string (so, mostly useless), and a fake 
 one which corresponds to the current insertion point.
 
+Mouse selections follow the displayed text and copy the original characters
+in logical reading order. A selection across mixed-direction runs may select
+several separate ranges in the logical text; intervening, unselected
+characters are not copied. Arabic text is copied without presentation-form
+shaping, and combining marks remain attached to their original characters.
+
+Click and drag to select characters, double-click for a word, or triple-click
+for a line. Right-click and Shift-click extend the selection; Meta-drag makes
+a rectangular selection. Dragging outside the window scrolls through the
+history. In applications that request mouse reporting, use Shift-drag to
+select text instead of sending the mouse event to the application.
+
+When bidi text is displayed, word selection uses the C<cutchars> resource.
+Custom patterns from the separate C<selection> extension are not applied.
+
 To enable the extension, add C<bidi> to the I<Urxvt.perl-ext-common> 
 resource. See urxvt(1) and urxvtperl(1) for other options and more details.
 
@@ -96,8 +111,11 @@ displayed on the left).
 =cut
 
 use 5.10.0;
+use strict;
+use warnings;
 use Text::Bidi qw(log2vis is_bidi);
 use Text::Bidi::Constants;
+use Text::Bidi::Selection;
 use Encode qw(decode_utf8);
 
 sub on_start {
@@ -121,100 +139,530 @@ sub on_start {
     $self->{'ls'} = length($self->{'split'});
 }
 
+# A layout maps each displayed terminal cell to its original logical cells.
+# Keep this separate from the temporary screen edits made by the refresh hooks.
+sub _layout {
+    my ($self, $row, $pdir) = @_;
+    my $source = $self->ROW_t($row);
+    return unless defined $source;
+    my @source = split //, $source;
+    my @rend = @{$self->ROW_r($row)};
+    my $layout = {
+        source => $source,
+        length => $self->ROW_l($row),
+        screen => $self->current_screen,
+        ncol => $self->ncol,
+    };
+    my $text = $self->special_decode($source);
+    $pdir = undef if $text =~ $self->{'pres'};
+    unless (is_bidi($text) || (defined($pdir) && $pdir == $Text::Bidi::Par::RTL)) {
+        $layout->{visual} = $source;
+        $layout->{rend} = \@rend;
+        $layout->{map} = [map { [$_] } 0..$#source];
+        $layout->{dir} = $text =~ $self->{'presa'} ? undef : $pdir;
+        return $layout;
+    }
+    $layout->{bidi} = 1;
+
+    # Decoding a composite can produce several Unicode characters; decoding a
+    # wide-character continuation produces none. Track the original cell for
+    # every decoded character instead of treating character offsets as columns.
+    my (@owner, @r);
+    for my $cell (0..$#source) {
+        my $decoded = $self->special_decode($source[$cell]);
+        push @owner, ($cell) x length($decoded);
+        push @r, ($rend[$cell]) x length($decoded);
+    }
+    if ($self->{'lre'}) {
+        while ($text =~ /\G$self->{'lre'}/gc) {
+            my $pos = pos($text);
+            my $at = $pos - length($1);
+            substr($text, $at, 0) = "\x{202a}";
+            splice @owner, $at, 0, undef;
+            splice @r, $at, 0, 0;
+            pos($text) = $pos + 1;
+        }
+        pos($text) = undef;
+        while ($text =~ /\G.*?$self->{'pdf'}/gc) {
+            my $at = pos($text);
+            substr($text, $at, 0) = "\x{202c}";
+            splice @owner, $at, 0, undef;
+            splice @r, $at, 0, 0;
+            pos($text) = $at + 1;
+        }
+    }
+
+    my @parts = length($self->{'split'}) ? split($self->{'spre'}, $text, -1) : ($text);
+    my (@visual, @map);
+    my $off = 0;
+    for my $part (@parts) {
+        if (@visual) {
+            push @visual, $self->{'split'};
+            push @map, $off..$off + $self->{'ls'} - 1;
+            $off += $self->{'ls'};
+        }
+        my ($par, $visual) = log2vis($part, undef, $pdir);
+        push @visual, $visual;
+        push @map, map { $_ + $off } @{$par->map};
+        $off += length($part);
+        $pdir = $par->dir if $self->{'par'} && !defined($pdir);
+    }
+    my $visual = join '', @visual;
+    my (@cells, @newr, @pending);
+    my $encoded = '';
+    # Encode grapheme clusters together so combining marks stay with their base.
+    # Prefixing a space also makes isolated zero-width format characters safe
+    # to encode. Such characters share the preceding displayed cell.
+    while ($visual =~ /(\X)/g) {
+        my $cluster = $1;
+        my $at = $-[1];
+        my %owners;
+        for my $index (@map[$at..$at + length($cluster) - 1]) {
+            $owners{$owner[$index]} = 1 if defined $owner[$index];
+        }
+        $cluster =~ s/[\x{200b}-\x{200f}\x{202a}-\x{202f}\x{2066}-\x{2069}\x{feff}]//g;
+        my $part = substr($self->special_encode(' ' . $cluster), 1);
+        my @owners = sort { $a <=> $b } keys %owners;
+        unless (length($part)) {
+            if (@cells) {
+                push @{$cells[-1]}, @owners;
+            } else {
+                push @pending, @owners;
+            }
+            next;
+        }
+        unshift @owners, splice @pending;
+        my $rend = $r[$map[$at]] // 0;
+        push @cells, map { [@owners] } 1..length($part);
+        push @newr, ($rend) x length($part);
+        $encoded .= $part;
+    }
+    $layout->{visual} = $encoded;
+    my $padding = $self->ncol - length($encoded);
+    if ($padding > 0) {
+        $layout->{visual} .= ' ' x $padding;
+        push @cells, map { [] } 1..$padding;
+        push @newr, ($rend[-1] // 0) x $padding;
+    }
+    $layout->{rend} = \@newr;
+    $layout->{map} = \@cells;
+    $layout->{dir} = $text =~ $self->{'presa'} ? undef : $pdir;
+    return $layout;
+}
+
+sub _native_selection {
+    my ($self) = @_;
+    return if $self->selection_screen != $self->current_screen;
+    my $top = $self->view_start;
+    for my $row ($top..$top + $self->nrow - 1) {
+        my $rend = $self->ROW_r($row) // next;
+        next unless grep { $_ & urxvt::RS_Sel() } @$rend;
+        return {
+            beg => [$self->selection_beg], end => [$self->selection_end],
+            rectangular => $self->{'rectangular'},
+        };
+    }
+    return;
+}
+
+sub _xor_selection {
+    my ($self, $selection) = @_;
+    return unless $selection;
+    my @span = (@{$selection->{beg}}, @{$selection->{end}});
+    my $style = urxvt::RS_Sel() | urxvt::RS_RVid();
+    if ($selection->{rectangular}) {
+        $self->scr_xor_rect(@span, $style, $style | urxvt::RS_Uline());
+    } else {
+        $self->scr_xor_span(@span, $style);
+    }
+}
+
 sub on_refresh_begin {
     my ($self) = @_;
+    $self->_restore_selection;
+    # urxvt applies its selection rendition before REFRESH_BEGIN. Remove it
+    # while reordering characters and their styles, then apply it at the
+    # original visual columns so the highlight does not follow the text map.
+    my $selection = $self->{'refresh_selection'} = $self->_native_selection;
+    $self->_xor_selection($selection);
     my ($crow, $ccol) = $self->screen_cur;
     my $pdir;
-    my $l;
-    for my $i ( 0..$self->nrow-1 ) {
-        $l = $self->ROW_t($i);
-        $pdir = undef if $l =~ $self->{'pres'};
-        # for speed
-        next unless is_bidi($l) or 
-            (defined($pdir) and $pdir == $Text::Bidi::Par::RTL);
-        chomp($l);
-        my @r = @{$self->ROW_r($i)};
-        # expand combining chars (Nikud) from one illegal char to two legal
-        $l = $self->special_decode($l);
-        # add bidi marks
-        if ( $self->{'lre'} ) {
-            while ( $l =~ /\G$self->{'lre'}/gc ) {
-                my $p = pos($l);
-                my $j = $p - length($1);
-                substr($l, $j, 0) = "\x{202a}";
-                splice(@r, $j, 0, 0);
-                $ccol++ if $j <= $ccol and $i == $crow;
-                pos($l) = $p + 1;
-            }
-            pos($l) = undef;
-            while ( $l =~ /\G.*?$self->{'pdf'}/gc ) {
-                my $j = pos($l);
-                substr($l, $j, 0) = "\x{202c}";
-                splice(@r, $j, 0, 0);
-                $ccol++ if $j <= $ccol and $i == $crow;
-                pos($l) = $j + 1;
+    my $top = $self->view_start;
+    $self->{'saved_rows'} = {};
+    $self->{'layouts'} = {};
+    for my $row ($top..$top + $self->nrow - 1) {
+        my $layout = $self->_layout($row, $pdir);
+        next unless $layout;
+        $pdir = $layout->{dir};
+        $self->{'layouts'}{$row} = $layout;
+        next unless $layout->{bidi};
+        my @rend = @{$layout->{rend}};
+        if ($row == $crow) {
+            for my $col (0..$#{$layout->{map}}) {
+                $rend[$col] |= urxvt::RS_RVid()
+                    if $col != $ccol && grep { $_ == $ccol } @{$layout->{map}[$col]};
             }
         }
-        # nikud
-        while ( $l =~ /[\x{5b0}-\x{5bb}]/g ) {
-            my $j = pos($l) - 1;
-            splice(@r, $j, 0, 0);
-            $ccol++ if $j <= $ccol and $i == $crow;
-        }
-        my @l = split $self->{'spre'}, $l;
-        my (@res, @map);
-        # current offset within the line
-        my $off = 0;
-        # we keep the map, so that we can apply it to the rendition
-        for my $part ( @l ) {
-            my ($p, $v) = log2vis($part, undef, $pdir);
-            my $types = $p->types;
-            #warn "$i: <$part> ==>\n  <$v>\n  dir:" . $p->dir . "\ntype: " .  
-            #join(',', map { my $cc = substr($part, $_, 1); '[' . $cc . ':' .  
-            #sprintf("%x", ord($cc)) . ":" . $types->[$_] . ']' } 
-            #0..$#{$types}) . "\n\n";
-            push @res, $v;
-            my @mmap = @{$p->map};
-            push @map, map { $_ + $off } @mmap;
-            $off += length($v);
-            # compensate for the field separator
-            push @map, $off..$off+$self->{'ls'}-1;
-            $off += $self->{'ls'};
-            $pdir = $p->dir if ( $self->{'par'} and not defined $pdir );
-        }
-        # remove the last field separator
-        splice @map, -$self->{'ls'};
-        my $res = join($self->{'split'}, @res);
-        # remove bidi marks
-        while ( $res =~ /[\x{200b}-\x{200f}\x{202a}-\x{202f}\x{5b0}-\x{5bb}]/g ) {
-            $map[pos($res)-1] = -1;
-        }
-        $res =~ s/[\x{200b}-\x{200f}\x{202a}-\x{202f}]//g;
-        $res = $self->special_encode($res); 
-        # fake cursor
-        if ( $crow == $i ) {
-            $r[$ccol] |= urxvt::RS_RVid unless $map[$ccol]==$ccol;
-        }
-        my @newr = (@r)[grep { $_ >= 0 } @map];
-        # keep the logical data for restoring after display
-        $self->{'text'}[$i] = $self->ROW_t($i, $res);
-        $self->{'rend'}[$i] = $self->ROW_r($i, \@newr);
-    } continue {
-        $pdir = undef if $l =~ $self->{'presa'};
+        $self->{'saved_rows'}{$row} = [
+            $self->ROW_t($row, $layout->{visual}),
+            $self->ROW_r($row, \@rend),
+        ];
     }
+    $self->_xor_selection($selection);
     ()
 }
 
 sub on_refresh_end {
     my ($self) = @_;
-    return unless defined $self->{'text'};
-    foreach (0..$self->nrow-1 ) {
-        next unless defined $self->{'text'}[$_];
-        $self->ROW_t($_, $self->{'text'}[$_]);
-        $self->ROW_r($_, $self->{'rend'}[$_]);
+    my $selection = delete $self->{'refresh_selection'};
+    $self->_xor_selection($selection);
+    my $saved = delete $self->{'saved_rows'} // {};
+    for my $row (keys %$saved) {
+        $self->ROW_t($row, $saved->{$row}[0]);
+        $self->ROW_r($row, $saved->{$row}[1]);
     }
-    delete $self->{'text'};
-    delete $self->{'rend'};
+    # Leave the logical buffer with urxvt's original selection rendition;
+    # the terminal removes that rendition after REFRESH_END returns.
+    $self->_xor_selection($selection);
     ()
 }
 
+sub _selection_layout {
+    my ($self, $row, $pdir) = @_;
+    my $layout = $self->{'layouts'}{$row};
+    my $source = $self->ROW_t($row);
+    return unless defined $source;
+    return $layout if $layout && $layout->{source} eq $source
+        && $layout->{length} == $self->ROW_l($row)
+        && $layout->{ncol} == $self->ncol
+        && $layout->{screen} == $self->current_screen;
+    return $self->{'layouts'}{$row} = $self->_layout($row, $pdir);
+}
+
+sub _selection_for_layout {
+    my ($self, $layout) = @_;
+    return $layout->{selection} if $layout->{selection};
+    # urxvt maps cells, including private composite characters and padding.
+    # Translate that encoding into the public module's Unicode offsets.
+    my (@cell_to_logical, $logical);
+    $logical = '';
+    for my $cell (split //, substr($layout->{source}, 0, $layout->{length})) {
+        my $decoded = $self->special_decode($cell);
+        my $offset = length($logical);
+        push @cell_to_logical, [$offset..$offset + length($decoded) - 1];
+        $logical .= $decoded;
+    }
+    my @map = map {
+        [map { @{$cell_to_logical[$_] // []} } @$_]
+    } @{$layout->{map}};
+    return $layout->{selection} = Text::Bidi::Selection->new(
+        text => $logical, visual_to_logical => \@map,
+    );
+}
+
+sub _mouse_reporting {
+    my ($self, $event) = @_;
+    return ($self->priv_modes & urxvt::PrivMode_mouse_report())
+        && !($event->{state} & ($self->ModMetaMask | urxvt::ShiftMask()));
+}
+
+sub _mouse_position {
+    my ($self, $event) = @_;
+    my $row = $event->{row};
+    $row = $self->view_start if $row < $self->view_start;
+    my $bottom = $self->view_start + $self->nrow - 1;
+    $row = $bottom if $row > $bottom;
+    my $col = $event->{col};
+    $col = 0 if $col < 0;
+    $col = $self->ncol if $col > $self->ncol;
+    my $layout = $self->_selection_layout($row);
+    --$col while $col > 0 && $layout
+        && substr($layout->{visual}, $col, 1) eq "\x{ffff}";
+    return [$row, $col];
+}
+
+sub _set_selection {
+    my ($self, $beg, $end) = @_;
+    if ($beg->[0] == $end->[0] && $beg->[1] == 0 && $end->[1] == 0) {
+        # selection_end(row, 0) means the end of the previous row in urxvt.
+        # An empty range at column one has the same (empty) highlight.
+        ($beg, $end) = ([$beg->[0], 1], [$end->[0], 1]);
+    }
+    my %saved;
+    for my $row ($beg->[0], $end->[0]) {
+        next if exists $saved{$row};
+        my $layout = $self->_selection_layout($row) or return;
+        $saved{$row} = [$self->ROW_t($row), $self->ROW_l($row)];
+        $self->ROW_t($row, $layout->{visual});
+        $self->ROW_l($row, $self->ncol);
+    }
+    $self->selection_beg(@$beg);
+    $self->selection_end(@$end);
+    $self->selection_mark(@{$self->{'mouse_anchor'}}) if $self->{'mouse_anchor'};
+    for my $row (keys %saved) {
+        $self->ROW_t($row, $saved{$row}[0]);
+        $self->ROW_l($row, $saved{$row}[1]);
+    }
+    $self->want_refresh;
+}
+
+sub _word_span {
+    my ($self, $position) = @_;
+    my ($row, $col) = @$position;
+    $col = $self->ncol - 1 if $col == $self->ncol;
+    my $layout = $self->_selection_layout($row);
+    my @cells = split //, $layout->{visual};
+    my $cut = $self->resource('cutchars') // q{"&()*,;<=>?@[\]^`{|}};
+    my $class = sub {
+        my $text = $self->special_decode($_[0]);
+        return 'space' if $text =~ /^\s/;
+        return 'cut' if length($text) && index($cut, substr($text, 0, 1)) >= 0;
+        return 'word';
+    };
+    --$col while $col > 0 && $cells[$col] eq "\x{ffff}";
+    my $kind = $class->($cells[$col]);
+    my ($from, $to) = ($col, $col + 1);
+    --$from while $from > 0 && ($cells[$from - 1] eq "\x{ffff}"
+        || $class->($cells[$from - 1]) eq $kind);
+    ++$to while $to < @cells && ($cells[$to] eq "\x{ffff}"
+        || $class->($cells[$to]) eq $kind);
+    my ($beg, $end) = ([$row, $from], [$row, $to]);
+    while ($beg->[1] == 0 && $beg->[0] > $self->top_row
+        && $self->ROW_is_longer($beg->[0] - 1)) {
+        my $previous = $self->_selection_layout($beg->[0] - 1) or last;
+        my @previous = split //, $previous->{visual};
+        my $col = @previous;
+        --$col while $col > 0 && ($previous[$col - 1] eq "\x{ffff}"
+            || $class->($previous[$col - 1]) eq $kind);
+        last if $col == @previous;
+        $beg = [$beg->[0] - 1, $col];
+    }
+    while ($end->[1] == $self->ncol && $end->[0] < $self->nrow - 1
+        && $self->ROW_is_longer($end->[0])) {
+        my $next = $self->_selection_layout($end->[0] + 1) or last;
+        my @next = split //, $next->{visual};
+        my $col = 0;
+        ++$col while $col < @next && ($next[$col] eq "\x{ffff}"
+            || $class->($next[$col]) eq $kind);
+        last unless $col;
+        $end = [$end->[0] + 1, $col];
+    }
+    return ($beg, $end);
+}
+
+sub _extend_selection {
+    my ($self, $position) = @_;
+    my $anchor = $self->{'mouse_anchor'};
+    my ($beg, $end) = ($anchor, $position);
+    ($beg, $end) = ($end, $beg) if $beg->[0] > $end->[0]
+        || ($beg->[0] == $end->[0] && $beg->[1] > $end->[1]);
+    if ($self->{'rectangular'}) {
+        ($beg, $end) = ([@$beg], [@$end]);
+        ($beg->[1], $end->[1]) = ($end->[1], $beg->[1]) if $beg->[1] > $end->[1];
+    } elsif ($self->{'mouse_clicks'} == 2) {
+        ($beg) = $self->_word_span($beg);
+        (undef, $end) = $self->_word_span($end);
+    } elsif ($self->{'mouse_clicks'} == 3) {
+        ($beg, $end) = ([$beg->[0], 0], [$end->[0], $self->ncol]);
+        --$beg->[0] while $beg->[0] > $self->top_row && $self->ROW_is_longer($beg->[0] - 1);
+        ++$end->[0] while $end->[0] < $self->nrow - 1 && $self->ROW_is_longer($end->[0]);
+    }
+    $self->_set_selection($beg, $end);
+}
+
+sub on_button_press {
+    my ($self, $event) = @_;
+    return if $self->_mouse_reporting($event);
+    return unless $event->{button} == 1 || $event->{button} == 3;
+    # Keep plain-text terminals on urxvt's native selection path. When any
+    # displayed row is bidi, a drag starting in an LTR row can still cross it.
+    my $bidi;
+    my $pdir;
+    for my $row ($self->view_start..$self->view_start + $self->nrow - 1) {
+        my $layout = $self->_selection_layout($row, $pdir) or next;
+        $pdir = $layout->{dir};
+        $bidi ||= $layout->{bidi};
+    }
+    unless ($bidi) {
+        delete $self->{'mouse_last'};
+        return;
+    }
+    my $position = $self->_mouse_position($event);
+    if ($event->{button} == 3 || (($event->{state} & urxvt::ShiftMask())
+        && !($self->priv_modes & urxvt::PrivMode_mouse_report()))) {
+        my @beg = $self->selection_beg;
+        my @end = $self->selection_end;
+        my $point = $position->[0] * $self->ncol + $position->[1];
+        my $left = $beg[0] * $self->ncol + $beg[1];
+        my $right = $end[0] * $self->ncol + $end[1];
+        $self->{'mouse_anchor'} = abs($point - $left) < abs($point - $right) ? \@end : \@beg;
+        $self->{'mouse_clicks'} = 1;
+    } else {
+        my $last = $self->{'mouse_last'};
+        my $interval = $self->resource('multiClickTime') // 500;
+        my $repeat = $last && $last->{screen} == $self->current_screen
+            && $last->{row} == $position->[0] && $last->{col} == $position->[1]
+            && $event->{time} - $last->{time} >= 0
+            && $event->{time} - $last->{time} < $interval;
+        $self->{'mouse_clicks'} = $repeat ? $self->{'mouse_clicks'} % 3 + 1 : 1;
+        $self->{'mouse_last'} = { row => $position->[0], col => $position->[1],
+            time => $event->{time}, screen => $self->current_screen };
+        $self->{'mouse_anchor'} = $position;
+        $self->{'rectangular'} = !!($event->{state} & $self->ModMetaMask);
+    }
+    $self->{'mouse_button'} = $event->{button};
+    {
+        # The public API also activates urxvt's selection highlight. Abort its
+        # copying hook here; merely setting coordinates does not activate it.
+        local $self->{'starting_selection'} = 1;
+        $self->selection_make($event->{time}, !!$self->{'rectangular'});
+    }
+    $self->_extend_selection($position);
+    return 1;
+}
+
+sub on_motion_notify {
+    my ($self, $event) = @_;
+    return unless $self->{'mouse_button'};
+    $self->_extend_selection($self->_mouse_position($event));
+    my $top = $self->view_start;
+    my $direction = $event->{row} < $top ? -1
+        : $event->{row} >= $top + $self->nrow ? 1 : 0;
+    if ($direction) {
+        $self->{'mouse_scroll'} = [$direction, $event->{col}];
+        $self->{'mouse_scroll_timer'} //= urxvt::timer->new
+            ->cb(sub { $self->_scroll_selection })
+            ->after(0.1, 0.05);
+    } else {
+        $self->_stop_selection_scroll;
+    }
+    return 1;
+}
+
+sub _stop_selection_scroll {
+    my ($self) = @_;
+    my $timer = delete $self->{'mouse_scroll_timer'};
+    $timer->stop if $timer;
+    delete $self->{'mouse_scroll'};
+}
+
+sub _scroll_selection {
+    my ($self) = @_;
+    my ($direction, $col) = @{$self->{'mouse_scroll'}};
+    my $top = $self->view_start + $direction;
+    $top = $self->top_row if $top < $self->top_row;
+    $top = 0 if $top > 0;
+    return $self->_stop_selection_scroll if $top == $self->view_start;
+    $self->view_start($top);
+    $self->{'layouts'} = {};
+    $self->_extend_selection($self->_mouse_position({
+        row => $direction < 0 ? $top : $top + $self->nrow - 1,
+        col => $col,
+    }));
+}
+
+sub on_button_release {
+    my ($self, $event) = @_;
+    return unless $self->{'mouse_button'} && $event->{button} == $self->{'mouse_button'};
+    delete $self->{'mouse_button'};
+    $self->_stop_selection_scroll;
+    $self->_extend_selection($self->_mouse_position($event));
+    local $self->{'making_selection'} = 1;
+    $self->selection_make($event->{time}, !!$self->{'rectangular'});
+    # Another extension can abort selection making, and urxvt does not call
+    # sel_grab for an empty result. Restore on either path before returning.
+    $self->_restore_selection;
+    return 1;
+}
+
+sub on_reset {
+    my ($self) = @_;
+    $self->_stop_selection_scroll;
+    delete $self->{'mouse_button'};
+    delete $self->{'mouse_last'};
+    delete $self->{'layouts'};
+    ()
+}
+
+sub on_destroy {
+    my ($self) = @_;
+    $self->_stop_selection_scroll;
+    ()
+}
+
+sub _restore_selection {
+    my ($self) = @_;
+    my $saved = delete $self->{'selection_rows'} or return;
+    # The end-coordinate setter clamps columns beyond ROW_l to ncol. Restore
+    # visual coordinates while the temporary row is still padded to full width.
+    $self->ROW_l($saved->{end}[0], $self->ncol);
+    $self->selection_beg(@{$saved->{beg}});
+    $self->selection_end(@{$saved->{end}});
+    for my $row (keys %{$saved->{rows}}) {
+        my ($text, $rend, $length) = @{$saved->{rows}{$row}};
+        $self->ROW_t($row, $text);
+        $self->ROW_r($row, $rend);
+        $self->ROW_l($row, $length);
+    }
+}
+
+sub on_sel_make {
+    my ($self) = @_;
+    return 1 if $self->{'starting_selection'};
+    return unless $self->{'making_selection'};
+    my @beg = $self->selection_beg;
+    my @end = $self->selection_end;
+    return if $self->selection_screen != $self->current_screen;
+    my $rect = $self->{'rectangular'};
+    my (@rows, $has_bidi, $has_text, $pdir, $last_from);
+    for my $row ($beg[0]..$end[0]) {
+        # A selection can be made before the next repaint or after scrolling.
+        my $layout = $self->_selection_layout($row, $pdir) or return;
+        $pdir = $layout->{dir};
+        $has_bidi ||= $layout->{bidi};
+        my $from = $rect || $row == $beg[0] ? $beg[1] : 0;
+        my $to = $rect || $row == $end[0] ? $end[1] : $self->ncol;
+        $from = 0 if $from < 0;
+        $to = $self->ncol if $to > $self->ncol;
+        $last_from = $from;
+        my $selection = $self->_selection_for_layout($layout);
+        my $text = $self->special_encode($selection->selected_text($from, $to));
+        $has_text ||= length($text);
+        push @rows, [$row, $text];
+    }
+    return unless $has_bidi;
+    shift @rows if !$rect && $beg[1] == $self->ncol && @rows > 1;
+    # As in urxvt, an empty selection leaves the previous selection alone.
+    return 1 unless $has_text || @rows > 1 || $rect
+        || ($end[1] == $self->ncol && $beg[1] < $self->ncol);
+
+    # Let urxvt itself copy these logical fragments, join wrapped lines, and
+    # run every sel_grab hook (including selection-to-clipboard). Coordinates
+    # and buffers are restored synchronously by on_sel_grab, before repaint.
+    my $saved = $self->{'selection_rows'} = { rows => {}, beg => \@beg, end => \@end };
+    my $last_length = 0;
+    for my $entry (@rows) {
+        my ($row, $text) = @$entry;
+        $saved->{rows}{$row} = [
+            $self->ROW_t($row), [@{$self->ROW_r($row)}], $self->ROW_l($row),
+        ];
+        $last_length = length($text);
+        $self->ROW_t($row, $text . ' ' x ($self->ncol - $last_length));
+        $self->ROW_l($row, $last_length);
+    }
+    $self->selection_beg($rows[0][0], 0);
+    # Preserve the line break when selecting an entire short terminal row.
+    my $last = $rows[-1][0];
+    my $end_col = $rect || ($last_from == 0 && $end[1] == $self->ncol
+        && $saved->{rows}{$last}[2] < $self->ncol) ? $self->ncol : $last_length;
+    $self->selection_end($last, $end_col);
+    ()
+}
+
+sub on_sel_grab {
+    my ($self) = @_;
+    $self->_restore_selection;
+    ()
+}
+
+1;

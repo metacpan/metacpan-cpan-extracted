@@ -1,7 +1,7 @@
 # PRAXO-CORE Perl Registry Introduction
 
-**Status:** published on CPAN (0.2.0); install smoke not recorded. Source version `0.4.0`, source
-tag `perl/v0.4.0`. Published registry version: `0.2.0`. Registry
+**Status:** published on CPAN (0.5.0); install smoke not recorded. Source version `0.5.1`, source
+tag `perl/v0.5.1`. Published registry version: `0.5.0`. Registry
 pages are release snapshots; verify the published version before relying on a
 feature.
 
@@ -15,11 +15,11 @@ PRAXO-CORE is an embeddable, MIT-licensed agent framework. This distribution is 
 | --- | --- |
 | Package | `Praxo::Core` |
 | Registry | [CPAN (MetaCPAN index)](https://metacpan.org/dist/Praxo-Core) |
-| Source version | `0.4.0` |
-| Published registry version | `0.2.0` |
+| Source version | `0.5.1` |
+| Published registry version | `0.5.0` |
 | Install (published) | `cpanm Praxo::Core` |
 | Install (source/release prepared) | `cpanm Praxo::Core` |
-| Source tag | `perl/v0.4.0` |
+| Source tag | `perl/v0.5.1` |
 | Tier | Core |
 | Contract | `SPEC_VERSION` `0.2.0` |
 | Documentation | https://axisvela.github.io/praxo-core/languages/perl/ |
@@ -39,10 +39,16 @@ PRAXO-CORE is an embeddable, MIT-licensed agent framework. This distribution is 
 
 ## Coding-agent entry
 
+- [Examples](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples): runnable language-specific examples.
 - [llms.txt](llms.txt): compact machine-readable entry for this language.
 - [llms.md](llms.md): Markdown version of the same entry.
 - [Coding-agent contract](../../docs/getting-started/coding-agents.md): explicit
   scope, final-argument authorization, denial tests, and verification commands.
+
+## Community
+
+- X: <https://x.com/axisvela>
+- Weibo: <https://weibo.com/u/1936025761>
 
 ## Boundaries
 

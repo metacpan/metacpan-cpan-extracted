@@ -1,7 +1,7 @@
 package DBIO::Test::Util::OverrideRequire;
 # ABSTRACT: Override CORE::GLOBAL::require for testing
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 # no use/require of any kind - work bare
 
@@ -144,7 +144,7 @@ DBIO::Test::Util::OverrideRequire - Override CORE::GLOBAL::require for testing
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

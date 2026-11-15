@@ -6,7 +6,7 @@ use Test::More;
 
 use Time::Keeper::Zone;
 
-is(Time::Keeper::Zone::_tzdata_version(), '2026e', 'compiled from tzdata 2026e');
+is(Time::Keeper::Zone::_tzdata_version(), '2026f', 'compiled from tzdata 2026f');
 
 my ($zones, $links, $lookup, $types, $trans, $footers, $windows) = Time::Keeper::Zone::_counts();
 is($zones, 344, '344 zones');

@@ -6,12 +6,11 @@ use Exporter qw(import);
 
 use Ekorn::Pipeline::Stop qw(Stop);
 
-# A facade over Ekorn::Pipeline::Stop: a subclass of it, exporting
-# DBIx::Squirrel's own list of its functions, imported from it by
-# name, so a name Ekorn::Pipeline drops fails here, as the module
-# loads, and one it adds isn't exported until it's listed here.
-our @ISA    = ('Ekorn::Pipeline::Stop');
-our @EXPORT = qw(Stop);                    ## no critic (Modules::ProhibitAutomaticExportation)
+# A plain re-export of Ekorn::Pipeline::Stop's function, from
+# DBIx::Squirrel's own list of them, imported from it by name, so a name
+# Ekorn::Pipeline drops fails here, as the module loads, and one it adds
+# isn't exported until it's listed here.
+our @EXPORT = qw(Stop);    ## no critic (Modules::ProhibitAutomaticExportation)
 
 1;
 __END__
@@ -33,20 +32,21 @@ DBIx::Squirrel::Stop - end a DBIx::Squirrel pipeline early
     sub ($row) { $row->{id} == $wanted ? Stop($row) : () }
 
     # The same, without importing Stop
-    sub ($row) { DBIx::Squirrel::Stop->throw if $done; ... }
+    sub ($row) { Ekorn::Pipeline::Stop->throw if $done; ... }
 
 =head1 DESCRIPTION
 
 DBIx::Squirrel's pipeline is L<Ekorn::Pipeline>'s. This module is
-DBIx::Squirrel's name for L<Ekorn::Pipeline::Stop>, which describes the
-stop in full. It's a subclass of it, and exports C<Stop> by default.
-That's Ekorn's function, from a list of DBIx::Squirrel's own. The
-module is here to stay, so code written with it keeps working.
+DBIx::Squirrel's name for L<Ekorn::Pipeline::Stop>'s function, which
+that module describes in full. It exports C<Stop> by default. That's
+Ekorn's function, from a list of DBIx::Squirrel's own. The module is
+here to stay, so code written with it keeps working. It isn't a class:
+a stop is an Ekorn::Pipeline::Stop.
 
 A stop is the exception that ends a pipeline early and quietly. The
-rest of the stage that throws it doesn't run. The values already out of
-the pipeline are kept. The values the stop carries go on through the
-stages after it, and nothing else is processed.
+rest of the stage that throws it doesn't run. The values already out
+of the pipeline are kept. The values the stop carries go on through
+the stages after it, and nothing else is processed.
 
 =head1 FUNCTIONS
 
@@ -56,28 +56,22 @@ stages after it, and nothing else is processed.
     Stop(@values);
 
 Throws a stop carrying C<@values>. The function is
-L<Ekorn::Pipeline::Stop/Stop>, so the stop is an Ekorn::Pipeline::Stop.
-To keep it out of your namespace:
+L<Ekorn::Pipeline::Stop/Stop>, so the stop is an
+Ekorn::Pipeline::Stop. To keep it out of your namespace:
 
     use DBIx::Squirrel::Stop ();
 
-=head1 METHODS
+To throw one without importing C<Stop>, or to throw a subclass of your
+own, use L<Ekorn::Pipeline::Stop/throw>:
 
-=head2 throw
-
-    DBIx::Squirrel::Stop->throw(@values);
-    My::Stop->throw(@values);
-
-Inherited from L<Ekorn::Pipeline::Stop/throw>. Throws a stop carrying
-C<@values>, blessed into the class it was called on. A subclass of
-DBIx::Squirrel::Stop is a subclass of Ekorn::Pipeline::Stop too, so the
-pipeline stops for it.
+    Ekorn::Pipeline::Stop->throw(@values);
+    My::Stop->throw(@values);    # @ISA = ('Ekorn::Pipeline::Stop')
 
 =head2 Catching errors in a stage
 
 A stage that catches errors itself, with C<eval> or C<try>, should
 throw a stop on again. Check for Ekorn::Pipeline::Stop. Every stop is
-one, whether thrown with C<Stop>, by this class, or by a canned stage
+one, whether thrown with C<Stop>, with C<throw>, or by a canned stage
 such as C<take>:
 
     sub ($row) {
@@ -87,9 +81,6 @@ such as C<take>:
             ...
         }
     }
-
-Checking for DBIx::Squirrel::Stop would miss the stops that aren't
-thrown by this class.
 
 =head1 DIAGNOSTICS
 
@@ -113,7 +104,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -14,8 +14,6 @@ lib/DBIx/Squirrel/Gather.pm
 lib/DBIx/Squirrel/Iterator.pm
 lib/DBIx/Squirrel/Manual/HowTo.pod
 lib/DBIx/Squirrel/Manual/Reference.pod
-lib/DBIx/Squirrel/Pipeline.pm
-lib/DBIx/Squirrel/Pipes.pm
 lib/DBIx/Squirrel/Placeholders.pm
 lib/DBIx/Squirrel/Result.pm
 lib/DBIx/Squirrel/Results.pm
@@ -25,6 +23,7 @@ lib/DBIx/Squirrel/Stages/Rows.pm
 lib/DBIx/Squirrel/Stages/Taps.pm
 lib/DBIx/Squirrel/Stop.pm
 lib/DBIx/Squirrel/Sugar.pm
+lib/DBIx/Squirrel/Tooling.pm
 lib/DBIx/Squirrel/Util.pm
 lib/DBIx/Squirrel/db.pm
 lib/DBIx/Squirrel/st.pm
@@ -53,7 +52,13 @@ t/20-stages-taps.t
 t/21-lists.t
 t/22-pipeline-as-stage.t
 t/23-documented.t
-xt/howto.t
+t/24-iterator-source.t
+t/25-iterator-ended-operators.t
+t/26-context-in-pipelines.t
+t/27-sinks.t
+t/28-tooling.t
+t/29-objects.t
+xt/examples.t
 xt/manuals.t
 META.yml
 MANIFEST

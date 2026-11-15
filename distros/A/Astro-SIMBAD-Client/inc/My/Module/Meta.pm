@@ -142,6 +142,8 @@ sub provides {
     return ( provides => $provides );
 }
 
+sub release_status { 'stable' }
+
 sub requires {
     my ( undef, @extra ) = @_;		# Invocant not used.
 ##  if ( ! $self->distribution() ) {
@@ -151,6 +153,7 @@ sub requires {
 	'HTTP::Request::Common'	=> 0,
 	'LWP::Protocol'	=> 0,	# Comes with LWP, but ...
 	'LWP::UserAgent' => 0,
+	'LWP::Protocol::https'	=> 0,	# As of November 7 2026.
 ##	'SOAP::Lite' => 0,
 	'Scalar::Util' => 1.01,	# Not in Perl 5.6
 	'URI::Escape' => 0,
@@ -292,6 +295,11 @@ This method attempts to load L<Module::Metadata|Module::Metadata>. If
 this succeeds, it returns a C<provides> entry suitable for inclusion in
 L<meta_merge()|/meta_merge> data (i.e. C<'provides'> followed by a hash
 reference). If it can not load the required module, it returns nothing.
+
+=head2 release_status
+
+This returns the L<CPAN::Meta::Spec|CPAN::Meta::Spec> release status for
+the distribution.
 
 =head2 requires
 

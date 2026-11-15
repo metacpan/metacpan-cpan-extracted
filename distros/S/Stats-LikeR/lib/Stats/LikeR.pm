@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3421';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3422';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -99,6 +99,8 @@ my %HELP_ALIAS = (
 	_impute_prop      => 'fillna',
 	_fill_seq         => 'fillna',
 	_render_grid      => 'view',
+	_view_size        => 'view',
+	_view_size_fmt    => 'view',
 	_df_shape         => 'agg',
 	_xtab             => 'cramers_v',
 	# The eight R distribution functions share one section, since what is
@@ -1984,6 +1986,32 @@ sub chunk {
 	return @groups;
 }
 
+# A caller's qr//, as one the match operator can be handed on any perl.
+#
+# Before perl 5.18, `$x =~ $rx` with an empty $rx -- qr//, qr//i, or a qr/$s/
+# of an empty $s -- does not match the empty string: pp_match() swaps in the
+# last pattern that matched successfully, whatever it was. This prints 1 on
+# 5.10.1, 5.12.5 and 5.16.3 (only "bob" holds a b) and 3 on 5.18.4 and later:
+#   perl -e 'my $rx = qr//; "abc" =~ /b/;
+#            print scalar(grep { $_ =~ $rx } qw(NPI name bob)), "\n"'
+# read_table(drop_cols => qr//) failed t/read_table.drop_cols.t 923-930 on
+# those three perls for it, leaving out no column where it should have left
+# out every one. An empty pattern matches every string under any flags, so it
+# is exchanged for one that says so in a pattern that is not empty.
+#
+# The exchange compiles nothing: re::regexp_pattern() (in perl's core since
+# 5.10.0, with no `use re`) reads the pattern text, and $RX_EVERY is evaluated
+# once, when the module loads. Wrapping every pattern as qr/(?:$rx)/ would
+# evaluate a qr// on each call instead, which leaks an SV on perl 5.10.0
+# (pp_qr()) and inversion lists on 5.32 (regcomp), inside the callers'
+# no_leaks_ok checks.
+my $RX_EVERY = qr/(?:)/;
+sub _rx_for_match {
+	my ($rx) = @_;
+	my ($text) = re::regexp_pattern($rx);
+	return defined $text && $text eq '' ? $RX_EVERY : $rx;
+}
+
 # filter DSL: col() builds a predicate via overloading (pure Perl)
 # col('name') returns an overloaded object; comparing it (col('age') >= 18) or
 # combining comparisons with & | ! builds a predicate that carries its per-row
@@ -2151,7 +2179,9 @@ sub col { Stats::LikeR::col::_new(@_) }
 		die "col(): ->$how must start from a bare column, e.g. col('x')->$how(qr/.../)\n"
 			unless defined $self->{name};
 		die "col(): ->$how needs a pattern (a qr// or a string)\n" unless defined $re;
-		my $qr   = ref $re eq 'Regexp' ? $re : qr/$re/;
+		# an empty pattern (qr//, or the string '') matches every defined cell;
+		# see _rx_for_match() for what perl before 5.18 makes of one
+		my $qr   = Stats::LikeR::_rx_for_match(ref $re eq 'Regexp' ? $re : qr/$re/);
 		my $name = $self->{name};
 		my $code = sub {
 			my $c = $_[0]{$name};
@@ -2833,19 +2863,10 @@ sub summary {
 	my $total = scalar @labels;
 	if ($nrows < $total) { $#labels = $nrows - 1; $#raw = $nrows - 1; }
 
-	return _render_grid(
-		kind => 'summary', total => $total,
-		cols => \@colnames, labels => \@labels, raw => \@raw, lab_header => $lab_header,
-		na          => $args{na},
-		max_width   => $args{max_width},
-		ellipsis    => $args{ellipsis},
-		gap         => (exists $args{gap} ? ' ' x $args{gap} : undef),
-		width       => $args{width},
-		to          => $args{to},
-		return_only => $args{return_only},
-		color       => (exists $args{color} ? $args{color} : undef),
-		colors      => $args{colors},
-	);
+	# The display options go on as they were given; _render_grid() checks them.
+	return _render_grid('summary', $total, \@colnames, \@labels, \@raw, $lab_header,
+		map { exists $args{$_} ? ($_ => $args{$_}) : () }
+			qw(na max_width ellipsis gap width to return_only color colors));
 }
 
 # .xlsx support (pure Perl, no CPAN deps)
@@ -3444,7 +3465,7 @@ sub read_table {
 	my %allowed_args = map { $_ => 1 } (
 		'comment', 'output_type', 'filter', 'row_names', 'sep',
 		'auto_row_names', 'sheet', 'na_strings', 'header', 'col_names', 'quote',
-		'explode', 'colClasses',
+		'explode', 'colClasses', 'drop_cols', 'keep_cols',
 		# private, undocumented: the multi-sheet expansion passes an already
 		# parsed worksheet list / shared-string table to each per-sheet recursion
 		# so a big sharedStrings.xml is not re-decompressed once per worksheet.
@@ -3469,6 +3490,44 @@ sub read_table {
 	}
 	my $explode = $is_vcf && ($args{explode} // 1)
 		&& !(exists $args{header} && defined $args{header} && !$args{header});
+	# keep_cols and drop_cols: the columns kept, and the columns left out, by
+	# name. Each is a column name, a qr//, or a list of either, tried against
+	# each column's name once the header is fixed (see $finalize_header); undef
+	# is no selection at all. A plain string is a whole name, compared with eq,
+	# and a qr// is a pattern. A column is stored when keep_cols, if given,
+	# names or matches it and drop_cols does not. It is what keeps a wide
+	# file's unwanted columns from ever being stored, so the entries are checked
+	# here, before the file is opened.
+	my %sel;	# keep / drop => { names => [...], name => {...}, rx => [...] }; absent when not given
+	for my $opt ('keep_cols', 'drop_cols') {
+		next unless defined $args{$opt};
+		my @ent = ref $args{$opt} eq 'ARRAY' ? @{ $args{$opt} } : ($args{$opt});
+		_usage_error('read_table', "'$opt' must be a column name, a qr// regex, or an "
+		  . "ARRAY reference of them")
+			if !@ent || grep { !defined($_) || (ref($_) && ref($_) ne 'Regexp') } @ent;
+		# The names, once each and in the order given, which is the order a
+		# name that is no column is reported in. {name} is what a header name
+		# is looked up in: a hash key is compared as the characters it spells,
+		# so a name held as characters and the same name held as Latin-1 bytes
+		# are one key.
+		my (@names, %name);
+		for my $n (grep { !ref $_ } @ent) {
+			push @names, $n unless $name{$n}++;
+		}
+		$sel{ $opt eq 'keep_cols' ? 'keep' : 'drop' } = {
+			names => \@names, name => \%name,
+			# qr// is every column, on every perl: see _rx_for_match()
+			rx    => [ map { _rx_for_match($_) } grep { ref $_ } @ent ],
+		};
+	}
+	# An exploded VCF is built from the file's own columns by position (FORMAT
+	# and each sample), so there is no column to choose until it has been
+	# exploded, by which time it has been stored.
+	for my $opt (grep { defined $args{$_} } 'keep_cols', 'drop_cols') {
+		_usage_error('read_table', "'$opt' cannot be used with an exploded VCF; pass "
+		  . "explode => 0 to read the file's own columns")
+			if $explode;
+	}
 	my $otype = $args{'output_type'} // ($explode ? 'hoh' : 'aoh');
 	_usage_error('read_table', "output_type \"$otype\" isn't allowed (aoa, aoh, hoa, hoh)")
 		unless $otype =~ m/^(?:aoa|aoh|hoa|hoh)$/;
@@ -3697,9 +3756,12 @@ sub read_table {
 	}
 	my $has_na = %na_string ? 1 : 0;   # skip the hash lookup in the common case
 
-	# @field_wins: per field, TRUE when it is the last to carry its name
+	# @field_wins: per field, TRUE when it is the last to carry its name and
+	# the name is not excluded, which is when %line_hash holds its value
+	# @excl: per field, TRUE when 'drop_cols' leaves its column out; empty when
+	# nothing is excluded. @kept_flds: the indices of the other fields
 	my (@data, %data, @header, @uniq_header, @hoa_cols, @field_wins,
-	    %mapped_filters, @sorted_filter_flds, %seen_rownames);
+	    %mapped_filters, @sorted_filter_flds, %seen_rownames, @excl, @kept_flds);
 	my ($data_row, $header_seen, $header_done, $provisional_hdr) = (0, 0, 0, 0);
 	# hoh: rows whose name an earlier row already had, and the first of them as
 	# [name, data row]. Counted and warned about once, after the parse.
@@ -3749,6 +3811,9 @@ sub read_table {
 			$plan->{cls} = [ @cls ];
 			$plan->{hdr} = [ @header ];
 		}
+		# 'drop_cols': @uniq_header already lacks the names, so no key reads an
+		# excluded field; this tells the parser not to make its cells
+		$plan->{skip} = [ @excl ] if @excl;
 		# in the order the closure below runs them
 		for my $fld (@sorted_filter_flds) {
 			for my $sub (@{ $mapped_filters{$fld} }) {
@@ -3804,6 +3869,94 @@ sub read_table {
 		}
 		my %seen_h;
 		@uniq_header = grep { !$seen_h{$_}++ } @header;
+		# 'keep_cols' and 'drop_cols', against the names as they now stand:
+		# after 'col_names', the VCF "#" and the row_name default, so a name or
+		# pattern is written for the name the table would have had. A name is
+		# the bytes the file holds, and is tried as those and, when they are
+		# UTF-8, as the characters they spell, so that a pattern compiled under
+		# `use utf8` and one compiled without it both match "Größe", and so do
+		# a column name written under it and one written without. Each name is
+		# tried once, and every field carrying an excluded name goes.
+		@excl = ();
+		@kept_flds = (0 .. $#header);
+		if (%sel) {
+			# A hoh is keyed by its row_names column, which is never a cell of
+			# a row, so keep_cols keeps it whether or not it names it: what
+			# keep_cols chooses is the cells. drop_cols naming it is refused
+			# below. Its default, the first column, is set further down.
+			my $rn = $otype ne 'hoh'               ? undef
+			       : defined $args{'row_names'} ? $args{'row_names'}
+			       :                              $header[0];
+			my %named;	# keep / drop => { name => 1 }: the entries that are a column
+			# the file, and the worksheet when a workbook is read one sheet at a time
+			my $in = $file;
+			if (defined $args{_sheet_ix}) {
+				my $sn = $xlsx_sheets->[ $args{_sheet_ix} ]{name};
+				$in .= defined $sn ? " (sheet \"$sn\")" : ' (sheet ' . ($args{_sheet_ix} + 1) . ')';
+			}
+			my $hit = sub {	# does $sel{$k} name or match this header name?
+				my ($k, $name, $chars, $wide) = @_;
+				my $s = $sel{$k};
+				my $found = 0;
+				for my $as ($wide ? ($name, $chars) : ($name)) {
+					next unless $s->{name}{$as};
+					$named{$k}{$as} = 1;
+					$found = 1;
+				}
+				return $found
+					|| grep { $name =~ $_ || ($wide && $chars =~ $_) } @{ $s->{rx} };
+			};
+			my %out;
+			for my $name (@uniq_header) {
+				my $chars = $name;
+				my $wide  = utf8::decode($chars) && $chars ne $name;
+				# both are tried, whatever the first says, so that each one's
+				# names are marked as found
+				my $kept    = !$sel{keep} || $hit->('keep', $name, $chars, $wide)
+				            || (defined $rn && $name eq $rn);
+				my $dropped = $sel{drop} && $hit->('drop', $name, $chars, $wide);
+				$out{$name} = 1 if !$kept || $dropped;
+			}
+			# A name that is no column is most often a misspelled one, and the
+			# column it meant is then stored after all, or not stored, so it is
+			# said -- as R's read.table() says "not all columns named in
+			# 'colClasses' exist" of colClasses = c(nope = "NULL"), its way of
+			# skipping a column by name (R 4.6.1 src/library/utils/R/readtable.R).
+			# A pattern that matches nothing stays silent: it never claimed a
+			# column was there. Said before the die below, so that a read
+			# refused for keeping no column says which name was no column; and
+			# of a workbook read sheet by sheet, with the sheet, since the name
+			# may be a column of another one.
+			#
+			# A workbook read sheet by sheet is refused instead: the caller
+			# chose columns for every sheet at once, and a sheet without one of
+			# them would come back whole, or cut down to other columns, under
+			# a warning that is easy to miss among the sheets that were right.
+			# Both options' names are said in the one error.
+			my @absent_msg;
+			for my $k ('keep', 'drop') {
+				next unless $sel{$k};
+				my @absent = grep { !$named{$k}{$_} } @{ $sel{$k}{names} };
+				push @absent_msg, "read_table: not all columns named in '${k}_cols' exist in $in: "
+				   . join(', ', map { "'" . _as_bytes($_) . "'" } @absent) . "\n"
+					if @absent;
+			}
+			if (@absent_msg && defined $args{_sheet_ix}) {
+				die join('', @absent_msg) . "read_table: pass 'sheet' to read one worksheet, "
+				  . "or a qr// regex, which may match no column of a sheet\n";
+			}
+			warn $_ for @absent_msg;
+			if (%out) {
+				@excl        = map { $out{$_} ? 1 : 0 } @header;
+				@kept_flds   = grep { !$excl[$_] } 0 .. $#header;
+				@uniq_header = grep { !$out{$_} } @uniq_header;
+				die "read_table: " . (!$sel{keep} ? "'drop_cols' leaves out every column"
+				                    : !$sel{drop} ? "'keep_cols' keeps no column"
+				                    :               "'keep_cols' and 'drop_cols' leave no column")
+				  . " of $in\n"
+					unless @kept_flds;
+			}
+		}
 		# Name each repeated column, with how many fields carry it and which
 		# ones (1-based, as a spreadsheet or `cut -f` counts them). A bare
 		# list of the names is not enough to find them: a merged banner row
@@ -3827,7 +3980,7 @@ sub read_table {
 			if @dup_cols && $otype ne 'aoa';
 		# An aoa's first row is the header -- the shape write_table reads an
 		# AoA as -- in file order and with any repeated name kept.
-		@data = ([ @header ]) if $otype eq 'aoa';
+		@data = ([ @header[@kept_flds] ]) if $otype eq 'aoa';
 		if ($otype eq 'hoh' && !defined $args{'row_names'}) {
 			$args{'row_names'} = $header[0];
 		}
@@ -3835,11 +3988,20 @@ sub read_table {
 				&& !grep { $_ eq $args{'row_names'} } @header) {
 			die "\"$args{'row_names'}\" isn't in the header of $file\n";
 		}
+		# A hoh is keyed by this column, so it cannot be left out; said here
+		# rather than picking another column to key the rows by.
+		die "read_table: 'drop_cols' leaves out \"$args{'row_names'}\", the row_names "
+		  . "column of $file\n"
+			if defined $args{'row_names'} && @excl
+				&& !grep { $_ eq $args{'row_names'} } @uniq_header;
 		# A repeated name resolves to its last field, which is the one
 		# %line_hash keeps, so only that field's filter writes $_ back into it.
 		my %last_field;
 		$last_field{ $header[$_] } = $_ for 0 .. $#header;
-		@field_wins = map { $last_field{ $header[$_] } == $_ } 0 .. $#header;
+		# An excluded field is not in %line_hash, so a filter keyed on it is
+		# given the field's own value, as one whose name a later field repeats
+		# is, and nothing it writes to $_ reaches %line_hash.
+		@field_wins = map { $last_field{ $header[$_] } == $_ && !$excl[$_] } 0 .. $#header;
 		if ($filter) {
 			# Each key is resolved to a field before any filter runs: '0' to
 			# the whole row; a column's name to the last field carrying it;
@@ -4131,7 +4293,7 @@ sub read_table {
 				defined $sep_note && @$line_ref > @header ? "; $sep_note" : '';
 		}
 		my %line_hash;
-		for my $i (0 .. $#header) {
+		for my $i (@kept_flds) {	# every field, unless 'drop_cols' left some out
 			my $v = $line_ref->[$i];
 			$line_hash{ $header[$i] }
 				= ( !defined($v) || $v eq ''
@@ -4192,7 +4354,7 @@ sub read_table {
 				( defined $v && @cls && $cls[$_] )
 					? _cell_class($v, $cls[$_], $file, $data_row, $header[$_], $_ + 1)
 					: $v
-			} 0 .. $#$line_ref ];
+			} grep { !$excl[$_] } 0 .. $#$line_ref ];	# a field past the header is one a filter added
 		} elsif ($otype eq 'hoa') {
 			my $c = 0;
 			push @{ $hoa_cols[ $c++ ] }, $line_hash{$_} for @uniq_header;
@@ -4261,395 +4423,8 @@ sub read_table {
 		return \%data;
 	}
 }
-# view($data, %opts) -- pretty-print an AoH / HoA / HoH / flat-hash table.
-#
-sub view {
-	my $data = shift;
-	if (not defined $data) {
-		_usage_error('view', 'undefined data in first position');
-	}
-	my %args = @_;
-	# reject unknown arguments (mirrors read_table/write_table)
-	my %allowed = map { $_ => 1 } qw(
-		n rows na max_width ellipsis gap cols columns width
-		to return_only row_names color colors
-	);
-	my @bad = sort grep { !$allowed{$_} } keys %args;
-	_usage_error('view', "unknown argument(s): @bad") if @bad;
-	# n / rows (synonyms); reject conflicting or non-integer values
-	_usage_error('view', "pass either 'n' or 'rows', not both")
-		if exists $args{n} && exists $args{rows};
-	my $n = exists $args{rows} ? $args{rows}
-		  : exists $args{n}    ? $args{n}
-		  :                      6;
-	_usage_error('view', "'n'/'rows' must be a non-negative integer")
-		unless defined $n && $n =~ /^\d+$/;
-	my $na    = exists $args{na}        ? $args{na}       : 'undef';
-	my $maxw  = exists $args{max_width} ? $args{max_width} : 80;
-	my $ell   = exists $args{ellipsis}  ? $args{ellipsis}  : '...';
-	my $gap   = exists $args{gap}       ? (' ' x $args{gap}) : '  ';
-	my $ucols = $args{cols} || $args{columns};
-	my $fh    = $args{to};
-	my $quiet = $args{return_only};
-	# terminal width used to break wide tables into column chunks (R-style).
-	# precedence: explicit 'width' arg -> $ENV{COLUMNS} -> 80 (R's default).
-	my $tw = exists $args{width} ? $args{width}
-		   : (defined $ENV{COLUMNS} && $ENV{COLUMNS} =~ /^[1-9][0-9]*\z/)
-			 ? $ENV{COLUMNS}
-			 : 80;
-	_usage_error('view', "'width' must be a positive integer")
-		unless defined $tw && $tw =~ /^[1-9][0-9]*\z/;
-	my $label_col = $args{row_names};
-	my $rt = ref $data;
-	_usage_error('view', 'expected an ARRAY (AoH) or HASH (HoA/HoH) reference, got '
-	  . ($rt || 'a non-reference'))
-	  unless $rt eq 'ARRAY' or $rt eq 'HASH';
-	my ($kind, @cols, @labels, @raw, $total, $lab_header);
-	if ($rt eq 'ARRAY') {
-		# distinguish AoA (rows are arrayrefs) from AoH (rows are hashrefs)
-		# by the first defined element; an empty array stays the AoH path.
-		my $first;
-		for my $e (@$data) { if (defined $e) { $first = $e; last } }
-		if (ref $first eq 'ARRAY') { # ---- AoA ----
-			$kind  = 'AoA';
-			$total = scalar @$data;
-			my $show = $n < $total ? $n : $total;
-			# column count from the shown rows (at least one row if any exist)
-			my $scan = $show > 0 ? $show : ($total > 0 ? 1 : 0);
-			my $m = 0;
-			for my $i (0 .. $scan - 1) {
-				my $row = $data->[$i];
-				next unless ref $row eq 'ARRAY';
-				$m = scalar @$row if scalar @$row > $m;
-			}
-			# 'cols'/'columns' selects & orders by 0-based column index
-			my @idx = $ucols ? @$ucols : (0 .. $m - 1);
-			# an integer 'row_names' names the label column index
-			my $lc = (defined $label_col && $label_col =~ /^\d+$/ && $label_col < $m)
-				   ? $label_col : undef;
-			@idx = grep { $_ != $lc } @idx if defined $lc;
-			@cols       = @idx;              # header = the 0-based array index
-			$lab_header = defined $lc ? $lc : '';
-			for my $i (0 .. $show - 1) {
-				my $row = $data->[$i];
-				$row = [] unless ref $row eq 'ARRAY';
-				push @labels, defined $lc ? $row->[$lc] : $i;
-				push @raw, [ map { $row->[$_] } @idx ];   # missing -> undef -> na
-			}
-		} else { # ---- AoH ----
-			$kind  = 'AoH';
-			$total = scalar @$data;
-			my $show = $n < $total ? $n : $total;
-			if ($ucols) {
-				@cols = @$ucols;
-			} else {
-				my $scan = $show > 0 ? $show : ($total > 0 ? 1 : 0);
-				my %seen;
-				for my $i (0 .. $scan - 1) {
-					my $row = $data->[$i];
-					next unless ref $row eq 'HASH';
-					$seen{$_} = 1 for keys %$row;
-				}
-				@cols = sort keys %seen;
-			}
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-			if (defined $lc) {
-				@cols = grep { $_ ne $lc } @cols;
-				$lab_header = $lc;
-			}
-			for my $i (0 .. $show - 1) {
-				my $row = $data->[$i];
-				$row = {} unless ref $row eq 'HASH';
-				push @labels, defined $lc ? $row->{$lc} : $i;
-				push @raw, [ map { $row->{$_} } @cols ];
-			}
-			$lab_header = '' unless defined $lab_header;
-		}
-	} elsif ($rt eq 'HASH') {
-		my @keys = keys %$data;
-		my $sample;
-		for my $k (@keys) { $sample = $data->{$k}; last if defined $sample; }
-		my $vt = ref $sample;
-		if (!@keys) {
-			$kind = 'Hash'; $total = 0; $lab_header = '';
-		} elsif ($vt eq 'ARRAY') {							# ---- HoA ----
-			$kind = 'HoA';
-			my @allcols = $ucols ? @$ucols : sort @keys;
-			$total = 0;
-			for my $k (@keys) {
-				next unless ref $data->{$k} eq 'ARRAY';
-				my $l = scalar @{ $data->{$k} };
-				$total = $l if $l > $total;
-			}
-			my $show = $n < $total ? $n : $total;
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @allcols) ? 'row_name' : undef;
-			@cols = grep { !defined $lc || $_ ne $lc } @allcols;
-			$lab_header = defined $lc ? $lc : '';
-			for my $i (0 .. $show - 1) {
-				push @labels, defined $lc
-					? (ref $data->{$lc} eq 'ARRAY' ? $data->{$lc}[$i] : undef)
-					: $i;
-				push @raw, [ map {
-					ref $data->{$_} eq 'ARRAY' ? $data->{$_}[$i] : undef
-				} @cols ];
-			}
-		} elsif ($vt eq 'HASH') {							# ---- HoH ----
-			$kind = 'HoH';
-			$total = scalar @keys;
-			my @rk = sort @keys;
-			my $show = $n < $total ? $n : $total;
-			my @shown = $show > 0 ? @rk[0 .. $show - 1] : ();
-			if ($ucols) { @cols = @$ucols; }
-			else {
-				my %seen;
-				for my $rkk (@shown) {
-					next unless ref $data->{$rkk} eq 'HASH';
-					$seen{$_} = 1 for keys %{ $data->{$rkk} };
-				}
-				@cols = sort keys %seen;
-			}
-			@cols = grep { $_ ne $label_col } @cols if defined $label_col;
-			$lab_header = defined $label_col ? $label_col : 'row_name';
-			for my $rkk (@shown) {
-				push @labels, $rkk;
-				my $inner = ref $data->{$rkk} eq 'HASH' ? $data->{$rkk} : {};
-				push @raw, [ map { $inner->{$_} } @cols ];
-			}
-		} else {											# ---- flat hash ----
-			$kind = 'Hash'; $total = 1;
-			my $show = $n < $total ? $n : $total;
-			if ($ucols) { @cols = @$ucols; } else { @cols = sort @keys; }
-			my $lc = defined $label_col ? $label_col
-				   : (grep { $_ eq 'row_name' } @cols) ? 'row_name' : undef;
-			if (defined $lc) { @cols = grep { $_ ne $lc } @cols; $lab_header = $lc; }
-			$lab_header = '' unless defined $lab_header;
-			for my $i (0 .. $show - 1) {
-				push @labels, defined $lc ? $data->{$lc} : $i;
-				push @raw, [ map { $data->{$_} } @cols ];
-			}
-		}
-	}
-
-	return _render_grid(
-		kind => $kind, total => $total,
-		cols => \@cols, labels => \@labels, raw => \@raw, lab_header => $lab_header,
-		na => $na, max_width => $maxw, ellipsis => $ell, gap => $gap,
-		width => $tw, to => $fh, return_only => $quiet,
-		color => (exists $args{color} ? $args{color} : undef), colors => $args{colors},
-	);
-}
-
-# _render_grid(%spec) -- shared, colourised table renderer used by view() and
-# summary(). Given a fully-resolved grid (row labels + column headers + a
-# row-major @raw of cell values) plus the display options, it produces the
-# output view() has always emitted: a "# Kind: R rows x C cols" banner,
-# wide-char-aware column widths, R-style column chunking to fit the terminal,
-# optional Data::Printer-style colour, and a trailing "... N more rows" note.
-sub _render_grid {
-	my %s = @_;
-	my $kind       = $s{kind};
-	my $total      = $s{total};
-	my @cols       = @{ $s{cols}   || [] };
-	my @labels     = @{ $s{labels} || [] };
-	my @raw        = @{ $s{raw}    || [] };
-	my $lab_header = defined $s{lab_header} ? $s{lab_header} : '';
-	my $na    = defined $s{na}        ? $s{na}        : 'undef';
-	my $maxw  = defined $s{max_width} ? $s{max_width} : 80;
-	my $ell   = defined $s{ellipsis}  ? $s{ellipsis}  : '...';
-	my $gap   = defined $s{gap}       ? $s{gap}       : '  ';
-	my $tw    = defined $s{width}     ? $s{width}     : 80;
-	my $fh    = $s{to};
-	my $quiet = $s{return_only};
-	my $color  = $s{color};
-	my $colors = $s{colors};
-
-	# display helpers (UTF-8 / wide-char aware)
-	my $RESET = "\e[0m";
-	my $decode = sub {
-		my $s = shift;
-		return ($s, 1) if utf8::is_utf8($s);	   # already-decoded chars: encode to bytes on output
-		my $d = $s;
-		return ($d, 1) if utf8::decode($d);	   # valid UTF-8 byte string -> chars
-		return ($s, 0);						   # not UTF-8: leave bytes untouched
-	};
-	my $wide = sub {
-		my $o = shift;
-		return 1 if ($o >= 0x1100 && $o <= 0x115F)
-				 || ($o >= 0x2E80 && $o <= 0xA4CF)
-				 || ($o >= 0xAC00 && $o <= 0xD7A3)
-				 || ($o >= 0xF900 && $o <= 0xFAFF)
-				 || ($o >= 0xFE30 && $o <= 0xFE4F)
-				 || ($o >= 0xFF00 && $o <= 0xFF60)
-				 || ($o >= 0xFFE0 && $o <= 0xFFE6)
-				 || ($o >= 0x1F300 && $o <= 0x1FAFF);
-		return 0;
-	};
-	my $cwidth = sub {							# width of an already-decoded string
-		my $s = shift; my $w = 0;
-		for my $ch (split //, $s) { my $o = ord $ch; next if $o == 0; $w += $wide->($o) ? 2 : 1; }
-		return $w;
-	};
-	my $dwidth = sub { my ($c) = $decode->(shift); return $cwidth->($c); };
-	my $ell_w  = $dwidth->($ell);
-	# stringify + sanitize + char-aware truncate; returns (output_bytes, width)
-	my $prep = sub {
-		my $v = shift;
-		my $s = defined $v ? "$v" : $na;
-		$s =~ s/\t/\\t/g; $s =~ s/\r/\\r/g; $s =~ s/\n/\\n/g;
-		my ($c, $dec) = $decode->($s);
-		if ($maxw && $cwidth->($c) > $maxw) {
-			my $budget = $maxw - $ell_w; $budget = 0 if $budget < 0;
-			my $keep = ''; my $w = 0;
-			for my $ch (split //, $c) {
-				my $cw = $wide->(ord $ch) ? 2 : 1;
-				last if $w + $cw > $budget;
-				$keep .= $ch; $w += $cw;
-			}
-			$c = $keep . $ell;
-			$dec ||= utf8::is_utf8($ell);
-		}
-		my $w = $cwidth->($c);
-		my $bytes = $c; utf8::encode($bytes) if $dec;
-		return ($bytes, $w);
-	};
-
-	# colour configuration (Data::Printer-style)
-	my %default_colors = (
-		array		=> 'bright_white',	number => 'bright_blue',
-		string		=> 'bright_yellow', class  => 'bright_green',
-		undef		=> 'bright_red',	hash   => 'magenta',
-		caller_info => 'bright_cyan',	separator => 'white',
-	);
-	my %color = (%default_colors, %{ $colors || {} });
-	my %fg = (
-		black=>30, red=>31, green=>32, yellow=>33, blue=>34, magenta=>35, cyan=>36, white=>37,
-		bright_black=>90, bright_red=>91, bright_green=>92, bright_yellow=>93,
-		bright_blue=>94, bright_magenta=>95, bright_cyan=>96, bright_white=>97,
-	);
-	my $sgr = sub {
-		my $spec = $color{ $_[0] };
-		return '' unless defined $spec && length $spec;
-		if ($spec =~ /^#?([0-9a-fA-F]{6})\z/) {
-			my ($r, $g, $b) = map { hex } unpack 'a2a2a2', $1;
-			return "\e[38;2;$r;$g;${b}m";
-		}
-		return "\e[$fg{$spec}m" if exists $fg{$spec};
-		return "\e[$spec" . 'm'	 if $spec =~ /^\d[\d;]*\z/;
-		return '';
-	};
-	my $want_color;
-	if (!defined $color || (!ref $color && $color eq 'auto')) {
-		my $target = defined $fh ? $fh : \*STDOUT;
-		$want_color = (!$quiet && -t $target) ? 1 : 0;
-	} else {
-		$want_color = $color ? 1 : 0;
-	}
-	my $paint = sub {
-		my ($text, $type) = @_;
-		return $text unless $want_color;
-		my $c = $sgr->($type);
-		return length $c ? $c . $text . $RESET : $text;
-	};
-
-	# column types (alignment)
-	my @numeric = (1) x scalar @cols;
-	for my $r (@raw) {
-		for my $j (0 .. $#cols) {
-			my $v = $r->[$j];
-			next unless defined $v;
-			$numeric[$j] = 0 unless looks_like_number($v);
-		}
-	}
-	my $lab_numeric = @labels ? 1 : 0;
-	for my $l (@labels) { $lab_numeric = 0, last unless defined $l && looks_like_number($l); }
-	my $val_type = sub {
-		my $v = shift;
-		return 'undef'	unless defined $v;
-		return 'number' if looks_like_number($v);
-		return 'string';
-	};
-
-	# prepare every cell once: [bytes, width, colour-type]
-	my @lab_cell = map { [ $prep->($_), (!defined $_ ? 'undef' : $lab_numeric ? 'array' : 'hash') ] } @labels;
-	my @row_cell;
-	for my $r (@raw) {
-		push @row_cell, [ map { [ $prep->($r->[$_]), $val_type->($r->[$_]) ] } 0 .. $#cols ];
-	}
-	my @head_cell = map { [ $prep->($_) ] } @cols;
-	my ($lh_b, $lh_w) = $prep->($lab_header);
-
-	# column widths (display columns)
-	my $lab_w = $lh_w;
-	for my $c (@lab_cell) { $lab_w = $c->[1] if $c->[1] > $lab_w; }
-	my @w;
-	for my $j (0 .. $#cols) {
-		my $width = $head_cell[$j][1];
-		for my $r (@row_cell) { $width = $r->[$j][1] if $r->[$j][1] > $width; }
-		$w[$j] = $width;
-	}
-
-	# pad: spaces are never coloured; only the value text is
-	my $field = sub {
-		my ($bytes, $bw, $width, $right, $type) = @_;
-		my $gapn = $width - $bw; $gapn = 0 if $gapn < 0;
-		my $sp = ' ' x $gapn;
-		my $painted = $paint->($bytes, $type);
-		return $right ? $sp . $painted : $painted . $sp;
-	};
-
-	# break columns into chunks that fit within $tw (R-style)
-	# the label column (width $lab_w) is repeated at the front of every chunk.
-	# $gap is spaces only, so its display width is length($gap).
-	my $gap_w = length $gap;
-	my @chunks;
-	if (@cols) {
-		my $j = 0;
-		while ($j <= $#cols) {
-			my $used = $lab_w;
-			my @chunk;
-			while ($j <= $#cols) {
-				my $add = $gap_w + $w[$j];
-				# always keep at least one column per chunk, even if it overflows
-				last if @chunk && $used + $add > $tw;
-				push @chunk, $j;
-				$used += $add;
-				$j++;
-			}
-			push @chunks, \@chunk;
-		}
-	} else {
-		@chunks = ( [] );	# no data columns: just the label column
-	}
-
-	my @out;
-	my $shown = scalar @row_cell;
-	push @out, $paint->(
-		sprintf("# %s: %d row%s x %d col%s	(showing %d)",
-			$kind, $total, ($total == 1 ? '' : 's'),
-			scalar(@cols), (@cols == 1 ? '' : 's'), $shown),
-		'caller_info');
-
-	for my $chunk (@chunks) {
-		my @hcells = ( $field->($lh_b, $lh_w, $lab_w, 0, 'hash') );
-		push @hcells, $field->($head_cell[$_][0], $head_cell[$_][1], $w[$_], $numeric[$_], 'hash') for @$chunk;
-		push @out, join($gap, @hcells);
-		for my $ri (0 .. $#row_cell) {
-			my @cells = ( $field->($lab_cell[$ri][0], $lab_cell[$ri][1], $lab_w, $lab_numeric, $lab_cell[$ri][2]) );
-			push @cells, $field->($row_cell[$ri][$_][0], $row_cell[$ri][$_][1], $w[$_], $numeric[$_], $row_cell[$ri][$_][2]) for @$chunk;
-			push @out, join($gap, @cells);
-		}
-	}
-
-	push @out, $paint->(
-		sprintf("# ... %d more row%s", $total - $shown, ($total - $shown == 1 ? '' : 's')),
-		'caller_info') if $shown < $total;
-
-	my $str = join("\n", @out) . "\n";
-	unless ($quiet) { defined $fh ? print {$fh} $str : print $str; }
-	return $str;
-}
+# view() and _render_grid(), the renderer it shares with summary(), are in
+# LikeR.xs, under "view() and summary(): the table renderer".
 
 # TukeyHSD($fit, %opts) -- Tukey Honest Significant Differences.
 #
@@ -6908,7 +6683,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3421
+version 0.3422
 
 =head1 Synopsis
 
@@ -12355,11 +12130,12 @@ back — into a data frame that all of them will:
  my $tbl    = h2aoh($counts, var_name => 'Pclass', value_name => 'n',
                     sort => 'value');
  view($tbl);
- # AoH: 3 rows x 2 cols   (showing 3)
+ # AoH: 3 rows x 2 cols   (showing 3 rows)
  #    Pclass    n
  # 0       3  491
  # 1       1  216
  # 2       2  184
+ # AoH: 3 rows x 2 cols   (showing 3 rows)
 
 R spells this C<tibble::enframe()>; base R gets close with
 C<stack()> or C<data.frame(name = names(x), value = unname(x))>. In pandas it is
@@ -15812,6 +15588,16 @@ minimal example:
   <td>R's: store the columns you name as numbers rather than text, which takes about a third of the memory, or as <code>character</code> to keep them text. A field that is plainly an integer is stored as one without being named. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses)</td>
   <td><code>colClasses =&gt; { age =&gt; 'integer', bmi =&gt; 'numeric' }</code></td>
 </tr>
+<tr>
+  <td><code>drop_cols</code></td>
+  <td>columns to leave out of the table, by name: a column name, a <code>qr//</code> regex, or an array reference of either. A column with one of the names, or whose name matches one of the patterns, is never stored, which is what keeps the memory of a wide file down. See [leaving columns out](#leaving-columns-out-drop_cols)</td>
+  <td><code>drop_cols =&gt; ['Entity Type Code', qr/^Provider License Number/]</code></td>
+</tr>
+<tr>
+  <td><code>keep_cols</code></td>
+  <td>the only columns to store, by name: a column name, a <code>qr//</code> regex, or an array reference of either, the counterpart of <code>drop_cols</code>. Kept columns stay in the file's order. See [keeping only some columns](#keeping-only-some-columns-keep_cols)</td>
+  <td><code>keep_cols =&gt; ['NPI', qr/^Provider Business/]</code></td>
+</tr>
 </tbody>
 </table>
 
@@ -16126,6 +15912,106 @@ skipped, but the first column is C<#CHROM> and nothing is split.
 The split is done in C. On a 3,499,678-record single-sample GATK C<.vcf.gz>,
 the exploded hoh takes 11.7 s, against 9.1 s for the file's own columns as a
 hoh, and an exploded aoa 8.4 s, against 7.0 s for the plain one.
+
+=head3 leaving columns out (C<drop_cols>)
+
+C<drop_cols> names the columns that are not wanted: by a column name, by a
+C<qr//> regex, or by an array reference holding any mix of the two. A column
+with one of the names, or whose name matches one of the patterns, is left out
+of the table as the file is read. Its cells are never stored, so a wide file
+costs the memory of the columns that are kept, not of the file:
+
+ my $d = read_table('npidata.csv', drop_cols => 'Entity Type Code');
+ my $d = read_table('npidata.csv', drop_cols => [ 'Entity Type Code', 'Provider Credential Text' ]);
+ my $d = read_table('npidata.csv', drop_cols => qr/^Provider License Number/);
+ my $d = read_table('npidata.csv', drop_cols => [ 'NPI Deactivation Date', qr/^Healthcare Provider Taxonomy/, qr/_\d+\z/ ]);
+
+A plain string is a whole column name. It is compared exactly, so it is
+case-sensitive, C<'id'> leaves out C<id> and neither C<paid> nor C<width>, and a
+C<.>, a C<(> or a C<|> in it is that character: C<'cost ($)'> needs no quoting. A
+number is a name as well, never a field position: C<< drop_cols =E<gt> 2 >> is the
+column named C<2>. A name that is no column of the file is warned about, in
+the words R's C<read.table> uses of a C<colClasses> name, and the read goes on:
+
+ read_table: not all columns named in 'drop_cols' exist in npidata.csv: 'Entity Type'
+
+Both are compared with the names the table would otherwise have had: after
+C<col_names> has renamed them, with C<V1>, C<V2>, ... under C<< header =E<gt> 0 >>, and
+with a VCF's leading C<#> off. A name the file holds as UTF-8 is found by the
+same name written under C<use utf8> or without it. A pattern is not
+anchored unless it says so, C<qr/id/> leaves out C<id>, C<paid> and C<width>
+alike, and it is case-sensitive without C</i>. A pattern that matches no column
+is not an error and is not warned about, since one list of patterns is often
+used for several files. Leaving out every column is an error, and so is leaving
+out the C<row_names> column of a hoh. An empty pattern, C<qr//>, matches every
+name, and does so on every perl: before perl 5.18 the match operator would
+reuse the last pattern that had matched instead, and C<read_table> does not let
+it. The empty string, C<''>, is not that: it is the column whose name is empty,
+which is how to leave out the unnamed columns of a sheet with a merged banner
+row.
+
+It works for every C<output_type>, for C<.xlsx> sheets and for compressed
+files. An C<aoa> drops the column from its header row and from every data row.
+Where the header repeats a name, every field carrying an excluded name goes.
+Everything that speaks of a field by its position still counts the file's own
+fields: a C<colClasses> list, a numeric C<filter> key, and the field number in
+an alignment message.
+
+A C<filter> may still test a column that is left out. It is handed the whole
+row as C<$_[0]>, and a filter keyed on an excluded column gets that column's
+value in C<$_>; the column is only missing from C<%_> (and C<$_[1]>), and from
+the table:
+
+ # keep active providers only, without keeping the column that says so
+ my $d = read_table('npidata.csv',
+     drop_cols => qr/^(?:Provider License Number|NPI Deactivation)/,
+     filter  => { 'NPI Deactivation Date' => sub { !defined $_ } });
+
+C<drop_cols> cannot be combined with an exploded VCF, whose columns are built
+from the file's by position; pass C<< explode =E<gt> 0 >> to use it on a VCF.
+To drop columns from a table that is already in memory, see C<cfilter> and
+the C<drop_cols> function, which this option shares its name with: the function
+takes column names only and dies on one that is not there, and the option
+takes names or patterns and only warns.
+
+=head3 keeping only some columns (C<keep_cols>)
+
+C<keep_cols> is the counterpart of C<drop_cols>: it names the only columns that
+are wanted, and every other column is left out as the file is read, never
+stored. It takes what C<drop_cols> takes -- a column name, a C<qr//> regex, or an
+array reference holding any mix of the two -- and a name or pattern means the
+same thing in either:
+
+ my $d = read_table('npidata.csv', keep_cols => [ 'NPI', 'Entity Type Code' ]);
+ my $d = read_table('npidata.csv', keep_cols => [ 'NPI', qr/^Provider Business Practice Location/ ]);
+
+The kept columns stay in the file's order, not the order they are listed in,
+as with pandas' C<read_csv(usecols = ...)>. Where pandas raises on a name that
+is no column, C<read_table> warns, as it does for C<drop_cols>, and keeps the
+names that are:
+
+ read_table: not all columns named in 'keep_cols' exist in npidata.csv: 'Entity Type'
+
+Keeping no column at all is an error. A hoh is the exception: it is keyed by
+its C<row_names> column, which is a key and never a cell, so that column is
+kept whether C<keep_cols> names it or not, and a hoh can keep nothing else:
+
+ my $by_npi = read_table('npidata.csv', output_type => 'hoh',
+     row_names => 'NPI', keep_cols => [ 'Entity Type Code' ]);
+
+C<keep_cols> and C<drop_cols> may be given together. A column is then stored
+when C<keep_cols> chooses it and C<drop_cols> does not, so C<drop_cols> takes
+columns back out of a broad pattern:
+
+ my $d = read_table('npidata.csv',
+     keep_cols => [ 'NPI', qr/^Provider/ ],
+     drop_cols => qr/^Provider License Number/);
+
+Everything else said of C<drop_cols> holds for C<keep_cols> too: the names it is
+compared with, UTF-8 names, C<.xlsx> sheets and compressed files, filters that
+test a column that is not kept, C<colClasses> and field numbers counting the
+file's own fields, C<qr//> meaning every column on every perl, and the refusal of
+an exploded VCF.
 
 =head3 numeric columns (C<colClasses>)
 
@@ -17143,7 +17029,7 @@ The AoH/HoH case is the per-column summary R gives for a data frame — so the a
 
 Non-numeric and undefined cells are ignored: they never count toward C<# values>, and a variable with no numeric values shows C<0> and C<na>. For example, C<summary> of an AoH:
 
- # summary: 2 rows x 7 cols    (showing 2)
+ # summary: 2 rows x 7 cols    (showing 2 rows)
  Column  # values  Min.  1st Qu.  Median  Mean  3rd Qu.  Max.
  x              3     1      1.5       2     2      2.5     3
  y              3    10       15      20    20       25    30
@@ -18006,7 +17892,7 @@ number is C<NaN>, again as in R.
 An R-style C<head> for the structures C<read_table> returns. Prints the first
 few rows of a dataframe as an aligned text table, with numeric columns
 right-justified, string columns left-justified, and undefined cells shown as
-C<NA>.
+C<undef>.
 
 =for html <table>
 <thead>
@@ -18055,18 +17941,21 @@ C<NA>.
 
 =head3 Output
 
- # AoH: 7 rows x 3 cols  (showing 6)
+ # AoH: 7 rows x 3 cols, 2.9 KB  (showing 6 rows)
  row_name  Testosterone, total (nmol/L)  age  sex
  p1                                18.2   41  M
- p2                                  NA    7  F
+ p2                               undef    7  F
  p3                                1.05   33  F
  p4                                22.9   55  M
  p5                                  14   29  M
- p6                                  NA   62  F
+ p6                               undef   62  F
  # ... 1 more row
+ # AoH: 7 rows x 3 cols, 2.9 KB  (showing 6 rows)
 
-The banner reports the structure type, full dimensions, and how many rows are
-displayed. A footer appears only when rows are hidden.
+The banner reports the structure type, full dimensions, L<the memory the data
+takes|/"The size">, and how many rows are displayed. A footer appears only when
+rows are hidden. The banner is printed again as the last line, so that a table
+longer than the screen still says what it is where the scrolling stops.
 
 =head3 Arguments
 
@@ -18103,7 +17992,7 @@ All arguments after the data reference are optional name/value pairs.
 </tr>
 <tr>
   <td><code>na</code></td>
-  <td><code>'NA'</code></td>
+  <td><code>'undef'</code></td>
   <td>Token printed for undefined cells</td>
 </tr>
 <tr>
@@ -18123,18 +18012,48 @@ All arguments after the data reference are optional name/value pairs.
 </tr>
 <tr>
   <td><code>to</code></td>
-  <td>STDOUT</td>
-  <td>Filehandle to print to.</td>
+  <td>the selected filehandle</td>
+  <td>Filehandle to print to. The default is the one <code>select</code> names, which is STDOUT unless the program changed it</td>
 </tr>
 <tr>
   <td><code>return_only</code></td>
   <td><code>0</code></td>
   <td>If true, return the string and print nothing</td>
 </tr>
+<tr>
+  <td><code>size</code></td>
+  <td><code>1</code></td>
+  <td>If false, leave the data's size out of the banner, and skip the pass over the whole dataframe that finds it. See [the size](#the-size)</td>
+</tr>
 </tbody>
 </table>
 
 C<view> always returns the formatted string, whether or not it also prints.
+
+=head3 The size
+
+The first line says how much memory the data takes: everything that can be
+reached from the reference C<view> was given -- every scalar and its string,
+every array and hash, and the keys that the rows of an C<aoh> share, once --
+as perl has allocated it. It is written the way pandas' C<DataFrame.info()>
+writes a memory usage, in units of 1024 with one decimal: C<952.0 bytes>,
+C<22.5 KB>, C<1.4 GB>.
+
+It is the size of the whole dataframe, not of the rows shown, so finding it
+means visiting every cell. For a million rows of ten columns that is 0.05 s
+as an C<aoa>, 0.10 s as an C<aoh> and 0.12 s as a C<hoa> on perl 5.44.0, where
+the rest of C<view> takes under a tenth of a millisecond. C<< size =E<gt> 0 >> leaves
+the size out, and the visit with it:
+
+ view($aoh, size => 0);            # "# AoH: 7 rows x 3 cols  (showing 6 rows)"
+
+What is counted is the data's own. A row or column that another dataframe
+shares -- the rows of a C<filter> result, say -- is counted in full in each,
+and once where one dataframe holds it twice. What a code reference, a glob or
+a filehandle leads to is not counted, nor is what a weak reference points at,
+and a tied structure counts as the tie alone, without fetching from it. The C
+library's own bookkeeping is not included, so the process's memory as the
+operating system reports it is somewhat larger.
 
 =head3 A note on column order
 
@@ -18153,8 +18072,9 @@ shown.
 
 =back
 
-When no label column is present, C<view> numbers the rows C<1, 2, 3, …>, the way
-R prints row names for an unnamed data frame.
+When no label column is present, C<view> labels each row with its index,
+C<0, 1, 2, …>, which is the number that reaches the row in Perl: the row
+labeled C<2> of an C<aoh> is C<< $aoh-E<gt>[2] >>.
 
 =head3 Edge cases
 
@@ -18173,9 +18093,11 @@ a clear message rather than producing garbled output.
 =head3 Tests
 
 The behavior above is covered by C<view.t> (run with C<prove view.t>): the three
-structure types, C<n> boundaries, alignment, C<NA> rendering, truncation,
+structure types, C<n> boundaries, alignment, the C<na> token, truncation,
 C<row_names>/C<cols> handling, control-character escaping, the C<return_only> and
-C<to> output paths, empty structures, and the error cases.
+C<to> output paths, empty structures, and the error cases. C<view.size.t> covers
+the size, its format against pandas' own, and C<view.xs.t> the row order of a
+C<hoh>, the argument errors, and where the table is printed.
 
 =head2 vif
 

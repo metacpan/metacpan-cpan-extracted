@@ -1,15 +1,16 @@
 ########################################################################
 # housekeeping
 ########################################################################
-package FindBin::Bin v2.1.0;
+package FindBin::Bin v2.3.0;
 use v5.40;
 
 use parent qw( Exporter );
 
 use File::stat;
 
-use Cwd qw( abs_path getcwd );
-use Symbol  qw( qualify_to_ref  );
+use Cwd         qw( abs_path getcwd );
+use List::Util  qw( uniq            );
+use Symbol      qw( qualify_to_ref  );
 
 use File::Spec::Functions
 qw
@@ -18,7 +19,6 @@ qw
     catpath
     curdir
     file_name_is_absolute
-    rel2abs
     rootdir
     splitdir
     splitpath
@@ -28,49 +28,74 @@ sub pwd()
 {
     # preserve symlinks in the path as with
     # "pwd -L" while still working on MSW, VMS.
+    # note the *NIX PWD reality check with '.'.
 
-    if( $^O eq 'MSWin32' )
+    state $pwd
+    = do
     {
-        # getcwd does not resolve junctions or symlinks here, and
-        # there is no usable inode to validate $PWD against.
+        # getcwd returns undef if the working directory has been
+        # removed.  abs_path cannot detect this: it returns a
+        # missing last component unchanged.
 
-        getcwd
-    }
-    elsif( $^O eq 'VMS' )
-    {
-        # $ENV{DEFAULT} keeps rooted logicals unexpanded.
+        my $cwd = getcwd()
+        // die "Unresolvable working directory: getcwd() returned undef ($!)\n";
 
-        $ENV{ DEFAULT } // getcwd
-    }
-    else
-    {
-        # *NIX, Cygwin, MSYS: trust $PWD only if it 
-        # still names the current directory (same 
-        # check as "pwd -L").  otherwise live with
-        # cwd and having rel2abs resolve symlinks.
-
-        if( my $pwd = $ENV{ PWD } )
+        if( $^O eq 'MSWin32' )
         {
-            if( $pwd =~ m{^/} )
-            {
-                my $env = File::stat::stat $pwd ;
-                my $cur = File::stat::stat '.'  ;
+            # getcwd does not resolve junctions or symlinks here, and
+            # there is no usable inode to validate $PWD against.
 
-                   $env->ino
-                && $cur->ino
-                && $env->dev == $cur->dev
-                && $env->ino == $cur->ino
-                ? $pwd
-                : getcwd
-            }
-            else
-            {
-                getcwd
-            }
+            $cwd
+        }
+        elsif( $^O eq 'VMS' )
+        {
+            # $ENV{DEFAULT} keeps rooted logicals unexpanded.
+
+            $ENV{ DEFAULT } // $cwd
         }
         else
         {
-            getcwd
+            # *NIX, Cygwin, MSYS: trust $PWD only if it 
+            # still names the current directory (same 
+            # check as "pwd -L").  otherwise live with
+            # cwd and having abs_path resolve symlinks.
+
+            if( my $pwd = $ENV{ PWD } )
+            {
+                # a stale $PWD (e.g., after a builtin chdir, which
+                # does not update it) leaves getcwd with symlinks
+                # resolved: the logical path is lost.
+
+                my $env
+                = $pwd =~ m{^/}
+                ? File::stat::stat $pwd
+                : undef
+                ;
+                my $cur = File::stat::stat '.';
+
+                if
+                (
+                       $env
+                    && $env->ino
+                    && $cur->ino
+                    && $env->dev == $cur->dev
+                    && $env->ino == $cur->ino
+                )
+                {
+                    $pwd
+                }
+                else
+                {
+                    warn "Mismatched working directory: '$pwd' is stale, "
+                    . "using '$cwd', this resolves symbolic links.\n";
+
+                    $cwd
+                }
+            }
+            else
+            {
+                $cwd
+            }
         }
     }
 }
@@ -81,7 +106,7 @@ sub canon_dir( $dir )
     # can deal with it. this also expects a dir, not a
     # file, path.
 
-    $dir or return;
+    $dir or return pwd;
 
     my $raw
     = file_name_is_absolute( $dir )
@@ -99,7 +124,10 @@ sub canon_dir( $dir )
     {
         # MSW and *NIX have the same process:
         # clean up '.' and '..' in the path without
-        # calling rel2abs to resolve the symlinks.
+        # calling abs_path to resolve the symlinks.
+        # can't use rel2abs as it is inconsistent in 
+        # handling symlinks: absolute paths get 
+        # canonpath, relative paths go through abs_path.
 
         state $root_marker = ( splitdir rootdir )[ 0 ];
         
@@ -138,13 +166,17 @@ BEGIN
     my ( $logical, $physical )
     = do
     {
-        if( $0 =~ m{^ (?: -e | - | interactive ) }x )
+        # a /dev/ path (e.g., perl /dev/stdin, or /dev/fd/N from bash
+        # process substitution) is input via a filehandle: like '-'
+        # it has no program directory.
+
+        if( $0 =~ m{^ (?: -e | - | interactive | /dev/ .* ) $}x )
         {
             my $raw = pwd;
 
             (
                 $raw
-              , rel2abs( $raw )
+              , abs_path( $raw )
             )
         }
         else
@@ -166,25 +198,40 @@ BEGIN
             ( $log, $phys )
         }
     };
-    
+
     # notice that these are installed into the *local* package.
-    # callers inherit them via import(), below.
+    # callers inherit them via import(), below, or just use them
+    # with package names FindBin::Bin::*.
+    #
+    # $Bin_l -- logical path (canon_dir $0, like "pwd -L")
+    # $Bin_p -- physical path (abs_path of $0, like "pwd -P")
+    # $Bin   -- module-level default = physical; import()
+    #           aliases the caller's $Bin to $Bin_l with
+    #           'noabspath'
+    #
+    # q#...# stores each path as a string literal.
+    # '#' is the delimiter and '\' is the escape character.
+    # All other non-word chars are literal inside q#...# and need no escaping.
 
-    # $Bin_l -- logical path (canon_dir, like "pwd -L")
+    for
+    (
+        [ Bin_l => $logical   ]
+      , [ Bin_p => $physical  ]
+      , [ Bin   => $physical  ]
+    )
+    {
+        my( $name, $raw ) = @$_;
 
-    eval qq| *{ qualify_to_ref 'Bin_l' } = \\'$logical'  |;
-    eval qq| sub Bin_l(){ '$logical'  } |;
+        # q#...# uses '#' as the delimiter and '\' as the escape
+        # character. Escape '\' first (doubles it), then escape '#'
+        # so that '\#' in a path does not collapse the escape sequence.
 
-    # $Bin_p -- physical path (abs_path of $0, resolves all symlinks)
+        my $cooked  = $raw =~ s{\\}{\\\\}gr
+                               =~ s{(?=[#])}{\\}gr;
 
-    eval qq| *{ qualify_to_ref 'Bin_p' } = \\'$physical' |;
-    eval qq| sub Bin_p(){ '$physical' } |;
-
-    # $Bin -- module-level default = logical; import() may 
-    # alias to physical
-
-    eval qq| *{ qualify_to_ref 'Bin' } = \\'$physical' |;
-    eval qq| sub Bin(){ '$physical' } |;
+        eval qq| *{ qualify_to_ref '$name' } = \\q#$cooked# |;
+        eval qq| sub $name(){ q#$cooked# }                  |;
+    }
 }
 
 ########################################################################
@@ -203,13 +250,13 @@ sub import
     my $pkg     = shift;
     my $caller  = caller;
 
-    # list context captures the matched string, not a count.
-    my ($flag)  = grep { m{abspath} } @_;
-    $flag     //= '';
-    my @want    = grep { ! m{abspath} } @_;
+    # take the first value if multiples are listed.
+    
+    my $abs     = ( grep { m{^(?:no)?abspath$} } @_ )[0] // '';
+    my @want    = uniq grep { ! m{ abspath$ }x  } @_;
 
     my $use_phys
-    = $flag eq 'noabspath'
+    = $abs eq 'noabspath'
     ? ''
     : 1
     ;
@@ -279,13 +326,15 @@ normalization strategies for paths containing C<..> segments.
     say $Bin_l;  # /home/jowbloe/project/bin   (canon_dir, logical)
     say $Bin_p;  # /home/jowbloe/project/bin   (abs_path,  physical)
 
-    # They differ when the program's directory path contains symlinks.
+    # They differ when the path to the program ($0) includes any
+    # symbolic links.
     # If /home/jowbloe is a symlink to /real/home/jowbloe:
 
     say $Bin_l;  # /home/jowbloe/project/bin   (symlinks preserved)
     say $Bin_p;  # /real/home/jowbloe/project/bin  (symlinks resolved)
 
-    # Interactive invocations (perl -e, perl -E, perl -, debugger):
+    # Interactive invocations (perl -e, perl -E, perl -, debugger) and
+    # input via a filehandle (perl /dev/stdin, perl <( ... )):
     # $Bin_l = pwd()          -- CWD as returned by pwd()
     # $Bin_p = abs_path(pwd()) -- CWD with symlinks resolved
 
@@ -335,22 +384,41 @@ not an object instance.  These modules provide no OO interface.
 
 =head2 $Bin_l and Bin_l()
 
-C<$Bin_l> ("logical", like C<pwd -L>) is computed via C<canon_dir()>,
-a stack algorithm that removes B<all> C<..> and C<.> segments without
-touching the filesystem.  Symbolic links in the path are B<preserved>.
+C<$Bin_l> ("logical", like C<pwd -L>) is the directory of C<$0> as
+given, with C<pwd()> prepended if C<$0> is relative, cleaned up via
+C<canon_dir()>: a stack algorithm that removes B<all> C<..> and C<.>
+segments without touching the filesystem.  Symbolic links in the path
+are B<preserved>; if C<$0> is itself a symlink, C<$Bin_l> is the
+directory containing the symlink.  Because C<pwd()> uses C<$ENV{PWD}>
+when it is valid, a relative C<$0> keeps the symlinks in the working
+directory as well.
 
 =head2 $Bin_p and Bin_p()
 
-C<$Bin_p> ("physical", like C<pwd -P>) is computed via C<Cwd::abs_path()>,
-which resolves all symbolic links.  If C<abs_path> fails, C<$Bin_l> is
-used as a fallback.
+C<$Bin_p> ("physical", like C<pwd -P>) is the directory of
+C<Cwd::abs_path( $0 )>: the physical directory of the executable file,
+with all symbolic links resolved.  If C<$0> is itself a symlink,
+C<$Bin_p> is the directory containing the file it points to.
 
 =head2 Symlinks
 
 C<$Bin_l> preserves directory symlinks in the path (logical, like
 C<pwd -L>).  C<$Bin_p> resolves them to the real on-disk location
 (physical, like C<pwd -P>).  They are identical when no symlinks appear
-in the directory path.
+in the path to C<$0>, including C<$0> itself:
+
+    # $0 = /home/user/bin/script, a symlink to /work/app/bin/script
+
+    $Bin_l = /home/user/bin          # directory of the symlink
+    $Bin_p = /work/app/bin           # directory of the executable file
+
+Bind mounts, on *NIX systems that support them, can also give a
+different C<$Bin_l>.  If C<$ENV{PWD}> names the working directory via
+one mount point and the process entered it via another, both have the
+same device and inode, so C<pwd()> accepts C<$ENV{PWD}>.  With a
+relative C<$0>, C<$Bin_l> then uses the C<$ENV{PWD}> mount point while
+C<$Bin_p> uses the one returned by C<abs_path>, though neither path
+contains a symlink.
 
 =head3 Example: two lib trees, one symlink
 
@@ -402,10 +470,44 @@ C<'noabspath'> at import time (see L</"$Bin and Bin()">).
 
 =head2 Resolving the working directory
 
+The C<$Bin*> variables and C<Bin*()> subs are computed once, when
+C<FindBin::Bin> is first loaded: at compile time of the first
+C<use FindBin::Bin> or C<use FindBin::libs>.  When C<$0> is relative
+or an interactive invocation they are based on the value of C<pwd()>
+at that time; an absolute C<$0> does not use C<pwd()>.
+
+If C<FindBin::libs> or C<FindBin::Bin> is used before any C<chdir>,
+they reflect the working directory at startup: a relative C<$0> is
+resolved against the original C<pwd()>, giving the correct absolute
+path.  A later C<chdir> does not change them.  Using C<FindBin::libs>
+before other modules avoids the problems below.
+
+A C<chdir> made before C<FindBin::Bin> is first loaded, e.g., by a
+module used earlier, affects them:
+
+=over 4
+
+=item * Builtin C<chdir>
+
+Does not update C<$ENV{PWD}>.  C<pwd()> finds the stale C<$PWD>, warns,
+and uses C<Cwd::getcwd()>, so C<$Bin_l> does not preserve symlinks.
+
+=item * C<Cwd::chdir>
+
+Updates C<$ENV{PWD}>.  C<pwd()> uses it without a warning.
+
+=back
+
+In either case, if the working directory is not restored before
+C<FindBin::Bin> is loaded, a relative C<$0> is resolved against the
+new working directory, and C<$Bin_l> and C<$Bin_p> are wrong.
+
 =head3 Interactive invocations
 
 When C<$0> is C<-e>, C<->, or C<interactive> (one-liner, stdin, or
-debugger), the directory is taken from C<pwd()>:
+debugger), or a path under C</dev/> (input via a filehandle, e.g.,
+C<perl /dev/stdin> or C</dev/fd/N> from bash process substitution),
+the directory is taken from C<pwd()>:
 
     $Bin_l = pwd()
     $Bin_p = Cwd::abs_path( pwd() )   # resolves symlinks in CWD
@@ -414,25 +516,53 @@ debugger), the directory is taken from C<pwd()>:
 
 When C<$0> holds a file path:
 
-    $Bin_l = catpath( $vol, canon_dir( $raw ),   '' )  # logical, '..' removed
-    $Bin_p = catpath( $vol, abs_path( $raw ),    '' )  # physical, symlinks resolved
+    $Bin_l = catpath( $vol, canon_dir( $dir ), '' )
+    $Bin_p = directory of abs_path( $0 )
 
-where C<$raw> is the absolute directory string derived from the
-directory component of C<$0> (with C<pwd()> prepended for relative paths).
+where C<$vol> and C<$dir> are the volume and directory of C<$0> as
+given; C<canon_dir()> prepends C<pwd()> to a relative C<$dir>.
+C<$Bin_l> keeps symlinks, including a symlinked C<$0>; C<$Bin_p>
+resolves them, following a symlinked C<$0> to the executable file.
 
 All variables are defined as read-only ref-to-constant scalars and
 constant subs; they do not change after the C<BEGIN> block runs.
 
 =head2 pwd()
 
-Returns the same value as C<"pwd -L"> -- an absolute path to the CWD
-with symbolic links left as-is.  On *NIX and Cygwin it validates
+Returns the working directory determined at runtime, the same value as
+C<"pwd -L"> -- an absolute path with symbolic links left as-is.  On *NIX and Cygwin it validates
 C<$ENV{PWD}> against the inode of C<'.'> and falls back to
 C<Cwd::getcwd()> (which resolves symlinks) only when they disagree.
-On VMS it uses C<$ENV{DEFAULT}>; on MSWin32 it uses C<Cwd::getcwd()>.
+On VMS it uses C<$ENV{DEFAULT}> if that is defined, otherwise
+C<Cwd::getcwd()>; on MSWin32 it uses C<Cwd::getcwd()>.
 
-The result is memoised; C<pwd()> always returns the value from program
-startup.
+If C<$ENV{PWD}> is set but stale -- not an absolute path, a path that
+does not exist, or not the same device and inode as C<'.'> -- C<pwd()>
+warns:
+
+    Mismatched working directory: '<$ENV{PWD}>' is stale,
+    using '<getcwd>', this resolves symbolic links.
+
+and returns C<Cwd::getcwd()>, so symlinks in the working directory are
+not preserved.  The usual cause is a builtin C<chdir>, which does not
+update C<$ENV{PWD}>; C<Cwd::chdir> does.  No warning is issued when
+C<$ENV{PWD}> is unset.
+
+If the working directory cannot be resolved, e.g., it has been
+removed, C<getcwd> returns undef and C<pwd()> dies:
+
+    Unresolvable working directory: getcwd() returned undef (<$!>)
+
+This is checked first, on all platforms, before C<$ENV{PWD}> or
+C<$ENV{DEFAULT}> is examined.  C<abs_path> cannot detect it, since it
+returns a missing last path component unchanged.
+
+The result is cached on the first call to C<pwd()>: later calls return
+the same value, even after a C<chdir>.  The first call is not
+necessarily at program startup.  Loading C<FindBin::Bin> calls
+C<pwd()> only when C<$0> is relative or an interactive invocation
+(C<-e>, C<->, C<interactive>, C</dev/...>); otherwise the first call
+is the caller's, and reflects any C<chdir> made before it.
 
 =head2 canon_dir()
 
@@ -445,3 +575,4 @@ are not consulted.  A relative input has C<pwd()> prepended.
 
     canon_dir '/foo/bar/../../../../../../../';
     # => '/'  (cannot go above root)
+

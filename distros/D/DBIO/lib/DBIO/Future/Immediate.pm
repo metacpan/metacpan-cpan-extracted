@@ -4,7 +4,7 @@ package DBIO::Future::Immediate;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Scalar::Util ();
 
@@ -94,7 +94,7 @@ DBIO::Future::Immediate - Dependency-free immediate Future for DBIO's 'immediate
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

@@ -148,6 +148,64 @@ is($result->{steps}, 2, 'agent steps');
 is($invocations, 1, 'agent tool invocation');
 is_deeply($sink->types, [qw(run.started tool.call run.completed)], 'agent events');
 
+my $policy_guard_options = Praxo::Agent::AgentOptions->new(TestModel->new([
+    { content => 'done' },
+]));
+$policy_guard_options->{require_policy} = 1;
+my $policy_guard_ok = eval {
+    Praxo::Agent::run_agent($policy_guard_options, Praxo::Models::session(id => 's1'), 'go');
+    1;
+};
+my $policy_guard_error = $@;
+is($policy_guard_ok, undef, 'require policy guard');
+is(Praxo::Errors::error_code($policy_guard_error), 'AGENT_INVALID_OPTIONS',
+    'require policy guard code');
+is("$policy_guard_error", 'agent: require policy: policy is required',
+    'require policy guard message');
+
+my $policy_configured_options = Praxo::Agent::AgentOptions->new(TestModel->new([
+    { content => 'done' },
+]));
+$policy_configured_options->{require_policy} = 1;
+$policy_configured_options->{policy} = sub { { allowed => 1 } };
+my $policy_configured_result = Praxo::Agent::run_agent(
+    $policy_configured_options, Praxo::Models::session(id => 's1'), 'go',
+);
+is($policy_configured_result->{output}, 'done', 'require policy configured');
+
+my $scope_guard_options = Praxo::Agent::AgentOptions->new(TestModel->new([
+    { content => 'done' },
+]));
+$scope_guard_options->{require_tool_scope} = 1;
+my $scope_guard_ok = eval {
+    Praxo::Agent::run_agent($scope_guard_options, Praxo::Models::session(id => 's1'), 'go');
+    1;
+};
+my $scope_guard_error = $@;
+is($scope_guard_ok, undef, 'require tool scope guard');
+is(Praxo::Errors::error_code($scope_guard_error), 'AGENT_INVALID_OPTIONS',
+    'require tool scope guard code');
+is("$scope_guard_error", 'agent: require tool scope: allowed_tools must not be empty',
+    'require tool scope guard message');
+
+my $scope_configured_options = Praxo::Agent::AgentOptions->new(TestModel->new([
+    { content => 'done' },
+]));
+$scope_configured_options->{require_tool_scope} = 1;
+$scope_configured_options->{allowed_tools} = ['echo'];
+my $scope_configured_result = Praxo::Agent::run_agent(
+    $scope_configured_options, Praxo::Models::session(id => 's1'), 'go',
+);
+is($scope_configured_result->{output}, 'done', 'require tool scope configured');
+
+my $default_guard_options = Praxo::Agent::AgentOptions->new(TestModel->new([
+    { content => 'done' },
+]));
+my $default_guard_result = Praxo::Agent::run_agent(
+    $default_guard_options, Praxo::Models::session(id => 's1'), 'go',
+);
+is($default_guard_result->{output}, 'done', 'agent guards default off');
+
 my $captured;
 my $adapter = Praxo::Adapters::OpenAICompatible->new(
     base_url => 'http://example.test/v1',
@@ -552,5 +610,21 @@ is(
     'SUBAGENT_INVALID',
     'delegate invalid',
 );
+
+my $schema_registry = Praxo::Agent::ToolRegistry->new;
+$schema_registry->register(Praxo::Agent::FuncTool->new(
+    'record',
+    'Record a target.',
+    sub { return 'recorded' },
+    {
+        type => 'object',
+        required => ['target'],
+        properties => { target => { type => 'string' } },
+    },
+    'write',
+));
+my $schema_spec = $schema_registry->specs->[0];
+is($schema_spec->{parameters}{required}[0], 'target', 'tool schema parameters');
+is($schema_spec->{risk}, 'write', 'tool schema risk');
 
 done_testing();

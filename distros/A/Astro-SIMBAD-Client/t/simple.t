@@ -9,23 +9,22 @@ use My::Module::Test;
 
 use constant TEST_SOAP	=> $ENV{ASTRO_SIMBAD_CLIENT_USE_SOAP};
 
-access();
+my $server = access();
 
 call( set => type => 'txt' );
 call( set => format => 'txt=FORMAT_TXT_SIMPLE_BASIC' );
 call( set => parser => 'txt=Parse_TXT_Simple' );
+call( set => server => $server );
 
 load_module( 'SOAP::Lite' );
 load_data( 't/canned.data' );
-
-access();
 
 echo( <<'EOD' );
 
 Test the handling of simple text
 EOD
 
-foreach my $scheme ( qw{ http https } ) {
+foreach my $scheme ( @TEST_SCHEMES ) {
 
     subtest "Test using $scheme" => sub {
 

@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 
 # The engine against DateTime::TimeZone. Author only. DateTime::TimeZone
-# 2.66 carries tzdata 2025c, eight releases behind this dist's 2026e, so
+# 2.66 carries tzdata 2025c, nine releases behind this dist's 2026f, so
 # some zones are expected to differ; each is listed with the reason, and
 # the test checks that it differs ONLY in that way.
 
@@ -19,10 +19,11 @@ my $y2026 = 1767225600;
 
 # Changed in tzdata after 2025c (see NEWS): the same before the date given,
 # not after. Moldova has used EU transition times since 2022 (2026a); the
-# rest change their future (2026a to 2026e).
+# rest change their future (2026a to 2026f; Cuba from November 2026).
 my %changed_from = (
     (map { $_ => $y2026 } qw(America/Winnipeg America/Inuvik America/Edmonton
-                             America/Vancouver Africa/Casablanca Africa/El_Aaiun)),
+                             America/Vancouver Africa/Casablanca Africa/El_Aaiun
+                             America/Havana)),
     'Europe/Chisinau' => 1640995200,
 );
 # Single transitions corrected after 2025c (NEWS): Colombia's 1992-05-02

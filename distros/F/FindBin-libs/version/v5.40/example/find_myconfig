@@ -5,9 +5,7 @@
 # See POD for subonly behavior and abspath vs. noabspath.
 ########################################################################
 
-use strict;
-use warnings;
-use feature 'say';
+use v5.40;
 
 use List::Util qw( first );
 
@@ -35,6 +33,7 @@ qw
     subdir=myconfig
     subonly
     export=myconfig
+    nofail
 );
 
 say "logical  bin (\$Bin_l): $Bin_l";

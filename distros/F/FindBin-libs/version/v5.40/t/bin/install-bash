@@ -1,0 +1,68 @@
+#!/usr/bin/env perl
+########################################################################
+# housekeeping
+########################################################################
+package Installer;
+use v5.40;
+
+use File::Basename        qw( basename dirname );
+use File::Path            qw( make_path        );
+use File::Spec::Functions qw( abs2rel catfile rel2abs );
+
+########################################################################
+# locate project root and install paths
+########################################################################
+
+my $bin_d  = rel2abs dirname $0;
+my $test_d = dirname $bin_d;
+my $work_d = dirname $test_d;
+
+my $bash_t = catfile $bin_d, 'install-tests.d', '01-bash_t';
+my $dest_d = catfile $test_d, '01-bash';
+
+chdir $work_d
+or die "chdir '$work_d': $!";
+
+-e $bash_t
+or die "Missing template: $bash_t";
+
+make_path $dest_d;
+
+########################################################################
+# remove stale symlinks
+########################################################################
+
+for my $old ( glob catfile $dest_d, '*.t' )
+{
+    unlink $old
+    or die "unlink '$old': $!";
+
+    say "Removed: $old";
+}
+
+########################################################################
+# create symlinks for each bash script found
+########################################################################
+
+my $target = abs2rel $bash_t, $dest_d;
+
+for my $path
+(
+    grep { ! m{^ (?: blib | version ) /}x }
+    grep { /\S/ }
+    map  { chomp; $_ }
+    qx{ find * -type f 2>/dev/null | xargs file 2>/dev/null | grep -i 'Bourne-Again' | cut -d: -f1 }
+)
+{
+    my $base = join '~', split '/', $path;
+    my $link = catfile $dest_d, "$base.t";
+
+    symlink $target, $link
+    or do
+    {
+        warn "symlink '$target' '$link': $!";
+        next
+    };
+
+    say $link;
+}

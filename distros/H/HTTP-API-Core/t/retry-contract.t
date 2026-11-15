@@ -191,4 +191,38 @@ is(
     'invalid HTTP-date time is rejected',
 );
 
+
+dies_like(
+    sub {
+        HTTP::API::Core->new(
+            base_url => 'https://api.example.test',
+            retry => { attempts => [] },
+        );
+    },
+    qr/retry attempts must be a positive integer/,
+    'reference-valued retry attempts rejected',
+);
+
+dies_like(
+    sub {
+        HTTP::API::Core->new(
+            base_url => 'https://api.example.test',
+            retry => { base_delay => {} },
+        );
+    },
+    qr/retry base_delay must be a non-negative number/,
+    'reference-valued retry base_delay rejected',
+);
+
+dies_like(
+    sub {
+        HTTP::API::Core->new(
+            base_url => 'https://api.example.test',
+            retry => { max_delay => [] },
+        );
+    },
+    qr/retry max_delay must be a non-negative number/,
+    'reference-valued retry max_delay rejected',
+);
+
 done_testing;

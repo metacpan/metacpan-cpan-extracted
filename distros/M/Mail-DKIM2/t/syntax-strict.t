@@ -59,7 +59,7 @@ for my $junk (' junk;', ' 9bad=foo;', ' x=a' . chr(127) . ';') {
     ok($sig->syntax_error, 'Signature->parse flags a malformed fragment');
     my $ok = Mail::DKIM2::Signature->parse("i=1; d=example.com; x9_y=\r\n\tsome value; s=sel:rsa-sha256:AAAA;");
     ok(!$ok->syntax_error, 'an unknown tag with folded internal whitespace is well formed');
-    like($ok->as_string_without_data, qr/x9_y=/, 'and is kept in the signing representation');
+    like($ok->as_string, qr/x9_y=/, 'and is kept in the signing representation');
 }
 
 # --- F4: s= item components ---

@@ -362,7 +362,7 @@ EOF
 
 sub do_help() {
   return print <<EOF;
-avemaria - commandline Rosary client for DailyRosary.cf and TheRosaryAPI.cf
+avemaria - commandline Rosary client for dailyrosary.catholicdevotion.org and the-rosary-api.catholicdevotion.org
 
 VERSION $Webservice::Rosary::API::VERSION
 
@@ -402,7 +402,7 @@ Usage - to print MP3 URL to STDOUT:
 Example 1,
 
   > avemaria today
-  > https://dailyrosary.cf/audio-rosary-sorrowful-mysteries.mp3
+  > https://dailyrosary.catholicdevotion.org/audio-rosary-sorrowful-mysteries.mp3
 
 Example 2,
 
@@ -542,7 +542,7 @@ increase in Faith, Hope, and Charity.
 
 VERSION $Webservice::Rosary::API::VERSION
 
-avemaria - commandline Rosary client for DailyRosary.cf and TheRosaryAPI.cf
+avemaria - commandline Rosary client for dailyrosary.catholicdevotion.org and the-rosary-api.catholicdevotion.org
 
 EOF
 

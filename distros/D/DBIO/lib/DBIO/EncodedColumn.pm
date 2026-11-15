@@ -4,7 +4,7 @@ package DBIO::EncodedColumn;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base qw/DBIO::Base/;
 
@@ -361,6 +361,13 @@ sub _digest_ctx {
 
   return unless defined $algorithm && $algorithm =~ m{\A[A-Za-z0-9][A-Za-z0-9/-]*\z};
 
+  # Digest knows the SHA3 names only from 1.20 on; the context comes from
+  # Digest::SHA3 itself, which is what 1.20 would load for them.
+  if ($algorithm =~ m{\ASHA3-(224|256|384|512)\z}) {
+    my $bits = $1;
+    return eval { require Digest::SHA3; Digest::SHA3->new($bits) };
+  }
+
   return eval { Digest->new($algorithm) };
 }
 
@@ -425,7 +432,7 @@ DBIO::EncodedColumn - One-way encode selected columns: passwords with Bcrypt or 
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 
@@ -485,7 +492,8 @@ string.
 =item C<Digest>
 
 Tokens and values that are compared by their digest. A salted L<Digest> of
-SHA-256, SHA-384, SHA-512 or SHA3-224, SHA3-256, SHA3-384, SHA3-512, stored as
+SHA-256, SHA-384, SHA-512 or SHA3-224, SHA3-256, SHA3-384, SHA3-512 (the SHA3
+digests need L<Digest::SHA3>), stored as
 
   dbio$<algorithm>$<salt_base64>$<digest_base64>
 
@@ -613,7 +621,8 @@ integer, default C<1>).
 =item C<algorithm> (Digest)
 
 SHA-256 (default), SHA-384, SHA-512, SHA3-224, SHA3-256, SHA3-384 or SHA3-512;
-another name is refused when the class is loaded.
+the SHA3 names need L<Digest::SHA3>. Another name is refused when the class is
+loaded.
 
 =item C<salt_length> (Digest)
 

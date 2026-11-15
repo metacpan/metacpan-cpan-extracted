@@ -4,7 +4,7 @@ package DBIO::SQLMaker::ClassicExtensions;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 
 # to pull in CAG and the frame-boundary-markers
@@ -1364,7 +1364,7 @@ DBIO::SQLMaker::ClassicExtensions - Class containing generic enhancements to SQL
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

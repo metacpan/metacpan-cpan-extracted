@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.14.0 - 2026-11-15
+
+### Features
+
+- Read hosted_domains' 10 most popular domains ([`8944313`](https://github.com/internetdata/sdk-perl/commit/894431347e45d2ac7ad2c77dc5bd4a90befe5084))
+
 ## 1.13.1 - 2026-11-14
 
 ### Fixes

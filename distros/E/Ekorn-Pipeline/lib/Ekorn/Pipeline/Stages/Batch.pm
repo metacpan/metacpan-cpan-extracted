@@ -25,12 +25,13 @@ sub batch ($size) {
         if !defined $size || $size !~ m( \A \d+ \z )xa || $size < 1;
     return gather {
         my @batch;
-        my $stage = sub ($value) {
-            push @batch, $value;
-            return @batch < $size ? () : [splice @batch];
+        return {
+            step => sub ($value) {
+                push @batch, $value;
+                return @batch < $size ? () : [splice @batch];
+            },
+            flush => sub () { @batch ? [splice @batch] : () },
         };
-        my $end = sub () { @batch ? [splice @batch] : () };
-        return ($stage, $end);
     };
 }
 
@@ -41,12 +42,13 @@ sub collect : prototype(;&) ($make = undef) {
         if defined $make && !is_coderef($make);
     return gather {
         my @values;
-        my $stage = sub ($value) { push @values, $value; return };
-        my $end   = sub () {
-            my @all = splice @values;
-            return $make ? $make->(@all) : \@all;
+        return {
+            step  => sub ($value) { push @values, $value; return },
+            flush => sub () {
+                my @all = splice @values;
+                return $make ? $make->(@all) : \@all;
+            },
         };
-        return ($stage, $end);
     };
 }
 
@@ -84,6 +86,11 @@ with L<Ekorn::Pipeline::Gather>, so what they hold starts afresh on
 each run. Both pass on what they still hold once the values run out.
 Each function returns a stage, and checks its arguments when it's
 called, not on each value.
+
+Each stage is an object, an L<Ekorn::Pipeline::Stage> or, for those
+that keep state, an L<Ekorn::Pipeline::Gather>, called as a code
+reference, so it goes wherever a stage goes. Code testing it with
+C<ref> or C<is_coderef> sees an object: v0.2.0 gave code references.
 
 =head1 FUNCTIONS
 

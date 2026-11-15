@@ -3,7 +3,7 @@ package DBIO::FilterColumn;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Row';
 use DBIO::Util qw(is_literal_value);
@@ -213,7 +213,7 @@ DBIO::FilterColumn - Automatically convert column data
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

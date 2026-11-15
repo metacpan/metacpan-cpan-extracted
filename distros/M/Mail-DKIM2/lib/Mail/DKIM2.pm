@@ -3,7 +3,7 @@ use 5.20.0;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 use Mail::DKIM2::Common ();
 use Mail::DKIM2::MessageInstance;
@@ -31,8 +31,7 @@ Mail::DKIM2 - DKIM2 signing and verification for email
     # message records the next m= with a Recipe; see
     # Mail::DKIM2::MessageInstance.)
     my $mi = Mail::DKIM2::MessageInstance->calculate($message);
-    $message = Mail::DKIM2::Common::fold_header('Message-Instance: ' . $mi->as_string)
-             . "\r\n" . $message;
+    $message = $mi->as_header . "\r\n" . $message;
     my $signer = Mail::DKIM2::Signer->new(
         Domain   => 'example.com',
         Selector => 'sel1',
@@ -90,6 +89,16 @@ Parses and builds one DKIM2-Signature header.
 Generates, authenticates and propagates DKIM2-signed Delivery Status
 Notifications (-09 section 16).
 
+=item L<Mail::DKIM2::Chain>
+
+A message's Message-Instance and DKIM2-Signature fields by number: which
+there are, whether the numbers form a chain, how far the signatures reach.
+
+=item L<Mail::DKIM2::Hop>
+
+The Message-Instance a hop adds before it signs: none, C<m=1>, or a change
+from the message as this host received it.
+
 =item L<Mail::DKIM2::Gate>
 
 The verify-before-sign decision shared by C<bin/dkim2sign> and
@@ -101,10 +110,31 @@ whether a top C<nd=> names the domain about to sign.
 The body hash of a message streamed from a file, for a host that computes a
 Message-Instance from the header block alone.
 
+=item L<Mail::DKIM2::Canon>, L<Mail::DKIM2::Fold>
+
+The octets the spec defines -- which header fields are hashed, how a field
+is canonicalized, the signing input -- and where a field this code creates
+may be folded.
+
+=item L<Mail::DKIM2::Address>
+
+Envelope paths, domains, the relaxed domain match, and whether a From
+header field is Authentic for a signing domain.
+
+=item L<Mail::DKIM2::Key>
+
+Private keys, public key records, Domain Policy Records, and the signing
+algorithms.
+
+=item L<Mail::DKIM2::RecipeJSON>
+
+The base64 JSON of a Message-Instance's C<r=> tag.
+
 =item L<Mail::DKIM2::Common>
 
-Canonicalization, hashing, folding and key-loading functions shared by the
-above.
+Constants, limits, and the numbering of Message-Instance and
+DKIM2-Signature fields. Until 0.31 it held everything in the five modules
+above, and still exports all of it.
 
 =item L<Mail::DKIM2::HeaderParser>, L<Mail::DKIM2::TagValueList>
 

@@ -6,9 +6,10 @@
 # "use POSIX::2008 'non_existent_name';" croaks at compile time.
 
 use File::Spec;
-
-require XSLoader;
-XSLoader::load('POSIX::2008', '0.29');
+use XSLoader ();
+BEGIN {
+  XSLoader::load('POSIX::2008', '0.30');
+}
 
 my %names;
 

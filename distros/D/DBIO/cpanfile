@@ -63,11 +63,13 @@ recommends 'Lingua::EN::Inflect', '0';
 # Salt source of DBIO::EncodedColumn; encoding throws without it.
 requires 'Crypt::URandom', '0';
 
-# DBIO::EncodedColumn classes: Bcrypt (the default class) and Argon2. The
-# module of the chosen class has to be installed, or the Result class does not
-# load; the same modules verify the hashes.
+# DBIO::EncodedColumn classes: Bcrypt (the default class) and Argon2, and the
+# SHA3 digests of the Digest class. The module of the chosen class or digest has
+# to be installed, or the Result class does not load; the same modules verify
+# the hashes.
 suggests 'Crypt::Bcrypt', '0';
 suggests 'Crypt::Argon2', '0';
+suggests 'Digest::SHA3', '0';
 
 # Optional: DBIO::InflateColumn::Serializer::YAML; 1.25 added
 # $YAML::LoadBlessed, which the unfreezer sets alongside $YAML::LoadCode

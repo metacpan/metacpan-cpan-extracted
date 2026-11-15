@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.11';
+our $VERSION = '0.13';
 
 use Time::Keeper;
 
@@ -20,7 +20,7 @@ Time::Keeper::Calendar - the calendars Time::Keeper values can be read in
 
 =head1 VERSION
 
-Version 0.11
+Version 0.13
 
 =head1 SYNOPSIS
 

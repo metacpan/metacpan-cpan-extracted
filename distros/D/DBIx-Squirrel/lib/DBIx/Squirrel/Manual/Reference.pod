@@ -1,6 +1,6 @@
 =encoding utf8
 
-=for stopwords flatMap
+=for stopwords bitwise flatMap
 
 =for comment Made from docs/REFERENCE.md by scripts/manuals. Edit docs/REFERENCE.md and run
 the script, rather than editing this.
@@ -15,19 +15,22 @@ DBI, minus the boilerplate, plus a pipeline.
 
 With DBIx::Squirrel, you still write SQL, as you do with the DBI. It
 takes away the friction around it: placeholders in whatever style you
-like, iterators over results, rows as objects, and a pipeline of
-transformations written beside the query. It's a subclass of the DBI,
-so everything the DBI does still works. Where the two do the same
+like, lists of values, iterators over results, rows as objects, and a
+pipeline of stages written beside the query. It's a subclass of the
+DBI, so everything the DBI does still works. Where the two do the same
 thing, they give the same result.
 
-This reference describes every feature, with examples.
-L<The how-to|DBIx::Squirrel::Manual::HowTo> shows how to do common tasks, one recipe at a
-time. Each module's own POD says the same things more briefly. Where
-the two differ, the POD is the authority.
+This reference describes every method, attribute, function and
+message, and the protocols other code can rely on. Its chapters follow
+the L<user guide|DBIx::Squirrel::Manual::HowTo>'s, a layer at a time from the DBI up, and
+each links to its chapter there: the guide is the tour, this is the
+map. Each module's own POD says the same things more briefly. Where
+the two differ, the POD is the authority. Every example runs, against
+the database below, and its comments say what it prints.
 
-This is version 2, a rewrite of DBIx::Squirrel 1.x for Perl 5.36 or
-later. L<Upgrading from 1.x|/"Upgrading from 1.x"> lists what changes for
-code written for 1.x.
+This is version 3. L<Upgrading from 2.x|/"Upgrading from 2.x"> and
+L<Upgrading from 1.x|/"Upgrading from 1.x"> list what changes for code
+written for earlier versions.
 
 =head1 Contents
 
@@ -35,87 +38,91 @@ code written for 1.x.
 
 =item *
 
+L<The examples' database|/"The examples' database">
+
+=item *
+
 L<At a glance|/"At a glance">
 
 =item *
 
-L<Connecting|/"Connecting">
+L<Importing: DBIx::Squirrel::Tooling|/"Importing: DBIx::Squirrel::Tooling">
 
 =item *
 
-L<DBIx::Squirrel's own attributes|/"DBIx::Squirrel's own attributes">
+L<1. Connecting|/"1. Connecting">
 
 =item *
 
-L<Placeholders|/"Placeholders">
+L<2. Placeholders|/"2. Placeholders">
 
 =item *
 
-L<Preparing statements|/"Preparing statements">
+L<3. Preparing, binding and running|/"3. Preparing, binding and running">
 
 =item *
 
-L<Binding and executing|/"Binding and executing">
+L<4. Iterators|/"4. Iterators">
 
 =item *
 
-L<do|/"do">
+L<5. Stages and Context|/"5. Stages and Context">
 
 =item *
 
-L<The select methods|/"The select methods">
+L<6. Stopping a pipeline|/"6. Stopping a pipeline">
 
 =item *
 
-L<Iterators|/"Iterators">
+L<7. Gathering: stages made for each run|/"7. Gathering: stages made for each run">
 
 =item *
 
-L<Result sets and row objects|/"Result sets and row objects">
+L<8. Sinks|/"8. Sinks">
 
 =item *
 
-L<Pipelines|/"Pipelines">
+L<9. Result sets and row objects|/"9. Result sets and row objects">
 
 =item *
 
-L<Stopping a pipeline|/"Stopping a pipeline">
+L<10. Pipelines|/"10. Pipelines">
 
 =item *
 
-L<Gathering: stages with state, and an end|/"Gathering: stages with state, and an end">
+L<11. Operators: E<verbar> and @{}|/"11. Operators: E<verbar> and @{}">
 
 =item *
 
-L<What a stage can ask: Context|/"What a stage can ask: Context">
+L<12. Sugar: a function for each database and statement|/"12. Sugar: a function for each database and statement">
 
 =item *
 
-L<pipe and tap on handles|/"pipe and tap on handles">
+L<13. Caching and connections|/"13. Caching and connections">
 
 =item *
 
-L<Canned stages|/"Canned stages">
+L<14. Writing stages, and functions that take them|/"14. Writing stages, and functions that take them">
 
 =item *
 
-L<Writing stages|/"Writing stages">
+L<15. Protocols|/"15. Protocols">
 
 =item *
 
-L<A function for each database and statement: Sugar|/"A function for each database and statement: Sugar">
+L<16. Errors and diagnostics|/"16. Errors and diagnostics">
 
 =item *
 
-L<Errors|/"Errors">
-
-=item *
-
-L<Diagnostics|/"Diagnostics">
+L<Making each kind of part|/"Making each kind of part">
 
 =item *
 
 L<Differences from plain DBI|/"Differences from plain DBI">
+
+=item *
+
+L<Upgrading from 2.x|/"Upgrading from 2.x">
 
 =item *
 
@@ -127,61 +134,214 @@ L<The modules|/"The modules">
 
 =back
 
-=head1 At a glance
+=head1 The examples' database
+
+The examples run against this SQLite database, the user guide's, a
+file called C<music.db>. They follow on from each other, so C<$dbh> is
+this handle wherever it appears. It imports everything from
+L<DBIx::Squirrel::Tooling|/"Importing: DBIx::Squirrel::Tooling">, so the
+examples needn't.
 
     use v5.36;
     use DBIx::Squirrel;
+    use DBIx::Squirrel::Tooling qw(:all);    # every stage, sink and word
 
-    my $dbh = DBIx::Squirrel->connect($data_source, $username, $password, \%attr);
+    my $dbh = DBIx::Squirrel->connect('dbi:SQLite:dbname=music.db', {RaiseError => 1, PrintError => 0});
+
+    $dbh->do("DROP TABLE IF EXISTS $_") for qw(track album artist);
+    $dbh->do('CREATE TABLE artist (id INTEGER PRIMARY KEY, name TEXT)');
+    $dbh->do('CREATE TABLE album  (id INTEGER PRIMARY KEY, artist_id INTEGER, title TEXT, year INTEGER)');
+    $dbh->do('CREATE TABLE track  (id INTEGER PRIMARY KEY, album_id INTEGER, name TEXT, plays INTEGER)');
+
+    $dbh->do('INSERT INTO artist (name) VALUES (?)', $_) for 'Abba', 'Blur', 'Cream';
+    $dbh->do('INSERT INTO album (artist_id, title, year) VALUES (?, ?, ?)', @$_)
+        for [1, 'Arrival', 1976], [2, 'Parklife', 1994], [2, 'The Great Escape', 1995],
+            [3, 'Disraeli Gears', 1967];
+    $dbh->do('INSERT INTO track (album_id, name, plays) VALUES (?, ?, ?)', @$_)
+        for [1, 'Dancing Queen', 9100], [1, 'Knowing Me, Knowing You', 4200],
+            [2, 'Girls & Boys', 6100], [2, 'Parklife', 5800],
+            [3, 'Country House', 3900], [4, 'Sunshine of Your Love', 7700];
+
+=head1 At a glance
+
+    use DBIx::Squirrel::Tooling qw(:all);    # every stage, sink and word
 
     # Placeholders in the style you like: ?, ?1, :1, $1, :name or $name
-    my $sth = $dbh->prepare('SELECT * FROM artist WHERE id = :id OR name = :name');
-    $sth->execute(id => 1, name => 'AC/DC');
+    my $sth = $dbh->prepare('SELECT name FROM artist WHERE id = :id');
+    $sth->execute(id => 2);
+    say $sth->fetchrow_arrayref->[0];    # Blur
 
-    # A numbered placeholder takes one value, wherever it appears
-    my $row = $dbh->selectrow_hashref(
-        'SELECT * FROM artist WHERE id = $1 OR parent_id = $1', undef, 2,
-    );
+    # A placeholder with ... takes a list: a ? for each of its values
+    my $names = $dbh->selectcol_arrayref('SELECT name FROM artist WHERE id IN (...:ids) ORDER BY id', ids => [1, 3]);
+    say "@$names";    # Abba Cream
 
-    # A placeholder with "..." takes a list: a "?" for each of its values
-    my $rows = $dbh->selectall_arrayref(
-        'SELECT * FROM artist WHERE id IN (...:ids)', ids => [1, 2, 3],
-    );
-
-    # An iterator over the results, each run through a pipeline of stages
-    my $names = $dbh->iterate(
-        'SELECT name FROM artist WHERE name LIKE ?', 'A%',
-        sub ($row) { $row->[0] },
-    );
-    while (my($name) = $names->next) {
-        say $name;
+    # An iterator over the rows, read as they're wanted
+    my $it = $dbh->iterate('SELECT name FROM artist ORDER BY id');
+    while (my($row) = $it->next) {
+        say $row->[0];
     }
+    # Abba
+    # Blur
+    # Cream
 
-    # Ready-made stages, for the jobs that come up again and again
-    use DBIx::Squirrel::Stages::Flow;    # take, drop
-    use DBIx::Squirrel::Stages::Rows;    # pluck, as_hash
-    my @first_ten = $dbh->iterate('SELECT name FROM artist ORDER BY name', pluck('name'), take(10))->all;
+    # Stages beside the query, and a sink last to say what comes back
+    my @top = $dbh->iterate(
+        'SELECT name FROM track ORDER BY plays DESC',
+        pluck('name'),
+        take(2),
+        keep_all,
+    );
+    say join ', ', @top;    # Dancing Queen, Sunshine of Your Love
+
+    say $dbh->iterate('SELECT * FROM track WHERE plays > ?', 6000, count_items);    # 3
 
     # Each row as an object, with a method for each column
-    my $artist = $dbh->results('SELECT * FROM artist WHERE id = :id', id => 1)->single;
-    say $artist->name;
+    say $dbh->results('SELECT * FROM album WHERE id = ?', 2)->first->title;    # Parklife
 
-    # A function for each database, and each statement, defined as the
-    # program compiles, so from the environment or literals
-    use DBIx::Squirrel::Sugar
-        database  => {music => [$ENV{MUSIC_DSN}, $ENV{MUSIC_USER}, $ENV{MUSIC_PASS}]},
-        statement => {artist_names => [music => 'SELECT name FROM artist', sub ($row) { $row->[0] }]};
+=head1 Importing: DBIx::Squirrel::Tooling
 
-    my @names = artist_names;
+    use DBIx::Squirrel::Tooling qw(:all);               # everything below
+    use DBIx::Squirrel::Tooling qw(:stages :sinks);     # or some tags
+    use DBIx::Squirrel::Tooling qw(pluck keep_all);     # or some names
 
-=head1 Connecting
+What a caller uses to do work is made in several modules, each
+described below. DBIx::Squirrel::Tooling exports all of it, from one
+place, by Ekorn::Pipeline::Tooling's tags, with DBIx::Squirrel's own
+C<:rows> and C<:context> besides:
+
+=over 4
+
+=item C<:core>
+
+B<Holds:> C<Stop>, C<gather>
+
+B<Made in:> L<Stop|/"6. Stopping a pipeline">, L<Gather|/"7. Gathering: stages made for each run">
+
+=item C<:flow>
+
+B<Holds:> C<take>, C<take_first>, C<take_last>, C<take_single>, C<take_if>, C<take_while>, C<drop>, C<drop_if>, C<drop_while>
+
+B<Made in:> L<Stages::Flow|/"Taking and dropping">
+
+=item C<:batch>
+
+B<Holds:> C<batch>, C<collect>
+
+B<Made in:> L<Stages::Batch|/"Batching and collecting">
+
+=item C<:taps>
+
+B<Holds:> C<peek>, C<count_into>, C<dump_to>
+
+B<Made in:> L<Stages::Taps|/"Canned stages">
+
+=item C<:rows>
+
+B<Holds:> C<pluck>, C<as_hash>
+
+B<Made in:> L<Stages::Rows|/"Canned stages">
+
+=item C<:stages>
+
+B<Holds:> C<:flow>, C<:batch>, C<:taps> and C<:rows>
+
+=item C<:context>
+
+B<Holds:> C<iterator>, C<result_number>, C<result_original>
+
+B<Made in:> L<Context|/"Context">
+
+=item C<:sources>
+
+B<Holds:> C<from_array>, C<from_fh>, C<from_file>, C<counter>
+
+B<Made in:> Ekorn::Pipeline::Sources
+
+=item C<:sinks>
+
+B<Holds:> C<count_items>, C<keep>, C<keep_all>, C<keep_first>, C<keep_last>, C<keep_single>, C<to_fh>, C<to_file>
+
+B<Made in:> L<Sinks|/"8. Sinks">
+
+=item C<:json>
+
+B<Holds:> C<from_json>, C<from_jsonl>, C<to_json>, C<to_jsonl>
+
+B<Made in:> Ekorn::Pipeline::JSON
+
+=item C<:words>
+
+B<Holds:> C<pipeline>, C<stage>, C<gather>, C<source>, C<generator>, C<yield>, C<sink_one>, C<sink_many>
+
+B<Made in:> Ekorn::Pipeline::Factories
+
+=item C<:all>
+
+B<Holds:> all of the above
+
+=back
+
+=over 4
+
+=item *
+
+B<Nothing by default.> Ask for tags, names, or both. An unknown tag
+or name is Exporter's error: it warns C<"%s" is not defined in
+%DBIx::Squirrel::Tooling::EXPORT_TAGS>, or C<"%s" is not exported by
+the DBIx::Squirrel::Tooling module>, and dies C<Can't continue after
+import errors>.
+
+=item *
+
+B<The same subs.> Each name is the sub its own module exports,
+prototype and all, so C<take_if { ... }> and C<stage { ... }> parse as
+they do imported from there, and importing a name from both does no
+harm.
+
+=item *
+
+B<DBIx::Squirrel's, where both export a name.> Each name comes from
+DBIx::Squirrel's own module where it has one, and from
+Ekorn::Pipeline's only where it has none. Today each name both
+export is the same sub, so importing Ekorn::Pipeline::Tooling too,
+in either order, gives the same subs. A test fails if that changes.
+
+=item *
+
+B<What's left out.> What's for extending DBIx::Squirrel rather than
+using it, such as C<croakf>, from DBIx::Squirrel::Errors, and
+C<is_stage>, from Ekorn::Pipeline; L<the
+Sugar|/"12. Sugar: a function for each database and statement">, whose
+C<use> makes functions; and L<C<E<verbar>>|/"11. Operators: E<verbar> and @{}">, which only
+C<use Ekorn::Pipeline::Operators> puts in force, in its own scope.
+
+=item *
+
+B<JSON.pm's names.> JSON exports a C<from_json> and a C<to_json> of
+its own, by default, so a module using both imports C<:all> or C<:json>
+from only one of them, or calls the other's by its full name.
+
+=item *
+
+B<What a tag holds is public.> A name may be added to one in a
+release that only adds, but is dropped or renamed only in a major
+release.
+
+=back
+
+=head1 1. Connecting
+
+The user guide's L<chapter 1|DBIx::Squirrel::Manual::HowTo/"1. Still the DBI">.
 
 =head2 Importing
 
 C<use DBIx::Squirrel> takes the names the DBI exports, as C<use DBI>
-does. The DBI exports them:
+does, and the DBI exports them:
 
     use DBIx::Squirrel qw(:sql_types neat);
+
+    say SQL_INTEGER;    # 4
+    say neat('Abba');   # 'Abba'
 
 =head2 connect
 
@@ -191,12 +351,12 @@ does. The DBI exports them:
     $dbh = DBIx::Squirrel->connect($dbh, \%attr);
 
 C<connect> connects to a data source, as the DBI's C<connect> does, and
-returns a database handle, a C<DBIx::Squirrel::db>. Its statement handles
-are C<DBIx::Squirrel::st>s. Both are subclasses of the DBI's own, so they
-do everything the DBI's handles do.
+returns a database handle, a C<DBIx::Squirrel::db>. Its statement
+handles are C<DBIx::Squirrel::st>s. Both are subclasses of the DBI's
+own, so they do everything the DBI's handles do.
 
-The username and password can be left out, with the attributes straight
-after the data source.
+The username and password can be left out, with the attributes
+straight after the data source.
 
 Unlike the DBI's C<connect>, it B<always croaks> if the connection
 fails, whatever C<RaiseError> is set to. The message is the one the DBI
@@ -204,6 +364,9 @@ raises under C<RaiseError>, such as
 C<DBIx::Squirrel connect('dbname=music.db','',...) failed: ...>, and
 it's reported at the line that called C<connect>. The DBI returns
 C<undef> without C<RaiseError>.
+
+    eval { DBIx::Squirrel->connect('dbi:NoSuchDriver:x', {RaiseError => 0, PrintError => 0}) };
+    say $@ ? 'croaked' : 'returned';    # croaked
 
 =head2 Connecting with an existing handle
 
@@ -214,27 +377,58 @@ come from DBIx::Squirrel, from the DBI itself, or from code that made
 its own connection. So a plain DBI handle can be turned into
 DBIx::Squirrel's:
 
-    my $plain = DBI->connect($data_source, $username, $password);
-    my $dbh   = DBIx::Squirrel->connect($plain);
+    use DBI;
 
-The new handle keeps the first one's C<ekorn_> defaults. Any passed take
-their place. It's a separate connection, not a second name for the
-first. It doesn't share the first one's transaction, temporary tables
-or session settings. An in-memory SQLite database, for example, gives
-a new, empty database.
+    my $plain    = DBI->connect('dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1});
+    my $squirrel = DBIx::Squirrel->connect($plain);
+    say ref $squirrel;    # DBIx::Squirrel::db
 
-=head2 connect_cached
+The new handle keeps the first one's C<ekorn_> defaults. Any passed
+take their place. It's a separate connection, not a second name for
+the first. It doesn't share the first one's transaction, temporary
+tables or session settings. An in-memory SQLite database, for example,
+gives a new, empty database.
 
-C<connect_cached> is the DBI's own. It calls C<connect> when it needs a
-new connection, so it croaks on failure too. DBIx::Squirrel's own
-attributes are part of the cache's key. Two calls with the same
-attributes have the same handle, and calls with different ones don't.
+=head2 DBIx::Squirrel's own attributes
+
+Attributes whose names start C<ekorn_> are DBIx::Squirrel's own. They
+aren't passed on to the DBI. Passed to C<connect>, they're the defaults
+for every statement the handle prepares. Passed to C<prepare> (or
+C<prepare_cached>, C<do>, C<iterate>, C<results> and the select methods),
+they override those defaults for one statement.
+
+=over 4
+
+=item C<ekorn_dialect>
+
+The database whose rules statements are read by, such as C<mysql> or C<Pg>. C<connect> works it out when it isn't given. See L<The dialect|/"The dialect">.
+
+=item C<ekorn_finish_active>
+
+When true, a statement still active from an earlier C<execute> is finished before it's executed again. See L<execute|/"execute">.
+
+=item C<ekorn_slice>
+
+The shape an iterator fetches rows in: an array reference for arrays, the default, or a hash reference for hashes. See L<Rows as arrays or hashes|/"Rows as arrays or hashes">.
+
+=item C<ekorn_result_class>
+
+The base class of a result set's row objects, a subclass of C<DBIx::Squirrel::Result>. See L<Methods of your own|/"Methods of your own">.
+
+=back
+
+    my $hashes = DBIx::Squirrel->connect('dbi:SQLite:dbname=music.db', {
+        RaiseError  => 1,
+        ekorn_slice => {},    # iterators fetch hashes, by default
+    });
+    say $hashes->iterate('SELECT name FROM artist WHERE id = 1')->first->{name};                        # Abba
+    say $hashes->iterate('SELECT name FROM artist WHERE id = 1', {ekorn_slice => []})->first->[0];    # Abba
 
 =head2 The dialect
 
 Statements are read by the rules of the database they're for: where
 strings start and end, and what's a comment (see
-L<Placeholders|/"Placeholders">). The dialect is given in the
+L<Placeholders|/"2. Placeholders">). The dialect is given in the
 C<ekorn_dialect> attribute. When it isn't, C<connect> works it out:
 
 =over 4
@@ -259,62 +453,27 @@ rules.
 
 Name the dialect when C<connect> can't tell:
 
-    # MySQL, through a driver that doesn't say what's behind it
-    $dbh = DBIx::Squirrel->connect($data_source, $username, $password, {
-        ekorn_dialect => 'mysql',
-    });
+    $dbh = DBIx::Squirrel->connect($odbc_data_source, $username, $password, {ekorn_dialect => 'mysql'});
 
 =head2 Subclassing
 
 Called on a subclass of DBIx::Squirrel, C<connect> uses that subclass's
-database and statement handle classes. The DBI requires the subclass to
-have both, and each must be a subclass of DBIx::Squirrel's:
+database and statement handle classes. The DBI requires the subclass
+to have both, and each must be a subclass of DBIx::Squirrel's:
 
     package My::Squirrel     { our @ISA = 'DBIx::Squirrel' }
     package My::Squirrel::db { our @ISA = 'DBIx::Squirrel::db' }
     package My::Squirrel::st { our @ISA = 'DBIx::Squirrel::st' }
 
-    my $dbh = My::Squirrel->connect($data_source, $username, $password);
+    my $mine = My::Squirrel->connect('dbi:SQLite:dbname=music.db', {RaiseError => 1});
+    say ref $mine;    # My::Squirrel::db
 
-Without them, the DBI warns that the subclass isn't set up, and returns
-its own handles.
+Without them, the DBI warns that the subclass isn't set up, and
+returns its own handles.
 
-=head1 DBIx::Squirrel's own attributes
+=head1 2. Placeholders
 
-Attributes whose names start C<ekorn_> are DBIx::Squirrel's own. They
-aren't passed on to the DBI. Passed to C<connect>, they're the defaults
-for every statement the handle prepares. Passed to C<prepare> (or
-C<prepare_cached>, C<do>, C<iterate> and the others), they override those
-defaults for one statement.
-
-=over 4
-
-=item C<ekorn_dialect>
-
-The driver whose rules statements are read by, such as C<mysql> or C<Pg>. C<connect> works it out when it isn't given. See L<The dialect|/"The dialect">.
-
-=item C<ekorn_finish_active>
-
-When true, a statement still active from an earlier C<execute> is finished before it's executed again. See L<execute|/"execute">.
-
-=item C<ekorn_slice>
-
-The shape an iterator fetches rows in: an array reference for arrays (the default), or a hash reference for hashes. See L<Rows as arrays or hashes|/"Rows as arrays or hashes">.
-
-=item C<ekorn_result_class>
-
-The base class of a result set's row objects, a subclass of C<DBIx::Squirrel::Result>. See L<Methods of your own|/"Methods of your own">.
-
-=back
-
-    my $dbh = DBIx::Squirrel->connect($data_source, $username, $password, {
-        RaiseError  => 1,
-        ekorn_slice => {},           # iterators fetch hashes, by default
-    });
-
-    my $sth = $dbh->prepare($statement, {ekorn_slice => []});    # arrays, here
-
-=head1 Placeholders
+The user guide's L<chapter 2|DBIx::Squirrel::Manual::HowTo/"2. Writing statements">.
 
 =head2 The styles
 
@@ -361,8 +520,8 @@ B<How values are bound:> By name.
 
 =back
 
-A statement uses B<one style> throughout. C<prepare> croaks if it finds
-more than one, listing each as an example:
+A statement uses B<one style> throughout. C<prepare> croaks if it
+finds more than one, listing each as an example:
 C<Expected one placeholder style, not several (?, :name)>.
 
 The same placeholder can appear more than once:
@@ -378,18 +537,19 @@ number, and numbers start from 1.
 
 =item *
 
-A B<named> placeholder is bound by name, wherever it appears. Values
-are given as pairs or in a hash reference, with or without the sigil.
-There must be a value for each name, and no other.
+A B<named> placeholder is bound by name, wherever it appears.
+Values are given as pairs or in a hash reference, with or without
+the sigil. There must be a value for each name, and no other.
 
 =back
 
-    my $sth = $dbh->prepare('SELECT * FROM artist WHERE id = :id OR parent_id = :id');
-    $sth->execute(id => 2);
-    $sth->execute({':id' => 2});
+    say join ' ', $dbh->selectrow_array('SELECT $2 + $1, $1', 10, 20);    # 30 10
 
-    $sth = $dbh->prepare('SELECT * FROM artist WHERE id = $1 OR parent_id = $1');
-    $sth->execute(2);
+    my $sth = $dbh->prepare('SELECT name FROM artist WHERE id = :id OR id = :id + 10');
+    $sth->execute(id => 2);
+    say $sth->fetchrow_arrayref->[0];    # Blur
+    $sth->execute({':id' => 3});
+    say $sth->fetchrow_arrayref->[0];    # Cream
 
 =head2 Lists
 
@@ -397,10 +557,8 @@ A placeholder with C<...> before it takes a list. It's written as a C<?>
 for each of its values, separated by commas. Use it for C<IN>, and
 anywhere else SQL takes a list of values:
 
-    my $rows = $dbh->selectall_arrayref(
-        'SELECT * FROM artist WHERE id IN (...:ids)', ids => [1, 2, 3],
-    );
-    # SELECT * FROM artist WHERE id IN (?, ?, ?), with 1, 2 and 3
+    my $names = $dbh->selectcol_arrayref('SELECT name FROM artist WHERE id IN (...:ids) ORDER BY id', ids => [1, 2]);
+    say "@$names";    # Abba Blur
 
 Any style can take a list: C<...?>, C<...?1>, C<...:1>, C<...$1>,
 C<...:name> or C<...$name>. The list is a reference to an array of at
@@ -408,11 +566,11 @@ least one plain value. It's given as any other value is: by name, or
 in order. Given to a statement whose one value is a list, a single
 array reference is the list, not the values in it:
 
-    $dbh->selectall_arrayref('SELECT * FROM artist WHERE id IN (...?)', [1, 2, 3]);
-    $dbh->selectall_arrayref(
-        'SELECT * FROM artist WHERE name = ? OR id IN (...?)',
-        'Abba', [1, 2, 3],
-    );
+    my $one = $dbh->selectcol_arrayref('SELECT name FROM artist WHERE id IN (...?) ORDER BY id', [1, 3]);
+    say "@$one";    # Abba Cream
+
+    my $two = $dbh->selectcol_arrayref('SELECT name FROM artist WHERE name = ? OR id IN (...?) ORDER BY id', 'Abba', [2]);
+    say "@$two";    # Abba Blur
 
 =over 4
 
@@ -421,7 +579,7 @@ array reference is the list, not the values in it:
 B<It's prepared with its values.> How many values a list has
 decides the statement the DBI prepares. So a statement taking a list
 is prepared by a method given its values: C<do>, the select methods,
-C<iterate>, C<results>, and Sugar's functions. C<prepare> and
+C<iterate>, C<results>, and the Sugar's functions. C<prepare> and
 C<prepare_cached> croak:
 C<Expected bind values with a statement taking a list (...:ids)>.
 
@@ -430,25 +588,24 @@ C<Expected bind values with a statement taking a list (...:ids)>.
 B<A list has at least one plain value.> An empty list croaks, as
 C<IN ()> isn't SQL, so the empty case is left to you:
 C<Expected at least one value in a list (...:ids)>. So does a plain
-value or C<undef> in place of a list. So does a list holding a
-reference, such as C<[[1, 2, 3]]> to a statement whose one value is a
-list.
+value or C<undef> in place of a list. So does a list holding an
+unblessed reference, such as C<[[1, 2, 3]]> to a statement whose one
+value is a list. An object in a list is a value.
 
 =item *
 
-B<A placeholder takes a list everywhere it's used, or nowhere.> Used
-twice, it takes its list in both places.
+B<A placeholder takes a list everywhere it's used, or nowhere.>
+Used twice, it takes its list in both places.
 
 =item *
 
 B<Its handle is for lists of the lengths it was prepared for.> The
 statement handle of a statement taking a list, such as an iterator's
 C<sth>, can be executed again with lists of the same lengths. Given
-another length, it croaks. An iterator's
-L<C<reset>|/"Iterator methods"> prepares the statement again, on a new
-handle, when a list has a different number of values. A Sugar
-statement taking a list isn't cached, as each length makes a
-different statement.
+another length, it croaks. An iterator's L<C<reset>|/"reset"> prepares
+the statement again, on a new handle, when a list has a different
+number of values. A Sugar statement taking a list isn't cached, as
+each length makes a different statement.
 
 =item *
 
@@ -494,12 +651,15 @@ an identifier containing C<$>, such as C<v$session>.
 
 =back
 
+    my $row = $dbh->selectrow_arrayref(q{SELECT '10:30', :name -- not :a placeholder}, undef, name => 'Abba');
+    say "@$row";    # 10:30 Abba
+
 To use a C<?>, C<:> or C<$> that isn't a placeholder, put a backslash
 before it, as DBD::Pg allows. PostgreSQL's C<?>, C<?|> and C<?&>
 operators are examples. The backslash and the character after it are
 passed on unchanged, and DBD::Pg removes the backslash:
 
-    $dbh->prepare(q{SELECT * FROM doc WHERE data \? 'key' AND id = :id});
+    $pg->prepare(q{SELECT * FROM doc WHERE data \? 'key' AND id = :id});
 
 =head2 Strings, by dialect
 
@@ -515,8 +675,8 @@ MySQL's C<NO_BACKSLASH_ESCAPES> mode isn't noticed.
 
 =item *
 
-With other dialects, a backslash is an ordinary character in a string
-(C<'C:\'>), except in PostgreSQL's C<E'...'> strings.
+With other dialects, a backslash is an ordinary character in a
+string (C<'C:\'>), except in PostgreSQL's C<E'...'> strings.
 
 =back
 
@@ -526,8 +686,8 @@ To read one statement as another dialect, give it C<ekorn_dialect>:
 
 =head2 DBD::Pg's own options
 
-DBD::Pg's placeholder options are followed, whether set on the database
-handle or passed to C<prepare>:
+DBD::Pg's placeholder options are followed, whether set on the
+database handle or passed to C<prepare>:
 
 =over 4
 
@@ -544,7 +704,10 @@ placeholders, so array slices such as C<data[:2]> are left alone.
 
 =back
 
-=head1 Preparing statements
+=head1 3. Preparing, binding and running
+
+The user guide's L<chapter
+3|DBIx::Squirrel::Manual::HowTo/"3. Binding values and running statements">.
 
 =head2 prepare
 
@@ -576,6 +739,14 @@ a statement handle, whose statement is prepared again.
 
 =back
 
+    my $sth = $dbh->prepare(['SELECT title', 'FROM album', 'WHERE id = ?']);
+    $sth->execute(1);
+    say $sth->fetchrow_arrayref->[0];    # Arrival
+
+    my $again = $dbh->prepare(sub { 'SELECT name FROM artist WHERE id = ?' });
+    $again->execute(3);
+    say $again->fetchrow_arrayref->[0];    # Cream
+
 Blank space around the statement is removed. Comments are passed on to
 the database.
 
@@ -591,34 +762,6 @@ again when it has that many.
 
 A statement taking a L<list|/"Lists"> can't be prepared without its
 values, so C<prepare> croaks given one.
-
-=head2 prepare_cached
-
-    $sth = $dbh->prepare_cached($statement);
-    $sth = $dbh->prepare_cached($statement, \%attr);
-    $sth = $dbh->prepare_cached($statement, \%attr, $if_active);
-
-As C<prepare>, using the DBI's cache of statement handles. Its errors
-name C<prepare_cached>, as the DBI's do. Like C<prepare>, it croaks given
-a statement taking a L<list|/"Lists">.
-
-Two statements can be rewritten the same: C<SELECT :a, :b> and
-C<SELECT :b, :a> both become C<SELECT ?, ?>. Each still has a handle of
-its own, as the statement as written is part of the cache's key.
-DBIx::Squirrel's own attributes are part of the key too. So a
-statement prepared with C<< {ekorn_slice => {}} >> and one prepared without
-have different handles.
-
-The DBI finishes a cached handle that's still active before handing it
-out. If an iterator is part way through the handle, that would cut its
-results short. So such a handle isn't handed out or finished. A new
-handle is made instead, and cached in its place. The exception is
-C<$if_active> of 2, which asks for the cached handle, unchanged.
-Otherwise, C<$if_active> means what it does to the DBI. A cached handle
-that's active, with no iterator, is finished, after a warning, unless
-C<$if_active> says otherwise.
-
-=head1 Binding and executing
 
 =head2 execute
 
@@ -636,13 +779,16 @@ A statement with numbered or named placeholders, executed without
 values, croaks unless each placeholder already has a value bound. The
 value can come from L<C<bind>|/"bind">, L<C<bind_param>|/"bind_param"> or an
 earlier C<execute>, as the DBI keeps them. The DBI would leave the
-placeholder unbound, which most drivers read as C<NULL>. C<do>, iterators
-and the select methods check the same way:
+placeholder unbound, which most drivers read as C<NULL>. C<do>,
+iterators and the select methods check the same way:
 
-    $sth = $dbh->prepare('SELECT * FROM artist WHERE id = :id');
-    $sth->execute;              # croaks: Expected a value for each placeholder (none for id)
+    my $sth = $dbh->prepare('SELECT name FROM artist WHERE id = :id');
+    eval { $sth->execute };
+    print $@;    # Expected a value for each placeholder (none for id) at ... line ...
+
     $sth->bind_param(id => 1);
-    $sth->execute;              # runs with id 1
+    $sth->execute;
+    say $sth->fetchrow_arrayref->[0];    # Abba
 
 The DBI doesn't finish a statement still active from an earlier
 C<execute> before executing it again. Nor does C<execute>, unless the
@@ -660,6 +806,10 @@ Binds values to the statement's placeholders without executing it.
 Returns the statement handle, or nothing if the DBI couldn't bind a
 value. How values are matched to placeholders depends on the
 L<style|/"The styles">.
+
+    my $sth = $dbh->prepare('SELECT name FROM track WHERE plays > :plays ORDER BY plays DESC');
+    $sth->bind(plays => 8000)->execute;
+    say $sth->fetchrow_arrayref->[0];    # Dancing Queen
 
 If the values don't match the placeholders, it croaks at the caller's
 line:
@@ -690,6 +840,10 @@ A single array reference stands for the values in it, so
 C<< $sth->bind([1, 2]) >> is C<< $sth->bind(1, 2) >>. The same goes for
 C<execute>, C<do> and the select methods.
 
+An object is a value, as it is to the DBI, whatever it's made of: a
+blessed array isn't unwrapped, and a blessed hash isn't taken for
+the attributes.
+
 There are two exceptions, each for a statement taking one value:
 
 =over 4
@@ -702,10 +856,10 @@ reference is the list.
 =item *
 
 DBD::Pg binds an array reference as a PostgreSQL array. So, with
-DBD::Pg, an array reference given to a statement taking one value, such as
-C<SELECT * FROM artist WHERE id = ANY(?)>, is that value, as it would
-be with the DBI. Through another driver, such as DBD::ODBC, it's
-unwrapped as usual, as the driver can't bind arrays.
+DBD::Pg, an array reference given to a statement taking one value,
+such as C<SELECT * FROM artist WHERE id = ANY(?)>, is that value, as
+it would be with the DBI. Through another driver, such as DBD::ODBC,
+it's unwrapped as usual, as the driver can't bind arrays.
 
 =back
 
@@ -731,8 +885,8 @@ or C<'$1'>;
 
 =item *
 
-by name, for named placeholders, with or without the sigil: C<'id'> or
-C<':id'>;
+by name, for named placeholders, with or without the sigil: C<'id'>
+or C<':id'>;
 
 =item *
 
@@ -747,9 +901,10 @@ to a position of its own.
     my $sth = $dbh->prepare('SELECT :a + :a, :b');
     $sth->bind_param(a => 2);
     $sth->bind_param(':b', 3);
-    $sth->execute;    # SELECT 2 + 2, 3
+    $sth->execute;
+    say join ' ', @{ $sth->fetchrow_arrayref };    # 4 3
 
-=head1 do
+=head2 do
 
     $rv = $dbh->do($statement);
     $rv = $dbh->do($statement, \%attr, @bind_values);
@@ -762,13 +917,16 @@ C<RaiseError>. An error names C<do>, as the DBI's does:
 C<DBD::SQLite::db do failed: ...>.
 
 Unlike the DBI's, the attributes may be left out. The first argument
-after the statement is taken as the attributes only if it's a hash
-reference or C<undef>. An array reference there stands for the
-L<values in it|/"An array reference of values">. Any other reference
-croaks: C<Expected a reference to a HASH or ARRAY>.
+after the statement is taken as the attributes only if it's an
+unblessed hash reference or C<undef>. An array reference there stands
+for the L<values in it|/"An array reference of values">. Any other
+unblessed reference croaks: C<Expected a reference to a HASH or ARRAY>.
+An object there is a bind value, as it is to the DBI.
 
-    $dbh->do('UPDATE artist SET name = :name WHERE id = :id', name => 'Blur', id => 2);
-    $dbh->do('UPDATE artist SET name = ? WHERE id = ?', ['Blur', 2]);
+    $dbh->begin_work;
+    say $dbh->do('UPDATE artist SET name = :name WHERE id = :id', name => 'BLUR', id => 2);    # 1
+    say $dbh->do('UPDATE artist SET name = ? WHERE id = ?', ['Blur', 2]);                       # 1
+    $dbh->rollback;
 
 A statement with C<?> placeholders, or none, goes to the driver's own
 C<do>, as with plain DBI. So the driver's row counts and options apply,
@@ -780,47 +938,71 @@ they're fetched, giving C<0E0>.
 
 Like the DBI's, C<do> returns no rows, even from a C<SELECT> or a
 C<RETURNING> clause. Use C<prepare> and C<execute>, an
-L<iterator|/"Iterators">, or the select methods, for those.
+L<iterator|/"4. Iterators">, or the select methods, for those.
 
-=head1 The select methods
+=head2 The select methods
 
-    @row_ary  = $dbh->selectrow_array($statement, \%attr, @bind_values);
-    @row_ary  = $dbh->selectrow_array($statement, @bind_values);
-    $ary_ref  = $dbh->selectrow_arrayref($statement, \%attr, @bind_values);
-    $hash_ref = $dbh->selectrow_hashref($statement, \%attr, @bind_values);
-    $ary_ref  = $dbh->selectall_arrayref($statement, \%attr, @bind_values);
-    $hash_ref = $dbh->selectall_hashref($statement, $key_field, \%attr, @bind_values);
-    $ary_ref  = $dbh->selectcol_arrayref($statement, \%attr, @bind_values);
+    @row_ary  = $dbh->selectrow_array($statement, \%attr, @bind_values, @stages);
+    $ary_ref  = $dbh->selectrow_arrayref($statement, \%attr, @bind_values, @stages);
+    $hash_ref = $dbh->selectrow_hashref($statement, \%attr, @bind_values, @stages);
+    $ary_ref  = $dbh->selectall_arrayref($statement, \%attr, @bind_values, @stages);
+    @rows     = $dbh->selectall_array($statement, \%attr, @bind_values, @stages);
+    $hash_ref = $dbh->selectall_hashref($statement, $key_field, \%attr, @bind_values, @stages);
+    $ary_ref  = $dbh->selectcol_arrayref($statement, \%attr, @bind_values, @stages);
 
-Each works as the DBI's does. It prepares the statement as C<prepare>
-does, unless it's already a statement handle, and binds the values as
-L<C<bind>|/"bind"> binds them. The DBI's C<selectall_array> goes through
-C<selectall_arrayref>, so it does all this too.
+Without stages, each works as the DBI's does. It prepares the
+statement as C<prepare> does, unless it's already a statement handle,
+and binds the values as L<C<bind>|/"bind"> binds them. C<selectall_array>
+gives the rows C<selectall_arrayref> gives, as a list, as the DBI's
+does.
 
 As with L<C<do>|/"do">, the attributes may be left out. The first
 argument after the statement, or after C<selectall_hashref>'s key
-field, is taken as the attributes only if it's a hash reference or
-C<undef>. So named values given in a hash reference, or a first value
-that's C<undef>, need the attributes, or C<undef>, in front.
+field, is taken as the attributes only if it's an unblessed hash
+reference or C<undef>. So named values given in a hash reference, or a
+first value that's C<undef>, need the attributes, or C<undef>, in front.
 
-    my $names = $dbh->selectcol_arrayref(
-        'SELECT name FROM artist WHERE id IN ($1, $2)', 1, 2,
+B<Given stages after the bind values,> each pushes what the DBI's
+method returns through them, as a pipeline called with values does. It
+returns every value that comes out of the last. Where one value is
+asked for, it returns a sink's result, if a sink is last, or else how
+many values came out. C<selectrow_array> pushes the row's values,
+C<selectall_array> each row, and the others their one reference. As a
+pushed run has no statement as its source, the stages can't use
+C<pluck> by a name for an array row, or C<as_hash>.
+
+    my @names = $dbh->selectall_array(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        sub {uc},
     );
+    say "@names";    # ABBA BLUR CREAM
+
+    say scalar $dbh->selectall_array('SELECT * FROM artist', sub { $_->[0] > 1 ? $_ : () });    # 2
+
+    my $col = $dbh->selectcol_arrayref('SELECT name FROM artist WHERE id IN ($1, $2) ORDER BY id', 1, 2);
+    say "@$col";    # Abba Blur
 
 Unlike C<prepare>, they don't croak if the statement can't be prepared.
 Without C<RaiseError>, each returns what the DBI's returns, C<undef> or
 nothing.
 
-=head1 Iterators
+=head1 4. Iterators
 
-An iterator executes a statement and hands out its results one at a
-time. Each row is run through a L<pipeline|/"Pipelines"> of stages.
+The user guide's L<chapter
+4|DBIx::Squirrel::Manual::HowTo/"4. A statement as a source of rows">.
+
+An iterator treats a statement as a source of rows, read only as
+they're wanted. Each row is run through the iterator's
+L<stages|/"5. Stages and Context">, if any, and what comes out is a
+result. With no stages, the result is the row.
 
 =head2 iterate
 
-    $it = $dbh->iterate($statement, \%attr, @bind_values, @stages);
-    $it = $dbh->iterate($statement, @bind_values, @stages);
-    $it = $sth->iterate(@bind_values, @stages);
+    $it     = $dbh->iterate($statement, \%attr, @bind_values, @stages);
+    $it     = $dbh->iterate($statement, @bind_values, @stages);
+    $it     = $sth->iterate(@bind_values, @stages);
+    @result = $dbh->iterate($statement, @bind_values, @stages, $sink);
 
 On a database handle, C<iterate> prepares the statement, as C<prepare>
 does, and returns a C<DBIx::Squirrel::Iterator> over its results. As
@@ -828,26 +1010,41 @@ with C<do>, the attributes may be left out. On a statement handle, it
 returns an iterator over that statement's results.
 
 The bind values are in any form C<execute> takes. The B<stages> are at
-the end of the arguments. Each is a code reference, or a pipeline,
-which stands for its stages. Each row is run through them, and what
-comes out is the result. With no stages, the result is the row. A
-stage can name the row with a signature, or leave it out and use C<$_>,
-as here. See L<Stages|/"Stages">.
+the end of the arguments: code references, pipelines, or any of
+Ekorn::Pipeline's stages. Each row is run through them, in order. See
+L<Stages|/"Stages">.
 
-    my $it = $dbh->iterate(
-        'SELECT id, name FROM artist WHERE name LIKE :pattern',
-        pattern => 'A%',
-        sub { $_->[1] },
-    );
+B<A sink given last says what comes back.> If the last stage is one
+of Ekorn::Pipeline's L<sinks|/"8. Sinks">, C<iterate> reads the run to its
+end and returns the sink's result, not an iterator.
+
+    my $it = $dbh->iterate('SELECT name FROM artist WHERE name LIKE :pattern ORDER BY id', pattern => '%r%', sub { $_->[0] });
     while (my($name) = $it->next) {
         say $name;
     }
+    # Blur
+    # Cream
 
 The statement isn't executed until the first result is asked for. It's
-finished when the results run out, or when the iterator is ended early,
-by a L<stop|/"Stopping a pipeline"> or by C<single>.
+finished when the results run out, when the run is ended early, by a
+L<stop|/"6. Stopping a pipeline">, or by C<first> or C<single>, and when
+the iterator is let go.
 
-Rows are fetched 100 at a time, with the DBI's C<fetchall_arrayref>.
+=head2 How rows are fetched
+
+Rows are fetched with the DBI's C<fetchall_arrayref>, 2 at first, the
+least that tells whether there's a second, then twice as many each
+time a fetch fills its batch, up to 64. Past 64, each fetch's cost is
+spread so thin that a bigger batch reads hardly any faster, and holds
+more of a wide row's data. So reading one row fetches no more than
+two, and DBIx::Squirrel holds no more than 64 rows of a result.
+
+The driver may hold more. DBD::SQLite reads rows as they're fetched,
+but DBD::Pg and DBD::mysql receive the whole result when the
+statement is executed. With MySQL, the C<mysql_use_result> attribute
+makes the driver read rows as they're fetched. With PostgreSQL, a
+cursor does, declared and fetched from in your SQL.
+
 Without stages, C<all> takes what's left of the batch and fetches the
 rest at once. That's nearly as quick as the DBI's own
 C<selectall_arrayref>. With stages, each row goes through them in turn,
@@ -855,13 +1052,10 @@ which costs a little for each row. So to change every row of a large
 result, when nothing needs to stop early, C<map> over C<all> is quicker
 than a stage:
 
-    my @names = map { $_->[0] } $dbh->iterate('SELECT name FROM artist')->all;
+    my @names = map { $_->[0] } $dbh->iterate('SELECT name FROM artist ORDER BY id')->all;
+    say "@names";    # Abba Blur Cream
 
-Use stages when the rows should come one at a time, from C<next>, or
-may stop early, or should go with the statement, as in
-L<Sugar|/"A function for each database and statement: Sugar">.
-
-=head2 Iterator methods
+=head2 The iterator's methods
 
 =over 4
 
@@ -871,19 +1065,23 @@ Returns the next result, or an empty list when there are no more.
 
 =item C<all>
 
-Returns the results not yet handed out. In scalar context, it returns how many there were. Without stages, it fetches the rest at once.
+Returns the results still to come, reading the run to its end: as a list, or, asked for one value, an array reference of them, never a count. The statement is then finished. Without stages, it fetches the rest at once.
+
+=item C<first>
+
+Returns the next result, or C<undef> if there's none, and finishes the statement.
 
 =item C<single>
 
-Executes the statement again, and returns its one result, or nothing if it has none. It croaks if there's more than one: C<Expected one result, not more>.
+Returns the next result, or C<undef> if there's none, and finishes the statement. If there's another, it warns, C<Expected only one item, but there were more>, and returns the first: for a statement that lost its C<LIMIT 1>.
+
+=item C<ended>
+
+Returns how the last run ended: C<done>, C<stopped> or C<died>; nothing while a run is going, or before one has started.
 
 =item C<reset>
 
-Executes the statement again, ready to iterate from its first row, and returns the iterator. If the statement is still active, it's finished first. A statement taking a L<list|/"Lists"> is prepared again, on a new handle, if a list has a different number of values.
-
-=item C<count>
-
-Returns the number of results handed out so far.
+Runs the statement again, from its first row, and returns the iterator. See L<reset|/"reset">.
 
 =item C<column_names>
 
@@ -896,21 +1094,46 @@ Returns the statement handle. It changes when C<reset> prepares a statement taki
 =back
 
 A stage can return C<undef> as a result. So read C<next> in list
-context, as above, rather than testing whether what it returns is
-defined.
+context, as below, rather than testing whether what it returns is
+defined. C<all>, C<first> and C<single> take what's left of the run, so
+after C<next> they start from the next result:
 
-C<reset> takes new bind values, which replace those given before. It
-also takes new stages, which are added to those given when the
-iterator was made. Both are kept until others are given:
+    my $it = $dbh->iterate('SELECT name FROM artist ORDER BY id', sub { $_->[0] });
+    my($abba) = $it->next;
+    say $abba;                  # Abba
+    say join ' ', $it->all;     # Blur Cream
+    say $it->ended;             # done
 
-    my $it = $dbh->iterate('SELECT name FROM artist WHERE id > ?', 0);
-    my @all   = $it->all;
-    my @later = $it->reset(10)->all;
-    my @upper = $it->reset(sub ($row) { uc $row->[0] })->all;    # still id > 10
+    say $dbh->iterate('SELECT name FROM artist ORDER BY id', sub { $_->[0] })->first;    # Abba
+    say $dbh->iterate('SELECT COUNT(*) FROM track', sub { $_->[0] })->single;          # 6
+    say join ', ', $dbh->iterate('SELECT id, title AS Album FROM album')->column_names;    # id, Album
 
-C<single> is for statements expected to find one row:
+C<ended> is C<done> when the rows ran out, C<stopped> when the run was
+cut short, by C<first>, by C<single> finding a second result, or by a
+stage that stopped, and C<died> when a stage died. A run read with C<|>
+or C<@{}> is the iterator's last run too (see L<11.
+Operators|/"11. Operators: E<verbar> and @{}">).
 
-    my $count = $dbh->iterate('SELECT COUNT(*) FROM artist', sub ($row) { $row->[0] })->single;
+=head2 reset
+
+    $it = $it->reset;
+    $it = $it->reset(@bind_values, @stages);
+
+Executes the statement again, ready to iterate from its first row, and
+returns the iterator. If the statement is still active, it's finished
+first, and whatever the run before held goes with it. Bind values
+given replace those given before. Stages given are added to those
+given when the iterator was made. Both are kept until others are
+given:
+
+    my $it = $dbh->iterate('SELECT name FROM artist WHERE id > ? ORDER BY id', 0, sub { $_->[0] });
+    say join ' ', $it->all;                      # Abba Blur Cream
+    say join ' ', $it->reset(1)->all;            # Blur Cream
+    say join ' ', $it->reset(sub {lc})->all;     # blur cream
+
+A statement taking a L<list|/"Lists"> is prepared again, on a new
+statement handle, if a list given has a different number of values
+from the one before. C<sth> then returns the new handle.
 
 =head2 Rows as arrays or hashes
 
@@ -920,10 +1143,8 @@ array reference for arrays, or a hash reference for hashes. Given to
 C<connect>, it's the default for each statement the handle prepares.
 Given to C<prepare> or C<iterate>, it's for that statement.
 
-    my $it = $dbh->iterate(
-        'SELECT id, name FROM artist', {ekorn_slice => {}},
-        sub ($row) { "$row->{id}: $row->{name}" },
-    );
+    my $it = $dbh->iterate('SELECT id, name FROM artist ORDER BY id', {ekorn_slice => {}}, sub { "$_->{id}: $_->{name}" });
+    say join ', ', $it->all;    # 1: Abba, 2: Blur, 3: Cream
 
 =head2 One iterator to a statement handle
 
@@ -931,139 +1152,24 @@ A statement handle can have only one iterator going through its
 results at a time. While the first has results left, executing another
 over the same handle croaks:
 C<Expected the statement handle's other iterator to be finished>. Read
-the first to the end, or let it go out of scope, first.
+the first to the end, or let it go out of scope, first. An iterator
+that's let go ends its run, and finishes its statement.
 
-=head1 Result sets and row objects
+=head1 5. Stages and Context
 
-=head2 results
-
-    $results = $dbh->results($statement, \%attr, @bind_values, @stages);
-    $results = $dbh->results($statement, @bind_values, @stages);
-    $results = $sth->results(@bind_values, @stages);
-
-As L<C<iterate>|/"iterate">, returning a C<DBIx::Squirrel::Results>. That's
-an iterator whose rows are objects, with a method for each column,
-named in lower case. The stages see the objects. A result set has the
-iterator's methods, and no others.
-
-    my $results = $dbh->results('SELECT id, Name FROM artist WHERE id <= ?', 10);
-    while (my($artist) = $results->next) {
-        say $artist->id, ' ', $artist->name;
-    }
-
-    say $dbh->results('SELECT * FROM artist WHERE id = $1', 1)->single->name;
-
-Rows are always fetched as arrays for a result set. The C<ekorn_slice>
-attribute doesn't apply.
-
-=head2 Row objects
-
-Each row is an array, blessed into a class with a method for each
-column. There's one class for each base class and list of column
-names. It's made the first time a result set fetches rows with those
-columns, and kept for the life of the program. A row needs nothing
-from its result set, and can be kept after the result set has gone.
-
-A column gets no method:
-
-=over 4
-
-=item *
-
-if its name can't be a method's, such as C<count(*)>;
-
-=item *
-
-if the base class already has a method of that name, such as C<can>,
-C<isa>, C<get_column>, or one of your own.
-
-=back
-
-When two columns have one name, as in C<SELECT a.id, b.id>, the method
-is the first's. To give such a column a method, give it another name
-in the statement, with C<AS>:
-
-    my $row = $dbh->results(
-        'SELECT COUNT(*) AS total, class AS kind, b.id AS b_id FROM ...'
-    )->single;
-    say $row->total, ' ', $row->kind, ' ', $row->b_id;
-
-=head2 get_column
-
-    $value = $row->get_column($name);
-    $value = $row->get_column($position);
-
-Returns a column's value by its name, in any case, or by its position,
-from 0. It reaches every column, including those without a method. It
-croaks if the row has no such column:
-C<Expected a column of the row (x)>.
-
-=head2 Methods of your own
-
-Row classes are subclasses of C<DBIx::Squirrel::Result>. Or they're
-subclasses of the class given in the C<ekorn_result_class> attribute,
-which must itself be a subclass of C<DBIx::Squirrel::Result>. So rows
-can have methods of your own:
-
-    package My::Artist {
-        our @ISA = 'DBIx::Squirrel::Result';
-        sub shout ($self) { return uc $self->name }
-    }
-
-    my $results = $dbh->results($statement, {ekorn_result_class => 'My::Artist'});
-    say $results->single->shout;
-
-A class that isn't a subclass of C<DBIx::Squirrel::Result> croaks:
-C<Expected ekorn_result_class to be a subclass of DBIx::Squirrel::Result (My::Other)>.
-
-=head1 Pipelines
-
-A pipeline is a list of stages. A stage is a code reference, or
-another pipeline, which stands for its stages. See
-L<A pipeline's stages|/"A pipeline's stages">. Iterators and result sets
-run their stages with a pipeline. You can also use one on its own,
-with C<DBIx::Squirrel::Pipeline>, or on a handle, with
-L<C<pipe> and C<tap>|/"pipe and tap on handles">. A function of your own
-can take stages from its caller, as C<iterate> does, and run what it
-returns through them. Loading a pipeline doesn't load the DBI, so that
-works in code that has nothing to do with a database.
-
-The pipeline is L<Ekorn::Pipeline|Ekorn::Pipeline>'s.
-It began here, and is now a distribution of its own, so that any
-function can take stages from its caller. DBIx::Squirrel keeps its own
-names for the modules: C<DBIx::Squirrel::Pipeline>,
-C<DBIx::Squirrel::Stop>, C<DBIx::Squirrel::Gather>, and the stages in
-C<DBIx::Squirrel::Stages::Flow>, C<Batch> and C<Taps>. They're here to
-stay. Each is a subclass of Ekorn's, or exports Ekorn's functions from
-a list of DBIx::Squirrel's own. So a function added to Ekorn::Pipeline
-reaches DBIx::Squirrel only once it's added to that list, and
-documented here. Stages that need DBIx::Squirrel, such as those in
-C<DBIx::Squirrel::Stages::Rows>, are its own.
-
-The names are DBIx::Squirrel's, but the objects are Ekorn's. A stop
-from C<Stop()> is an C<Ekorn::Pipeline::Stop>, and a stage made with
-C<gather> is an C<Ekorn::Pipeline::Gather>. That's what C<ref> and C<isa>
-see. It's deliberate. DBIx::Squirrel's classes inherit from Ekorn's,
-never the reverse, so Ekorn::Pipeline knows nothing of DBIx::Squirrel.
-
-Ekorn::Pipeline's L<reference|Ekorn::Pipeline::Manual::Reference>
-describes the pipeline in full, and its
-L<how-to|Ekorn::Pipeline::Manual::HowTo>
-has recipes for any values. This chapter keeps to what DBIx::Squirrel's
-iterators, result sets and handles do with it, and to what's
-DBIx::Squirrel's own. It links there for the rest.
+The user guide's L<chapter
+5|DBIx::Squirrel::Manual::HowTo/"5. Stages: shaping rows on the way out">.
 
 =head2 Stages
 
-A stage that's a code reference is called with one value, as its
-argument and in C<$_>. Write it whichever way reads best: name the
-value with a signature, or leave the signature out and use C<$_>.
+A stage is given one value, as its argument and in C<$_>, and returns a
+list. Write it whichever way reads best: name the value with a
+signature, or leave the signature out and use C<$_>:
 
     sub ($row) { $row->[1] }    # the value, named
     sub { $_->[1] }             # the same, in $_
 
-C<$_> is localised for each call, so your own C<$_> is unchanged. A
-stage returns a list:
+C<$_> is localised for each call, so your own C<$_> is unchanged.
 
 =over 4
 
@@ -1088,315 +1194,63 @@ B<The value:> is replaced by each, which goes through the rest of the stages on 
 =back
 
 Each value goes through every stage before the next one starts. So the
-values come out in order, and a stage sees them in the order a C<for>
-loop would. A stage returns whatever its last statement gives. So a
-stage run for its side effects should still return what the next stage
-needs. L<How values go through stages|Ekorn::Pipeline::Manual::Reference/"How values go through stages">
-has the details.
+values come out in order. A stage returns whatever its last statement
+gives, so a stage run for its side effects should still return what
+the next stage needs.
 
-    use DBIx::Squirrel::Pipeline;
-
-    my $p = DBIx::Squirrel::Pipeline->new(
-        sub { $_->{active} ? $_ : () },          # filter
-        sub ($row) { @{ $row->{tags} } },        # flatMap
-        sub { uc },                              # map
-    );
-
-=head2 Running a pipeline
-
-    my $p = DBIx::Squirrel::Pipeline->new(@stages);
-
-    my @results = $p->(@values);           # push: values in, a list out
-
-    my $next = $p->iterator($source);      # pull: one value per call
-    while (my($x) = $next->()) { ... }
-
-A pipeline is an object that can be called as a code reference. Called
-with values, it returns what comes out of the last stage. C<iterator>
-returns a closure handing out those values one per call. Its source is
-called only when the values from its last call have run out. Read the
-closure in list context, so an C<undef> value isn't mistaken for the
-end. Ekorn's reference has the details:
-L<new|Ekorn::Pipeline::Manual::Reference/"new">,
-with the errors it raises,
-L<calling a pipeline|Ekorn::Pipeline::Manual::Reference/"Calling a pipeline">
-and L<iterator|Ekorn::Pipeline::Manual::Reference/"iterator">.
-
-=head2 A pipeline's stages
-
-    my @stages = $p->stages;
-
-C<stages> returns a pipeline's stages, in order. A pipeline given to
-C<new> as a stage appears as the stages it was made of. In scalar
-context, C<stages> returns how many there are.
-
-A pipeline can go wherever a stage goes: in another pipeline, or given
-to C<iterate>, C<results>, an iterator's C<reset>, C<pipe>, C<tap>, or a
-Sugar function, for a database or a statement. Its stages run in its
-place.
-
-    use DBIx::Squirrel::Stages::Flow;
-    use DBIx::Squirrel::Stages::Rows;
-
-    my $hits = DBIx::Squirrel::Pipeline->new(
-        sub { $_->[1] >= 5000 ? $_ : () },    # 5,000 plays or more
-        pluck('name'),
-    );
-
-    my @hits    = $dbh->iterate('SELECT name, plays FROM track', $hits)->all;
-    my @top_ten = $dbh->iterate('SELECT name, plays FROM track ORDER BY plays DESC',
-        $hits, take(10))->all;
-    my $first   = DBIx::Squirrel::Pipeline->new($hits, take(1));
-
-The stages run as if they were written out where the pipeline stands.
-They belong to that run, so a C<take> inside C<$hits> limits the whole
-run. Give C<< $hits->stages >> only to a function that takes code
-references alone.
-
-Make a stage that counts or remembers with
-L<C<gather>|/"Gathering: stages with state, and an end">. A plain closure is
-the same code reference wherever it goes, so its state is shared by
-every pipeline it's in.
-L<A pipeline as a stage|Ekorn::Pipeline::Manual::Reference/"A pipeline as a stage">,
-in Ekorn's reference, says more.
-
-=head2 When a stage dies
-
-If a stage dies, the pipeline croaks at the line that called it. It
-names the stage by its position, from C<#1>, and indents the stage's
-message. See
-L<When a stage dies|Ekorn::Pipeline::Manual::Reference/"When a stage dies">,
-in Ekorn's reference.
-
-    Pipeline stage #2 failed at script.pl line 12:
-        Illegal division by zero at script.pl line 8.
-
-An exception object is passed on unchanged. A stage inside a pipeline
-given as a stage is named by its place in each: C<#2.3> is the third
-stage of the pipeline given as stage #2.
-
-Once a stage dies, its run has ended. An iterator then returns nothing
-more, whether it's a pipeline's C<iterator> or one that C<iterate> or
-C<results> returns. C<next> returns an empty list on every call after,
-and C<all> returns nothing. No more values are taken from its source,
-and no end function is called. A statement's handle is finished, so no
-more rows are fetched. C<reset> runs the statement again, from the
-start. To pass over a value a stage can't handle, the stage catches
-its own error and returns nothing for it, as
-L<What a stop is|/"What a stop is"> shows.
-
-=head1 Stopping a pipeline
-
-A stage can end a pipeline early and quietly by calling C<Stop>:
-
-=over 4
-
-=item *
-
-The rest of that stage doesn't run.
-
-=item *
-
-The values already out of the pipeline are kept.
-
-=item *
-
-Any values the stop carries go on through the stages after it.
-
-=item *
-
-Nothing else is processed.
-
-=back
-
-An iterator that's stopped finishes its statement. Stages after the
-one that stopped, made with
-L<C<gather>|/"Gathering: stages with state, and an end">, still have their
-end functions called.
-
-    use DBIx::Squirrel::Stop;
-    use DBIx::Squirrel::Context qw(result_number);
-
-    my @first_ten = $dbh->iterate(
-        'SELECT name FROM artist ORDER BY name',
-        sub ($row) { Stop() if result_number() > 10; $row->[0] },
+    my @words = $dbh->iterate(
+        'SELECT title, year FROM album ORDER BY year',
+        sub { $_->[1] < 1990 ? $_ : () },    # filter
+        sub { split ' ', $_->[0] },          # flatMap
+        sub {lc},                            # map
     )->all;
+    say "@words";    # disraeli gears arrival
 
-    # Stop, passing on a last value
-    my $found = $dbh->iterate(
-        $statement,
-        sub ($row) { $row->[0] == $wanted ? Stop($row) : () },
-    )->single;
+A stage can be a code reference, a L<pipeline|/"10. Pipelines">, or one
+of Ekorn::Pipeline's stage objects, such as those its words and the
+canned stages make. L<How values go through
+stages|Ekorn::Pipeline::Manual::Reference/"How values go through stages">,
+in Ekorn's reference, has the details.
 
-C<Stop> is exported by default. C<< DBIx::Squirrel::Stop->throw(@values) >>
-does the same without importing it. To keep C<Stop> out of your
-namespace:
+=head2 Context
 
-    use DBIx::Squirrel::Stop ();
-
-=head2 What a stop is
-
-A stop is an exception. C<DBIx::Squirrel::Stop> is a subclass of
-C<Ekorn::Pipeline::Stop>, and C<Stop()> is Ekorn's. So every stop is an
-C<Ekorn::Pipeline::Stop>, though not every one is a
-C<DBIx::Squirrel::Stop>. Ekorn's reference says what a stop holds, in
-L<The stop object|Ekorn::Pipeline::Manual::Reference/"The stop object">.
-It also says how a subclass of your own stops a pipeline, in
-L<Subclasses|Ekorn::Pipeline::Manual::Reference/"Subclasses">.
-
-A stage that catches errors itself, with C<eval> or C<try>, should throw
-a stop on again. Check for C<Ekorn::Pipeline::Stop>. Every stop is one,
-including those the canned stages throw, such as C<take>'s. Checking
-for C<DBIx::Squirrel::Stop> would miss them:
-
-    sub ($row) {
-        try { ... }
-        catch ($e) {
-            die $e if $e isa 'Ekorn::Pipeline::Stop';
-            ...
-        }
-    }
-
-=head1 Gathering: stages with state, and an end
-
-A stage can't tell when the last value has gone by. And whatever a
-closure keeps stays there from one run of the pipeline to the next.
-C<gather> makes a stage that has both: state of its own on each run,
-and an end function, called once the values run out.
-
-    use DBIx::Squirrel::Gather;
-
-    # Rows in batches of $size, the last, shorter one at the end
-    sub batches_of ($size) {
-        return gather {
-            my @batch;    # this run's
-            my $stage = sub ($row) {
-                push @batch, $row;
-                return @batch == $size ? [splice @batch] : ();
-            };
-            my $end = sub () { @batch ? [@batch] : () };
-            return ($stage, $end);
-        };
-    }
-
-    my $batches = $dbh->iterate('SELECT id, name FROM track', batches_of(500));
-    while (my($batch) = $batches->next) { ... }
-
-C<batch>, one of the L<canned stages|/"Canned stages">, does this
-already. It's written out here to show how.
-
-The block given to C<gather> is called at the start of each run, so
-whatever it declares is fresh each time. A run is each execution of an
-iterator or result set, including after C<reset>, each call of a Sugar
-statement, and each call of a pipeline. The block returns the stage,
-which is called with each value as any stage is, and optionally an end
-function. Make any stage that keeps state, even a count, with
-C<gather>, so that it starts afresh.
-
-The end function is called once the values run out, even when there
-were none. What it returns goes through the rest of the stages, as
-what a stage returns does. After a L<stop|/"Stopping a pipeline">, only
-the ends of the stages after the one that stopped are called. Ekorn's
-reference gives the order the ends are called in, in
-L<End functions|Ekorn::Pipeline::Manual::Reference/"End functions">.
-It also says what the block must return, in
-L<gather|Ekorn::Pipeline::Manual::Reference/"gather">.
-
-The stage the block returns can be a pipeline. Its stages are made for
-the run in its place, so the block can build a pipeline for each run,
-or choose one. The block's end function, if any, is called after the
-ends of the pipeline's stages.
-
-    my $two = $dbh->iterate(
-        'SELECT name FROM artist ORDER BY name',
-        gather {
-            my $n = 0;    # this run's
-            DBIx::Squirrel::Pipeline->new(sub { ++$n . ". $_->[0]" }, take(2));
-        },
-    );
-
-A stage made with C<gather> is an C<Ekorn::Pipeline::Gather>, which is a
-code reference, so it can be given wherever a stage can. C<gather> is
-exported by default. To keep it out of your namespace:
-
-    use DBIx::Squirrel::Gather ();
-
-=head1 What a stage can ask: Context
-
-Inside a stage run by an iterator or result set, these functions tell
-the stage about the result it's making: things it can't work out from
-the value it's given. Outside a stage, they return C<undef>. None is
-exported by default.
+DBIx::Squirrel::Context's functions tell a stage what it can't work
+out from its value. None is exported by default.
 
     use DBIx::Squirrel::Context qw(iterator result_number result_original);
-
-    my $it = $dbh->iterate(
-        'SELECT name FROM artist ORDER BY name',
-        sub ($row) { "@{[ result_number ]}. $row->[0]" },
-    );
 
 =over 4
 
 =item C<iterator>
 
-The iterator running the stage. Its C<sth> is the statement handle, and the statement handle's C<Database> is the database handle.
+The iterator running the stage, in its own stages. Its C<sth> is the statement handle, and the statement handle's C<Database> is the database handle.
 
 =item C<result_number>
 
-The number of the result being made, from 1. It counts results, not rows. While a stage drops rows, the number stays the same. Each value a stage returns in place of one row is a result of its own. In an end function, it's the number of the first value the end returns.
+The number of the result being made, from 1. It counts results, not rows. While a stage drops rows, the number stays the same. Each value a stage returns in place of one row is a result of its own. In a flush, it's the number of the first value the flush returns.
 
 =item C<result_original>
 
-The row the result is being made from, as it was fetched, before any stage changed it. For a result set, it's the row object. In an L<end function|/"Gathering: stages with state, and an end">, and the stages after it, it's C<undef>. What an end gives comes from every row, not one.
+The row the result is being made from, as it was fetched, before any stage changed it. For a result set, it's the row object. In a L<flush|/"7. Gathering: stages made for each run">, and the stages after it, it's C<undef>: what a flush gives comes from every row, not one.
 
 =back
 
-=head1 pipe and tap on handles
+C<result_original> works in any run reading a statement: an iterator's
+or result set's own stages, and the stages of a chain made with C<|>,
+or of a pipeline of yours, reading one, as it's read from the L<run's
+context|/"The run's context">. C<result_number> and C<iterator> work only
+in an iterator's or result set's own stages, run by its C<next>, C<all>,
+C<first> or C<single>, or by a sink given last to the call that made it.
+Elsewhere, and outside a stage, they return C<undef>.
 
-Database and statement handles both have these methods. The examples
-use a database handle. On a statement handle, the statement handle
-goes through the stages instead. The methods are
-Ekorn::Pipeline::Pipes's.
-L<pipe and tap|Ekorn::Pipeline::Manual::Reference/"pipe and tap: Ekorn::Pipeline::Pipes">,
-in Ekorn's reference, describes them, and how to give a class of your
-own the same.
+    my @chart = $dbh->iterate(
+        'SELECT name, plays FROM track ORDER BY plays DESC',
+        sub { $_->[0] },
+        sub { result_number() . ". $_ (" . result_original()->[1] . ')' },
+    )->all;
+    say $chart[0];    # 1. Dancing Queen (9100)
 
-=head2 pipe
-
-    @results = $dbh->pipe(@stages);
-    $result  = $dbh->pipe(@stages);
-
-Runs the handle through a pipeline of stages, and returns what comes
-out of the last one. In list context, that's all of it. In scalar
-context, it's the first value, or C<undef> if there's none. To count
-the values instead:
-
-    my $count = () = $dbh->pipe(@stages);
-
-With no stages, C<pipe> returns the handle. A stage can end the pipeline
-early with C<Stop>.
-
-    my @odd_doubled = $dbh->pipe(
-        sub ($dbh) { (3, 4, 5) },
-        sub { $_ % 2 ? $_ : () },
-        sub { $_ * 2 },
-    );    # (6, 10)
-
-=head2 tap
-
-    $dbh = $dbh->tap(@stages);
-
-Runs the handle through a pipeline of stages, as a branch off to the
-side, for their side effects. It returns the handle, so a chain of
-method calls can carry on after it. What comes out of the last stage
-is dropped. C<tap> returns the handle however the stages end.
-
-    $dbh->tap(
-        sub ($dbh)   { $dbh->selectrow_array('SELECT COUNT(*) FROM artist') },
-        sub ($count) { log_count($count) },
-    )->do('DELETE FROM artist WHERE id = ?', undef, $id);
-
-=head1 Canned stages
+=head2 Canned stages
 
 Four modules of ready-made stages ship with DBIx::Squirrel, each for
 one kind of job. Each exports the stages it's usually used for, and
@@ -1412,7 +1266,7 @@ and one more, name C<:DEFAULT> too:
 
 B<Exported by default:> C<take($n)>, C<drop($n)>
 
-B<On request:> C<take_while { ... }>, C<drop_while { ... }>
+B<On request:> C<take_first>, C<take_last>, C<take_single>, C<take_while { ... }>, C<drop_while { ... }>, C<take_if { ... }>, C<drop_if { ... }>
 
 =item C<DBIx::Squirrel::Stages::Rows>
 
@@ -1430,25 +1284,17 @@ B<On request:> C<dump_to($fh)>
 
 =back
 
-What each stage does:
+Flow's are described in L<6. Stopping a
+pipeline|/"6. Stopping a pipeline">, and Batch's in L<7.
+Gathering|/"7. Gathering: stages made for each run">. Flow's, Batch's and
+Taps' stages are Ekorn::Pipeline's, exported from a list of
+DBIx::Squirrel's own; its reference's L<Canned
+stages|Ekorn::Pipeline::Manual::Reference/"Canned stages">
+describes them in full. Rows' stages are DBIx::Squirrel's own. Each is
+a function that makes a stage, checking what it's given when it's
+called, not on each value.
 
 =over 4
-
-=item C<take($n)>
-
-Passes on the first C<$n> values, then stops the pipeline, so no more rows are fetched.
-
-=item C<drop($n)>
-
-Drops the first C<$n> values, and passes on the rest.
-
-=item C<take_while { ... }>
-
-Passes on values while the block is true of them. At the first it's false of, it stops the pipeline, and doesn't pass that value on.
-
-=item C<drop_while { ... }>
-
-Drops values while the block is true of them, then passes on the rest, from the first it's false of.
 
 =item C<pluck($column)>
 
@@ -1457,6 +1303,308 @@ Gives one column of each row, by its name, in any case, or its position, from 0,
 =item C<as_hash>
 
 Gives each row as a hash, as C<fetchrow_hashref> would, keyed as C<FetchHashKeyName> says. A hash row is passed on unchanged.
+
+=item C<peek { ... }>
+
+Calls the block with each value, and passes the value on.
+
+=item C<count_into(\$n)>
+
+Counts the values into C<$n>, from 0 on each run, and passes them on.
+
+=item C<dump_to($fh)>
+
+Writes each value, with Data::Dumper, to C<$fh> or STDERR, and passes it on.
+
+=back
+
+    my $read  = 0;
+    my @names = $dbh->iterate(
+        'SELECT id, name FROM artist ORDER BY id',
+        count_into(\$read),
+        pluck('name'),
+    )->all;
+    say "@names, from $read rows";    # Abba Blur Cream, from 3 rows
+
+    my $album = $dbh->iterate('SELECT title, year FROM album WHERE id = 2', as_hash)->first;
+    say "$album->{title} ($album->{year})";    # Parklife (1994)
+
+C<pluck> and C<as_hash> find the column names in the L<run's
+context|/"The run's context">, which a statement gives it: an iterator's
+or result set's own stages, or a chain made with C<|>, or a pipeline of
+yours, reading one. So a name for an array row, or C<as_hash>, needs a
+statement to be what the run reads. C<pluck> by name for a hash row
+reads the hash's own keys, and works anywhere.
+
+**C<pluck> reads the statement's columns, not the row's.** After a
+stage that reshapes rows, a name or position for an array row picks
+the wrong field, and says nothing. Make the rows hashes first, with
+C<as_hash>. Then C<pluck> by name reads each hash's own keys:
+
+    my $sql = 'SELECT id, name FROM artist ORDER BY id';
+
+    my @wrong = $dbh->iterate(
+        $sql,
+        sub { [reverse @$_] },
+        pluck('id'),
+    )->all;
+    say "@wrong";    # Abba Blur Cream
+
+    my @ids = $dbh->iterate(
+        $sql,
+        as_hash,
+        sub { +{%$_, name => uc $_->{name}} },
+        pluck('id'),
+    )->all;
+    say "@ids";    # 1 2 3
+
+C<dump_to> is for debugging. It writes each value in full, secrets and
+all. It doesn't escape control characters in strings, so a value from
+outside can send escape sequences to a terminal.
+
+=head1 6. Stopping a pipeline
+
+The user guide's L<chapter 6|DBIx::Squirrel::Manual::HowTo/"6. Stopping early">.
+
+=head2 Stop
+
+    use DBIx::Squirrel::Stop;
+
+    Stop();
+    Stop(@values);
+    Ekorn::Pipeline::Stop->throw(@values);
+
+Called from a stage, C<Stop> ends the run early and quietly:
+
+=over 4
+
+=item *
+
+The rest of that stage doesn't run.
+
+=item *
+
+The values already out of the pipeline are kept.
+
+=item *
+
+Any values the stop carries go on through the stages after it.
+
+=item *
+
+Nothing else is processed, and no more rows are fetched.
+
+=back
+
+An iterator that's stopped finishes its statement. Stages after the
+one that stopped, made with
+L<C<gather>|/"7. Gathering: stages made for each run">, still have their
+flushes called.
+
+    my @upto = $dbh->iterate(
+        'SELECT title, year FROM album ORDER BY year',
+        sub { $_->[1] >= 1990 ? Stop($_) : $_ },    # this one, then no more
+        sub { $_->[0] },
+    )->all;
+    say "@upto";    # Disraeli Gears Arrival Parklife
+
+C<Stop> is exported by default. C<< Ekorn::Pipeline::Stop->throw(@values) >>
+does the same without importing it. To keep C<Stop> out of your
+namespace, C<use DBIx::Squirrel::Stop ()>.
+
+=head2 What a stop is
+
+A stop is an exception, an C<Ekorn::Pipeline::Stop>, which the pipeline
+catches. DBIx::Squirrel::Stop isn't a class: it exports Ekorn's
+C<Stop>. A subclass of your own is a subclass of
+C<Ekorn::Pipeline::Stop>, and stops a pipeline as C<Stop> does. Ekorn's
+reference says what a stop holds, in L<The stop
+object|Ekorn::Pipeline::Manual::Reference/"The stop object">.
+
+A stage that catches errors itself, with C<eval> or C<try>, should throw
+a stop on again. Check for C<Ekorn::Pipeline::Stop>. Every stop is one,
+including those the canned stages throw, such as C<take>'s:
+
+    use experimental qw(try);
+
+    my @safe = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        sub ($row) {
+            try {
+                Stop() if $row->[0] eq 'Cream';
+                return uc $row->[0];
+            }
+            catch ($e) {
+                die $e if $e isa 'Ekorn::Pipeline::Stop';
+                return 'unknown';
+            }
+        },
+    )->all;
+    say "@safe";    # ABBA BLUR
+
+=head2 Taking and dropping
+
+DBIx::Squirrel::Stages::Flow's stages decide which values go on, by
+their place or by a test:
+
+=over 4
+
+=item C<take($n)>
+
+Passes on the first C<$n> values, then stops the run, so no more rows are fetched.
+
+=item C<drop($n)>
+
+Drops the first C<$n> values, and passes on the rest.
+
+=item C<take_first>
+
+Passes on the first value, then stops the run: C<take(1)>.
+
+=item C<take_last>
+
+Passes on the last value, once there are no more, reading every one to find it; nothing if there were none.
+
+=item C<take_single>
+
+Passes on the one value. At a second, it warns, C<Expected only one item, but there were more>, and stops the run, so only the first goes on.
+
+=item C<take_while { ... }>
+
+Passes on values while the block is true of them. At the first it's false of, it stops the run, and doesn't pass that value on.
+
+=item C<drop_while { ... }>
+
+Drops values while the block is true of them, then passes on the rest, from the first it's false of.
+
+=item C<take_if { ... }>
+
+Passes on each value the block is true of, testing every one, as C<grep> does; it never stops the run.
+
+=item C<drop_if { ... }>
+
+Passes on each value the block is false of, testing every one.
+
+=back
+
+    my @page = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        sub { $_->[0] },
+        drop(2),
+        take(2),
+    )->all;
+    say join ', ', @page;    # Girls & Boys, Parklife
+
+    my @hits = $dbh->iterate(
+        'SELECT name, plays FROM track ORDER BY plays DESC',
+        take_while { $_->[1] > 6000 },
+        sub { $_->[0] },
+    )->all;
+    say join ', ', @hits;    # Dancing Queen, Sunshine of Your Love, Girls & Boys
+
+    my @newest = $dbh->iterate(
+        'SELECT title FROM album ORDER BY year',
+        take_last,
+        sub { $_->[0] },
+    )->all;
+    say "@newest";    # The Great Escape
+
+    my @popular = $dbh->iterate(
+        'SELECT name, plays FROM track ORDER BY id',
+        take_if { $_->[1] > 6000 },
+        sub { $_->[0] },
+    )->all;
+    say join ', ', @popular;    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+
+In SQL, C<LIMIT> and C<OFFSET> page results in the database, which is
+quicker. C<take> and C<drop> are for when a stage in Perl decides which
+rows go on.
+
+=head1 7. Gathering: stages made for each run
+
+The user guide's L<chapter 7|DBIx::Squirrel::Manual::HowTo/"7. Parts made for each run">.
+
+=head2 gather
+
+    use DBIx::Squirrel::Gather;
+
+    my $stage = gather { ...; return $step };
+    my $stage = gather { ...; return ($step, $flush) };
+    my $stage = gather { ...; return ($step, $flush, $end) };
+    my $stage = gather { ...; return {step => $step, flush => $flush, end => $end} };
+
+C<gather> makes a stage afresh at the start of each run, by calling its
+block, so whatever the block declares is fresh each time. A run is
+each execution of an iterator or result set, including after C<reset>,
+each call of a Sugar statement, and each call of a pipeline. The block
+returns:
+
+=over 4
+
+=item *
+
+B<the step:> a code reference, called with each value as any stage
+is, or a pipeline, whose stages are made for the run in its place;
+
+=item *
+
+B<optionally, the flush:> called with no arguments once the values
+run out, even if there were none. What it returns goes through the
+rest of the stages, as what a stage returns does. After a
+L<stop|/"6. Stopping a pipeline">, only the flushes of the stages after
+the one that stopped are called;
+
+=item *
+
+B<optionally, the end:> called once the run has ended, however it
+ended, and told how: C<done>, C<stopped> or C<died>. An iterator's run
+is C<done> once its rows run out, and C<stopped> when C<first> or
+C<single> finishes it. What the end returns is dropped.
+
+=back
+
+The parts can be given as a list, in that order, with C<undef> for a
+flush left out before an end. Or they can be given by name, in one
+hash reference with the keys C<step>, C<flush> and C<end>, giving only
+those the stage has.
+
+    # Each value, then, once they run out, how many there were
+    sub and_count () {
+        return gather {
+            my $count = 0;    # this run's
+            return (sub ($value) { $count++; $value }, sub () {"($count)"});
+        };
+    }
+
+    my $it = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        and_count,
+    );
+    say join ' ', $it->all;           # Abba Blur Cream (3)
+    say join ' ', $it->reset->all;    # Abba Blur Cream (3)
+
+    my @how;
+    my $watched = gather { +{step => sub { $_->[0] }, end => sub ($how) { push @how, $how }} };
+    $dbh->iterate('SELECT name FROM artist', $watched)->first;
+    say "@how";    # stopped
+
+A block that returns anything else croaks as the run starts:
+C<Expected stage #%s, made with gather, to return a code reference or a pipeline, and optionally a flush and an end>.
+C<gather> given something other than a block or code reference croaks
+C<Expected a code reference>. Ekorn's reference gives the order flushes
+and ends are called in, in L<Flushes and
+ends|Ekorn::Pipeline::Manual::Reference/"Flushes and ends">.
+
+A stage made with C<gather> is an C<Ekorn::Pipeline::Gather>, an object
+that can go wherever a stage can. C<gather> is exported by default; to
+keep it out of your namespace, C<use DBIx::Squirrel::Gather ()>.
+
+=head2 Batching and collecting
+
+DBIx::Squirrel::Stages::Batch's stages are made with C<gather>:
+
+=over 4
 
 =item C<batch($n)>
 
@@ -1470,74 +1618,709 @@ Holds every value. When they run out, it passes on an array of them.
 
 Holds every value. When they run out, it passes on what the block makes of them, given as its arguments.
 
-=item C<peek { ... }>
+=back
 
-Calls the block with each value, and passes the value on.
+    my @batches = $dbh->iterate(
+        'SELECT name FROM track ORDER BY id',
+        pluck('name'),
+        batch(4),
+    )->all;
+    say scalar(@$_), ': ', join ', ', @$_ for @batches;
+    # 4: Dancing Queen, Knowing Me, Knowing You, Girls & Boys, Parklife
+    # 2: Country House, Sunshine of Your Love
 
-=item C<count_into(\$n)>
+    say $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        pluck('name'),
+        collect { join '+', @_ },
+    )->first;
+    # Abba+Blur+Cream
 
-Counts the values into C<$n>, from 0 on each run, and passes them on.
+=head1 8. Sinks
 
-=item C<dump_to($fh)>
+The user guide's L<chapter
+8|DBIx::Squirrel::Manual::HowTo/"8. Sinks: saying what you want back">.
 
-Writes each value, with Data::Dumper, to C<$fh> or STDERR, and passes it on. For debugging: see below.
+A sink is a last stage that says what a run gives. Given last to
+C<iterate>, C<results>, a Sugar function, or a select method, it makes
+the call read the run through and give the sink's result, not an
+iterator. The sinks are Ekorn::Pipeline's, from
+Ekorn::Pipeline::Sinks, which exports none by default, and
+DBIx::Squirrel::Tooling's C<:sinks> exports them all:
+
+    use Ekorn::Pipeline::Sinks qw(keep_all keep_first keep_last keep_single keep count_items to_file to_fh);
+
+=over 4
+
+=item C<keep_all>
+
+B<Gives:> every result, as a list; or, where one value is asked for, an array reference of them
+
+B<Stops the run early?:> no
+
+=item C<keep_first>
+
+B<Gives:> the first result, or C<undef> if none
+
+B<Stops the run early?:> yes
+
+=item C<keep_last>
+
+B<Gives:> the last result, reading every one to find it, or C<undef> if none
+
+B<Stops the run early?:> no
+
+=item C<keep_single>
+
+B<Gives:> the one result, or C<undef> if none; at a second, a warning, C<Expected only one item, but there were more>, and the first
+
+B<Stops the run early?:> at a second
+
+=item C<keep($n)>
+
+B<Gives:> the first C<$n> results, as a list, or an array reference where one value is asked for
+
+B<Stops the run early?:> yes, at C<$n>
+
+=item C<count_items>
+
+B<Gives:> how many results there were
+
+B<Stops the run early?:> no
+
+=item C<to_file($path)>
+
+B<Gives:> writes each result to the file, a line each, and gives how many; it closes the file however the run ends
+
+B<Stops the run early?:> no
+
+=item C<to_fh($fh)>
+
+B<Gives:> prints each result to your filehandle, a line each, and gives how many; you close it
+
+B<Stops the run early?:> no
 
 =back
 
-C<dump_to> is for debugging. It writes each value in full, secrets and
-all. It doesn't escape control characters in strings, so a value from
-outside can send escape sequences to a terminal.
+A sink of many, C<keep_all> or C<keep>, never gives a count: for that,
+use C<count_items>. An empty result is an empty array reference, which
+is true, so test it with C<@$rows>.
 
-Flow's, Batch's and Taps' stages are Ekorn::Pipeline's. Its
-reference's
-L<Canned stages|Ekorn::Pipeline::Manual::Reference/"Canned stages">
-describes them in full. Rows' stages are DBIx::Squirrel's own.
+Ekorn::Pipeline::JSON's C<to_json> and C<to_jsonl>, from Tooling's
+L<C<:json>|/"Importing: DBIx::Squirrel::Tooling">, are sinks too, given a
+C<file> or an C<fh>: they write each result as JSON, and give how many.
 
-Each is a function that makes a stage. It checks what it's given when
-it's called, not on each value. Those that keep a count or hold values
-are made with L<C<gather>|/"Gathering: stages with state, and an end">, so
-they start afresh on each run. C<pluck> and C<as_hash> find the column
-names through the iterator running them. So a name for an array row,
-or C<as_hash>, needs the stages to be run by an iterator or result set.
+    my @names = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        pluck('name'),
+        keep_all,
+    );
+    my $names = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        pluck('name'),
+        keep_all,
+    );
+    say "@names";            # Abba Blur Cream
+    say scalar @$names;      # 3
 
-    use DBIx::Squirrel::Stages::Flow;     # take, drop
-    use DBIx::Squirrel::Stages::Rows;     # pluck, as_hash
-    use DBIx::Squirrel::Stages::Batch;    # batch, collect
-    use DBIx::Squirrel::Stages::Taps;     # peek, count_into
+    say $dbh->iterate(
+        'SELECT name FROM track ORDER BY plays',
+        pluck('name'),
+        keep_last,
+    );
+    # Dancing Queen
 
-    # The second page of ten, as hashes, counting the rows read
-    my $read = 0;
-    my @page = $dbh->iterate(
-        'SELECT id, name FROM artist ORDER BY name',
-        count_into(\$read),
-        drop(10), take(10),
-        as_hash,
+    say $dbh->iterate(
+        'SELECT name FROM artist WHERE id = ?', 2,
+        pluck('name'),
+        keep_single,
+    );
+    # Blur
+
+    say join ', ', $dbh->iterate(
+        'SELECT name FROM track ORDER BY plays DESC',
+        pluck('name'),
+        keep(2),
+    );
+    # Dancing Queen, Sunshine of Your Love
+
+    say $dbh->iterate('SELECT * FROM album', count_items);    # 4
+
+The iterator's methods and the sinks overlap: C<all> and C<keep_all>,
+C<first> and C<keep_first>, C<single> and C<keep_single>. A method takes
+what's left of an iterator you have; a sink says, in the call, what it
+gives, and is the only way to have a count, the last, the first few,
+or a file. C<all> without stages is quicker than C<keep_all>, as it
+fetches every row in one go.
+
+Ekorn's reference has the sinks in full, and how to write one, in
+L<Sinks|Ekorn::Pipeline::Manual::Reference/"Sinks: Ekorn::Pipeline::Sinks">.
+
+=head1 9. Result sets and row objects
+
+The user guide's L<chapter 9|DBIx::Squirrel::Manual::HowTo/"9. Rows as objects">.
+
+=head2 results
+
+    $results = $dbh->results($statement, \%attr, @bind_values, @stages);
+    $results = $dbh->results($statement, @bind_values, @stages);
+    $results = $sth->results(@bind_values, @stages);
+    @result  = $dbh->results($statement, @bind_values, @stages, $sink);
+
+As L<C<iterate>|/"iterate">, returning a C<DBIx::Squirrel::Results>, or a
+sink's result, if the last stage is a sink. A result set is an
+iterator whose rows are objects, with a method for each column, named
+in lower case. The stages see the objects. A result set has the
+iterator's methods, and no others.
+
+    my $results = $dbh->results('SELECT id, Name FROM artist WHERE id <= ? ORDER BY id', 2);
+    while (my($artist) = $results->next) {
+        say $artist->id, ' ', $artist->name;
+    }
+    # 1 Abba
+    # 2 Blur
+
+Rows are always fetched as arrays for a result set. The C<ekorn_slice>
+attribute doesn't apply.
+
+=head2 Row objects
+
+Each row is an array, blessed into a class with a method for each
+column. There's one class for each base class and list of column
+names. It's made the first time a result set fetches rows with those
+columns, and kept for the life of the program. A row needs nothing
+from its result set, and can be kept after the result set has gone.
+
+A column gets no method:
+
+=over 4
+
+=item *
+
+if its name can't be a method's, such as C<COUNT(*)>;
+
+=item *
+
+if the base class already has a method of that name, such as C<can>,
+C<isa>, C<get_column>, or one of your own.
+
+=back
+
+When two columns have one name, as in C<SELECT a.id, b.id>, the method
+is the first's. To give such a column a method, give it another name
+in the statement, with C<AS>:
+
+    my $row = $dbh->results('SELECT COUNT(*), COUNT(*) AS albums FROM album')->first;
+    say $row->albums;    # 4
+    say $row->[0];       # 4
+
+=head2 get_column
+
+    $value = $row->get_column($name);
+    $value = $row->get_column($position);
+
+Returns a column's value by its name, in any case, or by its position,
+from 0. It reaches every column, including those without a method. It
+croaks if the row has no such column:
+C<Expected a column of the row (x)>.
+
+    my $row = $dbh->results('SELECT COUNT(*) FROM album')->first;
+    say $row->get_column('count(*)');    # 4
+    say $row->get_column(0);             # 4
+
+=head2 Methods of your own
+
+Row classes are subclasses of C<DBIx::Squirrel::Result>, or of the
+class given in the C<ekorn_result_class> attribute, which must itself
+be a subclass of C<DBIx::Squirrel::Result>. So rows can have methods of
+your own:
+
+    package My::Artist {
+        our @ISA = 'DBIx::Squirrel::Result';
+        sub shout ($self) { return uc $self->name }
+    }
+
+    my $artist = $dbh->results('SELECT * FROM artist WHERE id = 2', {ekorn_result_class => 'My::Artist'})->first;
+    say $artist->shout;    # BLUR
+
+A class that isn't a subclass of C<DBIx::Squirrel::Result> croaks:
+C<Expected ekorn_result_class to be a subclass of DBIx::Squirrel::Result (My::Other)>.
+
+=head1 10. Pipelines
+
+The user guide's L<chapter
+10|DBIx::Squirrel::Manual::HowTo/"10. Building pipelines from pipelines">.
+
+The pipeline is
+L<Ekorn::Pipeline|Ekorn::Pipeline>'s. It
+began here, and is now a distribution of its own, so that any function
+can take stages from its caller. DBIx::Squirrel uses it as it is: a
+pipeline is made with C<< Ekorn::Pipeline->new >>, and the handles' C<pipe>
+and C<tap> are Ekorn::Pipeline::Pipes'. Loading it doesn't load the
+DBI, so a pipeline works in code that has nothing to do with a
+database.
+
+DBIx::Squirrel keeps its own names for the modules of functions:
+C<DBIx::Squirrel::Stop>, C<DBIx::Squirrel::Gather>, and the stages in
+C<DBIx::Squirrel::Stages::Flow>, C<Batch> and C<Taps>. Each exports
+Ekorn's functions from a list of DBIx::Squirrel's own, so a function
+added to Ekorn::Pipeline reaches DBIx::Squirrel's modules only once
+it's added to that list, and documented here. The objects are Ekorn's:
+a stop is an C<Ekorn::Pipeline::Stop>, and a stage made with C<gather>
+an C<Ekorn::Pipeline::Gather>. DBIx::Squirrel subclasses none of
+Ekorn's classes.
+
+Ekorn::Pipeline's
+L<reference|Ekorn::Pipeline::Manual::Reference>
+describes the pipeline in full, and its L<user
+guide|Ekorn::Pipeline::Manual::HowTo>
+has recipes for any values. This chapter keeps to what DBIx::Squirrel
+does with it.
+
+=head2 Making and running a pipeline
+
+    use Ekorn::Pipeline;
+
+    my $p       = Ekorn::Pipeline->new(@stages);
+    my @results = $p->(@values);              # push: values in, a list out
+    my $next    = $p->iterator($source);      # pull: one value per call
+    my @stages  = $p->stages;
+
+A pipeline is an object that can be called as a code reference. Called
+with values, it returns what comes out of the last stage: every value
+in list context; in scalar context, a sink's result, if a sink is
+last, or how many values came out. C<iterator> returns an iterator, an
+object called as a code reference, handing out those values one per
+call, from a source; a DBIx::Squirrel iterator is a source (L<15.
+Protocols|/"The iterator as a source">). C<stages> returns the
+pipeline's stages, in order, a pipeline given as a stage appearing as
+the stages it was made of.
+
+    use Ekorn::Pipeline;
+
+    my $shout = Ekorn::Pipeline->new(
+        sub {uc},
+        sub {"$_!"},
+    );
+    say join ' ', $shout->('hello', 'world');    # HELLO! WORLD!
+
+    my $next  = Ekorn::Pipeline->new(sub { $_->[0] })->iterator($dbh->iterate('SELECT name FROM artist ORDER BY id'));
+    my @names;
+    while (my($name) = $next->()) { push @names, $name }
+    say "@names";    # Abba Blur Cream
+
+=head2 A pipeline as a stage
+
+A pipeline can go wherever a stage goes: in another pipeline, or given
+to C<iterate>, C<results>, an iterator's C<reset>, C<pipe>, C<tap>, a
+select method, or a Sugar function, for a database or a statement. Its
+stages run in its place, as if written out there, so a C<take> inside
+it limits the whole run:
+
+    use Ekorn::Pipeline;
+
+    my $hits = Ekorn::Pipeline->new(
+        sub { $_->[1] >= 5000 ? $_ : () },
+        pluck('name'),
+    );
+    my $sql  = 'SELECT name, plays FROM track ORDER BY plays DESC';
+    say join ', ', $dbh->iterate($sql, $hits)->all;             # Dancing Queen, Sunshine of Your Love, Girls & Boys, Parklife
+    say join ', ', $dbh->iterate(
+        $sql,
+        $hits,
+        take(1),
     )->all;
+    # Dancing Queen
 
-    # Names, 500 at a time, saying how many in each batch
-    my $batches = $dbh->iterate(
-        'SELECT name FROM track',
-        pluck('name'), batch(500),
-        peek { warn scalar(@$_), " names\n" },
+Make a stage that counts or remembers with
+L<C<gather>|/"7. Gathering: stages made for each run">. A plain closure is
+the same code reference wherever it goes, so its state is shared by
+every run it's in.
+
+=head2 Named pipelines
+
+    Ekorn::Pipeline->named($name => @stages);
+    use Ekorn::Pipeline::Factories qw(pipeline);
+    my $p = pipeline($name, @more_stages);
+
+C<< Ekorn::Pipeline->named >> names a pipeline for the rest of the program,
+in the package that names it, unless the name is qualified, as
+C<My::Module::clean>. C<pipeline>, from Ekorn::Pipeline::Factories,
+makes a pipeline of stages and names, looked up in its caller's
+package as it's made. A name given alone gives the pipeline named, so
+its stages are numbered where it stands. The L<Sugar's
+definitions|/"statement"> take names too. Ekorn's reference has the
+rules, in L<Named
+pipelines|Ekorn::Pipeline::Manual::Reference/"Named pipelines">.
+
+    use Ekorn::Pipeline;
+
+    Ekorn::Pipeline->named(first_column => sub { $_->[0] });
+    say join ' ', $dbh->iterate('SELECT name FROM artist ORDER BY id', pipeline('first_column', take(2)))->all;    # Abba Blur
+
+=head2 pipe and tap
+
+    @results = $dbh->pipe(@stages);
+    $result  = $dbh->pipe(@stages);
+    $dbh     = $dbh->tap(@stages);
+
+Database and statement handles both have these methods, from
+Ekorn::Pipeline::Pipes. C<pipe> runs the handle itself through stages,
+and returns what comes out of the last one: all of it in list context;
+in scalar context, the first value, or C<undef>. With no stages, it
+returns the handle. C<tap> runs the handle through stages for their
+side effects, drops what comes out, and returns the handle however
+they end, so a chain of method calls can carry on. On a statement
+handle, the statement handle goes through the stages instead.
+
+    my @names = $dbh->pipe(
+        sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist ORDER BY id') } },
+        sub {uc},
     );
+    say "@names";    # ABBA BLUR CREAM
 
-    # The first three names, from a handle
-    my @three = $dbh->pipe(
-        sub ($dbh) { @{ $dbh->selectcol_arrayref('SELECT name FROM artist ORDER BY name') } },
-        take(3),
+    my $n = $dbh->tap(sub ($dbh) { say 'tapped ', ref $dbh })->selectrow_array('SELECT COUNT(*) FROM artist');
+    say $n;
+    # tapped DBIx::Squirrel::db
+    # 3
+
+L<pipe and
+tap|Ekorn::Pipeline::Manual::Reference/"pipe and tap: Ekorn::Pipeline::Pipes">,
+in Ekorn's reference, says how to give a class of your own the same.
+
+=head2 When a stage dies
+
+If a stage dies, the call that asked for the result croaks, at your
+line. The message names the stage by its place, from C<#1>, and indents
+the stage's own message below. A stage inside a pipeline given as a
+stage is named by its place in each: C<#2.3> is the third stage of the
+pipeline given as stage #2. A stage of a named pipeline gives the name
+and its place there too: C<#2.2 (main::fussy#2)>. An exception object
+is passed on unchanged.
+
+    my $it = $dbh->iterate(
+        'SELECT name FROM artist',
+        sub {$_},
+        sub { die "no names today\n" },
     );
+    eval { $it->next };
+    print $@;
+    # Pipeline stage #2 failed at ... line ...:
+    #     no names today
 
-In SQL, C<LIMIT> and C<OFFSET> page results in the database. C<take> and
-C<drop> are for when a stage in Perl decides which rows go on, or for
-values from C<pipe>.
+    say $it->ended;    # died
+    say scalar(() = $it->next);    # 0
 
-=head1 Writing stages
+Once a stage dies, its run has ended. An iterator then returns nothing
+more: C<next> returns an empty list on every call after, and C<all>
+returns nothing. No more rows are fetched, no flush is called, and the
+statement is finished. An end is still called, told C<died>. C<reset>
+runs the statement again, from the start. To pass over a value a stage
+can't handle, the stage catches its own error and returns nothing for
+it, as L<What a stop is|/"What a stop is"> shows.
+
+=head1 11. Operators: | and @{}
+
+The user guide's L<chapter 11|DBIx::Squirrel::Manual::HowTo/"11. Chaining with E<verbar> and @{}">.
+
+    use Ekorn::Pipeline::Operators;
+
+    $result = $it | @stages... | $sink;
+    $chain  = $it | $stage;
+    @values = @$it;
+
+An iterator, and so a result set, overloads C<|> and C<@{}> with
+Ekorn::Pipeline::Operators' C<chain> and C<drain>, as Ekorn's own
+sources do. They're in force only where
+C<use Ekorn::Pipeline::Operators> is in scope. Elsewhere, both croak:
+C<Expected use Ekorn::Pipeline::Operators in scope, for |>.
+DBIx::Squirrel loads Operators with an empty import list, so it's
+there, but in force only where you say.
+
+=over 4
+
+=item *
+
+C<$it | $stage> gives a chain: the iterator's results through the
+stage, which C<|> can extend, and which is a source.
+
+=item *
+
+C<$it | ... | $sink> gives the sink's result.
+
+=item *
+
+C<@$it>, or C<@{ $chain }>, gives every result.
+
+=back
+
+**C<|> always gives one value.** Perl calls an operator for one value,
+so a chain ending in C<keep_all> gives an array reference, even
+assigned to an array: C<my @rows = $it | keep_all> has one element. Use
+C<@{ $it | keep_all }>, or give the stages and sink to C<iterate> as
+arguments.
+
+B<Each use is a run of its own,> from the first row, through the
+iterator's stages. So C<< $it->[0] >>, C<scalar @$it> and C<$#$it> read every
+row to give one row, a count or an index; two uses run the statement
+twice; and C<for (@$it)> reads every row before the loop starts.
+
+B<The run it starts is the iterator's.> It ends a run the iterator
+had going, so C<next> returns nothing after, and C<ended> says how the
+C<|> or C<@{}> run ended, until C<reset>.
+
+    use Ekorn::Pipeline::Operators;
+
+    my $it    = $dbh->iterate('SELECT name FROM artist ORDER BY id', pluck('name'));
+    my $names = $it | keep_all;
+    say "@$names";                  # Abba Blur Cream
+    say $it | count_items;          # 3
+    say "@$it";                     # Abba Blur Cream
+    say "@{ $it | sub {lc} }";      # abba blur cream
+
+    my @one = $it | keep_all;
+    say scalar @one;                # 1
+
+A chain run only for its sink's effect, written as a statement of its
+own, runs, but Perl warns "Useless use of numeric bitwise or (|) in
+void context" as it compiles the line, before any operator is called.
+Keep the result: C<my $n = $it | to_file($path)>.
+
+=head1 12. Sugar: a function for each database and statement
+
+The user guide's L<chapter
+12|DBIx::Squirrel::Manual::HowTo/"12. A function for each database and statement">.
+
+C<DBIx::Squirrel::Sugar> gives each database a name. The package that
+names it gets a function of that name, which returns the database
+handle or runs a statement on it. A statement gets a function too,
+which runs it with the bind values and any stages given.
+
+=head2 Defining them on use
+
+    use DBIx::Squirrel::Sugar database => {
+        music => [$data_source, $username, $password, \%attr],
+    };
+    use DBIx::Squirrel::Sugar statement => {
+        artist_names => [music => 'SELECT name FROM artist', sub ($row) { $row->[0] }],
+        artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
+    };
+    use DBIx::Squirrel::Sugar qw(database statement);
+
+Given a hash reference after C<database> or C<statement>, C<use> defines
+each database or statement named in it, with its arguments in an array
+reference. It gives the package each function while the package is
+compiled, so the function can be called without parentheses. The
+arguments are worked out then too: the environment, literals, and what
+a C<BEGIN> block has set are there, but a variable the program sets as
+it runs is not yet. C<use> also gives the package the C<database> and
+C<statement> functions, and, given just their names, only those.
+
+=head2 database
+
+    $dbh      = database($name);
+    $function = database($name, @connect_args);
+
+Given a name, returns the handle of the database defined by that name,
+anywhere in the program, connecting to it if it isn't connected. Given
+a name and the arguments C<connect> takes, it defines a database by
+that name, gives the calling package a function of that name, and
+returns the function. A database defined with a database handle, in
+place of a data source, is a clone of it, as C<connect> makes, made
+when the database is first used. Each database is defined once in a
+program. Its name must be one a function can have, and the package
+mustn't have a function of that name already.
+
+=head2 The function a database is given
+
+    $dbh     = music();
+    $sth     = music($statement, @bind_values);
+    $sth     = music($statement, \%attr, @bind_values);
+    $it      = music($statement, @bind_values, @stages);
+    @results = music($statement, @bind_values, @stages, $sink);
+
+=over 4
+
+=item nothing
+
+returns the database handle.
+
+=item a statement and bind values
+
+prepares the statement, executes it, and returns the statement handle, or nothing if it couldn't be executed.
+
+=item those, and stages at the end
+
+returns what C<iterate> does: an iterator over the results, or, if the last stage is a sink, the sink's result.
+
+=back
+
+An unblessed hash reference or C<undef> straight after the statement is
+the attributes to prepare it with. The statement can be a statement
+handle, which is itself executed, or iterated over.
+
+    use DBIx::Squirrel::Sugar database => {music => ['dbi:SQLite:dbname=music.db', '', '', {RaiseError => 1}]};
+
+    say music('SELECT name FROM artist WHERE id = ?', 1)->fetchrow_arrayref->[0];    # Abba
+    say ref music('SELECT name FROM artist', sub { $_->[0] });                        # DBIx::Squirrel::Iterator
+    say join ' ', music(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        keep_all,
+    );
+    # Abba Blur Cream
+
+=head2 statement
+
+    $function = statement($name, $database, $statement, @stages);
+    $function = statement($name, $database, $statement, \%attr, @stages);
+
+Defines a statement by that name, on the database of that name. The
+attributes are those to prepare it with, and the stages are its own.
+It gives the calling package a function of that name, and returns the
+function. The database is found when the function runs, so it can be
+defined after the statement.
+
+A stage in a definition can be a pipeline's B<name>, as
+Ekorn::Pipeline names them with C<named>: words joined by C<::>. A name
+is looked up as the statement is defined, in the package defining it,
+unless it's qualified, as C<My::Module::clean>, and stands in its place
+among the stages. So it must be defined first, and one that isn't
+croaks then: C<No pipeline named main::clean>. On C<use>, the definition
+is made as the program compiles, so define the name in a C<BEGIN> block
+before it.
+
+=head2 The function a statement is given
+
+    $sth     = artist(@bind_values);
+    $it      = artist(@bind_values, @stages);
+    @results = artist(@bind_values, @stages, $sink);
+
+It executes the statement with the bind values, and returns the
+statement handle, or nothing if it couldn't be executed. With stages,
+its own or those given after the bind values, it returns an iterator
+over the results, or, if the last stage is a sink, the sink's result,
+as C<iterate> does. The results go through its own stages, then those
+given. Stages given are for that call only. A string given is always a
+bind value, never a pipeline's name.
+
+    use Ekorn::Pipeline;
+
+    BEGIN { Ekorn::Pipeline->named(shouted => sub {uc}) }
+
+    use DBIx::Squirrel::Sugar statement => {
+        artist_names => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }],
+        loud_names   => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }, 'shouted'],
+        artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
+    };
+
+    say ref artist_names;                            # DBIx::Squirrel::Iterator
+    say join ' ', artist_names keep_all;             # Abba Blur Cream
+    say join ' ', artist_names sub {lc}, keep_all;   # abba blur cream
+    say artist_names count_items;                    # 3
+    say join ' ', loud_names keep_all;               # ABBA BLUR CREAM
+    say artist(id => 3)->fetchrow_hashref->{name};   # Cream
+
+A sink, imported, is a function of your package, so a statement can't
+be given its name: C<Expected no function of the name in main already
+(count_items)>. With Tooling's C<:all>, that's any name it exports.
+Import fewer tags, or by name, or call one by its full name,
+C<Ekorn::Pipeline::Sinks::count_items()>.
+
+The statement is prepared once for each database handle, with
+C<prepare_cached>. Its handle may be in use: by a statement handle not
+read to the end, or by an iterator of an earlier call still reading. A
+call then prepares one of its own. A statement taking a L<list|/"Lists">
+is prepared for each call's values instead, and isn't cached.
+
+=head1 13. Caching and connections
+
+The user guide's L<chapter 13|DBIx::Squirrel::Manual::HowTo/"13. Caching and connections">.
+
+=head2 prepare_cached
+
+    $sth = $dbh->prepare_cached($statement);
+    $sth = $dbh->prepare_cached($statement, \%attr);
+    $sth = $dbh->prepare_cached($statement, \%attr, $if_active);
+
+As C<prepare>, using the DBI's cache of statement handles. Its errors
+name C<prepare_cached>, as the DBI's do. Like C<prepare>, it croaks
+given a statement taking a L<list|/"Lists">.
+
+Two statements can be rewritten the same: C<SELECT :a, :b> and
+C<SELECT :b, :a> both become C<SELECT ?, ?>. Each still has a handle of
+its own, as the statement as written is part of the cache's key.
+DBIx::Squirrel's own attributes are part of the key too. So a
+statement prepared with C<< {ekorn_slice => {}} >> and one prepared without
+have different handles.
+
+The DBI finishes a cached handle that's still active before handing it
+out. If an iterator is part way through the handle, that would cut its
+results short. So such a handle isn't handed out or finished. A new
+handle is made instead, and cached in its place. The exception is
+C<$if_active> of 2, which asks for the cached handle, unchanged.
+Otherwise, C<$if_active> means what it does to the DBI. A cached handle
+that's active, with no iterator, is finished, after a warning, unless
+C<$if_active> says otherwise.
+
+    my $sql   = 'SELECT name FROM artist ORDER BY id';
+    my $first = $dbh->prepare_cached($sql)->iterate(sub { $_->[0] });
+    $first->next;
+    my $second = $dbh->prepare_cached($sql)->iterate(sub { $_->[0] });
+    say $first->sth == $second->sth ? 'shared' : 'a handle each';    # a handle each
+    say join ' ', $second->all;    # Abba Blur Cream
+    say join ' ', $first->all;     # Blur Cream
+
+=head2 connect_cached
+
+C<connect_cached> is the DBI's own. It calls C<connect> when it needs a
+new connection, so it croaks on failure too. DBIx::Squirrel's own
+attributes are part of the cache's key. Two calls with the same
+attributes have the same handle, and calls with different ones don't.
+
+=head2 The Sugar's connections
+
+A Sugar database is connected to when it's first used, not when it's
+defined, with C<connect_cached>. So two databases defined with the same
+arguments share a handle. The handle is kept, and each use has the
+same one, without a ping to the database each time. It's pinged only
+while its last call has failed, which leaves the error to be read.
+It's made again if the connection has gone, or if the handle has been
+disconnected. So the call after a connection drops fails, as it would
+with plain DBI, and the call after that has a new connection.
+
+=head1 14. Writing stages, and functions that take them
+
+The user guide's L<chapter
+14|DBIx::Squirrel::Manual::HowTo/"14. Functions that take stages, and stages for others">.
+
+=head2 A function that takes stages
+
+A function can take stages from its caller, at the end of its
+arguments, and hand them to C<iterate> after its values. Its caller
+then gets an iterator, or, with a sink last, the sink's result. To
+find the stages at the end of a list of arguments, test each from the
+end with Ekorn::Pipeline's C<is_stage>, which is true of code
+references, pipelines and Ekorn's stage objects, and false of strings
+and other values:
+
+    use Ekorn::Pipeline qw(is_stage);
+
+    sub albums_since ($year, @stages) {
+        return $dbh->iterate('SELECT title FROM album WHERE year >= ? ORDER BY year', $year, @stages);
+    }
+
+    say albums_since(1990, count_items);    # 2
+    say is_stage(sub {1}) ? 'a stage' : 'a value';    # a stage
+    say is_stage('name') ? 'a stage' : 'a value';     # a value
+
+=head2 Stages for others
 
 A stage of your own is a code reference, or a pipeline of other
-stages. Ekorn's reference, in
-L<Writing stages|Ekorn::Pipeline::Manual::Reference/"Writing stages">,
-and its how-to, in
-L<Writing stages for others|Ekorn::Pipeline::Manual::HowTo/"Writing stages for others">,
+stages. Ekorn's reference, in L<Writing
+stages|Ekorn::Pipeline::Manual::Reference/"Writing stages">,
+and its user guide, in L<Building parts for
+others|Ekorn::Pipeline::Manual::HowTo/"10. Building parts for others">,
 say how to write one that works alongside the canned stages:
 
 =over 4
@@ -1548,12 +2331,12 @@ a function that makes it, checking its options once;
 
 =item *
 
-state in a C<gather> block, so it starts afresh on each run, as after
-C<reset> or on each call of a Sugar statement;
+state in a C<gather> block, so it starts afresh on each run;
 
 =item *
 
-an end, for a stage that holds values;
+a flush, for a stage that holds values, and an end, for one that
+holds something to release;
 
 =item *
 
@@ -1574,9 +2357,8 @@ What follows is what's particular to stages for rows.
 B<The shapes of a row.> A row can be an array, a hash (with the
 C<ekorn_slice> attribute), or a row object (from C<results>). A stage
 for others should say which it takes, or take all three, as C<pluck>
-does. L<Context|/"What a stage can ask: Context"> gives the iterator
-running the stage, whose C<column_names> are the statement's columns.
-It also gives C<result_original>, the row as fetched.
+does. A stage that needs the statement's column names reads them from
+the L<run's context|/"The run's context">.
 
 B<Errors.> A function that makes a stage croaks when it's given the
 wrong things, so the message names the line that called it. A module
@@ -1585,9 +2367,26 @@ which take in the DBI's and Ekorn::Pipeline's. Then what it croaks
 while a row goes through its stage is reported at the line that asked
 for the result, not inside DBIx::Squirrel:
 
-    use DBIx::Squirrel::Errors qw(croakf);
+    package My::Stages {
+        use DBIx::Squirrel::Errors qw(croakf);
 
-    our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
+        our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
+
+        sub prefixed ($prefix) {
+            croakf 'Expected a prefix' unless defined $prefix && length $prefix;
+            return sub ($value) {"$prefix$value"};
+        }
+    }
+
+    say join ' ', $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        My::Stages::prefixed('#'),
+    )->all;
+    # #Abba #Blur #Cream
+
+    eval { My::Stages::prefixed('') };
+    print $@;    # Expected a prefix at ... line ...
 
 C<croakf> croaks with a message made by C<sprintf>. Its format is a
 literal, written in the code, with the values as its arguments. Never
@@ -1596,176 +2395,152 @@ make the format from data: it does whatever its C<%> directives say.
 B<Where they go.> A stage goes where what it needs to know is. One
 that needs a database, a statement, a row's column names, or the row a
 result came from goes under C<DBIx::Squirrel::Stages::>. One that would
-work on values from anywhere belongs under C<Ekorn::Pipeline::Stages::>,
-where any function's stages can use it, even if it was written for
-rows. Ekorn::Pipeline can't depend on DBIx::Squirrel, so a stage that
-would C<use> DBIx::Squirrel goes under C<DBIx::Squirrel::Stages::>. A
-stage added under C<Ekorn::Pipeline::Stages::> reaches DBIx::Squirrel's
-users only once DBIx::Squirrel adds it to the names its own modules of
-stages export. The how-to's
-L<Decide where a stage belongs|DBIx::Squirrel::Manual::HowTo/"Decide where a stage belongs">
-says how to choose.
+work on values from anywhere belongs under
+C<Ekorn::Pipeline::Stages::>, where any function's stages can use it,
+even if it was written for rows. Ekorn::Pipeline can't depend on
+DBIx::Squirrel, so a stage that would C<use> DBIx::Squirrel goes under
+C<DBIx::Squirrel::Stages::>. A stage added under
+C<Ekorn::Pipeline::Stages::> reaches DBIx::Squirrel's users only once
+DBIx::Squirrel adds it to the names its own modules of stages export.
+The user guide's L<Decide where a stage
+belongs|DBIx::Squirrel::Manual::HowTo/"Decide where a stage belongs"> says how to choose.
 
 B<Testing.> A pipeline called with values tests a stage without a
 database. Run it twice, to show it starts afresh. Then run it on rows
-from an in-memory SQLite database, in each shape it takes:
-
-    use Test2::V0;
-    use DBIx::Squirrel::Gather;
-    use DBIx::Squirrel::Pipeline;
-
-    # Each value, numbered from 1 on each run
-    sub numbered () {
-        return gather {
-            my $n = 0;
-            return sub ($value) { [++$n, $value] };
-        };
-    }
-
-    my $p = DBIx::Squirrel::Pipeline->new(numbered);
-    is [$p->(qw(a b))], [[1, 'a'], [2, 'b']], 'numbered';
-    is [$p->(qw(c))],   [[1, 'c']],           'from 1 on each run';
+from an in-memory SQLite database, in each shape it takes.
 
 B<Publishing.> Name a module of stages for its job, as
-C<DBIx::Squirrel::Stages::JSON>, in a distribution named
-C<DBIx-Squirrel-Stages-JSON>. Have it require the DBIx::Squirrel it was
-tested with. v2.0.3 was the first on Ekorn::Pipeline, and v2.1.0 the
-first to take a pipeline as a stage.
+C<DBIx::Squirrel::Stages::CSV>, in a distribution named
+C<DBIx-Squirrel-Stages-CSV>. Have it require the DBIx::Squirrel it was
+tested with: v3.0.0 is the first with sinks, C<|> and the run's context
+described in L<15. Protocols|/"15. Protocols">.
 
-=head1 A function for each database and statement: Sugar
+=head1 15. Protocols
 
-C<DBIx::Squirrel::Sugar> gives each database a name. The package that
-names it gets a function of that name, which returns the database
-handle or runs a statement on it. A statement gets a function too,
-which runs it with the bind values and any stages given.
+What other code can rely on: the contracts between DBIx::Squirrel and
+Ekorn::Pipeline, and between a statement's run and the stages reading
+it. They're Ekorn::Pipeline's protocols, as DBIx::Squirrel keeps them;
+Ekorn's reference describes the protocols themselves, in L<Delivering
+parts for
+Ekorn|Ekorn::Pipeline::Manual::Reference/"Delivering parts for Ekorn">.
 
-=head2 Defining them on use
+=head2 The iterator as a source
 
-    use DBIx::Squirrel::Sugar database => {
-        music => [$ENV{MUSIC_DSN}, $ENV{MUSIC_USER}, $ENV{MUSIC_PASS}],
-    };
-
-    use DBIx::Squirrel::Sugar statement => {
-        artist_names => [music => 'SELECT name FROM artist', sub ($row) { $row->[0] }],
-        artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
-    };
-
-Given a hash reference after C<database> or C<statement>, C<use> defines
-each database or statement named in it, with its arguments in an array
-reference. It gives the package each function while the package is
-compiled, so the function can be called without parentheses.
-
-The arguments are worked out then too. The environment, literals, and
-what a C<BEGIN> block has set are there, but a variable the program
-sets as it runs is not yet.
-
-C<use> also gives the package the C<database> and C<statement> functions.
-To have just those:
-
-    use DBIx::Squirrel::Sugar qw(database statement);
-
-=head2 database
-
-    $dbh      = database($name);
-    $function = database($name, @connect_args);
-
-Given a name, returns the handle of the database defined by that name,
-anywhere in the program. It connects to the database if it isn't
-connected.
-
-Given a name and the arguments C<connect> takes, it defines a database
-by that name. It gives the calling package a function of that name,
-and returns the function. A database defined with a database handle,
-in place of a data source, is a clone of it, as C<connect> makes. The
-clone is made when the database is first used.
-
-A database is defined once in a program, by a name that can be a
-function's. The package can't have a function of that name already.
-
-=head2 The function a database is given
-
-    $dbh     = music();
-    $sth     = music($statement, @bind_values);
-    $sth     = music($statement, \%attr, @bind_values);
-    @results = music($statement, @bind_values, @stages);
-    $count   = music($statement, @bind_values, @stages);
+A C<DBIx::Squirrel::Iterator>, and so a result set, is a source, as
+Ekorn::Pipeline takes one: it offers C<EKORN_SOURCE>, the role method
+that a pipeline's C<iterator>, a chain made with C<|>, and C<@{}> call.
+You don't call it yourself. Each call starts a fresh run of the
+statement, from its first row:
 
 =over 4
 
-=item nothing
+=item *
 
-returns the database handle.
+the statement is executed again, finishing it first if it's active,
+as C<reset> does, with the iterator's bind values;
 
-=item a statement and bind values
+=item *
 
-prepares the statement, executes it, and returns the statement handle, or nothing if it couldn't be executed.
+the rows go through the iterator's own stages before they leave it,
+so a pipeline reading it gets its results, not its rows;
 
-=item those, and stages at the end
+=item *
 
-iterates over the results, as C<iterate> does, and returns them all, or, in scalar context, how many there were.
+the run's context is the statement's (see below);
+
+=item *
+
+the run is the iterator's: one it had going ends, and C<ended> says
+how this one ended;
+
+=item *
+
+if another iterator over the same statement handle has results left,
+it croaks, C<Expected the statement handle's other iterator to be
+finished>, rather than take the handle from under it.
 
 =back
 
-A hash reference or C<undef> straight after the statement is the
-attributes to prepare it with. The statement can be a statement
-handle, which is itself executed, or iterated over.
+A run reading the iterator reads on even if the iterator itself is let
+go first, and finishes the statement when it ends.
 
-    my $sth   = music 'SELECT * FROM artist WHERE id = ?', 1;
-    my @names = music 'SELECT name FROM artist', sub ($row) { $row->[0] };
+    use Ekorn::Pipeline;
 
-=head2 statement
+    my $it   = $dbh->iterate('SELECT name FROM artist ORDER BY id', sub { $_->[0] });
+    my $next = Ekorn::Pipeline->new(sub {uc})->iterator($it);
+    undef $it;
+    my @names;
+    while (my($name) = $next->()) { push @names, $name }
+    say "@names";    # ABBA BLUR CREAM
 
-    $function = statement($name, $database, $statement, @stages);
-    $function = statement($name, $database, $statement, \%attr, @stages);
+=head2 The run's context
 
-Defines a statement by that name, on the database of that name. The
-attributes are those to prepare it with, and the stages are its own.
-It gives the calling package a function of that name, and returns the
-function. The database is found when the function runs, so it can be
-defined after the statement.
+A run reading a statement, whether the iterator's own or a pipeline's
+reading it, has the statement's context, which a stage asks for with
+C<Ekorn::Pipeline::run_context()>. It's a hash reference:
 
-=head2 The function a statement is given
+=over 4
 
-    $sth     = artist(@bind_values);
-    @results = artist(@bind_values, @stages);
-    $count   = artist(@bind_values, @stages);
+=item C<statement>
 
-It executes the statement with the bind values, and returns the
-statement handle, or nothing if it couldn't be executed.
+The statement handle, a C<DBIx::Squirrel::st>.
 
-With stages, its own or those given after the bind values, it iterates
-over the results. They go through its own stages, then those given. It
-returns them all, or, in scalar context, how many there were. Stages
-given are for that call only.
+=item C<columns>
 
-    my @all   = artist_names;                             # through its stage
-    my @upper = artist_names sub ($name) { uc $name };    # and one more
-    my $found = artist id => 1;                           # the statement handle
+A reference to an array of the statement's column names, as C<fetchrow_hashref> keys them, following C<FetchHashKeyName>, read when the statement was executed.
 
-The statement is prepared once for each database handle, with
-C<prepare_cached>. Its handle may be in use: by a statement handle not
-read to the end, or by a stage calling the same function. A call then
-prepares one of its own. A statement taking a L<list|/"Lists"> is
-prepared for each call's values instead, and isn't cached.
+=item C<row>
 
-=head2 Connections
+The row the statement gave last, as fetched, or as a row object for a result set: the row the value a stage is working on came from. C<undef> once the run has ended.
 
-A database is connected to when it's first used, not when it's
-defined, with C<connect_cached>. So two databases defined with the same
-arguments share a handle.
+=back
 
-The handle is kept, and each use has the same one, without a ping to
-the database each time. It's pinged only while its last call has
-failed, which leaves the error to be read. It's made again if the
-connection has gone, or if the handle has been disconnected. So the
-call after a connection drops fails, as it would with plain DBI, and
-the call after that has a new connection.
+A run whose context has a C<statement> that's a C<DBIx::Squirrel::st> is
+reading a statement; any other run, such as a pipeline called with
+values, has some other context, or none. C<pluck>, C<as_hash> and
+C<result_original> read it, and so can a stage of yours. While a flush
+gives its values, which come from every row, not one,
+C<Ekorn::Pipeline::ending()> is true, and the row is no value's;
+C<result_original> gives C<undef> then.
 
-=head1 Errors
+    my $columns = sub ($row) {
+        my $names = Ekorn::Pipeline::run_context()->{columns};
+        return join ', ', map {"$names->[$_]=$row->[$_]"} keys @$names;
+    };
+    say join '; ', $dbh->iterate('SELECT id, name FROM artist ORDER BY id', $columns)->all;    # id=1, name=Abba; id=2, name=Blur; id=3, name=Cream
+
+The context is the run's: a pipeline called inside a stage has its
+own, which has no row unless it too reads a statement.
+
+=head2 What a call takes as stages
+
+C<iterate>, C<results>, an iterator's C<reset>, the select methods,
+C<pipe>, C<tap> and the Sugar's functions take stages at the end of
+their arguments. A stage is whatever Ekorn::Pipeline's C<is_stage> is
+true of: a code reference, a pipeline, or one of Ekorn's stage
+objects. Those include stages made with C<gather>, Ekorn's words and
+the canned stages, and its sinks. Anything else is a bind value, so an
+object of your own given as a value stays one. A sink, if one is last,
+says what the call gives (see L<8. Sinks|/"8. Sinks">). Only a Sugar
+statement's definition takes pipelines' names, as strings.
+
+=head2 What a gather's block returns
+
+A C<gather> block, Ekorn's protocol for a part made for each run,
+returns its step, flush and end, as a list or by name in a hash
+reference (see L<gather|/"gather">). DBIx::Squirrel adds nothing to it;
+Ekorn's reference has it in full, in
+L<gather|Ekorn::Pipeline::Manual::Reference/"gather">.
+
+=head1 16. Errors and diagnostics
+
+The user guide's L<chapter 15|DBIx::Squirrel::Manual::HowTo/"15. When things go wrong">.
+
+=head2 Errors
 
 Errors are reported at the line of your code that called
-DBIx::Squirrel, never at a line inside it or the DBI. That includes the
-DBI's own errors under C<RaiseError>, such as
+DBIx::Squirrel, never at a line inside it or the DBI. That includes
+the DBI's own errors under C<RaiseError>, such as
 C<DBD::SQLite::db prepare failed: near "SELEC": syntax error>, which
 keep the DBI's message.
 
@@ -1774,22 +2549,25 @@ C<prepare> and C<prepare_cached>. The error then has the message the DBI
 raises under C<RaiseError>, so it reads the same whatever C<RaiseError>
 is set to.
 
-Each error names the method you called, as plain DBI does: C<do> and the
-select methods, not the C<prepare> or C<execute> they call.
+Each error names the method you called, as plain DBI does: C<do> and
+the select methods, not the C<prepare> or C<execute> they call;
+C<selectall_array>'s errors name C<selectall_arrayref>, as the DBI's do.
 
 An error from a C<HandleError> callback, or one that isn't a string, is
-passed on unchanged.
+passed on unchanged. The DBI's warnings, under C<PrintError>, its
+default, are reported the same way plain DBI reports them: at your
+line, naming the method you called.
 
-The DBI gives warnings under C<PrintError>, its default. They're
-reported the same way plain DBI reports them: at your line, naming the
-method you called.
+    eval { $dbh->prepare('SELEC name FROM artist') };
+    print $@;    # DBD::SQLite::db prepare failed: near "SELEC": syntax error at ... line ...
 
-=head1 Diagnostics
+=head2 Diagnostics
 
-These are DBIx::Squirrel's own messages. Each is reported at the
+These are DBIx::Squirrel's own messages, and the messages of
+Ekorn::Pipeline's that its users meet. Each is reported at the
 caller's line. Those starting "Expected" say what was expected.
 
-=head2 Connecting, preparing and binding
+=head3 Connecting, preparing and binding
 
 =over 4
 
@@ -1811,7 +2589,7 @@ C<ekorn_slice> was something else.
 
 =item C<Expected a reference to a HASH or ARRAY>
 
-The first argument after the statement in C<do>, C<iterate>, C<results> or a select method was a reference, but not to a hash or an array.
+The first argument after the statement in C<do>, C<iterate>, C<results> or a select method was an unblessed reference, but not to a hash or an array. An object there is a bind value.
 
 =item C<Expected %d bind values, not %d>
 
@@ -1851,7 +2629,7 @@ A list placeholder was given an empty list.
 
 =item C<Expected plain values in a list (%s)>
 
-A list held a reference, as C<[[1, 2]]> does to a statement whose one value is a list.
+A list held an unblessed reference, as C<[[1, 2]]> does to a statement whose one value is a list.
 
 =item C<Expected %d values in a list, as prepared, not %d (%s)>
 
@@ -1859,17 +2637,17 @@ The handle of a statement taking a list was executed or bound with a list of ano
 
 =back
 
-=head2 Iterators and result sets
+=head3 Iterators and result sets
 
 =over 4
 
-=item C<Expected a statement handle>
+=item C<Expected a DBIx::Squirrel statement handle>
 
 C<< DBIx::Squirrel::Iterator->new >> wasn't given a C<DBIx::Squirrel::st>.
 
-=item C<Expected one result, not more>
+=item C<Expected only one item, but there were more>
 
-C<single> found a second result.
+A warning: C<single>, C<keep_single> or C<take_single> found a second result, and gave the first.
 
 =item C<Expected the statement handle's other iterator to be finished>
 
@@ -1881,63 +2659,79 @@ C<ekorn_result_class> named a class that isn't one.
 
 =item C<Expected a column of the row (%s)>
 
-C<get_column> was given a name or position the row doesn't have.
+C<get_column> or C<pluck> was given a name or position the row doesn't have.
+
+=item C<Expected use Ekorn::Pipeline::Operators in scope, for %s>
+
+C<|> or C<@{}> was used on an iterator where the operators aren't in force.
 
 =back
 
-=head2 Pipelines
+=head3 Pipelines
 
 =over 4
 
-=item C<Expected stage #%d to be a code reference or a pipeline>
+=item C<Expected stage #%d to be a stage: a code reference, a pipeline, or an object offering a stage's role method>
 
-Something passed as a stage wasn't a code reference or a pipeline. No stage runs.
+Something passed as a stage to a pipeline, C<pipe> or C<tap> wasn't one. No stage runs.
+
+=item C<Expected stage #%d to be a stage: a code reference, a pipeline or its name, or an object offering a stage's role method>
+
+Something given to C<pipeline>, or to C<named>, wasn't a stage or a pipeline's name.
 
 =item C<Expected a code reference>
 
-The source given to a pipeline's C<iterator>, or the block given to C<gather>, wasn't a code reference.
+The block given to C<gather>, C<take_while>, C<drop_while>, C<take_if>, C<drop_if>, C<collect> or C<peek> wasn't a code reference.
 
-=item C<Expected stage #%s, made with gather, to return a code reference or a pipeline, and optionally an end function>
+=item C<Expected a source: a code reference, or an object offering EKORN_SOURCE>
+
+A pipeline's C<iterator> was given something it can't read.
+
+=item C<Expected stage #%s, made with gather, to return a code reference or a pipeline, and optionally a flush and an end>
 
 The block given to C<gather> for that stage returned something else.
 
 =item C<Pipeline stage #%s failed at %s line %d:>
 
-A stage, or its end function, died. The message it died with follows, indented. A stage inside a pipeline given as a stage is named C<#2.3>, for the third stage of the pipeline given as stage #2.
+A stage, or its flush, died. The message it died with follows, indented. See L<When a stage dies|/"When a stage dies">.
+
+=item C<Pipeline end of %s failed at %s line %d:>
+
+An end died, in a run that hadn't died already: the source's, as C<the source>, or a stage's, as C<stage #2>.
+
+=item C<The end of %s died while the run was already dying: %s>
+
+A warning: an end died in a run that had died already. The run's own error is the one thrown.
 
 =item C<Stop used outside a pipeline>
 
 C<Stop> was called where no pipeline was running to catch it.
 
+=item C<No pipeline named %s>
+
+A name, in a Sugar statement's definition or given to C<pipeline>, has no pipeline.
+
 =back
 
-=head2 Canned stages
+=head3 Canned stages and sinks
 
 =over 4
 
 =item C<Expected a count of 0 or more>
 
-C<take> or C<drop> was given something other than a whole number.
+C<take>, C<drop> or C<keep> was given something other than a whole number.
 
 =item C<Expected a batch size of 1 or more>
 
 C<batch> was given something other than a whole number above 0.
 
-=item C<Expected a code reference>
-
-C<take_while>, C<drop_while>, C<collect> or C<peek> was given something other than a block or code reference.
-
 =item C<Expected a column, by name or position>
 
 C<pluck> was given no column, or an empty name.
 
-=item C<Expected a column of the row (%s)>
+=item C<Expected a statement to read, for the column names>
 
-A row hasn't got the column C<pluck> was given.
-
-=item C<Expected an iterator, for the column names>
-
-C<as_hash>, or C<pluck> with a name for an array row or a position for a hash row, ran where no iterator was running it.
+C<as_hash>, or C<pluck> with a name for an array row or a position for a hash row, ran where no statement was being read, such as in a pipeline called with values.
 
 =item C<Expected a row: an array, a hash or a row object>
 
@@ -1949,11 +2743,11 @@ C<count_into> was given something else.
 
 =item C<Expected an open filehandle>
 
-C<dump_to> was given something else.
+C<dump_to> or C<to_fh> was given something else.
 
 =back
 
-=head2 Sugar
+=head3 Sugar
 
 =over 4
 
@@ -1981,7 +2775,7 @@ The name can't be a function's.
 
 The name was given to another database already.
 
-=item C<Expected a database defined as %s>
+=item C<Expected a database named %s>
 
 C<database> was given a name no database has.
 
@@ -1989,20 +2783,275 @@ C<database> was given a name no database has.
 
 A statement's definition didn't name its database, or have its SQL.
 
-=item C<Expected only code references or pipelines after the statement for %s>
+=item C<Expected only stages after the statement for %s: code references, pipelines or their names, or objects offering a stage's role method>
 
-A statement's definition had something other than stages, which are code references or pipelines, after the statement and its attributes.
+A statement's definition had something after the statement and its attributes that's neither a stage nor a pipeline's name.
 
 =item C<Expected no function of the name in %s already (%s)>
 
-The package has a function of that name already.
+The package has a function of that name already, such as a sink it imported.
 
 =back
 
+=head1 Making each kind of part
+
+This section is for developers making parts for DBIx::Squirrel's
+users. It says what a statement's run gives each piece of a part. Then
+it works through an example of each kind DBIx::Squirrel adds to, made
+with a word and as a class of your own. The protocol itself, what each
+piece is called with, what it returns, and the rules every part keeps,
+is Ekorn::Pipeline's, and its reference has it in full, in L<Making each
+kind of part|Ekorn::Pipeline::Manual::Reference/"Making each kind of part">.
+Each example runs against the examples' database, and its comments say
+what it prints.
+
+=head2 What a statement's run gives each piece
+
+A part reading a statement, through C<iterate>, C<results>, a Sugar
+function, C<|>, or a pipeline of yours reading an iterator, finds the
+statement in the L<run's context|/"The run's context">. What each piece
+finds there, and what L<Context|/"Context">'s functions give it:
+
+=over 4
+
+=item B<set-up>
+
+**C<Ekorn::Pipeline::run_context()>:** nothing: the run hasn't read the statement yet
+
+**C<result_original>:** C<undef>
+
+**C<result_number>, in an iterator's own run:** C<undef>
+
+=item a stage's B<step>
+
+**C<Ekorn::Pipeline::run_context()>:** C<statement>, C<columns>, and the C<row> this value came from
+
+**C<result_original>:** the row
+
+**C<result_number>, in an iterator's own run:** the number of the result being made
+
+=item a stage's B<flush>
+
+**C<Ekorn::Pipeline::run_context()>:** C<statement> and C<columns>; C<ending()> is true, and the row is no value's
+
+**C<result_original>:** C<undef>
+
+**C<result_number>, in an iterator's own run:** the number of the first value it gives
+
+=item a sink's B<step>
+
+**C<Ekorn::Pipeline::run_context()>:** C<statement>, C<columns> and C<row>, as for a stage
+
+**C<result_original>:** the row
+
+**C<result_number>, in an iterator's own run:** not the value's number, which has been counted: a sink counts for itself
+
+=item a sink's B<flush>
+
+**C<Ekorn::Pipeline::run_context()>:** as for a stage's flush
+
+**C<result_original>:** C<undef>
+
+**C<result_number>, in an iterator's own run:** not used
+
+=item an B<end>
+
+**C<Ekorn::Pipeline::run_context()>:** C<statement> and C<columns>; the C<row> is C<undef>
+
+**C<result_original>:** C<undef>
+
+**C<result_number>, in an iterator's own run:** not used
+
+=back
+
+So a stage that needs the statement's columns reads them in its step,
+the first time it's called in the run, and keeps them in a variable of
+the set-up, as C<pluck> and C<as_hash> do. It can't read them in the
+set-up, which runs before the statement does.
+
+=head2 A stage for rows, with the word C<gather>
+
+A stage that gives each row, an array, as its columns and values, and
+says how many rows there were once they run out. It croaks if what it
+reads isn't a statement, in a module of stages, as L<Stages for
+others|/"Stages for others"> says, so the message names the caller's
+line:
+
+    package My::Stages {
+        use DBIx::Squirrel::Errors qw(croakf);
+        use DBIx::Squirrel::Tooling qw(gather);
+
+        our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
+
+        sub labelled () {
+            return gather {
+                my($columns, $n) = (undef, 0);    # this run's
+                return {
+                    step => sub ($row) {
+                        $columns //= do {
+                            my $context = Ekorn::Pipeline::run_context();
+                            croakf 'Expected a statement to read, for its columns'
+                                unless ref $context eq 'HASH'
+                                && $context->{statement} isa 'DBIx::Squirrel::st';
+                            $context->{columns};
+                        };
+                        $n++;
+                        return join ', ', map {"$columns->[$_]=$row->[$_]"} 0 .. $#$columns;
+                    },
+                    flush => sub () {"($n rows)"},
+                };
+            };
+        }
+    }
+
+    say for $dbh->iterate(
+        'SELECT id, name FROM artist ORDER BY id',
+        My::Stages::labelled,
+    )->all;
+    # id=1, name=Abba
+    # id=2, name=Blur
+    # id=3, name=Cream
+    # (3 rows)
+
+    say for $dbh->iterate(
+        'SELECT id, name FROM artist ORDER BY id',
+        My::Stages::labelled,
+        take(1),
+    )->all;
+    # id=1, name=Abba
+
+    eval { Ekorn::Pipeline->new(My::Stages::labelled)->([1, 'Abba']) };
+    print $@;
+    # Pipeline stage #1 failed at ... line ...:
+    #     Expected a statement to read, for its columns at ... line ...
+
+In the second run, C<take(1)>, after it, stopped the run while rows
+were still to come, so its flush wasn't called, as Ekorn's rules say.
+Called with values, the pipeline reads no statement, so the stage
+croaks.
+
+=head2 The same stage, as a class
+
+A class of your own can be the same stage, by offering C<EKORN_STAGE>,
+called at the start of each run with the object, and returning the
+pieces, as the set-up did. The object keeps its settings, and each run
+its own columns:
+
+    package My::Labelled {
+        sub new ($class, %options) { bless {between => $options{between} // ', '}, $class }
+
+        sub EKORN_STAGE ($self) {
+            my $columns;    # this run's
+            return {
+                step => sub ($row) {
+                    $columns //= Ekorn::Pipeline::run_context()->{columns};
+                    return join $self->{between}, map {"$columns->[$_]=$row->[$_]"} 0 .. $#$columns;
+                },
+            };
+        }
+    }
+
+    say for $dbh->iterate(
+        'SELECT id, name FROM artist ORDER BY id',
+        My::Labelled->new(between => ' '),
+    )->all;
+    # id=1 name=Abba
+    # id=2 name=Blur
+    # id=3 name=Cream
+
+=head2 A sink into a table, with the word C<sink_one>
+
+A sink that inserts each value into a table, and gives how many it
+inserted. Its set-up begins a transaction, and its end commits it only
+if the run ended C<done>, so a run that dies, or is stopped, leaves the
+table as it was:
+
+    sub into ($dbh, $table) {
+        return sink_one {
+            my $n = 0;
+            $dbh->begin_work;
+            my $sth = $dbh->prepare("INSERT INTO $table (name) VALUES (?)");
+            return {
+                step  => sub ($name) { $sth->execute($name); $n++ },
+                flush => sub ()      {$n},
+                end   => sub ($how)  { $how eq 'done' ? $dbh->commit : $dbh->rollback },
+            };
+        };
+    }
+
+    $dbh->do('CREATE TEMP TABLE copy (name TEXT)');
+
+    say $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        pluck('name'),
+        into($dbh, 'copy'),
+    );
+    # 3
+
+    eval {
+        $dbh->iterate(
+            'SELECT name FROM artist ORDER BY id',
+            pluck('name'),
+            sub { die "no Cream\n" if $_ eq 'Cream'; $_ },
+            into($dbh, 'copy'),
+        );
+    };
+    print $@;
+    # Pipeline stage #2 failed at ... line ...:
+    #     no Cream
+
+    say $dbh->selectrow_array('SELECT COUNT(*) FROM copy');    # 3
+
+The second run inserted Abba and Blur, then died at Cream, so the sink's
+end was told C<died>, and rolled them back: the table has the first
+run's three rows.
+
+=head2 The same sink, as a class
+
+A class offers C<EKORN_SINK_ONE> for a sink of one result, or
+C<EKORN_SINK_MANY> for a sink of many, returning the same pieces:
+
+    package My::Into {
+        sub new ($class, $dbh, $table) { bless {dbh => $dbh, table => $table}, $class }
+
+        sub EKORN_SINK_ONE ($self) {
+            my($dbh, $n) = ($self->{dbh}, 0);
+            $dbh->begin_work;
+            my $sth = $dbh->prepare("INSERT INTO $self->{table} (name) VALUES (?)");
+            return {
+                step  => sub ($name) { $sth->execute($name); $n++ },
+                flush => sub ()      {$n},
+                end   => sub ($how)  { $how eq 'done' ? $dbh->commit : $dbh->rollback },
+            };
+        }
+    }
+
+    say $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        pluck('name'),
+        take(2),
+        My::Into->new($dbh, 'copy'),
+    );
+    # 2
+
+    say $dbh->selectrow_array('SELECT COUNT(*) FROM copy');    # 5
+    $dbh->do('DROP TABLE copy');
+
+C<take(2)> stopped the run, but before the sink, so the sink got every
+value it was going to get: its end was told C<done>, and it committed.
+
+=head2 Row classes and functions that take stages
+
+A row class of your own, for C<results>, is a subclass of
+DBIx::Squirrel::Result with methods of your own: see L<Methods of your
+own|/"Methods of your own">. A function that takes stages from its
+caller hands them to C<iterate>: see L<A function that takes
+stages|/"A function that takes stages">. Neither has pieces of its own.
+
 =head1 Differences from plain DBI
 
-Where DBIx::Squirrel and plain DBI do the same thing, they give the same
-result. These are the places they differ.
+Where DBIx::Squirrel and plain DBI do the same thing, they give the
+same result. These are the places they differ.
 
 =over 4
 
@@ -2072,20 +3121,122 @@ B<Plain DBI:> Left to the driver, which most read as C<NULL>.
 
 B<DBIx::Squirrel:> Croaks, for numbered and named placeholders: C<Expected a value for each placeholder (none for id)>.
 
+=item Stages after the select methods' values
+
+B<Plain DBI:> None.
+
+B<DBIx::Squirrel:> What the DBI gives is pushed through them.
+
 =item Iterators, result sets, pipelines
 
 B<Plain DBI:> None.
 
-B<DBIx::Squirrel:> C<iterate>, C<results>, C<pipe>, C<tap> and Sugar.
+B<DBIx::Squirrel:> C<iterate>, C<results>, sinks, C<|> and C<@{}>, C<pipe>, C<tap> and the Sugar.
 
 =back
 
+=head1 Upgrading from 2.x
+
+Version 3 builds on Ekorn::Pipeline v0.3.0, and makes one rule of what
+a call gives: a statement is a source; DBIx::Squirrel's calls give an
+iterator, and only a sink given last turns it into a result. These are
+the changes code written for 2.x meets, and how to move:
+
+=over 4
+
+=item A Sugar statement given stages, read as a list: C<my @names = artist_names sub {...}>
+
+B<What happens now:> gives an iterator, not every result
+
+B<How to move:> give a sink last: C<artist_names sub {...}, keep_all>
+
+=item A Sugar statement given stages in scalar context, for a count
+
+B<What happens now:> gives an iterator
+
+B<How to move:> give C<count_items> last
+
+=item C<< $it->count >>
+
+B<What happens now:> fails: the method is gone
+
+B<How to move:> give C<count_items> last, or count as you go with C<count_into(\$n)>
+
+=item C<< my $n = $it->all >>, for a count
+
+B<What happens now:> an array reference
+
+B<How to move:> C<count_items> given last
+
+=item C<< $it->single >>, after C<next>
+
+B<What happens now:> the next result, not a fresh run's only one
+
+B<How to move:> C<< $it->reset->single >>
+
+=item C<< $it->single >>, at a second result
+
+B<What happens now:> a warning, and the first, not a croak
+
+B<How to move:> check for the warning, or keep the croak with a stage of your own
+
+=item C<< DBIx::Squirrel::Pipeline->new(...) >>
+
+B<What happens now:> fails on a fresh install, as the module is no longer shipped; a copy that 2.x installed still loads, until it's deleted
+
+B<How to move:> C<< Ekorn::Pipeline->new(...) >>, or C<pipeline(...)> from Ekorn::Pipeline::Factories
+
+=item C<$x isa 'DBIx::Squirrel::Pipeline'>
+
+B<What happens now:> false
+
+B<How to move:> C<$x isa 'Ekorn::Pipeline'>
+
+=item C<< DBIx::Squirrel::Stop->throw >>, or a subclass of DBIx::Squirrel::Stop
+
+B<What happens now:> fails: it's no longer a class
+
+B<How to move:> C<< Ekorn::Pipeline::Stop->throw >>, and subclass C<Ekorn::Pipeline::Stop>
+
+=item C<ref $stage eq 'CODE'>, or C<is_coderef($stage)>, for a stage made by C<take>, C<gather> and the like
+
+B<What happens now:> false: they're objects now, called as code references
+
+B<How to move:> C<is_stage($stage)>, from Ekorn::Pipeline
+
+=item A C<gather> block's second part, "the end function"
+
+B<What happens now:> the same, now called the flush
+
+B<How to move:> nothing; an end, told how the run ended, can follow it
+
+=item C<result_number> or C<iterator> in a pipeline of your own reading an iterator
+
+B<What happens now:> C<undef>
+
+B<How to move:> count in a stage of your own
+
+=item C<< my($first) = $sth->iterate->next >>, then using the handle
+
+B<What happens now:> the handle is finished once the iterator goes
+
+B<How to move:> keep the iterator while the handle is in use
+
+=back
+
+Everything else works as it did: C<iterate>, C<results>, and the select
+methods and Sugar without stages or a sink last, C<pluck>, C<as_hash>,
+C<take>, C<Stop>, and C<gather>. New: C<first>, C<ended>, sinks given last,
+C<|> and C<@{}>, stages for the select methods, named pipelines in the
+Sugar's definitions, and the run's context as a documented protocol.
+
 =head1 Upgrading from 1.x
 
-DBIx::Squirrel 2.0 is a rewrite, not an update. Code written for 1.x
-needs changes before it runs on 2.0. The ideas carry over, so most
-changes are a rename or a simpler call. But some methods keep their
-names and change what they do. They're marked B<in bold> below.
+DBIx::Squirrel 2 was a rewrite, not an update, and version 3 builds on
+it. Code written for 1.x needs changes before it runs. The ideas carry
+over, so most changes are a rename or a simpler call. But some methods
+keep their names and change what they do. They're marked B<in bold>
+below.
 
 To stay on 1.x, which supports Perl 5.10.1 and later, install the last
 version by its number:
@@ -2128,7 +3279,7 @@ A function holds a database, or a statement on a database by name, with stages o
 
 =item A helper for a result set returned the iterator, so C<< artist('Aerosmith')->single->ArtistId >>.
 
-A statement's function returns the statement handle, or, with stages, the results themselves, as arrays: C<< artist('Aerosmith', sub ($row) { $row->[0] }) >>.
+A statement's function returns the statement handle, or, with stages, an iterator, or a sink's result: C<< artist('Aerosmith', sub ($row) { $row->[0] }, keep_single) >>.
 
 =back
 
@@ -2138,13 +3289,12 @@ A statement's function returns the statement handle, or, with stages, the result
     artist(db->results('SELECT * FROM artists WHERE Name = ? LIMIT 1'));
     say artist('Aerosmith')->single->ArtistId;
 
-    # 2.0
+    # Now
     use DBIx::Squirrel::Sugar
         database  => {db => [$ENV{DSN}, $ENV{USER}, $ENV{PASS}]},
         statement => {artist_id => [db => 'SELECT ArtistId FROM artists WHERE Name = ?', sub ($row) { $row->[0] }]};
-    my($id) = artist_id('Aerosmith');
-
-See L<A function for each database and statement: Sugar|/"A function for each database and statement: Sugar">.
+    use Ekorn::Pipeline::Sinks qw(keep_single);
+    my $id = artist_id('Aerosmith', keep_single);
 
 =head2 Placeholders and binding
 
@@ -2195,31 +3345,35 @@ C<results> only.
 
 =item C<< $dbh->iterate($sql, [@bind_values, @transforms]) >>: values and stages in one array reference.
 
-Stages are at the end of the arguments, as code references or pipelines: C<< $dbh->iterate($sql, @bind_values, @stages) >>.
+Stages are at the end of the arguments: C<< $dbh->iterate($sql, @bind_values, @stages) >>.
 
 =item **C<next> put the result in C<$_>**, as in C<< while ($it->next) { say $_->Name } >>.
 
 Nothing is put in C<$_>: C<< while (my($row) = $it->next) { say $row->name } >>.
 
-=item **C<all> in scalar context returned a reference to the results.**
+=item C<all> in scalar context returned a reference to the results.
 
-C<all> in scalar context returns how many there were: C<< my $results = [$it->all] >>.
+The same.
 
 =item **C<count> fetched the rest of the results and returned how many there were in all.**
 
-C<count> returns how many have been handed out so far, as 1.x's C<count_fetched> did. To count them all: C<< my $n = $it->all >>.
+Gone: give C<count_items> last, as C<< $dbh->iterate($sql, count_items) >>.
 
 =item C<count_fetched>.
 
-C<count>.
+Gone: C<count_into(\$n)> as a stage, or C<result_number> in one.
 
-=item **C<single> and C<one> returned the first result, with a warning if there were more.**
+=item C<single> and C<one> returned the first result, with a warning if there were more.
 
-C<single> executes the statement again and returns its one result, croaking if there's more than one. C<one> is gone.
+C<single> the same; C<one> is gone.
 
-=item C<first>, C<last> and C<last_fetched>.
+=item C<first>.
 
-Gone: C<single>, C<next>, or a stage.
+The same.
+
+=item C<last> and C<last_fetched>.
+
+Gone: C<keep_last> given last, or C<take_last> as a stage.
 
 =item C<remaining>.
 
@@ -2231,7 +3385,7 @@ C<reset(@bind_values, @stages)>.
 
 =item C<reset($slice, $cache_size)>, to change the slice or the cache size.
 
-C<reset> takes bind values and stages. The slice is the C<ekorn_slice> attribute. Rows are fetched 100 at a time.
+C<reset> takes bind values and stages. The slice is the C<ekorn_slice> attribute. Rows are fetched 2 at first, up to 64 at a time.
 
 =item C<slice>, C<cache_size> and their package-wide defaults, C<$DBIx::Squirrel::it::DEFAULT_SLICE> among them.
 
@@ -2279,7 +3433,7 @@ The same, from DBIx::Squirrel::Context.
 
 =item C<database> and C<statement>.
 
-C<< iterator->sth->{Database} >> and C<< iterator->sth >>.
+C<< iterator->sth->{Database} >> and C<< iterator->sth >>, or the L<run's context|/"The run's context">.
 
 =item C<result> and C<result_current>.
 
@@ -2287,7 +3441,7 @@ The stage's argument.
 
 =item C<result_first>, C<result_prev>, C<result_previous> and C<result_offset>.
 
-Gone. A stage that needs them keeps them itself, in a L<C<gather>|/"Gathering: stages with state, and an end"> block.
+Gone. A stage that needs them keeps them itself, in a L<C<gather>|/"gather"> block.
 
 =item C<DBIx::Squirrel::Transform::Data::Dumper>'s C<as_perl>, and C<DBIx::Squirrel::Transform::IO>'s C<stdout> and C<stderr>.
 
@@ -2295,13 +3449,13 @@ C<dump_to> and C<peek>, from DBIx::Squirrel::Stages::Taps. See L<Canned stages|/
 
 =item No way to end a transformation early.
 
-C<Stop>, from DBIx::Squirrel::Stop. See L<Stopping a pipeline|/"Stopping a pipeline">.
+C<Stop>, from DBIx::Squirrel::Stop. See L<Stop|/"Stop">.
 
 =back
 
 =head2 Gone, out of scope
 
-These have no place in 2.0. Any that come back will come back as
+These have no place now. Any that come back will come back as
 distributions of their own.
 
 =over 4
@@ -2312,7 +3466,7 @@ A Fernet module from CPAN.
 
 =item C<DBIx::Squirrel::Transform::JSON::Syck> and C<DBIx::Squirrel::Transform::YAML::Syck>.
 
-A stage of your own calling a JSON or YAML module. See L<Writing stages|/"Writing stages">.
+For JSON, C<from_json> and C<to_json>, from Ekorn::Pipeline::JSON, by Tooling's L<C<:json>|/"Importing: DBIx::Squirrel::Tooling">. For YAML, a stage of your own calling a YAML module: see L<Stages for others|/"Stages for others">.
 
 =item C<get_file_contents>, C<slurp>, C<uncompress>, C<unmarshal> and C<utf8decode>, from DBIx::Squirrel::util.
 
@@ -2324,7 +3478,7 @@ C<prepare> and C<execute>, in a loop.
 
 =item C<statement_digest>, C<statement_normalise>, C<statement_study> and C<statement_trim>, on a statement handle.
 
-C<study_sql> and C<trim_sql>, from DBIx::Squirrel::Placeholders.
+Gone. DBIx::Squirrel::Placeholders has C<study_sql> and C<trim_sql>, but they're internal, and may change.
 
 =back
 
@@ -2338,15 +3492,15 @@ The class you connect with; a subclass of C<DBI>.
 
 =item C<DBIx::Squirrel::db>
 
-The database handle class; a subclass of C<DBI::db>.
+The database handle class; a subclass of C<DBI::db>, with Ekorn::Pipeline::Pipes' C<pipe> and C<tap>.
 
 =item C<DBIx::Squirrel::st>
 
-The statement handle class; a subclass of C<DBI::st>.
+The statement handle class; a subclass of C<DBI::st>, with C<pipe> and C<tap> too.
 
 =item C<DBIx::Squirrel::Iterator>
 
-An iterator over a statement's results.
+An iterator over a statement's results, and a source for Ekorn::Pipeline.
 
 =item C<DBIx::Squirrel::Results>
 
@@ -2354,27 +3508,19 @@ An iterator handing out rows as objects.
 
 =item C<DBIx::Squirrel::Result>
 
-The base class of row objects.
-
-=item C<DBIx::Squirrel::Pipeline>
-
-Runs values through a list of stages.
-
-=item C<DBIx::Squirrel::Pipes>
-
-The C<pipe> and C<tap> methods of both handle classes.
+The base class of row objects. Its C<class_for>, which makes the row classes, is internal.
 
 =item C<DBIx::Squirrel::Stop>
 
-Ends a pipeline early.
+Exports Ekorn::Pipeline's C<Stop>, which ends a pipeline early.
 
 =item C<DBIx::Squirrel::Gather>
 
-Makes a stage afresh for each run, with a function called at the end.
+Exports Ekorn::Pipeline's C<gather>, which makes a stage afresh for each run.
 
 =item C<DBIx::Squirrel::Stages::Flow>
 
-Canned stages taking or dropping values: C<take>, C<drop>, C<take_while>, C<drop_while>.
+Canned stages taking or dropping values: C<take>, C<drop>, C<take_first>, C<take_last>, C<take_single>, C<take_while>, C<drop_while>, C<take_if>, C<drop_if>.
 
 =item C<DBIx::Squirrel::Stages::Rows>
 
@@ -2390,7 +3536,11 @@ Canned stages run for their side effects: C<peek>, C<count_into>, C<dump_to>.
 
 =item C<DBIx::Squirrel::Context>
 
-What a stage can ask about the result it's making.
+What a stage can ask about the result it's making. Its C<within> and C<statement_context> are internal, for the iterators and the stages for rows.
+
+=item C<DBIx::Squirrel::Tooling>
+
+Exports what callers use to do work, from one place, by tags: see L<Importing|/"Importing: DBIx::Squirrel::Tooling">.
 
 =item C<DBIx::Squirrel::Sugar>
 
@@ -2398,21 +3548,27 @@ A function for each database and statement.
 
 =item C<DBIx::Squirrel::Placeholders>
 
-Finds the placeholders in a statement, and matches values to them.
+Finds the placeholders in a statement, and matches values to them. Internal: C<trim_sql>, C<study_sql>, C<key_of>, C<is_numbered>, C<values_taken>, C<values_for>, C<expand_lists> and C<place_values> are for the handles.
 
 =item C<DBIx::Squirrel::Errors>
 
-Reports errors at the caller's line. Internal, apart from C<croakf> and C<@INTERNAL>, which a module of stages uses. See L<Writing stages|/"Writing stages">.
+Reports errors at the caller's line. Internal, apart from C<croakf> and C<@INTERNAL>, which a module of stages uses: C<at_caller>, C<in_method> and C<failed> are for the handles. See L<Stages for others|/"Stages for others">.
 
 =item C<DBIx::Squirrel::Util>
 
-Helpers the modules share. Internal.
+Helpers the modules share: C<canonical>, C<install_sub>, C<is_name>, C<iterator_going>, C<shift_attrs>, C<split_attrs>, C<split_stages> and C<unwrap_values>. Internal: they may change without notice.
+
+=item C<DBIx::Squirrel::Manual::Reference> and C<DBIx::Squirrel::Manual::HowTo>
+
+This reference and the user guide, as POD, for MetaCPAN.
 
 =back
 
-C<DBIx::Squirrel::Pipeline>, C<Pipes>, C<Stop> and C<Gather>, and the
-stages in C<DBIx::Squirrel::Stages::Flow>, C<Batch> and C<Taps>, are
-DBIx::Squirrel's names for L<Ekorn::Pipeline|/"Pipelines">'s modules.
+Pipelines, the operators, the sources, the sinks and the JSON parts
+are Ekorn::Pipeline's own: C<Ekorn::Pipeline>,
+C<Ekorn::Pipeline::Operators>, C<Ekorn::Pipeline::Sources>,
+C<Ekorn::Pipeline::Sinks>, C<Ekorn::Pipeline::JSON> and
+C<Ekorn::Pipeline::Factories>.
 
 =head1 SEE ALSO
 

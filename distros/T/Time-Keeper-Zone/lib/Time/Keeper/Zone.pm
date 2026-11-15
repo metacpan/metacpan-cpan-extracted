@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 require XSLoader;
 XSLoader::load('Time::Keeper::Zone', $VERSION);
@@ -19,7 +19,7 @@ Time::Keeper::Zone - the time zones of the IANA database, compiled in
 
 =head1 VERSION
 
-Version 0.05
+Version 0.06
 
 =head1 SYNOPSIS
 
@@ -32,7 +32,7 @@ Version 0.05
     Time::Keeper::Zone->name('europe/london');            # Europe/London
     Time::Keeper::Zone->canonical_name('US/Eastern');     # America/New_York
     Time::Keeper::Zone->local_name;                       # this machine's zone
-    Time::Keeper::Zone->tzdata_version;                   # 2026e
+    Time::Keeper::Zone->tzdata_version;                   # 2026f
 
     my %countries = Time::Keeper::Zone->countries;
     my @zones_gb  = Time::Keeper::Zone->zones_for_country('GB');
@@ -70,7 +70,7 @@ exactly, and keeps its own name.
 
 =head1 THE TIME ZONE DATABASE
 
-This release carries the IANA time zone database's release 2026e, which
+This release carries the IANA time zone database's release 2026f, which
 L</tzdata_version> also gives. IANA publishes several releases a year,
 whenever a country changes its clocks, often at short notice; a new one is a
 new release of this dist, and of this dist alone. Upgrading it is all a
@@ -125,7 +125,7 @@ own zone files never are.
 
 =head2 tzdata_version
 
-The release of the IANA time zone database compiled in, such as C<2026e>.
+The release of the IANA time zone database compiled in, such as C<2026f>.
 
 =head2 countries
 

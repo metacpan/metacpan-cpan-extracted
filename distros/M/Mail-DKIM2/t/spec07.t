@@ -126,7 +126,6 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     (my $no_r = mi_with_recipe($HOP1_TEXT, '{}')) =~ s/; r=[^;]*;/;/;
     unlike($no_r, qr/^Message-Instance: m=2;[^\r\n]*r=/m, 'no-change MI: no r= tag');
     is_pass(add_sig($no_r, %HOP2), 'no-change MI at m=2 passes');
-    is_pass(add_sig($no_r, %HOP2), 'no-change MI at m=2 passes (undo walk)', StreamBody => 0);
     # The same instance over a changed message: m=1 then fails its hash.
     (my $changed = $HOP1_TEXT) =~ s/^Subject: test/Subject: other/m;
     (my $lie = mi_with_recipe($changed, '{}')) =~ s/; r=[^;]*;/;/;
@@ -271,9 +270,6 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     (my $fixed = $bad1) =~ s/^From: .*$/From: list\@lists.example.org\r/m;
     is_error(add_sig(add_mi($fixed, $bad1), %HOP2), 'fail',
         'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A2: a From before the change is checked too');
-    is_error(add_sig(add_mi($fixed, $bad1), %HOP2), 'fail',
-        'FAIL: DKIM2-Signature i=1 matching From is not authentic', 'A2: ... with the undo walk',
-        StreamBody => 0);
 
     # Ruling 19: i=1 is checked against the From at state m(i=1). An
     # author's From in an unsigned ingress m=1 that the list rewrote in m=2
@@ -282,8 +278,6 @@ my $HOP1_TEXT = add_sig(add_mi(message()), %HOP1);
     (my $rewritten = $ingress) =~ s/^From: .*$/From: list\@lists.example.org\r/m;
     is_pass(add_sig(add_mi($rewritten, $ingress), %HOP2),
         'Ruling 19: From replaced before the first signature is not checked');
-    is_pass(add_sig(add_mi($rewritten, $ingress), %HOP2),
-        'Ruling 19: ... with the undo walk', StreamBody => 0);
     my $ingress_ok = add_mi(message());
     (my $tagged = $ingress_ok) =~ s/^Subject: .*$/Subject: [list] test\r/m;
     is_error(add_sig(add_mi($tagged, $ingress_ok), %HOP2), 'fail',

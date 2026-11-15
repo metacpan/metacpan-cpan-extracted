@@ -83,7 +83,7 @@ sub s_ { return summary(@_, return_only => 1, color => 0) }
 {
 	my $hoa = { map { ("k$_" => [1 .. 5]) } 1 .. 5 };   # 5 columns
 	my $txt = s_($hoa, nrows => 2);
-	like $txt, qr/# summary: 5 rows x 7 cols\s+\(showing 2\)/, 'banner shows the cap';
+	like $txt, qr/# summary: 5 rows x 7 cols\s+\(showing 2 rows\)/, 'banner shows the cap';
 	like $txt, qr/# \.\.\. 3 more rows/, 'a "... N more rows" note is appended';
 }
 

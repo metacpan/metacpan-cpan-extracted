@@ -1,7 +1,7 @@
 package DBIO::Test::MooseSugarSchema::ResultSet::Artist;
 # ABSTRACT: Custom Moose-based ResultSet for the MooseSugar artist source
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Moose;
 use MooseX::NonMoose;
@@ -34,7 +34,7 @@ DBIO::Test::MooseSugarSchema::ResultSet::Artist - Custom Moose-based ResultSet f
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

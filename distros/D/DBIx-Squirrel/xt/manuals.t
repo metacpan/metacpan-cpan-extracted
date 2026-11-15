@@ -18,7 +18,7 @@ my %sections = (
         {'the-pipeline' => 'The pipeline', 'pipe-and-tap' => 'pipe and tap'},
     'HOWTO.md'                           => {'stop-early' => 'Stop early'},
     'Ekorn::Pipeline::Manual::Reference' => {
-        'end-functions'                   => 'End functions',
+        'flushes-and-ends'                => 'Flushes and ends',
         'pipe-and-tap-ekornpipelinepipes' => 'pipe and tap: Ekorn::Pipeline::Pipes',
     },
 );
@@ -119,8 +119,8 @@ subtest 'links to Ekorn::Pipeline, by module name' => sub {
         'to its reference';
     is body("[its how-to]($EKORN/blob/main/docs/HOWTO.md)\n"),
         "L<its how-to|Ekorn::Pipeline::Manual::HowTo>\n\n", 'to its how-to';
-    is body("[ends]($EKORN/blob/main/docs/REFERENCE.md#end-functions)\n"),
-        qq{L<ends|Ekorn::Pipeline::Manual::Reference/"End functions">\n\n},
+    is body("[ends]($EKORN/blob/main/docs/REFERENCE.md#flushes-and-ends)\n"),
+        qq{L<ends|Ekorn::Pipeline::Manual::Reference/"Flushes and ends">\n\n},
         'to a section, by its name';
     is body(
         "[pipe]($EKORN/blob/main/docs/REFERENCE.md#pipe-and-tap-ekornpipelinepipes)\n"),
@@ -159,6 +159,10 @@ subtest 'lists and tables' => sub {
     is body("| A | B | C |\n|---|---|---|\n| x | `y|z` | |\n"),
         "=over 4\n\n=item x\n\nB<B:> C<y|z>\n\n=back\n\n",
         'of three, an empty cell left out, a | in code kept';
+    is body(
+        "| Written | Gives |\n|---|---|\n| `a \\| b` | a \\| b, or `\\|=` |\n"),
+        "=over 4\n\n=item C<a | b>\n\na | b, or C<|=>\n\n=back\n\n",
+        'a | escaped as \\|, in code or out, unescaped';
 };
 
 subtest 'quotes' => sub {
@@ -229,6 +233,8 @@ subtest 'each link between the manuals finds its section' => sub {
             =~ m( L< [^|>]+ \| (DBIx::Squirrel::Manual::\w+ / "[^"]+") > )xg)
         {
             my($to, $section) = $link =~ m( \A ([\w:]+) / "(.+)" \z )x;
+            # A | in a link's section is written E<verbar>.
+            $section =~ s( E<verbar> )(|)xg;
             ok $heads{$to}{$section}, "$module: $to has $section";
         }
     }

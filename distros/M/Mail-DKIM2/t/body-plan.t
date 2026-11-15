@@ -130,7 +130,7 @@ same('a lone CR is part of its line',
 
 same('instances numbered with leading zeros',
     message([mi('02', { b => [{ c => [1, 1] }], h => { subject => [{ d => ['x'] }] } }),
-             mi('001')],
+             mi('01')],
             "a\r\n", "b\r\n"));
 
 same('a recipe that rebuilds nothing',

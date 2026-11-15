@@ -4,7 +4,7 @@ package DBIx::Squirrel::st;
 
 use DBI        qw();
 use List::Util qw(pairs);
-use Ref::Util  qw(is_arrayref);
+use Ref::Util  qw(is_plain_arrayref);
 
 use DBIx::Squirrel::Errors       qw(at_caller croakf);
 use DBIx::Squirrel::Iterator     qw();
@@ -12,12 +12,12 @@ use DBIx::Squirrel::Placeholders qw(
     is_numbered key_of place_values values_for values_taken
 );
 use DBIx::Squirrel::Results qw();
-use DBIx::Squirrel::Pipes   qw();
+use Ekorn::Pipeline::Pipes  qw();
 use DBIx::Squirrel::Util    qw(unwrap_values);
 
 use namespace::clean;
 
-our @ISA = ('DBI::st', 'DBIx::Squirrel::Pipes');
+our @ISA = ('DBI::st', 'Ekorn::Pipeline::Pipes');
 
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
@@ -97,15 +97,16 @@ sub execute ($self, @args) {
 }
 
 # Return an iterator over the statement's results, executed with the bind
-# values given, and run through the stages given after them.
+# values given, and run through the stages given after them; or, if the
+# last stage is a sink, the sink's result.
 sub iterate ($self, @args) {
-    return DBIx::Squirrel::Iterator->new($self, @args);
+    return DBIx::Squirrel::Iterator->new($self, @args)->_or_sink;    ## no critic (Subroutines::ProtectPrivateSubs)
 }
 
 # Return a result set over the statement's results: an iterator handing
-# out rows as objects.
+# out rows as objects; or, if the last stage is a sink, the sink's result.
 sub results ($self, @args) {
-    return DBIx::Squirrel::Results->new($self, @args);
+    return DBIx::Squirrel::Results->new($self, @args)->_or_sink;    ## no critic (Subroutines::ProtectPrivateSubs)
 }
 
 # Return the values given, or those in an array reference given alone,
@@ -114,7 +115,7 @@ sub results ($self, @args) {
 # through the handles' attributes.
 sub _unwrap ($self, @args) {
     return @args
-        unless @args == 1 && is_arrayref($args[0]);
+        unless @args == 1 && is_plain_arrayref($args[0]);
     my $state = $self->{private_ekorn};
     return unwrap_values(
         $self->{Database}{Driver}{Name},
@@ -180,10 +181,10 @@ DBIx::Squirrel::st - DBIx::Squirrel's statement handle class
 =head1 DESCRIPTION
 
 A statement handle prepared on a DBIx::Squirrel database handle is
-blessed into this class. It's a subclass of the DBI's C<DBI::st>, so it
-does everything a DBI statement handle does. It also inherits
+blessed into this class. It's a subclass of the DBI's C<DBI::st>, so
+it does everything a DBI statement handle does. It also inherits
 L<DBIx::Squirrel/pipe> and L<DBIx::Squirrel/tap> from
-L<DBIx::Squirrel::Pipes>.
+L<Ekorn::Pipeline::Pipes>.
 
 =head2 Lists
 
@@ -247,7 +248,8 @@ the sigil. There must be a value for each name, and no other:
 =back
 
 A single array reference stands for the values in it, so
-C<< $sth->bind([1, 2]) >> is C<< $sth->bind(1, 2) >>. There are two
+C<< $sth->bind([1, 2]) >> is C<< $sth->bind(1, 2) >>. An object is a
+value, as it is to the DBI, whatever it's made of. There are two
 exceptions, each for a statement taking one value:
 
 =over
@@ -272,11 +274,12 @@ unwrapped as usual, as the driver can't bind arrays.
 Binds a value, as the DBI's C<bind_param> does, and returns what it
 returns. A numbered placeholder is given by number, and a named one by
 name, with or without its sigil. The value is bound to every use of it
-in the statement. A statement with named placeholders can also be bound
-by position, as with the DBI.
+in the statement. A statement with named placeholders can also be
+bound by position, as with the DBI.
 
-The value for a list placeholder is its list. Each value in it is bound
-to a position of its own, with the same C<\%attr> or C<$bind_type>.
+The value for a list placeholder is its list. Each value in it is
+bound to a position of its own, with the same C<\%attr> or
+C<$bind_type>.
 
 =head2 execute
 
@@ -311,12 +314,24 @@ L</execute> takes, when the first result is asked for. Each row is run
 through C<@stages>, the code references or pipelines at the end of the
 arguments.
 
+If the last stage is one of L<Ekorn::Pipeline::Sinks>' sinks, it reads
+the results to the end and returns the sink's result instead. A sink
+of one value, such as C<count_items> or C<keep_single>, gives it. A
+sink of many, such as C<keep_all>, gives a list, or, where one value
+is asked for, an array reference.
+
+    use Ekorn::Pipeline::Sinks qw(count_items keep_all);
+
+    my @rows = $sth->iterate(1990, keep_all);
+    my $n    = $sth->iterate(1990, count_items);
+
 =head2 results
 
     $results = $sth->results(@bind_values, @stages);
 
 As L</iterate>, returning a L<DBIx::Squirrel::Results>, whose rows are
-objects with a method for each column.
+objects with a method for each column, or, if the last stage is a
+sink, the sink's result.
 
 =head1 DIAGNOSTICS
 
@@ -337,14 +352,14 @@ A value was given for a placeholder the statement doesn't have.
 
 =item Expected a value for each placeholder (none for %s)
 
-A statement with named placeholders wasn't given a value for each name,
-or a statement with numbered or named placeholders was executed without
-values when some had none bound.
+A statement with named placeholders wasn't given a value for each
+name, or a statement with numbered or named placeholders was executed
+without values when some had none bound.
 
 =item Expected a reference to an ARRAY for a list (%s)
 
-The value given for a list placeholder, named with its C<...>, wasn't a
-list. It was a plain value, C<undef>, or a reference to something
+The value given for a list placeholder, named with its C<...>, wasn't
+a list. It was a plain value, C<undef>, or a reference to something
 other than an array.
 
 =item Expected at least one value in a list (%s)
@@ -354,8 +369,9 @@ so the caller must deal with an empty list.
 
 =item Expected plain values in a list (%s)
 
-A list held a reference, such as an array reference inside the one
-given, as in C<[[1, 2]]> to a statement whose one value is a list.
+A list held an unblessed reference, such as an array reference inside
+the one given, as in C<[[1, 2]]> to a statement whose one value is a
+list.
 
 =item Expected %d values in a list, as prepared, not %d (%s)
 
@@ -378,7 +394,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

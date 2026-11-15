@@ -3,14 +3,14 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use DBI;
-use DBIx::Squirrel::Pipeline;
+use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Stop;
 
 package My::Stop {
-    our @ISA = 'DBIx::Squirrel::Stop';
+    our @ISA = 'Ekorn::Pipeline::Stop';
 }
 
-my $class = 'DBIx::Squirrel::Pipeline';
+my $class = 'Ekorn::Pipeline';
 
 # Return every value an iterator hands out.
 sub drain ($next) {
@@ -30,13 +30,13 @@ subtest 'new checks its stages' => sub {
     my $p = $class->new(sub { $_ });
     isa_ok $p, [$class], 'a pipeline';
     ok ref($p) && $p->can('iterator'), 'with an iterator method';
-    my $msg
-        = qr( Expected\ stage\ \#2\ to\ be\ a\ code\ reference\ or\ a\ pipeline )x;
+    my $msg = quotemeta 'Expected stage #2 to be a stage: a code reference,'
+        . " a pipeline, or an object offering a stage's role method";
     my $at = qr( at\ \Q${\ __FILE__ }\E\ line\ \d+ )x;
     like dies {
         $class->new(sub { $_ }, 'x')
     }, qr( \A $msg \ $at \. \n \z )x,
-        'croaks on a stage that is neither a code reference nor a pipeline, naming it';
+        "croaks on what isn't a stage, naming it";
 };
 
 subtest 'a stage sees one value, in $_ and as its argument' => sub {
@@ -143,7 +143,7 @@ subtest 'iterator stops calling the source after Stop' => sub {
 subtest 'iterator checks its source' => sub {
     my $line = __LINE__ + 1;
     is dies { $class->new->iterator('x') },
-        "Expected a code reference at ${\ __FILE__ } line $line.\n";
+        "Expected a source: a code reference, or an object offering EKORN_SOURCE at ${\ __FILE__ } line $line.\n";
 };
 
 subtest 'a stage that dies says which it was' => sub {

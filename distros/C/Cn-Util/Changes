@@ -1,5 +1,11 @@
 Revision history for Cn-Util
 
+0.0242 2026-11-14 CST (Claude Opus 5.5 helped)
+
+ [`file2string`]
+
+ - A directory now dies with "can't read", its name and "Is a directory" on NetBSD as well. NetBSD's `read` succeeds on a directory and returns its raw entries, so 0.0241 returned those bytes as if they were the file's contents. The module was at fault, not the test: CPAN Testers report 52217fbc-dd66-11f1-9541-8d78add113b8 (perl 5.42.3, amd64-netbsd-thread-multi) failed test 4 of `t/file2string.t`. A directory is now refused before it is read, whatever the system's `read` does. `t/file2string.t` makes a directory read as it does on NetBSD on every platform, and has 5 tests, up from 4.
+
 0.0241 2026-11-09 CST (Claude Opus 5.5 helped)
 
  [`dir`]

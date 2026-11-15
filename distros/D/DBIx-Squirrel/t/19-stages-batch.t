@@ -3,11 +3,11 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use DBIx::Squirrel;
-use DBIx::Squirrel::Pipeline;
+use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Stages::Batch;
 use DBIx::Squirrel::Stop;
 
-my $class = 'DBIx::Squirrel::Pipeline';
+my $class = 'Ekorn::Pipeline';
 
 subtest 'what is exported' => sub {
 
@@ -91,8 +91,8 @@ subtest 'from an iterator' => sub {
     is [$it->next], [],                'then none';
 
     my $all = $dbh->iterate($names, sub { $_->[0] }, collect);
-    is $all->single, [qw(Abba Blur Cream)], 'every row, as one result';
-    is $all->single, [qw(Abba Blur Cream)], 'and again';
+    is $all->single,        [qw(Abba Blur Cream)], 'every row, as one result';
+    is $all->reset->single, [qw(Abba Blur Cream)], 'and again, reset';
 };
 
 done_testing;

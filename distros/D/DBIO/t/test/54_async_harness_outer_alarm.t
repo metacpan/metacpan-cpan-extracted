@@ -13,6 +13,12 @@ BEGIN {
     unless $hires;
 }
 
+# Where the kernel timers run slower than the clock this measures it and makes
+# Time::HiRes::sleep and ::alarm keep the clock again, so that the waits below
+# mean what they say; beyond a limit it skips the file.
+use lib 't/lib';
+use T::KernelTimers;
+
 use DBIO::Test::Future ();
 use DBIO::Test::AsyncHarness;
 
@@ -109,6 +115,8 @@ sub done_after {
 }
 
 my $SLACK = 0.1;
+# await sets the alarm of its timeout this much after the timeout the clock keeps.
+my $GRACE = 0.25;
 sub now { Time::HiRes::time() }
 
 # Set the process alarm; says when it is due, as [ no earlier, no later ].
@@ -116,7 +124,16 @@ sub now { Time::HiRes::time() }
 sub arm {
   my ($seconds, $how) = @_;
   my $before = now();
-  if ($how) { alarm $seconds } else { Time::HiRes::alarm($seconds) }
+  if ($how) {
+    # Whole seconds of the kernel's timer, rounded up, each worth K of the
+    # clock's: the alarm is due that many clock seconds from now.
+    my $k = T::KernelTimers::factor();
+    my $kernel = int($seconds / $k);
+    $kernel++ if $kernel * $k < $seconds;
+    alarm $kernel;
+    $seconds = $kernel * $k;
+  }
+  else { Time::HiRes::alarm($seconds) }
   return [ $before + $seconds, now() + $seconds ];
 }
 
@@ -245,7 +262,7 @@ sub death_of (&) {
   is $ran, 1, "$l: it fired, once, under its own handler";
   like $death, qr/TIMEOUT awaiting Future in K300::Harness/,
     "$l: ... and the wait ended on the harness's timeout";
-  is_due($then, [ $entered + 0.6, $entered + 0.6 ],
+  is_due($then, [ $entered + 0.6 + $GRACE, $entered + 0.6 + $GRACE ],
     "$l: ... due when it was due from the start");
   is due(), undef, "$l: no alarm is running afterwards";
   disarm();
@@ -373,7 +390,7 @@ for my $case ([ 'a longer timeout', 5 ], [ 'a shorter timeout', 2 ]) {
   my $entered = now();
   is $outer->await($f), 'outer value', "$l: the outer await returns its value";
   is $inner_value, 'inner value', "$l: ... the inner one its own";
-  is_due($then, [ $entered + 3, $entered + 3 ],
+  is_due($then, [ $entered + 3 + $GRACE, $entered + 3 + $GRACE ],
     "$l: after the inner await the outer one's timeout is still running, due when it was due");
   is_due(due(), $file, "$l: after both the file's alarm is still running, due when it was due");
   disarm();
@@ -399,7 +416,7 @@ for my $case ([ 'a longer timeout', 5 ], [ 'a shorter timeout', 2 ]) {
   my $entered = now();
   is $outer->await($f), 'outer value', "$l: the outer await returns its value";
   like $inner_death, qr/TIMEOUT awaiting Future/, "$l: ... the inner one timed out";
-  is_due($then, [ $entered + 3, $entered + 3 ],
+  is_due($then, [ $entered + 3 + $GRACE, $entered + 3 + $GRACE ],
     "$l: the outer one's timeout is still running, due when it was due");
   is_due(due(), $file, "$l: the file's alarm is still running, due when it was due");
   disarm();

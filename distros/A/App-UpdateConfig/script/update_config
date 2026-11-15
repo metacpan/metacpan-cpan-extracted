@@ -22,7 +22,7 @@ use Scalar::Util 'refaddr';
 
 # This must be kept in sync with the version in lib/App/UpdateConfig.pm (the
 # script cannot use that module as it must work as a standalone file).
-our $VERSION = '1.07';
+our $VERSION = '1.08';
 
 # With --help, prints the entire documentation, through perldoc when available.
 sub print_usage {
@@ -84,12 +84,66 @@ sub is_installed_globally {
 # Whether local::lib is loaded (undef until we try to load it).
 my $has_local_lib;
 
+# Quotes the given path for the PERL_MM_OPT and PERL_MB_OPT variables, which
+# are split on spaces.
+sub quote_install_path {
+  my ($path) = @_;
+  return $path =~ m/\s/ ? qq{"${path}"} : $path;
+}
+
+# Returns the PERL_MM_OPT and PERL_MB_OPT environment variables (as a list of
+# names and values) to install the modules with local::lib: the ones set by
+# local::lib, with the install directories of the man pages set to the
+# local::lib directory too, so that no files are installed outside of it
+# (otherwise, some distributions install their man pages in the system
+# directories). Returns an empty list if local::lib did not set its directory.
+sub get_local_lib_install_env {
+  my ($base) = split /\Q$Config{path_sep}\E/, $ENV{PERL_LOCAL_LIB_ROOT} // '';
+  return if not $base;
+  # The Module::Build names of the man pages directories.
+  my %build_names = (man1 => 'bindoc', man3 => 'libdoc');
+  my (@mm_opts, @mb_opts);
+  for my $man (sort keys %build_names) {
+    my $dir = quote_install_path(catfile($base, 'man', $man));
+    push @mm_opts, map { "INSTALL${_}".uc($man)."DIR=${dir}" } '', 'SITE', 'VENDOR';
+    push @mb_opts, "--install_path $build_names{$man}=${dir}";
+  }
+  return (
+    PERL_MM_OPT => join(' ', grep { defined && $_ ne '' } $ENV{PERL_MM_OPT}, @mm_opts),
+    PERL_MB_OPT => join(' ', grep { defined && $_ ne '' } $ENV{PERL_MB_OPT}, @mb_opts));
+}
+
+# Loads local::lib, from the default @INC or from its default directory
+# (~/perl5), where cpan installs it when it bootstraps it (the shell setup
+# that cpan then adds to ~/.bashrc is usually not run by `ssh host perl`).
+# Returns true if local::lib is loaded.
+sub load_local_lib {
+  # local::lib prints some configuration and exit the program when $0 is '-' (meant for `perl -Mlocal::lib`).
+  local $0 = $0 eq '-' ? 'fakename.pl' : $0;
+  return 1 if try_load('local::lib');
+  return 0 if not defined $ENV{HOME};
+  my $dir = catfile($ENV{HOME}, 'perl5', 'lib', 'perl5');
+  return 0 if not -f catfile($dir, 'local', 'lib.pm');
+  unshift @INC, $dir;
+  return try_load('local::lib');
+}
+
+# Loads local::lib (see load_local_lib). Sets and returns $has_local_lib.
+sub setup_local_lib {
+  $has_local_lib = load_local_lib();
+  print "Successfully loaded local::lib\n" if $has_local_lib and not $flags{silent};
+  return $has_local_lib;
+}
+
 # Installs the given module with cpanm if it is available, or cpan otherwise.
 # The module is installed in the local::lib directory if local::lib is loaded,
-# or system-wide otherwise, using sudo when needed.
+# or system-wide otherwise, using sudo when needed (except with --no-root, in
+# which case the program dies if the module can't be installed without it).
 sub install_module {
   my ($m) = @_;
-  local $ENV{PERL_MM_USE_DEFAULT} = 1;  # Used so that cpan don’t ask questions.
+  # PERL_MM_USE_DEFAULT is used so that cpan don’t ask questions.
+  my %env = (PERL_MM_USE_DEFAULT => 1, $has_local_lib ? get_local_lib_install_env() : ());
+  local @ENV{keys %env} = values %env;
   my $cpanm = find_program('cpanm');
   # When it can't write in the system directories, cpanm installs the modules
   # in ~/perl5, where we would not find them without local::lib. And when we
@@ -99,13 +153,20 @@ sub install_module {
       and not $has_local_lib
       and not -w $Config{installsitelib}
       and $EUID != 0;
-  my @cmd = $cpanm ? ($cpanm) : ('cpan', ($has_local_lib ? '-I' : ()), '-i');
+  # The environment of local::lib is already set (and `cpan -I` would reset
+  # the variables from get_local_lib_install_env).
+  my @cmd = $cpanm ? ($cpanm) : qw(cpan -i);
   my $name = $cpanm ? 'cpanm' : 'cpan';
   if (!$need_sudo) {
     print "Installing module '${m}' with ${name}\n" unless $flags{silent};
     return if system(@cmd, $m) == 0;
+    die "Cannot install module '$m' with ${name} (not retried with sudo because of --no-root).\n"
+        if $flags{'no-root'};
     $need_sudo = 1;
   }
+  die "Cannot install module '$m' without sudo, which is disabled by --no-root (install "
+      ."local::lib or the module itself).\n"
+      if $flags{'no-root'};
   # sudo resets the environment, so the module is installed system-wide even
   # if local::lib is loaded.
   print "Installing module '${m}' with sudo ${name}\n" unless $flags{silent};
@@ -128,11 +189,7 @@ sub load_module {
     print "Installing modules globally, as update_config is installed globally\n"
         unless $flags{silent};
   } elsif (!defined $has_local_lib) {
-    # local::lib prints some configuration and exit the program when $0 is '-' (meant for `perl -Mlocal::lib`).
-    local $0 = $0 eq '-' ? 'fakename.pl' : $0;
-    $has_local_lib = try_load('local::lib');
-    if ($has_local_lib) {
-      print "Successfully loaded local::lib\n" unless $flags{silent};
+    if (setup_local_lib()) {
       # We try to load the module again, in case it was already installed locally.
       return 1 if try_load($m, @args);
     } else {
@@ -141,6 +198,9 @@ sub load_module {
   }
 
   install_module($m);
+  # Without local::lib, cpan can bootstrap it in ~/perl5 and install the module
+  # there.
+  setup_local_lib() if not $has_local_lib and not is_installed_globally();
   try_load($m, @args) or die "Cannot load module '$m'.\n";
   return 1;
 }
@@ -347,6 +407,7 @@ my %DIRECTIVES = (
   'POST UPDATE' => {key => 'post_update'},
   'REM' => {},
   'REQUIRE' => {key => 'require', multiple => 1},
+  'SKIP' => {key => 'skip', optional => 1},
   'SYMLINK' => {key => 'symlink'},
 );
 
@@ -907,19 +968,47 @@ sub read_config_files {
   return;
 }
 
+# Prints that the given fragment or directory (described by $what) is skipped
+# because of the SKIP directive with the given reason (possibly empty).
+sub print_skip_directive {
+  my ($what, $reason) = @_;
+  printf "Skipping %s due to SKIP directive%s\n", $what, ($reason ne '' ? ': '.$reason : '')
+      unless $flags{silent};
+  return;
+}
+
 # Splits the given configuration files (indexed by their path relative to the
 # configuration directory) into the fragments, indexed the same way, and the
 # directives of the DIR_CONF_NAME files (from parse_dir_conf), indexed by the
 # path of their directory ('' for the root of the configuration directory).
+# The directories whose DIR_CONF_NAME file uses SKIP are ignored entirely
+# (neither their fragments nor their sub-directories are parsed).
 sub split_config_files {
   my ($config_files) = @_;
-  my (%fragments, %dir_confs);
-  while (my ($name, $content) = each %{$config_files}) {
-    if (basename($name) eq DIR_CONF_NAME) {
-      $dir_confs{$name =~ s{/?[^/]+$}{}r} = parse_dir_conf($name, $content);
+  my (%fragments, %dir_confs, @skipped_dirs);
+  my $is_skipped = sub {
+    my ($name) = @_;
+    return grep { $_ eq '' or index($name, "${_}/") == 0 } @skipped_dirs;
+  };
+  # The outermost DIR_CONF_NAME files are parsed first, so that the ones in a
+  # skipped directory are ignored.
+  my @dir_conf_names = sort { get_name_depth($a) <=> get_name_depth($b) || $a cmp $b }
+      grep { basename($_) eq DIR_CONF_NAME } keys %{$config_files};
+  for my $name (@dir_conf_names) {
+    next if $is_skipped->($name);
+    my $dir = $name =~ s{/?[^/]+$}{}r;
+    my $conf = parse_dir_conf($name, $config_files->{$name});
+    if (exists $conf->{skip}) {
+      print_skip_directive($dir eq '' ? 'the configuration directory' : "directory '${dir}'",
+        $conf->{skip});
+      push @skipped_dirs, $dir;
     } else {
-      $fragments{$name} = $content;
+      $dir_confs{$dir} = $conf;
     }
+  }
+  while (my ($name, $content) = each %{$config_files}) {
+    next if basename($name) eq DIR_CONF_NAME or $is_skipped->($name);
+    $fragments{$name} = $content;
   }
   return (\%fragments, \%dir_confs);
 }
@@ -982,9 +1071,14 @@ sub pack_fragments {
   return;
 }
 
-# Returns true if all the REQUIRE guards of the fragment are verified.
+# Returns true if the fragment does not use the SKIP directive and all its
+# REQUIRE guards are verified.
 sub check_requirements {
   my ($conf, $display_name) = @_;
+  if (exists $conf->{skip}) {
+    print_skip_directive($display_name, $conf->{skip});
+    return 0;
+  }
   for my $r (@{$conf->{require}}) {
     my ($expr, $reason) = split /\s*#\s*/, $r, 2;
     next if eval $expr;  ## no critic (ProhibitStringyEval)
@@ -1112,7 +1206,7 @@ sub by_fragment_order {
 # the directives of its directories, see parse_file_conf), as a hash-ref with
 # its name, `conf` (from parse_file_conf), `display_name`, and the `mode`,
 # `in_path` and `out_path` of its target (from parse_file_name). Returns undef
-# if its REQUIRE guards are not verified.
+# if it uses SKIP or if its REQUIRE guards are not verified.
 sub prepare_fragment {
   my ($name, $content, $dir_confs) = @_;
   my %conf = parse_file_conf($content, $name, $dir_confs);
@@ -1329,8 +1423,12 @@ they are missing (some of them only when they are first needed), with
 C<cpanm> if it is available, or C<cpan> otherwise. If the program is installed
 in the directories of the Perl installation (e.g. with C<sudo cpanm>), the
 modules are installed there too, using C<sudo> if needed. Otherwise, they are
-installed with L<local::lib> if that module is available, or system-wide (using
-C<sudo> if needed).
+installed with L<local::lib> if that module is available, in the default
+module path or in F<~/perl5> (including their man pages, so that nothing is
+installed outside of the L<local::lib> directory), or system-wide (using
+C<sudo> if needed). In that last case, C<cpan> can also bootstrap
+L<local::lib> in F<~/perl5> and install the modules with it. With the C<--no-root> option, C<sudo> is
+never used and the program fails if a module can't be installed without it.
 
 =head1 OPTIONS
 
@@ -1350,7 +1448,8 @@ abbreviated down to a single character.
   --root   Install only the configuration fragments that are marked as
            'NEED ROOT'.
 
-  --no-root  Do not attempt to install the 'NEED ROOT' fragments.
+  --no-root  Do not attempt to install the 'NEED ROOT' fragments, nor to
+           install the missing modules with sudo.
 
   --force  Overwrite the targets of the 'ENTIRE FILE' fragments even if they
            were modified since they were last written by the program, and
@@ -1574,6 +1673,14 @@ reason is printed when the fragment is skipped. The expression can use the
 C<which> function from L<File::Which> as well as the variables from
 L<English>. This directive can be repeated, in which case all the expressions
 must be true.
+
+=item C<SKIP> [I<reason>]
+
+Skips the fragment, which is not applied at all (its target is left
+untouched). The optional reason is printed when the fragment is skipped. In a
+F<.update_config> file, this directive skips the entire directory: its
+fragments and sub-directories are ignored (they are not even parsed, so they
+can contain invalid directives).
 
 =item C<POST UPDATE> I<command>
 

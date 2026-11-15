@@ -27,13 +27,41 @@ no_index:
 provides:
   Ekorn::Pipeline:
     file: lib/Ekorn/Pipeline.pm
-    version: v0.2.0
+    version: v0.3.1
+  Ekorn::Pipeline::Element:
+    file: lib/Ekorn/Pipeline/Element.pm
   Ekorn::Pipeline::Errors:
     file: lib/Ekorn/Pipeline/Errors.pm
+  Ekorn::Pipeline::Factories:
+    file: lib/Ekorn/Pipeline/Factories.pm
   Ekorn::Pipeline::Gather:
     file: lib/Ekorn/Pipeline/Gather.pm
+  Ekorn::Pipeline::Iterator:
+    file: lib/Ekorn/Pipeline/Iterator.pm
+  Ekorn::Pipeline::JSON:
+    file: lib/Ekorn/Pipeline/JSON.pm
+  Ekorn::Pipeline::Operators:
+    file: lib/Ekorn/Pipeline/Operators.pm
+  Ekorn::Pipeline::Operators::Chain:
+    file: lib/Ekorn/Pipeline/Operators.pm
+  Ekorn::Pipeline::Operators::Stages:
+    file: lib/Ekorn/Pipeline/Operators.pm
   Ekorn::Pipeline::Pipes:
     file: lib/Ekorn/Pipeline/Pipes.pm
+  Ekorn::Pipeline::Sink:
+    file: lib/Ekorn/Pipeline/Sink.pm
+  Ekorn::Pipeline::Sink::Many:
+    file: lib/Ekorn/Pipeline/Sink.pm
+  Ekorn::Pipeline::Sink::One:
+    file: lib/Ekorn/Pipeline/Sink.pm
+  Ekorn::Pipeline::Sinks:
+    file: lib/Ekorn/Pipeline/Sinks.pm
+  Ekorn::Pipeline::Source:
+    file: lib/Ekorn/Pipeline/Source.pm
+  Ekorn::Pipeline::Sources:
+    file: lib/Ekorn/Pipeline/Sources.pm
+  Ekorn::Pipeline::Stage:
+    file: lib/Ekorn/Pipeline/Stage.pm
   Ekorn::Pipeline::Stages::Batch:
     file: lib/Ekorn/Pipeline/Stages/Batch.pm
   Ekorn::Pipeline::Stages::Flow:
@@ -42,12 +70,18 @@ provides:
     file: lib/Ekorn/Pipeline/Stages/Taps.pm
   Ekorn::Pipeline::Stop:
     file: lib/Ekorn/Pipeline/Stop.pm
+  Ekorn::Pipeline::Sugar:
+    file: lib/Ekorn/Pipeline/Sugar.pm
+  Ekorn::Pipeline::Tooling:
+    file: lib/Ekorn/Pipeline/Tooling.pm
 requires:
   Carp: '0'
   Data::Dumper: '0'
   Exporter: '0'
+  JSON::MaybeXS: '0'
   Ref::Util: '0'
   Scalar::Util: '0'
+  Sub::Util: '0'
   experimental: '0'
   namespace::clean: '0'
   perl: v5.36.0
@@ -55,6 +89,6 @@ resources:
   bugtracker: https://github.com/nukopian/Ekorn-Pipeline/issues
   homepage: https://github.com/nukopian/Ekorn-Pipeline
   repository: https://github.com/nukopian/Ekorn-Pipeline.git
-version: v0.2.0
+version: v0.3.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

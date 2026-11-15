@@ -12,7 +12,9 @@ This document describes behavior intended to remain compatible across the 1.x se
 - `X-RateLimit-Limit`, `X-RateLimit-Remaining`, `X-RateLimit-Used`, `X-RateLimit-Reset`, `X-RateLimit-Resource`
 - `Retry-After`
 
-When both standard-style and `X-RateLimit-*` quota fields are present, the standard-style field wins for the normalized value.
+When both standard-style and `X-RateLimit-*` quota fields are present, the standard-style field wins for the normalized value. A present but invalid standard-style value is not replaced by a legacy value.
+
+Header names are case-insensitive. When different spellings of the **same** name occur with identical values, they agree and are retained. Conflicting duplicates (including a defined value and `undef`) are ambiguous and normalize to `undef`; no value is selected according to hash iteration order. In particular, ambiguous remaining-quota metadata is not treated as proof of quota exhaustion.
 
 `RateLimit-Reset` is interpreted as a relative delay in seconds. `X-RateLimit-Reset` is interpreted as an epoch timestamp.
 

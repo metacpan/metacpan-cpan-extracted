@@ -9,7 +9,7 @@ The normative contract is [`spec/`](../../spec/README.md); Go remains the
 reference implementation.
 
 - `SPEC_VERSION`: `0.2.0`
-- Core version: `0.4.0`
+- Core version: `0.5.0`
 - Tier: core
 - License: MIT
 - Dependencies: Perl core modules only (`JSON::PP`, `File::Spec`, `Cwd`)
@@ -18,8 +18,46 @@ reference implementation.
 
 - Registry introduction: [REGISTRY.md](https://github.com/axisvela/praxo-core/blob/main/language/perl/REGISTRY.md)
 - Machine-readable entry: [llms.txt](https://github.com/axisvela/praxo-core/blob/main/language/perl/llms.txt) and [llms.md](https://github.com/axisvela/praxo-core/blob/main/language/perl/llms.md)
+- [Examples](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples): runnable language-specific examples.
 - Coding-agent contract: [docs/getting-started/coding-agents.md](https://github.com/axisvela/praxo-core/blob/main/docs/getting-started/coding-agents.md)
 - Registry: [CPAN (MetaCPAN index)](https://metacpan.org/dist/Praxo-Core)
+- Community: [X](https://x.com/axisvela) · [Weibo](https://weibo.com/u/1936025761)
+
+## Get started
+
+Install the published package:
+
+```bash
+cpanm Praxo::Core
+```
+
+Then run the smallest deterministic example:
+
+- [Consumer starter](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/consumer): explicit tool scope and a deny check.
+- [Live model](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/live-model): connect an OpenAI-compatible endpoint and register `get_time`.
+
+See the [Perl documentation](https://axisvela.github.io/praxo-core/languages/perl/) for the full API and the
+[language matrix](https://axisvela.github.io/praxo-core/languages/matrix/) for
+current scope.
+
+## Examples
+
+Runnable examples live under [`language/perl/examples`](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples).
+
+| Goal | Example |
+| --- | --- |
+| Install and deny one unsafe call | [consumer](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/consumer) |
+| Connect a real model | [live-model](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/live-model) |
+| Connect MCP tools | [mcp](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/mcp) |
+| Validate structured output | [structured-output](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/structured-output) |
+| Stream a response | [streaming](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/streaming) |
+| Add identity and policy | [identity-policy](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/identity-policy) |
+| Persist checkpoints | [checkpoint](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/checkpoint) |
+| Run behind HTTP | [service](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/service) |
+| Resume a multi-turn session | [session-checkpoint](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/session-checkpoint) |
+| Retry transient failures | [retry](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/retry) |
+| Add provider fallback | [provider-fallback](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/provider-fallback) |
+| Observe agent events | [event-sink](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/event-sink) |
 
 ## Scope
 
@@ -138,6 +176,6 @@ delivery. Use HTTPS and filter sensitive event data first.
 
 ## Release
 
-Tag shape: `perl/v0.4.0`. The tag targets `SPEC_VERSION` `0.2.0`. CPAN
+Tag shape: `perl/v0.5.0`. The tag targets `SPEC_VERSION` `0.2.0`. CPAN
 publication uses `.github/workflows/perl-release.yml`; see
 [PUBLISHING.md](PUBLISHING.md).

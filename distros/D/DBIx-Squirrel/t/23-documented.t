@@ -7,8 +7,9 @@ use Test2::Plugin::NoWarnings;
 
 use DBI;
 use DBIx::Squirrel;
+use File::Temp              qw(tempfile);
 use DBIx::Squirrel::Context qw(result_number result_original);
-use DBIx::Squirrel::Pipeline;
+use Ekorn::Pipeline         qw();
 use DBIx::Squirrel::Stages::Rows;
 use DBIx::Squirrel::Stop;
 use DBIx::Squirrel::Sugar qw(database statement);
@@ -108,8 +109,8 @@ subtest 'Lists' => sub {
         some => listed => 'SELECT id FROM n WHERE id IN (...:ids) ORDER BY id',
         sub { $_->[0] },
     );
-    is [some(ids => [1, 3])], [1, 3], 'a Sugar statement takes a list';
-    is [some(ids => [2])],    [2],    'of any length';
+    is [some(ids => [1, 3])->all], [1, 3], 'a Sugar statement takes a list';
+    is [some(ids => [2])->all],    [2],    'of any length';
     is scalar(keys %{ database('listed')->{CachedKids} // {} }), 0,
         "and isn't cached, as each length makes another statement";
 };
@@ -191,11 +192,16 @@ subtest 'Row objects' => sub {
 subtest 'Pipelines' => sub {
     my @inc = map { "-I$_" } grep { !ref } @INC;
     for my $module (qw(
-        Pipeline     Gather Stop Context Stages::Flow Stages::Batch
+        Gather       Stop Context Stages::Flow Stages::Batch
         Stages::Taps Stages::Rows))
     {
-        my $code = qq{use DBIx::Squirrel::$module; print \$INC{'DBI.pm'} ? 1 : 0};
-        open my $child, '-|', $^X, @inc, '-e', $code
+        # In a file, not after -e, as a Windows command line can mangle
+        # the quotes of code given there (t/24-iterator-source.t).
+        my($fh, $file) = tempfile(SUFFIX => '.pl', UNLINK => 1);
+        print { $fh }
+            qq{use DBIx::Squirrel::$module; print \$INC{'DBI.pm'} ? 1 : 0};
+        close $fh;
+        open my $child, '-|', $^X, @inc, $file
             or die "Can't run $^X: $!";    ## no critic (ErrorHandling::RequireCarping)
         my $loaded = do { local $/ = undef; <$child> };
         close $child;
@@ -203,29 +209,29 @@ subtest 'Pipelines' => sub {
     }
 };
 
-subtest "A pipeline's stages" => sub {
+subtest 'A pipeline as a stage' => sub {
     my $dbh   = music();
-    my $count = DBIx::Squirrel::Pipeline->new(
+    my $count = Ekorn::Pipeline->new(
         sub ($dbh) { $dbh->selectrow_array('SELECT COUNT(*) FROM artist') },
         sub { $_ * 10 },
     );
     is [$dbh->pipe($count)], [30], 'a pipeline can be given to pipe';
     my $seen;
-    my $note = DBIx::Squirrel::Pipeline->new(sub ($dbh) {
+    my $note = Ekorn::Pipeline->new(sub ($dbh) {
         $seen = ref $dbh;
         ();
     });
     ref_is $dbh->tap($note), $dbh, 'and to tap';
     is $seen, 'DBIx::Squirrel::db', 'whose stages see the handle';
 
-    my $names = DBIx::Squirrel::Pipeline->new(sub { $_->[1] }, sub { uc });
+    my $names = Ekorn::Pipeline->new(sub { $_->[1] }, sub { uc });
     my $all   = 'SELECT id, name FROM artist ORDER BY id';
     my $it    = $dbh->iterate($all);
     is [$it->reset($names)->all], [qw(ABBA BLUR CREAM)], 'and to reset';
     is [$dbh->results($all, $names)->all], [qw(ABBA BLUR CREAM)],
         'and to results, straight after the statement';
 
-    my $until_blur = DBIx::Squirrel::Pipeline->new(
+    my $until_blur = Ekorn::Pipeline->new(
         sub { Stop() if $_->[1] eq 'Blur'; $_ },
         sub { result_number . ". $_->[1]" },
     );
@@ -237,7 +243,7 @@ subtest "A pipeline's stages" => sub {
     database(piped => @source);
     database('piped')->do('CREATE TABLE p (id INTEGER, name TEXT)');
     database('piped')->do(q{INSERT INTO p VALUES (1, 'x')});
-    is [piped('SELECT id, name FROM p', $names)], ['X'],
+    is [piped('SELECT id, name FROM p', $names)->all], ['X'],
         "and to a database's function, straight after the statement";
 };
 
@@ -256,19 +262,19 @@ subtest 'Canned stages' => sub {
         && Named::And::Defaults->can('take_while'),
         ':DEFAULT keeps them, with the one named';
 
-    my $expected = 'Expected an iterator, for the column names';
-    like dies { DBIx::Squirrel::Pipeline->new(pluck('name'))->([1, 'Abba']) },
+    my $expected = 'Expected a statement to read, for the column names';
+    like dies { Ekorn::Pipeline->new(pluck('name'))->([1, 'Abba']) },
         qr( \Q$expected\E )x, 'pluck by name, on an array, needs an iterator';
-    like dies { DBIx::Squirrel::Pipeline->new(as_hash)->([1, 'Abba']) },
+    like dies { Ekorn::Pipeline->new(as_hash)->([1, 'Abba']) },
         qr( \Q$expected\E )x, 'and so does as_hash';
-    is [DBIx::Squirrel::Pipeline->new(pluck(1))->([1, 'Abba'])], ['Abba'],
+    is [Ekorn::Pipeline->new(pluck(1))->([1, 'Abba'])], ['Abba'],
         'pluck by position needs none';
-    is [DBIx::Squirrel::Pipeline->new(pluck('name'))->({name => 'Abba'})],
+    is [Ekorn::Pipeline->new(pluck('name'))->({name => 'Abba'})],
         ['Abba'],
         'nor does pluck by name, on a hash';
 };
 
-subtest 'What a stage can ask: Context' => sub {
+subtest 'Context' => sub {
     my $dbh = music();
     my($original) = $dbh->results(
         'SELECT id, name FROM artist WHERE id = 1',
@@ -293,7 +299,7 @@ package My::Stages {    ## no critic (Modules::ProhibitMultiplePackages)
     }
 }
 
-subtest 'Writing stages' => sub {
+subtest 'Stages for others' => sub {
     my $dbh = music();
     my $it  = $dbh->iterate('SELECT name FROM artist', My::Stages::no_blur());
     my $line;
@@ -338,8 +344,46 @@ subtest 'The function a statement is given' => sub {
         names_of => staged => 'SELECT name FROM a ORDER BY name',
         sub { $_->[0] },
     );
-    is [names_of(sub { uc })], [qw(X Y)], 'stages given go after its own';
-    is [names_of()],           [qw(x y)], 'for that call only';
+    is [names_of(sub { uc })->all], [qw(X Y)], 'stages given go after its own';
+    is [names_of()->all],           [qw(x y)], 'for that call only';
+};
+
+subtest "The run's context" => sub {
+    my $dbh = music();
+    my @seen;
+    my $look = sub ($row) {
+        my $context = Ekorn::Pipeline::run_context();
+        push @seen, [
+            $context->{statement} isa 'DBIx::Squirrel::st',
+            [@{ $context->{columns} }],
+            $context->{row} == $row ? 'the row' : 'another',
+        ];
+        return $row;
+    };
+    my $it = $dbh->iterate('SELECT id, name FROM artist WHERE id = 1', $look);
+    $it->all;
+    is \@seen, [[T(), [qw(id name)], 'the row']],
+        "a statement's run: its handle, its columns and the row the value came from";
+
+    @seen = ();
+    my $next = Ekorn::Pipeline->new($look)
+        ->iterator($dbh->iterate('SELECT id, name FROM artist WHERE id = 2'));
+    $next->();
+    is \@seen, [[T(), [qw(id name)], 'the row']],
+        'and a pipeline reading an iterator';
+
+    my $context;
+    Ekorn::Pipeline->new(sub { $context = Ekorn::Pipeline::run_context(); $_ })
+        ->(1);
+    ok !(ref $context eq 'HASH' && $context->{statement}),
+        'a pushed run has no statement';
+
+    my $kept;
+    $dbh->iterate(
+        'SELECT id FROM artist',
+        sub { $kept = Ekorn::Pipeline::run_context(); $_ },
+    )->all;
+    is $kept->{row}, undef, 'and the row is gone once the run has ended';
 };
 
 done_testing;

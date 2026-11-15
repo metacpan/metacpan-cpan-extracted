@@ -3,7 +3,7 @@ package DBIO::Test::Schema::SelfRef;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -38,7 +38,7 @@ DBIO::Test::Schema::SelfRef - Test result class for the self_ref table
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

@@ -3982,11 +3982,12 @@ back — into a data frame that all of them will:
     my $tbl    = h2aoh($counts, var_name => 'Pclass', value_name => 'n',
                        sort => 'value');
     view($tbl);
-    # AoH: 3 rows x 2 cols   (showing 3)
+    # AoH: 3 rows x 2 cols   (showing 3 rows)
     #    Pclass    n
     # 0       3  491
     # 1       1  216
     # 2       2  184
+    # AoH: 3 rows x 2 cols   (showing 3 rows)
 
 R spells this `tibble::enframe()`; base R gets close with
 `stack()` or `data.frame(name = names(x), value = unname(x))`. In pandas it is
@@ -6406,6 +6407,8 @@ minimal example:
 | `undef_val` | `write_table`'s spelling of `na_strings`, so a round trip can use one name on both halves | `'undef_val' => 'NA'` |
 | `explode` | VCF only. `1` (the default): split each sample column into one column per `FORMAT` key, and return a hoh keyed by `CHROM:POS:REF:ALT`; `0`: the file's own columns. See [VCF files](#vcf-files) | `explode => 0` |
 | `colClasses` | R's: store the columns you name as numbers rather than text, which takes about a third of the memory, or as `character` to keep them text. A field that is plainly an integer is stored as one without being named. A hash by column name, a list by position, or one class for every column. See [numeric columns](#numeric-columns-colclasses) | `colClasses => { age => 'integer', bmi => 'numeric' }` |
+| `drop_cols` | columns to leave out of the table, by name: a column name, a `qr//` regex, or an array reference of either. A column with one of the names, or whose name matches one of the patterns, is never stored, which is what keeps the memory of a wide file down. See [leaving columns out](#leaving-columns-out-drop_cols) | `drop_cols => ['Entity Type Code', qr/^Provider License Number/]` |
+| `keep_cols` | the only columns to store, by name: a column name, a `qr//` regex, or an array reference of either, the counterpart of `drop_cols`. Kept columns stay in the file's order. See [keeping only some columns](#keeping-only-some-columns-keep_cols) | `keep_cols => ['NPI', qr/^Provider Business/]` |
 output types can be AOH (aoh), AOA (aoa), HOA (hoa), HOH (hoh)
 
     read_table($filename, 'output_type' => 'aoh');
@@ -6665,6 +6668,104 @@ skipped, but the first column is `#CHROM` and nothing is split.
 The split is done in C. On a 3,499,678-record single-sample GATK `.vcf.gz`,
 the exploded hoh takes 11.7 s, against 9.1 s for the file's own columns as a
 hoh, and an exploded aoa 8.4 s, against 7.0 s for the plain one.
+
+### leaving columns out (`drop_cols`)
+`drop_cols` names the columns that are not wanted: by a column name, by a
+`qr//` regex, or by an array reference holding any mix of the two. A column
+with one of the names, or whose name matches one of the patterns, is left out
+of the table as the file is read. Its cells are never stored, so a wide file
+costs the memory of the columns that are kept, not of the file:
+
+    my $d = read_table('npidata.csv', drop_cols => 'Entity Type Code');
+    my $d = read_table('npidata.csv', drop_cols => [ 'Entity Type Code', 'Provider Credential Text' ]);
+    my $d = read_table('npidata.csv', drop_cols => qr/^Provider License Number/);
+    my $d = read_table('npidata.csv', drop_cols => [ 'NPI Deactivation Date', qr/^Healthcare Provider Taxonomy/, qr/_\d+\z/ ]);
+
+A plain string is a whole column name. It is compared exactly, so it is
+case-sensitive, `'id'` leaves out `id` and neither `paid` nor `width`, and a
+`.`, a `(` or a `|` in it is that character: `'cost ($)'` needs no quoting. A
+number is a name as well, never a field position: `drop_cols => 2` is the
+column named `2`. A name that is no column of the file is warned about, in
+the words R's `read.table` uses of a `colClasses` name, and the read goes on:
+
+    read_table: not all columns named in 'drop_cols' exist in npidata.csv: 'Entity Type'
+
+Both are compared with the names the table would otherwise have had: after
+`col_names` has renamed them, with `V1`, `V2`, ... under `header => 0`, and
+with a VCF's leading `#` off. A name the file holds as UTF-8 is found by the
+same name written under `use utf8` or without it. A pattern is not
+anchored unless it says so, `qr/id/` leaves out `id`, `paid` and `width`
+alike, and it is case-sensitive without `/i`. A pattern that matches no column
+is not an error and is not warned about, since one list of patterns is often
+used for several files. Leaving out every column is an error, and so is leaving
+out the `row_names` column of a hoh. An empty pattern, `qr//`, matches every
+name, and does so on every perl: before perl 5.18 the match operator would
+reuse the last pattern that had matched instead, and `read_table` does not let
+it. The empty string, `''`, is not that: it is the column whose name is empty,
+which is how to leave out the unnamed columns of a sheet with a merged banner
+row.
+
+It works for every `output_type`, for `.xlsx` sheets and for compressed
+files. An `aoa` drops the column from its header row and from every data row.
+Where the header repeats a name, every field carrying an excluded name goes.
+Everything that speaks of a field by its position still counts the file's own
+fields: a `colClasses` list, a numeric `filter` key, and the field number in
+an alignment message.
+
+A `filter` may still test a column that is left out. It is handed the whole
+row as `$_[0]`, and a filter keyed on an excluded column gets that column's
+value in `$_`; the column is only missing from `%_` (and `$_[1]`), and from
+the table:
+
+    # keep active providers only, without keeping the column that says so
+    my $d = read_table('npidata.csv',
+        drop_cols => qr/^(?:Provider License Number|NPI Deactivation)/,
+        filter  => { 'NPI Deactivation Date' => sub { !defined $_ } });
+
+`drop_cols` cannot be combined with an exploded VCF, whose columns are built
+from the file's by position; pass `explode => 0` to use it on a VCF.
+To drop columns from a table that is already in memory, see `cfilter` and
+the `drop_cols` function, which this option shares its name with: the function
+takes column names only and dies on one that is not there, and the option
+takes names or patterns and only warns.
+
+### keeping only some columns (`keep_cols`)
+`keep_cols` is the counterpart of `drop_cols`: it names the only columns that
+are wanted, and every other column is left out as the file is read, never
+stored. It takes what `drop_cols` takes -- a column name, a `qr//` regex, or an
+array reference holding any mix of the two -- and a name or pattern means the
+same thing in either:
+
+    my $d = read_table('npidata.csv', keep_cols => [ 'NPI', 'Entity Type Code' ]);
+    my $d = read_table('npidata.csv', keep_cols => [ 'NPI', qr/^Provider Business Practice Location/ ]);
+
+The kept columns stay in the file's order, not the order they are listed in,
+as with pandas' `read_csv(usecols = ...)`. Where pandas raises on a name that
+is no column, `read_table` warns, as it does for `drop_cols`, and keeps the
+names that are:
+
+    read_table: not all columns named in 'keep_cols' exist in npidata.csv: 'Entity Type'
+
+Keeping no column at all is an error. A hoh is the exception: it is keyed by
+its `row_names` column, which is a key and never a cell, so that column is
+kept whether `keep_cols` names it or not, and a hoh can keep nothing else:
+
+    my $by_npi = read_table('npidata.csv', output_type => 'hoh',
+        row_names => 'NPI', keep_cols => [ 'Entity Type Code' ]);
+
+`keep_cols` and `drop_cols` may be given together. A column is then stored
+when `keep_cols` chooses it and `drop_cols` does not, so `drop_cols` takes
+columns back out of a broad pattern:
+
+    my $d = read_table('npidata.csv',
+        keep_cols => [ 'NPI', qr/^Provider/ ],
+        drop_cols => qr/^Provider License Number/);
+
+Everything else said of `drop_cols` holds for `keep_cols` too: the names it is
+compared with, UTF-8 names, `.xlsx` sheets and compressed files, filters that
+test a column that is not kept, `colClasses` and field numbers counting the
+file's own fields, `qr//` meaning every column on every perl, and the refusal of
+an exploded VCF.
 
 ### numeric columns (`colClasses`)
 A field is read as its text, with one exception: a field that is an integer
@@ -7492,7 +7593,7 @@ The AoH/HoH case is the per-column summary R gives for a data frame — so the a
 
 Non-numeric and undefined cells are ignored: they never count toward `# values`, and a variable with no numeric values shows `0` and `na`. For example, `summary` of an AoH:
 
-    # summary: 2 rows x 7 cols	(showing 2)
+    # summary: 2 rows x 7 cols	(showing 2 rows)
     Column  # values  Min.  1st Qu.  Median  Mean  3rd Qu.  Max.
     x              3     1      1.5       2     2      2.5     3
     y              3    10       15      20    20       25    30
@@ -8145,7 +8246,7 @@ number is `NaN`, again as in R.
 An R-style `head` for the structures `read_table` returns. Prints the first
 few rows of a dataframe as an aligned text table, with numeric columns
 right-justified, string columns left-justified, and undefined cells shown as
-`NA`.
+`undef`.
 
 | Input type | Perl structure     | What `view` shows                          |
 |------------|--------------------|--------------------------------------------|
@@ -8169,18 +8270,21 @@ right-justified, string columns left-justified, and undefined cells shown as
 
 ### Output
 
-    # AoH: 7 rows x 3 cols  (showing 6)
+    # AoH: 7 rows x 3 cols, 2.9 KB  (showing 6 rows)
     row_name  Testosterone, total (nmol/L)  age  sex
     p1                                18.2   41  M
-    p2                                  NA    7  F
+    p2                               undef    7  F
     p3                                1.05   33  F
     p4                                22.9   55  M
     p5                                  14   29  M
-    p6                                  NA   62  F
+    p6                               undef   62  F
     # ... 1 more row
+    # AoH: 7 rows x 3 cols, 2.9 KB  (showing 6 rows)
 
-The banner reports the structure type, full dimensions, and how many rows are
-displayed. A footer appears only when rows are hidden.
+The banner reports the structure type, full dimensions, [the memory the data
+takes](#the-size), and how many rows are displayed. A footer appears only when
+rows are hidden. The banner is printed again as the last line, so that a table
+longer than the screen still says what it is where the scrolling stops.
 
 ### Arguments
 
@@ -8192,14 +8296,40 @@ All arguments after the data reference are optional name/value pairs.
 | `rows`          | `6`     | Number of rows to show. `n` greater than the table shows everything  (synonymous with `n`)|
 | `cols` / `columns` | —    | Array ref pinning column order (and which columns appear).              |
 | `row_names`     | —       | Column to use as the row label (for `aoh`/`hoa`). See ordering note.    |
-| `na`            | `'NA'`  | Token printed for undefined cells |
+| `na`            | `'undef'` | Token printed for undefined cells |
 | `max_width`     | `80`    | Truncate any cell wider than this (column names are never truncated)   |
 | `ellipsis`      | `'...'` | Marker appended to truncated cells |
 | `gap`           | `2`     | Spaces between columns |
-| `to`            | STDOUT  | Filehandle to print to.   |
+| `to`            | the selected filehandle | Filehandle to print to. The default is the one `select` names, which is STDOUT unless the program changed it |
 | `return_only`   | `0`     | If true, return the string and print nothing |
+| `size`          | `1`     | If false, leave the data's size out of the banner, and skip the pass over the whole dataframe that finds it. See [the size](#the-size) |
 
 `view` always returns the formatted string, whether or not it also prints.
+
+### The size
+
+The first line says how much memory the data takes: everything that can be
+reached from the reference `view` was given -- every scalar and its string,
+every array and hash, and the keys that the rows of an `aoh` share, once --
+as perl has allocated it. It is written the way pandas' `DataFrame.info()`
+writes a memory usage, in units of 1024 with one decimal: `952.0 bytes`,
+`22.5 KB`, `1.4 GB`.
+
+It is the size of the whole dataframe, not of the rows shown, so finding it
+means visiting every cell. For a million rows of ten columns that is 0.05 s
+as an `aoa`, 0.10 s as an `aoh` and 0.12 s as a `hoa` on perl 5.44.0, where
+the rest of `view` takes under a tenth of a millisecond. `size => 0` leaves
+the size out, and the visit with it:
+
+    view($aoh, size => 0);            # "# AoH: 7 rows x 3 cols  (showing 6 rows)"
+
+What is counted is the data's own. A row or column that another dataframe
+shares -- the rows of a `filter` result, say -- is counted in full in each,
+and once where one dataframe holds it twice. What a code reference, a glob or
+a filehandle leads to is not counted, nor is what a weak reference points at,
+and a tied structure counts as the tie alone, without fetching from it. The C
+library's own bookkeeping is not included, so the process's memory as the
+operating system reports it is somewhat larger.
 
 ### A note on column order
 
@@ -8213,8 +8343,9 @@ layout. Two conveniences soften this:
 * Pass `cols => [ ... ]` to control both the order and the selection of columns
   shown.
 
-When no label column is present, `view` numbers the rows `1, 2, 3, …`, the way
-R prints row names for an unnamed data frame.
+When no label column is present, `view` labels each row with its index,
+`0, 1, 2, …`, which is the number that reaches the row in Perl: the row
+labeled `2` of an `aoh` is `$aoh->[2]`.
 
 ### Edge cases
 
@@ -8227,9 +8358,11 @@ R prints row names for an unnamed data frame.
 ### Tests
 
 The behavior above is covered by `view.t` (run with `prove view.t`): the three
-structure types, `n` boundaries, alignment, `NA` rendering, truncation,
+structure types, `n` boundaries, alignment, the `na` token, truncation,
 `row_names`/`cols` handling, control-character escaping, the `return_only` and
-`to` output paths, empty structures, and the error cases.
+`to` output paths, empty structures, and the error cases. `view.size.t` covers
+the size, its format against pandas' own, and `view.xs.t` the row order of a
+`hoh`, the argument errors, and where the table is printed.
 
 ## vif
 

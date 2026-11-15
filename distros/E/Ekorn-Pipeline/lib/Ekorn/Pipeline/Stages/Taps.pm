@@ -9,6 +9,7 @@ use Scalar::Util qw(openhandle);
 
 use Ekorn::Pipeline::Errors qw(croakf);
 use Ekorn::Pipeline::Gather qw(gather);
+use Ekorn::Pipeline::Stage  qw();
 
 use namespace::clean -except => 'import';
 
@@ -24,10 +25,10 @@ our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 # effects, and passing the value on.
 sub peek : prototype(&) ($block) {
     croakf 'Expected a code reference' unless is_coderef($block);
-    return sub ($value) {
+    return Ekorn::Pipeline::Stage->new(sub ($value) {
         $block->($value);
         return $value;
-    };
+    });
 }
 
 # Return a stage counting the values into the scalar given, from 0 on
@@ -48,13 +49,13 @@ sub count_into ($count) {
 # given, or STDERR, and passing it on.
 sub dump_to ($fh = \*STDERR) {
     croakf 'Expected an open filehandle' unless defined openhandle($fh);
-    return sub ($value) {
+    return Ekorn::Pipeline::Stage->new(sub ($value) {
         local $Data::Dumper::Indent   = 1;
         local $Data::Dumper::Sortkeys = 1;
         local $Data::Dumper::Terse    = 1;
         print { $fh } Data::Dumper::Dumper($value);
         return $value;
-    };
+    });
 }
 
 1;
@@ -89,6 +90,11 @@ for logging, counting or debugging. A stage passes on what it returns,
 so a stage of your own that runs for its side effects has to return
 its value. These do that for you. Each function returns a stage, and
 checks its arguments when it's called, not on each value.
+
+Each stage is an object, an L<Ekorn::Pipeline::Stage> or, for those
+that keep state, an L<Ekorn::Pipeline::Gather>, called as a code
+reference, so it goes wherever a stage goes. Code testing it with
+C<ref> or C<is_coderef> sees an object: v0.2.0 gave code references.
 
 They work wherever stages do: in any pipeline, or on an object with
 C<pipe> and C<tap>, from L<Ekorn::Pipeline::Pipes>, where the first

@@ -30,7 +30,7 @@ nup - n-up, multi-column paged output for commands and files
      -D  --document         document mode (default: on)
      -F  --no-paginate      disable page mode
      -A  --auto-paginate    auto disable page mode for single column
-     -L  --lateral          all pages in one row, scrolled sideways
+     -L  --lateral          pages or files in one row, scrolled sideways
      -H  --filename         show filename headers (default: on)
      -C  --pane=#[,#]       number of columns, and rows (e.g., 2,2)
      -P  --page=#           page height in lines
@@ -58,7 +58,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.14
+Version 1.17
 
 =cut
 
@@ -183,18 +183,24 @@ pager() {
 # Parse options
 ##############################################################################
 
+# NUP_OPTS goes before the options on the command line, split on
+# spaces (read does not expand file names), so that they win
+if [[ ${NUP_OPTS:-} ]]; then
+    read -ra nup_opts <<< "$NUP_OPTS"
+    (( ${#nup_opts[@]} )) && set -- "${nup_opts[@]}" "$@"
+fi
+
 . getoptlong.sh OPTS "$@"
 
 ##############################################################################
 # Main
 ##############################################################################
 
-# --lateral is a row of the pages of one input (the option only goes
-# to up_opts, so look for it there, as for --geometry below)
+# --lateral puts on the right what does not fit the screen: the pages
+# of one input, or the files side by side (the option only goes to
+# up_opts, so look for it there, as for --geometry below)
 lateral=
 [[ " ${up_opts[*]} " =~ " "(-L|--lateral)" " ]] && lateral=1
-[[ $lateral && ${parallel:-} ]] &&
-    die "--lateral cannot be used with --parallel."
 
 # --parallel/-V: forward to ansicolumn via up.pm passthrough
 [[ ${parallel:-} ]] && up_opts+=(-V)
@@ -258,9 +264,9 @@ if [[ -n $textconv && $textconv != none ]] && match_ext "$textconv" "$@"; then
     optex_mod+=(-Mtextconv)
 fi
 
+side_by_side=${parallel:-}
 if is_command_mode "$@"; then
     # Command mode: use optex -Mup
-    [[ ${parallel:-} ]] && paginate=
     local_cmd="$1"; shift
     declare -a expanded_cmd
     read -ra expanded_cmd <<< "$(expand_alias "$local_cmd")"
@@ -271,11 +277,16 @@ else
     # them are for ansicolumn (nup FILE -w 100).
     nfiles=0
     for arg; do [[ $arg == -?* ]] && break; (( ++nfiles )); done
-    [[ $lateral ]] && (( nfiles > 1 )) &&
-        die "--lateral cannot be used with more than one file."
-    [[ ${parallel:-} ]] || (( nfiles > 1 )) && paginate=
+    (( nfiles > 1 )) && side_by_side=1
     declare -a target=(ansicolumn "$@")
 fi
+
+# The files side by side (-V or more than one file) have no pages
+[[ $side_by_side ]] && paginate=
+
+# One input without pages (-F) fills the columns of the screen, and
+# there is nothing to put on the right: --lateral is turned off
+[[ $lateral && -z ${paginate:-} && -z $side_by_side ]] && up_opts+=(--no-lateral)
 
 # Disable page mode for --no-paginate/-F, or for parallel layout
 # (-V or multiple files) which has no page structure
@@ -405,32 +416,74 @@ The screen shows the same number of panes as without this option:
 as many as fit, or the number given by C<-C>.  With C<-C4>, four
 pages are on the screen at a time, each a quarter of it wide.
 
-When the pager is C<less>, C<nup> adds C<< -S --shift=I<N> --rscroll=- >>
-to it, where I<N> is the width of a pane: the lines are
-not wrapped, and the right and left arrow keys move by one page.
-C<h> and C<l> move to the left and to the right as well, and C<H>
-and C<L> go to the left end and to the right end of the row: C<nup>
-sets the C<LESSKEY_CONTENT> environment variable to
+When the pager is C<less>, C<nup> adds
+C<< -S --shift=I<N> --rscroll=- >> to it, where I<N> is the width of
+a pane: the lines are not wrapped, and the right and left arrow keys
+move by one page.
 
-    h left-scroll;l right-scroll;H no-scroll;L end-scroll
+C<nup> also puts the following keys in the C<LESSKEY_CONTENT>
+environment variable, which C<less> 661 or later reads.  With three panes on the
+screen and a C<less> older than 710, they are:
 
-when it is not set.  C<h> and C<H> are the help of C<less>, which
-is not on a key then: set C<LESSKEY_CONTENT> yourself to keep it.  The
-options are added to C<NUP_PAGER>, C<NUP_PAGE_PAGER> and C<--pager>
-as well when the command is C<less>; another pager is used as it is,
-and has to be told not to wrap the lines.
+    h , left    left-scroll         one page to the left
+    l . right   right-scroll        one page to the right
+    H g <       no-scroll           the left end of the row
+    L G >       end-scroll          the right end of the row
+    space       noaction ESC-) x 3  the panes on the screen to the right
+    b           noaction ESC-( x 3  the panes on the screen to the left
 
-What works depends on the version of C<less>, and the build of
-C<less> in tecolicom/tap keeps the panes at the edge of the screen in
-a search as well; see L</LESS>.
+C<noaction> does nothing and then types the keys after it, here
+ESC-) three times.  It cannot type the arrow keys, so ESC-) and
+ESC-( are given the same actions as the right and left arrow.  In
+C<LESSKEY_CONTENT>, they are in one line, joined by C<;>, as
+C<h left-scroll;l right-scroll;...>, and space is written C<\ >, a
+backslash and a space.
+With C<less> 710 or later, C<l>, C<.>, the right arrow and ESC-) are
+C<right-limit-scroll>, which stops at the right end.  A count before
+C<.> is taken for a decimal point of the number by C<less>; give it
+to the right arrow instead, as C<3> and the right arrow.
+
+The help of C<less> on C<h> and C<H> is then on no key, and C<g> and
+C<G> no longer go to the first and the last line, which are on the
+screen all the time anyway.
+
+When C<LESSKEY_CONTENT> is set, the keys are added after it, in a
+C<#command> section, so that they win over the same keys there and
+in F<~/.lesskey>; the other keys stay as they are.
+
+C<NUP_LESSKEY> gives the keys in place of those of C<nup>, in the
+same way, and they do not change with the panes or the C<less>.  Set
+it empty not to add any keys, and C<LESSKEY_CONTENT> is left as it
+is:
+
+    export NUP_LESSKEY=
+
+The options are added to C<NUP_PAGER>, C<NUP_PAGE_PAGER> and
+C<--pager> as well when the command is C<less>; another pager is used
+as it is, and has to be told not to wrap the lines.
+
+See L</"LESS INTEGRATION"> for what works with the versions of
+C<less>, and for the build of C<less> in tecolicom/tap, with which
+the screens are the same as without C<-L>.
 
     nup -L man perlfunc
     nup -L -C4 README.md
 
-This is for the pages of one input.  It cannot be used with more
-than one file, C<--parallel>, C<--no-paginate>, rows (C<-R>,
-C<-C2,2>, C<-G>) or PDF output (C<-T>, C<-o> with C<.pdf>).  C<--auto-paginate> is ignored.  The pages are laid out
-once, for the height of the terminal at that time.
+With more than one file, or C<-V>, the files side by side go on to
+the right in the same way, instead of going on below: each file is a
+column of its own, without pages, and as many columns as without this
+option are on the screen.  The lines move up and down as usual, and
+only C<h>, C<l>, C<,>, C<.>, the arrow keys, ESC-( and ESC-), C<H>,
+C<L>, C<E<lt>> and C<E<gt>> are put in C<LESSKEY_CONTENT>, to move by one column and to
+the ends; C<g> and C<G> go to the first and the last line.
+
+    nup -L *.txt
+
+With C<--no-paginate> and one input, which has nothing to put on the
+right, this option is ignored.  It cannot be used with rows (C<-R>,
+C<-C2,2>, C<-G>) or PDF output (C<-T>, C<-o> with C<.pdf>).
+C<--auto-paginate> is ignored.  The pages are laid out once, for the
+height of the terminal at that time.
 
 =item B<-H>, B<--filename>
 
@@ -549,7 +602,8 @@ and C<NUP_PAGE_PAGER> is not used there.
 The C<PAGER> variable is not used to avoid an infinite loop when
 C<PAGER> is set to C<nup>.
 C<+Gg> makes C<less> read all input before displaying, so that C<-F>
-and the percentage work; see L</LESS> for the settings of C<less>.
+and the percentage work; see L</"LESS INTEGRATION"> for the settings
+of C<less>.
 
 Use C<--pager=> (empty) or C<--no-pager> to disable pager.
 
@@ -647,30 +701,12 @@ to split the screen when the number of rows is set, as in C<-C2,2>:
 
     COLUMNS=170 nup -C2 file1.txt file2.txt
 
-=head1 LESS
+=head1 LESS INTEGRATION
 
 C<nup> is made to be used with C<less>.  It sets environment
-variables for C<less>, and adds options to it for C<-L>.  Some of them
-need a recent version, and a patched build of C<less> does more for
-the pages of C<nup>.
-
-=head2 Environment Variables
-
-C<nup> sets the following environment variables when they are not
-already defined, to ensure proper display with C<less>:
-
-=over 4
-
-=item C<LESS>
-
-Default: C<-R>.  Required for ANSI color sequences.
-
-=item C<LESSANSIENDCHARS>
-
-Default: C<mK>.  Recognizes SGR (C<m>) and erase line (C<K>)
-sequences.
-
-=back
+variables for C<less> (see L</ENVIRONMENT>), and adds options to it
+for C<-L>.  Some of them need a recent version, and a patched build
+of C<less> does more for the pages of C<nup>.
 
 =head2 Versions
 
@@ -686,14 +722,16 @@ have it, so C<+Gg> is the default.  Set C<NUP_PAGER> to use it:
 
 =item C<less> 661
 
-C<LESSKEY_CONTENT> is read, which C<-L> uses to put the keys C<h>,
-C<l>, C<H> and C<L>.  An older C<less> ignores it.
+C<LESSKEY_CONTENT> is read, which C<-L> uses to put its keys:
+C<h>, C<l>, C<,>, C<.>, the arrow keys, ESC-( and ESC-), C<H>, C<L>, C<g>, C<G>,
+C<E<lt>>, C<E<gt>>, space and C<b>.
+An older C<less> ignores it.
 
 =item C<less> 710
 
 C<right-limit-scroll> stops at the right end of the lines.  C<-L>
-puts it on C<l>, in place of C<right-scroll>, which goes on past the
-end.
+puts it on C<l>, C<.>, the right arrow and ESC-), in place of C<right-scroll>,
+which goes on past the end.
 
 =back
 
@@ -720,10 +758,17 @@ of C<nup>.  A repeated search goes on from the next record.
 =item B<--align-shift>
 
 The horizontal shift stays at a multiple of the C<--shift> amount, the
-width of a pane with C<-L>.  A search, and the right end, keep the
-panes at the edge of the screen, and C<n> and C<N> go through the
-panes that have a match, one by one.  C<-L> adds this option when the
-C<less> has it.
+width of a pane with C<-L>, so that the panes are always at the edge
+of the screen.  C<-L> adds this option when the C<less> has it, and
+the screens are then the same as without C<-L>: space, C<b>, C<G> and
+C<E<gt>> move by the screens, the last screen shows the last pages
+and the rest of it is blank, and C<n> and C<N> skip the matches on
+the screen and move by the screens to the next page that has one.
+C<l>, C<.> and the right arrow go on until the last page is at the left
+edge.  For this, the keys of C<-L> are given a count instead of being repeated:
+with three panes, space and C<b> are C<3> ESC-) and C<3> ESC-(, and
+C<G> and C<E<gt>> are C<3L>, while C<L> shows the end of the row at
+the right edge of the screen.
 
 =back
 
@@ -737,6 +782,64 @@ Then use C<--align-record> for the pages:
     export NUP_PAGER="less --file-size"
     export NUP_PAGE_PAGER="less --file-size --align-record=-1"
 
+=head1 ENVIRONMENT
+
+=head2 Read by C<nup>
+
+=over 4
+
+=item C<NUP_OPTS>
+
+Options given before those on the command line, separated by spaces,
+so that the options on the command line take precedence.  This is
+useful when C<nup> is called by another command, as C<MANPAGER>:
+
+    NUP_OPTS=-L man perlfunc
+
+=item C<NUP_PAGER>
+
+The pager command, used when C<--pager> is not given.  Default:
+C<less -F +Gg>.  See C<--pager> in L</"Pager Options">.
+
+=item C<NUP_PAGE_PAGER>
+
+The pager command in page mode, used in place of C<NUP_PAGER>.  See
+C<--pager> in L</"Pager Options">.
+
+=item C<NUP_LESSKEY>
+
+The keys that C<-L> gives to C<less>, in place of those of C<nup>.
+Empty for no keys.  See C<-L> in L</"General Options">.
+
+=item C<COLUMNS>, C<LINES>
+
+The width and the height of the terminal when C</dev/tty> is not
+available.  See L</Terminal Size>.
+
+=back
+
+C<PAGER> is not read, so that it can be set to C<nup>.
+
+=head2 Set by C<nup>
+
+These are set for C<less>, when they are not set already:
+
+=over 4
+
+=item C<LESS>
+
+Default: C<-R>.  Required for ANSI color sequences.
+
+=item C<LESSANSIENDCHARS>
+
+Default: C<mK>.  Recognizes SGR (C<m>) and erase line (C<K>)
+sequences.
+
+=back
+
+C<-L> adds its keys to C<LESSKEY_CONTENT>, after those already in
+it.  See C<-L> in L</"General Options">.
+
 =head1 EXAMPLES
 
 Typical n-up usage:
@@ -747,6 +850,7 @@ Typical n-up usage:
     nup -F man perl            # no pagination
     nup -L man perl            # one row of pages, scrolled sideways
     nup -L -C4 man perl        # four pages on the screen at a time
+    nup -L *.txt               # files side by side, scrolled sideways
     nup file1.txt file2.txt    # view files side by side
     nup -C2 a.txt b.txt -w 170 # 2 columns, width 170 (ansicolumn -w)
     nup -e ./script.sh         # force command mode for a file
@@ -766,7 +870,7 @@ Use L<tecolicom/tap|https://github.com/tecolicom/homebrew-tap>:
     brew tap tecolicom/tap
     brew install app-nup
 
-See L</LESS> for the build of C<less> in the same tap.
+See L</"LESS INTEGRATION"> for the build of C<less> in the same tap.
 
 =head2 CPAN
 

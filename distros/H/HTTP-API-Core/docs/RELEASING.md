@@ -7,9 +7,10 @@ This document is the release checklist for maintainers. The goal is to make a re
 1. Start from an up-to-date `main` branch with no open release-blocking issues.
 2. Confirm the GitHub Actions Perl matrix is green.
 3. Run the full distribution test suite locally with `perl Makefile.PL && make test` when possible.
-4. Review `Changes` and make sure every user-visible behavior change since the previous release is represented.
-5. Confirm `MANIFEST` contains every file intended for the distribution.
-6. Review the public compatibility documents under `docs/`, especially `COMPATIBILITY.md`.
+4. Review `Changes` and make sure every user-visible behavior change since the previous release is represented. The `t/release-version.t` check compares the module version with the newest numbered, dated `Changes` entry; the `Unreleased` section may remain above it until release preparation.
+5. Confirm `MANIFEST` includes `LICENSE`, `CONTRIBUTING.md`, `SECURITY.md`, and every library module, test, document, and example intended for the distribution.
+6. Run `make disttest` to verify the suite against a freshly assembled distribution directory (CI exercises this on Perl 5.40).
+7. Review the public compatibility documents under `docs/`, especially `COMPATIBILITY.md`.
 
 For a major release such as 1.00, also confirm that every interface listed under the 1.0 criteria in `DESIGN.md` has explicit documentation and regression coverage.
 
@@ -19,7 +20,7 @@ For a major release such as 1.00, also confirm that every interface listed under
 2. Add the final version and release date to `Changes`.
 3. Regenerate or inspect generated distribution metadata after `perl Makefile.PL`.
 4. Build the distribution with `make dist`.
-5. Inspect the resulting archive contents before upload.
+5. Inspect the resulting archive contents, including `META.json` name/version, before upload. The release workflow also requires a dated `Changes` entry.
 6. Run the test suite against the release candidate archive when practical.
 
 The release commit should contain only release-specific changes. Avoid mixing new features or behavioral changes into the version bump.
@@ -31,7 +32,7 @@ After the release-preparation pull request is merged and the `main` CI run is gr
 1. Choose **Run workflow** on the `release` workflow from `main`.
 2. Enter the version without the `v` prefix, for example `1.00`.
 3. The workflow verifies that the requested version matches `HTTP::API::Core::$VERSION` and that `Changes` contains the release entry.
-4. It runs the test suite, builds `HTTP-API-Core-VERSION.tar.gz`, and verifies the archive contents.
+4. It runs the test suite, builds `HTTP-API-Core-VERSION.tar.gz`, runs `make disttest` against the assembled distribution, and verifies the archive contents. Any failed packaged test stops publication before tagging.
 5. It creates and pushes the `vVERSION` tag from the exact checked-out `main` revision.
 6. It creates a GitHub Release for that tag and attaches the distribution archive.
 7. The same archive is retained as a workflow artifact.

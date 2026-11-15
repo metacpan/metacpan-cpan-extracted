@@ -5,7 +5,6 @@
 
 use 5.008;
 use strict;
-use feature 'say';
 use version;
 
 use ExtUtils::MakeMaker;
@@ -81,6 +80,37 @@ my @config_requires
 ;
 
 ########################################################################
+# File::Util::SecureDir is used by the v5.40 release, which is
+# installed for perl v5.40 and later; earlier releases do not use it.
+
+my @securedir_prereq
+= version->parse( $^V ) < version->parse( 'v5.40' )
+? ()
+: ( 'File::Util::SecureDir' => version->parse( 'v0.1.0' )->numify )
+;
+
+########################################################################
+# test-only modules: TEST_REQUIRES needs MakeMaker 6.64, older
+# versions get them as runtime prerequisites.
+
+my %test_requires
+= (
+    'Test::More'    => 0
+);
+
+my @test_requires
+= $mm_v < 6.64
+? ()
+: ( TEST_REQUIRES => { %test_requires } )
+;
+
+my @test_prereqs
+= $mm_v < 6.64
+? %test_requires
+: ()
+;
+
+########################################################################
 # install the correct version of libs.pm based on the running perl
 # version. after that take the version from whatever's on the disk.
 #
@@ -94,8 +124,10 @@ if( -d 'version' || $ENV{ FORCE_VERSION } )
     = do
     {
         my $text
-        = $forced_version
-        // sprintf '%vd' => $^V;
+        = defined $forced_version
+        ? $forced_version
+        : sprintf '%vd' => $^V
+        ;
 
         print "\n# Parsing perl version: '$text'\n";
 
@@ -195,10 +227,10 @@ if( -d 'version' || $ENV{ FORCE_VERSION } )
         : unlink $dest;
     }
 
-    say "\n# Note: FCR2 'Copying a symlink...whose target does not exist' warnings",
+    print "\n# Note: FCR2 'Copying a symlink...whose target does not exist' warnings",
         "\n# for t/bin/install-tests.d/*.inst are false positives -- relative",
         "\n# symlinks whose target exists in the same directory are copied",
-        "\n# correctly.  The warnings are suppressed.";
+        "\n# correctly.  The warnings are suppressed.\n";
 
     # FCR2 warns "whose target does not exist" for relative symlinks because
     # it checks !-e $target against CWD, not against the symlink's directory.
@@ -305,7 +337,7 @@ qw
 # after three modules and examples the version has to float
 # independent of just the modules.
 
-  VERSION         => v5.1.5
+  VERSION         => v5.4.1
 , AUTHOR          => 'Steven Lembark <lembark@wrkhors.com>'
 , PREREQ_PM       =>
     {
@@ -315,27 +347,29 @@ qw
         'File::Copy::Recursive::Reduced'
         => version->parse( 'v0.002' )->numify,
 
+        @securedir_prereq,
+
         # particular versions
         # are unlikely to cause pain.
 
         qw
         (
             Carp                    0
-            Cwd                     0
-            Data::Dump              0
             File::Basename          0
             File::Spec::Functions   0
             File::Temp              0
             File::stat              0
             List::Util              0
-            Test::More              0
             Symbol                  0
             strict                  0
             version                 0
-        )
+        ),
+
+        @test_prereqs
     }
 
-, @config_requires,
+, @config_requires
+, @test_requires,
 );
 
 {

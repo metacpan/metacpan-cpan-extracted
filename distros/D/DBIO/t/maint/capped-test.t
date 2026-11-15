@@ -23,7 +23,7 @@ use DBIO::Util qw(file_path mkpath slurp_file write_file);
 
 my $capped = file_path($FindBin::Bin, '..', '..', 'maint', 'capped-test');
 
-plan skip_all => 'maint/capped-test is a repository tool and not part of the shipped dist'
+plan skip_all => 'no maint/capped-test next to this test'
   unless -f $capped;
 
 my %tool;
@@ -78,6 +78,30 @@ plan skip_all => 'the user systemd manager starts no scope here'
 
 # What the wrapped command is in most cases below: proof that it was started.
 my @ran = ($^X, '-e', 'print "RAN\n"');
+
+# Whether this host can set the caps at all. A scope that systemd starts is not
+# a scope whose limits are in force (cpu.max may be missing on a kernel or a
+# user slice that does not delegate it), and then the wrapper refuses every
+# run, rightly. The cases below take it that the host can cap; ask it once,
+# with the real wrapper and no stand-in.
+{
+  my $probe = capped({}, @ran);
+  if ($probe->{exit} == 0 and $probe->{stdout} =~ /RAN/) {
+    # the host caps: carry on
+  }
+  elsif ($probe->{exit} == 99 and $probe->{stdout} !~ /RAN/
+      and $probe->{stderr} =~ /^(?:capped-test: )?(REFUSING to start.*)$/m) {
+    my $reason = "maint/capped-test refuses on this host: $1";
+    if ($ENV{AUTHOR_TESTING} or $ENV{RELEASE_TESTING}) {
+      # the development host must be able to cap; a skip would hide that
+      fail $reason;
+      done_testing;
+      exit 1;
+    }
+    plan skip_all => $reason;
+  }
+  # anything else is no host limit: the tests run and show the failure
+}
 
 sub refused_ok {
   my ($got, $why, $name) = @_;
@@ -244,7 +268,8 @@ $0 = 'capped-selftest';   # the name the kernel's OOM report will carry
 $| = 1;
 my @held;
 for (1 .. 64) {
-  push @held, 'x' x (4 * 1024 * 1024);
+  # perl 5.42 shares the copies of a folded constant on one buffer (copy-on-write), so the string is built at run time
+  push @held, chr($_) x (4 * 1024 * 1024);
   open my $in, '<', "/sys/fs/cgroup$cgroup/memory.swap.current" or die $!;
   print 'held=', 4 * @held, 'M swap=', scalar <$in>;
 }
@@ -262,5 +287,34 @@ subtest 'a run that eats memory is killed at the cap, with nothing in swap' => s
 
   like $got->{stderr}, qr/was KILLED -- it hit the 64M cap/, 'the wrapper says what happened';
 } or diag "exit $eater->{exit}\n$eater->{stdout}$eater->{stderr}";
+
+# A signal that reaches the in-scope stage after the command has ended must not
+# change the end that is reported. systemd does exactly that after an OOM kill
+# (OOMPolicy=stop): it sends SIGTERM to what is left in the scope. Here the
+# command stands in for it: it kills itself, and a helper that outlives it
+# sends SIGTERM to the stage in quick succession from the moment the stage has reaped it.
+my $late = capped({}, $^X, '-e', <<'PERL');
+use POSIX ();
+$SIG{TERM} = 'IGNORE';
+my $stage = getppid;
+my $cmd   = $$;
+my $helper = fork;
+die "fork: $!" unless defined $helper;
+if (!$helper) {
+  1 while kill 0, $cmd;          # until the stage has reaped the command
+  # every 0.2 ms: close enough to hit the stage in the gap, slow enough not to
+  # overflow perl's queue of deferred signals (120) while the stage is in waitpid
+  select undef, undef, undef, 0.0002 while kill 'TERM', $stage;
+  POSIX::_exit(0);
+}
+select undef, undef, undef, 0.2;
+kill 'KILL', $$;
+PERL
+
+subtest 'a signal after the command has ended does not change the reported end' => sub {
+  my $got = $late;
+  is $got->{exit}, 137, 'still the SIGKILL of the command, not the stage dying of SIGTERM';
+  like $got->{stderr}, qr/was KILLED/, 'and reported as the kill it was';
+} or diag "exit $late->{exit}\n$late->{stdout}$late->{stderr}";
 
 done_testing;

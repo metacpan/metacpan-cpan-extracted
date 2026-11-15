@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.14";
+our $VERSION = "1.17";
 
 =encoding utf-8
 
@@ -106,23 +106,36 @@ command does this automatically).
 Automatically disable page mode when only one column fits the
 terminal.
 
-=item B<-L>, B<--lateral>
+=item B<-L>, B<-->[B<no->]B<lateral>
 
 Put all the pages in one row, however wide it becomes.  The screen
 shows as many panes as without this option, as many as fit or the
 number given by C<-C>, and the row goes on to the right: the panes
 are given to C<ansicolumn> by their width (C<-S>), the width of the
-screen divided by that number, in a very large output width.  When
-the pager is C<less>, C<< -S --shift=I<N> --rscroll=- >> is added to
-it, where I<N> is the width of a pane, so that the lines are not
-wrapped and the arrow keys move by one page; C<h> and C<l> do the
-same, and C<H> and C<L> go to the left and the right end, by the
-C<LESSKEY_CONTENT> environment variable, when it is not set.  With
-less 710 or later, C<l> stops at the right end, and C<--align-shift>
-is added when the less has it; see L<nup/LESS>.  It cannot be used
-with
-rows (C<-R>, C<-C2,2>, C<-G>), C<--no-paginate> or PDF output, and
-C<--auto-paginate> is ignored.
+screen divided by that number, in a very large output width.
+
+When the pager is C<less>, C<< -S --shift=I<N> --rscroll=- >> is
+added to it, where I<N> is the width of a pane, so that the lines are
+not wrapped and the arrow keys move by one page.  Keys are added to
+C<LESSKEY_CONTENT> (less 661 or later), after the keys of the user,
+or those of C<NUP_LESSKEY> in their place, none when it is empty:
+C<h> and C<l>, C<,> and C<.>, and ESC-( and ESC-), move by one page
+as the arrow keys, C<H> and C<L> go to the left and the right end,
+and so do C<g> and C<G>, C<E<lt>> and C<E<gt>>, and space and C<b>
+move to the right and to the left by the panes on the screen.  With less 710 or
+later, C<l>, C<.>, the right arrow and ESC-) stop at the right end.
+The build of less in tecolicom/tap does more; see
+L<nup/"LESS INTEGRATION">.
+
+With C<--no-paginate>, it is for the files side by side, as the
+L<nup> command gives it for more than one file: each file is a column
+of its own, the columns go on to the right, and only C<h>, C<l>, C<,>,
+C<.>, the arrow keys, ESC-( and ESC-), C<H>, C<L>, C<E<lt>> and
+C<E<gt>> are put in C<LESSKEY_CONTENT>.  One input without pages
+makes a column of each line.
+
+It cannot be used with rows (C<-R>, C<-C2,2>, C<-G>) or PDF output,
+and C<--auto-paginate> is ignored.
 
 =item B<--pager>=I<COMMAND>
 
@@ -355,7 +368,7 @@ sub finalize {
         'grid|G=s', 'pane-width|S=i', 'pane|C=s', 'row|R=i',
         'border-style|bs=s', 'paginate!',
         'auto-paginate|autopaginate|A',
-        'lateral|L',
+        'lateral|L!',
         'pager:s', 'no-pager|nopager',
         'device|T=s', 'output|o=s',
         'pdf-opts=s', 'geometry');
@@ -394,11 +407,11 @@ sub finalize {
     }
     # --lateral: all the pages in one row, as wide as it becomes, to be
     # scrolled sideways by the pager.  There are no rows and no sheet
-    # of paper in it, and it is made of pages.
+    # of paper in it.  Without pages (--no-paginate), it is for the
+    # files side by side, each in a column of its own.
     my $lateral = $config->{lateral};
     if ($lateral) {
         my $with = defined $config->{row}  ? 'the number of rows (-R, -C, -G)'
-                 : !$config->{paginate}    ? '--no-paginate'
                  : $device ne 'tty'        ? 'PDF output (-T, -o)'
                  : undef;
         die "--lateral cannot be used with $with.\n" if $with;
@@ -459,11 +472,11 @@ sub finalize {
     # the row goes on to the right of it.  less shows the row without
     # wrapping the lines, and shifts it by a pane.  --rscroll=- is to
     # show the last column, where less puts a mark for the lines that
-    # go on.  h and l shift it as the arrow keys do, and H and L go
-    # to the left and the right end, unless the user has keys of their
-    # own in LESSKEY_CONTENT; a less older than 661 does not know the
-    # variable, and h and H are the help there as usual.  less 710 and
-    # later stop l at the right end (right-limit-scroll); an older one
+    # go on.  The arrow keys shift it, and H and L go to the left and
+    # the right end; a less older than 661 does not know
+    # LESSKEY_CONTENT, and H is the help there as usual.  less 710 and
+    # later stop the right arrow at the right end
+    # (right-limit-scroll); an older one
     # takes the name for an error, so it shifts with no limit.  A less
     # with --align-shift keeps the shift at the boundaries of the panes,
     # in a search and at the right end as well.
@@ -473,8 +486,39 @@ sub finalize {
         $pager .= " -S --shift=$lateral_width --rscroll=-";
         $pager .= " --align-shift" if $align_shift;
         my $right = $version >= 710 ? 'right-limit-scroll' : 'right-scroll';
-        $ENV{LESSKEY_CONTENT} //=
-            "h left-scroll;l $right;H no-scroll;L end-scroll";
+        # g, G, < and > go to the ends as H and L, and space and b move
+        # by the panes on the screen: with --align-shift, a count of l
+        # and h is the number of panes; without, it would change the
+        # shift, so they are given as many times.
+        my $n = max(1, int($term_width / $lateral_width));
+        # The arrow keys cannot be written in the string of noaction, so
+        # ESC-) and ESC-(, given the same actions, are used in it.
+        my($fwd, $back) = map { $align_shift ? "$n$_" : $_ x $n } '\e)', '\e(';
+        # With --align-shift, G and > give the count to end-scroll, to
+        # show the last screen as it is without --lateral.
+        my $end = $align_shift ? "noaction ${n}L" : 'end-scroll';
+        # The keys go after the LESSKEY_CONTENT of the user, in a
+        # #command section of their own, because the later of the same
+        # keys wins, and the keys of ~/.lesskey are read before it.
+        # NUP_LESSKEY gives keys in place of these, and an empty one
+        # leaves LESSKEY_CONTENT as it is.  Without pages, the columns
+        # go on downward, and the other keys move up and down as usual,
+        # but < and > go to the ends as H and L, while g and G go to the
+        # first and the last line.
+        my $keys = $ENV{NUP_LESSKEY} // join ';',
+            "h left-scroll;l $right;, left-scroll;. $right",
+            "\\kl left-scroll;\\kr $right;\\e( left-scroll;\\e) $right",
+            "H no-scroll;L end-scroll",
+            $config->{paginate} ? (
+                "g no-scroll;G $end;< no-scroll;> $end",
+                "\\  noaction $fwd;b noaction $back",
+            ) : (
+                "< no-scroll;> end-scroll",
+            );
+        if ($keys ne '') {
+            my $user = $ENV{LESSKEY_CONTENT} // '';
+            $ENV{LESSKEY_CONTENT} = $user eq '' ? $keys : "$user\n#command\n$keys";
+        }
     }
 
     # Build default ansicolumn options.  With --lateral, the panes are

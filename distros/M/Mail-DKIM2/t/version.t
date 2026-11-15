@@ -3,7 +3,7 @@ use Test::More;
 use Mail::DKIM2;
 use Mail::DKIM2::Common qw(DKIM2_DRAFT DKIM2_DATE);
 is(DKIM2_DRAFT, 'ietf-dkim-dkim2-spec-09', 'draft constant is -09');
-is($Mail::DKIM2::VERSION, '0.30', 'the distribution is 0.30');
+is($Mail::DKIM2::VERSION, '0.33', 'the distribution is 0.33');
 is(DKIM2_DATE, '2026-11-03', 'software date is the last DKIM2 behaviour change (draft -09)');
 
 # One distribution version, carried by every module.
@@ -26,7 +26,7 @@ for my $m (qw(BodyHasher BodyPlan Common Digest DSN Gate HeaderParser HeaderPlan
         't/validate-report.t'        => ['spec-06 §4 added a "received-" prefix rule'],
         't/hash-agility.t'           => ['pre-spec-06 wire form'],
         't/check-order.t'            => ['2026-10-18-dkim2-spec-07-design.md'],
-        'lib/Mail/DKIM2/Common.pm'   => ['spec-08 took auto-submitted'],
+        'lib/Mail/DKIM2/Canon.pm'    => ['spec-08 took auto-submitted'],
         't/common.t'                 => ['-08 §4 took these two off'],
         't/error-strings.t'          => ['-08 §14.2 dropped'],
         't/turscar.t'                => ['unchanged in draft-08'],

@@ -3,7 +3,7 @@ package DBIO::Test::Namespace::RtBug41083::Result_A::A::Sub;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Test::Namespace::RtBug41083::Result_A::A';
 1;
@@ -20,7 +20,7 @@ DBIO::Test::Namespace::RtBug41083::Result_A::A::Sub - Test fixture for namespace
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

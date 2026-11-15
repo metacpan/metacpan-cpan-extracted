@@ -39,6 +39,27 @@ is( ids(filter($aoh, col('id')->nomatch('^5iz'))), '1abc,25iz',
 is( ids(filter($aoh, !(col('id')->match(qr/^5iz/)))), '1abc,25iz,undef',
 	'!match negates the predicate (keeps undef)' );
 
+# An empty pattern matches every defined cell, as it does in R 4.6.2, where
+# grepl("", c("5iz1", "1abc", NA)) is TRUE TRUE FALSE, and in pandas 3.0.4,
+# where pd.Series(["5iz1", "1abc", None]).str.contains("") is [True, True,
+# None]. Before perl 5.18 the match operator does not match an empty qr// as
+# written: it reuses the last pattern that matched successfully, and until
+# 0.3422 ->match handed it the pattern as it came. Each filter here follows a
+# successful match of /^25/, which only '25iz' passes, so an old perl without
+# the fix keeps that one row for ->match and the other three for ->nomatch.
+for my $c ([ 'qr//', qr// ], [ 'qr//i', qr//i ], [ "''", '' ]) {
+	my ($what, $pat) = @$c;
+	'25iz' =~ /^25/ or die 'the match that arms the old perls failed';
+	is( ids(filter($aoh, col('id')->match($pat))), '5iz1,5iz9,1abc,25iz',
+		"match($what) keeps every defined cell" );
+	is( ids(filter($aoh, col('id')->nomatch($pat))), '',
+		"nomatch($what) keeps nothing" );
+	is( ids(filter($aoh, !(col('id')->match($pat)))), 'undef',
+		"!match($what) keeps only the undef row" );
+	is( ids(filter($aoh, col('id')->match($pat) & (col('res') < 2.5))), '5iz1,1abc,25iz',
+		"match($what) & numeric comparison" );
+}
+
 # composition with & and |
 is( ids(filter($aoh, col('id')->match(qr/^5iz/) & (col('res') < 2.5))), '5iz1',
 	'match & numeric comparison' );
@@ -86,6 +107,11 @@ my $re_5iz = qr/^5iz/;
 no_leaks_ok {
 	my $r = filter($aoh, col('id')->match($re_5iz) & (col('res') < 2.5));
 } 'col()->match: no memory leaks';
+# an empty pattern is exchanged for a kept one, which compiles nothing
+my $re_empty = qr//;
+no_leaks_ok {
+	my $r = filter($aoh, col('id')->match($re_empty));
+} 'col()->match with an empty pattern: no memory leaks';
 no_leaks_ok {
 	eval { col('x')->match() };
 } 'col()->match: no leaks on the die path';

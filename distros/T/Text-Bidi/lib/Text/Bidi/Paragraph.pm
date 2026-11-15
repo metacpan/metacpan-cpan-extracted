@@ -9,7 +9,7 @@ use strict;
 
 package Text::Bidi::Paragraph;
 # ABSTRACT: Run the bidi algorithm on one paragraph
-$Text::Bidi::Paragraph::VERSION = '2.18';
+$Text::Bidi::Paragraph::VERSION = '3.01';
 
 use Text::Bidi;
 
@@ -56,8 +56,9 @@ sub _init {
     $self->{'_unicode'} = $bd->utf8_to_internal($par);
     #$self->{'_par'} = [split '', $par];
     $self->{'_types'} = $bd->get_bidi_types($self->_unicode);
+    my $brackets = $bd->get_bracket_types($self->_unicode, $self->types);
     ($self->{'dir'}, $self->{'_levels'}) =
-        $bd->get_par_embedding_levels($self->types, $self->dir);
+        $bd->get_par_embedding_levels($self->types, $self->dir, $brackets);
     $self->{'_map'} = [0..$#{$self->_unicode}];
     $self->{'_unicode'} = $self->shaped($self->{'shape'}) 
         if defined $self->{'shape'};
@@ -121,7 +122,7 @@ Text::Bidi::Paragraph - Run the bidi algorithm on one paragraph
 
 =head1 VERSION
 
-version 2.18
+version 3.01
 
 =head1 SYNOPSIS
 

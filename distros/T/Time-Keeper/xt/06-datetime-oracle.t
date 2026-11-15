@@ -5,7 +5,7 @@ use warnings;
 use Test::More;
 
 # Values against DateTime. Author only. DateTime::TimeZone 2.66 carries
-# tzdata 2025c and Time::Keeper::Zone 2026e: the zones changed between them
+# tzdata 2025c and Time::Keeper::Zone 2026f: the zones changed between them
 # are compared only before the change (see Time-Keeper-Zone's
 # xt/04-datetime-oracle.t for the reasons), the System V names only from 1967,
 # and the Etc/GMT names only by offset.
@@ -19,7 +19,8 @@ use Time::Keeper::Zone;
 my $y2026 = 1767225600;
 my %changed_from = (
     (map { $_ => $y2026 } qw(America/Winnipeg America/Inuvik America/Edmonton
-                             America/Vancouver Africa/Casablanca Africa/El_Aaiun)),
+                             America/Vancouver Africa/Casablanca Africa/El_Aaiun
+                             America/Havana)),
     'Europe/Chisinau' => 1640995200,
 );
 # Two spring forwards corrected after 2025c (2026a): Colombia's on

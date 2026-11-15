@@ -1,5 +1,5 @@
 {
-   "abstract" : "Small foundation for JSON HTTP API clients",
+   "abstract" : "Build REST and JSON API clients in Perl",
    "author" : [
       "SHINGO <shingo@cpan.org>"
    ],
@@ -54,6 +54,6 @@
          "web" : "https://github.com/kawamurashingo/HTTP-API-Core"
       }
    },
-   "version" : "1.08",
+   "version" : "1.10",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

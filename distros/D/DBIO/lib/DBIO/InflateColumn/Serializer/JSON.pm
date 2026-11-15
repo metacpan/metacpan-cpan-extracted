@@ -4,7 +4,7 @@ package DBIO::InflateColumn::Serializer::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use JSON::MaybeXS;
 use Carp;
@@ -61,7 +61,7 @@ DBIO::InflateColumn::Serializer::JSON - JSON Inflator
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

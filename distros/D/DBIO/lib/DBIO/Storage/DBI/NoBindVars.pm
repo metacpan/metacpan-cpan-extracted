@@ -4,7 +4,7 @@ package DBIO::Storage::DBI::NoBindVars;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Storage::DBI';
 use mro 'c3';
@@ -174,7 +174,7 @@ DBIO::Storage::DBI::NoBindVars - Some DBDs have poor to no support for bind vari
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

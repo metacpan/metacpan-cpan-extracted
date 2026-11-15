@@ -1,6 +1,7 @@
 use v5.36;
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
+use FindBin qw($Bin);
 
 use DBIx::Squirrel;
 use DBIx::Squirrel::Errors;
@@ -9,7 +10,7 @@ use DBIx::Squirrel::Gather ();
 use DBIx::Squirrel::Iterator;
 use DBIx::Squirrel::Result;
 use DBIx::Squirrel::Results;
-use DBIx::Squirrel::Pipeline;
+use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Placeholders;
 use DBIx::Squirrel::Stages::Batch ();
 use DBIx::Squirrel::Stages::Flow  ();
@@ -36,6 +37,7 @@ my %imported = (
             study_sql    unwrap_values values_for     values_taken
         ),
     ],
+    'DBIx::Squirrel::Context'  => [qw(is_plain_hashref)],
     'DBIx::Squirrel::Errors'   => [qw(croak  is_ref)],
     'DBIx::Squirrel::Gather'   => [qw(croakf is_coderef)],
     'DBIx::Squirrel::Iterator' => [
@@ -44,7 +46,6 @@ my %imported = (
             iterator_going split_stages weaken
         ),
     ],
-    'DBIx::Squirrel::Pipeline'     => [qw(croak croakf is_coderef is_ref)],
     'DBIx::Squirrel::Placeholders' =>
         [qw(any croakf is_arrayref is_hashref is_plain_ref max uniq)],
     'DBIx::Squirrel::Result' =>
@@ -59,8 +60,8 @@ my %imported = (
     'DBIx::Squirrel::Stop'  => [qw(croak)],
     'DBIx::Squirrel::Sugar' => [
         qw(
-            croakf     install_sub is_arrayref is_coderef
-            is_hashref is_name     shift_attrs split_stages
+            at_caller  croakf  install_sub is_arrayref is_coderef
+            is_hashref is_name is_ref      shift_attrs split_stages
         ),
     ],
     'DBIx::Squirrel::st' => [
@@ -97,17 +98,15 @@ subtest 'what the packages need is kept' => sub {
     ok +DBIx::Squirrel::Sugar->can('database'), 'and keeps database';
     ok +DBIx::Squirrel::Util->can('import'),    'Util can export';
 
-    my $p = DBIx::Squirrel::Pipeline->new(sub { $_ * 2 });
-    is [$p->(1, 2)], [2, 4], 'a pipeline can be called';
-    is '' . dies { DBIx::Squirrel::Stop->throw },
+    is '' . dies { DBIx::Squirrel::Stop::Stop() },
         "Stop used outside a pipeline\n",
         'a stop explains itself as a string';
 };
 
 subtest 'both handle classes inherit pipe and tap' => sub {
     for my $class (qw(DBIx::Squirrel::db DBIx::Squirrel::st)) {
-        isa_ok $class, ['DBIx::Squirrel::Pipes'], $class;
-        ref_is $class->can($_), DBIx::Squirrel::Pipes->can($_), "$class can $_"
+        isa_ok $class, ['Ekorn::Pipeline::Pipes'], $class;
+        ref_is $class->can($_), Ekorn::Pipeline::Pipes->can($_), "$class can $_"
             for qw(pipe tap);
     }
 };
@@ -132,8 +131,13 @@ subtest 'the facades follow Ekorn::Pipeline' => sub {
         'Gather'        => [[qw(gather)]],
         'Stop'          => [[qw(Stop)]],
         'Stages::Batch' => [[qw(batch collect)], []],
-        'Stages::Flow'  => [[qw(take drop)], [qw(take_while drop_while)]],
-        'Stages::Taps'  => [[qw(peek count_into)], [qw(dump_to)]],
+        'Stages::Flow'  => [
+            [qw(take drop)],
+            [
+                qw(take_first take_last take_single take_while drop_while take_if drop_if)
+            ],
+        ],
+        'Stages::Taps' => [[qw(peek count_into)], [qw(dump_to)]],
     );
     for my $name (sort keys %exports) {
         my($ours,    $theirs) = ("DBIx::Squirrel::$name", "Ekorn::Pipeline::$name");
@@ -156,16 +160,16 @@ subtest 'the facades follow Ekorn::Pipeline' => sub {
                 "$ours\'s $function is $theirs\'s";
         }
     }
-    ref_is +DBIx::Squirrel::Pipeline->can('stages'),
-        Ekorn::Pipeline->can('stages'),
-        "Pipeline's stages is Ekorn's";
-    isa_ok 'DBIx::Squirrel::Pipeline', ['Ekorn::Pipeline'],        'Pipeline';
-    isa_ok 'DBIx::Squirrel::Pipes',    ['Ekorn::Pipeline::Pipes'], 'Pipes';
-    isa_ok 'DBIx::Squirrel::Stop',     ['Ekorn::Pipeline::Stop'],  'Stop';
-
-    my $p = DBIx::Squirrel::Pipeline->new(sub { $_ * 2 });
-    isa_ok $p, ['DBIx::Squirrel::Pipeline'], 'a pipeline made with it';
-    is [$p->(1, 2)], [2, 4], 'which can be called';
+    # The distribution doesn't ship them. A copy that version 2 installed
+    # stays where it was, as installing never removes a file, so this
+    # looks in the distribution, not @INC, where requiring one succeeds.
+    for my $gone (qw(Pipeline Pipes)) {
+        my @shipped
+            = grep { -e "$Bin/../$_/DBIx/Squirrel/$gone.pm" } qw(lib blib/lib);
+        is \@shipped, [], "DBIx::Squirrel::$gone is no longer shipped";
+    }
+    ok !DBIx::Squirrel::Stop->isa('Ekorn::Pipeline::Stop'),
+        'and Stop is no subclass of Ekorn\'s';
 };
 
 done_testing;

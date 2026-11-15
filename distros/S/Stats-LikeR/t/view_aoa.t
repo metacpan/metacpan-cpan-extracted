@@ -50,7 +50,7 @@ sub _body  { grep { $_ !~ /^#/ } _lines($_[0]) }
 	my $aoa = [ [1, 2, 3], [4, 5, 6] ];
 	my $s = view($aoa, return_only => 1, color => 0);
 	like $s, qr/^# AoA: 2 rows x 3 cols/, 'AoA banner: N rows x M cols';
-	like $s, qr/\(showing 2\)/,           'AoA banner: showing count';
+	like $s, qr/\(showing 2 rows\)/,           'AoA banner: showing count';
 
 	my @b = _body($s);
 	is scalar(@b), 3, 'header + 2 data rows';
@@ -113,7 +113,7 @@ sub _body  { grep { $_ !~ /^#/ } _lines($_[0]) }
 {
 	my $aoa = [ [1], [2], [3] ];
 	my $s = view($aoa, n => 1, return_only => 1, color => 0);
-	like $s, qr/\(showing 1\)/,       'n=1: banner shows 1';
+	like $s, qr/\(showing 1 row\)/,       'n=1: banner shows 1';
 	is scalar(grep { /^# \.\.\./ } _lines($s)), 1, 'row-truncation footer printed once';
 	is scalar(_body($s)), 2, 'header + a single data row';
 }
@@ -147,8 +147,8 @@ sub _body  { grep { $_ !~ /^#/ } _lines($_[0]) }
 	my $one  = view($wide, width => 1000, return_only => 1, color => 0);
 	my $many = view($wide, width => 16,   return_only => 1, color => 0);
 
-	is scalar(grep { /^# AoA:/ } _lines($one)),  1, 'banner printed once (single block)';
-	is scalar(grep { /^# AoA:/ } _lines($many)), 1, 'banner printed once (chunked)';
+	is scalar(grep { /^# AoA:/ } _lines($one)),  2, 'banner printed at the top and bottom (single block)';
+	is scalar(grep { /^# AoA:/ } _lines($many)), 2, 'banner printed at the top and bottom (chunked)';
 	like $one,  qr/x 8 cols/, 'banner counts every column';
 	like $many, qr/x 8 cols/, 'chunked banner still counts every column';
 	cmp_ok scalar(_lines($many)), '>', scalar(_lines($one)),

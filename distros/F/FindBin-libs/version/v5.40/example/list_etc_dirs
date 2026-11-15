@@ -5,9 +5,7 @@
 # See POD for abspath vs. noabspath and the three-module interaction.
 ########################################################################
 
-use strict;
-use warnings;
-use feature 'say';
+use v5.40;
 
 use FindBin::Bin
 qw
@@ -27,6 +25,7 @@ qw
 (
     base=etc
     export
+    nofail
 );
 
 say "logical  bin (\$Bin_l): $Bin_l";

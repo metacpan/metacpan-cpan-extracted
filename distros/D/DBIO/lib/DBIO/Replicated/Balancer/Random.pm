@@ -4,7 +4,7 @@ package DBIO::Replicated::Balancer::Random;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Replicated::Balancer';
 
@@ -47,7 +47,7 @@ DBIO::Replicated::Balancer::Random - Randomly choose an active replicant
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 METHODS
 

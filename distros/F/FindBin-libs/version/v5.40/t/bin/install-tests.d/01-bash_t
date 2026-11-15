@@ -1,0 +1,58 @@
+########################################################################
+# housekeeping
+########################################################################
+package Testy;
+use v5.40;
+
+use File::Basename  qw( basename dirname );
+use Test::More;
+
+########################################################################
+
+my $base0  = basename $0;
+my $dir0   = dirname  $0;
+
+my $path
+= do
+{
+    my $base = basename $0 => qw( .t );
+    $base   =~ s{~}{/}g;
+    $base
+};
+
+for( $path )
+{
+    -e      or BAIL_OUT "Non-existent: '$path'";
+    -r _    or BAIL_OUT "Non-readable: '$path'";
+}
+
+my $test_d = dirname $dir0;
+my $work_d = dirname $test_d;
+
+chdir $work_d
+or BAIL_OUT "chdir '$work_d': $!";
+
+my $last_prove = $ENV{ LAST_PROVE } // ( stat '.prove' )[9] // 0;
+
+SKIP:
+{
+    ( stat $path )[9] > $last_prove
+    or skip "File unchanged: $path", 1;
+
+    chomp( my @output = qx{ /bin/bash -n "$path" 2>&1 } );
+
+    if( $? == 0 )
+    {
+        pass "Bash syntax OK: $base0";
+
+        @output
+        and diag join "\n\t", "\nWarnings:", @output;
+    }
+    else
+    {
+        fail "Bash syntax error: $base0";
+        diag join "\n\t", "\nErrors:", @output;
+    }
+}
+
+done_testing

@@ -1,9 +1,9 @@
-DKIM2-Signature: i=2; m=2; t=1740000000; d=test2.dkim2.com;
+DKIM2-Signature: i=2; m=2; t=1740000000; d=test2.dkim2.com; f=exploded;
 	mf=PGZvcndhcmRlckB0ZXN0Mi5ka2ltMi5jb20+;
 	rt=PHJlY2lwaWVudEB0ZXN0Mi5ka2ltMi5jb20+;
-	s=rsa1024:rsa-sha256:mnCMkhzRY7uEvgulitxTouWlhyVbxVXdtNuKI+wbXH6
-	y4u93QK7/ot3nIDNop+WsXjhZ+G/0iH+SpnCgP9P3p6t1CTrp5r23rrHoP+sJoXA
-	w2fb9ElJXe0fTcxmxj3MLIvhlTaQB7oF9+pxbKqUiaIJb/pQO5dxkIrh5Mq0H69o
+	s=rsa1024:rsa-sha256:0aPDd4yxAocglWpyKKTqKtQKAbJOFxloeRy7X7fPWgT
+	OB6ZZERz0sc86rbrgI6C1uciGpXDqd/CkeZXF2r0hcTX4USuv/ZjqPv1jo0SqX4G
+	Xwota26oCC20OO/I1SbMS8WkZtL5ihIXX/nfHMSF8PprTh7shhAKRdspEPDsaCNQ
 	=;
 Message-Instance: m=2;
 	h=sha256:fQlVnF1jb8Mw8Zo/cBDo7IVI7QdoRF48LJ32r0nPF7s=:XI228V/720

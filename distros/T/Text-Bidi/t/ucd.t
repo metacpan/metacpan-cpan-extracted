@@ -28,7 +28,9 @@ my %char = (
     B => [map { chr } (0xa, 0xd, 0x1c..0x1e, 0x85, 0x2029)],
     S => [chr(9), chr(0xb), chr(0x1f)],
     WS => [chr(0xc), ' '],
-    ON => [qw(! " & ' * ; < = > ? @ [ \ ] ^ _ ` { | } ~), chr(0x606), chr(0x60e)],
+    # BidiTest specifies types without bracket properties. Avoid paired
+    # brackets here; their N0 behavior is covered by BidiCharacterTest.
+    ON => [qw(! " & ' * ; < = > ? @ \ ^ _ ` | ~), chr(0x606), chr(0x60e)],
     LRE => ["\N{LEFT-TO-RIGHT EMBEDDING}"],
     LRO => ["\N{LEFT-TO-RIGHT OVERRIDE}"],
     RLE => ["\N{RIGHT-TO-LEFT EMBEDDING}"],

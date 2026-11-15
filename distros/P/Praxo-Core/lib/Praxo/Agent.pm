@@ -12,11 +12,13 @@ our @EXPORT_OK = qw(run_agent);
 package Praxo::Agent::FuncTool;
 
 sub new {
-    my ($class, $name, $description, $function) = @_;
+    my ($class, $name, $description, $function, $parameters, $risk) = @_;
     return bless {
         name => $name // '',
         description => $description // '',
         function => $function,
+        parameters => $parameters,
+        risk => $risk,
     }, $class;
 }
 
@@ -48,9 +50,21 @@ sub get {
 sub specs {
     my ($self) = @_;
     my @specs = map {
+        my $name = ref($_) ? $_->name : $_->{name};
+        my $description = ref($_) ? $_->description : $_->{description};
+        my ($parameters, $risk);
+        if (ref($_) && ref($_) ne 'HASH') {
+            $parameters = $_->can('parameters') ? $_->parameters : $_->{parameters};
+            $risk = $_->can('risk') ? $_->risk : $_->{risk};
+        } else {
+            $parameters = $_->{parameters};
+            $risk = $_->{risk};
+        }
         Praxo::Models::tool_spec(
-            name => (ref($_) ? $_->name : $_->{name}),
-            description => (ref($_) ? $_->description : $_->{description}),
+            name => $name,
+            description => $description,
+            parameters => $parameters,
+            risk => $risk,
         )
     } values %{ $self->{tools} };
     return [ sort { $a->{name} cmp $b->{name} } @specs ];
@@ -70,6 +84,9 @@ sub new {
         max_steps => 8,
         max_tokens => 0,
         tool_choice => undef,
+        allowed_tools => [],
+        require_policy => 0,
+        require_tool_scope => 0,
     }, $class;
 }
 
@@ -91,6 +108,14 @@ package Praxo::Agent::Agent;
 
 sub new {
     my ($class, $options) = @_;
+    Praxo::Errors::praxo_error(
+        'AGENT_INVALID_OPTIONS',
+        'agent: require policy: policy is required',
+    ) if $options->{require_policy} && !$options->{policy};
+    Praxo::Errors::praxo_error(
+        'AGENT_INVALID_OPTIONS',
+        'agent: require tool scope: allowed_tools must not be empty',
+    ) if $options->{require_tool_scope} && !@{ $options->{allowed_tools} // [] };
     return bless { options => $options }, $class;
 }
 

@@ -2,7 +2,6 @@ use v5.36;
 
 package Ekorn::Pipeline::Stop;
 
-use Carp     qw(croak);
 use Exporter qw(import);
 
 use namespace::clean -except => 'import';
@@ -17,8 +16,15 @@ sub Stop (@data) {
 }
 
 # Throws an exception that stops a pipeline early.
+#
+# It's thrown with die, not croak, though croak is our rule for what we
+# pass on. Given an object, croak dies with it unchanged, adding no
+# location, so it gives catchers nothing die doesn't; but it does
+# Carp's work first, which made a stop about three times dearer: 1.4
+# microseconds against 0.42, as DBIx-Squirrel measured on 2026-11-14,
+# on Perl 5.36 and 5.44.
 sub throw ($class, @data) {
-    croak bless([$class, @data], $class);
+    die bless([$class, @data], $class);    ## no critic (ErrorHandling::RequireCarping)
 }
 
 1;
@@ -48,9 +54,9 @@ Ekorn::Pipeline::Stop - end a pipeline early
 A stop is the exception that ends a pipeline early and quietly. The
 rest of the stage that throws it doesn't run. The values already out
 of the pipeline are kept, and the values the stop carries go on
-through the stages after it. Nothing else is processed. Stages after
-the one that stopped still have their end functions called, if they
-were made with L<Ekorn::Pipeline::Gather>.
+through the stages after it. Nothing else is processed. The stages
+after the one that stopped still have their flushes called, and every
+part of the run has its end called, told how the run ended.
 
 =head1 FUNCTIONS
 
@@ -60,9 +66,8 @@ were made with L<Ekorn::Pipeline::Gather>.
     Stop(@values);
 
 Throws a stop carrying C<@values>, the last values of the stage that
-throws it. It's the same as
-C<< Ekorn::Pipeline::Stop->throw(@values) >>. It's exported by
-default.
+throws it. It's the same as C<< Ekorn::Pipeline::Stop->throw(@values)
+>>. It's exported by default.
 
 To keep it out of your namespace:
 

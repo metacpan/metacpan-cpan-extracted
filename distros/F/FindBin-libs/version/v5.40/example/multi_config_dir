@@ -4,9 +4,11 @@
 # tree in ./etc dir's above FinBin::Bin.
 ########################################################################
 
+use v5.40;
+
 use List::Util      qw( first );
 
-use FindBin::libs   qw( base=etc export );
+use FindBin::libs   qw( base=etc export nofail );
 
 my $base    = 'LocalPaths.conf';
 

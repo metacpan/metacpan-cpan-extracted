@@ -1,7 +1,7 @@
 package Mail::DKIM2::Reflector;
 use strict; use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 use 5.020;
 
 use Email::MIME;
@@ -11,7 +11,9 @@ use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signer;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::DSN;
-use Mail::DKIM2::Common qw(parse_mime fold_header should_skip DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
+use Mail::DKIM2::Common qw(parse_mime DKIM2_DRAFT DKIM2_REPO DKIM2_DATE);
+use Mail::DKIM2::Canon qw(should_skip);
+use Mail::DKIM2::Fold qw(fold_header);
 
 our $SUBJECT_PREFIX = '[DKIM2] ';
 our $FOOTER         = "-- \r\nReflected and signed by the DKIM2 reflector at dkim2.com\r\n";
@@ -97,7 +99,7 @@ sub _fresh_message_text {
       . "\r\n"
       . $a{body};
     my $mi = Mail::DKIM2::MessageInstance->calculate(parse_mime($text));
-    (my $miv = fold_header("Message-Instance: " . $mi->as_string)) =~ s/^Message-Instance:\s*//;
+    my $miv = $mi->as_header_value;
     my ($hc, $hn) = _header_list_for_hash(parse_mime($text));
     return _info_line('mi-m=1', hc => $hc, hn => $hn)
          . "Message-Instance: $miv\r\n" . $text;
@@ -402,8 +404,7 @@ sub reflect {
     #    continuing a chain reuses the top m=). Emitted whether or not we sign.
     my $mi = _build_mi($cur_text, $prev_text, $mode);
     if ($mi) {
-        my $val = fold_header("Message-Instance: " . $mi->as_string);
-        $val =~ s/^Message-Instance:\s*//;
+        my $val = $mi->as_header_value;
         my ($hc, $hn) = _header_list_for_hash(parse_mime($cur_text));
         $cur_text = _info_line("mi-m=" . $mi->get_tag('m'), hc => $hc, hn => $hn)
                   . "Message-Instance: $val\r\n" . $cur_text;

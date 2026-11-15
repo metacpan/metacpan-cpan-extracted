@@ -6,7 +6,7 @@ use strict 'vars';
 
 package Text::Bidi;
 # ABSTRACT: Unicode bidi algorithm using libfribidi
-$Text::Bidi::VERSION = '2.18';
+$Text::Bidi::VERSION = '3.01';
 use Exporter;
 use base qw(Exporter);
 use Carp;
@@ -102,6 +102,14 @@ sub get_bidi_types {
 }
 
 
+sub get_bracket_types {
+    my $self = S(@_);
+    my ($u, $types) = @_;
+    $types //= $self->get_bidi_types($u);
+    $self->tie_long(Text::Bidi::private::get_bracket_types($$u, $$types))
+}
+
+
 sub get_bidi_type_name {
     my $self = S(@_);
     Text::Bidi::private::get_bidi_type_name(@_)
@@ -125,8 +133,10 @@ sub get_par_embedding_levels {
     my $self = S(@_);
     my $bt = shift;
     my $p = shift // $Text::Bidi::private::FRIBIDI_PAR_ON;
+    my $brackets = shift // $self->tie_long([(0) x @$bt]);
     my ($lev, $par, $out) = 
-        Text::Bidi::private::get_par_embedding_levels($$bt, $p);
+        Text::Bidi::private::get_par_embedding_levels_ex($$bt, $$brackets, $p);
+    croak 'FriBidi could not compute paragraph embedding levels' if !$lev && @$bt;
     my $res = $self->tie_byte($out);
     ($par, $res)
 }
@@ -199,6 +209,7 @@ sub reorder_map {
 
     my ($lev, $elout, $mout) = Text::Bidi::private::reorder_map(
         $flags, $$bt, $off, $len, $par, $$el, $$map);
+    croak 'FriBidi could not reorder the line' if !$lev && $len;
 
     ($elout, $mout)
 }
@@ -281,7 +292,7 @@ Text::Bidi - Unicode bidi algorithm using libfribidi
 
 =head1 VERSION
 
-version 2.18
+version 3.01
 
 =head1 SYNOPSIS
 
@@ -341,7 +352,7 @@ All of them can be exported together using the C<:all> tag.
 This module provides basic support for the Unicode bidirectional (Bidi) text 
 algorithm, for displaying text consisting of both left-to-right and 
 right-to-left written languages (such as Hebrew and Arabic.) It does so via  
-a I<swig> interface file to the I<libfribidi> library.
+an L<FFI::Platypus> interface to the I<libfribidi> library.
 
 The fundamental purpose of the bidi algorithm is to reorder text given in 
 logical order into text in visually correct order, suitable for display using 
@@ -496,6 +507,14 @@ Returns a L<Text::Bidi::Array::Long> with the list of Bidi types of the text
 given by $internal, a representation of the paragraph text, as returned by 
 utf8_to_internal(). Wraps fribidi_get_bidi_types(3).
 
+=head2 get_bracket_types
+
+    $brackets = $tb->get_bracket_types($internal[, $types]);
+
+Return a L<Text::Bidi::Array::Long> of paired-bracket properties for the
+internal string. B<$types> defaults to L</get_bidi_types>. Wraps
+fribidi_get_bracket_types(3).
+
 =head2 get_joining_types
 
     $types = $tb->get_joining_types($internal);
@@ -514,12 +533,17 @@ to use L<Text::Bidi::Constants>.
 
 =head2 get_par_embedding_levels
 
-   ($odir, $lvl) = $tb->get_par_embedding_levels($types[, $dir]);
+   ($odir, $lvl) = $tb->get_par_embedding_levels($types[, $dir[, $brackets]]);
 
 Return the embedding levels of the characters, whose types are given by 
 I<$types>. I<$types> is a L<Text::Bidi::Array::Long> of Bidi types, as 
 returned by L</get_bidi_types>. I<$dir> is the base paragraph direction. If 
-not given, it defaults to C<FRIBIDI_PAR_ON> (neutral).
+not given, it defaults to C<FRIBIDI_PAR_ON> (neutral). B<$brackets> is the
+array returned by L</get_bracket_types>. Supply it to enable Unicode paired
+bracket resolution (rule N0). Without it, all characters are treated as
+non-brackets, preserving the original two-argument interface.
+
+This method uses fribidi_get_par_embedding_levels_ex(3).
 
 The output is the resolved paragraph direction I<$odir>, and the 
 L<Text::Bidi::Array::Byte> array I<$lvl> of embedding levels.
@@ -610,33 +634,65 @@ The output consists of the modified map B<$mout> (a
 L<Text::Bidi::Array::Long>), and possibly modified embedding levels 
 B<$elout>.
 
+=head2 remove_bidi_marks
+
+This legacy method is currently nonfunctional because the private backend
+does not expose C<remove_bidi_marks>. It remains as an unsupported placeholder.
+
+=head1 SELECTING DISPLAYED TEXT
+
+L<Text::Bidi::Selection> maps visual selections back to the original logical
+text. For a single unwrapped paragraph:
+
+    use Text::Bidi::Selection;
+
+    my ($paragraph, $visual) = log2vis($logical);
+    my $selection = Text::Bidi::Selection->new(
+        text              => $logical,
+        visual_to_logical => $paragraph->map,
+    );
+    my $copy = $selection->selected_text($start, $end);
+
+The start offset is included and the end offset is excluded. The result is
+in logical reading order and omits unselected gaps between logical ranges.
+For terminal cells or shaped glyphs, supply the renderer's map of displayed
+positions to original character offsets; grouped entries can represent
+combining characters or ligatures.
+
+=head1 BUILDING
+
+FriBidi is an external library; its source is not bundled with this module.
+Install its shared library before using this module. FriBidi 1.0.0 or newer
+is required. The C<ffi> branch uses L<FFI::Platypus> through
+C<Text::Bidi::private>, preserving the public API. This interface has been
+tested with FriBidi 1.0.18 (Unicode 18.0.0) and Perl 5.44.0.
+
+To build a source checkout:
+
+    perl Makefile.PL
+    make
+    make test
+
+Install the Perl dependencies with C<cpanm --installdeps .> first.
+C<FFI::Platypus> 2.00 and C<FFI::CheckLib> 0.28 or newer are required.
+Text::Bidi itself needs no compiler, SWIG, FriBidi headers, or C<pkg-config>.
+If the shared library is in a nonstandard location, set
+C<TEXT_BIDI_FRIBIDI_LIB=/path/to/libfribidi.so>.
+The checkout uses development version C<0.00>; Dist::Zilla supplies the
+version when preparing a release.
+
+An additional author test accepts the official C<BidiCharacterTest.txt>
+from L<https://www.unicode.org/Public/>. Use data matching the Unicode
+version reported by L</unicode_version>:
+
+    TEXT_BIDI_CHARACTER_TEST=/path/to/BidiCharacterTest.txt \
+        prove -b xt/author/ucd-characters.t
+
 =for Pod::Coverage S
 
 =for Pod::Coverage tie_byte tie_long
 
 =for Pod::Coverage hash2flags
-
-=begin comment
-
-
-
-
-=end comment
-
-method remove_bidi_marks
-
-    ($v, $to, $from, $levels) = 
-        $tb->remove_bidi_marks($v[, $to[, $from[, $levels]]])
-
-Remove the explicit bidi marks from C<$v>. The optional arguments, if given, 
-are the map from the logical to the visual string, the inverse map, and 
-embedding levels, respectively, as returned by L</reorder_map>. The inverse 
-map C<$from> can be obtained from the direct one C<$to> by a command like:
-
-    @$from[@$map] = 0..$#$map
-
-Each of the arguments can be C<undef>, in which case it will be skipped. This 
-implements step X9, see fribidi_remove_bidi_marks(3).
 
 =head1 BUGS
 
@@ -651,11 +707,13 @@ L<Text::Bidi::Paragraph>
 
 L<Text::Bidi::Constants>
 
+L<Text::Bidi::Selection>
+
 L<Encode>
 
 L<The fribidi library|http://fribidi.org/>
 
-L<Swig|http://www.swig.org>
+L<FFI::Platypus>
 
 L<The unicode bidi algorithm|http://www.unicode.org/unicode/reports/tr9/>
 

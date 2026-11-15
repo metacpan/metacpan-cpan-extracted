@@ -3,7 +3,7 @@ package DBIO::Test::Kubernetes;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Carp qw(croak);
 use DBIO::Exception ();
@@ -787,7 +787,7 @@ DBIO::Test::Kubernetes - Provision temporary database pods in Kubernetes for DBI
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

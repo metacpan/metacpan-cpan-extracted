@@ -184,7 +184,7 @@ dbioadmin - CLI for DBIO schema administration
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

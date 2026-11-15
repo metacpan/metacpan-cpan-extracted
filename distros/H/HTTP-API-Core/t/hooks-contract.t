@@ -179,7 +179,12 @@ is $bad_hook_transport_called, 0,
 
 for my $case (
     ['method', sub { $_[0]{method} = [] }, qr/method must be a non-empty scalar/],
-    ['url', sub { $_[0]{url} = {} }, qr/url must be a defined scalar/],
+    ['url reference', sub { $_[0]{url} = {} }, qr/url must be a non-empty scalar/],
+    ['empty url', sub { $_[0]{url} = '' }, qr/url must be a non-empty scalar/],
+    ['missing authority', sub { $_[0]{url} = 'https:///broken' }, qr/url must be an absolute HTTP\(S\) URL/],
+    ['missing host after colon', sub { $_[0]{url} = 'https://:/broken' }, qr/url must be an absolute HTTP\(S\) URL/],
+    ['missing host after userinfo', sub { $_[0]{url} = 'https://@/broken' }, qr/url must be an absolute HTTP\(S\) URL/],
+    ['non-http url', sub { $_[0]{url} = 'ftp://example.test/file' }, qr/url must be an absolute HTTP\(S\) URL/],
     ['content', sub { $_[0]{content} = [] }, qr/content must be a scalar or undef/],
 ) {
     my ($name, $mutate, $pattern) = @$case;

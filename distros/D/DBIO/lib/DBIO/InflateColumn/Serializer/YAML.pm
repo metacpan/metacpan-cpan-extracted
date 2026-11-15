@@ -4,7 +4,7 @@ package DBIO::InflateColumn::Serializer::YAML;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use YAML 1.25;
 use Carp;
@@ -53,7 +53,7 @@ DBIO::InflateColumn::Serializer::YAML - YAML Inflator
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

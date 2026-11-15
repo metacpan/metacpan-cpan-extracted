@@ -10,7 +10,7 @@ our @EXPORT_OK = qw(bearer_auth basic_auth api_key_auth);
 sub bearer_auth {
     my ($token) = @_;
     die "bearer token must be a non-empty scalar\n"
-        if !defined($token) || ref($token) || $token eq '';
+        if !defined($token) || ref($token) ne '' || $token eq '';
 
     return sub {
         my ($ctx) = @_;
@@ -20,8 +20,8 @@ sub bearer_auth {
 
 sub basic_auth {
     my ($username, $password) = @_;
-    die "basic auth username is required\n" if !defined($username) || ref($username);
-    die "basic auth password is required\n" if !defined($password) || ref($password);
+    die "basic auth username is required\n" if !defined($username) || ref($username) ne '';
+    die "basic auth password is required\n" if !defined($password) || ref($password) ne '';
 
     my $credentials = encode_base64("$username:$password", '');
     return sub {
@@ -31,16 +31,20 @@ sub basic_auth {
 }
 
 sub api_key_auth {
+    die "api_key auth options must be key/value pairs\n" if @_ % 2;
+    die "api_key auth option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
     my (%args) = @_;
     my $in = delete($args{in}) // 'header';
     my $name = delete $args{name};
     my $value = delete $args{value};
     die "unknown api_key auth option: $_\n" for sort keys %args;
 
-    die "api_key in must be header or query\n" if $in ne 'header' && $in ne 'query';
+    die "api_key in must be header or query\n"
+        if ref($in) ne '' || ($in ne 'header' && $in ne 'query');
     die "api_key name must be a non-empty scalar\n"
-        if !defined($name) || ref($name) || $name eq '';
-    die "api_key value must be a scalar\n" if !defined($value) || ref($value);
+        if !defined($name) || ref($name) ne '' || $name eq '';
+    die "api_key value must be a scalar\n" if !defined($value) || ref($value) ne '';
 
     if ($in eq 'header') {
         return sub {

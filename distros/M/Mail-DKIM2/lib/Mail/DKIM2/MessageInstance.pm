@@ -2,9 +2,11 @@ package Mail::DKIM2::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 
+use Mail::DKIM2::Fold ();
+use Mail::DKIM2::Util ();
 use Mail::DKIM2::Digest;
 use Email::MIME;
 use MIME::Base64 qw(encode_base64 decode_base64);
@@ -16,21 +18,15 @@ use Mail::DKIM2::TagValueList ();
 use Mail::DKIM2::Common qw(
     MI_MISSING_M_ERROR
     parse_mime
-    should_skip
-    dkim2_canonicalize_header
-    digest64
-    encode_tag_json
-    decode_tag_json
     extract_mi_version
-    check_ignore_prefixes
     MAX_CHAIN_LENGTH
     chain_length_error
     chain_number_error
     mi_version_tag
     duplicate_number_error
 );
-
-our $DEBUG = 0;
+use Mail::DKIM2::Canon qw(should_skip dkim2_canonicalize_header check_ignore_prefixes);
+use Mail::DKIM2::RecipeJSON qw(encode_tag_json decode_tag_json);
 
 # The PERMERROR for a message whose Message-Instance fields cannot form a
 # chain, or undef.
@@ -90,7 +86,7 @@ sub parse_hash_groups {
             my @hashes = split /:/, $rest, -1;
             # Both are base64strings (§2.14), whatever the algorithm.
             return unless @hashes == 2
-                && !grep { !Mail::DKIM2::Common::_is_base64string($_) } @hashes;
+                && !grep { !Mail::DKIM2::Util::is_base64string($_) } @hashes;
             push @sets, [$name, @hashes];
         }
         push @out, \@sets;
@@ -113,8 +109,10 @@ BEGIN {
             my @vals = @_;
             my $headers = $self->{headers};
             my $max = @$headers / 2 - 1;
+            # Names as DKIM2 compares them: "Subject :" is a Subject.
+            my $want = Mail::DKIM2::Canon::field_name($h);
             for my $idx (map { $_ * 2 } reverse 0..$max) {
-                next unless lc($headers->[$idx]) eq lc($h);
+                next unless Mail::DKIM2::Canon::field_name($headers->[$idx]) eq $want;
                 if (@vals) {
                     $headers->[$idx+1] = shift @vals;
                 } else {
@@ -154,9 +152,10 @@ sub get_tag {
     return $self->{bits}{$k};
 }
 
-# The header-hash component (base64) of this Message-Instance's h= tag.
-sub header_hash { return $_[0]->{bits}{h1} }
-sub body_hash { return $_[0]->{bits}{b1} }
+# The header hash and the body hash (base64) of this Message-Instance's h=
+# tag, for $alg (default sha256); undef if h= has no set for it.
+sub header_hash { return ($_[0]->{bits}{hashes}{ $_[1] // 'sha256' } || [])->[0] }
+sub body_hash   { return ($_[0]->{bits}{hashes}{ $_[1] // 'sha256' } || [])->[1] }
 
 # The body hash (-09 section 6.1) of a raw body string with LF or CRLF
 # line ends: no Email::MIME parse, for callers that hold the body alone.
@@ -220,7 +219,8 @@ sub _body_digest_feed {
 # previous state cannot be recreated. as_string() then emits "b": null.
 sub set_null_body_recipe {
     my ($self) = @_;
-    $self->{bits}{rb} = \'null';   # scalar-ref sentinel
+    delete $self->{bits}{rb};
+    $self->{bits}{rb_null} = 1;    # as parse() records it
 }
 
 # True if this instance declares the previous state non-recreatable (a null
@@ -238,35 +238,24 @@ sub as_string {
     my ($self) = @_;
     my %data = %{$self->{bits}};
     my $m = delete $data{m};
-    my $h1 = delete $data{h1};
-    my $b1 = delete $data{b1};
-    my $hashes = delete $data{hashes};
-    unless ($hashes && %$hashes) {
-        # Back-compat: bits built directly with bare h1/b1 and no hashes map
-        # (e.g. hand-constructed objects in tests) still emit a sha256 set.
-        $hashes = (defined $h1 || defined $b1) ? { sha256 => [ $h1 // '', $b1 // '' ] } : {};
-    }
+    my $hashes = delete($data{hashes}) || {};
 
-    # -09 §9.3: h= is hash-set *("," hash-set) -- one hash-set per
-    # configured algorithm, emitted in the signer's chosen order (default:
-    # sha256 only; the signer default MUST NOT change).
-    my @algs = @{ $self->{algs} || ['sha256'] };
-    my @sets;
-    for my $alg (@algs) {
-        my $pair = $hashes->{$alg} or next;
-        push @sets, "$alg:$pair->[0]:$pair->[1]";
-    }
-    my $result = "m=$m; h=" . join(',', @sets);
+    # -09 §9.3: h= is "|" groups of "," lists of hash-sets. A parsed
+    # instance writes the groups it was given; a calculated one, one list
+    # with a hash-set per configured algorithm, in the signer's order
+    # (default: sha256 only).
+    my $groups = $self->{hash_groups} || [ $self->{algs} || ['sha256'] ];
+    my $result = "m=$m; h=" . join('|', map {
+        join ',', map { "$_:$hashes->{$_}[0]:$hashes->{$_}[1]" } grep { $hashes->{$_} } @$_
+    } @$groups);
 
     # Build r= tag JSON if there are Recipes
     my %recipe_json;
-    if (exists $data{rb}) {
-        if (ref $data{rb} eq 'SCALAR' && ${$data{rb}} eq 'null') {
-            $recipe_json{b} = undef;          # encodes as JSON null
-            delete $data{rb};
-        } else {
-            $recipe_json{b} = _encode_recipe_list(delete $data{rb});
-        }
+    if (delete $data{rb_null}) {
+        $recipe_json{b} = undef;              # encodes as JSON null
+        delete $data{rb};
+    } elsif (exists $data{rb}) {
+        $recipe_json{b} = _encode_recipe_list(delete $data{rb});
     }
     if (exists $data{rh}) {
         my $rh = delete $data{rh};
@@ -285,6 +274,41 @@ sub as_string {
     $result .= ";";
 
     return $result;
+}
+
+# The whole field, folded where its grammar allows, ready to go at the top
+# of a message (no line break at the end); and its value alone, folded the
+# same way, for a milter's addheader/insheader, which takes name and value
+# apart.
+sub as_header {
+    my ($self) = @_;
+    return Mail::DKIM2::Fold::fold_header('Message-Instance: ' . $self->as_string);
+}
+
+sub as_header_value {
+    my ($self) = @_;
+    (my $value = $self->as_header) =~ s/\AMessage-Instance:[ \t]*//;
+    return $value;
+}
+
+# What this instance says its hop changed, read off its Recipes: the body
+# ('unchanged', no body Recipe; 'changed', one that rebuilds the previous
+# body; 'unrecoverable', the null Recipe) and the names of the header
+# fields with a Recipe, lower-cased and sorted.
+sub changes {
+    my ($self) = @_;
+    my $bits = $self->{bits};
+    return {
+        body    => $bits->{rb_null} ? 'unrecoverable' : $bits->{rb} ? 'changed' : 'unchanged',
+        headers => [ sort map { Mail::DKIM2::Canon::field_name($_) } keys %{ $bits->{rh} || {} } ],
+    };
+}
+
+# True if this instance has a header Recipe for the field named $name.
+sub changes_header {
+    my ($self, $name) = @_;
+    my $want = Mail::DKIM2::Canon::field_name($name);
+    return (grep { $_ eq $want } @{ $self->changes->{headers} }) ? 1 : 0;
 }
 
 # Convert internal Recipe list to wire format
@@ -318,7 +342,7 @@ sub _encode_recipe_list {
             # section 5 schema forbids and Go rejects as invalid JSON.
             push @encoded, { c => [ map { 0 + $_ } @$item ] };
         } else {
-            my $kind = Mail::DKIM2::Common::_is_utf8_octets($item) ? 'd' : 'u';
+            my $kind = Mail::DKIM2::RecipeJSON::is_utf8_octets($item) ? 'd' : 'u';
             $flush->() if $kind ne $pending_kind;
             $pending_kind = $kind;
             push @pending, $kind eq 'u' ? encode_base64($item, '') : $item;
@@ -389,10 +413,6 @@ sub parse {
         # its "|" groups of "," lists (-09 §9.3).
         $self->{hash_order} = [ map { $_->[0] } @$sets ];
         $self->{hash_groups} = [ map { [ map { $_->[0] } @$_ ] } @$groups ];
-        # Back-compatible aliases for the sha256 hash-set
-        if (my $sha256 = $self->{bits}{hashes}{sha256}) {
-            @{$self->{bits}}{qw(h1 b1)} = @$sha256;
-        }
     }
 
     if (exists $tags{r}) {
@@ -445,6 +465,11 @@ sub parse {
             # A non-empty object (minProperties 1); never null (section 5.1).
             die $invalid unless ref $top{h} eq 'HASH' && %{$top{h}};
             my %rh;
+            # Each key is a header field name (-09 section 5): ftext, so no
+            # WSP. "message-instance " is not a name -- and, taken for one
+            # by name matching that drops WSP before a colon, would let a
+            # Recipe rewrite the instances below it.
+            die $invalid if grep { !/\A[\x21-\x39\x3B-\x7E]+\z/ } keys %{$top{h}};
             for my $h (sort keys %{$top{h}}) {
                 $rh{$h} = _decode_recipe_list($top{h}{$h}, $bad, 'h.' . _path_name($h));
             }
@@ -529,12 +554,17 @@ sub h_digest {
     my ($msg, $alg, $prefixes) = @_;
     $alg = lc($alg // 'sha256');
 
+    # Fields grouped by name as DKIM2 compares names (field_name: "From :"
+    # is a From), names in order, each name's fields bottom-up.
+    my @pairs = $msg->header_obj->header_raw_pairs;
+    my %by;
+    push @{ $by{ Mail::DKIM2::Canon::field_name($pairs[2 * $_]) } }, $pairs[2 * $_ + 1]
+        for 0 .. $#pairs / 2;
     my $data = '';
-    for my $header (sort { lc($a) cmp lc($b) } $msg->header_names) {
+    for my $header (sort keys %by) {
         next if should_skip($header, $prefixes);
-        for my $item (reverse $msg->header_raw($header)) {
+        for my $item (reverse @{ $by{$header} }) {
             my $chead = dkim2_canonicalize_header("$header: $item\r\n");
-            warn "cdigest: $chead" if $DEBUG;
             $data .= $chead;
         }
     }
@@ -556,9 +586,7 @@ sub b_digest {
 }
 
 # -09 §3.1/§3.5: hash $data with the named (implemented) algorithm and
-# base64-encode the result. Equivalent to the historic digest64($digest)
-# path for sha256 (verified byte-identical), generalised to any algorithm
-# in %HASH_ALGS.
+# base64-encode the result.
 sub _hash_data_b64 {
     my ($alg, $data) = @_;
     my $fn = $HASH_ALGS{$alg} or croak "unsupported hash algorithm: $alg";
@@ -707,80 +735,6 @@ sub _body_diff {
     return \@recipe;
 }
 
-# --- Epilogue helpers ---
-
-# Generate a random boundary string that is very unlikely to appear in message content.
-sub _random_boundary {
-    return sprintf('dkim2-epilogue-%08x%08x', int(rand(2**32)), int(rand(2**32)));
-}
-
-# Add $old_body into the MIME epilogue of $msg (an Email::MIME object),
-# modifying it in place.  Returns the number of body lines that precede
-# the epilogue, so the caller can build a line-range rb Recipe.
-#
-# If $msg is already multipart, the old body is appended after the final
-# MIME boundary (--BOUNDARY--).  If it is not multipart, the current
-# content is wrapped in a single-part multipart/mixed container and the
-# old body goes after the new final boundary.  In the wrap case the
-# caller's rh header-diff will automatically record the Content-Type change.
-sub _add_epilogue {
-    my ($msg, $old_body) = @_;
-
-    my $ct = $msg->content_type // '';
-
-    if ($ct =~ m{^multipart/}i) {
-        # Already multipart: append old body after the final boundary line.
-        my ($boundary) = ($ct =~ /boundary="?([^";]+)"?/i);
-        croak "Cannot find MIME boundary in Content-Type: $ct" unless $boundary;
-
-        my $body  = $msg->body_raw;
-        my $final = "--$boundary--";
-
-        # Find the first (and should be only) final-boundary occurrence.
-        my $idx = index($body, "$final\r\n");
-        if ($idx >= 0) {
-            $body = substr($body, 0, $idx + length($final) + 2) . $old_body;
-        } else {
-            # Tolerate bare LF or missing trailing newline.
-            $idx = index($body, "$final\n");
-            if ($idx >= 0) {
-                $body = substr($body, 0, $idx + length($final) + 1) . $old_body;
-            } else {
-                $idx = index($body, $final);
-                $body = ($idx >= 0 ? substr($body, 0, $idx + length($final)) : $body)
-                      . "\r\n" . $old_body;
-            }
-        }
-        $msg->body_set($body);
-
-    } else {
-        # Not multipart: wrap current content in multipart/mixed; put old body in epilogue.
-        my $boundary  = _random_boundary();
-        my $orig_ct   = $msg->header('Content-Type') // 'text/plain';
-        my $orig_cte  = $msg->header('Content-Transfer-Encoding');
-        my $orig_body = $msg->body_raw;
-
-        my $new_body  = "--$boundary\r\n";
-        $new_body    .= "Content-Type: $orig_ct\r\n";
-        $new_body    .= "Content-Transfer-Encoding: $orig_cte\r\n" if $orig_cte;
-        $new_body    .= "\r\n";
-        $new_body    .= $orig_body;
-        $new_body    .= "\r\n--$boundary--\r\n";
-        $new_body    .= $old_body;
-
-        $msg->header_set('Content-Type', "multipart/mixed; boundary=\"$boundary\"");
-        $msg->header_set('Content-Transfer-Encoding') if $orig_cte;
-        $msg->body_set($new_body);
-    }
-
-    # Return number of lines before the epilogue so the caller can build
-    # a line-range Recipe.  The old body occupies the last N lines of the
-    # modified body, where N = lines in $old_body.
-    my @all_lines = split /\r?\n/, $msg->body_raw;
-    my @old_lines = split /\r?\n/, $old_body;
-    return scalar(@all_lines) - scalar(@old_lines);  # 0-based count of prefix lines
-}
-
 # --- Calculate helpers ---
 
 # The body Recipe rebuilding $prev_raw from $cur_raw (raw body strings):
@@ -791,16 +745,6 @@ sub _body_recipe {
     (my $s1 = $cur_raw)  =~ s/[\r\n]+$//;
     (my $s2 = $prev_raw) =~ s/[\r\n]+$//;
     return _body_diff([split /\r?\n/, $s1], [split /\r?\n/, $s2], $max);
-}
-
-# Store $old_body in the MIME epilogue of $current (modifying it in place),
-# then return a rb line-range Recipe pointing at those lines.
-sub _epilogue_recipe {
-    my ($current, $old_body) = @_;
-    my @old_lines  = split /\r?\n/, $old_body;
-    return undef unless @old_lines;
-    my $prefix_len = _add_epilogue($current, $old_body);
-    return [[$prefix_len + 1, $prefix_len + @old_lines]];
 }
 
 # BodyRecipe 'none' with a caller-supplied BodyHash: croak unless the hash
@@ -823,34 +767,10 @@ sub _check_body_unchanged {
 
 # --- Calculate ---
 
-# UseEpilogue and EpilogueThreshold are disabled (final review M5): the
-# instance is computed over the message rewritten with the epilogue, but a
-# caller holding the message as a string, as both milters do, signs and
-# sends the original bytes, and that mail fails verification. Until that is
-# fixed they croak. $ENABLE_BROKEN_EPILOGUE is for this distribution's own
-# tests of the epilogue code, which hand in an Email::MIME and keep the
-# rewritten object; it is not an interface.
-our $ENABLE_BROKEN_EPILOGUE = 0;
-use constant EPILOGUE_DISABLED =>
-    "UseEpilogue and EpilogueThreshold are disabled in Mail::DKIM2 0.23: the "
-  . "Message-Instance would be computed over the message rewritten with the "
-  . "epilogue while the original bytes are signed, and the mail fails "
-  . "verification. Leave them out (the default is a diff body Recipe, or a "
-  . "null body Recipe over MaxRecipeLiterals)";
-
-sub _check_epilogue {
-    my (%opts) = @_;
-    croak EPILOGUE_DISABLED
-        if !$ENABLE_BROKEN_EPILOGUE && ($opts{UseEpilogue} || exists $opts{EpilogueThreshold});
-    return;
-}
-
 sub calculate {
     my ($class, $current, $previous, %opts) = @_;
-    Mail::DKIM2::Common::_check_options("$class->calculate", \%opts,
-        qw(Algs BodyHash BodyRecipe EpilogueThreshold IgnorePrefixes
-           MaxRecipeLiterals UseEpilogue));
-    _check_epilogue(%opts);
+    Mail::DKIM2::Util::check_options("$class->calculate", \%opts,
+        qw(Algs BodyHash BodyRecipe IgnorePrefixes MaxRecipeLiterals));
     croak "need a message" unless $current;
 
     my $self = bless {}, $class;
@@ -866,16 +786,10 @@ sub calculate {
     croak "BodyRecipe needs a previous message"
         if exists $opts{BodyRecipe} && !$previous;
 
-    # The literal-line cap on a diff body Recipe: MaxRecipeLiterals on the
-    # default path (over it, a null body Recipe), EpilogueThreshold on the
-    # epilogue path (over it, the epilogue).
-    for my $opt (qw(MaxRecipeLiterals EpilogueThreshold)) {
-        next unless exists $opts{$opt};
-        croak "$opt must be a non-negative integer"
-            unless defined $opts{$opt} && $opts{$opt} =~ /\A[0-9]+\z/;
-    }
-    croak "MaxRecipeLiterals and EpilogueThreshold are mutually exclusive"
-        if exists $opts{MaxRecipeLiterals} && exists $opts{EpilogueThreshold};
+    # The literal-line cap on a diff body Recipe: over it, a null body Recipe.
+    croak "MaxRecipeLiterals must be a non-negative integer"
+        if exists $opts{MaxRecipeLiterals}
+            && !(defined $opts{MaxRecipeLiterals} && $opts{MaxRecipeLiterals} =~ /\A[0-9]+\z/);
 
     my $body_hash;
     if (exists $opts{BodyHash}) {
@@ -910,9 +824,6 @@ sub calculate {
         $current = parse_mime($current);
     }
 
-    # $rb_recipe is determined before hash computation because epilogue
-    # strategies modify $current in place, and hashes must cover the
-    # final (possibly modified) message.
     my $rb_recipe;
 
     if ($previous) {
@@ -971,25 +882,10 @@ sub calculate {
                 croak "BodyRecipe must be 'none', 'null' or an ARRAY ref";
             }
         }
-        elsif ($opts{UseEpilogue}) {
-            # Always store old body in MIME epilogue.
-            $rb_recipe = _epilogue_recipe($current, $previous->body_raw);
-        }
-        elsif (defined $opts{EpilogueThreshold}) {
-            # Use the epilogue only when the diff would need more literal
-            # lines than the threshold. The diff has no side effects; the
-            # epilogue rewrites $current.
-            my $diff = _body_recipe($current->body_raw, $previous->body_raw,
-                $opts{EpilogueThreshold});
-            $rb_recipe = defined $diff && !ref $diff
-                ? _epilogue_recipe($current, $previous->body_raw)
-                : $diff;
-        }
         else {
-            # Default: a diff Recipe, which never modifies $current. A body
-            # the diff cannot rebuild within MaxRecipeLiterals lines (default
-            # MAX_RECIPE_LITERALS) is declared unrecoverable: a caller that
-            # may rewrite the body asks for the epilogue instead.
+            # A diff Recipe. A body the diff cannot rebuild within
+            # MaxRecipeLiterals lines (default MAX_RECIPE_LITERALS) is
+            # declared unrecoverable.
             $rb_recipe = _body_recipe($current->body_raw, $previous->body_raw,
                 $opts{MaxRecipeLiterals});
             if (defined $rb_recipe && !ref $rb_recipe) {
@@ -1004,33 +900,38 @@ sub calculate {
     }
 
     # Hashes are always of the current (newest) version of the message,
-    # computed after any epilogue modification, for every configured
-    # algorithm (-09 §9.3).
+    # for every configured algorithm (-09 §9.3).
     for my $alg (@{$self->{algs}}) {
         $self->{bits}{hashes}{$alg} = [ h_digest($current, $alg, $prefixes),
             $body_hash ? $body_hash->{$alg} : b_digest($current, $alg) ];
-    }
-    if (my $sha256 = $self->{bits}{hashes}{sha256}) {
-        @{$self->{bits}}{qw(h1 b1)} = @$sha256;
     }
 
     # nothing more to calculate without a previous version
     return $self unless $previous;
 
-    # calculate the header difference (always, even for UseEpilogue, since
-    # wrapping changes Content-Type and we need rh to undo that)
-    my %all = map { lc($_) => 1 } ($current->header_names, $previous->header_names);
+    # The header difference.
+    # Names as hashing and undo group them (field_name: "Subject :" is
+    # "subject"), so each Recipe key names the fields it is undone on.
+    my %all = map { Mail::DKIM2::Canon::field_name($_) => 1 }
+              ($current->header_names, $previous->header_names);
     my %hdiff;
     for my $h (sort keys %all) {
         next if should_skip($h, $prefixes);
-        my @cur  = reverse $current->header_raw($h);
-        my @prev = reverse $previous->header_raw($h);
+        my @cur  = reverse Mail::DKIM2::Canon::header_values($current, $h);
+        my @prev = reverse Mail::DKIM2::Canon::header_values($previous, $h);
         # Same number of instances AND the same values: zero instances and
         # one empty instance both join to "", and removing an empty field
         # (a bare "Bcc:") is still a change the Recipe must record.
         next if @cur == @prev
              && join("\n", map { dkim2_canonicalize_header($_) } @cur)
              eq join("\n", map { dkim2_canonicalize_header($_) } @prev);
+        # A Recipe key is a header field name (-09 section 5): ftext. A
+        # field Email::Simple read under a name that is not one ("Y Bad:",
+        # a control character) cannot have its change recorded -- a verifier
+        # refuses the key -- so refuse to describe it rather than sign
+        # mail that no verifier accepts.
+        die "cannot record a change to the field \"$h\": not a header field name\n"
+            unless $h =~ /\A[\x21-\x39\x3B-\x7E]+\z/;
         # headers are indexed from 1 from the bottom up
         my %known;
         push @{ $known{dkim2_canonicalize_header($cur[$_])} }, $_ + 1 for 0..$#cur;
@@ -1077,9 +978,8 @@ sub calculate {
 
 sub calculate_first {
     my ($class, $current, $previous, %opts) = @_;
-    Mail::DKIM2::Common::_check_options("$class->calculate_first", \%opts,
-        qw(Algs EpilogueThreshold IgnorePrefixes MaxRecipeLiterals UseEpilogue));
-    _check_epilogue(%opts);
+    Mail::DKIM2::Util::check_options("$class->calculate_first", \%opts,
+        qw(Algs IgnorePrefixes MaxRecipeLiterals));
     croak "need a message" unless $current;
     croak "need a previous message" unless $previous;
 
@@ -1113,7 +1013,7 @@ sub calculate_first {
 
 sub verify {
     my ($class, $msg, %opts) = @_;
-    Mail::DKIM2::Common::_check_options("$class->verify", \%opts,
+    Mail::DKIM2::Util::check_options("$class->verify", \%opts,
         qw(HeadersOnly IgnorePrefixes BodyHashes));
     croak "need a message" unless $msg;
     check_ignore_prefixes($opts{IgnorePrefixes});
@@ -1285,7 +1185,7 @@ sub _body_raw_set {
 
 sub undo {
     my ($class, $msg, %opts) = @_;
-    Mail::DKIM2::Common::_check_options("$class->undo", \%opts, qw(HeadersOnly));
+    Mail::DKIM2::Util::check_options("$class->undo", \%opts, qw(HeadersOnly));
     croak "need a message" unless $msg;
 
     unless (ref($msg) && $msg->isa('Email::MIME')) {
@@ -1325,7 +1225,16 @@ sub undo {
         for my $h (sort keys %$rh) {
             my $v = $rh->{$h};
             next unless defined $v;
-            my @old = reverse $msg->header_raw($h);
+            # Message-Instance and DKIM2-Signature fields are not content (-09
+            # section 6.2): a Recipe naming one acts on content fields of that
+            # name, of which there are none, and what it rebuilds is not hashed.
+            # Applying it to the received fields would let a hop rewrite the
+            # instances below its own -- a forged history the walk then checks.
+            if (Mail::DKIM2::Canon::field_name($h) =~ /\A(?:message-instance|dkim2-signature)\z/) {
+                _apply_recipe("$h header", $v, []);
+                next;
+            }
+            my @old = reverse Mail::DKIM2::Canon::header_values($msg, $h);
             my @new = _apply_recipe("$h header", $v, \@old);
             $msg->header_obj->header_set_reverse($h, @new);
         }
@@ -1343,7 +1252,7 @@ sub undo {
 # Returns (1, undef) on success or (0, reason) on the first failure.
 sub chain_verifies {
     my ($class, $msg, %opts) = @_;
-    Mail::DKIM2::Common::_check_options("$class->chain_verifies", \%opts,
+    Mail::DKIM2::Util::check_options("$class->chain_verifies", \%opts,
         qw(IgnorePrefixes));
     check_ignore_prefixes($opts{IgnorePrefixes});
     unless (ref($msg) && $msg->isa('Email::MIME')) {
@@ -1496,13 +1405,10 @@ algorithm's length (32 octets for C<sha256>, 64 for C<sha512>), or if the
 body is needed (a previous message without C<BodyRecipe>, which runs the
 body diff).
 
-=item UseEpilogue, EpilogueThreshold, MaxRecipeLiterals
+=item MaxRecipeLiterals
 
-C<calculate> with a previous message only; see below. B<UseEpilogue> (true)
-and B<EpilogueThreshold> are disabled in 0.23: they croak. The instance would
-be computed over the message rewritten with the epilogue while a caller that
-holds the message as a string signs the original bytes, and that mail fails
-verification.
+C<calculate> with a previous message only; see below. (C<UseEpilogue> and
+C<EpilogueThreshold>, which croaked from 0.23, were removed in 0.31.)
 
 =back
 
@@ -1522,16 +1428,8 @@ not an earlier form of the same message.
 The body Recipe is a line diff by default: a Myers diff with the fewest
 literal lines, bounded by C<< MaxRecipeLiterals => N >> literal lines (default 1000)
 and a fixed amount of work. A body it cannot rebuild within those bounds
-gets the null body Recipe (the previous body is unrecoverable). (Disabled
-in 0.23, see above:) With C<< UseEpilogue => 1 >>, the
-previous body is instead appended after the final MIME boundary (the
-message is wrapped in a C<multipart/mixed> container if it is not already
-multipart) and the Recipe copies it from there; with C<< EpilogueThreshold
-=> N >>, that happens only when the diff would need more than C<N> literal
-lines (or more work than the fixed bound), and an unchanged body gets no
-Recipe. C<EpilogueThreshold> and C<MaxRecipeLiterals> are mutually
-exclusive; both must be non-negative integers. Both epilogue forms modify C<$msg> in place, and the
-hashes cover the modified message.
+gets the null body Recipe (the previous body is unrecoverable).
+C<calculate> never changes C<$msg>.
 
 =head2 calculate_first($msg, $previous, %options)
 
@@ -1619,8 +1517,34 @@ groups: C<parse_hash_groups> flattened. Returns undef where it does.
 
 =head2 as_string()
 
-The header value in wire format, unfolded. Fold it with
-L<Mail::DKIM2::Common/fold_header> before inserting it.
+The header value in wire format, unfolded, without the field name.
+
+=head2 as_header()
+
+The whole field, C<Message-Instance: ...>, folded where its grammar allows
+and ready to put at the top of a message; it has no line break at the end.
+New in 0.31.
+
+    $message = $mi->as_header . "\r\n" . $message;
+
+=head2 as_header_value()
+
+The value of C<as_header> without the field name, for an interface that
+takes the two apart (a milter's C<addheader>). New in 0.31.
+
+=head2 changes()
+
+What the instance says its hop changed, read off its Recipes, as a hashref:
+C<body> is C<unchanged> (no body Recipe), C<changed> (a Recipe that
+rebuilds the previous body) or C<unrecoverable> (the null Recipe); C<headers>
+is an arrayref of the names of the header fields it has a Recipe for,
+lower-cased and sorted. An C<m=1> instance normally has neither. New in
+0.31.
+
+=head2 changes_header($name)
+
+True if the instance has a header Recipe for the field of that name
+(C<< $mi->changes_header('From') >>). New in 0.31.
 
 =head2 header_hash()
 
@@ -1652,14 +1576,14 @@ Marks the body Recipe C<null>.
 
 The parsed fields: C<m>, C<hashes> (a hashref of algorithm to
 C<[header_hash, body_hash]>), C<rb> and C<rh> (the body and header
-Recipes in internal form), and C<h1>/C<b1>, the sha256 pair.
+Recipes in internal form), and C<rb_null>, true for a null body Recipe.
 
 =head1 FUNCTIONS
 
 =head2 h_digest($email_mime, [$alg], [\@prefixes])
 
 The base64 header hash of a message: every field not excluded by
-L<Mail::DKIM2::Common/should_skip>, canonicalized, sorted by name,
+L<Mail::DKIM2::Canon/should_skip>, canonicalized, sorted by name,
 repeated fields in bottom-up order.
 
 =head2 b_digest($email_mime, [$alg])

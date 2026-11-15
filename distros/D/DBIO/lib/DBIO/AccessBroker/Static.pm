@@ -4,7 +4,7 @@ package DBIO::AccessBroker::Static;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::AccessBroker';
 
@@ -58,7 +58,7 @@ DBIO::AccessBroker::Static - One fixed set of connection parameters as an Access
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

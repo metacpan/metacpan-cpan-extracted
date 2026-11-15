@@ -15,6 +15,41 @@ is(scalar(grep { $_ % 86400 } @ends), 0, 'every one ends at a midnight');
 my ($expires, $updated) = Time::Keeper::_leap_dates();
 is_deeply([(Time::Keeper::_civil_from_instant($expires, 0))[0 .. 2]], [2027, 6, 28], 'the list expires on 28 June 2027');
 cmp_ok($updated, '<', $expires, 'and was updated before that');
+is(Time::Keeper->leap_seconds_expire . '', '2027-06-28T00:00:00Z', 'leap_seconds_expire is that instant in UTC');
+
+# The compiler takes a list with no expiry line, as IERS may publish one
+# now that leap seconds end, and then defines no TK_LEAP_EXPIRES; a list
+# with the line still gets one.
+SKIP: {
+    require File::Temp;
+    require File::Spec;
+    require Digest::SHA;
+    my $compiler = 'tools/leapcompile';
+    skip 'tools/leapcompile is not here', 4 unless -e $compiler;
+    my $ntp = 2208988800;
+    my @entries = ([63072000 + $ntp, 10], map { [$ends[$_] + $ntp, 11 + $_] } 0 .. $#ends);
+    my $hashed = join '', map { "$_->[0]$_->[1]" } @entries;
+    my $u = $updated + $ntp;
+    my $x = $expires + $ntp;
+    my $hash = sub { join ' ', map { sprintf '%x', hex } unpack '(A8)*', Digest::SHA::sha1_hex(join '', @_) };
+    my $compile = sub {
+        my ($expiry_line, $h) = @_;
+        my $fh = File::Temp->new;
+        print $fh "#\$\t$u\n", ($expiry_line // ''), (map { "$_->[0]\t$_->[1]\n" } @entries), "#h\t$h\n";
+        close $fh;
+        open my $stderr, '>&', \*STDERR or die $!;
+        open STDERR, '>', File::Spec->devnull or die $!;
+        my $out = scalar `$^X $compiler $fh`;
+        open STDERR, '>&', $stderr or die $!;
+        return $out;
+    };
+    my $without = $compile->(undef, $hash->($u, $hashed));
+    like($without, qr/^#define TK_LEAP_COUNT\s+27$/m, 'a list with no expiry line compiles');
+    unlike($without, qr/TK_LEAP_EXPIRES INT64_C/, 'and defines no expiry');
+    my $with = $compile->("#@\t$x\n", $hash->($u, $x, $hashed));
+    like($with, qr/^#define TK_LEAP_EXPIRES INT64_C\($expires\)$/m, 'a list with one defines it');
+    isnt($compile->(undef, $hash->($u, $x, $hashed)), $without, 'a hash over the wrong fields is refused');
+}
 
 # Every leap second: 23:59:60 is a time, at its start and its last
 # nanosecond, and comes back as second 60; the day before and the day after

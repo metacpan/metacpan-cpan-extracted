@@ -3726,7 +3726,7 @@ $test_data = summary(
 	return_only => 1, color => 0,
 );
 if (
-	   $test_data =~ /# summary: 3 rows x 7 cols\s+\(showing 1\)/
+	   $test_data =~ /# summary: 3 rows x 7 cols\s+\(showing 1 row\)/
 	&& $test_data =~ /# \.\.\. 2 more rows/
 	) {
 	pass('summary: "nrows" limits rows of output');

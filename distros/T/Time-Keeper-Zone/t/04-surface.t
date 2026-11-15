@@ -9,7 +9,7 @@ use Time::Keeper::Zone;
 
 my $Z = 'Time::Keeper::Zone';
 
-is($Z->tzdata_version, '2026e', 'tzdata_version');
+is($Z->tzdata_version, '2026f', 'tzdata_version');
 
 my @names = $Z->names;
 is(scalar @names, 344, 'names gives every zone');
@@ -114,6 +114,6 @@ is(abi('next_change', $id, 1767225600), 1772953200, 'next_change');
 is_deeply([abi('resolve_local', $id, 1793496600, 0, 1)], [1, 1793511000], 'resolve_local');
 is((abi('resolve_local', 9999, 0, 0, 0))[0], -1, 'resolve_local with a bad id');
 is(abi('name', abi('local_zone', 'Asia/Tokyo')), 'Asia/Tokyo', 'local_zone');
-is(abi('tzdata_version'), '2026e', 'tzdata_version');
+is(abi('tzdata_version'), '2026f', 'tzdata_version');
 
 done_testing;

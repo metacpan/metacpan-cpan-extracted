@@ -4,7 +4,7 @@ package DBIO::Relationship::ManyToMany;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::Carp;
 use Sub::Util 'set_subname';
@@ -203,7 +203,7 @@ DBIO::Relationship::ManyToMany - Declare a many-to-many relationship via a bridg
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 METHODS
 

@@ -51,6 +51,14 @@ L<C<getpriority()>|"getpriority">,
 L<C<nice()>|"nice">. L<C<openat()>|"openat"> gets a special treatment in this
 regard, see below.
 
+Some functions are specified to return an error number on error instead of
+setting C<errno>. In this module they return undef and set C<$!>. These are
+L<C<clock_getcpuclockid()>|"clock_getcpuclockid">,
+L<C<clock_nanosleep()>|"clock_nanosleep">,
+L<C<posix_fadvise()>|"posix_fadvise">,
+L<C<posix_fallocate()>|"posix_fallocate">, L<C<ptsname_r()>|"ptsname">,
+L<C<ttyname_r()>|"ttyname">.
+
 =head1 FUNCTIONS
 
 =over 4

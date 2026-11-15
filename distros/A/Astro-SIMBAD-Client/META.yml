@@ -13,7 +13,7 @@ configure_requires:
   strict: '0'
   warnings: '0'
 dynamic_config: 1
-generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150013'
+generated_by: 'Module::Build version 0.4234, CPAN::Meta::Converter version 2.150015'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -28,14 +28,15 @@ no_index:
 provides:
   Astro::SIMBAD::Client:
     file: lib/Astro/SIMBAD/Client.pm
-    version: '0.049'
+    version: '0.050'
   Astro::SIMBAD::Client::WSQueryInterfaceService:
     file: lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm
-    version: '0.049'
+    version: '0.050'
 requires:
   Carp: '0'
   HTTP::Request::Common: '0'
   LWP::Protocol: '0'
+  LWP::Protocol::https: '0'
   LWP::UserAgent: '0'
   Scalar::Util: '1.01'
   URI::Escape: '0'
@@ -47,5 +48,5 @@ resources:
   bugtracker: https://github.com/trwyant/perl-Astro-SIMBAD-Client/issues
   license: http://dev.perl.org/licenses/
   repository: git://github.com/trwyant/perl-Astro-SIMBAD-Client.git
-version: '0.049'
+version: '0.050'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

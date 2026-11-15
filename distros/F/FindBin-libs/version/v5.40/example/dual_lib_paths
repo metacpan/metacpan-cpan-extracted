@@ -7,9 +7,7 @@
 # See POD for the symlink scenario and practical use cases.
 ########################################################################
 
-use strict;
-use warnings;
-use feature 'say';
+use v5.40;
 
 use FindBin::Bin
 qw
@@ -22,8 +20,8 @@ qw
 # noabspath          : walks from $Bin_l -- logical path,  symlinks preserved.
 # Each call exports into its own array; neither clobbers the other.
 
-use FindBin::libs qw( abspath   export=remote );
-use FindBin::libs qw( noabspath export=local  );
+use FindBin::libs qw( abspath   export=remote nofail );
+use FindBin::libs qw( noabspath export=local  nofail );
 
 say "physical bin (\$Bin_p, abspath):   $Bin_p";
 say "logical  bin (\$Bin_l, noabspath): $Bin_l";

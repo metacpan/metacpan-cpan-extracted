@@ -58,7 +58,7 @@ is(scalar $Z->offset_at('Europe/London', utc(2026, 3, 29, 1) - 0.5), 0, 'a fract
 
 is($Z->standard_offset_at('Europe/London', utc(2026, 7, 1)), 0, 'standard_offset_at in summer');
 is($Z->standard_offset_at('America/New_York', utc(2026, 7, 1)), -18000, 'New York');
-# 2026e: Europe/Dublin's standard time is IST, +01:00, and GMT in winter is
+# 2026f: Europe/Dublin's standard time is IST, +01:00, and GMT in winter is
 # its daylight time, a negative one.
 is($Z->standard_offset_at('Europe/Dublin', utc(2026, 1, 15)), 3600, 'Dublin in winter is +01:00 standard');
 is($Z->standard_offset_at('Europe/Dublin', utc(2026, 7, 15)), 3600, 'and in summer');

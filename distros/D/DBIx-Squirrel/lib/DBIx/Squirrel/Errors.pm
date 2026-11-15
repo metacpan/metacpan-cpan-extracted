@@ -21,12 +21,12 @@ our @EXPORT_OK = qw(at_caller croakf failed in_method);
 # takes this list as its @CARP_NOT.
 our @INTERNAL = (
     qw(
-        DBI                           DBI::db                  DBI::st
-        DBD::_::common                DBD::_::db               DBD::_::st
-        DBIx::Squirrel                DBIx::Squirrel::db       DBIx::Squirrel::st
-        DBIx::Squirrel::Context       DBIx::Squirrel::Errors   DBIx::Squirrel::Gather
-        DBIx::Squirrel::Iterator      DBIx::Squirrel::Pipeline DBIx::Squirrel::Pipes
-        DBIx::Squirrel::Placeholders  DBIx::Squirrel::Result   DBIx::Squirrel::Results
+        DBI                           DBI::db                DBI::st
+        DBD::_::common                DBD::_::db             DBD::_::st
+        DBIx::Squirrel                DBIx::Squirrel::db     DBIx::Squirrel::st
+        DBIx::Squirrel::Context       DBIx::Squirrel::Errors DBIx::Squirrel::Gather
+        DBIx::Squirrel::Iterator      DBIx::Squirrel::Placeholders
+        DBIx::Squirrel::Result        DBIx::Squirrel::Results DBIx::Squirrel::Stop
         DBIx::Squirrel::Sugar         DBIx::Squirrel::Util
         DBIx::Squirrel::Stages::Batch DBIx::Squirrel::Stages::Flow
         DBIx::Squirrel::Stages::Rows  DBIx::Squirrel::Stages::Taps
@@ -177,10 +177,10 @@ DBIx::Squirrel::Errors - report the DBI's errors at the caller's line
 =head1 DESCRIPTION
 
 Under C<RaiseError>, the DBI reports an error at the line that called
-it. Inside DBIx::Squirrel, that's a line of DBIx::Squirrel's own, which
-is no help to its user. This module moves the error to the user's
-line. It does the same for the DBI's warnings, under C<PrintError>.
-Nothing is exported by default.
+it. Inside DBIx::Squirrel, that's a line of DBIx::Squirrel's own,
+which is no help to its user. This module moves the error to the
+user's line. It does the same for the DBI's warnings, under
+C<PrintError>. Nothing is exported by default.
 
 =head1 VARIABLES
 
@@ -242,8 +242,9 @@ an error DBIx::Squirrel raises itself.
 Runs the code as one method of a database handle, and returns what it
 returns. The DBI may raise an error for a method the code calls, such
 as C<DBD::SQLite::st execute failed: ...>. It's raised again as the
-DBI raises one for the handle's method, C<DBD::SQLite::db do failed: ...>,
-as plain DBI does. Any other error is raised again unchanged.
+DBI raises one for the handle's method,
+C<DBD::SQLite::db do failed: ...>, as plain DBI does. Any other error
+is raised again unchanged.
 
 A warning the DBI gives for a method the code calls, as it does under
 C<PrintError>, names the handle's method too. It's passed on to the
@@ -263,7 +264,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

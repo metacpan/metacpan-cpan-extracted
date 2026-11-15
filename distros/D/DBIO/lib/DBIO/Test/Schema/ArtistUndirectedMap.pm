@@ -3,7 +3,7 @@ package DBIO::Test::Schema::ArtistUndirectedMap;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -38,7 +38,7 @@ DBIO::Test::Schema::ArtistUndirectedMap - Test result class for the artist_undir
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

@@ -4,14 +4,19 @@ package DBIx::Squirrel::Stages::Flow;
 
 use Exporter qw(import);
 
-use Ekorn::Pipeline::Stages::Flow qw(take drop take_while drop_while);
+use Ekorn::Pipeline::Stages::Flow qw(
+    take       drop       take_first take_last take_single
+    take_while drop_while take_if    drop_if);
 
 # A facade over Ekorn::Pipeline::Stages::Flow, exporting DBIx::Squirrel's
 # own list of its functions, imported from it by name, so a name
 # Ekorn::Pipeline drops fails here, as the module loads, and one it
 # adds isn't exported until it's listed here.
-our @EXPORT      = qw(take drop);                          ## no critic (Modules::ProhibitAutomaticExportation)
-our @EXPORT_OK   = (@EXPORT, qw(take_while drop_while));
+our @EXPORT    = qw(take drop);    ## no critic (Modules::ProhibitAutomaticExportation)
+our @EXPORT_OK = (
+    @EXPORT,
+    qw(take_first take_last take_single take_while drop_while take_if drop_if),
+);
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 1;
@@ -21,7 +26,7 @@ __END__
 
 =head1 NAME
 
-DBIx::Squirrel::Stages::Flow - stages taking or dropping values: take, drop, take_while and drop_while
+DBIx::Squirrel::Stages::Flow - stages taking or dropping values: take, drop, take_first, take_last, take_single, take_while, drop_while, take_if and drop_if
 
 =head1 SYNOPSIS
 
@@ -31,8 +36,9 @@ DBIx::Squirrel::Stages::Flow - stages taking or dropping values: take, drop, tak
 
 DBIx::Squirrel's name for L<Ekorn::Pipeline::Stages::Flow>, which
 describes its stages in full. It exports C<take> and C<drop> by
-default, and C<take_while> and C<drop_while> on request, or all four
-with C<:all>. They're Ekorn's functions, from a list of
+default, and C<take_first>, C<take_last>, C<take_single>,
+C<take_while>, C<drop_while>, C<take_if> and C<drop_if> on request, or
+all nine with C<:all>. They're Ekorn's functions, from a list of
 DBIx::Squirrel's own, so a stage added there reaches this module only
 once it's listed here. The module is here to stay, beside
 DBIx::Squirrel's own stages, such as L<DBIx::Squirrel::Stages::Rows>.
@@ -49,7 +55,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

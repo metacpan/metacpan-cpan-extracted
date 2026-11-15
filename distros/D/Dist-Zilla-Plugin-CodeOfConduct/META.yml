@@ -1,10 +1,12 @@
 ---
 abstract: 'add a Code of Conduct to a distribution'
 author:
-  - 'Robert Rothenberg <rrwo@cpan.org>'
+  - 'Robert Rothenberg <perl@rhizomnic.com>'
 build_requires:
   ExtUtils::MakeMaker: '7.22'
   File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
   Module::Metadata: '1.000015'
   Path::Tiny: '0'
   Software::License::Perl_5: '0.011'
@@ -16,7 +18,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: '0'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.032, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150014'
 keywords:
   - community
   - documentation
@@ -28,7 +30,7 @@ name: Dist-Zilla-Plugin-CodeOfConduct
 provides:
   Dist::Zilla::Plugin::CodeOfConduct:
     file: lib/Dist/Zilla/Plugin/CodeOfConduct.pm
-    version: v0.1.1
+    version: v0.1.2
 requires:
   Dist::Zilla::File::InMemory: '0'
   Dist::Zilla::Pragmas: '0'
@@ -47,8 +49,9 @@ requires:
 resources:
   bugtracker: https://github.com/robrwo/perl-Dist-Zilla-Plugin-CodeOfConduct/issues
   repository: git://github.com/robrwo/perl-Dist-Zilla-Plugin-CodeOfConduct.git
-version: v0.1.1
+version: v0.1.2
 x_authority: cpan:RRWO
-x_generated_by_perl: v5.34.3
+x_generated_by_perl: v5.42.1
 x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'
+x_static_install: 0

@@ -74,3 +74,6 @@
 	  selections remain fixed across cycles
 	- i.e., the Mystery changes as the calendar day changes unless it has
 	  been explicitly set
+
+0.1.10	Sat Nov 14 02:00:00 PM CDT 2026
+	- update uptream API URLs per GH issue #1

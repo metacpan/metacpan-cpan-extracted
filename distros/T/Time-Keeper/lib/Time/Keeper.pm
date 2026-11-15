@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 our $CLOCK;
 
@@ -39,7 +39,7 @@ Time::Keeper - dates and times with time zones, leap seconds and locales
 
 =head1 VERSION
 
-Version 0.12
+Version 0.13
 
 =head1 SYNOPSIS
 
@@ -1198,17 +1198,22 @@ A leap second is 23:59:60 UTC on one of the 27 days that ended with one,
 from 1972 to 2016. C<< second => 60 >> is accepted at that second, in any
 zone (it was 08:59:60 in Tokyo), and refused at any other.
 
+There will be no more. The General Conference on Weights and Measures
+resolved in October 2026 (Resolution 5) that UTC runs without leap seconds
+from 20 May 2027, so the 27 are all there are, and a value in any year to
+come has none to count.
+
 The leap seconds come from the list the International Earth Rotation and
-Reference Systems Service publishes. It says when no further leap second
-can come before:
+Reference Systems Service publishes.
 
 =head2 leap_seconds_expire
 
     my $until = Time::Keeper->leap_seconds_expire;   # 2027-06-28T00:00:00Z
 
-The list's expiry, as a value. Past it, no further leap second is known.
-None has been added since 2016, and leap seconds are due to be given up by
-2035.
+The expiry the list carries, as a value, or undef when it carries none.
+The expiry was the date before which no further leap second could come. A
+list published after the resolution need not have one, and zic ignores it
+since tzcode 2026f.
 
 =head1 LOCALES
 

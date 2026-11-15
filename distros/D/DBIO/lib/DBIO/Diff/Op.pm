@@ -4,7 +4,7 @@ package DBIO::Diff::Op;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Scalar::Util ();
 
@@ -196,7 +196,7 @@ DBIO::Diff::Op - Base class for DBIO driver diff operation objects
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

@@ -104,7 +104,7 @@ my $mp3_array = Webservice::Rosary::API->new(
 );
 is(
   $mp3_array->mp3Link('today'),
-  'https://dailyrosary.cf/array.mp3',
+  'https://dailyrosary.catholicdevotion.org/array.mp3',
   'single-item array MP3 response uses its first item',
 );
 
@@ -114,7 +114,7 @@ my $mp3_hash = Webservice::Rosary::API->new(
 );
 is(
   $mp3_hash->mp3Link('tomorrow'),
-  'https://dailyrosary.cf/legacy.mp3',
+  'https://dailyrosary.catholicdevotion.org/legacy.mp3',
   'legacy hash MP3 response remains supported',
 );
 
@@ -136,8 +136,8 @@ my $random_ua = Local::MockUA->new(
   ok_response('[{"mp3Link":"two.mp3"}]'),
 );
 my $random = Webservice::Rosary::API->new(ua => $random_ua, cache_ttl => 60);
-is($random->mp3Link('random'), 'https://dailyrosary.cf/one.mp3', 'first random MP3 request succeeds');
-is($random->mp3Link('random'), 'https://dailyrosary.cf/two.mp3', 'random MP3 is not served from fresh cache');
+is($random->mp3Link('random'), 'https://dailyrosary.catholicdevotion.org/one.mp3', 'first random MP3 request succeeds');
+is($random->mp3Link('random'), 'https://dailyrosary.catholicdevotion.org/two.mp3', 'random MP3 is not served from fresh cache');
 is($random_ua->calls, 2, 'random endpoint is requested each time');
 
 my $details_ua = Local::MockUA->new(

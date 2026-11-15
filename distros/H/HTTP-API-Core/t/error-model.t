@@ -8,6 +8,29 @@ use HTTP::API::Core::Error;
 my %stable = map { $_ => 1 } qw(encode decode transport http hook);
 
 {
+    my @warnings;
+    my $caught;
+    {
+        local $SIG{__WARN__} = sub { push @warnings, @_ };
+        eval {
+            HTTP::API::Core::Error->new(
+                category => 'transport',
+                'dangling_option',
+            );
+            1;
+        } or $caught = $@;
+    }
+    like $caught, qr/error constructor options must be key\/value pairs/,
+        'odd Error constructor options are rejected before hash coercion';
+    is_deeply \@warnings, [], 'odd Error options do not produce hash coercion warnings';
+
+    my $name_error;
+    eval { HTTP::API::Core::Error->new([], 'value'); 1 } or $name_error = $@;
+    like $name_error, qr/constructor option names must be scalars/,
+        'raw Error option-name validation remains intact';
+}
+
+{
     my $api = HTTP::API::Core->new(
         base_url => 'https://api.example.test',
         retry => { attempts => 1 },

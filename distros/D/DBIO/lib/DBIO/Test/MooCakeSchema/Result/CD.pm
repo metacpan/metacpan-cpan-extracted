@@ -1,7 +1,7 @@
 package DBIO::Test::MooCakeSchema::Result::CD;
 # ABSTRACT: Moo + Cake test result class for the cd table (no custom ResultSet)
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::Moo;
 use DBIO::Cake;
@@ -40,7 +40,7 @@ DBIO::Test::MooCakeSchema::Result::CD - Moo + Cake test result class for the cd 
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

@@ -28,12 +28,17 @@ _is_leap_day_end(sec)
     OUTPUT:
         RETVAL
 
-# (expires, updated): POSIX seconds, from the list.
+# (expires, updated): POSIX seconds, from the list; expires is undef for
+# a list without one.
 void
 _leap_dates()
     PPCODE:
         EXTEND(SP, 2);
+#ifdef TK_LEAP_EXPIRES
         mPUSHs(tk_newSVi64(aTHX_ TK_LEAP_EXPIRES));
+#else
+        PUSHs(&PL_sv_undef);
+#endif
         mPUSHs(tk_newSVi64(aTHX_ TK_LEAP_UPDATED));
 
 # A wall-clock time at a fixed offset to its instant: (sec, nsec).

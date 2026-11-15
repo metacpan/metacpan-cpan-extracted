@@ -4,7 +4,7 @@ package DBIO::Test::Schema::Event;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base qw/DBIO::Test::BaseResult/;
 
@@ -50,7 +50,7 @@ DBIO::Test::Schema::Event - Test result class for the event table with datetime 
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

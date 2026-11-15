@@ -4,9 +4,10 @@ use strict;
 use warnings;
 use FindBin;
 use File::Spec;
+use Cwd qw(abs_path);
 
-my $ROOT = File::Spec->rel2abs(File::Spec->catdir($FindBin::Bin, '..', '..'));
-my $SELF = File::Spec->rel2abs($FindBin::Bin);
+my $SELF = abs_path($FindBin::Bin);
+my $ROOT = abs_path(File::Spec->catdir($SELF, '..', '..'));
 
 sub read_text {
     my ($path) = @_;

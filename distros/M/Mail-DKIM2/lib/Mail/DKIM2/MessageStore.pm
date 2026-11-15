@@ -2,8 +2,9 @@ package Mail::DKIM2::MessageStore;
 use 5.20.0;
 use strict;
 use warnings;
+use Mail::DKIM2::Util ();
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 use Crypt::Digest::SHA256 qw(sha256_hex);
 use File::Path qw(make_path);
@@ -11,7 +12,7 @@ use Carp;
 
 sub new {
     my ($class, %args) = @_;
-    Mail::DKIM2::Common::_check_options("$class->new", \%args, qw(directory));
+    Mail::DKIM2::Util::check_options("$class->new", \%args, qw(directory));
     croak "directory required" unless $args{directory};
     my $self = bless \%args, $class;
     return $self;

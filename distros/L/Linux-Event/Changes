@@ -1,5 +1,17 @@
 Revision history for Linux-Event
 
+0.120  2026-11-14
+    - Fix unclean TLS EOF classification with OpenSSL 4.0. OpenSSL may
+      report an abrupt peer close through SSL_ERROR_SYSCALL while keeping
+      SSL_R_UNEXPECTED_EOF_WHILE_READING on its error queue. Recognize
+      that exact SSL reason in either error category, retain the stable
+      "TLS peer closed without close_notify" diagnostic, and correctly
+      increment the native unclean_eof_count statistic. Do not mistake
+      an abrupt TLS close for a clean close_notify shutdown.
+    - Add a dedicated ARM64/OpenSSL 4.0.3 CI job to exercise the TLS EOF
+      regression and full TLS test group on threaded Perl 5.36.
+      All existing public API and native ABI contracts are unchanged.
+
 0.119  2026-11-13
     - Fix a native Stream consumer use-after-free when a raw-input or framed
       message callback throws during Loop dispatch and watcher cleanup drops

@@ -2,6 +2,310 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.3.1 2026-11-14
+
+    Sources, stages, gathers and sinks, each made afresh for a run and
+    told how it ended, with words to make them and | to join them.
+
+    Pipelines can be made with pipeline(), and named, and a function
+    whose values can be code references can take its stages as a
+    pipeline given last. pipeline() is one of the words in
+    Ekorn::Pipeline::Factories, short functions that make Ekorn's
+    types: stage, gather, source, generator with yield, sink_one and
+    sink_many. The README's CPAN badge keeps up with releases, and the
+    how-to says where a stage belongs. Stages::Flow has take_first,
+    take_last and take_single, and take_if and drop_if, which filter.
+    Ekorn::Pipeline::Tooling exports every stage, source, sink and
+    word from one module, by tags. Ekorn::Pipeline::JSON reads and
+    writes JSON and JSON Lines, as sources, stages or sinks, and
+    Ekorn::Pipeline::Sugar names pipelines as the program compiles,
+    each with a function of its name.
+
+    A run's parts can be made afresh for it, and told how it ended:
+    sources that close what they open, however the run ends; sinks
+    that consume every value and give a result, committing only when
+    the run is done; and gathers with an end as well as a flush, what
+    v0.2.0 called the end function; Sources and Sinks have them
+    ready-made, and Operators joins them with |. A part's set-up, or
+    a package's role method, can return its parts by name, as a hash
+    reference, rather than as a list in a set order. An iterator is an
+    object, which can read what's left in one call, end its run early,
+    and say how it ended, and which ends its run when it's let go.
+
+    Pushing values through plain subs is several times faster, reading
+    an iterator's values in one call a tenth faster, and a stop about
+    three times cheaper.
+
+    It ships nineteen roadmap items, 2026-0009, 2026-0010, 2026-0011,
+    2026-0013, 2026-0014, 2026-0016, 2026-0017, 2026-0018, 2026-0021,
+    2026-0024, 2026-0025, 2026-0026, 2026-0027, 2026-0028, 2026-0029,
+    2026-0030, 2026-0031, 2026-0032 and 2026-0034. It changes what
+    some code sees, as the entries marked "Changed" say: a gather, an
+    iterator, every canned stage, and the stages a pipeline gives back
+    are objects, called as code references, not code references
+    themselves; a gather's message names the flush and the end; a
+    stage's error names the named pipeline it's in; the messages for
+    what isn't a stage or a source say what one is; and a pipeline
+    named alone, pipeline('clean'), is the pipeline itself, so its
+    stages are numbered where it's given. Otherwise, existing code
+    runs as before.
+
+    - Ekorn::Pipeline::Sugar names pipelines as the program compiles:
+      use Ekorn::Pipeline::Sugar pipeline => {name => [@stages]}, or an
+      array of pairs, names each in the package that uses it, and gives
+      that package a function of each name, which runs values through
+      the pipeline, and, given a pipeline last, through that too. A
+      definition can name any other in the same use, in either order.
+      Mistakes, such as a name taken already, or a circle of names,
+      croak as the use compiles. import_into does the same for a
+      package given, for other modules' sugar. Sub::Util, which comes
+      with Perl, is a new dependency. (roadmap 2026-0010)
+    - Ekorn::Pipeline::JSON makes from_json and to_json, for one JSON
+      document, and from_jsonl and to_jsonl, for JSON Lines: each a
+      source or a sink given a file or a filehandle, and a stage given
+      neither. from_json gives an array's elements, or the document
+      itself; from_jsonl gives each line's document, read a block at a
+      time, as values are pulled. to_json writes every value as one
+      array, and to_jsonl a value a line. As stages, each passes on
+      what a file would hold, so to_json and from_json undo each
+      other, as to_jsonl and from_jsonl do. The encoder is
+      JSON::MaybeXS's, configured by a json option, or replaced by an
+      object of the caller's. Tooling exports all four, by a :json
+      tag. JSON::MaybeXS is a new dependency. The user guide reads and
+      writes JSON in chapters 5 and 6, and walks through how a module
+      like it is put together in chapter 10. (roadmap 2026-0034)
+    - Ekorn::Pipeline::Tooling exports what callers use to do work,
+      from one module, so there's nothing to remember about which
+      module makes which: tags :core (Stop and gather), :flow, :batch
+      and :taps, :stages for the three, :sources, :sinks, :words (the
+      factories) and :all. Each tag holds every name its module
+      exports, as the same sub, and nothing is exported by default.
+      It leaves out is_stage, is_sink and croakf, which are for
+      extending the package, and the operators, which stay a pragma.
+      The user guide's examples, the README's and the reference's
+      At a glance import from it. (roadmap 2026-0031)
+    - The reference has a section, Making each kind of part, for
+      developers: a table of what each piece of a part, its set-up,
+      step, flush, end and context, is called with, returns, and
+      whether it may stop the run, and a worked example of each kind
+      of part, made with a word and as a class, from a stage with
+      state to an object that's both a source and a sink, committing
+      only a run that went through. Every example in the README, the
+      user guide, the reference and the modules' POD writes a
+      pipeline of two or more stages a stage to a line, and
+      paragraphs are filled evenly again.
+    - The role methods, by which any object can be a source, a stage
+      or a sink, are named in capitals, EKORN_SOURCE, EKORN_STAGE,
+      EKORN_SINK_ONE and EKORN_SINK_MANY, as Perl names subs that its
+      runtime calls, not their caller, such as DESTROY, and as CPAN
+      names hooks for another package, such as TO_JSON. No release had
+      them in lower case (roadmap 2026-0027).
+    - A set-up, a gather's, a source's or a sink's, and a role method,
+      EKORN_SOURCE, EKORN_STAGE, EKORN_SINK_ONE or EKORN_SINK_MANY,
+      can return its parts by name, as a hash reference with the keys
+      step, flush, end and context, giving only those it has, in place
+      of a list in a set order with undef for one left out before one
+      given: gather { {step => $step, end => $end} }. Other keys are
+      ignored, and a hash without what its part needs croaks, as a
+      list does. The list still works. Ekorn's own sources, sinks and
+      stages, and an iterator's EKORN_SOURCE, return theirs by name
+      (roadmap 2026-0026).
+    - Ekorn::Pipeline::Sources has ready-made sources, needing only
+      Perl, none exported by default: from_array(@values); from_fh($fh),
+      a filehandle's records, as $/ divides them, chomped, left open;
+      from_file($path, $layers), a file's records, opened through the
+      I/O layers given, if any, for each run, and closed however it
+      ends; and counter($start, $step), without end. With $/
+      undefined, from_fh and from_file slurp, an empty file giving
+      none. (roadmap 2026-0016)
+    - Ekorn::Pipeline::Sinks has ready-made sinks, needing only Perl,
+      none exported by default: keep_all, every item; keep($n), the
+      first $n, stopping there; keep_first, stopping at it;
+      keep_single, warning at a second; keep_last; count_items; and
+      to_fh($fh) and to_file($path, $layers), writing each item
+      followed by $/, as from_fh and from_file take it off, and giving
+      how many. to_file opens its file for each run, through the I/O
+      layers given, if any, and closes it however the run ends.
+      (roadmap 2026-0017)
+    - Ekorn::Pipeline::Operators, used in a scope, puts |, |= and @{}
+      in force there for Ekorn's types: $source | $stage | $sink gives
+      the sink's result, $stage | $stage a chain of stages, $source |
+      $stage a source, and @{ $source } every value, read through. A
+      chain starts with a source or a stage made with a word, never a
+      plain code reference, whose | is Perl's bitwise OR. Out of
+      scope, they croak "Expected use Ekorn::Pipeline::Operators in
+      scope, for %s". A package's own source class chains by
+      overloading | and @{} with Operators' chain and drain. (roadmap
+      2026-0018)
+    - Changed: a stage that isn't one croaks "Expected stage #%d to be
+      a stage: a code reference, a pipeline, or an object offering a
+      stage's role method", where it said "Expected stage #%d to be a
+      code reference or a pipeline", and, given to pipeline or named,
+      "... a pipeline or its name, or an object offering a stage's role
+      method"; both left out the parts made for a run. A pipeline whose
+      overridden stages method returns something that isn't a stage has
+      a message of its own, "Expected stage #%d, a pipeline, to give
+      only stages from its stages method", in place of one saying it
+      should be a pipeline. Stage->new, given one of Ekorn's types,
+      croaks "Expected a code reference, not one of Ekorn's types".
+    - Changed: iterator, given something other than a source, croaks
+      "Expected a source: a code reference, or an object offering
+      EKORN_SOURCE", where it said "Expected a code reference", which
+      was accurate only until sources could be objects.
+    - Changed: a stage that dies within a named pipeline is named with
+      it: after its place, the innermost named pipeline and the
+      stage's place there, "Pipeline stage #1.2 (main::clean#2)
+      failed at ...", and an end, "Pipeline end of stage #1.2
+      (main::clean#2) failed at ...". A stage of no named pipeline is
+      named as before. A pipeline's name method gives its first name,
+      qualified, or undef. (roadmap 2026-0013)
+    - Ekorn::Pipeline::Stages::Flow exports two more stages on request:
+      take_if { ... }, passing on each value the block is true of, and
+      drop_if { ... }, each it's false of, testing every value, as grep
+      does, where take_while and drop_while stop testing at the first
+      value that fails. A stage ending in a test passes on true or
+      false; take_if passes on the value. (roadmap 2026-0030)
+    - Faster: a pipeline whose stages are all plain subs, called with
+      values, runs them in a plain loop, with none of the machinery
+      for flushes, ends and sinks: a call of a few values is about
+      twelve times faster, and a call of many through one stage three
+      and a half times. Every other run is a little faster too: a push
+      hands its values over at once, and less is done for each value.
+      Nothing else changes. (roadmap 2026-0028)
+    - Faster: pulled runs, as DBIx-Squirrel measured them. An
+      iterator's all collects every value in one pass of the run,
+      rather than a call for each, about a tenth faster through one
+      plain stage, and each pull copies less. Nothing else changes.
+      (roadmap 2026-0032)
+    - Faster: a stop, thrown with die rather than Carp's croak, which
+      added nothing to it but cost, about three times cheaper, as
+      DBIx-Squirrel measured it. A catcher gets the same object as
+      before.
+    - Changed: pipeline_in, and so the word pipeline, given one name
+      and nothing else, returns the pipeline named itself, not a new
+      pipeline holding it, if it's of the invocant's class or a
+      subclass. So a stage of a named pipeline given second is
+      "Pipeline stage #2.2 (main::clean#2)", not "#2.1.2". named on a
+      class still makes a new pipeline, even of one name. (roadmap
+      2026-0029)
+    - The message for a gather's block that returns the wrong things
+      now ends "and optionally a flush and an end", where it ended
+      "and optionally an end function": what v0.2.0 called the end
+      function is now the flush, and an end, told how the run ended,
+      may follow it. Code matching the old wording must change.
+      (roadmap 2026-0014)
+    - A run's parts can be made for it. Ekorn::Pipeline::Source makes
+      a source from a set-up, called at the start of each run, which
+      returns its step and, optionally, its end and a context;
+      iterator takes one, or anything offering EKORN_SOURCE. A source
+      given to new as a stage croaks. (roadmap 2026-0014)
+    - Ekorn::Pipeline::Sink makes sinks, with new_sink_one, giving one
+      value, and new_sink_many, giving a list: a set-up returns the
+      step, the flush, giving the result, and optionally an end. A
+      pipeline ending in a sink gives its result: in scalar context, a
+      sink of one's value, or a sink of many's list as an array
+      reference. is_sink, exported on request, says "one", "many" or
+      false. (roadmap 2026-0014)
+    - Each end, a source's, a gather's or a sink's, is called once,
+      when the run has ended, however it ended, told "done", "stopped"
+      or "died", the source's first. A run that dies calls every end,
+      told "died", before throwing its error; an end that dies is
+      reported as "Pipeline end of %s failed at %s line %d:", or, in a
+      run already dying, warns "The end of %s died while the run was
+      already dying: %s". A gather's block may return an end, third,
+      after its flush. (roadmap 2026-0014)
+    - new takes, as a stage, any object offering EKORN_STAGE,
+      EKORN_SINK_ONE or EKORN_SINK_MANY, called at the start of each
+      run, so a package can deliver parts for Ekorn without using its
+      classes; one offering more than one croaks. is_stage is true for
+      them. run_context gives a stage the context its run's source
+      gave. (roadmap 2026-0014)
+    - Changed: iterator returns an Ekorn::Pipeline::Iterator, an object
+      called as a code reference, as before, with all, first, single,
+      finish and ended. Let go before its values run out, it ends its
+      run, so a source closes what it opened. An iterator can be a
+      source for another pipeline, once. (roadmap 2026-0014)
+    - Changed: a gather is an Ekorn::Pipeline::Gather object, called
+      as a code reference, not a blessed code reference, and stages
+      returns a pipeline's stages as objects: a code reference given
+      to new comes back as an Ekorn::Pipeline::Stage of it. Code
+      testing them with is_coderef or ref sees the change. (roadmap
+      2026-0014)
+    - New messages, for sources, sinks, parts and ends, are listed in
+      the POD's DIAGNOSTICS and the reference's Diagnostics. (roadmap
+      2026-0014)
+    - The how-to, Ekorn::Pipeline::Manual::HowTo, is rewritten as a
+      user guide. It tours the package from the bottom up, a layer at
+      a time: stages, pipelines pushed and pulled, stopping, parts made
+      for each run, sources, sinks, composition, the operators,
+      functions that take stages, and parts for other packages; then
+      errors and debugging, and the questions people ask first, such
+      as how fast it is, how it compares with map, grep, options and
+      callbacks, and where it falls short. Each of its examples runs,
+      and prints what it says.
+    - The README is rewritten for this release. It shows the shape of
+      a run, from a source through stages to a sink, with sections on
+      parts made for each run, sources, sinks, joining them with |,
+      named pipelines, and parts for other packages, and lists the
+      modules that come with it.
+    - The manuals' tables show a | written in them as |, not \|.
+    - The reference has a section, Runs and how they end, and another,
+      Delivering parts for Ekorn; the how-to has recipes for sources
+      and sinks that close and commit however a run ends, and for
+      reading an iterator's values in one call. (roadmap 2026-0014)
+    - pipeline(), exported on request by Ekorn::Pipeline::Factories,
+      makes a new pipeline from stages, as new does, but a stage can
+      also be the name of a pipeline: pipeline('clean', take(5)). It's
+      Ekorn::Pipeline->pipeline_in(scalar caller, @stages), the one
+      method that reads names, making its invocant's class. (roadmap
+      2026-0011, 2026-0021)
+    - Ekorn::Pipeline::Factories has the words that make Ekorn's
+      types, each one line over a class method, none exported by
+      default: pipeline, stage, gather (Gather's own), source,
+      generator and yield, sink_one and sink_many. generator gives a
+      source of what its block passes to yield, as a Python generator
+      does, collecting it all in one step; yield outside one croaks
+      "Expected yield to be called inside a generator". (roadmap
+      2026-0021)
+    - Ekorn::Pipeline->named(clean => @stages) defines a named
+      pipeline, and $p->named('clean') names one you have. A name is
+      kept in the caller's package unless it's qualified, whatever
+      class defined it, is resolved when a pipeline is made, and can't
+      be defined twice, or removed. Only pipeline() and named() read names: new
+      doesn't, and is_stage stays false for a string. (roadmap
+      2026-0011)
+    - Five new messages, for pipeline() and named(): "Expected stage
+      #%d to be a code reference, a pipeline or the name of one", "No
+      pipeline named %s", "A pipeline named %s is already defined",
+      "Expected a name, made of words joined by ::" and "Expected only
+      a name, naming a pipeline you have". (roadmap 2026-0011)
+    - The reference, the how-to and the README show a pipeline given
+      last as the way to take stages after values that can be code
+      references, and how to name a pipeline you use often. (roadmap
+      2026-0011)
+    - The reference has a section on the words, and its examples, and
+      the how-to's, make sources and sinks with them. (roadmap
+      2026-0021)
+
+    - The README's CPAN badge comes from shields.io, which keeps up
+      with a release within minutes, in place of badge.fury.io's, which
+      GitHub showed out of date for hours. (roadmap 2026-0009)
+    - The how-to has a recipe, "Decide where a stage belongs": under
+      Ekorn::Pipeline::Stages, or with the module whose values it
+      needs to know about. Its cpanfile example asks for v0.2.0.
+    - Ekorn::Pipeline::Stages::Flow exports three more stages on
+      request: take_first, which is take(1); take_last, passing on the
+      last value once there are no more; and take_single, passing on
+      the one value, and, at a second, warning "Expected only one item,
+      but there were more" and stopping. Each, with take($n), is the
+      stage of a keep sink, passing on what the sink would give.
+      (roadmap 2026-0024)
+    - Changed: every canned stage, in Stages::Flow, Batch and Taps, is
+      an object called as a code reference: a Gather, or, for
+      take_while, peek and dump_to, an Ekorn::Pipeline::Stage. Code
+      testing one with ref or is_coderef sees the change. (roadmap
+      2026-0024)
+
 v0.2.0 2026-11-09
 
     Messages say a stage can be a code reference or a pipeline.

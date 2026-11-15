@@ -1,5 +1,18 @@
 Revision history for Perl extension App-mdee
 
+1.19 2026-11-15T10:34:15Z
+
+    - Add --lateral (-L) to put all the pages in one row and scroll
+      it sideways in less, by nup --lateral; default[lateral] in
+      config.sh makes it the default, and --no-lateral turns it off.
+      With -V, the files go on to the right, as many on the screen
+      as fit unless -C is given.  It cannot be used with -w, and the
+      default is left out with -w, rows and PDF output
+    - -V shows as many files as fit on the screen, as nup does,
+      instead of all of them in narrow panes; the rest continue
+      below, and -C gives the number as before
+    - Require App::nup 1.17 for --lateral
+
 1.18 2026-11-11T10:03:49Z
 
     - Print to PDF with -o FILE.pdf, or with -T and a paper as the

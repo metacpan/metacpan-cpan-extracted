@@ -4,7 +4,7 @@ package DBIO::Carp;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 # load Carp early to prevent tickling of the ::Internal stash being
 # interpreted as "Carp is already loaded" by some braindead loader
@@ -166,7 +166,7 @@ DBIO::Carp - Error reporting utilities for DBIO
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

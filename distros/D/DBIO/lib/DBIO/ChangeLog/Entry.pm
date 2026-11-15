@@ -4,7 +4,7 @@ package DBIO::ChangeLog::Entry;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::ChangeLog::Table;
 
@@ -66,7 +66,7 @@ DBIO::ChangeLog::Entry - ResultSource definition for per-source changelog tables
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

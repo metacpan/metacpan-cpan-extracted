@@ -4,7 +4,7 @@ package DBIO::Diff::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 our $CONTRACT_VERSION = '1.3';
 
@@ -124,7 +124,7 @@ DBIO::Diff::Base - Base class for DBIO driver diff orchestrators
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

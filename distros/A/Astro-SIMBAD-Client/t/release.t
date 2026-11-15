@@ -7,11 +7,12 @@ use lib qw{ inc };
 
 use My::Module::Test;
 
-access();
+my $server = access();
+call( set => server => $server );
 
-foreach my $scheme ( qw{ http https } ) {
+foreach my $scheme ( @TEST_SCHEMES ) {
 
-    subtest "Get release information under $scheme" => sub {
+    subtest "Get release information from $server under $scheme" => sub {
 
 	have_scheme( $scheme )
 	    or plan skip_all => "$scheme not installed";
@@ -20,7 +21,7 @@ foreach my $scheme ( qw{ http https } ) {
 
 	TODO: {
 
-	    local $TODO = 'Release information missing as of September 6 2016';
+	    # local $TODO = 'Release information missing as of September 6 2016';
 
 	    call( 'release' );
 	    test( qr{ \A SIMBAD4 \b }smxi, 'Scalar release()' );
@@ -32,6 +33,11 @@ foreach my $scheme ( qw{ http https } ) {
 	}
     };
 
+}
+
+{
+    my $smb = object();
+    diag join ': ', $smb->__build_url(), scalar $smb->release();
 }
 
 end();

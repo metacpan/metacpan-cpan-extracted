@@ -28,6 +28,13 @@ BEGIN {
     unless eval { Time::HiRes::alarm(0); 1 };
 }
 
+# Where the kernel timers run slower than the clock this measures it and makes
+# Time::HiRes::sleep and ::alarm keep the clock again (the mock below sets the
+# alarm through that), so that the delays mean what they say; beyond a limit it
+# skips the file.
+use lib 't/lib';
+use T::KernelTimers;
+
 our $LATE = 0.03;
 my $NEGATIVE_WHEN_FIRED = 0;
 my $expiry;

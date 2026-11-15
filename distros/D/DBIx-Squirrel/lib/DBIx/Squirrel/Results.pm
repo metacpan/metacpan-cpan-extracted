@@ -20,23 +20,16 @@ sub _slice ($self) {    ## no critic (Subroutines::ProhibitUnusedPrivateSubrouti
     return [];
 }
 
-# Execute the statement again, as the iterator's reset does, and find the
-# class for its rows, from its columns' names. That's done before a row
+# Return what blesses each row into the class for the statement's
+# columns, found from their names as a run starts. That's before a row
 # is fetched: once the last row is, a driver such as DBD::mysql has let
-# the names go.
-sub reset ($self, @args) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
-    $self->SUPER::reset(@args);
-    return $self if $self->{done};
-    my $sth   = $self->sth;
+# the names go. The run keeps the class, so a pipeline reading the rows
+# after the result set is let go still gets objects.
+sub _row_maker ($self, $sth) {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
     my $names = at_caller { $sth->{NUM_OF_FIELDS} ? $sth->{NAME_lc} : undef };
-    $self->{row_class} = _base_class($self)->class_for($names) if $names;
-    return $self;
-}
-
-# Bless a row into the class for the statement's columns. The iterator
-# calls it for each row it fetches.
-sub _row ($self, $row) {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
-    return bless $row, $self->{row_class};
+    return undef unless $names;    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    my $class = _base_class($self)->class_for($names);
+    return sub ($row) { bless $row, $class };
 }
 
 # Return the base class of the rows' class: the ekorn_result_class
@@ -110,7 +103,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

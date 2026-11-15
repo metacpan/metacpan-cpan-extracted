@@ -26,7 +26,7 @@ The context includes:
 - `content`
 - `attempt`
 
-Before the transport call, the core also records `started_at` in the same context. The callback may modify `method`, `url`, `headers`, or `content`; those changes are used for that attempt.
+Before the transport call, the core also records `started_at` in the same context. The callback may modify `method`, `url`, `headers`, or `content`; those changes are used for that attempt. Mutated request fields are revalidated before transport execution. In particular, `url` must remain a non-empty absolute HTTP(S) URL.
 
 Example:
 

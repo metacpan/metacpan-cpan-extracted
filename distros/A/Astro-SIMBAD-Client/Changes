@@ -1,3 +1,18 @@
+0.050		2026-11-14	T. R. Wyant
+    Probe both web sites to find a responsive one for testing.
+
+    Add attribute 'timeout'.
+
+    Allow and expand servers 'strasbourg' and 'harvard', as a
+    convenience.
+
+    Make https: the default and deprecate http:
+    As of November 7 2026, SIMBAD (or at least the Harvard mirror) returns
+    '301 Moved permanently' to http: queries. The U-Strasbourg site times
+    out on pretty much anything.
+
+    Correct Makefile.PL EUMM version accommodations.
+
 0.049		2026-06-18	T. R. Wyant
     Remove references to the RT bug tracking system.
 

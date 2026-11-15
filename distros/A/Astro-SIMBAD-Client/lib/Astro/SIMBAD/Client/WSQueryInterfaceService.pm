@@ -9,7 +9,7 @@ package Astro::SIMBAD::Client::WSQueryInterfaceService;
 use strict;
 use warnings;
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 ## TRW ^^^^
 
 my %methods = (
@@ -76,7 +76,8 @@ sub _call {
     unless $self->proxy;
   ## TRW ^^^^
   my @templates = @{$method{parameters}};
-  my @parameters = ();
+## TRW  my @parameters = ();
+  my @parameters;
 ## TRW  foreach my $param (@_) {
   foreach my $param (@parm) {	## TRW
     if (@templates) {

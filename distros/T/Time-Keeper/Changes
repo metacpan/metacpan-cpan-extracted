@@ -1,5 +1,8 @@
 Revision history for Time-Keeper
 
+0.13    2026-11-14
+        - Leap seconds end on 20 May 2027 (CGPM Resolution 5, 2026): the list may carry no expiry, and leap_seconds_expire is then undef.
+
 0.12    2026-10-22
         - Duration->total in milliseconds, microseconds and nanoseconds is exact on long-double perls (1.5 s is 1500 ms).
 

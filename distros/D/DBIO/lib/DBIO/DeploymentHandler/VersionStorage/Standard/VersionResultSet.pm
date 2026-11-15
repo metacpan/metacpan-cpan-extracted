@@ -4,7 +4,7 @@ package DBIO::DeploymentHandler::VersionStorage::Standard::VersionResultSet;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::ResultSet';
 
@@ -40,7 +40,7 @@ DBIO::DeploymentHandler::VersionStorage::Standard::VersionResultSet - The typica
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 METHODS
 

@@ -103,11 +103,9 @@ sub add_sig {
     $s->set_tag('s', 'sel1:rsa-sha256:');
 
     my $input = build_signing_input(
-        mi_headers     => [ grep { $_->{v} <= ($m // 0) } @mi ],
-        dk2_headers    => [ @sigs, { i => $i, sig => $s } ],
-        signing_i      => $i,
-        signature      => $s,
-        signing_header => $s->as_folded_string_without_data);
+        instances  => [ map { $_->{raw} } grep { $_->{v} <= ($m // 0) } @mi ],
+        signatures => [ map { $_->{raw} } @sigs ],
+        signing    => $s->as_folded_string);
     my $value = encode_base64(key()->sign_message($input, 'SHA256', 'v1.5'), '');
     $s->set_tag('s', "sel1:rsa-sha256:$value");
     return $s->as_folded_string . "\r\n" . $text;

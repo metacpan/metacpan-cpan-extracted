@@ -4,17 +4,32 @@ use strict;
 use warnings;
 
 sub new {
-    my ($class, %args) = @_;
-    my $client = delete $args{client} or die "client is required\n";
+    my $class = shift;
+    die "pagination options must be key/value pairs\n" if @_ % 2;
+    die "pagination option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
+    my %args = @_;
+    die "client is required\n" if !exists $args{client} || !defined $args{client};
+    my $client = delete $args{client};
     my $path   = delete $args{path};
     die "path is required\n" if !defined $path;
+    die "path must be a scalar\n" if ref($path) ne '';
 
-    my $mode = delete($args{mode}) || 'next_url';
+    my $mode = delete($args{mode});
+    die "mode must be a scalar\n" if ref($mode) ne '';
+    $mode = 'next_url' if !defined($mode) || $mode eq '';
     die "unsupported pagination mode: $mode\n"
         if $mode ne 'next_url' && $mode ne 'page' && $mode ne 'cursor';
 
     my $items = delete($args{items});
     $items = 'items' if !defined $items;
+
+    my $response_aware_extractors = delete($args{response_aware_extractors});
+    die "response_aware_extractors must be a scalar\n"
+        if defined($response_aware_extractors) && ref($response_aware_extractors) ne '';
+    my $allow_cross_origin = delete($args{allow_cross_origin});
+    die "allow_cross_origin must be a scalar\n"
+        if defined($allow_cross_origin) && ref($allow_cross_origin) ne '';
 
     my $self = bless {
         client          => $client,
@@ -23,28 +38,40 @@ sub new {
         items           => $items,
         next            => exists($args{next}) ? delete($args{next}) : ($mode eq 'cursor' ? 'next_cursor' : 'next'),
         has_more        => delete($args{has_more}),
-        response_aware_extractors => delete($args{response_aware_extractors}) ? 1 : 0,
-        allow_cross_origin => delete($args{allow_cross_origin}) ? 1 : 0,
-        page_param      => delete($args{page_param}) || 'page',
-        page_size_param => delete($args{page_size_param}) || 'per_page',
+        response_aware_extractors => $response_aware_extractors ? 1 : 0,
+        allow_cross_origin => $allow_cross_origin ? 1 : 0,
+        page_param      => exists($args{page_param}) ? delete($args{page_param}) : 'page',
+        page_size_param => exists($args{page_size_param}) ? delete($args{page_size_param}) : 'per_page',
         page_size       => delete($args{page_size}),
         current_page    => exists($args{start_page}) ? delete($args{start_page}) : 1,
-        cursor_param    => delete($args{cursor_param}) || 'cursor',
+        cursor_param    => exists($args{cursor_param}) ? delete($args{cursor_param}) : 'cursor',
         cursor          => delete($args{cursor}),
-        query           => delete($args{query}) || {},
-        request         => delete($args{request}) || {},
+        query           => exists($args{query}) ? delete($args{query}) : {},
+        request         => exists($args{request}) ? delete($args{request}) : {},
         buffer          => [],
         finished        => 0,
         started         => 0,
         seen            => {},
     }, $class;
 
+    for my $name (qw(items next has_more)) {
+        next if !defined $self->{$name};
+        die "pagination $name extractor must be a code reference or scalar path\n"
+            if ref($self->{$name}) ne '' && ref($self->{$name}) ne 'CODE';
+    }
+    for my $name (qw(page_param page_size_param cursor_param)) {
+        die "pagination $name must be a non-empty scalar\n"
+            if !defined($self->{$name}) || ref($self->{$name}) ne '' || $self->{$name} eq '';
+    }
+
+    die "cursor must be a scalar or undef\n"
+        if defined($self->{cursor}) && ref($self->{cursor}) ne '';
     die "query must be a hash reference\n" if ref($self->{query}) ne 'HASH';
     die "request must be a hash reference\n" if ref($self->{request}) ne 'HASH';
     die "page_size must be a positive integer\n"
-        if defined($self->{page_size}) && ($self->{page_size} !~ /\A\d+\z/ || $self->{page_size} < 1);
+        if defined($self->{page_size}) && (ref($self->{page_size}) ne '' || $self->{page_size} !~ /\A\d+\z/ || $self->{page_size} < 1);
     die "start_page must be a positive integer\n"
-        if $self->{current_page} !~ /\A\d+\z/ || $self->{current_page} < 1;
+        if ref($self->{current_page}) ne '' || $self->{current_page} !~ /\A\d+\z/ || $self->{current_page} < 1;
     die "unknown pagination option: $_\n" for sort keys %args;
 
     return $self;
@@ -73,33 +100,51 @@ sub all {
 sub _fetch_page {
     my ($self) = @_;
     my $url = $self->_request_url;
+    my $first_page = !$self->{started};
     my $response = $self->{client}->get($url, %{ $self->{request} });
     my $data = $response->json;
     my $items = _extract($data, $self->{items}, $response, $self->{response_aware_extractors});
 
     die "pagination items extractor must return an array reference\n" if ref($items) ne 'ARRAY';
-    $self->{buffer} = [ @$items ];
-    $self->{started} = 1;
+
+    # Stage iterator updates until the continuation is fully validated.
+    # A failed page must not leave items in the buffer or advance the cursor.
+    my %update = (buffer => [ @$items ], started => 1);
+    my %seen = %{ $self->{seen} };
+
+    # Continuations must not revisit the initial page or a supplied cursor.
+    # These values were previously absent from the seen-continuation set.
+    if ($first_page) {
+        if ($self->{mode} eq 'next_url') {
+            $seen{"url:$url"} = 1;
+        }
+        elsif ($self->{mode} eq 'cursor'
+            && defined($self->{cursor}) && $self->{cursor} ne '') {
+            $seen{"cursor:$self->{cursor}"} = 1;
+        }
+    }
 
     if ($self->{mode} eq 'next_url') {
         my $next = _extract($data, $self->{next}, $response, $self->{response_aware_extractors});
+        die "pagination next URL continuation must be a scalar\n" if defined($next) && ref($next) ne '';
         if (!defined($next) || $next eq '') {
-            $self->{finished} = 1;
+            $update{finished} = 1;
         }
         else {
             $self->_guard_next_url_origin($next);
-            $self->_guard_continuation("url:$next");
-            $self->{path} = $next;
+            $self->_guard_continuation("url:$next", \%seen);
+            $update{path} = $next;
         }
     }
     elsif ($self->{mode} eq 'cursor') {
         my $next = _extract($data, $self->{next}, $response, $self->{response_aware_extractors});
+        die "pagination cursor continuation must be a scalar\n" if defined($next) && ref($next) ne '';
         if (!defined($next) || $next eq '') {
-            $self->{finished} = 1;
+            $update{finished} = 1;
         }
         else {
-            $self->_guard_continuation("cursor:$next");
-            $self->{cursor} = $next;
+            $self->_guard_continuation("cursor:$next", \%seen);
+            $update{cursor} = $next;
         }
     }
     else {
@@ -115,14 +160,16 @@ sub _fetch_page {
         }
 
         if ($has_more) {
-            $self->{current_page}++;
+            $update{current_page} = $self->{current_page} + 1;
         }
         else {
-            $self->{finished} = 1;
+            $update{finished} = 1;
         }
     }
 
-    $self->{finished} = 1 if !@$items && $self->{mode} eq 'page' && !defined($self->{has_more});
+    $update{finished} = 1 if !@$items && $self->{mode} eq 'page' && !defined($self->{has_more});
+    $update{seen} = \%seen;
+    $self->{$_} = $update{$_} for keys %update;
 }
 
 sub _request_url {
@@ -157,8 +204,9 @@ sub _guard_next_url_origin {
 }
 
 sub _guard_continuation {
-    my ($self, $key) = @_;
-    die "pagination continuation repeated: $key\n" if $self->{seen}{$key}++;
+    my ($self, $key, $seen) = @_;
+    $seen = $self->{seen} if !defined $seen;
+    die "pagination continuation repeated: $key\n" if $seen->{$key}++;
 }
 
 sub _extract {
@@ -187,16 +235,17 @@ sub _append_query {
     my ($url, $query) = @_;
     my @pairs;
     for my $key (sort keys %$query) {
+        die "query parameter names must be scalars\n" if ref($key) ne '';
         my $value = $query->{$key};
         next if !defined $value;
 
         my @values;
         if (ref($value) eq 'ARRAY') {
             die "query parameter array values must contain only scalars or undef\n"
-                if grep { defined($_) && ref($_) } @$value;
+                if grep { defined($_) && ref($_) ne '' } @$value;
             @values = grep { defined $_ } @$value;
         }
-        elsif (ref($value)) {
+        elsif (ref($value) ne '') {
             die "query values must be scalars, array references, or undef\n";
         }
         else {

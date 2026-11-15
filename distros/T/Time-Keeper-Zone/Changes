@@ -1,5 +1,8 @@
 Revision history for Time-Keeper-Zone
 
+0.06    2026-11-14
+        - tzdata 2026f: Cuba stays on -04 until November 2027.
+
 0.05    2026-10-20
         - Builds on perl 5.10.0 (mPUSHs, mXPUSHs).
         - Fix: t/04-surface.t failed on Windows where symlink works.

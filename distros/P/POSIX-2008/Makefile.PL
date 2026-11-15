@@ -33,9 +33,8 @@ $CCFLAGS .= " $Config{optimize}" if $Config{optimize};
 
 my %libs;
 
-sub guess_int_fmt_type {
-  # Guess largest integer type as well as integer type and format string
-  # suitable for formatting a size_t.
+sub guess_size_fmt {
+  # Guess integer type and format string suitable for formatting a size_t.
   my $sizesize = $Config{sizesize};
   my @types = (
     { dfmt => 'zd', ufmt => 'zu', size => $sizesize,
@@ -50,9 +49,6 @@ sub guess_int_fmt_type {
       dtype => 'short', utype => 'unsigned short' },
   );
 
-  # Get largest integer type.
-  my ($max_int) = grep $_->{size}, sort { $b->{size} <=> $a->{size} } @types;
-
   # Get smallest integer type that fits a size_t. Using the *smallest* type
   # avoids segfaults caused by wrong stack argument sizes when formatting with
   # croak() or warn().
@@ -65,7 +61,7 @@ sub guess_int_fmt_type {
   $size_fmt ||= { dfmt => 'IVdf', ufmt => 'UVuf', size => $Config{ivsize},
                   dtype => 'IV', utype => 'UV' };
 
-  return ($max_int, $size_fmt);
+  return $size_fmt;
 }
 
 sub run_cmd {
@@ -93,7 +89,7 @@ sub try_compile {
     $what =~ /^dl/ ? '-ldl' :
     $what =~ /^bcrypt/ ? '-lbcrypt' :
     $what =~ /^(?:clock|timer)/ ? '-lrt' :
-    $ccode =~ '<quadmath\.h>' ? '-lquadmath' :
+    $ccode =~ /<quadmath\.h>/ ? '-lquadmath' :
     $ccode =~ /<(?:complex|fenv|math)\.h>/ ? '-lm' : '';
 
   if ($lib eq '-lquadmath') {
@@ -144,6 +140,7 @@ check_cc();
 
 sysopen my $DEF, '2008.h', O_WRONLY|O_CREAT|O_EXCL or die "2008.h: $!";
 
+my %have;
 while (my $line = <DATA>) {
   next if $line =~ /^\s*(?:#.*)?$/;
   my ($what, $b64) = split ' ', $line;
@@ -151,6 +148,7 @@ while (my $line = <DATA>) {
   my $run = $what =~ /^(?:getrandom|rdrand|rndr|darn)/;
   my $ok = try_compile($what, $ccode, $run);
   if ($ok) {
+    $have{$what}++;
     my $define = '#define PSX2008_HAS_'.uc($what)."\n";
     print $DEF $define or close $DEF or die "Can't write to 2008.h: $!";
   }
@@ -158,10 +156,15 @@ while (my $line = <DATA>) {
 }
 close DATA;
 
-my ($max_int, $size_fmt) = guess_int_fmt_type();
+# Only link with bcrypt.dll if we really need it.
+if ($libs{'-lbcrypt'}) {
+  if (grep $have{$_}, qw(getentropy getrandom getrandom_sys arc4random_buf)) {
+    delete $libs{'-lbcrypt'};
+  }
+}
+
+my $size_fmt = guess_size_fmt();
 print $DEF <<EOSZ;
-#define INT_MAX_TYPE $max_int->{dtype}
-#define UINT_MAX_TYPE $max_int->{utype}
 #define PSX2008_SZdf "$size_fmt->{dfmt}"
 #define PSX2008_SZuf "$size_fmt->{ufmt}"
 #define PSX2008_SZdft $size_fmt->{dtype}
@@ -315,8 +318,10 @@ my %wmf_attributes = (
     XSLoader   => 0,
   },
 );
-if ($Config{gccversion} && $Config{d_attribute_deprecated}) {
-  $wmf_attributes{CCFLAGS} .= ' -Wno-deprecated-declarations';
+if ($Config{d_attribute_deprecated}) {
+  if (grep $have{$_}, qw(sighold sigignore sigpause sigrelse)) {
+    $wmf_attributes{CCFLAGS} .= ' -Wno-deprecated-declarations';
+  }
 }
 @{$wmf_attributes{TEST_REQUIRES}}{keys %{$wmf_attributes{PREREQ_PM}}} =
   values %{$wmf_attributes{PREREQ_PM}};
@@ -364,7 +369,7 @@ atoi I2luY2x1ZGUgPHN0ZGxpYi5oPgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpIHsgcmV
 atol I2luY2x1ZGUgPHN0ZGxpYi5oPgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpIHsgcmV0dXJuIChpbnQpYXRvbChhcmd2WzFdKTsgfQo=
 atoll I2luY2x1ZGUgPHN0ZGxpYi5oPgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpIHsgcmV0dXJuIChpbnQpYXRvbGwoYXJndlsxXSk7IH0K
 basename I2luY2x1ZGUgPGxpYmdlbi5oPgppbnQgbWFpbih2b2lkKSB7CiAgY2hhciBwYXRoW10gPSAiLiI7CiAgY2hhciAqYiA9IGJhc2VuYW1lKHBhdGgpOwogIHJldHVybiAoaW50KSpiOwp9Cg==
-bcryptgenrandom I2luY2x1ZGUgPHdpbmRvd3MuaD4KI2luY2x1ZGUgPGJjcnlwdC5oPgppbnQgbWFpbih2b2lkKSB7CiAgY2hhciBidWY7CiAgcmV0dXJuIEJDcnlwdEdlblJhbmRvbShOVUxMLCAmYnVmLCAxLCBCQ1JZUFRfVVNFX1NZU1RFTV9QUkVGRVJSRURfUk5HKSAhPSAwOwp9Cg==
+bcryptgenrandom I2luY2x1ZGUgPHN0ZGRlZi5oPgojaW5jbHVkZSA8d2luZG93cy5oPgojaW5jbHVkZSA8YmNyeXB0Lmg+CmludCBtYWluKHZvaWQpIHsKICBVQ0hBUiBidWY7CiAgcmV0dXJuIEJDcnlwdEdlblJhbmRvbShOVUxMLCAmYnVmLCAxLCBCQ1JZUFRfVVNFX1NZU1RFTV9QUkVGRVJSRURfUk5HKSAhPSAwOwp9Cg==
 cabs I2luY2x1ZGUgPGNvbXBsZXguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7CiAgZG91YmxlIHJlID0gMS4yKmFyZ2M7CiAgZG91YmxlIGltID0gMS4yKigqKmFyZ3YpOwogIGRvdWJsZSBjb21wbGV4IHogPSByZSArIGltICogSTsKICByZXR1cm4gKGludCljYWJzKHopOwp9Cg==
 cacos I2luY2x1ZGUgPGNvbXBsZXguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7CiAgZG91YmxlIHJlID0gMS4yKmFyZ2M7CiAgZG91YmxlIGltID0gMS4yKigqKmFyZ3YpOwogIGRvdWJsZSBjb21wbGV4IHogPSByZSArIGltICogSTsKICByZXR1cm4gKGludCljYWNvcyh6KTsKfQo=
 cacosh I2luY2x1ZGUgPGNvbXBsZXguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7CiAgZG91YmxlIHJlID0gMS4yKmFyZ2M7CiAgZG91YmxlIGltID0gMS4yKigqKmFyZ3YpOwogIGRvdWJsZSBjb21wbGV4IHogPSByZSArIGltICogSTsKICByZXR1cm4gKGludCljYWNvc2goeik7Cn0K
@@ -455,8 +460,8 @@ fesetround I2luY2x1ZGUgPGZlbnYuaD4KaW50IG1haW4odm9pZCkgeyByZXR1cm4gZmVzZXRyb3VuZ
 fetestexcept I2luY2x1ZGUgPGZlbnYuaD4KaW50IG1haW4odm9pZCkgeyByZXR1cm4gZmV0ZXN0ZXhjZXB0KDApOyB9Cg==
 fexecve I2luY2x1ZGUgPHN0ZGRlZi5oPgojaW5jbHVkZSA8dW5pc3RkLmg+CmludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikgewogIGNoYXIgKmNvbnN0IGVudnBbXSA9IHswfTsKICByZXR1cm4gZmV4ZWN2ZSgtMSwgYXJndiwgZW52cCk7Cn0K
 ffs I2luY2x1ZGUgPHN0cmluZ3MuaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiBmZnMoYXJnYyk7IH0K
-ffsl I2luY2x1ZGUgPHN0cmluZy5oPgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpIHsgcmV0dXJuIChpbnQpZmZzbChhcmdjKTsgfQo=
-ffsll I2luY2x1ZGUgPHN0cmluZy5oPgppbnQgbWFpbihpbnQgYXJnYywgY2hhciAqKmFyZ3YpIHsgcmV0dXJuIChpbnQpZmZzbGwoYXJnYyk7IH0K
+ffsl I2luY2x1ZGUgPHN0cmluZ3MuaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KWZmc2woYXJnYyk7IH0K
+ffsll I2luY2x1ZGUgPHN0cmluZ3MuaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KWZmc2xsKGFyZ2MpOyB9Cg==
 finiteq I2luY2x1ZGUgPHF1YWRtYXRoLmg+CmludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndikgeyByZXR1cm4gZmluaXRlcSgoX19mbG9hdDEyOClhcmdjKTsgfQo=
 floor I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7CiAgZG91YmxlIHggPSAoZG91YmxlKSgqKmFyZ3YpLyhkb3VibGUpYXJnYzsKICByZXR1cm4gKGludClmbG9vcih4KTsKfQo=
 fma I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7CiAgZG91YmxlIHggPSAoZG91YmxlKWFyZ2M7CiAgZG91YmxlIHkgPSAoZG91YmxlKSgqKmFyZ3YpOwogIGRvdWJsZSB6ID0gKGRvdWJsZSlhcmdjOwogIHJldHVybiAoaW50KWZtYSh4LCB5LCB6KTsKfQo=
@@ -591,7 +596,7 @@ posix_fadvise I2luY2x1ZGUgPGZjbnRsLmg+CmludCBtYWluKGludCBhcmdjLCBjaGFyICoqYXJndi
 posix_fallocate I2luY2x1ZGUgPGZjbnRsLmg+CmludCBtYWluKHZvaWQpIHsgcmV0dXJuIHBvc2l4X2ZhbGxvY2F0ZSgtMSwgMCwgMCk7IH0K
 posix_openpt I2luY2x1ZGUgPHN0ZGxpYi5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBwb3NpeF9vcGVucHQoMCk7IH0K
 pow I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KXBvdyhhcmdjLCAqKmFyZ3YpOyB9Cg==
-ppoll I2luY2x1ZGUgPHRpbWUuaD4KI2luY2x1ZGUgIjIwMDguaCIKI2lmIGRlZmluZWQoUFNYMjAwOF9IQVNfUE9MTF9IKQojaW5jbHVkZSA8cG9sbC5oPgojZWxpZiBkZWZpbmVkKFBTWDIwMDhfSEFTX1NZU19QT0xMX0gpCiNpbmNsdWRlIDxzeXMvcG9sbC5oPgojZW5kaWYKaW50IG1haW4odm9pZCkgewogIHN0cnVjdCBwb2xsZmQgZmRzID0gezB9OwogIHN0cnVjdCB0aW1lc3BlYyB0bW8gPSB7MH07CiAgcmV0dXJuIHBwb2xsKCZmZHMsIDAsICZ0bW8sIE5VTEwpOwp9Cg==
+ppoll I2luY2x1ZGUgPHN0ZGRlZi5oPgojaW5jbHVkZSA8dGltZS5oPgojaW5jbHVkZSAiMjAwOC5oIgojaWYgZGVmaW5lZChQU1gyMDA4X0hBU19QT0xMX0gpCiNpbmNsdWRlIDxwb2xsLmg+CiNlbGlmIGRlZmluZWQoUFNYMjAwOF9IQVNfU1lTX1BPTExfSCkKI2luY2x1ZGUgPHN5cy9wb2xsLmg+CiNlbmRpZgppbnQgbWFpbih2b2lkKSB7CiAgc3RydWN0IHBvbGxmZCBmZHMgPSB7MH07CiAgc3RydWN0IHRpbWVzcGVjIHRtbyA9IHswfTsKICByZXR1cm4gcHBvbGwoJmZkcywgMCwgJnRtbywgTlVMTCk7Cn0K
 pread I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7CiAgY2hhciBidWZbMV07CiAgcmV0dXJuIChpbnQpcHJlYWQoLTEsIGJ1Ziwgc2l6ZW9mKGJ1ZiksIDApOwp9Cg==
 preadv I2luY2x1ZGUgPHN5cy91aW8uaD4KaW50IG1haW4odm9pZCkgewogIGNoYXIgYnVmOwogIHN0cnVjdCBpb3ZlYyBpb3YgPSB7JmJ1ZiwgMX07CiAgcmV0dXJuIChpbnQpcHJlYWR2KC0xLCAmaW92LCAxLCAwKTsKfQo=
 preadv2 I2luY2x1ZGUgPHN5cy91aW8uaD4KaW50IG1haW4odm9pZCkgewogIGNoYXIgYnVmOwogIHN0cnVjdCBpb3ZlYyBpb3YgPSB7JmJ1ZiwgMX07CiAgcmV0dXJuIChpbnQpcHJlYWR2MigtMSwgJmlvdiwgMSwgMCwgMCk7Cn0K
@@ -609,7 +614,7 @@ read I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7CiAgY2hhciBidWZbOF07CiAgcmV
 readlink I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7CiAgY2hhciBidWZbOF07CiAgcmV0dXJuIChpbnQpcmVhZGxpbmsoIi4iLCBidWYsIHNpemVvZihidWYpKTsKfQo=
 readlinkat I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7CiAgY2hhciBidWZbOF07CiAgcmV0dXJuIChpbnQpcmVhZGxpbmthdCgtMSwgIi4iLCBidWYsIHNpemVvZihidWYpKTsKfQo=
 readv I2luY2x1ZGUgPHN5cy91aW8uaD4KaW50IG1haW4odm9pZCkgewogIGNoYXIgYnVmWzhdOwogIHN0cnVjdCBpb3ZlYyBpb3YgPSB7YnVmLCBzaXplb2YoYnVmKX07CiAgcmV0dXJuIChpbnQpcmVhZHYoLTEsICZpb3YsIDEpOwp9Cg==
-realpath I2luY2x1ZGUgPHN0ZGxpYi5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiAhIXJlYWxwYXRoKCIuIiwgTlVMTCk7IH0K
+realpath I2luY2x1ZGUgPHN0ZGRlZi5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiAhIXJlYWxwYXRoKCIuIiwgTlVMTCk7IH0K
 remainder I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KXJlbWFpbmRlcihhcmdjLCAqKmFyZ3YpOyB9Cg==
 remove I2luY2x1ZGUgPHN0ZGlvLmg+CmludCBtYWluKHZvaWQpIHsgcmV0dXJuIHJlbW92ZSgiXyIpOyB9Cg==
 remquo I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7CiAgaW50IGk7CiAgcmV0dXJuIChpbnQpcmVtcXVvKGFyZ2MsICoqYXJndiwgJmkpOwp9Cg==
@@ -639,11 +644,17 @@ setreuid I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBzZXRyZXVpZCg
 setsid I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiAoaW50KXNldHNpZCgpOyB9Cg==
 setuid I2luY2x1ZGUgPHVuaXN0ZC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBzZXR1aWQoMCk7IH0K
 setutxent I2luY2x1ZGUgPHV0bXB4Lmg+CmludCBtYWluKHZvaWQpIHsKICBzZXR1dHhlbnQoKTsKICByZXR1cm4gMDsKfQo=
+sigaction I2luY2x1ZGUgPHNpZ25hbC5oPgojaW5jbHVkZSA8c3RkZGVmLmg+CmludCBtYWluKHZvaWQpIHsKICBzdHJ1Y3Qgc2lnYWN0aW9uIGFjdCA9IHswfTsKICByZXR1cm4gc2lnYWN0aW9uKDE1LCAmYWN0LCBOVUxMKTsKfQo=
+sigaddset I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7CiAgc2lnc2V0X3Qgc2V0OwogIHJldHVybiBzaWdhZGRzZXQoJnNldCwgMTUpOwp9Cg==
+sigdelset I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7CiAgc2lnc2V0X3Qgc2V0OwogIHJldHVybiBzaWdkZWxzZXQoJnNldCwgMTUpOwp9Cg==
+sigemptyset I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7CiAgc2lnc2V0X3Qgc2V0OwogIHJldHVybiBzaWdlbXB0eXNldCgmc2V0KTsKfQo=
 sighold I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBzaWdob2xkKDE1KTsgfQo=
 sigignore I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBzaWdpZ25vcmUoMTUpOyB9Cg==
 signbit I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiBzaWduYml0KChkb3VibGUpYXJnYyk7IH0K
 sigpause I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBzaWdwYXVzZSgxNSk7IH0K
+sigprocmask I2luY2x1ZGUgPHNpZ25hbC5oPgojaW5jbHVkZSA8c3RkZGVmLmg+CmludCBtYWluKHZvaWQpIHsKICBzaWdzZXRfdCBzZXQ7CiAgcmV0dXJuIHNpZ3Byb2NtYXNrKDAsIE5VTEwsICZzZXQpOwp9Cg==
 sigrelse I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7IHJldHVybiBzaWdyZWxzZSgxNSk7IH0K
+sigsuspend I2luY2x1ZGUgPHNpZ25hbC5oPgppbnQgbWFpbih2b2lkKSB7CiAgc2lnc2V0X3Qgc2V0OwogIHNpZ2VtcHR5c2V0KCZzZXQpOwogIHJldHVybiBzaWdzdXNwZW5kKCZzZXQpOwp9Cg==
 sin I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KXNpbihhcmdjKTsgfQo=
 sinh I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KXNpbmgoYXJnYyk7IH0K
 sqrt I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KShzcXJ0KGFyZ2MpKTsgfQo=
@@ -666,7 +677,7 @@ tan I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVy
 tanh I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KSh0YW5oKGFyZ2MpKTsgfQo=
 tgamma I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KXRnYW1tYSgoZG91YmxlKWFyZ2MpOyB9Cg==
 tgammal I2luY2x1ZGUgPG1hdGguaD4KaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKiphcmd2KSB7IHJldHVybiAoaW50KXRnYW1tYWwoKGxvbmcgZG91YmxlKWFyZ2MpOyB9Cg==
-timer_create I2luY2x1ZGUgPHRpbWUuaD4KaW50IG1haW4odm9pZCkgewogIHRpbWVyX3QgdGltZXJfaWQ7CiAgcmV0dXJuIHRpbWVyX2NyZWF0ZShDTE9DS19SRUFMVElNRSwgTlVMTCwgJnRpbWVyX2lkKTsKfQo=
+timer_create I2luY2x1ZGUgPHN0ZGRlZi5oPgojaW5jbHVkZSA8dGltZS5oPgppbnQgbWFpbih2b2lkKSB7CiAgdGltZXJfdCB0aW1lcl9pZDsKICByZXR1cm4gdGltZXJfY3JlYXRlKENMT0NLX1JFQUxUSU1FLCBOVUxMLCAmdGltZXJfaWQpOwp9Cg==
 timer_delete I2luY2x1ZGUgPHRpbWUuaD4KaW50IG1haW4odm9pZCkgeyByZXR1cm4gdGltZXJfZGVsZXRlKCh0aW1lcl90KTApOyB9Cg==
 timer_getoverrun I2luY2x1ZGUgPHRpbWUuaD4KaW50IG1haW4odm9pZCkgeyByZXR1cm4gdGltZXJfZ2V0b3ZlcnJ1bigodGltZXJfdCkwKTsgfQo=
 timer_gettime I2luY2x1ZGUgPHRpbWUuaD4KaW50IG1haW4odm9pZCkgewogIHN0cnVjdCBpdGltZXJzcGVjIGN2OwogIHJldHVybiB0aW1lcl9nZXR0aW1lKCh0aW1lcl90KTAsICZjdik7Cn0K

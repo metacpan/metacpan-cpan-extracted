@@ -2,12 +2,12 @@ use v5.36;
 
 package DBIx::Squirrel::Sugar;
 
-use Ref::Util qw(is_arrayref is_hashref);
+use Ref::Util qw(is_arrayref is_hashref is_plain_hashref is_ref);
 
 use Ekorn::Pipeline qw(is_stage);
 
 use DBIx::Squirrel         qw();
-use DBIx::Squirrel::Errors qw(croakf);
+use DBIx::Squirrel::Errors qw(at_caller   croakf);
 use DBIx::Squirrel::Util   qw(install_sub is_name shift_attrs split_stages);
 
 use namespace::clean;
@@ -54,7 +54,7 @@ sub import ($class, @args) {
 # the connection, but each leaves the failure in err.
 sub database ($name, @connect) {
     return _define(scalar caller, $name, @connect) if @connect;
-    croakf 'Expected a database defined as %s', $name
+    croakf 'Expected a database named %s', $name
         unless $connect_args{$name};
     my $dbh = $handle{$name};
     return $dbh
@@ -99,16 +99,17 @@ sub _define_statement ($package, $name, @definition) {
         unless is_name($name);
     croakf 'Expected a database and a statement for %s', $name
         unless defined $database && defined $statement;
-    # A pipeline is a blessed hash, so is_hashref is true of it too: one
-    # straight after the statement is a stage, not the attributes.
+    # Only a plain hash is the attributes: a pipeline, or any other
+    # object, straight after the statement is a stage, or a mistake.
     my $attrs
-        = @rest
-        && (!defined $rest[0] || is_hashref($rest[0]) && !is_stage($rest[0]))
+        = @rest && (!defined $rest[0] || is_plain_hashref($rest[0]))
         ? shift @rest
         : undef;
-    croakf 'Expected only code references or pipelines after the statement for %s',
+    croakf
+        "Expected only stages after the statement for %s: code references, pipelines or their names, or objects offering a stage's role method",
         $name
-        if grep { !is_stage($_) } @rest;
+        if grep { !is_stage($_) && !_is_pipeline_name($_) } @rest;
+    @rest = map { _resolved($package, $_) } @rest;
     my %definition = (
         database  => $database,
         statement => $statement,
@@ -120,9 +121,28 @@ sub _define_statement ($package, $name, @definition) {
     return $function;
 }
 
+# Return true if a stage given in a definition is a pipeline's name:
+# words joined by ::, as Ekorn::Pipeline names them.
+sub _is_pipeline_name ($stage) {
+    return
+           defined $stage
+        && !is_ref($stage)
+        && $stage =~ m( \A [^\W\d]\w* (?: :: [^\W\d]\w* )* \z )xa;
+}
+
+# Return a stage given in a definition: a pipeline's name resolved now, in
+# the package making the definition, as Ekorn::Pipeline's pipeline word
+# resolves one in its caller's, each on its own, so the other stages keep
+# their places; anything else as it is.
+sub _resolved ($package, $stage) {
+    return $stage unless _is_pipeline_name($stage);
+    return at_caller { Ekorn::Pipeline->pipeline_in($package, $stage) };
+}
+
 # Run a statement's function: execute the statement with the bind values
 # given, and return its handle, or, with stages, its own or those given
-# after the bind values, return the results. The statement is prepared
+# after the bind values, return an iterator over the results, or, if the
+# last stage is a sink, its result. The statement is prepared
 # once for each handle, with prepare_cached, which makes a new one,
 # cached in its place, when the one prepared is in use; one taking a list
 # is prepared for the values given, and not cached.
@@ -139,13 +159,13 @@ sub _run_statement ($definition, @args) {
 
 # Run what a database's function is given: nothing, for the handle; a
 # statement and its bind values, for the statement handle, executed; or
-# those and stages after them, for the results.
+# those and stages after them, for an iterator, or a sink's result.
 sub _run ($name, @args) {
     my $dbh = database($name);
     return $dbh unless @args;
     my $statement = shift @args;
-    return _execute($statement, @args)           if $statement isa 'DBI::st';
-    return $dbh->iterate($statement, @args)->all if _ends_in_stages(\@args);
+    return _execute($statement, @args)      if $statement isa 'DBI::st';
+    return $dbh->iterate($statement, @args) if _ends_in_stages(\@args);
     my $attrs = shift_attrs(\@args);
 
     my $sth = DBIx::Squirrel::db::_prepare_as(    ## no critic (Subroutines::ProtectPrivateSubs)
@@ -156,9 +176,10 @@ sub _run ($name, @args) {
 
 # Execute a statement handle with the bind values given, and return it,
 # or nothing if it couldn't be executed; or, with stages after the bind
-# values, return the results.
+# values, return an iterator over the results, or, if the last stage is a
+# sink, its result.
 sub _execute ($sth, @args) {
-    return $sth->iterate(@args)->all if _ends_in_stages(\@args);
+    return $sth->iterate(@args) if _ends_in_stages(\@args);
     defined $sth->execute(@args) or return;
     return $sth;
 }
@@ -199,8 +220,12 @@ DBIx::Squirrel::Sugar - a function for each database, and each statement
     my $sth = music 'SELECT * FROM artist WHERE id = ?', 1;   # executed
     say $sth->fetchrow_hashref->{name};
 
-    my @names = music 'SELECT name FROM artist',       # through stages
+    use Ekorn::Pipeline::Sinks qw(keep_all);
+
+    my $it = music 'SELECT name FROM artist',          # an iterator
         sub ($row) { $row->[0] };
+    my @names = music 'SELECT name FROM artist',       # a sink's result
+        sub ($row) { $row->[0] }, keep_all;
 
     # Anywhere in the program
     my $handle = database('music');
@@ -211,8 +236,9 @@ DBIx::Squirrel::Sugar - a function for each database, and each statement
         artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
     };
 
-    my @all   = artist_names;                             # the results
-    my @upper = artist_names sub ($name) { uc $name };    # with more stages
+    my $names = artist_names;                                       # an iterator
+    my @all   = artist_names keep_all;                              # the results
+    my @upper = artist_names sub ($name) { uc $name }, keep_all;    # more stages
     my $found = artist id => 1;                           # executed
 
     # Or defined as the program runs
@@ -273,10 +299,10 @@ defines a database by that name. It gives the calling package a
 function of that name, and returns the function.
 
 A database defined with a database handle, in place of a data source,
-is a clone of it, as L<DBIx::Squirrel/connect> makes. The clone is made
-when the database is first used. The DBI makes a clone the way the
-handle was made. So a clone of a handle from C<connect_cached>, such
-as another database's, is that same handle.
+is a clone of it, as L<DBIx::Squirrel/connect> makes. The clone is
+made when the database is first used. The DBI makes a clone the way
+the handle was made. So a clone of a handle from C<connect_cached>,
+such as another database's, is that same handle.
 
 A database is defined once in a program, by a name that can be a
 function's. The package can't have a function of that name already.
@@ -292,25 +318,44 @@ It gives the calling package a function of that name, and returns the
 function. The database is found when the function runs, so it can be
 defined after the statement.
 
+A stage in a definition can be a pipeline's name, as
+L<Ekorn::Pipeline/named> names them. A name is looked up as the
+statement is defined, in the package defining it, unless it's
+qualified, as C<My::Module::clean>, so it must be defined first. One
+that isn't croaks then, "No pipeline named main::clean". Each name
+stands in its place among the stages. When the statement's function is
+called, a string given is a bind value, never a name.
+
+    BEGIN { Ekorn::Pipeline->named(trimmed => sub { s( \A \s+ | \s+ \z )()xgr }) }
+
+    use DBIx::Squirrel::Sugar statement => {
+        titles => [music => 'SELECT title FROM album', sub { $_->[0] }, 'trimmed'],
+    };
+
 =head2 The function a database is given
 
     $dbh     = music();
     $sth     = music($statement, @bind_values);
     $sth     = music($statement, \%attr, @bind_values);
-    @results = music($statement, @bind_values, @stages);
-    $count   = music($statement, @bind_values, @stages);
+    $it      = music($statement, @bind_values, @stages);
+    @results = music($statement, @bind_values, @stages, keep_all);
+    $count   = music($statement, @bind_values, @stages, count_items);
 
 Called with nothing, returns the database handle.
 
 Called with a statement, prepares it and executes it with the bind
 values, in any form L<DBIx::Squirrel::st/execute> takes. It returns
-the statement handle, or nothing if it couldn't be executed. A hash
-reference, or C<undef>, straight after the statement is the attributes
-to prepare it with, as with L<DBIx::Squirrel::db/do>.
+the statement handle, or nothing if it couldn't be executed. An
+unblessed hash reference, or C<undef>, straight after the statement is
+the attributes to prepare it with, as with L<DBIx::Squirrel::db/do>.
 
-With stages at the end, code references or pipelines, it iterates over
-the results, as L<DBIx::Squirrel::db/iterate> does. It returns them
-all, or, in scalar context, how many there were.
+With stages at the end, it does what L<DBIx::Squirrel::db/iterate>
+does: it returns an iterator over the results, or, if the last stage
+is a sink, such as L<Ekorn::Pipeline::Sinks>' C<keep_all> or
+C<count_items>, the sink's result. What it returns doesn't depend on
+the calling context, but for a sink of many, such as C<keep_all>,
+which gives a list, or, where one value is asked for, an array
+reference.
 
 The statement can be a statement handle, which is itself executed, or
 iterated over.
@@ -318,16 +363,24 @@ iterated over.
 =head2 The function a statement is given
 
     $sth     = artist(@bind_values);
-    @results = artist(@bind_values, @stages);
-    $count   = artist(@bind_values, @stages);
+    $it      = artist(@bind_values, @stages);
+    @results = artist(@bind_values, @stages, keep_all);
+    $count   = artist(@bind_values, @stages, count_items);
 
 Executes the statement with the bind values, and returns the statement
 handle, or nothing if it couldn't be executed.
 
-With stages, its own or those given after the bind values, it iterates
-over the results. They go through its own stages, then those given. It
-returns them all, or, in scalar context, how many there were. Stages
-given are for that call only.
+With stages, its own or those given after the bind values, it returns
+an iterator over the results, or, if the last stage is a sink, the
+sink's result, as the function a database is given does. The results
+go through its own stages, then those given. Stages given are for that
+call only.
+
+A sink is a function in the package that imports it, so a statement
+can't take its name. Define C<count_items> as a statement where
+C<count_items> is imported, and the definition croaks, as for any
+function the package has. Import sinks by name, or call one by its
+full name, C<Ekorn::Pipeline::Sinks::count_items()>.
 
 The statement is prepared once for each database handle, with
 L<DBIx::Squirrel::db/prepare_cached>. Its handle may be in use: by a
@@ -342,8 +395,8 @@ values instead, and isn't cached.
 
 =item Expected database or statement, not %s
 
-C<use DBIx::Squirrel::Sugar> was given something other than C<database>
-or C<statement> and their definitions.
+C<use DBIx::Squirrel::Sugar> was given something other than
+C<database> or C<statement> and their definitions.
 
 =item Expected the arguments to connect to %s in an ARRAY
 
@@ -359,10 +412,15 @@ A name can't be a function's.
 
 A statement given to C<use> didn't name its database, or have its SQL.
 
-=item Expected only code references or pipelines after the statement for %s
+=item Expected only stages after the statement for %s: code references, pipelines or their names, or objects offering a stage's role method
 
-A statement's definition had something other than stages, which are
-code references or pipelines, after the statement and its attributes.
+A statement's definition had something after the statement and its
+attributes that's neither a stage nor a pipeline's name.
+
+=item No pipeline named %s
+
+A statement's definition named a pipeline that wasn't defined. This is
+Ekorn::Pipeline's message.
 
 =item Expected a name for a database (%s)
 
@@ -376,7 +434,7 @@ The name was given to another database already.
 
 The package has a function of that name already.
 
-=item Expected a database defined as %s
+=item Expected a database named %s
 
 L</database> was given a name no database has.
 
@@ -394,7 +452,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

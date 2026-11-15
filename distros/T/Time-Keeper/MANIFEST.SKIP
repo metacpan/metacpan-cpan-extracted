@@ -15,3 +15,6 @@
 ^\.git
 ~$
 ^MANIFEST\.bak$
+^cover_db/
+\.gcda$
+\.gcno$

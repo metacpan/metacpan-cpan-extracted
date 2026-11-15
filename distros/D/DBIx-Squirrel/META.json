@@ -40,6 +40,7 @@
             "Perl::Critic" : "0",
             "Perl::Tidy" : "0",
             "Pod::Coverage" : "0",
+            "Pod::Markdown::Github" : "0",
             "Test2::Harness" : "0",
             "Test2::Plugin::Cover" : "0",
             "Test::CPAN::Meta" : "0",
@@ -56,11 +57,10 @@
             "DBI" : "0",
             "Data::Dumper" : "0",
             "Digest::SHA" : "0",
-            "Ekorn::Pipeline" : ">= v0.2.0, < v0.3.0",
+            "Ekorn::Pipeline" : ">= v0.3.0, < v0.4.0",
             "Exporter" : "0",
             "List::Util" : "0",
             "Ref::Util" : "0",
-            "Scalar::Util" : "0",
             "Sub::Util" : "0",
             "experimental" : "0",
             "namespace::clean" : "0",
@@ -78,7 +78,7 @@
    "provides" : {
       "DBIx::Squirrel" : {
          "file" : "lib/DBIx/Squirrel.pm",
-         "version" : "v2.1.0"
+         "version" : "v3.0.2"
       },
       "DBIx::Squirrel::Context" : {
          "file" : "lib/DBIx/Squirrel/Context.pm"
@@ -91,12 +91,6 @@
       },
       "DBIx::Squirrel::Iterator" : {
          "file" : "lib/DBIx/Squirrel/Iterator.pm"
-      },
-      "DBIx::Squirrel::Pipeline" : {
-         "file" : "lib/DBIx/Squirrel/Pipeline.pm"
-      },
-      "DBIx::Squirrel::Pipes" : {
-         "file" : "lib/DBIx/Squirrel/Pipes.pm"
       },
       "DBIx::Squirrel::Placeholders" : {
          "file" : "lib/DBIx/Squirrel/Placeholders.pm"
@@ -125,6 +119,9 @@
       "DBIx::Squirrel::Sugar" : {
          "file" : "lib/DBIx/Squirrel/Sugar.pm"
       },
+      "DBIx::Squirrel::Tooling" : {
+         "file" : "lib/DBIx/Squirrel/Tooling.pm"
+      },
       "DBIx::Squirrel::Util" : {
          "file" : "lib/DBIx/Squirrel/Util.pm"
       },
@@ -147,7 +144,7 @@
          "web" : "https://github.com/nukopian/DBIx-Squirrel"
       }
    },
-   "version" : "v2.1.0",
+   "version" : "v3.0.2",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

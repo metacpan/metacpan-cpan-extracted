@@ -38,7 +38,7 @@ my $hoh = {
 is( view($aoh, n => 3, return_only => 1),
     view($aoh, rows => 3, return_only => 1),
     'rows is a synonym for n' );
-like( view($aoh, rows => 2, return_only => 1), qr/\(showing 2\)/, 'rows controls the count' );
+like( view($aoh, rows => 2, return_only => 1), qr/\(showing 2 rows\)/, 'rows controls the count' );
 
 # reject unknown args
 eval { view($aoh, bogus => 1, return_only => 1) };
@@ -59,9 +59,10 @@ is( $@, '', 'all documented args accepted' );
 # n => 0 still lists column headers (AoH)
 {
 	my @lines = split /\n/, view($aoh, n => 0, return_only => 1);
-	is( scalar @lines, 3, 'n=0: banner + header + footer' );
+	is( scalar @lines, 4, 'n=0: banner + header + footer + banner again' );
 	like( $lines[1], qr/row_name\s+age\s+sex\s+tt/, 'n=0 still shows the column header row' );
-	like( $lines[-1], qr/7 more rows/, 'n=0 footer reports all rows hidden' );
+	like( $lines[-2], qr/7 more rows/, 'n=0 footer reports all rows hidden' );
+	is( $lines[-1], $lines[0], 'n=0: the banner is repeated as the last line' );
 }
 
 # empty hash does not die
@@ -82,18 +83,19 @@ is( $@, '', 'all documented args accepted' );
 {
 	my $s = view($aoh, return_only => 1);
 	my @lines = split /\n/, $s;
-	like( $lines[0], qr/^# AoH: 7 rows x 3 cols\t\(showing 6\)$/, 'AoH banner' );
+	like( $lines[0], qr/^# AoH: 7 rows x 3 cols, \d+\.\d (?:bytes|KB)\t\(showing 6 rows\)$/, 'AoH banner' );
 	like( $lines[1], qr/^row_name\s+age\s+sex\s+tt/, 'AoH header order' );
-	like( $lines[-1], qr/^# \.\.\. 1 more row$/, 'AoH footer' );
+	like( $lines[-2], qr/^# \.\.\. 1 more row$/, 'AoH footer' );
+	is( $lines[-1], $lines[0], 'AoH: the banner is repeated after the footer' );
 }
 {
 	my @lines = split /\n/, view($hoa, return_only => 1);
-	like( $lines[0], qr/^# HoA: 7 rows x 2 cols\t\(showing 6\)$/, 'HoA banner' );
+	like( $lines[0], qr/^# HoA: 7 rows x 2 cols, \d+\.\d (?:bytes|KB)\t\(showing 6 rows\)$/, 'HoA banner' );
 	like( $lines[1], qr/^row_name\s+gene\s+logfc/, 'HoA header' );
 }
 {
 	my @lines = split /\n/, view($hoh, return_only => 1);
-	like( $lines[0], qr/^# HoH: 3 rows x 3 cols\t\(showing 3\)$/, 'HoH banner' );
+	like( $lines[0], qr/^# HoH: 3 rows x 3 cols, \d+\.\d (?:bytes|KB)\t\(showing 3 rows\)$/, 'HoH banner' );
 	like( $lines[2], qr/^chr1\b/, 'HoH sorted row labels' );
 }
 
@@ -124,7 +126,7 @@ is( $@, '', 'all documented args accepted' );
 # flat (scalar-valued) hash renders as a single row
 {
 	my @lines = split /\n/, view({ a => 1, b => 2, c => 3 }, return_only => 1);
-	like( $lines[0], qr/^# Hash: 1 row x 3 cols\t\(showing 1\)$/, 'flat hash banner' );
+	like( $lines[0], qr/^# Hash: 1 row x 3 cols, \d+\.\d (?:bytes|KB)\t\(showing 1 row\)$/, 'flat hash banner' );
 	like( $lines[1], qr/^\s+a\s+b\s+c$/, 'flat hash header: sorted keys, leading label column' );
 	like( $lines[2], qr/^0\s+1\s+2\s+3$/, 'flat hash row: 0-based numeric label then values' );
 
@@ -141,7 +143,7 @@ is( $@, '', 'all documented args accepted' );
 
 	# n => 0 still shows the header
 	@lines = split /\n/, view({ a => 1, b => 2 }, n => 0, return_only => 1);
-	is( scalar @lines, 3, 'flat hash n=0: banner + header + footer' );
+	is( scalar @lines, 4, 'flat hash n=0: banner + header + footer + banner again' );
 	like( $lines[1], qr/a\s+b$/, 'flat hash n=0: header still lists columns' );
 
 	# row_names names a key to use as the label
@@ -175,7 +177,8 @@ is( $@, '', 'all documented args accepted' );
 	my @hdr = grep { /^row_name/ } @narrow;
 	cmp_ok( scalar @hdr, '>', 1, 'a narrow width splits into multiple blocks' );
 	is( scalar(grep { /^r1\b/ } @narrow), scalar @hdr, 'the label column repeats in every block' );
-	is( scalar(grep { /^# AoH:/ } @narrow), 1, 'the banner is printed exactly once' );
+	is( scalar(grep { /^# AoH:/ } @narrow), 2, 'the banner is printed once at the top and once at the bottom' );
+	is( $narrow[-1], $narrow[0], 'the bottom banner is the top one' );
 	like( $narrow[0], qr/x 8 cols/, 'the banner still reports every column, not just one block' );
 
 	# every column appears once, in its original order, across the blocks

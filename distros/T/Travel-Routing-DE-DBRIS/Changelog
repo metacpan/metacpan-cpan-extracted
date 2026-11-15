@@ -1,3 +1,7 @@
+Travel::Routing::DE::DBRIS 0.18 - Sat Nov 14 2026
+
+    * Work around latest Akamai BMP adjustments
+
 Travel::Routing::DE::DBRIS 0.17 - Fri Oct 30 2026
 
     * Try another Akamai TLS fingerprinting workaround.

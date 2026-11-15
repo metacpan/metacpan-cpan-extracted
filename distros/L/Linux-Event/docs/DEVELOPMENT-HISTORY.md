@@ -2,6 +2,24 @@
 
 This file preserves historical engineering decisions and the benchmark/optimization phase notes that previously occupied the project README. It is not public API documentation; current contracts are in module POD and the design guides.
 
+## 0.120 OpenSSL 4 TLS EOF compatibility (2026-11-14)
+
+Linux::Event 0.119 was released, after which CPAN Testers on ARM64 Linux
+using OpenSSL 4 reported two identical TLS EOF assertion failures, on Perl
+5.36.3 and Perl 5.44.0. OpenSSL placed the specific
+`SSL_R_UNEXPECTED_EOF_WHILE_READING` reason on the error queue but did not
+satisfy the existing `SSL_ERROR_SSL`-only classification path.
+
+[PR #43](https://github.com/haxmeister/perl-linux-event/pull/43)
+restored the public unclean-shutdown diagnostic and the native
+`unclean_eof_count` using the exact queued SSL error reason for either
+`SSL_ERROR_SSL` or `SSL_ERROR_SYSCALL`. Other TLS errors remain distinct.
+The new ARM64/OpenSSL 4.0.3 workflow passed the previously failing assertions
+and all 115 TLS tests. This is maintenance work only, with no public API or ABI
+change. Version 0.120 is prepared on a release branch; it must be merged,
+tagged and published separately, with maintainer authorization for each
+release action.
+
 ## 0.119 native-consumer exception hardening (2026-11-13)
 
 The 0.118 release was completed after the dated 2026-11-01 snapshot below.

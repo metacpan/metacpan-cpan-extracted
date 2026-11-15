@@ -245,7 +245,7 @@
     "mmdb"
   ],
   "bogonResponse": {
-    "why": "A bogon is answered locally, never on the network, in the shape the API answers one on a paid plan: every flag present and false, every detail object present and empty (Web IP's list empty), location, asn, company, abuse, whois and rwhois with every key empty, hostname empty and hosted_domains 0, and is_bogon true. On a lower plan it carries more members than a served answer, so a caller must not infer a plan from it.",
+    "why": "A bogon is answered locally, never on the network, in the shape the API answers one on a paid plan: every flag present and false, every detail object present and empty (Web IP's list empty), location, asn, company, abuse, whois and rwhois with every key empty, hostname empty, hosted_domains 0 with no domains, and is_bogon true. On a lower plan it carries more members than a served answer, so a caller must not infer a plan from it.",
     "flagsFalse": [
       "is_vpn",
       "is_tor",
@@ -353,7 +353,8 @@
     },
     "hostname": "",
     "hostedDomains": {
-      "total": 0
+      "total": 0,
+      "domains": []
     },
     "answer": {
       "is_bogon": true,
@@ -374,22 +375,6 @@
       "is_web": false,
       "is_dns_resolver": false,
       "is_bittorrent": false,
-      "vpn": {},
-      "tor": {},
-      "relay": {},
-      "resproxy": {},
-      "dcproxy": {},
-      "mobproxy": {},
-      "pubproxy": {},
-      "hosting": {},
-      "cdn": {},
-      "carrier": {},
-      "satellite": {},
-      "ssh": {},
-      "smtp": {},
-      "web": [],
-      "dns_resolver": {},
-      "bittorrent": {},
       "location": {
         "continent": "",
         "continent_name": "",
@@ -412,6 +397,22 @@
         "dma_code": "",
         "last_changed": ""
       },
+      "vpn": {},
+      "tor": {},
+      "relay": {},
+      "resproxy": {},
+      "dcproxy": {},
+      "mobproxy": {},
+      "pubproxy": {},
+      "hosting": {},
+      "cdn": {},
+      "carrier": {},
+      "satellite": {},
+      "ssh": {},
+      "smtp": {},
+      "web": [],
+      "dns_resolver": {},
+      "bittorrent": {},
       "asn": {
         "asn": 0,
         "name": "",
@@ -458,7 +459,8 @@
         "abuse_email": ""
       },
       "hosted_domains": {
-        "total": 0
+        "total": 0,
+        "domains": []
       }
     }
   },
@@ -778,8 +780,6 @@
         "is_web": false,
         "is_dns_resolver": false,
         "is_bittorrent": false,
-        "tor": {},
-        "relay": {},
         "location": {
           "continent": "EU",
           "continent_name": "Europe",
@@ -792,6 +792,8 @@
           "flag_emoji": "🇦🇹",
           "flag_unicode": "U+1F1E6 U+1F1F9"
         },
+        "tor": {},
+        "relay": {},
         "asn": {
           "asn": 9009,
           "name": "M247 Europe SRL",
@@ -922,6 +924,28 @@
         "is_web": false,
         "is_dns_resolver": false,
         "is_bittorrent": false,
+        "location": {
+          "continent": "EU",
+          "continent_name": "Europe",
+          "country": "AT",
+          "country_name": "Austria",
+          "timezone": "Europe/Vienna",
+          "currency_code": "EUR",
+          "currency_name": "Euro",
+          "currency_symbol": "€",
+          "flag_emoji": "🇦🇹",
+          "flag_unicode": "U+1F1E6 U+1F1F9",
+          "region": "Vienna",
+          "region_code": "AT-9",
+          "city": "Vienna",
+          "postal_code": "1230",
+          "latitude": 48.20849,
+          "longitude": 16.37208,
+          "accuracy_radius": 10,
+          "geoname_id": "2761369",
+          "dma_code": "",
+          "last_changed": "2026-10-06"
+        },
         "vpn": {
           "provider": "mullvad",
           "provider_name": "Mullvad",
@@ -948,28 +972,6 @@
         "web": [],
         "dns_resolver": {},
         "bittorrent": {},
-        "location": {
-          "continent": "EU",
-          "continent_name": "Europe",
-          "country": "AT",
-          "country_name": "Austria",
-          "timezone": "Europe/Vienna",
-          "currency_code": "EUR",
-          "currency_name": "Euro",
-          "currency_symbol": "€",
-          "flag_emoji": "🇦🇹",
-          "flag_unicode": "U+1F1E6 U+1F1F9",
-          "region": "Vienna",
-          "region_code": "AT-9",
-          "city": "Vienna",
-          "postal_code": "1230",
-          "latitude": 48.20849,
-          "longitude": 16.37208,
-          "accuracy_radius": 10,
-          "geoname_id": "2761369",
-          "dma_code": "",
-          "last_changed": "2026-10-06"
-        },
         "asn": {
           "asn": 9009,
           "name": "M247 Europe SRL",
@@ -1016,7 +1018,8 @@
           "abuse_email": ""
         },
         "hosted_domains": {
-          "total": 0
+          "total": 0,
+          "domains": []
         },
         "trial_expired": false
       },
@@ -1108,8 +1111,6 @@
         "is_web": false,
         "is_dns_resolver": false,
         "is_bittorrent": false,
-        "tor": {},
-        "relay": {},
         "location": {
           "continent": "EU",
           "continent_name": "Europe",
@@ -1122,6 +1123,8 @@
           "flag_emoji": "🇦🇹",
           "flag_unicode": "U+1F1E6 U+1F1F9"
         },
+        "tor": {},
+        "relay": {},
         "asn": {
           "asn": 9009,
           "name": "M247 Europe SRL",
@@ -1253,6 +1256,28 @@
         "is_web": false,
         "is_dns_resolver": false,
         "is_bittorrent": false,
+        "location": {
+          "continent": "EU",
+          "continent_name": "Europe",
+          "country": "AT",
+          "country_name": "Austria",
+          "timezone": "Europe/Vienna",
+          "currency_code": "EUR",
+          "currency_name": "Euro",
+          "currency_symbol": "€",
+          "flag_emoji": "🇦🇹",
+          "flag_unicode": "U+1F1E6 U+1F1F9",
+          "region": "Vienna",
+          "region_code": "AT-9",
+          "city": "Vienna",
+          "postal_code": "1230",
+          "latitude": 48.20849,
+          "longitude": 16.37208,
+          "accuracy_radius": 10,
+          "geoname_id": "2761369",
+          "dma_code": "",
+          "last_changed": "2026-10-06"
+        },
         "vpn": {
           "provider": "mullvad",
           "provider_name": "Mullvad",
@@ -1279,28 +1304,6 @@
         "web": [],
         "dns_resolver": {},
         "bittorrent": {},
-        "location": {
-          "continent": "EU",
-          "continent_name": "Europe",
-          "country": "AT",
-          "country_name": "Austria",
-          "timezone": "Europe/Vienna",
-          "currency_code": "EUR",
-          "currency_name": "Euro",
-          "currency_symbol": "€",
-          "flag_emoji": "🇦🇹",
-          "flag_unicode": "U+1F1E6 U+1F1F9",
-          "region": "Vienna",
-          "region_code": "AT-9",
-          "city": "Vienna",
-          "postal_code": "1230",
-          "latitude": 48.20849,
-          "longitude": 16.37208,
-          "accuracy_radius": 10,
-          "geoname_id": "2761369",
-          "dma_code": "",
-          "last_changed": "2026-10-06"
-        },
         "asn": {
           "asn": 9009,
           "name": "M247 Europe SRL",
@@ -1347,7 +1350,8 @@
           "abuse_email": ""
         },
         "hosted_domains": {
-          "total": 0
+          "total": 0,
+          "domains": []
         }
       },
       "expect": {
@@ -1422,7 +1426,7 @@
     },
     {
       "name": "paid-services",
-      "why": "A paid answer for an address in the Services tables: each flag true has its detail, Web IP's a list, and hosted_domains a count.",
+      "why": "A paid answer for an address in the Services tables: each flag true has its detail, Web IP's a list, and hosted_domains its count and 10 most popular domains.",
       "call": "lookup",
       "target": "1.1.1.1",
       "status": 200,
@@ -1446,6 +1450,28 @@
         "is_web": true,
         "is_dns_resolver": true,
         "is_bittorrent": true,
+        "location": {
+          "continent": "OC",
+          "continent_name": "Oceania",
+          "country": "AU",
+          "country_name": "Australia",
+          "timezone": "Australia/Brisbane",
+          "currency_code": "AUD",
+          "currency_name": "Dollar",
+          "currency_symbol": "A$",
+          "flag_emoji": "🇦🇺",
+          "flag_unicode": "U+1F1E6 U+1F1FA",
+          "region": "Queensland",
+          "region_code": "AU-QLD",
+          "city": "Brisbane",
+          "postal_code": "4000",
+          "latitude": -27.46794,
+          "longitude": 153.02809,
+          "accuracy_radius": 20000,
+          "geoname_id": "2174003",
+          "dma_code": "",
+          "last_changed": "2026-10-13"
+        },
         "vpn": {},
         "tor": {},
         "relay": {},
@@ -1507,28 +1533,6 @@
           "indexer": false,
           "clients": []
         },
-        "location": {
-          "continent": "OC",
-          "continent_name": "Oceania",
-          "country": "AU",
-          "country_name": "Australia",
-          "timezone": "Australia/Brisbane",
-          "currency_code": "AUD",
-          "currency_name": "Dollar",
-          "currency_symbol": "A$",
-          "flag_emoji": "🇦🇺",
-          "flag_unicode": "U+1F1E6 U+1F1FA",
-          "region": "Queensland",
-          "region_code": "AU-QLD",
-          "city": "Brisbane",
-          "postal_code": "4000",
-          "latitude": -27.46794,
-          "longitude": 153.02809,
-          "accuracy_radius": 20000,
-          "geoname_id": "2174003",
-          "dma_code": "",
-          "last_changed": "2026-10-13"
-        },
         "asn": {
           "asn": 13335,
           "name": "Cloudflare, Inc.",
@@ -1575,7 +1579,19 @@
           "abuse_email": ""
         },
         "hosted_domains": {
-          "total": 23427
+          "total": 23427,
+          "domains": [
+            "lomalinda-ca.gov",
+            "vetusware.com",
+            "rentspb.com",
+            "getshifter.net",
+            "worldteach.org",
+            "anne-sexton.net",
+            "greatukrainians.com.ua",
+            "getusinfo.com",
+            "medicinanet.com.br",
+            "imgup.net"
+          ]
         }
       },
       "expect": {

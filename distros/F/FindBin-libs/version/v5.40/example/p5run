@@ -4,7 +4,9 @@
 # updated environment.
 ########################################################################
 
-use FindBin::libs qw( p5lib );
+use v5.40;
+
+use FindBin::libs qw( p5lib nofail );
 
 $0 = shift;
 

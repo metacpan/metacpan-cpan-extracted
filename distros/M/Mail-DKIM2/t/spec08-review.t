@@ -78,9 +78,9 @@ like(detail(s => join('|', map { "s$_:rsa-sha256:AAAA" } 1 .. 8) . '|s1:rsa-sha2
      'a duplicate selector outranks the item limit');
 
 # 6. No fold between base64 padding and the ":" after it (§9.3 ABNF).
-ok(!Mail::DKIM2::Common::_dkim2_fold_ok({ name => 'h', colons => 1 }, '=', ':'),
+ok(!Mail::DKIM2::Fold::_dkim2_fold_ok({ name => 'h', colons => 1 }, '=', ':'),
    'no fold between "=" and ":" in h=');
-ok(Mail::DKIM2::Common::_dkim2_fold_ok({ name => 'h', colons => 2 }, '=', '|'),
+ok(Mail::DKIM2::Fold::_dkim2_fold_ok({ name => 'h', colons => 2 }, '=', '|'),
    'a fold between "=" and "|" is fine');
 
 done_testing;

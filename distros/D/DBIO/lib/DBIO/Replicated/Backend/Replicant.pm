@@ -4,7 +4,7 @@ package DBIO::Replicated::Backend::Replicant;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Replicated::Backend';
 
@@ -37,7 +37,7 @@ DBIO::Replicated::Backend::Replicant - Replicant backend wrapper
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 METHODS
 

@@ -4,8 +4,15 @@ use 5.020;
 use Path::Tiny;
 use Email::MIME;
 use lib 'lib';
-use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_key_record parse_mime
-                           valid_sequence chain_number_error mi_version_tag unkeyable_signature_error);
+use Mail::DKIM2::Common qw(
+    extract_mi_version
+    parse_mime
+    valid_sequence
+    chain_number_error
+    mi_version_tag
+    unkeyable_signature_error
+);
+use Mail::DKIM2::Key qw(parse_dkim_key_record);
 use Mail::DKIM2::Signature;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
@@ -174,7 +181,7 @@ sub find_key {
   # beginning v= other than DKIM1 are ignored; no record is "does not
   # exist"; one that is there but unusable is a PERMERROR with its reason
   # ("is malformed", "has been revoked", ...).
-  my @txt = Mail::DKIM2::Common::key_records(map { $_->[1] } @$records) or return;
+  my @txt = Mail::DKIM2::Key::key_records(map { $_->[1] } @$records) or return;
   die "PERMERROR: has multiple records\n" if @txt > 1;
   my ($key, $why) = parse_dkim_key_record($txt[0]);
   die "PERMERROR: $why\n" unless $key;

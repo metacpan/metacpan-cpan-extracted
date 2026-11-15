@@ -13,7 +13,7 @@ use Mail::DKIM2::MessageInstance;
 my $mi = bless {
     bits => {
         m  => 2,
-        h1 => 'AAAA', b1 => 'BBBB',
+        hashes => { sha256 => ['AAAA', 'BBBB'] },
         rh => { 'List-ID' => [], 'Reply-To' => [], 'X-Weird-CASE' => [] },
     },
 }, 'Mail::DKIM2::MessageInstance';

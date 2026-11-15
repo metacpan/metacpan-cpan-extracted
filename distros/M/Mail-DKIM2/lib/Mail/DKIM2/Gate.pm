@@ -2,15 +2,13 @@ package Mail::DKIM2::Gate;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 use Carp ();
-use Email::MIME;
 use Scalar::Util qw(blessed);
+use Mail::DKIM2::Util ();
 use Mail::DKIM2::HeaderParser;
-use Mail::DKIM2::Common qw(extract_mi_version parse_mime valid_sequence chain_number_error);
-use Mail::DKIM2::MessageInstance;
-use Mail::DKIM2::Signature;
+use Mail::DKIM2::Chain;
 use Mail::DKIM2::Verifier;
 
 =head1 NAME
@@ -47,7 +45,7 @@ C<PubkeyCallback>, C<Resolver> and C<SkipTimestampCheck> are passed to the
 Verifier, C<IgnorePrefixes> to both the Verifier and the Message-Instance
 chain check (the caller's own header fields, hashed by neither end),
 C<PolicyCallback> is passed to the Verifier too,
-C<AllowNullBodyRecipe> is deprecated and does nothing (see
+C<AllowNullBodyRecipe> is deprecated, does nothing and will be removed (see
 L</Null body Recipes>),
 C<SigningDomain> is the C<d=> the caller will sign with: when the top
 upstream signature carries C<nd=> the gate passes only if it equals that
@@ -108,24 +106,6 @@ sub _is_handle {
     return $can ? 1 : 0;
 }
 
-# True when the highest-i= DKIM2-Signature among @$sigs carries nd=. Uses the
-# parsed signature, so FWS around "=" (allowed by the tag-list syntax) is seen.
-sub _top_has_nd {
-    my ($sigs) = @_;
-    my ($best, $top_nd) = (-1, 0);
-    for my $raw (@$sigs) {
-        (my $v = $raw) =~ s/^\s+//;
-        my $sig = eval { Mail::DKIM2::Signature->parse($v) };
-        die $@ if ref $@;
-        next unless $sig;
-        my $i = $sig->sequence;
-        next unless valid_sequence($i) && $i > $best;
-        my $nd = $sig->next_domain;
-        ($best, $top_nd) = ($i, (defined $nd && length $nd) ? 1 : 0);
-    }
-    return $top_nd;
-}
-
 # AllowNullBodyRecipe is retired (0.29, -09 contract E2): this hop's own
 # null is always signed. Still accepted, so an existing caller does not
 # croak; a true value is warned about once per process.
@@ -138,7 +118,7 @@ sub _deprecated_allow_null {
 
 sub check {
     my ($class, $message, %o) = @_;
-    Mail::DKIM2::Common::_check_options("$class->check", \%o,
+    Mail::DKIM2::Util::check_options("$class->check", \%o,
         qw(SigningDomain AllowNullBodyRecipe SkipTimestampCheck IgnorePrefixes
            PubkeyCallback PolicyCallback Resolver VerifyResult));
     # Only a true value asks for the retired behaviour: hm's handler passes
@@ -153,10 +133,12 @@ sub check {
         Mail::DKIM2::HeaderParser::_read_handle($fh, sub { $head .= $_[0]; 1 }, 1);
         $message = $head;
     }
-    my $msg = parse_mime($message);
-    my @sigs = $msg->header_raw('DKIM2-Signature');
-    my @mis  = $msg->header_raw('Message-Instance');
-    my $has_dk2 = @sigs ? 1 : 0;
+    # The chain as its fields number it (Mail::DKIM2::Chain): which
+    # signatures and instances there are, and how far the signatures reach.
+    my $chain   = Mail::DKIM2::Chain->from_message($message);
+    my $has_dk2 = $chain->count('DKIM2-Signature') ? 1 : 0;
+    my $top_sig = $chain->top_signature;
+    my $top_nd  = $top_sig && length($top_sig->next_domain // '') ? 1 : 0;
 
     # nd= bridge: a top signature with nd= may be extended only by the domain
     # it names. A caller-supplied VerifyResult came from a plain verifier that
@@ -164,7 +146,7 @@ sub check {
     my $sd = $o{SigningDomain};
     my $verify_result = $o{VerifyResult};
     $verify_result = undef
-        if defined $sd && length $sd && $has_dk2 && _top_has_nd(\@sigs);
+        if defined $sd && length $sd && $has_dk2 && $top_nd;
     # One Verifier, the body streamed through it. It walks the
     # Message-Instance chain before it looks at a signature, so with no
     # signature, or with the signatures verified already (VerifyResult), it
@@ -173,7 +155,7 @@ sub check {
     # upstream-chain refusal below; on its own it is broken-mi-chain.
     my ($chain_ok, $chain_why) = (1, undef);
     my $instances_only = defined $verify_result || !$has_dk2;
-    if ($has_dk2 || @mis) {
+    if ($has_dk2 || $chain->count('Message-Instance')) {
         my $v = Mail::DKIM2::Verifier->new(
             SkipTimestampCheck => $o{SkipTimestampCheck} ? 1 : 0,
             InstancesOnly      => $instances_only ? 1 : 0,
@@ -196,37 +178,18 @@ sub check {
     }
     $verify_result //= 'none';
 
-    my %by_v;
-    for my $val (@mis) {
-        (my $x = $val) =~ s/^\s+//;
-        $by_v{extract_mi_version($x) // 0} = $x;
-    }
-    my ($top) = sort { $b <=> $a } keys %by_v;
-    my %null = map { $_ => 1 } grep {
-        my $v = $_;
-        my $null = $v && eval { Mail::DKIM2::MessageInstance->parse($by_v{$v})->unrecoverable };
-        die $@ if ref $@;
-        $null;
-    } keys %by_v;
+    my $top = $chain->top_instance;
+    my %null = map { $_ => 1 }
+               grep { my $mi = $chain->instance($_); $mi && $mi->unrecoverable }
+               $chain->instance_numbers;
     my $top_null = ($top && $null{$top}) ? 1 : 0;
-    # How far up the upstream signatures reach: a DKIM2-Signature with m=k
-    # covers instances 1..k (-09 §10.2), so the highest m= of any of them
-    # is the top covered instance, and every instance above it is unsigned --
-    # this hop will be the first to vouch for it. Only a signature with a
-    # valid i= counts: one the Verifier cannot key is a PERMERROR there (so
-    # the upstream-chain check below refuses anyway), and is never coverage
-    # here even if a caller-supplied VerifyResult said "pass".
-    my $covered = 0;
-    for my $raw (@sigs) {
-        (my $v = $raw) =~ s/^\s+//;
-        my $sig = eval { Mail::DKIM2::Signature->parse($v) };
-        die $@ if ref $@;
-        next unless $sig;
-        next unless valid_sequence($sig->sequence);
-        my $m = $sig->version // next;
-        next if chain_number_error('DKIM2-Signature', 'm', $m);
-        $covered = 0 + $m if $m > $covered;
-    }
+    # How far up the upstream signatures reach: every instance above the
+    # highest m= any of them names is unsigned -- this hop will be the first
+    # to vouch for it. Only a signature the chain could number counts: one it
+    # could not is a PERMERROR to the Verifier (so the upstream-chain check
+    # below refuses anyway), and is never coverage here even if a
+    # caller-supplied VerifyResult said "pass".
+    my $covered = $chain->covered_m;
     my $top_signed = ($top && $top <= $covered) ? 1 : 0;
     # The highest unsigned instance with a null body Recipe, the top's own or
     # one under another unsigned instance: a null nobody upstream signed.

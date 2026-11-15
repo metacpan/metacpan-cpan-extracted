@@ -15,7 +15,7 @@ use DBIx::Squirrel::st   qw();
 use namespace::clean;
 
 our @ISA     = 'DBI';
-our $VERSION = 'v2.1.0';
+our $VERSION = 'v3.0.2';
 
 # Export what the DBI exports, such as :sql_types, to the package using
 # DBIx::Squirrel. The names are the DBI's, so the DBI's import exports
@@ -186,25 +186,26 @@ DBIx::Squirrel - DBI, minus the boilerplate, plus a pipeline
 
 =head1 DESCRIPTION
 
-With DBIx::Squirrel, you still write SQL, as you do with the L<DBI>. It
-takes away the friction around it: placeholders in whatever style you
-like, iterators over results, and a pipeline of transformations written
+With DBIx::Squirrel, you still write SQL, as you do with the L<DBI>.
+It takes away the friction around it: placeholders in whatever style
+you like, iterators over results, and a pipeline of stages written
 beside the query.
 
 It's a subclass of the DBI, so everything the DBI does still works.
 Where the two do the same thing, they give the same result. This page
 notes where they differ.
 
-This is version 2, a rewrite of DBIx::Squirrel 1.x for Perl 5.36 or
-later. Code written for 1.x needs changes to run, and the reference's
-"Upgrading from 1.x" lists them. To stay on 1.x, install its last
+This is version 3, built on L<Ekorn::Pipeline>. Version 2 was a
+rewrite of DBIx::Squirrel 1.x for Perl 5.36 or later. Code written for
+either needs changes to run, and the reference's "Upgrading from 2.x"
+and "Upgrading from 1.x" list them. To stay on 1.x, install its last
 version, C<cpanm DBIx::Squirrel@1.6.5>.
 
-The database handle's own methods are in L<DBIx::Squirrel::db>, and the
-statement handle's in L<DBIx::Squirrel::st>. L<DBIx::Squirrel::Iterator>
-and L<DBIx::Squirrel::Results> describe what C<iterate> and C<results>
-return. L<DBIx::Squirrel::Sugar> gives each database a function with
-its own name.
+The database handle's own methods are in L<DBIx::Squirrel::db>, and
+the statement handle's in L<DBIx::Squirrel::st>.
+L<DBIx::Squirrel::Iterator> and L<DBIx::Squirrel::Results> describe
+what C<iterate> and C<results> return. L<DBIx::Squirrel::Sugar> gives
+each database a function with its own name.
 
 =head2 Importing
 
@@ -242,8 +243,8 @@ subclass of DBIx::Squirrel's:
     package My::Squirrel::db { our @ISA = 'DBIx::Squirrel::db' }
     package My::Squirrel::st { our @ISA = 'DBIx::Squirrel::st' }
 
-Without them, the DBI warns that the subclass isn't set up, and returns
-its own handles.
+Without them, the DBI warns that the subclass isn't set up, and
+returns its own handles.
 
 Attributes starting C<ekorn_> are DBIx::Squirrel's own. They aren't
 passed on to the DBI. They're kept in the database handle's
@@ -280,8 +281,8 @@ name, such as C<mysql> or C<Pg>. A driver that passes the connection
 on to another database (DBD::ADO, DBD::Gofer, DBD::JDBC, DBD::ODBC or
 DBD::Proxy) is asked what the database is, through the DBI's
 C<get_info>. MariaDB, MySQL, PostgreSQL and SQLite are recognised. Any
-other database, or one that doesn't say, is read by the standard rules.
-Name the dialect when C<connect> can't tell:
+other database, or one that doesn't say, is read by the standard
+rules. Name the dialect when C<connect> can't tell:
 
     # MySQL, through a driver that doesn't say what's behind it
     $dbh = DBIx::Squirrel->connect($data_source, $username, $password, {
@@ -304,27 +305,28 @@ a new, empty database.
 
 =head3 connect_cached
 
-C<connect_cached> is the DBI's own, unchanged. It calls C<connect> when
-it needs a new connection, so it croaks on failure too.
+C<connect_cached> is the DBI's own, unchanged. It calls C<connect>
+when it needs a new connection, so it croaks on failure too.
 
 =head1 HANDLE METHODS
 
 Database and statement handles both have these methods, inherited from
-L<DBIx::Squirrel::Pipes>. The examples use a database handle. On a
-statement handle, the statement handle goes through the stages instead.
+L<Ekorn::Pipeline::Pipes>. The examples use a database handle. On a
+statement handle, the statement handle goes through the stages
+instead.
 
 =head2 pipe
 
     @results = $dbh->pipe(@stages);
     $result  = $dbh->pipe(@stages);
 
-Runs the database handle through a pipeline of stages, and returns what
-comes out of the last one.
+Runs the database handle through a pipeline of stages, and returns
+what comes out of the last one.
 
 A stage is a code reference, or a pipeline, which stands for its
-stages, as L<DBIx::Squirrel::Pipeline> shows. A code reference is
-called with one value, as its argument and in C<$_>. It can name the
-value with a signature, or leave the signature out and use C<$_>:
+stages, as L<Ekorn::Pipeline> shows. A code reference is called with
+one value, as its argument and in C<$_>. It can name the value with a
+signature, or leave the signature out and use C<$_>:
 
     sub ($row) { $row->[1] }    # the value, named
     sub { $_->[1] }             # the same, in $_
@@ -355,7 +357,7 @@ stage by its position, from C<#1>:
     Pipeline stage #2 failed at script.pl line 12:
         ...
 
-L<DBIx::Squirrel::Pipeline> says more about stages.
+L<Ekorn::Pipeline> says more about stages.
 
 =head2 tap
 
@@ -394,13 +396,14 @@ dies, C<tap> croaks at the line that called it, as L</pipe> does.
     Stop();
     Stop(@values);
 
-    DBIx::Squirrel::Stop->throw(@values);
+    Ekorn::Pipeline::Stop->throw(@values);
 
 Called from a stage of a pipeline, ends the pipeline quietly. The rest
 of that stage doesn't run. The values already out of the pipeline are
-kept, C<@values> go on through the stages after it, and nothing else is
-processed. L<DBIx::Squirrel::Stop> exports C<Stop> by default.
-C<< DBIx::Squirrel::Stop->throw >> does the same without importing it.
+kept, C<@values> go on through the stages after it, and nothing else
+is processed. L<DBIx::Squirrel::Stop> exports C<Stop> by default.
+C<< Ekorn::Pipeline::Stop->throw >> does the same without importing
+it.
 
 Stop works by throwing an exception, which the pipeline catches. So a
 stage that catches errors itself, with C<eval> or C<try>, should throw
@@ -431,10 +434,11 @@ L<DBIx::Squirrel::Stop> says more, including what a stop carries.
     };
 
 Returns a stage that a pipeline makes afresh for each run, by calling
-the block. The block returns the stage, and optionally an end function.
-The end is called once the values run out, and what it returns goes
-through the rest of the stages. Make a stage this way if it gathers
-values, to give them in batches or as one, or keeps state of any kind.
+the block. The block returns the stage, and optionally a flush and an
+end. The flush is called once the values run out, and what it returns
+goes through the rest of the stages. The end is called once the run
+has ended, and told how. Make a stage this way if it gathers values,
+to give them in batches or as one, or keeps state of any kind.
 L<DBIx::Squirrel::Gather> exports C<gather> by default, and says more,
 including what happens after a stop.
 
@@ -446,7 +450,8 @@ exports the stages it's usually used for:
 =over
 
 =item * L<DBIx::Squirrel::Stages::Flow>: C<take> and C<drop>, with
-C<take_while> and C<drop_while> on request;
+C<take_first>, C<take_last>, C<take_single>, C<take_while> and
+C<drop_while> on request;
 
 =item * L<DBIx::Squirrel::Stages::Rows>: C<pluck> and C<as_hash>, for
 rows of any shape;
@@ -461,7 +466,11 @@ with C<dump_to> on request.
     use DBIx::Squirrel::Stages::Flow;
     use DBIx::Squirrel::Stages::Rows;
 
-    my @names = $dbh->iterate('SELECT name FROM artist', pluck('name'), take(10))->all;
+    my @names = $dbh->iterate(
+        'SELECT name FROM artist',
+        pluck('name'),
+        take(10),
+    )->all;
 
 The reference's "Writing stages" says how to write your own stages to
 work alongside them.
@@ -469,8 +478,8 @@ work alongside them.
 =head1 DIAGNOSTICS
 
 Errors are reported at the line of your code that called
-DBIx::Squirrel, never at a line inside it or the DBI. That includes the
-DBI's own errors under C<RaiseError>, such as
+DBIx::Squirrel, never at a line inside it or the DBI. That includes
+the DBI's own errors under C<RaiseError>, such as
 C<DBD::SQLite::db prepare failed: near "SELEC": syntax error>, which
 keep the DBI's message.
 
@@ -489,17 +498,17 @@ method you called.
 
 =item Pipeline stage #%s failed at %s line %d:
 
-A stage passed to L</pipe> or L</tap>, or its end function, died. The
-message it died with follows, indented. A stage inside a pipeline given
-as a stage is named C<#2.3>, for the third stage of the pipeline given
-as stage #2.
+A stage passed to L</pipe> or L</tap>, or its flush, died. The message
+it died with follows, indented. A stage inside a pipeline given as a
+stage is named C<#2.3>, for the third stage of the pipeline given as
+stage #2. A stage of a named pipeline is named by its name and its
+place there too, as C<#2.2 (main::fussy#2)>.
 
-=item Expected stage #%d to be a code reference or a pipeline
+=item Expected stage #%d to be a stage: a code reference, a pipeline, or an object offering a stage's role method
 
-Something passed to L</pipe> or L</tap> wasn't a code reference or a
-pipeline. No stage runs.
+Something passed to L</pipe> or L</tap> wasn't a stage. No stage runs.
 
-=item Expected stage #%s, made with gather, to return a code reference or a pipeline, and optionally an end function
+=item Expected stage #%s, made with gather, to return a code reference or a pipeline, and optionally a flush and an end
 
 The block given to L</gather> for that stage returned something else.
 
@@ -514,15 +523,15 @@ L</Stop> was called where no pipeline was running to catch it.
 L<DBI>, L<DBIx::Squirrel::db>, L<DBIx::Squirrel::st>,
 L<DBIx::Squirrel::Iterator>, L<DBIx::Squirrel::Results>,
 L<DBIx::Squirrel::Result>, L<DBIx::Squirrel::Context>,
-L<DBIx::Squirrel::Sugar>,
-L<DBIx::Squirrel::Pipes>, L<DBIx::Squirrel::Pipeline>,
-L<DBIx::Squirrel::Stop>, L<DBIx::Squirrel::Gather>,
-L<DBIx::Squirrel::Stages::Flow>, L<DBIx::Squirrel::Stages::Rows>,
-L<DBIx::Squirrel::Stages::Batch>, L<DBIx::Squirrel::Stages::Taps>
+L<DBIx::Squirrel::Sugar>, L<Ekorn::Pipeline>,
+L<Ekorn::Pipeline::Pipes>, L<DBIx::Squirrel::Stop>,
+L<DBIx::Squirrel::Gather>, L<DBIx::Squirrel::Stages::Flow>,
+L<DBIx::Squirrel::Stages::Rows>, L<DBIx::Squirrel::Stages::Batch>,
+L<DBIx::Squirrel::Stages::Taps>, L<DBIx::Squirrel::Tooling>
 
-L<DBIx::Squirrel::Manual::Reference> describes every feature in detail,
-with examples. L<DBIx::Squirrel::Manual::HowTo> shows how to do common
-tasks.
+L<DBIx::Squirrel::Manual::Reference> describes every feature in
+detail, with examples. L<DBIx::Squirrel::Manual::HowTo>, the user
+guide, is a tour of the package, a layer at a time, with recipes.
 
 =head1 AUTHOR
 
@@ -532,7 +541,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

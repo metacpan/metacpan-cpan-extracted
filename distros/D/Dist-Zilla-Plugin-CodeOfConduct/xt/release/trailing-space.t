@@ -21,6 +21,7 @@ my $finder = Test::TrailingSpace->new(
    {
        root => '.',
        filename_regex => qr#\.(?:p[lm]|pod)\z#,
+       abs_path_prune_re => undef,
    },
 );
 

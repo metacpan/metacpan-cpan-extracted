@@ -4,7 +4,7 @@ package DBIO::DeploymentHandler::HandlesDeploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::Exception;
 
@@ -55,7 +55,7 @@ DBIO::DeploymentHandler::HandlesDeploy - Interface for deploy methods
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

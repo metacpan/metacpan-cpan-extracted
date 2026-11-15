@@ -184,13 +184,29 @@ subtest 'lateral option' => sub {
     like nup('--lateral date'), qr/-Mup .*--lateral .*-- date$/, 'lateral, command';
     like nup('--lateral cpanfile'), qr/--lateral .*-- ansicolumn cpanfile$/, 'lateral, file';
     like nup('-L -C4 date'), qr/-Mup .* -L .*-C 4 .*-- date$/, '-L with -C';
-    ok system("$script -n -L cpanfile Changes >/dev/null 2>&1") != 0, '-L with two files fails';
     unlike nup('--lateral cpanfile'), qr/--no-paginate/, 'page mode is kept';
-    my $fail = sub { system("$script -n @_ >/dev/null 2>&1") != 0 };
-    ok  $fail->('--lateral cpanfile Changes'), 'lateral with two files fails';
-    ok  $fail->('--lateral -V cpanfile'), 'lateral with -V fails';
-    ok !$fail->('--lateral cpanfile -w 100'), 'an option after the file is not a file';
-    like nup('--lateral cpanfile Changes'), qr/lateral/, 'the message tells the option';
+    # files side by side go on to the right, without pages
+    like nup('-L cpanfile Changes'), qr/-Mup .* -L .*--no-paginate -- ansicolumn cpanfile Changes$/,
+        '-L with two files';
+    like nup('-L -V cpanfile'), qr/-Mup .* -L -V .*--no-paginate -- ansicolumn cpanfile$/,
+        '-L with -V';
+    like nup('-L -V date'), qr/-Mup .* -L .*--no-paginate -- date$/, '-L with -V, command';
+    unlike nup('-L cpanfile -w 100'), qr/--no-paginate/, 'an option after the file is not a file';
+    # one input without pages has nothing to put on the right
+    my $out = nup('-L -F cpanfile');
+    like $out, qr/ -L .*--no-lateral .*--no-paginate -- ansicolumn cpanfile$/,
+        '-L is turned off with -F and one file';
+};
+
+subtest 'NUP_OPTS' => sub {
+    local $ENV{NUP_OPTS} = '-L -C3';
+    like nup('date'), qr/-Mup .* -L .*-C 3 .*-- date$/, 'options of NUP_OPTS';
+    like nup('-C2 date'), qr/-C 3 -C 2 .*-- date$/,
+        'options on the command line come after them';
+    like nup('cpanfile Changes'), qr/ -L .*--no-paginate -- ansicolumn cpanfile Changes$/,
+        'they work as the others';
+    $ENV{NUP_OPTS} = '';
+    unlike nup('date'), qr/ -L /, 'empty NUP_OPTS';
 };
 
 subtest 'pdf options' => sub {

@@ -145,6 +145,9 @@ The `default` associative array supports:
 | `default[width]` | `--width` | `170` |
 | `default[fold_width]` | `--fold-width` | `80` |
 | `default[base_color]` | `--base-color` | `DarkCyan` |
+| `default[lateral]` | `--lateral` | `1` |
+
+`default[lateral]` is left out where nup cannot make the row (`-w`, rows, PDF; with `--parallel`, App::nup 1.17 puts the files side by side in one row), while `-L` given with `-w` is an error; with `--lateral` set either way, `default[width]` is not used, because `-w` after the file name would make rows of the pages again.
 
 Priority: command-line option > config default > built-in default.
 
@@ -208,7 +211,7 @@ flowchart LR
 
 Each stage is controlled by `--style` and individual `--[no-]fold`, `--[no-]table`, `--[no-]trim`, `--[no-]rule`, `--[no-]nup` options. Fold and table processing are handled within the greple `-Mmd` module (not as separate pipeline stages).
 
-`--parallel` (`-V`) shows two or more files side by side: greple already separates files with `\f`, so `run_nup` invokes `nup -V --pane=$_cols - --pages` and ansicolumn lays the pages out as panes (one per file unless `--pane` is given; `_cols` is set to the file count so the fold width follows). With a single file the option is ignored.
+`--parallel` (`-V`) shows two or more files side by side: greple already separates files with `\f`, so `run_nup` invokes `nup -V --pane=$_cols - --pages` and ansicolumn lays the pages out as panes (one per file; without `--pane`, `_cols` is the smaller of the file count and the panes that fit, `_total / pane_width`, as nup counts them, so the fold width follows). The files beyond the screen go on below, or to the right with `--lateral`, instead of narrowing the panes. Until 1.18 `_cols` was the file count, chosen for two files side by side without thinking of more. With a single file the option is ignored.
 
 `--[no-]filename` controls the file name label that greple prints at the top of each file (`--filestyle=once`, format and color from the `FILE_FORMAT`/`FILE` theme keys): `--no-filename` passes `-h` to greple so that panes start with the text. The label is only printed for more than one file anyway.
 

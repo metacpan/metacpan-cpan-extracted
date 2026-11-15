@@ -31,10 +31,11 @@ my @locales = qw(en fr de es it pt ru ja zh ko ar hi nl sv pl tr he th id vi);
 splice @locales, $ENV{TK_SWEEP_LOCALES} if $ENV{TK_SWEEP_LOCALES} && $ENV{TK_SWEEP_LOCALES} < @locales;
 
 # Zones whose rules changed between DateTime::TimeZone's tzdata (2025c) and
-# Zone's (2026e), from the instant they changed.
+# Zone's (2026f), from the instant they changed.
 my %changed_from = (
     (map { $_ => 1767225600 } qw(America/Winnipeg America/Inuvik America/Edmonton
-                                 America/Vancouver Africa/Casablanca Africa/El_Aaiun)),
+                                 America/Vancouver Africa/Casablanca Africa/El_Aaiun
+                                 America/Havana)),
     'Europe/Chisinau' => 1640995200,
 );
 my %skip = map { $_ => 1 } qw(EST5EDT CST6CDT MST7MDT PST8PDT);

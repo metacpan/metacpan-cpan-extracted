@@ -34,9 +34,11 @@ use Getopt::Long qw(GetOptions);
 use FindBin;
 use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
 
-use Mail::DKIM2::Common qw(fold_header parse_dkim_pubkey parse_mime);
+use Mail::DKIM2::Address ();
+use Mail::DKIM2::Common qw(parse_mime);
+use Mail::DKIM2::Key qw(parse_dkim_pubkey);
 use Mail::DKIM2::Gate;
-use Mail::DKIM2::MessageInstance;
+use Mail::DKIM2::Hop;
 use Mail::DKIM2::Signer;
 
 my ($selector, $domain, $keyfile, $timestamp, $next_domain);
@@ -125,16 +127,13 @@ unless ($gate->{ok}) {
 
 my $msg = parse_mime($raw);
 
-# §12.1/§12.2.5: only add an instance if this hop actually changed something.
-# MessageInstance->verify returns the version it matched, so a true result means
-# the top instance still describes the message and must be reused.
-my $mi_header;
-unless (Mail::DKIM2::MessageInstance->verify($msg)) {
-    my $mi = Mail::DKIM2::MessageInstance->calculate($msg, undef, Algs => $algs);
-    ($mi_header = fold_header('Message-Instance: ' . $mi->as_string))
-        =~ s/^Message-Instance:\s*//;
-    $msg->header_raw_prepend('Message-Instance', $mi_header);
-}
+# -09 section 12.1: add an instance only if the message has none. One whose
+# top instance still describes it is signed over that; one whose top
+# instance does not was refused by the gate above (this tool keeps no
+# snapshot to say what changed).
+my $next = Mail::DKIM2::Hop->next_instance($raw, Algs => $algs);
+$msg->header_raw_prepend('Message-Instance', $next->{instance}->as_header_value)
+    if $next->{instance};
 
 my $signer = Mail::DKIM2::Signer->new(
     Selector => $selector,
@@ -148,7 +147,7 @@ my $signer = Mail::DKIM2::Signer->new(
     ($exploded ? (Exploded => 1) : ()),
     # -09 contract E3.4: a d= below the From domain signs only for a
     # --parent-from domain; no DNS lookup.
-    ParentFromCallback => Mail::DKIM2::Common::parent_from_matcher(@parent_from),
+    ParentFromCallback => Mail::DKIM2::Address::parent_from_matcher(@parent_from),
 );
 $signer->PRINT($msg->as_string);
 $signer->CLOSE;

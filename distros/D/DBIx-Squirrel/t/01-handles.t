@@ -3,6 +3,7 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use DBIx::Squirrel;
+use Ekorn::Pipeline::Pipes qw();
 
 package My::Squirrel {
     our @ISA = 'DBIx::Squirrel';
@@ -38,11 +39,11 @@ subtest "a subclass's own handle classes" => sub {
 
 # The DBI's classes come first in each handle class's @ISA, so a pipe or
 # tap added to the DBI would silently take the place of ours.
-subtest 'pipe and tap come from DBIx::Squirrel::Pipes' => sub {
+subtest 'pipe and tap come from Ekorn::Pipeline::Pipes' => sub {
     for my $class (qw(DBIx::Squirrel::db DBIx::Squirrel::st)) {
         for my $method (qw(pipe tap)) {
             ref_is $class->can($method),
-                DBIx::Squirrel::Pipes->can($method),
+                Ekorn::Pipeline::Pipes->can($method),
                 "${class}->$method";
         }
     }

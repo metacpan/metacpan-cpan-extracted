@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.13.1';
+our $VERSION = '1.14.0';
 
 our @FLAGS = qw(is_registered is_disposable has_a has_aaaa has_mx has_ns has_cname);
 # Copied as served, and paid: absent from an answer whose plan leaves them out.

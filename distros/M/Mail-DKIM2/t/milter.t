@@ -13,6 +13,7 @@ use File::Find ();
 use lib 'lib', 't/lib';
 use MockAuthMilter qw(run_sign);
 use Mail::Milter::Authentication::Handler::DKIM2Verify;
+use Mail::DKIM2::Signature;
 use Mail::Milter::Authentication::Handler::DKIM2Sign;
 use Mail::DKIM2::Common qw(parse_dkim_pubkey strip_mi_versions);
 use DKIM2TestKeys;
@@ -21,6 +22,8 @@ use Mail::DKIM2::MessageStore;
 # Helper: feed a raw message through milter verify callbacks
 sub run_verify {
     my ($raw, %opts) = @_;
+    # _envelope: [MAIL FROM, [RCPT TO...]] in place of the top signature's.
+    my $envelope = delete $opts{_envelope};
     # _bare: pass only the given options, as a config file that leaves the
     # rest out would.
     my $config = delete $opts{_bare} ? { %opts } : {
@@ -55,8 +58,15 @@ sub run_verify {
     }
     push @header_lines, $current if $current ne '';
 
-    # Run callbacks
-    $handler->envfrom_callback('<sender@test1.dkim2.com>');
+    # Run callbacks, with the envelope the top signature names, as the MTA
+    # the message was sent to would see it (-09 section 14.4 checks it).
+    my ($top) = sort { $b->sequence <=> $a->sequence }
+                map  { Mail::DKIM2::Signature->parse((split /:/, $_, 2)[1]) }
+                grep { /^DKIM2-Signature\s*:/i } @header_lines;
+    $envelope //= $top ? [ $top->mail_from // '<>', $top->rcpt_to || [] ]
+                       : [ '<sender@test1.dkim2.com>', [] ];
+    $handler->envfrom_callback($envelope->[0]);
+    $handler->envrcpt_callback($_) for @{ $envelope->[1] };
 
     for my $hline (@header_lines) {
         my ($name, $value) = $hline =~ /^([^\s:]+)\s*:\s*(.*)/s;
@@ -787,6 +797,26 @@ for my $c (
     is(scalar @rem, 2, 'no signature: both unsigned instances removed');
     ok(grep({ $_->{field} eq 'X-DKIM2-Info' && $_->{value} =~ /removed-unsigned-mi=m=1,m=2;/ } @{$mock->{pre_headers}}),
        'no signature: removal recorded');
+}
+
+# --- -09 section 14.4: the envelope must match the top signature ---
+{
+    my $msg = make_originator_message();
+    my $top = (sort { $b->sequence <=> $a->sequence }
+               map { Mail::DKIM2::Signature->parse($_) }
+               Email::MIME->new($msg)->header_raw('DKIM2-Signature'))[0];
+    my $mf = $top->mail_from;
+    my $v = run_verify($msg, _envelope => [ $mf, $top->rcpt_to ]);
+    is($v->{_auth_headers}[0]{value}, 'pass', 'envelope: the envelope signed for passes');
+
+    $v = run_verify($msg, _envelope => [ $mf, ['<mallory@example.org>'] ]);
+    is($v->{_auth_headers}[0]{value}, 'fail', 'envelope: a replay to another recipient fails');
+
+    $v = run_verify($msg, _envelope => [ '<mallory@example.org>', $top->rcpt_to ]);
+    is($v->{_auth_headers}[0]{value}, 'fail', 'envelope: another MAIL FROM fails');
+
+    $v = run_verify($msg, check_envelope => 0, _envelope => [ $mf, ['<mallory@example.org>'] ]);
+    is($v->{_auth_headers}[0]{value}, 'pass', 'envelope: check_envelope 0 does not check');
 }
 
 done_testing();

@@ -4,10 +4,11 @@ use strict;
 use warnings;
 use Mail::Milter::Authentication::Pragmas;
 # ABSTRACT: Handler class for DKIM2 signature verification
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 use base 'Mail::Milter::Authentication::Handler';
 
-use Mail::DKIM2::Common qw(extract_mi_version parse_dkim_pubkey fold_header parse_mime);
+use Mail::DKIM2::Common qw(extract_mi_version parse_mime);
+use Mail::DKIM2::Key qw(parse_dkim_pubkey);
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::MessageStore;
@@ -22,6 +23,7 @@ sub default_config {
         'add_message_instance' => 1,      # compute and add MI header on inbound
         'snapshot_directory'   => undef,  # store message snapshots for egress diffing
         'ignore_header_prefixes' => [],   # our own fields, hashed by neither end (IgnorePrefixes)
+        'check_envelope'       => 1,      # -09 section 14.4: MAIL FROM/RCPT TO against the top signature
     };
 }
 
@@ -52,7 +54,13 @@ sub envfrom_callback {
     $self->{'has_mi'}      = 0;
     $self->{'carry'}       = q{};
     $self->{'env_from'}    = $env_from;
+    $self->{'env_rcpt'}    = [];
     $self->destroy_object('dkim2_verifier');
+}
+
+sub envrcpt_callback {
+    my ( $self, $env_to ) = @_;
+    push @{ $self->{'env_rcpt'} }, $env_to;
 }
 
 sub header_callback {
@@ -90,8 +98,16 @@ sub eoh_callback {
 
     my $verifier;
     eval {
+        # -09 section 14.4: the envelope this message arrived with must match
+        # its top signature, or a message signed for one recipient verifies
+        # when replayed to another.
+        my @envelope = $self->_config()->{'check_envelope'} ? (
+            MailFrom => $self->{'env_from'} // '<>',
+            RcptTo   => [ @{ $self->{'env_rcpt'} || [] } ],
+        ) : ();
         $verifier = Mail::DKIM2::Verifier->new(
             IgnorePrefixes => $self->_config()->{'ignore_header_prefixes'},
+            @envelope,
         );
         $self->_setup_pubkey_callback($verifier);
         $self->set_object('dkim2_verifier', $verifier, 1);
@@ -259,7 +275,7 @@ sub _add_mi_and_store {
             # Compute MI m=1 and prepend it.
             my $mi = Mail::DKIM2::MessageInstance->calculate($msg, undef,
                 IgnorePrefixes => $config->{'ignore_header_prefixes'});
-            $mi_value = $self->_format_mi($mi);
+            $mi_value = $mi->as_header_value;
             $self->prepend_header( 'Message-Instance', $mi_value );
             $snapshot = "Message-Instance: $mi_value$EOL" . $message_data;
             $self->dbgout( 'DKIM2MI', "Added Message-Instance m=" . ($mi->get_tag('m') || '?'), LOG_DEBUG );
@@ -294,14 +310,6 @@ sub _strip_snapshot_header {
     $self->change_header( 'X-DKIM2-Snapshot', $_, q{} ) for reverse 1 .. $n;
 }
 
-# Format MI header value with folding for insertion into message
-sub _format_mi {
-    my ( $self, $mi ) = @_;
-    my $folded = fold_header("Message-Instance: " . $mi->as_string());
-    $folded =~ s/^Message-Instance: //;
-    return $folded;
-}
-
 sub close_callback {
     my ( $self ) = @_;
     delete $self->{'failmode'};
@@ -312,6 +320,7 @@ sub close_callback {
     delete $self->{'has_dkim2'};
     delete $self->{'has_mi'};
     delete $self->{'env_from'};
+    delete $self->{'env_rcpt'};
     $self->destroy_object('dkim2_verifier');
 }
 
@@ -391,8 +400,16 @@ module here follows.
         "extra_properties"     : 0,      | Add extra properties to auth results
         "dns_overrides"        : null,   | Path to dns.json for testing
         "add_message_instance" : 1,      | Compute and add MI header on inbound
-        "snapshot_directory"   : null     | Store message snapshots for egress diffing
+        "snapshot_directory"   : null,    | Store message snapshots for egress diffing
+        "check_envelope"       : 1        | MAIL FROM/RCPT TO must match the top signature
     }
+
+With C<check_envelope> on (the default) the SMTP envelope must match the top
+DKIM2-Signature (-09 section 14.4): MAIL FROM equal to its C<mf=> and every
+RCPT TO in its C<rt=>, or the result is C<fail>. Without that a message
+signed for one recipient verifies when replayed to another. Set it to 0 only
+on an internal hop behind one that has checked the envelope the message
+arrived with.
 
 When C<add_message_instance> is enabled, the handler computes a Message-Instance
 header after successful DKIM2 verification and prepends it to the message.
@@ -423,6 +440,10 @@ Returns the metrics hash for this handler (C<dkim2_verify_total>).
 =head2 envfrom_callback($env_from)
 
 Resets per-message state and records the envelope sender.
+
+=head2 envrcpt_callback($env_to)
+
+Records an envelope recipient, for the C<check_envelope> comparison.
 
 =head2 header_callback($header, $value, $original)
 

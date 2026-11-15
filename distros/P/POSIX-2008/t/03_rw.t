@@ -158,10 +158,10 @@ SKIP: {
   sysseek $fh, 0, 0;
 
   $rv = eval { my $buf = 'foobar'; POSIX::2008::readv($fh, $buf, []) };
-  ok(!$rv && $@ =~ /'buffers' is not an ARRAY/i, 'readv rejects non-arrayref buffers');
+  ok(!$rv && $@ =~ /buffers is not an ARRAY/i, 'readv rejects non-arrayref buffers');
 
   $rv = eval { my $buf = {}; POSIX::2008::readv($fh, $buf, []) };
-  ok(!$rv && $@ =~ /'buffers' is not an ARRAY/i, 'readv rejects non-arrayref buffers');
+  ok(!$rv && $@ =~ /buffers is not an ARRAY/i, 'readv rejects non-arrayref buffers');
 
   $rv = eval { my $buf = []; POSIX::2008::readv($fh, $buf, 'foobar') };
   ok(!$rv && $@ =~ /not an ARRAY/i, 'readv rejects non-arrayref sizes');

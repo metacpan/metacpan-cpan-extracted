@@ -1,11 +1,14 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 use Email::MIME;
 use List::Util qw(max);
-use Mail::DKIM2::Common qw(extract_mi_version domain_of to_alabel relaxed_domain_match parse_dkim_pubkey parse_mime);
+use Mail::DKIM2::Util ();
+use Mail::DKIM2::Common qw(extract_mi_version parse_mime);
+use Mail::DKIM2::Address qw(domain_of to_alabel relaxed_domain_match);
+use Mail::DKIM2::Key qw(parse_dkim_pubkey);
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
@@ -130,10 +133,10 @@ sub _default_cb {
         if ($dns && $dom && $sel && (my $rr = $dns->{$dom}{"$sel._domainkey"})) {
             # As the Verifier's own fetch: non-DKIM1 records ignored, then
             # one record or an error (-09 section 3.7).
-            my @t = Mail::DKIM2::Common::key_records(map { $_->[1] } @$rr);
+            my @t = Mail::DKIM2::Key::key_records(map { $_->[1] } @$rr);
             die "PERMERROR: has multiple records\n" if @t > 1;
             if (@t) {
-                my ($key, $why) = Mail::DKIM2::Common::parse_dkim_key_record($t[0]);
+                my ($key, $why) = Mail::DKIM2::Key::parse_dkim_key_record($t[0]);
                 die "PERMERROR: $why\n" unless $key;
                 return $key;
             }
@@ -157,7 +160,7 @@ sub _default_cb {
 # deploy/www/verify/verify.js's verifyMessage().
 sub report {
     my ($text, %opts) = @_;
-    Mail::DKIM2::Common::_check_options('Mail::DKIM2::Validate::report', \%opts,
+    Mail::DKIM2::Util::check_options('Mail::DKIM2::Validate::report', \%opts,
         qw(DnsPath PubkeyCallback PolicyCallback SkipTimestampCheck));
     $text //= '';
 

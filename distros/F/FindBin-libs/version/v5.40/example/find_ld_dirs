@@ -4,9 +4,7 @@
 # See POD for abspath vs. noabspath walk behavior.
 ########################################################################
 
-use strict;
-use warnings;
-use feature 'say';
+use v5.40;
 
 use FindBin::Bin
 qw
@@ -26,6 +24,7 @@ qw
     base=blib
     subdir=arch/auto
     subonly
+    nofail
 );
 
 say "logical  bin (\$Bin_l): $Bin_l";

@@ -3,8 +3,8 @@ use v5.36;
 package DBIx::Squirrel::Placeholders;
 
 use Exporter   qw(import);
-use List::Util qw(any         max        uniq);
-use Ref::Util  qw(is_arrayref is_hashref is_plain_ref);
+use List::Util qw(any         max              uniq);
+use Ref::Util  qw(is_arrayref is_plain_hashref is_plain_ref);
 
 use DBIx::Squirrel::Errors qw(croakf);
 
@@ -166,7 +166,7 @@ sub values_for ($binds, @args) {
         return map { ($_ => $args[$_ - 1]) } keys %$binds;
     }
     my %values;
-    if (@args == 1 && is_hashref($args[0])) {
+    if (@args == 1 && is_plain_hashref($args[0])) {
         %values = %{ $args[0] };
     }
     else {
@@ -282,15 +282,15 @@ DBIx::Squirrel::Placeholders - find the placeholders in a statement, and match v
 =head1 DESCRIPTION
 
 The functions L<DBIx::Squirrel::db> and L<DBIx::Squirrel::st> use to
-find the placeholders in a statement, rewrite them as C<?> for the DBI,
-and match the values given to them. They're for DBIx::Squirrel itself.
-None is exported by default.
+find the placeholders in a statement, rewrite them as C<?> for the
+DBI, and match the values given to them. They're for DBIx::Squirrel
+itself. None is exported by default.
 
-Several take a statement's map of its placeholders' numbers or names to
-their positions, from 1, such as C<< {id => [1, 3], name => [2]} >>.
-It's called C<$binds> below. Others take what a statement handle keeps
-about its statement, called C<$state>, which holds that map as
-C<Binds>.
+Several take a statement's map of its placeholders' numbers or names
+to their positions, from 1, such as
+C<< {id => [1, 3], name => [2]} >>. It's called C<$binds> below.
+Others take what a statement handle keeps about its statement, called
+C<$state>, which holds that map as C<Binds>.
 
 =head1 FUNCTIONS
 
@@ -453,7 +453,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

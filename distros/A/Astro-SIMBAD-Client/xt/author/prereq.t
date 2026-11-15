@@ -20,6 +20,9 @@ my $tpm = Test::Prereq::Meta->new(
 	blib/script
 	blib/lib/Astro/SIMBAD/Client/WSQueryInterfaceService.pm
 	} ],
+    uses	=> [ qw{
+	LWP::Protocol::https
+	} ],
 );
 
 $tpm->all_prereq_ok();

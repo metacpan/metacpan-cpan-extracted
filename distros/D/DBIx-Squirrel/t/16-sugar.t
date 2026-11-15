@@ -3,7 +3,9 @@ use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
 use DBIx::Squirrel;
-use Sub::Util qw();
+use Ekorn::Pipeline        qw();
+use Ekorn::Pipeline::Sinks qw(count_items keep_all);
+use Sub::Util              qw();
 
 # An in-memory SQLite database lasts as long as its handle, which
 # connect_cached keeps, so each use of music sees the same one.
@@ -75,21 +77,33 @@ subtest 'a statement, executed' => sub {
 
 subtest 'through stages' => sub {
     my $sql = 'SELECT id, name FROM artist ORDER BY id';
-    is [music $sql, sub ($row) { $row->[1] }], [qw(Abba Blur Cream)],
-        'the results';
-    is scalar(music $sql, sub ($row) { $row->[0] > 1 ? $row : () }), 2,
-        'or how many in scalar context';
-    is [music $sql, {ekorn_slice => {}}, sub ($row) { $row->{name} }],
+    my $it  = music $sql, sub ($row) { $row->[1] };
+    isa_ok $it, ['DBIx::Squirrel::Iterator'], 'an iterator';
+    is [$it->all], [qw(Abba Blur Cream)], 'over the results';
+    is scalar(music $sql, sub ($row) { $row->[1] }), T(),
+        'an iterator in scalar context too, not a count';
+    is [music $sql, sub ($row) { $row->[1] }, keep_all], [qw(Abba Blur Cream)],
+        'or a sink\'s result, a list';
+    is scalar(music $sql, sub ($row) { $row->[1] }, keep_all),
+        [qw(Abba Blur Cream)], 'an array reference for one value';
+    is
+        scalar(music $sql, sub ($row) { $row->[0] > 1 ? $row : () }, count_items),
+        2, 'and count_items for how many';
+    is [music $sql, {ekorn_slice => {}}, sub ($row) { $row->{name} }, keep_all],
         [qw(Abba Blur Cream)], 'with attributes';
-    is [music 'SELECT name FROM artist WHERE id > ?', 1, sub { $_->[0] }],
+    is [
+        music 'SELECT name FROM artist WHERE id > ?', 1, sub { $_->[0] },
+        keep_all,
+        ],
         [qw(Blur Cream)], 'and bind values';
 };
 
 subtest 'a statement handle' => sub {
     my $sth = music->prepare('SELECT name FROM artist WHERE id = ?');
     ref_is music($sth, 1), $sth, 'executed itself';
-    is $sth->fetchrow_arrayref,                   ['Abba'],  'with the bind values';
-    is [music $sth, 3, sub ($row) { $row->[0] }], ['Cream'], 'or iterated';
+    is $sth->fetchrow_arrayref, ['Abba'], 'with the bind values';
+    is [music $sth, 3, sub ($row) { $row->[0] }, keep_all], ['Cream'],
+        'or iterated';
 };
 
 subtest 'defined as the program runs' => sub {
@@ -164,12 +178,14 @@ subtest 'connected again when the connection has gone' => sub {
 };
 
 subtest 'statements, defined on use' => sub {
-    is [artist_names], [qw(Abba Blur Cream)], 'the results, through its stages';
-    is scalar(artist_names), 3,               'or how many in scalar context';
-    is [artist_names sub ($name) { lc $name }], [qw(abba blur cream)],
+    isa_ok artist_names, ['DBIx::Squirrel::Iterator'], 'an iterator';
+    is [artist_names->all],       [qw(Abba Blur Cream)], 'through its stages';
+    is [artist_names keep_all],   [qw(Abba Blur Cream)], 'or a sink\'s result';
+    is artist_names(count_items), 3, 'how many, with count_items';
+    is [artist_names sub ($name) { lc $name }, keep_all], [qw(abba blur cream)],
         'with stages added for a call';
-    is [artist_names], [qw(Abba Blur Cream)], 'and for that call only';
-    is [named],        [qw(Abba Blur Cream)], 'with attributes';
+    is [artist_names keep_all], [qw(Abba Blur Cream)], 'and for that call only';
+    is [named keep_all],        [qw(Abba Blur Cream)], 'with attributes';
     ok main->can('statement'), 'statement is imported';
 };
 
@@ -202,7 +218,7 @@ subtest 'a stage calling its own statement' => sub {
     # while its iterator hands them out; more than a batch, and it's
     # still fetching.
     for my $n (3, 150) {
-        is [ns_upto($n, sub ($id) { [$id, scalar ns_upto($id)] })],
+        is [ns_upto($n, sub ($id) { [$id, ns_upto($id, count_items)] }, keep_all)],
             [map { [$_, $_] } 1 .. $n], "has a statement handle of its own ($n rows)";
     }
 };
@@ -211,14 +227,14 @@ subtest 'a list placeholder' => sub {
     my $sql = 'SELECT name FROM artist WHERE id IN (...:ids) ORDER BY id';
     is music($sql, ids => [1, 3])->fetchall_arrayref, [['Abba'], ['Cream']],
         'through the database, executed';
-    is [music $sql, ids => [2, 3], sub ($row) { $row->[0] }], [qw(Blur Cream)],
-        'or through stages';
+    is [music $sql, ids => [2, 3], sub ($row) { $row->[0] }, keep_all],
+        [qw(Blur Cream)], 'or through stages';
     statement(
         artists_by_id => music => $sql,
         sub ($row) { $row->[0] },
     );
-    is [artists_by_id(ids => [3])], ['Cream'], 'as a statement';
-    is [artists_by_id(ids => [1, 2, 3])], [qw(Abba Blur Cream)],
+    is [artists_by_id(ids => [3], keep_all)], ['Cream'], 'as a statement';
+    is [artists_by_id(ids => [1, 2, 3], keep_all)], [qw(Abba Blur Cream)],
         'prepared for each list';
 
     database(
@@ -243,7 +259,7 @@ subtest 'statements defined as the program runs' => sub {
     );
     ref_is $function, \&count_of,
         'gives the package its function, and returns it';
-    my $expected = 'Expected a database defined as later';
+    my $expected = 'Expected a database named later';
     my $line     = __LINE__ + 1;
     like dies { count_of() },
         qr( \A \Q$expected\E \ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
@@ -253,7 +269,7 @@ subtest 'statements defined as the program runs' => sub {
         '', '', {RaiseError => 1, PrintError => 0, LongReadLen => 1024},
     );
     later('CREATE TABLE t (x)');
-    is [count_of()], [0], 'so it can be defined after the statement';
+    is [count_of(keep_all)], [0], 'so it can be defined after the statement';
 };
 
 # The error from using DBIx::Squirrel::Sugar with the arguments given.
@@ -262,7 +278,7 @@ sub use_error ($args) {
 }
 
 subtest 'mistakes' => sub {
-    my $expected = 'Expected a database defined as unknown';
+    my $expected = 'Expected a database named unknown';
     my $line     = __LINE__ + 1;
     like dies { database('unknown') },
         qr( \A \Q$expected\E \ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
@@ -296,12 +312,73 @@ subtest 'mistakes' => sub {
     like dies { statement(nowhere => undef, 'SELECT 1') },
         qr( \A \QExpected a database and a statement for nowhere\E )x,
         'a statement on no database';
-    like dies { statement(odd => music => 'SELECT 1', 'x') },
-        qr( \A \QExpected only code references or pipelines after the statement for odd\E )x,
-        'anything but code references or pipelines after it';
+    like dies { statement(odd => music => 'SELECT 1', ['x']) },
+        qr( \A \QExpected only stages after the statement for odd: code references, pipelines or their names, or objects offering a stage's role method\E )x,
+        'anything but code references, pipelines or names after it';
+    like dies { statement(odder => music => 'SELECT 1', 'no good') },
+        qr( \A \QExpected only stages after the statement for odder: code references, pipelines or their names, or objects offering a stage's role method\E )x,
+        'a string that is not a name';
+    like dies {
+        statement(oddest => music => 'SELECT 1', bless {}, 'Not::Attrs')
+    },
+        qr( \A \QExpected only stages after the statement for oddest: \E )x,
+        'an object that is not a stage, not taken for the attributes';
     like dies { statement(music => music => 'SELECT 1') },
         qr( \A \QExpected no function of the name in main already (music)\E )x,
         'a name a database has';
+    like dies { statement(keep_all => music => 'SELECT 1') },
+        qr( \A \QExpected no function of the name in main already (keep_all)\E )x,
+        'or a sink imported';
+};
+
+subtest "a definition's names are pipelines, resolved as it's made" => sub {
+    Ekorn::Pipeline->named(trimmed => sub { s( \A \s+ | \s+ \z )()xgr });
+    Ekorn::Pipeline->named(shouted => sub { uc });
+    music 'CREATE TABLE padded (name TEXT)';
+    music 'INSERT INTO padded VALUES (?)', $_ for '  abba ', ' blur';
+    statement(
+        padded_names => music => 'SELECT name FROM padded WHERE name LIKE ?',
+        sub { $_->[0] }, trimmed => 'shouted',
+    );
+    is [padded_names('%b%', keep_all)], [qw(ABBA BLUR)],
+        'each name, in its place among the stages';
+    is [padded_names('trimmed', keep_all)], [],
+        'and a string given to the call is a bind value, not a name';
+    like dies { padded_names('%abba%', 'trimmed', keep_all) },
+        qr( called\ with\ 2\ bind\ variables\ when\ 1\ are\ needed )x,
+        'even after the bind values, where a stage could go';
+
+    package Other::Names {    ## no critic (Modules::ProhibitMultiplePackages)
+        use DBIx::Squirrel::Sugar qw(statement);
+        Ekorn::Pipeline->named(trimmed => sub { 'theirs' });
+        statement(their_names => music => 'SELECT name FROM padded', 'trimmed');
+    }
+    is [Other::Names::their_names(keep_all)], [qw(theirs theirs)],
+        "a name is looked up in the package making the definition";
+    statement(
+        borrowed => music => 'SELECT name FROM padded',
+        'Other::Names::trimmed',
+    );
+    is [borrowed(keep_all)], [qw(theirs theirs)], "or a qualified one, its own";
+
+    my $line = __LINE__ + 1;
+    like dies { statement(nameless => music => 'SELECT 1', 'nowhere') },
+        qr( \A \QNo pipeline named main::nowhere\E\ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
+        "a name not defined croaks as it's made, at its line";
+};
+
+subtest "a named pipeline's stage that dies is named" => sub {
+    Ekorn::Pipeline->named(fussy => sub { $_ }, sub { die "no names today\n" })
+        ;    ## no critic (ErrorHandling::RequireCarping)
+    statement(
+        fussy_names => music => 'SELECT name FROM artist', sub { $_ },
+        'fussy',
+    );
+    my $line = __LINE__ + 1;
+    is dies { fussy_names(keep_all) },
+        "Pipeline stage #2.2 (main::fussy#2) failed at ${\ __FILE__ } line $line:\n"
+        . "    no names today\n",
+        'by its place, and by its name and its place there';
 };
 
 done_testing;

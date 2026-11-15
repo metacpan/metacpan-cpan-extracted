@@ -2,11 +2,11 @@ use v5.36;
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
-use DBIx::Squirrel::Pipeline;
+use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Stop;
 
 package My::Stop {
-    our @ISA = 'DBIx::Squirrel::Stop';
+    our @ISA = 'Ekorn::Pipeline::Stop';
 }
 
 subtest 'Stop is Ekorn::Pipeline::Stop, carrying its arguments' => sub {
@@ -16,25 +16,19 @@ subtest 'Stop is Ekorn::Pipeline::Stop, carrying its arguments' => sub {
     ref_is \&Stop, \&Ekorn::Pipeline::Stop::Stop, 'the same function';
 };
 
-subtest 'throw is blessed into the class it was called on' => sub {
-    my $stop = dies { DBIx::Squirrel::Stop->throw(1) };
-    is ref($stop), 'DBIx::Squirrel::Stop',      'the class itself';
-    is $stop,      ['DBIx::Squirrel::Stop', 1], 'carrying its arguments';
-    isa_ok $stop, ['Ekorn::Pipeline::Stop'],
-        'which is an Ekorn::Pipeline::Stop';
-
+subtest 'DBIx::Squirrel::Stop re-exports Stop, and is no class' => sub {
+    ok !DBIx::Squirrel::Stop->isa('Ekorn::Pipeline::Stop'),
+        'not a subclass of Ekorn::Pipeline::Stop';
+    ok !DBIx::Squirrel::Stop->can('throw'), 'so it has no throw';
     my $sub = dies { My::Stop->throw(2) };
-    is ref($sub), 'My::Stop', 'a subclass';
-    isa_ok $sub, ['DBIx::Squirrel::Stop', 'Ekorn::Pipeline::Stop'],
-        'which is still both';
+    isa_ok $sub, ['Ekorn::Pipeline::Stop'], "a subclass of Ekorn's";
     is $sub, ['My::Stop', 2], 'carrying its arguments';
 };
 
 subtest 'each kind of stop stops a pipeline' => sub {
-    my $class = 'DBIx::Squirrel::Pipeline';
+    my $class = 'Ekorn::Pipeline';
     for my $throw (
         ['Stop',                  sub { Stop('last') }],
-        ['DBIx::Squirrel::Stop',  sub { DBIx::Squirrel::Stop->throw('last') }],
         ['a subclass of it',      sub { My::Stop->throw('last') }],
         ['Ekorn::Pipeline::Stop', sub { Ekorn::Pipeline::Stop->throw('last') }],
     ) {

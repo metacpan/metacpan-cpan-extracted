@@ -4,7 +4,7 @@ package DBIO::Storage::DBI::Cursor;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base 'DBIO::Cursor';
 
@@ -218,7 +218,7 @@ DBIO::Storage::DBI::Cursor - Object representing a query cursor on a resultset.
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

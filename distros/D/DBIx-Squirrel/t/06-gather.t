@@ -2,16 +2,14 @@ use v5.36;
 use Test2::V0;
 use Test2::Plugin::NoWarnings;
 
-use Ref::Util qw(is_coderef);
-
 use DBIx::Squirrel;
 use DBIx::Squirrel::Context qw(result_number result_original);
 use DBIx::Squirrel::Gather;
-use DBIx::Squirrel::Pipeline;
 use DBIx::Squirrel::Stop;
 use DBIx::Squirrel::Sugar qw(database statement);
+use Ekorn::Pipeline       qw(is_stage);
 
-my $class = 'DBIx::Squirrel::Pipeline';
+my $class = 'Ekorn::Pipeline';
 
 # Return every value an iterator hands out.
 sub drain ($next) {
@@ -28,7 +26,7 @@ sub source (@xs) {
 }
 
 # A stage gathering its values into batches of $size, the last batch
-# given at the end.
+# given by its flush, once the values run out.
 sub batches_of ($size) {
     return gather {
         my @batch;
@@ -36,12 +34,12 @@ sub batches_of ($size) {
             push @batch, $x;
             return @batch == $size ? [splice @batch] : ();
         };
-        my $end = sub () { @batch ? [@batch] : () };
-        return ($stage, $end);
+        my $flush = sub () { @batch ? [@batch] : () };
+        return ($stage, $flush);
     };
 }
 
-# A stage holding every value, and giving them, joined, at the end.
+# A stage holding every value, and giving them, joined, from its flush.
 sub joined ($separator = ',') {
     return gather {
         my @all;
@@ -67,16 +65,16 @@ subtest 'gather checks it was given a code reference' => sub {
         "Expected a code reference at ${\ __FILE__ } line $line.\n";
 };
 
-subtest 'a stage made with gather is a code reference' => sub {
+subtest 'a stage made with gather is an object a pipeline takes' => sub {
     my $stage = gather {
         sub { $_ }
     };
     isa_ok $stage, ['Ekorn::Pipeline::Gather'], 'an Ekorn::Pipeline::Gather';
-    ok is_coderef($stage),            'and a code reference';
+    ok is_stage($stage),              'a stage';
     ok lives { $class->new($stage) }, 'which a pipeline takes';
 };
 
-subtest 'without an end, it is an ordinary stage, made for each run' => sub {
+subtest 'without a flush, it is an ordinary stage, made for each run' => sub {
     my $made = 0;
     my $p    = $class->new(gather {
         $made++;
@@ -92,19 +90,19 @@ subtest 'without an end, it is an ordinary stage, made for each run' => sub {
     is $made,                     3,         'made for it';
 };
 
-subtest 'the values an end returns go through the rest of the stages' => sub {
+subtest 'the values a flush returns go through the rest of the stages' => sub {
     my $p = $class->new(batches_of(2), sub { join '', @$_ });
     is [$p->(1 .. 5)], [qw(12 34 5)], 'the last batch, at the end';
-    is [$p->(1 .. 4)], [qw(12 34)], 'an end returning nothing adds nothing';
+    is [$p->(1 .. 4)], [qw(12 34)], 'a flush returning nothing adds nothing';
 };
 
-subtest 'an end is called even without values' => sub {
+subtest 'a flush is called even without values' => sub {
     is [$class->new(joined)->()], [''], 'pushed';
     my($src) = source();
     is drain($class->new(joined)->iterator($src)), [''], 'pulled';
 };
 
-subtest 'an end gets no arguments, and $_ is undef' => sub {
+subtest 'a flush gets no arguments, and $_ is undef' => sub {
     my @seen;
     my $p = $class->new(gather {
         (sub { $_ }, sub (@args) { push @seen, [scalar(@args), $_]; () });
@@ -115,7 +113,7 @@ subtest 'an end gets no arguments, and $_ is undef' => sub {
     is $_,     'mine',       'and $_ is left as it was';
 };
 
-subtest 'ends are called in order, each feeding those after it' => sub {
+subtest 'flushes are called in order, each feeding those after it' => sub {
     my @log;
     my $p = $class->new(
         batches_of(2),
@@ -123,11 +121,11 @@ subtest 'ends are called in order, each feeding those after it' => sub {
         joined('+'),
         sub { push @log, 'last'; "<$_>" },
     );
-    is [$p->(1 .. 5)], ['<12+34+5>'],          'the first end, then the second';
+    is [$p->(1 .. 5)], ['<12+34+5>'],          'the first flush, then the second';
     is \@log,          [qw(map map map last)], 'each value going on in turn';
 };
 
-subtest 'an end can give several values' => sub {
+subtest 'a flush can give several values' => sub {
     my $p = $class->new(
         gather { (sub { () }, sub { qw(x y z) }) },
         sub { uc },
@@ -135,7 +133,7 @@ subtest 'an end can give several values' => sub {
     is [$p->(1)], [qw(X Y Z)];
 };
 
-subtest 'after a Stop, ends after the stage that stopped are called' => sub {
+subtest 'after a Stop, flushes after the stage that stopped are called' => sub {
     my $p = $class->new(
         sub { Stop() if $_ == 4; $_ },
         joined,
@@ -149,25 +147,25 @@ subtest 'after a Stop, ends after the stage that stopped are called' => sub {
     is [$q->(1 .. 9)], ['1,2,3,last'], 'and the values the Stop carries';
 };
 
-subtest 'after a Stop, ends before the stage that stopped are not' => sub {
-    my $ended = 0;
-    my $p     = $class->new(
-        gather { (sub { $_ }, sub { $ended++; 'end' }) },
+subtest 'after a Stop, flushes before the stage that stopped are not' => sub {
+    my $flushed = 0;
+    my $p       = $class->new(
+        gather { (sub { $_ }, sub { $flushed++; 'end' }) },
         sub { Stop() if $_ == 2; $_ },
     );
     is [$p->(1 .. 5)], [1], 'nothing after the Stop';
-    is $ended,         0,   'the end before it dropped';
+    is $flushed,       0,   'the flush before it dropped';
 };
 
-subtest 'an end can Stop, its values going on' => sub {
+subtest 'a flush can Stop, its values going on' => sub {
     my $p = $class->new(
         gather { (sub { $_ }, sub { Stop('stopped') }) },
         joined,
     );
-    is [$p->(1, 2)], ['1,2,stopped'], 'to the ends after it';
+    is [$p->(1, 2)], ['1,2,stopped'], 'to the flushes after it';
 };
 
-subtest 'an iterator calls the ends once, after the source runs out' => sub {
+subtest 'an iterator calls the flushes once, after the source runs out' => sub {
     my($src, $calls) = source(1 .. 3);
     my $next = $class->new(batches_of(2))->iterator($src);
     is [$next->()],  [[1, 2]], 'a full batch';
@@ -180,8 +178,8 @@ subtest 'an iterator calls the ends once, after the source runs out' => sub {
 
 subtest 'a block giving the wrong things croaks, naming the stage' => sub {
     my $msg
-        = 'Expected stage #2, made with gather, to return a code reference or a pipeline, and optionally an end function';
-    my @bad = ([], [sub { }, sub { }, sub { }], ['x'], [sub { }, 'x']);
+        = 'Expected stage #2, made with gather, to return a code reference or a pipeline, and optionally a flush and an end';
+    my @bad = ([], [sub { }, sub { }, sub { }, sub { }], ['x'], [sub { }, 'x']);
     for my $returns (@bad) {
         my $p    = $class->new(sub { $_ }, gather { @$returns });
         my $line = __LINE__ + 1;
@@ -190,7 +188,7 @@ subtest 'a block giving the wrong things croaks, naming the stage' => sub {
     }
 };
 
-subtest 'an end that dies says which stage it was' => sub {
+subtest 'a flush that dies says which stage it was' => sub {
     my $p = $class->new(
         sub { $_ },
         gather { (sub { $_ }, sub { die "boom\n" }) },    ## no critic (ErrorHandling::RequireCarping)
@@ -224,14 +222,15 @@ subtest 'an iterator runs its gathers afresh on each execution' => sub {
 
 subtest 'a gathered result is counted' => sub {
     my $it = $dbh->iterate(
-        'SELECT name FROM artist ORDER BY id', sub { $_->[0] },
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
         joined,
+        sub { [result_number, $_] },
     );
-    is [$it->all], ['Abba,Blur,Cream,Dido,Enya'];
-    is $it->count, 1;
+    is [$it->all], [[1, 'Abba,Blur,Cream,Dido,Enya']], 'as the first result';
 };
 
-subtest 'what an end can ask' => sub {
+subtest 'what a flush can ask' => sub {
     my @seen;
     my $it = $dbh->iterate(
         'SELECT name FROM artist WHERE id <= 2 ORDER BY id',
@@ -245,7 +244,7 @@ subtest 'what an end can ask' => sub {
         'the result it makes, but no original: it comes from every row';
 };
 
-subtest 'an iterator run while an end gives its values has originals' => sub {
+subtest 'an iterator run while a flush gives its values has originals' => sub {
     my @seen;
     my $it = $dbh->iterate(
         'SELECT id FROM artist WHERE id <= 2 ORDER BY id',
@@ -264,6 +263,54 @@ subtest 'an iterator run while an end gives its values has originals' => sub {
     is \@seen, [['Abba'], undef], 'the inner one has its own, the outer none';
 };
 
+subtest 'a block can return its parts by name' => sub {
+    my @how;
+    my $it = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        gather {
+            my @seen;
+            return {
+                step  => sub ($name) { push @seen, $name; () },
+                flush => sub () { join ',', @seen },
+                end   => sub ($how) { push @how, $how },
+            };
+        },
+    );
+    is [$it->all], ['Abba,Blur,Cream,Dido,Enya'], 'a step and a flush';
+    is \@how,      ['done'],                      'and an end';
+    $it = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        gather {
+            +{step => sub { $_->[0] }, end => sub ($how) { push @how, $how }}
+        },
+    );
+    is $it->first, 'Abba',             'or a step and an end alone';
+    is \@how,      [qw(done stopped)], 'told how the run ended';
+};
+
+subtest "a gather's end is told how the iterator's run ended" => sub {
+    my @how;
+    my $it = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        sub { $_->[0] },
+        gather { (sub { $_ }, undef, sub ($how) { push @how, $how }) },
+    );
+    $it->all;
+    is \@how, ['done'], 'done, once the rows ran out';
+    $it->reset->first;
+    is \@how, [qw(done stopped)], 'stopped, by first';
+
+    @how = ();
+    $it  = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY id',
+        gather { (sub { $_ }, undef, sub ($how) { push @how, $how }) },
+        sub { die "boom\n" },    ## no critic (ErrorHandling::RequireCarping)
+    );
+    ok dies { $it->next }, 'a stage after it dying';
+    is \@how, ['died'], 'died';
+};
+
 subtest 'a Sugar statement runs its gathers afresh on each call' => sub {
     database(
         bands => 'dbi:SQLite:dbname=:memory:', '', '',
@@ -276,8 +323,8 @@ subtest 'a Sugar statement runs its gathers afresh on each call' => sub {
         sub { $_->[0] },
         joined,
     );
-    is [band_names(2)], ['Abba,Blur'],       'the first call';
-    is [band_names(3)], ['Abba,Blur,Cream'], 'the second, starting afresh';
+    is [band_names(2)->all], ['Abba,Blur'],       'the first call';
+    is [band_names(3)->all], ['Abba,Blur,Cream'], 'the second, starting afresh';
 };
 
 done_testing;

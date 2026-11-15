@@ -4,7 +4,7 @@ package DBIO::Generate::Style::Moo;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Data::Dumper ();
 use DBIO::Generate::Util ();
@@ -115,7 +115,7 @@ DBIO::Generate::Style::Moo - Moo-style emitter for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 METHODS
 

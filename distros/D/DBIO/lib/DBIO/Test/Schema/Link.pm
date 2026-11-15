@@ -4,7 +4,7 @@ package DBIO::Test::Schema::Link;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base qw/DBIO::Test::BaseResult/;
 
@@ -45,7 +45,7 @@ DBIO::Test::Schema::Link - Test result class for the link table
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

@@ -2,47 +2,54 @@ package POSIX::2008;
 
 use strict;
 use warnings;
+
 use Carp ();
 use IO::Dir ();
 use IO::File ();
+use XSLoader ();
+
+BEGIN {
+  our $VERSION = '0.30';
+  our $XS_VERSION = $VERSION;
+  $VERSION = eval $VERSION; # so "use Module 0.002" won't warn on underscore
+  XSLoader::load('POSIX::2008', $XS_VERSION);
+}
 
 require Exporter;
-require 'POSIX/2008/symbols.pl'; # Defines @_constants and @_functions.
+require 'POSIX/2008/symbols.pl'; # Get @_constants and @_functions.
 
 our @_constants;
 our @_functions;
 
-our $VERSION = '0.29';
-our $XS_VERSION = $VERSION;
-$VERSION = eval $VERSION; # so "use Module 0.002" won't warn on underscore
-
-our @ISA = qw(Exporter);
+our @ISA = 'Exporter';
 our @EXPORT = ();
 our @EXPORT_OK = (@_functions, @_constants);
 
 our %EXPORT_TAGS = (
-  # at: Older Perls don't have variable length lookbehind, thus two regexen
+  # at: Older Perls lack variable length lookbehind, thus two regexen
   # for functions.
   'at'     => [
     grep(/^(?:AT|RENAME|RESOLVE)_/, @_constants),
-    grep(/at2?$/ && !/^(?:creat|l?stat)$/, @_functions),
+    grep(/at2?$/ && !/^(?:creat|lstat|stat)$/, @_functions),
   ],
   'id'     => [grep /^[gs]et.+id$/, @_functions],
   'is'     => [grep /^is/, @_functions],
-  'rw'     => [qw(read write readv writev)],
-  'prw'    => [qw(pread preadv preadv2 pwrite pwritev pwritev2)],
+  'rw'     => [grep /^(?:read|write)v?$/, @_functions],
+  'prw'    => [grep /^(?:pread|pwrite)(?:v2?)?$/, @_functions],
   'clock'  => [
     grep(/^(?:CLOCK_|TIMER_ABSTIME)/, @_constants),
     grep(/^clock/, @_functions),
   ],
   'errno_h'=> [grep /^E(?!MPTY)[A-Z]+$/, @_constants],
-  'fcntl'  => [grep /^(?:[FORWX]|FD|POSIX_FADV|SEEK)_/, @_constants],
+  'fcntl'  => [grep /^(?:[ORWX]|F|FD|POSIX_FADV|SEEK)_/, @_constants],
   'fenv_h' => [grep(/^FE_/, @_constants), grep (/^fe/, @_functions)],
-  'fnm'    => [grep(/^FNM_/, @_constants), 'fnmatch'],
-  'poll'   => ['poll', 'ppoll', grep /^(?:POLL|INFTIM)/, @_constants],
+  'fnm'    => [grep(/^FNM_/, @_constants), grep(/^fnmatch$/, @_functions)],
+  'poll'   => [
+    grep(/^(?:POLL|INFTIM)/, @_constants),
+    grep(/^(?:poll|ppoll)$/, @_functions),
+  ],
   'socket_h' => [
-    qw(SCM_RIGHTS SOL_SOCKET SOMAXCONN),
-    grep(/^(?:AF|MSG|SHUT|SO|SOCK)_/, @_constants),
+    grep(/^(?:AF|MSG|SCM|SHUT|SO|SOCK|SOL)_/ || /^SOMAXCONN$/, @_constants),
   ],
   'stat_h' => [grep /^(?:S_I|UTIME_)/, @_constants],
   'time_h' => [grep /^(?:CLOCK|TIMER)_/, @_constants],
@@ -52,9 +59,9 @@ our %EXPORT_TAGS = (
     grep(/^(?:ACCOUNTING|EMPTY|RUN_LVL|UT_UNKNOWN)$/, @_constants),
     grep(/utx/, @_functions),
   ],
-  'confstr'  => ['confstr', grep /^_CS_/, @_constants],
-  'pathconf' => ['pathconf', grep /^_PC_/, @_constants],
-  'sysconf'  => ['sysconf', grep /^_SC_/, @_constants],
+  'confstr'  => [grep(/^confstr$/, @_functions), grep(/^_CS_/, @_constants)],
+  'pathconf' => [grep(/^pathconf$/, @_functions), grep(/^_PC_/, @_constants)],
+  'sysconf'  => [grep(/^sysconf$/, @_functions), grep(/^_SC_/, @_constants)],
 );
 
 my %deprecated = (
@@ -81,18 +88,15 @@ sub AUTOLOAD {
 sub import {
   my $this = shift;
 
-  require XSLoader;
-  XSLoader::load('POSIX::2008', $XS_VERSION);
-
   while (my ($func, $repl) = each %deprecated) {
-    my $package_func = __PACKAGE__."::${func}";
-    my $package_repl = __PACKAGE__."::${repl}";
+    my $pkg_func = __PACKAGE__."::${func}";
+    my $pkg_repl = __PACKAGE__."::${repl}";
     no strict 'refs';
-    *{$package_func} = sub {
+    *{$pkg_func} = sub {
       Carp::carp(
-        "${package_func}() is deprecated, use ${package_repl}() instead"
+        "${pkg_func}() is deprecated, use ${pkg_repl}() instead"
       ) unless $deprecated_warned{$func}++;
-      &{*{$package_repl}};
+      &{$pkg_repl};
     }
   }
 

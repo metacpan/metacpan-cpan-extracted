@@ -10,6 +10,12 @@
 #   chain-fraud-body.eml           body changed, recipe declares no body change.
 #   chain-fraud-body-truncate.eml  innocent-looking "drop trailing block" copy-
 #                                  range recipe that hides an edited first line.
+#   chain-fraud-mi-rewrite.eml     content replaced wholesale; the recipe
+#                                  declares no content change but rewrites
+#                                  the m=1 Message-Instance to one hashed over
+#                                  the new content (a forged history).
+#   chain-fraud-mi-rewrite-wsp.eml the same under the key "message-instance "
+#                                  (not a field name: invalid JSON).
 #
 # All signed d=test1.dkim2.com s=sel1 (real DNS published) with NO
 # Authentication-Results / Delivered-To, so the only thing that can trip a
@@ -149,4 +155,40 @@ EOH2
     (my $s = "Message-Instance: " . $mi2->as_string()) =~ s/^Message-Instance: //;
     $c->header_raw_prepend('Message-Instance', $s);
     sign_and_write($c, 'chain-fraud-body-truncate.eml');
+}
+
+# ---- FRAUD (history): a header Recipe that rewrites Message-Instance --------
+# The hop replaces headers and body wholesale, declares no content change, and
+# instead names message-instance in its header Recipe with a literal m=1 hashed
+# over the NEW content. A verifier that re-reads the instances from the rebuilt
+# message checks m=1 against the forgery and reports the original as unchanged.
+# Message-Instance and DKIM2-Signature fields are never content (-09 section
+# 6.2): a Recipe naming them acts on content fields of that name, of which
+# there are none, so the received m=1 still governs and its header hash fails.
+{
+    my $c = Email::MIME->new(crlf(<<'EOH3') . "\r\n" . crlf("Please wire \$1M to account 666\r\n"));
+Date: Tue, 08 Jul 2026 10:00:00 +0000
+To: victim@example.org
+From: alice@test1.dkim2.com
+Subject: URGENT wire money
+Message-Id: <evil.20260708@test1.dkim2.com>
+EOH3
+    my $forged = Mail::DKIM2::MessageInstance->calculate($c)->as_string;
+    $c->header_raw_prepend('Message-Instance', $mi1s);   # the genuine m=1
+    my $mi2 = Mail::DKIM2::MessageInstance->calculate($c, $c);
+    delete $mi2->{bits}{rb};
+    $mi2->{bits}{rh} = { 'message-instance' => [ " $forged" ] };
+    say "fraud-mi-rewrite rh = { message-instance => [forged m=1] }";
+    (my $s = "Message-Instance: " . $mi2->as_string()) =~ s/^Message-Instance: //;
+    my $c2 = Email::MIME->new($c->as_string);
+    $c->header_raw_prepend('Message-Instance', $s);
+    sign_and_write($c, 'chain-fraud-mi-rewrite.eml');
+
+    # The same under a key with WSP in it, "message-instance ": no field
+    # name, so invalid JSON -- where name matching that drops WSP before a
+    # colon would take it for Message-Instance.
+    $mi2->{bits}{rh} = { 'message-instance ' => [ " $forged" ] };
+    (my $s2 = "Message-Instance: " . $mi2->as_string()) =~ s/^Message-Instance: //;
+    $c2->header_raw_prepend('Message-Instance', $s2);
+    sign_and_write($c2, 'chain-fraud-mi-rewrite-wsp.eml');
 }

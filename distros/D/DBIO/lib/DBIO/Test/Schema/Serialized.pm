@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Serialized;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -30,7 +30,7 @@ DBIO::Test::Schema::Serialized - Test result class for the serialized table
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

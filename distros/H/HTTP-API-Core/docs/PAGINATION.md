@@ -134,9 +134,13 @@ The `request` option is a hash reference whose values are passed to the client's
 
 This is the supported way to carry request-level options such as headers, retry overrides, or hooks into pagination.
 
+## Error handling and page state
+
+A page is accepted only after its items and continuation metadata are both validated. If an extractor throws or a continuation URL/cursor is rejected, the paginator does not expose that failed page's items or advance its cursor, page number, or loop-detection state. A later call on the same paginator can refetch the failed page; callers should only retry when the underlying failure can be corrected. Earlier successfully accepted pages remain consumed.
+
 ## Continuation-loop protection
 
-Repeated next URLs or cursor values are rejected instead of looping forever.
+Repeated next URLs or cursor values are rejected instead of looping forever. This includes a continuation that returns to the initial requested URL (including pagination query options) or to an explicitly supplied initial cursor; the duplicate request is avoided. Detection compares the URL and cursor values directly, without URL canonicalization.
 
 A repeated continuation throws an error containing `pagination continuation repeated`.
 

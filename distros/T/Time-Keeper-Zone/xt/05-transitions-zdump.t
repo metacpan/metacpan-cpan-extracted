@@ -11,7 +11,7 @@ use File::Temp qw(tempdir);
 # and each change's next is the one after it, its previous the one before.
 # transitions takes at most 1,000 years, so the span is asked in pieces.
 #
-#   TKZ_ZIC=/path/zic TKZ_ZDUMP=/path/zdump TKZ_TZDATA=/path/tzdata-2026e.tar.gz
+#   TKZ_ZIC=/path/zic TKZ_ZDUMP=/path/zdump TKZ_TZDATA=/path/tzdata-2026f.tar.gz
 #
 # Zones are named to zdump by absolute path: see xt/03-zdump-oracle.t.
 

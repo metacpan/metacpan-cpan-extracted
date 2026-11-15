@@ -68,9 +68,9 @@ sub as_hash : prototype() () {
 # Return the names of the columns of the statement whose rows the
 # stages are running on.
 sub _column_names () {
-    my $iterator = DBIx::Squirrel::Context::iterator
-        or croakf 'Expected an iterator, for the column names';
-    return $iterator->column_names;
+    my $run = DBIx::Squirrel::Context::statement_context()
+        or croakf 'Expected a statement to read, for the column names';
+    return @{ $run->{columns} };
 }
 
 # Return the position of a column, by its name: as it's written, or else
@@ -125,10 +125,15 @@ DBIx::Squirrel::Stages::Rows - stages reshaping rows: pluck and as_hash
 Stages that reshape rows, whatever shape they were fetched in: as
 arrays, as hashes (with the C<ekorn_slice> attribute), or as row
 objects (from C<results>). Each finds what it needs from the
-statement's column names, once on each run, through
-L<DBIx::Squirrel::Context/iterator> and
-L<DBIx::Squirrel::Iterator/column_names>. So a stage can be given to
+statement's column names, once on each run, in the context a statement
+gives the run: in an iterator's own stages, or in a chain made with
+C<|>, or a pipeline of yours, reading one. So a stage can be given to
 statements whose columns differ.
+
+B<The columns are the statement's, not the row's.> After a stage that
+reshapes rows, C<pluck> by a name for an array row, or by a position,
+picks the wrong field, and says nothing. Use L</as_hash> first, and
+C<pluck> by name then reads each hash's own keys.
 
 =head1 FUNCTIONS
 
@@ -142,7 +147,7 @@ Both are exported by default, and with C<:all>.
 Gives one column of each row, by its name, in any case, or by its
 position, from 0, as a row object's C<get_column> does. A name for an
 array row, or a position for a hash row, is found from the column
-names. So it needs the stages to be run by an iterator. A column the
+names. So it needs to be in a run reading a statement. A column the
 row hasn't got croaks.
 
 =head2 as_hash
@@ -154,7 +159,7 @@ C<fetchrow_hashref> would key them, following C<FetchHashKeyName>. So
 it gives what plain DBI does. An array row, or a row object, is made
 into a new hash. A hash row is passed on unchanged. As with
 C<fetchrow_hashref>, of two columns with the same name, the hash has
-one. It needs the stages to be run by an iterator, for the column
+one. It needs to be in a run reading a statement, for the column
 names.
 
 =head1 DIAGNOSTICS
@@ -169,11 +174,11 @@ C<pluck> was given no column, or an empty name.
 
 A row hasn't got the column C<pluck> was given.
 
-=item Expected an iterator, for the column names
+=item Expected a statement to read, for the column names
 
 C<as_hash>, or C<pluck> with a name for an array row or a position for
-a hash row, ran in a pipeline no iterator was running, such as one
-called with values. So the column names aren't known.
+a hash row, ran where no statement was being read, such as in a
+pipeline called with values. So the column names aren't known.
 
 =item Expected a row: an array, a hash or a row object
 
@@ -183,8 +188,8 @@ A stage was given a value that isn't a row.
 
 =head1 SEE ALSO
 
-L<DBIx::Squirrel>, L<DBIx::Squirrel::Iterator>, L<DBIx::Squirrel::Result>,
-L<DBIx::Squirrel::Context>
+L<DBIx::Squirrel>, L<DBIx::Squirrel::Iterator>,
+L<DBIx::Squirrel::Result>, L<DBIx::Squirrel::Context>
 
 =head1 AUTHOR
 
@@ -194,7 +199,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

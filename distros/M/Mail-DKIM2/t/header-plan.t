@@ -130,17 +130,27 @@ same('a line ending in a lone CR (the Email::Simple parse)',
     message([mi(2, { h => { subject => [{ d => ['x'] }] } }), mi(1)],
             "Subject: a\rb", @base[0, 1]));
 
-# A header Recipe naming Message-Instance changes the instances the walk
-# below it sees: the plan says so, for the caller to use the undo walk.
+# Message-Instance and DKIM2-Signature fields are not content (-09 section
+# 6.2): a header Recipe naming one acts on content fields of that name, of
+# which there are none. Copying one is an error, a literal rebuilds nothing
+# that is hashed, and the instances below are always the ones received --
+# the planned walk and the undo walk agree, and nothing makes the Verifier
+# fall back to the undo walk.
+same('a Recipe copying a Message-Instance has nothing to copy',
+    message([mi(2, { h => { 'message-instance' => [{ c => [1, 1] }] } }), mi(1)], @base));
+same('a Recipe rewriting a Message-Instance leaves the received ones',
+    message([mi(2, { h => { 'message-instance' => [{ d => [' m=1; h=sha256:BBBB:BBBB'] }] } }), mi(1)],
+            @base));
+same('a Recipe naming DKIM2-Signature likewise',
+    message([mi(2, { h => { 'dkim2-signature' => [{ c => [1, 1] }] } }), mi(1)], @base));
 {
     my @mi = map { Mail::DKIM2::MessageInstance->parse($_) }
         "m=2; h=sha256:AAAA:AAAA; r=" . encode_base64($JSON->encode(
             { h => { 'message-instance' => [{ c => [1, 1] }] } }), ''),
         "m=1; h=sha256:AAAA:AAAA";
-    my $plan = Mail::DKIM2::HeaderPlan->new("From: a\r\n")->plan(@mi);
-    ok($plan->rewrites_instances, 'a Message-Instance header Recipe is flagged');
-    ok(!Mail::DKIM2::HeaderPlan->new("From: a\r\n")->plan($mi[1])->rewrites_instances,
-       'no Message-Instance Recipe, no flag');
+    my $plan = Mail::DKIM2::HeaderPlan->new("Message-Instance: m=1; h=sha256:AAAA:AAAA\r\nFrom: a\r\n")->plan(@mi);
+    like($plan->recipe_error(2), qr/message-instance header/i,
+        'copying from Message-Instance is a Recipe error, however many there are');
 }
 
 done_testing;

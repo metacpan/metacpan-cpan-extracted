@@ -109,6 +109,18 @@ is_deeply([Mail::DKIM2::Common::from_mailbox('nobody')], ['none'], 'from_mailbox
 is_deeply([Mail::DKIM2::Common::from_mailbox('A <a@[IPv6:2001:db8::1]>')], ['literal'],
           'from_mailbox: an IPv6 literal\'s ":"s are not a group');
 is_deeply([Mail::DKIM2::Common::from_mailbox()], ['none'], 'from_mailbox: no From field');
+{
+    # 2048 octets is the longest From value read; the line breaks of
+    # folding and the white space round the value are not counted.
+    my $long = sub { '"' . ('a' x ($_[0] - 18)) . '" <a@example.com>' };
+    is(length $long->(2048), 2048, 'the long From is the length it says');
+    is_deeply([Mail::DKIM2::Common::from_mailbox($long->(2048))], ['ok', 'example.com'], 'from_mailbox: 2048 octets');
+    is_deeply([Mail::DKIM2::Common::from_mailbox($long->(2049))], ['none'], 'from_mailbox: 2049 octets');
+    (my $folded = ' ' . $long->(2048) . " \r\n") =~ s/ </\r\n </;
+    is_deeply([Mail::DKIM2::Common::from_mailbox($folded)], ['ok', 'example.com'], 'from_mailbox: folding is not counted');
+    is_deeply([Mail::DKIM2::Common::from_mailbox($long->(2040) . ', b@y.com')], ['none'],
+              'from_mailbox: too long comes before a list');
+}
 
 # The Domain Policy Record parser (E3.2).
 for my $c (

@@ -10,7 +10,7 @@ use File::Temp qw(tempdir);
 # happens. Past each zone's last transition the engine works the changes
 # out from the zone's TZ string, and so does zdump, independently.
 #
-#   TKZ_ZIC=/path/zic TKZ_ZDUMP=/path/zdump TKZ_TZDATA=/path/tzdata-2026e.tar.gz
+#   TKZ_ZIC=/path/zic TKZ_ZDUMP=/path/zdump TKZ_TZDATA=/path/tzdata-2026f.tar.gz
 #
 # Zones are named to zdump by absolute path: see xt/03-zdump-oracle.t.
 

@@ -182,7 +182,7 @@ subtest 'messages name a stage inside by its place in each pipeline' => sub {
     my $bad = $class->new(sub { $_ }, $class->new(sub { $_ }, gather { 'x' }));
     $line = __LINE__ + 1;
     is dies { $bad->(1) },
-        'Expected stage #2.2, made with gather, to return a code reference or a pipeline, and optionally an end function'
+        'Expected stage #2.2, made with gather, to return a code reference or a pipeline, and optionally a flush and an end'
         . " at ${\ __FILE__ } line $line.\n",
         'a bad gather inside';
 
@@ -199,13 +199,13 @@ subtest 'a bad stage is refused as it was' => sub {
     is dies {
         $class->new($class->new(sub { $_ }), 'x')
     },
-        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
+        "Expected stage #2 to be a stage: a code reference, a pipeline, or an object offering a stage's role method at ${\ __FILE__ } line $line.\n",
         'beside a pipeline';
     $line = __LINE__ + 2;
     is dies {
         $class->new(sub { $_ }, $class->new(sub { $_ }, 'x'))
     },
-        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
+        "Expected stage #2 to be a stage: a code reference, a pipeline, or an object offering a stage's role method at ${\ __FILE__ } line $line.\n",
         'inside one, by its place there, when it is made';
 };
 
@@ -236,8 +236,8 @@ subtest 'its stages come from its stages method' => sub {
     is dies {
         $class->new(sub { $_ }, My::Odd->new)
     },
-        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
-        'and refused if they are not code references';
+        "Expected stage #2, a pipeline, to give only stages from its stages method at ${\ __FILE__ } line $line.\n",
+        'and refused if they are not stages';
 
     my $first = sub { $_ };
     local @My::Odd::STAGES = ($first, 'x');
@@ -245,7 +245,7 @@ subtest 'its stages come from its stages method' => sub {
     is dies {
         $class->new(My::Odd->new($first, sub { $_ }))
     },
-        "Expected stage #1 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
+        "Expected stage #1, a pipeline, to give only stages from its stages method at ${\ __FILE__ } line $line.\n",
         'as many as it was made with, or not';
 
     local @My::Odd::STAGES = ($first, $boom);

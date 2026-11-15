@@ -12,30 +12,40 @@ use HTTP::API::Core::Response;
 use HTTP::API::Core::Error;
 use HTTP::API::Core::Pagination;
 
-our $VERSION = '1.08';
+our $VERSION = '1.10';
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    die "constructor options must be key/value pairs\n" if @_ % 2;
+    die "constructor option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
+    my %args = @_;
 
     my $base_url = delete $args{base_url};
-    die "base_url is required\n" if !defined($base_url) || $base_url eq '';
+    my $base_url_ref = ref($base_url);
+    die "base_url is required\n"
+        if !defined($base_url) || ($base_url_ref eq '' && $base_url eq '');
+    die "base_url must be a non-empty scalar\n" if $base_url_ref ne '';
     $base_url =~ s{/+\z}{};
 
-    my $headers = delete($args{headers}) || {};
+    my $headers = exists($args{headers}) ? delete($args{headers}) : {};
     die "headers must be a hash reference\n" if ref($headers) ne 'HASH';
     _validate_header_values($headers);
 
     my $timeout = exists $args{timeout} ? delete($args{timeout}) : 10;
+    my $timeout_ref = ref($timeout);
     die "timeout must be a positive number\n"
         if !defined($timeout)
+        || $timeout_ref ne ''
         || $timeout !~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/
         || $timeout <= 0;
 
     my $transport = delete $args{transport};
+    my $transport_class = blessed($transport);
     die "transport must be a code reference or object with request()\n"
         if defined($transport)
         && ref($transport) ne 'CODE'
-        && !(blessed($transport) && $transport->can('request'));
+        && !(defined($transport_class) && $transport->can('request'));
 
     my $retry = exists $args{retry} ? delete($args{retry}) : {};
     die "retry must be a hash reference\n" if ref($retry) ne 'HASH';
@@ -55,7 +65,7 @@ sub new {
         hooks     => $hooks,
     }, $class;
 
-    $self->{http} = HTTP::Tiny->new(timeout => $timeout) if !$transport;
+    $self->{http} = HTTP::Tiny->new(timeout => $timeout) if !defined $transport;
     return $self;
 }
 
@@ -64,26 +74,35 @@ sub timeout  { $_[0]->{timeout} }
 sub retry    { +{ %{ $_[0]->{retry} }, methods => [ @{ $_[0]->{retry}{methods} } ] } }
 sub hooks    { _clone_hooks($_[0]->{hooks}) }
 
-sub get    { my ($self, $path, %opts) = @_; return $self->request('GET',    $path, %opts) }
-sub post   { my ($self, $path, %opts) = @_; return $self->request('POST',   $path, %opts) }
-sub put    { my ($self, $path, %opts) = @_; return $self->request('PUT',    $path, %opts) }
-sub patch  { my ($self, $path, %opts) = @_; return $self->request('PATCH',  $path, %opts) }
-sub delete { my ($self, $path, %opts) = @_; return $self->request('DELETE', $path, %opts) }
+sub get    { my ($self, $path) = splice @_, 0, 2; return $self->request('GET',    $path, @_) }
+sub post   { my ($self, $path) = splice @_, 0, 2; return $self->request('POST',   $path, @_) }
+sub put    { my ($self, $path) = splice @_, 0, 2; return $self->request('PUT',    $path, @_) }
+sub patch  { my ($self, $path) = splice @_, 0, 2; return $self->request('PATCH',  $path, @_) }
+sub delete { my ($self, $path) = splice @_, 0, 2; return $self->request('DELETE', $path, @_) }
 
 sub paginate {
-    my ($self, $path, %opts) = @_;
+    my ($self, $path) = splice @_, 0, 2;
     return HTTP::API::Core::Pagination->new(
         client => $self,
         path   => $path,
-        %opts,
+        @_,
     );
 }
 
 sub request {
-    my ($self, $method, $path, %opts) = @_;
-    $method = uc($method // '');
-    die "method is required\n" if $method eq '';
+    my ($self, $method, $path) = splice @_, 0, 3;
+    die "request options must be key/value pairs\n" if @_ % 2;
+    die "request option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
+    my %opts = @_;
+    my $method_ref = ref($method);
+    die "method is required\n"
+        if !defined($method) || ($method_ref eq '' && $method eq '');
+    die "method must be a non-empty scalar\n" if $method_ref ne '';
     die "path is required\n" if !defined $path;
+    my $path_ref = ref($path);
+    die "path must be a scalar\n" if $path_ref ne '';
+    $method = uc($method);
 
     my $url = $path =~ m{\Ahttps?://} ? $path : $self->_join_url($path);
 
@@ -110,16 +129,21 @@ sub request {
         my $key = delete $copy{key};
         my $header = delete $copy{header};
 
+        my $key_ref = ref($key);
         die "idempotency key must be a non-empty scalar\n"
-            if !defined($key) || ref($key) || $key eq '';
+            if !defined($key) || $key_ref ne '' || $key eq '';
+        my $header_ref = ref($header);
         die "idempotency header must be a non-empty scalar\n"
-            if !defined($header) || ref($header) || $header eq '';
+            if !defined($header) || $header_ref ne '' || $header eq '';
         die "unknown idempotency option: $_\n" for sort keys %copy;
 
         my $wanted = lc $header;
         my $already = grep { lc($_) eq $wanted } keys %headers;
         $headers{$header} = "$key" if !$already;
     }
+
+    die "json and content request options are mutually exclusive\n"
+        if exists($opts{json}) && exists($opts{content});
 
     my $content;
 
@@ -142,11 +166,15 @@ sub request {
     }
 
     my $retry = exists $opts{retry} ? delete($opts{retry}) : $self->{retry};
-    if (ref($retry) eq 'HASH' && $retry != $self->{retry}) {
+    my $retry_ref = ref($retry);
+    if ($retry_ref eq 'HASH' && $retry != $self->{retry}) {
         $retry = _normalize_retry($retry);
     }
-    elsif (!ref($retry)) {
+    elsif ($retry_ref eq '') {
         $retry = $retry ? $self->{retry} : _normalize_retry({ attempts => 1 });
+    }
+    elsif ($retry_ref ne 'HASH') {
+        die "retry must be a hash reference or scalar switch\n";
     }
 
     my $request_hooks = exists $opts{hooks}
@@ -171,31 +199,35 @@ sub request {
         };
 
         my $hook_error = _run_hooks($hooks->{before_request}, $context);
-        die _hook_error($hook_error, $method, $url) if $hook_error;
+        die _hook_error($hook_error, $method, $url) if defined $hook_error;
+        my $context_method_ref = ref($context->{method});
         die "method must be a non-empty scalar\n"
-            if !defined($context->{method}) || ref($context->{method}) || $context->{method} eq '';
-        die "url must be a defined scalar\n"
-            if !defined($context->{url}) || ref($context->{url});
+            if !defined($context->{method}) || $context_method_ref ne '' || $context->{method} eq '';
+        _validate_request_url($context->{url});
         die "headers must be a hash reference\n"
             if ref($context->{headers}) ne 'HASH';
         _validate_header_values($context->{headers});
+        my $context_content_ref = ref($context->{content});
         die "content must be a scalar or undef\n"
-            if defined($context->{content}) && ref($context->{content});
+            if defined($context->{content}) && $context_content_ref ne '';
 
+        # Hooks may change the method. Keep the actual dispatched method for
+        # retry eligibility even if on_error hooks later mutate the context.
+        my $dispatched_method = $context->{method};
         my $started_at = time;
         $context->{started_at} = $started_at;
 
         my ($response, $error, $elapsed) = $self->_request_once(
-            $context->{method},
+            $dispatched_method,
             $context->{url},
             $context->{headers},
             $context->{content},
         );
 
         $context->{elapsed} = $elapsed;
-        $context->{request_id} = $response
+        $context->{request_id} = defined($response)
             ? $response->request_id
-            : $error ? $error->request_id : undef;
+            : defined($error) ? $error->request_id : undef;
 
         if ($response) {
             my $after_error = _run_hooks(
@@ -207,7 +239,7 @@ sub request {
                 $after_error,
                 $context->{method},
                 $context->{url},
-            ) if $after_error;
+            ) if defined $after_error;
             return $response;
         }
 
@@ -216,9 +248,11 @@ sub request {
             $on_error_error,
             $context->{method},
             $context->{url},
-        ) if $on_error_error;
+        ) if defined $on_error_error;
 
-        die $error if $attempt >= $attempts || !$error->retryable;
+        die $error if $attempt >= $attempts
+            || !$error->retryable
+            || !_method_is_retryable($dispatched_method, $retry);
 
         my $delay = _retry_delay($retry, $attempt, $error);
         sleep($delay) if $delay > 0;
@@ -233,7 +267,7 @@ sub _request_once {
     my $started_at = time;
 
     eval {
-        if ($self->{transport}) {
+        if (defined $self->{transport}) {
             my $request_opts = {
                 headers => $headers,
                 (defined($content) ? (content => $content) : ()),
@@ -255,8 +289,9 @@ sub _request_once {
         1;
     } or do {
         my $cause = $@;
+        my $cause_class = blessed($cause);
         return (undef, $cause, time - $started_at)
-            if blessed($cause) && $cause->isa('HTTP::API::Core::Error');
+            if defined($cause_class) && $cause->isa('HTTP::API::Core::Error');
 
         my $elapsed = time - $started_at;
         return (undef, HTTP::API::Core::Error->new(
@@ -272,13 +307,15 @@ sub _request_once {
     if (ref($raw) ne 'HASH'
         || !exists($raw->{status})
         || !defined($raw->{status})
-        || ref($raw->{status})
+        || ref($raw->{status}) ne ''
         || $raw->{status} !~ /\A\d{3}\z/
         || $raw->{status} < 100
         || $raw->{status} > 599
         || (defined($raw->{headers}) && ref($raw->{headers}) ne 'HASH')
-        || (defined($raw->{reason}) && ref($raw->{reason}))
-        || (defined($raw->{content}) && ref($raw->{content}))) {
+        || (defined($raw->{headers})
+            && grep { defined($_) && ref($_) ne '' } values %{ $raw->{headers} })
+        || (defined($raw->{reason}) && ref($raw->{reason}) ne '')
+        || (defined($raw->{content}) && ref($raw->{content}) ne '')) {
         my $elapsed = time - $started_at;
         return (undef, HTTP::API::Core::Error->new(
             category  => 'transport',
@@ -294,7 +331,7 @@ sub _request_once {
     my $response = HTTP::API::Core::Response->new(
         status  => 0 + $raw->{status},
         reason  => $raw->{reason},
-        headers => $raw->{headers} || {},
+        headers => defined($raw->{headers}) ? $raw->{headers} : {},
         content => defined($raw->{content}) ? $raw->{content} : '',
         method  => $method,
         url     => $url,
@@ -333,6 +370,7 @@ sub _normalize_hooks {
     die "hooks must be a hash reference\n" if ref($hooks) ne 'HASH';
 
     my %copy = %$hooks;
+    die "hook names must be scalars\n" if grep { ref($_) ne '' } keys %copy;
     my %normalized;
     for my $name (qw(before_request after_response on_error)) {
         my $value = delete $copy{$name};
@@ -351,7 +389,7 @@ sub _normalize_hooks {
 sub _clone_hooks {
     my ($hooks) = @_;
     return {
-        map { $_ => [ @{ $hooks->{$_} || [] } ] }
+        map { $_ => [ @{ defined($hooks->{$_}) ? $hooks->{$_} : [] } ] }
         qw(before_request after_response on_error)
     };
 }
@@ -361,8 +399,8 @@ sub _merge_hooks {
     return {
         map {
             $_ => [
-                @{ $first->{$_} || [] },
-                @{ $second->{$_} || [] },
+                @{ defined($first->{$_}) ? $first->{$_} : [] },
+                @{ defined($second->{$_}) ? $second->{$_} : [] },
             ]
         } qw(before_request after_response on_error)
     };
@@ -370,7 +408,7 @@ sub _merge_hooks {
 
 sub _run_hooks {
     my ($callbacks, @args) = @_;
-    for my $callback (@{ $callbacks || [] }) {
+    for my $callback (@{ defined($callbacks) ? $callbacks : [] }) {
         my $ok = eval { $callback->(@args); 1 };
         return $@ if !$ok;
     }
@@ -379,7 +417,8 @@ sub _run_hooks {
 
 sub _hook_error {
     my ($cause, $method, $url) = @_;
-    return $cause if blessed($cause) && $cause->isa('HTTP::API::Core::Error');
+    my $cause_class = blessed($cause);
+    return $cause if defined($cause_class) && $cause->isa('HTTP::API::Core::Error');
     return HTTP::API::Core::Error->new(
         category  => 'hook',
         method    => $method,
@@ -392,10 +431,12 @@ sub _hook_error {
 sub _normalize_retry {
     my ($retry) = @_;
     my %copy = %$retry;
+    die "retry option names must be scalars\n" if grep { ref($_) ne '' } keys %copy;
 
     my $attempts = exists $copy{attempts} ? delete($copy{attempts}) : 3;
+    my $attempts_ref = ref($attempts);
     die "retry attempts must be a positive integer\n"
-        if $attempts !~ /\A\d+\z/ || $attempts < 1;
+        if $attempts_ref ne '' || $attempts !~ /\A\d+\z/ || $attempts < 1;
 
     my $base_delay = exists $copy{base_delay}
         ? delete($copy{base_delay})
@@ -410,6 +451,7 @@ sub _normalize_retry {
         if !_non_negative_number($max_delay);
 
     my $jitter = exists $copy{jitter} ? delete($copy{jitter}) : 1;
+    die "retry jitter must be a scalar\n" if ref($jitter) ne '';
     $jitter = $jitter ? 1 : 0;
 
     my $methods = exists $copy{methods}
@@ -418,9 +460,11 @@ sub _normalize_retry {
     die "retry methods must be an array reference\n"
         if ref($methods) ne 'ARRAY';
 
-    my @methods = map { uc($_ // '') } @$methods;
+    die "retry methods must contain only scalar values\n"
+        if grep { ref($_) ne '' } @$methods;
     die "retry methods must not contain empty values\n"
-        if grep { $_ eq '' } @methods;
+        if grep { !defined($_) || $_ eq '' } @$methods;
+    my @methods = map { uc($_) } @$methods;
 
     die "unknown retry option: $_\n" for sort keys %copy;
 
@@ -446,7 +490,7 @@ sub _retry_delay {
     return $retry_after if defined $retry_after;
 
     my $rate_limit = $error->rate_limit;
-    if ($rate_limit && $rate_limit->exhausted) {
+    if (defined($rate_limit) && $rate_limit->exhausted) {
         my $wait = $rate_limit->wait_seconds;
         return $wait if defined $wait;
     }
@@ -471,10 +515,10 @@ sub _retry_after_delay {
     );
 
     return undef
-        if $value !~ /\A(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT\z/;
+        if $value !~ /\A(Mon|Tue|Wed|Thu|Fri|Sat|Sun), (\d{2}) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{4}) (\d{2}):(\d{2}):(\d{2}) GMT\z/;
 
-    my ($day, $mon, $year, $hour, $min, $sec) =
-        ($1, $2, $3, $4, $5, $6);
+    my ($weekday, $day, $mon, $year, $hour, $min, $sec) =
+        ($1, $2, $3, $4, $5, $6, $7);
 
     return undef if $hour > 23 || $min > 59 || $sec > 60;
 
@@ -482,6 +526,14 @@ sub _retry_after_delay {
         timegm($sec, $min, $hour, $day, $month{$mon}, $year);
     };
     return undef if $@ || !defined $epoch;
+
+    # IMF-fixdate includes a weekday, which must agree with the date.
+    # Inconsistent values are malformed, so use the normal retry fallback.
+    my %weekday_number = (
+        Sun => 0, Mon => 1, Tue => 2, Wed => 3,
+        Thu => 4, Fri => 5, Sat => 6,
+    );
+    return undef if (gmtime($epoch))[6] != $weekday_number{$weekday};
 
     my $delay = $epoch - $now;
     return $delay > 0 ? $delay : 0;
@@ -492,16 +544,17 @@ sub _append_query {
     my @pairs;
 
     for my $key (sort keys %$query) {
+        die "query parameter names must be scalars\n" if ref($key) ne '';
         my $value = $query->{$key};
         next if !defined $value;
 
         my @values;
         if (ref($value) eq 'ARRAY') {
             die "query parameter array values must contain only scalars or undef\n"
-                if grep { defined($_) && ref($_) } @$value;
+                if grep { defined($_) && ref($_) ne '' } @$value;
             @values = grep { defined $_ } @$value;
         }
-        elsif (ref($value)) {
+        elsif (ref($value) ne '') {
             die "query values must be scalars, array references, or undef\n";
         }
         else {
@@ -532,10 +585,21 @@ sub _uri_escape {
     return $bytes;
 }
 
+sub _validate_request_url {
+    my ($url) = @_;
+    my $url_ref = ref($url);
+    die "url must be a non-empty scalar\n"
+        if !defined($url) || $url_ref ne '' || $url eq '';
+    die "url must be an absolute HTTP(S) URL\n"
+        if $url !~ m{\Ahttps?://(?:[^/?#\s@]+@)?(?:\[[0-9A-Fa-f:.]+\]|[^/?#\s:@]+)(?::\d+)?(?:[/?#]|\z)}i;
+}
+
 sub _validate_header_values {
     my ($headers) = @_;
+    die "header names must be scalars\n"
+        if grep { ref($_) ne '' } keys %$headers;
     die "header values must be scalars or undef\n"
-        if grep { defined($_) && ref($_) } values %$headers;
+        if grep { defined($_) && ref($_) ne '' } values %$headers;
 }
 
 sub _set_header_if_absent {
@@ -548,6 +612,7 @@ sub _set_header_if_absent {
 sub _non_negative_number {
     my ($value) = @_;
     return defined($value)
+        && ref($value) eq ''
         && $value =~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/
         && $value >= 0;
 }
@@ -571,7 +636,7 @@ __END__
 
 =head1 NAME
 
-HTTP::API::Core - Small foundation for JSON HTTP API clients
+HTTP::API::Core - Build REST and JSON API clients in Perl
 
 =head1 SYNOPSIS
 
@@ -612,10 +677,11 @@ HTTP::API::Core - Small foundation for JSON HTTP API clients
 
 =head1 DESCRIPTION
 
-HTTP::API::Core is a deliberately small base layer for building HTTP API
-clients. It provides base URL handling, default headers, JSON request/response
-helpers, timeout configuration, structured errors, conservative retries,
-pagination helpers, normalized rate-limit metadata, and lifecycle hooks.
+HTTP::API::Core is a deliberately small, dependency-light base layer for
+building REST and JSON API clients in Perl. It provides base URL handling,
+default headers, JSON request/response helpers, timeout configuration,
+structured errors, conservative retries, pagination helpers, normalized
+rate-limit metadata, lifecycle hooks, and pluggable HTTP transports.
 
 Retry is enabled by default for GET, HEAD, PUT, DELETE, and OPTIONS. POST and
 PATCH are not retried automatically. Retryable failures include transport

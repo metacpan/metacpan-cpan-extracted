@@ -1,5 +1,34 @@
 Revision history for Perl extension App-nup
 
+1.17 2026-11-15T09:26:34Z
+
+    - With --lateral and more than one file, or -V, the files side by
+      side go on to the right, scrolled sideways, instead of below;
+      --no-lateral turns it off
+    - With --lateral, , and . and the arrow keys move by one page as
+      h and l, and without pages, < and > go to the ends as H and L
+
+1.16 2026-11-15T02:58:52Z
+
+    - Add NUP_OPTS for the options given before those on the command
+      line, as for nup called by another command: NUP_OPTS=-L man
+    - With --lateral, the keys are added after LESSKEY_CONTENT of the
+      user, so that they win over the same keys there and in
+      ~/.lesskey; NUP_LESSKEY gives keys in their place, and an empty
+      one adds none
+    - Rearrange the documents: the build of less in tecolicom/tap in
+      one place, the LESS section renamed to LESS INTEGRATION, a new
+      ENVIRONMENT section, and the keys of --lateral as a table
+
+1.15 2026-11-14T13:44:34Z
+
+    - With --lateral, g and < go to the left end and G and > to the
+      right end, as H and L, and space and b move to the right and
+      to the left by the panes on the screen (less 661 or later, by
+      LESSKEY_CONTENT); with a less that has --align-shift
+      (tecolicom/tap), G and > show the last screen as it is without
+      --lateral, the last pages at the left and the rest blank
+
 1.14 2026-11-13T07:02:52Z
 
     - Add --lateral (-L) to put all the pages in one row, however

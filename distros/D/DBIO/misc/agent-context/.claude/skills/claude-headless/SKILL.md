@@ -33,12 +33,11 @@ claude -p "Reply with exactly one word: PONG" \
   | jq -er '.result, (.modelUsage | keys[0])'
 ```
 
-**Default to the model you're already on.** `fable` / `claude-fable-5-1`
-is the most expensive slot in the Anthropic lineup and currently no better
-than `opus` (5.5) on most work — a one-shot `-p` call on `fable` writes a
-fresh cache before it even answers. Try `opus` at higher effort first;
-escalate to `fable` only when that falls short. Otherwise let the parent's
-tier stand.
+**Default to the model you're already on.** `fable` / `claude-fable-5-2`
+is the strongest and most expensive slot in the Anthropic lineup, twice
+`opus` (5.5), and a one-shot `-p` call on it writes a fresh cache before it
+even answers. Switch to it when the run's task sits at the frontier tier of
+skill `model-routing`; otherwise let the parent's tier stand.
 
 The system prompt's "alternative models" list (typically the recent Claude
 family plus Haiku) is the switch menu — your current model is often *not*

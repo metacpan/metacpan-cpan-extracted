@@ -20,7 +20,7 @@ use Getopt::Long qw(GetOptions);
 use FindBin;
 use lib -d "$FindBin::Bin/../lib/Mail/DKIM2" ? "$FindBin::Bin/../lib" : ();   # running from a checkout
 
-use Mail::DKIM2::Common qw(parse_dkim_pubkey);
+use Mail::DKIM2::Key qw(parse_dkim_pubkey);
 use Mail::DKIM2::Verifier;
 
 my ($dns_json, $ignore_ts, $allow_unsigned, @prefixes);

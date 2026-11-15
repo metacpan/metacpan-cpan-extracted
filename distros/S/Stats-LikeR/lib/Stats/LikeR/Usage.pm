@@ -870,8 +870,9 @@ usage: read_table(FILE [, sep => SEP] [, header => {0,1}] [, col_names => NAMES]
                   [, output_type => {aoa,aoh,hoa,hoh}] [, row_names => COL]
                   [, auto_row_names => NAME] [, comment => STR] [, quote => Q]
                   [, filter => FILTER] [, na_strings => STRS]
-                  [, colClasses => CLASSES] [, sheet => SHEET]
-                  [, explode => {0,1}])
+                  [, colClasses => CLASSES] [, keep_cols => COLS]
+                  [, drop_cols => COLS]
+                  [, sheet => SHEET] [, explode => {0,1}])
 
 Read a delimited text, VCF or .xlsx file into a data frame, like R's read.table.
 
@@ -904,6 +905,15 @@ options:
   colClasses => CLASSES  numeric, integer or character: one for all columns, an
                          array ref by position or a hash ref by name (default:
                          text, with an integer such as 42 stored as a number)
+  keep_cols => COLS      a column name, a qr// regex, or an array ref of
+                         either: only the columns with one of the names, or
+                         whose name matches one of the regexes, are stored, in
+                         the file's order; a hoh's row_names column is always
+                         kept (default: every column is kept)
+  drop_cols => COLS      a column name, a qr// regex, or an array ref of
+                         either: a column with one of the names, or whose name
+                         matches one of the regexes, is left out of the table
+                         and never stored (default: every column is kept)
   sheet => SHEET         .xlsx only: a sheet name or 1-based index (default: the
                          first sheet)
   explode => {0,1}       VCF only: split each sample column by its FORMAT keys
@@ -1051,7 +1061,7 @@ $SCREEN{view} = <<'END';
 usage: view(DF [, n => N] [, cols => COLS] [, row_names => COL] [, na => STR]
             [, max_width => N] [, ellipsis => STR] [, gap => N] [, width => N]
             [, color => {auto,0,1}] [, colors => COLORS] [, to => FH]
-            [, return_only => {0,1}])
+            [, return_only => {0,1}] [, size => {0,1}])
 
 Print the first rows of a data frame as an aligned table, like R's head.
 
@@ -1074,6 +1084,8 @@ options:
   colors => COLORS       hash ref of colour overrides
   to => FH               filehandle to print to (default: STDOUT)
   return_only => {0,1}   return the text and print nothing (default: 0)
+  size => {0,1}          say how much memory the data takes, in the first line
+                         (default: 1)
 
 example:
   my $text = view([ { a => 1, b => 'x' } ], return_only => 1)
@@ -3057,7 +3069,7 @@ Stats::LikeR::Usage
 
 =head1 VERSION
 
-version 0.3421
+version 0.3422
 
 =head1 AUTHOR
 

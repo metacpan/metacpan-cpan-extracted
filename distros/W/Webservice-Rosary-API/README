@@ -1,7 +1,7 @@
 This archive contains the distribution Webservice-Rosary-API,
-version 0.1.9:
+version 0.1.10:
 
-  Perl API client for the Rosary API at https://the-rosary-api.vercel.app and https://dailyrosary.cf.
+  Perl API client for the Rosary API at https://the-rosary-api.vercel.app and https://dailyrosary.catholicdevotion.org.
 
 This software is copyright (c) 2024-present by Brett Estrade.
 

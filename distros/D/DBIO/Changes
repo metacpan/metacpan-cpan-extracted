@@ -1,5 +1,14 @@
 Revision history for DBIO
 
+0.900006  2026-11-14
+    * Changed
+        - DBIO::EncodedColumn takes the SHA3 digests directly from
+          Digest::SHA3, so they work on every perl that has it installed.
+        - DBIO::Test::AsyncHarness: await sets the signal for its timeout a
+          grace period after its clock and catches a signal that arrives
+          late, so the harness reports the timeout itself, also on hosts whose
+          kernel timers run slower than the clock.
+
 0.900005  2026-11-13
     * Added
         - DBIO::Test::Slow marks a test file as slow: with it loaded after

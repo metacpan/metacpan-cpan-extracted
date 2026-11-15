@@ -154,6 +154,24 @@ our $VERSION = 0.01;
 
 {
   my $t = UpdateConfigTest->new;
+  $t->add_fragment('reason', "SKIP the reason\ncontent\n");
+  $t->add_fragment('no_reason', "SKIP\nREQUIRE die 'not evaluated'\ncontent\n");
+  my $r = $t->run();
+  is($r->{exit}, 0, 'SKIP: success');
+  is($t->read_home_file('reason'), undef, 'SKIP: fragment not applied');
+  is($t->read_home_file('no_reason'), undef, 'SKIP: fragment without reason not applied');
+  like(
+    $r->{stdout},
+    qr/^Skipping[ ]reason[ ]due[ ]to[ ]SKIP[ ]directive:[ ]the[ ]reason$/mx,
+    'SKIP: reason printed');
+  like(
+    $r->{stdout},
+    qr/^Skipping[ ]no_reason[ ]due[ ]to[ ]SKIP[ ]directive$/mx,
+    'SKIP: skipped without reason');
+}
+
+{
+  my $t = UpdateConfigTest->new;
   $t->add_fragment('file', "REQUIRE die 'oops'\ncontent\n");
   my $r = $t->run();
   isnt($r->{exit}, 0, 'REQUIRE: failure on error');

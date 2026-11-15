@@ -57,9 +57,8 @@ sub signed {
         (defined $o{flags} ? (Flags => [ split /\s*,\s*/, $o{flags} ]) : ()),
         Signatures => [ map { [$_->[0], $_->[1], ''] } @items ]);
     my $input = build_signing_input(
-        mi_headers => [{ v => 1, raw => "Message-Instance: $mi\r\n" }],
-        signing_i => 1, signature => $s,
-        signing_header => $s->as_folded_string_without_data);
+        instances => ["Message-Instance: $mi\r\n"],
+        signing   => $s->as_folded_string);
     my $sig = encode_base64($key->sign_message($input, 'SHA256', 'v1.5'), '');
     $s->set_tag('s', join ',', map {
         "$_->[0]:$_->[1]:" . (@$_ > 2 ? $_->[2] : $sig)
@@ -93,9 +92,8 @@ sub _signed_s {
         RcptTo => ['b@test2.dkim2.com']);
     $s->set_tag('s', $blank);
     my $input = build_signing_input(
-        mi_headers => [{ v => 1, raw => "Message-Instance: $mi\r\n" }],
-        signing_i => 1, signature => $s,
-        signing_header => $s->as_folded_string_without_data);
+        instances => ["Message-Instance: $mi\r\n"],
+        signing   => $s->as_folded_string);
     (my $value = $o{s}) =~ s{([^:,|\s]+):([^:,|\s]+):(SIG|BAD)(?=\s*[,|]|\z)}{
         "$1:$2:" . _sign_with($1, $2, $3 eq 'SIG' ? $input : "other $input")
     }ge;

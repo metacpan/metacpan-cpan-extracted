@@ -9,6 +9,7 @@ use Ekorn::Pipeline;
 use Ekorn::Pipeline::Gather;
 use Ekorn::Pipeline::Stages::Batch;
 use Ekorn::Pipeline::Stages::Flow;
+use Ekorn::Pipeline::Stages::Taps;
 use Ekorn::Pipeline::Stop;
 
 my $class = 'Ekorn::Pipeline';
@@ -113,6 +114,32 @@ subtest 'take(0) sees one value first' => sub {
     my $calls = 0;
     my $next  = $class->new(take(0))->iterator(sub { $calls++; 1 });
     is [[$next->()], $calls], [[], 1], 'so the source is called once';
+};
+
+subtest 'Canned stages: each is an object, called as a code reference' => sub {
+    my $count;
+    open my $null, '>', \my $dumped or die "Can't open a string: $!\n";
+    my %stages = (
+        take        => take(1),
+        drop        => drop(1),
+        take_first  => Ekorn::Pipeline::Stages::Flow::take_first(),
+        take_last   => Ekorn::Pipeline::Stages::Flow::take_last(),
+        take_single => Ekorn::Pipeline::Stages::Flow::take_single(),
+        take_while  => Ekorn::Pipeline::Stages::Flow::take_while(sub { 1 }),
+        take_if     => Ekorn::Pipeline::Stages::Flow::take_if(sub { 1 }),
+        drop_if     => Ekorn::Pipeline::Stages::Flow::drop_if(sub { 1 }),
+        drop_while  => Ekorn::Pipeline::Stages::Flow::drop_while(sub { 1 }),
+        batch       => batch(2),
+        collect     => collect(),
+        peek        => Ekorn::Pipeline::Stages::Taps::peek(sub { }),
+        count_into  => Ekorn::Pipeline::Stages::Taps::count_into(\$count),
+        dump_to     => Ekorn::Pipeline::Stages::Taps::dump_to($null),
+    );
+    for my $name (sort keys %stages) {
+        my $stage = $stages{$name};
+        ok $stage isa 'Ekorn::Pipeline::Element' && ref $stage ne 'CODE',
+            "$name is an Element, not a plain code reference";
+    }
 };
 
 subtest 'Exports: Ekorn::Pipeline exports nothing by default' => sub {

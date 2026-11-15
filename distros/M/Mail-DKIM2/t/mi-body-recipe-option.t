@@ -194,12 +194,7 @@ subtest 'BodyHash misuse croaks' => sub {
           BodyHash => { sha256 => $bh } ],
         [ 'not b64 or hash', BodyRecipe => 'null', BodyHash => [] ],
         [ 'body diff', BodyHash => $bh ],
-        [ 'epilogue', UseEpilogue => 1, BodyHash => $bh ],
-        [ 'threshold', EpilogueThreshold => 3, BodyHash => $bh ],
     );
-    # The epilogue options croak in 0.23 whatever else is given (final
-    # review M5); the BodyHash check is still there behind them.
-    local $Mail::DKIM2::MessageInstance::ENABLE_BROKEN_EPILOGUE = 1;
     for my $c (@bad) {
         my ($name, @opts) = @$c;
         eval { Mail::DKIM2::MessageInstance->calculate($cur, $headers_only_prev, @opts) };

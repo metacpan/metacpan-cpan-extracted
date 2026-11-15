@@ -1,6 +1,6 @@
 package DBIO::Test::Slow;
 # ABSTRACT: Mark a test file as slow so DBIO_TEST_FAST skips it
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 use strict;
 use warnings;
 
@@ -27,7 +27,7 @@ DBIO::Test::Slow - Mark a test file as slow so DBIO_TEST_FAST skips it
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

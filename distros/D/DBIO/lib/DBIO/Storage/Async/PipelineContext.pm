@@ -4,7 +4,7 @@ package DBIO::Storage::Async::PipelineContext;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Carp 'croak';
 use Scalar::Util ();
@@ -208,7 +208,7 @@ DBIO::Storage::Async::PipelineContext - Generic pinned-connection context for as
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 DESCRIPTION
 

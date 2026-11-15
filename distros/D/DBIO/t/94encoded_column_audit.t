@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use Digest ();
 use Digest::SHA ();
 
 use DBIO::Test::Storage;
@@ -124,7 +125,15 @@ sub class_error {
 my $dbio_hash = $rs->new_result({ password => 'secret' })->get_column('password');
 like($dbio_hash, qr/\Adbio\$SHA-256\$/, 'fixture: dbio hash');
 
-my $bcrypt = crypt('secret', '$2b$06$abcdefghijklmnopqrstuu');
+# The crypt() of the system, or undef where it has none: a perl built without
+# crypt() dies when it is called, and such a host has no hash of it to compare.
+sub system_crypt {
+  my ($plain, $salt) = @_;
+  local $@;
+  return eval { crypt($plain, $salt) };
+}
+
+my $bcrypt = system_crypt('secret', '$2b$06$abcdefghijklmnopqrstuu');
 my $have_crypt_bcrypt = defined $bcrypt && $bcrypt =~ /\A\$2b\$06\$/;
 my $have_module = eval { require Crypt::Bcrypt; 1 };
 
@@ -332,6 +341,29 @@ subtest 'the class definition is refused for what the component would ignore' =>
   }
 };
 
+subtest 'SHA3 is known without the SHA3 entries in Digest' => sub {
+  plan skip_all => 'Digest::SHA3 is not installed'
+    unless eval { require Digest::SHA3; 1 };
+  require MIME::Base64;
+
+  # a stored value built from Digest::SHA3 alone
+  my $salt = 'saltsalt';
+  my $stored = join '$', 'dbio', 'SHA3-256',
+    MIME::Base64::encode_base64($salt, ''),
+    MIME::Base64::encode_base64(Digest::SHA3->new(256)->add($salt)->add('secret')->digest, '');
+
+  # a Digest older than 1.20 has no SHA3 names in its table
+  my @names = map { "SHA3-$_" } 224, 256, 384, 512;
+  delete local @Digest::MMAP{@names};
+
+  is(class_error({ encode_class => 'Digest', encode_args => { algorithm => 'SHA3-256', salt_length => 0, accept_unencoded => 0 } }),
+    undef, 'SHA3-256 is accepted in the class definition');
+
+  my $row = from_storage($user_source, $stored);
+  is($row->check_password('secret'), 1, 'a stored SHA3-256 value: right password');
+  is($row->check_password('wrong'),  0, 'a stored SHA3-256 value: wrong password');
+};
+
 # ---------------------------------------------- value without a hash format --
 
 subtest 'a stored value without a hash format: opt-in, constant time, 0 or 1' => sub {
@@ -384,7 +416,7 @@ subtest 'a dbio hash is compared in constant time' => sub {
 subtest 'foreign hash formats are plaintext to the column and are hashed again' => sub {
   my @foreign = (
     [ 'DBIx::Class::EncodedColumn Digest SHA-1 hex' => $dbic_hex ],
-    [ 'crypt $6$'                                    => crypt('secret', '$6$saltsalt$') ],
+    [ 'crypt $6$'                                    => system_crypt('secret', '$6$saltsalt$') ],
   );
 
   for my $case (@foreign) {

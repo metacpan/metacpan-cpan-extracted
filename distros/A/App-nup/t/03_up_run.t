@@ -107,7 +107,7 @@ case "$*" in *--version*)
     exit 0 ;;
 esac
 echo "ARGS: $*"
-echo "KEYS: $LESSKEY_CONTENT"
+printf "KEYS: %s\n" "$LESSKEY_CONTENT"
 cat >/dev/null
 SH
     close $fh;
@@ -128,21 +128,56 @@ SH
          'less shifts by the width of a pane');
     unlike(optex('-Mup', '-S20', @cmd)->run->stdout, qr/--shift/,
            'no shift without --lateral');
+    unlike(optex('-Mup', '--lateral', '--no-lateral', '-S20', @cmd)->run->stdout,
+           qr/--shift/, '--no-lateral turns it off');
 
-    # h and l of less scroll to the left and to the right
-    like(optex('-Mup', '--lateral', @cmd)->run->stdout,
-         qr/^KEYS: h left-scroll;l right-scroll;H no-scroll;L end-scroll$/m,
-         'h, l, H and L are given to less');
+    # The arrow keys, and ESC-) and ESC-( with the same actions, scroll
+    # to the right and to the left, H, L, g, G, < and > go to the ends,
+    # and space and b move by the panes on the screen: a count of ESC-)
+    # and ESC-( with --align-shift, them as many times without
+    my $on_screen = sub { my $w = shift; int($width / $fit->($w)) };
+    my $keys = sub {
+        my($right, $align) = @_;
+        my $n = $on_screen->(20);
+        my($fwd, $back) = map { $align ? "$n$_" : $_ x $n } '\e)', '\e(';
+        my $end = $align ? "noaction ${n}L" : 'end-scroll';
+        "h left-scroll;l $right;, left-scroll;. $right;\\kl left-scroll;\\kr $right;\\e( left-scroll;\\e) $right;H no-scroll;L end-scroll;"
+        . "g no-scroll;G $end;< no-scroll;> $end;"
+        . "\\  noaction $fwd;b noaction $back";
+    };
+    like(optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout,
+         qr/^KEYS: \Q@{[ $keys->('right-scroll', 0) ]}\E$/m,
+         'keys are given to less');
     like(optex('-Mup', @cmd)->run->stdout,
          qr/^KEYS: $/m, 'no keys without --lateral');
     {
+        # The keys go after the LESSKEY_CONTENT of the user, in a
+        # #command section, so that they win over the same keys there
+        local $ENV{LESSKEY_CONTENT} = 'x quit';
+        like(optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout,
+             qr/^KEYS: x quit\n#command\n\Q@{[ $keys->('right-scroll', 0) ]}\E$/m,
+             'keys are added to LESSKEY_CONTENT of the user');
+    }
+    {
+        # NUP_LESSKEY gives the keys in place of those of nup, and
+        # an empty one gives none, leaving LESSKEY_CONTENT as it is
+        local $ENV{NUP_LESSKEY} = 'y quit';
+        like(optex('-Mup', '--lateral', @cmd)->run->stdout,
+             qr/^KEYS: y quit$/m, 'keys of NUP_LESSKEY');
         local $ENV{LESSKEY_CONTENT} = 'x quit';
         like(optex('-Mup', '--lateral', @cmd)->run->stdout,
-             qr/^KEYS: x quit$/m, 'LESSKEY_CONTENT of the user is kept');
+             qr/^KEYS: x quit\n#command\ny quit$/m,
+             'keys of NUP_LESSKEY are added to LESSKEY_CONTENT');
+        $ENV{NUP_LESSKEY} = '';
+        like(optex('-Mup', '--lateral', @cmd)->run->stdout,
+             qr/^KEYS: x quit$/m, 'LESSKEY_CONTENT is kept with empty NUP_LESSKEY');
+        delete $ENV{LESSKEY_CONTENT};
+        like(optex('-Mup', '--lateral', @cmd)->run->stdout,
+             qr/^KEYS: $/m, 'no keys with empty NUP_LESSKEY');
     }
-    # A less of 710 or later stops l at the right end, and one that has
-    # --align-shift keeps the shift at the boundaries of the panes
-    my $keys = sub { "h left-scroll;l $_[0];H no-scroll;L end-scroll" };
+    # A less of 710 or later stops the right arrow at the right end,
+    # and one that has --align-shift keeps the shift at the boundaries
+    # of the panes
     for (['709x',             'right-scroll',       ''],
          ['710',              'right-limit-scroll', ''],
          ['713x align-shift', 'right-limit-scroll', ' --align-shift']) {
@@ -151,7 +186,8 @@ SH
         my $out = optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout;
         like($out, qr/^ARGS: --file-size -S --shift=@{[ $fit->(20) ]} --rscroll=-\Q$align\E$/m,
              "less $less: options");
-        like($out, qr/^KEYS: \Q@{[ $keys->($right) ]}\E$/m, "less $less: l is $right");
+        like($out, qr/^KEYS: \Q@{[ $keys->($right, $align) ]}\E$/m,
+             "less $less: right is $right" . ($align ? ', space and b by a count' : ''));
     }
     like(optex('-Mup', '-L', "--pager=$bin/less -R", @cmd)->run->stdout,
          qr/^ARGS: -R -S --shift=@{[ $fit->(85) ]} --rscroll=-$/m,
@@ -167,13 +203,23 @@ SH
         # a page of 8 lines has 6 lines of text inside the border
         is(length $top, $pane->(4) * 7, 'seven panes, each a quarter of the screen');
     }
+    # Without pages, as for the files side by side, only the arrow
+    # keys, ESC-) and ESC-(, H, L, < and > are put, and the other keys
+    # move up and down as usual
+    like(optex('-Mup', '--lateral', '--no-paginate', '-S20', @cmd)->run->stdout,
+         qr/^KEYS: h left-scroll;l right-scroll;, left-scroll;\. right-scroll;\\kl left-scroll;\\kr right-scroll;\\e\( left-scroll;\\e\) right-scroll;H no-scroll;L end-scroll;< no-scroll;> end-scroll$/m,
+         'without pages, only the arrows, H, L, < and >');
+    like(optex('-Mup', '--lateral', '--no-paginate', '-S20', @cmd)->run->stdout,
+         qr/^ARGS: --file-size -S --shift=@{[ $fit->(20) ]} --rscroll=-$/m,
+         'without pages, less shifts by the width of a pane');
+
     $ENV{NUP_PAGER} = q(perl -pe s/^/OTHER:/);
     my $other = optex('-Mup', '--lateral', '-S20', @cmd)->run;
     like($other->stdout, qr/^OTHER:/m, 'another pager is used as it is');
     is($other->status, 0, 'another pager gets no option of less');
 
     # what makes no sense with one row of pages
-    for my $with ('-R2', '-C2,2', '-G2x2', '--no-paginate', '-T a4', '-o out.pdf') {
+    for my $with ('-R2', '-C2,2', '-G2x2', '-T a4', '-o out.pdf') {
         isnt(run("-Mup --lateral $with --no-pager -- true")->status, 0,
              "--lateral with $with fails");
     }

@@ -12,10 +12,17 @@ use Sendmail::PMilter 1.28 ':all';   # 1.27 never answered MAIL FROM:<>
 # should_skip are known at compile time. Spec version constants are the single
 # source of truth in Mail::DKIM2::Common.
 use Mail::DKIM2::Common qw(
-    parse_dkim_pubkey load_private_key fold_header extract_mi_version strip_mi_versions should_skip parse_mime
-    chain_number_error mi_version_tag from_refusal_note
-    DKIM2_DRAFT DKIM2_REPO DKIM2_DATE
+    extract_mi_version
+    strip_mi_versions
+    parse_mime
+    DKIM2_DRAFT
+    DKIM2_REPO
+    DKIM2_DATE
 );
+use Mail::DKIM2::Address qw(from_refusal_note);
+use Mail::DKIM2::Canon qw(should_skip);
+use Mail::DKIM2::Fold qw(fold_header);
+use Mail::DKIM2::Key qw(parse_dkim_pubkey load_private_key);
 use constant DKIM2_SOFTWARE => 'dkim2-milter';
 
 # X-DKIM2-Info value per draft-gondwana-dkim2-debug-header-01: a tag-list in
@@ -57,6 +64,7 @@ sub _header_list_for_hash {
 use Mail::DKIM2::Signer;
 use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Gate;
+use Mail::DKIM2::Hop;
 use Mail::DKIM2::MessageInstance;
 use Mail::DKIM2::MessageStore;
 use Mail::DKIM2::Wrap qw(wrap_single_part);
@@ -78,33 +86,17 @@ GetOptions(\%opts,
     'snapshot-dir=s',
     'dns-json=s',
     'allow-null-body-recipe',
-    'use-epilogue',
-    'epilogue-threshold=i',
     'max-recipe-literals=i',
     'wrap-single-part',
+    'no-envelope-check',
     'help|h',
 ) or pod2usage(2);
 
 pod2usage(-exitval => 0, -verbose => 2, -noperldoc => 1) if $opts{help};
 
-if ($opts{'use-epilogue'} && defined $opts{'epilogue-threshold'}) {
-    die "--use-epilogue and --epilogue-threshold are mutually exclusive\n";
-}
-if (defined $opts{'max-recipe-literals'}
-    && ($opts{'use-epilogue'} || defined $opts{'epilogue-threshold'})) {
-    die "--max-recipe-literals cannot be combined with --use-epilogue or --epilogue-threshold\n";
-}
 if (defined $opts{'max-recipe-literals'} && $opts{'max-recipe-literals'} < 0) {
     die "--max-recipe-literals must not be negative\n";
 }
-# Disabled (final review M5): the Message-Instance is computed over the
-# message rewritten with the epilogue, but the original bytes are signed,
-# and that mail fails verification.
-if ($opts{'use-epilogue'} || defined $opts{'epilogue-threshold'}) {
-    die "--use-epilogue and --epilogue-threshold are disabled in this release: "
-      . "they produce mail that fails verification (Mail::DKIM2 0.23 Changes)\n";
-}
-
 # Retired in 0.29 (-09 contract E2): this hop's own null body Recipe is
 # always signed. Still accepted so an existing unit file starts.
 warn "dkim2-milter: --allow-null-body-recipe is deprecated and does nothing: "
@@ -126,6 +118,10 @@ if ($opts{'wrap-single-part'}) {
 
 my $do_verify = $opts{mode} eq 'inbound' || $opts{mode} eq 'both';
 my $do_sign   = $opts{mode} eq 'outbound' || $opts{mode} eq 'both';
+# -09 section 14.4: the envelope must match the top signature. Only where the
+# transaction is the one the message arrived in: in --mode both it is the
+# outgoing one.
+my $check_envelope = $opts{mode} eq 'inbound' && !$opts{'no-envelope-check'};
 
 # Determine if signing is possible
 my $can_sign_single = $opts{domain} && $opts{selector} && $opts{keyfile};
@@ -180,15 +176,7 @@ if ($opts{'snapshot-dir'}) {
 
 # Options passed to MessageInstance->calculate() for diff-based MI
 my %mi_opts;
-if ($opts{'use-epilogue'}) {
-    $mi_opts{UseEpilogue} = 1;
-    warn "dkim2-milter: MI strategy: UseEpilogue (always store body in MIME epilogue)\n";
-}
-elsif (defined $opts{'epilogue-threshold'}) {
-    $mi_opts{EpilogueThreshold} = $opts{'epilogue-threshold'};
-    warn "dkim2-milter: MI strategy: EpilogueThreshold=$opts{'epilogue-threshold'}\n";
-}
-elsif (defined $opts{'max-recipe-literals'}) {
+if (defined $opts{'max-recipe-literals'}) {
     $mi_opts{MaxRecipeLiterals} = $opts{'max-recipe-literals'};
     warn "dkim2-milter: MI strategy: MaxRecipeLiterals=$opts{'max-recipe-literals'}\n";
 }
@@ -322,7 +310,7 @@ sub cb_header {
 sub cb_eoh {
     my ($ctx) = @_;
     my $priv = $ctx->getpriv;
-    $priv->{verify} = _start_verify($priv->{raw_hdrs}) if $do_verify;
+    $priv->{verify} = _start_verify($priv) if $do_verify;
     return SMFIS_CONTINUE;
 }
 
@@ -353,6 +341,13 @@ sub cb_eom {
     # distribution copy, asking the signer for the -08 "exploded" flag. Only
     # a signing milter acts on it, and it never leaves: removed before signing.
     $priv->{exploded} = _strip_exploded_header($ctx, $priv, \$message) if $do_sign;
+    # A List-Id says the same without being asked: a list sent this copy,
+    # and a list sends copies to more than one address. That covers a list
+    # manager that adds no hint (stock Mailman). The Signer drops the flag
+    # from a first signature (-09 section 12.5), so an unsigned post the
+    # list originates as i=1 is unaffected.
+    $priv->{exploded} ||= 1
+        if $do_sign && substr($message, 0, index($message, "\r\n\r\n") + 2) =~ /^List-Id[ \t]*:/mi;
 
     # Extract message-id for logging
     my $msgid = '';
@@ -374,7 +369,7 @@ sub cb_eom {
     if ($do_verify) {
         # Started at the end of the headers; should no eoh have come, here.
         $verify_result = _finish_verify($priv->{verify} // do {
-            my $state = _start_verify($priv->{raw_hdrs});
+            my $state = _start_verify($priv);
             _feed_verify($state, $priv->{body});
             $state;
         });
@@ -385,8 +380,8 @@ sub cb_eom {
         # Authentication-Results is not in the spec exclusion list so it
         # is included in the header hash.  The MI must be computed over
         # a synthetic message that already contains these headers.
-        my $ar_value = "localhost; dkim2=$result";
-        my $info_value = _dkim2_info("verify=$result");
+        my $ar_value = "localhost; dkim2=" . _ar_result($result);
+        my $info_value = _dkim2_info("verify=" . _ar_result($result));
         my $ar_raw = "Authentication-Results: $ar_value$EOL";
         # _dkim2_info() folds with bare LF (the milter wire form); the
         # message we stamp, snapshot and may wrap is CRLF throughout.
@@ -798,11 +793,31 @@ sub _gate_pubkey_cb {
 #
 # Fail closed: a verifier exception, at any step, is reported as temperror
 # (never pass) and logged at the end, rather than killing the callback.
+# A verdict ("fail (FAIL: ...)") as Authentication-Results carries it: the
+# result word, then the detail as an RFC 5322 comment. The detail quotes
+# signature fields (a bad i= or m= value, as written), so it is cut to
+# printable ASCII, its "\", "(" and ")" quoted, and kept short: a crafted
+# i= must not close the comment and add properties of its own.
+sub _ar_result {
+    my ($verdict) = @_;
+    my ($word, $detail) = ($verdict // '') =~ /\A([a-z]+)(?: \((.*)\))?\z/s
+        or return 'temperror (unreadable verdict)';
+    return $word unless defined $detail && length $detail;
+    $detail =~ s/[^\x20-\x7e]//g;
+    $detail = substr($detail, 0, 200) . '...' if length $detail > 200;
+    $detail =~ s/([\\()])/\\$1/g;
+    return "$word ($detail)";
+}
+
 sub _start_verify {
-    my ($raw_hdrs) = @_;
+    my ($priv) = @_;
+    my $raw_hdrs = $priv->{raw_hdrs};
     my $state = {};
     eval {
-        my $verifier = Mail::DKIM2::Verifier->new();
+        my $verifier = Mail::DKIM2::Verifier->new($check_envelope ? (
+            MailFrom => '<' . ($priv->{env_from} // '') . '>',
+            RcptTo   => [ map { "<$_>" } @{ $priv->{env_rcpt} || [] } ],
+        ) : ());
         my %cb = _gate_pubkey_cb();
         $verifier->set_pubkey_callback($cb{PubkeyCallback}) if $cb{PubkeyCallback};
         $state->{verifier} = $verifier;
@@ -872,121 +887,17 @@ sub _compute_mi {
     $info->{hc} = $hcount;
     $info->{hn} = $hnames;
 
-    my @mi_hdrs = $msg->header_raw('Message-Instance');
-    my $matched = @mi_hdrs && Mail::DKIM2::MessageInstance->verify($msg);
-    $info->{matched} = 1 if $matched;
-
-    # Outbound, unsigned: restart as one m=1 unless it already is one.
-    return _restart_mi($message, $msg, \@mi_hdrs, $matched, $info, %o)
-        if $o{Outbound} && @mi_hdrs && !$msg->header_raw('DKIM2-Signature')
-        && !($matched && @mi_hdrs == 1);
-
-    # The top instance already describes the content: nothing to add.
-    return undef if $matched;
-
-    # An m= above MAX_CHAIN_LENGTH is a PERMERROR (the verifier and the gate
-    # say so) and is never a range bound below: snap_max_v+1 .. max_v with
-    # m=99999999999999999999 dies, and m=4294967297 is a four-billion
-    # element list. Add no instance over such a chain.
-    if (my ($e) = grep { defined } map { chain_number_error('Message-Instance', 'm', mi_version_tag($_)) }
-                                    @mi_hdrs) {
-        warn "dkim2-milter: not computing a Message-Instance: $e\n";
-        return undef;
+    # Which instance, if any, and over what: Mail::DKIM2::Hop decides.
+    my $next = Mail::DKIM2::Hop->next_instance($message, %mi_opts,
+        map { defined $o{$_} ? ($_ => $o{$_}) : () } qw(Snapshot Outbound));
+    $info->{matched} = 1 if $next->{matched};
+    if (@{ $next->{removed} }) {
+        $info->{strip_mi_versions} = $next->{removed};
+        $info->{restart} = $next->{removed} if $next->{restart};
     }
-
-    # No instance yet: this hop originates the chain, m=1 over everything.
-    return _format_mi(Mail::DKIM2::MessageInstance->calculate($msg)) unless @mi_hdrs;
-
-    # The top instance does not match. Only a snapshot this host took of this
-    # very message can say what changed; anything else (a lookup by instance
-    # value would find a different message that carried the same instance)
-    # would book someone else's change as ours.
-    unless (defined $o{Snapshot}) {
-        warn "dkim2-milter: top Message-Instance does not match the content and no snapshot of ours describes it\n";
-        return undef;
-    }
-    my $snap_msg = parse_mime($o{Snapshot});
-    my @snap_mi = $snap_msg->header_raw('Message-Instance');
-    my %by_v      = map { (extract_mi_version($_) || 0) => $_ } @mi_hdrs;
-    my %snap_by_v = map { (extract_mi_version($_) || 0) => $_ } @snap_mi;
-    # The snapshot's instances must be the message's lower ones, unchanged.
-    for my $v (keys %snap_by_v) {
-        my ($a, $b) = map { defined $_ ? s/\s+/ /gr =~ s/^ | $//gr : '' } $snap_by_v{$v}, $by_v{$v};
-        if ($a ne $b) {
-            warn "dkim2-milter: snapshot does not belong to this message (m=$v differs)\n";
-            return undef;
-        }
-    }
-
-    # The message may have more instances than the snapshot: a hop between
-    # added some, and since the top one does not match, they are broken.
-    # Strip them and recompute a fresh diff from the snapshot rather than
-    # propagating a broken chain.
-    my ($work_message, $work_msg) = ($message, $msg);
-    my $max_v      = (sort { $b <=> $a } keys %by_v)[0];
-    my $snap_max_v = (sort { $b <=> $a } keys %snap_by_v)[0] // 0;
-    if ($max_v > $snap_max_v) {
-        my @to_strip = ($snap_max_v + 1 .. $max_v);
-        $work_message = strip_mi_versions($message, @to_strip);
-        $work_msg = eval { parse_mime($work_message) };
-        $info->{strip_mi_versions} = \@to_strip;
-        warn "dkim2-milter: stripping broken MI versions "
-           . join(',', map { "m=$_" } @to_strip)
-           . " (snapshot at m=$snap_max_v) — broken chain detected\n";
-    }
-
-    my $mi = eval {
-        Mail::DKIM2::MessageInstance->calculate($work_msg, $snap_msg, %mi_opts);
-    };
-    return $mi ? _format_mi($mi) : undef;
-}
-
-# _restart_mi: the m=1 an unsigned outgoing copy leaves with (-09 section
-# 12.1; see _compute_mi). The message as it arrived comes from the chain of
-# instances itself when its top matches the content (a list manager that
-# recorded its own change), else from this host's snapshot of this very
-# message. Either chain must undo cleanly; if not, no instance, and the gate
-# refuses the message on its chain as before.
-sub _restart_mi {
-    my ($message, $msg, $mi_hdrs, $matched, $info, %o) = @_;
-    my @versions = sort { $a <=> $b } map { extract_mi_version($_) // 0 } @$mi_hdrs;
-    if (my ($e) = grep { defined } map { chain_number_error('Message-Instance', 'm', mi_version_tag($_)) }
-                                    @$mi_hdrs) {
-        warn "dkim2-milter: not computing a Message-Instance: $e\n";
-        return undef;
-    }
-    my $previous;
-    if ($matched) {
-        $previous = $message;
-    } elsif (!defined $o{Snapshot}) {
-        warn "dkim2-milter: top Message-Instance does not match the content and no snapshot of ours describes it\n";
-        return undef;
-    } else {
-        # The snapshot's instances must be the message's own, unchanged
-        # (any the message has above them are dropped with the rest).
-        my $snap_msg = parse_mime($o{Snapshot});
-        my %by_v = map { (extract_mi_version($_) || 0) => $_ } @$mi_hdrs;
-        for my $sv ($snap_msg->header_raw('Message-Instance')) {
-            my $v = extract_mi_version($sv) || 0;
-            my ($a, $b) = map { defined $_ ? s/\s+/ /gr =~ s/^ | $//gr : '' } $sv, $by_v{$v};
-            if ($a ne $b) {
-                warn "dkim2-milter: snapshot does not belong to this message (m=$v differs)\n";
-                return undef;
-            }
-        }
-        $previous = $o{Snapshot};
-    }
-    my ($ok, $why) = Mail::DKIM2::MessageInstance->chain_verifies($previous);
-    unless ($ok) {
-        warn "dkim2-milter: not restarting the unsigned instances as m=1: $why\n";
-        return undef;
-    }
-    my $mi = Mail::DKIM2::MessageInstance->calculate_first($message, $previous, %mi_opts);
-    $info->{strip_mi_versions} = \@versions;
-    $info->{restart} = \@versions;
-    warn "dkim2-milter: restarting unsigned " . join(',', map { "m=$_" } @versions)
-       . " as one m=1\n";
-    return _format_mi($mi);
+    warn "dkim2-milter: $next->{detail}\n"
+        if $next->{reason} !~ /\A(?:unchanged|first|changed)\z/ || @{ $next->{removed} };
+    return $next->{instance} ? $next->{instance}->as_header_value : undef;
 }
 
 # Not signing: remove every Message-Instance no DKIM2-Signature on the
@@ -1053,13 +964,6 @@ sub _strip_header {
     return @val;
 }
 
-sub _format_mi {
-    my ($mi) = @_;
-    my $folded = fold_header("Message-Instance: " . $mi->as_string());
-    $folded =~ s/^Message-Instance: //;
-    return $folded;
-}
-
 # Convert CRLF folding to LF for milter insheader (CRLF = end of value)
 sub _milter_value {
     my ($val) = @_;
@@ -1085,7 +989,7 @@ sub _do_sign {
             ($priv->{exploded} ? (Exploded => 1) : ()),
             # -09 contract E3.4: a d= below the From domain signs only for
             # a parent the configuration lists; no DNS lookup.
-            ParentFromCallback => Mail::DKIM2::Common::parent_from_matcher(
+            ParentFromCallback => Mail::DKIM2::Address::parent_from_matcher(
                 @{ $config->{parent_from} || [] }),
         );
         $signer->PRINT($message);
@@ -1172,9 +1076,10 @@ auto-detected from the key type (RSA or Ed25519).
 When signing, a message carrying an C<X-DKIM2-Exploded> header field (any
 value; Mailman and Sympa add C<X-DKIM2-Exploded: yes> to every
 distribution copy) is signed with the C<exploded> flag (-09 section 12.5),
-which a signature also gets whenever the message has more than one
-recipient; never at C<i=1>. The field is removed from the message before
-it is signed and never leaves.
+which a signature also gets whenever the message has a C<List-Id> header
+field (a list sent it, whether or not the list manager added the hint) or
+more than one recipient; never at C<i=1>. The C<X-DKIM2-Exploded> field is
+removed from the message before it is signed and never leaves.
 
 When the signing gate (L<Mail::DKIM2::Gate>) refuses a message that carries
 an upstream DKIM2-Signature, the milter rejects it with C<550 5.7.1> and the
@@ -1365,33 +1270,21 @@ re-encoding the body. A message whose arrival snapshot could not be kept (an
 upstream instance that does not match) is not wrapped. Adds
 C<X-DKIM2-Info: action=wrap-single-part;>.
 
-=item B<--use-epilogue>
+=item B<--no-envelope-check>
 
-B<Disabled in this release:> the milter refuses to start with it. The
-Message-Instance is computed over the message rewritten with the epilogue
-while the original bytes are signed, so the mail fails verification.
-
-When computing a diff-based MI, always store the previous message body in
-the MIME epilogue rather than as inline diff lines.  This keeps MI headers
-small regardless of how much the body changed, at the cost of increasing
-the transmitted message size.  Cannot be combined with C<--epilogue-threshold>.
-
-=item B<--epilogue-threshold> I<N>
-
-B<Disabled in this release,> as B<--use-epilogue>.
-
-When computing a diff-based MI, switch to epilogue storage only when the
-diff recipe would contain more than I<N> literal (non-range) lines.  Small
-changes (C<< <= N >> lines) stay as a compact inline diff; large changes
-fall back to epilogue.  C<5> is a reasonable starting value.
-Cannot be combined with C<--use-epilogue>.
+Inbound mode checks the SMTP envelope against the top DKIM2-Signature (-09
+section 14.4): MAIL FROM must equal its C<mf=> and every RCPT TO must be in
+its C<rt=>, or the result is C<fail>. Turn that off for a milter on an
+internal hop, after an earlier one has checked the envelope the message
+arrived with and the MTA may have rewritten it since (the wrap milter behind
+port 25, say). The other modes never check: there the transaction is the
+outgoing one.
 
 =item B<--max-recipe-literals> I<N>
 
-Without either epilogue option, a diff-based MI whose body recipe would
-need more than I<N> literal lines (default 1000) gets a null body recipe
-instead: the previous body is declared unrecoverable rather than carried
-in the header.  Cannot be combined with the epilogue options.
+A diff-based MI whose body recipe would need more than I<N> literal lines
+(default 1000) gets a null body recipe instead: the previous body is
+declared unrecoverable rather than carried in the header.
 
 =item B<--dns-json> I<PATH>
 

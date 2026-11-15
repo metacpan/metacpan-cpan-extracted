@@ -6,9 +6,9 @@
 [![CPAN Testers](https://img.shields.io/badge/CPAN-Testers-blue.svg)](https://www.cpantesters.org/distro/H/HTTP-API-Core.html)
 [![License](https://img.shields.io/badge/license-Perl%205-blue.svg)](https://dev.perl.org/licenses/)
 
-**Production-ready API client plumbing for Perl — without replacing your HTTP stack.**
+**Build REST and JSON API clients in Perl — without replacing your HTTP stack.**
 
-Retries, pagination, rate limits, authentication, structured errors, JSON handling, observability, and idempotency in one small, dependency-light core.
+`HTTP::API::Core` is a lightweight, dependency-light Perl library for building REST and JSON API clients with retries, pagination, rate-limit handling, authentication, structured errors, JSON handling, observability, idempotency, and pluggable HTTP transports.
 
 ```perl
 use HTTP::API::Core;
@@ -24,9 +24,9 @@ Keep using `HTTP::Tiny`, LWP, Mojo::UserAgent, Furl, or your preferred transport
 
 **You write the service-specific methods. HTTP::API::Core handles the plumbing.**
 
-## Is this for me?
+## When should I use HTTP::API::Core?
 
-Use `HTTP::API::Core` when you are building an API client or small SDK and do not want to reimplement the same plumbing for every service:
+Use `HTTP::API::Core` when you are building a REST API client, JSON API client, or small SDK in Perl and do not want to reimplement the same plumbing for every service. It is especially useful when wrapping a third-party HTTP API or adding retries, exponential backoff, pagination, rate-limit handling, and authentication to an existing Perl API client:
 
 * JSON request and response handling
 * query parameter encoding

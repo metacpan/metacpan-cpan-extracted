@@ -6,7 +6,7 @@ use warnings;
 
 use Test::More;
 
-plan tests => 8 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+plan tests => 9 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 my @module_files = (
     'Text/Bidi.pm',
@@ -15,6 +15,7 @@ my @module_files = (
     'Text/Bidi/Array/Long.pm',
     'Text/Bidi/Constants.pm',
     'Text/Bidi/Paragraph.pm',
+    'Text/Bidi/Selection.pm',
     'Text/Bidi/private.pm'
 );
 

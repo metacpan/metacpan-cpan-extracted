@@ -10,7 +10,7 @@ use Devel::Confess;
 
 package Cn::Util;
 require 5.010001;
-our $VERSION = 0.0241;
+our $VERSION = 0.0242;
 require Exporter;
 our @ISA = ('Exporter');
 our @EXPORT = qw(dir execute file2string format_commas json_file_to_ref random_key random_value ref_to_json_file st structure);
@@ -456,12 +456,22 @@ sub execute {
 sub file2string {
 	my ($file) = @_;
 	open my $fh, '<', $file or die "can't read $file: $!"; # was autodie
-	# readline returns undef only on an error -- an empty file reads as '' --
-	# and open() succeeds on a directory on POSIX systems, so file2string('lib')
-	# used to return undef without a word.  Tested with // rather than through
-	# a lexical, which on perl 5.10.1 took a third copy of the file at return:
-	# a 200 MB file peaked at 575 MB, against 384 MB this way (5.44 is 195 MB
-	# either way, through copy-on-write).
+	# open() succeeds on a directory on POSIX systems.  Linux, OpenBSD and
+	# FreeBSD 13+ then fail the read with EISDIR, but NetBSD's read(2) returns
+	# the raw directory entries, so 0.0241 handed back binary garbage there
+	# (CPAN Testers report 52217fbc-dd66-11f1-9541-8d78add113b8, perl 5.42.3,
+	# amd64-netbsd-thread-multi).  So a directory is refused by fstat, whatever
+	# read() would do; Windows never gets here, as its open() fails.
+	if (-d $fh) {
+		require POSIX;
+		$! = POSIX::EISDIR();
+		die "can't read $file: $!";
+	}
+	# readline returns undef only on an error -- an empty file reads as ''.
+	# Tested with // rather than through a lexical, which on perl 5.10.1 took
+	# a third copy of the file at return: a 200 MB file peaked at 575 MB,
+	# against 384 MB this way (5.44 is 195 MB either way, through
+	# copy-on-write).
 	return do { local $/; <$fh> } // die "can't read $file: $!";
 }
 

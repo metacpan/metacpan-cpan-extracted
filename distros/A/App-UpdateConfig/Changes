@@ -1,5 +1,13 @@
 Revision history for Perl distribution App-UpdateConfig
 
+1.08 - 2026-11-14
+ - Add a SKIP directive to skip a fragment.
+ - With --no-root, never use sudo to install the missing modules.
+ - Load local::lib from ~/perl5 when it is not in the default module path
+   (e.g. when it was bootstrapped by cpan, including during the current run).
+ - Install the man pages of the modules installed with local::lib in its
+   directory, so that nothing is installed outside of it.
+
 1.07 - 2026-11-08
  - Add an APPEND directive to append the content of a fragment to the ENTIRE
    FILE fragment with the same target.

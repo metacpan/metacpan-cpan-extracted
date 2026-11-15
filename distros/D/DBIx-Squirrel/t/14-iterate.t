@@ -5,7 +5,7 @@ use Test2::Plugin::NoWarnings;
 use DBI;
 use DBIx::Squirrel;
 use DBIx::Squirrel::Gather;
-use DBIx::Squirrel::Pipeline;
+use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Stop;
 use DBIx::Squirrel::Context qw(iterator result_number result_original);
 use experimental            qw(builtin);
@@ -94,33 +94,52 @@ subtest 'next' => sub {
     ok !$it->sth->{Active}, 'with the statement finished';
 };
 
-subtest 'all and count' => sub {
+subtest 'all' => sub {
     my $it = $dbh->iterate($all, sub { $_->[1] });
-    is $it->count, 0,      'count, before any';
-    is $it->next,  'Abba', 'one';
-    is $it->count, 1,      'count, after it';
+    is $it->next, 'Abba', 'one';
     is [$it->all], [qw(Blur Cream Dido Enya Faust Genesis Hole Inxs Japan)],
         'all, the rest';
-    is $it->count,  10, 'count, after them';
+    ok !$it->sth->{Active}, 'finishing the statement';
     is [$it->all],  [], 'all, with none left';
     is [$it->next], [], 'and next';
 
-    $it = $dbh->iterate($all);
-    is scalar($it->all), 10, 'all, in scalar context, counts them';
-    is scalar($dbh->iterate("$all LIMIT 0")->all), 0, 'or that there are none';
+    my $names = $dbh->iterate($all, sub { $_->[1] })->all;
+    is $names, [qw(Abba Blur Cream Dido Enya Faust Genesis Hole Inxs Japan)],
+        'asked for one value, a reference to them';
+    is scalar($dbh->iterate("$all LIMIT 0")->all), [],
+        'empty, if there are none';
+};
+
+subtest 'first' => sub {
+    my $it = $dbh->iterate($all, sub { $_->[1] });
+    is $it->next,  'Abba', 'one';
+    is $it->first, 'Blur', 'the next result';
+    ok !$it->sth->{Active}, 'finishing the statement';
+    is [$it->next],                          [],     'and ending the run';
+    is $it->first,                           undef,  'then undef';
+    is $it->reset->first,                    'Abba', 'until reset';
+    is $dbh->iterate("$all LIMIT 0")->first, undef,  'or undef for none';
 };
 
 subtest 'single' => sub {
     my $sql = 'SELECT name FROM artist WHERE id = ?';
     my $it  = $dbh->iterate($sql, 3, sub { $_->[0] });
     is $it->single, 'Cream', 'the one result';
-    is $it->single, 'Cream', 'again, executing the statement again';
-    is [$dbh->iterate($sql, 99)->single], [], 'or nothing';
-    my $expected = qr( \A Expected\ one\ result,\ not\ more )x;
-    my $line     = __LINE__ + 1;
-    like dies { $dbh->iterate($all)->single },
-        qr( $expected \ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
-        'croaks at the caller on more than one';
+    ok !$it->sth->{Active}, 'finishing the statement';
+    is $it->single,                     undef,   'then undef, the run having ended';
+    is $it->reset->single,              'Cream', 'until reset';
+    is $dbh->iterate($sql, 99)->single, undef,   'or undef for none';
+
+    my($got, $warnings);
+    my $more = $dbh->iterate($all, sub { $_->[1] });
+    my $line = __LINE__ + 1;
+    $warnings = warnings { $got = $more->single };
+    is $got, 'Abba', 'the first, if there are more';
+    is $warnings,
+        [
+        "Expected only one item, but there were more at ${\ __FILE__ } line $line.\n"],
+        'warning at the caller';
+    ok !$more->sth->{Active}, 'and finishing the statement too';
 };
 
 subtest 'reset' => sub {
@@ -190,13 +209,13 @@ subtest 'one iterator at a time on a statement handle' => sub {
     like dies { $two->next },
         qr( \A \Q$expected\E \ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
         'croaks while another has results left';
-    is scalar($one->all), 9, 'and that one is unharmed';
+    is scalar(@{ scalar $one->all }), 9, 'and that one is unharmed';
     ok lives { $two->next },        'once it ends';
     ok lives { $two->reset->next }, 'and the one going can reset itself';
     undef $two;
     ok lives { $sth->iterate->next }, 'or once the other goes';
     my $single = $sth->iterate(sub { $_->[1] });
-    ok dies { $single->single },      'single, with more than one result';
+    ok warnings { $single->single },  'single, with more than one result';
     ok lives { $sth->iterate->next }, 'is finished, either way';
 };
 
@@ -251,8 +270,7 @@ subtest 'all, without stages, after next, across batches' => sub {
     my @rest = $it->all;
     is [map { $_->[0] } @rest], [4 .. 250],
         'the rest of the batch, then the rows after it';
-    is $rest[0],   [4, 'n4'], 'every column';
-    is $it->count, 250,       'all counted';
+    is $rest[0], [4, 'n4'], 'every column';
     ok !$it->sth->{Active}, 'and the statement finished';
 
     my $rs = $dbh->results($sql);
@@ -295,7 +313,8 @@ subtest 'an iterator ended early finishes its statement' => sub {
     is [$it->all], [1, 2], 'by a stop';
     ok !$it->sth->{Active}, 'which finishes it';
     $it = $dbh->iterate($sql);
-    like dies { $it->single }, qr( \A Expected\ one\ result,\ not\ more )x,
+    like warnings { $it->single },
+        [qr( \A Expected\ only\ one\ item,\ but\ there\ were\ more )x],
         'by single, finding more than one';
     ok !$it->sth->{Active}, 'which finishes it too';
 };
@@ -339,7 +358,7 @@ subtest 'errors are reported at the caller' => sub {
         qr( $expected \ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
         'from binding';
     like dies { DBIx::Squirrel::Iterator->new('x') },
-        qr( \A Expected\ a\ statement\ handle )x, 'from new';
+        qr( \A Expected\ a\ DBIx::Squirrel\ statement\ handle )x, 'from new';
 
     # The second row overflows, so the fetch fails after execute succeeds.
     my $failed = 'DBD::SQLite::st fetchall_arrayref failed: integer overflow';
@@ -364,7 +383,6 @@ subtest 'once a stage dies, the iterator has ended' => sub {
     is [$it->next], [], 'on every call';
     is [$it->all],  [], 'and all nothing';
     ok !$it->sth->{Active}, 'the statement finished, part way through';
-    is $it->count, 1, 'counting what was handed out';
     $it->reset;
     is [$it->next], [1], 'reset runs it again, from the start';
 
@@ -378,10 +396,10 @@ subtest 'once a stage dies, the iterator has ended' => sub {
 };
 
 subtest "a pipeline's stages, wherever stages go" => sub {
-    my $even = DBIx::Squirrel::Pipeline->new(sub ($row) {
+    my $even = Ekorn::Pipeline->new(sub ($row) {
         $row->[0] % 2 ? () : $row;
     });
-    my $named = DBIx::Squirrel::Pipeline->new(sub ($row) {
+    my $named = Ekorn::Pipeline->new(sub ($row) {
         $row->[1];
     });
     my @spliced = ($even->stages, $named->stages);
@@ -393,12 +411,12 @@ subtest "a pipeline's stages, wherever stages go" => sub {
         $dbh->results($all, sub ($row) { [$row->id, $row->name] }, @spliced)->all
         ],
         [qw(Blur Dido Faust Hole Japan)], 'and into results';
-    my $both = DBIx::Squirrel::Pipeline->new(@spliced, sub { lc });
+    my $both = Ekorn::Pipeline->new(@spliced, sub { lc });
     is [$dbh->iterate($all, $both->stages)->all],
         [qw(blur dido faust hole japan)],
         'from a pipeline made of pipelines';
 
-    my $counted = DBIx::Squirrel::Pipeline->new(gather {
+    my $counted = Ekorn::Pipeline->new(gather {
         my $n = 0;
         (sub { ++$n; () }, sub { $n });
     });

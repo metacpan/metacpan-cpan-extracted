@@ -9,7 +9,7 @@ use File::Temp qw(tempdir);
 # from the same tzcode release. Author only: it needs that release's zic
 # and zdump, and the tzdata tarball, named by environment variables.
 #
-#   TKZ_ZIC=/path/zic TKZ_ZDUMP=/path/zdump TKZ_TZDATA=/path/tzdata-2026e.tar.gz
+#   TKZ_ZIC=/path/zic TKZ_ZDUMP=/path/zdump TKZ_TZDATA=/path/tzdata-2026f.tar.gz
 #
 # zdump reads files zic writes here with "-b fat", which spells out every
 # transition, so it does not see the "slim" files tools/tzcompile read.

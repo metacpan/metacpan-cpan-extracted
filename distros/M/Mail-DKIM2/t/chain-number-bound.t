@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 # Every DKIM2-Signature i= and m=, and every Message-Instance m=, is a chain
-# number: 1*DIGIT (anything else is a malformed tag), at most three digits
-# and 1..MAX_CHAIN_NUMBER (100), so "01" and "001" are 1; and no more than
+# number: 1*DIGIT (anything else is a malformed tag), at most two digits
+# and 1..MAX_CHAIN_NUMBER (99), so "01" is 1; and no more than
 # MAX_CHAIN_LENGTH (32). Each is a PERMERROR found while the header fields are
 # read, before anything walks 1..i= or 1..m= looking for gaps.
 # i=99999999999999999999 used to kill the Verifier with "Range iterator
@@ -31,17 +31,17 @@ my $PLAIN = join($EOL,
     '');
 
 is(MAX_CHAIN_LENGTH, 32, 'MAX_CHAIN_LENGTH is 32');
-is(MAX_CHAIN_NUMBER, 100, 'MAX_CHAIN_NUMBER is 100');
+is(MAX_CHAIN_NUMBER, 99, 'MAX_CHAIN_NUMBER is 99');
 is(chain_number_error('DKIM2-Signature', 'i', $_), undef, "i=$_ is in range")
-    for qw(1 9 32 01 001 032);
+    for qw(1 9 32 01 09);
 is(chain_number_error('DKIM2-Signature', 'm', $_, 2),
    "PERMERROR: DKIM2-Signature i=2 m=$_ exceeds the maximum chain length of 32",
    "m=$_ is a chain number but past the chain length")
-    for qw(33 99 100 099);
+    for qw(33 99);
 is(chain_number_error('DKIM2-Signature', 'i', $_),
-   "PERMERROR: DKIM2-Signature i=$_ exceeds the maximum chain number of 100",
+   "PERMERROR: DKIM2-Signature i=$_ exceeds the maximum chain number of 99",
    "i=$_ is out of range")
-    for qw(101 999 0001 4294967297 99999999999999999999);
+    for qw(100 101 999 001 032 099 0001 4294967297 99999999999999999999);
 is(chain_number_error('Message-Instance', 'm', $_), "PERMERROR: Message-Instance m=$_ syntax error",
    "m=" . join('', map { sprintf('\\x%X', ord) } split //) . " is malformed")
     for ('abc', '', '1.5', '0', '00', '000', '1x', '4294967297x', '30000000x', '0_1', "\x{FF11}", '+1', '-1');
@@ -76,7 +76,7 @@ sub verify {
 is(verify($signed)->result, 'pass', 'control: the signed message passes');
 
 my $range = 'exceeds the maximum chain length of 32';
-my $number = 'exceeds the maximum chain number of 100';
+my $number = 'exceeds the maximum chain number of 99';
 my %cases = (
     'signature i=33' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}33;/m }, "DKIM2-Signature i=33 $range" ],
     'signature i=101' => [ sub { $_[0] =~ s/^(DKIM2-Signature: i=)1;/${1}101;/m }, "DKIM2-Signature i=101 $number" ],
@@ -139,9 +139,9 @@ for my $name (sort keys %cases) {
     like($why // '', qr/Message-Instance m=4294967297x syntax error/, '... as a malformed m= tag');
 }
 
-# Item: m=01 / m=001 / i=001 are 1 everywhere (the Verifier used to key its
-# instances by the m= string, so a Message-Instance m=01 read as "missing m=1").
-for my $form ('01', '001') {
+# Item: m=01 is 1 everywhere (the Verifier used to key its instances by the
+# m= string, so a Message-Instance m=01 read as "missing m=1").
+for my $form ('01') {
     my $mi1 = Mail::DKIM2::MessageInstance->calculate(Email::MIME->new($PLAIN));
     (my $mis = $mi1->as_string) =~ s/^m=1;/m=$form;/ or die;
     my $un = "Message-Instance: $mis$EOL$PLAIN";

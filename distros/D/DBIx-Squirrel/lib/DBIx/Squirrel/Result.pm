@@ -88,10 +88,10 @@ made the first time a result set fetches rows with those columns, and
 kept, so a row can be kept after its result set has gone.
 
 A column gets no method if its name can't be a method's, such as
-C<count(*)>. Nor does it if the base class already has a method of that
-name, such as C<can>, C<isa> or C<get_column>, or one of its own. When
-two columns have one name, as in C<SELECT a.id, b.id>, the method is
-the first's. L</get_column> reaches every column.
+C<count(*)>. Nor does it if the base class already has a method of
+that name, such as C<can>, C<isa> or C<get_column>, or one of its own.
+When two columns have one name, as in C<SELECT a.id, b.id>, the method
+is the first's. L</get_column> reaches every column.
 
 To give such a column a method, give it another name in the statement,
 with C<AS>:
@@ -138,7 +138,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

@@ -26,6 +26,17 @@
  */
 
 %include "typemaps.i"
+%include "stdint.i"
+%import "fribidi-types.h"
+
+%{
+#include <limits.h>
+#include <fribidi.h>
+%}
+
+/* Version strings belong to the library and must not have setters. */
+%immutable fribidi_unicode_version;
+%immutable fribidi_version_info;
 
 /**************************************************************/
 
@@ -55,7 +66,7 @@
   %}
 
   %typemap(check) Type* NEWOPT %{
-    Newx(*temp$argnum, ((*_global_p_len) + 1), $*1_ltype);
+    Newxz(*temp$argnum, ((STRLEN)*_global_p_len + 1), $*1_ltype);
   %}
 
   %typemap(argout) Type* NEWOPT %{
@@ -69,6 +80,7 @@
 %enddef
 
 OUTARR(FriBidiCharType, btypes);
+OUTARR(FriBidiBracketType, btypes);
 OUTARR(FriBidiJoiningType, jtypes);
 OUTARR(FriBidiLevel, embedding_levels);
     
@@ -91,15 +103,32 @@ OUTSTR(char, utf8out);
   _global_p_len = &$1;
 %}
 
-%typemap(in) const FriBidiChar* str (char* buf = 0, size_t size = 0) %{
-  buf = SvPV($input, size);
+%typemap(in) const FriBidiChar* str (char* buf = 0, STRLEN size = 0) %{
+  buf = SvPVbyte($input, size);
+  if (size % sizeof($*1_ltype) || size/sizeof($*1_ltype) > INT_MAX)
+    SWIG_exception_fail(SWIG_ValueError, "Invalid packed array length");
   *_global_p_len = (FriBidiStrIndex)(size/sizeof($*1_ltype));
   $1 = ($1_ltype)(buf);
 %}
 
+%typemap(check) const FriBidiChar* str %{
+  if (size$argnum/sizeof($*1_ltype) != (STRLEN)*_global_p_len)
+    SWIG_exception_fail(SWIG_ValueError, "Packed arrays must have equal lengths");
+%}
+
 %apply const FriBidiChar* str { const FriBidiCharType* bidi_types }
-%apply unsigned long { FriBidiChar ch }
-%apply unsigned long *OUTPUT { FriBidiChar *mirrored_ch }
+%apply unsigned int { FriBidiChar ch }
+%apply unsigned int *OUTPUT { FriBidiChar *mirrored_ch }
+
+/* Secondary arrays must not change the paragraph length. */
+%typemap(in) const FriBidiBracketType* bracket_types (STRLEN size = 0) %{
+  $1 = ($1_ltype)SvPVbyte($input, size);
+%}
+%typemap(check) const FriBidiBracketType* bracket_types %{
+  if (size$argnum != (STRLEN)*_global_p_len * sizeof($*1_ltype))
+    SWIG_exception_fail(SWIG_ValueError, "Packed arrays must have equal lengths");
+%}
+%apply const FriBidiBracketType* bracket_types { const FriBidiCharType* types }
 
 %typemap(check) const FriBidiLevel* embedding_levels ""
 %typemap(argout) const FriBidiLevel* embedding_levels ""
@@ -108,8 +137,14 @@ OUTSTR(char, utf8out);
 %apply const FriBidiChar* str { const FriBidiLevel* embedding_levels }
 
 /* input/output str, length not determined by str (e.g., shape_mirroring) */
-%typemap(in) FriBidiChar* str %{
-  $1 = ($1_ltype)SvPV_nolen($input);
+%typemap(in) FriBidiChar* str (STRLEN size = 0, char *buf = 0) %{
+  buf = SvPVbyte($input, size);
+  $1 = ($1_ltype)SvPVX(sv_2mortal(newSVpvn(buf, size)));
+%}
+
+%typemap(check) FriBidiChar* str %{
+  if (size$argnum != (STRLEN)*_global_p_len * sizeof($*1_ltype))
+    SWIG_exception_fail(SWIG_ValueError, "Packed arrays must have equal lengths");
 %}
 
 %typemap(argout) FriBidiChar* str %{
@@ -136,28 +171,29 @@ OUTSTR(char, utf8out);
   $1 = &temp;
 %}
 
-%apply unsigned long *INOUT { FriBidiParType* pbase_dir }
+%apply unsigned int *INOUT { FriBidiParType* pbase_dir }
 
-%typemap(in) const FriBidiCharType* bd_types (char* buf = 0, size_t size = 0, FriBidiStrIndex* _global_p_len, FriBidiStrIndex _len) %{
-  buf = SvPV($input, size);
-  _len = (FriBidiStrIndex)(size/sizeof($*1_ltype));
-  _global_p_len = &_len;
-  $1 = ($1_ltype)(buf);
+%typemap(in) FriBidiLevel *emb_levels (STRLEN size = 0, char *buf = 0) %{
+  buf = SvPVbyte($input, size);
+  $1 = ($1_ltype)SvPVX(sv_2mortal(newSVpvn(buf, size)));
 %}
 
-%typemap(in) FriBidiLevel *emb_levels, FriBidiStrIndex *map %{
-  $1 = ($1_ltype)SvPV_nolen($input);
+%typemap(check) FriBidiLevel *emb_levels %{
+  if (size$argnum != (STRLEN)*_global_p_len * sizeof($*1_ltype))
+    SWIG_exception_fail(SWIG_ValueError, "Packed arrays must have equal lengths");
 %}
 
-%typemap(argout) FriBidiLevel *emb_levels, FriBidiStrIndex *map %{
+%typemap(argout) FriBidiLevel *emb_levels %{
   MXPUSHUA($1, (*_global_p_len))
 %}
+
+%apply FriBidiLevel *emb_levels { FriBidiStrIndex *map }
 
 %apply const FriBidiChar* str { const char* s }
 
 %apply int { FriBidiStrIndex }
-%apply unsigned long { FriBidiFlags, FriBidiParType, FriBidiCharType }
-%apply unsigned short { FriBidiJoiningType }
+%apply unsigned int { FriBidiFlags, FriBidiParType, FriBidiCharType, FriBidiBracketType }
+%apply unsigned char { FriBidiJoiningType }
 
 
 %rename("%(strip:[fribidi_])s") "";
@@ -168,12 +204,16 @@ OUTSTR(char, utf8out);
 %include "fribidi-flags.h"
 %include "fribidi-joining-types.h"
 %include "fribidi-mirroring.h"
+%include "fribidi-brackets.h"
+/* reorder_map supplies initialized levels and a full-paragraph map. */
+%ignore fribidi_reorder_line;
 %include "fribidi-bidi.h"
 
 %apply FriBidiLevel *emb_levels { FriBidiArabicProp *ar_props }
 
 %include "fribidi-joining.h"
 %include "fribidi-arabic.h"
+%include "fribidi-shape.h"
 %include "fribidi-deprecated.h"
 
 %apply FriBidiStrIndex *map { FriBidiStrIndex *positions_to_this, 
@@ -191,20 +231,20 @@ OUTSTR(char, utf8out);
  */
 
 /* push (and mortalise) an SV */
-#define XPUSHS(VAL) \
+#define TEXT_BIDI_PUSH(VAL) \
   if (argvi >= items)\
     EXTEND(sp, 1);\
   ST(argvi)=sv_2mortal(VAL);\
   argvi++
 
 /* push an unsigned int */
-#define MXPUSHU(uv) XPUSHS(newSVuv(uv))
+#define MXPUSHU(uv) TEXT_BIDI_PUSH(newSVuv(uv))
 
 /* push string pv of length len */
-#define MXPUSHP(pv,len) XPUSHS(newSVpvn(pv,len))
+#define MXPUSHP(pv,len) TEXT_BIDI_PUSH(newSVpvn(pv,len))
 
 /* push a ref to an sv */
-#define MXPUSHR(sv) XPUSHS(newRV_noinc((SV *)sv))
+#define MXPUSHR(sv) TEXT_BIDI_PUSH(newRV_noinc((SV *)sv))
 
 /* push an array (ref) of unsigned (of length len) */
 #define MXPUSHUA(ua,len) {\
@@ -230,11 +270,14 @@ FriBidiStrIndex internal_to_utf8 (const FriBidiChar *str, const FriBidiStrIndex 
 }
 
 FriBidiLevel reorder_map (const FriBidiFlags flags,
-    const FriBidiCharType *bd_types, const FriBidiStrIndex off,
+    const FriBidiCharType *bidi_types, const FriBidiStrIndex len,
+    const FriBidiStrIndex off,
     const FriBidiStrIndex length,      const FriBidiParType base_dir,
     FriBidiLevel *emb_levels,          FriBidiStrIndex *map) {
+  if (off < 0 || length < 0 || off > len || length > len - off)
+    croak("Line range is outside the paragraph");
   return fribidi_reorder_line(
-      flags, bd_types, length, off, base_dir, emb_levels, NULL, map);
+      flags, bidi_types, length, off, base_dir, emb_levels, NULL, map);
 }
 
 

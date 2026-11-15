@@ -117,6 +117,10 @@ subtest 'lists and tables' => sub {
     is body("| A | B | C |\n|---|---|---|\n| x | `y|z` | |\n"),
         "=over 4\n\n=item x\n\nB<B:> C<y|z>\n\n=back\n\n",
         'of three, an empty cell left out, a | in code kept';
+    is body(
+        "| Written | Gives |\n|---|---|\n| `a \\| b` | a \\| b, or `\\|=` |\n"),
+        "=over 4\n\n=item C<a | b>\n\na | b, or C<|=>\n\n=back\n\n",
+        'a | escaped as \\|, in code or out, unescaped';
 };
 
 subtest 'quotes' => sub {

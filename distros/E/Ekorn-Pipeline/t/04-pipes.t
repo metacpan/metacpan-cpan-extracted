@@ -111,13 +111,13 @@ subtest 'a stage that is neither a code reference nor a pipeline' => sub {
     my $line   = __LINE__ + 1;
     my $err    = dies { $thing->pipe(@stages) };
     is $err,
-        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
+        "Expected stage #2 to be a stage: a code reference, a pipeline, or an object offering a stage's role method at ${\ __FILE__ } line $line.\n",
         'pipe';
 
     $line = __LINE__ + 1;
     $err  = dies { $thing->tap(@stages) };
     is $err,
-        "Expected stage #2 to be a code reference or a pipeline at ${\ __FILE__ } line $line.\n",
+        "Expected stage #2 to be a stage: a code reference, a pipeline, or an object offering a stage's role method at ${\ __FILE__ } line $line.\n",
         'tap';
 };
 

@@ -1,7 +1,7 @@
 package DBIO::Test::MooCakeSchema::Result::Artist;
 # ABSTRACT: Moo + Cake test result class for the artist table
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::Moo;
 use DBIO::Cake;
@@ -36,7 +36,7 @@ DBIO::Test::MooCakeSchema::Result::Artist - Moo + Cake test result class for the
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

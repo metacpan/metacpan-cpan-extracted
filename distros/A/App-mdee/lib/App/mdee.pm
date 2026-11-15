@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.18";
+our $VERSION = "1.19";
 
 1;
 =encoding utf-8
@@ -31,6 +31,7 @@ mdee - em·dee, Markdown Easy on the Eyes
          --[no-]trim        trim cell spaces (default: on)
          --[no-]nup         nup paged output (default: on)
      -V  --parallel         show files side by side
+     -L  --[no-]lateral     all pages in one row, scrolled sideways
          --[no-]rule        use Unicode rules for tables (default: on)
     --ts --table-style=#    table style: lattice, 3line or simple (default: lattice)
          --cat-v            visualize whitespace via cat-v
@@ -63,7 +64,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.18
+Version 1.19
 
 =cut
 =head1 DESCRIPTION
@@ -167,8 +168,10 @@ calculation and limits the output to that width.
 With two or more files, C<--parallel> shows the files side by side,
 one pane per file, instead of one after another.  Each file is
 folded to its pane width, and the panes scroll together in the
-pager.  C<--pane> (C<-C>) still sets the number of panes when given;
-files that do not fit in one row continue on the next.
+pager.  The screen shows as many files as fit, as many as the pages
+of a single file, and the files that do not fit in one row continue
+on the next, or on the right with C<--lateral>; C<--pane> (C<-C>)
+sets the number of panes.
 
 Use C<-p> (C<--style=pager>) for a simpler view without nup
 formatting — highlighted output is piped directly through a
@@ -487,8 +490,8 @@ not break inside an alphanumeric word, C<space> not inside a sequence
 of non-space characters, and C<none> breaks anywhere.  Lists, tables
 and the paragraphs joined by C<--refill> are folded by the md module
 at word boundaries, and this option keeps the other paragraphs, which
-are folded by nup, in step with them.  The value is given to nup (App::nup 1.10 or later), which
-gives it to ansicolumn after F<~/.ansicolumnrc>, so it takes
+are folded by nup, in step with them.  The value is given to nup,
+which gives it to ansicolumn after F<~/.ansicolumnrc>, so it takes
 precedence over the value there.
 
 =back
@@ -726,8 +729,32 @@ All controllable fields are enabled by default.
 =item B<-V>, B<--parallel>
 
 Show two or more files side by side, one pane per file, instead of
-one after another.  The number of panes is the number of files
-unless C<--pane> is given.  Ignored with a single file.
+one after another.  The screen shows as many files as fit, as many
+as the pages of a single file, but not more than there are, and the
+rest continue below; C<--pane> gives the number.  Ignored with a
+single file.
+
+With C<--lateral>, the rest go on to the right in one row instead,
+and are scrolled sideways, a file at a time:
+
+    mdee -LV *.md
+    mdee -LVC3 *.md
+
+=item B<-L>, B<--[no-]lateral>
+
+Put all the pages in one row, given to L<nup(1)|App::nup> as its
+C<--lateral>.  The screen shows as many pages as without it, and
+space and C<b> of C<less> move by the screen as usual, while C<h> and
+C<l> move by one page; see L<nup(1)|App::nup> for the keys and the
+build of C<less> that keeps the pages at the edge of the screen.  A
+single pane goes to nup as well, so that the pages can be shifted one
+by one.  It cannot be used with C<--width>,
+and nup refuses it with rows (C<-C2,2>, C<-R>, C<-G>) and PDF output.
+With C<--parallel>, the files go on to the right in the same way,
+each file a column scrolled up and down as usual; see C<--parallel>.
+C<default[lateral]=1> in the configuration file makes it the default;
+the default is left out where the option cannot be used, and
+C<default[width]> is not used with it.
 
 =item B<-C> I<C>[,I<R>], B<--pane>=I<C>[,I<R>]
 
@@ -803,7 +830,7 @@ The device C<pdf> is the default paper, A4.
 The paper takes the place of the terminal, as described in
 L</Printing to PDF>, and the pager is not used.
 
-This requires the nup style, C<nup> 1.13 or later, and C<ansi2pdf>
+This requires the nup style, and C<ansi2pdf>
 0.1.3 or later for PDF (0.1.4 or later for the margin).
 
 =item B<-o> I<FILE>, B<--output>=I<FILE>
@@ -944,6 +971,7 @@ This is a shell script that can set defaults and override colors:
     default[width]=170               # set default output width
     default[fold_width]=80           # set default fold width
     default[refill]=1                # join paragraph lines
+    default[lateral]=1               # all pages in one row
     default[base_color]='DarkCyan'   # set default base color
 
 The C<default> associative array supports the following keys:
@@ -961,6 +989,8 @@ The C<default> associative array supports the following keys:
 =item C<default[fold_width]> - Corresponds to C<--fold-width> (e.g., C<80>)
 
 =item C<default[refill]> - Corresponds to C<--refill> (C<1> to enable)
+
+=item C<default[lateral]> - Corresponds to C<--lateral> (C<1> to enable)
 
 =item C<default[pane_width]> - Corresponds to C<--pane-width> (e.g., C<100>)
 

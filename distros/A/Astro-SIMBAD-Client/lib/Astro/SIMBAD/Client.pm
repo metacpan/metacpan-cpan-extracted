@@ -112,6 +112,7 @@ use constant HAVE_DOUBLE_ENCODED	=> do {
 
 use constant ARRAY_REF	=> ref [];
 use constant CODE_REF	=> ref sub {};
+use constant HASH_REF	=> ref {};
 
 my $have_time_hires;
 BEGIN {
@@ -126,7 +127,7 @@ BEGIN {
 	|| sub { return $_[0] };
 }
 
-our $VERSION = '0.049';
+our $VERSION = '0.050';
 
 our @CARP_NOT = qw{Astro::SIMBAD::Client::WSQueryInterfaceService};
 
@@ -208,9 +209,10 @@ my %static = (
     },
     post => 1,
     # lc(...) per https://tools.ietf.org/html/rfc3986#section-3.1
-    scheme => lc( $ENV{ASTRO_SIMBAD_CLIENT_SCHEME} || 'http' ),
+    scheme => lc( $ENV{ASTRO_SIMBAD_CLIENT_SCHEME} || 'https' ),
 ##    server => 'simbad.u-strasbg.fr',
     server => $ENV{ASTRO_SIMBAD_CLIENT_SERVER} || 'simbad.u-strasbg.fr',
+    timeout => LWP::UserAgent->new()->timeout(),
     type => 'txt',
     url_args => {},
     verbatim => 0,
@@ -958,6 +960,11 @@ it sets the default value of the attribute.
 	url_args => \&_set_hash,
     );
 
+    my %server_map = (
+	harvard	=> 'simbad.cfa.harvard.edu',
+	strasbourg	=> 'simbad.u-strasbg.fr',
+    );
+
     my %transform = (
 	delay => ($have_time_hires ?
 	    $ckpn :
@@ -985,6 +992,12 @@ it sets the default value of the attribute.
 	    }
 	    $val;
 	},
+	server	=> sub {
+##	    my ( $self, $name, $val, $key ) = @_;
+	    my ( undef, undef, $val ) = @_;	# Invocant name and key unused
+	    return ( defined( $val ) && exists $server_map{$val} ) ?
+		$server_map{$val} : $val;
+	}
     );
 
     foreach my $key (keys %static) {
@@ -1210,6 +1223,11 @@ sub _callers_caller {
 {
 
     my %deprecate = (
+	attribute	=> {
+	    scheme	=> {
+		http	=> 1,
+	    },
+	},
 	method	=> {
 	    query	=> 2,
 	},
@@ -1219,16 +1237,26 @@ sub _callers_caller {
 	my ( undef, $type, $name, $repl ) = @_;	# Invocant unused
 	$deprecate{$type} or return;
 	$deprecate{$type}{$name} or return;
-	my $msg = sprintf 'The %s %s is %s', $name, $type,
-	    $deprecate{$type}{$name} > 2 ? 'removed' : 'deprecated';
-	defined $repl
-	    and $msg .= "; use $repl instead";
+	my $msg;
+	if ( ref( $deprecate{$type}{$name} ) eq HASH_REF ) {
+	    $deprecate{$type}{$name}{$repl}
+		or return;
+	    $msg = sprintf 'The %s %s value %s is %s', $name, $type, $repl,
+		$deprecate{$type}{$name} > 2 ? 'removed' : 'deprecated';
+	    $deprecate{$type}{$name}{$repl} == 1
+		and $deprecate{$type}{$name}{$repl} = 0;
+	} else {
+	    $msg = sprintf 'The %s %s is %s', $name, $type,
+		$deprecate{$type}{$name} > 2 ? 'removed' : 'deprecated';
+	    defined $repl
+		and $msg .= "; use $repl instead";
+	    $deprecate{$type}{$name} == 1
+		and $deprecate{$type}{$name} = 0;
+	}
 	$deprecate{$type}{$name} >= 3
 	    and croak( $msg );
 	warnings::enabled( 'deprecated' )
 	    and carp( $msg );
-	$deprecate{$type}{$name} == 1
-	    and $deprecate{$type}{$name} = 0;
 	return;
     }
 
@@ -1299,6 +1327,7 @@ sub _get_parser {
     sub _is_scheme_valid {
 	my ( $scheme, $msg ) = @_;
 	$scheme = lc( $scheme || '' );
+	__PACKAGE__->_deprecation_notice( attribute => 'query', 'http' );
 	$msg ||= q<Unsupported scheme '%s'>;
 	$supported{$scheme}
 	    or return sprintf $msg, $scheme;
@@ -1329,18 +1358,18 @@ sub _get_parser {
     }
 }	# End local symbol block.
 
-#	$ua = _get_user_agent ();
+#	$ua = $self->_get_user_agent();
 #
 #	This subroutine returns an LWP::UserAgent object with its agent
 #	string set to the default, with our class name and version
 #	appended in parentheses.
 
 sub _get_user_agent {
-    my $ua = LWP::UserAgent->new (
+    my ( $self ) = @_;
+    my $ua = LWP::UserAgent->new(
+	agent	=> $self->agent(),
+	timeout	=> $self->get( 'timeout' ),
     );
-##    $ua->agent ($ua->_agent . ' (' . __PACKAGE__ . ' ' . $VERSION .
-##	')');
-    $ua->agent (&agent);
     return $ua;
 }
 
@@ -1404,9 +1433,9 @@ sub _retrieve {
     my ($self, $fragment, $args) = @_;
     my $url = $self->__build_url( $fragment );
     $args ||= {};
-    my $debug = $self->get ('debug');
-    my $ua = _get_user_agent ();
-    $self->_delay ();
+    my $debug = $self->get( 'debug' );
+    my $ua = $self->_get_user_agent();
+    $self->_delay();
     my $resp;
     if (eval {$url->isa('HTTP::Request')}) {
 	$debug
@@ -1603,15 +1632,22 @@ This string attribute specifies the server's URI scheme to be used. As
 of January 27 2017, either C<'http'> or C<'https'> is valid.
 
 The default is the value of environment variable
-C<ASTRO_SIMBAD_CLIENT_SCHEME>, or C<'http'> if the environment variable
+C<ASTRO_SIMBAD_CLIENT_SCHEME>, or C<'https'> if the environment variable
 is not set, or if it contains a value other than C<'http'> or
 C<'https'>, case-insensitive.
+
+As of November 7 2026, SIMBAD (at least the Harvard mirror) seems not to
+support scheme C<'http'>, returning status C<301 - Moved permanently> to
+an otherwise-valid query. For this reason, scheme C<'http'> is
+deprecated and will warn on first use. Eventually the C<'scheme'>
+attribute itself will be retracted.
 
 =item server
 
 This string attribute specifies the server to be used. As of March 10
 2010, either C<'simbad.u-strasbg.fr'> or C<'simbad.cfa.harvard.edu'> is
-valid.
+valid. As a convenience, you can specify C<'strasbourg'> or C<harvard>,
+which will be expanded appropriately.
 
 The default is the value of environment variable
 ASTRO_SIMBAD_CLIENT_SERVER, or C<'simbad.u-strasbg.fr'> if the

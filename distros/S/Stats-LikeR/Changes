@@ -1,5 +1,202 @@
 Revision history for Stats-LikeR
 
+0.3422 2026-11-13 CST (Claude Fable 5.2 helped)
+
+ [view()]
+
+ - view() is now written in C. It was a Perl sub that built an array
+   for every cell and called three or four closures on it. The table
+   is unchanged: 25000 random frames and option lists, of every shape
+   and with UTF-8, Latin-1, wide characters, NULs, escapes and cut
+   cells in them, came out byte for byte the same from both.
+ - What that did to its time and memory, on perl 5.44.0 and frames of
+   ten columns, six of numbers and four of strings, is in the table
+   below. Showing every row is 61 to 75 times faster, 29 times for a
+   HoH, and takes between a seventh and an eighth of the memory. Six
+   rows of a small frame are 5 to 12 times faster. Six rows of a
+   million are slower than they were unless size => 0 is given, by
+   the time it takes to find the size, and a HoH, whose keys the Perl
+   sorted, takes as long as it did. With size => 0 they are 50 to 71
+   times faster, and a HoH 6 times. In the table "Perl" is view() as
+   0.3421 had it, "C" is view() as it is now, and "size=>0" is the C
+   without the size described below, which is the work the Perl did.
+   A time is the fastest call seen in three processes. A peak is how
+   far the call raised the process's peak resident memory, in MB of
+   1024 kB, and 0 is less than 0.1 MB.
+
+     All 100000 rows of a 100000-row frame, a table of 15 MB
+     frame  Perl ms    C ms  size=>0 ms   Perl MB   C MB  size=>0 MB
+     AoA       7867     104          99       438     58          58
+     AoH       7941     131         124       453     58          58
+     HoA       7900     108          98       445     58          58
+     HoH       8202     287         228       469     66          66
+
+     The default six rows of a 1000-row frame
+     frame  Perl ms    C ms  size=>0 ms   Perl MB   C MB  size=>0 MB
+     AoA      0.424   0.044       0.006         0      0           0
+     AoH      0.446   0.084       0.009         0      0           0
+     HoA      0.445   0.036       0.007         0      0           0
+     HoH      0.686   0.134       0.031         0      0           0
+
+     The default six rows of a 1000000-row frame
+     frame  Perl ms    C ms  size=>0 ms   Perl MB   C MB  size=>0 MB
+     AoA      0.424    46.8       0.006         0      0           0
+     AoH      0.444     100       0.009         0      0           0
+     HoA      0.444     116       0.007         0      0           0
+     HoH        744     721         127       115      0           0
+
+ - The first line now says how much memory the data takes:
+   "# AoH: 7 rows x 3 cols, 2.9 KB (showing 6)", with the tab it has
+   always had before "(showing". It is everything that can be reached
+   from the reference, as perl has allocated it, with a key the rows
+   of an AoH share, a row or column held twice and a copy-on-write
+   string each counted once. What a code reference, a glob or a weak
+   reference leads to is not counted, and a tied structure is not
+   fetched from. The size is written as pandas' DataFrame.info()
+   writes a memory usage, in units of 1024 with one decimal:
+   "152.0 bytes", "22.5 KB", "1.4 GB". Against Devel::Size 0.87 the
+   count differs by 8 bytes for every string and by nothing else on
+   200000-row frames, and the 8 are a stale row in that module's
+   table of body sizes.
+ - The size is the whole frame's, so it means visiting every cell:
+   0.05 s for a million rows of ten columns as an AoA, 0.10 s as an
+   AoH and 0.12 s as a HoA, where the rest of view() takes under a
+   tenth of a millisecond. The new option size => 0 leaves the size
+   out and the visit with it, and view() of such a frame is then 50
+   to 71 times faster than it was.
+ - A HoH's rows are found without sorting every key. Showing six rows
+   of 500000 took 332 ms and 59 MB for the list of keys, and takes
+   56 ms and no memory to speak of with size => 0.
+ - view() leaves nothing on the frame. The Perl's keys() left an
+   iterator on every row it read the columns off, 120 bytes each on
+   perl 5.44.0: 12 MB after showing 100000 rows of an AoH. An each()
+   in progress on a row or on the frame is no longer reset either.
+ - A hash with an array among its values is a HoA, whichever value
+   perl's hash order puts first. The Perl let the first defined value
+   decide, so a HoA that also held a scalar, which assign() documents,
+   was shown as a HoA on one run and as a one-row hash of ARRAY(0x...)
+   cells on another. A hash with a hash among its values and no array
+   is a HoH, and one with neither is a flat hash, as before.
+ - An odd option list, an undef option name, a `cols` that is not an
+   array reference, an undef name in it and a `colors` that is not a
+   hash reference now die with view's help screen. They used to die
+   on whichever line of the module first tripped over them, with
+   perl's own message. max_width and gap are now checked as n and
+   width always were, so a negative or fractional one is refused where
+   it used to give a garbled table or be truncated, and gap => undef
+   is the default gap where it died with "uninitialized value".
+ - An ellipsis given as UTF-8 bytes, a literal "…" in a file without
+   `use utf8`, is no longer encoded a second time and counted as
+   three columns.
+ - A table printed to a handle with a :utf8 or :encoding layer is no
+   longer encoded twice. The table is UTF-8 bytes, and print upgraded
+   them again on such a handle, so "Jørgensen" came out as mojibake.
+   The string view() returns is unchanged.
+ - t/view.size.t is new: the size's format against 643 results of
+   pandas 3.0.4's own _sizeof_fmt(), frozen in the file and crossing
+   every unit, every exact tie in the tenths and the counts past
+   1024 PB, and what must hold of the count on every perl (754
+   subtests). t/view.xs.t is new too: a HoH's row order against
+   perl's sort for keys that mix Latin-1 and UTF-8, the argument
+   errors, tied and overloaded cells, where the table is printed, and
+   leak checks through each croak (201 subtests). Five tests in
+   t/view.t and t/view2.t that matched the whole first line now allow
+   for the size.
+ - The first line says what it is counting: "(showing 6 rows)", and
+   "(showing 1 row)" for one, where it said "(showing 6)". The count
+   is the same.
+ - That first line is printed again as the last, after the "# ... N
+   more rows" line when there is one, so that a table longer than the
+   screen still says what it is, how big it is and how much of it was
+   shown where the scrolling stops. The tests in t/view.t, t/view2.t,
+   t/view_aoa.t, t/view.aoa.t, t/view.xs.t and t/view.size.t that
+   counted lines or read the last one now expect it.
+
+ [summary()]
+
+ - summary() prints through the same C renderer, so its table is
+   unchanged and no size is added to it. Its first line now ends in
+   "(showing N rows)" as view()'s does, but it is not repeated at the
+   bottom: a summary is a few lines long. Its display options are now
+   checked in its own name: a width, max_width or gap that is not a
+   whole number, or a `colors` that is not a hash reference, dies with
+   summary's help screen where it used to die inside the renderer with
+   perl's "isn't numeric". gap => undef is the default gap.
+
+ [read_table()]
+
+ - New option drop_cols: a column name, a qr// regex, or an array
+   reference holding any mix of the two, and a column with one of the
+   names, or whose name matches one of the patterns, is left out of the
+   table as the file is read. Its cells are never made, so a wide
+   file costs the memory of the columns that are kept. On a 200000 x
+   40 CSV of 72 MB, leaving out 30 columns took an aoh from 0.61 s
+   and 764 MB of peak memory growth to 0.20 s and 138 MB, a hoa from
+   0.47 s and 528 MB to 0.14 s and 64 MB, and an aoa from 0.42 s and
+   544 MB to 0.15 s and 84 MB, on perl 5.44.0.
+ - A name is a whole column name, compared exactly: case-sensitive,
+   never a prefix, and with a '.', '(' or '|' in it meaning that
+   character. A number is a name too, never a field position, and ''
+   is the column whose name is empty. A name that is no column is
+   warned about, as R's read.table() warns of a colClasses name: "not
+   all columns named in 'drop_cols' exist", followed by the file and
+   the missing names. The read goes on without them.
+ - Names and patterns are matched against the names the table would
+   have had: after col_names, with V1, V2, ... under header => 0, and
+   with a VCF's leading "#" off. A header name is tried as the bytes
+   the file holds and, when they are UTF-8, as the characters they
+   spell, so a name or pattern written under `use utf8` and one
+   written without it both match. It works for every output_type, for .xlsx sheets and for
+   compressed files, and where the header repeats a name every field
+   carrying it goes. A colClasses list, a numeric filter key and the
+   field number in an alignment message still count the file's own
+   fields, and a filter may test a column that is left out.
+ - A pattern that matches no column is not an error, and is not warned
+   about, since one list of patterns often serves several files.
+   Leaving out every column is an error, and so is leaving out the
+   row_names column of a hoh.
+   drop_cols is refused for an exploded VCF, whose columns are built
+   by position; explode => 0 reads the file's own columns.
+ - drop_cols => qr// is every column, on every perl. Before perl 5.18
+   the match operator does not match an empty qr// as it is written:
+   it reuses the last pattern that matched successfully, so on perl
+   5.10.1, 5.12.5 and 5.16.3 an empty pattern left out whichever
+   columns that other pattern happened to match, and no column at all
+   of an .xlsx sheet. An empty pattern is now exchanged for one that
+   is not empty before it is matched, without compiling anything on
+   the call.
+ - t/read_table.drop_cols.t is new (1865 subtests): every output
+   type by the parser's plan and by the row closure, which check each
+   other, on delimited text, .gz, .xlsx and VCF, with colClasses,
+   filters, repeated names, UTF-8 names and ragged rows, the empty
+   pattern after an unrelated match, each refusal, and leak checks.
+ - New option keep_cols, the counterpart of drop_cols: it takes the
+   same names and patterns, and only the columns it names or matches
+   are stored, in the file's order, as pandas' read_csv(usecols = ...)
+   keeps them. A name that is no column is warned about rather than
+   raised on as pandas does, and keeping no column is an error. A
+   hoh's row_names column is its key and never a cell, so it is kept
+   whether keep_cols names it or not. Given together, a column is
+   stored when keep_cols chooses it and drop_cols does not.
+ - t/read_table.keep_cols.t is new (1512 subtests). It ports every
+   name-based case of pandas 3.0.4's
+   tests/io/parser/usecols/test_usecols_basic.py and test_strings.py,
+   pins each place read_table departs from them, and holds the rest
+   to the row closure and, on a 600 x 40 table, to drop_cols given
+   the complement.
+
+ [filter()]
+
+ - col()->match and ->nomatch with an empty pattern, qr// or the
+   string '', now match every defined cell on every perl, as
+   grepl("", x) does in R and str.contains("") in pandas. Before perl
+   5.18 they matched whatever pattern had last matched successfully
+   instead, for the reason given under read_table() above:
+   col('id')->match(qr//) kept one row of four in t/filter_match.t
+   on perl 5.10.1 and 5.16.3 where it should have kept all four.
+   cfilter()'s regex selector and read_table()'s qr// separator match
+   in C, where there is no such rule, and are unchanged.
+
 0.3421 2026-11-13 CST (Claude Fable 5.2 helped)
 
  [qnorm(), qt(), qchisq()]

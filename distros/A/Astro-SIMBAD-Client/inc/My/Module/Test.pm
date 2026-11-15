@@ -36,15 +36,19 @@ our @EXPORT_OK = qw{
     load_module_or_skip_all
     module_loaded
     note
+    object
     plan
     returned_value
     silent
     subtest
     test
     test_false
+    @TEST_SCHEMES
     $TODO
 };
 our @EXPORT = @EXPORT_OK;	## no critic (ProhibitAutomaticExportation)
+
+our @TEST_SCHEMES = qw{ https };
 
 my $canned;	# Canned data to test against.
 my $got;	# Result of method call.
@@ -59,10 +63,22 @@ sub access {
 	require LWP::UserAgent;
 	1;
     } or plan skip_all => 'Can not load LWP::UserAgent';
-    my $resp = LWP::UserAgent->new(
-    )->get( Astro::SIMBAD::Client->__build_url( 'simbad/' ) );
-    $resp->is_success
-	or plan skip_all => "@{[$resp->status_line]}";
+    my $ua = LWP::UserAgent->new(
+	timeout	=> 10,
+    );
+    my $smb = Astro::SIMBAD::Client->new();
+    my $resp;
+    foreach my $server ( qw{
+	simbad.u-strasbg.fr
+	simbad.cfa.harvard.edu
+    } ) {
+	$smb->set( server => $server );
+	$resp = $ua->head( $smb->__build_url( 'simbad/' ) );
+	$resp->is_success()
+	    or next;
+	return $server;
+    }
+    plan skip_all => "@{[$resp->status_line]}";
     return;
 }
 
@@ -261,6 +277,11 @@ sub module_loaded {		## no critic (RequireArgUnpacking)
     goto &$code;
 }
 
+sub object {
+    $obj ||= Astro::SIMBAD::Client->new();
+    return $obj;
+}
+
 sub returned_value {
     return $got;
 }
@@ -380,8 +401,9 @@ The subroutines exported are:
 =head2 access
 
 This subroutine must be called, if at all, before the first test. It
-checks access to the SIMBAD web site. If the web site is accessable, it
-simply returns. If not, it calls C<plan skip_all>.
+checks access to all known SIMBAD web sites, and returns the domain name
+of the first one accessable. If none is accessable, it calls
+C<plan skip_all>.
 
 =head2 call
 
@@ -483,6 +505,12 @@ subroutines, and subsequent arguments are arguments for the named
 subroutine. If the named module has not been loaded, nothing happens. If
 the named module has been loaded, the named subroutine is called (as a
 co-routine), with the given arguments.
+
+=head2 object
+
+This subroutine returns the
+L<Astro::SIMBAD::Client|Astro::SIMBAD::Client> object being used for
+testing, creating it if necessary.
 
 =head2 returned_value
 

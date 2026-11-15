@@ -177,7 +177,8 @@ if (@ARGV and $ARGV[0] eq '--in-scope') {
   $SIG{$_} = sub { kill $_[0], $pid } for qw(TERM INT HUP QUIT);
   waitpid $pid, 0;
   my $wait = $?;
-  $SIG{$_} = 'DEFAULT' for qw(TERM INT HUP QUIT);
+  # systemd sends the scope SIGTERM after an OOM kill: not the stage's end
+  $SIG{$_} = 'IGNORE' for qw(TERM INT HUP QUIT);
 
   my $peak = first_line("$dir/memory.peak");
   syswrite $ready, "P$peak\n" if defined $peak and $peak =~ /^\d+$/;

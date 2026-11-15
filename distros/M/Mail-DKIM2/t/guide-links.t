@@ -38,8 +38,10 @@ unlike($text, qr/perldoc -l/, 'nothing depends on perl-doc (not on a stock Debia
 like($text, qr/useradd -r -U -G postfix/, 'the dkim2 user has its own group and is in postfix');
 like($text, qr/install -d -m 750 -o dkim2 -g postfix \/var\/spool\/postfix\/var\/run/,
      'the socket directory is created before the units start');
-like($text, qr/mailman3 journal/, 'says Mailman DKIM2 logs go to the mailman3 journal');
-unlike($text, qr/logging\.dkim2/, 'no [logging.dkim2] section (Mailman ignores it)');
+# Since the 14 November 2026 series the handlers have a schema logger of
+# their own, which writes to mailman.log, not the journal.
+unlike($text, qr/mailman3 journal/, 'does not send the reader to the journal for Mailman DKIM2 logs');
+like($text, qr/\[logging\.dkim2\]\nlevel: debug/, 'shows the [logging.dkim2] setting');
 like($text, qr/not (?:been )?tested end to end/i, 'the authentication_milter path is labelled as untested');
 like($text, qr/wwsympa/, 'Sympa restart list includes wwsympa');
 like($text, qr/git -c user\.name/, 'git am works on a host with no identity');

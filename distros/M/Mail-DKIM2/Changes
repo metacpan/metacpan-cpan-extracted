@@ -1,5 +1,170 @@
 Revision history for Mail::DKIM2
 
+0.33    2026-11-14
+        - A From field value longer than 2048 octets (not counting the line
+          breaks of folding or the white space round it) is not read for a
+          mailbox: from_mailbox gives 'none', so the Verifier's result is
+          "matching From is not authentic" and the Signer does not sign.
+          $Mail::DKIM2::Address::MAX_FROM_LENGTH holds the limit. Every
+          implementation in the interop repository now has it; one of
+          them took tens of seconds to parse a hostile 100 KB From.
+        - The Verifier waits no longer than 20 seconds in all for one
+          message's DNS lookups ($Mail::DKIM2::Verifier::LOOKUP_BUDGET):
+          after that the lookups not yet made fail at once, and the result
+          is temperror, as for any DNS failure. A message can name 8 keys
+          per signature and 32 signatures, each lookup worth the
+          resolver's whole timeout. Lookups made by a PubkeyCallback or a
+          PolicyCallback are not counted.
+
+0.32    2026-11-14
+        - dkim2-milter and the DKIM2Sign handler sign a message that has a
+          List-Id header field with the exploded flag (-09 section 12.5),
+          whether or not it carries the X-DKIM2-Exploded hint: a list sent
+          it, to more than one address. A stock Mailman list, which adds
+          no hint, went out without the flag. Never on a first signature,
+          as before.
+
+0.31    2026-11-14
+        (0.31 was prepared on 2026-11-06 and never released; this is that
+        work and the clean-up that followed it.)
+
+        The clean-up: no change to the wire format, to what verifies, or to
+        any result string. What a caller may notice:
+
+        - Signer: the Algorithm defaults to the one the key signs with (it
+          was rsa-sha256 whatever the key, and an Ed25519 key then died
+          inside CLOSE). An Algorithm the library does not implement, or
+          one the key cannot sign with, croaks from new(): before, any name
+          not starting "ed25519" produced an RSA signature labelled with
+          that name.
+        - Signer: an RSA key under 1024 bits does not sign (-09 section
+          3.2): result 'fail', details "signing key is shorter than 1024
+          bits". Every verifier already called such a signature "too
+          short".
+        - Signer: a message carrying a Message-Instance with no m= is
+          refused, as every verifier refuses it.
+        - Verifier: new AcceptedAt option, the time the message was accepted
+          over SMTP, for a caller verifying later than that: t= is checked
+          against it instead of now (-09 section 14.3).
+        - Verifier: provisionally_verified() checks the envelope against the
+          top signature's mf= and rt= when the Verifier was given one
+          (MailFrom, RcptTo; -09 section 13.2 step 4). It was skipped.
+        - Verifier: the StreamBody option and stream_body() are gone. The
+          chain is always checked from the header and body plans; the undo
+          walk it could be switched back to is now only the tests'
+          reference (t/lib/UndoWalkVerifier.pm). HeadersOnly reads its one
+          hash from the plan too, and the Verifier no longer loads
+          Email::MIME.
+        - MessageInstance: a calculated null body Recipe is unrecoverable()
+          as a parsed one is (it was false until the field was re-parsed).
+        - MessageInstance: a parsed instance's as_string writes every hash
+          group it was given (it wrote only the sha256 set).
+        - MessageInstance: UseEpilogue and EpilogueThreshold, which croaked
+          since 0.23, are removed (unknown options now), with dkim2-milter's
+          --use-epilogue and --epilogue-threshold. calculate never changes
+          the message it is given.
+        - MessageInstance: the h1/b1 entries of get_tag are gone;
+          header_hash() and body_hash() remain, and take an algorithm.
+        - Common: build_signing_input takes the fields themselves
+          (instances, signatures, signing) and empties the s= values of the
+          one being signed or checked. The Signer and the Verifier now
+          build the input the same way; the Verifier no longer re-serialises
+          the parsed signature. Signature::as_string_without_data and
+          as_folded_string_without_data are gone with it.
+        - Common: a Message-Instance or DKIM2-Signature field written with
+          white space before its colon is canonicalized for the signing
+          input without it (-09 section 12.8).
+        - Common: digest64 and fold_value (unused) are gone, and so is
+          HeaderPlan::rewrites_instances (see the security fix below: it
+          could only ever be false).
+        - Deprecated, still working, to be removed: Common::extract_domain
+          (use domain_of) and Gate's AllowNullBodyRecipe (a no-op since
+          0.29).
+
+        New:
+
+        - Mail::DKIM2::Chain: a message's Message-Instance and
+          DKIM2-Signature fields by number -- which there are, whether the
+          numbers form a chain, how far the signatures reach, each instance
+          parsed once. The Verifier, the Signer and the Gate read the chain
+          through it (each worked this out for itself); both have a chain()
+          accessor.
+        - Mail::DKIM2::Hop->next_instance: the Message-Instance a hop adds
+          before it signs -- none, m=1, a change from this host's snapshot,
+          or one m=1 replacing unsigned instances -- and the message to add
+          it to. dkim2-milter, the DKIM2Sign handler and dkim2sign each
+          made this decision in their own code.
+        - MessageInstance: as_header() and as_header_value(), the field
+          folded and ready to insert; changes() and changes_header(), what
+          the instance records its hop as changing.
+        - Key: signature_algorithm and signature_algorithm_for_key, the one
+          table of signing algorithms the Signer and Verifier share.
+        - Common.pm is split by subject. Mail::DKIM2::Canon (the fields that
+          are not hashed, canonicalization, build_signing_input),
+          Mail::DKIM2::Fold (fold_header), Mail::DKIM2::Address (paths,
+          domains, the relaxed domain match, the Authentic From check),
+          Mail::DKIM2::Key (private keys, key records, Domain Policy
+          Records, algorithms) and Mail::DKIM2::RecipeJSON (the r= JSON)
+          each hold what their name says; Mail::DKIM2::Util has the two
+          helpers they all need. Common keeps the constants, the limits and
+          the chain numbering, and still exports every name it ever did:
+          "use Mail::DKIM2::Common qw(fold_header)" and
+          Mail::DKIM2::Common::relaxed_domain_match(...) work as before.
+
+        The changes of 2026-11-06:
+
+        - Signer: never folds an rt= list at a comma. -09 section 10.6 gives
+          rt= no FWS around its commas (a base64string cannot start with
+          FWS), though the generic tag-value grammar would allow it; rt=
+          still folds inside its base64.
+        - An i= or m= is at most two digits now (MAX_CHAIN_NUMBER 99, was
+          100 in three digits): with a chain length limit of 32, a third
+          digit only ever named a number that is refused anyway. "001" is
+          "exceeds the maximum chain number of 99".
+        - DSN->authenticate no longer reports ok for a DSN that carries no
+          DKIM2-Signature of its own: dsn_result is still none, so a caller
+          can relay it as the legacy bounce it is, but anyone holding a
+          copy of the returned message could have written it, so
+          propagate refuses it rather than re-sign it. (An nd= top
+          signature, with no rt= to align with, is unchanged.)
+        - Split: plan_copies and disclosed_addresses fold the domain only,
+          keeping the local-part's case, so a Bcc to user@ never shares a
+          copy (and an rt=) with a To: User@ that may be another mailbox.
+        - Security: a header Recipe naming Message-Instance could rewrite
+          the instances below it. The undo walk applied it to the received
+          fields and checked the lower hashes against what it rebuilt, so a
+          hop could replace a message wholesale, swap in an m=1 hashed over
+          its own content, and have the chain pass with the original
+          reported unchanged. Message-Instance and DKIM2-Signature fields
+          are not content (-09 section 6.2): a Recipe naming one acts on
+          content fields of that name, of which there are none (copying is
+          a Recipe error), as in the other implementations.
+        - Verifier: new MailFrom and RcptTo options, the SMTP envelope. Given,
+          the top signature must match it (-09 section 14.4): MAIL FROM
+          equal to mf=, every RCPT TO in rt=, else fail ("MAIL FROM <x> did
+          not match" / "RCPT TO <x> did not match"). The DKIM2Verify
+          handler passes both (check_envelope, default on), as does
+          dkim2-milter in --mode inbound (--no-envelope-check for an
+          internal hop). Before, neither checked, and a message signed for
+          one recipient verified when replayed to another.
+        - A header field written with white space before its colon
+          ("From : x", RFC 5322 obsolete syntax) is a field of that name,
+          as -09 section 6.2 has it. Perl kept the white space in the name,
+          so such a From was hashed but escaped the From check. New
+          Common::field_name and header_values.
+        - A header Recipe key must be a header field name (ftext: no white
+          space, no colon, -09 section 5), or the Recipe is invalid JSON.
+          "message-instance " would otherwise be matched as
+          Message-Instance by the name matching above.
+          MessageInstance->calculate dies rather than record a change to a
+          field whose name is not one (a malformed "Y Bad:" line), which
+          no verifier would accept.
+        - dkim2-milter: the verdict's detail in Authentication-Results is
+          an RFC 5322 comment with its "\", "(" and ")" quoted, printable
+          ASCII, at most 200 characters. It quotes signature fields as
+          written, so a crafted i= could close the comment and add text
+          that read as properties.
+
 0.30    2026-11-03
         - Signers no longer look the Domain Policy Record up by default
           (contract E3.4, revised). A d= below the From domain signs only

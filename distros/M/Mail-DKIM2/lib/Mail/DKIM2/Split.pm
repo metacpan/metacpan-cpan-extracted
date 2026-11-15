@@ -2,7 +2,7 @@ package Mail::DKIM2::Split;
 use strict;
 use warnings;
 
-our $VERSION = '0.30';
+our $VERSION = '0.33';
 
 use Email::MIME;
 use Mail::DKIM2::Common qw(parse_mime);
@@ -22,8 +22,21 @@ our @EXPORT_OK = qw(plan_copies disclosed_addresses);
 # (bin/dkim2-split-lmtp) uses it to fan a message out into per-copy
 # re-injections. See deploy/SERVER.md "Bcc-safe origination".
 
-# disclosed_addresses($message_bytes) -> hashref { lc-address => 1 } of every
-# address named in the message's To: and Cc: header fields.
+# An address as a key: the domain lowercased, the local-part exactly as written.
+# A local-part may be case-sensitive (RFC 5321 2.4), so User@ and user@ can be
+# two mailboxes; folding them together would put a Bcc to one in the same copy,
+# and so the same rt=, as the other. Telling them apart when they are in fact
+# one mailbox costs only an extra copy.
+sub _addr_key {
+    my ($a) = @_;
+    my $at = rindex($a, '@');
+    return $a if $at < 0;
+    return substr($a, 0, $at) . lc substr($a, $at);
+}
+
+# disclosed_addresses($message_bytes) -> hashref { address => 1 } of every
+# address named in the message's To: and Cc: header fields, keyed as _addr_key
+# makes them (domain lowercased, local-part as written).
 sub disclosed_addresses {
     my ($msg_bytes) = @_;
     my %seen;
@@ -34,23 +47,23 @@ sub disclosed_addresses {
         for my $val ($em->header($hdr)) {
             next unless defined $val;
             # addresses inside angle brackets: To: "Name" <a@b>, ...
-            while ($val =~ /<([^>]+)>/g) { $seen{ lc $1 } = 1; }
+            while ($val =~ /<([^>]+)>/g) { $seen{ _addr_key($1) } = 1; }
             # bare addr-specs (comma-separated tokens with @ and no <>)
             for my $tok (split /,/, $val) {
                 $tok =~ s/^\s+|\s+$//g;
                 next if $tok =~ /</;
-                $seen{ lc $1 } = 1 if $tok =~ /([^\s<>,]+\@[^\s<>,]+)/;
+                $seen{ _addr_key($1) } = 1 if $tok =~ /([^\s<>,]+\@[^\s<>,]+)/;
             }
         }
     }
     return \%seen;
 }
 
-# Strip optional angle brackets from an envelope path and lowercase it.
+# Strip optional angle brackets from an envelope path and key it as above.
 sub _addr {
     my ($r) = @_;
     $r =~ s/^<//; $r =~ s/>$//;
-    return lc $r;
+    return _addr_key($r);
 }
 
 # plan_copies($message_bytes, \@envelope_rcpts) -> \@copies
@@ -114,7 +127,9 @@ so a message with neither header yields one copy per recipient.
 
 =head2 disclosed_addresses($message_bytes)
 
-A hashref of lowercased addresses named in C<To:> and C<Cc:>.
+A hashref of the addresses named in C<To:> and C<Cc:>, each with its
+domain lowercased and its local-part as written: a local-part can be
+case-sensitive, so C<User@> and C<user@> are kept apart.
 
 =head1 AUTHOR
 

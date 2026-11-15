@@ -3,7 +3,7 @@ package DBIO::Test::SQLMRebase;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -30,7 +30,7 @@ DBIO::Test::SQLMRebase - Test SQLMaker subclass with select call counting
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

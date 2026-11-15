@@ -9,11 +9,11 @@ use HTTP::Tiny qw//;
 use JSON qw/decode_json/;
 use Scalar::Util qw/reftype/;
 
-our $VERSION = "0.1.9";
+our $VERSION = "0.1.10";
 
 use constant {
   BASEURL  => "https://the-rosary-api.vercel.app/v1",
-  DAILYURL => "https://dailyrosary.cf",
+  DAILYURL => "https://dailyrosary.catholicdevotion.org",
 };
 
 sub new {
@@ -219,7 +219,7 @@ __END__
 =head1 NAME
 
 Webservice::Rosary::API - Perl API client for the Rosary API at
-L<https://the-rosary-api.vercel.app> and L<https://dailyrosary.cf>.
+L<https://the-rosary-api.vercel.app> and L<https://dailyrosary.catholicdevotion.org>.
 
 =head1 SYNOPSIS
 
@@ -233,13 +233,13 @@ L<https://the-rosary-api.vercel.app> and L<https://dailyrosary.cf>.
 =head1 DESCRIPTION
 
 This is an API client for L<https://the-rosary-api.vercel.app>, which powers
-L<https://dailyrosary.cf>*; the API requires no authentication, so the
+L<https://dailyrosary.catholicdevotion.org>*; the API requires no authentication, so the
 client here simply wraps most of the calls for convenient use in Perl programs.
 
 It is meant to facilitate a couple of things. One is the generation of a
 full URL that may be used to download an audio file of the specified Mystery
 being said, as an C<.mp3> file. This means you may do something like what
-is done at L<https://dailyrosary.cf>.
+is done at L<https://dailyrosary.catholicdevotion.org>.
 
 The second thing it is meant to do is to return the text of a full recitation
 of the Rosary, which is what the provided C<avemaria> commandline utility

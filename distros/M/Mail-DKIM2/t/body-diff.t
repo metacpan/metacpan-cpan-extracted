@@ -119,7 +119,7 @@ is_deeply(diff([qw(a b)], [qw(b a)], 1000), [[2, 2], 'a'],
     'swap: tie-break skips the current line first');
 
 # calculate(): over the cap, the default (header-only) path declares the
-# body unrecoverable; EpilogueThreshold stores it in the epilogue.
+# body unrecoverable.
 {
     my $old  = join '', map { "old line $_\r\n" } 1 .. 1200;
     my $prev = "From: a\@example.com\r\nSubject: hi\r\n\r\n$old";
@@ -142,26 +142,13 @@ is_deeply(diff([qw(a b)], [qw(b a)], 1000), [[2, 2], 'a'],
     ok(Mail::DKIM2::MessageInstance->parse($mi->as_string)->unrecoverable,
         '1200 literals, default: null body recipe');
 
-    # The epilogue options are disabled in 0.23 (final review M5): they
-    # croak, saying why ...
+    # The epilogue options went in 0.31: unknown options, like any other.
     for my $opt ([UseEpilogue => 1], [EpilogueThreshold => 100]) {
         eval { Mail::DKIM2::MessageInstance->calculate($small, $prev, @$opt) };
-        like($@, qr/\AUseEpilogue and EpilogueThreshold are disabled in Mail::DKIM2 0\.23: .* fails verification/,
-            "$opt->[0] croaks: disabled");
+        like($@, qr/\Aunknown option $opt->[0] /, "$opt->[0] is an unknown option");
         eval { Mail::DKIM2::MessageInstance->calculate_first($small, $prev, @$opt) };
-        like($@, qr/are disabled in Mail::DKIM2 0\.23/, "calculate_first with $opt->[0] croaks: disabled");
+        like($@, qr/\Aunknown option $opt->[0] /, "calculate_first: $opt->[0] is an unknown option");
     }
-    # ... and the epilogue code itself is still tested, until it is fixed.
-    local $Mail::DKIM2::MessageInstance::ENABLE_BROKEN_EPILOGUE = 1;
-
-    my $msg = Mail::DKIM2::Common::parse_mime($small);
-    $mi = Mail::DKIM2::MessageInstance->calculate($msg, $prev,
-        EpilogueThreshold => 100);
-    $p = Mail::DKIM2::MessageInstance->parse($mi->as_string);
-    is(scalar(@{ $p->{bits}{rb} }), 1, 'over EpilogueThreshold: one epilogue copy');
-    ($ok, $err) = Mail::DKIM2::MessageInstance->chain_verifies(
-        "Message-Instance: " . $mi->as_string . "\r\n" . $msg->as_string);
-    ok($ok, 'epilogue chain verifies') or diag $err;
 
     # MaxRecipeLiterals moves the default path's cap either way.
     $mi = Mail::DKIM2::MessageInstance->calculate($small, $prev,
@@ -175,24 +162,12 @@ is_deeply(diff([qw(a b)], [qw(b a)], 1000), [[2, 2], 'a'],
     is(scalar(grep { !ref } @{ $p->{bits}{rb} }), 1200,
         'MaxRecipeLiterals 2000, 1200 literals: a diff recipe');
 
-    # EpilogueThreshold is the cap on the epilogue path, as given.
-    $msg = Mail::DKIM2::Common::parse_mime($big_old);
-    $mi = Mail::DKIM2::MessageInstance->calculate($msg, $prev,
-        EpilogueThreshold => 2000);
-    $p = Mail::DKIM2::MessageInstance->parse($mi->as_string);
-    is(scalar(grep { !ref } @{ $p->{bits}{rb} }), 1200,
-        'EpilogueThreshold 2000, 1200 literals: a diff recipe');
-
     for my $bad (-1, 'x', undef) {
         eval { Mail::DKIM2::MessageInstance->calculate($small, $prev,
             MaxRecipeLiterals => $bad) };
         like($@, qr/MaxRecipeLiterals/, 'MaxRecipeLiterals '
             . ($bad // 'undef') . ' croaks');
     }
-    eval { Mail::DKIM2::MessageInstance->calculate($small, $prev,
-        MaxRecipeLiterals => 10, EpilogueThreshold => 10) };
-    like($@, qr/MaxRecipeLiterals.*EpilogueThreshold|EpilogueThreshold.*MaxRecipeLiterals/,
-        'MaxRecipeLiterals with EpilogueThreshold croaks');
 }
 
 done_testing;

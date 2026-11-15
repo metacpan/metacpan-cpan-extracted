@@ -59,6 +59,23 @@ our $VERSION = 0.01;
 
 {
   my $t = UpdateConfigTest->new;
+  $t->add_fragment('a/.update_config', "SKIP dir reason\n");
+  $t->add_fragment('a/b/skipped', "DIR x\nMIRROR\nskipped\n");
+  $t->add_fragment('a/b/.update_config', "invalid\n");
+  $t->add_fragment('applied', "applied\n");
+  my $r = $t->run();
+  is($r->{exit}, 0, 'SKIP: invalid files in the directory are not parsed');
+  is($t->read_home_file('skipped'), undef, 'SKIP: applies to the fragments of the directory');
+  is($t->read_home_file('applied'), guarded("applied\n"), 'SKIP: other fragments applied');
+  like(
+    $r->{stdout},
+    qr/^Skipping[ ]directory[ ]'a'[ ]due[ ]to[ ]SKIP[ ]directive:[ ]dir[ ]reason$/mx,
+    'SKIP: directory reported once');
+  unlike($r->{stdout}, qr/skipped/x, 'SKIP: fragments of the directory not reported');
+}
+
+{
+  my $t = UpdateConfigTest->new;
   $t->add_fragment('profile/.update_config', "FILENAME .profile\n");
   $t->add_fragment('profile/path [path]', "path\n");
   $t->add_fragment('profile/editor [editor]', "editor\n");

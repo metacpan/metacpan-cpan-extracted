@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Artwork;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -61,7 +61,7 @@ DBIO::Test::Schema::Artwork - Test result class for the cd_artwork table
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

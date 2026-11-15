@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Collection;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -47,7 +47,7 @@ DBIO::Test::Schema::Collection - Test result class for the collection table
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

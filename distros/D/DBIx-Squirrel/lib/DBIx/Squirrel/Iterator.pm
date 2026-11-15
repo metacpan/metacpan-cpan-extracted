@@ -6,25 +6,43 @@ use experimental qw(builtin);
 
 use builtin qw(weaken);
 
-use Ref::Util qw(is_plain_arrayref);
+use List::Util qw(min);
+use Ref::Util  qw(is_plain_arrayref);
 
-use DBIx::Squirrel::Context  qw();
-use DBIx::Squirrel::Errors   qw(at_caller croakf);
-use DBIx::Squirrel::Pipeline qw();
-use DBIx::Squirrel::Util     qw(iterator_going split_stages);
+use Ekorn::Pipeline            qw();
+use Ekorn::Pipeline::Factories qw(source);
+use Ekorn::Pipeline::Operators qw();
+
+use DBIx::Squirrel::Context qw();
+use DBIx::Squirrel::Errors  qw(at_caller      croakf);
+use DBIx::Squirrel::Util    qw(iterator_going split_stages);
 
 use namespace::clean;
+
+# | and @{} are Ekorn's, as for its own sources, in force only where the
+# user wrote use Ekorn::Pipeline::Operators. Loading it with an empty
+# import list defines them without putting them in force here.
+use overload
+    '|'      => \&Ekorn::Pipeline::Operators::chain,
+    '@{}'    => \&Ekorn::Pipeline::Operators::drain,
+    fallback => 1;
 
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
 
-# How many rows are fetched at a time.
-my $BATCH_SIZE = 100;
+# How many rows are fetched at a time: 2 at first, the least that tells
+# whether there's a second, doubling each time a fetch fills its batch,
+# up to 64, as in version 1. Measured on 2026-11-14, reading 297,848
+# narrow rows with SQLite, PostgreSQL and MySQL: a cap of 8 was 25 to
+# 35% slower than 64, and 1024 at most 7% quicker. With rows of 1.6 KB
+# or 24 KB, the cap made almost no difference.
+my $BATCH_FIRST = 2;
+my $BATCH_LIMIT = 64;
 
 # Return a new iterator over the rows of a statement handle, executed with
 # the bind values given, and run through the stages given after them.
 sub new ($class, $sth, @args) {
-    croakf 'Expected a statement handle'
+    croakf 'Expected a DBIx::Squirrel statement handle'
         unless $sth isa 'DBIx::Squirrel::st';
     my @stages = split_stages(\@args);
     return bless {
@@ -36,43 +54,65 @@ sub new ($class, $sth, @args) {
 
 # Return the next result, or nothing when there are no more, executing the
 # statement first if it hasn't been.
+#
+# It's called for each row, so it does what Context's within and
+# _executed do itself, without a call to each.
 sub next ($self) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
-    _executed($self);
-    return _take($self);
+    $self->reset unless $self->{executed};
+    return       if $self->{done};
+    local $DBIx::Squirrel::Context::ITERATOR = $self;
+    my @result = $self->{pull}->();
+    unless (@result) {
+        _finish($self);
+        return;
+    }
+    return $result[0];
 }
 
-# Return the results not yet fetched, or, in scalar context, how many
-# there were.
+# Return the results still to come, reading the run to its end: as a
+# list, or, asked for one value, an array reference of them. Without
+# stages, the source gives every row left in one step.
 sub all ($self) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
     _executed($self);
-    my @results;
-    DBIx::Squirrel::Context::within($self, sub { _drain($self, \@results) })
-        unless $self->{done};
-    $self->{count} += @results;
-    _finish($self);
-    return @results;
+    my $all = [];
+    unless ($self->{done}) {
+        local $self->{all_at_once} = !@{ $self->{stages} };
+        my $run = $self->{run};
+        $all = DBIx::Squirrel::Context::within($self, sub { scalar $run->all });
+        _finish($self);
+    }
+    return wantarray ? @$all : $all;
 }
 
-# Execute the statement again, and return its one result, or nothing if
-# it has none, croaking if it has more than one.
-sub single ($self) {
-    $self->reset;
-    my($result) = _take($self) or return;
-    my @more = _take($self);
+# Return the next result, or undef if there's none, and finish the run.
+sub first ($self) {
+    _executed($self);
+    return undef if $self->{done};    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    my $run    = $self->{run};
+    my $result = DBIx::Squirrel::Context::within($self, sub { $run->first });
     _finish($self);
-    croakf 'Expected one result, not more' if @more;
+    return $result;
+}
+
+# Return the next result, or undef if there's none, warning if there's
+# another, and finish the run.
+sub single ($self) {
+    _executed($self);
+    return undef if $self->{done};    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
+    my $run    = $self->{run};
+    my $result = DBIx::Squirrel::Context::within($self, sub { $run->single });
+    _finish($self);
     return $result;
 }
 
 # Execute the statement again, ready to iterate from its first row, and
-# return the iterator. Bind values given replace those given before;
-# stages given are added to those given to new. Both are kept until
-# others are given. A statement with list placeholders is prepared again,
-# on a new statement handle, if a list has a different number of values.
+# return the iterator. Whatever the run before held goes with it. Bind
+# values given replace those given before; stages given are added to
+# those given to new. Both are kept until others are given. A statement
+# with list placeholders is prepared again, on a new statement handle, if
+# a list has a different number of values.
 sub reset ($self, @args) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms)
-    my $sth   = $self->{sth};
-    my $state = $sth->{private_ekorn};
-    my $other = iterator_going($sth);
+    my $other = iterator_going($self->{sth});
     croakf "Expected the statement handle's other iterator to be finished"
         if $other && $other != $self;
 
@@ -82,7 +122,9 @@ sub reset ($self, @args) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms
     $self->{bind_values}   = \@args if @args;
     $self->{bind_values} //= [@{ $self->{bind_values_initial} }];
 
-    $sth->finish if $sth->{Active};
+    _finish($self);
+    my $sth   = $self->{sth};
+    my $state = $sth->{private_ekorn};
     if ($state->{Lists}) {
         my $again = DBIx::Squirrel::db::_prepare_again(    ## no critic (Subroutines::ProtectPrivateSubs)
             $sth->{Database}, $sth, @{ $self->{bind_values} },
@@ -101,35 +143,37 @@ sub reset ($self, @args) {    ## no critic (Subroutines::ProhibitBuiltinHomonyms
     my %fresh = (
         executed     => 1,
         done         => 0,
-        buffer       => [],
-        count        => 0,
+        ended        => undef,
         produced     => 0,
-        original     => undef,
         column_names => [],
         slice        => $slice,
     );
     @$self{keys %fresh} = values %fresh;
-    $self->{done} = 1
-        unless defined $sth->execute(@{ $self->{bind_values} });
-    # The names are read now, before a row is fetched: once the last row
-    # is, DBD::mysql gives none, unless they were read before.
-    unless ($self->{done}) {
-        my $key = $sth->{FetchHashKeyName} || 'NAME';
-        $self->{column_names}
-            = at_caller { $sth->{NUM_OF_FIELDS} ? [@{ $sth->{$key} }] : [] };
+    # The source's set-up executes the statement, as the run starts. The
+    # stages, if any, are followed by one counting the results, for
+    # DBIx::Squirrel::Context: before the last, if it's a sink, whose
+    # result is the run's, so its results are counted too.
+    my @counted = @{ $self->{stages} };
+    if (@counted) {
+        my $counter = $self;
+        weaken $counter;
+        my $at = Ekorn::Pipeline::is_sink($counted[-1]) ? $#counted : @counted;
+        splice @counted, $at, 0, sub ($result) { $counter->{produced}++; $result };
     }
-    # Without stages, the rows are the results, straight from the source.
-    my $source = _source($self);
-    $self->{next}
-        = @{ $self->{stages} }
-        ? DBIx::Squirrel::Pipeline->new(@{ $self->{stages} })->iterator($source)
-        : $source;
+    $self->{run} = Ekorn::Pipeline->new(@counted)->iterator(_statement($self));
+    # The run's code reference, taken once, as Ekorn's iterator suggests
+    # for a loop, so next doesn't pay its &{} overload on each call. It
+    # doesn't keep the run, which the iterator holds.
+    $self->{pull} = \&{ $self->{run} };
     return $self;
 }
 
-# Return the number of results fetched so far.
-sub count ($self) {
-    return $self->{count} // 0;
+# Return how the last run ended, as Ekorn's iterator says: done, stopped
+# or died; nothing while it's going, or before one has started.
+sub ended ($self) {
+    my $run = $self->{run};
+    return $run->ended if $run;
+    return $self->{ended} // ();
 }
 
 # Return the names of the statement's columns, as fetchrow_hashref keys
@@ -144,93 +188,142 @@ sub sth ($self) {
     return $self->{sth};
 }
 
+# An iterator is a source: each run reads the statement afresh, from its
+# first row, through the iterator's stages, passing on the statement's
+# columns as the run's context.
+sub EKORN_SOURCE ($self) {
+    local $self->{read_by_pipeline} = 1;
+    $self->reset;
+    return $self->{run}->EKORN_SOURCE;
+}
+
+# For the calls taking stages: return the iterator; or, if its last stage
+# is a sink, the sink's result, reading the run to its end. A sink of
+# many, whose items a run hands out one by one, gives them as a list,
+# or, where one value is asked for, as an array reference.
+sub _or_sink ($self) {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    my $stages = $self->{stages_initial};
+    my $sink   = @$stages && Ekorn::Pipeline::is_sink($stages->[-1]);
+    return $self        unless $sink;
+    return $self->first unless $sink eq 'many';
+    return $self->all;
+}
+
 # Execute the statement, unless it's been executed.
 sub _executed ($self) {
     $self->reset unless $self->{executed};
     return;
 }
 
-# Run the stages until the next result comes out of them, and return it
-# as a list of one, or an empty list when there are no more.
-sub _take ($self) {
-    return if $self->{done};
-    my @result = DBIx::Squirrel::Context::within($self, $self->{next});
-    unless (@result) {
-        _finish($self);
-        return;
-    }
-    $self->{produced}++;
-    $self->{count}++;
-    return $result[0];
-}
-
-# Run the stages until no more results come out of them, adding each to
-# the results given, and counting it as it's made, for
-# DBIx::Squirrel::Context.
-sub _drain ($self, $results) {
-    return _rest($self, $results) unless @{ $self->{stages} };
-    my $next = $self->{next};
-    while (my($result) = $next->()) {
-        push @$results, $result;
-        $self->{produced}++;
-    }
-    return;
-}
-
-# Without stages, the rows are the results: add what's left of the batch
-# fetched last, and the rest of the rows, fetched at once, to the results
-# given, rather than one at a time from the source. A subclass's _row
-# makes something of each, as the source does.
-sub _rest ($self, $results) {
-    my $sth   = $self->{sth};
-    my $first = @$results;
-    push @$results, splice @{ $self->{buffer} };
-    my $rows = at_caller {
-        $sth->{Active} && $sth->{NUM_OF_FIELDS}
-            ? $sth->fetchall_arrayref($self->{slice})
-            : undef;
-    };
-    push @$results, @$rows if $rows;
-    return if @$results == $first;
-    if (my $row = $self->can('_row')) {
-        $_ = $self->$row($_) for @$results[$first .. $#$results];
-    }
-    $self->{produced} += @$results - $first;
-    $self->{original}  = $results->[-1];
-    return;
-}
-
-# Stop iterating, and finish the statement.
+# End the run, if one is going, and finish the statement. What the run
+# held goes with it: its batch, and anything its Ekorn iterator holds.
 sub _finish ($self) {
-    @$self{qw(done buffer)} = (1, []);
-    $self->{sth}->finish if $self->{sth}{Active};
+    delete $self->{pull};
+    my $run = delete $self->{run};
+    if ($run) {
+        $run->finish;
+        $self->{ended} = $run->ended;
+    }
+    $self->{done} = 1;
+    my $sth = $self->{sth};
+    $sth->finish if $sth->{Active};
     return;
 }
 
-# Return a source for the pipeline: a closure returning the statement's
-# next row, fetched a batch at a time, or nothing. It keeps the row as
-# the original, for DBIx::Squirrel::Context. A subclass can make
-# something else of each row, before the stages see it, with a _row
-# method of its own, as DBIx::Squirrel::Results does.
-sub _source ($self) {
-    my $row = $self->can('_row');
+# Return a source of the statement's rows, made for each run: its set-up
+# executes the statement and reads the columns' names; its step gives the
+# next row, from a batch of the run's own, fetched as needed, or every row
+# left at once when all asks for them without stages; its end finishes
+# the statement. A run's end touches only its own run, as the iterator
+# ends a run before it starts another. The run keeps what it needs
+# itself, so it reads on if the iterator is let go first, as when a
+# pipeline reads it. A subclass can make something else of each row,
+# before the stages see it, with a _row_maker method of its own, as
+# DBIx::Squirrel::Results does.
+sub _statement ($self) {
     weaken $self;
-    return sub () {
-        my $buffer = $self->{buffer};
-        unless (@$buffer) {
-            my $sth  = $self->{sth};
-            my $rows = at_caller {
+    return source {
+        my $sth   = $self->{sth};
+        my $slice = $self->{slice};
+        my @binds = @{ $self->{bind_values} };
+        # With no stages of the iterator's own, and no pipeline reading it,
+        # nothing asks which row a value came from, so a step gives the
+        # whole batch, which costs less than a row at a time.
+        my $whole = !@{ $self->{stages} } && !$self->{read_by_pipeline};
+        my @buffer;
+        my $batch = $BATCH_FIRST;
+        my $done  = !defined $sth->execute(@binds);
+        my @names;
+        # The names are read now, before a row is fetched: once the last
+        # row is, DBD::mysql gives none, unless they were read before.
+        unless ($done) {
+            my $key = $sth->{FetchHashKeyName} || 'NAME';
+            @names = at_caller { $sth->{NUM_OF_FIELDS} ? @{ $sth->{$key} } : () };
+        }
+        $self->{column_names} = [@names];
+        my $row = $done ? undef : $self->_row_maker($sth);
+        # The run's context: the statement, its columns, and the row given
+        # last, which the stages behind the source are working on, for
+        # DBIx::Squirrel::Context and the stages that ask for columns.
+        my $context = {columns => [@names], statement => $sth, row => undef};
+        my $fetch   = sub ($size) {
+            return at_caller {
                 $sth->{Active} && $sth->{NUM_OF_FIELDS}
-                    ? $sth->fetchall_arrayref($self->{slice}, $BATCH_SIZE)
+                    ? $sth->fetchall_arrayref($slice, $size)
                     : undef;
             };
-            return unless $rows && @$rows;
-            $self->{buffer} = $buffer = $rows;
-        }
-        my $original = shift @$buffer;
-        $original = $self->$row($original) if $row;
-        return $self->{original} = $original;
+        };
+        my $made = sub (@rows) {
+            @rows           = map { $row->($_) } @rows if $row;
+            $context->{row} = $rows[-1]                if @rows;
+            return @rows;
+        };
+        my $step = sub () {
+            # A row at a time from the batch, as stages or a pipeline read
+            # it: the commonest case, so it's done here, without a call
+            # of $made for each row.
+            if (@buffer && !$whole) {
+                my $next = shift @buffer;
+                $next = $row->($next) if $row;
+                return $context->{row} = $next;
+            }
+            return if $done;
+            if ($self && $self->{all_at_once}) {
+                my @rows = splice @buffer;
+                my $rest = $fetch->(undef);
+                push @rows, @$rest if $rest;
+                $done = 1;
+                return $made->(@rows);
+            }
+            # The batch is used up here, as a whole batch is given at once,
+            # and a row at a time is given above while any are left.
+            my $rows = $fetch->($batch);
+            unless ($rows && @$rows) {
+                $done = 1;
+                return;
+            }
+            $batch  = min($batch * 2, $BATCH_LIMIT) if @$rows >= $batch;
+            @buffer = @$rows;
+            return $made->($whole ? splice @buffer : shift @buffer);
+        };
+        my $end = sub ($how) {
+            @buffer = ();
+            $context->{row} = undef;
+            # At program exit, the database may have gone already.
+            return       if ${^GLOBAL_PHASE} eq 'DESTRUCT';
+            $sth->finish if $sth->{Active};
+            return;
+        };
+        return {step => $step, end => $end, context => $context};
     };
+}
+
+# Return what makes each row fetched into the row the stages see, or
+# undef for the row as it is. It's called as a run starts, once the
+# statement is executed, and before a row is fetched, so a subclass can
+# read the columns, and the run keeps what it returns.
+sub _row_maker ($self, $sth) {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    return undef;                 ## no critic (Subroutines::ProhibitExplicitReturnUndef)
 }
 
 # Return the slice rows are fetched as: the ekorn_slice attribute, or
@@ -273,21 +366,25 @@ DBIx::Squirrel::Iterator - an iterator over a statement's results
 =head1 DESCRIPTION
 
 An iterator executes a statement and hands out its rows one at a time.
-Each row is run through a pipeline of stages, as
-L<DBIx::Squirrel::Pipeline> runs them. A stage can change a row, drop
-it, return several values in its place, or stop the iteration with
-L<DBIx::Squirrel::Stop>. A result is whatever comes out of the stages.
-With no stages, it's the row. A stage can ask about the result it's
-making with L<DBIx::Squirrel::Context>.
+Each row is run through a pipeline of stages, as L<Ekorn::Pipeline>
+runs them. A stage can change a row, drop it, return several values in
+its place, or stop the iteration with L<DBIx::Squirrel::Stop>. A
+result is whatever comes out of the stages. With no stages, it's the
+row. A stage can ask about the result it's making with
+L<DBIx::Squirrel::Context>.
 
 An iterator is made by L<DBIx::Squirrel::db/iterate> or
-L<DBIx::Squirrel::st/iterate>. It executes the statement when its first
-result is asked for, and finishes the statement when the results run
-out.
+L<DBIx::Squirrel::st/iterate>. It executes the statement when its
+first result is asked for, and finishes the statement when the results
+run out.
 
-Rows are fetched 100 at a time, with L<DBI/fetchall_arrayref>. L</all>
-without stages fetches them all at once. Each row is an array, or,
-with the C<ekorn_slice> attribute, in the shape it gives:
+Rows are fetched with L<DBI/fetchall_arrayref>, 2 at first, the least
+that tells whether there's a second, then twice as many each time a
+fetch fills its batch, up to 64. Past 64, each fetch's cost is spread
+so thin that a bigger batch reads hardly any faster, and holds more of
+a wide row's data. L</all> without stages fetches the rest at once.
+Each row is an array, or, with the C<ekorn_slice> attribute, in the
+shape it gives:
 
     $dbh = DBIx::Squirrel->connect($dsn, $user, $pass, {ekorn_slice => {}});
     $sth = $dbh->prepare($statement, {ekorn_slice => {}});
@@ -328,11 +425,11 @@ finished. L</reset> runs it again, from the start.
 =head2 all
 
     @results = $it->all;
-    $count   = $it->all;
+    $results = $it->all;
 
-Returns the results not yet fetched. In scalar context, it returns how
-many there were. Either way, they're fetched, and C<next> returns
-nothing after.
+Returns the results still to come, reading the run to its end: as a
+list, or, asked for one value, an array reference of them. Either way,
+the statement is finished, and C<next> returns nothing after.
 
 Without stages, the rows are the results. So C<all> takes what's left
 of the batch fetched last, and fetches the rest with one
@@ -348,13 +445,21 @@ Use stages when the rows should come one at a time, from C<next>, or
 may stop early, or should go with the statement, as in a Sugar
 statement.
 
+=head2 first
+
+    $result = $it->first;
+
+Returns the next result, or C<undef> if there's none, and finishes the
+statement. C<next> returns nothing after, until L</reset>.
+
 =head2 single
 
     $result = $it->single;
 
-Executes the statement again, and returns its one result, or nothing
-if it has none. It croaks if there's more than one. Either way, the
-iterator is done, and C<next> returns nothing after.
+Returns the next result, or C<undef> if there's none, and finishes the
+statement. If there's another, it warns, and returns the first: for a
+statement that lost its C<LIMIT 1>. C<next> returns nothing after,
+until L</reset>.
 
 =head2 reset
 
@@ -363,19 +468,28 @@ iterator is done, and C<next> returns nothing after.
 
 Executes the statement again, ready to iterate from its first row, and
 returns the iterator. If the statement is still active, it's finished
-first. Bind values given replace those given before. Stages given are
-added to those given to L</new>. Both are kept until others are given.
+first, and whatever the run before held goes with it. Bind values
+given replace those given before. Stages given are added to those
+given to L</new>. Both are kept until others are given.
 
 A statement taking a list (see L<DBIx::Squirrel::st/Lists>) is
 prepared again, on a new statement handle, if a list given has a
 different number of values from the one before. L</sth> then returns
 the new handle.
 
-=head2 count
+=head2 ended
 
-    $n = $it->count;
+    $how = $it->ended;
 
-Returns the number of results fetched so far.
+Returns how the last run ended, as L<Ekorn::Pipeline::Iterator/ended>
+says: C<done> if the rows ran out, C<stopped> if the run was cut
+short, by L</first>, by L</single> finding a second result, or by a
+stage that stopped, and C<died> if a stage died. While a run is going,
+and before one has started, it returns nothing. L</reset> starts a new
+run, so it returns nothing after one.
+
+A run read with C<|> or C<@{}> is the iterator's last run, too (see
+L</Operators>).
 
 =head2 column_names
 
@@ -396,17 +510,56 @@ them through L<DBIx::Squirrel::Context/iterator>.
 Returns the statement handle. It changes if L</reset> prepares a
 statement taking a list again.
 
+=head2 EKORN_SOURCE
+
+An iterator is a source, as L<Ekorn::Pipeline> takes one: a run
+reading it executes the statement again, from its first row, through
+the iterator's stages, and passes on the statement's columns as the
+run's context. It's called by Ekorn::Pipeline, not by you.
+
+=head1 Operators
+
+An iterator overloads C<|> and C<@{}> as Ekorn::Pipeline's own sources
+do, with L<Ekorn::Pipeline::Operators>. They're in force only where
+you write C<use Ekorn::Pipeline::Operators>. Elsewhere, they croak.
+
+    use Ekorn::Pipeline::Operators;
+    use Ekorn::Pipeline::Sinks qw(count_items keep_all);
+
+    my $it    = $dbh->iterate('SELECT name FROM artist', sub { $_->[0] });
+    my $names = $it | keep_all;       # an array reference
+    my $n     = $it | count_items;    # a number
+    my @names = @$it;                 # every result
+
+B<C<|> always gives one value.> Perl calls an overloaded C<|> for one
+value, so a sink that keeps many, such as C<keep_all>, gives an array
+reference, even in a list assignment:
+
+    my @names = $it | keep_all;       # one element: the array reference
+    my @names = @{ $it | keep_all };  # the names
+
+B<Each use is a run of its own,> from the first row, through the
+iterator's stages, as L</EKORN_SOURCE> says. So C<< $it->[0] >>,
+C<scalar @$it> and C<$#$it> read every row to give one row, a count or
+an index, and two uses run the statement twice. C<for (@$it)> reads
+every row before the loop starts, where L</next>, in a C<while>, gives
+each as it comes.
+
+B<The run it starts is the iterator's.> It ends a run the iterator had
+going, so L</next> returns nothing after, and L</ended> says how the
+C<|> or C<@{}> run ended, until L</reset>.
+
 =head1 DIAGNOSTICS
 
 =over
 
-=item Expected a statement handle
+=item Expected a DBIx::Squirrel statement handle
 
 L</new> wasn't given a L<DBIx::Squirrel::st>.
 
-=item Expected one result, not more
+=item Expected only one item, but there were more
 
-L</single> found a second result.
+A warning: L</single> found a second result, and returned the first.
 
 =item Expected the statement handle's other iterator to be finished
 
@@ -418,8 +571,8 @@ before executing this one.
 
 =head1 SEE ALSO
 
-L<DBIx::Squirrel>, L<DBIx::Squirrel::Context>,
-L<DBIx::Squirrel::Pipeline>
+L<DBIx::Squirrel>, L<DBIx::Squirrel::Context>, L<Ekorn::Pipeline>,
+L<Ekorn::Pipeline::Operators>
 
 =head1 AUTHOR
 
@@ -429,7 +582,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut

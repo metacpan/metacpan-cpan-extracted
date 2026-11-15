@@ -3,7 +3,7 @@ package DBIO::Test::ErrorComponent;
 # ABSTRACT: Test component that fails to load due to missing true value
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -32,7 +32,7 @@ DBIO::Test::ErrorComponent - Test component that fails to load due to missing tr
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

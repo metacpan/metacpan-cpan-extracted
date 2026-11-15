@@ -7,11 +7,52 @@ use HTTP::API::Core::Error;
 use HTTP::API::Core::RateLimit;
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    die "response constructor options must be key/value pairs\n" if @_ % 2;
+    die "constructor option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
+    my %args = @_;
+
+    die "response status must be a valid HTTP status\n"
+        if !defined($args{status})
+        || ref($args{status}) ne ''
+        || $args{status} !~ /\A\d{3}\z/
+        || $args{status} < 100
+        || $args{status} > 599;
+
+    my $headers = defined($args{headers}) ? $args{headers} : {};
+    die "response headers must be a hash reference\n" if ref($headers) ne 'HASH';
+    die "response header names must be scalars\n"
+        if grep { ref($_) ne '' } keys %$headers;
+    die "response header values must be scalars or undef\n"
+        if grep { defined($_) && ref($_) ne '' } values %$headers;
+
+    for my $name (qw(reason content method url elapsed)) {
+        die "response $name must be a scalar or undef\n"
+            if defined($args{$name}) && ref($args{$name}) ne '';
+    }
+
+    # Conflicting case-insensitive header names are ambiguous. Never let
+    # hash iteration order decide which value controls retry behavior.
+    my (%normalized_headers, %conflicts);
+    for my $name (keys %$headers) {
+        my $key = lc $name;
+        my $value = $headers->{$name};
+        if (exists $normalized_headers{$key}) {
+            my $previous = $normalized_headers{$key};
+            $conflicts{$key} = 1
+                if (!defined($previous) && defined($value))
+                || (defined($previous) && !defined($value))
+                || (defined($previous) && defined($value) && $previous ne $value);
+        }
+        $normalized_headers{$key} = $value;
+    }
+    $normalized_headers{$_} = undef for keys %conflicts;
+
     return bless {
         status  => $args{status},
         reason  => $args{reason},
-        headers => { map { lc($_) => $args{headers}{$_} } keys %{ $args{headers} || {} } },
+        headers => \%normalized_headers,
         content => defined($args{content}) ? $args{content} : '',
         method  => $args{method},
         url     => $args{url},
@@ -58,7 +99,12 @@ sub request_id {
 
 sub url        { $_[0]->{url} }
 sub is_success { $_[0]->{status} >= 200 && $_[0]->{status} < 300 }
-sub header      { my ($self, $name) = @_; return $self->{headers}{lc $name} }
+sub header {
+    my ($self, $name) = @_;
+    die "response header name must be a defined scalar\n"
+        if !defined($name) || ref($name) ne '';
+    return $self->{headers}{lc $name};
+}
 sub rate_limit  { HTTP::API::Core::RateLimit->from_headers($_[0]->{headers}) }
 
 sub json {
@@ -125,6 +171,8 @@ ending in C<+json>, such as C<application/problem+json>.
 =head2 status, reason, headers, header, method, url
 
 Provide response status and request metadata. C<headers> returns a copy.
+Case-insensitively duplicated header names with identical values are preserved;
+conflicting values become C<undef> rather than being chosen arbitrarily.
 
 =head2 elapsed
 

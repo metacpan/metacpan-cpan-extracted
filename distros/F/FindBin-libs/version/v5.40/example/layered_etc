@@ -10,9 +10,7 @@
 # precedence over the standard defaults.  See POD for details.
 ########################################################################
 
-use strict;
-use warnings;
-use feature 'say';
+use v5.40;
 
 use List::Util qw( first );
 
@@ -27,8 +25,8 @@ qw
 # Second call: append physical (default) dirs to the same @etc.
 # Result: local overrides at front, production defaults at the back.
 
-use FindBin::libs qw( base=etc noabspath export        );
-use FindBin::libs qw( base=etc abspath   export append );
+use FindBin::libs qw( base=etc noabspath export        nofail );
+use FindBin::libs qw( base=etc abspath   export append nofail );
 
 say "logical  bin (\$Bin_l, noabspath): $Bin_l";
 say "physical bin (\$Bin_p, abspath):   $Bin_p";

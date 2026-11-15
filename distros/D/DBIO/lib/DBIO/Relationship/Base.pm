@@ -4,7 +4,7 @@ package DBIO::Relationship::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use base qw/DBIO::Base/;
 
@@ -284,7 +284,7 @@ DBIO::Relationship::Base - Inter-table relationships
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

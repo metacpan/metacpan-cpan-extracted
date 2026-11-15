@@ -4,7 +4,7 @@ package DBIO::Test::AsyncHarness;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Carp 'croak';
 use Test::More ();
@@ -138,6 +138,17 @@ sub timeout { $_[0]->{timeout} // $_[0]->harness_default_timeout }
 # coming.
 my $FALLBACK = 10;
 
+# The alarm of the timeout is set this much later than the timeout the clock
+# keeps. Long enough that a loop that turns is out of the wait, by the clock,
+# before the alarm is due; short enough that a loop hanging in a C call ends
+# not noticeably later.
+my $ALARM_GRACE = 0.25;
+
+# The longest await waits, after the wait, for the signal of an alarm that is
+# reported as expired and whose handler has not run. Short: where the system
+# discards the signal together with the alarm, none comes.
+my $SIGNAL_WAIT = 0.25;
+
 
 sub await {
   my ($self, $f) = @_;
@@ -145,8 +156,8 @@ sub await {
   # The process has ONE alarm, and it may be somebody's already: a test file
   # guarding itself against a hang, or an await further out whose callback
   # called this one. So the alarm is borrowed: what is running is taken off
-  # the clock here, and is back on it on EVERY way out, due when it was due
-  # (karr k300). Times are absolute, by Time::HiRes: perl's own alarm answers
+  # the clock here, and is back on it on EVERY way out, due when it was due.
+  # Times are absolute, by Time::HiRes: perl's own alarm answers
   # what is left rounded to a whole second, 9.8 as 10, and putting that back
   # after each await pushes the alarm ahead of a row of quick awaits for good.
   my $timeout  = $self->timeout;
@@ -206,26 +217,54 @@ sub await {
     }
 
     {
-      local $SIG{ALRM} = sub { die "TIMEOUT awaiting Future in " . ref($self) . "\n" };
-      # Our alarm is off the clock on every way out of the eval, a die inside
+      # Our handler dies only while the wait is going on ($in_wait); a signal
+      # at any other time, one that is late included, is only noted. It clears
+      # the flag as it dies, so a wait is cut short once and never twice.
+      my ($got, $in_wait) = (0, 0);
+      local $SIG{ALRM} = sub {
+        $got = 1;
+        return unless $in_wait;
+        $in_wait = 0;
+        die "TIMEOUT awaiting Future in " . ref($self) . "\n";
+      };
+      # The clock ends the wait at the timeout; the alarm is due a grace later
+      # (see $ALARM_GRACE), the addition for a _tick_loop that blocks in a C
+      # call and for a platform that delivers a signal only now and then.
+      my $alarm_due = defined $ours_at ? _alarm_at($ours_at + $ALARM_GRACE) : undef;
+      # The outer eval holds the gap between the end of the inner one and the
+      # clearing of the flag, where the handler may still die; what it catches
+      # there never replaces the error of the inner one, and is the error when
+      # the inner one has none (the signal came before it could be taken).
+      my $ok;
+      eval {
+        eval {
+          $in_wait = 1;
+          until ($f->is_ready) {
+            die "TIMEOUT awaiting Future in " . ref($self) . "\n"
+              if defined $ours_at and Time::HiRes::time() >= $ours_at;
+            $self->_tick_loop;
+          }
+          $ok = 1;
+        } or $err = $@;
+        $in_wait = 0;
+        1;
+      };
+      my $gap = $@;
+      $err = $gap if !$ok and !defined $err and length $gap;
+      # Our alarm is off the clock on every way out of the wait, a die inside
       # _tick_loop included: left running it would fire later, under whatever
       # handler is there then, far away from the test that set it.
-      eval {
-        _alarm_at($ours_at) if defined $ours_at;
-        # The clock ends the wait in the loop itself; the alarm is the
-        # addition for a _tick_loop that blocks in a C call, and for a
-        # platform that delivers a signal only now and then.
-        until ($f->is_ready) {
-          die "TIMEOUT awaiting Future in " . ref($self) . "\n"
-            if defined $ours_at and Time::HiRes::time() >= $ours_at;
-          $self->_tick_loop;
+      if (defined $ours_at) {
+        my $rest = _alarm(0);
+        # Expired by its report and by the clock, and its handler has not run:
+        # the signal may still be on the way. Wait for it, bounded; where it
+        # was discarded with the alarm, none comes.
+        if ($rest <= 0 and !$got and Time::HiRes::time() >= $alarm_due) {
+          my $until = Time::HiRes::time() + $SIGNAL_WAIT;
+          Time::HiRes::sleep(0.01) until $got or Time::HiRes::time() >= $until;
         }
-        _alarm(0);
-        1;
-      } or do {
-        $err = $@;
-        _alarm(0);
-      };
+      }
+      # $SIG{ALRM} is reset when this block ends, with nothing in flight.
     }
     # ... and the outer one back on it -- after our handler is gone, so that
     # one whose time has come meanwhile fires under its own.
@@ -372,7 +411,7 @@ DBIO::Test::AsyncHarness - Parameterised live harness base for DBIO async transp
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 
@@ -610,7 +649,19 @@ With no alarm running, none is running afterwards.
 
 The timeout is kept by the clock as well: C<await> looks at it before every
 turn of L</_tick_loop> and ends the wait with the same error when it is due. The
-alarm is the addition for a loop that blocks inside a C call.
+alarm is the addition for a loop that blocks inside a C call, and it is set a
+grace of 0.25 seconds B<later> than the timeout, so that a loop that turns is
+out of C<await> by the clock before the alarm is due and the two never run out
+in the same instant. A callback that stays in the loop past the timeout plus
+the grace is interrupted by the alarm.
+
+A signal of the alarm that is delivered late is caught. C<$SIG{ALRM}> is not
+reset while one may still be on its way, and the handler of C<await> dies only
+during the wait itself, never later and never in the bookkeeping that puts an
+outer alarm back. When the alarm is reported as expired on the way out, its
+time has passed by the clock and its handler has not run, C<await> waits for
+the signal, for 0.25 seconds at most. On systems that discard the signal with
+the alarm, none comes, and that is all the wait costs.
 
 Where perl's C<alarm> does not report the time that is left (Windows: it
 always answers 0), an outer alarm cannot be borrowed. C<await> clears it on
@@ -620,9 +671,10 @@ holds as before, by the clock in the loop and by the alarm.
 The bookkeeping is done with L<Time::HiRes>, in fractions of a second, on the
 same timer perl's own C<alarm> sets. Where C<Time::HiRes::alarm> is not
 implemented (Windows) the alarm of perl itself is used, in whole seconds
-rounded up: the alarm of the timeout is a whole second at least, the clock in
-the loop holds the time asked, and an outer alarm that C<await> takes off and puts back moves
-by up to a second each time. What is guaranteed: the outer alarm is
+rounded up: the alarm of the timeout is a whole second at least and falls due
+at the next whole second after the timeout plus the grace (a timeout of 1 sets
+an alarm of 2 seconds), the clock in the loop holds the time asked, and an outer alarm that C<await> takes off and
+puts back moves by up to a second each time. What is guaranteed: the outer alarm is
 moved by no more than the time C<await> itself takes to read and to set it --
 microseconds, each time -- and never by rounding. That matters: perl's
 C<alarm> answers what is left rounded to a whole second, 9.8 as 10, and

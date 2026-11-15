@@ -54,4 +54,4 @@ OUTPUT
 T_SYSRET0
 	$arg = LIKELY($var != -1) ? newSViv((IV)$var) : &PL_sv_undef;
 T_SYSRET_TRUE
-	$arg = LIKELY($var == 0) ? newSVpvn("0 but true", 10) : &PL_sv_undef;
+	$arg = LIKELY($var == 0) ? newSVpvs("0 but true") : &PL_sv_undef;

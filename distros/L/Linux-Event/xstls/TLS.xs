@@ -13,6 +13,7 @@
 
 #include <openssl/err.h>
 #include <openssl/ssl.h>
+#include <openssl/sslerr.h>
 #include <openssl/x509_vfy.h>
 
 #include "stream_transport_abi.h"
@@ -207,9 +208,19 @@ let_ssl_result(let_tls_t *tls, int return_value, const char *operation)
         return let_result(LES_TRANSPORT_ERROR, 0, 0);
     }
 
-    code = ERR_peek_last_error();
+    /*
+     * OpenSSL 4 may classify an abrupt socket close as a syscall error
+     * while still placing SSL_R_UNEXPECTED_EOF_WHILE_READING on the error
+     * queue. Inspect the reason from the failed operation, rather than
+     * relying solely on SSL_get_error()'s broad error category.
+     *
+     * Only this exact SSL reason is an unclean TLS EOF. Other SSL/SYSCALL
+     * errors retain their original diagnostics and counters.
+     */
+    code = ERR_peek_error();
 #ifdef SSL_R_UNEXPECTED_EOF_WHILE_READING
-    if (ssl_error == SSL_ERROR_SSL && code
+    if ((ssl_error == SSL_ERROR_SSL || ssl_error == SSL_ERROR_SYSCALL)
+        && code && ERR_GET_LIB(code) == ERR_LIB_SSL
         && ERR_GET_REASON(code) == SSL_R_UNEXPECTED_EOF_WHILE_READING) {
         tls->unclean_eof_count++;
         tls->error_count++;

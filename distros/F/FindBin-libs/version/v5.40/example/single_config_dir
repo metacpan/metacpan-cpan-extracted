@@ -7,9 +7,11 @@
 # config files in ./t, keeping them separate from "real" configs.
 ########################################################################
 
+use v5.40;
+
 use File::Basename;
 
-use FindBin::libs   qw( base=etc export=conf_dir scalar );
+use FindBin::libs   qw( base=etc export=conf_dir scalar nofail );
 
 my $base    = basename $0;
 my $path    = "$conf_dir/$base.conf";

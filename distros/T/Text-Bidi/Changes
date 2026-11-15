@@ -1,4 +1,48 @@
 Revision history for Perl module Text::Bidi
+3.01      2026-11-15 09:36:22+02:00 Asia/Jerusalem
+        * Load the distribution's own modules in ffi.t and pin subprocesses
+          to those exact frontend and backend files, so an older installed
+          SWIG copy cannot mask an invalid library override. Isolate inherited
+          Perl startup options and cover later module-search-path changes.
+        * Document the unsupported legacy remove_bidi_marks placeholder.
+
+3.0       2026-11-14 22:52:27+02:00 Asia/Jerusalem
+        * Replace the SWIG backend with FFI::Platypus,
+          preserving the public API and packed-array calling conventions.
+        * Load the system FriBidi shared library at runtime; building
+          Text::Bidi no longer requires SWIG, FriBidi headers, or a compiler.
+        * Avoid paired-bracket characters in random bidi-class test fixtures;
+          their bracket properties can disagree with class-only test data.
+
+2.19      2026-11-14 16:54:11+02:00 Asia/Jerusalem
+        * Extract Text::Bidi::Selection with logical_ranges and selected_text
+          for reusable visual-to-logical selection mapping. Snapshot original
+          Unicode text and maps, including grouped glyphs and display padding.
+        * Use the shared selection module in the urxvt extension, retaining
+          terminal encoding, mouse gestures, and highlighting in the plugin.
+        * Add visual mouse selection to the urxvt bidi extension, with
+          logical-order copying, word/line selection, selection extension,
+          rectangular selections, and scrollback autoscrolling.
+        * Preserve combining and wide-character cell mappings when rendering
+          terminal text, and copy original Arabic letters instead of shaped
+          presentation forms.
+        * Keep urxvt selection highlighting in visual columns by removing its
+          selection rendition before reordering and reapplying it afterwards.
+          Add a regression for Hebrew table fields and a headless X11 test.
+        * Update the SWIG interface for FriBidi 1.0.18 and SWIG 4.5.1.
+        * Use bracket properties and get_par_embedding_levels_ex for
+          Unicode paired-bracket resolution in paragraphs.
+        * Add get_bracket_types while retaining the existing embedding-level
+          calling convention with an optional bracket-properties argument.
+        * Import fixed-width FriBidi types, expose bracket and shaping APIs,
+          and make library version strings read-only.
+        * Validate packed array lengths and line ranges, copy mutable input
+          buffers, and handle empty arrays correctly.
+        * Support building a checkout without Dist::Zilla, find pkg-config
+          without its Perl helper, and propagate SWIG generation failures.
+        * Add interface regressions and an optional Unicode character
+          conformance test.
+
 2.18      2022-07-04 11:18:31+03:00 Asia/Jerusalem
         * Add Unicode license (#143543)
         * Cleanup some tests

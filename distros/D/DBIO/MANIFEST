@@ -775,6 +775,8 @@ t/lib/MigrationsTest/Util/LeakTracer.pm
 t/lib/MigrationsTest/Util/OverrideRequire.pm
 t/lib/MockConformanceServer.pm
 t/lib/SkillTestSchema.pm
+t/lib/T/KernelTimers.pm
+t/lib/T/SlowKernelTimers.pm
 t/lib/TestDBIO/Broken/Bogus/A.pm
 t/lib/TestDBIO/Broken/Bogus/B.pm
 t/lib/TestDBIO/Broken/Bogus/Bigos.pm
@@ -1098,6 +1100,7 @@ t/test/85_async_harness_no_hires_alarm.t
 t/test/85_conformance_cases_copy_regexp.t
 t/test/86_async_harness_late_timer.t
 t/test/87_test_slow.t
+t/test/88_async_harness_expired_signal.t
 t/timestamp_class.t
 t/timestamp_runtime.t
 t/util/canonical_text.t

@@ -31,7 +31,7 @@ subtest 'new checks its stages' => sub {
     isa_ok $p, [$class], 'a pipeline';
     ok ref($p) && $p->can('iterator'), 'with an iterator method';
     my $msg
-        = qr( Expected\ stage\ \#2\ to\ be\ a\ code\ reference\ or\ a\ pipeline )x;
+        = qr( Expected\ stage\ \#2\ to\ be\ a\ stage:\ a\ code\ reference,\ a\ pipeline,\ or\ an\ object\ offering\ a\ stage's\ role\ method )x;
     my $at = qr( at\ \Q${\ __FILE__ }\E\ line\ \d+ )x;
     like dies {
         $class->new(sub { $_ }, 'x')
@@ -72,7 +72,9 @@ subtest 'in scalar context, a pipeline returns how many results' => sub {
 subtest 'stages returns the stages, to splice into another pipeline' => sub {
     my($double, $odd) = (sub { $_ * 2 }, sub { $_ % 2 ? $_ : () });
     my $p = $class->new($odd, $double);
-    is [$p->stages], [exact_ref($odd), exact_ref($double)], 'in order';
+    is [map { $_->code } $p->stages], [exact_ref($odd), exact_ref($double)],
+        'in order, each a code reference given made a Stage, of that code';
+    isa_ok [$p->stages]->[0], ['Ekorn::Pipeline::Stage'];
     my $n = $p->stages;
     is $n,                    2,  'how many, in scalar context';
     is [$class->new->stages], [], 'none';
@@ -184,7 +186,7 @@ subtest 'iterator stops calling the source after Stop' => sub {
 subtest 'iterator checks its source' => sub {
     my $line = __LINE__ + 1;
     is dies { $class->new->iterator('x') },
-        "Expected a code reference at ${\ __FILE__ } line $line.\n";
+        "Expected a source: a code reference, or an object offering EKORN_SOURCE at ${\ __FILE__ } line $line.\n";
 };
 
 subtest 'a stage that dies says which it was' => sub {

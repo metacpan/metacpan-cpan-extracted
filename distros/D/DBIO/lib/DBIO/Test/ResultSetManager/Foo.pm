@@ -3,7 +3,7 @@ package DBIO::Test::ResultSetManager::Foo;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -28,7 +28,7 @@ DBIO::Test::ResultSetManager::Foo - Test result class for ResultSetManager compo
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

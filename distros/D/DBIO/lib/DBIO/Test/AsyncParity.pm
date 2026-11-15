@@ -4,7 +4,7 @@ package DBIO::Test::AsyncParity;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use Scalar::Util ();
 use Test::More ();
@@ -476,7 +476,7 @@ DBIO::Test::AsyncParity - The same ResultSet operations, synchronous and asynchr
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

@@ -1,5 +1,32 @@
 Revision history for HTTP-API-Core
 
+1.10  2026-11-15
+    - Prevent automatic retries of unsafe HTTP methods introduced by before_request hooks,
+      unless the method is explicitly allowed by the retry policy.
+    - Normalize conflicting case-insensitive response headers conservatively so ambiguous
+      rate-limit metadata cannot trigger an unintended HTTP 403 retry.
+    - Ignore Retry-After HTTP-dates whose weekday disagrees with the calendar date,
+      preserving rate-limit reset and exponential-backoff fallbacks.
+    - Preserve pagination state when a page's continuation metadata is invalid, allowing
+      subsequent calls to refetch that page instead of exposing unvalidated items.
+    - Detect pagination continuations back to the initial URL or cursor before an
+      unnecessary repeat request.
+    - Validate API-key authentication placement before string coercion, including
+      overloaded references.
+    - Reject odd named-option lists in Response and RateLimit APIs without Perl hash
+      warnings; retain valid behavior through regression tests.
+    - Check module versions against dated Changes entries and require packaged
+      make disttest in the release workflow before publication.
+
+1.09  2026-11-15
+    - Strengthen constructor, request, authentication, and pagination validation for malformed option lists and non-scalar values.
+    - Preserve false-valued references and structured errors across transport, hooks, and retry handling.
+    - Reject odd Error constructor arguments before hash coercion; cover warning-free failures.
+    - Add regression coverage for preserving false-valued Error subclasses from transports and hooks.
+    - Include LICENSE, CONTRIBUTING.md, SECURITY.md, and docs/REFERENCE.md in the distribution.
+    - Check MANIFEST completeness and test assembled distributions in CI.
+    - Verify essential release archive files before publishing.
+
 1.08  2026-09-23
     - Add opt-in response-aware pagination extractors for continuation metadata in response headers.
     - Update the GitHub example to follow Link-header rel=next continuation URLs.

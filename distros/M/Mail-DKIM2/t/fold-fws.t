@@ -200,4 +200,27 @@ my $vis = sub {
     is($parsed->{bits}{hashes}{sha512}[0], ('C' x 86) . '==', 'folded h= parses back');
 }
 
+# rt= is "base64string *("," base64string)" (-09 §10.6): no FWS around its
+# commas (a base64string cannot start with FWS), so a signer must not fold
+# there, even though the generic tag-value grammar (§8) would allow it. The
+# base64 itself may still fold. The first recipient's length slides the
+# commas past every position relative to the fold margin.
+{
+    require MIME::Base64;
+    my ($folds, $beside) = (0, 0);
+    for my $pad (0 .. 80) {
+        my @rcpts = ('<' . ('x' x $pad) . '@example.com>',
+                     map { "<recipient$_\@example$_.com>" } 1 .. 6);
+        my $rt = join ',', map { MIME::Base64::encode_base64($_, '') } @rcpts;
+        my $folded = fold_header("DKIM2-Signature: i=1; m=1; d=example.com; rt=$rt; s=sel1:rsa-sha256:;");
+        my ($rt_val) = $folded =~ /\brt=(.*?);/s;
+        $folds++ if $rt_val =~ /\r\n/;
+        $beside++ if $rt_val =~ /,\r\n|\r\n[ \t]*,/;
+        my $p = Mail::DKIM2::Signature->parse($folded);
+        ok(!$p->syntax_error, "pad $pad: the folded rt= parses") or last;
+    }
+    ok($folds > 0, 'long rt= lists do fold');
+    is($beside, 0, 'rt= never folds beside a comma');
+}
+
 done_testing();

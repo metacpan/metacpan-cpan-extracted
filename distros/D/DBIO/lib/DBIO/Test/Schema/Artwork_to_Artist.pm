@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Artwork_to_Artist;
 
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use strict;
 
@@ -73,7 +73,7 @@ DBIO::Test::Schema::Artwork_to_Artist - Test result class for the artwork_to_art
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 AUTHOR
 

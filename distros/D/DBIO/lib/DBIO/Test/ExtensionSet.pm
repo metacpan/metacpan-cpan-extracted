@@ -4,7 +4,7 @@ package DBIO::Test::ExtensionSet;
 use strict;
 use warnings;
 
-our $VERSION = '0.900005';
+our $VERSION = '0.900006';
 
 use DBIO::Util ();
 use Test::More ();
@@ -205,7 +205,7 @@ DBIO::Test::ExtensionSet - Commutativity test for a set of database extension cl
 
 =head1 VERSION
 
-version 0.900005
+version 0.900006
 
 =head1 SYNOPSIS
 

@@ -20,6 +20,19 @@ dies_like(
 );
 
 dies_like(
+    sub { HTTP::API::Core->new(base_url => {}) },
+    qr/base_url must be a non-empty scalar/,
+    'constructor rejects reference-valued base_url',
+);
+
+my $false_ref_base_url = bless {}, '0';
+dies_like(
+    sub { HTTP::API::Core->new(base_url => $false_ref_base_url) },
+    qr/base_url must be a non-empty scalar/,
+    'constructor rejects false-valued reference base_url before coercion',
+);
+
+dies_like(
     sub { HTTP::API::Core->new(base_url => 'https://api.example.test', headers => []) },
     qr/headers must be a hash reference/,
     'constructor validates headers',
@@ -41,6 +54,27 @@ dies_like(
     sub { HTTP::API::Core->new(base_url => 'https://api.example.test', transport => []) },
     qr/transport must be a code reference or object with request\(\)/,
     'constructor validates transport',
+);
+
+dies_like(
+    sub {
+        HTTP::API::Core->new(
+            base_url => 'https://api.example.test',
+            retry => { methods => [ [] ] },
+        );
+    },
+    qr/retry methods must contain only scalar values/,
+    'constructor rejects reference-valued retry methods',
+);
+
+my $lowercase_retry = HTTP::API::Core->new(
+    base_url => 'https://api.example.test',
+    retry => { methods => ['get'] },
+);
+is_deeply(
+    $lowercase_retry->retry->{methods},
+    ['GET'],
+    'constructor normalizes scalar retry methods to uppercase',
 );
 
 dies_like(
@@ -132,9 +166,56 @@ dies_like(
 );
 
 dies_like(
+    sub { $request_api->post('/x', json => { ok => 1 }, content => 'raw') },
+    qr/json and content request options are mutually exclusive/,
+    'request rejects conflicting body options',
+);
+
+dies_like(
     sub { $request_api->get('/x', mystery => 1) },
     qr/unknown request option: mystery/,
     'request rejects unknown options',
+);
+
+
+dies_like(
+    sub { HTTP::API::Core->new(base_url => 'https://api.example.test', timeout => {}) },
+    qr/timeout must be a positive number/,
+    'constructor rejects reference-valued timeout',
+);
+
+my $false_ref_timeout = bless {}, '0';
+dies_like(
+    sub { HTTP::API::Core->new(base_url => 'https://api.example.test', timeout => $false_ref_timeout) },
+    qr/timeout must be a positive number/,
+    'constructor rejects false-valued reference timeout before coercion',
+);
+
+
+dies_like(
+    sub { $request_api->request({}, '/x') },
+    qr/method must be a non-empty scalar/,
+    'request rejects reference-valued method',
+);
+
+dies_like(
+    sub { $request_api->request('GET', []) },
+    qr/path must be a scalar/,
+    'request rejects reference-valued path',
+);
+
+my $false_ref_method = bless {}, '0';
+dies_like(
+    sub { $request_api->request($false_ref_method, '/x') },
+    qr/method must be a non-empty scalar/,
+    'request rejects false-valued reference method before coercion',
+);
+
+my $false_ref_path = bless {}, '0';
+dies_like(
+    sub { $request_api->request('GET', $false_ref_path) },
+    qr/path must be a scalar/,
+    'request rejects false-valued reference path before coercion',
 );
 
 done_testing;

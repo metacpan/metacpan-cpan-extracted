@@ -68,8 +68,9 @@ my $wide = [
 		{ id => 30, name => 'Cara',	 score => 100	},
 	];
 	my @L = _lines(view($aoh, return_only => 1, color => 0));
-	is(scalar @L, 5, 'AoH: summary + header + 3 data rows');
-	like($L[0], qr/^# AoH: 3 rows x 3 cols	\(showing 3\)$/, 'AoH summary line');
+	is(scalar @L, 6, 'AoH: summary + header + 3 data rows + summary again');
+	is($L[-1], $L[0], 'AoH: the summary line is repeated as the last line');
+	like($L[0], qr/^# AoH: 3 rows x 3 cols, \d+\.\d (?:bytes|KB)\t\(showing 3 rows\)$/, 'AoH summary line');
 	like($L[1], qr/id.*name.*score/, 'header lists columns in sorted order');
 	like($L[2], qr/^0\b/,	 'row 0 labelled 0');
 	like($L[2], qr/Alice/,	 'row 1 carries its data');
@@ -98,7 +99,7 @@ my $wide = [
 {
 	my @L = _lines(view({ alpha => 1, beta => 'two', gamma => 3.5 }, return_only => 1, color => 0));
 	like($L[0], qr/^# Hash: 1 row x 3 cols/, 'flat hash single-row summary');
-	is(scalar @L, 3, 'flat hash: summary + header + 1 row');
+	is(scalar @L, 4, 'flat hash: summary + header + 1 row + summary again');
 	like($L[2], qr/^0\b/, 'flat hash row labelled 0');
 }
 
@@ -112,7 +113,7 @@ my $wide = [
 {
 	my $aoh = [ { a => 1, b => 'xx', c => 3 }, { a => 22, b => 'y', c => 444 } ];
 	my @L = _lines(view($aoh, return_only => 1, color => 0));
-	my %w; $w{ _dwidth($_) }++ for @L[1 .. $#L];
+	my %w; $w{ _dwidth($_) }++ for @L[1 .. $#L - 1];	# not the banner repeated at the bottom
 	is(scalar keys %w, 1, 'header and all rows share one display width');
 }
 
@@ -121,7 +122,7 @@ my $wide = [
 	my $oe = "J\xC3\xB8rgensen";   # o-slash as 2 UTF-8 bytes
 	my $d  = [ { n => 1, who => $oe, z => 'x' }, { n => 22, who => 'Bo', z => 'y' } ];
 	my @L  = _lines(view($d, return_only => 1, color => 0));
-	my %w; $w{ _dwidth($_) }++ for @L[1 .. $#L];
+	my %w; $w{ _dwidth($_) }++ for @L[1 .. $#L - 1];	# not the banner repeated at the bottom
 	is(scalar keys %w, 1, 'a multibyte cell keeps columns aligned');
 	my ($oe_line) = grep { /gensen/ } @L;
 	isnt(length $oe_line, _dwidth($oe_line), 'the UTF-8 row is wider in bytes than in display columns');
@@ -139,8 +140,9 @@ my $wide = [
 {
 	my $aoh = [ map { { i => $_ } } 1 .. 5 ];
 	my @L = _lines(view($aoh, n => 2, return_only => 1, color => 0));
-	like($L[0],	 qr/showing 2/,			   'n => 2 shows two rows');
-	like($L[-1], qr/^# \.\.\. 3 more rows$/, 'footer reports remaining rows');
+	like($L[0],	 qr/showing 2 rows/,			   'n => 2 shows two rows');
+	like($L[-2], qr/^# \.\.\. 3 more rows$/, 'footer reports remaining rows');
+	is($L[-1], $L[0], 'the summary line follows the footer');
 	is(scalar(grep { /^\d/ } @L), 2, 'exactly two data rows shown');
 
 	my @R = _lines(view($aoh, rows => 2, return_only => 1, color => 0));
@@ -153,8 +155,8 @@ my $wide = [
 
 	my @Z = _lines(view($aoh, n => 0, return_only => 1, color => 0));
 	is(scalar(grep { /^\d/ } @Z), 0, 'n => 0 shows no data rows');
-	like($Z[0],	 qr/showing 0/,	   'n => 0 summary says showing 0');
-	like($Z[-1], qr/5 more rows/,  'n => 0 still reports all rows in the footer');
+	like($Z[0],	 qr/showing 0 rows/,	   'n => 0 summary says showing 0');
+	like($Z[-2], qr/5 more rows/,  'n => 0 still reports all rows in the footer');
 	like($Z[1],	 qr/\bi\b/,		   'header still lists columns when showing 0 rows');
 }
 
@@ -232,7 +234,7 @@ my $wide = [
 	my @hdr = grep { /^row_name/ } @narrow;
 	cmp_ok(scalar @hdr, '>', 1, 'a narrow width splits the columns into multiple blocks');
 	is(scalar(grep { /^r1\b/ } @narrow), scalar @hdr, 'the label column is repeated in every block');
-	is(scalar(grep { /^# AoH:/ } @narrow), 1, 'the banner is printed exactly once');
+	is(scalar(grep { /^# AoH:/ } @narrow), 2, 'the banner is printed once at the top and once at the bottom');
 	like($narrow[0], qr/x 8 cols/, 'the banner still counts every column, not just one block');
 
 	# every column appears once, in original order, across the blocks

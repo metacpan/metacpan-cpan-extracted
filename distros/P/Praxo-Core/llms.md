@@ -8,11 +8,11 @@
 
 - package: `Praxo::Core`
 - registry: [CPAN (MetaCPAN index)](https://metacpan.org/dist/Praxo-Core)
-- source_version: `0.4.0`
-- published_version: `0.2.0`
+- source_version: `0.5.1`
+- published_version: `0.5.0`
 - install_published: `cpanm Praxo::Core`
 - install_source: `cpanm Praxo::Core`
-- source_tag: `perl/v0.4.0`
+- source_tag: `perl/v0.5.1`
 - tier: Core
 - contract: `SPEC_VERSION` `0.2.0`
 - documentation: https://axisvela.github.io/praxo-core/languages/perl/
@@ -34,7 +34,13 @@
 - Registry introduction: `REGISTRY.md`
 - Markdown entry: `llms.md`
 - Compact entry: `llms.txt`
+- [Examples](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples): runnable language-specific examples.
 - Coding-agent contract: ../../docs/getting-started/coding-agents.md
+
+## Community
+
+- X: <https://x.com/axisvela>
+- Weibo: <https://weibo.com/u/1936025761>
 
 ## Boundaries
 

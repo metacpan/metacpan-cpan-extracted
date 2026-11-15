@@ -5,7 +5,23 @@ use warnings;
 use Time::HiRes qw(time);
 
 sub new {
-    my ($class, %args) = @_;
+    my $class = shift;
+    die "rate-limit constructor options must be key/value pairs\n" if @_ % 2;
+    die "constructor option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
+    my %args = @_;
+
+    for my $name (qw(limit remaining used reset reset_epoch retry_after)) {
+        die "rate-limit $name must be a non-negative number or undef\n"
+            if defined($args{$name})
+            && (ref($args{$name}) ne ''
+                || $args{$name} !~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/);
+    }
+    for my $name (qw(resource source)) {
+        die "rate-limit $name must be a scalar or undef\n"
+            if defined($args{$name}) && ref($args{$name}) ne '';
+    }
+
     return bless {
         limit       => $args{limit},
         remaining   => $args{remaining},
@@ -20,8 +36,27 @@ sub new {
 
 sub from_headers {
     my ($class, $headers) = @_;
-    $headers ||= {};
-    my %h = map { lc($_) => $headers->{$_} } keys %$headers;
+    $headers = {} if !defined $headers;
+    die "rate-limit headers must be a hash reference\n"
+        if ref($headers) ne 'HASH';
+    die "rate-limit header values must be scalars or undef\n"
+        if grep { defined($_) && ref($_) ne '' } values %$headers;
+    # Duplicate spellings with conflicting values are ambiguous, not
+    # arbitrarily chosen according to Perl hash iteration order.
+    my (%h, %conflicts);
+    for my $name (keys %$headers) {
+        my $key = lc $name;
+        my $value = $headers->{$name};
+        if (exists $h{$key}) {
+            my $previous = $h{$key};
+            $conflicts{$key} = 1
+                if (!defined($previous) && defined($value))
+                || (defined($previous) && !defined($value))
+                || (defined($previous) && defined($value) && $previous ne $value);
+        }
+        $h{$key} = $value;
+    }
+    $h{$_} = undef for keys %conflicts;
 
     my $source = exists $h{'ratelimit-limit'} || exists $h{'ratelimit-remaining'} || exists $h{'ratelimit-reset'}
         ? 'ratelimit'
@@ -30,13 +65,13 @@ sub from_headers {
             : undef;
 
     return $class->new(
-        limit       => _number($h{'ratelimit-limit'} // $h{'x-ratelimit-limit'}),
-        remaining   => _number($h{'ratelimit-remaining'} // $h{'x-ratelimit-remaining'}),
-        used        => _number($h{'ratelimit-used'} // $h{'x-ratelimit-used'}),
+        limit       => _number(exists $h{'ratelimit-limit'} ? $h{'ratelimit-limit'} : $h{'x-ratelimit-limit'}),
+        remaining   => _number(exists $h{'ratelimit-remaining'} ? $h{'ratelimit-remaining'} : $h{'x-ratelimit-remaining'}),
+        used        => _number(exists $h{'ratelimit-used'} ? $h{'ratelimit-used'} : $h{'x-ratelimit-used'}),
         reset       => _number($h{'ratelimit-reset'}),
         reset_epoch => _number($h{'x-ratelimit-reset'}),
         retry_after => _number($h{'retry-after'}),
-        resource    => $h{'ratelimit-resource'} // $h{'x-ratelimit-resource'},
+        resource    => exists $h{'ratelimit-resource'} ? $h{'ratelimit-resource'} : $h{'x-ratelimit-resource'},
         source      => $source,
     );
 }
@@ -56,8 +91,17 @@ sub exhausted {
 }
 
 sub wait_seconds {
-    my ($self, %args) = @_;
-    my $now = exists $args{now} ? $args{now} : time;
+    my $self = shift;
+    die "rate-limit wait_seconds options must be key/value pairs\n" if @_ % 2;
+    die "rate-limit wait_seconds option names must be scalars\n"
+        if grep { ref($_) ne '' } @_[ grep { $_ % 2 == 0 } 0 .. $#_ ];
+    my %args = @_;
+    my $now = exists $args{now} ? delete($args{now}) : time;
+    die "unknown rate-limit wait_seconds option: $_\n" for sort keys %args;
+    die "rate-limit now must be a non-negative number\n"
+        if !defined($now)
+        || ref($now) ne ''
+        || $now !~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/;
 
     return $self->{retry_after} if defined $self->{retry_after};
     return $self->{reset} if defined $self->{reset};
@@ -86,7 +130,8 @@ sub as_hash {
 
 sub _number {
     my ($value) = @_;
-    return undef if !defined($value) || $value !~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/;
+    return undef if !defined($value) || ref($value) ne ''
+        || $value !~ /\A(?:\d+(?:\.\d*)?|\.\d+)\z/;
     return 0 + $value;
 }
 

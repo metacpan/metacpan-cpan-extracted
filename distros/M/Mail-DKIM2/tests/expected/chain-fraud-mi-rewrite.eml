@@ -1,0 +1,20 @@
+DKIM2-Signature: i=1; m=2; t=1783372800; d=test1.dkim2.com;
+	mf=PGJvdW5jZUB0ZXN0MS5ka2ltMi5jb20+;
+	rt=PHVzZXJAdGVzdDMuZGtpbTIuY29tPg==;
+	s=sel1:rsa-sha256:GiuCFe5fq9o1Rw+DQuW6u1Bc9TBa72RQ48W6TCijy8XIDo
+	EAL0slf73fSky3C0LEOgzVYyQj0oxUz/PRcyiWOobtGf3EMMtY7vhUXjzFertaFb
+	adjvF7weAhmh/VyNPNB8hzGivkABjpS1eO6neD/V74oh6qvrY7xuPuu7TaCI2o6/
+	qfnZpvNizMWBmuYvmiDRTjx6ela8WqQdyvYlQZT0lzcyLvoAld5K5NKweAore5oE
+	tcyfs3YEHFzBOKjgI/92NZoZk64Xsm55IcTuXT262v31TN7uTxMhNnL+O2l3OAVQ
+	q3VLGZkPoXqWzgdPiKZYPa3xo/nus++M0CnEQ1lg==;
+Message-Instance: m=2;
+ h=sha256:59WDCo7ooOZl6sFXDn8lIz+ZBsj7IQSEgxTQcL0WEWE=:vK6dL8vkPYAEQAmMCqqmZxMPhiO/dfvRrpROD4mY5M4=; r=eyJoIjp7Im1lc3NhZ2UtaW5zdGFuY2UiOlt7ImQiOlsiIG09MTsgaD1zaGEyNTY6NTlXRENvN29vT1psNnNGWERuOGxJeitaQnNqN0lRU0VneFRRY0wwV0VXRT06dks2ZEw4dmtQWUFFUUFtTUNxcW1aeE1QaGlPL2RmdlJycFJPRDRtWTVNND07Il19XX19;
+Message-Instance: m=1;
+ h=sha256:BacK9Eo0Q8hCN1vcrEz3dLzcT2BhwZ+tslkrLiBKJmk=:SZeYHENh/K932sMRQMMdUeQj+THa6uSq6iv/c0V99TE=;
+Date: Tue, 08 Jul 2026 10:00:00 +0000
+To: victim@example.org
+From: alice@test1.dkim2.com
+Subject: URGENT wire money
+Message-Id: <evil.20260708@test1.dkim2.com>
+
+Please wire $1M to account 666

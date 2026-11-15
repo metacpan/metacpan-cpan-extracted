@@ -13,14 +13,14 @@ use DBIx::Squirrel::Errors       qw(at_caller croakf failed in_method);
 use DBIx::Squirrel::Placeholders qw(
     expand_lists key_of study_sql values_for values_taken
 );
-use DBIx::Squirrel::Pipes qw();
-use DBIx::Squirrel::Util  qw(
+use Ekorn::Pipeline::Pipes qw();
+use DBIx::Squirrel::Util   qw(
     canonical iterator_going shift_attrs split_attrs split_stages unwrap_values
 );
 
 use namespace::clean;
 
-our @ISA = ('DBI::db', 'DBIx::Squirrel::Pipes');
+our @ISA = ('DBI::db', 'Ekorn::Pipeline::Pipes');
 
 # Croak at the line that called DBIx::Squirrel.
 our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
@@ -285,9 +285,25 @@ sub selectcol_arrayref ($self, $statement, @args) {
     return _select($self, 'selectcol_arrayref', $statement, [], @args);
 }
 
+# The DBI's selectall_array: the rows selectall_arrayref gives, as a
+# list; or, with stages after the values, each row pushed through them,
+# and what comes out, as a pipeline called with values gives it. The
+# DBI's own would call selectall_arrayref with the stages, and take what
+# it gives for one value, a count, for its rows.
+sub selectall_array ($self, $statement, @args) {
+    my $attrs  = @args && is_stage($args[0]) ? undef : shift_attrs(\@args);
+    my @stages = split_stages(\@args);
+    my $rows = _select($self, 'selectall_arrayref', $statement, [], $attrs, @args);
+    my @rows = $rows ? @$rows : ();
+    return @rows unless @stages;
+    return Ekorn::Pipeline->new(@stages)->(@rows);
+}
+
 # Call one of the DBI's select methods with a statement handle, prepared,
 # unless it was given one, and with any values bound. Return what the
-# DBI's method returns. The attributes may be left out, as with do.
+# DBI's method returns; or, with stages after the values, push what it
+# returns through them, and return what comes out, as a pipeline called
+# with values does. The attributes may be left out, as with do.
 #
 # A statement that can't be prepared returns what the DBI's method does,
 # without RaiseError: undef from those returning a reference to one row
@@ -296,7 +312,12 @@ sub _select ($self, $method, $statement, $before, @args) {
     state %UNDEF = map { ($_ => 1) } qw(
         selectrow_arrayref selectrow_hashref selectall_arrayref
     );
-    my $attrs = shift_attrs(\@args);
+    my $attrs  = @args && is_stage($args[0]) ? undef : shift_attrs(\@args);
+    my @stages = split_stages(\@args);
+    return _select_through(
+        $self, $method, $statement, $before, $attrs, \@stages,
+        @args,
+    ) if @stages;
     return in_method $self, $method, sub {
         my $sth
             = $statement isa 'DBI::st'
@@ -318,6 +339,19 @@ sub _select ($self, $method, $statement, $before, @args) {
     };
 }
 
+# Call a select method as _select does, without stages, and push what it
+# returns through the stages: a reference, from most, or a row's values,
+# from selectrow_array. What comes out is what a pipeline called with
+# values gives: every value, or, where one is asked for, a sink's result,
+# or how many.
+sub _select_through (
+    $self, $method, $statement, $before, $attrs, $stages,
+    @args,
+) {
+    my @got = _select($self, $method, $statement, $before, $attrs, @args);
+    return Ekorn::Pipeline->new(@$stages)->(@got);
+}
+
 # Return a statement with its placeholders rewritten as "?", for the DBI
 # to prepare, what its statement handle keeps about it, the attributes to
 # prepare it with, without DBIx::Squirrel's own, and DBIx::Squirrel's own,
@@ -328,8 +362,9 @@ sub _select ($self, $method, $statement, $before, @args) {
 #
 # A statement given as a string, without attributes, as most are, is
 # studied once for each handle, which keeps what was found in its
-# private_ekorn_studied attribute, keyed by the statement and, with DBD::Pg, its placeholder options, as they can be
-# changed on the handle. Each statement handle has a copy of its own of
+# private_ekorn_studied attribute, keyed by the statement and, with
+# DBD::Pg, its placeholder options, as they can be changed on the
+# handle. Each statement handle has a copy of its own of
 # what the statement handle keeps, as an iterator adds to it. The handle
 # keeps no more than $STUDIED statements, starting again when it has
 # that many, so statements made as the program runs can't fill memory.
@@ -454,9 +489,9 @@ DBIx::Squirrel::db - DBIx::Squirrel's database handle class
 =head1 DESCRIPTION
 
 A database handle from L<DBIx::Squirrel/connect> is blessed into this
-class. It's a subclass of the DBI's C<DBI::db>, so it does everything a
-DBI database handle does. It also inherits L<DBIx::Squirrel/pipe> and
-L<DBIx::Squirrel/tap> from L<DBIx::Squirrel::Pipes>.
+class. It's a subclass of the DBI's C<DBI::db>, so it does everything
+a DBI database handle does. It also inherits L<DBIx::Squirrel/pipe>
+and L<DBIx::Squirrel/tap> from L<Ekorn::Pipeline::Pipes>.
 
 =head1 METHODS
 
@@ -634,9 +669,10 @@ methods, for those.
     $it = $dbh->iterate($statement, @bind_values, @stages);
 
 Prepares a statement, as L</prepare> does, and returns a
-L<DBIx::Squirrel::Iterator> over its results. See
-L<DBIx::Squirrel::st/iterate>. As with L</do>, the attributes may be
-left out. A statement taking a list is prepared for the values given.
+L<DBIx::Squirrel::Iterator> over its results, or, if the last stage is
+a sink, the sink's result. See L<DBIx::Squirrel::st/iterate>. As with
+L</do>, the attributes may be left out. A statement taking a list is
+prepared for the values given.
 
 =head2 results
 
@@ -656,6 +692,7 @@ objects with a method for each column.
     $hash_ref = $dbh->selectall_hashref($statement, $key_field, \%attr,
                                         @bind_values);
     $ary_ref  = $dbh->selectcol_arrayref($statement, \%attr, @bind_values);
+    @rows     = $dbh->selectall_array($statement, \%attr, @bind_values);
 
 =over
 
@@ -671,17 +708,28 @@ objects with a method for each column.
 
 =item selectcol_arrayref
 
+=item selectall_array
+
 =back
 
 Each works as the DBI's does. It prepares the statement as L</prepare>
 does, unless it's already a statement handle, and binds the values as
 L<DBIx::Squirrel::st/bind> binds them. A statement taking a list is
-prepared for the values given. The DBI's C<selectall_array> goes
-through C<selectall_arrayref>, so it does all this too.
+prepared for the values given. C<selectall_array> gives the rows
+C<selectall_arrayref> gives, as a list, as the DBI's does.
 
 As with L</do>, the attributes may be left out. The first argument
 after the statement, or after C<selectall_hashref>'s key field, is
 taken as the attributes only if it's a hash reference or C<undef>.
+
+Given stages after the bind values, each pushes what the DBI's method
+returns through them, as a pipeline called with values does, and
+returns what comes out of the last: every value; or, where one value
+is asked for, a sink's result, if a sink is last, and otherwise how
+many values came out. C<selectrow_array> pushes the row's values,
+C<selectall_array> each row, and the others their one reference.
+
+    my @names = $dbh->selectall_array('SELECT name FROM artist', sub { $_->[0] });
 
 Unlike L</prepare>, they don't croak if the statement can't be
 prepared. Without C<RaiseError>, each returns what the DBI's returns,
@@ -693,9 +741,9 @@ as C<do> does.
 
 =item Expected one placeholder style, not several (%s)
 
-The statement used more than one style of placeholder, such as C<?> and
-C<:name>. The styles found are listed, each as an example: C<?>, C<?1>,
-C<:1>, C<$1>, C<:name> or C<$name>.
+The statement used more than one style of placeholder, such as C<?>
+and C<:name>. The styles found are listed, each as an example: C<?>,
+C<?1>, C<:1>, C<$1>, C<:name> or C<$name>.
 
 =item Expected placeholders numbered from 1 (%s)
 
@@ -703,8 +751,8 @@ The statement had a numbered placeholder such as C<$0>.
 
 =item Expected a statement
 
-The statement was blank, or was a reference other than those L</prepare>
-takes.
+The statement was blank, or was a reference other than those
+L</prepare> takes.
 
 =item Expected bind values with a statement taking a list (%s)
 
@@ -726,8 +774,9 @@ DBD::Pg as written, so a C<$1> placeholder can't take a list.
 =item Expected a reference to a HASH or ARRAY
 
 The first argument after the statement in L</do>, L</iterate>,
-L</results> or a select method was a reference, but not to a hash or an
-array.
+L</results> or a select method was an unblessed reference, but not to
+a hash or an array. An object there is a bind value, as it is to the
+DBI.
 
 =back
 
@@ -743,7 +792,7 @@ Iain Campbell E<lt>cpanic@cpan.orgE<gt>
 
 Copyright (c) 2024-2026 by Iain Campbell.
 
-This is free software; you can redistribute it and/or modify it under the
-same terms as the Perl 5 programming language system itself.
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
 =cut
