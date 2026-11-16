@@ -310,4 +310,81 @@ sub text_file {
 	is($env->read_file('client', 'gone.txt'), $server_edit, 'the fallback still delivers the file');
 }
 
+# ------------------------------------------------- weak sums and literal runs
+
+# The weak sum is on the wire, so it must stay rsync's definition however it
+# is computed: a = sum of the bytes, b = sum of (length - i) * byte[i], each
+# mod 2**16.  The 200,000-byte block is longer than the slice the sum unpacks
+# at a time, and the 0xff block makes b as large as it can be.
+{
+	my $reference = sub {
+		my ($bytes) = @_;
+		my ($a, $b, $length) = (0, 0, length $bytes);
+		for my $index (0 .. $length - 1) {
+			my $value = ord substr($bytes, $index, 1);
+			$a = ($a + $value) % 65_536;
+			$b = ($b + ($length - $index) * $value) % 65_536;
+		}
+		return $b * 65_536 + $a;
+	};
+
+	my $dir = tempdir(CLEANUP => 1);
+	srand 11;
+	my %contents = (
+		random => join('', map { chr int rand 256 } 1 .. 400_000),
+		ff     => "\xff" x 400_000,
+		text   => text_file(8_000),
+	);
+	for my $name (sort keys %contents) {
+		my $path = write_raw(File::Spec->catfile($dir, "$name.bin"), $contents{$name});
+		for my $block (1_024, 200_000) {
+			my $signature = App::FileSync::Delta::signature($path, $block);
+			my @expected = map { $reference->(substr($contents{$name}, $_ * $block, $block)) }
+				0 .. $#{ $signature->{blocks} };
+			is_deeply([ map { $_->[0] } @{ $signature->{blocks} } ], \@expected,
+				"$name, $block-byte blocks: the weak sums follow rsync's definition");
+		}
+	}
+}
+
+# The rolling scan queues each unmatched run in one piece; it must still be
+# written as records of at most $LITERAL bytes, and rebuild exactly.
+{
+	my $dir = tempdir(CLEANUP => 1);
+	srand 12;
+	my $old_content = join '', map { chr int rand 256 } 1 .. 300_000;
+	my $new_content = substr($old_content, 0, 5_000) . ('XYZ' x 3_000) . substr($old_content, 9_000) . ('tail' x 10);
+	my $old = write_raw(File::Spec->catfile($dir, 'old.bin'), $old_content);
+	my $new = write_raw(File::Spec->catfile($dir, 'new.bin'), $new_content);
+
+	for my $limit (7, 1_000) {
+		local $App::FileSync::Delta::LITERAL = $limit;
+		my $signature = App::FileSync::Delta::signature($old, 1_024);
+		my $spool_path = File::Spec->catfile($dir, "spool-$limit");
+		open my $spool, '+>', $spool_path or die "Cannot write $spool_path: $!";
+		binmode $spool;
+		my $stats = App::FileSync::Delta::diff($new, $signature, $spool);
+
+		seek $spool, 0, 0;
+		my ($largest, $literal) = (0, 0);
+		while (my ($type, @rest) = App::FileSync::Delta::read_op($spool)) {
+			next unless $type eq 'literal';
+			$literal += length $rest[0];
+			$largest = length $rest[0] if length $rest[0] > $largest;
+		}
+		is($largest, $limit, "LITERAL=$limit: no literal record is longer than \$LITERAL");
+		is($literal, $stats->{literal}, 'the records carry every literal byte the stats count');
+		ok($stats->{copy} > 250_000, 'the blocks after the edit are still found');
+
+		seek $spool, 0, 0;
+		my $out_path = File::Spec->catfile($dir, "out-$limit");
+		open my $out, '>', $out_path or die "Cannot write $out_path: $!";
+		binmode $out;
+		App::FileSync::Delta::apply($old, $spool, $out);
+		close $out;
+		close $spool;
+		is(slurp($out_path), $new_content, 'the delta rebuilds the new file');
+	}
+}
+
 done_testing();

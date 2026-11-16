@@ -9,6 +9,7 @@ use Test::More;
 use Mail::BIMI;
 use Mail::BIMI::Indicator;
 use MIME::Base64;
+use IO::Compress::Gzip;
 my $bimi = Mail::BIMI->new;
 
 subtest 'no location' => sub {
@@ -94,6 +95,39 @@ rZq2o4XslVHkHARUPgGLA3kJseC4CwEwKXRAqBK4qAOD8bWOSSMzYNRkDTiviVBbJAg2q9fEMUfF');
   is($indicator->data_uncompressed, '', 'No uncompressed data returned when input is bad requested (data_uncompressed)');
   is_deeply($indicator->error_codes,['SVG_UNZIP_ERROR'],'Error codes');
   is($indicator->data_xml,undef,'No XML returned (data_xml)');
+};
+
+subtest 'gzip bomb' => sub {
+  my $bimi = Mail::BIMI->new;
+  my $max_size = $bimi->options->svg_max_size;
+  my $payload = '<svg xmlns="http://www.w3.org/2000/svg">' . ( 'A' x ( 32 * 1024 * 1024 ) ) . '</svg>';
+  my $gzipped;
+  IO::Compress::Gzip::gzip(\$payload => \$gzipped) or die "gzip failed: $IO::Compress::Gzip::GzipError";
+  undef $payload;
+  my $indicator = Mail::BIMI::Indicator->new( bimi_object=>$bimi, uri => 'test1', data=>$gzipped );
+  is($indicator->data_uncompressed, '', 'No uncompressed data returned when expanded size is too large');
+  is_deeply($indicator->error_codes,['SVG_SIZE'],'Error codes');
+  is($indicator->is_valid,0,'SVG is not valid');
+  is_deeply($indicator->error_codes,['SVG_SIZE'],'No additional error codes after validation');
+};
+
+subtest 'gzip at size limit' => sub {
+  my $bimi = Mail::BIMI->new;
+  $bimi->options->no_validate_svg(1);
+  my $payload = '<svg xmlns="http://www.w3.org/2000/svg">' . ( 'A' x 1000 ) . '</svg>';
+  $bimi->options->svg_max_size(length $payload);
+  my $gzipped;
+  IO::Compress::Gzip::gzip(\$payload => \$gzipped) or die "gzip failed: $IO::Compress::Gzip::GzipError";
+  my $indicator = Mail::BIMI::Indicator->new( bimi_object=>$bimi, uri => 'test1', data=>$gzipped );
+  is($indicator->data_uncompressed, $payload, 'Uncompressed data returned when exactly at size limit');
+  is($indicator->is_valid,1,'SVG is valid');
+  is_deeply($indicator->error_codes,[],'No error codes');
+
+  $bimi = Mail::BIMI->new;
+  $bimi->options->svg_max_size(length($payload) - 1);
+  $indicator = Mail::BIMI::Indicator->new( bimi_object=>$bimi, uri => 'test1', data=>$gzipped );
+  is($indicator->data_uncompressed, '', 'No uncompressed data returned when one byte over size limit');
+  is_deeply($indicator->error_codes,['SVG_SIZE'],'Error codes');
 };
 
 subtest 'bad xm;' => sub {

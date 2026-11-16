@@ -1,0 +1,142 @@
+use alienfile;
+
+plugin 'PkgConfig' => 'mysqlclient';
+
+share {
+    requires 'Alien::Build::Plugin::Build::CMake' => 0;
+
+    start_url 'https://repo.mysql.com/apt/debian/pool/';
+    plugin 'Fetch::HTTPTiny';
+    plugin 'Decode::HTML';
+
+    download sub {
+        my ($build) = @_;
+
+        my $listing = $build->fetch;
+        $listing = $build->decode($listing) if $listing->{type} eq 'html';
+
+        my @series =
+            sort { $b->{ver}[0] <=> $a->{ver}[0] || $b->{ver}[1] <=> $a->{ver}[1] }
+            map  { $_->{ver} = [ $_->{filename} =~ /mysql-(\d+)\.(\d+)-lts/ ]; $_ }
+            grep { $_->{filename} =~ /^mysql-\d+\.\d+-lts\/?$/ }
+            @{ $listing->{list} };
+
+        die "no MySQL LTS directories found" unless @series;
+        my $dir = $series[0];
+        $build->log("picked $dir->{filename}");
+
+        my $pkg_url = $dir->{url} =~ m{/$} ? "$dir->{url}m/mysql-community/" : "$dir->{url}/m/mysql-community/";
+        my $listing2 = $build->fetch($pkg_url);
+        $listing2 = $build->decode($listing2) if $listing2->{type} eq 'html';
+
+        my @tarballs =
+            sort { _vercmp($b->{ver}, $a->{ver}) }
+            map  { $_->{ver} = [ $_->{filename} =~ /(\d+)\.(\d+)\.(\d+)/ ]; $_ }
+            grep { $_->{filename} =~ /^mysql-community_\d+\.\d+\.\d+\.orig\.tar\.gz$/ }
+            @{ $listing2->{list} };
+
+        die "no source tarball in $pkg_url" unless @tarballs;
+        my $tarball = $tarballs[0];
+        $build->log("downloading $tarball->{filename}");
+
+        require HTTP::Tiny;
+        my $http = HTTP::Tiny->new(
+            agent      => 'Alien-Build',
+            verify_SSL => $build->download_rule =~ /encrypt/ ? 1 : 0,
+        );
+        my $res = $http->mirror($tarball->{url}, $tarball->{filename});
+        die "failed to download $tarball->{url}: $res->{status} $res->{reason}"
+            unless $res->{success};
+
+        require Path::Tiny;
+        $build->install_prop->{download_detail}->{
+            Path::Tiny->new($tarball->{filename})->absolute->stringify
+        } = { protocol => 'https' };
+
+        my $version = join '.', @{ $tarball->{ver} };
+        $build->runtime_prop->{version} = $version;
+    };
+
+    plugin 'Extract::CommandLine' => 'tar.gz';
+    plugin 'Build::CMake';
+
+    my @ssl_args;
+    if ($^O eq 'darwin') {
+        for my $pkg (qw(openssl@3 openssl@1.1 openssl)) {
+            my $ssl = `brew --prefix $pkg 2>/dev/null`;
+            chomp $ssl;
+            if ($ssl && -d $ssl) {
+                @ssl_args = ("-DOPENSSL_ROOT_DIR=$ssl");
+                last;
+            }
+        }
+    }
+
+    build [
+        sub {
+            my $build = shift;
+            if (!$ENV{CMAKE_BUILD_PARALLEL_LEVEL}) {
+                my $jobs = 4;
+                if ($^O eq 'linux' && open my $fh, '<', '/proc/cpuinfo') {
+                    my $n = grep { /^processor\s*:/ } <$fh>;
+                    $jobs = $n if $n > 0;
+                } elsif ($^O eq 'darwin' || $^O =~ /bsd/i) {
+                    my $n = `sysctl -n hw.ncpu 2>/dev/null`;
+                    chomp $n;
+                    $jobs = $n if $n && $n =~ /^\d+$/ && $n > 0;
+                }
+                $ENV{CMAKE_BUILD_PARALLEL_LEVEL} = $jobs;
+            }
+        },
+        ['%{cmake}',
+            '-B', '_build',
+            '-S', '%{.install.extract}',
+            @{ meta->prop->{plugin_build_cmake}->{args} },
+            @ssl_args,
+            '-DCMAKE_BUILD_TYPE=Release',
+            '-DWITHOUT_SERVER=ON',
+            '-DWITH_UNIT_TESTS=OFF',
+            '-DWITH_CURL=none',
+            '-DWITH_FIDO=none',
+            '-DWITH_KERBEROS=none',
+            '-DWITH_AUTHENTICATION_WEBAUTHN=OFF',
+            '-DWITH_AUTHENTICATION_KERBEROS=OFF',
+            '-DWITH_AUTHENTICATION_LDAP=OFF',
+            '-DWITH_AUTHENTICATION_CLIENT_PLUGINS=OFF',
+            '-DWITH_ZLIB=bundled',
+            '-DWITH_ZSTD=bundled',
+            '-DWITH_EDITLINE=bundled',
+            '-DWITH_TIRPC=bundled',
+        ],
+        ['%{cmake}', '--build', '_build', '--target', 'libmysql', 'mysqlclient'],
+        sub {
+            my $build = shift;
+            require Alien::cmake3;
+            my $cmake  = Alien::cmake3->exe;
+            my $prefix = $build->install_prop->{prefix};
+            for my $sub (qw(include libmysql scripts)) {
+                system($cmake, "-DCMAKE_INSTALL_PREFIX=$prefix", '-P', "_build/$sub/cmake_install.cmake") == 0
+                    or die "cmake install $sub failed";
+            }
+        },
+        sub {
+            my $build = shift;
+            return unless $^O eq 'darwin';
+            my $prefix  = $build->install_prop->{prefix};
+            my $destdir = $ENV{DESTDIR} // '';
+            my $lib     = "$destdir$prefix/lib";
+
+            for my $dylib (glob "$lib/libmysqlclient*.dylib") {
+                next if -l $dylib;
+                (my $name = $dylib) =~ s{.*/}{};
+                system('install_name_tool', '-id', "\@rpath/$name", $dylib) == 0
+                    or die "install_name_tool failed on $dylib";
+            }
+        },
+    ];
+};
+
+sub _vercmp {
+    my ($x, $y) = @_;
+    $x->[0] <=> $y->[0] || $x->[1] <=> $y->[1] || $x->[2] <=> $y->[2];
+}

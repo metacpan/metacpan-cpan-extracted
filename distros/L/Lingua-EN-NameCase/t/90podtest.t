@@ -7,6 +7,7 @@ use Test::More;
 plan skip_all => "Author tests not required for installation"
     unless ( $ENV{AUTHOR_TESTING} );
 
-eval "use Test::Pod 1.00";
-plan skip_all => "Test::Pod 1.00 required for testing POD" if $@;
+use Test::Needs { "Test::Pod" => "1.00" };    # block form: no string eval
+
+Test::Pod->import();
 all_pod_files_ok();

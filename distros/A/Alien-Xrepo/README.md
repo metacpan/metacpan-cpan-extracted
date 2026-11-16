@@ -494,10 +494,10 @@ $repo->add_repo( $name, $git_url, $branch );
 
 Adds a custom `xmake` repository.
 
-## `remove_repo( ... )`
+## `rm_repo( ... )`
 
 ```
-$repo->remove_repo( $name );
+$repo->rm_repo( $name );
 ```
 
 Removes a custom repository.

@@ -5,12 +5,13 @@ use Mojo::Util            qw(dumper);
 
 my $class = 'Net::PublicSuffixList';
 
+my $warnings;
+local $SIG{'__WARN__'} = sub { $warnings .= $_[0] };
+
 subtest sanity => sub {
-	use_ok( $class ) or BAILOUT( "$class did not compile" );
+	use_ok( $class ) or BAIL_OUT( "$class did not compile" );
 	can_ok( $class, 'new' );
 	};
-
-diag( "You'll see a warnings about 'no way to fetch' for this test. That's fine." );
 
 subtest bad_arg_parse_list => sub {
 	my $obj = $class->new( no_local => 1, no_net => 1 );
@@ -41,7 +42,5 @@ subtest bad_arg_parse_list => sub {
 		};
 
 	};
-
-diag( "You shouldn't see any more 'no way to fetch' warnings." );
 
 done_testing();

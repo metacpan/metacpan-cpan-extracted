@@ -508,9 +508,9 @@ Cleans the cached packages and downloads. Pass C<installdir> and/or C<cachedir> 
 
 Adds a custom C<xmake> repository.
 
-=head2 C<remove_repo( ... )>
+=head2 C<rm_repo( ... )>
 
-    $repo->remove_repo( $name );
+    $repo->rm_repo( $name );
 
 Removes a custom repository.
 

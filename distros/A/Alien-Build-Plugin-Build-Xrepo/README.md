@@ -97,7 +97,8 @@ with `root` and `verbose`.
 
 An optional arrayref of directory paths pointing to local xmake-repo trees (each containing a `packages/`
 subdirectory). These are registered with the engine before installation, allowing patched or private package recipes to
-override the upstream xrepo store.
+override the upstream xrepo store. The registration is temporary: the plugin unregisters the repos it added as soon as
+the `download` stage finishes, so the build's temporary paths do not break later xrepo commands.
 
 # HELPERS
 

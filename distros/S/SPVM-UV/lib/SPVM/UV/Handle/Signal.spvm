@@ -1,0 +1,21 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Handle::Signal extends UV::Handle {
+  
+  use UV::Callback::Signal;
+  use Resource::UV;
+  use UV::Resource::UV;
+  
+  # Fields
+  has signal_cb : rw UV::Callback::Signal;
+  
+  # Class Methods
+  native static method new : UV::Handle::Signal ();
+  
+  # Instance Methods
+  native method start : void ($cb : UV::Callback::Signal, $signum : int);
+  
+  native method stop : void ();
+  
+}

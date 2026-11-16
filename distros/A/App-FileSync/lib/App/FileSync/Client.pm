@@ -30,6 +30,7 @@ use App::FileSync::Constants qw(
 	$PROTOCOL_VERSION $ROLE_CLIENT $ROLE_REPLICA $TYPE_FILE $TYPE_DIR $MODE_MASK
 	$EXIT_OK $EXIT_FATAL $EXIT_LOCKED $EXIT_WARNINGS
 	$ROOT_MARKER $SNAPSHOT_DIR $TEMP_PREFIX $TRASH_DAYS $SNAPSHOT_KEEP
+	$STAT_MODE $STAT_SIZE $STAT_MTIME $SHA_BITS
 );
 use App::FileSync::Delta;
 use App::FileSync::I18N qw(os_error strip_location);
@@ -45,7 +46,7 @@ use App::FileSync::Transport::SSH;
 use App::FileSync::Trash;
 use App::FileSync::Verify;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # Tunables, kept as package variables so tests can localise them.
 our $CHUNK          = 262_144;
@@ -55,19 +56,19 @@ our $MANIFEST_CHUNK = 2_000;
 our $LOG_LIMIT = 500;
 
 # How many runs "filesync log" shows when no limit is given.
-Readonly my $LOG_DEFAULT_LIMIT => 20;
+Readonly::Scalar my $LOG_DEFAULT_LIMIT => 20;
 
 # Wire cost of one delta record (see the server's identical estimate).
-Readonly my $DELTA_OP_BYTES => 12;
-Readonly my $DELTA_OVERHEAD => 64;
+Readonly::Scalar my $DELTA_OP_BYTES => 12;
+Readonly::Scalar my $DELTA_OVERHEAD => 64;
 
 # Per-repo trash lives under trash/repos/NAME; "repos" can never be mistaken
 # for a year directory of the trash layout used before 0.001.1, which put
 # every repo's trash straight under trash/.
-Readonly my $TRASH_REPOS => 'repos';
+Readonly::Scalar my $TRASH_REPOS => 'repos';
 
 # Names probed to discover whether the sync root's filesystem folds case.
-Readonly my $CASE_PROBE => "${TEMP_PREFIX}caseprobe";
+Readonly::Scalar my $CASE_PROBE => "${TEMP_PREFIX}caseprobe";
 
 # Summary counters, in the order the run log records them.
 Readonly my @SUMMARY_KEYS => qw(pulled pushed deleted conflicts skipped delta_pulled delta_pushed bytes_sent bytes_received);
@@ -77,6 +78,10 @@ Readonly my @SUMMARY_KEYS => qw(pulled pushed deleted conflicts skipped delta_pu
 =head1 NAME
 
 App::FileSync::Client - sync one repo, and the client-side repo commands
+
+=head1 VERSION
+
+0.002.1
 
 =head1 SYNOPSIS
 
@@ -1160,7 +1165,7 @@ sub _receive :Private {
 	my ($self, $abs, $fill, @close) = @_;
 
 	my ($out, $temp) = @{ temp_file(dirname($abs)) };
-	my $sha = Digest::SHA->new(256);
+	my $sha = Digest::SHA->new($SHA_BITS);
 	my $written = 0;
 
 	my $server = eval {
@@ -1236,7 +1241,7 @@ sub _push :Private {
 
 	my @stat = Time::HiRes::stat($abs);
 	$self->_throw('client.cannot_stat', { path => $abs, error => os_error() }) unless @stat;
-	my %file = (s => $stat[7], m => $stat[9], mode => $stat[2] & $MODE_MASK);
+	my %file = (s => $stat[$STAT_SIZE], m => $stat[$STAT_MTIME], mode => $stat[$STAT_MODE] & $MODE_MASK);
 
 	return 1 if !$action->{loser_name} && $self->_push_delta($connection, $path, $abs, \%file, $action->{h});
 
@@ -1333,10 +1338,11 @@ sub _resolve_conflict :Private {
 sub _delete_local :Private {
 	my ($self, $path) = @_;
 
+	# A file already gone needs nothing; a dangling symlink is still moved.
 	my $abs = $self->_abs($path);
-	return 1 unless -e $abs || -l $abs;
+	App::FileSync::Trash::move_to_trash(src => $abs, rel => $path, root => $self->_trash_root(), epoch => time)
+		if -e $abs || -l $abs;
 
-	App::FileSync::Trash::move_to_trash(src => $abs, rel => $path, root => $self->_trash_root(), epoch => time);
 	return 1;
 }
 
@@ -1466,10 +1472,10 @@ sub _trim_log :Private {
 	my ($self, $path) = @_;
 
 	my @lines = split /^/m, read_text($path);
-	return 0 if @lines <= $LOG_LIMIT;
+	my $too_long = @lines > $LOG_LIMIT;
+	write_atomic($path, join('', @lines[ -$LOG_LIMIT .. -1 ])) if $too_long;
 
-	write_atomic($path, join('', @lines[ -$LOG_LIMIT .. -1 ]));
-	return 1;
+	return $too_long ? 1 : 0;
 }
 
 # _save_cache
@@ -1625,8 +1631,8 @@ sub _has_warnings :Private {
 sub _read_jsonl :Private {
 	my ($path) = @_;
 
-	return [] unless -e $path;
-	return [ grep { ref($_) eq 'HASH' } map { length ? eval { json_decode($_) } : () } split /\n/, read_text($path) ];
+	my @lines = -e $path ? split(/\n/, read_text($path)) : ();
+	return [ grep { ref($_) eq 'HASH' } map { length ? eval { json_decode($_) } : () } @lines ];
 }
 
 # _case_insensitive

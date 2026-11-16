@@ -1,5 +1,27 @@
 Revision history for Hyperman
 
+0.70	2026-11-13
+        - $writer->close(\@trailers) sends trailer fields after a body: always on HTTP/2, on a chunked HTTP/1.1 body when the request's TE lists trailers, and HTTP/3 croaks.
+        - ABI v10 adds stream_close_trailers, the same ending for a C producer.
+        - psgix.hyperman.trailers tells the application whether trailers will reach its client.
+        - An HTTP/2 response that completes inside its handler no longer has the access log read its freed stream.
+        - POD: the ABI table shown is v10 and includes the v5 bus_dispatch and v9 entries it lacked.
+        - t/74 skips four tests as root, not three.
+        - TEST: t/69 bounds the body-rate cut it waits for and names a gone
+          server's exit status and error log. Six smoker runs died on an
+          undefined socket: the rate floor had not cut, both servers were
+          killed by the test helper's own 120 second alarm, and the 119
+          second cut passed.
+        - TEST: t/74 sends its second USR2 once the successor has started,
+          into a second the successor spends starting. Sent 50ms after the
+          first it was coalesced with it on a loaded smoker.
+        - TEST: the descriptor-starvation tests in t/64 and t/74 skip where
+          ulimit -n cannot be lowered (Haiku).
+        - TEST: t/60 spells EEXIST as the libc does and skips the socket
+          mode on Haiku, whose bind ignores the umask around it.
+        - TEST: t/27 guards its server and prints the server's stderr when
+          a response is cut short.
+
 0.69	2026-11-10
         - pid_file: a directory that answers EEXIST for every fresh name
           (DragonFly) is treated as one that refuses creation, so the file

@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Utilities;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Internal utilities for JSON::Schema::Modern
 
-our $VERSION = '0.653';
+our $VERSION = '0.654';
 
 use 5.020;
 use strictures 2;
@@ -102,7 +102,7 @@ use constant _JSON_BACKEND =>
 # supports the six core types, plus integer (which is also a number)
 # we do NOT check stringy_numbers here -- you must do that in the caller
 # note that sometimes a value may return true for more than one type, e.g. integer+number,
-# or number+string, depending on its internal flags.
+# or number+string, depending on its internal flags; use get_type() to report ambiguous values.
 # pass { legacy_ints => 1 } in $config to use draft4 integer behaviour
 # behaviour is consistent with get_type() (where integers are also numbers).
 sub is_type ($type, $value, $config = {}) {
@@ -1017,7 +1017,7 @@ JSON::Schema::Modern::Utilities - Internal utilities for JSON::Schema::Modern
 
 =head1 VERSION
 
-version 0.653
+version 0.654
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

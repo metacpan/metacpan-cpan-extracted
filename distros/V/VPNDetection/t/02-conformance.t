@@ -69,8 +69,12 @@ sub serve {
 
 subtest 'a bogon is answered locally in the widest shape' => sub {
     serve();
-    my $result = client()->lookup('10.0.0.1');
+    # Evaluated, so a bogon that reached the network fails at the count rather
+    # than ending the file with the refusal the origin gives it.
+    my $result = eval { client()->lookup('10.0.0.1') };
 
+    is($origin->count, 0, 'a bogon must not reach the network');
+    ok($result, 'and is answered') or return;
     is($result->ip, '10.0.0.1', 'the address comes back');
     is($result->is_bogon, 1, 'marked as computed rather than served');
     for my $flag (@{ $corpus->{bogonResponse}{flagsFalse} }) {
@@ -85,7 +89,6 @@ subtest 'a bogon is answered locally in the widest shape' => sub {
         ok($result->has($object), "$object is present");
         is_deeply($result->$object, $corpus->{bogonResponse}{$object}, "$object carries every key, empty");
     }
-    is($origin->count, 0, 'a bogon must not reach the network');
 };
 
 subtest 'lookup preserves absent-versus-false across every plan shape' => sub {
@@ -150,6 +153,9 @@ subtest 'batch dedupes, short-circuits bogons and keys by address' => sub {
     # Perl hashes carry no insertion order, so the corpus's key claim is a SET.
     is_deeply([sort keys %$answers], [sort @{ $case->{expect}{keys} }], 'keyed by address');
     is($origin->count, $case->{expect}{httpRequests}, 'duplicates collapsed to one request');
+    # The keys collapse duplicates whatever was sent, and one chunk is one request
+    # however many times an address is in it, so only the body shows a duplicate.
+    is_deeply([sort @batch_sent], ['1.1.1.1', '8.8.8.8'], 'carrying each servable address once');
     for my $ip (@{ $case->{expect}{bogonKeys} }) {
         is($answers->{$ip}->is_bogon, 1, "$ip was answered locally");
     }
@@ -220,6 +226,8 @@ subtest 'an entry error is classified by its status' => sub {
     for my $ip (sort keys %{ $case->{expect}{errorKinds} }) {
         isa_ok($answers->{$ip}, 'VPNDetection::Error', "$ip carries its error");
         is($answers->{$ip}->kind, $case->{expect}{errorKinds}{$ip}, "$ip is $case->{expect}{errorKinds}{$ip}");
+        is($answers->{$ip}->status, $routes{"/$ip"}{status}, "$ip keeps the status its entry gave");
+        is($answers->{$ip}->message, $routes{"/$ip"}{body}{error}, "$ip says why in the entry's words");
     }
     is($origin->count, $case->{expect}{httpRequests}, 'the call was made once and no entry was retried');
 };
@@ -282,6 +290,32 @@ subtest 'an IPv4-mapped address is the IPv4 address it carries' => sub {
         is_deeply([keys %$answers], [$ip], "$ip: a batch keys the answer as asked");
         is($answer && $answer->can('ip') && $answer->ip, $carries, "$ip: and answers it as $carries");
         is_deeply(\@batch_sent, [$carries], "$ip: the batch sent $carries alone");
+    }
+};
+
+# The answer as served: list and downloads unwrap their envelope, so it is put
+# back under its wire name for the corpus's paths, which are wire names
+# throughout, a number indexing a list.
+my %vocabulary_calls = (
+    myEntitlement => ['/api/v1/entitlement', sub { $_[0]->my_entitlement }],
+    listDatabases => ['/api/v1/database/list', sub { { databases => $_[0]->database->list } }],
+    listDownloads => ['/api/v1/database/downloads', sub { { downloads => $_[0]->database->downloads } }],
+);
+
+subtest 'a closed vocabulary hands back a value it was not built with' => sub {
+    my $cases = $corpus->{vocabulary}{cases};
+    ok(@$cases >= 6, 'the corpus carries a case per vocabulary');
+    for my $case (@$cases) {
+        my ($path, $call) = @{ $vocabulary_calls{ $case->{call} } };
+        %routes = ($path => { body => $case->{answer} });
+        $origin->reset;
+        my $answer = eval { $call->(client(retries => 0)) };
+        ok($answer, "$case->{name}: the answer reads") or diag($@), next;
+        for my $member (sort keys %{ $case->{expect} }) {
+            my $value = $answer;
+            $value = ref $value eq 'ARRAY' ? $value->[$_] : $value->{$_} for split /\./, $member;
+            is($value, $case->{expect}{$member}, "$case->{name}: $member");
+        }
     }
 };
 

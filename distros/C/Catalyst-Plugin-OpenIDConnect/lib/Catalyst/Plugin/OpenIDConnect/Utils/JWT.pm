@@ -102,6 +102,14 @@ sub sign_token {
     $payload{iss} = $self->issuer unless defined $payload{iss};
     $payload{iat} = time() unless defined $payload{iat};
 
+    # RFC 7519 §4.1.2 requires these claims (and jti, handled elsewhere)
+    # to be a StringOrURI value.
+    for my $claim (qw(iss aud sub)) {
+        if ( defined $payload{$claim} ) {
+            $payload{$claim} = "$payload{$claim}";
+        }
+    }
+
     # Log only non-sensitive metadata — never log PII-bearing claims (MED-2).
     if ( $self->logger ) {
         $self->logger->debug( sprintf(

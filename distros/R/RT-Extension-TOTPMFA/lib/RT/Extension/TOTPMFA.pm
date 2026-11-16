@@ -9,7 +9,7 @@ use LWP::UserAgent;
 
 package RT::Extension::TOTPMFA;
 
-our $VERSION = '0.12';
+our $VERSION = '0.20';
 
 =head1 NAME
 
@@ -130,7 +130,7 @@ is at L<https://codeberg.org/ivarch/rt-extension-totpmfa/issues>.
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright 2025 Andrew Wood.
+Copyright 2025-2026 Andrew Wood.
 
 Contributors include:
 
@@ -141,6 +141,11 @@ Contributors include:
 L<elacour|https://codeberg.org/elacour> - localisation support, French
 translation, inline QR code display, bugfix in secret reset, and packaging
 improvements.
+
+=item *
+
+L<kta1kri|https://github.com/kta1kri> - reported MFA bypass and weak
+secret scenarios in 0.12, and suggested routes to a fix.
 
 =back
 
@@ -407,7 +412,8 @@ sub MFALogin {
 
         # Can't validate if we have no stored secret.
         return (0, $UserObj->loc('No TOTP secret registered'))
-          if (not defined $Settings->{'Secret'});
+          if ( (not defined $Settings->{'Secret'})
+            || ($Settings->{'Secret'} eq ''));
 
         # Calculate what the OTP should be.
         my $OATH = Authen::OATH->new(

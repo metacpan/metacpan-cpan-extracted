@@ -31,7 +31,7 @@ use App::FileSync::Args qw(named);
 use App::FileSync::I18N qw(throw);
 use App::FileSync::IO qw(ensure_dir);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # The hook predicates moved to App::FileSync::Platform, which must load before
 # this module's dependencies; these names are kept for existing callers.
@@ -71,18 +71,18 @@ our %REPO_SSH_KEYS = (
 our @REPO_SSH_SETTINGS = qw(ssh_identity ssh_known_hosts server_command);
 
 # Section names Object::Configure and Config::Abstraction use.
-Readonly my $CLASS_SECTION     => 'App__FileSync';
-Readonly my $UNIVERSAL_SECTION => 'UNIVERSAL';
-Readonly my $CONF_DIR          => '.conf';
+Readonly::Scalar my $CLASS_SECTION     => 'App__FileSync';
+Readonly::Scalar my $UNIVERSAL_SECTION => 'UNIVERSAL';
+Readonly::Scalar my $CONF_DIR          => '.conf';
 
 # Settings that only a repo records: there is no process-wide layer, and ssh's
 # own default applies when the repo leaves them out.
 Readonly my @REPO_ONLY => ([ port => '22' ], [ host_key_checking => 'yes' ]);
 
 # Provenance labels for "filesync settings".
-Readonly my $LABEL_DEFAULT     => 'built-in default';
-Readonly my $LABEL_SSH_DEFAULT => 'ssh default';
-Readonly my $LABEL_UNKNOWN     => 'unknown source';
+Readonly::Scalar my $LABEL_DEFAULT     => 'built-in default';
+Readonly::Scalar my $LABEL_SSH_DEFAULT => 'ssh default';
+Readonly::Scalar my $LABEL_UNKNOWN     => 'unknown source';
 
 # Object::Configure's search order for a universal file beside the settings file.
 Readonly my @UNIVERSAL_EXTENSIONS => qw(.conf .yml .yaml .json);
@@ -202,11 +202,16 @@ None.
 sub config_file {
 	my ($given) = @_;
 
-	return $given if defined $given && length $given;
+	# A file named on the command line is used as given, so a typo is an
+	# error later.  A stale FILESYNC_SETTINGS must not fail every command:
+	# it is only a default, so a missing one is ignored.
+	my $path = $given;
+	unless (defined $path && length $path) {
+		$path = _default_config_path();
+		undef $path unless defined $path && -e $path;
+	}
 
-	# A stale FILESYNC_SETTINGS must not fail every command: it is only a default.
-	my $path = _default_config_path();
-	return (defined $path && -e $path) ? $path : undef;
+	return $path;
 }
 
 =head2 load
@@ -710,7 +715,10 @@ sub _explanation :Private {
 sub _env_key :Private {
 	my ($name) = @_;
 
-	return exists $ENV{$name} ? $name : first { lc $_ eq lc $name } sort keys %ENV;
+	# Not "exists $ENV{$name}": on Windows that lookup ignores case too, so it
+	# answered with the caller's spelling instead of the environment's.
+	my @names = sort keys %ENV;
+	return (first { $_ eq $name } @names) // first { lc $_ eq lc $name } @names;
 }
 
 # _pick

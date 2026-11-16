@@ -4,7 +4,7 @@
       "Jozef Kutej <jkutej@cpan.org>"
    ],
    "dynamic_config" : 1,
-   "generated_by" : "Module::Build version 0.4202",
+   "generated_by" : "Module::Build version 0.4234",
    "keywords" : [
       "io",
       "portable",
@@ -16,7 +16,7 @@
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "IO-Any",
    "prereqs" : {
@@ -42,7 +42,7 @@
             "IO::AtomicFile" : "0",
             "IO::File" : "0",
             "IO::String" : "0",
-            "List::MoreUtils" : "0",
+            "List::Util" : "1.33",
             "Scalar::Util" : "0"
          }
       }
@@ -50,7 +50,7 @@
    "provides" : {
       "IO::Any" : {
          "file" : "lib/IO/Any.pm",
-         "version" : "0.09"
+         "version" : "0.10"
       }
    },
    "release_status" : "stable",
@@ -65,5 +65,6 @@
          "url" : "git://github.com/jozef/IO-Any.git"
       }
    },
-   "version" : "0.09"
+   "version" : "0.10",
+   "x_serialization_backend" : "JSON::PP version 4.16"
 }

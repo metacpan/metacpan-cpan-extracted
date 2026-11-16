@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.15.0 - 2026-11-16
+
+### Features
+
+- Read an AS's rank, neighbors and hosted domains, and the plan's name ([`91d60c0`](https://github.com/internetdata/sdk-perl/commit/91d60c0dbdae7ca730b8203ebdacc9fc803bdfb1))
+
 ## 1.14.0 - 2026-11-15
 
 ### Features

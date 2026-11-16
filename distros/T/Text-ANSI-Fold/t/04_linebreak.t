@@ -57,4 +57,30 @@ is(folded($_, width => 22), bd("「吾輩は猫である。」"),       "[4]bd r
 is(folded($_, width => 24), bd("「吾輩は猫である。」"),       "[4]bd run-out(4)");
 is(folded($_, width => 26), bd("「吾輩は猫である。」「（名"), "[4]bd normal");
 
+# Colors left after the run-in character, with no visible text after
+# them, stay on the line and do not make a line of their own.  They
+# are not closed here: a color which the text leaves open at its end
+# is left open.
+{
+    my $runin = sub {
+	my $f = Text::ANSI::Fold->new(width => 4, linebreak => LINEBREAK_RUNIN);
+	[ $f->text(shift)->chops ];
+    };
+    is_deeply($runin->("\e[31mabcd.\e[0m\e[22;23;24m"),
+	      [ "\e[31mabcd.\e[0m\e[22;23;24m" ],
+	      "run-in: reset and another sequence at the end");
+    is_deeply($runin->("abcd.\e[0m\e[1m"),
+	      [ "abcd.\e[0m\e[1m" ],
+	      "run-in: reset and color at the end");
+    is_deeply($runin->("abcd.\e[1m"),
+	      [ "abcd.\e[1m" ],
+	      "run-in: color at the end");
+    is_deeply($runin->("\e[31mabcd.\e[1m"),
+	      [ "\e[31mabcd.\e[1m\e[m" ],
+	      "run-in: the color of the line is closed");
+    is_deeply($runin->("abcd.\e[1mefgh"),
+	      [ "abcd.", "\e[1mefgh\e[m" ],
+	      "run-in: color with text after it goes to the next line");
+}
+
 done_testing;

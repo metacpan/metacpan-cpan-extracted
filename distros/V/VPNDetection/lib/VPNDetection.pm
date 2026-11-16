@@ -19,7 +19,7 @@ use VPNDetection::Error;
 use VPNDetection::Oauth;
 use VPNDetection::Result;
 
-our $VERSION = '3.14.0';
+our $VERSION = '3.15.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.vpndetection.io';
@@ -76,7 +76,7 @@ our $BATCH = [fields => [[results => [map_of => ['any']], 1], [errors => [map_of
 our $ENTITLEMENT = [fields => [
     [org_id => ['string'], 1],
     [apikey => [fields => [[id => ['string'], 1], [expires => ['date-time']], [allowed_cidrs => [list => ['string']], 1]]], 1],
-    [plan => [fields => [[key => ['string'], 1], [tier => ['string'], 1]]], 1],
+    [plan => [fields => [[key => ['string'], 1], [name => ['string'], 1], [tier => ['string'], 1]]], 1],
     [usage => [fields => [
         [requests => ['integer'], 1], [quota => ['integer'], 1], [hard_limit => ['integer']],
         [window_start => ['date-time'], 1], [window_end => ['date-time'], 1],
@@ -870,7 +870,9 @@ where it used to be.
     printf "%d of %d\n", $ent->{usage}{requests}, $ent->{usage}{quota};
 
 What this client's API key is entitled to, and how much of it has been used, as a
-hash reference with C<org_id>, C<apikey>, C<plan> and C<usage> keys.
+hash reference with C<org_id>, C<apikey>, C<plan> and C<usage> keys. Show
+C<< $ent->{plan}{name} >> and compare against C<< $ent->{plan}{key} >>: a plan's name
+can change, and its key never does.
 
 Named for what it answers rather than C<me>, which sits one letter from C<my_ip>
 and means something quite different: one is which address you are calling FROM,

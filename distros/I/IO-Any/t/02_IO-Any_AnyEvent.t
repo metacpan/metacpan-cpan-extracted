@@ -11,7 +11,7 @@ BEGIN {
 	eval "use AnyEvent";
 	plan skip_all => "requires AnyEvent to run"
 		if $@;
-	plan tests => 6;
+	plan tests => 3;
 }
 
 use Test::Differences;
@@ -33,35 +33,15 @@ sub main {
 	my $tmpdir = tempdir( CLEANUP => 1 );
 
 	eq_or_diff(
-		[ IO::Any->slurp([$Bin, 'stock', '01.txt']) ],
-		[ qq{1\n22\n333\n} ],
-		'[ IO::Any->slurp() ]'
-	);
-	eq_or_diff(
 		scalar IO::Any->slurp([$Bin, 'stock', '01.txt']),
 		qq{1\n22\n333\n},
-		'scalar IO::Any->slurp()'
+		'IO::Any->slurp() with AnyEvent loaded'
 	);
-	eq_or_diff(
-		scalar IO::Any->slurp(\qq{1\n22\n333\n}),
-		qq{1\n22\n333\n},
-		'IO::Any->slurp() string'
-	);
-	
-	IO::Any->spew([$tmpdir, '02-test.txt'], qq{4\n55\n666\n});
-	eq_or_diff(
-		scalar read_file(File::Spec->catfile($tmpdir, '02-test.txt')),
-		qq{4\n55\n666\n},
-		'IO::Any->spew()'
-	);
-	my $str;
-	IO::Any->spew(\$str, qq{1\n22\n333\n});
-	eq_or_diff(
-		$str,
-		qq{1\n22\n333\n},
-		'IO::Any->spew(\$str)'
-	);
+
+	my $atomic = File::Spec->catfile($tmpdir, '02-atomic.txt');
+	IO::Any->spew($atomic, 'old');
+	IO::Any->spew($atomic, qq{atom\n}, { atomic => 1 });
+	eq_or_diff(scalar read_file($atomic), qq{atom\n}, 'atomic IO::Any->spew() with AnyEvent loaded');
 
 	return 0;
 }
-

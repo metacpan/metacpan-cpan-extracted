@@ -36,7 +36,7 @@ getoptlong - Option parsing that does what you mean, for Bash
 
 # VERSION
 
-1.1.1
+1.2.0
 
 # DESCRIPTION
 
@@ -189,6 +189,19 @@ was specified.
 `--config=value` sets to `value`, `--config` without value sets to
 empty string. Short form `-c` sets to empty string; `-cvalue` form
 is **not** supported.
+
+`--no-config`, or a negative alias, takes the option back: the
+variable is unset, as when the option is not specified. A value given
+to the variable before the options are parsed works as a default,
+which stays without the option and is removed by `--no-config`:
+
+    config=default.conf
+    . getoptlong.sh OPTS "$@"
+    [[ -v config ]] && echo "config: ${config:-default.conf}"
+
+A callback is called with an empty value for `--no-config` as well,
+after the variable is unset: use `${config-}` in it, not `$config`,
+under `set -u`.
 
 ## ARRAY (`@`)
 

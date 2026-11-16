@@ -32,6 +32,9 @@ typedef struct hm_h2_stream {
     int      status;         /* response status (logging)             */
     int      resp_status;    /* streaming: stashed until close        */
     SV      *resp_headers;   /* streaming: stashed headers arrayref   */
+    AV      *trailers_owed;  /* a list from hm_trailers_build, owned
+                              * here until the body reaches EOF, when
+                              * it is sent and freed. Set means owed  */
     int      awaiting;       /* parked on a Future                    */
     SV      *resp_f;         /* that Future, held so a RST_STREAM can
                               * cancel it the way an HTTP/1 close does */
@@ -62,6 +65,18 @@ typedef struct hm_h2_sess {
                                  * it returns (hm_h2_input)        */
     int              in_send;   /* inside nghttp2_session_send: a second
                                  * one would re-enter the library    */
+    /* The stream whose handler hm_h2_dispatch is running, and the two
+     * numbers the access log wants from it if the stream is freed before
+     * dispatch gets them: a responder or writer used inside the handler
+     * flushes, and a response small enough for the window completes, and
+     * frees its stream, before the handler returns. One slot suffices, as
+     * hm_h2_run_ready never re-enters dispatch for a session. */
+    struct {
+        int32_t sid;
+        int     freed;
+        int     status;
+        size_t  blen;
+    }                answering;
     int              dispatching; /* an application call for this
                                  * session is on the C stack: requests
                                  * that complete meanwhile wait for it */
@@ -128,6 +143,9 @@ static void hm_h2_env_init(pTHX_ hm_h2_sess *s, HV *env) {
      * sends for a streamed upload, having no Transfer-Encoding to use - can
      * be read to EOF safely. */
     hv_stores(env, "psgix.input.buffered", newSViv(1));
+    /* Every h2 stream can end with trailers, and no TE is needed to receive
+     * them, so the promise is unconditional here (hm_h2_body_end sends). */
+    hv_stores(env, "psgix.hyperman.trailers", newSViv(1));
     hv_stores(env, "psgix.loop",        hm_loop_to_sv(aTHX_ loop));
     if (loop->log_wants_t0)
         hv_stores(env, "psgix.request_start", newSVnv((NV)hm_now_ns() / 1e9));
@@ -294,6 +312,53 @@ static void hm_h2_src_free(pTHX_ hm_h2_stream *st) {
     st->src_rem = 0;
 }
 
+/* Queue the trailing HEADERS frame for a stream. The nv array points into
+ * the list's own SVs, which hm_trailers_build made and which outlive the
+ * call, and nghttp2 copies every name and value before returning. 1 when
+ * the frame was accepted. */
+static int hm_h2_queue_trailers(pTHX_ nghttp2_session *ses, int32_t sid,
+                                AV *trailers) {
+    SV **field = AvARRAY(trailers);
+    SSize_t i, n = av_len(trailers) + 1;
+    nghttp2_nv *nva = (nghttp2_nv *)hm_xmalloc((size_t)(n / 2) * sizeof(nghttp2_nv));
+    size_t count = 0;
+    int rc;
+    for (i = 0; i < n; i += 2, count++) {
+        nva[count].name     = (uint8_t *)SvPVX(field[i]);
+        nva[count].namelen  = SvCUR(field[i]);
+        nva[count].value    = (uint8_t *)SvPVX(field[i + 1]);
+        nva[count].valuelen = SvCUR(field[i + 1]);
+        nva[count].flags    = NGHTTP2_NV_FLAG_NONE;
+    }
+    rc = nghttp2_submit_trailer(ses, sid, nva, count);
+    free(nva);
+    return rc == 0;
+}
+
+/* The data provider has reached the end of the body. Without trailers the
+ * last DATA frame carries END_STREAM. With trailers it must not, since the
+ * trailing HEADERS frame ends the stream, so EOF is paired with
+ * NO_END_STREAM and the trailers are queued here, inside the provider
+ * callback, which is where nghttp2 expects a trailer submission.
+ *
+ * The list is released here on both paths. EOF happens once, and a list
+ * left on the stream could only be sent again. If nghttp2 declines the
+ * submission (the stream is on its way out) the DATA frame ends the stream
+ * after all, and a gRPC client that finds no grpc-status reports the call
+ * as failed, which is accurate. */
+static void hm_h2_body_end(pTHX_ nghttp2_session *ses, hm_h2_stream *st,
+                           uint32_t *data_flags) {
+    AV *trailers = st->trailers_owed;
+    *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+    if (!trailers) return;
+    st->trailers_owed = NULL;
+    /*
+     # uncoverable branch false class:ignore_covered_err */
+    if (hm_h2_queue_trailers(aTHX_ ses, st->id, trailers))
+        *data_flags |= NGHTTP2_DATA_FLAG_NO_END_STREAM;
+    SvREFCNT_dec((SV *)trailers);
+}
+
 static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
                                size_t length, uint32_t *data_flags,
                                nghttp2_data_source *source, void *ud) {
@@ -302,7 +367,7 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
     STRLEN blen = 0;
     const char *bp = "";
     size_t remain, n;
-    (void)ses; (void)sid; (void)ud;
+    (void)sid; (void)ud;
     if (st->src_sv) {                 /* file source: read per window */
         size_t want = st->src_rem < length ? (size_t)st->src_rem : length;
         ssize_t got = want ? hm_os_pread(st->src_fd, buf, want, st->src_off) : 0; /* # uncoverable condition right count:1 class:ignore_covered_err */
@@ -316,7 +381,7 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
             /* spent - or truncated under us, in which case the promised
              * length cannot be met and ending the stream is all there is */
             st->src_rem = 0;
-            *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+            hm_h2_body_end(aTHX_ ses, st, data_flags);
         }
         return (ssize_t)got;
     }
@@ -340,11 +405,11 @@ static ssize_t hm_h2_data_read(nghttp2_session *ses, int32_t sid, uint8_t *buf,
         }
         /* The producer closing is not the end of the body while frames it
          * wrote are still waiting here: only the last of them carries EOF. */
-        if (st->prod_done && drained) *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+        if (st->prod_done && drained) hm_h2_body_end(aTHX_ ses, st, data_flags);
         else if (n == 0)              return NGHTTP2_ERR_DEFERRED;
         return (ssize_t)n;
     }
-    if (st->resp_off >= blen) *data_flags |= NGHTTP2_DATA_FLAG_EOF;
+    if (st->resp_off >= blen) hm_h2_body_end(aTHX_ ses, st, data_flags);
     return (ssize_t)n;
 }
 
@@ -657,7 +722,11 @@ static int hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *data) {
     return 1;
 }
 
-static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid) {
+/* `trailers` is a list from hm_trailers_build or NULL and becomes this
+ * call's to dispose of: parked on the stream for hm_h2_body_end, or freed
+ * when nothing will be submitted (the connection is gone, or the writer was
+ * closed before). */
+static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid, AV *trailers) {
     hm_loop *loop = hm_cur_loop;
     /*
      # uncoverable condition right count:1 class:ignore_covered_err
@@ -672,12 +741,12 @@ static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid) {
      # uncoverable condition left count:1 class:ignore_covered_err
      # uncoverable condition left count:2 class:ignore_covered_err
      # uncoverable condition left count:3 class:ignore_covered_err */
-    if (!(c && c->id == gen && c->h2)) return;
+    if (!(c && c->id == gen && c->h2)) goto drop;
     s = (hm_h2_sess *)c->h2;
     /*
      # uncoverable branch true
      # uncoverable condition left count:1 class:ignore_covered_err */
-    if (!s->session) return;
+    if (!s->session) goto drop;
     st = (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session, sid);
     /* a second close resubmitted the response from offset 0 and overran
      * its content-length; status is set by the first submit */
@@ -685,15 +754,22 @@ static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid) {
      # uncoverable branch true class:ignore_covered_err
      # uncoverable condition left count:1 class:ignore_covered_err
      # uncoverable condition left count:2 class:ignore_covered_err */
-    if (!st || st->status) return;
+    if (!st || st->status) goto drop;
     /*
      # uncoverable branch false class:ignore_covered_err
      # uncoverable condition right count:1 class:ignore_covered_err */
     { STRLEN l; if (st->resp_body) { (void)SvPV(st->resp_body, l); st->blen = l; } }
     hav = (st->resp_headers && SvROK(st->resp_headers))
         ? (AV *)SvRV(st->resp_headers) : NULL;
+    /* Parked before the submit, because an empty body reaches EOF inside
+     * it. The slot is free: only this writer sets it, and a second close
+     * never gets past the status check above. */
+    st->trailers_owed = trailers;
     hm_h2_submit_response(aTHX_ s, st, st->resp_status ? st->resp_status : 200, hav); /* # uncoverable condition right count:1 class:ignore_covered_err */
     hm_h2_flush_send(aTHX_ s);
+    return;
+drop:
+    if (trailers) SvREFCNT_dec((SV *)trailers);
 }
 
 /* sync array / streaming CV / invalid -> a response */
@@ -970,9 +1046,28 @@ static void hm_h2_dispatch(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
         }
         return; /* # uncoverable statement */
     }
-    hm_h2_respond(aTHX_ s, st, resp);
-    if (hm_logging(loop))
-        hm_access_log(aTHX_ loop, env_rv, st->status, (ssize_t)st->blen);
+    {
+        /* st may not survive hm_h2_respond: a responder or writer used in
+         * the handler flushes, and a response that fits the window closes
+         * its stream on the spot (hm_h2_cb_stream_close). So the stream is
+         * looked up again by id afterwards, and if it has been freed the
+         * numbers hm_h2_stream_free left in `answering` stand in for it. */
+        int32_t sid = st->id;
+        int status;
+        size_t blen;
+        s->answering.sid   = sid;
+        s->answering.freed = 0;
+        hm_h2_respond(aTHX_ s, st, resp);
+        st = s->session
+           ? (hm_h2_stream *)nghttp2_session_get_stream_user_data(s->session,
+                                                                  sid)
+           : NULL;
+        status = st ? st->status : s->answering.freed ? s->answering.status : 0; /* # uncoverable condition right count:2 class:ignore_covered_err */
+        blen   = st ? st->blen   : s->answering.freed ? s->answering.blen   : 0; /* # uncoverable condition right count:2 class:ignore_covered_err */
+        s->answering.sid = 0;
+        if (hm_logging(loop))
+            hm_access_log(aTHX_ loop, env_rv, status, (ssize_t)blen);
+    }
     /*
      # uncoverable branch false class:ignore_covered_err
      # uncoverable condition right count:1 class:ignore_covered_err */
@@ -1166,6 +1261,13 @@ static void hm_h2_stream_free(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
      # uncoverable branch false class:ignore_covered_err
      # uncoverable condition right count:2 class:ignore_covered_err */
     while (*pp) { if (*pp == st) { *pp = st->next; break; } pp = &(*pp)->next; }
+    /* hm_h2_dispatch is still inside this stream's handler and will want
+     * these two for the access log once it comes back */
+    if (st->id == s->answering.sid) {
+        s->answering.freed  = 1;
+        s->answering.status = st->status;
+        s->answering.blen   = st->blen;
+    }
     /* The stream went (RST_STREAM, or the connection) while its response
      * was still being made: cancel the Future, as hm_close does for an
      * HTTP/1 connection, so the work behind it can stop. Without this a
@@ -1191,6 +1293,9 @@ static void hm_h2_stream_free(pTHX_ hm_h2_sess *s, hm_h2_stream *st) {
     if (st->body)         SvREFCNT_dec(st->body);
     if (st->resp_body)    SvREFCNT_dec(st->resp_body);
     if (st->resp_headers) SvREFCNT_dec(st->resp_headers);
+    /* trailers never sent: the stream was reset, or the connection went,
+     * before the body reached EOF */
+    if (st->trailers_owed) SvREFCNT_dec((SV *)st->trailers_owed);
     hm_h2_src_free(aTHX_ st);
     free(st);
 }
@@ -1428,6 +1533,10 @@ static int hm_h2_start_upgrade(pTHX_ hm_conn *c, const char *settings,
     st = (hm_h2_stream *)hm_xcalloc(1, sizeof(hm_h2_stream));
     st->id = 1;
     st->env = env;
+    /* The HTTP/1.1 parser built this env and set the flag only for a TE
+     * that asked. The response goes out as h2 stream 1, where trailers
+     * need no asking. */
+    hv_stores(env, "psgix.hyperman.trailers", newSViv(1));
     st->next = s->streams;
     s->streams = st;
     if (nghttp2_session_upgrade2(s->session, sbuf, (size_t)n, is_head, st) != 0)
@@ -1665,8 +1774,8 @@ static void hm_h2_input(pTHX_ hm_conn *c)  { (void)c; }
 static void hm_h2_free(pTHX_ void *h2)     { (void)h2; }
 static int  hm_h2_writer_write(pTHX_ int fd, UV gen, int32_t sid, SV *d)
     { (void)fd; (void)gen; (void)sid; (void)d; return -1; }
-static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid)
-    { (void)fd; (void)gen; (void)sid; }
+static void hm_h2_writer_close(pTHX_ int fd, UV gen, int32_t sid, AV *trailers)
+    { (void)fd; (void)gen; (void)sid; if (trailers) SvREFCNT_dec((SV *)trailers); }
 static int  hm_h2_preface_pending(hm_conn *c) { (void)c; return 0; }
 static int  hm_h2_available(void) { return 0; }
 

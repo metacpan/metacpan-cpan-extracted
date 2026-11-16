@@ -337,6 +337,20 @@ sub cb_eom {
     # leaves: every mode removes it on sight (inbound adds a fresh one).
     my @snapshot_tokens = _strip_snapshot_header($ctx, $priv, \$message);
 
+    # X-DKIM2-Arrival says how the chain verified when the message arrived
+    # from outside. Only an inbound milter on this host writes one, and it
+    # never leaves: every mode removes it on sight (inbound adds its own).
+    # A verdict other than pass or none is final. The outbound milter does
+    # not sign such a message, and an inbound milter on an internal hop
+    # (--no-envelope-check: it cannot see the envelope the message arrived
+    # in) hands it on rather than replace it with a better one of its own.
+    # The edge milter, and --mode both, believe none: there the message is
+    # arriving from outside.
+    my ($arrival_bad) = grep { !/\A(?:pass|none)\z/ }
+                        map { /\A([a-z]{1,20})\z/ ? $1 : 'permerror' }
+                        _strip_header($ctx, $priv, \$message, 'X-DKIM2-Arrival');
+    undef $arrival_bad if $do_verify && ($do_sign || $check_envelope);
+
     # X-DKIM2-Exploded: a list manager on this host (Mailman, Sympa) marks each
     # distribution copy, asking the signer for the -08 "exploded" flag. Only
     # a signing milter acts on it, and it never leaves: removed before signing.
@@ -376,6 +390,13 @@ sub cb_eom {
         my $result = $verify_result;
         warn "dkim2-milter: verify $msgid result=$result\n";
 
+        # The verdict as one word, for the hops behind us. Only pass and
+        # none are vouched for: a snapshot, an instance of ours, a wrap.
+        my ($arrival_word) = $result =~ /\A([a-z]+)/;
+        $arrival_word = $arrival_bad // $arrival_word // 'permerror';
+        my $vouched = $arrival_word =~ /\A(?:pass|none)\z/;
+        $ctx->insheader('X-DKIM2-Arrival', $arrival_word, 0) unless $do_sign;
+
         # Build the A-R and X-DKIM2-Info headers we're about to add.
         # Authentication-Results is not in the spec exclusion list so it
         # is included in the header hash.  The MI must be computed over
@@ -400,8 +421,9 @@ sub cb_eom {
             # message must never take the callback down with it) means no
             # Message-Instance; the message passes with its A-R.
             # On arrival: stamp m=1, or accept a top instance that matches
-            # the content. A top that does not match gets no snapshot.
-            my $ok = eval { $mi_header = _compute_mi($message_with_ar, \%mi_info); 1 };
+            # the content. A top that does not match gets no snapshot, and
+            # nor does anything whose chain did not verify.
+            my $ok = !$vouched || eval { $mi_header = _compute_mi($message_with_ar, \%mi_info); 1 };
             unless ($ok) {
                 warn "dkim2-milter: no Message-Instance for $msgid: internal error: "
                    . _error_text($@) . "\n";
@@ -414,7 +436,8 @@ sub cb_eom {
 
         # The arrival snapshot: our own m=1 over everything, or a top
         # instance that matches the content. Nothing else is vouched for.
-        my $arrival = $mi_header ? "Message-Instance: $mi_header$EOL" . $message_with_ar
+        my $arrival = !$vouched ? undef
+                    : $mi_header ? "Message-Instance: $mi_header$EOL" . $message_with_ar
                     : $mi_info{matched} ? $message_with_ar
                     : undef;
         my $token = defined $arrival ? unpack('H*', random_bytes(16)) : undef;
@@ -437,8 +460,8 @@ sub cb_eom {
         # leaves the message unwrapped with only its arrival headers.
         if ($opts{'wrap-single-part'}) {
             my ($wrap, $wrap_mi, %wrap_info);
-            if ($verify_result !~ /^(?:pass|none)\b/) {
-                warn "dkim2-milter: not wrapping $msgid: arrival result $verify_result\n";
+            if (!$vouched) {
+                warn "dkim2-milter: not wrapping $msgid: arrival result $arrival_word\n";
             } elsif (!defined $arrival) {
                 warn "dkim2-milter: not wrapping $msgid: no arrival snapshot\n";
             } else {
@@ -513,9 +536,18 @@ sub cb_eom {
             return SMFIS_CONTINUE;
         }
 
-        # If there are upstream DKIM2-Signature headers we must verify the
-        # chain before extending it.  In mode=both the verify block already
-        # ran; in mode=outbound we run it now on demand.
+        # A chain that did not verify when the message arrived is never
+        # extended: nothing is computed and nothing is looked up.
+        if (defined $arrival_bad) {
+            return _refuse($ctx, $priv, $msgid, "arrival result $arrival_bad");
+        }
+
+        # If there are upstream DKIM2-Signature headers the chain must have
+        # verified before we extend it.  In mode=both the verify block already
+        # ran. In mode=outbound a snapshot of this message is the proof: the
+        # inbound milter took it only of a message whose chain verified (or
+        # that had none), so the signatures are not checked again, only the
+        # instances (below). With no snapshot the Gate verifies it all now.
         #
         # allow_unsigned_mi: the message may carry a Message-Instance above the
         # top signature that is OURS to sign. A list manager on this host
@@ -549,6 +581,7 @@ sub cb_eom {
         # DKIM2Sign has always computed first and gated second.
         my $mi_header;
         my %mi_info;
+        my $arrival_verdict;
         if ($snapshot_store) {
             # Fail closed: an exception computing the instance means no
             # Message-Instance and no signature.
@@ -561,6 +594,17 @@ sub cb_eom {
                 $snap = $snapshot_store->fetch(_snapshot_key($snapshot_tokens[0]));
                 $mi_info{snapf} = $snapshot_store->rel_path_for_mi(_snapshot_key($snapshot_tokens[0]))
                     if defined $snap;
+            }
+            # The token on a message names the snapshot of that message, or
+            # something is badly wrong: never signed.
+            if (defined $snap) {
+                my ($same, $why) = eval { Mail::DKIM2::Hop->snapshot_vouches($message, $snap) };
+                $why = 'the snapshot is not of this message: ' . _error_text($@)
+                    unless defined $same;
+                return _refuse($ctx, $priv, $msgid, $why) unless $same;
+                $arrival_verdict = (grep { lc $_->[0] eq 'dkim2-signature' } @{$priv->{headers}})
+                                 ? 'pass' : 'none';
+                warn "dkim2-milter: $msgid arrived $arrival_verdict (snapshot $snapshot_tokens[0])\n";
             }
             my $ok = eval { $mi_header = _compute_mi($message, \%mi_info, Outbound => 1,
                                 (defined $snap ? (Snapshot => $snap) : ())); 1 };
@@ -585,7 +629,8 @@ sub cb_eom {
         my $gate = eval {
             Mail::DKIM2::Gate->check($sign_msg,
                 (defined $gate_sd ? (SigningDomain => $gate_sd) : ()),
-                ($do_verify && $sign_msg eq $message ? (VerifyResult => $verify_result) : ()),
+                ($do_verify && $sign_msg eq $message ? (VerifyResult => $verify_result)
+                 : defined $arrival_verdict ? (VerifyResult => $arrival_verdict) : ()),
                 _gate_pubkey_cb());
         };
         unless ($gate) {
@@ -705,6 +750,20 @@ sub cb_eom {
     return SMFIS_CONTINUE;
 }
 
+# Not signing, for $why: a message with a DKIM2-Signature on it is refused
+# (-09 section 13: it is not sent on by a hop that cannot sign it); one with
+# none goes on without the instances this host added.
+sub _refuse {
+    my ($ctx, $priv, $msgid, $why) = @_;
+    if (grep { lc $_->[0] eq 'dkim2-signature' } @{$priv->{headers}}) {
+        warn "dkim2-milter: not signing $msgid: $why (rejected 550 5.7.1)\n";
+        return _reject($ctx, "not signing: $why");
+    }
+    warn "dkim2-milter: not signing $msgid: $why\n";
+    _remove_unsigned_instances($ctx, $priv, $msgid);
+    return SMFIS_CONTINUE;
+}
+
 # Refuse the message with 550 5.7.1 and $reason as the reply text (-08
 # section 13.3), one line, with sendmail's "%" expansion escaped.
 sub _reject {
@@ -820,6 +879,14 @@ sub _start_verify {
         ) : ());
         my %cb = _gate_pubkey_cb();
         $verifier->set_pubkey_callback($cb{PubkeyCallback}) if $cb{PubkeyCallback};
+        # Behind an inbound milter of ours that gave pass or none (an
+        # internal hop: --no-envelope-check), a Message-Instance nobody has
+        # signed is this host's own -- the m=1 that milter stamped -- and
+        # not a broken chain.
+        my @arrived = map { $_->[1] } grep { lc $_->[0] eq 'x-dkim2-arrival' } @{$priv->{headers}};
+        $verifier->allow_unsigned_mi(1)
+            if $opts{mode} eq 'inbound' && !$check_envelope
+            && @arrived && !grep { !/\A\s*(?:pass|none)\s*\z/ } @arrived;
         $state->{verifier} = $verifier;
         $verifier->PRINT(join('', grep { !/\AX-DKIM2-Snapshot[ \t]*:/i } @$raw_hdrs)
                          . "\015\012");
@@ -1215,14 +1282,40 @@ In keydir mode, the algorithm is auto-detected from each key file.
 =item B<--snapshot-dir> I<PATH>
 
 Directory for message snapshots.  Enables diff-based Message-Instance
-computation.  On inbound, a message gets a snapshot only when the milter
-stamps its own C<m=1> or the top Message-Instance matches the content; the
-snapshot is stored under a random token, which is added to the message as
+computation.  On inbound, a message gets a snapshot only when its chain
+verified (C<pass>) or it had none (C<none>), and the milter stamps its own
+C<m=1> or the top Message-Instance matches the content; the snapshot is
+stored under a random token, which is added to the message as
 C<X-DKIM2-Snapshot>.  On outbound, a top Message-Instance that no longer
 matches is explained by a diff against the snapshot that token names, and
 nothing else.  Every mode removes any C<X-DKIM2-Snapshot> a message arrives
 with (inbound then adds its own), so a token can neither come from outside
 nor leave the host.  Both milters must share the directory.
+
+=item The arrival verdict
+
+A snapshot is also the proof that the message's chain verified when it
+arrived.  The outbound milter does not verify the upstream signatures of a
+message whose token names a snapshot of it: it checks only that the
+Message-Instance fields describe the message and undo cleanly, with no key
+lookups.  The snapshot has to be of that very message (the same
+DKIM2-Signature fields, and the Message-Instance fields they cover); if it
+is not, the message is not signed.  A message with no snapshot is verified
+in full before it is signed, as before.
+
+The inbound milter also adds C<X-DKIM2-Arrival> with its verdict as one word
+(C<pass>, C<none>, C<fail>, C<permerror>, C<temperror>).  The outbound
+milter does not sign a message whose verdict is anything but C<pass> or
+C<none>, and does no work on it.  Not signed means what it means for any
+other refusal: C<550 5.7.1> when the message has a DKIM2-Signature on it,
+and otherwise it goes on without the instances this host added.  Like the
+token, the field is removed on sight by every mode and never leaves the
+host.  An inbound milter run with C<--no-envelope-check> (an internal hop)
+keeps a verdict other than C<pass> or C<none> that the milter before it
+gave, since that one saw the envelope the message arrived in.  Behind a
+C<pass> or C<none> it takes a Message-Instance that no signature covers for
+this host's own (the C<m=1> the first milter stamped on an unsigned post),
+not for a broken chain.
 
 =item Unsigned posts leave with one m=1
 

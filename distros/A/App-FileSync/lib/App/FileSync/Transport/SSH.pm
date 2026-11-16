@@ -16,7 +16,6 @@ use warnings;
 use autodie qw(open);
 
 use File::Temp ();
-use IPC::Open3 ();
 use List::Util qw(any);
 use Readonly;
 use Sub::Private { mode => 'enforce' };
@@ -26,8 +25,9 @@ use App::FileSync::Args qw(named);
 use App::FileSync::Constants qw($PROTOCOL_VERSION $ROLE_CLIENT @ROLES $SERVER_PROGRAM);
 use App::FileSync::I18N qw(throw);
 use App::FileSync::IO qw(read_text);
+use App::FileSync::Process;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # Kept for compatibility: the protocol version sent as --proto.
 our $PROTO = $PROTOCOL_VERSION;
@@ -45,7 +45,7 @@ Readonly my @SSH_OPTIONS => (
 Readonly my @HOST_KEY_CHECKING => qw(yes accept-new);
 
 # The highest TCP port.
-Readonly my $MAX_PORT => 65_535;
+Readonly::Scalar my $MAX_PORT => 65_535;
 
 # Characters that would end or split an argument.
 Readonly my $UNSAFE_ARG => qr/[\0\n]/;
@@ -293,10 +293,13 @@ Purpose: end the ssh session.
 
 Args: none.
 
-Returns: 1 when ssh exited 0, else 0.  Repeated calls return 1.
+Returns: 1 when ssh exited 0 by itself, else 0.  Repeated calls return 1.
 
 Side Effects: closes both pipes, reaps ssh, records its exit status and
-signal, and reads what it wrote to standard error.
+signal, and reads what it wrote to standard error.  An ssh that has not
+exited after C<$App::FileSync::Process::GRACE_SECONDS> is stopped (and C<close>
+returns 0), so a session whose far end never sees end of file cannot hang
+the client.
 
 Usage:
 
@@ -338,13 +341,12 @@ sub close {	## no critic (Subroutines::ProhibitBuiltinHomonyms, Subroutines::Pro
 	}
 
 	if ($self->{pid}) {
-		waitpid($self->{pid}, 0);
-		my $status = $?;
-		@{$self}{qw(status signal pid)} = ($status >> 8, $status & 127, 0);
+		my $end = App::FileSync::Process::reap(pid => $self->{pid});
+		@{$self}{qw(status signal killed pid)} = (@{$end}{qw(status signal killed)}, 0);
 	}
 	$self->{stderr} = _slurp($self->{error_path});
 
-	return ($self->{status} || 0) == 0 ? 1 : 0;
+	return ($self->{status} || 0) == 0 && !$self->{killed} ? 1 : 0;
 }
 
 =head2 error_text
@@ -461,10 +463,10 @@ sub valid_program {
 # Entry:       $command is the full argv.
 # Exit:        returns { pid, writer, reader, errors, error_path }.
 # Side effects: creates the error file (removed when the object goes) and
-#              starts the process.  IPC::Open3 rather than fork/exec: on
-#              Windows fork() is a pseudo-process whose pipe handles are
-#              not always duplicated, which leaves a full-duplex session
-#              waiting on a pipe end that never closes.
+#              starts the process.  App::FileSync::Process rather than
+#              fork/exec: on Windows fork() is a pseudo-process whose pipe
+#              handles are not always duplicated, and IPC::Open3 alone lets
+#              ssh inherit our end of its stdin, so it never saw end of file.
 sub _spawn :Private {
 	my ($command) = @_;
 
@@ -472,11 +474,12 @@ sub _spawn :Private {
 	my $error_path = $errors->filename;
 	open my $err_fh, '>', $error_path;
 
-	my ($writer, $reader);
-	my $pid = IPC::Open3::open3($writer, $reader, '>&' . fileno($err_fh), @{$command});
+	my $child = eval { App::FileSync::Process::spawn(command => $command, stderr => fileno($err_fh)) };
+	my $error = $@;
 	CORE::close($err_fh);
+	die $error unless $child;
 
-	return { pid => $pid, writer => $writer, reader => $reader, errors => $errors, error_path => $error_path };
+	return { %{$child}, errors => $errors, error_path => $error_path };
 }
 
 # _check
@@ -511,9 +514,9 @@ sub _given :Private {
 sub _slurp :Private {
 	my ($path) = @_;
 
-	return '' unless defined $path && -e $path;
-	my $text = eval { read_text($path) };
-	return defined $text ? $text : '';
+	# Diagnostics only: a file that is missing or unreadable says nothing.
+	my $text = (defined $path && -e $path) ? eval { read_text($path) } : undef;
+	return $text // '';
 }
 
 1;

@@ -14,7 +14,7 @@ use Sub::Private { mode => 'enforce' };
 
 use App::FileSync::Args qw(named);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # A line that is blank or a comment ("# note", or a lone "#").  "#*#" is a
 # pattern (Emacs autosave files), as .gitignore allows with a backslash.

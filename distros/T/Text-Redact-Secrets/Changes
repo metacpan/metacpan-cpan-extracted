@@ -1,0 +1,21 @@
+Revision history for Text-Redact-Secrets
+
+Unreleased
+
+v1.0.2 2026-11-15
+
+    The first release: find secrets in text by gitleaks' rules, and
+    redact them.
+
+    redact puts *REDACTED* in place of each secret it finds in a
+    string, and find reports each, with the rule that found it and
+    where. The rules are gitleaks', from its v8.30.1, run as gitleaks
+    runs them on a string: keywords first, then each rule's regex, the
+    secret picked out of what it matched, and its entropy and
+    allowlists checked. Beside them is a rule of the module's own,
+    url-userinfo-password, for a password in a URL, such as
+    postgres://user:password@host/db, which gitleaks has no rule for.
+    A dump of a few hundred rows takes about 8 ms on a laptop. It needs
+    nothing beyond core Perl, from 5.36.
+
+    It ships roadmap 2026-0001.

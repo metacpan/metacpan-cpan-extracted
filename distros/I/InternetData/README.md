@@ -74,6 +74,7 @@ Same answer `lookup` would give for that address, and the same cost against your
 ```perl
 my $acct = $client->my_entitlement;
 print $acct->{plan}{key};          # free
+print $acct->{plan}{name};         # Unlimited, the name to show
 print $acct->{usage}{requests};    # 4
 print $acct->{usage}{window_end};  # when the allowance resets
 ```
@@ -252,7 +253,7 @@ my $url = $client->database->download_url($id, 'csvgz');
 
 `download_bytes` holds the **entire file** in memory. The catalog spans seven orders of magnitude, from `bogon_asn_v1` at 264 bytes to `resproxy_ip_14d_v1` at 5.34 GiB, and a 5.34 GiB database is 5.34 GiB of resident memory here, so reach for it at the small end. `metadata` publishes the size per format without transferring anything, which is how you find out which end you are at.
 
-`download_url` hands back the link rather than the bytes, so you choose how to move the file, hand it to a downloader, or pass it on without passing on your API key. The link is presigned and authorizes itself; it authorizes the START of a transfer, so one already running is not interrupted when it lapses. The client never follows that redirect for you. `download` and `download_bytes` do follow it, and that second request carries no API key: object storage has no business holding your credential.
+`download_url` hands back the link rather than the bytes, so you choose how to move the file, hand it to a downloader, or pass it on without passing on your API key. The link is presigned and authorizes itself. It only has to be valid when a transfer starts, so one already running isn't cut off when it lapses. The client never follows that redirect for you. `download` and `download_bytes` do follow it, and that second request carries no API key: object storage has no business holding your credential.
 
 Each of the three downloads the build that is live unless you name one. A `database.updated` webhook names the build it announces and carries its `sha256`, so a receiver that downloads after the next publish asks for that build to get the file the hash is of:
 

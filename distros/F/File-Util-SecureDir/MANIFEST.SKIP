@@ -1,0 +1,21 @@
+# version/ holds the per-perl sources; the dist ships the generated
+# lib/ and t/ instead.
+^version/
+
+# repository files.
+^\.git(/|$)
+^\.gitignore$
+^\.gitlab-ci\.yml$
+^restart-session\.md$
+
+# build products.
+^blib/
+^Makefile$
+^Makefile\.old$
+^MYMETA\.
+^pm_to_blib$
+^_build
+^\.prove$
+^File-Util-SecureDir-v
+\.tar\.gz$
+~$

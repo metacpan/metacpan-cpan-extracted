@@ -26,7 +26,7 @@ use App::FileSync qw(json_encode json_decode);
 use App::FileSync::Args qw(named);
 use App::FileSync::I18N qw(os_error strip_location);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # Payloads are raw-deflated when that makes them smaller.  Small payloads and
 # already-compressed data are left alone, so the flag costs more than it saves.
@@ -35,10 +35,10 @@ our $MAX_WIRE     = 64 * 1024 * 1024;
 our $MAX_INFLATED = 64 * 1024 * 1024;
 
 # zlib level: the default trade-off between speed and size.
-Readonly my $DEFLATE_LEVEL => 6;
+Readonly::Scalar my $DEFLATE_LEVEL => 6;
 
 # Bytes asked of the pipe per sysread.
-Readonly my $READ_SIZE => 65_536;
+Readonly::Scalar my $READ_SIZE => 65_536;
 
 =encoding utf8
 

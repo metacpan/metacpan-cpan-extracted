@@ -28,6 +28,7 @@ include/hyperman/hm_sa_bus.h
 include/hyperman/hm_sa_bus_perl.h
 include/hyperman/hm_stream.h
 include/hyperman/hm_tls.h
+include/hyperman/hm_trailers.h
 include/hyperman/hm_win.h
 include/hyperman/hm_workerhook.h
 include/hyperman/hm_workerhook_perl.h
@@ -109,6 +110,7 @@ t/71-api-in-request.t
 t/72-tls-edges.t
 t/73-h2-edges.t
 t/74-supervisor-edges.t
+t/75-trailers.t
 t/lib/HMTest.pm
 t/manifest.t
 t/pod-coverage.t

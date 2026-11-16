@@ -2,7 +2,7 @@ package Mail::DKIM2::Digest;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp;
 use Crypt::Digest::SHA256 ();
@@ -52,9 +52,22 @@ sub new {
     return bless \$ctx, $class;
 }
 
+# Net::SSLeay hashes a string's buffer as it finds it, which for a string
+# Perl holds as characters is the UTF-8 of them: the octets 0x80 to 0xFF
+# would be hashed as two each. Such a string is hashed as the octets it
+# stands for, as CryptX (and Digest::SHA) hash it; the caller's copy is left
+# alone.
 sub add {
     my $self = shift;
-    Net::SSLeay::EVP_DigestUpdate($$self, $_) for @_;
+    for (@_) {
+        if (utf8::is_utf8($_)) {
+            my $octets = $_;
+            utf8::downgrade($octets, 1) or croak 'Wide character in data to hash';
+            Net::SSLeay::EVP_DigestUpdate($$self, $octets);
+        } else {
+            Net::SSLeay::EVP_DigestUpdate($$self, $_);
+        }
+    }
     return $self;
 }
 
@@ -114,7 +127,9 @@ and C<digest()> (once), as a L<Crypt::Digest> object has.
 
 =head2 add(@data)
 
-Hashes more data; returns the object.
+Hashes more data; returns the object. The data are octets: a string Perl
+holds as characters is hashed as the octets those characters stand for, and
+one with a character above 0xFF croaks ("Wide character").
 
 =head2 digest()
 

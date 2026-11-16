@@ -1,0 +1,47 @@
+---
+abstract: "find secrets in text by gitleaks' rules, and redact them"
+author:
+  - 'Iain Campbell <cpanic@cpan.org>'
+build_requires:
+  Test2::Plugin::NoWarnings: '0'
+  Test2::V0: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.3.2, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-Redact-Secrets
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::Redact::Secrets:
+    file: lib/Text/Redact/Secrets.pm
+    version: v1.0.2
+  Text::Redact::Secrets::Rules::Dist:
+    file: lib/Text/Redact/Secrets/Rules/Dist.pm
+  Text::Redact::Secrets::Rules::Gitleaks:
+    file: lib/Text/Redact/Secrets/Rules/Gitleaks.pm
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '1.33'
+  POSIX: '0'
+  perl: v5.36.0
+resources:
+  bugtracker: https://github.com/nukopian/Text-Redact-Secrets/issues
+  homepage: https://github.com/nukopian/Text-Redact-Secrets
+  repository: https://github.com/nukopian/Text-Redact-Secrets.git
+version: v1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,5 +1,14 @@
 Revision history for Getopt-Long-Bash
 
+1.2.0 2026-11-16T09:05:11Z
+
+    - --no- with an option which takes an optional argument (?) unsets
+      the variable, as when the option is not specified.  It gave the
+      empty string, the same as the option without a value.  A value
+      assigned to the variable before the options are parsed works as
+      a default, which --no- removes.  A callback of such an option
+      has to use ${var-} under set -u
+
 1.1.1 2026-11-10T10:47:07Z
 
     - Pass-through keeps a value as one element: it was split at

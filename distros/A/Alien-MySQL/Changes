@@ -1,0 +1,4 @@
+0.01  2026-11-15
+    - Initial release
+    - System detection via pkg-config
+    - Share build from MySQL source (auto-detects latest LTS)

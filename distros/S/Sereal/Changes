@@ -16,6 +16,11 @@ from the the Encoder and Decoder changelogs:
 * require a version 7 Decoder.                                 *
 ****************************************************************
 
+7.003
+    * Restore Encoder compilation on Perl builds without a U64 typedef
+      and correct a false native long-double declaration test failure
+      on older x86 macOS Perls.
+
 7.002
     * Add opt-in paranoid presets for Decoder and Encoder with stricter
       checksum, object and resource defaults; explicit options retain

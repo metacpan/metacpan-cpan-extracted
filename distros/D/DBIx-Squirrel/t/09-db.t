@@ -378,6 +378,82 @@ subtest 'a statement is studied once for each handle' => sub {
 };
 ## use critic
 
+subtest 'a statement given attributes is studied once by iterate' => sub {
+    my $dbh     = connect_both()->{squirrel};
+    my $studied = 0;
+    my $afresh  = \&DBIx::Squirrel::db::_study_afresh;    ## no critic (Variables::ProtectPrivateVars)
+    local *DBIx::Squirrel::db::_study_afresh              ## no critic (Variables::ProtectPrivateVars)
+        = sub (@args) { $studied++; $afresh->(@args) };
+    my $sql = 'SELECT name FROM artist WHERE id = :id';
+    is [$dbh->iterate($sql, {ekorn_slice => {}}, id => 1)->all],
+        [{name => 'AC/DC'}], 'iterate';
+    is $studied, 1, 'studied once';
+    $studied = 0;
+    is [map { $_->name }
+            $dbh->results($sql, {ekorn_slice => {}}, id => 2)->all],
+        ['Accept'], 'results';
+    is $studied,                    1,     'studied once';
+    is $DBIx::Squirrel::db::HANDED, undef, 'nothing handed on after';
+    like
+        dies { $dbh->iterate('SELECT nothing FROM', {ekorn_slice => {}})->all },
+        qr( syntax\ error )x, 'a statement that fails';
+    is $DBIx::Squirrel::db::HANDED, undef, 'nothing handed on after it';
+
+    package Rewritten {    ## no critic (Modules::ProhibitMultiplePackages)
+        our @ISA = 'DBIx::Squirrel';
+    }
+
+    package Rewritten::db {    ## no critic (Modules::ProhibitMultiplePackages)
+        our @ISA = 'DBIx::Squirrel::db';
+
+
+        sub prepare ($self, $statement, @args) {
+            return $self->SUPER::prepare($statement =~ s( name )( id )xr, @args);
+        }
+    }
+
+    package Rewritten::st {    ## no critic (Modules::ProhibitMultiplePackages)
+        our @ISA = 'DBIx::Squirrel::st';
+    }
+
+    my $rewritten = Rewritten->connect(@source);
+    $rewritten->do('CREATE TABLE artist (id INTEGER, name TEXT)');
+    $rewritten->do(q(INSERT INTO artist VALUES (1, 'AC/DC')));
+    $studied = 0;
+    is [$rewritten->iterate($sql, {ekorn_slice => {}}, id => 1)->all],
+        [{id => 1}], "a subclass's prepare changing the statement";
+    is $studied, 2, 'has the statement it gives studied afresh';
+
+    my $called = 0;
+    $studied = 0;
+    is [$dbh->iterate(sub () { $called++; $sql }, {ekorn_slice => {}}, id => 1)
+            ->all],
+        [{name => 'AC/DC'}], 'a statement given as code';
+    is [$studied, $called], [2, 2], 'is studied, and called, each time';
+
+    my $attrs   = {ekorn_slice => {}};
+    my @studied = DBIx::Squirrel::db::_study($dbh, $sql, $attrs);    ## no critic (Subroutines::ProtectPrivateSubs)
+    my $other   = connect_both()->{squirrel};
+    for my $case (
+        [$other, $sql,       $attrs,    'another handle'],
+        [$dbh,   'SELECT 2', $attrs,    'another statement'],
+        [$dbh,   undef,      $attrs,    'no statement'],
+        [$dbh,   $sql,       {%$attrs}, 'other attributes'],
+        [$dbh,   $sql,       undef,     'no attributes'],
+    ) {
+        my($handle, $statement, $given, $name) = @$case;
+        local $DBIx::Squirrel::db::HANDED = [$dbh, $sql, $attrs, @studied];
+        # No statement croaks, as it would without a study handed on.
+        my $error
+            = dies { DBIx::Squirrel::db::_study($handle, $statement, $given) };    ## no critic (Subroutines::ProtectPrivateSubs)
+        ok $DBIx::Squirrel::db::HANDED, "not taken for $name";
+    }
+    local $DBIx::Squirrel::db::HANDED = [$dbh, $sql, $attrs, @studied];
+    is [DBIx::Squirrel::db::_study($dbh, $sql, $attrs)], [@studied],               ## no critic (Subroutines::ProtectPrivateSubs)
+        'taken for its own';
+    is $DBIx::Squirrel::db::HANDED, undef, 'once';
+};
+
 subtest 'prepare takes ekorn_ attributes' => sub {
     my $dbh = connect_both()->{squirrel};
     my $sth = $dbh->prepare('SELECT :x', {ekorn_dialect => 'SQLite'});
@@ -490,6 +566,8 @@ subtest "prepare_cached and DBIx::Squirrel's own attributes" => sub {
     ref_is $dbh->prepare_cached($sql, undef, 2), $sth,
         'a handle, cached, as it is';
     ref_is iterator_going($sth), $it, 'keeps the iterator using it';
+    $it->all;
+    is [iterator_going($sth)], [], 'which is going until it ends';
     weaken(my $gone = $it);
     undef $it;
     ok !$gone, 'without keeping it from being freed';

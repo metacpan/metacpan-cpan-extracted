@@ -5,7 +5,7 @@ NAME
 
 VERSION
 
-    version 2.07
+    version 2.08
 
 SYNOPSIS
 
@@ -54,21 +54,21 @@ HOW THE TIME ZONE IS DETERMINED
 	This gives us the English name of the Windows time zone, which we
 	use to look up the IANA time zone name.
 
-	* Windows 95, Windows 98, Windows Millenium Edition
+	* Windows 95, Windows 98, Windows Millennium Edition
 
 	The algorithm is the same as for NT, but we loop through the sub
 	keys of "SOFTWARE/Microsoft/Windows/CurrentVersion/Time Zones/"
 
 AUTHORS
 
-      * David Pinkowitz <dapink@cpan.org>
+      * David Pinkowitz <dapink_cpan@pinkowitz.com>
 
       * Dave Rolsky <autarch@urth.org>
 
 COPYRIGHT AND LICENSE
 
     Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org> Copyright (C)
-    2014-2026 by David Pinkowitz <dapink@cpan.org>
+    2014-2026 by David Pinkowitz <dapink_cpan@pinkowitz.com>
 
     This is free software; you can redistribute it and/or modify it under
     the same terms as the Perl 5 programming language system itself.

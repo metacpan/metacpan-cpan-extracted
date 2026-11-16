@@ -696,7 +696,7 @@ subtest 'my_entitlement reports the plan and the usage, and is never cached' => 
             expires       => undef,
             allowed_cidrs => [],
         },
-        plan  => { key => 'max', tier => 'max' },
+        plan  => { key => 'max', name => 'Max', tier => 'max' },
         usage => {
             requests     => 580,
             quota        => 5_000_000,
@@ -714,6 +714,7 @@ subtest 'my_entitlement reports the plan and the usage, and is never cached' => 
 
     my $account = $client->my_entitlement;
     is($account->{plan}{key},     'max',     'reports the plan');
+    is($account->{plan}{name},    'Max',     'and its name');
     is($account->{plan}{tier},    'max',     'and the field tier');
     is($account->{usage}{requests}, 580,     'and what has been spent');
     is($account->{usage}{quota}, 5_000_000,  'and what the plan includes');
@@ -754,7 +755,7 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
     };
     my $entitlement = {
         org_id => 'o', apikey => { id => 'k', expires => undef, allowed_cidrs => [] },
-        plan => { key => 'max', tier => 'max' },
+        plan => { key => 'max', name => 'Max', tier => 'max' },
         usage => {
             requests => 1, quota => 10, hard_limit => undef,
             window_start => '2026-09-04T00:00:00Z', window_end => '2026-09-05T00:00:00Z',
@@ -914,7 +915,8 @@ subtest 'an empty envelope field gives way to the other' => sub {
     my $origin = VPNDetectionTest::Origin->new(sub { $_[0]->render(data => $body, status => 403) });
     my $client = VPNDetection->new(base_url => $origin->url, cache_size => 0);
     for my $case (['{"error":"","rc":"NOT_LICENSED"}', 'NOT_LICENSED'], ['{"rc":"","error":"bad"}', 'bad'],
-        ['{"error":"","rc":""}', 'request failed with status 403']) {
+        ['{"error":"","rc":""}', 'request failed with status 403'],
+        ['{"rc":"NOT_LICENSED","error":"not licensed"}', 'not licensed']) {
         $body = $case->[0];
         eval { $client->lookup('9.9.9.9') };
         is($@->message, $case->[1], $case->[0]);
@@ -1073,7 +1075,7 @@ subtest 'a date or date-time member that is not RFC 3339 is a retried server_err
         lookup_batch => { results => { '9.9.9.9' => $lookup }, errors => {} },
         my_entitlement => {
             org_id => 'o', apikey => { id => 'k', expires => '2026-10-05T10:00:00Z', allowed_cidrs => [] },
-            plan => { key => 'max', tier => 'max' },
+            plan => { key => 'max', name => 'Max', tier => 'max' },
             usage => {
                 requests => 1, quota => 10, hard_limit => undef,
                 window_start => '2026-10-05T10:00:00Z', window_end => '2026-10-05T10:00:00Z',

@@ -20,7 +20,7 @@ my $builder = Module::Build->new(
         'Scalar::Util'   => 0,
         'IO::AtomicFile' => 0,
         'Fcntl'          => 0,
-        'List::MoreUtils' => 0,
+        'List::Util'     => '1.33',
     },
     build_requires => {
         'Test::More'        => 0,

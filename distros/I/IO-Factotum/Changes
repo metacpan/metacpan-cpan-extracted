@@ -1,0 +1,17 @@
+Revision history for Perl extension IO-Factotum
+
+0.03 2026-11-16T09:10:05Z
+
+    - Add IO::Factotum::sourcehighlight, which colors source files by
+      the source-highlight command of GNU Source-highlight
+
+0.02 2026-11-16T07:46:23Z
+
+    - skylighting: a file whose name does not tell the language, as a
+      script without an extension, is colored by the interpreter on
+      its first line (#!/usr/bin/env perl, #!/bin/bash)
+
+0.01 2026-11-16T05:23:41Z
+
+    - original version
+

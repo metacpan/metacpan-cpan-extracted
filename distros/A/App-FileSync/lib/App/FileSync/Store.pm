@@ -12,6 +12,8 @@ use autodie qw(:all);
 
 use File::Basename qw(dirname);
 use File::Spec;
+use POSIX qw(strftime);
+use Readonly;
 use Sub::Private { mode => 'enforce' };
 
 use parent -norequire, 'App::FileSync::Base';
@@ -28,7 +30,10 @@ use App::FileSync::Lock;
 use App::FileSync::Scan;
 use App::FileSync::Trash;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
+
+# A month's journal file name: 2026-11.jsonl.
+Readonly::Scalar my $JOURNAL_NAME => '%Y-%m.jsonl';
 
 =encoding utf8
 
@@ -246,9 +251,8 @@ sub lock_path {
 sub journal_path {
 	my ($self) = @_;
 
-	my @t = gmtime();
-	return File::Spec->catfile($self->meta_dir(), 'journal',
-		sprintf('%04d-%02d.jsonl', $t[5] + 1900, $t[4] + 1));
+	# One journal file per UTC month, so old months can be archived whole.
+	return File::Spec->catfile($self->meta_dir(), 'journal', strftime($JOURNAL_NAME, gmtime()));
 }
 
 =head2 base_path

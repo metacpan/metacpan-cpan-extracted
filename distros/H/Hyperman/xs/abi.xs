@@ -85,6 +85,17 @@ _abi_stream_close()
     OUTPUT:
         RETVAL
 
+# v10: end the open stream handle with trailer fields, through the table.
+# Returns what stream_close_trailers returned: 0 ok, -2 gone, -3 the list
+# was refused and the handle is still open for a later close or abort.
+IV
+_abi_stream_close_trailers(trailers = &PL_sv_undef)
+        SV *trailers
+    CODE:
+        RETVAL = hm_abi_st_stream_close_trailers(aTHX_ trailers);
+    OUTPUT:
+        RETVAL
+
 # v7: the other ending. Stops the body so the peer can tell it was not
 # finished - RST_STREAM on h2, a connection reset on HTTP/1.1 - and releases
 # the handle the same way close does.

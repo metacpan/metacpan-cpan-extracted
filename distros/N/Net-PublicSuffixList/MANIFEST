@@ -11,6 +11,7 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.pod
+SECURITY.md
 t/cache/public_suffix_list.dat
 t/errors.t
 t/load.t

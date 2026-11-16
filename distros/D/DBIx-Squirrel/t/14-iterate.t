@@ -153,6 +153,28 @@ subtest 'reset' => sub {
     is drain($it->reset(1, sub { lc })), ['abba'],  'and stages, added';
     is drain($it->reset(1)),             ['abba'],  'and kept';
 
+    # The iterator keeps its pipeline from run to run, and each run of it
+    # has its own state.
+    $it = $dbh->iterate(
+        'SELECT name FROM artist WHERE id <= ?', 3,
+        sub { [result_number, $_->[0]] },
+    );
+    my $expected = [[1, 'Abba'], [2, 'Blur'], [3, 'Cream']];
+    is [$it->all],        $expected, 'counted';
+    is [$it->reset->all], $expected, 'and counted again, from 1';
+    $it = $dbh->iterate(
+        'SELECT name FROM artist WHERE id <= ?', 3,
+        Ekorn::Pipeline->new(gather {
+            my @names;
+            return sub ($row) { push @names, $row->[0]; () },
+                sub () { join ',', @names };
+        })->stages,
+    );
+    is [$it->all], ['Abba,Blur,Cream'], 'a gather';
+    is [$it->reset->all], ['Abba,Blur,Cream'],
+        'and its batch, new for each run';
+    is [$it->reset(2)->all], ['Abba,Blur'], 'with other values';
+
     $it = $dbh->iterate($all, sub { $_->[1] });
     is $it->next, 'Abba', 'one fetched';
     ref_is $it->reset, $it, 'reset returns the iterator';

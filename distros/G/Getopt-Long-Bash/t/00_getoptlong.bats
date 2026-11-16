@@ -393,6 +393,81 @@ load test_helper.bash
     assert_output "optarg_val:"
 }
 
+# Test: --no- with an optional argument unsets the variable, the third
+# state besides a value and the empty string of --optarg
+@test "getoptlong: optional arg - long --no-optarg unsets" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optarg|o?]=)
+        getoptlong init OPTS
+        getoptlong parse --no-optarg
+        eval "$(getoptlong set)"
+        echo "optarg_val:${optarg-UNSET}"
+    '
+    assert_success
+    assert_output "optarg_val:UNSET"
+}
+
+@test "getoptlong: optional arg - --no-optarg after --optarg=value" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optarg|o?]=)
+        getoptlong init OPTS
+        getoptlong parse --optarg=value --no-optarg
+        eval "$(getoptlong set)"
+        echo "optarg_val:${optarg-UNSET}"
+    '
+    assert_success
+    assert_output "optarg_val:UNSET"
+}
+
+@test "getoptlong: optional arg - --optarg after --no-optarg" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optarg|o?]=)
+        getoptlong init OPTS
+        getoptlong parse --no-optarg --optarg
+        eval "$(getoptlong set)"
+        echo "optarg_val:${optarg-UNSET}"
+    '
+    assert_success
+    assert_output "optarg_val:"
+}
+
+# A value given to the variable before the options is the default: it
+# stays without the option, and --no- takes it away
+@test "getoptlong: optional arg - default set before, and --no-optarg" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optarg|o?]=)
+        optarg=default
+        getoptlong init OPTS
+        getoptlong parse
+        eval "$(getoptlong set)"
+        echo "none:${optarg-UNSET}"
+        getoptlong parse --no-optarg
+        eval "$(getoptlong set)"
+        echo "no:${optarg-UNSET}"
+    '
+    assert_success
+    assert_line --index 0 "none:default"
+    assert_line --index 1 "no:UNSET"
+}
+
+@test "getoptlong: optional arg - negative alias unsets" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optarg|o|~n?]=)
+        optarg=default
+        getoptlong init OPTS
+        getoptlong parse -n
+        eval "$(getoptlong set)"
+        echo "optarg_val:${optarg-UNSET}"
+    '
+    assert_success
+    assert_output "optarg_val:UNSET"
+}
+
 # Test: Array option (--item val1 --item val2)
 @test "getoptlong: array option - long --item val1 --item val2" {
     run $BASH -c '

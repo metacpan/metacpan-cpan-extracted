@@ -314,14 +314,15 @@ sub clash {
 # XS
 
 {
- my $desc = 'exception thrown from XS';
+ my $desc   = 'exception thrown from XS';
+ my $offset = "$]" >= 5.045004 ? 4 : 2; # Exception fires at target frame
  local $@;
  eval {
   sub {
    &uplevel(\&uplevel => \1, HERE);
   }->();
  };
- my $line = $^P ? '\d+' : __LINE__-2; # The error happens at the target frame.
+ my $line = $^P ? '\d+' : __LINE__ - $offset;
  my $file = $^P ? '\S+' : quotemeta $0;
  like $@,
    qr/^First argument to uplevel must be a code reference at $file line $line/,

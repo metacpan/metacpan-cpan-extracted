@@ -1,5 +1,18 @@
 Revision history for Perl extension Command-Run
 
+1.06 2026-11-16T04:35:13Z
+
+    - The child process never returns to the program of the caller.
+      It leaves by _exit after flushing STDOUT and STDERR, so the END
+      blocks and the destructors of the caller do not run in it, and
+      a child whose exec failed inside an eval of the caller does not
+      go on as a second copy of the program
+    - The exit status is 127 when the command can not be executed, and
+      255 when a code reference dies.  The message of the exec failure
+      has the reason
+    - Read the pipes of stdout and stderr together.  A command which
+      wrote much to stderr blocked forever with stderr => 'capture'
+
 1.05 2026-11-02T08:39:48Z
 
     - Select STDOUT while a code reference runs, in nofork and fork mode,

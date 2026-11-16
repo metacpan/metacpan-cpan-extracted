@@ -1,6 +1,6 @@
 package Mail::BIMI::Indicator;
 # ABSTRACT: Class to model a BIMI indicator
-our $VERSION = '3.20260824'; # VERSION
+our $VERSION = '3.20261116'; # VERSION
 use 5.20.0;
 use Moose;
 use Moose::Util::TypeConstraints;
@@ -54,8 +54,32 @@ sub _build_data_uncompressed($self) {
   if ( $data =~ /^\037\213/ ) {
     $self->log_verbose('Uncompressing SVG');
 
-    my $unzipped;
-    IO::Uncompress::Gunzip::gunzip(\$data,\$unzipped);
+    # Stream the decompression and stop as soon as we exceed the maximum
+    # allowed size, rather than expanding a potential gzip bomb into memory.
+    my $max_size = $self->bimi_object->options->svg_max_size;
+    my $unzipped = '';
+    my $gunzip = IO::Uncompress::Gunzip->new(\$data);
+    if ( !$gunzip ) {
+      $self->add_error('SVG_UNZIP_ERROR');
+      return '';
+    }
+    while (1) {
+      my $buffer;
+      my $status = $gunzip->read($buffer, $max_size + 1 - length $unzipped);
+      if ( $status < 0 ) {
+        $gunzip->close;
+        $self->add_error('SVG_UNZIP_ERROR');
+        return '';
+      }
+      last if $status == 0;
+      $unzipped .= $buffer;
+      if ( length $unzipped > $max_size ) {
+        $gunzip->close;
+        $self->add_error('SVG_SIZE');
+        return '';
+      }
+    }
+    $gunzip->close;
     if ( !$unzipped ) {
       $self->add_error('SVG_UNZIP_ERROR');
       return '';
@@ -154,6 +178,10 @@ sub _build_is_valid($self) {
     return 0;
   }
 
+  if (!$self->data_uncompressed && $self->errors->@*) {
+    return 0;
+  }
+
   my $is_valid;
   if ( length $self->data_uncompressed > $self->bimi_object->options->svg_max_size ) {
     $self->add_error('SVG_SIZE');
@@ -248,7 +276,7 @@ Mail::BIMI::Indicator - Class to model a BIMI indicator
 
 =head1 VERSION
 
-version 3.20260824
+version 3.20261116
 
 =head1 DESCRIPTION
 

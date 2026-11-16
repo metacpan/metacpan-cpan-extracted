@@ -54,6 +54,8 @@ t/22-fast-paths.t
 t/23-tooling.t
 t/24-json.t
 t/25-sugar.t
+t/26-dump-to-redacts.t
+t/27-plain-runs.t
 xt/howto.t
 xt/manuals.t
 xt/scaling.t

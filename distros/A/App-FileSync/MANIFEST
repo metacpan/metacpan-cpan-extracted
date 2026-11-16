@@ -19,6 +19,7 @@ lib/App/FileSync/IO.pm
 lib/App/FileSync/Lock.pm
 lib/App/FileSync/Merge.pm
 lib/App/FileSync/Platform.pm
+lib/App/FileSync/Process.pm
 lib/App/FileSync/Protocol.pm
 lib/App/FileSync/Scan.pm
 lib/App/FileSync/Server.pm
@@ -40,6 +41,7 @@ t/delta.t
 t/forced.t
 t/ignore.t
 t/join.t
+t/json.t
 t/journal.t
 t/lib/TestSync.pm
 t/locales.t

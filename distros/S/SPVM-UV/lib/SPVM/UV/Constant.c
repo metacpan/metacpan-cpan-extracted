@@ -585,3 +585,18 @@ int32_t SPVM__UV__Constant__UV_WRITABLE_PIPE(SPVM_ENV* env, SPVM_VALUE* stack) {
   stack[0].ival = (int32_t)UV_WRITABLE_PIPE;
   return 0;
 }
+
+int32_t SPVM__UV__Constant__UV_FS_EVENT_RECURSIVE(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_FS_EVENT_RECURSIVE;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_RENAME(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_RENAME;
+  return 0;
+}
+
+int32_t SPVM__UV__Constant__UV_CHANGE(SPVM_ENV* env, SPVM_VALUE* stack) {
+  stack[0].ival = (int32_t)UV_CHANGE;
+  return 0;
+}

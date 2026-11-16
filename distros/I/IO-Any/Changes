@@ -1,5 +1,15 @@
 Revision history for IO-Any
 
+0.10    12 Nov 2026
+    - BINMODE option added to set binmode(); without it no layer is set,
+      same as in 0.09
+    - AnyEvent code paths removed from slurp() and spew(); atomic spew()
+      with AnyEvent loaded returned success but kept the old file and left
+      FILE..TMP
+    - atomic spew() removes the temporary file and dies when binmode(),
+      flock(), writing or closing fails, the target file keeps its old
+      content
+
 0.09    21 Sep 2014
     - fix dist tests
 

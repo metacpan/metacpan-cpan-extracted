@@ -1,3 +1,7 @@
+3.20261116 2026-11-16 Australia/Melbourne
+  - Indicator: Enforce svg_max_size while decompressing gzipped SVGs, rather
+    than after, to prevent memory exhaustion from gzip bombs.
+
 3.20260824 2026-08-24 Australia/Melbourne
   - Ensure all relevant network and security options are passed to
     XML::LibXML whenever a new object is created.

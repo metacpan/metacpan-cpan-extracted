@@ -2,6 +2,54 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.3.3 2026-11-16
+
+    A run costs about half what it did to start and end, so a short
+    run, such as an iterator reading one row, costs 7 to 8 µs less.
+
+    It ships change record 2026-0040, a task from DBIx-Squirrel, which
+    profiled its handles. Nothing changes but speed: the values, the
+    messages, the order things run in, and what each part is told are
+    as they were.
+
+    - An iterator whose run has no flush, no stage's end and no sink,
+      as most have, takes a shorter way, with none of their
+      bookkeeping: with no stages, $p->iterator($code) let go costs
+      about 8 µs, not 15, and $p->iterator(source {...})->all about 12
+      µs, not 20, on Perl 5.36 and 5.44 alike. Every run is a little
+      cheaper to set up, and a plain run pulling many values is 3 to 6%
+      faster a value. (change record 2026-0040)
+
+v0.3.2 2026-11-15
+
+    dump_to redacts the secrets in what it writes, whenever
+    Text::Redact::Secrets is installed, so a dump sent to a log
+    doesn't leak a password, a token or a DSN.
+
+    It ships roadmap 2026-0038. Nothing changes unless
+    Text::Redact::Secrets is installed: then dumps are redacted, and
+    a module that's there but broken makes dump_to croak, with a new
+    message. What a stage sees, and every message there was before,
+    are as they were.
+
+    - dump_to redacts with Text::Redact::Secrets' redact when it's
+      installed, a v1.x, and passes a self-test, redacting a few
+      made-up secrets in a dump: each secret it finds in what's
+      written, such as a password, a token or the password in a DSN,
+      is written as *REDACTED*. Only the dump is redacted: the value
+      passed on is as it came. The module is looked for once, at the
+      first dump. If it's there but fails to load, isn't a v1.x, or
+      fails the test, dump_to croaks, on that dump and each after,
+      rather than write a dump that may hold secrets, with a new
+      message, "Text::Redact::Secrets ..., so dump_to won't write a
+      dump that may hold secrets". local
+      $Ekorn::Pipeline::Stages::Taps::DumpSecrets = 1 writes secrets as
+      they are, read as each value is dumped; while it's true, the
+      module is neither loaded nor tested. It isn't a dependency:
+      cpanfile recommends it, so installers that take recommendations
+      install it. The user guide and the reference show it. (roadmap
+      2026-0038)
+
 v0.3.1 2026-11-14
 
     Sources, stages, gathers and sinks, each made afresh for a run and

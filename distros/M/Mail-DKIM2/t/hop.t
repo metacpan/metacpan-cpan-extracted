@@ -133,4 +133,31 @@ subtest 'as_header' => sub {
     is_deeply($mi->changes, { body => 'unchanged', headers => [] }, 'm=1 changes nothing');
 };
 
+subtest 'snapshot_vouches' => sub {
+    my $sig = "DKIM2-Signature: i=1; m=1; t=1; d=test1.dkim2.com;\r\n s=sel1:rsa-sha256:AAAA\r\n";
+    my ($ok, $why) = Mail::DKIM2::Hop->snapshot_vouches($m1, $m1);
+    ok($ok, 'the message itself') or diag($why);
+    ($ok) = Mail::DKIM2::Hop->snapshot_vouches($edited, $m1);
+    ok($ok, 'changed since, same unsigned chain');
+    ($ok) = Mail::DKIM2::Hop->snapshot_vouches($sig . $edited, $sig . $m1);
+    ok($ok, 'same signature');
+    (my $refolded = $sig) =~ s/; d=/;\r\n\td=/;
+    ($ok) = Mail::DKIM2::Hop->snapshot_vouches($refolded . $m1, $sig . $m1);
+    ok($ok, 'same signature, folded differently');
+    ($ok, $why) = Mail::DKIM2::Hop->snapshot_vouches($sig . $m1, $m1);
+    ok(!$ok, 'a signature the snapshot has not');
+    like($why, qr/DKIM2-Signature i=1/, '  ... named');
+    ($ok) = Mail::DKIM2::Hop->snapshot_vouches($m1, $sig . $m1);
+    ok(!$ok, 'a signature the message has lost');
+    (my $sig2 = $sig) =~ s/AAAA/AAAB/;
+    ($ok) = Mail::DKIM2::Hop->snapshot_vouches($sig2 . $m1, $sig . $m1);
+    ok(!$ok, 'another signature value');
+    (my $other = $m1) =~ s/h=sha256:[^:]+:/h=sha256:AAAA:/;
+    ($ok, $why) = Mail::DKIM2::Hop->snapshot_vouches($sig . $other, $sig . $m1);
+    ok(!$ok, 'another signed instance');
+    like($why, qr/Message-Instance m=1/, '  ... named');
+    ($ok) = Mail::DKIM2::Hop->snapshot_vouches($other, $m1);
+    ok($ok, 'an unsigned instance is not compared');
+};
+
 done_testing;

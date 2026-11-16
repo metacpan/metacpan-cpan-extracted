@@ -1,0 +1,26 @@
+name = "Text-Redact-Secrets"
+module_maker = "ModuleBuildTiny"
+static_install = "auto"
+license = "perl_5"
+
+# Minilla always writes README.md from POD. The README is written by hand
+# in README.pod, not in the main module's POD.
+readme_from = "README.pod"
+# README.md's code goes in ```perl fences, which GitHub highlights, rather
+# than indented blocks, which Markdown reads as part of a list they follow.
+markdown_maker = "Pod::Markdown::Github"
+# Only the CI badge comes from Minilla. Its "metacpan" badge, from
+# badge.fury.io, is served with a three-day cache, which GitHub's image
+# proxy keeps, so it shows the old version for hours after a release
+# (Ekorn-Pipeline 2026-0009). README.pod writes a shields.io CPAN badge,
+# cached for five minutes, beside the Kwalitee badge.
+badges = ["github-actions/test.yml"]
+
+# Changes keeps an "Unreleased" heading, edited by hand at a release,
+# rather than Minilla's {{$NEXT}}.
+manage_changes = false
+
+# Files for the maintainers, not for CPAN. scripts/ holds update-rules,
+# which makes the module of rules; the module is shipped, not the script.
+[FileGatherer]
+exclude_match = ['^CLAUDE\.md$', '^ROADMAP\.md$', '^TODO\.md$', '^docs/', '^scripts/']

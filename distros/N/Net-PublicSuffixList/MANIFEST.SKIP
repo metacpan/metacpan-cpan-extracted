@@ -81,3 +81,11 @@ Net-.*
 \A\.github\b
 
 \.gitattributes\b
+
+^\.downstream\.json
+
+^cpan_tester_reports/
+\.claude/
+^AGENTS\.md
+^CLAUDE\.md
+^\.claude

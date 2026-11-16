@@ -1,6 +1,6 @@
 package Mail::BIMI::VMC::Chain;
 # ABSTRACT: Class to model a VMC Chain
-our $VERSION = '3.20260824'; # VERSION
+our $VERSION = '3.20261116'; # VERSION
 use 5.20.0;
 use Moose;
 use Mail::BIMI::Prelude;
@@ -204,7 +204,7 @@ Mail::BIMI::VMC::Chain - Class to model a VMC Chain
 
 =head1 VERSION
 
-version 3.20260824
+version 3.20261116
 
 =head1 DESCRIPTION
 

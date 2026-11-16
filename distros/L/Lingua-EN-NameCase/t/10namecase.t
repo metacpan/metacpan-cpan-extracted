@@ -4,7 +4,7 @@ use strict;
 use integer;
 
 use Lingua::EN::NameCase qw( NameCase nc );
-use Test::More  tests => 31;
+use Test::More  tests => 32;
 
 my $debugging = 0;
 
@@ -88,6 +88,10 @@ is( $fixed_name, "John McVey", 'Literal scalar...' );
 # Test a literal array.
 @result = NameCase( "nancy", "drew" );
 is_deeply( \@result, [ "Nancy", "Drew" ], 'Literal array...' );
+
+# The documented list-context call, stated literally.
+my @letters = NameCase( 'A', 'B' );
+is_deeply( \@letters, [ 'A', 'B' ], 'Literal one-letter names in list context...' );
 
 # Test a scalar.
 $name = $lowercase_names[1];

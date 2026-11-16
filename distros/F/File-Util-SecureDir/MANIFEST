@@ -1,0 +1,23 @@
+CHANGES
+lib/File/Util/SecureDir.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.md
+t/01-load.t
+t/02-verbose-debug.t
+t/03-bad-input.t
+t/04-caller-restriction.t
+t/10-default-latch.t
+t/11-bare-filter.t
+t/12-all.t
+t/13-group_no_write.t
+t/14-same_owner-euid.t
+t/15-same_owner-mode.t
+t/18-verbose-output.t
+t/20-parse_sd.t
+t/21-choose_sid.t
+t/30-win32-process-sid.t
+t/31-win32-same_owner.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,16 +1,11 @@
-#!perl -wT
+#!perl -w
 
 use strict;
 use warnings;
+
+use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Pod::No404s';
 
-if(not $ENV{AUTHOR_TESTING}) {
-	plan(skip_all => 'Author tests not required for installation');
-}
-
-eval "use Test::Pod::No404s";
-if($@) {
-	plan skip_all => 'Test::Pod::No404s required for testing POD';
-} else {
-	all_pod_files_ok();
-}
+Test::Pod::No404s->import();
+all_pod_files_ok();

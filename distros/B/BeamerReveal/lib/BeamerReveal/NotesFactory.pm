@@ -3,7 +3,7 @@
 
 
 package BeamerReveal::NotesFactory;
-our $VERSION = '20260408.1240'; # VERSION
+our $VERSION = '20261115.1249'; # VERSION
 
 use strict;
 use warnings;
@@ -190,7 +190,7 @@ BeamerReveal::NotesFactory - NotesFactory
 
 =head1 VERSION
 
-version 20260408.1240
+version 20261115.1249
 
 =head1 SYNOPSIS
 

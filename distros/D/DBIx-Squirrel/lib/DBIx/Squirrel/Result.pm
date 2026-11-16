@@ -45,7 +45,9 @@ sub class_for ($base, $names) {
     for my $name (keys %position) {
         next if !is_name($name) || $base->can($name);
         my $n = $position{$name};
-        install_sub("${class}::$name", sub ($row) { $row->[$n] });
+        # Without a signature, as it's called for each column read, and
+        # a signature costs about 20 ns a call (roadmap 2026-0028).
+        install_sub("${class}::$name", sub { $_[0][$n] });
     }
     $position_of{$class} = \%position;
     return $class;

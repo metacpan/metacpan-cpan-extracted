@@ -17,7 +17,7 @@ use Ekorn::Pipeline::Stage    qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.3.1';
+our $VERSION = 'v0.3.3';
 
 our @EXPORT_OK = qw(is_sink is_stage);
 
@@ -299,7 +299,8 @@ sub run_context () {
 # its EKORN_SOURCE, if it offers one; a code reference is its own step,
 # with no end or context.
 sub _source_run ($source) {
-    return ($source) unless _is_source($source);
+    # As _is_source asks, without the call, as every run asks it.
+    return ($source) unless blessed($source) && $source->can('EKORN_SOURCE');
     my($step, $end, $context)
         = _parts([qw(step end context)], $source->EKORN_SOURCE);
     croakf
@@ -518,21 +519,16 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
         stages => [], names => [], within => [], flushes => [], ends => [],
         sinks  => [],
     );
-    # A stage named in a message: by its place, and, if it's within a named
-    # pipeline, the innermost, by its name and its place in it.
-    my $label = sub ($n) {
-        return _label($pipeline, $run{names}[$n], $run{within}[$n]);
-    };
     my($pull, $source_end, $context);
     try {
         ($pull, $source_end, $context) = _source_run($source);
-        _make_run($stages, $names, $within, \%run);
+        _make_run($stages, $names, $within, \%run) if @$stages;
     }
     catch ($e) {
         _end_all(
             [
                 ($source_end ? ['the source', $source_end, 'died'] : ()),
-                map { [$label->($_), $run{ends}[$_], 'died'] }
+                map { [_run_label($pipeline, \%run, $_), $run{ends}[$_], 'died'] }
                     grep { $run{ends}[$_] } 0 .. $#{ $run{ends} },
             ],
             1,
@@ -544,6 +540,10 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
         croak $e if is_ref($e);
         die $e;    ## no critic (ErrorHandling::RequireCarping): thrown again, as it was
     }
+    # A run with no flush, no end of a stage's, and no sink, as most are,
+    # takes the shorter way.
+    return _plain_iterator($pipeline, \%run, $pull, $source_end, $context)
+        unless grep { defined } @{ $run{flushes} }, @{ $run{ends} };
     my @stages  = @{ $run{stages} };
     my @flushes = @{ $run{flushes} };
     my @ends    = @{ $run{ends} };
@@ -574,9 +574,10 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
         $waiting_at[$n] += @values;
         return;
     };
-    # Whether any value waits at a stage up to $upto.
+    # Whether any value waits at a stage up to $upto. The run has a stage,
+    # so values from the source wait at the first.
     my $waiting_upto = sub ($upto) {
-        return 1 if @from_source && $upto >= 0;
+        return 1 if @from_source;
         $waiting_at[$_] && return 1 for 0 .. $upto;
         return 0;
     };
@@ -595,7 +596,8 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
             if $source_end;
         push @calls,
             map { [
-                $label->($_), $ends[$_], $input_done[$_] ? 'done' : 'stopped',
+                _run_label($pipeline, \%run, $_), $ends[$_],
+                $input_done[$_] ? 'done' : 'stopped',
             ] }
             grep { $ends[$_] } 0 .. $#ends;
         local $running{context} = $context;
@@ -649,13 +651,9 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
         return if $outside;
         while (1) {
             if ($into) {
-                # All takes at once a step's values where there are no
-                # stages, and the values already at the end, such as a list
-                # sink's result.
-                if (!@stages && @from_source) {
-                    push @$into, splice @from_source;
-                    next;
-                }
+                # All takes at once the values already at the end, such as a
+                # list sink's result. A run with no stages takes the shorter
+                # way, so this one has a stage.
                 if (@todo && $todo[-1][0] == @stages) {
                     while (@todo && $todo[-1][0] == @stages) {
                         push @$into, (pop @todo)->[1];
@@ -709,11 +707,11 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
                 ($next_flush, $flush, $from_flush) = ($n + 1, $flushes[$n], 1);
             }
             if ($n == @stages) {
-                # Nothing can end while the source is still being read.
+                # Only while values are handed out one at a time: all takes
+                # them from the top of the loop. Nothing can end while the
+                # source is still being read.
                 $end_if_ended->() if $done;
-                return $value     unless $into;
-                push @$into, $value;
-                next;
+                return $value;
             }
             # Set only when it changes, as most values come from the source,
             # and most runs, and the code running them, have no context.
@@ -769,7 +767,7 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
                 croak $e if is_ref($e);
                 my $at      = Carp::shortmess() =~ s( \.? \n \z )()xr;
                 my $message = $e =~ s( \n \z )()xr =~ s( ^ )(    )xmgr;
-                my $stage   = $label->($n);
+                my $stage   = _run_label($pipeline, \%run, $n);
                 die "Pipeline $stage failed$at:\n$message\n";
             }
             return if $outside;
@@ -810,16 +808,189 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
         $ended = 'stopped' if $dropped;
         return;
     };
+    # How the run ended, held back until the iterator has nothing more to
+    # give, so it's said once, and doesn't change. It's the iterator's
+    # spent too: the run has ended, and so is said to, once it has.
+    my $ended_once = sub () {
+        return $ended if $spent || $outside || ($ended // '') eq 'died';
+        return;
+    };
     return Ekorn::Pipeline::Iterator->new(
-        $next, $end_run, $context,
-        # How the run ended, held back until the iterator has nothing more
-        # to give, so it's said once, and doesn't change.
-        sub () {
-            return $ended if $spent || $outside || ($ended // '') eq 'died';
-            return;
-        },
-        sub () { $spent || $outside || ($ended // '') eq 'died' },
-        $all,
+        $next, $end_run, $context, $ended_once, $ended_once, $all,
+    );
+}
+
+
+# Return how stage $n of a run made into %$run, of $pipeline, is named in
+# a message, as _label names it.
+sub _run_label ($pipeline, $run, $n) {
+    return _label($pipeline, $run->{names}[$n], $run->{within}[$n]);
+}
+
+
+# Return an iterator, as _iterator does, for a run made into %$run with
+# no flush, no end of a stage's, and no sink, so with none of their
+# bookkeeping: each value through every step before the next, what a
+# step returns going on in order, and a stop's values going on from the
+# step after it. The run ends, as _iterator's does, once the source is
+# done and no value waits before the last step, and then the source's
+# end, its only one, is called.
+sub _plain_iterator ($pipeline, $run, $pull, $source_end, $context) {
+    my @steps = @{ $run->{stages} };
+    # Each value waiting to go through a step, as the step's index and the
+    # value, the next on top, so in order of index from the bottom: the
+    # lowest is at the bottom. Values a source's step gave, still to go
+    # through the steps from the first, are held as they came.
+    my(@todo, @from_source);
+    my($done, $source_done, $finished, $outside, $ended, $spent, $dropped, $into);
+    my $finish = sub ($died) {
+        return if $finished++;
+        # Values dropped from outside make it stopped, as end_run says.
+        $ended = $died ? 'died' : $source_done ? 'done' : 'stopped';
+        return unless $source_end;
+        local $running{context} = $context;
+        try {
+            _end_all(
+                [['the source', $source_end, $source_done ? 'done' : 'stopped']],
+                $died,
+            );
+        }
+        catch ($e) {
+            # The end died: the run died, and hands out nothing more.
+            ($ended, $spent, @todo, @from_source) = ('died', 1);
+            die $e;    ## no critic (ErrorHandling::RequireCarping): thrown again, as it was
+        }
+        return;
+    };
+    my $next = sub () {
+        return if $outside;
+        while (1) {
+            if ($into) {
+                # All takes at once a step's values where there are no
+                # steps, and the values already at the end.
+                if (!@steps && @from_source) {
+                    push @$into, splice @from_source;
+                    next;
+                }
+                if (@todo && $todo[-1][0] == @steps) {
+                    push @$into, (pop @todo)->[1]
+                        while @todo && $todo[-1][0] == @steps;
+                    next;
+                }
+            }
+            my($n, $value);
+            if (@todo) {
+                ($n, $value) = @{ pop @todo };
+            }
+            elsif (@from_source) {
+                ($n, $value) = (0, shift @from_source);
+            }
+            elsif (!$done) {
+                try {
+                    @from_source = $pull->();
+                }
+                catch ($e) {
+                    if ($e isa 'Ekorn::Pipeline::Stop') {
+                        my(undef, @carried) = is_arrayref($e) ? @$e : ();
+                        ($done, $source_done) = (1, 1);
+                        @from_source = @carried;
+                        next;
+                    }
+                    ($done, @todo, @from_source) = (1);
+                    $finish->(1);
+                    croak $e if is_ref($e);
+                    die $e;    ## no critic (ErrorHandling::RequireCarping): thrown again, as it was
+                }
+                unless (@from_source) {
+                    ($done, $source_done) = (1, 1);
+                    next;
+                }
+                ($n, $value) = (0, shift @from_source);
+            }
+            else {
+                # Nothing waits, and the source is done.
+                $finish->(0);
+                last;
+            }
+            if ($n < @steps) {
+                local $running{ending}  = undef if $running{ending};
+                local $running{context} = $context
+                    if defined $context || defined $running{context};
+                my $kept = 1;
+                try {
+                    while ($n < @steps) {
+                        local $_ = $value;
+                        my @values = $steps[$n]->($value);
+                        last if $outside;
+                        $n++;
+                        unless (@values) {
+                            $kept = 0;
+                            last;
+                        }
+                        $value = shift @values;
+                        push @todo, map { [$n, $_] } reverse @values if @values;
+                    }
+                }
+                catch ($e) {
+                    if ($e isa 'Ekorn::Pipeline::Stop') {
+                        my(undef, @carried) = is_arrayref($e) ? @$e : ();
+                        $done        = 1;
+                        @from_source = ();
+                        @todo        = map { [$n + 1, $_] } reverse @carried;
+                        next;
+                    }
+                    ($done, @todo, @from_source) = (1);
+                    $finish->(1);
+                    croak $e if is_ref($e);
+                    my $at      = Carp::shortmess() =~ s( \.? \n \z )()xr;
+                    my $message = $e =~ s( \n \z )()xr =~ s( ^ )(    )xmgr;
+                    my $stage   = _run_label($pipeline, $run, $n);
+                    die "Pipeline $stage failed$at:\n$message\n";
+                }
+                return if $outside;
+                next   unless $kept;
+            }
+            # The run ends once nothing waits before the last step: values
+            # from the source wait before the first, if there is one.
+            $finish->(0)
+                if $done
+                && !$finished
+                && !(@from_source && @steps)
+                && !(@todo        && $todo[0][0] < @steps);
+            return $value unless $into;
+            push @$into, $value;
+        }
+        # Everything has been handed out: the iterator is spent.
+        $spent = 1;
+        return;
+    };
+    my $all = sub () {
+        my @all;
+        $into = \@all;
+        try {
+            $next->();
+        }
+        catch ($e) {
+            $into = undef;
+            die $e;    ## no critic (ErrorHandling::RequireCarping): thrown again, as it was
+        }
+        $into = undef;
+        return @all;
+    };
+    my $end_run = sub () {
+        $outside = 1;
+        $dropped = 1 if @todo || @from_source;
+        ($done, @todo, @from_source) = (1);
+        $finish->(0);
+        $ended = 'stopped' if $dropped;
+        return;
+    };
+    my $ended_once = sub () {
+        return $ended if $spent || $outside || ($ended // '') eq 'died';
+        return;
+    };
+    return Ekorn::Pipeline::Iterator->new(
+        $next, $end_run, $context, $ended_once, $ended_once, $all,
     );
 }
 1;

@@ -41,9 +41,10 @@ SKIP: {
 # ratelimit_hit) against the shared arena, and the v6 stream entries' refusal
 # paths - a ticket naming no connection, and every entry point handed a
 # pointer that is not a live handle. t/41-stream-abi.t covers v6 live.
-is(Hyperman::_abi_version(), 9,
-   'ABI version 9 (v2 conn_detach, v3 denylist + rate limit, v4 worker start, '
- . 'v5 the cross-worker message bus, v6 stream handles, v7 stream_abort, v8 stream_on_data, v9 the arena and its scoreboard)');
+is(Hyperman::_abi_version(), 10,
+   'ABI version 10 (v2 conn_detach, v3 denylist + rate limit, v4 worker start, '
+ . 'v5 the cross-worker message bus, v6 stream handles, v7 stream_abort, v8 stream_on_data, v9 the arena and its scoreboard, '
+ . 'v10 trailer fields through stream_close_trailers)');
 
 # v4 on_worker_start registers here; that it actually FIRES, once per worker
 # and after the fork, is t/33-worker-start.t, which needs a live server.

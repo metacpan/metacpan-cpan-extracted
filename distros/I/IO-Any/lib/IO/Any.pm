@@ -4,7 +4,7 @@ use warnings;
 use strict;
 use utf8;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Carp 'confess';
 use Scalar::Util 'blessed';
@@ -13,7 +13,7 @@ use IO::File;
 use IO::AtomicFile;
 use File::Spec;
 use Fcntl qw(:flock);
-use List::MoreUtils qw(none any);
+use List::Util qw(none any);
 
 sub new {
     my $class = shift;
@@ -30,7 +30,7 @@ sub new {
         if ref $opt ne 'HASH';
     foreach my $key (keys %$opt) {
         confess 'unknown option '.$key
-            if (none { $key eq $_ } qw(atomic LOCK_SH LOCK_EX LOCK_NB));
+            if (none { $key eq $_ } qw(atomic LOCK_SH LOCK_EX LOCK_NB BINMODE));
     }
 
     my ($type, $proper_what) = $class->_guess_what($what);
@@ -41,14 +41,22 @@ sub new {
             my $fh = $opt->{'atomic'} ? IO::AtomicFile->new() : IO::File->new();
             $fh->open($proper_what, $how)
                 or confess 'error opening file "'.$proper_what.'" - '.$!;
+            if (defined $opt->{BINMODE} and not binmode($fh, $opt->{BINMODE})) {
+                _discard_atomic($fh);
+                confess 'binmode('.$opt->{BINMODE}.') failed';
+            }
 
             # locking if requested
             if ($opt->{'LOCK_SH'} or $opt->{'LOCK_EX'}) {
-                flock($fh,
+                if (not flock($fh,
                     ($opt->{'LOCK_SH'} ? LOCK_SH : 0)
                     | ($opt->{'LOCK_EX'} ? LOCK_EX : 0)
                     | ($opt->{'LOCK_NB'} ? LOCK_NB : 0)
-                ) or confess 'flock failed - '.$!;
+                )) {
+                    my $error = $!;
+                    _discard_atomic($fh);
+                    confess 'flock failed - '.$error;
+                }
             }
 
             return $fh;
@@ -121,35 +129,6 @@ sub slurp {
         if @_;
 
     my $fh = $class->read($what, $opt);
-
-    # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
-    # not supported under MSWin32
-    if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String') and ($^O ne 'MSWin32')) {
-        eval 'use AnyEvent::Handle'
-            if not $INC{'AnyEvent/Handle.pm'};
-        my $eof = AnyEvent->condvar;
-        my $content = '';
-        my $hdl = AnyEvent::Handle->new(
-            fh      => $fh,
-            on_read => sub {
-                $content .= delete $_[0]->{'rbuf'};
-            },
-            on_eof  => sub {
-                $eof->send;
-            },
-            on_error => sub {
-                my ($hdl, $fatal, $msg) = @_;
-                $hdl->destroy;
-                $eof->croak($msg);
-            }
-        );
-
-        $eof->recv;
-        $hdl->destroy;
-        close $fh;
-        return $content;
-    }
-
     my $content = do { local $/; <$fh> };
     close $fh;
     return $content;
@@ -168,34 +147,28 @@ sub spew {
     $fh->seek(0,0);
     $fh->truncate(0);
 
-    # use event loop when AnyEvent is loaded (skip IO::String, doesn't work and makes no sense)
-    if ($INC{'AnyEvent.pm'} and not $fh->isa('IO::String')) {
-        eval 'use AnyEvent::Handle'
-            if not $INC{'AnyEvent/Handle.pm'};
-
-        my $eof = AnyEvent->condvar;
-        my $hdl = AnyEvent::Handle->new(
-            fh       => $fh,
-            on_drain => sub {
-                $eof->send;
-            },
-            on_error => sub {
-                my ($hdl, $fatal, $msg) = @_;
-                $hdl->destroy;
-                $eof->croak($msg);
-            }
-        );
-
-        $hdl->push_write($data);
-
-        $eof->recv;
-        $hdl->destroy;
-        close $fh;
-        return;
+    if (not print $fh $data) {
+        my $error = $!;
+        _discard_atomic($fh);
+        confess 'failed to write file - '.$error;
     }
+    if (not $fh->close) {
+        my $error = $!;
+        _discard_atomic($fh);
+        confess 'failed to close file - '.$error;
+    }
+    return;
+}
 
-    print $fh $data;
-    $fh->close || confess 'failed to close file - '.$!;
+# remove the temporary file of a failed IO::AtomicFile write, the target stays intact
+sub _discard_atomic {
+    my $fh = shift;
+    return if not blessed($fh) or not $fh->isa('IO::AtomicFile');
+
+    # delete() is a no-op once close() has run (also a failed one)
+    my $temp = ${*$fh}{'io_atomicfile_temp'};
+    $fh->delete;
+    unlink($temp) if defined $temp and -e $temp;
     return;
 }
 
@@ -289,6 +262,10 @@ Returns filehandle. L<IO::String> for 'string', L<IO::File> for 'file'.
 Here are available C<%$options> options:
 
     atomic    true/false if the file operations should be done using L<IO::AtomicFile> or L<IO::File>
+    BINMODE   I/O layer passed to binmode() for files, for example ":utf8"
+              or ":raw"; without it no binmode() is called and the platform
+              default layers apply (":crlf" on Windows); ignored for strings
+              and already opened handles
     LOCK_SH   lock file for shared access
     LOCK_EX   lock file for exclusive
     LOCK_NB   lock file non blocking (will throw an excpetion if file is
@@ -318,13 +295,27 @@ Same as C<< IO::Any->new($what, '>'); >>
 
 Returns content of C<$what>.
 
-If L<AnyEvent> is loaded then uses event loop to read the content.
+Without the C<BINMODE> option nothing is decoded; on Windows the default
+C<:crlf> layer still translates line endings. Pass
+C<< { BINMODE => ':utf8' } >> to get decoded characters, or
+C<< { BINMODE => ':raw' } >> for binary files on every platform.
 
 =head2 spew($what, $data, $opt)
 
-Writes C<$data> to C<$what>.
+Writes C<$data> to C<$what>. Dies if writing or closing fails.
 
-If L<AnyEvent> is loaded then uses event loop to write the content.
+Without the C<BINMODE> option C<$data> is not encoded; on Windows the
+default C<:crlf> layer still translates line endings. Strings with
+characters above 255 need C<< { BINMODE => ':utf8' } >> or must be encoded
+first. Use C<< { BINMODE => ':raw' } >> for binary data.
+
+With C<< { atomic => 1 } >> the data goes to a temporary file that replaces
+C<$what> on success. On failure C<spew> removes the temporary file and dies;
+C<$what> keeps its old content.
+
+This holds for a single writer only. Concurrent atomic writers to the same
+C<$what> share one temporary file (C<$what..TMP>), and C<LOCK_SH>/C<LOCK_EX>
+then lock that temporary file, not C<$what>.
 
 =head1 SEE ALSO
 

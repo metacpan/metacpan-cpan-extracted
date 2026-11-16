@@ -1,5 +1,5 @@
 package DateTime::TimeZone::Local::Win32;
-$DateTime::TimeZone::Local::Win32::VERSION = '2.07';
+$DateTime::TimeZone::Local::Win32::VERSION = '2.08';
 use 5.006;
 
 use strict;
@@ -17,6 +17,11 @@ sub EnvVars { return 'TZ' }
 {
     # This list comes (mostly) in the zipball for the Chronos project
     # - a Smalltalk datetime library. Thanks, Chronos!
+    #
+    # Never remove an entry from this table. Older versions of Windows
+    # report older zone names (for example 'Pacific' or 'Tasmania',
+    # without 'Standard Time'), and a machine may still be set to a zone
+    # Microsoft has since marked obsolete. Only add or correct entries.
     my %WinToIANA = (
         'Afghanistan'                     => 'Asia/Kabul',
         'Afghanistan Standard Time'       => 'Asia/Kabul',
@@ -295,7 +300,7 @@ sub _FindWindowsTZName {
             ? $LMachine->{
             'SOFTWARE/Microsoft/Windows NT/CurrentVersion/Time Zones/'}
 
-            # Windows 95, Windows 98, Windows Millenium Edition
+            # Windows 95, Windows 98, Windows Millennium Edition
             : $LMachine->{
             'SOFTWARE/Microsoft/Windows/CurrentVersion/Time Zones/'};
 
@@ -326,7 +331,7 @@ DateTime::TimeZone::Local::Win32 - Determine the local system's time zone on Win
 
 =head1 VERSION
 
-version 2.07
+version 2.08
 
 =head1 SYNOPSIS
 
@@ -378,7 +383,7 @@ to the end to the value of
 gives us the I<English> name of the Windows time zone, which we use to
 look up the IANA time zone name.
 
-=item * Windows 95, Windows 98, Windows Millenium Edition
+=item * Windows 95, Windows 98, Windows Millennium Edition
 
 The algorithm is the same as for NT, but we loop through the sub keys
 of "SOFTWARE/Microsoft/Windows/CurrentVersion/Time Zones/"
@@ -393,7 +398,7 @@ of "SOFTWARE/Microsoft/Windows/CurrentVersion/Time Zones/"
 
 =item *
 
-David Pinkowitz <dapink@cpan.org>
+David Pinkowitz <dapink_cpan@pinkowitz.com>
 
 =item *
 
@@ -404,7 +409,7 @@ Dave Rolsky <autarch@urth.org>
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org>
-Copyright (C) 2014-2026 by David Pinkowitz <dapink@cpan.org>
+Copyright (C) 2014-2026 by David Pinkowitz <dapink_cpan@pinkowitz.com>
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

@@ -63,6 +63,7 @@ my %WriteMakefileArgs = (
     "Class::Load" => 0,
     "Digest::MD5" => 0,
     "Encode" => 0,
+    "IO::Compress::Gzip" => 0,
     "Mail::SPF::Request" => 0,
     "Mail::SPF::Server" => 0,
     "Moo" => 0,
@@ -79,7 +80,7 @@ my %WriteMakefileArgs = (
     "Try::Tiny" => 0,
     "lib" => 0
   },
-  "VERSION" => "3.20260824",
+  "VERSION" => "3.20261116",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -103,6 +104,7 @@ my %FallbackPrereqs = (
   "File::Slurp" => 0,
   "File::Temp" => 0,
   "HTTP::Tiny::Paranoid" => 0,
+  "IO::Compress::Gzip" => 0,
   "IO::Uncompress::Gunzip" => 0,
   "Import::Into" => 0,
   "JSON" => 0,

@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Callback::Signal : interface_t {
+  
+  use UV::Handle::Signal;
+  
+  required method : void ($uv_signal : UV::Handle::Signal, $signum : int);
+  
+}

@@ -1,0 +1,17 @@
+Build.PL
+Changes
+etc/dpd-sk/api.ini
+etc/dpd-sk/geordb.ini
+lib/Business/DPD/SK.pm
+lib/Business/DPD/SK/API.pm
+lib/Business/DPD/SK/GeoRDB.pm
+lib/Business/DPD/SK/SPc.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00_load.t
+t/10_geordb-update.t
+t/11_geordb-read.t
+t/20_api.t
+var/lib/dpd-sk/.exists

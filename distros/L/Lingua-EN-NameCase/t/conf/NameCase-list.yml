@@ -1,0 +1,38 @@
+---
+# Hand-written schema for Lingua::EN::NameCase::NameCase.
+#
+# The top-level input describes NameCase([...]); the list transform describes
+# NameCase('A', 'B').  Output type 'array' captures each call in list context,
+# which is the form that returns name-cased copies for both shapes.  The
+# transform's own input fields are what its generated cases use, so the
+# arrayref and list forms are both covered by this one schema.
+#
+# Absent boolean config keys default to on, so only the tests that must be
+# off are listed here.
+module: Lingua::EN::NameCase
+function: NameCase
+config:
+  test_non_ascii: 0
+  test_nuls: 0
+  test_security: 0
+  test_undef: 0
+input:
+  names:
+    type: arrayref
+    position: 0
+    optional: 0
+output:
+  type: array
+transforms:
+  list:
+    input:
+      first:
+        type: string
+        position: 0
+        optional: 0
+      second:
+        type: string
+        position: 1
+        optional: 0
+    output:
+      type: array

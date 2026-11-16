@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 use Test::More;
-use HMTest qw(free_ports quiet_child server_reap);
+use HMTest qw(free_ports quiet_child server_reap can_lower_nofile);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -110,13 +110,20 @@ my $app = sub {
 {
     my $pidfile = "$dir/reexec.pid";
     my $sock = "$dir/reexec.sock";
-    my $code = "Hyperman->run(app => sub { [200, [], [\"w\$\$\"]] }, host => '127.0.0.1', listen => [ { port => $pd }, { path => '$sock' } ], workers => 2, pid_file => '$pidfile', error_log => '$dir/reexec.err')";
+    # The successor is this same command line re-executed, so the sleep it
+    # starts with (only when it IS the successor) holds it in "still
+    # starting" for a full second. Without that the second USR2 raced the
+    # takeover, and sent 50ms after the first it was also, on a loaded
+    # smoker, coalesced with it: the supervisor had not yet cleared the flag
+    # the first one set, so the second was never seen at all. It is sent
+    # once the log says the successor has started, into that second.
+    my $code = "sleep 1 if \$ENV{HYPERMAN_REEXEC}; Hyperman->run(app => sub { [200, [], [\"w\$\$\"]] }, host => '127.0.0.1', listen => [ { port => $pd }, { path => '$sock' } ], workers => 2, pid_file => '$pidfile', error_log => '$dir/reexec.err')";
     my $pid = fork // die "fork: $!";
     if (!$pid) { quiet_child(); exec $^X, '-Mblib', '-MHyperman', '-e', $code; exit 1 }
     like(get($pd, '/'), qr{^HTTP/1\.1 200}, 'the pool to be re-executed answers');
     is(slurp($pidfile) + 0, $pid, 'and wrote its pid');
     kill 'USR2', $pid;
-    Time::HiRes::sleep(0.05);
+    wait_for("$dir/reexec.err", qr/successor \d+ started/, 10);
     kill 'USR2', $pid;
     my $log = wait_for("$dir/reexec.err", qr/asked to drain/, 20);
     like($log, qr/USR2: successor (\d+) started/, 'a USR2 starts a successor');
@@ -165,7 +172,7 @@ my $app = sub {
 
 # --- a pid file in a directory that cannot be written ---
 SKIP: {
-    skip 'root can write anywhere', 3 if $> == 0;
+    skip 'root can write anywhere', 4 if $> == 0;
     my $ro = "$dir/ro";
     mkdir $ro or die;
     open my $pf, '>', "$ro/have.pid" or die; print $pf "0\n"; close $pf;
@@ -201,7 +208,8 @@ SKIP: {
 
 # --- a listener starved of descriptors ---
 SKIP: {
-    skip 'no sh to lower the descriptor limit', 3 unless -x '/bin/sh';
+    skip 'cannot lower the descriptor limit here (no /bin/sh, or ulimit -n is refused)', 4
+        unless can_lower_nofile();
     my ($port) = free_ports(1);
     my $pid = fork // die "fork: $!";
     if (!$pid) {

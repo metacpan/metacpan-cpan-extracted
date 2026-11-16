@@ -432,6 +432,8 @@ Options that can take a value or be specified without one.
     *   If the option is specified without a value: An empty string `""` is stored in the variable.
     *   If the option is not specified: The variable remains unset (if no initial value was defined). Existence can be checked with `${variable+_}` or `[[ -v variable ]]`.
 
+*   **Negation with `no-` Prefix:** Specifying with `--no-mode`, or a negative alias, takes the option back: the variable is unset, as when the option is not specified. A value assigned to the variable before the options are parsed works as a default, which stays without the option and is removed by `--no-mode`. A callback is called with an empty value for `--no-mode` as well, after the variable is unset: use `${mode-}` in it, not `$mode`, under `set -u`.
+
 *   **Initial Value:** Can be set during definition (e.g., `]=default_mode`).
 
 *   **Use Cases:** Optional configuration values, parameters valid only in certain cases.

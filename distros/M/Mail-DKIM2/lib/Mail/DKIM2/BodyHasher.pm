@@ -2,7 +2,7 @@ package Mail::DKIM2::BodyHasher;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use base 'Mail::DKIM2::HeaderParser';
 

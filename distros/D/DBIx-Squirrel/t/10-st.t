@@ -37,6 +37,8 @@ subtest 'numbered placeholders' => sub {
     is row('SELECT $2, $1', ['a', 'b']), ['b', 'a'], 'from an array reference';
     is $dbh->prepare('SELECT $2 + $1, $1')->{private_ekorn}{Binds},
         {1 => [2, 3], 2 => [1]}, 'mapped to their positions';
+    is $dbh->prepare('SELECT $2 + $1, $1')->{private_ekorn}{Order},
+        [2, 1, 1], 'and kept in the order of their positions';
 
     my $sth = $dbh->prepare('SELECT $1, $2');
     like dies { $sth->execute(1) },
@@ -61,6 +63,14 @@ subtest 'named placeholders' => sub {
     is row('SELECT $a, $b', a => 1, b => 2), [1, 2], 'with $';
     is $dbh->prepare($sql)->{private_ekorn}{Binds}, {a => [1, 2], b => [3]},
         'mapped to their positions';
+    is $dbh->prepare($sql)->{private_ekorn}{Order}, [qw(a a b)],
+        'and kept in the order of their positions';
+    is row($sql, a => 2, ':b' => 3), [4, 3], 'with and without sigils';
+    my(undef, $listed) = DBIx::Squirrel::db::_study(    ## no critic (Subroutines::ProtectPrivateSubs)
+        $dbh, 'SELECT :a WHERE 1 IN (...:b)', undef,
+    );
+    is $listed->{Order}, undef,
+        'but not with a list placeholder, placed as its list is';
 
     my $sth  = $dbh->prepare($sql);
     my $each = qr( Expected\ a\ value\ for\ each\ placeholder )x;

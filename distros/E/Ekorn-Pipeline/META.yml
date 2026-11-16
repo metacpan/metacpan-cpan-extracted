@@ -27,7 +27,7 @@ no_index:
 provides:
   Ekorn::Pipeline:
     file: lib/Ekorn/Pipeline.pm
-    version: v0.3.1
+    version: v0.3.3
   Ekorn::Pipeline::Element:
     file: lib/Ekorn/Pipeline/Element.pm
   Ekorn::Pipeline::Errors:
@@ -74,6 +74,8 @@ provides:
     file: lib/Ekorn/Pipeline/Sugar.pm
   Ekorn::Pipeline::Tooling:
     file: lib/Ekorn/Pipeline/Tooling.pm
+recommends:
+  Text::Redact::Secrets: '>= v1.0.0, < v2.0.0'
 requires:
   Carp: '0'
   Data::Dumper: '0'
@@ -89,6 +91,6 @@ resources:
   bugtracker: https://github.com/nukopian/Ekorn-Pipeline/issues
   homepage: https://github.com/nukopian/Ekorn-Pipeline
   repository: https://github.com/nukopian/Ekorn-Pipeline.git
-version: v0.3.1
+version: v0.3.3
 x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
 x_static_install: 1

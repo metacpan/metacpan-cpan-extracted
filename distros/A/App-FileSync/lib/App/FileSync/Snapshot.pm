@@ -12,35 +12,38 @@ use autodie qw(:all);
 
 use File::Path qw(remove_tree);
 use File::Spec;
+use POSIX qw(strftime);
 use Readonly;
 use Sub::Private { mode => 'enforce' };
 use Time::HiRes ();
 
 use App::FileSync qw(validate_relpath);
 use App::FileSync::Args qw(named);
-use App::FileSync::Constants qw($MODE_MASK $ROOT_MARKER $SNAPSHOT_DIR $STALE_TEMP_SECONDS $TEMP_PREFIX);
+use App::FileSync::Constants qw($MODE_MASK $ROOT_MARKER $SNAPSHOT_DIR $STALE_TEMP_SECONDS $TEMP_PREFIX $STAT_MODE $STAT_SIZE $STAT_MTIME);
 use App::FileSync::I18N qw(throw os_error);
 use App::FileSync::IO qw(copy_preserving ensure_dir list_dir);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # Kept for compatibility: the snapshot directory's name.
 our $DIR_NAME = $SNAPSHOT_DIR;
 
 # The two ways a snapshot can hold a file.
-Readonly my $HARDLINK => 'hardlink';
-Readonly my $COPY     => 'copy';
+Readonly::Scalar my $HARDLINK => 'hardlink';
+Readonly::Scalar my $COPY     => 'copy';
 
-# A snapshot date, and an interrupted attempt's directory.
+# A snapshot date (as strftime writes it and as the pattern recognises it),
+# and an interrupted attempt's directory.
+Readonly::Scalar my $DATE_FORMAT => '%Y-%m-%d';
 Readonly my $DATE      => qr/\A\d{4}-\d{2}-\d{2}\z/;
 Readonly my $TEMP_DIR  => qr/\A\.tmp-\d+-\d+\z/;
 Readonly my $TEMP_FILE => qr/\A\Q$TEMP_PREFIX\E/;
 
 # Windows has no POSIX permission bits worth restoring on a directory.
-Readonly my $HAS_MODES => $^O ne 'MSWin32';
+Readonly::Scalar my $HAS_MODES => $^O ne 'MSWin32';
 
 # Range for the random part of a temporary snapshot directory's name.
-Readonly my $TEMP_RANGE => 1_000_000;
+Readonly::Scalar my $TEMP_RANGE => 1_000_000;
 
 # Every function takes the replica root and needs it.
 my %ROOT = (root => { type => 'string', min => 1 });
@@ -157,8 +160,7 @@ None.
 sub date_for_epoch {
 	my ($epoch) = @_;
 
-	my @t = gmtime(defined $epoch ? $epoch : time);
-	return sprintf('%04d-%02d-%02d', $t[5] + 1900, $t[4] + 1, $t[3]);
+	return strftime($DATE_FORMAT, gmtime($epoch // time));
 }
 
 sub is_date {
@@ -549,7 +551,7 @@ sub _mirror :Private {
 		if (-d _) {
 			ensure_dir($to);
 			_mirror($from, $to, $mode, $counts, 0);
-			chmod($stat[2] & $MODE_MASK, $to) if $HAS_MODES;
+			chmod($stat[$STAT_MODE] & $MODE_MASK, $to) if $HAS_MODES;
 		} elsif (-f _) {
 			# A link shares the inode, so mode and mtime are already right;
 			# a copy (or a failed link across filesystems) needs them set.
@@ -557,7 +559,7 @@ sub _mirror :Private {
 			copy_preserving($from, $to, \@stat) unless $linked;
 			$counts->{ $linked ? 'linked' : 'copied' }++;
 			$counts->{files}++;
-			$counts->{bytes} += $stat[7];
+			$counts->{bytes} += $stat[$STAT_SIZE];
 		}
 	}
 
@@ -577,7 +579,7 @@ sub _clean_stale_temps :Private {
 	for my $name (grep { $_ =~ $TEMP_DIR } @{ list_dir($dir) || [] }) {
 		my $path = File::Spec->catdir($dir, $name);
 		my @stat = Time::HiRes::lstat($path);
-		next unless @stat && -d _ && $now - $stat[9] >= $STALE_TEMP_SECONDS;
+		next unless @stat && -d _ && $now - $stat[$STAT_MTIME] >= $STALE_TEMP_SECONDS;
 		eval { remove_tree($path) };
 	}
 
@@ -599,7 +601,7 @@ sub _count :Private {
 			_count($path, $counts);
 		} elsif (-f _) {
 			$counts->{files}++;
-			$counts->{bytes} += $stat[7];
+			$counts->{bytes} += $stat[$STAT_SIZE];
 		}
 	}
 
@@ -642,15 +644,15 @@ sub _copy_out :Private {
 
 		# Directory metadata last: filling it changed its mtime.
 		unless ($dry_run) {
-			chmod($stat[2] & $MODE_MASK, $dst) if $HAS_MODES;
-			utime($stat[9], $stat[9], $dst);
+			chmod($stat[$STAT_MODE] & $MODE_MASK, $dst) if $HAS_MODES;
+			utime($stat[$STAT_MTIME], $stat[$STAT_MTIME], $dst);
 		}
 		return 1;
 	}
 
 	throw('snapshot.not_regular', { path => $src }) unless -f _;
 	$counts->{files}++;
-	$counts->{bytes} += $stat[7];
+	$counts->{bytes} += $stat[$STAT_SIZE];
 	return 1 if $dry_run;
 
 	# A rollback replaces whatever is in the way, even a directory.

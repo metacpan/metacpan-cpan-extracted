@@ -1,6 +1,6 @@
-%% Beamer-reveal driver file (v1.09-2026-02-08)
+%% Beamer-reveal driver file (v1.10-2026-04-08)
 @@Presentation: 
--parameters:latexversion={v1.09},latexdate={2026-02-08},sourcefilename={beamer-reveal-example.tex},title={Test slide deck},author={Walter Daems},compiler={lualatex},loop={false},autoslide={4000},canvaswidth={1920},canvasheight={1200}
+-parameters:latexversion={v1.10},latexdate={2026-04-08},sourcefilename={beamer-reveal-example.tex},title={Test slide deck},author={Walter Daems},compiler={lualatex},loop={false},autoslide={4000},canvaswidth={1920},canvasheight={1200}
 @@BeamerFrame: 
 -parameters:rawpage={1},truepage={1},overlay={1},transition={none},title={Test slide deck},toc={titlepage}
 @@BeamerFrame: 

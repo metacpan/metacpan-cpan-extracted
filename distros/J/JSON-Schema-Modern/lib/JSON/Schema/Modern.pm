@@ -1,11 +1,11 @@
 use strict;
 use warnings;
-package JSON::Schema::Modern; # git description: v0.652-4-g6757b55a
+package JSON::Schema::Modern; # git description: v0.653-7-g79ba092a
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Validate data against a schema using a JSON Schema
 # KEYWORDS: JSON Schema validator data validation structure specification
 
-our $VERSION = '0.653';
+our $VERSION = '0.654';
 
 use 5.020;  # for fc, unicode_strings features
 use Moo;
@@ -861,7 +861,7 @@ sub _evaluate_subschema ($self, $data, $schema, $state) {
 
 has _resource_index => (
   is => 'bare',
-  isa => Map[my $resource_key_type = Str->where('!/#/'), my $resource_type = Dict[
+  isa => Map[my $resource_key_type = Str->where('!/#/') => my $resource_type = Dict[
       canonical_uri => (InstanceOf['Mojo::URL'])->where(q{not defined $_->fragment}),
       path => json_pointer_type,  # JSON pointer relative to the document root
       specification_version => my $spec_version_type = Enum(SPECIFICATION_VERSIONS_SUPPORTED),
@@ -1307,7 +1307,7 @@ JSON::Schema::Modern - Validate data against a schema using a JSON Schema
 
 =head1 VERSION
 
-version 0.653
+version 0.654
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.
@@ -2093,7 +2093,7 @@ C<hostname> and C<idn-hostname> require L<Data::Validate::Domain> version 0.13 (
 
 =item *
 
-C<idn-hostname> also requires L<Net::IDN::Encode>
+C<idn-hostname> also requires L<Net::IDN::Encode> version 2.600 (or higher)
 
 =item *
 

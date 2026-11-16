@@ -13,7 +13,7 @@ require Exporter;
 use vars qw(@ISA @EXPORT_OK);
 @ISA       = qw(Exporter);
 @EXPORT_OK = qw(ExcelFmt LocaltimeExcel ExcelLocaltime col2int int2col sheetRef xls2csv);
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 my $sNUMEXP = '(^[+-]?\d+(\.\d+)?$)|(^[+-]?\d+\.?(\d*)[eE][+-](\d+))$';
 
@@ -184,9 +184,11 @@ sub ExcelFmt {
           ) {
             $iFmtMode = 1 unless ($iFmtMode);
             if (substr($sFmtObj, $i, 1) =~ /[#0]/) {
-                if (substr($sFmtObj, $i) =~ /^([#0]+)([\.]?)([0#]*)([eE])([\+\-])([0#]+)/) {
-                    push @aRep, [substr($sFmtObj, $i, length($&)), $i, length($&)];
-                    $i += length($&);
+                my ($number_format) = substr($sFmtObj, $i) =~ /^([#0]+[.]?[0#]*[eE][+-][0#]+)/;
+                if (defined $number_format) {
+                    my $match_length = length($number_format);
+                    push @aRep, [$number_format, $i, $match_length];
+                    $i += $match_length;
                 } else {
                     if ($iFflg == -1) {
                         $iFflg = $i;
@@ -216,9 +218,11 @@ sub ExcelFmt {
                 push @aRep, [substr($sFmtObj, $iFflg, $i - $iFflg + 1), length($sFmtRes), $i - $iFflg + 1];
                 $iFflg = -1;
             } elsif (substr($sFmtObj, $i, 3) =~ /^[eE][\+\-][0#]$/) {
-                if (substr($sFmtObj, $i) =~ /([eE])([\+\-])([0#]+)/) {
-                    push @aRep, [substr($sFmtObj, $i, length($&)), $i, length($&)];
-                    $i += length($&);
+                my ($exponent_format) = substr($sFmtObj, $i) =~ /([eE][+-][0#]+)/;
+                if (defined $exponent_format) {
+                    my $match_length = length($exponent_format);
+                    push @aRep, [$exponent_format, $i, $match_length];
+                    $i += $match_length;
                 }
                 $iFflg = -1;
             } else {
@@ -243,17 +247,19 @@ sub ExcelFmt {
                 }
             }
             $i++;
+        } elsif (substr($sFmtObj, $i, 5) =~ /\Aam\/pm\z/i) {
+            $iFmtMode = 2 unless ($iFmtMode);
+            push @aRep, ['am/pm', length($sFmtRes), 5, substr($sFmtObj, $i, 5)];
+            $iAm = 1;
+            $i += 5;
+        } elsif (substr($sFmtObj, $i, 3) =~ /\Aa\/p\z/i) {
+            $iFmtMode = 2 unless ($iFmtMode);
+            push @aRep, ['a/p', length($sFmtRes), 3, substr($sFmtObj, $i, 3)];
+            $iAm = 1;
+            $i += 3;
         } elsif ($sWk =~ /[ymdhsapg]/) {
             $iFmtMode = 2 unless ($iFmtMode);
-            if (substr($sFmtObj, $i, 5) =~ /am\/pm/i) {
-                push @aRep, ['am/pm', length($sFmtRes), 5];
-                $iAm = 1;
-                $i += 5;
-            } elsif (substr($sFmtObj, $i, 3) =~ /a\/p/i) {
-                push @aRep, ['a/p', length($sFmtRes), 3];
-                $iAm = 1;
-                $i += 3;
-            } elsif (substr($sFmtObj, $i, 5) eq 'mmmmm') {
+            if (substr($sFmtObj, $i, 5) eq 'mmmmm') {
                 push @aRep, ['mmmmm', length($sFmtRes), 5];
                 $i += 5;
             } elsif ((substr($sFmtObj, $i, 4) eq 'mmmm')
@@ -263,6 +269,7 @@ sub ExcelFmt {
                 push @aRep, [substr($sFmtObj, $i, 4), length($sFmtRes), 4];
                 $i += 4;
             } elsif ((substr($sFmtObj, $i, 3) eq 'mmm')
+                || (substr($sFmtObj, $i, 3) eq 'ddd')
                 || (substr($sFmtObj, $i, 3) eq 'yyy')) {
                 push @aRep, [substr($sFmtObj, $i, 3), length($sFmtRes), 3];
                 $i += 3;
@@ -339,12 +346,12 @@ sub ExcelFmt {
         my @aMonL = qw (dum January February March April May June July
           August September October November December );
         my @aMonNm  = qw (dum Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
-        my @aWeekNm = qw (Mon Tue Wed Thu Fri Sat Sun);
-        my @aWeekL  = qw (Monday Tuesday Wednesday Thursday Friday Saturday Sunday);
+        my @aWeekNm = qw (Sun Mon Tue Wed Thu Fri Sat);
+        my @aWeekL  = qw (Sunday Monday Tuesday Wednesday Thursday Friday Saturday);
         my $sRep;
         for (my $iIt = $#aRep ; $iIt >= 0 ; $iIt--) {
             my $rItem = $aRep[$iIt];
-            if ((scalar @$rItem) >= 4) {
+            if (defined($rItem->[3]) && $rItem->[3] eq 'min') {
 
                 #Min
                 if ($rItem->[0] eq 'mm') {
@@ -376,9 +383,9 @@ sub ExcelFmt {
 
             #Day
             elsif ($rItem->[0] eq 'dddd') {
-                $sRep = $aWeekL[$aTime[7]];
+                $sRep = $aWeekL[$aTime[6]];
             } elsif ($rItem->[0] eq 'ddd') {
-                $sRep = $aWeekNm[$aTime[7]];
+                $sRep = $aWeekNm[$aTime[6]];
             } elsif ($rItem->[0] eq 'dd') {
                 $sRep = sprintf('%02d', $aTime[3]);
             } elsif ($rItem->[0] eq 'd') {
@@ -388,13 +395,13 @@ sub ExcelFmt {
             #Hour
             elsif ($rItem->[0] eq 'hh') {
                 if ($iAm) {
-                    $sRep = sprintf('%02d', $aTime[2] % 12);
+                    $sRep = sprintf('%02d', ($aTime[2] % 12) || 12);
                 } else {
                     $sRep = sprintf('%02d', $aTime[2]);
                 }
             } elsif ($rItem->[0] eq 'h') {
                 if ($iAm) {
-                    $sRep = sprintf('%d', $aTime[2] % 12);
+                    $sRep = sprintf('%d', ($aTime[2] % 12) || 12);
                 } else {
                     $sRep = sprintf('%d', $aTime[2]);
                 }
@@ -408,17 +415,16 @@ sub ExcelFmt {
             }
 
             #am/pm
-            elsif ($rItem->[0] eq 'am/pm') {
-                $sRep = ($aTime[4] > 12) ? 'pm' : 'am';
-            } elsif ($rItem->[0] eq 'a/p') {
-                $sRep = ($aTime[4] > 12) ? 'p' : 'a';
+            elsif ($rItem->[0] eq 'am/pm' || $rItem->[0] eq 'a/p') {
+                my @periods = split '/', $rItem->[3];
+                $sRep = $periods[$aTime[2] >= 12 ? 1 : 0];
             } elsif ($rItem->[0] eq '.') {
                 $sRep = '.';
-            } elsif ($rItem->[0] =~ /^0+$/) {
-                my $i0Len = length($&);
+            } elsif ($rItem->[0] =~ /^(0+)$/) {
+                my $fraction_digits = length($1);
 
                 #print "SEC:", $aTime[7], "\n";
-                $sRep = substr(sprintf("%.${i0Len}f", $aTime[7] / 1000.0), 2, $i0Len);
+                $sRep = substr(sprintf("%.${fraction_digits}f", $aTime[7] / 1000.0), 2, $fraction_digits);
             } elsif ($rItem->[0] eq '[h]') {
                 $sRep = sprintf('%d', int($iData) * 24 + $aTime[2]);
             } elsif ($rItem->[0] eq '[mm]') {

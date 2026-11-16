@@ -436,13 +436,12 @@ sub userinfo : Local {
 
     $c->log->debug("UserInfo requested for user: $user_id") if $config->{debug};
 
-    # This would normally fetch the user from database
-    # For now, we'll use the claims already in the token
-    my %claims = (
-        sub => $payload->{sub},
-    );
+    # Build claims from token using standard list. String context
+    # is required for correct JSON encoding of these attributes. Other
+    # registered claims which must be strings are: iss, aud, jti (RFC7519 §4.1).
+    my %claims = map { $_ => "$payload->{$_}" } qw(sub);
 
-    # Add other standard claims from token
+    # Include remaining claims which are not as tightly specified.
     for my $claim (qw(name email email_verified picture phone_number phone_number_verified)) {
         $claims{$claim} = $payload->{$claim} if exists $payload->{$claim};
     }

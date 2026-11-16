@@ -15,19 +15,19 @@ use autodie qw(open);
 
 use File::Basename qw(dirname);
 use File::Spec;
-use IPC::Open3 ();
 use Readonly;
 use Sub::Private { mode => 'enforce' };
 
 use App::FileSync::Args qw(named);
 use App::FileSync::Constants qw($ROLE_CLIENT $SERVER_PROGRAM);
 use App::FileSync::I18N qw(throw);
+use App::FileSync::Process;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # How far up from this file to look for a checkout's bin/filesync-server:
 # lib/App/FileSync/Transport is four levels, blib/lib/... five.
-Readonly my $SEARCH_DEPTH => 6;
+Readonly::Scalar my $SEARCH_DEPTH => 6;
 
 =encoding utf8
 
@@ -116,13 +116,11 @@ sub new {
 		'--role',   $args->{role} || $ROLE_CLIENT,
 	);
 
-	# '>&STDERR' dups the parent's stderr.  Passing a filehandle here would not
-	# redirect the child at all: it would write into an unread pipe, and the
-	# first log line would kill it with SIGPIPE.
-	my ($writer, $reader);
-	my $pid = IPC::Open3::open3($writer, $reader, '>&STDERR', @command);
+	# The child's stderr is a dup of ours.  A pipe here would not be read, and
+	# the first log line would kill the server with SIGPIPE.
+	my $child = App::FileSync::Process::spawn(command => \@command, stderr => fileno(STDERR));
 
-	return bless { pid => $pid, writer => $writer, reader => $reader }, $class;
+	return bless { %{$child} }, $class;
 }
 
 =head2 reader
@@ -188,7 +186,9 @@ Args: none.
 Returns: 1.  Repeated calls do nothing.
 
 Side Effects: closes both pipes (the server sees end of file) and reaps the
-child.
+child.  A server that has not exited after
+C<$App::FileSync::Process::GRACE_SECONDS> is stopped, so a server that never
+sees end of file cannot hang the client.
 
 Usage:
 
@@ -227,7 +227,10 @@ sub close {	## no critic (Subroutines::ProhibitBuiltinHomonyms, Subroutines::Pro
 	for my $handle (grep { defined } @{$self}{qw(writer reader)}) {
 		CORE::close($handle);
 	}
-	waitpid($self->{pid}, 0) if $self->{pid};
+	if ($self->{pid}) {
+		$self->{end} = App::FileSync::Process::reap(pid => $self->{pid});
+		$self->{pid} = 0;
+	}
 
 	return 1;
 }

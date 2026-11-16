@@ -5,15 +5,16 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.14.0';
+our $VERSION = '1.15.0';
 
 # Copied as served. Those the spec does not require are paid, and absent from an
 # answer whose plan leaves them out.
 our @MEMBERS = qw(
     name country registry allocated domain type num_ips num_prefixes4 num_prefixes6 rpki_valid
-    rpki_invalid rpki_not_found whois prefixes
+    rpki_invalid rpki_not_found whois prefixes rank num_upstreams upstreams num_peers peers
+    num_downstreams downstreams hosted_domains
 );
-our @MARKERS = qw(trial_expired);
+our @MARKERS = qw(tier1 trial_expired);
 
 my %KNOWN = map { $_ => 1 } 'asn', @MEMBERS, @MARKERS;
 
@@ -93,6 +94,23 @@ Paid: the AS's WHOIS record as a hash reference of strings, and the prefixes it
 announces as an array reference, each a hash reference with C<prefix>,
 C<peer_count>, C<rpki_status>, C<first_seen>, C<country>, C<size> and
 C<other_origins>.
+
+=head2 rank, tier1
+
+Paid: its rank in ASN Extended by customer cone, 1 the largest and 0 for an AS
+seen in no AS path, and 1 when it is one of the transit-free networks at the
+top of the hierarchy, 0 when it is not.
+
+=head2 num_upstreams, upstreams, num_peers, peers, num_downstreams, downstreams
+
+Paid: how many AS numbers it gets transit from, exchanges routes with and
+provides transit to, and each list of them as an array reference of integers,
+ascending, up to 20000.
+
+=head2 hosted_domains
+
+Paid: a hash reference with C<total>, how many registered domains it hosts, and
+C<domains>, an array reference of the 10 most popular.
 
 =head2 trial_expired
 

@@ -10,84 +10,98 @@ use warnings;
 use Exporter qw(import);
 use Readonly;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
+
+# Plain values use Readonly::Scalar: it sets Perl's own read-only flag, where
+# "Readonly our $X" ties the variable and makes every read a method call
+# (about nine times slower).  Several of these are read once per file.  The
+# pattern and the list keep Readonly, which handles references.
 
 # Exit codes: the contract with cron, the Task Scheduler and "--exit N".
-Readonly our $EXIT_OK       => 0;
-Readonly our $EXIT_FATAL    => 1;
-Readonly our $EXIT_LOCKED   => 2;
-Readonly our $EXIT_WARNINGS => 3;
-Readonly our $EXIT_DRIFT    => 4;
+Readonly::Scalar our $EXIT_OK       => 0;
+Readonly::Scalar our $EXIT_FATAL    => 1;
+Readonly::Scalar our $EXIT_LOCKED   => 2;
+Readonly::Scalar our $EXIT_WARNINGS => 3;
+Readonly::Scalar our $EXIT_DRIFT    => 4;
 
 # Highest exit status a process can report; "--exit N" is checked against it.
-Readonly our $EXIT_MAX => 255;
+Readonly::Scalar our $EXIT_MAX => 255;
 
 # Wire protocol version spoken by this release; client and server must agree.
-Readonly our $PROTOCOL_VERSION => 2;
+Readonly::Scalar our $PROTOCOL_VERSION => 2;
 
 # Where the server tree lives when neither --root nor FILESYNC_ROOT says.
-Readonly our $DEFAULT_SERVER_ROOT => '/srv/filesync';
+Readonly::Scalar our $DEFAULT_SERVER_ROOT => '/srv/filesync';
 
 # The program sshd runs as the forced command.
-Readonly our $SERVER_PROGRAM => 'filesync-server';
+Readonly::Scalar our $SERVER_PROGRAM => 'filesync-server';
 
 # Session roles.  A replica only ever pulls.
-Readonly our $ROLE_CLIENT  => 'client';
-Readonly our $ROLE_REPLICA => 'replica';
+Readonly::Scalar our $ROLE_CLIENT  => 'client';
+Readonly::Scalar our $ROLE_REPLICA => 'replica';
 Readonly our @ROLES        => ($ROLE_CLIENT, $ROLE_REPLICA);
 
 # Manifest entry types.
-Readonly our $TYPE_FILE => 'f';
-Readonly our $TYPE_DIR  => 'd';
+Readonly::Scalar our $TYPE_FILE => 'f';
+Readonly::Scalar our $TYPE_DIR  => 'd';
+
+# Fields of the list stat() and lstat() return.
+Readonly::Scalar our $STAT_MODE  => 2;
+Readonly::Scalar our $STAT_SIZE  => 7;
+Readonly::Scalar our $STAT_MTIME => 9;
 
 # Permission bits worth carrying between machines, and the mode a file gets
 # when the peer did not send one.
-Readonly our $MODE_MASK         => oct('7777');
-Readonly our $DEFAULT_FILE_MODE => oct('644');
+Readonly::Scalar our $MODE_MASK         => oct('7777');
+Readonly::Scalar our $DEFAULT_FILE_MODE => oct('644');
 
 # Reserved names inside a sync root or the master.
-Readonly our $ROOT_MARKER  => '.filesync-root';
-Readonly our $TEMP_PREFIX  => '.filesync-tmp-';
-Readonly our $SNAPSHOT_DIR => '.filesync-snapshots';
+Readonly::Scalar our $ROOT_MARKER  => '.filesync-root';
+Readonly::Scalar our $TEMP_PREFIX  => '.filesync-tmp-';
+Readonly::Scalar our $SNAPSHOT_DIR => '.filesync-snapshots';
 
 # Temporaries older than this are from a run that died; younger ones may
 # belong to a run in progress.
-Readonly our $STALE_TEMP_SECONDS => 3600;
+Readonly::Scalar our $STALE_TEMP_SECONDS => 3600;
 
 # Largest single data frame either side accepts for an upload chunk.
-Readonly our $MAX_CHUNK_BYTES => 8 * 1024 * 1024;
+Readonly::Scalar our $MAX_CHUNK_BYTES => 8 * 1024 * 1024;
 
 # Repo policy defaults, also used when a stored config omits a key.
-Readonly our $TRASH_DAYS         => 30;
-Readonly our $MAX_DELETES        => 200;
-Readonly our $MAX_DELETE_PERCENT => 10;
+Readonly::Scalar our $TRASH_DAYS         => 30;
+Readonly::Scalar our $MAX_DELETES        => 200;
+Readonly::Scalar our $MAX_DELETE_PERCENT => 10;
 
 # Replica snapshots kept by "filesync snapshot" when nothing says otherwise.
-Readonly our $SNAPSHOT_KEEP => 14;
+Readonly::Scalar our $SNAPSHOT_KEEP => 14;
 
 # Calendar arithmetic.
-Readonly our $SECONDS_PER_DAY => 86_400;
+Readonly::Scalar our $SECONDS_PER_DAY => 86_400;
 
 # Repo and client ids become directory names, so they are short.
-Readonly our $MAX_ID_LENGTH => 64;
+Readonly::Scalar our $MAX_ID_LENGTH => 64;
+
+# The Digest::SHA algorithm behind every content hash.
+Readonly::Scalar our $SHA_BITS => 256;
 
 # A SHA-256 digest as it appears on the wire and in the index.
 Readonly our $SHA256_HEX => qr/\A[0-9a-f]{64}\z/;
 
 # Two clocks are treated as agreeing within this many seconds (FAT stores
 # mtimes in 2-second units).
-Readonly our $MTIME_TOLERANCE => 2;
+Readonly::Scalar our $MTIME_TOLERANCE => 2;
 
 our @EXPORT_OK = qw(
 	$EXIT_OK $EXIT_FATAL $EXIT_LOCKED $EXIT_WARNINGS $EXIT_DRIFT $EXIT_MAX
 	$PROTOCOL_VERSION $DEFAULT_SERVER_ROOT $SERVER_PROGRAM
 	$ROLE_CLIENT $ROLE_REPLICA @ROLES
 	$TYPE_FILE $TYPE_DIR
+	$STAT_MODE $STAT_SIZE $STAT_MTIME
 	$MODE_MASK $DEFAULT_FILE_MODE
 	$ROOT_MARKER $TEMP_PREFIX $SNAPSHOT_DIR $STALE_TEMP_SECONDS
 	$MAX_CHUNK_BYTES
 	$TRASH_DAYS $MAX_DELETES $MAX_DELETE_PERCENT $SNAPSHOT_KEEP
-	$SECONDS_PER_DAY $MAX_ID_LENGTH $SHA256_HEX $MTIME_TOLERANCE
+	$SECONDS_PER_DAY $MAX_ID_LENGTH $SHA_BITS $SHA256_HEX $MTIME_TOLERANCE
 );
 
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
@@ -109,8 +123,9 @@ App::FileSync::Constants - shared constants for App::FileSync
 =head1 DESCRIPTION
 
 Read-only values (L<Readonly>) shared by the client, server and admin tools:
-exit codes, the protocol version, reserved file names, policy defaults and
-size limits.  Import them by name, or all of them with C<:all>.
+exit codes, the protocol version, reserved file names, the fields of
+C<stat()>, policy defaults and size limits.  Import them by name, or all of
+them with C<:all>.
 
 =head1 EXIT CODES
 

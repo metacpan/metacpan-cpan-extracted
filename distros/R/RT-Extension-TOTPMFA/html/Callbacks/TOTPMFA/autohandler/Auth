@@ -1,6 +1,9 @@
 <%doc>
 Redirect the user to the TOTP MFA authentication page if the user is logged
 in, has MFA enabled, and their MFA session isn't currently valid.
+
+For a helper, rather than redirecting, trigger a 403 (forbidden) response
+if MFA is enabled for the user and they have no valid MFA session.
 </%doc>
 \
 <%INIT>
@@ -14,9 +17,6 @@ my $CurrentPath = $m->request_comp->path;
 # Don't redirect if we're already on the target page.
 return if ($CurrentPath =~ /\Q\/NoAuth\/TOTPMFALogin.html\E/);
 
-# Don't redirect if this is a helper, not a main page.
-return if ($CurrentPath =~ /\Q\/Helpers\/\E/);
-
 # Don't redirect if the session is authenticated for MFA already.
 return if RT::Extension::TOTPMFA::SessionIsAuthenticated(\%session);
 
@@ -24,6 +24,19 @@ return if RT::Extension::TOTPMFA::SessionIsAuthenticated(\%session);
 return
   if not RT::Extension::TOTPMFA::IsEnabledForUser(
     $session{'CurrentUser'}->UserObj);
+
+# Reject the request with a 403 if the requested item is a helper rather
+# than a normal page (issue #10).
+if ($CurrentPath =~ /\Q\/Helpers\/\E/) {
+    RT->Logger->debug('TOTPMFA - rejecting unauthorised helper request');
+    $HTML::Mason::Commands::r->headers_out->{'Status'} =
+      '403 Forbidden - MFA required';
+    $HTML::Mason::Commands::r->content_type("text/plain; charset=utf-8");
+    $m->error_format("text");
+    $m->out("RT/$RT::VERSION 403 MFA required\n");
+    $m->abort(403);
+    return;
+}
 
 # Redirect to the MFA login form, with "next" set to a hash encoding our
 # original destination.

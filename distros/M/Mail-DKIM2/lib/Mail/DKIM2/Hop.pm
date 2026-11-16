@@ -2,7 +2,7 @@ package Mail::DKIM2::Hop;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 use Carp ();
 use Mail::DKIM2::Util ();
@@ -107,6 +107,38 @@ sub next_instance {
     }
     $r{instance} = Mail::DKIM2::MessageInstance->calculate($msg, parse_mime($previous), @calc);
     return $done->('changed', $detail);
+}
+
+# snapshot_vouches($message, $snapshot): is the snapshot one of this very
+# message? True when the message has exactly the snapshot's DKIM2-Signature
+# fields and, under them, the Message-Instance fields they cover (white space
+# apart: neither is hashed with it). What a signature was verified over on
+# arrival is then what is on the message now. Instances above the signatures
+# are this host's own, and next_instance and the Gate judge those.
+sub snapshot_vouches {
+    my ($class, $message, $snapshot) = @_;
+    Carp::croak("snapshot_vouches needs a message and a snapshot")
+        unless defined $message && length $message && defined $snapshot && length $snapshot;
+    my ($msg, $snap) = map { Mail::DKIM2::Chain->from_message($_) } $message, $snapshot;
+    for my $c ($msg, $snap) {
+        my $e = $c->numbering_error(Signatures => 1) // next;
+        return (0, "the snapshot is not of this message: $e");
+    }
+    my $same = sub {
+        my ($x, $y) = map { my $v = $_ // ''; $v =~ s/\A[^:]*://; $v =~ s/\s+//g; $v } @_;
+        return length $x && $x eq $y;
+    };
+    my %i = map { $_ => 1 } $msg->signature_numbers, $snap->signature_numbers;
+    for my $i (sort { $a <=> $b } keys %i) {
+        return (0, "the snapshot is not of this message: DKIM2-Signature i=$i differs")
+            unless $same->(scalar $msg->signature_field($i), scalar $snap->signature_field($i));
+    }
+    my $covered = $snap->covered_m;
+    for my $m (grep { $_ <= $covered } $snap->instance_numbers) {
+        return (0, "the snapshot is not of this message: Message-Instance m=$m differs")
+            unless $same->(scalar $msg->instance_field($m), scalar $snap->instance_field($m));
+    }
+    return (1, undef);
 }
 
 # The lowest m= at which a snapshot's Message-Instance fields are not the
@@ -240,6 +272,21 @@ without an instance for one of those is one L<Mail::DKIM2::Gate> refuses.
 =back
 
 Dies, as C<calculate> does, if the instance cannot be computed.
+
+=head2 snapshot_vouches
+
+    my ($ok, $why) = Mail::DKIM2::Hop->snapshot_vouches($message, $snapshot);
+
+Is C<$snapshot> a snapshot of this very message? True when the message has
+exactly the snapshot's DKIM2-Signature fields, and the Message-Instance
+fields those signatures cover, each the same apart from white space.
+Instances above the signatures are not compared: they are this host's own,
+and C<next_instance> and L<Mail::DKIM2::Gate> judge them.
+
+A host that took the snapshot only of a message whose chain verified can
+then take the message's signatures as verified, and pass
+C<< VerifyResult => 'pass' >> to the Gate. When it is false, C<$why> says
+which field differs; such a message is not one to sign.
 
 =head1 AUTHOR
 

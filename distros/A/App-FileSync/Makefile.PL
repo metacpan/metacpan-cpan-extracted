@@ -42,12 +42,14 @@ WriteMakefile(
 		'IO::Handle'     => 0,
 		'IPC::Open3'     => 0,
 		'IPC::System::Simple' => '1.30',
+		'JSON::MaybeXS'  => '1.004',	# pulls in Cpanel::JSON::XS given a compiler
 		'JSON::PP'       => 0,
 		'List::Util'     => '1.54',
 		'Log::Abstraction' => '0.36',	# structured fields
 		'Object::Configure' => 0,
 		'Params::Get'    => '0.17',
 		'Params::Validate::Strict' => '0.41',
+		'POSIX'          => 0,
 		'Readonly'       => '2.05',
 		'Scalar::Util'   => 0,
 		'Sub::Private'   => '0.07',
@@ -56,16 +58,23 @@ WriteMakefile(
 		'Time::HiRes'    => 0,
 		'Time::Local'    => 0,
 		'version'        => '0.77',
+		($^O eq 'MSWin32' ? ('Win32API::File' => 0) : ()),	# Process: pipe ends the child must not inherit
 	}, TEST_REQUIRES   => {
 		'Errno'          => 0,
 		'File::Find'     => 0,
 		'File::Temp'     => 0,
-		'POSIX'          => 0,
 		'Test::Exception' => 0,
 		'Test::Mockingbird::TimeTravel' => '0.14',
 		'Test::Most'     => 0,
 	}, META_MERGE      => {
 		'meta-spec' => { version => 2 },
+		prereqs     => {
+			runtime => {
+				recommends => {
+					'Cpanel::JSON::XS' => 0,	# JSON::MaybeXS adds it given a compiler
+				},
+			},
+		},
 		dynamic_config => 0,
 		no_index    => {
 			directory => [ 't', 'xt' ],	# t/lib/TestSync.pm is not for CPAN

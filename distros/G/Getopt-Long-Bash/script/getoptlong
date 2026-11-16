@@ -72,7 +72,7 @@ B<Or:>
 
 =head1 VERSION
 
-1.1.1
+1.2.0
 
 =head1 DESCRIPTION
 
@@ -229,6 +229,19 @@ was specified.
 C<--config=value> sets to C<value>, C<--config> without value sets to
 empty string. Short form C<-c> sets to empty string; C<-cvalue> form
 is B<not> supported.
+
+C<--no-config>, or a negative alias, takes the option back: the
+variable is unset, as when the option is not specified. A value given
+to the variable before the options are parsed works as a default,
+which stays without the option and is removed by C<--no-config>:
+
+    config=default.conf
+    . getoptlong.sh OPTS "$@"
+    [[ -v config ]] && echo "config: ${config:-default.conf}"
+
+A callback is called with an empty value for C<--no-config> as well,
+after the variable is unset: use C<${config-}> in it, not C<$config>,
+under C<set -u>.
 
 =head2 ARRAY (C<@>)
 

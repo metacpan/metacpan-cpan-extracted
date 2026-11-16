@@ -15,7 +15,7 @@ use DBIx::Squirrel::st   qw();
 use namespace::clean;
 
 our @ISA     = 'DBI';
-our $VERSION = 'v3.0.2';
+our $VERSION = 'v3.0.3';
 
 # Export what the DBI exports, such as :sql_types, to the package using
 # DBIx::Squirrel. The names are the DBI's, so the DBI's import exports

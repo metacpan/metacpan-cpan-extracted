@@ -365,6 +365,8 @@ SKIP: {
     my $r = $raw->("GET /p?q=1 HTTP/1.1\r\nHost: [::1]:8080\r\nConnection: close\r\n\r\n", $rport);
     like $r, qr{^HTTP/1\.1 301 }, 'redirect_https answers 301';
     like $r, qr{Location: https://\[::1\]:8443/p\?q=1\r\n}, '...with the bracketed IPv6 host kept whole';
+    $r = $raw->("GET /p?q=1 HTTP/1.1\r\nHost: plain.test:8080\r\nConnection: close\r\n\r\n", $rport);
+    like $r, qr{Location: https://plain\.test:8443/p\?q=1\r\n}, '...and a plain host cut at its port';
 }
 
 {

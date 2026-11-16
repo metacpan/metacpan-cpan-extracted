@@ -46,7 +46,7 @@ Command::Run - Execute external command or code reference
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # DESCRIPTION
 
@@ -57,6 +57,14 @@ When a code reference is passed as the first element of the command
 array, it is called in a forked child process instead of executing an
 external command.  This avoids the overhead of loading Perl and
 modules for each invocation.
+
+The child process ends when the code returns, without going back to
+the program of the caller: `END` blocks and destructors of the caller
+do not run in the child.  STDOUT and STDERR are flushed before that,
+but other file handles are not, so the code should close the files it
+writes.  If the code dies, the message goes to STDERR and the exit
+status is 255.  If the code calls `exit` by itself, `END` blocks do
+run in the child.
 
 This module inherits from [Command::Run::Tmpfile](https://metacpan.org/pod/Command%3A%3ARun%3A%3ATmpfile), which provides
 temporary file functionality.  The captured output is stored in this
@@ -205,7 +213,10 @@ The `run` method returns a hash reference containing:
 
 - **result**
 
-    The exit status of the command (`$?`).
+    The exit status of the command (`$?`).  When the command can not be
+    executed, the exit status is 127 (`$result->{result} >> 8`), as
+    the shell does.  When a code reference dies, it is 255.  In nofork
+    mode, it is -1 for a code reference that dies.
 
 - **data**
 

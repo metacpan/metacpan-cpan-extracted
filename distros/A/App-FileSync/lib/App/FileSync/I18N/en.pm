@@ -7,7 +7,7 @@ package App::FileSync::I18N::en;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 our %MESSAGES = (
 	# ---------------------------------------------------------- i18n itself
@@ -147,6 +147,7 @@ our %MESSAGES = (
 	'server.no_connection'   => 'Server: no connection',
 	'server.locked'          => q{Another sync session holds the lock for repo '%{repo}s'},
 	'server.unknown_error'   => 'unknown server error',
+	'server.journal_failed'  => 'cannot journal the failed session: %{error}s',
 	'server.not_allowed'     => q{Client '%{client}s' is not allowed on repo '%{repo}s'},
 	'server.wrong_role'      => q{Client '%{client}s' is registered as '%{registered}s', not '%{asked}s'},
 	'server.proto'           => 'Unsupported protocol version',
@@ -241,6 +242,9 @@ our %MESSAGES = (
 	'transport.missing'   => '%{transport}s transport: no %{what}s given',
 	'transport.bad_value' => q{SSH transport: bad %{field}s '%{value}s'},
 	'transport.bad_id'    => 'SSH transport: %{reason}s',
+
+	'process.spawn'   => q{Cannot start '%{program}s': %{error}s},
+	'process.inherit' => 'Cannot stop a child process inheriting a pipe: %{error}s',
 
 	'cli.help.client' => <<'USAGE',
 filesync - keep a directory in step with a master copy

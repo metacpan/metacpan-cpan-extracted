@@ -280,4 +280,29 @@ lives_ok {
         'sign_token iat value is numeric in raw JSON' );
 }
 
+# ---------------------------------------------------------------------------
+# sub, aud, and iss must always be encoded as a JSON string (RFC 7519 §4.1.2).
+# ---------------------------------------------------------------------------
+
+{
+    my $token = $jwt->create_id_token(
+        sub => 12345,  # Supplied by host app, e.g. database ID
+        aud => 23456,  # Ultimately an HTTP query parameter
+        iss => 34567,  # Should be a URL, but we test numeric to ensure stringification occurs
+    );
+
+    my @parts = split /\./, $token;
+    use MIME::Base64 qw(decode_base64);
+    ( my $padded = $parts[1] ) =~ tr/-_/+\//;
+    $padded .= '=' x ( (4 - length($padded) % 4) % 4 );
+    my $raw_payload = decode_base64($padded);
+
+    like( $raw_payload, qr/"sub"\s*:\s*"12345"/,
+        'create_id_token encodes numeric sub as a JSON string' );
+    like( $raw_payload, qr/"aud"\s*:\s*"23456"/,
+        'create_id_token encodes numeric aud as a JSON string' );
+    like( $raw_payload, qr/"iss"\s*:\s*"34567"/,
+        'create_id_token encodes numeric iss as a JSON string' );
+}
+
 done_testing();

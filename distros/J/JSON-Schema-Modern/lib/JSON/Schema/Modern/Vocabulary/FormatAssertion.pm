@@ -4,7 +4,7 @@ package JSON::Schema::Modern::Vocabulary::FormatAssertion;
 # vim: set ts=8 sts=2 sw=2 tw=100 et :
 # ABSTRACT: Implementation of the JSON Schema Format-Assertion vocabulary
 
-our $VERSION = '0.653';
+our $VERSION = '0.654';
 
 use 5.020;
 use Moo;
@@ -61,7 +61,7 @@ sub keywords ($class, $spec_version) {
       { domain_disable_tld_validation => 1, domain_allow_single_label => 1 });
   };
   my $idn_decode = sub {  # idn-hostname
-    require Net::IDN::Encode;
+    require Net::IDN::Encode; Net::IDN::Encode->VERSION('2.600');
     try { return Net::IDN::Encode::domain_to_ascii($_[0]) } catch ($e) { return $_[0]; }
   };
   my $is_ipv4 = sub {     # ipv4, ipv6
@@ -256,7 +256,7 @@ sub keywords ($class, $spec_version) {
 my $warnings = {
   email => sub { require Email::Address::XS; Email::Address::XS->VERSION(1.04); 1 },
   hostname => sub { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); 1 },
-  'idn-hostname' => sub { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); require Net::IDN::Encode; 1 },
+  'idn-hostname' => sub { require Data::Validate::Domain; Data::Validate::Domain->VERSION(0.13); require Net::IDN::Encode; Net::IDN::Encode->VERSION('2.600'); 1 },
   uri => sub { require Data::Validate::URI; 1 },
 };
 $warnings->{'idn-email'} = $warnings->{email};
@@ -326,7 +326,7 @@ JSON::Schema::Modern::Vocabulary::FormatAssertion - Implementation of the JSON S
 
 =head1 VERSION
 
-version 0.653
+version 0.654
 
 I use a linearly-increasing version numbering scheme. No meaning should be
 presumed or inferred from the version being less than 1.0.

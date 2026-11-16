@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 use Test::More;
-use HMTest qw(free_ports quiet_child server_reap);
+use HMTest qw(free_ports quiet_child server_reap server_guard server_status slurp);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -118,6 +118,20 @@ if ($sup == 0) {
         host => '127.0.0.1', port => $port, workers => 1,
     );
     exit 0;
+}
+server_guard($sup);
+
+# A response cut short is a die in read_response, and the file ended on that
+# one line (a Haiku smoker: "peer closed in headers" after the first test),
+# with the server's own account of it unread in the stderr log. Said here,
+# with the server's exit status, when the file ends without its plan.
+my $owner = $$;
+END {
+    return unless $$ == $owner;
+    my $tb = Test::More->builder;
+    return if $tb->has_plan && $tb->is_passing;
+    diag("server: " . (server_status($sup) // 'alive') . "; its stderr: "
+       . (slurp("$dir/stderr.log") =~ /\S/ ? slurp("$dir/stderr.log") : '(empty)'));
 }
 
 use constant BUDGET => 15;

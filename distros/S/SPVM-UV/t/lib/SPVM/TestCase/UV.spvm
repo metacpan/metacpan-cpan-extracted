@@ -8,6 +8,7 @@ class TestCase::UV {
   use Sys::Ioctl::Constant as IOCTL_C;
   use Sys::IO::Constant as IO_C;
   use UV::Constant as UV_C;
+  use Sys::Signal::Constant as SIGNAL_C;
   
   static method test : int () {
     
@@ -785,6 +786,297 @@ class TestCase::UV {
         return 0;
       }
     }
+    
+    # env
+    {
+      my $loop = UV::Loop->new;
+      
+      my $read_pipe = UV::Handle::Pipe->new;
+      $loop->pipe_init($read_pipe, 0);
+      
+      my $container0 = UV::StdioContainer->new;
+      $container0->set_flags(UV_C->UV_IGNORE);
+      
+      my $container1 = UV::StdioContainer->new;
+      $container1->set_flags(UV_C->UV_CREATE_PIPE | UV_C->UV_WRITABLE_PIPE);
+      $container1->set_stream($read_pipe);
+      
+      my $stdios = [$container0, $container1];
+      
+      my $process = UV::Handle::Process->new;
+      
+      my $exit_called_ref = [0];
+      my $status_ref = [(long)-1];
+      my $read_data = new_string_len 20;
+      my $read_length_ref = [-1];
+      
+      my $read_cb = [$read_pipe : , $read_data : , $read_length_ref : ] method : void ($stream : UV::Handle::Stream, $nread : int, $buf : string) {
+        if ($nread > 0) {
+          my $copy_len = $nread > 20 ? 20 : (int)$nread;
+          for (my $i = 0; $i < $copy_len; $i++) {
+            $read_data->[$i] = $buf->[$i];
+          }
+          $read_length_ref->[0] = (int)$nread;
+        }
+        $stream->read_stop;
+        $stream->close_safe;
+        $read_pipe->close_safe;
+      };
+      weaken $read_cb->{read_pipe};
+      
+      my $options = UV::ProcessOptions->new;
+      $options->set_file("perl");
+      $options->set_args(["perl", "-e", "print \$ENV{SPVM_UV_TEST_VAL}"]);
+      $options->set_env(["SPVM_UV_TEST_VAL=hello_env"]);
+      $options->set_stdios($stdios);
+      
+      $options->set_exit_cb([$exit_called_ref : , $status_ref : ] method : void ($process_handle : UV::Handle::Process, $exit_status : long, $term_signal : int) {
+        $exit_called_ref->[0]++;
+        $status_ref->[0] = $exit_status;
+        $process_handle->close_safe;
+      });
+      
+      $loop->spawn($process, $options);
+      
+      $read_pipe->read_start($read_data, 20, $read_cb);
+      
+      $loop->run(UV_C->UV_RUN_DEFAULT);
+      
+      unless ($exit_called_ref->[0] == 1 && $status_ref->[0] == 0) {
+        diag;
+        return 0;
+      }
+      
+      unless ($read_length_ref->[0] == 9 && Fn->substr($read_data, 0, $read_length_ref->[0]) eq "hello_env") {
+        diag $read_length_ref->[0];
+        diag $read_data;
+        return 0;
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method signal : int () {
+    
+    if (Sys::OS->is_windows) {
+      diag "[Test Skip] Signal tests are skipped on Windows.";
+    }
+    else {
+      # SIGINT
+      {
+        my $loop = UV::Loop->new;
+        
+        my $signal = UV::Handle::Signal->new;
+        $loop->signal_init($signal);
+        
+        my $called_count_ref = [0];
+        my $received_signum_ref = [-1];
+        
+        $signal->start([$called_count_ref : int[], $received_signum_ref : int[]] method : void ($signal_handle : UV::Handle::Signal, $signum : int) {
+          $called_count_ref->[0]++;
+          $received_signum_ref->[0] = $signum;
+          $signal_handle->stop;
+          $signal_handle->close_safe;
+        }, SIGNAL_C->SIGINT);
+        
+        # Send SIGINT to self
+        Sys::Signal->raise(SIGNAL_C->SIGINT);
+        
+        $loop->run(UV_C->UV_RUN_DEFAULT);
+        
+        unless ($called_count_ref->[0] == 1) {
+          return 0;
+        }
+        
+        unless ($received_signum_ref->[0] == SIGNAL_C->SIGINT) {
+          return 0;
+        }
+      }
+      
+      # SIGTERM
+      {
+        my $loop = UV::Loop->new;
+        
+        my $signal = UV::Handle::Signal->new;
+        $loop->signal_init($signal);
+        
+        my $called_count_ref = [0];
+        my $received_signum_ref = [-1];
+        
+        $signal->start([$called_count_ref : int[], $received_signum_ref : int[]] method : void ($signal_handle : UV::Handle::Signal, $signum : int) {
+          $called_count_ref->[0]++;
+          $received_signum_ref->[0] = $signum;
+          $signal_handle->stop;
+          $signal_handle->close_safe;
+        }, SIGNAL_C->SIGTERM);
+        
+        # Send SIGTERM to self
+        Sys::Signal->raise(SIGNAL_C->SIGTERM);
+        
+        $loop->run(UV_C->UV_RUN_DEFAULT);
+        
+        unless ($called_count_ref->[0] == 1) {
+          return 0;
+        }
+        
+        unless ($received_signum_ref->[0] == SIGNAL_C->SIGTERM) {
+          return 0;
+        }
+      }
+      
+      # SIGHUP
+      {
+        my $loop = UV::Loop->new;
+        
+        my $signal = UV::Handle::Signal->new;
+        $loop->signal_init($signal);
+        
+        my $called_count_ref = [0];
+        my $received_signum_ref = [-1];
+        
+        $signal->start([$called_count_ref : int[], $received_signum_ref : int[]] method : void ($signal_handle : UV::Handle::Signal, $signum : int) {
+          $called_count_ref->[0]++;
+          $received_signum_ref->[0] = $signum;
+          $signal_handle->stop;
+          $signal_handle->close_safe;
+        }, SIGNAL_C->SIGHUP);
+        
+        # Send SIGHUP to self
+        Sys::Signal->raise(SIGNAL_C->SIGHUP);
+        
+        $loop->run(UV_C->UV_RUN_DEFAULT);
+        
+        unless ($called_count_ref->[0] == 1) {
+          return 0;
+        }
+        
+        unless ($received_signum_ref->[0] == SIGNAL_C->SIGHUP) {
+          return 0;
+        }
+      }
+
+      # SIGWINCH
+      {
+        my $loop = UV::Loop->new;
+        
+        my $signal = UV::Handle::Signal->new;
+        $loop->signal_init($signal);
+        
+        my $called_count_ref = [0];
+        my $received_signum_ref = [-1];
+        
+        $signal->start([$called_count_ref : int[], $received_signum_ref : int[]] method : void ($signal_handle : UV::Handle::Signal, $signum : int) {
+          $called_count_ref->[0]++;
+          $received_signum_ref->[0] = $signum;
+          $signal_handle->stop;
+          $signal_handle->close_safe;
+        }, SIGNAL_C->SIGWINCH);
+        
+        # Send SIGWINCH to self
+        Sys::Signal->raise(SIGNAL_C->SIGWINCH);
+        
+        $loop->run(UV_C->UV_RUN_DEFAULT);
+        
+        unless ($called_count_ref->[0] == 1) {
+          return 0;
+        }
+        
+        unless ($received_signum_ref->[0] == SIGNAL_C->SIGWINCH) {
+          return 0;
+        }
+      }
+    }
+    
+    return 1;
+  }
+  
+  static method fs_event : int ($temp_dir : string) {
+    
+    my $loop = UV::Loop->new;
+    
+    my $fs_event = UV::Handle::FsEvent->new;
+    $loop->fs_event_init($fs_event);
+    
+    my $called_count_ref = [0];
+    my $filename_ref = [(string)undef];
+    my $events_ref = [0];
+    my $status_ref = [0];
+    
+    my $target_file = $temp_dir . "/test_fs_event.txt";
+    
+    $fs_event->start([$called_count_ref : int[], $filename_ref : string[], $events_ref : int[], $status_ref : int[]] method : void ($fs_event_handle : UV::Handle::FsEvent, $filename : string, $events : int, $status : int) {
+      $called_count_ref->[0]++;
+      $filename_ref->[0] = $filename;
+      $events_ref->[0] = $events;
+      $status_ref->[0] = $status;
+      $fs_event_handle->stop;
+      $fs_event_handle->close_safe;
+    }, $temp_dir, 0);
+    
+    {
+      Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+      my $fh = $_->[0];
+      Sys->print($fh, "hello fs_event");
+      Sys->close($fh);
+    }
+    
+    $loop->run(UV_C->UV_RUN_DEFAULT);
+    
+    Sys->unlink($target_file);
+    
+    unless ($called_count_ref->[0] > 0) {
+      return 0;
+    }
+    
+    unless ($status_ref->[0] == 0) {
+      return 0;
+    }
+    
+    return 1;
+  }
+
+  static method fs_event_constants : int ($temp_dir : string) {
+    
+    my $loop = UV::Loop->new;
+    
+    my $fs_event = UV::Handle::FsEvent->new;
+    $loop->fs_event_init($fs_event);
+    
+    my $called_count_ref = [0];
+    my $events_ref = [0];
+    
+    my $target_file = $temp_dir . "/test_fs_event_const.txt";
+    
+    $fs_event->start([$called_count_ref : int[], $events_ref : int[]] method : void ($fs_event_handle : UV::Handle::FsEvent, $filename : string, $events : int, $status : int) {
+      $called_count_ref->[0]++;
+      $events_ref->[0] = $events;
+      $fs_event_handle->stop;
+      $fs_event_handle->close_safe;
+    }, $temp_dir, 0);
+    
+    {
+      Sys->open(my $_ = [(Sys::IO::FileStream)undef], "w", $target_file);
+      my $fh = $_->[0];
+      Sys->print($fh, "test constants");
+      Sys->close($fh);
+    }
+    
+    $loop->run(UV_C->UV_RUN_DEFAULT);
+    
+    Sys->unlink($target_file);
+    
+    unless ($called_count_ref->[0] > 0) {
+      return 0;
+    }
+    
+    my $rename_const = UV_C->UV_RENAME;
+    my $change_const = UV_C->UV_CHANGE;
+    
+    if (($events_ref->[0] & ($rename_const | $change_const)) == 0) {
+      return 0;
+    }
+    
     return 1;
   }
   

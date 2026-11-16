@@ -163,6 +163,12 @@ struct hm_conn {
                                    * sends goes to the handle's read half,
                                    * never to the request parser         */
     unsigned char accepts_gzip;   /* this request's Accept-Encoding    */
+    unsigned char te_trailers;    /* the request's TE listed "trailers", so
+                                   * a chunked body may end with trailer
+                                   * fields (hm_stream_finish). A client
+                                   * that did not ask is allowed to discard
+                                   * them and may not even parse them, so
+                                   * without this bit they are dropped    */
     unsigned char cont_sent;      /* a 100 Continue has gone out for the
                                    * request being read. Per request, and
                                    * on the connection rather than on the
@@ -1921,6 +1927,24 @@ static const char *hm_find_header(const char *head, size_t headlen,
     return NULL;
 }
 
+/* Is "trailers" one of the t-codings in a TE value? The value is a
+ * comma-separated list, each member a token with optional ;parameters and
+ * optional whitespace, so each token is compared whole and without regard
+ * to case. "x-trailers" or "trailersx" is a different token. */
+static int hm_te_names_trailers(const char *v, size_t vl) {
+    size_t i = 0;
+    while (i < vl) {
+        size_t start;
+        while (i < vl && (v[i] == ' ' || v[i] == '\t' || v[i] == ',')) i++;
+        start = i;
+        while (i < vl && v[i] != ',' && v[i] != ';' && v[i] != ' ' && v[i] != '\t') i++;
+        if (i - start == 8 && hm_strncasecmp(v + start, "trailers", 8) == 0)
+            return 1;
+        while (i < vl && v[i] != ',') i++;
+    }
+    return 0;
+}
+
 /* case-insensitive substring search */
 static int hm_ci_contains(const char *hay, size_t hl, const char *needle) {
     size_t nl = strlen(needle), i;
@@ -2266,6 +2290,7 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
      * different Accept-Encoding on its next request, and the response path
      * has no env to read by the time it needs this. One bit, set below. */
     c->accepts_gzip = 0;
+    c->te_trailers = 0;
 
     /* header lines, from the framing pass's index (no rescan) */
     char keybuf[300];
@@ -2319,6 +2344,10 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
         if (nk == 15 && p[6] == '-' && c->loop->compress
             && memEQ(keybuf + 5, "ACCEPT_ENCODING", 15))
             c->accepts_gzip = (unsigned char)hz_accepts_gzip(vp, nv);
+        /* TE is read the same way, into one bit, and still stored as HTTP_TE.
+         * Several TE lines form one list, so the bit only ever goes on. */
+        if (nk == 2 && memEQ(keybuf + 5, "TE", 2) && hm_te_names_trailers(vp, nv))
+            c->te_trailers = 1;
 
         if (nk == 14 && p[7] == '-' && memEQ(keybuf + 5, "CONTENT_LENGTH", 14)) { /* # uncoverable condition right count:3 class:ignore_covered_err */
             hm_env_store(env, HMK_CONTENT_LENGTH, newSVpvn(vp, nv));
@@ -2388,6 +2417,13 @@ static HV *hm_build_env(pTHX_ char *head, size_t headlen,
     else
         hm_env_store(env, HMK_PSGI_INPUT, hm_empty_input_sv(aTHX));
     hm_env_store(env, HMK_PSGIX_INPUT_BUFFERED, SvREFCNT_inc(hm_env_one));
+    /* The flag promises only what the framing can deliver: a streamed body
+     * is chunked on an HTTP/1.1 keep-alive connection and nowhere else, and
+     * only a chunked body has room for trailers. An application that then
+     * supplies its own Content-Length gives that room away again, see
+     * hm_stream_finish. */
+    if (c->te_trailers && c->req_11 && c->keepalive)
+        hv_stores(env, "psgix.hyperman.trailers", SvREFCNT_inc(hm_env_one));
 
     return env;
 }
@@ -4032,7 +4068,17 @@ static int hm_stream_write(pTHX_ int fd, UV id, UV serial, SV *data) {
     return (c->wlen - c->woff) > HM_WB_HIWAT ? 0 : 1;
 }
 
-static void hm_stream_close(pTHX_ int fd, UV id, UV serial) {
+/* End a streamed HTTP/1.1 body. `trailers` is a list from hm_trailers_build
+ * or NULL, borrowed for the duration of the call.
+ *
+ * Trailer fields have exactly one home in HTTP/1.1: between the last chunk
+ * and the blank line that ends a chunked body (RFC 9112 7.1.2). So they go
+ * out when the body is chunked, the request was not a HEAD, and the client's
+ * TE asked for them. Otherwise the body ends as it would have with no list,
+ * since a counted or EOF-delimited body has no place for them and a client
+ * that did not ask may not parse them. Every name and value was checked by
+ * hm_trailers_build, so nothing here can put a bare CR or LF on the wire. */
+static void hm_stream_finish(pTHX_ int fd, UV id, UV serial, AV *trailers) {
     hm_loop *loop = hm_cur_loop;
     /*
      # uncoverable condition right count:1 class:ignore_covered_err
@@ -4047,8 +4093,21 @@ static void hm_stream_close(pTHX_ int fd, UV id, UV serial) {
     if (serial && c->stream_serial != serial) return;
     if (!c->awaiting) return;                    /* closed already         */
     c->stream_open = 0;
-    if (c->stream_mode == HM_SM_CHUNKED && !c->is_head)
-        hm_wb_put(c, "0\r\n\r\n", 5);
+    if (c->stream_mode == HM_SM_CHUNKED && !c->is_head) {
+        if (trailers && c->te_trailers) {
+            SV **field = AvARRAY(trailers);
+            SSize_t i, n = av_len(trailers) + 1;
+            hm_wb_put(c, "0\r\n", 3);
+            for (i = 0; i < n; i += 2) {
+                hm_wb_put(c, SvPVX_const(field[i]), SvCUR(field[i]));
+                hm_wb_put(c, ": ", 2);
+                hm_wb_put(c, SvPVX_const(field[i + 1]), SvCUR(field[i + 1]));
+                hm_wb_put(c, "\r\n", 2);
+            }
+            hm_wb_put(c, "\r\n", 2);
+        }
+        else hm_wb_put(c, "0\r\n\r\n", 5);
+    }
     else if (c->stream_mode == HM_SM_LENGTH && c->stream_left && !c->is_head) /* # uncoverable condition right count:3 class:ignore_covered_err */
         c->keepalive = 0;                        /* short body: cannot keep
                                                   * the connection in frame */
@@ -4058,6 +4117,10 @@ static void hm_stream_close(pTHX_ int fd, UV id, UV serial) {
     if (c->keepalive) c->stream_done = 1;        /* hm_flush: serve the
                                                   * pipeline when drained  */
     hm_flush(aTHX_ c);   /* closes when drained if keepalive is off */
+}
+
+static void hm_stream_close(pTHX_ int fd, UV id, UV serial) {
+    hm_stream_finish(aTHX_ fd, id, serial, NULL);
 }
 
 /* The parked-Future continuation: when the response Future resolves,
@@ -4274,6 +4337,10 @@ static void hm_delayed(pTHX_ hm_conn *c, SV *code) {
     FREETMPS; LEAVE;
     SvREFCNT_dec(responder);
 }
+
+/* ---- trailer fields: checked once, for both transports and both doors --- */
+
+#include "hm_trailers.h"
 
 /* ---- HTTP/2 (h2c via nghttp2), reusing the helpers above ----------------- */
 

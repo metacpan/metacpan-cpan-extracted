@@ -1695,13 +1695,22 @@
           "rpki_invalid",
           "rpki_not_found",
           "whois",
-          "prefixes"
+          "prefixes",
+          "rank",
+          "tier1",
+          "num_upstreams",
+          "upstreams",
+          "num_peers",
+          "peers",
+          "num_downstreams",
+          "downstreams",
+          "hosted_domains"
         ]
       }
     },
     {
       "name": "asn-paid-answer",
-      "why": "An AS on a paid plan: ASN Whois, its prefixes with RPKI status, and its counts.",
+      "why": "An AS on a paid plan: ASN Whois, its prefixes with RPKI status, its counts, its rank and neighbors from ASN Extended, and the domains it hosts.",
       "call": "lookupAsn",
       "target": 9009,
       "status": 200,
@@ -1779,7 +1788,31 @@
             "size": 0,
             "other_origins": []
           }
-        ]
+        ],
+        "rank": 341,
+        "tier1": false,
+        "num_upstreams": 18,
+        "upstreams": [
+          174,
+          260
+        ],
+        "num_peers": 1018,
+        "peers": [
+          42,
+          286
+        ],
+        "num_downstreams": 146,
+        "downstreams": [
+          3210,
+          3503
+        ],
+        "hosted_domains": {
+          "total": 51759,
+          "domains": [
+            "fotopedia.com",
+            "kissfm.ro"
+          ]
+        }
       },
       "expect": {
         "present": {
@@ -1795,11 +1828,20 @@
           "num_prefixes6": 807,
           "rpki_valid": 2972,
           "rpki_invalid": 50,
-          "rpki_not_found": 2295
+          "rpki_not_found": 2295,
+          "rank": 341,
+          "tier1": false,
+          "num_upstreams": 18,
+          "num_peers": 1018,
+          "num_downstreams": 146
         },
         "objects": [
           "whois",
-          "prefixes"
+          "prefixes",
+          "upstreams",
+          "peers",
+          "downstreams",
+          "hosted_domains"
         ],
         "empty": [],
         "absent": []

@@ -1,5 +1,20 @@
 Revision history for Module-Build-SysPath
 
+0.20    15 November 2026
+    - Add the perl-module-build-syspath agent skill in docs/skills/ describing
+      how to install and locate files with Module::Build::SysPath and Sys::Path.
+    - Install only files listed in MANIFEST when the distribution has one, and
+      warn about each file skipped because it is not listed, unless
+      MANIFEST.SKIP excludes it. Installs from a checkout no longer deploy
+      files that are missing from MANIFEST.
+    - Add file_modes option to set the permissions of installed files
+    - Keep the owner and group of installed files that replace existing ones,
+      including a conffile whose new version is accepted and its -spc copy.
+    - Install dot files listed in <path_type>_files.
+    - Load and declare IO::Any, which is used to checksum configuration files.
+    - Document <path_type>_files, MANIFEST filtering, seed file overwrites and
+      the unattended configuration file default.
+
 0.19    22 September 2026
     - Check configuration files at install time to preserve local changes made after Build.PL.
     - Restore active configuration files when installation fails and preserve

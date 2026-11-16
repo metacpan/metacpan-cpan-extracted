@@ -56,6 +56,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Text::Redact::Secrets" : ">= v1.0.0, < v2.0.0"
+         },
          "requires" : {
             "Carp" : "0",
             "Data::Dumper" : "0",
@@ -79,7 +82,7 @@
    "provides" : {
       "Ekorn::Pipeline" : {
          "file" : "lib/Ekorn/Pipeline.pm",
-         "version" : "v0.3.1"
+         "version" : "v0.3.3"
       },
       "Ekorn::Pipeline::Element" : {
          "file" : "lib/Ekorn/Pipeline/Element.pm"
@@ -163,7 +166,7 @@
          "web" : "https://github.com/nukopian/Ekorn-Pipeline"
       }
    },
-   "version" : "v0.3.1",
+   "version" : "v0.3.3",
    "x_serialization_backend" : "JSON::PP version 4.18",
    "x_static_install" : 1
 }

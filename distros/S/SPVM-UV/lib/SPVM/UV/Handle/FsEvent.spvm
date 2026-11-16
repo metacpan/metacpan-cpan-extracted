@@ -1,0 +1,23 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Handle::FsEvent extends UV::Handle {
+  
+  use UV::Callback::FsEvent;
+  use Resource::UV;
+  use UV::Resource::UV;
+  
+  # Fields
+  has fs_event_cb : rw UV::Callback::FsEvent;
+  
+  # Class Methods
+  native static method new : UV::Handle::FsEvent ();
+  
+  # Instance Methods
+  native method start : void ($cb : UV::Callback::FsEvent, $path : string, $flags : int);
+  
+  native method stop : void ();
+  
+  native method getpath : string ();
+  
+}

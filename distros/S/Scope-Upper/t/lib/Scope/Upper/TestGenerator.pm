@@ -44,7 +44,7 @@ sub import {
   warnings->unimport('experimental::smartmatch');
  }
 
- if ("$]" >= 5.010_001) {
+ if ("$]" >= 5.010_001 && "$]" < 5.037_010) {
   require feature;
   feature->import('switch');
  }

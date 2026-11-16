@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.16] - 2026-11-15 Ensure JWT and user claim values are appropriately stringified
+
+- Ensured numeric `sub` claims are serialized as JSON strings in issued JWTs
+  and UserInfo responses, as required by RFC 7519.
+
 ## [0.15] - 2026-06-21 Extension points implementation
 
 - Added support for registering additional functions that can be used to 

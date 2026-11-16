@@ -7,7 +7,6 @@ build_requires:
   ExtUtils::MakeMaker: '0'
   File::Find: '0'
   File::Temp: '0'
-  POSIX: '0'
   Test::Exception: '0'
   Test::Mockingbird::TimeTravel: '0.14'
   Test::Most: '0'
@@ -26,6 +25,8 @@ no_index:
     - inc
     - t
     - xt
+recommends:
+  Cpanel::JSON::XS: '0'
 requires:
   Carp: '0'
   Compress::Raw::Zlib: '0'
@@ -44,10 +45,12 @@ requires:
   IO::Handle: '0'
   IPC::Open3: '0'
   IPC::System::Simple: '1.30'
+  JSON::MaybeXS: '1.004'
   JSON::PP: '0'
   List::Util: '1.54'
   Log::Abstraction: '0.36'
   Object::Configure: '0'
+  POSIX: '0'
   Params::Get: '0.17'
   Params::Validate::Strict: '0.41'
   Readonly: '2.05'
@@ -63,5 +66,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/App-FileSync/issues
   repository: https://github.com/nigelhorne/App-FileSync.git
-version: 0.002.0
+version: 0.002.1
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -13,6 +13,7 @@ use File::Copy::Recursive 'dircopy';
 use File::Find::Rule;
 use Path::Tiny 'path';
 use File::Temp;
+use POSIX ();
 
 use FindBin qw($Bin);
 use lib File::Spec->catfile($Bin, 'lib');
@@ -155,11 +156,17 @@ PERL
             my $pid = open(my $out, '-|');
             die $! unless defined $pid;
             if (!$pid) {
-                chdir $dist or die $!;
-                open(STDIN, '<&', $stdin) or die $!;
-                open(STDERR, '>&', STDOUT) or die $!;
-                exec $^X, @inc, '-I'.$dist, '-MTestPaths', @args;
-                die "exec: $!";
+                # Never return into the test script from the child: a die here
+                # would be caught by the subtest and the child would keep forking.
+                eval {
+                    chdir $dist or die $!;
+                    open(STDIN, '<&', $stdin) or die $!;
+                    open(STDERR, '>&', STDOUT) or die $!;
+                    exec $^X, @inc, '-I'.$dist, '-MTestPaths', @args;
+                    die "exec: $!";
+                };
+                print "child setup failed: $@";
+                POSIX::_exit(127);
             }
             local $/;
             my $output = <$out>;

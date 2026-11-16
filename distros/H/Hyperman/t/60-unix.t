@@ -67,7 +67,9 @@ sub get_tcp {
     waitpid $pid, 0;
     is $? >> 8, 3, 'a regular file at the path is refused';
     open my $fh, '<', "$dir/file.err"; local $/; my $e = <$fh> // '';
-    like $e, qr/bind \Q$sock\E:0: File exists/, '...with EEXIST naming the path';
+    # EEXIST in this libc's words: Haiku says "File or Directory already exists"
+    my $eexist = do { local $! = POSIX::EEXIST(); "$!" };
+    like $e, qr/bind \Q$sock\E:0: \Q$eexist\E/, '...with EEXIST naming the path';
     unlink $sock;
 }
 {
@@ -83,7 +85,14 @@ sub get_tcp {
     }
     is get_unix($sock), "none|$sock|0|unset",
         'served over the unix socket: no REMOTE_ADDR, SERVER_NAME is the path, SERVER_PORT 0';
-    is sprintf('%04o', (stat $sock)[2] & 07777), '0600', 'mode 0600 applied to the socket file';
+    SKIP: {
+        # The mode is applied through the umask around the bind. Haiku's
+        # bind(2) creates the socket file with the process's original umask
+        # regardless (a smoker got 0644), so there the mode cannot be set
+        # this way at all.
+        skip "Haiku's bind ignores the umask around it", 1 if $^O eq 'haiku';
+        is sprintf('%04o', (stat $sock)[2] & 07777), '0600', 'mode 0600 applied to the socket file';
+    }
     kill 'TERM', $pid; waitpid $pid, 0;
 }
 

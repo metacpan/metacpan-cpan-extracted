@@ -6,14 +6,19 @@ use File::Temp qw(tempfile);
 use Spreadsheet::XLSX;
 
 sub parse_style {
-    my ($reference, $declaration) = @_;
+    my ($reference, $declaration, $format_code) = @_;
+    $format_code = '0.000' unless defined $format_code;
+    my @references = ref($reference) eq 'ARRAY' ? @$reference : ($reference);
     my %members = (
         'xl/workbook.xml' => '<workbook xmlns:r="x"><sheets><sheet name="S1" sheetId="1" r:id="rId1"/></sheets></workbook>',
         'xl/_rels/workbook.xml.rels' => '<Relationships><Relationship Id="rId1" Target="worksheets/sheet1.xml"/></Relationships>',
         'xl/styles.xml' => '<styleSheet>'
-            . (defined($declaration) ? qq{<numFmts><numFmt numFmtId="$declaration" formatCode="0.000"/></numFmts>} : '')
-            . qq{<cellXfs><xf numFmtId="$reference"/></cellXfs></styleSheet>},
-        'xl/worksheets/sheet1.xml' => '<worksheet><sheetData><row><c r="A1" s="0"><v>2</v></c></row></sheetData></worksheet>',
+            . (defined($declaration) ? qq{<numFmts><numFmt numFmtId="$declaration" formatCode="$format_code"/></numFmts>} : '')
+            . '<cellXfs>' . join('', map { qq{<xf numFmtId="$_"/>} } @references)
+            . '</cellXfs></styleSheet>',
+        'xl/worksheets/sheet1.xml' => '<worksheet><sheetData>'
+            . join('', map { my $row = $_ + 1; qq{<row r="$row"><c r="A$row" s="$_"><v>2</v></c></row>} } 0 .. $#references)
+            . '</sheetData></worksheet>',
     );
     my ($fh, $filename) = tempfile(SUFFIX => '.xlsx', UNLINK => 1);
     close $fh;
@@ -42,4 +47,16 @@ is(parse_style('0', undef)->{Worksheet}[0]{Cells}[0][0]->value(),
     '2', 'default numeric format ID still resolves');
 is(parse_style('14', undef)->{Worksheet}[0]{Cells}[0][0]->value(),
     '1900-01-02', 'built-in date format ID still resolves');
+for my $references (['164', '164'], ['0', '164', '164', '164'],
+    ['164', '0', '164', '14', '164']) {
+    my $sheet = parse_style($references, '164', '00000')->worksheet(0);
+    for my $row (0 .. $#$references) {
+        my $id = $references->[$row];
+        my $cell = $sheet->get_cell($row, 0);
+        is($cell->value(), $id eq '164' ? '00002' : $id eq '14' ? '1900-01-02' : '2',
+            "RT #132420: format $id preserved at style index $row (@$references)");
+        is($cell->unformatted(), '2', 'underlying numeric value is preserved');
+    }
+}
+
 done_testing();

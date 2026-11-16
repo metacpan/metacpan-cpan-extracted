@@ -1,5 +1,12 @@
 Revision history for Perl extension Text-ANSI-Fold
 
+2.3902 2026-11-16T04:33:54Z
+
+    - With run-in, color sequences which follow the character taken
+      into the line, with no visible text after them, stay on the line.
+      They made a line of their own: ansicolumn showed an empty line
+      after a line which filled the width and ended with two sequences
+
 2.3901 2026-11-12T10:44:04Z
 
     - A form feed after nothing but ANSI sequences, as in a form feed

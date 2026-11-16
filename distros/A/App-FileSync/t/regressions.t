@@ -20,11 +20,15 @@ use App::FileSync::Client;
 use App::FileSync::Config;
 use App::FileSync::I18N qw(strip_location);
 use App::FileSync::Ignore;
+use App::FileSync::Process;
 use App::FileSync::Protocol;
 use App::FileSync::Scan;
+use App::FileSync::Settings;
 use App::FileSync::Store;
 use App::FileSync::Transport::Local;
+use App::FileSync::Transport::SSH;
 use App::FileSync::Trash;
+use App::FileSync::Verify;
 
 my $T0 = 1_700_000_000;
 
@@ -351,7 +355,8 @@ subtest 'Client: restore still finds files in the old shared trash' => sub {
 	my $env = TestSync->new_env();
 	my $src = tempdir(CLEANUP => 1);
 	my $file = File::Spec->catfile($src, 'legacy.txt');
-	open my $fh, '>', $file or die $!;
+	# Raw: in text mode Windows writes "legacy\r\n", and restore copies bytes.
+	open my $fh, '>:raw', $file or die $!;
 	print {$fh} "legacy\n";
 	close $fh;
 	App::FileSync::Trash::move_to_trash(src => $file, rel => 'legacy.txt', root => File::Spec->catdir($env->{home}, 'trash'));
@@ -419,6 +424,118 @@ subtest 'CLI: sync --quiet says nothing when nothing happened' => sub {
 	$env->write_file('client', 'b.txt', "beta\n", 1_700_000_100);
 	$output = `$^X -Ilib $filesync sync --repo docs --quiet --dry-run 2>&1`;
 	like($output, qr/would push b\.txt/, '--quiet --dry-run still lists what it would do');
+};
+
+subtest 'json_decode: non-ASCII hash keys come back as bytes' => sub {
+	# json_decode downgraded values but not hash keys, and manifests are keyed
+	# by path.  A key such as "h\xc3\xa9llo.txt" kept the UTF-8 flag, so a
+	# file test on it looked for a differently-encoded name: verify's random
+	# sample silently skipped every non-ASCII file (sampled 1 of 2 here).
+	my $root = tempdir(CLEANUP => 1);
+	for my $name ("h\xc3\xa9llo.txt", 'plain.txt') {
+		open my $fh, '>:raw', File::Spec->catfile($root, $name) or die "Cannot write $name: $!";
+		print {$fh} "x\n";
+		close $fh;
+	}
+	my $manifest = App::FileSync::Scan::scan(root => $root)->{manifest};
+	my $entries = App::FileSync::json_decode(App::FileSync::json_encode($manifest));
+
+	my ($key) = grep { /[^\x00-\x7f]/ } keys %{$entries};
+	ok(!utf8::is_utf8($key), 'the decoded key carries no UTF-8 flag');
+	ok(-e File::Spec->catfile($root, $key), 'and names the file on disk');
+
+	my $result = App::FileSync::Verify::verify(root => $root, entries => $entries, sample => 10);
+	is($result->{sampled}, 2, 'verify samples the non-ASCII file too');
+};
+
+# --- Transports: closing a session part-way ---------------------------------
+
+subtest 'Transport::Local: closing mid-session lets the server exit by itself' => sub {
+	# Old: on Windows the server inherited the client's end of its own stdin
+	# pipe, so closing it never gave the server end of file, and close()
+	# waited for it forever.  Every Windows CI run hung here.
+	local $App::FileSync::Process::GRACE_SECONDS = 10;
+	my $env = conflict_env();
+	my $s = session($env);
+	my $content = "client\n";
+	ok(call($s, { cmd => 'put', p => 'a.txt', s => length $content, h => sha256_hex($content), m => $T0 + 20, mode => 0644 })->{ok},
+		'put accepted; the server now waits for the data');
+	$s->{transport}->close();
+	is($s->{transport}{end}{killed}, 0, 'the server saw end of file and exited without being stopped');
+};
+
+subtest 'Process: reap stops a child that will not exit' => sub {
+	my $child = App::FileSync::Process::spawn(command => [ $^X, '-e', 'sleep 300' ], stderr => fileno(STDERR));
+	close $child->{writer};
+	close $child->{reader};
+	my $started = time;
+	my $end = App::FileSync::Process::reap(pid => $child->{pid}, grace => 0.2);
+	is($end->{killed}, 1, 'it was stopped');
+	cmp_ok(time - $started, '<', 30, 'promptly (old: waitpid with no limit)');
+	SKIP: {
+		# Windows waitpid() falls back to OpenProcess() for a pid that is no
+		# longer its child, so asking again can return the pid.
+		skip 'waitpid on a reaped pid is not -1 on Windows', 1 if $^O eq 'MSWin32';
+		is(waitpid($child->{pid}, 0), -1, 'and reaped');
+	}
+
+	$child = App::FileSync::Process::spawn(command => [ $^X, '-e', 'exit 7' ], stderr => fileno(STDERR));
+	$end = App::FileSync::Process::reap(pid => $child->{pid}, grace => 10);
+	is_deeply($end, { status => 7, signal => 0, killed => 0 }, 'a child that exits keeps its status');
+};
+
+subtest 'Process: a program that cannot start is named' => sub {
+	my $missing = File::Spec->catfile(tempdir(CLEANUP => 1), 'no-such-program');
+	if ($^O eq 'MSWin32') {
+		# Perl on Windows retries a program it cannot start through cmd.exe,
+		# so the start succeeds and the failure is cmd.exe's exit status.
+		open my $null, '>', File::Spec->devnull() or die "null: $!";
+		my $child = App::FileSync::Process::spawn(command => [ $missing ], stderr => fileno($null));
+		close $child->{writer};
+		close $child->{reader};
+		isnt(App::FileSync::Process::reap(pid => $child->{pid}, grace => 30)->{status}, 0, 'the child reports failure');
+		return;
+	}
+	throws_ok { App::FileSync::Process::spawn(command => [ $missing ], stderr => fileno(STDERR)) }
+		qr/Cannot start '\Q$missing\E'/, 'process.spawn';
+};
+
+subtest 'Transport::SSH: an ssh that has to be stopped is a failed close' => sub {
+	plan skip_all => 'the stand-in ssh is a #! script' if $^O eq 'MSWin32';
+	local $App::FileSync::Process::GRACE_SECONDS = 0.2;
+
+	my $fake = File::Spec->catfile(tempdir(CLEANUP => 1), 'stuck-ssh');
+	open my $fh, '>', $fake or die "Cannot write $fake: $!";
+	print {$fh} "#!$^X\nsleep 300;\n";
+	close $fh;
+	chmod 0755, $fake or die "chmod: $!";
+
+	my $ssh = App::FileSync::Transport::SSH->new(server => 'host', repo => 'docs', client => 'test-1', command => $fake);
+	is($ssh->close(), 0, 'close reports the failure (old: it would have waited for ssh forever)');
+	ok($ssh->{killed}, 'and records that ssh was stopped');
+};
+
+# --- Settings ---------------------------------------------------------------
+
+subtest 'Settings: an environment variable is named as the environment spells it' => sub {
+	# Old: _env_key asked "exists $ENV{name}" first.  On Windows that lookup
+	# ignores case, so "filesync settings" named App__FileSync__ssh_identity
+	# when the environment holds APP__FILESYNC__SSH_IDENTITY.  A tied %ENV
+	# whose exists() ignores case stands in for Windows here.
+	{
+		package CaseBlindEnv;
+		require Tie::Hash;
+		our @ISA = ('Tie::StdHash');
+		sub EXISTS { my ($self, $key) = @_; return scalar grep { lc $_ eq lc $key } keys %{$self} }
+	}
+	# Keep the real variables: HARNESS_ACTIVE lets the test call a :Private sub.
+	my %real = map { $_ => $ENV{$_} } grep { !/\Aapp__filesync__/i } keys %ENV;
+	local *ENV;
+	tie %ENV, 'CaseBlindEnv';
+	%ENV = (%real, APP__FILESYNC__SSH_IDENTITY => '/tmp/id');
+	is(App::FileSync::Settings::_env_key('App__FileSync__ssh_identity'), 'APP__FILESYNC__SSH_IDENTITY', 'the stored spelling');
+	is(App::FileSync::Settings::_env_key('APP__FILESYNC__SSH_IDENTITY'), 'APP__FILESYNC__SSH_IDENTITY', 'an exact match');
+	is(App::FileSync::Settings::_env_key('App__FileSync__log_level'), undef, 'an unset variable');
 };
 
 subtest 'Sub::Private is enforced outside the test harness' => sub {

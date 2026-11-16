@@ -2,6 +2,16 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.15.0 - 2026-11-16
+
+### Features
+
+- Read the plan's name, required beside its key ([`671bb1f`](https://github.com/vpndetection-io/sdk-perl/commit/671bb1f075d8dc75a71f1e015939f4d79073194e))
+
+### Fixes
+
+- Leave a .git file out of the distribution, as a .git directory is ([`369b7da`](https://github.com/vpndetection-io/sdk-perl/commit/369b7da7e53599a07ddc52fbba86b045760785a4))
+
 ## 3.14.0 - 2026-11-14
 
 ### Features

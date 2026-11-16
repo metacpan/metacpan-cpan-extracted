@@ -72,6 +72,7 @@
             "Class::Load" : "0",
             "Digest::MD5" : "0",
             "Encode" : "0",
+            "IO::Compress::Gzip" : "0",
             "Mail::SPF::Request" : "0",
             "Mail::SPF::Server" : "0",
             "Moo" : "0",
@@ -101,7 +102,7 @@
          "web" : "https://github.com/marcbradshaw/mail-bimi"
       }
    },
-   "version" : "3.20260824",
+   "version" : "3.20261116",
    "x_contributors" : [
       "Andrew Davis <adavis@fastmailteam.com>",
       "Freddie Leeman <freddie@freddieleeman.nl>",

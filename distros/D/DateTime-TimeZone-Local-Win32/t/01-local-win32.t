@@ -50,6 +50,7 @@ if ( $DateTime::TimeZone::Local::VERSION >= DT_TZ_MIN )
 }
 
 my $WindowsTZKey;
+my $TZDataDifference;
 
 {
     foreach my $win_tz_name ( windows_tz_names() ) {
@@ -271,6 +272,32 @@ sub get_windows_tz_info {
     return $windows_tz_info;
 }
 
+# Windows' TzVersion registry value appears to follow IANA's release
+# numbering: 0x07EA0006 is 2026, release 6, i.e. IANA 2026f. When Windows and
+# the IANA data used by DateTime::TimeZone are different releases, their
+# offsets can legitimately differ (e.g. a Windows update that hasn't been
+# installed yet), so mismatches are reported as TODO instead of failures.
+# Returns '' when the releases match or TzVersion isn't available.
+sub tz_data_version_difference {
+    my $tz_version = $WindowsTZKey->{'/TzVersion'};
+    my $iana_release = DateTime::TimeZone->new( name => 'America/New_York' )->olson_version;
+
+    unless ( defined $tz_version ) {
+        diag( "Windows TzVersion not found; IANA time zone data $iana_release" );
+        return '';
+    }
+
+    $tz_version = registry_dword( $tz_version );
+    my $release = $tz_version & 0xFFFF;
+    my $windows_release = ( $tz_version >> 16 )
+        . ( $release >= 1 && $release <= 26 ? chr( ord('a') + $release - 1 ) : ".$release" );
+
+    diag( "Windows time zone data $windows_release, IANA time zone data $iana_release" );
+
+    return '' if $windows_release eq $iana_release;
+    return "Windows time zone data $windows_release differs from IANA $iana_release used by DateTime::TimeZone";
+}
+
 # Win32::TieRegistry returns REG_DWORD values as hex strings, e.g. "0x000007EB"
 sub registry_dword {
     my $value = shift;
@@ -419,6 +446,13 @@ sub test_windows_zone {
             $windows_feb_offset /= MINUTES_PER_HOUR;
             $windows_aug_offset /= MINUTES_PER_HOUR;
 
+            unless ( defined $TZDataDifference ) {
+                $TZDataDifference = tz_data_version_difference();
+            }
+
+            my $obsolete = defined $WindowsTZKey->{"${windows_tz_name}/IsObsolete"}
+                && $WindowsTZKey->{"${windows_tz_name}/IsObsolete"} eq "0x00000001";
+
             if ( $KnownBad{$windows_tz_name} ) {
             TODO: {
                     local $TODO
@@ -441,30 +475,33 @@ sub test_windows_zone {
                     return;
                 }
             }
-            elsif ( defined $WindowsTZKey->{"${windows_tz_name}/IsObsolete"}
-                && $WindowsTZKey->{"${windows_tz_name}/IsObsolete"} eq
-                "0x00000001" ) {
+            elsif ( $obsolete ) {
                 skip (
                     "$windows_tz_name - deprecated by Microsoft",
                     3
                 );
             }
             else {
-                is(
-                    $windows_offset, $dt_offset,
-                    "$windows_tz_name - Windows offset matches IANA offset for current time"
-                );
-
-                is(
-                    $windows_feb_offset, $feb_dt_offset,
-                    "$windows_tz_name - Windows offset matches IANA offset for time set February 1"
-                );
-
-                is(
-                    $windows_aug_offset, $aug_dt_offset,
-                    "$windows_tz_name - Windows offset matches IANA offset for time set August 1"
-                );
+                is_windows_offset( $windows_tz_name, 'current time', $windows_offset, $dt_offset );
+                is_windows_offset( $windows_tz_name, 'time set February 1', $windows_feb_offset, $feb_dt_offset );
+                is_windows_offset( $windows_tz_name, 'time set August 1', $windows_aug_offset, $aug_dt_offset );
             }
         }
     }
+}
+
+# Compares one Windows offset with IANA's. A mismatch is reported as TODO,
+# not a failure, only when Windows and DateTime::TimeZone are using different
+# releases of the time zone data; matching offsets are always plain passes.
+sub is_windows_offset {
+    my ( $windows_tz_name, $when, $windows_offset, $iana_offset ) = @_;
+
+    local $TODO;
+    $TODO = $TZDataDifference
+        if $TZDataDifference ne '' && $windows_offset != $iana_offset;
+
+    is(
+        $windows_offset, $iana_offset,
+        "$windows_tz_name - Windows offset matches IANA offset for $when"
+    );
 }

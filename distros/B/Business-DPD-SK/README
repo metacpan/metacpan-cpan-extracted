@@ -1,0 +1,52 @@
+NAME
+    Business::DPD::SK - DPD Slovakia integrations
+
+SYNOPSIS
+        use Business::DPD::SK::GeoRDB;
+
+        my $geordb = Business::DPD::SK::GeoRDB->new;
+        my $new_zip = $geordb->update;    # undef when nothing newer exists
+
+DESCRIPTION
+    This distribution groups modules for working with DPD Slovakia (business
+    unit 016). This module only carries the distribution version.
+
+    Business::DPD::SK::GeoRDB
+        downloads the GeoRDB routing database from the DPD SFTP server and
+        reads its tables.
+
+    Business::DPD::SK::API
+        creates shipments and fetches parcel labels through the DPD Slovakia
+        shipment JSON API.
+
+FILES
+    etc/dpd-sk/geordb.ini
+        SFTP connection settings for the GeoRDB download. It is installed
+        into the system configuration directory (for example
+        /etc/dpd-sk/geordb.ini); see Business::DPD::SK::SPc.
+
+        The file holds the SFTP password, so "./Build install" installs it
+        with mode 0640. On upgrades the mode never becomes more permissive
+        than it was, so a stricter mode set by the admin is kept. The
+        install does not change the owner; give the group of the user that
+        runs the download read access.
+
+    etc/dpd-sk/api.ini
+        Endpoint URL and account settings for Business::DPD::SK::API. The
+        shipped copy selects the DPD test endpoint and holds placeholder
+        credentials; the production URL is present but commented out. It is
+        installed next to geordb.ini, with the same 0640 mode handling,
+        because it holds the API key.
+
+    var/lib/dpd-sk/
+        holds the most recent downloaded GeoRDB zip file. The user that runs
+        "update" in Business::DPD::SK::GeoRDB needs write access to it; the
+        install does not change ownership.
+
+AUTHOR
+    Jozef Kutej
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

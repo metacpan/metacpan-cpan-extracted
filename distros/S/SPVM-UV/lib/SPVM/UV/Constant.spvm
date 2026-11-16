@@ -234,4 +234,11 @@ class UV::Constant {
   native static method UV_READABLE_PIPE : int ();
 
   native static method UV_WRITABLE_PIPE : int ();
+  
+  native static method UV_FS_EVENT_RECURSIVE : int ();
+
+  native static method UV_RENAME : int ();
+
+  native static method UV_CHANGE : int ();
+  
 }

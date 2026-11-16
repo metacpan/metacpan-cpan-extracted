@@ -10,7 +10,7 @@ use POSIX ();
 
 our @ISA       = 'Exporter';
 our @EXPORT_OK = qw(free_ports free_ports6 quiet_child server_guard server_status
-                    server_reap slurp);
+                    server_reap slurp can_lower_nofile);
 
 # SIGPIPE, for the test process itself.
 #
@@ -256,6 +256,15 @@ sub server_reap {
     return $status{$pid} if exists $status{$pid};
     waitpid $pid, 0;
     return $status{$pid} = $?;
+}
+
+# Can a child of this process lower its own descriptor limit? The starvation
+# tests run a server under `ulimit -n 48`. A Haiku smoker's sh answered
+# "cannot modify limit: Operation not allowed" and never reached the exec, so
+# the tests asserted against a server that was never started.
+sub can_lower_nofile {
+    return 0 unless -x '/bin/sh';
+    return system('/bin/sh', '-c', 'ulimit -n 48 2>/dev/null') == 0 ? 1 : 0;
 }
 
 sub slurp {

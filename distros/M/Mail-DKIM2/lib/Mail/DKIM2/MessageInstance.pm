@@ -2,7 +2,7 @@ package Mail::DKIM2::MessageInstance;
 use strict;
 use warnings;
 
-our $VERSION = '0.33';
+our $VERSION = '0.34';
 
 
 use Mail::DKIM2::Fold ();
@@ -466,9 +466,10 @@ sub parse {
             die $invalid unless ref $top{h} eq 'HASH' && %{$top{h}};
             my %rh;
             # Each key is a header field name (-09 section 5): ftext, so no
-            # WSP. "message-instance " is not a name -- and, taken for one
-            # by name matching that drops WSP before a colon, would let a
-            # Recipe rewrite the instances below it.
+            # WSP. "subject " is not a name, and name matching that drops
+            # WSP before a colon would take it for Subject where a stricter
+            # verifier does not: it is malformed, so that every verifier
+            # says the same.
             die $invalid if grep { !/\A[\x21-\x39\x3B-\x7E]+\z/ } keys %{$top{h}};
             for my $h (sort keys %{$top{h}}) {
                 $rh{$h} = _decode_recipe_list($top{h}{$h}, $bad, 'h.' . _path_name($h));

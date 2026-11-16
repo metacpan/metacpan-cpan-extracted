@@ -21,6 +21,15 @@ our %EXPORT_TAGS = (all => \@EXPORT_OK);
 # Croak at the line that called Ekorn::Pipeline.
 our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 
+# True, dump_to writes secrets as they are, without redacting them. A
+# package variable, so that it can be localised, as Data::Dumper's are.
+our $DumpSecrets;    ## no critic (Variables::ProhibitPackageVars)
+
+# What dump_to redacts with, looked for at its first dump: undef until
+# then; then Text::Redact::Secrets' redact, '' when the module isn't
+# installed, or why it's there but can't be used.
+my $redactor;
+
 # Return a stage calling the block given with each value, for its side
 # effects, and passing the value on.
 sub peek : prototype(&) ($block) {
@@ -46,16 +55,81 @@ sub count_into ($count) {
 }
 
 # Return a stage writing each value, with Data::Dumper, to the filehandle
-# given, or STDERR, and passing it on.
+# given, or STDERR, and passing it on, with its secrets redacted when
+# Text::Redact::Secrets is installed, unless $DumpSecrets is true.
 sub dump_to ($fh = \*STDERR) {
     croakf 'Expected an open filehandle' unless defined openhandle($fh);
     return Ekorn::Pipeline::Stage->new(sub ($value) {
-        local $Data::Dumper::Indent   = 1;
-        local $Data::Dumper::Sortkeys = 1;
-        local $Data::Dumper::Terse    = 1;
-        print { $fh } Data::Dumper::Dumper($value);
+        my $dump = _dump($value);
+        unless ($DumpSecrets) {
+            my $redact = _redactor();
+            $dump = $redact->($dump) if $redact;
+        }
+        print { $fh } $dump;
         return $value;
     });
+}
+
+
+sub _dump ($value) {
+    local $Data::Dumper::Indent   = 1;
+    local $Data::Dumper::Sortkeys = 1;
+    local $Data::Dumper::Terse    = 1;
+    return Data::Dumper::Dumper($value);
+}
+
+# Return Text::Redact::Secrets' redact, or nothing when it isn't
+# installed; croak when it's there but can't be used. It's looked for
+# once, and the answer kept.
+sub _redactor () {
+    $redactor //= _find_redactor();
+    croakf 'Text::Redact::Secrets %s, so dump_to won\'t write a dump that'
+        . ' may hold secrets; local $Ekorn::Pipeline::Stages::Taps::DumpSecrets'
+        . ' = 1 dumps them without redacting', $redactor
+        unless ref $redactor || $redactor eq '';
+    return ref $redactor ? $redactor : ();
+}
+
+# Load Text::Redact::Secrets, check its version and that it redacts, and
+# return its redact, '' when it isn't installed, or why it can't be used.
+sub _find_redactor () {
+    my $loaded = eval { require Text::Redact::Secrets; 1 };
+    unless ($loaded) {
+        my $error = $@;
+        return ''
+            if $error =~ m( \A Can't\ locate\ Text/Redact/Secrets\.pm\ in\ \@INC )x;
+        return 'failed to load: ' . ($error =~ s( \s* \n .* )()xsr);
+    }
+    my $version = eval { version->parse(Text::Redact::Secrets->VERSION) };
+    return 'has no version we can read' unless defined $version;
+    return "is $version, not v1.x"      if $version < v1.0.0 || $version >= v2.0.0;
+    my $redact = Text::Redact::Secrets->can('redact');
+    return 'has no redact'        unless $redact;
+    return 'failed its self-test' unless _redacts($redact);
+    return $redact;
+}
+
+# Whether redact takes each of a few made-up secrets out of a dump. Each
+# is built from pieces, so that no line holds one whole for a scanner.
+sub _redacts ($redact) {
+    my $password = join '', 'Zq8vR2mX', 'kP4wL9nT';
+    my $key_id   = join '', 'AKIA',     'QYLPMN5H', 'HHFPZAM2';
+    my $dump     = _dump({
+        password => $password,
+        dsn      => "postgres://app:$password\@db/app",
+        key_id   => $key_id,
+    });
+    my $redacted = eval { $redact->($dump) };
+    return 0 if !defined $redacted || ref $redacted;
+    return 0 if index($redacted, $password) >= 0 || index($redacted, $key_id) >= 0;
+    return 0 if index($redacted, '*REDACTED*') < 0;
+    return 1;
+}
+
+# Forget what was found, so the next dump looks again. For the tests.
+sub _forget_redactor () {    ## no critic (Subroutines::ProhibitUnusedPrivateSubroutines)
+    undef $redactor;
+    return;
 }
 
 1;
@@ -130,9 +204,29 @@ none did.
 Writes each value to C<$fh>, or to STDERR, with Data::Dumper, keys
 sorted, and passes it on.
 
-It's for debugging. It writes each value in full, secrets and all. It
-doesn't escape control characters in strings, so a value from outside
-can send escape sequences to a terminal.
+When L<Text::Redact::Secrets> is installed, a v1.x, each secret it
+finds in what's written, such as a password, a token or the password
+in a DSN, is written as C<*REDACTED*>. Only the dump is redacted: the
+value passed on is as it came. Without the module, values are written
+as they are. It's looked for once, at the first dump, and tested then,
+by redacting a few made-up secrets. If it's there but fails to load,
+isn't a v1.x, or fails the test, C<dump_to> croaks, on that dump and
+each after, rather than write a dump that may hold secrets.
+
+To write secrets as they are, set
+C<$Ekorn::Pipeline::Stages::Taps::DumpSecrets> true, with C<local>,
+for as long as you need it. It's read as each value is dumped, and
+while it's true, the module is neither loaded nor tested:
+
+    {
+        local $Ekorn::Pipeline::Stages::Taps::DumpSecrets = 1;
+        $pipeline->(@rows);
+    }
+
+It's for debugging. Text::Redact::Secrets finds the secrets its rules
+know, not every secret, so a dump can still hold some. It doesn't
+escape control characters in strings, so a value from outside can send
+escape sequences to a terminal.
 
 =head1 DIAGNOSTICS
 
@@ -150,11 +244,21 @@ C<count_into> was given something other than a reference to a scalar.
 
 C<dump_to> was given something other than an open filehandle.
 
+=item Text::Redact::Secrets %s, so dump_to won't write a dump that may hold secrets; local $Ekorn::Pipeline::Stages::Taps::DumpSecrets = 1 dumps them without redacting
+
+C<dump_to> found L<Text::Redact::Secrets> installed, but can't redact
+with it: it failed to load, with the first line of its error; it isn't
+a v1.x, the versions C<dump_to> takes; it has no C<redact>; or it
+failed the self-test, leaving a made-up secret in a dump. Install a
+v1.x that works, or set C<$Ekorn::Pipeline::Stages::Taps::DumpSecrets>
+true to write dumps without redacting them.
+
 =back
 
 =head1 SEE ALSO
 
-L<Ekorn::Pipeline>, L<Ekorn::Pipeline::Gather>, L<Data::Dumper>
+L<Ekorn::Pipeline>, L<Ekorn::Pipeline::Gather>, L<Data::Dumper>,
+L<Text::Redact::Secrets>
 
 =head1 AUTHOR
 

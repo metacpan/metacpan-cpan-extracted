@@ -4,7 +4,7 @@
 # GetOptLong: Getopt Library for Bash Script
 # Copyright 2025-2026 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=1.1.1}
+: ${GOL_VERSION:=1.2.0}
 ###############################################################################
 # Check bash version (4.4+ for nameref and ${parameter@Q})
 ((BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4))) ||
@@ -218,6 +218,11 @@ _gol_getopts_store() { local _vals _v ;
 		esac
 	    done
 	    ;;
+	[$_IS_MAYB])
+	    # --no- takes the option back: the variable is unset, the
+	    # third state besides a value and the empty string
+	    [[ $_non ]] && { unset -v "$_vname" ; return ; }
+	    ;;&
 	*) [[ $_check ]] && _gol_validate "$_check" "$_val"
 	   _gol_value $_vname "$_val" ;;
     esac

@@ -97,13 +97,15 @@ is at [https://codeberg.org/ivarch/rt-extension-totpmfa/issues](https://codeberg
 
 # License and copyright
 
-Copyright 2025 Andrew Wood.
+Copyright 2025-2026 Andrew Wood.
 
 Contributors include:
 
  * [elacour](https://codeberg.org/elacour) - localisation support, French
    translation, inline QR code display, bugfix in secret reset, and
    packaging improvements.
+ * [kta1kri](https://github.com/kta1kri) - reported MFA bypass and weak
+   secret scenarios in 0.12, and suggested routes to a fix.
 
 License GPLv3+: GNU GPL version 3 or later: [https://gnu.org/licenses/gpl.html](https://gnu.org/licenses/gpl.html)
 

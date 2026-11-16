@@ -127,25 +127,46 @@ DESTROY(self)
         }
     }
 
+# ->close ends the body. ->close(\@trailers) ends it and sends the listed
+# fields after it. The list is judged first, whatever the writer's shape
+# (hm_trailers.h), so a bad list croaks before anything is sent and the
+# body is still open for a corrected close. A good list then goes where the
+# transport can put it:
+#
+#   h2, and a stream handle over h2    a trailing HEADERS frame
+#   h1, and a stream handle over h1    after the last chunk, if the body is
+#                                      chunked and the request's TE asked,
+#                                      and otherwise nowhere
+#   h3                                 nowhere yet: close croaks
 void
-close(self)
+close(self, given = NULL)
     SV *self
+    SV *given
     CODE:
     {
         AV *w = (AV *)SvRV(self);
         SSize_t n = av_len(w);
+        SV *err;
+        AV *trailers = hm_trailers_build(aTHX_ given, &err);
+        if (err) croak("Hyperman::Writer::close: %" SVf, SVfARG(err));
+        if (trailers && n >= 3 && hm_writer_tag_is(aTHX_ w, "h3", 2)) {
+            SvREFCNT_dec((SV *)trailers);
+            croak("Hyperman::Writer::close: trailers are not implemented "
+                  "over HTTP/3");
+        }
         if (n == 2) {                   /* stream-handle form */
             SV **h = av_fetch(w, 0, 0);
             # uncoverable branch false class:ignore_covered_err
             # uncoverable condition right count:1 class:ignore_covered_err
             # uncoverable condition right count:2 class:ignore_covered_err
             if (h && SvIV(*h)) {
-                hm_stream_close_h(aTHX_ INT2PTR(void *, SvIV(*h)));
+                hm_stream_finish_h(aTHX_ INT2PTR(void *, SvIV(*h)), trailers);
+                trailers = NULL;
                 /* the handle is freed; blank the slot so a second ->close
                  * cannot hand the registry a stale pointer to compare */
                 sv_setiv(*h, 0);
             }
-        } else if (n >= 3) {            /* h2 or h3: told apart by the tag */
+        } else if (n >= 3) {            /* h1, h2 or h3: told apart by the tag */
             SV **f = av_fetch(w, 0, 0);
             SV **g = av_fetch(w, 1, 0);
             SV **s = av_fetch(w, 2, 0);
@@ -155,15 +176,17 @@ close(self)
             # uncoverable condition right count:3 class:ignore_covered_err
             if (f && g && s) {
                 if (hm_writer_tag_is(aTHX_ w, "h1", 2))
-                    hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s));
+                    hm_stream_finish(aTHX_ (int)SvIV(*f), SvUV(*g), SvUV(*s), trailers);
                 # uncoverable branch true class:ignore_covered_err
                 # uncoverable condition left count:1 class:ignore_covered_err
                 else if (hm_writer_tag_is(aTHX_ w, "h3", 2))
                     hm_h3_writer_close(aTHX_ (int)SvIV(*f), SvUV(*g), /* # uncoverable statement class:ignore_covered_err */
                                        (int64_t)SvIV(*s)); /* # uncoverable statement class:ignore_covered_err */
-                else
+                else {
                     hm_h2_writer_close(aTHX_ (int)SvIV(*f), SvUV(*g),
-                                       (int32_t)SvIV(*s));
+                                       (int32_t)SvIV(*s), trailers);
+                    trailers = NULL;
+                }
             }
         } else {
             SV **f = av_fetch(w, 0, 0);
@@ -172,8 +195,9 @@ close(self)
             # uncoverable condition right count:1 class:ignore_covered_err
             # uncoverable condition right count:2 class:ignore_covered_err
             if (f && i)
-                hm_stream_close(aTHX_ (int)SvIV(*f), SvUV(*i), 0);
+                hm_stream_finish(aTHX_ (int)SvIV(*f), SvUV(*i), 0, trailers);
         }
+        if (trailers) SvREFCNT_dec((SV *)trailers);
     }
 
 # The other ending, for a producer that failed part way through a body. Only

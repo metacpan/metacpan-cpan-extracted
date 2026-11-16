@@ -1,0 +1,57 @@
+NAME
+    Alien::MySQL - Find or build libmysqlclient client library
+
+SYNOPSIS
+        use Alien::MySQL;
+        use ExtUtils::MakeMaker;
+
+        WriteMakefile(
+            ...
+            CONFIGURE_REQUIRES => {
+                'Alien::MySQL' => 0,
+            },
+            CCFLAGS => Alien::MySQL->cflags,
+            LIBS    => Alien::MySQL->libs,
+        );
+
+DESCRIPTION
+    This module provides the MySQL C client library (libmysqlclient). It
+    will use the system library if available, or download and build from
+    source if necessary.
+
+INSTALLING DBD::mysql
+    For "share" installs, "Alien::MySQL" bundles "mysql_config" in
+    "Alien::MySQL->bin_dir". Prepend it to "PATH" when installing
+    DBD::mysql:
+
+        PATH="$(perl -MAlien::MySQL -e 'print join(":", Alien::MySQL->bin_dir, $ENV{PATH})')" \
+            cpanm DBD::mysql
+
+    Alternatively, point "DBD_MYSQL_CONFIG" directly to the bundled
+    "mysql_config" (on "share" installs):
+
+        DBD_MYSQL_CONFIG="$(perl -MAlien::MySQL -e 'print Alien::MySQL->dist_dir')/bin/mysql_config" \
+            cpanm DBD::mysql
+
+    Note: DBD::mysql's Makefile.PL validates "--libs" with Devel::CheckLib,
+    which rejects "-Wl,-rpath" flags returned by "Alien::MySQL->libs" on
+    "share" installs; using "mysql_config" via "PATH" or "DBD_MYSQL_CONFIG"
+    avoids this issue.
+
+METHODS
+    Inherits all methods from Alien::Base.
+
+  libs, libs_static
+    Overridden to add "-Wl,-rpath" flags on share installs so the dynamic
+    linker can find the bundled libmysqlclient at runtime.
+
+SEE ALSO
+    Alien::Base, <https://dev.mysql.com/doc/c-api/en/>
+
+AUTHOR
+    vividsnow
+
+LICENSE
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.14.0';
+our $VERSION = '1.15.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -138,7 +138,11 @@ our $ASN_LOOKUP = [fields => [
     [asn => ['integer'], 1], (map { [$_ => ['string'], 1] } qw(name country registry allocated domain)),
     [type => ['string']],
     (map { [$_ => ['integer']] } qw(num_ips num_prefixes4 num_prefixes6 rpki_valid rpki_invalid rpki_not_found)),
-    [whois => [map_of => ['string']]], [prefixes => [list => $AS_PREFIX]], [trial_expired => ['boolean']],
+    [whois => [map_of => ['string']]], [prefixes => [list => $AS_PREFIX]],
+    [rank => ['integer']], [tier1 => ['boolean']],
+    (map { (["num_$_" => ['integer']], [$_ => [list => ['integer']]]) } qw(upstreams peers downstreams)),
+    [hosted_domains => [fields => [[total => ['integer'], 1], [domains => [list => ['string']]]]]],
+    [trial_expired => ['boolean']],
 ]];
 my $DNS_ADDRESS = [fields => [map { [$_ => ['string'], 1] } qw(ip last_seen)]];
 my $DOMAIN_DNS = [fields => [
@@ -169,7 +173,7 @@ our $ENTITLEMENT = [fields => [
     [apikey => [fields => [
         [id => ['string'], 1], [expires => ['date-time']], [allowed_cidrs => [list => ['string']], 1],
     ]], 1],
-    [plan => [fields => [[key => ['string'], 1], [tier => ['string'], 1]]], 1],
+    [plan => [fields => [[key => ['string'], 1], [name => ['string'], 1], [tier => ['string'], 1]]], 1],
     [usage => [fields => [
         [requests => ['integer'], 1], [quota => ['integer'], 1], [hard_limit => ['integer']],
         [window_start => ['date-time'], 1], [window_end => ['date-time'], 1],

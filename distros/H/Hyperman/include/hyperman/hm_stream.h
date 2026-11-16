@@ -292,6 +292,23 @@ static int hm_stream_h2_feed(pTHX_ hm_conn *c, int64_t sid,
     return 1;
 }
 
+/* Park trailers on a stream for hm_h2_body_end to send at EOF. This has to
+ * happen before the closing feed: that feed resumes the data provider, and
+ * the provider can reach EOF synchronously inside the flush. The list is
+ * owned from here on, and freed at once if the stream has already gone. */
+static int hm_stream_h2_owe_trailers(pTHX_ hm_conn *c, int64_t sid, AV *trailers) {
+    hm_h2_stream *st = hm_stream_h2_st(c, sid);
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
+    if (!st) { SvREFCNT_dec((SV *)trailers); return 0; }
+    /*
+     # uncoverable branch true class:ignore_covered_err */
+    if (st->trailers_owed) SvREFCNT_dec((SV *)st->trailers_owed);
+    st->trailers_owed = trailers;
+    return 1;
+}
+
 /* Kill one stream and leave the rest of the connection alone. INTERNAL_ERROR
  * is the code for "the server failed", which is what an aborted producer is;
  * a client that has already had the headers reports the response as
@@ -357,6 +374,11 @@ static SV *hm_stream_h2_take_early(pTHX_ hm_conn *c, int64_t sid) {
     PERL_UNUSED_CONTEXT;
     (void)c; (void)sid;
     return NULL;
+}
+static int hm_stream_h2_owe_trailers(pTHX_ hm_conn *c, int64_t sid, AV *trailers) {
+    (void)c; (void)sid;
+    SvREFCNT_dec((SV *)trailers);
+    return 0;
 }
 static size_t hm_stream_h2_held(hm_conn *c, int64_t sid) {
     (void)c; (void)sid;
@@ -540,25 +562,53 @@ static int hm_stream_write_h(pTHX_ void *h, const char *buf, STRLEN len) {
     return hm_stream_pressure(s, c);
 }
 
-static int hm_stream_close_h(pTHX_ void *h) {
+/* End the body behind a handle. `trailers` is a list from hm_trailers_build
+ * or NULL, and is consumed on every path, stale handle and dead connection
+ * included, so no caller has to track what became of it. */
+static int hm_stream_finish_h(pTHX_ void *h, AV *trailers) {
     hm_stream *s = hm_stream_of(h);
     hm_conn *c;
     int r = HM_ABI_STREAM_OK;
-    if (!s) return HM_ABI_STREAM_STALE;
+    if (!s) {
+        if (trailers) SvREFCNT_dec((SV *)trailers);
+        return HM_ABI_STREAM_STALE;
+    }
     c = s->dead ? NULL : hm_stream_conn(s);
     hm_stream_unlink(s);
     if (!c) r = HM_ABI_STREAM_GONE;
     else if (s->kind == HM_STREAM_H2) {
+        if (trailers) {
+            (void)hm_stream_h2_owe_trailers(aTHX_ c, s->sid, trailers);
+            trailers = NULL;
+        }
         /*
          # uncoverable branch true class:ignore_covered_err
          # uncoverable condition left count:1 class:ignore_covered_err */
         if (!hm_stream_h2_feed(aTHX_ c, s->sid, NULL, 0, 1))
             r = HM_ABI_STREAM_GONE; /* # uncoverable statement */
     } else {
-        hm_stream_close(aTHX_ s->fd, s->cid, 0);   /* unparks, then drains */
+        hm_stream_finish(aTHX_ s->fd, s->cid, 0, trailers);   /* borrows */
     }
+    if (trailers) SvREFCNT_dec((SV *)trailers);
     free(s);
     return r;
+}
+
+static int hm_stream_close_h(pTHX_ void *h) {
+    return hm_stream_finish_h(aTHX_ h, NULL);
+}
+
+/* The v10 table entry. Liveness first, so a pointer that is not a handle is
+ * STALE whatever travels with it and is never looked at. Then the list, so
+ * a refused list leaves a live handle open and the caller's (hm_abi.h): a
+ * body is not ended by a list that was never going to be sent. */
+static int hm_abi_stream_close_trailers(pTHX_ void *h, SV *given) {
+    SV *err;
+    AV *trailers;
+    if (!hm_stream_of(h)) return HM_ABI_STREAM_STALE;
+    trailers = hm_trailers_build(aTHX_ given, &err);
+    if (err) return HM_ABI_STREAM_ARG;      /* a mortal, freed with the scope */
+    return hm_stream_finish_h(aTHX_ h, trailers);
 }
 
 /* The other ending: stop the body in a way the peer can tell apart from

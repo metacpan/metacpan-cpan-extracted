@@ -19,6 +19,9 @@
 /* perl 5.23.8 onwards has a revamped context system */
 #define SU_HAS_NEW_CXT XSH_HAS_PERL(5, 23, 8)
 
+/* given/when was added in 5.10.0 and removed in 5.41.3 */
+#define SU_HAS_GIVEN (XSH_HAS_PERL(5, 10, 0) && !XSH_HAS_PERL(5, 41, 3))
+
 #ifndef dVAR
 # define dVAR dNOOP
 #endif
@@ -1401,7 +1404,9 @@ static void su_unwind(pTHX_ void *ud_) {
 # define SU_RETOP_SUB(C)   ((C)->blk_sub.retop)
 # define SU_RETOP_EVAL(C)  ((C)->blk_eval.retop)
 # define SU_RETOP_LOOP(C)  ((C)->blk_loop.my_op->op_lastop->op_next)
-# define SU_RETOP_GIVEN(C) ((C)->blk_givwhen.leave_op->op_next)
+# if SU_HAS_GIVEN
+#  define SU_RETOP_GIVEN(C) ((C)->blk_givwhen.leave_op->op_next)
+# endif
 #else
 # define SU_RETOP_SUB(C)  ((C)->blk_oldretsp > 0 ? PL_retstack[(C)->blk_oldretsp - 1] : NULL)
 # define SU_RETOP_EVAL(C) SU_RETOP_SUB(C)
@@ -1425,7 +1430,7 @@ static void su_yield(pTHX_ void *ud_) {
    OP *o = NULL;
    /* Is this actually a given/when block? This may occur only when yield was
     * called with HERE (or nothing) as the context. */
-#if XSH_HAS_PERL(5, 10, 0)
+#if SU_HAS_GIVEN
    if (cxix > 0) {
     PERL_CONTEXT *prev = cx - 1;
     U8       prev_type = CxTYPE(prev);
@@ -1526,7 +1531,7 @@ static void su_yield(pTHX_ void *ud_) {
    type = OP_LEAVELOOP;
    next = SU_RETOP_LOOP(cx);
    break;
-#if XSH_HAS_PERL(5, 10, 0)
+#if SU_HAS_GIVEN
   case CXt_GIVEN:
 cxt_given:
    type = OP_LEAVEGIVEN;
@@ -2536,7 +2541,7 @@ static I32 su_context_normalize_up(pTHX_ I32 cxix) {
   PERL_CONTEXT *prev = cx - 1;
 
   switch (CxTYPE(prev)) {
-#if XSH_HAS_PERL(5, 10, 0)
+#if SU_HAS_GIVEN
    case CXt_GIVEN:
    case CXt_WHEN:
 #endif
@@ -2572,7 +2577,7 @@ static I32 su_context_normalize_down(pTHX_ I32 cxix) {
   PERL_CONTEXT *cx = next - 1;
 
   switch (CxTYPE(cx)) {
-#if XSH_HAS_PERL(5, 10, 0)
+#if SU_HAS_GIVEN
    case CXt_GIVEN:
    case CXt_WHEN:
 #endif

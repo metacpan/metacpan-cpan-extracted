@@ -1,10 +1,63 @@
 Revision history for Lingua-EN-NameCase
 =======================================
 
-1.21	Sun Nov 15 07:38:11 EST 2020
+1.22	Sun Nov 15 09:37:08 AM EST 2026
+	Added t/fuzz.t, t/all-fuzz.t and t/conf/NameCase-list.yml (fuzz testing,
+	  extended tests only); t/NameCase-list.t runs the hand-written schema
+	  under make test
+	Fix: Makefile.PL declares
+	  List::Util and all test prerequisites and now generates META files
+	Added t/transition.t (state diagram); the STATE DIAGRAM now shows the
+	  too_long edge and that $MAX_LENGTH is part of the configuration
+	Added the Test Dashboard
+	Added t/transaction.t (lifecycle, rollback, idempotency, concurrency)
+	Added t/path.t (every execution path); marked the unreachable die after
+	  croak in _fail
+	Added t/domain.t (equivalence partitions and boundary values) and documented
+	  the valid and invalid input domains in the API SPECIFICATION
+	Use gtar to create a distribution on Macs
+	Use Test::DescribeMe to simplify tests
+	Use Test::Needs
+	Refactored into small private routines (Sub::Private, enforce mode)
+	Table-driven Mac exceptions, particles and post-nominals: about 10x faster
+	Fix: post-nominal entries "MCh.", "FCSP." and "FSCR." matched any
+	  character for the dot, so "MCHX" became "MCh."
+	Fix: nc() with no argument no longer modifies a reference in $_
+	NameCase(\@array) in place now returns the array reference
+	Error messages are templates, overridable via %MESSAGES; they name the
+	  offending argument type
+	Fix: Windows/C-locale failures: removed "use locale", which warned about wide
+	  characters and mis-cased accented Latin-1 names outside UTF-8 locales
+	New $MAX_LENGTH switch and too_long message to refuse oversize names
+	Fix: nc() read a tied argument twice (check/use gap); now once
+	Fix: error messages no longer echo raw class names (log injection);
+	  an empty message text or a reference as text no longer breaks croak
+	Fix: no warnings for lone surrogates or non-Unicode code points
+	Added t/edge_cases.t and t/data-flow.t
+	Fix: a post-nominal found only through case folding (long s, "fi" ligature)
+	  had its text deleted, with an uninitialized-value warning
+	Fix: NameCase(\@array) no longer breaks aliases: the elements are written in
+	  place again (NameCase(\@_) changes the caller's variables), still all-or-nothing
+	Security audit: new SECURITY section; author tests no longer build code
+	  with string eval from META data; taint and growth tests
+	Fix: the Mac test let a following space or punctuation stand in for the last
+	  letter, so Polish/Italian names such as Macchiato were cased as Mac names
+	  when another word followed them
+	Regex audit: possessive quantifiers, one-letter capture, post-nominal check
+	  now copies only the end of the name
+	Fix: declare IPC::System::Simple, which "use autodie qw(:all)" needs
+	Faster: roman numerals 4x, particles 2x, whole nc() about 1.6x; post-nominal
+	  matching no longer scans every word boundary of a long name
+	NameCase(\@array) is now all-or-nothing: a bad element leaves it unchanged
+	Added t/integration.t, t/unit.t, t/function.t, t/messages.t and t/locales.t; documented LIMITATIONS
+	Now requires Readonly and Perl 5.10.  Sub::Private is optional (it needs
+	  Perl 5.26 via Params::Validate::Strict): the internals are locked only if it
+	  is installed.  Fixes install failures on old Perls
+
+1.21	2020-11-15T07:38:11-05:00
 	Fix CPAN breakage
 
-1.20	Fri Nov 13 15:20:30 EST 2020
+1.20	2020-11-13T15:20:30-05:00
 	No changes to the code, new maintainer - thanks to BARBIE
 
 1.19    2015-01-29

@@ -27,6 +27,7 @@ use App::FileSync::Constants qw(
 	$PROTOCOL_VERSION $ROLE_CLIENT @ROLES $TYPE_FILE $TYPE_DIR
 	$MODE_MASK $DEFAULT_FILE_MODE $MAX_CHUNK_BYTES $SHA256_HEX
 	$EXIT_OK $EXIT_FATAL $EXIT_LOCKED $EXIT_WARNINGS $SERVER_PROGRAM
+	$STAT_MODE $STAT_SIZE $STAT_MTIME $SHA_BITS
 );
 use App::FileSync::Delta;
 use App::FileSync::I18N qw(message os_error strip_location);
@@ -35,7 +36,7 @@ use App::FileSync::Protocol;
 use App::FileSync::Settings;
 use App::FileSync::Store;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # Package variables for compatibility: the CLI checks $PROTO, and tests may
 # localise $CHUNK.
@@ -44,14 +45,14 @@ our $PROTO = $PROTOCOL_VERSION;
 
 # Bounds on a pull signature the client uploads, so a hostile client cannot
 # make the server allocate or hash without limit.
-Readonly my $MAX_SIGNATURE_BLOCKS => 16_384;
-Readonly my $MIN_SIGNATURE_BLOCK  => 1024;
-Readonly my $MAX_SIGNATURE_BLOCK  => 1024 * 1024;
+Readonly::Scalar my $MAX_SIGNATURE_BLOCKS => 16_384;
+Readonly::Scalar my $MIN_SIGNATURE_BLOCK  => 1024;
+Readonly::Scalar my $MAX_SIGNATURE_BLOCK  => 1024 * 1024;
 
 # Wire cost of one delta record, for deciding whether a delta is worth it;
 # the constant covers the reply headers.
-Readonly my $DELTA_OP_BYTES => 12;
-Readonly my $DELTA_OVERHEAD => 64;
+Readonly::Scalar my $DELTA_OP_BYTES => 12;
+Readonly::Scalar my $DELTA_OVERHEAD => 64;
 
 # Unsigned decimal integers, and mtimes (which may be fractional or, for a
 # file dated before 1970, negative).
@@ -499,7 +500,7 @@ sub _journal_failed_session :Private {
 		});
 		1;
 	};
-	$self->{logger}->warn('cannot journal the failed session', { error => strip_location($@) }) unless $ok;
+	$self->{logger}->warn($self->i18n('server.journal_failed', { error => strip_location($@) })) unless $ok;
 
 	return $ok ? 1 : 0;
 }
@@ -1181,7 +1182,7 @@ sub _open_upload :Private {
 	return $self->{uploads}{$path} = {
 		fh    => $fh,
 		temp  => $temp,
-		sha   => Digest::SHA->new(256),
+		sha   => Digest::SHA->new($SHA_BITS),
 		got   => 0,
 		size  => $size,
 		hash  => $message->{h},
@@ -1284,9 +1285,13 @@ sub _commit_upload :Private {
 sub _discard_upload :Private {
 	my ($self, $path) = @_;
 
-	my $upload = delete $self->{uploads}{$path} or return 1;
-	eval { close $_ } for grep { defined } @{$upload}{qw(fh old_fh)};
-	eval { unlink $upload->{temp} };
+	# Best effort: the session is ending or the upload was refused, so a
+	# handle that will not close or a temp that will not go is not an error.
+	if (my $upload = delete $self->{uploads}{$path}) {
+		eval { close $_ } for grep { defined } @{$upload}{qw(fh old_fh)};
+		eval { unlink $upload->{temp} };
+	}
+
 	return 1;
 }
 
@@ -1308,7 +1313,7 @@ sub _file_stat :Private {
 	my @stat = Time::HiRes::stat($abs);
 	$self->_throw('server.cannot_stat', { path => $path, error => os_error() }) unless @stat;
 	$self->_throw('server.not_file', { path => $path }) unless -f _;
-	return { s => $stat[7], m => $stat[9], mode => $stat[2] & $MODE_MASK };
+	return { s => $stat[$STAT_SIZE], m => $stat[$STAT_MTIME], mode => $stat[$STAT_MODE] & $MODE_MASK };
 }
 
 # _uint

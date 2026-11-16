@@ -1,5 +1,17 @@
 Revision history for Scope-Upper
 
+0.35    2026-11-16 10:30 UTC
+        + Fix : [RT #154985] : given/when/switch leaves perl in 5.41.3
+                Following their deprecation and subsequent removal from core,
+                the support for these features is no longer tested starting
+                perl 5.37.10 and no longer built starting perl 5.41.3.
+                Thanks James Keenan for reporting and submitting a fix.
+
+        + Fix : [RT #181699] : t/63-uplevel-ctl.t fails on v5.45.4
+                An hardcoded line value has been adjust for a recent fix
+                in core.
+                Thanks Richard Leach for reporting and submitting a fix.
+
 0.34    2023-03-26 16:00 UTC
         + Add : Contributing guidelines are now listed in the new
                 CONTRIBUTING file.

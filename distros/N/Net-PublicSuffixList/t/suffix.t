@@ -5,29 +5,35 @@ use Mojo::Util            qw(dumper);
 
 my $class = 'Net::PublicSuffixList';
 
+my $warnings;
+local $SIG{'__WARN__'} = sub { $warnings .= $_[0] };
 
 subtest sanity => sub {
-	use_ok( $class ) or BAILOUT( "$class did not compile" );
+	use_ok( $class ) or BAIL_OUT( "$class did not compile" );
 	can_ok( $class, 'new' );
 	};
 
-diag( "You'll see a warnings about 'no way to fetch' for this test. That's fine." );
-
 subtest bare => sub {
+	$warnings = undef;
+
 	my $obj = $class->new( no_local => 1, no_net => 1 );
 	isa_ok( $obj, $class );
 	ok( $obj->{no_local}, "no_local is true" );
 	ok( $obj->{no_net}, "no_net is true" );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
 
 	ok( ! defined $obj->fetch_list_from_local, 'fetch_list_from_local returns undef for no_local = 1' );
 	ok( ! defined $obj->fetch_list_from_net, 'fetch_list_from_net returns undef for no_net = 1' );
 	};
 
 subtest add_suffix => sub {
+	$warnings = undef;
+
 	my $obj = $class->new( no_net => 1, no_local => 1 );
 	my $suffix = 'co.uk';
 	isa_ok( $obj, $class );
 	can_ok( $obj, 'suffix_exists', 'add_suffix' );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
 
 	ok( ! $obj->suffix_exists( $suffix ), "Suffix <$suffix> does not exist yet" );
 
@@ -38,10 +44,13 @@ subtest add_suffix => sub {
 	};
 
 subtest add_suffix_strip => sub {
+	$warnings = undef;
+
 	my $obj = $class->new( no_net => 1, no_local => 1 );
 	my $suffix = 'co.uk';
 	isa_ok( $obj, $class );
 	can_ok( $obj, 'suffix_exists', 'add_suffix' );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
 
 	my @suffixes = (
 		[ qw( *.com    com   ) ],
@@ -68,10 +77,13 @@ subtest add_suffix_strip => sub {
 	};
 
 subtest remove_suffix => sub {
+	$warnings = undef;
+
 	my $obj = $class->new( no_net => 1, no_local => 1 );
 	my $suffix = 'au';
 	isa_ok( $obj, $class );
 	can_ok( $obj, 'suffix_exists', 'add_suffix', 'remove_suffix' );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
 
 	ok( ! $obj->suffix_exists( $suffix ), "Suffix <$suffix> does not exist yet" );
 
@@ -82,12 +94,16 @@ subtest remove_suffix => sub {
 
 	$result = $obj->remove_suffix( $suffix );
 	isa_ok( $result, $class, 'remove_suffix returns the object' );
+	ok( ! $obj->suffix_exists( $suffix ), "Suffix <$suffix> no longer exists" );
 
 	};
 
 subtest parse_list => sub {
+	$warnings = undef;
+
 	my $obj = $class->new( no_net => 1, no_local => 1 );
 	can_ok( $obj, 'parse_list' );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
 
 	my @suffixes = qw( co.uk foo.bar com );
 	foreach my $suffix ( @suffixes ) {
@@ -100,13 +116,16 @@ subtest parse_list => sub {
 	isa_ok( $result, $class );
 
 	foreach my $suffix ( @suffixes ) {
-		ok( $obj->suffix_exists( $suffix ), "Suffix <$suffix> does not exist yet" );
+		ok( $obj->suffix_exists( $suffix ), "Suffix <$suffix> now exists" );
 		}
 	};
 
 subtest parse_list_strip => sub {
+	$warnings = undef;
+
 	my $obj = $class->new( no_net => 1, no_local => 1 );
 	can_ok( $obj, 'parse_list' );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
 
 	my @suffixes = (
 		[ qw( *.com    com   ) ],
@@ -129,8 +148,6 @@ subtest parse_list_strip => sub {
 		ok( ! $obj->suffix_exists( $pair->[0] ), "Suffix <$pair->[0]> does not exist" );
 		}
 	};
-
-diag( "You shouldn't see any more 'no way to fetch' warnings." );
 
 subtest local_path => sub {
 	my $local_file = 'test.dat';
@@ -184,7 +201,6 @@ subtest suffixes => sub {
 		is( $result->{short}, 'wildfire' );
 		is( $result->{host}, $host );
 		}
-
 	};
 
 done_testing();

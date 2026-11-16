@@ -73,8 +73,54 @@ EXAMPLE
         sharedstatedir
 
     are skipped during the installation. Add .exists to this folders if you
-    want them to be created during `./Build install`.
+    want them to be created during `./Build install`. The .exists file
+    itself is not installed.
 
+    To install a specific file from a skipped folder, a file from a folder
+    starting with a dot, or a file starting with a dot, list its path
+    relative to the distribution root in the "<path_type>_files" property:
+
+        my $builder = Module::Build::SysPath->new(
+            ...
+            sharedstatedir_files => {
+                'var/lib/acme-notes/index.json' => 1,
+            },
+            webdir_files => {
+                'www/.htaccess' => 1,
+            },
+        );
+
+    Every "./Build install" overwrites such a file with the distribution
+    version, so runtime changes to it are lost. To keep them, also list the
+    file in "conffiles", or create the file at runtime instead of shipping
+    it.
+
+   MANIFEST
+    When the distribution root contains a MANIFEST, only files listed in it
+    are installed. "perl Build.PL" warns about every other file it would
+    have installed:
+
+        'etc/acme/secret.pem' is not listed in MANIFEST and will not be installed
+
+    Files matching MANIFEST.SKIP (or the default skip list of
+    ExtUtils::Manifest when there is no MANIFEST.SKIP) are left out on
+    purpose, so they are not installed and not reported.
+
+    Files kept out of the tarball by MANIFEST.SKIP are not installed from a
+    checkout either. If a checkout install must deploy such files, for
+    example keys that should not be published, copy them in a custom
+    "ACTION_install" or deploy them outside the build.
+
+    This keeps editor backups and other stray files in a checkout from being
+    installed, and makes an install from a checkout match an install from
+    the distribution tarball. Without a MANIFEST, every file found is
+    installed.
+
+    Rerun "perl Build.PL" after adding files. The file list is collected
+    from the folders on disk when "perl Build.PL" runs, not when "./Build
+    install" runs.
+
+   Configuration files
     Configuration files get a special (Debian like) treatment. All files in
     "sysconfdir" and all files specified as
     "$builder->{'properties'}->{'conffiles'}" are configuration files. Using
@@ -122,10 +168,91 @@ EXAMPLE
         already exists. If the parent installation fails after the rename,
         the original "conffile" is restored.
 
+        Unattended installs take the default answer N: the system "conffile"
+        is kept and the distribution version is installed with the -spc
+        suffix. An install is unattended with "PERL_MM_USE_DEFAULT=1", or
+        without a terminal when standard input is at end of file.
+
+        A system "conffile" without a recorded checksum counts as changed in
+        the system.
+
+   File modes
+    Set the permissions of installed files with "file_modes". Keys are paths
+    relative to the distribution root, values are modes written as Perl
+    octal literals:
+
+        my $builder = Module::Build::SysPath->new(
+            ...
+            file_modes => {
+                'etc/acme/secret.ini' => 0640,
+            },
+        );
+
+    Write the mode unquoted. A quoted '0640' would be read as a decimal
+    number, so quoted modes with a leading zero are rejected.
+
+    Every key must name a single file that is already selected for
+    installation. "file_modes" does not select files: it neither bypasses
+    MANIFEST nor replaces "<path_type>_files". A "file_modes" value that is
+    not a hash, keys naming unselected files, the same file twice (for
+    example etc/x and ./etc/x), directories, globs, .exists markers,
+    absolute paths or paths leaving the distribution root, and modes outside
+    0000..0777 or non-integer modes make "perl Build.PL" die.
+
+    A declared mode is a ceiling. It never grants access that the file in
+    the system does not already have:
+
+    new file
+        Gets the declared mode.
+
+    existing file
+        Gets the declared mode combined (bitwise AND) with its current mode.
+        With 0640 declared, a 0644 file becomes 0640 and a 0600 file stays
+        0600. This also applies to a kept "conffile", its -spc copy and an
+        -old backup, whose current mode is the mode of the replaced
+        "conffile", so a 0644 original becomes a 0640 backup. A new -spc
+        copy is limited only by an existing -spc, not by the mode of the
+        kept "conffile".
+
+    "--destdir"
+        The same rules apply to the staged files under the destination
+        directory. Files in the live system are not touched.
+
+    Without a declaration, files installed to "sysconfdir" and
+    "sharedstatedir" are set to 0644, and other files keep the mode set by
+    ExtUtils::Install (0444, or 0555 for executables).
+
+    If setting a declared mode fails, the installation dies with the path
+    and mode, and no "conffile" checksums are recorded.
+
+    The declared mode is guaranteed only after a successful installation.
+    ExtUtils::Install first installs every file with mode 0444 (0555 for
+    executables), and "ACTION_install" sets the declared mode afterwards.
+    Until then, and after a failed installation, a secret file can be
+    readable by every local user who can reach its folder. Deployments that
+    need stronger guarantees should install through a distribution package
+    that sets permissions while copying.
+
+   Owner and group
+    Installation never assigns an owner or group of its own. A new file
+    belongs to the user running the installation. When a file that already
+    exists in the system is replaced, the new file gets the owner and group
+    of the replaced file, so a "chgrp" of a secret "conffile" to the group
+    of a service survives upgrades. This covers payload files of every path
+    type, the -spc copy of a kept "conffile" and, when the new version of a
+    "conffile" is accepted, the newly installed "conffile". A kept
+    "conffile" and an -old backup are not replaced, so they keep their owner
+    and group. With "--destdir", the same applies to the staged files.
+
+    Only root can give a file to another user. If restoring the owner or
+    group fails, the installation warns with the path and continues.
+
   ACTION_install
     This action is responsible for renaming files, replacing SPc.pm paths to
-    systems once from Sys::Path. Also makes files writable (chmod 0644). And
-    stores the checksums of "conffile"s.
+    systems once from Sys::Path. Also restores the owner and group of
+    replaced files as described in "Owner and group", sets undeclared
+    "sysconfdir" and "sharedstatedir" files to 0644, applies "file_modes" as
+    described in "File modes", and stores the checksums of "conffile"s.
 
 AUTHOR
     Jozef Kutej, <jkutej@cpan.org>

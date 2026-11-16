@@ -2,6 +2,58 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v3.0.3 2026-11-16
+
+    Quicker handles, from execute to each row read.
+
+    With named values, execute takes a quarter to two fifths of the time
+    it did, a statement given attributes is studied once, not twice, and
+    iterators and result sets do less for each run and each row (roadmap
+    2026-0028). dump_to redacts secrets where Text::Redact::Secrets is
+    installed, as Ekorn::Pipeline v0.3.2's dump_to does, and
+    DBIx::Squirrel now recommends that module.
+
+    - execute does less to put named or numbered values in order, and
+      passes them on without copying them. On SQLite, with five named
+      values it takes about 4.8 µs, not 12; with twenty, 8.5, not 33;
+      with a list placeholder, 9.5, not 13; and with five positional
+      values, 3.0, not 3.5 (roadmap 2026-0028).
+
+    - iterate, results and the Sugar's statements study a statement
+      given attributes once: they studied it in full, then the prepare
+      they call studied it again. iterate with attributes takes about
+      110 µs, not 149. A subclass's prepare that changes the statement
+      or the attributes has them studied afresh, as before (roadmap
+      2026-0028).
+
+    - An iterator keeps its pipeline from run to run, until it's
+      given other stages, and hands on the rows it fetches without
+      copying them. A prepared statement's iterate(...)->all, reading
+      one row, takes about 50 µs, not 59. Reading 297,848 rows, all
+      takes about 440 ns a row, not 475, and next 875, not 915 (roadmap
+      2026-0028).
+
+    - A result set makes its row objects, and their column accessors
+      read a column, without a signature: results reading 297,848 rows
+      takes about 612 ns a row, not 671, and a column read about 126
+      ns, not 148. An accessor given an argument by mistake ignores it,
+      where it died before (roadmap 2026-0028).
+
+    - Requires Ekorn::Pipeline v0.3.3 or later, below v0.4.0, whose
+      runs set up in about half the time, so each iterator takes about
+      8 µs less again.
+
+    - Text::Redact::Secrets v1.x is recommended, as Ekorn::Pipeline
+      recommends it, and installers that take recommendations install
+      it with DBIx::Squirrel.
+
+    - dump_to's notes, in the reference, the user guide and
+      DBIx::Squirrel::Stages::Taps, no longer say it writes secrets
+      and all: from Ekorn::Pipeline v0.3.2, within DBIx::Squirrel's
+      range, it writes those Text::Redact::Secrets finds as
+      *REDACTED*, unless $Ekorn::Pipeline::Stages::Taps::DumpSecrets
+      is set.
+
 v3.0.2 2026-11-14
 
     Version 3: a statement is a source for Ekorn::Pipeline, and a sink

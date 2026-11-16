@@ -144,3 +144,4 @@ t/057_runtime_deps.t
 t/102_ffi.t
 t/103_tools.t
 t/105_dist.t
+t/106_repo.t

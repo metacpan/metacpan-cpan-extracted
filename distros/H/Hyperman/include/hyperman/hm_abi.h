@@ -38,8 +38,11 @@
  *       bidirectional, which is what Extended CONNECT needs)
  *   9 - arena_region, arena_table, pool_stats (the Shared::Arena the server
  *       created, its provider's table, and the worker scoreboard's sum)
+ *  10 - stream_close_trailers (stream_close plus trailer fields: the
+ *       trailing HEADERS frame of HTTP/2, the trailer section of a chunked
+ *       HTTP/1.1 body. gRPC reports its status this way)
  */
-#define HM_ABI_VERSION 9
+#define HM_ABI_VERSION 10
 
 /* io_watch masks (match Hyperman's internal HM_EV_READ/HM_EV_WRITE) */
 #define HM_ABI_READ  0x1
@@ -328,6 +331,42 @@ typedef struct hm_abi {
     void       *(*arena_region)(void);
     const void *(*arena_table)(void);
     int         (*pool_stats)(hm_abi_pool_stats *out);
+
+    /* ---- v10: trailer fields -----------------------------------------
+     *
+     * stream_close, followed by trailer fields. A gRPC server needs this
+     * because grpc-status and grpc-message are trailers and nothing else,
+     * the HTTP status being 200 for a failed call as much as a successful
+     * one. `trailers` is an arrayref of name, value pairs in PSGI header
+     * style. NULL, undef and an empty list make the call a stream_close.
+     *
+     * The list is judged before any byte is sent. A bad list earns
+     * HM_ABI_STREAM_ARG and nothing else happens: the body stays open and
+     * the handle stays the caller's, for a corrected list, a bare
+     * stream_close, or stream_abort. A gRPC body that ends without its
+     * status is a failure the caller should decide on, not have decided
+     * for it. Bad means: not an array reference, an odd number of
+     * elements, an empty name, a name with a character outside RFC 9110's
+     * token set, an undefined value, or a control character other than
+     * HTAB in a value. Quietly dropped, as hop-by-hop response headers
+     * are: connection, keep-alive, proxy-connection, transfer-encoding,
+     * upgrade, te, content-length, host and trailer. Names are sent in
+     * lower case.
+     *
+     * A good list then gets stream_close's result, OK or HM_ABI_STREAM_GONE,
+     * and the handle is released. Where the fields end up:
+     *
+     *   HTTP/2    the trailing HEADERS frame that ends the stream, always.
+     *   HTTP/1.1  the trailer section of a chunked body, provided the
+     *             request's TE listed "trailers". A counted or EOF-ended
+     *             body has no trailer section, and a client that did not
+     *             ask gets none, so in those cases the body ends as
+     *             stream_close ends it. psgix.hyperman.trailers in the env
+     *             tells the application in advance.
+     *
+     * A handle that is not live is HM_ABI_STREAM_STALE whatever the list
+     * holds. Nothing here croaks. The list is read, never kept. */
+    int   (*stream_close_trailers)(pTHX_ void *h, SV *trailers);
 } hm_abi;
 
 /* How many worker-start callbacks the server will hold. Fixed, so

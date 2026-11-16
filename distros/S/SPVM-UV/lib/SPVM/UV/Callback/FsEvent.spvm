@@ -1,0 +1,10 @@
+# Copyright (c) 2026 Yuki Kimoto
+# MIT License
+
+class UV::Callback::FsEvent : interface_t {
+  
+  use UV::Handle::FsEvent;
+  
+  required method : void ($fs_event : UV::Handle::FsEvent, $filename : string, $events : int, $status : int);
+  
+}

@@ -1,5 +1,5 @@
 package Net::Checkpoint::Management::v1;
-$Net::Checkpoint::Management::v1::VERSION = '0.004002';
+$Net::Checkpoint::Management::v1::VERSION = '0.004003';
 # ABSTRACT: Checkpoint Management API version 1.x client library
 
 use 5.024;
@@ -456,7 +456,7 @@ sub install_policy($self, $policyname, $targets, $params={}) {
 }
 
 
-sub wait_for_task($self, $taskid, $callback) {
+sub wait_for_task($self, $taskid, $callback = undef) {
     croak "task-id missing"
         unless defined $taskid;
     croak "callback must be a coderef"
@@ -506,7 +506,7 @@ Net::Checkpoint::Management::v1 - Checkpoint Management API version 1.x client l
 
 =head1 VERSION
 
-version 0.004002
+version 0.004003
 
 =head1 SYNOPSIS
 

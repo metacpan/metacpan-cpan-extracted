@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 use Spreadsheet::XLSX::Utility2007 qw(ExcelFmt);
-our $VERSION = '0.20';    #
+our $VERSION = '0.21';    #
 
 my %hFmtDefault = (
     0x00 => '@',
@@ -90,7 +90,7 @@ sub FmtString {
     #        $oBook->{Format}[$oCell->{FormatNo}]->{FmtIdx}, $oBook);
 
     # Check for formula error before evaluating format
-    return '@' if ( $oCell->{Val} =~ m/^#/ );
+    return '@' if (defined($oCell->{Val}) && $oCell->{Val} =~ m/^#/);
     
     unless (defined($sFmtStr)) {
         if ($oCell->{Type} eq 'Numeric') {
@@ -122,7 +122,7 @@ sub FmtString {
 sub ValFmt {
     my ($oThis, $oCell, $oBook) = @_;
 
-    my ($Dt, $iFmtIdx, $iNumeric, $Flg1904);
+    my ($Dt, $Flg1904);
 
     if ($oCell->{Type} eq 'Text') {
         $Dt = ((defined $oCell->{Val}) && ($oCell->{Val} ne '')) ? $oThis->TextFmt($oCell->{Val}, $oCell->{Code}) : '';

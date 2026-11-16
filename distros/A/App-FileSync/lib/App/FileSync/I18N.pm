@@ -18,7 +18,7 @@ use Scalar::Util qw(blessed);
 
 use App::FileSync::I18N::en;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 our @EXPORT_OK = qw(message throw warning os_error strip_location);
 
@@ -28,13 +28,13 @@ $Carp::Internal{ (__PACKAGE__) }++;
 
 # The language every lookup falls back to, and the catalogue that must hold
 # every key.
-Readonly my $FALLBACK => 'en';
+Readonly::Scalar my $FALLBACK => 'en';
 
 # Selector keys inside a catalogue entry, see "CATALOGUE FORMAT" below.
-Readonly my $SELECT_KEY    => '_by';
-Readonly my $SELECT_COUNT  => 'count';
-Readonly my $SELECT_GENDER => 'gender';
-Readonly my $OTHER         => 'other';
+Readonly::Scalar my $SELECT_KEY    => '_by';
+Readonly::Scalar my $SELECT_COUNT  => 'count';
+Readonly::Scalar my $SELECT_GENDER => 'gender';
+Readonly::Scalar my $OTHER         => 'other';
 
 # Environment variables consulted, in order, when no language is configured.
 # FILESYNC_LANG lets a cron job choose a language without touching the

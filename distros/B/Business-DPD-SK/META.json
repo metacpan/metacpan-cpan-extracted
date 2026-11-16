@@ -1,0 +1,76 @@
+{
+   "abstract" : "DPD Slovakia integrations",
+   "author" : [
+      "Jozef Kutej"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4234",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Business-DPD-SK",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IO::Compress::Zip" : "0",
+            "Module::Build::SysPath" : "0.20",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607",
+            "Module::Build::SysPath" : "0.20"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::INI::Reader" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request" : "0",
+            "IO::Pty" : "0",
+            "IO::Uncompress::Unzip" : "0",
+            "JSON::XS" : "0",
+            "LWP::UserAgent" : "0",
+            "Moo" : "0",
+            "Moose" : "0",
+            "Net::SFTP::Foreign" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Business::DPD::SK" : {
+         "file" : "lib/Business/DPD/SK.pm",
+         "version" : "0.01"
+      },
+      "Business::DPD::SK::API" : {
+         "file" : "lib/Business/DPD/SK/API.pm",
+         "version" : "0.01"
+      },
+      "Business::DPD::SK::GeoRDB" : {
+         "file" : "lib/Business/DPD/SK/GeoRDB.pm",
+         "version" : "0.01"
+      },
+      "Business::DPD::SK::SPc" : {
+         "file" : "lib/Business/DPD/SK/SPc.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

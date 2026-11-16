@@ -4,6 +4,84 @@ package App::FileSync;
 # byte-transparent JSON, path and id validation, conflict-copy naming, date
 # parsing and (re-exported from App::FileSync::IO) atomic file writes.
 
+# TODO: from the 0.002.0 gap analysis.  Pre-release blockers first.
+#
+# Behaviour that is silently wrong or inconsistent:
+# TODO: trash retention of 0 means different things on each side: the client's
+#	local_trash_days 0 keeps trash forever (Client.pm, "//"), the server's
+#	trash_days 0 silently becomes 30 days (Store.pm prune_trash, "||").
+#	Pick one meaning, document it, add a regression test.
+# TODO: document for users that 0 switches off --max-deletes and
+#	--max-delete-percent (only Merge's internal POD says so; not the help
+#	text, the admin POD or website/html/commands.html).
+# TODO: give --max-delete-percent an upper bound of 100 (150 is accepted).
+# TODO: Params::Validate::Strict failures bypass the catalogue and name the
+#	internal parameter ('trash_days') instead of the option (--trash-days).
+# TODO: I18N::warning is exported but never called or tested, and its
+#	trailing "\n" to carp puts the location on its own line, unlike its
+#	FORMAL SPECIFICATION.  Test and fix it, or remove it.
+#
+# Failure and rollback paths no test runs:
+# TODO: Delta past the 8 MiB scan window (the literal tail loop in diff):
+#	large-file deltas are unverified; "local $SCAN_LIMIT" makes it cheap.
+# TODO: Snapshot rollback: a failed build should remove its temp directory.
+# TODO: IO::write_atomic failure (a full disk): the temp file is discarded.
+# TODO: Scan::clean_stale_temps never deletes a stale temp in any test.
+# TODO: type changes: moving a directory into the trash (Trash::move_to_trash)
+#	and replacing a directory with a file (IO::clear_target).
+# TODO: the admin root-not-writable path in Admin::repo_create.
+#
+# Commands and APIs with no tests:
+# TODO: filesync-admin "repo show" and "client list" (Admin::repo_show,
+#	Admin::client_list) never run, in-process or through the CLI.
+# TODO: Protocol::close, Transport::SSH::command and exit_status,
+#	Transport::Local::error_text, Store::root and Store::repo.
+# TODO: the extra_args check in Transport::SSH->new has never run.
+#
+# Mutation testing:
+# TODO: the 80% score is 10 mutants, all in Platform.pm.  Mutation-test Merge,
+#	Delta, the server's %MAY table and the deletion guard.
+# TODO: kill the two survivors: nothing checks the return value of
+#	Platform::use_plain_end_of_scope_hook.
+#
+# Documentation:
+# TODO: =head3 PSEUDOCODE for the 24 public routines over 15 lines without it
+#	(Server::new, Client::new, Trash::move_to_trash and prune,
+#	Merge::check_delete_limit, Scan::clean_stale_temps, Ignore::new, ...).
+# TODO: UTF-8 notes in Scan, Ignore, Trash, Snapshot and Store: names are
+#	bytes, and NFC and NFD forms of a name are different files.
+# TODO: warn when the client cache is damaged: the run silently re-hashes
+#	every file (no data is at risk; the merge base is on the server).
+# TODO: remove the unused message key word.snapshot, and make t/locales.t
+#	report unused keys as well as missing ones.
+#
+# Post-release roadmap: features.
+# TODO: incremental manifests (a change journal or Merkle summary), so an
+#	idle run costs almost nothing instead of O(files).
+# TODO: "filesync watch": sync on file changes (inotify, FSEvents,
+#	ReadDirectoryChangesW), with cron as the fallback.
+# TODO: let a client restore from the server's trash (admin-only today).
+# TODO: selective sync: a client takes only a subtree of a repo.
+# TODO: --bwlimit and a quiet-hours window for metered links.
+# TODO: monitoring output: a node-exporter textfile, or a status --json health
+#	summary that alerts on repeated exit codes 3 or 4.
+# TODO: reconcile NFC and NFD forms of a name (the macOS/Linux gap).
+# TODO: a conflict review command to list and resolve conflict copies.
+#
+# Post-release roadmap: technical debt.
+# TODO: widen mutation testing (Merge, Delta, Server, Trash first) and gate CI
+#	on condition coverage (57% now).
+# TODO: pipeline the protocol: one request in flight bounds throughput by the
+#	round-trip time.
+# TODO: stream the plan as JSON lines instead of one huge line, which also
+#	bounds message size.
+# TODO: fsync: renames are atomic between processes but not durable across a
+#	power cut.
+# TODO: an optional native rolling checksum (Inline::C or XS) to lift the
+#	8 MiB scan window; pure Perl manages about 2.5 MB/s when nothing matches.
+# TODO: one validation error layer that turns Params::Validate::Strict
+#	failures into catalogue messages naming the CLI option.
+
 use App::FileSync::Platform;
 
 use strict;
@@ -12,7 +90,8 @@ use autodie qw(:all);
 use feature 'current_sub';
 
 use Exporter qw(import);
-use JSON::PP ();
+use JSON::MaybeXS ();
+use POSIX qw(strftime);
 use Readonly;
 use Sub::Private { mode => 'enforce' };
 use Time::Local ();
@@ -21,7 +100,7 @@ use App::FileSync::Constants qw($MAX_ID_LENGTH $SECONDS_PER_DAY);
 use App::FileSync::I18N qw(message throw);
 use App::FileSync::IO qw(write_atomic read_text set_mtime);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 our @EXPORT_OK = qw(
 	json_encode json_decode
@@ -38,23 +117,39 @@ our $MAX_COMPONENT_BYTES = 255;
 
 # A conflict-copy name is kept this far inside the common 255-byte limit, and
 # never trims the original stem below the minimum.
-Readonly my $CONFLICT_NAME_BYTES => 200;
-Readonly my $MIN_STEM_BYTES      => 16;
+Readonly::Scalar my $CONFLICT_NAME_BYTES => 200;
+Readonly::Scalar my $MIN_STEM_BYTES      => 16;
 
 # The alphabet of a repo or client id: it becomes a directory name.
 Readonly my $ID_PATTERN => qr/\A[A-Za-z0-9][A-Za-z0-9._-]*\z/;
 
 # What an unusable client id is replaced with in a conflict-copy name.
-Readonly my $UNKNOWN_CLIENT => 'unknown';
+Readonly::Scalar my $UNKNOWN_CLIENT => 'unknown';
 
+# format_utc's ISO 8601 basic format: 20261104T014157Z.
+Readonly::Scalar my $UTC_STAMP => '%Y%m%dT%H%M%SZ';
+
+# JSON::MaybeXS picks Cpanel::JSON::XS, then JSON::XS, then the core JSON::PP,
+# and installing it pulls in Cpanel::JSON::XS wherever there is a compiler.  On
+# a 100,000-file manifest Cpanel::JSON::XS decodes in 0.2s where JSON::PP takes
+# about 15s.  All three read any valid JSON, so a client and a server using
+# different backends still understand each other.  The text differs only in
+# number formatting (Cpanel::JSON::XS writes a whole-valued float as 1000.0),
+# which decodes to the same value everywhere.
+#
 # Deliberately utf8(0): paths are byte strings on the wire, and both ends of the
 # protocol are this implementation.
-my $JSON = JSON::PP->new->canonical->allow_nonref;
+my $JSON = JSON::MaybeXS->new->canonical->allow_nonref;
 
-# JSON::PP returns UTF8-flagged strings even though paths are byte strings on
+# Both backends return UTF8-flagged strings even though paths are byte strings on
 # disk.  Left alone, the flag makes -e/stat encode the name a second time and
 # every non-ASCII file "disappears".  This downgrades back to the original
 # bytes; only a genuine wide-character string is encoded as UTF-8.
+#
+# Hash keys need the same treatment, and manifests are keyed by path, but a key
+# cannot be changed in place: a non-ASCII key is deleted and stored again as
+# bytes.  An ASCII key names the same file flagged or not, so it is left alone,
+# which keeps the cost to one pattern match per key.
 #
 # A lexical coderef rather than a named sub: it runs once per JSON value (six
 # times per manifest entry), and the Sub::Private enforce wrapper would cost
@@ -62,7 +157,15 @@ my $JSON = JSON::PP->new->canonical->allow_nonref;
 my $to_bytes = sub {
 	# Work through @_ aliases: copying the scalar would rewrite the copy only.
 	if (ref($_[0]) eq 'HASH') {
-		__SUB__->($_) for values %{ $_[0] };
+		my $hash = $_[0];
+		for my $key (grep { /[^\x00-\x7f]/ } keys %{$hash}) {
+			my $bytes = $key;
+			utf8::encode($bytes) unless utf8::downgrade($bytes, 1);
+			# delete first: a flagged key and its bytes are the same hash key.
+			my $value = delete $hash->{$key};
+			$hash->{$bytes} = $value;
+		}
+		__SUB__->($_) for values %{$hash};
 	} elsif (ref($_[0]) eq 'ARRAY') {
 		__SUB__->($_) for @{ $_[0] };
 	} elsif (defined($_[0]) && !ref($_[0]) && utf8::is_utf8($_[0])) {
@@ -79,7 +182,7 @@ App::FileSync - cron-driven file synchronisation without a daemon
 
 =head1 VERSION
 
-0.002.0
+0.002.1
 
 =head1 SYNOPSIS
 
@@ -146,7 +249,9 @@ Usage:
 
 =head3 MESSAGES
 
-JSON::PP's own error for a value it cannot encode (a code reference, say).
+The JSON backend's own error for a value it cannot encode (a code reference,
+say).  L<JSON::MaybeXS> chooses the backend: L<Cpanel::JSON::XS>, else
+L<JSON::XS>, else L<JSON::PP>.
 
 =head3 FORMAL SPECIFICATION
 
@@ -193,7 +298,9 @@ Usage:
 
 =head3 MESSAGES
 
-JSON::PP's own error for malformed JSON.
+The JSON backend's own error for malformed JSON, so its wording depends on
+which backend L<JSON::MaybeXS> chose (L<Cpanel::JSON::XS>, else L<JSON::XS>,
+else L<JSON::PP>).
 
 =head3 FORMAL SPECIFICATION
 
@@ -562,9 +669,7 @@ None.
 sub format_utc {
 	my ($epoch) = @_;
 
-	my @t = gmtime(defined $epoch ? $epoch : time);
-	return sprintf('%04d%02d%02dT%02d%02d%02dZ',
-		$t[5] + 1900, $t[4] + 1, $t[3], $t[2], $t[1], $t[0]);
+	return strftime($UTC_STAMP, gmtime($epoch // time));
 }
 
 =head2 split_name
@@ -959,7 +1064,10 @@ until an administrator points them at a rebuilt master.
 per file and the server answers with the whole plan as a single JSON line, so
 a run costs O(files) in time, memory and bandwidth even when nothing changed.
 A tree of a million files means a plan message of the order of a hundred
-megabytes.  A change journal or Merkle summary would remove that, at the cost
+megabytes.  JSON goes through L<JSON::MaybeXS>, which installs and uses
+L<Cpanel::JSON::XS> wherever there is a compiler: it decodes about 70 times
+faster than the core L<JSON::PP> (0.2 seconds against 15 for a 100,000-file
+manifest).  A pure-Perl install (C<PUREPERL_ONLY=1>) falls back to JSON::PP.  A change journal or Merkle summary would remove that, at the cost
 of the "everything is inspectable with cat" property.
 
 =item * B<No line-length cap on the wire.>  Because of the previous point, a
@@ -995,6 +1103,12 @@ C<enforce> mode, which costs about 1.4 microseconds per call (measured on
 the JSON byte downgrade, the rolling checksum) are therefore lexical code
 references: private by scope, with no wrapper.  Both Sub::Private and
 L<Sub::Protected> are bypassed while C<HARNESS_ACTIVE> is set.
+
+=item * B<Log event names are English.>  Log lines carry a fixed event name
+(C<sync finished>, C<session opened>) with structured fields, so that log
+tools and tests can match them.  Those names are identifiers, not messages,
+and are not translated; warnings and errors in the log go through the
+message catalogue like everything else.
 
 =item * B<Validation costs.>  L<Params::Validate::Strict> costs about 11
 microseconds per call, so it guards the public entry points that run a few

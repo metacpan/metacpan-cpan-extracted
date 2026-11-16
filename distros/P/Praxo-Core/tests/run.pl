@@ -110,14 +110,22 @@ my $fallback = Praxo::Middleware::fallback_model(sub {
 is($fallback->(Praxo::Models::request())->{message}{content}, 'fallback', 'fallback');
 
 package TestSink;
-sub new { bless { types => [] }, shift }
-sub emit { push @{ $_[0]{types} }, $_[1]{type} }
+sub new { bless { types => [], events => [] }, shift }
+sub emit {
+    push @{ $_[0]{types} }, $_[1]{type};
+    push @{ $_[0]{events} }, $_[1];
+}
 sub types { $_[0]{types} }
+sub events { $_[0]{events} }
 
 package TestModel;
-sub new { bless { steps => $_[1], next => 0 }, shift }
+sub new { bless { steps => $_[1], next => 0, requests => [] }, shift }
 sub generate {
-    my ($self) = @_;
+    my ($self, $request) = @_;
+    push @{ $self->{requests} }, {
+        %$request,
+        messages => [ @{ $request->{messages} // [] } ],
+    };
     my $step = $self->{steps}[ $self->{next}++ ];
     my @calls = map {
         Praxo::Models::tool_call(id => $_->{id}, name => $_->{name}, arguments => $_->{arguments})
@@ -126,6 +134,8 @@ sub generate {
         message => Praxo::Models::message_assistant($step->{content} // '', \@calls),
     );
 }
+
+sub requests { $_[0]{requests} }
 
 package main;
 
@@ -626,5 +636,277 @@ $schema_registry->register(Praxo::Agent::FuncTool->new(
 my $schema_spec = $schema_registry->specs->[0];
 is($schema_spec->{parameters}{required}[0], 'target', 'tool schema parameters');
 is($schema_spec->{risk}, 'write', 'tool schema risk');
+
+my $interrupt_steps = [
+    {
+        content => '',
+        toolCalls => [{
+            id => 'interrupt-1',
+            name => 'echo',
+            arguments => { text => 'hi' },
+        }],
+    },
+    { content => 'done' },
+];
+
+my $approve_invocations = 0;
+my $approve_registry = Praxo::Agent::ToolRegistry->new;
+$approve_registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo', sub {
+    $approve_invocations++;
+    return $_[0];
+}));
+my $approve_sink = TestSink->new;
+my $approve_model = TestModel->new($interrupt_steps);
+my $approve_options = Praxo::Agent::AgentOptions->new($approve_model);
+$approve_options->{tools} = $approve_registry;
+$approve_options->{events} = $approve_sink;
+$approve_options->{interrupt_on} = ['echo'];
+my $approved_interrupt;
+$approve_options->{on_interrupt_decision} = sub {
+    $approved_interrupt = $_[0];
+    return Praxo::Models::interrupt_decision(
+        action => Praxo::Models::INTERRUPT_APPROVE(),
+    );
+};
+my $approve_result = Praxo::Agent::run_agent(
+    $approve_options, Praxo::Models::session(id => 'hitl-approve'), 'go',
+);
+is($approve_result->{output}, 'done', 'hitl approve output');
+is($approve_invocations, 1, 'hitl approve invokes tool');
+is_deeply(
+    $approve_sink->types,
+    [qw(run.started tool.interrupt tool.call run.completed)],
+    'hitl approve events',
+);
+is($approve_sink->events->[1]{data}{name}, 'echo', 'hitl interrupt event name');
+is_deeply(
+    $approve_sink->events->[1]{data}{arguments},
+    { text => 'hi' },
+    'hitl interrupt event arguments',
+);
+is($approved_interrupt->{runId}, $approve_result->{runId},
+    'hitl interrupt run id');
+is($approved_interrupt->{sessionId}, 'hitl-approve', 'hitl interrupt session id');
+is($approved_interrupt->{call}{name}, 'echo', 'hitl interrupt call name');
+
+my $edit_invocations = 0;
+my $edit_registry = Praxo::Agent::ToolRegistry->new;
+$edit_registry->register(Praxo::Agent::FuncTool->new('write_note', 'Write', sub {
+    $edit_invocations++;
+    return 'written';
+}));
+my $edit_options = Praxo::Agent::AgentOptions->new(TestModel->new([
+    {
+        content => '',
+        toolCalls => [{
+            id => 'edit-1',
+            name => 'write_note',
+            arguments => { text => 'hello', visibility => 'public' },
+        }],
+    },
+    { content => 'done' },
+]));
+$edit_options->{tools} = $edit_registry;
+$edit_options->{allowed_tools} = ['write_note'];
+$edit_options->{interrupt_on} = ['write_note'];
+$edit_options->{policy} = sub {
+    my ($action) = @_;
+    if ($action->{kind} eq 'model.generate') {
+        return Praxo::Models::decision(allowed => 1);
+    }
+    my $public = ($action->{arguments}{visibility} // '') eq 'public';
+    return Praxo::Models::decision(
+        allowed => $public,
+        reason => 'only public notes are permitted',
+    );
+};
+$edit_options->{on_interrupt_decision} = sub {
+    return Praxo::Models::interrupt_decision(
+        action => Praxo::Models::INTERRUPT_EDIT(),
+        arguments => { text => 'hello', visibility => 'private' },
+    );
+};
+my $edit_ok = eval {
+    Praxo::Agent::run_agent(
+        $edit_options, Praxo::Models::session(id => 'hitl-edit'), 'go',
+    );
+    1;
+};
+my $edit_error = $@;
+is($edit_ok, undef, 'hitl edit rejected');
+is(Praxo::Errors::error_code($edit_error), 'POLICY_ERROR',
+    'hitl edit reauthorization code');
+is($edit_invocations, 0, 'hitl edit has no effects');
+
+my $reject_invocations = 0;
+my $reject_registry = Praxo::Agent::ToolRegistry->new;
+$reject_registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo', sub {
+    $reject_invocations++;
+    return $_[0];
+}));
+my $reject_sink = TestSink->new;
+my $reject_options = Praxo::Agent::AgentOptions->new(TestModel->new($interrupt_steps));
+$reject_options->{tools} = $reject_registry;
+$reject_options->{events} = $reject_sink;
+$reject_options->{interrupt_on} = ['echo'];
+$reject_options->{on_interrupt_decision} = sub {
+    return Praxo::Models::interrupt_decision(
+        action => Praxo::Models::INTERRUPT_REJECT(),
+        reason => 'not allowed',
+    );
+};
+my $reject_ok = eval {
+    Praxo::Agent::run_agent(
+        $reject_options, Praxo::Models::session(id => 'hitl-reject'), 'go',
+    );
+    1;
+};
+my $reject_error = $@;
+is($reject_ok, undef, 'hitl reject fails run');
+is(Praxo::Errors::error_code($reject_error), 'AGENT_APPROVAL_DENIED',
+    'hitl reject code');
+like("$reject_error", qr/not allowed/, 'hitl reject reason');
+is($reject_invocations, 0, 'hitl reject has no effects');
+is_deeply(
+    $reject_sink->types,
+    [qw(run.started tool.interrupt run.failed)],
+    'hitl reject events',
+);
+
+my $respond_invocations = 0;
+my $respond_registry = Praxo::Agent::ToolRegistry->new;
+$respond_registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo', sub {
+    $respond_invocations++;
+    return $_[0];
+}));
+my $respond_sink = TestSink->new;
+my $respond_model = TestModel->new($interrupt_steps);
+my $respond_options = Praxo::Agent::AgentOptions->new($respond_model);
+$respond_options->{tools} = $respond_registry;
+$respond_options->{events} = $respond_sink;
+$respond_options->{interrupt_on} = ['echo'];
+$respond_options->{on_interrupt_decision} = sub {
+    return Praxo::Models::interrupt_decision(
+        action => Praxo::Models::INTERRUPT_RESPOND(),
+        response => 'human answer',
+    );
+};
+my $respond_result = Praxo::Agent::run_agent(
+    $respond_options, Praxo::Models::session(id => 'hitl-respond'), 'go',
+);
+is($respond_result->{output}, 'done', 'hitl respond output');
+is($respond_invocations, 0, 'hitl respond skips tool');
+is_deeply(
+    $respond_sink->types,
+    [qw(run.started tool.interrupt run.completed)],
+    'hitl respond events',
+);
+my $respond_requests = $respond_model->requests;
+is(
+    $respond_requests->[1]{messages}[-1]{content},
+    Praxo::Json::stringify('human answer'),
+    'hitl respond feeds response to model',
+);
+
+my $unhandled_registry = Praxo::Agent::ToolRegistry->new;
+$unhandled_registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo', sub {
+    return $_[0];
+}));
+my $unhandled_sink = TestSink->new;
+my $unhandled_options = Praxo::Agent::AgentOptions->new(TestModel->new($interrupt_steps));
+$unhandled_options->{tools} = $unhandled_registry;
+$unhandled_options->{events} = $unhandled_sink;
+$unhandled_options->{interrupt_on} = ['echo'];
+my $unhandled_ok = eval {
+    Praxo::Agent::run_agent(
+        $unhandled_options, Praxo::Models::session(id => 'hitl-unhandled'), 'go',
+    );
+    1;
+};
+my $unhandled_error = $@;
+is($unhandled_ok, undef, 'hitl unhandled fails run');
+is(Praxo::Errors::error_code($unhandled_error), 'AGENT_INTERRUPT_UNHANDLED',
+    'hitl unhandled code');
+ok(!(grep { $_ eq 'tool.interrupt' } @{ $unhandled_sink->types }),
+    'hitl unhandled emits no interrupt event');
+
+my $invalid_registry = Praxo::Agent::ToolRegistry->new;
+$invalid_registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo', sub {
+    return $_[0];
+}));
+my $invalid_options = Praxo::Agent::AgentOptions->new(TestModel->new($interrupt_steps));
+$invalid_options->{tools} = $invalid_registry;
+$invalid_options->{interrupt_on} = ['echo'];
+$invalid_options->{on_interrupt_decision} = sub {
+    return Praxo::Models::interrupt_decision(action => 'invalid');
+};
+my $invalid_ok = eval {
+    Praxo::Agent::run_agent(
+        $invalid_options, Praxo::Models::session(id => 'hitl-invalid'), 'go',
+    );
+    1;
+};
+my $invalid_error = $@;
+is($invalid_ok, undef, 'hitl invalid fails run');
+is(Praxo::Errors::error_code($invalid_error), 'AGENT_INTERRUPT_DECISION_INVALID',
+    'hitl invalid code');
+
+my $edit_missing_options = Praxo::Agent::AgentOptions->new(TestModel->new($interrupt_steps));
+$edit_missing_options->{tools} = $invalid_registry;
+$edit_missing_options->{interrupt_on} = ['echo'];
+$edit_missing_options->{on_interrupt_decision} = sub {
+    return Praxo::Models::interrupt_decision(
+        action => Praxo::Models::INTERRUPT_EDIT(),
+    );
+};
+my $edit_missing_ok = eval {
+    Praxo::Agent::run_agent(
+        $edit_missing_options, Praxo::Models::session(id => 'hitl-edit-missing'), 'go',
+    );
+    1;
+};
+my $edit_missing_error = $@;
+is($edit_missing_ok, undef, 'hitl edit without arguments fails run');
+is(
+    Praxo::Errors::error_code($edit_missing_error),
+    'AGENT_INTERRUPT_DECISION_INVALID',
+    'hitl edit without arguments code',
+);
+
+my $legacy_invocations = 0;
+my $legacy_registry = Praxo::Agent::ToolRegistry->new;
+$legacy_registry->register(Praxo::Agent::FuncTool->new('echo', 'Echo', sub {
+    $legacy_invocations++;
+    return $_[0];
+}));
+my $legacy_options = Praxo::Agent::AgentOptions->new(TestModel->new($interrupt_steps));
+$legacy_options->{tools} = $legacy_registry;
+$legacy_options->{interrupt_on} = ['echo'];
+$legacy_options->{on_interrupt} = sub { 1 };
+my $legacy_result = Praxo::Agent::run_agent(
+    $legacy_options, Praxo::Models::session(id => 'hitl-legacy-approve'), 'go',
+);
+is($legacy_result->{output}, 'done', 'hitl legacy approval output');
+is($legacy_invocations, 1, 'hitl legacy approval invokes tool');
+
+my $legacy_denied_options = Praxo::Agent::AgentOptions->new(TestModel->new($interrupt_steps));
+$legacy_denied_options->{tools} = $legacy_registry;
+$legacy_denied_options->{interrupt_on} = ['echo'];
+$legacy_denied_options->{on_interrupt} = sub { 0 };
+my $legacy_denied_ok = eval {
+    Praxo::Agent::run_agent(
+        $legacy_denied_options,
+        Praxo::Models::session(id => 'hitl-legacy-deny'),
+        'go',
+    );
+    1;
+};
+my $legacy_denied_error = $@;
+is($legacy_denied_ok, undef, 'hitl legacy denial fails run');
+is(
+    Praxo::Errors::error_code($legacy_denied_error),
+    'AGENT_APPROVAL_DENIED',
+    'hitl legacy denial code',
+);
 
 done_testing();

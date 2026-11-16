@@ -1,5 +1,37 @@
 Revision history for App-FileSync
 
+0.002.1	Sun Nov 15 03:36:05 PM EST 2026
+	[ Enhancements ]
+	- Block deltas are much faster to compute.  A changed file of 8 MiB or
+	  more with no blocks in common took about 45 seconds to diff; it now
+	  takes about 3.  Signatures (the receiver's description of its copy)
+	  are computed about twice as fast.  The wire format is unchanged, so
+	  old and new clients and servers still work together.
+	- JSON now goes through JSON::MaybeXS (a new dependency), which
+	  installs and uses Cpanel::JSON::XS wherever there is a compiler.
+	  Reading a 100,000-file manifest took about 15 seconds with JSON::PP
+	  and takes under half a second with Cpanel::JSON::XS.  Pure-Perl
+	  installs still work, on JSON::PP, and either side of a sync may use
+	  either backend.
+	- Paths read back from JSON as hash keys (manifests are keyed by
+	  path) kept Perl's UTF-8 flag, so a file test on a non-ASCII name
+	  looked for a differently encoded file.  "verify" silently left such
+	  files out of its random sample.  Keys are now byte strings, like
+	  values.
+	[ Bug Fixes ]
+	- On Windows, a client whose session ended early (any error mid-sync)
+	  hung for ever instead of reporting the error: the server or ssh it
+	  started inherited the client's end of its own input pipe, so it never
+	  saw end of file, and the client waited for it to exit.  The client's
+	  pipe ends are no longer inheritable, and a server or ssh that has not
+	  exited 30 seconds after the session ends is stopped.  The Windows test
+	  runs had hung in t/regressions.t since 0.001.1.
+	- "filesync settings" on Windows named an environment variable in the
+	  spelling it was looked up with (App__FileSync__ssh_identity) rather
+	  than the one the environment holds (APP__FILESYNC__SSH_IDENTITY):
+	  Windows' %ENV lookups ignore case, so the exact-match test always
+	  succeeded.
+
 0.002.0	Wed Nov  4 09:44:06 PM EST 2026
 	[ Enhancements ]
 	- Created a website

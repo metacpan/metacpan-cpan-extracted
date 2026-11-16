@@ -1,6 +1,6 @@
 package Command::Run;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use v5.14;
 use warnings;
@@ -9,6 +9,7 @@ use Carp;
 use POSIX ();
 use Fcntl;
 use IO::File;
+use IO::Select;
 
 use parent 'Command::Run::Tmpfile';
 
@@ -147,54 +148,81 @@ sub execute {
 
     my $pid = fork // die "fork: $!\n";
     if ($pid == 0) {
-        # Child process
-        close $stdout_r;
-        close $stderr_r if $stderr eq 'capture';
+        # Child process.  It must never return to the program of the
+        # caller: a die here could be caught by an eval of the caller,
+        # and the child would go on as a second copy of the program.
+        # So catch everything, and leave by _exit.
+        my $status = 255;
+        eval {
+            close $stdout_r;
+            close $stderr_r if $stderr eq 'capture';
 
-        if (exists $opt{stdin}) {
-            my $tmp = new_tmpfile IO::File or die "tmpfile: $!\n";
-            binmode $tmp, ':encoding(utf8)';
-            $tmp->print($opt{stdin});
-            $tmp->seek(0, 0) or die "seek: $!\n";
-            open STDIN, '<&', $tmp or die "dup: $!\n";
-            binmode STDIN, ':encoding(utf8)';
-        } elsif (my $input = $obj->{INPUT}) {
-            open STDIN, "<&=", $input->fileno or die "open: $!\n";
-            binmode STDIN, ':encoding(utf8)';
-        }
-
-        open STDOUT, ">&=", $stdout_w->fileno or die "open stdout: $!\n";
-        if ($stderr eq 'redirect') {
-            open STDERR, ">&STDOUT" or die "open stderr: $!\n";
-        } elsif ($stderr eq 'capture') {
-            open STDERR, ">&=", $stderr_w->fileno or die "open stderr: $!\n";
-        }
-        # else: stderr passes through to terminal
-
-        if (ref $command[0] eq 'CODE') {
-            # print goes to the selected handle: make that the new STDOUT
-            select(STDOUT);
-            my $code = shift @command;
-            @ARGV = @command;
-            if (my $name = code_name($code)) {
-                $0 = $name;
+            if (exists $opt{stdin}) {
+                my $tmp = new_tmpfile IO::File or die "tmpfile: $!\n";
+                binmode $tmp, ':encoding(utf8)';
+                $tmp->print($opt{stdin});
+                $tmp->seek(0, 0) or die "seek: $!\n";
+                open STDIN, '<&', $tmp or die "dup: $!\n";
+                binmode STDIN, ':encoding(utf8)';
+            } elsif (my $input = $obj->{INPUT}) {
+                open STDIN, "<&=", $input->fileno or die "open: $!\n";
+                binmode STDIN, ':encoding(utf8)';
             }
-            $code->(@command);
-            exit 0;
-        }
-        exec @command;
-        die "exec: $@\n";
+
+            open STDOUT, ">&=", $stdout_w->fileno or die "open stdout: $!\n";
+            if ($stderr eq 'redirect') {
+                open STDERR, ">&STDOUT" or die "open stderr: $!\n";
+            } elsif ($stderr eq 'capture') {
+                open STDERR, ">&=", $stderr_w->fileno or die "open stderr: $!\n";
+            }
+            # else: stderr passes through to terminal
+
+            if (ref $command[0] eq 'CODE') {
+                # print goes to the selected handle: make that the new STDOUT
+                select(STDOUT);
+                my $code = shift @command;
+                @ARGV = @command;
+                if (my $name = code_name($code)) {
+                    $0 = $name;
+                }
+                $code->(@command);
+                $status = 0;
+            } else {
+                $status = 127;
+                exec @command;
+                die "exec: $!\n";
+            }
+            1;
+        } or print STDERR $@;
+        # _exit does not run the END blocks and the destructors of the
+        # caller, and does not flush: do it here for our two handles.
+        STDOUT->flush;
+        STDERR->flush;
+        POSIX::_exit($status);
     }
 
     # Parent process
     close $stdout_w;
     close $stderr_w if $stderr eq 'capture';
 
-    binmode $stdout_r, ':encoding(utf8)';
-    binmode $stderr_r, ':encoding(utf8)' if $stderr eq 'capture';
+    # Read both pipes as the data comes.  Reading one to the end
+    # before the other blocks forever when the command fills the pipe
+    # which is not being read.
+    my %buf = ($stdout_r => '');
+    $buf{$stderr_r} = '' if $stderr eq 'capture';
+    my $select = IO::Select->new($stdout_r);
+    $select->add($stderr_r) if $stderr eq 'capture';
+    while ($select->count) {
+        for my $fh ($select->can_read) {
+            my $n = sysread $fh, $buf{$fh}, 65536, length $buf{$fh};
+            next if not defined $n and $!{EINTR};
+            $select->remove($fh) if not $n;  # end of file, or error
+        }
+    }
 
-    my $stdout = do { local $/; <$stdout_r> };
-    my $stderr_out = $stderr eq 'capture' ? do { local $/; <$stderr_r> } : '';
+    # Decode after everything is read: a character can be cut by a read
+    my $stdout = _decode($buf{$stdout_r});
+    my $stderr_out = $stderr eq 'capture' ? _decode($buf{$stderr_r}) : '';
 
     close $stdout_r;
     close $stderr_r if $stderr eq 'capture';
@@ -208,6 +236,17 @@ sub execute {
         error  => $stderr_out,
         pid    => $pid,
     };
+}
+
+##
+## Decode bytes read from a pipe in the same way as reading the pipe
+## through the :encoding(utf8) layer.
+##
+sub _decode {
+    my $bytes = shift;
+    open my $fh, '<:encoding(utf8)', \$bytes or die "open: $!\n";
+    my $text = do { local $/; <$fh> };
+    $text // '';
 }
 
 sub _tmpfile {
@@ -467,7 +506,7 @@ Command::Run - Execute external command or code reference
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 DESCRIPTION
 
@@ -478,6 +517,14 @@ When a code reference is passed as the first element of the command
 array, it is called in a forked child process instead of executing an
 external command.  This avoids the overhead of loading Perl and
 modules for each invocation.
+
+The child process ends when the code returns, without going back to
+the program of the caller: C<END> blocks and destructors of the caller
+do not run in the child.  STDOUT and STDERR are flushed before that,
+but other file handles are not, so the code should close the files it
+writes.  If the code dies, the message goes to STDERR and the exit
+status is 255.  If the code calls C<exit> by itself, C<END> blocks do
+run in the child.
 
 This module inherits from L<Command::Run::Tmpfile>, which provides
 temporary file functionality.  The captured output is stored in this
@@ -652,7 +699,10 @@ The C<run> method returns a hash reference containing:
 
 =item B<result>
 
-The exit status of the command (C<$?>).
+The exit status of the command (C<$?>).  When the command can not be
+executed, the exit status is 127 (C<<< $result->{result} >> 8 >>>), as
+the shell does.  When a code reference dies, it is 255.  In nofork
+mode, it is -1 for a code reference that dies.
 
 =item B<data>
 

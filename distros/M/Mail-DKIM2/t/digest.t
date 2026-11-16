@@ -56,4 +56,40 @@ SKIP: {
     is_deeply($verdicts{openssl}, $verdicts{cryptx}, 'the verifier: same verdicts either way');
 }
 
+# A string is hashed as the octets it stands for, whatever Perl's internal
+# form of it: a message that passed through code that upgraded it (joined to
+# a decoded header field, say) still goes on the wire as the same octets.
+# CryptX does that itself; Net::SSLeay reads the string's buffer, so the
+# OpenSSL backend downgrades a character string first. One with a character
+# above 0xFF stands for no octets, and croaks.
+for my $backend (@backends) {
+    local $Mail::DKIM2::Digest::BACKEND = $backend;
+    for my $alg (qw(sha256 sha512)) {
+        my $octets = "Gr\xfc\xdfe aus K\xf6ln\r\n";
+        my $chars  = $octets;
+        utf8::upgrade($chars);
+        my $want = $cryptx{$alg}->new->add($octets)->digest;
+        is(Mail::DKIM2::Digest::digest_data($alg, $chars), $want,
+           "$backend $alg: an upgraded string hashes as its octets");
+        is(Mail::DKIM2::Digest->new($alg)->add($chars, $chars)->digest,
+           $cryptx{$alg}->new->add($octets . $octets)->digest,
+           "$backend $alg: and in pieces");
+        eval { Mail::DKIM2::Digest::digest_data($alg, "snow \x{2603}") };
+        like($@, qr/Wide character/, "$backend $alg: a character above 0xFF croaks");
+    }
+}
+
+{
+    require Mail::DKIM2::MessageInstance;
+    my $octets = "From: a\@example.com\r\nSubject: Gr\xfc\xdfe\r\n"
+        . "Content-Type: text/plain; charset=iso-8859-1\r\n"
+        . "Content-Transfer-Encoding: 8bit\r\n\r\nGr\xfc\xdfe aus K\xf6ln\r\n";
+    my $chars = $octets;
+    utf8::upgrade($chars);
+    is(Mail::DKIM2::MessageInstance->calculate($chars)->as_string,
+       Mail::DKIM2::MessageInstance->calculate($octets)->as_string,
+       'a Message-Instance is the same for a message held as characters');
+}
+
+
 done_testing;

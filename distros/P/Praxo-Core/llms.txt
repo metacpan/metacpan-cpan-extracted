@@ -8,11 +8,11 @@
 
 - package: `Praxo::Core`
 - registry: [CPAN (MetaCPAN index)](https://metacpan.org/dist/Praxo-Core)
-- source_version: `0.5.1`
-- published_version: `0.5.0`
+- source_version: `0.6.0`
+- published_version: `0.5.1`
 - install_published: `cpanm Praxo::Core`
 - install_source: `cpanm Praxo::Core`
-- source_tag: `perl/v0.5.1`
+- source_tag: `perl/v0.6.0`
 - tier: Core
 - contract: `SPEC_VERSION` `0.2.0`
 - documentation: https://axisvela.github.io/praxo-core/languages/perl/

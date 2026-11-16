@@ -7,7 +7,7 @@ use Carp ();
 
 use InternetData::Error;
 
-our $VERSION = '1.14.0';
+our $VERSION = '1.15.0';
 
 # The formats a database is published in. Anything else is refused before it
 # reaches the API, whose 400 would cost a round trip and name nothing to act on.
@@ -95,8 +95,8 @@ sub downloads_p {
 # The API answers 302 and this returns the Location without following it, so the
 # caller decides how to transfer a file that can run to gigabytes. The link
 # carries its own authorization, which is what makes it safe to hand to another
-# process: it names no credential of yours. It authorizes the START of a
-# transfer, so one already running is not interrupted when it lapses.
+# process: it names no credential of yours. The link only has to be valid when a
+# transfer starts, so one already running isn't cut off when it lapses.
 sub download_url {
     my $self = shift;
     $self->_assert_blocking_ok('download_url');
@@ -407,9 +407,9 @@ the number returned.
 
 A time-limited URL for one file. The API answers C<302> and this returns the
 C<Location> without following it. The link carries its own authorization and
-names no credential of yours, so it is safe to hand to another process; it
-authorizes the START of a transfer, so one already running is not interrupted
-when it lapses.
+names no credential of yours, so it is safe to hand to another process. The
+link only has to be valid when a transfer starts, so one already running isn't
+cut off when it lapses.
 
 =head2 download($id, $format, $path)
 

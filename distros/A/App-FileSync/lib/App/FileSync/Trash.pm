@@ -14,25 +14,28 @@ use File::Basename qw(basename dirname);
 use File::Copy ();
 use File::Path qw(remove_tree);
 use File::Spec;
+use POSIX qw(strftime);
 use Readonly;
 use Sub::Private { mode => 'enforce' };
 use Time::HiRes ();
 use Time::Local ();
 
 use App::FileSync::Args qw(named);
-use App::FileSync::Constants qw($MODE_MASK $TRASH_DAYS $SECONDS_PER_DAY);
+use App::FileSync::Constants qw($MODE_MASK $TRASH_DAYS $SECONDS_PER_DAY $STAT_MODE $STAT_SIZE $STAT_MTIME);
 use App::FileSync::I18N qw(throw os_error);
 use App::FileSync::IO qw(copy_preserving ensure_dir list_dir);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
-# The three levels of a day bucket.
+# The three levels of a day bucket, as strftime writes them and as the
+# patterns recognise them.
+Readonly::Scalar my $BUCKET_FORMAT => '%Y/%m/%d';
 Readonly my $YEAR  => qr/\A\d{4}\z/;
 Readonly my $MONTH => qr/\A\d{2}\z/;
 Readonly my $DAY   => qr/\A\d{2}\z/;
 
 # Windows has no POSIX permission bits worth restoring on a directory.
-Readonly my $HAS_MODES => $^O ne 'MSWin32';
+Readonly::Scalar my $HAS_MODES => $^O ne 'MSWin32';
 
 =encoding utf8
 
@@ -449,8 +452,8 @@ sub version_info {
 	return {
 		path  => $path,
 		date  => date_of($path),
-		size  => @stat ? $stat[7] : undef,
-		mtime => @stat ? $stat[9] : undef,
+		size  => @stat ? $stat[$STAT_SIZE] : undef,
+		mtime => @stat ? $stat[$STAT_MTIME] : undef,
 	};
 }
 
@@ -462,9 +465,9 @@ sub version_info {
 sub _bucket :Private {
 	my ($root, $epoch) = @_;
 
-	my @t = gmtime($epoch);
-	return File::Spec->catdir($root,
-		sprintf('%04d', $t[5] + 1900), sprintf('%02d', $t[4] + 1), sprintf('%02d', $t[3]));
+	# One directory per year, month and day: strftime gives "2026/11/04", and
+	# catdir rejoins the parts with this platform's separator.
+	return File::Spec->catdir($root, split m{/}, strftime($BUCKET_FORMAT, gmtime($epoch)));
 }
 
 # _buckets
@@ -513,8 +516,8 @@ sub _restore_entry :Private {
 			for @{ list_dir($src) || [] };
 
 		# Directory metadata last: filling it changed its mtime.
-		chmod($stat[2] & $MODE_MASK, $to) if $HAS_MODES;
-		utime($stat[9], $stat[9], $to);
+		chmod($stat[$STAT_MODE] & $MODE_MASK, $to) if $HAS_MODES;
+		utime($stat[$STAT_MTIME], $stat[$STAT_MTIME], $to);
 		return 1;
 	}
 

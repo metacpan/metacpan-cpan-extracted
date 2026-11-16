@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use lib 't/lib';
 use Test::More;
-use HMTest qw(free_ports quiet_child server_reap);
+use HMTest qw(free_ports quiet_child server_reap server_status slurp);
 use IO::Socket::INET;
 use Time::HiRes ();
 use File::Temp ();
@@ -37,7 +37,7 @@ if (!$pida) {
     quiet_child();
     Hyperman->run(app => $app, host => '127.0.0.1', port => $pa, workers => 1,
         body_min_rate => 100000, max_pipeline => 2, completion => 0, compress => 1,
-        access_log => "$dir/a.log", access_log_format => 'json');
+        error_log => "$dir/a.err", access_log => "$dir/a.log", access_log_format => 'json');
     exit 0;
 }
 my $pidb = fork // die "fork: $!";
@@ -59,6 +59,19 @@ sub connect_to {
         Time::HiRes::sleep(0.1);
     }
     return;
+}
+# A connection to one of the two servers, or the reason there is none: six
+# Linux smokers had server B answer a bare connect at start-up and refuse the
+# next one two seconds later, and the file died on an undefined socket with
+# nothing to say about the server. The exit status and the error log say it.
+my %srv = (a => [ $pa, \$pida, "$dir/a.err" ], b => [ $pb, \$pidb, "$dir/b.err" ]);
+sub conn {
+    my $name = shift;
+    my ($port, $pid, $log) = @{ $srv{$name} };
+    return connect_to($port)
+        || die "server $name on port $port is not answering: "
+             . (server_status($$pid) // 'the process is alive') . "; its error log: "
+             . (slurp($log) =~ /\S/ ? slurp($log) : "(empty)\n");
 }
 sub raw {
     my ($port, $req, $budget) = @_;
@@ -84,28 +97,51 @@ sub closed_within {
     return;
 }
 
-ok(connect_to($pa) && connect_to($pb), 'both servers are up');
+# A served request, not a bare connect: a connect succeeds into the backlog
+# the moment the socket listens, before the worker has started, and so said
+# nothing about a server that then died on its way into the loop.
+for my $name (sort keys %srv) {
+    my $up = raw($srv{$name}[0], "GET /up HTTP/1.1\r\nHost: a\r\nConnection: close\r\n\r\n");
+    like($up, qr{^HTTP/1\.1 200}, "server $name is up and answers")
+        or conn($name);
+}
 
 # --- a body dribbled a byte a second is cut by the rate floor ---
 {
-    my $s = connect_to($pa);
+    my $s = conn('a');
     $s->syswrite("POST /drip HTTP/1.1\r\nHost: a\r\nContent-Length: 1000\r\n\r\n");
     my $t0 = Time::HiRes::time;
     my $cut;
-    for (1 .. 80) {
-        $s->syswrite('x');
-        my $n = $s->sysread(my $c, 10);
-        if (defined $n && $n == 0) { $cut = Time::HiRes::time - $t0; last }
-        Time::HiRes::sleep(0.1);
-    }
-    ok($cut, 'the connection was closed') and cmp_ok($cut, '>=', 1.5, 'after the two seconds the rate is judged over');
+    # Bounded. Each sysread blocks until the server closes, and the test
+    # once accepted ANY close: on six smoker runs the floor never cut and
+    # the server was killed by quiet_child's 120 second alarm instead, the
+    # 119 second "cut" passed, and the next test found the other server
+    # dead of the same alarm. A floor judged every five seconds is met well
+    # inside fifteen, or the server is still holding the connection.
+    eval {
+        local $SIG{ALRM} = sub { die "timeout\n" };
+        alarm 15;
+        for (1 .. 80) {
+            $s->syswrite('x');
+            my $n = $s->sysread(my $c, 10);
+            if (defined $n && $n == 0) { $cut = Time::HiRes::time - $t0; last }
+            Time::HiRes::sleep(0.1);
+        }
+        alarm 0;
+    };
+    ok($cut, 'the connection was closed within fifteen seconds')
+        or diag("server a: " . (server_status($pida) // 'alive, still holding the connection')
+              . "; its error log: " . (slurp("$dir/a.err") =~ /\S/ ? slurp("$dir/a.err") : '(empty)'));
+    cmp_ok($cut, '>=', 1.5, 'after the two seconds the rate is judged over') if $cut;
 }
 
 # --- a request that never finishes is cut by request_timeout ---
 {
-    my $s = connect_to($pb);
+    my $s = conn('b');
     $s->syswrite("POST /hang HTTP/1.1\r\nHost: a\r\nContent-Length: 10\r\n\r\nabc");
-    my $cut = closed_within($s, 5);
+    # the sweep that judges it runs every five seconds, so the ceiling of one
+    # is met within the sweep after the one that saw the request arrive
+    my $cut = closed_within($s, 11);
     ok($cut, 'a request past its ceiling is closed');
 }
 
@@ -154,7 +190,7 @@ ok(connect_to($pa) && connect_to($pb), 'both servers are up');
 
 # --- a hard stop: TERM during a slow request, the grace runs out ---
 {
-    my $s = connect_to($pb);
+    my $s = conn('b');
     $s->syswrite("GET /slow HTTP/1.1\r\nHost: a\r\n\r\n");
     Time::HiRes::sleep(0.3);
     kill 'TERM', $pidb;

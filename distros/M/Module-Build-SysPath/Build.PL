@@ -17,6 +17,7 @@ my $builder = Module::Build->new(
         'File::Spec'      => 0,
         'File::Temp'      => 0,
         'Path::Tiny'      => 0.101,
+        'IO::Any'         => 0,
     },
     build_requires => {
         'Capture::Tiny'         => 0,

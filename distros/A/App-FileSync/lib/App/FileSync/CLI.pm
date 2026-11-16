@@ -33,20 +33,20 @@ use App::FileSync::Server;
 use App::FileSync::Settings;
 use App::FileSync::Transport::SSH;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # What the marker file says to anyone who finds it.  File content, not a
 # message: it must not change with the reader's language.
-Readonly my $MARKER_TEXT => "This directory is a filesync root; do not delete this file.\n";
+Readonly::Scalar my $MARKER_TEXT => "This directory is a filesync root; do not delete this file.\n";
 
 # The client's default local-trash retention, written by init.
-Readonly my $LOCAL_TRASH_DAYS => 30;
+Readonly::Scalar my $LOCAL_TRASH_DAYS => 30;
 
 # How many journal events "filesync-admin log" shows by default.
-Readonly my $ADMIN_LOG_LIMIT => 20;
+Readonly::Scalar my $ADMIN_LOG_LIMIT => 20;
 
 # Size units for human-readable byte counts.
-Readonly my $KIB => 1024;
+Readonly::Scalar my $KIB => 1024;
 Readonly my @SIZE_UNITS => ([ $KIB ** 3, 'GB' ], [ $KIB ** 2, 'MB' ], [ $KIB, 'kB' ]);
 
 # The client commands and their handlers.
@@ -201,11 +201,14 @@ sub run_server {
 sub _run :Private {
 	my ($code, @args) = @_;
 
+	# A handler returns its exit code; one that died returns nothing.
 	my $exit = eval { $code->(@args) };
-	return $exit if defined $exit;
+	unless (defined $exit) {
+		_report_error(strip_location($@));
+		$exit = $EXIT_FATAL;
+	}
 
-	_report_error(strip_location($@));
-	return $EXIT_FATAL;
+	return $exit;
 }
 
 # _report_error
@@ -327,6 +330,7 @@ sub _one_repo :Private {
 # Purpose:     a Client for one configured repo.
 # Entry:       %extra is passed to Client->new.
 # Exit:        returns the client.
+# Side effects: none until the client is used.
 sub _client :Private {
 	my ($config, $name, %extra) = @_;
 
@@ -567,12 +571,14 @@ sub _client_sync :Private {
 # Entry:       $result is a sync result.
 # Exit:        returns true when nothing was planned, moved, deleted,
 #              conflicted or skipped and no bytes crossed the wire.
+# Side effects: none.
 sub _idle :Private {
 	my ($result) = @_;
 
+	# A dry run moves nothing, so its planned actions count as activity too.
 	my $summary = $result->{summary} || {};
-	return 0 if @{ $result->{actions} || [] };
-	return !any { $summary->{$_} } qw(pulled pushed deleted conflicts skipped delta_pulled delta_pushed bytes_sent bytes_received);
+	return !@{ $result->{actions} || [] }
+		&& !any { $summary->{$_} } qw(pulled pushed deleted conflicts skipped delta_pulled delta_pushed bytes_sent bytes_received);
 }
 
 # _print_sync
@@ -1195,9 +1201,12 @@ sub _admin_repo_list :Private {
 	my ($admin) = @_;
 
 	my $repos = $admin->repo_list();
-	return _say('cli.repo.none', { root => $admin->root }) && $EXIT_OK unless @{$repos};
+	if (@{$repos}) {
+		print "$_\n" for @{$repos};
+	} else {
+		_say('cli.repo.none', { root => $admin->root });
+	}
 
-	print "$_\n" for @{$repos};
 	return $EXIT_OK;
 }
 
@@ -1399,9 +1408,12 @@ sub _admin_client_list :Private {
 	my $repo = _require($opt{repo}, 'client list', '--repo');
 
 	my $clients = $admin->client_list($repo);
-	return _say('cli.client.none', { repo => $repo }) && $EXIT_OK unless @{$clients};
+	if (@{$clients}) {
+		_say('cli.client.row', { %{$_}, state => message($_->{base} ? 'cli.client.synced' : 'cli.client.never') }) for @{$clients};
+	} else {
+		_say('cli.client.none', { repo => $repo });
+	}
 
-	_say('cli.client.row', { %{$_}, state => message($_->{base} ? 'cli.client.synced' : 'cli.client.never') }) for @{$clients};
 	return $EXIT_OK;
 }
 

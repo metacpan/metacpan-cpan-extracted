@@ -1,0 +1,10 @@
+# Copyright (c) 2023 Yuki Kimoto
+# MIT License
+
+use SPVM::UV::ConfigBuilder;
+
+my $uv_config_builder = SPVM::UV::ConfigBuilder->new;
+
+my $config = $uv_config_builder->build_config;
+
+$config;

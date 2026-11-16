@@ -6,14 +6,16 @@ use Mojo::Util            qw(dumper);
 
 my $class = 'Net::PublicSuffixList';
 
+my $warnings;
+local $SIG{'__WARN__'} = sub { $warnings .= $_[0] };
 
 subtest sanity => sub {
-	use_ok( $class ) or BAILOUT( "$class did not compile" );
+	use_ok( $class ) or BAIL_OUT( "$class did not compile" );
 	can_ok( $class, 'new' );
 	};
 
-diag( "You'll see a warnings about 'no way to fetch' for this test. That's fine." );
 subtest url => sub {
+	$warnings = undef;
 	my $url = 'http://www.example.com/list.dat';
 
 	my $default_obj = $class->new(
@@ -21,6 +23,8 @@ subtest url => sub {
 		no_net   => 1,
 		);
 	can_ok( $default_obj, 'url' );
+	like $warnings, qr/No way to fetch/, 'got fetch warning';
+
 	delete $default_obj->{list_url};
 	ok( ! exists $default_obj->{list_url}, 'list_url is not set' );
 	is( $default_obj->url, $default_obj->default_url, 'No configured URL uses the default' );
@@ -33,7 +37,6 @@ subtest url => sub {
 	can_ok( $url_obj, 'url' );
 	is( $url_obj->url, $url, 'Configured URL uses the configured URL'  );
 	};
-diag( "You shouldn't see any more 'no way to fetch' warnings." );
 
 SKIP: {
 	skip 'Enable network testing with NET_PUBLICSUFFIXLIST_NETWORK=1', 2
@@ -74,7 +77,7 @@ SKIP: {
 				cache_dir => $cache_dir,
 				);
 			isa_ok( $obj, $class );
-			is( $obj->{source}, 'net_cached', 'source parameter is "net_cache"' );
+			is( $obj->{source}, 'net_cached', 'source parameter is "net_cached"' );
 			};
 
 		subtest local_file => sub {

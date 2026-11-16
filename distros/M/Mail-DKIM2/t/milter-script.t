@@ -1126,4 +1126,146 @@ sub info_has { my ($mods, $re) = @_; scalar grep { $_->{value} =~ $re } inserted
     unlike($v, qr/[^\\]\)header\.d=/, '  ... so the comment does not end early');
 }
 
+# --- The arrival verdict: X-DKIM2-Arrival, and the snapshot as proof of it ---
+# The inbound milter says how the chain verified in X-DKIM2-Arrival, which
+# nothing from outside may supply, and takes a snapshot only of a message
+# whose verdict was pass or none. The outbound milter does not sign a message
+# that arrived any other way; one whose token names a snapshot of it is taken
+# as verified then, and only its instances are checked.
+sub arrival_of { my ($raw) = @_; [ $raw =~ /^X-DKIM2-Arrival:[ \t]*(\S+)/mgi ] }
+{
+    my (undef, $edge) = spawn_milter(mode => 'inbound');
+
+    # pass: the verdict and a snapshot.
+    (my $p = $PLAIN) =~ s/<post\@test1/<arrival-pass\@test1/;
+    my $signed = originator_signed($p);
+    my ($iv, $imods) = run_milter(sock => $edge,
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $signed);
+    my $arrived = apply_mods($signed, $imods);
+    is_deeply(arrival_of($arrived), ['pass'], 'arrival pass: X-DKIM2-Arrival: pass');
+    like($arrived, qr/^X-DKIM2-Snapshot:/mi, 'arrival pass: snapshot taken');
+
+    # none: the same.
+    (my $u = $LOCAL) =~ s/<post\@test1/<arrival-none\@test1/;
+    ($iv, $imods) = run_milter(sock => $edge,
+        from => 'author@test2.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $u);
+    is_deeply(arrival_of(apply_mods($u, $imods)), ['none'], 'arrival none: X-DKIM2-Arrival: none');
+
+    # fail (another recipient than the one signed for), with a forged verdict
+    # on it: the top instance matches, and there is still no snapshot.
+    (my $f = $PLAIN) =~ s/<post\@test1/<arrival-fail\@test1/;
+    my $fsigned = originator_signed($f);
+    my $forged = "X-DKIM2-Arrival: pass$EOL" . $fsigned;
+    ($iv, $imods) = run_milter(sock => $edge,
+        from => 'author@test1.dkim2.com', rcpt => ['someone@test2.dkim2.com'], message => $forged);
+    my $failed = apply_mods($forged, $imods);
+    is_deeply(arrival_of($failed), ['fail'], 'arrival fail: the forged verdict is replaced by ours');
+    unlike($failed, qr/^X-DKIM2-Snapshot:/mi, 'arrival fail: no snapshot');
+    is_deeply([mi_numbers($failed)], [1], 'arrival fail: no instance of ours');
+
+    # An internal inbound milter (--no-envelope-check, the wrap milter) keeps
+    # the edge's verdict: it cannot see the envelope the message arrived in.
+    my (undef, $inner) = spawn_milter(mode => 'inbound',
+        extra => ['--no-envelope-check', '--wrap-single-part']);
+    ($iv, $imods) = run_milter(sock => $inner,
+        from => 'author@test1.dkim2.com', rcpt => ['someone@test2.dkim2.com'], message => $failed);
+    my $inner_out = apply_mods($failed, $imods);
+    is_deeply(arrival_of($inner_out), ['fail'], 'internal hop: the edge verdict stands');
+    unlike($inner_out, qr/^X-DKIM2-Snapshot:/mi, 'internal hop: no snapshot of a failed arrival');
+    ok(!grep({ $_->{op} eq 'body' } @$imods), 'internal hop: not wrapped');
+
+    # Outbound, a failed arrival is not signed at all: refused, as it has the
+    # sender's signature on it.
+    my $listed = list_modified($failed);
+    my ($v, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $listed);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'failed arrival: not signed');
+    is($v, 'y', 'failed arrival: rejected');
+    like(reply_of($mods), qr/^550 5\.7\.1 not signing: arrival result fail/, 'failed arrival: 550 says why');
+
+    # ... and one with no signature on it goes on, without our instances.
+    (my $nosig = unsigned_arrival($u, $edge)) =~ s/^(X-DKIM2-Arrival:[ \t]*)\S+/${1}permerror/mi or die 'fixture';
+    ($v, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $nosig);
+    is($v, 'c', 'failed arrival, no signature: continues');
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'failed arrival, no signature: not signed');
+    is_deeply([mi_numbers(apply_mods($nosig, $mods))], [], 'failed arrival, no signature: unsigned m=1 removed');
+
+    # The verdict never leaves: a signed copy has no X-DKIM2-Arrival.
+    $listed = list_modified($arrived);
+    ($v, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $listed);
+    my $out = apply_mods($listed, $mods);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 1, 'arrival pass: signed');
+    is_deeply(arrival_of($out), [], 'arrival pass: X-DKIM2-Arrival removed from the signed copy');
+    is(verify($out)->result, 'pass', 'arrival pass: the copy verifies');
+
+    # The snapshot is the proof: an outbound milter that cannot verify the
+    # sender's signature (it is given another key for test1) signs the copy
+    # the token vouches for, and refuses the same copy without the token.
+    require JSON;
+    my $dns = JSON::decode_json($DNS_JSON->slurp);
+    $dns->{'test1.dkim2.com'}{'sel1._domainkey'} = $dns->{'test3.dkim2.com'}{'sel1._domainkey'};
+    path("$dir/wrong-dns.json")->spew(JSON::encode_json($dns));
+    my (undef, $blind) = spawn_milter(extra => ['--dns-json', "$dir/wrong-dns.json"]);
+    ($v, $mods) = run_milter(sock => $blind,
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $listed);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 1, 'snapshot vouches: signed without verifying upstream again')
+        or diag(join "\n", (split /\n/, milter_log())[-8 .. -1]);
+    is(verify(apply_mods($listed, $mods))->result, 'pass', 'snapshot vouches: the copy verifies at a receiver');
+    (my $untok = $listed) =~ s/^X-DKIM2-Snapshot:[^\r\n]*\r\n//mi or die 'fixture';
+    ($v, $mods) = run_milter(sock => $blind,
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $untok);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'no token: upstream is verified, and here that fails');
+
+    # A token that names another message's snapshot: never signed.
+    (my $p2 = $PLAIN) =~ s/<post\@test1/<arrival-other\@test1/;
+    my $signed2 = originator_signed($p2);
+    ($iv, $imods) = run_milter(sock => $edge,
+        from => 'author@test1.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $signed2);
+    my ($tok2) = apply_mods($signed2, $imods) =~ /^X-DKIM2-Snapshot:[ \t]*(\S+)/mi;
+    (my $swapped = $arrived) =~ s/^(X-DKIM2-Snapshot:[ \t]*)\S+/$1$tok2/mi or die 'fixture';
+    ($v, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $swapped);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 0, 'another message\'s snapshot: not signed');
+    is($v, 'y', 'another message\'s snapshot: rejected');
+    like(reply_of($mods), qr/^550 5\.7\.1 not signing: the snapshot is not of this message/,
+        'another message\'s snapshot: 550 says why');
+}
+
+# An unsigned post as the edge milter leaves it (m=1 stamped), under a
+# Message-Id of its own.
+sub unsigned_arrival {
+    my ($plain, $sock) = @_;
+    $plain =~ s/<arrival-none\@/<arrival-nosig\@/;
+    my ($iv, $imods) = run_milter(sock => $sock,
+        from => 'author@test2.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $plain);
+    return apply_mods($plain, $imods);
+}
+
+# --- Two inbound milters in a row, unsigned post (port 25, then the wrap) ---
+# The edge milter stamps m=1; the wrap milter behind it sees an instance
+# nobody has signed. That is this host's own, not a broken chain: the post
+# is wrapped, and the outbound milter signs it.
+{
+    my (undef, $edge) = spawn_milter(mode => 'inbound');
+    my (undef, $inner) = spawn_milter(mode => 'inbound',
+        extra => ['--no-envelope-check', '--wrap-single-part']);
+    (my $p = $LOCAL) =~ s/<post\@test1/<two-inbound\@test1/;
+    my ($iv, $imods) = run_milter(sock => $edge,
+        from => 'author@test2.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $p);
+    my $first = apply_mods($p, $imods);
+    ($iv, $imods) = run_milter(sock => $inner,
+        from => 'author@test2.dkim2.com', rcpt => ['list@test2.dkim2.com'], message => $first);
+    my $second = apply_mods($first, $imods);
+    is_deeply(arrival_of($second), ['none'], 'two inbound: still arrived none')
+        or diag(join "\n", (split /\n/, milter_log())[-8 .. -1]);
+    is_deeply([mi_numbers($second)], [1, 2], 'two inbound: wrapped as m=2');
+    my ($v, $mods) = run_milter(
+        from => 'list-bounces@test2.dkim2.com', rcpt => ['subscriber@example.org'], message => $second);
+    my $out = apply_mods($second, $mods);
+    is(scalar(inserted($mods, 'DKIM2-Signature')), 1, 'two inbound: signed');
+    is(verify($out)->result, 'pass', 'two inbound: the copy verifies');
+}
+
 done_testing;

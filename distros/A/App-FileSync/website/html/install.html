@@ -89,6 +89,7 @@ make install</code></pre>
 			<tr><td><code>Compress::Raw::Zlib</code></td><td>&mdash;</td><td>deflating data frames</td></tr>
 			<tr><td><code>Digest::SHA</code></td><td>&mdash;</td><td>content hashes and transfer verification</td></tr>
 			<tr><td><code>JSON::PP</code></td><td>&mdash;</td><td>configuration, manifests and the wire protocol</td></tr>
+			<tr><td><code>JSON::MaybeXS</code></td><td>1.004</td><td>chooses the fastest JSON encoder installed; it also installs <code>Cpanel::JSON::XS</code> where there is a compiler, which reads large manifests about 70 times faster than <code>JSON::PP</code></td></tr>
 			<tr><td><code>autodie</code></td><td>2.37</td><td>file operations</td></tr>
 			<tr><td><code>List::Util</code></td><td>1.54</td><td>list helpers</td></tr>
 			<tr><td><code>version</code></td><td>0.77</td><td>dotted version objects</td></tr>
@@ -100,7 +101,7 @@ make install</code></pre>
 	<code>Fcntl</code>, <code>File::Basename</code>, <code>File::Copy</code>,
 	<code>File::Path</code>, <code>File::Spec</code>, <code>File::Temp</code>,
 	<code>FindBin</code>, <code>Getopt::Long</code>, <code>IO::Handle</code>,
-	<code>IPC::Open3</code>, <code>Scalar::Util</code>, <code>Sys::Hostname</code>,
+	<code>IPC::Open3</code>, <code>POSIX</code>, <code>Scalar::Util</code>, <code>Sys::Hostname</code>,
 	<code>Time::HiRes</code> and <code>Time::Local</code> &mdash; ships with
 	Perl.</p>
 

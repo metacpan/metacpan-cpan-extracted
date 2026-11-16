@@ -12,6 +12,7 @@ use autodie qw(:all);
 
 use Digest::SHA ();
 use Exporter qw(import);
+use Fcntl qw(SEEK_END);
 use File::Basename qw(dirname);
 use File::Copy ();
 use File::Path qw(make_path);
@@ -21,10 +22,10 @@ use Readonly;
 use Sub::Private { mode => 'enforce' };
 use Time::HiRes ();
 
-use App::FileSync::Constants qw($MODE_MASK $TEMP_PREFIX);
+use App::FileSync::Constants qw($MODE_MASK $TEMP_PREFIX $STAT_MODE $STAT_MTIME $SHA_BITS);
 use App::FileSync::I18N qw(throw os_error strip_location);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 our @EXPORT_OK = qw(
 	read_text open_file temp_file write_atomic install_file clear_target
@@ -33,7 +34,7 @@ our @EXPORT_OK = qw(
 
 # File::Temp wants at least four X's; ten keep collisions out of reach even
 # with thousands of uploads in one directory.
-Readonly my $TEMP_TEMPLATE => $TEMP_PREFIX . ('X' x 10);
+Readonly::Scalar my $TEMP_TEMPLATE => $TEMP_PREFIX . ('X' x 10);
 
 # Catalogue key for each open mode, so the error names what was attempted.
 Readonly my %OPEN_KEY => (
@@ -45,10 +46,10 @@ Readonly my %OPEN_KEY => (
 # The permission bits a new file would get from open() under the current
 # umask.  File::Temp creates 0600 files, which would otherwise leak into the
 # master and every replica.
-Readonly my $CREATE_MODE => oct('666');
+Readonly::Scalar my $CREATE_MODE => oct('666');
 
 # Windows has no POSIX permission bits worth setting.
-Readonly my $HAS_MODES => $^O ne 'MSWin32';
+Readonly::Scalar my $HAS_MODES => $^O ne 'MSWin32';
 
 =encoding utf8
 
@@ -545,7 +546,7 @@ None; an unreadable file yields C<undef>.
 sub sha256_file {
 	my ($path) = @_;
 
-	my $sha = Digest::SHA->new(256);
+	my $sha = Digest::SHA->new($SHA_BITS);
 	my $ok = -f $path && eval { $sha->addfile($path, 'b'); 1 };
 
 	return $ok ? $sha->hexdigest() : undef;
@@ -663,8 +664,8 @@ sub copy_preserving {
 	File::Copy::copy($source, $destination)
 		or throw('io.copy', { from => $source, to => $destination, error => "$!" });
 
-	chmod($stat->[2] & $MODE_MASK, $destination) if $HAS_MODES;
-	utime($stat->[9], $stat->[9], $destination);
+	chmod($stat->[$STAT_MODE] & $MODE_MASK, $destination) if $HAS_MODES;
+	utime($stat->[$STAT_MTIME], $stat->[$STAT_MTIME], $destination);
 
 	return 1;
 }
@@ -826,7 +827,8 @@ sub _ends_mid_line :Private {
 	return 0 unless -s $path;
 
 	my $fh = open_file($path, '<');
-	seek($fh, -1, 2);
+	# Only the final byte matters.
+	seek($fh, -1, SEEK_END);
 	read($fh, my $last, 1);
 	close $fh;
 

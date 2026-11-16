@@ -1,0 +1,51 @@
+---
+abstract: 'read files through a converter chosen by their names'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: IO-Factotum
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Getopt::EX::Factotum:
+    file: lib/Getopt/EX/Factotum.pm
+  IO::Factotum:
+    file: lib/IO/Factotum.pm
+    version: '0.03'
+  IO::Factotum::ARGV:
+    file: lib/IO/Factotum/ARGV.pm
+  IO::Factotum::skylighting:
+    file: lib/IO/Factotum/skylighting.pm
+  IO::Factotum::sourcehighlight:
+    file: lib/IO/Factotum/sourcehighlight.pm
+requires:
+  Command::Run: '1.05'
+  perl: v5.16.0
+resources:
+  bugtracker: https://github.com/tecolicom/IO-Factotum/issues
+  homepage: https://github.com/tecolicom/IO-Factotum
+  repository: https://github.com/tecolicom/IO-Factotum.git
+version: '0.03'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 1

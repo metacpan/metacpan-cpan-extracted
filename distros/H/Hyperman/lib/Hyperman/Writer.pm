@@ -3,7 +3,7 @@ package Hyperman::Writer;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 require Hyperman;   # all methods are XS (xs/writer.xs, include/hyperman/)
 
@@ -94,6 +94,7 @@ from the C ABI's C<stream_write>. See L<Hyperman/Stream handles>.
 =head2 close
 
     $w->close;
+    $w->close(\@trailers);
 
 End the body. On HTTP/1.1 the connection stays open for its next request
 when the body was chunked or counted, and closes when it was EOF-delimited;
@@ -106,6 +107,43 @@ Closing twice is harmless. A writer that goes out of scope without being
 closed is closed then, the way a lexical filehandle is - but close it
 yourself where you can, so the body ends when you meant it to and not when
 the last reference happens to go.
+
+=head3 Trailers
+
+    $w->close([ 'grpc-status' => 0, 'grpc-message' => 'ok' ]);
+
+Given an array reference of C<< name => value >> pairs, C<close> ends the
+body and sends those fields after it as trailers. A gRPC server cannot do
+without this: the status of a gRPC call is carried by the C<grpc-status>
+trailer and by nothing else, the HTTP status being 200 either way.
+L<Hyperman/Trailers> has the full account. The short one:
+
+=over 4
+
+=item * B<HTTP/2>: a trailing C<HEADERS> frame ends the stream, and the
+client always receives it.
+
+=item * B<HTTP/1.1>: the trailer section of a chunked body, provided the
+request's C<TE> header listed C<trailers>. When either condition fails the
+fields are dropped and the body ends as a bare C<close> ends it.
+C<< $env->{'psgix.hyperman.trailers'} >> tells the application beforehand.
+
+=item * B<HTTP/3>: not yet supported, so C<close> with a non-empty list
+croaks.
+
+=back
+
+The list is checked before anything goes out, and a bad list croaks while
+the body is B<still open>, so the application can close it properly. Bad
+means anything other than an array reference, an odd number of elements, an
+empty name, a name containing a character outside RFC 9110's token set, an
+undefined value, or a control character other than a tab in a value (over
+HTTP/1.1 a CR or LF there would split the response). Dropped without a word,
+as hop-by-hop headers are: C<connection>, C<keep-alive>,
+C<proxy-connection>, C<transfer-encoding>, C<upgrade>, C<te>,
+C<content-length>, C<host> and C<trailer>. Names are sent in lower case, and
+values without their leading and trailing blanks. C<undef>, an empty list,
+and a list made only of dropped names are each a bare C<close>.
 
 =head2 abort
 

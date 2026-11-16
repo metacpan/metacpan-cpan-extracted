@@ -37,9 +37,17 @@ added there reaches this module only once it's listed here. The module
 is here to stay, beside DBIx::Squirrel's own stages, such as
 L<DBIx::Squirrel::Stages::Rows>.
 
-C<dump_to> is for debugging. It writes each value in full, secrets and
-all. It doesn't escape control characters in strings, so a value from
-outside can send escape sequences to a terminal.
+C<dump_to> is for debugging. Where Text::Redact::Secrets v1.x is
+installed, it writes each secret that module's rules find as
+C<*REDACTED*>, in the text it writes only: the value passed on is as it
+came. The rules find a long, random password, token or key, such as
+the password in a DSN, but not a short or ordinary password, so a dump
+can still hold secrets. Without the module, or while
+C<local $Ekorn::Pipeline::Stages::Taps::DumpSecrets = 1> is set, it
+writes each value in full; with the module there but broken, it
+croaks rather than write a dump. It doesn't escape control characters
+in strings, so a value from outside can send escape sequences to a
+terminal.
 
 =head1 SEE ALSO
 

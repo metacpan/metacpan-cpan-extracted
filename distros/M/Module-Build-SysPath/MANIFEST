@@ -1,6 +1,9 @@
 AGENTS.md
 Build.PL
 Changes
+docs/skills/perl-module-build-syspath/README.md
+docs/skills/perl-module-build-syspath/references/example.md
+docs/skills/perl-module-build-syspath/SKILL.md
 examples/Sys-Path-Example1/.gitignore
 examples/Sys-Path-Example1/Build.PL
 examples/Sys-Path-Example1/Build2.PL
@@ -31,6 +34,8 @@ t/01_Module-Build-SysPath.t
 t/02_path-handling.t
 t/03-spc-rewrite.t
 t/04-install-failure-detection.t
+t/06-file-modes.t
+t/07-file-owners.t
 t/lib/PostCopyFailure.pm
 t/lib/Sys/Path/SPc.pm
 t/tdirs/Acme-Test-SysPath.installed/etc/acme-test-syspath.cfg

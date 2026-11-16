@@ -4,7 +4,7 @@ use v5.14;
 use warnings;
 use utf8;
 
-our $VERSION = "2.3901";
+our $VERSION = "2.3902";
 
 use Data::Dumper;
 {
@@ -569,7 +569,11 @@ sub fold {
 	    push @runin, ${^MATCH};
 	    $_ = ${^POSTMATCH};
 	}
-	$folded .= join '', @runin if @runin;
+	if (@runin) {
+	    $folded .= join '', @runin;
+	    # colors with no visible text after them stay on this line
+	    $folded .= $1 if s/\A((?:${color_re}|${reset_re})++)\z//;
+	}
     }
 
     ##
@@ -739,7 +743,7 @@ Text::ANSI::Fold - Text folding library supporting ANSI terminal sequence and As
 
 =head1 VERSION
 
-Version 2.3901
+Version 2.3902
 
 =head1 SYNOPSIS
 

@@ -24,7 +24,7 @@ do { my $x = {
                                       'Getopt::Long::Descriptive' => '0',
                                       'IO::Handle' => '0',
                                       'IPC::Open3' => '0',
-                                      'Net::IDN::Encode' => '0',
+                                      'Net::IDN::Encode' => '2.600',
                                       'Pod::Wordlist' => '0',
                                       'Sereal' => '0',
                                       'Test2::Plugin::SubtestFilter' => '0',
@@ -74,7 +74,7 @@ do { my $x = {
                                       'Data::Validate::URI' => '0',
                                       'Email::Address::XS' => '1.04',
                                       'Getopt::Long::Descriptive' => '0',
-                                      'Net::IDN::Encode' => '0',
+                                      'Net::IDN::Encode' => '2.600',
                                       'Sereal' => '0',
                                       'Type::Tiny::XS' => '0'
                                     }

@@ -5713,6 +5713,48 @@
         }
       },
       {
+        "name": "numeric-upper-bound-on-absent-member",
+        "why": "lt on a member this plan does not serve matches nothing and is reported. A binding that reads the missing member as zero matches lt: 5 and blocks a visitor on data it never saw, which the gte case above cannot show.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "lt": 5
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": [
+            "resproxy"
+          ]
+        }
+      },
+      {
+        "name": "numeric-inclusive-upper-bound-on-absent-member",
+        "why": "lte, the mirror of the case above: zero is inside lte: 5 too.",
+        "body": {
+          "ip": "45.83.91.1",
+          "is_vpn": true
+        },
+        "condition": {
+          "resproxy": {
+            "hits": {
+              "lte": 5
+            }
+          }
+        },
+        "expect": {
+          "blocked": false,
+          "missing": [
+            "resproxy"
+          ]
+        }
+      },
+      {
         "name": "false-entry-is-ignored",
         "why": "A false entry states nothing, so the remaining term decides. There is deliberately no way to write block-when-false, which would read as blocking everybody.",
         "body": {
@@ -7954,6 +7996,221 @@
         }
       ]
     }
+  },
+  "vocabulary": {
+    "why": "A closed vocabulary in an ANSWER (a plan's tier, a database's standing and license type, a format, a download's outcome) is the API's to extend. Each case serves a well-formed answer carrying a value no published list holds, and the call must hand that value back as served, a raw string or an unknown case that carries it, and never fail: a binding that refuses it breaks every installed copy of itself the day the API adds a value, and a release cannot reach the copies already installed. A wrong TYPE (a number, a null where the member is required) is still refused, and refusing an unpublished value in a REQUEST before the network is unchanged. Each `expect` key is a path through the answer's wire names, a number indexing a list; each suite reads it through its own typed result.",
+    "cases": [
+      {
+        "name": "entitlement-plan-name",
+        "why": "The plan's name is what a client shows, and key is what it compares: the free plan's key is free and its name Unlimited. A binding that drops name leaves a client building one from the key, which a renamed plan then gets wrong.",
+        "call": "myEntitlement",
+        "answer": {
+          "org_id": "85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61",
+          "apikey": {
+            "id": "0ab424cc-7619-4dad-b027-afacdc2cedb0",
+            "expires": null,
+            "allowed_cidrs": []
+          },
+          "plan": {
+            "key": "free",
+            "name": "Unlimited",
+            "tier": "free"
+          },
+          "usage": {
+            "requests": 580,
+            "quota": 5000000,
+            "hard_limit": null,
+            "window_start": "2026-11-01T00:00:00Z",
+            "window_end": "2026-12-01T00:00:00Z"
+          }
+        },
+        "expect": {
+          "plan.key": "free",
+          "plan.name": "Unlimited",
+          "plan.tier": "free"
+        }
+      },
+      {
+        "name": "entitlement-tier-unknown",
+        "why": "A plan whose tier no published list holds: the answer reads, and the tier comes back as served.",
+        "call": "myEntitlement",
+        "answer": {
+          "org_id": "85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61",
+          "apikey": {
+            "id": "0ab424cc-7619-4dad-b027-afacdc2cedb0",
+            "expires": null,
+            "allowed_cidrs": []
+          },
+          "plan": {
+            "key": "data",
+            "name": "Data",
+            "tier": "data"
+          },
+          "usage": {
+            "requests": 580,
+            "quota": 5000000,
+            "hard_limit": null,
+            "window_start": "2026-11-01T00:00:00Z",
+            "window_end": "2026-12-01T00:00:00Z"
+          }
+        },
+        "expect": {
+          "plan.key": "data",
+          "plan.name": "Data",
+          "plan.tier": "data"
+        }
+      },
+      {
+        "name": "database-standing-unknown",
+        "why": "A database whose standing no published list holds: the catalog reads, and the standing comes back as served.",
+        "call": "listDatabases",
+        "answer": {
+          "databases": [
+            {
+              "base": "vpn_ip_extended",
+              "name": "VPN IP Extended",
+              "summary": "Every VPN exit address, with its provider.",
+              "license_type": "standard",
+              "starts": "2026-01-01T00:00:00Z",
+              "expires": null,
+              "renews_at": null,
+              "notice_due_at": null,
+              "in_term": true,
+              "standing": "suspended",
+              "open": false,
+              "versions": [
+                {
+                  "id": "vpn_ip_extended_v1",
+                  "version": 1,
+                  "formats": [
+                    {
+                      "format": "csvgz",
+                      "bytes": 1024
+                    }
+                  ],
+                  "sample_formats": [
+                    "csvgz"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expect": {
+          "databases.0.base": "vpn_ip_extended",
+          "databases.0.standing": "suspended"
+        }
+      },
+      {
+        "name": "database-license-type-unknown",
+        "why": "A license type no published list holds: the catalog reads, and the license type comes back as served, never as no license at all.",
+        "call": "listDatabases",
+        "answer": {
+          "databases": [
+            {
+              "base": "vpn_ip_extended",
+              "name": "VPN IP Extended",
+              "summary": "Every VPN exit address, with its provider.",
+              "license_type": "oem",
+              "starts": "2026-01-01T00:00:00Z",
+              "expires": null,
+              "renews_at": null,
+              "notice_due_at": null,
+              "in_term": true,
+              "standing": "licensed",
+              "open": false,
+              "versions": [
+                {
+                  "id": "vpn_ip_extended_v1",
+                  "version": 1,
+                  "formats": [
+                    {
+                      "format": "csvgz",
+                      "bytes": 1024
+                    }
+                  ],
+                  "sample_formats": [
+                    "csvgz"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expect": {
+          "databases.0.base": "vpn_ip_extended",
+          "databases.0.license_type": "oem"
+        }
+      },
+      {
+        "name": "database-format-unknown",
+        "why": "A format no published list holds, in a version's formats and its sample formats: the catalog reads, and each comes back as served. Refusing it in a download REQUEST before the network stays as it is.",
+        "call": "listDatabases",
+        "answer": {
+          "databases": [
+            {
+              "base": "vpn_ip_extended",
+              "name": "VPN IP Extended",
+              "summary": "Every VPN exit address, with its provider.",
+              "license_type": "standard",
+              "starts": "2026-01-01T00:00:00Z",
+              "expires": null,
+              "renews_at": null,
+              "notice_due_at": null,
+              "in_term": true,
+              "standing": "licensed",
+              "open": false,
+              "versions": [
+                {
+                  "id": "vpn_ip_extended_v1",
+                  "version": 1,
+                  "formats": [
+                    {
+                      "format": "parquet",
+                      "bytes": 2048
+                    }
+                  ],
+                  "sample_formats": [
+                    "parquet"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        "expect": {
+          "databases.0.versions.0.formats.0.format": "parquet",
+          "databases.0.versions.0.formats.0.bytes": 2048,
+          "databases.0.versions.0.sample_formats.0": "parquet"
+        }
+      },
+      {
+        "name": "download-outcome-unknown",
+        "why": "A download outcome no published list holds: the history reads, and the outcome comes back as served.",
+        "call": "listDownloads",
+        "answer": {
+          "downloads": [
+            {
+              "dataset_id": "vpn_ip_extended_v1",
+              "format": "csvgz",
+              "outcome": "throttled",
+              "sample": false,
+              "open": false,
+              "bytes": 1024,
+              "http_status": 302,
+              "apikey_id": "0ab424cc-7619-4dad-b027-afacdc2cedb0",
+              "client_ip": "8.8.8.8",
+              "user_agent": "curl/8.14.1",
+              "created": "2026-11-15T07:00:00Z"
+            }
+          ]
+        },
+        "expect": {
+          "downloads.0.dataset_id": "vpn_ip_extended_v1",
+          "downloads.0.outcome": "throttled"
+        }
+      }
+    ]
   },
   "bogons": {
     "v4": [

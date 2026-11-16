@@ -5,7 +5,7 @@
 #                                  into file $2
 #                          with engine:voice $3
 #           using AWS Polly
-our $VERSION = '20260408.1240'; # VERSION
+our $VERSION = '20261115.1249'; # VERSION
 
 
 use v5.32;
@@ -79,7 +79,7 @@ awspollymp3.pl - script converting textfile named $1
 
 =head1 VERSION
 
-version 20260408.1240
+version 20261115.1249
 
 =head1 DESCRIPTION
 

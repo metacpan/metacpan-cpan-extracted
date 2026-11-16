@@ -29,7 +29,7 @@ use App::FileSync::Store;
 use App::FileSync::Trash;
 use App::FileSync::Verify;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # The per-repo metadata directories a new repo starts with.
 Readonly my @META_DIRS => qw(clients trash journal locks);
@@ -276,7 +276,7 @@ sub repo_create {
 		# its own error.
 		my $blocked = _unwritable_base($master) // _unwritable_base($meta);
 		$self->_throw('admin.root_unwritable', { root => $self->{root}, blocked => $blocked }) if defined $blocked;
-		die $error;
+		die $error;	## no critic (ErrorHandling::RequireCarping) -- rethrow unchanged
 	}
 
 	App::FileSync::Config::save_repo($self->{root}, $name, $config);

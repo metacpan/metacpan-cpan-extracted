@@ -1,0 +1,5 @@
+Revision history for Business-DPD-SK
+
+0.01	15 November 2026
+  - Business::DPD::SK::GeoRDB
+  - Business::DPD::SK::API

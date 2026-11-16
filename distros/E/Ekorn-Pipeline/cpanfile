@@ -9,6 +9,10 @@ requires 'Sub::Util';
 requires 'experimental';
 requires 'namespace::clean';
 
+# dump_to redacts secrets with it when it's installed (roadmap 2026-0038).
+# A v2.0.0 changes what redact takes or returns, so dump_to takes v1.x.
+recommends 'Text::Redact::Secrets', '>= v1.0.0, < v2.0.0';
+
 on test => sub {
     requires 'Test2::V0';
     requires 'Test2::Plugin::NoWarnings';

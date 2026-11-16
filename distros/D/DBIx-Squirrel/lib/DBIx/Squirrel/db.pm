@@ -11,7 +11,7 @@ use Ekorn::Pipeline qw(is_stage);
 
 use DBIx::Squirrel::Errors       qw(at_caller croakf failed in_method);
 use DBIx::Squirrel::Placeholders qw(
-    expand_lists key_of study_sql values_for values_taken
+    expand_lists key_of study_sql values_taken
 );
 use Ekorn::Pipeline::Pipes qw();
 use DBIx::Squirrel::Util   qw(
@@ -27,6 +27,11 @@ our @CARP_NOT = @DBIx::Squirrel::Errors::INTERNAL;
 
 # DBD::Pg's options that change which placeholders it reads.
 my @PG_OPTIONS = qw(pg_placeholder_dollaronly pg_placeholder_nocolons);
+
+# A study _prepare_as hands on to the method it calls, while it calls it:
+# the handle, the statement and the attributes it's for, and what _study
+# returned. See _prepare_as.
+our $HANDED;
 
 # Prepare a statement, with placeholders in any style, and return its
 # handle.
@@ -86,8 +91,10 @@ sub _for_values ($self, $normalised, $state, $dbi_attrs, @values) {
         sub { values_taken($state->{Binds}) },
         $state->{Lists}, @values,
     );
-    my($expanded, $binds, $lengths)
-        = expand_lists($state, {values_for($state->{Binds}, @values)});
+    my($expanded, $binds, $lengths) = expand_lists(
+        $state,
+        DBIx::Squirrel::Placeholders::_values_for($state->{Binds}, \@values),    ## no critic (Subroutines::ProtectPrivateSubs)
+    );
     my %kept = map { ($_ => $state->{$_}) }
         qw(Placeholders OriginalStatement Options Lists Pieces);
     return $expanded, {
@@ -177,10 +184,18 @@ sub prepare_cached ($self, $statement, $attrs = undef, $if_active = undef) {
 # values given, as _prepare_for does, and not cached, croaking as the
 # method does if it can't be prepared. iterate, results and
 # DBIx::Squirrel::Sugar's functions prepare their statements with it.
+#
+# What it studied is handed on, in $HANDED, to the study the method
+# makes, so the statement is studied once: twice in full, with
+# attributes, cost about 32 µs each (roadmap 2026-0028).
 sub _prepare_as ($self, $method, $statement, $attrs, $if_active, @values) {
-    my(undef, $state) = _study($self, $statement, $attrs);
+    my @studied = _study($self, $statement, $attrs);
+    # A statement given as a reference, such as code to call, is studied
+    # each time, as before.
+    local $HANDED
+        = is_ref($statement) ? undef : [$self, $statement, $attrs, @studied];
     return $self->$method($statement, $attrs, defined $if_active ? $if_active : ())
-        unless $state->{Lists};
+        unless $studied[1]{Lists};
     return _prepare_for($self, $statement, $attrs, @values)
         || croak failed($self, $method);
 }
@@ -370,6 +385,19 @@ sub _select_through (
 # that many, so statements made as the program runs can't fill memory.
 sub _study ($self, $statement, $attrs) {
     state $STUDIED = 1000;
+    # A study _prepare_as handed on, taken once, and only for the handle,
+    # statement and attributes it was made for: a subclass's prepare that
+    # changes them has them studied afresh.
+    if ($HANDED) {
+        my($dbh, $text, $given, @studied) = @$HANDED;
+        if (   $dbh == $self
+            && $text eq ($statement // '')
+            && ($given // 0) == ($attrs // 0))
+        {
+            $HANDED = undef;
+            return @studied;
+        }
+    }
     return _study_afresh($self, $statement, $attrs)
         if ($attrs && %$attrs)
         || !defined $statement
@@ -416,7 +444,21 @@ sub _study_afresh ($self, $statement, $attrs) {
     );
     @state{qw(Lists Pieces)} = (_lists($placeholders, $lists), $pieces)
         if $lists;
+    $state{Order} = _order($state{Binds})
+        if $state{Binds} && !$lists;
     return $normalised, \%state, split_attrs($attrs);
+}
+
+# Return the number or name of the placeholder at each position, in
+# order, given a statement's map of its placeholders' numbers or names to
+# their positions, so its values can be put in order with a slice
+# (roadmap 2026-0028).
+sub _order ($binds) {
+    my @order;
+    for my $key (keys %$binds) {
+        $order[$_ - 1] = $key for @{ $binds->{$key} };
+    }
+    return \@order;
 }
 
 # Return a map of each number or name a statement's placeholders use to

@@ -87,6 +87,9 @@ sub new {
         allowed_tools => [],
         require_policy => 0,
         require_tool_scope => 0,
+        interrupt_on => [],
+        on_interrupt_decision => undef,
+        on_interrupt => undef,
     }, $class;
 }
 
@@ -189,12 +192,38 @@ sub run {
 
 sub _invoke_tool {
     my ($options, $call, $run_id, $session_id) = @_;
+    my $original_name = $call->{name};
+    my $original_arguments = _deep_copy($call->{arguments} // {});
+    Praxo::Errors::praxo_error(
+        'AGENT_INVALID_OPTIONS',
+        "agent: tool $original_name is not allowed",
+    ) unless _tool_allowed($options, $original_name);
     _authorize($options, Praxo::Models::action(
         kind => 'tool.invoke', session_id => $session_id,
-        tool_name => $call->{name}, arguments => $call->{arguments},
+        tool_name => $original_name, arguments => $original_arguments,
     ));
     Praxo::Errors::praxo_error('TOOL_NOT_FOUND', 'tool is not registered')
         unless $options->{tools};
+    Praxo::Errors::praxo_error(
+        'AGENT_INVALID_OPTIONS',
+        "agent: tool $call->{name} is not allowed",
+    ) unless _tool_allowed($options, $call->{name});
+    my ($skip, $result) = _apply_interrupt(
+        $options, $call, $run_id, $session_id,
+    );
+    if ($skip) {
+        return Praxo::Models::message_tool(
+            Praxo::Json::stringify($result // ''),
+            $call->{id} // '',
+        );
+    }
+    if ($call->{name} ne $original_name
+        || !Praxo::Json::equals($call->{arguments} // {}, $original_arguments)) {
+        _authorize($options, Praxo::Models::action(
+            kind => 'tool.invoke', session_id => $session_id,
+            tool_name => $call->{name}, arguments => $call->{arguments},
+        ));
+    }
     my $tool = $options->{tools}->get($call->{name});
     _emit($options, 'tool.call', $session_id, $run_id, {
         name => $call->{name}, arguments => $call->{arguments} // {},
@@ -204,6 +233,88 @@ sub _invoke_tool {
         Praxo::Json::stringify($value),
         $call->{id} // '',
     );
+}
+
+sub _apply_interrupt {
+    my ($options, $call, $run_id, $session_id) = @_;
+    return (0, undef) unless _interrupt_on($options, $call->{name});
+    my $handler = $options->{on_interrupt_decision};
+    my $approval = $options->{on_interrupt};
+    Praxo::Errors::praxo_error(
+        'AGENT_INTERRUPT_UNHANDLED',
+        'agent: approval handler not configured: ' . $call->{name},
+    ) unless $handler || $approval;
+    _emit($options, 'tool.interrupt', $session_id, $run_id, {
+        name => $call->{name},
+        arguments => _deep_copy($call->{arguments} // {}),
+    });
+    my $interrupt = Praxo::Models::interrupt(
+        run_id => $run_id,
+        session_id => $session_id,
+        call => $call,
+    );
+    if ($handler) {
+        my $decision = $handler->($interrupt);
+        Praxo::Errors::praxo_error(
+            'AGENT_INTERRUPT_DECISION_INVALID',
+            'agent: invalid interrupt decision',
+        ) unless ref($decision) eq 'HASH';
+        my $action = $decision->{action} // '';
+        if ($action eq Praxo::Models::INTERRUPT_APPROVE()) {
+            return (0, undef);
+        }
+        if ($action eq Praxo::Models::INTERRUPT_EDIT()) {
+            Praxo::Errors::praxo_error(
+                'AGENT_INTERRUPT_DECISION_INVALID',
+                'agent: edit requires arguments',
+            ) unless defined $decision->{arguments};
+            $call->{arguments} = _deep_copy($decision->{arguments});
+            return (0, undef);
+        }
+        if ($action eq Praxo::Models::INTERRUPT_REJECT()) {
+            Praxo::Errors::praxo_error(
+                'AGENT_APPROVAL_DENIED',
+                'agent: tool call denied by approval: ' . $call->{name}
+                    . ': ' . ($decision->{reason} // ''),
+            );
+        }
+        if ($action eq Praxo::Models::INTERRUPT_RESPOND()) {
+            return (1, $decision->{response} // '');
+        }
+        Praxo::Errors::praxo_error(
+            'AGENT_INTERRUPT_DECISION_INVALID',
+            'agent: invalid interrupt decision: ' . $action,
+        );
+    }
+    my $approved = $approval->($interrupt);
+    Praxo::Errors::praxo_error(
+        'AGENT_APPROVAL_DENIED',
+        'agent: tool call denied by approval: ' . $call->{name},
+    ) unless $approved;
+    return (0, undef);
+}
+
+sub _tool_allowed {
+    my ($options, $name) = @_;
+    my $allowed = $options->{allowed_tools} // [];
+    return 1 unless ref($allowed) eq 'ARRAY' && @$allowed;
+    return scalar grep { $_ eq $name } @$allowed;
+}
+
+sub _interrupt_on {
+    my ($options, $name) = @_;
+    my $on = $options->{interrupt_on};
+    return 0 unless defined $on;
+    return exists $on->{$name} ? 1 : 0 if ref($on) eq 'HASH';
+    return scalar grep { $_ eq $name } @$on if ref($on) eq 'ARRAY';
+    return $on eq $name ? 1 : 0 unless ref($on);
+    return 0;
+}
+
+sub _deep_copy {
+    my ($value) = @_;
+    return undef unless defined $value;
+    return Praxo::Json::parse(Praxo::Json::stringify($value));
 }
 
 sub _authorize {

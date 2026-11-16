@@ -92,4 +92,38 @@ my $dry = App::FileSync::Trash::prune(
 ok(@{$dry}, 'dry run reports what it would remove');
 ok(-d File::Spec->catdir($trash_root, '2023', '11', '13'), 'dry run deleted nothing');
 
+# --- dated names ------------------------------------------------------------
+#
+# Trash buckets, snapshot dates, conflict-copy stamps and journal files are all
+# named from the UTC date.  The names are on disk, so they must not change:
+# zero-padded, UTC whatever the local zone, and past 2038.
+{
+	require App::FileSync;
+	require App::FileSync::Snapshot;
+	require App::FileSync::Store;
+
+	my %cases = (
+		0                 => [ '19700101T000000Z', '1970-01-01', [ '1970', '01', '01' ] ],
+		86_399            => [ '19700101T235959Z', '1970-01-01', [ '1970', '01', '01' ] ],
+		951_782_400       => [ '20000229T000000Z', '2000-02-29', [ '2000', '02', '29' ] ],
+		1_700_000_000.75  => [ '20231114T221320Z', '2023-11-14', [ '2023', '11', '14' ] ],
+		2_147_483_648     => [ '20380119T031408Z', '2038-01-19', [ '2038', '01', '19' ] ],
+		4_102_444_800     => [ '21000101T000000Z', '2100-01-01', [ '2100', '01', '01' ] ],
+	);
+
+	local $ENV{TZ} = 'America/New_York';
+	for my $epoch (sort { $a <=> $b } keys %cases) {
+		my ($stamp, $date, $bucket) = @{ $cases{$epoch} };
+		is(App::FileSync::format_utc($epoch), $stamp, "format_utc($epoch)");
+		is(App::FileSync::Snapshot::date_for_epoch($epoch), $date, "date_for_epoch($epoch)");
+		is(App::FileSync::Trash::_bucket('root', $epoch), File::Spec->catdir('root', @{$bucket}),
+			"the trash bucket for $epoch is one directory per year, month and day");
+	}
+
+	my $store = App::FileSync::Store->new(root => tempdir(CLEANUP => 1), repo => 'docs', config => {});
+	my @t = gmtime();
+	is((File::Spec->splitpath($store->journal_path()))[2], sprintf('%04d-%02d.jsonl', $t[5] + 1900, $t[4] + 1),
+		"the journal file is named after this UTC month");
+}
+
 done_testing();

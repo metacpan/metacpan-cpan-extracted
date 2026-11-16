@@ -17,15 +17,15 @@ use Sub::Private { mode => 'enforce' };
 use Time::HiRes ();
 
 use App::FileSync::Args qw(named);
-use App::FileSync::Constants qw($MODE_MASK $TEMP_PREFIX $STALE_TEMP_SECONDS $TYPE_FILE $TYPE_DIR);
+use App::FileSync::Constants qw($MODE_MASK $TEMP_PREFIX $STALE_TEMP_SECONDS $TYPE_FILE $TYPE_DIR $STAT_MODE $STAT_SIZE $STAT_MTIME $SHA_BITS);
 use App::FileSync::I18N qw(message os_error);
 use App::FileSync::IO qw(list_dir);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
 
 # A cached mtime within this much of the file's is the same mtime: JSON
 # round-trips the fractional part with float noise.
-Readonly my $MTIME_EPSILON => 0.001;
+Readonly::Scalar my $MTIME_EPSILON => 0.001;
 
 # Matches a temporary file left by an interrupted run.
 Readonly my $TEMP_NAME => qr/\A\Q$TEMP_PREFIX\E/;
@@ -40,7 +40,7 @@ Readonly my $TEMP_NAME => qr/\A\Q$TEMP_PREFIX\E/;
 my $file_entry = sub {
 	my ($context, $abs, $rel, $stat) = @_;
 
-	my ($size, $mtime) = @{$stat}[7, 9];
+	my ($size, $mtime) = @{$stat}[$STAT_SIZE, $STAT_MTIME];
 	my $cached = $context->{cache}{$rel};
 
 	my $hash;
@@ -52,7 +52,7 @@ my $file_entry = sub {
 		$hash = $cached->{h};
 		$context->{stats}{cached}++;
 	} else {
-		my $sha = Digest::SHA->new(256);
+		my $sha = Digest::SHA->new($SHA_BITS);
 		unless (eval { $sha->addfile($abs, 'b'); 1 }) {
 			$context->{skipped}{$rel} = message('scan.unreadable', { error => $@ =~ s/\s+\z//r });
 			$context->{stats}{skipped}++;
@@ -67,7 +67,7 @@ my $file_entry = sub {
 		s    => $size,
 		m    => $mtime,
 		h    => $hash,
-		mode => $stat->[2] & $MODE_MASK,
+		mode => $stat->[$STAT_MODE] & $MODE_MASK,
 	};
 };
 
@@ -256,7 +256,7 @@ sub clean_stale_temps {
 			my @stat = Time::HiRes::lstat($path) or next;
 			if (-d _) {
 				push @queue, $path;
-			} elsif ($name =~ $TEMP_NAME && $now - $stat[9] >= $max_age) {
+			} elsif ($name =~ $TEMP_NAME && $now - $stat[$STAT_MTIME] >= $max_age) {
 				no autodie qw(unlink);
 				$removed++ if unlink $path;
 			}

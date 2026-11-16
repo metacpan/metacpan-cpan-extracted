@@ -301,13 +301,27 @@ my $new_tokens = $c->openidconnect->refresh_token(
 
 ## Securing Endpoints
 
-Use Catalyst roles and attributes to protect endpoints:
+Use Catalyst plugins, roles and/or attributes to protect endpoints.
+For example, this plugin works well alongside the standard Catalyst
+plugins often used to handle authentication, roles and ACL:
 
 ```perl
-sub profile : Local : RequireUser {
-    my ( $self, $c ) = @_;
-    # User is authenticated, $c->user is available
-}
+use Catalyst qw/OpenIDConnect
+                Authentication
+                Authorization::Roles
+                Authorization::ACL
+               /;
+
+# See auth plugin documentation for configuration examples, omitted here.
+
+__PACKAGE__->setup();
+
+# Block users who do not have the 'staff' role from accessing `/profile` endpoint:
+__PACKAGE__->allow_access_if( '/profile', [ qw( staff ) ] );
+__PACKAGE__->deny_access( '/profile' );
+
+# Ensure the OpenID Connect endpoint is generally accessible:
+__PACKAGE__->allow_access( '/openidconnect' );
 ```
 
 ## Advanced Topics

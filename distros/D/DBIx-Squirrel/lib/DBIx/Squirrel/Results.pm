@@ -29,7 +29,9 @@ sub _row_maker ($self, $sth) {    ## no critic (Subroutines::ProhibitUnusedPriva
     my $names = at_caller { $sth->{NUM_OF_FIELDS} ? $sth->{NAME_lc} : undef };
     return undef unless $names;    ## no critic (Subroutines::ProhibitExplicitReturnUndef)
     my $class = _base_class($self)->class_for($names);
-    return sub ($row) { bless $row, $class };
+    # Without a signature, as it's called for each row, and a signature
+    # costs about 20 ns a call (roadmap 2026-0028).
+    return sub { bless $_[0], $class };
 }
 
 # Return the base class of the rows' class: the ekorn_result_class

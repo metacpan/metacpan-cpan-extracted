@@ -2,7 +2,7 @@ use v5.40;
 use feature 'class';
 no warnings 'experimental::class';
 #
-class Alien::Xrepo v1.0.10 {
+class Alien::Xrepo v1.0.11 {
     use Alien::Xmake;
     use Alien::Xrepo::PackageInfo;
     use JSON::PP;
@@ -77,7 +77,7 @@ class Alien::Xrepo v1.0.10 {
         my @args    = (
             $self->_confirm_args( \%opts ),
             $self->_build_args( defined $pkgfile ? { %opts, configs => undef } : \%opts ),
-            $self->_verbosity_args( \%opts ),
+            $self->_verbosity_args( \%opts )
         );
         say "[*] xrepo: ensuring $full_spec is installed..." if $verbose;
 
@@ -401,13 +401,13 @@ class Alien::Xrepo v1.0.10 {
         my @cmd = $self->_argv( 'add-repo', ['-y'], $name, $url, $branch );
         my ( $out, $err, $exit ) = capture { system @cmd };
         die "xrepo add-repo failed:\n$err" if $exit != 0;
-        return 1;
+        1;
     }
 
-    method remove_repo ($name) {
+    method rm_repo ($name) {
         local $ENV{XMAKE_THEME} = $self->_theme;
         say "[*] xrepo: removing repo $name..." if $verbose;
-        my @cmd = $self->_argv( 'remove-repo', ['-y'], $name );
+        my @cmd = $self->_argv( 'rm-repo', ['-y'], $name );
         system @cmd;
     }
 

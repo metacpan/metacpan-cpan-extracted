@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use lib 't/lib';
+use HMTest qw(can_lower_nofile);
 use Test::More;
 use File::Temp ();
 use Hyperman;
@@ -221,7 +222,8 @@ SKIP: {
 # --- a log handle whose dup fails: the descriptor table is full ---
 SKIP: {
     skip "fork is not Windows", 2 if $^O eq "MSWin32";
-    skip "no /bin/sh to lower the descriptor limit", 2 unless -x "/bin/sh";
+    skip "cannot lower the descriptor limit here (no /bin/sh, or ulimit -n is refused)", 2
+        unless can_lower_nofile();
     my $dir = File::Temp::tempdir(CLEANUP => 1);
     for my $which (qw(access_log error_log)) {
         my $file = "$dir/dup-$which";

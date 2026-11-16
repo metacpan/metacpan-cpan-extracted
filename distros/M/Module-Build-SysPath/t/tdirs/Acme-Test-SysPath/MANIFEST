@@ -16,3 +16,4 @@ state/acme-state/.exists
 www/.hidden/hidden
 www/empty/.exists
 www/www
+srv/srv.file

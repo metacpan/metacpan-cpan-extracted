@@ -411,7 +411,7 @@ subtest 'my_entitlement reports the plan and the usage, and is never cached' => 
     my $body = {
         org_id => '85bb51e4-2eb6-4a31-8e4d-02ba8b98fe61',
         apikey => { id => '0ab424cc-7619-4dad-b027-afacdc2cedb0', expires => undef, allowed_cidrs => [] },
-        plan => { key => 'free', tier => 'free' },
+        plan => { key => 'free', name => 'Unlimited', tier => 'free' },
         usage => {
             requests => 4, quota => 100, hard_limit => undef,
             window_start => '2026-11-13T00:00:00Z', window_end => '2026-11-14T00:00:00Z',
@@ -427,6 +427,7 @@ subtest 'my_entitlement reports the plan and the usage, and is never cached' => 
     my $account = $client->my_entitlement;
     is($account->{plan}{key}, 'free', 'reports the plan');
     is($account->{plan}{tier}, 'free', 'and the field tier');
+    is($account->{plan}{name}, 'Unlimited', 'and the name to show');
     is($account->{usage}{requests}, 4, 'and what has been spent');
     is($account->{usage}{quota}, 100, 'and what the plan includes');
     # Undef means NEVER stop, which is not the same as a limit of zero.
@@ -489,7 +490,7 @@ subtest 'a 2xx a lookup cannot read as its answer is a retried server_error' => 
 subtest 'a member of the wrong type or a null is a retried server_error' => sub {
     my $entitlement = {
         org_id => 'o', apikey => { id => 'k', expires => undef, allowed_cidrs => [] },
-        plan => { key => 'max', tier => 'max' },
+        plan => { key => 'max', name => 'Max', tier => 'max' },
         usage => {
             requests => 1, quota => 10, hard_limit => undef,
             window_start => '2026-09-04T00:00:00Z', window_end => '2026-09-05T00:00:00Z',
@@ -523,6 +524,11 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['lookup_asn, an AS number of "9009"', 'lookup_asn', InternetDataTest::asn(asn => '9009')],
         ['lookup_asn, no registry', 'lookup_asn', InternetDataTest::asn(registry => undef)],
         ['lookup_asn, num_ips of "1"', 'lookup_asn', InternetDataTest::asn(num_ips => '1')],
+        ['lookup_asn, a rank of "341"', 'lookup_asn', InternetDataTest::asn(rank => '341')],
+        ['lookup_asn, a tier1 of "false"', 'lookup_asn', InternetDataTest::asn(tier1 => 'false')],
+        ['lookup_asn, upstreams of ["174"]', 'lookup_asn', InternetDataTest::asn(upstreams => ['174'])],
+        ['lookup_asn, downstreams of [null]', 'lookup_asn', InternetDataTest::asn(downstreams => [undef])],
+        ['lookup_asn, hosted_domains without total', 'lookup_asn', InternetDataTest::asn(hosted_domains => { domains => [] })],
         ['lookup_asn, a whois value of 1', 'lookup_asn', InternetDataTest::asn(whois => { handle => 1 })],
         ['lookup_asn, a prefix missing its size', 'lookup_asn', InternetDataTest::asn(prefixes => [{
             prefix => 'p', peer_count => 1, rpki_status => 'valid', first_seen => 'd', country => 'RO', other_origins => [],
@@ -540,6 +546,8 @@ subtest 'a member of the wrong type or a null is a retried server_error' => sub 
         ['my_entitlement, requests of "1"', 'my_entitlement', { %$entitlement, usage => { %{ $entitlement->{usage} }, requests => '1' } }],
         ['my_entitlement, a null CIDR', 'my_entitlement', { %$entitlement, apikey => { %{ $entitlement->{apikey} }, allowed_cidrs => [undef] } }],
         ['my_entitlement, an empty object', 'my_entitlement', {}],
+        ['my_entitlement, a plan name of 1', 'my_entitlement', { %$entitlement, plan => { key => 'max', name => 1, tier => 'max' } }],
+        ['my_entitlement, a plan without its name', 'my_entitlement', { %$entitlement, plan => { key => 'max', tier => 'max' } }],
     );
     my $body;
     my $origin = InternetDataTest::Origin->new(sub { $_[0]->render(json => $body) });
@@ -611,7 +619,7 @@ subtest 'an entitlement date-time that is not RFC 3339 is a retried server_error
     my $origin = InternetDataTest::Origin->new(sub { $_[0]->render(json => $body) });
     my $entitlement = {
         org_id => 'o', apikey => { id => 'k', expires => '2026-10-05T10:00:00Z', allowed_cidrs => [] },
-        plan => { key => 'max', tier => 'max' },
+        plan => { key => 'max', name => 'Max', tier => 'max' },
         usage => {
             requests => 1, quota => 10, hard_limit => undef,
             window_start => '2026-10-05T10:00:00Z', window_end => '2026-10-05T10:00:00Z',

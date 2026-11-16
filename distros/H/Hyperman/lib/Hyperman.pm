@@ -4,7 +4,7 @@ use 5.010;
 use strict;
 use warnings;
 
-our $VERSION = '0.69';
+our $VERSION = '0.70';
 
 require XSLoader;
 XSLoader::load('Hyperman', $VERSION);
@@ -679,6 +679,9 @@ exactly as they are for an HTTP/1.1 request. A stream the client resets
 before its response is ready has that response's Future cancelled, as a
 closed HTTP/1.1 connection does.
 
+A streamed body may end with trailer fields, which is what lets a gRPC
+service run on this server. See L</Trailers>.
+
 =head2 HTTP/3
 
 With C<< http3 => 1 >> alongside C<tls_cert>/C<tls_key>, the listener also
@@ -975,6 +978,71 @@ EOF-delimited body and a close, as before 0.57.
 
 The equivalent for a C consumer is the table's C<stream_open>; see
 L</Stream handles>.
+
+C<< ->close(\@trailers) >> ends the body and sends trailer fields after it.
+See L</Trailers>.
+
+=head2 Trailers
+
+    return sub {
+        my $w = $_[0]->([ 200, [ 'Content-Type' => 'application/grpc' ] ]);
+        $w->write($message);
+        $w->close([ 'grpc-status' => 0, 'grpc-message' => 'ok' ]);
+    };
+
+A trailer is a header-shaped field that arrives B<after> the body. Plain
+HTTP rarely has a use for one. gRPC depends on them: the outcome of a gRPC
+call travels in the C<grpc-status> and C<grpc-message> trailers and nowhere
+else, while the HTTP status is 200 whatever the outcome was.
+
+PSGI has no slot for trailers and Hyperman does not invent one. A response
+array with a fourth element would be truncated or mangled by any middleware
+that rebuilds C<[ $status, $headers, $body ]>. Trailers are therefore
+accepted only at the two points where a body is ended on purpose:
+
+=over 4
+
+=item * C<< $writer->close(\@trailers) >>, on the writer a C<psgi.streaming>
+responder hands back and on a L</stream> handle. L<Hyperman::Writer/Trailers>
+lists what the array may contain.
+
+=item * C<stream_close_trailers>, entry v10 of the C ABI. See
+L</Stream handles>.
+
+=back
+
+A synchronous response cannot carry them, and a gRPC B<Trailers-Only> reply
+does not need to: a call that fails before it produces a message puts its
+C<grpc-status> among the ordinary headers of an empty response.
+
+Where the fields go depends on the transport:
+
+=over 4
+
+=item * B<HTTP/2>, h2c or TLS: a trailing C<HEADERS> frame follows the last
+C<DATA> frame and ends the stream. Every HTTP/2 client receives it. The
+first response of an h2c upgrade counts as HTTP/2 here.
+
+=item * B<HTTP/1.1>: the trailer section between the last chunk and the
+empty line that ends a chunked body. That needs the body to be B<chunked>,
+meaning a streamed body on a keep-alive connection with no C<Content-Length>
+from the application, B<and> it needs the request's C<TE> header to have
+listed C<trailers>, since RFC 9110 lets a client that did not ask discard
+them. When either is missing the fields are dropped and the body ends as it
+would have anyway. That covers HTTP/1.0, a request with
+C<Connection: close>, a C<HEAD>, and a counted body.
+
+=item * B<HTTP/3>: not supported yet. C<close> with a non-empty list croaks.
+
+=back
+
+    $env->{'psgix.hyperman.trailers'}   # 1, or absent
+
+is set before the application runs when trailers will reach this client:
+on every HTTP/2 request, and on an HTTP/1.1 request that asked for them over
+a keep-alive connection. It is never set on HTTP/3. An HTTP/1.1 application
+that then gives its streamed response a C<Content-Length> has given up the
+trailer section regardless of the flag.
 
 =head2 Denylist and rate limiting
 
@@ -1370,7 +1438,7 @@ F<hm_abi.h>.
 
 =head2 The table
 
-    #define HM_ABI_VERSION 8
+    #define HM_ABI_VERSION 10
 
     #define HM_ABI_READ  0x1        /* io_watch masks     */
     #define HM_ABI_WRITE 0x2
@@ -1380,7 +1448,8 @@ F<hm_abi.h>.
     #define HM_ABI_FAILED    2
     #define HM_ABI_CANCELLED 3
 
-    #define HM_ABI_STREAM_OK      0 /* stream_write, stream_close */
+    #define HM_ABI_STREAM_OK      0 /* stream_write, stream_close,
+                                       stream_close_trailers      */
     #define HM_ABI_STREAM_FULL    1
     #define HM_ABI_STREAM_STALE  -1
     #define HM_ABI_STREAM_GONE   -2
@@ -1396,6 +1465,11 @@ F<hm_abi.h>.
     typedef void (*hm_abi_stream_cb)(pTHX_ void *h, void *ud);
     typedef void (*hm_abi_stream_data_cb)(pTHX_ void *h, const char *buf,
                                           STRLEN len, int fin, void *ud);
+
+    typedef struct hm_abi_pool_stats {            /* v9 */
+        UV workers, alive;
+        UV requests, accepts, denied, conns, bytes_out, datagrams, h3;
+    } hm_abi_pool_stats;
 
     typedef struct hm_abi {
         int abi_version;                          /* == HM_ABI_VERSION */
@@ -1455,6 +1529,7 @@ F<hm_abi.h>.
                              const char *group, STRLEN glen,
                              hm_abi_bus_cb cb, void *ud);
         int (*bus_unsubscribe)(pTHX_ int id);
+        int (*bus_dispatch)(pTHX);     /* run this process's subscriptions */
 
         /* v6: stream handles. stream_open sends status + headers and
          * returns an opaque handle, or NULL if the ticket names no live
@@ -1486,6 +1561,21 @@ F<hm_abi.h>.
          * would grow without bound. NULL removes it. */
         int   (*stream_on_data)(pTHX_ void *h, hm_abi_stream_data_cb cb,
                                 void *ud);
+
+        /* v9: the Shared::Arena the server created (as void *, so this
+         * header needs no sa_abi.h), its provider's table, and the worker
+         * scoreboard summed: 1 with *out filled, 0 with no board. */
+        void       *(*arena_region)(void);
+        const void *(*arena_table)(void);
+        int         (*pool_stats)(hm_abi_pool_stats *out);
+
+        /* v10: stream_close followed by trailer fields. An h2 stream ends
+         * on a trailing HEADERS frame. A chunked HTTP/1.1 body gets a
+         * trailer section when the request's TE asked for one. trailers
+         * is an arrayref of name, value pairs. NULL, undef and [] mean a
+         * plain stream_close. A malformed list is HM_ABI_STREAM_ARG and
+         * leaves the body open and the handle the caller's. */
+        int   (*stream_close_trailers)(pTHX_ void *h, SV *trailers);
     } hm_abi;
 
 C<on_worker_start> is the seam for anything a consumer owns that is bound to
@@ -1526,9 +1616,10 @@ the five v6 entries are it. L</stream> is the same registry as a Perl call.
 The handle carries its own generation guard and every entry point checks it
 against the live registry before dereferencing it, so a write arriving after
 the connection died is C<HM_ABI_STREAM_GONE> and never a read of freed
-memory. Nothing but C<stream_close> frees a handle: a connection that goes
-away only marks its handles dead and fires their abort callbacks, and an
-aborted stream still has to be closed.
+memory. Only the three calls that end a body free a handle:
+C<stream_close>, C<stream_abort> and C<stream_close_trailers>. A connection
+that goes away marks its handles dead and fires their abort callbacks, and
+an aborted stream still has to be closed.
 
 C<stream_on_abort> is what makes this better than detach rather than merely
 equivalent. A multiplexed peer can reset one stream out of many - an HTTP/2
@@ -1550,6 +1641,25 @@ C<HM_ABI_STREAM_HIWAT> unwritten bytes: the bytes were taken, but a
 well-behaved producer stops there and resumes when the drain callback fires.
 
 Like every other callback in the table, neither may croak.
+
+C<stream_close_trailers> (v10) is C<stream_close> followed by L</Trailers>,
+which is how a gRPC service written in C ends each call:
+
+    AV *t = newAV();
+    av_push(t, newSVpvs("grpc-status"));  av_push(t, newSVpvs("0"));
+    int r = A->stream_close_trailers(aTHX_ h, sv_2mortal(newRV_noinc((SV *)t)));
+    if (r == HM_ABI_STREAM_ARG)         /* refused: h is still open, and ours */
+        r = A->stream_abort(aTHX_ h);
+
+The list is read and not kept, so the caller's reference remains the
+caller's. It is checked before anything is sent, and a malformed list is
+C<HM_ABI_STREAM_ARG> with no other effect: the body is still open and the
+handle still belongs to the caller, who can close again or abort. A gRPC
+body sent without the status it was meant to end with is a decision for the
+producer, not for the server. A sound list gets the result C<stream_close>
+would give, and the handle is released. Over HTTP/1.1 the fields reach the
+wire only when the body is chunked and the request asked for them (see
+L</Trailers>). Otherwise they are dropped, not refused.
 
 =head2 Hyperman::_abi_ptr
 

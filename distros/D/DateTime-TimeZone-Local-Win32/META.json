@@ -1,7 +1,7 @@
 {
    "abstract" : "Determine the local system's time zone on Windows",
    "author" : [
-      "David Pinkowitz <dapink@cpan.org>",
+      "David Pinkowitz <dapink_cpan@pinkowitz.com>",
       "Dave Rolsky <autarch@urth.org>"
    ],
    "dynamic_config" : 0,
@@ -60,18 +60,21 @@
    "provides" : {
       "DateTime::TimeZone::Local::Win32" : {
          "file" : "lib/DateTime/TimeZone/Local/Win32.pm",
-         "version" : "2.07"
+         "version" : "2.08"
       }
    },
    "release_status" : "stable",
    "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dapink/DateTime-TimeZone-Local-Win32/issues"
+      },
       "repository" : {
          "type" : "git",
          "url" : "https://github.com/dapink/DateTime-TimeZone-Local-Win32",
          "web" : "https://github.com/dapink/DateTime-TimeZone-Local-Win32"
       }
    },
-   "version" : "2.07",
+   "version" : "2.08",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.028000"
@@ -132,6 +135,11 @@
             "class" : "Dist::Zilla::Plugin::Repository",
             "name" : "Repository",
             "version" : "0.23"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "6.012"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",

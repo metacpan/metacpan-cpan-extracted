@@ -35,6 +35,7 @@
             "Digest::MD5" : "0",
             "File::Spec" : "0",
             "File::Temp" : "0",
+            "IO::Any" : "0",
             "List::MoreUtils" : "0",
             "Path::Tiny" : "0.101",
             "Sys::Path" : "0.17",
@@ -45,7 +46,7 @@
    "provides" : {
       "Module::Build::SysPath" : {
          "file" : "lib/Module/Build/SysPath.pm",
-         "version" : "0.19"
+         "version" : "0.20"
       }
    },
    "release_status" : "stable",
@@ -62,6 +63,6 @@
          "web" : "https://github.com/jozef/Module-Build-SysPath"
       }
    },
-   "version" : "0.19",
+   "version" : "0.20",
    "x_serialization_backend" : "JSON::PP version 4.16"
 }

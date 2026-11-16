@@ -26,6 +26,16 @@ my $hidden = $distribution->child('www', '.private[1]+', 'hidden');
 $hidden->parent->mkpath;
 $hidden->spew("hidden payload\n");
 
+$distribution->child('www', '.listed')->spew("listed dot file\n");
+$distribution->child('www', 'forgotten')->spew("unlisted payload\n");
+$distribution->child('www', 'www~')->spew("editor backup matching MANIFEST.SKIP\n");
+$distribution->child('www', '.unwanted')->spew("unlisted dot file\n");
+$distribution->child('log', 'acme-log', 'app.log')->spew("runtime log\n");
+$distribution->child('log', 'acme-unlisted', '.exists')->touchpath;
+$distribution->child('MANIFEST')->append("www/Xhidden/visible\nwww/.listed\n");
+my $build_pl = $distribution->child('Build.PL');
+$build_pl->edit(sub { s/(conffiles\s*=>)/webdir_files => { 'www\/.listed' => 1 },\n    $1/ });
+
 my @inc = map { '-I'.path($_)->absolute } @INC;
 my $run = sub {
     my (@args) = @_;
@@ -41,7 +51,13 @@ my $run = sub {
     return $output;
 };
 
-$run->('Build.PL', '--destdir='.$destination);
+my $configure_output = $run->('Build.PL', '--destdir='.$destination);
+like($configure_output, qr{www/forgotten.*not listed in MANIFEST},
+    'unlisted payload file is reported');
+like($configure_output, qr{log/acme-unlisted/\.exists.*not listed in MANIFEST},
+    'unlisted folder marker is reported');
+unlike($configure_output, qr{(?:\.private|\.unwanted|app\.log|www~).*not listed in MANIFEST},
+    'files excluded for other reasons or by MANIFEST.SKIP are not reported');
 $run->('Build');
 
 ok($distribution->child('blib', 'webdir', 'www')->is_file,
@@ -52,6 +68,12 @@ ok(!$distribution->child('blib', 'webdir', '.hidden', 'hidden')->exists,
     'ordinary hidden-directory payload is excluded');
 ok(!$distribution->child('blib', 'webdir', '.private[1]+', 'hidden')->exists,
     'metacharacter hidden-directory payload is excluded');
+ok($distribution->child('blib', 'webdir', '.listed')->is_file,
+    'dot file listed in webdir_files is included');
+ok(!$distribution->child('blib', 'webdir', 'forgotten')->exists,
+    'payload file missing from MANIFEST is excluded');
+ok(!$distribution->child('blib', 'webdir', 'www~')->exists,
+    'file matching MANIFEST.SKIP is excluded');
 
 $run->('Build', 'install');
 
@@ -66,5 +88,8 @@ ok(!$installed_webdir->child('.hidden', 'hidden')->exists,
     'ordinary hidden-directory payload is not installed');
 ok(!$installed_webdir->child('.private[1]+', 'hidden')->exists,
     'metacharacter hidden-directory payload is not installed');
+ok(!$destination->child(
+    path(Sys::Path->logdir)->absolute->relative(path('/')), 'acme-unlisted',
+)->exists, 'folder marker missing from MANIFEST creates no folder');
 
 done_testing;

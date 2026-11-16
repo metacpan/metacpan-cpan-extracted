@@ -7,6 +7,7 @@ use Test::More;
 plan skip_all => "Author tests not required for installation"
     unless ( $ENV{AUTHOR_TESTING} );
 
-eval "use Test::Pod::Coverage 0.08";
-plan skip_all => "Test::Pod::Coverage 0.08 required for testing POD coverage" if $@;
+use Test::Needs { "Test::Pod::Coverage" => "0.08" };    # block form: no string eval
+
+Test::Pod::Coverage->import();
 all_pod_coverage_ok({ also_private => ['new'] });

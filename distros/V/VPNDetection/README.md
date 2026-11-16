@@ -56,12 +56,15 @@ Same answer `lookup` would give for that address, and the same cost against your
 
 ```perl
 my $acct = $client->my_entitlement;
-print $acct->{plan}{key};          # max
+print $acct->{plan}{name};         # Max, what to show
+print $acct->{plan}{key};          # max, what to compare against
 print $acct->{usage}{requests};    # 580
 print $acct->{usage}{window_end};  # when the allowance resets
 ```
 
 Usage counts against the anniversary of your subscription on a paid plan, not the calendar month and not the billing period, and against the UTC day on the free plan; it is the same number a lookup is gated on. `hard_limit` is `undef` on an uncapped plan, which is not the same as zero.
+
+Show `plan.name` and compare against `plan.key`: a plan's name can change, and its key never does. A value the API adds later to a plan's `tier`, a database's `standing` or `license_type`, a format or a download's `outcome` comes back as the string it served, so check for the values you know rather than assuming the list is complete.
 
 `my_ip` returns a `VPNDetection::Result` like `lookup` does; `my_entitlement` returns the decoded hashref. `my_ip_p` and `my_entitlement_p` are the non-blocking forms.
 

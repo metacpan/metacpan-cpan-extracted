@@ -1,8 +1,7 @@
 package Net::PublicSuffixList;
 use v5.26;
 use strict;
-use feature qw(signatures);
-no warnings qw(experimental::signatures);
+use experimental qw(signatures);
 
 use warnings;
 no warnings;
@@ -12,7 +11,7 @@ use File::Basename        qw(basename dirname);
 use File::Path            qw(make_path);
 use File::Spec::Functions qw(catfile);
 
-our $VERSION = '0.503';
+our $VERSION = '0.504';
 
 =encoding utf8
 
@@ -39,7 +38,7 @@ Net::PublicSuffixList - The Mozilla Public Suffix List
 =head1 DESCRIPTION
 
 I mostly wrote this because I was working on L<App::url> and needed a
-way to figure out which part of a URL was the registered part and with
+way to figure out which part of a URL was the registered part and which
 was the top-level domain.
 
 The Public Suffix List is essentially a self-reported collection of the
@@ -143,8 +142,9 @@ sub parse_list ( $self, $list ) {
 		}
 
 	my( $line_ending ) = $$list =~ m/(\R)/;
+	local $/ = $line_ending;
+
 	open my $string_fh, '<:utf8', $list;
-	$string_fh->input_record_separator( $line_ending );
 
 	while( <$string_fh> ) {
 		chomp;
@@ -172,7 +172,7 @@ sub add_suffix ( $self, $suffix ) {
 
 =item remove_suffix( STRING )
 
-Remove the STRING as a known public suffices. This returns the object
+Remove the STRING as a known public suffix. This returns the object
 itself.
 
 =cut
@@ -189,7 +189,7 @@ sub suffix_exists ( $self, $suffix ) { exists $self->{suffix}{$suffix} ? $self :
 
 =item suffixes_in( HOST )
 
-Return an array reference of the publix suffixes in HOST, sorted from
+Return an array reference of the public suffixes in HOST, sorted from
 shortest to longest.
 
 =cut
@@ -399,7 +399,7 @@ brian d foy, C<< <briandfoy@pobox.com> >>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright © 2020-2024, brian d foy, All Rights Reserved.
+Copyright © 2020-2026, brian d foy, All Rights Reserved.
 
 You may redistribute this under the terms of the Artistic License 2.0.
 

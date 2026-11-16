@@ -1,7 +1,8 @@
 # What `make manifest` must leave OUT of the released tarball. MANIFEST itself is
 # generated from this, so this file is the reviewable one.
 
-^\.git/
+# A submodule checkout's .git is a FILE naming its gitdir, which must not ship either.
+^\.git(/|$)
 ^\.github/
 ^\.gitignore$
 ^scripts/

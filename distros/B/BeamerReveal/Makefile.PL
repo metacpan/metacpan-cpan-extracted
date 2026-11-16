@@ -23,7 +23,6 @@ my %WriteMakefileArgs = (
   "EXE_FILES" => [
     "bin/awspolly.pl",
     "bin/azuretts.py",
-    "bin/azuretts.py~",
     "bin/balabolka.pl",
     "bin/beamer-reveal.pl",
     "bin/festival.pl"
@@ -69,7 +68,7 @@ my %WriteMakefileArgs = (
     "File::Spec" => 0,
     "Test::More" => 0
   },
-  "VERSION" => "20260408.1240",
+  "VERSION" => "20261115.1249",
   "test" => {
     "TESTS" => "t/*.t t/02-bin/*.t"
   }

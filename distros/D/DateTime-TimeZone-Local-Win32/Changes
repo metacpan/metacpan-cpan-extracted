@@ -1,3 +1,10 @@
+2.08    2026-11-15
+
+    - Update author email address and report bugs on GitHub issues instead of RT.
+
+    - Author tests: treat offset mismatches as TODO when the Windows time zone
+      data and the IANA data used by DateTime::TimeZone are different releases.
+
 2.07    2026-11-12
 
     - Add new time zones for Alberta Standard Time, British Columbia Standard Time

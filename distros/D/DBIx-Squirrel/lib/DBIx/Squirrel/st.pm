@@ -9,7 +9,7 @@ use Ref::Util  qw(is_plain_arrayref);
 use DBIx::Squirrel::Errors       qw(at_caller croakf);
 use DBIx::Squirrel::Iterator     qw();
 use DBIx::Squirrel::Placeholders qw(
-    is_numbered key_of place_values values_for values_taken
+    is_numbered key_of place_values values_taken
 );
 use DBIx::Squirrel::Results qw();
 use Ekorn::Pipeline::Pipes  qw();
@@ -35,10 +35,15 @@ sub bind ($self, @args) {
 # placeholders to positions, if it has one. Each value is bound to its
 # positions directly, with the DBI's bind_param.
 sub _bind ($self, $binds, @args) {
-    my @placed
-        = $binds
-        ? place_values($self->{private_ekorn}, values_for($binds, @args))
-        : map { ($_ => $args[$_ - 1]) } 1 .. @args;
+    my @placed;
+    if ($binds) {
+        my $given = DBIx::Squirrel::Placeholders::_values_for($binds, \@args);    ## no critic (Subroutines::ProtectPrivateSubs)
+        my $state = $self->{private_ekorn};
+        @placed = @{ DBIx::Squirrel::Placeholders::_place_values($state, $given) };    ## no critic (Subroutines::ProtectPrivateSubs)
+    }
+    else {
+        @placed = map { ($_ => $args[$_ - 1]) } 1 .. @args;
+    }
     return at_caller {
         for my $pair (pairs @placed) {
             $self->SUPER::bind_param(@$pair) or return;
@@ -86,11 +91,14 @@ sub execute ($self, @args) {
     my $state = $self->{private_ekorn};
     $self->finish
         if $state && $state->{Options}{ekorn_finish_active} && $self->{Active};
-    @args = _unwrap($self, @args);
+    # Only values in an array reference given alone need unwrapping, and
+    # most aren't: the call, copying them in and out, is left out for
+    # them (roadmap 2026-0028).
+    @args = _unwrap($self, @args) if @args == 1 && is_plain_arrayref($args[0]);
     my $binds = $state && $state->{Binds};
     if ($binds) {
         _check_bound($self) unless @args;
-        @args = _in_order($state, @args) if @args;
+        @args = _in_order($state, \@args) if @args;
         $state->{AllBound} = 1;
     }
     return at_caller { $self->SUPER::execute(@args) };
@@ -162,9 +170,22 @@ sub _check_bound ($self) {
 # them, in the order of their positions, each as often as it's used, and
 # each value in a list at a position of its own, given what the statement
 # handle keeps about the statement.
-sub _in_order ($state, @args) {
-    my %placed = place_values($state, values_for($state->{Binds}, @args));
-    return @placed{1 .. keys %placed};
+#
+# A statement without list placeholders keeps their order, so its values
+# are put in it with a slice (roadmap 2026-0028).
+sub _in_order ($state, $args) {
+    my $given = DBIx::Squirrel::Placeholders::_values_for($state->{Binds}, $args); ## no critic (Subroutines::ProtectPrivateSubs)
+    if (my $order = $state->{Order}) {
+        return @$given{@$order};
+    }
+    # A list's values go to positions of their own, each pair a position
+    # and its value, put in order without a hash of them.
+    my $placed = DBIx::Squirrel::Placeholders::_place_values($state, $given);    ## no critic (Subroutines::ProtectPrivateSubs)
+    my @in_order;
+    for (my $i = 0; $i < @$placed; $i += 2) {
+        $in_order[$placed->[$i] - 1] = $placed->[$i + 1];
+    }
+    return @in_order;
 }
 
 1;

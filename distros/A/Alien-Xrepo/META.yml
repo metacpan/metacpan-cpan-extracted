@@ -14,7 +14,7 @@ configure_requires:
   Module::Build::Tiny: '0'
   perl: v5.40.0
 dynamic_config: 0
-generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150013'
+generated_by: 'App::mii v1.0.0, CPAN::Meta::Converter version 2.150015'
 keywords: []
 license: artistic_2
 meta-spec:
@@ -34,7 +34,7 @@ no_index:
 provides:
   Alien::Xrepo:
     file: lib/Alien/Xrepo.pm
-    version: v1.0.10
+    version: v1.0.11
   Alien::Xrepo::Build:
     file: lib/Alien/Xrepo/Build.pm
     version: v1.0.10
@@ -74,7 +74,7 @@ resources:
   homepage: https://github.com/sanko/Alien-Xrepo
   license: http://www.perlfoundation.org/artistic_license_2_0
   repository: https://github.com/sanko/Alien-Xrepo.git
-version: v1.0.10
+version: v1.0.11
 x_authority: cpan:SANKO
 x_ignore:
   - .tidyallrc

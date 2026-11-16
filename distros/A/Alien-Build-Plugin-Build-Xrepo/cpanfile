@@ -1,15 +1,15 @@
 requires 'Alien::Build', '2.84';
 requires 'Alien::Xmake', 'v1.0.0';
-requires 'Alien::Xrepo', 'v1.0.0';
+requires 'Alien::Xrepo', 'v1.0.11';
 requires 'Path::Tiny';
 requires 'perl', 'v5.40.0';
 on configure => sub {
-    requires 'Alien::Xrepo', 'v1.0.0';
+    requires 'Alien::Xrepo', 'v1.0.11';
     requires 'perl',         'v5.40.0';
 };
 on build => sub {
     requires 'Alien::Build', '2.84';
-    requires 'Alien::Xrepo', 'v1.0.0';
+    requires 'Alien::Xrepo', 'v1.0.11';
     requires 'perl',         'v5.40.0';
 };
 on test => sub {

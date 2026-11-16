@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 
+## [11.2.0] - 2026-11-15
+### Added
+- [Java] Add OSGI Bundle name ([#329](https://github.com/cucumber/tag-expressions/pull/329))
+
 ## [11.1.0] - 2026-11-13
 ### Added
 - [cpp] add C++ implementation ([#309](https://github.com/cucumber/tag-expressions/pull/309))
@@ -252,7 +256,8 @@ by [aslakhellesoy](https://github.com/aslakhellesoy))
 ### Added
 - First stable release!
 
-[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v11.1.0...HEAD
+[Unreleased]: https://github.com/cucumber/tag-expressions/compare/v11.2.0...HEAD
+[11.2.0]: https://github.com/cucumber/tag-expressions/compare/v11.1.0...v11.2.0
 [11.1.0]: https://github.com/cucumber/tag-expressions/compare/v11.0.1...v11.1.0
 [11.0.1]: https://github.com/cucumber/tag-expressions/compare/v11.0.0...v11.0.1
 [11.0.0]: https://github.com/cucumber/tag-expressions/compare/v10.0.0...v11.0.0

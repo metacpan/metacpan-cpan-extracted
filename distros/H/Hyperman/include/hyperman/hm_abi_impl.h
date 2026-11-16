@@ -282,6 +282,7 @@ static const hm_abi hm_abi_table = {
     hm_abi_arena_region,         /* v9 - the arena, its table, the board   */
     hm_abi_arena_table,
     hm_abi_pool_sum,
+    hm_abi_stream_close_trailers, /* v10 - trailer fields after the body   */
 };
 
 /* ---- v4 on_worker_start, driven from C (t/33-worker-start.t) ------------ *
@@ -476,6 +477,21 @@ static int hm_abi_st_stream_close(pTHX) {
     if (!HM_ABI_ST_SH) return HM_ABI_STREAM_STALE;
     r = A->stream_close(aTHX_ HM_ABI_ST_SH);
     HM_ABI_ST_SH = NULL;
+    return r;
+}
+
+/* v10 through the TABLE. ARG means the list was refused and the handle is
+ * still open and still ours, which is the contract t/75 checks, so the
+ * handle is forgotten only when the call released it. */
+static int hm_abi_st_stream_close_trailers(pTHX_ SV *trailers) {
+    const hm_abi *A = &hm_abi_table;
+    int r;
+    /*
+     # uncoverable branch true
+     # uncoverable condition left count:1 class:ignore_covered_err */
+    if (!HM_ABI_ST_SH) return HM_ABI_STREAM_STALE;
+    r = A->stream_close_trailers(aTHX_ HM_ABI_ST_SH, trailers);
+    if (r != HM_ABI_STREAM_ARG) HM_ABI_ST_SH = NULL;
     return r;
 }
 
@@ -1031,6 +1047,41 @@ static int hm_abi_selftest(pTHX) {
          # uncoverable condition left count:1
          # uncoverable condition right count:1 */
         else if (A->pool_stats(&ps) != 0)                           ok = 0;
+    }
+
+    /* v10. The handle is checked before the list: a pointer that is not a
+     * live handle is STALE even beside a malformed list, and is never
+     * dereferenced. What a live handle does with a list, and that a refused
+     * list leaves it open, is t/75-trailers.t on both transports. */
+    {
+        void *bogus = (void *)&hm_abi_table;        /* real memory, no handle */
+        AV *odd = newAV();
+        SV *badrv;
+        av_push(odd, newSVpvs("odd"));
+        badrv = sv_2mortal(newRV_noinc((SV *)odd));
+        /*
+         # uncoverable branch true class:ignore_covered_err
+         # uncoverable condition left count:1 class:ignore_covered_err */
+        if (!A->stream_close_trailers)                              ok = 0;
+        else {
+            /*
+             # uncoverable branch true class:ignore_covered_err
+             # uncoverable condition left count:1 class:ignore_covered_err */
+            if (A->stream_close_trailers(aTHX_ bogus, NULL) != HM_ABI_STREAM_STALE)
+                                                                    ok = 0; /* # uncoverable statement */
+            /*
+             # uncoverable statement class:ignore_covered_err
+             # uncoverable branch true
+             # uncoverable condition left count:1 */
+            if (A->stream_close_trailers(aTHX_ bogus, badrv) != HM_ABI_STREAM_STALE)
+                                                                    ok = 0; /* # uncoverable statement */
+            /*
+             # uncoverable statement class:ignore_covered_err
+             # uncoverable branch true
+             # uncoverable condition left count:1 */
+            if (A->stream_close_trailers(aTHX_ NULL, badrv) != HM_ABI_STREAM_STALE)
+                                                                    ok = 0; /* # uncoverable statement */
+        }
     }
 
     return ok;

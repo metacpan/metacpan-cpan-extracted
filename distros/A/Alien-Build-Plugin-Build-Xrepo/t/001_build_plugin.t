@@ -62,6 +62,11 @@ class Alien::Build::Plugin::Build::Xrepo::TestSpy {
         push @main::ALL_CALLS, { action => 'add_repo', name => $name, url => $url };
     }
 
+    method rm_repo ($name) {
+        push @$calls,          { action => 'rm_repo', name => $name };
+        push @main::ALL_CALLS, { action => 'rm_repo', name => $name };
+    }
+
     method _pkg ( $name, $version ) {
         Alien::Xrepo::PackageInfo->new(
             includedirs => ["$store/$name/include"],
@@ -99,7 +104,7 @@ sub driven_build ($text) {
     $build->build;
     return { dir => $dir, build => $build };
 }
-sub winslash { my $s = shift; $s =~ s{\\}{/}g; $s }
+sub winslash { shift =~ s{\\}{/}gr }
 #
 subtest 'share install assembles and gathers a single package' => sub {
     my $r     = driven_build( sf("['zstd']") );
@@ -187,7 +192,7 @@ subtest 'nested xrepo export layout is flattened into the prefix' => sub {
     my $rp = $build->runtime_prop;
     like winslash( $rp->{cflags} ), qr/-I[^\s]*zstd\/include/, 'cflags point at the flattened include dir';
 };
-subtest 'local_repos are registered with the engine' => sub {
+subtest 'local_repos are registered and then removed' => sub {
     my $lr = Path::Tiny->tempdir;
     $lr->child('packages')->mkpath;
     @main::ALL_CALLS = ();
@@ -195,6 +200,26 @@ subtest 'local_repos are registered with the engine' => sub {
     my @repos = map { $_->{url} } grep { $_->{action} eq 'add_repo' } @main::ALL_CALLS;
     like "@repos", qr/\Q$lr\E/, 'local repo path passed to the engine add_repo';
     is scalar @repos, 1, 'exactly one repo registered';
+    my @removed = grep { $_->{action} eq 'rm_repo' } @main::ALL_CALLS;
+    is scalar @removed,   1,                        'the temporary repo is removed again';
+    is $removed[0]{name}, 'alien-' . $lr->basename, 'the same repo is removed';
+    my @order = map { $_->{action} } @main::ALL_CALLS;
+    is $order[-1], 'rm_repo', 'cleanup happens after installs and exports';
+};
+subtest 'temporary repos are removed when no package installs' => sub {
+    my $lr = Path::Tiny->tempdir;
+    $lr->child('packages')->mkpath;
+    @main::ALL_CALLS = ();
+    $Alien::Build::Plugin::Build::Xrepo::TestSpy::FAIL{zstd} = 1;
+    my $dir   = tempdir( CLEANUP => 1 );
+    my $build = alienfile_ok( sf( "['zstd']", local_repos => [$lr] ), stage => "$dir/stage", prefix => "$dir/prefix", root => "$dir/root" );
+    ok $build, 'alienfile compiles';
+    is $build->probe, 'share', 'probe ends in a share install';
+    like dies { $build->download }, qr[no packages installed successfully], 'download aborts when nothing installs';
+    delete $Alien::Build::Plugin::Build::Xrepo::TestSpy::FAIL{zstd};
+    my @removed = grep { $_->{action} eq 'rm_repo' } @main::ALL_CALLS;
+    is scalar @removed,   1,                        'the temporary repo is removed despite the failed install';
+    is $removed[0]{name}, 'alien-' . $lr->basename, 'the expected repo is removed';
 };
 subtest 'missing packages is rejected at alienfile compile' => sub {
     my $dir = Path::Tiny->tempdir;

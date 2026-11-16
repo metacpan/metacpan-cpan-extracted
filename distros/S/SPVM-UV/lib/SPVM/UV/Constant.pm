@@ -699,3 +699,21 @@ Returns the value of C<UV_READABLE_PIPE>.
 C<static method UV_WRITABLE_PIPE : int ();>
 
 Returns the value of C<UV_WRITABLE_PIPE>.
+
+=head2 UV_FS_EVENT_RECURSIVE
+
+C<static method UV_FS_EVENT_RECURSIVE : int ();>
+
+Returns the value of C<UV_FS_EVENT_RECURSIVE>.
+
+=head2 UV_RENAME
+
+C<static method UV_RENAME : int ();>
+
+Returns the value of C<UV_RENAME>.
+
+=head2 UV_CHANGE
+
+C<static method UV_CHANGE : int ();>
+
+Returns the value of C<UV_CHANGE>.

@@ -8,7 +8,8 @@ our @EXPORT_OK = qw(
     SYSTEM USER ASSISTANT TOOL stream_kinds
     content_block tool_call message message_wire message_text message_assistant
     message_tool tool_spec usage usage_plus request response session run_result
-    memory_record event action decision
+    memory_record event action decision interrupt interrupt_decision
+    INTERRUPT_APPROVE INTERRUPT_EDIT INTERRUPT_REJECT INTERRUPT_RESPOND
 );
 
 use constant {
@@ -16,6 +17,10 @@ use constant {
     USER => 'user',
     ASSISTANT => 'assistant',
     TOOL => 'tool',
+    INTERRUPT_APPROVE => 'approve',
+    INTERRUPT_EDIT => 'edit',
+    INTERRUPT_REJECT => 'reject',
+    INTERRUPT_RESPOND => 'respond',
 };
 
 my @STREAM_KINDS = qw(values updates messages tasks debug checkpoint);
@@ -38,6 +43,26 @@ sub tool_call {
         name => $args{name} // '',
         arguments => $args{arguments} // {},
     };
+}
+
+sub interrupt {
+    my (%args) = @_;
+    return {
+        runId => $args{run_id} // '',
+        sessionId => $args{session_id} // '',
+        call => $args{call},
+    };
+}
+
+sub interrupt_decision {
+    my (%args) = @_;
+    my %decision = (
+        action => $args{action} // '',
+        response => $args{response} // '',
+        reason => $args{reason} // '',
+    );
+    $decision{arguments} = $args{arguments} if defined $args{arguments};
+    return \%decision;
 }
 
 sub message {

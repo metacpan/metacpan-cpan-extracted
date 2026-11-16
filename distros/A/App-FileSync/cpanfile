@@ -19,12 +19,14 @@ requires 'Getopt::Long';
 requires 'IO::Handle';
 requires 'IPC::Open3';
 requires 'IPC::System::Simple', '1.30';
+requires 'JSON::MaybeXS', '1.004';   # pulls in Cpanel::JSON::XS given a compiler
 requires 'JSON::PP';
 requires 'List::Util', '1.54';
 requires 'Log::Abstraction', '0.36';   # structured fields
 requires 'Object::Configure';
 requires 'Params::Get', '0.17';
 requires 'Params::Validate::Strict', '0.41';
+requires 'POSIX';
 requires 'Readonly', '2.05';
 requires 'Scalar::Util';
 requires 'Sub::Private', '0.07';
@@ -35,6 +37,12 @@ requires 'Time::Local';
 requires 'autodie', '2.37';
 requires 'version', '0.77';
 
+recommends 'Cpanel::JSON::XS';   # JSON::MaybeXS adds it given a compiler
+
+if ($^O eq 'MSWin32') {
+	requires 'Win32API::File';   # Process: pipe ends the child must not inherit
+}
+
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # first to honour TEST_REQUIRES
 };
@@ -43,7 +51,6 @@ on 'test' => sub {
 	requires 'Errno';
 	requires 'File::Find';
 	requires 'File::Temp';
-	requires 'POSIX';
 	requires 'Test::Exception';
 	requires 'Test::Mockingbird::TimeTravel', '0.14';
 	requires 'Test::Most';

@@ -363,6 +363,22 @@ subtest "Iterator: all, with values waiting part way through the stages" =>
         'one value, with values waiting at the end and part way';
         is [$next->all], [-1, 10, -10], 'then the rest, in order';
 
+        my @log;
+        $next = $class->new(
+            sub { ($_, $_ * 10) },
+            gather {
+                return (sub ($x) { ($x, -$x) }, undef, sub ($how) { push @log, $how });
+            },
+        )->iterator(do {
+            my @values = (1, 2);
+            sub { @values ? shift @values : () };
+        });
+        is [$next->(), $next->()], [1, -1],
+        'with an end last, one value, then one waiting at the end';
+        is \@log,        [], 'while the source is still being read';
+        is [$next->all], [10, -10, 2, -2, 20, -20], 'then the rest, in order';
+        is \@log,        ['done'],                  'and the run ends';
+
         $next = $class->new(keep_all)->iterator(do {
             my @values = (1, 2, 3);
             sub { @values ? shift @values : () };

@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use autodie qw(:all);
 
+use Readonly;
 use Sub::Private { mode => 'enforce' };
 
 use App::FileSync qw(conflict_name);
@@ -20,7 +21,10 @@ use App::FileSync::Constants qw(
 );
 use App::FileSync::I18N qw(message);
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.002.1');
+
+# max_delete_percent is a percentage of the repo's size.
+Readonly::Scalar my $PERCENT => 100;
 
 # The comparisons below run several times per path in the tree, so they are
 # lexical code references rather than wrapped private subs; see
@@ -295,7 +299,7 @@ sub check_delete_limit {
 
 	# Never block a single deletion just because the repo is small: 10% of
 	# five files is zero, which would make the tool unusable.
-	my $allowed = int($known * $percent / 100);
+	my $allowed = int($known * $percent / $PERCENT);
 	$allowed = 1 if $allowed < 1;
 
 	my %args = (count => $deletions, known => $known, max => $max, percent => $percent);

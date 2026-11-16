@@ -11,7 +11,7 @@ die "OS unsupported\n" unless $^O eq 'MSWin32';
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "Determine the local system's time zone on Windows",
-  "AUTHOR" => "David Pinkowitz <dapink\@cpan.org>, Dave Rolsky <autarch\@urth.org>",
+  "AUTHOR" => "David Pinkowitz <dapink_cpan\@pinkowitz.com>, Dave Rolsky <autarch\@urth.org>",
   "CONFIGURE_REQUIRES" => {
     "ExtUtils::MakeMaker" => 0
   },
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "integer" => 0,
     "lib" => 0
   },
-  "VERSION" => "2.07",
+  "VERSION" => "2.08",
   "test" => {
     "TESTS" => "t/*.t"
   }
