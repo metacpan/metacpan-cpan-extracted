@@ -22,7 +22,7 @@ LiveServer->require_server;
 # LIVE test for karr k120, point 9 (maintainer's decision 2026-10-16): what the
 # install script takes as a name and what as SQL, asked of a server.
 #
-# WHY it exists: t/124-ddl-names-and-sql-refusals.t pins the text of the
+# WHY it exists: t/121-ddl-refusals.t pins the text of the
 # script. Whether the server reads it as meant only the server says:
 #
 #  * a pg_settings key is a name, quoted by the server's rule: DateStyle is

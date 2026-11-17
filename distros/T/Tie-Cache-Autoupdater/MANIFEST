@@ -1,14 +1,22 @@
 Autoupdater.pm
 Changes
-MANIFEST
+LICENSE
 Makefile.PL
+MANIFEST
+MANIFEST.SKIP
 README
-TODO
 t/01_base.t
-t/02_base_list.t  
-t/03_tie_list.t  
-t/04_sub.t  
-t/05_sub.t  
+t/02_base_list.t
+t/03_tie_list.t
+t/04_sub.t
+t/05_sub.t
 t/06_time_hires.t
 t/07_storable.t
 t/08_storable.t
+t/09_hash_ops.t
+t/10_errors.t
+t/11_returns.t
+t/12_defaults.t
+t/13_no_time_hires.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

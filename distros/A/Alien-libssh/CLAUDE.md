@@ -16,7 +16,7 @@ Alien::libssh follows the Alien::Build pattern:
 
 ## Bundled Source
 
-The distribution ships `libssh-0.10.6.tar.xz` in `share/`. No network access
+The distribution ships `libssh-0.12.2.tar.xz` in `share/`. No network access
 required during `cpanm` install — suitable for air-gapped environments.
 
 ## Build Config
@@ -52,21 +52,21 @@ runs both forced paths.
 ## Delegation
 
 Delegate behavior-relevant work to the right agent instead of touching it yourself —
-principle and lane are in `.claude/rules/alien-libssh-rules.md`.
+the principle is a shared house rule (skilletor bundle `getty-cpan-dist@getty`); lanes and
+hazards are in `.claude/rules/alien-libssh-rules.md`.
 
 | Task | Agent |
 |---|---|
 | alienfile, `share/` tarball, `t/`, `lib/Alien/`, POD | `alien-libssh-worker` (default) |
-| Pre-release audit before a CPAN release | `alien-libssh-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `alien-libssh-release-manager` |
 
 The agents carry their skills via `briefing.skills` (see `.claude/agents/`); the main
 agent delegates rather than loading them. Tickets live on the repo's `karr` board.
 
 ## Skills
 
-`alien-libssh-core` is project-owned; every other skill under `.claude/skills/` is a
-hardlink into the shared library — `manage-skills sync` re-establishes the links after a
-fresh clone, and a hardlinked `SKILL.md` is edited in place, never with `Edit`/`Write`.
+`alien-libssh-core` is project-owned; every other skill under `.claude/skills/` is
+installed by skilletor from `.claude/skilletor.json` and changes in its source repo.
 
 | Skill | Covers |
 |---|---|
@@ -75,4 +75,4 @@ fresh clone, and a hardlinked `SKILL.md` is edited in place, never with `Edit`/`
 | `perl-xs` | the Perl/C boundary — `t/01-alien.t` compiles XS, and `Net::LibSSH` is XS |
 | `getty-perl-core` | house Perl conventions |
 | `getty-perl-release-author-getty`, `perl-release-dist-ini` | the `[@Author::GETTY]` bundle and `dist.ini` |
-| `kanban-issues-karr-cli` | the karr board |
+| `kanban-issues-karr-coordination` | the karr board |

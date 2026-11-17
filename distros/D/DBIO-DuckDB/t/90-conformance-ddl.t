@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 BEGIN {
   eval { require DBD::DuckDB; 1 }

@@ -929,24 +929,47 @@ subtest '_detect_filehandle_type() detects filepath from file test operator' => 
 # _analyze_parameter_constraints
 # ==================================================================
 
-subtest '_analyze_parameter_constraints() detects length min from length check' => sub {
+subtest '_analyze_parameter_constraints() accepts length >= N from an if guard' => sub {
 	my $e = _extractor();
 	my $p = {};
 	$e->_analyze_parameter_constraints(\$p, 'name', 'sub foo { die if length($name) < 3; }');
-	# length < 3 means max = 2 ... but this is a guard so guarded=1
-	# Actually the guard logic... let me check - if die is present with if, it's guarded
-	# The constraint should not be set in this case since it's inside a die guard
-	# Based on the code: guarded = 1 if die/croak/confess if $param
-	# So numeric range checks with guarded won't be set
-	# But length checks ARE set regardless of guard
-	is($p->{max}, 2, 'max set from length < 3');
+	is($p->{min}, 3, 'min set from die if length < 3');
+	ok(!exists($p->{max}), 'no contradictory max set');
 };
 
-subtest '_analyze_parameter_constraints() detects length max from length check' => sub {
+subtest '_analyze_parameter_constraints() accepts length >= N from an unless guard' => sub {
+	my $e = _extractor();
+	my $p = {};
+	$e->_analyze_parameter_constraints(\$p, 'name', "sub foo { croak('too short') unless length(\$name) >= 5; }");
+	is($p->{min}, 5, 'min set from croak unless length >= 5');
+	ok(!exists($p->{max}), 'no contradictory max set');
+};
+
+subtest '_analyze_parameter_constraints() accepts length <= N from an if guard' => sub {
 	my $e = _extractor();
 	my $p = {};
 	$e->_analyze_parameter_constraints(\$p, 'name', 'sub foo { die if length($name) > 50; }');
-	is($p->{min}, 51, 'min set from length > 50');
+	is($p->{max}, 50, 'max set from die if length > 50');
+	ok(!exists($p->{min}), 'no contradictory min set');
+};
+
+subtest '_analyze_parameter_constraints() accepts length <= N from an unless guard' => sub {
+	my $e = _extractor();
+	my $p = {};
+	$e->_analyze_parameter_constraints(\$p, 'name', "sub foo { croak('too long') unless length(\$name) <= 50; }");
+	is($p->{max}, 50, 'max set from croak unless length <= 50');
+	ok(!exists($p->{min}), 'no contradictory min set');
+};
+
+subtest '_analyze_parameter_constraints() handles block-form length guards' => sub {
+	my $e = _extractor();
+	my $p = {};
+	$e->_analyze_parameter_constraints(\$p, 'name', 'sub foo { if (length($name) < 5) { croak "too short"; } }');
+	is($p->{min}, 5, 'min set from if-block length guard');
+
+	my $q = {};
+	$e->_analyze_parameter_constraints(\$q, 'name', 'sub foo { unless (length($name) >= 5) { die "too short"; } }');
+	is($q->{min}, 5, 'min set from unless-block length guard');
 };
 
 subtest '_analyze_parameter_constraints() detects regex pattern' => sub {
@@ -1967,13 +1990,13 @@ subtest '_serialize_parameter_for_yaml() maps callback semantic to coderef type'
 	ok(defined $result->{_note},   '_note present for callback');
 };
 
-subtest '_serialize_parameter_for_yaml() removes _source key' => sub {
+subtest '_serialize_parameter_for_yaml() preserves _source key' => sub {
 	my $e = _extractor();
 	my $result = $e->_serialize_parameter_for_yaml({
 		type    => 'string',
 		_source => 'pod',
 	});
-	ok(!exists $result->{_source}, '_source removed from output');
+	is($result->{_source}, 'pod', '_source preserved in output');
 };
 
 subtest '_serialize_parameter_for_yaml() removes semantic key' => sub {
@@ -2143,6 +2166,15 @@ subtest '_validate_pod_code_agreement() reports compatible type difference' => s
 		'compatible type difference reported');
 };
 
+subtest '_validate_pod_code_agreement() checks formal input spec bounds against code bounds' => sub {
+	my $e = _extractor();
+	my $pod  = { text => { type => 'string', min => 5, _source => 'input_spec' } };
+	my $code = { text => { type => 'string', max => 4 } };
+	my @errors = $e->_validate_pod_code_agreement($pod, $code, 'my_method');
+	ok((grep { /Constraint contradiction.*POD says min '5'.*code suggests max '4'/ } @errors),
+		'error when a formal input spec minimum exceeds an inferred code maximum');
+};
+
 subtest '_validate_pod_code_agreement() skips $self for non-new methods' => sub {
 	my $e = _extractor();
 	my $pod  = {};
@@ -2188,12 +2220,12 @@ subtest '_merge_parameter_analyses() code fills in missing info' => sub {
 	is($result->{x}{max}, 50, 'code max merged in');
 };
 
-subtest '_merge_parameter_analyses() removes _source key from merged result' => sub {
+subtest '_merge_parameter_analyses() keeps one _source value' => sub {
 	my $e = _extractor();
 	my $pod  = { x => { type => 'string', _source => 'pod', position => 0 } };
 	my $code = {};
 	my $result = $e->_merge_parameter_analyses($pod, $code);
-	ok(!exists $result->{x}{_source}, '_source removed from merged param');
+	is($result->{x}{_source}, 'pod', 'pod source kept in merged param');
 };
 
 subtest '_merge_parameter_analyses() handles empty pod and code' => sub {

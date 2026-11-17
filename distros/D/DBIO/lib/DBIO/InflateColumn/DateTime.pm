@@ -4,7 +4,7 @@ package DBIO::InflateColumn::DateTime;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Base/;
 use DBIO::Carp;
@@ -314,7 +314,7 @@ DBIO::InflateColumn::DateTime - Auto-create DateTime objects from date and datet
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

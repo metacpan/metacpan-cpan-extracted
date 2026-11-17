@@ -124,6 +124,12 @@ use strict;
 use warnings;
 my \$real = '$systemd_run';
 my \$mode = \$ENV{CAPPED_TEST_FAKE} // '';
+# the wrapper asks what this systemd-run knows: the real one answers, in every mode
+exec { \$real } \$real, '--help' if \@ARGV == 1 and \$ARGV[0] eq '--help';
+if (\$mode eq 'expand') {
+  # a systemd that expands the environment in the arguments, as 258 and later do by default
+  exec { \$real } \$real, '--expand-environment=yes', \@ARGV;
+}
 if (\$mode eq 'fail') {
   print STDERR "Failed to start transient scope unit: stand-in says no\\n";
   exit 1;
@@ -287,6 +293,26 @@ subtest 'a run that eats memory is killed at the cap, with nothing in swap' => s
 
   like $got->{stderr}, qr/was KILLED -- it hit the 64M cap/, 'the wrapper says what happened';
 } or diag "exit $eater->{exit}\n$eater->{stdout}$eater->{stderr}";
+
+# The command reaches the run as it was given. systemd 258 expands $VAR and $$ in
+# the arguments of a scope by default; the wrapper switches that off where the
+# switch exists (systemd 254 and later).
+my $dollars = [ $^X, '-e', 'print join("|", @ARGV), "\n"', '$HOME', '${HOME}', '$$', 'a$$b' ];
+my $dollars_out = qq{\$HOME|\${HOME}|\$\$|a\$\$b\n};
+subtest 'a command reaches the run with its $ signs unchanged' => sub {
+  my $real = capped({}, @$dollars);
+  is $real->{exit}, 0, 'the command ran';
+  is $real->{stdout}, $dollars_out, 'with every argument as given';
+
+  my $help = run({}, $tool{timeout}, 30, $tool{'systemd-run'}, '--help');
+  SKIP: {
+    skip 'this systemd-run has no --expand-environment (systemd before 254): there is no expansion to stand in for', 2
+      unless $help->{stdout} =~ /--expand-environment/;
+    my $got = capped({ %fake, CAPPED_TEST_FAKE => 'expand' }, @$dollars);
+    is $got->{exit}, 0, 'the command ran under a systemd that expands';
+    is $got->{stdout}, $dollars_out, 'with every argument as given';
+  }
+};
 
 # A signal that reaches the in-scope stage after the command has ended must not
 # change the end that is reported. systemd does exactly that after an OOM kill

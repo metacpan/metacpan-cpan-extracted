@@ -132,7 +132,7 @@ BEGIN {
 use EV;
 use DBIO::PostgreSQL::EV::Storage;
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 alarm 60;
@@ -312,7 +312,7 @@ sub bring_up {
   is scalar(@h), 1, 'the first listen opened one connection';
   my $pg = $h[0];
   isa_ok $pg, 'DBIO::PostgreSQL::EV::Pool::_Connection',
-    '... built by the pool\'s constructor, so it closes fork-safe (karr k45)';
+    '... built by the pool\'s constructor, so it closes fork-safe';
   is_deeply conninfo_of($pg),
     { host => 'db.example', dbname => 'listen_test', user => 'u', password => 'tr0ub4dor-pw' },
     '... from the storage\'s connect info';
@@ -636,6 +636,20 @@ sub bring_up {
   is_deeply \@warnings, [], '... its timer did not fire into it';
 
   ok eval { $s->_listen_delay(0.01)->get; 1 }, 'get on a delay runs the EV loop until it fires';
+
+  # libev counts a relative timer from its cached time, which only moves on a
+  # loop pass: after long synchronous work a naive timer starts already due.
+  # The delay counts from the call.
+  my ($want, $block) = (0.2, 0.4);
+  EV::run(EV::RUN_NOWAIT);
+  select undef, undef, undef, $block;
+  my $t0 = EV::time();
+  my $late = $s->_listen_delay($want);
+  my $fired_at;
+  $late->on_done(sub { $fired_at = EV::time() });
+  ok drive(sub { $late->is_ready }, 2), 'a delay started after blocking work resolves';
+  cmp_ok $fired_at - $t0, '>=', $want - 0.05,
+    'it waits the asked time from the call, not from the last loop pass';
 }
 
 # ---------------------------------------------------------------------------

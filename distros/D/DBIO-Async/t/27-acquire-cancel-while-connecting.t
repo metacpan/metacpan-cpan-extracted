@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO qw( POLLIN );
@@ -113,7 +115,7 @@ sub polls { return @LoopSpy27::POLLS }
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $conn = { id => ++$self->{_next_id}, r => $r, w => $w, up => 0 };
     # Held weakly: the test reaches a connection no acquire has resolved with
@@ -273,7 +275,7 @@ isnt refaddr(DBIO::Async::Pool->can('_connection_ready_future')),
   'the readiness seam IS the transport\'s own -- core sees only a Future';
 
 {
-  pipe(my $r, my $w) or die "pipe: $!";
+  my ($r, $w) = ChannelPair::channel();
   my $poll = Future::IO->poll($r, POLLIN);
   ok !loop_is_idle(), 'the probe: with one poll pending the loop is not idle';
   ok loop_is_idle(),  'the probe: ... and once that poll is gone, it is';
@@ -305,7 +307,7 @@ isnt refaddr(DBIO::Async::Pool->can('_connection_ready_future')),
   is $pool->available, 0, "$l: borrowed by the caller, not idle";
   ok loop_is_idle(), "$l: nothing is watched once the connection is up";
   ok !exists conn($storage, 1)->{_dbio_async_ready},
-    "$l: the connection carries no readiness bookkeeping once it is up (karr k49)";
+    "$l: the connection carries no readiness bookkeeping once it is up";
   quiet($l, $storage->{pool_errors});
 }
 
@@ -320,7 +322,7 @@ isnt refaddr(DBIO::Async::Pool->can('_connection_ready_future')),
 
   my $f = $pool->acquire;
   come_up(conn($storage, 1));
-  my $conn = eval { $f->get };
+  my $conn = eval { within(15, sub { $f->get }) };
   is $@, '', "$l: ->get on an acquire still connecting runs the loop";
   is $conn && $conn->{id}, 1, "$l: ... and returns the connection";
   quiet($l, $storage->{pool_errors});

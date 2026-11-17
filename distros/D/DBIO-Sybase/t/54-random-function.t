@@ -166,8 +166,8 @@ ok !DBIO::Sybase::Storage::ASE->can('_explain_sql'),
 
 isnt( DBIO::Sybase::Storage::ASE->can('_explain_query'),
       DBIO::Storage::DBI->can('_explain_query'),
-  'Sybase ASE overrides _explain_query -- the server-message seam (core karr '
-. 'k140) gives the plan an outlet; see t/55-explain-query.t' );
+  'Sybase ASE overrides _explain_query -- the server-message seam '
+. 'gives the plan an outlet; see t/55-explain-query.t' );
 
 isnt( DBIO::Sybase::Storage::ASE->can('_execute_sth'),
       DBIO::Storage::DBI->can('_execute_sth'),

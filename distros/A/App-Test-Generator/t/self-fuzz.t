@@ -132,6 +132,8 @@ my @fuzz_report;
 #   extract              PodExampleExtractor->new needs file
 #   extract_all, generate_pod_validation_report
 #                        SchemaExtractor->new needs input_file
+#   apply_to_schema, proposals, survivors
+#                        Mutation::Feedback->new needs a mutation results file
 my %no_fuzz = map { $_ => 1 } qw(
 	generate
 	DB::DB
@@ -158,6 +160,9 @@ my %no_fuzz = map { $_ => 1 } qw(
 	extract
 	extract_all
 	generate_pod_validation_report
+	apply_to_schema
+	proposals
+	survivors
 );
 
 my @pm_files;

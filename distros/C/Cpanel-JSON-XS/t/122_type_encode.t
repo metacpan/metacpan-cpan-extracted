@@ -4,7 +4,7 @@ use warnings;
 use Cpanel::JSON::XS;
 use Cpanel::JSON::XS::Type;
 
-use Test::More tests => 30;
+use Test::More tests => 32;
 
 # GH #240: encode with type_spec must not modify the type_spec hash
 
@@ -119,3 +119,14 @@ my $cjson = Cpanel::JSON::XS->new->utf8->canonical;
     like($@, qr/no type was specified for hash key 'a'/,
          'undeclared hash keys still croak (GH #242 stays strict by default)');
 }
+
+# JSON_TYPE_BOOL of a reference to a scalar other than 0 or 1 used to crash
+eval { Cpanel::JSON::XS->new->encode(\2, JSON_TYPE_BOOL) };
+like($@, qr/cannot encode reference to scalar/,
+     'JSON_TYPE_BOOL of \2 croaks');
+
+# the ".0" appended to an integer with allow_bignum overflowed the buffer
+is(Cpanel::JSON::XS->new->allow_bignum->encode({ k1 => 1446800527275131137 },
+                                              json_type_hashof(JSON_TYPE_FLOAT)),
+   '{"k1":1446800527275131137.0}',
+   'JSON_TYPE_FLOAT integer with allow_bignum gets ".0"');

@@ -40,12 +40,12 @@ DBIO::Async::Storage        (Future::IO transport base: _query_async +
 DBIO::PostgreSQL::Storage::Async  (driver adapter: DB-specific seam hooks only)
 ```
 
-Since core ADR 0030 §4 the Model-B orchestration is **concrete in core**;
-`DBIO::Async::Storage` is now the thin Future::IO transport base over it. The
+Core ADR 0030 §4 makes the Model-B orchestration **concrete in core**;
+`DBIO::Async::Storage` is the thin Future::IO transport base over it. The
 per-driver adapter is **resolved by convention** — `connect(..., { async =>
 'future_io' })` on a `DBIO::PostgreSQL::Storage` schema loads
 `DBIO::PostgreSQL::Storage::Async` (core resolver, `ref($storage).'::Async'`, ADR
-0030 refinement / karr k65). There is **no** `async_backend` declaration and no
+0030 refinement). There is **no** `async_backend` declaration and no
 generic registration; a driver with no adapter croaks early. **Installing
 `dbio-async` provides the shared transport base** — a sync-only driver pulls no
 async deps.
@@ -71,39 +71,38 @@ runs on its built-in impl (a plain `select` loop of its own, no event loop) unti
 an impl is **loaded** -- `use Future::IO::Impl::IOAsync;` (likewise AnyEvent /
 Mojo / UV / Glib) or `Future::IO->load_best_impl` in the main program; installing
 a `Future::IO::Impl::*` alone changes nothing, and this dist loads none. **The
-user picks the loop; no event loop is a hard require** (core ADR 0014). The seam is isolated on purpose so spike findings
-(dbio-postgresql k21 DBD::Pg-native async) can rework the `_await_*` hooks
-punctually without rebuilding the skeleton (ADR 0004 isolation principle).
+user picks the loop; no event loop is a hard require** (core ADR 0014). The seam is isolated on purpose so a driver's native
+async client can rework the `_await_*` hooks punctually without rebuilding the
+skeleton (ADR 0004 isolation principle).
 
 What an implementation does with a poll on the way is its own, and three
-behaviours reach a caller (POD `FUTURE::IO IMPLEMENTATIONS`; Future::IO 0.23,
-Future::IO::Impl::IOAsync 0.805): the built-in one's round dies when a poll is
-cancelled from the callback of a poll in front of it (karr k37); IOAsync keeps
-a cancelled poll's watch and dup until the socket next turns readable (karr
-k38), and kills a `->get` made in a poll's callback when that socket turns
+behaviours reach a caller (POD `FUTURE::IO IMPLEMENTATIONS`): the built-in
+one's round dies when a poll is cancelled from the callback of a poll in front
+of it; IOAsync keeps a cancelled poll's watch and dup until the socket next
+turns readable, and kills a `->get` made in a poll's callback when that socket turns
 readable again — every synchronous statement of a `txn_do` block. **Nothing in
 `lib/` works around them**; `t/33` and `t/34` hold them as `TODO`. Whether to
-work around, report upstream or leave documented is the maintainer's decision
-(karr k37) — do not build a workaround in passing.
+work around, report upstream or leave documented is undecided — do not build a
+workaround in passing.
 
 ## Transport behaviour a driver relies on
 
 Decided in `DBIO::Async::Storage`, documented in its POD; the skill carries the
 driver-facing detail.
 
-- **Pinned statement queue** (karr k33 / k34): `_query_async_pinned` sends the
+- **Pinned statement queue**: `_query_async_pinned` sends the
   statements on one pinned connection one after the other, queued under the
   reserved key `_dbio_async_queue` on the connection hashref. A connection that
   is not a hashref gets no queue — the driver serialises. The connection is idle
   once its statement has settled, before that statement's callbacks run; a
   synchronous statement issued from a callback behind statements still waiting
   cannot complete.
-- **Cancel retires** (karr k29): a query cancelled in flight, pooled or pinned,
+- **Cancel retires**: a query cancelled in flight, pooled or pinned,
   has its connection reported dead to the pool (`_mark_connection_dead` — by
   `_abandon_on_cancel` pooled, by the statement queue pinned) — never drained,
   `_conn_error_is_fatal` not asked. A cancel while still waiting for the pool
   retires nothing.
-- **Flights are held** (karr k46 / k39, ADR 0007): the storage keeps every
+- **Flights are held** (ADR 0007): the storage keeps every
   statement on the wire in a register until it settles, and the caller gets a
   Future of its own. A Future the caller drops (not cancels) is carried
   through: collected, connection handed back once. A connection the pool
@@ -117,10 +116,10 @@ driver-facing detail.
   nor in a forked child for a flight it inherited: a poll made in another
   process continues into nothing (`_await_readable`). No completion asks `pool()`; `_let_go` is the one
   place a poll is given up, as `_await_readable` is the one that makes it.
-- **No Future, no query** (karr k35): a dispatch seam (`_await_query_result`)
+- **No Future, no query**: a dispatch seam (`_await_query_result`)
   that dies or returns no Future fails the query through core's `_seam_future`;
   a pooled connection is still released.
-- **Broker answers** (karr k27 / k43 / k44): `_async_broker_conninfo` reads a
+- **Broker answers**: `_async_broker_conninfo` reads a
   DBI-form arrayref, a hashref of connection parameters (DSN built by the owning
   sync storage; a `dbname` that is a whole DSN needs no owner, and refuses
   `host` / `port` beside it) and the transport's own connect info. Anything else
@@ -151,62 +150,53 @@ single home — so a sync-only driver pulls no async deps.
 the same value — bare `[@DBIO]`, versioned via `@Git::VersionManager`, whose
 RewriteVersion/BumpVersionAfterRelease run `global = 1` over `[:InstallModules]`
 and so rewrite and bump every module in lockstep. Do not strip one from a skeleton
-module. Do not copy a `$VERSION` from another DBIO repo into the cpanfile — a
-repo's `$VERSION` is ahead of its last release; pin to the latest released
-version via `cpanm --info`. The one exception is release staging: for a
-coordinated release the whole family is pinned ahead to the version it will be
-released as. That is the state now — `requires 'DBIO', '0.900004'` is staged;
-do not "correct" it back to the released number. Rule and exception: skill
-`dbio-perl-syntax`, § *cpanfile versioning*.
+module. cpanfile entries name the family version; the release run sets it. Rule:
+skill `dbio-perl-syntax`, § *cpanfile versioning*.
 
 ## ADRs
 
 - 0001 — sync methods block via `->get`
 - 0002 — transaction pinning via `TransactionContext`
-- 0003 — pipeline as generic bracketing over driver seam hooks (amended: the
-  block is handed a pinned `PipelineContext` from core, so batching is
-  structural and not a per-driver obligation — karr k7/k6)
+- 0003 — pipeline as generic bracketing over driver seam hooks (the block is
+  handed a pinned `PipelineContext` from core, so batching is structural and
+  not a per-driver obligation)
 - 0004 — dbio-async is the generic Future::IO-based async layer (split, dependency
   posture, isolation principle; relationship to core ADR 0014)
-- 0005 — the Future::IO listen seams live here once (core ADR 0056, karr k22):
+- 0005 — the Future::IO listen seams live here once (core ADR 0056):
   `_listen_delay`, one watch loop behind `_listen_watch` / `_listen_unwatch`
   (socket- or timer-driven via `_listen_poll_interval`), the pooled
   `_notify_send`; a driver supplies `_listen_drain`, `_notify_sql`, the
   connection seams and its own `listen` / `notify` capabilities
-- 0006 — the driver says when a connection is dead (core ADR 0047 addenda, karr
-  k26 / k28): `_conn_error_is_fatal` is asked on every failed query and reported
+- 0006 — the driver says when a connection is dead (core ADR 0047 addenda):
+  `_conn_error_is_fatal` is asked on every failed query and reported
   to the pool before the release (a throw counts as dead and goes to `on_error`;
   a transaction's connection goes back through core's finalizer);
   `DBIO::Async::Pool` delegates core's `_idle_connection_alive` to the adapter
-- 0007 — the transport holds its statements in flight (core ADR 0047 k258 as
-  precedent, karr k46 / k39): a register on the storage, a Future of the
-  caller's own, a dropped Future carried through, a flight ended where the
-  pool closes its connection (`_abandon_flights_on`, called from the pool's
-  `_shutdown_connection` — `shutdown` / `disconnect` stay core's), a closed
-  connection refused by the transport, an inherited flight inert in a forked
-  child, no pool built by a completion, `_let_go` as the one place a poll is
-  given up
-- 0008 — a blocking call waits for a pool connection (core k256, karr k30;
-  refines 0001): the pool's waiter is a `DBIO::Async::Future` whose `await`
-  drives `Future::IO`; a blocking wait that dies withdraws its waiter
-  (`_withdraw_waiter`); no heuristic refusal, no wrapper around core's queue
+- 0007 — the transport holds its statements in flight: a register on the
+  storage, a Future of the caller's own, a dropped Future carried through, a
+  flight ended where the pool closes its connection (`_abandon_flights_on`,
+  called from the pool's `_shutdown_connection` — `shutdown` / `disconnect`
+  stay core's), a closed connection refused by the transport, an inherited
+  flight inert in a forked child, no pool built by a completion, `_let_go` as
+  the one place a poll is given up
+- 0008 — a blocking call waits for a pool connection (refines 0001): the pool's
+  waiter is a `DBIO::Async::Future` whose `await` drives `Future::IO`; a
+  blocking wait that dies withdraws its waiter (`_withdraw_waiter`); no
+  heuristic refusal, no wrapper around core's queue
 - 0009 — the trace runs through the owner storage's debug object and the
-  `redact_bind_value` hook (core ADR 0025, karr k53): `DBIO_TRACE=1` the SQL,
-  from `=2` the binds, redacted and cut to 32 characters, no `warn`; since
-  core k402 the rule is core's `_debug_query` (the hook gets column name and
-  bind attributes, `query_end` runs), the transport only calls it
-- 0010 — a statement on the wire and a pinned queue are bounded (core ADR 0078,
-  karr k54): `statement_timeout` (cancel path, connection retired),
+  `redact_bind_value` hook (core ADR 0025): `DBIO_TRACE=1` the SQL,
+  from `=2` the binds, redacted and cut to 32 characters, no `warn`; the rule is
+  core's `_debug_query` (the hook gets column name and bind attributes,
+  `query_end` runs), the transport only calls it
+- 0010 — a statement on the wire and a pinned queue are bounded (core ADR 0078):
+  `statement_timeout` (cancel path, connection retired),
   `max_pending_pinned` (fail at once, queue unchanged), both declared through
   `async_option_names`; core's `acquire_timeout` / `max_waiters` / `txn_timeout`
   / `reset_timeout` pass through
 
-0001–0004 carry a 2026-09-05 addendum (karr k14): the decisions stand, but their
-implementation is **core's** since ADR 0030 §4, `future_io` registers nothing (the
-adapter is resolved by convention, core k65/k67), the watcher call is `poll`, and
-0003's "sequential degrade" and 0004's "the EV dists are then retired" never
-described anything real. Core ADR 0028, cited throughout 0004, no longer exists —
-ADR 0030 replaced 0028 and 0029.
+The implementation of 0001–0004 is core's since core ADR 0030 §4, `future_io`
+registers nothing (the adapter is resolved by convention), and the watcher call
+is `poll`.
 
 See `.claude/skills/dbio-async/SKILL.md` for the full subclass contract and seam
 hook table.
@@ -233,13 +223,14 @@ and disconnect / shutdown with a statement in flight (pooled, pinned, queued,
 in a transaction, on an idle connection, in a forked child that tears down or
 turns its own loop, in global destruction; a transaction that ends after
 the disconnect builds no new pool -- core hands its connection back to the
-pool it came from, dbio 4aa01dc67). `t/27` also holds a connection retired
-while it comes up (karr k49): its readiness poll is let go of, the waiting
-acquire fails, the slot goes on. `t/32`
+pool it came from). `t/27` also holds a connection retired
+while it comes up: its readiness poll is let go of, the waiting
+acquire fails, the slot goes on. `t/38`-`t/42` hold the trace through the debug
+object, the no-reset retirement, `statement_timeout`, `max_pending_pinned` and
+core's pool limits through the pool. `t/32`
 runs the dropped and torn-down cases on IO::Async and skips without
 `Future::IO::Impl::IOAsync`. `t/33` (built-in implementation) and `t/34`
 (IO::Async, skips like `t/32`) hold what the `Future::IO` implementations do
 with the transport's polls: a race of two pooled queries and a disconnect in a
 callback, a cancelled poll's watch, a synchronous statement in a callback, in
-a `txn_do` block and in a channel callback. Their `TODO`s are upstream's (karr
-k37, k38): red today, `TODO passed` the day upstream changes.
+a `txn_do` block and in a channel callback. Their `TODO`s are upstream's: red today, `TODO passed` the day upstream changes.

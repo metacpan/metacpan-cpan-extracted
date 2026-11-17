@@ -176,70 +176,70 @@ sub transforms_to {
 transforms_to(
   q{SELECT $body$ what? $body$ WHERE id = ?},
   q{SELECT $body$ what? $body$ WHERE id = $1},
-  1, 'k84: a ? in a tagged dollar-quoted body is text',
+  1, 'a ? in a tagged dollar-quoted body is text',
 );
 transforms_to(
   "SELECT 1 -- really?\n WHERE id = ?",
   "SELECT 1 -- really?\n WHERE id = \$1",
-  1, 'k84: a ? in a -- comment is text',
+  1, 'a ? in a -- comment is text',
 );
 transforms_to(
   q{SELECT /* why? */ 1 WHERE id = ?},
   q{SELECT /* why? */ 1 WHERE id = $1},
-  1, 'k84: a ? in a /* */ comment is text',
+  1, 'a ? in a /* */ comment is text',
 );
 transforms_to(
   q{SELECT E'it\'s ?' , ?},
   q{SELECT E'it\'s ?' , $1},
-  1, q{k84: a backslashed quote does not end an E'' string},
+  1, q{a backslashed quote does not end an E'' string},
 );
 
 # Dollar quoting.
 transforms_to(
   q{SELECT $$ a? $$, ?},
   q{SELECT $$ a? $$, $1},
-  1, 'k84 dollar: the empty tag',
+  1, 'dollar: the empty tag',
 );
 transforms_to(
   q{SELECT $_t1$ a? $_t1$, ?},
   q{SELECT $_t1$ a? $_t1$, $1},
-  1, 'k84 dollar: a tag of underscore, letters and digits',
+  1, 'dollar: a tag of underscore, letters and digits',
 );
 transforms_to(
   "SELECT \$\x{fc}\$ a? \$\x{fc}\$, ?",
   "SELECT \$\x{fc}\$ a? \$\x{fc}\$, \$1",
-  1, 'k84 dollar: a tag with a letter outside ASCII',
+  1, 'dollar: a tag with a letter outside ASCII',
 );
 transforms_to(
   q{SELECT $a$ x $b$ ? $b$ ? $a$, ?},
   q{SELECT $a$ x $b$ ? $b$ ? $a$, $1},
-  1, 'k84 dollar: another tag inside the body is body text',
+  1, 'dollar: another tag inside the body is body text',
 );
 transforms_to(
   q{SELECT $a$ $$ ? $a$, ?, $$ ? $$},
   q{SELECT $a$ $$ ? $a$, $1, $$ ? $$},
-  1, 'k84 dollar: $$ inside a tagged body does not open or close anything',
+  1, 'dollar: $$ inside a tagged body does not open or close anything',
 );
 transforms_to(
   q{SELECT $body$ ?$bod$ ? $body $ ? $Body$ ? $body$, ?},
   q{SELECT $body$ ?$bod$ ? $body $ ? $Body$ ? $body$, $1},
-  1, 'k84 dollar: only the very same tag closes the body',
+  1, 'dollar: only the very same tag closes the body',
 );
 transforms_to(
   q{SELECT $$ -- ' /* " ? $$, ?},
   q{SELECT $$ -- ' /* " ? $$, $1},
-  1, 'k84 dollar: comment and quote starts inside the body are body text',
+  1, 'dollar: comment and quote starts inside the body are body text',
 );
 transforms_to(
   q{SELECT $q$ never closed ? and ?},
   q{SELECT $q$ never closed ? and ?},
-  0, 'k84 dollar: a body that is never closed runs to the end',
+  0, 'dollar: a body that is never closed runs to the end',
 );
 # Held before k84 as well: these keep the dollar-quote reading from going too far.
 transforms_to(
   q{SELECT $1::int, $2::text},
   q{SELECT $1::int, $2::text},
-  0, 'k84 dollar: $N passes through',
+  0, 'dollar: $N passes through',
 );
 # A digit starts no tag: '$1$ ? $1$' is a parameter, a '?' and a parameter, not a
 # quote around the '?'. A $N beside a ? is refused (dbio-postgresql k120, the
@@ -249,159 +249,159 @@ transforms_to(
 {
   my $got = eval { $storage->_transform_sql(q{SELECT $1$ ? $1$ ?}) };
   ok !defined $got && $@ =~ /mixes/,
-    'k84 dollar: a digit starts no tag, $1$ ... $1$ is no quote (read as parameters, refused)';
+    'dollar: a digit starts no tag, $1$ ... $1$ is no quote (read as parameters, refused)';
 }
 transforms_to(
   q{SELECT a$b$ FROM t WHERE x = ? AND c$b$ = ?},
   q{SELECT a$b$ FROM t WHERE x = $1 AND c$b$ = $2},
-  2, 'k84 dollar: a $ inside an identifier opens no quote',
+  2, 'dollar: a $ inside an identifier opens no quote',
 );
 transforms_to(
   q{SELECT e$x$, ?, E$x$},
   q{SELECT e$x$, $1, E$x$},
-  1, 'k84 dollar: nor inside one that starts with the letter of the escape string',
+  1, 'dollar: nor inside one that starts with the letter of the escape string',
 );
 transforms_to(
   q{SELECT 5 -?, 6 /?, $'a?', ?},
   q{SELECT 5 -$1, 6 /$2, $'a?', $3},
-  3, 'k84: a lone -, / or $ opens nothing and hides nothing behind it',
+  3, 'a lone -, / or $ opens nothing and hides nothing behind it',
 );
 
 # Comments.
 transforms_to(
   "SELECT 1 -- it's ?\n, ?, 'x?'",
   "SELECT 1 -- it's ?\n, \$1, 'x?'",
-  1, 'k84 comment: a quote inside a -- comment opens no string',
+  1, 'comment: a quote inside a -- comment opens no string',
 );
 transforms_to(
   q{SELECT /* it's "?" */ ?, 'x?'},
   q{SELECT /* it's "?" */ $1, 'x?'},
-  1, 'k84 comment: a quote inside a /* */ comment opens no string',
+  1, 'comment: a quote inside a /* */ comment opens no string',
 );
 transforms_to(
   "SELECT 1 -- a?\r, ?",
   "SELECT 1 -- a?\r, \$1",
-  1, 'k84 comment: a carriage return ends a -- comment',
+  1, 'comment: a carriage return ends a -- comment',
 );
 transforms_to(
   q{SELECT ? -- trailing? no newline?},
   q{SELECT $1 -- trailing? no newline?},
-  1, 'k84 comment: a -- comment without a newline runs to the end',
+  1, 'comment: a -- comment without a newline runs to the end',
 );
 transforms_to(
   "SELECT 2 *-- twice?\n ?",
   "SELECT 2 *-- twice?\n \$1",
-  1, 'k84 comment: -- right behind an operator character starts a comment',
+  1, 'comment: -- right behind an operator character starts a comment',
 );
 transforms_to(
   q{SELECT /* a /* b? */ c? */ ?},
   q{SELECT /* a /* b? */ c? */ $1},
-  1, 'k84 comment: /* */ nests',
+  1, 'comment: /* */ nests',
 );
 transforms_to(
   q{SELECT /* 1 /* 2 /* 3? */ ? */ ? */ ?},
   q{SELECT /* 1 /* 2 /* 3? */ ? */ ? */ $1},
-  1, 'k84 comment: /* */ nests three deep',
+  1, 'comment: /* */ nests three deep',
 );
 transforms_to(
   q{SELECT /*/ ? */ ?},
   q{SELECT /*/ ? */ $1},
-  1, 'k84 comment: /*/ does not close itself',
+  1, 'comment: /*/ does not close itself',
 );
 transforms_to(
   q{SELECT /* open ? and ?},
   q{SELECT /* open ? and ?},
-  0, 'k84 comment: a /* that is never closed runs to the end',
+  0, 'comment: a /* that is never closed runs to the end',
 );
 transforms_to(
   q{SELECT /* a /* b */ ? and ?},
   q{SELECT /* a /* b */ ? and ?},
-  0, 'k84 comment: so does a nested one whose outer level is never closed',
+  0, 'comment: so does a nested one whose outer level is never closed',
 );
 # Held before k84 as well: these keep the comment reading from going too far.
 transforms_to(
   q{SELECT '-- no comment', ?, '/* nor this', ?, '*/'},
   q{SELECT '-- no comment', $1, '/* nor this', $2, '*/'},
-  2, 'k84 comment: a comment start inside a string is string text',
+  2, 'comment: a comment start inside a string is string text',
 );
 transforms_to(
   "SELECT 1 -- \$\$\n, ?, /* \$\$ */ ?",
   "SELECT 1 -- \$\$\n, \$1, /* \$\$ */ \$2",
-  2, 'k84 comment: a $$ inside a comment opens no dollar quote',
+  2, 'comment: a $$ inside a comment opens no dollar quote',
 );
 
 # Escape strings. In q{} a doubled backslash is one backslash.
 transforms_to(
   q{SELECT e'it\'s ?' , ?},
   q{SELECT e'it\'s ?' , $1},
-  1, q{k84 E'': a lowercase e opens an escape string too},
+  1, q{E'': a lowercase e opens an escape string too},
 );
 transforms_to(
   q{SELECT E'it''s \' ?', ?},
   q{SELECT E'it''s \' ?', $1},
-  1, q{k84 E'': a doubled quote and a backslashed one in one string},
+  1, q{E'': a doubled quote and a backslashed one in one string},
 );
 transforms_to(
   q{SELECT E'open \' ? and ?},
   q{SELECT E'open \' ? and ?},
-  0, q{k84 E'': a string that is never closed runs to the end},
+  0, q{E'': a string that is never closed runs to the end},
 );
 transforms_to(
   "SELECT E'a'\n  'b\\'c ?', ?",
   "SELECT E'a'\n  'b\\'c ?', \$1",
-  1, q{k84 E'': the string continued on the next line is an escape string too},
+  1, q{E'': the string continued on the next line is an escape string too},
 );
 transforms_to(
   "SELECT E'a' -- more?\n 'b\\'c ?', ?",
   "SELECT E'a' -- more?\n 'b\\'c ?', \$1",
-  1, q{k84 E'': continued across a -- comment},
+  1, q{E'': continued across a -- comment},
 );
 # Held before k84 as well: these keep the escape-string reading from going too
 # far, and the reading of every other quoted run where it was.
 transforms_to(
   q{SELECT E'a\\\\', ?, 'b?'},
   q{SELECT E'a\\\\', $1, 'b?'},
-  1, q{k84 E'': a backslashed backslash does not escape the quote behind it},
+  1, q{E'': a backslashed backslash does not escape the quote behind it},
 );
 transforms_to(
   q{SELECT E'open \' and \' ? and ?},
   q{SELECT E'open \' and \' ? and ?},
-  0, q{k84 E'': never closed, with two backslashed quotes before the ?},
+  0, q{E'': never closed, with two backslashed quotes before the ?},
 );
 transforms_to(
   q{SELECT E'a' 'b\' , ?, 'x?'},
   q{SELECT E'a' 'b\' , $1, 'x?'},
-  1, q{k84 E'': without a newline in between the next string is not its continuation},
+  1, q{E'': without a newline in between the next string is not its continuation},
 );
 transforms_to(
   q{SELECT dome'a\', ?, 'b?'},
   q{SELECT dome'a\', $1, 'b?'},
-  1, q{k84 E'': a word that only ends in e opens a plain string},
+  1, q{E'': a word that only ends in e opens a plain string},
 );
 transforms_to(
   q{SELECT N'a\', ?, B'01', X'1F', U&'d\0061?', 'x?'},
   q{SELECT N'a\', $1, B'01', X'1F', U&'d\0061?', 'x?'},
-  1, q{k84: N'', B'', X'' and U&'' have no backslashed quote},
+  1, q{N'', B'', X'' and U&'' have no backslashed quote},
 );
 transforms_to(
   q{SELECT 'back\', ?, 'x?'},
   q{SELECT 'back\', $1, 'x?'},
-  1, q{k84: a backslash in a plain '' string is text (standard_conforming_strings on)},
+  1, q{a backslash in a plain '' string is text (standard_conforming_strings on)},
 );
 transforms_to(
   q{SELECT "a--b", "c$$d", "e/*f", ?, "g$$"},
   q{SELECT "a--b", "c$$d", "e/*f", $1, "g$$"},
-  1, 'k84: comment and dollar-quote starts inside a quoted identifier are its name',
+  1, 'comment and dollar-quote starts inside a quoted identifier are its name',
 );
 transforms_to(
   q{SELECT ?, 'open ? and ?},
   q{SELECT $1, 'open ? and ?},
-  1, q{k84: a '' string that is never closed runs to the end},
+  1, q{a '' string that is never closed runs to the end},
 );
 transforms_to(
   q{SELECT ?, "open ? and ?},
   q{SELECT $1, "open ? and ?},
-  1, 'k84: a quoted identifier that is never closed runs to the end',
+  1, 'a quoted identifier that is never closed runs to the end',
 );
 
 # What the maker emits, to the character. It writes the jsonpath operator as
@@ -412,18 +412,18 @@ transforms_to(
 {
   my ($sql, @bind) = $sm->select('t', ['*'], { 'me.data' => { '@?' => '$.a' } });
   is $sql, q{SELECT * FROM "t" WHERE ( "me"."data" @\? ?::jsonpath )},
-    'k120 the maker writes the jsonpath operator as @\?';
-  is scalar(@bind), 1, 'k120 ... with one bind';
+    'the maker writes the jsonpath operator as @\?';
+  is scalar(@bind), 1, '... with one bind';
   transforms_to(
     $sql,
     q{SELECT * FROM "t" WHERE ( "me"."data" @? $1::jsonpath )},
-    1, 'k120 maker output: the @? operator and its placeholder, to the character',
+    1, 'maker output: the @? operator and its placeholder, to the character',
   );
 }
 transforms_to(
   q{SELECT * FROM "t" WHERE ( "me"."data" @? ?::jsonpath )},
   q{SELECT * FROM "t" WHERE ( "me"."data" @$1 $2::jsonpath )},
-  2, 'k120 the same statement with a bare @?: two placeholders',
+  2, 'the same statement with a bare @?: two placeholders',
 );
 
 # Its SQL holds no literal and no comment: every ? in it is a placeholder but
@@ -443,8 +443,8 @@ for my $where (
   my ($sql, @bind) = $sm->select('t', ['*'], $where);
   my $i = 0;
   (my $want = $sql) =~ s/(\\?)\?/$1 ? '?' : '$' . ++$i/ge;
-  is $storage->_transform_sql($sql), $want, "k84 maker output: $want";
-  is $i, scalar(@bind), "k84 maker output: $i placeholder(s) for its $i bind(s)";
+  is $storage->_transform_sql($sql), $want, "maker output: $want";
+  is $i, scalar(@bind), "maker output: $i placeholder(s) for its $i bind(s)";
 }
 
 # Shaped SQL shaped again is the same text.
@@ -454,7 +454,7 @@ for my $sql (
   q{SELECT * FROM "t" WHERE "me"."data" @> ?::jsonb AND "id" = ?},
 ) {
   my $once = $storage->_transform_sql($sql);
-  is $storage->_transform_sql($once), $once, "k84: shaping is idempotent: $once";
+  is $storage->_transform_sql($once), $once, "shaping is idempotent: $once";
 }
 
 # A statement with a \? is shaped once and no more: the backslash is gone from
@@ -465,15 +465,15 @@ for my $sql (
 {
   my $once = $storage->_transform_sql(q{SELECT * FROM "t" WHERE "me"."data" @\? ?::jsonpath});
   is $once, q{SELECT * FROM "t" WHERE "me"."data" @? $1::jsonpath},
-    'k120: a statement with \? shaped once';
+    'a statement with \? shaped once';
   my $twice = eval { $storage->_transform_sql($once) };
   ok !defined $twice && $@ =~ /mixes/,
-    'k120: ... shaped a second time it is refused: its ? stands beside a $N'
+    '... shaped a second time it is refused: its ? stands beside a $N'
     or diag 'got: ' . ($twice // $@);
 
   is $storage->_transform_sql($storage->_transform_sql(q{SELECT a @\? '$.a'})),
     q{SELECT a @$1 '$.a'},
-    'k120: a \? alone, shaped a second time, is a placeholder';
+    'a \? alone, shaped a second time, is a placeholder';
 }
 
 # --- a ? behind an @ is a placeholder like every other --------------------------
@@ -541,7 +541,7 @@ for my $case (
   [ q{SELECT $1, $2 \? 'x'},            q{SELECT $1, $2 ? 'x'},            0, '$N and \? do not mix' ],
 ) {
   my ($sql, $want, $binds, $name) = @$case;
-  transforms_to($sql, $want, $binds, "k120 $name");
+  transforms_to($sql, $want, $binds, $name);
 }
 
 for my $case (
@@ -555,9 +555,9 @@ for my $case (
   my ($sql, $name) = @$case;
   my $got = eval { $storage->_transform_sql($sql) };
   my $err = $@;
-  ok !defined $got, "k120 $name: refused";
-  like $err, qr/mix.*\$N.*\?|\?.*\$N.*mix/is, "k120 $name: the message names the mix";
-  unlike $err, qr/SELECT|jsonpath/, "k120 $name: ... and does not repeat the statement";
+  ok !defined $got, "$name: refused";
+  like $err, qr/mix.*\$N.*\?|\?.*\$N.*mix/is, "$name: the message names the mix";
+  unlike $err, qr/SELECT|jsonpath/, "$name: ... and does not repeat the statement";
 }
 
 done_testing;

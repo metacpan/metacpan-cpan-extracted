@@ -4,7 +4,7 @@ package DBIO::Firebird::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -106,7 +106,7 @@ DBIO::Firebird::Introspect::ForeignKeys - Introspect Firebird foreign keys via r
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

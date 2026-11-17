@@ -4,7 +4,7 @@ package DBIO::Informix::Introspect;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Introspect::Base';
 
@@ -123,7 +123,7 @@ DBIO::Informix::Introspect - Introspect an Informix database via its system cata
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

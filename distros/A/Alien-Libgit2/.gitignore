@@ -77,3 +77,10 @@ AGENTS.md
 # karr materialized task view -- never commit
 tasks/
 config.yml
+
+# skilletor: committe Config + Ignore-Block
+!.claude/skilletor.json
+!.claude/.gitignore
+
+# Claude Code worktrees (claude --worktree / isolated agents) -- never commit
+/.claude/worktrees/

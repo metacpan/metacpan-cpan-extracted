@@ -4,7 +4,7 @@ package DBIO::Sybase::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::Conformance';
 
@@ -380,7 +380,7 @@ DBIO::Sybase::Test::Conformance - Answers the shared conformance case table for 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

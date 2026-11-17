@@ -4,7 +4,7 @@ package DBIO::MySQL::Introspect::Tables;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::MySQL::Identifier qw(quote_ident);
 
@@ -72,7 +72,7 @@ DBIO::MySQL::Introspect::Tables - Introspect MySQL/MariaDB tables and views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

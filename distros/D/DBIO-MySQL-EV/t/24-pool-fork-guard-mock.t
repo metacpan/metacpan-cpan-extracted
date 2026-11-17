@@ -231,6 +231,7 @@ my $TICK = EV::timer(0.002, 0.002, sub {});   # RUN_ONCE never blocks for long
 sub loop_returns {
   my ($max) = @_;
   my $stuck;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $bound = EV::timer($max // 2, 0, sub { $stuck = 1; EV::break(EV::BREAK_ALL()) });
   $bound->keepalive(0);
   EV::run();
@@ -344,7 +345,7 @@ $_->release_held for @conns;
 ok drive(sub { $query->is_ready && $txn->is_ready }), 'the statements in flight at fork time complete in the parent';
 ok $query->is_done, 'the pooled query succeeded';
 is_deeply [ $query->get ], [ [ "own:$queried->{thread_id}", 7 ] ], '... with its own result';
-is $queried->open_stmts, 0, '... and its statement was closed (karr k45)';
+is $queried->open_stmts, 0, '... and its statement was closed';
 ok $txn->is_done, 'the transaction committed';
 is_deeply [ $txn->get ], [ 1 ], '... with the result of its own statement';
 is "$query_ready/$txn_ready", '1/1', 'each Future became ready exactly once';
@@ -442,7 +443,7 @@ sub own_report {
 # The claims every case makes about the child's own connection.
 sub child_owns_its_connection {
   my ($r, $bind, $parent_tid) = @_;
-  is $r->{adopted}, 1, 'the child\'s first acquire took the pool over (core k233)';
+  is $r->{adopted}, 1, 'the child\'s first acquire took the pool over';
   is "$r->{own}/$r->{own_mine}", '1/1',
     '... and the pool in the child holds exactly one connection, opened by the child';
   is $r->{own_finished}, 0, 'the fork watcher did not finish the child\'s own connection';
@@ -456,7 +457,7 @@ my $K233 = DBIO::Storage::PoolBase->can('_verify_pid');
 my $tick = EV::timer(0.002, 0.002, sub {});   # RUN_ONCE never blocks for long
 
 SKIP: {
-  skip 'core before k233: DBIO::Storage::PoolBase has no _verify_pid, so a forked '
+  skip 'the installed DBIO core has no PoolBase::_verify_pid, so a forked '
      . 'child does not take the pool over and there is no own connection to protect', 3
     unless $K233;
 

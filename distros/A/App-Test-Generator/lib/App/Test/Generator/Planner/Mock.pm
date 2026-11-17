@@ -15,11 +15,11 @@ use Readonly;
 Readonly my $MOCK_SYSTEM     => 'mock_system';
 Readonly my $MOCK_CAPTURE_IO => 'capture_io';
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::Oracle::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 # Compose cross-cutting Storage behaviour via ISA (not Exporter import), so the
 # role methods live in the MRO and their next::method calls resolve. Roles that
@@ -37,6 +37,9 @@ use DBIO::Oracle::Util ();
 sub __cache_queries_with_max_lob_parts { 2 }
 
 sub dbio_deploy_class { 'DBIO::Oracle::Deploy' }
+
+# a DATE holds a date and a time of day
+sub datetime_date_carries_time { 1 }
 
 # The attributes of every connection of this driver that the connect_info does
 # not name (an attribute it names wins, core merges it over these): LongReadLen
@@ -487,7 +490,7 @@ DBIO::Oracle::Storage - Oracle Support for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -561,6 +564,19 @@ setting is made before the application's own C<on_connect_call> and
 C<on_connect_do>, which can change it for their connection;
 C<< on_connect_call =E<gt> 'datetime_setup' >> is still accepted and sets the
 same formats again.
+
+A C<DATE> holds a date and a time of day. A C<date> column keeps the time it
+is read and written with and follows the C<timezone> of the column like a
+C<datetime> (L<DBIO::Storage::DBI/datetime_date_carries_time>).
+
+=head2 Decimal character
+
+Every connection also sets C<NLS_NUMERIC_CHARACTERS> to C<.,> for its
+session, so a number is bound and read with a decimal point in every NLS
+territory (C<NUMBER>, C<BINARY_DOUBLE>, C<BINARY_FLOAT>), see
+L<DBIO::Oracle::Storage::ConnectSetup>. The environment variable of that name
+is not used; an C<on_connect_do> or C<on_connect_call> of the application runs
+after and wins.
 
 =head2 LOB length and character set
 

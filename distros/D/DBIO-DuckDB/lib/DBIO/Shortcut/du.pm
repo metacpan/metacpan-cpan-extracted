@@ -4,7 +4,7 @@ package DBIO::Shortcut::du;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 sub apply { DBIO->apply_driver($_[1], 'DuckDB') }
 
@@ -22,7 +22,7 @@ DBIO::Shortcut::du - `use DBIO -du` shortcut for the DuckDB driver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

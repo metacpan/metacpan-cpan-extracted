@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 
@@ -191,7 +191,7 @@ DBIO::ClickHouse::Util - Shared ClickHouse-specific helper functions for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

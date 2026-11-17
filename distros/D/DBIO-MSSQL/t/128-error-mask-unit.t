@@ -108,8 +108,18 @@ my @unchanged = (
   q{Invalid object name 'dbo.nothere'.},
   q{something nobody has seen: geheim42},
 );
+# These texts belong to no message number that quotes a value, so the frames
+# carry a number that does not (the frames above say 245 / 22018, a
+# conversion, whatever the text; t/132 holds what a number does).
+my @neutral_frames = (
+  [ bare => sub { $_[0] } ],
+  [ odbc => sub { "[FreeTDS][SQL Server]$_[0] (SQL-42000)" } ],
+  [ sybase => sub { "Server message number=208 severity=16 state=1 line=1 server=DBIO text=$_[0]" } ],
+  [ 'sybase, two messages' => sub { "Server message number=208 severity=16 state=1 line=1 server=DBIO text=$_[0]\nServer message number=3621 severity=0 state=0 line=1 server=DBIO text=$terminated" } ],
+  [ 'odbc, two messages' => sub { "[FreeTDS][SQL Server]$_[0] (SQL-42000)\n[FreeTDS][SQL Server]$terminated (SQL-01000)" } ],
+);
 for my $text (@unchanged) {
-  for my $frame (@frames) {
+  for my $frame (@neutral_frames) {
     my ($fname, $wrap) = @$frame;
     is mask($wrap->($text)), $wrap->($text), "left as it is [$fname]: " . substr($text, 0, 60);
   }

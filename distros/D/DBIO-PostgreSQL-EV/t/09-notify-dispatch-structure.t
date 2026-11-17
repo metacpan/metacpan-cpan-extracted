@@ -109,7 +109,7 @@ sub pad_cvs {
 ok( (grep { ${ $_->START } == $start } pad_cvs(
       B::svref_2object(\&DBIO::PostgreSQL::EV::Storage::_dispatch_notify))),
   'notify completion callback is created in the named sub _dispatch_notify '
-  . '(karr k30 / ADR 0044)' );
+  . '(ADR 0044)' );
 # karr k43: notify is core's now (ADR 0056) and the acquire->then closure moved
 # with the old notify body into the listen seam _notify_send, so that is where
 # the callback must NOT be. Same claim, the holder renamed.

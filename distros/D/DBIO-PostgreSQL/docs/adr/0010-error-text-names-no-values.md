@@ -62,3 +62,47 @@ shorter than four characters pass the base net.
   forms are in `t/141-error-values-live.t`.
 - DDL run through a plain handle (`Deploy`) has no binds and its text is not
   passed through the hook.
+
+## Addendum 2026-11-09
+
+Maintainer decision: no bound or quoted value appears in a message, in
+whatever language the server reports. PostgreSQL words its text by
+`lc_messages`, and the rules above knew only the English sentences, so on a
+German or French server a short value and every value the server quotes
+(`Schlüssel »(name)=(ab)« existiert bereits.`, `ungültige Eingabesyntax für
+Typ integer: »xy«`) stood in the message.
+
+- **The masking holds on the SQLSTATE and the quoting marks, not on the
+  wording.** `mask_error_details($message, $state)` and
+  `mask_detail_values($text, $state)` take the SQLSTATE of the error as an
+  optional second argument; without it, or with a state of another class, the
+  English rules are all there is, as before.
+- **The extra stage runs only where the English rules read nothing in a
+  field**, so the English result is untouched. Class 22 (data exception): the
+  primary text has the span from its first quoting mark to its last (`"…"`,
+  `»…«`, `« … »`, `„…“`, `“…”`, `「…」`) replaced by `***`, the marks and the
+  blanks inside them kept, else what follows its last colon. Class 22 and 23
+  (integrity constraint violation): the detail keeps the columns of a
+  `(cols)=(value)` key, masks a bracketed row as `(***)`, else the quoted span;
+  a detail with a bracket or a mark left over after masking is `***` whole. A
+  portal parameter (`$1 = '…'`) is masked in any field but the statement's, a
+  context line `words N: rest` of another language keeps its words.
+- **A message with the severity label in English** (`ERROR:  `; for the
+  `detail` field of the exception the severity DBD::Pg reports) is read by the
+  English rules alone: a sentence of an English server that no rule knows
+  (`Array value must start with "{" …`) is not taken for a foreign one.
+- **A label of any language starts a field** (capital letters, an optional
+  number, an optional blank before the colon: `ZEILE 1:`, `DÉTAIL :  `). A
+  label with a number is the statement excerpt and stays; an unknown label is
+  read as a context or a detail. This applies with a state of class 22 or 23
+  only.
+- **Where the state comes from**: `DBIO::PostgreSQL::Util::error_sqlstate`
+  reads it from the database handle the error happened on (the statement
+  handle's `Database`): the sync storage in `_mask_error_values` and
+  `_dbi_error_fields`, the future_io transport in `_pg_raise`. Core is not
+  changed.
+- **Not covered**: a text of a class other than 22 and 23 that quotes a value
+  (such a text is a name in practice, and a name stays).
+
+`t/142-error-values-language-live.t` holds it live for German and French on
+both transports; `t/140-mask-error-values.t` holds the texts offline.

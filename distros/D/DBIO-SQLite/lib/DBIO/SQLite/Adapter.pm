@@ -4,7 +4,7 @@ package DBIO::SQLite::Adapter;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp qw/croak/;
 use base 'DBIO::Adapter::Base';
@@ -45,7 +45,7 @@ DBIO::SQLite::Adapter - SQLite base->native type resolver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

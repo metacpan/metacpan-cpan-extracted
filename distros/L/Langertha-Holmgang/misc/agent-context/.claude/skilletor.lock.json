@@ -1,0 +1,205 @@
+{
+  "rules/agent-delegation": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.agent-delegation.md": "sha256:3722b8ce549f51f7847b39c438c6b85ee7ebf4476e74a3989e9fd1b4d4f28434"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/board-karr": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.board-karr.md": "sha256:ff3b98284b1ca2ea8afc2aaa91e671138a78e33e71cc63a263a25fdb97ba485e"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/engineering-discipline": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.engineering-discipline.md": "sha256:177d01585bdd5fa273685e3f65aeafe9d8c0d2fdfaa94916f9f6fa74234615b8"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/getty-cpan-release": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.getty-cpan-release.md": "sha256:f0a3fb481dc5ca68179b17eaf36a85f76c5b709fd66e1b9bbb19f500f7189738"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "rules/publish-gate": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "rules/.local.publish-gate.md": "sha256:07266d381c99f8d3e13f966508fce652c548b2b20a68ced1637519eb9f9404a6"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-git-commit-style": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-commit-style/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-commit-style/SKILL.md": "sha256:d69e6b556e277975e08cdea82471ac0689dd3418791e9cccc9bbe54f04b73c4d"
+    }
+  },
+  "skills/getty-git-usage": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-git-usage/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-git-usage/SKILL.md": "sha256:d822ec8cba6bd63bd9fd7c0e3bb0c73268f101f931d8fae82b3a553b64756989"
+    }
+  },
+  "skills/getty-perl-core": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-core/SKILL.md": "sha256:204d50a28c1c8216845efc649aa7e4c0184c61c57aa0c72cc1898ce2889d7ed1",
+      "skills/getty-perl-core/references/dbic.md": "sha256:ab308272fa65891d02fa1a36326f6fe7c5972ce95fa4323c1cb36e08cf519627"
+    }
+  },
+  "skills/getty-perl-moose": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-moose/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-moose/SKILL.md": "sha256:1b8f63c667e03d98eb676b2c9dc12f9997d1640dd784dcc0e6b64eda0605e7e0"
+    }
+  },
+  "skills/getty-perl-pod": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-pod/SKILL.md": "sha256:105c0a002592f877eadc60246c71ab739a0bf4fbf52771b8fb7ea1ff8bbdec7c"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-perl-release-author-getty": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-release-author-getty/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-release-author-getty/SKILL.md": "sha256:839cf000e1770c1026ad34a731502f505c5b4b68c0de78552038aeda5416fe09"
+    },
+    "via": [
+      "bundle:getty-cpan-dist@getty"
+    ]
+  },
+  "skills/getty-perl-sugar": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/getty-perl-sugar/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/getty-perl-sugar/SKILL.md": "sha256:b6cf974ac7248fbc616b0f2cd022c98f3991c9e1b7cded2398adc304bfc6cf85",
+      "skills/getty-perl-sugar/examples/reference/README.md": "sha256:cb508956b78c5d6fc4680a4b0b871767ec2a19ee9c867dcf619c2f4fa1e5e087",
+      "skills/getty-perl-sugar/examples/reference/cpanfile": "sha256:983c3d361e02142332273fd9ce236957d88114275883e9b0ed0ddf9b44207c14",
+      "skills/getty-perl-sugar/examples/reference/demo-core.pl": "sha256:f2818fbbad8ed307c08930b240b816e7fc08eba8c4c9e3915b43f72d1fd0ba0a",
+      "skills/getty-perl-sugar/examples/reference/demo-moose.pl": "sha256:b4c6890701e13d97f6bb21b906853a78fcd6dbbf1a75bb58db0549b6c14b74d3",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Flow/Check.pm": "sha256:22f1a41deba046b7aee299fbcc141b7b075297dbfbf0b7a7e16202dc07b10cef",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Flow/Probe.pm": "sha256:4df59a27909b1ff05a4753f37da858c079e4d903dac2afd3e0227910ea08919f",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar.pm": "sha256:19bccba49c49d53c4f700727af8b62e588ed74b4776f9e1192e933f1dd194cd9",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Executor.pm": "sha256:5bb4af1e4b246a19133cfbcf7a2be32f2dd2eb15c13af01ea962f4de96561681",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Owners.pm": "sha256:5b647d0b67841d4a11a1ce75ffd9129701b7ed994f4bd06184b0e8764d2449b8",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Plan.pm": "sha256:f656f10fd08ee4efee6bb523cc29f64360421b48511028724c07d9a1bc92de57",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Predicate.pm": "sha256:cffd081c02cc3a3384c493dfa6dcf57b99e9ead30a46caa0c8cbd438402384c7",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Registry.pm": "sha256:01a1abb4ab6d6a181a93d29db5c76d8cff6d406c09bde7d9b7cd0ac2fa148469",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/RoleDSL.pm": "sha256:9b1ce543ab641c176dcede6e7635ac7b035ae61db54782815253f1846dce894d",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Runner.pm": "sha256:6e01f3192b0a1a7ba0e8ce5ce3bc18e185eaa62df191aad4f33fc509b993c1b9",
+      "skills/getty-perl-sugar/examples/reference/lib/Example/Sugar/Schema.pm": "sha256:ff1c8e1d320ed2a77283b638831846192680c1e2fc87e55ae081efbae1165002",
+      "skills/getty-perl-sugar/examples/reference/schema-demo.pl": "sha256:c60d320b001c5c7f3af5da098f640d1bf12c2de5484a5fbddc75bec021e5430b",
+      "skills/getty-perl-sugar/examples/reference/t/00-load.t": "sha256:fe2850952d6e54b06dd920c16278f4152b8c232c96f4ddc13d837c14fd70fe3f",
+      "skills/getty-perl-sugar/examples/reference/t/10-caller.t": "sha256:4ebbfccda797a96f0490573393f1e1d6f78260621f97402d52ece46afc5ebeee",
+      "skills/getty-perl-sugar/examples/reference/t/20-registry.t": "sha256:251118d88da22921472bec593523cece30225937fa3eba440c8506ad9159170e",
+      "skills/getty-perl-sugar/examples/reference/t/30-plan.t": "sha256:3d23e86b0b9c4a296aebd68054e30a3caf5be70240733d664e98614c17f77654",
+      "skills/getty-perl-sugar/examples/reference/t/40-executor.t": "sha256:13311ae35e7f7f4d2c8cbbb75e8d1b2d741390c555e36d9a601b8bc5fe4daf90",
+      "skills/getty-perl-sugar/examples/reference/t/50-schema.t": "sha256:6e18ef6a2c8f19cec53400b2fa7d994b0b7d06a58446f2017225012b6c30d4af",
+      "skills/getty-perl-sugar/examples/reference/t/70-moose.t": "sha256:dcab6a415801350615a033fe741ace03dab0f7001da0e9831a54670c2a32d64d",
+      "skills/getty-perl-sugar/examples/reference/t/80-future.t": "sha256:1a1afb9fb8e317d0b596b391fc87d31f3a8f92846b726f92ee12b083b1f2b005",
+      "skills/getty-perl-sugar/examples/reference/t/90-io-async.t": "sha256:d9be884a118dabe9f50332a799f29e9902ac47b0aae2312ba3a433673229f4cf",
+      "skills/getty-perl-sugar/references/architecture.md": "sha256:9511fdb4961fa020afb76012fa0e6ec57f5d6f5eb31a4c963c7cb16b0063a403",
+      "skills/getty-perl-sugar/references/attributes-and-forms.md": "sha256:e0c1ea1333e93e21ad945b75c7d3463a4c9161aee22fabcdc6159b15fccabc48",
+      "skills/getty-perl-sugar/references/composition-and-inheritance.md": "sha256:273f976fb343a886f9427511d5cd1f55f5da34120b4b8f89b18442f629ed1309",
+      "skills/getty-perl-sugar/references/corrections-and-adoption.md": "sha256:31e842e0a57a6c4aeefd17d740f6c666c2e01a078a60bfa9eeb41f745d5032c6",
+      "skills/getty-perl-sugar/references/exporters-and-caller.md": "sha256:f8d7cba976ab56f8cb4aae89b7f5c370698bb251731b17b24f7b3dc247863030",
+      "skills/getty-perl-sugar/references/parallelism-and-futures.md": "sha256:f57ef486accc949a8575746836519cf816b2cd78184fcd697f612abc95fd1686",
+      "skills/getty-perl-sugar/references/performance.md": "sha256:e2bdff9916ebcac9236bebf63a706b8996df48d16ff824f88bc9fb5b6b06c80f",
+      "skills/getty-perl-sugar/references/planning-and-dependencies.md": "sha256:2566dece9156c63427e1bb0b459e4ce2603b68e5513671b418f6f9064419433a",
+      "skills/getty-perl-sugar/references/predicates.md": "sha256:cff7196000561650fc217430eed9ae4c9239e299076450858631aa06531cd72a",
+      "skills/getty-perl-sugar/references/progress-and-observability.md": "sha256:d92ab368b2b02c5ab847ec8abd5f435ffb18871871acfb566d8e50b022014c59",
+      "skills/getty-perl-sugar/references/recipes.md": "sha256:a803eb1f6a5641f02c102b803b075d07e55471cdca877c0e1e4fdb3552fae119",
+      "skills/getty-perl-sugar/references/registry-and-lifecycle.md": "sha256:40d57eaf5672d04d279a86d116c065f83838442bfc629aa4c53d8f30e1a8f467",
+      "skills/getty-perl-sugar/references/resume-and-idempotency.md": "sha256:9f18c48573692e3e291e18aa72410439f14753652c13505670c55d582e2fbd1e",
+      "skills/getty-perl-sugar/references/runner-and-results.md": "sha256:554579f78a4c2449a3adc825670ad2c69428569acb18bb66033abdb4811e84da",
+      "skills/getty-perl-sugar/references/security-and-trust.md": "sha256:14865906b4eb0e736664555c17883799eaaf288f177c66edf120c8a4fcc0b256",
+      "skills/getty-perl-sugar/references/testing-and-debugging.md": "sha256:f20aead247bcd1ad7e2a111aa353af0e66ca73390f2184e6153266f4a30bf4c1",
+      "skills/getty-perl-sugar/references/tool-schemas.md": "sha256:4269ae2bb56743731a786fe4e87f7ff17dbb2ca5e58dbd8e7202882e0d13eb6d",
+      "skills/getty-perl-sugar/references/validation-and-localization.md": "sha256:f3fe365733aa6e6f1c98870d07e7538f5e5b734a57b5741d84a285034179d26f"
+    }
+  },
+  "skills/kanban-issues-karr-coordination": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-coordination/SKILL.md": "sha256:60296bb91931ad9e2b90eb5b187716b810feb55c4f99c670fb0505bc5753d0c9",
+      "skills/kanban-issues-karr-coordination/references/cards.md": "sha256:ed1ed17fdffa756e8ee8ff5d72a3a22c3e414abdaadc9b0fc0ba08e176d95340",
+      "skills/kanban-issues-karr-coordination/references/claims.md": "sha256:81459998fe329f30bc6c10fcf750955fa2b6134e13093e59df5970c335e3aadb",
+      "skills/kanban-issues-karr-coordination/references/config.md": "sha256:1220e5d2069af5b760fc76572dbedeccda00f0ee51c3c770040a454671c15430",
+      "skills/kanban-issues-karr-coordination/references/cross-board.md": "sha256:7ece9e04470ebcd738dbd20b4ea372cbb730de10af27ab33ce0eb068be453a8d",
+      "skills/kanban-issues-karr-coordination/references/queries.md": "sha256:0c4c38c7aa36f050a61f4abdc79a2531b58b0148e57ca9e56581a31a5e9d63c8",
+      "skills/kanban-issues-karr-coordination/references/setup.md": "sha256:d90667962ec6301eb994d5a463f9441979711c031e67073dac3f98d584983a61",
+      "skills/kanban-issues-karr-coordination/references/storage.md": "sha256:4e50a5927f3a1582e4f08a8bbfad1d10a78cae386636f0007c498a85d9a823bf"
+    }
+  },
+  "skills/kanban-issues-karr-ticket": {
+    "source": "karr",
+    "version": "local",
+    "files": {
+      "skills/kanban-issues-karr-ticket/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/kanban-issues-karr-ticket/SKILL.md": "sha256:a8885a983ac394c3e604e8a06fc483f5f953888a863373671df1bf460d1e9f93"
+    }
+  },
+  "skills/perl-ai-langertha": {
+    "source": "langertha",
+    "version": "local",
+    "files": {
+      "skills/perl-ai-langertha/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-ai-langertha/SKILL.md": "sha256:c6f2a82055f1618a34617582b63951c99ff548b3d28610080541c63cf20fa463"
+    }
+  },
+  "skills/perl-io-async-future": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-io-async-future/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-io-async-future/SKILL.md": "sha256:7c6d9a3403175ed8d4a6bf836267f5a750a383eecd300d2a43e7d4f7a8064ab2"
+    }
+  },
+  "skills/perl-release-dist-ini": {
+    "source": "getty",
+    "version": "local",
+    "files": {
+      "skills/perl-release-dist-ini/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
+      "skills/perl-release-dist-ini/SKILL.md": "sha256:f7d074d471499db86ecd33d92fdbea0e35f20e94b04aaaa4669b705fcfd01c3b"
+    }
+  }
+}

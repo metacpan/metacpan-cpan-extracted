@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 
 # LIVE: an AccessBroker whose answer carries a libpq parameter, through a
 # schema connected with { async => 'ev' }, against a real PostgreSQL (karr
@@ -358,7 +361,7 @@ subtest 'c) the DBI form with the parameter in the DSN, one answer for every sto
   hang_up($schema);
 };
 
-subtest 'd) a hash with a dsn key (karr k79)' => sub {
+subtest 'd) a hash with a dsn key' => sub {
   my ($env_name, $param) = ("${TAG}_d_env", "${TAG}_d_param");
   local $ENV{PGAPPNAME} = $env_name;
 

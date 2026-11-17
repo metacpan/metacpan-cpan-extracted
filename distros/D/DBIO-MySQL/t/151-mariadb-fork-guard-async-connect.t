@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use POSIX ();
+use Config;
 use lib 't/lib';
 
 # The guard (t/149) is installed by the connect paths of this dist, so that no
@@ -10,6 +11,8 @@ use lib 't/lib';
 # against t/lib/MySQLProtocolStub.pm.
 
 BEGIN {
+  plan skip_all => 'a real fork() is needed (d_fork is unset): the test forks a child that exits over a shared connection'
+    unless $Config{d_fork};
   eval { require DBD::MariaDB; require DBD::mysql; 1 }
     or plan skip_all => 'DBD::MariaDB and DBD::mysql are needed to tell the drivers apart';
 }

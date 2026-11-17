@@ -128,7 +128,7 @@ like $plain_sql, qr/ON DUPLICATE KEY UPDATE/,
   'direct SQLMaker render keeps the ODKU UPDATE branch';
 unlike $plain_sql, qr/LAST_INSERT_ID/xi,
   'direct SQLMaker render has NO identity idiom on a core-built on_conflict '
-  . '(no Source branch left to invent it -- k45 revert frozen)';
+  . '(no Source branch left to invent it)';
 
 # --- 1+2+3. the real path: upsert_async -> insert_async -> _run_crud_pinned,
 # with the mocked pool/executor sitting under the genuine backend.

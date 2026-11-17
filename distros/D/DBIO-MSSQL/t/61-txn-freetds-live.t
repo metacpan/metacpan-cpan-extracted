@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage 'english';   # SQL Server reports in the language of the session; this test reads its English wording
 use File::Temp ();
 use DBI;
 use DBIO::Optional::Dependencies ();

@@ -1,5 +1,33 @@
 Revision history for Mail::DKIM2
 
+0.35    2026-11-16
+        Security: three faults reported against 0.34.
+        - CVE-2026-129847: a line in the header section that is not a
+          header field (no colon; white space or nothing before the
+          colon; a fold before the colon, which RFC 5322 does not allow
+          and 0.34 read as a field; a first line starting with white
+          space) was dropped unread, so it was in no header hash: such
+          lines could be added to a signed message without breaking any
+          Message-Instance, while other parsers read them (Python's email
+          ends the header section at one). The Verifier now gives
+          "PERMERROR: malformed header field" for a message with any
+          DKIM2 field, before every other check, and the Signer refuses
+          ("malformed header field"). A message with no DKIM2 field is
+          still none. New HeaderParser method malformed_header. Since
+          0.22.
+        - CVE-2026-129848: the tag-list parser trimmed a value's trailing
+          white space with a pattern quadratic in a run of white space
+          inside the value: a DKIM2-Signature or Message-Instance field
+          of about 1MB took minutes, before any authentication. Linear
+          now; what is accepted is unchanged. Since 0.20.
+        - CVE-2026-129849: Mail::DKIM2::Validate::report walked the chain
+          level by level even when the Verifier had refused it for having
+          more than 32 Message-Instance or DKIM2-Signature fields, parsing
+          the whole message again at every level: one request to the
+          validator could cost minutes. Over the limit it now reports the
+          Verifier's PERMERROR and no levels; it reads i= and m= only as
+          chain numbers (1 to 99). Since 0.18.
+
 0.34    2026-11-15
         - dkim2-milter: the inbound milter takes a snapshot (and stamps an
           instance, and wraps) only when the chain verified or there was

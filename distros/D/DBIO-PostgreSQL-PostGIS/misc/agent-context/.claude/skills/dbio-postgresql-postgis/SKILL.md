@@ -58,7 +58,7 @@ objects deflate to that hex):
 
 ```perl
 DBIO::PostgreSQL::PostGIS::Geometry->point($lon, $lat, srid => 4326);
-DBIO::PostgreSQL::PostGIS::Geometry->from_lat_lon($lat, $lon, srid => 4326);
+DBIO::PostgreSQL::PostGIS::Geometry->from_lat_lon($lat, $lon);   # always SRID 4326
 DBIO::PostgreSQL::PostGIS::Geometry->from_wkt($wkt);
 DBIO::PostgreSQL::PostGIS::Geometry->from_ewkt($ewkt);
 DBIO::PostgreSQL::PostGIS::Geometry->from_ewkb_hex($hex);
@@ -72,11 +72,11 @@ Mixed in via `DBIO::PostgreSQL::PostGIS::ResultSet`:
 
 | Method | Purpose |
 |---|---|
-| `within_distance($col, $geom, $meters)` | `ST_DWithin` filter |
+| `within_distance($col, $geom, $distance)` | `ST_DWithin` filter; metres for `geography`, SRID units for `geometry` |
 | `bbox_intersects($col, $geom)` | bounding-box `&&` |
-| `nearest_to($col, $geom)` | KNN order, nearest first |
+| `nearest_to($col, $geom, $limit)` | KNN order, nearest first; `$limit` (optional) sets `rows` |
 | `order_by_distance($col, $geom)` | order by distance |
-| `with_distance($col, $geom)` | add a computed distance column |
+| `with_distance($col, $geom, $alias)` | add a computed distance column, `$alias` defaults to `distance` |
 
 Raw spatial SQL is always available via a `-bool` literal:
 
@@ -116,5 +116,6 @@ this distribution defines no `dbio_deploy_class`.
 
 Offline: `../dbio/maint/capped-test prove -lr t/` (mock storage, no database).
 Live needs a PostGIS-enabled PostgreSQL (this repo's database is `dbio_postgis`):
-`DBIO_TEST_PG_DSN` / `_USER` / `_PASS`. Bring-up and run rules: house rules, *Live
+`DBIO_TEST_PG_DSN` / `_USER` / `_PASS` (`DBIO_TEST_PG_EXT_DSN` / `_USER` / `_PASS` as
+fallback); `dbio-db env postgresql` sets up the maintainer's `dbio_postgis`. Bring-up and run rules: house rules, *Live
 testing — resource discipline*.

@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Year2000CDs;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -35,7 +35,7 @@ DBIO::Test::Schema::Year2000CDs - Test virtual view result class for 2000 CDs
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

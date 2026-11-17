@@ -26,8 +26,9 @@ sub batch ($size) {
     return gather {
         my @batch;
         return {
-            step => sub ($value) {
-                push @batch, $value;
+            # Without a signature, as it's called for each value.
+            step => sub {
+                push @batch, $_[0];
                 return @batch < $size ? () : [splice @batch];
             },
             flush => sub () { @batch ? [splice @batch] : () },
@@ -43,7 +44,8 @@ sub collect : prototype(;&) ($make = undef) {
     return gather {
         my @values;
         return {
-            step  => sub ($value) { push @values, $value; return },
+            # Without a signature, as it's called for each value.
+            step  => sub { push @values, $_[0]; return },
             flush => sub () {
                 my @all = splice @values;
                 return $make ? $make->(@all) : \@all;

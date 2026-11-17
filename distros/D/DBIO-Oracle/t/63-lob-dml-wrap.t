@@ -13,7 +13,7 @@ use DBIO::Oracle::Storage;
 # storage sends every such statement that binds a LOB inside BEGIN ... END;.
 #
 # Offline: this pins what is put on the wire. That Oracle accepts it, and that
-# the refetch really is skipped, is proven live in t/11 and t/21 (table and
+# the refetch really is skipped, is proven live in t/11 (table and
 # columns there are quoted lower-case; they fail on the unwrapped statement).
 
 DBIO::Test::Schema::BindType->add_columns(

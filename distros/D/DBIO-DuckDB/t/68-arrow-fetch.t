@@ -16,14 +16,18 @@
 use strict;
 use warnings;
 use utf8;
+use lib 't/lib';
 use Test::More;
+use DBIO::Test::Slow;
 use Test::Exception;
 use File::Temp ();
 use FFI::Platypus::Memory qw(calloc memcpy);
 use FFI::Platypus::Buffer qw(scalar_to_buffer);
 use DBIO::DuckDB::Test;
+use ChildPerl;
 
 my $PROBE = <<'EOP';
+use DBI;
 my $d = DBI->connect("dbi:DuckDB:dbname=$ARGV[0]", '', '', { RaiseError => 0, PrintError => 0 });
 if ($d) { $d->disconnect; exit 0 }
 exit 3;
@@ -34,6 +38,28 @@ my $storage = $schema->storage;
 my $dbh     = $storage->dbh;
 
 $dbh->do(q{CREATE TYPE mood AS ENUM ('sad', 'ok', 'glad')});
+
+# DBD::DuckDB (not this dist) reads a DATE through duckdb_from_date, which it
+# binds only for the libduckdb versions it knows; on another one reading a DATE
+# dies with "Undefined subroutine". The row path is then no yardstick for a DATE,
+# and the assertions that read one through it are skipped. The Arrow path reads
+# no DBD value, so its assertions stay.
+my $CAN_READ_DATE = eval { $dbh->selectrow_array(q{SELECT DATE '2026-01-01'}); 1 } ? 1 : 0;
+my $NO_DATE_READ  = 'DBD::DuckDB here cannot read DATE values (duckdb_from_date is not bound)';
+
+# The same for TIME (duckdb_from_time, a record returned by value). DBD::DuckDB::FFI
+# binds its functions in a loop of `eval { $ffi->attach(...) }` and swallows a
+# failed bind, so on a perl/FFI where a function cannot be bound (seen: Windows,
+# perl 5.20) the first TIME read dies with "Undefined subroutine
+# &DBD::DuckDB::FFI::duckdb_from_time". Only that message counts as "cannot read";
+# any other error of the probe is thrown. The Arrow assertions stay.
+my $CAN_READ_TIME = do {
+  my $ok  = eval { $dbh->selectrow_array(q{SELECT TIME '12:00:00'}); 1 };
+  my $err = $@;
+  die $err if !$ok and $err !~ /Undefined subroutine &DBD::DuckDB::FFI::duckdb_from_\w+/;
+  $ok ? 1 : 0;
+};
+my $NO_TIME_READ = 'DBD::DuckDB here cannot read TIME values (duckdb_from_time is not bound)';
 
 # The row path of the same statement, as columns.
 sub row_columns {
@@ -99,12 +125,19 @@ for my $case (@cases) {
     . join(', ', map { "(CAST($_ AS $type))" } @$values, 'NULL')
     . ') t(v)';
   my $t = $storage->duckdb_arrow_fetch($sql, []);
-  my $want = row_columns($sql);
+  my $row_path_reads = $name ne 'DATE' || $CAN_READ_DATE;
+  my $want = $row_path_reads ? row_columns($sql) : undef;
 
-  is $t->{rows}, scalar @{ $want->[0] }, "$name: rows";
+  SKIP: {
+    skip $NO_DATE_READ, 1 unless $row_path_reads;
+    is $t->{rows}, scalar @{ $want->[0] }, "$name: rows";
+  }
   is_deeply $t->{names}, ['v'], "$name: names";
   is $t->{formats}[0], $format, "$name: arrow format";
-  is_deeply $t->{columns}, $want, "$name: values equal the row path";
+  SKIP: {
+    skip $NO_DATE_READ, 1 unless $row_path_reads;
+    is_deeply $t->{columns}, $want, "$name: values equal the row path";
+  }
   ok !defined $t->{columns}[0][-1], "$name: NULL is undef";
 }
 
@@ -146,7 +179,11 @@ for my $c (@text_cases) {
 for my $c (grep { $_->[3] } @text_cases) {
   my ($name, $format, $expr) = @$c;
   my $sql = "SELECT $expr AS v";
-  is_deeply $storage->duckdb_arrow_fetch($sql)->{columns}, row_columns($sql), "$name: equal the row path";
+  SKIP: {
+    skip $NO_DATE_READ, 1 if $name =~ /^DATE/ and !$CAN_READ_DATE;
+    skip $NO_TIME_READ, 1 if $name =~ /^TIME(?!STAMP)/ and !$CAN_READ_TIME;
+    is_deeply $storage->duckdb_arrow_fetch($sql)->{columns}, row_columns($sql), "$name: equal the row path";
+  }
 }
 {
   my ($bc) = $dbh->selectrow_array("SELECT CAST($BC_TS AS VARCHAR)");
@@ -170,14 +207,21 @@ TODO: {
   for my $c (grep { !$_->[3] } @text_cases) {
     my ($name, $format, $expr) = @$c;
     my $sql = "SELECT $expr AS v";
-    is_deeply $storage->duckdb_arrow_fetch($sql)->{columns}, row_columns($sql), "$name: equal the row path";
+    SKIP: {
+      skip $NO_DATE_READ, 1 if $name =~ /^DATE/ and !$CAN_READ_DATE;
+      skip $NO_TIME_READ, 1 if $name =~ /^TIME(?!STAMP)/ and !$CAN_READ_TIME;
+      is_deeply $storage->duckdb_arrow_fetch($sql)->{columns}, row_columns($sql), "$name: equal the row path";
+    }
   }
   my $isql = "SELECT v FROM (VALUES $INTERVALS) t(v)";
   is_deeply $storage->duckdb_arrow_fetch($isql)->{columns}, row_columns($isql), 'INTERVAL: equal the row path';
   $dbh->do(q{SET TimeZone = 'UTC'});
   for my $type (qw(DATE TIMESTAMP_S TIMESTAMP_MS TIMESTAMP TIMESTAMP_NS)) {
     my $sql = "SELECT v FROM (VALUES (CAST('infinity' AS $type)), (CAST('-infinity' AS $type))) t(v)";
-    is_deeply $storage->duckdb_arrow_fetch($sql)->{columns}, row_columns($sql), "$type infinity: equal the row path";
+    SKIP: {
+      skip $NO_DATE_READ, 1 if $type eq 'DATE' and !$CAN_READ_DATE;
+      is_deeply $storage->duckdb_arrow_fetch($sql)->{columns}, row_columns($sql), "$type infinity: equal the row path";
+    }
   }
 }
 
@@ -481,7 +525,7 @@ is_deeply $storage->duckdb_arrow_fetch(q{SELECT MAP {1: 'a', 2: 'b'} AS m})->{co
     is $st->duckdb_arrow_fetch($sql)->{rows}, 5000, "a whole fetch works after the exception ($die_at)";
   }
   $st->disconnect;
-  my $rc = system($^X, '-MDBI', '-e', $PROBE, $file);
+  my $rc = run_child_perl($PROBE, $file);
   is $rc >> 8, 0, 'a second process opens the file after disconnect, though fetches died in a block';
 }
 
@@ -509,14 +553,14 @@ is_deeply $storage->duckdb_arrow_fetch(q{SELECT MAP {1: 'a', 2: 'b'} AS m})->{co
   );
   my $st = $s->storage;
   $st->ensure_connected;
-  my $held = system($^X, '-MDBI', '-e', $PROBE, $file) >> 8;
+  my $held = run_child_perl($PROBE, $file) >> 8;
   is $held, 3, 'baseline: a connected storage holds the file, a second process is refused';
   $st->duckdb_arrow_fetch(q{SELECT i, 'v' || i AS s FROM range(5000) t(i)}) for 1 .. 20;
   eval { $st->duckdb_arrow_fetch(q{SELECT '1'::BIT AS b}) };
   $st->duckdb_arrow_fetch(q{SELECT 1 AS a WHERE false});
   $s->storage->disconnect;
 
-  my $rc = system($^X, '-MDBI', '-e', $PROBE, $file);
+  my $rc = run_child_perl($PROBE, $file);
   is $rc >> 8, 0, 'a second process opens the file after disconnect';
 }
 

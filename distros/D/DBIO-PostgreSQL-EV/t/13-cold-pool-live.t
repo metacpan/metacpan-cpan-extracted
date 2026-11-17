@@ -76,7 +76,7 @@ lives_ok {
 my $ins;
 lives_ok {
   $ins = await($storage->insert_async($table, { name => 'cold' }));
-} 'karr k9: first facade insert on a COLD pool succeeded (no pre-warm)';
+} 'first facade insert on a COLD pool succeeded (no pre-warm)';
 ok $ins && ref $ins eq 'HASH',
   'cold insert resolved with the returned-columns HASHREF (ADR 0031 §3)';
 is $ins->{name}, 'cold', 'cold insert hashref carries the supplied data';
@@ -103,7 +103,7 @@ $txn_storage->connect_info([ \%ci, {} ]);
 my $txn_pg;
 lives_ok {
   $txn_pg = await($txn_storage->pool->acquire_txn);
-} 'karr k9: first acquire_txn on a COLD pool resolved without "not connected"';
+} 'first acquire_txn on a COLD pool resolved without "not connected"';
 ok $txn_pg->is_connected, 'cold-pool acquire_txn handed back a CONNECTED handle';
 
 # BEGIN on the cold-acquired handle must succeed — this is the first thing

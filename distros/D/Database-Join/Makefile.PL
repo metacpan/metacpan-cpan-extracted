@@ -21,7 +21,7 @@ WriteMakefile(
 	PREREQ_PM      => {
 		'autodie'                  => 0,
 		'Carp'                => 0,
-		'Database::Abstraction'  => 0.51,
+		'Database::Abstraction'  => 0.57,
 		'DBD::SQLite'              => '1.70',
 		'DBI'                      => 0,
 		'File::Spec'               => 0,

@@ -40,8 +40,7 @@ my $schema = MyApp::DB->connect('dbi:DuckDB:dbname=app.duckdb');
 ## Design notes
 
 - **Built on DBD::DuckDB** (FFI-based, no XS compile). We do NOT reimplement
-  the DBI layer. DuckDB is embedded and synchronous, so there is no
-  async-driven reason to go raw like dbio-postgresql-async.
+  the DBI layer. DuckDB is embedded and synchronous, so there is no async path.
 - **Escape hatches for DuckDB-native features** live as methods on
   `DBIO::DuckDB::Storage`, bypassing DBI where DBI hurts:
   - `$storage->duckdb_appender($table)` -- bulk insert via DuckDB's
@@ -54,26 +53,24 @@ my $schema = MyApp::DB->connect('dbi:DuckDB:dbname=app.duckdb');
     (`CAST(v AS VARCHAR)`: fraction without trailing zeros, `0044-03-15 (BC)`,
     `infinity` / `-infinity`) and TIMESTAMPTZ is UTC. UNION, BIT,
     BIGNUM, TIME WITH TIME ZONE, TIME_NS and a MAP with a nested key throw,
-    naming column and format. ADR 0002 (addendum 2026-10-31).
+    naming column and format. ADR 0002.
   - `$storage->duckdb_read_csv($path, \%opts)` / `duckdb_read_parquet` /
     `duckdb_read_json` -- table-function helpers.
 - **No statement cache.** `DBIO::DuckDB::Storage` overrides
   `disable_sth_caching` to always answer true, so core's `_prepare_sth` never
   calls `prepare_cached`; `disable_sth_caching => 0` changes nothing. A
-  DBD::DuckDB 0.16 handle cannot be used twice: `finish` destroys the
-  statement, `execute` never sets `Active`, and `execute` keeps the previous
-  result's chunk -- which returns wrong rows without an error. In driver code
-  use `$dbh->prepare`, one execution per handle. See
+  DBD::DuckDB handle runs once: `finish` destroys the statement, `execute`
+  never sets `Active`, and `execute` keeps the previous result's chunk. In
+  driver code use `$dbh->prepare`, one execution per handle. See
   `docs/adr/0007-no-statement-handle-from-the-dbi-cache.md`; the upstream
   draft is `docs/upstream/dbd-duckdb-statement-handles-cannot-be-reused.md`.
-- **`finish` without a result.** DBD::DuckDB 0.16's `finish` segfaults on a
+- **`finish` without a result.** DBD::DuckDB's `finish` segfaults on a
   handle that has no result (never executed, only refused executes, finished
   before), and core finishes the handle of a bulk insert whatever happened to
   it. The ADR 0006 callback gives such a handle an empty `duckdb_result`
   first, so a void-context `populate` whose first row is refused throws
-  instead of ending the process. Bound to DBD::DuckDB <= 0.16; a plain DBI
-  handle outside the storage still crashes. See the 2026-10-08 addendum of
-  `docs/adr/0006-storage-frees-dbd-duckdb-prepared-statements.md` (karr k38).
+  instead of ending the process. A plain DBI handle outside the storage
+  still crashes. See ADR 0006.
 - **Introspection** uses the standard `information_schema` plus
   `duckdb_indexes()` (tables, columns, constraints and views all come from
   `information_schema`).
@@ -88,12 +85,11 @@ my $schema = MyApp::DB->connect('dbi:DuckDB:dbname=app.duckdb');
   after their parents. `ON DELETE/UPDATE CASCADE`, `SET NULL` and `SET DEFAULT`
   are refused loudly with table and column (DuckDB rejects them at parse
   time); `RESTRICT`/`NO ACTION` pass. A FK change on an *existing* table
-  rebuilds the table (`Diff::Rebuild`, k50, ADR 0010; hub decision 2026-10-26,
-  replacing the 2026-10-25 refusal); FKs of a table the diff creates are
-  written. Introspected FKs carry the live name as `constraint_name`
-  (ADR 0021), read via `duckdb_constraints()`. See
-  `docs/adr/0001-foreign-keys-omitted-from-install-ddl.md` (addendum 2026-10-25).
-- **Table rebuild** (k50, `docs/adr/0010-tables-are-rebuilt-for-what-alter-cannot-do.md`):
+  rebuilds the table (`Diff::Rebuild`, ADR 0010); FKs of a table the diff
+  creates are written. Introspected FKs carry the live name as `constraint_name`
+  (core ADR 0021), read via `duckdb_constraints()`. See
+  `docs/adr/0001-foreign-keys-omitted-from-install-ddl.md`.
+- **Table rebuild** (`docs/adr/0010-tables-are-rebuilt-for-what-alter-cannot-do.md`):
   what DuckDB cannot ALTER -- a column dropped under an index/UNIQUE on it or a
   later column, a UNIQUE constraint dropped, a FK added/dropped, a UNIQUE a FK
   of the target points to (DuckDB takes a key to a constraint, not to a unique
@@ -101,7 +97,7 @@ my $schema = MyApp::DB->connect('dbi:DuckDB:dbname=app.duckdb');
   `t__dbio_rebuild`, rows of the common columns copied, old dropped, new
   renamed, target indexes created again, all in the apply's one transaction.
   Refused before the first statement, naming both tables: a table another
-  table has a FK to (`DROP TABLE` fails, measured 1.5.3) and a self-referencing
+  table has a FK to (`DROP TABLE` fails) and a self-referencing
   table (the FK keeps the temporary name through the rename).
 - **Indexes** are read from the canonical declaration
   (`$source->index_declarations_for('duckdb', ['expression'])`: Cake `idx`, `indices`)
@@ -110,7 +106,7 @@ my $schema = MyApp::DB->connect('dbi:DuckDB:dbname=app.duckdb');
   key is `expression`; `type` other than unique and `options` throw.
   An expression index is written and read back as its expression
   (Introspect::Indexes reads the `sql`). ADR 0008.
-- **Extensions** are a declared list (core ADR 0066, karr k46):
+- **Extensions** are a declared list (core ADR 0066, local ADR 0009):
   `__PACKAGE__->duckdb_extensions('httpfs', spatial => { class => '...' })`,
   the only option is `class`; classes are `DBIO::DuckDB::Extension` (plain,
   `activation` = `{ load => name }`, no family classes). `Storage::_extension_activation`
@@ -129,12 +125,9 @@ Quack is a DuckDB extension (v1.5+) that exposes an embedded DuckDB instance
 over HTTP-based RPC, turning it into a lightweight server while keeping the
 client a normal in-process DuckDB via `DBD::DuckDB`.
 
-**Requires libduckdb >= 1.5.** `Alien::DuckDB` 0.04 (2026-09-13) bundles
-libduckdb 1.5.3. dbio-duckdb requires `Alien::DuckDB` >= 0.04 itself at
-runtime, because DBD::DuckDB 0.16 declares it only as a test prereq -- a
-`cpanm --notest DBD::DuckDB` alone installs no libduckdb at all (karr k26).
-Older `Alien::DuckDB` 0.03 shipped 1.2.2, which does NOT include quack; with
-such an install, supply a newer libduckdb:
+**Requires libduckdb >= 1.5.** `Alien::DuckDB` (cpanfile, a runtime requires of
+dbio-duckdb) brings libduckdb. With a libduckdb older than 1.5 (no quack),
+supply a newer one:
 
 ```bash
 DUCKDB_NO_ALIEN=1 LD_LIBRARY_PATH=/path/to/1.5.x perl ...
@@ -204,13 +197,13 @@ tests assume libduckdb and DBD::DuckDB are present — no skip-fallbacks.
 - `t/48-no-savepoints.t` — no savepoints: core's refusal, nothing sent to the engine
 - `t/49-statement-reuse.t` — ADR 0007: the same create / find / single / first /
                         populate again on one connection, two cursors read in turn
-- `t/36-ddl-literals.t` — quote in a default, ENUM values, reserved-word name, UNIQUE constraint (karr k49)
+- `t/36-ddl-literals.t` — quote in a default, ENUM values, reserved-word name, UNIQUE constraint
 - `t/68-arrow-fetch.t` — `duckdb_arrow_fetch`: every type against the row path, the time types against DuckDB's text (row path as TODO), TIMESTAMPTZ in UTC,
                         refusals, hand-built arrays with offset, death in the middle of a block
 - `t/69-arrow-storage-load.t` — the storage class loads without the Arrow module (and without libduckdb by name)
 - `t/50-arrow.t`      — escape hatches: `duckdb_appender`,
                         `duckdb_arrow_fetch`, `duckdb_read_csv`
-- `t/51-finish-without-result.t` — karr k38: a refused `populate` / a `finish`
+- `t/51-finish-without-result.t` — a refused `populate` / a `finish`
                         on a handle without a result is an exception, not a
                         crash; every scenario runs in a child process
 - `t/52-index-declaration.t` — canonical index declarations in install DDL and
@@ -224,11 +217,11 @@ tests assume libduckdb and DBD::DuckDB are present — no skip-fallbacks.
 - `t/63-quack-client-catalog.t` — what the attached catalog shows the client:
                         listings that throw, tables created after ATTACH, refresh
 - `t/64-foreign-keys.t`, `t/65-diff-unique.t` — FKs in install DDL / diff; UNIQUE in the diff model
-- `t/66-diff-rebuild.t` — table rebuild (karr k50, ADR 0010): dropped column under index/UNIQUE, dropped UNIQUE,
+- `t/66-diff-rebuild.t` — table rebuild (ADR 0010): dropped column under index/UNIQUE, dropped UNIQUE,
                         FK added/dropped, parent-first order, rollback of a failing copy, refusals
 - `t/67-diff-lossy.t` — which column type changes keep every value (ADR 0011): widenings run, the rest needs `allow_destructive`
-- `t/93-conformance-names.t` — the Names list (core k391): extension and library names, `schema` not applicable
-- `t/90-conformance-ddl.t` — the core DDL case list through `DBIO::DuckDB::Test::Conformance` (ADR 0060, karr k49)
+- `t/93-conformance-names.t` — the Names list: extension and library names, `schema` not applicable
+- `t/90-conformance-ddl.t` — the core DDL case list through `DBIO::DuckDB::Test::Conformance` (ADR 0060)
 - `t/80-extension-list.t` — `duckdb_extensions` declaration, refusals, class resolution (ADR 0066)
 - `t/81-extension-activation.t` — a declared extension is INSTALLed + LOADed per connection; unknown one fails connect
 - `t/82-extension-installed-state.t` — installed state from `duckdb_extensions()`; diff target DB has the extension loaded

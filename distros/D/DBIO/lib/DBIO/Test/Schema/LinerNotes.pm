@@ -3,7 +3,7 @@ package DBIO::Test::Schema::LinerNotes;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -38,7 +38,7 @@ DBIO::Test::Schema::LinerNotes - Test result class for the liner_notes table
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

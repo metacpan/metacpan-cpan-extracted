@@ -365,4 +365,56 @@ unless ($INC{'Devel/Cover.pm'}) {
 	} 'read_table(drop_cols, filter) croaking on an undefined row name: no memory leaks';
 }
 
+# A header that repeats a name keeps the last field of that name, and
+# colClasses is not applied to the earlier one, which the table never holds:
+# up to 0.3422 the CSV parser converted it anyway and croaked on its value,
+# where an .xlsx and the perl closure read the same table.  An aoa keeps every
+# field, so it is still converted, and still refused, there.
+{
+	my $file = spew('csv', "e,b,e\nx,2,3\n");
+	my @cls = (colClasses => [ 'integer', 'character', 'integer' ]);
+	local $SIG{__WARN__} = sub { die @_ unless $_[0] =~ /duplicate column name/ };
+	for my $closure (0, 1) {
+		my @c = $closure ? (_closure => 1) : ();
+		my $how = $closure ? 'closure' : 'plan';
+		is_deeply(read_table($file, @cls, @c), [ { e => 3, b => '2' } ],
+			"read_table: colClasses skips a field a repeated name shadows (aoh, $how)");
+		is_deeply(read_table($file, @cls, @c, output_type => 'hoa'), { e => [3], b => ['2'] },
+			"read_table: likewise for a hoa ($how)");
+		is_deeply(read_table($file, @cls, @c, output_type => 'hoh', row_names => 'b'), { 2 => { e => 3 } },
+			"read_table: likewise for a hoh ($how)");
+		throws_ok { read_table($file, @cls, @c, output_type => 'aoa') } qr/colClasses makes column 'e' \(field 1\) integer/,
+			"read_table: an aoa keeps the field, so colClasses still refuses it ($how)";
+	}
+}
+
+# A quoted field in a dropped column is scanned to its end but not gathered,
+# and an .xlsx cell in a dropped column is not built (S_field_dropped()).  The
+# quote must still be followed exactly: doubled quotes, a separator and line
+# ends inside it, a quote opened after text, and one never closed.  A row whose
+# only value is in a dropped .xlsx column is still a row, not a blank one.
+{
+	my $q = spew('csv', qq{a,b,c\n1,"x ""y"", z",3\n4,"two\nlines\r\nthree",6\n7,pre"open, still"post,9\n10,"",12\n});
+	my $want = [ { a => 1, c => 3 }, { a => 4, c => 6 }, { a => 7, c => 9 }, { a => 10, c => 12 } ];
+	check_both('a dropped quoted column', $want, [], $q, drop_cols => 'b');
+	check_both('a quoted column keep_cols leaves out', $want, [], $q, keep_cols => [qw(a c)]);
+	check_both('a dropped quoted column, aoa',
+		[ [qw(a c)], [1, 3], [4, 6], [7, 9], [10, 12] ], [], $q, drop_cols => 'b', output_type => 'aoa');
+	# a quote in a dropped column that runs to the end of the file still swallows
+	# the rows after it: the row comes up short, and both are said
+	my $open = spew('csv', qq{a,b,c\n1,"never closed,3\n4,5,6\n});
+	dies_both('a dropped quoted column never closed', qr/Alignment error .* \(2 fields vs 3 headers\); a '"' at the start of a field on line 2/,
+		[ qr/end of file inside a quoted field/ ], $open, drop_cols => 'b');
+	# a dropped quoted field on a row that is too long is still in the message
+	my $long = spew('csv', qq{a,b,c\n1,"two\nlines",3,4\n});
+	dies_both('a dropped quoted field on a long row', qr/4 fields/, [], $long, drop_cols => 'b');
+
+	my $x = File::Spec->catfile($dir, 'dropped_only.xlsx');
+	write_table([ [qw(a b c)], [1, 2, 3], [undef, 'only b', undef], [4, undef, 6] ], $x, quiet => 1);
+	check_both('an .xlsx row whose only value is in a dropped column is kept',
+		[ { a => 1, c => 3 }, { a => undef, c => undef }, { a => 4, c => 6 } ], [], $x, drop_cols => 'b');
+	check_both('likewise as an aoa', [ [qw(a c)], [1, 3], [undef, undef], [4, 6] ], [], $x, drop_cols => 'b', output_type => 'aoa');
+	check_both('likewise with keep_cols', { a => [1, undef, 4] }, [], $x, keep_cols => 'a', output_type => 'hoa');
+}
+
 done_testing();

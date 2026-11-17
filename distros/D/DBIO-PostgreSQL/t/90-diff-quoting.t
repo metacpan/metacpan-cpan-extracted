@@ -55,7 +55,7 @@ is $drop->as_sql, "DROP TABLE $SQL;", 'table drop';
 my ($k110) = DBIO::PostgreSQL::Diff::Table->diff(
   { 'public.MixedCase' => { schema_name => 'public', table_name => 'MixedCase' } }, {});
 is $k110->as_sql, 'DROP TABLE public."MixedCase";',
-  'k110 as reported: DROP TABLE public."MixedCase", not public.MixedCase';
+  'DROP TABLE quotes the mixed-case name: public."MixedCase", not public.MixedCase';
 
 # --- Diff::Column -----------------------------------------------------------
 
@@ -182,7 +182,7 @@ is_deeply ops_sql(@trg_ops), [ "$trg_def;", qq{DROP TRIGGER "Old Trg" ON $SQL;} 
 
 my ($k110_trg) = DBIO::PostgreSQL::Diff::Trigger->diff(
   { 'public.MixedCase' => { t => { trigger_name => 't', schema_name => 'public', table_name => 'MixedCase' } } }, {});
-is $k110_trg->as_sql, 'DROP TRIGGER t ON public."MixedCase";', 'k110 as reported: DROP TRIGGER ... ON public."MixedCase"';
+is $k110_trg->as_sql, 'DROP TRIGGER t ON public."MixedCase";', 'DROP TRIGGER ... ON quotes the mixed-case table: public."MixedCase"';
 
 # --- Diff::Policy -----------------------------------------------------------
 

@@ -120,7 +120,7 @@ is $storage->_txn_context_class, 'DBIO::PostgreSQL::EV::TransactionContext',
 is $storage->_txn_conn_accessor, 'txn_conn',
   '_txn_conn_accessor names core\'s constructor key';
 is $storage->_ddl_class, 'DBIO::PostgreSQL::DDL',
-  '_ddl_class seam resolves the same DDL generator as the sync deploy path (karr k25)';
+  '_ddl_class seam resolves the same DDL generator as the sync deploy path';
 
 my $sm = $storage->sql_maker;
 isa_ok $sm, 'DBIO::PostgreSQL::SQLMaker', 'sql_maker built via base from the seam';

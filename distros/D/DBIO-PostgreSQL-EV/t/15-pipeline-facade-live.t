@@ -121,8 +121,13 @@ run_raw($storage, "CREATE TABLE $table (id serial PRIMARY KEY, name text)");
   sub columns { qw(id name) }
 }
 
-# Pre-flight: snapshot idle pool size so we can detect release/leak.
+# Pre-flight: snapshot idle pool size so we can detect release/leak. A
+# connection counts as idle only once the reset of its borrow is answered, and
+# a call that finds every connection resetting opens another: wait for the
+# setup statements' resets first, so the snapshot is the pool at rest and not
+# a function of how fast the server answered DISCARD ALL.
 my $pool    = $storage->pool;
+PoolReset->until_reset($storage);
 my $idle_before = $pool->available;
 my $conns_before = $pool->size;
 
@@ -175,7 +180,10 @@ is $f->get, "ok-from-coderef", 'pipeline Future resolved to the coderef return v
 # Pool did not spawn a new connection (still bounded by prior state).
 is $pool->size, $conns_before, 'pool did not spawn a new connection';
 
-# Connection is back on the idle stack — proves release happened.
+# Connection is back on the idle stack — proves release happened. The release
+# resets the session first (karr k99), so wait for that reset to be answered;
+# only then is the connection idle.
+PoolReset->until_reset($storage);
 # Note: `available` does not necessarily equal `idle_before + 1`; the
 # pipeline acquires one and then releases it, net-zero change on the idle
 # stack. What we want to assert is: at least one connection is idle
@@ -190,11 +198,13 @@ await_guarded(
   $storage->insert_async($table, { name => 'after-pipeline' }),
   'post-pipeline insert',
 );
+PoolReset->until_reset($storage);   # the insert's connection is idle again: the select reuses it, spawns none
 my @rows = await_guarded(
   $storage->select_async($table, ['name'], { name => 'after-pipeline' }),
   'post-pipeline select',
 )->get;
 is scalar(@rows), 1, 'normal CRUD works after pipeline (exit_pipeline ran)';
+PoolReset->until_reset($storage);   # the select's reset is answered before the next section counts
 
 # --- 3. a real batch: CRUD on the context rides the bracketed connection --
 
@@ -258,6 +268,7 @@ is scalar(@all_rows), 1 + scalar(@batch_names),
 run_raw($storage, "DELETE FROM $table");
 PoolReset->until_reset($storage);   # a connection is idle once its reset is answered (karr k99)
 
+my $size_before_die = $pool->size;   # the pool at rest: what the failed batch must take one from
 my $idle_before_die = $pool->available;
 my $f_die = await_guarded(
   $storage->pipeline(sub {
@@ -276,7 +287,7 @@ is +($f_die->failure // ''), "boom-in-pipeline\n",
 # leaked: the pool holds that one connection less and every other one is idle.
 is $pool->available, $idle_before_die - 1,
   'dying coderef: the failed batch\'s connection is retired, not released';
-is $pool->size, $conns_before - 1,
+is $pool->size, $size_before_die - 1,
   'dying coderef: the pool holds that one connection less, and spawned none';
 is $pool->available, $pool->size,
   'dying coderef: no connection is left checked out (no leak on error)';

@@ -3,7 +3,7 @@ package DBIO::Test::OptionalComponent;
 # ABSTRACT: Test component for optional component loading
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -21,7 +21,7 @@ DBIO::Test::OptionalComponent - Test component for optional component loading
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

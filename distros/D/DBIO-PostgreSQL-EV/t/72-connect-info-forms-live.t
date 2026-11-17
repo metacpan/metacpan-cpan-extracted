@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE: connect info in every form the owning sync storage reads, through a
 # schema connected with { async => 'ev' }, against a real PostgreSQL (karr

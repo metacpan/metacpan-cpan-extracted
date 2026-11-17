@@ -4,7 +4,7 @@ package DBIO::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp 'croak';
 use namespace::clean;
@@ -32,7 +32,7 @@ DBIO::Future - Future interface contract for async DBIO operations
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

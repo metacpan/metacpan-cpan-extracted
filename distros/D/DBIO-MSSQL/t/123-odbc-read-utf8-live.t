@@ -3,6 +3,9 @@ use warnings;
 use utf8;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
+use MssqlClientCharset;      # client character set UTF-8, whatever the locale
 use DBI;
 use DBIO::Optional::Dependencies ();
 use DBIO::Schema;
@@ -21,6 +24,9 @@ use DBIO::Schema;
 # $ENV{DBIO_TEST_MSSQL_ODBC_DSN}, _USER and _PASS. Offline: t/124.
 
 my ($DSN, $USER, $PASS) = @ENV{ map { "DBIO_TEST_MSSQL_ODBC_$_" } qw/DSN USER PASS/ };
+# reading characters needs a UTF-8 client character set, which the driver
+# otherwise takes from the locale (t/lib/MssqlClientCharset.pm)
+$DSN = MssqlClientCharset::utf8($DSN);
 
 plan skip_all => 'Set $ENV{DBIO_TEST_MSSQL_ODBC_DSN}, _USER and _PASS to run this test'
   unless $DSN and defined $USER and defined $PASS;

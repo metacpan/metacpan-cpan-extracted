@@ -1,0 +1,86 @@
+From 3a11fe5c14ca32b3fea48edb29585862e16c5136 Mon Sep 17 00:00:00 2001
+From: Torsten Raudssus <torsten@raudss.us>
+Date: Sat, 14 Nov 2026 15:53:13 +0100
+Subject: [PATCH] Pass a __float128 to the Qf format on every quadmath build
+
+sqlite_is_number() formats the value back with "%.<n>Qf" on a quadmath
+perl, which reads a __float128 argument. Outside Windows it was handed
+atof(), a double. On x86_64 Linux the check then never matches, so a
+decimal string is bound as text, both when guessed with
+sqlite_see_if_its_a_number and with an explicit SQL_FLOAT/SQL_DOUBLE
+(with a "datatype mismatch" warning). On Cygwin it crashes:
+t/58_see_if_its_a_number_and_explicit_binding.t and
+t/rt_73787_exponential_buffer_overflow.t end with SIGSEGV.
+
+Use strtoflt128() there as well, as the Windows branch already does.
+t/69_bind_decimal_as_real.t checks that a decimal is bound as a real.
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>
+---
+ dbdimp.c                    |  7 ++-----
+ t/69_bind_decimal_as_real.t | 34 ++++++++++++++++++++++++++++++++++
+ 2 files changed, 36 insertions(+), 5 deletions(-)
+ create mode 100644 t/69_bind_decimal_as_real.t
+
+diff --git a/dbdimp.c b/dbdimp.c
+index b2c4290..c00555e 100644
+--- a/dbdimp.c
++++ b/dbdimp.c
+@@ -407,12 +407,9 @@ sqlite_is_number(pTHX_ const char *v, int sql_type)
+     if (sql_type != SQLITE_INTEGER) {
+ #ifdef USE_QUADMATH
+         sprintf(format, (has_plus ? "+%%.%dQf" : "%%.%dQf"), precision);
+-#  if defined(WIN32)
+-        /* On Windows quadmath, we need to use strtoflt128(), not atov() */
++        /* A Qf format reads a __float128, so pass one: atof() returns a
++           double */
+         if (strEQ(form(format, strtoflt128(v, NULL)), v)) return 2;
+-#  else
+-        if (strEQ(form(format, atof(v)), v)) return 2;
+-#  endif
+ #else
+         sprintf(format, (has_plus ? "+%%.%df"  : "%%.%df" ), precision);
+         if (strEQ(form(format, atof(v)), v)) return 2;
+diff --git a/t/69_bind_decimal_as_real.t b/t/69_bind_decimal_as_real.t
+new file mode 100644
+index 0000000..dfa3ce4
+--- /dev/null
++++ b/t/69_bind_decimal_as_real.t
+@@ -0,0 +1,34 @@
++use strict;
++use warnings;
++use lib "t/lib";
++use SQLiteTest qw/connect_ok/;
++use Test::More;
++use if -d ".git", "Test::FailWarnings";
++use DBI qw(:sql_types);
++
++# A decimal string is bound as a REAL when formatting it back with its
++# own precision gives the same string: guessed with
++# sqlite_see_if_its_a_number, or with an explicit float type. On a perl
++# whose NV is __float128 the value passed to form() has to be an NV as
++# well, or the check never matches (Linux) or crashes (Cygwin).
++
++my @values = qw/1.5 -0.25 +3.5 1234567.20/;
++
++my $dbh = connect_ok(sqlite_see_if_its_a_number => 1);
++
++for my $value (@values) {
++    my ($type) = $dbh->selectrow_array('select typeof(?)', undef, $value);
++    is $type, 'real', "$value is guessed as a real";
++}
++
++for my $sql_type (SQL_FLOAT, SQL_DOUBLE) {
++    for my $value (@values) {
++        my $sth = $dbh->prepare('select typeof(?)');
++        $sth->bind_param(1, $value, $sql_type);
++        $sth->execute;
++        my ($type) = $sth->fetchrow_array;
++        is $type, 'real', "$value bound as SQL type $sql_type is a real";
++    }
++}
++
++done_testing;
+-- 
+2.47.3
+

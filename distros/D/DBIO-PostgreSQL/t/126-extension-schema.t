@@ -73,7 +73,7 @@ sub pos_of { my ($sql, $re) = @_; $sql =~ $re ? $-[0] : undef }
 {
   my $sql = script(fresh_schema(extensions => [ 'pgcrypto' ]));
   like $sql, qr/^CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;$/m,
-    'list form: CREATE EXTENSION names public (karr k141)';
+    'list form: CREATE EXTENSION names public';
   unlike $sql, qr/CREATE SCHEMA/, '... and creates no schema for it';
 }
 {
@@ -84,7 +84,7 @@ sub pos_of { my ($sql, $re) = @_; $sql =~ $re ? $-[0] : undef }
   like $sql, qr/^CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA extensions;$/m,
     'the extension is created WITH SCHEMA';
   like $sql, qr/^CREATE EXTENSION IF NOT EXISTS hstore WITH SCHEMA public;$/m,
-    '... one without a schema is created in public (karr k141)';
+    '... one without a schema is created in public';
   my $schema_at = pos_of($sql, qr/^CREATE SCHEMA IF NOT EXISTS extensions;$/m);
   my $ext_at    = pos_of($sql, qr/^CREATE EXTENSION IF NOT EXISTS pgcrypto /m);
   ok defined $schema_at && defined $ext_at && $schema_at < $ext_at,
@@ -240,7 +240,7 @@ sub deploy_diff {
     grep { $_->isa('DBIO::PostgreSQL::Diff::Extension') } @{ $diff->operations };
   is_deeply \%act, { vector => 'move' },
     'the deploy marks the declared schema: moved; the undeclared hstore of a '
-    . 'restricted deploy is not dropped (k89)';
+    . 'restricted deploy is not dropped';
   like $diff->as_sql, qr/ALTER EXTENSION vector SET SCHEMA extensions;/, '... in the SQL';
 }
 {

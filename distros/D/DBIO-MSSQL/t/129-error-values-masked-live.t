@@ -24,6 +24,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage 'english';   # SQL Server reports in the language of the session; this test reads its English wording
 use DBI;
 use DBIO::Optional::Dependencies ();
 use DBIO::Schema;
@@ -275,6 +277,7 @@ for my $way (@WAYS) {
 
   create_tables($dbd);
 
+  # (the cases read the server's English wording: see the import of MssqlServerLanguage)
   my $schema = T::FW::Schema->connect(@{ $CONNECT{$dbd} });
   if ($nobindvars) {
     # set, not read: reading the capability would connect to detect it

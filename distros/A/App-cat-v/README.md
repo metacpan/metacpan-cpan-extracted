@@ -1,4 +1,4 @@
-[![Actions Status](https://github.com/tecolicom/App-cat-v/workflows/test/badge.svg)](https://github.com/tecolicom/App-cat-v/actions) [![MetaCPAN Release](https://badge.fury.io/pl/App-cat-v.svg)](https://metacpan.org/release/App-cat-v)
+[![Actions Status](https://github.com/tecolicom/App-cat-v/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/tecolicom/App-cat-v/actions?workflow=test) [![MetaCPAN Release](https://badge.fury.io/pl/App-cat-v.svg)](https://metacpan.org/release/App-cat-v)
 # NAME
 
 cat-v - visualize non-printing characters
@@ -34,7 +34,7 @@ cat-v \[ options \] args ...
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # DESCRIPTION
 
@@ -77,41 +77,47 @@ and escape characters are displayed as corresponding Unicode symbols.
 The second field is the default action. `s` stands for symbol, `m`
 for Unicode mark, and `0` for no conversion.
 
-    nul   s  \000  \x{2400}  ␀  SYMBOL FOR NULL
-    soh   s  \001  \x{2401}  ␁  SYMBOL FOR START OF HEADING
-    stx   s  \002  \x{2402}  ␂  SYMBOL FOR START OF TEXT
-    etx   s  \003  \x{2403}  ␃  SYMBOL FOR END OF TEXT
-    eot   s  \004  \x{2404}  ␄  SYMBOL FOR END OF TRANSMISSION
-    enq   s  \005  \x{2405}  ␅  SYMBOL FOR ENQUIRY
-    ack   s  \006  \x{2406}  ␆  SYMBOL FOR ACKNOWLEDGE
-    bel   s  \007  \x{2407}  ␇  SYMBOL FOR BELL
-    bs    s  \010  \x{2408}  ␈  SYMBOL FOR BACKSPACE
-    ht    s  \011  \x{2409}  ␉  SYMBOL FOR HORIZONTAL TABULATION
-    nl    m  \012  \x{240A}  ␊  SYMBOL FOR LINE FEED
-    vt    s  \013  \x{240B}  ␋  SYMBOL FOR VERTICAL TABULATION
-    np    m  \014  \x{240C}  ␌  SYMBOL FOR FORM FEED
-    cr    s  \015  \x{240D}  ␍  SYMBOL FOR CARRIAGE RETURN
-    so    s  \016  \x{240E}  ␎  SYMBOL FOR SHIFT OUT
-    si    s  \017  \x{240F}  ␏  SYMBOL FOR SHIFT IN
-    dle   s  \020  \x{2410}  ␐  SYMBOL FOR DATA LINK ESCAPE
-    dc1   s  \021  \x{2411}  ␑  SYMBOL FOR DEVICE CONTROL ONE
-    dc2   s  \022  \x{2412}  ␒  SYMBOL FOR DEVICE CONTROL TWO
-    dc3   s  \023  \x{2413}  ␓  SYMBOL FOR DEVICE CONTROL THREE
-    dc4   s  \024  \x{2414}  ␔  SYMBOL FOR DEVICE CONTROL FOUR
-    nak   s  \025  \x{2415}  ␕  SYMBOL FOR NEGATIVE ACKNOWLEDGE
-    syn   s  \026  \x{2416}  ␖  SYMBOL FOR SYNCHRONOUS IDLE
-    etb   s  \027  \x{2417}  ␗  SYMBOL FOR END OF TRANSMISSION BLOCK
-    can   s  \030  \x{2418}  ␘  SYMBOL FOR CANCEL
-    em    s  \031  \x{2419}  ␙  SYMBOL FOR END OF MEDIUM
-    sub   s  \032  \x{241A}  ␚  SYMBOL FOR SUBSTITUTE
-    esc   0  \033  \x{241B}  ␛  SYMBOL FOR ESCAPE
-    fs    s  \034  \x{241C}  ␜  SYMBOL FOR FILE SEPARATOR
-    gs    s  \035  \x{241D}  ␝  SYMBOL FOR GROUP SEPARATOR
-    rs    s  \036  \x{241E}  ␞  SYMBOL FOR RECORD SEPARATOR
-    us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
-    sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
-    del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
+    nul   s      \000  \x{2400}  ␀   SYMBOL FOR NULL
+    soh   s      \001  \x{2401}  ␁   SYMBOL FOR START OF HEADING
+    stx   s      \002  \x{2402}  ␂   SYMBOL FOR START OF TEXT
+    etx   s      \003  \x{2403}  ␃   SYMBOL FOR END OF TEXT
+    eot   s      \004  \x{2404}  ␄   SYMBOL FOR END OF TRANSMISSION
+    enq   s      \005  \x{2405}  ␅   SYMBOL FOR ENQUIRY
+    ack   s      \006  \x{2406}  ␆   SYMBOL FOR ACKNOWLEDGE
+    bel   s      \007  \x{2407}  ␇   SYMBOL FOR BELL
+    bs    s      \010  \x{2408}  ␈   SYMBOL FOR BACKSPACE
+    ht    s      \011  \x{2409}  ␉   SYMBOL FOR HORIZONTAL TABULATION
+    nl    m      \012  \x{240A}  ␊   SYMBOL FOR LINE FEED
+    vt    s      \013  \x{240B}  ␋   SYMBOL FOR VERTICAL TABULATION
+    np    m      \014  \x{240C}  ␌   SYMBOL FOR FORM FEED
+    cr    s      \015  \x{240D}  ␍   SYMBOL FOR CARRIAGE RETURN
+    so    s      \016  \x{240E}  ␎   SYMBOL FOR SHIFT OUT
+    si    s      \017  \x{240F}  ␏   SYMBOL FOR SHIFT IN
+    dle   s      \020  \x{2410}  ␐   SYMBOL FOR DATA LINK ESCAPE
+    dc1   s      \021  \x{2411}  ␑   SYMBOL FOR DEVICE CONTROL ONE
+    dc2   s      \022  \x{2412}  ␒   SYMBOL FOR DEVICE CONTROL TWO
+    dc3   s      \023  \x{2413}  ␓   SYMBOL FOR DEVICE CONTROL THREE
+    dc4   s      \024  \x{2414}  ␔   SYMBOL FOR DEVICE CONTROL FOUR
+    nak   s      \025  \x{2415}  ␕   SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn   s      \026  \x{2416}  ␖   SYMBOL FOR SYNCHRONOUS IDLE
+    etb   s      \027  \x{2417}  ␗   SYMBOL FOR END OF TRANSMISSION BLOCK
+    can   s      \030  \x{2418}  ␘   SYMBOL FOR CANCEL
+    em    s      \031  \x{2419}  ␙   SYMBOL FOR END OF MEDIUM
+    sub   s      \032  \x{241A}  ␚   SYMBOL FOR SUBSTITUTE
+    esc   0      \033  \x{241B}  ␛   SYMBOL FOR ESCAPE
+    fs    s      \034  \x{241C}  ␜   SYMBOL FOR FILE SEPARATOR
+    gs    s      \035  \x{241D}  ␝   SYMBOL FOR GROUP SEPARATOR
+    rs    s      \036  \x{241E}  ␞   SYMBOL FOR RECORD SEPARATOR
+    us    s      \037  \x{241F}  ␟   SYMBOL FOR UNIT SEPARATOR
+    sp    m      \040  \x{2420}  ␠   SYMBOL FOR SPACE
+    del   m      \177  \x{2421}  ␡   SYMBOL FOR DELETE
+    nbsp  s      \240  \x{237D}  ⍽   SHOULDERED OPEN BOX
+    fwsp  s  \x{3000}  \x{303C}  〼  MASU MARK
+
+The `fwsp` is the full-width IDEOGRAPHIC SPACE (U+3000), which
+occupies two columns on the display.  The default symbol is also
+two columns wide, so the layout is preserved.  If you replace it by
+other character, choose one with the same width.
 
 At this time, Unicode markings are available for the following
 characters
@@ -166,10 +172,10 @@ characters
 
     If `all` is specified for the name, the value applies to all
     character types.  The following command sets all characters to `s`,
-    then sets `nl`, `nl`, `np`, and `sp` to `m` and disables `esc`.
+    then sets `nul`, `nl`, `np`, `sp`, and `del` to `m` and disables `esc`.
     This is the default state.
 
-        cat-v -c all=s,nul=nl=np=sp=m,esc=0
+        cat-v -c all=s,nul=nl=np=sp=del=m,esc=0
 
     If none of the name labels are specified, it is assumed that `all` is
     given.  The following command prints all control characters except
@@ -303,6 +309,13 @@ characters
 
         echo -ne "$(cat-v -Ence FILE)"
 
+    This does not work if the file contains `nbsp` or `fwsp`, because
+    `echo` produces a raw byte rather than UTF-8 character for `\xa0`,
+    and does not understand the `\x{3000}` form.  In that case, use the
+    [ansiecho](https://metacpan.org/pod/ansiecho) command, which interprets them as Perl does.
+
+        ansiecho -n "$(cat-v -Ence FILE)"
+
 # INSTALL
 
 ## CPANMINUS
@@ -326,6 +339,11 @@ From GIT repository:
     The predecessor of the `cat-v` command was originally created as the 
     filter module of the [App::optex](https://metacpan.org/pod/App%3A%3Aoptex) command.
 
+- [ansiecho](https://metacpan.org/pod/ansiecho)
+
+    Echo command which interprets escape sequences in the same way as
+    Perl's string literal.
+
 - [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
 
     UNIX Style, or cat -v Considered Harmful
@@ -340,7 +358,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2024-2025 Kazumasa Utashiro.
+Copyright © 2024-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

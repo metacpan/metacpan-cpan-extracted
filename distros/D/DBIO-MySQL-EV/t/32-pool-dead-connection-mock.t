@@ -116,6 +116,7 @@ BEGIN {
   sub _later {
     my ($cb) = @_;
     my $t;
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     $t = EV::timer(0.001, 0, sub { undef $t; $cb->() });
     return;
   }
@@ -264,7 +265,7 @@ use DBIO::Storage::PoolBase;
 use DBIO::MySQL::EV::Storage;
 use DBIO::MySQL::EV::Pool;
 
-plan skip_all => 'the installed DBIO core predates _mark_connection_dead (core k230)'
+plan skip_all => 'the installed DBIO core predates _mark_connection_dead'
   unless DBIO::Storage::PoolBase->can('_mark_connection_dead');
 
 alarm 120;
@@ -815,7 +816,7 @@ sub replaced_before {
 }
 
 SKIP: {
-  skip 'the installed DBIO core predates _idle_connection_alive (core k241)', 1
+  skip 'the installed DBIO core predates _idle_connection_alive', 1
     unless DBIO::Storage::PoolBase->can('_idle_connection_alive');
 
   # -- the answer, by criterion: _mysql_connection_gone's, of an idle connection

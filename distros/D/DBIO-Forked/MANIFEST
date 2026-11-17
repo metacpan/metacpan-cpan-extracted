@@ -24,6 +24,7 @@ docs/adr/0003-loop-free-pipe-backed-future-eof-framing.md
 lib/DBIO/Forked.pm
 lib/DBIO/Forked/Future.pm
 lib/DBIO/Forked/Storage.pm
+maint/assert-fork-capability.pl
 misc/agent-context/.claude/agents/.local.dbio-adr-auditor.md
 misc/agent-context/.claude/agents/.local.dbio-release-manager.md
 misc/agent-context/.claude/agents/.local.karr-coordinator.md
@@ -34,13 +35,18 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/dbio-adr/SKILL.md
 misc/agent-context/.claude/skills/dbio-codeberg-user-issues/SKILL.md
 misc/agent-context/.claude/skills/dbio-consolidate-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-consolidate-release/references/all-and-recovery.md
 misc/agent-context/.claude/skills/dbio-coordination/SKILL.md
+misc/agent-context/.claude/skills/dbio-coordination/references/direct-execution.md
 misc/agent-context/.claude/skills/dbio-core/SKILL.md
+misc/agent-context/.claude/skills/dbio-core/references/access-broker.md
+misc/agent-context/.claude/skills/dbio-core/references/capabilities.md
 misc/agent-context/.claude/skills/dbio-driver-development/SKILL.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/async-transport.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/deploy-introspect-diff.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/extension-layers.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/live-testing.md
+misc/agent-context/.claude/skills/dbio-driver-development/references/platform-skips.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-class.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-seams.md
 misc/agent-context/.claude/skills/dbio-forked-core/SKILL.md
@@ -48,6 +54,8 @@ misc/agent-context/.claude/skills/dbio-forked/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-class-patterns/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/bundle-tests.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/share-skill.md
 misc/agent-context/.claude/skills/dbio-perl-syntax/SKILL.md
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -78,6 +86,6 @@ t/13-no-credentials.t
 t/14-cancel.t
 t/15-limits.t
 t/16-limits-sqlite.t
+t/17-no-real-fork.t
 t/author-pod-checker.t
 t/release-changes_has_content.t
-t/release-coverage.t

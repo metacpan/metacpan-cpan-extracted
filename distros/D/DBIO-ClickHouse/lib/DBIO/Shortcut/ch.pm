@@ -4,7 +4,7 @@ package DBIO::Shortcut::ch;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 sub apply { DBIO->apply_driver($_[1], 'ClickHouse') }
 
@@ -22,7 +22,7 @@ DBIO::Shortcut::ch - `use DBIO -ch` shortcut for the ClickHouse driver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

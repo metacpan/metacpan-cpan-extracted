@@ -1,5 +1,14 @@
 Revision history for DBIO-PostgreSQL-Age
 
+0.900007  2026-11-17
+
+    * Documentation
+        - The dbio-postgresql-age skill states that result column names
+          must be plain identifiers, that edges decode with start_id and
+          end_id, that all three *_async methods exist on the sync storage
+          and route to the async backend, and how the offline and live
+          suites run.
+
 0.900004  2026-11-08
     * Deploy
         - New DBIO::PostgreSQL::Age::Extension: a schema that declares

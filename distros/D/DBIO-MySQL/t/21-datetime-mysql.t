@@ -69,33 +69,35 @@ my $schema = DBIO::Test->init_schema(
 
 # Test "timezone" parameter
 foreach my $tbl (qw/EventTZ EventTZDeprecated/) {
+  my $starts = DateTime->new(year=>2007, month=>12, day=>31, time_zone => "America/Chicago" );
+  my $created = DateTime->new(year=>2006, month=>1, day=>31,
+      hour => 13, minute => 34, second => 56, time_zone => "America/New_York" );
   my $event_tz = $schema->resultset($tbl)->create({
-      starts_at => DateTime->new(year=>2007, month=>12, day=>31, time_zone => "America/Chicago" ),
-      created_on => DateTime->new(year=>2006, month=>1, day=>31,
-          hour => 13, minute => 34, second => 56, time_zone => "America/New_York" ),
+      starts_at => $starts,
+      created_on => $created,
   });
 
-  is ($event_tz->starts_at->day_name, "Montag", 'Locale de_DE loaded: day_name');
-  is ($event_tz->starts_at->month_name, "Dezember", 'Locale de_DE loaded: month_name');
-  is ($event_tz->created_on->day_name, "Tuesday", 'Default locale loaded: day_name');
-  is ($event_tz->created_on->month_name, "January", 'Default locale loaded: month_name');
-
-  my $starts_at = $event_tz->starts_at;
-  is("$starts_at", '2007-12-31T00:00:00', 'Correct date/time using timezone');
-
-  my $created_on = $event_tz->created_on;
-  is("$created_on", '2006-01-31T12:34:56', 'Correct timestamp using timezone');
-  is($event_tz->created_on->time_zone->name, "America/Chicago", "Correct timezone");
+  # a copy is written; the DateTime objects passed in stay as they are
+  is($event_tz->get_column('starts_at'), '2007-12-31', 'Date written as its day');
+  is($event_tz->get_column('created_on'), '2006-01-31 12:34:56', 'Timestamp written in the column timezone');
+  is("$created", '2006-01-31T13:34:56', 'Passed-in timestamp keeps its time');
+  is($created->time_zone->name, 'America/New_York', 'and its timezone');
+  is($starts->month_name, 'December', 'Passed-in date keeps its locale');
 
   my $loaded_event = $schema->resultset($tbl)->find( $event_tz->id );
 
+  is ($loaded_event->starts_at->day_name, "Montag", 'Locale de_DE loaded: day_name');
+  is ($loaded_event->starts_at->month_name, "Dezember", 'Locale de_DE loaded: month_name');
+  is ($loaded_event->created_on->day_name, "Tuesday", 'Default locale loaded: day_name');
+  is ($loaded_event->created_on->month_name, "January", 'Default locale loaded: month_name');
+
   isa_ok($loaded_event->starts_at, 'DateTime', 'DateTime returned');
-  $starts_at = $loaded_event->starts_at;
-  is("$starts_at", '2007-12-31T00:00:00', 'Loaded correct date/time using timezone');
+  my $starts_at = $loaded_event->starts_at;
+  is("$starts_at", '2007-12-31T12:00:00', 'Loaded date at noon');
   is($starts_at->time_zone->name, 'America/Chicago', 'Correct timezone');
 
   isa_ok($loaded_event->created_on, 'DateTime', 'DateTime returned');
-  $created_on = $loaded_event->created_on;
+  my $created_on = $loaded_event->created_on;
   is("$created_on", '2006-01-31T12:34:56', 'Loaded correct timestamp using timezone');
   is($created_on->time_zone->name, 'America/Chicago', 'Correct timezone');
 

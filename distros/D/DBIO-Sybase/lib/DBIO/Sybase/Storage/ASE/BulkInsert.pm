@@ -4,7 +4,7 @@ package DBIO::Sybase::Storage::ASE::BulkInsert;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Sub::Util ();
 use Try::Tiny;
@@ -267,7 +267,7 @@ DBIO::Sybase::Storage::ASE::BulkInsert - Bulk insert API for Sybase ASE
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

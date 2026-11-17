@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Age::Storage::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::PostgreSQL::Age::Storage ();
 
@@ -84,7 +84,7 @@ DBIO::PostgreSQL::Age::Storage::Async - Floating async storage layer for Apache 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

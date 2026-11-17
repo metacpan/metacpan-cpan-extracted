@@ -4,10 +4,10 @@ package DBIO::SQLite::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Introspect::Base ();
-use DBIO::SQLite::Util qw(quote_identifier);
+use DBIO::SQLite::Util qw(quote_identifier selectall_hashrefs);
 
 
 
@@ -16,10 +16,8 @@ sub fetch {
   my %fks;
 
   for my $table_name (sort keys %$tables) {
-    my $list = $dbh->selectall_arrayref(
-      sprintf('PRAGMA foreign_key_list(%s)', quote_identifier($table_name)),
-      { Slice => {} },
-    );
+    my $list = selectall_hashrefs($dbh,
+      sprintf('PRAGMA foreign_key_list(%s)', quote_identifier($table_name)));
     next unless @$list;
 
     my $groups = DBIO::Introspect::Base->_aggregate_by_ordered($list, 'id');
@@ -57,7 +55,7 @@ DBIO::SQLite::Introspect::ForeignKeys - Introspect SQLite foreign keys
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::EncodedColumn;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Base/;
 
@@ -432,7 +432,7 @@ DBIO::EncodedColumn - One-way encode selected columns: passwords with Bcrypt or 
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

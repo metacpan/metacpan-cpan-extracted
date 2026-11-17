@@ -9,8 +9,10 @@ docs/superpowers/specs/2026-11-16-io-polarizer-design.md
 lib/Getopt/EX/Factotum.pm
 lib/IO/Factotum.pm
 lib/IO/Factotum/ARGV.pm
-lib/IO/Factotum/skylighting.pm
-lib/IO/Factotum/sourcehighlight.pm
+lib/IO/Factotum/Highlight/gnu.pm
+lib/IO/Factotum/Highlight/sky.pm
+lib/IO/Factotum/Highlight/skylighting.pm
+lib/IO/Factotum/Highlight/sourcehighlight.pm
 minil.toml
 t/00_compile.t
 t/01_open_input.t
@@ -18,5 +20,6 @@ t/02_argv.t
 t/03_skylighting.t
 t/04_process.t
 t/05_sourcehighlight.t
+t/06_short.t
 META.yml
 MANIFEST

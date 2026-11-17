@@ -92,6 +92,12 @@ subtest 'next' => sub {
     is [$it->next], [],     'and nothing at the end';
     is [$it->next], [],     'and after';
     ok !$it->sth->{Active}, 'with the statement finished';
+
+    my $undef
+        = $dbh->iterate("$all LIMIT 2", sub { $_->[0] == 1 ? undef : $_->[1] });
+    is [$undef->next], [undef],  'an undefined result is a result';
+    is [$undef->next], ['Blur'], 'and the next follows it';
+    is [$undef->next], [],       'then nothing at the end';
 };
 
 subtest 'all' => sub {

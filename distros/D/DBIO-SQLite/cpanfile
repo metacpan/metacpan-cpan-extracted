@@ -1,11 +1,14 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900004';
-requires 'DBD::SQLite';
+requires 'DBIO', '0.900007';
+# 1.72 is the first release that bundles libsqlite 3.37+ (STRICT, PRAGMA
+# table_list), which the suite exercises; the suite is measured green on it.
+requires 'DBD::SQLite', '1.72';
 requires 'DateTime::Format::SQLite';
 
 # Used directly by shipped modules (Storage, Deploy, DBIO::SQLite::Test).
 # DBIO already pulls them in; declared here because this dist uses them itself.
-requires 'DBI', '1.57';
+# 1.634 is the oldest DBI the suite is measured green on.
+requires 'DBI', '1.634';
 requires 'Context::Preserve', '0.03';
 requires 'SQL::Abstract', '2.000002';
 requires 'Try::Tiny', '0.32';

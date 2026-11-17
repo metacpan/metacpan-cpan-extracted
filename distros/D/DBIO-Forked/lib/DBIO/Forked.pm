@@ -1,5 +1,5 @@
 package DBIO::Forked;
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 # ABSTRACT: Dependency-free, fork-based async layer for DBIO drivers
 
 use strict;
@@ -27,7 +27,7 @@ DBIO::Forked - Dependency-free, fork-based async layer for DBIO drivers
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -116,21 +116,18 @@ Model A, not a defect.
 
 =head1 PLATFORM SUPPORT
 
-C<DBIO::Forked> needs a real Unix C<fork()> and is B<not yet mature on Windows,
-where it is not recommended>. Model A relies on the forked child being a genuine
+C<DBIO::Forked> needs a real Unix C<fork()>. Model A relies on the forked child being a genuine
 separate process that discards the inherited DBI handle and reconnects fresh;
 that child-side reconnect -- driven by the inherited sync storage's
 C<_verify_pid> fork handling -- is also what re-runs C<on_connect_do> /
 C<on_connect_call> in the child, the property L</TRANSACTION SEMANTICS> and
 ADR 0002 rely on.
 
-Windows has no real C<fork()>: Perl emulates it with ithreads, and core switches
-C<_verify_pid> off there (C<DBIO::Util::is_windows>). Under the emulation the
-child never sees a new PID, does B<not> reconnect, and keeps the handle it
-inherited -- so parent and child share one DBI handle across two pseudo-processes
-and the reconnect property above silently does not hold. Because that central
-guarantee vanishes with no error, Windows is treated as not fully mature and is
-not recommended for C<DBIO::Forked>.
+A perl without a real C<fork()> (C<$Config{d_fork}> unset; Windows Perl emulates
+fork with ithreads) cannot carry that: the child would never see a new PID, would
+not reconnect and would share the parent's DBI handle. So the dist refuses it, on
+the capability and not on the system's name: C<Makefile.PL> stops with
+C<OS unsupported> there, and a C<*_async> call croaks before it forks anything.
 
 =head1 AUTHOR
 

@@ -38,6 +38,46 @@ use Test::More ();
 use DBIO::Util ();
 use DBIO::PostgreSQL::EV::ConnectInfo ();
 
+# WHY: PostgreSQL words its messages by lc_messages, and a client cannot tell
+# it to do otherwise but per session. The masking of values in an error text
+# must hold in every language (ADR 0010), so the suite can be run with
+# DBIO_TEST_SERVER_LANGUAGE=de or =fr: every connection a test opens then
+# reports in that language. Empty or unset: the server's own default. Any other
+# value ends the file at once -- a typo must not run the suite in English and
+# call it German.
+#
+# The session setting is libpq's startup parameter (PGOPTIONS, '-c
+# lc_messages=...'), set here because every live file loads this module before
+# its first connection (t/88-live-files-use-live-server.t) and libpq hands it
+# to every connection of the process -- DBI handles, the schema's storage, the
+# future_io pool, the private databases -- and to the children it starts. It is
+# a setting of the session: no ALTER SYSTEM, no ALTER DATABASE. A DSN that
+# carries an options= of its own (the search_path tests) replaces PGOPTIONS for
+# that connection; a test that needs its wording in English sets
+# lc_messages = 'C' in its own session.
+our %SERVER_LANGUAGE = (
+  de => 'de_DE.UTF-8',
+  fr => 'fr_FR.UTF-8',
+);
+
+sub server_locale {
+  my $lang = $ENV{DBIO_TEST_SERVER_LANGUAGE};
+  return undef unless defined $lang && length $lang;
+  die "DBIO_TEST_SERVER_LANGUAGE is '$lang'; it is one of: "
+    . join(', ', sort keys %SERVER_LANGUAGE) . " (or empty for the server's default)\n"
+    unless exists $SERVER_LANGUAGE{$lang};
+  return $SERVER_LANGUAGE{$lang};
+}
+
+{
+  my $locale = server_locale();
+  if (defined $locale) {
+    my $option = "-c lc_messages=$locale";
+    $ENV{PGOPTIONS} = join ' ', grep { length } $ENV{PGOPTIONS}, $option
+      unless ($ENV{PGOPTIONS} // '') =~ /\Q$option\E/;
+  }
+}
+
 # The DSN, user and password of the test database, as the environment has them.
 sub login { return @ENV{ map { "DBIO_TEST_PG_$_" } qw( DSN USER PASS ) } }
 

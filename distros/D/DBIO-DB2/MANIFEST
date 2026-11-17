@@ -30,6 +30,7 @@ docs/adr/0010-index-over-covered-columns-is-left-out-and-605-is-a-warning.md
 docs/adr/0011-views-have-diff-operations-pk-index-and-fk-target-key-in-the-model.md
 docs/adr/0012-identity-columns-are-added-and-changed-by-the-diff.md
 docs/adr/0013-the-model-is-normalized-the-catalog-form-is-internal-to-the-diff.md
+docs/adr/0014-numeric-columns-are-read-with-a-decimal-point.md
 lib/DBIO/DB2.pm
 lib/DBIO/DB2/DDL.pm
 lib/DBIO/DB2/Deploy.pm
@@ -50,6 +51,7 @@ lib/DBIO/DB2/Introspect/UniqueConstraints.pm
 lib/DBIO/DB2/SQLMaker.pm
 lib/DBIO/DB2/Storage.pm
 lib/DBIO/DB2/Storage/Cursor.pm
+lib/DBIO/DB2/Storage/DateTimeFormat.pm
 lib/DBIO/DB2/Test/Conformance.pm
 lib/DBIO/DB2/Type.pm
 lib/DBIO/Shortcut/db2.pm
@@ -67,8 +69,12 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/dbio-adr/SKILL.md
 misc/agent-context/.claude/skills/dbio-codeberg-user-issues/SKILL.md
 misc/agent-context/.claude/skills/dbio-consolidate-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-consolidate-release/references/all-and-recovery.md
 misc/agent-context/.claude/skills/dbio-coordination/SKILL.md
+misc/agent-context/.claude/skills/dbio-coordination/references/direct-execution.md
 misc/agent-context/.claude/skills/dbio-core/SKILL.md
+misc/agent-context/.claude/skills/dbio-core/references/access-broker.md
+misc/agent-context/.claude/skills/dbio-core/references/capabilities.md
 misc/agent-context/.claude/skills/dbio-db2-database/SKILL.md
 misc/agent-context/.claude/skills/dbio-db2/SKILL.md
 misc/agent-context/.claude/skills/dbio-driver-development/SKILL.md
@@ -76,11 +82,14 @@ misc/agent-context/.claude/skills/dbio-driver-development/references/async-trans
 misc/agent-context/.claude/skills/dbio-driver-development/references/deploy-introspect-diff.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/extension-layers.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/live-testing.md
+misc/agent-context/.claude/skills/dbio-driver-development/references/platform-skips.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-class.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-seams.md
 misc/agent-context/.claude/skills/dbio-perl-class-patterns/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/bundle-tests.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/share-skill.md
 misc/agent-context/.claude/skills/dbio-perl-syntax/SKILL.md
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -98,6 +107,8 @@ share/skills/dbio-db2/SKILL.md
 t/00-load.t
 t/08-shortcut.t
 t/10-db2.t
+t/100-numeric-decimal-point.t
+t/101-numeric-decimal-point-live.t
 t/11-db2-fk.t
 t/12-db2-upgrade.t
 t/13-db2-upgrade-reorg.t
@@ -150,11 +161,9 @@ t/78-identity-add-reorg-pending-live.t
 t/79-boolean-default-live.t
 t/80-binary-limits-live.t
 t/81-view-order-cte-schema-live.t
-t/82-conformance-ddl.t
+t/82-conformance.t
 t/83-conformance-ddl-live.t
-t/84-conformance-diff.t
 t/85-conformance-diff-live.t
-t/86-conformance-bind.t
 t/87-conformance-bind-live.t
 t/88-upgrade-refuses-unfillable.t
 t/89-insert-no-values.t
@@ -166,6 +175,7 @@ t/94-qualified-tables-diff.t
 t/95-qualified-tables-diff-live.t
 t/96-diff-lossy.t
 t/97-explain-schema-identifier.t
+t/98-time-of-day.t
+t/99-time-of-day-live.t
 t/author-pod-checker.t
 t/release-changes_has_content.t
-t/release-coverage.t

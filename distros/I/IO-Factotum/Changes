@@ -1,5 +1,13 @@
 Revision history for Perl extension IO-Factotum
 
+0.04 2026-11-17T00:33:46Z
+
+    - The converters for syntax highlight are under
+      IO::Factotum::Highlight: Highlight::skylighting and
+      Highlight::sourcehighlight, which were IO::Factotum::skylighting
+      and IO::Factotum::sourcehighlight
+    - Add Highlight::sky and Highlight::gnu, the short names of them
+
 0.03 2026-11-16T09:10:05Z
 
     - Add IO::Factotum::sourcehighlight, which colors source files by

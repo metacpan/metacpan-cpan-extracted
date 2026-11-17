@@ -8,7 +8,7 @@ use Cwd ();
 use IPC::Open3;
 use Path::Tiny;
 
-# Pins the POD gate the [@DBIO] bundle puts into every distribution (k10).
+# Pins the POD gate the [@DBIO] bundle puts into every distribution.
 #
 # Why it exists: dbio-async shipped a woven DBIO::Async::Storage with 19
 # podchecker errors -- L</_submit_query> and friends pointing at headings the

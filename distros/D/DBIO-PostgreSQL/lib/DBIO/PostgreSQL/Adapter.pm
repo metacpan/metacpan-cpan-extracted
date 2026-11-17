@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Adapter;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp qw/croak/;
 use base 'DBIO::Adapter::Base';
@@ -52,7 +52,7 @@ DBIO::PostgreSQL::Adapter - PostgreSQL base->native type resolver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -70,7 +70,11 @@ SQL
 });
 
 # --- The async connection ----------------------------------------------------
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, { async => 'future_io' });
+# PostgreSQL reports in the language of lc_messages; the test matches the
+# server's English words (null value in column), so the sessions of the pool
+# are set to 'C' after the connect
+my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass,
+  { async => 'future_io', on_connect_do => [q{SET lc_messages = 'C'}] });
 
 my $async = $schema->storage->async;
 isa_ok $async, 'DBIO::PostgreSQL::Storage::Async',
@@ -182,7 +186,7 @@ my $in_time = sub {
 #      resolved; and the row inserted before it is not there;
 #   and after each, the next call on the pool runs.
 SKIP: {
-  skip 'the installed DBIO core predates _txn_commit_rolled_back (core k236)', 10
+  skip 'the installed DBIO core predates _txn_commit_rolled_back', 10
     unless DBIO::Storage::Async->can('_txn_commit_rolled_back');
   my $ROLLED_BACK = qr/COMMIT was answered with ROLLBACK/;
   my $count = sub {

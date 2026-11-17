@@ -4,7 +4,7 @@ package DBIO::Extension::List;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Exception;
 use DBIO::Util ();
@@ -160,7 +160,7 @@ DBIO::Extension::List - The declared list of database extensions of a schema, re
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

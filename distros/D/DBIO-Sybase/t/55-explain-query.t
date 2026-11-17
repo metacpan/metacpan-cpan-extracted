@@ -152,7 +152,7 @@ SKIP: {
       0, 0, 'old handler', 'old handler', 0, 0, 'old handler', 'old handler' ],
     '... the handler returns 0 for showplan output (not an error) and chains '
   . 'everything else to the prior handler, whose verdict passes through -- a '
-  . 'caller\'s PRINT/dbcc processing is not skipped (karr k34)';
+  . 'caller\'s PRINT/dbcc processing is not skipped';
 
   is $dbh->{syb_err_handler}, $old,
     'the previous handler is restored after the statement';

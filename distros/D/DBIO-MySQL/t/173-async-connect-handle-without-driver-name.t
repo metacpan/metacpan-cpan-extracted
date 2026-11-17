@@ -4,7 +4,10 @@ use Test::More;
 use lib 't/lib';
 
 use DBI ();
-use DBIO::MySQL::Storage::Async;
+
+eval { require DBIO::MySQL::Storage::Async; 1 }
+  or plan skip_all =>
+    'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
 
 # The fork guard is installed only for a DBD::MariaDB handle, and the connect
 # asks the handle for its DBD name to tell. A handle that does not name its

@@ -51,7 +51,7 @@ additionally asserts the return value with C<is()>
 =back
 
 Running this test suite after any code change ensures that all documented
-examples still work — the "round-trip" between documentation and code.
+examples still work - the "round-trip" between documentation and code.
 
 =head1 ANNOTATION FORMAT
 

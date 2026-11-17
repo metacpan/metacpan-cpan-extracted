@@ -122,6 +122,11 @@ throws_ok { interpolate({ v => [ 1, 2 ] }, method => 'spline') }
 	qr/requires an integer 'order'/, 'spline without order dies';
 throws_ok { interpolate({ v => [ 1, 2 ] }, method => 'polynomial', order => 4) }
 	qr/order 1, 2, or 3/, 'polynomial order 4 dies';
+# 2**32 + 1 narrowed to an int was 1, and was accepted as linear interpolation.
+for my $m (qw(polynomial spline)) {
+	throws_ok { interpolate({ v => [ 1, undef, 3 ] }, method => $m, order => 4294967297) }
+		qr/order 1, 2, or 3/, "$m order 2**32 + 1 dies";
+}
 throws_ok { interpolate({ v => [ 1, undef, 3, undef ] }, method => 'cubic') }
 	qr/at least 4 numeric anchors/, 'cubic with too few anchors dies';
 throws_ok { interpolate({ v => [ 1, undef ] }, method => 'index', x => [ 3, 1 ]) }

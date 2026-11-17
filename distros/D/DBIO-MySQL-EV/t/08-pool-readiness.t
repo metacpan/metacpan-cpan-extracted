@@ -124,9 +124,9 @@ like $ef->failure, qr/could not connect/, 'failure carries the connect error';
 # exactly the bug k197 closes, and proving the loop is closed means proving
 # the broken handle has left the pool.
 ok !(grep { $_ == $bad } @{ $err_pool->{_connections} }),
-  'a failed connection is RETIRED from _connections (k197)';
+  'a failed connection is RETIRED from _connections';
 ok !(grep { $_ == $bad } @{ $err_pool->{_idle} }),
-  'a failed connection is RETIRED from _idle (k197)';
+  'a failed connection is RETIRED from _idle';
 
 # Consequence the old assertion was a proxy for: the next acquire does NOT
 # hang. The pool has an open capacity slot (the broken conn was dropped), so

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE regression for karr k47: a pipeline whose connection dies before the
 # sync point fails with EV::Pg's error, and the pool serves on.
@@ -59,7 +60,10 @@ my $LOST  = qr/^connection lost/;
 my $FATAL = qr/^FATAL:  terminating connection due to administrator command/;
 
 sub harness {
-  return DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 1 });
+  # lc_messages 'C': the test reads the server's English wording (PostgreSQL
+  # reports in the language of the session's lc_messages, which
+  # DBIO_TEST_SERVER_LANGUAGE sets for the suite).
+  return DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 1, on_connect_do => [ q{SET lc_messages = 'C'} ] });
 }
 
 # Wait for $f: (1, @result) once it is done, (0, $error) once it failed. A

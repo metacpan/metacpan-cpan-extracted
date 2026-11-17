@@ -4,7 +4,7 @@ package DBIO::SQLite::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::Conformance';
 
@@ -81,6 +81,11 @@ sub conformance_answered_through { { DDL => 2, Diff => 4, Bind => 1 } }
 
 
 sub conformance_refusals {
+  # The value the NUMERIC column holds, as this perl writes it: its NV and its
+  # C runtime decide the text (1.23456789012346e+15 for a double on one,
+  # 1234567890123456.75 for a wider NV on another).
+  my $real = unpack 'd', pack 'd', '1234567890123456.7890';
+
   return {
     'diff-column-added-not-null-populated' => {
       kind   => 'server',
@@ -100,7 +105,7 @@ sub conformance_refusals {
     },
     'bind-numeric-exact' => {
       kind   => 'deviation',
-      fact   => qr/read back '-?1\.23456789012346e\+15'/,
+      fact   => qr/read back '-?\Q$real\E'/,
       reason => 'NUMERIC affinity turns a text that is no 64-bit integer '
               . 'into a REAL, and of a REAL only the first 15 significant '
               . 'digits are preserved (https://www.sqlite.org/datatype3.html, '
@@ -187,7 +192,7 @@ DBIO::SQLite::Test::Conformance - Answers the shared conformance case table for 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -315,7 +320,8 @@ is written and read back, but SQLite never rejects eleven characters in it. It
 does not enforce a declared length, and the driver adds no C<CHECK> to make it
 (maintainer decision 2026-10-12), so this is declared a deviation.
 The C<fact> is the runner's own failure text, so a different wrong answer is not
-hidden behind it.
+hidden behind it. For C<bind-numeric-exact> it is the output of this perl for
+the double the column holds (its NV, its C runtime), not a fixed spelling.
 
 C<diff-constraint-changed> and C<diff-fk-action-changed> are not refused: this
 driver applies both, by rebuilding the table (ADR 0003).

@@ -1,5 +1,22 @@
 Revision history for Database::Join
 
+0.011.3	Mon Nov 16 02:16:04 PM EST 2026
+	[ Performance ]
+	- mandatory_filters: LIKE patterns are now compiled to a qr// at
+	  construction time and reused on every row evaluation.  Previously the
+	  pattern was converted to a Perl regex and compiled inside the per-row
+	  loop, so a query over N rows with M like predicates compiled the same
+	  regex N×M times.
+	- _apply_distinct_array (full-row dedup path): the sort of column names
+	  used to build the deduplication key is now hoisted outside the row loop.
+	  Previously sort keys %{$row} ran once per row; it now runs once per
+	  query call.
+	- _sqlite_criteria: replaced the per-secondary hash copy-and-delete
+	  pattern (used to test whether any non-join-column criteria were present)
+	  with the same O(1) arithmetic already used on the array path.
+	- Outer-join absent-primary sentinel [{}] is now a package-level constant
+	  instead of a fresh allocation per qualifying key.
+
 0.011.2	Fri Nov 13 02:14:28 PM EST 2026
 	[ Enhancements ]
 	- Key pushdown on the array backend: under a left or inner join, a

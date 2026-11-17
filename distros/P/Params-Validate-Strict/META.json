@@ -39,6 +39,7 @@
             "List::Util" : "1.33",
             "Readonly::Values::Boolean" : "0",
             "Scalar::Util" : "0",
+            "constant" : "0",
             "overload" : "0",
             "perl" : "5.026",
             "strict" : "0",
@@ -47,6 +48,7 @@
       },
       "test" : {
          "requires" : {
+            "Data::Dumper" : "0",
             "POSIX" : "0",
             "Readonly" : "0",
             "Test::Compile" : "0",
@@ -73,6 +75,6 @@
          "x_repository" : "https://github.com/nigelhorne/Params-Validate-Strict"
       }
    },
-   "version" : "0.42",
+   "version" : "0.43",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

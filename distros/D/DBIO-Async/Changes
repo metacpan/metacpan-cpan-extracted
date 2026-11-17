@@ -1,5 +1,30 @@
 Revision history for DBIO-Async
 
+0.900007  2026-11-17
+    * Fixed
+        - The pool's waiter runs with Future::XS installed as it does
+          without. The pool mark that DBIO::Async::Future lays on a waiter,
+          and on every Future derived from it, is kept with set_udata and
+          udata instead of in the Future's hash, which Future::XS objects
+          do not have; the mark is still held weakly.
+        - The test suite runs through on Windows and checks there what it
+          checks elsewhere: the fake servers are socket pairs, not pipes,
+          which the built-in Future::IO loop cannot wait on, and every wait
+          is bounded by a Future::IO timer, so a failure is red, not a hang.
+
+    * Documentation
+        - The shipped dbio-async skill describes the connect options
+          statement_timeout and max_pending_pinned and the statement trace,
+          points to the core driver skill for the seam tables, and states
+          the limits of the Future::IO implementations.
+        - The POD states that on Windows the transport cannot wait on the
+          socket of a DBD: the built-in Future::IO implementation selects on
+          a Perl file descriptor, and a DBD reports a Winsock handle.
+
+    * Tests
+        - The trace test silences the redefine warning of its localised
+          class-method stub, which perls before 5.36 emit.
+
 0.900004  2026-11-08
     * Timeouts and limits
         - The connect option statement_timeout (seconds, 0 or absent for

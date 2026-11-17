@@ -1,5 +1,5 @@
 package DBIO::Informix;
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # ABSTRACT: Informix-specific schema management for DBIO
@@ -32,7 +32,7 @@ DBIO::Informix - Informix-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO;
@@ -51,7 +53,7 @@ use DBIO::Async::Pool;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w };
   }
@@ -142,7 +144,7 @@ is refaddr(DBIO::Async::Pool->can('_withdraw_waiter')),
   is_deeply $storage->{wire}, [ [ 'SELECT held', 1 ] ],
     'sync wait: the async query holds the one connection';
 
-  my $got = eval { [ $storage->_query_async('SELECT sync', [])->get ] };
+  my $got = eval { [ within(15, sub { $storage->_query_async('SELECT sync', [])->get }) ] };
   is $@, '', 'sync wait: the blocking call does not croak';
   is_deeply $got, [ [ 'row', 1 ] ],
     'sync wait: ... it waited its turn and got the answer on the freed connection';
@@ -186,7 +188,7 @@ is refaddr(DBIO::Async::Pool->can('_withdraw_waiter')),
   is_deeply [ $again->get ], [ $held ], '... it is the very same connection';
   $pool->release($held);
 
-  my $after = eval { [ $storage->_query_async('SELECT after', [])->get ] };
+  my $after = eval { [ within(15, sub { $storage->_query_async('SELECT after', [])->get }) ] };
   is_deeply $after, [ [ 'row', 1 ] ],
     'dying wait: a later statement runs on it, as if nothing had happened';
   is_deeply $storage->{wire}, [ [ 'SELECT after', 1 ] ],
@@ -207,13 +209,13 @@ is refaddr(DBIO::Async::Pool->can('_withdraw_waiter')),
   my $waiter = $pool->{_waiters}[0];
   my $derived = $acq->then(sub { Future->done });
 
-  my ($mark_pool, $mark_waiter) = @{ $waiter->{dbio_async_pool_wait} };
+  my ($mark_pool, $mark_waiter) = @{ $waiter->udata("dbio_async_pool_wait") };
   is refaddr($mark_pool), refaddr($pool), 'weak: the waiter is marked with its pool';
-  ok isweak($waiter->{dbio_async_pool_wait}[0]),
+  ok isweak($waiter->udata("dbio_async_pool_wait")->[0]),
     'weak: ... held weakly, the pool holds the waiter';
-  ok isweak($waiter->{dbio_async_pool_wait}[1]),
+  ok isweak($waiter->udata("dbio_async_pool_wait")->[1]),
     'weak: ... and the mark does not hold the waiter either';
-  is refaddr($derived->{dbio_async_pool_wait}), refaddr($waiter->{dbio_async_pool_wait}),
+  is refaddr($derived->udata("dbio_async_pool_wait")), refaddr($waiter->udata("dbio_async_pool_wait")),
     'weak: a Future derived from the wait carries the same mark';
   $derived->cancel;
 }

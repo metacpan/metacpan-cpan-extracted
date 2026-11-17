@@ -317,7 +317,7 @@ my @expected_ddl =
   like $cd_conn->{log}[0], qr/^INSERT INTO `deploy_mock_cd`/,
     'the CD insert ran against the mapped table name (source unwrapped via ->name)';
   ok scalar(grep { defined $_ && $_ eq $FakeConn::LII } @{ $cd_conn->{binds}[0] }),
-    'the dependent INSERT carries the artist id as a bind (not NULL -- the k41 failure)'
+    'the dependent INSERT carries the artist id as a bind (not NULL)'
     or diag explain $cd_conn->{binds};
   is $pool->{acquired}, 2, 'one pinned connection per insert_async';
   is $pool->{released}, 2, 'both connections released after LAST_INSERT_ID()';

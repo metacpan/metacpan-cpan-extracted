@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "IBM DB2-specific schema management for DBIO",
   "AUTHOR" => "DBIO & DBIx::Class Authors",
   "CONFIGURE_REQUIRES" => {
+    "DBI" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
   },
@@ -25,14 +26,14 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::DB2",
   "PREREQ_PM" => {
     "DBD::DB2" => 0,
-    "DBIO" => "0.900004",
+    "DBIO" => "0.900007",
     "DateTime::Format::DB2" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -41,7 +42,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::DB2" => 0,
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
   "DateTime::Format::DB2" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98"

@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::PostGIS::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::PostgreSQL::Util ();
 use DBIO::PostgreSQL::DDL ();
@@ -105,7 +105,7 @@ DBIO::PostgreSQL::PostGIS::Storage - Storage class with PostGIS spatial extensio
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

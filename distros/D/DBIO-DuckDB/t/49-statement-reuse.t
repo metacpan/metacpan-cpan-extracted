@@ -284,7 +284,7 @@ SKIP: {
   my $sql = 'SELECT i FROM t WHERE g = ? ORDER BY i';
 
   TODO: {
-    local $TODO = 'DBD::DuckDB 0.16 statement handles do not survive reuse (karr k33)';
+    local $TODO = 'DBD::DuckDB 0.16 statement handles do not survive reuse';
 
     is outcome {
       map {

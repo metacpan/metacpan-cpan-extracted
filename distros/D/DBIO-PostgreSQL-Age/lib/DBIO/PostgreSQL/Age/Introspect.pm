@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Age::Introspect;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::PostgreSQL::Introspect';
 
@@ -23,7 +23,7 @@ DBIO::PostgreSQL::Age::Introspect - Stub: the graph schemas of Apache AGE are cl
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

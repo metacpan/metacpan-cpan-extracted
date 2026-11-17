@@ -11,7 +11,7 @@ build_requires:
 configure_requires:
   Module::Build::Tiny: '0.035'
 dynamic_config: 0
-generated_by: 'Minilla/v3.1.25, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,7 +30,7 @@ no_index:
 provides:
   App::cat::v:
     file: lib/App/cat/v.pm
-    version: '1.05'
+    version: '1.06'
 requires:
   Getopt::EX: '0'
   Getopt::EX::Hashed: '0'
@@ -45,9 +45,9 @@ resources:
   bugtracker: https://github.com/tecolicom/App-cat-v/issues
   homepage: https://github.com/tecolicom/App-cat-v
   repository: https://github.com/tecolicom/App-cat-v.git
-version: '1.05'
+version: '1.06'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
 x_static_install: 1

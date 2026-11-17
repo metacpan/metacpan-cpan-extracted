@@ -153,4 +153,8 @@ unless ($INC{'Devel/Cover.pm'}) {
 	   'aoh2hoh: an undefined key prints the help screen');
 }
 
+# Every aoh2hoh error names the function.
+throws_ok { aoh2hoh([ 1 ], 'id') } qr/^aoh2hoh: index 0 is not a hash/, 'aoh2hoh: a row error names the function';
+throws_ok { aoh2hoh([ {} ], 'id') } qr/^aoh2hoh: index 0 has no key "id"/, 'aoh2hoh: a missing-key error names the function';
+
 done_testing();

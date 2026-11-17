@@ -4,7 +4,7 @@ package DBIO::MySQL::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Deploy::Base::TempDatabase';
 
@@ -190,7 +190,7 @@ DBIO::MySQL::Deploy - Deploy and upgrade MySQL/MariaDB schemas via test-deploy-a
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

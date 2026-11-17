@@ -6,13 +6,13 @@ META.json
 README.deepl-JA.md
 README.deepl-KO.md
 README.deepl-ZH.md
-README.gpt4-JA.md
+README.gpt5-JA.md
 README.md
 cpanfile
 docs/cat-v.deepl-JA.pod
 docs/cat-v.deepl-KO.pod
 docs/cat-v.deepl-ZH.pod
-docs/cat-v.gpt4-JA.pod
+docs/cat-v.gpt5-JA.pod
 docs/cat-v.pod
 lib/App/cat/v.pm
 lib/App/cat/v.pod
@@ -22,7 +22,10 @@ script/cat-v
 t/00_compile.t
 t/02_week.sh
 t/02_week.t
+t/03_fwsp.sh
+t/03_fwsp.t
 t/Command.pm
+t/fwsp.txt
 t/week-tab.txt
 t/week.txt
 META.yml

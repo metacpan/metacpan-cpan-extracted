@@ -4,7 +4,7 @@ package DBIO::Relationship;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Base/;
 
@@ -29,7 +29,7 @@ DBIO::Relationship - Relationship declaration helpers for DBIO result classes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

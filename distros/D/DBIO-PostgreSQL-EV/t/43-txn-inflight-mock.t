@@ -379,7 +379,7 @@ sub back_idle {
     return 'not reached';
   }));
   ok !$ok, "$label: the transaction fails";
-  like $err, qr/^Blocking wait refused/, "$label: with the refusal (karr k44)";
+  like $err, qr/^Blocking wait refused/, "$label: with the refusal";
   is_deeply wire($conn), [qw( BEGIN blocking ROLLBACK )],
     "$label: ROLLBACK went on the wire, after the INSERT";
   is_deeply \@EV::Pg::COMMITTED, [], "$label: the row was not committed";
@@ -447,7 +447,7 @@ my $NO_LONGER_ACTIVE = qr/transaction context is no longer active/;
   is_deeply wire($conn), [qw( BEGIN early ROLLBACK )],
     "$label: nothing issued after ROLLBACK was queued reached the wire";
   like $ctx_err, $NO_LONGER_ACTIVE,
-    "$label: the context refuses a statement at once -- core ended it as ROLLBACK went out (core k237)";
+    "$label: the context refuses a statement at once -- core ended it as ROLLBACK went out";
   ok $past && $past->is_failed, "$label: a statement past the context: its Future failed";
   like $past && $past->is_failed ? $past->failure : '', qr/ROLLBACK has already been issued/,
     "$label: saying why";
@@ -468,7 +468,7 @@ my $NO_LONGER_ACTIVE = qr/transaction context is no longer active/;
   }));
   ok $ok, "$label: the transaction commits" or diag "it failed: $r[0]";
   is_deeply wire($conn), [qw( BEGIN a b late COMMIT )],
-    "$label: core waits for b, and for what b's then issued, before COMMIT (core k236)";
+    "$label: core waits for b, and for what b's then issued, before COMMIT";
   ok $late && $late->is_done, "$label: that statement ran inside the transaction";
   is_deeply \@EV::Pg::COMMITTED, [qw( a b late )], "$label: and was committed with it";
   back_idle($label, $storage, $conn);
@@ -493,7 +493,7 @@ my $NO_LONGER_ACTIVE = qr/transaction context is no longer active/;
   is_deeply wire($conn), [qw( BEGIN a SELECT COMMIT )],
     "$label: nothing issued after COMMIT was queued reached the wire";
   like $ctx_err, $NO_LONGER_ACTIVE,
-    "$label: the context refuses a statement at once -- core ended it as COMMIT went out (core k237)";
+    "$label: the context refuses a statement at once -- core ended it as COMMIT went out";
   ok $past && $past->is_failed, "$label: a statement past the context: its Future failed";
   like $past && $past->is_failed ? $past->failure : '', qr/COMMIT has already been issued/,
     "$label: saying why";
@@ -531,7 +531,7 @@ my $NO_LONGER_ACTIVE = qr/transaction context is no longer active/;
   ok $refused && $refused->is_failed, "$label: the refused statement's Future failed";
   is $refused && $refused->is_failed ? $refused->failure : undef, "PQsendQueryParams failed: refused\n",
     "$label: with EV::Pg's error";
-  ok !$ok, "$label: the transaction fails -- a statement of it failed (core k236)";
+  ok !$ok, "$label: the transaction fails -- a statement of it failed";
   is $err, "PQsendQueryParams failed: refused\n", "$label: with that statement's error";
   is_deeply wire($conn), [qw( BEGIN before after ROLLBACK )],
     "$label: the statement behind it still ran; then ROLLBACK";

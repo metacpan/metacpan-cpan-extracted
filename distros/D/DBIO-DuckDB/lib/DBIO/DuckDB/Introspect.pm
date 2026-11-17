@@ -4,7 +4,7 @@ package DBIO::DuckDB::Introspect;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Introspect::Base';
 
@@ -221,7 +221,7 @@ DBIO::DuckDB::Introspect - Introspect a DuckDB database via information_schema +
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

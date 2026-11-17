@@ -4,7 +4,7 @@ package DBIO::Oracle::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Introspect::Base';
 
@@ -35,7 +35,8 @@ sub fetch {
      AND rc.position = kcu.position
     WHERE cc.constraint_type = 'R'
       AND cc.owner = ?
-    ORDER BY cc.table_name, cc.constraint_name, kcu.position
+    ORDER BY NLSSORT(cc.table_name, 'NLS_SORT=BINARY'),
+             NLSSORT(cc.constraint_name, 'NLS_SORT=BINARY'), kcu.position
   });
   $fk_sth->execute($schema);
 
@@ -97,13 +98,16 @@ DBIO::Oracle::Introspect::ForeignKeys - Introspect Oracle foreign keys
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
 Fetches Oracle foreign key metadata via C<all_constraints> and
 C<all_cons_columns>. Includes deferrability information from
 C<all_constraints> directly.
+
+Foreign keys come in binary order by table and constraint name, in every
+session language (not by the C<NLS_SORT> of the session).
 
 A referential constraint has its own columns in C<all_cons_columns> and
 names, in C<r_constraint_name>, the primary or unique constraint it

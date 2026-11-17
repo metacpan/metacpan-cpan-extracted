@@ -49,6 +49,9 @@ use DiffTempDbProbe qw(temp_db_skip_reason);
 my $DB = "dbio_k94_$$";
 
 my $raw = DBI->connect($dsn, $user, $pass, { AutoCommit => 1, RaiseError => 1, PrintError => 0 });
+# MySQL reports in the language of the session; is_refused reads the English
+# "foreign key constraint fails".
+$raw->do("SET SESSION lc_messages = 'en_US'");
 my ($dbd) = $dsn =~ /\Adbi:(\w+):/;
 
 sub drop_database { local $raw->{Warn} = 0; $raw->do("DROP DATABASE IF EXISTS `$DB`") }
@@ -186,7 +189,7 @@ my %AUTHOR = (A_Author => { table => 'author', columns => ['id'] });
 sub book { return (B_Book => { table => 'book', columns => [ 'id', 'author_id' ],
   (@_ ? (fk => [ @_ ]) : ()) }) }
 
-subtest 'k94 A: a foreign key leaves, the server\'s index over its column with it' => sub {
+subtest 'a foreign key leaves, the server\'s index over its column with it' => sub {
   my $schema = installed(%AUTHOR, book(author_id => A_Author => 'id'), %OTHER);
   is_deeply server_fks(), { 'book.author_id' => 'author.id' }, '... the foreign key is there';
   is_deeply server_keys('book'), { book_author_id_fk => [ plain => 'author_id' ] },
@@ -208,7 +211,7 @@ subtest 'k94 A: a foreign key leaves, the server\'s index over its column with i
   $schema->storage->disconnect;
 };
 
-subtest 'k94 B: the referenced table and the referencing one both leave' => sub {
+subtest 'the referenced table and the referencing one both leave' => sub {
   my $schema = installed(%AUTHOR, book(author_id => A_Author => 'id'), %OTHER);
   $schema->storage->disconnect;
 
@@ -223,7 +226,7 @@ subtest 'k94 B: the referenced table and the referencing one both leave' => sub 
   $schema->storage->disconnect;
 };
 
-subtest 'k94 C: the referenced table leaves, the referencing one stays without the foreign key' => sub {
+subtest 'the referenced table leaves, the referencing one stays without the foreign key' => sub {
   my $schema = installed(%AUTHOR, book(author_id => A_Author => 'id'), %OTHER);
   $schema->storage->disconnect;
 
@@ -254,7 +257,7 @@ sub parent_with {
 sub child { return (B_Child => { table => 'b_child', columns => [ 'id', 'parent_code' ],
   fk => [ parent_code => A_Parent => 'code' ] }) }
 
-subtest 'k81 1: parent and child are new, the foreign key is to a unique key of the parent' => sub {
+subtest 'parent and child are new, the foreign key is to a unique key of the parent' => sub {
   fresh_database();
   my $first = schema_version(%OTHER);
   DBIO::MySQL::Deploy->new(schema => $first)->install;
@@ -286,7 +289,7 @@ for my $case (
   ] ],
 ) {
   my ($label, $to_name, $ran) = @$case;
-  subtest "k81 2: the unique key the foreign key needs is extended, $label" => sub {
+  subtest "the unique key the foreign key needs is extended, $label" => sub {
     my $schema = installed(parent(uniq_parent_code => ['code']), child(), %OTHER);
     $raw->do('INSERT INTO `a_parent` (`code`, `region`) VALUES (7, 1)');
     $raw->do('INSERT INTO `b_child` (`parent_code`) VALUES (7)');
@@ -317,7 +320,7 @@ for my $case (
   ] ],
 ) {
   my ($label, $to_name, $ran) = @$case;
-  subtest "k81 2: ... over a column that is new, $label" => sub {
+  subtest "... over a column that is new, $label" => sub {
     my $schema = installed(parent(uniq_parent_code => ['code']), child(), %OTHER);
     $raw->do('INSERT INTO `a_parent` (`code`, `region`) VALUES (7, 1)');
     $raw->do('INSERT INTO `b_child` (`parent_code`) VALUES (7)');
@@ -340,7 +343,7 @@ for my $case (
 # would make one of its own, and the CREATE INDEX a second one over the same
 # column. So the foreign key is added after the index, and the server keeps the
 # one index.
-subtest 'k92: a new table references the primary key: the index over its column first, then the foreign key' => sub {
+subtest 'a new table references the primary key: the index over its column first, then the foreign key' => sub {
   my $schema = installed(%AUTHOR, %OTHER);
   $schema->storage->disconnect;
   $schema = schema_version(%AUTHOR, book(author_id => A_Author => 'id'), %OTHER);

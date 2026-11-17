@@ -93,20 +93,20 @@ END_MODULE
 			'optional' => 1,
 			'default' => 0,
 			'type' => 'boolean',
-			'_type_checked' => 1
+			'_source' => 'validator'
 		}, 'username' => {
 			'type' => 'string',
 			'optional' => 0,
-			'_type_checked' => 1
+			'_source' => 'validator'
 		}, 'roles' => {
 			'optional' => 1,
 			'type' => 'arrayref',
 			'default' => [],
-			'_type_checked' => 1
+			'_source' => 'validator'
 		}
 	});
 
-	ok($format_user_schema->{input}{username}{_type_checked},
+	is($format_user_schema->{input}{username}{_source}, 'validator',
 		'Validator-enforced parameter is marked as type-checked');
 
 	done_testing();

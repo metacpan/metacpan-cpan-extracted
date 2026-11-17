@@ -4,7 +4,7 @@ package DBIO::Sybase::Storage::ASE::NoBindVars;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/
   DBIO::Storage::DBI::NoBindVars
@@ -84,7 +84,7 @@ DBIO::Sybase::Storage::ASE::NoBindVars - Support for Sybase ASE via DBD::Sybase 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

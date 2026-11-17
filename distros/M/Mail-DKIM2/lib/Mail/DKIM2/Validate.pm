@@ -1,7 +1,7 @@
 package Mail::DKIM2::Validate;
 use strict; use warnings; use 5.020;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use Email::MIME;
 use List::Util qw(max);
@@ -14,8 +14,10 @@ use Mail::DKIM2::Verifier;
 use Mail::DKIM2::Signature;
 
 # i= / m= of a field value; tag-names are case-sensitive (-09 §8, D10).
-sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d+)/ ? 0 + $1 : 0 }
-sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d+)/ ? 0 + $1 : 0 }
+# Only a chain number (one or two digits, 1..MAX_CHAIN_NUMBER) counts; 0
+# for anything else, as the Chain treats it.
+sub _i { my $h = shift // ''; $h =~ /(?:\A|;)\s*i\s*=\s*(\d{1,2})\s*(?:;|\z)/ ? 0 + $1 : 0 }
+sub _m { my $h = shift // ''; $h =~ /(?:\A|;)\s*m\s*=\s*(\d{1,2})\s*(?:;|\z)/ ? 0 + $1 : 0 }
 
 # --- parsed-tag breakdown for the validator UI ---------------------------
 # A compact, human-readable rendering of every tag in a DKIM2-Signature or
@@ -219,6 +221,17 @@ sub _report_once {
     # Deprecated (0.29): a null body Recipe is now a PERMERROR (-09 contract
     # E2), so this is true exactly for a pass.
     $res{fully_verified} = $v->fully_verified;
+
+    # The walk below parses the message again for every level, so it is
+    # bounded by the chain cap like everything else: over it, the
+    # Verifier's PERMERROR is the whole report (reported against 0.34,
+    # CVE-2026-129849).
+    if (Mail::DKIM2::Common::chain_length_error(
+            { 'message-instance' => scalar @mi_hdrs,
+              'dkim2-signature'  => scalar @sig_hdrs })) {
+        $res{levels} = [];
+        return \%res;
+    }
 
     my %sig_by_i = map { _i($_) => $_ } @sig_hdrs;
 

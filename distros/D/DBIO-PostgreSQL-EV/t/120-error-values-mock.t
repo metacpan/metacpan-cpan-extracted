@@ -32,6 +32,10 @@ use Scalar::Util qw( blessed );
 #      reference, undef.
 #   8. a value shorter than four characters is the business of the forms
 #      alone: a bound 'ab' is not struck out of the words around it.
+#   9. a server that reports in German: the SQLSTATE of error_fields takes the
+#      quoted values out of message and detail (DBIO::PostgreSQL::Util knows
+#      the forms of the languages by it); a text that is not the server's has
+#      no state, and only the English forms apply to it.
 
 BEGIN {
   package EV::Pg;
@@ -357,6 +361,34 @@ my $REL = qq{ERROR:  relation "geheim42" does not exist\n};
   my $s = DBIO::PostgreSQL::EV::Storage->new(undef);
   is $s->_pg_mask_error_text('connection lost on table ab', ['ab']), 'connection lost on table ab',
     "$l: a bound 'ab' stays in the words around it";
+}
+
+# -----------------------------------------------------------------------------
+# 9. a server in another language: the SQLSTATE finds the forms
+# -----------------------------------------------------------------------------
+{
+  my $l = 'german';
+  my $storage = new_storage();
+  my $f = $storage->_query_async('SELECT 1 WHERE ?', ['ab']);
+  my $got = failure_of($f);
+  until_sent(1);
+  server_error($EV::Pg::SENT[0],
+    "FEHLER:  ung\xc3\xbcltige Eingabesyntax f\xc3\xbcr Typ integer: \xc2\xbbxy\xc2\xab\n",
+    severity => 'FEHLER', sqlstate => '22P02',
+    primary  => "ung\xc3\xbcltige Eingabesyntax f\xc3\xbcr Typ integer: \xc2\xbbxy\xc2\xab",
+    detail   => "Schl\xc3\xbcssel \xc2\xbb(name)=(ab)\xc2\xab existiert bereits.");
+  ok blessed($got->[0]) && $got->[0]->isa('DBIO::Exception::Server'), "$l: the server's object";
+  is $got->[0]->sqlstate, '22P02', "$l: the sqlstate is kept";
+  no_value($got->[0], qr/(?<![\w])(?:xy|ab)(?![\w])/, $l);
+  like $got->[0]->detail, qr/\(name\)=\(\*\*\*\)/, "$l: the key stays, the value goes from the detail";
+  $storage->disconnect;
+}
+{
+  my $l = 'german, no server text';
+  my $s = DBIO::PostgreSQL::EV::Storage->new(undef);
+  my $text = "FEHLER:  ung\xc3\xbcltige Eingabesyntax f\xc3\xbcr Typ integer: \xc2\xbbxy\xc2\xab\n";
+  is $s->_pg_mask_error_text($text), $text, "$l: without a state, the English forms only";
+  isnt $s->_pg_mask_error_text($text, undef, '22P02'), $text, "$l: with the state, the value goes";
 }
 
 done_testing;

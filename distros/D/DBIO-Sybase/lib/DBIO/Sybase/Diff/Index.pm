@@ -4,7 +4,7 @@ package DBIO::Sybase::Diff::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Diff::Compare qw(changed_index_fields);
 use DBIO::Sybase::Quote ();
@@ -123,7 +123,7 @@ DBIO::Sybase::Diff::Index - Diff Sybase ASE indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

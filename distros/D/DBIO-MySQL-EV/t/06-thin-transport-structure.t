@@ -147,7 +147,7 @@ is $storage->_post_insert_sql, '', '_post_insert_sql seam is empty (MySQL has no
 is $storage->_txn_context_class, 'DBIO::MySQL::EV::TransactionContext',
   '_txn_context_class points at the EV transaction context';
 is $storage->_txn_conn_accessor, 'txn_conn',
-  "_txn_conn_accessor is core's constructor key (karr k31; was the private 'mdb')";
+  "_txn_conn_accessor is core's constructor key (was the private 'mdb')";
 isa_ok $storage->_txn_context_class, 'DBIO::Storage::Async::TransactionContext',
   'the EV txn context class';
 

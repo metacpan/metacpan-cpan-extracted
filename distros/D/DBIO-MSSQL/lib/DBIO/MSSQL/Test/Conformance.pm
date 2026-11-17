@@ -4,7 +4,7 @@ package DBIO::MSSQL::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::Conformance';
 
@@ -22,6 +22,12 @@ my %DATABASE;
 sub _server {
   my @odbc   = @ENV{qw(DBIO_TEST_MSSQL_ODBC_DSN DBIO_TEST_MSSQL_ODBC_USER DBIO_TEST_MSSQL_ODBC_PASS)};
   my @sybase = @ENV{qw(DBIO_TEST_MSSQL_DSN DBIO_TEST_MSSQL_USER DBIO_TEST_MSSQL_PASS)};
+  # The Bind list writes and reads text beyond ASCII. Over DBD::ODBC without Unicode
+  # support the storage takes that only with a UTF-8 client character set, which the
+  # FreeTDS ODBC driver reads from the locale of the process; the DSN names it
+  # instead (a DSN that names a ClientCharset keeps it).
+  $odbc[0] .= ($odbc[0] =~ /;\z/ ? '' : ';') . 'ClientCharset=UTF-8'
+    if length($odbc[0] // '') and $odbc[0] =~ /\Adbi:ODBC:/i and $odbc[0] !~ /ClientCharset=/i;
   return \@odbc   if length($odbc[0] // '')   and eval { require DBD::ODBC; 1 };
   return \@sybase if length($sybase[0] // '') and eval { require DBD::Sybase; 1 };
   return undef;
@@ -313,7 +319,7 @@ DBIO::MSSQL::Test::Conformance - Answers the shared conformance case table for t
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

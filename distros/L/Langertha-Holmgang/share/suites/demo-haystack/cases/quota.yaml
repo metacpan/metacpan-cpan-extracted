@@ -1,0 +1,40 @@
+id: quota
+title: Which service ran out of quota
+difficulty: leicht
+messages:
+  - role: user
+    content:
+      - "Below is the journal of box-3 from last night. One service failed because a disk quota ran out. Report which service it was.\n\n"
+      - generate:
+          kind: journal
+          tokens: 3000
+          seed: 42
+          host: box-3
+          units: [ widget-sync, report-mailer, thumb-render, feed-poller ]
+          exclude: [ "(?i)quota" ]
+          insert:
+            - at: 0.6
+              text: "{ts} {host} thumb-render[{pid:thumb-render}]: ERROR: write /var/cache/thumb-render/t-{num}.png: disk quota exceeded"
+state:
+  findings: []
+rules:
+  - title: one finding names thumb-render
+    state: findings
+    any: { service: "^thumb-render(\\.service)?$" }
+  - title: no other service accused
+    state: findings
+    none: { service: "^(?!thumb-render(\\.service)?$)" }
+solution:
+  - { tool: report_finding, args: { service: thumb-render, note: "disk quota exceeded writing to /var/cache/thumb-render" } }
+alternatives:
+  - title: unit name with suffix
+    calls:
+      - { tool: report_finding, args: { service: thumb-render.service, note: "quota exceeded" } }
+wrong_solutions:
+  - title: the wrong service
+    calls:
+      - { tool: report_finding, args: { service: report-mailer, note: "quota exceeded" } }
+  - title: two guesses
+    calls:
+      - { tool: report_finding, args: { service: report-mailer, note: "maybe" } }
+      - { tool: report_finding, args: { service: thumb-render, note: "maybe" } }

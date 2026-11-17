@@ -30,9 +30,11 @@ sub take ($count) {
     _check_count($count);
     return gather {
         my $taken = 0;
-        return sub ($value) {
+
+        # Without a signature, as it's called for each value.
+        return sub {
             Ekorn::Pipeline::Stop->throw if $taken >= $count;
-            return ++$taken < $count ? $value : Ekorn::Pipeline::Stop->throw($value);
+            return ++$taken < $count ? $_[0] : Ekorn::Pipeline::Stop->throw($_[0]);
         };
     };
 }
@@ -43,8 +45,10 @@ sub drop ($count) {
     _check_count($count);
     return gather {
         my $dropped = 0;
-        return sub ($value) {
-            return $value if $dropped >= $count;
+
+        # Without a signature, as it's called for each value.
+        return sub {
+            return $_[0] if $dropped >= $count;
             $dropped++;
             return;
         };
@@ -64,7 +68,8 @@ sub take_last : prototype() () {
     return gather {
         my @kept;
         return {
-            step  => sub ($value) { @kept = ($value); return },
+            # Without a signature, as it's called for each value.
+            step  => sub { @kept = ($_[0]); return },
             flush => sub () { splice @kept },
         };
     };
@@ -76,8 +81,10 @@ sub take_last : prototype() () {
 sub take_single : prototype() () {
     return gather {
         my $seen = 0;
-        return sub ($value) {
-            return $value unless $seen++;
+
+        # Without a signature, as it's called for each value.
+        return sub {
+            return $_[0] unless $seen++;
             Carp::carp 'Expected only one item, but there were more';
             Ekorn::Pipeline::Stop->throw;
         };

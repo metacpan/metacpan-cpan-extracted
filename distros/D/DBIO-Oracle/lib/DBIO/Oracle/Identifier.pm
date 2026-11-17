@@ -4,7 +4,7 @@ package DBIO::Oracle::Identifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Digest::MD5 ();
 use Math::BigInt ();
@@ -119,7 +119,7 @@ DBIO::Oracle::Identifier - Shorten Oracle identifiers to the 30-character limit
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::MySQL::Introspect::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -37,7 +37,7 @@ DBIO::MySQL::Introspect::Util - Shared helpers for the MySQL/MariaDB introspect 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

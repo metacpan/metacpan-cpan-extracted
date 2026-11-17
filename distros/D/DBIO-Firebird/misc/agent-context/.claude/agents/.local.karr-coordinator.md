@@ -18,6 +18,7 @@ Your job: route work across DBIO repos via karr tickets.
    - SQL generation / Storage / Schema core → `dbio`
    - DB-specific bugs/features → `dbio-<db>` driver repo
    - Release/cpanfile/dzil → `dbio-dzil`
+   - Async base → `dbio-async`; fork-per-query → `dbio-forked`; EV transports → `dbio-<db>-ev`; AGE/PostGIS/GraphQL → their own repos; retired module names (tombstones) → `dbio-deprecated` (table in skill `dbio-coordination`)
 3. If the ticket belongs to a different repo, post it there via that repo's remote, then archive locally with a pointer note.
 4. Monitor handoffs (`karr list --status review`) and notify originating repo when work completes.
 

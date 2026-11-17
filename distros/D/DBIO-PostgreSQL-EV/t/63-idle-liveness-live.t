@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 
 # LIVE, karr k73 (d) / karr k72: a pooled connection whose session ended while
 # it sat idle, what the next borrower gets, and what the socket says before
@@ -117,7 +121,7 @@ $ENV{PGAPPNAME} = $TAG;   # every connection a harness opens from here on
 my $rdhup = DBIO::PostgreSQL::EV::Pool->can('_pg_rdhup');
 ok $rdhup, 'the pool measures whether poll can be asked for a closed peer (_pg_rdhup)';
 my $CAN_ASK = $rdhup ? $rdhup->() : 0x2000;
-my $NO_FLAG = "this platform's poll has no flag for a closed peer: the pool vouches, as before karr k72";
+my $NO_FLAG = "this platform's poll has no flag for a closed peer: the pool vouches for an idle connection without asking the socket";
 
 # The backend pid of the connection a call runs on.
 my @PID = ('pg_namespace', [ \'pg_backend_pid()' ], { nspname => 'pg_catalog' });
@@ -465,7 +469,7 @@ for my $how ('lost, on_error replaced by a caller', 'finished by a caller') {
 
 SKIP: {
   my ($ssl) = $observer->selectrow_array('SHOW ssl');
-  skip "the server has ssl = $ssl: that the pool's look at the socket (karr k72) sees the same "
+  skip "the server has ssl = $ssl: that the pool's look at the socket sees the same "
     . 'over TLS cannot be measured against it -- A and 4 were held over a plain connection only', 1
     unless $ssl eq 'on';
 

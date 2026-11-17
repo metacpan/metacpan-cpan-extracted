@@ -49,6 +49,9 @@ BEGIN {
 use DBI;
 use DBD::Pg;
 use Future::IO;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
 
 my $ASYNC = 'DBIO::PostgreSQL::Storage::Async';
 
@@ -170,7 +173,7 @@ my $OPENDIR    = qr/\ADBD::ExampleP::st execute failed: opendir\(\Q$NO_SUCH\E\):
 # ---------------------------------------------------------------------------
 # 3. A connection that cannot be opened.
 # ---------------------------------------------------------------------------
-my $SOCKET_TRIED = qr{\Q$DEAD\E/\.s\.PGSQL\.\d+};
+my $SOCKET_TRIED = LiveServer->dead_host_reason($DEAD);   # a libpq without sockets names none
 {
   my %conninfo = (dsn => "dbi:Pg:host=$DEAD;dbname=appdb", user => 'app', password => 'pw');
 

@@ -25,9 +25,9 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::SQLite",
   "PREREQ_PM" => {
     "Context::Preserve" => "0.03",
-    "DBD::SQLite" => 0,
-    "DBI" => "1.57",
-    "DBIO" => "0.900004",
+    "DBD::SQLite" => "1.72",
+    "DBI" => "1.634",
+    "DBIO" => "0.900007",
     "DateTime::Format::SQLite" => 0,
     "SQL::Abstract" => "2.000002",
     "Try::Tiny" => "0.32"
@@ -42,7 +42,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t t/count/*.t t/debug/*.t t/delete/*.t t/helpers/*.t t/inflate/*.t t/multi_create/*.t t/ordered/*.t t/pager/*.t t/prefetch/*.t t/relationship/*.t t/resultset/*.t t/resultsource/*.t t/row/*.t t/schema/*.t t/search/*.t t/sqlmaker/*.t t/sqlmaker/limit_dialects/*.t t/storage/*.t t/update/*.t"
   }
@@ -51,9 +51,9 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Context::Preserve" => "0.03",
-  "DBD::SQLite" => 0,
-  "DBI" => "1.57",
-  "DBIO" => "0.900004",
+  "DBD::SQLite" => "1.72",
+  "DBI" => "1.634",
+  "DBIO" => "0.900007",
   "DateTime::Format::SQLite" => 0,
   "File::Temp" => 0,
   "Math::BigInt" => 0,

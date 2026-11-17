@@ -32,19 +32,26 @@ FreeTDS detection: `$dbh->{syb_oc_version} =~ /freetds/i`. The driver mixes in
 
 ## ASE Version Notes
 
-If the server lacks placeholder support the storage reblesses to
+If the client library lacks placeholder support the storage reblesses to
 `...::ASE::NoBindVars` (which always disables statement caching); placeholders
 without typeless-placeholder support trigger `auto_cast(1)`. Server type is
-probed at first use via `sp_server_info @attribute_id=1` (`SQL_Server` → `ASE`).
+not asked: the schema declares the driver and the storage goes to `::ASE` without a query to the server. Only `syb_server_version_string` is read; Microsoft SQL Server is refused through `_driver_mismatch` (`DBIO::Sybase::Storage`).
 
 ## Type System
 
 Driver type mapping (`DBIO::Sybase::DDL::sybase_column_type`, logical → ASE):
 integer/serial → `INT`; bigint/bigserial → `BIGINT`; smallint/tinyint → `SMALLINT`;
-varchar/nvarchar → `VARCHAR(255)`; char/nchar → `CHAR(1)`; text/long/clob → `TEXT`;
+varchar/nvarchar/`char varying`/`character varying` → `VARCHAR(255)`;
+char/nchar/`character` → `CHAR(1)`; text/long/clob/mediumtext → `TEXT`;
+uniqueidentifier → `VARCHAR(36)` (ASE has no GUID type; the column holds the string);
 date/timestamp/datetime → `DATETIME`; smalldatetime → `SMALLDATETIME`;
 bytea/blob → `IMAGE`; numeric/decimal → `NUMERIC(18,6)`; float/real → `FLOAT`;
-double precision → `DOUBLE PRECISION`; boolean → `BIT`.
+double precision → `DOUBLE PRECISION`; boolean → `BIT`. Any other name is passed
+through uppercased with its size (`binary` 16 → `BINARY(16)`); only the server
+can tell whether it exists (Msg 2715).
+
+Refused by `DBIO::Sybase::DDL` before the server is asked (`t/104-ddl-type-refusals.t`):
+`enum`, a size on `bit`/`boolean`, a nullable `bit`/`boolean` (Msg 2718).
 
 - **money** — ASE-native fixed-point currency type (also `smallmoney`).
 - **text/image** — LOB types; written on a dedicated writer connection
@@ -101,7 +108,10 @@ than the main one. ASE also supports `TOP n`, but the driver uses `SET ROWCOUNT`
 
 ## Identifier Quoting + Case Sensitivity
 
-Quote char is **square brackets**: `sql_quote_char([qw/[ ]/])` → `[col]`. Case
+DML quotes with **square brackets**: `sql_quote_char([qw/[ ]/])` on the ASE storage
+→ `[col]`. DDL and Diff write a name through `DBIO::Sybase::Quote::quote_ident`:
+bare, or `[name]` when it is an ASE keyword or not a simple name (`"name"` is Msg 102
+without `set quoted_identifier on`). Case
 sensitivity of identifiers and string comparisons is **server-dependent** (set by
 the server's sort order / charset at install time); do not assume.
 
@@ -114,7 +124,7 @@ on the connection rather than assuming UTF-8.
 ## Introspection Catalog
 
 ASE has **no** `INFORMATION_SCHEMA` views (Msg 208 on 16.0) — that is SQL Server
-and ANSI. The driver reads the system catalog (karr k48):
+and ANSI. The driver reads the system catalog:
 
 | What | Catalog | Detail |
 |------|---------|--------|
@@ -134,4 +144,8 @@ does not support `CHECK` constraints the way other engines do.
 `DBIO_TEST_SYBASE_DSN` (used by the test suite). `DBIO_TEST_SYBASE_USER` /
 `DBIO_TEST_SYBASE_PASS` by convention. `DBIO_SYBASE_FREETDS_NOWARN=1` silences the
 FreeTDS-support warning. ASE has no `:memory:` DB — Deploy creates a temp database
-`CREATE DATABASE <prefix><pid>_<time>` and drops it after compare.
+`CREATE DATABASE _dbio_tmp_<pid>_<minutes>_<serial>` and drops it after compare.
+
+Live files (`t/*-live.t`) connect with these variables and `skip_all` without them;
+ASE needs `TDSVER=5.0`. Run every suite through `maint/capped-test`, live ones after
+`maint/live-preflight` (skill `dbio-driver-development`, `references/live-testing.md`).

@@ -46,7 +46,7 @@
    "provides" : {
       "Stats::LikeR" : {
          "file" : "lib/Stats/LikeR.pm",
-         "version" : "0.3422"
+         "version" : "0.3424"
       }
    },
    "release_status" : "stable",
@@ -61,9 +61,9 @@
          "web" : "https://github.com/hhg7/stats"
       }
    },
-   "version" : "0.3422",
+   "version" : "0.3424",
    "x_generated_by_perl" : "v5.44.0",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.81",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

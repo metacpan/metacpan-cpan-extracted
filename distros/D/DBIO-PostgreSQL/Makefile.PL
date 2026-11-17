@@ -25,8 +25,8 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::PostgreSQL",
   "PREREQ_PM" => {
     "Crypt::URandom" => 0,
-    "DBD::Pg" => "3.7.1",
-    "DBIO" => "0.900004",
+    "DBD::Pg" => "3.19.0",
+    "DBIO" => "0.900007",
     "DateTime::Format::Pg" => 0
   },
   "TEST_REQUIRES" => {
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Warn" => 0
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,8 +45,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Crypt::URandom" => 0,
-  "DBD::Pg" => "3.7.1",
-  "DBIO" => "0.900004",
+  "DBD::Pg" => "3.19.0",
+  "DBIO" => "0.900007",
   "DateTime::Format::Pg" => 0,
   "Sub::Name" => 0,
   "Test::Exception" => 0,

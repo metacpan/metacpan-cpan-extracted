@@ -4,7 +4,7 @@ package DBIO::Introspect::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 our $CONTRACT_VERSION = '1.2';
 
@@ -178,7 +178,7 @@ DBIO::Introspect::Base - Base class for DBIO driver introspectors
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

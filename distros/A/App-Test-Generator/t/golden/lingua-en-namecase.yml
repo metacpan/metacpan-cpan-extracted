@@ -1,0 +1,43 @@
+---
+NameCase:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: NameCase
+  input:
+    names:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 1
+      optional: 0
+      position: 0
+      type: arrayref
+  module: Lingua::EN::NameCase
+  output:
+    _context_aware: 1
+    type: arrayref
+nc:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: nc
+  input:
+    name:
+      _source: input_spec
+      optional: 1
+      position: 0
+      type: string
+  module: Lingua::EN::NameCase
+  output:
+    type: string

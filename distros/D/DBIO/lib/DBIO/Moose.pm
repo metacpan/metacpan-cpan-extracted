@@ -4,7 +4,7 @@ package DBIO::Moose;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Util ();
 
@@ -52,7 +52,7 @@ DBIO::Moose - Enable Moose attributes in DBIO result classes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

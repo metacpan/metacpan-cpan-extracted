@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE, karr k73 (a) and (b): a statement Future cancelled while its statement
 # is in flight on a real PostgreSQL -- on the pooled path and inside
@@ -217,6 +218,18 @@ sub fresh {
   PoolReset->until_reset($h->async);
   settle();
   return ($h, $r[0][0], the_conn($h));
+}
+
+# fresh_english(): a pool whose connection reports in English. For a test that
+# reads the server's English wording: PostgreSQL reports in the language of
+# lc_messages, which DBIO_TEST_SERVER_LANGUAGE sets for the suite. The setting
+# is the libpq startup option in the DSN and not an on_connect_do: the reset
+# replays on_connect_do, and several tests hold that the last statement of a
+# backend is the DISCARD ALL.
+sub fresh_english {
+  my $dsn = $ENV{DBIO_TEST_PG_DSN};
+  local $ENV{DBIO_TEST_PG_DSN} = $dsn . q{;options='-c lc_messages=C'};
+  return fresh();
 }
 
 sub state_of {
@@ -545,7 +558,7 @@ for my $when ('in the coderef', 'after the coderef returned') {
 
 {
   my $label = 'txn, a statement behind the cancelled one';
-  my ($h, $pid) = fresh();
+  my ($h, $pid) = fresh_english();
   my $rows = rows_in_table();
   hold_inserts();
 
@@ -613,7 +626,7 @@ for my $when ('in the coderef', 'after the coderef returned') {
   is state_of($queued), 'cancelled', "$label: the cancelled one stays cancelled";
 
   my $sent = inserts_run() - $run;
-  is $sent, 1, "$label: a statement cancelled before it was sent is not sent (karr k75)";
+  is $sent, 1, "$label: a statement cancelled before it was sent is not sent";
   rolled_back($label, $h, $pid, $rows);
   $h->disconnect;
 }
@@ -649,14 +662,14 @@ for my $end (qw( ROLLBACK )) {
   $h->disconnect;
 }
 
-is $REQUESTS{cancel}, 0, 'karr k75: none of these cancels called the blocking EV::Pg cancel';
+is $REQUESTS{cancel}, 0, 'none of these cancels called the blocking EV::Pg cancel';
 # 3 pooled cases of 1, late error, lost connection, then 3 txn cases, the one
 # behind the cancelled statement: every cancel of a statement in flight, and
 # not the one that waited in the queue (6).
 # Plus one: the retirement of the connection in 6b cancels what it may still be
 # running before it closes the connection (_pg_close_after_cancel).
 is $REQUESTS{cancel_async}, $CAN ? 3 + 1 + 1 + 3 + 1 + 1 : 0,
-  'karr k75: one cancel request for each statement cancelled in flight, none for the one cancelled in the queue';
+  'one cancel request for each statement cancelled in flight, none for the one cancelled in the queue';
 
 # --- 10. the race: the connection is held until the request is answered (k75) -----
 
@@ -706,7 +719,7 @@ SKIP: {
 SKIP: {
   my $label = 'measured, EV::Pg cancel_async';
   skip 'this EV::Pg has no cancel_async', 7 unless EV::Pg->can('cancel_async');
-  my ($h, $pid) = fresh();
+  my ($h, $pid) = fresh_english();
   my ($got, $pg) = wait_for($h->pool->acquire);
   die "acquiring the pool's connection failed: $pg" unless $got;
 
@@ -728,7 +741,7 @@ SKIP: {
   cmp_ok $took, '<', 2.5, "$label: long before its pg_sleep(5) would have ended";
   note sprintf '%s: the statement failed %.3fs after it was sent', $label, $took;
   ok wait_until(sub { @answer }), "$label: the cancel request is answered";
-  note "$label: its callback got (" . join(', ', map { defined ? $_ : 'undef' } @answer) . ')';
+  note "$label: its callback got (" . join(', ', map { defined($_) ? $_ : 'undef' } @answer) . ')';
   is $pg->transaction_status, EV::Pg::PQTRANS_IDLE(), "$label: the connection is IDLE";
   my ($again, @r) = wait_for($h->query_on($pg, 'SELECT pg_backend_pid()'));
   is $again ? $r[0][0] : undef, $pid, "$label: and the next statement runs on it, on the same backend";

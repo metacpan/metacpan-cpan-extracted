@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::PostGIS::ResultSet;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::ResultSet';
 use DBIO::Exception ();
@@ -150,7 +150,7 @@ DBIO::PostgreSQL::PostGIS::ResultSet - Spatial query helpers for PostGIS-aware r
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

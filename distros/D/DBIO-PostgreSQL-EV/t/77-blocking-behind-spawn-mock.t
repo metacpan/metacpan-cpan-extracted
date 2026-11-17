@@ -193,6 +193,7 @@ BEGIN {
 
 use EV;
 use Scalar::Util ();
+use Time::HiRes ();
 use DBIO::AccessBroker;
 use DBIO::PostgreSQL::EV::Storage;
 
@@ -505,11 +506,28 @@ for my $alive (0, 1) {
     my $label  = "in a timer during the connect statement's replay, $when, pool of one ($with)";
     my ($storage, $owner) = with_replay(1, $replay);
     my %seen;
-    my $app = EV::timer($after, 0, sub {
+    my $app;
+    my $act = sub {
       my ($conn) = conns($storage);
       @seen{qw( up pending )} = ($conn->is_connected, $conn->pending_count) if $conn;
       blocking_inner($storage, \%seen);
-    });
+    };
+    if ($pending) {
+      # By state, not by the clock: look every few ms until the new connection is
+      # up and its connect statement is out, with a fixed ceiling (then the
+      # assertion below says what it found).
+      my $deadline = Time::HiRes::time() + 5;
+      $app = EV::timer(0, 0.002, sub {
+        my ($conn) = conns($storage);
+        return unless Time::HiRes::time() > $deadline
+          or $conn and $conn->is_connected and $conn->pending_count;
+        undef $app;
+        $act->();
+      });
+    }
+    else {
+      $app = EV::timer($after, 0, $act);
+    }
     my $r = bounded(sub { call_block($storage, 'outer') });
 
     is_deeply $seen{at}, { size => 1, available => 0, queued => 0, spawning => 0 },

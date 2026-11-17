@@ -4,7 +4,7 @@ package DBIO::MySQL::Test::EventTZDeprecated;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Test::BaseResult/;
 
@@ -44,7 +44,7 @@ DBIO::MySQL::Test::EventTZDeprecated - Test result class using deprecated extra 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

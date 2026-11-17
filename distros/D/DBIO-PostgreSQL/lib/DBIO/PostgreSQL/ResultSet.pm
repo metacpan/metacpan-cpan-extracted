@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::ResultSet;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::ResultSet';
 
@@ -88,7 +88,7 @@ DBIO::PostgreSQL::ResultSet - ResultSet with pgvector nearest-neighbor search
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

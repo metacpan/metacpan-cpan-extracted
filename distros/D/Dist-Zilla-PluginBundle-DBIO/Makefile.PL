@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use 5.020;
+use 5.022;
 
 use ExtUtils::MakeMaker;
 
@@ -21,7 +21,7 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-DBIO",
   "LICENSE" => "perl",
-  "MIN_PERL_VERSION" => "5.020",
+  "MIN_PERL_VERSION" => "5.022",
   "NAME" => "Dist::Zilla::PluginBundle::DBIO",
   "PREREQ_PM" => {
     "Dist::Zilla" => "6.000",
@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::GatherAgentContext" => 0,
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,
     "Dist::Zilla::Plugin::InstallRelease" => 0,
-    "Dist::Zilla::Plugin::LicenseFile" => 0,
+    "Dist::Zilla::Plugin::LicenseFile" => "0.002",
     "Dist::Zilla::Plugin::MakeMaker::Awesome" => 0,
     "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
     "Dist::Zilla::Plugin::PodWeaver" => 0,
@@ -37,16 +37,15 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::ShareDir" => 0,
     "Dist::Zilla::Plugin::Test::ChangesHasContent" => 0,
     "Dist::Zilla::Plugin::TestRelease" => 0,
-    "Dist::Zilla::Plugin::VersionFromMainModule" => 0,
     "Dist::Zilla::PluginBundle::Git" => 0,
     "Dist::Zilla::PluginBundle::Git::VersionManager" => 0,
+    "File::pushd" => 0,
     "Moose" => 0,
     "Path::Tiny" => 0,
     "Pod::Weaver" => 0,
     "Pod::Weaver::Section::GenerateSection" => 0
   },
   "TEST_REQUIRES" => {
-    "Devel::Cover" => "1.00",
     "Dist::Zilla::Tester" => 0,
     "PPI" => 0,
     "Pod::Elemental" => 0,
@@ -54,7 +53,7 @@ my %WriteMakefileArgs = (
     "Software::License::Perl_5" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -62,13 +61,12 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "Devel::Cover" => "1.00",
   "Dist::Zilla" => "6.000",
   "Dist::Zilla::Plugin::Bootstrap::lib" => 0,
   "Dist::Zilla::Plugin::GatherAgentContext" => 0,
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => 0,
   "Dist::Zilla::Plugin::InstallRelease" => 0,
-  "Dist::Zilla::Plugin::LicenseFile" => 0,
+  "Dist::Zilla::Plugin::LicenseFile" => "0.002",
   "Dist::Zilla::Plugin::MakeMaker::Awesome" => 0,
   "Dist::Zilla::Plugin::MetaProvides::Package" => 0,
   "Dist::Zilla::Plugin::PodWeaver" => 0,
@@ -76,10 +74,10 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::ShareDir" => 0,
   "Dist::Zilla::Plugin::Test::ChangesHasContent" => 0,
   "Dist::Zilla::Plugin::TestRelease" => 0,
-  "Dist::Zilla::Plugin::VersionFromMainModule" => 0,
   "Dist::Zilla::PluginBundle::Git" => 0,
   "Dist::Zilla::PluginBundle::Git::VersionManager" => 0,
   "Dist::Zilla::Tester" => 0,
+  "File::pushd" => 0,
   "Moose" => 0,
   "PPI" => 0,
   "Path::Tiny" => 0,

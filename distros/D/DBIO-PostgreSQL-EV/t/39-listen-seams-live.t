@@ -33,7 +33,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use LiveServer;
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 alarm 300;
@@ -141,7 +141,7 @@ subtest 'c) channel names: one identifier with a dot; over 63 bytes refused' => 
   ok settle($async->unlisten($dotted), 'unlisten dotted'), 'unlisten on it resolved';
 
   ok !eval { $sender->do('LISTEN "dbio_k43"."dotted"'); 1 },
-    'control: the split form the SQLMaker quoting produced before k43 is not a LISTEN PostgreSQL accepts';
+    'control: the split form the SQLMaker quoting used to produce is not a LISTEN PostgreSQL accepts';
 
   my $pid  = listen_pid();
   my $long = $async->listen(('x' x 64) => sub { });

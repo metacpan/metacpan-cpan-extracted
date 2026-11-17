@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
+
+plan skip_all => 'this perl has no real fork() ($Config{d_fork} is not set)'
+  unless $Config{d_fork};
 use POSIX qw(WNOHANG);
 use Errno ();
 use POSIX ();

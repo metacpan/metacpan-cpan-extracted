@@ -1,7 +1,7 @@
 package Mail::DKIM2::Reflector;
 use strict; use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 use 5.020;
 
 use Email::MIME;

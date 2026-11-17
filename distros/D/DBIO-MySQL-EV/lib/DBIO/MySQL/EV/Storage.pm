@@ -4,7 +4,7 @@ package DBIO::MySQL::EV::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Async';
 
@@ -397,12 +397,12 @@ sub _executor {
 
 
 sub _mysql_mask_error {
-  my ($text, $values, $sql) = @_;
+  my ($text, $values, $sql, $code) = @_;
   return $text unless defined $text && !ref $text;
 
   my $masked = eval {
     DBIO::Util::mask_bound_values(
-      DBIO::MySQL::Util::mask_error_details($text, $values, $sql),
+      DBIO::MySQL::Util::mask_error_details($text, $values, $sql, $code),
       $values,
     );
   };
@@ -1119,6 +1119,7 @@ sub _listen_delay {
   require EV;
   my $f = $self->future_class->new;
   my $timer;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   $timer = EV::timer($seconds, 0, sub {
     undef $timer;
     $f->done unless $f->is_ready;
@@ -1205,12 +1206,17 @@ sub _mysql_listen_prepared_cb {
     my ($stmt, $err) = @_;
     my $conn = $weak_conn;
     return if $conn && $conn->{pid} != $$;
-    return $done->(undef, $err // 'prepare failed') if defined $err || !defined $stmt;
+    return $done->(undef, $err // 'prepare failed',
+      DBIO::MySQL::EV::QueryExecutor::_handle_code($conn && $conn->{mdb}, $err))
+      if defined $err || !defined $stmt;
     my $mdb = $conn && $conn->{mdb}
       or return $done->(undef, 'the listen connection was closed');
     local $@;
     eval { $mdb->execute($stmt, $bind, _mysql_listen_executed_cb($conn, $stmt, $done)); 1 }
-      or $done->(undef, $@ || 'execute failed');
+      or do {
+        my $died = $@ || 'execute failed';
+        $done->(undef, $died, DBIO::MySQL::EV::QueryExecutor::_handle_code($mdb, $died));
+      };
     return;
   };
 }
@@ -1223,12 +1229,15 @@ sub _mysql_listen_executed_cb {
     my $conn = $weak_conn;
     return if $conn && $conn->{pid} != $$;
     my $mdb = $conn && $conn->{mdb};
+    # The execute's error number, read before the close: it is the execute's
+    # error the handle holds now.
+    my $code = DBIO::MySQL::EV::QueryExecutor::_handle_code($mdb, $err);
     my $closing;
     if ($mdb) {
       local $@;
-      $closing = eval { $mdb->close_stmt($stmt, sub { $done->($result, $err) }); 1 };
+      $closing = eval { $mdb->close_stmt($stmt, sub { $done->($result, $err, $code) }); 1 };
     }
-    $done->($result, $err) unless $closing;
+    $done->($result, $err, $code) unless $closing;
     return;
   };
 }
@@ -1242,7 +1251,7 @@ sub _mysql_listen_done_cb {
   Scalar::Util::weaken(my $weak_conn = $conn);
   my $settled;
   return sub {
-    my ($result, $err) = @_;
+    my ($result, $err, $code) = @_;
     return if $settled++;
     my ($self, $conn) = ($weak_self, $weak_conn);
     return if $conn && $conn->{pid} != $$;
@@ -1251,7 +1260,10 @@ sub _mysql_listen_done_cb {
       if (defined $err) {
         # The notify statements bind a channel and a payload: the server's
         # text for them is masked like any statement's (ADR 0075 of the core).
-        chomp(my $msg = _mysql_mask_error("$err", $bind, $sql));
+        # The server's error number: given by the prepare and execute paths,
+        # read here for the plain query, where the handle holds the error now.
+        $code //= DBIO::MySQL::EV::QueryExecutor::_handle_code($conn && $conn->{mdb}, "$err");
+        chomp(my $msg = _mysql_mask_error("$err", $bind, $sql, $code));
         $f->fail($msg);
       }
       else {
@@ -1280,6 +1292,8 @@ sub _mysql_listen_live {
 
 sub _mysql_listen_arm {
   my ($self, $conn, $watch) = @_;
+  require EV;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   $watch->{timer} = EV::timer(
     $conn->{notify}->poll_interval, 0,
     $self->_mysql_listen_cb($conn, $watch, '_mysql_listen_poll'),
@@ -1390,7 +1404,7 @@ DBIO::MySQL::EV::Storage - Async MySQL/MariaDB storage driver using EV::MariaDB
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -2027,7 +2041,7 @@ callback of a statement that was in flight at fork time runs in the child
 
 =head2 _mysql_mask_error
 
-  my $text = DBIO::MySQL::EV::Storage::_mysql_mask_error($text, \@values, $sql);
+  my $text = DBIO::MySQL::EV::Storage::_mysql_mask_error($text, \@values, $sql, $code);
 
 The error masker of this transport's executor (ADR 0075 of the core: a message
 names keys, columns and options, never a value). MySQL and MariaDB write the
@@ -2046,6 +2060,14 @@ C<INSERT>) and the statement runner of the listen connection
 (C<_mysql_listen_done_cb>). C<\@values> are plain values (the executor hands
 over the bound ones of four characters or more); the SQLSTATE of the exception
 is not a part of the text and stays.
+
+C<$code> is the error number of the server (1062, 1366, ...), optional: the
+server words its text in the language of its session (C<lc_messages>), and
+with the code L<DBIO::MySQL::Util/mask_error_details> masks the text by the
+code and not by the wording, so a short value is out of a German or French
+text as well. The executor reads it from the handle while the handle holds the
+error of the statement (L<DBIO::MySQL::EV::QueryExecutor/_handle_code>); no code
+is the masking by the wording alone.
 
 It is a function and not a method on purpose: it asks no storage and so never
 connects a dbh of the owning sync storage. It never throws -- a text it cannot

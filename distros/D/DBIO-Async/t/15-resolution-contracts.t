@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 BEGIN {
   plan skip_all => 'PERL_FUTURE_STRICT disables Future\'s plain-return wrapping'
@@ -69,7 +71,7 @@ use DBIO::Async::Storage;
   }
 
   sub _create_pool_connection {
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { r => $r, w => $w };
   }

@@ -1,7 +1,13 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900004';
+requires 'DBIO', '0.900007';
 requires 'DBD::Sybase', '1.26';
 requires 'Scope::Guard';
+
+# DBD::Sybase's Makefile.PL loads DBI before its own prereqs are installed
+# (mpeppler/DBD-Sybase#145): DBI goes in first, at configure time.
+on configure => sub {
+  requires 'DBI';
+};
 
 on test => sub {
   requires 'Test::More', '0.98';

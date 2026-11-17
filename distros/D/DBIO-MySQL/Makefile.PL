@@ -24,7 +24,7 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO::MySQL",
   "PREREQ_PM" => {
-    "DBIO" => "0.900004",
+    "DBIO" => "0.900007",
     "DateTime::Format::MySQL" => 0
   },
   "TEST_REQUIRES" => {
@@ -36,7 +36,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "Time::HiRes" => 0
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -45,7 +45,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBI::Const::GetInfoType" => 0,
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
   "Data::Dumper" => 0,
   "DateTime::Format::MySQL" => 0,
   "Scalar::Util" => 0,

@@ -1,0 +1,462 @@
+---
+_build_aggregate_sql:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: _build_aggregate_sql
+  input:
+    dbh:
+      _source: code
+      optional: 0
+      position: 3
+      type: hashref
+    join_clause:
+      _source: code
+      optional: 1
+      position: 1
+      type: string
+    spec:
+      _source: code
+      optional: 0
+      position: 0
+      type: hashref
+    table:
+      _source: code
+      optional: 1
+      position: 2
+      type: string
+  module: Database::Abstraction
+  new: ~
+  output:
+    _list_return: 2
+    type: array
+_build_having_fragment:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: _build_having_fragment
+  input:
+    alias_to_sql:
+      _source: code
+      optional: 0
+      position: 1
+      type: hashref
+    having:
+      _source: code
+      optional: 0
+      position: 0
+      type: hashref
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: array
+_build_joins:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: _build_joins
+  input:
+    join_spec:
+      _source: code
+      optional: 1
+      position: 0
+      type: arrayref
+  module: Database::Abstraction
+  new: ~
+  output: {}
+_build_where:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: _build_where
+  input:
+    params:
+      _source: code
+      optional: 1
+      position: 0
+      type: hashref
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: array
+_build_where_conditions:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: _build_where_conditions
+  input:
+    params:
+      _source: code
+      optional: 0
+      position: 0
+      type: hashref
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: array
+aggregate:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: aggregate
+  input:
+    entry:
+      _source: code
+      optional: 0
+      position: 0
+      type: string
+  module: Database::Abstraction
+  new: ~
+  output:
+    _list_return: 2
+    type: array
+columns:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: columns
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: arrayref
+count:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: count
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: string
+dbi_source:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: dbi_source
+  module: Database::Abstraction
+  new: ~
+  output:
+    _error_handling:
+      type: string
+      undef_on_error:
+      - $dbh && ref($dbh) && (($dbh->{Driver}{Name} // '') eq 'SQLite')
+    _error_return: undef
+    _success_failure_pattern: 1
+    type: hashref
+each_row:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: each_row
+  input:
+    callback:
+      _note: CODE reference - provide sub { } in tests
+      _source: code
+      optional: 0
+      position: 0
+      type: coderef
+    entry:
+      _source: code
+      optional: 0
+      position: 1
+      type: string
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: string
+execute:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: execute
+  input:
+    query:
+      _source: code
+      optional: 1
+      position: 0
+      type: number
+  module: Database::Abstraction
+  new: ~
+  output:
+    _context_aware: 1
+    type: string
+fetchrow_hashref:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: fetchrow_hashref
+  input:
+    entry:
+      _source: code
+      optional: 0
+      position: 0
+      type: string
+  module: Database::Abstraction
+  new: ~
+  output:
+    _context_aware: 1
+    _error_handling:
+      type: string
+      undef_on_error:
+      - exists($self->{'data'}->{$params->{'entry'}})
+      - 'all { $self->_match_criterion(exists($row->{$_}) ? $row->{$_} : undef, $bc->{$_},
+        $_) } keys %{$bc}'
+    _error_return: undef
+    _success_failure_pattern: 1
+    type: hashref
+import:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: import
+  module: Database::Abstraction
+  output: {}
+init:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: init
+  module: Database::Abstraction
+  output: {}
+new:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: new
+  module: Database::Abstraction
+  output:
+    _STATUS: DIES
+query:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: query
+  module: Database::Abstraction
+  new: ~
+  output: {}
+schema:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: schema
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: hashref
+select:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: select
+  input:
+    database:
+      _source: code
+      optional: 0
+      position: 0
+      type: string
+  module: Database::Abstraction
+  new: ~
+  output:
+    _returns_self: 1
+    isa: Database::Abstraction
+    type: object
+selectall_array:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: selectall_array
+  module: Database::Abstraction
+  new: ~
+  output:
+    _context_aware: 1
+    _error_handling:
+      empty_list: 1
+      type: string
+    _error_return: empty_list
+    _list_context:
+      type: array
+    _scalar_context:
+      type: scalar
+    type: array
+selectall_arrayref:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: selectall_arrayref
+  input:
+    entry:
+      _source: code
+      optional: 0
+      position: 0
+      type: string
+  module: Database::Abstraction
+  new: ~
+  output:
+    _list_return: 2
+    type: array
+selectall_hash:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: selectall_hash
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: string
+selectall_hashref:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: selectall_hashref
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: string
+set_logger:
+  accessor:
+    param: logger
+    property: logger
+    type: setter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: set_logger
+  input:
+    logger:
+      type: any
+  module: Database::Abstraction
+  new: ~
+  output:
+    _returns_self: 1
+    _void_context_hint: setter
+    isa: Database::Abstraction
+    type: object
+updated:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: updated
+  module: Database::Abstraction
+  new: ~
+  output:
+    type: string

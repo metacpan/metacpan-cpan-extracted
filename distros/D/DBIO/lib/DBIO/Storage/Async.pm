@@ -4,7 +4,7 @@ package DBIO::Storage::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage';
 
@@ -3167,7 +3167,7 @@ DBIO::Storage::Async - Base class for async storage implementations
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

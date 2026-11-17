@@ -160,4 +160,14 @@ no_leaks_ok {
 	   'concat: a string prints the help screen');
 }
 
+# An empty frame of the other kind ([] among HoAs, {} among AoHs) is skipped
+# like any other empty frame.  Up to 0.3422 it was dereferenced as the first
+# frame's kind and died "Not a HASH reference".
+is_deeply(concat({ a => [1] }, [], { a => [2] }), { a => [1, 2] }, 'concat: an empty AoA among HoAs is skipped');
+is_deeply(concat([], { a => [1] }), { a => [1] }, 'concat: an empty AoA before a HoA is skipped');
+is_deeply(concat({}, [ { a => 1 } ]), [ { a => 1 } ], 'concat: an empty hash before an AoH is skipped');
+is_deeply(concat([ [1] ], {}, [ [2] ]), [ [1], [2] ], 'concat: an empty hash among AoAs is skipped');
+throws_ok { concat([ { a => 1 } ], \1) } qr/every frame must be an ARRAY or HASH ref/,
+	'concat: a frame after the first non-empty one is still checked for its kind';
+
 done_testing();

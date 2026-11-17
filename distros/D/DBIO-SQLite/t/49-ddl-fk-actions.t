@@ -739,7 +739,7 @@ section "one key, several relationships: installed and used" => sub {
 #
 # This pins what happens today so that it cannot change without anybody
 # noticing. It does not say that two keys are right, or that this order is.
-section "one key, two different actions: as it is today (karr k74 open)" => sub {
+section "one key, two different actions: as it is today" => sub {
   is_deeply(fk_lines(FB => 'differ'),
     [ "$REF ON DELETE CASCADE", "$REF ON DELETE SET NULL" ],
     'differ: each relationship writes its line, with its own action, in name order');

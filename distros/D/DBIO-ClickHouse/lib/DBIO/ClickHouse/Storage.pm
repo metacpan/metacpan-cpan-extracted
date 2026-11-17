@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -509,7 +509,7 @@ DBIO::ClickHouse::Storage - ClickHouse storage driver for DBIO (MySQL wire proto
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

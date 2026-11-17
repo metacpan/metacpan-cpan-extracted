@@ -1,0 +1,37 @@
+# Example suite shipped with Langertha-Holmgang, to learn suite format 2 from.
+# Origin: written for this distribution; every scenario, name and value is
+# invented and no real benchmark case (ADR 0003). Names use example.org and
+# the documentation addresses of RFC 5737.
+# Author: Torsten Raudssus <torsten@raudssus.de>
+# License: same terms as Perl itself (Perl_5), like the distribution.
+format: 2
+id: demo-linux
+version: 1
+title: "Demo: small edits on a Linux server"
+description: Two invented cases on a simulated Linux device, run through run_command and write_file.
+license: Perl_5
+source:
+  title: Langertha-Holmgang example suites
+  authors: Torsten Raudssus <torsten@raudssus.de>
+  license: Perl_5
+  url: https://github.com/Getty/langertha-holmgang
+topic: demo
+threshold: { pass_rate: 1 }
+defaults:
+  system: "You administer Linux servers through the tools. Act, do not explain."
+  max_turns: 6
+tools:
+  - name: run_command
+    simulator: run_command
+    description: Run a shell command on a host.
+    parameters:
+      type: object
+      required: [host, command]
+      properties: { host: { type: string }, command: { type: string } }
+  - name: write_file
+    simulator: write_file
+    description: Replace a file on a host.
+    parameters:
+      type: object
+      required: [host, path, content]
+      properties: { host: { type: string }, path: { type: string }, content: { type: string } }

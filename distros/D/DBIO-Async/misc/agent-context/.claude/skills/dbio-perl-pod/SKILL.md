@@ -2,6 +2,8 @@
 name: dbio-perl-pod
 description: Use when writing or editing POD in a DBIO distribution — # ABSTRACT, =attr/=method/=seealso, what PodWeaver generates.
 user-invocable: false
+allowed-tools: Read, Grep, Glob
+model: sonnet
 ---
 
 # POD under `[@DBIO]`

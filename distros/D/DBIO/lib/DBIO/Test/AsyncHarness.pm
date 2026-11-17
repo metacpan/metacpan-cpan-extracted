@@ -4,7 +4,7 @@ package DBIO::Test::AsyncHarness;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp 'croak';
 use Test::More ();
@@ -411,7 +411,7 @@ DBIO::Test::AsyncHarness - Parameterised live harness base for DBIO async transp
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

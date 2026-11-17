@@ -23,7 +23,7 @@ types) to this repo's `dbio-worker-mssql` instead of touching them yourself. Lan
 - `DBIO::MSSQL::SQLMaker` — MSSQL SQL dialect
 - `DBIO::MSSQL::Storage::Sybase` — MSSQL via DBD::Sybase
 
-**`-nulls` in `order_by` is emulated** (karr k78, maintainer's decision 2026-10-25; SQL Server has no
+**`-nulls` in `order_by` is emulated** (SQL Server has no
 NULLS FIRST/LAST). `DBIO::MSSQL::SQLMaker` renders `{ -asc|-desc => col, -nulls => 'first'|'last' }` as
 `CASE WHEN col IS NULL THEN 0 ELSE 1 END ASC, col ASC|DESC` (`last`: `THEN 1 ELSE 0`), the key always
 ASC (`_render_op_nulls`, `render_op` copied in `new` as in dbio-mysql). The ROW_NUMBER limit takes the
@@ -49,30 +49,30 @@ Supports both scalar and hash `connect_info` formats.
 
 - `DBIO::MSSQL::Introspect::Tables` — `INFORMATION_SCHEMA.TABLES`
 - `DBIO::MSSQL::Introspect::Columns` — `INFORMATION_SCHEMA.COLUMNS` + PK/identity
-- `DBIO::MSSQL::Introspect::Indexes` — `sys.indexes` / `sys.index_columns` (incl. `filter_definition`, karr k76)
+- `DBIO::MSSQL::Introspect::Indexes` — `sys.indexes` / `sys.index_columns` (incl. `filter_definition`)
 - `DBIO::MSSQL::Introspect::ForeignKeys` — `REFERENTIAL_CONSTRAINTS` + `TABLE_CONSTRAINTS`
-- `DBIO::MSSQL::Introspect::Views` — `sys.views` + `sys.sql_modules`; the stored text goes into `tables->{view}{definition}` (read in 4000-character pieces: an `nvarchar(max)` is cut at TEXTSIZE over DBD::Sybase), karr k82
+- `DBIO::MSSQL::Introspect::Views` — `sys.views` + `sys.sql_modules`; the stored text goes into `tables->{view}{definition}` (read in 4000-character pieces: an `nvarchar(max)` is cut at TEXTSIZE over DBD::Sybase)
 
 ## Diff Sub-modules
 
-- `DBIO::MSSQL::Diff::Schema` — CREATE SCHEMA for a schema the target needs and the live DB lacks (karr k72); first op of the diff, never a DROP SCHEMA
-- `DBIO::MSSQL::Diff::View` — `CREATE OR ALTER VIEW` for a new or changed view, `DROP VIEW` for a live view the classes lack (karr k82, replaces k45's omission; no `skipped_views` any more). Compared: the text after the header's `AS`, white space folded, case kept (`View->body/normalize`). One statement per batch; drops after the FK drops and before DROP TABLE, creates/alters last; `schema.view` quoted per part, `Diff::Schema` creates the schema; views among themselves by dependency: Introspect puts `depends_on` (view keys read, from `sys.sql_expression_dependencies`) into the model, creates go after what they read, drops before; cycle or unknown view read = DBIO::Exception "refused" before any statement; `DDL::_order_view_statements` orders install_ddl by the names the text mentions (t/125, live t/126)
+- `DBIO::MSSQL::Diff::Schema` — CREATE SCHEMA for a schema the target needs and the live DB lacks; first op of the diff, never a DROP SCHEMA
+- `DBIO::MSSQL::Diff::View` — `CREATE OR ALTER VIEW` for a new or changed view, `DROP VIEW` for a live view the classes lack. Compared: the text after the header's `AS`, white space folded, case kept (`View->body/normalize`). One statement per batch; drops after the FK drops and before DROP TABLE, creates/alters last; `schema.view` quoted per part, `Diff::Schema` creates the schema; views among themselves by dependency: Introspect puts `depends_on` (view keys read, from `sys.sql_expression_dependencies`) into the model, creates go after what they read, drops before; cycle or unknown view read = DBIO::Exception "refused" before any statement; `DDL::_order_view_statements` orders install_ddl by the names the text mentions (t/125, live t/126)
 - `DBIO::MSSQL::Diff::Table` — CREATE/DROP TABLE (no inline FK: keys are `Diff::ForeignKey` ops)
 - `DBIO::MSSQL::Diff::Column` — ADD/ALTER/DROP COLUMN
 - `DBIO::MSSQL::Diff::Index` — CREATE/DROP INDEX (clustered/nonclustered); a unique constraint
   (`is_unique_constraint` from `sys.indexes`) is `ALTER TABLE ... ADD/DROP CONSTRAINT`
 - `DBIO::MSSQL::Diff::ForeignKey` — ADD/DROP CONSTRAINT, also for new and dropped tables
-- `DBIO::MSSQL::Diff::PrimaryKey` — DROP/ADD CONSTRAINT `PK_<table>` on existing tables (karr k74; live name from `pk_constraint_name`; CLUSTERED/NONCLUSTERED (`pk_clustered`) is compared too -- the classes create the key clustered, a live nonclustered one is replaced, and the ADD says `CLUSTERED` out loud (without it the server makes the key nonclustered while a clustered index stands, measured); referencing FKs dropped/re-added around it; key dropped around a type change of a key column; a target without key DROPS the live one -- summary line `PRIMARY KEY DROPPED`, undeclared referencing FKs dropped first, a declared referencing FK without a unique key over the same columns is refused with DBIO::Exception; measured: server refuses the drop while an FK references it and cannot create an FK onto a table without PK/candidate key). `install_ddl` names the key `PK_<table>` too
+- `DBIO::MSSQL::Diff::PrimaryKey` — DROP/ADD CONSTRAINT `PK_<table>` on existing tables (live name from `pk_constraint_name`; CLUSTERED/NONCLUSTERED (`pk_clustered`) is compared too -- the classes create the key clustered, a live nonclustered one is replaced, and the ADD says `CLUSTERED` out loud (without it the server makes the key nonclustered while a clustered index stands, measured); referencing FKs dropped/re-added around it; key dropped around a type change of a key column; a target without key DROPS the live one -- summary line `PRIMARY KEY DROPPED`, undeclared referencing FKs dropped first, a declared referencing FK without a unique key over the same columns is refused with DBIO::Exception; measured: server refuses the drop while an FK references it and cannot create an FK onto a table without PK/candidate key). `install_ddl` names the key `PK_<table>` too
 
-## Schemas (karr k72, maintainer's decision 2026-10-25)
+## Schemas
 
 A table or view name `schema.table` is made in that schema; `dbo.t` is `t`; two or more
 dots (database-qualified) or an empty part are refused (`DDL::_check_table_name`).
 `DDL::_quote_table` quotes both parts on their own (`[my schema].t`); a bare name is
 `dbo` and written bare, as before. `install_ddl` writes `CREATE SCHEMA x;` for every
 schema the classes name, each a statement of its own (it has to be first in its batch;
-`_execute_ddl` runs statement by statement, measured over DBD::ODBC and DBD::Sybase
-2026-10-25, inside the `txn_do` bracket too), before the first object. Constraint
+`_execute_ddl` runs statement by statement, measured over DBD::ODBC and DBD::Sybase,
+inside the `txn_do` bracket too), before the first object. Constraint
 names are made from the *bare* table (`PK_t`, `FK_t_col`, `UQ_t_col`, `DF_t_col`) --
 they live in the schema of their table, so `one.t` and `two.t` may both have `PK_t`;
 `_check_constraint_names` and the unique-name check are per schema (`_schema_prefix`).
@@ -85,24 +85,23 @@ schema says `schema.table` in `to_table` (`to_schema` carries the schema; the qu
 schemas that exist. `Deploy::_new_introspect` hands it the schemas the classes name
 (`DDL::_schemas_of`), for the live and the throwaway database alike -- a schema no class
 names is not looked at, its tables are neither compared nor dropped. `Introspect::Columns`
-joins identity columns on the schema too (it used to mix same-named tables of two schemas).
+joins identity columns on the schema too .
 `Diff::Schema` decides CREATE SCHEMA from the target's table keys against the source's
 `schemas` and table keys (case-insensitively in a CI database); `Diff` puts it first.
 A schema is **never dropped** (not decided). Open: a live `dbo` table whose name has a dot
 (`[a.b]`) reads as table `b` of schema `a` in the model. Offline `t/111`, live `t/112`.
 
-**Names follow the collation of the live database** (karr k77; measured 2026-10-25, MSSQL 2022,
-server and tempdb `SQL_Latin1_General_CP1_CI_AS`): in a CI database `Foo`/`foo` as tables, columns, indexes
+**Names follow the collation of the live database** : in a CI database `Foo`/`foo` as tables, columns, indexes
 or constraints are duplicates (refused, Msg 2714/2705/1913), in a `_CS_` one they are two objects.
 `Introspect` puts `collation => { name, case_sensitive }` (ComparisonStyle bit 1 = ignore case) into the
 model; `Diff::_fold_names` writes the target's names in the live spelling when the source model is CI, so a
 change of spelling alone is no operation (no `sp_rename`, which the server would accept for a table and a
-column even in CI: not built, a recommendation on k77). A model without `collation` compares exactly.
+column even in CI: not built, a recommendation). A model without `collation` compares exactly.
 `Deploy::_create_temp_db` creates the throwaway database `COLLATE`d like the live one (t/109, live t/110).
 
 `DBIO::MSSQL::Diff` orders the ops itself (core's walk is alphabetical): FK drops, index/unique
-drops, PK drops, DROP TABLE, column ops, CREATE TABLE, PK adds, index/unique creates, FK adds (t/92, live t/93, karr k71; PK: t/103, live t/104, karr k74).
-One rule for FKs around a changing key or column (`Diff.pm`, k74; measured 2026-10-21): an FK that
+drops, PK drops, DROP TABLE, column ops, CREATE TABLE, PK adds, index/unique creates, FK adds (t/92, live t/93; PK: t/103, live t/104).
+One rule for FKs around a changing key or column (`Diff.pm`): an FK that
 references a key the diff drops (PK, unique constraint or unique index, from any source incl. the
 unbinds-dependents extras) or stands on a column the diff retypes (`Diff::Column::retypes`, child
 or referenced column, a width change of nvarchar too -- server: "object FK is dependent on column"; a
@@ -114,15 +113,15 @@ FK onto columns no PK/unique key covers afterwards is refused with DBIO::Excepti
 `DBIO::MSSQL::DDL->install_ddl($schema)` generates a full DDL script from DBIO classes.
 Handles: table creation with inline PK (FKs as `ALTER TABLE ADD CONSTRAINT` after all tables), unique constraints, `IDENTITY(1,1)` for auto-inc,
 and standalone indexes via `mssql_indexes` class method and the canonical index
-declaration of the ResultSource (Cake `idx`/`indices`, ADR 0061, karr k66) read
+declaration of the ResultSource (Cake `idx`/`indices`, ADR 0061) read
 with `index_declarations_for('mssql', ['kind', 'where'])`; own block
 `mssql => { kind => 'clustered'|'nonclustered', where => '<predicate>' }`, canonical wins on equal name,
 foreign-only block / unknown key / invalid kind throw. `where` (also in a `mssql_indexes` entry) makes a
-filtered index (karr k76): written as `... (cols) WHERE <predicate>`; empty/non-string `where` and a filter on a
+filtered index: written as `... (cols) WHERE <predicate>`; empty/non-string `where` and a filter on a
 `clustered` index are refused; a filtered index over the key's columns is written (the unfiltered duplicate is not).
 Introspect reads `sys.indexes.filter_definition` as `filter`; the server returns its own form (`a = 1` as `([a]=(1))`),
 so `Diff::Index::normalize_filter` compares (case, brackets, spaces, parentheses around numbers and the whole
-predicate; literals exact), a changed/added/removed filter is drop+create (t/107, live t/108). A `clustered` index on a table with a primary key (the key is `CLUSTERED`) and a second clustered index on any table are refused (Msg 1902; karr k71, t/96); a string default that is no number on a numeric/bit type is refused, date/time types are not (open: live t/99). Deploy/Diff build the
+predicate; literals exact), a changed/added/removed filter is drop+create (t/107, live t/108). A `clustered` index on a table with a primary key (the key is `CLUSTERED`) and a second clustered index on any table are refused (Msg 1902, t/96); a string default that is no number on a numeric/bit type is refused, date/time types are not (open: live t/99). Deploy/Diff build the
 desired model through `install_ddl`, so nothing else reads the declaration.
 
 ## MSSQL-Specifics
@@ -136,7 +135,14 @@ desired model through `install_ddl`, so nothing else reads the declaration.
 | `datetimeoffset` | 0001-01-01 to 9999-12-31 | 100ns + timezone |
 | `smalldatetime` | 1900-01-01 to 2079-06-06 | 1 min |
 
-Storage uses `DBIO::MSSQL::Storage::DateTime::Format` (Strptime-based).
+Storage uses `DBIO::MSSQL::Storage::DateTime::Format` (Strptime-based). It reads
+`YYYY-MM-DD hh:mm:ss.mmm` but **writes `YYYYMMDD hh:mm:ss[.mmm]`** for `datetime`/`smalldatetime`: the dashed
+form is read by the session's DATEFORMAT (German/French `dmy` swapped day and month, Msg 242 for day > 12), the
+digits-only form is language-independent; the session is never changed (t/133 live, t/31 offline).
+`date` has its own pair (`date_parse_pattern`/`date_format_pattern`, so core's `parse_date`/`format_date` work): written `YYYYMMDD`,
+read as `YYYY-MM-DD` (DBD::ODBC) or `YYYY-MM-DDT00:00:00.000Z` (DBD::Sybase, ISO_strict). `datetime2`, `datetimeoffset` and `time`
+have no channel (`inflate_datetime => 1` falls back to `parse_datetime`): `datetime2` keeps milliseconds only on read (`%3N`),
+`datetimeoffset` is written without its offset, `time` does not parse (open, not decided).
 
 ### MONEY
 
@@ -169,7 +175,7 @@ No native bulk INSERT in DBIO. Use `OUTPUT` clause or direct `BULK INSERT` via `
 
 ### Connection parameters without a DSN
 
-`DBIO::MSSQL::Storage::_connect_params_dsn` (core ADR 0057, karr k37) builds the
+`DBIO::MSSQL::Storage::_connect_params_dsn` (core ADR 0057) builds the
 DSN for `{ dbname, host, port }` (AccessBroker::Static, or a connect-info hash
 without `dsn`). The registered name `MSSQL` is no DBD, so the DSN always names
 DBD::Sybase: `dbi:Sybase:host=..;port=..;database=..`, parts not given left out
@@ -178,8 +184,7 @@ without `port` and `port` without `host` throw — DBD::Sybase ignores a lone on
 and no 1433 is assumed. ODBC has no form these parts can fill:
 `DBIO::MSSQL::Storage::ODBC` keeps core's ODBC refusal through its base order
 (pinned in `t/59-connect-params-dsn.t`); the whole DSN goes in as `dsn` or as a
-`dbname` starting with `dbi:`. All three forms are live-verified (2026-10-05,
-MSSQL 2022, DBD::Sybase 1.27 / FreeTDS 1.3.17, `t/60-connect-params-live.t`);
+`dbname` starting with `dbi:`. All three forms are live-verified (MSSQL 2022, DBD::Sybase 1.27 / FreeTDS 1.3.17, `t/60-connect-params-live.t`);
 that file needs `DBIO_TEST_MSSQL_DSN` in exactly the form
 `dbi:Sybase:host=..;port=..;database=..` and skips on anything else. The seam
 is asked at `connect_info`, on the declared base class, before the storage
@@ -189,13 +194,13 @@ decides the DBD, and connection parameters always lead to
 seam of the class the storage became: the same form over DBD::Sybase, core's
 refusal over DBD::ODBC (pinned in `t/62-adapt-access-path.t`). Two defects
 were found on the way, both fixed: the DBD::Sybase class read `@@identity`
-over FreeTDS, which a trigger overwrites (k39, see "The key of a new row"
-below), and bind values were cut to 4000 without an error (k40, see "Bind
+over FreeTDS, which a trigger overwrites (see "The key of a new row"
+below), and bind values were cut to 4000 without an error (see "Bind
 values over 4000 bytes over DBD::Sybase" below).
 
 ### HostBound seam `_bind_host_into_dsn`
 
-Core k276 (ADR 0013 addendum 2026-10-09), here karr k64. A
+Core ADR 0013 addendum. A
 `DBIO::AccessBroker::HostBound` view asks the storage class
 `_bind_host_into_dsn($driver, $dsn, $host, $port)`; it answers the DSN or
 `(undef, $form)`, and the view then refuses the connection with the form in
@@ -213,7 +218,7 @@ declines `server=NAME`) is core's default via `next::method`. Offline in
 
 ### A declared storage adapts itself to the access path
 
-Core ADR 0059 (core k301, maintainer decision 2026-10-06), here karr k37. The
+Core ADR 0059. The
 `MSSQL` component and the `-ms` shortcut pin `DBIO::MSSQL::Storage` — that pin
 declares the driver, and core never asks the DSN what the driver is. `DBIO::MSSQL::Storage::_adapt_to_access_path($dbd)` is what core
 calls instead, at the first use that needs the driver:
@@ -225,14 +230,14 @@ calls instead, at the first use that needs the driver:
   so the declared way ends in the class the generic way ends in. Without
   DBIO::Sybase installed the hook throws, naming it.
 - `$dbd` undef: for a connection coderef the hook runs it and reads the DBD
-  off the handle; connect info without a DSN is refused by core at connect (k306), so the
+  off the handle; connect info without a DSN is refused by core at connect, so the
   hook never sees one.
 - Only the declared base moves. A private subclass pinned through
   `storage_type` stays what it is (core throws if a hook moves a storage out
   of the class that was declared); a storage pinned to `::ODBC` or `::Sybase`
   itself is already there. **Over DBD::ODBC** core reports the private
   subclass's DBD as not its own (a warning). **Over DBD::Sybase it is
-  refused** (karr k42, k43; `docs/adr/0008`): the hook throws, naming
+  refused** (`docs/adr/0008`): the hook throws, naming
   `DBIO::MSSQL::Storage::Sybase` as the class to derive from and DBD::ODBC as
   the other way, whatever `driver_strict`/`driver_warnings` say. This departs
   from ADR 0059 (c)/(d), where a mismatch only warns. A layer class core
@@ -247,16 +252,16 @@ calls instead, at the first use that needs the driver:
   the DBD of another driver (`dbi:Pg:`) is reported by core.
 - `DBIO::MSSQL::Storage::Sybase::_adapt_to_access_path` does **not** call
   `next::method`: `DBIO::Sybase::Storage` precedes `DBIO::MSSQL::Storage` in
-  that class's linearisation, and a hook there (dbio-sybase k64) is the ASE
+  that class's linearisation, and a hook there is the ASE
   dispatcher's.
 
 Offline in `t/62-adapt-access-path.t` (DBI->connect replaced). **The ODBC
-branch is also held live** (karr k54, `t/72-adapt-access-path-odbc-live.t`,
-2026-10-17, MSSQL 2022 16.0.4295.3, DBD::ODBC 1.61 / tdsodbc 1.3.17, DSN
+branch is also held live** (`t/72-adapt-access-path-odbc-live.t`,
+MSSQL 2022 16.0.4295.3, DBD::ODBC 1.61 / tdsodbc 1.3.17, DSN
 `dbi:ODBC:Driver=FreeTDS;Server=..;Port=..;Database=..;TDS_Version=7.4`):
 a schema with the component is `DBIO::MSSQL::Storage` before the first use
 and `DBIO::MSSQL::Storage::ODBC` after it, one `DBI->connect`, no warning.
-Live over DBD::Sybase (2026-10-07, MSSQL 2022 16.0.4295.3, DBD::Sybase
+Live over DBD::Sybase (MSSQL 2022 16.0.4295.3, DBD::Sybase
 1.27 / FreeTDS 1.3.17, TDS 7.4, DSN `dbi:Sybase:host=..;port=..;database=..`):
 a schema with the component ends as `DBIO::MSSQL::Storage::Sybase::FreeTDS`,
 and core's "Driver mismatch for declared storage class DBIO::MSSQL::Storage"
@@ -264,31 +269,31 @@ warning, which every declared MSSQL schema got at its first use before, is
 gone.
 
 What a declared schema over DBD::Sybase got with that class, measured in t/60
-and t/61 against what the base class did there on 2026-10-05:
+and t/61 against what the base class did there:
 
 - gained: the server version, DateTime inflation with `datetime_setup`, the
   NoBindVars class when told the connection has no placeholders, statement
   caching turned off;
-- **lost, then fixed, k39**: `create()` on a table whose trigger inserts into
+- **Key of a new row**, fixed: `create()` on a table whose trigger inserts into
   another IDENTITY table returned that table's identity (1000 where the row is
   1). The base class appends `SELECT SCOPE_IDENTITY()` and was right; the class
   does too now ("The key of a new row");
-- **lost, then refused, k47**: the FreeTDS class sets `SET TEXTSIZE` to
+- **Long values**, refused: the FreeTDS class sets `SET TEXTSIZE` to
   `LongReadLen` (32768 unless the connect info says otherwise), so a
   100000-character value came back cut to 32768, without an error. The base
-  class left the TDS 7.4 default and read it whole. Since k47 a column of a
+  class left the TDS 7.4 default and read it whole. A column of a
   result source is read behind a check the server runs and a value over
   TEXTSIZE is **refused**, not cut ("Values longer than TEXTSIZE" below); the
   raw handle is as it was;
-- transactions with an open cursor: see the next section (decided and built, k43).
+- transactions with an open cursor: see the next section (decided and built).
 
 ### Transactions with an active statement handle over DBD::Sybase
 
-Decided by the maintainer 2026-10-18 and built in `DBIO::Sybase::Storage::FreeTDS`
-(dbio-sybase karr k65, here karr k43); measured live in
-`t/61-txn-freetds-live.t` (karr k41; MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 /
+Built in `DBIO::Sybase::Storage::FreeTDS`
+; measured live in
+`t/61-txn-freetds-live.t` (MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 /
 FreeTDS 1.3.17, TDS 7.4, both DSN forms, both ways: declared and pinned, one
-expectation for both since k37). DBD::Sybase runs a statement on a database
+expectation for both). DBD::Sybase runs a statement on a database
 handle with an active statement handle (an open cursor: a resultset read with
 `->next`, not to its end) over a second connection, outside the transaction.
 The FreeTDS class therefore never sends a transaction statement past one:
@@ -318,23 +323,22 @@ The FreeTDS class therefore never sends a transaction statement past one:
   pins today's state.
 - ASE's `txn_scope_guard` trigger -- a statement refused at prepare -- is
   harmless here: on TDS 7.4 the refused prepare leaves no statement handle.
-- Before the decision (measured 2026-10-05, 2026-10-07): the three statements
+- Before the decision : the three statements
   went out with `$dbh->do` on a second connection. SQL Server answered a stray
   COMMIT/ROLLBACK with Msg 3902/3903, the storage did not count down, the
   transaction stayed open and the row locked, and a `txn_scope_guard` + `die`
   told the caller nothing; with the cursor open before the transaction the
-  UPDATE ran outside it on a named server and was committed for good. Since
-  core of 2026-10-13 (k303, k65) the handle whose rollback failed was
-  discarded and `txn_do` ran its block twice. All of that is gone.
+  UPDATE ran outside it on a named server and was committed for good. A handle whose rollback failed was
+  discarded and `txn_do` ran its block twice. The FreeTDS class avoids all of that.
 - The base class `DBIO::MSSQL::Storage` on a DBD::Sybase handle -- what a
-  declared schema had until k37 -- failed differently (COMMIT and ROLLBACK
-  refused by the client library, `txn_do` ran its body twice; k42, k43). That
-  pin is **refused** now (k42, k43; `docs/adr/0008`): the access path hook
+  declared schema -- failed differently (COMMIT and ROLLBACK
+  refused by the client library, `txn_do` ran its body twice). That
+  pin is **refused** (`docs/adr/0008`): the access path hook
   throws before anything runs, nothing of it is in t/61.
 
 ### Bind values over 4000 bytes over DBD::Sybase
 
-karr k40, measured 2026-10-07 (MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 /
+Measured (MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 /
 FreeTDS 1.3.17, TDS 7.4; client charset UTF-8, taken from the locale).
 
 **The cause.** FreeTDS prepares with `sp_prepare` and declares every
@@ -381,16 +385,16 @@ value of more than 4000 bytes — as DBD::Sybase sends it: Perl's internal bytes
 
 **Not reached, measured:** a private subclass of `DBIO::MSSQL::Storage` on a
 DBD::Sybase handle stored 4000 of 5000 — the base is transport-neutral and has
-none of this; such a pin is refused since k42 (`docs/adr/0008`). NoBindVars
+none of this; such a pin is refused (`docs/adr/0008`). NoBindVars
 and DBD::ODBC do not have the defect (ODBC:
 5000 and 100000 characters arrive whole as binds, plain DBI and through
 `DBIO::MSSQL::Storage::ODBC`).
 
-**Found on the way** (the NoBindVars literal is core's and only noted on k40;
-k49 and k55 are decided and built, see "Strings beyond ASCII and empty strings"
-below; k50, binary values, is fixed -- see "Binary values" below):
+**Found on the way** (the NoBindVars literal is core's and is core's;
+the refusals are decided and built, see "Strings beyond ASCII and empty strings"
+below; binary values are bound as described in "Binary values" below):
 
-- k51, decided (left as it is): a statement run on the handle directly
+- Decided (left as it is): a statement run on the handle directly
   (`dbh_do`, `on_connect_do` with bind values) passes the storage by and is
   still cut, and it is as exposed to the two defects of the next section. The
   caller has the handle in hand. Documented in the POD and the matrix below.
@@ -399,21 +403,21 @@ below; k50, binary values, is fixed -- see "Binary values" below):
   character the code page lacks becomes `?`. Measured on the literal with
   plain DBI, not through the NoBindVars class.
 - Over DBD::ODBC a bound string with characters outside the code page was
-  refused by the driver even for an NVARCHAR column (k58, fixed: "Strings
+  refused by the driver even for an NVARCHAR column (fixed: "Strings
   beyond the code page over DBD::ODBC").
 
 ### Strings beyond ASCII and empty strings over DBD::Sybase
 
-Maintainer's principle (2026-10-17): silently wrong behaviour (data corruption)
+Principle: silently wrong behaviour (data corruption)
 is refused loudly or fixed; DBD::ODBC is the supported access path; where
 DBD::Sybase corrupts and the driver cannot repair it, the storage refuses with
 a message that names DBD::ODBC, and that refusal is tested. Both cards in
-`DBIO::MSSQL::Storage::Sybase`, in `_rewrite_binds` (the seam of k40/k50),
+`DBIO::MSSQL::Storage::Sybase`, in `_rewrite_binds` (the seam of the long-value and binary rewrites),
 no `@ISA` change. Offline `t/81-nonascii-empty-binds.t`, live per access path
 `t/82-nonascii-empty-live.t`.
 
-**k49, refused.** A bound string with a character beyond ASCII is corrupted at
-any length (measured 2026-10-08; MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 /
+**Beyond ASCII, refused.** A bound string with a character beyond ASCII is corrupted at
+any length (MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 /
 FreeTDS 1.3.17): FreeTDS sends it as a fixed CHAR of its length in client
 bytes, converted to the server's code page, and the server pads it with
 blanks (`ä` arrives as `ä` + one blank, `€` + two); a character the code page
@@ -432,26 +436,26 @@ whether an index is used, and was not built.
 - Holds for `INSERT`, `UPDATE`, `DELETE`, conditions, literal SQL with binds,
   `EXEC`; `populate` in void context refuses before its first row
   (`_bulk_text_values`).
-- Not refused: NULL, a value for a binary column (k50: its hex form), a value
-  of more than 4000 bytes (k40: a literal, exact), ASCII.
+- Not refused: NULL, a value for a binary column (its hex form), a value
+  of more than 4000 bytes (a literal, exact), ASCII.
 - Applied for the whole class, FreeTDS or not (only FreeTDS was measured).
   Introspection or deploy queries that bind a non-ASCII name over this
   transport are refused too.
 - Not touched: the NoBindVars class (core's plain literal: `?` for a character
-  the code page lacks, noted on k40), and a statement on the handle (k51).
+  the code page lacks), and a statement on the handle.
 - What was `t/63`'s "1333 euro signs are a placeholder" (3999 bytes, under the
   line) is a refusal now; the claim of that block, that the line is drawn in
   bytes, stands (1334 euro signs are a literal).
-- Over DBD::ODBC on the test host (plain DBI, 2026-10-17, fresh connection per
+- Over DBD::ODBC on the test host (plain DBI, fresh connection per
   value): `€` is exact in `VARCHAR` (0x80) and `NVARCHAR`; `ä`, `aäb`, CJK and
   the emoji are refused by the FreeTDS ODBC driver with errors of its own
   ("Character set conversion is not available between client character set
   ... and server character set", "Error converting characters into server's
   character set"), the handle then answers "Invalid cursor state". Loud, not
-  silent; the client character set is an environment matter (k58: "Strings
+  silent; the client character set is an environment matter (see "Strings
   beyond the code page over DBD::ODBC").
 
-**k55, fixed.** DBD::Sybase binds an empty string as one blank
+**Empty string, fixed.** DBD::Sybase binds an empty string as one blank
 (`dbdimp.c`; ASE has no empty string). Bound, `''` was stored with `DATALENGTH`
 1 in `VARCHAR`/`TEXT`, 2 in `NVARCHAR`, and `LIKE ''` found the row of the
 blank. Option L of the card: `_rewrite_binds` writes the literal `''` where the
@@ -461,7 +465,7 @@ placeholder stood.
   value through `redact_bind_value`).
 - `EXEC` with `''` throws (RPC drops what stands around the placeholder; the
   procedure would be handed a blank). A `?` that is no placeholder beside `''`
-  throws (count check, as k40). `populate` in void context goes row by row in
+  throws (count check, as for long values). `populate` in void context goes row by row in
   one transaction when a row has `''`. NULL stays NULL, a bound `' '` stays
   one blank.
 - Measured live on both access paths, one set of expectations (t/82):
@@ -481,28 +485,28 @@ it).
 
 | Case | DBD::ODBC (supported) | DBD::Sybase / FreeTDS (restricted) |
 |------|-----------------------|-------------------------------------|
-| Bind of > 4000 bytes | bound, whole | literal in the statement, whole (k40) |
-| Bind beyond ASCII, into a column that is `NCHAR`/`NVARCHAR`/`NTEXT` **on the server**: declared `nchar`, `nvarchar`, `ntext` — and `text`, `varchar`, `string`, `char`, which DBIO deploys as national (`_server_data_type`) | exact: `SQL_WLONGVARCHAR`; the ODBC client character set must be UTF-8, else the string is **refused** (k58). A string that already is UTF-8 bytes is **encoded a second time**, silently — it cannot be told from text (documented, not fixable) | **refused**, naming DBD::ODBC (k49) |
-| Bind beyond ASCII, into a real `VARCHAR`/`CHAR`: declared `varchar(n)`, `char(n)`, `varchar(max)` | what the code page has is exact; what it lacks is refused by the driver (loud; the driver's connection is then abandoned by core, with warnings; k58) | **refused** (k49) |
-| Empty string `''` | exact | fixed: literal `''` (k55); `EXEC` refused |
-| Binary values, writing | `SQL_LONGVARBINARY` (k50) | hex pieces, 2099 placeholders per statement; `EXEC` refused (k50) |
-| Binary values, reading | bytes; `LongReadLen` 1 GiB unless set (k61) | bytes through `CAST AS IMAGE` up to `TEXTSIZE`; a longer value **refused** (k56, k47) |
-| `TEXT`, `NTEXT`, `VARCHAR(MAX)`, `NVARCHAR(MAX)`, reading | whole by default (k61); an explicit small `LongReadLen` throws beyond it, but a value **at** the boundary comes back with a NUL for its last character (TODO tests, upstream draft) | whole up to `TEXTSIZE` = `LongReadLen` (32768); a longer value **refused**, exactly (k47). On the handle / in literal SQL: cut without an error (limit) |
-| Empty LOB value, memory | none (k60) | `NTEXT`/`MAX` types (a declared `text` too): none; binary columns: `LongReadLen` bytes each (k60) |
-| `SQL_VARIANT` column | read (a binary value as hex digits, as text) | **refused** (k59): rows with a binary base type are lost |
-| `IMAGE` as hex above `TEXTSIZE`/2; `VARBINARY(MAX)` on `dbh_do` | n/a | row lost, no error (limit, k59; upstream draft) |
+| Bind of > 4000 bytes | bound, whole | literal in the statement, whole |
+| Bind beyond ASCII, into a column that is `NCHAR`/`NVARCHAR`/`NTEXT` **on the server**: declared `nchar`, `nvarchar`, `ntext` — and `text`, `varchar`, `string`, `char`, which DBIO deploys as national (`_server_data_type`) | exact: `SQL_WLONGVARCHAR`; the ODBC client character set must be UTF-8, else the string is **refused**. A string that already is UTF-8 bytes is **encoded a second time**, silently — it cannot be told from text (documented, not fixable) | **refused**, naming DBD::ODBC |
+| Bind beyond ASCII, into a real `VARCHAR`/`CHAR`: declared `varchar(n)`, `char(n)`, `varchar(max)` | what the code page has is exact; what it lacks is refused by the driver (loud; the driver's connection is then abandoned by core, with warnings) | **refused** |
+| Empty string `''` | exact | fixed: literal `''`; `EXEC` refused |
+| Binary values, writing | `SQL_LONGVARBINARY` | hex pieces, 2099 placeholders per statement; `EXEC` refused |
+| Binary values, reading | bytes; `LongReadLen` 1 GiB unless set | bytes through `CAST AS IMAGE` up to `TEXTSIZE`; a longer value **refused** |
+| `TEXT`, `NTEXT`, `VARCHAR(MAX)`, `NVARCHAR(MAX)`, reading | whole by default; an explicit small `LongReadLen` throws beyond it, but a value **at** the boundary comes back with a NUL for its last character (TODO tests, upstream draft) | whole up to `TEXTSIZE` = `LongReadLen` (32768); a longer value **refused**, exactly. On the handle / in literal SQL: cut without an error (limit) |
+| Empty LOB value, memory | none | `NTEXT`/`MAX` types (a declared `text` too): none; binary columns: `LongReadLen` bytes each |
+| `SQL_VARIANT` column | read (a binary value as hex digits, as text) | **refused**: rows with a binary base type are lost |
+| `IMAGE` as hex above `TEXTSIZE`/2; `VARBINARY(MAX)` on `dbh_do` | n/a | row lost, no error (limit; upstream draft) |
 | `HIERARCHYID`, `GEOGRAPHY`, `GEOMETRY` | refused by the driver | refused (`ct_describe` failed), loud |
-| Transaction with an open cursor | cursor before: commit and rollback right, core warns that it abandoned the handle; cursor inside: the next statement is refused, rolled back (t/78) | `BEGIN TRAN` and `COMMIT` throw, nothing is sent; `ROLLBACK` ends the cursor and rolls back on the same connection (dbio-sybase k65, k43; t/61) |
-| Binds on `dbh_do` / `on_connect_do` | DBD binds as it is | not covered; the caller has the handle (k51, decided) |
-| Private subclass pinned by `storage_type` | core warns | refused (k42, k43) |
-| `$rs->explain` | refused, "no plan over ODBC": the prepared `SET SHOWPLAN_ALL ON` does not outlive its prepare and the query would run (k71; live 2026-10-19; t/56) | the 18-column plan for a query without placeholders; with placeholders it dies in execute (k71; live half of t/56 written, not yet run) |
-| Key of a new row, trigger on the table | `SCOPE_IDENTITY()` | `SCOPE_IDENTITY()` (k39; was `@@identity` over FreeTDS: the trigger's key) |
-| `populate` (void) with a row the server refuses (Msg 8114) | throws, nothing of the data set stays | same (k62; the tuples after the failing one used to stay) |
-| NoBindVars class: `populate` in void context | n/a (binds) | row by row in one transaction (k57); core's fast path threw |
-| NoBindVars class: pinned to `::Sybase` with storage layers | n/a | decision taken, layers kept (k48) |
-| NoBindVars class: `''` for an `INT` column | exact (`0`) | core's literal is unquoted, the server refuses it (Msg 102, loud; k63, core's) |
+| Transaction with an open cursor | cursor before: commit and rollback right, core warns that it abandoned the handle; cursor inside: the next statement is refused, rolled back (t/78) | `BEGIN TRAN` and `COMMIT` throw, nothing is sent; `ROLLBACK` ends the cursor and rolls back on the same connection (t/61) |
+| Binds on `dbh_do` / `on_connect_do` | DBD binds as it is | not covered; the caller has the handle (decided) |
+| Private subclass pinned by `storage_type` | core warns | refused |
+| `$rs->explain` | refused, "no plan over ODBC": the prepared `SET SHOWPLAN_ALL ON` does not outlive its prepare and the query would run (t/56) | the 18-column plan for a query without placeholders; with placeholders it dies in execute (live half of t/56 written, not yet run) |
+| Key of a new row, trigger on the table | `SCOPE_IDENTITY()` | `SCOPE_IDENTITY()` (was `@@identity` over FreeTDS: the trigger's key) |
+| `populate` (void) with a row the server refuses (Msg 8114) | throws, nothing of the data set stays | same (the tuples after the failing one used to stay) |
+| NoBindVars class: `populate` in void context | n/a (binds) | row by row in one transaction; core's fast path threw |
+| NoBindVars class: pinned to `::Sybase` with storage layers | n/a | decision taken, layers kept |
+| NoBindVars class: `''` for an `INT` column | exact (`0`) | core's literal is unquoted, the server refuses it (Msg 102, loud; core's) |
 
-### The key of a new row (k39)
+### The key of a new row
 
 `DBIO::MSSQL::Storage::Sybase::_init` used to set `_identity_method('@@identity')`
 and `_no_scope_identity_query(1)` for FreeTDS above 0.82. `@@identity` is the
@@ -519,9 +523,9 @@ caching stays off. Mutation: turning the appended `SELECT SCOPE_IDENTITY()`
 into `@@IDENTITY` makes t/60 part C fail with 1000. DBD::ODBC was not
 measured with a trigger (it never had the workaround).
 
-### A refused statement rolls the transaction back (k62)
+### A refused statement rolls the transaction back
 
-Measured 2026-10-17, plain DBI first, then through the storage; MSSQL 2022
+Measured with plain DBI first, then through the storage; MSSQL 2022
 16.0.4295.3, DBD::Sybase 1.27 / FreeTDS 1.3.17, DBD::ODBC 1.61 / tdsodbc
 1.3.17 (`t/74-failed-populate-live.t`).
 
@@ -529,9 +533,9 @@ Measured 2026-10-17, plain DBI first, then through the storage; MSSQL 2022
   that cannot be converted, `'abc'` for a `DECIMAL`): `@@TRANCOUNT` goes 1 to 0
   on the failing statement, over both DBDs; the rows before it in the
   transaction are gone, and a `ROLLBACK` after it is refused (Msg 3903). DBIO's
-  `transaction_depth` still says 1. This mismatch is what k62 saw as "deferred
+  `transaction_depth` still says 1. This mismatch shows as "deferred
   rollback, every further operation throws" — core's discard of a handle whose
-  rollback failed (core k303, 2026-10-13) makes the connection usable again:
+  rollback failed makes the connection usable again:
   a failing single-statement `populate` or `create` leaves depth 0, no
   deferred rollback, `@@TRANCOUNT` 0, and the next statements, `populate` and
   `txn_do` work, on both access paths. **The card's symptom does not
@@ -555,28 +559,28 @@ Measured 2026-10-17, plain DBI first, then through the storage; MSSQL 2022
   script, not pinned by a test); do not catch such an exception inside the
   transaction block.
 
-### The NoBindVars class (k57, k48, k63)
+### The NoBindVars class
 
 `DBIO::MSSQL::Storage::Sybase::NoBindVars(::FreeTDS)` is what a DBD::Sybase
 connection without placeholders gets (`_adapt_to_placeholder_support`; live it
 is reached by `_use_typeless_placeholders(0)` before the first use, t/84).
 
-- **k57**: core's fast path of `populate` in void context threw "Unable to
+- **Void-context `populate`**: core's fast path of `populate` in void context threw "Unable to
   invoke fast-path insert without storage placeholder support" for every data
   set, pure ASCII included (measured offline t/83, live t/84): the values were
   interpolated, so `_prep_for_execute` returns no binds. `_insert_bulk` of
   `DBIO::MSSQL::Storage::Sybase` inserts row by row in one transaction there
-  (`_insert_rows_in_transaction`, the way it already did for k40/k50/k55 data
+  (`_insert_rows_in_transaction`, the way it already does for long, binary and empty-string data
   sets); a refused row rolls the data set back. None of the bind-based checks
-  (non-ASCII refusal, k50 binary) apply: there are no binds, core's literal is
+  (non-ASCII refusal, binary) apply: there are no binds, core's literal is
   what it is.
-- **k48**: the decision used `ref $self ne __PACKAGE__`, true for a storage
+- **Storage pinned to `::Sybase`**: the decision used `ref $self ne __PACKAGE__`, true for a storage
   pinned straight to `::Sybase` with schema storage layers (a
   `DBIO::Storage::Composed` class). It now looks through the composition to
   its base; core recomposes the layers over the NoBindVars class after the
   hook. No `@ISA` change. t/83 and t/84 run declared, pinned and
   pinned+layered.
-- **k63**: `''` for an integer column: core's `interpolate_unquoted` writes
+- **`''` for an integer column**: `''` for an integer column: core's `interpolate_unquoted` writes
   it unquoted (`VALUES ( )`), Msg 102, loud, no row, the connection stays
   usable. Left as it is -- the literal is core's and the same for every
   NoBindVars driver; narrowing `interpolate_unquoted` here would only
@@ -585,7 +589,7 @@ is reached by `_use_typeless_placeholders(0)` before the first use, t/84).
 
 ### Binary values
 
-karr k50, measured 2026-10-08 (MSSQL 2022 16.0.4295.3; DBD::Sybase 1.27 /
+Measured (MSSQL 2022 16.0.4295.3; DBD::Sybase 1.27 /
 FreeTDS 1.3.17; DBD::ODBC 1.61 / tdsodbc 1.3.17), through a declared schema
 with `VARBINARY(MAX)`, `VARBINARY(8000)`, `BINARY(16)` and `IMAGE` columns.
 
@@ -595,7 +599,7 @@ access path: `INSERT`, `UPDATE`, `WHERE col = ?`, `find` on a binary key,
 `populate`, at every size from 1 to 100000 bytes. Msg 257 (implicit conversion
 from varchar refused) where the bytes happened to pass as characters, the
 client library's conversion error where they did not. Over DBD::Sybase a value
-over 4000 bytes was taken by the k40 rewriting (the error then came from
+over 4000 bytes was taken by the long-value rewriting (the error then came from
 the prepare). One
 silent case: an empty value in an `IMAGE` column over DBD::Sybase was stored
 as one byte, a blank.
@@ -622,8 +626,8 @@ A value is the bytes of the string whatever its UTF-8 flag
   downgraded value. `populate` in void context stays one statement; the type
   bound with the first row holds for the rest.
 - **DBD::Sybase** (`DBIO::MSSQL::Storage::Sybase`): the DBD ignores a bind
-  type outside an `EXEC` (k49), so the value is bound as its hex form and the
-  placeholder becomes `CONVERT(VARBINARY(MAX), ?, 1)`. Hooked into the k40
+  type outside an `EXEC`, so the value is bound as its hex form and the
+  placeholder becomes `CONVERT(VARBINARY(MAX), ?, 1)`. Hooked into the long-value
   seam (`_rewrite_binds`, formerly `_inline_long_binds`; computed in
   `_dbh_execute`/`_dbh_prepare`, applied in `_prepare_sth` and
   `_bind_sth_params`), because that is where bind list and statement are both
@@ -648,14 +652,14 @@ A value is the bytes of the string whatever its UTF-8 flag
     data has a binary value (the placeholder count depends on the size).
   - `FORCESEEK` on a `VARBINARY(64)` primary key against the expression
     works: the index is still used.
-  - k40's literal no longer sees a binary value; a hex piece is never over
+  - The long-value literal no longer sees a binary value; a hex piece is never over
     4000 bytes.
 
 **Not covered, measured:** the NoBindVars class (core's text literal: Msg 257
 or a conversion error for every value; only NULL and an empty `IMAGE` value
 arrive).
 A private subclass of `DBIO::MSSQL::Storage` on a DBD::Sybase handle bound as
-text; it is refused since k42 (`docs/adr/0008`).
+text; it is refused (`docs/adr/0008`).
 
 **Reading** was found on the way and is its own card: "Reading binary
 values" below.
@@ -665,7 +669,7 @@ Offline in `t/64-binary-bind-values.t`, live per access path in
 
 ### Reading binary values
 
-karr k56, measured 2026-10-08 (MSSQL 2022 16.0.4295.3; DBD::Sybase 1.27 /
+Measured (MSSQL 2022 16.0.4295.3; DBD::Sybase 1.27 /
 FreeTDS 1.3.17; DBD::ODBC 1.61 / tdsodbc 1.3.17), through a declared schema.
 
 **Before, over DBD::Sybase** (`find`, `next`, `all`, a cursor and
@@ -694,7 +698,7 @@ acts only through the `SET TEXTSIZE` of the FreeTDS class. Not looked at in a
 
 - `_select` takes what `_select_args` returns and replaces every entry of the
   select list that is a plain column whose `data_type` is a binary one
-  (`_resolve_column_info`, `_is_binary_data_type` -- the question k50 asks of
+  (`_resolve_column_info`, `_is_binary_data_type` -- the question the binary bind asks of
   a bind) by `CAST(<quoted column> AS IMAGE)`, in the list and in the
   `select` of the attributes (the limit dialect builds its subqueries from
   the latter). All binary types, the sized ones too: hex digits were the
@@ -728,14 +732,14 @@ too), `join` + `+columns`, an alias; `distinct`, `group_by`, `union`,
 `union_all`, `as_subselect_rs`; `retrieve_on_insert`; `create` +
 `discard_changes`; a binary primary key -- `find`, `$row->update`,
 `get_from_storage`, `find_or_create` (before: "Can't update", not found
-again); `count` unchanged; `update`/`delete` by a binary value as k50 left
+again); `count` unchanged; `update`/`delete` by a binary value as the binary bind leaves
 them; the NoBindVars class.
 
 **Limits, measured:**
 
 - A value arrives whole up to the `TEXTSIZE` of the session (`LongReadLen`,
   32768 unless the connect info says otherwise). It was **cut to it without an
-  error** beyond; since k47 it is **refused** (the column is behind the guard,
+  error** beyond; it is **refused** (the column is behind the guard,
   "Values longer than TEXTSIZE" below; t/65 and t/77 hold it). With
   `LongReadLen => 5000000`: 4195901 bytes exact.
 - **An empty value costs `TEXTSIZE` bytes of memory**: the client library
@@ -743,7 +747,7 @@ them; the NoBindVars class.
   an empty `TEXT` four times that; `VARCHAR(MAX)` nothing). Nothing at 32768.
   With an unlimited `TEXTSIZE` -- plain DBI, a private subclass of the base
   class -- a row with an empty `TEXT` value was killed at a 1 GB cap. Kept for
-  binary columns (they are IMAGEs); TEXT and NTEXT no longer pay it (k60).
+  binary columns (they are IMAGEs); TEXT and NTEXT no longer pay it.
 - `IMAGE` is a deprecated type, and cannot be compared: a `DISTINCT` written
   in literal SQL beside a rewritten column is refused by the server (Msg 421;
   with a `VARBINARY(n)` column that statement ran before, and gave hex
@@ -756,14 +760,13 @@ them; the NoBindVars class.
   itself -- `get_column('sized')->max`, `HASHBYTES(...)`, literal SQL, a
   column without a declared `data_type`: hex digits, as before (lower case
   from the client library). A hand-written `CAST(col AS IMAGE)` too.
-- `dbh_do`: hex digits, no rows for `VARBINARY(MAX)`, nothing refused (k59:
-  pinned in t/77, a limit).
+- `dbh_do`: hex digits, no rows for `VARBINARY(MAX)`, nothing refused (pinned in t/77, a limit).
 - An `IMAGE` read as hex digits (literal SQL, a function, a column without a
   declared type) above `TEXTSIZE`/2 bytes loses its row: 16384 bytes read,
-  16385 do not (k59: pinned in t/77, a limit; a refusal would hit results that
+  16385 do not (pinned in t/77, a limit; a refusal would hit results that
   read right).
 - A private subclass of `DBIO::MSSQL::Storage` on a DBD::Sybase handle: it
-  read the same way; refused since k42 (`docs/adr/0008`).
+  read the same way; refused (`docs/adr/0008`).
 
 **Other carriers, measured and not used:** `CONVERT(VARCHAR(MAX), col, 2)`
 is exact to `TEXTSIZE`/2 bytes and cut without an error beyond (and would
@@ -772,21 +775,21 @@ need decoding at three fetch sites); `CAST(col AS VARBINARY(8000))` is cut at
 character set conversion.
 
 **DBD::ODBC** reads every binary type as its bytes, up to `LongReadLen`, and
-throws beyond ("long truncated"). The ODBC class set nothing here until k61;
+throws beyond ("long truncated"). The ODBC class set nothing here until then;
 it takes 1 GiB now unless the connect info names one ("LOB values over
 DBD::ODBC"); t/65 still connects with one of its own.
 
-**Found on the way** (plain DBI over DBD::Sybase), then measured by k59: a
-`SQL_VARIANT` column loses its row the same silent way (refused since k59); a
+**Found on the way** (plain DBI over DBD::Sybase), then measured: a
+`SQL_VARIANT` column loses its row the same silent way (refused); a
 `GEOGRAPHY` or `HIERARCHYID` column is not described at all ("ct_describe()
 failed", loud). See "SQL_VARIANT and the other types" below.
 
 Offline in `t/66-binary-read-values.t`, live per access path in
 `t/65-binary-values-live.t`.
 
-### Strings beyond the code page over DBD::ODBC (k58)
+### Strings beyond the code page over DBD::ODBC 
 
-Measured 2026-10-17 (MSSQL 2022 16.0.4295.3, collation
+Measured (MSSQL 2022 16.0.4295.3, collation
 `SQL_Latin1_General_CP1_CI_AS`; DBD::ODBC 1.61 **built without Unicode
 support** — `odbc_has_unicode` is 0, a string goes to the driver as bytes, and
 a string with the UTF-8 flag on as its UTF-8 form — over tdsodbc 1.3.17), first
@@ -819,14 +822,14 @@ Offline `t/75-odbc-unicode-binds.t`, live `t/76-odbc-unicode-binds-live.t`.
   in the DSN — or a C locale, where FreeTDS takes it from the locale — the
   UTF-8 bytes are read as Latin-1: `ä` is stored as `Ã¤`, with or without a bind
   type, without an error. Measured with plain DBI. The storage asks the
-  connection once per handle, when it is made (karr k81: before, ahead of the first
+  connection once per handle, when it is made (before, ahead of the first
   string beyond ASCII; the answer decides `odbc_utf8_on` for reading too),
   `SELECT UNICODE(CAST(? AS NVARCHAR(10)))` with an a-umlaut bound as
   `SQL_WLONGVARCHAR`: 228 means UTF-8; anything else **refuses** every string
   beyond ASCII, naming `ClientCharset=UTF-8` (no value, DSN or password in the
   message, `t/75`, `t/76`). Never refused for ASCII, NULL, an empty string or a
   binary value; not asked at all of a DBD::ODBC built with Unicode support.
-- **Reading returns characters (karr k81, t/123 live, t/124 offline):** the same
+- **Reading returns characters (t/123 live, t/124 offline):** the same
   DBD returned the UTF-8 bytes without the flag (`length` of an a-umlaut 2, CJK
   3 each) -- a silently wrong value. `DBIO::MSSQL::Storage::ODBC::_run_connection_actions`
   now sets `odbc_utf8_on` on the handle (every connection, reconnects too) once
@@ -836,12 +839,19 @@ Offline `t/75-odbc-unicode-binds.t`, live `t/76-odbc-unicode-binds-live.t`.
   NVARCHAR/NTEXT/VARCHAR (code page) is the written string with the flag on.
 - Core's DBI exception text carries `ParamValues` of the statement (the
   values), for every error. Core's, not looked at here.
-- The refusal message of the DBD::Sybase class (k49) now says what ODBC does and
+- The refusal message of the DBD::Sybase class now says what ODBC does and
   does not take.
 
-### Values longer than TEXTSIZE over DBD::Sybase (k47, k60)
+**Live tests and the locale.** FreeTDS takes the client character set from the locale of
+the process, so a test that writes or reads text beyond ASCII states it itself:
+`t/lib/MssqlClientCharset.pm` (ODBC DSN gets `ClientCharset=UTF-8`; loading the module sets
+LC_CTYPE to a UTF-8 locale, because `charset=` in a `dbi:Sybase:` DSN is ignored by FreeTDS,
+measured). t/76 forces the refusal with `ClientCharset=ISO-8859-1` in the DSN, independent
+of the locale (offline t/75). Used by t/76, t/80, t/82, t/123 and `DBIO::MSSQL::Test::Conformance` (t/120).
 
-Measured 2026-10-17 (DBD::Sybase 1.27 / FreeTDS 1.3.17, MSSQL 2022; plain DBI,
+### Values longer than TEXTSIZE over DBD::Sybase
+
+Measured (DBD::Sybase 1.27 / FreeTDS 1.3.17, MSSQL 2022; plain DBI,
 then through a schema). Live `t/77-long-values-live.t`, offline `t/66`.
 
 - **The cut.** The FreeTDS class sets `SET TEXTSIZE` = `LongReadLen` (32768).
@@ -850,7 +860,7 @@ then through a schema). Live `t/77-long-values-live.t`, offline `t/66`.
   characters of a VARCHAR(MAX), 16384 of an NVARCHAR(MAX) (value lengths
   32767, 32768 whole; 32769 cut). Sized `VARCHAR(n)`/`NVARCHAR(n)`/`VARBINARY(n)`
   (8000 bytes whole under a TEXTSIZE of 100) and `XML` (50007 characters under
-  32768) are not subject to it. A sized binary column read as an IMAGE (k56) is.
+  32768) are not subject to it. A sized binary column read as an IMAGE is.
 - **The way built: a guard the server runs.** `_select` reads a column of a
   result source that is, **on the server**, an `NTEXT`, a `(N)VARCHAR(MAX)` or
   binary, behind
@@ -858,19 +868,18 @@ then through a schema). Live `t/77-long-values-live.t`, offline `t/66`.
   ELSE col END`. What the column is on the server is what the DDL deploys the
   declared type as, asked of the one table (`DBIO::MSSQL::Storage::_server_data_type`
   → `DBIO::MSSQL::DDL::_mssql_column_type` → `DBIO::MSSQL::Adapter`), shared
-  with the ODBC bind type (k58): declared `text` is an **NVARCHAR(MAX)**, not a
+  with the ODBC bind type: declared `text` is an **NVARCHAR(MAX)**, not a
   TEXT, and so is a `varchar`/`string` of size -1; only `varchar(max)` (the
   server's spelling) is a VARCHAR(MAX). A `text` column used to be read as TEXT
-  through `CAST(.. AS VARCHAR(MAX))`: CJK and emoji arrived as `?`. Measured
-  2026-10-18 (t/80): they arrive unchanged now. A real TEXT column cannot be
+  through `CAST(.. AS VARCHAR(MAX))`: CJK and emoji arrived as `?`. t/80: they arrive unchanged. A real TEXT column cannot be
   declared; a `text` declaration over a legacy TEXT reads (CASE .. ELSE col)
-  but pays the empty-value memory price of k60.
+  but pays the empty-value memory price of an empty value (see "Values longer than TEXTSIZE").
   **Bytes:** TEXTSIZE counts an NVARCHAR(MAX) at two bytes per character, so
   16384 characters fit under 32768 and 20000 are **refused** (not cut), read
   with a `LongReadLen` ≥ 40000 (t/80). Open question, not decided: reading
   more characters under the default would need a UTF-8 collation (SQL Server
   2019+).
-  **NULL (2026-10-18):** `SESSIONPROPERTY('CONCAT_NULL_YIELDS_NULL')` is 1 on a
+  **NULL:** `SESSIONPROPERTY('CONCAT_NULL_YIELDS_NULL')` is 1 on a
   fresh session over dbi:Sybase:, so the old concatenation guard kept NULL as
   NULL by default; with `SET CONCAT_NULL_YIELDS_NULL OFF` (on_connect_do) a NULL
   in a VARCHAR(MAX) or NVARCHAR(MAX) column became `''` (measured, plain DBI and
@@ -892,14 +901,14 @@ then through a schema). Live `t/77-long-values-live.t`, offline `t/66`.
   literal SQL, a function or expression over the column, a column without a
   declared LOB data type, subqueries. Cut to TEXTSIZE without an error, as
   before.
-- **Ways measured and not taken:** raising the TEXTSIZE default (see k60 — an
+- **Ways measured and not taken:** raising the TEXTSIZE default (see below — an
   empty binary value then costs that much per column; unlimited killed the
   process at a 1 GB cap) and checking the length of fetched values on the
   client (the cut point depends on the type: TEXTSIZE/2 characters for
   national columns, and the client only sees UTF-8 bytes; three fetch sites).
   Recommendation, not a decision: keep 32768; `LongReadLen` stays the regulator
   and now says so when it is too small.
-- **k60, the price of an empty value** (plain DBI, TEXTSIZE 50000000): empty
+- **The price of an empty value** (plain DBI, TEXTSIZE 50000000): empty
   TEXT +191 MB, NTEXT +95 MB, IMAGE +48 MB, VARCHAR(MAX)/NVARCHAR(MAX)/XML
   +0; one byte and NULL +0; nothing at 32768. Behind the guard NTEXT is a
   MAX type and pays nothing, and so is a declared `text` (an NVARCHAR(MAX);
@@ -908,9 +917,9 @@ then through a schema). Live `t/77-long-values-live.t`, offline `t/66`.
   while the handle lives (t/77 pins it as a documented limit); `NULLIF` would
   turn an empty value into NULL, hex digits need decoding at every fetch site.
 
-### SQL_VARIANT and the other types over DBD::Sybase (k59)
+### SQL_VARIANT and the other types over DBD::Sybase
 
-Measured 2026-10-17, `t/77`, upstream draft `maint/upstream/dbd-sybase-row-fail.md`.
+Measured in `t/77`, upstream draft `maint/upstream/dbd-sybase-row-fail.md`.
 
 - `SQL_VARIANT` is described `TYPE` 1, `PRECISION` 8009 (no CHAR/VARCHAR/NCHAR/
   NVARCHAR has it: the client library gives four times the length). A variant
@@ -934,9 +943,9 @@ Measured 2026-10-17, `t/77`, upstream draft `maint/upstream/dbd-sybase-row-fail.
   A CLR type of an assembly of one's own: not measured (CLR is not on the test
   server).
 
-### LOB values over DBD::ODBC (k61)
+### LOB values over DBD::ODBC
 
-Measured 2026-10-17 (DBD::ODBC 1.61 / tdsodbc 1.3.17), `t/77`, upstream draft
+Measured (DBD::ODBC 1.61 / tdsodbc 1.3.17), `t/77`, upstream draft
 `maint/upstream/dbd-odbc-longreadlen-boundary.md`.
 
 - With DBI's `LongReadLen` 80 every LOB type — TEXT, NTEXT, VARCHAR(MAX),
@@ -950,7 +959,7 @@ Measured 2026-10-17 (DBD::ODBC 1.61 / tdsodbc 1.3.17), `t/77`, upstream draft
 - **A large `LongReadLen` cost nothing in the measurement** (no memory for an
   empty or short value at 50000000 and 2147483647, 5 MB values whole, 20000
   rows of TEXT no slower) -- **but it has a price, and only overcommit hides
-  it** (hub check 2026-10-18): DBD::ODBC 1.61 allocates a buffer of
+  it** : DBD::ODBC 1.61 allocates a buffer of
   `LongReadLen` bytes per LOB column per statement handle (`dbdimp.c`,
   `bind_columns`; twice that for NVARCHAR(MAX)/XML in the Unicode build). With
   `vm.overcommit_memory=2`, `ulimit -v`, or many LOB columns: "Out of
@@ -964,21 +973,21 @@ Measured 2026-10-17 (DBD::ODBC 1.61 / tdsodbc 1.3.17), `t/77`, upstream draft
 - The Sybase path has 32768 and refuses beyond; the ODBC path has 1 GiB and
   reads everything that fits memory. Both: no value is cut without being said.
 
-## Conformance (core ADR 0060, karr k71)
+## Conformance (core ADR 0060)
 
-`DBIO::MSSQL::Test::Conformance` answers core's shared DDL, Diff and Bind case tables (DDL: t/85 offline,
-t/86 live, t/89 namespace token; Diff t/117 + t/118; Bind t/119 + t/120). `conformance_answered_through` is a hash,
-`{ DDL => 2, Diff => 4, Bind => 1 }` (karr k81, core k399). `conformance_upgrade` connects the to-class to the database of the case
+`DBIO::MSSQL::Test::Conformance` answers core's shared DDL, Diff and Bind case tables (DDL: t/85-conformance.t offline,
+t/86 live, t/89 namespace token; Diff t/85-conformance.t + t/118; Bind t/85-conformance.t + t/120). `conformance_answered_through` is a hash,
+`{ DDL => 2, Diff => 4, Bind => 1 }`. `conformance_upgrade` connects the to-class to the database of the case
 (`%DATABASE`, `_dsn_for`) and runs `upgrade(allow_destructive => 1)` of DBIO::Deploy::Base, whose checks the driver answers in
 `_check_before_apply` (core ADR 0080); `conformance_deploy` runs the deploy cases. Its cleanup closes only its own connection. Diff (23 cases):
-`diff-view-added/-dropped/-definition-changed` answered right (karr k82), `diff-column-added-not-null-populated` and `diff-not-null-over-nulls` server refusals
+`diff-view-added/-dropped/-definition-changed` answered right, `diff-column-added-not-null-populated` and `diff-not-null-over-nulls` server refusals
 (`Deploy::_refuse_unfillable`: Msg 4901 / 515, before the server; without it the doomed txn made txn_do run twice and say
-"disconnected"), `diff-default-removed` answered right (karr k83: `Diff::Column` drops the default constraint by its live name; core k367 reports it). Bind (10): deviation
-`bind-empty-string` (`''` for int is 0 on SQL Server); `bind-non-ascii` is right over DBD::ODBC (reads characters, `odbc_utf8_on`, k81);
-over DBD::Sybase it is a refusal (k49) and the connect names `LongReadLen` 1000000 (k47). `DBIO::MSSQL::Storage::Sybase` names
+"disconnected"), `diff-default-removed` answered right (`Diff::Column` drops the default constraint by its live name). Bind (10): deviation
+`bind-empty-string` (`''` for int is 0 on SQL Server); `bind-non-ascii` is right over DBD::ODBC (reads characters, `odbc_utf8_on`);
+over DBD::Sybase it is a refusal and the connect names `LongReadLen` 1000000. `DBIO::MSSQL::Storage::Sybase` names
 `DBIO::MSSQL::Deploy` as `dbio_deploy_class` (DBIO::Sybase::Storage precedes the base in the MRO and would deploy ASE DDL).
 DDL: of the 20
-cases 17 are right (`ddl-qualified-source-name` since karr k72: `other.t` is made in
+cases 17 are right (`ddl-qualified-source-name` since the schema work: `other.t` is made in
 the schema `other`, see "Schemas" below; `ddl-type-size-char`), `ddl-enum-value-apostrophe` and
 `ddl-type-size-bit` are refused (no enum type; `bit` has no size) and
 `ddl-default-digit-string` (`char(n)` pads) is a declared deviation. The namespace of a case is a
@@ -992,7 +1001,7 @@ and quotes names through `DBIO::MSSQL::DDL::_quote_ident` (reserved words,
 non-identifier names; case kept).
 
 Refused before the server, all `DBIO::Exception` with the word "refus", naming
-table and column or relationship: a table or view name with other than one dot (k72, a
+table and column or relationship: a table or view name with other than one dot (a
 name qualified with a database);
 foreign keys SQL Server rejects with Msg 1785 (self-reference with an action,
 cycles, two cascading paths to one table; rule measured in
@@ -1014,6 +1023,23 @@ explicit and default cannot be told apart, and core's test schema declares one
 failed / overflowed column / duplicate key value / truncated value / `near '...'` / JSON character, one rule each,
 names stay) and then core's `next::method`. Offline `t/128` (rules) and `t/130` (override), live per access path incl.
 NoBindVars `t/129`. `RAISERROR`/`THROW` texts of the application and `$dbh->errstr` stay raw.
+
+**The language of the session does not matter.** SQL Server reports in the language of the session (`SET LANGUAGE`,
+login or server default) and the English sentence rules do not hold there. `Util::_mask_by_number` masks by the number of
+the message and the marks the server quotes with (measured, 25 languages, both DBDs): 244/245/248/102/13607/13609 one
+quoted value (`'x'` `"x"` `« x »` `„x“` `“x”`: first mark to the last closing mark of its kind), 2627/2601/1505 the
+parenthesis (first `(` to last `)`), 2628 everything after the quoted names of table and column. No mark to take hold of
+(Czech, Finnish, Swedish, Dutch ... write the value bare) = the text of that message is replaced by `(text withheld: ...)`,
+the number stays. A number that quotes no value (156 keyword form, 8114, 547, 515) is not touched; a message with English
+rule words is left to `_mask_sentences`; the TEXTSIZE guard text is exempt. The number is `Server message number=N`
+(DBD::Sybase); DBD::ODBC has none in the text, so `Storage::ODBC::_dbi_handle_error` reads the diagnostic records of the
+failing handle (`odbc_getdiagrec`: state, native number, text) into `$self->{_dbio_server_diag}` and the hook hands them
+to `mask_error_details` as 4th argument; a handle without records (`$dbh->do` with binds) falls back to the SQLSTATE
+(22018, HY019, 23000), and 42000 forms (syntax, truncation, JSON) are then English-rule only (limit). Offline `t/132`,
+live `t/131` (Deutsch and French, the three paths). Tests: `DBIO_TEST_SERVER_LANGUAGE=de|fr` makes
+`t/lib/MssqlServerLanguage.pm` (loaded by every live test) send `SET LANGUAGE German|French` after every `DBI->connect`
+of the process; a test that reads the English wording of a server message sets `SET LANGUAGE us_english` for its own
+session (`on_connect_do`).
 
 ## Storage Wiring
 
@@ -1044,11 +1070,11 @@ eval "$(<cihq-ocp>/umgebungen/dbio/dbio-db env mssql)"
 Without that infrastructure, set the variables yourself against any SQL Server. Which
 live files run depends on them:
 ```bash
-# DBD::ODBC over the FreeTDS ODBC driver (t/11, t/21, t/30, t/65, t/82, t/72, t/76, t/77, t/78, live block of t/56)
+# DBD::ODBC over the FreeTDS ODBC driver (t/11, t/30, t/65, t/82, t/72, t/76, t/77, t/78, live block of t/56)
 DBIO_TEST_MSSQL_ODBC_DSN='dbi:ODBC:Driver=FreeTDS;Server=<host>;Port=1433;Database=tempdb;TDS_Version=7.4'
 DBIO_TEST_MSSQL_ODBC_USER=sa
 DBIO_TEST_MSSQL_ODBC_PASS='...'
-# DBD::Sybase (t/10, t/20, t/30, t/60, t/61, t/65, t/82, t/77)
+# DBD::Sybase (t/10, t/30, t/60, t/61, t/65, t/82, t/77)
 DBIO_TEST_MSSQL_DSN='dbi:Sybase:...'
 DBIO_TEST_MSSQL_USER=sa
 DBIO_TEST_MSSQL_PASS='...'
@@ -1060,9 +1086,9 @@ be in `odbc.ini`. `dbi:ODBC:DSN=<name>` works as well where a data source is
 set up. The login is the one DBD::Sybase
 uses. Both access paths run live, DBD::Sybase and DBD::ODBC.
 
-`t/10-mssql.t` and `t/20-mssql-core.t` need DBD::Sybase (DBD::ODBC+FreeTDS won't
-work for those). They need DBD::Sybase (compiled against FreeTDS) and a named
-server in `freetds.conf`, see "Live test status" below.
+`t/10-mssql.t` needs DBD::Sybase (DBD::ODBC+FreeTDS won't
+work for it). It needs DBD::Sybase (compiled against FreeTDS) and a named
+server in `freetds.conf`, see "Live test setup" below.
 
 ### The test database
 
@@ -1071,9 +1097,9 @@ cleans them up. Check with `SELECT name FROM sys.databases WHERE name LIKE '[_]d
 and drop them. `maint/k8s/mssql-dev.yaml` is the
 manifest `dbio-db` starts the standing database from.
 
-### Generic DSN detection is gone
+### No driver detection from the DSN
 
-Retired by core ADR 0067 (core k308, here karr k69). A schema without a declared driver
+Core ADR 0067: a schema without a declared driver
 is refused at connect; core calls no `_rebless` and has no connector registry.
 `DBIO->driver_for` names the exact driver of a DSN: `dbi:ODBC:` throws (the DBD names no
 driver), `dbi:Sybase:` answers `Sybase` (ASE) — the declaration is the only way into this
@@ -1084,185 +1110,27 @@ core requirement is raised and dbio-sybase drops its `_rebless`.
 
 ### `on_connect_call` options
 
-`t/11` + `t/21` loop over the `on_connect_call` options
+`t/11` loops over the `on_connect_call` options
 `use_dynamic_cursors` / `use_mars` / `use_server_cursors` and `plain`. No DBIO
 distribution has a `connect_call_*` handler for the first three (the
-DBIx::Class ones were ODBC-only and were not ported, see karr k13 below), so
+DBIx::Class ones were ODBC-only and were not ported), so
 the test pre-skips them with a `can("connect_call_$_")` check and `last SKIP`
 to abort the iteration cleanly (otherwise the iteration continues to `dbh_do`
 and exits 255). Only `plain` runs, and with it the "multiple active
-statements" block of these two files never does (measured over ODBC,
-2026-10-07, karr k52: 4 skips per file). The TODO marker for "freetds with
-dynamic cursors" in the MONEY section sat behind that skip and could not be
-reached; it is gone.
+statements" block of these two files never does (4 skips per file over ODBC).
 
-### Live test status
+### Live test setup
 
-**Last full run 2026-07-26** against MSSQL 2022 (16.0.4255.1) on the
-standing test database, both transports wired: `../dbio/maint/capped-test prove -lr t/` →
-**14 files, 547 tests, all PASS** in 7s wallclock, no temp databases left
-behind. The per-file table below is from the 2026-06-25 run and still describes
-the notable per-file details.
+DBD::Sybase (compiled against FreeTDS) reaches the test database. The declared storage
+ends in `DBIO::MSSQL::Storage::Sybase` over `dbi:Sybase:` (see "A declared storage adapts
+itself to the access path" above).
 
-**DBD::Sybase-only run 2026-10-05** against MSSQL 2022 (16.0.4295.3) in a
-docker container on another host, DSN `dbi:Sybase:host=..;port=..;database=..`
-(no named server, no ODBC driver on the test host): **22 files, 608 tests, all
-PASS**. Live: t/10 + t/20 (67 each, 14 skipped), t/30 (11, DBD::Sybase half
-only), t/60 (106, 8 of them TODO: k37 ×5, k39 ×1, k40 ×2). Not run: t/11, t/21
-and the live block of t/56 — ODBC only. Added the same day and run on its own,
-not as part of that suite run: t/61 (161, 18 of them TODO: dbio-sybase k65 ×10,
-k43 ×6, k42 ×2).
-
-**DBD::Sybase-only runs 2026-10-07** (karr k37, with the declared storage
-adapting to the access path) against MSSQL 2022 (16.0.4295.3), DBD::Sybase
-1.27 / FreeTDS 1.3.17, no ODBC driver on the test host. Full suite on DSN
-`dbi:Sybase:server=..;port=..`: **24 files, 633 tests, all PASS** — live t/10 +
-t/20 + t/30; t/11 and t/21 skip (ODBC only), t/60 and t/61 skip (they need the
-other DSN form). On DSN `dbi:Sybase:host=..;port=..;database=..`, the two
-files alone: t/60 (110, 4 of them TODO: k39 ×2, k40 ×2) and t/61 (163, 20 of
-them TODO: dbio-sybase k65 ×20), both PASS. The five k37 TODO of t/60 are
-plain tests now; the k42/k43 TODO of t/61 are gone with the class they were
-about (see "Transactions with an active statement handle"). Offline: 24 files,
-488 tests.
-
-**Runs 2026-10-07 with karr k40** (long bind values over DBD::Sybase), same
-server, DBD::Sybase 1.27 / FreeTDS 1.3.17, and for the first time on this host
-DBD::ODBC 1.61 over the FreeTDS ODBC driver (tdsodbc 1.3.17). All PASS:
-
-- offline: 25 files, 548 tests (t/63 new, 60 tests);
-- DBD::Sybase, DSN `dbi:Sybase:server=..;port=..`: 25 files, 693 tests — t/11,
-  t/21 skip (ODBC only), t/60, t/61 skip (other DSN form);
-- DBD::Sybase, DSN `dbi:Sybase:host=..;port=..;database=..`, the two files
-  alone: t/60 (134, 2 of them TODO: k39 ×2) and t/61 (163, 20 of them TODO:
-  dbio-sybase k65 ×20). The two k40 TODO of t/60 are plain tests;
-- DBD::ODBC, DSN `dbi:ODBC:Driver=FreeTDS;Server=..;Port=..;Database=..;
-  TDS_Version=7.4`: 25 files, 809 tests — live t/11 + t/21 (125 each), t/30;
-  t/10, t/20, t/60, t/61 skip (DBD::Sybase only). 14 TODO tests of t/11 and of
-  t/21 passed in that run ("Top-limit does not work when your limit ends up
-  past the resultset"); karr k52, next paragraph, removed the markers.
-
-**Runs 2026-10-07 with karr k52** (t/11, t/21 without the limit-dialect loop),
-same server and client versions. All PASS, and no TODO test passes anywhere:
-
-- offline: 25 files, 548 tests;
-- DBD::ODBC, DSN `dbi:ODBC:Driver=FreeTDS;Server=..;Port=1433;Database=tempdb;
-  TDS_Version=7.4`: 25 files, 713 tests — live t/11 + t/21 (77 each, 4 skipped
-  each, see "`on_connect_call` options"), t/30; t/10, t/20, t/60, t/61 skip
-  (DBD::Sybase only);
-- DBD::Sybase, DSN `dbi:Sybase:server=..;port=..`: 25 files, 693 tests;
-- DBD::Sybase, DSN `dbi:Sybase:host=..;port=..;database=..`, the two files
-  alone: t/60 (134, 2 of them TODO: k39 ×2) and t/61 (163, 20 of them TODO:
-  dbio-sybase k65 ×20).
-
-The 96 tests fewer over ODBC are 2 × 48: t/11 and t/21 ran their LIMIT section
-once as `Dialect:Top` and once as `Dialect:RowNumberOver`, handing
-`limit_dialect` to `connect`. Nothing in DBIO reads that DBIx::Class
-attribute — `DBIO::MSSQL::SQLMaker->apply_limit` always renders
-`ROW_NUMBER() OVER()` — and both runs sent the same statements (measured over
-ODBC: the 18 statements executed and the 7 `as_query` forms of the section,
-per quoting, are identical with `Top`, with `RowNumberOver` and without the
-attribute). The section runs once per quoting now, as plain tests; the TODO
-markers described a `TOP` dialect this driver does not have.
-
-**Runs 2026-10-08 with karr k50** (binary values over both access paths),
-MSSQL 2022 16.0.4295.3, DBD::Sybase 1.27 / FreeTDS 1.3.17, DBD::ODBC 1.61 /
-tdsodbc 1.3.17. All PASS, no TODO test passes:
-
-- offline: 27 files, 673 tests (t/64 new, 125 tests; t/65 new, skips);
-- both access paths in one run, DSNs `dbi:Sybase:host=..;port=..;database=..`
-  and `dbi:ODBC:Driver=FreeTDS;Server=..;Port=..;Database=..;TDS_Version=7.4`:
-  27 files, 1337 tests -- the 1155 of the same run before k50, t/64 (125) and
-  t/65 (57: 28 per access path and one for the warnings). Not run on that
-  day: the `dbi:Sybase:server=..` form.
-
-**Runs 2026-10-08 with karr k56** (reading binary values over DBD::Sybase),
-same server and client versions, the database in the HQ cluster (`dbio-db env
-mssql`). All PASS, no TODO test passes:
-
-- offline: 28 files, 752 tests (t/66 new, 79 tests); 8 files skip (the live
-  ones), 4 tests skipped;
-- both access paths in one run, DSNs as for k50: 28 files, 1462 tests, no
-  file skipped -- the 1337 before, t/66 (79) and 46 more in t/65 (103: 57
-  over DBD::Sybase, 45 over DBD::ODBC and one for the warnings). 36 tests
-  skipped (t/10 and t/20 14 each, t/11 and t/21 4 each), 23 TODO tests: k39
-  ×2 (t/60), dbio-sybase k65 ×20 (t/61) and, new, k47 ×1 (t/65: a value over
-  the session's `TEXTSIZE` comes back cut). Not run: the
-  `dbi:Sybase:server=..` form.
-
-Against the storage classes as they were before k56, the new tests fail: 35
-of the 79 of t/66, and 13 of the first 85 of t/65 -- every `find` of a
-`VARBINARY(MAX)` value of one byte or more (no row), the bytes of the sized
-types (hex digits), the key a row object holds -- before the file dies at
-`$row->update` on a row found by its binary key ("row not found").
-
-**Runs 2026-10-17 with karr k49, k55** (strings beyond ASCII refused, empty
-strings written as `''` over DBD::Sybase), MSSQL 2022 16.0.4295.3, DBD::Sybase
-1.27 / FreeTDS 1.3.17, DBD::ODBC 1.61 / tdsodbc 1.3.17, the database in the HQ
-cluster (`dbio-db env mssql`). All PASS, no `_dbio_*` database left:
-
-- offline: 32 files, 849 tests (t/81 new, 67 tests; t/82 skips);
-- both access paths in one run (`dbi:Sybase:host=..;port=..;database=..` and
-  `dbi:ODBC:Driver=FreeTDS;...`): 32 files, 1632 tests (t/82 new, 72: 36 per
-  access path).
-
-Against the storage class as it was before, t/81 fails 44 of its 67 tests and
-t/82 32 of its 72, all of them DBD::Sybase (the empty-string and the refusal
-tests; the DBD::ODBC half is green on both sides).
-
-**Runs 2026-10-17 with karr k58 (Unicode binds over DBD::ODBC) and k47, k59,
-k60, k61 (long values, both access paths)**, MSSQL 2022 16.0.4295.3, DBD::Sybase
-1.27 / FreeTDS 1.3.17, DBD::ODBC 1.61 / tdsodbc 1.3.17, the database in the HQ
-cluster (`dbio-db env mssql`), both DSNs in one run, through `capped-test`.
-All PASS, no `_dbio_*` database and no test table left:
-
-- offline: 40 files, 985 tests (t/75 new, 49; t/66 grew by 17);
-- both access paths: 40 files, 2173 tests -- t/76 (90, ODBC), t/77 (198,
-  both ways, the memory checks run in child processes), t/78 (34, ODBC);
-  t/65's k47 pair ("IS: cut" and a TODO "SHOULD") became one test that
-  passes. TODO tests now: k39 ×2 (t/60), dbio-sybase k65 ×20 (t/61) and, new, 4
-  in t/77 (the DBD::ODBC `LongReadLen` boundary, upstream draft).
-- Red before the fix, against the tree of the previous commit (new test files
-  copied in): t/75 23 of 49, t/76 42 of 50, t/66 29 of 93, t/65 1 of 103
-  (the refusal), t/77 over DBD::Sybase 31 of the first 80 (the file dies in
-  the SQL_VARIANT part) and over DBD::ODBC 59 of the first 105 (it dies at the
-  XML test, which throws at DBI's 80); t/78 passes there (it measures a row of
-  the matrix, no fix).
-
-**Run 2026-10-18 with karr k43** (t/61 on the decision of dbio-sybase k65,
-DBIO::Sybase::Storage::FreeTDS of branch k65-txn in front), MSSQL 2022
-16.0.4295.3, DBD::Sybase 1.27 / FreeTDS 1.3.17, DBD::ODBC 1.61, both DSNs in
-one run through `capped-test`: offline 46 files, 1148 tests; live 46 files,
-2443 tests, all PASS, no `_dbio_*` database left. t/61: 171 tests, 4 TODO
-(case 8 in the four combinations, core's guard). Against the previous FreeTDS
-class the new t/61 is red in cases 6 to 8b.
-
-### Per-file detail (2026-06-25, MSSQL 2022)
-
-| Test | Result | Notes |
-|------|--------|-------|
-| t/00-load.t | PASS | offline |
-| t/40-sqlmaker-mssql-torture.t | PASS | offline |
-| t/50-diff.t | PASS | offline |
-| t/52-introspect-contract.t | PASS | offline |
-| t/11-mssql-odbc.t | PASS | 125/125; 77/77 since karr k52 (2026-10-07), 4 of them skipped |
-| t/21-mssql-odbc-core.t | PASS | same as t/11 (files are identical) |
-| t/30-datetime-mssql.t | PASS | 1 skipped (no DBD::Sybase `syb_date_fmt`) |
-| t/10-mssql.t | PASS | 53 pass, 14 skipped (MAS complex), 0 fail, exit 0 — needs a named server in `freetds.conf` + DSN `dbi:Sybase:server=<name>` |
-| t/20-mssql-core.t | PASS | same as t/10 (files are identical) |
-
-DBD::Sybase 1.27 compiled against FreeTDS v1.3.17 reaches the test database
-(karr k12 / supersedes the DBD::Sybase-install note from karr k3).
-The declared storage ends in `DBIO::MSSQL::Storage::Sybase` over `dbi:Sybase:`,
-live-verified; see "A declared storage adapts itself to the access path" above.
-
-Running t/10/t/20 over DBD::Sybase+FreeTDS needs a *named* server, because
-several sections open a second concurrent server-side cursor — DBD::Sybase
-then opens a second physical connection. That connection is made on a bare
-`host=...;port=...` DSN too (measured, karr k41/k44: `use <db>` is answered
-on it); what is left on the handle is client message 44 ("Server name not
-found in configuration files"), which `$dbh->do` clears at its execute and
-core's own `prepare` reports as an error. The named `[server]` block in
-`freetds.conf` is what makes that message go away. Add to `~/.freetds.conf`:
+`t/10` over DBD::Sybase + FreeTDS need a *named* server: several sections open a
+second concurrent server-side cursor, so DBD::Sybase opens a second physical connection.
+That connection is made on a bare `host=...;port=...` DSN too; what is left on the handle is
+client message 44 ("Server name not found in configuration files"), which `$dbh->do` clears
+at its execute and core's own `prepare` reports as an error. The named `[server]` block in
+`freetds.conf` makes that message go away. Add to `~/.freetds.conf`:
 
     [<name>]
         host = <host of the test database>
@@ -1271,18 +1139,12 @@ core's own `prepare` reports as an error. The named `[server]` block in
 
 and set `DBIO_TEST_MSSQL_DSN='dbi:Sybase:server=<name>'`.
 
-Even with the named server the "multiple active statements" complex cannot
-pass over this transport, and this is a permanent limitation, not a pending
-port (karr k13): the DBIx::Class `connect_call_use_dynamic_cursors` /
-`use_mars` / `use_server_cursors` handlers were **ODBC-only** and self-throw on
-FreeTDS by design (`use_mars` → "FreeTDS does not support MARS";
-`use_dynamic_cursors` → unsupported with FreeTDS > 0.82; `use_server_cursors` →
-Windows-only). DBD::Sybase has no real MARS — it only fakes a second active
-statement via a child connection, whose separate session deadlocks on a
-write-in-transaction. So both MAS blocks in t/10/t/20 are wrapped in a `SKIP`
-with that reason — the files complete cleanly (exit 0) instead of dying on a
-desynced COMMIT. The dialect/LIMIT
-behaviour the old "RNO detection" block tried to probe via the removed
-`sql_limit_dialect` API is covered offline by
-`t/sqlmaker/limit_dialects/rno.t` and `t/40-sqlmaker-mssql-torture.t`; the live
-files now just assert the storage is wired to `DBIO::MSSQL::SQLMaker`.
+The "multiple active statements" complex cannot pass over this transport: the
+DBIx::Class `connect_call_use_dynamic_cursors` / `use_mars` / `use_server_cursors` handlers
+are ODBC-only and self-throw on FreeTDS (`use_mars`: "FreeTDS does not support MARS";
+`use_dynamic_cursors`: unsupported with FreeTDS > 0.82; `use_server_cursors`: Windows-only).
+DBD::Sybase fakes a second active statement through a child connection, whose separate
+session deadlocks on a write in a transaction. The MAS block in `t/10` is
+wrapped in a `SKIP` with that reason. The limit dialect is covered offline by
+`t/sqlmaker/limit_dialects/rno.t` and `t/40-sqlmaker-mssql-torture.t`; the live files assert
+that the storage is wired to `DBIO::MSSQL::SQLMaker`.

@@ -3,7 +3,7 @@ package DBIO::GraphQL::Relationship;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Class::Accessor::Grouped';
 use GraphQL::Type::List;
@@ -139,7 +139,7 @@ DBIO::GraphQL::Relationship - Resolve GraphQL relationship fields from a DBIO so
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO;
@@ -86,7 +88,7 @@ use DBIO::Async::TransactionContext;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w, socket => 7 };
   }
@@ -163,7 +165,7 @@ sub new_storage {
 }
 
 # Drive the loop until the Future settles, without dying on a failure.
-sub settle { my $f = shift; eval { $f->get }; return $f }
+sub settle { my $f = shift; eval { get_within($f, 15) }; return $f }
 
 # The same for a query that waited for the pool: it hangs off a pool waiter,
 # a plain Future that knows no loop and so cannot ->get while pending. Turn
@@ -278,7 +280,7 @@ for my $method (qw(_mark_connection_dead _retire_in_use_connection acquire)) {
   is $pool->available, 1, 'default: the connection is back on the idle list';
   is $pool->acquire->get->{id}, 1,
     'default: ... and handed out again, dead or not: without a classifier the '
-    . 'behaviour is the one from before k26';
+    . 'behaviour is the one from before the classifier';
 }
 
 {
@@ -341,12 +343,12 @@ for my $method (qw(_mark_connection_dead _retire_in_use_connection acquire)) {
   my $sqls = sqls($storage);
   is scalar @$sqls, 2,
     'txn: only BEGIN and the doomed statement reached the wire -- core '
-    . 'issues no ROLLBACK on a connection reported dead (core k274)';
+    . 'issues no ROLLBACK on a connection reported dead';
   is $sqls->[0], 'BEGIN', 'txn: ... the first was BEGIN';
   like $sqls->[1], qr/FROM doomed/, 'txn: ... the second the doomed one';
   unlike scalar $f->failure, qr/Rollback failed/,
     'txn: ... and no ROLLBACK went out on the dead connection, so the failure '
-    . 'is the original error and names no rollback (core k274)';
+    . 'is the original error and names no rollback';
   is scalar @{ $storage->{asked} }, 1,
     'txn: the seam was asked once -- there is no ROLLBACK for it to classify';
 

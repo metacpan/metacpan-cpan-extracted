@@ -6,7 +6,7 @@ use warnings;
 
 use DBIO::Exception ();
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -246,7 +246,7 @@ DBIO::Oracle::Type - Oracle type mapping utilities
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

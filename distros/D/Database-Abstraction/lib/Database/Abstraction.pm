@@ -105,11 +105,11 @@ Database::Abstraction - Read-only Database Abstraction Layer (ORM)
 
 =head1 VERSION
 
-Version 0.56
+Version 0.57
 
 =cut
 
-our $VERSION = '0.56';
+our $VERSION = '0.57';
 
 =head1 DESCRIPTION
 
@@ -1606,7 +1606,15 @@ sub _open :Protected
 						require XML::Simple;
 
 						my $xml = XML::Simple::XMLin($slurp_file);
-						my @keys = keys %{$xml};
+						# Hash order is random: take the repeating element (the
+						# one with most occurrences, then by name) so a document
+						# with several top-level elements reads the same way
+						# every time, not only when the right key came first.
+						my @keys = ref($xml) eq 'HASH' ? sort {
+							(ref($xml->{$b}) eq 'ARRAY' ? scalar(@{$xml->{$b}}) : 0)
+								<=> (ref($xml->{$a}) eq 'ARRAY' ? scalar(@{$xml->{$a}}) : 0)
+								|| $a cmp $b
+						} keys %{$xml} : ();
 						my $key = $keys[0];
 						my @data;
 						if(ref($xml->{$key}) eq 'ARRAY') {
@@ -1623,6 +1631,8 @@ sub _open :Protected
 							} else {
 								Carp::croak('XML slurp: multi-key documents are not yet supported');
 							}
+						} elsif((ref($xml) eq 'HASH') && scalar(keys %{$xml}) > 1) {
+							Carp::croak('XML slurp: multi-key documents with no repeating element are not yet supported');
 						} else {
 							Carp::croak('XML slurp: cannot handle ', ref($xml), ' structure');
 						}
@@ -1859,6 +1869,7 @@ sub selectall_arrayref {
 		my $bo       = delete $params->{'offset'};
 		my $bdist    = delete $params->{'distinct'};
 		my $bcols    = delete $params->{'columns'};
+		delete $params->{'no_fixate'};
 		my ($bsc, $bsd) = _parse_sort_by(delete($params->{'sort_by'}), 'selectall_arrayref');
 		if(defined($bl) && $bl !~ /\A\d+\z/) {
 			Carp::carp('selectall_arrayref: limit must be a non-negative integer, ignoring');
@@ -1940,6 +1951,7 @@ sub selectall_arrayref {
 		}
 	}
 
+	my $no_fixate = delete($params->{'no_fixate'}) // $self->{'no_fixate'};
 	$params = $self->_merge_base_criteria($params);
 
 	if(!$join_clause && $self->{'data'} && !$self->_has_complex_criteria($params)) {
@@ -2127,7 +2139,7 @@ sub selectall_arrayref {
 
 		$c->set($key, $rc, $self->{'cache_duration'}) if $c;
 
-		if($rc && !$self->{'no_fixate'}) {
+		if($rc && !$no_fixate) {
 			$self->_fixate($rc);
 		}
 
@@ -2410,6 +2422,7 @@ sub selectall_array
 		my $params = Params::Get::get_params(undef, \@_) // {};
 		my $bl = delete $params->{'limit'};
 		my $bo = delete $params->{'offset'};
+		delete $params->{'no_fixate'};
 		my ($bsc, $bsd) = _parse_sort_by(delete($params->{'sort_by'}), 'selectall_array');
 		if(defined($bl) && $bl !~ /\A\d+\z/) {
 			Carp::carp('selectall_array: limit must be a non-negative integer, ignoring');
@@ -2464,6 +2477,7 @@ sub selectall_array
 	}
 
 	my ($sort_col, $sort_dir) = _parse_sort_by(delete($params->{'sort_by'}), 'selectall_array');
+	my $no_fixate = delete($params->{'no_fixate'}) // $self->{'no_fixate'};
 	$params = $self->_merge_base_criteria($params);
 
 	if(!$join_clause && $self->{'data'} && !$self->_has_complex_criteria($params)) {
@@ -2634,7 +2648,7 @@ sub selectall_array
 		$c->set($key, $rc, $self->{'cache_duration'}) if $c;
 
 		if($rc) {
-			if(!$self->{'no_fixate'}) {
+			if(!$no_fixate) {
 				$self->_fixate($rc);
 			}
 			return @{$rc};
@@ -2882,6 +2896,7 @@ sub fetchrow_hashref {
 	}
 	my $target = $raw_target // $table;
 	my $join_spec = delete $params->{'join'};
+	delete $params->{'no_fixate'};
 	$params = $self->_merge_base_criteria($params);
 	my $join_clause = $join_spec ? $self->_build_joins($join_spec) : '';
 	my ($where, $wargs) = $self->_build_where($params);

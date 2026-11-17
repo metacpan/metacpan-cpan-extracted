@@ -1,11 +1,11 @@
-requires 'perl', '5.020';
+# Dist::Zilla itself runs on Perl 5.22 and later.
+requires 'perl', '5.022';
 requires 'Dist::Zilla', '6.000';
 requires 'Dist::Zilla::Plugin::Bootstrap::lib';
 requires 'Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch';
 requires 'Dist::Zilla::Plugin::InstallRelease';
-requires 'Dist::Zilla::Plugin::LicenseFile';
+requires 'Dist::Zilla::Plugin::LicenseFile', '0.002';
 requires 'Dist::Zilla::Plugin::MakeMaker::Awesome';
-requires 'Dist::Zilla::Plugin::VersionFromMainModule';
 requires 'Dist::Zilla::Plugin::MetaProvides::Package';
 requires 'Dist::Zilla::Plugin::PodWeaver';
 requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile';
@@ -15,10 +15,16 @@ requires 'Dist::Zilla::Plugin::TestRelease';
 requires 'Dist::Zilla::Plugin::GatherAgentContext';
 requires 'Dist::Zilla::PluginBundle::Git';
 requires 'Dist::Zilla::PluginBundle::Git::VersionManager';
+requires 'File::pushd';
 requires 'Moose';
 requires 'Path::Tiny';
 requires 'Pod::Weaver';
 requires 'Pod::Weaver::Section::GenerateSection';
+
+# The coverage gate of the bundle loads Devel::Cover::DB when it runs for a
+# dist, at that dist's release. The bundle itself never loads it, and no
+# minimum version is measurable.
+recommends 'Devel::Cover';
 
 on test => sub {
   requires 'Test::More', '0.98';
@@ -27,6 +33,4 @@ on test => sub {
   requires 'Pod::Simple';
   requires 'PPI';
   requires 'Software::License::Perl_5';
-  # xt/release/coverage.t loads Devel::Cover::DB at run time
-  requires 'Devel::Cover', '1.00';
 };

@@ -240,7 +240,7 @@ sub pool_setup {
     '... the table is written without a namespace';
   like $sql, qr/^CREATE INDEX idx_things_name ON things /m, '... and so is its index';
   is scalar(grep { /\ASET search_path/ } @$stmts), 1,
-    'the path of the connection is set once, at the head of the script (karr k121)';
+    'the path of the connection is set once, at the head of the script';
   unlike $stmts->[-1], qr/search_path/,
     '... and the script does not close with it';
   unlike $sql, qr/search_path TO auth/,
@@ -303,7 +303,7 @@ sub pool_setup {
   is script($class->connect(@LOGIN)), $plain,
     'a connection without the key installs what the class installs';
   unlike $plain, qr/search_path/,
-    '... and writing no pg_search_path (karr k121)';
+    '... and writing no pg_search_path';
   unlike $plain, qr/tenant_/, '... and without a trace of the connections beside it';
 
   is_deeply [ $class->pg_schemas ], [ 'extensions' ], 'pg_schemas of the class is what was declared';

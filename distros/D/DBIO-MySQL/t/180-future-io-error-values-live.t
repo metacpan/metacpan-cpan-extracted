@@ -87,7 +87,9 @@ $class->register_class(Item => $rc);
 my $schema = $class->connect($dsn, $user, $pass, {
   RaiseError => 1, PrintError => 0, AutoCommit => 1,
   async => 'future_io', pool_size => 2,
-  on_connect_do => ["USE `$DB`"],
+  # MySQL reports in the language of the session; this test reads the English
+  # sentences (the other languages are t/181)
+  on_connect_do => ["USE `$DB`", "SET SESSION lc_messages = 'en_US'"],
 });
 push @schemas, $schema;
 my $rs = $schema->resultset('Item');

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE, karr k73 (c) / karr k71: a blocking storage call made inside a callback
 # that holds the pool's last connection, against a real PostgreSQL. The live
@@ -521,7 +522,7 @@ for my $variant (
   [ 'the coderef dies with the refusal', 1 ],
 ) {
   my ($what, $dies) = @$variant;
-  my $label = "k85, blocking insert after a \$ctx statement in flight, $what";
+  my $label = "blocking insert after a \$ctx statement in flight, $what";
   my ($h, $pid) = fresh(1);
   my $table = "dbio_k85_block_$$";
   $observer->do("DROP TABLE IF EXISTS $table");
@@ -541,7 +542,7 @@ for my $variant (
   });
   ok !$r->{hung}, "$label: nothing hangs"
     or diag "still blocked: queued $r->{queued}, EV::Pg counts $r->{pending}";
-  like $seen{error}, qr/\ABlocking wait refused: .*more result\(s\) due/s, "$label: the INSERT is refused (k44)";
+  like $seen{error}, qr/\ABlocking wait refused: .*more result\(s\) due/s, "$label: the INSERT is refused";
   is $seen{queued}, 0, "$label: and taken out of the pool's queue as it is refused";
   is !$r->{ok}, !!$dies, "$label: txn_do " . ($dies ? 'dies with the refusal' : 'commits')
     or diag $r->{error};
@@ -571,7 +572,7 @@ for my $variant (
 # of a chain nobody holds.
 
 {
-  my $label = 'k86, the loop runs dry under a queued blocking call, pool of one';
+  my $label = 'the loop runs dry under a queued blocking call, pool of one';
   # Dry needs a loop with no timer in it: core's acquire_timeout (default 30
   # seconds, core k397) arms one for the queued caller, so the dry loop is asked
   # for with acquire_timeout => 0.

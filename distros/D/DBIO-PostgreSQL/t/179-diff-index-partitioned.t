@@ -14,7 +14,7 @@ use DBIO::PostgreSQL::Diff::Index;
 # ALTER INDEX ... ATTACH PARTITION, a partition that is itself partitioned
 # getting ON ONLY and its own partitions first.
 #
-# Without a server; t/180-diff-index-partitioned-live.t has it measured.
+# Without a server; t/112-diff-index-live.t has it measured.
 
 my $SRC_TABLES = {
   'public.p'   => { schema_name => 'public', table_name => 'p',   kind => 'p', partition_of => undef },

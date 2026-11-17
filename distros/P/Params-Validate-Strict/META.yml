@@ -3,6 +3,7 @@ abstract: 'Validates a set of parameters against a schema'
 author:
   - 'Nigel Horne <njh@nigelhorne.com>'
 build_requires:
+  Data::Dumper: '0'
   ExtUtils::MakeMaker: '0'
   POSIX: '0'
   Readonly: '0'
@@ -33,6 +34,7 @@ requires:
   List::Util: '1.33'
   Readonly::Values::Boolean: '0'
   Scalar::Util: '0'
+  constant: '0'
   overload: '0'
   perl: '5.026'
   strict: '0'
@@ -41,5 +43,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Params-Validate-Strict
   homepage: https://metacpan.org/pod/Params::Validate::Strict
   repository: git://github.com/nigelhorne/Params-Validate-Strict.git
-version: '0.42'
+version: '0.43'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

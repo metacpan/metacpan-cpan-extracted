@@ -1,7 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
-use Time::HiRes qw(time);
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use CpuGrowth qw(growth_ratio min_cpu);
 
 use DBIO::PostgreSQL::PostGIS::Codec::WKT::Parser;
 my $p = 'DBIO::PostgreSQL::PostGIS::Codec::WKT::Parser';
@@ -284,13 +287,20 @@ is $p->parse('GEOMETRYCOLLECTION(POINT(1 2)'), undef, 'unbalanced collection';
 sub nested { my $d = shift; ('GEOMETRYCOLLECTION(' x $d) . 'POINT(1 1)' . (')' x $d) }
 
 {
-  my $started = time;
   my $r = eval { $p->parse(nested(2000)); 1 };
   my $err = $@;
   ok !$r, 'depth 2000 throws';
   like "$err", qr/WKT nesting too deep/, '... naming the limit';
   unlike "$err", qr/POINT|GEOMETRYCOLLECTION/, '... without the input in the message';
-  cmp_ok time - $started, '<', 2, '... fast';
+}
+
+# Too deep is refused early (at level 33), so the cost does not depend on the
+# size of the input: a parser that first reads or copies all of it would
+# fail at depth 128000. CPU time, smallest of 3, with a generous 1 s.
+for my $depth (2000, 128_000) {
+  my $wkt = nested($depth);
+  my $cpu = min_cpu(sub { eval { $p->parse($_[0]) } }, $wkt, 3);
+  cmp_ok $cpu, '<', 1, "depth $depth is refused fast";
 }
 
 {
@@ -307,36 +317,43 @@ sub nested { my $d = shift; ('GEOMETRYCOLLECTION(' x $d) . 'POINT(1 1)' . (')' x
   like "$@", qr/WKT nesting too deep/, '... naming the limit';
 }
 
-# Wide input costs time in proportion to its length.
-{
-  my $started = time;
-  my $r = $p->parse('MULTIPOINT(' . join(',', map { "($_ 1)" } 1 .. 200_000) . ')');
-  is scalar @{ $r->{coords} }, 200_000, 'MULTIPOINT with 200000 points';
-  is_deeply $r->{coords}[199_999], [200_000, 1], '... the last one is read';
-  cmp_ok time - $started, '<', 10, '... in linear time';
+# Wide input costs time in proportion to its length. Growth is measured, not
+# the wall clock: the same shape of input at n and at 8n, compared by CPU time
+# (see CpuGrowth). Linear gives a ratio near 8, quadratic near 64; the limit
+# 24 separates them. The sizes can be set for experiments.
+my $N = $ENV{WKT_GROWTH_N} || 25_000;
+my $MAX_RATIO = 24;
 
-  $started = time;
-  $r = $p->parse('GEOMETRYCOLLECTION(' . join(',', ('POINT(1 2)') x 100_000) . ')');
-  is scalar @{ $r->{coords} }, 100_000, 'GEOMETRYCOLLECTION with 100000 members';
-  cmp_ok time - $started, '<', 10, '... in linear time';
+{
+  my ($ratio, $small, $big, $r) = growth_ratio(
+    sub { 'MULTIPOINT(' . join(',', map { "($_ 1)" } 1 .. $_[0]) . ')' },
+    sub { $p->parse($_[0]) }, $N, 8);
+  is scalar @{ $r->{coords} }, 8 * $N, 'MULTIPOINT with ' . 8 * $N . ' points';
+  is_deeply $r->{coords}[8 * $N - 1], [8 * $N, 1], '... the last one is read';
+  cmp_ok $ratio, '<', $MAX_RATIO, '... in linear time' or diag "ratio $ratio ($small s, $big s)";
+
+  ($ratio, $small, $big, $r) = growth_ratio(
+    sub { 'GEOMETRYCOLLECTION(' . join(',', ('POINT(1 2)') x $_[0]) . ')' },
+    sub { $p->parse($_[0]) }, $N / 2, 8);
+  is scalar @{ $r->{coords} }, 4 * $N, 'GEOMETRYCOLLECTION with ' . 4 * $N . ' members';
+  cmp_ok $ratio, '<', $MAX_RATIO, '... in linear time' or diag "ratio $ratio ($small s, $big s)";
 }
 
 # A long run of whitespace is read in linear time, wherever it stands.
 {
-  my $w = ' ' x 1_000_000;
+  my $W = $ENV{WKT_GROWTH_W} || 1_000_000;
   for my $case (
-    ['between ordinates',    "POINT(1${w}2)"],
-    ['before a comma',       "LINESTRING(1 2${w},3 4)"],
-    ['after a comma',        "LINESTRING(1 2,${w}3 4)"],
-    ['around a ring',        "POLYGON((${w}0 0${w},1 0,1 1,0 0${w}))"],
-    ['in a MULTIPOINT',      "MULTIPOINT((1${w}2)${w},(3 4))"],
+    ['between ordinates',    sub { "POINT(1$_[0]2)" }],
+    ['before a comma',       sub { "LINESTRING(1 2$_[0],3 4)" }],
+    ['after a comma',        sub { "LINESTRING(1 2,$_[0]3 4)" }],
+    ['around a ring',        sub { "POLYGON(($_[0]0 0$_[0],1 0,1 1,0 0$_[0]))" }],
+    ['in a MULTIPOINT',      sub { "MULTIPOINT((1$_[0]2)$_[0],(3 4))" }],
   ) {
-    my ($name, $wkt) = @$case;
-    my $started = time;
-    my $r = $p->parse($wkt);
-    my $took = time - $started;
-    ok $r, "1 MB of whitespace $name: read";
-    cmp_ok $took, '<', 0.5, '... in linear time';
+    my ($name, $shape) = @$case;
+    my ($ratio, $small, $big, $r) = growth_ratio(
+      sub { $shape->(' ' x $_[0]) }, sub { $p->parse($_[0]) }, $W, 8);
+    ok $r, "8 MB of whitespace $name: read";
+    cmp_ok $ratio, '<', $MAX_RATIO, '... in linear time' or diag "ratio $ratio ($small s, $big s)";
   }
 }
 

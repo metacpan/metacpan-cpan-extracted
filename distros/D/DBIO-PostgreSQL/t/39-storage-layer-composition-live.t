@@ -132,7 +132,7 @@ $async->insert_async($source, { name => 'John Coltrane' })->get;
     q{SELECT current_setting('dbio_async.marker', true)}, []
   )->get;
   is $m[0][0], 'replayed',
-    'on_connect_do replayed on the freshly-spawned pooled async connection (core k68)';
+    'on_connect_do replayed on the freshly-spawned pooled async connection';
 }
 
 # --- Cleanup -----------------------------------------------------------------

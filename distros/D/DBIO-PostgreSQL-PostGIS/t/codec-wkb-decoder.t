@@ -2,6 +2,10 @@ use strict;
 use warnings;
 use Test::More;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use CpuGrowth qw(cpu_time);
+
 use DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder;
 my $d = 'DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder';
 
@@ -116,7 +120,7 @@ subtest 'a collection of decoded types is still decoded' => sub {
   is_deeply $got->{coords}, [
     { type => 'point',      coords => [1,2],         is_empty => 0 },
     { type => 'linestring', coords => [[0,0],[1,1]], is_empty => 0 },
-  ], 'the members, each with its type (CHANGED from bare coordinates, karr k24)';
+  ], 'the members, each with its type';
   is $got->{is_empty}, 0, 'not empty';
 };
 
@@ -594,10 +598,17 @@ subtest 'nesting of collections is limited to 32 levels' => sub {
   like $@, qr/decode_hex: nesting too deep/, '... naming the limit';
   unlike $@, qr/[0-9a-f]{10}/, '... without the input in the message';
 
-  my $started = time;
-  eval { $d->decode_hex($nested->(100_000)) };
+  # The depth is refused early, so the cost does not depend on the input size.
+  # The input is built before the measurement; the measure is CPU time of the
+  # process, not wall clock, so a loaded machine does not tip it. The limit is
+  # generous: a refusal costs close to nothing, a decoder that reads or copies
+  # the whole input first is what it catches.
+  my $deep = $nested->(100_000);
+  my $started = cpu_time();
+  eval { $d->decode_hex($deep) };
+  my $took = cpu_time() - $started;
   like $@, qr/nesting too deep/, 'depth 100000 is refused';
-  cmp_ok time - $started, '<', 2, '... fast';
+  cmp_ok $took, '<', 1, '... fast';
 
   require DBIO::PostgreSQL::PostGIS::Geometry;
   my $g = DBIO::PostgreSQL::PostGIS::Geometry->from_ewkb_hex($nested->(33));
@@ -606,5 +617,23 @@ subtest 'nesting of collections is limited to 32 levels' => sub {
   is $g->geometry_type, 'GEOMETRYCOLLECTION', '... and the type of its header';
   is $g->coordinates, undef, '... without coordinates';
 };
+
+# A coordinate read from EWKB is the shortest decimal whose double is the
+# bytes read (what PostGIS writes as text), also on a perl whose NV is
+# wider than a double: there 13.4 would read as 13.4000000000000004.
+for my $x (0.1, 13.4, 52.5, -0.25, 1e300, 5e-324, 0.30000000000000004) {
+  my $bytes = pack 'd<', $x;
+  my $hex = unpack 'H*', pack('C V', 1, 1) . $bytes . pack('d<', 0);
+  my $got = $d->decode_hex($hex)->{coords}[0];
+  is pack('d<', $got), $bytes, "x=$x: read number packs to the input bytes";
+}
+for my $lit ('0.1', '13.4', '52.5', '-0.25', '1e+300') {
+  my $hex = unpack 'H*', pack('C V d< d<', 1, 1, $lit, 0);
+  is $d->decode_hex($hex)->{coords}[0], $lit, "$lit reads as the literal";
+}
+{
+  my $hex = unpack 'H*', pack('C V', 1, 1) . pack('d<', 9**9**9 / 9**9**9) x 2;
+  is_deeply $d->decode_hex($hex)->{coords}, [], 'NaN point stays an empty point';
+}
 
 done_testing;

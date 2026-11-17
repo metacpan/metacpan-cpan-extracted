@@ -6,17 +6,19 @@ use Test2::Plugin::NoWarnings;
 # plain steps runs in a plain loop, with no run's machinery. Each case
 # here runs the same stages both ways, the plain loop, with the full
 # path made to die so it can't be taken, and the full path, forced by a
-# gather after them that passes each value on, and expects the same.
+# gather after them that passes each value on, with a flush that gives
+# nothing, and expects the same.
 
 use Ekorn::Pipeline;
 use Ekorn::Pipeline::Gather;
 use Ekorn::Pipeline::Stop;
-use Ekorn::Pipeline::Sources qw(from_array);
-use Ekorn::Pipeline::Stages::Flow;
+use Ekorn::Pipeline::Sinks        qw(keep_all);
+use Ekorn::Pipeline::Sources      qw(from_array);
+use Ekorn::Pipeline::Stages::Flow qw(take drop take_last);
 
 my $class = 'Ekorn::Pipeline';
 my $same  = gather {
-    sub ($value) { $value }
+    return (sub ($value) { $value }, sub () { return });
 };
 
 # Return what calling, in list context, a pipeline of @stages with
@@ -27,7 +29,7 @@ sub both ($stages, @values) {
     my @got;
     {
         no warnings 'redefine';
-        local *Ekorn::Pipeline::_iterator = sub { die "the full path\n" };
+        local *Ekorn::Pipeline::_full_iterator = sub { die "the full path\n" };
         push @got, [eval { [$plain->(@values)] } // $@];
     }
     push @got, [eval { [$full->(@values)] } // $@];
@@ -80,11 +82,55 @@ subtest 'A stop ends the run as a run ends it' => sub {
         [sub { $_ == 2 ? die(bless {}, 'My::Hash::Stop') : $_ }], [1 .. 5], [1];
 };
 
-subtest 'A stage made for a run takes the full path' => sub {
-    my $taking = $class->new(sub { $_ }, take(2));
+# Roadmap 2026-0041: a stage made for a run takes the plain loop too,
+# once it's made, unless it has a flush or an end.
+subtest 'A stage made for a run takes the plain loop' => sub {
     no warnings 'redefine';
-    local *Ekorn::Pipeline::_iterator = sub { die "the full path\n" };
-    is dies { $taking->(1 .. 5) }, "the full path\n", 'take, made with gather';
+    local *Ekorn::Pipeline::_full_iterator = sub { die "the full path\n" };
+    is [$class->new(sub { $_ }, take(2))->(1 .. 5)], [1, 2],
+        'take, made with gather';
+    my $n = 0;
+    is [
+        $class->new(gather {
+            my $i = $n++;
+            sub ($value) { "$i:$value" }
+        })->(qw(a b))
+        ],
+        [qw(0:a 0:b)], 'made once for the run';
+    is [
+        $class->new(gather {
+            sub ($value) { $value }
+        })->()
+        ],
+        [], 'given no values';
+    is dies { $class->new(take_last)->(1 .. 3) }, "the full path\n",
+        'take_last, with a flush, by the full path';
+    is dies {
+        $class->new(gather {
+            return (sub ($v) { $v }, undef, sub ($how) { })
+        })->(1)
+    },
+        "the full path\n", 'a stage with an end, by the full path';
+    is dies {
+        $class->new(sub { $_ }, keep_all)->(1)
+    },
+        "the full path\n", 'a sink, by the full path';
+};
+
+subtest 'A set-up that dies, pushed, is reported as before' => sub {
+    my @ended;
+    my $ending = gather {
+        return (sub ($v) { $v }, undef, sub ($how) { push @ended, $how })
+    };
+    like dies {
+        $class->new($ending, gather { die "no set-up\n" })->(1)
+    },
+        qr( \A no\ set-up \n \z )x, 'its error thrown on';
+    is \@ended, ['died'], 'the end made before it told the run died';
+    like dies {
+        $class->new(gather { Ekorn::Pipeline::Stop->throw })->(1)
+    },
+        qr( \A Expected\ no\ stop\ in\ a\ set-up, )x, 'a stop in it croaks';
 };
 
 subtest 'A step that dies is named as a run names it' => sub {

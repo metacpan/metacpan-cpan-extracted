@@ -130,7 +130,7 @@ is_deeply sql(model(ITEM => [ fk() ]),
 
 like( sql({ %{ model() }, tables => { PARENT => { table_name => 'PARENT' } } },
           model(ITEM => [ fk() ]))->[-1], qr/ADD CONSTRAINT "FK_X" FOREIGN KEY/,
-  'a table that only the target has: its key is created (karr k37)');
+  'a table that only the target has: its key is created');
 
 # the key of a table both have that points to a table the target drops goes
 # before that table

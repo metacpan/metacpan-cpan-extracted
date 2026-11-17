@@ -66,7 +66,7 @@ is $loaded->geom->srid, 4326;
 is $loaded->geom->wkt, 'POINT(13.4 52.5)';
 is_deeply $loaded->geom->to_geojson,
   { type => 'Point', coordinates => [13.4, 52.5] },
-  'a value read from the database answers to_geojson (karr k13)';
+  'a value read from the database answers to_geojson';
 
 # spatial query
 my $here = DBIO::PostgreSQL::PostGIS::Geometry->point(13.4, 52.5, srid => 4326);

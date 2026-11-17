@@ -1,11 +1,11 @@
 /*
 * ----------------------------------------------------------------------------
 * PO Files Manipulation - Text-PO/share/gettext.js
-* Version v1.1.1
+* Version v1.1.3
 * Copyright(c) 2021-2026 DEGUEST Pte. Ltd.
 * Author: Jacques Deguest <jack@deguest.jp>
 * Created 2021/06/29
-* Modified 2026/09/08
+* Modified 2026/10/26
 * All rights reserved
 * 
 * This program is free software; you can redistribute  it  and/or  modify  it
@@ -2257,7 +2257,7 @@ function printf() {
                 callerFuncName = (callerFunc.substring( callerFunc.indexOf( 'function' ) + 8, callerFunc.indexOf( '(' ) ) || 'anoynmous');
             }
             var logData = {};
-            var stackString = (new Error()).stack;
+            var stackString = (new Error()).stack || '';
             stackString = stackString.replace( /[\n\r]+$/g, '' );
             logData.stackTrace = stackString;
             var stackLines = stackString.split( "\n" );
@@ -2267,10 +2267,32 @@ function printf() {
                 var def = {};
                 var line = stackLines[i];
                 // console.log( "Checking line '" + line + "'" );
-                var chunk = line.split( "@" );
-                var functionInfo = chunk[0];
-                var locationInfo = chunk[1];
+                var functionInfo = '';
+                var locationInfo = '';
                 var matches = [];
+                var chunk = line.split( "@" );
+                if( chunk.length > 1 )
+                {
+                    // Firefox and Safari: function@url:line:column
+                    functionInfo = chunk.slice( 0, -1 ).join( '@' );
+                    locationInfo = chunk[ chunk.length - 1 ];
+                }
+                else if( ( matches = line.match( /^\s*at\s+(.*?)\s+\((.*)\)\s*$/ ) ) !== null )
+                {
+                    // Chromium: at function (url:line:column)
+                    functionInfo = matches[1];
+                    locationInfo = matches[2];
+                }
+                else if( ( matches = line.match( /^\s*at\s+(.+?)\s*$/ ) ) !== null )
+                {
+                    // Chromium: at url:line:column, or a native frame
+                    locationInfo = matches[1];
+                }
+                else
+                {
+                    // Error headings and stack frames without a usable location
+                    continue;
+                }
                 // http://legal-server.test/js/jquery-1.11.2.min.js line 2 > eval:749:4
                 if( ( matches = locationInfo.match( /^(\S+)\s+line\s\d+\s+>\s+eval\:(\d+):(\d+)$/ ) ) !== null )
                 {
@@ -2292,6 +2314,7 @@ function printf() {
                 else
                 {
                     console.info( "Location no match for: '" + locationInfo + "'" );
+                    continue;
                 }
                 // LegalTech</ui.legalTechProgressBar
                 // LegalTech/this.init/</<
@@ -2344,7 +2367,13 @@ function printf() {
             var j = 1;
             var ref = stackTrace[j];
             // console.log( "Checking method '" + ref.method + "'" );
-            if( ( ref.method === 'debug' || ref.method === 'error' || ref.method === 'log' || ref.method === 'trace' || ref.method === 'warn' ) && ( j + 1 ) < stackTrace.length )
+            if( ref && ( ref.method === 'debug' ||
+                         ref.method === 'error' ||
+                         ref.method === 'log' ||
+                         ref.method === 'trace' ||
+                         ref.method === 'warn'
+                       ) &&
+                       ( j + 1 ) < stackTrace.length )
             {
                 var def = stackTrace[j+1];
                 if( def.object !== null && def.object.length > 0 )
@@ -4091,7 +4120,7 @@ function printf() {
             }
 
             if( !hash[ self.domain ].hasOwnProperty( self.locale ) || 
-                !Object.keys( hash[ self.domain ][ self.locale ] ).length == 0 )
+                Object.keys( hash[ self.domain ][ self.locale ] ).length == 0 )
             {
                 return self.loadDomainData({ domain: self.domain, locale: self.locale }).then(function()
                 {
@@ -4634,7 +4663,7 @@ Or:
 
 =head1 VERSION
 
-    v1.1.0
+    v1.1.2
 
 =head1 DESCRIPTION
 

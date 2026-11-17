@@ -4,7 +4,7 @@ package DBIO::DuckDB::DDL::Emit;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 
@@ -113,7 +113,7 @@ DBIO::DuckDB::DDL::Emit - Single source of DuckDB DDL statement shape
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

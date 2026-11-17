@@ -58,8 +58,13 @@ my @ENV_LOGIN = map { "DBIO_TEST_PG_$_" } qw( DSN USER PASS );
 my $DEAD_DSN = "dbi:Pg:dbname=appdb;host=$DEAD;password=GEHEIM-in-der-dsn";
 my @DEAD     = ($DEAD_DSN, 'app', 'GEHEIM-als-argument');
 
-# libpq's reason, by what no locale translates: the socket it tried.
-my $SOCKET_TRIED = qr{\Q$DEAD\E/\.s\.PGSQL\.\d+};
+# libpq's reason, by what no locale translates: the socket it tried. A libpq
+# without Unix-domain socket directories takes the dead directory for a host
+# name and goes to TCP, so it never names a socket; there the reason is what
+# it means, a connection that failed.
+my $HAS_SOCKETS   = LiveServer->libpq_has_unix_sockets;
+my $SOCKET_TRIED  = qr{\Q$DEAD\E/\.s\.PGSQL\.\d+};
+my $REASON        = $HAS_SOCKETS ? $SOCKET_TRIED : qr/could not connect|connection to server|failed:/i;
 
 # ---------------------------------------------------------------------------
 # 1. The login of the environment.
@@ -96,7 +101,7 @@ SKIP: {
       BAIL_OUT('a connection was opened -- this file must never reach a server');
     }
 
-    like $err, $SOCKET_TRIED, "a connect that fails, with $label: thrown, with libpq's reason";
+    like $err, $REASON, "a connect that fails, with $label: thrown, with libpq's reason";
     unlike $err, qr/GEHEIM/, '... without the password of the DSN and without the one given as an argument';
     is_deeply \@warnings, [], '... and DBI printed nothing';
   }
@@ -124,6 +129,7 @@ sub run_file {
   close $in;
   my $output = do { local $/; <$out> };
   waitpid $pid, 0;
+  $output =~ s/\r\n/\n/g;    # a pipe is text on Windows: its lines end in CRLF
   return ($output, $? >> 8);
 }
 
@@ -145,7 +151,7 @@ SKIP: {
     like $output, qr/^1\.\.2$/m, '... with a plan';
     isnt $exit, 0, '... and a failing exit status';
     unlike $output, qr/REACHED-BEHIND-IT/, '... and ends there';
-    like $output, qr/^# .*$SOCKET_TRIED/m, q{... libpq's reason is a diagnostic};
+    like $output, qr/^# .*$REASON/m, q{... libpq's reason is a diagnostic};
     like $output, qr/\Qpassword=***\E/, '... the password of the DSN in it as ***';
     unlike $output, qr/GEHEIM/, '... and no password anywhere in what the file wrote';
   }
@@ -154,7 +160,7 @@ SKIP: {
     my $dbh = eval { LiveServer->control_dbh(login => \@DEAD) };
     my $err = "$@";
     ok !$dbh, 'control_dbh throws';
-    like $err, $SOCKET_TRIED, q{... libpq's reason};
+    like $err, $REASON, q{... libpq's reason};
     unlike $err, qr/GEHEIM/, '... without a password';
   };
   pass 'and the file went on behind the subtest';
@@ -247,6 +253,7 @@ SKIP: {
     [ 'behind a dbname in double quotes',    qq{dbi:Pg:dbname="my;db";host=$DEAD/behind} ],
   );
   skip "$DEAD exists on this machine", scalar @forms if -e $DEAD;
+  skip $LiveServer::NO_UNIX_SOCKETS, scalar @forms unless $HAS_SOCKETS;
 
   for my $form (@forms) {
     my ($label, $dsn) = @$form;

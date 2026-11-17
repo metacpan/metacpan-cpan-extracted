@@ -1,0 +1,591 @@
+---
+as_string:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: as_string
+  input:
+    raw:
+      _source: validator
+      optional: 1
+      type: boolean
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+browser_type:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: browser_type
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+cache:
+  accessor:
+    property: cache
+    type: getset
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: cache
+  input:
+    cache:
+      optional: 1
+      position: 0
+      type: object
+  module: CGI::Info
+  new: {}
+  output:
+    type: object
+cgi_host_url:
+  accessor:
+    property: cgi_site
+    type: getter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: cgi_host_url
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+cookie:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: cookie
+  input:
+    cookie_name:
+      _source: validator
+      matches: ^[!#-'*+\-.\^_`|~0-9A-Za-z]+$
+      min: 1
+      type: string
+  module: CGI::Info
+  new: {}
+  output:
+    _type_confidence: medium
+    type: number
+documentroot:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: documentroot
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+domain_name:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: domain_name
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+get_cookie:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: get_cookie
+  input:
+    cookie_name:
+      _source: validator
+      matches: ^[!#-'*+\-.\^_`|~0-9A-Za-z]+$
+      min: 1
+      type: string
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+host_name:
+  accessor:
+    property: site
+    type: getter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: host_name
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+is_ai:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: is_ai
+  module: CGI::Info
+  new: {}
+  output:
+    type: boolean
+is_mobile:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: is_mobile
+  module: CGI::Info
+  new: {}
+  output:
+    _error_handling:
+      type: string
+      zero_on_error: 1
+    _error_return: 'false'
+    type: boolean
+is_robot:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: is_robot
+  module: CGI::Info
+  new: {}
+  output:
+    _error_handling:
+      type: string
+      zero_on_error: 1
+    _error_return: 'false'
+    type: integer
+is_search_engine:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: is_search_engine
+  module: CGI::Info
+  new: {}
+  output:
+    _error_handling:
+      type: string
+      zero_on_error: 1
+    _error_return: 'false'
+    type: integer
+is_tablet:
+  accessor:
+    property: is_tablet
+    type: getter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: is_tablet
+  module: CGI::Info
+  new: {}
+  output:
+    type: boolean
+logdir:
+  accessor:
+    property: logdir
+    type: getset
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: logdir
+  input:
+    dir:
+      _note: Existing directory
+      _source: input_spec
+      optional: 1
+      position: 0
+      semantic: directory
+      type: string
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+messages:
+  accessor:
+    property: messages
+    type: getter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: messages
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+messages_as_string:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: messages_as_string
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+new:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: new
+  input:
+    allow:
+      _source: input_spec
+      optional: 1
+      type: hashref
+    allow_dtd:
+      _source: input_spec
+      optional: 1
+      type: boolean
+    auto_load:
+      _source: input_spec
+      optional: 1
+      type: boolean
+    cache:
+      _source: input_spec
+      optional: 1
+      type: object
+    carp_on_warn:
+      _source: input_spec
+      optional: 1
+      type: boolean
+    config_dirs:
+      _source: input_spec
+      optional: 1
+      type: arrayref
+    config_file:
+      _note: Existing file
+      _source: input_spec
+      optional: 1
+      semantic: existing_file
+      type: string
+    dtd_warning_interval:
+      _constraint_source:
+        min: input_spec
+      _source: input_spec
+      min: 0
+      optional: 1
+      type: integer
+    logger:
+      _source: input_spec
+      optional: 1
+      type: object
+    max_body_size:
+      _source: input_spec
+      optional: 1
+      type: integer
+    max_nesting_depth:
+      _source: input_spec
+      optional: 1
+      type: integer
+    max_params:
+      _source: input_spec
+      optional: 1
+      type: integer
+    max_part_headers:
+      _source: input_spec
+      optional: 1
+      type: integer
+    max_parts:
+      _source: input_spec
+      optional: 1
+      type: integer
+    max_upload_size:
+      _source: input_spec
+      optional: 1
+      type: integer
+    upload_dir:
+      _source: input_spec
+      optional: 1
+      type: string
+  module: CGI::Info
+  output:
+    isa: CGI::Info
+    type: object
+param:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: param
+  input:
+    field:
+      _source: input_spec
+      optional: 1
+      position: 0
+      type: string
+  module: CGI::Info
+  new: {}
+  output:
+    _list_return: 2
+params:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: params
+  module: CGI::Info
+  new: {}
+  output:
+    _error_handling:
+      exception_handling: 1
+      type: string
+    _list_return: 2
+protocol:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: protocol
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+reset:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: reset
+  module: CGI::Info
+  output:
+    _void_context: 1
+    type: void
+root_dir:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: root_dir
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+rootdir:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: rootdir
+  module: CGI::Info
+  output:
+    type: string
+script_dir:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: script_dir
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+script_name:
+  accessor:
+    property: script_name
+    type: getter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: script_name
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+script_path:
+  accessor:
+    property: script_path
+    type: getter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: script_path
+  module: CGI::Info
+  new: {}
+  output:
+    type: string
+set_logger:
+  accessor:
+    param: logger
+    property: logger
+    type: setter
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: set_logger
+  input:
+    logger:
+      type: any
+  module: CGI::Info
+  new: {}
+  output:
+    _returns_self: 1
+    _void_context_hint: setter
+    isa: CGI::Info
+    type: object
+status:
+  accessor:
+    property: status
+    type: getset
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: status
+  input:
+    status:
+      _source: input_spec
+      optional: 1
+      position: 0
+      type: integer
+  module: CGI::Info
+  new: {}
+  output:
+    _type_confidence: low
+    type: integer
+tmpdir:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: tmpdir
+  input:
+    default:
+      _source: input_spec
+      optional: 1
+      type: string
+  module: CGI::Info
+  new: {}
+  output:
+    type: string

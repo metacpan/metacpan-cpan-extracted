@@ -5,12 +5,12 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.15.0';
+our $VERSION = '1.16.0';
 
 our @FLAGS = qw(is_registered is_disposable has_a has_aaaa has_mx has_ns has_cname);
 # Copied as served, and paid: absent from an answer whose plan leaves them out.
 our @MEMBERS = qw(dns ip_ranges disposable);
-our @MARKERS = qw(trial_expired);
+our @MARKERS = qw(trial_expired cap_reached);
 
 my %KNOWN = map { $_ => 1 } 'domain', @FLAGS, @MEMBERS, @MARKERS;
 
@@ -93,6 +93,10 @@ plan omits them.
 =head2 trial_expired
 
 On answers to a key on the free plan only, as on L<InternetData::Result>.
+
+=head2 cap_reached
+
+On answers to a key on a paid plan only, as on L<InternetData::Result>.
 
 =head2 has($field), fields, raw
 

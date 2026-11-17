@@ -4,7 +4,7 @@ package DBIO::Oracle::Storage::Savepoints;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 sub _exec_svp_begin {
@@ -41,7 +41,7 @@ DBIO::Oracle::Storage::Savepoints - Savepoint management for Oracle
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Introspect::Tables;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::ClickHouse::Introspect::Util ();
 
@@ -120,7 +120,7 @@ DBIO::ClickHouse::Introspect::Tables - Introspect ClickHouse tables and views vi
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

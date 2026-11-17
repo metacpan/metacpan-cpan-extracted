@@ -69,7 +69,7 @@ my ( $groupings, $added ) = ( 0, 0 );
       sub { $added++; goto &$add_header };
 }
 
-my $hlist = join ':', ('x') x 2000;
+my $hlist = join ':', 'from', ('x') x 2000;
 my $msg = join( '',
     map { "DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=example$_.com; s=s; h=$hlist; bh=AAAA; b=AAAA\n" }
       1 .. 10 )

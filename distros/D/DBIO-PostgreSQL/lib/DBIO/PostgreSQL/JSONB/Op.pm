@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::JSONB::Op;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp ();
 use DBIO::Exception ();
@@ -102,7 +102,7 @@ DBIO::PostgreSQL::JSONB::Op - JSONB path-extraction operator object built by jso
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

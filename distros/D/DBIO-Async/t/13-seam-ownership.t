@@ -60,7 +60,7 @@ use DBIO::Async::TransactionContext;
   ok $has_seam,
     'core\'s own seam-ownership probe says this transport OWNS _query_async '
     . '-- the gate an async layer with no declared requirements is admitted '
-    . 'through (core ADR 0032 addendum / karr k118)';
+    . 'through (core ADR 0032 addendum)';
 }
 
 my %OWNED = (

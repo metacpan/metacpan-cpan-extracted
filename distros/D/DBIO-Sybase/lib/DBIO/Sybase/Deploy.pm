@@ -4,7 +4,7 @@ package DBIO::Sybase::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Deploy::Base::TempDatabase';
 
@@ -315,7 +315,7 @@ DBIO::Sybase::Deploy - Deploy and upgrade Sybase ASE schemas via test-deploy-and
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

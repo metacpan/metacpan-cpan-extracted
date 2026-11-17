@@ -8,7 +8,7 @@ use Dist::Zilla::Tester;
 
 # Pins how Dist::Zilla::Plugin::DBIO::GatherSkills gathers a distribution's own
 # skills from .claude/skills/ into share/skills/. Two behaviours the skilletor
-# switchover (core ADR 0058) depends on (k11):
+# switchover (core ADR 0058) depends on:
 #
 #   1. skilletor writes a per-skill .gitignore (content "*") into every installed
 #      skill dir. It is skilletor's management file, not content, and must never
@@ -117,6 +117,27 @@ sub gathered {
   is_deeply [ gathered($tzil) ],
     [ 'share/skills/dbio-test-extra/SKILL.md' ],
     'fallback ships the matching dir and still drops .gitignore';
+}
+
+# --- (d) files ship as bytes: a binary file arrives unchanged ---
+{
+  my $binary = join '', map { chr } 0xFF, 0xD8, 0x00, 0x01, 0x80, 0xC3, 0x28, 0x0A, 0xFE;
+  my $text   = "caf\xC3\xA9 skill body\n";    # UTF-8 bytes of "caf\x{e9}"
+  my $corpus = Path::Tiny->tempdir;
+  my $skill  = $corpus->child('dbio-test');
+  $skill->child('assets')->mkpath;
+  $skill->child('SKILL.md')->spew_raw($text);
+  $skill->child('assets', 'logo.bin')->spew_raw($binary);
+
+  my $tzil = build_tzil($corpus, 'skill = dbio-test');
+  plugin($tzil)->gather_files;
+
+  my %file = map { $_->name => $_ } grep { $_->name =~ m{^share/skills/} } @{ $tzil->files };
+  ok $file{'share/skills/dbio-test/assets/logo.bin'}, 'binary file gathered';
+  ok $file{'share/skills/dbio-test/assets/logo.bin'}->encoded_content eq $binary,
+    'binary file content is byte-identical';
+  ok $file{'share/skills/dbio-test/SKILL.md'}->encoded_content eq $text,
+    'text file content is byte-identical (UTF-8 bytes stay as they are)';
 }
 
 done_testing;

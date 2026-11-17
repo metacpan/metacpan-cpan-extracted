@@ -1,6 +1,6 @@
 # ABSTRACT: ArangoDB Collection object
 package Arango::Tango::Collection;
-$Arango::Tango::Collection::VERSION = '0.020';
+$Arango::Tango::Collection::VERSION = '0.021';
 use warnings;
 use strict;
 
@@ -184,7 +184,7 @@ Arango::Tango::Collection - ArangoDB Collection object
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 USAGE
 

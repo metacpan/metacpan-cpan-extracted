@@ -1,5 +1,16 @@
 Revision history for DBIO-PostgreSQL-PostGIS
 
+0.900007  2026-11-17
+    * Codecs
+        - Coordinates decoded from EWKB are the numbers PostGIS writes as
+          text, also on perls whose NV is a long double or a quadmath
+          __float128.
+    * Documentation
+        - The dbio-postgresql-postgis skill states the from_lat_lon
+          signature (always SRID 4326), the units of within_distance, the
+          limit of nearest_to, the alias of with_distance and the
+          DBIO_TEST_PG_EXT_* fallback of the live tests.
+
 0.900004  2026-11-08
     * Breaking Changes
         - DBIO::PostgreSQL::PostGIS::Deploy and ::Introspect are stubs: the
@@ -121,7 +132,7 @@ Revision history for DBIO-PostgreSQL-PostGIS
       PostGIS ships no ::Async layer, so on a composed schema geometry
       CRUD simply flows through whichever transport the schema resolves
       unchanged; core skips async-less layers silently. Zero
-      storage_type writes remain in lib/. karr k4, core k70.
+      storage_type writes remain in lib/.
 
     * Error handling: all driver-internal error throws now flow through
       DBIO::Exception (CurtisPoe review F21). Previously these paths

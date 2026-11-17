@@ -4,7 +4,7 @@ package DBIO::Shortcut::pg;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -24,7 +24,7 @@ DBIO::Shortcut::pg - `use DBIO -pg` shortcut for the PostgreSQL driver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

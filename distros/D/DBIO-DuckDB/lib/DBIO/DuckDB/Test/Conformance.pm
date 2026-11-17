@@ -4,7 +4,7 @@ package DBIO::DuckDB::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 my $Name_schema_serial = 0;
 
@@ -240,7 +240,7 @@ DBIO::DuckDB::Test::Conformance - Answers the shared conformance case table for 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

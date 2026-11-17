@@ -1,5 +1,55 @@
 Revision history for DBIO-PostgreSQL
 
+0.900007  2026-11-17
+    * Fixed
+        - No bound or quoted value is in the text of a server error, whatever
+          language the server reports in (lc_messages). The masking holds on
+          the SQLSTATE and the quoting marks of the text, not on the English
+          wording: a short value, the key or row of a DETAIL and the quoted
+          value of a data exception are masked in German, French and any
+          other language, on the sync storage and on the future_io transport.
+          mask_error_details and mask_detail_values take the SQLSTATE as an
+          optional second argument, and error_sqlstate reads it from a
+          handle; with one argument they work as before.
+        - The bytes of an invalid or untranslatable character sequence
+          (SQLSTATE 22021, 22P05) are in no language in the text of a server
+          error, the name of the encoding stays. The masking cuts no
+          character through, whether the text arrives as characters or as
+          UTF-8 bytes.
+
+    * Documentation
+        - The skills dbio-postgresql and dbio-postgresql-database state the
+          not-diffed list as CHECK constraints, pg_settings, FORCE RLS and a
+          changed policy under an unchanged name, and name no live-test
+          variable the suite does not read.
+
+    * Dependencies
+        - Requires DBD::Pg 3.19.0, which hands a quoted DSN value to libpq
+          as given, with a ';' or a quote inside it; the DSN model of the
+          driver and the broker relies on that. It also provides
+          pg_error_field, which the error fields are read through.
+
+    * Tests
+        - The test suite passes on an install with only the required
+          modules: the tests of the future_io transport skip when DBIO::Async
+          is not installed, the storage half of the search_path test skips
+          when DBIO-PostgreSQL-Age is not installed.
+        - The tests that send a Unix-domain socket directory through libpq
+          (the connection-parameter DSN test and the live-server helper test)
+          skip when the libpq behind DBD::Pg has no Unix-domain sockets, and
+          the helper test reads the reason of a failed connect by its
+          meaning there. Its child-process output is read with CRLF line
+          endings folded, as a pipe delivers them on Windows.
+        - The tests that compare libpq's own wording run in any locale: they
+          set the message locale to C, since libpq translates its messages
+          by the locale of the process. On a perl without POSIX::LC_MESSAGES
+          (Windows) that helper goes on through the environment alone; the
+          error-text tests read libpq's reason of a failed connect by its
+          meaning where libpq has no Unix-domain sockets; and where perl
+          cannot read the mode of a socket (Windows: no fcntl), the checks
+          on the mode are skipped in the future_io tests and everything
+          else runs.
+
 0.900004  2026-11-08
     * Storage
         - $rs->upsert renders INSERT ... ON CONFLICT ... DO UPDATE|NOTHING

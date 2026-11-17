@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::EV::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Future';
 
@@ -225,7 +225,7 @@ DBIO::PostgreSQL::EV::Future - A Future whose get waits on the EV loop
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -276,8 +276,9 @@ delivering to at the head of the connection's queue until that callback
 returns. A nested loop that reads the next result on the same connection
 therefore hands it to that callback a second time instead of to its own, shifts
 every later result onto the wrong callback, and then spins inside L<EV::Pg>
-with 100% CPU -- no EV timer and no C<alarm> fires there (measured with EV::Pg
-0.07; the 0.02 source delivers the same way). The next result is due
+with 100% CPU -- no EV timer and no C<alarm> fires there (EV::Pg 0.07; 0.09
+no longer spins and misdelivers, but hands the nested loop nothing until the
+callback has returned, so the wait still never ends -- measured). The next result is due
 whenever more than the delivering statement is pending on that connection: a
 statement issued from the callback -- L<EV::Pg> sends it at once, with or
 without bind values, so the failure is certain -- or the rest of a pipeline

@@ -1,5 +1,5 @@
 This archive contains the distribution DBIO-PostgreSQL-EV,
-version 0.900004:
+version 0.900007:
 
   Async PostgreSQL storage for DBIO via EV::Pg
 

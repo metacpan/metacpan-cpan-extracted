@@ -4,7 +4,7 @@ package DBIO::Oracle::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::Conformance';
 
@@ -322,7 +322,6 @@ sub conformance_refusals {
   # refused, as the driver's own refusal that waits for such a user.
   $refusals->{'ddl-qualified-source-name'} = {
     kind   => 'pending',
-    card   => 'k58',
     reason => qr/does not exist/,
   } if $class->conformance_live_available && !$class->_user_exists('other');
   return $refusals;
@@ -475,7 +474,7 @@ DBIO::Oracle::Test::Conformance - Answers the shared conformance case table for 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -51,7 +51,12 @@ sub select_upper {
 }
 
 {
-  my $h = DBIO::PostgreSQL::EV::TestHarness->new;
+  # lc_messages 'C': the test reads the server's English wording (PostgreSQL
+  # reports in the language of the session's lc_messages, which
+  # DBIO_TEST_SERVER_LANGUAGE sets for the suite).
+  my $h = DBIO::PostgreSQL::EV::TestHarness->new(
+    connect_attrs => { on_connect_do => [ q{SET lc_messages = 'C'} ] },
+  );
   my $got = select_upper($h);
   is $got->[0], 'failed', 'nothing said: the transport quotes the upper-case names';
   like "$got->[1]", qr/does not exist/, '... and the server finds no such relation';
@@ -60,7 +65,7 @@ sub select_upper {
 
 SKIP: {
   my $h = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { quote_names => 0 });
-  skip 'the installed DBIO::PostgreSQL quotes with quote_names => 0 -- needs dbio-postgresql k121 (bf640c4)', 3
+  skip 'the installed DBIO::PostgreSQL quotes with quote_names => 0 -- needs a DBIO::PostgreSQL whose maker quotes names', 3
     if $h->sync_storage->sql_maker->_quote_chars;
 
   my $got = select_upper($h);

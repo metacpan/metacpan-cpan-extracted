@@ -10,7 +10,7 @@ model: sonnet
 
 ClickHouse is a column-oriented OLAP DB. `DBIO::ClickHouse` reaches it over the
 **MySQL wire protocol** (server port 9004) via `DBD::mysql` (standard, verified
-live against a stock server — karr k15) or `DBD::MariaDB` (supported, needs a
+live against a stock server) or `DBD::MariaDB` (supported, needs a
 server-side prefix) — there is no native `DBD::ClickHouse`. The storage is
 a direct subclass of `DBIO::Storage::DBI`, NOT of `DBIO::MySQL::Storage` (shares
 the wire protocol, none of the semantics). See `docs/adr/0001` and `0002`.
@@ -39,6 +39,9 @@ Always pin the storage.
 Direct subclass of `DBIO::Storage::DBI`; backtick quoting; errors via
 `throw_exception`, never `croak`.
 
+- `register_access_path_dbd(qw( mysql MariaDB ))` declares both MySQL-wire DBDs as
+  this storage's own access path, so core's driver check accepts them while a
+  `dbi:Pg:` DSN is still reported.
 - No `INSERT ... RETURNING`, no `last_insert_id`/auto-increment; PK is the
   MergeTree `ORDER BY` key; surrogate ids via `generateUUIDv4()`.
 - **Transaction API is split (ADR 0003).** No-ops that warn once (`carp_once`):
@@ -61,8 +64,8 @@ not implemented (literal SQL only). Renders the mutation statements above.
 
 `ENGINE = MergeTree` + `ORDER BY` (default: primary key), set per result class
 with `clickhouse_table({ engine, order_by, primary_key, partition_by, settings })`.
-Engine, sorting/primary key and partition expression are immutable: Diff refuses
-a change.
+Four properties are immutable: engine, sorting key, primary key and partition
+key. Diff refuses a change to any of them.
 
 ## Key modules
 
@@ -89,11 +92,13 @@ Offline by default, no server and no MySQL-wire DBD:
 
 Numbering: `0x` load/shortcut/fixture/transport, `1x` storage and SQL
 (sqlmaker, dialect, txn, insert, mutations, capabilities), `2x` introspect,
-`3x` DDL and deploy, `4x` diff and set operations, `5x` Native bridge.
+`3x` DDL and deploy, `4x` diff, set operations, qualified names and views,
+`5x` Native bridge, view diff and ordering (`t/50`-`t/52`), `6x` conformance,
+bind and error-value masking (`t/60`-`t/67`).
 
-Gated: live files (`t/07-transport-dbd-live`, `14`, `16`, `17-smoke`, `18`, `19`, `38`, plus `t/20`,
-`t/30` and `t/32` at their layer slots) `skip_all` without `DBIO_TEST_CLICKHOUSE_DSN`
-(+ `_DBUSER`/`_DBPASS`); `t/51` skips without `ClickHouse::Encoder`. There is no
-in-memory mode; `init_schema` dies cleanly without a DSN. Live runs follow the
-"Live testing" discipline in `.claude/rules/.local.dbio-rules.md`; procedure in
-skill `dbio-clickhouse-database`; pod manifest `maint/k8s/clickhouse.yaml`.
+Gated: every file that reads `DBIO_TEST_CLICKHOUSE_DSN` (+ `_DBUSER`/`_DBPASS`)
+skips without it (`grep -l DBIO_TEST_CLICKHOUSE_DSN t/*.t`); `t/51` skips without
+`ClickHouse::Encoder`. There is no in-memory mode; `init_schema` dies cleanly
+without a DSN. Live runs follow `dbio-driver-development`,
+`references/live-testing.md`; ClickHouse procedure in skill
+`dbio-clickhouse-database`; pod manifest `maint/k8s/clickhouse.yaml`.

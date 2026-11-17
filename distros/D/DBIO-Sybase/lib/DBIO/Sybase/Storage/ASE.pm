@@ -4,7 +4,7 @@ package DBIO::Sybase::Storage::ASE;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 # The ASE::* trait classes below are standalone (no parent) and override
 # methods that also exist in the deep DBIO::Storage::DBI hierarchy reached
@@ -969,7 +969,7 @@ DBIO::Sybase::Storage::ASE - Sybase ASE SQL Server support for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

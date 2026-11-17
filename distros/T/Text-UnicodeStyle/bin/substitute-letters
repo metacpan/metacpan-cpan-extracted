@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use 5.010;
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+
+use Getopt::Long qw(:config posix_default no_ignore_case);
+use Pod::Usage;
+use FindBin;
+use lib "$FindBin::RealBin/../lib";
+use Text::UnicodeStyle qw( stylize styles );
+
+my $style = 'monospace';
+my $help;
+my $list;
+
+GetOptions(
+    'style|s=s' => \$style,
+    'list|l'   => \$list,
+    'help|h|?' => \$help,
+) or pod2usage(2);
+
+pod2usage({ -verbose => 2, -exitval => 0 }) if $help;
+
+if ($list) {
+    say for styles();
+    exit 0;
+}
+
+my %known = map { $_ => 1 } styles();
+pod2usage("Unknown style '$style'. Available: " . join(', ', styles()))
+    unless $known{$style};
+
+my $text;
+if (@ARGV) {
+    $text = join ' ', @ARGV;
+}
+else {
+    local $/;
+    $text = <STDIN>;
+    defined $text or pod2usage(2);
+    $text =~ s/\s+\z//;
+}
+
+say stylize($text, $style);
+
+__END__
+
+=head1 NAME
+
+substitute-letters - replace Latin letters with Unicode lookalikes
+
+=head1 SYNOPSIS
+
+    substitute-letters [--style STYLE] STRING [STRING ...]
+    echo "some text" | substitute-letters --style script
+    substitute-letters --list
+    substitute-letters -h
+
+=head1 DESCRIPTION
+
+Replaces every ASCII letter in the input with the corresponding
+character from the requested Unicode style (mathematical alphanumeric
+symbols, enclosed forms and similar ranges). In the styles C<bold>,
+C<circled>, C<doublestruck>, C<fullwidth>, C<monospace>,
+C<parenthesized>, C<sans_serif> and C<sans_serif_bold> digits C<0-9>
+are substituted as well (except C<parenthesized> has no glyph for 0).
+The C<fullwidth> style also maps all printable ASCII punctuation to
+its fullwidth form, including C<_>. The styles C<squared>,
+C<negative_circled> and C<negative_squared> only cover uppercase
+letters. Spaces and other characters are never modified.
+
+The input may be given as command-line arguments (joined with spaces)
+or piped via standard input.
+
+=head1 OPTIONS
+
+=over
+
+=item B<-s>, B<--style> I<STYLE>
+
+Style to apply. See C<--list> for available styles.
+Defaults to C<monospace>.
+
+=item B<-l>, B<--list>
+
+List all available styles, one per line, and exit.
+
+=item B<-h>, B<-?>, B<--help>
+
+Print this help text and exit.
+
+=back
+
+=head1 EXAMPLES
+
+    substitute-letters --style script 'Hello, World!'
+    substitute-letters -s fraktur route_id
+    echo mkdir folder_name | substitute-letters -s monospace
+    substitute-letters --list
+
+=head1 SEE ALSO
+
+L<Text::UnicodeStyle>
+
+Project repository: L<https://github.com/shoorick/substitute-letters>
+
+Bug reports and other issues: L<https://github.com/shoorick/substitute-letters/issues>
+
+=head1 LICENSE
+
+L<https://opensource.org/licenses/MIT|MIT>
+
+=cut

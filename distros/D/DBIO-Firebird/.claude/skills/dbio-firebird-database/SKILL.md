@@ -1,6 +1,6 @@
 ---
 name: dbio-firebird-database
-description: Use when you need Firebird or InterBase specifics for driver work — DBD module, dialect, types, generators, transactions, pagination.
+description: Use when you need Firebird or InterBase engine specifics for driver work — DBD module, dialect, types, generators, transactions, pagination.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -29,8 +29,7 @@ connection; `datetime_setup` stays and is harmless.
 
 Dialect 1 = InterBase compat (no `"`-quoting, no `BIGINT`). Dialect 3 = full
 type system + identifier quoting — always used. Server version via
-`rdb$get_context('SYSTEM', 'ENGINE_VERSION')`. `last_insert_id` needs Firebird
-2+; `auto_nextval` works on earlier versions.
+`rdb$get_context('SYSTEM', 'ENGINE_VERSION')`. The driver's minimum is Firebird 3.
 
 ## Type System
 
@@ -45,8 +44,7 @@ Firebird types (driver mapping in `DBIO::Firebird::Type`):
 | Large | BLOB (binary), BLOB SUB_TYPE TEXT (text/CLOB) |
 | Date | DATE (date only), TIME, TIMESTAMP (to 4 decimal places of seconds) |
 
-Native BOOLEAN from FB3 (the driver's minimum); `boolean` is a `BOOLEAN` column
-(karr k36). No native
+Native BOOLEAN from FB3 (the driver's minimum); `boolean` is a `BOOLEAN` column. No native
 `TEXT`/`SERIAL` — mapped to `BLOB SUB_TYPE TEXT` / `BIGINT`. DDL emits
 `VARCHAR(255)` for bare `varchar`, `DECIMAL(18,6)` for bare numeric.
 
@@ -105,15 +103,15 @@ No schemas — relation names are bare/unqualified. Read via `RDB$` system table
 | Columns | `RDB$RELATION_FIELDS` + `RDB$FIELDS` (`rdb$field_type`, precision/scale, `rdb$null_flag`, default) |
 | Indexes | `RDB$INDICES` + `RDB$INDEX_SEGMENTS` (PK/UNIQUE-backed excluded) |
 | Constraints | `RDB$RELATION_CONSTRAINTS` (`rdb$constraint_type`) |
-| Foreign keys | `RDB$REF_CONSTRAINTS` (`rdb$update_rule`, `rdb$delete_rule`, `rdb$match_option`) |
+| Foreign keys | `RDB$RELATION_CONSTRAINTS` + `RDB$INDICES` + `RDB$INDEX_SEGMENTS` + `RDB$REF_CONSTRAINTS` (`rdb$update_rule`, `rdb$delete_rule`, `rdb$match_option`) |
 
-## FK Behavior
+## Foreign Keys
 
-Supports `MATCH FULL`/`SIMPLE` and `ON UPDATE`/`ON DELETE` actions. Composite
-FK columns grouped by constraint name during introspection.
+Firebird supports `MATCH FULL`/`SIMPLE` and `ON UPDATE`/`ON DELETE` actions.
+How the driver reads and writes them: `dbio-firebird`.
 
 ## Testing Env Vars
 
 `DBIO_TEST_FIREBIRD_DSN`, `DBIO_TEST_FIREBIRD_USER`, `DBIO_TEST_FIREBIRD_PASS`.
 Variants: `DBIO_TEST_FIREBIRD_INTERBASE_DSN` (DBD::InterBase),
-`DBIO_TEST_FIREBIRD_ODBC_DSN` (ODBC driver). Server and run rules: CLAUDE.md "Tests" and the house rules ("Live testing"); a server of your own carries a cpu and memory cap.
+`DBIO_TEST_FIREBIRD_ODBC_DSN` (ODBC driver). The maintainer's server: `dbio-db env firebird` (`references/live-testing.md` of `dbio-driver-development`). Run rules: CLAUDE.md "Tests" and the house rules ("Live testing"); a server of your own carries a cpu and memory cap.

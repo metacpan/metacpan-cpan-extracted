@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.16.0 - 2026-11-17
+
+### Features
+
+- Read cap_reached on a paid answer past its overage cap ([`3b656e8`](https://github.com/internetdata/sdk-perl/commit/3b656e80a5dd8109772ff5319e4cd2ee379efe5e))
+
 ## 1.15.0 - 2026-11-16
 
 ### Features

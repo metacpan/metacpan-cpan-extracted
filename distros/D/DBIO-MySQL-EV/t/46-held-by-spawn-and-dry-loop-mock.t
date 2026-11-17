@@ -75,7 +75,7 @@ local $SIG{__WARN__} = sub { push @WARN, $_[0] };
 
   $pool->{_spawning}{1} = 1;
   ok !$pool->_mysql_held_by_callbacks,
-    'a spawn in flight can still serve the queued caller -> not held (karr k90)';
+    'a spawn in flight can still serve the queued caller -> not held';
 
   my $waiter = $pool->acquire;
   my $chain  = $waiter->then(sub { $_[0] });
@@ -101,7 +101,7 @@ local $SIG{__WARN__} = sub { push @WARN, $_[0] };
   my $ok = eval { $chain->await; 1 };
   ok !$ok, 'the wait dies: nothing in the loop could complete it';
   like $@, qr/nothing left that could complete it/, '... with the loop-dry message';
-  is scalar @{ $pool->{_waiters} }, 0, '... and the caller is out of the pool\'s queue (karr k69)';
+  is scalar @{ $pool->{_waiters} }, 0, '... and the caller is out of the pool\'s queue';
   ok $waiter->is_failed, '... failed, not left pending';
 
   $pool->release($conn);

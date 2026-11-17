@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -27,8 +27,6 @@ use DBIO::PostgreSQL::Util ();
 use DBIO::PostgreSQL::Extension ();
 use DBIO::PostgreSQL::DDL ();
 use Context::Preserve 'preserve_context';
-use DBIO::Carp;
-use Try::Tiny;
 
 # PostgreSQL defaults
 __PACKAGE__->sql_maker_class('DBIO::PostgreSQL::SQLMaker');
@@ -442,10 +440,14 @@ sub _dbi_error_fields {
     table      => 'table',
     detail     => 'detail',
   );
+  # the label of the severity is in the server's language; an English one says
+  # the detail is read by the English rules alone
+  my $severity = eval { $dbh->pg_error_field('severity') } // '';
+  my $state = $severity =~ /\A(?:ERROR|FATAL|PANIC)\z/ ? undef : $fields->{sqlstate};
   for my $key (sort keys %field) {
     my $value = eval { $dbh->pg_error_field($field{$key}) };
     next unless defined $value && length $value;
-    $value = DBIO::PostgreSQL::Util::mask_detail_values($value) if $key eq 'detail';
+    $value = DBIO::PostgreSQL::Util::mask_detail_values($value, $state) if $key eq 'detail';
     $fields->{$key} = $value;
   }
 
@@ -459,7 +461,8 @@ sub _mask_error_values {
   my $masked = $self->next::method($text, $values, $statement);
   return $masked unless defined $masked and !ref $masked;
 
-  my $details = eval { DBIO::PostgreSQL::Util::mask_error_details($masked) };
+  my $state = eval { DBIO::PostgreSQL::Util::error_sqlstate($self->_dbh) };
+  my $details = eval { DBIO::PostgreSQL::Util::mask_error_details($masked, $state) };
   return defined $details ? $details : $masked;
 }
 
@@ -715,19 +718,6 @@ sub bind_attribute_by_data_type {
   my ($self, $data_type) = @_;
 
   if ($self->_is_binary_lob_type($data_type)) {
-    unless ($DBD::Pg::__DBIO_DBD_VERSION_CHECK_DONE__) {
-      if ($self->_server_info->{normalized_dbms_version} >= 9.0) {
-        try { DBD::Pg->VERSION('2.17.2'); 1 } or carp(
-          __PACKAGE__ . ': BYTEA columns are known to not work on Pg >= 9.0 with DBD::Pg < 2.17.2'
-        );
-      }
-      elsif (not try { DBD::Pg->VERSION('2.9.2'); 1 }) { carp(
-        __PACKAGE__ . ': DBD::Pg 2.9.2 or greater is strongly recommended for BYTEA column support'
-      )}
-
-      $DBD::Pg::__DBIO_DBD_VERSION_CHECK_DONE__ = 1;
-    }
-
     return { pg_type => DBD::Pg::PG_BYTEA() };
   }
   else {
@@ -879,7 +869,7 @@ DBIO::PostgreSQL::Storage - PostgreSQL storage layer for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -1421,7 +1411,9 @@ line of the message, which L</_mask_error_values> masks;
 L<DBIO::PostgreSQL::Util/mask_detail_values>) -- the server's own
 C<PG_DIAG_CONSTRAINT_NAME>, C<PG_DIAG_TABLE_NAME> and
 C<PG_DIAG_MESSAGE_DETAIL>, not parsed out of the text, which depends on the
-server's C<lc_messages>.
+server's C<lc_messages>. The detail is masked with the C<sqlstate> of the
+same error, so that it holds in the server's language as well
+(L<DBIO::PostgreSQL::Util/mask_detail_values>).
 
 C<pg_error_field> is a method of the database handle. DBI hands
 C<HandleError> the handle the error occurred on, a statement handle for a
@@ -1454,6 +1446,16 @@ value the statement did not bind (one of the row a constraint names) and every
 error that reaches the handler with no values at hand. A value that is a name
 in the text (C<relation "x" does not exist>) is replaced by the base only,
 which knows the bound values.
+
+The server reports in the language of its C<lc_messages>, so the forms are not
+read by their English words alone: the SQLSTATE of the error, read from the
+connection's database handle
+(L<DBIO::PostgreSQL::Util/error_sqlstate>), is passed on, and for a data
+exception (class 22) or an integrity constraint violation (class 23) the
+text is masked by the marks it quotes a value in and the form
+C<(columns)=(value)>, in any language. A German C<Schlüssel
+»(name)=(ab)« existiert bereits.> reads C<Schlüssel »(name)=(***)«
+existiert bereits.>.
 
 A text with no known form is returned as it is, C<undef> and a reference as
 they are. It never throws: a text the rules cannot read stays as the base
@@ -1577,8 +1579,7 @@ it, so reading that file needs no server (see L</Installing a schema>).
     my $attr = $storage->bind_attribute_by_data_type($data_type);
 
 Returns C<{ pg_type =E<gt> DBD::Pg::PG_BYTEA() }> for binary LOB types so that
-C<DBD::Pg> handles C<BYTEA> columns correctly. Also checks that a compatible
-C<DBD::Pg> version is installed for the connected PostgreSQL server version.
+C<DBD::Pg> handles C<BYTEA> columns correctly.
 
 =head2 is_replicating
 

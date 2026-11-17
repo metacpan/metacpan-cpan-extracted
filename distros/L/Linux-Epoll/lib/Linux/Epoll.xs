@@ -13,7 +13,6 @@
 #include "perl.h"
 #include "XSUB.h"
 #define NEED_mg_findext
-#define NEED_sv_unmagicext
 #include "ppport.h"
 
 static int S_get_fd(pTHX_ SV* fh) {
@@ -59,21 +58,6 @@ static void S_die_sys(pTHX_ const char* format) {
 	Perl_croak(aTHX_ format, buffer);
 }
 #define die_sys(format) S_die_sys(aTHX_ format)
-
-static sigset_t* S_sv_to_sigset(pTHX_ SV* sigmask, const char* name) {
-	IV tmp;
-	if (!SvOK(sigmask))
-		return NULL;
-	if (!SvROK(sigmask) || !sv_derived_from(sigmask, "POSIX::SigSet"))
-		Perl_croak(aTHX_ "Value is not of type POSIX::SigSet");
-#if PERL_VERSION > 15 || PERL_VERSION == 15 && PERL_SUBVERSION > 2
-	return (sigset_t *) SvPV_nolen(SvRV(sigmask));
-#else
-	tmp = SvIV((SV*)SvRV(sigmask));
-	return INT2PTR(sigset_t*, tmp);
-#endif
-}
-#define sv_to_sigset(sigmask, name) S_sv_to_sigset(aTHX_ sigmask, name)
 
 typedef struct { const char* key; size_t keylen; uint32_t value; } entry;
 typedef entry map[];
@@ -160,12 +144,12 @@ static int weak_set(pTHX_ SV* sv, MAGIC* magic) {
 
 static int weak_free(pTHX_ SV* sv, MAGIC* magic);
 
-MGVTBL epoll_magic = { NULL };
-MGVTBL weak_magic = { NULL, weak_set, NULL, NULL, weak_free };
+static const MGVTBL epoll_magic = { NULL };
+static const MGVTBL weak_magic = { NULL, weak_set, NULL, NULL, weak_free };
 
 static int weak_free(pTHX_ SV* sv, MAGIC* magic) {
 	struct data* data = (struct data*)magic->mg_ptr;
-	mg_findext(sv, PERL_MAGIC_ext, &weak_magic)->mg_virtual = NULL; /* Cover perl bugs under the carpet */
+	SvREFCNT_dec((SV*)data->backrefs);
 	return 0;
 }
 
@@ -174,9 +158,10 @@ static int weak_free(pTHX_ SV* sv, MAGIC* magic) {
 static void S_set_backref(pTHX_ SV* epoll, SV* fh, int fd, CV* callback) {
 	AV* backrefs = get_backrefs(epoll);
 	struct data backref = { backrefs, fd };
-	SV* ref = sv_rvweaken(SvROK(fh) ? newSVsv(fh) : newRV(fh));
+	SV* ref = sv_rvweaken(SvROK(fh) ? newSVsv(fh) : newRV_inc(fh));
 
 	av_store(backrefs, fd, ref);
+	SvREFCNT_inc((SV*)backrefs);
 	sv_magicext(ref, (SV*)callback, PERL_MAGIC_ext, &weak_magic, (const char*)&backref, sizeof backref);
 }
 #define set_backref(epoll, fh, fd, cb) S_set_backref(aTHX_ epoll, fh, fd, cb)
@@ -190,8 +175,9 @@ static void S_del_backref(pTHX_ SV* epoll, int fd) {
 
 static SV* S_io_fdopen(pTHX_ int fd, const char* package) {
 	PerlIO* pio = PerlIO_fdopen(fd, "r");
-	GV* gv = newGVgen("Linux::Epoll");
-	SV* ret = newRV_noinc((SV*)gv);
+	GV* gv = newGVgen(package);
+	SV* ret = newRV_inc((SV*)gv);
+	hv_delete(GvSTASH(gv), GvNAME(gv), GvNAMELEN(gv), G_DISCARD);
 	IO* io = GvIOn(gv);
 	IoTYPE(io) = '<';
 	IoIFP(io) = pio;
@@ -219,9 +205,7 @@ static SV* S_event_bits_to_hash(pTHX_ UV bits) {
 
 MODULE = Linux::Epoll				PACKAGE = Linux::Epoll
 
-SV*
-new(package)
-	const char* package;
+SV* new(const char* package)
 	PREINIT:
 		int fd;
 	CODE: 
@@ -237,12 +221,7 @@ new(package)
 	OUTPUT:
 		RETVAL
 
-const char*
-add(self, fh, events, callback)
-	SV* self;
-	SV* fh;
-	SV* events;
-	SV* callback;
+const char* add(SV* self, SV* fh, SV* events, SV* callback)
 	PREINIT:
 		int efd, ofd;
 		struct epoll_event event;
@@ -264,12 +243,7 @@ add(self, fh, events, callback)
 	OUTPUT:
 		RETVAL
 
-const char*
-modify(self, fh, events, callback)
-	SV* self;
-	SV* fh;
-	SV* events;
-	SV* callback;
+const char* modify(SV* self, SV* fh, SV* events, SV* callback)
 	PREINIT:
 		int efd, ofd;
 		struct epoll_event event;
@@ -291,10 +265,7 @@ modify(self, fh, events, callback)
 	OUTPUT:
 		RETVAL
 
-const char*
-delete(self, fh)
-	SV* self;
-	SV* fh;
+const char* delete(SV* self, SV* fh)
 	PREINIT:
 		int efd, ofd;
 	CODE:
@@ -311,12 +282,7 @@ delete(self, fh)
 	OUTPUT:
 		RETVAL
 
-int
-wait(self, maxevents = 1, timeout = undef, sigset = undef)
-	SV* self;
-	ssize_t maxevents;
-	SV* timeout;
-	SV* sigset;
+int wait(SV* self, ssize_t maxevents = 1, SV* timeout = undef, sigset_t* sigset = NULL)
 	PREINIT:
 		int efd, i;
 		int real_timeout;
@@ -327,10 +293,9 @@ wait(self, maxevents = 1, timeout = undef, sigset = undef)
 			Perl_croak(aTHX_ "Can't wait for a non-positive number of events (maxevents = %ld)", maxevents);
 		efd = get_fd(self);
 		real_timeout = SvOK(timeout) ? (int)ceil(SvNV(timeout) * 1000) : -1;
-		real_sigset = SvOK(sigset) ? sv_to_sigset(sigset, "epoll_pwait") : NULL;
 
 		events = alloca(sizeof(struct epoll_event) * maxevents);
-		RETVAL = epoll_pwait(efd, events, maxevents, real_timeout, real_sigset);
+		RETVAL = epoll_pwait(efd, events, maxevents, real_timeout, sigset);
 		if (RETVAL == -1) {
 			if (errno != EINTR)
 				die_sys("Couldn't wait on epollfd: %s");

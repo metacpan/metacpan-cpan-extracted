@@ -4,7 +4,7 @@
 # GetOptLong: Getopt Library for Bash Script
 # Copyright 2025-2026 Office TECOLI, LLC <https://github.com/tecolicom/getoptlong>
 # MIT License: See <https://opensource.org/licenses/MIT>
-: ${GOL_VERSION:=1.2.0}
+: ${GOL_VERSION:=1.3.0}
 ###############################################################################
 # Check bash version (4.4+ for nameref and ${parameter@Q})
 ((BASH_VERSINFO[0] > 4 || (BASH_VERSINFO[0] == 4 && BASH_VERSINFO[1] >= 4))) ||
@@ -102,7 +102,9 @@ _gol_init_entry() { local _entry="$1" _pass= _name _vname _dtype ;
     : ${_vtype:=$_IS_FLAG} ${_dtype:=${_pass:+$_IS_LIST}}
     case ${_dtype:-$_vtype} in
 	"$_IS_MAYB")
-	    [[ $_initial ]] && _gol_die "$_initial: optional parameter can't be initialized" ;;
+	    # the initial value is the default, which --no- unsets;
+	    # without it, the variable is left as it is
+	    [[ $_initial ]] && _gol_value $_vname "$_initial" ;;
 	"$_IS_LIST"|"$_IS_HASH")
 	    [[ $_vtype == $_IS_LIST && ! -v $_vname ]] && declare -ga $_vname
 	    [[ $_vtype == $_IS_HASH && ! -v $_vname ]] && declare -gA $_vname
@@ -285,7 +287,7 @@ _gol_show_help() { local _key _aliases _init= _default= _column _flag _msg ;
 		*[$_IS_NEED]) _msg="set ${_key^^}$_default" ;;
 		*[$_IS_LIST]) _msg="add item(s) to ${_key^^}" ;;
 		*[$_IS_HASH]) _msg="set KEY=VALUE(s) in ${_key^^}" ;;
-		*[$_IS_MAYB]) _msg="enable/set ${_key^^}" ;;
+		*[$_IS_MAYB]) _msg="enable/set ${_key^^}$_default" ;;
 	    esac
 	}
 	printf '    %s\t%1s\t%s\n' "$(_gol_optize $_key)" "$(_gol_optize $_aliases)" "$_msg"

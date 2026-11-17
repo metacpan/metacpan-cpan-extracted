@@ -4,7 +4,7 @@ package DBIO::Sybase::Storage::ASE::TxnManager;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use namespace::clean;
 
@@ -54,7 +54,7 @@ DBIO::Sybase::Storage::ASE::TxnManager - Transaction and savepoint management fo
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

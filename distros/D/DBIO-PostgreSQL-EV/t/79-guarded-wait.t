@@ -1,13 +1,31 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 use POSIX ();
 use Time::HiRes ();
+use Config;
+
+BEGIN {
+  # The claim is about fractions of a second; where Time::HiRes has no alarm
+  # (Windows: "unimplemented in this platform") there is nothing to measure.
+  my $hires = do { local $@; eval { Time::HiRes::alarm(0); 1 } };
+  plan skip_all => 'Time::HiRes::alarm is not implemented on this platform: no alarm in fractions of a second'
+    unless $hires;
+}
+
+use FindBin;
+use lib "$FindBin::Bin/lib";
+
+# Where the kernel timers run slower than the clock this measures it, says so
+# with a note, and makes Time::HiRes::sleep and ::alarm keep the clock again, so
+# that the alarm and the sleeps below take the seconds they are given; beyond a
+# limit it skips the file with the measured ratio as its reason. It comes
+# before what it must see: GuardedWait and EV.
+use T::KernelTimers;
 
 use EV;
 use Future;
-use FindBin;
-use lib "$FindBin::Bin/lib";
 use GuardedWait;
 
 # A wait guarded through t/lib/GuardedWait.pm gives the process alarm back
@@ -116,24 +134,32 @@ sub never { failed_in($_[0], "nothing ended this wait in $_[0]s\n") }
 }
 
 # Set the process alarm; says when it is due, as [ no earlier, no later ].
-# 'builtin' sets it the way a test file does, with perl's own alarm.
+# 'builtin' sets it the way a test file does, with perl's own alarm. That one
+# runs on the kernel timer, which T::KernelTimers does not touch: where the
+# kernel timers are slower than the clock by a factor, its seconds are that
+# factor times as many on the clock (the factor is 1 on a host where they agree).
 sub arm {
   my ($seconds, $how) = @_;
   my $before = now();
+  my $clock  = $how ? $seconds * T::KernelTimers::factor() : $seconds;
   if ($how) { alarm $seconds } else { Time::HiRes::alarm($seconds) }
-  return [ $before + $seconds, now() + $seconds ];
+  return [ $before + $clock, now() + $clock ];
 }
 
 # When the alarm that is running is due, in the same form; undef when none
 # is. Read by taking it off the clock and putting it back at once.
 sub due {
   my $before = now();
-  my $left   = Time::HiRes::alarm(0) or return undef;
+  my $left   = Time::HiRes::alarm(0);
+  # Some systems keep perl's alarm apart from Time::HiRes's (Solaris), and
+  # some answer a timer that has fired with a negative time left (Cygwin).
+  $left = CORE::alarm(0) unless $left > 0;
+  return undef unless $left > 0;
   Time::HiRes::alarm($left);
   return [ $before + $left, now() + $left ];
 }
 
-sub disarm { Time::HiRes::alarm(0); return }
+sub disarm { Time::HiRes::alarm(0); CORE::alarm(0); return }
 
 sub is_due {
   my ($got, $want, $name) = @_;
@@ -155,7 +181,7 @@ sub death_of (&) {
 
 # The message a test file hands over: what it waited for, and the regression
 # the wait guards against.
-my $MESSAGE = "TIMEOUT awaiting the answer (karr k00 regression: it hung)\n";
+my $MESSAGE = "TIMEOUT awaiting the answer (it hung)\n";
 
 # --- 1. the Future is done: the alarm is still running -------------------------
 {
@@ -231,6 +257,9 @@ my $MESSAGE = "TIMEOUT awaiting the answer (karr k00 regression: it hung)\n";
   my $death   = death_of { GuardedWait->until_ready(never(3), 1, $MESSAGE) };
   my $took    = now() - $entered;
   is $death, $MESSAGE, "$l: the wait ends with the caller's message, word for word";
+  # The upper bound is the timeout (1s) plus the wait's grace (0.25s) before
+  # its own alarm ends a loop that blocks (EV waits for a timer 3s away), plus
+  # room for scheduling: 2s.
   ok $took >= 1 - $SLACK && $took < 2, "$l: ... after its timeout"
     or diag sprintf 'after %.3fs', $took;
   is $fired, 0, "$l: the outer handler has not run";
@@ -279,8 +308,9 @@ my $MESSAGE = "TIMEOUT awaiting the answer (karr k00 regression: it hung)\n";
 
 # It has no handler -- `alarm 120;` and nothing else, as the test files have
 # it: the signal ends the process.
-{
+SKIP: {
   my $l = 'an alarm with no handler, due before the timeout';
+  skip "$l: this perl cannot fork", 1 unless $Config{d_fork};
   my $pid = fork;
   if (defined $pid && !$pid) {
     $SIG{ALRM} = 'DEFAULT';
@@ -319,6 +349,8 @@ my $MESSAGE = "TIMEOUT awaiting the answer (karr k00 regression: it hung)\n";
   my $took    = now() - $entered;
   is $inner, '(it returned)', "$l: the inner wait returns";
   is $death, "TIMEOUT awaiting the outer one\n", "$l: the outer one ends on its own timeout";
+  # Same bound as in case 4: the timeout (1s), the grace (0.25s) of the alarm
+  # that ends a blocked loop, room for scheduling.
   ok $took >= 1 - $SLACK && $took < 2, "$l: ... at its time"
     or diag sprintf 'after %.3fs', $took;
   is_due(due(), $file, "$l: after both the file's alarm is still running, due when it was due");
@@ -373,6 +405,8 @@ my $MESSAGE = "TIMEOUT awaiting the answer (karr k00 regression: it hung)\n";
   };
   my $took = now() - $entered;
   is $death, $MESSAGE, "$l that blocks: run ends it with the caller's message";
+  # Same bound as in case 4: here only the alarm ends the blocked call, and it
+  # stands the timeout (1s) plus the grace (0.25s) from the start.
   ok $took >= 1 - $SLACK && $took < 2, "$l that blocks: ... after its timeout"
     or diag sprintf 'after %.3fs', $took;
   is $fired, 0, "$l: the outer handler has not run";

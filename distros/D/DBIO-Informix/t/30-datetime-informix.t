@@ -63,7 +63,8 @@ SQL
   cmp_ok $row->created_on->nanosecond, '==', $dt->nanosecond,
     'fractional part of a second survived';
 
-  is $row->starts_at, $date_only, 'DATE as DateTime roundtrip';
+  is $row->starts_at->ymd, $date_only->ymd, 'DATE as DateTime roundtrip: the same day';
+  is $row->starts_at->hms, '12:00:00', '... read at noon';
 }
 
 done_testing;

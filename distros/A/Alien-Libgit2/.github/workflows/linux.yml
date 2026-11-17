@@ -62,7 +62,7 @@ jobs:
           set -eux
           test "$(pkg-config --modversion libgit2)" = 1.9.3
       - name: dzil test (system libgit2)
-        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
         with:
           install-type: system
 
@@ -94,6 +94,6 @@ jobs:
       - name: Install Alien::cmake3 (dynamic share-build prereq)
         run: cpanm -nq Alien::cmake3
       - name: dzil test (share build)
-        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@main
+        uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
         with:
           install-type: share

@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use DBIO::Test::Slow;
 use Test::Exception;
 
 plan skip_all => 'Set DBIO_TEST_PG_DSN, _USER and _PASS to run this test'

@@ -1,7 +1,7 @@
 package Mail::DKIM;
 use strict;
 use warnings;
-our $VERSION = '1.20261105'; # VERSION
+our $VERSION = '1.20261116'; # VERSION
 # ABSTRACT: Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 #require 5.010;
@@ -23,7 +23,7 @@ Mail::DKIM - Signs/verifies Internet mail with DKIM/DomainKey signatures
 
 =head1 VERSION
 
-version 1.20261105
+version 1.20261116
 
 =head1 SYNOPSIS
 

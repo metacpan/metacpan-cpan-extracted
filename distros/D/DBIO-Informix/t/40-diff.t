@@ -53,7 +53,7 @@ use_ok 'DBIO::Informix::Diff';
     },
   );
   unlike($ops[0]->as_sql, qr/FOREIGN KEY/,
-    'no inline FK: the referenced table may be created later (karr k19)');
+    'no inline FK: the referenced table may be created later');
 }
 
 # --- Diff::Table single-column PK (karr k16) ---

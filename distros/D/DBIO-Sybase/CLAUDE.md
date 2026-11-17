@@ -36,16 +36,15 @@ __PACKAGE__->load_components('Sybase');
 `DBIO::Sybase::Storage` extends `DBIO::Storage::DBI` and is the class a schema
 declares (the component and `-syb` pin it). At the first use that needs the
 driver — not at `connect` — it reaches `DBIO::Sybase::Storage::ASE` by one
-way (core ADR 0059, karr k64): the schema declares the driver (component /
+way (core ADR 0059): the schema declares the driver (component /
 `-syb`), and the hook `_adapt_to_access_path` moves only the declared base (or a
 `DBIO::Storage::Composed` class over it) to `::ASE` on a `dbi:Sybase:` DSN,
 without `sp_server_info`, and never to `DBIO::MSSQL::Storage::Sybase`. A
 server DBD::Sybase found to be Microsoft SQL Server at login
 (`syb_server_version_string`) goes to core's `_driver_mismatch`. A storage
-pinned to `::ASE` itself (karr k78, k94) meets the server like the declared base
+pinned to `::ASE` itself meets the server like the declared base
 (Microsoft SQL Server at login goes to `_driver_mismatch` before anything is
-probed; live against SQL Server 2022, 2026-10-25: warns, `driver_strict` throws,
-otherwise Msg 195 in ASE's first `set`) and takes the same placeholder decision on its
+probed: warns, `driver_strict` throws, otherwise Msg 195 in ASE's first `set`) and takes the same placeholder decision on its
 one connection (`auto_cast`, or `::ASE::NoBindVars`: the class and `auto_cast`
 of the declared base on that connection, never `auto_cast` across the board --
 CAST(? AS ..) dies under FreeTDS with Msg 12828); a private subclass, a pinned
@@ -63,7 +62,7 @@ library (`auto_cast`, or `::ASE::NoBindVars`), and if DBD::Sybase was compiled
 against FreeTDS, `_init` mixes in the `DBIO::Sybase::Storage::FreeTDS` fixups.
 Assert a storage's class only after a first use. Under FreeTDS the trait class
 is built over the base of a layered storage's composition and the layers are
-composed again over it (`Composed->recompose`, karr k77): layers stay ahead of
+composed again over it (`Composed->recompose`): layers stay ahead of
 the FreeTDS class, and `composition_of` knows the class (base
 `<ASE class>::FreeTDS`, layers unchanged). `DBIO::MSSQL::Storage::Sybase`
 inherits this `_init` (`t/59-component-rebless.t`).
@@ -71,7 +70,7 @@ inherits this `_init` (`t/59-component-rebless.t`).
 Key settings:
 ```perl
 __PACKAGE__->sql_maker_class('DBIO::Sybase::SQLMaker');  # set on the ASE subclass
-__PACKAGE__->sql_quote_char ([qw/[ ]/]);  # on the ASE subclass; DDL/Diff quote with [ ] via DBIO::Sybase::Quote (karr k58, k92)
+__PACKAGE__->sql_quote_char ([qw/[ ]/]);  # on the ASE subclass; DDL/Diff quote with [ ] via DBIO::Sybase::Quote
 __PACKAGE__->datetime_parser_type('DBIO::Sybase::Storage::ASE::DateTime::Format');  # on the ASE subclass
 ```
 
@@ -79,11 +78,10 @@ __PACKAGE__->datetime_parser_type('DBIO::Sybase::Storage::ASE::DateTime::Format'
 
 ### Connection parameters without a DSN
 
-`DBIO::Sybase::Storage::_connect_params_dsn` (core ADR 0057, karr k59) builds the
+`DBIO::Sybase::Storage::_connect_params_dsn` (core ADR 0057) builds the
 DSN for `{ dbname, host, port }` (AccessBroker::Static, or a connect-info hash
 without `dsn`): `dbi:Sybase:host=..;port=..;database=..`, parts not given left
-out (`dbname` alone → `dbi:Sybase:database=..`, server from `$DSQUERY`). Core's
-default wrote `dbname=`, which DBD::Sybase does not read. `host` without `port`
+out (`dbname` alone → `dbi:Sybase:database=..`, server from `$DSQUERY`). DBD::Sybase does not read `dbname=`. `host` without `port`
 and `port` without `host` throw — DBD::Sybase sets the server address only when
 it has both (`dbdimp.c`, 1.27) and ignores a lone one; no port is assumed. A
 server reached by name goes in as the whole DSN (`dsn`, or a `dbname` starting
@@ -91,10 +89,10 @@ with `dbi:`). `Storage::ASE`, its FreeTDS trait class and the ASE writer storage
 inherit the seam (pinned in `t/57-connect-params-dsn.t`). So does
 `DBIO::MSSQL::Storage::Sybase`, which lists this class before
 `DBIO::MSSQL::Storage`: the form here must stay the one dbio-mssql's
-`t/59-connect-params-dsn.t` expects. Live-verified 2026-10-05 against ASE 16.0
-SP02 with DBD::Sybase 1.27 on FreeTDS 1.3.17 (`t/60-connect-params-live.t`): the
+`t/59-connect-params-dsn.t` expects. Pinned live against ASE 16.0 SP02
+with DBD::Sybase on FreeTDS (`t/60-connect-params-live.t`): the
 full form lands in the database named (first connect, reconnect, writer
-storage), `host` + `port` alone and core's `dbname=` form land in the login's
+storage), `host` + `port` alone and a `dbname=` form land in the login's
 default database (the latter without an error), `dbname` alone reaches the
 `$DSQUERY` server, and a lone `host` or `port` in a hand-written DSN is dropped
 in favour of that server. Not verified with Open Client. Under FreeTDS the
@@ -107,26 +105,23 @@ a `$dbh->do` goes through on it, on another session — which is how `BEGIN TRAN
 is active. The FreeTDS trait therefore finishes the active statement handles and
 rolls back on the same connection, and throws on `BEGIN TRAN` and `COMMIT` before
 sending anything; the failed `COMMIT` then ends the transaction by core's rule (rollback on the
-same connection, depth 0; karr k99) (karr k65, `t/75-txn-open-cursor.t`, `t/64-txn-scope-guard-live.t`).
+same connection, depth 0; `t/75-txn-open-cursor.t`, `t/64-txn-scope-guard-live.t`).
 
 ## Identifier quoting
 
-`DBIO::Sybase::Quote::quote_ident` (karr k92) is the one place `DDL` and the
+`DBIO::Sybase::Quote::quote_ident` is the one place `DDL` and the
 `Diff::*` operations write a name: bare when it is `/^[a-z_][a-z0-9_]*$/i` and
-not on the keyword list, `[name]` otherwise (a `]` in it doubled). Core's
-`_quote_ident` left `dummy` bare (Msg 156 -- the table of
-`DBIO::Test::Schema::Dummy`) and wrote `"name"` for the rest, which ASE refuses
-without `set quoted_identifier on` (Msg 102, the login's default). The list is
+not on the keyword list, `[name]` otherwise (a `]` in it doubled). `"name"` is
+refused by ASE without `set quoted_identifier on` (Msg 102, the login's default), and a
+keyword left bare is Msg 156 (`dummy`, the table of `DBIO::Test::Schema::Dummy`). The list is
 the server's own: the catalog `master..spt_values`, rows of `type = 'W'` (218 words
-on ASE 16.0 SP02, read 2026-10-25), plus four words a measurement (2026-10-24, about
-600 candidates sent bare and in brackets) found refused that the catalog does not
+on ASE 16.0 SP02), plus four words the server refuses that the catalog does not
 name: `called`, `log` (index name only), `unsigned` (column only), `identity_insert`.
-The measurement had found 215 words, 211 of them in the catalog; the catalog had
-seven it did not try. The list is fixed in the code, not read at run time;
+The list is fixed in the code, not read at run time;
 `t/96-quote-ident-live.t` compares it with the server's catalog in both directions (a
 catalog word missing fails; the four extras are kept and named). `t/95-quote-ident.t`
 pins every emitter offline, `t/97-quote-diff-live.t` runs keyword names through
-install/diff/apply. A word in neither source is Msg 156 as before. A name starting
+install/diff/apply. A word in neither source is Msg 156. A name starting
 with `#` or `@` (Msg 11717, 16366) or containing a dot (read as `owner.name`, Msg
 2734) fails in brackets too: `quote_ident` refuses it itself with a `DBIO::Exception`
 naming name and reason; the driver sends no temporary table through it. The summaries
@@ -144,7 +139,7 @@ The rows-only case (no offset) does not reach `apply_limit`:
 `Storage::ASE::_prep_for_execute` takes the limit out and wraps the statement
 in `SET ROWCOUNT n` / `SET ROWCOUNT 0`. `-nulls => 'first'|'last'` in an
 `order_by` is emulated by a leading `CASE WHEN col IS NULL THEN 0 ELSE 1 END`
-(`_render_op_nulls`, karr k95; `t/98`, live `t/99`). Note: DBIO core replaced DBIx::Class's
+(`_render_op_nulls`; `t/98`, live `t/99`). Note: DBIO core replaced DBIx::Class's
 `sql_limit_dialect` string dispatch with the `apply_limit` method override.
 
 ## Error texts without values
@@ -176,7 +171,7 @@ offline half (bulk callback, LOB errstr, warning, the hook's contract) and
 `DBIO::Sybase::Introspect` extends `DBIO::Introspect::Base` — reads the ASE
 system catalog (`sysobjects`, `syscolumns` + `systypes`, `syscomments` for
 default/view text, `sysindexes` + `index_col()`, `sysreferences`). SAP ASE has
-**no** `INFORMATION_SCHEMA` views (Msg 208 live on ASE 16.0; karr k48). Both
+**no** `INFORMATION_SCHEMA` views (Msg 208 on ASE 16.0). Both
 sides of the deploy diff are introspected, so every value must read back
 identically for two deployments of the same DDL: the server-named PK index
 carries `origin => 'pk'` and `Diff::Index` skips it; a quoted default comes back
@@ -189,17 +184,17 @@ as its bare literal, an expression default as a SCALAR ref, which
 | `DBIO::Sybase::Introspect::Columns` | column defs per table |
 | `DBIO::Sybase::Introspect::Indexes` | index defs per table |
 | `DBIO::Sybase::Introspect::ForeignKeys` | FK defs per table |
-| `DBIO::Sybase::Introspect::Views` | view definitions + view dependencies (karr k98) |
+| `DBIO::Sybase::Introspect::Views` | view definitions + view dependencies |
 
 Model shape: `{ tables, columns, indexes, foreign_keys, views }`. A view is in
 `tables` (`kind => 'view'`) with its columns, and in `views` (`DBIO::Sybase::Introspect::Views`,
-karr k98) as `{ view_name, definition, depends_on }`: `definition` is the text after `AS` (the
+) as `{ view_name, definition, depends_on }`: `definition` is the text after `AS` (the
 `syscomments` rows joined in `colid2`/`colid` order, the `CREATE VIEW` head stripped),
 `depends_on` the views it reads from (`sysdepends`).
 
 A column's `size` is `syscolumns.length` for the character types (halved for
 `unichar`/`univarchar`, divided by `@@ncharsize` for `nchar`/`nvarchar`) and for
-`binary`/`varbinary` (bytes, karr k93), `[prec, scale]` for `numeric`/`decimal`.
+`binary`/`varbinary` (bytes), `[prec, scale]` for `numeric`/`decimal`.
 A `VARBINARY` written without a size is ASE's length 1 on both sides of the
 diff (live: `t/94-binary-size-live.t`).
 
@@ -208,16 +203,16 @@ diff (live: `t/94-binary-size-live.t`).
 `DBIO::Sybase::Deploy` — test-deploy-and-compare. Sybase ASE does not
 support `:memory:` databases, so it creates a temporary database
 (`CREATE DATABASE _dbio_tmp_<pid>_<time>_<n>`, `<time>` in minutes so the name stays within
-the 30 characters ASE allows, karr k97), deploys the desired schema
+the 30 characters ASE allows), deploys the desired schema
 there, introspects both live and temp, diffs them, then drops the temp DB.
 
 `_create_temp_db` and `_drop_temp_db` need a handle with `AutoCommit` (CREATE/DROP
 DATABASE do not run in a transaction); one without is refused with a `DBIO::Exception`
 naming the method, before any statement -- they send no `COMMIT` and never switch
-`AutoCommit` (karr k96, `t/100`).
+`AutoCommit` (`t/100`).
 
 `_create_temp_db` sets `abort tran on log full` on the temp database before
-anything is deployed into it (karr k69): from `master`, by `sp_dboption`, which
+anything is deployed into it: from `master`, by `sp_dboption`, which
 runs the checkpoint itself; its two severity-10 messages go to a borrowed
 `syb_err_handler`, and the option is read back (`status2 & 1` in
 `sysdatabases`). A database it cannot be set on is dropped and the error
@@ -227,7 +222,7 @@ refusing the statement -- `diff`/`upgrade` never returned. With it a schema too
 large for the temp database dies of Msg 1105.
 
 The temp database is created `ON default = 'NNM'` at a size calculated from the
-schema (karr k69, the maintainer's decision), not the server's `default database
+schema, not the server's `default database
 size` (live: 24 MB, 686 free pages of 16K; DBIO::Test::Schema needs 733, so it
 did not fit). `(2 * tables + other indexes) * 8` pages (a table, its PK and
 every further index take an extent of 8 pages, measured), counted from the
@@ -247,7 +242,7 @@ pins the calculation offline.
 
 `_drop_temp_db` repeats `DROP DATABASE` on Msg 3702 ("currently in use"), and on
 no other error: 40 tries, 0.25 s apart, ten seconds (`_drop_in_use_tries`,
-`_drop_in_use_wait`; karr k74). Core drops the temp database the moment it has
+`_drop_in_use_wait`). Core drops the temp database the moment it has
 closed the session into it and catches whatever the drop dies of, so one refusal
 left `_dbio_tmp_<pid>_<time>_<n>` on the server without a word -- and after the last
 try it still does. What is in a database need not be a client: the server's
@@ -255,7 +250,7 @@ checkpoint process was seen in one nobody was connected to.
 
 `DBIO::Sybase::DDL` reads the canonical index declaration of the source
 (`$source->index_declarations_for('sybase', [])`; Cake `idx`, `indices`,
-`add_index_declaration`; ADR 0061, core k333, karr k88) and writes each as
+`add_index_declaration`; ADR 0061) and writes each as
 `CREATE [UNIQUE] INDEX` after the table's unique indexes, before the FKs. The
 sybase block has no allowed key (ASE has no partial or function index), so
 `where`/`expression`, a block of only another driver, a `type` other than
@@ -270,7 +265,7 @@ Live: `t/74-ddl-index-declarations-live.t`.
 `DBIO::Sybase::DDL->install_ddl($schema)`; the FK constraints come last, one
 `ALTER TABLE ... ADD CONSTRAINT` each, after every `CREATE TABLE`.
 `apply` and `upgrade` are those of `DBIO::Deploy::Base` (`allow_destructive`, `dry_run`;
-ADR 0080, core k399): a diff with a drop or a lossy column change runs only with
+ADR 0080): a diff with a drop or a lossy column change runs only with
 `allow_destructive => 1`. `Diff::Column::Alter::lossy` calls only the integer
 widenings `tinyint` to `smallint`/`int`/`bigint`, `smallint` to `int`/`bigint` and
 `int` to `bigint` lossless (and a same-type size that does not shrink); every other
@@ -292,7 +287,7 @@ are dropped, a server error over an unchanged dependent view is not caught. `Dif
 | `DBIO::Sybase::Diff::Column` | columns |
 | `DBIO::Sybase::Diff::Index` | indexes |
 | `DBIO::Sybase::Diff::ForeignKey` | FK constraints (create/drop) |
-| `DBIO::Sybase::Diff::View` | views: `CREATE VIEW`, `DROP VIEW`, drop + create when the definition (white space reduced) changed (karr k98) |
+| `DBIO::Sybase::Diff::View` | views: `CREATE VIEW`, `DROP VIEW`, drop + create when the definition (white space reduced) changed |
 
 ## FK Behavior
 
@@ -304,7 +299,7 @@ than `NO ACTION` (undef/`''` = none) on a relationship that becomes a constraint
 (`CASCADE`, `SET NULL`, `SET DEFAULT`, `RESTRICT`, any other word) is refused by
 `DBIO::Sybase::DDL::_table_foreign_keys` with a `DBIO::Exception` naming
 relationship, table, event and value -- before the deduplication, so the second
-relationship over the same columns is refused too (karr k91). That covers
+relationship over the same columns is refused too. That covers
 `install`, `diff` and `upgrade` (the desired side is the DDL deployed to the temp
 DB). `Diff::ForeignKey::Create->as_sql` refuses the same on a hand-built model.
 A relationship that yields no constraint (`is_foreign_key_constraint => 0`,
@@ -319,7 +314,7 @@ neutralise the actions first with `t/lib/AseNoFkActions.pm`.
 | `DBIO::Sybase` | Schema component |
 | `DBIO::Sybase::Storage` | DBI storage, declared base of the ASE class |
 | `DBIO::Sybase::SQLMaker` | SQL generation (GenericSubQ pagination) |
-| `DBIO::Sybase::Quote` | identifier quoting for DDL/Diff: `[name]` for ASE keywords and non-simple names (karr k92) |
+| `DBIO::Sybase::Quote` | identifier quoting for DDL/Diff: `[name]` for ASE keywords and non-simple names |
 | `DBIO::Sybase::Deploy` | test-deploy-and-compare orchestrator |
 | `DBIO::Sybase::Diff` | Compare introspected models |
 | `DBIO::Sybase::Introspect` | Read live DB |
@@ -331,7 +326,7 @@ neutralise the actions first with `t/lib/AseNoFkActions.pm`.
   time using a dirty "instance role application" pattern.
 - **`maxConnect` / `bulkLogin` DSN parts**: `_set_max_connect` remembers the
   value (`_max_connect_value`), appends `;maxConnect=N` to the stored DSN and
-  reconnects. `_finish_connect_dsn` (core's seam, karr k60) adds `;maxConnect=N`
+  reconnects. `_finish_connect_dsn` (core's seam) adds `;maxConnect=N`
   once a value is remembered and `;bulkLogin=1` for the bulk storage, to the DSN
   of every connect with a string DSN -- which is what carries them past an
   AccessBroker, whose answer forms the DSN anew for each connect. Idempotent
@@ -354,11 +349,10 @@ neutralise the actions first with `t/lib/AseNoFkActions.pm`.
 ## Conformance
 
 `Storage::ASE::_run_connection_actions` sends `set string_rtruncation on` on every connection
-(first connect, reconnect, writer and bulk storage; karr k97, `t/113`): ASE cut a string that
-was too long without a word (`char(10)` took 11 characters), it is Msg 9502 now. A behaviour
-change for every user; `ddl-type-size-char` is answered right.
+(first connect, reconnect, writer and bulk storage; `t/113`): a string too long
+for its column is Msg 9502 (ASE alone would cut it silently); `ddl-type-size-char` is answered right.
 
-`DBIO::Sybase::Test::Conformance` (karr k97) answers core's shared case table
+`DBIO::Sybase::Test::Conformance` answers core's shared case table
 (`DBIO::Test::Conformance`, ADR 0060); `answered_through` is `{ DDL => 2, Diff => 4, Bind => 1 }` (version 4: the deploy cases, through
 `conformance_deploy`; `conformance_upgrade` runs `upgrade(allow_destructive => 1)`). The namespace of a case is a database of
 its own, `dbio_cf_<pid>_<n>`, made by `conformance_namespace` with `abort tran on log
@@ -368,25 +362,25 @@ only) when the database named in the DSN is not there yet, so `conformance_insta
 asserts `db_name()` first and `conformance_quote_ident` needs no connection. The
 connection sets `datetime_setup` (ASE's default text for a `datetime` has no
 seconds). Refusals: `ddl-enum-value-apostrophe`, `ddl-type-size-bit`,
-`ddl-base-types-roundtrip` (a nullable `boolean`/`bit` is Msg 2718), `ddl-fk-actions`
-(k91), `ddl-qualified-source-name` (a dot is `owner.name`), all `server`; deviation
+`ddl-base-types-roundtrip` (a nullable `boolean`/`bit` is Msg 2718), `ddl-fk-actions`,
+`ddl-qualified-source-name` (a dot is `owner.name`), all `server`; deviation
 `ddl-default-digit-string` (`char(n)` is blank-padded). `DBIO::Sybase::DDL` refuses
 the first three itself, before the server is asked (`_check_column_type`).
 The Diff list: `server` refusals for a NOT NULL add without a default or with an
 expression default (`Diff::Column::Add`, Msg 13918), for a CASCADE (`diff-table-added-complete`)
 and for NOT NULL over NULLs (`_check_before_apply` looks first, Msg 515), `diff-default-removed`
-is answered right since core k367 (`REPLACE col DEFAULT NULL`, `t/112`). `conformance_cleanup` also closes the
+is answered right since core (`REPLACE col DEFAULT NULL`, `t/112`). `conformance_cleanup` also closes the
 schema the upgrade started from (it keeps the database in use, Msg 3702). The three view
-cases are answered right since k98 (`Diff::View`). One named TODO in `t/106`: `diff-constraint-changed` (waits
-for core k369). Bind: `bind-empty-string` is a deviation (ASE keeps `''` as one space; `''` into
+cases are answered right (`Diff::View`). One named TODO in `t/106`: `diff-constraint-changed` (waits
+for a core change). Bind: `bind-empty-string` is a deviation (ASE keeps `''` as one space; `''` into
 an int is 0). Over FreeTDS four Bind cases plus `bind-non-ascii` (a TEXT column) are `server`
 refusals: `LOBWriter::_refuse_lob_content` refuses LOB content before the INSERT/UPDATE
 (`t/111`; offline tests that fake FreeTDS replace it). A character beyond ASCII bound for a
 varchar/univarchar column over FreeTDS is refused by `ASE::_refuse_non_ascii_binds` and the bulk
 path (`t/114`, live `t/115`): the client library reports the conversion after the row was
 written, with a blank in it. `ddl-qualified-source-name` is refused always (the DDL never writes
-`owner.table`). `t/109`/`t/110` for Bind.
-`t/101`/`t/105` offline, `t/102-conformance-ddl-live.t`/`t/106-conformance-diff-live.t` live.
+`owner.table`). `t/110-conformance-bind-live.t` for Bind.
+`t/101-conformance.t` offline, `t/102-conformance-ddl-live.t`/`t/106-conformance-diff-live.t` live.
 
 ## Live Testing
 
@@ -426,7 +420,7 @@ Notes:
 - The image by itself has no room for `CREATE DATABASE` (Msg 1810: `master`, the only
   default device, has 20 MB left and a database needs the 24 MB of `model`). The pod of
   `maint/k8s/ase.yaml` makes a default device of its own at start (`dbiotestdev`, 384M)
-  and is Ready only once it is there (karr k73) -- nothing by hand. A `docker run`
+  and is Ready only once it is there -- nothing by hand. A `docker run`
   container, as above, still needs it once before the first run: the `disk init` /
   `sp_diskdefault` lines in README.md, "Live tests". `t/09-create-database-live.t` asks
   the server for that room first and names what is missing; without it that file fails,
@@ -434,7 +428,7 @@ Notes:
   `CREATE DATABASE` before `plan`, is refused with Msg 1810) and `t/62` loses five.
 - A live file that makes a database drops it with `AseDatabase::drop` (`t/lib/AseDatabase.pm`),
   never with a bare `DROP DATABASE`: the server may refuse the drop for a moment (Msg 3702,
-  karr k74), and one refusal ended `t/63` in a full run. The helper repeats it on that message
+ ), and one refusal ended `t/63` in a full run. The helper repeats it on that message
   alone, ten seconds at most, and returns what the server said instead of dying -- the file
   fails one test by name and goes on. It uses nothing of `lib/`.
 - Connect as `sa`/`myPassword` (not the `tester` login) — the Deploy/temp-db path needs

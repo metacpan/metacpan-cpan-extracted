@@ -30,7 +30,7 @@ sub slurp {
 
 my $text = sub { $_[0] =~ s/\e\[[0-9;]*m//gr };
 
-IO::Factotum::load('sourcehighlight');
+IO::Factotum::load('Highlight::sourcehighlight');
 ok !tied(*ARGV), 'load does not tie ARGV';
 
 subtest 'sourcehighlight: C source' => sub {
@@ -61,23 +61,23 @@ subtest 'sourcehighlight: files left as they are' => sub {
     put 'empty.c', "";
     is slurp(IO::Factotum::open_input("$dir/empty.c")), "", 'an empty file';
     put 'big.c', "int x;\n" x 100;
-    local $IO::Factotum::sourcehighlight::MAX_SIZE = 699;
+    local $IO::Factotum::Highlight::sourcehighlight::MAX_SIZE = 699;
     is slurp(IO::Factotum::open_input("$dir/big.c")), "int x;\n" x 100,
 	'a file over the limit';
-    local $IO::Factotum::sourcehighlight::MAX_SIZE = 700;
+    local $IO::Factotum::Highlight::sourcehighlight::MAX_SIZE = 700;
     like slurp(IO::Factotum::open_input("$dir/big.c")), qr/\e\[/, 'within the limit';
 };
 
 subtest 'sourcehighlight: style' => sub {
     put 'a.c', "int x = 1;\n";
-    local @IO::Factotum::sourcehighlight::STYLE = ('--style-file=nosuchstyle.style');
+    local @IO::Factotum::Highlight::sourcehighlight::STYLE = ('--style-file=nosuchstyle.style');
     is slurp(IO::Factotum::open_input("$dir/a.c")), "int x = 1;\n",
 	'a style which is not found leaves the file as it is';
 };
 
 subtest 'sourcehighlight: -M ties ARGV' => sub {
     put 'a.c', "int x = 1;\n";
-    my $out = qx{$^X -I"$lib" -MIO::Factotum::sourcehighlight -ne 'print "\$ARGV: \$_"' "$dir/a.c" 2>&1};
+    my $out = qx{$^X -I"$lib" -MIO::Factotum::Highlight::sourcehighlight -ne 'print "\$ARGV: \$_"' "$dir/a.c" 2>&1};
     like $out, qr/^\Q$dir\E\/a\.c: .*\e\[/, 'one-liner reads the colored text';
 };
 

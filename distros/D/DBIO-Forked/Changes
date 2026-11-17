@@ -1,5 +1,38 @@
 Revision history for DBIO-Forked
 
+0.900007  2026-11-17
+    * Storage
+        - DBIO::Forked::Storage dies with a clear message naming the
+          missing fork() when the perl has no real fork ($Config{d_fork}
+          unset, a pseudo-fork emulated with threads); it opens no pipe
+          and starts no process.
+
+    * Packaging
+        - Makefile.PL aborts with "OS unsupported" on a perl without a
+          real fork, so the dist is not installed there. The check is put
+          into the generated Makefile.PL by maint/assert-fork-capability.pl
+          (every dzil build, [Run::AfterBuild]).
+
+    * Documentation
+        - The dbio-forked skill describes the connect options
+          statement_timeout and max_in_flight, cancel, and a Future's
+          binding to the process that created it; it names the real fork()
+          requirement and the POSIX dependency.
+
+    * Tests
+        - Tests that cannot do anything without a real fork skip on
+          $Config{d_fork}; t/11-live-transport.t no longer decides by
+          operating system name.
+        - The fork() failure section of t/11-live-transport.t skips when
+          RLIMIT_NPROC does not limit the test process (root).
+        - t/07-transport-paths.t sizes its large result and its hand-fed
+          pieces from the measured capacity of a fresh pipe instead of
+          assuming 64 KiB; a write that cannot complete fails loudly
+          instead of hanging until the alarm.
+        - t/10-exit-status.t runs its scripts from a file instead of a
+          multi-line -e argument.
+
+
 0.900004  2026-11-08
     * Limits
         - statement_timeout (seconds) and max_in_flight (calls) are connect

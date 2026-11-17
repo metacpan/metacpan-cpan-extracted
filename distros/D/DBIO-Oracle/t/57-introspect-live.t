@@ -99,7 +99,7 @@ sub own_objects {
     SELECT object_type, object_name FROM user_objects
     WHERE object_type IN ('TABLE', 'VIEW', 'SEQUENCE', 'TRIGGER', 'INDEX')
       AND UPPER(object_name) $OWN
-    ORDER BY object_type, object_name
+    ORDER BY NLSSORT(object_type, 'NLS_SORT=BINARY'), NLSSORT(object_name, 'NLS_SORT=BINARY')
   }) } ];
 }
 
@@ -359,7 +359,7 @@ is_deeply own($model->{views}), {
                   definition => 'SELECT ID, CODE FROM T57_LIVE_ITEM WHERE CODE IS NOT NULL',
                   columns => [ qw(ID CODE) ],
                   depends_on => [] },
-}, 'views: the definition of the view as Oracle stores it, and the names of its columns in order (karr k65)';
+}, 'views: the definition of the view as Oracle stores it, and the names of its columns in order';
 
 is_deeply own($model->{unique_constraints}), \%UNIQUE,
   'unique constraints: by name, the two-column one with its columns in the '

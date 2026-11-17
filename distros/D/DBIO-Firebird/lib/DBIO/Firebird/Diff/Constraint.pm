@@ -4,7 +4,7 @@ package DBIO::Firebird::Diff::Constraint;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -195,7 +195,7 @@ DBIO::Firebird::Diff::Constraint - Diff operations for Firebird primary keys, fo
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

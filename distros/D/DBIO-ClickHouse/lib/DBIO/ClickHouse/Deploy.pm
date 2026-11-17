@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Deploy::Base::TempDatabase';
 
@@ -156,7 +156,7 @@ DBIO::ClickHouse::Deploy - Deploy and upgrade ClickHouse schemas via test-deploy
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

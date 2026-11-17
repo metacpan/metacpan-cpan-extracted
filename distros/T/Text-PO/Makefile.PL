@@ -29,7 +29,7 @@ my %WriteMakefileArgs = (
         'warnings'              => 0,
         'Class::Struct'         => '0.63',
         'DateTime::Format::Lite' => 'v0.1.3',
-        'DateTime::Lite'        => 'v0.9.0',
+        'DateTime::Lite'        => 'v0.11.0',
         # Based on 2011-05-15 (perl v5.14.0) availability
         # https://metacpan.org/release/DANKOGAI/Encode-2.42/source/Encode.pm
         'Encode'                => '2.42',
@@ -43,7 +43,7 @@ my %WriteMakefileArgs = (
         # 2011-05-22
         # 'JSON'                  => '2.53',
         # 'JSON::XS'              => '4.03',
-        'Module::Generic'       => 'v1.7.0',
+        'Module::Generic'       => 'v1.8.1',
         # version 1.30 is the one shipped with perl v5.16.0
         'POSIX'                 => '1.30',
         'Scalar::Util'          => '1.50',

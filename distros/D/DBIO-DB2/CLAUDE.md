@@ -27,8 +27,7 @@ types) to this repo's `dbio-worker-db2` instead of touching them yourself. Lane 
 
 ```perl
 package MyApp::DB;
-use base 'DBIO::Schema';
-__PACKAGE__->load_components('DB2');
+use DBIO Schema => -db2;
 
 my $schema = MyApp::DB->connect('dbi:DB2:database=mydb', $user, $pass);
 ```
@@ -38,7 +37,7 @@ my $schema = MyApp::DB->connect('dbi:DB2:database=mydb', $user, $pass);
 `DBIO::DB2::Storage` extends `DBIO::Storage::DBI`:
 
 ```perl
-__PACKAGE__->datetime_parser_type('DateTime::Format::DB2');
+__PACKAGE__->datetime_parser_type('DBIO::DB2::Storage::DateTimeFormat');
 __PACKAGE__->sql_quote_char('"');
 __PACKAGE__->sql_maker_class('DBIO::DB2::SQLMaker');
 
@@ -46,13 +45,15 @@ sub dbio_deploy_class { 'DBIO::DB2::Deploy' }
 ```
 
 Key methods:
+- `DBIO::DB2::Storage::DateTimeFormat` — the datetime parser: `DateTime::Format::DB2` plus a working `parse_time` (0.06's dies on every value) and `format_time` (`HH:MM:SS`); a `time` column with `inflate_datetime` stands on 1970-01-01 (`t/98`, live `t/99`)
 - `sql_name_sep` — queries `SQL_QUALIFIER_NAME_SEPARATOR` from server (default `.`)
 - `_dbh_last_insert_id` — uses `IDENTITY_VAL_LOCAL()` for auto-increment retrieval
 - `deploy_setup` — no-op stub (DB2 does not need tablespace pre-allocation)
 - `_connect_params_dsn` — DSN form for connection parameters without a DSN (AccessBroker::Static, core ADR 0057): `dbname` alone → cataloged `dbi:DB2:<dbname>`; `dbname`+`host`+`port` → uncataloged `dbi:DB2:DATABASE=..;HOSTNAME=..;PORT=..;PROTOCOL=TCPIP`; `host` without `port`, `port` without `host`, or no `dbname` throws
-- `_bind_host_into_dsn` — HostBound seam (core k276, karr k50): `HOSTNAME=` (and `PORT=`) of the uncataloged form take the view's host/port, keys case-insensitive; a missing `PORT=` is put after `HOSTNAME=` when the view has a port, `PROTOCOL=` is never invented; a cataloged alias, a non-`key=value` part or a DSN without `HOSTNAME=` is declined with `(undef, $form)` (never a DSN value)
-- `_connect` — wraps the `HandleError` core installs, so a DBI message of SQLSTATE class `01` is not an exception (ADR 0007, karr k43): `DBD::DB2` sets a true `err` for a server warning, and `DELETE`/`UPDATE` without `WHERE` (`01504`, SQL0513W) threw after changing the rows. Silent — `err`/`state`/`errstr` stay on the handle; every other state throws through core's handler as before; the return value is not looked at; with `unsafe` nothing is installed. The wrapper keeps core's blessing (`__DBIO__DBH__ERROR__HANDLER__`)
-- `_connect` also takes SQL0605W (err 605, SQLSTATE `42S11`, `CREATE INDEX` over columns already indexed): not an exception, a `carp` naming index and table, from the statement text a `do` callback keeps (ADR 0010, karr k47). Other states, and err 605 under another state, throw as before
+- `_bind_host_into_dsn` — HostBound seam: `HOSTNAME=` (and `PORT=`) of the uncataloged form take the view's host/port, keys case-insensitive; a missing `PORT=` is put after `HOSTNAME=` when the view has a port, `PROTOCOL=` is never invented; a cataloged alias, a non-`key=value` part or a DSN without `HOSTNAME=` is declined with `(undef, $form)` (never a DSN value)
+- `_connect` — wraps the `HandleError` core installs, so a DBI message of SQLSTATE class `01` is not an exception (ADR 0007): `DBD::DB2` sets a true `err` for a server warning, and `DELETE`/`UPDATE` without `WHERE` (`01504`, SQL0513W) threw after changing the rows. Silent — `err`/`state`/`errstr` stay on the handle; every other state throws through core's handler as before; the return value is not looked at; with `unsafe` nothing is installed. The wrapper keeps core's blessing (`__DBIO__DBH__ERROR__HANDLER__`)
+- `_connect` also takes SQL0605W (err 605, SQLSTATE `42S11`, `CREATE INDEX` over columns already indexed): not an exception, a `carp` naming index and table, from the statement text a `do` callback keeps (ADR 0010). Other states, and err 605 under another state, throw as before
+- `DBIO::DB2::Storage::Cursor::decode_rows` (cursor `next`/`all`, `select_single`, the plan rows of `_explain_query`) — besides the UTF-8 decoding of the character columns, a numeric column with a fraction (`DESCRIBE` TYPE 2, 3, 6, 7, 8, -360: `NUMERIC`, `DECIMAL`, `FLOAT`, `REAL`, `DOUBLE`, `DECFLOAT`) is delivered with a decimal point whatever the locale of the process is (ADR 0014): the CLI writes `1234567890,12` / `1,500000E+00` under a German `LC_CTYPE` set at process start, and a value with exactly one comma (optional exponent, no grouping) gets a point. Independent of a UTF-8 database; other values, `NULL` and character columns stay as they are. DBIO sets no environment or session setting and leaves the process locale alone; no client key steers the CLI's format
 - limit/offset — `DBIO::DB2::SQLMaker::apply_limit` branches on whether an offset is present: `RowNumberOver` when an offset is given, `FetchFirst` otherwise (not server-version detection; see ADR 0003)
 
 ## Introspection
@@ -62,12 +63,12 @@ Key methods:
 - `SYSCAT.TABLES` — tables and views; `SYSCAT.VIEWS.TEXT` — the `view_definition` of a view
 - `SYSCAT.COLUMNS` — column metadata + primary key from `SYSCAT.KEYCOLUSE`/`SYSCAT.TABCONST`
 - `SYSCAT.INDEXES` + `SYSCAT.INDEXCOLUSE` — index definitions
-- `SYSCAT.TABCONST` + `SYSCAT.KEYCOLUSE` + `SYSCAT.REFERENCES` — foreign keys; `to_columns` are the columns of `REFKEYNAME` (the parent's primary key or `UNIQUE` constraint) via `KEYCOLUSE` in `COLSEQ` order (karr k45, ADR 0011)
+- `SYSCAT.TABCONST` + `SYSCAT.KEYCOLUSE` + `SYSCAT.REFERENCES` — foreign keys; `to_columns` are the columns of `REFKEYNAME` (the parent's primary key or `UNIQUE` constraint) via `KEYCOLUSE` in `COLSEQ` order (ADR 0011)
 - `SYSCAT.TABCONST` (type `U`) + `SYSCAT.KEYCOLUSE` — unique constraints
 
 Model shape: `{ tables, columns, indexes, foreign_keys, unique_constraints }`;
 `unique_constraints` is the optional section of the `DBIO::Introspect::Base` contract,
-`{ $table => [ [ $name, \@columns ], ... ] }`, an entry for every table (karr k39, ADR 0009).
+`{ $table => [ [ $name, \@columns ], ... ] }`, an entry for every table (ADR 0009).
 Db2 keeps an index of the constraint's name behind each `UNIQUE` constraint
 (`system_required` 1); `Introspect::Indexes` leaves it out, it is the constraint.
 `table_uniq_info` is overridden: constraints plus the unique `db2_indexes` indexes.
@@ -75,16 +76,16 @@ Db2 keeps an index of the constraint's name behind each `UNIQUE` constraint
 The index behind a primary key lives in schema `SYSIBM` (`UNIQUERULE='P'`), under a
 server-chosen name, not in the table's schema. `Introspect::Indexes` reads it for the
 introspected schema's tables and the model carries it with `origin => 'pk'` and the
-primary key's columns (karr k45, ADR 0011). It is the primary key: `Diff::Index` skips
+primary key's columns (ADR 0011). It is the primary key: `Diff::Index` skips
 every index of origin `pk` on both sides (no `CREATE`/`DROP INDEX`), `table_uniq_info`
-leaves it out (karr k53 first found it, `t/14`, `t/66`, `t/67`).
+leaves it out (`t/14`, `t/66`, `t/67`).
 
 A view is an entry of `tables` with `kind => 'view'` and a `view_definition`: the text of
 `SYSCAT.VIEWS.TEXT` after the view's name (`AS SELECT ...`, a column list in front when the
 view has one), name and schema cut off so the live and the compare-schema view compare
 by what they read (ADR 0011).
 
-A column of the model carries two descriptions (karr k44, ADR 0013). The **normalized**
+A column of the model carries two descriptions (ADR 0013). The **normalized**
 one is the `DBIO::Introspect::Base` contract that `DBIO::Generate` reads through
 `table_columns_info`, as the other drivers hand it: `data_type` is the lower-case type a
 result class writes (`char` for `CHARACTER`, `double precision` for `DOUBLE`, else
@@ -105,12 +106,12 @@ declared without one, `10,2`, the `SCALE` alone for `TIMESTAMP`, 16/34 for `DECF
 Operations emitted in dependency order: the view drops, tables, columns, the `REORG` some column
 changes need, indexes, unique constraints, foreign keys, the view creates.
 
-`DBIO::DB2::Diff::View` (karr k45, ADR 0011): `CREATE VIEW "v" <view_definition>;` /
+`DBIO::DB2::Diff::View` (ADR 0011): `CREATE VIEW "v" <view_definition>;` /
 `DROP VIEW "v";`; a changed definition (whitespace set aside) is a `drop` marked `replaced`
 plus a `create`; no definition on a side = unchanged, a `create` without one throws. All view
 drops stand at the head of the diff, all creates at its end. A view is no table: `Diff::Table` and
-`Diff::Column` leave kind `view` alone (the karr k36 refusal is gone). Views are ordered by what they
-read (karr k54, ADR 0011 addendum, as mysql k110/k113): `DBIO::DB2::DDL::view_reads` reads the names
+`Diff::Column` leave kind `view` alone. Views are ordered by what they
+read (ADR 0011 addendum): `DBIO::DB2::DDL::view_reads` reads the names
 after `FROM`/`JOIN`/the comma of a definition (`"x"` as written, unquoted upper-case, schema qualifier
 dropped), `order_views` puts a view after the views it reads, otherwise by name; `install_ddl` and
 `Diff::View` create in that order and drop in reverse, a reader of a replaced view (transitively) is
@@ -131,9 +132,9 @@ default text written as it is — never through `_db2_default_literal`, which is
 `GENERATED ALWAYS AS IDENTITY` on a created table's `is_auto_increment` column. The
 comparison is `DBIO::Diff::Compare::changed_fields` on those fields (what core's
 `changed_column_fields` does for the normalized ones). A mock model in a diff test has to
-carry the catalog fields (karr k41, k44).
+carry the catalog fields.
 
-Identity (karr k45, ADR 0012): `Diff::Column` compares `is_auto_increment` itself (core's
+Identity (ADR 0012): `Diff::Column` compares `is_auto_increment` itself (core's
 `changed_column_fields` does not). An added identity column is three statements (`ADD COLUMN
 ... NOT NULL DEFAULT 0`, `DROP DEFAULT`, `SET GENERATED ALWAYS AS IDENTITY`; existing rows
 hold 0, the counter starts at 1); a changed flag is `SET GENERATED ALWAYS AS IDENTITY` (last
@@ -152,7 +153,7 @@ the column pass the orchestrator emits one `DBIO::DB2::Diff::Reorg` per such tab
 `CALL SYSPROC.ADMIN_CMD('REORG TABLE "<table>"');`, unqualified like the `ALTER TABLE`s —
 visible in `as_sql` and `summary`, run by `apply` like any statement. A table already
 reorg-pending before the diff is not in the model, so the diff emits no `REORG` for it;
-`Deploy::upgrade` covers it (see *Deploy*, karr k48). ADR 0008 is `proposed` until the
+`Deploy::upgrade` covers it (see *Deploy*). ADR 0008 is `proposed` until the
 maintainer confirms the choice.
 
 ## Deploy
@@ -165,22 +166,22 @@ maintainer confirms the choice.
 4. Diff source vs target via `DBIO::DB2::Diff`
 
 Supports `install`, `diff`, `apply`, and `upgrade`; `apply` and `upgrade` are those of
-`DBIO::Deploy::Base` (core k399, ADR 0080), `_execute_diff` too: a refusal always stops the run, a
+`DBIO::Deploy::Base` (ADR 0080), `_execute_diff` too: a refusal always stops the run, a
 destructive operation or a `lossy` one runs with `allow_destructive => 1` only, `dry_run => 1` executes
 nothing. An upgrade whose diff holds a `REORG` (see *Diff*) rewrites that table as part of `apply`.
 
 The Db2 checks are `_check_before_apply($diff)`, run by `apply` (so by `upgrade`) after the release and
-before the first statement, in this order. First `_reorg_pending_before_apply` (karr k48, ADR 0008
+before the first statement, in this order. First `_reorg_pending_before_apply` (ADR 0008
 addendum) reads `SYSIBMADM.ADMINTABINFO` (`TABSCHEMA` = `CURRENT SCHEMA`, `REORG_PENDING = 'Y'`) and runs
 `CALL SYSPROC.ADMIN_CMD('REORG TABLE ...')` (rendered by `Diff::Reorg`) for every pending *table* that is in
 both the source and the target model, sorted, with a `carp` naming them. Narrowest reading of "affected": a
 table only in the source is dropped, one only in the target is created, a view is no `REORG` target; with no
 table in both models the server is not asked. A diff without changes is not applied: nothing is asked or
-reorganised. Second `_refuse_identity_on_rows` (karr k54, ADR 0012 addendum) asks `SELECT 1 FROM "<table>" FETCH
+reorganised. Second `_refuse_identity_on_rows` (ADR 0012 addendum) asks `SELECT 1 FROM "<table>" FETCH
 FIRST 1 ROW ONLY` for every table that gets an added identity column (`Diff::Column::adds_identity`, table in
 both models) and croaks naming table and column when it holds a row (Db2 would set the rows to 0); it comes
 after the `REORG` because a reorg-pending table cannot be read (SQL0668N rc 7). Third `_refuse_unfillable`
-(karr k57). Nothing is executed when a check throws; `diff`/`as_sql` do not look.
+. Nothing is executed when a check throws; `diff`/`as_sql` do not look.
 
 `DBIO::DB2::Diff::Column::lossy` (ADR 0080) answers through `DBIO::Diff::Compare::column_change_lossy` on
 `catalog_type`/`catalog_size`: the same type with a size at least the live one (scale equal), and the widenings
@@ -190,19 +191,19 @@ unique constraint, foreign key, view not `replaced`) are destructive by their `a
 
 ## DDL
 
-`table('schema.table')` is the table in that schema (karr k57): `CREATE TABLE "schema"."table"`, Db2 makes the schema with its first table (implicit schema creation, needs that authority); FK targets and indexes name it, the FK constraint name keys on the table part. `diff`/`upgrade` compare such a table too (pattern of dbio-mysql k122): `Deploy::_introspect_current` reads the schemas of the declared qualified tables, **the declared tables of them only** (`DDL->qualified_tables`), and merges them into the model under the name `schema.table` (`_merge_schema_model`); the target is built per schema (`install_ddl` options `local_only` / `only_schema`, one compare schema each, `_build_target_model`); the op classes write `"schema"."table"` (`_db2_quote_table`), an index in the schema of its table. A table of such a schema the declaration does not name (or no longer names) is in no model and is never dropped. Refused before the first statement (`_refuse_cross_schema_keys`, `DBIO::Exception` naming both tables): a foreign key between tables of different schemas (`install` still writes it). Not covered: views named `schema.table`, and the reorg-pending check before an upgrade (`_reorg_pending_before_apply`) looks at the current schema only.
+`table('schema.table')` is the table in that schema: `CREATE TABLE "schema"."table"`, Db2 makes the schema with its first table (implicit schema creation, needs that authority); FK targets and indexes name it, the FK constraint name keys on the table part. `diff`/`upgrade` compare such a table too: `Deploy::_introspect_current` reads the schemas of the declared qualified tables, **the declared tables of them only** (`DDL->qualified_tables`), and merges them into the model under the name `schema.table` (`_merge_schema_model`); the target is built per schema (`install_ddl` options `local_only` / `only_schema`, one compare schema each, `_build_target_model`); the op classes write `"schema"."table"` (`_db2_quote_table`), an index in the schema of its table. A table of such a schema the declaration does not name (or no longer names) is in no model and is never dropped. Refused before the first statement (`_refuse_cross_schema_keys`, `DBIO::Exception` naming both tables): a foreign key between tables of different schemas (`install` still writes it). Not covered: views named `schema.table`, and the reorg-pending check before an upgrade (`_reorg_pending_before_apply`) looks at the current schema only.
 
 `DBIO::DB2::DDL` generates DB2 DDL from DBIO result classes. Handles:
 - `CREATE TABLE` with inline PK and named foreign keys (see *Foreign Keys*)
 - A source's `unique_constraints` as named `CONSTRAINT "name" UNIQUE ("col", ...)` inline
-  in `CREATE TABLE` (name = the source's, `primary` skipped; karr k39, ADR 0009). A
+  in `CREATE TABLE` (name = the source's, `primary` skipped; ADR 0009). A
   constraint over a nullable column is refused with a `croak` naming table and column
   (Db2: SQL0542N); a column without `is_nullable` is `NOT NULL`
 - A `db2_indexes` entry over a column sequence the PK, a `UNIQUE` constraint or an earlier
   index (name order) already has is not written: Db2 answers SQL0605W and makes nothing.
   Non-unique is a duplicate of any cover, `unique` only of a unique one (`_index_is_duplicate`;
   a unique index over a non-unique one is made). `Diff::Index` applies the same rule and puts
-  the `DROP INDEX` of a renamed index before the `CREATE` (karr k47, ADR 0010)
+  the `DROP INDEX` of a renamed index before the `CREATE` (ADR 0010)
 - Unique without a constraint as a standalone `CREATE UNIQUE INDEX`, from a `db2_indexes`
   entry with `unique => 1`
 - `GENERATED ALWAYS AS IDENTITY` for auto-increment columns
@@ -210,11 +211,11 @@ unique constraint, foreign key, view not `replaced`) are destructive by their `a
 - Index creation via `db2_indexes` method on result classes and the canonical index declarations of the result source (ADR 0061, `index_declarations_for('db2', [])`; a declaration of the same name wins; `type` other than unique and `options` refused)
 - `CREATE VIEW <quoted name> AS <view_definition>` for every non-virtual
   `DBIO::ResultSource::View` source with a non-empty `view_definition`, emitted
-  after all table and index statements, in the order of what they read (karr k54)
+  after all table and index statements, in the order of what they read
 
 Type mapping: PostgreSQL-style types (serial, bigserial, timestamptz) mapped to DB2 equivalents;
 `boolean`/`bool` are the native `BOOLEAN` (no length) and `binary` is `BINARY(n)` (bare valid, `VARBINARY`
-needs a length), measured, ADR 0004 addendum (karr k54, k44).
+needs a length), measured, ADR 0004 addendum.
 
 ## Foreign Keys
 
@@ -259,7 +260,7 @@ capped (rule 4):
 - **`maint/k8s/db2-pod.yaml`** — DB2 pod + Service for a cluster that admits a
   privileged container. Still needs `DBD::DB2` locally.
 
-Tests (`t/`, 71 files). "Live" below means `DBIO_TEST_DB2_DSN` and `_USER` are set
+Tests (`t/`, 73 files). "Live" below means `DBIO_TEST_DB2_DSN` and `_USER` are set
 (`_PASS` beside them) and `DBD::DB2` is installed; everything else runs offline, on
 mock models, recording handles and storages that never connect.
 
@@ -291,19 +292,19 @@ component, and the shared `DBIO::Test::Schema` gets `+DBIO::DB2::Storage` as
   `SYSIBMADM.ADMINTABINFO.REORG_PENDING` is `N`, the follow-up diff is empty and an
   inserted row reads back. And the other half: a `VARCHAR` that only gets longer has no
   `REORG` in its diff and the table stays usable
-- `t/14-diff-pk-index.t` — **live only** (karr k53): a new identity-PK table is one
+- `t/14-diff-pk-index.t` — **live only**: a new identity-PK table is one
   `CREATE TABLE` with the `PRIMARY KEY` inline and no index operation in
   `$deploy->diff`, and the follow-up diff after `install` is empty. Pins the reason:
   `SYSCAT.INDEXES` holds the PK backing index (`UNIQUERULE='P'`) in `SYSIBM`, under a name
-  of the server's (the model carries it with `origin` `pk`, karr k45)
-- `t/15-char-default-live.t` — **live only** (karr k46): after `install`, a `CHAR(5)`
+  of the server's (the model carries it with `origin` `pk`)
+- `t/15-char-default-live.t` — **live only**: after `install`, a `CHAR(5)`
   default `'00000'`, a `VARCHAR` default `'USER'` and `'NULL'` read back as text from an
   inserted row (the old bare `DEFAULT 00000` stored `0`, silently), and the follow-up
   diff is empty
 - `t/30-diff.t`, `t/31-diff-compare-semantics.t`, `t/32-diff-drop-table-index.t` —
   diff. `30`: the four op classes (`Diff::Table`, `::Column`, `::Index`,
   `::ForeignKey`) and the orchestrator's ordering over mock models, including that
-  `Diff::Table`/`Diff::Column` leave a view alone (karr k45); the create, add-with-default and string-default alter
+  `Diff::Table`/`Diff::Column` leave a view alone; the create, add-with-default and string-default alter
   blocks feed the catalog shape, the rest a bare `catalog_type => 'integer'`. `31`: what the `DBIO::Diff::Compare` comparators
   return, as the op classes consume it. `32`: no standalone `DROP INDEX` for an
   index whose table is dropped in the same pass
@@ -319,20 +320,20 @@ component, and the shared `DBIO::Test::Schema` gets `+DBIO::DB2::Storage` as
   `is_nullable` deploys `NOT NULL`. `38`: the `DEFAULT` clause on both paths —
   `_db2_default_literal(value, data_type)` for `install_ddl` (a result class value; on
   a character column every non-ref value is a string literal, `'00000'` on `CHAR(5)`,
-  `'USER'`, `'NULL'`; a SCALAR ref stays raw; no type, no change — karr k46), the
+  `'USER'`, `'NULL'`; a SCALAR ref stays raw; no type, no change), the
   catalog text as it is for `Diff::Table` and `Diff::Column` — and `_db2_quote_ident` croaking on
   `undef`. `39`: `_db2_column_type` and the size — an array reference (`[10, 2]`)
   renders comma-joined (`DECIMAL(10,2)`), and a type Db2 declares without a length
   gets none, whatever size comes with it (the catalog's `INTEGER` 4, a result class's
   `integer` 11); `varchar`/`json`/`varbinary` without a size, `interval`, `enum` and `bit` are refused
-  (a `DBIO::Exception` naming type and column); `text` without a size is a `CLOB` (karr k57), `char`/`blob`/`clob` bare stay valid, `decfloat` takes 16 or
-  34 or none, and the character-type test (`_db2_mapped_type`) never refuses (karr k45); `boolean` is `BOOLEAN` without a length and `binary` `BINARY(n)` (karr k54)
+  (a `DBIO::Exception` naming type and column); `text` without a size is a `CLOB`, `char`/`blob`/`clob` bare stay valid, `decfloat` takes 16 or
+  34 or none, and the character-type test (`_db2_mapped_type`) never refuses; `boolean` is `BOOLEAN` without a length and `binary` `BINARY(n)`
 - `t/40-introspect-contract.t`, `t/41-introspect-tables.t`,
   `t/45-introspect-columns.t` — introspect. `40`: the `DBIO::Introspect::Base`
   normalized contract over an injected model. `41`: the tables introspector scopes on
   `tabschema` only (SQL captured from a mock handle). `45`: what the columns
   introspector makes of `SYSCAT.COLUMNS` rows replayed from a mock handle — the normalized
-  `data_type`, `size` and `default_value` (karr k44, ADR 0013) and the internal
+  `data_type`, `size` and `default_value` (ADR 0013) and the internal
   `catalog_type`, `catalog_size` (for `TIMESTAMP` the precision, not `LENGTH,SCALE`; for
   `DECFLOAT` the digits, `LENGTH` 8/16 → 16/34) and `catalog_default` as SQL text;
   `is_auto_increment`
@@ -378,11 +379,11 @@ component, and the shared `DBIO::Test::Schema` gets `+DBIO::DB2::Storage` as
   literal SQL (`01504`) — the same inside `txn_do`, read back committed over a
   second connection, a raw `DELETE` through `dbh_do`, and real errors (`42S02`,
   `42703`) that still throw and still roll a transaction back
-- `t/57-hostbound-dsn.t` — `_bind_host_into_dsn` (karr k50): `HOSTNAME=`/`PORT=`
+- `t/57-hostbound-dsn.t` — `_bind_host_into_dsn`: `HOSTNAME=`/`PORT=`
   replaced (any case), `PORT=` added when missing, the rest of the DSN unchanged;
   alias, non-`key=value` part and DSN without `HOSTNAME=` declined naming the form
   and no DSN value; end to end through a HostBound view with `DBI->connect` mocked
-- `t/58-unique-constraint.t` — offline (karr k39, ADR 0009): `install_ddl` emits the
+- `t/58-unique-constraint.t` — offline (ADR 0009): `install_ddl` emits the
   named `UNIQUE` constraints inline (order, quoting, `primary` skipped) and refuses a
   nullable column naming table and column; `Diff::Table` create renders the same clause;
   `Diff::UniqueConstraint` add / drop / changed / dropped table; the orchestrator;
@@ -394,7 +395,7 @@ component, and the shared `DBIO::Test::Schema` gets `+DBIO::DB2::Storage` as
   `DROP UNIQUE` and `ADD CONSTRAINT` through `diff`/`apply` on an existing table, a missing
   table created with the constraints inline, each ending on an empty diff; a nullable
   column refused at render time, nothing created
-- `t/61-duplicate-index-live.t` — **live only** (karr k47), tables `dbio_k47_<pid>`,
+- `t/61-duplicate-index-live.t` — **live only**, tables `dbio_k47_<pid>`,
   `dbio_k47r_<pid>`: the server's 605 rule row by row on a raw handle; `db2_indexes` on the
   PK columns and a repeated sequence through `install` and `upgrade`, each ending on an
   empty diff; a raw 605 through the storage handle is a warning
@@ -402,31 +403,31 @@ component, and the shared `DBIO::Test::Schema` gets `+DBIO::DB2::Storage` as
   diff over catalog-shaped models (left out, empty follow-up, rename order)
 - `t/63-sqlstate-605.t` — offline: the `_connect` wrapper on a `DBD::NullP` handle, warning
   with index and table, other states still throw
-- `t/60-decfloat-live.t` — **live only** (karr k45), on a table of its own (`dbio_k45_<pid>`):
+- `t/60-decfloat-live.t` — **live only**, on a table of its own (`dbio_k45_<pid>`):
   `DECFLOAT(16)`, `DECFLOAT(34)` and a bare `DECFLOAT` install, the model holds size
   16 / 34 / 34, the follow-up diff is empty
 
-- `t/64-upgrade-reorg-pending-live.t` — **live only** (karr k48), tables `dbio_k48_<pid>_*`: a table
+- `t/64-upgrade-reorg-pending-live.t` — **live only**, tables `dbio_k48_<pid>_*`: a table
   made reorg-pending by hand (ADD then DROP COLUMN, no `REORG`), columns equal to the class, gets its
   new index through `upgrade`; afterwards `REORG_PENDING` is `N`, the follow-up diff empty, an insert
   reads back; a table that is not pending and one the diff drops get no `REORG`
 - `t/65-upgrade-reorg-pending.t` — offline counterpart, on a recording handle and a deploy with a
-  replaced diff, run through `upgrade` and `apply` (core k399): query shape and bind, the `REORG` before the diff, none when
+  replaced diff, run through `upgrade` and `apply`: query shape and bind, the `REORG` before the diff, none when
   nothing is pending, the narrow reading (view, source-only, target-only), sorted and quoted, no query without a
   common table, an empty diff asks and runs nothing (`apply` returns before `_check_before_apply`), `dry_run` too
-- `t/66-introspect-keys-live.t` — **live only** (karr k45, ADR 0011), tables `dbio_k45k_<pid>_*`:
+- `t/66-introspect-keys-live.t` — **live only** (ADR 0011), tables `dbio_k45k_<pid>_*`:
   an FK onto a `UNIQUE` constraint has the constraint's columns as `to_columns` (one onto the
   primary key keeps the PK's); the model holds the `SYSIBM` PK index with `origin` `pk` and the PK
   columns, not the index behind a `UNIQUE` constraint; `table_uniq_info`; the follow-up diff is empty
 - `t/67-diff-pk-index-origin.t` — offline counterpart: `Diff::Index` writes no operation for an
   index of origin `pk` (both sides, one side), real indexes beside it still compare; the
   introspector's query and its schema-and-name keying over a mock handle
-- `t/68-diff-view.t` — offline (karr k45, ADR 0011): `Diff::View` create / drop / unchanged /
+- `t/68-diff-view.t` — offline (ADR 0011): `Diff::View` create / drop / unchanged /
   whitespace / replaced / no definition, and the orchestrator: view drops at the head, creates at
   the end, no table operation for a view, a table turned view
 - `t/69-diff-view-live.t` — **live only**, objects `dbio_k45v_<pid>_*`: missing, surplus and changed
   view through `diff`/`upgrade` and back, each ending on an empty diff
-- `t/70-diff-identity.t` — offline (karr k45, ADR 0012), catalog-shaped models: the three
+- `t/70-diff-identity.t` — offline (ADR 0012), catalog-shaped models: the three
   statements of an added identity column, `is_auto_increment` 0→1 / 1→0 (default, nullable and
   type change beside it), the identity moving between two columns (`DROP IDENTITY` first), no
   `REORG`, the allowed types, and the refusals naming table and column
@@ -434,36 +435,38 @@ component, and the shared `DBIO::Test::Schema` gets `+DBIO::DB2::Storage` as
   an added identity column (to an empty table, `t/77`), a plain `NOT NULL` column made identity, an identity made plain and a
   nullable column made identity through `upgrade`, each ending on an empty diff and on the
   server's identity value in a new row
-- `t/72-diff-reads-catalog-fields.t` — offline (karr k44, ADR 0013): models whose normalized and
+- `t/72-diff-reads-catalog-fields.t` — offline (ADR 0013): models whose normalized and
   catalog fields disagree on purpose; the diff, `Diff::Table`, `Diff::Column` and
   `reorg_recommended` follow the catalog fields only
-- `t/73-generate-roundtrip-live.t` — **live only** (karr k44), tables `dbio_k44<class>_<pid>`, one
+- `t/73-generate-roundtrip-live.t` — **live only**, tables `dbio_k44<class>_<pid>`, one
   per type class (`bol`: boolean and binary) plus a hand-made `BOOLEAN`/`BINARY(8)` one: install, introspect, `DBIO::Generate`
   writes result classes, drop, install from them, introspect again; every column equal in both
-- `t/74-diff-view-order.t` — offline (karr k54, ADR 0011 addendum): `view_reads` and `order_views` (quoting,
+- `t/74-diff-view-order.t` — offline (ADR 0011 addendum): `view_reads` and `order_views` (quoting,
   case, qualifier, strings and comments, `TRIM(.. FROM ..)`, cycle), creates in dependency order and drops
   reversed, a replaced base view folds its readers (transitively) and leaves others alone, a cycle throws
   from the diff before an operation, `install_ddl` in dependency order
 - `t/75-diff-view-order-live.t` — **live only**, objects `dbio_k54v_<pid>_*`: a view reading a view
   reading a view (name order the wrong one) through `install` and `upgrade`, a replaced base view with its
   readers, the drop in reverse; each ending on an empty diff
-- `t/76-identity-add-rows.t` — offline (karr k54, ADR 0012 addendum), recording handle as `t/65`: an
+- `t/76-identity-add-rows.t` — offline (ADR 0012 addendum), recording handle as `t/65`: an
   identity ADD onto a table with rows is refused from `apply` and `upgrade` (`_check_before_apply`) naming table and column,
-  nothing executed; every pending table is reorganised first (one rule for both, core k399); an empty table, a plain column, a column made identity and a new table are not asked
-- `t/96-diff-lossy.t` — offline (core k399, ADR 0080): `Diff::Column::lossy` pair by pair (the three widenings,
+  nothing executed; every pending table is reorganised first (one rule for both); an empty table, a plain column, a column made identity and a new table are not asked
+- `t/96-diff-lossy.t` — offline (ADR 0080): `Diff::Column::lossy` pair by pair (the three widenings,
   longer `VARCHAR`/`DECIMAL` free; shrinking, scale, family changes lossy; nullability, default, added column not),
   a dropped column destructive, `apply`/`upgrade` inherited from `Deploy::Base`, a lossy change refused without
   `allow_destructive` (nothing ran, no check) and run with it
-- `t/97-explain-schema-identifier.t` — offline (core k391, ADR 0077): `explain_table_schema` is an identifier; `_explain_query` writes it through the driver's quoting (`"SYSTOOLS"."EXPLAIN_OPERATOR"` by default, `"` doubled, `;` and blanks inside the quotes, case as given)
+- `t/97-explain-schema-identifier.t` — offline (ADR 0077): `explain_table_schema` is an identifier; `_explain_query` writes it through the driver's quoting (`"SYSTOOLS"."EXPLAIN_OPERATOR"` by default, `"` doubled, `;` and blanks inside the quotes, case as given)
+- `t/100-numeric-decimal-point.t` — offline (ADR 0014): `decode_rows` on a mock handle with TYPE arrays: comma to point per numeric type (UTF-8 database or not), grouping / two commas / no comma / integers / character columns (`a,b`) / `NULL` / `BLOB` unchanged, text still decoded beside a number
+- `t/101-numeric-decimal-point-live.t` — **live only**, table `dbio_decpoint_<pid>`, the counterpart of `100`: child processes started with the C locale, `LC_ALL=de_DE.utf8` and `LC_ALL=de_DE.iso88591` (the locales must be installed, otherwise the test skips) write `DECIMAL`, `NUMERIC`, `REAL`, `DOUBLE`, `DECFLOAT(16/34)` as strings and Perl numbers and read them with `find`, `all`, `single`, cursor `next`/`all`, `select_single`, `get_column`; the parent checks point and exact value; the write side is checked on the server (`WHERE` match, `cast(? as decimal(12,2))*100`)
 - `t/77-identity-add-rows-live.t` — **live only**, table `dbio_k54i_<pid>`: rows -> exception and the
   table unchanged; emptied -> added, follow-up diff empty, a new row has its identity
 - `t/78-identity-add-reorg-pending-live.t`, `t/79-boolean-default-live.t`, `t/80-binary-limits-live.t`,
-  `t/81-view-order-cte-schema-live.t` — **live only** (karr k55): `apply` of an identity ADD onto a
+  `t/81-view-order-cte-schema-live.t` — **live only**: `apply` of an identity ADD onto a
   reorg-pending table reorganises first; a hand-made BOOLEAN `DEFAULT '1'` equals the class (empty diff);
   `binary` > 255 is `VARBINARY(n)`, > 32672 refused; views with a CTE / schema-qualified read install, empty diff.
   Offline halves in `t/39`, `t/45`, `t/74`, `t/76`. `view_reads`/`order_views` take an optional schema; a
   qualified read of a view of the set without a schema is refused (ADR 0011 addendum)
-- `t/82-conformance-ddl.t`, `t/84-conformance-diff.t`, `t/86-conformance-bind.t` — offline (karr k57, core
+- `t/82-conformance.t` — offline, one subtest each for DDL, Diff and Bind (core
   ADR 0060): `DBIO::DB2::Test::Conformance->check_declarations` for the list, the answered table version
   against core's. `t/83-`, `t/85-`, `t/87-conformance-{ddl,diff,bind}-live.t` — **live only**, the shared case
   lists of core run against the server, each case in a schema of its own (`DBIO_CF_<pid>_<n>`, `CURRENT SCHEMA`

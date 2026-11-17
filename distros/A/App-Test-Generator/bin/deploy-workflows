@@ -10,7 +10,7 @@ use File::Spec;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =head1 NAME
 
@@ -30,10 +30,10 @@ the C<.github/workflows/> directory of the target repository:
 
 =over 4
 
-=item * C<dashboard.yml> — generates the HTML test dashboard on every push
+=item * C<dashboard.yml> - generates the HTML test dashboard on every push
 and after each mutation run; deploys to GitHub Pages.
 
-=item * C<mutate.yml> — runs mutation testing on a monthly schedule and on
+=item * C<mutate.yml> - runs mutation testing on a monthly schedule and on
 manual dispatch.
 
 =back
@@ -252,7 +252,7 @@ jobs:
             perl Makefile.PL && make install
           else
             echo "Install ATG"
-            cpanm -iqn App::Test::Generator@0.48
+            cpanm -iqn App::Test::Generator@0.49
           fi
 
       - name: Generate dashboard
@@ -406,7 +406,7 @@ jobs:
         run: |
           if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
             cpanm -iqn Data::Random::Structure Data::Random::String::Matches Data::Random::String Data::Random
-            cpanm -iqn App::Test::Generator@0.48
+            cpanm -iqn App::Test::Generator@0.49
           fi
 
       - name: Generate the mutants

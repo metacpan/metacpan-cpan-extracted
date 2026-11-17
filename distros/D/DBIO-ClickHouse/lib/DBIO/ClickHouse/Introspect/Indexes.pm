@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Introspect::Indexes;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -68,7 +68,7 @@ DBIO::ClickHouse::Introspect::Indexes - Introspect ClickHouse data-skipping inde
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

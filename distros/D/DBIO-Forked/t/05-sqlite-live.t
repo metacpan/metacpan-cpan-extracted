@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
+
+plan skip_all => 'this perl has no real fork() ($Config{d_fork} is not set)'
+  unless $Config{d_fork};
 use POSIX qw(WNOHANG);
 
 # Skip the entire file if live deps are absent.
@@ -187,7 +191,7 @@ is_deeply(
 #    LongReadLen is the probe -- DBI's default is 80, so only the options can
 #    have put 4096 on the child's handle.
 SKIP: {
-  skip 'the installed DBIO core predates connect options beside an AccessBroker (core k243)', 6
+  skip 'the installed DBIO core predates connect options beside an AccessBroker', 6
     unless DBIO::Storage::Async->can('_takes_broker_connect_options');
 
   my $broker = DBIO::AccessBroker::Static->new(

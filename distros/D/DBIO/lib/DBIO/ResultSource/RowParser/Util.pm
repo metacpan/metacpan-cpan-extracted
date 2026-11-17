@@ -4,7 +4,7 @@ package DBIO::ResultSource::RowParser::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Util 'perlstring';
 
@@ -387,7 +387,7 @@ DBIO::ResultSource::RowParser::Util - Assemble row-parser source code for simple
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 METHODS
 

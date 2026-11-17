@@ -73,7 +73,7 @@ for my $case (
   like $err, qr/\bchild\b/,             '... the table';
   like $err, qr/\Q$event $value\E/,     '... the event and the value';
   like $err, qr/Msg 156/,               '... and that ASE has no referential actions';
-  like $err, qr/\bparent_id\b/,         '... the column (karr k97, the conformance convention)';
+  like $err, qr/\bparent_id\b/,         '... the column (the conformance convention)';
   like $err, qr/\brefused\b/,          '... and that it is refused';
   isa_ok $err, 'DBIO::Exception';
 }

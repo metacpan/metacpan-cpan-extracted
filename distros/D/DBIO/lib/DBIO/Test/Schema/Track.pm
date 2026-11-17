@@ -3,7 +3,7 @@ package DBIO::Test::Schema::Track;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -155,7 +155,7 @@ DBIO::Test::Schema::Track - Test result class for the track table
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

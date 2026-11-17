@@ -76,13 +76,18 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/dbio-adr/SKILL.md
 misc/agent-context/.claude/skills/dbio-codeberg-user-issues/SKILL.md
 misc/agent-context/.claude/skills/dbio-consolidate-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-consolidate-release/references/all-and-recovery.md
 misc/agent-context/.claude/skills/dbio-coordination/SKILL.md
+misc/agent-context/.claude/skills/dbio-coordination/references/direct-execution.md
 misc/agent-context/.claude/skills/dbio-core/SKILL.md
+misc/agent-context/.claude/skills/dbio-core/references/access-broker.md
+misc/agent-context/.claude/skills/dbio-core/references/capabilities.md
 misc/agent-context/.claude/skills/dbio-driver-development/SKILL.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/async-transport.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/deploy-introspect-diff.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/extension-layers.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/live-testing.md
+misc/agent-context/.claude/skills/dbio-driver-development/references/platform-skips.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-class.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-seams.md
 misc/agent-context/.claude/skills/dbio-oracle-database/SKILL.md
@@ -90,6 +95,8 @@ misc/agent-context/.claude/skills/dbio-oracle/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-class-patterns/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/bundle-tests.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/share-skill.md
 misc/agent-context/.claude/skills/dbio-perl-syntax/SKILL.md
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -110,11 +117,11 @@ t/10-oracle.t
 t/100-diff-column-lossy.t
 t/100-error-values-mask.t
 t/101-error-values-live.t
+t/102-numeric-characters-live.t
+t/103-introspect-order.t
+t/104-introspect-order-live.t
 t/11-oracle-blob.t
 t/12-oracle-hq.t
-t/20-oracle-core.t
-t/21-oracle-blob-core.t
-t/22-oracle-hq-core.t
 t/30-sqlmaker-oracle.t
 t/31-sqlmaker-oraclejoin.t
 t/32-sqlmaker-hierarchical-oracle.t
@@ -126,6 +133,7 @@ t/37-connect-params-dsn.t
 t/38-connect-params-live.t
 t/39-driver-declared.t
 t/40-datetime-oracle.t
+t/41-date-carries-time.t
 t/50-diff.t
 t/51-deploy-split.t
 t/52-deploy-transactional-ddl.t
@@ -178,5 +186,4 @@ t/98-ddl-plsql-live.t
 t/99-savepoints-printwarn.t
 t/author-pod-checker.t
 t/release-changes_has_content.t
-t/release-coverage.t
 t/sqlmaker/limit_dialects/rownum.t

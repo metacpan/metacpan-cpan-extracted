@@ -4,7 +4,7 @@ package DBIO::MySQL::EV::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Future';
 
@@ -120,7 +120,7 @@ DBIO::MySQL::EV::Future - A Future whose get waits on the EV loop
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

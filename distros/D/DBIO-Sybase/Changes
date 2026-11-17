@@ -1,5 +1,15 @@
 Revision history for DBIO-Sybase
 
+0.900007  2026-11-17
+    * Installation
+        - DBI is a configure requirement, so it is installed before
+          DBD::Sybase, whose Makefile.PL needs it.
+
+    * Documentation
+        - The shipped skills match the code: identifier quoting, temp
+          database name and size, diff order, views, FK action refusals,
+          type refusals, no server probe.
+
 0.900004  2026-11-08
     * Breaking Changes
         - Every connection sets string_rtruncation on, so a string too long

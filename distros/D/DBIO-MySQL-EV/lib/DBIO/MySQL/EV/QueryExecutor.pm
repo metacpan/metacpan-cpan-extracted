@@ -4,7 +4,7 @@ package DBIO::MySQL::EV::QueryExecutor;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Scalar::Util ();
 use DBIO::Exception ();
@@ -100,7 +100,7 @@ sub execute {
     };
     unless ($dispatched) {
       my $died = $@;
-      die _masked($mask, $died);
+      die _masked($mask, $died, _handle_code($mdb, $died));
     }
   }
 
@@ -123,7 +123,7 @@ sub reset_connection {
   my $settle = _settle_cb($f, $pid, $key, 1);
 
   my $mask = _error_mask($self->{error_masker}, [], undef);
-  $mdb->reset_connection(_reset_cb($settle, $mask));
+  $mdb->reset_connection(_reset_cb($mdb, $settle, $mask));
 
   delete $IN_FLIGHT{$key} unless ++$IN_FLIGHT{$key};
   delete $EXCL{$key} if !++$EXCL{$key};
@@ -159,6 +159,7 @@ sub _enqueue {
   my $timer;
   if ($timeout && $timeout > 0) {
     Scalar::Util::weaken(my $weak_outer = $outer);
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     $timer = EV::timer($timeout, 0, sub {
       undef $timer;
       my $f = $weak_outer or return;
@@ -331,8 +332,10 @@ sub _prepared_cb {
     # No statement id, nothing to close.
     return $settle->(undef, _server_error($mdb, $perr, $mask) || 'prepare failed') if $perr || !defined $stmt;
     local $@;
-    eval { $mdb->execute($stmt, $bind, _executed_cb($mdb, $stmt, $settle, $pid, $mask)); 1 }
-      or _close_and_settle($mdb, $stmt, $settle, undef, _masked($mask, $@ || 'execute failed'));
+    unless (eval { $mdb->execute($stmt, $bind, _executed_cb($mdb, $stmt, $settle, $pid, $mask)); 1 }) {
+      my $died = $@ || 'execute failed';
+      _close_and_settle($mdb, $stmt, $settle, undef, _masked($mask, $died, _handle_code($mdb, $died)));
+    }
     return;
   };
 }
@@ -358,10 +361,10 @@ sub _queried_cb {
 }
 
 sub _reset_cb {
-  my ($settle, $mask) = @_;
+  my ($mdb, $settle, $mask) = @_;
   return sub {
     my ($ok, $err) = @_;
-    $settle->($err ? (undef, _masked($mask, $err)) : (1, undef));
+    $settle->($err ? (undef, _masked($mask, $err, _handle_code($mdb, $err))) : (1, undef));
   };
 }
 
@@ -373,23 +376,38 @@ sub _error_mask {
   my ($masker, $bind, $sql) = @_;
   return unless $masker;
   my @values = map { "$_" } grep { defined && !ref && length >= 4 } @{ $bind || [] };
-  return sub { $masker->($_[0], \@values, $sql) };
+  return sub { $masker->($_[0], \@values, $sql, $_[1]) };
 }
 
-# An error text through the mask; an object, undef and an empty text as they are.
+# An error text through the mask, with the server's error number when there is
+# one; an object, undef and an empty text as they are.
 sub _masked {
-  my ($mask, $err) = @_;
+  my ($mask, $err, $code) = @_;
   return $err unless $mask && defined $err && !ref $err && length $err;
-  return $mask->($err);
+  return $mask->($err, $code);
+}
+
+
+sub _handle_code {
+  my ($mdb, $text) = @_;
+  return unless defined $text && !ref $text && length $text;
+  return unless Scalar::Util::blessed($mdb)
+    && $mdb->can('error_number') && $mdb->can('error_message');
+  my ($number, $message) = do { local $@; eval { ($mdb->error_number, $mdb->error_message) } };
+  return unless defined $number && $number =~ /\A[0-9]+\z/
+    && ($number >= 1000 && $number < 2000 || $number >= 3000);
+  return unless defined $message && length $message && index($text, $message) >= 0;
+  return $number + 0;
 }
 
 
 sub _server_error {
   my ($mdb, $err, $mask) = @_;
   return $err if ref $err or not defined $err or not length $err;
+  my $code  = _handle_code($mdb, $err);
   my $state = _server_sqlstate($mdb, $err)
-    or return _masked($mask, $err);
-  return DBIO::Exception::Server->new(message => _masked($mask, $err), sqlstate => $state);
+    or return _masked($mask, $err, $code);
+  return DBIO::Exception::Server->new(message => _masked($mask, $err, $code), sqlstate => $state);
 }
 
 # The SQLSTATE of the handle when $err is a refusal by the server, else undef.
@@ -438,7 +456,7 @@ DBIO::MySQL::EV::QueryExecutor - Query execution wrapper for DBIO MySQL async st
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -506,7 +524,7 @@ logic from connection pooling and transaction orchestration.
   );
 
 C<error_masker> is optional: a coderef called as C<< $masker->($text, \@values,
-$sql) >> that answers the text of an error with the values taken out
+$sql, $code) >> that answers the text of an error with the values taken out
 (ADR 0075 of the core: an error names keys, columns and options, never a value;
 MySQL and MariaDB write the offending value into their text, a bound one
 included). Every error text a statement ends in goes through it B<before> the
@@ -516,7 +534,12 @@ EV::MariaDB refuses (L</execute> rethrows it masked). An exception object is
 passed on as it is. C<\@values> are the bound values that can be looked for in a
 text -- the defined, non-reference ones of four characters or more, as plain
 strings, a copy: the caller's bind arrayref is not held (ADR 0044) -- and
-C<$sql> the statement as it was handed over. The SQLSTATE of the server's
+C<$sql> the statement as it was handed over. C<$code> is the error number of the
+server (1062, 1366, ...), read from the handle while it holds the error of this
+very statement, or C<undef> -- for a client error (2000 to 2999), a text the
+handle does not carry, no handle: the server words its text in the language of
+its session, and the masker masks by the code, not by the wording
+(L<DBIO::MySQL::Util/mask_error_details>). The SQLSTATE of the server's
 refusal stays. Without a masker the text is the engine's own. The storage
 passes L<DBIO::MySQL::EV::Storage/_mysql_mask_error>.
 
@@ -649,6 +672,19 @@ L<DBIO::MySQL::EV::Pool/_shutdown_connection> B<before> C<finish>: C<finish>
 calls back the statement in flight, which would start the waiting ones against
 the finished handle.
 
+=head2 _handle_code
+
+  my $code = DBIO::MySQL::EV::QueryExecutor::_handle_code($mdb, $text);
+
+The error number of the server (EV::MariaDB's C<error_number>) for the error
+C<$text>, or C<undef>. The handle answers only while it holds the error of the
+statement that is being reported: its C<error_message> must be C<$text> (or
+part of it, a croak adds its location). A number of the client library (2000
+to 2999), zero, a handle without the accessors, a handle that holds another
+error and anything that throws all answer C<undef>: the text is then masked
+by its wording alone. Read in the statement's own callback, before
+anything else is sent on the handle.
+
 =head2 _server_error
 
   my $error = DBIO::MySQL::EV::QueryExecutor::_server_error($mdb, $text, $mask);
@@ -656,7 +692,8 @@ the finished handle.
 The error of a statement as its Future fails with it (core ADR 0062):
 a L<DBIO::Exception::Server> carrying the C<sqlstate> when the B<server>
 refused the statement, the text itself otherwise. It stringifies to C<$text>
-with the values taken out by C<$mask> (an optional coderef, see L</new>; the
+with the values taken out by C<$mask> (an optional coderef, see L</new>, handed
+the server's error number as well; the
 comparison with the handle's error below is made with the text as the handle
 holds it, the masking comes after). Called from the statement's own callback, where the handle still
 holds that error.

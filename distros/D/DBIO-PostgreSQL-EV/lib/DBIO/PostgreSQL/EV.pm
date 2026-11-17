@@ -1,5 +1,5 @@
 package DBIO::PostgreSQL::EV;
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 # ABSTRACT: Async PostgreSQL storage for DBIO via EV::Pg
 
 use strict;
@@ -22,7 +22,7 @@ DBIO::PostgreSQL::EV - Async PostgreSQL storage for DBIO via EV::Pg
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

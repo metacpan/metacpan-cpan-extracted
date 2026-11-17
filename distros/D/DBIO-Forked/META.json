@@ -23,17 +23,20 @@
       "develop" : {
          "recommends" : {
             "Dist::Zilla::PluginBundle::Git::VersionManager" : "0.007"
+         },
+         "requires" : {
+            "Dist::Zilla::Plugin::Run" : "0"
          }
       },
       "runtime" : {
          "requires" : {
-            "DBIO" : "0.900004",
+            "DBIO" : "0.900007",
             "perl" : "5.020"
          }
       },
       "test" : {
          "recommends" : {
-            "DBIO::SQLite" : "0.900004"
+            "DBIO::SQLite" : "0.900007"
          },
          "requires" : {
             "Test::More" : "0.98"
@@ -43,15 +46,15 @@
    "provides" : {
       "DBIO::Forked" : {
          "file" : "lib/DBIO/Forked.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::Forked::Future" : {
          "file" : "lib/DBIO/Forked/Future.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::Forked::Storage" : {
          "file" : "lib/DBIO/Forked/Storage.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       }
    },
    "release_status" : "stable",
@@ -67,7 +70,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dbio"
    },
-   "version" : "0.900004",
+   "version" : "0.900007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -76,7 +79,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::SetMeta",
             "name" : "@DBIO/DBIO::SetMeta",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -106,12 +109,12 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::LicenseFile",
             "name" : "@DBIO/DBIO::LicenseFile",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::DBIO::GatherSkills",
             "name" : "@DBIO/DBIO::GatherSkills",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
@@ -248,7 +251,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900004",
+                  "tag" : "v0.900007",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -417,14 +420,9 @@
             "version" : "4.010"
          },
          {
-            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
-            "name" : "@DBIO/DBIO::CoverageTest",
-            "version" : "0.900004"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::DBIO::PodCheckerTest",
             "name" : "@DBIO/DBIO::PodCheckerTest",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
@@ -432,14 +430,29 @@
             "version" : "6.040"
          },
          {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@DBIO/ExecDir",
+            "version" : "6.040"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "16"
                }
             },
             "name" : "@DBIO/MakeMaker",
             "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageGate",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : "16"
+               }
+            },
+            "name" : "@DBIO/DBIO::CoverageGate",
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
@@ -459,7 +472,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::CodebergMeta",
             "name" : "@DBIO/DBIO::CodebergMeta",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -499,6 +512,11 @@
             },
             "name" : "@DBIO/Git::CheckFor::CorrectBranch",
             "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::RequireCoreVersion",
+            "name" : "@DBIO/DBIO::RequireCoreVersion",
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
@@ -541,6 +559,21 @@
             },
             "name" : "@DBIO/Git::Push",
             "version" : "2.052"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Run::AfterBuild",
+            "config" : {
+               "Dist::Zilla::Plugin::Run::Role::Runner" : {
+                  "fatal_errors" : 1,
+                  "quiet" : 0,
+                  "run" : [
+                     "%x maint/assert-fork-capability.pl %d"
+                  ],
+                  "version" : "0.050"
+               }
+            },
+            "name" : "Run::AfterBuild",
+            "version" : "0.050"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

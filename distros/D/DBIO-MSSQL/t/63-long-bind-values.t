@@ -231,7 +231,7 @@ is ref $storage, 'DBIO::MSSQL::Storage::Sybase::FreeTDS',
   # (a bind), 1334 are over it and are a literal, which arrives exactly.
   throws_ok { $rs->create({ body => $under }) } qr/beyond ASCII/,
     '1333 euro signs are 3999 bytes: under the line, so a bind -- which a '
-  . 'value beyond ASCII may not be (karr k49)';
+  . 'value beyond ASCII may not be';
 
   my ($sth) = sent { $rs->create({ body => $over }) };
 

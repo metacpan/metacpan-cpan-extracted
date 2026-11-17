@@ -4,7 +4,7 @@ package DBIO::MySQL::Storage::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Async::Storage';
 
@@ -419,18 +419,20 @@ sub _submit_query {
   $self->_silence_statement($old) if $old && $self->_conn_known_dead($conn);
   undef $old;
 
-  delete @$conn{qw(_error_binds _error_sql)};
+  delete @$conn{qw(_error_binds _error_sql _error_code)};
 
   my $values = $self->_error_values($bind);
   my $sth = eval { $dbh->prepare($sql, $self->_async_prepare_attrs($conn)) };
   unless ($sth) {
     my $error = $@;
-    die $self->_masked_error($error, $values, $sql);
+    my $code  = $conn->{_error_code} = $self->_error_code($dbh);
+    die $self->_masked_error($error, $values, $sql, $code);
   }
   unless (eval { $self->_bind_and_execute($dbh, $sth, $bind); 1 }) {
     my $error = $@;
+    my $code  = $conn->{_error_code} = $self->_error_code($sth, $dbh);
     $self->_silence_statement($sth) if $self->_conn_known_dead($conn);
-    die $self->_masked_error($error, $values, $sql);
+    die $self->_masked_error($error, $values, $sql, $code);
   }
   $conn->{sth} = $sth;
 
@@ -508,7 +510,8 @@ sub _collect_result {
   };
   unless ($ok) {
     my $error = $@;
-    die $self->_masked_error($error, $values, $sql);
+    my $code  = $conn->{_error_code} = $self->_error_code($sth, $conn->{dbh});
+    die $self->_masked_error($error, $values, $sql, $code);
   }
 
   return $self->future_class->done(@out);
@@ -527,13 +530,13 @@ sub _drain_more_results {
 
 
 sub _mask_error_values {
-  my ($self, $text, $values, $statement) = @_;
+  my ($self, $text, $values, $statement, $code) = @_;
 
   return $text unless defined $text and !ref $text;
 
   my $masked = eval {
     DBIO::Util::mask_bound_values(
-      DBIO::MySQL::Util::mask_error_details($text, $values, $statement),
+      DBIO::MySQL::Util::mask_error_details($text, $values, $statement, $code),
       $values,
     );
   };
@@ -559,8 +562,20 @@ sub _error_values {
 
 # An error as it leaves the transport: text masked, an object as it is.
 sub _masked_error {
-  my ($self, $error, $values, $sql) = @_;
-  return $self->_mask_error_values($error, $values, $sql);
+  my ($self, $error, $values, $sql, $code) = @_;
+  return $self->_mask_error_values($error, $values, $sql, $code);
+}
+
+# The error code of the server (1062, 1366, ...) from the first handle that has
+# one. Read at once after the failure, before anything else touches the handles.
+sub _error_code {
+  my ($self, @handles) = @_;
+
+  for my $handle (@handles) {
+    my $code = eval { Scalar::Util::blessed($handle) ? $handle->err : undef };
+    return $code if $code;
+  }
+  return undef;
 }
 
 # --- Dead-connection seams --------------------------------------------------
@@ -699,7 +714,7 @@ sub _listen_subscribe {
   my ($sql, $bind) = $notify->subscribe_sql($channel);
   return $self->_mysql_listen_statement($conn, $sql, $bind)->then(
     _mysql_subscribed_cb($self->future_class, $notify, $channel),
-    _mysql_subscribe_failed_cb($self->future_class, $notify),
+    _mysql_subscribe_failed_cb($self->future_class, $notify, $conn),
   );
 }
 
@@ -711,16 +726,22 @@ sub _mysql_subscribed_cb {
   };
 }
 
+# The server words "the table does not exist" in the language of the session,
+# so the missing notify table is told by its error code (1146,
+# ER_NO_SUCH_TABLE), which the failing statement left on the connection, not by
+# the text.
 sub _mysql_subscribe_failed_cb {
-  my ($fc, $notify) = @_;
+  my ($fc, $notify, $conn) = @_;
+  Scalar::Util::weaken(my $weak_conn = $conn);
   return sub {
     my ($err) = @_;
+    my $code = $weak_conn && delete $weak_conn->{_error_code};
     $err = sprintf(
       'the notify table %s does not exist -- MySQL has no LISTEN/NOTIFY, and '
     . 'its emulation needs that table: deploy it once with deploy_notify_table, '
     . 'or run DBIO::MySQL::NotifyTable->create_table_sql from a migration (%s)',
       $notify->quoted_table, $err,
-    ) if defined $err && $err =~ /doesn't exist/;
+    ) if defined $err && $code && $code == 1146;
     return $fc->fail($err);
   };
 }
@@ -859,11 +880,17 @@ sub _mysql_listen_idle_cb {
   my ($conn, $f) = @_;
   Scalar::Util::weaken(my $weak_conn = $conn);
   my $id = Scalar::Util::refaddr($f);
+  Scalar::Util::weaken(my $weak_f = $f);
   return sub {
     my $conn = $weak_conn or return;
-    $conn->{_mysql_abandoned} = 1 if $_[0]->is_cancelled;
-    delete $conn->{_mysql_busy}
-      if $conn->{_mysql_busy} && Scalar::Util::refaddr($conn->{_mysql_busy}) == $id;
+    # The Future is not read from the arguments: Future::XS passes none to an
+    # on_ready callback that sits in the on_cancel list of another Future. The
+    # connection holds it as the one in flight until this callback removes it.
+    my $busy = $conn->{_mysql_busy};
+    my $mine = $busy && Scalar::Util::refaddr($busy) == $id;
+    my $fut  = $mine ? $busy : ($_[0] // $weak_f);
+    $conn->{_mysql_abandoned} = 1 if $fut && $fut->is_cancelled;
+    delete $conn->{_mysql_busy} if $mine;
     return;
   };
 }
@@ -893,7 +920,7 @@ DBIO::MySQL::Storage::Async - future_io async MySQL transport over the DBD drive
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -1650,15 +1677,18 @@ the pool retires it.
 
 =head2 _mask_error_values
 
-  my $text = $storage->_mask_error_values($text, \@values, $statement);
+  my $text = $storage->_mask_error_values($text, \@values, $statement, $code);
 
 The seam of the synchronous storage (L<DBIO::MySQL::Storage/_mask_error_values>)
 for the transport: the text an engine writes into an error with the offending
 value taken out, C<***> in its place, and the type, the column and the key left.
 C<\@values> are the values bound to the statement as plain values, C<$statement>
-the statement in placeholder form or C<undef>. It never throws; a text it cannot
-treat is answered unchanged, and anything that is no text (an exception object)
-as it is.
+the statement in placeholder form or C<undef>. C<$code> is the error code of the
+server (C<< $dbh->err >>), optional: the engine words its text in the language
+of the session, and with the code the text is masked by the code, not by the
+wording (L<DBIO::MySQL::Util/mask_error_details>). It never throws; a text it
+cannot treat is answered unchanged, and anything that is no text (an exception
+object) as it is.
 
   Duplicate entry 'geheim42' for key 'users.PRIMARY'
   # becomes

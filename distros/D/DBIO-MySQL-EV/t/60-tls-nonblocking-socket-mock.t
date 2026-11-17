@@ -71,7 +71,7 @@ for my $param (qw( ssl_key ssl_cert ssl_ca ssl_capath ssl_cipher )) {
   my ($mdb, $seen) = make(on_connect => sub { $called++; return });
   ok !nonblocking($fd), 'no ssl_* parameter: nothing is touched before the connect completes';
   $seen->{on_connect}->();
-  ok nonblocking($fd), 'no ssl_* parameter: the socket is non-blocking too once on_connect fired (k95)';
+  ok nonblocking($fd), 'no ssl_* parameter: the socket is non-blocking too once on_connect fired';
   is $called, 1, '... and the caller\'s on_connect is called';
   fcntl(do { open(my $d, '+<&', $fd); $d }, Fcntl::F_SETFL(), flags($fd) & ~Fcntl::O_NONBLOCK());
 }

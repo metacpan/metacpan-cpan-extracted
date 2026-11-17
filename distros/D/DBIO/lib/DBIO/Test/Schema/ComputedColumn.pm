@@ -4,7 +4,7 @@ package DBIO::Test::Schema::ComputedColumn;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Test::BaseResult/;
 
@@ -48,7 +48,7 @@ DBIO::Test::Schema::ComputedColumn - Test result class for the computed_column_t
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

@@ -4,7 +4,7 @@ package DBIO::DuckDB::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Extension';
 
@@ -61,7 +61,7 @@ DBIO::DuckDB::Extension - The extension class of a DuckDB extension without rule
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

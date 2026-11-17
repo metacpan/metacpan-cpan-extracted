@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use File::Temp ();
+use IPC::Open3 ();
 
 # What a plain SQLite session must NOT load. The list is a contract: each
 # module below is lazy on purpose, and loading one of them for an ordinary
@@ -25,6 +27,10 @@ my %lazy_because = (
 my $probe = <<'PROBE';
 use strict; use warnings;
 use DBIO::Test; use DBIO::SQLite::Test;
+# Windows writes "\r\n" through a text-mode STDOUT and the parent end of the
+# pipe is binary (win32iop.h: pipe() is win32_pipe(fd, 512, O_BINARY)), so the
+# parent reads the CR. Force the same layers everywhere to keep it testable.
+binmode STDOUT, ':raw:crlf';
 my $loaded = sub { exists $INC{ ($_[0] =~ s{::}{/}gr) . '.pm' } ? 1 : 0 };
 my $schema = DBIO::Test::Schema->clone;
 $schema->storage_type('DBIO::SQLite::Storage');
@@ -42,14 +48,29 @@ print "ran=", scalar(@rows) ? 1 : 0, "\n";
 print "loaded=$_\n" for grep { $loaded->($_) } @ARGV;
 PROBE
 
-open my $fh, '-|', $^X, (map { "-I$_" } @INC), '-e', $probe, sort keys %lazy_because
+# The probe goes through a script file, not -e: a multi-line program as one
+# argument does not survive the command-line quoting of every platform
+# (Windows splits and re-quotes it).
+my ($pfh, $pfile) = File::Temp::tempfile('lean_probe_XXXXXX', SUFFIX => '.pl', TMPDIR => 1, UNLINK => 1);
+print {$pfh} $probe;
+close $pfh or die "cannot write the probe: $!";
+
+# open3 takes the command as a list on every platform; a list-form pipe open
+# ('-|', LIST) is not available to Perl before 5.22 on Windows. An undef
+# stderr handle folds the child's stderr into its stdout.
+my $pid = IPC::Open3::open3(my $stdin, my $fh, undef,
+  $^X, (map { "-I$_" } @INC), $pfile, sort keys %lazy_because)
   or die "cannot start the probe: $!";
+close $stdin;
 my @out = <$fh>;
 close $fh;
+waitpid $pid, 0;
 is $?, 0, 'the probe session ran to the end' or diag @out;
 
-my %out = map { /^(\w[\w-]*)=(.*)$/ ? ($1 => $2) : () } map { chomp; $_ } @out;
-my @loaded = map { /^loaded=(.+)$/ ? $1 : () } map { chomp; $_ } @out;
+# The probe's line ends are "\r\n" on Windows; chomp would leave the CR behind.
+my @lines = map { s/\r?\n\z//r } @out;
+my %out = map { /^(\w[\w-]*)=(.*)$/ ? ($1 => $2) : () } @lines;
+my @loaded = map { /^loaded=(.+)$/ ? $1 : () } @lines;
 
 is $out{'connected-without-DBI'}, 1, 'DBI waits for the first real connection';
 is $out{ran}, 1, 'the session did real work (prefetch returned rows)';

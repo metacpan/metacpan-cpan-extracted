@@ -69,7 +69,7 @@ schemas\.yml$
 App-.*
 .test-script-*
 typescript
-mutation*
+^mutation\.json$
 ^xt/mutant_\d
 CLAUDE.md
 \.claude

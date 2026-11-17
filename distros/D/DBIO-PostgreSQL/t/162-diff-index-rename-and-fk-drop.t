@@ -16,7 +16,7 @@ use DBIO::PostgreSQL::Diff::Index;
 #    elsewhere is gone before the constraint is (the drops of the keys come
 #    ahead of the drops of the indexes).
 #
-# These are the claims without a server; t/163-diff-index-rename-and-fk-drop-live.t
+# These are the claims without a server; t/112-diff-index-live.t
 # has each measured.
 
 my $TABLES = {
@@ -109,7 +109,7 @@ sub refusal {
 
   @ops = ops(model([ unique('t_code_old', 'code') ]), model([ unique('t_code_key', 'code') ]));
   is_deeply(sql(@ops), [ 'ALTER TABLE public.t RENAME CONSTRAINT t_code_old TO t_code_key;' ],
-    'the constraint of the same definition under another name is renamed, with its index (karr k139)');
+    'the constraint of the same definition under another name is renamed, with its index');
 
   @ops = ops({ 'public.o' => { bare('t_code_uidx', 'code') } }, model([ unique('t_code_key', 'code') ]));
   unlike(join('', @{ sql(@ops) }), qr/RENAME/, 'an index of another table is not taken');

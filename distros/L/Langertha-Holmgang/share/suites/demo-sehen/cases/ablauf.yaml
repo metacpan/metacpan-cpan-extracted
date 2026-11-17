@@ -1,0 +1,53 @@
+id: ablauf
+title: Hand in a small flow chart
+difficulty: leicht
+messages:
+  - role: user
+    content: "Hand in the flow chart in the picture with graph_abgeben."
+    images:
+      - file: img/ablauf.png
+state:
+  sehen: { type: sehen }
+rules:
+  - { title: a directed graph, state: sehen.graph.norm.gerichtet, equals: 1 }
+  - { title: the three nodes, state: sehen.graph.norm.knoten, contains: [start, pruefen, ende], length: 3 }
+  - { title: the two edges, state: sehen.graph.norm.kanten, contains: ["start -> pruefen", "pruefen -> ende"], length: 2 }
+  - { title: nothing else handed in, unchanged_except: [sehen.graph] }
+solution:
+  - tool: graph_abgeben
+    args:
+      gerichtet: true
+      knoten: [START, PRUEFEN, ENDE]
+      kanten: [ { von: START, nach: PRUEFEN }, { von: PRUEFEN, nach: ENDE } ]
+alternatives:
+  - title: other spelling, then the edges in another order
+    calls:
+      - tool: graph_abgeben
+        args:
+          gerichtet: true
+          knoten: [Start, Prüfen, Ende]
+          kanten: [ { von: Prüfen, nach: Ende }, { von: Start, nach: Prüfen } ]
+  - title: a first reading corrected by a second call
+    calls:
+      - tool: graph_abgeben
+        args: { gerichtet: true, knoten: [START, ENDE], kanten: [ { von: START, nach: ENDE } ] }
+      - tool: graph_abgeben
+        args:
+          gerichtet: true
+          knoten: [START, PRUEFEN, ENDE]
+          kanten: [ { von: START, nach: PRUEFEN }, { von: PRUEFEN, nach: ENDE } ]
+wrong_solutions:
+  - title: the arrows read backwards
+    calls:
+      - tool: graph_abgeben
+        args:
+          gerichtet: true
+          knoten: [START, PRUEFEN, ENDE]
+          kanten: [ { von: PRUEFEN, nach: START }, { von: ENDE, nach: PRUEFEN } ]
+  - title: the middle step left out
+    calls:
+      - tool: graph_abgeben
+        args: { gerichtet: true, knoten: [START, ENDE], kanten: [ { von: START, nach: ENDE } ] }
+  - title: reported as unreadable
+    calls:
+      - { tool: bild_melden, args: { grund: unlesbar, notiz: too small } }

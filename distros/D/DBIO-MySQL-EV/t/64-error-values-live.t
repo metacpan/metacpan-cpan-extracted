@@ -45,7 +45,9 @@ my $h = DBIO::MySQL::EV::TestHarness->new(
   schema_class  => 'T64L::Schema',
   connect_attrs => {
     pool_size     => 1,
-    on_connect_do => ['SET NAMES utf8mb4'],
+    # the cases read the English wording of the server's texts (the type, the
+    # column, the key that stays); German and French are t/65-error-code-live.t
+    on_connect_do => ['SET NAMES utf8mb4', q{SET SESSION lc_messages = 'en_US'}],
   },
 );
 my $async = $h->async;

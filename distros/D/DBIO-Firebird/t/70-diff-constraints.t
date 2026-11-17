@@ -214,7 +214,7 @@ for my $case (
   my $tgt = model(columns => { t => [qw/id c/] }, uniques => { t => [ [ 't_c', ['c'] ] ] });
   $tgt->{columns}{t}[1] = { %{ col('c') }, data_type => 'varchar', size => 10 };
   ok !eval { diff($src, $tgt)->as_sql; 1 }, 'a refused column change still refuses the whole diff';
-  like "$@", qr/refusing to change 1 column/, '... with the column refusal of karr k38';
+  like "$@", qr/refusing to change 1 column/, '... with the column refusal of the column diff';
   unlike "$@", qr/UNIQUE|ADD CONSTRAINT/, '... and the constraint is no part of the refusal';
 }
 

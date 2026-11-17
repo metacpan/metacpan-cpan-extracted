@@ -296,7 +296,7 @@ subtest 'mistakes' => sub {
         qr( \A \QExpected no function of the name in main already (is)\E )x,
         'a function the package has';
     like use_error(q{'other'}),
-        qr( \A \QExpected database or statement, not other\E )x,
+        qr( \A \QExpected database, pipeline or statement, not other\E )x,
         'on use, anything else';
     like use_error(q{database => {x => 'y'}}),
         qr( \A \QExpected the arguments to connect to x in an ARRAY\E )x,
@@ -365,6 +365,46 @@ subtest "a definition's names are pipelines, resolved as it's made" => sub {
     like dies { statement(nameless => music => 'SELECT 1', 'nowhere') },
         qr( \A \QNo pipeline named main::nowhere\E\ at\ \Q${\ __FILE__ }\E\ line\ $line\. )x,
         "a name not defined croaks as it's made, at its line";
+};
+
+subtest 'pipelines, defined on use' => sub {
+
+    package Piped {    ## no critic (Modules::ProhibitMultiplePackages)
+        use DBIx::Squirrel::Sugar statement => {
+            loud_names => [music => 'SELECT name FROM artist ORDER BY id', 'loud'],
+            },
+            pipeline => {loud => [sub { $_->[0] }, sub { uc }]};
+    }
+
+    package Paired {    ## no critic (Modules::ProhibitMultiplePackages)
+        use DBIx::Squirrel::Sugar pipeline => [
+            first_letter => [sub { $_->[0] }, sub { substr $_, 0, 1 }],
+            lower        => [sub { lc }],
+        ];
+    }
+    is [Piped::loud_names(keep_all)], [qw(ABBA BLUR CREAM)],
+        'a statement names one given after it';
+    is [Piped::loud(['x'], ['y'])], [qw(X Y)], 'with a function of its name';
+    ok !Piped->can('pipeline'), 'and no pipeline function';
+    is [Paired::first_letter(['Abba'])], ['A'],    'given an ARRAY of pairs';
+    is [Paired::lower('ABBA')],          ['abba'], 'each of them';
+    ok Piped->can('statement'), 'beside statement, which it still gives';
+
+    like use_error(q{pipeline => 'x'}),
+        qr( \A \QExpected the pipelines after pipeline in a HASH or an ARRAY of pairs\E )x,
+        "Ekorn's errors: anything but a HASH or an ARRAY";
+    like use_error(q{'pipeline'}),
+        qr( \A \QExpected the pipelines after pipeline in a HASH or an ARRAY of pairs\E )x,
+        'or nothing';
+    like use_error(q{pipeline => ['x']}),
+        qr( \A \QExpected the pipelines after pipeline in pairs of a name and an ARRAY\E )x,
+        'or an odd ARRAY';
+    my $code
+        = qq{#line 99 "where.pl"\nuse DBIx::Squirrel::Sugar pipeline => 'x'; 1};
+    ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    my $error = eval $code ? undef : $@;
+    ## use critic
+    like $error, qr( \ at\ where\.pl\ line\ 99\. )x, 'reported at the use';
 };
 
 subtest "a named pipeline's stage that dies is named" => sub {

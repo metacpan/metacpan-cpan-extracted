@@ -4,7 +4,7 @@ package DBIO::Sybase::Quote;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 use DBIO::Exception ();
@@ -75,7 +75,7 @@ DBIO::Sybase::Quote - Quote an identifier the way Sybase ASE reads it
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

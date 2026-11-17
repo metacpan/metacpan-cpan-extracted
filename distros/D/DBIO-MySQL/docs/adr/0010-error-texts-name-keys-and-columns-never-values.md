@@ -54,3 +54,19 @@ text is masked more, not less.
   (`where i = ***`, and a `LIMIT 10` with them).
 - A sentence of the engine that is not known quotes its value until a rule is
   added; the core net still catches values of four characters or more.
+
+## Addendum — masking by the error code
+
+The server words its messages in the language of the session (`lc_messages`),
+and the sentence rules above know the English ones: a German `Doppelter Eintrag
+'ab' für Schlüssel 'k'` kept a short value. The masking now hangs on the error
+code of the server, not on the wording. `mask_error_details` takes the code as
+an optional fourth argument; the storage hooks read it from the handle
+(`$dbh->err`, set before DBI calls the error handler) and pass it on. For a
+code that quotes a value (1062, 1366, 1411, 1292, 1231, 1064, 1690, ...) the value is
+what the server puts between single quotes, and the structure of the code says
+which quoted text is the value and which is the key or column. A text that does
+not have the structure of its code is withheld: only `Server error <code>` and
+a note that the text quotes a value stay. The hook
+`_mask_error_values($text, \@values, $statement)` keeps its signature; the
+English sentence rules and the bound-value masking run after the code.

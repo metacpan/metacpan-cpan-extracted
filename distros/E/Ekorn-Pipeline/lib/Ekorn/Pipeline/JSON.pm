@@ -52,10 +52,12 @@ sub from_jsonl (@options) {
     my $new = $option{new};
     return gather {
         my $json = $new->();    # this run's, as its parser holds what it's read
-        return sub ($text) {
+
+        # Without a signature, as it's called for each value.
+        return sub {
             my @documents;
             try {
-                @documents = $json->incr_parse($text);
+                @documents = $json->incr_parse($_[0]);
             }
             catch ($e) {
                 _undecodable($json, 'a value', _unplaced($e));
@@ -77,7 +79,7 @@ sub to_json (@options) {
     return gather {
         my @values;    # this run's
         return (
-            sub ($value) { push @values, $value; return },
+            sub { push @values, $_[0]; return },    # for each value: no signature
             sub () { _encoded($json, \@values) =~ s( \n \z )()xr },
         );
     };
@@ -188,7 +190,9 @@ sub _reader ($option, $format) {
         my $json = $new->();            # this run's, or the caller's, reset
         $json->incr_reset;
         my(@documents, $ended);
-        my $step = sub () {
+
+        # Without a signature, as it's called for each value.
+        my $step = sub {
             while (1) {
                 return splice @documents if @documents && $format eq 'lines';
                 if ($ended) {
@@ -271,11 +275,13 @@ sub _writer ($option, $format, $json) {
         my $write = sub (@text) {
             print { $fh } @text or croakf q(Can't write %s: %s), $to, $!;
         };
+
+        # Without a signature, as it's called for each value.
         my $step
             = $format eq 'lines'
-            ? sub ($value) { $write->(_encoded($json, $value), "\n"); $n++ }
-            : sub ($value) {
-                my $text = _encoded($json, $value) =~ s( \n \z )()xr;
+            ? sub { $write->(_encoded($json, $_[0]), "\n"); $n++ }
+            : sub {
+                my $text = _encoded($json, $_[0]) =~ s( \n \z )()xr;
                 $text =~ s( ^ )(   )xmg if $indent;
                 $write->($n++ ? $between : $before, $text);
             };

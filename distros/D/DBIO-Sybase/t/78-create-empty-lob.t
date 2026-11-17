@@ -195,7 +195,7 @@ for my $in_txn (0, 1) {
   is_deeply \@SENT, [ { content => { c_text => 'some text' }, id => $IDENTITY } ],
     'create() with a text only: it is written afterwards';
   is $row->get_column('c_text'), 'some text',
-    '... the object holds the text it was given (k79)';
+    '... the object holds the text it was given';
   ok !$row->has_column_loaded($_), "... and not $_, which it was not given"
     for qw(c_image name);
 }

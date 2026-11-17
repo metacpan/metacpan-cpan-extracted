@@ -51,13 +51,12 @@ What each one does beyond being stored:
   `Deploy` checks them against `pg_available_extensions` first and dies naming
   the missing one.
 - `pg_search_path` — the `search_path` of every connection of the schema
-  (sync and each `future_io` pool connection; karr k121): `SET search_path`
+  (sync and each `future_io` pool connection): `SET search_path`
   ahead of `on_connect_do`, which can still replace it. Order: declared
   entries, schemas the declared extensions name (one without a schema adds
   nothing), the extensions' activation; `$user` is written `"$user"`. Nothing
   declared: nothing set. The connect key `schema` wins and the list is not
-  read there. The install script writes nothing for it (it no longer ends
-  with `SET search_path`); a table or view without a `pg_schema` is created
+  read there. The install script writes nothing for it; a table or view without a `pg_schema` is created
   in the first existing schema of the installing session's path.
 - `pg_settings` — one `DO` block per entry that runs
   `ALTER DATABASE <current_database()> SET key = 'value'`. Install only: a
@@ -121,7 +120,7 @@ __PACKAGE__->pg_index('idx_users_active' => { columns => ['role'], where => "rol
   default, `0` switches a class off; `is_foreign_key_constraint => 0` in a
   relationship's attributes writes no key for it. A `belongs_to` to a class that
   is not loaded or a table outside the deploy refuses the install unless it
-  says that, karr k120).
+  says that).
 - A pgvector column promotes `resultset_class` to `DBIO::PostgreSQL::ResultSet`
   (`nearest_neighbors`) and inflates/deflates; a `tsvector` column inflates too.
 
@@ -164,7 +163,7 @@ it is class data, so one class is connected for many namespaces at once.
   ahead of `pg_schemas`: the diff sees the namespace alone, drops no
   extension, and a `CREATE EXTENSION` it writes names its schema and, where that
   schema is not `public`, is behind a `CREATE SCHEMA IF NOT EXISTS` of it
-  (the diff cannot see that schema; karr k131).
+  (the diff cannot see that schema).
 - Refused in the install (`refusing to write the install DDL: ...`): an
   extension whose schema (declared or `public`) is the namespace, a
   `pg_schema_class` binding, a result class with a `pg_schema`, a table name
@@ -199,7 +198,7 @@ $rs->search({ 'me.data' => { '@>' => \'other_col' } });
 
 Written as the operators, each `?` as `\?` (a bare `?` is a DBI placeholder),
 so a GIN index over the column answers them — the functions
-`jsonb_exists*()` behind them it does not (karr k121):
+`jsonb_exists*()` behind them it does not:
 
 ```perl
 $rs->search({ 'me.data' => { '?'  => 'email' } });
@@ -272,7 +271,7 @@ $deploy->upgrade;                      # diff + apply
 ```
 
 The driver storage's `dbio_deploy_class` is the one place that names the deploy
-class; a storage layer that defines it is refused (core karr k347). An extension
+class; a storage layer that defines it is refused. An extension
 adds its rules through its `DBIO::Extension` class, not a deploy class (ADR
 0066). `$schema->deploy`
 and `$storage->deploy($schema)` install through it, with or without the
@@ -387,7 +386,7 @@ at its place in the target's order, none at the end): an
   that settles it. A key of the target is created as `ALTER TABLE ... ADD
   CONSTRAINT ... PRIMARY KEY|UNIQUE (cols)`, never as the bare index
   (`pg_get_indexdef` is the same text for both); a database that has it only
-  as an index gets `ADD CONSTRAINT ... USING INDEX` (k139), after `ALTER INDEX
+  as an index gets `ADD CONSTRAINT ... USING INDEX`, after `ALTER INDEX
   ... RENAME TO` when the index has another name than the constraint. A constraint with
   another definition under its name is dropped and added again; one the
   target lacks is dropped by `ALTER TABLE ... DROP CONSTRAINT`, a unique index
@@ -406,9 +405,8 @@ kept, neither compared nor dropped, and named `=fk: ... -- kept (target
 outside the deploy)` in the summary (no operation, no change). A table only one
 model has is inside the deploy.
 
-Not diffed: CHECK constraints, `pg_settings`, FORCE RLS, a
-changed policy under an unchanged name, attribute changes of a composite type,
-removed enum values.
+Not diffed: CHECK constraints, `pg_settings`, FORCE RLS, a changed policy
+under an unchanged name.
 
 ## Introspection
 
@@ -469,7 +467,7 @@ PostgreSQL extensions (AGE, PostGIS, …) are **declared**, not loaded: `__PACKA
 vector => { schema => 'extensions' })` names them (ADR 0066), and the driver resolves each name to a
 `DBIO::PostgreSQL::Extension` class (`class` option for one outside the family table).
 Loading an extension's component adds nothing to that list. The extension's
-storage layer — still a **layer**, never a `storage_type` subclass (core karr k70),
+storage layer — still a **layer**, never a `storage_type` subclass,
 registered with `$schema->register_storage_layer('DBIO::PostgreSQL::Ext::Storage')` —
 carries only its connection-time activation (`LOAD`, `search_path`); core composes it
 (C3) over the PG driver storage for sync, and its async mirror `…::Storage::Async`
@@ -533,9 +531,9 @@ never with `prove -j`:
 Live (needs **pgvector**): one run per database at a time, preflight first.
 
 ```bash
-eval "$(<cihq-ocp>/umgebungen/dbio/dbio-db env postgresql)"   # maintainer's cluster: DBIO_TEST_PG_DSN/_USER/_PASS
+eval "$(dbio-db env postgresql)"   # maintainer's cluster: DBIO_TEST_PG_DSN/_USER/_PASS
 # this repo works in its own database dbio_pg, not the dbio_test that env names
-export DBIO_TEST_PG_DSN="${DBIO_TEST_PG_DSN/dbname=dbio_test/dbname=dbio_pg}" DBIO_TEST_PG_EXT_DSN="${DBIO_TEST_PG_EXT_DSN/dbname=dbio_test/dbname=dbio_pg}"
+export DBIO_TEST_PG_DSN="${DBIO_TEST_PG_DSN/dbname=dbio_test/dbname=dbio_pg}"
 ../dbio/maint/live-preflight && ../dbio/maint/capped-test prove -lr t/
 ```
 

@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::PostgreSQL::Introspect ();
 
@@ -104,7 +104,7 @@ DBIO::PostgreSQL::Introspect::Columns - Introspect PostgreSQL table columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

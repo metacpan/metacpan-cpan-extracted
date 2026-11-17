@@ -1,5 +1,5 @@
 This archive contains the distribution DBIO-Async,
-version 0.900004:
+version 0.900007:
 
   Shared, loop-agnostic async layer for DBIO drivers
 

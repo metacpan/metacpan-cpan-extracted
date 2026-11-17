@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 use Test::Exception;
 
 use Future;
@@ -55,7 +57,7 @@ use DBIO::Async::TransactionContext;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { r => $r, w => $w, id => ++$self->{_next_id} };
   }

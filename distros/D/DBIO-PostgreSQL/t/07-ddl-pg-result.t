@@ -99,11 +99,11 @@ like($sql, qr/email character varying\(255\) NOT NULL/s, 'varchar size honored (
 like($sql, qr/tenant_key character varying\(64\) NOT NULL/s, 'varchar size honored (tenant_key)');
 like($sql, qr/nickname character varying\(64\) NOT NULL/s, 'missing is_nullable deploys as NOT NULL (ADR 0043)');
 like($sql, qr/embedding vector\(1536\)/s, 'pgvector size honored (data_type vector, size 1536 -> vector(1536))');
-unlike($sql, qr/embedding\s+vector\s+(?!\()/si, 'embedding does not deploy as bare vector (karr k56)');
+unlike($sql, qr/embedding\s+vector\s+(?!\()/si, 'embedding does not deploy as bare vector');
 like($sql, qr/half_embedding halfvec\(1536\)/s, 'halfvec size honored (data_type halfvec, size 1536 -> halfvec(1536))');
-unlike($sql, qr/half_embedding\s+halfvec\s+(?!\()/si, 'half_embedding does not deploy as bare halfvec (karr k58)');
+unlike($sql, qr/half_embedding\s+halfvec\s+(?!\()/si, 'half_embedding does not deploy as bare halfvec');
 like($sql, qr/sparse_embedding sparsevec\(1024\)/s, 'sparsevec size honored (data_type sparsevec, size 1024 -> sparsevec(1024))');
-unlike($sql, qr/sparse_embedding\s+sparsevec\s+(?!\()/si, 'sparse_embedding does not deploy as bare sparsevec (karr k58)');
+unlike($sql, qr/sparse_embedding\s+sparsevec\s+(?!\()/si, 'sparse_embedding does not deploy as bare sparsevec');
 like($sql, qr/CONSTRAINT users_email UNIQUE \(email\)/s, 'named unique constraint emitted');
 like($sql, qr/CONSTRAINT users_tenant_key UNIQUE \(tenant_key\)/s, 'auto-named unique constraint emitted');
 unlike($sql, qr/CONSTRAINT primary UNIQUE/s, 'primary unique constraint not duplicated');

@@ -4,7 +4,7 @@ package DBIO::Test::Cursor;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI::Cursor/;
 
@@ -22,7 +22,7 @@ DBIO::Test::Cursor - Test cursor subclass for DBIO storage testing
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

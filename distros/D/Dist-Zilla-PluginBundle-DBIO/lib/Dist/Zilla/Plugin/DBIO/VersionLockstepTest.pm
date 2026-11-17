@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::VersionLockstepTest;
 # ABSTRACT: Generate xt/author/version-lockstep.t, a gate that every module carries the main module's version
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use Moose;
 use Dist::Zilla::File::InMemory;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -25,10 +25,9 @@ use warnings;
 use File::Find ();
 use Test::More;
 
-# Every module under lib/ carries the version of the main module. Core is
-# versioned from its main module only (VersionFromMainModule) and nothing
-# rewrites the other modules on a version bump, so this is what notices one
-# left behind. Paths are relative to the distribution root.
+# Every module under lib/ carries the version of the main module. The
+# release rewrites all of them; this checks the result. Paths are relative to
+# the distribution root.
 my $main = '@@MAIN@@';
 
 # The literal $VERSION assignment of a file, or undef when it has none.
@@ -83,7 +82,7 @@ Dist::Zilla::Plugin::DBIO::VersionLockstepTest - Generate xt/author/version-lock
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -92,12 +91,12 @@ C<$VERSION> of the main module and of every F<.pm> under F<lib/> of the
 B<built> distribution, and fails when a module has none or a different one.
 Each deviating module is named with the version it carries.
 
-It exists for the core distribution (C<core = 1> in the bundle). Drivers
-version every module through C<RewriteVersion::Transitional>, which rewrites
-them in lockstep on release. Core only reads the version from the main module
-(L<Dist::Zilla::Plugin::VersionFromMainModule>) and writes nothing, so a module
-left behind at a version bump would install with a stale C<$VERSION> and
-nothing would notice. This test notices.
+It exists for the core distribution (C<core = 1> in the bundle). Core and
+drivers alike version through L<Dist::Zilla::PluginBundle::Git::VersionManager>:
+C<RewriteVersion::Transitional> rewrites the C<$VERSION> of every module at the
+release. This test checks the result in the built distribution, so a module
+whose C<$VERSION> comes out of step, whatever the way, turns the test red
+instead of installing with a stale version.
 
 The main module is the one L<Dist::Zilla> reports for the distribution at
 build time; its path is written into the generated test. A run that finds no

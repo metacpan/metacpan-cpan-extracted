@@ -3,7 +3,7 @@ package DBIO::GraphQL::ScalarMap;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use GraphQL::Type::Scalar qw($Int $String $Float $Boolean);
 
@@ -43,7 +43,7 @@ DBIO::GraphQL::ScalarMap - Map DBIO column data_types to GraphQL scalars
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

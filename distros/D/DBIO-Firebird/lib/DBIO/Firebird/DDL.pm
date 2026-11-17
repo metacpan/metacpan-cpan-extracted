@@ -4,7 +4,7 @@ package DBIO::Firebird::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp 'croak';
 use Digest::MD5 ();
@@ -569,7 +569,7 @@ DBIO::Firebird::DDL - Generate Firebird DDL from DBIO Result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 METHODS
 

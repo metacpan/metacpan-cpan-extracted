@@ -77,7 +77,7 @@ unlike($ddl, qr/"soft" VARCHAR2\(10\) NOT NULL/,
   like($ddl, qr/^\s*"code" VARCHAR2\(20\) DEFAULT 'x' NOT NULL,$/m,
     'a literal default is written before NOT NULL');
   like($ddl, qr/^\s*"n" INTEGER DEFAULT 0 NOT NULL,$/m,
-    '... a false one (0) as well, and a number is not quoted (karr k47)');
+    '... a false one (0) as well, and a number is not quoted');
   like($ddl, qr/^\s*"twice" INTEGER DEFAULT 1 \+ 1 NOT NULL,$/m,
     '... and so is an expression default (scalar ref)');
   like($ddl, qr/^\s*"note" VARCHAR2\(20\) DEFAULT 'none'$/m,
@@ -158,7 +158,7 @@ unlike($ddl, qr/"soft" VARCHAR2\(10\) NOT NULL/,
   my $ddl = DBIO::Oracle::DDL->install_ddl('T::K46');
 
   like($ddl, qr/^\s*CONSTRAINT "r_code" UNIQUE \("code"\)/m,
-    'a one-column unique constraint is written (karr k46)');
+    'a one-column unique constraint is written');
   like($ddl, qr/^\s*CONSTRAINT "r_pair" UNIQUE \("a", "b"\)/m,
     '... and a two-column one, in the declared column order');
   unlike($ddl, qr/CONSTRAINT "r_pk_again"/,
@@ -270,7 +270,7 @@ unlike($ddl, qr/"soft" VARCHAR2\(10\) NOT NULL/,
   my $ddl = DBIO::Oracle::DDL->install_ddl('T::K42');
 
   like($ddl, qr/^CREATE TABLE "K42_Author" \(\n\s*"Id" INTEGER NOT NULL,\n\s*"name" VARCHAR2\(20\),\n\s*PRIMARY KEY \("Id"\)/m,
-    'table and column names are quoted and keep their case (karr k42)');
+    'table and column names are quoted and keep their case');
   unlike($ddl, qr/^\s*(?:CREATE|ALTER) (?:TABLE|SEQUENCE|TRIGGER|INDEX) [^"]/m,
     '... and so is every other object the DDL names');
 
@@ -400,7 +400,7 @@ SQL
 
   is_deeply [ map { $_->[1] } @{ $fk{k42a_kid} } ],
     [ 'FOREIGN KEY ("parent_id") REFERENCES "k42a_parent" ("id") ON DELETE CASCADE' ],
-    'a belongs_to that declares no on_delete is ON DELETE CASCADE when the has_many on the other side cascades (karr k42)';
+    'a belongs_to that declares no on_delete is ON DELETE CASCADE when the has_many on the other side cascades';
   is_deeply [ map { $_->[1] } @{ $fk{k42a_quiet} } ],
     [ 'FOREIGN KEY ("parent_id") REFERENCES "k42a_parent" ("id")' ],
     '... and has no action when that has_many has cascade_delete => 0';

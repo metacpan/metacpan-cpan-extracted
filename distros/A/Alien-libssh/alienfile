@@ -30,12 +30,17 @@ meta->register_hook( override => sub {
   return '';
 });
 
+# 0.9.0 is where ssh_session_is_known_server and ssh_session_update_known_hosts
+# appear, the known-hosts API Net::LibSSH calls. Without a floor any libssh
+# the probe finds was accepted, and the consumer then failed at link time.
+# The floor is the probe's only: the share path builds a known version.
 plugin 'PkgConfig' => (
-  pkg_name => 'libssh',
+  pkg_name        => 'libssh',
+  minimum_version => '0.9.0',
 );
 
 share {
-  start_url 'file://' . Path::Tiny->cwd->child('share/libssh-0.10.6.tar.xz')->stringify;
+  start_url 'file://' . Path::Tiny->cwd->child('share/libssh-0.12.2.tar.xz')->stringify;
 
   # start_url alone does nothing: without a fetch hook Alien::Build reaches the
   # download phase with no way to act on it and dies with "No hooks registered

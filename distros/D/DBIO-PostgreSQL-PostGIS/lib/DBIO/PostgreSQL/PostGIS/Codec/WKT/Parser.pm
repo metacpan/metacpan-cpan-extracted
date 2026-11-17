@@ -6,7 +6,7 @@ use warnings;
 
 use DBIO::Exception ();
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # Collections nest at most this deep; the outermost counts as level 1.
@@ -221,7 +221,7 @@ DBIO::PostgreSQL::PostGIS::Codec::WKT::Parser - WKT/EWKT parser for PostGIS geom
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 METHODS
 

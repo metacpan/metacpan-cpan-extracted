@@ -4,7 +4,7 @@ package DBIO::Replicated::Balancer;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Base';
 use Scalar::Util 'blessed';
@@ -243,7 +243,7 @@ DBIO::Replicated::Balancer - Base class for replicated read balancing
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

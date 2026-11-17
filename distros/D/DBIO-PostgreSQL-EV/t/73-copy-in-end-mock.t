@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 use Scalar::Util qw( refaddr );
 
 # OFFLINE regression for karr k65: how a COPY ends, and what becomes of its

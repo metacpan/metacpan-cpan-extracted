@@ -168,7 +168,7 @@ is $storage->bind_attribute_by_data_type($_), undef,
   for 'varchar(50)', 'char(10)', 'varchar(max)', 'integer', 'bit', 'datetime';
 
 is $storage->bind_attribute_by_data_type($_), DBI::SQL_LONGVARBINARY(),
-  "'$_' is still SQL_LONGVARBINARY (karr k50)"
+  "'$_' is still SQL_LONGVARBINARY"
   for 'varbinary', 'image';
 
 is $WLONG, -10, '(SQL_WLONGVARCHAR is -10: SQL_WVARCHAR -9 cuts at 4000 characters, silently)';

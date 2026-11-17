@@ -71,7 +71,7 @@ alarm 120;
 sub await_guarded {
   my ($f, $what) = @_;
   return GuardedWait->until_ready(
-    $f, 20, "TIMEOUT awaiting $what (karr k10 regression: deploy hung)\n",
+    $f, 20, "TIMEOUT awaiting $what (the deploy hung)\n",
   );
 }
 

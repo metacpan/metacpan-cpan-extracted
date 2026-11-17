@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::ClickHouse::Introspect::Util ();
 
@@ -103,7 +103,7 @@ DBIO::ClickHouse::Introspect::Columns - Introspect ClickHouse columns via system
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

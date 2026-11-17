@@ -182,6 +182,7 @@ sub connection_errors {
   my $settled = sub {
     my ($f) = @_;
     my $late  = 0;
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     my $timer = EV::timer(10, 0, sub { $late = 1 });
     EV::run(EV::RUN_ONCE) until $f->is_ready || $late;
     return $f->is_failed ? ($f->failure)[0] : $f->is_ready ? 'no error' : 'it did not settle';
@@ -198,15 +199,18 @@ sub connection_errors {
   # was given -- here with what a DSN with a separator gone wrong leaves in
   # it: 'dbi:mysql:database=appdb;mysql_socket=/run/mysqld.sock,password=...'
   # for the ';' that was meant.
-  my $socket = "/nonexistent/dbio-k76/mysqld.sock,password=$SECRET";
+  my $socket = "/nonexistent/dbio-test/mysqld.sock,password=$SECRET";
   my %named  = (host => 'localhost', user => 'app', password => $SECRET, unix_socket => $socket);
 
+  # EV::MariaDB 0.09 throws from new when the connect fails at once; before it
+  # called on_error. Either way the text is the client library's, as given.
   my @raw;
-  my $mdb = EV::MariaDB->new(%named, on_error => sub { push @raw, $_[0] });
-  like $raw[0] // '', qr/\Q$SECRET\E/,
+  my $mdb = eval { EV::MariaDB->new(%named, on_error => sub { push @raw, $_[0] }) };
+  my $raw = $raw[0] // $@;
+  like "$raw", qr/\Q$SECRET\E/,
     'the client library quotes the socket it cannot open, as given: what must not be passed on'
-    or diag 'it reported: ' . ($raw[0] // 'nothing');
-  $mdb->finish;
+    or diag 'it reported: ' . ($raw // 'nothing');
+  $mdb->finish if $mdb;
 
   for my $case (
     [ 'static connect info', [ { %named }, {} ] ],
@@ -221,7 +225,7 @@ sub connection_errors {
     for my $what (qw( pool listen )) {
       like $err->{$what}, qr/through socket/, "$label, $what: opening a connection fails with the client library's words";
       unlike $err->{$what}, qr/\Q$SECRET\E/, '... without the password';
-      like $err->{$what}, qr{'/nonexistent/dbio-k76/mysqld\.sock,password=\*\*\*},
+      like $err->{$what}, qr{'/nonexistent/dbio-test/mysqld\.sock,password=\*\*\*},
         '... and with the rest of what it quotes';
     }
     like $err->{warned}, qr/DBIO::MySQL::EV pool error: .*through socket/, "$label: the pool warns about it";

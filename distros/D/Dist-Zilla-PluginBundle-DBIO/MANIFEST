@@ -16,10 +16,11 @@ SECURITY.md
 cpanfile
 dist.ini
 lib/Dist/Zilla/Plugin/DBIO/CodebergMeta.pm
-lib/Dist/Zilla/Plugin/DBIO/CoverageTest.pm
+lib/Dist/Zilla/Plugin/DBIO/CoverageGate.pm
 lib/Dist/Zilla/Plugin/DBIO/GatherSkills.pm
 lib/Dist/Zilla/Plugin/DBIO/LicenseFile.pm
 lib/Dist/Zilla/Plugin/DBIO/PodCheckerTest.pm
+lib/Dist/Zilla/Plugin/DBIO/RequireCoreVersion.pm
 lib/Dist/Zilla/Plugin/DBIO/SetMeta.pm
 lib/Dist/Zilla/Plugin/DBIO/VersionLockstepTest.pm
 lib/Dist/Zilla/PluginBundle/DBIO.pm
@@ -35,9 +36,13 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/dbio-adr/SKILL.md
 misc/agent-context/.claude/skills/dbio-codeberg-user-issues/SKILL.md
 misc/agent-context/.claude/skills/dbio-consolidate-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-consolidate-release/references/all-and-recovery.md
 misc/agent-context/.claude/skills/dbio-coordination/SKILL.md
+misc/agent-context/.claude/skills/dbio-coordination/references/direct-execution.md
 misc/agent-context/.claude/skills/dbio-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/bundle-tests.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/share-skill.md
 misc/agent-context/.claude/skills/dbio-perl-syntax/SKILL.md
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -51,8 +56,14 @@ misc/agent-context/.claude/skills/kanban-issues-karr-coordination/references/sto
 misc/agent-context/.claude/skills/kanban-issues-karr-ticket/SKILL.md
 misc/agent-context/CLAUDE.md
 share/skills/dbio-perl-release/SKILL.md
+share/skills/dbio-perl-release/references/bundle-tests.md
+share/skills/dbio-perl-release/references/share-skill.md
 t/10-bundle.t
 t/100-licensefile.t
+t/110-requirecoreversion.t
+t/120-build.t
+t/125-build-core.t
+t/130-setmeta.t
 t/20-podweaver.t
 t/30-codebergmeta.t
 t/40-bundle-coverage.t
@@ -66,4 +77,3 @@ t/compile.t
 t/corpus/heritage/weaver.ini
 t/corpus/standard/weaver.ini
 t/release-changes_has_content.t
-t/release-coverage.t

@@ -1,5 +1,51 @@
 Revision history for DBIO-MySQL
 
+0.900007  2026-11-17
+    * Fixed
+        - Stopping a listen watch works with Future::XS installed as it does
+          with Future::PP: the callback that marks the statement in flight as
+          done (and a cancelled one as abandoned) takes its Future from the
+          connection, not from its arguments, where Future::XS passes none.
+        - The connection attributes mariadb_* and mysql_* are accepted
+          whatever the DBI version: the storage class knows the prefixes of
+          its DBDs itself instead of asking the registry of DBI, which has
+          mariadb_ only from 1.640 on.
+        - An error text names no bound value in any language the server
+          reports in (lc_messages): German and French texts kept short values
+          such as 'ab' in the message. The text is masked by the error code of
+          the server and the quotes it puts around a value, not by the English
+          wording; a text of such a code that cannot be masked for sure loses
+          its wording, and the code stays.
+        - The expression an overflow error quotes ("BIGINT UNSIGNED value is
+          out of range in '(`a` - 5)'") holds no bound value either: its
+          literals are masked, the columns and functions stay.
+        - A listen against a missing notify table names the table and
+          deploy_notify_table in every language the server reports in: the
+          missing table is told by its error code, not by the English text.
+    * Documentation
+        - The dbio-mysql skill names the declared driver (the schema component
+          pins the storage), the lock dialect, the zero-date and set-operator
+          gates, and runs every suite through capped-test with the
+          conformance class; the dbio-mysql-database skill covers both DBD
+          drivers, the driver's utf8mb4_unicode_ci default and FOR SHARE.
+    * Tests
+        - DBIO_TEST_SERVER_LANGUAGE=de or fr runs the live suite with the
+          server reporting in that language (prove reads .proverc; a run that
+          does not load the hook fails t/01 instead of passing in English);
+          the tests that read an English server text set an English session.
+        - The test suite passes on an install with only the required
+          modules: the tests of the future_io transport skip when DBIO::Async
+          is not installed.
+        - The fork tests (t/149-t/151, the fork parts of t/10 and t/63)
+          skip when perl has no real fork().
+        - t/182 starts its child perl from a script file (t/lib/connect-wrapped-probe.pl)
+          through a list-form IPC::Open3, so it runs under cmd.exe on Windows,
+          where single quotes quote nothing.
+        - t/83 recognises the reason of the DBD on Windows too: there is no unix
+          socket there, the client connects by TCP and reports "Can't connect to
+          ... server on '<host>' (<code>)"; elsewhere the test still asks for the
+          socket path in the message.
+
 0.900004  2026-11-08
     * Storage
         - The SQL dialect follows the connected server, not the DBD driver:

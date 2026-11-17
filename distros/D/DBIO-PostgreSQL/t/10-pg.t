@@ -12,7 +12,7 @@ use DBIO::Test;
 # PostgreSQL (core ADR 0067).
 DBIO::Test::Schema->storage_type('+DBIO::PostgreSQL::Storage');
 
-use DBIO::Util qw( is_exception is_literal_value old_mro sigwarn_silencer modver_gt_or_eq );
+use DBIO::Util qw( is_exception is_literal_value old_mro sigwarn_silencer );
 
 my ($dsn, $user, $pass) = @ENV{map { "DBIO_TEST_PG_${_}" } qw/DSN USER PASS/};
 
@@ -144,7 +144,11 @@ for my $use_insert_returning ($test_server_supports_insert_returning
 
 ### connect, create postgres-specific test schema
 
-  $schema = DBIO::Test::Schema->connect($dsn, $user, $pass);
+  # PostgreSQL reports in the language of lc_messages; this test matches the
+  # server's English words (violates foreign key constraint), so its session
+  # is set to 'C' after the connect
+  $schema = DBIO::Test::Schema->connect($dsn, $user, $pass,
+    { on_connect_do => [q{SET lc_messages = 'C'}] });
   $schema->storage->ensure_connected;
 
   drop_test_schema($schema);
@@ -222,9 +226,7 @@ for my $use_insert_returning ($test_server_supports_insert_returning
     # the is_auto_increment setting...
     __PACKAGE__->column_info('id')->{is_auto_increment} = 1;
   }
-  SKIP: {
-    skip "Need DBD::Pg 2.9.2 or newer for array tests", 4 if $DBD::Pg::VERSION < 2.009002;
-
+  {
     my $arr_rs = $schema->resultset('ArrayTest');
 
     lives_ok {
@@ -408,8 +410,7 @@ lives_ok { $cds->update({ year => '2010' }) } 'Update on prefetched rs';
 
               # FIXME - this needs to go away in lieu of a non-retrying runner
               # ( i.e. after solving RT#47005 )
-              local *DBIO::Storage::DBI::_ping = sub { 1 }, old_mro && Class::C3->reinitialize()
-                if modver_gt_or_eq( 'DBD::Pg' => '3.5.0' );
+              local *DBIO::Storage::DBI::_ping = sub { 1 }, old_mro && Class::C3->reinitialize();
 
               alarm(1);
               $artist2->update;

@@ -4,7 +4,7 @@ package DBIO::DuckDB::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -255,6 +255,7 @@ sub _run_connection_actions {
   $self->_duckdb_release_statements($self->_dbh);
   $self->_duckdb_text_callbacks($self->_dbh);
   $self->_duckdb_exact_decimals;
+  $self->_duckdb_exact_hugeints;
   return $self->next::method(@_);
 }
 
@@ -312,10 +313,10 @@ sub _duckdb_release_statements {
 # -- a perl double -- and prints that with sprintf("%.${scale}f"). A double holds
 # 15 to 17 digits, so the 20-digit 1234567890123456.7890 of a numeric(20,4)
 # comes back as 1234567890123456.7500: the stored value is right and the read
-# invents the tail, with no error. Its HUGEINT reader, which a wide DECIMAL
-# goes through, also subtracts 2**128 from every value whose upper word is odd
-# (`$upper & (1 << 64)` is `$upper & 1`), so a numeric(20,4) above 2**64
-# unscaled units reads wrong too.
+# invents the tail, with no error. A wide DECIMAL is stored as a HUGEINT; the
+# replacement below reads those 16 bytes itself and does not call the DBD's
+# HUGEINT reader, which misreads (_duckdb_exact_hugeints, below), so a
+# numeric(20,4) above 2**64 unscaled units reads right either way.
 #
 # So the reader is replaced, once, by one that formats the unscaled integer as
 # a string and puts the point in by hand; same output shape as before (scale
@@ -374,6 +375,43 @@ sub _duckdb_exact_decimals {
   };
 
   $_DECIMAL_READER_FIXED = 1;
+  return;
+}
+
+# HUGEINT, read back exact.
+#
+# DBD::DuckDB 0.16 (DBD::DuckDB::st::_vector_hugeint) subtracts 2**128 from a
+# value whose upper word tests true on `$upper & (1 << 64)`. Shifting by the
+# width of the integer is undefined before perl 5.24, where `1 << 64` is 1, so
+# on such a perl every value with an odd upper word comes back 2**128 too low:
+# 170141183460469231731687303715884105727 reads as
+# -170141183460469231731687303715884105729. The two's complement upper word is
+# signed already (unpack 'q<'), so no subtraction is ever needed.
+#
+# So the reader is replaced, once, by one that adds the words with Math::BigInt
+# and subtracts nothing. Bound to the DBD versions measured, as the DECIMAL
+# reader is (0.16 and older); a newer one is left alone. The unsigned reader
+# next to it, _vector_uhugeint, was checked and is right: it adds the words and
+# has no subtraction, so it is not replaced. t/74 reads the boundary values
+# through the storage; the Arrow path never went through this reader.
+my $_HUGEINT_READER_FIXED;
+
+sub _duckdb_exact_hugeints {
+  return if $_HUGEINT_READER_FIXED;
+  return unless DBD::DuckDB->can('VERSION');
+  return if version->parse(DBD::DuckDB->VERSION) > $_STATEMENT_LEAK_READ_UP_TO;
+  return unless defined &DBD::DuckDB::st::_vector_hugeint;
+
+  no warnings 'redefine';
+  *DBD::DuckDB::st::_vector_hugeint = sub {
+    my ($vector_data, $row_idx) = @_;
+
+    my ($lower, $upper) = unpack 'Q< q<',
+      FFI::Platypus::Buffer::buffer_to_scalar($vector_data + $row_idx * 16, 16);
+    return Math::BigInt->new($upper)->blsft(64)->badd($lower)->bstr;
+  };
+
+  $_HUGEINT_READER_FIXED = 1;
   return;
 }
 
@@ -842,7 +880,7 @@ DBIO::DuckDB::Storage - DuckDB storage driver for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

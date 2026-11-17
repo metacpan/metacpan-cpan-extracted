@@ -111,6 +111,7 @@ my @COLS    = qw( id name );
   sub _later {
     my ($cb) = @_;
     my $t;
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     $t = EV::timer(0.001, 0, sub { undef $t; $cb->() });
     return;
   }

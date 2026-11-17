@@ -4,7 +4,7 @@ package DBIO::Firebird::Storage::ODBC;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/
   DBIO::Storage::DBI::ODBC
@@ -103,7 +103,7 @@ DBIO::Firebird::Storage::ODBC - Driver for the Firebird RDBMS via L<DBD::ODBC>
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -218,7 +218,7 @@ B<Unverified.> No Firebird server was reached over ODBC for any of this. The
 two savepoint workarounds and the C<OdbcFb> array-operations one are upstream
 L<DBIx::Class> findings carried over with their reasons; the datetime claim
 above is the ODBC canonical format rather than something observed. The ODBC leg
-of F<t/10-firebird.t>, F<t/20-firebird-core.t> and F<t/30-datetime-firebird.t>
+of F<t/10-firebird.t> and F<t/30-datetime-firebird.t>
 (C<DBIO_TEST_FIREBIRD_ODBC_DSN>) is where a server checks them.
 
 =item *

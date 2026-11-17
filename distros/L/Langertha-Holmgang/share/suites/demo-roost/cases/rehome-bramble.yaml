@@ -1,0 +1,39 @@
+id: rehome-bramble
+title: Find a dragon a perch that holds her
+difficulty: leicht
+messages:
+  - role: user
+    content: "Bramble has outgrown her perch. Move her to a free perch whose span holds her wingspan. Leave the other dragons where they are."
+state:
+  roost:
+    type: roost
+    dragons:
+      bramble: { wingspan: 18, perch: low-ledge, eats: [moonmelon], meals: [] }
+      ember:   { wingspan: 14, perch: north-crag, eats: [coal, peppers], meals: [] }
+      moss:    { wingspan: 9, perch: willow-stump, eats: [moonmelon], meals: [] }
+    perches:
+      low-ledge:    { span: 12 }
+      north-crag:   { span: 20 }
+      willow-stump: { span: 10 }
+      east-arch:    { span: 16 }
+      south-spire:  { span: 24 }
+    larder: { moonmelon: 3 }
+rules:
+  - { title: bramble sits on south-spire, state: roost.dragons.bramble.perch, equals: south-spire }
+  - { title: no other dragon moved, unchanged_except: [roost.dragons.bramble.perch] }
+solution:
+  - tool: move_dragon
+    args: { dragon: bramble, perch: south-spire }
+alternatives:
+  - title: survey first, then move
+    calls:
+      - { tool: survey_roost, args: {} }
+      - { tool: move_dragon, args: { dragon: Bramble, perch: South-Spire } }
+wrong_solutions:
+  - title: a free perch too small for her
+    calls:
+      - { tool: move_dragon, args: { dragon: bramble, perch: east-arch } }
+  - title: ember moved away to make room on north-crag
+    calls:
+      - { tool: move_dragon, args: { dragon: ember, perch: south-spire } }
+      - { tool: move_dragon, args: { dragon: bramble, perch: north-crag } }

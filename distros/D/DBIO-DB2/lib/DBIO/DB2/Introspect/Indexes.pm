@@ -4,7 +4,7 @@ package DBIO::DB2::Introspect::Indexes;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # An index is identified by schema and name: the one behind a primary key is in SYSIBM.
@@ -87,7 +87,7 @@ DBIO::DB2::Introspect::Indexes - Introspect DB2 indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

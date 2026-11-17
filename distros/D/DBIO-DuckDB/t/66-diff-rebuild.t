@@ -14,6 +14,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 use Test::Exception;
 
 BEGIN {

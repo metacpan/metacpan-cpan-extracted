@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 use Scalar::Util qw( refaddr );
 
 # OFFLINE regression for karr k51: notify and copy_in settle their Future

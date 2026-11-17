@@ -1,5 +1,75 @@
 Release history for Dist-Zilla-PluginBundle-DBIO
 
+0.900007  2026-11-17
+    * Release
+        - Core versions like the drivers, through @Git::VersionManager:
+          every module under lib/ is rewritten to the version of the
+          dist at the release, and BumpVersionAfterRelease raises them
+          all to the next version afterwards. Core keeps
+          MakeMaker::Awesome and the version-lockstep test, and has no
+          RequireCoreVersion.
+        - The bundle needs Perl 5.22, the minimum of Dist::Zilla itself,
+          and its prereqs are the plugins it loads.
+        - New plugin DBIO::RequireCoreVersion, in the bundle for every
+          dist but core. Before the release the runtime prereq DBIO in
+          the prereqs (the cpanfile) must ask for at least the version
+          being released. A lower minimum version stops the release and
+          names both versions and the cpanfile line to write. A dist
+          without a runtime prereq on DBIO has nothing to check. The
+          plugin changes no prereq.
+
+    * Coverage
+        - The coverage gate runs once the whole test suite is through:
+          the new test runner DBIO::CoverageGate, placed behind the
+          build plugin, scores cover_db/ of the build directory for
+          dzil test and dzil release, also under a parallel harness.
+          It replaces the generated coverage test, so a dist no longer
+          gets xt/release/coverage.t and t/release-coverage.t.
+        - Only the lib/ of the dist counts; vendor code and perl's own
+          libraries stay out. The gate merges a fresh cover_db/ itself.
+        - A failure names the total and the 20 modules with the lowest
+          coverage, lowest first. Under RELEASE=1 the gate also fails when
+          there is no cover_db/, no Devel::Cover::DB, no valid database
+          or no measured lib/ file; otherwise it only logs a note.
+          coverage_threshold = 0 still switches it off.
+
+    * Tests
+        - A build test builds a driver dist from a corpus and checks
+          META (name, version, prereqs, resources), Makefile.PL, the
+          woven COPYRIGHT section, the script from bin/ and the shipped
+          skill. A behaviour test pins what SetMeta sets.
+
+    * Build
+        - The option eumm_version of [@DBIO] sets the minimum version of
+          ExtUtils::MakeMaker in Makefile.PL and in META
+          configure_requires. A driver passes it to MakeMaker, the core
+          to MakeMaker::Awesome, which keeps 6.78 without the option.
+        - ExecDir (bin/) is wired for every dist. A dist without bin/
+          builds the same.
+        - DBIO::GatherSkills copies skill files as bytes, so binary
+          files arrive unchanged.
+        - The cpanfile asks for Dist::Zilla::Plugin::LicenseFile 0.002,
+          the version DBIO::LicenseFile builds on.
+
+    * Dependencies
+        - Devel::Cover is a runtime recommendation, not a test
+          requirement: the tests run without it, and the coverage gate needs
+          it at the release of a dist.
+
+    * Metadata
+        - DBIO::CodebergMeta logs why it adds no repository, bugtracker
+          or homepage: no URL for the remote, a URL it does not
+          understand, or the host the remote points at (credentials in
+          the URL stay out of the message). It asks git in list form
+          with -C on the root of the dist.
+
+    * Docs
+        - The code, tests and README describe what the bundle does,
+          without card references.
+        - CLAUDE.md and the bundle POD name the exclude_filename list of
+          the tarball and say the source carries the next version
+          between two releases.
+
 0.900004  2026-11-08
     * Tarball
         - What is tracked in git ships, for core and drivers alike,

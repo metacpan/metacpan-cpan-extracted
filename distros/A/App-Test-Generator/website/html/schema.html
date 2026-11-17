@@ -155,13 +155,15 @@ output:
 				<tr><td><code>min</code>, <code>max</code></td><td>string</td><td>Length bounds, in characters.</td></tr>
 				<tr><td><code>min</code>, <code>max</code></td><td>arrayref, hashref</td><td>Number of elements, or of keys.</td></tr>
 				<tr><td><code>len</code></td><td>string, arrays</td><td>Exact length, treated as <code>min == max</code>.</td></tr>
-				<tr><td><code>matches</code></td><td>string</td><td>Regex the value must satisfy. Random strings are generated until they match.</td></tr>
+				<tr><td><code>matches</code></td><td>string</td><td>Regex the value must satisfy, written as a plain pattern string. Matching strings are generated from the seeded RNG, inside any <code>min</code>/<code>max</code> length, within <code>regex_timeout</code> seconds.</td></tr>
 				<tr><td><code>nomatch</code></td><td>string</td><td>Regex the value must not match.</td></tr>
 				<tr><td><code>memberof</code>, <code>enum</code></td><td>string, integer, number</td><td>Allowed values. Each one is tested, plus one value outside the list that should be rejected.</td></tr>
+				<tr><td><code>schema</code></td><td>arrayref, hashref</td><td>A spec for each element of an array or each value of a hash — see <a href="#elements">element schemas</a>.</td></tr>
 				<tr><td><code>value</code></td><td>all</td><td>An exact expected or supplied value.</td></tr>
 				<tr><td><code>semantic</code></td><td>string</td><td>A realistic data generator instead of random characters — see below.</td></tr>
 				<tr><td><code>can</code></td><td>object</td><td>Methods the stub object must provide. Without it, a mandatory object parameter makes the routine untestable and it is skipped.</td></tr>
 				<tr><td><code>isa</code></td><td>object</td><td>Class name; the harness emits <code>use_ok</code> and <code>new_ok</code> for it.</td></tr>
+				<tr><td><code>_source</code></td><td>all</td><td>One provenance value: <code>validator</code>, <code>input_spec</code>, <code>pod</code>, <code>code</code>, <code>signature</code> or <code>field</code>. A <code>validator</code> source makes wrong-typed arguments expected to die; <code>pod</code> and <code>input_spec</code> make constraints documentation-only. <code>extract-schemas</code> sets it; add it by hand where needed.</td></tr>
 			</tbody>
 		</table>
 	</div>
@@ -175,6 +177,52 @@ output:
 		<code>true</code>/<code>false</code> and <code>off</code>/<code>on</code>
 		plus values that should be refused. An <code>enum</code> gets one case per
 		allowed value plus one outside.
+	</p>
+	<p>
+		How strictly the outside case is judged depends on where the constraint
+		came from. One you wrote by hand, or one the routine's code was seen to
+		enforce, must die. One that <code>extract-schemas</code> read only from
+		documentation (<code>_source: pod</code> or <code>input_spec</code>) is
+		still tried, but a routine that accepts it is reported as contradicting
+		its POD rather than failed, unless the harness was generated with
+		<code>--strict-documented</code>.
+	</p>
+
+	<h3 id="elements">Element schemas</h3>
+	<p>
+		A nested <code>schema</code> describes what is inside a container.
+		Element specs are full specs: they carry their own bounds, member lists
+		and patterns, and can nest again.
+	</p>
+<pre><code>input:
+  words:
+    type: arrayref
+    min: 1
+    max: 3
+    schema:
+      type: string
+      min: 3
+      max: 10
+  record:
+    type: hashref
+    schema:
+      name:
+        type: string
+        min: 2
+        max: 20
+      age: integer
+  things:
+    type: arrayref
+    schema:
+      type: object
+      isa: My::Thing
+</code></pre>
+	<p>
+		On a hashref, a <code>schema</code> with a <code>type</code> describes
+		every value; one without a <code>type</code> maps fixed key names to
+		element specs. An object element needs <code>isa</code> (a class with a
+		no-argument constructor) or <code>can</code>. An invalid element schema
+		is rejected before anything is generated.
 	</p>
 
 	<h3>Semantic generators</h3>
@@ -208,6 +256,8 @@ output:
 				<tr><td><code>json</code>, <code>base64</code></td><td>Simple JSON objects; base64 strings</td></tr>
 				<tr><td><code>md5</code>, <code>sha256</code></td><td>Hex hashes of the right length</td></tr>
 				<tr><td><code>unix_timestamp</code></td><td>Epoch seconds</td></tr>
+				<tr><td><code>directory</code></td><td>The path of a real temporary directory. Set by <code>extract-schemas</code> for a parameter the routine tests with <code>-d</code></td></tr>
+				<tr><td><code>existing_file</code></td><td>The path of a real temporary file. Set by <code>extract-schemas</code> for a parameter the routine tests with <code>-e</code> or <code>-f</code> but does not read</td></tr>
 			</tbody>
 		</table>
 	</div>
@@ -269,7 +319,11 @@ output: undef
 				<tr><td><code>test_empty</code></td><td>1</td><td>Try empty strings and empty containers.</td></tr>
 				<tr><td><code>test_non_ascii</code></td><td>1</td><td>Try strings containing non-ASCII characters.</td></tr>
 				<tr><td><code>timeout</code></td><td>10</td><td>Seconds before a call is abandoned. <code>0</code> disables the guard.</td></tr>
+				<tr><td><code>regex_timeout</code></td><td>5</td><td>Seconds allowed for generating one string that satisfies a <code>matches</code> pattern. A pattern that takes longer, or cannot be satisfied, falls back to a fixed matching value; if there is none, its cases are skipped and reported once.</td></tr>
 				<tr><td><code>dedup</code></td><td>1</td><td>Remove duplicate generated cases.</td></tr>
+				<tr><td><code>check_files</code></td><td>1</td><td>Fail a call that leaves a file in the working directory. The file is removed either way. Turn it off for a routine whose job is to write one.</td></tr>
+				<tr><td><code>check_fds</code></td><td>1</td><td>Fail a call that leaks a file descriptor. Only checked where <code>/proc/self/fd</code> exists. Turn it off for a routine that returns a filehandle.</td></tr>
+				<tr><td><code>check_accessors</code></td><td>1</td><td>Fail a getter that changes its object, or a getset that changes anything but its own property. Memoised values and lazily filled <code>undef</code> slots are ignored. Turn it off for an accessor that is meant to change state, such as an iterator's <code>next()</code>.</td></tr>
 				<tr><td><code>properties</code></td><td>0</td><td>Property-based tests. Either <code>1</code>, or a hashref with <code>enable</code> and <code>trials</code>.</td></tr>
 				<tr><td><code>test_security</code></td><td>0</td><td>Add security-shaped strings: SQL fragments, markup, control characters.</td></tr>
 			</tbody>
@@ -338,6 +392,14 @@ transforms:
 		For each transform the generator makes cases from its input spec, calls
 		the routine, checks the return against the transform's output spec, and
 		requires an exact match when the output names a <code>value</code>.
+	</p>
+	<p>
+		A transform whose input names a field the top-level <code>input</code>
+		does not have brings its own call shape: its cases are built from the
+		transform's fields, not the top-level ones. One schema can therefore
+		cover two ways of calling the same routine, such as
+		<code>NameCase([...])</code> and <code>NameCase('A', 'B')</code>. A
+		transform that only names top-level fields adjusts them, as above.
 	</p>
 
 	<h3>Properties on a transform</h3>
@@ -446,7 +508,9 @@ iterations: 200
 </code></pre>
 	<p>
 		<code>seed</code> makes the generated harness call <code>srand()</code>
-		with that value, so a failing run repeats exactly. <code>iterations</code>
+		with that value, so a failing run repeats exactly — including strings
+		generated from a <code>matches</code> pattern. A failing case names the
+		seed and the input that was sent. <code>iterations</code>
 		defaults to 30 random cases; the boundary and corpus cases are added on
 		top of that, so the total test count is always higher.
 	</p>
@@ -483,7 +547,7 @@ iterations: 200
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

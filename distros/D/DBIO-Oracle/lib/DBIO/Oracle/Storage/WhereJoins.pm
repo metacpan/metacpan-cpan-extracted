@@ -4,7 +4,7 @@ package DBIO::Oracle::Storage::WhereJoins;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw( DBIO::Oracle::Storage );
 use mro 'c3';
@@ -26,7 +26,7 @@ DBIO::Oracle::Storage::WhereJoins - Oracle joins in WHERE syntax support (instea
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

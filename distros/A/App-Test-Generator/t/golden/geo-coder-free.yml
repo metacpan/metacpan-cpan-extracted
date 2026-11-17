@@ -1,0 +1,161 @@
+---
+clear_miss_cache:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: clear_miss_cache
+  module: Geo::Coder::Free
+  output:
+    _success_indicator: 1
+    _void_context_hint: mutator
+    type: boolean
+geocode:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: geocode
+  module: Geo::Coder::Free
+  new: {}
+  output:
+    _context_aware: 1
+    _error_handling:
+      implicit_undef:
+      - '!length($params{''location''}) || ($on_error eq ''undef'')'
+      - '!length($params{''scantext''}) || ($on_error eq ''undef'')'
+      - $self->_scantext_missed($miss_key)
+      type: string
+    _error_return: undef
+    _list_context:
+      type: array
+    _scalar_context:
+      type: scalar
+    type: string
+geocode_many:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: geocode_many
+  input:
+    values:
+      _source: code
+      optional: 1
+      position: 0
+      type: arrayref
+  module: Geo::Coder::Free
+  new: {}
+  output:
+    _type_confidence: medium
+    type: number
+new:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: new
+  module: Geo::Coder::Free
+  output:
+    isa: Geo::Coder::Free
+    type: object
+provenance:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: provenance
+  input:
+    dist:
+      _source: pod
+      optional: 0
+      type: string
+    point:
+      _source: code
+      optional: 0
+      type: hashref
+  module: Geo::Coder::Free
+  new: {}
+  output:
+    _context_aware: 1
+    _list_context:
+      type: scalar
+    _scalar_context:
+      type: hashref
+    _type_confidence: medium
+    type: number
+reverse_geocode:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: reverse_geocode
+  module: Geo::Coder::Free
+  new: {}
+  output:
+    _type_confidence: medium
+    type: number
+run:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: run
+  module: Geo::Coder::Free
+  new: {}
+  output: {}
+ua:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: ua
+  module: Geo::Coder::Free
+  output: {}
+valid_location:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: valid_location
+  module: Geo::Coder::Free
+  new: {}
+  output:
+    _success_indicator: 1
+    type: boolean

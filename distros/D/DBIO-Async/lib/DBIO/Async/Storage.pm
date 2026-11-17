@@ -4,7 +4,7 @@ package DBIO::Async::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Async';
 
@@ -1168,7 +1168,7 @@ DBIO::Async::Storage - Future::IO transport backend for DBIO async storage
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -2384,6 +2384,26 @@ is traced at which C<DBIO_TRACE> level, how the C<redact_bind_value> hook is
 asked and where the output goes is that method's rule (ADR 0009, core ADR
 0025). A statement without attributes -- C<BEGIN>, C<COMMIT>, a ping, a reset,
 C<_notify_send> -- gives the hook C<undef> for column name and attributes.
+
+=head1 WINDOWS
+
+B<The transport cannot wait on the socket of a DBD on Windows.> The built-in
+L<Future::IO> implementation waits with C<select>, and on Windows C<select>
+waits for sockets only, named by a Perl file descriptor. A DBD reports
+something else there: the socket of a database handle (DBD::Pg's C<pg_socket>,
+for one) is a Winsock handle, not a Perl file descriptor.
+L</_conn_poll_fh> turns the value of L</_conn_fileno> into a filehandle with a
+dup of that file descriptor, and a Winsock handle is none -- the dup fails or
+lands on another descriptor. This dist converts nothing, so a driver whose
+L</_conn_fileno> hands back such a handle gets no working transport on
+Windows, with the built-in implementation or with any other that takes a
+file descriptor. A driver's live tests should skip Windows, with this as the
+reason.
+
+What does hold on Windows is the transport itself over a channel that is a
+socket with a Perl file descriptor: this dist's own test suite runs there on
+a C<socketpair> (a loopback pair on Windows), apart from the tests of a forked
+child, which need C<fork> and skip.
 
 =head1 FUTURE::IO IMPLEMENTATIONS
 

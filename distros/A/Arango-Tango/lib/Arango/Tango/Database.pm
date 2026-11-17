@@ -1,7 +1,7 @@
 # ABSTRACT: ArangoDB Database object
 
 package Arango::Tango::Database;
-$Arango::Tango::Database::VERSION = '0.020';
+$Arango::Tango::Database::VERSION = '0.021';
 use Arango::Tango::Cursor;
 use Arango::Tango::API;
 
@@ -56,7 +56,7 @@ BEGIN {
         create_collection => {
             rest => [ post => '{{database}}_api/collection' ],
             schema => {
-                keyOptions => { type => 'object', additionalProperties => 0, params => {
+                keyOptions => { type => 'object', additionalProperties => 0, properties => {
                     allowUserKeys => { type => 'boolean' },
                     type          => { type => 'string', default => 'traditional', enum => [qw'traditional autoincrement uuid padded'] },
                     increment     => { type => 'integer' },
@@ -157,7 +157,7 @@ Arango::Tango::Database - ArangoDB Database object
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 USAGE
 

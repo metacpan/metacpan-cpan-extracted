@@ -4,7 +4,7 @@ package DBIO::MSSQL::Introspect::Tables;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -53,7 +53,7 @@ DBIO::MSSQL::Introspect::Tables - Introspect MSSQL tables and views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -20,9 +20,10 @@ Two connection paths, both reach MSSQL:
 
 ODBC is the primary path. `DBD::Sybase` (incl. FreeTDS builds) adapts to
 `...::Sybase::NoBindVars` if placeholders are unsupported. FreeTDS > 0.82 has
-broken stmt caching → driver disables caching (the key of a new row is still
-`SCOPE_IDENTITY()`; the old `@@identity` workaround returned a trigger's key,
-k39). Set tds version 8.0/7.0
+broken stmt caching: the driver checks `_use_typeless_placeholders`
+(`Storage/Sybase.pm`) and, when the configuration has no placeholders, adapts to
+`...::NoBindVars` (caching off, warning unless `DBIO_MSSQL_FREETDS_LOWVER_NOWARN`).
+The key of a new row is `SCOPE_IDENTITY()`. Set tds version 8.0/7.0
 in `freetds.conf` to keep placeholders.
 
 ## Version notes
@@ -35,8 +36,21 @@ subselects legal (see Pagination). Server version retrieved via
 
 ## Type system
 
-DDL type mapping in `DBIO::MSSQL::DDL::_mssql_column_type`. Base types go
-through `DBIO::MSSQL::Adapter`; alias map:
+DDL type mapping in `DBIO::MSSQL::DDL::_mssql_column_type`. The eight portable
+base types go through `DBIO::MSSQL::Adapter`:
+
+| Base type | MSSQL native |
+|-----------|--------------|
+| integer | `bigint` |
+| text | `nvarchar(max)` |
+| boolean | `bit` |
+| double | `float` |
+| blob | `varbinary(max)` |
+| timestamp | `datetime` |
+| char | `nchar(<size>)`, 255 without a size |
+| numeric | `numeric(<precision>,<scale>)`, bare `numeric` without both |
+
+Other names go through the DDL alias map (it differs from the adapter):
 
 | Cross-engine | MSSQL native |
 |--------------|--------------|
@@ -47,8 +61,10 @@ through `DBIO::MSSQL::Adapter`; alias map:
 | serial / bigserial | `int` / `bigint` |
 | timestamptz | `datetimeoffset` |
 
-Length appended for `n?char`/`n?varchar`/`binary`/`varbinary` only when
-`size > 0` (MSSQL reports `nvarchar(max)`/`varbinary(max)` as size -1).
+Length is appended for `n?char`/`n?varchar`/`binary`/`varbinary`: `size > 0`
+gives `(n)`; `size -1` gives `(max)` for `varchar`/`nvarchar`/`varbinary` (the
+value introspection reports for the unbounded variants); size 0, below -1, or
+-1 on `char`/`nchar`/`binary` throws; an absent size leaves the bare type.
 
 Datetime flavours: `datetime` (1753+, 3.33ms), `datetime2` (0001+, 100ns),
 `datetimeoffset` (+tz), `smalldatetime` (1900–2079, 1 min). Parsed by
@@ -74,7 +90,8 @@ name`; a same-named `SAVE TRANSACTION` releases the prior (release is a no-op).
 Deferred FK checks via `with_deferred_fk_checks`: `EXEC sp_msforeachtable
 "ALTER TABLE ? NOCHECK CONSTRAINT ALL"` then re-`CHECK` (MSSQL does not
 re-validate on enable, so driver runs `WITH CHECK CHECK CONSTRAINT ALL`
-explicitly). `for_update` NOT supported. Default isolation READ COMMITTED;
+explicitly). `for_update` NOT supported. `transactional_ddl` is declared 1: DDL
+inside a transaction rolls back with it. Default isolation READ COMMITTED;
 RCSI/snapshot are DB-level settings, not set by the driver.
 
 ## Pagination — be exact
@@ -119,6 +136,9 @@ test-and-compare via temp DB) — no SQL::Translator.
 
 `DBIO_TEST_MSSQL_DSN` / `_USER` / `_PASS` (Sybase path);
 `DBIO_TEST_MSSQL_ODBC_DSN` / `_USER` / `_PASS` (ODBC path). User/pass names
-by convention. `DBIO_MSSQL_FREETDS_LOWVER_NOWARN=1` silences the
+by convention. Offline: `../dbio/maint/capped-test prove -lr t/`. Live: get the
+environment with `dbio-db env mssql`, run `../dbio/maint/live-preflight`, then
+the same `capped-test` command (see the core skill `dbio-driver-development`,
+`references/live-testing.md`). `DBIO_MSSQL_FREETDS_LOWVER_NOWARN=1` silences the
 no-placeholders warning. No in-memory mode — integration tests need a real
 SQL Server (e.g. `mcr.microsoft.com/mssql/server`).

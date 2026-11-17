@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Diff::SequenceOwner;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -109,7 +109,7 @@ DBIO::PostgreSQL::Diff::SequenceOwner - Diff operations for the column a Postgre
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

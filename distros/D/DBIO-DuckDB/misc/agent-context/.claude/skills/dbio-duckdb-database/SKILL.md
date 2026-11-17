@@ -1,6 +1,6 @@
 ---
 name: dbio-duckdb-database
-description: Use when you need DuckDB specifics for driver work — DBD module, SQL dialect, types, sequences, transactions, pagination.
+description: Use when you need DuckDB specifics for driver work — DBD::DuckDB, SQL dialect, types, sequences, transactions, savepoints, quoting, introspection catalog.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -29,9 +29,8 @@ exact string-cast route, and `undef` for integer and narrower.
 
 ## Version Notes
 
-`$storage->duckdb_version` → e.g. `v1.5.3`. Alien::DuckDB 0.04 bundles
-libduckdb 1.5.3 (0.03 shipped 1.2.2). The Quack client-server RPC extension
-needs libduckdb >= 1.5, so 0.04 provides it out of the box.
+`$storage->duckdb_version` → e.g. `v1.5.3`. `Alien::DuckDB` (cpanfile) brings
+libduckdb; Quack needs >= 1.5.
 FK constraints are enforced (an insert without a parent fails).
 
 ## Type System
@@ -58,9 +57,6 @@ DuckDB types (`DBIO::DuckDB::DDL::_duckdb_column_type`):
 
 Native nested types also exist (LIST, STRUCT, MAP, UNION, ARRAY) — not
 mapped by the DDL layer; reach them via raw SQL / escape hatches.
-`datetime_parser_type` is **inherited** (`DateTime::Format::MySQL`) — not
-overridden in `DBIO::DuckDB::Storage`. `sqlt_type` returns the DBI driver
-name, `DuckDB`.
 
 ## Identity / Sequences
 
@@ -92,7 +88,7 @@ no DuckDB override.
 
 Double-quote identifiers (`sql_quote_char '"'`), PostgreSQL-style. Unquoted
 identifiers fold to lowercase; comparisons are case-insensitive for unquoted
-names. The driver quotes all identifiers via `DBIO::SQL::Util::_quote_ident`.
+names. The driver quotes all identifiers via `DBIO::DuckDB::DDL::Emit::quote_ident`.
 
 ## Unicode
 
@@ -115,7 +111,7 @@ PK/unique order (DuckDB validates the referenced tuple in that order), tables
 after their parents. `ON DELETE/UPDATE CASCADE`, `SET NULL` and `SET DEFAULT`
 are refused with table and column; `RESTRICT`/`NO ACTION` pass. A FK added or
 dropped on an existing table rebuilds the table (`Diff::Rebuild`, ADR 0010).
-Introspected FKs carry the live name as `constraint_name` (ADR 0021).
+Introspected FKs carry the live name as `constraint_name` (core ADR 0021).
 
 ## Testing Env Vars
 

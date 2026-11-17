@@ -83,7 +83,7 @@ SKIP: {
   my $drifted = $deploy->diff;
   ok $drifted->has_changes, 'a column the schema does not declare shows up as drift';
   like $drifted->as_sql, qr/DROP COLUMN IF EXISTS `dbio_scratch_probe`/,
-    'and the diff proposes dropping it, guarded (Deploy hands the diff its storage, karr k29)';
+    'and the diff proposes dropping it, guarded (Deploy hands the diff its storage)';
 
   # the probe column is dropped on purpose: a drop is destructive, so it is released
   $deploy->apply($drifted, allow_destructive => 1);

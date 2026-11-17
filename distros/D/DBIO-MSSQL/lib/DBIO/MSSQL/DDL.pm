@@ -4,7 +4,7 @@ package DBIO::MSSQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(_mssql_column_type _quote_ident _quote_table _bare_table _schema_prefix _schemas_of _check_table_name _constraint_name _check_cascade_paths _check_constraint_names);
@@ -1019,7 +1019,7 @@ DBIO::MSSQL::DDL - Generate MSSQL DDL from DBIO Result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

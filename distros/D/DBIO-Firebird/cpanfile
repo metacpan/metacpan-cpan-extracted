@@ -1,5 +1,5 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900004';
+requires 'DBIO', '0.900007';
 requires 'DBD::Firebird';
 recommends 'DateTime::Format::Strptime', '1.2';
 

@@ -4,7 +4,7 @@ package DBIO::MySQL::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp qw/croak/;
 use Digest::SHA ();
@@ -764,7 +764,7 @@ DBIO::MySQL::DDL - Generate MySQL/MariaDB DDL from DBIO Result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 
 # LIVE, karr k73 (e): a pipeline whose coderef dies with a statement of the
 # batch in flight, on a pooled connection and on a transaction's, against a

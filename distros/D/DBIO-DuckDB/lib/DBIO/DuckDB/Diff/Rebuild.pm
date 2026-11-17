@@ -4,7 +4,7 @@ package DBIO::DuckDB::Diff::Rebuild;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -83,7 +83,7 @@ DBIO::DuckDB::Diff::Rebuild - Rebuild a DuckDB table for what ALTER TABLE cannot
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -193,7 +193,7 @@ sub ops_of {
   is scalar(@$without), 2 + 5 + 3,
     'without the classifier and without the declaration: a drop for each of docs, geo and their eight shadow tables';
   ok((grep { $_ eq 'drop docs_data' } @$without) && (grep { $_ eq 'drop geo_node' } @$without),
-    '... shadow tables among them (the chain that fails with "no such table", karr k44)');
+    '... shadow tables among them (the chain that fails with "no such table")');
 
   is_deeply ops_of(deploy_over(live_db(), 'fts5', 'rtree')->diff), ['drop docs', 'drop geo'],
     'declared, the claims keep every shadow table out of the diff, by the name of the module alone';

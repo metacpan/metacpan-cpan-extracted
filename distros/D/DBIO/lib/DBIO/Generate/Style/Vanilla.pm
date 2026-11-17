@@ -4,7 +4,7 @@ package DBIO::Generate::Style::Vanilla;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp::Clan qw/^DBIO/;
 use Data::Dumper ();
@@ -121,7 +121,7 @@ DBIO::Generate::Style::Vanilla - Vanilla-style Result class emitter for DBIO::Ge
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 METHODS
 

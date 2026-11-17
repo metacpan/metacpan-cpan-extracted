@@ -4,7 +4,7 @@ package DBIO::DB2::Type;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp ();
 use DBIO::Exception ();
@@ -146,7 +146,7 @@ DBIO::DB2::Type - DB2 column type utilities
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

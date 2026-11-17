@@ -4,7 +4,8 @@ package DBIx::Squirrel::Sugar;
 
 use Ref::Util qw(is_arrayref is_hashref is_plain_hashref is_ref);
 
-use Ekorn::Pipeline qw(is_stage);
+use Ekorn::Pipeline        qw(is_stage);
+use Ekorn::Pipeline::Sugar qw();
 
 use DBIx::Squirrel         qw();
 use DBIx::Squirrel::Errors qw(at_caller   croakf);
@@ -22,14 +23,28 @@ my %handle;
 
 # Give the calling package database or statement, and define the
 # databases or statements named in a hash reference after each, with
-# their arguments in an array reference.
+# their arguments in an array reference. The pipelines after each
+# pipeline go to Ekorn::Pipeline::Sugar first, wherever they're given,
+# so a statement can name one (roadmap 2026-0027).
 sub import ($class, @args) {
     state %define = (database => \&_define, statement => \&_define_statement);
     state %what = (database => 'arguments to connect to', statement => 'statement');
     my $package = caller;
+    my(@pipelines, @rest);
     while (@args) {
         my $arg = shift @args;
-        croakf 'Expected database or statement, not %s', $arg
+        if (defined $arg && $arg eq 'pipeline') {
+            push @pipelines, $arg, shift @args;
+            next;
+        }
+        push @rest, $arg;
+    }
+    at_caller { Ekorn::Pipeline::Sugar->import_into($package, @pipelines) }
+    if @pipelines;
+    @args = @rest;
+    while (@args) {
+        my $arg = shift @args;
+        croakf 'Expected database, pipeline or statement, not %s', $arg
             unless $define{$arg};
         _install($package, $arg => $class->can($arg));
         next unless @args && is_hashref($args[0]);
@@ -241,6 +256,11 @@ DBIx::Squirrel::Sugar - a function for each database, and each statement
     my @upper = artist_names sub ($name) { uc $name }, keep_all;    # more stages
     my $found = artist id => 1;                           # executed
 
+    # Pipelines, which a statement can name
+    use DBIx::Squirrel::Sugar
+        statement => {loud_names => [music => 'SELECT name FROM artist', 'loud']},
+        pipeline  => {loud => [sub ($row) { $row->[0] }, sub { uc }]};
+
     # Or defined as the program runs
     use DBIx::Squirrel::Sugar qw(database statement);
     database(archive => 'dbi:SQLite:dbname=archive.db', '', '', \%attr);
@@ -272,12 +292,20 @@ the call after that has a new connection.
     use DBIx::Squirrel::Sugar statement => {
         $name => [$database, $statement, \%attr, @stages], ...
     };
+    use DBIx::Squirrel::Sugar pipeline => {$name => [@stages], ...};
 
 Gives the package L</database>, or L</statement>, or both. Given a
 hash reference after either, it also defines each database or
 statement named in it, with the arguments it takes, in an array
 reference. It gives the package each function while the package is
 compiled, so the function can be called without parentheses.
+
+After C<pipeline>, it takes what L<Ekorn::Pipeline::Sugar> takes, a
+hash reference, or an array reference of names and stages in turn, and
+names each pipeline in the package, with a function of its name, as
+that module does. It defines them first, wherever they're given, so a
+statement given with them can name one. It gives no C<pipeline>
+function, which is Ekorn::Pipeline's.
 
 The arguments are worked out then too. The environment, literals, and
 what a C<BEGIN> block has set are there, but a variable the program
@@ -324,13 +352,13 @@ statement is defined, in the package defining it, unless it's
 qualified, as C<My::Module::clean>, so it must be defined first. One
 that isn't croaks then, "No pipeline named main::clean". Each name
 stands in its place among the stages. When the statement's function is
-called, a string given is a bind value, never a name.
+called, a string given is a bind value, never a name. On C<use>, name
+the pipeline after C<pipeline>, in the same C<use> or one before it,
+or with C<named> in a C<BEGIN> block above it.
 
-    BEGIN { Ekorn::Pipeline->named(trimmed => sub { s( \A \s+ | \s+ \z )()xgr }) }
-
-    use DBIx::Squirrel::Sugar statement => {
-        titles => [music => 'SELECT title FROM album', sub { $_->[0] }, 'trimmed'],
-    };
+    use DBIx::Squirrel::Sugar
+        statement => {titles => [music => 'SELECT title FROM album', sub { $_->[0] }, 'trimmed']},
+        pipeline  => {trimmed => [sub { s( \A \s+ | \s+ \z )()xgr }]};
 
 =head2 The function a database is given
 
@@ -393,10 +421,18 @@ values instead, and isn't cached.
 
 =over
 
-=item Expected database or statement, not %s
+=item Expected database, pipeline or statement, not %s
 
 C<use DBIx::Squirrel::Sugar> was given something other than
-C<database> or C<statement> and their definitions.
+C<database>, C<pipeline> or C<statement> and their definitions.
+
+=item Expected the pipelines after pipeline in a HASH or an ARRAY of pairs
+
+=item Expected the pipelines after pipeline in pairs of a name and an ARRAY
+
+What came after C<pipeline> wasn't a hash reference, or an array
+reference of names and stages in turn. These, and the other errors in
+the pipelines' definitions, are L<Ekorn::Pipeline::Sugar>'s messages.
 
 =item Expected the arguments to connect to %s in an ARRAY
 
@@ -442,7 +478,7 @@ L</database> was given a name no database has.
 
 =head1 SEE ALSO
 
-L<DBIx::Squirrel>, L<DBIx::Squirrel::Iterator>
+L<DBIx::Squirrel>, L<DBIx::Squirrel::Iterator>, L<Ekorn::Pipeline::Sugar>
 
 =head1 AUTHOR
 

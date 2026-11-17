@@ -35,12 +35,16 @@
 
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
+use DBIO::Test::Slow;
+use Config;
+use ChildPerl;
 use File::Temp ();
 use DBIO::Util qw(file_path slurp_file_utf8);
 
 # ---- the process a scenario runs in -------------------------------------
-# perl -e <this> <scenario> <report file>. The report is rewritten after every
+# perl <this, as a script file> <scenario> <report file>. The report is rewritten after every
 # step, so a process that dies leaves everything it saw up to there.
 my $SCENARIO = <<'EOS';
 use strict;
@@ -205,7 +209,7 @@ sub scenario {
   my ($name) = @_;
 
   my $report = file_path($tmp, 'k38-' . ++$n . '.report');
-  my $rc     = system($^X, (map { "-I$_" } grep { !ref } @INC), '-e', $SCENARIO, $name, $report);
+  my $rc     = run_child_perl($SCENARIO, $name, $report);
   die "could not run the scenario process: $!" if $rc == -1;
 
   my %got = (
@@ -318,7 +322,10 @@ for my $name ('populate, first row refused', 'populate of literals refused') {
 # only the process that opened the database frees anything in it. An empty
 # result frees nothing, and a child that finishes the handle it inherited
 # must not crash either.
-{
+SKIP: {
+  skip 'this perl has no fork, so there is no forked child to finish a handle in', 3
+    unless $Config{d_fork};
+
   my $name = 'finish in a forked child';
   my $got  = scenario($name);
 
@@ -342,7 +349,7 @@ for my $name ('populate, first row refused', 'populate of literals refused') {
     "$name: premise -- the execute was refused by the engine";
 
   TODO: {
-    local $TODO = 'DBD::DuckDB 0.16 finish crashes on a handle without a result (karr k38)';
+    local $TODO = 'DBD::DuckDB 0.16 finish crashes on a handle without a result';
     is $got->{ended}, 'exit 0', "$name: finish after a refused execute does not end the process";
   }
 }

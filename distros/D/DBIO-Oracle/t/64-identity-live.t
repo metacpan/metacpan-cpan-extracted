@@ -92,6 +92,6 @@ my $again = T::K41::Schema->connect($dsn, $user, $pass);
 $again->storage->_use_insert_returning(0);
 my $row = eval { $again->resultset('Ident')->create({ name => 'new table' }) };
 is $row ? $row->id : "died: $@", 1,
-  'without RETURNING, a table created again in the same process gets its new sequence read, not the first one (karr k46)';
+  'without RETURNING, a table created again in the same process gets its new sequence read, not the first one';
 
 done_testing;

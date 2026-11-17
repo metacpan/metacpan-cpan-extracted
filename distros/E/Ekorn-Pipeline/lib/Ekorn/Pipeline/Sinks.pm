@@ -27,7 +27,8 @@ our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 sub count_items : prototype() () {
     return Ekorn::Pipeline::Sink->new_sink_one(sub {
         my $n = 0;
-        return {step => sub ($value) { $n++ }, flush => sub () { $n }};
+        # Without a signature, as it's called for each value.
+        return {step => sub { $n++ }, flush => sub () { $n }};
     });
 }
 
@@ -40,7 +41,8 @@ sub count_items : prototype() () {
 sub keep_all : prototype() () {
     return Ekorn::Pipeline::Sink->new_sink_many(sub {
         my @all;
-        return {step => sub ($item) { push @all, $item }, flush => sub () { @all }};
+        # Without a signature, as it's called for each value.
+        return {step => sub { push @all, $_[0] }, flush => sub () { @all }};
     });
 }
 
@@ -52,12 +54,13 @@ sub keep_single : prototype() () {
     return Ekorn::Pipeline::Sink->new_sink_one(sub {
         my @only;
         return {
-            step => sub ($item) {
+            # Without a signature, as it's called for each value.
+            step => sub {
                 if (@only) {
                     Carp::carp 'Expected only one item, but there were more';
                     Ekorn::Pipeline::Stop->throw;
                 }
-                @only = ($item);
+                @only = ($_[0]);
                 return;
             },
             flush => sub () { @only },
@@ -72,7 +75,8 @@ sub keep_first : prototype() () {
     return Ekorn::Pipeline::Sink->new_sink_one(sub {
         my @first;
         return {
-            step  => sub ($value) { @first = ($value); Ekorn::Pipeline::Stop->throw },
+            # Without a signature, as it's called for each value.
+            step  => sub { @first = ($_[0]); Ekorn::Pipeline::Stop->throw },
             flush => sub () { @first },
         };
     });
@@ -87,9 +91,10 @@ sub keep ($count) {
     return Ekorn::Pipeline::Sink->new_sink_many(sub {
         my @kept;
         return {
-            step => sub ($item) {
+            # Without a signature, as it's called for each value.
+            step => sub {
                 Ekorn::Pipeline::Stop->throw if @kept >= $count;
-                push @kept, $item;
+                push @kept, $_[0];
                 Ekorn::Pipeline::Stop->throw if @kept >= $count;
                 return;
             },
@@ -105,7 +110,8 @@ sub keep_last : prototype() () {
     return Ekorn::Pipeline::Sink->new_sink_one(sub {
         my @kept;
         return {
-            step  => sub ($item) { @kept = ($item); return },
+            # Without a signature, as it's called for each value.
+            step  => sub { @kept = ($_[0]); return },
             flush => sub () { @kept },
         };
     });
@@ -147,8 +153,9 @@ sub _writer ($fh, $what) {
     my $after = ref $/ || !defined $/ ? '' : length $/ ? $/ : "\n\n";
     my $n     = 0;
     return {
-        step => sub ($value) {
-            print { $fh } $value, $after or croakf q(Can't write %s: %s), $what, $!;
+        # Without a signature, as it's called for each value.
+        step => sub {
+            print { $fh } $_[0], $after or croakf q(Can't write %s: %s), $what, $!;
             $n++;
         },
         flush => sub () { $n },

@@ -4,7 +4,7 @@ package DBIO::Firebird::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Firebird::Type qw(sql_type_from_rdb);
 
@@ -116,7 +116,7 @@ DBIO::Firebird::Introspect::Columns - Introspect Firebird columns via rdb$fields
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

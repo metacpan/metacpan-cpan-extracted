@@ -36,7 +36,8 @@ is_deeply $storage->sql_seen, [
   q{alter session set nls_date_format = 'YYYY-MM-DD HH24:MI:SS'},
   q{alter session set nls_timestamp_format = 'YYYY-MM-DD HH24:MI:SS.FF'},
   q{alter session set nls_timestamp_tz_format='YYYY-MM-DD HH24:MI:SS.FF TZHTZM'},
-], 'every connection sets the three ISO formats, with no on_connect_call given';
+  q{alter session set nls_numeric_characters = '.,'},
+], 'every connection sets the three ISO formats and the decimal point, with no on_connect_call given';
 
 is $ENV{NLS_TIMESTAMP_FORMAT}, 'YYYY-MM-DD HH24:MI:SS.FF',
   '... and the format is in the environment, which is what DateTime::Format::Oracle parses with';
@@ -53,8 +54,17 @@ delete $ENV{NLS_DATE_FORMAT};
 $storage->reset_sql;
 $storage->connect_call_datetime_setup;
 $storage->connect_call_datetime_setup;
-is scalar(@{ $storage->sql_seen }), 6,
-  'asking for datetime_setup as well just sets the same formats again';
+is scalar(@{ $storage->sql_seen }), 8,
+  'asking for datetime_setup as well just sets the same settings again';
+
+$storage->reset_sql;
+{
+  local $ENV{NLS_NUMERIC_CHARACTERS} = ',.';
+  $storage->_apply_connection_schema;
+}
+is_deeply [ grep /numeric/, @{ $storage->sql_seen } ],
+  [ q{alter session set nls_numeric_characters = '.,'} ],
+  'the decimal point is set whatever NLS_NUMERIC_CHARACTERS the environment names';
 
 # --- live: a connection without on_connect_call ----------------------------
 

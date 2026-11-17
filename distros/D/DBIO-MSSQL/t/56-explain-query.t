@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
 use mro;
 
 use DBIO::Test;
@@ -56,8 +58,8 @@ isnt(
 is(
   DBIO::MSSQL::Storage->_random_function, 'NEWID()',
   'the random-number function is NEWID(). Core answers RANDOM(), which SQL '
-. 'Server has no such function for -- this half of karr k22 was already '
-. 'correct and is pinned so it stays correct',
+. 'Server has no such function for. NEWID() is pinned so it stays '
+. 'correct',
 );
 
 # --- 2. the rebless targets resolve to THIS driver's operation --------------

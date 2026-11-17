@@ -96,7 +96,7 @@ for my $case (@$cases) {
 # the Diff area
 {
   my $areas = $class->conformance_refused_areas;
-  is_deeply $areas, {}, 'no area is refused: the Diff area is answered (karr k37)';
+  is_deeply $areas, {}, 'no area is refused: the Diff area is answered';
   isnt $class->can('conformance_diff_is_empty'),
     DBIO::Test::Conformance->can('conformance_diff_is_empty'),
     '... the diff postcondition is the driver\'s, not the unprovided seam';

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Config;
 use POSIX ();
@@ -139,7 +141,7 @@ sub polls { return @LoopSpy30::POLLS }
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $id = ++$self->{_next_id};
     $self->{server}{$id} = $w;

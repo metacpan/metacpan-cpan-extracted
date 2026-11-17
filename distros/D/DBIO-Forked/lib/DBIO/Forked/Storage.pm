@@ -4,7 +4,7 @@ package DBIO::Forked::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Async';
 
@@ -18,6 +18,7 @@ use DBIO::Storage::DBI ();
 DBIO::Storage::DBI->register_async_mode( forked => __PACKAGE__ );
 
 use Carp 'croak';
+use Config ();
 use Scalar::Util ();
 use POSIX ();
 use Storable ();
@@ -146,6 +147,11 @@ sub txn_do_async        { my $self = shift; $self->_run_forked('txn_do',        
 sub _run_forked {
   my ($self, $op, @args) = @_;
 
+  croak 'DBIO::Forked: this perl has no real fork() ($Config{d_fork} is not set; '
+    . 'a pseudo-fork emulated with threads is not enough). DBIO::Forked runs '
+    . 'every query in a process of its own and cannot be used here'
+    unless $self->_has_real_fork;
+
   my $max = $self->async_option('max_in_flight');
   croak 'DBIO::Forked: max_in_flight reached, the call was refused before forking'
     if defined $max && $self->_in_flight_count >= $max;
@@ -181,6 +187,11 @@ sub _run_forked {
   $self->_track_in_flight($future) if defined $max;
   return $future;
 }
+
+# Whether this perl can fork a process of its own. A pseudo-fork emulated with
+# threads (Strawberry Perl) leaves $Config{d_fork} unset and does not carry
+# Model A. A method so a test can stand in for such a perl.
+sub _has_real_fork { $Config::Config{d_fork} ? 1 : 0 }
 
 # The futures this process has forked and that may still be unresolved, held
 # weakly: a dropped future is gone from the list. Only the process that forked
@@ -294,7 +305,7 @@ DBIO::Forked::Storage - Fork-per-query async storage - make any sync DBIO driver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -507,6 +518,10 @@ All six C<*_async> entry points are implemented (with their sync C<< ->get >>
 wrappers): each forks per query and roundtrips through C<_run_forked> and
 L<DBIO::Forked::Future>. L</txn_do_async> runs the whole transaction in one
 child; see the two caller-facing limits documented on it.
+
+Model A needs a real C<fork()>: on a perl whose C<$Config{d_fork}> is unset (a
+pseudo-fork emulated with threads) every C<*_async> call croaks before it
+forks anything.
 
 =head1 TRANSPORT CAPABILITIES AND ASYNC LAYERS
 

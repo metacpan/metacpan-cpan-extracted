@@ -25,7 +25,7 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::MSSQL",
   "PREREQ_PM" => {
     "Context::Preserve" => "0.01",
-    "DBIO" => "0.900004",
+    "DBIO" => "0.900007",
     "Scope::Guard" => 0,
     "Try::Tiny" => "0.07",
     "namespace::clean" => "0.24"
@@ -37,7 +37,7 @@ my %WriteMakefileArgs = (
     "Test::More" => "0.98",
     "Test::Warn" => 0
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t t/sqlmaker/limit_dialects/*.t"
   }
@@ -46,7 +46,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Context::Preserve" => "0.01",
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
   "DateTime" => 0,
   "DateTime::Format::Strptime" => 0,
   "Scope::Guard" => 0,

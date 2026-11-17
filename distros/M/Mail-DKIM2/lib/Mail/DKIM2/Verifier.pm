@@ -2,7 +2,7 @@ package Mail::DKIM2::Verifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use base 'Mail::DKIM2::HeaderParser';
 use MIME::Base64 qw(decode_base64);
@@ -234,8 +234,16 @@ sub finish_header {
 # instance above every signature's m= is one nothing vouches for -- but not
 # for an outbound signer (AllowUnsignedMI: it holds the instance it is about
 # to sign) or a partial chain view (MidProcess).
+#
+# Before any of that: a header section holding a line that is not a field
+# (HeaderParser::malformed_header). No instance hashed that line, so no
+# result about the message can stand. A message with no DKIM2 field is
+# still 'none': there is no DKIM2 result to give.
 sub _structure_error {
     my ($self) = @_;
+    return 'PERMERROR: malformed header field'
+        if $self->malformed_header
+        && (%{$self->{_dk2_headers}} || %{$self->{_mi_headers}});
     return $self->{_chain}->structure_error(
         Signatures    => $self->{InstancesOnly} ? 0 : 1,
         AllowUnsigned => ($self->{AllowUnsignedMI} || $self->{MidProcess}) ? 1 : 0);

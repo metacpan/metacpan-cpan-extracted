@@ -3,7 +3,7 @@ package DBIO::Test::Schema::CustomSql;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -34,7 +34,7 @@ DBIO::Test::Schema::CustomSql - Test result class using a custom SQL query as so
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

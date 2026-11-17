@@ -1,6 +1,10 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 use Scalar::Util ();
 
 # LIVE, ADR 0075 (core): the values a statement bound do not reach an

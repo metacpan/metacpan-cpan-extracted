@@ -344,9 +344,11 @@ subtest 'file_path method' => sub {
 	my $path_param = $schema->{input}{path};
 	ok($path_param, 'path parameter detected');
 	is($path_param->{type}, 'string', 'type is string');
-	# POD parser detects 'path' from description, which is close enough
+	# POD parser detects 'path' from description; the code's -f check is
+	# stronger and makes the harness supply a real temporary file.
 	ok($path_param->{semantic}, 'has semantic type');
-	like($path_param->{semantic}, qr/path|filepath/, 'semantic indicates path/filepath');
+	like($path_param->{semantic}, qr/path|filepath|existing_file/,
+		'semantic indicates a path (or the existing-file fixture)');
 };
 
 # File handle detection

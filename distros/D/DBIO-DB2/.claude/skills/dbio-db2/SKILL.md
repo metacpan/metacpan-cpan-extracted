@@ -8,16 +8,18 @@ model: sonnet
 
 # DBIO::DB2
 
-IBM DB2 driver for DBIO. Extracted from DBIx::Class, modernized with native Introspect/Diff/DDL/Deploy classes.
+IBM Db2 (LUW) driver for DBIO with native Introspect, Diff, DDL and Deploy classes.
 
 ## Component Loading
 
 ```perl
 package MyApp::DB;
-use base 'DBIO::Schema';
-__PACKAGE__->load_components('DB2');
+use DBIO Schema => -db2;   # DBIO::Shortcut::db2
 # → sets storage_type to +DBIO::DB2::Storage automatically
 ```
+
+The shortcut is the standard way; `__PACKAGE__->load_components('DB2')` on a
+`DBIO::Schema` subclass is the same declaration spelled out.
 
 ## Storage
 
@@ -37,7 +39,7 @@ sub dbio_deploy_class { 'DBIO::DB2::Deploy' }
 |--------|-------------|
 | `sql_name_sep` | Queries `SQL_QUALIFIER_NAME_SEPARATOR` (default `.`) |
 | `_dbh_last_insert_id` | `IDENTITY_VAL_LOCAL()` for auto-increment |
-| `deploy_setup` | No-op (DB2 does not need tablespace pre-allocation) |
+| `deploy_setup` | Empty hook (nothing to pre-allocate) |
 | `_connect_params_dsn` | DSN form for connection parameters without a DSN (core ADR 0057): `dbname` alone is the cataloged alias `dbi:DB2:<dbname>`; `dbname`+`host`+`port` the uncataloged `dbi:DB2:DATABASE=..;HOSTNAME=..;PORT=..;PROTOCOL=TCPIP`; anything else throws |
 | `sqlt_type` | Returns `'DB2'` for SQL::Translator |
 
@@ -47,11 +49,11 @@ sub dbio_deploy_class { 'DBIO::DB2::Deploy' }
 
 Sources: `SYSCAT.TABLES`, `SYSCAT.COLUMNS`, `SYSCAT.INDEXES`, `SYSCAT.INDEXCOLUSE`, `SYSCAT.TABCONST`, `SYSCAT.KEYCOLUSE`, `SYSCAT.REFERENCES`.
 
-Model shape: `{ tables, columns, indexes, foreign_keys }`.
+Model shape: `{ tables, columns, indexes, unique_constraints, foreign_keys }`. Views are entries of `tables` (kind `view`). One class per section under `DBIO::DB2::Introspect::*` (`Tables`, `Columns`, `Indexes`, `UniqueConstraints`, `ForeignKeys`); unique constraints are `SYSCAT.TABCONST` rows of type `U` (ADR 0009).
 
 ## Diff
 
-`DBIO::DB2::Diff` extends `DBIO::Diff::Base`. Operations run in four passes (`_build_operations`): tables → columns → indexes → foreign keys. The FK pass is last, so a referenced table or column already exists; within each pass the drops come last.
+`DBIO::DB2::Diff` extends `DBIO::Diff::Base`. Operations run in this order (`_build_operations`): view drops → tables → columns → `REORG` → indexes → unique constraints → foreign keys → view creates. Views are no tables (ADR 0011): a view drop at the head lets the table it reads go, a view create at the end sees every table, column and key. The FK pass comes after the tables, so a referenced table or column already exists. The `REORG` per reorg-pending table sits before the first statement such a table refuses (ADR 0008).
 
 ## Deploy
 
@@ -80,8 +82,14 @@ DB2 enforces referential integrity. FK constraints are inline in CREATE TABLE fo
 | `DBIO::DB2::Storage` | DBI storage + driver registration |
 | `DBIO::DB2::Deploy` | test-deploy-and-compare |
 | `DBIO::DB2::Diff` | Compare introspected models |
-| `DBIO::DB2::Diff::ForeignKey` | FK ALTER diff (ADD/DROP/drop-then-add) |
-| `DBIO::DB2::Introspect` | Read live DB via SYSCAT |
+| `DBIO::DB2::Diff::{Table,Column,Index,UniqueConstraint,ForeignKey,View}` | One diff pass each; ForeignKey is ADD/DROP/drop-then-add |
+| `DBIO::DB2::Diff::Reorg` | `REORG` operation after the column pass (ADR 0008) |
+| `DBIO::DB2::Introspect` (+ `Introspect::*`) | Read live DB via SYSCAT |
 | `DBIO::DB2::DDL` | Generate DB2 DDL |
 | `DBIO::DB2::SQLMaker` | DB2 SQL dialect (apply_limit: RowNumberOver / FetchFirst) |
 | `DBIO::DB2::Type` | DB2 column type mapping |
+| `DBIO::DB2::Storage::Cursor` | Reads character columns of a result as characters |
+| `DBIO::DB2::Test::Conformance` | Answers the shared conformance case table |
+| `DBIO::Shortcut::db2` | The `-db2` shortcut |
+
+Type mapping details, live-test setup and server facts: skill `dbio-db2-database`. Driver layout and testing rules: core skill `dbio-driver-development`.

@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::PodCheckerTest;
 # ABSTRACT: Generate xt/author/pod-checker.t, a Pod::Checker gate on the built POD
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use Moose;
 use Dist::Zilla::File::InMemory;
 with 'Dist::Zilla::Role::FileGatherer';
@@ -79,7 +79,7 @@ Dist::Zilla::Plugin::DBIO::PodCheckerTest - Generate xt/author/pod-checker.t, a 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -43,7 +43,7 @@
 <main id="main" class="wrap">
 	<h1>Install</h1>
 	<p class="lead">
-		App::Test::Generator is one Perl distribution with ten command-line tools.
+		App::Test::Generator is one Perl distribution with nine command-line tools.
 		Nothing needs a daemon, a database or a network connection once it is
 		installed; the only runtime service any part of it touches is the CPAN
 		Testers API, and only when you ask for that part of the dashboard.
@@ -57,8 +57,8 @@
 		<code>fuzz-harness-generator</code>, <code>extract-schemas</code>,
 		<code>test-generator-mutate</code>, <code>test-generator-index</code>,
 		<code>generate-test-dashboard</code>, <code>benchmark-generator</code>,
-		<code>pod-example-tester</code>, <code>deploy-workflows</code>,
-		<code>instrument-modules</code> and <code>demo_extractor</code> on your
+		<code>pod-example-tester</code>, <code>deploy-workflows</code> and
+		<code>instrument-modules</code> on your
 		<code>PATH</code>.
 	</p>
 
@@ -121,8 +121,8 @@ make install
 					<td>Reading schemas and writing <code>mutation.json</code> and the dashboard data files.</td>
 				</tr>
 				<tr>
-					<td><code>Test::Most</code></td>
-					<td>The generated <code>.t</code> files are Test::Most scripts.</td>
+					<td><code>Test::Most</code>, <code>Test::Returns</code> 0.03+, <code>Test::LectroTest</code> and <code>Test::LectroTest::Compat</code></td>
+					<td>The generated <code>.t</code> files are Test::Most scripts, and their property-based section uses LectroTest. Since 0.48 these are runtime prerequisites, because <code>fuzz-harness-generator -r</code> runs a harness on your machine.</td>
 				</tr>
 				<tr>
 					<td><code>prove</code></td>
@@ -146,11 +146,7 @@ make install
 			<tbody>
 				<tr>
 					<td><code>Devel::Cover</code> 1.51+</td>
-					<td>Coverage-guided fuzzing in <code>CoverageGuidedFuzzer</code> and the coverage columns in the dashboard. Without it, fuzzing runs blind — random only, no branch feedback.</td>
-				</tr>
-				<tr>
-					<td><code>Test::LectroTest</code> and <code>Test::LectroTest::Compat</code></td>
-					<td>Property-based tests. Both are in <code>TEST_REQUIRES</code>, so <code>make test</code> installs them; generated property tests skip themselves if they are missing.</td>
+					<td>Coverage-guided fuzzing in <code>CoverageGuidedFuzzer</code> and the coverage columns in the dashboard. Installing it is not enough for guidance: the program must also be started under it (<code>perl -MDevel::Cover</code> or <code>cover -test</code>). Otherwise fuzzing runs blind — random only, no branch feedback.</td>
 				</tr>
 				<tr>
 					<td><code>Type::Params</code> and <code>Types::Common</code></td>
@@ -174,7 +170,7 @@ cpanm --with-recommends App::Test::Generator
 
 	<h2>Verify the install</h2>
 <pre><code>perl -MApp::Test::Generator -e 'print "$App::Test::Generator::VERSION\n"'
-<span class="comment">0.47</span>
+<span class="comment">0.49</span>
 
 fuzz-harness-generator --version
 extract-schemas --version
@@ -214,7 +210,7 @@ fuzz-harness-generator -r /tmp/schemas/greet.yml
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

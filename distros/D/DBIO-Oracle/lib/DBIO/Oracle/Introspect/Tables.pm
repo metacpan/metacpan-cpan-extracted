@@ -4,7 +4,7 @@ package DBIO::Oracle::Introspect::Tables;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -15,6 +15,7 @@ sub fetch {
 
   # Fetch tables from all_tables (owned tables)
   my $sth = $dbh->prepare(q{
+    SELECT * FROM (
     SELECT table_name, 'table' AS kind
     FROM all_tables
     WHERE owner = ?
@@ -24,7 +25,8 @@ sub fetch {
     SELECT view_name, 'view' AS kind
     FROM all_views
     WHERE owner = ?
-    ORDER BY table_name
+    )
+    ORDER BY NLSSORT(table_name, 'NLS_SORT=BINARY')
   });
   $sth->execute($schema, $schema);
 
@@ -53,12 +55,15 @@ DBIO::Oracle::Introspect::Tables - Introspect Oracle tables and views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
 Fetches Oracle table and view metadata via C<all_tables> and C<all_views>.
 Skips system tables and recycle bin tables (C<BIN$*>).
+
+The tables come in binary order by name, in every session language (not by the
+C<NLS_SORT> of the session).
 
 =head1 METHODS
 

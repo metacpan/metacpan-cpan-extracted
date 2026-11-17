@@ -1,5 +1,44 @@
 Revision history for DBIO-SQLite
 
+0.900007  2026-11-17
+
+    * Fixed
+        - vacuum($file) on a libsqlite older than 3.27 throws an exception that
+          names VACUUM INTO, the version it needs and the version present,
+          before any statement is sent, instead of SQLite's bare
+          'near "INTO": syntax error'. A plain vacuum is unchanged.
+        - Introspection and the primary key check read a PRAGMA that has no
+          result columns (foreign_key_list of a table without keys, a PRAGMA
+          the linked SQLite library does not know) as no rows on DBI 1.634 and
+          older too, instead of dying in fetchall_arrayref.
+
+    * Documentation
+        - The dbio-sqlite skill lists every component (Result, Extension, JSON,
+          Test::Conformance), the sqlite_extensions API, the always-declared
+          capabilities supports_upsert_where and supports_exists_query, the
+          deliberate transactional_ddl = 0, the -sqlite shortcut, the test
+          variables and the capped-test run, and shows the SQLMaker override as
+          the code has it, with the ON CONFLICT and INSERT OR clauses.
+
+    * Tests
+        - t/storage/txn_scope_guard.t skips its 'no warnings' assertion on
+          Text::Balanced older than 2.06, whose broken overloading raises
+          the intended warning.
+        - t/14-vacuum.t compares the bind list in the form the trace shows it (bind
+          values cut to 32 characters plus '...'), so long temp paths pass.
+        - t/53lean_startup.t runs its probe program from a temporary script file,
+          not as a multi-line -e argument, and starts it through IPC::Open3,
+          which takes the command as a list on every platform; a list-form
+          pipe open is not available to Perl before 5.22 on Windows.
+        - t/debug/core.t closes the log file handle before removing the file, which
+          Windows cannot do while it is open.
+        - The declared deviation of the conformance case bind-numeric-exact also
+          recognises the three-digit exponent (e+015) some Windows perls print;
+          t/69-conformance-bind-fact.t pins both spellings.
+        - t/53lean_startup.t reads the probe's output with the CR of a Windows
+          line end removed, and the probe writes through a CRLF layer on every
+          platform, so the Windows line end is exercised on Linux too.
+
 0.900004  2026-11-08
     * Storage
         - Atomic upsert: $rs->upsert renders ON CONFLICT (columns) DO UPDATE
@@ -147,7 +186,7 @@ Revision history for DBIO-SQLite
           every test schema (replicated => 1 included) and keeps its
           init_schema arguments out of the connect attributes.
         - DBIO::SQLite::Test::Conformance answers the shared case tables of
-          DBIO core (DDL, Diff, Bind); t/67-conformance-ddl.t runs the DDL
+          DBIO core (DDL, Diff, Bind); t/67-conformance.t runs the DDL
           cases against an in-memory database.
 
     * Documentation

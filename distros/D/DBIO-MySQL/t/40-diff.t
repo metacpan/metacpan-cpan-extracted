@@ -110,7 +110,7 @@ use DBIO::MySQL::Adapter ();
     'ALTER TABLE `t` ADD COLUMN `zeta` int(11);',
     'ALTER TABLE `t` MODIFY COLUMN `beta` bigint;',
     'ALTER TABLE `t` ADD COLUMN `alpha` int(11);',
-  ], 'k92: the columns a table gains are added in the order of the target, not of their names';
+  ], 'the columns a table gains are added in the order of the target, not of their names';
 }
 
 # --- Diff::Index create ---
@@ -563,35 +563,35 @@ use DBIO::MySQL::Adapter ();
 
   is_deeply $sql->([ [qw(id)] ], [ [qw(id_big)] ]),
     [ 'ALTER TABLE `t` MODIFY COLUMN `id` bigint(20) NOT NULL AUTO_INCREMENT;' ],
-    'k93: the MODIFY of an AUTO_INCREMENT column keeps AUTO_INCREMENT';
+    'the MODIFY of an AUTO_INCREMENT column keeps AUTO_INCREMENT';
 
   is_deeply $sql->([ [qw(id_no)] ], [ [qw(id)] ]),
     [ 'ALTER TABLE `t` MODIFY COLUMN `id` int(11) NOT NULL AUTO_INCREMENT;' ],
-    'k93: AUTO_INCREMENT that comes is a change, and is written';
+    'AUTO_INCREMENT that comes is a change, and is written';
 
   is_deeply $sql->([ [qw(id)] ], [ [qw(id_no)] ]),
     [ 'ALTER TABLE `t` MODIFY COLUMN `id` int(11) NOT NULL;' ],
-    'k93: AUTO_INCREMENT that goes is a change, and is written';
+    'AUTO_INCREMENT that goes is a change, and is written';
 
   is_deeply $sql->([ [qw(id seq)], $key ], [ [qw(id seq_no)] ]),
     [
       'ALTER TABLE `t` MODIFY COLUMN `seq` int(11) NOT NULL;',
       'DROP INDEX `k_seq` ON `t`;',
-    ], 'k80 A: the column loses AUTO_INCREMENT and its only key: MODIFY, then DROP INDEX';
+    ], 'the column loses AUTO_INCREMENT and its only key: MODIFY, then DROP INDEX';
 
   is_deeply $sql->([ [qw(id seq note)], $key ], [ [qw(id seq_big note_b)] ]),
     [
       'ALTER TABLE `t` MODIFY COLUMN `seq` bigint(20) NOT NULL;',
       'DROP INDEX `k_seq` ON `t`;',
       'ALTER TABLE `t` MODIFY COLUMN `note` bigint(20) NOT NULL;',
-    ], 'k80 B: ... and gets another type at the same time: the one MODIFY stands before the DROP INDEX, the other columns after';
+    ], '... and gets another type at the same time: the one MODIFY stands before the DROP INDEX, the other columns after';
 
   is_deeply $sql->([ [qw(id seq note)], $key ], [ [qw(id note)] ]),
     [
       'ALTER TABLE `t` MODIFY COLUMN `seq` int(11) NOT NULL;',
       'DROP INDEX `k_seq` ON `t`;',
       'ALTER TABLE `t` DROP COLUMN `seq`;',
-    ], 'k80 C: the column leaves the schema with its key: MODIFY without AUTO_INCREMENT, DROP INDEX, DROP COLUMN';
+    ], 'the column leaves the schema with its key: MODIFY without AUTO_INCREMENT, DROP INDEX, DROP COLUMN';
 
   is_deeply $sql->([ [qw(id note)], {} ], [ [qw(id note_b)] ]),
     [ 'ALTER TABLE `t` MODIFY COLUMN `note` bigint(20) NOT NULL;' ],

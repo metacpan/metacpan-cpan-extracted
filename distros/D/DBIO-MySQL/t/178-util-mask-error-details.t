@@ -1,6 +1,9 @@
 use strict;
 use warnings;
+use utf8;
 use Test::More;
+
+binmode(Test::More->builder->$_, ':utf8') for qw(output failure_output todo_output);
 
 use DBIO::MySQL::Util qw(mask_error_details);
 
@@ -20,7 +23,14 @@ use DBIO::MySQL::Util qw(mask_error_details);
 #   c. a text of no known form, and every error without a value, is unchanged;
 #   d. a bound value of four characters or more is also replaced where it stands
 #      verbatim, in the form DBD quote() gives it as well;
-#   e. the result masked again is the result.
+#   e. the result masked again is the result;
+#   f. the server words its text in the language of the session (lc_messages),
+#      and a value must not appear in any of them. With the error code of the
+#      server the text is masked by the code and the quote around the value,
+#      not by the English wording: German, French and the text of a MariaDB
+#      that leaves a quote without its partner give '***' for the value and keep
+#      the key and the column. What cannot be masked for sure loses its text and
+#      keeps the code. Without a code nothing of that happens (the cases above).
 # The raw texts are what DBD::mysql 4.055 and DBD::MariaDB 1.24 returned from
 # MySQL 8.0.30 and MariaDB 11.8 (server_prepare on or off, the same text).
 
@@ -275,6 +285,174 @@ for my $case (@cases) {
   is mask_error_details($got), $got, "$name: masking the result changes nothing";
   is mask_error_details($raw, [ 'geheim42', 7 ], 'SELECT 1'), $want,
     "$name: the same with binds and a statement";
+}
+
+# --- by the error code, in the language of the session (f)
+#
+# The raw texts are what both servers answered with lc_messages de_DE and fr_FR
+# (fr_FR has no translation of every message: those stay English).
+{
+  my $withheld = sub { "Server error $_[0]: the text quotes a value and is withheld" };
+  my $VALUE = qr/geheim|sekret|dupmark|'ab'|'xy'|it's|\bxy\b/;
+
+  my @by_code = (
+    # code, name, raw text, masked text
+    [ 1062, 'de, duplicate entry',
+      q{Doppelter Eintrag 'ab' für Schlüssel 'msglang_probe.name'},
+      q{Doppelter Eintrag '***' für Schlüssel 'msglang_probe.name'} ],
+    [ 1062, 'fr, duplicate entry',
+      q{Duplicata du champ 'ab' pour la clef 'msglang_probe.name'},
+      q{Duplicata du champ '***' pour la clef 'msglang_probe.name'} ],
+    [ 1062, 'de, quote, comma and key words in the value',
+      q{Doppelter Eintrag 'it's, ab' für Schlüssel 'x' für Schlüssel 'msglang_probe.name'},
+      q{Doppelter Eintrag '***' für Schlüssel 'msglang_probe.name'} ],
+    [ 1062, 'de, a newline in the value',
+      qq{Doppelter Eintrag 'ab\nxy' für Schlüssel 'k'},
+      q{Doppelter Eintrag '***' für Schlüssel 'k'} ],
+    [ 1062, 'de, behind the DBD prefix and with the location in Perl',
+      q{DBD::mysql::st execute failed: Doppelter Eintrag 'ab' für Schlüssel 'k' at /srv/app/x.pl line 7.},
+      q{DBD::mysql::st execute failed: Doppelter Eintrag '***' für Schlüssel 'k' at /srv/app/x.pl line 7.} ],
+    [ 1062, 'the statement of DBI with the values goes',
+      q{DBD::mysql::st execute failed: Duplicate entry 'ab' for key 'k' [for Statement "INSERT INTO t (n) VALUES (?)" with ParamValues: 1='ab'] at /srv/app/x.pl line 7.},
+      q{DBD::mysql::st execute failed: Duplicate entry '***' for key 'k'} ],
+    [ 1062, 'the statement of the storage stays',
+      q{DBI Exception: Doppelter Eintrag 'ab' für Schlüssel 'k' [for Statement "INSERT INTO t (n) VALUES (?)" with 1 bind value]},
+      q{DBI Exception: Doppelter Eintrag '***' für Schlüssel 'k' [for Statement "INSERT INTO t (n) VALUES (?)" with 1 bind value]} ],
+    [ 1062, 'no quotes: withheld',
+      q{Doppelter Eintrag ab},
+      $withheld->(1062) ],
+    [ 1062, 'one quote only: withheld',
+      q{Doppelter Eintrag 'ab für Schlüssel k},
+      $withheld->(1062) ],
+    [ 1062, 'a quote before the key that has no partner: withheld',
+      q{Doppelter Eintrag 'ab für Schlüssel 'k'},
+      $withheld->(1062) ],
+    [ 1366, 'de, integer',
+      q{Falscher integer-Wert: 'xy' für Feld 'n' in Zeile 1},
+      q{Falscher integer-Wert: '***' für Feld 'n' in Zeile 1} ],
+    [ 1366, 'de, MariaDB leaves a quote without its partner before the column',
+      q{Falscher integer-Wert: 'xy' für Feld '`dbio_test`.`msglang_probe`.`n` in Zeile 1},
+      q{Falscher integer-Wert: '***' für Feld '`dbio_test`.`msglang_probe`.`n` in Zeile 1} ],
+    [ 1366, 'en, MariaDB column',
+      q{Incorrect integer value: 'xy' for column `dbio_test`.`msglang_probe`.`n` at row 1},
+      q{Incorrect integer value: '***' for column `dbio_test`.`msglang_probe`.`n` at row 1} ],
+    [ 1366, 'de, MariaDB, quotes and a backtick in the value',
+      q{Falscher integer-Wert: 'x'y`z' für Feld '`dbio_test`.`msglang_probe`.`n` in Zeile 1},
+      q{Falscher integer-Wert: '***' für Feld '`dbio_test`.`msglang_probe`.`n` in Zeile 1} ],
+    [ 1366, 'de, the bytes of a string',
+      q{Falscher string-Wert: '\xF0\x9F\x98\x80cd' für Feld 's3' in Zeile 1},
+      q{Falscher string-Wert: '***' für Feld 's3' in Zeile 1} ],
+    [ 1366, 'fr, the column in French wording with an elision',
+      q{Valeur d'entier incorrecte: 'xy' pour la colonne 'n' à la ligne 1},
+      q{Valeur d'entier incorrecte: '***' pour la colonne 'n' à la ligne 1} ],
+    [ 1411, 'de, function without a quoted name: the whole span is the value',
+      q{Falscher datetime-Wert: 'xy' für Funktion str_to_date},
+      q{Falscher datetime-Wert: '***' für Funktion str_to_date} ],
+    [ 1292, 'de, DOUBLE: the value is last',
+      q{Falscher DOUBLE-Wert gekürzt: 'ab'},
+      q{Falscher DOUBLE-Wert gekürzt: '***'} ],
+    [ 1292, 'de, DOUBLE with quotes in the value',
+      q{Falscher DOUBLE-Wert gekürzt: 'a 'b' c'},
+      q{Falscher DOUBLE-Wert gekürzt: '***'} ],
+    [ 1292, 'de, date: column behind the value',
+      q{Falscher date-Wert: 'xy' für Feld 'd' in Zeile 1},
+      q{Falscher date-Wert: '***' für Feld 'd' in Zeile 1} ],
+    [ 1292, 'de, date with a quote in the value',
+      q{Falscher date-Wert: 'x'y' für Feld 'd' in Zeile 1},
+      q{Falscher date-Wert: '***' für Feld 'd' in Zeile 1} ],
+    [ 1292, 'de, MariaDB date: the quote without its partner',
+      q{Falscher date-Wert: 'xy' für Feld '`dbio_test`.`msglang_probe`.`d` in Zeile 1},
+      q{Falscher date-Wert: '***' für Feld '`dbio_test`.`msglang_probe`.`d` in Zeile 1} ],
+    [ 1292, 'a single quote only: withheld',
+      q{Falscher DOUBLE-Wert gekürzt: xy'},
+      $withheld->(1292) ],
+    [ 1231, 'de, words behind the value',
+      q{Variable 'sql_mode' kann nicht auf 'ab cd' gesetzt werden},
+      q{Variable 'sql_mode' kann nicht auf '***' gesetzt werden} ],
+    [ 1231, 'en, the apostrophe of can\'t is not a quote',
+      q{Variable 'sql_mode' can't be set to the value of 'ab cd'},
+      q{Variable 'sql_mode' can't be set to the value of '***'} ],
+    [ 1231, 'no name quoted: withheld',
+      q{Variable sql_mode kann nicht gesetzt werden},
+      $withheld->(1231) ],
+    [ 1298, 'de, time zone',
+      q{Unbekannte oder falsche Zeitzone: 'Nowhere/Xy'},
+      q{Unbekannte oder falsche Zeitzone: '***'} ],
+    [ 1115, 'de, character set',
+      q{Unbekannter Zeichensatz: 'zzz'},
+      q{Unbekannter Zeichensatz: '***'} ],
+    [ 1115, 'fr, character set',
+      q{Jeu de caractères inconnu: 'zzz'},
+      q{Jeu de caractères inconnu: '***'} ],
+    [ 1273, 'de, collation',
+      q{Unbekannte Sortierreihenfolge: 'zzz_ci'},
+      q{Unbekannte Sortierreihenfolge: '***'} ],
+    [ 3854, 'cannot convert a string, words behind the value',
+      q{Kann Zeichenkette '\xFF\xFExy' nicht von binary nach utf8mb4 umwandeln},
+      q{Kann Zeichenkette '***' nicht von binary nach utf8mb4 umwandeln} ],
+    [ 1064, 'de, syntax: the values of the excerpt',
+      q{Fehler in der SQL-Syntax. Bitte die korrekte Syntax im Handbuch nachschlagen bei 'fw_t where s = 'xy' and i = 5' in Zeile 1},
+      q{Fehler in der SQL-Syntax. Bitte die korrekte Syntax im Handbuch nachschlagen bei 'fw_t where s = *** and i = ***' in Zeile 1} ],
+    [ 1064, 'fr, syntax with an empty excerpt',
+      q{Erreur de syntaxe près de '' à la ligne 1},
+      q{Erreur de syntaxe près de '' à la ligne 1} ],
+    [ 1064, 'fr, syntax',
+      q{Erreur de syntaxe près de 'where s = 'xy'' à la ligne 1},
+      q{Erreur de syntaxe près de 'where s = ***' à la ligne 1} ],
+    [ 1064, 'no excerpt: withheld',
+      q{Erreur de syntaxe},
+      $withheld->(1064) ],
+    # the expression of an overflow holds the bound values (client side
+    # prepare writes them into the statement); the server does not translate
+    # this message
+    [ 1690, 'MySQL, BIGINT UNSIGNED, typed bind',
+      q{BIGINT UNSIGNED value is out of range in '(`dbio_test`.`t`.`a` - 5)'},
+      q{BIGINT UNSIGNED value is out of range in '(`dbio_test`.`t`.`a` - ***)'} ],
+    [ 1690, 'MariaDB, BIGINT UNSIGNED, typed bind',
+      q{BIGINT UNSIGNED value is out of range in '`dbio_test`.`t`.`a` - 5'},
+      q{BIGINT UNSIGNED value is out of range in '`dbio_test`.`t`.`a` - ***'} ],
+    [ 1690, 'MySQL, nested expression',
+      q{BIGINT value is out of range in '((cast(2147483647 as signed) * 5) * 5000000000)'},
+      q{BIGINT value is out of range in '((cast(*** as signed) * ***) * ***)'} ],
+    [ 1690, 'MySQL, DOUBLE, binds written as strings',
+      q{DOUBLE value is out of range in 'exp('1000')'},
+      q{DOUBLE value is out of range in 'exp(***)'} ],
+    [ 1690, 'MariaDB, DOUBLE, binds written as strings',
+      q{DOUBLE value is out of range in '1.7e308 * '10''},
+      q{DOUBLE value is out of range in '*** * ***'} ],
+    [ 1690, 'a string with quotes in the expression',
+      q{DOUBLE value is out of range in 'exp('it\'s geheim42')'},
+      q{DOUBLE value is out of range in 'exp(***)'} ],
+    # a code that quotes no value, and a code the module does not know
+    [ 1048, 'not null: unchanged',
+      q{Feld 'i' darf nicht NULL sein},
+      q{Feld 'i' darf nicht NULL sein} ],
+    [ 1452, 'foreign key: unchanged',
+      q{Cannot add or update a child row: a foreign key constraint fails (`dbio_test`.`fw_ch`, CONSTRAINT `fw_fk` FOREIGN KEY (`pid`) REFERENCES `fw_p` (`id`))},
+      q{Cannot add or update a child row: a foreign key constraint fails (`dbio_test`.`fw_ch`, CONSTRAINT `fw_fk` FOREIGN KEY (`pid`) REFERENCES `fw_p` (`id`))} ],
+  );
+
+  for my $case (@by_code) {
+    my ($code, $name, $raw, $want) = @$case;
+    my $label = "$code, $name";
+
+    my $got = mask_error_details($raw, undef, undef, $code);
+    is $got, $want, $label;
+    unlike $got, $VALUE, "$label: no value left";
+    is mask_error_details($got, undef, undef, $code), $got, "$label: masking the result changes nothing";
+    is mask_error_details($raw, [ 'geheim42', 7 ], 'SELECT 1', $code), $want,
+      "$label: the same with binds and a statement";
+  }
+
+  # the language is not what masks: without the code the German text is not
+  # known, and that is why the storage hands the code over
+  is mask_error_details(q{Doppelter Eintrag 'ab' für Schlüssel 'k'}), q{Doppelter Eintrag 'ab' für Schlüssel 'k'},
+    'no code: a text in another language is returned as it is';
+  is mask_error_details(q{Duplicate entry 'ab' for key 'k'}, undef, undef, 1366),
+    q{Duplicate entry '***' for key 'k'},
+    'a code of another sentence: the sentences of the engine still apply';
+  is mask_error_details(q{Duplicate entry 'ab' for key 'k'}, undef, undef, 'x'),
+    q{Duplicate entry '***' for key 'k'}, 'a code that is no number';
 }
 
 # --- the verbatim replacement of bound values (c, d)

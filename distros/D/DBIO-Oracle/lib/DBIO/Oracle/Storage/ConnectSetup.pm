@@ -4,7 +4,7 @@ package DBIO::Oracle::Storage::ConnectSetup;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # The seam: core runs _apply_connection_schema first on every new connection,
@@ -25,6 +25,7 @@ sub connect_call_datetime_setup {
   $self->_do_query("alter session set nls_date_format = '$date_format'");
   $self->_do_query("alter session set nls_timestamp_format = '$timestamp_format'");
   $self->_do_query("alter session set nls_timestamp_tz_format='$timestamp_tz_format'");
+  $self->_do_query(q{alter session set nls_numeric_characters = '.,'});
 }
 
 1;
@@ -41,7 +42,7 @@ DBIO::Oracle::Storage::ConnectSetup - Oracle session NLS setup on connect
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -61,6 +62,18 @@ environment, not of the session, and its own defaults are not ISO.
 The call is still there as C<< on_connect_call =E<gt> 'datetime_setup' >>, for
 applications that name it: it sets the same formats a second time, which is
 harmless.
+
+The same step sets C<NLS_NUMERIC_CHARACTERS> to C<.,> (decimal point, group
+comma) for the session, whatever the territory of the client or the server
+says. A number goes to the server as text and comes back as text, and both
+are read and written with the decimal character of the session: under a
+territory with a decimal comma (C<NLS_LANG=GERMAN_GERMANY.AL32UTF8>) a bound
+C<1.5> was refused with ORA-01722, and a C<NUMBER>, C<BINARY_DOUBLE> or
+C<BINARY_FLOAT> would have come back as C<1,5>. With the setting a number
+makes the round trip with its decimals in every territory. The environment
+variable C<NLS_NUMERIC_CHARACTERS> does not change it (unlike the date
+formats); an application that wants another one names it in its own
+C<on_connect_do> or C<on_connect_call>, which run after and win.
 
 =head1 AUTHOR
 

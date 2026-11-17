@@ -2,6 +2,45 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.3.5 2026-11-16
+
+    Pushing values through take, drop and the other stages made with
+    gather costs 40 to 45% less a value, and a short push less than
+    half what it did.
+
+    It ships roadmap 2026-0041. Nothing changes but speed: the values,
+    the messages, the order things run in, and what each part is told
+    are as they were.
+
+    - A push, $pipeline->(@values), takes the plain loop whenever the
+      stages made for its run have no flush or end, as take, drop,
+      take_single, drop_while, count_into and most stages made with
+      gather haven't; until now any stage made for a run sent it the
+      longer way. A stage made with gather then costs a pushed value
+      no more than a plain one: through take, about 400 ns a value,
+      not 720, on Perl 5.36, and 440, not 775, on 5.44; and a push of
+      one value through take(5) about 5 µs, not 14. Pulled runs, and
+      runs with a flush, an end or a sink, such as batch, take_last
+      and the sinks, are as they were. (roadmap 2026-0041)
+
+v0.3.4 2026-11-16
+
+    The canned stages, sources and sinks cost a little less a value.
+
+    It ships no roadmap item: the change came of a message from
+    DBIx-Squirrel. Nothing else changes: the values, the messages and
+    the order things run in are as they were.
+
+    - The closures that the canned stages, sources and sinks run for
+      each value read it without a signature, which cost about 19 ns
+      a call: take, drop, take_last, take_single, count_into, dump_to,
+      batch, collect, the sinks of Ekorn::Pipeline::Sinks, from_array,
+      from_fh, from_file, counter, and Ekorn::Pipeline::JSON's. Pushed
+      through one of them, a value costs 15 to 30 ns less, 2 to 4%, on
+      Perl 5.36 and 5.44. take_if, drop_if, take_while, drop_while and
+      peek still copy the value before giving it to their block, so a
+      block that changes its argument changes nothing passed on.
+
 v0.3.3 2026-11-16
 
     A run costs about half what it did to start and end, so a short

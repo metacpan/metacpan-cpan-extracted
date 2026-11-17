@@ -3,22 +3,14 @@ package App::Test::Generator;
 # FIXME: SchemaExtractor does not strip comments before scanning for a sub's parameters,
 #	so a comment that quotes a parameter-declaration idiom is read as a real declaration
 #	and fails --strict-pod=fatal (seen in generate(); the comment there was reworded)
-# FIXME: generate() documents its output as a string but returns the result of print;
-#	either return the test source or change the =head4 Output spec (this alters the
-#	extracted schema, so check t/app.t)
 # FIXME: Schema extraction is not deterministic: SchemaExtractor::_build_schema_from_meta
 #	extracts its output type as hashref on some runs and string on others (hash order)
-# FIXME: bin/demo_extractor is installed through EXE_FILES; move it to examples/ and
-#	update Makefile.PL and MANIFEST
 # TODO: Test validator from Params::Validate::Strict 0.16
-# TODO: $seed should be passed to Data::Random::String::Matches
 # TODO: positional args - when config_undef is set, see what happens when not all args are given
 # TODO: The Dup and TER1/2/3 columns should be moved from the Mutation table
 #	to a new table called Metrics.  Add Halstead and McCabes metrics to
 #	this new Metrics table.  Include links to the definitions of TER1/2/3,
 #	Halstead and McCabes metrics, perhaps from Wikipedia
-# TODO: Template.pm - $spec->{schema} support for nested hashref/arrayref not implemented
-#	(Template.pm ~line 629-631); the hashref case currently skips the field with a carp
 # TODO: Template.pm public API (27/28 subs) lacks POD documentation; add =head2 sections
 #	with =head4 input / =head4 output formal specs for each public sub
 # TODO: SchemaExtractor does not traverse @ISA for inherited constructors; if a module's
@@ -42,6 +34,7 @@ use autodie qw(:all);
 use utf8;
 use open qw(:std :encoding(UTF-8));
 
+use App::Test::Generator::Provenance ();
 use App::Test::Generator::Template;
 use Carp qw(carp croak confess);
 use Config::Abstraction 0.36;
@@ -63,7 +56,7 @@ use Exporter 'import';
 
 our @EXPORT_OK = qw(generate);
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 Readonly my $DEFAULT_ITERATIONS      => 30;
 Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
@@ -71,7 +64,8 @@ Readonly my $DEFAULT_PROPERTY_TRIALS => 1000;
 # Hash for O(1) lookup rather than a list needing grep O(n)
 Readonly my %VALID_CONFIG_KEYS => map { $_ => 1 } qw(
 	test_nuls test_undef test_empty test_non_ascii
-	dedup properties close_stdin test_security timeout check_files check_fds check_accessors
+	dedup properties close_stdin test_security timeout regex_timeout
+	check_files check_fds check_accessors
 );
 
 # --------------------------------------------------
@@ -178,13 +172,15 @@ Readonly my $ENV_TEST_VERBOSE       => 'TEST_VERBOSE';
 Readonly my $ENV_GENERATOR_VERBOSE  => 'GENERATOR_VERBOSE';
 Readonly my $ENV_VALIDATE_LOAD      => 'GENERATOR_VALIDATE_LOAD';
 
+=encoding utf8
+
 =head1 NAME
 
 App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Dashboard for Perl modules
 
 =head1 VERSION
 
-Version 0.48
+Version 0.49
 
 =head1 SYNOPSIS
 
@@ -213,7 +209,7 @@ From the command line:
   fuzz-harness-generator -r t/conf/abs.yml
 
   # Attempt to create a formal definition from a routine package, then run tests against that formal definition
-  # This is the holy grail of test generation, a set of tests is automatically created directly from the source code,
+  # This is the Holy Grail of test generation, a set of tests is automatically created directly from the source code,
   extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
   # Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
@@ -501,8 +497,6 @@ pipeline driver
 
 =back
 
-=encoding utf8
-
 =head1 CONFIGURATION
 
 The configuration file,
@@ -528,6 +522,54 @@ When using named parameters
 Supported basic types used by the fuzzer: C<string>, C<integer>, C<float>, C<number>, C<boolean>, C<arrayref>, C<hashref>.
 See also L<Params::Validate::Strict>.
 You can add more custom types using properties.
+
+A nested C<schema> describes the elements of an C<arrayref> or the values of a
+C<hashref>.  Element schemas are full specs, so they carry their own
+constraints and can nest again:
+
+  input:
+    words:
+      type: arrayref
+      min: 1
+      max: 3
+      schema:
+        type: string
+        min: 3
+        max: 10
+    scores:
+      type: hashref
+      schema:
+        type: integer
+        min: 0
+        max: 100
+    record:
+      type: hashref
+      schema:
+        name:
+          type: string
+          min: 2
+          max: 20
+        age: integer
+    grid:
+      type: arrayref
+      schema:
+        type: arrayref
+        min: 1
+        max: 2
+        schema:
+          type: integer
+          min: 0
+          max: 9
+    things:
+      type: arrayref
+      schema:
+        type: object
+        isa: My::Thing      # needs a no-argument constructor
+        # or: can: label   # mocked with Class::Simple
+
+A hashref C<schema> without a C<type> is a map of fixed key names to element
+schemas, so generated valid data uses those keys instead of random filler.
+Generated element values satisfy the element's own constraints.
 
 For routines with one unnamed parameter
 
@@ -604,6 +646,15 @@ With this test enabled, the function is expected to die when a NUL byte is passe
 
 =item * C<timeout>, ensure tests don't hang (default: 10)
 
+=item * C<regex_timeout>, seconds allowed for generating one string that
+matches a regex pattern (default: 5)
+
+A pattern the generator cannot satisfy, or one that makes it search for too
+long, falls back to a fixed matching value; when none exists the pattern's
+cases are skipped and reported once instead of failing the run.  Matching
+strings are generated from the seeded RNG, so a schema's C<seed> makes them
+reproducible.
+
 Setting this to 0 disables timeout testing.
 
 =item * C<check_files>, assert the routine leaves no files in the working
@@ -612,12 +663,19 @@ Setting this to 0 disables timeout testing.
 Every call is checked for files it created.  They are removed afterwards
 whatever the setting, so a routine that writes a file cannot break the cases
 that follow it; set this to 0 for a routine whose purpose is to write one.
+C<extract-schemas> sets it to 0 when the routine's POD documents creating or
+writing a file in its SIDE EFFECTS section.
 
 =item * C<check_fds>, assert the routine leaks no file descriptors
  (default: 1)
 
 Only checked where F</proc/self/fd> exists.  Set this to 0 for a routine that
 returns a filehandle to its caller, which still holds a descriptor.
+
+The first descriptor a call opens on a given file (or its first socket or
+pipe) is taken as a resource held on purpose, such as a log file an object
+opens on first use, and is not reported.  A later call that opens the same
+target again is.
 
 =item * C<check_accessors>, assert an accessor leaves the object it was called
  on alone (default: 1)
@@ -669,6 +727,13 @@ This is useful for testing functions that convert between formats, normalize dat
 or apply business logic transformations on a set of data to different set of data.
 It takes a list of subsets of the input and output definitions,
 and verifies that data from each input subset is correctly transformed into data from the matching output subset.
+
+A transform whose input names at least one field that the top-level input does not
+introduces its own call shape: its test cases are built from those fields rather
+than the top-level ones.  This lets one schema cover two calls, such as an
+arrayref argument and a list of scalar arguments.  A transform whose input only
+names fields that are already at the top level adjusts the top-level input and
+keeps the usual behaviour.
 
 =head4 Transform Validation Rules
 
@@ -957,8 +1022,17 @@ other fuzz testing support for C<semantic> entries is being developed.
 
 The harness creates a temporary directory and passes its path, because no
 pattern can describe "a directory that exists".
+No empty-string case is generated for such a parameter, since routines
+commonly read an empty path as "not given".
 L<App::Test::Generator::SchemaExtractor> sets this for a parameter that the
 routine tests with C<-d>.
+
+=item * C<existing_file> - The path of an existing file
+
+The harness creates a temporary file and passes its path, because no pattern
+can describe "a file that exists".  L<App::Test::Generator::SchemaExtractor>
+sets this for a parameter that the routine tests with C<-e> or C<-f> but does
+not read.
 
 =item * C<unix_timestamp>
 
@@ -985,6 +1059,36 @@ This case should succeed, since it meets the constraint exactly.
 
 This case is annotated with C<_STATUS = 'DIES'> in the corpus and
 should cause the harness to fail validation or croak.
+
+A constraint that came only from L<extract-schemas> reading POD (marked
+with C<_source: pod> for prose or C<_source: input_spec> for a formal spec)
+is a claim about valid input, not a check the routine has been seen to make.
+The constraint still sizes the valid data that is generated.  It also gets
+explicit out-of-bound probes: a probe that dies is accepted as enforcement
+of the documented limit, while one that survives is recorded as a
+documentation contradiction.  Provenance is tracked per constraint in
+C<_constraint_source>, so a documented minimum does not make a maximum that
+the code enforces tolerant on the same field.  This applies to array and hash sizes, string
+lengths and numeric ranges, to constraints parsed from POD prose
+(C<3-50>, C<at least 5>), and to C<memberof> lists and C<matches> patterns.
+Every documented constraint gets an outside value as an advisory probe; in
+the normal advisory mode a probe that survives is reported as a routine
+accepting a value its POD says is invalid, without failing the run.  A
+constraint written by hand in a schema is still required to die outside
+it.  Because tolerance reduces what the
+harness proves, every tolerated bound is reported with C<diag>, so a
+passing run never hides the concession.  Without this, a routine whose POD
+says C<min =E<gt> 1> but which accepts an empty list failed every harness
+run.
+
+Fuzzing can still reveal a contradiction in either direction: a routine may
+reject a value inside a documented constraint, or accept one outside it.  The
+harness records those observations and reports them together at the end of
+the run.  Advisory mode tolerates them, so POD-derived documentation cannot
+fail a routine that merely documents differently; pass C<--strict-documented>
+to C<fuzz-harness-generator> to make each recorded contradiction a failing
+test.  The strict choice is embedded in the generated harness, so a later
+C<prove> run behaves the same way.
 
 =back
 
@@ -1645,12 +1749,12 @@ The generated test:
 =item * Asserts that a wrong-typed argument dies, where the type is enforced
 
 Passing a reference where a string is declared is only expected to die for a
-parameter whose input spec sets C<_type_checked: 1>.
-L<App::Test::Generator::SchemaExtractor> sets that key when the routine checks
-its arguments with a validator such as L<Params::Validate::Strict>.
+parameter whose input spec sets C<_source: validator>.
+L<App::Test::Generator::SchemaExtractor> sets that source when the routine
+checks its arguments with a validator such as L<Params::Validate::Strict>.
 A type taken from POD, or inferred from the code, documents intent but does not
 promise rejection, so no such case is generated for it.
-Add the key by hand to a schema whose routine does check its argument types.
+Add the source by hand to a schema whose routine does check its argument types.
 
 =item * Validates outputs with L<Return::Set>
 
@@ -1674,6 +1778,13 @@ Takes a schema file and produces a test file (or STDOUT).
       output_file => 'test/foo.t',
   );
 
+  # Feed surviving mutants into the generated harness
+  App::Test::Generator->generate(
+      schema_file      => 'schemas/foo.yml',
+      mutation_results => 'mutation.json',
+      output_file      => 'test/foo.t',
+  );
+
   # Legacy positional API
   App::Test::Generator->generate($schema_file, $test_file);
 
@@ -1685,11 +1796,23 @@ Takes a schema file and produces a test file (or STDOUT).
         schema_file => { type => 'string', optional => 0 },
         input_file  => { type => 'string', optional => 1 },
         output_file => { type => 'string', optional => 1, max => 255 },
+        strict_documented => { type => 'boolean', optional => 1 },
+        mutation_results => { type => 'string', optional => 1 },
     }
+
+C<mutation_results> is the JSON report written by
+C<test-generator-mutate --json>.  Surviving numeric-boundary mutants are
+converted into C<min> or C<max> constraints on the matching input field, so
+the harness generates data either side of the boundary the survivor exposed.
+Existing constraints are never replaced.  See
+L<App::Test::Generator::Mutation::Feedback>.
 
 =head4 Output
 
-    { type => 'string' }
+    { type => 'boolean' }
+
+Always 1.  The test source itself is written to C<output_file>, or printed
+on STDOUT when no output file is given; it is not returned.
 
 The mathematical description is in L</FORMAL SPECIFICATION>.
 
@@ -1708,6 +1831,7 @@ sub generate
 	# Globals loaded from the user's conf (all optional except function maybe)
 	my ($module, $function, $new, $yaml_cases);
 	my ($seed, $iterations);
+	my $strict_documented = 0;
 
 	if((ref($_[0]) eq 'HASH') || defined($_[2])) {
 		# Modern API
@@ -1719,8 +1843,11 @@ sub generate
 				output_file => { type => 'string', optional => 1 },
 				schema => { type => 'hashref', optional => 1 },
 				quiet => { type => 'boolean', optional => 1 },	# Not yet used
+				strict_documented => { type => 'boolean', optional => 1 },
+				mutation_results => { type => 'string', optional => 1 },
 			}
 		});
+		$strict_documented = $params->{'strict_documented'} ? 1 : 0;
 		if($params->{'schema_file'}) {
 			$schema_file = $params->{'schema_file'};
 		} elsif($params->{'input_file'}) {
@@ -1732,6 +1859,16 @@ sub generate
 		}
 		if(defined($schema_file)) {
 			$schema = _load_schema($schema_file);
+		}
+		if($params->{'mutation_results'}) {
+			# Surviving mutants add constraints the schema is missing, so
+			# the harness exercises the boundary that survived the suite.
+			require App::Test::Generator::Mutation::Feedback;
+			my $feedback = App::Test::Generator::Mutation::Feedback->new(
+				mutation_results => $params->{'mutation_results'},
+				(defined($schema->{module}) ? (module => $schema->{module}) : ()),
+			);
+			$feedback->apply_to_schema($schema);
 		}
 		$test_file = $params->{'output_file'};
 	} else {
@@ -1769,6 +1906,7 @@ sub generate
 	my %config = %{$schema->{config}} if(exists($schema->{config}));
 
 	_normalize_config(\%config);
+	$config{'strict_documented'} = $strict_documented;
 
 	# Guess module name from config file if not set
 	if(!$module) {
@@ -2112,7 +2250,7 @@ sub generate
 				}
 			}
 		} else {
-			$call_code = "\$result = \$obj->$function(\$input);";
+			$call_code = "\$result = \$obj->$function(_fuzz_args(\$input));";
 			if($output{'_returns_self'}) {
 				$call_code .= "ok(defined(\$result)); ok(\$result eq \$obj, '$function returns self')";
 			} elsif(defined($accessor{type}) && ($accessor{type} eq 'getset')) {
@@ -2125,24 +2263,27 @@ sub generate
 			}
 		}
 	} elsif(defined($module) && length($module)) {
-		if($function eq 'new') {
+		# `import` is a class method: `use Module` calls Module->import(...).
+		# Some modules (Database::Abstraction) take the class as their first
+		# argument, so a plain Module::import() with no named arguments dies.
+		if(($function eq 'new') || ($function eq 'import')) {
 			if($has_positions) {
 				$position_code = "\$result = (scalar(\@alist) == 1) ? ${module}\->$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}\->$function() : ${module}\->$function(\@alist);";
 			} else {
-				$call_code = "\$result = ${module}\->$function(\$input);";
+				$call_code = "\$result = ${module}\->$function(_fuzz_args(\$input));";
 			}
 		} else {
 			if($has_positions) {
 				$position_code = "\$result = (scalar(\@alist) == 1) ? ${module}::$function(\$alist[0]) : (scalar(\@alist) == 0) ? ${module}::$function() : ${module}::$function(\@alist);";
 			} else {
-				$call_code = "\$result = ${module}::$function(\$input);";
+				$call_code = "\$result = ${module}::$function(_fuzz_args(\$input));";
 			}
 		}
 	} else {
 		if($has_positions) {
 			$position_code = "\$result = $function(\@alist);";
 		} else {
-			$call_code = "\$result = $function(\$input);";
+			$call_code = "\$result = $function(_fuzz_args(\$input));";
 		}
 	}
 
@@ -2171,7 +2312,7 @@ sub generate
 		# an optional second argument would store it as if it were a value.
 		foreach my $code (\$call_code, \$position_code) {
 			next unless(defined($$code));
-			$$code =~ s/\Q$function\E\(\$input\)/$function()/g;
+			$$code =~ s/\Q$function\E\(_fuzz_args\(\$input\)\)/$function()/g;
 		}
 		my $snapshot = 'my $getter_copy = eval { require Storable; Storable::dclone($obj) }; ';
 		my $check = 'if(defined($getter_copy) && eval { scalar(keys %{$getter_copy}); 1 }) {'
@@ -2304,11 +2445,18 @@ sub generate
 	}
 
 	# Prepare seed/iterations code fragment for the generated test
-	my $seed_code = '';
+	# A schema can record a precondition that no generated value can meet (for
+	# example a file the routine parses).  The harness then has nothing to
+	# assert and says so instead of failing on a call it cannot make.
+	my $skip_reason = $schema->{skip};
+
+	# The generated harness needs the seed both to seed Perl's RNG (which the
+	# regex generator uses) and to name it in failure diagnostics.
+	my $seed_code = "our \$seed;\n";
 	if (defined $seed) {
 		# ensure integer-ish
 		$seed = int($seed);
-		$seed_code = "srand($seed);\n";
+		$seed_code .= "srand(\$seed = $seed);\n";
 	}
 
 	my $determinism_code = 'my $result2;' .
@@ -2337,13 +2485,16 @@ sub generate
 		call_code => $call_code,
 		position_code => $position_code,
 		determinism_code => $determinism_code,
+		documented_sources => join(' ', App::Test::Generator::Provenance::documented_sources()),
+		type_checks_source => App::Test::Generator::Provenance::type_checks_source(),
 		function => $function,
 		iterations_code => int($iterations),
 		use_properties => $use_properties,
 		transform_properties_code => $transform_properties_code,
 		property_trials => $config{properties}{trials} // $DEFAULT_PROPERTY_TRIALS,
 		relationships_code => $relationships_code,
-		module => $module
+		module => $module,
+		skip_reason => $skip_reason
 	};
 
 	my $test;
@@ -2365,6 +2516,8 @@ sub generate
 	} else {
 		print "$test\n";
 	}
+
+	return 1;
 }
 
 # --- Helpers for rendering data structures into Perl code for the generated test ---
@@ -2614,6 +2767,60 @@ sub _validate_config {
 #
 # Exit:       Returns nothing. Croaks on invalid type.
 # --------------------------------------------------
+# Validate a nested element specification.  `schema` on an arrayref describes
+# every element; on a hashref it describes every value, or -- when it has no
+# type of its own -- maps fixed key names to element specs.
+sub _validate_element_spec {
+	my ($element, $param, $allow_keys) = @_;
+
+	return unless defined($element);
+	if(!ref($element)) {
+		croak("Invalid element type '$element' for '$param'")
+			unless _valid_nested_type($element);
+		return;
+	}
+	croak("schema for parameter '$param' must be a hash or a type name")
+		if ref($element) ne 'HASH';
+
+	if($allow_keys && !exists($element->{type})) {
+		croak("A hashref schema for '$param' with fixed keys needs at least one key")
+			unless keys %{$element};
+		foreach my $key (sort keys %{$element}) {
+			my $value = $element->{$key};
+			if(!ref($value)) {
+				croak("Invalid element type '$value' for '$param.$key'")
+					unless _valid_nested_type($value);
+				next;
+			}
+			croak("Element schema for '$param.$key' must be a hash")
+				unless ref($value) eq 'HASH';
+			_validate_element_spec($value, "$param.$key", 0);
+		}
+		return;
+	}
+
+	croak("Missing type in the element schema for '$param'")
+		unless defined($element->{type});
+	croak("Invalid element type '$element->{type}' for '$param'")
+		unless !ref($element->{type}) && _valid_nested_type($element->{type});
+	croak("Object element schema for '$param' needs 'isa' or 'can'")
+		if(($element->{type} eq 'object') && !defined($element->{isa}) && !defined($element->{can}));
+
+	if(($element->{type} eq 'arrayref') || ($element->{type} eq 'array')) {
+		_validate_element_spec($element->{schema}, $param, 0) if defined($element->{schema});
+	} elsif($element->{type} eq 'hashref') {
+		_validate_element_spec($element->{schema}, $param, 1) if defined($element->{schema});
+	}
+}
+
+sub _valid_nested_type {
+	my ($type) = @_;
+
+	return 0 unless defined($type) && !ref($type);
+	return 1 if($type eq 'array') || ($type eq 'coderef');
+	return _valid_type($type);
+}
+
 sub _validate_input_params {
 	my $schema = $_[0];
 
@@ -2629,10 +2836,18 @@ sub _validate_input_params {
 		if(ref($spec)) {
 			croak("Missing type for parameter '$param'")
 				unless defined $spec->{type};
-			# 'coderef' is a SchemaExtractor-specific type; treat as 'any'
-			$spec->{type} = 'any' if $spec->{type} eq 'coderef';
+			# 'coderef' is a SchemaExtractor-specific type, not one of the
+			# schema's value types: the harness satisfies it with a no-op
+			# coderef rather than generating values for it.
+			next if $spec->{type} eq 'coderef';
 			croak("Invalid type '$spec->{type}' for parameter '$param'")
 				unless _valid_type($spec->{type});
+
+			if(($spec->{type} eq 'arrayref') || ($spec->{type} eq 'array')) {
+				_validate_element_spec($spec->{schema}, $param, 0) if defined($spec->{schema});
+			} elsif($spec->{type} eq 'hashref') {
+				_validate_element_spec($spec->{schema}, $param, 1) if defined($spec->{schema});
+			}
 		} else {
 			croak("Invalid type '$spec' for parameter '$param'")
 				unless _valid_type($spec);
@@ -3010,8 +3225,19 @@ sub _validate_module {
 	my $verbose = $ENV{$ENV_TEST_VERBOSE} || $ENV{$ENV_GENERATOR_VERBOSE};
 
 	if($verbose) {
-		carp "Found module '$module' at: $mod_info->{'file'} " .
-			'(version ' . ($mod_info->{'version'} || 'unknown') . ')';
+		# check_install() returns undef when the module is not in @INC, which
+		# is normal for a schema whose module only exists when the tests run
+		# (and when no schema file was given, the miss is not reported
+		# above).  Never read a location from a missing result: it would be
+		# concatenated as an undefined value.
+		if($mod_info) {
+			carp "Found module '$module' at: " .
+				($mod_info->{'file'} // 'an unknown location') .
+				' (version ' . ($mod_info->{'version'} || 'unknown') . ')';
+		} else {
+			carp "Module '$module' is not in \@INC during generation; " .
+				'continuing (it may be available when the tests run)';
+		}
 	}
 
 	# Optional load validation — disabled by default because
@@ -3161,6 +3387,23 @@ The mathematical description is in L</FORMAL SPECIFICATION>.
 
 =cut
 
+# Render a nested hashref of scalars (and further hashrefs) as Perl source.
+# _constraint_source is such a map: constraint name => provenance.
+sub _render_nested_hash {
+	my ($href) = @_;
+
+	my @pairs;
+	foreach my $key (sort keys %{$href}) {
+		my $value = $href->{$key};
+		next unless defined $value;
+		push @pairs, perl_quote($key) . ' => ' . (ref($value) eq 'HASH'
+			? _render_nested_hash($value)
+			: perl_quote($value));
+	}
+
+	return '{ ' . join(', ', @pairs) . ' }';
+}
+
 sub render_hash {
 	my $href = $_[0];
 
@@ -3192,11 +3435,13 @@ sub render_hash {
 			# Skip undef sub-values — they contribute nothing to the spec
 			next unless defined $def->{$subk};
 
-			# Validate that reference types are ones we can render —
-			# nested hashrefs are not yet supported
+			# Validate that reference types are ones we can render.  A nested
+			# hashref of scalars (such as _constraint_source) is rendered as a
+			# nested Perl hash literal.
 			if(ref($def->{$subk})) {
 				unless((ref($def->{$subk}) eq 'ARRAY') ||
-				       (ref($def->{$subk}) eq 'Regexp')) {
+				       (ref($def->{$subk}) eq 'Regexp') ||
+				       (ref($def->{$subk}) eq 'HASH')) {
 					croak(
 						__PACKAGE__,
 						": $subk is a nested element, not yet supported (",
@@ -3217,6 +3462,8 @@ sub render_hash {
 					next;
 				}
 				push @pairs, "$subk => " . perl_quote($re);
+			} elsif(ref($def->{$subk}) eq 'HASH') {
+				push @pairs, "$subk => " . _render_nested_hash($def->{$subk});
 			} else {
 				# All other sub-keys are rendered via perl_quote which
 				# handles scalars, arrayrefs, and Regexp objects correctly
@@ -4017,6 +4264,16 @@ sub _get_semantic_generators {
 				}
 			},
 			description => 'Paths to existing writable directories',
+		}, existing_file => {
+			code => q{
+				Gen {
+					require File::Temp;
+					my ($fh, $path) = File::Temp::tempfile(SUFFIX => '.pm', UNLINK => 1);
+					close $fh;
+					$path;
+				}
+			},
+			description => 'Paths to existing files',
 		}, unix_timestamp => {
 			code => q{
 				Gen {
@@ -4996,6 +5253,7 @@ no state schema.  C<quote(v)> stands for the result of C<perl_quote(v)>.
     │ schema_file? : STRING
     │ output_file? : STRING ∪ { undef }
     │ test : STRING
+    │ result! : BOOLEAN
     ├───────────────────────────────────────────────────
     │ pre   schema_file? names a readable schema
     │       the schema defines function
@@ -5003,6 +5261,7 @@ no state schema.  C<quote(v)> stands for the result of C<perl_quote(v)>.
     │ post  test is a complete Perl test file for function
     │       output_file? ≠ undef ⇒ file output_file? holds test
     │       output_file? = undef ⇒ test is printed on STDOUT
+    │       result! = 1
     └───────────────────────────────────────────────────
 
     no arguments                     ⇒ croak 'Usage: generate(...)'

@@ -152,7 +152,7 @@ my @expected_ddl =
     . '(identical DDL on both paths)';
   ok !$storage->_use_transactional_ddl,
     'no _owner_storage wired -- capability probe conservatively answers false '
-    . '(mirrors the sync DeploymentHandler default; karr k25 pitfall 1)';
+    . '(mirrors the sync DeploymentHandler default)';
 }
 
 # --- no owner wired: deploy_async falls back to the non-transactional branch -
@@ -194,8 +194,7 @@ my @expected_ddl =
 
   ok $f->is_done && !$f->is_failed,
     'deploy_async succeeded through the transactional (txn_do_async) branch -- '
-    . 'proves $ctx->txn_conn resolves on DBIO::PostgreSQL::EV::TransactionContext '
-    . '(karr k25 pitfall 2)';
+    . 'proves $ctx->txn_conn resolves on DBIO::PostgreSQL::EV::TransactionContext';
 
   is $pool->{acquired}, 1, 'one connection acquired via acquire_txn';
   is $pool->{released}, 1, 'connection released once, at the txn boundary';
@@ -224,7 +223,7 @@ my @expected_ddl =
     [ 'DROP TABLE IF EXISTS deploy_mock_artist CASCADE',
       'DROP TABLE IF EXISTS deploy_mock_cd CASCADE' ],
     'DROPs name the mapped table names, quoted via the same DBIO::SQL::Util::_quote_ident '
-    . 'DBIO::PostgreSQL::DDL uses (karr k25 pitfall 2) -- _split_statements strips the '
+    . 'DBIO::PostgreSQL::DDL uses -- _split_statements strips the '
     . 'trailing ; before dispatch';
   is $log[0], 'BEGIN', 'still opens with BEGIN';
   is $log[-1], 'COMMIT', 'still closes with COMMIT';

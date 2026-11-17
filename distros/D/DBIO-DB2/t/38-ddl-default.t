@@ -65,7 +65,7 @@ is(DBIO::DB2::DDL::_db2_default_literal('hello'), "'hello'",
 is(DBIO::DB2::DDL::_db2_default_literal(''), "''",
   'empty string default is an empty quoted literal');
 
-# With the column's type (karr k46): a character column takes every non-ref
+# With the column's type: a character column takes every non-ref
 # value as text, the type map's aliases included; other types and no type at
 # all behave as above.
 is(DBIO::DB2::DDL::_db2_default_literal('00000', 'char'), "'00000'",
@@ -144,7 +144,7 @@ like($ddl, qr/"created"\s+TIMESTAMP DEFAULT CURRENT TIMESTAMP/,
   'install_ddl emits a SCALAR-ref CURRENT TIMESTAMP default bare');
 
 like($ddl, qr/"plz"\s+CHAR\(5\) DEFAULT '00000'/,
-  'install_ddl quotes digits on a CHAR column (karr k46)');
+  'install_ddl quotes digits on a CHAR column');
 like($ddl, qr/"who"\s+VARCHAR\(32\) DEFAULT 'USER'/,
   'install_ddl quotes USER on a VARCHAR column');
 like($ddl, qr/"nothing"\s+VARCHAR\(32\) DEFAULT 'NULL'/,

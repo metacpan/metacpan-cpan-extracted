@@ -4,7 +4,7 @@ package DBIO::Oracle::Introspect::Indexes;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -26,7 +26,8 @@ sub fetch {
         SELECT constraint_name FROM all_constraints
         WHERE owner = ? AND constraint_type IN ('P', 'U')
       )
-    ORDER BY i.table_name, i.index_name, ic.column_position
+    ORDER BY NLSSORT(i.table_name, 'NLS_SORT=BINARY'),
+             NLSSORT(i.index_name, 'NLS_SORT=BINARY'), ic.column_position
   });
   $idx_sth->execute($schema, $schema);
 
@@ -64,12 +65,15 @@ DBIO::Oracle::Introspect::Indexes - Introspect Oracle indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
 Fetches Oracle index metadata via C<all_indexes> and C<all_ind_columns>.
 Explicit indexes are returned (not auto-generated PK/UK indexes).
+Indexes are read in binary order by table and index name, in every session
+language (not by the C<NLS_SORT> of the session); their columns follow
+C<column_position>.
 
 =head1 METHODS
 

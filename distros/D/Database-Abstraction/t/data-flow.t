@@ -607,7 +607,7 @@ note '';
 note '=== DF9: no_fixate data mutability flow ===';
 
 SKIP: {
-	skip 'DBD::SQLite not available for DF9 mutability tests', 9
+	skip 'DBD::SQLite not available for DF9 mutability tests', 14
 		unless $HAVE_SQLITE;
 
 	my $df9_dir = tempdir(CLEANUP => 1);
@@ -660,6 +660,26 @@ SKIP: {
 	ok(defined $fh_mutable, 'DF9.8 fetchrow_hashref mutable result defined');
 	is($fh_locked->{'score'}, $fh_mutable->{'score'},
 		'DF9.9 same column value regardless of no_fixate setting');
+
+	# DF9.10-11: per-call no_fixate on selectall_arrayref overrides constructor default
+	my $per_call_rows = $db_locked->selectall_arrayref(no_fixate => 1);
+	ok(defined $per_call_rows && ref $per_call_rows eq 'ARRAY',
+		'DF9.10 per-call no_fixate selectall_arrayref returns arrayref');
+	my $per_call_row = $per_call_rows->[0];
+	lives_ok { $per_call_row->{'entry'} = 'per_call_mutated' }
+		'DF9.11 per-call no_fixate selectall_arrayref row is writable';
+
+	# DF9.12-13: per-call no_fixate on selectall_array (selectall_hash alias)
+	my @per_call_arr = $db_locked->selectall_array(no_fixate => 1);
+	ok(scalar @per_call_arr > 0,
+		'DF9.12 per-call no_fixate selectall_array returns rows');
+	lives_ok { $per_call_arr[0]{'entry'} = 'arr_mutated' }
+		'DF9.13 per-call no_fixate selectall_array row is writable';
+
+	# DF9.14: fetchrow_hashref silently ignores per-call no_fixate (no SQL error)
+	my $fh_percall;
+	lives_ok { $fh_percall = $db_locked->fetchrow_hashref(entry => 'two', no_fixate => 1) }
+		'DF9.14 fetchrow_hashref accepts no_fixate without SQL error';
 }
 
 # ---------------------------------------------------------------------------

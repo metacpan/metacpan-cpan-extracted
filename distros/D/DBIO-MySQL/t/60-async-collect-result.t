@@ -193,7 +193,7 @@ sub make_readable { $_[0]->{readable}->done }
 
   is_deeply $storage->{collect_arity}, [ 1, 1, 1 ],
     'EVERY dispatch -- the first one and both re-poll recursions -- carries one '
-  . 'argument: _collect_result($conn) (ADR 0044, karr k11/k47)';
+  . 'argument: _collect_result($conn) (ADR 0044)';
   is $storage->{polls}, 3,
     'one initial socket wait plus one per re-poll -- the recursion really went '
   . 'back through _await_readable';

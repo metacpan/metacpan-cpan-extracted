@@ -128,7 +128,13 @@ sub settle {
 # A pool of one with its connection up, and that connection's backend pid.
 sub fresh {
   my (%attrs) = @_;
-  my $h = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 1, %attrs });
+  # lc_messages 'C' first: the test reads the server's English wording (the
+  # language of a message is the session's lc_messages, which
+  # DBIO_TEST_SERVER_LANGUAGE sets for the suite); section 7 sets its own.
+  my $h = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => {
+    pool_size => 1, %attrs,
+    on_connect_do => [ q{SET lc_messages = 'C'}, @{ $attrs{on_connect_do} || [] } ],
+  });
   my ($ok, @r) = wait_for($h->async->select_async(@PID));
   die "warming the pool failed: $r[0]" unless $ok;
   return ($h, $r[0][0]);
@@ -350,10 +356,13 @@ sub failed_as_cancelled {
 }
 
 # --- 8. a connection lost after an error carries no SQLSTATE --------------------
-# error_fields still holds the cancel's 57014 when the connection goes: EV::Pg
-# sets it for a server's error result only. The Future of the statement that
-# the loss ends fails with a string -- not with an object that would tell the
-# caller its statement was cancelled.
+# error_fields still holds the cancel's 57014 right before the connection goes:
+# EV::Pg sets it for a server's error result only, a success does not clear it.
+# The Future of the statement that the loss ends fails with a string -- not with
+# an object that would tell the caller its statement was cancelled. (EV::Pg 0.09
+# clears error_fields when it ends the statements of a lost connection, before
+# their callbacks run; 0.07 kept the old error. So the trap is armed before the
+# loss, and the loss must not carry it into the failure.)
 
 {
   my $label = 'connection lost';
@@ -378,6 +387,7 @@ sub failed_as_cancelled {
   # down on our side, so libpq reads end-of-file and EV::Pg answers every
   # statement queued on it with "connection lost".
   my $fd   = $pg->socket;
+  is_57014 sqlstate_of($pg), "$label: error_fields still says 57014 right before the loss";
   my $f    = $h->query_on($pg, 'SELECT pg_sleep(5)');
   my $kill = EV::timer(0.2, 0, sub {
     open my $sock, '+<&=', $fd or die "fdopen $fd: $!";
@@ -389,9 +399,8 @@ sub failed_as_cancelled {
   ok !$ok, "$label: the statement fails";
   ok !ref $err, "$label: with a string, not an object" or diag explain $err;
   unlike "$err", qr/\b57014\b|SQLSTATE/, "$label: without the earlier cancel's SQLSTATE in it";
-  is $pg->error_fields && $pg->error_fields->{sqlstate}, '57014',
-    "$label: while error_fields of the lost connection still says 57014"
-    if $pg->can('error_fields');
+  isnt sqlstate_of($pg), '57014',
+    "$label: error_fields of the lost connection is cleared by EV::Pg 0.09";
   note "  with: $err";
 
   # the caller hands the lost connection back; the pool retires it

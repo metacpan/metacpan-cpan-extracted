@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Changes — App::Test::Generator</title>
-<meta name="description" content="Release history for App::Test::Generator 0.47: the --function flag, a clearer self-fuzz summary, invocant fixes, CPD drill-downs, sortable persistent dashboard tables and the domain, path, data-flow and transaction test suites.">
+<meta name="description" content="Release history for App::Test::Generator 0.49: mutation survivors fed back into harness generation, documented constraints checked against behaviour, element schemas, deterministic regex generation, and the side-effect checks from 0.48.">
 <link rel="canonical" href="changelog.html">
 <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="App::Test::Generator">
 <meta property="og:title" content="Changes — App::Test::Generator">
-<meta property="og:description" content="What changed in 0.47 and 0.46, and where to find the rest.">
+<meta property="og:description" content="What changed in 0.49 and 0.48, and where to find the rest.">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="../css/site.css">
 </head>
@@ -47,85 +47,134 @@
 		distribution's <code>Changes</code> file is the authoritative record.
 	</p>
 
-	<h2 id="v0-47">0.47 — 7 October 2026</h2>
+	<h2 id="v0-49">0.49 — November 2026</h2>
 
 	<h3>Enhancements</h3>
 	<ul>
-		<li><strong><code>extract-schemas --function NAME</code> (<code>-F</code>)</strong> —
-		extracts everything, then deletes every schema except <code>NAME.yml</code>
-		and limits the fuzz run and the summary table to that one routine. Built
-		for isolating a single failure in the self-fuzz suite; if the name is not
-		found, the available routine names are printed and the command exits 1.</li>
-		<li><strong>A clearer self-fuzz summary.</strong> The end-of-run table now
-		lists every processed routine, not only the ones that fuzzed successfully,
-		with the module name, the routine and either a test count or a plain
-		reason for skipping: internal helper, excluded from the fuzz list, instance
-		method needing an object, mandatory object parameter without a
-		<code>can</code> hint, or FAILED.</li>
-	</ul>
-
-	<h3>Documentation</h3>
-	<ul>
-		<li>Expanded the <code>MUTANT_SKIP</code> examples.</li>
+		<li><strong>Surviving mutants feed harness generation.</strong>
+		<code>fuzz-harness-generator --mutation-results</code> (or
+		<code>mutation_results</code> to <code>generate()</code>) reads
+		<code>test-generator-mutate</code>'s JSON report. Each surviving
+		numeric-boundary mutant is traced to the comparison it mutated and
+		becomes a <code>min</code> or <code>max</code> on the matching input
+		field. Existing constraints are never replaced, and survivors that need
+		a hand-written test are listed.
+		<a href="mutation.html#mutation-results">Details</a>.</li>
+		<li><strong>Documented constraints are checked, not assumed.</strong> A
+		bound, member list or pattern that came only from POD is probed from
+		outside. A routine that contradicts its documentation is reported at
+		the end of the run, and
+		<code>fuzz-harness-generator --strict-documented</code> turns each
+		finding into a failing test for CI.</li>
+		<li><strong>Element schemas.</strong> An arrayref or hashref parameter
+		can describe its elements with a nested <code>schema</code>, which can
+		nest again and build objects from <code>isa</code> or <code>can</code>.
+		<a href="schema.html#elements">Details</a>.</li>
+		<li><strong>Transforms can have their own input fields.</strong> One
+		hand-written schema can cover two call shapes, such as
+		<code>NameCase([...])</code> and <code>NameCase('A', 'B')</code>.</li>
+		<li><strong>Regex-based strings are deterministic and bounded.</strong>
+		The schema's <code>seed</code> drives them, generation is limited by the
+		new <code>regex_timeout</code> config key (default 5 seconds), and a
+		pattern that hangs or cannot be satisfied falls back or skips its cases
+		instead of failing the run. A failing case names the seed and the input
+		that was sent.</li>
+		<li><strong>An <code>existing_file</code> semantic.</strong> A routine
+		that only tests that a path exists (<code>-e</code>/<code>-f</code>) is
+		no longer skipped: the harness creates a temporary file for it. Only
+		routines that read the file's contents stay skipped.</li>
+		<li><strong>Portable, repeatable schema YAML.</strong> A
+		<code>matches</code> pattern is written as a plain string rather than a
+		<code>!!perl/regexp</code> object, and maps and analysis notes are
+		sorted, so repeated runs are byte-identical.</li>
+		<li><strong>One provenance marker.</strong> Each parameter carries a
+		single <code>_source</code> value, replacing
+		<code>_type_checked</code>, <code>_bounds_unverified</code> and
+		<code>_from_input_spec</code>; provenance is also tracked per
+		constraint. The allowed values live in
+		<code>App::Test::Generator::Provenance</code>.</li>
+		<li><strong><code>demo_extractor</code> is no longer installed.</strong>
+		It ships as <code>examples/demo_extractor</code>. The bug tracker in the
+		distribution metadata is now GitHub issues.</li>
 	</ul>
 
 	<h3>Bug fixes</h3>
 	<ul>
-		<li><strong><code>$pkg</code> was extracted as a parameter.</strong> The
-		invocant filter only knew <code>$self</code> and <code>$class</code>, so
-		<code>$pkg</code> in <code>import()</code>, <code>$proto</code> in older
-		constructors and <code>$klass</code> were emitted as position-0 string
-		parameters — giving modules that use <code>use Module key =&gt; value</code>
-		a spurious <code>pkg: {type: string}</code> entry. All extraction loops,
-		the POD/code agreement check and the inline body guard now share the full
-		<code>self|class|pkg|proto|klass</code> set. Three regression tests cover
+		<li><strong>Generated values stay inside declared bounds.</strong> Random
+		integers, numbers and strings respect a maximum, pattern-generated
+		strings honour <code>min</code>/<code>max</code> length, and a
+		pattern-constrained field is never given the fixed whitespace, newline
+		or BOM samples its own pattern excludes.</li>
+		<li><strong>Length guards are read correctly.</strong>
+		<code>croak ... if length &lt; 5</code> used to be read as
+		<code>max: 4</code>; it now gives <code>min: 5</code>, the same as
+		<code>croak ... unless length &gt;= 5</code>. A formal Input spec's
+		bounds are compared with the inferred ones, so an impossible range is
+		reported instead of emitted.</li>
+		<li><strong><code>import</code></strong> is called as a class method,
+		<code>Module-&gt;import(...)</code>, the way <code>use</code> invokes
 		it.</li>
+		<li><strong>Extraction</strong> reads a single documented parameter as
+		the first positional argument when the routine reads no hash of
+		arguments, keeps the value list from <code>=item</code> prose for a
+		parameter named only by a formal spec, and drops a reference used as a
+		parameter name instead of emitting <code>HASH(0x...)</code>.</li>
+		<li><strong>File descriptors.</strong> An object that opens a file on
+		first use and keeps it, such as a logger, is no longer reported as a
+		leak; a descriptor is reported when the same target is opened again.</li>
+		<li><strong><code>generate()</code></strong> is documented as returning
+		1, which is what it has always returned.</li>
 	</ul>
 
-	<h2 id="v0-46">0.46 — 18 August 2026</h2>
+	<h2 id="v0-48">0.48 — 11 November 2026</h2>
 
-	<h3>Dashboard</h3>
+	<h3>Enhancements</h3>
 	<ul>
-		<li><strong>CPD drill-down pages.</strong> A per-file page shows the source
-		with duplicated lines highlighted, and ◆ markers linking to the other copy
-		of each block. Dup% badges link to it, and the mutation page's legend does
-		too.</li>
-		<li><strong>One visual style for per-file pages.</strong> Duplication pages
-		now use the same header, footer, CSS variables and dark-mode toggle as
-		mutation pages.</li>
-		<li><strong>Sortable mutation and duplication tables.</strong> Any column
-		header sorts; arrows show the active column and direction. Sorting detects
-		numbers versus text, honours <code>data-sort-type="date"</code>, and
-		respects a <code>data-value</code> attribute where the displayed text is
-		not the sort key.</li>
-		<li><strong>Fixed a column-alignment bug.</strong> The TER column appeared
-		in data rows but only in the header when LCSAJ data existed, shifting the
-		Dup% index. TER is now always in the header.</li>
-		<li><strong>Drag to reorder columns</strong>, with the active sort column
-		following its column to its new position.</li>
-		<li><strong>Persistent sort and column order</strong> for all four tables,
-		stored in <code>localStorage</code> and restored on load. Columns are
-		identified by their original index, so a saved order survives a new column
-		being added.</li>
+		<li><strong>Harnesses check what a call leaves behind.</strong> Every call
+		is checked for changes to the caller's globals (<code>$_</code>,
+		<code>$/</code>, <code>$,</code> and <code>$;</code>), for files left in
+		the working directory and for leaked file descriptors. The last two have
+		config keys, <code>check_files</code> and <code>check_fds</code>, for
+		routines whose job is to write a file or hand a handle back.</li>
+		<li><strong>Accessors are tested for damage to their object.</strong> A
+		getter must not change the object it was given, and a getset must change
+		nothing but its own property. Memoised values and lazy initialisation are
+		not reported. The config key is <code>check_accessors</code>.</li>
+		<li><strong>Unbuildable classes are skipped, not failed.</strong> When a
+		constructor refuses — an abstract base class, for example —
+		<code>extract-schemas</code> marks the class so that its routines are
+		skipped.</li>
+		<li><strong>A <code>directory</code> semantic.</strong> A parameter the
+		routine tests with <code>-d</code> is given a real temporary directory
+		instead of an invented string.</li>
 	</ul>
 
-	<h3>Tests</h3>
+	<h3>Bug fixes</h3>
 	<ul>
-		<li><strong><code>t/domain.t</code></strong> — equivalence partitioning and
-		boundary value analysis across six modules: confidence thresholds at
-		19/20/39/40, the signal-to-bucket mappings and their alphabetical
-		tie-breaks, numeric <code>min</code>/<code>max</code> boundaries where the
-		code uses strict comparisons, the
-		<code>exists</code>-versus-<code>defined</code> distinction in required
-		attributes, cyclomatic and early-return thresholds, nesting depth, purity
-		classes and mutation-field deduplication.</li>
-		<li><strong><code>t/data-flow.t</code></strong> — define-use chains:
-		corpus staleness after minimisation, evidence isolation between objects,
-		<code>weight =&gt; 0</code> stored as zero rather than defaulted to one,
-		YAML export/import round trips, file handles closed inside <code>export()</code>,
-		and string literals not mistaken for IO.</li>
-		<li>Plus the path, transaction and path-coverage suites described in the
-		repository's <code>CLAUDE.md</code>.</li>
+		<li><strong>Coverage-guided fuzzing now gets coverage.</strong> The fuzzer
+		was reading the names of the coverage criteria rather than the counters,
+		so every run was random-only. The program must be started under
+		Devel::Cover. Dies on hashref inputs with <code>properties</code> are now
+		recorded as bugs, and corpus files are UTF-8.</li>
+		<li><strong>BenchmarkGenerator</strong> quotes and escapes every name and
+		constructor value, so the generated script always compiles, and no longer
+		dies on <code>input: undef</code>.</li>
+		<li><strong>Extraction</strong> recognises accessors that guard on
+		<code>defined($arg)</code>, no longer takes a getter driven by
+		<code>%ENV</code> for a getset, types a wrapping setter as
+		<code>any</code>, gives a wrapper that forwards <code>@_</code> the
+		target's input schema, emits <code>matches</code> patterns as Regexp
+		objects, and no longer types a return built from <code>$1</code> as an
+		integer.</li>
+		<li><strong>Harnesses</strong> now pass scalar inputs to positional
+		routines, compare numeric getset round trips with <code>==</code>, and
+		only assert that a wrong-typed argument dies when the routine's own
+		validator enforces the type.</li>
+		<li><strong><code>deploy-workflows</code></strong> ships the current
+		workflow files again; the embedded copies had fallen behind.</li>
+		<li><strong>Prerequisites.</strong> The modules a generated harness loads
+		(Test::Most, Test::Returns, Test::LectroTest) are now runtime
+		prerequisites.</li>
 	</ul>
 
 	<h2 id="earlier">Earlier releases</h2>
@@ -135,6 +184,8 @@
 				<tr><th>Version</th><th>Date</th><th>Highlights</th></tr>
 			</thead>
 			<tbody>
+				<tr><td>0.47</td><td>7 October 2026</td><td><code>extract-schemas --function NAME</code> for isolating one routine, a self-fuzz summary that lists every routine and why it was skipped, and <code>$pkg</code>, <code>$proto</code> and <code>$klass</code> recognised as invocants.</td></tr>
+				<tr><td>0.46</td><td>18 August 2026</td><td>Duplication drill-down pages, sortable and reorderable dashboard tables with saved state, and the domain, path, data-flow and transaction test suites.</td></tr>
 				<tr><td>0.45</td><td>10 August 2026</td><td>Bug fixes and test-suite work.</td></tr>
 				<tr><td>0.44</td><td>21 July 2026</td><td>Schema extraction and dashboard refinements.</td></tr>
 				<tr><td>0.43</td><td>11 July 2026</td><td>The version required by <code>t/fuzz.t</code>'s <code>Test::Needs</code> guard.</td></tr>
@@ -157,7 +208,7 @@
 <pre><code>cpanm App::Test::Generator
 </code></pre>
 	<p>
-		Schemas are compatible across releases: a schema that works with 0.47 has
+		Schemas are compatible across releases: a schema that works with 0.49 has
 		worked since the transform syntax settled. Generated harnesses are
 		regenerated by tooling, so a stale one is replaced rather than migrated.
 		If you keep generated <code>.t</code> files in version control, regenerate
@@ -174,7 +225,7 @@
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

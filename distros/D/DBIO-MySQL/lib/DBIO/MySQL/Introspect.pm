@@ -4,7 +4,7 @@ package DBIO::MySQL::Introspect;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Introspect::Base';
 
@@ -69,7 +69,7 @@ DBIO::MySQL::Introspect - Introspect a MySQL/MariaDB database via information_sc
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

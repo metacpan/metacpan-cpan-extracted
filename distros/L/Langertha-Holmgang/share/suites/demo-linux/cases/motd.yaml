@@ -1,0 +1,30 @@
+id: motd
+title: Announce the maintenance window
+difficulty: leicht
+messages:
+  - role: user
+    content: "On web-1, make /etc/motd say: Maintenance Saturday 06:00."
+state:
+  web-1:
+    type: linux
+    files:
+      /etc/motd: "Welcome.\n"
+rules:
+  - title: motd announces the window
+    state: [web-1, files, /etc/motd, content]
+    regex: "Maintenance Saturday 06:00"
+  - title: nothing else changed
+    unchanged_except: [ [web-1, files, /etc/motd] ]
+solution:
+  - tool: write_file
+    args: { host: web-1, path: /etc/motd, content: "Maintenance Saturday 06:00.\n" }
+alternatives:
+  - title: echo into the file
+    calls:
+      - tool: run_command
+        args: { host: web-1, command: "echo 'Maintenance Saturday 06:00.' > /etc/motd" }
+wrong_solutions:
+  - title: wrote the wrong file
+    calls:
+      - tool: write_file
+        args: { host: web-1, path: /etc/issue, content: "Maintenance Saturday 06:00.\n" }

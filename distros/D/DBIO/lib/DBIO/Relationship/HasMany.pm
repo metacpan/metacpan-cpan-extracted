@@ -4,7 +4,7 @@ package DBIO::Relationship::HasMany;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Try::Tiny;
 use namespace::clean;
@@ -69,7 +69,7 @@ DBIO::Relationship::HasMany - Declare a one-to-many relationship
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 METHODS
 

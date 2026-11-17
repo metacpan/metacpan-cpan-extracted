@@ -65,7 +65,7 @@ sub create_table {
   is_deeply statements($with, $without), [
     'ALTER TABLE `book` DROP FOREIGN KEY `book_ibfk_1`;',
     'DROP INDEX `author_id` ON `book`;',
-  ], 'k94: the constraint is dropped before the index the server made for it';
+  ], 'the constraint is dropped before the index the server made for it';
 
   my $none = model(other => [ ['id'] ]);
   is_deeply statements(
@@ -76,13 +76,13 @@ sub create_table {
     'ALTER TABLE `book` DROP FOREIGN KEY `book_ibfk_1`;',
     'DROP TABLE `author`;',
     'DROP TABLE `book`;',
-  ], 'k94: both tables leave: the constraint of the referencing one is dropped before either DROP TABLE';
+  ], 'both tables leave: the constraint of the referencing one is dropped before either DROP TABLE';
 
   is_deeply statements($with, model(book => [ [qw(id author_id)] ])), [
     'ALTER TABLE `book` DROP FOREIGN KEY `book_ibfk_1`;',
     'DROP TABLE `author`;',
     'DROP INDEX `author_id` ON `book`;',
-  ], 'k94: the referenced table leaves, the referencing one stays: constraint, table, index';
+  ], 'the referenced table leaves, the referencing one stays: constraint, table, index';
 
   is_deeply statements(
     model(%author, book => [ [qw(id author_id)], { $key->(author_id => 0, 'author_id') },
@@ -119,7 +119,7 @@ sub create_table {
     'CREATE INDEX `parent_code` ON `child` (`parent_code`) USING BTREE;',
     'CREATE UNIQUE INDEX `uniq_code` ON `parent` (`code`) USING BTREE;',
     'ALTER TABLE `child` ADD CONSTRAINT `child_ibfk_1` FOREIGN KEY (`parent_code`) REFERENCES `parent`(`code`);',
-  ], 'k81 1: parent and child are new: the unique key is created, and the constraint is added after it';
+  ], 'parent and child are new: the unique key is created, and the constraint is added after it';
 
   # The parent already there with the key: nothing to wait for on the parent
   # side. The child has no index of its own over parent_code here -- one the
@@ -149,7 +149,7 @@ sub create_table {
     create_table(child => '`id` int(11) NOT NULL', '`parent_id` int(11) NOT NULL', 'PRIMARY KEY (`id`)'),
     'CREATE INDEX `parent_id` ON `child` (`parent_id`) USING BTREE;',
     'ALTER TABLE `child` ADD CONSTRAINT `child_ibfk_1` FOREIGN KEY (`parent_id`) REFERENCES `parent`(`id`);',
-  ], 'k92: the child has an index over the column of the constraint: the index first, then the constraint';
+  ], 'the child has an index over the column of the constraint: the index first, then the constraint';
 }
 
 # --- k81 2: an index a foreign key that stays needs is not dropped before its replacement ---
@@ -163,7 +163,7 @@ sub create_table {
   )), [
     'CREATE UNIQUE INDEX `uniq_pair` ON `parent` (`code`, `region`) USING BTREE;',
     'DROP INDEX `uniq_code` ON `parent`;',
-  ], 'k81 2: another name: the replacement is created before the drop';
+  ], 'another name: the replacement is created before the drop';
 
   is_deeply statements($from, model(
     parent => [ [qw(id code region)], { $key->(uniq_code => 1, 'code', 'region') } ], child => $child,
@@ -209,7 +209,7 @@ sub create_table {
   )); 1 }, '... and where no index takes its place the diff dies, writing no statement the server would refuse';
   like $@, qr/index uniq_code on parent is dropped.*no index of this diff takes its place/s,
     '... and says which index and why';
-  isa_ok $@, 'DBIO::Exception', '... the error (karr k106)';
+  isa_ok $@, 'DBIO::Exception', '... the error';
 }
 
 done_testing;

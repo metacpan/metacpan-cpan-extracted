@@ -1,5 +1,11 @@
 Revision history for Linux-Epoll
 
+0.020     2026-11-16 19:12:46+01:00 Europe/Brussels
+          - Don't leave freed globs in stash
+          - When subclassing create the glob in the subclass
+          - Use Signal typemap
+          - Refcount the backrefs array
+
 0.019     2024-01-27 21:10:55+01:00 Europe/Brussels
          - Fix compiler warnings in XS code
 

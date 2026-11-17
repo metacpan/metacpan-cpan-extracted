@@ -171,6 +171,7 @@ t/test.ed.key
 t/test.key
 t/test5.txt
 t/textwrap.t
+t/verifier-required-tags.t
 t/verifier.t
 t/verifier_strict.t
 weaver.ini

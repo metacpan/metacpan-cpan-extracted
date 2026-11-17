@@ -169,7 +169,7 @@ my @expect_fk = (
     'DROP TABLE "parent" CASCADE CONSTRAINTS',
     'DROP SEQUENCE "parent_id_seq"',
     'DROP INDEX "keep_x_ix"',
-  ], 'tables only the source has are dropped with CASCADE CONSTRAINTS, with the sequence of the install (karr k61); the '
+  ], 'tables only the source has are dropped with CASCADE CONSTRAINTS, with the sequence of the install; the '
    . 'DROP INDEX of the table that stays follows, and none is sent for the '
    . 'indexes of the dropped tables (ORA-01418)';
 }
@@ -225,7 +225,7 @@ my @expect_fk = (
   my $changed = { %$with, foreign_keys => { %{ $with->{foreign_keys} }, item => [] } };
   is_deeply statements(DBIO::Oracle::Diff->new(source => $with, target => $changed)),
     [ q{ALTER TABLE "item" DROP CONSTRAINT "fk_item_parent_id_parent"} ],
-    'the foreign key of a table both models have, gone in the target, is dropped (karr k64, t/80)';
+    'the foreign key of a table both models have, gone in the target, is dropped (t/80)';
 }
 
 # --------------------------------------------------- 7 what the model cannot say

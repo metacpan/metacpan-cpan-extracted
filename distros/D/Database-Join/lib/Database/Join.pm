@@ -48,6 +48,11 @@ Readonly::Scalar my $MAX_PUSHDOWN_KEYS => 999;
 # Database::Abstraction's spelling of SQL IN.  It croaks on 'IN'.
 Readonly::Scalar my $DA_IN_OP => '-in';
 
+# Sentinel for outer-join keys absent from the primary: a single pre-allocated
+# [{}] shared across all keys and queries.  The inner loop copies the {} into
+# %merged immediately, so the shared hashref is never mutated.
+my $_EMPTY_PRIMARY_ROW = [{}];
+
 # Valid aggregate functions for aggregate().  Lower-cased at validation time.
 Readonly::Hash my %AGGREGATE_FNS => map { $_ => 1 } qw(sum avg min max count count_distinct);
 
@@ -67,7 +72,7 @@ Readonly::Hash my %MANDATORY_OP_SQL => (
 	contains => 'LIKE',
 );
 
-use version; our $VERSION = version->declare('0.011.2');
+use version; our $VERSION = version->declare('0.011.3');
 
 # Package-level cache for threads availability.  undef = not yet checked;
 # 1 = available; 0 = not available.  Checked lazily on the first parallel
@@ -120,7 +125,7 @@ Database::Join - Read-only combined view across two or more Database::Abstractio
 
 =head1 VERSION
 
-Version 0.011.2
+Version 0.011.3
 
 =head1 SYNOPSIS
 
@@ -1085,7 +1090,17 @@ sub new {
 				unless exists $self->{_col_db}{ $pred->{col} };
 			croak $self->_err('error_mandatory_filter_op', $j, $pred->{op})
 				unless $MANDATORY_FILTER_OPS{ $pred->{op} };
-			push @validated, { %{$pred} };   # shallow copy
+			# Shallow copy; for 'like' predicates also pre-compile the LIKE
+			# pattern into a qr// so _pass_mandatory_filters never recompiles
+			# the same regex on every row it evaluates.
+			my %p = %{$pred};
+			if ($p{op} eq 'like') {
+				my $re = join('', map {
+					$_ eq '%' ? '.*' : $_ eq '_' ? '.' : quotemeta($_)
+				} split //, $p{val});
+				$p{_re} = qr/\A$re\z/s;
+			}
+			push @validated, \%p;
 		}
 		$self->{_mandatory_filters} = \@validated;
 	}
@@ -3839,8 +3854,10 @@ sub _joined_query_array :Protected {
 	for my $key ($ob_override ? keys %key_set : sort keys %key_set) {
 		# Iterate directly over the arrayref: avoids copying primary rows into a
 		# new @base_rows array (saves P element copies per key, P = rows per key).
-		# [{}] ensures outer-join keys absent from the primary produce one merged row.
-		for my $prow (@{ $indexed[0]{$key} // [{}] }) {
+		# $_EMPTY_PRIMARY_ROW ensures outer-join keys absent from the primary
+		# produce one merged row; the shared sentinel is safe because %merged
+		# copies its contents immediately (the {} is never mutated).
+		for my $prow (@{ $indexed[0]{$key} // $_EMPTY_PRIMARY_ROW }) {
 			my %merged = %{$prow};
 
 			for my $i (1 .. $n - 1) {
@@ -4433,9 +4450,12 @@ sub _sqlite_criteria :Protected {
 	for my $i (1 .. $n - 1) {
 		my $local_jc   = $self->{_join_map}{$i} // $join_col;
 		my $has_filter = !!%{ $self->{_filters}{$i} // {} };
-		my %q          = %{ $per_db_query->[$i] };
-		delete $q{$local_jc};
-		$had_criteria[$i] = $has_filter || !!%q;
+		# O(1) arithmetic: count total keys, subtract 1 when the join-col key
+		# is present — same approach as _joined_query_array; avoids a full hash
+		# copy just to delete one key and test emptiness.
+		my $crit = $per_db_query->[$i];
+		my $own  = (keys %{$crit}) - (exists $crit->{$local_jc} ? 1 : 0);
+		$had_criteria[$i] = $has_filter || $own;
 	}
 
 	return ($per_db_query, \@per_db_full, \@had_criteria);
@@ -5269,13 +5289,8 @@ sub _pass_mandatory_filters {
 		elsif ($op eq 'gte')      { return 0 unless $rv ge $val }
 		elsif ($op eq 'contains') { return 0 unless index($rv, $val) >= 0 }
 		elsif ($op eq 'like') {
-			# Convert LIKE pattern (%=any, _=one char) to a Perl regex.
-			my $re = join('', map {
-				$_ eq '%' ? '.*'
-				: $_ eq '_' ? '.'
-				: quotemeta($_)
-			} split //, $val);
-			return 0 unless $rv =~ /\A$re\z/s;
+			# _re was pre-compiled at construction time; no per-row regex build.
+			return 0 unless $rv =~ $pred->{_re};
 		}
 	}
 	return 1;
@@ -5302,8 +5317,11 @@ sub _apply_distinct_array {
 			push @result, { map { $_ => $row->{$_} } @cols };
 		}
 	} else {
+		# Column order is constant across all rows in a merged result.
+		# Hoist the sort outside the loop: O(C log C) once instead of per-row.
+		my @col_order = @{$rows} ? sort keys %{ $rows->[0] } : ();
 		for my $row (@{$rows}) {
-			my $key = join("\0", map { ($row->{$_} // '') } sort keys %{$row});
+			my $key = join("\0", map { ($row->{$_} // '') } @col_order);
 			next if $seen{$key}++;
 			push @result, $row;
 		}

@@ -4,10 +4,13 @@ package DBIO::SQLite::Introspect::Tables;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp ();
-use DBIO::SQLite::Util qw(create_name_index create_table_name_index sql_tokens);
+use DBIO::SQLite::Util qw(
+  create_name_index create_table_name_index libsqlite_version
+  selectall_hashrefs sql_tokens
+);
 
 
 
@@ -84,7 +87,7 @@ sub _table_options {
 sub _refuse_attached_databases {
   my ($class, $dbh) = @_;
 
-  my $list = $dbh->selectall_arrayref('PRAGMA database_list', { Slice => {} });
+  my $list = selectall_hashrefs($dbh, 'PRAGMA database_list');
   my @attached =
     grep { $_ ne 'main' && $_ ne 'temp' }
     map  { $_->{name} // '' } @$list;
@@ -135,7 +138,7 @@ sub _drop_shadow_tables {
     );
   }
 
-  my $list = $dbh->selectall_arrayref('PRAGMA table_list', { Slice => {} });
+  my $list = selectall_hashrefs($dbh, 'PRAGMA table_list');
   for my $entry (@$list) {
     next unless ($entry->{schema} // '') eq 'main';
     next unless ($entry->{type}   // '') eq 'shadow';
@@ -145,18 +148,9 @@ sub _drop_shadow_tables {
   return;
 }
 
-# Returns the libsqlite version as ($string, $comparable_integer). Compared
-# numerically per component, never as text: "3.9" lt "3.37" is true as a
-# string and false as a version.
-sub _libsqlite_version {
-  my ($dbh) = @_;
-  my ($version) = $dbh->selectrow_array('SELECT sqlite_version()');
-  my @part = split /\./, ($version // '0');
-  return (
-    $version // '(unknown)',
-    ($part[0] // 0) * 1_000_000 + ($part[1] // 0) * 1_000 + ($part[2] // 0),
-  );
-}
+# The reading lives in DBIO::SQLite::Util (libsqlite_version); this name stays
+# for the callers and tests that reach it here.
+sub _libsqlite_version { libsqlite_version(@_) }
 
 1;
 
@@ -172,7 +166,7 @@ DBIO::SQLite::Introspect::Tables - Introspect SQLite tables and views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

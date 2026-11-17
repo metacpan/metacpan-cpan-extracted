@@ -46,6 +46,8 @@ use strict;
 use warnings;
 
 use Scalar::Util qw/ looks_like_number blessed /;
+use File::Spec ();
+use File::Basename ();
 use YAML::PP qw/ LoadFile /;
 
 use App::Dapper::Utils;
@@ -124,6 +126,28 @@ sub load {
     return $schema;
 }
 
+=head2 for_file
+
+Takes the source directory and a file in it, and returns the schema that
+applies to the file (from the nearest C<_schema.yml> at or above its
+directory), or nothing.
+
+=cut
+
+sub for_file {
+    my ($source, $file) = @_;
+
+    $source = File::Spec->canonpath($source);
+    my $dir = File::Basename::dirname($file);
+    while (1) {
+        my $schema_file = File::Spec->catfile($dir, '_schema.yml');
+        return load($schema_file) if -f $schema_file;
+        last if File::Spec->canonpath($dir) eq $source or $dir eq '.' or $dir eq '/';
+        $dir = File::Basename::dirname($dir);
+    }
+    return;
+}
+
 =head2 validate
 
 Takes a schema (from L</load>) and a hash of front matter, and returns a list
@@ -174,7 +198,7 @@ sub check_value {
         if ($rules->{values}) {
             my %allowed = map { $_ => 1 } @{$rules->{values}};
             for my $item (@items) {
-                push @problems, "\"$name\" has \"$item\", which is not one of: " . join(', ', @{$rules->{values}})
+                push @problems, "\"$name\" has \"" . (defined $item ? $item : '') . "\", which is not one of: " . join(', ', @{$rules->{values}})
                     unless defined $item and $allowed{$item};
             }
         }

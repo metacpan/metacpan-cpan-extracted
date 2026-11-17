@@ -1,6 +1,6 @@
 package DBIO::Firebird;
 # ABSTRACT: Firebird-specific schema management for DBIO
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use strict;
 use warnings;
@@ -30,7 +30,7 @@ DBIO::Firebird - Firebird-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

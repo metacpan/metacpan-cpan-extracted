@@ -1,0 +1,20 @@
+id: hall
+title: Light in the hall
+difficulty: leicht
+messages:
+  - { role: user, content: "Turn the light in the hall on, leave the kitchen as it is." }
+state:
+  lamps: { kitchen: { on: false }, hall: { on: false } }
+rules:
+  - { title: hall is on, state: lamps.hall.on, equals: true }
+  - { title: kitchen untouched, unchanged_except: [lamps.hall] }
+solution:
+  - { tool: set_lamp, args: { lamp: hall, on: true } }
+alternatives:
+  - title: kitchen switched off first, which it already was
+    calls:
+      - { tool: set_lamp, args: { lamp: kitchen, on: false } }
+      - { tool: set_lamp, args: { lamp: hall, on: true } }
+wrong_solutions:
+  - title: wrong room
+    calls: [ { tool: set_lamp, args: { lamp: kitchen, on: true } } ]

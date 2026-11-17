@@ -14,8 +14,7 @@ my $builder = Module::Build->new(
     'POSIX' => '0',
     'Scalar::Util' => '0',
     'Socket' => '0',
-    'Test::More' => '0',
-    'Time::HiRes' => '0'
+    'Test::More' => '0'
   },
   'configure_requires' => {
     'Module::Build' => '0.28'

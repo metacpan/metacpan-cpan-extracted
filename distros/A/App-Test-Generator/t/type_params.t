@@ -102,16 +102,16 @@ END_MODULE
 				'optional' => 1,
 				'default' => 0,
 				'type' => 'Bool',
-				'_type_checked' => 1
+				'_source' => 'validator'
 			}, 'username' => {
 				'type' => 'Str',
 				'optional' => 0,
-				'_type_checked' => 1
+				'_source' => 'validator'
 			}, 'roles' => {
 				'optional' => 1,
 				'type' => 'arrayref',
 				'element_type' => 'Str',
-				'_type_checked' => 1
+				'_source' => 'validator'
 			}
 		});
 	};

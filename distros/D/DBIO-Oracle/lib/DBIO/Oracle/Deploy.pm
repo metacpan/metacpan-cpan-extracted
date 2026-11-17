@@ -4,7 +4,7 @@ package DBIO::Oracle::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Deploy::Base::TempDatabase';
 
@@ -482,7 +482,7 @@ DBIO::Oracle::Deploy - Deploy, diff and upgrade a schema on Oracle, against a te
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -81,9 +81,9 @@ env ALIEN_INSTALL_TYPE=share  dzil test    # forced bundled build
 env ALIEN_INSTALL_TYPE=system dzil test    # forced probe; fails loudly with no system lib
 ```
 
-An unforced `dzil test` on a machine that has libgit2 proves the share build
-nothing. Share-build prerequisites: cmake, a C compiler, pkg-config, OpenSSL
-headers, libssh2 headers. Build logs and the gathered `alien.json` land in
+An unforced `dzil test` on a machine that has libgit2 proves nothing about the
+share build; on Debian it never enters the probe at all. Share-build
+prerequisites: cmake, a C compiler, pkg-config, OpenSSL headers, libssh2 headers. Build logs and the gathered `alien.json` land in
 `_alien/` — read that file first when a consumer sees flags it did not expect.
 
 `t/01-alien.t` is `alien_ok` + `ffi_ok` on `git_libgit2_init` /
@@ -98,3 +98,21 @@ and the job reports green for the path it never tested. On linux the system job
 installs the bundled 1.9.3 into `/usr/local` itself (apt cannot reach the floor);
 on macOS Homebrew's libgit2 is the real system-path coverage, guarded by a
 `pkg-config --atleast-version=1.9.3` check up front.
+
+This is not hypothetical: a job without the pin once passed as "system" on apt's
+below-floor libgit2-dev. That is why every job pins `install-type:` and every
+job you add must too.
+
+## Repo mechanics
+
+- **`.claude/` is git-ignored except for a whitelist.** The root `.gitignore` ignores
+  `.claude/*` and re-admits `settings.json`, `agents/`, `skills/`, `rules/` — a *new*
+  directory under `.claude/` therefore stays invisible to git until it is whitelisted
+  there. Verify with `git status --short` after creating one; the same applies to
+  `.claude/worktrees/`, which is ignored explicitly.
+- **Two kinds of skill live under `.claude/skills/`.** The ones `skilletor` installs
+  (`skilletor status` lists them under *project scope*) carry a `.gitignore` holding `*`
+  in their own directory — they are build artifacts, the next `skilletor sync` overwrites
+  them, and editing one is forbidden. A repo-owned skill (tracked by git, no entry in
+  `.claude/skilletor.json`) belongs to this repository: `alien-libgit2-core` is the only
+  one here, and it is the file to extend when the rules grow too long.

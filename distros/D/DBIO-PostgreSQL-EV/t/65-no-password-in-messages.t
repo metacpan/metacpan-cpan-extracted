@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 
 # OFFLINE test: no message of this transport about a connection quotes its
 # password (karr k78; core k297 for the sync side).
@@ -94,7 +97,7 @@ my @UNREADABLE = (
   [ 'the DBI form for another driver, the password in the DSN and beside it',
     [ "dbi:mysql:database=appdb;password=$SECRET", 'app', $SECRET, { Password => $SECRET } ],
     qr/a DBI-form arrayref whose DSN is not dbi:Pg:<parameters> \(DBI driver 'mysql'\)/ ],
-  [ q{DBI's Password attribute in front of the driver's name, no colon (nothing behind dbi:Pg: is read since k66)},
+  [ q{DBI's Password attribute in front of the driver's name, no colon (nothing behind dbi:Pg: is read)},
     [ "dbi:Pg(Username=>app,Password=>$SECRET)", undef, undef, {} ],
     qr/a DBI-form arrayref whose DSN is not dbi:Pg:<parameters> \(DBI driver 'Pg'\)/ ],
   [ 'a DSN with no colon behind the driver before its password',
@@ -181,7 +184,7 @@ for my $case (grep { ref $_->[1] eq 'ARRAY' } @UNREADABLE) {
 }
 
 for my $case (
-  [ q{DBI's Password attribute in front of the driver's name, no colon (nothing behind dbi:Pg: is read since k66)},
+  [ q{DBI's Password attribute in front of the driver's name, no colon (nothing behind dbi:Pg: is read)},
     [ "dbi:Pg(Username=>app,Password=>$SECRET)", undef, undef, {} ],
     qr/\(DBI driver 'Pg'\)/ ],
   [ 'a DSN with no colon behind the driver before its password',

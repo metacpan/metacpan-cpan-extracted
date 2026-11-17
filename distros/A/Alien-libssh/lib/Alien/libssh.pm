@@ -1,7 +1,7 @@
 # ABSTRACT: Find or build libssh, the SSH library
 
 package Alien::libssh;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use strict;
 use warnings;
 use parent 'Alien::Base';
@@ -20,7 +20,7 @@ Alien::libssh - Find or build libssh, the SSH library
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -47,7 +47,7 @@ L<Net::LibSSH>, L<Alien::Build>, L<Alien::Base>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-alien-libssh/issues>.
 
 =head1 CONTRIBUTING

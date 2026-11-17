@@ -4,15 +4,16 @@ package DBIO::PostgreSQL::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp 'croak';
 use Exporter 'import';
+use Scalar::Util ();
 
 our @EXPORT_OK = qw(
   quote_ident quote_qualified quote_literal quote_role quote_channel
   create_schema_if_missing trim_end
-  mask_detail_values mask_error_details
+  mask_detail_values mask_error_details error_sqlstate
   type_takes_modifier type_with_modifier
   number_placeholders
   quote_dsn_value dsn_names_target
@@ -121,6 +122,21 @@ my $MASK = '***';
 # runs to the next one or to the end of the text.
 my $FIELD_START = qr/^(?:DETAIL:  |HINT:  |CONTEXT:  |QUERY:  |LINE \d+: |STATEMENT:|LOCATION:)/m;
 
+# The same for any language of the server (lc_messages): a label is capital
+# letters, optionally a number (the statement excerpt, "LINE 1: ", "ZEILE 1: ")
+# and a space before the colon ("DETAIL :  " in French). Used only where the
+# SQLSTATE says the text may hold a value (mask_error_details).
+my $FIELD_ANY = qr/^(?:\p{Lu}+ \d+ ?: |\p{Lu}+ ?:  |STATEMENT:|LOCATION:)/m;
+
+# SQLSTATE class of the errors whose text holds a value: 22 data exception
+# (the value of a cast, a range, a literal), 23 integrity constraint violation
+# (the key or the row in DETAIL).
+sub _state_class {
+  my ($state) = @_;
+  return '' unless defined $state && !ref $state && $state =~ /\A([0-9A-Z]{2})/;
+  return $1;
+}
+
 # Where the quoted value of a primary text ends: at the end of the text, which
 # DBI may follow with the place of its caller.
 my $VALUE_END = qr/(?=(?: at \S+ line \d+\.?)?\s*\z)/;
@@ -168,29 +184,131 @@ sub _mask_key_text {
   return _readable_columns($cols) ? "($cols)=($MASK)" : $MASK;
 }
 
-# The sentences of the primary text that hold a value.
-sub _mask_primary {
+# The sentences of the primary text that hold a value, in the words of the
+# server's English. Answers the text and whether a rule found its form.
+sub _mask_primary_en {
   my ($text) = @_;
+  my $hit = 0;
 
-  $text =~ s/($_)"(.*)"$VALUE_END/$1"$MASK"/s for @SENTENCE_ENDING_IN_VALUE;
+  $hit += ($text =~ s/($_)"(.*)"$VALUE_END/$1"$MASK"/s) for @SENTENCE_ENDING_IN_VALUE;
 
-  $text =~ s/(\bvalue )"(.*)"( is out of range for type )/$1"$MASK"$3/s;
-  $text =~ s/(\binvalid value )"(.*)"( for ")/$1"$MASK"$3/s;
-  $text =~ s/(?<!\w)"(.*)"( is not a valid (?:binary|hexadecimal) digit)/"$MASK"$2/s;
-  $text =~ s/(\btime zone )"(.*)"( not recognized)/$1"$MASK"$3/s;
-  $text =~ s/(\bsyntax error at or near )"(.*)"( of jsonpath input)/$1"$MASK"$3/s;
+  $hit += ($text =~ s/(\bvalue )"(.*)"( is out of range for type )/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(\binvalid value )"(.*)"( for ")/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(?<!\w)"(.*)"( is not a valid (?:binary|hexadecimal) digit)/"$MASK"$2/s);
+  $hit += ($text =~ s/(\btime zone )"(.*)"( not recognized)/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(\bsyntax error at or near )"(.*)"( of jsonpath input)/$1"$MASK"$3/s);
 
   # invalid byte sequence for encoding "UTF8": 0xc3 0x28
   # character with byte sequence 0xe2 0x82 in encoding "UTF8" has no equivalent ...
-  $text =~ s/(\bbyte sequence for encoding "[^"\n]*": )0x[0-9A-Fa-f]{2}(?: 0x[0-9A-Fa-f]{2})*/$1$MASK/g;
-  $text =~ s/(\bbyte sequence )0x[0-9A-Fa-f]{2}(?: 0x[0-9A-Fa-f]{2})*/$1$MASK/g;
+  $hit += ($text =~ s/(\bbyte sequence for encoding "[^"\n]*": )0x[0-9A-Fa-f]{2}(?: 0x[0-9A-Fa-f]{2})*/$1$MASK/g);
+  $hit += ($text =~ s/(\bbyte sequence )0x[0-9A-Fa-f]{2}(?: 0x[0-9A-Fa-f]{2})*/$1$MASK/g);
 
+  return ($text, $hit);
+}
+
+# The pairs of marks a message of any language quotes a value in: the opening
+# and the closing one.
+my @QUOTE_PAIRS = (
+  [ '"', '"' ],
+  [ "\x{BB}", "\x{AB}" ],         # German
+  [ "\x{AB}", "\x{BB}" ],         # French
+  [ "\x{201E}", "\x{201C}" ],
+  [ "\x{201C}", "\x{201D}" ],
+  [ "\x{300C}", "\x{300D}" ],
+);
+my $QUOTE_CHARS = qr/["\x{AB}\x{BB}\x{201C}\x{201D}\x{201E}\x{300C}\x{300D}]/;
+my $PAD = qr/[\s\x{A0}\x{202F}]*/;
+
+# The text with the span from the first opening mark to the last closing mark
+# replaced by the mark, *** and the mark (the padding a language puts inside
+# its marks stays). Without a span the text, undef as the second answer.
+sub _mask_quoted_span {
+  my ($text) = @_;
+  my ($best_start, $pair);
+  my $best_end;
+  for my $p (@QUOTE_PAIRS) {
+    my ($o, $c) = @$p;
+    my $start = index($text, $o);
+    next if $start < 0;
+    my $end = rindex($text, $c);
+    next if $end <= $start;
+    ($best_start, $best_end, $pair) = ($start, $end, $p)
+      if !defined $best_start || $start < $best_start;
+  }
+  return ($text, undef) unless defined $best_start;
+  my ($o, $c) = @$pair;
+  my $inner = substr($text, $best_start + length $o, $best_end - $best_start - length $o);
+  my ($pre) = $inner =~ /\A($PAD)/;
+  my ($post) = $inner =~ /($PAD)\z/;
+  substr($text, $best_start, $best_end + length($c) - $best_start) = $o . $pre . $MASK . $post . $c;
+  return ($text, 1);
+}
+
+# The primary text of a server that does not speak English: what stands
+# between the marks it quotes a value in; else what stands after the last colon.
+# The place DBI adds behind the text is no part of it.
+sub _mask_primary_foreign {
+  my ($text) = @_;
+  my $tail = '';
+  ($text, $tail) = ($1, $2) if $text =~ /\A(.*?)((?: at \S+ line \d+\.?)?\s*)\z/s;
+
+  my ($masked, $span) = _mask_quoted_span($text);
+  return $masked . $tail if $span;
+
+  # the prefix of DBI and the severity label hold colons of their own
+  my ($head, $rest) = ('', $text);
+  ($head, $rest) = ($1, $2) if $text =~ /\A((?:DBD::\w+::\w+ \w+ failed: )?(?:\p{Lu}+ ?:  )?)(.*)\z/s;
+  if ($rest =~ /\A(.*[:\x{FF1A}]$PAD)(.+)\z/s && $2 ne $MASK) {
+    return $head . $1 . $MASK . $tail;
+  }
+  return $text . $tail;
+}
+
+sub _mask_primary {
+  my ($text, $state) = @_;
+  my ($masked, $hit) = _mask_primary_en($text);
+
+  # An invalid or untranslatable byte sequence (22021, 22P05): the bytes go in
+  # any language, the name of the encoding stays.
+  if (!$hit && defined $state && $state =~ /\A22(?:021|P05)\z/) {
+    $hit += ($masked =~ s/\b0x[0-9A-Fa-f]{2}(?: 0x[0-9A-Fa-f]{2})*/$MASK/g);
+  }
+
+  $masked = _mask_primary_foreign($masked)
+    if !$hit && _state_class($state) eq '22';
+  return $masked;
+}
+
+# A text that arrives as UTF-8 bytes (no utf8 flag) is masked as characters, so
+# that no mark or padding character is cut through; the answer is bytes again.
+# A text that is a string already, or is no UTF-8, goes to the code as it is.
+sub _as_characters {
+  my ($text, $code) = @_;
+  if (!utf8::is_utf8($text) && $text =~ /[\x80-\xFF]/) {
+    my $chars = $text;
+    if (utf8::decode($chars)) {
+      my $masked = $code->($chars);
+      utf8::encode($masked);
+      return $masked;
+    }
+  }
+  return $code->($text);
+}
+
+# The parameters of a portal ($1 = 'a''b') stand in the same words in every
+# language, in a field of any label.
+sub _mask_portal_parameters {
+  my ($text) = @_;
+  $text =~ s/(\$\d+ = )'(?:[^']|'')*'/$1'$MASK'/g;
   return $text;
 }
 
-# The lines of the context that hold a value.
+# The lines of the context that hold a value. With $state (a SQLSTATE of
+# class 22 or 23: a value may stand in the text) a line of the form
+# "words 1: rest" that no rule knows is a line of the server in another
+# language -- JSON data, line 1: {"a":x... -- and keeps its words, the rest is ***.
 sub _mask_context {
-  my ($text) = @_;
+  my ($text, $state) = @_;
 
   # JSON data, line 1: {"a":x...
   $text =~ s/(\bJSON data, line \d+: )[^\n]*/$1$MASK/g;
@@ -199,52 +317,152 @@ sub _mask_context {
   $text =~ s/(\bCOPY [^\n,]+, line \d+(?:, column [^:\n]+)?: )"(.*)"/$1"$MASK"/s;
 
   # unnamed portal with parameters: $1 = 'a''b', $2 = NULL
-  $text =~ s/(\$\d+ = )'(?:[^']|'')*'/$1'$MASK'/g;
+  $text = _mask_portal_parameters($text);
+
+  if (_state_class($state) =~ /\A2[23]\z/) {
+    my ($label, $body) = $text =~ /\A(\p{Lu}+ ?:  )(.*)\z/s ? ($1, $2) : ('', $text);
+    $body =~ s/^([^:\n]*\d[^:\n]*: )(.+)$/index($2, $MASK) >= 0 ? "$1$2" : "$1$MASK"/gme;
+    $text = $label . $body;
+  }
 
   return $text;
 }
 
 
 sub mask_detail_values {
-  my ($text) = @_;
+  my ($text, $state) = @_;
   return $text unless defined $text;
+  return _as_characters($text, sub { _mask_detail_values($_[0], $state) });
+}
 
+sub _mask_detail_values {
+  my ($text, $state) = @_;
+
+  my $hit = 0;
   my $tail = qr/ (?:already exists|is duplicated|is not present in table|is still referenced from table|conflicts with existing key)/;
-  unless ($text =~ s/\bKey (\(.*\)=\(.*\))(?=$tail)/'Key ' . _mask_key_text($1)/se) {
-    $text =~ s/\bKey (\(.*\)=\(.*\))(?=[^)]*\z)/'Key ' . _mask_key_text($1)/se;
-  }
-  $text =~ s/(\bconflicts with existing key )(\(.*\)=\(.*\))(?=[^)]*\z)/$1 . _mask_key_text($2)/se;
+  my $key = $text =~ s/\bKey (\(.*\)=\(.*\))(?=$tail)/'Key ' . _mask_key_text($1)/se;
+  $key ||= $text =~ s/\bKey (\(.*\)=\(.*\))(?=[^)]*\z)/'Key ' . _mask_key_text($1)/se;
+  $hit += $key;
+  $hit += ($text =~ s/(\bconflicts with existing key )(\(.*\)=\(.*\))(?=[^)]*\z)/$1 . _mask_key_text($2)/se);
 
-  $text =~ s/(\bFailing row contains \().*\)/$1$MASK)/s;
-  $text =~ s/(\bPartition key of the failing row contains \([^=]*?\) = \().*\)/$1$MASK)/s;
+  $hit += ($text =~ s/(\bFailing row contains \().*\)/$1$MASK)/s);
+  $hit += ($text =~ s/(\bPartition key of the failing row contains \([^=]*?\) = \().*\)/$1$MASK)/s);
 
-  $text =~ s/(\bToken )"(.*)"( is invalid\.)/$1"$MASK"$3/s;
-  $text =~ s/(, but found )"(.*)"(\.?)/$1"$MASK"$3/s;
-  $text =~ s/(\bEscape sequence )"(.*)"( is invalid\.)/$1"$MASK"$3/s;
-  $text =~ s/(\bUnexpected )"(.*)"( character\.)/$1"$MASK"$3/s;
-  $text =~ s/(\bCharacter with value )0x[0-9A-Fa-f]+/$1$MASK/g;
+  $hit += ($text =~ s/(\bToken )"(.*)"( is invalid\.)/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(, but found )"(.*)"(\.?)/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(\bEscape sequence )"(.*)"( is invalid\.)/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(\bUnexpected )"(.*)"( character\.)/$1"$MASK"$3/s);
+  $hit += ($text =~ s/(\bCharacter with value )0x[0-9A-Fa-f]+/$1$MASK/g);
 
-  $text =~ s/((?:\A|\bDETAIL:  )line \d+: ).*?(\n?)\z/$1$MASK$2/s;
+  $hit += ($text =~ s/((?:\A|\bDETAIL:  )line \d+: ).*?(\n?)\z/$1$MASK$2/s);
+
+  $text = _mask_detail_foreign($text)
+    if !$hit && _state_class($state) =~ /\A2[23]\z/;
 
   return $text;
 }
 
+# The detail of a server that does not speak English (or the form of which no
+# rule above knows), for an error whose SQLSTATE says the text holds a value.
+# What is kept is what stands outside of the value: the label, the words, the
+# columns of a key. The text goes whole when it cannot be told where the value
+# ends.
+sub _mask_detail_foreign {
+  my ($text) = @_;
+
+  my ($label, $body) = $text =~ /\A(\p{Lu}+ ?:  )(.*)\z/s ? ($1, $2) : ('', $text);
+  my $trail = '';
+  ($body, $trail) = ($1, $2) if $body =~ /\A(.*?)(\s*)\z/s;
+
+  my $first = index($body, '(');
+  my $last  = rindex($body, ')');
+  my $bracketed = $first >= 0 && $last > $first;
+
+  if ($bracketed) {
+    # Schluessel (cols)=(value) ... / Failing row contains (a, b, c)
+    my $span = substr($body, $first, $last - $first + 1);
+    my $masked = $span =~ /\)=\(/ ? _mask_key_text($span) : "($MASK)";
+    substr($body, $first, $last - $first + 1) = $masked;
+  }
+  else {
+    ($body) = _mask_quoted_span($body);
+  }
+
+  # what is left of a value: a bracket or a mark that no mask above covers
+  my $left = $body;
+  $left =~ s/\([^=]*?\)=\(\Q$MASK\E\)//g;
+  $left =~ s/\(\Q$MASK\E\)//g;
+  $left =~ s/($QUOTE_CHARS)$PAD\Q$MASK\E$PAD$QUOTE_CHARS//g unless $bracketed;
+  $body = $MASK if $left =~ /[()]/ || (!$bracketed && $left =~ $QUOTE_CHARS);
+
+  return $label . $body . $trail;
+}
+
 
 sub mask_error_details {
-  my ($message) = @_;
+  my ($message, $state) = @_;
   return $message unless defined $message && length $message;
+  return _as_characters($message, sub { _mask_error_details($_[0], $state) });
+}
+
+sub _mask_error_details {
+  my ($message, $state) = @_;
 
   my $tail = '';
   ($message, $tail) = ($1, $2) if $message =~ /\A(.*)(\s\[for Statement\b.*)\z/s;
 
-  my @fields = split /(?=$FIELD_START)/, $message;
+  # With a SQLSTATE of class 22 or 23 the labels of any language start a field
+  # A message with the severity label in English (the server reports in English,
+  # or has no catalog for its language) is read by the English rules alone: a
+  # sentence they do not know is no sentence of another language.
+  my $gated = _state_class($state) =~ /\A2[23]\z/
+    && $message !~ /\A(?:[^\n]*?\bfailed: )?(?:ERROR|FATAL|PANIC|WARNING|NOTICE|INFO|LOG):  /;
+  $state = undef unless $gated;
+  my $labels = $gated ? $FIELD_ANY : $FIELD_START;
+  my @fields = split /(?=$labels)/, $message;
+  my $n = 0;
   for my $field (@fields) {
-    if    ($field =~ /\ADETAIL:  /)  { $field = mask_detail_values($field) }
-    elsif ($field =~ /\ACONTEXT:  /) { $field = _mask_context($field) }
+    my $first = !$n++;
+    if    ($field =~ /\ADETAIL:  /)  { $field = mask_detail_values($field, $state) }
+    elsif ($field =~ /\ACONTEXT:  /) { $field = _mask_context($field, $state) }
     elsif ($field =~ $FIELD_START)   { }
-    else                             { $field = _mask_primary($field) }
+    elsif ($first)                   { $field = _mask_primary($field, $state) }
+    elsif ($field =~ /\A(?:\p{Lu}+ \d+ ?: |STATEMENT:|LOCATION:)/) { }
+    else                             { $field = _mask_foreign_field($field, $state) }
+    $field = _mask_portal_parameters($field)
+      if $gated && $field !~ /\A(?:\p{Lu}+ \d+ ?: |STATEMENT:|LOCATION:|QUERY:)/;
   }
   return join('', @fields) . $tail;
+}
+
+# A field with a label this module does not know, in a text whose SQLSTATE says
+# it may hold a value: a translated context is read as one, anything else as a
+# detail.
+sub _mask_foreign_field {
+  my ($field, $state) = @_;
+  my $body = $field =~ /\A\p{Lu}+ ?:  (.*)\z/s ? $1 : $field;
+  return $body !~ /\)=\(/
+      && ($body =~ /\$\d+ = '/ || $body =~ /^[^:\n]*\d[^:\n]*: /m)
+    ? _mask_context($field, $state)
+    : mask_detail_values($field, $state);
+}
+
+
+sub error_sqlstate {
+  my ($h) = @_;
+  return undef unless Scalar::Util::blessed($h);
+
+  my $dbh = eval { ($h->{Type} // '') eq 'st' ? $h->{Database} : $h };
+  return undef unless Scalar::Util::blessed($dbh);
+
+  for my $read (
+    sub { $dbh->state },
+    sub { $dbh->pg_error_field('sqlstate') },
+  ) {
+    my $state = eval { $read->() };
+    return $state if defined $state && !ref $state && length $state && $state ne '00000';
+  }
+  return undef;
 }
 
 
@@ -521,7 +739,7 @@ DBIO::PostgreSQL::Util - Shared PostgreSQL-specific helper functions for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -692,6 +910,21 @@ masked whole, C<Key *** already exists.>. A libxml detail (C<line N: ...>) is
 masked after its line number, it repeats the input. A text without any of
 these forms is returned as it is.
 
+The forms above are the words of the server's English. A server that reports
+in another language (C<lc_messages>) writes the same detail in its own words
+(C<SchlE<0xFC>ssel E<0xBB>(name)=(ab)E<0xAB> existiert bereits.>), so the masking cannot hang at
+the wording. With the SQLSTATE of the error as the second argument
+(C<mask_detail_values($text, $sqlstate)>, L</error_sqlstate>), a detail of
+class 22 (data exception) or 23 (integrity constraint violation) that none of
+the forms above read is masked by what holds in every language: the
+C<(columns)=(value)> of a key (the columns stay where they are readable), a
+bracket C<(value, value)> of a row, and what stands between the marks a
+language quotes a value in (C<"...">, C<E<0xBB>...E<0xAB>>, C<E<0xAB> ... E<0xBB>>, C<E<0x201E>...E<0x201C>>,
+C<E<0x201C>...E<0x201D>>, C<E<0x300C>...E<0x300D>>; the blanks inside them stay). A detail that has a bracket
+or a mark left over once masked is not told from its value: the whole text,
+its label kept, is C<***>. Without the state, and for a state of another
+class, only the forms above are read.
+
 =head2 mask_error_details
 
   my $message = mask_error_details($message);
@@ -722,6 +955,41 @@ excerpt of the statement, its caret line, the hint, the query and the position
 fields are the statement's text and stay as they are, as does a text of no
 known form, and the names of a relation, a column, a function or a constraint.
 Each rule gives the same text when it is applied to its own result.
+
+The rules above are the server's English. The message of a server that reports
+in another language (C<lc_messages>) quotes its values in its own words, so
+with the SQLSTATE of the error as the second argument
+(C<mask_error_details($message, $sqlstate)>, L</error_sqlstate>) the masking
+holds on what is the same in every language and not on the wording. For class
+22 (data exception) a primary text that no rule above read has the span from
+its first quoting mark to its last (C<"...">, C<E<0xBB>...E<0xAB>>, C<E<0xAB> ... E<0xBB>>, C<E<0x201E>...E<0x201C>>,
+C<E<0x201C>...E<0x201D>>, C<E<0x300C>...E<0x300D>>; the blanks inside the marks stay) replaced by C<***>, the
+marks kept (C<ungE<0xFC>ltige Eingabesyntax fE<0xFC>r Typ integer: E<0xBB>***E<0xAB>>), else what
+follows its last colon. For class 22 and 23 a detail that no rule above read
+is L</mask_detail_values>' second stage, and the parameters of a portal
+(C<$1 = '***'>) are masked in any field but the statement's. A label of any
+language starts a field (capital letters, C<ZEILE 1: >, C<DE<0xC9>TAIL :  >): one
+with a number is the statement excerpt and stays; a known English label is read
+as before; another one is a context where it holds a line C<words 1: rest>
+(C<JSON-Daten, Zeile 1: ***>) or a portal parameter, else a detail. The second
+stage runs only on a field where the English rules found nothing, and not at
+all in a message whose severity label is English (C<ERROR:  >): a sentence of
+an English server that no rule knows holds no value of its own. Without the
+state, and for a state of another class, the message is read as described
+above, English only.
+
+=head2 error_sqlstate
+
+  my $state = error_sqlstate($dbh);    # 23505, or undef
+
+The SQLSTATE of the error that just happened on a database handle, which
+L</mask_error_details> and L</mask_detail_values> take as their second
+argument. The handle is a DBD::Pg database handle, or a statement handle (its
+C<Database> is read). The state is the handle's C<state>, which DBI gives in
+every language of the server and keeps through the call; where that is empty,
+DBD::Pg's C<pg_error_field('sqlstate')> (it clears the error DBI holds, which
+is why it is asked second). C<undef> where there is none: no handle, an empty
+state, C<00000>.
 
 =head2 quote_role
 

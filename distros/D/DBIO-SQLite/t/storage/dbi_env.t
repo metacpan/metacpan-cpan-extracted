@@ -54,7 +54,7 @@ SKIP: {
 
 $schema = declared("dbi::$dbname");
 throws_ok { count_sheep($schema) } qr{DSN without a driver part},
-    'Driver in DSN empty is refused (core karr k340)';
+    'Driver in DSN empty is refused';
 isa_ok $schema->storage, 'DBIO::SQLite::Storage';
 
 SKIP: {

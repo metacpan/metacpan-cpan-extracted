@@ -1,5 +1,53 @@
 Revision history for DBIO-PostgreSQL-EV
 
+0.900007  2026-11-17
+
+    * Requirements
+        - Requires EV 4.15, whose EV::run returns whether watchers are still
+          active; the blocking wait reads it to tell a loop with nothing left
+          from one that ran.
+        - Requires EV::Pg 0.09, with no upper bound: it guards a forked
+          child's copy of a connection itself, clears error_fields when a
+          connection is lost, and gives a nested loop's wait its own result.
+          The documentation states what was measured with it.
+
+    * Fixes
+        - The listen reconnect backoff waits the requested time from the
+          call, also after long work during which the event loop did not
+          run; it no longer starts already (partly) elapsed.
+        - The guarded-wait test skips where Time::HiRes::alarm is not
+          implemented (no alarm in fractions of a second), reads the time
+          left on the alarm also where perl's alarm is kept apart from
+          Time::HiRes's (Solaris) or answers a fired timer with a negative
+          time (Cygwin), and skips its fork cases on a perl without fork.
+        - A server error masks the values it quotes in the language the
+          server reports in (lc_messages), not only in English: the
+          SQLSTATE of the error goes to the masking of the message and of
+          the detail field, so a German or French unique violation, input
+          syntax error or failing row names no value. A text that is not
+          the server's has no SQLSTATE and is masked by the English forms.
+        - The test suite compiles under Perl 5.20.
+
+    * Tests
+        - The tests that check libpq's own wording run in every locale: they
+          set the message locale to C, because libpq translates its messages.
+        - The live tests can run against a server that reports in German or
+          French (DBIO_TEST_SERVER_LANGUAGE=de or fr); the tests that read
+          the server's English wording set lc_messages to C in their own
+          session. A new live test holds that no value is in an error text
+          under de_DE.UTF-8 and fr_FR.UTF-8.
+        - The test helpers and tests run on Windows: LibpqCLocale sets the
+          language to C through the environment also without
+          POSIX::LC_MESSAGES, live files without a DSN skip there, and the
+          tests start child perls without a shell and without double quotes
+          in their arguments and read their CRLF output.
+
+    * Documentation
+        - The dbio-postgresql-ev skill keeps its connect-info rules and the
+          callback and pool pattern in references, points to the async
+          transport reference of dbio-driver-development for the
+          LISTEN/NOTIFY seam obligations, and names the guarded-wait skip.
+
 0.900004  2026-11-08
     * Connect info
         - Connect info is read in one place, in every form the owning sync

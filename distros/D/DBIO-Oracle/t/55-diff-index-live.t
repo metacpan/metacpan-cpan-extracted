@@ -256,7 +256,7 @@ sub snapshot {
   for my $row (@{ server_rows(qq{
     SELECT table_name, column_name, data_type, char_length, nullable
     FROM user_tab_columns WHERE UPPER(table_name) $OWN
-    ORDER BY table_name, column_id
+    ORDER BY NLSSORT(table_name, 'NLS_SORT=BINARY'), column_id
   }) }) {
     my ($table, $column, $type, $chars, $nullable) = @$row;
     push @tables, $table unless $columns{$table};
@@ -271,7 +271,7 @@ sub snapshot {
     FROM user_constraints c
     JOIN user_cons_columns cc ON cc.constraint_name = c.constraint_name
     WHERE c.constraint_type IN ('P', 'U', 'R') AND UPPER(c.table_name) $OWN
-    ORDER BY c.table_name, c.constraint_type, c.constraint_name, cc.position
+    ORDER BY NLSSORT(c.table_name, 'NLS_SORT=BINARY'), c.constraint_type, NLSSORT(c.constraint_name, 'NLS_SORT=BINARY'), cc.position
   }) }) {
     my ($type, $table, $name, $column, $generated) = @$row;
     $name = '(system)' if $generated eq 'GENERATED NAME';
@@ -288,7 +288,7 @@ sub snapshot {
     FROM user_indexes i
     JOIN user_ind_columns c ON c.index_name = i.index_name
     WHERE UPPER(i.table_name) $OWN
-    ORDER BY i.index_name, c.column_position
+    ORDER BY NLSSORT(i.index_name, 'NLS_SORT=BINARY'), c.column_position
   }) }) {
     my ($table, $name, $uniqueness, $column, $generated) = @$row;
     $name = '(system)' if $generated eq 'Y';
@@ -300,12 +300,12 @@ sub snapshot {
 
   push @is, map { "SEQUENCE $_->[0]" } @{ server_rows(qq{
     SELECT sequence_name FROM user_sequences
-    WHERE UPPER(sequence_name) $OWN ORDER BY sequence_name
+    WHERE UPPER(sequence_name) $OWN ORDER BY NLSSORT(sequence_name, 'NLS_SORT=BINARY')
   }) };
 
   push @is, map { "TRIGGER $_->[0] ON $_->[1]" } @{ server_rows(qq{
     SELECT trigger_name, table_name FROM user_triggers
-    WHERE UPPER(table_name) $OWN ORDER BY trigger_name
+    WHERE UPPER(table_name) $OWN ORDER BY NLSSORT(trigger_name, 'NLS_SORT=BINARY')
   }) };
 
   return \@is;
@@ -320,7 +320,7 @@ sub normal { [ sort @{ snapshot() } ] }
 sub in_recycle_bin {
   return server_rows(qq{
     SELECT type, original_name, object_name FROM user_recyclebin
-    WHERE UPPER(original_name) $OWN ORDER BY type, original_name
+    WHERE UPPER(original_name) $OWN ORDER BY type, NLSSORT(original_name, 'NLS_SORT=BINARY')
   });
 }
 
@@ -503,11 +503,11 @@ make(@INDEXES);
     'DROP SEQUENCE "K37_LIVE_ITEM_SEQ" -- ok',
     'DROP TABLE "K37_LIVE_PARENT" CASCADE CONSTRAINTS -- ok',
   ], 'IS: ... and Oracle takes the statements, the sequence of the item '
-   . 'table too (karr k61)';
+   . 'table too';
 
   is_deeply snapshot(), [],
     'IS: the tables are gone with their indexes, keys and trigger, and the '
-  . 'sequence with them: the diff dropped it (karr k61)';
+  . 'sequence with them: the diff dropped it';
 
   # What walking the dropped tables too (scope "all" of
   # DBIO::Diff::Op::diff_nested as it stands, the way another driver
@@ -550,7 +550,7 @@ wipe();
   );
 
   my $diff = eval { $deploy->diff };
-  is "$@", '', 'DBIO::Oracle::Deploy->diff runs (karr k36)';
+  is "$@", '', 'DBIO::Oracle::Deploy->diff runs';
   ok $diff && !$diff->has_changes, '... and finds nothing between two empty schemas';
 
   my $upgraded = eval { $deploy->upgrade };
@@ -628,7 +628,7 @@ wipe();
   ], 'IS: B -> A drops both tables and the sequence, and Oracle takes the statements';
 
   is_deeply snapshot(), [],
-    'IS: ... nothing of the dropped tables stays, the sequence neither (karr k61)';
+    'IS: ... nothing of the dropped tables stays, the sequence neither';
 }
 
 # ===================================================================== 5

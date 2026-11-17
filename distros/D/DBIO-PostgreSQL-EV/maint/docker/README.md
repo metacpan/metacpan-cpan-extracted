@@ -100,7 +100,7 @@ doesn't have to.
 
 ## cpanfile
 
-`cpanfile` pins `EV::Pg >= 0.02, < 0.08` (karr k16). Hosts on libpq 15
+`cpanfile` pins `EV::Pg >= 0.09` (karr k16). Hosts on libpq 15
 (Debian 12 default) should run this image; libpq 16+ hosts can install
 straight from cpanfile.
 

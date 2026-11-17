@@ -4,7 +4,7 @@ package DBIO::MySQL::Introspect::ForeignKeys;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Introspect::Base ();
 use DBIO::MySQL::Introspect::Util ();
@@ -99,7 +99,7 @@ DBIO::MySQL::Introspect::ForeignKeys - Introspect MySQL/MariaDB foreign keys
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

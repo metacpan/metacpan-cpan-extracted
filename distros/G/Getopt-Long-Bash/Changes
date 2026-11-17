@@ -1,5 +1,12 @@
 Revision history for Getopt-Long-Bash
 
+1.3.0 2026-11-17T01:41:41Z
+
+    - An option which takes an optional argument (?) can have an
+      initial value, which was an error.  It is the default: the
+      variable has it when the option is not specified, and --no-
+      unsets the variable
+
 1.2.0 2026-11-16T09:05:11Z
 
     - --no- with an option which takes an optional argument (?) unsets

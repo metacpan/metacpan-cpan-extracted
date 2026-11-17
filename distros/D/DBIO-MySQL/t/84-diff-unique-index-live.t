@@ -111,7 +111,11 @@ sub schema_version {
   }
   # Every connection of the schema works in this test's database, whatever
   # the DSN names.
-  return $ns->connect($dsn, $user, $pass, { on_connect_do => ["USE `$DB`"] });
+  # MySQL reports in the language of the session, and is_refused reads the
+  # English "Duplicate entry".
+  return $ns->connect($dsn, $user, $pass, {
+    on_connect_do => ["USE `$DB`", "SET SESSION lc_messages = 'en_US'"],
+  });
 }
 
 sub account {

@@ -21,7 +21,7 @@ use InternetData::Error;
 use InternetData::Oauth;
 use InternetData::Result;
 
-our $VERSION = '1.15.0';
+our $VERSION = '1.16.0';
 our @EXPORT_OK = ('is_bogon');
 
 use constant DEFAULT_BASE_URL => 'https://api.internetdata.io';
@@ -128,6 +128,7 @@ our $LOOKUP = [fields => [
     [abuse => $ABUSE, 1], [whois => $WHOIS], [rwhois => $RWHOIS],
     [hosted_domains => [fields => [[total => ['integer'], 1], [domains => [list => ['string']]]]]],
     [trial_expired => ['boolean']],
+    [cap_reached => ['boolean']],
 ]];
 my $AS_PREFIX = [fields => [
     [prefix => ['string'], 1], [peer_count => ['integer'], 1],
@@ -143,6 +144,7 @@ our $ASN_LOOKUP = [fields => [
     (map { (["num_$_" => ['integer']], [$_ => [list => ['integer']]]) } qw(upstreams peers downstreams)),
     [hosted_domains => [fields => [[total => ['integer'], 1], [domains => [list => ['string']]]]]],
     [trial_expired => ['boolean']],
+    [cap_reached => ['boolean']],
 ]];
 my $DNS_ADDRESS = [fields => [map { [$_ => ['string'], 1] } qw(ip last_seen)]];
 my $DOMAIN_DNS = [fields => [
@@ -164,6 +166,7 @@ our $DOMAIN_LOOKUP = [fields => [
         (map { [$_ => ['string']] } qw(first_seen last_seen)),
     ]]],
     [trial_expired => ['boolean']],
+    [cap_reached => ['boolean']],
 ]];
 our $BATCH_ERROR = [fields => [[status => ['integer'], 1], [error => ['string'], 1]]];
 # Each entry is judged alone, by _lookup_chunk_p.

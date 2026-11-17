@@ -1,6 +1,6 @@
 package DBIO::PostgreSQL::Age;
 # ABSTRACT: Apache AGE graph database support for DBIO::PostgreSQL
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use strict;
 use warnings;
@@ -29,7 +29,7 @@ DBIO::PostgreSQL::Age - Apache AGE graph database support for DBIO::PostgreSQL
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

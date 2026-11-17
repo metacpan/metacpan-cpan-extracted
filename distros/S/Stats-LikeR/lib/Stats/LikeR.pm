@@ -3,7 +3,7 @@
 require 5.010001;
 use strict;
 package Stats::LikeR;
-our $VERSION = '0.3422';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
+our $VERSION = '0.3424';	# quoted: a bare version ending in 0, such as 0.320, is the number 0.32, which the dist would be named
 require XSLoader;
 use warnings FATAL => 'all';
 use Exporter 'import';
@@ -1071,8 +1071,8 @@ sub aoh2hoh {
 	my %out;
 	my $i = 0;
 	for my $row (@$aoh) {
-		die "index $i is not a hash" unless ref($row) eq 'HASH';
-		die "index $i has no key \"$key\"" unless defined $row->{$key};
+		die "aoh2hoh: index $i is not a hash" unless ref($row) eq 'HASH';
+		die "aoh2hoh: index $i has no key \"$key\"" unless defined $row->{$key};
 		my $rk = $row->{$key};
 		die "aoh2hoh: duplicate key '$rk' has >= 2 occurrences"
 			if exists $out{$rk};
@@ -1961,13 +1961,18 @@ sub chunk {
 		||  (!defined $opt{size} && !defined $opt{parts});
 
 	my $n = scalar @$aref;
-	return () unless $n; # empty input -> no groups
-
 	my @groups;
+	# Validated before the empty-input return, so a bad option is refused for [] too.
+	for my $o (qw(size parts)) {
+		_usage_error('chunk', "$o must be a positive integer")
+			if defined $opt{$o} && $opt{$o} !~ /\A[1-9][0-9]*\z/;
+	}
+	# Empty input has no groups.  Returning @groups rather than () keeps scalar
+	# context a count (0), as it is for non-empty input, not undef.
+	return @groups unless $n;
+
 	if (defined $opt{size}) {
 		my $sz = $opt{size};
-		_usage_error('chunk', 'size must be a positive integer')
-			unless $sz =~ /\A[1-9][0-9]*\z/;
 		for (my $i = 0; $i < $n; $i += $sz) {
 			my $hi = $i + $sz - 1;
 			$hi = $n - 1 if $hi > $n - 1;
@@ -1975,8 +1980,6 @@ sub chunk {
 		}
 	} else {
 		my $k = $opt{parts};
-		_usage_error('chunk', 'parts must be a positive integer')
-			unless $k =~ /\A[1-9][0-9]*\z/;
 		for my $i (0 .. $k - 1) {
 			my $lo = int( $i       * $n / $k );
 			my $hi = int( ($i + 1) * $n / $k );
@@ -2221,23 +2224,20 @@ sub concat {
 	my @frames = grep { defined } @_;
 	_usage_error('concat', 'needs at least one data frame') unless @frames;
 
-	# reference shape = first non-empty frame; remember a fallback for all-empty
-	my $ref_shape;
 	for my $f (@frames) {
-		my $nonempty = ref $f eq 'ARRAY' ? scalar(@$f)
-		             : ref $f eq 'HASH'  ? scalar(keys %$f)
-		             : _usage_error('concat', 'every frame must be an ARRAY or HASH ref');
-		next unless $nonempty;
-		$ref_shape = _df_shape($f, 'concat');
-		last;
+		_usage_error('concat', 'every frame must be an ARRAY or HASH ref')
+			unless ref $f eq 'ARRAY' || ref $f eq 'HASH';
 	}
-	unless (defined $ref_shape) {           # all frames empty
+	# An empty frame has no shape, so it is dropped here rather than skipped in
+	# each loop below, which dereferenced a [] among HoAs as a hash and died.
+	my @nonempty = grep { ref $_ eq 'ARRAY' ? scalar(@$_) : scalar(%$_) } @frames;
+	unless (@nonempty) {                    # all frames empty
 		return ref $frames[0] eq 'ARRAY' ? [] : {};
 	}
-	# all non-empty frames must agree
+	@frames = @nonempty;
+	# reference shape = first frame; all the others must agree
+	my $ref_shape = _df_shape($frames[0], 'concat');
 	for my $f (@frames) {
-		my $nonempty = ref $f eq 'ARRAY' ? scalar(@$f) : scalar(keys %$f);
-		next unless $nonempty;
 		my $s = _df_shape($f, 'concat');
 		die "concat: cannot mix a $s frame with a $ref_shape frame; "
 		  . "convert them to one shape first (aoh2hoa, hoa2aoh, hoh2hoa, aoh2hoh)\n"
@@ -4757,6 +4757,9 @@ sub melt {
 	my @id = !defined $arg{id_vars}        ? ()
 	       : ref $arg{id_vars} eq 'ARRAY'  ? @{ $arg{id_vars} }
 	       :                                 ( $arg{id_vars} );
+	# A name repeated in id_vars is one output column, so it is kept once:
+	# pushed twice per row, it made that column of a hoa twice as long as the rest.
+	{ my %s; @id = grep { !$s{$_}++ } @id }
 	my $var_name   = defined $arg{var_name}   ? $arg{var_name}   : 'variable';
 	my $value_name = defined $arg{value_name} ? $arg{value_name} : 'value';
 	my $otype = defined $arg{'output_type'} ? lc $arg{'output_type'} : lc $shape;
@@ -4795,33 +4798,45 @@ sub melt {
 	# values, alive at the same time as the result it was about to become.  On
 	# a million-row frame with ten value columns that is ten million throwaway
 	# containers, and none of them is anything the output needs.  Emitting as
-	# the loops go keeps only the result.
-	my (@aoa, @aoh, %hoa, %hoh);
-	if ($otype eq 'hoa') { $hoa{$_} = [] for @id, $var_name, $value_name }
-	my $n = 0;
-	for my $v (@val) {
-		my $vcol = $col->{$v};
-		for (my $i = 0; $i < $R; $i++) {
-			if ($otype eq 'aoa') {
-				push @aoa, [ (map { $col->{$_}[$i] } @id), $v, $vcol->[$i] ];
-			} elsif ($otype eq 'hoa') {
-				push @{ $hoa{ $id[$_] } }, $col->{ $id[$_] }[$i] for 0 .. $#id;
-				push @{ $hoa{$var_name} },   $v;
-				push @{ $hoa{$value_name} }, $vcol->[$i];
-			} else {                             # aoh and hoh share the row
-				my %h;
-				@h{ @id } = map { $col->{$_}[$i] } @id;
-				$h{$var_name}   = $v;
-				$h{$value_name} = $vcol->[$i];
-				if ($otype eq 'aoh') { push @aoh, \%h }
-				else                 { $hoh{ $n++ } = \%h }   # hoh: RangeIndex
+	# the loops go keeps only the result.  The output type is branched on once,
+	# outside the loops, and a hoa is built a whole column at a time: per cell,
+	# the branch and the pushes made a hoa melt about 4 times slower.
+	my @idcol = map { $col->{$_} } @id;
+	if ($otype eq 'hoa') {
+		my %hoa = map { $_ => [] } @id, $var_name, $value_name;
+		for my $v (@val) {
+			my $vcol = $col->{$v};
+			# _frame_cols() columns can be short (ragged AoA rows); a slice
+			# reads undef past the end, as $vcol->[$i] did, and keeps R cells.
+			push @{ $hoa{ $id[$_] } }, @{ $idcol[$_] }[0 .. $R - 1] for 0 .. $#id;
+			push @{ $hoa{$var_name} },   ($v) x $R;
+			push @{ $hoa{$value_name} }, @{$vcol}[0 .. $R - 1];
+		}
+		return \%hoa;
+	}
+	if ($otype eq 'aoa') {
+		my @aoa;
+		for my $v (@val) {
+			my $vcol = $col->{$v};
+			for my $i (0 .. $R - 1) {
+				push @aoa, [ (map { $_->[$i] } @idcol), $v, $vcol->[$i] ];
 			}
 		}
+		return \@aoa;
 	}
-	return \@aoa if $otype eq 'aoa';
-	return \@aoh if $otype eq 'aoh';
-	return \%hoa if $otype eq 'hoa';
-	return \%hoh;
+	my @rows;                                    # aoh and hoh share the row
+	for my $v (@val) {
+		my $vcol = $col->{$v};
+		for my $i (0 .. $R - 1) {
+			my %h;
+			@h{ @id } = map { $_->[$i] } @idcol;
+			$h{$var_name}   = $v;
+			$h{$value_name} = $vcol->[$i];
+			push @rows, \%h;
+		}
+	}
+	return \@rows if $otype eq 'aoh';
+	return { map { $_ => $rows[$_] } 0 .. $#rows };   # hoh: RangeIndex
 }
 
 # pivot_table($df, index => $col|\@cols, columns => $col|\@cols,
@@ -5171,12 +5186,14 @@ sub _impute_prop {
 
 	if ($shape eq 'AoH') {
 		my @out = map { ref $_ eq 'HASH' ? { %$_ } : $_ } @$df;
+		# Only the rows that are hashes take part, so a row that cannot be
+		# written neither breaks a gap nor counts against `limit`.
+		my @rows = grep { ref eq 'HASH' } @out;
 		for my $c (@targets) {
-			my @vals = map { ref $_ eq 'HASH' ? $_->{$c} : undef } @out;
+			my @vals = map { $_->{$c} } @rows;
 			_fill_seq(\@vals, $dir, $limit);
-			for my $i (0 .. $#out) {
-				next unless ref $out[$i] eq 'HASH';
-				$out[$i]{$c} = $vals[$i] if defined $vals[$i];
+			for my $i (0 .. $#rows) {
+				$rows[$i]{$c} = $vals[$i] if defined $vals[$i];
 			}
 		}
 		return \@out;
@@ -5186,13 +5203,12 @@ sub _impute_prop {
 		my %out = map {
 			$_ => ( ref $df->{$_} eq 'HASH' ? { %{ $df->{$_} } } : $df->{$_} )
 		} keys %$df;
+		my @rows = grep { ref eq 'HASH' } map { $out{$_} } @keys;   # as for AoH
 		for my $c (@targets) {
-			my @vals = map { ref $out{$_} eq 'HASH' ? $out{$_}{$c} : undef } @keys;
+			my @vals = map { $_->{$c} } @rows;
 			_fill_seq(\@vals, $dir, $limit);
-			for my $j (0 .. $#keys) {
-				my $rk = $keys[$j];
-				next unless ref $out{$rk} eq 'HASH';
-				$out{$rk}{$c} = $vals[$j] if defined $vals[$j];
+			for my $j (0 .. $#rows) {
+				$rows[$j]{$c} = $vals[$j] if defined $vals[$j];
 			}
 		}
 		return \%out;
@@ -5209,11 +5225,13 @@ sub _impute_prop {
 	# AoA
 	my @out = map { ref $_ eq 'ARRAY' ? [ @$_ ] : $_ } @$df;
 	for my $c (@targets) {
-		my @vals = map { ref $_ eq 'ARRAY' ? $_->[$c] : undef } @out;
+		# Only rows long enough to hold column $c take part (rows are not
+		# extended), so a short row neither breaks a gap nor counts against `limit`.
+		my @rows = grep { ref eq 'ARRAY' && $c <= $#$_ } @out;
+		my @vals = map { $_->[$c] } @rows;
 		_fill_seq(\@vals, $dir, $limit);
-		for my $i (0 .. $#out) {
-			next unless ref $out[$i] eq 'ARRAY';
-			$out[$i][$c] = $vals[$i] if $c <= $#{ $out[$i] } && defined $vals[$i];
+		for my $i (0 .. $#rows) {
+			$rows[$i][$c] = $vals[$i] if defined $vals[$i];
 		}
 	}
 	return \@out;
@@ -6683,7 +6701,7 @@ Stats::LikeR - Get basic statistical functions, like in R, but with Perl using X
 
 =head1 VERSION
 
-version 0.3422
+version 0.3424
 
 =head1 Synopsis
 

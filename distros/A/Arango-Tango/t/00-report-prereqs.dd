@@ -23,9 +23,9 @@ do { my $x = {
                                       'MIME::Base64' => '3.11',
                                       'Sub::Install' => '0',
                                       'Sub::Name' => '0',
-                                      'URI::Encode' => '0',
+                                      'URI::Escape' => '0',
                                       'base' => '0',
-                                      'perl' => '5.008',
+                                      'perl' => '5.010',
                                       'strict' => '0',
                                       'warnings' => '0'
                                     }

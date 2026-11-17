@@ -1,0 +1,37 @@
+# Example suite shipped with Langertha-Holmgang, to learn suite format 2 from:
+# a small world without a simulator, its one tool described in data by
+# handlers.
+# Origin: written for this distribution; the rooms and the task are invented
+# and no real benchmark case (ADR 0003).
+# Author: Torsten Raudssus <torsten@raudssus.de>
+# License: same terms as Perl itself (Perl_5), like the distribution.
+format: 2
+id: demo-lamp
+version: 1
+title: "Demo: lamps switched through handlers"
+description: An invented handler world — a tool whose effect on the state is written in the suite.
+license: Perl_5
+source:
+  title: Langertha-Holmgang example suites
+  authors: Torsten Raudssus <torsten@raudssus.de>
+  license: Perl_5
+  url: https://github.com/Getty/langertha-holmgang
+topic: demo
+threshold: { pass_rate: 1 }
+defaults:
+  system: "You control the lights of a flat through the tools."
+  max_turns: 4
+tools:
+  - name: set_lamp
+    description: Switch a lamp on or off.
+    parameters:
+      type: object
+      required: [lamp, on]
+      properties: { lamp: { type: string }, on: { type: boolean } }
+    handlers:
+      - match: { lamp: "^(?<room>kitchen|hall)$" }
+        apply:
+          - { set: "lamps.{room}.on", value: "{on}" }
+        output: "<: $args.room :> is now <: $state.lamps[$args.room].on ? 'on' : 'off' :>"
+      - output: "no such lamp"
+        error: true

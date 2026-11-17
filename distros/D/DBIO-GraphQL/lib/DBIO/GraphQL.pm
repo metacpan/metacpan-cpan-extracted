@@ -1,6 +1,6 @@
 package DBIO::GraphQL;
 # ABSTRACT: Auto-generate a GraphQL schema from a DBIO schema
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use strict;
 use warnings;
 
@@ -551,7 +551,7 @@ DBIO::GraphQL - Auto-generate a GraphQL schema from a DBIO schema
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

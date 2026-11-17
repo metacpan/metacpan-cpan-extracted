@@ -49,7 +49,7 @@ declared driver storage; when it adapts to its access path (`_adapt_to_access_pa
 re-composes the same layers over the adapted class (`recompose`), so the layers survive
 the adaptation.
 
-**A layer states its async side** (ADR 0032 addendum 2026-09-25): it ships a
+**A layer states its async side** (ADR 0032 addendum): it ships a
 `${L}::Async` mirror, or defines `sub async_layer_class { undef }` to say it is
 deliberately sync-only. A layer with neither is refused when core composes the async
 storage of a schema in an async mode — silence is no opt-out. Mirror mechanics:
@@ -60,26 +60,15 @@ are constrained: the *layer* has no `@ISA` pointing at a storage, and the *compo
 inherits no driver component's `connection()` hook. That hook is the only seam through
 which a component can decide the storage class, and it is exactly where every driver
 component pins `storage_type` — so the rule is about the connect path, not about a
-mandated base class. All four extension components sit on `DBIO::Base` today, but
-`Age` carried an empty `@ISA` until karr dbio-postgresql-age k9 and resolved identically all along, since
-`load_components` unshifts the component into the consumer's `@ISA` either way.
+mandated base class. The extension components sit on `DBIO::Base`;
+`load_components` unshifts the component into the consumer's `@ISA`.
 
-A component that `use base`s a driver component (`DBIO::PostgreSQL`, `DBIO::MySQL`, …) inherits that component's `connection()` and with it
-its `storage_type` pin — the same violation, second-hand. It also breaks the direct
-stacking form: once `DBIO::X` inherits `DBIO::PostgreSQL`,
-
-    use base qw( DBIO::PostgreSQL DBIO::X DBIO::Schema );
-
-fails C3 linearisation ("Inconsistent hierarchy during C3 merge") and the class will not
-load, while the reverse base order still works — an order trap `load_components` hides
-through `Class::C3::Componentised` dedup and `use base` does not. It does not surface at
-compile time either: `use base` alone does not compute the linearisation, so a naive probe
-reports success and it dies at the first resolution. That stacking form is a de-facto
-contract carried by tests only — seven files across dbio-postgresql-age and
-dbio-postgresql-postgis stack this way, no driver POD documents it. Broken twice in the
-family with two different tools: karr dbio-mysql-ev k14 (`storage_type` override),
-karr dbio-postgresql-age k8 (`use base`). ADR 0032 §7 plus its 2026-08-07 addendum is the full
-rule; core carries a structural test for it.
+A component inherits no driver component (`DBIO::PostgreSQL`, `DBIO::MySQL`, …): that
+would carry the driver's `connection()` and its `storage_type` pin into the extension.
+It would also break the direct stacking form
+`use base qw( DBIO::PostgreSQL DBIO::X DBIO::Schema );`, which fails C3 linearisation
+("Inconsistent hierarchy during C3 merge") at the first resolution, not at compile time.
+ADR 0032 §7 and its addendum are the full rule; core carries a structural test for it.
 
 **Driver resolution is lazy — connect before you assert the access-path class.**
 `_determine_driver` runs on the first `dbh` access, not on `connect`. From `connect` on, the
@@ -92,8 +81,6 @@ to its access path, and the layers are re-composed over the adapted class:
     $schema->storage->ensure_connected;
     $schema->storage->isa('DBIO::MSSQL::Storage::ODBC');     # true — layers recomposed
 
-A test that asserts the specialised class on a layered storage connects first. Both
-violations above started from a test that sampled the intermediate state and was "fixed"
-by pinning the driver in the extension — after which the assertion holds because of the
-pin and no longer tests the composition at all.
+A test that asserts the specialised class on a layered storage connects first and then
+asks; the declaration comes from the schema, never from a pin in the extension.
 

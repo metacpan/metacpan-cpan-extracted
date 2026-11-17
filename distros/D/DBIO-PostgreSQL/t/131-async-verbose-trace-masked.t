@@ -2,7 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 
-use DBIO::PostgreSQL::Storage::Async;
+eval { require DBIO::PostgreSQL::Storage::Async; 1 }
+  or plan skip_all => 'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
 
 # k133: under $Carp::Verbose _pg_raise writes a stack trace; the arguments of
 # its frames must not show the password of connect info.

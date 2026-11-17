@@ -4,7 +4,7 @@ package DBIO::Storage::PoolBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Pool';
 
@@ -1472,7 +1472,7 @@ DBIO::Storage::PoolBase - Shared connection pool mechanics for async DBIO driver
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ package DBIO::MySQL::Diff::Column;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -345,7 +345,7 @@ DBIO::MySQL::Diff::Column - Diff operations for MySQL/MariaDB columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

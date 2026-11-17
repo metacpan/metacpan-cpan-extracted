@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Diff::NoStatement;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -58,7 +58,7 @@ DBIO::PostgreSQL::Diff::NoStatement - An operation the diff has no statement for
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

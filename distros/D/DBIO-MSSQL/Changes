@@ -1,5 +1,69 @@
 Revision history for DBIO-MSSQL
 
+0.900007  2026-11-17
+    * Fixed
+        - Columns of type datetime2, datetimeoffset and time with DateTime
+          inflation (inflate_datetime) have a channel of their own each.
+          datetime2 is written and read with all seven fractional digits;
+          datetimeoffset is written with the offset of the value (a value in
+          an Olson zone: the offset it has at that moment) and read with it;
+          time goes through parse_time/format_time with up to seven digits.
+          All three are written in forms no language or DATEFORMAT of the
+          session changes (YYYYMMDD hh:mm:ss.fffffff [+HH:MM]). What is read
+          is what the DBD hands over: DBD::ODBC the full text of the server;
+          DBD::Sybase over TDS 7.3 and 7.4 the value the client library has
+          already cut to milliseconds (a datetimeoffset as the UTC instant,
+          without its offset), over TDS 7.2 and below the full text.
+        - A date column with DateTime inflation (InflateColumn::DateTime)
+          is written and read over DBD::ODBC and DBD::Sybase. DBIO writes
+          'YYYYMMDD', which reads the same under every language and
+          DATEFORMAT, and reads what the DBD hands over ('YYYY-MM-DD' over
+          DBD::ODBC, 'YYYY-MM-DDT00:00:00.000Z' over DBD::Sybase).
+        - A datetime or smalldatetime column keeps its date under any
+          language or DATEFORMAT of the session (SET LANGUAGE German or
+          French, a login's default language): DBIO writes it as
+          'YYYYMMDD hh:mm:ss[.mmm]', which SQL Server reads the same under
+          every setting, and leaves the session of the user as it is.
+        - Error texts name no values whatever language the server reports
+          in. SQL Server writes its messages in the language of the session
+          (SET LANGUAGE, the login's or the server's default) and quotes
+          the offending value in them; the English wording the masking
+          knew did not hold there, and a short bound value or a value the
+          server quotes (in a German conversion error, in a French
+          duplicate-key message) stood in the exception. The
+          masking now goes by the number of the message (conversion and
+          overflow, syntax, JSON, duplicate key, truncation) and the marks
+          the server quotes with; where the language writes the value
+          without a mark, the text of that message falls away and its
+          number stays. Over DBD::ODBC, which has no number in the text,
+          the storage reads it from the diagnostic records of the failing
+          handle. English texts are masked as before.
+    * Documentation
+        - The dbio-mssql and dbio-mssql-database skills describe the
+          limit dialect, the type maps, the declared capabilities, the
+          -ms shortcut and the live test path as the code has them.
+    * Tests
+        - DBIO_TEST_SERVER_LANGUAGE (de, fr) runs the live suite with the
+          server reporting in that language; the tests that read an English
+          wording of the server say us_english for their own session.
+        - The test suite passes on an install with only the required
+          modules: the DBD::Sybase half of the server data type test skips
+          when DBIO::Sybase is not installed.
+        - The live tests that write or read text beyond ASCII state the
+          client character set they need (ClientCharset=UTF-8 in the ODBC
+          DSN, a UTF-8 LC_CTYPE for DBD::Sybase) instead of taking it from
+          the locale of the process, so the live suite also passes under a
+          non-UTF-8 locale such as de_DE.iso88591. The refusal of such text
+          under a client character set that is not UTF-8 is tested with an
+          explicit ClientCharset=ISO-8859-1 in the DSN.
+        - The live test files that need a client character set also load
+          and skip without a DSN on a perl without I18N::Langinfo
+          (Strawberry Perl 5.20 for Windows has none; it works on every
+          platform from perl 5.28). The helper then reads the code set from
+          the name of the locale; where that does not say UTF-8 the code set
+          is unknown, nothing dies, and only the DBD::Sybase half of the
+          tests that write or read text beyond ASCII skips, with the reason.
+
 0.900004  2026-11-08
     * Storage
         - A schema that declares DBIO::MSSQL::Storage gets, on first use,

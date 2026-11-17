@@ -106,9 +106,9 @@ my $async = $h->async;
 
     my $sync = eval { $dbh->selectall_arrayref($sql, undef, @$bind) };
     diag $@ unless $sync;
-    is_deeply $sync, $want, "k84 $name: runs over the dbh";
+    is_deeply $sync, $want, "$name: runs over the dbh";
     is_deeply $over_ev->($sql, @$bind), $sync,
-      "k84 $name: the same rows over the ev transport";
+      "$name: the same rows over the ev transport";
   }
 
   # --- karr k84 (c): a ? behind an @ that ends another operator ----------------
@@ -131,8 +131,8 @@ my $async = $h->async;
     # a boolean comes back 't'/'f' or 1/0 depending on the DBD::Pg; compare as bool
     my $norm = sub { [ map { [ map { /^(?:t|true)$/ ? 1 : /^(?:f|false)$/ ? 0 : $_ } @$_ ] } @{ $_[0] // [] } ] };
     my $got_ev = $over_ev->($sql, @$bind);
-    is_deeply $norm->($sync), $norm->($want), "k84 $name: over the dbh";
-    is_deeply $norm->($got_ev), $norm->($sync), "k84 $name: the same over the ev transport";
+    is_deeply $norm->($sync), $norm->($want), "behind an @, $name: over the dbh";
+    is_deeply $norm->($got_ev), $norm->($sync), "behind an @, $name: the same over the ev transport";
   }
 
   # --- dbio-postgresql k120: the bare @? is read alike over both ways ----------
@@ -150,14 +150,14 @@ my $async = $h->async;
   ) {
     my ($name, $sql, $bind) = @$case;
     my $sync = eval { $dbh->selectall_arrayref($sql, undef, @$bind) };
-    ok !$sync, "k120 a bare @? with $name: does not run over the dbh";
+    ok !$sync, "a bare @? with $name: does not run over the dbh";
     my $rows = eval { [ $h->await($async->_query_async($sql, [@$bind])) ] };
-    ok !$rows, "k120 a bare @? with $name: nor over the ev transport";
+    ok !$rows, "a bare @? with $name: nor over the ev transport";
 
     is_deeply scalar eval { $dbh->selectall_arrayref('SELECT ?::int AS n', undef, 7) }, [[ 7 ]],
-      "k120 a bare @? with $name: the next statement runs over the dbh";
+      "a bare @? with $name: the next statement runs over the dbh";
     is_deeply $over_ev->('SELECT ?::int AS n', 7), [[ 7 ]],
-      "k120 a bare @? with $name: ... and over the ev transport";
+      "a bare @? with $name: ... and over the ev transport";
   }
 
   # --- karr k84 / dbio-postgresql k120: \? is a literal question mark ----------
@@ -199,9 +199,9 @@ my $async = $h->async;
     my $norm = sub { [ map { [ map { /^(?:t|true)$/ ? 1 : /^(?:f|false)$/ ? 0 : $_ } @$_ ] } @{ $_[0] // [] } ] };
     my $sync = eval { $dbh->selectall_arrayref($sql, undef, @$bind) };
     diag $@ unless $sync;
-    is_deeply $norm->($sync), $norm->($want), "k120 $name: over the dbh";
+    is_deeply $norm->($sync), $norm->($want), "\\? $name: over the dbh";
     is_deeply $norm->($over_ev->($sql, @$bind)), $norm->($sync),
-      "k120 $name: the same over the ev transport";
+      "\\? $name: the same over the ev transport";
   }
 
   # A statement that mixes $N and ? is refused, as DBD::Pg refuses it, before
@@ -209,9 +209,9 @@ my $async = $h->async;
   {
     my $f = eval { $async->_query_async('SELECT $1::int, ?::int', [ 1, 2 ]) };
     ok !$f && $@ =~ /mixes \$N and \?/,
-      'k120 a statement that mixes $N and ? is refused by the transport';
+      'a statement that mixes $N and ? is refused by the transport';
     ok !eval { $dbh->selectall_arrayref('SELECT $1::int, ?::int', undef, 1, 2); 1 },
-      'k120 ... as the dbh refuses it';
+      '... as the dbh refuses it';
   }
 
   # No bind at all (karr k88, the cases of dbio-postgresql's
@@ -228,9 +228,9 @@ my $async = $h->async;
     my ($name, $sql, $want) = @$case;
     my $sync = eval { $dbh->selectall_arrayref($sql) };
     diag $@ unless $sync;
-    is_deeply $sync, $want, "k88 $name: runs over the dbh";
+    is_deeply $sync, $want, "no bind, $name: runs over the dbh";
     is_deeply $over_ev->($sql), $sync,
-      "k88 $name: the same rows over the ev transport";
+      "no bind, $name: the same rows over the ev transport";
   }
 
   # Where the server reads further than DBD::Pg 3.20.2 does, the server is the
@@ -250,7 +250,7 @@ my $async = $h->async;
   ) {
     my ($name, $sql, $want) = @$case;
     is_deeply $over_ev->($sql, 7), $want,
-      "k84 $name: read as the server reads it";
+      "$name: read as the server reads it";
   }
 }
 

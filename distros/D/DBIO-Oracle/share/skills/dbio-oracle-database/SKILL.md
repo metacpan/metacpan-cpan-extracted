@@ -51,7 +51,20 @@ Driver canonical-to-Oracle mapping (`Type::map_dbio_type_to_oracle`):
 | interval year to month / day to second | INTERVAL YEAR(n) TO MONTH / INTERVAL DAY(d) TO SECOND(s) |
 | blob/bytea | BLOB |
 
-Reverse (`map_dbd_type_to_dbio`, from `ALL_TAB_COLUMNS`): `INTEGER`/`SMALLINT` (precision NULL, scale 0, only those) → integer; `NUMBER(38)`/`NUMBER(38,0)` → numeric `[38,0]` (column diff compares `[p,0]` and `p` equal); `DATE` → date (size dropped; `BINARY_FLOAT`/`BINARY_DOUBLE` likewise stay `binary_float`/`binary_double`); `FLOAT` → float with size = `data_precision` (126 or none → float without size); VARCHAR2/CHAR with `char_used` 'C' read as size `"20 CHAR"` (string, written as `VARCHAR2(20 CHAR)`; BYTE keeps the number); VARCHAR2/NVARCHAR2/NCHAR/TIMESTAMP(n) keep their size (national types from `char_length`), written back as `VARCHAR2(n)` etc.; `TIMESTAMP(n) WITH [LOCAL] TIME ZONE` → `timestamp with [local] time zone` size n (6 = no size); a bare `NUMBER` (precision and scale NULL) is numeric. Column diff size key: `[p,0]`=p, timestamp 6 and float 126 = no size, `n BYTE`=n, `n CHAR` stays; NCHAR/NVARCHAR2 are always CHAR (written `NCHAR(5)`); float size must be an integer 1..126. RAW size is `data_length` (bytes, 16 for RAW(16)); `INTERVAL YEAR(n) TO MONTH` reads as `interval year to month` size n, `INTERVAL DAY(d) TO SECOND(s)` as `[d,s]` (defaults 2 and 2,6 = no size) and both are written with their precision; nvarchar is NVARCHAR2. The column diff compares data types by the Oracle type they render (varchar = varchar2, datetime = timestamp, real = binary_float). `long` is still written as CLOB (not changed, only noted). New-table DDL goes through `map_dbio_type_to_oracle` as well. LOB types (BLOB/CLOB/NCLOB) carry no size.
+Reverse (`map_dbd_type_to_dbio`, from `ALL_TAB_COLUMNS`):
+
+- `INTEGER`/`SMALLINT` (precision NULL, scale 0, only those) -> integer; `NUMBER(38)`/`NUMBER(38,0)` -> numeric `[38,0]` (column diff compares `[p,0]` and `p` equal); a bare `NUMBER` (precision and scale NULL) is numeric.
+- `DATE` -> date (size dropped); `BINARY_FLOAT`/`BINARY_DOUBLE` stay `binary_float`/`binary_double`; `FLOAT` -> float with size = `data_precision` (126 or none -> float without size).
+- VARCHAR2/CHAR with `char_used` 'C' read as size `"20 CHAR"` (string, written as `VARCHAR2(20 CHAR)`; BYTE keeps the number). VARCHAR2/NVARCHAR2/NCHAR/TIMESTAMP(n) keep their size (national types from `char_length`), written back as `VARCHAR2(n)` etc.; nvarchar is NVARCHAR2.
+- `TIMESTAMP(n) WITH [LOCAL] TIME ZONE` -> `timestamp with [local] time zone` size n (6 = no size).
+- RAW size is `data_length` (bytes, 16 for RAW(16)). `INTERVAL YEAR(n) TO MONTH` reads as `interval year to month` size n, `INTERVAL DAY(d) TO SECOND(s)` as `[d,s]` (defaults 2 and 2,6 = no size); both are written with their precision.
+
+Column diff:
+
+- It compares data types by the Oracle type they render (varchar = varchar2, datetime = timestamp, real = binary_float).
+- Size key: `[p,0]`=p, timestamp 6 and float 126 = no size, `n BYTE`=n, `n CHAR` stays; NCHAR/NVARCHAR2 are always CHAR (written `NCHAR(5)`); float size must be an integer 1..126.
+
+`long` is written as CLOB. New-table DDL goes through `map_dbio_type_to_oracle` as well. LOB types (BLOB/CLOB/NCLOB) carry no size.
 
 ## Identity / Last-Insert-Id
 
@@ -69,7 +82,7 @@ Oracle has no `LIMIT`. Driver `apply_limit` always delegates to the inherited `_
 
 - Quote char `"` (`sql_quote_char`). Unquoted identifiers fold to UPPERCASE — driver uppercases table/owner names when no quote char is in play (`AutoIncrement`, introspection passes `owner = USER`).
 - A table named `schema.table` lives in that schema (a user): schema and table are quoted apart, as spelled (`"OWNX"."t"`); upper case for a user made unquoted. Writing into another user needs the `CREATE ANY TABLE` etc. system privileges; the user must exist (`all_users`).
-- 30-byte limit (pre-12.2). One shared algorithm in `DBIO::Oracle::Identifier::shorten`: names ≤30 chars pass through; longer ones are CamelCase-compressed (vowels trimmed if still too long), then suffixed `_<base36 MD5>` for stable, collision-resistant uniqueness. Used at both query time (`SQLMaker::_shorten_identifier`, relation aliases via `relname_to_table_alias`) and deploy time (sequence/index names) so generated and referenced names match. Requires Digest::MD5, Math::BigInt, Math::Base36.
+- 30-character limit (`Identifier::shorten` measures `length`, i.e. characters, though Oracle before 12.2 counts bytes: a multi-byte name can exceed 30 bytes). One shared algorithm in `DBIO::Oracle::Identifier::shorten`: names ≤30 chars pass through; longer ones are CamelCase-compressed (vowels trimmed if still too long), then suffixed `_<base36 MD5>` for stable, collision-resistant uniqueness. Used at both query time (`SQLMaker::_shorten_identifier`, relation aliases via `relname_to_table_alias`) and deploy time (sequence/index names) so generated and referenced names match. Requires Digest::MD5, Math::BigInt, Math::Base36.
 
 ## Hierarchical Queries
 
@@ -81,12 +94,12 @@ Oracle has no `LIMIT`. Driver `apply_limit` always delegates to the inherited `_
 
 ## Introspection Catalog
 
-`ALL_*` views (owner-scoped), per `Introspect/*.pm`: `ALL_TABLES`, `ALL_TAB_COLUMNS`, `ALL_CONSTRAINTS`, `ALL_CONS_COLUMNS`, `ALL_INDEXES`, `ALL_IND_COLUMNS`, `ALL_TRIGGERS`, `ALL_VIEWS`. Deploy (`Deploy.pm`): `install` (what `$schema->deploy` runs) and `apply` work; `diff` and `upgrade` build the desired state in a temporary user `DBIO_TMP_<pid>_<n>` (needs `CREATE USER`/`DROP USER`; a test deploy on the live connection cannot be rolled back, DDL commits implicitly, so `CREATE USER`/`GRANT`/`DROP USER` run on a connection of their own); the diff creates a table only the target has whole (karr k37): columns, keys, sequence and trigger, then its indexes, then its foreign keys, every name quoted.
+`ALL_*` views (owner-scoped), per `Introspect/*.pm`: `ALL_TABLES`, `ALL_TAB_COLUMNS`, `ALL_CONSTRAINTS`, `ALL_CONS_COLUMNS`, `ALL_INDEXES`, `ALL_IND_COLUMNS`, `ALL_TRIGGERS`, `ALL_VIEWS`. Deploy (`Deploy.pm`): `install` (what `$schema->deploy` runs) and `apply` work; `diff` and `upgrade` build the desired state in a temporary user `DBIO_TMP_<pid>_<n>` (needs `CREATE USER`/`DROP USER`; a test deploy on the live connection cannot be rolled back, DDL commits implicitly, so `CREATE USER`/`GRANT`/`DROP USER` run on a connection of their own); the diff creates a table only the target has whole: columns, keys, sequence and trigger, then its indexes, then its foreign keys, every name quoted.
 
 ## LOBs
 
-CLOB/BLOB binds via `ora_type => ORA_CLOB/ORA_BLOB` (`Type::oracle_lob_bind_attrs`). Comparisons split into 2000-char chunks via `DBMS_LOB.SUBSTR`. Multi-part LOB binds disable sth caching (`Storage._dbh_execute`).
+CLOB/BLOB binds via `ora_type => ORA_CLOB/ORA_BLOB` (`Type::oracle_lob_bind_attrs`). Comparisons split into parts via `DBMS_LOB.SUBSTR` (`Storage/LOBSupport.pm`): text in 1000-character parts, binary in 2000-byte parts compared with `HEXTORAW(?)`. Multi-part LOB binds disable sth caching (`Storage._dbh_execute`).
 
 ## Testing Env Vars
 
-`DBIO_TEST_ORA_DSN`, `DBIO_TEST_ORA_USER`, `DBIO_TEST_ORA_PASS`. Cross-schema tests also need `DBIO_TEST_ORA_EXTRAUSER_DSN`/`_USER`/`_PASS` (a *different* Oracle user). Tests skip when unset.
+`DBIO_TEST_ORA_DSN`, `DBIO_TEST_ORA_USER`, `DBIO_TEST_ORA_PASS`. Cross-schema tests also need `DBIO_TEST_ORA_EXTRAUSER_DSN`/`_USER`/`_PASS` (a *different* Oracle user). Tests skip when unset. On the maintainer's database `dbio-db env oracle` sets them; run the suite with `../dbio/maint/capped-test prove -lr t/` after `../dbio/maint/live-preflight` (`references/live-testing.md` of `dbio-driver-development`).

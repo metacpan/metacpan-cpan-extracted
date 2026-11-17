@@ -256,7 +256,7 @@ for my $t (qw(int bigint smallint tinyint bit)) {
   # was: refused ("a deployed view with a dotted name"). Since karr k72 a view
   # "schema.view" is made in that schema, like a table (t/111).
   my $vddl = eval { DBIO::MSSQL::DDL->install_ddl($c) };
-  ok defined $vddl, 'a deployed view with a dotted name is installed (karr k72)' or diag $@;
+  ok defined $vddl, 'a deployed view with a dotted name is installed' or diag $@;
   like $vddl // '', qr/^CREATE SCHEMA other;/m, '... its schema is created';
   like $vddl // '', qr/^CREATE VIEW other\.real AS SELECT id FROM p;/m, '... and the view made in it';
   unlike $vddl // '', qr/other\.virt/, '... the virtual view is still not deployed';

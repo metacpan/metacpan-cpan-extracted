@@ -4,7 +4,7 @@ App::Test::Generator - Fuzz Testing, Mutation Testing, LCSAJ Metrics and Test Da
 
 ## Version
 
-Version 0.48
+Version 0.49
 
 ## Synopsis
 
@@ -25,7 +25,7 @@ From the command line:
 fuzz-harness-generator -r t/conf/abs.yml
 
 # Attempt to create a formal definition from a routine package, then run tests against that formal definition
-# This is the holy grail of test generation, a set of tests is automatically created directly from the source code,
+# This is the Holy Grail of test generation, a set of tests is automatically created directly from the source code,
 extract-schemas lib/App/Test/Generator/Sample/Module.pm && fuzz-harness-generator -r schemas/greet.yml
 
 # Fuzz a module and keep the corpus bounded: trim to the minimum subset that still covers every branch
@@ -301,6 +301,56 @@ Supported basic types used by the fuzzer: `string`, `integer`, `float`, `number`
 See also [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
 You can add more custom types using properties.
 
+A nested `schema` describes the elements of an `arrayref` or the values of a
+`hashref`.  Element schemas are full specs, so they carry their own
+constraints and can nest again:
+
+```
+input:
+  words:
+    type: arrayref
+    min: 1
+    max: 3
+    schema:
+      type: string
+      min: 3
+      max: 10
+  scores:
+    type: hashref
+    schema:
+      type: integer
+      min: 0
+      max: 100
+  record:
+    type: hashref
+    schema:
+      name:
+        type: string
+        min: 2
+        max: 20
+      age: integer
+  grid:
+    type: arrayref
+    schema:
+      type: arrayref
+      min: 1
+      max: 2
+      schema:
+        type: integer
+        min: 0
+        max: 9
+  things:
+    type: arrayref
+    schema:
+      type: object
+      isa: My::Thing      # needs a no-argument constructor
+      # or: can: label   # mocked with Class::Simple
+```
+
+A hashref `schema` without a `type` is a map of fixed key names to element
+schemas, so generated valid data uses those keys instead of random filler.
+Generated element values satisfy the element's own constraints.
+
 For routines with one unnamed parameter
 
 ```
@@ -380,6 +430,14 @@ The current supported variables are
 - `test_empty`, test with empty strings (default: 1)
 - `test_non_ascii`, test with strings that contain non ascii characters (default: 1)
 - `timeout`, ensure tests don't hang (default: 10)
+- `regex_timeout`, seconds allowed for generating one string that
+matches a regex pattern (default: 5)
+
+    A pattern the generator cannot satisfy, or one that makes it search for too
+    long, falls back to a fixed matching value; when none exists the pattern's
+    cases are skipped and reported once instead of failing the run.  Matching
+    strings are generated from the seeded RNG, so a schema's `seed` makes them
+    reproducible.
 
     Setting this to 0 disables timeout testing.
 
@@ -389,12 +447,19 @@ The current supported variables are
     Every call is checked for files it created.  They are removed afterwards
     whatever the setting, so a routine that writes a file cannot break the cases
     that follow it; set this to 0 for a routine whose purpose is to write one.
+    `extract-schemas` sets it to 0 when the routine's POD documents creating or
+    writing a file in its SIDE EFFECTS section.
 
 - `check_fds`, assert the routine leaks no file descriptors
  (default: 1)
 
     Only checked where `/proc/self/fd` exists.  Set this to 0 for a routine that
     returns a filehandle to its caller, which still holds a descriptor.
+
+    The first descriptor a call opens on a given file (or its first socket or
+    pipe) is taken as a resource held on purpose, such as a log file an object
+    opens on first use, and is not reported.  A later call that opens the same
+    target again is.
 
 - `check_accessors`, assert an accessor leaves the object it was called
  on alone (default: 1)
@@ -441,6 +506,13 @@ This is useful for testing functions that convert between formats, normalize dat
 or apply business logic transformations on a set of data to different set of data.
 It takes a list of subsets of the input and output definitions,
 and verifies that data from each input subset is correctly transformed into data from the matching output subset.
+
+A transform whose input names at least one field that the top-level input does not
+introduces its own call shape: its test cases are built from those fields rather
+than the top-level ones.  This lets one schema cover two calls, such as an
+arrayref argument and a list of scalar arguments.  A transform whose input only
+names fields that are already at the top level adjusts the top-level input and
+keeps the usual behaviour.
 
 ##### Transform Validation Rules
 
@@ -719,8 +791,17 @@ input:
 
     The harness creates a temporary directory and passes its path, because no
     pattern can describe "a directory that exists".
+    No empty-string case is generated for such a parameter, since routines
+    commonly read an empty path as "not given".
     [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) sets this for a parameter that the
     routine tests with `-d`.
+
+- `existing_file` - The path of an existing file
+
+    The harness creates a temporary file and passes its path, because no pattern
+    can describe "a file that exists".  [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor)
+    sets this for a parameter that the routine tests with `-e` or `-f` but does
+    not read.
 
 - `unix_timestamp`
 
@@ -743,6 +824,36 @@ For each constraint, three edge cases are added:
 
     This case is annotated with `_STATUS = 'DIES'` in the corpus and
     should cause the harness to fail validation or croak.
+
+    A constraint that came only from [extract-schemas](https://metacpan.org/pod/extract-schemas) reading POD (marked
+    with `_source: pod` for prose or `_source: input_spec` for a formal spec)
+    is a claim about valid input, not a check the routine has been seen to make.
+    The constraint still sizes the valid data that is generated.  It also gets
+    explicit out-of-bound probes: a probe that dies is accepted as enforcement
+    of the documented limit, while one that survives is recorded as a
+    documentation contradiction.  Provenance is tracked per constraint in
+    `_constraint_source`, so a documented minimum does not make a maximum that
+    the code enforces tolerant on the same field.  This applies to array and hash sizes, string
+    lengths and numeric ranges, to constraints parsed from POD prose
+    (`3-50`, `at least 5`), and to `memberof` lists and `matches` patterns.
+    Every documented constraint gets an outside value as an advisory probe; in
+    the normal advisory mode a probe that survives is reported as a routine
+    accepting a value its POD says is invalid, without failing the run.  A
+    constraint written by hand in a schema is still required to die outside
+    it.  Because tolerance reduces what the
+    harness proves, every tolerated bound is reported with `diag`, so a
+    passing run never hides the concession.  Without this, a routine whose POD
+    says `min => 1` but which accepts an empty list failed every harness
+    run.
+
+    Fuzzing can still reveal a contradiction in either direction: a routine may
+    reject a value inside a documented constraint, or accept one outside it.  The
+    harness records those observations and reports them together at the end of
+    the run.  Advisory mode tolerates them, so POD-derived documentation cannot
+    fail a routine that merely documents differently; pass `--strict-documented`
+    to `fuzz-harness-generator` to make each recorded contradiction a failing
+    test.  The strict choice is embedded in the generated harness, so a later
+    `prove` run behaves the same way.
 
 Supported constraint types:
 
@@ -1366,12 +1477,12 @@ The generated test:
 - Asserts that a wrong-typed argument dies, where the type is enforced
 
     Passing a reference where a string is declared is only expected to die for a
-    parameter whose input spec sets `_type_checked: 1`.
-    [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) sets that key when the routine checks
-    its arguments with a validator such as [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
+    parameter whose input spec sets `_source: validator`.
+    [App::Test::Generator::SchemaExtractor](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3ASchemaExtractor) sets that source when the routine
+    checks its arguments with a validator such as [Params::Validate::Strict](https://metacpan.org/pod/Params%3A%3AValidate%3A%3AStrict).
     A type taken from POD, or inferred from the code, documents intent but does not
     promise rejection, so no such case is generated for it.
-    Add the key by hand to a schema whose routine does check its argument types.
+    Add the source by hand to a schema whose routine does check its argument types.
 
 - Validates outputs with [Return::Set](https://metacpan.org/pod/Return%3A%3ASet)
 - Runs static `is(... )` corpus tests from Perl and/or YAML corpus
@@ -1390,6 +1501,13 @@ App::Test::Generator->generate(
     output_file => 'test/foo.t',
 );
 
+# Feed surviving mutants into the generated harness
+App::Test::Generator->generate(
+    schema_file      => 'schemas/foo.yml',
+    mutation_results => 'mutation.json',
+    output_file      => 'test/foo.t',
+);
+
 # Legacy positional API
 App::Test::Generator->generate($schema_file, $test_file);
 ```
@@ -1403,14 +1521,26 @@ App::Test::Generator->generate($schema_file, $test_file);
     schema_file => { type => 'string', optional => 0 },
     input_file  => { type => 'string', optional => 1 },
     output_file => { type => 'string', optional => 1, max => 255 },
+    strict_documented => { type => 'boolean', optional => 1 },
+    mutation_results => { type => 'string', optional => 1 },
 }
 ```
+
+`mutation_results` is the JSON report written by
+`test-generator-mutate --json`.  Surviving numeric-boundary mutants are
+converted into `min` or `max` constraints on the matching input field, so
+the harness generates data either side of the boundary the survivor exposed.
+Existing constraints are never replaced.  See
+[App::Test::Generator::Mutation::Feedback](https://metacpan.org/pod/App%3A%3ATest%3A%3AGenerator%3A%3AMutation%3A%3AFeedback).
 
 ##### Output
 
 ```perl
-{ type => 'string' }
+{ type => 'boolean' }
 ```
+
+Always 1.  The test source itself is written to `output_file`, or printed
+on STDOUT when no output file is given; it is not returned.
 
 The mathematical description is in ["FORMAL SPECIFICATION"](#formal-specification).
 
@@ -1717,6 +1847,7 @@ no state schema.  `quote(v)` stands for the result of `perl_quote(v)`.
 │ schema_file? : STRING
 │ output_file? : STRING ∪ { undef }
 │ test : STRING
+│ result! : BOOLEAN
 ├───────────────────────────────────────────────────
 │ pre   schema_file? names a readable schema
 │       the schema defines function
@@ -1724,6 +1855,7 @@ no state schema.  `quote(v)` stands for the result of `perl_quote(v)`.
 │ post  test is a complete Perl test file for function
 │       output_file? ≠ undef ⇒ file output_file? holds test
 │       output_file? = undef ⇒ test is printed on STDOUT
+│       result! = 1
 └───────────────────────────────────────────────────
 
 no arguments                     ⇒ croak 'Usage: generate(...)'

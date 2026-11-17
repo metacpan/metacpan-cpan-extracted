@@ -33,13 +33,13 @@
 # the second script of the ConfigMap: dbio_x (password dbio_x_secret) and the
 # lower-case user "other" (password other_secret), each with CREATE SESSION and a
 # quota on USERS (dbio_x also CREATE TABLE, CREATE SEQUENCE and CREATE TRIGGER:
-# t/10 and t/20 make their objects in its schema as that user). The test user
+# t/10 make their objects in its schema as that user). The test user
 # dbio gets the ANY privileges that writing into their schemas takes: CREATE,
 # ALTER and DROP ANY TABLE, INDEX, SEQUENCE and TRIGGER, SELECT, INSERT, UPDATE,
 # DELETE and COMMENT ANY TABLE, SELECT ANY DICTIONARY. The tests read the second
 # user from DBIO_TEST_ORA_EXTRAUSER_DSN (the DSN of DBIO_TEST_ORA_DSN),
 # DBIO_TEST_ORA_EXTRAUSER_USER=dbio_x and DBIO_TEST_ORA_EXTRAUSER_PASS=dbio_x_secret
-# (t/10-oracle.t, t/20-oracle-core.t, t/84-ddl-cross-schema-live.t) and skip
+# (t/10-oracle.t, t/84-ddl-cross-schema-live.t) and skip
 # without them. The conformance case ddl-qualified-source-name needs "other"; where
 # it is missing the case stays pending on k58.
 #
@@ -111,7 +111,7 @@ data:
     /
   02_dbio_second_users.sql: |
     -- The users the cross-schema tests write into (karr k58): t/84, t/85, the
-    -- conformance case ddl-qualified-source-name, t/10 and t/20 read them from
+    -- conformance case ddl-qualified-source-name, t/10 read them from
     -- DBIO_TEST_ORA_EXTRAUSER_*. Runs as SYS after 01; created when missing,
     -- password and quota set again when they exist, so that a re-run is safe.
     --   DBIO_X  (unquoted, so it logs in as dbio_x)  password dbio_x_secret
@@ -137,7 +137,7 @@ data:
         EXECUTE IMMEDIATE 'ALTER SESSION SET CONTAINER = ' || v_target;
       END IF;
 
-      -- t/10 and t/20 create their tables, sequences and triggers in the schema of
+      -- t/10 create their tables, sequences and triggers in the schema of
       -- the second user as that user
       ensure_user('DBIO_X', 'dbio_x_secret',
         'CREATE SESSION, CREATE TABLE, CREATE SEQUENCE, CREATE TRIGGER');

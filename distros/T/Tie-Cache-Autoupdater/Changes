@@ -6,3 +6,22 @@ Revision history for Tie::Cache::Autoupdater
         Added new attribute - "clone". Delete unnecessary warn message when key doesn't exist
 0.21
         Bugfix. Check data type before returned dclone reference
+0.22
+        Bugfix. FIRSTKEY and NEXTKEY returned cached values instead of key
+        names, so "keys %cache" listed values and "each %cache" could not be
+        used at all. Iterating an empty cache also created an entry under an
+        empty key. They now return key names, as the tie interface requires.
+
+        Rewrote the documentation and the README, and documented behaviour
+        that was previously undescribed: how a source's return value is
+        normalised, what happens when a source dies, what "clone" does and
+        does not copy, and how the standard hash operations behave.
+
+        Test suite extended to cover the whole module (statements, branches,
+        conditions and subroutines). Verified on perl 5.26 - 5.42.
+
+        Added a LICENSE file with the full license text and fixed the license
+        declared in Makefile.PL: it said Artistic 2.0, while the documentation
+        has always said "the same terms as Perl itself" (Artistic 1.0 or GPL).
+
+        Removed the empty TODO file from the distribution.

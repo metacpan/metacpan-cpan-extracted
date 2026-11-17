@@ -4,7 +4,7 @@ package DBIO::Storage::Async::TransactionContext;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Exception ();
 use Scalar::Util ();
@@ -251,7 +251,7 @@ DBIO::Storage::Async::TransactionContext - Generic pinned-connection context for
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Scalar::Util ();
@@ -55,7 +57,7 @@ use DBIO::Async::TransactionContext;
   package TxnConn14;
   sub new {
     my ($class, $id) = @_;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return bless { id => $id, r => $r, w => $w, in_txn => 0 }, $class;
   }
@@ -239,7 +241,7 @@ sub released_exactly_once {
   isa_ok $ctx, 'DBIO::Async::TransactionContext',
     'the context handed to the coderef';
   is $storage->_txn_context_class, 'DBIO::Async::TransactionContext',
-    '... the one _txn_context_class names (karr k13: no adapter has to say so)';
+    '... the one _txn_context_class names (no adapter has to say so)';
 
   is_deeply $storage->{log},
     [ 'acquire', 'BEGIN', 'stmt', 'COMMIT', 'release' ],

@@ -22,7 +22,7 @@ selected per connection via `connect(..., { async => 'future_io' })` (ADR 0030 �
 explicit, no auto-fallback) and its transport class is **resolved by convention**:
 the core resolver derives `ref($storage) . '::Async'` off the concrete driver
 storage — `DBIO::PostgreSQL::Storage` → `DBIO::PostgreSQL::Storage::Async` — and
-croaks early if a driver ships no such adapter (ADR 0030 refinement / karr k65).
+croaks early if a driver ships no such adapter (ADR 0030 refinement).
 The adapter is a concrete subclass of `DBIO::Async::Storage` that supplies the
 seam hooks below; the Model-B orchestration (CRUD runner, txn pinning, pipeline)
 is inherited from core (ADR 0030 §4). Its `insert_async` resolves the
@@ -48,7 +48,7 @@ unimplemented ones croak `"Subclass must override …"`.
 | Hook | Driver supplies |
 |------|-----------------|
 | `_submit_query($conn, $sql, $bind)` | dispatch the query on the wire, non-blocking. The **return value is ignored** — `_await_query_result` calls it in void context and then chains on `_await_readable` |
-| `_collect_result($conn)` | read the ready result off the connection, as a Future. Takes the connection and **nothing else** (ADR 0044 / karr k11): a driver needing more of the result re-polls with `_await_readable($conn)`, carrying no SQL and no binds. A query cancelled in flight, or whose connection is closed under it (karr k39), may never reach it, or be cut off between re-polls: the connection is then retired or closed, not drained (karr k29) — never count on a later call to finish the read |
+| `_collect_result($conn)` | read the ready result off the connection, as a Future. Takes the connection and **nothing else** (ADR 0044): a driver needing more of the result re-polls with `_await_readable($conn)`, carrying no SQL and no binds. A query cancelled in flight, or whose connection is closed under it, may never reach it, or be cut off between re-polls: the connection is then retired or closed, not drained — never count on a later call to finish the read |
 | `_conn_fileno($conn)` | the **raw** socket fd. The base dups it once per connection (`_conn_poll_fh`) and polls that handle — `Future::IO` needs a real filehandle, and a per-poll one is closed before the loop unwatches it |
 | `_conn_ready($conn)` | **boolean**: is the connection ready for queries? `_await_conn_ready` returns a done Future when true, and polls until it is when not |
 | `_normalize_conninfo($ci)` | driver's connect-info shape |
@@ -64,8 +64,8 @@ unimplemented ones croak `"Subclass must override …"`.
 | `_listen_poll_interval` | optional mode switch: `undef` (default) = socket-driven watch, positive seconds = timer-driven (emulation; the driver's POD must state latency = interval and on-commit delivery, core ADR 0056 §6) |
 | `_listen_open` / `_listen_close` / `_listen_subscribe` / `_listen_unsubscribe` / `_listen_probe` | the listen connection's DB-specific seams, inherited as croaking seams from core — plus the driver's own `transport_capabilities` declaring `listen` / `notify` (the base declares neither) |
 
-`_txn_context_class` and `_txn_conn_accessor` are **not** on that list: since
-karr k13 `DBIO::Async::Storage` answers both itself, with
+`_txn_context_class` and `_txn_conn_accessor` are **not** on that list:
+`DBIO::Async::Storage` answers both itself, with
 `'DBIO::Async::TransactionContext'` and `'txn_conn'`. An adapter names them only
 when it wants a different context class or constructor key.
 
@@ -77,27 +77,26 @@ dist's. What lives here is the transport: `future_class`, the pool
 `PoolBase`), `_query_async` / `_query_async_pinned`, the `_await_*` watcher
 seam, `transport_capabilities`, and the one AccessBroker hook the transport
 fills for core's per-spawn conninfo provider, `_async_broker_conninfo`.
-Since karr k22 (ADR 0005) it also owns the Future::IO-generic half of core's
+It also owns (ADR 0005) the Future::IO-generic half of core's
 LISTEN/NOTIFY seams, once for every driver: `_listen_delay` (`Future::IO->sleep`),
 the watch loop behind `_listen_watch` / `_listen_unwatch` (state on
 `$conn->{_dbio_async_listen_watch}`, private steps `_watch_*`) and the pooled
 `_notify_send` over `_query_async` + `_notify_sql`.
-Since karr k26 / k28 (ADR 0006) it also tells the pool about dead connections on
+It also tells (ADR 0006) the pool about dead connections on
 the driver's word: `_query_async` and `_query_async_pinned` register
 `_mark_dead_on_fail` on every query Future (ahead of `_release_on_ready` on the
 pooled path), and `DBIO::Async::Pool` passes core's borrow-time
 `_idle_connection_alive` on to the storage.
 
 Both dispatch sites — `_query_async` (pooled) and `_dispatch_pinned` (pinned) —
-call `_await_query_result` through core's `_seam_future` (karr k25 / k35, core
-k229 / k252). A seam that dies fails the query with its error; one that returns
+call `_await_query_result` through core's `_seam_future` (core's seam wrapper). A seam that dies fails the query with its error; one that returns
 **no Future** (`undef`, a plain value) fails it with an error naming the backend
 class and the seam. Either way `_conn_error_is_fatal` is still asked, and a
 pooled connection still released.
 A driver overriding `_await_query_result` returns a Future — unlike
 `_submit_query`, whose return value is ignored.
 
-**Statements in flight are held by the storage** (ADR 0007, karr k46 / k39; POD
+**Statements in flight are held by the storage** (ADR 0007; POD
 `STATEMENTS IN FLIGHT` in `DBIO::Async::Storage`). Every statement
 `_query_async` / `_query_async_pinned` put on the wire sits in a register on
 the storage (`_flight_register`) with its connection and the pool it was
@@ -138,8 +137,7 @@ own**, of the flight's class.
 - A driver with **its own pool class** calls `_abandon_flights_on` from its
   `_shutdown_connection`.
 
-A query **cancelled in flight retires its connection** (karr k29 pooled, k33
-pinned): the poll is dropped, but the statement is on the server and its result
+A query **cancelled in flight retires its connection**, pooled and pinned: the poll is dropped, but the statement is on the server and its result
 unread, and the base neither drains it nor cancels it on the server. Pooled,
 `_query_async` registers `_abandon_on_cancel`, which reports the connection to
 the pool (`_mark_connection_dead`) before the release runs; pinned, the
@@ -149,7 +147,7 @@ cancel that comes while the caller still waits for the pool dispatched nothing
 and retires nothing.
 
 `_query_async_pinned` **serialises** the statements on one pinned connection
-(karr k33; POD `THE PINNED STATEMENT QUEUE` in `DBIO::Async::Storage`): a
+(POD `THE PINNED STATEMENT QUEUE` in `DBIO::Async::Storage`): a
 statement is dispatched only once the one before it on that connection has
 settled, in the order issued, and the caller gets its Future at once. That
 covers everything pinned — a transaction context, a pipeline context, core's
@@ -161,8 +159,7 @@ covers everything pinned — a transaction context, a pipeline context, core's
   queue**: its statements are dispatched at once and the driver serialises them
   itself, cancel handling included.
 - The connection counts as idle as soon as its statement has settled with
-  nothing waiting behind it — **before** that statement's callbacks run (karr
-  k34). So a synchronous statement issued from such a callback goes out at
+  nothing waiting behind it — **before** that statement's callbacks run. So a synchronous statement issued from such a callback goes out at
   once; every statement of a `txn_do` block is one, since core runs the block
   from the callback of `BEGIN`'s Future. On `Future::IO::Impl::IOAsync` it
   goes out and then dies in its `->get` — the implementation's limit, not the
@@ -177,15 +174,15 @@ covers everything pinned — a transaction context, a pipeline context, core's
 ## Pipeline and transactions
 
 - Sync methods are `->get` wrappers (ADR 0001); transactions pin one connection via `TransactionContext` (ADR 0002).
-- Pipeline is a generic `pipeline(\&coderef)` bracketing over driver seam hooks, in **core** since ADR 0030 §4; a transport supplying no pipeline seams fails the returned Future rather than degrading to sequential (ADR 0003 amendment k14, core ADR 0030 §3) — `future_io` supplies none, batching is the `ev` transports' capability. The block is handed a **`DBIO::Storage::Async::PipelineContext`** pinned to the bracketed connection (core), not the storage — its CRUD routes through `_query_async_pinned`, so batching needs no driver cooperation. A call on the *storage* inside the block takes a pooled connection and is NOT batched; `_query_async` must not consult pipeline state (ADR 0003 amendment, karr k7).
+- `pipeline(\&coderef)` is core's bracketing over driver seam hooks (ADR 0003, core ADR 0030 §4). A transport supplying no pipeline seams fails the returned Future (core ADR 0030 §3); `future_io` supplies none, batching is the `ev` transports' capability. The block is handed a pinned `DBIO::Storage::Async::PipelineContext`, not the storage; a call on the *storage* inside the block takes a pooled connection and is not batched, and `_query_async` does not consult pipeline state.
+- Seam and capability tables: skill `dbio-driver-development`, `references/async-transport.md`.
 
 ## Future::IO implementation limits
 
 What a `Future::IO` implementation does with this transport's polls is its
 own, and some of it reaches a caller (POD `FUTURE::IO IMPLEMENTATIONS` in
-`DBIO::Async::Storage`). As of Future::IO 0.23 and Future::IO::Impl::IOAsync
-0.805, the newest releases; **nothing in `lib/` works around any of it**, and
-whether something should is undecided (karr k37). `t/33` (built-in) and `t/34`
+`DBIO::Async::Storage`). **Nothing in `lib/` works around any of it**, and
+whether something should is undecided. `t/33` (built-in) and `t/34`
 (IO::Async) hold the first, third and fourth as `TODO` on what the caller is
 owed, with the transport's own part asserted hard beside it — so an upstream
 fix shows as `TODO passed`, and an install never fails over it.
@@ -193,7 +190,7 @@ fix shows as `TODO passed`, and an install never fails over it.
 - **Built-in: a poll cancelled from inside another poll's callback kills the
   round** when it stood behind the resolving one (`Can't call method "fh" on an
   undefined value at Future/IO.pm line 890`), out of whatever `->get` drove the
-  loop, on a Future that is already done (karr k37). Met by `Future->wait_any`
+  loop, on a Future that is already done. Met by `Future->wait_any`
   over two pooled queries when the first issued wins, and by a `disconnect`,
   pool shutdown or `cancel` in a query's callback while a later statement is in
   flight. The transport's part is done by then (winner collected and released,
@@ -205,7 +202,7 @@ fix shows as `TODO passed`, and an install never fails over it.
   the reason the listen watch loop confirms readability itself. Not asserted
   in the suite.
 - **IOAsync: a cancelled poll keeps its watch and the dup** until the socket
-  next turns readable (karr k38) — after a query cancelled in flight, a
+  next turns readable — after a query cancelled in flight, a
   teardown under a statement, a stopped listen watch. Caller outcome,
   retirement and "late answer not read" do not wait for it.
 - **IOAsync: the read handler is not reentrant** — a `->get` in a callback run
@@ -217,7 +214,33 @@ fix shows as `TODO passed`, and an install never fails over it.
   (rolled back). Also a `listen` channel callback that blocks while the next
   notification arrives. Chained (`select_async(...)->then`, `txn_do_async`) it
   works; so does the blocking form on the built-in implementation (`t/26`).
-  No card of its own: noted on karr k38, decided with karr k37.
+
+## Timeouts and limits (ADR 0010)
+
+Connect options, read through core's `async_option` and declared through
+`async_option_names`; a malformed value is refused on connect, the message
+naming the option and its form, never the value. A driver adapter that declares
+options of its own extends `async_option_names`. POD `TIMEOUTS AND LIMITS` in
+`DBIO::Async::Storage`.
+
+- `statement_timeout` — seconds a statement may take on the wire, pooled and
+  pinned (`0` or absent: none). A statement that runs out is cancelled like one
+  cancelled in flight: its connection is retired, the caller's Future fails with
+  `statement timed out after N seconds (statement_timeout)`, never naming SQL
+  or binds.
+- `max_pending_pinned` — statements that may wait on a pinned connection; the
+  statement over the limit fails at once (`not sent: … max_pending_pinned`), the
+  queue stays as it was. A connection that is no hashref has no queue and no
+  limit.
+- Core's `acquire_timeout`, `max_waiters`, `txn_timeout` and `reset_timeout`
+  reach the pool through this storage.
+
+## Trace (ADR 0009)
+
+The trace of a statement runs through the owner storage's debug object and its
+`redact_bind_value` hook, as the sync path does: `DBIO_TRACE=1` shows the SQL,
+`=2` and up the binds, redacted and cut to 32 characters. The transport only
+calls core's `_debug_query`; the hook gets column name and bind attributes.
 
 ## Connection / AccessBroker
 
@@ -228,7 +251,7 @@ has the same broker-vs-direct branch as the drivers.
 With a broker attached, core's per-spawn provider (`_conninfo_provider`) calls
 `_async_broker_conninfo` for every new connection — each pool spawn, and a
 driver's listen connection — so rotated credentials reach the next one. The base
-implements it (karr k27); a `future_io` adapter inherits it. It asks the broker
+implements it; a `future_io` adapter inherits it. It asks the broker
 anew each time and reads three answer shapes:
 
 - **DBI form** `[ 'dbi:…', $user, $password, \%attrs ]` (Vault, HostBound over
@@ -242,7 +265,7 @@ anew each time and reads three answer shapes:
   `_dsn_from_connect_params`), which alone knows the DBD; a backend without an
   owner croaks, naming the fix. A `dbname` that starts with `dbi:` is the whole
   DSN and needs no owner; `host` / `port` are never DBD attributes there either,
-  and a non-empty one beside it croaks, naming the keys (karr k44).
+  and a non-empty one beside it croaks, naming the keys.
 - **The transport's own connect info** — a hashref with a `dsn`, or a
   `[ \%conninfo, \%opts ]` pair: taken as it is.
 
@@ -251,7 +274,7 @@ The first two reach the driver's `_normalize_conninfo` as the DBI form
 DSN hands it, so the driver needs no broker branch of its own. Any other answer
 croaks naming its shape: types and hash keys, never the values, which carry the
 password. Without a broker attached the hook croaks `… has no AccessBroker
-attached to ask for connect info` (karr k43) — the provider outlives a broker
+attached to ask for connect info` — the provider outlives a broker
 detached through `clear_access_broker`.
 
 DBD attributes given beside the broker (`connect($broker, \%options)`) are

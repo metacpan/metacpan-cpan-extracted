@@ -4,7 +4,7 @@ package DBIO::Async::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Future';
 
@@ -16,8 +16,8 @@ use Scalar::Util ();
 sub new {
   my $proto = shift;
   my $self  = $proto->SUPER::new(@_);
-  if (ref $proto and my $mark = $proto->{dbio_async_pool_wait}) {
-    $self->{dbio_async_pool_wait} = $mark;
+  if (ref $proto and my $mark = $proto->udata("dbio_async_pool_wait")) {
+    $self->set_udata(dbio_async_pool_wait => $mark);
   }
   return $self;
 }
@@ -27,7 +27,7 @@ sub mark_pool_wait {
   my ($self, $pool) = @_;
   my $mark = [ $pool, $self ];
   Scalar::Util::weaken($_) for @$mark;
-  $self->{dbio_async_pool_wait} = $mark;
+  $self->set_udata(dbio_async_pool_wait => $mark);
   return $self;
 }
 
@@ -55,7 +55,7 @@ sub await {
 
 sub _withdraw_dying_wait {
   my ($self, $error) = @_;
-  my $mark = $self->{dbio_async_pool_wait} or return;
+  my $mark = $self->udata("dbio_async_pool_wait") or return;
   my ($pool, $waiter) = @$mark;
   return unless $pool && $waiter;
   $waiter->fail($error) if $pool->_withdraw_waiter($waiter);
@@ -76,7 +76,7 @@ DBIO::Async::Future - The Future a caller waits on for a pool connection, blocki
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

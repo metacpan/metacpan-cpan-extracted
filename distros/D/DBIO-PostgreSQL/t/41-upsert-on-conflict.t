@@ -288,7 +288,7 @@ my @values_bind = ( [ name => 'foo' ], [ rank => 3 ] );
     qq{$values ON CONFLICT ("name") DO UPDATE SET "rank" = EXCLUDED."rank" }
   . q{WHERE "artist"."rank" < EXCLUDED."rank"},
     'the last-write-wins guard: the stored column is qualified with the target '
-  . 'table (bare is ambiguous in the ON CONFLICT DO UPDATE scope, k205), '
+  . 'table (bare is ambiguous in the ON CONFLICT DO UPDATE scope), '
   . '-attempted is the value that was tried';
   is_deeply $bind, \@values_bind, '... and it binds nothing of its own';
 }
@@ -339,7 +339,7 @@ my @values_bind = ( [ name => 'foo' ], [ rank => 3 ] );
     qq{$values ON CONFLICT ("name") DO UPDATE SET "rank" = EXCLUDED."rank" }
   . q{WHERE ( "artist"."rank" < EXCLUDED."rank" AND ( "artist"."charfield" IS NULL OR }
   . q{"artist"."charfield" != EXCLUDED."charfield" ) )},
-    'every stored column is qualified with the target table at any depth (k205); '
+    'every stored column is qualified with the target table at any depth; '
   . '-attempted is substituted at any depth, not just at the top level';
   is_deeply $bind, \@values_bind, '... still no bind of its own';
 }
@@ -380,7 +380,7 @@ my @values_bind = ( [ name => 'foo' ], [ rank => 3 ] );
     qq{$values ON CONFLICT ("name") DO UPDATE SET "rank" = EXCLUDED."rank" }
   . q{WHERE "artist"."charfield" = EXCLUDED."charfield"},
     'a marker as a bare column value is an equality against the attempted row '
-  . '(the stored column stays qualified with the target table, k205)';
+  . '(the stored column stays qualified with the target table)';
 }
 
 {

@@ -13,7 +13,7 @@ DBIO::Manual::QuickStart - Up and running with DBIO in 10 minutes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

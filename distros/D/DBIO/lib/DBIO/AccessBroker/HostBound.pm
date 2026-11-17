@@ -4,7 +4,7 @@ package DBIO::AccessBroker::HostBound;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp qw(croak);
 use Scalar::Util qw(blessed);
@@ -193,7 +193,7 @@ DBIO::AccessBroker::HostBound - One credential identity pinned to one host
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

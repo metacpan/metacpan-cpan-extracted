@@ -107,7 +107,7 @@ dbiogen - Dump a database schema to DBIO Result classes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

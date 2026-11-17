@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Diff::Type;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -424,7 +424,7 @@ DBIO::PostgreSQL::Diff::Type - Diff operations for PostgreSQL types (enums, comp
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

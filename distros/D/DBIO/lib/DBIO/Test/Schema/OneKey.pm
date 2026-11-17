@@ -3,7 +3,7 @@ package DBIO::Test::Schema::OneKey;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -39,7 +39,7 @@ DBIO::Test::Schema::OneKey - Test result class for the onekey table
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

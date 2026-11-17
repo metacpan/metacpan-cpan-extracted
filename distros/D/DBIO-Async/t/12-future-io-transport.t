@@ -1,12 +1,20 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 use Scalar::Util 'refaddr';
 
 use Future;
 use Future::IO qw( POLLIN );
 use DBIO::SQLMaker;          # the mock's sql_maker_class
 use DBIO::Async::Storage;
+
+# Every warning of the run, checked at the end: the pool reports a failing
+# Future::IO call as a warning, so a test double that lacks a method surfaces
+# only there.
+my @warnings;
+$SIG{__WARN__} = sub { push @warnings, @_ };
 
 # OFFLINE test for the PRODUCTIVE Future::IO transport path (karr k15 point 1):
 # _await_query_result -> _submit_query -> _await_readable -> Future::IO->poll ->
@@ -57,6 +65,13 @@ use DBIO::Async::Storage;
     local $Future::IO::IMPL;     # -> the built-in impl for this one call
     return Future::IO->poll($fh, $events);
   }
+  # The pool sleeps through Future::IO as well (retry back-off); not a poll,
+  # so it is not recorded.
+  sub sleep {
+    my ($class, @args) = @_;
+    local $Future::IO::IMPL;
+    return Future::IO->sleep(@args);
+  }
 }
 $Future::IO::IMPL = 'PollSpy';
 
@@ -86,7 +101,7 @@ sub polls       { [ @PollSpy::POLLS ] }
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { r => $r, w => $w, id => ++$self->{_next_id} };
   }
@@ -328,5 +343,8 @@ for my $seam (qw(
   is $storage->pool->available, 0,
     'and the connection is STILL checked out -- the pinned path never releases';
 }
+
+is_deeply \@warnings, [],
+  'the run prints no pool error from the test double (PollSpy implements every Future::IO method the pool calls)';
 
 done_testing;

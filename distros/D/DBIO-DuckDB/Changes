@@ -1,5 +1,49 @@
 Revision history for DBIO-DuckDB
 
+0.900007  2026-11-17
+    * Dependencies
+        - Requires DBI 1.634.
+        - Requires Math::BigInt 1.9993, the version Perl 5.20 ships.
+    * Storage
+        - A HUGEINT is read back exact on a perl before 5.24: DBD::DuckDB
+          0.16 tested the upper word with a shift by 64 bits, which is a
+          shift by none there, and returned every value with an odd upper
+          word 2**128 too low (the largest HUGEINT came back negative). The
+          storage replaces that reader for the DBD versions it knows and the
+          UHUGEINT reader, which is right, stays.
+    * Documentation
+        - The shipped skills `dbio-duckdb` and `dbio-duckdb-database` cover
+          Quack, the extension list, `duckdb_checkpoint`, the Arrow decoder,
+          sequence auto-increment and the test command, and name the quoter
+          `DBIO::DuckDB::DDL::Emit::quote_ident`.
+    * Tests
+        - The second-process probes (file lock, crash scenarios, Arrow fetch)
+          run from a script file started in list form, so they work where
+          the shell cuts a multi-line `perl -e` program; a held file is
+          also recognised by Windows' "being used by another process".
+          The fork scenario is skipped on a perl without fork.
+        - The helper that starts the second perl reads the child's output
+          through a temporary file, not through a list-form pipe open,
+          which a Windows perl before 5.22 does not implement. It returns
+          the same output lines and wait status; the child is still
+          started in list form, without a shell, and the probes on
+          perl 5.20 and later run the same way on every platform.
+        - Under Windows the helper quotes every argument for the child's C
+          runtime itself, because perl leaves an argument that holds a `"`
+          raw; an argument such as `it's "mixed"` reaches the child as one
+          argument, unchanged.
+        - The Arrow fetch test ends cleanly where DBD::DuckDB cannot bind
+          `duckdb_from_time` (perl 5.20 on Windows): the comparison of a TIME
+          value with the row path is skipped there, as for DATE, and every
+          Arrow-path assertion still runs.
+        - The Arrow fetch cases that read a DATE through DBD::DuckDB for
+          comparison are skipped where it cannot read DATE values (it binds
+          that reader only for the libduckdb versions it knows); the Arrow
+          path's own DATE assertions stay.
+        - The DECIMAL reader premise is measured in a child process started
+          from a script file; a child that returns no two values is a clear
+          failure with its output shown, not a silent pass or a warning.
+
 0.900004  2026-11-08
     * Storage
         - An error of the engine names no value: DuckDB writes the value into

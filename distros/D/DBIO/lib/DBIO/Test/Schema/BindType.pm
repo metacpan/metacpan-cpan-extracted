@@ -3,7 +3,7 @@ package DBIO::Test::Schema::BindType;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -50,7 +50,7 @@ DBIO::Test::Schema::BindType - Test result class for the bindtype_test table
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

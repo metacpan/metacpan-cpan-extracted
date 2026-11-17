@@ -111,7 +111,7 @@ like $ef->failure, qr/could not connect/, 'failure carries the connect error';
 # 3a. The connect-error retired the broken handle from the pool's connection
 # inventory (k197 _retire_readiness_failure removes the conn from _connections).
 is scalar @{ $err_pool->{_connections} }, 0,
-  'connect-error retires the broken connection (k197)';
+  'connect-error retires the broken connection';
 
 # 3b. Fresh acquire -- no prior release of the broken handle -- spawns a
 # NEW conn. The new conn is cold, so acquire is pending; firing on_connect

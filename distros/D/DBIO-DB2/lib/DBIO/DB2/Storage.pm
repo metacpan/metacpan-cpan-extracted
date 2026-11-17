@@ -4,7 +4,7 @@ package DBIO::DB2::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -16,7 +16,7 @@ use DBIO::DB2::Storage::Cursor ();
 
 __PACKAGE__->register_driver('DB2' => __PACKAGE__);
 
-__PACKAGE__->datetime_parser_type('DateTime::Format::DB2');
+__PACKAGE__->datetime_parser_type('DBIO::DB2::Storage::DateTimeFormat');
 __PACKAGE__->sql_quote_char ('"');
 __PACKAGE__->sql_maker_class('DBIO::DB2::SQLMaker');
 __PACKAGE__->cursor_class('DBIO::DB2::Storage::Cursor');
@@ -408,7 +408,9 @@ sub _explain_query {
     [],
   );
 
-  return $sth->fetchall_arrayref;
+  my $rows = $sth->fetchall_arrayref;
+  DBIO::DB2::Storage::Cursor->decode_rows($self, $sth, @$rows);
+  return $rows;
 }
 
 
@@ -530,13 +532,13 @@ DBIO::DB2::Storage - IBM DB2 support for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
 Storage driver for IBM DB2 databases. Handles autoincrement column retrieval
 via C<IDENTITY_VAL_LOCAL()>, queries the server name separator from L<DBI>,
-and sets the datetime parser to L<DateTime::Format::DB2>.
+and sets the datetime parser to L<DBIO::DB2::Storage::DateTimeFormat> (L<DateTime::Format::DB2> with a working C<parse_time>).
 
 Uses L<DBIO::DB2::SQLMaker> for SQL generation with DB2-specific LIMIT/OFFSET
 support (C<ROW_NUMBER() OVER()> for OFFSET, C<FETCH FIRST n ROWS ONLY> otherwise).
@@ -960,8 +962,11 @@ Every other type is bound as core does.
 =head2 select_single
 
 L<DBIO::Storage::DBI/select_single> (what C<find> and C<single> read through),
-with the character columns of the row decoded as the cursor does
-(L<DBIO::DB2::Storage::Cursor/decode_rows>).
+with the row repaired as the cursor does
+(L<DBIO::DB2::Storage::Cursor/decode_rows>): the character columns decoded, and
+a C<DECIMAL>, C<NUMERIC>, C<REAL>, C<DOUBLE> or C<DECFLOAT> value delivered with
+a decimal point whatever the locale of the process is (the CLI writes a comma
+under a German locale; DBIO neither sets an environment nor changes the locale).
 
 =head2 _utf8_database
 

@@ -381,10 +381,12 @@ sub _select_through (
 # DBD::Pg, its placeholder options, as they can be changed on the
 # handle. Each statement handle has a copy of its own of
 # what the statement handle keeps, as an iterator adds to it. The handle
-# keeps no more than $STUDIED statements, starting again when it has
-# that many, so statements made as the program runs can't fill memory.
+# keeps no more than $STUDIED statements, so statements made as the
+# program runs can't fill memory: when it has that many, it evicts
+# $EVICTED of those used least, as _evict says (roadmap 2026-0030).
 sub _study ($self, $statement, $attrs) {
     state $STUDIED = 1000;
+    state $EVICTED = 125;
     # A study _prepare_as handed on, taken once, and only for the handle,
     # statement and attributes it was made for: a subclass's prepare that
     # changes them has them studied afresh.
@@ -405,6 +407,7 @@ sub _study ($self, $statement, $attrs) {
     my $cache = $self->{private_ekorn_studied} //= {
         Pg         => $self->{Driver}{Name} eq 'Pg',
         Statements => {},
+        Order      => [],
     };
     my $key
         = $cache->{Pg}
@@ -412,12 +415,40 @@ sub _study ($self, $statement, $attrs) {
         : $statement;
     my $studied = $cache->{Statements};
     my $found   = $studied->{$key};
-    unless ($found) {
+    if ($found) {
+        $found->[2]++;
+    }
+    else {
         my($normalised, $kept) = _study_afresh($self, $statement, undef);
-        %$studied = () if keys %$studied >= $STUDIED;
-        $found    = $studied->{$key} = [$normalised, $kept];
+        _evict($studied, $cache->{Order}, $EVICTED)
+            if keys %$studied >= $STUDIED;
+        $found = $studied->{$key} = [$normalised, $kept, 0];
+        push @{ $cache->{Order} }, $key;
     }
     return $found->[0], {%{ $found->[1] }}, undef, {};
+}
+
+# Evict the number of studies given, walking the queue of their keys,
+# in the order they were first studied: a study unused since the walk
+# last passed it is evicted, and one used has its count of uses halved,
+# so it ages, and goes to the back. It touches only the studies it
+# passes. A program with more statements than the cache holds keeps
+# those it uses, and takes 1 to 4% less time than when the cache was
+# emptied (roadmap 2026-0030).
+sub _evict ($studied, $order, $number) {
+    while ($number) {
+        my $key   = shift @$order;
+        my $entry = $studied->{$key};
+        if ($entry->[2]) {
+            $entry->[2] >>= 1;
+            push @$order, $key;
+        }
+        else {
+            delete $studied->{$key};
+            $number--;
+        }
+    }
+    return;
 }
 
 # Study a statement, as _study does, without keeping what was found.

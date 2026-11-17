@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Storage::TxnScopeGuard;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::TxnScopeGuard';
 
@@ -61,7 +61,7 @@ DBIO::ClickHouse::Storage::TxnScopeGuard - Scope guard for a storage that has no
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

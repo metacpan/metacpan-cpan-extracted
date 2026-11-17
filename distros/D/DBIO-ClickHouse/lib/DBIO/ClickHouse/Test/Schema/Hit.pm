@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Test::Schema::Hit;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Core';
 
@@ -41,7 +41,7 @@ DBIO::ClickHouse::Test::Schema::Hit - Test result class -- the plain MergeTree t
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

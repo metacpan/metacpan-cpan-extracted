@@ -97,16 +97,16 @@ END_MODULE
 			'optional' => 1,
 			'default' => 0,
 			'type' => 'string',	# FIXME:  would be good to say boolean here!
-			'_type_checked' => 1
+			'_source' => 'validator'
 		}, 'username' => {
 			'type' => 'string',
 			'optional' => 0,
-			'_type_checked' => 1
+			'_source' => 'validator'
 		}, 'roles' => {
 			'optional' => 1,
 			'type' => 'arrayref',
 			'default' => [],
-			'_type_checked' => 1
+			'_source' => 'validator'
 		}
 	});
 

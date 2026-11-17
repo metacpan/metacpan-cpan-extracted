@@ -144,7 +144,7 @@ sub drive {
   my $plain = Future->new;
   settle_later(0.01, $plain, done => 'never read');
   ok !eval { $plain->get; 1 }, 'a plain Future cannot get while it is pending';
-  like $@, qr/does not provide ->await/, '(the reason this class exists)';
+  like $@, qr/does not provide (?:an )?->await/, '(the reason this class exists)';
   drive($plain);
 
   my $f = $EVF->new;

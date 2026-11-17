@@ -54,3 +54,26 @@ numeric`, operand type clash, uniqueidentifier and date conversion failures,
   and the populate reports are core's and call the hook.
 - A new server sentence that quotes a value is not masked until a rule for it
   is added (or the value is a bind of four characters or more).
+
+## Addendum 2026-11-10 — the language of the session
+
+Measured (SQL Server 2022, 25 languages of `sys.syslanguages`, DBD::Sybase and
+DBD::ODBC over FreeTDS): the server reports in the language of the session and
+quotes the values in it, with the marks of the language (`'x'`, `"x"`,
+`« x »`, `„x“`, `“x”`, `(x)` for the truncated value in Italian) or with none
+(Czech, Finnish, Swedish, Dutch: the bare word). The English sentence rules
+missed all of it. The decision: the masking does not depend on the wording.
+
+1. The message number decides what quotes a value (244, 245, 248, 102, 13607,
+   13609: one quoted value; 2627, 2601, 1505: the parenthesis; 2628: what
+   follows the names of table and column). The marks do the rest.
+2. Where no mark can be taken hold of, the text of that message falls away
+   and its number stays; a wrong guess would put a value into the exception,
+   a missing text only costs a diagnosis. The number, the SQLSTATE and the
+   statement are enough to find the cause.
+3. DBD::ODBC gives no number in the text. The ODBC storage reads it from the
+   diagnostic records of the failing handle (`odbc_getdiagrec`), in
+   `_dbi_handle_error`, the one place that has the handle; the SQLSTATE behind
+   the text is the fallback. The records of a `$dbh->do` do not exist; the
+   42000 forms are then covered by the English rules only (limit).
+4. English texts and a message with English rule words are masked as before.

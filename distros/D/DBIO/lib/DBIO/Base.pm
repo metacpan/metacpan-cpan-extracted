@@ -4,7 +4,7 @@ package DBIO::Base;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Util;
 use mro 'c3';
@@ -88,7 +88,7 @@ DBIO::Base - Meta-infrastructure base for all DBIO internal classes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

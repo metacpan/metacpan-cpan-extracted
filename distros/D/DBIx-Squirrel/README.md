@@ -195,6 +195,8 @@ my @titles = titles_by 2, keep_all;
 [DBIx::Squirrel::Sugar](https://metacpan.org/pod/DBIx%3A%3ASquirrel%3A%3ASugar) makes each a function with its own name. A
 statement's stages are declared beside its SQL. Called, it gives an
 iterator over the results, or, with a sink last, the sink's result.
+Given `pipeline`, it names pipelines too, which a statement can name
+among its stages.
 
 ## Documentation
 

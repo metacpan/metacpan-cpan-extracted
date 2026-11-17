@@ -1,5 +1,23 @@
 Revision history for DBIO-Informix
 
+0.900007  2026-11-17
+
+    * Fixed
+        - A DATE goes in and comes back as the same day whatever the
+          caller's DBDATE, DBCENTURY or GL_DATE hold (DMY4., Y4MD-, MDY4/ or
+          none). The storage pins the client's date format during the
+          connect, where the client reads it, and restores the caller's
+          environment; before, DBDATE=DMY4. stored the ninth of November as
+          the eleventh of September, and a day above 12 failed.
+          datetime_setup now sets GL_DATETIME only.
+
+    * Documentation
+        - The dbio-informix and dbio-informix-database skills and CLAUDE.md
+          follow the code: the DateTime parser, SERIAL/ix_sqlerrd
+          auto-increment, the throwaway-database deploy, the
+          dbi:Informix:database[@server] DSN, the coltype table, GL_DATETIME
+          and the live-test path.
+
 0.900004  2026-11-08
     First release: the IBM Informix driver for DBIO, over DBD::Informix.
 

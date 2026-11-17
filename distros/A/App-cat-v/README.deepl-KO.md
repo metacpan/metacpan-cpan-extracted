@@ -33,7 +33,7 @@ cat-v \[ 옵션 \] args ...
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # DESCRIPTION
 
@@ -63,41 +63,44 @@ Version 1.05
 
 두 번째 필드는 기본 동작입니다. `s`는 기호, `m`은 유니코드 마크, `0`은 변환하지 않음을 나타냅니다.
 
-    nul   s  \000  \x{2400}  ␀  SYMBOL FOR NULL
-    soh   s  \001  \x{2401}  ␁  SYMBOL FOR START OF HEADING
-    stx   s  \002  \x{2402}  ␂  SYMBOL FOR START OF TEXT
-    etx   s  \003  \x{2403}  ␃  SYMBOL FOR END OF TEXT
-    eot   s  \004  \x{2404}  ␄  SYMBOL FOR END OF TRANSMISSION
-    enq   s  \005  \x{2405}  ␅  SYMBOL FOR ENQUIRY
-    ack   s  \006  \x{2406}  ␆  SYMBOL FOR ACKNOWLEDGE
-    bel   s  \007  \x{2407}  ␇  SYMBOL FOR BELL
-    bs    s  \010  \x{2408}  ␈  SYMBOL FOR BACKSPACE
-    ht    s  \011  \x{2409}  ␉  SYMBOL FOR HORIZONTAL TABULATION
-    nl    m  \012  \x{240A}  ␊  SYMBOL FOR LINE FEED
-    vt    s  \013  \x{240B}  ␋  SYMBOL FOR VERTICAL TABULATION
-    np    m  \014  \x{240C}  ␌  SYMBOL FOR FORM FEED
-    cr    s  \015  \x{240D}  ␍  SYMBOL FOR CARRIAGE RETURN
-    so    s  \016  \x{240E}  ␎  SYMBOL FOR SHIFT OUT
-    si    s  \017  \x{240F}  ␏  SYMBOL FOR SHIFT IN
-    dle   s  \020  \x{2410}  ␐  SYMBOL FOR DATA LINK ESCAPE
-    dc1   s  \021  \x{2411}  ␑  SYMBOL FOR DEVICE CONTROL ONE
-    dc2   s  \022  \x{2412}  ␒  SYMBOL FOR DEVICE CONTROL TWO
-    dc3   s  \023  \x{2413}  ␓  SYMBOL FOR DEVICE CONTROL THREE
-    dc4   s  \024  \x{2414}  ␔  SYMBOL FOR DEVICE CONTROL FOUR
-    nak   s  \025  \x{2415}  ␕  SYMBOL FOR NEGATIVE ACKNOWLEDGE
-    syn   s  \026  \x{2416}  ␖  SYMBOL FOR SYNCHRONOUS IDLE
-    etb   s  \027  \x{2417}  ␗  SYMBOL FOR END OF TRANSMISSION BLOCK
-    can   s  \030  \x{2418}  ␘  SYMBOL FOR CANCEL
-    em    s  \031  \x{2419}  ␙  SYMBOL FOR END OF MEDIUM
-    sub   s  \032  \x{241A}  ␚  SYMBOL FOR SUBSTITUTE
-    esc   0  \033  \x{241B}  ␛  SYMBOL FOR ESCAPE
-    fs    s  \034  \x{241C}  ␜  SYMBOL FOR FILE SEPARATOR
-    gs    s  \035  \x{241D}  ␝  SYMBOL FOR GROUP SEPARATOR
-    rs    s  \036  \x{241E}  ␞  SYMBOL FOR RECORD SEPARATOR
-    us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
-    sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
-    del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
+    nul   s      \000  \x{2400}  ␀   SYMBOL FOR NULL
+    soh   s      \001  \x{2401}  ␁   SYMBOL FOR START OF HEADING
+    stx   s      \002  \x{2402}  ␂   SYMBOL FOR START OF TEXT
+    etx   s      \003  \x{2403}  ␃   SYMBOL FOR END OF TEXT
+    eot   s      \004  \x{2404}  ␄   SYMBOL FOR END OF TRANSMISSION
+    enq   s      \005  \x{2405}  ␅   SYMBOL FOR ENQUIRY
+    ack   s      \006  \x{2406}  ␆   SYMBOL FOR ACKNOWLEDGE
+    bel   s      \007  \x{2407}  ␇   SYMBOL FOR BELL
+    bs    s      \010  \x{2408}  ␈   SYMBOL FOR BACKSPACE
+    ht    s      \011  \x{2409}  ␉   SYMBOL FOR HORIZONTAL TABULATION
+    nl    m      \012  \x{240A}  ␊   SYMBOL FOR LINE FEED
+    vt    s      \013  \x{240B}  ␋   SYMBOL FOR VERTICAL TABULATION
+    np    m      \014  \x{240C}  ␌   SYMBOL FOR FORM FEED
+    cr    s      \015  \x{240D}  ␍   SYMBOL FOR CARRIAGE RETURN
+    so    s      \016  \x{240E}  ␎   SYMBOL FOR SHIFT OUT
+    si    s      \017  \x{240F}  ␏   SYMBOL FOR SHIFT IN
+    dle   s      \020  \x{2410}  ␐   SYMBOL FOR DATA LINK ESCAPE
+    dc1   s      \021  \x{2411}  ␑   SYMBOL FOR DEVICE CONTROL ONE
+    dc2   s      \022  \x{2412}  ␒   SYMBOL FOR DEVICE CONTROL TWO
+    dc3   s      \023  \x{2413}  ␓   SYMBOL FOR DEVICE CONTROL THREE
+    dc4   s      \024  \x{2414}  ␔   SYMBOL FOR DEVICE CONTROL FOUR
+    nak   s      \025  \x{2415}  ␕   SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn   s      \026  \x{2416}  ␖   SYMBOL FOR SYNCHRONOUS IDLE
+    etb   s      \027  \x{2417}  ␗   SYMBOL FOR END OF TRANSMISSION BLOCK
+    can   s      \030  \x{2418}  ␘   SYMBOL FOR CANCEL
+    em    s      \031  \x{2419}  ␙   SYMBOL FOR END OF MEDIUM
+    sub   s      \032  \x{241A}  ␚   SYMBOL FOR SUBSTITUTE
+    esc   0      \033  \x{241B}  ␛   SYMBOL FOR ESCAPE
+    fs    s      \034  \x{241C}  ␜   SYMBOL FOR FILE SEPARATOR
+    gs    s      \035  \x{241D}  ␝   SYMBOL FOR GROUP SEPARATOR
+    rs    s      \036  \x{241E}  ␞   SYMBOL FOR RECORD SEPARATOR
+    us    s      \037  \x{241F}  ␟   SYMBOL FOR UNIT SEPARATOR
+    sp    m      \040  \x{2420}  ␠   SYMBOL FOR SPACE
+    del   m      \177  \x{2421}  ␡   SYMBOL FOR DELETE
+    nbsp  s      \240  \x{237D}  ⍽   SHOULDERED OPEN BOX
+    fwsp  s  \x{3000}  \x{303C}  〼  MASU MARK
+
+`fwsp`는 전체 너비 표의 문자 공백(U+3000)으로, 화면에서 두 열을 차지합니다. 기본 기호도 너비가 두 열이므로 레이아웃이 유지됩니다. 이를 다른 문자로 대체할 경우, 너비가 동일한 문자를 선택하십시오.
 
 현재 다음 문자에 대해 유니코드 표시를 사용할 수 있습니다.
 
@@ -140,9 +143,9 @@ Version 1.05
 
         cat-v -c tab=bel=0,esc=s
 
-    이름에 `all`을 지정하면 이 값은 모든 문자 유형에 적용됩니다. 다음 명령은 모든 문자를 `s`로 설정한 다음 `nl`, `nl`, `np` 및 `sp`를 `m`으로 설정하고 `esc`를 비활성화합니다. 이것이 기본 상태입니다.
+    이름으로 `all`이 지정된 경우, 해당 값은 모든 문자 유형에 적용됩니다. 다음 명령은 모든 문자를 `s`로 설정한 다음, `nul`, `nl`, `np`, `sp` 및 `del`를 `m`으로 설정하고 `esc`를 비활성화합니다. 이것이 기본 상태입니다.
 
-        cat-v -c all=s,nul=nl=np=sp=m,esc=0
+        cat-v -c all=s,nul=nl=np=sp=del=m,esc=0
 
     이름 레이블을 지정하지 않으면 `all`이 주어진 것으로 간주합니다. 다음 명령은 개행 문자를 제외한 모든 제어 문자를 이스케이프 형식으로 출력하며, 이는 Perl의 문자열 리터럴과 호환됩니다.
 
@@ -245,6 +248,10 @@ Version 1.05
 
         echo -ne "$(cat-v -Ence FILE)"
 
+    파일에 `nbsp` 또는 `fwsp`가 포함되어 있는 경우 이 기능은 작동하지 않습니다. `echo`는 `\xa0`에 대해 UTF-8 문자가 아닌 원시 바이트를 생성하며, `\x{3000}` 형식을 인식하지 못하기 때문입니다. 이 경우, [ansiecho](https://metacpan.org/pod/ansiecho) 명령을 사용하면 됩니다. 이 명령은 Perl과 동일한 방식으로 이스케이프 시퀀스를 해석합니다.
+
+        ansiecho -n "$(cat-v -Ence FILE)"
+
 # INSTALL
 
 ## CPANMINUS
@@ -267,6 +274,10 @@ GIT 리포지토리에서:
 
     `cat-v` 명령의 이전 버전은 원래 [App::optex](https://metacpan.org/pod/App%3A%3Aoptex) 명령의 필터 모듈로 만들어졌습니다.
 
+- [ansiecho](https://metacpan.org/pod/ansiecho)
+
+    Perl의 문자열 리터럴과 동일한 방식으로 이스케이프 시퀀스를 해석하는 echo 명령입니다.
+
 - [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
 
     UNIX 스타일 또는 cat -v 유해한 것으로 간주됨
@@ -281,7 +292,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2024-2025 Kazumasa Utashiro.
+Copyright © 2024-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

@@ -23,6 +23,7 @@ WriteMakefile(
 		'ExtUtils::MakeMaker' => 6.64,	# Minimum version for TEST_REQUIRES
 	}, PREREQ_PM => {
 		'Carp' => 0,
+		'constant' => 0,	# type codes for compiled schemas
 		'Encode' => 0,
 		'Exporter' => 0,
 		'IO::Handle' => 0,
@@ -33,6 +34,7 @@ WriteMakefile(
 		'strict' => 0,
 		'warnings' => 0
 	}, TEST_REQUIRES => {
+		'Data::Dumper' => 0,
 		'POSIX' => 0,
 		'Readonly' => 0,
 		'Test::Compile' => 0,

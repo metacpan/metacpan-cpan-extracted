@@ -56,11 +56,16 @@ eval { require DBIO::PostgreSQL::Storage::Async; 1 }
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use LiveServer;
+use LibpqEnglish;    # libpq words its messages by locale, see there
 LiveServer->require_server;
 
 my $TABLE = 'dbio_k120_error_text';
 
-my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass, { async => 'future_io' });
+# PostgreSQL reports in the language of lc_messages; this test compares the
+# server's English words, so its sessions (the pool's, the listen connection's)
+# are set to 'C' after the connect.
+my $schema = DBIO::Test::Schema->connect($dsn, $user, $pass,
+  { async => 'future_io', on_connect_do => [q{SET lc_messages = 'C'}] });
 my $async  = $schema->storage->async;
 my $dbh    = $schema->storage->dbh;
 

@@ -153,6 +153,7 @@ sub fork_looping_child {
   my $child = fork;
   die "fork: $!" unless defined $child;
   unless ($child) {
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     my $stop = EV::timer(1.5, 0, sub { EV::break(EV::BREAK_ALL()) });
     EV::run();
     if (open my $fh, '>', $file->filename) {
@@ -331,7 +332,7 @@ sub sessions_alive {
 }
 
 subtest 'c) a child that acquires before its loop runs, with a query in flight and a transaction pinned' => sub {
-  plan skip_all => 'core before k233: a forked child does not take the pool over'
+  plan skip_all => 'the installed DBIO core has no PoolBase::_verify_pid: a forked child does not take the pool over'
     unless DBIO::Storage::PoolBase->can('_verify_pid');
 
   my $v      = $admin->selectrow_array("SELECT v FROM `$T` WHERE id = 1");
@@ -377,7 +378,7 @@ subtest 'c) a child that acquires before its loop runs, with a query in flight a
   my ($up, $adopted, $tid, $handle_tid) = child_line($c, 15);
   is $up, 'up', 'the child\'s acquire, called before its loop ran, gave it a connection that answers'
     or diag('the child said: ' . join(' ', map { $_ // '' } $up, $adopted, $tid));
-  is $adopted, 1, '... its first acquire took the pool over (core k233)';
+  is $adopted, 1, '... its first acquire took the pool over';
   $tid = 0 unless ($up // '') eq 'up' && ($tid // '') =~ /\A[0-9]+\z/;
   is $handle_tid, $tid, '... SELECT CONNECTION_ID() names the session of the handle it was given';
   ok $tid && !grep({ $_ == $tid } @TIDS), '... a new session, neither of the parent\'s'

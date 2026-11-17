@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
 use POSIX qw(WNOHANG);
 use IO::Select;
 use File::Temp ();
@@ -61,7 +62,8 @@ if ($ENV{DBIO_TEST_PG_DSN}
 plan skip_all => 'neither DBD::SQLite + dbio-sqlite nor DBIO_TEST_PG_DSN + DBD::Pg + dbio-postgresql available -- skipping live transport tests'
   unless %backend;
 
-plan skip_all => 'no fork on this platform' if $^O eq 'MSWin32';
+plan skip_all => 'this perl has no real fork() ($Config{d_fork} is not set)'
+  unless $Config{d_fork};
 
 alarm 240;   # the whole file; every wait below has a bound of its own
 
@@ -243,6 +245,18 @@ for my $name (sort keys %backend) {
 use strict; use warnings;
 use POSIX qw(WNOHANG);
 use DBIO::Forked;
+if ($ENV{TL_MODE} eq 'nproc') {
+  # RLIMIT_NPROC does not bind every process (root, CAP_SYS_RESOURCE): if a
+  # plain fork still works under the limit, there is nothing to test
+  my $probe = fork;
+  if (defined $probe) {
+    POSIX::_exit(0) unless $probe;
+    waitpid($probe, 0);
+    print "probe free\n";
+    exit 0;
+  }
+  print "probe held\n";
+}
 eval $ENV{TL_DEFS} or die $@;
 my $schema = "$ENV{TL_PKG}::Schema"->connect($ENV{TL_DSN}, $ENV{TL_USER}, $ENV{TL_PASS},
   { async => 'forked', AutoCommit => 1, RaiseError => 1 });
@@ -324,11 +338,15 @@ EOS
 
       # fork() itself fails: RLIMIT_NPROC is below the user's process count
       $r = $run->(nproc => '-u 1');
-      is($r->{call}, 'croak', "$name: no process left -- the call croaks");
-      like($r->{call_err} // '', qr/fork failed: Resource temporarily unavailable/,
-        "$name: ... naming fork and the system's reason");
-      is($r->{reaped} . '/' . ($r->{sync_after} // 'none'), '-1/1',
-        "$name: ... no child, and the parent's own connection still answers");
+    SKIP: {
+        skip 'RLIMIT_NPROC does not limit this process (root or CAP_SYS_RESOURCE): fork() still succeeds under ulimit -u 1', 3
+          if ($r->{probe} // '') eq 'free';
+        is($r->{call}, 'croak', "$name: no process left -- the call croaks");
+        like($r->{call_err} // '', qr/fork failed: Resource temporarily unavailable/,
+          "$name: ... naming fork and the system's reason");
+        is($r->{reaped} . '/' . ($r->{sync_after} // 'none'), '-1/1',
+          "$name: ... no child, and the parent's own connection still answers");
+      }
     }
 
     # ---------------------------------------------------------------------
@@ -337,7 +355,7 @@ EOS
     #    broker; only the child's reconnect is refused.
     # ---------------------------------------------------------------------
   SKIP: {
-      skip 'the installed DBIO core predates connect options beside an AccessBroker (core k243)', 9
+      skip 'the installed DBIO core predates connect options beside an AccessBroker', 9
         unless DBIO::Storage::Async->can('_takes_broker_connect_options');
 
       {

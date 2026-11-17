@@ -4,7 +4,7 @@ package DBIO::DB2::Diff::Column;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -301,7 +301,7 @@ DBIO::DB2::Diff::Column - Diff operations for DB2 columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

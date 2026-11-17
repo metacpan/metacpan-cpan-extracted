@@ -4,7 +4,7 @@ package DBIO::DuckDB::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -93,7 +93,7 @@ DBIO::DuckDB::Introspect::Columns - Introspect DuckDB columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

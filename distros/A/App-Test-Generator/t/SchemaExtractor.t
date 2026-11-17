@@ -954,16 +954,17 @@ subtest '_serialize_parameter_for_yaml' => sub {
 	is($result->{type},     'string', 'type preserved');
 	is($result->{optional}, 1,        'optional preserved');
 
-	# Internal _source key must be stripped from output
+	# The source survives into the generated schema: it is the single
+	# provenance value the harness uses for tolerance decisions.
 	$result = $fn->({ type => 'string', _source => 'pod' });
-	ok(!exists $result->{_source}, '_source key stripped');
+	is($result->{_source}, 'pod', '_source key preserved');
 
 	# filepath semantic keeps string type and adds a path note
 	$result = $fn->({ type => 'string', semantic => 'filepath' });
 	is($result->{type}, 'string', 'filepath semantic keeps string type');
 	like($result->{_note}, qr/path/i, 'filepath gets path note');
-	is(ref($result->{matches}), 'Regexp', 'filepath pattern is compiled, not a string');
-	like('/usr/local/bin', $result->{matches}, 'filepath pattern matches a path');
+	ok(!ref($result->{matches}), 'filepath pattern is a plain string');
+	like('/usr/local/bin', qr/$result->{matches}/, 'filepath pattern matches a path');
 
 	# A directory requirement cannot be described by a pattern, so the
 	# semantic is kept and no matches key is invented
@@ -972,13 +973,15 @@ subtest '_serialize_parameter_for_yaml' => sub {
 	is($result->{semantic}, 'directory', 'directory semantic reaches the harness');
 	ok(!exists $result->{matches}, 'directory semantic adds no matches pattern');
 
-	# A pattern written as a regex literal must reach the harness compiled:
-	# compiled from the raw string, qr// would treat the delimiters as part of
-	# the pattern and nothing generated could ever match
+	# A pattern written as a regex literal keeps its body and drops the
+	# delimiters, which consumers would otherwise treat as part of the
+	# pattern.  It stays a string: a compiled Regexp is written to YAML as a
+	# !!perl/regexp object that a YAML consumer cannot read back.
 	$result = $fn->({ type => 'string', matches => '/^[a-z]+$/' });
-	is(ref($result->{matches}), 'Regexp', 'slash-delimited matches is compiled');
-	like('abc', $result->{matches}, 'pattern body matches without the delimiters');
-	unlike('/abc/', $result->{matches}, 'the delimiters are not part of the pattern');
+	ok(!ref($result->{matches}), 'slash-delimited matches is stored as a string');
+	is($result->{matches}, '^[a-z]+$', 'the delimiters are stripped from the pattern');
+	like('abc', qr/$result->{matches}/, 'pattern body matches without the delimiters');
+	unlike('/abc/', qr/$result->{matches}/, 'the delimiters are not part of the pattern');
 
 	# unix_timestamp semantic sets integer type and bounds
 	$result = $fn->({ type => 'integer', semantic => 'unix_timestamp' });

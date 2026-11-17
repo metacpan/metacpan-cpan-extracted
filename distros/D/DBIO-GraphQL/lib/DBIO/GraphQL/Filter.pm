@@ -3,7 +3,7 @@ package DBIO::GraphQL::Filter;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Class::Accessor::Grouped';
 use DBIO::GraphQL::Error qw(client_error);
@@ -255,7 +255,7 @@ DBIO::GraphQL::Filter - Per-source GraphQL filter InputObject with adapter seam
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

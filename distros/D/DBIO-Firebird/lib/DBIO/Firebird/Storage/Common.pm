@@ -4,7 +4,7 @@ package DBIO::Firebird::Storage::Common;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -303,7 +303,7 @@ DBIO::Firebird::Storage::Common - Shared Firebird / InterBase storage logic
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

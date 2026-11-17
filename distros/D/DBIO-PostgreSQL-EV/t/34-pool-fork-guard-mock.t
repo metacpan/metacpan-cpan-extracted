@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use File::Spec ();
 use File::Temp ();
 use IO::Select;
 use IO::Socket::UNIX;
@@ -55,6 +56,11 @@ use Time::HiRes ();
 # before the fix the claims fail rather than hang.
 
 BEGIN {
+  # perlfork: fork there is an interpreter thread of the same process, so no
+  # child ever shares the pool's sockets with its parent, and EV::fork
+  # watchers do not run. The case this file tests does not arise.
+  plan skip_all => 'MSWin32: fork is an interpreter thread (perlfork); a child cannot share the pool\'s sockets'
+    if $^O eq 'MSWin32';
   eval { require EV; 1 }     or plan skip_all => 'EV not installed';
   eval { require EV::Pg; 1 } or plan skip_all => 'EV::Pg not installed';
 }
@@ -71,12 +77,24 @@ alarm 120;
 
 # --- a PostgreSQL server just good enough for libpq ---------------------------
 
-my $DIR      = File::Temp::tempdir(CLEANUP => 1);
-my $LISTENER = IO::Socket::UNIX->new(
+# libpq refuses a Unix socket path of sizeof(sun_path) - 1 bytes or more:
+# 107 on Linux, 103 on the BSDs and macOS. A deep TMPDIR can exceed it, so
+# take the first temporary directory under which the socket path fits.
+my $SOCK_MAX  = $^O eq 'linux' ? 107 : 103;
+my $SOCK_NAME = '.s.PGSQL.5432';
+my $DIR;
+for my $base (File::Spec->tmpdir, '/tmp', '/var/tmp', '/dev/shm') {
+  next unless defined $base && -d $base && -w _;
+  my $d = File::Temp::tempdir(DIR => $base, CLEANUP => 1);
+  if (length("$d/$SOCK_NAME") <= $SOCK_MAX) { $DIR = $d; last }
+}
+plan skip_all => "no temporary directory short enough for a Unix socket path (max $SOCK_MAX bytes)"
+  unless defined $DIR;
+my $LISTENER = eval { IO::Socket::UNIX->new(
   Type   => SOCK_STREAM,
-  Local  => "$DIR/.s.PGSQL.5432",
+  Local  => "$DIR/$SOCK_NAME",
   Listen => 16,
-) or plan skip_all => "cannot listen on a Unix socket: $!";
+) } or plan skip_all => "cannot listen on a Unix socket: " . ($@ || $!);
 
 my @BACKENDS;           # one per accepted connection, in accept order
 my $NEXT_PID = 4500;

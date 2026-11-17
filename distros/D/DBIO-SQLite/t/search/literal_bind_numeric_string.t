@@ -4,6 +4,8 @@ use warnings;
 use Test::More;
 use DBI ();
 use DBIO::SQLite::Test;
+use lib 't/lib';
+use DBDSQLiteQuadmath qw($todo_quadmath);
 
 # karr k55.
 #
@@ -11,7 +13,7 @@ use DBIO::SQLite::Test;
 # compares INTEGER against TEXT by storage class whenever no column affinity
 # is in play -- so COUNT(x) > ? with a TEXT bind is always false. The storage
 # therefore hints a bind as an integer when nothing else says what it is
-# (t/search/having_bind.t holds that side).
+# (the having_bind subtest of t/search/small_cases.t holds that side).
 #
 # The hint must stay off every value that is not certainly a number. A string
 # that merely looks like one -- a zip code, a phone or article number -- loses
@@ -124,8 +126,11 @@ for my $spec (
 is $artists->search(\[ 'upper(name) = ?', [ { dbd_attrs => undef } => '99999' ] ])->count, 1,
   'bind with dbd_attrs => undef is not given an integer hint';
 
-is $bound_as->([ { dbd_attrs => DBI::SQL_REAL() } => 1.5 ]), 'real',
-  'an explicit dbd_attrs on a non-integer value is passed through';
+TODO: {
+  local $TODO = $todo_quadmath;
+  is $bound_as->([ { dbd_attrs => DBI::SQL_REAL() } => 1.5 ]), 'real',
+    'an explicit dbd_attrs on a non-integer value is passed through';
+}
 
 # --- which untyped values are hinted ---
 {

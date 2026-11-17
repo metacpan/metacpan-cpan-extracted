@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Vector::Op;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp ();
 
@@ -151,7 +151,7 @@ DBIO::PostgreSQL::Vector::Op - pgvector distance-operator object built by vector
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -30,6 +30,22 @@ Each file must contain subtests grouped by feature or routine.
 - Where possible, design tests to achieve **high LCSAJ scores** to maximize control‑flow coverage.
 - Where possible, use **Test::Returns** in white box testing.
 
+### Downstream Regression Suites
+
+A change to `extract-schemas` or `fuzz-harness-generator` is not finished until the dependent distributions' fuzz suites still pass. Run `t/all-fuzz.t` in each of these, from that repository:
+
+```
+A=/path/to/App-Test-Generator
+PATH=$A/bin:$PATH PERL5LIB=$A/lib EXTENDED_TESTING=1 prove -Ilib t/all-fuzz.t
+```
+
+- `CGI-Info` — `directory` semantics and the fd-leak check (`logdir`)
+- `Database-Abstraction` — validator-backed schemas with many required parameters
+- `Lingua-EN-NameCase` — a documented size bound the code does not enforce (`min => 1` versus `[]`), and the positional/named argument distinction (`nc`, `NameCase`)
+- `Schema-Validator` — the largest suite (~12k generated tests); `load_dynamic_vocabulary` is skipped when it exceeds that suite's own per-routine timeout, which is a skip, not a failure
+
+Those suites find the **installed** tools through `Test::Which`, so a fix in this tree only shows there with `PERL5LIB`/`PATH` pointing at it, or after reinstalling.
+
 ---
 
 ## Code Quality Standards

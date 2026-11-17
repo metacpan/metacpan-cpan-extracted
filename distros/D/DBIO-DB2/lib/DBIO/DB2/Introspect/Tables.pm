@@ -4,7 +4,7 @@ package DBIO::DB2::Introspect::Tables;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # SYSCAT.VIEWS.TEXT is the whole CREATE VIEW statement as it was written:
@@ -76,7 +76,7 @@ DBIO::DB2::Introspect::Tables - Introspect DB2 tables and views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

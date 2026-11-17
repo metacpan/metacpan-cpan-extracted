@@ -1,7 +1,7 @@
 package Mail::DKIM::Canonicalization::seal;
 use strict;
 use warnings;
-our $VERSION = '1.20261105'; # VERSION
+our $VERSION = '1.20261116'; # VERSION
 # ABSTRACT: arc seal canonicalization
 
 # Copyright 2017 FastMail Pty Ltd. All Rights Reserved.
@@ -165,7 +165,7 @@ Mail::DKIM::Canonicalization::seal - arc seal canonicalization
 
 =head1 VERSION
 
-version 1.20261105
+version 1.20261116
 
 =head1 AUTHORS
 

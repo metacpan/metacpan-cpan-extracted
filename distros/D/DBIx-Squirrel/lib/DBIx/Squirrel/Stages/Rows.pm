@@ -28,18 +28,21 @@ sub pluck ($column) {
     my $by_position = $column =~ m( \A \d+ \z )xa;
     return gather {
         my $key;    # the array index or hash key, found once a run
-        return sub ($row) {
-            return $row->get_column($column)
-                if $row isa 'DBIx::Squirrel::Result';
-            if (is_plain_arrayref($row)) {
+
+        # Without a signature, as it's called for each row: one costs
+        # about 19 ns a call.
+        return sub {
+            return $_[0]->get_column($column)
+                if $_[0] isa 'DBIx::Squirrel::Result';
+            if (is_plain_arrayref($_[0])) {
                 $key //= $by_position ? $column : _position_of($column);
                 croakf 'Expected a column of the row (%s)', $column
-                    if $key >= @$row;
-                return $row->[$key];
+                    if $key >= @{ $_[0] };
+                return $_[0][$key];
             }
-            if (is_plain_hashref($row)) {
-                $key //= _key_of($row, $column, $by_position);
-                return $row->{$key};
+            if (is_plain_hashref($_[0])) {
+                $key //= _key_of($_[0], $column, $by_position);
+                return $_[0]{$key};
             }
             croakf 'Expected a row: an array, a hash or a row object';
         };
@@ -52,14 +55,16 @@ sub pluck ($column) {
 sub as_hash : prototype() () {
     return gather {
         my $names;    # the column names, found once a run
-        return sub ($row) {
-            return $row if is_plain_hashref($row);
+
+        # Without a signature, as for pluck.
+        return sub {
+            return $_[0] if is_plain_hashref($_[0]);
             croakf 'Expected a row: an array, a hash or a row object'
-                unless is_plain_arrayref($row)
-                || $row isa 'DBIx::Squirrel::Result';
+                unless is_plain_arrayref($_[0])
+                || $_[0] isa 'DBIx::Squirrel::Result';
             $names //= [_column_names()];
             my %hash;
-            @hash{@$names} = @$row;
+            @hash{@$names} = @{ $_[0] };
             return \%hash;
         };
     };

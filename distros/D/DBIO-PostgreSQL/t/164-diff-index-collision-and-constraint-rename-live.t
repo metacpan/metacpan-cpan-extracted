@@ -20,7 +20,7 @@ use PrivatePgDatabase;
 LiveServer->require_server;
 
 # LIVE test for the second review of karr k139 and k140 (cases the rename of
-# t/163 did not reach, measured on PostgreSQL 18).
+# t/112-diff-index-live.t did not reach, measured on PostgreSQL 18).
 #
 # 1. The target's constraint name is taken by another index (not unique, so the
 #    rename does not apply to it): the colliding index goes first, then the

@@ -142,7 +142,7 @@ use_ok 'DBIO::Oracle::Diff';
   like($sql, qr/^\s*"code" VARCHAR2\(20\) DEFAULT 'x' NOT NULL,$/m,
     'create: a literal default is written before NOT NULL');
   like($sql, qr/^\s*"n" NUMBER DEFAULT 0 NOT NULL,$/m,
-    'create: ... a false one (0) as well, and a number is not quoted (karr k47)');
+    'create: ... a false one (0) as well, and a number is not quoted');
   like($sql, qr/^\s*"twice" NUMBER DEFAULT 1 \+ 1 NOT NULL,$/m,
     'create: ... and so is an expression default (scalar ref)');
   like($sql, qr/^\s*"note" VARCHAR2\(20\) DEFAULT 'none'$/m,

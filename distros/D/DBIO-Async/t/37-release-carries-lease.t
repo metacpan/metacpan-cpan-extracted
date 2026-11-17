@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Scalar::Util 'refaddr';
@@ -73,7 +75,7 @@ use DBIO::Async::Pool;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w };
   }
@@ -112,7 +114,7 @@ sub new_storage {
 }
 
 # Run the loop until the Future settles, without dying on a failure.
-sub settle { my $f = shift; eval { $f->get }; return $f }
+sub settle { my $f = shift; eval { get_within($f, 15) }; return $f }
 
 # A statement on its way, on the pool's only connection: dispatched, its
 # answer still on the pipe -- not collected until the loop runs.

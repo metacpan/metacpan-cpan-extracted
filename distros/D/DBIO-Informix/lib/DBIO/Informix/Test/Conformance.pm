@@ -4,7 +4,7 @@ package DBIO::Informix::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::Conformance';
 
@@ -327,7 +327,7 @@ DBIO::Informix::Test::Conformance - Answers the shared conformance case table fo
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

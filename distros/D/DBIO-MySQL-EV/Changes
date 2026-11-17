@@ -1,5 +1,35 @@
 Revision history for DBIO-MySQL-EV
 
+0.900007  2026-11-17
+    * Fixes
+        - EV::MariaDB 0.09 throws from its constructor when a connect cannot
+          even be started (a socket that cannot be opened), where earlier
+          versions called on_error. The transport treats that throw like a
+          callback error, for the pool and the listen connection: the same
+          text with passwords masked, the open fails as a Future, and the
+          pool warns. The minimum version of EV::MariaDB is 0.09.
+        - An error text of the server is masked by the server's error number
+          (1062, 1366, ...) as well as by its wording, so a short value is
+          out of a German or French text too. The number is read from the
+          EV::MariaDB handle while it holds the error of that statement and
+          handed to DBIO::MySQL::Util::mask_error_details, on every path
+          (execute, query, the session reset, the statements of a
+          transaction, the listen connection); the masker of the executor
+          (error_masker) takes it as a fourth argument. A client error (2000
+          to 2999) and a refused prepare, after which the handle holds no
+          error number, are masked by their wording.
+        - The waits of the transport count from the call that starts them,
+          not from the last run of the EV loop: the timeout of a statement
+          queued behind one in flight, the delay before a listen reconnect
+          and the notify poll interval no longer run out at once when the
+          program worked for longer than the wait before it asked.
+    * Documentation
+        - The dbio-mysql-ev skill states what holds: the ev mode is chosen
+          by { async => 'ev' } only, readiness comes from
+          DBIO::Storage::PoolBase, the dist builds on DBIO::MySQL, and the
+          session counters of TestHarness (count_session_status,
+          session_status) and the live run via dbio-db env are described.
+
 0.900004  2026-11-08
     * Async
         - Statements run concurrently over EV::MariaDB on a pool, chosen per

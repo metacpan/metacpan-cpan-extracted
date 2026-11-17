@@ -3,7 +3,7 @@ package DBIO::Test::Namespace::RtBug41083::ResultSet;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::ResultSet';
 1;
@@ -20,7 +20,7 @@ DBIO::Test::Namespace::RtBug41083::ResultSet - Test fixture for namespace resolu
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

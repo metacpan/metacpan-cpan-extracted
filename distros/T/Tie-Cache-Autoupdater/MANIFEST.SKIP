@@ -1,0 +1,14 @@
+#!include_default
+
+# "make dist" output: the distribution directory and the tarball itself
+^Tie-Cache-Autoupdater-
+
+# Coding assistant instructions and configuration - not part of the dist
+^CLAUDE\.md$
+^AGENTS\.md$
+^\.claude/
+
+# Git housekeeping. The default list skips .git/ and .gitignore everywhere,
+# but .gitattributes nowhere and .github/ only since ExtUtils::Manifest 1.75,
+# so cover them all regardless of which perl runs "make manifest".
+^\.git

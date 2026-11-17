@@ -1,5 +1,13 @@
 Revision history for DBIO-ClickHouse
 
+0.900007  2026-11-17
+    * Dependencies
+        - Requires DBI 1.634, the floor the other DBIO dists ask for.
+    * Documentation
+        - The dbio-clickhouse and dbio-clickhouse-database skills follow the
+          code: access path DBDs, the four immutable table properties, test
+          numbering, live-test gating and setup.
+
 0.900004  2026-11-08
     First release: the ClickHouse driver for DBIO, over the MySQL wire
     protocol (server port 9004) through DBD::mysql or DBD::MariaDB.

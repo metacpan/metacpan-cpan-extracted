@@ -4,7 +4,7 @@ package DBIO::DuckDB::Arrow;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Config;
 use Try::Tiny;
@@ -521,7 +521,7 @@ DBIO::DuckDB::Arrow - Read a DuckDB result through libduckdb's Arrow interface
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

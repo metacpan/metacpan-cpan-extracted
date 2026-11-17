@@ -933,4 +933,18 @@ subtest 'device and output' => sub {
     isnt($? >> 8, 0, 'unknown paper fails');
 };
 
+# Test: --pager takes an optional value, and --no-pager turns it off.
+# getoptlong.sh unsets the variable for --no-pager (Getopt::Long::Bash
+# after 1.1.1), and gives the empty string before that.
+subtest 'pager option' => sub {
+    my $nup = sub {
+        my $out = `COLUMNS=200 $mdee --dryrun @_ $test_md 2>&1`;
+        ($out =~ /(nup .*)/)[0] // $out;
+    };
+    like($nup->('--pager=cat'), qr/ --pager=cat /, '--pager=cat');
+    like($nup->('--no-pager'), qr/ --no-pager /, '--no-pager');
+    like($nup->('--pager'), qr/ --no-pager /, '--pager without a value');
+    unlike($nup->(), qr/pager/, 'no option');
+};
+
 done_testing;

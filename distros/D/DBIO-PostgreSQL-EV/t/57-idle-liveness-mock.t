@@ -307,7 +307,7 @@ my $CAN_ASK = $rdhup ? $rdhup->() : 0x2000;
 note $CAN_ASK
   ? sprintf('poll reports a closed peer here: bit 0x%x', $CAN_ASK)
   : 'poll has no flag for a closed peer here';
-my $NO_FLAG = "this platform's poll has no flag for a closed peer: the pool vouches, as before karr k72";
+my $NO_FLAG = "this platform's poll has no flag for a closed peer: the pool vouches for an idle connection without asking the socket";
 
 my @KINDS = grep { my @pair = EV::Pg::t_pair($_); scalar @pair } qw( unix tcp );
 note 'no TCP connection over loopback to be had: Unix-domain sockets only' unless @KINDS == 2;

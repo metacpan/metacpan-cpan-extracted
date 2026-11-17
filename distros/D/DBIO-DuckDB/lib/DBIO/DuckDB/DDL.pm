@@ -4,7 +4,7 @@ package DBIO::DuckDB::DDL;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::DuckDB::DDL::Emit qw(
   quote_ident quote_table split_table column_def pk_clause unique_clause create_table create_index create_sequence fk_clause
@@ -480,7 +480,7 @@ DBIO::DuckDB::DDL - Generate DuckDB DDL from DBIO Result classes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -3,8 +3,12 @@ use warnings;
 use Test::More;
 use Time::HiRes ();
 
-# Offline test for karr k153: a text the catalog hands over is read in time
-# linear in its length.
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use CpuGrowth qw(growth_ratio calibrate);
+
+# Offline test: a text the catalog hands over is read in time linear in its
+# length.
 #
 # Claim: a trigger's function and arguments come from the catalog columns
 # (pg_trigger.tgfoid, tgargs), never from a pattern run over the text of
@@ -13,8 +17,13 @@ use Time::HiRes ();
 # whitespace inside such a text, in a trigger argument or in a definition,
 # costs no more than its length.
 #
-# Each timed case runs in a child process that is killed at the deadline, so
-# a superlinear read fails the test instead of hanging the suite.
+# Each growth case runs in a child process: it picks how often to repeat the
+# read so that the small run needs 0.1 s of CPU, builds the input for the
+# length and for 8 times that, and reports the ratio of the CPU times (linear:
+# 8 at most, less where the fixed cost of a call weighs in; quadratic: near 64;
+# the limit is 24). CPU time, not the wall clock, so a loaded machine or a
+# coverage run slows both runs alike. The child is killed at a hard deadline,
+# so a superlinear read fails the test instead of hanging the suite.
 
 use DBIO::PostgreSQL::Introspect::Triggers ();
 use DBIO::PostgreSQL::Util qw(trim_end);
@@ -32,28 +41,65 @@ sub _build_model { die "should not be called" }
 
 package main;
 
-# Runs $code in a child; true when it ended inside $limit seconds.
-sub finishes_within {
-  my ($limit, $code) = @_;
+my $FACTOR   = 8;
+my $LIMIT    = 3 * $FACTOR;
+my $DEADLINE = 60;
+my $LENGTH   = 4_000;     # the length the repetitions are calibrated at
+
+# Growth of the CPU time of $run->($build->($n)) from $LENGTH to $FACTOR *
+# $LENGTH, measured in a child that is killed after $DEADLINE seconds. One read
+# of a text this long takes far less than the 0.1 s the small run needs, so the
+# run repeats it on the same input; the child picks the repetitions that bring
+# the small run to 0.1 s of CPU, the memory stays that of one text.
+# Returns ($ratio, $small_cpu, $repetitions), or an empty list when the child
+# did not report in time.
+sub growth_in_child {
+  my ($build, $run) = @_;
+  pipe my $reader, my $writer or die "pipe failed: $!";
   my $pid = fork;
   die "fork failed" unless defined $pid;
   if (!$pid) {
-    my $start = [ Time::HiRes::gettimeofday ];
-    $code->();
-    exit(Time::HiRes::tv_interval($start) < $limit ? 0 : 1);
+    close $reader;
+    my $repeated = sub { my ($in) = @_; $run->($in->[0]) for 1 .. $in->[1] };
+    my $reps = calibrate(sub { [ $build->($LENGTH), $_[0] ] }, $repeated, 1, 1.25, 0.1, 1);
+    my ($ratio, $small) = growth_ratio(sub { [ $build->($_[0]), $reps ] },
+      $repeated, $LENGTH, $FACTOR, 1);
+    print {$writer} "$ratio $small $reps\n";
+    close $writer;
+    exit 0;
   }
-  my $deadline = Time::HiRes::time + $limit + 3;
+  close $writer;
+  my $deadline = Time::HiRes::time + $DEADLINE;
+  my $done = 0;
   while (Time::HiRes::time < $deadline) {
-    my $done = waitpid $pid, 1;    # WNOHANG
-    return $? == 0 if $done == $pid;
+    if (waitpid($pid, 1) == $pid) { $done = 1; last }    # WNOHANG
     Time::HiRes::sleep 0.02;
   }
-  kill 'KILL', $pid;
-  waitpid $pid, 0;
-  return 0;
+  if (!$done) {
+    kill 'KILL', $pid;
+    waitpid $pid, 0;
+    return;
+  }
+  my $line = <$reader>;
+  return unless $? == 0 && defined $line && $line =~ /^(\S+) (\S+) (\d+)$/;
+  return ($1, $2, $3);
 }
 
-my $MB     = 1_000_000;
+# $what is the claim; the CPU time for $FACTOR times the length stays below
+# $LIMIT times that of the length itself.
+sub grows_linearly {
+  my ($what, $build, $run) = @_;
+  my ($ratio, $small, $reps) = growth_in_child($build, $run);
+  if (!defined $ratio) {
+    fail "$what: no result within $DEADLINE s";
+    return;
+  }
+  note sprintf '%s: %d repetitions, small run %.3f s CPU, ratio %.2f', $what, $reps, $small, $ratio;
+  cmp_ok $ratio, '<', $LIMIT,
+    sprintf '%s: CPU time grows %.1f-fold for %d times the length (limit %d)',
+      $what, $ratio, $FACTOR, $LIMIT;
+}
+
 my $SPACES = ' ' x 16_000;
 
 # --- the trigger: function and arguments from the catalog columns ---------
@@ -77,23 +123,26 @@ my $SPACES = ' ' x 16_000;
   is $call->(function_signature => undef, argument_count => 0, arguments_hex => ''),
     undef, 'no function, no call';
 
-  ok finishes_within(0.1, sub {
-      $call->(function_signature => 'f()', argument_count => 1,
-        arguments_hex => unpack('H*', "$SPACES\0"));
-    }), 'a trigger argument of 16 000 blanks is read in under 0.1 s';
+  grows_linearly 'a trigger argument of blanks is read',
+    sub { unpack 'H*', (' ' x $_[0]) . "\0" },
+    sub { $call->(function_signature => 'f()', argument_count => 1, arguments_hex => $_[0]) };
 
-  my $big = "f('$SPACES');";
-  my $intro = DBIO::PostgreSQL::Introspect::Mock->new(
-    preserve_case => 0,
-    model => { triggers => { 'public.t' => { trg => {
-      timing => 'BEFORE', event => 'INSERT', orientation => 'ROW',
-      definition => "CREATE TRIGGER trg BEFORE INSERT ON public.t FOR EACH ROW EXECUTE FUNCTION f('$SPACES')",
-      execute    => "f('$SPACES')",
-    } } } },
-  );
+  sub trigger_model {
+    my ($blanks) = @_;
+    DBIO::PostgreSQL::Introspect::Mock->new(
+      preserve_case => 0,
+      model => { triggers => { 'public.t' => { trg => {
+        timing => 'BEFORE', event => 'INSERT', orientation => 'ROW',
+        definition => "CREATE TRIGGER trg BEFORE INSERT ON public.t FOR EACH ROW EXECUTE FUNCTION f('$blanks')",
+        execute    => "f('$blanks')",
+      } } } },
+    );
+  }
+  my $intro = trigger_model($SPACES);
   my @stmts;
-  ok finishes_within(0.1, sub { @stmts = $intro->result_class_extra_statements('public.t') }),
-    'the generator takes the call from the model, in under 0.1 s with 16 000 blanks in the definition';
+  grows_linearly 'the generator takes the call from the model, with blanks in the definition',
+    sub { trigger_model(' ' x $_[0]) },
+    sub { $_[0]->result_class_extra_statements('public.t') };
   @stmts = $intro->result_class_extra_statements('public.t');
   is_deeply [ grep { $_->[0] eq 'pg_trigger' } @stmts ],
     [[ pg_trigger => 'trg', {
@@ -123,10 +172,10 @@ is trim_end(''), '', 'the empty string stays';
   is $view->("SELECT 1  \n"), 'SELECT 1', 'trailing blanks without semicolon';
   is $view->(undef), undef, 'no definition stays none';
 
-  ok finishes_within(0.5, sub { $view->("SELECT 1" . (' ' x $MB) . "FROM t;") }),
-    'a view definition with a 1 MB run of blanks inside is read in under 0.5 s';
-  ok finishes_within(0.5, sub { $view->("SELECT '" . (' ' x $MB) . "';") }),
-    'a 1 MB run of blanks ahead of a closing semicolon, in under 0.5 s';
+  grows_linearly 'a view definition with a run of blanks inside is read',
+    sub { "SELECT 1" . (' ' x $_[0]) . "FROM t;" }, $view;
+  grows_linearly 'a run of blanks ahead of a closing semicolon is read',
+    sub { "SELECT '" . (' ' x $_[0]) . "';" }, $view;
 }
 
 # --- the diff of a function and of a view ----------------------------------
@@ -140,8 +189,8 @@ is trim_end(''), '', 'the empty string stays';
   is $function->("CREATE FUNCTION f() ...  \n"), 'CREATE FUNCTION f() ...;', 'a function gets its semicolon';
   is $function->("CREATE FUNCTION f() ...;\n\n"), 'CREATE FUNCTION f() ...;', 'and keeps the one it has';
 
-  ok finishes_within(0.5, sub { $function->("CREATE FUNCTION f() AS x" . (' ' x $MB) . "y") }),
-    'a function definition with a 1 MB run of blanks inside is written in under 0.5 s';
+  grows_linearly 'a function definition with a run of blanks inside is written',
+    sub { "CREATE FUNCTION f() AS x" . (' ' x $_[0]) . "y" }, $function;
 
   my $view_sql = sub {
     my ($def) = @_;
@@ -154,8 +203,8 @@ is trim_end(''), '', 'the empty string stays';
   };
   like $view_sql->(" SELECT 1 ;\n"), qr/AS\s+SELECT 1;/, 'a view is written without the doubled semicolon';
 
-  ok finishes_within(0.5, sub { $view_sql->("SELECT 1" . (' ' x $MB) . "FROM t;") }),
-    'a view definition with a 1 MB run of blanks inside is written in under 0.5 s';
+  grows_linearly 'a view definition with a run of blanks inside is written',
+    sub { "SELECT 1" . (' ' x $_[0]) . "FROM t;" }, $view_sql;
 }
 
 done_testing;

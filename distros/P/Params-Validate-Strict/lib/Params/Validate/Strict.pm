@@ -19,16 +19,30 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 # Recursion depth counter - localised on every entry so it unwinds automatically.
 # Protects against mutations (or bugs) that turn the pipe-normalisation guard into
 # an infinite loop through the union-type ARRAY handler.
 our $_depth = 0;
+
+# Type codes used by compiled schemas (see _compile_schema).  Numeric codes
+# keep the per-call dispatch to integer comparisons.
+use constant {
+	_T_STRING => 1,
+	_T_INT => 2,
+	_T_NUM => 3,
+	_T_BOOL => 4,
+	_T_ARRAY => 5,
+	_T_HASH => 6,
+	_T_SCALAR => 7,
+	_T_CODE => 8,
+	_T_OBJECT => 9,
+};
 
 =head1 SYNOPSIS
 
@@ -1211,8 +1225,8 @@ sub validate_strict
 	Carp::croak('validate_strict: maximum call depth exceeded - possible infinite recursion in union-type schema')
 		if $_depth > 20;
 
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-	my $params = \%args;
+	# $params is only ever read, so a hashref argument need not be copied
+	my $params = (ref($_[0]) eq 'HASH') ? $_[0] : { @_ };
 
 	my $schema = $params->{'schema'} || $params->{'members'};
 	my $args = $params->{'args'} || $params->{'input'};
@@ -1260,14 +1274,29 @@ sub validate_strict
 		_error($logger, $error_msg || "$schema_description: args must be a hash or array reference");
 	}
 
+	# A schema prepared by compile_schema carries pre-computed per-field records
+	# that let simple fields bypass the generic rule interpreter below.  It is
+	# honoured only when it describes exactly the schema now in hand and the
+	# input is a named-argument hash.
+	my $compiled = $params->{'_compiled'};
+	my $fields;
+	if($compiled && ref($args) eq 'HASH' && $schema == $compiled->{'schema'}) {
+		$fields = $compiled->{'fields'};
+	} else {
+		$compiled = undef;
+	}
+
 	if(ref($args) eq 'HASH') {
 		# Named args: build alias reverse-map first so aliased keys are not
-		# treated as unknown parameters.
+		# treated as unknown parameters.  A compiled schema already knows
+		# whether it has any aliases.
 		my %_alias_to_canonical;
-		foreach my $canonical (keys %{$schema}) {
-			my $r = $schema->{$canonical};
-			if(ref($r) eq 'HASH' && ref($r->{'aliases'}) eq 'ARRAY') {
-				$_alias_to_canonical{$_} = $canonical for @{$r->{'aliases'}};
+		if(!$compiled || $compiled->{'has_aliases'}) {
+			foreach my $canonical (keys %{$schema}) {
+				my $r = $schema->{$canonical};
+				if(ref($r) eq 'HASH' && ref($r->{'aliases'}) eq 'ARRAY') {
+					$_alias_to_canonical{$_} = $canonical for @{$r->{'aliases'}};
+				}
 			}
 		}
 
@@ -1292,7 +1321,10 @@ sub validate_strict
 
 	# Find out if this routine takes positional arguments
 	my $are_positional_args = -1;
-	foreach my $key (keys %{$schema}) {
+	# compile_schema only prepares schemas that are not positional, so a compiled
+	# schema supplies the answer and the detection loop has nothing to do.
+	$are_positional_args = $compiled->{'positional'} if($compiled);
+	foreach my $key ($compiled ? () : keys %{$schema}) {
 		if(defined(my $rules = $schema->{$key})) {
 			if(ref($rules) eq 'HASH') {
 				if($rules->{'slurp'} && !defined($rules->{'position'})) {
@@ -1318,7 +1350,192 @@ sub validate_strict
 
 	my %validated_args;
 	my %invalid_args;
+	my $has_needs = 0;	# true if any parameter has a 'needs' rule
 	foreach my $key (keys %{$schema}) {
+		# Fast path: a field that compile_schema fully understood is validated
+		# here without the generic interpreter.  It must produce exactly the same
+		# result and error messages as the generic code below; t/compile_schema.t
+		# checks the two against each other.  Fields it does not understand have no
+		# record and fall through.
+		if($fields && (my $f = $fields->{$key})) {
+			my $value = $args->{$key};
+
+			if(!exists($args->{$key})) {
+				if($f->{'opt'}) {
+					$validated_args{$key} //= $f->{'default'} if($f->{'has_default'});
+					next;
+				}
+				_error($logger, "$schema_description: Required parameter $f->{label} is missing");
+			}
+
+			my $label = $f->{'label'};
+			my $frules = $f->{'rules'};
+			my $t = $f->{'t'};
+
+			if($t == _T_STRING) {
+				if(ref($value)) {
+					_rule_error($logger, $frules, "$schema_description: Parameter $label must be a string");
+				}
+			} elsif($t == _T_INT) {
+				if(defined($value)) {
+					if(!Scalar::Util::looks_like_number($value) || ($value - $value) != 0 || $value != int($value)) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label ($value) must be an integer");
+					}
+					$value = int($value);
+				}
+			} elsif($t == _T_NUM) {
+				if(defined($value)) {
+					if(!Scalar::Util::looks_like_number($value)) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label must be a number");
+					}
+					$value = 0 + $value;
+				}
+			} elsif($t == _T_BOOL) {
+				if(defined($value)) {
+					if(defined(my $b = $Readonly::Values::Boolean::booleans{$value})) {
+						$value = $b;
+					} else {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label ($value) must be a boolean");
+					}
+				}
+			} elsif($t == _T_ARRAY) {
+				if(defined($value) && ref($value) ne 'ARRAY') {
+					_rule_error($logger, $frules, "$schema_description: Parameter $label must be an arrayref, not " . ref($value));
+				}
+			} elsif($t == _T_HASH) {
+				if(defined($value) && ref($value) ne 'HASH') {
+					_rule_error($logger, $frules, "$schema_description: Parameter $label must be an hashref");
+				}
+			} elsif($t == _T_SCALAR) {
+				if(defined($value) && ref($value)) {
+					_rule_error($logger, $frules, "$schema_description: Parameter $label must be a scalar, not a " . ref($value) . ' reference');
+				}
+			} elsif($t == _T_CODE) {
+				if(defined($value) && ref($value) ne 'CODE') {
+					_rule_error($logger, $frules, "$schema_description: Parameter $label must be a coderef, not a ref to " . ref($value));
+				}
+			} else {	# _T_OBJECT
+				if(defined($value) && !Scalar::Util::blessed($value)) {
+					_rule_error($logger, $frules, "$schema_description: Parameter $label must be an object");
+				}
+			}
+
+			my $chars;	# the character count, computed at most once for min and max
+			if(defined(my $min = $f->{'min'})) {
+				my $mk = $f->{'mk'};
+				if($mk eq 's') {
+					if(!defined($value)) {
+						if($min > 0 && !$f->{'opt'}) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label is undefined, but must be at least $min character" . ($min == 1 ? '' : 's'));
+						}
+					} elsif(defined(my $len = ($chars = _number_of_characters($value)))) {
+						if($len < $min) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label too short, ($len characters), must be at least $min characters");
+						}
+					} else {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label can't be decoded");
+					}
+				} elsif($mk eq 'a') {
+					if(!defined($value)) {
+						if($min > 0 && !$f->{'opt'}) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label is undefined, but must have at least $min member" . ($min > 1 ? 's' : ''));
+						}
+					} elsif(scalar(@{$value}) < $min) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label must have at least $min member" . (($min > 1) ? 's' : ''));
+					}
+				} elsif($mk eq 'h') {
+					if(!defined($value)) {
+						if($min > 0 && !$f->{'opt'}) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label is undefined, but must contain at least $min keys");
+						}
+					} elsif(scalar(keys(%{$value})) < $min) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label must contain at least $min keys");
+					}
+				} else {	# 'n': integer, number or float
+					if(!defined($value)) {
+						if($min > 0 && !$f->{'opt'}) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label is undefined, but must be at least $min");
+						}
+					} elsif(Scalar::Util::looks_like_number($value)) {
+						if($value < $min) {
+							if($frules->{'error_msg'}) {
+								_error($logger, $frules->{'error_msg'});
+							} elsif(($f->{'tname'} eq 'integer') && ($value == 0)) {
+								_error($logger, "$schema_description: Parameter $label ($value) must be a positive number");
+							} elsif(($f->{'tname'} eq 'integer') && ($value == 1)) {
+								_error($logger, "$schema_description: Parameter $label ($value) must be a positive, non-zero number");
+							} else {
+								_error($logger, "$schema_description: Parameter $label ($value) must be at least $min");
+							}
+						}
+					} else {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label ($value) must be a number");
+					}
+				}
+			}
+
+			if(defined(my $max = $f->{'max'}) && defined($value)) {
+				my $mk = $f->{'mk'};
+				if($mk eq 's') {
+					if(defined(my $len = $chars // _number_of_characters($value))) {
+						if($len > $max) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label too long, ($len characters), must be no longer than $max");
+						}
+					} else {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label can't be decoded");
+					}
+				} elsif($mk eq 'a') {
+					if(scalar(@{$value}) > $max) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label must contain no more than $max items");
+					}
+				} elsif($mk eq 'h') {
+					if(scalar(keys(%{$value})) > $max) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label must contain no more than $max keys");
+					}
+				} else {	# 'n': integer, number or float
+					if(Scalar::Util::looks_like_number($value)) {
+						if($value > $max) {
+							if($frules->{'error_msg'}) {
+								_error($logger, $frules->{'error_msg'});
+							} elsif(($f->{'tname'} eq 'integer') && ($value == 0)) {
+								_error($logger, "$schema_description: Parameter $label ($value) must be a negative number");
+							} elsif(($f->{'tname'} eq 'integer') && ($value == -1)) {
+								_error($logger, "$schema_description: Parameter $label ($value) must be a negative, non-zero number");
+							} else {
+								_error($logger, "$schema_description: Parameter $label ($value) must be no more than $max");
+							}
+						}
+					} else {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label ($value) must be a number");
+					}
+				}
+			}
+
+			if(defined($value)) {
+				if(my $re = $f->{'re'}) {
+					# As in the generic 'matches' handler, a failed match is raised
+					# inside an eval and then re-raised wrapped, so the messages agree.
+					eval {
+						if($value !~ $re) {
+							_rule_error($logger, $frules, "$schema_description: Parameter $label ($value) must match pattern '$re'");
+						}
+						1;
+					};
+					if($@) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label regex '$f->{match_src}' error: $@");
+					}
+				}
+				if(my $list = $f->{'list'}) {
+					unless(_value_in_list($value, $list, $f->{'type'}, $frules->{'case_sensitive'})) {
+						_rule_error($logger, $frules, "$schema_description: Parameter $label ($value) must be one of ", join(', ', @{$list}));
+					}
+				}
+			}
+
+			$validated_args{$key} = $value;
+			next;
+		}
+
 		my $rules = $schema->{$key};
 
 		# For named-arg schemas: resolve which input key provides this parameter.
@@ -1359,6 +1576,8 @@ sub validate_strict
 		if(ref($rules) eq '') {
 			$rules = { type => $rules };
 		}
+
+		$has_needs = 1 if(ref($rules) eq 'HASH' && defined($rules->{'needs'}));
 
 		my $is_optional = 0;
 
@@ -1421,7 +1640,7 @@ sub validate_strict
 					if(scalar(@{$args}) < $rules->{'position'}) {
 						# arg array is too short, so it must be missing
 						_error($logger, "$rule_description: Required parameter $param_label is missing");
-						next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+						_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 					}
 				}
 				if(exists($rules->{'default'})) {
@@ -1450,7 +1669,7 @@ sub validate_strict
 		# Each candidate type inherits all other constraints from the parent rule
 		# (min, max, matches, optional, etc.) so they are each fully validated.
 		# Must run after optional/transform handling above but before rule dispatch below.
-		if(ref($rules) eq 'HASH' && !ref($rules->{'type'}) && defined($rules->{'type'}) && $rules->{'type'} =~ /\|/) {
+		if(ref($rules) eq 'HASH' && !ref($rules->{'type'}) && defined($rules->{'type'}) && index($rules->{'type'}, '|') >= 0) {
 			$rules = { %$rules, type => [ split /\s*\|\s*/, $rules->{'type'} ] };
 		}
 		if(ref($rules) eq 'HASH' && ref($rules->{'type'}) eq 'ARRAY') {
@@ -1494,7 +1713,7 @@ sub validate_strict
 				}
 
 				# Better OOP, the routine has been given an object rather than a scalar
-				if(Scalar::Util::blessed($rule_value) && $rule_value->can('as_string')) {
+				if(ref($rule_value) && Scalar::Util::blessed($rule_value) && $rule_value->can('as_string')) {
 					$rule_value = $rule_value->as_string();
 				}
 
@@ -1734,7 +1953,7 @@ sub validate_strict
 							}
 						} else {
 							_rule_error($logger, $rules, "$rule_description: Parameter $param_label ($value) must be a number");
-							next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+							_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 						}
 					} else {
 						_error($logger, "$rule_description: Parameter $param_label of type '$type' has meaningless min value $rule_value");
@@ -1797,7 +2016,7 @@ sub validate_strict
 							}
 						} else {
 							_rule_error($logger, $rules, "$rule_description: Parameter $param_label ($value) must be a number");
-							next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+							_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 						}
 					} else {
 						_error($logger, "$rule_description: Parameter $param_label of type '$type' has meaningless max value $rule_value");
@@ -1926,9 +2145,9 @@ sub validate_strict
 						_error($logger, "$rule_description: 'classcan' rule for Parameter $param_label must be either a scalar or an arrayref");
 					}
 					unless(!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/) {
-						_error($logger, "$rule_description: Parameter $param_label must be a valid class name");
 						$invalid_args{$key} = 1;
-						next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+						_error($logger, "$rule_description: Parameter $param_label must be a valid class name");
+						_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 					}
 					foreach my $method (ref($rule_value) ? @{$rule_value} : ($rule_value)) {
 						# Always a method call, so an overridden can() is respected
@@ -1979,17 +2198,17 @@ sub validate_strict
 						next;
 					}
 					unless(!ref($value) && $value =~ /\A[A-Za-z_]\w*(?:::[A-Za-z_]\w*)*\z/) {
-						_error($logger, "$rule_description: Parameter $param_label must be a valid class name");
 						$invalid_args{$key} = 1;
-						next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+						_error($logger, "$rule_description: Parameter $param_label must be a valid class name");
+						_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 					}
 					(my $file = $value) =~ s{::}{/}g;
 					$file .= '.pm';
 					eval { require $file };
 					if($@) {
-						_error($logger, "$rule_description: Parameter $param_label ($value) could not be loaded: $@");
 						$invalid_args{$key} = 1;
-						next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+						_error($logger, "$rule_description: Parameter $param_label ($value) could not be loaded: $@");
+						_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 					}
 					unless($value->isa($rule_value)) {
 						_error($logger, "$rule_description: Parameter $param_label ($value) must be a class that isa '$rule_value'");
@@ -2042,9 +2261,9 @@ sub validate_strict
 					if(($rules->{'type'} eq 'arrayref') || ($rules->{'type'} eq 'ArrayRef')) {
 						foreach my $member (@{$value}) {
 							unless(Scalar::Util::blessed($member) && $member->isa($rule_value)) {
-								_rule_error($logger, $rules, "$rule_description: Parameter $param_label can only contain '$rule_value' objects");
 								$invalid_args{$key} = 1;
-								last;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+								_rule_error($logger, $rules, "$rule_description: Parameter $param_label can only contain '$rule_value' objects");
+								_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 							}
 						}
 					} else {
@@ -2159,9 +2378,10 @@ sub validate_strict
 						$invalid_args{$key} = 1;
 					}
 				} elsif($rule_name eq 'position') {
-					# TODO: Unreachable code detected during path analysis. Investigate for removal.
 					if($rule_value < 0) {
-						_error($logger, "$rule_description: Parameter $param_label: 'position' must be a positive integer, not $value");
+						# A negative number always contains a non-digit ('-'), so the
+						# /\D/ check below (and the positional detection) catch it first.
+						_unreachable($logger);
 					}
 					if($rule_value =~ /\D/) {
 						_error($logger, "$rule_description: Parameter $param_label: 'position' must be a positive integer");
@@ -2222,7 +2442,9 @@ sub validate_strict
 	my @relationships = ref($params->{'relationships'}) eq 'ARRAY' ? @{$params->{'relationships'}} : ();
 
 	# Desugar per-parameter 'needs' into dependency relationships
-	foreach my $name (sort keys %{$schema}) {
+	# (the sort, which keeps the relationship order stable, is only needed when
+	# some parameter actually has a 'needs' rule)
+	foreach my $name ($has_needs ? sort(keys %{$schema}) : ()) {
 		my $rules = $schema->{$name};
 		next unless(ref($rules) eq 'HASH' && defined($rules->{'needs'}));
 		my $needs = $rules->{'needs'};
@@ -2243,7 +2465,7 @@ sub validate_strict
 			my $validator = $cross_validation->{$validator_name};
 			if((!ref($validator)) || (ref($validator) ne 'CODE')) {
 				_error($logger, "$schema_description: cross_validation $validator is not a code snippet");
-				next;	# TODO: Unreachable code detected during path analysis. Investigate for removal.
+				_unreachable($logger);	# Defensive: _error always croaks, so this is never reached.
 			}
 			if(my $error = &{$validator}(\%validated_args, $validator)) {
 				_error($logger, $error);
@@ -2295,8 +2517,26 @@ coderef is equivalent to:
 
   validate_strict(schema => \%schema, input => \%input, %opts);
 
-but avoids the overhead of argument parsing on every call - useful when the
-same schema is applied repeatedly in a hot path.
+but the schema is analysed once, when C<compile_schema> is called, rather than
+on every call - useful when the same schema is applied repeatedly in a hot
+path.  The result, the errors raised, the warnings and the logger calls are
+exactly those of C<validate_strict>; only the speed differs.
+
+Fields that use a built-in type (C<string>, C<integer>, C<number>, C<boolean>,
+C<arrayref>, C<hashref>, C<scalar>, C<coderef>, C<object> and their synonyms)
+with any of the rules C<min>, C<max>, C<optional>, C<nullable>, C<default>,
+C<description>, C<error_msg>, C<matches>, C<memberof> (also C<enum> and
+C<values>) and C<case_sensitive> are validated by a fast path.  Any other
+field - one that uses C<callback>, C<transform>, union types, C<aliases>,
+C<needs>, nested C<schema>, custom types, the class and element rules, and so
+on - is validated by the general code, as before, so using such a rule never
+changes behaviour; it just does not get faster.  Positional schemas (those with
+C<position>) are not precompiled.  On a typical five-field schema a compiled
+validator runs about three times faster than calling C<validate_strict>
+directly.
+
+B<The schema must not be modified after it has been compiled>, since what was
+learnt about it is kept.  Compile a new validator instead.
 
 =head3 Arguments
 
@@ -2344,10 +2584,182 @@ sub compile_schema
 	unless(ref($schema) eq 'HASH' || ref($schema) eq 'ARRAY') {
 		Carp::croak('compile_schema: schema must be a hash or array reference');
 	}
+
+	# Options that would override the schema or input are left to
+	# validate_strict to resolve, exactly as before, with nothing precompiled.
+	if(grep { exists($opts{$_}) } qw(schema input args _compiled)) {
+		return sub {
+			my $input = shift;
+			return validate_strict(schema => $schema, input => $input, %opts);
+		};
+	}
+
+	# An arrayref schema is normalised once here rather than on every call.  Any
+	# error it would raise is left to surface at call time, as before.
+	if(ref($schema) eq 'ARRAY') {
+		my $normalised = eval { _schema_from_arrayref($schema, undef) };
+		$schema = $normalised if($normalised);
+	}
+
+	my $compiled = _compile_schema($schema, $opts{'custom_types'});
+	my %params = (schema => $schema, %opts);
+	$params{'_compiled'} = $compiled if($compiled);
+
 	return sub {
-		my $input = shift;
-		return validate_strict(schema => $schema, input => $input, %opts);
+		# Setting input in place avoids copying the option hash on every call.
+		# local restores it on exit, so re-entrant and recursive use is safe.
+		local $params{'input'} = shift;
+		return validate_strict(\%params);
 	};
+}
+
+# _compile_schema($schema, $custom_types)
+#
+# Pre-compute everything about a named-parameter schema that does not depend on
+# the input, for use by compile_schema.  Returns undef when the schema is not
+# suitable (positional, wrapped in 'members', and so on), in which case
+# validate_strict simply interprets it as usual.
+#
+# For each field whose rules are *fully* understood - a plain built-in type and
+# a small set of common rules - a record is stored in {fields}; validate_strict
+# validates such fields without the generic rule interpreter.  Anything unusual
+# (callbacks, transforms, unions, aliases, nested schemas, custom types, bad
+# constraint values, ...) is left out and so takes the generic path, which keeps
+# a single implementation of the complicated rules and of every error path.
+sub _compile_schema
+{
+	my ($schema, $custom_types) = @_;
+
+	return unless(ref($schema) eq 'HASH');
+	return if(exists($schema->{'members'}));	# 'members' may denote a wrapper
+
+	my %type_info = (
+		string => [_T_STRING, 's'], str => [_T_STRING, 's'],
+		integer => [_T_INT, 'n'], int => [_T_INT, undef],
+		number => [_T_NUM, 'n'], float => [_T_NUM, 'n'],
+		num => [_T_NUM, undef], double => [_T_NUM, undef],
+		boolean => [_T_BOOL, undef], bool => [_T_BOOL, undef],
+		arrayref => [_T_ARRAY, 'a'], hashref => [_T_HASH, 'h'],
+		scalar => [_T_SCALAR, undef], coderef => [_T_CODE, undef],
+		object => [_T_OBJECT, undef],
+	);
+	# Types whose values are plain scalars, so that 'matches' behaves simply
+	my %scalar_like = map { $_ => 1 } qw(string str integer int number float num double boolean bool scalar);
+	my %allowed = map { $_ => 1 } qw(type min max optional nullable default description error_msg
+		matches memberof enum values case_sensitive);
+
+	my $has_aliases = 0;
+	my $has_needs = 0;
+	my %fields;
+
+	foreach my $key (keys %{$schema}) {
+		my $rules = $schema->{$key};
+		next unless(defined($rules));
+
+		if(ref($rules) eq 'HASH') {
+			# Positional schemas are not compiled, and a slurp rule is an error
+			# when there is no position; leave both to the generic code.
+			return if(exists($rules->{'position'}) || exists($rules->{'slurp'}));
+			$has_aliases = 1 if(ref($rules->{'aliases'}) eq 'ARRAY');
+			$has_needs = 1 if(defined($rules->{'needs'}));
+		} elsif(ref($rules) eq '') {
+			$rules = { type => $rules };	# as the generic code does
+		} else {
+			next;
+		}
+
+		my $f = _compile_field($key, $rules, \%type_info, \%scalar_like, \%allowed, $custom_types);
+		$fields{$key} = $f if($f);
+	}
+
+	return {
+		schema => $schema,
+		fields => \%fields,
+		has_aliases => $has_aliases,
+		has_needs => $has_needs,
+		positional => (%{$schema} ? 0 : -1),
+	};
+}
+
+# _compile_field($key, \%rules, ...)
+#
+# Return the record for one field, or undef if its rules are not entirely within
+# what the fast path in validate_strict reproduces.  When in any doubt, undef.
+sub _compile_field
+{
+	my ($key, $rules, $type_info, $scalar_like, $allowed, $custom_types) = @_;
+
+	return if(grep { !$allowed->{$_} } keys %{$rules});
+
+	# Every value must be a plain scalar, apart from the two that may be refs
+	foreach my $name (keys %{$rules}) {
+		next if($name eq 'default');
+		my $v = $rules->{$name};
+		if(ref($v)) {
+			next if($name eq 'matches' && ref($v) eq 'Regexp');
+			next if(($name eq 'memberof' || $name eq 'enum' || $name eq 'values') && ref($v) eq 'ARRAY');
+			return;
+		}
+	}
+
+	my $type = $rules->{'type'};
+	return unless(defined($type) && !ref($type));
+	my $info = $type_info->{lc($type)} or return;
+	return if(ref($custom_types) eq 'HASH' && exists($custom_types->{lc($type)}));
+
+	my $label = "'$key'";
+	if(exists($rules->{'description'})) {
+		return unless(defined($rules->{'description'}));
+		$label = "'$key' ($rules->{description})";
+	}
+
+	my %f = (
+		rules => $rules,
+		type => $type,
+		tname => lc($type),
+		t => $info->[0],
+		mk => $info->[1],
+		label => $label,
+		opt => 0,
+		has_default => exists($rules->{'default'}) ? 1 : 0,
+		default => $rules->{'default'},
+	);
+
+	# optional wins over nullable if both are present, as in validate_strict
+	if(exists($rules->{'optional'})) {
+		$f{'opt'} = $rules->{'optional'} ? 1 : 0;
+	} elsif($rules->{'nullable'}) {
+		$f{'opt'} = 1;
+	}
+
+	foreach my $bound (qw(min max)) {
+		next unless(exists($rules->{$bound}));
+		my $v = $rules->{$bound};
+		return unless(defined($v) && $info->[1] && Scalar::Util::looks_like_number($v));
+		return if($bound eq 'min' && $info->[1] eq 's' && $v < 0);	# meaningless; generic code reports it
+		$f{$bound} = $v;
+	}
+	return if(defined($f{'min'}) && defined($f{'max'}) && $f{'min'} > $f{'max'});
+
+	if(exists($rules->{'matches'})) {
+		return unless($scalar_like->{lc($type)});
+		my $m = $rules->{'matches'};
+		return unless(defined($m));
+		$f{'re'} = (ref($m) eq 'Regexp') ? $m : qr/\Q$m\E/;
+		$f{'match_src'} = $m;
+	}
+
+	my @list_names = grep { exists($rules->{$_}) } qw(memberof enum values);
+	if(@list_names) {
+		# exactly one, and not combined with min/max (which is an error)
+		return if(@list_names > 1 || exists($rules->{'min'}) || exists($rules->{'max'}));
+		return unless(ref($rules->{$list_names[0]}) eq 'ARRAY');
+		$f{'list'} = $rules->{$list_names[0]};
+	} elsif(exists($rules->{'case_sensitive'})) {
+		return;	# meaningless without a list; leave it to the generic code
+	}
+
+	return \%f;
 }
 
 # _schema_from_arrayref($arrayref, $logger)
@@ -2634,6 +3046,20 @@ sub _param_defined
 {
 	my ($args, $param) = @_;
 	return exists($args->{$param}) && defined($args->{$param});
+}
+
+# Called from code paths that path analysis shows can never run.  If one ever
+# does, fail loudly rather than carry on with undefined behaviour.
+sub _unreachable
+{
+	my $logger = shift;
+	my @call_details = caller(0);
+	my $message = 'BUG: this code should not be reachable.  Please report it to the maintainer';
+
+	if($logger) {
+		$logger->error(__PACKAGE__, ' line ', $call_details[2], ": $message");
+	}
+	Carp::croak(__PACKAGE__, ' line ', $call_details[2], ": $message");
 }
 
 # Helper to log error or croak

@@ -900,4 +900,48 @@ END_MODULE
 	done_testing();
 };
 
+# Regression: a =head4 Input bound must not hide an inferred code bound that
+# makes the merged range impossible (min 5 alongside max 4).
+subtest 'Formal =head4 Input bound contradicting code is reported' => sub {
+	my $module = <<'END_MODULE';
+package Test::Head4BoundContradiction;
+use strict;
+use warnings;
+use Carp qw(croak);
+
+=head2 check_text
+
+Checks text length.
+
+=head4 Input
+
+    {
+        text => { type => 'string', min => 5 },
+    }
+
+=cut
+
+sub check_text {
+	my ($self, $text) = @_;
+	croak 'too long' if length($text) > 4;
+	return $text;
+}
+
+END_MODULE
+
+	my $extractor = create_extractor($module, 1);
+	my $schemas;
+
+	warning_like {
+		$schemas = $extractor->extract_all(no_write => 1);
+	} qr/\[POD STRICT\] POD\/Code disagreement in method 'check_text'/,
+		'strict_pod=1 warns about the contradictory formal input bound';
+
+	my @errors = @{$schemas->{check_text}{_pod_validation_errors} || []};
+	ok((grep { /Constraint contradiction.*POD says min '5'.*code suggests max '4'/ } @errors),
+		'min 5 and inferred max 4 are reported as a contradiction');
+
+	done_testing();
+};
+
 done_testing();

@@ -19,7 +19,7 @@ IO::Factotum - read files through a converter chosen by their names
 
 # VERSION
 
-Version 0.03
+Version 0.04
 
 # DESCRIPTION
 
@@ -90,7 +90,7 @@ Nothing is exported.
     calling their `setup` function.  It dies when there is no such
     module.
 
-        IO::Factotum::load('skylighting');
+        IO::Factotum::load('Highlight::skylighting');
 
 - **tie\_argv**()
 
@@ -111,10 +111,25 @@ Nothing is exported.
     no file.  `<<>>` and the `-i` option of perl are
     not supported.
 
+# CONVERTERS
+
+The converters which come with this module are under
+`IO::Factotum::Highlight`.  They color source files by their syntax.
+
+- [IO::Factotum::Highlight::skylighting](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Askylighting) (`Highlight::sky`)
+
+    by the `skylighting` command, the highlighter of pandoc
+
+- [IO::Factotum::Highlight::sourcehighlight](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Asourcehighlight) (`Highlight::gnu`)
+
+    by the `source-highlight` command of GNU Source-highlight
+
+    IO::Factotum::load('Highlight::sky');
+
 # SEE ALSO
 
-[IO::Factotum::skylighting](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3Askylighting), [IO::Factotum::sourcehighlight](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3Asourcehighlight),
-[Getopt::EX::Factotum](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AFactotum)
+[IO::Factotum::Highlight::skylighting](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Askylighting),
+[IO::Factotum::Highlight::sourcehighlight](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Asourcehighlight), [Getopt::EX::Factotum](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AFactotum)
 
 [Command::Run](https://metacpan.org/pod/Command%3A%3ARun)
 

@@ -1,6 +1,6 @@
 ---
 name: alien-gettext-core
-description: Use when working on the Alien::gettext distribution — its [@Author::GETTY] alien config (alien_repo + alien_bins), the system-vs-share probe, the GNU-FTP source download, the msgfmt/xgettext tool set it exposes, or the bin_dir contract its consumers rely on.
+description: Use when working on the Alien::gettext distribution — its [@Author::GETTY] alien config (the root alienfile), the system-vs-share probe, the GNU-FTP source download, the msgfmt/xgettext tool set it exposes, or the bin_dir contract its consumers rely on.
 metadata:
   type: project
 ---
@@ -30,72 +30,39 @@ unshift @PATH, Alien::gettext->bin_dir;
 ```
 
 `lib/Alien/gettext.pm` is deliberately logic-free: `use parent 'Alien::Base'` +
-POD, nothing else. Every decision lives in the generated build config, not in
-Perl. Do not add methods there to "help" consumers — the contract is `bin_dir`
+POD, nothing else. Every decision lives in the alienfile, not in Perl. Do not add methods there to "help" consumers — the contract is `bin_dir`
 and the tools on it.
 
 The lowercase module name (`Alien::gettext`, not `Alien::Gettext`) is
 intentional and matches the tool-Alien convention — do not "correct" it.
 
-## The build is generated, not checked in — it lives in dist.ini
+## The build is the root alienfile
 
-There is **no `alienfile` and no `Build.PL` in the tree**. Both are produced at
-`dzil build` from two keys in `dist.ini`:
-
-```ini
-[@Author::GETTY]
-alien_repo = http://ftp.gnu.org/pub/gnu/gettext
-alien_bins = msgfmt msgfilter msgcmp msgcomm xgettext msgexec msguniq msginit msgunfmt msgconv
-```
-
-`alien_repo` (any non-empty value) is what flips the bundle into Alien mode; it
-emits `[Alien]` (`Dist::Zilla::Plugin::Alien`), which builds a `Build.PL` on top
-of **`Alien::Base::ModuleBuild`** — the classic Module-Build path, *not*
-`Alien::Build`/`alienfile`. So the mental model here is Alien::Base::ModuleBuild,
-and `perl-alien`'s `alienfile` recipes do **not** apply verbatim. To change the
-build you edit `dist.ini` (or the bundle / the `Dist::Zilla::Plugin::Alien`
-knobs — `alien_pattern*`, `alien_version_check`, `alien_build_command`, …), never
-a file in the repo root.
+The build lives in the root `alienfile` (Alien::Build). `dist.ini` only says
+`alien_build = 1`; `[@Author::GETTY]` then generates a `Makefile.PL` driven by
+`Alien::Build::MM` at `dzil build`. The tool list is `@bins` in the alienfile;
+`t/bin.t` runs `msgfmt` and `xgettext` from it.
 
 ## Two install paths
 
-Alien::Base::ModuleBuild probes at install time and picks one:
+- **system** — the `probe` runs `msgfmt --version`; any `GNU gettext-tools` on `PATH`
+  satisfies it (no version floor). Nothing is built; the tools resolve from `PATH` and
+  `bin_dir` is empty.
+- **share** — no system gettext (or `ALIEN_INSTALL_TYPE=share`): the newest
+  `gettext-<version>.tar.gz` listed at `https://ftp.gnu.org/gnu/gettext/` is downloaded
+  over https, then `configure --disable-shared && make && make install` (static internal
+  libraries, so the tools run without a library search path). The last build command
+  fails loudly if any tool in `@bins` was not built. The tools land in the share dir's
+  `bin/`, which is what `bin_dir` returns.
 
-- **system** — a usable gettext is already on the box; the Alien points at it and
-  builds nothing. There is **no version floor set** (`alien_version_check` is
-  unset), so *any* system gettext satisfies the probe. The generated per-tool
-  wrappers exist only for share installs; on a system install the tools resolve
-  from the system location.
-- **share** — no system gettext (or the probe is forced off); the newest source
-  tarball matching the pattern is **downloaded from `ftp.gnu.org`**, then
-  `./configure && make && make install` into the `File::ShareDir` share dir. For
-  each name in `alien_bins` a `bin/<tool>` wrapper is generated that `exec`s the
-  freshly built tool out of the share dir.
+**The share build needs the network** — no bundled tarball. No version is pinned and
+there is no digest (GNU publishes none next to the tarball); https is the integrity
+guard. A GNU mirror outage or a changed tarball name breaks the share build.
 
-**The share build needs the network** — unlike a bundled-tarball Alien, this one
-has no source in `share/` and fetches from GNU at install time. A GNU mirror
-outage, or the newest tarball changing name/shape, breaks the share build. If an
-offline/pinned install is ever required, that is a real design change (bundle a
-tarball or set `alien_exact_filename`), not a tweak.
+## `@bins` is the authoritative tool set
 
-## The pattern picks "newest on the mirror"
-
-`Dist::Zilla::Plugin::Alien` defaults the download pattern to
-`^gettext-([\d\.]+)\.tar\.gz$` (prefix = module name minus `Alien-`, i.e.
-`gettext-`; version `([\d\.]+)`; suffix `\.tar\.gz`). It selects the
-highest-versioned match in `alien_repo`. Nothing pins a version — a new GNU
-release is picked up automatically on the next share install. Set
-`alien_pattern*` / `alien_exact_filename` in `dist.ini` if that ever needs
-constraining.
-
-## `alien_bins` is the authoritative tool set
-
-The ten tools this distribution promises: `msgfmt msgfilter msgcmp msgcomm
-xgettext msgexec msguniq msginit msgunfmt msgconv`. This list — not the POD — is
-the contract; each name becomes a share-install wrapper. Note the POD synopsis in
-`lib/Alien/gettext.pm` mentions `msgmerge`, which is **not** in `alien_bins`;
-either the tool is added to the list or the POD example is corrected — they must
-agree, and the list is the source of truth.
+The eleven tools: `msgfmt msgfilter msgcmp msgcomm msgmerge xgettext msgexec msguniq
+msginit msgunfmt msgconv`. The POD must agree with the list.
 
 ## Verification — both paths
 
@@ -109,5 +76,5 @@ env ALIEN_INSTALL_TYPE=share  dzil test    # forces the GNU download + build (ne
 env ALIEN_INSTALL_TYPE=system dzil test    # forces the probe path; fails loudly with no system gettext
 ```
 
-`t/load.t` only `use_ok`s the module — it does not prove either path works, so it
-is not verification for a build change.
+`t/load.t` only `use_ok`s the module; `t/bin.t` runs `msgfmt`/`xgettext --version` through
+`bin_dir` and is the real check.

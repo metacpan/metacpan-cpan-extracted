@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 use Test::Exception;
 use Scalar::Util qw( refaddr weaken );
 use Time::HiRes ();
@@ -84,7 +86,7 @@ $Future::IO::IMPL = 'ListenSpy';
   # -- the pooled side; only _notify_send uses it --
 
   sub _create_pool_connection {
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { r => $r, w => $w, pooled => 1 };
   }
@@ -114,7 +116,7 @@ $Future::IO::IMPL = 'ListenSpy';
   sub _listen_open {
     my ($self) = @_;
     my $f = $self->{fake};
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     $r->blocking(0);
     my $conn = {
@@ -466,7 +468,7 @@ for my $rebuild (qw( listen_reconnect heal )) {
   my $c = conn_no($s, 1);
   ok drive(sub { $s->{fake}{drains}{1} }), 'watching, the poll armed';
 
-  pipe(my $or, my $ow) or die "pipe: $!";
+  my ($or, $ow) = ChannelPair::channel();
   $ow->autoflush(1);
   $or->blocking(0);
   syswrite $ow, 'x';
@@ -475,8 +477,12 @@ for my $rebuild (qw( listen_reconnect heal )) {
   $other->on_ready(sub { $presumed = $or->blocking });
   $other->get;    # one round with two read pollers and no timer
 
-  ok $presumed,
-    'precondition: that round was a presumed-ready one (O_NONBLOCK cleared)';
+  SKIP: {
+    skip 'IO::Handle::blocking does not report the state of a Windows socket', 1
+      if $^O eq 'MSWin32';
+    ok $presumed,
+      'precondition: that round was a presumed-ready one (O_NONBLOCK cleared)';
+  }
   is $s->{fake}{drains}{1}, 1,
     'the listen socket was presumed ready too, but was not drained -- it was quiet';
   ok watch_of($c)->{pending}, 'the loop re-armed instead';

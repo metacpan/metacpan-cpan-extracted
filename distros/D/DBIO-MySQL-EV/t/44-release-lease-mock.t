@@ -96,22 +96,22 @@ sub pool_of_one {
 
   my $waiter = $pool->acquire;                 # queued behind the holder
   my $third  = $pool->acquire;                 # and another behind it
-  ok !$waiter->is_ready, 'k91: a caller is queued for the one connection';
+  ok !$waiter->is_ready, 'a caller is queued for the one connection';
 
   $cb->();                                     # the holder's release: hands it on
   settle();                                    # the reset of the session first (karr k100)
-  ok $waiter->is_done, 'k91: the release hands the connection to the queued caller';
-  is refaddr($waiter->get), refaddr($conn), 'k91: the same connection';
+  ok $waiter->is_done, 'the release hands the connection to the queued caller';
+  is refaddr($waiter->get), refaddr($conn), 'the same connection';
 
   $cb->();                                     # the completion fires again
   settle();
   ok !$third->is_ready,
-    'k91: the second run does not hand the session to the caller behind';
-  is $pool->available, 0, 'k91: the connection is not on the idle list under its holder';
+    'the second run does not hand the session to the caller behind';
+  is $pool->available, 0, 'the connection is not on the idle list under its holder';
 
   $pool->release($conn, $pool->_lease($conn)); # the new holder's own release
   settle();
-  ok $third->is_done, 'k91: the new holder\'s release hands it on';
+  ok $third->is_done, 'the new holder\'s release hands it on';
   $storage->disconnect;
 }
 
@@ -123,15 +123,15 @@ sub pool_of_one {
   my $f = $storage->select_async('thing', [qw( id name )], {});
   my $deadline = EV::time() + 2;
   settle() while !@HoldMDB::SENT && EV::time() < $deadline;
-  is scalar @HoldMDB::SENT, 1, 'k90: the statement is in flight';
+  is scalar @HoldMDB::SENT, 1, 'the statement is in flight';
 
   $storage->disconnect;
-  ok !defined $storage->{pool}, 'k90: disconnected: no pool';
+  ok !defined $storage->{pool}, 'disconnected: no pool';
 
   $HoldMDB::SENT[0]{cb}->([ [ 1, 'one' ] ]);   # it completes afterwards
   settle();
   ok !defined $storage->{pool},
-    'k90: the completion of the statement built no new pool on the disconnected storage';
+    'the completion of the statement built no new pool on the disconnected storage';
 }
 
 {
@@ -139,7 +139,7 @@ sub pool_of_one {
   my $f = $storage->insert_async('thing', {});
   my $deadline = EV::time() + 2;
   settle() while !@HoldMDB::SENT && EV::time() < $deadline;
-  is scalar @HoldMDB::SENT, 1, 'k90: the insert is in flight';
+  is scalar @HoldMDB::SENT, 1, 'the insert is in flight';
 
   $storage->disconnect;
   $HoldMDB::SENT[0]{cb}->(1);                  # the INSERT is answered afterwards
@@ -147,7 +147,7 @@ sub pool_of_one {
   $HoldMDB::SENT[1]{cb}->([ [ 7 ] ]) if $HoldMDB::SENT[1];   # and LAST_INSERT_ID()
   settle();
   ok !defined $storage->{pool},
-    'k90: the end of an insert built no new pool on the disconnected storage either';
+    'the end of an insert built no new pool on the disconnected storage either';
 }
 
 done_testing;

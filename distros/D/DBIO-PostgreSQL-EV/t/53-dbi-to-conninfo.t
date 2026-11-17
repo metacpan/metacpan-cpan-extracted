@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 
 # OFFLINE test: dbi_to_conninfo reads a dbi:Pg: DSN the way DBD::Pg does
 # (karr k58, measured in k54).
@@ -397,7 +400,7 @@ for my $case (
     [ 'a quoted password= with a blank and a semicolon in it',
       [ "dbi:mysql:database=appdb;password='hun;ter2 $SECRET';host=db.example", 'app', undef ],
       qr/dbi:mysql:database=appdb;password=\*\*\*;host=db\.example/, 'mysql' ],
-    [ q{DBI's Password attribute in front of the driver's name and no colon (nothing behind dbi:Pg: is read since k66)},
+    [ q{DBI's Password attribute in front of the driver's name and no colon (nothing behind dbi:Pg: is read)},
       [ "dbi:Pg(Username=>app,Password=>$SECRET)" ],
       qr/dbi:Pg\(Username=>app,Password=\*\*\*/, 'Pg' ],
     [ 'a DSN with no colon behind the driver',

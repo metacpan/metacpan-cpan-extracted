@@ -91,7 +91,7 @@ is $plain_ddl, $comp_ddl,
 
 my $default_path = join ', ', DBIO::PostgreSQL->pg_search_path;
 unlike $plain_ddl, qr/search_path/,
-  "... and neither writes the component's default search_path ($default_path) (karr k121)";
+  "... and neither writes the component's default search_path ($default_path)";
 
 # -----------------------------------------------------------------------
 # 3. The fallback reads the component's defaults, it never writes them

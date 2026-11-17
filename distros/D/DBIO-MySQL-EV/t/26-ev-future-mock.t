@@ -43,6 +43,7 @@ my $EVF = 'DBIO::MySQL::EV::Future';
 sub settle_later {
   my ($delay, $f, $method, @values) = @_;
   my $t;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   $t = EV::timer($delay, 0, sub { undef $t; $f->$method(@values) });
   return;
 }
@@ -61,7 +62,7 @@ sub bounded {
   my $plain = Future->new;
   settle_later(0.01, $plain, done => 'never read');
   ok !eval { $plain->get; 1 }, 'a plain Future cannot get while it is pending';
-  like $@, qr/does not provide ->await/, '(the reason this class exists)';
+  like $@, qr/does not provide (?:->await|an ->await method)/, '(the reason this class exists; Future::PP and Future::XS word it differently)';
   bounded('drain', sub { EV::run(EV::RUN_ONCE()) until $plain->is_ready });
 
   my $f = $EVF->new;

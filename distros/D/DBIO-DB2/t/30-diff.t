@@ -58,7 +58,7 @@ use_ok 'DBIO::DB2::DDL';
   is($ops[0]->action, 'create', 'action create');
   is($ops[0]->table_name, 'author', 'table_name');
   my $sql = $ops[0]->as_sql;
-  like($sql, qr/CREATE TABLE "author"/,       'create table (quoted, karr k28)');
+  like($sql, qr/CREATE TABLE "author"/,       'create table (quoted)');
   like($sql, qr/^  "name" VARCHAR\(255\) NOT NULL,$/m, 'name VARCHAR(255) NOT NULL (quoted column)');
   like($sql, qr/^  "born" DATE,$/m,           'a DATE gets no length, whatever LENGTH the catalog holds');
   like($sql, qr/^  "seen" TIMESTAMP\(6\),$/m, 'a TIMESTAMP gets its precision');
@@ -157,7 +157,7 @@ use_ok 'DBIO::DB2::DDL';
     {},
   );
   is($ops[0]->action, 'drop',                'drop op');
-  is($ops[0]->as_sql, 'DROP TABLE "gone";', 'drop SQL (quoted, karr k28)');
+  is($ops[0]->as_sql, 'DROP TABLE "gone";', 'drop SQL (quoted)');
   is($ops[0]->summary, '- table: gone',       'drop summary');
 }
 
@@ -175,7 +175,7 @@ use_ok 'DBIO::DB2::DDL';
   );
   is(scalar @ops, 1, 'one add op');
   is($ops[0]->action, 'add', 'action add');
-  is($ops[0]->as_sql, 'ALTER TABLE "t" ADD COLUMN "extra" VARCHAR(50);', 'add SQL (quoted, karr k28)');
+  is($ops[0]->as_sql, 'ALTER TABLE "t" ADD COLUMN "extra" VARCHAR(50);', 'add SQL (quoted)');
 }
 
 # --- Diff::Column add NOT NULL with default ---
@@ -214,7 +214,7 @@ use_ok 'DBIO::DB2::DDL';
     { t => {} }, { t => {} },
   );
   is($ops[0]->action, 'drop', 'drop op');
-  is($ops[0]->as_sql, 'ALTER TABLE "t" DROP COLUMN "old";', 'drop column SQL (quoted, karr k28)');
+  is($ops[0]->as_sql, 'ALTER TABLE "t" DROP COLUMN "old";', 'drop column SQL (quoted)');
 }
 
 # --- Diff::Column alter type + NOT NULL (DB2 supports ALTER COLUMN) ---
@@ -227,8 +227,8 @@ use_ok 'DBIO::DB2::DDL';
   is(scalar @ops, 1,        'one alter op');
   is($ops[0]->action, 'alter', 'action alter');
   my $sql = $ops[0]->as_sql;
-  like($sql, qr/ALTER TABLE "t" ALTER COLUMN "a" SET DATA TYPE VARCHAR\(50\);/, 'SET DATA TYPE (quoted, karr k28)');
-  like($sql, qr/ALTER TABLE "t" ALTER COLUMN "a" SET NOT NULL;/,               'SET NOT NULL (quoted, karr k28)');
+  like($sql, qr/ALTER TABLE "t" ALTER COLUMN "a" SET DATA TYPE VARCHAR\(50\);/, 'SET DATA TYPE (quoted)');
+  like($sql, qr/ALTER TABLE "t" ALTER COLUMN "a" SET NOT NULL;/,               'SET NOT NULL (quoted)');
 }
 
 # --- Diff::Column alter default change + drop NOT NULL ---
@@ -239,8 +239,8 @@ use_ok 'DBIO::DB2::DDL';
     { t => {} }, { t => {} },
   );
   my $sql = $ops[0]->as_sql;
-  like($sql, qr/ALTER COLUMN "a" DROP NOT NULL;/,    'DROP NOT NULL (quoted, karr k28)');
-  like($sql, qr/ALTER COLUMN "a" SET DEFAULT 2;/,    'SET DEFAULT (quoted, karr k28)');
+  like($sql, qr/ALTER COLUMN "a" DROP NOT NULL;/,    'DROP NOT NULL (quoted)');
+  like($sql, qr/ALTER COLUMN "a" SET DEFAULT 2;/,    'SET DEFAULT (quoted)');
 }
 
 # --- Diff::Column alter of a string default, catalog shape (karr k41) ---
@@ -286,7 +286,7 @@ use_ok 'DBIO::DB2::DDL';
     old_info => { catalog_type => 'integer', catalog_default => '5' },
     new_info => { catalog_type => 'integer', catalog_default => undef },
   );
-  like($op->as_sql, qr/ALTER COLUMN "a" DROP DEFAULT;/, 'as_sql renders DROP DEFAULT (quoted, karr k28)');
+  like($op->as_sql, qr/ALTER COLUMN "a" DROP DEFAULT;/, 'as_sql renders DROP DEFAULT (quoted)');
 }
 
 # --- Diff::Table creates new tables in foreign key order (karr k57) ---
@@ -432,7 +432,7 @@ use_ok 'DBIO::DB2::DDL';
   );
   is(scalar @ops, 1, 'one index create');
   is($ops[0]->action, 'create', 'action create');
-  is($ops[0]->as_sql, 'CREATE UNIQUE INDEX "idx_t_name" ON "t" ("name");', 'unique index SQL (quoted, karr k28)');
+  is($ops[0]->as_sql, 'CREATE UNIQUE INDEX "idx_t_name" ON "t" ("name");', 'unique index SQL (quoted)');
 }
 
 # --- Diff::Index create non-unique multi-column ---
@@ -445,7 +445,7 @@ use_ok 'DBIO::DB2::DDL';
       },
     },
   );
-  is($ops[0]->as_sql, 'CREATE INDEX "idx_ab" ON "t" ("a", "b");', 'non-unique multi-col index (quoted, karr k28)');
+  is($ops[0]->as_sql, 'CREATE INDEX "idx_ab" ON "t" ("a", "b");', 'non-unique multi-col index (quoted)');
 }
 
 # --- Diff::Index drop ---
@@ -455,7 +455,7 @@ use_ok 'DBIO::DB2::DDL';
     {},
   );
   is($ops[0]->action, 'drop',                 'drop op');
-  is($ops[0]->as_sql, 'DROP INDEX "gone_idx";', 'drop index SQL (quoted, karr k28)');
+  is($ops[0]->as_sql, 'DROP INDEX "gone_idx";', 'drop index SQL (quoted)');
 }
 
 # --- Diff::Index alter (drop+create pair) ---
@@ -495,7 +495,7 @@ use_ok 'DBIO::DB2::DDL';
   );
   is(scalar @ops, 1,           'index drop still emitted when the table itself survives');
   is($ops[0]->action, 'drop',  'surviving-table index drop is a drop op');
-  is($ops[0]->as_sql, 'DROP INDEX "idx_users_email";', 'surviving-table index still dropped standalone (quoted, karr k28)');
+  is($ops[0]->as_sql, 'DROP INDEX "idx_users_email";', 'surviving-table index still dropped standalone (quoted)');
 }
 
 # --- Top-level Diff orchestrator: create from empty ---
@@ -516,7 +516,7 @@ use_ok 'DBIO::DB2::DDL';
   };
   my $diff = DBIO::DB2::Diff->new(source => $source, target => $target);
   ok($diff->has_changes, 'has_changes');
-  like($diff->as_sql,  qr/CREATE TABLE "author"/, 'as_sql contains create (quoted, karr k28)');
+  like($diff->as_sql,  qr/CREATE TABLE "author"/, 'as_sql contains create (quoted)');
   like($diff->summary, qr/\+ table: author/,    'summary contains create line');
 }
 
@@ -549,9 +549,9 @@ use_ok 'DBIO::DB2::DDL';
   # tables first, then columns, then indexes
   isa_ok($ops[0],  'DBIO::DB2::Diff::Table',  'first op is a table op');
   isa_ok($ops[-1], 'DBIO::DB2::Diff::Index',  'last op is an index op');
-  like($diff->as_sql, qr/CREATE TABLE "fresh"/,            'new table created (quoted, karr k28)');
-  like($diff->as_sql, qr/ADD COLUMN "note"/,               'column added to existing table (quoted, karr k28)');
-  like($diff->as_sql, qr/DROP INDEX "old_idx"/,            'stale index dropped (quoted, karr k28)');
+  like($diff->as_sql, qr/CREATE TABLE "fresh"/,            'new table created (quoted)');
+  like($diff->as_sql, qr/ADD COLUMN "note"/,               'column added to existing table (quoted)');
+  like($diff->as_sql, qr/DROP INDEX "old_idx"/,            'stale index dropped (quoted)');
 }
 
 # --- Diff::ForeignKey: ADD on a retained table ---
@@ -577,7 +577,7 @@ use_ok 'DBIO::DB2::DDL';
   is($ops[0]->action, 'add', 'action add');
   is($ops[0]->as_sql,
     'ALTER TABLE "book" ADD CONSTRAINT "fk_book_author_id" FOREIGN KEY ("author_id") REFERENCES "author"("id");',
-    'add FK SQL, NO ACTION rules suppressed (quoted, karr k28)');
+    'add FK SQL, NO ACTION rules suppressed (quoted)');
 }
 
 # --- Diff::ForeignKey: DROP uses the real server name ---
@@ -600,7 +600,7 @@ use_ok 'DBIO::DB2::DDL';
   is(scalar @ops, 1, 'one FK drop op');
   is($ops[0]->action, 'drop', 'action drop');
   is($ops[0]->as_sql, 'ALTER TABLE "book" DROP FOREIGN KEY "SQL230101_REALNAME";',
-    'drop uses the real server-carried name (quoted, karr k28)');
+    'drop uses the real server-carried name (quoted)');
 }
 
 # --- Diff::ForeignKey: MODIFY -> drop-then-add, drop first ---
@@ -633,10 +633,10 @@ use_ok 'DBIO::DB2::DDL';
   is($ops[0]->action, 'drop', 'drop first');
   is($ops[1]->action, 'add',  'add second');
   like($ops[0]->as_sql, qr/^ALTER TABLE "book" DROP FOREIGN KEY "fk_book_ref_id";$/,
-    'drop targets old constraint (quoted, karr k28)');
+    'drop targets old constraint (quoted)');
   is($ops[1]->as_sql,
     'ALTER TABLE "book" ADD CONSTRAINT "fk_book_ref_id" FOREIGN KEY ("ref_id") REFERENCES "editor"("id") ON DELETE CASCADE;',
-    'add renders new definition with ON DELETE CASCADE (quoted, karr k28)');
+    'add renders new definition with ON DELETE CASCADE (quoted)');
 }
 
 # --- Diff::ForeignKey: ON DELETE CASCADE rendered, NO ACTION suppressed ---
@@ -739,9 +739,9 @@ use_ok 'DBIO::DB2::DDL';
     $tail_all_fk = 0 unless $op->isa('DBIO::DB2::Diff::ForeignKey');
   }
   ok($tail_all_fk, 'FK ops are emitted last, after table/column/index ops');
-  like($diff->as_sql, qr/ADD COLUMN "note"/,                      'column add present (quoted, karr k28)');
-  like($diff->as_sql, qr/DROP INDEX "idx_old"/,                   'stale index dropped (quoted, karr k28)');
-  like($diff->as_sql, qr/ADD CONSTRAINT "fk_book_author_id" FOREIGN KEY/, 'FK add present (quoted, karr k28)');
+  like($diff->as_sql, qr/ADD COLUMN "note"/,                      'column add present (quoted)');
+  like($diff->as_sql, qr/DROP INDEX "idx_old"/,                   'stale index dropped (quoted)');
+  like($diff->as_sql, qr/ADD CONSTRAINT "fk_book_author_id" FOREIGN KEY/, 'FK add present (quoted)');
 }
 
 # --- No changes ---

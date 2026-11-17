@@ -49,7 +49,7 @@ my $h     = DBIO::PostgreSQL::EV::TestHarness->new;
 my $async = $h->async;
 
 SKIP: {
-  skip 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)', 4
+  skip 'the installed DBIO core predates the LISTEN/NOTIFY contract', 4
     unless DBIO::Storage::Async->can('listen_alive');
 
   $async->on_listen_error(sub { });

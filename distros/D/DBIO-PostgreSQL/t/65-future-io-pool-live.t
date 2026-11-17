@@ -73,11 +73,11 @@ use LiveServer;
 eval { require DBIO::PostgreSQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed DBIO core predates PoolBase::_mark_connection_dead (core k230)'
+plan skip_all => 'the installed DBIO core predates PoolBase::_mark_connection_dead'
   unless DBIO::Storage::PoolBase->can('_mark_connection_dead');
-plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam (dbio-async k26)'
+plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam'
   unless DBIO::Async::Storage->can('_conn_error_is_fatal');
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 # A server that is not there fails the file, with a plan (karr k113).

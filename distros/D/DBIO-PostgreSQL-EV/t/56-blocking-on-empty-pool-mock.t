@@ -701,7 +701,7 @@ for my $call (
 
   # The coderef dies with the refusal: the transaction rolls back.
   {
-    my $label   = "k85, txn_do coderef with a \$ctx statement in flight, blocking $kind, pool of one";
+    my $label   = "txn_do coderef with a \$ctx statement in flight, blocking $kind, pool of one";
     my $storage = build_storage(1);
     my %seen;
     my $r = bounded(sub {
@@ -717,7 +717,7 @@ for my $call (
     });
     ok !$r->{hung}, "$label: nothing hangs" or diag 'it hung';
     like $seen{error}, qr/\ABlocking wait refused: .*1 more result\(s\) due/s,
-      "$label: the blocking call is refused with the k44 text";
+      "$label: the blocking call is refused with the blocking-wait refusal text";
     is $seen{queued}, 0, "$label: and taken out of the pool's queue as it is refused";
     like $r->{error}, qr/more result\(s\) due/, "$label: txn_do dies with that refusal";
     pool_recovered($label, $storage, [qw( BEGIN in-txn ROLLBACK )]);
@@ -728,7 +728,7 @@ for my $call (
   # The coderef catches the refusal and goes on: the transaction commits, and
   # that is the moment the queued caller used to be handed the connection.
   {
-    my $label   = "k85, the coderef catches the refusal of a blocking $kind, pool of one";
+    my $label   = "the coderef catches the refusal of a blocking $kind, pool of one";
     my $storage = build_storage(1);
     my %seen;
     my $r = bounded(sub {
@@ -751,7 +751,7 @@ for my $call (
 # completes, as the k44 refusal says: the blocking call finds an idle second
 # connection (here: opens one) and was never queued.
 {
-  my $label   = 'k85, the k44 refusal of a call that was never queued, pool of two';
+  my $label   = 'the blocking-wait refusal of a call that was never queued, pool of two';
   my $storage = build_storage(2);
   my %seen;
   my $r = bounded(sub {
@@ -778,7 +778,7 @@ for my $call (
 # is taken out and never runs; the statement already sent completes and gives
 # its connection back.
 {
-  my $label   = 'k85, a convergent of a queued call and a statement in flight, pool of two';
+  my $label   = 'a convergent of a queued call and a statement in flight, pool of two';
   my $storage = build_storage(2);
   my $slow    = select_named($storage, 'slow');   # connection 1, in flight
   my %seen;
@@ -795,7 +795,7 @@ for my $call (
   });
   ok $r->{ok} && !$r->{hung}, "$label: the transaction commits" or diag $r->{hung} ? 'it hung' : $r->{error};
   is $seen{waiting}, 1, "$label: (the call was queued: both connections checked out)";
-  like $seen{error}, qr/more result\(s\) due/, "$label: the wait is refused with the k44 text";
+  like $seen{error}, qr/more result\(s\) due/, "$label: the wait is refused with the blocking-wait refusal text";
   is $seen{queued}, 0, "$label: the queued call is out of the queue";
   settle() for 1 .. 3;   # the statement named slow* is answered after $EV::Pg::SLOW
   is_deeply [ map { wire($_) } conns($storage) ], [ ['slow'], [qw( BEGIN in-txn COMMIT )] ],
@@ -807,7 +807,7 @@ for my $call (
 # 5c. a chain that catches the failure of the queued caller: the wait is still
 # refused (k44 speaks), the call is still not run.
 {
-  my $label   = 'k85, a chain that catches the failure, pool of one';
+  my $label   = 'a chain that catches the failure, pool of one';
   my $storage = build_storage(1);
   my %seen;
   my $r = bounded(sub {
@@ -830,7 +830,7 @@ for my $call (
 
 # 5d. a callback of the failed waiter dies: the pool is in order regardless.
 {
-  my $label   = 'k85, a callback on the queued caller dies when it is failed, pool of one';
+  my $label   = 'a callback on the queued caller dies when it is failed, pool of one';
   my $storage = build_storage(1);
   my %seen;
   my $r = bounded(sub {
@@ -844,7 +844,7 @@ for my $call (
     });
   });
   ok !$r->{hung}, "$label: nothing hangs";
-  like $seen{error}, qr/more result\(s\) due/, "$label: the wait is still refused with the k44 text";
+  like $seen{error}, qr/more result\(s\) due/, "$label: the wait is still refused with the blocking-wait refusal text";
   pool_recovered($label, $storage, [qw( BEGIN in-txn COMMIT )]);
   @warnings = grep { !/callback of the failed waiter died/ } @warnings;
   nothing_warned($label);
@@ -861,7 +861,7 @@ for my $call (
 # This case says "no timeout" with acquire_timeout => 0, which is how a program
 # gets the dry loop back.
 {
-  my $label   = 'k86, the loop runs dry under a queued blocking call, pool of one';
+  my $label   = 'the loop runs dry under a queued blocking call, pool of one';
   my $storage = build_storage(1, acquire_timeout => 0);
   my $gate    = $EVF->new;
   my $txn     = $storage->txn_do_async(sub { return $gate });
@@ -884,7 +884,7 @@ for my $call (
 # after the timeout, long before the 1 second watchdog, and nobody is left
 # queued.
 {
-  my $label   = 'k397, the same wait under acquire_timeout, pool of one';
+  my $label   = 'the same wait under acquire_timeout, pool of one';
   my $storage = build_storage(1, acquire_timeout => 0.2);
   my $gate    = $EVF->new;
   my $txn     = $storage->txn_do_async(sub { return $gate });

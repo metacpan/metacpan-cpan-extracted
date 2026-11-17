@@ -3,6 +3,7 @@ requires 'Alien::Base' => '2.00';
 on configure => sub {
   requires 'Alien::Build'    => '2.00';
   requires 'Alien::Build::MM' => '2.00';
+  requires 'Path::Tiny';
 };
 
 on build => sub {

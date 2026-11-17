@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mutation testing — App::Test::Generator</title>
+<meta name="description" content="Mutation testing for Perl: four operators, in-place mutant application, skip markers for recursion and process code, and a pipeline that turns surviving mutants into new fuzz schemas.">
+<link rel="canonical" href="mutation.html">
+<meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="article">
+<meta property="og:site_name" content="App::Test::Generator">
+<meta property="og:title" content="Mutation testing — App::Test::Generator">
+<meta property="og:description" content="Four operators, honest results, and a loop that turns survivors into tests.">
+<meta name="twitter:card" content="summary">
+<link rel="stylesheet" href="../css/site.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+	<div class="wrap header-inner">
+		<a class="brand" href="index.html">
+			<span class="brand-name">App::Test::Generator</span>
+			<span class="brand-tag">tests that are generated, not typed</span>
+		</a>
+		<nav class="site-nav" aria-label="Main">
+			<a href="index.html">Home</a>
+			<a href="install.html">Install</a>
+			<a href="quickstart.html">Quick start</a>
+			<a href="schema.html">Schema</a>
+			<a href="commands.html">Commands</a>
+			<a href="extraction.html">Extraction</a>
+			<a href="fuzzing.html">Fuzzing</a>
+			<a href="mutation.html" class="current" aria-current="page">Mutation</a>
+			<a href="dashboard.html">Dashboard</a>
+			<a href="limitations.html">Limits</a>
+			<a href="changelog.html">Changes</a>
+		</nav>
+	</div>
+</header>
+
+<main id="main" class="wrap">
+	<h1>Mutation testing</h1>
+	<p class="lead">
+		Coverage says a line ran. Mutation testing says the line mattered: change
+		it slightly, and see whether any test notices. A mutant that survives is
+		either an untested behaviour or a line that does not need to exist — both
+		worth knowing.
+	</p>
+
+<pre><code>test-generator-mutate --lib lib --tests t --json mutation.json --min-score 85
+</code></pre>
+
+	<h2>Operators</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Operator</th><th>Mutates</th><th>Catches</th></tr>
+			</thead>
+			<tbody>
+				<tr><td><code>BooleanNegation</code></td><td>A boolean expression or a returned boolean, including <code>return $x;</code> → <code>return !$x;</code></td><td>Tests that check truthiness at all, rather than only that a call succeeded.</td></tr>
+				<tr><td><code>ConditionalInversion</code></td><td><code>if</code>/<code>unless</code>/<code>while</code>/<code>until</code> conditions, negated in place</td><td>Branches where only one side is exercised.</td></tr>
+				<tr><td><code>NumericBoundary</code></td><td>A numeric literal, nudged to the value either side of it</td><td>Off-by-one handling and inclusive-versus-exclusive comparisons.</td></tr>
+				<tr><td><code>ReturnUndef</code></td><td>A <code>return</code> expression, replaced by <code>undef</code></td><td>Callers that never check for a failed or empty result.</td></tr>
+			</tbody>
+		</table>
+	</div>
+	<p>
+		Four operators is a deliberate choice. They are the ones whose survivors
+		usually mean something, and whose mutants rarely fail for structural
+		reasons. A mutant that does not compile, or that changes a signature, is
+		noise in a report a human has to read.
+	</p>
+
+	<h2>How a mutant is applied</h2>
+	<p>
+		The mutated source is written into the project's own <code>lib/</code>
+		file, the tests run, and the original is restored — always, including when
+		<code>prove</code> crashes. A workspace copy is used only for the syntax
+		check.
+	</p>
+	<p>
+		This is not the obvious design, and the reason is worth knowing if you
+		modify it. Many CPAN modules put <code>use lib "$Bin/../lib"</code> near
+		the top of a test file. <code>use lib</code> unshifts onto <code>@INC</code>
+		at compile time, which happens after <code>PERL5LIB</code> has been
+		applied — so a harness pointed at a mutated workspace copy still loads the
+		original library, every mutant survives, and the reported kill rate is 0%.
+		Writing to <code>lib/</code> means every resolution path sees the mutant.
+	</p>
+	<div class="warn">
+		<span class="warn-title">If the process is killed mid-run</span>
+		<p>
+			The restore happens in the same process that writes the mutant. Kill it
+			between the two and the file is left mutated. <code>git status lib/</code>
+			will show it; <code>git restore lib/</code> puts it back. Running
+			mutation testing only on a clean tree makes that obvious.
+		</p>
+	</div>
+	<p>
+		Per-mutant runs use <code>prove -l -r</code>. The baseline run uses
+		<code>prove -Mblib -l -r</code>, deliberately, so the baseline sees what
+		the full suite sees while the per-mutant runs are not shadowed by the
+		original code in <code>blib/lib</code>.
+	</p>
+
+	<h2>Reading the result</h2>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Term</th><th>Meaning</th></tr>
+			</thead>
+			<tbody>
+				<tr><td>Killed</td><td>A test failed with the mutant applied. The behaviour is covered.</td></tr>
+				<tr><td>Survived</td><td>Every test passed. Nothing asserts this behaviour.</td></tr>
+				<tr><td>Skipped</td><td>The line is inside a <code>MUTANT_SKIP</code> block, or the file was excluded.</td></tr>
+				<tr><td>Difficulty</td><td>HIGH, MEDIUM or LOW — how hard the survivor is likely to be to kill, used to order the work and to decide what to generate.</td></tr>
+				<tr><td>Score</td><td>Killed as a percentage of mutants that were actually run.</td></tr>
+			</tbody>
+		</table>
+	</div>
+
+	<h3>Fast mode</h3>
+	<p>
+		<code>mutation_level =&gt; 'full'</code> is the default and tries every
+		mutant. <code>'fast'</code> deduplicates first: several mutants on one
+		line usually produce the same behaviour, and one good test kills all of
+		them. The fast list is a subset of the full one, so it is the right mode
+		for a pull request and the full mode for a nightly run.
+	</p>
+
+	<h2 id="skipping">Skipping a line</h2>
+	<p>
+		Some code must not be mutated, because a mutant does not fail the suite —
+		it hangs it. Mark the region with two anchored comments:
+	</p>
+<pre><code><span class="comment">## MUTANT_SKIP_BEGIN</span>
+return 1 if $n &lt;= 1;
+<span class="comment">## MUTANT_SKIP_END</span>
+</code></pre>
+	<p>
+		The two cases this exists for:
+	</p>
+	<ul>
+		<li><strong>Recursion base cases.</strong> Negating the guard that stops a
+		recursive function produces infinite recursion, and the per-mutant
+		<code>prove</code> run has no timeout, so the whole run stalls.</li>
+		<li><strong>Process management.</strong> Lines calling
+		<code>kill</code>, <code>waitpid</code> or <code>fork</code> can hang or
+		emit <code>END</code>-block warnings instead of failing cleanly.</li>
+	</ul>
+	<p>
+		Markers are matched only as whole comment lines. A mismatched or nested
+		pair is fatal rather than silently ignored, because a skip that stops
+		halfway is how a run turns into an afternoon.
+	</p>
+
+	<h2 id="the-feedback-loop">The feedback loop</h2>
+	<p>
+		A survivor is a statement that a test is missing. The pipeline tries to
+		write that test:
+	</p>
+<pre><code>mutation survivor
+    │
+    ▼
+SchemaExtractor reads the enclosing sub
+    │
+    ▼
+schema augmented with the mutant's boundary value
+    │
+    ▼
+written to t/conf/
+    │
+    ▼
+t/fuzz.t picks it up and runs it
+    │
+    ▼
+mutation killed on the next run
+</code></pre>
+	<p>
+		Three flags drive it, and they are additive:
+	</p>
+	<div class="table-wrap">
+		<table>
+			<thead>
+				<tr><th>Flag</th><th>Produces</th></tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td><code>--generate_mutant_tests=DIR</code></td>
+					<td><code>t/mutant_YYYYMMDD_HHMMSS.t</code> — TODO stubs for HIGH and MEDIUM survivors, with the suggested boundary value, the enclosing subroutine and environment hints. LOW survivors get a comment only. Several mutants on one line collapse into one stub, because one good test kills them all.</td>
+				</tr>
+				<tr>
+					<td><code>--generate_test=mutant</code></td>
+					<td>For each NUM_BOUNDARY survivor, extract the enclosing routine's schema and write a runnable <code>t/conf/mutant_MODULE_FUNCTION_*.yml</code>, with the boundary value and one value either side added. Falls back to a TODO stub when the schema cannot be parsed, the enclosing sub cannot be found, or confidence is <code>very_low</code>/<code>none</code>.</td>
+				</tr>
+				<tr>
+					<td><code>--generate_fuzz</code></td>
+					<td>Copies every existing schema in <code>t/conf/</code> that has matching survivors, merges their boundary values in, and writes <code>t/conf/mutant_fuzz_*.yml</code>. The originals are never modified, and files that already start with <code>mutant_fuzz_</code> are skipped so augmentation cannot cascade.</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+<pre><code>test-generator-index \
+    --generate_mutant_tests=t \
+    --generate_test=mutant \
+    --generate_fuzz
+</code></pre>
+	<p>
+		The shipped <code>dashboard.yml</code> workflow runs all three and commits
+		the new files, so a repository accumulates tests that were provoked by its
+		own mutation results. That is the closest thing here to a test suite that
+		improves without being written.
+	</p>
+
+	<h3 id="mutation-results">Feeding survivors straight into a harness</h3>
+	<p>
+		The same report can be handed to the harness generator, with no
+		intermediate schema file:
+	</p>
+<pre><code>test-generator-mutate --lib lib --tests t --json mutation.json
+fuzz-harness-generator --mutation-results mutation.json -o t/fuzz.t schema.yml
+</code></pre>
+	<p>
+		Each surviving numeric-boundary mutant in the schema's module is traced
+		to the comparison it mutated, and that comparison becomes a
+		<code>min</code> or <code>max</code> on the matching input field, so the
+		harness generates values either side of the boundary the suite missed.
+		A constraint already in the schema is never replaced, and survivors
+		that do not describe a numeric comparison are listed for review, since
+		they need a hand-written test. From Perl, pass
+		<code>mutation_results =&gt; $file</code> to <code>generate()</code>.
+	</p>
+
+	<div class="note">
+		<span class="note-title">A survivor is not always a bug</span>
+		<p>
+			Sometimes the mutant is equivalent: no input can distinguish it from
+			the original. Equivalent mutants are unavoidable in mutation testing,
+			and a kill rate of 100% is usually a sign that the source has been
+			shaped around the operators rather than that the tests are complete.
+			Use the score as a trend, not a target.
+		</p>
+	</div>
+
+	<div class="pager">
+		<a href="fuzzing.html">← Fuzzing</a>
+		<a href="dashboard.html">Dashboard →</a>
+	</div>
+</main>
+
+<footer class="site-footer">
+	<div class="wrap">
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>
+			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
+			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·
+			<a href="https://nigelhorne.github.io/App-Test-Generator/coverage/">Test dashboard</a>
+		</p>
+	</div>
+</footer>
+</body>
+</html>

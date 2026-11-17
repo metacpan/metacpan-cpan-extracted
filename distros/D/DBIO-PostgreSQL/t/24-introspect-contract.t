@@ -458,7 +458,7 @@ is($users->{external_id}{is_auto_increment}, 1, 'identity columns count as auto 
     preserve_case => 0,
   );
   my $t_info = $pk_intro->table_columns_info('public.t');
-  is($t_info->{id}{is_nullable}, 0, 'PK column folds to NOT NULL even when not_null is 0 (karr k49)');
+  is($t_info->{id}{is_nullable}, 0, 'PK column folds to NOT NULL even when not_null is 0');
 }
 
 is_deeply($intro->table_pk_info('auth.users'), ['id'], 'primary key comes from indexes');

@@ -798,6 +798,23 @@ subtest 'Generator: schema with new: key generates OO test' => sub {
 	like($out, qr/new_ok/, 'OO mode uses new_ok');
 };
 
+subtest 'Generator: import is called as a class method' => sub {
+	# `use Module` is Module->import(...).  With named arguments flattened to
+	# a list, a no-input import would otherwise be called as Module::import()
+	# and a module that shifts its class name (Database::Abstraction) dies.
+	my ($fh, $path) = tempfile(SUFFIX => '.yml', UNLINK => 1);
+	print $fh "module: Database::Abstraction\nfunction: import\n";
+	print $fh "input: {}\noutput: {}\n";
+	close $fh;
+
+	my ($out) = capture(sub {
+		eval { App::Test::Generator->generate($path) };
+	});
+	is($@, '', 'import schema does not croak');
+	like($out, qr/Database::Abstraction->import\(_fuzz_args\(\$input\)\)/,
+		'import receives the class as its invocant, as use() calls it');
+};
+
 subtest 'Generator: schema with transforms key generates transform code' => sub {
 	my ($fh, $path) = tempfile(SUFFIX => '.yml', UNLINK => 1);
 	print $fh "module: builtin\nfunction: abs\n";

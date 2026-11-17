@@ -242,11 +242,12 @@ subtest 'A gather of a step only takes the shorter way' => sub {
         $taken++;
         return $shorter->(@args);
     };
-    my $n = 0;
+    my $n  = 0;
+    my @in = (1, 1, 1);
     is [
         $class->new(gather {
             sub ($value) { $value + $n++ }
-        })->(1, 1, 1)
+        })->iterator(sub { @in ? shift @in : () })->all
         ],
         [1, 2, 3], 'made for the run';
     is $taken, 1, 'by the shorter way';

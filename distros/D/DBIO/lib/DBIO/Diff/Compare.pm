@@ -4,7 +4,7 @@ package DBIO::Diff::Compare;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 
@@ -209,7 +209,7 @@ DBIO::Diff::Compare - Engine-agnostic comparison helpers for DBIO diff operation
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

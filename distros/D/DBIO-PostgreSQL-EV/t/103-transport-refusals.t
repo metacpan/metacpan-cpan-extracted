@@ -225,7 +225,7 @@ sub refused {
 }
 
 SKIP: {
-  skip 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)', 4
+  skip 'the installed DBIO core predates the LISTEN/NOTIFY contract', 4
     unless DBIO::Storage::Async->can('listen_alive');
 
   # A callback of the transport's own: core subscribes the channel once the
@@ -251,7 +251,7 @@ SKIP: {
 }
 
 SKIP: {
-  skip 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)', 4
+  skip 'the installed DBIO core predates the LISTEN/NOTIFY contract', 4
     unless DBIO::Storage::Async->can('listen_alive');
 
   # The same, the way EV::Pg calls back: from XS, inside EV::run. The

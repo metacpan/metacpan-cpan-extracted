@@ -309,7 +309,7 @@ my ($view_seen) = $dbh->selectrow_array(
 
 like $engine_full // '', qr/index_granularity = 1024/,
   'a table created by upgrade carries the SETTINGS the result class declares';
-ok $view_seen, 'a view newly declared in the schema exists after upgrade (karr k31)';
+ok $view_seen, 'a view newly declared in the schema exists after upgrade';
 ok !$deploy3->diff->has_changes,
   '... and a second diff is empty once the view exists';
 

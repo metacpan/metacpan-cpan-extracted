@@ -1,6 +1,6 @@
 # ABSTRACT: A simple interface to ArangoDB REST API
 package Arango::Tango;
-$Arango::Tango::VERSION = '0.020';
+$Arango::Tango::VERSION = '0.021';
 use base 'Arango::Tango::API';
 use Arango::Tango::Database;
 use Arango::Tango::Collection;
@@ -10,7 +10,6 @@ use warnings;
 use HTTP::Tiny;
 use JSON;
 use MIME::Base64 3.11 'encode_base64url';
-use URI::Encode qw(uri_encode);
 
 
 BEGIN {
@@ -199,7 +198,7 @@ Arango::Tango - A simple interface to ArangoDB REST API
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 SYNOPSYS
 

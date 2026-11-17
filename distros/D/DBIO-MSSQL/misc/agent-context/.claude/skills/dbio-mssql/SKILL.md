@@ -14,9 +14,9 @@ DBIO MSSQL driver — driver for Microsoft SQL Server.
 |-------|------|
 | `DBIO::MSSQL` | Schema entry point |
 | `DBIO::MSSQL::Storage` | DBI storage (SCOPE_IDENTITY, MONEY, ordered subselects) |
-| `DBIO::MSSQL::SQLMaker` | SQL dialect (SELECT TOP, no OVER() empty clause) |
+| `DBIO::MSSQL::SQLMaker` | SQL dialect (`ROW_NUMBER() OVER` limit with `(SELECT(1))` as default order; `TOP` only for ordered subselects) |
 | `DBIO::MSSQL::Deploy` | Native deploy (test-and-compare via temp DB) |
-| `DBIO::MSSQL::Introspect` | Schema introspection via INFORMATION_SCHEMA |
+| `DBIO::MSSQL::Introspect` | Schema introspection via INFORMATION_SCHEMA and `sys.*` views |
 | `DBIO::MSSQL::Diff` | Diff two introspected models |
 | `DBIO::MSSQL::DDL` | DDL generation from DBIO classes |
 
@@ -24,18 +24,13 @@ DBIO MSSQL driver — driver for Microsoft SQL Server.
 
 ```perl
 package MyApp::DB;
-use base 'DBIO::Schema';
-__PACKAGE__->load_components('MSSQL');
-__PACKAGE__->connect("dbi:ODBC:Driver={SQL Server};Server=...;Database=...", $user, $pass);
-```
-
-## Storage Setup
-
-```perl
-__PACKAGE__->connection($dsn, $user, $pass, {
+use DBIO Schema => -ms;   # DBIO::Shortcut::ms applies the MSSQL driver
+__PACKAGE__->connection("dbi:ODBC:Driver={SQL Server};Server=...;Database=...", $user, $pass, {
   LongReadLen => 100_000,  # for MONEY/blob columns
 });
 ```
+
+`__PACKAGE__->load_components('MSSQL')` is the long form of `-ms`.
 
 ## Connection parameters without a DSN
 
@@ -62,14 +57,14 @@ The component and `-ms` pin `DBIO::MSSQL::Storage` (the declaration, core ADR 00
 | no connect info | stays `DBIO::MSSQL::Storage` |
 | another driver's DBD | stays; core warns (`driver_strict(1)` throws, `driver_warnings(0)` silences) |
 
-- Only the declared base moves: a private subclass pinned through `storage_type` stays what it is. Over DBD::ODBC core warns; **over DBD::Sybase the hook throws** (k42, k43; ADR 0008), naming `DBIO::MSSQL::Storage::Sybase`. Derive from `::ODBC` or `::Sybase` instead.
+- Only the declared base moves: a private subclass pinned through `storage_type` stays what it is. Over DBD::ODBC core warns; **over DBD::Sybase the hook throws** (ADR 0008), naming `DBIO::MSSQL::Storage::Sybase`. Derive from `::ODBC` or `::Sybase` instead.
 - The hook never calls `_rebless` or the connector registry and never asks the server what it is — that is the generic DSN detection (schema without a declared driver), which ends in the same classes.
 - `DBIO::MSSQL::Storage::Sybase` has its own hook and does not call `next::method` (`DBIO::Sybase::Storage` is ahead of the MSSQL base in its MRO).
-- Over DBD::Sybase + FreeTDS the key of a new row is `SCOPE_IDENTITY()` as in the base class (k39: the old `@@identity` workaround returned the trigger's key; only FreeTDS 1.3.17 measured) and the class brings `SET TEXTSIZE` = `LongReadLen` (long values cut at 32768 by default).
-- Over DBD::Sybase a bind value of more than 4000 bytes goes into the statement as a literal (k40): FreeTDS declares every placeholder `varchar(4000)` and the server cuts a bound value silently. Plain literal for ASCII, `N'...'` otherwise; the trace keeps the placeholder; void-context `populate` goes row by row. Only `DBIO::MSSQL::Storage::Sybase` does this; a private subclass of the base is refused over DBD::Sybase. `t/63-long-bind-values.t` (offline), `t/60` part D (live).
-- A value for a binary column (`binary`, `varbinary`, `image`, and the names the DDL makes one of them: `blob`, `bytea`, …) is bound in the way each DBD carries one (k50), decided by the data type of the bind, in conditions too. DBD::ODBC: `SQL_LONGVARBINARY` (`SQL_VARBINARY` cuts at 8000 bytes silently). DBD::Sybase: the hex form, in pieces of 1999 bytes, to `CONVERT(VARBINARY(MAX), ?, 1)` — never a literal; at most 2099 placeholders per statement (about 4 MB), an `EXEC` with such a value throws, void-context `populate` goes row by row. A value is the bytes of the string whatever its UTF-8 flag; a character above 255 throws. Not covered: NoBindVars. `t/64-binary-bind-values.t` (offline), `t/65-binary-values-live.t` (live).
-- Reading a binary column over DBD::Sybase (k56): the DBD hands back hex digits for `BINARY(n)`/`VARBINARY(n)`/`IMAGE` and **drops every row with a value in a `VARBINARY(MAX)` column, without an error** (a buffer of one byte). `DBIO::MSSQL::Storage::Sybase::_select` therefore asks for a column of a result source whose `data_type` is a binary one as `CAST(<col> AS IMAGE)`, with `syb_binary_images` on for that execute alone (`_execute_sth`), and the bytes come back. Only a select-list entry that is the column itself — not a function, an expression, literal SQL, a column without a declared `data_type`; not in a subquery (`as_query`, `count`, `-in`), where an `IMAGE` could not be compared. A `VARBINARY(MAX)` result column that was not rewritten throws after the execute (decided by how the handle describes it: `TYPE` -2, `PRECISION` 2147483647), whatever the rows hold; the way out is `CONVERT(VARCHAR(MAX), <expr>, 2)`. Sized binary values that are not the column itself stay hex digits. A value is cut silently at the session's `TEXTSIZE` (= `LongReadLen`, 32768 by default; k47) — connect with `LongReadLen` for more; an empty value costs `TEXTSIZE` bytes of memory. NoBindVars reads the same way; `dbh_do` is not reached. DBD::ODBC reads bytes, up to `LongReadLen` (DBI's default 80), and throws beyond. `t/66-binary-read-values.t` (offline), `t/65-binary-values-live.t` (live).
-- Connect before asserting a class in a test. `t/62-adapt-access-path.t` (offline; the only proof of the ODBC branch), `t/60`, `t/61` (live, DBD::Sybase).
+- Over DBD::Sybase + FreeTDS the key of a new row is `SCOPE_IDENTITY()` as in the base class and the class brings `SET TEXTSIZE` = `LongReadLen` (long values cut at 32768 by default).
+- Over DBD::Sybase a bind value of more than 4000 bytes goes into the statement as a literal: FreeTDS declares every placeholder `varchar(4000)` and the server cuts a bound value silently. Plain literal for ASCII, `N'...'` otherwise; the trace keeps the placeholder; void-context `populate` goes row by row. Only `DBIO::MSSQL::Storage::Sybase` does this; a private subclass of the base is refused over DBD::Sybase. `t/63-long-bind-values.t` (offline), `t/60` part D (live).
+- A value for a binary column (`binary`, `varbinary`, `image`, and the names the DDL makes one of them: `blob`, `bytea`, …) is bound in the way each DBD carries one, decided by the data type of the bind, in conditions too. DBD::ODBC: `SQL_LONGVARBINARY` (`SQL_VARBINARY` cuts at 8000 bytes silently). DBD::Sybase: the hex form, in pieces of 1999 bytes, to `CONVERT(VARBINARY(MAX), ?, 1)` — never a literal; at most 2099 placeholders per statement (about 4 MB), an `EXEC` with such a value throws, void-context `populate` goes row by row. A value is the bytes of the string whatever its UTF-8 flag; a character above 255 throws. Not covered: NoBindVars. `t/64-binary-bind-values.t` (offline), `t/65-binary-values-live.t` (live).
+- Reading a binary column over DBD::Sybase: the DBD hands back hex digits for `BINARY(n)`/`VARBINARY(n)`/`IMAGE` and **drops every row with a value in a `VARBINARY(MAX)` column, without an error** (a buffer of one byte). `DBIO::MSSQL::Storage::Sybase::_select` therefore asks for a column of a result source whose `data_type` is a binary one as `CAST(<col> AS IMAGE)`, with `syb_binary_images` on for that execute alone (`_execute_sth`), and the bytes come back. Only a select-list entry that is the column itself — not a function, an expression, literal SQL, a column without a declared `data_type`; not in a subquery (`as_query`, `count`, `-in`), where an `IMAGE` could not be compared. A `VARBINARY(MAX)` result column that was not rewritten throws after the execute (decided by how the handle describes it: `TYPE` -2, `PRECISION` 2147483647), whatever the rows hold; the way out is `CONVERT(VARCHAR(MAX), <expr>, 2)`. Sized binary values that are not the column itself stay hex digits. A value is cut silently at the session's `TEXTSIZE` (= `LongReadLen`, 32768 by default) — connect with `LongReadLen` for more; an empty value costs `TEXTSIZE` bytes of memory. NoBindVars reads the same way; `dbh_do` is not reached. DBD::ODBC reads bytes, up to `LongReadLen` (DBI's default 80), and throws beyond. `t/66-binary-read-values.t` (offline), `t/65-binary-values-live.t` (live).
+- A test connects before it asserts a class. `t/62-adapt-access-path.t` (offline; the only proof of the ODBC branch), `t/60`, `t/61` (live, DBD::Sybase).
 
 ## Deploy
 
@@ -115,14 +110,14 @@ MSSQL does not allow `SELECT ... ORDER BY` in subqueries without `TOP`. The `_se
 
 ## Bulk Operations
 
-MSSQL supports `BULK INSERT` via direct API, but DBIO uses standard DBI. For bulk copy, use direct `INSERT ... OUTPUT ...` or the native `BULK INSERT` via `$dbh->do`.
+Bulk inserts go through `_dbh_execute_for_fetch` (`DBIO::MSSQL::Storage`), which binds a column of binary type through `_bulk_binary_values_as_bytes`. Over DBD::Sybase a void-context `populate` with long or binary values goes row by row (see the access-path notes above).
 
 ## Capabilities
 
-- `last_insert_id`: via `SCOPE_IDENTITY()`
-- `insert_returning`: NOT supported (use OUTPUT clause instead)
-- ` multicolumn_in`: supported
-- `for_update`: NOT supported
+- `supports_exists_query`: 1 (ADR 0037) — `EXISTS` as a `CASE WHEN` condition.
+- `transactional_ddl`: 1 — a failed DDL batch rolls back.
+- `last_insert_id`: via `SCOPE_IDENTITY()`.
+- `$rs->upsert`: not implemented; the design is `MERGE` (ADR 0036).
 
 ## Testing
 

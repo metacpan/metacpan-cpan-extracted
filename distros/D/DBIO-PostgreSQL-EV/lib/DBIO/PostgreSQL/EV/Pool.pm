@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::EV::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::PoolBase';
 
@@ -341,7 +341,7 @@ DBIO::PostgreSQL::EV::Pool - EV::Pg connection pool for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -390,17 +390,22 @@ still override the seam; see core's C<_connection_ready_future> POD.
 =head2 Fork safety
 
 A forked child shares the socket of every connection the pool had opened, and
-L<EV::Pg> knows nothing of C<fork> (0.02 and 0.07 alike). Two things went wrong
-in the child, both measured against PostgreSQL 18.6 with EV::Pg 0.07:
+L<EV::Pg> up to 0.07 knew nothing of C<fork>; 0.09 guards its own destruction
+and C<finish> in a child. Two things went wrong in the child, the first with
+EV::Pg 0.07 and gone with 0.09, the second measured with 0.09 against
+PostgreSQL 18:
 
 =over 4
 
-=item * Closing its copy of a connection ended the parent's session. EV::Pg's
-C<finish> and its destructor both call libpq's C<PQfinish>, which sends the
-server a Terminate message on the shared socket, and the backend exits. The
-destructor runs on its own when the child exits, so a child that did nothing
-but C<exit> left the parent with I<"server closed the connection
-unexpectedly"> on every pooled connection.
+=item * Closing its copy of a connection ended the parent's session (EV::Pg
+0.07 and before). EV::Pg's C<finish> and its destructor both called libpq's
+C<PQfinish>, which sends the server a Terminate message on the shared socket,
+and the backend exits. The destructor runs on its own when the child exits, so
+a child that did nothing but C<exit> left the parent with I<"server closed the
+connection unexpectedly"> on every pooled connection. EV::Pg 0.09 knows the
+process that opened a connection and does not call C<PQfinish> in any other
+(a child's C<exit>, C<undef> and C<finish> leave the parent's session as it
+was); the descriptor redirect below stays as the guard for EV::Pg 0.07.
 
 =item * A child that resumed the L<EV> loop read the parent's replies. EV
 re-arms the default loop in a child and EV::Pg's watchers stay armed on the
@@ -671,18 +676,18 @@ did before.
 
 =back
 
-B<Measured> against PostgreSQL 18.6 with EV::Pg 0.07 on libpq 17, over plain
+B<Measured> against PostgreSQL 18 with EV::Pg 0.09 on libpq 17, over plain
 TCP (F<t/63-idle-liveness-live.t>): the idle session terminated and its
 backend gone, or ended by C<idle_session_timeout> -- the next call completes on
 a new session, without the loop having run; a live idle session with
 notifications waiting, with the unread answer of a statement, a notice among
 it, or 4 MB of one -- vouched for every time, and nothing of it lost. The look
 took 6 microseconds asked back to back, 15 to 20 as part of a borrow, where a
-statement's round trip took 2100. B<Not measured>: TLS (the server at hand had
+statement's round trip took 2100 (those times taken with EV::Pg 0.07).
+B<Not measured>: TLS (the server at hand had
 C<ssl = off>; the look is at the TCP connection underneath, where a TLS record
 is data like any other and the close is the same close), a server restart
-(its backends exit as a terminated one does), EV::Pg 0.02 (its
-C<is_connected>, C<pending_count> and C<socket> are the same code), and a
+(its backends exit as a terminated one does), and a
 Unix-domain socket to a server (the kernel answers the same for a socket pair
 of that kind, F<t/57-idle-liveness-mock.t>).
 

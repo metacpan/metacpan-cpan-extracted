@@ -196,4 +196,18 @@ SKIP: {
     for ('007', '1.50', '1.', '.5', '+1', '1e3', '0x10', '1,5', '-0', '00');
 }
 
+# ---------------------------------------------------------------------------
+# Shortening an identifier warns about nothing, whichever Math::Base36 the
+# cpanfile admits (0.07 .. 0.13 warn "Negative repeat count does nothing").
+# ---------------------------------------------------------------------------
+{
+  require DBIO::Oracle::Identifier;
+  my @warnings;
+  local $SIG{__WARN__} = sub { push @warnings, @_ };
+  my $short = DBIO::Oracle::Identifier::shorten(
+    'very_long_identifier_which_exceeds_the_30char_limit');
+  cmp_ok(length $short, '<=', 30, 'a long identifier is shortened');
+  is_deeply(\@warnings, [], '... without a warning');
+}
+
 done_testing;

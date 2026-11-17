@@ -4,7 +4,7 @@ package DBIO::Informix::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -33,6 +33,9 @@ sub deploy_setup { }
 sub _connect {
   my $self = shift;
   local $ENV{DELIMIDENT} = 'y';
+  local $ENV{DBDATE} = 'MDY4/';
+  local @ENV{qw(DBCENTURY GL_DATE)};
+  delete @ENV{qw(DBCENTURY GL_DATE)};
   return $self->next::method(@_);
 }
 
@@ -359,9 +362,6 @@ sub with_deferred_fk_checks {
 sub connect_call_datetime_setup {
   my $self = shift;
 
-  delete @ENV{qw/DBDATE DBCENTURY/};
-
-  $ENV{GL_DATE}     = "%m/%d/%Y";
   $ENV{GL_DATETIME} = "%Y-%m-%d %H:%M:%S.%F5";
 }
 
@@ -390,7 +390,7 @@ DBIO::Informix::Storage - Base Storage Class for Informix Support
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -413,8 +413,16 @@ require special setup for deployments.
 Sets C<DELIMIDENT=y> in the environment for the duration of the connect.
 The storage quotes identifiers with C<">, and Informix reads a double-quoted
 token as an identifier only when C<DELIMIDENT> is set at connect time;
-without it every quoted statement is a C<-201> syntax error. The caller's
-environment is left as it was.
+without it every quoted statement is a C<-201> syntax error.
+
+Also sets C<DBDATE=MDY4/> for the connect and hides C<DBCENTURY> and
+C<GL_DATE>. The client reads these when it connects and then formats and
+reads every C<DATE> that way, but the storage writes and parses a C<DATE> as
+C<%m/%d/%Y>; under a caller's C<DBDATE=DMY4.> the ninth of November would be
+stored as the eleventh of September, and a day above 12 refused. With the
+format pinned, a C<DATE> goes in and comes back as the same day whatever the
+caller's C<DBDATE>, C<DBCENTURY> or C<GL_DATE> hold. The caller's environment
+is left as it was.
 
 =head2 _exists_value_sql
 
@@ -483,19 +491,17 @@ Used as:
 
   on_connect_call => 'datetime_setup'
 
-In L<connect_info|DBIO::Storage::DBI/connect_info> to set the C<DATE> and
-C<DATETIME> formats.
+In L<connect_info|DBIO::Storage::DBI/connect_info> to set the C<DATETIME>
+format.
 
-Sets the following environment variables:
+Sets the environment variable (for the rest of the process):
 
-    GL_DATE="%m/%d/%Y"
     GL_DATETIME="%Y-%m-%d %H:%M:%S.%F5"
 
-The C<DBDATE> and C<DBCENTURY> environment variables are cleared.
-
-B<NOTE:> setting the C<GL_DATE> environment variable seems to have no effect
-after the process has started, so the default format is used. The C<GL_DATETIME>
-setting does take effect however.
+The C<DATE> format is not set here: the client reads C<DBDATE>, C<DBCENTURY>
+and C<GL_DATE> when it connects, so the storage pins the format during the
+connect itself (see L</_connect>) and leaves those variables of the caller
+untouched.
 
 The C<DATETIME> data type supports up to 5 digits after the decimal point for
 second precision, depending on how you have declared your column. The full

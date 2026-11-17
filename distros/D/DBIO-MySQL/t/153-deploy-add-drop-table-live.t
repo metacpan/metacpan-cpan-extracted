@@ -7,7 +7,7 @@ use Test::More;
 # key between them, a view over a table and a view over that view -- and the
 # result is the schema as new.
 #
-# WHY IT MATTERS. t/152 pins the statements. Whether the server takes the
+# WHY IT MATTERS. Subtest ddl-drop-views of t/135-ddl-view.t pins the statements. Whether the server takes the
 # DROP VIEW before the DROP TABLE, whether a table that a foreign key points at
 # can go with its child still standing (the checks are off for the drops), and
 # whether the install DDL then runs through again (CREATE VIEW has no OR

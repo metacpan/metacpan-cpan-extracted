@@ -42,7 +42,7 @@ LiveServer->require_server;
 
 use DBIO::Storage::Async ();
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 # Every wait below is a Future's get, which runs the EV loop. A hang ends the

@@ -3,7 +3,7 @@ package DBIO::Storage::BlockRunner;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -257,7 +257,7 @@ DBIO::Storage::BlockRunner - Execute code blocks with transaction wrapping and r
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

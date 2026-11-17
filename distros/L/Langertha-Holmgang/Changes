@@ -1,0 +1,91 @@
+Revision history for Langertha-Holmgang
+
+0.001     2026-11-17 03:22:26Z
+  - Initial release
+  - Deterministic tool-use benchmarks for language models: a case gives the
+    model a task and tools in a simulated world, and the rules grade the
+    end state of that world, never the wording of the answer
+  - Suite format 2 (suite.yaml plus cases/*.yaml) loads into objects that
+    keep the values as written; every case is linted on load, including two
+    mock runs, and a case that fails lint does not load
+  - Worlds with tool dispatch, observations, handlers and Kolon output, and
+    simulators for the device types linux (bash grammar and many services),
+    routeros and ios, plus the answer world kueche; a simulator plugin
+    contract (Role::Simulator, Role::AnswerWorld, registry); a simulator
+    that fails in Perl never shows its error to the model, the call answers
+    a generic tool error and the gap is recorded
+  - Grader with rules on the end state and on the calls, and seven statuses:
+    passed, failed, uncertain (a simulation gap was hit), turn_limit, and
+    the not-measured error, context_exceeded and no_vision
+  - Runner over any Langertha engine through Target, with turn limit and
+    tokens, finish reason and calls per turn; Langertha::Engine::Virtual
+    mock models run a case without a network; Haystack generates long,
+    deterministic inputs
+  - Target classifies a failed turn as context_exceeded, no_vision or error
+    and scrubs its error text: the engine's key, credentials in URLs,
+    Authorization and Bearer values, provider key shapes, die locations and
+    host paths never reach a result
+  - Report: the JSON report (holmgang_report 1), written, read and merged
+    without double counting
+  - Evaluation: rates per topic with case weights, overall as the mean of
+    topics, curves per length tier, verdicts against a threshold with pass^k
+    and hard cases, and the comparison of targets as text, Markdown or JSON
+  - bin/holmgang with the commands lint, run and report. lint loads exactly
+    as a run does; run takes any Langertha engine by name (--model, --url,
+    --option) or the network-free mock-solution and mock-text, with
+    --variant, --repeat and --report, and no key on the command line;
+    report evaluates report files with thresholds from --suite. Exit 0 ok,
+    1 refused, verdict not ok or no case answered by the target, 2 usage or
+    setup error. Errors on stderr carry no Perl location
+  - Six invented example suites under share/suites: demo-linux, demo-lamp,
+    demo-haystack, demo-sehen, demo-roost and demo-beacons, found with
+    File::ShareDir::dist_dir('Langertha-Holmgang').'/suites'
+  - Documentation: an overview in Langertha::Holmgang, the suite format 2
+    reference in ::Loader, rules and statuses in ::Grader, the simulator
+    contract in ::Role::Simulator, and a README with a quick start
+  - Simulator documentation (Sim::Linux and its parts, RouterOS, IOS,
+    Kueche, Shell, Shell::Filter) is now in English
+  - Haystack refusals are Langertha::Holmgang::Error; Structure no longer
+    re-wraps them (k29)
+  - A when path that cannot be evaluated no longer dies out of World->call;
+    the entry does not fit (k39)
+  - Suite->checksum is now Suite->digest, and Loader->list carries digest,
+    the same name as the report's suite.digest (k30)
+  - Loader->list leaves out suites whose format is a name rather than a
+    number (another kind of corpus) (k33)
+  - Case->report_meta builds the case meta Report->add_run takes;
+    Case->tier returns undef in list context too (k36)
+  - Tool parameters: const is checked per call, a non-scalar const is
+    refused at load (k31)
+  - Runner refuses an engine with its own system_prompt instead of sending
+    a second system message (k37)
+  - New answer world Sim::Sehen (type sehen): hand in what an image shows (graph, sequence, receipt fields, table, chart values, error finding, or report the image unreadable); stores raw and normalised answers (text, ISO dates, cents, compact IBAN), a repeated call replaces the earlier one (k27)
+  - Images on user messages in suite format 2 (images: [{file, untrusted}]): PNG or JPEG inside the suite, at most 2 MiB, at most four per message; SHA-256 and dimensions go into the case and the suite digest. They reach the model only as Langertha content parts in the request; transcripts and reports keep {image, sha256, bytes} (k27)
+  - The vision pre-check per target and suite: Langertha's ImageInput role, its model-metadata probe, and a sight test that catches a template silently dropping the image. A case with an image on a blind target ends no_vision (k27)
+  - New example suite demo-sehen: an image on a user message, handed in through the answer world sehen (k27)
+  - Tool parameters: type may be a list of types (type: [string, "null"]), checked at load and per call; a null in enum matches a null (k48)
+  - Expectations: tolerance beside a numeric equals compares numbers within it, bounds included; refused at load without a numeric equals (k49)
+  - Langertha::Holmgang::Batch: suites against targets and their variants, repeated, with a bounded number of concurrent requests per target; resumes an earlier report, cancels, scrubs and cuts run errors (k15)
+  - Target: variant settings named and checked (enable_thinking, reasoning_effort, max_tokens, temperature, deadline); a per-request deadline on the engine's event loop (k15)
+  - holmgang run: several variants per target (--variant NAME:K=V), --concurrency, --resume, checkpoints of the report while running, cancel on SIGINT/SIGTERM (k15)
+  - New answer world roost (Langertha::Holmgang::Sim::Roost), an invented dragon roost, and the example suite demo-roost with two cases on it (k43)
+  - New Langertha::Holmgang::Random: a seeded random source in pure Perl for generators, the same on every perl and platform (k18)
+  - Cases and suites in a Perl DSL (use Langertha::Holmgang, ADR 0007): a suite.pl in a suite directory loads, lints and runs like a format 2 suite; it covers images, tolerance, tiers, weights and tags; generate seed => N gives the same cases for the same seed, and the loader can override the seed per suite (k18)
+  - holmgang lint and holmgang run take a directory with suite.pl (k18)
+  - New answer world denken (Langertha::Holmgang::Sim::Denken): one tool antwort_abgeben, a checker per Reasoning Gym task, only the full score counts as right; cai-platform's suite denken loads unchanged (k53)
+  - Answer world uebersetzung (Langertha::Holmgang::Sim::Uebersetzung): hand in segments, report ambiguity, look up the glossary; hand-ins normalised and analysed (numbers in the target format, codes, placeholders, what is missing, length class) into the state (k54)
+  - New answer world schichtfehler (Langertha::Holmgang::Sim::Schichtfehler): sources, recorded page fetches and browser console, reported findings matched to causes by file and line overlap; answers only from the state (k55)
+  - holmgang export-yaml / Loader->export write a DSL suite as suite format 2 (canonical YAML, images copied); a DSL suite's digest is now its export's digest; DSL cases run in file-name order of their export (k19)
+  - --seed ID=N on lint, run and export-yaml overrides a DSL suite's generate seeds (k51)
+  - New example suite demo-beacons: the case DSL, cases from a seeded generate block (k50)
+  - Format 2 takes the message part auszug: { datei, von, bis }: a range of a statute text under the suite's quellen/, inserted at load and digested as cai-platform does; the DSL constructor excerpt; the YAML export copies the fixtures (k52)
+  - A code reference or other non-data value in a case's state is refused at load with its field path (k59)
+  - A ctx-<N>k tag is no length tier: it names a context window, not an input length (k56)
+  - Reports carry each case's difficulty; reports without it still read and merge (k57)
+  - The evaluation shows curves per difficulty next to the tier curves, in text, Markdown and JSON (k57)
+  - Simulators: restic answers for snapshots without paths and no longer adds them on --path; von_liste_nehmen no longer creates an empty liste (k58)
+  - Verdicts carry unfinished (a cancelled or aborted run is never ok) and repetitions_error (repetitions where the target answered nothing; next to a measured repetition only reported, not deciding ok, ADR 0009 k42; a suite with none measured is never ok, k73), ported from cai-platform's verdicts (k58)
+  - Acceptance 1 and 2 pass against cai-platform origin/main 993637ab: 36 suites, 708 cases, mock runs identical (k58)
+  - New acceptance test t/acceptance_dsl.t: a suite written in the case DSL loads, matches its format 2 original case by case, gives identical mock runs, and its export-yaml does too (k20)
+  - A suite.pl is compiled as UTF-8 source whether or not it says "use utf8", so non-ASCII text reaches the model as written instead of as Latin-1 mojibake; a suite.pl that is not valid UTF-8 is refused (k60, ADR 0007)
+  - A suite in which no repetition reached the target (every result error, or none) gets a verdict that is never ok, shown NOT MEASURED, with or without a threshold; holmgang report now exits 1 for it as holmgang run does. Unmeasured repetitions next to a measured one are still only noted; context_exceeded and no_vision count as measured (k73, ADR 0008)

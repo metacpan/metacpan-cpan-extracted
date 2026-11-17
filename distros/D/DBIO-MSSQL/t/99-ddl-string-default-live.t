@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
 use DBI;
 
 use DBIO::MSSQL::DDL;

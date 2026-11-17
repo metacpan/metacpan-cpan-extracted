@@ -58,7 +58,10 @@ $dbh->do('DROP SEQUENCE IF EXISTS dbio_k155_seq');
 $dbh->do('CREATE SEQUENCE dbio_k155_seq START 100');
 $dbh->do('CREATE TABLE dbio_k155_doc (id integer PRIMARY KEY, name text UNIQUE, data jsonb)');
 
-my $schema = DBIO::Test::K155->connect($dsn, $user, $pass);
+# PostgreSQL reports in the language of lc_messages; the test compares the
+# server's English words (Key ... already exists), so its session is set to 'C'
+my $schema = DBIO::Test::K155->connect($dsn, $user, $pass,
+  { on_connect_do => [q{SET lc_messages = 'C'}] });
 my $rs = $schema->resultset('Doc');
 
 # 1. sequence

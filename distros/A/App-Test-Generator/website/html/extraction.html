@@ -82,7 +82,7 @@
 				</tr>
 				<tr>
 					<td>Code heuristics</td>
-					<td>What a parameter is compared with, folded into arithmetic, checked with <code>looks_like_number</code>, matched against a regex, or used to index a hash. Constraints such as <code>&gt;= 0</code> become <code>min</code>; <code>length(...) &lt;= 255</code> becomes <code>max</code>.</td>
+					<td>What a parameter is compared with, folded into arithmetic, checked with <code>looks_like_number</code>, matched against a regex, or used to index a hash. Constraints such as <code>&gt;= 0</code> become <code>min</code>; <code>length(...) &lt;= 255</code> becomes <code>max</code>. A length comparison is read according to the guard it sits in, so <code>croak ... if length($t) &lt; 5</code> and <code>croak ... unless length($t) &gt;= 5</code> both give <code>min: 5</code>. A parameter tested with <code>-d</code> gets <code>semantic: directory</code>, one tested only with <code>-e</code> or <code>-f</code> gets <code>semantic: existing_file</code>, and one used only in a truthiness test is optional.</td>
 				</tr>
 				<tr>
 					<td>POD</td>
@@ -90,7 +90,7 @@
 				</tr>
 				<tr>
 					<td>Structure</td>
-					<td>Accessors (getter, setter, getset), object parameters and the methods they are documented to need (<code>can</code>), constructor arguments from <code>new</code>, Perl 5.38 <code>class</code> syntax, and Moose <code>before</code>/<code>after</code>/<code>around</code> modifiers.</td>
+					<td>Accessors (getter, setter, getset), including those that guard on <code>defined($arg)</code> rather than on <code>@_</code>; wrappers that forward <code>@_</code> to another method, which inherit that method's input schema; object parameters and the methods they are documented to need (<code>can</code>), constructor arguments from <code>new</code>, Perl 5.38 <code>class</code> syntax, and Moose <code>before</code>/<code>after</code>/<code>around</code> modifiers.</td>
 				</tr>
 			</tbody>
 		</table>
@@ -125,9 +125,27 @@ sub validate {
 		<em>without</em> a <code>type</code> is treated as deliberately
 		unconstrained: the extractor will not fill in a type from heuristics, and
 		the harness will not generate wrong-type cases that are expected to die.
+		More generally, wrong-type cases are only generated where the routine's
+		own validator enforces the type (<code>_source: validator</code> in the
+		schema); a type taken from POD or inferred from code is not a promise to
+		reject a reference.
 		And a type may be written either as a quoted string
 		(<code>type =&gt; 'object'</code>) or as a <code>Params::Validate</code>
 		constant (<code>type =&gt; OBJECT</code>).
+	</p>
+	<p>
+		A bound in a spec block is compared with the bounds inferred from the
+		code. A formal <code>min =&gt; 5</code> next to an inferred
+		<code>max =&gt; 4</code> is reported as a contradiction instead of being
+		merged into a range with no valid value. Provenance is also kept per
+		constraint, so a documented minimum and a code-enforced maximum on the
+		same field are judged separately by the harness.
+	</p>
+	<p>
+		The YAML is written with sorted keys and sorted analysis notes, and a
+		<code>matches</code> pattern as a plain string, so repeated runs over
+		the same module are byte-identical and any YAML reader can load the
+		result.
 	</p>
 
 	<h2 id="confidence">Confidence</h2>
@@ -166,6 +184,13 @@ sub validate {
 		tells the generator to construct an instance first — and tells the
 		mutation pipeline that the routine needs an object it cannot build, so it
 		becomes a TODO stub rather than a broken schema.
+	</p>
+	<p>
+		A class whose constructor refuses to build one — an abstract base class,
+		or a constructor that croaks over an argument the schema does not describe
+		— gets <code>new: ~</code> for its instance methods and
+		<code>_STATUS: DIES</code> for <code>new()</code>, so its routines are
+		skipped rather than reported as failures.
 	</p>
 
 	<h2>Fuzzing during extraction</h2>
@@ -210,6 +235,10 @@ fuzz-harness-generator -r /tmp/dbg/bugs.yml
 		<code>@ISA</code> is not traversed, so such a routine is emitted with an
 		unenrichable <code>new:</code> rather than constructor arguments inferred
 		from the base class.</li>
+		<li><strong>Comments are read as code.</strong> A comment inside a sub
+		that quotes an argument-unpacking line is taken for a real declaration,
+		and under <code>--strict-pod=fatal</code> that is an error. Describe such
+		idioms in words.</li>
 		<li><strong>Cross-package subs are skipped.</strong> <code>sub DB::DB</code>
 		and other qualified declarations are not fuzz targets.</li>
 		<li><strong>Heuristic types can be wrong.</strong> A parameter used only as
@@ -240,7 +269,7 @@ fuzz-harness-generator -r /tmp/dbg/bugs.yml
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

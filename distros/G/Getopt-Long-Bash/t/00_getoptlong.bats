@@ -468,6 +468,65 @@ load test_helper.bash
     assert_output "optarg_val:UNSET"
 }
 
+# Test: an optional argument can have an initial value, which is the
+# default: it stays without the option, and --no- unsets the variable
+@test "getoptlong: optional arg - initial value" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        for args in "" "--optarg" "--optarg=value" "--no-optarg" "--optarg=value --no-optarg" "--no-optarg --optarg=value"; do
+            (
+                declare -A OPTS=([optarg|o?]=default)
+                getoptlong init OPTS
+                getoptlong parse $args
+                eval "$(getoptlong set)"
+                echo "[$args] ${optarg-UNSET}"
+            )
+        done
+    '
+    assert_success
+    assert_line --index 0 "[] default"
+    assert_line --index 1 "[--optarg] "
+    assert_line --index 2 "[--optarg=value] value"
+    assert_line --index 3 "[--no-optarg] UNSET"
+    assert_line --index 4 "[--optarg=value --no-optarg] UNSET"
+    assert_line --index 5 "[--no-optarg --optarg=value] value"
+}
+
+# Without an initial value, the variable is left as it is
+@test "getoptlong: optional arg - no initial value leaves the variable" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        (
+            declare -A OPTS=([optarg|o?]=)
+            getoptlong init OPTS
+            getoptlong parse
+            eval "$(getoptlong set)"
+            echo "unset:${optarg-UNSET}"
+        )
+        (
+            declare -A OPTS=([optarg|o?]=)
+            optarg=before
+            getoptlong init OPTS
+            getoptlong parse
+            eval "$(getoptlong set)"
+            echo "kept:${optarg-UNSET}"
+        )
+    '
+    assert_success
+    assert_line --index 0 "unset:UNSET"
+    assert_line --index 1 "kept:before"
+}
+
+@test "getoptlong: optional arg - initial value in help" {
+    run $BASH -c '
+        . ../script/getoptlong.sh
+        declare -A OPTS=([optarg|o?]=default)
+        getoptlong init OPTS
+        getoptlong help
+    '
+    assert_output --partial "enable/set OPTARG (default:default)"
+}
+
 # Test: Array option (--item val1 --item val2)
 @test "getoptlong: array option - long --item val1 --item val2" {
     run $BASH -c '

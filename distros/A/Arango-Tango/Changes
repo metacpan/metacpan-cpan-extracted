@@ -1,3 +1,28 @@
+0.021 2026-11-16
+
+     - API.pm
+       - fixed: percent-encode path placeholder values and the database
+         name, so keys such as 'a/b' or 'x?y' can no longer change the
+         target endpoint (#36)
+       - fixed: '_url_parameters' was not removed from the request options
+         (typo in the list of internal keys), so it could leak into the
+         query string or the JSON body (#16)
+       - fixed: the 'Missing <argument>' error named the wrong argument
+         (off by one, and counting optional arguments), and was stored in
+         the sub-object instead of the Arango::Tango instance, so it could
+         not be read with $collection->error or $database->error (#18)
+       - fixed: parsing of optional arguments no longer clobbers the
+         package global $a (#18)
+       - modified: GET query values are now encoded with
+         URI::Escape::uri_escape_utf8, which also escapes reserved
+         characters such as '&', '=' and '+'
+     - Database.pm
+       - fixed: 'create_collection' dropped every 'keyOptions' sub-field
+         because its schema was declared with 'params' instead of
+         'properties' (#19)
+     - replaced dependency on URI::Encode by URI::Escape (from the URI
+       distribution)
+
 0.020 2026-07-16
 
      - Refactored behavior on error.

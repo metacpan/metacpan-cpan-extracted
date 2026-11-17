@@ -1,5 +1,11 @@
 Revision history for DBIO
 
+0.900007  2026-11-16
+    * Changed
+        - maint/capped-test hands the command to systemd-run with variable
+          expansion switched off, so every $ in the command arrives
+          unchanged, also under systemd 258 and later.
+
 0.900006  2026-11-14
     * Changed
         - DBIO::EncodedColumn takes the SHA3 digests directly from

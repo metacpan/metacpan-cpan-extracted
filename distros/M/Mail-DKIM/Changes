@@ -1,5 +1,19 @@
 This file summarizes what's changed between releases of Mail-DKIM.
 
+1.20261116 2026-11-17 Australia/Melbourne
+  * Security: the verifier now rejects (result "invalid") a
+    DKIM-Signature that has no h= tag or an empty one, whose h= tag
+    doesn't include From, or that has no bh= tag, as RFC 6376 requires.
+    The check meant to reject a missing h= tag never fired, so such a
+    signature covered none of the message's header fields, and without
+    bh= not its body either, yet still passed. One such signature, made
+    with a key published under the signer's own d= domain, verified on
+    any message. Signatures made without bh= by pre-standard drafts of
+    DKIM are now rejected too
+    Thanks to Jakub Kozub
+  * Document that the ARC verifier accepts an ARC-Message-Signature with
+    an empty or missing h= tag, as the ARC test suite expects
+
 1.20261105 2026-11-06 Australia/Melbourne
   * Don't canonicalize ARC-Seals once the ARC chain has failed, and only
     match ARC-Authentication-Results at the start of a header field

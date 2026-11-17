@@ -4,7 +4,7 @@ package DBIO::Informix::Types;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 our @EXPORT_OK = qw(logical_for_coltype size_for_coltype ddl_type qualifier_for_coltype lob_kind is_numeric_type);
@@ -203,7 +203,7 @@ DBIO::Informix::Types - Canonical Informix type vocabulary
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -71,7 +71,10 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
 my $h = DBIO::PostgreSQL::EV::TestHarness->new(
   schema_class  => 'Test::K88::Schema',
-  connect_attrs => { pool_size => 2 },
+  # lc_messages 'C': the test reads the server's English wording (PostgreSQL
+  # reports in the language of the session's lc_messages, which
+  # DBIO_TEST_SERVER_LANGUAGE sets for the suite).
+  connect_attrs => { pool_size => 2, on_connect_do => [ q{SET lc_messages = 'C'} ] },
 );
 my $schema = $h->schema;
 my $async  = $h->async;

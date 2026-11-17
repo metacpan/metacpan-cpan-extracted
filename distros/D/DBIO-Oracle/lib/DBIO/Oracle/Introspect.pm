@@ -4,7 +4,7 @@ package DBIO::Oracle::Introspect;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Introspect::Base';
 
@@ -185,7 +185,7 @@ DBIO::Oracle::Introspect - Introspect an Oracle database via all_* views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -217,6 +217,12 @@ C<views> holds the defining query of each view (from
 C<all_views.text>, see L<DBIO::Oracle::Introspect::Views>), which
 L<DBIO::Oracle::Diff> writes C<CREATE OR REPLACE VIEW> from; the view itself
 is in C<tables> with C<kind> C<view>.
+
+The order of what the model lists is the same in every session language:
+names are read in binary order (C<NLSSORT(name, 'NLS_SORT=BINARY')>), not in
+the C<NLS_SORT> of the session, which would put C<a_x>, C<aB> and C<Ab> in
+another order under C<GERMAN>. The session itself keeps its own C<NLS_SORT>.
+Columns and the columns of a key or index follow their position.
 
 The Oracle introspection is built on the C<all_*> data dictionary views,
 providing sequence detection via trigger inspection, LOB type handling,

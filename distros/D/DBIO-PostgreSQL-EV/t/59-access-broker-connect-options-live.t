@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE: the connect options beside an AccessBroker on the ev transport, against
 # a real PostgreSQL (karr k60; core k240 / k243 / k245). The offline half,
@@ -63,7 +64,7 @@ use DBIO::AccessBroker::Static;
 use DBIO::PostgreSQL::EV::Storage;
 use DBIO::Util ();
 
-plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker (core k243 / k245)'
+plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker'
   unless DBIO::Storage::Async->can('_access_broker_pool_size');
 
 alarm 120;

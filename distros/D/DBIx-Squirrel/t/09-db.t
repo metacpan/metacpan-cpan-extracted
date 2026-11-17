@@ -368,13 +368,23 @@ subtest 'a statement is studied once for each handle' => sub {
     is $normalised, 'SELECT ?', 'kept apart when they change';
 
     my $sqlite = {Driver => {Name => 'SQLite'}};
-    DBIx::Squirrel::db::_study($sqlite, "SELECT $_", undef) for 1 .. 1000;
-    is scalar(keys %{ $sqlite->{private_ekorn_studied}{Statements} }), 1000,
-        'up to 1000';
-    DBIx::Squirrel::db::_study($sqlite, 'SELECT 1001', undef);
-    is [keys %{ $sqlite->{private_ekorn_studied}{Statements} }],
-        ['SELECT 1001'],
-        'then started again';
+    my sub study ($n) { DBIx::Squirrel::db::_study($sqlite, "SELECT $n", undef) }
+    study($_) for 1 .. 1000;
+    my $kept = $sqlite->{private_ekorn_studied}{Statements};
+    is scalar(keys %$kept), 1000, 'up to 1000';
+    study(3) for 1 .. 2;
+    study(2);
+    study(1001);
+    is scalar(keys %$kept), 876, 'then 125 evicted, to make room';
+    ok !$kept->{'SELECT 1'}, 'the first studied, unused, among them';
+    ok $kept->{'SELECT 2'} && $kept->{'SELECT 3'}, 'but not those used';
+    ok !$kept->{'SELECT 127'} && $kept->{'SELECT 128'},
+        'the others in the order they were first studied';
+    is [map { $kept->{"SELECT $_"}[2] } 2, 3], [0, 1],
+        "and the uses of those passed halved";
+    is $sqlite->{private_ekorn_studied}{Order},
+        [map { "SELECT $_" } 128 .. 1000, 2, 3, 1001],
+        'which go to the back';
 };
 ## use critic
 

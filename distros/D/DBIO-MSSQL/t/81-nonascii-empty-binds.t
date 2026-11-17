@@ -265,8 +265,8 @@ for my $case (
   my $long = "\x{E4}" x 4001;
   ($sth) = sent { $rs->create({ body => $long }) };
   like $sth->{Statement}, qr/VALUES \(N'/,
-    'a value beyond ASCII of more than 4000 bytes is still a literal '
-  . '(karr k40): it arrives whole, so it needs no refusal';
+    'a value beyond ASCII of more than 4000 bytes is still a literal: '
+  . 'it arrives whole, so it needs no refusal';
   is_deeply $sth->{bound}, [], '... nothing of it is bound';
 }
 
@@ -348,7 +348,7 @@ for my $case (
 {
   my ($sth) = sent { $rs->create({ bin => '' }) };
   like $sth->{Statement}, qr/CONVERT\(VARBINARY\(MAX\), \?, 1\)/,
-    "an empty value for a binary column keeps its way (karr k50)";
+    "an empty value for a binary column keeps its way";
   is_deeply $sth->{bound}, [ '0x' ], "... '0x' is bound, never an empty string";
 }
 
@@ -472,7 +472,7 @@ for my $case (
   };
   like $sth->{Statement}, qr/VALUES \('[^']+', ''\)/,
     'there core puts every value into the statement; this class neither '
-  . "refuses nor rewrites it (karr k49: a plain literal is core's)";
+  . "refuses nor rewrites it (a plain literal is core's)";
   is_deeply $sth->{bound}, [], '... and nothing is bound';
 }
 

@@ -45,7 +45,7 @@ BEGIN {
   eval { require DBIO::PostgreSQL::Storage::Async; 1 }
     or plan skip_all =>
       'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-  plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker (core k243)'
+  plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker'
     unless DBIO::Storage::Async->can('_access_broker_call_attributes');
 }
 

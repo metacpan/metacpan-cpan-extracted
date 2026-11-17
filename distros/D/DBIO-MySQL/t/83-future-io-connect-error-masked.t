@@ -74,8 +74,33 @@ my %SECRET = (
   attr => [ 'attr-s3cret-k76' ],
 );
 
-# The DBD's reason, by what no locale translates: the socket it tried.
-my $SOCKET_TRIED = qr{\Q$DEAD\E};
+# The DBD's reason, as the parts of a message no locale translates are. Where
+# the client has unix sockets that is the socket it tried. On Windows there is
+# none: mysql_socket is ignored, the client connects by TCP and the message is
+# "Can't connect to MySQL server on 'localhost' (10061)" (10061 is
+# WSAECONNREFUSED; the path never appears), so the host and the number stand in.
+sub connect_reason_pattern {
+  my ($os) = @_;
+  return qr{\Q$DEAD\E} unless $os eq 'MSWin32';
+  # libmysqlclient / MariaDB Connector/C CR_CONN_HOST_ERROR (2003), both DBDs
+  return qr{Can't connect to \S+ server on '[^']+' \(\d+\)};
+}
+
+SOCKET_TRIED_TESTS: {
+  my $win   = connect_reason_pattern('MSWin32');
+  my $other = connect_reason_pattern('linux');
+  my $windows_message = "DBI connect failed: Can't connect to MySQL server on 'localhost' (10061) at lib/X.pm line 1.";
+  like $windows_message, $win, 'MSWin32: the reason of the DBD without a socket path is recognised';
+  like "DBI connect failed: Can't connect to MariaDB server on '127.0.0.1:3306' (10061) at x", $win,
+    'MSWin32: the same for MariaDB, with host and port';
+  unlike 'DBI connect failed: the driver could not connect at x line 1.', $win,
+    'MSWin32: a text with no reason does not pass';
+  unlike $windows_message, $other, 'elsewhere: the Windows form is not enough';
+  like "DBI connect failed: Can't connect to local MySQL server through socket '$DEAD' (2) at x", $other,
+    'elsewhere: the socket path is what is asked for';
+}
+
+my $SOCKET_TRIED = connect_reason_pattern($^O);
 
 my @FLAVOURS = (
   { dbd => 'mysql',   socket => 'mysql_socket'   },

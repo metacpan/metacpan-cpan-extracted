@@ -1,0 +1,13 @@
+Revision history for Perl extension Text::UnicodeStyle
+
+0.01  2026-11-16
+    - Initial release
+    - Text::UnicodeStyle module with stylize() and styles() API
+    - 19 styles: bold, bold_fraktur, bold_italic, bold_script,
+      circled, doublestruck, fraktur, fullwidth, italic, monospace,
+      negative_circled, negative_squared, parenthesized, sans_serif,
+      sans_serif_bold, sans_serif_bold_italic, sans_serif_italic,
+      script, squared
+    - Digit substitution in styles that define it
+    - Fullwidth punctuation mapping
+    - substitute-letters CLI script (--style, --list, --help)

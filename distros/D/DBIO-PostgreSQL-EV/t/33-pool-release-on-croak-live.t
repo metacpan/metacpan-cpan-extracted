@@ -1,6 +1,9 @@
 use strict;
 use warnings;
 use Test::More;
+use FindBin ();
+use lib "$FindBin::Bin/lib";
+use LibpqCLocale;
 
 # LIVE regression for karr k46: a pooled call whose real EV::Pg dispatch
 # croaks gives its connection back to the pool. t/32 proves the same claims

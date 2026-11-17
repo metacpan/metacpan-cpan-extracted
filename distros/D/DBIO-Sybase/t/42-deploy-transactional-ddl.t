@@ -257,7 +257,7 @@ is_deeply($again, $plain, '... running the same statements as the first pass');
   is($executed_ddl, 0,
     'CREATE/DROP DATABASE bypass _execute_ddl -- the capability never sees them');
   ok(!(grep { /^COMMIT$/i } @log),
-    'no COMMIT is sent: the methods end no transaction of the handle (karr k96)');
+    'no COMMIT is sent: the methods end no transaction of the handle');
   ok(defined $create_at, 'the temp database is created ...');
   ok(defined $drop_at && $drop_at > ($create_at // -1), '... and dropped');
   ok($option_set{$name}, 'abort tran on log full is set on the temp database (sp_dboption)');

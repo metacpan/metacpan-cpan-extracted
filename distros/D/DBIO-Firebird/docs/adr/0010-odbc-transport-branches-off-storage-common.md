@@ -16,7 +16,7 @@ no class for it: `dbi:ODBC:Driver=Firebird` determined to core's generic
 `sqlt_type`, sequences and savepoints. The POD of `Storage::InterBase` had
 pointed at `DBIO::Storage::DBI::ODBC::Firebird` in three places since the fork —
 an upstream class name that never existed in this namespace — and the ODBC leg
-of `t/10-firebird.t`, `t/20-firebird-core.t` and `t/30-datetime-firebird.t`
+of `t/10-firebird.t` and `t/30-datetime-firebird.t`
 (`DBIO_TEST_FIREBIRD_ODBC_DSN`) advertised a transport the code did not
 implement (karr k20).
 

@@ -120,6 +120,19 @@ it forked weakly and counts those not yet resolved, so a resolved, cancelled or
 dropped future frees its slot. The POD of `DBIO::Forked::Storage` names the
 process and connection count per call (karr k27).
 
+## Addendum 2026-11-08: Model A needs a real fork, decided on the capability
+
+Model A is one process per query, with its own copy of the interpreter, handles
+and pipe. A perl whose `fork()` is a pseudo-fork emulated with threads
+(`$Config{d_fork}` unset, `d_pseudofork` set -- Strawberry Perl) does not carry
+it. The dist refuses such a perl twice, both times on the capability and never on
+the operating system's name: at install, the generated `Makefile.PL` starts with
+a check that dies with "OS unsupported" (CPAN Testers reads that as NA, not
+FAIL); and at use, `_run_forked` croaks naming the missing fork before it opens
+a pipe or forks. `[AssertOS]` was not taken because it only compares system
+names against a list. The tests that cannot do anything without a real fork skip
+on `$Config{d_fork}` too.
+
 ## Future architecture work (tracked cross-repo, not here)
 
 - **dbio (core)**: a fallback chain in `DBIO::Storage::DBI::_async_storage` so a

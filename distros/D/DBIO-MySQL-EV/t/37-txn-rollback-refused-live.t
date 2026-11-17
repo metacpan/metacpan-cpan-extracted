@@ -224,6 +224,7 @@ my $TICK = EV::timer(0.02, 0.02, sub {});   # RUN_ONCE never blocks for long
 sub pause {
   my ($s) = @_;
   my $done = 0;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $t = EV::timer($s, 0, sub { $done = 1 });
   wait_until(sub { $done }, $s + 5);
 }

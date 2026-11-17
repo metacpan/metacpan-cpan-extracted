@@ -292,7 +292,7 @@ sub at {
     cmp_ok($at{$first} // 99, '<', $at{$then} // -1, $why);
   }
   is(at($sql, qr/\ASET search_path /), undef,
-    'the script holds no SET search_path, whatever pg_search_path declares (karr k121)');
+    'the script holds no SET search_path, whatever pg_search_path declares');
   is(at($sql, qr/ALTER DATABASE/), scalar(() = run_by_deploy($sql)) - 1,
     'the last statement is the last setting');
 }

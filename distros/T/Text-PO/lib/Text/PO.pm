@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO.pm
-## Version v1.0.2
+## Version v1.0.3
 ## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2018/06/21
-## Modified 2026/05/28
+## Modified 2026/11/17
 ## All rights reserved
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -44,7 +43,7 @@ BEGIN
         require JSON::PP;
         $JSON_CLASS   = 'JSON::PP';
     }
-    our $VERSION = 'v1.0.2';
+    our $VERSION = 'v1.0.3';
 };
 
 use strict;
@@ -1784,7 +1783,7 @@ Or, maybe using the object overloading directly:
 
 =head1 VERSION
 
-    v1.0.2
+    v1.0.3
 
 =head1 DESCRIPTION
 

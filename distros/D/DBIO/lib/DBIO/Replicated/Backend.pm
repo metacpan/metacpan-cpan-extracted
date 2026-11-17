@@ -4,7 +4,7 @@ package DBIO::Replicated::Backend;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Base';
 use Scalar::Util 'weaken';
@@ -102,7 +102,7 @@ DBIO::Replicated::Backend - Wrapper base class for replicated backends
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

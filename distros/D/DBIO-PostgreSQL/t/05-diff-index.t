@@ -91,7 +91,7 @@ like($ops[0]->as_sql, qr/^DROP INDEX public\.idx_users_email;$/, 'surviving-tabl
 # karr k121 (U2, point 1): an index behind a constraint is dropped with the
 # constraint. The server refuses DROP INDEX for it, and the model says which
 # index that is (constraint_name, constraint_type); these are the claims
-# without a server, t/112-diff-index-constraint-live.t has it measured.
+# without a server, t/112-diff-index-live.t has it measured.
 {
   my $tables = { 'public.users' => { schema_name => 'public', table_name => 'users' } };
   my $idx = sub {

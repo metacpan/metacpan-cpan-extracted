@@ -4,7 +4,7 @@ package DBIO::MSSQL::Introspect::Views;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 sub fetch {
@@ -74,7 +74,7 @@ DBIO::MSSQL::Introspect::Views - Introspect MSSQL view definitions
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

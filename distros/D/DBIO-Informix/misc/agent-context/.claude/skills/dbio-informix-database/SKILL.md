@@ -1,6 +1,6 @@
 ---
 name: dbio-informix-database
-description: Use when you need IBM Informix IDS specifics for driver work — DBD module, SQL dialect, types, SERIAL, transactions, pagination.
+description: Use when you need IBM Informix IDS specifics for driver work — DBD::Informix, SQL dialect, coltype mapping, SERIAL, transactions, SKIP/FIRST paging, sys* catalog.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -17,7 +17,7 @@ plus `$INFORMIXDIR`/`$INFORMIXSERVER` in the environment. Synchronous only — n
 async path. Connection:
 ```perl
 DBI->connect("dbi:Informix:database\@server", $user, $pass)
-DBIO::Schema->connect("dbi:Informix:dbname=myapp")   # driver style
+$schema->connect("dbi:Informix:myapp")   # database[@server]; "database=myapp" is SQL -354
 ```
 The autoincrement value lands in the statement handle's `ix_sqlerrd[1]`
 attribute after an INSERT — the driver reads it there for `last_insert_id`.
@@ -26,7 +26,8 @@ attribute after an INSERT — the driver reads it there for `last_insert_id`.
 
 IDS = Informix Dynamic Server (the modern engine; v11/12/14). Catalog layout
 (`sys*` tables) is stable across these. SQLite/DuckDB-style `:memory:` does
-not exist — the deploy path introspects a live throwaway schema instead.
+not exist — the deploy path creates a throwaway database `WITH LOG`, deploys
+into it, introspects it and drops it.
 
 ## Type System
 
@@ -35,21 +36,27 @@ logical name; logical → DDL string).
 
 | Logical | Informix SQL | coltype |
 |---------|--------------|---------|
-| smallint | SMALLINT | 2 |
-| integer | INTEGER | 3 |
-| bigint | BIGINT | 17 / 52 |
-| serial | SERIAL | 6 |
-| float | (DOUBLE PRECISION) | 5 |
-| smallfloat | REAL | 18 |
-| decimal | DECIMAL(s) | 14 |
-| char / nchar | CHAR(n) | 0,1 / 15 |
-| varchar / nvarchar | VARCHAR(n) | 13 / 16 |
-| lvarchar | LVARCHAR | 40 |
-| text | TEXT | 12 |
-| bytea | BYTE | 11 |
+| char / nchar | CHAR(n) | 0 / 15 |
+| smallint | SMALLINT | 1 |
+| integer | INTEGER | 2 |
+| float | DOUBLE PRECISION | 3 |
+| smallfloat | REAL | 4 |
+| decimal / money | DECIMAL(p,s) / MONEY | 5 / 8 |
+| serial / serial8 / bigserial | SERIAL / SERIAL8 / BIGSERIAL | 6 / 18 / 53 |
 | date | DATE | 7 |
-| datetime | DATETIME y TO fraction(5) | 8,9,10 |
-| blob/clob, set/multiset/list | smart/collection LOBs | 41, 19-21 |
+| datetime | DATETIME y TO fraction(5) | 10 |
+| interval | INTERVAL | 14 |
+| bytea | BYTE | 11 |
+| text | TEXT | 12 |
+| varchar / nvarchar | VARCHAR(n) | 13 / 16 |
+| int8 / bigint | INT8 / BIGINT | 17 / 52 |
+| set / multiset / list | collections | 19 / 20 / 21 |
+| lvarchar | LVARCHAR | 40 |
+| blob / clob / boolean | opaque, told apart by `extended_id` 10 / 11 / 5 | 41 |
+| boolean | BOOLEAN | 45 |
+
+`coltype` is taken modulo 256. The table is `%LOGICAL_FOR_COLTYPE` in
+`DBIO::Informix::Types`; `logical_for_coltype` is the authority.
 
 Sized DDL types default to `(255)` when no size given.
 
@@ -81,10 +88,10 @@ Not a trailing `LIMIT/OFFSET`. `FIRST n` alone for no-offset queries.
 
 ## Identifier Quoting & Case
 
-Driver quotes with `"` (`sql_quote_char('"')`). Double-quoted identifiers are
-literal/case-sensitive only when `DELIMIDENT` is set in the environment;
-without it Informix folds unquoted names to lowercase and treats `"x"` as a
-string literal in some contexts. Catalog `tabname`/`colname` come back
+Driver quotes with `"` (`sql_quote_char('"')`). Informix reads a double-quoted
+token as an identifier only when `DELIMIDENT` is set at connect time; the
+driver sets `DELIMIDENT=y` itself in `_connect`, and without it every quoted
+statement is a -201 syntax error. Catalog `tabname`/`colname` come back
 lowercase.
 
 ## Unicode / Charset
@@ -92,14 +99,14 @@ lowercase.
 No connection-level `SET NAMES`. Locale is environment-driven: `DB_LOCALE` /
 `CLIENT_LOCALE` (e.g. `en_US.utf8`); `GL_USEGLU=1` enables ICU/Unicode
 collation. `NCHAR`/`NVARCHAR` use the database locale collation. Datetime
-formatting is set via `connect_call_datetime_setup`: `GL_DATETIME=%Y-%m-%d
-%H:%M:%S%F5` (takes effect), `GL_DATE` (often ignored mid-process); `DBDATE`
-and `DBCENTURY` are cleared.
+formatting is set via `connect_call_datetime_setup`: `GL_DATETIME="%Y-%m-%d
+%H:%M:%S.%F5"`. The client reads `DBDATE`/`DBCENTURY`/`GL_DATE` when it
+connects, so `_connect` pins `DBDATE=MDY4/` for the connect and restores the
+caller's values (`t/31-date-client-env.t`).
 
 ## Introspection Catalog
 
-System catalog is the lowercase `sys*` tables under owner `informix` (NOT
-DB2-style `SYSCAT`):
+System catalog is the lowercase `sys*` tables under owner `informix`:
 
 | Table | Use |
 |-------|-----|
@@ -115,5 +122,8 @@ Catalog queries filter out system owners (`informix`, `sys`, `sysmaster`, ...).
 ## Testing Env Vars
 
 `DBIO_TEST_INFORMIX_DSN`, `DBIO_TEST_INFORMIX_USER`, `DBIO_TEST_INFORMIX_PASS`
-(gate live tests; skipped when unset). Docker: `ibmcom/informix-developer` /
-`icr.io/informix/informix-developer-database`.
+(gate live tests; skipped when unset). Test server: image
+`icr.io/informix/informix-developer-database:latest`, manifest
+`maint/k8s/informix.yaml`. Every suite, live or offline, runs through
+`maint/capped-test` (and a live one after `maint/live-preflight`); the rules are in
+`dbio-driver-development`, `references/live-testing.md`.

@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Test::Schema::Probe;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Core';
 
@@ -88,7 +88,7 @@ DBIO::ClickHouse::Test::Schema::Probe - Test result class -- one column per bran
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

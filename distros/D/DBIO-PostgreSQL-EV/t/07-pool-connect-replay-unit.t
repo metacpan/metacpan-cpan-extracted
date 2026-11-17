@@ -64,7 +64,7 @@ use DBIO::PostgreSQL::EV::Storage;
   my $pool = $storage->pool;
   isa_ok $pool, 'DBIO::PostgreSQL::EV::Pool', 'pool is the EV pool';
   is $pool->{storage}, $storage,
-    'pool carries the storage back-reference (core k68 replay can reach _setup_pool_connection)';
+    'pool carries the storage back-reference (a replay can reach _setup_pool_connection)';
 }
 
 # --- 2. _run_pool_connect_statement drives the EV::Pg connection --------------

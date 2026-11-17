@@ -3,7 +3,7 @@ package DBIO::GraphQL::Mutation;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Class::Accessor::Grouped';
 use GraphQL::Type::NonNull;
@@ -272,7 +272,7 @@ DBIO::GraphQL::Mutation - Build createX / updateX / deleteX GraphQL field per so
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

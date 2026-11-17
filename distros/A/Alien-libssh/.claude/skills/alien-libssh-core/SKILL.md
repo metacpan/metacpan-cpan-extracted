@@ -17,10 +17,10 @@ holds only what is true about *this* distribution.
 
 One job: make libssh available to Perl, over two paths.
 
-- **system** — `plugin 'PkgConfig' => (pkg_name => 'libssh')`. No
-  `minimum_version`: every current distro libssh is new enough for
-  `Net::LibSSH`.
-- **share** — CMake build of `share/libssh-0.10.6.tar.xz`, no network
+- **system** — `plugin 'PkgConfig' => (pkg_name => 'libssh', minimum_version
+  => '0.9.0')`. 0.9.0 is where the known-hosts API `Net::LibSSH` calls
+  (`ssh_session_is_known_server`) appears; `t/01-alien.t` asserts the same floor.
+- **share** — CMake build of `share/libssh-0.12.2.tar.xz`, no network
   (`Fetch::Local` + a `file://` `start_url` built with `Path::Tiny->cwd`).
   Offline install is a promise this distribution makes; never add a network
   `start_url`, never a second tarball.
@@ -88,3 +88,17 @@ env ALIEN_INSTALL_TYPE=system dzil test    # forced probe; fails loudly with no 
 `dzil test` proves one path at most. Build logs and the gathered `alien.json`
 land in `_alien/`; read that file first when a consumer sees flags it did not
 expect.
+
+## Repo mechanics
+
+- **`.claude/` is git-ignored except for a whitelist.** The root `.gitignore` ignores
+  `.claude/*` and re-admits `settings.json`, `agents/`, `skills/`, `rules/` — a *new*
+  directory under `.claude/` therefore stays invisible to git until it is whitelisted
+  there. Verify with `git status --short` after creating one; the same applies to
+  `.claude/worktrees/`, which is ignored explicitly.
+- **Two kinds of skill live under `.claude/skills/`.** The ones `skilletor` installs
+  (`skilletor status` lists them under *project scope*) carry a `.gitignore` holding `*`
+  in their own directory — they are build artifacts, the next `skilletor sync` overwrites
+  them, and editing one is forbidden. A repo-owned skill (tracked by git, no entry in
+  `.claude/skilletor.json`) belongs to this repository: `alien-libssh-core` is the only
+  one here, and it is the file to extend when the rules grow too long.

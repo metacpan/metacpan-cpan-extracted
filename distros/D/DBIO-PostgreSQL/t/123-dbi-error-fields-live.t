@@ -45,7 +45,10 @@ LiveServer->require_server;
 
 my $S = 'dbio_k130_error_fields';
 
-my $schema  = DBIO::Test::Schema->connect($dsn, $user, $pass, { AutoCommit => 1 });
+# PostgreSQL reports in the language of lc_messages; this test compares the
+# server's English words, so its session is set to 'C' after the connect
+my $schema  = DBIO::Test::Schema->connect($dsn, $user, $pass,
+  { AutoCommit => 1, on_connect_do => [q{SET lc_messages = 'C'}] });
 my $storage = $schema->storage;
 my $dbh     = $storage->dbh;   # connects; driver resolved from here on
 

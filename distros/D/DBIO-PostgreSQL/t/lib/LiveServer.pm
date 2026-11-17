@@ -46,8 +46,87 @@ use Test::More ();
 use DBIO::Util ();
 use DBIO::PostgreSQL::Util ();
 
+# The language the server reports in (lc_messages), for the whole live suite.
+#
+# WHY: PostgreSQL words its messages by lc_messages, and a client cannot tell
+# it to do otherwise but per session. The masking of values in an error text
+# must hold in every language (ADR 0010), so the suite can be run with
+# DBIO_TEST_SERVER_LANGUAGE=de or =fr: every connection a test opens then
+# reports in that language. Empty or unset: the server's own default. Any other
+# value ends the file at once -- a typo must not run the suite in English and
+# call it German.
+#
+# The session setting is libpq's startup parameter (PGOPTIONS, '-c
+# lc_messages=...'), set here because every live file loads this module before
+# its first connection (t/109-live-files-use-live-server.t) and libpq hands it
+# to every connection of the process -- DBI handles, the schema's storage, the
+# future_io pool, the private databases -- and to the children it starts. It is
+# a setting of the session: no ALTER SYSTEM, no ALTER DATABASE. A DSN that
+# carries an options= of its own (the search_path tests) replaces PGOPTIONS for
+# that connection; a test that needs its wording in English sets
+# lc_messages = 'C' in its own session.
+our %SERVER_LANGUAGE = (
+  de => 'de_DE.UTF-8',
+  fr => 'fr_FR.UTF-8',
+);
+
+sub server_locale {
+  my $lang = $ENV{DBIO_TEST_SERVER_LANGUAGE};
+  return undef unless defined $lang && length $lang;
+  die "DBIO_TEST_SERVER_LANGUAGE is '$lang'; it is one of: "
+    . join(', ', sort keys %SERVER_LANGUAGE) . " (or empty for the server's default)\n"
+    unless exists $SERVER_LANGUAGE{$lang};
+  return $SERVER_LANGUAGE{$lang};
+}
+
+{
+  my $locale = server_locale();
+  if (defined $locale) {
+    my $option = "-c lc_messages=$locale";
+    $ENV{PGOPTIONS} = join ' ', grep { length } $ENV{PGOPTIONS}, $option
+      unless ($ENV{PGOPTIONS} // '') =~ /\Q$option\E/;
+  }
+}
+
 # The DSN, user and password of the test database, as the environment has them.
 sub login { return @ENV{ map { "DBIO_TEST_PG_$_" } qw( DSN USER PASS ) } }
+
+# Whether the libpq behind DBD::Pg reads a host that starts with '/' as a
+# directory of Unix-domain sockets. A libpq built without them (older Windows
+# builds) takes such a host for a host name and goes to TCP, so its error
+# never names a socket path. Asked once, with a directory that does not exist
+# and a connect that fails in connect(2); never reaches a server. Tests that
+# send a socket directory through libpq skip with $NO_UNIX_SOCKETS where it
+# is false.
+our $NO_UNIX_SOCKETS = 'libpq here has no Unix-domain socket directories';
+
+my $HAS_UNIX_SOCKETS;
+sub libpq_has_unix_sockets {
+  return $HAS_UNIX_SOCKETS if defined $HAS_UNIX_SOCKETS;
+
+  my $dir = '/nonexistent/dbio-postgresql-socket-probe';
+  delete local @ENV{ grep { /^(?:PG|DBI_)/ } keys %ENV };
+
+  my $dbh = eval { DBI->connect("dbi:Pg:dbname=probe;host=$dir", 'probe', 'probe',
+    { RaiseError => 1, PrintError => 0 }) };
+  if ($dbh) {
+    $dbh->disconnect;
+    die "a connection was opened by the socket probe -- LiveServer must never reach a server\n";
+  }
+  return $HAS_UNIX_SOCKETS = ("$@" =~ m{socket "\Q$dir\E/\.s\.PGSQL\.\d+"} ? 1 : 0);
+}
+
+# The pattern libpq's reason for a connect to the dead socket directory $dir
+# matches, by what no locale translates. With Unix-domain sockets the error
+# names the socket it tried ($dir/.s.PGSQL.<port>); a libpq without them
+# takes $dir for a host name, goes to TCP and never names a path, so there the
+# reason is what it means, a connection that failed.
+sub dead_host_reason {
+  my ($class, $dir) = @_;
+  return $class->libpq_has_unix_sockets
+    ? qr{\Q$dir\E/\.s\.PGSQL\.\d+}
+    : qr/could not connect|connection to server|failed:/i;
+}
 
 # A DBI connection, or the reason there is none, thrown: DBI's words with the
 # password as *** (DBIO::Util::mask_connect_secrets), ending in a newline.

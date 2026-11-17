@@ -224,7 +224,7 @@ for my $t (qw(text varchar json)) {
     "_db2_is_character_type($t) answers without a size";
 }
 lives_and { is DBIO::DB2::DDL::_db2_default_literal('00000', 'varchar'), "'00000'" }
-  'a default on a size-less varchar is still quoted (k46)';
+  'a default on a size-less varchar is still quoted';
 
 # install_ddl: the refusal names table and column.
 {
@@ -248,6 +248,6 @@ throws_ok { DBIO::DB2::DDL->install_ddl('T::K45::Schema') }
 T::K45::Result::Item->add_columns(note => { data_type => 'varchar', size => 40, is_nullable => 1 });
 T::K45::Schema->register_class(Item => 'T::K45::Result::Item');
 like(DBIO::DB2::DDL->install_ddl('T::K45::Schema'), qr/^\s*"body" CLOB,$/m,
-  'install_ddl writes a text column without a size as CLOB (karr k57)');
+  'install_ddl writes a text column without a size as CLOB');
 
 done_testing;

@@ -4,7 +4,7 @@ package DBIO::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Test::Schema;
 use Carp;
@@ -507,7 +507,7 @@ DBIO::Test - Test utilities for DBIO and DBIO driver distributions
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -1,12 +1,11 @@
 ##----------------------------------------------------------------------------
 ## PO Files Manipulation - ~/lib/Text/PO/Gettext.pm
-## Version v1.0.0
-## Copyright(c) 2025 DEGUEST Pte. Ltd.
+## Version v1.0.1
+## Copyright(c) 2026 DEGUEST Pte. Ltd.
 ## Author: Jacques Deguest <jack@deguest.jp>
 ## Created 2021/07/12
-## Modified 2026/01/29
+## Modified 2026/11/17
 ## All rights reserved
-## 
 ## This program is free software; you can redistribute  it  and/or  modify  it
 ## under the same terms as Perl itself.
 ##----------------------------------------------------------------------------
@@ -90,7 +89,7 @@ BEGIN
         (?:\.(?<locale_encoding>[\w-]+))?
     )
     /xi;
-    our $VERSION = 'v1.0.0';
+    our $VERSION = 'v1.0.1';
 };
 
 use strict;
@@ -174,6 +173,7 @@ sub dngettext
     my( $domain, $msgid, $msgidPlural, $count ) = @_;
     my $default;
     my $index;
+    my $locale = $self->locale_web;
     if( !defined( $count ) || $count !~ /^\d+$/ )
     {
         $default = $msgidPlural || $msgid;
@@ -203,7 +203,7 @@ sub dngettext
                 $index = eval( $expr );
                 if( $@ )
                 {
-                    warn( "Warning only: problem evaluating expression '$expr' for locale ", $opts->{locale}, ": $@" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
+                    warn( "Warning only: problem evaluating expression '$expr' for locale ", $locale, ": $@" ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
                 }
                 else
                 {
@@ -216,16 +216,16 @@ sub dngettext
             }
             # return( join( '', @{$def->{msgstr}->[ $index ]} ) || $default );
             my $locale_str = ref( $def->[ $index ] ) eq 'ARRAY' ? join( '', @{$def->[ $index ]} ) : $def->[ $index ];
-            return( Text::PO::String->new( $locale_str => $opts->{locale} ) ) if( length( "$locale_str" ) );
-            return( Text::PO::String->new( $default ) );
+            return( Text::PO::String->new( $locale_str => $locale ) ) if( length( "$locale_str" ) );
+            return( Text::PO::String->new( $default => $locale ) );
         }
-        return( Text::PO::String->new( $def || $default ) );
+        return( Text::PO::String->new( $def || $default => $locale ) );
     }
     elsif( !exists( $dict->{ $msgid } ) )
     {
         warn( "No dictionary was found for msgid \"${msgid}\" and domain \"${domain}\" and locale \"", $self->locale_unix, "\"." ) if( $self->_is_warnings_enabled( 'Text::PO' ) );
     }
-    return( Text::PO::String->new( $default ) );
+    return( Text::PO::String->new( $default => $locale ) );
 }
 
 sub domain
@@ -916,7 +916,7 @@ Text::PO::Gettext - Object-oriented GNU Gettext-style implementation
 
 =head1 VERSION
 
-    v1.0.0
+    v1.0.1
 
 =head1 DESCRIPTION
 

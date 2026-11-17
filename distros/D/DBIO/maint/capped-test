@@ -258,8 +258,23 @@ fcntl($ready_w, Fcntl::F_SETFD(), 0) or die_uncappable("fcntl: $!");   # survive
 print STDERR "capped-test: MemoryMax=$MEMMAX MemorySwapMax=0 CPUQuota=$CPUQUOTA nice=19 ionice=idle\n";
 print STDERR "capped-test: @cmd\n\n";
 
+# systemd 258 expands $VAR and $$ in the arguments of a scope, which would alter
+# the command; the switch to turn that off exists from systemd 254 on.
+my $help = '';
+{
+  open my $olderr, '>&', \*STDERR or die_uncappable("dup STDERR: $!");
+  open STDERR, '>', '/dev/null' or die_uncappable("/dev/null: $!");
+  if (open my $hfh, '-|', 'systemd-run', '--help') {
+    local $/;
+    $help = <$hfh> // '';
+    close $hfh;
+  }
+  open STDERR, '>&', $olderr or die_uncappable("restore STDERR: $!");
+}
+my @no_expand = $help =~ /--expand-environment/ ? ('--expand-environment=no') : ();
+
 my @wrapped = (
-  'systemd-run', '--user', '--scope', "--unit=$unit", '--quiet',
+  'systemd-run', '--user', '--scope', "--unit=$unit", '--quiet', @no_expand,
   '-p', 'CollectMode=inactive-or-failed',   # an OOM-killed scope ends "failed"; do not keep it
   '-p', 'MemoryAccounting=yes',
   '-p', "MemoryMax=$MEMMAX",

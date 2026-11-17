@@ -80,7 +80,9 @@ sub connect_schema {
   my $schema = $class->connect($dsn, $user, $pass, {
     RaiseError => 1, PrintError => 0, AutoCommit => 1,
     ($dbd eq 'mysql' ? (mysql_enable_utf8mb4 => 1) : ()),
-    on_connect_do => ["USE `$DB`"],
+    # MySQL reports in the language of the session; this test reads the English
+    # sentences (the other languages are t/181)
+    on_connect_do => ["USE `$DB`", "SET SESSION lc_messages = 'en_US'"],
     %attrs,
   });
   push @schemas, $schema;

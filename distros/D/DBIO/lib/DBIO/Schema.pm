@@ -4,7 +4,7 @@ package DBIO::Schema;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Base';
 
@@ -959,7 +959,7 @@ DBIO::Schema - Schema class and connection container for DBIO applications
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

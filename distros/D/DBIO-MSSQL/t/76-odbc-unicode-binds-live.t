@@ -3,6 +3,9 @@ use warnings;
 use utf8;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
+use MssqlClientCharset;      # client character set UTF-8, whatever the locale
 use Test::Exception;
 use DBI;
 use Digest::SHA ();
@@ -19,8 +22,8 @@ use DBIO::Schema;
 # SQL_Latin1_General_CP1_CI_AS, code page 1252), DBD::ODBC 1.61 -- built
 # WITHOUT Unicode support (odbc_has_unicode 0), so a string goes to the
 # driver as bytes, and a string with the UTF-8 flag on as its UTF-8 form --
-# over the FreeTDS ODBC driver 1.3.17 with ClientCharset UTF-8 (from the
-# locale):
+# over the FreeTDS ODBC driver 1.3.17 with ClientCharset UTF-8 (named in the
+# DSN, not taken from the locale):
 #
 #   Bound without a type, as it was, a string is a CHAR to the driver and
 #   goes through the code page of the server whatever the column is:
@@ -47,6 +50,9 @@ use DBIO::Schema;
 # What the server holds is looked at from another session, in ASCII.
 
 my ($DSN, $USER, $PASS) = @ENV{ map { "DBIO_TEST_MSSQL_ODBC_$_" } qw/DSN USER PASS/ };
+# the tests write text beyond ASCII: UTF-8 client character set stated in the DSN,
+# not taken from the locale (t/lib/MssqlClientCharset.pm)
+$DSN = MssqlClientCharset::utf8($DSN);
 
 plan skip_all => 'Set $ENV{DBIO_TEST_MSSQL_ODBC_DSN}, _USER and _PASS to run this test'
   unless $DSN and defined $USER and defined $PASS;
@@ -292,7 +298,7 @@ SKIP: {
     if $schema->storage->dbh->{odbc_has_unicode};
 
   # same connection, ClientCharset the driver reads the UTF-8 bytes in
-  my $latin = T::K76::Schema->connect("$DSN;ClientCharset=ISO-8859-1", $USER, $PASS);
+  my $latin = T::K76::Schema->connect(MssqlClientCharset::with($DSN, 'ISO-8859-1'), $USER, $PASS);
   my $lrs   = $latin->resultset('Uni');
 
   lives_ok { $lrs->create({ tag => 'latin-ascii', nv => 'plain ascii', v => 'plain' }) }

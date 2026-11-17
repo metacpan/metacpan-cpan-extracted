@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
 
 # LIVE half of karr k78: order_by with -nulls => 'first' | 'last' returns the
 # rows in the order NULLS FIRST / NULLS LAST would, which SQL Server cannot say

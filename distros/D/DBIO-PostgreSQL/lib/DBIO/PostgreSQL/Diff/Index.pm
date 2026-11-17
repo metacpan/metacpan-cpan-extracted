@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Diff::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -849,7 +849,7 @@ DBIO::PostgreSQL::Diff::Index - Diff operations for PostgreSQL indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

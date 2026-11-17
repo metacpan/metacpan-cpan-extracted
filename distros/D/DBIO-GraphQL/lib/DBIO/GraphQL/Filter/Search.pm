@@ -3,7 +3,7 @@ package DBIO::GraphQL::Filter::Search;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::GraphQL::Filter';
 
@@ -26,7 +26,7 @@ DBIO::GraphQL::Filter::Search - Default filter adapter - per-source nested-DBIO-
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

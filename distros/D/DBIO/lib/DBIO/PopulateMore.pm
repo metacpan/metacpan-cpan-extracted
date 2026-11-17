@@ -5,7 +5,7 @@ package DBIO::PopulateMore;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Scalar::Util qw(refaddr);
 use namespace::clean;
@@ -127,7 +127,7 @@ DBIO::PopulateMore - Enhanced populate with cross-source references
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

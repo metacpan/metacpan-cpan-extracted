@@ -303,7 +303,7 @@ ok !$storage->_is_binary_data_type($_),
   is scalar( () = $sth->{Statement} =~ /\?/g ), 51, '... and 51 placeholders';
   is_deeply [ grep { length > 4000 } @{ $sth->{bound} } ], [],
     '... none of more than 4000 characters: nothing the server would cut, '
-  . 'and nothing that goes into the statement as a long value does (karr k40)';
+  . 'and nothing that goes into the statement as a long value does';
   is from_hex(@{ $sth->{bound} }), $value, '... and together they are the value';
   unlike $sth->{Statement}, qr/'|0x/i,
     '... of which the statement has nothing: no literal of any kind';
@@ -474,7 +474,7 @@ ok !$storage->_is_binary_data_type($_),
   like $sth->{Statement},
     qr/\(\[body\], \[text\], \[title\]\) VALUES \(\(\Q$ONE + $ONE\E\), 'x{5000}', \?\)/,
     'a binary value, a text value over 4000 bytes and a short one: pieces, '
-  . 'the literal of karr k40, a placeholder';
+  . 'the long-value literal, a placeholder';
   is scalar @{ $sth->{bound} }, 3, '... three values bound';
   is from_hex(@{ $sth->{bound} }[0, 1]), bytes(3000), '... the two pieces';
   is $sth->{bound}[2], 'a title', '... and the title';
@@ -690,7 +690,7 @@ ok !$storage->_is_binary_data_type($_),
   is_deeply [ @{ $sth->{bound} }[0, 1] ], [ $value, 'a title' ],
     '... the value bound whole, as its bytes';
   is_deeply [ @{ $sth->{attrs} }[0, 1] ], [ $LONGVAR, DBI::SQL_WLONGVARCHAR() ],
-    "... with the type, and the title (a varchar is an NVARCHAR on the server, karr k58) as Unicode";
+    "... with the type, and the title (a varchar is an NVARCHAR on the server) as Unicode";
 
   ($sth) = sent { $ors->search({ body => $value })->all };
 

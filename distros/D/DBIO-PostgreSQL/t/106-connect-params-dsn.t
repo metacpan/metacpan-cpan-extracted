@@ -58,6 +58,9 @@ use DBIO::Util ();
 use DBIO::AccessBroker::Static;
 use DBIO::PostgreSQL::Storage;
 use DBIO::PostgreSQL::Util ();
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
 
 my $HAVE_FUTURE_IO = eval { require DBIO::PostgreSQL::Storage::Async; 1 };
 my $NO_FUTURE_IO   = 'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
@@ -279,6 +282,7 @@ sub sync_host_as_libpq_read_it {
 
 SKIP: {
   skip "$DEAD exists on this machine", 8 if -e $DEAD;
+  skip $LiveServer::NO_UNIX_SOCKETS, 8 unless LiveServer->libpq_has_unix_sockets;
 
   for my $value (
     'plain',
@@ -302,6 +306,7 @@ SKIP: {
 SKIP: {
   my $empty = eval { $quote->('') } // '';
   skip "$DEAD exists on this machine", 1 if -e $DEAD;
+  skip $LiveServer::NO_UNIX_SOCKETS, 1 unless LiveServer->libpq_has_unix_sockets;
   skip 'quote_dsn_value does not write an empty value quoted', 1 unless $empty eq q{''};
 
   delete local @ENV{ grep { /^PG/ } keys %ENV };

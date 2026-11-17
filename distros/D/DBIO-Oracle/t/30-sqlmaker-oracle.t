@@ -221,7 +221,7 @@ for my $q ('', '"') {
   # mock-cursor invariant); the data assertions need at least one row to
   # inflate, so register a mock that returns one row wide enough to back the
   # prefetch+order_by SELECT. Real round-trip coverage for shortened
-  # identifiers lives in t/10-oracle.t and t/20-oracle-core.t where a DSN
+  # identifiers lives in t/10-oracle.t where a DSN
   # is actually wired up.
   $schema->storage->mock_persistent(qr/\ASELECT\b/i, [
     [ 'EP C', 4, 2, 'EP C', 2001, 1, undef, 2, 'Random Boy Band', 13, 'X' ],

@@ -4,7 +4,7 @@ package DBIO::Firebird::DateTime::Format;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::DateTimeFormat';
 
@@ -28,7 +28,7 @@ DBIO::Firebird::DateTime::Format - DateTime formatter for Firebird / InterBase
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

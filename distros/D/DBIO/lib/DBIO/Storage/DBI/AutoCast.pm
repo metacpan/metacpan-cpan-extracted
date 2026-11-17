@@ -4,7 +4,7 @@ package DBIO::Storage::DBI::AutoCast;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -54,7 +54,7 @@ DBIO::Storage::DBI::AutoCast - Storage component for RDBMS requiring explicit pl
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

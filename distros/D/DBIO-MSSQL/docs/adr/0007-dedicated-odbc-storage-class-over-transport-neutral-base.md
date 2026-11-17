@@ -64,9 +64,9 @@ class per transport" — the same single source of truth for MSSQL semantics,
 without the dead Sybase layer in the ODBC ISA.
 
 The split also makes each path's `isa` honest. Before, both transports answered
-`isa('DBIO::MSSQL::Storage::Sybase')`; now `t/11-mssql-odbc.t` and
-`t/21-mssql-odbc-core.t` assert `DBIO::MSSQL::Storage::ODBC`, while `t/10-mssql.t`
-and `t/20-mssql-core.t` assert `DBIO::MSSQL::Storage::Sybase` (or
+`isa('DBIO::MSSQL::Storage::Sybase')`; now
+`t/11-mssql-odbc.t` asserts `DBIO::MSSQL::Storage::ODBC`, while `t/10-mssql.t`
+asserts `DBIO::MSSQL::Storage::Sybase` (or
 `...::Sybase::NoBindVars`).
 
 Shipped in commits `c73dcde` ("route ODBC off the Sybase class", 2026-06-24) and

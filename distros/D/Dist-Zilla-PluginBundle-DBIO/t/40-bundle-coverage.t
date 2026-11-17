@@ -6,16 +6,16 @@ use File::Temp ();
 use Dist::Zilla::Tester;
 use IPC::Open3;
 use Path::Tiny;
+use File::pushd ();
 
-# Pins how the [@DBIO] bundle wires Dist::Zilla::Plugin::DBIO::CoverageTest:
-# - the plugin is present in both driver and core configurations
-# - coverage_threshold defaults to 80
-# - a custom coverage_threshold is forwarded to the plugin
-# - coverage_threshold = 0 collapses the generated test to a no-op skip
-#
-# Generated file content is checked by running gather_files on the
-# CoverageTest plugin instance and inspecting the file it added to the
-# in-memory dist. from_config is enough -- no real build is needed.
+# Pins the coverage gate of the [@DBIO] bundle, Dist::Zilla::Plugin::DBIO::CoverageGate:
+# - it is a TestRunner that runs after the build plugin (MakeMaker or
+#   MakeMaker::Awesome), so it judges cover_db/ once the whole suite has run
+# - coverage_threshold defaults to 80, a custom value is forwarded, 0 disables
+# - test($dir) scores the lib/ of $dir from a real Devel::Cover database: it
+#   passes above the threshold, warns below it, and fails below it under
+#   RELEASE=1 or COVERAGE_STRICT=1; a missing cover_db/ fails under RELEASE=1
+#   and only notes otherwise; files outside lib/ do not count
 
 sub tzil_for {
   my ($bundle_args) = @_;
@@ -39,219 +39,179 @@ sub tzil_for {
   );
 }
 
-sub by_class {
-  my $tzil = shift;
-  my %c;
-  $c{ ref $_ } = $_ for @{ $tzil->plugins };
-  return \%c;
+my $GATE = 'Dist::Zilla::Plugin::DBIO::CoverageGate';
+
+sub gate_of {
+  my ($tzil) = @_;
+  my ($gate) = grep { ref $_ eq $GATE } @{ $tzil->plugins };
+  return $gate;
 }
 
-# --- CoverageTest plugin is wired in both driver and core configurations ---
-{
-  my $driver = by_class( tzil_for('') );
-  my $core   = by_class( tzil_for("core = 1") );
-
-  ok $driver->{'Dist::Zilla::Plugin::DBIO::CoverageTest'},
-    'driver: CoverageTest present';
-  ok $core->{'Dist::Zilla::Plugin::DBIO::CoverageTest'},
-    'core:   CoverageTest present';
-}
-
-# --- default coverage_threshold = 80 ---
-{
-  my $tzil = by_class( tzil_for('') );
-  my $ct = $tzil->{'Dist::Zilla::Plugin::DBIO::CoverageTest'};
-  is $ct->coverage_threshold, 80,
-    'default coverage_threshold = 80';
-}
-
-# --- custom coverage_threshold is forwarded ---
-{
-  my $tzil = by_class( tzil_for("coverage_threshold = 95") );
-  my $ct = $tzil->{'Dist::Zilla::Plugin::DBIO::CoverageTest'};
-  is $ct->coverage_threshold, 95,
-    'coverage_threshold = 95 -> CoverageTest threshold = 95';
-}
-
-# Helper: run gather_files on the CoverageTest plugin in $tzil and
-# return the generated xt/release/coverage.t body.
-sub coverage_body {
-  my $tzil = shift;
-  my $ct = by_class($tzil)->{'Dist::Zilla::Plugin::DBIO::CoverageTest'}
-    or die "no CoverageTest plugin in dist";
-
-  # gather_files pushes onto $zilla->files via FileInjector::add_file
-  $ct->gather_files;
-  my @cov = grep { $_->name eq 'xt/release/coverage.t' } @{ $tzil->files };
-  return @cov ? $cov[0]->content : undef;
-}
-
-# --- coverage_threshold = 0 disables enforcement: generated file is skip-only ---
-{
-  my $tzil = tzil_for("coverage_threshold = 0");
-  my $body = coverage_body($tzil);
-  ok defined $body, 'xt/release/coverage.t gathered when threshold = 0';
-  like $body, qr/coverage enforcement disabled/,
-    'off-body says coverage enforcement disabled';
-  like $body, qr/plan skip_all/,
-    'off-body emits plan skip_all';
-  unlike $body, qr/COVERAGE_STRICT/,
-    'off-body omits the COVERAGE_STRICT strict branch';
-}
-
-# --- strict (default) body contains the gating logic and env var references ---
-{
-  my $tzil = tzil_for('');
-  my $body = coverage_body($tzil);
-  ok defined $body, 'xt/release/coverage.t gathered (default threshold)';
-
-  like $body, qr/cover_db/,        'body references cover_db';
-  like $body, qr/Devel::Cover::DB/, 'body uses Devel::Cover::DB';
-  like $body, qr/COVERAGE_STRICT/,  'body honours COVERAGE_STRICT';
-  like $body, qr/\$ENV\{RELEASE\}/, 'body honours RELEASE';
-  like $body, qr/my \$THRESHOLD\s*=\s*80\b/,
-    'body has threshold 80 substituted in';
-  like $body, qr/^use strict;\s*\nuse warnings;/m,
-    'body has the required strict/warnings preamble';
-}
-
-# --- the generated script counts a non-object statement entry as uncovered ---
+# --- the gate runs after the build plugin, driver and core ---
 #
-# The statement loop guards every entry before it calls ->val on it. The claim
-# of that guard: an entry that is not a Devel::Cover::Statement object is
-# counted as an uncovered statement -- it never kills the coverage test, and it
-# never inflates the number. Before k9 the guard was ref($stmt) && $stmt->can,
-# which turned away non-references but died on exactly the other thing it was
-# there for: "Can't call method "can" on unblessed reference".
-#
-# This has to be run, not grepped: only executing the loop shows whether the
-# guard holds. And it needs a stand-in Devel::Cover::DB, because the real one
-# (1.52, objectify_cover) blesses every entry or dies itself, so no cover_db/
-# on disk can produce such an entry. The stand-in serves one lib/ file with
-# three entries on one line: a covered statement object, an unblessed arrayref
-# in the shape of a raw statement record, and a plain scalar.
-{
-  my $body = coverage_body( tzil_for('') );
+# Dist::Zilla runs the TestRunner plugins in this order; the build plugin has
+# to come first, the gate after it.
+for my $case (
+  [ driver => '',         'Dist::Zilla::Plugin::MakeMaker' ],
+  [ core   => 'core = 1', 'Dist::Zilla::Plugin::MakeMaker::Awesome' ],
+) {
+  my ($label, $args, $builder) = @$case;
+  my @runners = map { ref } @{ tzil_for($args)->plugins_with(-TestRunner) };
+  my %at; @at{reverse @runners} = reverse 0 .. $#runners;
+  ok defined $at{$GATE}, "$label: CoverageGate is a TestRunner";
+  ok defined $at{$builder}, "$label: $builder is a TestRunner";
+  cmp_ok $at{$GATE}, '>', $at{$builder}, "$label: the gate runs after $builder"
+    or diag join ', ', @runners;
+}
 
-  my $dir = Path::Tiny->tempdir;
-  $dir->child('cover_db')->mkpath;
-  $dir->child('coverage.t')->spew_utf8($body);
+# --- coverage_threshold ---
+is gate_of( tzil_for('') )->coverage_threshold, 80, 'default coverage_threshold = 80';
+is gate_of( tzil_for('coverage_threshold = 95') )->coverage_threshold, 95,
+  'coverage_threshold = 95 reaches the gate';
 
-  my $fake = $dir->child('fakelib', 'Devel', 'Cover', 'DB.pm');
-  $fake->parent->mkpath;
-  $fake->spew_utf8(<<'FAKE');
-package Devel::Cover::DB;
-use strict;
-use warnings;
-sub new      { bless {}, shift }
-sub is_valid { 1 }
-sub merge_runs { $_[0] }
-sub cover    { bless {}, 'Fake::Cover' }
-
-package Fake::Cover;
-sub items { 'lib/DBIO/Test.pm' }
-sub file  { bless {}, 'Fake::File' }
-
-package Fake::File;
-sub items     { 'statement' }
-sub criterion { bless {}, 'Fake::Criterion' }
-
-package Fake::Criterion;
-sub items    { 1 }
-sub location { [ bless([1], 'Fake::Statement'), [1], 1 ] }
-
-package Fake::Statement;
-sub val { $_[0][0] }
-
-1;
-FAKE
-
-  my ($output, $exit);
-  {
-    # PERL5OPT: a suite run under -MDevel::Cover must not load the real
-    # Devel::Cover into the child on top of the stand-in. COVERAGE_STRICT /
-    # RELEASE: the fixture sits below the threshold on purpose, and whether
-    # that gap fails is not what is under test here.
-    delete local @ENV{qw(PERL5OPT COVERAGE_STRICT RELEASE)};
-
-    my $pid = open3(
-      my $in, my $out, undef,   # no separate stderr handle: merged into $out
-      $^X, '-I' . $dir->child('fakelib'), $dir->child('coverage.t')->stringify,
-    );
-    close $in;
-    $output = do { local $/; <$out> };
-    waitpid $pid, 0;
-    $exit = $? >> 8;
+# --- the gate scores a real Devel::Cover database ---
+SKIP: {
+  # The author (AUTHOR_TESTING) and the release (RELEASE_TESTING) always run
+  # this block: a missing Devel::Cover is a failure there, a skip elsewhere.
+  unless ( eval { require Devel::Cover::DB; 1 } ) {
+    fail 'Devel::Cover::DB is needed under AUTHOR_TESTING / RELEASE_TESTING'
+      if $ENV{AUTHOR_TESTING} || $ENV{RELEASE_TESTING};
+    skip 'Devel::Cover not installed', 21;
   }
 
-  is $exit, 0, 'generated coverage.t survives non-object statement entries'
-    or diag $output;
-  like $output, qr/statement coverage 33\.3%/,
-    'non-object entries count as uncovered statements (1 of 3 covered)';
-}
+  # A suite run under -MDevel::Cover, RELEASE=1 or COVERAGE_STRICT=1 must not
+  # change what the cases below claim.
+  delete local @ENV{qw(PERL5OPT COVERAGE_STRICT RELEASE HARNESS_PERL_SWITCHES)};
 
-# --- the generated script gates on a fresh cover_db and a missing run ---
-#
-# The claim (karr k12): under RELEASE=1 a coverage run that did not happen is a
-# failure, not a skip. A fresh cover_db -- what a plain run under
-# -MDevel::Cover leaves, runs/ and structure/ but no merged database -- must be
-# merged by the test itself and scored; before k12 it ended in skip_all even
-# under RELEASE=1, so the release gate only bit after a manual `cover`. And the
-# per-module diag line must not warn. Real Devel::Cover, nothing stubbed.
-SKIP: {
-  eval { require Devel::Cover::DB; 1 }
-    or skip 'Devel::Cover not installed', 7;
-
-  my $body = coverage_body( tzil_for('') );
-
-  my $dir = Path::Tiny->tempdir;
-  $dir->child('lib')->mkpath;
-  $dir->child('t')->mkpath;
-  $dir->child('lib', 'Cov.pm')->spew_utf8(
-    "package Cov;\nuse strict;\nuse warnings;\nsub a { 1 }\nsub b { 2 }\n1;\n");
-  $dir->child('t', 'coverage.t')->spew_utf8($body);
-  $dir->child('prog.pl')->spew_utf8("use lib 'lib'; use Cov; Cov::a(); Cov::b();\n");
-
+  # One dist directory with a real cover_db/ from a Devel::Cover run of
+  # prog.pl. Besides lib/ it holds files the gate must not score: other/ is
+  # no lib/, and vendor/lib/ only ends in lib/.
   my $cwd = Path::Tiny->cwd;
-  chdir $dir or die $!;
-
-  my $run = sub {
-    my (@cmd) = @_;
-    my $out;
-    my $pid = open3(my $in, my $o, undef, @cmd);
-    close $in;
-    $out = do { local $/; <$o> };
-    waitpid $pid, 0;
-    return ($? >> 8, $out);
+  my $fixture = sub {
+    my ($mods) = @_;
+    my $dir = Path::Tiny->tempdir;
+    $dir->child($_)->mkpath for qw(lib vendor/lib other);
+    $dir->child('lib', "$_.pm")->spew_utf8($mods->{$_}) for keys %$mods;
+    my $dead = "package %s;\nsub a { 1 }\nsub b { 2 }\nsub c { 3 }\n1;\n";
+    $dir->child('vendor', 'lib', 'Vend.pm')->spew_utf8(sprintf $dead, 'Vend');
+    $dir->child('other', 'Foreign.pm')->spew_utf8(sprintf $dead, 'Foreign');
+    $dir->child('prog.pl')->spew_utf8(
+      "use lib 'lib', 'vendor/lib', 'other';\n"
+      . "use Cov; use Vend; use Foreign; Cov::a(); Cov::b();\n"
+      . ( $mods->{Weak} ? "use Weak; Weak::a();\n" : '' ));
+    chdir $dir or die $!;
+    my $pid = open3(my $in, my $out, undef,
+      $^X, '-MDevel::Cover=-silent,1,-db,cover_db', 'prog.pl');
+    close $in; my $o = do { local $/; <$out> }; waitpid $pid, 0;
+    chdir $cwd or die $!;
+    die "fixture run failed: $o" if $?;
+    die 'fixture has no cover_db/runs' unless $dir->child('cover_db', 'runs')->is_dir;
+    return $dir;
+  };
+  my $copy = sub {
+    my ($dir) = @_;
+    my $new = Path::Tiny->tempdir;
+    system('cp', '-a', "$dir/.", "$new") == 0 or die "cp failed";
+    return $new;
   };
 
-  # fresh cover_db made by a real Devel::Cover run, never merged
+  my $cov = "package Cov;\nuse strict;\nuse warnings;\nsub a { 1 }\nsub b { 2 }\n1;\n";
+  my $weak = join '', "package Weak;\nuse strict;\nuse warnings;\n",
+    ( map { "sub $_ { 1 }\n" } 'a' .. 'h' ), "1;\n";
+  my $good_db = $fixture->({ Cov => $cov });
+  my $weak_db = $fixture->({ Cov => $cov, Weak => $weak });
+
+  my $run = sub {
+    my ($tzil, $dir, %env) = @_;
+    $tzil->clear_log_events;
+    local @ENV{ keys %env } = values %env;
+    my $ok = eval { gate_of($tzil)->test("$dir"); 1 };
+    return ( $ok, "$@", join "\n", @{ $tzil->log_messages } );
+  };
+
+  # --- above the threshold: ok, and the success line has the total ---
   {
-    delete local @ENV{qw(PERL5OPT COVERAGE_STRICT RELEASE)};
-    $run->($^X, '-MDevel::Cover=-silent,1,-db,cover_db', 'prog.pl');
+    my $tzil = tzil_for('');
+    my $dir = $copy->($good_db);
+    my ($ok, $err, $log) = $run->($tzil, $dir);
+    ok $ok, 'above the threshold: no exception' or diag $err;
+    like $log, qr/statement coverage 100\.0%/,
+      'the success line names the total, which counts lib/ only';
+    ok scalar(glob "$dir/cover_db/cover.*"), 'the gate merged the runs itself'
+      or diag join ' ', glob "$dir/cover_db/*";
 
-    ok -d 'cover_db/runs', 'fixture: fresh cover_db with runs/';
-    ok !glob('cover_db/cover.*'), 'fixture: no merged database yet';
-
-    local $ENV{RELEASE} = 1;
-    my ($exit, $out) = $run->($^X, 't/coverage.t');
-    is $exit, 0, 'RELEASE=1 on a fresh cover_db: script exits 0'
-      or diag $out;
-    like $out, qr/^(?:not )?ok 1 - statement coverage [\d.]+%/m,
-      'fresh cover_db is merged and scored, not skipped'
-      or diag $out;
-    unlike $out, qr/uninitialized/, 'no uninitialized warning in the diag line';
-
-    # no cover_db at all
-    $dir->child('cover_db')->remove_tree;
-    ($exit, $out) = $run->($^X, 't/coverage.t');
-    isnt $exit, 0, 'RELEASE=1 without any cover_db fails';
-
-    delete local $ENV{RELEASE};
-    ($exit, $out) = $run->($^X, 't/coverage.t');
-    is $exit, 0, 'without RELEASE a missing cover_db still skips';
+    ($ok, $err) = $run->($tzil, $copy->($good_db), RELEASE => 1);
+    ok $ok, 'above the threshold under RELEASE=1: still ok' or diag $err;
   }
-  chdir $cwd or die $!;
+
+  # --- a relative target, as Dist::Zilla passes it ---
+  #
+  # run_tests_in changes into the build directory (a path relative to the
+  # directory it started in) and then calls test() with that same relative
+  # path. The gate has to take the current directory as the build directory,
+  # not resolve the relative target against it a second time.
+  {
+    my $tzil = tzil_for('');
+    my $dir = $copy->($good_db);
+    $tzil->clear_log_events;
+    my $ok = do {
+      my $start = File::pushd::pushd($dir->parent);
+      my $rel   = $dir->basename;
+      my $in    = File::pushd::pushd($rel);
+      local $ENV{RELEASE} = 1;
+      eval { gate_of($tzil)->test($rel); 1 };
+    };
+    ok $ok, 'a relative target with the build directory as cwd: found and scored under RELEASE=1'
+      or diag $@;
+    like join("\n", @{ $tzil->log_messages }), qr/statement coverage 100\.0%/,
+      'a relative target: the lib/ of the build directory is scored';
+  }
+
+  # --- below the threshold ---
+  {
+    my $tzil = tzil_for('');
+    my ($ok, $err, $log) = $run->($tzil, $copy->($weak_db));
+    ok $ok, 'below the threshold: a warning, no exception' or diag $err;
+    like $log, qr/below threshold 80%/, 'the warning says it is below the threshold';
+
+    for my $env (qw(RELEASE COVERAGE_STRICT)) {
+      ($ok, $err) = $run->($tzil, $copy->($weak_db), $env => 1);
+      ok !$ok, "below the threshold under $env=1: fails";
+      like $err, qr/below threshold 80%/, "$env: the failure says so";
+      like $err, qr/lib\/Weak\.pm.*lib\/Cov\.pm/s,
+        "$env: the weakest module is named first";
+    }
+  }
+
+  # --- coverage_threshold lower than the score lets the weak run pass ---
+  {
+    my ($ok, $err) = $run->(tzil_for('coverage_threshold = 10'), $copy->($weak_db),
+      RELEASE => 1);
+    ok $ok, 'threshold 10: the weak run passes even under RELEASE=1' or diag $err;
+  }
+
+  # --- coverage_threshold = 0 switches the gate off ---
+  {
+    my $tzil = tzil_for('coverage_threshold = 0');
+    my $empty = Path::Tiny->tempdir;
+    my ($ok, $err, $log) = $run->($tzil, $empty, RELEASE => 1);
+    ok $ok, 'threshold 0: no exception, not even without cover_db/ under RELEASE=1'
+      or diag $err;
+    like $log, qr/disabled/, 'threshold 0: the log says the gate is off';
+  }
+
+  # --- no cover_db/ ---
+  {
+    my $tzil = tzil_for('');
+    my $empty = Path::Tiny->tempdir;
+    my ($ok, $err, $log) = $run->($tzil, $empty, RELEASE => 1);
+    ok !$ok, 'no cover_db/ under RELEASE=1: fails';
+    like $err, qr/-MDevel::Cover/, 'the failure says how to get a coverage run';
+
+    ($ok, $err, $log) = $run->($tzil, $empty);
+    ok $ok, 'no cover_db/ without RELEASE: no exception' or diag $err;
+    like $log, qr/cover_db/, 'no cover_db/ without RELEASE: a note in the log';
+  }
 }
 
 done_testing;

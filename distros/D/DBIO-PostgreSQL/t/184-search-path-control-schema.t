@@ -37,6 +37,15 @@ is_deeply [ connection_search_path('t', ['age'], {}, ['ag_catalog', 'public'], {
 
 # --- Storage --------------------------------------------------------------
 
+# The storage half declares the extension age, whose class ships with
+# DBIO-PostgreSQL-Age. That dist is built on this one, so a fresh install of
+# this dist runs these tests before Age can be there.
+unless (eval { require DBIO::PostgreSQL::Age::Extension; 1 }) {
+  SKIP: { skip 'DBIO-PostgreSQL-Age not installed (it is built on this dist)', 9 }
+  done_testing;
+  exit 0;
+}
+
 {
   package K142Off::Result::Thing;
   use base 'DBIO::Core';

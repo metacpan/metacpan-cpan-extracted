@@ -71,13 +71,18 @@ misc/agent-context/.claude/skilletor.lock.json
 misc/agent-context/.claude/skills/dbio-adr/SKILL.md
 misc/agent-context/.claude/skills/dbio-codeberg-user-issues/SKILL.md
 misc/agent-context/.claude/skills/dbio-consolidate-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-consolidate-release/references/all-and-recovery.md
 misc/agent-context/.claude/skills/dbio-coordination/SKILL.md
+misc/agent-context/.claude/skills/dbio-coordination/references/direct-execution.md
 misc/agent-context/.claude/skills/dbio-core/SKILL.md
+misc/agent-context/.claude/skills/dbio-core/references/access-broker.md
+misc/agent-context/.claude/skills/dbio-core/references/capabilities.md
 misc/agent-context/.claude/skills/dbio-driver-development/SKILL.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/async-transport.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/deploy-introspect-diff.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/extension-layers.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/live-testing.md
+misc/agent-context/.claude/skills/dbio-driver-development/references/platform-skips.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-class.md
 misc/agent-context/.claude/skills/dbio-driver-development/references/storage-seams.md
 misc/agent-context/.claude/skills/dbio-firebird-database/SKILL.md
@@ -85,6 +90,8 @@ misc/agent-context/.claude/skills/dbio-firebird/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-class-patterns/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-pod/SKILL.md
 misc/agent-context/.claude/skills/dbio-perl-release/SKILL.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/bundle-tests.md
+misc/agent-context/.claude/skills/dbio-perl-release/references/share-skill.md
 misc/agent-context/.claude/skills/dbio-perl-syntax/SKILL.md
 misc/agent-context/.claude/skills/getty-git-commit-style/SKILL.md
 misc/agent-context/.claude/skills/kanban-issues-karr-coordination/SKILL.md
@@ -107,7 +114,6 @@ t/16-introspect-types-live.t
 t/17-deploy-live.t
 t/18-deploy-live-db-location.t
 t/19-deploy-roundtrip-live.t
-t/20-firebird-core.t
 t/21-diff-case-only-live.t
 t/22-broker-live.t
 t/23-statement-cache-ddl-live.t
@@ -156,7 +162,7 @@ t/74-hostbound-dsn.t
 t/75-deploy-broker-coderef.t
 t/77-error-values.t
 t/80-conformance-ddl-live.t
-t/80-conformance-ddl.t
+t/80-conformance.t
 t/81-ddl-conformance-answers.t
 t/82-deploy-class.t
 t/83-introspect-fk-constraint-name.t
@@ -166,9 +172,7 @@ t/86-bool-alias-live.t
 t/87-datetime-default-live.t
 t/88-timezone-types-dbd-live.t
 t/89-conformance-diff-live.t
-t/89-conformance-diff.t
 t/90-conformance-bind-live.t
-t/90-conformance-bind.t
 t/91-deploy-unfillable.t
 t/92-diff-default-removed.t
 t/93-utf8-connection.t
@@ -182,5 +186,4 @@ t/99-diff-column-lossless-live.t
 t/99-diff-column-lossy.t
 t/author-pod-checker.t
 t/release-changes_has_content.t
-t/release-coverage.t
 t/sqlmaker/limit_dialects/first_skip.t

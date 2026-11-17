@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
 use Test::Exception;
 use Scope::Guard ();
 use Try::Tiny;
@@ -156,7 +158,7 @@ SQL
       starts_at => undef,
     },{
       id => 2,
-      starts_at => '2011-03-22',
+      starts_at => '20110322',
     }])
   } 'populate with datetime does not throw';
   ok ( my $row = $schema->resultset('Event')->find(2), 'SQL_DATE bulk insert check' );

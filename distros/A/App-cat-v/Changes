@@ -1,5 +1,12 @@
 Revision history for Perl extension App-cat-v
 
+1.06 2026-11-17T10:31:52Z
+
+    - add fwsp to visualize IDEOGRAPHIC SPACE (U+3000) as MASU MARK
+    - use \x{...} form in escape style for characters above U+00FF
+    - document ansiecho to reproduce -Ence output containing nbsp or fwsp
+    - fix character table in the document
+
 1.05 2025-03-27T13:16:45Z
 
     - use "SHOULDERED OPEN BOX" for NBSP

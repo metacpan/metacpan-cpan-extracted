@@ -159,7 +159,9 @@ my $executor = $storage->_executor;
 # --- the reset ----------------------------------------------------------------
 
 {
-  my $conn = FakeConn->new(reset_err => 'Reset refused geheim-wert-77');
+  # the number of a text that quotes no value (1105, unknown error): the
+  # handle's default 1062 would be a claim that the text is a duplicate entry
+  my $conn = FakeConn->new(number => 1105, reset_err => 'Reset refused geheim-wert-77');
   my $err = failure_of($executor->reset_connection($conn));
   is $err, 'Reset refused geheim-wert-77', 'a reset carries no bound value and is answered as it is';
 }
@@ -193,6 +195,7 @@ my $executor = $storage->_executor;
     pid   => $$,
     queue => [],
     mdb   => FakeConn->new(
+      number      => 1265,
       execute_err => q{Data truncated: payload geheim-nutzlast went wrong},
     ),
   };

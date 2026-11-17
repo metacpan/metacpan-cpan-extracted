@@ -111,7 +111,7 @@ my $ctx     = DBIO::MySQL::EV::TransactionContext->new(
 
 isa_ok $ctx, 'DBIO::MySQL::EV::TransactionContext';
 isa_ok $ctx, 'DBIO::Storage::Async::TransactionContext',
-  'the EV txn context (karr k31: a thin subclass of the core generic one)';
+  'the EV txn context (a thin subclass of the core generic one)';
 
 # The constructor key is core's txn_conn, NOT the pre-k31 private 'mdb'.
 # Core's txn_do_async builds the context with the key _txn_conn_accessor

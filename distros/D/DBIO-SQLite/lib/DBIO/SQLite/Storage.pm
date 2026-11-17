@@ -4,7 +4,7 @@ package DBIO::SQLite::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 use mro 'c3';
@@ -13,7 +13,7 @@ __PACKAGE__->register_driver('SQLite' => __PACKAGE__);
 
 use Context::Preserve 'preserve_context';
 use DBIO::Util qw(file_path iv_size mkpath modver_gt_or_eq os_name sigwarn_silencer);
-use DBIO::SQLite::Util qw(column_is_nullable pk_is_rowid_alias);
+use DBIO::SQLite::Util qw(column_is_nullable libsqlite_version pk_is_rowid_alias);
 use DBIO::SQLite::Extension ();
 use DBIO::Carp;
 use Try::Tiny;
@@ -449,6 +449,13 @@ sub vacuum {
   return $self->_do_query('VACUUM')
     unless defined $into;
 
+  # VACUUM INTO is libsqlite 3.27+; an older one answers it with a bare
+  # 'near "INTO": syntax error'. Say what is missing before any statement.
+  my ($version, $numeric) = libsqlite_version($self->_get_dbh);
+  $self->throw_exception(
+    "VACUUM INTO needs libsqlite 3.27 or newer, this is libsqlite $version"
+  ) if $numeric < 3_027_000;
+
   # The target filename MUST go as a bind parameter, so the emitted SQL is
   # "VACUUM INTO ?" -- never interpolated into the statement text.
   return $self->_do_query([ 'VACUUM INTO ?', undef, $into ]);
@@ -883,7 +890,7 @@ DBIO::SQLite::Storage - SQLite storage driver for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -1127,7 +1134,9 @@ argument this emits a bare C<VACUUM>. Given a target filename it emits
 C<VACUUM INTO ?> (libsqlite 3.27+), writing a fresh, compacted copy of the
 database to C<$file> while leaving the live database untouched; the filename is
 passed as a bind parameter rather than interpolated into the SQL. The target
-file must not already exist.
+file must not already exist. On a libsqlite older than 3.27 the call throws an
+exception naming the required and the present version, before any statement is
+sent; a plain C<vacuum> works on every libsqlite.
 
 C<VACUUM> cannot run inside a transaction; call this outside any active
 transaction.

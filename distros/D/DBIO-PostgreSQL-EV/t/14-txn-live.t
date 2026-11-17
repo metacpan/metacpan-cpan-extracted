@@ -56,7 +56,7 @@ alarm 120;
 sub await_guarded {
   my ($f, $what) = @_;
   return GuardedWait->until_ready(
-    $f, 15, "TIMEOUT awaiting $what (karr k10 regression: txn hung)\n",
+    $f, 15, "TIMEOUT awaiting $what (the transaction hung)\n",
   );
 }
 
@@ -95,7 +95,7 @@ lives_ok {
     }),
     'txn_do_async COMMIT',
   )->get;
-} 'karr k10: txn_do_async COMMIT round-trip completed without hanging';
+} 'txn_do_async COMMIT round-trip completed without hanging';
 ok scalar(@committed), 'COMMIT txn resolved with the coderef result';
 is ref($committed[0]), 'HASH',
   'insert_async inside COMMIT txn resolved with a returned-columns HASHREF (ADR 0031 §3)';
@@ -155,7 +155,7 @@ is scalar(@after_rollback), 0, 'rolled-back write was NOT persisted';
 # --- 5. No "lost a sequence Future" warning on any path --------------------
 
 my @lost = grep { /lost a sequence Future/ } @warnings;
-is scalar(@lost), 0, 'no "lost a sequence Future" warning emitted (karr k10)'
+is scalar(@lost), 0, 'no "lost a sequence Future" warning emitted'
   or diag "Unexpected lost-future warnings:\n@lost";
 
 # --- cleanup ---------------------------------------------------------------

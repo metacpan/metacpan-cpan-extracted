@@ -4,7 +4,7 @@ package DBIO::Storage::DBI::DataTypeClassifier;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage';
 use mro 'c3';
@@ -107,7 +107,7 @@ DBIO::Storage::DBI::DataTypeClassifier - Native data type and LOB classification
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

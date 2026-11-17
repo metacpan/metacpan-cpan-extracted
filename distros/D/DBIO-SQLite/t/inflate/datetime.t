@@ -20,7 +20,7 @@ isa_ok($event->starts_at, 'DateTime', 'DateTime returned');
 
 # klunky, but makes older Test::More installs happy
 my $starts = $event->starts_at;
-is("$starts", '2006-04-25T22:24:33', 'Correct date/time');
+is("$starts", '2006-04-25T12:00:00', 'date column carries the day, read at noon');
 
 my $dt_warn_re = qr/DateTime objects.+not supported properly/;
 
@@ -86,7 +86,7 @@ is("$created_cron", '2006-06-23T00:00:00', 'Correct date/time');
 
 ## varchar field using inflate_date => 1
 my $varchar_date = $event->varchar_date;
-is("$varchar_date", '2006-07-23T00:00:00', 'Correct date/time');
+is("$varchar_date", '2006-07-23T12:00:00', 'inflate_date reads the day at noon');
 
 ## varchar field using inflate_datetime => 1
 my $varchar_datetime = $event->varchar_datetime;

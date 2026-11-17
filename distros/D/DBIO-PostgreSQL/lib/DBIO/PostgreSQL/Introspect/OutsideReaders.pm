@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Introspect::OutsideReaders;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::PostgreSQL::Introspect ();
 
@@ -73,7 +73,7 @@ DBIO::PostgreSQL::Introspect::OutsideReaders - Introspect the views outside the 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::MySQL::EV::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::PoolBase';
 
@@ -183,7 +183,19 @@ sub _mysql_new_handle {
   }
   Scalar::Util::weaken($weak_mdb = $mdb) if defined $mdb;
   return $mdb unless defined $died;
-  die DBIO::Util::mask_connect_secrets($died, [ undef, $args{user}, $args{password} ]);
+  my $text = DBIO::Util::mask_connect_secrets($died, [ undef, $args{user}, $args{password} ]);
+  # EV::MariaDB 0.09 throws from new when the connect cannot even be started
+  # (a socket it cannot open); older ones called on_error. With an on_error
+  # the throw is treated the same way: its masked text goes to the callback,
+  # and the handle returned is an inert one (no host, no user: no connect) the
+  # caller's readiness wiring can hold, already failed.
+  if (my $on_error = $args{on_error}) {
+    my $inert = EV::MariaDB->new;
+    Scalar::Util::weaken($weak_mdb = $inert);
+    $on_error->($text);
+    return $inert;
+  }
+  die $text;
 }
 
 
@@ -282,7 +294,7 @@ DBIO::MySQL::EV::Pool - EV::MariaDB connection pool for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

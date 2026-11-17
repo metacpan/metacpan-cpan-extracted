@@ -1,7 +1,7 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900004';
+requires 'DBIO', '0.900007';
 
-# Loaded at compile time by DBIO::MSSQL::Storage itself (karr k26). Three of the
+# Loaded at compile time by DBIO::MSSQL::Storage itself. Three of the
 # four are also dependencies of DBIO core today and arrive through its chain in
 # practice -- that is a coincidence of the current core cpanfile, not a contract,
 # so this dist declares what it loads. The floors are core's own floors for the
@@ -25,12 +25,12 @@ recommends 'DBD::ODBC';
 # needs this; the default ODBC path does not. Keep it optional so ODBC-only
 # users are not forced to build DBD::Sybase. DBD::Sybase itself is a hard
 # requirement of DBIO::Sybase and is not repeated here.
-recommends 'DBIO::Sybase', '0.900004';
+recommends 'DBIO::Sybase', '0.900007';
 
 on test => sub {
   requires 'Test::More', '0.98';
-  requires 'Test::Exception';   # t/10, t/11, t/20, t/21, t/30, t/42, t/54, t/55, t/59, t/60, t/62, t/63, t/64, t/65
-  requires 'Test::Warn';        # t/11, t/21
+  requires 'Test::Exception';   # t/10, t/11, t/30, t/42, t/54, t/55, t/59, t/60, t/62, t/63, t/64, t/65
+  requires 'Test::Warn';        # t/11
 
   # t/31-datetime-format.t drives both DateTime format classes through a real
   # parse/format round-trip and asserts on DateTime objects:
@@ -40,6 +40,6 @@ on test => sub {
   requires 'DateTime';
   requires 'DateTime::Format::Strptime';
 
-  # Try::Tiny (t/11, t/21, t/30) and Scope::Guard (t/30) are runtime
+  # Try::Tiny (t/11, t/30) and Scope::Guard (t/30) are runtime
   # requirements above and are not repeated here.
 };

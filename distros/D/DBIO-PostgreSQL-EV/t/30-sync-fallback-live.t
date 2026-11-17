@@ -107,10 +107,18 @@ sub sync_call {
   return (0, $@);
 }
 
-$h = DBIO::PostgreSQL::EV::TestHarness->new(
-  schema_class  => 'DBIO::PostgreSQL::EV::SyncFallbackLive::Schema',
-  connect_attrs => { pool_size => 3 },
-);
+# lc_messages 'C': the test reads the server's English wording (PostgreSQL
+# reports in the language of the session's lc_messages, which
+# DBIO_TEST_SERVER_LANGUAGE sets for the suite). It is the libpq startup option
+# in the DSN, not an on_connect_do: the replay of that is a state of the pool
+# this file measures (the blocking calls refused while connections open).
+{
+  local $ENV{DBIO_TEST_PG_DSN} = $ENV{DBIO_TEST_PG_DSN} . q{;options='-c lc_messages=C'};
+  $h = DBIO::PostgreSQL::EV::TestHarness->new(
+    schema_class  => 'DBIO::PostgreSQL::EV::SyncFallbackLive::Schema',
+    connect_attrs => { pool_size => 3 },
+  );
+}
 
 my $async  = $h->async;
 my $schema = $h->schema;

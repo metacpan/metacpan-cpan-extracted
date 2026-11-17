@@ -2,7 +2,7 @@
 
 use strict;
 no warnings;
-use Test::More $] < 5.008 ? (tests => 39) : (tests => 724);
+use Test::More $] < 5.008 ? (tests => 39) : (tests => 730);
 
 use Cpanel::JSON::XS;
 
@@ -203,4 +203,32 @@ is_deeply( [ Cpanel::JSON::XS->new->allow_nonref->incr_parse('1 ') ], [1] );
     eval { my @v = Cpanel::JSON::XS->new->utf8->incr_parse($text) };
     like( $@, qr/malformed UTF-8/, "Catch malformed UTF-8" );
     is_deeply( [ Cpanel::JSON::XS->new->utf8->incr_parse(qq(["\xc3\xa9"] [1])) ], [ ["\x{e9}"], [1] ] );
+}
+
+# wide characters make the downgrade croak: the incr state must stay consistent
+{
+  my $dec = Cpanel::JSON::XS->new->utf8->allow_nonref;
+  eval { $dec->incr_parse("[1] ") };
+  eval { $dec->incr_parse("[1]\x{feff}[2]") };
+  eval { $dec->incr_skip };
+  ok( 1, "incr_skip after a failed downgrade does not corrupt the buffer" );
+}
+
+# a NUL byte between values must not stall the parser
+{
+  my $dec = Cpanel::JSON::XS->new;
+  my @v = $dec->incr_parse("[1]\x00[2]");
+  is( scalar @v, 1, "complete value before a NUL byte is returned" );
+  my $x = eval { $dec->incr_parse("[3]") };
+  like( $@, qr/unexpected NUL byte/, "NUL byte in incr_parse is an error" );
+  $dec->incr_skip;
+  is( $dec->incr_text, "[2][3]", "incr_skip drops the NUL byte" );
+  is( scalar(() = Cpanel::JSON::XS->new->incr_parse("[1]")), 1, "no NUL, no error" );
+}
+
+# allow_barekey: the incr scanner ends the value earlier than the decoder
+{
+  my $dec = Cpanel::JSON::XS->new->allow_barekey;
+  my @v = eval { $dec->incr_parse("\x7b\x5d\x22\x3a\x22\x23\x22\x7d") };
+  is( scalar @v, 1, "allow_barekey incr_parse does not underflow incr_pos" );
 }

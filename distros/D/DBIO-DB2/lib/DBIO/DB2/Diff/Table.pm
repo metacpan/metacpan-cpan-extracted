@@ -4,7 +4,7 @@ package DBIO::DB2::Diff::Table;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -163,7 +163,7 @@ DBIO::DB2::Diff::Table - Diff operations for DB2 tables
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

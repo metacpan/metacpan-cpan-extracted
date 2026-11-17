@@ -64,7 +64,7 @@ use DBIO Schema => -ch;
 - **Transport is the MySQL wire protocol.** ClickHouse speaks the MySQL wire
   protocol on server port **9004**. There is no native `DBD::ClickHouse` on
   CPAN, so the driver rides `DBD::mysql` (standard, verified live against a
-  stock server — karr k15) or `DBD::MariaDB` (supported, needs a server-side
+  stock server) or `DBD::MariaDB` (supported, needs a server-side
   prefix). See `docs/adr/0001-mysql-wire-protocol-transport.md`.
 - **No DSN-based driver detection — the consequence of the transport choice.**
   A ClickHouse MySQL-wire DSN is `dbi:MariaDB:...` (or `dbi:mysql:...`), which
@@ -83,9 +83,7 @@ use DBIO Schema => -ch;
   documented `__PACKAGE__->register_access_path_dbd('mysql', 'MariaDB')`, so a
   `dbi:Pg:` DSN is still reported by core. Not `_adapt_to_access_path` (would
   need the `@ISA` ADR 0002 refuses), not `register_driver('mysql')`, not
-  `driver_warnings(0)`, and no override of core's private check method (the
-  first solution, replaced — karr k38). ADR 0001, addenda 2026-10-07 and
-  2026-10-14; pinned by `t/07-transport-dbd.t` and `t/07-transport-dbd-live.t`.
+  `driver_warnings(0)`, and no override of core's private check method. ADR 0001; pinned by `t/07-transport-dbd.t` and `t/07-transport-dbd-live.t`.
 - **Standalone dist, not a MySQL subclass.** ClickHouse shares only the wire
   protocol with MySQL, none of the semantics. Making it a MariaDB-style storage
   subclass inside dbio-mysql would inherit a lying API (transactions, FKs,

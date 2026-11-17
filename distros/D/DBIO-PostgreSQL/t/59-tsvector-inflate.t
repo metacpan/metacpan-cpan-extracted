@@ -75,7 +75,7 @@ ok( TSVI::Result::Doc->column_info('search')->{_inflate_info},
   'tsvector column carries _inflate_info' );
 
 ok( TSVI::Result::Doc->column_info('padded')->{_inflate_info},
-  'a padded " tsvector " data_type is still recognised (karr k61)' );
+  'a padded " tsvector " data_type is still recognised' );
 
 ok( !TSVI::Result::Doc->column_info('plain')->{_inflate_info},
   'plain text column is untouched (zero change)' );

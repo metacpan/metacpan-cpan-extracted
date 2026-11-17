@@ -4,7 +4,7 @@ package DBIO::SQLite::Extension::FTS5;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::SQLite::Extension::VirtualTable';
 
@@ -26,7 +26,7 @@ DBIO::SQLite::Extension::FTS5 - The extension class of SQLite's FTS5 full-text m
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

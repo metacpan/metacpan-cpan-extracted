@@ -1,6 +1,9 @@
 use strict;
 use warnings;
+use utf8;
 use Test::More;
+
+binmode(Test::More->builder->$_, ':utf8') for qw(output failure_output todo_output);
 
 # OFFLINE test: the values in the text of a server's error.
 #
@@ -323,5 +326,237 @@ is DBIO::PostgreSQL::Util::mask_detail_values('Token "x" is invalid.'),
   'Token "***" is invalid.', 'a bare detail: json token';
 is DBIO::PostgreSQL::Util::mask_detail_values(undef), undef, 'undef stays undef';
 is DBIO::PostgreSQL::Util::mask_error_details(undef), undef, '... for the message too';
+
+# --- a server that does not speak English -------------------------------------
+# WHY: PostgreSQL words its messages by lc_messages. The rules above know the
+# English sentences only, so a short bound value (core masks four characters
+# and more) or a value the server quotes stood in a German or French text as
+# it was. What holds in every language is the SQLSTATE (class 22: the value of
+# a cast; class 23: the key or the row in DETAIL), the marks a language quotes
+# a value in and the "(cols)=(value)" form of a key. The texts are measured
+# (PostgreSQL 18, lc_messages de_DE.UTF-8 and fr_FR.UTF-8); NBSP is U+00A0.
+# Without the state the rules are the ones above, English only.
+my $nb = "\x{A0}";
+my $ctx_de = qq|KONTEXT:  JSON-Daten, Zeile 1: {"a":qq...\n|;
+my @foreign = (
+  [ 'de: unique key, short value', '23505',
+    qq|FEHLER:  doppelter Schlüsselwert verletzt Unique-Constraint »pr_name_key«\nDETAIL:  Schlüssel »(name)=(ab)« existiert bereits.\n|,
+    qq|FEHLER:  doppelter Schlüsselwert verletzt Unique-Constraint »pr_name_key«\nDETAIL:  Schlüssel »(name)=(***)« existiert bereits.\n|,
+    ['ab'] ],
+  [ 'fr: unique key, short value, NBSP inside the marks', '23505',
+    qq|ERREUR:  la valeur d'une clé dupliquée rompt la contrainte unique « pr_name_key »\nDETAIL:  La clé «${nb}(name)=(ab)${nb}» existe déjà.\n|,
+    qq|ERREUR:  la valeur d'une clé dupliquée rompt la contrainte unique « pr_name_key »\nDETAIL:  La clé «${nb}(name)=(***)${nb}» existe déjà.\n|,
+    ['ab'] ],
+  [ 'fr: unique key, two columns, plain blanks', '23505',
+    qq|ERREUR:  x\nDETAIL:  La clé « (a, b)=(1, geheim) » existe déjà.\n|,
+    qq|ERREUR:  x\nDETAIL:  La clé « (a, b)=(***) » existe déjà.\n|,
+    ['geheim'] ],
+  [ 'de: integer syntax, the statement excerpt stays', '22P02',
+    qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »xy«\nZEILE 1: INSERT INTO pr(id,n) VALUES (3,'xy')\n                                       ^\n|,
+    qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »***«\nZEILE 1: INSERT INTO pr(id,n) VALUES (3,'xy')\n                                       ^\n|,
+    [q{»xy«}] ],
+  [ 'fr: integer syntax, NBSP before the colon and inside the marks', '22P02',
+    qq|ERREUR:  syntaxe en entrée invalide pour le type integer${nb}: «${nb}xy${nb}»\n|,
+    qq|ERREUR:  syntaxe en entrée invalide pour le type integer${nb}: «${nb}***${nb}»\n|,
+    ['xy'] ],
+  [ 'fr: integer syntax, narrow NBSP U+202F', '22P02',
+    "ERREUR:  syntaxe en entr\x{E9}e invalide pour le type integer\x{202F}: \x{AB}\x{202F}xy\x{202F}\x{BB}\n",
+    "ERREUR:  syntaxe en entr\x{E9}e invalide pour le type integer\x{202F}: \x{AB}\x{202F}***\x{202F}\x{BB}\n",
+    ['xy'] ],
+  [ 'de: a value with a mark in it is masked whole', '22P02',
+    qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »a«b»c«\n|,
+    qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »***«\n|,
+    ['a«b', 'b»c'] ],
+  [ 'de: two quoted pieces, one span', '22007',
+    qq|FEHLER:  ungültiger Wert »gehe« für »YYYY«\n|,
+    qq|FEHLER:  ungültiger Wert »***«\n|,
+    ['gehe'] ],
+  [ 'a message with no mark: after the last colon', '22P02',
+    qq|FEHLER:  Eingabewert ungültig: geheim42\n|,
+    qq|FEHLER:  Eingabewert ungültig: ***\n|,
+    ['geheim42'] ],
+  [ 'no mark and no colon: nothing to find, the message stays', '22001',
+    qq|FEHLER:  Wert zu lang für Typ character varying(5)\n|,
+    qq|FEHLER:  Wert zu lang für Typ character varying(5)\n|,
+    [] ],
+  [ 'de: NOT NULL, failing row', '23502',
+    qq|FEHLER:  NULL-Wert in Spalte »n« von Relation »pr« verletzt Not-Null-Constraint\nDETAIL:  Fehlgeschlagene Zeile enthält (4, null, null, null, null).\n|,
+    qq|FEHLER:  NULL-Wert in Spalte »n« von Relation »pr« verletzt Not-Null-Constraint\nDETAIL:  Fehlgeschlagene Zeile enthält (***).\n|,
+    ['4, null'] ],
+  [ 'fr: CHECK, failing row', '23514',
+    qq|ERREUR:  la nouvelle ligne de la relation « pr » viole la contrainte de vérification « pr_c_check »\nDETAIL:  La ligne en échec contient (5, null, 1, -7, null).\n|,
+    qq|ERREUR:  la nouvelle ligne de la relation « pr » viole la contrainte de vérification « pr_c_check »\nDETAIL:  La ligne en échec contient (***).\n|,
+    ['-7'] ],
+  [ 'de: foreign key, key not present', '23503',
+    qq|FEHLER:  Einfügen oder Aktualisieren in Tabelle »pf« verletzt Fremdschlüssel-Constraint »pf_x_fkey«\nDETAIL:  Schlüssel (x)=(99) ist nicht in Tabelle »pr« vorhanden.\n|,
+    qq|FEHLER:  Einfügen oder Aktualisieren in Tabelle »pf« verletzt Fremdschlüssel-Constraint »pf_x_fkey«\nDETAIL:  Schlüssel (x)=(***) ist nicht in Tabelle »pr« vorhanden.\n|,
+    ['99'] ],
+  [ 'fr: foreign key, key still referenced, a label with a blank before the colon', '23503',
+    qq|ERREUR:  UPDATE ou DELETE sur la table « pr » viole la contrainte de clé étrangère « pf_x_fkey » de la table « pf »\nDÉTAIL :  La clé (id)=(1) est toujours référencée à partir de la table « pf ».\n|,
+    qq|ERREUR:  UPDATE ou DELETE sur la table « pr » viole la contrainte de clé étrangère « pf_x_fkey » de la table « pf »\nDÉTAIL :  La clé (id)=(***) est toujours référencée à partir de la table « pf ».\n|,
+    ['(id)=(1)'] ],
+  [ 'fr: foreign key, the message wraps inside its text', '23503',
+    qq|ERREUR:  une instruction insert ou update sur la table « pf » viole la contrainte de clé\nétrangère « pf_x_fkey »\nDETAIL:  La clé (x)=(99) n'est pas présente dans la table « pr ».\n|,
+    qq|ERREUR:  une instruction insert ou update sur la table « pf » viole la contrainte de clé\nétrangère « pf_x_fkey »\nDETAIL:  La clé (x)=(***) n'est pas présente dans la table « pr ».\n|,
+    ['99'] ],
+  [ 'de: an expression in the column list', '23505',
+    qq|FEHLER:  x\nDETAIL:  Schlüssel »(lower(name))=(geheim)« existiert bereits.\n|,
+    qq|FEHLER:  x\nDETAIL:  Schlüssel »(lower(name))=(***)« existiert bereits.\n|,
+    ['geheim'] ],
+  [ 'de: columns that cannot be read: the key text is masked whole', '23505',
+    qq|FEHLER:  x\nDETAIL:  Schlüssel »("a=b")=(geheim)« existiert bereits.\n|,
+    qq|FEHLER:  x\nDETAIL:  Schlüssel »***« existiert bereits.\n|,
+    ['geheim', 'a=b'] ],
+  [ 'de: json token and the translated context', '22P02',
+    qq|FEHLER:  ungültige Eingabesyntax für Typ json\nZEILE 1: INSERT INTO pr(id,j) VALUES (6,'{"a":qq}')\n                                       ^\nDETAIL:  Token »qq« ist ungültig.\n$ctx_de|,
+    qq|FEHLER:  ungültige Eingabesyntax für Typ json\nZEILE 1: INSERT INTO pr(id,j) VALUES (6,'{"a":qq}')\n                                       ^\nDETAIL:  Token »***« ist ungültig.\nKONTEXT:  JSON-Daten, Zeile 1: ***\n|,
+    ['qq...', '»qq«'] ],
+  [ 'fr: json token left in English by the server, translated context', '22P02',
+    qq|ERREUR:  syntaxe en entrée invalide pour le type json\nDETAIL:  Token "qq" is invalid.\nCONTEXT:  données JSON, ligne 1 : {"a":qq...\n|,
+    qq|ERREUR:  syntaxe en entrée invalide pour le type json\nDETAIL:  Token "***" is invalid.\nCONTEXT:  données JSON, ligne 1 : ***\n|,
+    ['qq'] ],
+  [ 'fr: a detail and a context under labels of their own', '22P02',
+    qq|ERREUR:  x\nDÉTAIL :  Le jeton « qq » est invalide.\nCONTEXTE :  données JSON, ligne 1 : {"a":qq...\n|,
+    qq|ERREUR:  x\nDÉTAIL :  Le jeton « *** » est invalide.\nCONTEXTE :  données JSON, ligne 1 : ***\n|,
+    ['qq'] ],
+  [ 'de: the parameter of the portal, under a label of its own', '22P02',
+    qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »xy«\nKONTEXT:  unbenanntes Portal mit Parametern: \$1 = 'xy'\n|,
+    qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »***«\nKONTEXT:  unbenanntes Portal mit Parametern: \$1 = '***'\n|,
+    [q{'xy'}] ],
+  [ 'de: a detail with a bracket that cannot be told from the value: the detail goes', '22P02',
+    qq|FEHLER:  x\nDETAIL:  Wert »a« (b\n|,
+    qq|FEHLER:  x\nDETAIL:  ***\n|,
+    ['Wert', '»a«'] ],
+  [ 'de: a detail with a mark left over: the detail goes', '22P02',
+    qq|FEHLER:  x\nDETAIL:  Zeichen " und »a« sind ungültig.\n|,
+    qq|FEHLER:  x\nDETAIL:  ***\n|,
+    ['»a«'] ],
+  [ 'the prefix and the place DBI adds stay outside', '22P02',
+    qq|DBD::Pg::st execute failed: FEHLER:  ungültige Eingabesyntax für Typ integer: »xy« at /lib/x.pm line 12.\n|,
+    qq|DBD::Pg::st execute failed: FEHLER:  ungültige Eingabesyntax für Typ integer: »***« at /lib/x.pm line 12.\n|,
+    ['xy'] ],
+  [ 'the English form is read by its rule, the extra stage leaves it alone', '23503',
+    qq|ERROR:  insert or update on table "pf" violates foreign key constraint "pf_x_fkey"\nDETAIL:  Key (x)=(99) is not present in table "pr".\n|,
+    qq|ERROR:  insert or update on table "pf" violates foreign key constraint "pf_x_fkey"\nDETAIL:  Key (x)=(***) is not present in table "pr".\n|,
+    ['99'] ],
+);
+
+for my $case (@foreign) {
+  my ($name, $state, $in, $want, $markers) = @$case;
+  my $got = DBIO::PostgreSQL::Util::mask_error_details($in, $state);
+  is $got, $want, "$state: $name";
+  for my $m (@$markers) {
+    ok index($got, $m) < 0, "... '$m' is nowhere in the message" or diag $got;
+  }
+  is DBIO::PostgreSQL::Util::mask_error_details($got, $state), $got,
+    '... masking the masked text changes nothing';
+}
+
+# the bytes of an invalid or untranslatable character sequence are in no
+# language in the message (22021, 22P05); the name of the encoding stays
+{
+  my @bytes = (
+    [ 'de 22021', '22021',
+      qq|FEHLER:  ungültige Byte-Sequenz für Kodierung »UTF8«: 0xc3 0x28|,
+      qq|FEHLER:  ungültige Byte-Sequenz für Kodierung »UTF8«: ***| ],
+    [ 'de 22P05', '22P05',
+      qq|FEHLER:  Zeichen mit Byte-Folge 0xe2 0x82 0xac in Kodierung »UTF8« hat keine Entsprechung in Kodierung »LATIN1«|,
+      qq|FEHLER:  Zeichen mit Byte-Folge *** in Kodierung »UTF8« hat keine Entsprechung in Kodierung »LATIN1«| ],
+    [ 'fr 22021', '22021',
+      qq|ERREUR:  séquence d'octets invalide pour l'encodage « UTF8 » : 0xc3 0x28|,
+      qq|ERREUR:  séquence d'octets invalide pour l'encodage « UTF8 » : ***| ],
+    [ 'fr 22P05', '22P05',
+      qq|ERREUR:  le caractère dont la séquence d'octets est 0xE2 0x82 0xAC dans l'encodage « UTF8 » n'a pas\nd'équivalent dans l'encodage « LATIN1 »|,
+      qq|ERREUR:  le caractère dont la séquence d'octets est *** dans l'encodage « UTF8 » n'a pas\nd'équivalent dans l'encodage « LATIN1 »| ],
+  );
+  for my $c (@bytes) {
+    my ($name, $state, $in, $want) = @$c;
+    my $got = DBIO::PostgreSQL::Util::mask_error_details($in, $state);
+    is $got, $want, "bytes: $name: the bytes are gone, the encoding stays";
+    unlike $got, qr/0x[0-9a-f]{2}/i, '... no byte in the message';
+    utf8::encode(my $b_in = $in);
+    utf8::encode(my $b_want = $want);
+    is DBIO::PostgreSQL::Util::mask_error_details($b_in, $state), $b_want,
+      '... the same for the text as UTF-8 bytes';
+  }
+}
+
+# a text that arrives as UTF-8 bytes is masked as characters: the same result
+# as the string, as bytes, and no byte of a cut character left over
+{
+  for my $pad ("\x{A0}", "\x{202F}", '') {
+    my $chars = qq|ERREUR:  syntaxe en entrée invalide pour le type integer : «${pad}geheim42${pad}»|;
+    my $want  = qq|ERREUR:  syntaxe en entrée invalide pour le type integer : «${pad}***${pad}»|;
+    my $label = $pad eq '' ? 'no padding' : sprintf 'U+%04X inside the marks', ord $pad;
+    is DBIO::PostgreSQL::Util::mask_error_details($chars, '22P02'), $want, "fr, characters: $label";
+    utf8::encode(my $bytes = $chars);
+    my $got = DBIO::PostgreSQL::Util::mask_error_details($bytes, '22P02');
+    utf8::encode(my $want_bytes = $want);
+    is $got, $want_bytes, "... as UTF-8 bytes the same, as bytes";
+    ok utf8::decode(my $round = $got), '... valid UTF-8, no orphaned byte';
+    ok index($got, 'geheim42') < 0, '... geheim42 is gone';
+  }
+  my $detail = "Schlüssel »(name)=(ab)« existiert bereits.";
+  utf8::encode(my $b = $detail);
+  utf8::encode(my $b_want = 'Schlüssel »(name)=(***)« existiert bereits.');
+  is DBIO::PostgreSQL::Util::mask_detail_values($b, '23505'), $b_want,
+    'the bare detail as UTF-8 bytes';
+}
+
+# the detail on its own (the field of the exception), bare and with the state
+is DBIO::PostgreSQL::Util::mask_detail_values('Schlüssel »(name)=(ab)« existiert bereits.', '23505'),
+  'Schlüssel »(name)=(***)« existiert bereits.', 'a bare German detail with its state';
+is DBIO::PostgreSQL::Util::mask_detail_values('La clé « (name)=(ab) » existe déjà.', '23505'),
+  'La clé « (name)=(***) » existe déjà.', 'a bare French detail with its state';
+
+# without the state the English rules are all there is, as before; and a state
+# outside of the classes whose text holds a value leaves the text alone
+{
+  my $de = qq|FEHLER:  ungültige Eingabesyntax für Typ integer: »xy«\nDETAIL:  Schlüssel »(name)=(ab)« existiert bereits.\n|;
+  is DBIO::PostgreSQL::Util::mask_error_details($de), $de, 'no state: the foreign text is returned as it is';
+  is DBIO::PostgreSQL::Util::mask_error_details($de, ''), $de, '... an empty state is none';
+  is DBIO::PostgreSQL::Util::mask_error_details($de, '42P01'), $de, '... a state of another class does not reach for the marks';
+  is DBIO::PostgreSQL::Util::mask_detail_values('Schlüssel »(name)=(ab)« existiert bereits.'),
+    'Schlüssel »(name)=(ab)« existiert bereits.', '... the bare detail too';
+
+  my $en = qq|ERROR:  relation "users" does not exist\nDETAIL:  Key (id)=(5) is not present in table "users".\nCONTEXT:  PL/pgSQL function f() line 3 at RAISE\n|;
+  my $en_want = qq|ERROR:  relation "users" does not exist\nDETAIL:  Key (id)=(***) is not present in table "users".\nCONTEXT:  PL/pgSQL function f() line 3 at RAISE\n|;
+  is DBIO::PostgreSQL::Util::mask_error_details($en), $en_want, 'English, no state';
+  is DBIO::PostgreSQL::Util::mask_error_details($en, '23503'), $en_want,
+    '... the same with a state: the table stays, the line of the function stays';
+  # a sentence of the English server that holds no value and that no rule knows
+  # is not a sentence of another language: its quotes and colons stay
+  my $array = qq|ERROR:  malformed array literal: "abc"\nDETAIL:  Array value must start with "{" or dimension information.\n|;
+  is DBIO::PostgreSQL::Util::mask_error_details($array, '22P02'),
+    qq|ERROR:  malformed array literal: "***"\nDETAIL:  Array value must start with "{" or dimension information.\n|,
+    'English with a state: an unknown English detail is not read as a foreign one';
+  my $regex = qq|DBD::Pg::st execute failed: ERROR:  invalid regular expression: parentheses () not balanced\n|;
+  is DBIO::PostgreSQL::Util::mask_error_details($regex, '2201B'), $regex,
+    '... nor an unknown English primary text';
+  my $hint = qq|ERROR:  date/time field value out of range: "31337-99-99"\nHINT:  Perhaps you need a different "DateStyle" setting.\n|;
+  is DBIO::PostgreSQL::Util::mask_error_details($hint, '22008'),
+    qq|ERROR:  date/time field value out of range: "***"\nHINT:  Perhaps you need a different "DateStyle" setting.\n|,
+    'English with a state: the hint is not touched';
+}
+
+# the state of a handle
+{
+  package StateHandle;
+  sub new { my ($c, %a) = @_; bless {%a}, $c }
+  sub state { $_[0]{state} }
+  sub pg_error_field { $_[0]{field} }
+  package main;
+
+  my $err = DBIO::PostgreSQL::Util::error_sqlstate(StateHandle->new(state => '23505'));
+  is $err, '23505', 'error_sqlstate: the state of the handle';
+  is DBIO::PostgreSQL::Util::error_sqlstate(StateHandle->new(state => '', field => '22P02')), '22P02',
+    '... the field the driver reports where the state is empty';
+  is DBIO::PostgreSQL::Util::error_sqlstate(StateHandle->new(state => '00000')), undef, '... 00000 is no error';
+  is DBIO::PostgreSQL::Util::error_sqlstate(StateHandle->new(state => '')), undef, '... empty is none';
+  is DBIO::PostgreSQL::Util::error_sqlstate(StateHandle->new(Type => 'st', Database => StateHandle->new(state => '23503'))),
+    '23503', '... a statement handle is read at its database handle';
+  is DBIO::PostgreSQL::Util::error_sqlstate(undef), undef, '... undef is none';
+  is DBIO::PostgreSQL::Util::error_sqlstate('23505'), undef, '... a string is no handle';
+}
 
 done_testing;

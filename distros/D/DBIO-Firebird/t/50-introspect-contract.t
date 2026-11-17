@@ -101,7 +101,7 @@ my $book_info = $fixture->table_columns_info('BOOK');
 is($book_info->{ID}{data_type}, 'integer', 'BOOK.ID data_type');
 is($book_info->{ID}{is_nullable}, 0, 'BOOK.ID not nullable (PK, not_null)');
 is($book_info->{TITLE}{is_nullable}, 1, 'BOOK.TITLE nullable');
-is($book_info->{ID}{is_auto_increment}, 1, 'BOOK.ID is_auto_increment reaches the contract (karr k46)');
+is($book_info->{ID}{is_auto_increment}, 1, 'BOOK.ID is_auto_increment reaches the contract');
 ok(!exists $fixture->table_columns_info('AUTHOR')->{ID}{is_auto_increment},
   'a column whose model has no flag carries none');
 is($book_info->{NAME}{size}, undef, 'BOOK has no NAME column');

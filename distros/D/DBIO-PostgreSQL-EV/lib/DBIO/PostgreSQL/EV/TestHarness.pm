@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::EV::TestHarness;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::AsyncHarness';
 
@@ -56,7 +56,7 @@ DBIO::PostgreSQL::EV::TestHarness - Reusable live-PostgreSQL harness for EV asyn
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -4,7 +4,7 @@ package DBIO::SQLite::Introspect;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Introspect::Base';
 
@@ -66,7 +66,7 @@ DBIO::SQLite::Introspect - Introspect a SQLite database via sqlite_master and PR
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

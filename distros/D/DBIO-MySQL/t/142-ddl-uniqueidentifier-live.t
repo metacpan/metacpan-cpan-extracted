@@ -2,13 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 
-# LIVE half of karr k115 (t/141 has the offline half and the reasoning): the
+# LIVE half of karr k115 (subtest ddl-uniqueidentifier of t/114-ddl-declarations.t has the offline half and the reasoning): the
 # shared test schema of core, with its uniqueidentifier columns (ArtistGUID),
 # deploys on the server, the GUID columns come back as varchar(36), and the
 # next diff has nothing left.
 #
 # Gated like the other live tests: needs DBIO_TEST_MYSQL_DSN, _USER and _PASS.
-# Works in a database of its own, created and dropped here (see t/138).
+# Works in a database of its own, created and dropped here (see subtest ddl-auto-increment-key-in-create-table of t/109-auto-increment-key-in-create-table-live.t).
 
 my ($dsn, $user, $pass) = @ENV{ map { "DBIO_TEST_MYSQL_${_}" } qw/DSN USER PASS/ };
 

@@ -42,6 +42,10 @@ LiveServer->require_server;
 
 my @db = PrivatePgDatabase->create('t149');
 my $h  = LiveServer->control_dbh(login => \@db, attrs => { PrintWarn => 0 });
+# PostgreSQL reports in the language of lc_messages; the test matches the
+# server's English words (other objects depend on it), so its session is set
+# to 'C'
+$h->do(q{SET lc_messages = 'C'});
 
 $h->do('CREATE EXTENSION postgis');
 $h->do('CREATE EXTENSION postgis_topology');

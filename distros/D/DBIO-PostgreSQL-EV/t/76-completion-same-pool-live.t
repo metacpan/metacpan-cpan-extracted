@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE, karr k88 (1): what ends pooled work hands its connection back to the
 # pool the connection was acquired from -- against a real EV::Pg and a real
@@ -166,7 +167,9 @@ sub loaded { $observer->selectcol_arrayref("SELECT name FROM $TABLE ORDER BY nam
 # the backend of that connection.
 sub warm {
   my ($label) = @_;
-  my $h    = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 2 });
+  # lc_messages 'C': the test reads the server's English wording (the language
+  # of a message is the session's lc_messages, DBIO_TEST_SERVER_LANGUAGE sets it).
+  my $h    = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 2, on_connect_do => [ q{SET lc_messages = 'C'} ] });
   my $warm = drive($h->async->select_async(@PID));
   die "$label: warming the pool failed: " . outcome($warm) unless $warm->is_done;
   settle();

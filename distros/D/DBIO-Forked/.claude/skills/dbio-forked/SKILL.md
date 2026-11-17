@@ -14,10 +14,10 @@ driver async — no async-capable client, no event loop. It is a **sibling** of
 `dbio-async` = Future::IO + async client (PG/MySQL native async), `dbio-forked`
 = `fork()` + pipe + the ordinary sync driver run in a child. Forked is the only
 async backend that is genuinely generic — it needs nothing but the DBI-form
-connect info every sync driver already has, so it covers the ~13 drivers that
-will never get a native async client (Oracle, db2, Sybase, SQLite, …).
+connect info every sync driver already has, so it covers every driver without a
+native async client (Oracle, db2, Sybase, SQLite, …).
 
-**Dependency-free**: only core Perl (`fork`, `pipe`, `Storable`, `IO::Select`)
+**Dependency-free**: only core Perl (`fork`, `pipe`, `Storable`, `IO::Select`, `POSIX`)
 plus DBIO core. No `Future`, no `Future::IO`, no event loop.
 
 ## Namespace
@@ -57,9 +57,38 @@ route through it.
 - `get` — blocks, returns the rows or re-throws the child's error; idempotent.
 - `then`/`catch`/`and_then` — lazy, loop-free; they run at first force.
 - `done`/`fail`/`needs_all` — class constructors, no fork.
-- A dropped Future is reaped (no zombies); the destructor blocks until the child ends.
+- `cancel` ends the query: the child gets SIGTERM, SIGKILL after one second, and is
+  reaped; the Future then fails with `DBIO::Forked::Future: cancelled`. On a derived
+  Future it cancels the source; on a resolved one it does nothing.
+- A dropped Future whose query still runs ends its child the same way and reaps it
+  (no zombies, no waiting for the database).
+- A Future belongs to the process that created it. In any other process (a copy
+  inherited through an application `fork`) `get`, `is_ready`, `is_failed` and `cancel`
+  fail with `belongs to process N`, and the destructor reaps nothing.
 - A child that dies without a result fails the Future with
   `child killed by signal N` / `child exited with status N`.
+
+## Connect options
+
+Given at connect time beside `async => 'forked'` (DBI-form attribute hash, hash form, or
+beside an AccessBroker); core keeps them out of `DBI->connect` and hands them to the
+backend (`async_option_names`):
+
+```perl
+MyApp::Schema->connect($dsn, $user, $pass, {
+  async => 'forked', statement_timeout => 5, max_in_flight => 4,
+});
+```
+
+- `statement_timeout` — seconds above 0, default none. A call still unresolved at its
+  deadline is ended like a cancelled one and fails with `statement_timeout exceeded`.
+  The Future checks the clock when asked (`get`, `is_ready`, `is_failed`).
+- `max_in_flight` — positive integer, default no limit. A call made while that many are
+  unresolved fails before anything forks, with `max_in_flight reached`; the limit is per
+  connection and per process.
+- Each call costs one process and one database connection beside the parent's own;
+  `max_in_flight` bounds that number.
+- An invalid value is refused naming the option, never quoting the value.
 
 ## Limits (Model A)
 
@@ -75,7 +104,9 @@ route through it.
   AutoCommit => 1 })`; `pool_size` sizes nothing.
 - With a rotating broker and an expired lease in the parent, every forked query
   refreshes in its child; the parent's broker changes only when it reconnects.
-- Unix fork only.
+- A real `fork()` is required: on a perl with `$Config{d_fork}` unset (a thread-emulated
+  pseudo-fork, e.g. Strawberry) the dist is refused at install and every `*_async` croaks
+  before forking.
 
 ## Boundary
 

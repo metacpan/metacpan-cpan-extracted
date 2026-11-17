@@ -2,7 +2,7 @@ package Mail::DKIM2::Signer;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 use base 'Mail::DKIM2::HeaderParser';
 use MIME::Base64 qw(encode_base64);
@@ -67,7 +67,9 @@ sub finish_header {
     # is one a signature would take past the limit: do not sign over it.
     # Whether the chain is otherwise worth extending -- its signatures, its
     # instances against the content -- is Mail::DKIM2::Gate's to decide.
-    my $error = $chain->numbering_error
+    # A line that is not a field is in no header hash (HeaderParser).
+    my $error = ($self->malformed_header ? 'malformed header field' : undef)
+        // $chain->numbering_error
         // chain_length_error({ 'dkim2-signature' => $next_i });
     # A signature names the Message-Instance it covers in m=, and a verifier
     # rejects one that names none (tag=m missing), so a message with no

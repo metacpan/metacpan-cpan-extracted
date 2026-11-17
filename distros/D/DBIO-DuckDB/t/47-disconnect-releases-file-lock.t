@@ -23,8 +23,11 @@
 
 use strict;
 use warnings;
+use lib 't/lib';
 use Test::More;
+use DBIO::Test::Slow;
 use DBI;
+use ChildPerl;
 use File::Temp ();
 use DBIO::Util qw(file_path slurp_file);
 use DBIO::DuckDB::Storage;
@@ -33,17 +36,21 @@ use DBIO::Test::Schema;
 
 # ---- the two probes ----------------------------------------------------
 
+# Run from a script file (ChildPerl), not `perl -e`. A refused open is a lock
+# in the engine's words: "Could not set lock on file" where it is a POSIX
+# lock, "...being used by another process" where Windows holds the file.
 my $PROBE = <<'EOP';
+use DBI;
 my $dbh = DBI->connect("dbi:DuckDB:dbname=$ARGV[0]", '', '',
   { RaiseError => 0, PrintError => 0 });
 if ($dbh) { $dbh->disconnect; exit 0 }
-exit( (DBI->errstr // '') =~ /lock/i ? 3 : 4 );
+exit( (DBI->errstr // '') =~ /lock|being used by another process/i ? 3 : 4 );
 EOP
 
 # 'opened' / 'locked', as seen by a separate perl process.
 sub second_process {
   my ($file) = @_;
-  my $rc = system($^X, '-MDBI', '-e', $PROBE, $file);
+  my $rc = run_child_perl($PROBE, $file);
   die "could not run the probe process: $!" if $rc == -1;
   return 'probe died of signal ' . ($rc & 127) if $rc & 127;
   my $exit = $rc >> 8;
@@ -318,7 +325,7 @@ for my $case ([ '0.16' => 1 ], [ '0.17' => 0 ]) {
   undef $dbh;
 
   TODO: {
-    local $TODO = 'DBD::DuckDB 0.16 never frees a prepared statement (karr k25)';
+    local $TODO = 'DBD::DuckDB 0.16 never frees a prepared statement';
     is second_process($file), 'opened',
       'plain DBD::DuckDB: disconnect releases the file';
   }

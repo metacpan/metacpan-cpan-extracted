@@ -1,5 +1,4 @@
 bin/benchmark-generator
-bin/demo_extractor
 bin/deploy-workflows
 bin/extract-schemas
 bin/fuzz-harness-generator
@@ -13,6 +12,7 @@ CONTRIBUTIONS.md
 cpanfile
 doc/getting-started-blog.md
 doc/SchemaExtractor.pm
+examples/demo_extractor
 lib/App/Test/Generator.pm
 lib/App/Test/Generator/Analyzer/Complexity.pm
 lib/App/Test/Generator/Analyzer/Return.pm
@@ -29,6 +29,7 @@ lib/App/Test/Generator/Mutant.pm
 lib/App/Test/Generator/Mutation/Base.pm
 lib/App/Test/Generator/Mutation/BooleanNegation.pm
 lib/App/Test/Generator/Mutation/ConditionalInversion.pm
+lib/App/Test/Generator/Mutation/Feedback.pm
 lib/App/Test/Generator/Mutation/NumericBoundary.pm
 lib/App/Test/Generator/Mutation/ReturnUndef.pm
 lib/App/Test/Generator/Mutator.pm
@@ -38,6 +39,7 @@ lib/App/Test/Generator/Planner/Grouping.pm
 lib/App/Test/Generator/Planner/Isolation.pm
 lib/App/Test/Generator/Planner/Mock.pm
 lib/App/Test/Generator/PodExampleExtractor.pm
+lib/App/Test/Generator/Provenance.pm
 lib/App/Test/Generator/Sample/Module.pm
 lib/App/Test/Generator/SchemaExtractor.pm
 lib/App/Test/Generator/Template.pm
@@ -54,6 +56,7 @@ t/40-more.t
 t/abs.t
 t/accessor_state_checks.t
 t/advanced_types.t
+t/all-fuzz.t
 t/Analyzer-Complexity.t
 t/Analyzer-Return.t
 t/Analyzer-ReturnMeta.t
@@ -79,7 +82,9 @@ t/CoverageGuided_Fuzzer_unit.t
 t/data-flow.t
 t/default_value_extraction.t
 t/destructive_checks.t
+t/deterministic_output.t
 t/dist.t
+t/documented_types.t
 t/domain.t
 t/edge_cases.t
 t/Emitter-Perl.t
@@ -97,6 +102,13 @@ t/generator-regression.t
 t/Generator.t
 t/Generator_unit.t
 t/getset_accessor.t
+t/golden/cgi-info.yml
+t/golden/database-abstraction.yml
+t/golden/genealogy-wills.yml
+t/golden/geo-coder-free.yml
+t/golden/ham-dxcc-lookup.yml
+t/golden/lingua-en-namecase.yml
+t/golden_schemas.t
 t/instantiation.t
 t/integration.t
 t/LCSAJ-Coverage.t
@@ -109,6 +121,7 @@ t/modern.t
 t/moosex_params_validate.t
 t/Mutant.t
 t/mutant_killers.t
+t/mutation_feedback.t
 t/Mutant_unit.t
 t/Mutation-Base.t
 t/Mutation-Base_unit.t
@@ -121,10 +134,13 @@ t/Mutation-ReturnUndef.t
 t/mutator.t
 t/mutator_num_boundary.t
 t/Mutator_unit.t
+t/nested_schema.t
 t/object_detection.t
+t/param_names.t
 t/params_validate.t
 t/params_validate_strict.t
 t/path.t
+t/pattern_fixed_samples.t
 t/Planner-Fixture.t
 t/Planner-Grouping.t
 t/Planner-Isolation.t
@@ -137,7 +153,10 @@ t/pod-coverage.t
 t/pod-spelling.t
 t/pod-synopsis.t
 t/pod.t
+t/pod_bounds.t
 t/PodExampleExtractor_unit.t
+t/positional_pod_input.t
+t/regex_generation.t
 t/relationship_tests.t
 t/return.t
 t/schema_input.t
@@ -154,6 +173,7 @@ t/test_extractor.t
 t/test_hints.t
 t/TestStrategy.t
 t/transaction.t
+t/transform_input_fields.t
 t/type_params.t
 t/unbuildable_constructor.t
 t/unit.t
@@ -169,6 +189,7 @@ website/html/fuzzing.html
 website/html/index.html
 website/html/install.html
 website/html/limitations.html
+website/html/mutation.html
 website/html/quickstart.html
 website/html/schema.html
 website/index.html

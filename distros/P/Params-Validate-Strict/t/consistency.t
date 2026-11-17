@@ -8,6 +8,7 @@ use warnings;
 use Test::Most;
 
 use File::Spec;
+use File::Temp ();
 
 use_ok('Params::Validate::Strict');
 use_ok('Params::Validate::Strict::BNF');
@@ -56,7 +57,12 @@ $lib = File::Spec->canonpath($lib);
 
 sub _perl_ok {
 	my ($code, $name) = @_;
-	my $out = `"$^X" "-I$lib" -we '$code' 2>&1`;
+	# Run the snippet from a temp file rather than via -e: quoting of a -e
+	# argument differs between POSIX shells and cmd.exe (RT/GH #11).
+	my ($fh, $file) = File::Temp::tempfile(SUFFIX => '.pl', UNLINK => 1);
+	print $fh $code, "\n";
+	close $fh;
+	my $out = `"$^X" "-I$lib" -w "$file" 2>&1`;
 	is($? >> 8, 0, $name) or diag($out);
 	unlike($out, qr/redefined|Subroutine .* redefined/i, "$name: no redefinition warnings");
 }

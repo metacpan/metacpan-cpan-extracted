@@ -26,24 +26,25 @@ no_index:
 provides:
   App::nup:
     file: lib/App/nup.pm
-    version: '1.17'
+    version: '1.19'
   App::optex::up:
     file: lib/App/optex/up.pm
-    version: '1.17'
+    version: '1.19'
 requires:
-  App::ansicolumn: '1.5701'
+  App::ansicolumn: '1.66'
   App::optex: '1.05'
   App::optex::textconv: '1.07'
   Getopt::EX: '3.02'
   Getopt::EX::Config: '1.01'
-  Getopt::Long::Bash: v1.1.1
+  Getopt::Long::Bash: v1.3.0
+  IO::Factotum: '0.04'
   Term::ReadKey: '0'
   perl: '5.016'
 resources:
   bugtracker: https://github.com/tecolicom/App-nup/issues
   homepage: https://github.com/tecolicom/App-nup
   repository: https://github.com/tecolicom/App-nup.git
-version: '1.17'
+version: '1.19'
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

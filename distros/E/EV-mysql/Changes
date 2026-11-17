@@ -1,0 +1,13 @@
+0.01  2026-11-15
+    - Initial release: asynchronous MySQL client for EV using libmysqlclient
+      (via Alien::MySQL)
+    - Non-blocking connection setup, queries, result streaming, and connection
+      reset via libmysqlclient *_nonblocking C API
+    - Query queuing/pipelining, async transaction helpers (commit, rollback,
+      autocommit), ping, select_db, set_charset, change_user, close_async
+    - Prepared statements (prepare, execute, bind_params, send_long_data,
+      stmt_reset, close_stmt) and multi-result draining
+    - Connection options (timeouts, compression, charset, utf8, found_rows,
+      multi_statements, SSL / ssl_mode / ssl_verify_server_cert)
+    - Fork safety, ithread CLONE_SKIP, deferred-free callback safety
+    - Short method aliases (q, prep, reconnect, disconnect, errstr, errno)

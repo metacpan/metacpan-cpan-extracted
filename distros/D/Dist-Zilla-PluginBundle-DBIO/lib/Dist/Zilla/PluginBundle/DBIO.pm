@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::DBIO;
 # ABSTRACT: Dist::Zilla plugin bundle for DBIO distributions
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use Moose;
 use Dist::Zilla;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
@@ -31,6 +31,14 @@ has copyright_holder => (
   isa     => 'Maybe[Str]',
   lazy    => 1,
   default => sub { $_[0]->payload->{copyright_holder} },
+);
+
+
+has eumm_version => (
+  is      => 'ro',
+  isa     => 'Maybe[Str]',
+  lazy    => 1,
+  default => sub { $_[0]->payload->{eumm_version} },
 );
 
 
@@ -97,20 +105,17 @@ sub configure {
     Prereqs::FromCPANfile
   ));
 
-  # Version — core uses VersionFromMainModule, drivers use @Git::VersionManager
-  if ($self->core) {
-    $self->add_plugins('VersionFromMainModule');
-  } else {
-    $self->add_bundle('@Git::VersionManager' => {
-      'RewriteVersion::Transitional.global' => 1,
-      'RewriteVersion::Transitional.finder' => [':InstallModules'],
-      'BumpVersionAfterRelease.finder'      => [':InstallModules'],
-      'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
-      'Git::NextVersion.first_version' => '0.900000',
-      'Git::Tag.tag_format' => 'v%V',
-      'NextRelease.format' => '%-9v %{yyyy-MM-dd}d',
-    });
-  }
+  # Version — core and drivers alike through @Git::VersionManager: every module
+  # under lib/ is rewritten to the version of the dist and raised after the release
+  $self->add_bundle('@Git::VersionManager' => {
+    'RewriteVersion::Transitional.global' => 1,
+    'RewriteVersion::Transitional.finder' => [':InstallModules'],
+    'BumpVersionAfterRelease.finder'      => [':InstallModules'],
+    'RewriteVersion::Transitional.fallback_version_provider' => 'Git::NextVersion',
+    'Git::NextVersion.first_version' => '0.900000',
+    'Git::Tag.tag_format' => 'v%V',
+    'NextRelease.format' => '%-9v %{yyyy-MM-dd}d',
+  });
 
   # POD — heritage uses @DBIO::Heritage which adds DBIx::Class attribution
   $self->add_plugins([
@@ -120,27 +125,37 @@ sub configure {
   ]);
 
   # Tests
-  # ExtraTests promotes the xt/ files gathered by CoverageTest and
-  # PodCheckerTest into t/. The order here is only for readability: munging
-  # runs after all gathering.
-  $self->add_plugins([ 'DBIO::CoverageTest' => {
-    coverage_threshold => $self->coverage_threshold,
-  }]);
+  # ExtraTests promotes the xt/ files gathered by PodCheckerTest and
+  # VersionLockstepTest into t/. The order here is only for readability:
+  # munging runs after all gathering.
   # PodCheckerTest gathers xt/author/pod-checker.t, promoted the same way: a
   # Pod::Checker run over the built (woven) POD under AUTHOR_TESTING.
   $self->add_plugins('DBIO::PodCheckerTest');
-  # Core only: nothing rewrites the modules other than the main one, so a
-  # test fails when one deviates from the main module's $VERSION (k14).
+  # Core only: a test fails when a module deviates from the main module's
+  # $VERSION, whatever the way it got out of step.
   $self->add_plugins('DBIO::VersionLockstepTest') if $self->core;
   $self->add_plugins('ExtraTests');
 
+  # Scripts under bin/ are installed (and woven) for every dist; without a
+  # bin/ the plugin finds nothing and the build is unchanged.
+  $self->add_plugins([ 'ExecDir' => { dir => 'bin' } ]);
+
   # Build — core uses MakeMaker::Awesome
   if ($self->core) {
-    $self->add_plugins([ 'MakeMaker::Awesome' => { eumm_version => '6.78' } ]);
-    $self->add_plugins([ 'ExecDir' => { dir => 'bin' } ]);
+    $self->add_plugins([ 'MakeMaker::Awesome' =>
+      { eumm_version => defined $self->eumm_version ? $self->eumm_version : '6.78' } ]);
+  } elsif (defined $self->eumm_version) {
+    $self->add_plugins([ 'MakeMaker' => { eumm_version => $self->eumm_version } ]);
   } else {
     $self->add_plugins('MakeMaker');
   }
+
+  # The coverage gate is a TestRunner: Dist::Zilla runs the TestRunners in
+  # plugin order, so it stands behind the build plugin and judges cover_db/
+  # when the suite of the build directory is through.
+  $self->add_plugins([ 'DBIO::CoverageGate' => {
+    coverage_threshold => $self->coverage_threshold,
+  }]);
 
   $self->add_plugins(qw(
     Readme
@@ -167,31 +182,23 @@ sub configure {
   ]);
 
   # Release workflow
+  # A driver is released against the core version it was written for: its
+  # runtime prereq on DBIO must be at least its own version (core is the
+  # source of that version and has no such prereq).
   my @release_checks = (
+    ($self->core ? () : 'DBIO::RequireCoreVersion'),
     'TestRelease',
     'Test::ChangesHasContent',
     [ 'InstallRelease' => { install_command => 'cpanm .' } ],
   );
-  if ($self->core) {
-    $self->add_plugins([ 'NextRelease' => {
-      format => '%-9v %{yyyy-MM-dd}d',
-    }]);
-    $self->add_plugins(
-      @release_checks,
-      'ConfirmRelease',
-      'UploadToCPAN',
-      [ 'Git::Commit' => { allow_dirty => [qw( dist.ini Changes cpanfile )] } ],
-      [ 'Git::Tag' => { tag_format => 'v%V' } ],
-      'Git::Push',
-    );
-  } else {
-    $self->add_plugins(
-      @release_checks,
-      'ConfirmRelease',
-      'UploadToCPAN',
-      [ 'Git::Push' => { push_to => 'origin' } ],
-    );
-  }
+  # NextRelease, the release snapshot, the tag and the post-release commit
+  # come from @Git::VersionManager above.
+  $self->add_plugins(
+    @release_checks,
+    'ConfirmRelease',
+    'UploadToCPAN',
+    [ 'Git::Push' => { push_to => 'origin' } ],
+  );
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -210,7 +217,7 @@ Dist::Zilla::PluginBundle::DBIO - Dist::Zilla plugin bundle for DBIO distributio
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -239,8 +246,8 @@ Standard L<Dist::Zilla> plugin bundle for all DBIO distributions.
 
 =head2 All distributions
 
-Every distribution using C<[@DBIO]> gets an automatic code-coverage test
-(F<xt/release/coverage.t>) that scores F<lib/> after a Devel::Cover run, plus:
+Every distribution using C<[@DBIO]> gets an automatic code-coverage gate that
+scores F<lib/> after the whole test suite has run under Devel::Cover, plus:
 
 =over 4
 
@@ -254,11 +261,13 @@ Every distribution using C<[@DBIO]> gets an automatic code-coverage test
 
 =item * L<Dist::Zilla::Plugin::ExtraTests> — promotes F<xt/author/>, F<xt/release/> and F<xt/smoke/> tests into F<t/> for release; tests lying flat in F<xt/> are not promoted and are therefore not covered by the release gate
 
-=item * L<Dist::Zilla::Plugin::DBIO::CoverageTest> — generates F<xt/release/coverage.t>, a coverage gate that reads F<cover_db/> after C<HARNESS_PERL_SWITCHES=-MDevel::Cover>. A missing F<cover_db/> skips the test, even under C<COVERAGE_STRICT=1> or C<RELEASE=1>; a score below the threshold passes with a diagnostic by default and fails under C<COVERAGE_STRICT=1> or C<RELEASE=1>.
+=item * L<Dist::Zilla::Plugin::DBIO::CoverageGate> — a test runner behind the build plugin that reads F<cover_db/> of the build directory once the whole suite has run (C<HARNESS_PERL_SWITCHES=-MDevel::Cover>), for C<dzil test> and C<dzil release>. It scores the F<lib/> of the dist. A score below the threshold logs a warning by default and aborts under C<COVERAGE_STRICT=1> or C<RELEASE=1>; without a measured coverage (no F<cover_db/>, no L<Devel::Cover::DB>) it aborts under C<RELEASE=1>, because a release without a coverage run is a failed release, and only logs a note otherwise.
 
 =item * L<Dist::Zilla::Plugin::DBIO::PodCheckerTest> — generates F<xt/author/pod-checker.t>, a L<Pod::Checker> run over the built (woven) POD under F<lib/> and F<bin/>. Any Pod::Checker error — above all an unresolved internal link — fails C<dzil test> and C<dzil release>; skipped on a plain install.
 
-=item * L<Dist::Zilla::Plugin::DBIO::CodebergMeta> — repository, bugtracker and homepage META resources, derived offline from the git remote (codeberg.org only; no resources for other hosts)
+=item * L<Dist::Zilla::Plugin::ExecDir> — installs the scripts under F<bin/>, and PodWeaver weaves their POD; a distribution without F<bin/> is not affected
+
+=item * L<Dist::Zilla::Plugin::DBIO::CodebergMeta> — repository, bugtracker and homepage META resources, derived offline from the git remote (codeberg.org only; for another host or an unusable remote the build logs why and adds no resources)
 
 =item * L<Dist::Zilla::Plugin::MetaResources> — sets the family-wide IRC channel META resource (C<x_IRC = irc://irc.perl.org/#dbio>) for every distribution; fixed, not per-dist configurable
 
@@ -271,8 +280,9 @@ Every distribution using C<[@DBIO]> gets an automatic code-coverage test
 What is tracked in git is what ships. L<Dist::Zilla::Plugin::Git::GatherDir>
 gathers every tracked file, dotfiles included, for core and drivers alike;
 only what the build generates itself stays out (F<META.yml>, F<META.json>,
-F<MANIFEST>, F<README>, F<README.md>), plus F<.karr>. There is no
-C<PruneCruft> and no exclude list: a file that should not ship is not tracked.
+F<MANIFEST>, F<README>, F<README.md>), plus F<.karr>; these are the six
+C<exclude_filename> names, and there is no C<exclude_match>. There is no
+C<PruneCruft>: a file that should not ship is not tracked.
 Untracked files, such as the git-ignored skills skilletor installs, are never
 gathered by it.
 
@@ -288,9 +298,11 @@ attribution preamble, which the plugin holds as its reference text.
 
 =head2 Release checks
 
-Before L<Dist::Zilla::Plugin::ConfirmRelease>, for core and drivers alike:
+Before L<Dist::Zilla::Plugin::ConfirmRelease>, for core and drivers alike (the first item is for drivers only):
 
 =over 4
+
+=item * L<Dist::Zilla::Plugin::DBIO::RequireCoreVersion> — every dist but core: the runtime prereq C<DBIO> in the prereqs (the F<cpanfile>) must ask for at least the version being released. A lower minimum version stops the release with a message that names both versions and the line to write (C<requires 'DBIO', 'E<lt>versionE<gt>';>). A dist without a runtime prereq on C<DBIO> has nothing to check. It changes no prereq.
 
 =item * L<Dist::Zilla::Plugin::TestRelease> — runs the tests of the built dist and stops the release when they fail
 
@@ -302,22 +314,21 @@ Before L<Dist::Zilla::Plugin::ConfirmRelease>, for core and drivers alike:
 
 =head2 Versioning
 
-Version is read from the main module's C<$VERSION> via
-L<Dist::Zilla::Plugin::VersionFromMainModule> (core) or via
-L<Dist::Zilla::PluginBundle::Git::VersionManager> (drivers).
+Core and drivers version alike, through
+L<Dist::Zilla::PluginBundle::Git::VersionManager>. The version is the main
+module's C<$VERSION>; only when it has none does L<Git::NextVersion> take it
+from the git tags (C<first_version = 0.900000>). L<RewriteVersion::Transitional> is
+configured with C<global = 1> and C<finder = [:InstallModules]>, so B<every>
+module under F<lib/> is versioned: each C<.pm> carries its own literal
+C<$VERSION> assignment, and all of them are rewritten in lockstep at the
+release. Right after the release C<BumpVersionAfterRelease> raises all of them
+to the next version, so between two releases the source carries the next
+version.
 
-For drivers, L<RewriteVersion::Transitional> is configured with C<global = 1>
-and C<finder = [:InstallModules]>, so B<every> module under F<lib/> is
-versioned: each C<.pm> carries its own literal C<$VERSION> assignment, and all
-of them are rewritten in lockstep on version bump.
-
-Core versions only from the main module (VersionFromMainModule) and rewrites
-no other file, yet every core module carries a literal C<$VERSION>. For
-C<core = 1> the bundle therefore adds
+For C<core = 1> the bundle also adds
 L<Dist::Zilla::Plugin::DBIO::VersionLockstepTest>: a test that fails when a
 module under F<lib/> has no C<$VERSION> or one that differs from the main
-module's. At a version bump the core raises every module by hand; the test
-fails the build until none is left behind. Non-core distributions do not get it.
+module's. Non-core distributions do not get it.
 
 =head2 Heritage distributions (C<heritage = 1>)
 
@@ -328,12 +339,11 @@ defaults to C<DBIO & DBIx::Class Authors>.
 
 =head2 Core distribution (C<core = 1>)
 
-Uses L<Dist::Zilla::Plugin::VersionFromMainModule> (version from C<$VERSION>
-in the main module) and L<Dist::Zilla::Plugin::MakeMaker::Awesome> instead
-of the standard MakeMaker. Also enables L<Dist::Zilla::Plugin::ExecDir> for
-F<bin/>. The release workflow uses NextRelease + Git::Commit/Tag/Push
-directly rather than C<@Git::VersionManager>. It also gets
-L<Dist::Zilla::Plugin::DBIO::VersionLockstepTest> (see L</Versioning>).
+Uses L<Dist::Zilla::Plugin::MakeMaker::Awesome> instead of the standard
+MakeMaker. Versioning and release workflow are those of the drivers
+(L</Versioning>, L</Release checks>), except that core has no
+L<Dist::Zilla::Plugin::DBIO::RequireCoreVersion>. It also gets
+L<Dist::Zilla::Plugin::DBIO::VersionLockstepTest>.
 
 =head1 ATTRIBUTES
 
@@ -352,6 +362,15 @@ Override the copyright holder string. If not set, defaults to
 C<DBIO & DBIx::Class Authors> for heritage distributions and
 C<DBIO Authors> for all others.
 
+=head2 eumm_version
+
+Minimum version of L<ExtUtils::MakeMaker> the build asks for. It is written
+into the C<use ExtUtils::MakeMaker> line of F<Makefile.PL> and into
+C<configure_requires> of the META files. For a driver it goes to
+L<Dist::Zilla::Plugin::MakeMaker>, for the core (C<core = 1>) to
+L<Dist::Zilla::Plugin::MakeMaker::Awesome>. Without it a driver keeps the
+default of C<MakeMaker> and the core asks for C<6.78>.
+
 =head2 share_skill
 
 Names of the agent skills this distribution owns (is the source of truth for).
@@ -361,9 +380,9 @@ See L<Dist::Zilla::Plugin::DBIO::GatherSkills>.
 
 =head2 coverage_threshold
 
-Statement-coverage percentage required for F<xt/release/coverage.t> to pass.
-Default: 80. Set to C<0> to gather the file as a no-op skip (coverage
-enforcement disabled). See L<Dist::Zilla::Plugin::DBIO::CoverageTest>.
+Statement-coverage percentage the suite run must reach. Default: 80. Set to
+C<0> to switch the coverage gate off. See
+L<Dist::Zilla::Plugin::DBIO::CoverageGate>.
 
 =head1 AUTHOR
 

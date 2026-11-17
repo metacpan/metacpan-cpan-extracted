@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Introspect::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -291,7 +291,7 @@ DBIO::ClickHouse::Introspect::Util - ClickHouse type-string parser shared by the
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

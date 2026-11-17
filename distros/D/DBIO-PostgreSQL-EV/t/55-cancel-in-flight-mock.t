@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # OFFLINE test for karr k70: a statement Future cancelled while its statement
 # is in flight -- on the pooled path and inside txn_do_async.
@@ -725,7 +726,7 @@ for my $when ('in the coderef', 'after the coderef returned') {
   is state_of($first), 'done', "$label: the statement in flight completed";
   is state_of($queued), 'cancelled', "$label: the cancelled one stays cancelled";
   is_deeply wire($conn), [qw( BEGIN first ROLLBACK )],
-    "$label: the statement in flight ran, the one cancelled in the queue was skipped (karr k75), ROLLBACK ended it";
+    "$label: the statement in flight ran, the one cancelled in the queue was skipped, ROLLBACK ended it";
   ok !grep({ $_ eq 'COMMIT' } @{ wire($conn) }), "$label: COMMIT was never sent";
   is_deeply released($storage), [ clean($conn) ],
     "$label: the connection comes back once, no transaction open, nothing in flight";

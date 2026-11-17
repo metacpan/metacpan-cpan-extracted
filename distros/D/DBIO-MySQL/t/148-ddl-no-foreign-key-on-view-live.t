@@ -2,13 +2,13 @@ use strict;
 use warnings;
 use Test::More;
 
-# LIVE half of karr k118 (t/147 has the offline half and the reasoning): the
+# LIVE half of karr k118 (subtest ddl-no-foreign-key-on-view of t/135-ddl-view.t has the offline half and the reasoning): the
 # shared test schema of core, with Track pointing at two virtual views, deploys
 # whole (no 1824), Track has foreign keys to its tables and none to a view, and
 # the next diff has nothing left.
 #
 # Gated like the other live tests: needs DBIO_TEST_MYSQL_DSN, _USER and _PASS.
-# Works in a database of its own, created and dropped here (see t/138).
+# Works in a database of its own, created and dropped here (see subtest ddl-auto-increment-key-in-create-table of t/109-auto-increment-key-in-create-table-live.t).
 
 my ($dsn, $user, $pass) = @ENV{ map { "DBIO_TEST_MYSQL_${_}" } qw/DSN USER PASS/ };
 

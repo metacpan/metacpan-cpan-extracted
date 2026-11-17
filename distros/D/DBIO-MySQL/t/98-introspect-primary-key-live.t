@@ -81,7 +81,7 @@ sub primary_cols {
   . "AND index_name = 'PRIMARY' ORDER BY seq_in_index", undef, $DB, $t) } ];
 }
 is_deeply primary_cols('nopk'), [], 'the server has no PRIMARY index on it';
-is_deeply primary_cols('comp'), [qw(b a)], 'and the composite one keeps its own, in its order (karr k107)';
+is_deeply primary_cols('comp'), [qw(b a)], 'and the composite one keeps its own, in its order';
 
 # A second upgrade has to find nothing to do, not a primary key to drop or add.
 $raw->do("USE `$DB`");

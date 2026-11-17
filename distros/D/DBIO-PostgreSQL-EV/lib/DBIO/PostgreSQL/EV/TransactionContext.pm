@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::EV::TransactionContext;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Async::TransactionContext';
 
@@ -25,7 +25,7 @@ DBIO::PostgreSQL::EV::TransactionContext - Pinned connection context for an asyn
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -82,14 +82,14 @@ had committed. From the moment C<COMMIT> or C<ROLLBACK> is sent the
 context refuses every further statement: it would run outside the
 transaction.
 
-This class adds exactly one thing: the L</txn_pg> compatibility alias below.
+This class adds exactly one thing: the L</txn_pg> alias below.
 The pinning policy this context implements is recorded in ADR 0002; the
 duplicated-context half of that ADR is superseded by core ADR 0030 §4.
 
 The pinned connection is passed to C<new> under the core constructor key
 C<txn_conn>, which L<DBIO::PostgreSQL::EV::Storage/_txn_conn_accessor> names and
-core's C<txn_do_async> builds the context with. The pre-k32 key C<pg> is gone:
-the constructor dies without C<txn_conn>.
+core's C<txn_do_async> builds the context with. The constructor dies without
+C<txn_conn>.
 
 =head1 ATTRIBUTES
 
@@ -97,12 +97,10 @@ the constructor dies without C<txn_conn>.
 
   my $pg = $ctx->txn_pg;
 
-Compatibility alias for the inherited
+Alias for the inherited
 L<DBIO::Storage::Async::TransactionContext/txn_conn>: the pinned L<EV::Pg>
-connection handle for the duration of this transaction. It is the name this
-driver's own context carried before it became a subclass of the core one, kept
-because it says B<which> kind of handle is pinned -- and because it is load
-bearing: C<t/21-deploy-async-live.t> reaches for it to drive
+connection handle for the duration of this transaction. The name says B<which>
+kind of handle is pinned, and it is load bearing: C<t/21-deploy-async-live.t> reaches for it to drive
 C<_execute_ddl_async> on the pinned connection. C<txn_conn> is the name core's
 own code reaches for -- C<deploy_async>'s transactional branch among them -- so
 both answer the same handle.

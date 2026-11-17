@@ -4,7 +4,7 @@ package DBIO::Schema::ModelCompiler;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp qw/croak/;
 use DBIO::Schema::Type ();
@@ -71,7 +71,7 @@ DBIO::Schema::ModelCompiler - compile a base-type schema into one engine's nativ
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

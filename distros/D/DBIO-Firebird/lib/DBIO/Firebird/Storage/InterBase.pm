@@ -4,7 +4,7 @@ package DBIO::Firebird::Storage::InterBase;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Firebird::Storage::Common/;
 use mro 'c3';
@@ -745,7 +745,7 @@ DBIO::Firebird::Storage::InterBase - Driver for the Firebird RDBMS via L<DBD::In
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

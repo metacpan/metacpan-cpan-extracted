@@ -125,7 +125,7 @@ use DBIO::AccessBroker::Vault;
 use DBIO::AccessBroker::HostBound;
 use DBIO::PostgreSQL::EV::Storage;
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 alarm 60;

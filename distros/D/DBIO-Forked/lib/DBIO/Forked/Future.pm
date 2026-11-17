@@ -4,7 +4,7 @@ package DBIO::Forked::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp 'croak';
 use Errno ();
@@ -396,7 +396,7 @@ DBIO::Forked::Future - Loop-free, pipe-backed Future for DBIO::Forked
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

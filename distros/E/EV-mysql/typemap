@@ -1,0 +1,3 @@
+TYPEMAP
+EV::mysql       T_PTROBJ
+EV::Loop        T_PTROBJ

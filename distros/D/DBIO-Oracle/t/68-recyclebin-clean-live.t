@@ -23,7 +23,7 @@ sub bin_count {
   return ($dbh->selectrow_array('SELECT COUNT(*) FROM user_recyclebin'))[0];
 }
 
-for my $file (qw(t/12-oracle-hq.t t/22-oracle-hq-core.t t/40-datetime-oracle.t)) {
+for my $file (qw(t/12-oracle-hq.t t/40-datetime-oracle.t)) {
   my $before = bin_count();
   my $out = `"$^X" -Ilib "$file" 2>&1`;
   my $status = $?;

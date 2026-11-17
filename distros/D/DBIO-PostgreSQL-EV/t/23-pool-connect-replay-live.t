@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE test for the karr k22 WP3 / core k68 pool-connect replay: on_connect_do
 # AND on_connect_call must run on EVERY freshly-spawned EV pool connection, so a

@@ -75,16 +75,16 @@ alarm 60;
   my $pool = $storage->pool;
   my $f    = $pool->acquire;            # spawns a handle; it never connects
   my ($conn) = @{ $pool->{_connections} };
-  ok $conn && !$conn->is_connected, 'k67: the pool holds a handle that is still connecting';
+  ok $conn && !$conn->is_connected, 'the pool holds a handle that is still connecting';
 
   my $ok = eval { $pool->_shutdown_connection($conn); 1 };
-  ok $ok, 'k67: closing it does not croak' or diag $@;
-  is_deeply \@StrictMDB::CALLS, ['finish'], 'k67: it was finished, once, without an argument';
+  ok $ok, 'closing it does not croak' or diag $@;
+  is_deeply \@StrictMDB::CALLS, ['finish'], 'it was finished, once, without an argument';
 
   @StrictMDB::CALLS = ();
   $storage->disconnect;
-  ok !grep({ $_ eq 'close_async' } @StrictMDB::CALLS), 'k67: disconnect never calls close_async';
-  is scalar(grep { $_ eq 'finish' } @StrictMDB::CALLS), 1, 'k67: disconnect finished the handle';
+  ok !grep({ $_ eq 'close_async' } @StrictMDB::CALLS), 'disconnect never calls close_async';
+  is scalar(grep { $_ eq 'finish' } @StrictMDB::CALLS), 1, 'disconnect finished the handle';
 }
 
 # -----------------------------------------------------------------------------
@@ -111,11 +111,11 @@ sub idle_start_is_immediate {
   leaves_work_in_flight($mdb);
   @StrictMDB::SENT = ();
   $executor->execute_when_idle($mdb, 'ROLLBACK', []);
-  is scalar @StrictMDB::SENT, 0, 'k82: with the count left over, the statement waits (the inherited state)';
+  is scalar @StrictMDB::SENT, 0, 'with the count left over, the statement waits (the inherited state)';
 
   # The handle is shut down; a new one comes up at the same key.
   DBIO::MySQL::EV::Pool->_shutdown_connection($mdb);
-  idle_start_is_immediate($mdb, 'k82: after the shutdown, a handle at the same key starts from nothing');
+  idle_start_is_immediate($mdb, 'after the shutdown, a handle at the same key starts from nothing');
 }
 
 {
@@ -124,13 +124,13 @@ sub idle_start_is_immediate {
   # The fork watcher's callback of a child: it finishes the inherited copies.
   my $pool = bless { _mysql_inherited => [$mdb] }, 'ForkHolder';   # the callback reads only this slot
   DBIO::MySQL::EV::Pool::_mysql_pool_fork_cb($pool, $$)->();
-  idle_start_is_immediate($mdb, 'k82: a handle the fork guard finished is forgotten too');
+  idle_start_is_immediate($mdb, 'a handle the fork guard finished is forgotten too');
 }
 
 {
   my $mdb = StrictMDB->new;
   ok eval { DBIO::MySQL::EV::QueryExecutor->forget($mdb); DBIO::MySQL::EV::QueryExecutor->forget(undef); 1 },
-    'k82: forget of an unknown handle and of undef does nothing';
+    'forget of an unknown handle and of undef does nothing';
 }
 
 # -----------------------------------------------------------------------------
@@ -157,18 +157,18 @@ sub says_torn_down {
   @StrictMDB::SENT = ();
   my $w1 = waiting_on($mdb, 'ROLLBACK');
   my $w2 = $executor->execute_when_idle($mdb, 'COMMIT', []);
-  ok !$w1->is_ready && !$w2->is_ready, 'k98: both statements wait';
+  ok !$w1->is_ready && !$w2->is_ready, 'both statements wait';
   DBIO::MySQL::EV::QueryExecutor->forget($mdb);
-  says_torn_down($w1, 'k98 forget (first)');
-  says_torn_down($w2, 'k98 forget (second)');
-  is scalar(grep { $_->{sql} =~ /ROLLBACK|COMMIT/ } @StrictMDB::SENT), 0, 'k98: neither was sent';
+  says_torn_down($w1, 'forget, first waiter');
+  says_torn_down($w2, 'forget, second waiter');
+  is scalar(grep { $_->{sql} =~ /ROLLBACK|COMMIT/ } @StrictMDB::SENT), 0, 'neither was sent';
 }
 
 {
   my $mdb = StrictMDB->new;
   my $w = waiting_on($mdb, 'ROLLBACK');
   DBIO::MySQL::EV::Pool->_shutdown_connection($mdb);
-  says_torn_down($w, 'k98 Pool::_shutdown_connection');
+  says_torn_down($w, 'Pool::_shutdown_connection');
 }
 
 {
@@ -177,8 +177,8 @@ sub says_torn_down {
   my $w2 = $executor->execute_when_idle($mdb, 'COMMIT', []);
   $w1->cancel;
   DBIO::MySQL::EV::QueryExecutor->forget($mdb);
-  ok $w1->is_cancelled, 'k98: a cancelled waiter stays cancelled';
-  says_torn_down($w2, 'k98 next to a cancelled one');
+  ok $w1->is_cancelled, 'a cancelled waiter stays cancelled';
+  says_torn_down($w2, 'next to a cancelled one');
 }
 
 {
@@ -205,7 +205,7 @@ sub says_torn_down {
   $mdb->{connected} = 1;
   my $w = waiting_on($mdb, 'ROLLBACK');
   DBIO::MySQL::EV::Pool->_shutdown_connection($mdb);
-  says_torn_down($w, 'k98 finish calls back the statement in flight');
+  says_torn_down($w, 'finish calls back the statement in flight');
 }
 
 {
@@ -223,8 +223,8 @@ sub says_torn_down {
   });
   $w2->on_fail(sub { push @order, 'w2' });
   DBIO::MySQL::EV::QueryExecutor->forget($mdb);
-  is_deeply \@order, [qw(w1 w2)], 'k98: waiters fail oldest first, each exactly once, despite reentry';
-  says_torn_down($late, 'k98 queued from inside a failure callback');
+  is_deeply \@order, [qw(w1 w2)], 'waiters fail oldest first, each exactly once, despite reentry';
+  says_torn_down($late, 'queued from inside a failure callback');
 }
 
 done_testing;

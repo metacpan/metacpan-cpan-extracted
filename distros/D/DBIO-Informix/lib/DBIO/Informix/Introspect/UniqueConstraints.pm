@@ -4,7 +4,7 @@ package DBIO::Informix::Introspect::UniqueConstraints;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Informix::Introspect::Util ();
 
@@ -61,7 +61,7 @@ DBIO::Informix::Introspect::UniqueConstraints - Introspect Informix unique const
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

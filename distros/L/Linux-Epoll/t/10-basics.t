@@ -2,12 +2,12 @@
 
 use strict;
 use warnings;
-use Test::More tests => 19;
+use Test::More tests => 21;
 use Linux::Epoll;
+use POSIX qw/raise sigprocmask SIG_BLOCK SIGUSR1/;
 
 use Socket qw/AF_UNIX SOCK_STREAM PF_UNSPEC/;
 use Scalar::Util qw/weaken/;
-use Time::HiRes qw/alarm/;
 
 my $poll = Linux::Epoll->new();
 
@@ -31,11 +31,16 @@ syswrite $out, 'foo', 3;
 is $poll->wait(1, 0), 1, 'Finally an event';
 is $poll->wait(1, 0), 0, 'No more events to wait for';
 
-$SIG{ALRM} = sub {
+my $sigset = POSIX::SigSet->new(SIGUSR1);
+my $empty = POSIX::SigSet->new;
+sigprocmask(SIG_BLOCK, $sigset);
+
+$SIG{USR1} = sub {
 	$subnum = 2;
 	syswrite $out, 'bar', 3;
 };
-alarm 0.1;
+raise(SIGUSR1);
+
 my $sub2 = sub {
 	my $event = shift;
 	is $subnum, 2, 'New handler works too'; 
@@ -45,8 +50,9 @@ my $sub2 = sub {
 ok $poll->modify($in, [ qw/in prio/ ], $sub2), 'Can modify the set';
 weaken $sub2;
 ok defined $sub2, '$sub2 is still defined';
-is $poll->wait(2, 1), undef, 'Interrupted event';
-is $poll->wait(2, 0), 1, 'Yet another event';
+is $subnum, 1, 'subnum is still 1';
+is $poll->wait(2, 1, $empty), undef, 'Interrupted event';
+is $poll->wait(2, 0, $empty), 1, 'Yet another event';
 
 ok $poll->delete($in), 'Can delete from set';
 ok !defined $sub2, '$sub2 is no longer defined';
@@ -61,3 +67,5 @@ weaken $sub3;
 undef $out;
 ok !defined $sub3, '$sub3 is no longer defined';
 
+my @gen_globs = grep { /^_GEN_\d+$/ } keys %Linux::Epoll::;
+is_deeply \@gen_globs, [], 'Epoll leaves nothing in the stash';

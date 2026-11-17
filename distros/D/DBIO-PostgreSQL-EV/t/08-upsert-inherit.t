@@ -127,7 +127,7 @@ for my $oc (
     "$values ON CONFLICT (\"name\") DO UPDATE SET \"charfield\" = ? "
   . 'WHERE "artist"."rank" < ?',
     'der bedingte DO UPDATE-Zweig (last-write-wins guard) rendert die WHERE-Clause, '
-  . 'tabellenqualifiziert (dbio-postgresql k75)';
+  . 'tabellenqualifiziert';
   is_deeply \@bind, [ 'foo', 3, 'fixed', 0 ],
     '... die Binds folgen den VALUES-Binds, der SET-Bind ist der nackte Wert '
   . '(bindtype normal, durchgehend flach)';

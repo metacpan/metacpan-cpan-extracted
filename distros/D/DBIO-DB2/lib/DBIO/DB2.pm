@@ -1,5 +1,5 @@
 package DBIO::DB2;
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # ABSTRACT: IBM DB2-specific schema management for DBIO
@@ -32,7 +32,7 @@ DBIO::DB2 - IBM DB2-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

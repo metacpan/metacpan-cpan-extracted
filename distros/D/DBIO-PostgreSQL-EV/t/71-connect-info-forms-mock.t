@@ -436,7 +436,7 @@ my @UNREADABLE = (
   [ 'the DBI form for another driver',
     sub { [ "dbi:mysql:database=appdb;password=$SECRET", 'app', $SECRET ] },
     qr/: a DBI-form arrayref whose DSN is not dbi:Pg:<parameters> \(DBI driver 'mysql'\)\. It takes/, 1 ],
-  [ 'the DBI form with DBI attributes in front and no colon behind them (dbi:Pg: with nothing behind it is read since k66)',
+  [ 'the DBI form with DBI attributes in front and no colon behind them (dbi:Pg: with nothing behind it is read)',
     sub { [ "dbi:Pg(Password=>$SECRET)", 'app', $SECRET ] },
     qr/: a DBI-form arrayref whose DSN is not dbi:Pg:<parameters> \(DBI driver 'Pg'\)\. It takes/, 1 ],
   [ 'a DSN libpq cannot read',

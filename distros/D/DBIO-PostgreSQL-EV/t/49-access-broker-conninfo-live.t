@@ -44,7 +44,7 @@ use FindBin;
 use lib "$FindBin::Bin/lib";
 use LiveServer;
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 alarm 120;

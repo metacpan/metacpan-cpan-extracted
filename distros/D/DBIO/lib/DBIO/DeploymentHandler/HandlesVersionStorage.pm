@@ -4,7 +4,7 @@ package DBIO::DeploymentHandler::HandlesVersionStorage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Exception;
 
@@ -52,7 +52,7 @@ DBIO::DeploymentHandler::HandlesVersionStorage - Interface for version storage m
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

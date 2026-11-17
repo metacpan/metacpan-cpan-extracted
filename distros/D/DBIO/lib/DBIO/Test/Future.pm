@@ -4,7 +4,7 @@ package DBIO::Test::Future;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Scalar::Util ();
 use DBIO::Exception ();
@@ -190,7 +190,7 @@ DBIO::Test::Future - Manually settled Future for deterministic DBIO tests
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

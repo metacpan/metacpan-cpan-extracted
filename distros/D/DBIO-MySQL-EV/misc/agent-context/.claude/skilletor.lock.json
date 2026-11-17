@@ -24,14 +24,14 @@
     "source": "dbio-core",
     "version": "local",
     "files": {
-      "agents/.local.karr-coordinator.md": "sha256:66a8f2c63e2d632238327d7480a2b552174c0a8b1792bf8a40742eb309ce055a"
+      "agents/.local.karr-coordinator.md": "sha256:3d602599e9431b2c809fb6f34f7390f20c948904ab439ccf6c7aeef9c2e25cfa"
     }
   },
   "rules/dbio-rules": {
     "source": "dbio-core",
     "version": "local",
     "files": {
-      "rules/.local.dbio-rules.md": "sha256:c02ee3a9c10bfc79b5899806c8b0add6b047cb5a097e4bedc8783d213651bef8"
+      "rules/.local.dbio-rules.md": "sha256:ef92652d2c10ae9c5e1244c0125c28a9bd6db0b735cd801138a86fc6170e6110"
     }
   },
   "skills/dbio-adr": {
@@ -39,7 +39,7 @@
     "version": "local",
     "files": {
       "skills/dbio-adr/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-adr/SKILL.md": "sha256:695d4e046e9224d5ea45c0da9f554934126243aeddc64b147a0a5e592f3059b8"
+      "skills/dbio-adr/SKILL.md": "sha256:1b86cbd4c12535edb7ea40d25e8d9ddedb77a2cdf10b152c1e0b8138c00ad82a"
     }
   },
   "skills/dbio-codeberg-user-issues": {
@@ -55,7 +55,8 @@
     "version": "local",
     "files": {
       "skills/dbio-consolidate-release/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-consolidate-release/SKILL.md": "sha256:63887a0a9aeab60b767db0e0ff6c99f8466f431b3884f1aa1fed7c7545652bdf"
+      "skills/dbio-consolidate-release/SKILL.md": "sha256:b34e4b177e3f40c86352b70a11586fa38a159d53cc76bf6241c0bd2a26d66167",
+      "skills/dbio-consolidate-release/references/all-and-recovery.md": "sha256:857a9d7acb7128a5db8a7bb08c813f4f15542e7140696a5e0a35c618e11c5216"
     }
   },
   "skills/dbio-coordination": {
@@ -63,7 +64,8 @@
     "version": "local",
     "files": {
       "skills/dbio-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-coordination/SKILL.md": "sha256:ed2347c9990e8c21bce4390462da93cc01ce4435c46c764885976fee93961b6a"
+      "skills/dbio-coordination/SKILL.md": "sha256:f3d891cea846562fe795a42a01240f22e2aeb35ca826239fc7692fc8c000dd82",
+      "skills/dbio-coordination/references/direct-execution.md": "sha256:2ccbc8540dcc15f1d1ac831458cd2df73342895690086a9477afa314880d2918"
     }
   },
   "skills/dbio-core": {
@@ -71,7 +73,9 @@
     "version": "local",
     "files": {
       "skills/dbio-core/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-core/SKILL.md": "sha256:d74c50fe942e2437ea03c9cc679b48b5e814743d56b205ae80362c0d05e8cbf9"
+      "skills/dbio-core/SKILL.md": "sha256:dd3f4c4e549c62c737f58510f4738dee75f6e66bdc99a7bc87cc203d5a41ddb7",
+      "skills/dbio-core/references/access-broker.md": "sha256:7d3acf1b7d8039ddeea9ad0312676fb5357d67dc4acfb8c73b523c40caf244bb",
+      "skills/dbio-core/references/capabilities.md": "sha256:823a6a7b710391902af62e7d24b6cf4ff4bc5b81e2280aa0d13835f6c9014f6c"
     }
   },
   "skills/dbio-driver-development": {
@@ -79,13 +83,14 @@
     "version": "local",
     "files": {
       "skills/dbio-driver-development/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-driver-development/SKILL.md": "sha256:3928815e84b52c9523ff25280bf4868019705fead083ff8c75db0961dadf363e",
-      "skills/dbio-driver-development/references/async-transport.md": "sha256:eef22b5e626602bbed381cd653377cba25e357e418b289b08b1d9a062bd30c1f",
-      "skills/dbio-driver-development/references/deploy-introspect-diff.md": "sha256:d3b94d166a24b3f17373e6ed1fbf2c9ebfc602b4a96d03cf5f589069c2fa81f6",
-      "skills/dbio-driver-development/references/extension-layers.md": "sha256:f77ccd27c0b7086a3211f3b1c5dc1d5542cf8fd991efbcfed998b4757333eec4",
-      "skills/dbio-driver-development/references/live-testing.md": "sha256:b512122f7cc8d7014fc027dad7655938e020722e389e31f79601f03ddb766df6",
-      "skills/dbio-driver-development/references/storage-class.md": "sha256:3b24d2865e6f478418b07f54fce760474919e09b207d6cbe56d61d6d56b31c04",
-      "skills/dbio-driver-development/references/storage-seams.md": "sha256:c20a95191e4b9e9fe2e814baf938d19189c401ca3ec3640204b548f008f458c1"
+      "skills/dbio-driver-development/SKILL.md": "sha256:06137a2b94ec790705c82da40f26d66cde2f0bc2e6f77cae5e3b04bc49043a6f",
+      "skills/dbio-driver-development/references/async-transport.md": "sha256:3cfb95ea68e8b37c1f8010a8fcc57c754d9068fdc63e8b7e2263ca54e5cc71e6",
+      "skills/dbio-driver-development/references/deploy-introspect-diff.md": "sha256:35896023782cae24e58a961d11c39966e7f00072e06aed0596bedde4db393391",
+      "skills/dbio-driver-development/references/extension-layers.md": "sha256:6ee6ec68d06017d471ef08a3c22655ff13caa2c189f69263f85f0792f48dcc30",
+      "skills/dbio-driver-development/references/live-testing.md": "sha256:38b2c2e31b5b29623d65b5065aebc9c3ed45f835e0413d190f0956c42e1d6fb2",
+      "skills/dbio-driver-development/references/platform-skips.md": "sha256:87149ff3ade7a667bc9c80d5a568ea712be0da37f9e9bdb24a52d62bf85c7513",
+      "skills/dbio-driver-development/references/storage-class.md": "sha256:9a90890116ad125516fc128de438db0b9bb39c406e4294585b1b56ff60f126f5",
+      "skills/dbio-driver-development/references/storage-seams.md": "sha256:a8d25f5e84bf2235bb6db42a345041f82b2deb777cbf499a3d87f1bec4674762"
     }
   },
   "skills/dbio-mysql": {
@@ -93,7 +98,7 @@
     "version": "local",
     "files": {
       "skills/dbio-mysql/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-mysql/SKILL.md": "sha256:3a1cf589abc1826a00ed43031bb06dedacaf50d22f83bf51965c93a32f0415c6"
+      "skills/dbio-mysql/SKILL.md": "sha256:698d131b757f7b29ebc8d5ef1ea6f9a8890bd46644240b7bf41436d62a990aa8"
     }
   },
   "skills/dbio-mysql-database": {
@@ -101,7 +106,7 @@
     "version": "local",
     "files": {
       "skills/dbio-mysql-database/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-mysql-database/SKILL.md": "sha256:4c2f5894cb30e9234c1ef99f10e968b7336a05da9c8f8d12c188867cce316bc7"
+      "skills/dbio-mysql-database/SKILL.md": "sha256:3626e3fb98f887ce639b7034fadf5851f2973069f183d9fac9157430c01a1f03"
     }
   },
   "skills/dbio-perl-class-patterns": {
@@ -109,7 +114,7 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-class-patterns/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-class-patterns/SKILL.md": "sha256:951102cfb3495f444ab940d2e541eac373daa599b9c7ac3632d8e14053091234"
+      "skills/dbio-perl-class-patterns/SKILL.md": "sha256:fb29159fb89fbcdfc7a21869ed18eb35d9e882521c4f1460428caa5325b5a46c"
     }
   },
   "skills/dbio-perl-pod": {
@@ -117,7 +122,7 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-pod/SKILL.md": "sha256:ffd323a96fdb048358270349a146c0335e02aa9654e6b9026ca67bbabba1b74e"
+      "skills/dbio-perl-pod/SKILL.md": "sha256:73117b7414d66747b31d587b948da9789c98494314b4c4f7bd47da0b84967298"
     }
   },
   "skills/dbio-perl-release": {
@@ -125,7 +130,9 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-release/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-release/SKILL.md": "sha256:88d41995f66fcb1fc9ab968014e906285f66a57bb701d9c22dbd7e3ed6c356b6"
+      "skills/dbio-perl-release/SKILL.md": "sha256:4717f1a4df445b9ac2f12f784b8490c77bf40281290c3733b95e598f621e4027",
+      "skills/dbio-perl-release/references/bundle-tests.md": "sha256:ab06a655ec9360459e27d90d2379d01892332b280e2ec89dbf1d12e83da63fac",
+      "skills/dbio-perl-release/references/share-skill.md": "sha256:b1f4b89ab26edaad09c9baee27d589f929b3e8504161881756e7976d3fcb5fef"
     }
   },
   "skills/dbio-perl-syntax": {
@@ -133,7 +140,7 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-syntax/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-syntax/SKILL.md": "sha256:459ed6ed8ae462bf2af5e055acd5b3a0f57a5d8579ffc14e0567f96efa0071d9"
+      "skills/dbio-perl-syntax/SKILL.md": "sha256:b749a184fe55e2de380c3c1cae55be65e9b813e229220a934cab9ef8eb144798"
     }
   },
   "skills/getty-git-commit-style": {

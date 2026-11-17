@@ -2,6 +2,11 @@ use strict;
 use warnings;
 use Test::More;
 
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use LiveServer;
+use LibpqEnglish;   # libpq words its messages by locale, see there
+
 # OFFLINE test: a connection the future_io transport cannot open is reported
 # without its password (karr k111; core k297 for the sync storage).
 #
@@ -79,9 +84,10 @@ my %SECRET = (
   attr   => [ 'attr-s3cret-k111' ],
 );
 
-# libpq's reason, by what no locale translates: the socket it tried, or the
-# string it could not read.
-my $SOCKET_TRIED = qr{\Q$DEAD\E/\.s\.PGSQL\.\d+};
+# libpq's reason, by what no locale translates: the socket it tried (a libpq
+# without Unix-domain sockets names none: a failed connection), or the string
+# it could not read.
+my $SOCKET_TRIED = LiveServer->dead_host_reason($DEAD);
 my $URI_REFUSED  = qr{"postgresql://app(?::\*\*\*)?\@\[::1/appdb};
 
 my @CASES = (

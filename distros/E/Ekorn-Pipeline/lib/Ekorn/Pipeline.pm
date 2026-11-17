@@ -17,7 +17,7 @@ use Ekorn::Pipeline::Stage    qw();
 
 use namespace::clean -except => 'import';
 
-our $VERSION = 'v0.3.3';
+our $VERSION = 'v0.3.5';
 
 our @EXPORT_OK = qw(is_sink is_stage);
 
@@ -125,7 +125,9 @@ sub new ($class, @given) {
     my $sink = @stages ? is_sink($stages[-1]) : !!0;
     # Where every stage is a plain step, a Stage of Ekorn's own, with no
     # flush, end or sink, and nothing made for a run, a push runs the
-    # steps in a plain loop, with none of a run's machinery.
+    # steps in a plain loop, with none of a run's machinery; otherwise it
+    # makes the stages for the run first, and takes the plain loop if
+    # what's made allows it.
     my @steps
         = (grep { ref ne 'Ekorn::Pipeline::Stage' } @stages)
         ? ()
@@ -142,10 +144,7 @@ sub new ($class, @given) {
             my @results
                 = @steps
                 ? _push_steps($self, \@steps, \@names, \@within, @values)
-                : _iterator(
-                    $self, \@stages, \@names, \@within,
-                    sub { splice @values },
-                )->all;
+                : _pushed($self, \@stages, \@names, \@within, \@values);
             return @results    if wantarray;
             return $results[0] if $sink && $sink eq 'one';
             return \@results   if $sink;
@@ -465,7 +464,7 @@ sub _make_run ($stages, $names, $within, $run) {
                     $run,
                 );
                 next unless $flush || $end;
-                $step = sub ($value) { $value };
+                $step = sub { $_[0] };    # for each value: no signature
             }
         }
         elsif ($role eq 'EKORN_SINK_ONE' || $role eq 'EKORN_SINK_MANY') {
@@ -507,13 +506,6 @@ sub _make_run ($stages, $names, $within, $run) {
 
 # Return an iterator handing out, one per call, the values from $source
 # run through the stages in @$stages, named in messages by @$names.
-#
-# The run ends as soon as nothing in it can still act on a value: the
-# source has run out or stopped, every flush has been called, and every
-# value still to be handed out has passed the last stage; or when it's
-# ended from outside, or dies. Then each end is called, the source's
-# first, told how the run ended from where it stands: "died" if the run
-# died; else "done" if its input ran out, and "stopped" if not.
 sub _iterator ($pipeline, $stages, $names, $within, $source) {
     my %run = (
         stages => [], names => [], within => [], flushes => [], ends => [],
@@ -525,29 +517,73 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
         _make_run($stages, $names, $within, \%run) if @$stages;
     }
     catch ($e) {
-        _end_all(
-            [
-                ($source_end ? ['the source', $source_end, 'died'] : ()),
-                map { [_run_label($pipeline, \%run, $_), $run{ends}[$_], 'died'] }
-                    grep { $run{ends}[$_] } 0 .. $#{ $run{ends} },
-            ],
-            1,
-        );
-        # A set-up runs before the run has values, so has nothing to stop.
-
-        croakf 'Expected no stop in a set-up, as the run has nothing yet to stop'
-            if $e isa 'Ekorn::Pipeline::Stop';
-        croak $e if is_ref($e);
-        die $e;    ## no critic (ErrorHandling::RequireCarping): thrown again, as it was
+        _set_up_died($pipeline, \%run, $source_end, $e);
     }
     # A run with no flush, no end of a stage's, and no sink, as most are,
     # takes the shorter way.
     return _plain_iterator($pipeline, \%run, $pull, $source_end, $context)
         unless grep { defined } @{ $run{flushes} }, @{ $run{ends} };
-    my @stages  = @{ $run{stages} };
-    my @flushes = @{ $run{flushes} };
-    my @ends    = @{ $run{ends} };
-    my @sinks   = @{ $run{sinks} };
+    return _full_iterator($pipeline, \%run, $pull, $source_end, $context);
+}
+
+
+# Return the results of pushing @$values through @$stages, as a run of
+# them gives them: once the stages are made for the run, by the plain
+# loop if none has a flush or an end, as most haven't, so a stage made
+# with gather costs no more a value than a plain one; otherwise by an
+# iterator of the run. Its set-up is _iterator's, with no source to set
+# up.
+sub _pushed ($pipeline, $stages, $names, $within, $values) {
+    my %run = (
+        stages => [], names => [], within => [], flushes => [], ends => [],
+        sinks  => [],
+    );
+    try {
+        _make_run($stages, $names, $within, \%run);
+    }
+    catch ($e) {
+        _set_up_died($pipeline, \%run, undef, $e);
+    }
+    return _push_steps($pipeline, @run{qw(stages names within)}, @$values)
+        unless grep { defined } @{ $run{flushes} }, @{ $run{ends} };
+    return _full_iterator($pipeline, \%run, sub { splice @$values }, undef, undef)
+        ->all;
+}
+
+
+# Tell each end of a run made by then, the source's first, that the run
+# died, as a set-up died with $error, and throw it on.
+sub _set_up_died ($pipeline, $run, $source_end, $error) {
+    _end_all(
+        [
+            ($source_end ? ['the source', $source_end, 'died'] : ()),
+            map { [_run_label($pipeline, $run, $_), $run->{ends}[$_], 'died'] }
+                grep { $run->{ends}[$_] } 0 .. $#{ $run->{ends} },
+        ],
+        1,
+    );
+    # A set-up runs before the run has values, so has nothing to stop.
+    croakf 'Expected no stop in a set-up, as the run has nothing yet to stop'
+        if $error isa 'Ekorn::Pipeline::Stop';
+    croak $error if is_ref($error);
+    die $error;    ## no critic (ErrorHandling::RequireCarping): thrown again, as it was
+}
+
+
+# Return an iterator of a run that isn't plain, made by _iterator or
+# _pushed, from its source's step, end and context.
+#
+# The run ends as soon as nothing in it can still act on a value: the
+# source has run out or stopped, every flush has been called, and every
+# value still to be handed out has passed the last stage; or when it's
+# ended from outside, or dies. Then each end is called, the source's
+# first, told how the run ended from where it stands: "died" if the run
+# died; else "done" if its input ran out, and "stopped" if not.
+sub _full_iterator ($pipeline, $run, $pull, $source_end, $context) {
+    my @stages  = @{ $run->{stages} };
+    my @flushes = @{ $run->{flushes} };
+    my @ends    = @{ $run->{ends} };
+    my @sinks   = @{ $run->{sinks} };
     # The places of the stages with a flush, so finding the next needn't
     # look at every stage.
     my @flush_at = grep { $flushes[$_] } 0 .. $#stages;
@@ -596,7 +632,7 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
             if $source_end;
         push @calls,
             map { [
-                _run_label($pipeline, \%run, $_), $ends[$_],
+                _run_label($pipeline, $run, $_), $ends[$_],
                 $input_done[$_] ? 'done' : 'stopped',
             ] }
             grep { $ends[$_] } 0 .. $#ends;
@@ -767,7 +803,7 @@ sub _iterator ($pipeline, $stages, $names, $within, $source) {
                 croak $e if is_ref($e);
                 my $at      = Carp::shortmess() =~ s( \.? \n \z )()xr;
                 my $message = $e =~ s( \n \z )()xr =~ s( ^ )(    )xmgr;
-                my $stage   = _run_label($pipeline, \%run, $n);
+                my $stage   = _run_label($pipeline, $run, $n);
                 die "Pipeline $stage failed$at:\n$message\n";
             }
             return if $outside;

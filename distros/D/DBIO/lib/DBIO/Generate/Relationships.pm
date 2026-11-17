@@ -4,7 +4,7 @@ package DBIO::Generate::Relationships;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/Class::Accessor::Grouped/;
 use mro 'c3';
@@ -280,7 +280,7 @@ DBIO::Generate::Relationships - Relationship inference for DBIO::Generate
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 METHODS
 

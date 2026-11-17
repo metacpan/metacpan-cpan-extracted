@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE, karr k88 (core ed0f33a0e): a storage that has run deploy_async, listen
 # or copy_in is freed when its holder lets go of it -- the same claim core

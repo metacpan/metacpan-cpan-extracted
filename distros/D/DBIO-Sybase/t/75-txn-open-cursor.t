@@ -112,7 +112,7 @@ sub fresh {
   like $@, qr/COMMIT.*open cursor/s,
     'commit with an open cursor throws, naming the cursor (before anything is sent)';
   is_deeply $dbh->{log}, [ 'finish cur', 'do ROLLBACK' ],
-    '... then the failed commit ends the transaction (core, karr k372): the cursor is finished, ROLLBACK on the same dbh';
+    '... then the failed commit ends the transaction (core): the cursor is finished, ROLLBACK on the same dbh';
   ok !$k->{Active}, '... the cursor is ended';
   is $s->transaction_depth, 0, '... depth 0, no txn_rollback needed';
 }

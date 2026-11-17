@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use DBIO::SQLMaker;          # the mock's sql_maker_class
@@ -38,7 +40,7 @@ use DBIO::Async::Pool;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w };
   }
@@ -70,7 +72,7 @@ sub new_storage {
 # The server answers the statement in flight on $conn.
 sub answer_one { syswrite $_[0]{w}, 'R' }
 
-sub settle { my $f = shift; eval { $f->get }; return $f }
+sub settle { my $f = shift; eval { get_within($f, 15) }; return $f }
 
 # What is queued on the connection, in order: the SQL of every live entry.
 sub waiting_sql {

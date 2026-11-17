@@ -36,11 +36,11 @@ BEGIN {
     1;
   } or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-  plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+  plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
     unless DBIO::Storage::Async->can('listen_alive');
-  plan skip_all => 'the installed DBIO core predates _listen_error for non-fatal listen errors (core k227)'
+  plan skip_all => 'the installed DBIO core predates _listen_error for non-fatal listen errors'
     unless DBIO::Storage::Async->can('_listen_error');
-  plan skip_all => 'the installed dbio-async predates its Future::IO listen seams (dbio-async k22)'
+  plan skip_all => 'the installed dbio-async predates its Future::IO listen seams'
     unless defined &DBIO::Async::Storage::_listen_drain
         && defined &DBIO::Async::Storage::_listen_watch;
 }
@@ -155,7 +155,8 @@ my $next_thread = 100;
     my $dbh = $self->{dbh};
     die "DBD::mysql::st execute failed: MySQL server has gone away\n" if $dbh->{dead};
     my $r = eval { $main::SERVER->answer($self->{sql}, \@bind, $dbh->{thread_id}) };
-    $self->{result}           = $r || { error => $@ };
+    # the server's error number, as the DBD leaves it on the handle
+    $self->{result}           = $r || { error => $@, err => ($@ =~ /doesn't exist/ ? 1146 : undef) };
     $self->{NUM_OF_FIELDS}    = $self->{result}{fields} // 0;
     $self->{mysql_insertid}   = $self->{result}{insertid} // 0;
     $self->{mariadb_insertid} = $self->{mysql_insertid};
@@ -183,6 +184,7 @@ my $next_thread = 100;
     my $dbh = $self->{dbh};
     undef $dbh->{in_flight} if $dbh->{in_flight} && $dbh->{in_flight} == $self;
     my $r = $self->{result};
+    $dbh->{err} = $r->{err};
     die "DBD::mysql::st execute failed: $r->{error}" if defined $r->{error};
     return $r->{rv} // '0E0';
   }

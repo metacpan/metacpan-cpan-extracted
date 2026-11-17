@@ -93,6 +93,7 @@ my $CHARSET = 'latin1';
 sub wait_for {
   my ($f, $seconds) = @_;
   my $late  = 0;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $timer = EV::timer($seconds, 0, sub { $late = 1 });
   EV::run(EV::RUN_ONCE) until $f->is_ready || $late;
   return $f->is_ready;

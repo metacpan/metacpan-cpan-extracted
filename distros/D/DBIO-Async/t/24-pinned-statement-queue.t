@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO;
@@ -82,7 +84,7 @@ use DBIO::Async::TransactionContext;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w, socket => 7 };
   }
@@ -156,7 +158,8 @@ sub new_storage {
 sub label { my ($sql) = @_; return $sql =~ /\bFROM (\w+)/ ? $1 : $sql }
 
 # Drive the loop until the Future settles, without dying on a failure.
-sub settle { my $f = shift; eval { $f->get }; return $f }
+# A Future the fake never answers fails the test after 15 seconds, not hangs it.
+sub settle { my $f = shift; eval { get_within($f, 15) }; return $f }
 
 # A statement on the context, with its settling logged -- from a callback on
 # the caller's own Future, so the log shows when the CALLER saw the result
@@ -349,8 +352,7 @@ for my $method (qw(_mark_connection_dead _retire_in_use_connection acquire)) {
     . 'refused by the queue, not by the dead handle';
   is_deeply $storage->{wire}, [ 'BEGIN', 'KILL' ],
     'dead connection: nothing after the kill reached the wire -- not the '
-    . 'waiting statement, not the one issued on the failure, and no ROLLBACK '
-    . '(k47, core k274)';
+    . 'waiting statement, not the one issued on the failure, and no ROLLBACK';
   unlike scalar $f->failure, qr/Rollback failed/,
     'dead connection: ... no ROLLBACK was issued on it, so the transaction '
     . 'fails with the original error and names no rollback';
@@ -365,7 +367,7 @@ for my $method (qw(_mark_connection_dead _retire_in_use_connection acquire)) {
 
 {
   my $storage = new_storage();
-  my $conn = $storage->pool->acquire->get;
+  my $conn = get_within($storage->pool->acquire);
 
   my $fa = pinned($storage, $conn, 'a');
   my $fb = pinned($storage, $conn, 'b');
@@ -395,7 +397,7 @@ for my $method (qw(_mark_connection_dead _retire_in_use_connection acquire)) {
 
 {
   my $storage = new_storage();
-  my $conn = $storage->pool->acquire->get;
+  my $conn = get_within($storage->pool->acquire);
 
   my $fa = pinned($storage, $conn, 'a');
   my $fb = pinned($storage, $conn, 'b');

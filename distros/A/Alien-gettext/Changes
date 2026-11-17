@@ -1,5 +1,14 @@
 Revision history for Alien-gettext
 
+0.003     2026-11-17 04:51:12Z
+    - Build on Alien::Build with an alienfile instead of the deprecated
+      Alien::Base::ModuleBuild; the share build now downloads over https
+      from ftp.gnu.org/gnu/gettext/ and builds static internal libraries
+    - Probe for a system gettext by running msgfmt --version
+    - Fix the dist summary typo ("an" for "and") and describe the dist as
+      finding or building the GNU gettext command-line tools
+    - Drop the unused Travis CI configuration
+
 0.002     2026-09-19 02:53:52Z
     - Update dist config to current @Author::GETTY standards
     - Add msgmerge to the provided gettext tools

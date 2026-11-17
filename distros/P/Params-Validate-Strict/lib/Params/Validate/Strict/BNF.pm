@@ -6,7 +6,7 @@ use Carp ();
 use Exporter qw(import);
 use Params::Validate::Strict qw(validate_strict);
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 our @EXPORT_OK = qw(bnf_to_matcher);
 
 my %_cache;

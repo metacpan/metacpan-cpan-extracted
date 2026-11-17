@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 use Test::Exception;
 
 use Future;
@@ -56,7 +58,7 @@ use DBIO::Async::Pool;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { r => $r, w => $w, id => ++$self->{_next_id} };
   }
@@ -123,7 +125,7 @@ sub deploy_quietly {
   {
     local $SIG{__WARN__} = sub { push @warnings, $_[0] };
     $f = $storage->deploy_async(@args);
-    eval { $f->get };
+    eval { within(15, sub { $f->get }) };
   }
   note "deploy warned: $_" for @warnings;
   return ($f, \@warnings);

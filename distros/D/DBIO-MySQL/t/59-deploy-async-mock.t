@@ -259,7 +259,7 @@ my @async_stmts;
   isa_ok $f, 'Future', 'deploy_async returns a Future';
 
   ok eval { $f->get; 1 },
-    'deploy_async completes (the _ddl_class croak is gone -- karr k46)' or diag $@;
+    'deploy_async completes (the _ddl_class croak is gone)' or diag $@;
   ok $f->is_done && !$f->is_failed, 'deploy_async succeeded';
 
   is $pool->{acquired}, 1, 'the whole DDL batch ran on exactly one acquired connection';

@@ -209,4 +209,18 @@ no_leaks_ok {
 	   'bfill: an unknown option prints the help screen');
 }
 
+# `limit` counts only the cells ffill/bfill can write.  Up to 0.3422 a row that
+# is no hash, or an AoA row too short to hold the column, counted against it,
+# so ffill([{a=>1}, undef, {a=>undef}], limit => 1) left the last row unfilled.
+is_deeply(ffill([ { a => 1 }, undef, { a => undef } ], limit => 1), [ { a => 1 }, undef, { a => 1 } ],
+	'ffill: a row that is no hash does not count against limit (AoH)');
+is_deeply(bfill([ { a => undef }, 'x', { a => 2 } ], limit => 1), [ { a => 2 }, 'x', { a => 2 } ],
+	'bfill: likewise');
+is_deeply(ffill({ x => { a => 1 }, y => 'z', zz => { a => undef } }, limit => 1),
+	{ x => { a => 1 }, y => 'z', zz => { a => 1 } }, 'ffill: likewise for a HoH');
+is_deeply(bfill([ [ undef, undef ], [1], [ undef, 5 ] ], limit => 1), [ [ 1, 5 ], [1], [ undef, 5 ] ],
+	'bfill: a row too short for the column does not count against limit (AoA)');
+is_deeply(ffill([ { a => 1 }, { a => undef }, undef, { a => undef } ], limit => 1),
+	[ { a => 1 }, { a => 1 }, undef, { a => undef } ], 'ffill: limit still caps the fills in a gap');
+
 done_testing;

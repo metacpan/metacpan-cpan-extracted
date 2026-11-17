@@ -2,6 +2,9 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
+use MssqlClientCharset;      # client character set UTF-8, whatever the locale
 use Test::Exception;
 use DBI;
 use DBIO::Optional::Dependencies ();
@@ -46,12 +49,20 @@ my %ENV_PREFIX = (
 my %WAY;
 for my $dbd (keys %ENV_PREFIX) {
   my ($dsn, $user, $pass) = @ENV{ map { "$ENV_PREFIX{$dbd}_$_" } qw/DSN USER PASS/ };
+  # text beyond ASCII over DBD::ODBC needs a UTF-8 client character set; the
+  # driver takes it from the locale otherwise (t/lib/MssqlClientCharset.pm)
+  $dsn = MssqlClientCharset::utf8($dsn);
   $WAY{$dbd} = [ $dsn, $user, $pass ] if $dsn and defined $user and defined $pass;
 }
 
 plan skip_all => 'Set $ENV{DBIO_TEST_MSSQL_DSN} or '
   . '$ENV{DBIO_TEST_MSSQL_ODBC_DSN}, with _USER and _PASS, to run this test'
   unless %WAY;
+
+if ($WAY{'DBD::Sybase'} and my $why = MssqlClientCharset::utf8_locale_skip_reason()) {
+  diag "DBD::Sybase is not looked at: $why";
+  delete $WAY{'DBD::Sybase'};
+}
 
 if ($WAY{'DBD::Sybase'}) {
   if (not DBIO::Optional::Dependencies->req_ok_for('test_rdbms_mssql_sybase')) {
@@ -314,7 +325,7 @@ for my $way (sort keys %WAY) {
       $rs->create({ tag => $t, nvm => $euros });
       is_deeply holds($way, nvm => $t)->[0], 2668,
         "$way: a value beyond ASCII of 4002 bytes is a literal and arrives "
-      . 'whole (karr k40), so it is not refused';
+      . 'whole, so it is not refused';
     }
   }
   else {

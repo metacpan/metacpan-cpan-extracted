@@ -1,0 +1,43 @@
+id: hosts-entry
+title: Pin a name in /etc/hosts
+difficulty: leicht
+messages:
+  - role: user
+    content: "On app-2, make db.example.org resolve to 192.0.2.10 through /etc/hosts. Keep the entries that are there."
+state:
+  app-2:
+    type: linux
+    files:
+      /etc/hosts: "127.0.0.1 localhost\n198.51.100.7 cache.example.org\n"
+rules:
+  - title: db.example.org points to 192.0.2.10
+    state: [app-2, files, /etc/hosts, content]
+    regex: "(?m)^192\\.0\\.2\\.10\\s+(\\S+\\s+)*db\\.example\\.org(\\s|$)"
+  - title: localhost kept
+    state: [app-2, files, /etc/hosts, content]
+    regex: "(?m)^127\\.0\\.0\\.1\\s+localhost"
+  - title: cache entry kept
+    state: [app-2, files, /etc/hosts, content]
+    regex: "(?m)^198\\.51\\.100\\.7\\s+cache\\.example\\.org"
+  - title: nothing else changed
+    unchanged_except: [ [app-2, files, /etc/hosts] ]
+solution:
+  - tool: run_command
+    args: { host: app-2, command: "echo '192.0.2.10 db.example.org' >> /etc/hosts" }
+alternatives:
+  - title: the whole file rewritten
+    calls:
+      - tool: write_file
+        args:
+          host: app-2
+          path: /etc/hosts
+          content: "127.0.0.1 localhost\n198.51.100.7 cache.example.org\n192.0.2.10 db.example.org\n"
+wrong_solutions:
+  - title: overwrote the file instead of appending
+    calls:
+      - tool: run_command
+        args: { host: app-2, command: "echo '192.0.2.10 db.example.org' > /etc/hosts" }
+  - title: wrong address
+    calls:
+      - tool: run_command
+        args: { host: app-2, command: "echo '192.0.2.100 db.example.org' >> /etc/hosts" }

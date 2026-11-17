@@ -30,7 +30,7 @@ my $TODO_selects =
 
 my $TODO_nested =
   'data nested under a related row that already exists is dropped -- the '
-  . 'same case as the TODO in t/multi_create/existing_in_chain.t';
+  . 'same case as the TODO in the existing_in_chain subtest of t/multi_create/small_cases.t';
 
 my $schema = DBIO::SQLite::Test->init_schema();
 

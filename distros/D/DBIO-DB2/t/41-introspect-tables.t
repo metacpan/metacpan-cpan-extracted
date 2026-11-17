@@ -54,7 +54,7 @@ my $tables = DBIO::DB2::Introspect::Tables->fetch($dbh, 'USER');
 my $sql = $dbh->{sql};
 like($sql, qr/FROM syscat\.tables t\b/,  'introspect reads syscat.tables');
 like($sql, qr/WHERE t\.tabschema = \?/, 'introspect scopes on tabschema only');
-like($sql, qr/syscat\.views/, 'a view\'s text is read from syscat.views (karr k45)');
+like($sql, qr/syscat\.views/, 'a view\'s text is read from syscat.views');
 unlike($sql, qr/NOT LIKE/,
   'no tabname NOT LIKE filter: an EX-prefix user table must stay in the model');
 unlike($sql, qr/\btabname\b\s*(?:=|\bLIKE\b|\bNOT\b)/i,

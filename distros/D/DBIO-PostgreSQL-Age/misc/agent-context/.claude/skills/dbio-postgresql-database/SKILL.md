@@ -134,8 +134,8 @@ A type without a modifier takes none: `integer(11)` is a syntax error.
 
 Features: partial (`WHERE ...`), expression (`ON lower(name)`), `INCLUDE` columns, `CONCURRENTLY`.
 
-- `pg_get_indexdef` does not print an operator class that is the default:
-  `ivfflat` defaults to `vector_l2_ops` for `vector`, `hnsw` has no default.
+- `pg_get_indexdef` does not print an operator class that is the default;
+  the pgvector defaults are in skill `dbio-postgresql`.
 - There is no `ALTER INDEX` for a predicate, an expression or the method: a
   changed index is dropped and created.
 - `CREATE INDEX CONCURRENTLY` cannot run inside a transaction block.
@@ -199,7 +199,6 @@ require one another (`postgis` before `postgis_topology`).
 - One temp database or schema per test
 - `CREATE DATABASE` / `DROP DATABASE` for isolation
 - Transactions with rollback for quick cleanup
-- `pg_prove` for pgTAP (SQL-level testing)
 
 How this distribution's own suite is run and written — `capped-test`,
 `t/lib/LiveServer.pm`, private databases — is in skill `dbio-postgresql`,

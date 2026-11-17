@@ -1,5 +1,5 @@
 package DBIO::Async;
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 # ABSTRACT: Shared, loop-agnostic async layer for DBIO drivers
 
 use strict;
@@ -42,7 +42,7 @@ DBIO::Async - Shared, loop-agnostic async layer for DBIO drivers
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

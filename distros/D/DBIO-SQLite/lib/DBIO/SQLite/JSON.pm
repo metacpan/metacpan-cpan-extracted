@@ -4,7 +4,7 @@ package DBIO::SQLite::JSON;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::SQLite::JSON::Op ();
 
@@ -32,7 +32,7 @@ DBIO::SQLite::JSON - JSON path expression helpers for DBIO::SQLite queries
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

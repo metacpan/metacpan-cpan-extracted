@@ -2,6 +2,48 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v3.1.0 2026-11-16
+
+    The Sugar names pipelines, a handle keeps the statements it uses,
+    and a little less work for each row.
+
+    One use of DBIx::Squirrel::Sugar names pipelines as well as
+    databases and statements, so a statement can name a pipeline
+    defined beside it (roadmap 2026-0027). A handle with more than
+    1,000 statements evicts those it uses least, rather than forgetting
+    them all (roadmap 2026-0030). pluck, as_hash and an iterator's next
+    do less for each row. Ekorn::Pipeline v0.3.4 makes stages a little
+    faster too: it comes with a new install, but where v0.3.3 is
+    installed already, it stays until you upgrade it yourself, as with
+    cpanm Ekorn::Pipeline.
+
+    - DBIx::Squirrel::Sugar takes pipeline, followed by what
+      Ekorn::Pipeline::Sugar takes, and names each pipeline, with a
+      function of its name, before it defines any statement, wherever
+      it's given. It gives no pipeline function. Given anything else,
+      it now croaks "Expected database, pipeline or statement, not
+      ...", not "Expected database or statement, not ..." (roadmap
+      2026-0027).
+
+    - A handle keeps what it found studying up to 1,000 statements, as
+      before, but when it has that many, it evicts 125 of those it uses
+      least, rather than all of them, so a program with more statements
+      than that keeps those it uses often, rather than studying them
+      again after each emptying. Under that pressure it takes 1 to 4%
+      less time; a statement found among those kept takes up to 60 ns
+      more, of a prepare's 7 to 9 µs (roadmap 2026-0030).
+
+    - pluck and as_hash read each row without a signature, saving
+      about 10 ns a row of pluck's 420 or so.
+
+    - An iterator with stages counts its results without a signature:
+      reading a table through one stage takes about 25 to 50 ns a row
+      less, of about 1.8 µs.
+
+    - An iterator's next takes about 5 to 35 ns a row less: it takes
+      the result without an array to hold it, and its source's step
+      has no signature.
+
 v3.0.3 2026-11-16
 
     Quicker handles, from execute to each row read.

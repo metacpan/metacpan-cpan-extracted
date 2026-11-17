@@ -1,12 +1,13 @@
 requires 'perl', '5.020';
 
-requires 'DBIO', '0.900004';
-requires 'DBIO::PostgreSQL', '0.900004';
+requires 'DBIO', '0.900007';
+requires 'DBIO::PostgreSQL', '0.900007';
 requires 'JSON::MaybeXS', '0';
 
 on test => sub {
   requires 'Test::More', '0.98';
   requires 'Test::Exception', '0.43';
+  requires 'Test::Fatal', '0';
 };
 
 on develop => sub {
@@ -16,6 +17,6 @@ on develop => sub {
   #     DBIO::PostgreSQL::EV::TestHarness (t/43 live ev integration, t/41 dual-mode).
   #   * DBIO::PostgreSQL::PostGIS -- the stacking / dual-mode regression
   #     (t/40, t/41): two storage-layer extensions on one schema.
-  recommends 'DBIO::PostgreSQL::EV', '0.900004';
-  recommends 'DBIO::PostgreSQL::PostGIS', '0.900004';
+  recommends 'DBIO::PostgreSQL::EV', '0.900007';
+  recommends 'DBIO::PostgreSQL::PostGIS', '0.900007';
 };

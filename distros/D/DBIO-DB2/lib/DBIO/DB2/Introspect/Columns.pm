@@ -4,7 +4,7 @@ package DBIO::DB2::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -161,7 +161,7 @@ DBIO::DB2::Introspect::Columns - Introspect DB2 columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

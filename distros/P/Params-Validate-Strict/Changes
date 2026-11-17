@@ -1,5 +1,26 @@
 Revision history for Params-Validate-Strict
 
+0.43	Mon Nov 16 11:38:06 AM EST 2026
+	[Enhancements]
+	- compile_schema now does real work.  The schema is analysed once, when it is
+	  compiled, and fields that use a built-in type with the common rules (min,
+	  max, optional, nullable, default, description, error_msg, matches,
+	  memberof/enum/values, case_sensitive) are validated by a fast path.  A
+	  compiled validator is about three times faster than validate_strict on a
+	  typical schema.  Results, errors, warnings and logger calls are identical;
+	  t/compile_schema.t checks the two routes against each other.  Fields using
+	  any other rule, and positional schemas, are validated by the general code
+	  exactly as before.
+	  The schema must not be modified after it has been compiled.
+	- validate_strict itself is a little faster (about 15%) for every caller: it
+	  no longer copies a hashref argument, no longer sorts the schema keys unless
+	  a 'needs' rule is present, and avoids two needless checks per rule.
+
+	[Dependencies]
+	- Added 'constant' (core) at runtime and Data::Dumper (core) for the tests.
+	[ Bug Fixes ]
+	- Fixed https://github.com/nigelhorne/Params-Validate-Strict/issues/11
+
 0.42	Thu Nov 12 01:14:48 PM EST 2026
 	[Enhancements]
 	- The 'callback' rule now passes the parameter name as a fourth argument

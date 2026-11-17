@@ -6,6 +6,7 @@ build_requires:
   Test::Exception: '0'
   Test::More: '0.98'
 configure_requires:
+  DBI: '0'
   ExtUtils::MakeMaker: '0'
   File::ShareDir::Install: '0.06'
 dynamic_config: 0
@@ -18,76 +19,79 @@ name: DBIO-DB2
 provides:
   DBIO::DB2:
     file: lib/DBIO/DB2.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::DDL:
     file: lib/DBIO/DB2/DDL.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Deploy:
     file: lib/DBIO/DB2/Deploy.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff:
     file: lib/DBIO/DB2/Diff.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::Column:
     file: lib/DBIO/DB2/Diff/Column.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::ForeignKey:
     file: lib/DBIO/DB2/Diff/ForeignKey.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::Index:
     file: lib/DBIO/DB2/Diff/Index.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::Reorg:
     file: lib/DBIO/DB2/Diff/Reorg.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::Table:
     file: lib/DBIO/DB2/Diff/Table.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::UniqueConstraint:
     file: lib/DBIO/DB2/Diff/UniqueConstraint.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Diff::View:
     file: lib/DBIO/DB2/Diff/View.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Introspect:
     file: lib/DBIO/DB2/Introspect.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Introspect::Columns:
     file: lib/DBIO/DB2/Introspect/Columns.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Introspect::ForeignKeys:
     file: lib/DBIO/DB2/Introspect/ForeignKeys.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Introspect::Indexes:
     file: lib/DBIO/DB2/Introspect/Indexes.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Introspect::Tables:
     file: lib/DBIO/DB2/Introspect/Tables.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Introspect::UniqueConstraints:
     file: lib/DBIO/DB2/Introspect/UniqueConstraints.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::SQLMaker:
     file: lib/DBIO/DB2/SQLMaker.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Storage:
     file: lib/DBIO/DB2/Storage.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Storage::Cursor:
     file: lib/DBIO/DB2/Storage/Cursor.pm
-    version: '0.900004'
+    version: '0.900007'
+  DBIO::DB2::Storage::DateTimeFormat:
+    file: lib/DBIO/DB2/Storage/DateTimeFormat.pm
+    version: '0.900007'
   DBIO::DB2::Test::Conformance:
     file: lib/DBIO/DB2/Test/Conformance.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::DB2::Type:
     file: lib/DBIO/DB2/Type.pm
-    version: '0.900004'
+    version: '0.900007'
   DBIO::Shortcut::db2:
     file: lib/DBIO/Shortcut/db2.pm
-    version: '0.900004'
+    version: '0.900007'
 requires:
   DBD::DB2: '0'
-  DBIO: '0.900004'
+  DBIO: '0.900007'
   DateTime::Format::DB2: '0'
   perl: '5.020'
 resources:
@@ -95,7 +99,7 @@ resources:
   bugtracker: https://codeberg.org/dbio/dbio-db2/issues
   homepage: https://codeberg.org/dbio/dbio-db2
   repository: https://codeberg.org/dbio/dbio-db2.git
-version: '0.900004'
+version: '0.900007'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -103,7 +107,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DBIO::SetMeta
       name: '@DBIO/DBIO::SetMeta'
-      version: '0.900004'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::Git::GatherDir
       config:
@@ -127,11 +131,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DBIO::LicenseFile
       name: '@DBIO/DBIO::LicenseFile'
-      version: '0.900004'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::DBIO::GatherSkills
       name: '@DBIO/DBIO::GatherSkills'
-      version: '0.900004'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@DBIO/ShareDir'
@@ -235,7 +239,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: v0.900004
+          tag: v0.900007
           tag_format: v%V
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -363,24 +367,31 @@ x_Dist_Zilla:
       name: '@DBIO/PodWeaver'
       version: '4.010'
     -
-      class: Dist::Zilla::Plugin::DBIO::CoverageTest
-      name: '@DBIO/DBIO::CoverageTest'
-      version: '0.900004'
-    -
       class: Dist::Zilla::Plugin::DBIO::PodCheckerTest
       name: '@DBIO/DBIO::PodCheckerTest'
-      version: '0.900004'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@DBIO/ExtraTests'
       version: '6.040'
     -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DBIO/ExecDir'
+      version: '6.040'
+    -
       class: Dist::Zilla::Plugin::MakeMaker
       config:
         Dist::Zilla::Role::TestRunner:
-          default_jobs: 1
+          default_jobs: '16'
       name: '@DBIO/MakeMaker'
       version: '6.040'
+    -
+      class: Dist::Zilla::Plugin::DBIO::CoverageGate
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: '16'
+      name: '@DBIO/DBIO::CoverageGate'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@DBIO/Readme'
@@ -396,7 +407,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::DBIO::CodebergMeta
       name: '@DBIO/DBIO::CodebergMeta'
-      version: '0.900004'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::MetaResources
       name: '@DBIO/MetaResources'
@@ -426,6 +437,10 @@ x_Dist_Zilla:
           repo_root: .
       name: '@DBIO/Git::CheckFor::CorrectBranch'
       version: '0.015'
+    -
+      class: Dist::Zilla::Plugin::DBIO::RequireCoreVersion
+      name: '@DBIO/DBIO::RequireCoreVersion'
+      version: '0.900007'
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@DBIO/TestRelease'

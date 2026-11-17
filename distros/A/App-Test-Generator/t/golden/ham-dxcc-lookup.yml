@@ -1,0 +1,37 @@
+---
+lookup_dxcc:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: lookup_dxcc
+  input:
+    callsign:
+      _source: validator
+      matches: ^([A-Z0-9]{1,3})([0-9])([A-Z]{1,4})$
+      min: 3
+      type: string
+  module: Ham::DXCC::Lookup
+  output:
+    type: hashref
+run:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: run
+  input:
+    program:
+      optional: 0
+      position: 0
+      type: string
+  module: Ham::DXCC::Lookup
+  output: {}

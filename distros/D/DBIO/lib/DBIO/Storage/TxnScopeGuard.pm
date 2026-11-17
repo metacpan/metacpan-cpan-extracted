@@ -4,7 +4,7 @@ package DBIO::Storage::TxnScopeGuard;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Try::Tiny;
 use Scalar::Util qw(weaken blessed refaddr);
@@ -158,7 +158,7 @@ DBIO::Storage::TxnScopeGuard - Scope-based transaction handling
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -9,6 +9,7 @@ requires 'IO::Handle';
 requires 'List::Util', '1.33';   # Minimum version for any()
 requires 'Readonly::Values::Boolean';
 requires 'Scalar::Util';
+requires 'constant';   # type codes for compiled schemas
 requires 'overload';
 requires 'strict';
 requires 'warnings';
@@ -18,6 +19,7 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
+	requires 'Data::Dumper';
 	requires 'POSIX';
 	requires 'Readonly';
 	requires 'Test::Compile';

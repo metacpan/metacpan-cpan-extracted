@@ -32,9 +32,16 @@ like($loglines[0], qr/^SELECT COUNT/, 'File log via debugfh success');
 
 $schema->storage->debugfh(undef);
 
+# the file is removed so the env trace below starts from an empty one; where
+# a file can not be removed while a handle is open (Windows) the handle has
+# to be closed first, or the old line stays and counts
+close $logfh or die "Cannot close $lfn: $!";
+unlink $lfn;
+ok ! -e $lfn, 'log file removed before the env trace starts'
+  or diag "Cannot remove $lfn: $!";
+
 {
   local $ENV{DBIO_TRACE} = "2=$lfn";
-  unlink $lfn;
 
   $schema->resultset('CD')->count;
 

@@ -33,7 +33,7 @@ use EV;
 use DBIO::MySQL::NotifyTable;
 use DBIO::MySQL::EV::Storage;
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 my $h     = DBIO::MySQL::EV::TestHarness->new(connect_attrs => { pool_size => 2 });
@@ -121,6 +121,11 @@ END {
 # before the table exists is refused on a live connection, naming the way out,
 # and core does not reconnect in a loop over it.
 subtest '0) no table: listen is refused, naming deploy_notify_table' => sub {
+  # The test reads the server's English text ("doesn't exist"): the listen
+  # connection is the transport's own, so the language hook is told to make it
+  # English (without the hook the variable is unused).
+  no warnings 'once';
+  local $DBIOMySQLEVTestLanguage::OVERRIDE = 'en_US';
   my $f = settled($async->listen($A => sub {}));
   like scalar $f->failure, qr/`\Q$T\E` does not exist.*deploy_notify_table/s, 'listen failed, naming table and way out';
   run_for(0.5);
@@ -323,6 +328,7 @@ subtest 'h) fork: a child that resumes the loop during a poll leaves the parent 
   my $child = fork;
   die "fork: $!" unless defined $child;
   unless ($child) {
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     my $stop = EV::timer(1.5, 0, sub { EV::break(EV::BREAK_ALL()) });
     EV::run();
     POSIX::_exit(0);   # no END: the parent's DBI sessions stay theirs

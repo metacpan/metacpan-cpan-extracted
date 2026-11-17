@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Commands — App::Test::Generator</title>
-<meta name="description" content="The ten App::Test::Generator commands: fuzz-harness-generator, extract-schemas, test-generator-mutate, test-generator-index, generate-test-dashboard, benchmark-generator, pod-example-tester, deploy-workflows, instrument-modules and demo_extractor.">
+<meta name="description" content="The nine App::Test::Generator commands: fuzz-harness-generator, extract-schemas, test-generator-mutate, test-generator-index, generate-test-dashboard, benchmark-generator, pod-example-tester, deploy-workflows and instrument-modules.">
 <link rel="canonical" href="commands.html">
 <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="App::Test::Generator">
 <meta property="og:title" content="Commands — App::Test::Generator">
-<meta property="og:description" content="What each of the ten command-line tools does, and the options it takes.">
+<meta property="og:description" content="What each of the nine command-line tools does, and the options it takes.">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="../css/site.css">
 </head>
@@ -43,7 +43,7 @@
 <main id="main" class="wrap">
 	<h1>Commands</h1>
 	<p class="lead">
-		Ten scripts, all installed by the distribution. Four carry the daily
+		Nine scripts, all installed by the distribution. Four carry the daily
 		workflow — generate, extract, mutate, report — and the rest are helpers
 		around them.
 	</p>
@@ -63,7 +63,6 @@
 				<tr><td><code>pod-example-tester</code></td><td>POD examples → round-trip test file.</td></tr>
 				<tr><td><code>deploy-workflows</code></td><td>Two GitHub Actions workflows → another repository.</td></tr>
 				<tr><td><code>instrument-modules</code></td><td>Writes the <code>.lcsaj.json</code> path definitions.</td></tr>
-				<tr><td><code>demo_extractor</code></td><td>Self-contained demonstration of schema extraction.</td></tr>
 			</tbody>
 		</table>
 	</div>
@@ -74,6 +73,8 @@
 	</div>
 <pre><code>fuzz-harness-generator [-r] [-o FILE] schema.yml
 fuzz-harness-generator --dry-run schema.yml
+fuzz-harness-generator --strict-documented -r schema.yml
+fuzz-harness-generator --mutation-results mutation.json -o t/fuzz.t schema.yml
 fuzz-harness-generator --replay-corpus DIR -o t/fuzz_replay.t
 </code></pre>
 	<p>
@@ -92,6 +93,8 @@ fuzz-harness-generator --replay-corpus DIR -o t/fuzz_replay.t
 				<tr><td><code>-r</code>, <code>--run</code></td><td>Run the generated harness with <code>prove</code> and report the outcome.</td></tr>
 				<tr><td><code>-o FILE</code></td><td>Write the harness to <code>FILE</code> instead of standard output.</td></tr>
 				<tr><td><code>--dry-run</code></td><td>Parse the schema and report what would be generated, without writing a test file.</td></tr>
+				<tr><td><code>--strict-documented</code></td><td>Make every contradiction of a POD-derived constraint — a bound, a <code>memberof</code> list or a <code>matches</code> pattern — a failing test. Without it the harness only reports them.</td></tr>
+				<tr><td><code>--mutation-results FILE</code></td><td>Read the report written by <code>test-generator-mutate --json</code> and turn each surviving numeric-boundary mutant in the schema's module into a <code>min</code> or <code>max</code> on the matching input field. Existing constraints are never replaced; survivors that need a hand-written test are listed.</td></tr>
 				<tr><td><code>--replay-corpus DIR|FILE</code></td><td>Emit a harness that replays a saved corpus — every recorded input, in a deterministic order — rather than fuzzing afresh.</td></tr>
 				<tr><td><code>-v</code>, <code>--verbose</code></td><td>More diagnostics on standard error.</td></tr>
 			</tbody>
@@ -292,13 +295,14 @@ instrument-modules lib/My/Module.pm
 		<h2 id="demo_extractor">demo_extractor</h2>
 		<span class="tag">demo</span>
 	</div>
-<pre><code>demo_extractor
+<pre><code>perl examples/demo_extractor
 </code></pre>
 	<p>
 		Creates a temporary sample module, extracts its schemas, prints them, and
 		compares the result with the expected output. Useful as a tour of what
 		extraction can infer, and as a quick check that the extractor still
-		behaves after an upgrade.
+		behaves after an upgrade. It is an example shipped in the
+		distribution's <code>examples/</code> directory, not an installed command.
 	</p>
 
 	<h2>Exit codes</h2>
@@ -318,7 +322,7 @@ instrument-modules lib/My/Module.pm
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

@@ -1,5 +1,56 @@
 Revision history for DBIO-Oracle
 
+0.900007  2026-11-17
+    * Storage
+        - Numbers are bound and read with a decimal point in every NLS
+          territory: a connection sets NLS_NUMERIC_CHARACTERS to '.,' for its
+          session, so a NUMBER, BINARY_DOUBLE or BINARY_FLOAT with decimals
+          makes the round trip under a client such as
+          NLS_LANG=GERMAN_GERMANY.AL32UTF8, where a bound 1.5 was refused
+          with ORA-01722. The environment variable of that name does not
+          change it; an on_connect_do or on_connect_call of the application
+          runs after and wins.
+        - An error text carries no bound value whatever language the session
+          reports in: the rules that replace the value (ORA-03302, ORA-03301,
+          ORA-01722, ORA-01438, ORA-61800, ORA-01428) read the error code and
+          the structure of the message, not the English sentence, so a short
+          value no longer stands in the clear in a German message. Where the
+          structure of a message is not known, the text after the code is
+          replaced by ***; the code and the columns stay. French is read
+          too (the French details line and help line of ORA-00001, the help
+          label with a blank before the colon, and a link line that follows
+          the language of the client and not of the session), so the
+          columns of a key stay in a French environment, in an American
+          session as well
+          (docs/adr/0012-oracle-error-values-masking.md).
+    * Introspect
+        - The model lists its foreign keys of a table and the views a view
+          rests on in the same order in every session language: names are
+          read in binary order (NLSSORT with NLS_SORT=BINARY), not in the
+          NLS_SORT of the session, under which names such as a_x, aB and Ab
+          came in another order. The session keeps its own NLS_SORT.
+    * Tests
+        - The error masking is tested with the German texts of the server and
+          with made-up texts of an unknown language; the live test runs every
+          case in an English and in a German session of its own. The live
+          tests that read an English sentence of the server put their
+          connection on English messages.
+        - The live tests that list the data dictionary sort names binary, so
+          their expectations hold in a session with another NLS_SORT. The
+          order of the introspection is pinned offline by the text of its
+          ORDER BY clauses and live under NLS_SORT=GERMAN.
+        - The temporary-user deploy test replaces its subs under
+          no warnings 'redefine', so it passes on older perls too.
+    * Documentation
+        - The dbio-oracle and dbio-oracle-database skills state the LOB
+          comparison parts as the code has them (text 1000 characters,
+          binary 2000 bytes), list the capability declarations (transactional
+          DDL, set operator ALL family, exists query, upsert) and the live
+          test path.
+    * Dependencies
+        - Requires Math::Base36 >= 0.14; earlier versions warn "Negative
+          repeat count does nothing" on every shortened identifier.
+
 0.900004  2026-11-08
     * Storage
         - An error text names the error code, the column, the table and the

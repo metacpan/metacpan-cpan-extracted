@@ -57,6 +57,7 @@ await_guarded(
 is $storage->pool->size, 2, 'two pooled connections';
 
 my $ticks = 0;
+EV::now_update();
 my $timer = EV::timer 0.05, 0.05, sub { $ticks++ };
 
 my $t0 = Time::HiRes::time;

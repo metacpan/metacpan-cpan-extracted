@@ -4,9 +4,9 @@ package DBIO::SQLite::Introspect::Indexes;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
-use DBIO::SQLite::Util qw(quote_identifier sql_tokens);
+use DBIO::SQLite::Util qw(quote_identifier selectall_hashrefs sql_tokens);
 
 
 
@@ -22,17 +22,13 @@ sub fetch {
   );
 
   for my $table_name (sort keys %$tables) {
-    my $list = $dbh->selectall_arrayref(
-      sprintf('PRAGMA index_list(%s)', quote_identifier($table_name)),
-      { Slice => {} },
-    );
+    my $list = selectall_hashrefs($dbh,
+      sprintf('PRAGMA index_list(%s)', quote_identifier($table_name)));
 
     my %t_idx;
     for my $idx (@$list) {
-      my $info = $dbh->selectall_arrayref(
-        sprintf('PRAGMA index_info(%s)', quote_identifier($idx->{name})),
-        { Slice => {} },
-      );
+      my $info = selectall_hashrefs($dbh,
+        sprintf('PRAGMA index_info(%s)', quote_identifier($idx->{name})));
       my @cols = map { $_->{name} // '' } sort { $a->{seqno} <=> $b->{seqno} } @$info;
 
       my $sql = $sql_lookup->{ $idx->{name} }
@@ -74,7 +70,7 @@ DBIO::SQLite::Introspect::Indexes - Introspect SQLite indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

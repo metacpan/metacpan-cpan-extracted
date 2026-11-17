@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 # Loaded before anything polls: Future::IO takes the implementation that is
 # loaded first, and this one applies itself as it loads. Only a recommendation
@@ -65,7 +67,7 @@ $SIG{PIPE} = 'IGNORE';
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $id = ++$self->{_next_id};
     $self->{server}{$id} = $w;

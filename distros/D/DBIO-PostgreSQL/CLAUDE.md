@@ -90,7 +90,7 @@ because the DDL generator calls it by name. The binding is the one source of
 the namespace the class's definitions are installed into, and it never
 restricts the deploy: only `pg_schemas` does, and it keeps the order it was
 declared in. The class has no name of its own; an instance may be given one
-with `PgSchema->new(pg_schema_name => 'auth')` (karr k103):
+with `PgSchema->new(pg_schema_name => 'auth')`:
 
 ```perl
 package MyApp::DB;
@@ -308,7 +308,7 @@ All introspection goes through `pg_catalog`; `information_schema` is not read:
   `pg_get_functiondef()`, `pg_get_viewdef()` → exact DDL. A view definition is
   read under an empty `search_path`, so it is the same text in every session;
   the other texts are read under the session's `search_path` and name an
-  object without its schema where that path finds it (karr k120, point 7)
+  object without its schema where that path finds it
 
 ### Diff Output
 
@@ -346,7 +346,7 @@ each feature.
   declared extension) and restricts its deploy to it; `pg_search_path` is not read
   there (ADR 0008); a diff over such a connection writes the
   `pg_namespace` lookup that creates a missing schema ahead of a `CREATE EXTENSION ... WITH SCHEMA` whose schema is
-  not `public`, since the deploy sees the namespace alone (karr k131). Types
+  not `public`, since the deploy sees the namespace alone. Types
   and functions of such a connection are declared without a schema (enum
   column list, `pg_extra_ddl`) and land in the namespace;
   `pg_enum`/`pg_type`/`pg_function` need the refused `pg_schema_class`
@@ -355,7 +355,7 @@ each feature.
   `search_path` of every connection of the schema (sync and each `future_io`
   pool connection), set ahead of `on_connect_do`: the declared entries, then
   the schemas the declared extensions name, then the extensions' activation;
-  nothing is set when none is declared (karr k121) `[P1]`
+  nothing is set when none is declared `[P1]`
 - Tables: CREATE/DROP TABLE, also UNLOGGED and the switch between the two
   (SET LOGGED/UNLOGGED, written in foreign-key order: to UNLOGGED the
   referencing table first, to LOGGED the referenced one first; two tables
@@ -482,7 +482,7 @@ placeholder.
   inherits (INHERITS): its inherited columns are changed at the parent, and
   the diff refuses to create one or to change what a table belongs to `[P3]`
 - Foreign Tables (FDW): recognized as a table kind; the diff drops one and
-  refuses to create one; FDW management is parked on karr k36 `[P3]`
+  refuses to create one; FDW management is not covered `[P3]`
 - Generated Columns (STORED, VIRTUAL on 18): the diff writes `GENERATED ALWAYS
   AS (expr) STORED|VIRTUAL` in CREATE TABLE and ADD COLUMN and refuses a change
   to an existing one; no way to declare one `[P3]`
@@ -500,7 +500,7 @@ placeholder.
 ### Multi-Tenant via PG Schemas
 ```perl
 # One schema class, one PostgreSQL schema per tenant: the connection names
-# the namespace, the class names none (karr k128, ADR 0008)
+# the namespace, the class names none (ADR 0008)
 foreach my $tenant (@tenants) {
     my $schema = MyApp::DB->connect($dsn, $user, $pass,
         { schema => $tenant->schema_name });
@@ -543,8 +543,9 @@ __PACKAGE__->pg_extensions(qw(
 
 - **Unit tests** (no DB): annotation parsing, DDL generation, diff logic
 - **Integration tests** (need PostgreSQL): introspection, deploy, roundtrip
-- `t/120-conformance-ddl(-live).t` runs the core's shared DDL case table, one
-  schema per case; `t/122-conformance-ddl-text.t` checks the same cases offline
+- `t/120-conformance.t` checks the declarations of the DDL, Diff and Bind lists
+  offline (one subtest each); `t/120-conformance-ddl-live.t` runs the core's
+  shared DDL case table, one schema per case; `t/122-conformance-ddl-text.t` checks the same cases offline
 - `t/140-mask-error-values.t` (offline table of server texts) and
   `t/141-error-values-live.t` (a marker bound per form, also where the server
   reads it as a name; sync and future_io, which holds no value at the handle
@@ -583,6 +584,11 @@ generation) require the `vector` extension; the extension tests also use `age` a
 `postgis`. One run per database at a time. How a live database is provided, the caps and
 the preflight are in "Live testing" of `.claude/rules/.local.dbio-rules.md`.
 
+`DBIO_TEST_SERVER_LANGUAGE=de|fr` makes every connection of the live suite report in that
+language (`lc_messages` per session, set in `t/lib/LiveServer.pm`); unset, the server's own
+language holds. A test that checks the English wording of a server message sets its session
+to `SET lc_messages = 'C'`; `t/142` sets its own language.
+
 ### The maintainer's cluster, and the pod scripts
 
 The maintainer's own live databases (`dbio-db up|env postgresql`, namespace `dev-dbio`) are
@@ -591,8 +597,7 @@ infrastructure*; there `dbio-db env postgresql` names `dbio_test`, which this re
 replaces by `dbio_pg` in `DBIO_TEST_PG_DSN` and `DBIO_TEST_PG_EXT_DSN`.
 
 `maint/k8s/pg-pod.yaml` is the manifest `dbio-db` starts the standing PostgreSQL pod
-from; keep it. The script `xbin/dbio-pg-k8s` that once built the same pod is gone (karr
-k121): `dbio-db` provides the database.
+from; keep it. `dbio-db` provides the database.
 
 ## Important Design Decisions
 

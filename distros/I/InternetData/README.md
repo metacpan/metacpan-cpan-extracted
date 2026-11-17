@@ -167,7 +167,7 @@ if (my $err = $@) {
 
 `kind` is one of `bad_request`, `unauthorized`, `forbidden`, `rate_limited`, `quota_exceeded`, `server_error` or `network`. `message` is a lookup refusal's explanation, or a database call's own result code, so a 403 from a download tells you whether it was `NOT_LICENSED`, `LICENSE_EXPIRED` or `IP_NOT_ALLOWED`, a call from an address the key or its organization does not allow.
 
-Note that `rate_limited` and `quota_exceeded` both arrive as HTTP 429 and are not the same thing. A rate limit is when the API faces extreme traffic bursts and so retrying later works; but a spent quota needs your allowance raised or the window to roll over. The library retries rate limits for you, but not if your quota is exceeded. The database API has no quota, so you won't see `quota_exceeded` from it. Nothing else in the 4xx range is retried at all: a misspelled database ID is a 404, and asking for it three times gets the same answer three times.
+Note that `rate_limited` and `quota_exceeded` both arrive as HTTP 429 and are not the same thing. A rate limit is when the API faces extreme traffic bursts and so retrying later works; but a 429 without `Retry-After` is `quota_exceeded`, which the library never retries. The API itself always sends `Retry-After` with a 429, so that one comes from something in between, such as a proxy; a paid key past its overage cap gets `cap_reached` instead. The database API has no quota, so you won't see `quota_exceeded` from it. Nothing else in the 4xx range is retried at all: a misspelled database ID is a 404, and asking for it three times gets the same answer three times.
 
 ### Timeouts and retries
 
@@ -329,13 +329,14 @@ Each redirect URI must be https on a public host name, or http on a loopback add
 
 ### Absent is not false
 
-Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its daily trial is spent. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
+Unlimited leaves out `is_vpn`, `is_hosting`, `is_cdn` and the four proxy flags, the detail behind them, and the paid members inside `location`, `asn`, `company` and `abuse`, such as `location->{city}`; a free-plan key's answer carries `trial_expired`, true once its daily trial is spent. A paid key's carries `cap_reached`, true once its organization's overage cap is reached, when the answer has Unlimited's fields and isn't billed. A field your plan does not include is absent, which never means "we checked and found nothing". Perl makes that easy to miss, since `undef` and `0` are both false.
 
 ```perl
 if ($result->is_hosting // 0) { ... }          # absent counts as false
 if ($result->has('is_hosting')) { ... }        # is this field in my plan? Not without a key
 if (exists $result->location->{city}) { ... }  # and a member inside an object
 if ($result->trial_expired) { ... }            # a free-plan key's daily trial is spent
+if ($result->cap_reached) { ... }              # a paid key is past its overage cap
 ```
 
 ## Other Libraries

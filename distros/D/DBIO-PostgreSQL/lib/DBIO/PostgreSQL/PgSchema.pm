@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::PgSchema;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 my (%_CLASS_ENUM_DEFS, %_CLASS_TYPE_DEFS, %_CLASS_FUNCTION_DEFS);
 
@@ -95,7 +95,7 @@ DBIO::PostgreSQL::PgSchema - Base class for PostgreSQL schema namespaces
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -33,7 +33,7 @@ cat-v \[ 选项 \] args ...
 
 # VERSION
 
-Version 1.05
+Version 1.06
 
 # DESCRIPTION
 
@@ -63,41 +63,44 @@ Version 1.05
 
 第二个字段是默认操作。`s` 表示符号，`m` 表示 Unicode 标识，`0` 表示不转换。
 
-    nul   s  \000  \x{2400}  ␀  SYMBOL FOR NULL
-    soh   s  \001  \x{2401}  ␁  SYMBOL FOR START OF HEADING
-    stx   s  \002  \x{2402}  ␂  SYMBOL FOR START OF TEXT
-    etx   s  \003  \x{2403}  ␃  SYMBOL FOR END OF TEXT
-    eot   s  \004  \x{2404}  ␄  SYMBOL FOR END OF TRANSMISSION
-    enq   s  \005  \x{2405}  ␅  SYMBOL FOR ENQUIRY
-    ack   s  \006  \x{2406}  ␆  SYMBOL FOR ACKNOWLEDGE
-    bel   s  \007  \x{2407}  ␇  SYMBOL FOR BELL
-    bs    s  \010  \x{2408}  ␈  SYMBOL FOR BACKSPACE
-    ht    s  \011  \x{2409}  ␉  SYMBOL FOR HORIZONTAL TABULATION
-    nl    m  \012  \x{240A}  ␊  SYMBOL FOR LINE FEED
-    vt    s  \013  \x{240B}  ␋  SYMBOL FOR VERTICAL TABULATION
-    np    m  \014  \x{240C}  ␌  SYMBOL FOR FORM FEED
-    cr    s  \015  \x{240D}  ␍  SYMBOL FOR CARRIAGE RETURN
-    so    s  \016  \x{240E}  ␎  SYMBOL FOR SHIFT OUT
-    si    s  \017  \x{240F}  ␏  SYMBOL FOR SHIFT IN
-    dle   s  \020  \x{2410}  ␐  SYMBOL FOR DATA LINK ESCAPE
-    dc1   s  \021  \x{2411}  ␑  SYMBOL FOR DEVICE CONTROL ONE
-    dc2   s  \022  \x{2412}  ␒  SYMBOL FOR DEVICE CONTROL TWO
-    dc3   s  \023  \x{2413}  ␓  SYMBOL FOR DEVICE CONTROL THREE
-    dc4   s  \024  \x{2414}  ␔  SYMBOL FOR DEVICE CONTROL FOUR
-    nak   s  \025  \x{2415}  ␕  SYMBOL FOR NEGATIVE ACKNOWLEDGE
-    syn   s  \026  \x{2416}  ␖  SYMBOL FOR SYNCHRONOUS IDLE
-    etb   s  \027  \x{2417}  ␗  SYMBOL FOR END OF TRANSMISSION BLOCK
-    can   s  \030  \x{2418}  ␘  SYMBOL FOR CANCEL
-    em    s  \031  \x{2419}  ␙  SYMBOL FOR END OF MEDIUM
-    sub   s  \032  \x{241A}  ␚  SYMBOL FOR SUBSTITUTE
-    esc   0  \033  \x{241B}  ␛  SYMBOL FOR ESCAPE
-    fs    s  \034  \x{241C}  ␜  SYMBOL FOR FILE SEPARATOR
-    gs    s  \035  \x{241D}  ␝  SYMBOL FOR GROUP SEPARATOR
-    rs    s  \036  \x{241E}  ␞  SYMBOL FOR RECORD SEPARATOR
-    us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
-    sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
-    del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
+    nul   s      \000  \x{2400}  ␀   SYMBOL FOR NULL
+    soh   s      \001  \x{2401}  ␁   SYMBOL FOR START OF HEADING
+    stx   s      \002  \x{2402}  ␂   SYMBOL FOR START OF TEXT
+    etx   s      \003  \x{2403}  ␃   SYMBOL FOR END OF TEXT
+    eot   s      \004  \x{2404}  ␄   SYMBOL FOR END OF TRANSMISSION
+    enq   s      \005  \x{2405}  ␅   SYMBOL FOR ENQUIRY
+    ack   s      \006  \x{2406}  ␆   SYMBOL FOR ACKNOWLEDGE
+    bel   s      \007  \x{2407}  ␇   SYMBOL FOR BELL
+    bs    s      \010  \x{2408}  ␈   SYMBOL FOR BACKSPACE
+    ht    s      \011  \x{2409}  ␉   SYMBOL FOR HORIZONTAL TABULATION
+    nl    m      \012  \x{240A}  ␊   SYMBOL FOR LINE FEED
+    vt    s      \013  \x{240B}  ␋   SYMBOL FOR VERTICAL TABULATION
+    np    m      \014  \x{240C}  ␌   SYMBOL FOR FORM FEED
+    cr    s      \015  \x{240D}  ␍   SYMBOL FOR CARRIAGE RETURN
+    so    s      \016  \x{240E}  ␎   SYMBOL FOR SHIFT OUT
+    si    s      \017  \x{240F}  ␏   SYMBOL FOR SHIFT IN
+    dle   s      \020  \x{2410}  ␐   SYMBOL FOR DATA LINK ESCAPE
+    dc1   s      \021  \x{2411}  ␑   SYMBOL FOR DEVICE CONTROL ONE
+    dc2   s      \022  \x{2412}  ␒   SYMBOL FOR DEVICE CONTROL TWO
+    dc3   s      \023  \x{2413}  ␓   SYMBOL FOR DEVICE CONTROL THREE
+    dc4   s      \024  \x{2414}  ␔   SYMBOL FOR DEVICE CONTROL FOUR
+    nak   s      \025  \x{2415}  ␕   SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn   s      \026  \x{2416}  ␖   SYMBOL FOR SYNCHRONOUS IDLE
+    etb   s      \027  \x{2417}  ␗   SYMBOL FOR END OF TRANSMISSION BLOCK
+    can   s      \030  \x{2418}  ␘   SYMBOL FOR CANCEL
+    em    s      \031  \x{2419}  ␙   SYMBOL FOR END OF MEDIUM
+    sub   s      \032  \x{241A}  ␚   SYMBOL FOR SUBSTITUTE
+    esc   0      \033  \x{241B}  ␛   SYMBOL FOR ESCAPE
+    fs    s      \034  \x{241C}  ␜   SYMBOL FOR FILE SEPARATOR
+    gs    s      \035  \x{241D}  ␝   SYMBOL FOR GROUP SEPARATOR
+    rs    s      \036  \x{241E}  ␞   SYMBOL FOR RECORD SEPARATOR
+    us    s      \037  \x{241F}  ␟   SYMBOL FOR UNIT SEPARATOR
+    sp    m      \040  \x{2420}  ␠   SYMBOL FOR SPACE
+    del   m      \177  \x{2421}  ␡   SYMBOL FOR DELETE
+    nbsp  s      \240  \x{237D}  ⍽   SHOULDERED OPEN BOX
+    fwsp  s  \x{3000}  \x{303C}  〼  MASU MARK
+
+`fwsp` 表示全宽表意符空格（U+3000），在屏幕上占用两列空间。默认符号的宽度也是两列，因此布局得以保留。若要用其他字符替换它，请选择宽度相同的字符。
 
 目前，Unicode 标识可用于以下字符
 
@@ -140,9 +143,9 @@ Version 1.05
 
         cat-v -c tab=bel=0,esc=s
 
-    如果为名称指定了 `all`，则该值适用于所有字符类型。下面的命令将所有字符设置为 `s`，然后将 `nl`、`nl`、`np` 和 `sp` 设置为 `m`，并禁用 `esc`。这是默认状态。
+    如果名称指定为 `all`，则该值适用于所有字符类型。以下命令将所有字符设置为 `s`，然后将 `nul`、`nl`、`np`、`sp` 和 `del` 设置为 `m`，并禁用 `esc`。这是默认状态。
 
-        cat-v -c all=s,nul=nl=np=sp=m,esc=0
+        cat-v -c all=s,nul=nl=np=sp=del=m,esc=0
 
     如果没有指定任何名称标签，则假定给出的是 `all`。下面的命令以转义形式打印除换行符以外的所有控制字符，这与 Perl 的字符串字面形式兼容。
 
@@ -245,6 +248,10 @@ Version 1.05
 
         echo -ne "$(cat-v -Ence FILE)"
 
+    如果文件中包含 `nbsp` 或 `fwsp`，则此操作无效，因为 `echo` 对于 `\xa0` 会生成原始字节而非 UTF-8 字符，并且不支持 `\x{3000}` 这种形式。 在这种情况下，请使用 [ansiecho](https://metacpan.org/pod/ansiecho) 命令，该命令会像 Perl 一样解释这些转义序列。
+
+        ansiecho -n "$(cat-v -Ence FILE)"
+
 # INSTALL
 
 ## CPANMINUS
@@ -267,6 +274,10 @@ Version 1.05
 
     `cat-v` 命令的前身最初是作为 [App::optex](https://metacpan.org/pod/App%3A%3Aoptex) 命令的过滤器模块创建的。
 
+- [ansiecho](https://metacpan.org/pod/ansiecho)
+
+    该 echo 命令会像 Perl 的字符串字面量一样解释转义序列。
+
 - [https://harmful.cat-v.org/cat-v/](https://harmful.cat-v.org/cat-v/)
 
     UNIX 风格，或 cat -v 被认为是有害的
@@ -281,7 +292,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright © 2024-2025 Kazumasa Utashiro.
+Copyright © 2024-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

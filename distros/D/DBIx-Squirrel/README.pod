@@ -182,6 +182,8 @@ objects.
 L<DBIx::Squirrel::Sugar> makes each a function with its own name. A
 statement's stages are declared beside its SQL. Called, it gives an
 iterator over the results, or, with a sink last, the sink's result.
+Given C<pipeline>, it names pipelines too, which a statement can name
+among its stages.
 
 =head2 Documentation
 

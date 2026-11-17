@@ -4,7 +4,7 @@ package DBIO::SQLite::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 
@@ -12,13 +12,24 @@ use DBIO::Exception ();
 
 our @EXPORT_OK = qw(
   column_is_nullable comparable_statement create_name_index
-  foreign_key_action
+  foreign_key_action libsqlite_version
   create_table_name_index default_literal_sql default_value_sql
-  pk_is_rowid_alias quote_identifier refuse_qualified_name split_type_size
-  sql_tokens
+  pk_is_rowid_alias quote_identifier refuse_qualified_name
+  selectall_hashrefs split_type_size sql_tokens
   token_identifier type_affinity type_with_size
 );
 
+
+
+sub libsqlite_version {
+  my ($dbh) = @_;
+  my ($version) = $dbh->selectrow_array('SELECT sqlite_version()');
+  my @part = split /\./, ($version // '0');
+  return (
+    $version // '(unknown)',
+    ($part[0] // 0) * 1_000_000 + ($part[1] // 0) * 1_000 + ($part[2] // 0),
+  );
+}
 
 
 my %FK_ACTION = map { $_ => 1 } ('NO ACTION', 'RESTRICT', 'CASCADE', 'SET NULL', 'SET DEFAULT');
@@ -57,12 +68,19 @@ sub quote_identifier {
 sub pk_is_rowid_alias {
   my ($dbh, $table) = @_;
   my $list = eval {
-    $dbh->selectall_arrayref(
-      sprintf('PRAGMA index_list(%s)', quote_identifier($table)),
-      { Slice => {} },
-    );
+    selectall_hashrefs($dbh,
+      sprintf('PRAGMA index_list(%s)', quote_identifier($table)));
   } or return 1;
   return (grep { ($_->{origin} // '') eq 'pk' } @$list) ? 0 : 1;
+}
+
+
+sub selectall_hashrefs {
+  my ($dbh, $sql) = @_;
+  my $sth = $dbh->prepare($sql);
+  $sth->execute;
+  return [] unless $sth->{NUM_OF_FIELDS};
+  return $sth->fetchall_arrayref({});
 }
 
 
@@ -216,7 +234,7 @@ DBIO::SQLite::Util - Shared SQLite-specific helper functions for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -224,6 +242,15 @@ Small helpers that capture SQLite-specific truths shared across the driver,
 so the same rule is not re-encoded in several places.
 
 =head1 METHODS
+
+=head2 libsqlite_version
+
+    my ($string, $number) = libsqlite_version($dbh);
+
+The version of the linked libsqlite, as the string C<SELECT sqlite_version()>
+gives and as an integer to compare against (C<3.27.0> is C<3_027_000>). The
+components are compared as numbers, never as text: C<"3.9"> sorts before
+C<"3.37"> as a string and after it as a version.
 
 =head2 foreign_key_action
 
@@ -333,6 +360,23 @@ consulted for a column C<PRAGMA table_info> already marked C<pk>. If the
 C<PRAGMA> cannot be run the function reports true, which falls back to the
 L<DBIO::Introspect::Base> answer (a key column is not nullable) rather than
 inventing a new one.
+
+=head2 selectall_hashrefs
+
+    my $rows = selectall_hashrefs($dbh, 'PRAGMA index_list("item")');
+
+Runs C<$sql> and returns every row as a hash reference, like
+C<< $dbh->selectall_arrayref($sql, { Slice => {} }) >>, except that a
+statement without result columns yields C<[]>.
+
+That is the case for a C<PRAGMA> that has nothing to report -- the
+C<foreign_key_list> of a table without keys -- or that the linked SQLite
+library does not know. DBI before 1.635 dies in C<fetchall_arrayref> on such a
+statement ("invalid number of arguments" from C<bind_columns>); later DBI
+returns an empty list. The helper gives the older DBI the later answer without
+looking at the DBI version: it asks the statement handle for C<NUM_OF_FIELDS>
+and does not fetch when there are none. Every C<PRAGMA> read of
+L<DBIO::SQLite::Introspect> goes through here.
 
 =head2 default_value_sql
 

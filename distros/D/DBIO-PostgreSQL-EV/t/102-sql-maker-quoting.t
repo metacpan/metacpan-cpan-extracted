@@ -79,7 +79,7 @@ for my $case (
   is $maker{ev}{limit_dialect}, 'LimitOffset', "$name: ... and keeps limit_dialect LimitOffset";
 
   SKIP: {
-    skip "$name: the sync maker quotes here -- needs dbio-postgresql with karr k121 (bf640c4)", 4
+    skip "$name: the sync maker quotes here -- needs a DBIO::PostgreSQL whose maker quotes names", 4
       if $needs_k121 && !$sync_off;
     for my $side (qw(sync ev)) {
       my $sm = $maker{$side};

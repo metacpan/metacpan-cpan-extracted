@@ -4,7 +4,7 @@ package DBIO::InflateColumn::Serializer;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Util ();
 use namespace::clean;
@@ -50,7 +50,7 @@ DBIO::InflateColumn::Serializer - Inflators to serialize data structures for DBI
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

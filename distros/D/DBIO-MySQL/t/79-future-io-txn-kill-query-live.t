@@ -72,7 +72,7 @@ use DBIO::Test;
 eval { require DBIO::MySQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam (dbio-async k26)'
+plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam'
   unless DBIO::Async::Storage->can('_conn_error_is_fatal');
 
 # A schema always declares its driver (core ADR 0067), and DBIO::Test::Schema
@@ -171,7 +171,12 @@ my @asked;
 my @warnings;
 local $SIG{__WARN__} = sub { push @warnings, @_ };
 
-$schema = $test_schema->connect($dsn, $user, $pass, { async => 'future_io', pool_size => 1 });
+# MySQL reports in the language of the session; this test reads the English
+# "Query execution was interrupted".
+$schema = $test_schema->connect($dsn, $user, $pass, {
+  async => 'future_io', pool_size => 1,
+  on_connect_do => ["SET SESSION lc_messages = 'en_US'"],
+});
 $async  = $schema->storage->async;
 
 sub session_id { my @rows = $async->_query_async('SELECT CONNECTION_ID()', [])->get; $rows[0][0] }

@@ -288,7 +288,7 @@ my $LITERAL_NULL  = 'SCALAR ref to <NULL>';
     ],
     '_remove_blob_cols_array: every defined LOB value of every row, empty or '
   . 'not, is replaced by the literal -- a SCALAR ref --; the row that is undef '
-  . 'in a column that has values elsewhere gets the same one (karr k81, one '
+  . 'in a column that has values elsewhere gets the same one (one '
   . 'literal for a column; t/84 holds the NULL it gets afterwards)';
 
   {

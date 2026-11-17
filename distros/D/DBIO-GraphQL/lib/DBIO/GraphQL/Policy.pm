@@ -3,7 +3,7 @@ package DBIO::GraphQL::Policy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'Class::Accessor::Grouped';
 use DBIO::GraphQL::Error qw(client_error);
@@ -183,7 +183,7 @@ DBIO::GraphQL::Policy - What DBIO::GraphQL exposes and who may use it (the trust
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 METHODS
 

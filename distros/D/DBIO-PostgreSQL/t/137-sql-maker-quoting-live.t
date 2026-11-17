@@ -129,7 +129,12 @@ my @cases = (
 
 for my $case (@cases) {
   my ($name, $attrs, $good, $bad) = @$case;
-  my $schema = DBIO::Test::K121Quote->connect($dsn, $user, $pass, { %$attrs });
+  # PostgreSQL reports in the language of lc_messages; the test reads the
+  # server's English words (column ... does not exist), so the session is
+  # set to 'C' after the connect
+  my $english = [q{SET lc_messages = 'C'}];
+  my $schema = DBIO::Test::K121Quote->connect($dsn, $user, $pass,
+    { %$attrs, on_connect_do => $english });
 
   my ($ok) = works($schema, $good);
   ok $ok, "$name: $good (column written to match) works";
@@ -146,7 +151,8 @@ for my $case (@cases) {
       unless $have_future_io;
 
     my $async = DBIO::Test::K121Quote->connect(
-      $dsn, $user, $pass, { %$attrs, async => 'future_io' },
+      $dsn, $user, $pass,
+      { %$attrs, async => 'future_io', on_connect_do => $english },
     );
 
     my ($aok) = works_async($async, $good);

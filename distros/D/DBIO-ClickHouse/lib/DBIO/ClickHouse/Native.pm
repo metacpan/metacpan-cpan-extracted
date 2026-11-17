@@ -4,7 +4,7 @@ package DBIO::ClickHouse::Native;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Base';
 
@@ -361,7 +361,7 @@ DBIO::ClickHouse::Native - Turn DBIO schemas and rows into ClickHouse::Encoder i
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

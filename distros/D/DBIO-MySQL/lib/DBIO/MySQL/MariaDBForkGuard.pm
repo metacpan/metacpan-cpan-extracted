@@ -4,7 +4,7 @@ package DBIO::MySQL::MariaDBForkGuard;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 # Set once, to the pid that installed the guard. The wrapper compares against it.
 my $OWNER;
@@ -45,7 +45,7 @@ DBIO::MySQL::MariaDBForkGuard - keep a forked child's exit from closing DBD::Mar
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

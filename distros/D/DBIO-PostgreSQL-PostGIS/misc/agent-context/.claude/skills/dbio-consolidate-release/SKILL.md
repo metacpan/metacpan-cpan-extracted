@@ -12,7 +12,7 @@ reworded, then superseded; intermediate commits that only add noise. This proced
 cleans that up into two deliverables:
 
 1. **A clean `Changes` `{{$NEXT}}` entry** that contains *all* the real changes in
-   their **final form** — the intermediate hin-und-her collapsed away, nothing lost.
+   their **final form** — the intermediate steps collapsed away, nothing lost.
 2. **One clean commit** since the last release tag, whose message records everything
    nicely — a readable changelog of the release, not a pile of intermediate steps.
 
@@ -23,6 +23,8 @@ is a cleanliness workaround, not the normal flow.
 **Lane:** git + `Changes` prose + `dzil build/test`. No driver internals are touched, so
 no `dbio-worker`; the commit itself is `dbio-release-manager`'s (house rule: only the
 release manager commits) — the orchestrating agent plans, confirms and dispatches it.
+The commit belongs to `dbio-release-manager`; the orchestrating agent runs
+`git push --force-with-lease` after the maintainer's explicit go (step 5).
 
 **This rewrites published history.** Most commits since the last release are already
 on `origin/main`, so the single-commit result needs a `git push --force-with-lease`.
@@ -34,7 +36,7 @@ on your machine.
 
 - *(none)* — operate on the current repo.
 - `--all` — operate on every DBIO dist next to this repo (the directory that holds the DBIO checkouts side by side, `..`) that has commits
-  since its last tag (see **--all mode**).
+  since its last tag (see `references/all-and-recovery.md`).
 - `--dry-run` — preview only: show the commits in scope and the proposed `Changes`
   entry, then STOP. No edit, no commit, no push. Combine with `--all` to preview the
   whole family.
@@ -66,7 +68,7 @@ git log --reverse --format='%h %s%n%w(0,6,6)%b' "$LAST"..HEAD   # subjects + bod
 git rev-list --count "$LAST"..@{u} 2>/dev/null                  # how many are already pushed
 ```
 
-### 2. Rewrite the Changes entry — everything, in final form, no hin-und-her
+### 2. Rewrite the Changes entry — everything, in final form
 Read the current `Changes`. The unreleased block is everything **between the
 `{{$NEXT}}` line and the first following version header** (a line starting with a
 digit, e.g. `0.900000  2026-06-23`). It is often already partly hand-written — do
@@ -79,7 +81,7 @@ Produce ONE consolidated entry covering the **whole** `"$LAST"..HEAD` delta:
   real detail; never leave a real change unmentioned.
 - **Describe the net effect, not the journey.** A change that was added then reworded
   then superseded appears **once, in its final form** — this is the whole point (the
-  hin-und-her disappears). Fold superseded/intermediate commits into the final-state
+  intermediate steps disappear). Fold superseded/intermediate commits into the final-state
   bullet.
 - **The entry names the change, not the card** (skill `dbio-perl-release`, § *Changes*):
   the final-form bullet says what the user of the dist gets, in words, and carries no
@@ -124,15 +126,15 @@ git commit -F <message>                           # single commit = entire delta
 dzil clean                                        # drop build artifacts, keep tree clean
 ```
 The commit message must read like a **clean changelog of the release** — everything
-nicely in it, grouped, with every ticket ref. Do **not** frame it as "consolidated N
-commits" or "squashed": present the real, final-form work, not the mechanics. Pick the
+nicely in it, grouped, with every ticket ref. The message reads as the changelog of the
+release: it presents the real, final-form work, in the words of the work and not of the
+mechanics of consolidating. Pick the
 conventional type of the dominant change (`feat` if any feature, else `fix`, else
 `docs`/`chore`):
 ```
 feat: <headline of the release's work> since <LAST>
 
-Everything since <LAST> as one clean commit — intermediate back-and-forth
-collapsed into final form:
+Everything since <LAST>, in final form:
 
   * <Category> — <what, refs>
   * <Category> — <what, refs>
@@ -151,7 +153,7 @@ git diff consolidate-release-backup HEAD -- . ':(exclude)Changes'   # expect: em
 git range-diff "$LAST" "@{u}" HEAD                        # old published history vs the one commit
 echo "backup: consolidate-release-backup ($(git rev-parse --short consolidate-release-backup))"
 ```
-On the user's confirmation:
+On the maintainer's explicit go the orchestrating agent runs:
 ```bash
 git push --force-with-lease origin "$BR"
 ```
@@ -159,35 +161,14 @@ git push --force-with-lease origin "$BR"
 clean push, tell the user `consolidate-release-backup` can be deleted once satisfied.
 
 ### 6. STOP before release
-Do **not** run `dzil release` or any CPAN upload — that is a separate, maintainer-
-gated step (house rule: release needs explicit go-ahead). Report: consolidated N
+`dzil release` and any CPAN upload are a separate, maintainer-gated step (house
+rule: release needs explicit go-ahead). Report: consolidated N
 commits → 1, Changes rewritten in final form, tests green, force-pushed to
 `origin/$BR`. Remind about family-version alignment (see [[dbio-perl-release]]) if this
 dist is part of a coordinated cross-repo train.
 
-## --all mode
+## --all mode and recovery
 
-1. Discover DBIO dists: every dir under `../*/` (seen from this repo) with a `.git` and a
-   `dist.ini` containing `@DBIO` (bundle or `[@Filter] -bundle = @DBIO`); skip `dbio-deprecated`
-   (tombstone dist, versions of its own).
-2. For each, compute `LAST` and the commit count since it. Print ONE plan table:
-   `repo | last tag | #commits since | clean-tree? | will force-push?`.
-3. Get a **single explicit confirmation** that lists every repo that will be
-   force-pushed. Then process repos **sequentially**, each via the single-repo
-   procedure above (steps 1–6, but the per-repo force-push is covered by the one
-   up-front confirmation — do NOT re-prompt per repo).
-4. Skip (don't abort the whole run) any repo that fails a precondition or whose
-   `dzil test` is red; collect and report those at the end. **Fail loud** — never
-   report a repo as done if its tests were skipped or failed.
-
-## Recovery
-
-Consolidation regretted, not yet force-pushed:
-```bash
-git reset --hard consolidate-release-backup
-```
-Already force-pushed but want the old history back:
-```bash
-git push --force-with-lease origin consolidate-release-backup:"$BR"
-```
-(works as long as `consolidate-release-backup` still exists locally).
+The `--all` run over every dist (plan table, one up-front confirmation, sequential
+processing) and the recovery steps for a regretted consolidation or force-push:
+`references/all-and-recovery.md`.

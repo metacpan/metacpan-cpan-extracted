@@ -16,7 +16,10 @@ name = DBIO-DriverName
 
 [@DBIO]
 ```
-Bundle sets `author`, `license`, `copyright_holder`. No version/copyright_year.
+The bundle sets `author`, `license` (Perl_5) and `copyright_holder` (overridable with the
+`copyright_holder` option; core also states `author` and `license` in its `dist.ini`).
+`copyright_year` is not a bundle option; it stands in `dist.ini` when the dist states one
+(core: 2005).
 
 Heritage distributions (code derived from DBIx::Class — most extracted drivers):
 ```ini
@@ -38,7 +41,7 @@ copyright_year = 2005
 core     = 1
 heritage = 1
 ```
-Core extras: VersionFromMainModule, MakeMaker::Awesome, ExecDir.
+Core extras: VersionFromMainModule, MakeMaker::Awesome, ExecDir, VersionLockstepTest.
 
 ## Repository metadata
 
@@ -46,16 +49,16 @@ All distributions (drivers and core) get `[DBIO::CodebergMeta]`. It derives the
 `repository` / `bugtracker` / `homepage` resources from the git `origin` remote —
 fully offline, no API token, no network. `origin` must point at `codeberg.org`
 (the DBIO family lives at `codeberg.org/dbio/<repo>`); if it does not, the plugin
-adds nothing rather than emitting metadata for the wrong forge. Do NOT hardcode a
-`[MetaResources]` block in `dist.ini` — the bundle handles it.
+adds nothing rather than emitting metadata for the wrong forge. The bundle supplies the
+resources, so `dist.ini` carries no `[MetaResources]` block.
 
 ## Agent skills (share_skill)
 
 Each distribution ships the agent skills it OWNS (is the source of truth for)
 into its sharedir. The bundle wires `[DBIO::GatherSkills]` + `[ShareDir]`:
 GatherSkills copies `.claude/skills/<name>/` → `share/skills/<name>/` at build
-time (the `.claude/` sources never reach CPAN — dot-dir, untracked by
-`Git::GatherDir`). Declare owned skills explicitly:
+time (sharedir, read at runtime through `DBIO::Skills`). The tracked `.claude/`
+itself also lies in the tarball (see *The tarball*). Declare owned skills explicitly:
 
 ```ini
 [@DBIO]
@@ -67,20 +70,14 @@ share_skill = dbio-mssql-database
 - Each skill is shipped by exactly ONE dist (its home), never re-shipped from an
   installed copy. Drivers own `dbio-<driver>` + `dbio-<driver>-database`;
   derived dists (async/age/postgis/graphql) own only their own skill; the shared
-  family skills belong to `DBIO` core (the karr skills come from the karr tool via skilletor, no DBIO dist ships them); `dbio-perl-release` belongs to
-  `Dist-Zilla-PluginBundle-DBIO`.
-- The EV dists (`dbio-postgresql-ev`, `dbio-mysql-ev`) use `[@Filter] -bundle = @DBIO`
-  (with `-remove = MakeMaker` and their own `[MakeMaker]`); `dbio-async`, `dbio-forked`
-  and the extensions use plain `[@DBIO]`. In a `[@Filter]` dist put `share_skill` inside
-  the `[@Filter]` section. It reaches the bundle as a plain scalar (Filter does not
-  know it is multivalue) — the `share_skill` attr accepts scalar or arrayref.
+  family skills belong to `DBIO` core (the karr skills come from the karr tool via
+  skilletor, no DBIO dist ships them). `dbio-perl-release` is maintained in core and
+  delivered to `dbio-dzil` through skilletor.
+- Skills that only brief agents (`<dist>-core`) stay out of `share_skill`.
 - Omitting `share_skill` makes GatherSkills derive owned skills from the dist
   name — declare them anyway, so the set is deterministic.
-- Runtime (in `DBIO` core): `DBIO::Skills` exposes the installed sharedir skills;
-  `DBIO->skill($name)` / `$schema->skill($name)` retrieve them. A schema may
-  override via its `skills` classdata — sugar `skills({...})` / `skill(k => v)`
-  under `use DBIO 'Schema', -<driver>`, or `->connect(..., { skills => {...} })`.
-  `bin/dbio-skills -MMyApp::Schema --deploy` deploys them into `.claude/skills/`.
+- Filtered bundles (`[@Filter]` in the EV dists) and the runtime access to the shipped
+  skills (`DBIO::Skills`, `DBIO->skill`, `bin/dbio-skills`): `references/share-skill.md`.
 
 ## Version
 
@@ -91,16 +88,29 @@ share_skill = dbio-mssql-database
   `BumpVersionAfterRelease` (`finder = [:InstallModules]`) — the bundle rewrites
   and bumps every module in lockstep around release.
 - Core: the dist version is read from `lib/DBIO.pm` via `[VersionFromMainModule]`
-  (core does not use `@Git::VersionManager`), so the sub-module `$VERSION`s are
-  stamped by hand in one sweep commit rather than by a plugin.
-Target: `1.000000` when stable.
+  (core does not use `@Git::VersionManager`). Nothing rewrites the sub-modules; they are
+  raised by hand with it, and `xt/author/version-lockstep.t` names every module whose
+  `$VERSION` is missing or differs.
 - **Family alignment (soft rule):** keep the whole DBIO family on the *same*
   released version — bump laggards up to match, don't release a patchwork.
   Especially for a coordinated cross-repo train (a core change plus its
   driver/transport/extension shares): release every touched dist at one shared
   version so a given version of `X` always pairs with the same version across
-  repos. E.g. the core k70 storage-layer-composition train ships core + dbio-async +
-  the drivers all as `0.900001`.
+  repos.
+
+### Coordinated version step
+
+For a family-wide step to one new version, in this order:
+
+1. Core first: raise `$VERSION` in `lib/DBIO.pm` and in every module; the lockstep test
+   is green.
+2. In every dist's `cpanfile`, the family pins (`requires` and `recommends` alike) name
+   that same number.
+3. `Changes` of every dist is filled under `{{$NEXT}}`.
+4. Dists follow in dependency order, core before the dists that require it.
+
+A dist still carrying the previous number after the step was missed by the sweep.
+The release itself runs only on the maintainer's go-ahead (see *Release*).
 
 ## PodWeaver
 
@@ -116,14 +126,13 @@ POD, never the gate.
 ## Dependencies
 
 In `cpanfile`, not dist.ini. Bundle uses `[Prereqs::FromCPANfile]`.
-Versioning rules for DBIO-family deps: see [[dbio-perl-syntax]] (incl. the
-bootstrap exception while the family is not yet on CPAN).
+Versioning rules for DBIO-family deps: see [[dbio-perl-syntax]].
 
 ## Changes — the change, not the card
 
-Maintainer's rule (2026-10-31), in every DBIO distribution. An entry in `Changes` says
+Rule in every DBIO distribution: an entry in `Changes` says
 what changed for the user of the dist, in words; it carries no karr card number, neither
-`(k103)` nor a board-qualified `(core k103)`. The card belongs in the commit message, in
+`(kNN)` nor a board-qualified `(core kNN)`. The card belongs in the commit message, in
 the house form `kNN`. Codeberg issues are public and keep their notation, `(Codeberg #13)`.
 
 The changelog section of the commit-style skill applies in full: one topic one entry,
@@ -136,9 +145,20 @@ not touched.
 skilletor sync && ../dbio/maint/capped-test dzil test   # core: maint/capped-test dzil test
 ```
 
-`dzil release` and any CPAN upload only on the maintainer's explicit go-ahead (house rules,
-*Release*); a plan that lists "release" as the next step is not
-that go-ahead.
+`dzil release`, any CPAN upload, `git tag` and `git push` only on the maintainer's
+explicit go-ahead (house rules, *Release*); a plan that lists "release" as the next step
+is not that go-ahead.
+
+The release flow (`dzil release`), in order:
+
+- Checks: `Git::Check` (only `dist.ini`, `Changes`, `cpanfile` may be dirty),
+  `Git::CheckFor::CorrectBranch` (`main`), `TestRelease`, `Test::ChangesHasContent`,
+  `InstallRelease` (`cpanm .`), then `ConfirmRelease` and `UploadToCPAN`.
+- Core: `NextRelease` stamps `{{$NEXT}}`, then `Git::Commit` (same dirty allowance),
+  `Git::Tag` and `Git::Push`.
+- Drivers: `@Git::VersionManager` stamps, commits, tags and bumps; `Git::Push` pushes to
+  `origin`.
+- The tag format is `v%V` (`v` plus the version).
 
 `skilletor sync` comes first. GatherSkills reads the skill dirs from disk, and a
 dist may declare a `share_skill` it installs through skilletor rather than tracks
@@ -156,39 +176,26 @@ the tracked `.claude/` as it is, and `GatherAgentContext` records the full agent
 context a release was built with, skilletor-installed skills included, under
 `misc/agent-context/`.
 
-## Also in the bundle
+## The tarball
 
-- The tarball holds everything tracked in git, dotfiles and agent setup included; only the files the build writes itself (`META.yml`, `META.json`, `MANIFEST`, `README`, `README.md`) are left out.
-- `DBIO::LicenseFile` checks the committed `LICENSE`: the text from `dist.ini`, or with `heritage` the DBIx::Class text. A missing or stale file stops the build.
-- `TestRelease`, `Test::ChangesHasContent` and `InstallRelease` (`cpanm .`) run before `ConfirmRelease`.
-- `GatherAgentContext` snapshots `.claude/`, `CLAUDE.md` into `misc/agent-context/` of the tarball (provenance, not installed).
-- `DBIO::CoverageTest` generates `xt/release/coverage.t` with `coverage_threshold`.
-- `Git::CheckFor::CorrectBranch` — release only from `main`.
+- It holds everything tracked in git, dotfiles and agent setup included (`.claude/`,
+  `CLAUDE.md`); left out are the files the build writes itself (`META.yml`, `META.json`,
+  `MANIFEST`, `README`, `README.md`) and `.karr`.
+- `GatherAgentContext` snapshots `.claude/` and `CLAUDE.md` (and `.codex/`, `AGENTS.md`
+  where present) into `misc/agent-context/` (provenance, not installed).
+- `DBIO::LicenseFile` checks the committed `LICENSE`: the text from `dist.ini`, or with
+  `heritage` the DBIx::Class text. A missing or stale file stops the build.
+- `DBIO::CoverageGate` is a test runner behind the build plugin: once the whole suite
+  of the build directory is through, it scores `cover_db/` against `coverage_threshold`
+  (default 80, `0` = off), for `dzil test` and `dzil release`, also under a parallel
+  harness. Under `RELEASE=1` it fails without `cover_db/` and below the threshold.
+  `dzil release` sets only `RELEASE_TESTING`, so a release runs with
+  `RELEASE=1 HARNESS_PERL_SWITCHES=-MDevel::Cover dzil release`. The tarball carries no
+  coverage test.
 - `MetaResources` sets the family `x_IRC` channel.
 - Core's `MetaNoIndex` keeps the test facades (`DBIO::Test::Conformance` & co.) indexed, they are public.
 
 ## Reference tests (dbio-dzil)
 
-The tests in `dbio-dzil` are the executable reference for the bundle — read them
-when unsure what `[@DBIO]` does:
-
-- `t/10-bundle.t` — resolves `[@DBIO]` via `Dist::Zilla::Tester` and pins the
-  `core = 1` vs driver branches (both: DBIO::CodebergMeta, DBIO::GatherSkills +
-  ShareDir; core-only: VersionFromMainModule + MakeMaker::Awesome + ExecDir;
-  driver-only: `@Git::VersionManager`), the `share_skill` → GatherSkills
-  passthrough, and the versioning policy (RewriteVersion/Bump patch
-  `:InstallModules` with `global = 1` — every module is versioned).
-- `t/30-codebergmeta.t` — pins how `DBIO::CodebergMeta` parses the git remote
-  and assembles the repository/bugtracker/homepage resources.
-- `t/20-podweaver.t` — weaves a sample through `@DBIO` / `@DBIO::Heritage` and
-  pins how `# ABSTRACT:` → NAME and `=attr`/`=method` → ATTRIBUTES/METHODS, plus
-  the DBIx::Class copyright the Heritage variant adds.
-- `t/40-bundle-coverage.t` — pins how the bundle wires `DBIO::CoverageTest` and
-  its `coverage_threshold` (default 80, `0` = no-op skip).
-- `t/50-gatherskills.t` — pins `DBIO::GatherSkills`: a declared `share_skill`
-  whose dir is missing is fatal, skilletor's per-skill `.gitignore` is not shipped.
-- `t/60-agentcontext.t` — pins the `misc/agent-context/` snapshot
-  (`GatherAgentContext`).
-- `t/70-bundle-podchecker.t` — pins the POD gate: an unresolved internal link in
-  a built module turns the generated test red, naming file and link; without
-  `AUTHOR_TESTING` it skips.
+The tests in `dbio-dzil` are the executable reference for the bundle — read them when
+unsure what `[@DBIO]` does. The list with what each pins: `references/bundle-tests.md`.

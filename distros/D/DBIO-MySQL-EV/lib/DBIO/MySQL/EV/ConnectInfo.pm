@@ -4,7 +4,7 @@ package DBIO::MySQL::EV::ConnectInfo;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Exporter 'import';
 use DBIO::Util ();
@@ -12,7 +12,7 @@ use DBIO::Storage ();
 
 our @EXPORT_OK = qw( dbi_to_conninfo );
 
-# What EV::MariaDB->new takes besides its callbacks and loop (EV::MariaDB 0.08,
+# What EV::MariaDB->new takes besides its callbacks and loop (EV::MariaDB 0.09,
 # %ALLOWED_ARGS). db, its alias of database, is read as database.
 my %NATIVE = map { $_ => 1 } qw(
   host port user password database unix_socket
@@ -252,7 +252,7 @@ DBIO::MySQL::EV::ConnectInfo - MySQL/MariaDB connection-info utilities for DBIO 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 METHODS
 

@@ -2,7 +2,7 @@ package Mail::DKIM2::HeaderParser;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # Thin base class for streaming message parsing.
 # Replaces the deep Mail::DKIM::Common → Mail::DKIM::MessageParser
@@ -217,6 +217,8 @@ sub stop {
 
 sub stopped { return $_[0]->{_stopped} }
 
+sub malformed_header { return $_[0]->{_malformed_header} ? 1 : 0 }
+
 # Parse a block of header text into individual headers (handling continuation lines)
 sub _parse_headers {
     my ($self, $block) = @_;
@@ -238,9 +240,19 @@ sub _parse_headers {
     $self->_emit_header($current) if $current ne '';
 }
 
+# A line that is not a field -- no colon, WSP or nothing before the colon,
+# or a first line that starts with WSP -- is never hashed, so it is not
+# silently dropped either: the header section is malformed, and
+# malformed_header says so (the Verifier's PERMERROR, the Signer's refusal).
+# Dropping it let lines be added to a signed message that no
+# Message-Instance covered while other parsers read them (reported against
+# 0.34, CVE-2026-129847).
 sub _emit_header {
     my ($self, $raw) = @_;
-    return unless $raw =~ /^([^\s:]+)\s*:\s*(.*)/s;
+    unless ($raw =~ /^([^\s:]+)[ \t]*:\s*(.*)/s) {
+        $self->{_malformed_header} = 1;
+        return;
+    }
     my ($field_name, $contents) = ($1, $2);
     $contents =~ s/\r?\n$//s;
 
@@ -313,6 +325,13 @@ Feeds message data, in chunks of any size, with CRLF line endings exactly
 as the message has them; several arguments are concatenated. When the blank line ending the headers has been
 seen, the header fields are parsed and C<finish_header> is called. Body
 data is kept until C<CLOSE> unless the subclass has called C<stop>.
+
+=head2 malformed_header()
+
+True once the header section has held a line that is not a header field:
+one with no colon, with nothing or white space before its colon, or a first
+line that starts with white space. Such a line is in no header hash, so a
+verifier must not pass the message and a signer must not sign it.
 
 =head2 CLOSE()
 

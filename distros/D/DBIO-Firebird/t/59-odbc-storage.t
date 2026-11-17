@@ -14,7 +14,7 @@ use DBIO::Firebird::Storage::ODBC;
 # karr #20 -- the third transport. Firebird speaks to three DBDs, and until now
 # this distribution had a storage class for two of them: DBD::Firebird and
 # DBD::InterBase. A dbi:ODBC:Driver=Firebird DSN -- the one the ODBC leg of
-# t/10-firebird.t, t/20-firebird-core.t and t/30-datetime-firebird.t connects
+# t/10-firebird.t and t/30-datetime-firebird.t connects
 # with, through DBIO_TEST_FIREBIRD_ODBC_DSN -- had nowhere to land: core
 # determined it to the generic DBIO::Storage::DBI::ODBC, which knows nothing
 # about this engine. What that costs is not subtle:

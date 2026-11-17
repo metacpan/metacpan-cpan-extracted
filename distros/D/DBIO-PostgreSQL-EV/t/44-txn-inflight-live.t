@@ -180,7 +180,7 @@ sub done_with {
     return 'not reached';
   }));
   ok !$ok, "$label: the transaction fails";
-  like $err, qr/^Blocking wait refused/, "$label: with the refusal (karr k44), not a libpq refusal";
+  like $err, qr/^Blocking wait refused/, "$label: with the refusal, not a libpq refusal";
   rolled_back_cleanly($label, $h, $pid, 'k48-refused');
   done_with($h);
 }

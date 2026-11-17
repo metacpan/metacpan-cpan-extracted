@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Age::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Extension';
 
@@ -66,7 +66,7 @@ DBIO::PostgreSQL::Age::Extension - Apache AGE as a DBIO database extension: grap
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

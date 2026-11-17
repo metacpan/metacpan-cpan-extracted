@@ -79,7 +79,9 @@ sub is_server_error {
 }
 
 my $h = DBIO::PostgreSQL::EV::TestHarness->new(
-  connect_attrs => { pool_size => 2, on_connect_do => [ q{SET lock_timeout = '10s'} ] },
+  # lc_messages 'C': the test reads the server's English wording (the language
+  # of a message is the session's lc_messages, DBIO_TEST_SERVER_LANGUAGE sets it).
+  connect_attrs => { pool_size => 2, on_connect_do => [ q{SET lc_messages = 'C'}, q{SET lock_timeout = '10s'} ] },
 );
 my $dbh = $h->sync_storage->dbh;
 
@@ -185,7 +187,7 @@ sub check_unique {
   my $ssi = DBIO::PostgreSQL::EV::TestHarness->new(
     connect_attrs => {
       pool_size     => 2,
-      on_connect_do => [ q{SET default_transaction_isolation = 'serializable'} ],
+      on_connect_do => [ q{SET lc_messages = 'C'}, q{SET default_transaction_isolation = 'serializable'} ],
     },
   );
   my $skew = sub {

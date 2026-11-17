@@ -80,7 +80,7 @@ child through the owner storage (`broker_connect_options`).
 
 ## Capabilities: exactly one, by intent
 
-`transport_capabilities` returns `broker_connect_options` and nothing else (core k243).
+`transport_capabilities` returns `broker_connect_options` and nothing else (ADR 0002 addendum).
 Core hands DBD attributes and `pool_size` given beside a broker to the backend as
 `[ $broker, \%options ]` only when the transport declares it. Model A keeps the promise
 without code; `pool_size` sizes nothing.
@@ -106,12 +106,33 @@ backend. POD: `DBIO::Forked::Storage`, "TRANSPORT CAPABILITIES AND ASYNC LAYERS"
   child and the refresh dies with it; the parent's broker changes only when the parent
   reconnects. The parent refreshing before the fork is not implemented
   (`t/09-broker-in-child.t` section 3; POD "ROTATING BROKERS AND AN EXPIRED LEASE").
-- Unix fork only.
+- A real `fork()` is required. `_has_real_fork` reads `$Config{d_fork}`; unset (a
+  thread-emulated pseudo-fork, e.g. Strawberry) `_run_forked` croaks before it forks, and
+  Makefile.PL refuses the install. The capability decides, never the OS name.
+
+## Options, cancel, ownership
+
+- `async_option_names` declares `statement_timeout` and `max_in_flight` to core, which
+  strips them from the DBI attributes and hands them to the backend. Values are checked
+  when the connect info is read (first async use); a bad value is named, not quoted.
+- `max_in_flight` is checked in `_run_forked` before `pipe`/`fork`; a slot frees when a
+  Future resolves, is cancelled or is dropped. The count is per connection and process.
+- `statement_timeout` becomes the leaf Future's `timeout`: the deadline runs from
+  construction and is checked by `get` (waits only the time left), `is_ready` and
+  `is_failed`; on expiry the Future cancels itself and fails with `statement_timeout
+  exceeded`.
+- `cancel` (`_cancel`): SIGTERM, SIGKILL after one second, reap, fail with
+  `DBIO::Forked::Future: cancelled`; derived Futures cancel their source; resolved ones
+  ignore it. The destructor ends a still-running child the same way.
+- A Future records its creating pid. In another process `get`/`is_ready`/`is_failed`/
+  `cancel` fail with `belongs to process N` and `DESTROY` closes and reaps nothing, so
+  the owner still reads the whole blob. Derived Futures follow their source.
+- The backend holds no access data: `connect_info` keeps `{ broker => 0|1, elements => N }`.
 
 ## Testing
 
-Run recursively through the wrapper: `../dbio/maint/capped-test prove -lr t/` (from a
-worktree: `~/dev/dbio-dev/dbio/maint/capped-test`). `prove -l t/` skips subdirectories.
+Run recursively through the wrapper: `../dbio/maint/capped-test prove -lr t/`. Plain
+`prove -l t/` leaves out subdirectories.
 Offline is the default; no database server, no event loop.
 
 | File | Covers |
@@ -125,21 +146,25 @@ Offline is the default; no database server, no event loop.
 | `t/09-broker-in-child.t` | AccessBroker in the child, expired lease |
 | `t/10-exit-status.t` | reaping leaves `$?`, `$!`, `$@` alone |
 | `t/11-live-transport.t` | SQLite; PostgreSQL with `DBIO_TEST_PG_DSN` (+ `_USER`/`_PASS`) |
+| `t/12-process-ownership.t` | a Future belongs to its creating process; copies read and reap nothing |
+| `t/13-no-credentials.t` | `connect_info` keeps the form only, no access data |
+| `t/14-cancel.t` | `cancel`, a dropped Future ends its child |
+| `t/15-limits.t` | `statement_timeout`, `max_in_flight` on the backend with a mock |
+| `t/16-limits-sqlite.t` | both limits through core's real connect path (SQLite, skips without the driver) |
+| `t/17-no-real-fork.t` | `_has_real_fork` replaced: the call croaks before forking |
 
-Live PostgreSQL uses this repo's database `dbio_forked`, never `dbio_test`; set it up per
-the house rules' live-testing section (`maint/live-preflight` first).
+Live PostgreSQL uses this repo's database `dbio_forked`, never `dbio_test`; its
+environment comes from `dbio-db env postgresql` (run `../dbio/maint/live-preflight`
+first). Rules: skill `dbio-driver-development`, `references/live-testing.md`.
 
 ## ADRs (docs/adr)
 
-- 0001 — generic fork-per-query backend, sibling of `dbio-async`. Addendum: the
-  activation model of core ADR 0028/0029 is superseded by the explicit `forked` mode of
-  core ADR 0030; the decision stands.
-- 0002 — the child reuses the inherited sync storage. Addenda: connection actions re-run
-  in the child and why that is not `on_connect_replay`; the one capability
-  `broker_connect_options`.
-- 0003 — loop-free pipe-backed Future, EOF-framed, and its size limit. Addendum: the full
-  `future_class` surface no longer rests on the withdrawn core ADR 0029 chain;
-  `DBIO::Test::Future` is now `DBIO::Future::Immediate`.
+- 0001 — generic fork-per-query backend, sibling of `dbio-async`; activation is the
+  explicit `forked` mode of core ADR 0030.
+- 0002 — the child reuses the inherited sync storage; connection actions re-run in the
+  child (not `on_connect_replay`); the one capability is `broker_connect_options`.
+- 0003 — loop-free pipe-backed Future, EOF-framed, with a size limit; the full
+  `future_class` surface is `DBIO::Future::Immediate`-compatible.
 
 Changing `@ISA`/`use base` of a component or storage class is an architecture change with
 a ticket and an ADR.

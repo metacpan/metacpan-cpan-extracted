@@ -38,9 +38,9 @@ speaks libpq's async protocol directly for maximum performance.
 
 ## Dependencies
 
-- EV::Pg >= 0.02, < 0.08 (both ends reference libpq 16 symbols and fail under
-  `PERL_DL_NONLAZY=1` on libpq 15; 0.02 loads lazily — measured, see
-  `maint/docker/README.md`)
+- EV::Pg >= 0.09, no upper bound (fork safety in a child, error_fields cleared on
+  a lost connection, no misdelivery to a nested loop in a callback; still
+  references libpq 16 symbols, so libpq 15 needs `maint/docker/`)
 - Future >= 0.49
 - DBIO core
 
@@ -58,6 +58,15 @@ speaks libpq's async protocol directly for maximum performance.
   and on `future_io`; requires `DBIO_TEST_PG_DSN` + EV::Pg (`future_io` part skips without
   IO::Async/DBIO::Async)
 - `t/120-error-values-mock.t` — the same offline: no `error_fields`, session reset, connect action
+- `t/122-error-values-language-live.t` — no bound value in a server error under `lc_messages` de_DE.UTF-8
+  and fr_FR.UTF-8, on every EV path (skips a language the server has no locale for)
+
+### Server message language
+
+`DBIO_TEST_SERVER_LANGUAGE=de|fr` runs the live suite against a server that reports in German or
+French (`t/lib/LiveServer.pm` puts `-c lc_messages=...` into `PGOPTIONS`; an unknown value ends the
+file at once). A test that reads the server's English wording sets `lc_messages = 'C'` in its own
+session; it does not skip.
 
 ### Running the suites
 
@@ -71,6 +80,7 @@ env -u DBIO_TEST_PG_DSN ../dbio/maint/capped-test prove -lr t/
 ../dbio/maint/capped-test prove -lr t/
 ```
 
+The maintainer's own database is `dbio_pgev`; its login comes from `dbio-db env postgresql`.
 Where the live server comes from, and the one-run-per-database rule, is in the house rules
 (*Live testing*, *Maintainer-only live infrastructure*). On the shared PostgreSQL this repo
 works in `dbio_pgev`, never in `dbio_test`.

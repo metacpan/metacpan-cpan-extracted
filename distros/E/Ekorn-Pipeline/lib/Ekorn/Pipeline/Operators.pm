@@ -104,7 +104,8 @@ sub _chain ($source, @stages) {
     my $chain    = Ekorn::Pipeline::Operators::Chain->new(sub {
         my $next = $pipeline->iterator($source);
         return (
-            sub () { $next->() }, sub ($how) { $next->finish },
+            sub { $next->() },    # for each value: no signature
+            sub ($how) { $next->finish },
             $next->{context},
         );
     });

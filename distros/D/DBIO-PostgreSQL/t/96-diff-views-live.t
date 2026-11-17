@@ -41,7 +41,9 @@ LiveServer->require_server;
 #    into another by the diff between them, and afterwards the catalog of the
 #    one reads like the catalog of the other.
 
-my @CONNECT = ({ PrintError => 0, PrintWarn => 0 });
+# PostgreSQL reports in the language of lc_messages; this test matches the
+# server's English words, so its sessions are set to 'C' after the connect
+my @CONNECT = ({ PrintError => 0, PrintWarn => 0, on_connect_do => [q{SET lc_messages = 'C'}] });
 
 # ---------------------------------------------------------------------------
 # Schemas

@@ -141,7 +141,7 @@ subtest 'unrestricted: the undeclared extension is dropped, as before' => sub {
   like $diff->summary, qr/^  -extension: pg_trgm \([^)]*schema public; not declared, DROP EXTENSION takes the objects it owns\)$/m,
     'the summary names the undeclared extension the diff drops';
   like $diff->summary, qr/^  \+extension: hstore \(\S+, schema public\)$/m,
-    '... and the one it creates, with the version and the schema it is created in (karr k141)';
+    '... and the one it creates, with the version and the schema it is created in';
 
   is scalar @K136::Probe::seen, 1, 'inspect ran once';
   my $self = $K136::Probe::seen[0];

@@ -166,6 +166,7 @@ my $TICK = EV::timer(0.02, 0.02, sub {});   # RUN_ONCE never blocks for long
 sub pause {
   my ($s) = @_;
   my $done = 0;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $t = EV::timer($s, 0, sub { $done = 1 });
   wait_until(sub { $done }, $s + 5);
 }
@@ -213,7 +214,9 @@ sub new_harness {
   my (%o) = @_;
   my $h = DBIO::MySQL::EV::TestHarness->new(
     schema_class  => 'T32::Schema',
-    connect_attrs => { pool_size => $o{pool_size} // 1, ($o{on_connect_do} ? (on_connect_do => $o{on_connect_do}) : ()) },
+    # the tests read the English wording of the server's texts
+    connect_attrs => { pool_size => $o{pool_size} // 1,
+      on_connect_do => [ q{SET SESSION lc_messages = 'en_US'}, @{ $o{on_connect_do} || [] } ] },
     ($o{dsn} ? (dsn => $o{dsn}) : ()),
   );
   push @ALL_H, $h;
@@ -284,7 +287,7 @@ END {
 diag 'server: ' . $admin->selectrow_array('SELECT VERSION()');
 
 # ====================================================================== a)
-subtest 'a) k55: the session ends after the borrow, exactly that call fails' => sub {
+subtest 'a) the session ends after the borrow, exactly that call fails' => sub {
 
   for my $path ([ 'query (no bind values)', 'SELECT SLEEP(30)', [] ],
                 [ 'prepare/execute (bind values)', 'SELECT SLEEP(?)', [ 30 ] ]) {
@@ -385,7 +388,7 @@ subtest 'a) k55: the session ends after the borrow, exactly that call fails' => 
 };
 
 # ====================================================================== b)
-subtest 'b) k55: a statement error the session survives keeps the session' => sub {
+subtest 'b) a statement error the session survives keeps the session' => sub {
   my $h = new_harness();
   my $async = $h->async;
   my $tid = cid_of($async);
@@ -420,7 +423,7 @@ for my $mode (@MODES) {
   my ($name, $dsn_for) = @$mode;
   my $dsn = $dsn_for->();
 
-  subtest "c) k58: the session ends while the connection is idle ($name)" => sub {
+  subtest "c) the session ends while the connection is idle ($name)" => sub {
     subtest 'c1) KILL of an idle connection' => sub {
       my $h = new_harness(dsn => $dsn);
       my $async = $h->async;
@@ -504,7 +507,7 @@ for my $mode (@MODES) {
   my ($name, $dsn_for) = @$mode;
   my $dsn = $dsn_for->();
 
-  subtest "d) k58: a healthy idle connection is never taken for gone ($name)" => sub {
+  subtest "d) a healthy idle connection is never taken for gone ($name)" => sub {
     my $h = new_harness(dsn => $dsn);
     my $async = $h->async;
 
@@ -561,7 +564,7 @@ for my $mode (@MODES) {
   my ($name, $dsn_for) = @$mode;
   my $dsn = $dsn_for->();
 
-  subtest "e) k58: CALL with result sets ($name)" => sub {
+  subtest "e) CALL with result sets ($name)" => sub {
     for my $proc ([ '1 result set', $P1 ], [ '2 result sets', $P2 ]) {
       my ($plabel, $p) = @$proc;
       for my $path ([ 'query', "CALL `$p`(7)", [] ], [ 'prepare/execute', "CALL `$p`(?)", [ 7 ] ]) {
@@ -657,7 +660,7 @@ for my $mode (@MODES) {
   my ($name, $dsn_for) = @$mode;
   my $dsn = $dsn_for->();
 
-  subtest "f) k58: the next call chained in the callback of the previous one ($name)" => sub {
+  subtest "f) the next call chained in the callback of the previous one ($name)" => sub {
     my $h = new_harness(dsn => $dsn);
     my $async = $h->async;
     my $source = $h->schema->source('Item');
@@ -747,7 +750,7 @@ for my $mode (@MODES) {
   my $dsn = $dsn_for->();
   my $bound = sub { $_[0]->_query_async('SELECT ? AS v', [ $_[1] ]) };
 
-  subtest "g) k83: a CALL via query() settles before the rest of its answer was read ($name)" => sub {
+  subtest "g) a CALL via query() settles before the rest of its answer was read ($name)" => sub {
 
     subtest 'g1) the rest arrives while the loop does not turn' => sub {
       my $h = new_harness(dsn => $dsn);
@@ -850,7 +853,7 @@ for my $mode (@MODES) {
 # begins with CALL does not need this: since karr k84 it is prepared.
 for my $mode (@MODES) {
   my ($name, $dsn_for) = @$mode;
-  subtest "h) k75: a multi-statement text is refused and leaves the session ($name)" => sub {
+  subtest "h) a multi-statement text is refused and leaves the session ($name)" => sub {
     my $h = new_harness(dsn => $dsn_for->());
     my $async = $h->async;
     my $tid = cid_of($async);

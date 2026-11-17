@@ -4,7 +4,7 @@ package DBIO::SQLite::SQLMaker;
 use warnings;
 use strict;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw( DBIO::SQLMaker );
 
@@ -316,7 +316,7 @@ DBIO::SQLite::SQLMaker - SQLite-specific SQL generation for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

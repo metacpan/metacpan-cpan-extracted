@@ -139,7 +139,7 @@ use DBIO::MySQL::EV::Storage;
     'bound statement keeps its ? placeholder (MySQL native -- no ?->$N rewrite)';
   is_deeply $conn->{params}[-1], [ 'v' ], 'bind value forwarded to execute()';
   is_deeply $conn->{closed}, [ q{SELECT set_myvar(?)} ],
-    'the prepared connect statement is closed again, the bindless one had none (karr k45)';
+    'the prepared connect statement is closed again, the bindless one had none';
 }
 
 # --- 2a. dbio_rows: the rows of the statement come back (karr k99) -----------
@@ -255,7 +255,7 @@ require EV;
 
   my $err;
   {
-    local $SIG{ALRM} = sub { die "TIMEOUT: replay runner spun on a failed connect (k29)\n" };
+    local $SIG{ALRM} = sub { die "TIMEOUT: replay runner spun on a failed connect\n" };
     alarm 10;
     eval { $storage->_run_pool_connect_statement($conn, q{SET time_zone = '+00:00'}, undef) };
     $err = $@;
@@ -286,7 +286,7 @@ require EV;
   });
 
   {
-    local $SIG{ALRM} = sub { die "TIMEOUT: replay runner never saw readiness (k29)\n" };
+    local $SIG{ALRM} = sub { die "TIMEOUT: replay runner never saw readiness\n" };
     alarm 10;
     $storage->_run_pool_connect_statement($conn, q{SET sql_mode = 'TRADITIONAL'}, undef);
     alarm 0;

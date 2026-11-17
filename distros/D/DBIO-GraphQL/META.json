@@ -27,7 +27,7 @@
       },
       "runtime" : {
          "requires" : {
-            "DBIO" : "0.900004",
+            "DBIO" : "0.900007",
             "GraphQL" : "0.54",
             "MIME::Base64" : "0",
             "perl" : "5.020"
@@ -36,7 +36,7 @@
       "test" : {
          "requires" : {
             "DBD::SQLite" : "1.70",
-            "DBIO::SQLite" : "0.900004",
+            "DBIO::SQLite" : "0.900007",
             "GraphQL::Execution" : "0",
             "Test::More" : "0.98"
          }
@@ -45,43 +45,43 @@
    "provides" : {
       "DBIO::GraphQL" : {
          "file" : "lib/DBIO/GraphQL.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Error" : {
          "file" : "lib/DBIO/GraphQL/Error.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Filter" : {
          "file" : "lib/DBIO/GraphQL/Filter.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Filter::Null" : {
          "file" : "lib/DBIO/GraphQL/Filter/Null.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Filter::Search" : {
          "file" : "lib/DBIO/GraphQL/Filter/Search.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Limits" : {
          "file" : "lib/DBIO/GraphQL/Limits.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Mutation" : {
          "file" : "lib/DBIO/GraphQL/Mutation.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Policy" : {
          "file" : "lib/DBIO/GraphQL/Policy.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::Relationship" : {
          "file" : "lib/DBIO/GraphQL/Relationship.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       },
       "DBIO::GraphQL::ScalarMap" : {
          "file" : "lib/DBIO/GraphQL/ScalarMap.pm",
-         "version" : "0.900004"
+         "version" : "0.900007"
       }
    },
    "release_status" : "stable",
@@ -97,7 +97,7 @@
       },
       "x_IRC" : "irc://irc.perl.org/#dbio"
    },
-   "version" : "0.900004",
+   "version" : "0.900007",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -106,7 +106,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::SetMeta",
             "name" : "@DBIO/DBIO::SetMeta",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::GatherDir",
@@ -136,12 +136,12 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::LicenseFile",
             "name" : "@DBIO/DBIO::LicenseFile",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::DBIO::GatherSkills",
             "name" : "@DBIO/DBIO::GatherSkills",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
@@ -278,7 +278,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "v0.900004",
+                  "tag" : "v0.900007",
                   "tag_format" : "v%V",
                   "tag_message" : "v%V"
                },
@@ -447,14 +447,9 @@
             "version" : "4.010"
          },
          {
-            "class" : "Dist::Zilla::Plugin::DBIO::CoverageTest",
-            "name" : "@DBIO/DBIO::CoverageTest",
-            "version" : "0.900004"
-         },
-         {
             "class" : "Dist::Zilla::Plugin::DBIO::PodCheckerTest",
             "name" : "@DBIO/DBIO::PodCheckerTest",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
@@ -462,14 +457,29 @@
             "version" : "6.040"
          },
          {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@DBIO/ExecDir",
+            "version" : "6.040"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
             "config" : {
                "Dist::Zilla::Role::TestRunner" : {
-                  "default_jobs" : 1
+                  "default_jobs" : "16"
                }
             },
             "name" : "@DBIO/MakeMaker",
             "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::CoverageGate",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : "16"
+               }
+            },
+            "name" : "@DBIO/DBIO::CoverageGate",
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
@@ -489,7 +499,7 @@
          {
             "class" : "Dist::Zilla::Plugin::DBIO::CodebergMeta",
             "name" : "@DBIO/DBIO::CodebergMeta",
-            "version" : "0.900004"
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaResources",
@@ -529,6 +539,11 @@
             },
             "name" : "@DBIO/Git::CheckFor::CorrectBranch",
             "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::DBIO::RequireCoreVersion",
+            "name" : "@DBIO/DBIO::RequireCoreVersion",
+            "version" : "0.900007"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",

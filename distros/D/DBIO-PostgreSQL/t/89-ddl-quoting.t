@@ -167,7 +167,7 @@ has_stmt 'CREATE POLICY by_role ON "AppData"."MixedCase" TO "AppRole", current_u
 # --- types ------------------------------------------------------------------
 
 has_stmt q{CREATE TYPE "AppData"."Mood" AS ENUM ('ok', 'don''t', 'so so');},
-  'k117: an apostrophe in a PgSchema enum value is doubled; the type name is quoted';
+  'an apostrophe in a PgSchema enum value is doubled; the type name is quoted';
 has_stmt qq{CREATE TYPE "AppData"."Addr" AS (\n  "Street" text,\n  "order" integer\n);},
   'composite type: name and attribute names quoted, attribute types as given';
 
@@ -181,7 +181,7 @@ unlike $sql, qr/'it's|'o'b'|'don't'/, 'no literal is cut short by its own apostr
 
 # --- extensions -------------------------------------------------------------
 
-has_stmt q{CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;}, q{an extension name that needs quotes gets them (WITH SCHEMA public, karr k141)};
+has_stmt q{CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;}, q{an extension name that needs quotes gets them (WITH SCHEMA public)};
 has_stmt q{CREATE EXTENSION IF NOT EXISTS pgcrypto WITH SCHEMA public;}, q{... one that does not is bare, by the same rule};
 
 # --- the generated enum type: one name in CREATE TYPE and in the column -----

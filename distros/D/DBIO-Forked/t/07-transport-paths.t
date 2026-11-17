@@ -1,7 +1,13 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
+
+plan skip_all => 'this perl has no real fork() ($Config{d_fork} is not set)'
+  unless $Config{d_fork};
+
 use POSIX qw(WNOHANG);
+use IO::Handle;
 use Storable ();
 use Time::HiRes ();
 
@@ -47,7 +53,30 @@ use DBIO::Forked::Future;
 
 alarm 60;
 
-my $BIG_BYTES = 200 * 1024;   # three times a 64 KiB pipe buffer, and then some
+# What a fresh pipe holds on THIS machine: write without blocking until the
+# pipe refuses. Pipe sizes differ (4 KiB to 64 KiB and growing pipes to more),
+# so no size is assumed anywhere below.
+my $PIPE_CAP = do {
+  pipe(my $mr, my $mw) or die "pipe: $!";
+  $mw->blocking(0);
+  my $total = 0;
+  while (1) {
+    my $n = syswrite($mw, 'x' x 65536);
+    last unless $n;   # undef (EAGAIN) or 0: full
+    $total += $n;
+    last if $total > 16 * 1024 * 1024;
+  }
+  close $mw; close $mr;
+  $total;
+};
+die "fixture: the measured pipe capacity ($PIPE_CAP bytes) is not plausible"
+  unless $PIPE_CAP >= 512 && $PIPE_CAP <= 8 * 1024 * 1024;
+
+# Four times the pipe, a multiple of four bytes (pack 'N*'): a child writing it
+# cannot finish before somebody reads.
+my $BIG_BYTES = 4 * $PIPE_CAP;
+$BIG_BYTES -= $BIG_BYTES % 4;
+my $BIG_KIB = sprintf '%.0f', $BIG_BYTES / 1024;
 
 {
   # What a real sync select() returns: a cursor, not rows. Blessed, answers all.
@@ -58,7 +87,7 @@ my $BIG_BYTES = 200 * 1024;   # three times a 64 KiB pipe buffer, and then some
   package t::Mock::Storage;
   sub new { bless {}, shift }
 
-  # 200 KiB whose every four bytes differ: a lost, repeated or misplaced chunk
+  # Several pipes' worth whose every four bytes differ: a lost, repeated or misplaced chunk
   # changes the string, which a run of one character would not show.
   sub big { pack 'N*', 0 .. $BIG_BYTES / 4 - 1 }
 
@@ -174,7 +203,7 @@ sub in_child_ok {
   my $f = $storage->select_async('die-unanswered');   # SIGKILL: no blob, no exit code path
   eval { $f->get };
   like $@, qr/DBIO::Forked::Future: child killed by signal 9 before sending a result/,
-    'a child that dies unanswered: get throws, naming the signal (karr k20)';;
+    'a child that dies unanswered: get throws, naming the signal';;
   ok $f->is_failed, '... the Future is failed';
 
   # $f is still alive here: the reaping is get's, not DESTROY's.
@@ -208,7 +237,7 @@ sub in_child_ok {
 # ---------------------------------------------------------------------------
 {
   my $expected = t::Mock::Storage->big;
-  die 'fixture: the big row is not 200 KiB' unless length $expected == $BIG_BYTES;
+  die 'fixture: the big row is not the measured size' unless length $expected == $BIG_BYTES;
 
   # through get
   {
@@ -217,12 +246,12 @@ sub in_child_ok {
     # ADR 0003, the documented ceiling: the child cannot finish on its own.
     Time::HiRes::sleep(0.2);
     is waitpid(-1, WNOHANG), 0,
-      'before anybody reads, the child of a 200 KiB result is still alive (blocked in its write)';
+      "before anybody reads, the child of a $BIG_KIB KiB result is still alive (blocked in its write)";
 
     my @rows = eval { $f->get };
     is $@, '', 'get: does not fail';
     is scalar @rows, 1, 'get: one row';
-    is length($rows[0][1] // ''), $BIG_BYTES, 'get: all 200 KiB of it';
+    is length($rows[0][1] // ''), $BIG_BYTES, "get: all $BIG_KIB KiB of it";
     ok @rows && $rows[0][1] eq $expected, 'get: byte for byte what the child computed';
     no_children_ok('get reaped the child');
   }
@@ -249,26 +278,33 @@ sub in_child_ok {
   # is_ready usually finds the whole blob: it reads as fast as the child
   # refills the pipe.)
   {
-    my $blob  = Storable::freeze({ rows => [ [ 1, $expected ] ] });
+    # Its own, smaller payload: two pipes' worth in four pieces, so each piece
+    # is about half the measured pipe and fits an empty one.
+    my $hand_bytes = 2 * $PIPE_CAP;
+    $hand_bytes -= $hand_bytes % 4;
+    my $hand  = pack 'N*', 0 .. $hand_bytes / 4 - 1;
+    my $blob  = Storable::freeze({ rows => [ [ 1, $hand ] ] });
     my $size  = int(length($blob) / 4) + 1;
     my @piece = unpack "(a$size)*", $blob;
     die 'fixture: four pieces, each fitting an empty pipe buffer'
-      unless @piece == 4 && $size < 4096 * 15;
+      unless @piece == 4 && $size < $PIPE_CAP;
 
     pipe(my $rh, my $wh) or die "pipe: $!";
+    $wh->blocking(0);   # a write that cannot complete fails loudly, never hangs
     my $f = DBIO::Forked::Future->new(read_fh => $rh);
 
     ok !$f->is_ready, 'fed by hand: not ready before anything was written';
     for my $n (0 .. 3) {
       my $written = syswrite($wh, $piece[$n]);
-      die "short write: $!" unless defined $written && $written == length $piece[$n];
+      die "short write of piece " . ($n + 1) . ": " . ($written // $!)
+        unless defined $written && $written == length $piece[$n];
       ok !$f->is_ready, 'fed by hand: not ready after piece ' . ($n + 1) . ' of 4, the write end still open';
     }
     close $wh;
     ok $f->is_ready, 'fed by hand: ready at EOF';
     ok !$f->is_failed, 'fed by hand: the blob thawed';
     my @rows = eval { $f->get };
-    ok @rows == 1 && $rows[0][1] eq $expected,
+    ok @rows == 1 && $rows[0][1] eq $hand,
       'fed by hand: the four pieces were put together in order';
   }
 }
@@ -327,7 +363,7 @@ sub in_child_ok {
 
   # pipeline: a failed Future.
   SKIP: {
-    skip 'the installed DBIO core predates the pipeline refusal (core k218)', 5
+    skip 'the installed DBIO core predates the pipeline refusal', 5
       unless DBIO::Storage::Async->can('_pipeline_refusal');
 
     my $f = eval { $async->pipeline(sub { 1 }) };

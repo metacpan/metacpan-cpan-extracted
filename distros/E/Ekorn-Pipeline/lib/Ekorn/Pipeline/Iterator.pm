@@ -94,7 +94,12 @@ sub EKORN_SOURCE ($self) {
         if $self->{spent}->();
     my $next = $self->{call};
     return {
-        step    => sub () { $next->() },
+        # Without a signature, as it's called for each value.
+        step => sub { $next->() },
+        # $how is how the reading run ended, which this one doesn't take
+        # on: it's ended as from outside, and each of its parts is told
+        # how from where it stands, so "stopped", not "died", if the
+        # reading run died while this one still had values to give.
         end     => sub ($how) { $self->finish },
         context => $self->{context},
     };

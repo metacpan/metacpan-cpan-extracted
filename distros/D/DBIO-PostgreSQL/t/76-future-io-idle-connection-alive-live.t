@@ -68,7 +68,7 @@ use LiveServer;
 eval { require DBIO::PostgreSQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed dbio-async predates the _idle_connection_alive seam (dbio-async k28)'
+plan skip_all => 'the installed dbio-async predates the _idle_connection_alive seam'
   unless DBIO::Async::Storage->can('_idle_connection_alive')
       && DBIO::Async::Pool->can('_idle_connection_alive');
 

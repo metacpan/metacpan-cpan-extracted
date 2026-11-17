@@ -1,5 +1,5 @@
 package DBIO::DuckDB;
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 # ABSTRACT: DuckDB-specific schema management for DBIO
@@ -90,7 +90,7 @@ DBIO::DuckDB - DuckDB-specific schema management for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

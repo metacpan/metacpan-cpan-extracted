@@ -190,7 +190,7 @@ unlike($schema->resultset('Artist')->explain->[0][1], qr/Filters/,
   like($traced[0] // '', qr/Caterwauler \s McCrae/x,
     '... carrying the query\'s own bind value, the caller\'s data, which is '
   . 'exactly where redact_bind_value must get its chance at it (ADR 0025); '
-  . 'trace level 2 carries the values, level 1 the statement alone (core k401)');
+  . 'trace level 2 carries the values, level 1 the statement alone');
 }
 
 # --- why the absent ANALYZE matters on DuckDB, measured --------------------

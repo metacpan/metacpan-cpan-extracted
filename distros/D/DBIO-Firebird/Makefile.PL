@@ -25,13 +25,13 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::Firebird",
   "PREREQ_PM" => {
     "DBD::Firebird" => 0,
-    "DBIO" => "0.900004"
+    "DBIO" => "0.900007"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t t/sqlmaker/limit_dialects/*.t"
   }
@@ -40,7 +40,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::Firebird" => 0,
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
   "Test::Exception" => 0,
   "Test::More" => "0.98"
 );

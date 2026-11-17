@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO;
@@ -70,7 +72,7 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $id = ++$self->{_next_id};
     $self->{server}{$id} = $w;
@@ -145,7 +147,7 @@ $SIG{__WARN__} = sub { push @warnings, $_[0] };
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $id = ++$self->{_next_id};
     $self->{server}{$id} = $w;
@@ -548,7 +550,7 @@ for my $method (qw( acquire release )) {
   });
 
   answer($storage->{server}{1});
-  is_deeply [ $f->get ], [ [ 'row-for', 'a', 1 ] ],
+  is_deeply [ within(15, sub { $f->get }) ], [ [ 'row-for', 'a', 1 ] ],
     "$l: ->get on the caller's Future drives the loop to the answer";
   is $available_in_callback, 1,
     "$l: the connection is back in the pool when the caller's callbacks run";
@@ -556,7 +558,7 @@ for my $method (qw( acquire release )) {
     "$l: ... so a query issued from one goes out at once";
 
   answer($storage->{server}{1});
-  is_deeply [ $from_callback->get ], [ [ 'row-for', 'b', 1 ] ], "$l: ... and resolves";
+  is_deeply [ within(15, sub { $from_callback->get }) ], [ [ 'row-for', 'b', 1 ] ], "$l: ... and resolves";
   quiet($l);
 }
 

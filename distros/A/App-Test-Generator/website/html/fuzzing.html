@@ -56,6 +56,8 @@
 		<li><strong>The fuzz loop</strong> — <code>iterations</code> cases (30 by default) built from the declared types, with edge-case pools mixed in.</li>
 		<li><strong>Input validation</strong> — each argument spec is re-expressed as a <code>Params::Validate::Strict</code> schema, so a case that should die is checked for dying for the right reason.</li>
 		<li><strong>Output validation</strong> — the return value goes through <code>Return::Set</code>, which is what makes "returns an integer" a testable claim.</li>
+		<li><strong>Side-effect checks</strong> — after every call the harness checks that the caller's globals (<code>$_</code>, <code>$/</code>, <code>$,</code>, <code>$;</code>), the working directory, <code>%ENV</code> and the warn and die handlers are unchanged, that no file was left behind and no file descriptor leaked, and that an accessor did not damage its object.</li>
+		<li><strong>Documentation checks</strong> — a constraint that came only from POD is probed from outside as well. A routine that rejects a value inside a documented bound, or accepts one outside a documented bound, member list or pattern, is recorded, and all such findings are reported at the end of the run. They fail the run only when the harness was generated with <code>--strict-documented</code>.</li>
 		<li><strong>Housekeeping</strong> — <code>srand</code> when a seed is set, an alarm-based timeout, and cleanup of files a routine writes into the working directory.</li>
 	</ol>
 
@@ -66,8 +68,9 @@ Result: PASS
 Files=1, Tests=118,  0 wallclock secs
 </code></pre>
 	<p>
-		If it fails, the TAP output names the case: the parameter, the value, and
-		whether it was expected to live or die. Turn the failing value into an
+		If it fails, the TAP output names the case: the parameter, the value,
+		whether it was expected to live or die, and the seed and input that were
+		sent, so the case can be replayed. Turn the failing value into an
 		<code>edge_cases</code> entry so it is retested forever, not just until
 		the next random seed.
 	</p>
@@ -79,7 +82,9 @@ Files=1, Tests=118,  0 wallclock secs
 		deduplication, the timeout, and the security-string set. All of them are
 		on by default except the last two, because a routine that accepts
 		<code>undef</code> is unusual — but not rare enough to be a safe
-		assumption.
+		assumption. The side-effect checks have switches too:
+		<code>check_files</code>, <code>check_fds</code> and
+		<code>check_accessors</code>, all on by default.
 	</p>
 <pre><code>config:
   test_undef: no
@@ -108,8 +113,9 @@ fuzz-harness-generator --replay-corpus schemas/corpus/translate.json \
 
 	<h2 id="coverage-guided">Coverage-guided fuzzing</h2>
 	<p>
-		With <code>Devel::Cover</code> installed, the fuzzer does not just
-		generate — it measures. Each iteration is scored by which branches it
+		When the program is started under <code>Devel::Cover</code>
+		(<code>perl -MDevel::Cover</code> or <code>cover -test</code>), the fuzzer
+		does not just generate — it measures. Each iteration is scored by which branches it
 		executed; an input that adds coverage is kept and becomes a seed for
 		mutation, so later iterations are variations on inputs that already got
 		deep into the code rather than fresh random values.
@@ -134,7 +140,10 @@ fuzz-harness-generator --replay-corpus schemas/corpus/translate.json \
 	</p>
 	<p>
 		Without Devel::Cover the fuzzer still runs; it simply has no branch
-		feedback, so it degrades to random generation with corpus retention.
+		feedback, so it degrades to random generation with corpus retention. The
+		same is true when Devel::Cover is installed but the program was started
+		without it: the report then shows <code>branches_covered</code> as 0.
+		Corpus files are UTF-8; files written by 0.47 and earlier still load.
 	</p>
 
 	<h2 id="properties">Property-based tests</h2>
@@ -161,7 +170,7 @@ fuzz-harness-generator --replay-corpus schemas/corpus/translate.json \
 		<a href="https://metacpan.org/pod/Test::LectroTest">Test::LectroTest</a>
 		and
 		<a href="https://metacpan.org/pod/Test::LectroTest::Compat">Test::LectroTest::Compat</a>.
-		Both are test requirements of the distribution, so <code>make test</code>
+		Both are prerequisites of the distribution since 0.48, so installing it
 		installs them; a generated file that cannot load them skips its property
 		section with a diagnostic instead of failing.
 	</p>
@@ -218,7 +227,7 @@ ok 124 - positive property holds (1000 trials)
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.47 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

@@ -1,5 +1,9 @@
 Revision history for Alien-Libgit2
 
+0.003     2026-11-17 04:41:05Z
+  - The tarball carries the agent context the release was built with under
+    misc/agent-context/ (not installed).
+
 0.002     2026-08-30 13:47:34Z
 
   - Raise the system-libgit2 floor from 1.5 to 1.9.3. Not an API requirement:

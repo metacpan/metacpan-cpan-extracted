@@ -176,7 +176,7 @@ my $N  = col('n', is_auto_increment => 1);
   { local $SIG{__WARN__} = sub { }; $deploy->apply($diff); }
   ok !(grep { $_->[0] eq 'query' } @$log), 'no identity ADD: no rows are asked';
   ok scalar(grep { $_->[0] eq 'run' && $_->[1] =~ /REORG TABLE "t"/ } @$log),
-    '... the pending table is reorganised all the same (one rule, core k399)';
+    '... the pending table is reorganised all the same (one rule)';
 
   # upgrade does not do the work twice
   ($deploy, $diff, $log) = run({ t => [$ID] }, { t => [$ID, $N] }, _pending => ['t']);

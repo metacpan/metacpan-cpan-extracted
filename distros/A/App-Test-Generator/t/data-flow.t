@@ -54,17 +54,36 @@ subtest 'DF01 — seed D→U chain: stored at construction, immediately consumed
 	my $fuzzer = _fuzzer(seed => 99);
 	is($fuzzer->{seed}, 99, 'seed stored as passed');
 
-	# srand is called at construction, not at run() time.  Reproducibility
-	# holds only when construction and run() are paired with no intervening
-	# rand() calls.  Test the pair: construct → run → construct → run.
-	my $f1 = _fuzzer(seed => 42);
-	$f1->run();
+	# srand is called at construction, so the random stream is reproducible:
+	# two fuzzers given the same seed generate the same inputs.
+	my $a = _fuzzer(seed => 42);
+	$a->_seed_corpus();
+	my $b = _fuzzer(seed => 42);    # srand(42) resets the global stream
+	$b->_seed_corpus();
 
-	my $f2 = _fuzzer(seed => 42);    # srand(42) resets the global stream
-	$f2->run();
+	is_deeply(
+		[ map { $_->{input} } @{ $b->corpus } ],
+		[ map { $_->{input} } @{ $a->corpus } ],
+		'same seed → identical generated inputs',
+	);
 
-	is(scalar @{ $f1->corpus }, scalar @{ $f2->corpus },
-		'same seed with construct-run-construct-run pairing → identical corpus size');
+	# Corpus size also depends on which branches are new to this object.  A
+	# process running under Devel::Cover accumulates coverage across fuzzers,
+	# so the second run starts from a larger baseline and legitimately keeps
+	# fewer inputs; only when no external coverage collection is changing
+	# that baseline is corpus size itself reproducible.
+	if(!$a->{_cover_available}) {
+		my $f1 = _fuzzer(seed => 42);
+		$f1->run();
+
+		my $f2 = _fuzzer(seed => 42);
+		$f2->run();
+
+		is(scalar @{ $f1->corpus }, scalar @{ $f2->corpus },
+			'same seed with construct-run-construct-run pairing → identical corpus size');
+	} else {
+		pass('corpus size not compared: live coverage is shared between runs');
+	}
 };
 
 subtest 'DF02 — stats.total DU: total_iterations == iterations after run()' => sub {

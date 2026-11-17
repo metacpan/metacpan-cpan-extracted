@@ -57,7 +57,7 @@ use DBIO::AccessBroker;
 use DBIO::AccessBroker::Static;
 use DBIO::Forked;
 
-plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker (core k243)'
+plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker'
   unless DBIO::Storage::Async->can('_takes_broker_connect_options');
 
 alarm 60;

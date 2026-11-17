@@ -1,0 +1,251 @@
+#!/usr/bin/env perl
+# PODNAME: holmgang
+# ABSTRACT: Lint Holmgang suites, run them against a Langertha engine, evaluate the reports
+
+our $VERSION = '0.001';
+
+use strict;
+use warnings;
+use Langertha::Holmgang::CLI;
+
+binmode STDOUT, ':encoding(UTF-8)';
+binmode STDERR, ':encoding(UTF-8)';
+
+exit Langertha::Holmgang::CLI->new->run(@ARGV);
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+holmgang - Lint Holmgang suites, run them against a Langertha engine, evaluate the reports
+
+=head1 VERSION
+
+version 0.001
+
+=head1 SYNOPSIS
+
+  holmgang lint /srv/suites/demo-fan /srv/more-suites
+
+  LANGERTHA_OPENAI_API_KEY=... holmgang run --suite /srv/suites/demo-fan \
+    --target OpenAI --model gpt-4o-mini --repeat 3 --report /data/reports/run.json
+
+  holmgang run --suite /srv/suites/demo-fan --target vLLM \
+    --url http://10.0.0.5:8000/v1 --model some-model \
+    --variant max_tokens=4000 --variant enable_thinking=off --concurrency 4
+
+  # two variants of one target, side by side in the report
+  holmgang run --suite /srv/suites/demo-fan --target vLLM --url http://10.0.0.5:8000/v1 \
+    --variant think-off:enable_thinking=off \
+    --variant think-on:enable_thinking=on --variant think-on:deadline=1800 \
+    --report /data/reports/run.json
+
+  # continue a run that was cut off: only the missing results are played
+  holmgang run ... --resume /data/reports/run.json --report /data/reports/run.json
+
+  holmgang run --suite /srv/suites/demo-fan --target mock-solution   # dry run, no network
+
+  holmgang report /data/reports/*.json --by topic --format markdown --suite /srv/suites/demo-fan
+
+  # a suite in the case DSL as format 2, and with a private seed for its generators
+  holmgang export-yaml /srv/dsl-suites/example-sums --out /srv/exported
+  holmgang run --suite /srv/dsl-suites/example-sums --target mock-solution --seed example-sums=90210
+
+=head1 DESCRIPTION
+
+The command line of L<Langertha::Holmgang> (ADR 0009). Four commands:
+
+B<lint> loads each suite exactly as a run would -- format 2 shape checks, lint
+and its two mock runs -- and prints C<ok> with every case, or C<FAIL> with the
+refusal, which names the case file and the field. An argument is a suite
+directory (it holds F<suite.yaml>, or F<suite.pl> in the case DSL) or a
+directory of suites.
+
+B<run> plays every case of the suites against one target, under each of its
+variants, repetition after repetition, with at most C<--concurrency> requests
+open at once (L<Langertha::Holmgang::Batch>); it prints one line per case and
+repetition as each ends and then the evaluation per topic. With C<--report> it
+writes the JSON report (ADR 0006), also while the run goes on, so a run that
+is cut off can be continued with C<--resume>. Write reports outside any
+checkout: a report quotes its cases. SIGINT or SIGTERM cancels: no further
+case starts, the cases in play finish, the report is written (the run
+C<cancelled>); a second signal ends the process at once.
+
+B<report> reads report files, joins them, and prints the evaluation per topic:
+the comparison of targets, the verdicts per suite and, where cases have a
+length tier or a difficulty, the curves per tier and per difficulty.
+
+B<export-yaml> writes each suite in the case DSL (F<suite.pl>) among its
+arguments -- suite directories or directories of suites -- as suite format 2
+into C<--out>/I<id>: F<suite.yaml>, F<cases/*.yaml> and the images. The suite
+is loaded first, lint included, and the export must load back with the same
+digest; a format 2 suite is skipped. A suite directory that already exists
+under C<--out> is a usage error before anything is written: nothing is
+overwritten.
+
+B<Exit codes:> C<0> everything loaded or ran and every verdict is ok; C<1> a
+suite was refused (lint, export-yaml), a verdict is not ok (run, report; a
+suite in which every result is C<error> measured nothing, its verdict reads
+C<NOT MEASURED>, with or without a threshold), or the target
+answered no case of the run -- every result C<error>, C<context_exceeded> or
+C<no_vision> (run; said on standard error with the count per status and the
+first error text, the report is written all the same); C<2> a usage or setup
+error, or a run that aborted or was cancelled.
+
+B<Keys:> holmgang reads no key. An engine takes its key from where Langertha
+reads it, its environment variable (C<LANGERTHA_OPENAI_API_KEY>,
+C<LANGERTHA_ANTHROPIC_API_KEY> ...). There is no default target and no default
+endpoint.
+
+=head2 --suite DIR
+
+C<run>, C<report>: a suite directory, repeatable. For C<report> only the
+suites' C<threshold> is taken; without C<--suite> a verdict is judged without
+one: by its hard cases, an unfinished run and whether anything was measured.
+
+=head2 --target NAME
+
+C<run>, required: a Langertha engine -- C<OpenAI> is
+L<Langertha::Engine::OpenAI>, a name with C<::> a class name as written -- or
+one of the two network-free targets: C<mock-solution> replays every case's
+reference solution, C<mock-text> answers text only.
+
+=head2 --model M
+
+C<run>: the engine's C<model>.
+
+=head2 --url U
+
+C<run>: the engine's C<url>.
+
+=head2 --option K=V
+
+C<run>, repeatable: any other constructor argument of the engine. A value that
+parses as JSON (a number, C<true>, an object ...) is taken as that, otherwise
+as text. C<api_key> is refused -- the command line is visible to every user of
+the host.
+
+=head2 --label L
+
+C<run>: the target's name in the report and the tables; default the model,
+else the engine name.
+
+=head2 --variant K=V
+
+=head2 --variant NAME:K=V
+
+C<run>, repeatable: the variants of the target, each a name and its
+settings, values as for C<--option>. C<K=V> adds to the one unnamed variant,
+whose name is its sorted settings (C<max_tokens=4000,temperature=0>);
+C<NAME:K=V> adds to the variant C<NAME>, C<NAME:> names one without
+settings. Every variant runs every suite; the report has one run per variant
+and suite. Without C<--variant> there is one variant, C<default>. The
+settings are named and checked (L<Langertha::Holmgang::Target/check_variant>):
+
+=over
+
+=item * C<enable_thinking=on|off> -- sent as
+C<chat_template_kwargs.enable_thinking>; only to an OpenAI-compatible engine.
+
+=item * C<reasoning_effort=none|minimal|low|medium|high|xhigh|max> -- only to
+an engine that takes it.
+
+=item * C<max_tokens=N> -- 1 to 9999999, beats the case's.
+
+=item * C<temperature=T> -- 0 to 2, beats the case's; only to an engine that
+takes it.
+
+=item * C<deadline=S> -- seconds one request may take (above 0, at most
+86400); a request that runs out ends the case C<error> with C<timeout:
+deadline (S s)>. Needs the engine on an event loop (IO::Async and
+Net::Async::HTTP installed). A timeout without data is the engine's
+C<user_agent_timeout>: C<--option user_agent_timeout=900>.
+
+=back
+
+Anything else is refused, and so is a setting the engine would drop.
+
+=head2 --concurrency N
+
+C<run>: at most N requests open against the target at once, 1 to 64; default
+1. Each of the N slots gets its own engine (and connection).
+
+=head2 --resume FILE
+
+C<run>: continue the run of an earlier report: every result it holds is taken
+over, only the missing ones are played. The report must come from the same
+suites (unchanged), target, variants and C<--repeat>; anything else is
+refused. C<--report> may name the same file.
+
+=head2 --repeat N
+
+C<run>: repetitions per suite, 1 to 100; default the suite's C<repeat>, else 1.
+
+=head2 --report FILE
+
+C<run>: write the JSON report there.
+
+=head2 --seed ID=N
+
+C<lint>, C<run>, C<export-yaml>, repeatable: replace the seed of every
+C<generate> block of the DSL suite C<ID> with C<N> (0 to 4294967295), so a
+private measurement seed never has to be written into the suite file. An id
+that is no suite in the case DSL among the command's suites is a usage error.
+Another seed is another suite, with another digest.
+
+=head2 --out DIR
+
+C<export-yaml>, required: the directory the suites are written into, one
+subdirectory per suite id; created when missing.
+
+=head2 --by topic
+
+C<report>: the axis of the evaluation; C<topic> is the only one.
+
+=head2 --format F
+
+C<report>: C<text> (default), C<markdown> or C<json>.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<Langertha::Holmgang::CLI>
+
+=item * L<Langertha::Holmgang::Report>
+
+=item * L<Langertha::Holmgang::Evaluation>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Issues
+
+Please report bugs and feature requests at
+L<https://github.com/Getty/langertha-holmgang/issues>.
+
+=head2 IRC
+
+Join C<#langertha> on C<irc.perl.org> or message Getty directly.
+
+=head1 CONTRIBUTING
+
+Contributions are welcome! Please fork the repository and submit a pull request.
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudssus.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

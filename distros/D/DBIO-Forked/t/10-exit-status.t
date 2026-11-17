@@ -1,8 +1,13 @@
 use strict;
 use warnings;
 use Test::More;
+use Config;
+
+plan skip_all => 'this perl has no real fork() ($Config{d_fork} is not set)'
+  unless $Config{d_fork};
 use Errno ();
 use IPC::Open3 ();
+use File::Temp ();
 use POSIX qw(WNOHANG);
 
 use DBIO::Forked::Storage;
@@ -84,9 +89,14 @@ PERL
 # Returns how it ended ("exit N" / "signal N") and everything it printed.
 sub run_script {
   my ($ending) = @_;
+  # The script goes to a file: a multi-line -e argument does not survive the
+  # command-line quoting of every platform.
+  my $script = File::Temp->new(SUFFIX => '.pl');
+  print {$script} $SCRIPT, $ending, "\n";
+  close $script;
   my $pid = IPC::Open3::open3(
     my $in, my $out, undef,
-    $^X, (map { "-I$_" } grep { !ref } @INC), '-e', $SCRIPT . $ending,
+    $^X, (map { "-I$_" } grep { !ref } @INC), $script->filename,
   );
   close $in;
   my $output = do { local $/; <$out> };

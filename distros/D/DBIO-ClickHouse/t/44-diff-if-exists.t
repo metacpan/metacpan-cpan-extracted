@@ -141,7 +141,7 @@ my $drop_table = diff_with_storage(
 );
 like $drop_table->as_sql,
   qr/DROP TABLE IF EXISTS `event`/,
-  'DROP TABLE IF EXISTS when storage declares the capability (karr k20 design '
+  'DROP TABLE IF EXISTS when storage declares the capability (design '
 . 'decision: the partial-failure-reapply scenario needs the guard on DROP as '
 . 'well as CREATE)';
 

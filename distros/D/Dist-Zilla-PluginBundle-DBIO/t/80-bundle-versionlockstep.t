@@ -9,17 +9,16 @@ use IPC::Open3;
 use Path::Tiny;
 use Dist::Zilla::File::InMemory;
 
-# Pins the version gate [@DBIO] puts into the core distribution (k14).
+# Pins the version gate [@DBIO] puts into the core distribution.
 #
-# Why it exists: core carries a literal $VERSION in every module but versions
-# only from its main module (VersionFromMainModule); nothing rewrites the rest.
-# A module left behind at a version bump installed with a stale $VERSION and no
-# build or test noticed. The claim of the gate is therefore:
+# Why it exists: core carries a literal $VERSION in every module, and the
+# release rewrites all of them; the gate checks the result in the built dist.
+# The claim of the gate is therefore:
 #
 #   with core = 1, a module under lib/ whose $VERSION is missing or differs
 #   from the main module's turns the built dist's test red and names the file.
 #
-# Drivers are versioned by RewriteVersion::Transitional and must not get it.
+# Drivers get the same rewrite and no gate.
 #
 # The generated script is run, not grepped: only executing it against a lib/
 # shows whether it goes red.

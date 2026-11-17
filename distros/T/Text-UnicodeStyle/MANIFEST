@@ -1,0 +1,32 @@
+LICENSE
+MANIFEST
+Makefile.PL
+Changes
+README.md
+example.pl
+lib/Text/UnicodeStyle.pm
+lib/Text/UnicodeStyle/Bold.pm
+lib/Text/UnicodeStyle/BoldFraktur.pm
+lib/Text/UnicodeStyle/BoldItalic.pm
+lib/Text/UnicodeStyle/BoldScript.pm
+lib/Text/UnicodeStyle/Circled.pm
+lib/Text/UnicodeStyle/Doublestruck.pm
+lib/Text/UnicodeStyle/Fraktur.pm
+lib/Text/UnicodeStyle/Fullwidth.pm
+lib/Text/UnicodeStyle/Italic.pm
+lib/Text/UnicodeStyle/Monospace.pm
+lib/Text/UnicodeStyle/NegativeCircled.pm
+lib/Text/UnicodeStyle/NegativeSquared.pm
+lib/Text/UnicodeStyle/Parenthesized.pm
+lib/Text/UnicodeStyle/SansSerif.pm
+lib/Text/UnicodeStyle/SansSerifBold.pm
+lib/Text/UnicodeStyle/SansSerifBoldItalic.pm
+lib/Text/UnicodeStyle/SansSerifItalic.pm
+lib/Text/UnicodeStyle/Script.pm
+lib/Text/UnicodeStyle/Squared.pm
+russian.md
+t/cli.t
+t/stylize.t
+bin/substitute-letters
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

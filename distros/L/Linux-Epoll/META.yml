@@ -1,18 +1,17 @@
 ---
 abstract: 'O(1) multiplexing for Linux'
 author:
-  - 'Leon Timmermans <leont@cpan.org>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
 build_requires:
   Module::Build: '0.28'
   POSIX: '0'
   Scalar::Util: '0'
   Socket: '0'
   Test::More: '0'
-  Time::HiRes: '0'
 configure_requires:
   Module::Build: '0.28'
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 6.030, CPAN::Meta::Converter version 2.150010'
+generated_by: 'Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150013'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -21,7 +20,7 @@ name: Linux-Epoll
 provides:
   Linux::Epoll:
     file: lib/Linux/Epoll.pm
-    version: '0.019'
+    version: '0.020'
 requires:
   IO::Handle: '0'
   parent: '0'
@@ -31,7 +30,7 @@ requires:
 resources:
   bugtracker: https://github.com/Leont/linux-epoll/issues
   repository: git://github.com/Leont/linux-epoll.git
-version: '0.019'
-x_generated_by_perl: v5.38.0
-x_serialization_backend: 'YAML::Tiny version 1.74'
+version: '0.020'
+x_generated_by_perl: v5.44.0
+x_serialization_backend: 'YAML::Tiny version 1.76'
 x_spdx_expression: 'Artistic-1.0-Perl OR GPL-1.0-or-later'

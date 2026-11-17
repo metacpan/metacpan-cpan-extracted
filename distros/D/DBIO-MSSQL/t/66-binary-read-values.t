@@ -858,7 +858,7 @@ for my $case (
   . textual(ntext => '[me].[nt]', 'me.nt') . ' FROM [k56_notes] [me]',
     "a 'text' column is an NVARCHAR(MAX) on the server (DBIO::MSSQL::Adapter), read as one, "
   . 'not as a TEXT through VARCHAR(MAX); an NTEXT is cast to the MAX type '
-  . '(a CASE cannot return an NTEXT) (karr k47)';
+  . '(a CASE cannot return an NTEXT)';
 
   is selected { $notes->search({}, { columns => [qw(vm nvm rvm)] })->all },
     'SELECT ' . textual(nvarchar_max => '[me].[vm]', 'me.vm') . ', '

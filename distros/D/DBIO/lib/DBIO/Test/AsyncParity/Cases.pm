@@ -4,7 +4,7 @@ package DBIO::Test::AsyncParity::Cases;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Scalar::Util ();
 use DBIO::Exception ();
@@ -1202,7 +1202,7 @@ DBIO::Test::AsyncParity::Cases - The case table of DBIO::Test::AsyncParity: Resu
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::Informix::Diff::Column;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -145,7 +145,7 @@ DBIO::Informix::Diff::Column - Diff operations for Informix columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

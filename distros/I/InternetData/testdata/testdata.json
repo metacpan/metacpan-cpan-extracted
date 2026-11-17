@@ -205,12 +205,12 @@
       }
     },
     {
-      "name": "overage-cap-is-not-retryable",
-      "why": "No Retry-After: the key's overage cap is reached, and raising it in Billing, not retrying, is what helps.",
+      "name": "a-429-without-retry-after-is-not-retryable",
+      "why": "No Retry-After: a spent allowance, which retrying does not help. The API's own 429s always carry one, and a paid plan past its overage cap is answered with cap_reached, so only something in front of the API sends this.",
       "status": 429,
       "headers": {},
       "body": {
-        "error": "overage cap reached; raise or remove it in Billing"
+        "error": "too many requests"
       },
       "expect": {
         "kind": "quota_exceeded",
@@ -863,7 +863,8 @@
           "whois",
           "rwhois",
           "hosted_domains",
-          "trial_expired"
+          "trial_expired",
+          "cap_reached"
         ],
         "absentIn": {
           "location": [
@@ -1088,7 +1089,9 @@
           "dns_resolver",
           "bittorrent"
         ],
-        "absent": [],
+        "absent": [
+          "cap_reached"
+        ],
         "absentIn": {}
       }
     },
@@ -1195,7 +1198,147 @@
           "bittorrent",
           "whois",
           "rwhois",
-          "hosted_domains"
+          "hosted_domains",
+          "cap_reached"
+        ],
+        "absentIn": {
+          "location": [
+            "region",
+            "region_code",
+            "city",
+            "postal_code",
+            "latitude",
+            "longitude",
+            "accuracy_radius",
+            "geoname_id",
+            "dma_code",
+            "last_changed"
+          ],
+          "asn": [
+            "country",
+            "rpki_status"
+          ],
+          "company": [
+            "type",
+            "country"
+          ],
+          "abuse": [
+            "name",
+            "phone",
+            "address",
+            "country",
+            "network",
+            "validated",
+            "unvalidated_since"
+          ]
+        }
+      }
+    },
+    {
+      "name": "cap-reached-answer",
+      "why": "A key on a paid plan past its organization's overage cap: Unlimited's fields with cap_reached true, never a 429.",
+      "call": "lookup",
+      "target": "146.70.116.130",
+      "status": 200,
+      "body": {
+        "ip": "146.70.116.130",
+        "is_bogon": false,
+        "is_tor": false,
+        "is_relay": false,
+        "is_anycast": false,
+        "is_carrier": false,
+        "is_satellite": false,
+        "is_ssh": false,
+        "is_smtp": false,
+        "is_web": false,
+        "is_dns_resolver": false,
+        "is_bittorrent": false,
+        "location": {
+          "continent": "EU",
+          "continent_name": "Europe",
+          "country": "AT",
+          "country_name": "Austria",
+          "timezone": "Europe/Vienna",
+          "currency_code": "EUR",
+          "currency_name": "Euro",
+          "currency_symbol": "€",
+          "flag_emoji": "🇦🇹",
+          "flag_unicode": "U+1F1E6 U+1F1F9"
+        },
+        "tor": {},
+        "relay": {},
+        "asn": {
+          "asn": 9009,
+          "name": "M247 Europe SRL",
+          "domain": "m247global.com",
+          "type": "hosting",
+          "prefix": "146.70.116.0/24"
+        },
+        "company": {
+          "name": "M247 LTD Vienna Infrastructure",
+          "domain": "m247.ro"
+        },
+        "hostname": "",
+        "abuse": {
+          "email": "abuse@m247.ro"
+        },
+        "cap_reached": true
+      },
+      "expect": {
+        "present": {
+          "ip": "146.70.116.130",
+          "is_bogon": false,
+          "is_tor": false,
+          "is_relay": false,
+          "is_anycast": false,
+          "is_carrier": false,
+          "is_satellite": false,
+          "is_ssh": false,
+          "is_smtp": false,
+          "is_web": false,
+          "is_dns_resolver": false,
+          "is_bittorrent": false,
+          "hostname": "",
+          "cap_reached": true
+        },
+        "objects": [
+          "tor",
+          "relay",
+          "location",
+          "asn",
+          "company",
+          "abuse"
+        ],
+        "empty": [
+          "tor",
+          "relay"
+        ],
+        "absent": [
+          "is_vpn",
+          "is_resproxy",
+          "is_dcproxy",
+          "is_mobproxy",
+          "is_pubproxy",
+          "is_hosting",
+          "is_cdn",
+          "vpn",
+          "resproxy",
+          "dcproxy",
+          "mobproxy",
+          "pubproxy",
+          "hosting",
+          "cdn",
+          "carrier",
+          "satellite",
+          "ssh",
+          "smtp",
+          "web",
+          "dns_resolver",
+          "bittorrent",
+          "whois",
+          "rwhois",
+          "hosted_domains",
+          "trial_expired"
         ],
         "absentIn": {
           "location": [
@@ -1352,7 +1495,8 @@
         "hosted_domains": {
           "total": 0,
           "domains": []
-        }
+        },
+        "cap_reached": false
       },
       "expect": {
         "present": {
@@ -1375,7 +1519,8 @@
           "is_web": false,
           "is_dns_resolver": false,
           "is_bittorrent": false,
-          "hostname": ""
+          "hostname": "",
+          "cap_reached": false
         },
         "objects": [
           "vpn",
@@ -1592,7 +1737,8 @@
             "medicinanet.com.br",
             "imgup.net"
           ]
-        }
+        },
+        "cap_reached": false
       },
       "expect": {
         "present": {
@@ -1615,7 +1761,8 @@
           "is_web": true,
           "is_dns_resolver": true,
           "is_bittorrent": true,
-          "hostname": "one.one.one.one"
+          "hostname": "one.one.one.one",
+          "cap_reached": false
         },
         "objects": [
           "vpn",
@@ -1704,7 +1851,8 @@
           "peers",
           "num_downstreams",
           "downstreams",
-          "hosted_domains"
+          "hosted_domains",
+          "cap_reached"
         ]
       }
     },
@@ -1812,7 +1960,8 @@
             "fotopedia.com",
             "kissfm.ro"
           ]
-        }
+        },
+        "cap_reached": false
       },
       "expect": {
         "present": {
@@ -1833,7 +1982,8 @@
           "tier1": false,
           "num_upstreams": 18,
           "num_peers": 1018,
-          "num_downstreams": 146
+          "num_downstreams": 146,
+          "cap_reached": false
         },
         "objects": [
           "whois",
@@ -1845,6 +1995,56 @@
         ],
         "empty": [],
         "absent": []
+      }
+    },
+    {
+      "name": "asn-cap-reached-answer",
+      "why": "An AS for a key on a paid plan past its organization's overage cap: Unlimited's fields with cap_reached true.",
+      "call": "lookupAsn",
+      "target": 9009,
+      "status": 200,
+      "body": {
+        "asn": 9009,
+        "name": "M247 Europe SRL",
+        "country": "RO",
+        "registry": "ripe",
+        "allocated": "2005-06-06",
+        "domain": "m247global.com",
+        "cap_reached": true
+      },
+      "expect": {
+        "present": {
+          "asn": 9009,
+          "name": "M247 Europe SRL",
+          "country": "RO",
+          "registry": "ripe",
+          "allocated": "2005-06-06",
+          "domain": "m247global.com",
+          "cap_reached": true
+        },
+        "objects": [],
+        "empty": [],
+        "absent": [
+          "type",
+          "num_ips",
+          "num_prefixes4",
+          "num_prefixes6",
+          "rpki_valid",
+          "rpki_invalid",
+          "rpki_not_found",
+          "whois",
+          "prefixes",
+          "rank",
+          "tier1",
+          "num_upstreams",
+          "upstreams",
+          "num_peers",
+          "peers",
+          "num_downstreams",
+          "downstreams",
+          "hosted_domains",
+          "trial_expired"
+        ]
       }
     },
     {
@@ -1878,7 +2078,8 @@
           "is_disposable",
           "dns",
           "ip_ranges",
-          "disposable"
+          "disposable",
+          "cap_reached"
         ]
       }
     },
@@ -1942,7 +2143,8 @@
             }
           ]
         },
-        "disposable": {}
+        "disposable": {},
+        "cap_reached": false
       },
       "expect": {
         "present": {
@@ -1953,7 +2155,8 @@
           "has_aaaa": true,
           "has_mx": true,
           "has_ns": true,
-          "has_cname": false
+          "has_cname": false,
+          "cap_reached": false
         },
         "objects": [
           "dns",
@@ -1964,6 +2167,44 @@
           "disposable"
         ],
         "absent": []
+      }
+    },
+    {
+      "name": "domain-cap-reached-answer",
+      "why": "A domain for a key on a paid plan past its organization's overage cap: Unlimited's fields with cap_reached true.",
+      "call": "lookupDomain",
+      "target": "example.com",
+      "status": 200,
+      "body": {
+        "domain": "example.com",
+        "is_registered": true,
+        "has_a": true,
+        "has_aaaa": true,
+        "has_mx": true,
+        "has_ns": true,
+        "has_cname": false,
+        "cap_reached": true
+      },
+      "expect": {
+        "present": {
+          "domain": "example.com",
+          "is_registered": true,
+          "has_a": true,
+          "has_aaaa": true,
+          "has_mx": true,
+          "has_ns": true,
+          "has_cname": false,
+          "cap_reached": true
+        },
+        "objects": [],
+        "empty": [],
+        "absent": [
+          "is_disposable",
+          "dns",
+          "ip_ranges",
+          "disposable",
+          "trial_expired"
+        ]
       }
     }
   ],

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use Test2::V0;
 use Test::Alien;
 use Alien::Libgit2;

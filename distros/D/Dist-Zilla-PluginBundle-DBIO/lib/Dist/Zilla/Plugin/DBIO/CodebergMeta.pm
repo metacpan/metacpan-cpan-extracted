@@ -1,7 +1,9 @@
 package Dist::Zilla::Plugin::DBIO::CodebergMeta;
 # ABSTRACT: Add Codeberg (or a Forgejo instance via host=) repository metadata to META.{json,yml}
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use Moose;
+use IPC::Open3 ();
+use Symbol ();
 with 'Dist::Zilla::Role::MetaProvider';
 
 
@@ -39,6 +41,13 @@ has homepage => (
   default => 'repo',
 );
 
+has _remote_url => (
+  is      => 'ro',
+  isa     => 'Maybe[Str]',
+  lazy    => 1,
+  builder => '_build_remote_url',
+);
+
 has _remote_info => (
   is      => 'ro',
   isa     => 'Maybe[HashRef]',
@@ -46,11 +55,29 @@ has _remote_info => (
   builder => '_build_remote_info',
 );
 
-sub _build_remote_info {
+# The URL of the configured remote, asked of git at the dist root (list form,
+# no shell), or undef when there is none.
+sub _build_remote_url {
   my ($self) = @_;
   my $remote = $self->remote;
-  chomp(my $url = `git config --get remote.$remote.url 2>/dev/null` // '');
-  return undef unless length $url;
+  my $err = Symbol::gensym();
+  my ($in, $out);
+  my $pid = eval {
+    IPC::Open3::open3($in, $out, $err, 'git', '-C', $self->zilla->root->stringify,
+      'config', '--get', "remote.$remote.url");
+  } or return undef;
+  close $in;
+  my $url = do { local $/; <$out> };
+  waitpid $pid, 0;
+  return undef unless defined $url;
+  $url =~ s/\s+\z//;
+  return length $url ? $url : undef;
+}
+
+sub _build_remote_info {
+  my ($self) = @_;
+  my $url = $self->_remote_url;
+  return undef unless defined $url;
   return $self->_parse_remote_url($url);
 }
 
@@ -72,22 +99,37 @@ sub _parse_remote_url {
 
 # Resolve the owner/repo slug for $self->host. An explicit repo= override is
 # trusted; otherwise the git remote must point at the expected host. Returns
-# undef (no usable target) if there is no remote or it points elsewhere.
-sub _slug {
+# the slug, or (undef, $reason) when there is no usable target: no remote, a
+# URL that is not understood, or a remote on another host.
+sub _resolve {
   my ($self) = @_;
   return $self->repo if defined $self->repo && length $self->repo;
 
-  my $info = $self->_remote_info or return undef;
-  return undef unless $info->{host} eq $self->host;
+  my ($remote, $host) = ($self->remote, $self->host);
+  my $url = $self->_remote_url;
+  return (undef, "git remote '$remote' has no URL in " . $self->zilla->root)
+    unless defined $url;
+
+  (my $shown = $url) =~ s{^(\w+://)[^/\@]*\@}{$1};   # no credentials in the log
+  my $info = $self->_remote_info
+    or return (undef, "git remote '$remote' URL '$shown' is not understood");
+  return (undef, "git remote '$remote' points at $info->{host}, not at $host")
+    unless $info->{host} eq $host;
   return $info->{slug};
+}
+
+sub _slug {
+  my ($self) = @_;
+  my ($slug) = $self->_resolve;
+  return $slug;
 }
 
 sub metadata {
   my ($self) = @_;
 
-  my $slug = $self->_slug;
+  my ($slug, $why) = $self->_resolve;
   unless (defined $slug) {
-    $self->log_debug('no meta target found -- skipping repository metadata');
+    $self->log("$why -- skipping repository metadata (META gets no repository, bugtracker or homepage)");
     return {};
   }
 
@@ -145,21 +187,22 @@ Dist::Zilla::Plugin::DBIO::CodebergMeta - Add Codeberg (or a Forgejo instance vi
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
 Derives the C<repository>, C<bugtracker>, and C<homepage> META resources from
 the distribution's git remote URL. Works fully offline: no API token and no
-network access, unlike the external L<Dist::Zilla::Plugin::Codeberg::Meta>
-(which additionally targets the GitLab API and does not actually work against
-Codeberg's Forgejo API).
+network access. The remote is read with C<git -C> at the root of the
+distribution, so the working directory of the build does not matter.
 
 This plugin is Codeberg-only by design. The C<owner/repo> slug is taken from
 the git remote and the URLs are built for L<host|/host> (C<codeberg.org> by
 default). If the remote does not point at that host (or there is no usable
 remote and no L<repo|/repo> override), no target is found and the plugin adds
-B<no> resources at all -- it never emits metadata for the wrong forge.
+B<no> resources at all -- it never emits metadata for the wrong forge. It says so
+in the build log, with the reason: no URL for the remote, a URL it does not
+understand, or the host the remote points at.
 
 =head1 ATTRIBUTES
 

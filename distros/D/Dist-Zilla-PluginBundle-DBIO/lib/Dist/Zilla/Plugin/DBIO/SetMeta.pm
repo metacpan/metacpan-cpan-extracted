@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::SetMeta;
 # ABSTRACT: Set author, copyright_holder, and license on the Dist::Zilla object
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use Moose;
 with 'Dist::Zilla::Role::Plugin', 'Dist::Zilla::Role::BeforeBuild';
 
@@ -34,7 +34,7 @@ Dist::Zilla::Plugin::DBIO::SetMeta - Set author, copyright_holder, and license o
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

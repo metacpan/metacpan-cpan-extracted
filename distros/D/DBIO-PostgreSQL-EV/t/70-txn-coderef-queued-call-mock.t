@@ -224,7 +224,7 @@ sub txn_returning_queued_call {
 # --- 1. top level, pool of one ---------------------------------------------------
 
 {
-  my $label   = 'k87, top level, pool of one';
+  my $label   = 'top level, pool of one';
   my $storage = build_storage(1);
   my $r = bounded(txn_returning_queued_call($storage));
   settle();
@@ -249,7 +249,7 @@ sub txn_returning_queued_call {
 # --- 2. in a then callback of another connection, pool of two ---------------------
 
 {
-  my $label   = 'k87, in a then callback of another connection, pool of two';
+  my $label   = 'in a then callback of another connection, pool of two';
   my $storage = build_storage(2);
   my %seen;
   my $r = bounded(sub {
@@ -274,7 +274,7 @@ sub txn_returning_queued_call {
 # --- 3. the legitimate case: the Future of a call on $ctx ------------------------
 
 {
-  my $label   = 'k87, the coderef returns a call on $ctx, pool of one';
+  my $label   = 'the coderef returns a call on $ctx, pool of one';
   my $storage = build_storage(1);
   my $r = bounded(sub {
     $storage->txn_do(sub { $_[0]->select_async('thing', \@COLS, { name => 'ctx' }) });

@@ -210,6 +210,7 @@ my $TICK = EV::timer(0.02, 0.02, sub {});   # RUN_ONCE never blocks for long
 sub pause {
   my ($s) = @_;
   my $done = 0;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $t = EV::timer($s, 0, sub { $done = 1 });
   wait_until(sub { $done }, $s + 5);
 }
@@ -533,7 +534,11 @@ for my $kind (qw( bound plain )) {
   subtest "3) $label" => sub {
     # A setting made inside a borrow is gone when it ends (karr k100, core k398):
     # the one-second lock wait is a connect action, which the reset puts back.
-    my $h     = new_harness(on_connect_do => [ q{SET SESSION innodb_lock_wait_timeout = 1} ]);
+    my $h     = new_harness(on_connect_do => [
+      q{SET SESSION innodb_lock_wait_timeout = 1},
+      # the case reads the English wording of the server's text (Lock wait timeout)
+      q{SET SESSION lc_messages = 'en_US'},
+    ]);
     my $async = $h->async;
     my $tid   = cid_of($async);
     my $conn  = the_conn($h);

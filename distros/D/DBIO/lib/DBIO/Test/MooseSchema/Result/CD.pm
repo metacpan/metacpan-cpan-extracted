@@ -4,7 +4,7 @@ package DBIO::Test::MooseSchema::Result::CD;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Moose;
 
@@ -53,7 +53,7 @@ DBIO::Test::MooseSchema::Result::CD - Moose-enabled test result class for the cd
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

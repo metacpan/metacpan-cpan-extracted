@@ -51,7 +51,7 @@ is (
   'and the declaration is in the _determine_ slot, so both query paths agree '
 . '-- ADR 0037 section 2 names __PACKAGE__->_use_supports_exists_query(1) and '
 . 'the rest of the family took it, which leaves get_dbms_capability answering '
-. '0 on a storage that does support the query (karr k27)',
+. '0 on a storage that does support the query',
 );
 
 # ------------------------------------------------------------------ SQL shape
@@ -161,7 +161,7 @@ ok (
   'clearing the forced value hands the question back to the driver '
 . 'declaration: the force above really took the capability away, and the '
 . 'undef gives it back instead of pinning core\'s default 0 for the life of '
-. 'this storage. Since core k137 / ADR 0041 that holds for either declaration '
+. 'this storage. Per ADR 0041 that holds for either declaration '
 . 'form -- a per-storage force and a class-level _use_ declaration are two '
 . 'physically different slots (the instance hash vs the $Class::__cag_<field> '
 . 'package variable), and set_use_dbms_capability now deletes the instance '

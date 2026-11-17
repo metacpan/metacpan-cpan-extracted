@@ -4,7 +4,7 @@ package DBIO::DeploymentHandler::DeployMethod::Native;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Exception;
 use DBIO::Util ();
@@ -113,7 +113,7 @@ DBIO::DeploymentHandler::DeployMethod::Native - Native DBIO driver deploy (no SQ
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

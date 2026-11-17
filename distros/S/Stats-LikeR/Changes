@@ -1,5 +1,134 @@
 Revision history for Stats-LikeR
 
+0.3424 2026-11-16 CST (Claude Opus 5.5 helped)
+
+ [read_table()]
+
+ - keep_cols and drop_cols read faster when the columns left out are
+   quoted, or the file is an .xlsx. A quoted field in such a column is
+   now scanned for its closing quote without its text being copied, and
+   an .xlsx cell in one is no longer built only to be freed. The table
+   is unchanged. Times are the fastest of five processes, each reading
+   once into an aoh on perl 5.44.0; peak memory did not change.
+
+     file                                           kept     before  after
+     20,000 x 200 CSV, half the columns quoted      3        0.070 s 0.043 s
+     20,000 x 200 CSV, every column quoted          3        0.103 s 0.054 s
+     50,000 x 20 CSV, 10 quoted 200-byte texts      10       0.074 s 0.052 s
+     50,000 x 20 CSV, 10 quoted 3-line notes        10       0.090 s 0.071 s
+     10,000 x 100 .xlsx of numbers                  3        0.139 s 0.084 s
+     10,000 x 100 .xlsx of shared strings           3        0.218 s 0.138 s
+     20,000 x 200 CSV, every column read            200      0.305 s 0.298 s
+     10,000 x 100 .xlsx, every column read          100      0.198 s 0.200 s
+
+ [density()]
+
+ - density() now refuses an nb above 2147483647 with "invalid 'nb'", as
+   bw_sj(), bw_ucv() and bw_bcv() already did; that is R's own bound,
+   since as.integer() is NA above it. On a 32-bit perl with 64-bit
+   integers an nb of 2**32 truncated to 0, and with bw => 'SJ', 'ucv' or
+   'bcv' the bandwidth step divided by it and wrote into an empty table.
+
+ - density() needs about half the memory at large n. The interpolation
+   grid and the output x values are now computed when needed rather than
+   stored, each work buffer is freed as soon as it is dead rather than
+   all at the end, and an output point's grid interval is found
+   arithmetically instead of by bisection (bisection stays for a grid
+   so narrow that adjacent points are equal). The estimate is unchanged
+   bit for bit. Times are the fastest of five processes on perl 5.44.0,
+   memory is the peak resident size:
+
+     x values    n            before             after
+     1,000,000   512          0.094 s   134 MB   0.093 s   118 MB
+     100,000     4,194,304    4.13 s    663 MB   3.94 s    339 MB
+     1,000,000   16,777,216   21.20 s   2679 MB  20.44 s   1375 MB
+
+ [interpolate()]
+
+ - interpolate() with method 'spline' or 'polynomial' refuses an order
+   too large for a C int instead of truncating it: order => 4294967297
+   became 1 and was silently run as linear interpolation.
+
+ [sum(), mean(), sd(), var()]
+
+ - When the running total overflows, these read their arguments a second
+   time, which FETCHes a tied array again. That second read now croaks
+   as the first does if an element has become undef, and croaks if the
+   array's length has changed, instead of skipping the element or
+   reading a different number of values and dividing by the first count.
+
+0.3423 2026-11-15 CST (Claude Opus 5.5 helped)
+
+ [Distribution]
+
+ - lib/Stats/LikeR.pm.rej, a reject left by patch(1) after its hunk had
+   been applied by hand, is no longer in the tarball. It was tracked in
+   git, [PruneFiles] keeps all of lib/, and so 0.3422 shipped it, and
+   `make install` copied it into site_perl beside the module. The module
+   itself was unaffected. .gitignore now ignores *.rej, and dzil.sh
+   leaves *.rej out of what it adds and refuses a tarball that has one,
+   as it has done for *.orig since 0.3415 and 0.3416 shipped
+   lib/Stats/LikeR.pm.orig.
+
+ [read_table()]
+
+ - read_table() with keep_cols or drop_cols no longer aborts perl on a
+   perl built with -DDEBUGGING. The parser stands a NULL in its row
+   buffer for each field whose column is left out, and when the buffer
+   was full it stored that NULL with av_push(), which such a perl
+   asserts against ("Perl_av_push: Assertion `val' failed"). It now
+   grows the buffer with av_extend() and stores the NULL itself, as it
+   already did while there was room. A perl without -DDEBUGGING stored
+   the NULL correctly and was never affected. The module was at fault,
+   not the tests: t/read_table.keep_cols.t died before its first
+   subtest and t/read_table.drop_cols.t after its 17th or 33rd, in all
+   11 FAIL reports for 0.3422, every one from a -DDEBUGGING perl
+   (5.30.1 to 5.45.4, double, long double and quadmath). A -DDEBUGGING
+   perl 5.44.0 reproduced both failures here, at the same subtests, and
+   passes the whole suite with the fix. That perl is now part of the
+   test matrix this is released against.
+ - colClasses is no longer applied to a field the table never holds.
+   When a header repeats a name, the last field of that name is the
+   column, and a CSV read still converted the earlier ones as it cut
+   them, so read_table() croaked over a value in a column it was about
+   to throw away ('e,b,e' over 'x,2,3' with colClasses integer for
+   both e). An .xlsx and the perl row closure already read that table
+   as { e => 3, b => 2 }. An aoa keeps every field, so there the field
+   is still converted and still refused.
+
+ [view()]
+
+ - A hash key that perl holds downgraded, such as a UTF-8 "é" stored as
+   the byte E9, is now shown as the UTF-8 string keys() returns. It was
+   read from its stored bytes and printed as a lone E9 byte in a HoH's
+   row labels and in the column names of an AoH, a HoA or a HoH, while
+   a flat hash printed the same key as C3 A9.
+ - A gap that no buffer can hold, such as gap => 1e12, is now refused
+   with "view: the table is too large to render" instead of ending perl
+   with "Out of memory".
+ - Listing every key of a hash no longer makes one temporary copy per
+   key that lived until view() returned.
+
+ [Data-frame helpers]
+
+ - concat() and rbind() skip an empty frame of either kind, as their
+   documentation says. An empty [] among HoAs, or {} among AoHs, was
+   dereferenced as the other kind and died "Not a HASH reference".
+ - melt() keeps a name given twice in id_vars once. Each mention was
+   pushed again, so a hoa's id column came out twice as long as the
+   rest. A hoa is now built a column at a time, which melts 300,000
+   rows of two id and five value columns in 0.17 s instead of 0.62 s,
+   and the other output types decide their shape once rather than once
+   per cell.
+ - ffill() and bfill() with limit count only the cells they can write.
+   A row that is no hash, or an AoA row too short for the column, was
+   counted against the limit, so ffill([{a => 1}, undef, {a => undef}],
+   limit => 1) left the last row unfilled.
+ - chunk() in scalar context gives 0 for empty input, not undef, and
+   refuses a bad size or parts for empty input as for any other.
+ - aoh2hoh()'s errors for a row that is no hash and for a missing key
+   now name the function, as its other errors do.
+
 0.3422 2026-11-13 CST (Claude Fable 5.2 helped)
 
  [view()]

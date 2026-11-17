@@ -1,0 +1,45 @@
+# CI for an Alien [@Author::GETTY] distribution: one job against the system
+# library, one forced share build; the Dist::Zilla mechanics live in the shared
+# dzil-test action of the bundle repository.
+name: ci
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - '*'
+  pull_request:
+jobs:
+  system-lib:
+    runs-on: ubuntu-latest
+    container:
+      image: perl:5.40-bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: perl -V
+        run: perl -V
+      - name: Install system packages
+        run: apt-get update && apt-get install -y --no-install-recommends libssh-dev pkg-config
+      - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
+
+  share-build:
+    runs-on: ubuntu-latest
+    container:
+      image: perl:5.40-bookworm
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fix safe.directory
+        run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+      - name: perl -V
+        run: perl -V
+      - name: Install system packages
+        run: apt-get update && apt-get install -y --no-install-recommends cmake build-essential libssl-dev zlib1g-dev pkg-config
+      # Build::CMake adds Alien::cmake3 as a dynamic configure prereq of share
+      # builds only, so the static metadata the action installs from lacks it.
+      - name: Install Alien::cmake3 (dynamic share-build prereq)
+        run: cpanm -nq Alien::cmake3
+      - uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/actions/dzil-test@v1
+        with:
+          install-type: share

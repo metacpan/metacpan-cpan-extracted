@@ -85,7 +85,9 @@ T93::KeepVector->pg_extensions('vector');
   );
 }
 
-my @CONNECT = ({ PrintError => 0, PrintWarn => 0 });
+# PostgreSQL reports in the language of lc_messages; this test matches the
+# server's English words, so its sessions are set to 'C' after the connect
+my @CONNECT = ({ PrintError => 0, PrintWarn => 0, on_connect_do => [q{SET lc_messages = 'C'}] });
 
 # A private database with $class installed and @sql run on top of it.
 sub database_with {
@@ -351,6 +353,9 @@ SKIP: {
   my $dbh = LiveServer->control_dbh(
     login => [ PrivatePgDatabase->create('t93part') ], attrs => { PrintWarn => 0 });
   $dbh->do('SET client_min_messages = warning');
+  # PostgreSQL reports in the language of lc_messages; the test matches the
+  # server's English words, so its session is set to 'C'
+  $dbh->do(q{SET lc_messages = 'C'});
   my $model = sub { DBIO::PostgreSQL::Introspect->new(dbh => $dbh)->model };
 
   my $empty = $model->();

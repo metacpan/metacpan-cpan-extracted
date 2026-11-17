@@ -1,5 +1,12 @@
 Revision history for Perl extension App-mdee
 
+1.20 2026-11-17T07:47:33Z
+
+    - --no-pager works with Getopt::Long::Bash 1.2.0, which unsets the
+      variable of an option with an optional argument by --no-: it
+      failed with "unbound variable"
+    - Requires App::nup 1.18 and Getopt::Long::Bash 1.2.0
+
 1.19 2026-11-15T10:34:15Z
 
     - Add --lateral (-L) to put all the pages in one row and scroll

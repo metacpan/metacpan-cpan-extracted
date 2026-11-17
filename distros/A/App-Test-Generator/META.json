@@ -135,9 +135,7 @@
    "release_status" : "stable",
    "resources" : {
       "bugtracker" : {
-         "mailto" : "bug-App-Test-Generator@rt.cpan.org",
-         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator",
-         "x_url" : "https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator"
+         "web" : "https://github.com/nigelhorne/App-Test-Generator/issues"
       },
       "homepage" : "https://metacpan.org/pod/App::Test::Generator",
       "repository" : {
@@ -147,6 +145,6 @@
          "x_repository" : "https://github.com/nigelhorne/App-Test-Generator"
       }
    },
-   "version" : "0.48",
+   "version" : "0.49",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

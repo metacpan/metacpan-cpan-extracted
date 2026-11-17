@@ -1,0 +1,72 @@
+use strict;
+use warnings;
+use Test::More;
+use JSON::PP ();
+use Example::Sugar::Registry ();
+use Example::Sugar::Plan ();
+use Example::Sugar::Predicate ();
+{
+  package Test::Subject;
+  sub new { bless {deep=>1, tier=>'pro', empty=>undef}, shift }
+  sub deep { $_[0]{deep} }
+  sub tier { $_[0]{tier} }
+  sub empty { $_[0]{empty} }
+}
+my $add = \&Example::Sugar::Registry::register_step;
+my $compile = \&Example::Sugar::Plan::compile;
+my $body_count=0;
+my $body=sub { ++$body_count; {ok=>1} };
+$add->('Test::AnalysisRole', undef, 'Analyse', 'analysis', $body, phase=>'analyse', requires=>['input']);
+$add->('Test::Class', undef, 'Output', 'output', $body, phase=>'render', requires=>['analysis']);
+$add->('Test::Class', undef, 'Input', 'input', $body);
+my $plan = $compile->([qw(Test::AnalysisRole Test::Class Test::AnalysisRole)]);
+is_deeply([map { $_->{key} } @{$plan->{steps}}], [qw(input analysis output)], 'phases and dependencies override owner order');
+is(scalar @{$plan->{owners}}, 2, 'duplicate owner visited once');
+is($body_count, 0, 'compilation never executes step bodies');
+$add->('Test::Topo', undef, 'Last', 'last', $body, requires=>['first']);
+$add->('Test::Topo', undef, 'First', 'first', $body);
+is_deeply([map {$_->{key}} @{$compile->(['Test::Topo'])->{steps}}], [qw(first last)], 'stable topological scheduling within phase');
+$add->('Test::Collision', undef, 'Input too', 'input', $body);
+eval { $compile->([qw(Test::Class Test::AnalysisRole Test::Collision)]) };
+like($@, qr/collides between/, 'merged duplicate rejected with provenance');
+$add->('Test::Unknown', undef, 'Unknown', 'u', $body, requires=>['absent']);
+eval { $compile->(['Test::Unknown']) };
+like($@, qr/Unknown dependency/, 'unknown prerequisite rejected');
+$add->('Test::Cycle', undef, 'A', 'a', $body, requires=>['b']);
+$add->('Test::Cycle', undef, 'B', 'b', $body, requires=>['a']);
+eval { $compile->(['Test::Cycle']) };
+like($@, qr/Dependency cycle/, 'cycle rejected before execution');
+$add->('Test::Inversion', undef, 'Early', 'early', $body, requires=>['late']);
+$add->('Test::Inversion', undef, 'Late', 'late', $body, phase=>'render');
+eval { $compile->(['Test::Inversion']) };
+like($@, qr/Phase inversion/, 'dependency cannot reverse a phase barrier');
+my $subject = Test::Subject->new;
+my $evaluate = \&Example::Sugar::Predicate::evaluate;
+ok($evaluate->(undef,$subject), 'unconditional predicate');
+ok($evaluate->('deep',$subject), 'reader predicate');
+ok($evaluate->({tier=>'pro',deep=>1},$subject), 'all expected readers match');
+ok(!$evaluate->({tier=>'basic'},$subject), 'map mismatch is false');
+ok($evaluate->({empty=>undef},$subject), 'explicit undefined value matches');
+ok(!$evaluate->({empty=>''},$subject), 'undefined and empty string differ');
+ok($evaluate->(sub { $_[0]->deep },$subject), 'callback predicate');
+eval { $evaluate->('missing',$subject) };
+like($@, qr/Missing predicate reader/, 'missing reader fails explicitly');
+eval { $evaluate->(sub { [] },$subject) };
+like($@, qr/reference/, 'predicate does not accidentally accept Future/object truthiness');
+my $pred_calls=0;
+$add->('Test::Bound', sub { ++$pred_calls; $_[0]->deep }, 'Maybe', 'maybe', $body);
+my $static = $compile->(['Test::Bound']);
+is($pred_calls,0,'static plan does not evaluate predicates');
+my $manifest=Example::Sugar::Plan::manifest($static);
+is($manifest->{steps}[0]{predicate}{kind},'opaque_callback','introspection labels opaque predicates honestly');
+like(JSON::PP->new->encode($manifest), qr/opaque_callback/, 'manifest is serializable without closures');
+my $bound = Example::Sugar::Plan::bind($static,$subject);
+is($pred_calls,1,'predicate evaluated exactly once during binding');
+$subject->{deep}=0;
+is($bound->{active_total},1,'bound plan does not change with later reader mutation');
+$add->('Test::Disabled', 'deep', 'Optional', 'opt', $body);
+$add->('Test::Disabled', undef, 'Required', 'req', $body, requires=>['opt']);
+eval { Example::Sugar::Plan::bind($compile->(['Test::Disabled']),$subject) };
+like($@,qr/requires disabled step/, 'active consumer cannot depend on disabled producer');
+is($body_count,0,'all planning failures occur before step execution');
+done_testing;

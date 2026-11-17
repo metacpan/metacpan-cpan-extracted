@@ -4,7 +4,7 @@ package DBIO::MySQL::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Storage::DBI/;
 
@@ -282,6 +282,15 @@ sub _dbd_attribute {
   . 'DBD::MariaDB only, and this connection belongs to '
   . ( defined $dbd ? "DBD::$dbd" : 'no DBD driver it can name' )
   );
+}
+
+
+sub _dbd_attribute_prefixes {
+  my ($self, $driver) = @_;
+
+  return 'mariadb_' if defined $driver && $driver eq 'MariaDB';
+  return 'mysql_'   if defined $driver && $driver eq 'mysql';
+  return $self->next::method($driver);
 }
 
 
@@ -775,7 +784,13 @@ sub _mask_error_values {
 
   return $text unless defined $text and !ref $text;
 
-  my $masked = eval { DBIO::MySQL::Util::mask_error_details($text, $values, $statement) };
+  # DBI sets the error of the handle before it calls the error handler, so the
+  # code of the error that is being reported is the one of the connection. The
+  # server words its text in the language of the session; the code is the same
+  # in every one.
+  my $code = eval { my $dbh = $self->_dbh; $dbh && $dbh->err };
+
+  my $masked = eval { DBIO::MySQL::Util::mask_error_details($text, $values, $statement, $code) };
   $text = $masked if defined $masked;
 
   return $self->next::method($text, $values, $statement);
@@ -863,7 +878,7 @@ sub _ddl_sql_dialect { 'mysql' }
 #
 # and it was already DEAD when it was removed: core ADR 0040 / karr #138 took
 # the _explain_sql string hook out -- not deprecated, not aliased -- and put
-# _explain_query in its slot in DBIO 0.900004, the version the cpanfile pins.
+# _explain_query in its slot in DBIO 0.900004.
 # Core had stopped calling it, so it produced the same statement by inheritance
 # while looking like the thing that produced it. It also said nothing: it was
 # byte-for-byte core's own default even while the hook still existed.
@@ -949,7 +964,7 @@ DBIO::MySQL::Storage - MySQL storage layer for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 
@@ -1339,6 +1354,21 @@ transport asks per connection: with the DBD the DSN names for the
 connect attributes, which are built before a handle exists, and with the
 handle's own driver name from then on
 (L<DBIO::MySQL::Storage::Async/One dist, two DBD drivers>).
+
+=head2 _dbd_attribute_prefixes
+
+  my @prefixes = $storage->_dbd_attribute_prefixes('MariaDB');   # mariadb_
+
+The prefix the private connect attributes of DBD C<$driver> start with, for
+C<mysql> (C<mysql_>) and C<MariaDB> (C<mariadb_>); every other driver is
+handed to L<DBIO::Storage::DBI/_dbd_attribute_prefixes>. Each DBD gets its own
+prefix only, so C<mysql_*> stays refused on a C<dbi:MariaDB:> DSN and the other
+way round.
+
+Core asks L<DBI>'s registry of driver prefixes by default, which knows
+C<mariadb_> only from DBI 1.640 on, while this dist runs on older DBI too.
+Answering here keeps C<mariadb_auto_reconnect> and the other C<mariadb_*>
+connect attributes accepted whatever the DBI version.
 
 =head2 _dbh_last_insert_id
 
@@ -1742,6 +1772,13 @@ type, the column, the key and the constraint stay.
   Duplicate entry 'geheim42' for key 'users.PRIMARY'
   # becomes
   Duplicate entry '***' for key 'users.PRIMARY'
+
+The server words its messages in the language of the session (C<lc_messages>),
+so the hook takes the error code of the connection (C<< $dbh->err >>) along and
+masks the text by the code, not by the wording: in German or French as in
+English, no bound value is left in the text. A text of a code that quotes a
+value, and that cannot be masked for sure, is replaced by one that names the
+code (L<DBIO::MySQL::Util/mask_error_details>).
 
 Applies to L<DBIO::MySQL::Storage::MariaDB> as well. Never throws; a text it
 cannot treat is answered unchanged.

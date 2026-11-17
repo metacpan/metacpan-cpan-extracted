@@ -2,6 +2,7 @@ use strict;
 use warnings;
 use Test::More;
 use POSIX ();
+use Config;
 use lib 't/lib';
 
 # DBD::MariaDB 1.24: DBI's END in an exiting forked child runs disconnect_all,
@@ -17,6 +18,8 @@ use lib 't/lib';
 # parent see that the child closed its connection. No server, no database.
 
 BEGIN {
+  plan skip_all => 'a real fork() is needed (d_fork is unset): the test forks a child that exits over a shared connection'
+    unless $Config{d_fork};
   eval { require DBD::MariaDB; 1 }
     or plan skip_all => 'DBD::MariaDB is not installed';
 }

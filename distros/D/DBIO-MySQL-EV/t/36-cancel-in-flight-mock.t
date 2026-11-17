@@ -317,11 +317,19 @@ BEGIN {
     return;
   }
 
+  # As EV::MariaDB 0.09: finish closes the connection synchronously and cancels
+  # every pending operation, their callbacks fire with an error before it
+  # returns -- the operation in flight first, then the queries sent, then the
+  # ones queued.
   sub finish {
     my ($self) = @_;
     $self->{conn} = 0;
     my $had = delete $self->{client};
     close $had if $had;
+    delete $self->{timer};
+    my @pending = grep { defined } delete $self->{op}, splice(@{ $self->{sent} }), splice(@{ $self->{queue} });
+    $self->{reading} = 0;
+    $self->_callback($_->{cb}, undef, 'connection finished') for @pending;
     return;
   }
 
@@ -1179,7 +1187,8 @@ for my $kind (qw( bound plain )) {
   my $busy   = $executor->execute($conn, 'SELECT tag FROM busy WHERE tag = ?', [ 1 ]);
   my $first  = $executor->execute_when_idle($conn, 'SELECT tag FROM first', []);
   my $second = $executor->execute_when_idle($conn, 'SELECT tag FROM second', [ 1 ]);
-  $conn->finish;   # the handle is gone; the answer already due still comes in the fake
+  $conn->finish;   # the handle is gone; finish called the statement in flight back with an error
+  EV::run(EV::RUN_NOWAIT());   # the Futures settle from the loop's idle watcher
 
   run_out($conn);
   is state_of($first), 'failed', "$label: the first waiting Future fails, it does not hang";
@@ -1387,6 +1396,28 @@ for my $how ('the server fails it', 'EV::MariaDB refuses it') {
   run_out($conn);
   is_deeply wire($conn), [ on_wire(bound => 'busy') ], "$label: the statement was never sent";
   is state_of($busy), 'done', "$label: the statement in flight is unaffected";
+  nothing_warned($label);
+}
+
+# --- 15. the fake is faithful to EV::MariaDB 0.09 finish -------------------------
+#
+# The claim: the real finish closes the connection synchronously and calls every
+# pending operation back with an error before it returns. A fake whose answer
+# came after finish would let a transport that forgets the handle in finish's
+# wake see a late callback for a statement it no longer tracks -- depending on
+# the address a later handle gets, that broke other sections by hash seed.
+
+{
+  my $label = "fake finish";
+  my ($storage, $conn) = fresh();
+  local $EV::MariaDB::HOLD = 1;
+  my @order;
+  $conn->prepare('SELECT tag FROM busy WHERE tag = ?', sub { push @order, [ op => @_ ] });
+  $conn->finish;
+  is scalar(@order), 1, "$label: the operation in flight was called back before finish returned";
+  is $order[0][1], undef, "$label: without a result";
+  like $order[0][2] // '', qr/\S/, "$label: with an error text";
+  is $conn->pending_count, 0, "$label: nothing is pending afterwards";
   nothing_warned($label);
 }
 

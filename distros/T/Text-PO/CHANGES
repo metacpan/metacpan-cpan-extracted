@@ -1,5 +1,9 @@
 Revision history for Perl module Text::PO
 
+v1.0.3 2026-11-17T19:35:59+0900
+    - Corrected dngetext in Text::PO::Gettext that was not correctly using the effective
+      locale.
+
 v1.0.2 2026-09-14T15:28:30+0900
     - Fixed parser bug where duplicate msgids skipped via includes leaked their state
       (msgid, msgstr, flags, reference) into the next block. With multi-line continuation

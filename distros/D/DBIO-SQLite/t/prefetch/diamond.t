@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use DBIO::Test::Slow;
 use DBIO::SQLite::Test;
 my $schema = DBIO::SQLite::Test->init_schema();
 

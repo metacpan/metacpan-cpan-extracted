@@ -4,8 +4,9 @@ package DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
+use Config;
 use DBIO::Carp;
 use DBIO::Exception;
 
@@ -126,11 +127,30 @@ sub _read_uint32 {
   my $v = unpack($le ? 'V' : 'N', substr($$buf, $$pos, 4));
   $$pos += 4; $v;
 }
+# On a perl whose NV is wider than a double (long double, __float128) the
+# unpacked double is that exact binary value: 13.4 reads as
+# 13.4000000000000004. Decoded coordinates are the shortest decimal whose
+# double is the 8 bytes read -- the number PostGIS writes as text. A perl
+# with a double NV does no extra work.
+use constant _WIDE_NV => $Config{nvsize} > 8;
+
+sub _shortest_double {
+  my ($v) = @_;
+  return $v if $v != $v || $v == 9**9**9 || $v == -9**9**9;
+  my $bytes = pack('d', $v);
+  for my $p (15, 16, 17) {
+    my $s = sprintf('%.' . $p . 'g', $v);
+    return 0 + $s if pack('d', $s) eq $bytes;
+  }
+  $v;
+}
+
 sub _read_double {
   my ($buf, $pos, $le, $len) = @_;
   _check_bounds($buf, $pos, 8, $len);
   my $v = unpack($le ? 'd<' : 'd>', substr($$buf, $$pos, 8));
-  $$pos += 8; $v;
+  $$pos += 8;
+  return _WIDE_NV ? _shortest_double($v) : $v;
 }
 
 # The point of a POINT, or of a MULTIPOINT or a collection: PostGIS writes
@@ -260,7 +280,7 @@ DBIO::PostgreSQL::PostGIS::Codec::WKB::Decoder - EWKB-hex decoder for PostGIS ge
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

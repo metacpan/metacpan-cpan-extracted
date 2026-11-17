@@ -81,9 +81,9 @@ use DBIO::Test;
 eval { require DBIO::MySQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed DBIO core predates PoolBase::_mark_connection_dead (core k230)'
+plan skip_all => 'the installed DBIO core predates PoolBase::_mark_connection_dead'
   unless DBIO::Storage::PoolBase->can('_mark_connection_dead');
-plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam (dbio-async k26)'
+plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam'
   unless DBIO::Async::Storage->can('_conn_error_is_fatal');
 
 # The transport has no session reset (core ADR 0079): the pool retires its
@@ -438,7 +438,7 @@ SKIP: {
   @asked = ();
   my $next = eval { session_id($async) };
   my $failure = $@;
-  is $failure, '', '... the next statement on that pool connection runs (karr k73)';
+  is $failure, '', '... the next statement on that pool connection runs';
   is $next, $before, '... on the same session: the connection was neither retired nor replaced';
   ok !@asked, '... and the seam was not asked: nothing failed';
   eval { $async->disconnect };

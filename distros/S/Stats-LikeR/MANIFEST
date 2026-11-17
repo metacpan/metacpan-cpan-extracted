@@ -11,7 +11,6 @@ README
 README.md
 SECURITY.md
 lib/Stats/LikeR.pm
-lib/Stats/LikeR.pm.rej
 lib/Stats/LikeR/Usage.pm
 ppport.h
 t/01.t
@@ -384,6 +383,7 @@ t/table_one.t
 t/tied.fetch.once.t
 t/tied.frames.t
 t/tied.hashes.t
+t/tied.overflow.reread.t
 t/tied_cell.double_fetch.t
 t/tied_cell.filter_clears_row.t
 t/tied_cell.free_mid_read.t

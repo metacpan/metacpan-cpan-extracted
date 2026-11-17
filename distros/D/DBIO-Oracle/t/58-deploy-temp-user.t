@@ -510,6 +510,7 @@ ok( DBIO::Oracle::Deploy->isa('DBIO::Deploy::Base::TempDatabase'),
 
 {
   my $deploy = fresh();
+  no warnings 'redefine';
   local *DBIO::Oracle::Deploy::_introspect_current = sub { { tables => {}, columns => {} } };
 
   my $diff = eval { $deploy->diff };

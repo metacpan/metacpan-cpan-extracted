@@ -48,6 +48,9 @@ my @db = PrivatePgDatabase->create('t103leaves');
 sub handle {
   my $dbh = LiveServer->control_dbh(login => \@db, attrs => { %ATTR, @_ });
   $dbh->do('SET client_min_messages = warning');
+  # PostgreSQL reports in the language of lc_messages; the test reads the
+  # server's English words (division by zero)
+  $dbh->do(q{SET lc_messages = 'C'});
   $dbh->commit unless $dbh->{AutoCommit};
   return $dbh;
 }

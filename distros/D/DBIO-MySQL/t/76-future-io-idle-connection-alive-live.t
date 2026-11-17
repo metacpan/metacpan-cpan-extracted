@@ -72,9 +72,9 @@ use DBIO::Test;
 eval { require DBIO::MySQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed DBIO core predates PoolBase::_idle_connection_alive (core k241)'
+plan skip_all => 'the installed DBIO core predates PoolBase::_idle_connection_alive'
   unless DBIO::Storage::PoolBase->can('_idle_connection_alive');
-plan skip_all => 'the installed dbio-async predates the _idle_connection_alive seam (dbio-async k28)'
+plan skip_all => 'the installed dbio-async predates the _idle_connection_alive seam'
   unless DBIO::Async::Storage->can('_idle_connection_alive');
 
 # The transport has no session reset (core ADR 0079): the pool retires its

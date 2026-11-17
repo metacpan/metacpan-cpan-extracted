@@ -141,6 +141,7 @@ t/recipe-u-step.t
 t/reflector-cli.t
 t/reflector-dkim1.t
 t/reflector.t
+t/security-0.35.t
 t/sign-cli.t
 t/sign-per-recipient.t
 t/signature-accessors.t

@@ -48,6 +48,9 @@ my ($dbh_a, $dbh_b) = map {
   my $h = LiveServer->control_dbh(
     login => [ PrivatePgDatabase->create($_) ], attrs => { PrintWarn => 0 });
   $h->do('SET client_min_messages = warning');
+  # PostgreSQL reports in the language of lc_messages; the test reads the
+  # server's English words (cannot drop table), so its sessions are set to 'C'
+  $h->do(q{SET lc_messages = 'C'});
   $h;
 } qw( t194a t194b );
 

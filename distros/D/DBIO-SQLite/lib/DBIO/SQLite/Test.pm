@@ -4,7 +4,7 @@ package DBIO::SQLite::Test;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Test;
 use DBIO::Test::Schema;
@@ -222,7 +222,7 @@ DBIO::SQLite::Test - SQLite-specific test utilities for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -70,3 +70,96 @@ single errors in `ArrayTupleStatus` carry the forms above).
   errors; the rules then find nothing and leave the text alone.
 - Pinned offline in `t/100-error-values-mask.t` with the measured texts, live
   in `t/101-error-values-live.t`.
+
+## Addendum 2026-11-09 — the masking does not depend on the session language
+
+Oracle writes its messages in the language of the session (`NLS_LANGUAGE`, taken
+from `NLS_LANG` or `LC_ALL`). The form rules above were written against the
+English sentences; under `NLS_LANG=GERMAN_GERMANY.AL32UTF8` a short bound value
+(below the four characters of the core's masking) stood in the clear in the
+message. Measured on Oracle 23ai Free, DBD::Oracle 1.95:
+
+| Code | German text |
+|---|---|
+| ORA-01722 | `Zeichenfolgenwert mit 'a' kann nicht in eine Zahl konvertiert werden:` |
+| ORA-03302 | `(ORA-01722-Details) Ungültiger Zeichenfolgenwert: ab` |
+| ORA-00001 | `Unique Constraint (DBIO.FW_P_PK) für Tabelle DBIO.FW_P mit Spalten (id) verletzt` |
+| ORA-03301 | `(ORA-00001-Details) Zeile mit Spaltenwerten (id:7) ist bereits vorhanden` |
+| ORA-01438 | `Wert 77 ist größer als die angegebene Dezimalstellenanzahl (1, 0) für Spalte` |
+| ORA-61800 | `Ungültiges boolesches Literal: ab` |
+| ORA-01428 | `Argument 3 befindet sich außerhalb des zulässigen Wertebereichs.` |
+| help line, PL/SQL stack | `Hilfe: https://docs.oracle.com/error-help/...`, `ORA-06512: in Zeile 1` |
+
+Decision:
+
+1. Masking is independent of the language. A message that quotes a value is
+   recognised by its **code** and read by its **structure**, not by its words:
+   label and value of ORA-03302/ORA-61800 are split at the first colon; the key
+   of ORA-03301 is the first brackets after the label up to the last bracket
+   that is followed by words (the columns come from the last brackets of the
+   ORA-00001 line before it); the value of ORA-01722 is what stands between the
+   first and the last quote of its line; the value of ORA-01438 and ORA-01428
+   is the number in the line (before the precision for ORA-01438). The end of
+   a value is found by the link to the error help and the ORA-06512 code, in
+   any language.
+2. **Where the structure is not there, the text after the code is dropped**
+   (`ORA-03302: ***`, `ORA-03301: ***`, `ORA-01438: ***`): a label with no
+   colon, a key with no brackets or no details, a line with no number (or, for
+   ORA-01438, no precision), an ORA-01722 line with no quote. The code stays,
+   and for ORA-03301 the ORA-00001 line with the columns; no value does. An
+   unknown language thus loses wording, never hides a value.
+3. The session language is not forced by the driver (no `ALTER SESSION` on
+   connect). A test that asserts an English sentence puts its own connection on
+   `NLS_LANGUAGE = 'AMERICAN'`; `t/101` runs every case in an AMERICAN and in a
+   GERMAN session of its own, independent of the environment.
+4. The decimal point is another matter: a number bound as `99999.9` is refused
+   with ORA-01722 in a German territory before ORA-01438 is reached. `t/101`
+   uses whole numbers for those cases; the cause is not treated here.
+
+Pinned offline in `t/100-error-values-mask.t` (measured German texts and made-up
+texts of an unknown language), live in `t/101-error-values-live.t`.
+
+## Addendum 2026-11-10 — French, and the link line follows the client
+
+Under `NLS_LANG=FRENCH_FRANCE.AL32UTF8` the test round of ORA-03301 was red in
+the AMERICAN session as well as in the FRENCH one: `ORA-03301: ***`, the value
+gone and the column with it. Two things in the structure were taken from the
+English and German texts. Measured on Oracle 23ai Free, DBD::Oracle 1.95
+(client `NLS_LANG` French; session language set with `ALTER SESSION SET
+NLS_LANGUAGE`, with and without `NLS_TERRITORY`, no difference in the texts):
+
+| Code | FRENCH session |
+|---|---|
+| ORA-01722 | `impossible de convertir une valeur de chaîne contenant 'a' en un nombre : ` |
+| ORA-03302 | `(Détails ORA-01722) valeur de chaîne non valide : ab` |
+| ORA-00001 | `violation de contrainte unique (DBIO.PRB_P_PK) sur la table DBIO.PRB_P colonnes (id, email)` |
+| ORA-03301 | `(Détails ORA-00001) la ligne avec les valeurs de colonne (id:7, email:'a b') existe déjà` |
+| ORA-01438 | `valeur 77 supérieure à la précision indiquée (1, 0) pour la colonne ` |
+| ORA-61800 | `valeur littérale booléenne non valide : ab` |
+| ORA-01428 | `L'argument 3 est hors limites.` |
+| help line, PL/SQL stack | `Aide : https://docs.oracle.com/error-help/...` , `ORA-06512: à la ligne 1` |
+
+1. **The label of the help line is the client's language, not the session's.**
+   An AMERICAN session under a French client writes the English sentences and
+   still `Aide : https://...`. The end of a value was found by `\n\S+: https://`,
+   which does not match `Aide :` (a blank before the colon, French
+   typography), so the key of ORA-03301 was not seen to end where it does and
+   the whole text after the code was dropped. The label is now anything
+   without a colon up to the colon, then optional white space and the link; the
+   link stays what is recognised.
+2. **The details bracket of ORA-03301 holds the code anywhere**
+   (`(Détails ORA-00001)`; English and German have it first). It is a
+   parenthesis without nested ones that contains an `ORA-` code.
+3. The colons of French typography (`valide : ab`, `nombre : `) fall under the
+   existing rule (label up to the first colon, the value after it), and the
+   keys are written `id:7` without blanks, so the column reading is unchanged.
+   A value with no-break or narrow no-break spaces, `, `, colons or line breaks
+   is masked as before; the text of an array execution comes from the DBD as
+   UTF-8 bytes, which the patterns must read as well (a character pattern with
+   a blank class beyond Latin-1 turns the last byte of `déjà` into white
+   space; the patterns therefore name no such character).
+
+Not changed: the session language is still not forced by the driver, and the
+masking does not look at it. `t/101` runs every case in an AMERICAN, a GERMAN
+and a FRENCH session of its own; the French texts are pinned offline in
+`t/100`.

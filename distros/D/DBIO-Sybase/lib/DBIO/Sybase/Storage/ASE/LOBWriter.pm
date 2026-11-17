@@ -4,7 +4,7 @@ package DBIO::Sybase::Storage::ASE::LOBWriter;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Exception ();
 use Try::Tiny;
@@ -313,7 +313,7 @@ DBIO::Sybase::Storage::ASE::LOBWriter - LOB (TEXT/IMAGE) handling mixin for Syba
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

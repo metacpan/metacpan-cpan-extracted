@@ -1557,12 +1557,26 @@ utf16_cmp (pTHX_ SV *a_sv, SV *b_sv)
     }
 }
 
+/* HeSVKEY_force passes HeKUTF8 as the newSVpvn_flags flags on perls < 5.20,
+   which loses the UTF8 flag. Build the key SV ourselves. */
+static SV *
+he_key_sv (pTHX_ HE *he)
+{
+  SV *sv;
+  if (He_IS_SVKEY (he))
+    return HeKEY_sv (he);
+  sv = sv_2mortal (newSVpvn (HeKEY (he), HeKLEN (he)));
+  if (HeKUTF8 (he))
+    SvUTF8_on (sv);
+  return sv;
+}
+
 /* compare hash entries, used when some keys are SV's or UTF-8 */
 static int
 he_cmp_slow (const void *a, const void *b)
 {
   dTHX;
-  return utf16_cmp (aTHX_ HeSVKEY_force (*(HE **)b), HeSVKEY_force (*(HE **)a));
+  return utf16_cmp (aTHX_ he_key_sv (aTHX_ *(HE **)b), he_key_sv (aTHX_ *(HE **)a));
 }
 
 /* Private copy of one entry of a tied hash: a HE plus room for a
@@ -2163,7 +2177,18 @@ encode_rv (pTHX_ enc_t *enc, SV *rv)
             encode_stringify(aTHX_ enc, rv, 1);
         }
       else if (enc->json.flags & F_CONV_BLESSED)
-        encode_stringify(aTHX_ enc, sv, 0);
+        {
+          /* do not expand huge Math::BigFloat exponents into digits */
+          SV *compact = bignum_compact (aTHX_ rv);
+          if (compact)
+            {
+              STRLEN clen;
+              char *cstr = SvPV (compact, clen);
+              encode_str (aTHX_ enc, cstr, clen, 0);
+            }
+          else
+            encode_stringify(aTHX_ enc, sv, 0);
+        }
       else if (enc->json.flags & F_ALLOW_BLESSED)
         encode_const_str (aTHX_ enc, "null", 4, 0);
       else
@@ -2260,7 +2285,7 @@ encode_bool (pTHX_ enc_t *enc, SV *sv)
           if (!encode_bool_ref (aTHX_ enc, sv))
             {
               /* Use default stringification, bypassing any "" overload (GH #191). */
-              const char *name = HvNAME(SvSTASH(sv));
+              const char *name = SvOBJECT(sv) ? HvNAME(SvSTASH(sv)) : NULL;
               SV *desc = sv_2mortal(newSVpvf("%s=%s(0x%p)",
                 name ? name : "(unknown)", sv_reftype(sv, 0), sv));
               croak ("cannot encode reference to scalar '%s' unless the scalar is 0 or 1",
@@ -2570,7 +2595,7 @@ encode_sv (pTHX_ enc_t *enc, SV *sv, SV *typesv)
                       str++;
                       len--;
                     }
-                  need (aTHX_ enc, len+1);
+                  need (aTHX_ enc, len+1+2); /* +2 for '.0' */
                   savecur = enc->cur;
                   saveend = enc->end;
                   memcpy (enc->cur, str, len);
@@ -4146,6 +4171,8 @@ _decode_str (pTHX_ dec_t *dec, char endstr)
   return sv;
 
 fail:
+  if (sv)
+    SvREFCNT_dec (sv);
   dec->cur = dec_cur;
   return 0;
 }
@@ -4262,7 +4289,7 @@ decode_num (pTHX_ dec_t *dec, SV *typesv)
           if (numtype & IS_NUMBER_NEG)
             {
               if (uv <= (UV)(IV_MAX) + 1)
-                return newSViv (-(IV)uv);
+                return newSViv (uv == (UV)IV_MAX + 1 ? IV_MIN : -(IV)uv);
             }
           else
             return newSVuv (uv);
@@ -4342,6 +4369,11 @@ decode_av (pTHX_ dec_t *dec, SV *typesv)
   AV *av = newAV ();
   AV *typeav = NULL;
   SV *typerv;
+  int hooked = (dec->json.flags & F_HOOK) != 0;
+  /* a croaking filter callback would leak this container, which is only
+     referenced from the C stack; hold a mortal reference while hooks can run */
+  if (UNLIKELY (hooked))
+    sv_2mortal ((SV *)av);
 
   DEC_INC_DEPTH;
   decode_ws (dec);
@@ -4398,10 +4430,11 @@ decode_av (pTHX_ dec_t *dec, SV *typesv)
       }
 
   DEC_DEC_DEPTH;
-  return newRV_noinc ((SV *)av);
+  return hooked ? newRV_inc ((SV *)av) : newRV_noinc ((SV *)av);
 
 fail:
-  SvREFCNT_dec (av);
+  if (!hooked)
+    SvREFCNT_dec (av);
   DEC_DEC_DEPTH;
   return 0;
 }
@@ -4447,6 +4480,10 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
   int dupkeys_as_arrayref = dec->json.flags & F_DUPKEYS_AS_AREF;
   HV *dupkeys_seen = NULL;
   char endstr = '"';
+  int hooked = (dec->json.flags & F_HOOK) != 0;
+
+  if (UNLIKELY (hooked))
+    sv_2mortal ((SV *)hv);
 
   DEC_INC_DEPTH;
   decode_ws (dec);
@@ -4714,7 +4751,7 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
       }
 
   DEC_DEC_DEPTH;
-  sv = newRV_noinc ((SV *)hv);
+  sv = hooked ? newRV_inc ((SV *)hv) : newRV_noinc ((SV *)hv);
 
   /* check filter callbacks */
   if (dec->json.flags & F_HOOK)
@@ -4790,7 +4827,8 @@ decode_hv (pTHX_ dec_t *dec, SV *typesv)
   return sv;
 
 fail:
-  SvREFCNT_dec (hv);
+  if (!hooked)
+    SvREFCNT_dec (hv);
   DEC_DEC_DEPTH;
   return 0;
 }
@@ -5224,7 +5262,7 @@ incr_starts_bare_scalar (JSON *self)
 // or __attribute__((optimize("no-tree-vectorize")))
 __attribute__((optimize("O0")))
 #endif
-static void
+static int
 incr_parse (JSON *self)
 {
   const char *p = SvPVX (self->incr_text) + self->incr_pos;
@@ -5420,6 +5458,11 @@ incr_parse (JSON *self)
 
 interrupt:
   self->incr_pos = p - SvPVX (self->incr_text);
+
+  /* a NUL before the end of the buffer is not "need more data": without
+     this the parser would stall silently and the buffer grow forever.
+     The caller decides, so that values already complete are still returned. */
+  return p < SvEND (self->incr_text) && !INCR_DONE (self);
   /*printf ("interrupt<%.*s>\n", self->incr_pos, SvPVX(self->incr_text));//D */
   /*printf ("return pos %d mode %d nest %d\n", self->incr_pos, self->incr_mode, self->incr_nest);//D */
 }
@@ -5716,10 +5759,16 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
           if (DECODE_WANTS_OCTETS (self))
             {
               if (self->incr_pos)
-                self->incr_pos = utf8_length ((U8 *)SvPVX (self->incr_text),
-                                              (U8 *)SvPVX (self->incr_text) + self->incr_pos);
-
-              sv_utf8_downgrade (self->incr_text, 0);
+                {
+                  /* may croak on wide characters, so only update the offset
+                     once the text really has been downgraded */
+                  STRLEN newpos = utf8_length ((U8 *)SvPVX (self->incr_text),
+                                               (U8 *)SvPVX (self->incr_text) + self->incr_pos);
+                  sv_utf8_downgrade (self->incr_text, 0);
+                  self->incr_pos = newpos;
+                }
+              else
+                sv_utf8_downgrade (self->incr_text, 0);
             }
           else
             {
@@ -5770,7 +5819,18 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
 
               if (!INCR_DONE (self))
                 {
-                  incr_parse (self);
+                  if (UNLIKELY (incr_parse (self)))
+                    {
+                      /* nothing returned yet: report it */
+                      if (SP <= PL_stack_base + ax - 1)
+                        {
+                          /* count the NUL as consumed so that incr_skip drops it */
+                          ++self->incr_pos;
+                          croak ("malformed JSON string, unexpected NUL byte in incremental text, at character offset %lu",
+                                 (unsigned long)(self->incr_pos - 1));
+                        }
+                      break;
+                    }
 
                   if (UNLIKELY(self->max_size && INCR_SIZE (self) > self->max_size))
                     croak ("attempted decode of JSON text of %lu bytes size, but max_size is set to %lu",
@@ -5796,7 +5856,9 @@ void incr_parse (JSON *self, SV *jsonstr = 0)
               XPUSHs (sv);
 
               endp = SvPVX(self->incr_text) + offset;
-              self->incr_pos -= offset;
+              /* the incremental scanner may have stopped earlier than the real parser,
+                 e.g. with allow_barekey, so never let this underflow */
+              self->incr_pos = self->incr_pos > offset ? self->incr_pos - offset : 0;
               self->incr_nest = 0;
               self->incr_mode = 0;
 #if PERL_VERSION > 9
@@ -5845,6 +5907,8 @@ void incr_skip (JSON *self)
 {
         if (self->incr_pos)
           {
+            if (self->incr_pos > SvCUR (self->incr_text))
+              self->incr_pos = SvCUR (self->incr_text);
             sv_chop (self->incr_text, SvPV_nolen (self->incr_text) + self->incr_pos);
             self->incr_pos  = 0;
             self->incr_nest = 0;

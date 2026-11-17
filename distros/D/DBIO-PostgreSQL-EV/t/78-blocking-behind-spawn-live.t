@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE, karr k88: a blocking storage call queued behind a connection the pool
 # is still opening, made from inside that opening, against a real PostgreSQL
@@ -65,7 +66,7 @@ use DBIO::AccessBroker;
 use DBIO::PostgreSQL::EV::Storage;
 use DBIO::PostgreSQL::EV::ConnectInfo 'conninfo_string';
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
 
 alarm 180;

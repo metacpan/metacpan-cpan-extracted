@@ -4,7 +4,7 @@ package DBIO::Test::MooSchema::Result::Artist;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Moo;
 
@@ -41,7 +41,7 @@ DBIO::Test::MooSchema::Result::Artist - Moo-enabled test result class for the ar
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

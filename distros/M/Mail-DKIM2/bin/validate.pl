@@ -46,7 +46,10 @@ my $dns = decode_json(path($dns_json)->slurp);
   $verifier->skip_timestamp_check(1) if $ignore_ts;
   $verifier->set_pubkey_callback(sub { find_key(@_) });
   $verifier->set_policy_callback(sub { find_policy(@_) });
-  $verifier->PRINT($msg1->as_string());
+  # The bytes as given, not Email::MIME's re-serialisation of them: that
+  # rewrites a header section it cannot parse (a first line starting with
+  # WSP vanished), and the Verifier must judge what arrived.
+  $verifier->PRINT($data);
   $verifier->CLOSE;
   unless ($verifier->result =~ /\A(?:pass|none)\z/) {
     say STDERR $verifier->details if $verifier->details;

@@ -1,6 +1,6 @@
 ---
 name: dbio-firebird
-description: Load when working on the DBIO::Firebird driver — storage, rdb$ introspection, deploy-and-compare, generators.
+description: Use when working on the DBIO::Firebird driver — its three storage transports, rdb$ introspection, deploy-and-diff, generators.
 user-invocable: false
 allowed-tools: Read, Grep, Glob
 model: sonnet
@@ -8,30 +8,41 @@ model: sonnet
 
 # DBIO::Firebird
 
-Firebird RDBMS driver. Built on DBD::Firebird (closely modeled on DBD::InterBase).
+Firebird RDBMS driver. Three transports: DBD::Firebird (closely modeled on
+DBD::InterBase), DBD::InterBase and DBD::ODBC.
 
 ## Component Loading
 
 ```perl
 package MyApp::DB;
-use base 'DBIO::Schema';
-__PACKAGE__->load_components('Firebird');
-# → sets storage_type to +DBIO::Firebird::Storage automatically
+use DBIO Schema => -fb;     # DBIO::Shortcut::fb
+# or: use base 'DBIO::Schema'; __PACKAGE__->load_components('Firebird');
+# → both declare storage_type +DBIO::Firebird::Storage
 ```
+
+An ODBC DSN is reached by declaring `storage_type '+DBIO::Firebird::Storage::ODBC'`
+(ADR 0010); the component and the shortcut declare the DBD::Firebird storage.
 
 ## Storage
 
-`DBIO::Firebird::Storage` extends `DBIO::Firebird::Storage::InterBase`. Key settings:
+`DBIO::Firebird::Storage` extends `DBIO::Firebird::Storage::InterBase`;
+`Storage::ODBC` branches off `Storage::Common` (ADR 0010). Key settings:
 
 ```perl
 # on DBIO::Firebird::Storage::Common (all three transports)
 __PACKAGE__->sql_maker_class('DBIO::Firebird::SQLMaker');
 __PACKAGE__->sql_quote_char ('"');
 __PACKAGE__->_use_insert_returning (1);   # RETURNING support
+__PACKAGE__->_use_supports_exists_query (1);
+__PACKAGE__->_use_transactional_ddl (0);
 
 # on each transport class (Storage, Storage::InterBase, Storage::ODBC)
 __PACKAGE__->datetime_parser_type('DBIO::Firebird::DateTime::Format');
 ```
+
+Capability facts on `Storage::Common`: `_random_function` is `RAND()`; the
+EXISTS query is rendered with `FROM RDB$DATABASE`; set operations are `UNION` /
+`UNION ALL` only — `INTERSECT` and `EXCEPT` are refused (ADR 0039).
 
 ### Sequences / Generators
 
@@ -52,7 +63,7 @@ for `gen_id()` or `NEXT VALUE FOR` expressions.
 ## SQLMaker
 
 `DBIO::Firebird::SQLMaker` — inherits from `DBIO::SQLMaker` with Firebird-specific
-LIMIT/OFFSET via `apply_limit`. SQL dialect 3 is forced on connect.
+`FIRST n SKIP m` limits via `apply_limit`. SQL dialect 3 is forced on connect.
 
 ## Introspection
 
@@ -66,7 +77,7 @@ Sources:
 - `rdb$relation_fields` + `rdb$fields` — column type, size, default, PK membership
 - `rdb$indices` + `rdb$index_segments` — user indexes (excludes PK/UNIQUE constraints)
 - `rdb$relation_constraints` (UNIQUE) + `rdb$index_segments` — unique constraints
-- `rdb$relation_constraints` + `rdb$indices` — FK constraints (composite, grouped by constraint name)
+- `rdb$relation_constraints` + `rdb$indices` + `rdb$index_segments` + `rdb$ref_constraints` — FK constraints (composite, grouped by constraint name; update/delete rule, match option)
 
 ## Deploy
 
@@ -82,19 +93,26 @@ Uses `DBIO::Firebird::DDL` for DDL generation (hand-rolled emitter built on `DBI
 
 ## FK Behavior
 
-Firebird supports `MATCH FULL` / `SIMPLE` and `ON UPDATE/DELETE` actions.
-Introspector groups composite FK columns by constraint name. `install_ddl` and
+The introspector groups composite FK columns by constraint name. `install_ddl` and
 `Diff::Constraint` write FKs and unique constraints as `ALTER TABLE ... ADD
-CONSTRAINT` after all CREATE TABLE statements (not inline; karr k34).
+CONSTRAINT` after all CREATE TABLE statements (not inline). Engine facts
+(`MATCH`, actions): `dbio-firebird-database`.
 
 ## Key Modules
 
 | Module | Purpose |
 |--------|---------|
 | `DBIO::Firebird` | Schema component |
+| `DBIO::Shortcut::fb` | `-fb` shortcut |
 | `DBIO::Firebird::Storage` | Firebird driver (inherits InterBase) |
-| `DBIO::Firebird::Storage::Common` | seq, datetime, insert_returning |
-| `DBIO::Firebird::Storage::InterBase` | InterBase driver via DBD::InterBase |
+| `DBIO::Firebird::Storage::Common` | seq, savepoints, insert_returning, quote char, exists query, set-op refusal |
+| `DBIO::Firebird::Storage::InterBase` | DBD::Firebird / DBD::InterBase transport |
+| `DBIO::Firebird::Storage::ODBC` | DBD::ODBC transport, branch off Common (ADR 0010) |
+| `DBIO::Firebird::DateTime::Format` | datetime parser of all transports |
+| `DBIO::Firebird::Type` | type mapping, DDL type rendering |
+| `DBIO::Firebird::Util` | `mask_error_details` (ADR 0014) |
+| `DBIO::Firebird::DDL` | DDL emitter |
 | `DBIO::Firebird::Deploy` | test-deploy-and-compare |
-| `DBIO::Firebird::Diff` | Compare introspected models |
-| `DBIO::Firebird::Introspect` | Read live DB via rdb$ tables |
+| `DBIO::Firebird::Diff` (+ `Diff::*`) | Compare introspected models |
+| `DBIO::Firebird::Introspect` (+ `Introspect::*`) | Read live DB via rdb$ tables |
+| `DBIO::Firebird::Test::Conformance` | driver half of core's shared case table |

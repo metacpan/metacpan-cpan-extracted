@@ -12,6 +12,7 @@ briefing:
     - dbio-perl-syntax
     - dbio-perl-pod
     - dbio-driver-development
+    - perl-io-async-future
     - kanban-issues-karr-ticket
 ---
 

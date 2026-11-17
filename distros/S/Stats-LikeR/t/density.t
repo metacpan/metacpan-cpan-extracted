@@ -344,6 +344,10 @@ for my $k (@KERNELS) {
 		[ sub { density(\@X, n => -1) },           qr/'n' must be at least 1/,   'n < 0' ],
 		[ sub { density(\@X, n => 1 << 27) },      qr/'n' is too large/,         'n absurdly large' ],
 		[ sub { density(\@X, nb => 0) },           qr/invalid 'nb'/,             'nb = 0' ],
+		# R's bw.*() bound (as.integer() is NA above INT_MAX).  2**32 truncated to 0
+		# in a 32-bit size_t on an ivsize=8 perl and was written through.
+		[ sub { density(\@X, nb => 2**31) },       qr/invalid 'nb'/,             'nb = 2**31' ],
+		[ sub { density(\@X, nb => 2**32) },       qr/invalid 'nb'/,             'nb = 2**32' ],
 		[ sub { density(\@X, weights => 42) },     qr/'weights' must be an array reference/, 'weights not a reference' ],
 		[ sub { density(\@X, weights => [1, 2]) }, qr/unequal length/,           'weights of the wrong length' ],
 		[ sub { density(\@X, weights => [(1 / 12) x 11, -1]) }, qr/must not be negative/, 'a negative weight' ],

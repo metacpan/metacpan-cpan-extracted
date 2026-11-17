@@ -153,4 +153,20 @@ no_leaks_ok {
 	eval { melt([ { A => 1 } ], value_vars => 'Z') };
 } 'melt: no memory leaks (die path)';
 
+# A name given twice in id_vars is one id column.  Up to 0.3422 it was pushed
+# once per mention, and a hoa's id column came out twice as long as the rest.
+{
+	my $df = { id => [1, 2], a => [3, 4], b => [5, 6] };
+	my $want = { id => [1, 2, 1, 2], variable => [qw(a a b b)], value => [3, 4, 5, 6] };
+	is_deeply(melt($df, id_vars => [ 'id', 'id' ]), $want, 'melt: a repeated id_vars name is one column (hoa)');
+	is_deeply(melt($df, id_vars => [ 'id', 'id' ], output_type => 'aoa'),
+		[ [1, 'a', 3], [2, 'a', 4], [1, 'b', 5], [2, 'b', 6] ], 'melt: likewise for aoa');
+	# The hoa path pushes whole columns: a ragged column is read as undef past
+	# its end, and the caller's arrays are not lengthened by that read.
+	my $ragged = { id => [1], a => [3, 4] };
+	is_deeply(melt($ragged, id_vars => 'id'), { id => [1, undef], variable => [qw(a a)], value => [3, 4] },
+		'melt: a short id column reads undef past its end');
+	is(scalar @{ $ragged->{id} }, 1, 'melt: and the caller\'s column keeps its length');
+}
+
 done_testing();

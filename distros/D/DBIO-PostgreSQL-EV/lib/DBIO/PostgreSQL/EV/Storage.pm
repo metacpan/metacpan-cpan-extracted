@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::EV::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Async';
 
@@ -638,44 +638,66 @@ sub _pg_answer_connect_info {
 sub _pg_server_error {
   my ($self, $pg, $err, $values) = @_;
   return $err if ref $err or not defined $err;
-  my $text = $self->_pg_mask_error_text($err, $values);
-  return $text unless Scalar::Util::blessed($pg) && $pg->can('error_fields');
-  my $fields = $pg->error_fields;
-  return $text unless ref $fields eq 'HASH';
-  my ($severity, $primary, $sqlstate) = @$fields{qw( severity primary sqlstate )};
-  return $text unless defined $severity && length $severity
-                   && defined $primary  && length $primary;
-  my $verbose = defined $sqlstate && length $sqlstate ? qr/(?:\Q$sqlstate\E: )?/ : qr//;
-  return $text unless $err =~ /\A\Q$severity\E:  $verbose\Q$primary\E/;
+  my $fields = $self->_pg_server_fields($pg, $err);
+  my $sqlstate = $fields ? $fields->{sqlstate} : undef;
+  my $text = $self->_pg_mask_error_text($err, $values, $sqlstate);
+  return $text unless $fields;
   return DBIO::Exception::Server->new(
     message    => $text,
     sqlstate   => $sqlstate,
     constraint => $fields->{constraint},
     table      => $fields->{table},
-    detail     => $self->_pg_mask_error_detail($fields->{detail}, $values),
+    detail     => $self->_pg_mask_error_detail($fields->{detail}, $values, $sqlstate),
   );
+}
+
+# The error_fields of $pg when $err is the server's error they belong to, else
+# undef: the fields have a severity and a primary and the text begins with
+# them, as libpq renders an error (see _pg_server_error). The only place the
+# SQLSTATE of an error is taken from, so that no text of a lost connection
+# gets the state of an earlier statement.
+sub _pg_server_fields {
+  my ($self, $pg, $err) = @_;
+  return undef unless defined $err && !ref $err;
+  return undef unless Scalar::Util::blessed($pg) && $pg->can('error_fields');
+  my $fields = $pg->error_fields;
+  return undef unless ref $fields eq 'HASH';
+  my ($severity, $primary, $sqlstate) = @$fields{qw( severity primary sqlstate )};
+  return undef unless defined $severity && length $severity
+                   && defined $primary  && length $primary;
+  my $verbose = defined $sqlstate && length $sqlstate ? qr/(?:\Q$sqlstate\E: )?/ : qr//;
+  return undef unless $err =~ /\A\Q$severity\E:  $verbose\Q$primary\E/;
+  return $fields;
+}
+
+# The SQLSTATE of $err when it is the server's error on $pg, else undef.
+sub _pg_sqlstate_of {
+  my ($self, $pg, $err) = @_;
+  my $fields = $self->_pg_server_fields($pg, $err);
+  return $fields ? $fields->{sqlstate} : undef;
 }
 
 
 sub _pg_mask_error_text {
-  my ($self, $text, $values) = @_;
+  my ($self, $text, $values, $sqlstate) = @_;
   return $text if not defined $text or ref $text;
   my $masked = eval {
     DBIO::PostgreSQL::Util::mask_error_details(
-      DBIO::Util::mask_bound_values($text, $values)
+      DBIO::Util::mask_bound_values($text, $values), $sqlstate
     );
   };
   return defined $masked ? $masked : $text;
 }
 
 # The detail field of the server with the values taken out: the bound values,
-# then the values of its forms (Key (name)=(***), Failing row contains (***)).
+# then the values of its forms (Key (name)=(***), Failing row contains (***)),
+# in the language of the SQLSTATE when it is given.
 sub _pg_mask_error_detail {
-  my ($self, $detail, $values) = @_;
+  my ($self, $detail, $values, $sqlstate) = @_;
   return $detail if not defined $detail or ref $detail;
   my $masked = eval {
     DBIO::PostgreSQL::Util::mask_detail_values(
-      DBIO::Util::mask_bound_values($detail, $values)
+      DBIO::Util::mask_bound_values($detail, $values), $sqlstate
     );
   };
   return defined $masked ? $masked : $detail;
@@ -715,7 +737,7 @@ sub _pg_error_values {
 # EV::Pg calls a statement's callback with ($result) when it went through and
 # with (undef, $message) when it did not, the message a string that is never
 # empty -- libpq's, or a text of its own where libpq has none ("connection
-# lost", "pipeline aborted", ...; Pg.xs, 0.02 and 0.07 alike).
+# lost", "pipeline aborted", ...; Pg.xs, 0.09).
 #
 # $pool is handed in by whoever acquired $pg, and is the only pool this talks
 # to -- never $self->pool (karr k88, this transport's half of karr dbio-async
@@ -765,7 +787,7 @@ sub _reset_pool_connection {
     return if $f->is_ready; # cancelled by the pool: it retired the connection
     if (defined $err) {
       $f->fail("the session of a pool connection could not be reset: DISCARD ALL failed: "
-             . $self->_pg_mask_error_text($err));
+             . $self->_pg_mask_error_text($err, undef, $self->_pg_sqlstate_of($pg, $err)));
       return;
     }
     # The connect actions run the EV loop to the end of each statement
@@ -1042,7 +1064,7 @@ sub _run_pool_connect_statement {
   $self->_pg_connect_wait(sub { $done });
 
   croak 'pool connect statement failed: '
-      . $self->_pg_mask_error_text($err, _pg_error_values(@bind))
+      . $self->_pg_mask_error_text($err, _pg_error_values(@bind), $self->_pg_sqlstate_of($conn, $err))
     if defined $err;
 
   # dbio_rows (core k358): hand back the rows, as selectall_arrayref does. A
@@ -1349,6 +1371,7 @@ sub _listen_delay {
   my ($self, $seconds) = @_;
   my $f = $self->future_class->new;
   my $timer;
+  EV::now_update();
   $timer = EV::timer($seconds, 0, sub {
     undef $timer;
     $f->done unless $f->is_ready;
@@ -1668,7 +1691,7 @@ DBIO::PostgreSQL::EV::Storage - Async PostgreSQL storage driver using EV::Pg
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -1864,8 +1887,9 @@ with as the coderef died
 
 The line is drawn by the text, not by the connection. EV::Pg keeps
 C<error_fields> of the I<last> server error on the connection and sets it only
-for an error result of a server: after a lost connection it still holds the
-previous error's SQLSTATE. A failure is the server's only when its text begins
+for an error result of a server: a successful statement leaves it, so it still
+holds the previous error's SQLSTATE; only a lost, reset or finished connection
+clears it (measured with EV::Pg 0.09). A failure is the server's only when its text begins
 with the severity and the primary message C<error_fields> holds -- libpq's
 C<SEVERITY:  primary>, the SQLSTATE between them in verbose mode -- which is
 true in the callback of the very statement that was refused and of nothing
@@ -2498,15 +2522,14 @@ C<COMMIT> and for its C<ROLLBACK> answer alike. Reading it here gets the
 C<COMMIT>'s own. Core asks from the success callback of the C<COMMIT>'s Future,
 and L</_query_async_pinned> settles that Future inside EV::Pg's callback for
 the C<COMMIT>'s result. EV::Pg points C<result_meta> at a result before it
-calls that result's callback (0.02 builds the hash right away, 0.07 when asked)
+calls that result's callback (0.09 builds the hash when asked)
 and changes it only when the next result is delivered or the connection is torn
 down -- neither happens between the start of that callback and core's question.
 Nothing goes out on the connection behind the C<COMMIT> either: a statement
 issued after it is refused (L</_query_async_pinned>), and sending one would not
 touch C<result_meta> anyway.
 
-EV::Pg has had C<result_meta> since 0.02, the oldest version this distribution
-accepts. A connection without it -- the stand-in of an offline test -- is taken
+A connection without C<result_meta> -- the stand-in of an offline test -- is taken
 at its word, core's default.
 
 =head2 _txn_inner_future
@@ -2623,7 +2646,7 @@ storage stays without a pool until the next call builds one. The same holds
 for L</_dispatch_notify> and L</copy_in>. A C<disconnect> from outside, with
 the statement on the server, never showed this: EV::Pg calls the statement's
 callback from inside C<finish>, while the pool being shut down is still the
-storage's (measured against PostgreSQL 18 with EV::Pg 0.07,
+storage's (measured against PostgreSQL 18 with EV::Pg 0.09,
 F<t/76-completion-same-pool-live.t>).
 
 Named sub, deliberately B<not> a closure inside the C<< ->then(sub {...}) >>
@@ -2732,7 +2755,8 @@ C<primary> and the text begins with them, as libpq renders an error:
 C<SEVERITY:  primary>, with C<sqlstate: > between the two in verbose mode. The
 text of a lost connection, an aborted pipeline, a finished connection, an empty
 query or EV::Pg's own croak begins with none of that, and stays a string,
-although C<error_fields> still holds the last server error.
+although C<error_fields> may still hold the last server error (a successful
+statement does not clear it).
 
 An error message names keys and columns, never values, whether or not it is
 the server's and whether or not the connection can answer C<error_fields>: the
@@ -2745,11 +2769,17 @@ the values of its forms masked
 C<Key (name)=(***) already exists.>, as on the synchronous storage and on
 C<future_io>. A text of no known form is not changed.
 
+The SQLSTATE of C<< $pg->error_fields >> goes to both maskings when C<$text>
+is the server's: the forms of the messages are then found in whatever language
+the server reports in. A text that is not the server's is masked by the
+English forms alone, as no state belongs to it.
+
 Only a plain string is looked at: an object and C<undef> pass unchanged.
 
 =head2 _pg_mask_error_text
 
   my $text = $storage->_pg_mask_error_text($text, \@values);
+  my $text = $storage->_pg_mask_error_text($text, \@values, $sqlstate);
 
 The text of an error with the values taken out, for every text of the
 server's or libpq's that reaches an exception or a failed Future: the values
@@ -2757,10 +2787,14 @@ bound to the statement (each of four characters or more, wherever it stands --
 L<DBIO::Util/mask_bound_values>, the net of core's
 L<DBIO::Storage::DBI/_mask_error_values>), then the values the server quotes in
 the forms of its messages (L<DBIO::PostgreSQL::Util/mask_error_details>).
-C<\@values> is optional. A text of no known form, C<undef> and a reference
-come back as they are, a text already masked comes back unchanged, and it
-never dies. The text of a statement without binds -- the C<DISCARD ALL> of the
-session reset, a C<LISTEN> -- passes it too.
+C<\@values> is optional. C<$sqlstate> is the SQLSTATE of the server's error,
+when the caller knows it (L</_pg_server_error> reads it from C<error_fields>
+for a text that is the server's): with it the forms are found in any language
+the server reports in (C<lc_messages>), without it only the English ones. A
+text of no known form, C<undef> and a reference come back as they are, a text
+already masked comes back unchanged, and it never dies. The text of a
+statement without binds -- the C<DISCARD ALL> of the session reset, a
+C<LISTEN> -- passes it too.
 
 =head2 _pg_report_if_dead
 
@@ -2784,7 +2818,7 @@ command is already in progress">), leave it true. C<finish> is the one call
 that fails the queued statements (I<"connection finished">) B<before> it
 closes the connection, so a statement in flight on a connection someone
 finishes is not reported, and the connection goes back to the pool. EV::Pg
-0.02 and 0.07 behave alike here. Harmless when the pool already knows: the
+0.09 behaves so (measured). Harmless when the pool already knows: the
 report may be made any number of times.
 
 A connection that sits idle and is not connected any more does not get as far
@@ -2964,7 +2998,7 @@ L<EV::Pg> calls that callback with C<(1)> when the server acknowledged the sync
 point, and with C<(undef, $error)> when the batch never got there. The Future
 is done in the first case only; in the second it fails with EV::Pg's own
 message, and the scaffold fails the whole pipeline with it. The error comes two
-ways (EV::Pg 0.07 and 0.02 alike):
+ways (measured with EV::Pg 0.09):
 
 =over 4
 
@@ -3095,9 +3129,8 @@ connection, a protocol error) goes to L<DBIO::Storage::Async/_listen_lost>.
 
 First it delivers the notifications that arrived after the connect and before
 this call -- while core subscribed the channels one by one -- in the order they
-arrived. EV::Pg 0.07 discards a notification when no C<on_notify> is set, and
-0.02 leaves it in libpq's buffer until the next read, so C<on_notify> is set
-from the open on and holds them until here. A channel callback that ends the
+arrived. EV::Pg 0.09 discards a notification when no C<on_notify> is set (measured),
+so C<on_notify> is set from the open on and holds them until here. A channel callback that ends the
 connection (unlistening the last channel, C<listen_reconnect>) stops that
 delivery there.
 
@@ -3121,8 +3154,7 @@ connection right after (L</_listen_close>).
 Core listen seam (L<DBIO::Storage::Async/_listen_probe>), asked by
 L<DBIO::Storage::Async/listen_alive> and after a failed C<LISTEN> /
 C<UNLISTEN>: EV::Pg's C<is_connected> -- the handle exists, its connect has
-completed and libpq reports C<CONNECTION_OK> (the same in EV::Pg 0.02 and
-0.07) -- and the look the pool takes at an idle connection
+completed and libpq reports C<CONNECTION_OK> -- and the look the pool takes at an idle connection
 (L<DBIO::PostgreSQL::EV::Pool/_pg_peer_closed>): the server's end of the socket
 is not closed. Synchronous, without a round trip, nothing sent, nothing read,
 no loop run. EV::Pg keeps reporting the handle connected until the loop has
@@ -3143,6 +3175,8 @@ backoff, an L<EV/timer> settling a L</future_class> Future from the EV loop.
 The timer lives until it fires or the Future is cancelled, which core does
 when a wait is cut short (C<listen_reconnect>, C<disconnect>), and which stops
 it.
+The wait counts from the call: the loop's cached time is brought up to date
+first, so work that kept the loop from running does not shorten the delay.
 
 =head2 _notify_send
 
@@ -3261,7 +3295,7 @@ fresh connection. That is a C<put_copy_end> that
 =over 4
 
 =item * answered -1. L<EV::Pg> does no more about it than hand libpq's -1 on
-(0.02 and 0.07 alike). Where libpq could not queue the end of the stream it
+(EV::Pg 0.09, Pg.xs). Where libpq could not queue the end of the stream it
 is still in the COPY, on an open connection, and refuses every statement with
 I<"another command is already in progress">; nothing is left to end the COPY
 with. Where libpq met the end of the connection, EV::Pg has not heard of it.
@@ -3292,8 +3326,8 @@ touching the Future or the pool, as a late call does in L</_pipeline_sync>.
 EV::Pg keeps the callback queued after a C<put_copy_end> that answered -1, to
 call it again whenever it reads from the connection while libpq has the COPY
 open, and when the connection goes. Retiring the connection closes it inside
-the callback's own delivery, and there EV::Pg 0.02 and 0.07 drop the callback
-instead.
+the callback's own delivery, and there EV::Pg 0.09 drops the callback
+instead (measured).
 
 B<The connection goes back to the pool it was acquired from>, however the COPY
 ends -- released, reported dead or retired there, never at L</pool> asked

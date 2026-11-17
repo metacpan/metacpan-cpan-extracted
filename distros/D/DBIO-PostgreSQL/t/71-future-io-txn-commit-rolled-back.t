@@ -43,7 +43,7 @@ BEGIN {
   eval { require DBIO::PostgreSQL::Storage::Async; 1 }
     or plan skip_all =>
       'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-  plan skip_all => 'the installed DBIO core predates _txn_commit_rolled_back (core k236)'
+  plan skip_all => 'the installed DBIO core predates _txn_commit_rolled_back'
     unless DBIO::Storage::Async->can('_txn_commit_rolled_back');
 }
 

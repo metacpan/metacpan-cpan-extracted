@@ -20,6 +20,7 @@ t/bnf.t
 t/comment-spelling.t
 t/conf/validate_strict.yml
 t/cross_validation.t
+t/compile_schema.t
 t/consistency.t
 t/custom_types.t
 t/custom_validation.t

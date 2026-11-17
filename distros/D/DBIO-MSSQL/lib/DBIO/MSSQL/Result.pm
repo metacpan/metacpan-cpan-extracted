@@ -4,7 +4,7 @@ package DBIO::MSSQL::Result;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Core';
 
@@ -43,7 +43,7 @@ DBIO::MSSQL::Result - MSSQL-specific Result component for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -6,7 +6,12 @@ use Test::More;
 use DBI;
 use DBIO::MSSQL::Storage;
 use DBIO::MSSQL::Storage::ODBC;
-use DBIO::MSSQL::Storage::Sybase;
+
+# The DBD::Sybase path is built on DBIO::Sybase (cpanfile recommends). Only
+# "not installed" is a reason to skip its half.
+my $HAVE_SYBASE = eval { require DBIO::Sybase::Storage; 1 };
+die $@ unless $HAVE_SYBASE or $@ =~ m{\ACan't locate DBIO/Sybase/Storage\.pm };
+require DBIO::MSSQL::Storage::Sybase if $HAVE_SYBASE;
 
 # OFFLINE (karr k47, k58). Both access paths decide what to do with a value
 # by the type its column has ON THE SERVER, not by the portable name it is
@@ -18,7 +23,7 @@ use DBIO::MSSQL::Storage::Sybase;
 
 my $base   = DBIO::MSSQL::Storage->new(undef);
 my $odbc   = DBIO::MSSQL::Storage::ODBC->new(undef);
-my $sybase = DBIO::MSSQL::Storage::Sybase->new(undef);
+my $sybase = $HAVE_SYBASE ? DBIO::MSSQL::Storage::Sybase->new(undef) : undef;
 
 # ------------------------------------------- the type a column has on the server
 
@@ -61,10 +66,16 @@ is $odbc->bind_attribute_by_data_type($_), undef,
   for 'varchar(50)', 'varchar(max)', 'char(10)';
 
 is $odbc->bind_attribute_by_data_type($_), DBI::SQL_LONGVARBINARY(),
-  "ODBC: '$_' is still SQL_LONGVARBINARY (k50: a binary type is decided first)"
+  "ODBC: '$_' is still SQL_LONGVARBINARY (a binary type is decided first)"
   for qw(varbinary binary image blob);
 
 # ------------------------------------------ DBD::Sybase: which columns are guarded
+
+unless ($HAVE_SYBASE) {
+  SKIP: { skip 'DBIO::Sybase is not installed (optional, cpanfile recommends): the Sybase path is built on it', 18 }
+  done_testing;
+  exit 0;
+}
 
 my %kind = (
   text           => 'nvarchar_max',

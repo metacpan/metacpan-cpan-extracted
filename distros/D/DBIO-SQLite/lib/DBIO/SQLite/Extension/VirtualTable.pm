@@ -4,7 +4,7 @@ package DBIO::SQLite::Extension::VirtualTable;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::SQLite::Extension';
 
@@ -74,7 +74,7 @@ DBIO::SQLite::Extension::VirtualTable - Base of the extension classes of SQLite 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

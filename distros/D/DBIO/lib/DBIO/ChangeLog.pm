@@ -4,7 +4,7 @@ package DBIO::ChangeLog;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Base';
 
@@ -250,7 +250,7 @@ DBIO::ChangeLog - Row-level change tracking component
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

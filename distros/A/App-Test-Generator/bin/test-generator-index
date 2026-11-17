@@ -56,7 +56,7 @@ including Perl version cliffs, locale sensitivity, and dependency
 version cliffs.  For each failure report where installed-module data is
 available, the dashboard also generates a self-contained shell script
 (C<cover_html/reproduce/reproduce-GUID.sh>) that reproduces the exact
-environment — pinning every installed module version with C<cpanm> and
+environment - pinning every installed module version with C<cpanm> and
 suggesting the matching Perl via perlbrew/plenv.
 
 =back
@@ -6746,17 +6746,17 @@ no C<guid> field.
 
 =over 4
 
-=item * C<$dist> — distribution name (e.g. C<Foo-Bar>).
+=item * C<$dist> - distribution name (e.g. C<Foo-Bar>).
 
-=item * C<$version> — distribution version string (e.g. C<1.23>).
+=item * C<$version> - distribution version string (e.g. C<1.23>).
 
-=item * C<$report> — hashref with at minimum C<guid>, C<perl>, C<osname>,
+=item * C<$report> - hashref with at minimum C<guid>, C<perl>, C<osname>,
 and C<reporter> keys as returned by the CPAN Testers API.
 
-=item * C<$installed_mods> — hashref of C<< Module => version >> pairs from
+=item * C<$installed_mods> - hashref of C<< Module => version >> pairs from
 L</extract_installed_modules>, or an empty hashref.
 
-=item * C<$outdir> — root output directory.  The script is written to
+=item * C<$outdir> - root output directory.  The script is written to
 C<$outdir/reproduce/reproduce-$guid.sh> (mode 0755).
 
 =back

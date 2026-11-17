@@ -13,7 +13,7 @@ DBIO::Manual::Heritage - Everything that changed from DBIx::Class to DBIO
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 OVERVIEW
 

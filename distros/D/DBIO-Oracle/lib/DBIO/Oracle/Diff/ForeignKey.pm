@@ -4,7 +4,7 @@ package DBIO::Oracle::Diff::ForeignKey;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -148,7 +148,7 @@ DBIO::Oracle::Diff::ForeignKey - Diff operations for Oracle foreign keys
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE check: a process that ends with statements in flight is silent on STDERR.
 #
@@ -40,7 +41,7 @@ PERL
 my %CHILD = (
   statement => <<'PERL',
 my $f = $a->_query_async('SELECT pg_sleep(30)', []);
-{ my $t = EV::timer(0.3, 0, sub { EV::break() }); EV::run(); }
+{ EV::now_update(); my $t = EV::timer(0.3, 0, sub { EV::break() }); EV::run(); }
 undef $f; undef $a; undef $h;
 PERL
   reset => <<'PERL',
@@ -63,6 +64,11 @@ for my $case (qw( statement reset )) {
   my @err;
   for my $run (1 .. 5) {
     my $out = qx{"$^X" @{[ map { qq{"$_"} } @inc ]} "$file" 2>&1};
+    # An old Test::More (the cpanfile floor, 0.98) warns while loading, in the
+    # child, from its own Test/Builder.pm and Test/More.pm. That is the test
+    # framework talking, not the driver, so such lines are not output; any
+    # other line still counts.
+    $out = join '', grep { !m{ at \S*Test/(?:Builder|More)\.pm line \d+\.$} } split /^/, $out;
     push @err, $out if length $out;
   }
   is scalar(@err), 0, "$case: a process ending with statements in flight is silent on STDERR"

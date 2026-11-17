@@ -3,6 +3,7 @@ use warnings;
 use Test::More;
 use Time::HiRes ();
 use POSIX ();
+use Config;
 
 # LIVE emulated LISTEN/NOTIFY over the future_io transport against a real
 # MySQL / MariaDB server (karr k54; core ADR 0056, dbio-async ADR 0005, this
@@ -47,9 +48,9 @@ use DBIO::MySQL::NotifyTable;
 eval { require DBIO::MySQL::Storage::Async; 1 }
   or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
-plan skip_all => 'the installed dbio-async predates its Future::IO listen seams (dbio-async k22)'
+plan skip_all => 'the installed dbio-async predates its Future::IO listen seams'
   unless defined &DBIO::Async::Storage::_listen_drain;
 
 # A schema always declares its driver (core ADR 0067), and DBIO::Test::Schema
@@ -295,6 +296,7 @@ sub pooled_notify {
 # pool handles. It leaves with POSIX::_exit, so DBI's END does not run -- this
 # is the DESTROY path alone, the one AutoInactiveDestroy governs on both DBDs.
 subtest 'f) fork: a child that disconnects its inherited storage leaves the parent\'s pool and listen sessions alone' => sub {
+  plan skip_all => 'a real fork() is needed (d_fork is unset)' unless $Config{d_fork};
   my $pooled  = pooled_notify('before-fork');
   ok $pooled, 'a notify through the pool before the fork';
   my $held    = $async->pool->acquire->get;   # a pool connection that lives across the fork
@@ -343,6 +345,7 @@ sub held_session {
 # installs DBIO::MySQL::MariaDBForkGuard on its first connect, which makes the
 # call a no-op in the child (karr k56, ADR 0009). No TODO: both DBDs pass.
 subtest 'g) fork: a child that exits leaves the parent\'s pool and listen sessions alone' => sub {
+  plan skip_all => 'a real fork() is needed (d_fork is unset)' unless $Config{d_fork};
   my $pooled  = pooled_notify('before-fork');
   ok $pooled, 'a notify through the pool before the fork';
   my $held    = $async->pool->acquire->get;   # a pool connection that lives across the fork

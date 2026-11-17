@@ -152,7 +152,7 @@ plan skip_all => 'Test needs '
   . DBIO::Optional::Dependencies->req_missing_for('test_rdbms_ase')
   unless DBIO::Optional::Dependencies->req_ok_for('test_rdbms_ase');
 
-my $K52 = 'karr k52: the whole DBIO::Test::Schema is to install on ASE';
+my $K52 = 'the whole DBIO::Test::Schema is to install on ASE';
 
 my $NO_IDENTITY = q{Msg 2764: Identity field 'x' must be a numeric with a }
                 . q{scale of 0. It may not be nullable or encrypted.};
@@ -538,7 +538,7 @@ in_database a => undef, sub {
       ) };
     };
 
-    note "MEASURED, not asserted (karr k52): $source->create with $column "
+    note "MEASURED, not asserted: $source->create with $column "
        . ( %$values ? 'given as the literal newid(1)' : 'left out' ) . ': '
        . ( $row ? 'lived, the object has ' . ( $row->get_column($column) // 'undef' )
                 : "died: $died" )

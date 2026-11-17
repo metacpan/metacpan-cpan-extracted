@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Age::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use JSON::MaybeXS ();
 
@@ -243,7 +243,7 @@ DBIO::PostgreSQL::Age::Storage - PostgreSQL storage with Apache AGE graph suppor
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

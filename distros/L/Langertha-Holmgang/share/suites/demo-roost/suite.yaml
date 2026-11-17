@@ -1,0 +1,42 @@
+# Example suite shipped with Langertha-Holmgang, to learn suite format 2 from:
+# a typed answer world (Role::AnswerWorld), the invented dragon roost "roost",
+# whose tools are the same for every case.
+# Origin: written for this distribution; the roost, its dragons, perches and
+# larder are invented and no real benchmark case (ADR 0003).
+# Author: Torsten Raudssus <torsten@raudssus.de>
+# License: same terms as Perl itself (Perl_5), like the distribution.
+format: 2
+id: demo-roost
+version: 1
+title: "Demo: keep an invented dragon roost"
+description: Two invented cases in the answer world roost (Langertha::Holmgang::Sim::Roost) — survey it, feed a dragon, move one to another perch.
+license: Perl_5
+source:
+  title: Langertha-Holmgang example suites
+  authors: Torsten Raudssus <torsten@raudssus.de>
+  license: Perl_5
+  url: https://github.com/Getty/langertha-holmgang
+topic: demo
+threshold: { pass_rate: 1 }
+defaults:
+  system: "You keep a dragon roost through the tools. Act, do not explain."
+  max_turns: 6
+tools:
+  - name: survey_roost
+    simulator: roost
+    description: Show the dragons (wingspan, perch, what each eats, meals so far), the perches (span, who sits there) and the larder (baskets per food).
+    parameters: { type: object, properties: {} }
+  - name: feed_dragon
+    simulator: roost
+    description: Give a dragon one basket of a food from the larder.
+    parameters:
+      type: object
+      required: [dragon, food]
+      properties: { dragon: { type: string }, food: { type: string } }
+  - name: move_dragon
+    simulator: roost
+    description: Send a dragon to a perch. One dragon per perch.
+    parameters:
+      type: object
+      required: [dragon, perch]
+      properties: { dragon: { type: string }, perch: { type: string } }

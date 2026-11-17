@@ -37,9 +37,9 @@ BEGIN {
 
 use DBIO::MySQL::EV::Storage;
 
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
-plan skip_all => 'the installed DBIO core predates _listen_error (core k227)'
+plan skip_all => 'the installed DBIO core predates _listen_error'
   unless DBIO::Storage::Async->can('_listen_error');
 
 our ($SERVER, @VIOLATIONS);
@@ -455,7 +455,7 @@ sub watching {
   my $mdb = listen_mdb($s);
   is refaddr($mdb), refaddr($handles[0]), '... it is the listen connection';
   is_deeply $mdb->{args}, { host => 'fakehost', database => 'listen_test', user => 'u', password => 'pw-listen-k100', found_rows => 1 },
-    '... opened from the storage\'s connect info (pool_size stripped), CLIENT_FOUND_ROWS on (karr k80)';
+    '... opened from the storage\'s connect info (pool_size stripped), CLIENT_FOUND_ROWS on';
 
   my @marks = $SERVER->statements($MARK);
   is scalar(@marks), 1, 'one mark was taken';
@@ -905,6 +905,7 @@ sub watching {
     # not keep it running: kept alive by something else, it breaks instead.
     undef $TICK;
     my $stuck;
+    EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
     my $bound = EV::timer(2, 0, sub { $stuck = 1; EV::break(EV::BREAK_ALL()) });
     $bound->keepalive(0);
     EV::run();

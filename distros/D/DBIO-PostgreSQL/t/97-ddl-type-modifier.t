@@ -90,7 +90,7 @@ sub ddl_cases_ok {
 # ---------------------------------------------------------------------------
 # 1. install_ddl
 # ---------------------------------------------------------------------------
-ddl_cases_ok('the table of karr k116, row for row',                TypeModifierCases->card);
+ddl_cases_ok('the table of type modifiers, row for row',                 TypeModifierCases->card);
 ddl_cases_ok('every other name of a type with a modifier',         TypeModifierCases->synonyms);
 ddl_cases_ok('pgvector keeps its dimensions',                      TypeModifierCases->pgvector);
 ddl_cases_ok('without a size nothing is added',                    TypeModifierCases->unsized);

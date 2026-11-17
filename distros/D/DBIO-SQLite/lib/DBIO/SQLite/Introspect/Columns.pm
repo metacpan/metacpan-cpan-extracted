@@ -4,7 +4,7 @@ package DBIO::SQLite::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::SQLite::Util qw(
   column_is_nullable pk_is_rowid_alias quote_identifier split_type_size
@@ -87,7 +87,7 @@ DBIO::SQLite::Introspect::Columns - Introspect SQLite columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

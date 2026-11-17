@@ -4,7 +4,7 @@ package DBIO::MySQL::Storage::MariaDB::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::MySQL::Storage::Async';
 
@@ -23,7 +23,7 @@ DBIO::MySQL::Storage::MariaDB::Async - future_io async adapter resolved for the 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -71,16 +71,35 @@ my $SOCKET_TRIED = qr{\Q$DEAD\E/\.s\.PGSQL\.\d+};
 # ---------------------------------------------------------------------------
 # 2. A connect that fails, at the top level of a file.
 # ---------------------------------------------------------------------------
-sub run_file {
-  my ($code) = @_;
-  local @ENV{@ENV_LOGIN} = @DEAD;
-  my $pid = IPC::Open3::open3(my $in, my $out, undef,
-    $^X, (map { "-I$_" } grep { !ref } @INC),
-    '-MTest::More', '-MLiveServer', '-e', $code);
+# A perl of its own, started from a list with no shell (no quoting of the -e
+# program for sh or cmd.exe). Its stderr is read with its stdout. The -e
+# programs below hold no double quote: on Windows perl builds the command line
+# itself and does not escape one (win32.c create_command_line). On Windows the
+# child writes CRLF; the output is returned with LF, as the patterns below
+# read it.
+#
+# run_perl returns stderr and stdout together; run_perl_stdout only stdout, the
+# child's stderr going to the test's own stderr (it shows in the log, and the
+# warnings of an old Test::More in the child do not become part of a value
+# compared here).
+sub run_perl        { _run_perl(undef,      @_) }
+sub run_perl_stdout { _run_perl('>&STDERR', @_) }
+
+sub _run_perl {
+  my ($err, @args) = @_;
+  my $pid = IPC::Open3::open3(my $in, my $out, $err,
+    $^X, (map { "-I$_" } grep { !ref } @INC), @args);
   close $in;
   my $output = do { local $/; <$out> };
   waitpid $pid, 0;
+  $output =~ s/\r\n/\n/g if defined $output;
   return ($output, $? >> 8);
+}
+
+sub run_file {
+  my ($code) = @_;
+  local @ENV{@ENV_LOGIN} = @DEAD;
+  return run_perl(q{-MTest::More}, q{-MLiveServer}, q{-e}, $code);
 }
 
 SKIP: {
@@ -160,6 +179,38 @@ SKIP: {
   local @ENV{@ENV_LOGIN} = ('dbi:Pg:dbname=appdb', '', '');
   is_deeply { LiveServer->conninfo }, { dbname => 'appdb' },
     '... and an empty login user and password are given: DBI_USER is not read for them';
+}
+
+# ---------------------------------------------------------------------------
+# 6. DBIO_TEST_SERVER_LANGUAGE: the language the live suite asks the server
+#    to report in, through libpq's PGOPTIONS.
+# ---------------------------------------------------------------------------
+{
+  delete local $ENV{DBIO_TEST_SERVER_LANGUAGE};
+  is(LiveServer->server_locale, undef, 'server_locale: none where the variable is unset');
+  local $ENV{DBIO_TEST_SERVER_LANGUAGE} = '';
+  is(LiveServer->server_locale, undef, '... and none where it is empty');
+  local $ENV{DBIO_TEST_SERVER_LANGUAGE} = 'de';
+  is(LiveServer->server_locale, 'de_DE.UTF-8', '... de is the German locale');
+  $ENV{DBIO_TEST_SERVER_LANGUAGE} = 'fr';
+  is(LiveServer->server_locale, 'fr_FR.UTF-8', '... fr is the French locale');
+  $ENV{DBIO_TEST_SERVER_LANGUAGE} = 'dee';
+  my $ok = eval { LiveServer->server_locale; 1 };
+  ok !$ok, 'an unknown value dies: a typo must not run the suite in English';
+  like $@, qr/'dee'.*de, fr/s, '... naming the value and the languages there are';
+}
+
+# Loading the helper sets PGOPTIONS; measured in a perl of its own, from its
+# stdout. StderrNoise writes to the child's stderr as an old Test::More does
+# on loading: the value must not carry it.
+for my $case ([ de => 'de_DE.UTF-8', undef ], [ fr => 'fr_FR.UTF-8', '-c search_path=x' ]) {
+  my ($lang, $locale, $before) = @$case;
+  local $ENV{DBIO_TEST_SERVER_LANGUAGE} = $lang;
+  local $ENV{PGOPTIONS} = $before if defined $before;
+  delete local $ENV{PGOPTIONS} unless defined $before;
+  my ($got) = run_perl_stdout(q{-MStderrNoise}, q{-MLiveServer}, q{-e}, q{print $ENV{PGOPTIONS}});
+  is $got, join(' ', grep { defined } $before, "-c lc_messages=$locale"),
+    "loading the helper with $lang puts lc_messages in PGOPTIONS, beside what was there";
 }
 
 done_testing;

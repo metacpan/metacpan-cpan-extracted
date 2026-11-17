@@ -64,7 +64,7 @@ is(ddl_type_from_info({ data_type => 'timestamp' }), 'TIMESTAMP',     'timestamp
 is(ddl_type_from_info({ data_type => 'datetime' }),  'TIMESTAMP',     'datetime -> TIMESTAMP');
 is(ddl_type_from_info({ data_type => 'date' }),      'DATE',          'date -> DATE');
 is(ddl_type_from_info({ data_type => 'numeric' }), 'DECIMAL(18,6)',   'numeric (no size) -> DECIMAL(18,6) default');
-is(ddl_type_from_info({ data_type => 'boolean' }), 'BOOLEAN',         'boolean -> BOOLEAN (Firebird 3 minimum, karr k36)');
+is(ddl_type_from_info({ data_type => 'boolean' }), 'BOOLEAN',         'boolean -> BOOLEAN (Firebird 3 minimum)');
 is(ddl_type_from_info({ data_type => 'custom_t' }), 'CUSTOM_T',       'unknown -> uppercased');
 is(ddl_type_from_info({}),                          'VARCHAR(255)',   'missing data_type -> VARCHAR(255)');
 

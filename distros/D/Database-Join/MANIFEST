@@ -68,5 +68,6 @@ t/transition.t
 t/tsv.t
 t/unit.t
 t/xlsx.t
+t/xml-document.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

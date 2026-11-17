@@ -1,5 +1,165 @@
 Revision history for App-Test-Generator
 
+0.49	Mon Nov 16 10:59:07 AM EST 2026
+	[Enhancements]
+	- A matches pattern is written to schema YAML as a plain pattern string
+	  instead of a !!perl/regexp object, which a YAML consumer cannot read
+	  back; the golden schemas record the plain form
+	- A routine that only tests that an input path exists (-e/-f) is no longer
+	  skipped: its parameter is marked semantic => 'existing_file' and the
+	  harness creates a temporary file for it.  Only routines that read the
+	  file's contents stay skipped, with a reason that says so
+	- A parameter named only by a formal =head Input spec still gets the value
+	  list from its =item prose description (e.g. strict_pod's off/warn/fatal),
+	  which the harness needs to build valid data for it
+	- A pattern-constrained string field is never given the generator's fixed
+	  whitespace, newline or BOM samples as valid data, so a cookie-style
+	  validator is not failed by values its own pattern excludes;
+	  t/pattern_fixed_samples.t covers the CGI-Info cookie regression in the
+	  ATG suite as well as downstream
+	- Surviving mutation-testing results now feed back into harness generation:
+	  test-generator-mutate's JSON report can be passed to
+	  fuzz-harness-generator --mutation-results (or to generate() as
+	  mutation_results), where each surviving numeric-boundary mutant is
+	  traced to the comparison it mutated and becomes a min or max constraint
+	  on the matching input field.  The harness then generates values either
+	  side of the boundary the suite missed; existing constraints are never
+	  replaced and survivors that need a hand-written test are listed for
+	  review
+	- Regex-based string generation is deterministic and bounded: a schema's
+	  seed drives Data::Random::String::Matches through Perl's RNG, generation
+	  is limited by the new config setting 'regex_timeout' (default 5
+	  seconds), and a pattern that hangs or cannot be satisfied falls back to
+	  a fixed matching value or skips its cases with one report instead of
+	  failing the run.  A failing case now names the seed and the input that
+	  was sent, so it can be replayed
+	- The fuzz harness records a contradiction when a routine rejects a value
+	  inside a POD-derived bound or accepts one outside it, reports all such
+	  findings at the end of the run, and tolerates them by default
+	- fuzz-harness-generator --strict-documented embeds strict mode in the
+	  generated harness: recorded documented-bound contradictions become
+	  failing tests, so CI can enforce them while normal runs stay tolerant
+	- A transform may introduce its own input fields: its foundation and test
+	  cases are built from the transform's input when it names fields, not from
+	  the top-level input.  One hand-written schema can therefore cover two
+	  call shapes, such as NameCase([...]) and NameCase('A', 'B')
+	- demo_extractor is no longer installed as a command; it is shipped as
+	  examples/demo_extractor
+	- The bug tracker in the distribution metadata is now GitHub issues
+
+	[Bug fixes]
+	- generate() is documented as returning 1, which is what it has always
+	  returned; the test source is written or printed, not returned
+	- Mutation::Feedback passes extract-schemas --strict-pod=fatal, and
+	  t/mutation_feedback.t is included in the distribution
+	- Pattern-generated strings honour a field's min/max length: the regex
+	  generator treats 'length' as a hint and can return a value the schema
+	  forbids, so generation retries inside the bounds and falls back rather
+	  than producing data the declared maximum rejects
+	- Random integer, number and string inputs stay inside a declared maximum:
+	  max-only numerics are generated downwards from the bound, fixed valid
+	  samples are skipped when they exceed it, and Unicode strings are
+	  truncated to the declared character count rather than its grapheme count
+	- A bound that only extract-schemas read from POD is treated as a hint for
+	  valid data, not a check the code was seen to make: fixed valid samples
+	  outside it are skipped, but explicit out-of-bound probes are generated
+	  for string lengths, numeric ranges, array and hash sizes alike, whether
+	  the constraint came from an input spec or from prose such as
+	  "3-50 chars" / "at least 5" (NameCase
+	  documents min => 1 for an argument that accepts an empty array).  A
+	  probe that dies is expected; one that survives is reported as a
+	  documentation contradiction.  Other POD constraints such as memberof
+	  lists and matches patterns remain hints, and their outside cases are
+	  skipped.  Each tolerated constraint is reported with diag, and one in
+	  a hand-written schema is still required to die
+	- Provenance is one `_source` value per parameter in generated schemas,
+	  replacing `_type_checked`, `_bounds_unverified` and `_from_input_spec`.
+	  `validator` means the routine checks types; `pod` and `input_spec` mean
+	  constraints are documentation only; `code`, `signature` and `field`
+	  mean inferred.  The harness makes every tolerance and reporting
+	  decision from that single value
+	- Code analysis reads a length comparison according to the guard it sits
+	  in: `croak ... unless length >= 5` and `croak ... if length < 5` both
+	  enforce min => 5.  The second form used to be read literally as
+	  max => 4, so a routine containing both forms produced min greater
+	  than max.  A comparison is only read this way when it is the whole
+	  guard condition: `croak ... if length($t) < 5 || $other` and
+	  `... if length($t) < 5 && $other` enforce no bound, since either
+	  operand alone can reject long text or accept short text
+	- An arrayref or hashref parameter can describe its elements with a nested
+	  `schema`: element specs carry their own type, bounds, member list and
+	  pattern, can nest again (array of arrays), and can build objects from
+	  `isa` or `can`.  A hashref schema without a type maps fixed key names to
+	  element schemas.  Generated valid data, boundary cases and mandatory
+	  argument fillers all use the element schema instead of homogeneous
+	  filler, and an invalid nested schema is rejected before generation
+	- A routine named `import` is generated as a class method call,
+	  Module->import(...), the way `use` invokes it, so a module that shifts
+	  its class name (Database::Abstraction) no longer dies when a no-input
+	  harness calls it with a flattened, empty argument list
+	- The allowed `_source` provenance markers live in one place,
+	  App::Test::Generator::Provenance.  SchemaExtractor emits only those
+	  values and the generated harness asks the same module which markers
+	  mean documentation and which mean the routine checks types, so the
+	  extractor and the harness cannot drift apart
+	- Documented member lists and patterns are now advisory probes like
+	  documented bounds: the outside value is tried, and a routine that
+	  accepts it is reported as accepting a value its POD says is invalid.
+	  Advisory runs only report; --strict-documented turns each finding into
+	  a failing test, exactly as it already did for bounds
+	- Provenance is tracked per constraint (`_constraint_source`), not only
+	  per parameter.  A minimum documented in POD and a maximum the code
+	  enforces on the same field stay separate decisions: the documented one
+	  sizes valid data and is tolerated, the enforced one is still a
+	  must-die check
+	- extract-schemas compares a =head3|4 Input spec's bounds with bounds
+	  inferred from code, so a formal min => 5 alongside an inferred max => 4
+	  is reported as a contradiction instead of being merged into an
+	  impossible range with no valid value
+	- A documented string or numeric bound now suppresses every out-of-range
+	  sample, not only the boundary case that used to be expected to die:
+	  fixed samples such as a newline-containing string longer than a
+	  documented maximum, or 43.56 above a documented numeric maximum, were
+	  still generated as values that should survive, so routines that
+	  actually enforce their documented range failed the harness
+	- A POD-derived string minimum of zero no longer expects "0" to die,
+	  and a POD-derived maximum combined with a pattern no longer expects
+	  a non-matching value to die; hand-written bounds remain strict
+	- extract-schemas writes YAML with sorted map keys and sorted analysis
+	  notes, so repeated runs over the same module are byte-identical and CI
+	  diffs stay readable
+	- A reference can no longer become a parameter name.  A hashref used where
+	  a key/value list was meant stringifies to "HASH(0x...)" and used to be
+	  emitted into the schema silently; such keys are now dropped and reported
+	  ("ignoring parameter key ...: not a parameter name")
+	- A single documented input parameter is read as the first positional
+	  argument when the routine reads no hash of arguments (nc was called as
+	  nc(name => ...) and every harness case failed)
+	- Generated harnesses no longer report a leaked file descriptor when an
+	  object opens a file on first use and keeps it (e.g. a logger); a
+	  descriptor is reported when the same target is opened again
+	- Generated harnesses no longer expect a "directory" parameter to die on
+	  an empty string
+	- The per-case marker for a documented-constraint probe is
+	  `_DOCUMENTED_CONSTRAINTS`, renamed from `_DOCUMENTED_BOUND_PROBE`
+	  because it marks any documented constraint, not only a numeric bound
+	- A constructor that parses the file it is given (open(...) on the
+	  argument or on a local copy of it) is reported as skipped, and its
+	  instance methods get new: ~ instead of constructor arguments naming a
+	  file that does not exist
+	- An integer, float or boolean type that only the documentation declares
+	  no longer makes the harness expect a wrong-type value to die, as was
+	  already the case for strings, hashrefs and arrayrefs; a constructor
+	  that documents its arguments without validating them (CGI::Info::new)
+	  failed thousands of cases.  A hand-written schema stays strict
+	- A formal =head Input spec is read when introductory prose or comment
+	  lines come before its opening bracket; it was ignored, so the types
+	  fell back to the =item prose (Genealogy::Wills::new's logger became a
+	  string)
+	- A config_file parameter passed to Object::Configure::configure() is
+	  marked semantic => 'existing_file', because Object::Configure croaks
+	  on a file that does not exist
+
 0.48	Wed Nov 11 09:42:47 AM EST 2026
 	[Enhancements]
 	- Generated harnesses check that each call leaves the caller's globals

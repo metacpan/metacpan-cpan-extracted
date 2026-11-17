@@ -4,7 +4,7 @@ package DBIO::Schema::Type;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp qw/croak/;
 use namespace::clean;
@@ -102,7 +102,7 @@ DBIO::Schema::Type - portable base-type vocabulary for multi-engine schemas
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 METHODS
 

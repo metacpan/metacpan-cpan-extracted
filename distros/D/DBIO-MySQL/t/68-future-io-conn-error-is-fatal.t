@@ -77,9 +77,9 @@ BEGIN {
     1;
   } or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-  plan skip_all => 'the installed DBIO core predates PoolBase::_mark_connection_dead (core k230)'
+  plan skip_all => 'the installed DBIO core predates PoolBase::_mark_connection_dead'
     unless DBIO::Storage::PoolBase->can('_mark_connection_dead');
-  plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam (dbio-async k26)'
+  plan skip_all => 'the installed dbio-async predates the _conn_error_is_fatal seam'
     unless DBIO::Async::Storage->can('_conn_error_is_fatal');
 }
 
@@ -118,7 +118,8 @@ my %ERROR = (
   2055 => [ "Lost connection to MySQL server at 'reading initial communication "
           . "packet', system error: 104",                                         1 ],
   1062 => [ "Duplicate entry '1' for key 'PRIMARY'",                              0 ],
-  1064 => [ 'You have an error in your SQL syntax; check the manual',             0 ],
+  1064 => [ "You have an error in your SQL syntax; check the manual that corresponds "
+          . "to your MySQL server version for the right syntax to use near 'x' at line 1", 0 ],
   1205 => [ 'Lock wait timeout exceeded; try restarting transaction',             0 ],
   1213 => [ 'Deadlock found when trying to get lock; try restarting transaction', 0 ],
   1317 => [ 'Query execution was interrupted',                                    0 ],

@@ -4,7 +4,7 @@ package DBIO::MySQL::SQLMaker;
 use warnings;
 use strict;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw( DBIO::SQLMaker );
 
@@ -442,7 +442,7 @@ DBIO::MySQL::SQLMaker - MySQL-specific SQL generation for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

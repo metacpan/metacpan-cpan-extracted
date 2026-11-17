@@ -47,9 +47,11 @@ sub count_into ($count) {
         unless is_plain_scalarref($count);
     return gather {
         $$count = 0;
-        return sub ($value) {
+
+        # Without a signature, as it's called for each value.
+        return sub {
             $$count++;
-            return $value;
+            return $_[0];
         };
     };
 }
@@ -59,14 +61,15 @@ sub count_into ($count) {
 # Text::Redact::Secrets is installed, unless $DumpSecrets is true.
 sub dump_to ($fh = \*STDERR) {
     croakf 'Expected an open filehandle' unless defined openhandle($fh);
-    return Ekorn::Pipeline::Stage->new(sub ($value) {
-        my $dump = _dump($value);
+    # Without a signature, as it's called for each value.
+    return Ekorn::Pipeline::Stage->new(sub {
+        my $dump = _dump($_[0]);
         unless ($DumpSecrets) {
             my $redact = _redactor();
             $dump = $redact->($dump) if $redact;
         }
         print { $fh } $dump;
-        return $value;
+        return $_[0];
     });
 }
 

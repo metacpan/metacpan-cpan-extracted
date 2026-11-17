@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO;
@@ -91,7 +93,7 @@ $SIG{PIPE} = 'IGNORE';
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $id = ++$self->{_next_id};
     $self->{server}{$id} = $w;
@@ -144,15 +146,8 @@ sub answer { my ($server) = @_; syswrite $server, 'R' if $server; return }
 sub bounded {
   my ($code) = @_;
   my @result;
-  my $ok = eval {
-    local $SIG{ALRM} = sub { die "timed out\n" };
-    alarm 10;
-    @result = $code->();
-    alarm 0;
-    1;
-  };
+  my $ok = eval { @result = within(10, $code); 1 };
   my $error = $@;
-  alarm 0;
   return $ok ? (1, @result) : (0, $error);
 }
 

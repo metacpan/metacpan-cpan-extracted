@@ -4,7 +4,7 @@ package DBIO::MSSQL::Storage;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/
   DBIO::Storage::DBI::UniqueIdentifier
@@ -163,7 +163,7 @@ __PACKAGE__->_use_supports_exists_query(1);
 # FreeTDS hazard does not reach here as long as no cursor is open on the
 # handle: DBD::Sybase has no real MARS and fakes a second active statement with
 # a child connection that deadlocks against a write in a transaction (which is
-# why t/10 and t/20 skip the MAS complexes), but _execute_ddl runs one
+# why t/10 skips the MAS complexes), but _execute_ddl runs one
 # statement after another on ONE handle and $dbh->do on DDL leaves no rowset
 # pending, so no second statement is ever active. It is the same shape as any
 # other txn_do this driver already runs on that transport.
@@ -812,8 +812,9 @@ sub _set_operation_keyword {
 sub _mask_error_values {
   my ($self, $text, $values, $statement) = @_;
 
-  $text = DBIO::MSSQL::Util::mask_error_details($text, $values, $statement)
-    if defined $text and !ref $text;
+  $text = DBIO::MSSQL::Util::mask_error_details(
+    $text, $values, $statement, ref $self ? $self->{_dbio_server_diag} : undef
+  ) if defined $text and !ref $text;
 
   return $self->next::method($text, $values, $statement);
 }
@@ -876,7 +877,7 @@ DBIO::MSSQL::Storage - Base Class for Microsoft SQL Server support in DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -1147,6 +1148,13 @@ handle quotes. The base class carries it, so L<DBIO::MSSQL::Storage::ODBC> and
 L<DBIO::MSSQL::Storage::Sybase> (and the NoBindVars classes, whose statement
 holds the values) have it too. Only a defined text that is no reference is
 looked at; C<< $dbh->errstr >> stays as the DBD has it.
+
+SQL Server reports in the language of the session (C<SET LANGUAGE>, the
+login's or the server's default), and the words around a value change with
+it. The masking therefore goes by what does not: the number of the message
+(C<Server message number=N> in the text of DBD::Sybase; over DBD::ODBC the
+numbers the handle reported, see L<DBIO::MSSQL::Storage::ODBC>) and the marks
+the server quotes with. See L<DBIO::MSSQL::Util/mask_error_details>.
 
 =head2 with_deferred_fk_checks
 

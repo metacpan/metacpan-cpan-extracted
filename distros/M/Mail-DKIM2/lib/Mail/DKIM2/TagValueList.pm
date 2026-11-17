@@ -2,7 +2,7 @@ package Mail::DKIM2::TagValueList;
 use strict;
 use warnings;
 
-our $VERSION = '0.34';
+our $VERSION = '0.35';
 
 # Simple tag=value list as defined in draft-ietf-dkim-dkim2-spec-09 Section 8.
 # Preserves insertion order for serialization.
@@ -36,8 +36,14 @@ sub split_tag_list {
     pop @specs if @specs && $specs[-1] =~ /\A[ \t\r\n]*\z/;
     for my $spec (@specs) {
         if ($spec =~ /\A[ \t\r\n]*\z/) { $bad = 1; next }
-        my ($name, $val) = $spec =~ /\A[ \t\r\n]*($TAG_NAME)[ \t\r\n]*=[ \t\r\n]*(.*?)[ \t\r\n]*\z/s
+        # The value's trailing FWS is trimmed by a greedy match that backs
+        # up to the last non-WSP character, never by "(.*?)\s*\z": that
+        # retried every position of a run of internal FWS against the rest
+        # of it, quadratic in the run (reported against 0.34,
+        # CVE-2026-129848).
+        my ($name, $val) = $spec =~ /\A[ \t\r\n]*($TAG_NAME)[ \t\r\n]*=[ \t\r\n]*(.*)\z/s
             or do { $bad = 1; next };
+        $val = $val =~ /\A(.*[^ \t\r\n])/s ? $1 : '';
         $bad = 1 unless $val =~ /\A$TAG_VALUE\z/;
         push @pairs, [$name, $val];
     }

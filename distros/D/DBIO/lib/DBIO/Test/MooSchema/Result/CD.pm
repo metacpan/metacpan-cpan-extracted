@@ -4,7 +4,7 @@ package DBIO::Test::MooSchema::Result::CD;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Moo;
 
@@ -46,7 +46,7 @@ DBIO::Test::MooSchema::Result::CD - Moo-enabled test result class for the cd tab
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

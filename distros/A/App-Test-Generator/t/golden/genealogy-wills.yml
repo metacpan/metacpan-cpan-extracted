@@ -1,0 +1,70 @@
+---
+new:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: new
+  input:
+    cache_duration:
+      _source: input_spec
+      optional: 1
+      type: string
+    config_file:
+      _note: Existing file
+      _source: input_spec
+      optional: 1
+      semantic: existing_file
+      type: string
+    directory:
+      _source: input_spec
+      optional: 1
+      type: string
+    logger:
+      _source: input_spec
+      optional: 1
+      type: object
+  module: Genealogy::Wills
+  output:
+    isa: Genealogy::Wills
+    type: object
+search:
+  config:
+    close_stdin: 1
+    dedup: 1
+    test_empty: 1
+    test_non_ascii: 0
+    test_nuls: 0
+    test_security: 0
+    test_undef: 0
+  function: search
+  input:
+    first:
+      _source: pod
+      optional: 1
+      type: string
+    last:
+      _source: pod
+      optional: 0
+      type: number
+    middle:
+      _source: pod
+      optional: 1
+      type: string
+    town:
+      _source: pod
+      optional: 1
+      type: string
+    year:
+      _source: pod
+      optional: 1
+      type: integer
+  module: Genealogy::Wills
+  new: {}
+  output:
+    _context_aware: 1
+    type: array

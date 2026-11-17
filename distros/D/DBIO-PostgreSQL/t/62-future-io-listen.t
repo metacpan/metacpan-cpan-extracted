@@ -3,7 +3,9 @@ use warnings;
 use Test::More;
 use Scalar::Util qw( refaddr weaken );
 use Socket qw( AF_UNIX SOCK_STREAM PF_UNSPEC );
-use Fcntl qw( F_GETFL O_NONBLOCK );
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use SocketMode;
 use Time::HiRes ();
 
 # OFFLINE test for the PostgreSQL LISTEN/NOTIFY seams of the future_io
@@ -30,9 +32,9 @@ BEGIN {
   eval { require DBIO::PostgreSQL::Storage::Async; 1 }
     or plan skip_all =>
       'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-  plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+  plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
     unless DBIO::Storage::Async->can('listen_alive');
-  plan skip_all => 'the installed dbio-async predates its Future::IO listen seams (dbio-async k22)'
+  plan skip_all => 'the installed dbio-async predates its Future::IO listen seams'
     unless defined &DBIO::Async::Storage::_listen_drain
         && defined &DBIO::Async::Storage::_listen_watch;
 }
@@ -43,7 +45,10 @@ use Future::IO qw( POLLIN );
 plan skip_all => "Future::IO is bound to $Future::IO::IMPL; this test drives the built-in implementation"
   if defined $Future::IO::IMPL && $Future::IO::IMPL ne 'Future::IO::_DefaultImpl';
 
-sub nonblocking { (fcntl($_[0], F_GETFL, 0) & O_NONBLOCK) ? 1 : 0 }
+# fcntl where perl has it; undef (unknown) where it has not (Windows): the
+# assertions on the mode are skipped there, everything else runs.
+sub nonblocking { SocketMode::nonblocking($_[0]) }
+my $NO_MODE = 'this perl cannot read a socket\'s blocking mode (no fcntl: Windows)';
 
 # --- the fake PostgreSQL --------------------------------------------------------
 
@@ -127,7 +132,8 @@ my $next_pid = 4000;
   # then hand out one parsed notification as [ $name, $pid, $payload ]. A
   # socket found blocking is recorded as a violation and NOT read unless
   # select says there is data, so a broken guard fails an assertion instead of
-  # hanging the test.
+  # hanging the test. A socket of unknown mode (undef) is read as it is: the
+  # fake's socket is non-blocking from its construction.
   sub pg_notifies {
     my ($self) = @_;
     $self->_check;
@@ -135,7 +141,7 @@ my $next_pid = 4000;
     push @{ $self->{reads} }, $nb;
 
     my $read = 1;
-    unless ($nb) {
+    if (defined $nb && !$nb) {
       my $rin = '';
       vec($rin, fileno $self->{client}, 1) = 1;
       $read = select($rin, undef, undef, 0) > 0;
@@ -534,12 +540,21 @@ sub server_says {
   Future::IO->poll($or, POLLIN)->get;   # one round: two read pollers, no timer
 
   is_deeply \@got, [ [ 'jobs', 'presumed', 21 ] ], 'the notification was delivered in that round';
-  ok scalar(grep { !$_ } @{ $s->{spy}{drain_entry_nb} }),
-    'precondition: the drain started with O_NONBLOCK cleared on the shared description';
   ok scalar(@{ $dbh->{reads} }) >= 2, 'the drain read until the socket ran dry';
-  is_deeply [ grep { !$_ } @{ $dbh->{reads} } ], [],
-    'every read of libpq\'s socket saw O_NONBLOCK set -- the drain cannot block';
-  ok nonblocking($dbh->{client}), 'and the socket is non-blocking again after the round';
+  SKIP: {
+    skip $NO_MODE, 1 unless grep { defined } @{ $s->{spy}{drain_entry_nb} };
+    ok scalar(grep { defined && !$_ } @{ $s->{spy}{drain_entry_nb} }),
+      'precondition: the drain started with O_NONBLOCK cleared on the shared description';
+  }
+  SKIP: {
+    skip $NO_MODE, 1 unless grep { defined } @{ $dbh->{reads} };
+    is_deeply [ grep { defined && !$_ } @{ $dbh->{reads} } ], [],
+      'every read of libpq\'s socket saw O_NONBLOCK set -- the drain cannot block';
+  }
+  SKIP: {
+    skip $NO_MODE, 1 unless defined nonblocking($dbh->{client});
+    ok nonblocking($dbh->{client}), 'and the socket is non-blocking again after the round';
+  }
 }
 
 # ---------------------------------------------------------------------------

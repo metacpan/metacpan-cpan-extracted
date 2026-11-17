@@ -4,7 +4,7 @@ package DBIO::Informix::Introspect::Util;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Carp ();
 
@@ -72,7 +72,7 @@ DBIO::Informix::Introspect::Util - Shared helpers of the Informix catalog reader
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

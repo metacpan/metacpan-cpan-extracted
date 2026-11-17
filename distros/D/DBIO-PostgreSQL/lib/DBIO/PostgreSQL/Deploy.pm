@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Deploy::Base::TempDatabase';
 
@@ -669,7 +669,7 @@ DBIO::PostgreSQL::Deploy - Deploy and upgrade PostgreSQL schemas via test-deploy
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

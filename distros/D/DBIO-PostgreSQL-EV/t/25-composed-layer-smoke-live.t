@@ -56,7 +56,7 @@ my $async = $h->async;
 isa_ok $async, 'DBIO::PostgreSQL::EV::Storage',
   'composed async backend is still the EV transport at its base';
 isa_ok $async, 'DBIO::PostgreSQL::EV::TestDummyLayer::Async',
-  'the extension async layer was mirrored and composed onto the transport (core k70)';
+  'the extension async layer was mirrored and composed onto the transport';
 can_ok $async, 'dummy_async_double';
 
 # The composed layer's async method, issuing '?' SQL, resolves correctly.

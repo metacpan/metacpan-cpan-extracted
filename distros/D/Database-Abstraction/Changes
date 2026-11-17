@@ -1,5 +1,23 @@
 Revision history for Database-Abstraction
 
+0.57	Mon Nov 16 01:19:14 PM EST 2026
+	[ Bug Fixes ]
+	- An XML document with several top-level elements (a DMARC report:
+	  version, report_metadata, policy_published, record...) was read from
+	  whichever key Perl listed first, so with no_entry it croaked "XML slurp:
+	  cannot handle HASH structure" on some runs and not others.  The
+	  repeating element (most occurrences, then name) is now always the one
+	  read as rows, and a document with none says so.
+	- no_fixate is now honoured as a per-call argument to selectall_arrayref,
+	  selectall_array (and their deprecated aliases selectall_hashref /
+	  selectall_hash), and fetchrow_hashref.  Previously the flag was only
+	  read from the constructor; passing no_fixate => 1 directly to any of
+	  these methods silently treated it as a SQL criteria column, potentially
+	  producing a spurious WHERE no_fixate = 1 clause.  Per-call no_fixate
+	  now overrides the constructor default for that call only (SQL path);
+	  the slurp path still fixates data at open() time regardless of
+	  no_fixate because slurped rows are shared in-memory references.
+
 0.56	Sun Nov  8 12:50:38 PM EST 2026
 	[ Bug Fixes ]
 	- A quote inside a quoted CSV, PSV or TSV field written as two quotes

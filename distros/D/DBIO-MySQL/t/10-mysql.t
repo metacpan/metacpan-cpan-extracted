@@ -7,6 +7,7 @@ use Test::Warn;
 
 use DBI::Const::GetInfoType;
 use Scalar::Util qw/weaken/;
+use Config;
 
 use DBIO::Test;
 use DBIO::Util qw(peepeeness);
@@ -406,6 +407,8 @@ ZEROINSEARCH: {
     # portion of this test when using DBD::MariaDB.
     skip 'DBD::MariaDB fork+auto_reconnect behaves differently', 6
       if $is_mariadb;
+    skip 'a real fork() is needed (d_fork is unset)', 6
+      unless $Config{d_fork};
 
     my $schema_autorecon = $test_schema->connect($dsn, $user, $pass, { $ar_attr => 1 });
     my $orig_dbh = $schema_autorecon->storage->_get_dbh;

@@ -334,7 +334,7 @@ ok !diff_of(
   model(tables => $base_tables, columns => { user => [ column('born', 'Date') ] }),
   model(tables => $base_tables, columns => { user => [ column('born', $desired_date) ] })
 )->has_changes,
-  'karr k11: a live Date against a schema declaring Date is not a change';
+  'a live Date against a schema declaring Date is not a change';
 
 # A genuine widening is still one visible MODIFY COLUMN that converges after a
 # single apply: Date and Date32 are two different types, not two spellings of

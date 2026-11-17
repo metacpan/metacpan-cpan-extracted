@@ -4,7 +4,7 @@ package DBIO::Test::StorageLayer;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use mro;
 use DBIO::Componentised ();
@@ -256,7 +256,7 @@ DBIO::Test::StorageLayer - Structural contract check for DBIO storage-extension 
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -16,6 +16,7 @@ my %WriteMakefileArgs = (
   "ABSTRACT" => "Sybase-specific schema management for DBIO",
   "AUTHOR" => "DBIO & DBIx::Class Authors",
   "CONFIGURE_REQUIRES" => {
+    "DBI" => 0,
     "ExtUtils::MakeMaker" => 0,
     "File::ShareDir::Install" => "0.06"
   },
@@ -25,7 +26,7 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::Sybase",
   "PREREQ_PM" => {
     "DBD::Sybase" => "1.26",
-    "DBIO" => "0.900004",
+    "DBIO" => "0.900007",
     "Scope::Guard" => 0
   },
   "TEST_REQUIRES" => {
@@ -33,7 +34,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,7 +43,7 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::Sybase" => "1.26",
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
   "Scope::Guard" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98"

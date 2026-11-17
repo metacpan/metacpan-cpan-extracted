@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::InflateColumn::TSVector;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Base';
 use Carp ();
@@ -127,7 +127,7 @@ DBIO::PostgreSQL::InflateColumn::TSVector - Auto-inflate/deflate PostgreSQL tsve
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

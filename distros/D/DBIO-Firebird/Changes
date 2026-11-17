@@ -1,5 +1,12 @@
 Revision history for DBIO-Firebird
 
+0.900007  2026-11-17
+    * Documentation
+        - The dbio-firebird and dbio-firebird-database skills follow the
+          code: the -fb shortcut, the capability declarations, the module
+          table, the foreign key catalog tables, Firebird 3 as minimum and
+          the live test path.
+
 0.900004  2026-11-08
     * Storage
         - The text of an error names the type, the column, the constraint

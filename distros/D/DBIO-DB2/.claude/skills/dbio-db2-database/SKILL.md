@@ -31,24 +31,36 @@ Driver maps DBIO types to Db2 types (`DBIO::DB2::Type::_db2_column_type`):
 
 | DBIO type | Db2 type |
 |-----------|----------|
-| tinyint/smallint/boolean/bool | SMALLINT |
+| tinyint/smallint | SMALLINT |
+| boolean/bool | BOOLEAN |
 | int/integer/serial | INTEGER |
 | bigint/bigserial | BIGINT |
 | real | REAL |
 | float | FLOAT |
 | double / double precision | DOUBLE PRECISION |
 | numeric/decimal | DECIMAL |
-| text/varchar/json | VARCHAR |
+| text (with size) / varchar / json | VARCHAR(n) |
+| text (no size) | CLOB |
 | char | CHAR |
 | clob | CLOB |
-| blob/binary | BLOB |
-| varbinary | VARBINARY |
+| blob | BLOB |
+| binary | BINARY(n), VARBINARY(n) above 255 |
+| varbinary | VARBINARY(n) |
 | date/time | DATE/TIME |
 | datetime/timestamp/timestamptz | TIMESTAMP |
-| interval | INTERVAL |
+| interval / enum / bit | refused: `DBIO::Exception` |
 | uuid | CHAR(16) |
 
-No native BOOLEAN or JSON in the mapping — both collapse (SMALLINT, VARCHAR).
+Only json collapses (to VARCHAR). interval, enum and bit have no Db2 type; the
+mapping throws `DBIO::Exception` before the server is asked.
+
+Sizes: `varchar`/`varbinary`/`json` without a size throw (Db2 refuses them with
+SQL0604N; no length is guessed). `text` without a size is a `CLOB`. Types written
+without a length (`SMALLINT`, `INTEGER`, `BIGINT`, `REAL`, `DOUBLE PRECISION`,
+`DATE`, `TIME`, `XML`, `BOOLEAN`) drop any size that comes with the column; the
+catalog reports a LENGTH for every one of them. `binary` takes up to 255 bytes,
+above that it is written `VARBINARY(n)`; above 32672 the mapping throws (use a
+blob).
 Datetime parsing: `DateTime::Format::DB2` (`datetime_parser_type`).
 
 ## Identity / auto-increment
@@ -66,9 +78,13 @@ connection). Introspection detects identity via `SYSCAT.COLUMNS.IDENTITY = 'Y'`.
 
 ## Transactions / locking / savepoints
 
-Db2 is transactional (ACID). `COMMIT` / `ROLLBACK`. Savepoints:
-`SAVEPOINT sp ON ROLLBACK RETAIN CURSORS` / `ROLLBACK TO SAVEPOINT sp` /
-`RELEASE SAVEPOINT sp`. Locking is row/table level; isolation levels CS
+Db2 is transactional (ACID). `COMMIT` / `ROLLBACK`. Db2 LUW runs DDL inside the
+unit of work, yet the storage declares `_use_transactional_ddl(0)`: the compare
+deploy runs on the storage's own handle (only a schema can be thrown away, not
+a database), so a transactional upgrade would pull the whole compare deploy into
+the migration's unit of work. DDL runs statement by statement with AutoCommit on;
+re-running `upgrade` recomputes the diff against live state (reasoning in
+`DBIO::DB2::Storage` and `DBIO::DB2::Deploy`). Locking is row/table level; isolation levels CS
 (cursor stability, default), RR, RS, UR. `SELECT ... FOR UPDATE` / `WITH RR`.
 
 ## Pagination
@@ -84,8 +100,8 @@ SELECT * FROM (
   SELECT inner.*, ROW_NUMBER() OVER (...) AS rno FROM (...) inner
 ) WHERE rno BETWEEN offset+1 AND offset+rows
 ```
-Modern Db2 also supports `OFFSET n ROWS FETCH FIRST m ROWS ONLY`, but the
-driver uses `ROW_NUMBER()` for offset for broad compatibility.
+`FETCH FIRST` cannot express an offset, so the offset form uses
+`ROW_NUMBER() OVER()` (ADR 0003).
 
 ## Identifier quoting + case folding
 
@@ -111,7 +127,7 @@ default schema `USER`):
 | `SYSCAT.COLUMNS` | columns, identity (`IDENTITY='Y'`) |
 | `SYSCAT.INDEXES` | indexes (`UNIQUERULE`: P=pk, U=unique, D=dup) |
 | `SYSCAT.INDEXCOLUSE` | index columns |
-| `SYSCAT.TABCONST` | constraints (`TYPE` F=FK, P=PK) |
+| `SYSCAT.TABCONST` | constraints (`TYPE` F=FK, P=PK, U=unique; ADR 0009) |
 | `SYSCAT.KEYCOLUSE` | key columns (FK + PK) |
 | `SYSCAT.REFERENCES` | FK parent table, `DELETERULE`/`UPDATERULE` |
 
@@ -125,7 +141,11 @@ children. `DELETERULE`/`UPDATERULE` map to `on_delete`/`on_update`.
 
 ## Testing env vars
 
-`DBIO_TEST_DB2_DSN`, `DBIO_TEST_DB2_USER`, `DBIO_TEST_DB2_PASS`.
-Tests skip unless DSN and USER are set (`t/10-db2.t`); also gated on the
-`test_rdbms_db2` optional-dependency group. Docker: `ibmcom/db2` /
+`DBIO_TEST_DB2_DSN`, `DBIO_TEST_DB2_USER`, `DBIO_TEST_DB2_PASS`; the values come
+from `dbio-db env db2` (core skill `dbio-driver-development`,
+`references/live-testing.md`). Live tests skip unless DSN and USER are set
+(`t/10-db2.t` tests `$dsn && $user`); `t/10-db2.t` is also gated on the
+`test_rdbms_db2` optional-dependency group. Offline and live suites both run
+through `../dbio/maint/capped-test prove -lr t/`; before a live run
+`../dbio/maint/live-preflight`. Docker: `ibmcom/db2` /
 `icr.io/db2_community/db2` (needs license acceptance + privileged container).

@@ -47,6 +47,8 @@ type references** (A has a field of type B which has a field of type A).
 2. Phase 2 — replace `->{fields}` with a coderef that closes over a *snapshot*
    of all shells, so a relationship field can reference another source's type
    that may still be half-built in this same loop.
+3. Phase 3 — build the root `Query` and (when a source opted in) `Mutation`
+   types; every resolver is wrapped in the error envelope.
 
 When adding a field whose type is another source's object, resolve it through
 that snapshot inside the coderef — never capture a type that is still being
@@ -82,9 +84,12 @@ resolve => sub {
 - **Return plain Perl data**: a hashref of column→value resolves against an
   Object type's fields; an arrayref of hashrefs resolves a List. DBIO::GraphQL
   returns `{ $row->get_columns }`, not the row object.
-- **Errors**: `die` in a resolver — the engine catches it and puts the message
-  in the top-level `errors` array, leaving that field `null`. (DBIO::GraphQL's
-  create/update mutations rely on this; delete returns `false` instead.)
+- **Errors**: a `die` in a resolver runs through the error envelope
+  (`DBIO::GraphQL::Error->guard`): `client_error` objects reach the client in
+  the top-level `errors` array, anything else is answered with a SQLSTATE class
+  (unique, foreign key, not null, check) or `internal error`, and the field is
+  `null`. `deleteX` returns `false` when the row is missing and dies on a
+  database failure.
 
 ## Args / coercion
 
@@ -92,13 +97,6 @@ resolve => sub {
 `InputObject`s only — never an output `Object`. Enum arg values arrive as the
 enum's `value`. Nested `InputObject`s arrive as nested hashrefs (that is how
 the nested filter shape works).
-
-## Engine quirk to know
-
-A connection/wrapper Object queried with **only** a list sub-field (e.g.
-`{ allBooks { nodes { title } } }`) may resolve `nodes` empty in some
-`GraphQL::Execution` versions. Always include a scalar sibling
-(`total`/`hasNextPage`). This is engine behaviour, not a DBIO bug.
 
 ## SEE ALSO
 

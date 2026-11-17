@@ -8,7 +8,7 @@
 
 use strict;
 use warnings;
-use Test::Most tests => 20;
+use Test::Most tests => 21;
 use Readonly;
 use Params::Validate::Strict qw(validate_strict);
 
@@ -395,6 +395,23 @@ subtest 'args => undef with args key present → treated as empty hashref' => su
 			args   => undef,
 		);
 	} 'args => undef with key present does not croak';
+};
+
+subtest '_unreachable croaks with a BUG message and logs it' => sub {
+	our @logged;
+	local @logged = ();
+	{
+		package Local::UnreachableLogger;
+		sub new { bless {}, shift }
+		sub error { shift; push @main::logged, join('', @_) }
+	}
+	throws_ok {
+		Params::Validate::Strict::_unreachable(Local::UnreachableLogger->new)
+	} qr/BUG: this code should not be reachable/, 'croaks with BUG message';
+	is(scalar(@logged), 1, 'logger called once');
+	like($logged[0], qr/BUG: this code should not be reachable/, 'logger got the message');
+	throws_ok { Params::Validate::Strict::_unreachable(undef) }
+		qr/BUG: this code should not be reachable/, 'croaks without a logger';
 };
 
 done_testing();

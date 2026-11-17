@@ -79,9 +79,9 @@ eval {
   1;
 } or plan skip_all =>
     'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract (core k219)'
+plan skip_all => 'the installed DBIO core predates the LISTEN/NOTIFY contract'
   unless DBIO::Storage::Async->can('listen_alive');
-plan skip_all => 'the installed dbio-async predates its Future::IO listen seams (dbio-async k22)'
+plan skip_all => 'the installed dbio-async predates its Future::IO listen seams'
   unless defined &DBIO::Async::Storage::_listen_drain;
 
 # Each DBD's own names, spelled out here on purpose: the expectation must not

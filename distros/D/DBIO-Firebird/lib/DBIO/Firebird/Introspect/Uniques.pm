@@ -4,7 +4,7 @@ package DBIO::Firebird::Introspect::Uniques;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -65,7 +65,7 @@ DBIO::Firebird::Introspect::Uniques - Introspect Firebird UNIQUE constraints via
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

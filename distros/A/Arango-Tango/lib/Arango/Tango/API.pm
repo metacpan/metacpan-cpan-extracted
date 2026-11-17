@@ -1,6 +1,6 @@
 # ABSTRACT: Internal module with the API specification
 package Arango::Tango::API;
-$Arango::Tango::API::VERSION = '0.020';
+$Arango::Tango::API::VERSION = '0.021';
 #use Arango::Tango::Database;
 #use Arango::Tango::Collection;
 
@@ -10,7 +10,7 @@ use HTTP::Tiny;
 use JSON;
 use Clone 'clone';
 use MIME::Base64 3.11 'encode_base64url';
-use URI::Encode qw(uri_encode);
+use URI::Escape qw(uri_escape_utf8);
 use JSON::Schema::Fit 0.07;
 
 use Sub::Install qw(install_sub);
@@ -22,6 +22,12 @@ sub _install_methods($$) {
     my ($package, $methods) = @_;
     for my $method (keys %$methods) {
         my $value = $methods->{$method};
+
+        # A signature lists the positional arguments in order; the names
+        # starting with '?' are optional.
+        my @required_names = grep { !/^\?/ } @{ $value->{signature} // [] };
+        my @optional_names = map  { /^\?(.+)$/ } @{ $value->{signature} // [] };
+
         install_sub {
             into => $package,
               as => $method,
@@ -33,15 +39,18 @@ sub _install_methods($$) {
                       my %required = ();
                       my %optional = ();
                       if (exists($value->{signature})) {
-                          if (scalar(@_) < scalar( grep { !/^\?/ } @{$value->{signature}})) {
-                              $self->{error} = sprintf("Arango::Tango | %s | Missing %s", $method, $value->{signature}[scalar(@_) - 1]);
+                          if (scalar(@_) < scalar(@required_names)) {
+                              # Required arguments are consumed in order, so the
+                              # first missing one is the one right after the
+                              # arguments that were supplied.
+                              $arango->{error} = sprintf("Arango::Tango | %s | Missing %s", $method, $required_names[scalar(@_)]);
                               die "-1\n";
                           }
-                          %required = ( map { $_ => shift @_ } grep { !/^\?/ } @{$value->{signature}} );
-                          %optional = ( map {
-                              /^\?(.+)$/ and $a = $1;
-                              ref($_[0]) ? () : ($a => shift @_)
-                          } grep {  /^\?/ } @{$value->{signature}} );
+                          %required = map { $_ => shift @_ } @required_names;
+                          for my $name (@optional_names) {
+                              next if ref($_[0]);
+                              $optional{$name} = shift @_;
+                          }
 
                           %required = ( %required, %optional );
                       }
@@ -160,6 +169,10 @@ sub _check_options {
     return $prepared_data;
 }
 
+# Keys of the params hash that are consumed by __api itself and must
+# never be forwarded as request options.
+my @INTERNAL_KEYS = qw( _body _url_parameters );
+
 sub _api {
     my ($self, $action, $params) = @_;
     return $self->__api( $API{$action}, $params);
@@ -173,8 +186,8 @@ sub __api {
 
     my $params_copy = clone $params; ## FIXME: decide if this is relevant
 
-    $uri =~ s[\{\{database\}\}]  [ defined $params->{database} ? "_db/$params->{database}/" : "" ]e;
-    $uri =~ s[\{([^}]+)\}]  [$params->{$1} // ""]eg;
+    $uri =~ s[\{\{database\}\}]  [ defined $params->{database} ? "_db/" . uri_escape_utf8($params->{database}) . "/" : "" ]e;
+    $uri =~ s[\{([^}]+)\}]  [uri_escape_utf8($params->{$1} // "")]eg;
 
     my $url = sprintf("%s://%s:%d/%s", $self->{scheme}, $self->{host}, $self->{port}, $uri);
 
@@ -185,7 +198,7 @@ sub __api {
         $body = $params->{_body} if exists $params->{_body};
         $url_opts = $params->{_url_parameters} if exists $params->{_url_parameters} and ref($params->{_url_parameters}) eq "HASH";
         $opts = $params;
-        delete $opts->{$_} for (qw._body _parameters.);
+        delete $opts->{$_} for @INTERNAL_KEYS;
     }
     $opts = exists($conf->{schema}) ? _check_options($opts, $conf->{schema}) : {};
     $url_opts = exists($conf->{url_schema}) ? _check_options($url_opts, $conf->{url_schema}) : {};
@@ -206,7 +219,7 @@ sub __api {
     }
 
     if ($method eq 'GET' && scalar(keys %$opts)) {
-        $url .= "?" . join("&", map { "$_=" . uri_encode($opts->{$_} )} keys %$opts);
+        $url .= "?" . join("&", map { "$_=" . uri_escape_utf8($opts->{$_} // "")} keys %$opts);
     }
     elsif ($body && (ref($body) eq "HASH" || ref($body) eq "ARRAY")) {
         $opts = { content => encode_json $body }
@@ -253,7 +266,7 @@ Arango::Tango::API - Internal module with the API specification
 
 =head1 VERSION
 
-version 0.020
+version 0.021
 
 =head1 AUTHOR
 

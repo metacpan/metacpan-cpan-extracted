@@ -4,7 +4,7 @@ package DBIO::Skills;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use File::ShareDir ();
 use File::Spec;
@@ -109,7 +109,7 @@ DBIO::Skills - Runtime access to the AI agent skills bundled with DBIO
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

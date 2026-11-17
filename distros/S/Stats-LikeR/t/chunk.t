@@ -89,4 +89,17 @@ unless ($INC{'Devel/Cover.pm'}) {
 	   'chunk: neither size nor parts prints the help screen');
 }
 
+# Scalar context is the number of groups for empty input too (0, not undef),
+# and a bad size or parts is refused for empty input as for any other.
+{
+	my $n = chunk([], size => 2);
+	is($n, 0, 'chunk: scalar context gives 0 groups for empty input');
+	$n = chunk([1, 2, 3], size => 2);
+	is($n, 2, 'chunk: and the group count otherwise');
+	like(eval { chunk([], size => 'x'); 1 } ? '' : $@, qr/size must be a positive integer/,
+		'chunk: a bad size is refused for empty input');
+	like(eval { chunk([], parts => 0); 1 } ? '' : $@, qr/parts must be a positive integer/,
+		'chunk: a bad parts is refused for empty input');
+}
+
 done_testing();

@@ -4,7 +4,7 @@ package DBIO::Oracle::Diff::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -121,7 +121,7 @@ DBIO::Oracle::Diff::Index - Diff operations for Oracle indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

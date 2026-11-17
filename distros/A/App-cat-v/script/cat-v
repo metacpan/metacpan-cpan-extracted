@@ -45,7 +45,7 @@ cat-v [ options ] args ...
 
 =head1 VERSION
 
-Version 1.05
+Version 1.06
 
 =head1 DESCRIPTION
 
@@ -94,41 +94,47 @@ and escape characters are displayed as corresponding Unicode symbols.
 The second field is the default action. C<s> stands for symbol, C<m>
 for Unicode mark, and C<0> for no conversion.
 
-    nul   s  \000  \x{2400}  ␀  SYMBOL FOR NULL
-    soh   s  \001  \x{2401}  ␁  SYMBOL FOR START OF HEADING
-    stx   s  \002  \x{2402}  ␂  SYMBOL FOR START OF TEXT
-    etx   s  \003  \x{2403}  ␃  SYMBOL FOR END OF TEXT
-    eot   s  \004  \x{2404}  ␄  SYMBOL FOR END OF TRANSMISSION
-    enq   s  \005  \x{2405}  ␅  SYMBOL FOR ENQUIRY
-    ack   s  \006  \x{2406}  ␆  SYMBOL FOR ACKNOWLEDGE
-    bel   s  \007  \x{2407}  ␇  SYMBOL FOR BELL
-    bs    s  \010  \x{2408}  ␈  SYMBOL FOR BACKSPACE
-    ht    s  \011  \x{2409}  ␉  SYMBOL FOR HORIZONTAL TABULATION
-    nl    m  \012  \x{240A}  ␊  SYMBOL FOR LINE FEED
-    vt    s  \013  \x{240B}  ␋  SYMBOL FOR VERTICAL TABULATION
-    np    m  \014  \x{240C}  ␌  SYMBOL FOR FORM FEED
-    cr    s  \015  \x{240D}  ␍  SYMBOL FOR CARRIAGE RETURN
-    so    s  \016  \x{240E}  ␎  SYMBOL FOR SHIFT OUT
-    si    s  \017  \x{240F}  ␏  SYMBOL FOR SHIFT IN
-    dle   s  \020  \x{2410}  ␐  SYMBOL FOR DATA LINK ESCAPE
-    dc1   s  \021  \x{2411}  ␑  SYMBOL FOR DEVICE CONTROL ONE
-    dc2   s  \022  \x{2412}  ␒  SYMBOL FOR DEVICE CONTROL TWO
-    dc3   s  \023  \x{2413}  ␓  SYMBOL FOR DEVICE CONTROL THREE
-    dc4   s  \024  \x{2414}  ␔  SYMBOL FOR DEVICE CONTROL FOUR
-    nak   s  \025  \x{2415}  ␕  SYMBOL FOR NEGATIVE ACKNOWLEDGE
-    syn   s  \026  \x{2416}  ␖  SYMBOL FOR SYNCHRONOUS IDLE
-    etb   s  \027  \x{2417}  ␗  SYMBOL FOR END OF TRANSMISSION BLOCK
-    can   s  \030  \x{2418}  ␘  SYMBOL FOR CANCEL
-    em    s  \031  \x{2419}  ␙  SYMBOL FOR END OF MEDIUM
-    sub   s  \032  \x{241A}  ␚  SYMBOL FOR SUBSTITUTE
-    esc   0  \033  \x{241B}  ␛  SYMBOL FOR ESCAPE
-    fs    s  \034  \x{241C}  ␜  SYMBOL FOR FILE SEPARATOR
-    gs    s  \035  \x{241D}  ␝  SYMBOL FOR GROUP SEPARATOR
-    rs    s  \036  \x{241E}  ␞  SYMBOL FOR RECORD SEPARATOR
-    us    s  \037  \x{241F}  ␟  SYMBOL FOR UNIT SEPARATOR
-    sp    m  \040  \x{2420}  ␠  SYMBOL FOR SPACE
-    del   s  \177  \x{2421}  ␡  SYMBOL FOR DELETE
-    nbsp  s  \240  \x{2423}  ⍽  SHOULDERED OPEN BOX
+    nul   s      \000  \x{2400}  ␀   SYMBOL FOR NULL
+    soh   s      \001  \x{2401}  ␁   SYMBOL FOR START OF HEADING
+    stx   s      \002  \x{2402}  ␂   SYMBOL FOR START OF TEXT
+    etx   s      \003  \x{2403}  ␃   SYMBOL FOR END OF TEXT
+    eot   s      \004  \x{2404}  ␄   SYMBOL FOR END OF TRANSMISSION
+    enq   s      \005  \x{2405}  ␅   SYMBOL FOR ENQUIRY
+    ack   s      \006  \x{2406}  ␆   SYMBOL FOR ACKNOWLEDGE
+    bel   s      \007  \x{2407}  ␇   SYMBOL FOR BELL
+    bs    s      \010  \x{2408}  ␈   SYMBOL FOR BACKSPACE
+    ht    s      \011  \x{2409}  ␉   SYMBOL FOR HORIZONTAL TABULATION
+    nl    m      \012  \x{240A}  ␊   SYMBOL FOR LINE FEED
+    vt    s      \013  \x{240B}  ␋   SYMBOL FOR VERTICAL TABULATION
+    np    m      \014  \x{240C}  ␌   SYMBOL FOR FORM FEED
+    cr    s      \015  \x{240D}  ␍   SYMBOL FOR CARRIAGE RETURN
+    so    s      \016  \x{240E}  ␎   SYMBOL FOR SHIFT OUT
+    si    s      \017  \x{240F}  ␏   SYMBOL FOR SHIFT IN
+    dle   s      \020  \x{2410}  ␐   SYMBOL FOR DATA LINK ESCAPE
+    dc1   s      \021  \x{2411}  ␑   SYMBOL FOR DEVICE CONTROL ONE
+    dc2   s      \022  \x{2412}  ␒   SYMBOL FOR DEVICE CONTROL TWO
+    dc3   s      \023  \x{2413}  ␓   SYMBOL FOR DEVICE CONTROL THREE
+    dc4   s      \024  \x{2414}  ␔   SYMBOL FOR DEVICE CONTROL FOUR
+    nak   s      \025  \x{2415}  ␕   SYMBOL FOR NEGATIVE ACKNOWLEDGE
+    syn   s      \026  \x{2416}  ␖   SYMBOL FOR SYNCHRONOUS IDLE
+    etb   s      \027  \x{2417}  ␗   SYMBOL FOR END OF TRANSMISSION BLOCK
+    can   s      \030  \x{2418}  ␘   SYMBOL FOR CANCEL
+    em    s      \031  \x{2419}  ␙   SYMBOL FOR END OF MEDIUM
+    sub   s      \032  \x{241A}  ␚   SYMBOL FOR SUBSTITUTE
+    esc   0      \033  \x{241B}  ␛   SYMBOL FOR ESCAPE
+    fs    s      \034  \x{241C}  ␜   SYMBOL FOR FILE SEPARATOR
+    gs    s      \035  \x{241D}  ␝   SYMBOL FOR GROUP SEPARATOR
+    rs    s      \036  \x{241E}  ␞   SYMBOL FOR RECORD SEPARATOR
+    us    s      \037  \x{241F}  ␟   SYMBOL FOR UNIT SEPARATOR
+    sp    m      \040  \x{2420}  ␠   SYMBOL FOR SPACE
+    del   m      \177  \x{2421}  ␡   SYMBOL FOR DELETE
+    nbsp  s      \240  \x{237D}  ⍽   SHOULDERED OPEN BOX
+    fwsp  s  \x{3000}  \x{303C}  〼  MASU MARK
+
+The C<fwsp> is the full-width IDEOGRAPHIC SPACE (U+3000), which
+occupies two columns on the display.  The default symbol is also
+two columns wide, so the layout is preserved.  If you replace it by
+other character, choose one with the same width.
 
 At this time, Unicode markings are available for the following
 characters
@@ -185,10 +191,10 @@ example sets C<tab> and C<bel> to 0 and C<esc> to C<s>.
 
 If C<all> is specified for the name, the value applies to all
 character types.  The following command sets all characters to C<s>,
-then sets C<nl>, C<nl>, C<np>, and C<sp> to C<m> and disables C<esc>.
+then sets C<nul>, C<nl>, C<np>, C<sp>, and C<del> to C<m> and disables C<esc>.
 This is the default state.
 
-    cat-v -c all=s,nul=nl=np=sp=m,esc=0
+    cat-v -c all=s,nul=nl=np=sp=del=m,esc=0
 
 If none of the name labels are specified, it is assumed that C<all> is
 given.  The following command prints all control characters except
@@ -326,6 +332,13 @@ file.
 
     echo -ne "$(cat-v -Ence FILE)"
 
+This does not work if the file contains C<nbsp> or C<fwsp>, because
+C<echo> produces a raw byte rather than UTF-8 character for C<\xa0>,
+and does not understand the C<\x{3000}> form.  In that case, use the
+L<ansiecho> command, which interprets them as Perl does.
+
+    ansiecho -n "$(cat-v -Ence FILE)"
+
 =back
 
 =head1 INSTALL
@@ -353,6 +366,11 @@ Git repository.
 The predecessor of the C<cat-v> command was originally created as the 
 filter module of the L<App::optex> command.
 
+=item L<ansiecho>
+
+Echo command which interprets escape sequences in the same way as
+Perl's string literal.
+
 =item L<https://harmful.cat-v.org/cat-v/>
 
 UNIX Style, or cat -v Considered Harmful
@@ -369,7 +387,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright © 2024-2025 Kazumasa Utashiro.
+Copyright © 2024-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

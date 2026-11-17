@@ -1,6 +1,6 @@
 package App::cat::v;
 
-our $VERSION = "1.05";
+our $VERSION = "1.06";
 
 use 5.024;
 use warnings;
@@ -66,6 +66,7 @@ my %control = (
     del  => [ 'm', "\x7f", { s => "\x{2421}",    , # ␡ SYMBOL FOR DELETE
 			     m => "\x{232B}", } ], # ⌫ ERASE TO THE LEFT
     nbsp => [ 's', "\xa0", { s => "\x{237D}", } ], # ⍽ SHOULDERED OPEN BOX
+    fwsp => [ 's', "\x{3000}", { s => "\x{303C}", } ], # 〼 MASU MARK
 );
 
 package #
@@ -94,7 +95,8 @@ for my $v (values %control) {
 	"\e" => '\e',
     );
     my $code = $v->code;
-    $v->cmap->{e} = $map{$code} // sprintf "\\x%02x", ord($code);
+    $v->cmap->{e} = $map{$code} // sprintf(ord($code) > 0xff ? "\\x{%x}" : "\\x%02x",
+					   ord($code));
 }
 
 my %code = pairmap { $a => $b->code } %control;

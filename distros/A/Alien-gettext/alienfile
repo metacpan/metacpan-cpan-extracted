@@ -1,0 +1,57 @@
+use alienfile;
+
+# Alien::gettext build recipe (Alien::Build path).
+#
+# Tools Alien: provides the GNU gettext command-line utilities through
+# Alien::gettext->bin_dir. No library, no cflags/libs. Probe for a system
+# gettext first; otherwise fetch the newest upstream release and build it.
+
+# The tool set this distribution promises (also asserted in t/bin.t).
+my @bins = qw(
+  msgfmt msgfilter msgcmp msgcomm msgmerge xgettext
+  msgexec msguniq msginit msgunfmt msgconv
+);
+
+# System detection: any GNU gettext-tools on PATH satisfies it (no version
+# floor). If found, the share block below is skipped entirely.
+probe sub {
+  my ($build) = @_;
+  my $out = `msgfmt --version 2>&1`;
+  return 'share' if $? != 0 || $out !~ /GNU gettext-tools\)\s+(\d+(?:\.\d+)*)/;
+  $build->runtime_prop->{version} = $1;
+  return 'system';
+};
+
+sys {
+  gather sub {
+    my ($build) = @_;
+    $build->runtime_prop->{version} //= 'unknown';
+  };
+};
+
+share {
+
+  # Upstream is fetched over https at build time and the version is NOT
+  # pinned: pick the newest gettext-<version>.tar.gz the directory lists.
+  start_url 'https://ftp.gnu.org/gnu/gettext/';
+  plugin 'Download' => (
+    filter  => qr/^gettext-[0-9\.]+\.tar\.gz$/,
+    version => qr/^gettext-([0-9\.]+)\.tar\.gz$/,
+  );
+  plugin 'Extract' => 'tar.gz';
+
+  # Static internal libraries: the tools link libgettextsrc / libgettextlib,
+  # and a shared build leaves them outside any runtime search path.
+  plugin 'Build::Autoconf';
+  build [
+    '%{configure} --disable-shared --enable-static --disable-java'
+      . ' --disable-csharp --disable-openmp --without-emacs --without-git'
+      . ' --without-cvs --disable-nls',
+    '%{make}',
+    '%{make} install',
+    # Fail loudly if the build did not produce the promised tool set.
+    'for t in ' . join(' ', @bins) . '; do test -x gettext-tools/src/$t'
+      . ' || { echo "gettext build is missing $t" >&2; exit 1; }; done',
+  ];
+
+};

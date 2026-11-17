@@ -44,7 +44,8 @@ sub gql {
     or diag explain $res->{errors};
   is($res->{data}{author}{id},     1,                'author id'    );
   is($res->{data}{author}{name},   'J.R.R. Tolkien', 'author name'  );
-  is($res->{data}{author}{rating}, 9.8,              'author rating');
+  # a float column holds a double, which on a perl with a wider NV (long double, quadmath) is not the literal 9.8
+  is($res->{data}{author}{rating}, unpack('d', pack('d', 9.8)), 'author rating');
 }
 
 # Singular query - NOT FOUND

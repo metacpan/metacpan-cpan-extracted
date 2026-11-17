@@ -2,7 +2,6 @@ use strict;
 use warnings;
 
 use Test::More;
-use Try::Tiny;
 use DBIO::Test;
 
 # DBIO::Test::Schema keeps no driver in its class: this file runs it on
@@ -21,17 +20,6 @@ use LiveServer;
 LiveServer->require_server;
 
 my $schema = DBIO::Test::Schema->connect($dsn, $dbuser, $dbpass, { AutoCommit => 1 });
-
-if ($schema->storage->_server_info->{normalized_dbms_version} >= 9.0) {
-  if (not try { DBD::Pg->VERSION('2.17.2') }) {
-    plan skip_all =>
-      'DBD::Pg < 2.17.2 does not work with Pg >= 9.0 BYTEA columns';
-  }
-}
-elsif (not try { DBD::Pg->VERSION('2.9.2') }) {
-  plan skip_all =>
-    'DBD::Pg < 2.9.2 does not work with BYTEA columns';
-}
 
 my $dbh = $schema->storage->dbh;
 

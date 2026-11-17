@@ -1,7 +1,7 @@
 package DBIO::Test::Schema::ResultDDL::Result::Artist;
 # ABSTRACT: Test Cake result class for the artist table
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use DBIO::Cake;
 table 'artist';
@@ -22,7 +22,7 @@ DBIO::Test::Schema::ResultDDL::Result::Artist - Test Cake result class for the a
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

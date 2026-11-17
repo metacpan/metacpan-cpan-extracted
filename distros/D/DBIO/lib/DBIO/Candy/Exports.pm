@@ -4,7 +4,7 @@ package DBIO::Candy::Exports;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Sub::Util ();
 
@@ -46,7 +46,7 @@ DBIO::Candy::Exports - Create sugar for DBIO components
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

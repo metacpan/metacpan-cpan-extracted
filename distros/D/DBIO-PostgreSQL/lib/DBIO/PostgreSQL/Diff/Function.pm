@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Diff::Function;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -291,7 +291,7 @@ DBIO::PostgreSQL::Diff::Function - Diff operations for PostgreSQL functions
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -338,7 +338,7 @@ runs. That is so for a function a trigger or a column default still uses, a
 trigger function that becomes a procedure: the server answers C<cannot drop
 function ... because other objects depend on it>, naming the trigger or the
 column, and the transaction C<apply> runs the statements in leaves the
-database as it was (t/171-diff-function-kind-dependents-live.t).
+database as it was (t/137-diff-function-kind-live.t).
 
 Where the keys do not pair -- an C<INOUT> argument (its mode is not left out
 of the signature), another argument name, an C<OUT> argument one side has --

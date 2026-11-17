@@ -131,7 +131,7 @@ like $ddl, qr/\Q"name" TEXT NOT NULL\E/,
   my $diff = diff_of($schema);
   ok !$diff->has_changes,
     'a freshly deployed schema diffs to nothing -- rowid alias, TEXT key and '
-  . 'composite key alike. Before karr k32 the TEXT and composite keys each '
+  . 'composite key alike. Before that fix the TEXT and composite keys each '
   . 'reported an alter of a column that had just been created from this very '
   . 'target'
     or diag $diff->summary;
@@ -144,7 +144,7 @@ like $ddl, qr/\Q"name" TEXT NOT NULL\E/,
   is $alias->{id}{not_null}, 1,
     'the rowid alias reads as NOT NULL although PRAGMA table_info says '
   . 'notnull=0: it cannot hold NULL, since NULL there is the "assign a rowid" '
-  . 'token (karr k29). The model states the truth, not the declaration';
+  . 'token. The model states the truth, not the declaration';
   is $alias->{note}{not_null}, 0,
     '... and an ordinary nullable column is untouched by that';
 

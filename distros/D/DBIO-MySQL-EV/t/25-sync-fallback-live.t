@@ -81,6 +81,7 @@ END {
 # Run $code; if it has not returned after $LIMIT seconds, bail out.
 sub bounded {
   my ($label, $code) = @_;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $dog = EV::timer($LIMIT, 0, sub {
     $hung = 1;
     BAIL_OUT("$label: still blocked after ${LIMIT}s");
@@ -99,7 +100,8 @@ sub sync_call {
 
 $h = DBIO::MySQL::EV::TestHarness->new(
   schema_class  => 'DBIO::MySQL::EV::SyncFallbackLive::Schema',
-  connect_attrs => { pool_size => 3 },
+  # the test reads the server's English error text
+  connect_attrs => { pool_size => 3, on_connect_do => [q{SET SESSION lc_messages = 'en_US'}] },
 );
 
 my $async  = $h->async;
@@ -313,8 +315,8 @@ my $source1 = $h1->schema->source('Thing');
     });
   });
   ok !$ok, 'a sync select on the STORAGE in a txn coderef (pool of one) still dies';
-  like $ok ? '' : $r[0], qr/\QBlocking wait refused\E/, 'refused: the transaction holds the only connection (karr k53)';
-  ($ok, @r) = sync_call('select after the k53 refusal', sub { $one->select($table, \@cols, {}, {%by_id}) });
+  like $ok ? '' : $r[0], qr/\QBlocking wait refused\E/, 'refused: the transaction holds the only connection';
+  ($ok, @r) = sync_call('select after the refusal', sub { $one->select($table, \@cols, {}, {%by_id}) });
   ok $ok, 'and the pool recovered' or diag "died: $r[0]";
 }
 

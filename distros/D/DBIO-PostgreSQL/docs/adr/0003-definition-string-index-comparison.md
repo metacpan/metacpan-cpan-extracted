@@ -160,4 +160,4 @@ Pinned live by `t/164-diff-index-collision-and-constraint-rename-live.t`.
 
 Supersedes karr k101 (the diff creates no constraint). Pinned offline by
 `t/157-diff-constraint-create.t`, live by `t/158-diff-constraint-live.t` and
-`t/112-diff-index-constraint-live.t`.
+`t/112-diff-index-live.t`.

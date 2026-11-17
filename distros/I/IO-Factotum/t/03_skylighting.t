@@ -34,8 +34,8 @@ put 'noext', "#!/bin/bash\necho\n";
 
 # the module registers its converter, without tying ARGV when it is
 # only required
-require IO::Factotum::skylighting;
-IO::Factotum::skylighting::setup();
+require IO::Factotum::Highlight::skylighting;
+IO::Factotum::Highlight::skylighting::setup();
 ok !tied(*ARGV), 'setup does not tie ARGV';
 
 subtest 'skylighting: C source' => sub {
@@ -78,12 +78,12 @@ subtest 'skylighting: large and empty files' => sub {
     put 'empty.c', "";
     is slurp(IO::Factotum::open_input("$dir/empty.c")), "", 'an empty file is empty';
     put 'big.c', "int x;\n" x 100;
-    local $IO::Factotum::skylighting::MAX_SIZE = 700;
+    local $IO::Factotum::Highlight::skylighting::MAX_SIZE = 700;
     like slurp(IO::Factotum::open_input("$dir/big.c")), qr/\e\[/, 'within the limit';
-    local $IO::Factotum::skylighting::MAX_SIZE = 699;
+    local $IO::Factotum::Highlight::skylighting::MAX_SIZE = 699;
     is slurp(IO::Factotum::open_input("$dir/big.c")), "int x;\n" x 100,
 	'a file over the limit is as it is';
-    local $IO::Factotum::skylighting::MAX_SIZE = 0;
+    local $IO::Factotum::Highlight::skylighting::MAX_SIZE = 0;
     like slurp(IO::Factotum::open_input("$dir/big.c")), qr/\e\[/, 'no limit by 0';
 };
 
@@ -122,7 +122,7 @@ subtest 'skylighting: interpreter line' => sub {
 };
 
 subtest 'skylighting: interpreter' => sub {
-    my $interp = \&IO::Factotum::skylighting::interpreter;
+    my $interp = \&IO::Factotum::Highlight::skylighting::interpreter;
     is $interp->("#!/bin/sh\n"), 'sh';
     is $interp->("#!/usr/bin/env perl\n"), 'perl';
     is $interp->("#!/usr/bin/env -S perl -w\n"), 'perl';
@@ -137,19 +137,19 @@ subtest 'skylighting: interpreter' => sub {
 };
 
 subtest 'skylighting: setup twice' => sub {
-    IO::Factotum::skylighting::setup();
+    IO::Factotum::Highlight::skylighting::setup();
     like slurp(IO::Factotum::open_input("$dir/a.c")), qr/\e\[/;
 };
 
 subtest 'skylighting: -M ties ARGV' => sub {
-    my $out = qx{$^X -I"$lib" -MIO::Factotum::skylighting -ne 'print "\$ARGV: \$_"' "$dir/a.c" 2>&1};
+    my $out = qx{$^X -I"$lib" -MIO::Factotum::Highlight::skylighting -ne 'print "\$ARGV: \$_"' "$dir/a.c" 2>&1};
     like $out, qr/^\Q$dir\E\/a\.c: .*\e\[/, 'one-liner reads the colored text';
 };
 
 subtest 'Getopt::EX::Factotum: load' => sub {
     my $script = put 'load.pl', q{
 	use Getopt::EX::Factotum;
-	Getopt::EX::Factotum::load(skylighting => 1);
+	Getopt::EX::Factotum::load(q(Highlight::skylighting) => 1);
 	print tied(*ARGV) ? "tied\n" : "not tied\n";
 	print IO::Factotum::open_input(shift)->getlines;
     };
@@ -161,7 +161,7 @@ subtest 'Getopt::EX::Factotum: load' => sub {
 subtest 'load' => sub {
     my $script = put 'ioload.pl', q{
 	use IO::Factotum;
-	IO::Factotum::load('skylighting');
+	IO::Factotum::load('Highlight::skylighting');
 	print tied(*ARGV) ? "tied\n" : "not tied\n";
 	print IO::Factotum::open_input(shift)->getlines;
     };

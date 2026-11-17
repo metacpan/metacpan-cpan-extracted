@@ -27,14 +27,15 @@ my %WriteMakefileArgs = (
     "Context::Preserve" => "0.03",
     "DBD::Informix" => 0,
     "DBI" => 0,
-    "DBIO" => "0.900004",
+    "DBIO" => "0.900007",
     "namespace::clean" => 0
   },
   "TEST_REQUIRES" => {
+    "Scope::Guard" => 0,
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t t/sqlmaker/limit_dialects/*.t"
   }
@@ -45,7 +46,8 @@ my %FallbackPrereqs = (
   "Context::Preserve" => "0.03",
   "DBD::Informix" => 0,
   "DBI" => 0,
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
+  "Scope::Guard" => 0,
   "Test::Exception" => 0,
   "Test::More" => "0.98",
   "namespace::clean" => 0

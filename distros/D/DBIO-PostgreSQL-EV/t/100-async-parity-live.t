@@ -1,6 +1,7 @@
 use strict;
 use warnings;
 use Test::More;
+use DBIO::Test::Slow;
 
 # LIVE: the one list of ResultSet cases of core (DBIO::Test::AsyncParity,
 # core karr k344), driven twice on the same database -- the synchronous

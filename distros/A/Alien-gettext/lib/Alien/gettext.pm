@@ -1,7 +1,7 @@
 package Alien::gettext;
-# ABSTRACT: Getting latest gettext installed an available
+# ABSTRACT: Find or build the GNU gettext command-line tools
 
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 
 use parent 'Alien::Base';
 
@@ -15,11 +15,11 @@ __END__
 
 =head1 NAME
 
-Alien::gettext - Getting latest gettext installed an available
+Alien::gettext - Find or build the GNU gettext command-line tools
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -31,7 +31,7 @@ version 0.002
 =head1 DESCRIPTION
 
 This distribution provides the GNU gettext utilities via L<Alien::Base>. It
-will either use the system gettext if available and recent enough, or download
+will either use the system gettext if available, or download
 and build it from source.
 
 The gettext utilities include C<msgfmt>, C<msgmerge>, C<xgettext>, and other
@@ -45,7 +45,7 @@ This module inherits all methods from L<Alien::Base>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-alien-gettext/issues>.
 
 =head1 CONTRIBUTING
@@ -54,11 +54,11 @@ Contributions are welcome! Please fork the repository and submit a pull request.
 
 =head1 AUTHOR
 
-Torsten Raudssus <torsten@raudssus.de>
+Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2026 by Torsten Raudssus.
+This software is copyright (c) 2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

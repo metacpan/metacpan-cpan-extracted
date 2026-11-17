@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.15.0';
+our $VERSION = '1.16.0';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn
@@ -35,8 +35,10 @@ our %MEMBERS = (
 );
 # On answers to a key on the free plan only, and so never on a bogon's: false
 # while its organization's daily trial lasts (every field for the first 100
-# lookups each UTC day), true once the answer has Unlimited's.
-our @MARKERS = qw(trial_expired);
+# lookups each UTC day), true once the answer has Unlimited's. cap_reached is
+# its paid-plan twin: false while the answer has every field, true once the
+# organization's overage cap is reached.
+our @MARKERS = qw(trial_expired cap_reached);
 
 my %KNOWN = map { $_ => 1 } 'ip', 'is_bogon', @FLAGS, @DETAILS, @OBJECTS, @MARKERS;
 
@@ -182,6 +184,12 @@ C<undef> when your plan omits them.
 On answers to a key on the free plan only: C<0> while its organization's daily
 trial lasts (every field for the first 100 lookups each UTC day), C<1> once the
 answer has Unlimited's, and C<undef> on any other answer.
+
+=head2 cap_reached
+
+On answers to a key on a paid plan only: C<0> while the answer has every field,
+C<1> once its organization's overage cap is reached and the answer has
+Unlimited's, which is not billed, and C<undef> on any other answer.
 
 =head2 has($field)
 

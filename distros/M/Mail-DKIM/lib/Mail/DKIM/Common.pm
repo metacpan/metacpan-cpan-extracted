@@ -1,7 +1,7 @@
 package Mail::DKIM::Common;
 use strict;
 use warnings;
-our $VERSION = '1.20261105'; # VERSION
+our $VERSION = '1.20261116'; # VERSION
 # ABSTRACT: Common class for Mail::DKIM
 
 # Copyright 2005-2007 Messiah College. All rights reserved.
@@ -182,7 +182,7 @@ Mail::DKIM::Common - Common class for Mail::DKIM
 
 =head1 VERSION
 
-version 1.20261105
+version 1.20261116
 
 =head1 AUTHORS
 

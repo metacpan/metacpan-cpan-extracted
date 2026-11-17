@@ -8,6 +8,7 @@ use Symbol qw(gensym);
 use File::Temp qw(tempdir);
 use File::Spec;
 use FindBin;
+use YAML::XS qw(LoadFile);
 
 my $script = File::Spec->catfile($FindBin::Bin, '..', 'bin', 'extract-schemas');
 ok(-x $script, "$script is executable") if ($^O ne 'MSWin32');
@@ -296,6 +297,62 @@ END_PM
 		or diag("schema content:\n$schema_text");
 	like($schema_text, qr/max:\s*30\b/, 'max constraint resolved from Readonly constant ($MAX_NAME_LEN => 30)')
 		or diag("schema content:\n$schema_text");
+}
+
+# --------------------------------------------------------------------
+# Guard polarity for length comparisons
+#
+# Both forms accept strings of length 5 or more.  The second one used to
+# be read literally as max => 4, so a routine containing both forms got
+# min => 5 and max => 4.
+# --------------------------------------------------------------------
+
+{
+	my $guard_dir    = File::Spec->catdir($tmpdir, 'guard-schemas');
+	my $guard_module = File::Spec->catfile($tmpdir, 'TestLengthGuards.pm');
+
+	open my $gfh, '>', $guard_module or die "Cannot write $guard_module: $!";
+	print $gfh <<'END_PM';
+package TestLengthGuards;
+use Carp qw(croak);
+
+sub unless_guard {
+	my ($class, $text) = @_;
+	croak 'too short' unless length($text) >= 5;
+	return $text;
+}
+
+sub if_guard {
+	my ($class, $text) = @_;
+	croak 'too short' if length($text) < 5;
+	return $text;
+}
+
+sub both_guards {
+	my ($class, $text) = @_;
+	croak 'too short' unless length($text) >= 5;
+	croak 'too short' if length($text) < 5;
+	return $text;
+}
+
+1;
+END_PM
+	close $gfh;
+
+	my ($exit, $out, $err) = run_cmd(
+		$script,
+		'--output-dir', $guard_dir,
+		$guard_module,
+	);
+
+	is($exit, 0, 'length-guard extraction exits cleanly')
+		or diag("stdout: $out\nstderr: $err");
+
+	for my $func (qw(unless_guard if_guard both_guards)) {
+		my $schema = LoadFile(File::Spec->catfile($guard_dir, "$func.yml"));
+		is($schema->{input}{text}{min}, 5, "$func: min is 5");
+		ok(!exists($schema->{input}{text}{max}), "$func: no contradictory max");
+	}
 }
 
 done_testing();

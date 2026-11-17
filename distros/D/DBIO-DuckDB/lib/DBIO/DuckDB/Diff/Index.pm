@@ -4,7 +4,7 @@ package DBIO::DuckDB::Diff::Index;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -111,7 +111,7 @@ DBIO::DuckDB::Diff::Index - Diff operations for DuckDB indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

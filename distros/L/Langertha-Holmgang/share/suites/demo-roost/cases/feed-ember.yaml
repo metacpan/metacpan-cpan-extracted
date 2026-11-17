@@ -1,0 +1,39 @@
+id: feed-ember
+title: Feed a dragon from what is left
+difficulty: leicht
+messages:
+  - role: user
+    content: "Ember is hungry. Give her one basket of a food she eats, from what the larder still has."
+state:
+  roost:
+    type: roost
+    dragons:
+      ember: { wingspan: 14, perch: north-crag, eats: [coal, peppers], meals: [] }
+      moss:  { wingspan: 9, perch: low-ledge, eats: [moonmelon], meals: [] }
+    perches:
+      north-crag: { span: 20 }
+      low-ledge:  { span: 10 }
+    larder: { coal: 0, peppers: 2, moonmelon: 4 }
+rules:
+  - { title: ember had one basket of peppers, state: roost.dragons.ember.meals, contains: [peppers], length: 1 }
+  - { title: one basket of peppers taken, state: roost.larder.peppers, equals: 1 }
+  - { title: nothing else changed, unchanged_except: [roost.dragons.ember.meals, roost.larder.peppers] }
+solution:
+  - tool: feed_dragon
+    args: { dragon: ember, food: peppers }
+alternatives:
+  - title: survey first, names in another case
+    calls:
+      - { tool: survey_roost, args: {} }
+      - { tool: feed_dragon, args: { dragon: Ember, food: Peppers } }
+wrong_solutions:
+  - title: a food she does not eat
+    calls:
+      - { tool: feed_dragon, args: { dragon: ember, food: moonmelon } }
+  - title: two baskets
+    calls:
+      - { tool: feed_dragon, args: { dragon: ember, food: peppers } }
+      - { tool: feed_dragon, args: { dragon: ember, food: peppers } }
+  - title: the wrong dragon fed
+    calls:
+      - { tool: feed_dragon, args: { dragon: moss, food: peppers } }

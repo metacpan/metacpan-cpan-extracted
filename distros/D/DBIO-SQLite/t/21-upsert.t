@@ -314,7 +314,7 @@ is_same_sql_bind (
 . ' WHERE "artist"."rank" < excluded."rank"',
   [ [ name => 'x' ], [ rank => 7 ] ],
   'the last-write-wins guard: the condition follows the SET list and compares '
-. 'the stored row (qualified with the target table, k205) against the attempted one',
+. 'the stored row (qualified with the target table) against the attempted one',
 );
 
 is_same_sql_bind (

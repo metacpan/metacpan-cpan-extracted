@@ -25,16 +25,16 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::Oracle",
   "PREREQ_PM" => {
     "DBD::Oracle" => 0,
-    "DBIO" => "0.900004",
+    "DBIO" => "0.900007",
     "DateTime::Format::Oracle" => 0,
-    "Math::Base36" => "0.07"
+    "Math::Base36" => "0.14"
   },
   "TEST_REQUIRES" => {
     "Data::Dumper::Concise" => 0,
     "Test::Exception" => "0.43",
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t t/sqlmaker/limit_dialects/*.t"
   }
@@ -43,10 +43,10 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "DBD::Oracle" => 0,
-  "DBIO" => "0.900004",
+  "DBIO" => "0.900007",
   "Data::Dumper::Concise" => 0,
   "DateTime::Format::Oracle" => 0,
-  "Math::Base36" => "0.07",
+  "Math::Base36" => "0.14",
   "Test::Exception" => "0.43",
   "Test::More" => "0.98"
 );

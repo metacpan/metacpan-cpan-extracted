@@ -7,7 +7,7 @@ use Dist::Zilla::Tester;
 use Digest::MD5 ();
 use Software::License::Perl_5;
 
-# Pins DBIO::LicenseFile (k18): the LICENSE stays a committed file that
+# Pins DBIO::LicenseFile: the LICENSE stays a committed file that
 # Git::GatherDir gathers; the plugin only checks it, and breaks the build when
 # it is missing or not the text the dist is supposed to carry.
 #

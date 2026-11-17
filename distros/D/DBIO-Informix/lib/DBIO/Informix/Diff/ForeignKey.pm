@@ -4,7 +4,7 @@ package DBIO::Informix::Diff::ForeignKey;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -240,7 +240,7 @@ DBIO::Informix::Diff::ForeignKey - Diff operations for Informix foreign keys
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::Sybase::Storage::FreeTDS;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Sybase::Storage/;
 use mro 'c3';
@@ -129,7 +129,7 @@ DBIO::Sybase::Storage::FreeTDS - Base class for drivers using DBD::Sybase over F
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

@@ -4,7 +4,7 @@ package DBIO::Oracle::Storage::FKDeferral;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Util qw( scope_guard );
 use Context::Preserve 'preserve_context';
@@ -39,7 +39,7 @@ DBIO::Oracle::Storage::FKDeferral - FK constraint deferral for Oracle
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

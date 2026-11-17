@@ -3,7 +3,7 @@ package IO::Factotum;
 use v5.16;
 use warnings;
 
-our $VERSION = "0.03";
+our $VERSION = "0.04";
 
 use Carp;
 use IO::File;
@@ -158,7 +158,7 @@ IO::Factotum - read files through a converter chosen by their names
 
 =head1 VERSION
 
-Version 0.03
+Version 0.04
 
 =head1 DESCRIPTION
 
@@ -231,7 +231,7 @@ Register the converters of the modules C<IO::Factotum::>I<name>, by
 calling their C<setup> function.  It dies when there is no such
 module.
 
-    IO::Factotum::load('skylighting');
+    IO::Factotum::load('Highlight::skylighting');
 
 =item B<tie_argv>()
 
@@ -254,10 +254,29 @@ not supported.
 
 =back
 
+=head1 CONVERTERS
+
+The converters which come with this module are under
+C<IO::Factotum::Highlight>.  They color source files by their syntax.
+
+=over 4
+
+=item L<IO::Factotum::Highlight::skylighting> (C<Highlight::sky>)
+
+by the C<skylighting> command, the highlighter of pandoc
+
+=item L<IO::Factotum::Highlight::sourcehighlight> (C<Highlight::gnu>)
+
+by the C<source-highlight> command of GNU Source-highlight
+
+=back
+
+    IO::Factotum::load('Highlight::sky');
+
 =head1 SEE ALSO
 
-L<IO::Factotum::skylighting>, L<IO::Factotum::sourcehighlight>,
-L<Getopt::EX::Factotum>
+L<IO::Factotum::Highlight::skylighting>,
+L<IO::Factotum::Highlight::sourcehighlight>, L<Getopt::EX::Factotum>
 
 L<Command::Run>
 

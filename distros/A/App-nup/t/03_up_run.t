@@ -134,7 +134,9 @@ SH
     # The arrow keys, and ESC-) and ESC-( with the same actions, scroll
     # to the right and to the left, H, L, g, G, < and > go to the ends,
     # and space and b move by the panes on the screen: a count of ESC-)
-    # and ESC-( with --align-shift, them as many times without
+    # and ESC-( with --align-shift, them as many times without.  So
+    # do j and k and the down and up arrows: the pages have the height
+    # of the screen, and there is nothing to scroll down to.
     my $on_screen = sub { my $w = shift; int($width / $fit->($w)) };
     my $keys = sub {
         my($right, $align) = @_;
@@ -143,13 +145,37 @@ SH
         my $end = $align ? "noaction ${n}L" : 'end-scroll';
         "h left-scroll;l $right;, left-scroll;. $right;\\kl left-scroll;\\kr $right;\\e( left-scroll;\\e) $right;H no-scroll;L end-scroll;"
         . "g no-scroll;G $end;< no-scroll;> $end;"
-        . "\\  noaction $fwd;b noaction $back";
+        . "\\  noaction $fwd;b noaction $back;"
+        . "j noaction $fwd;k noaction $back;\\kd noaction $fwd;\\ku noaction $back;"
+        . "d noaction $fwd;u noaction $back;^D noaction $fwd;^U noaction $back;"
+        . "\\r noaction $fwd;\\n noaction $fwd;"
+        . "J $end;K no-scroll";
     };
     like(optex('-Mup', '--lateral', '-S20', @cmd)->run->stdout,
          qr/^KEYS: \Q@{[ $keys->('right-scroll', 0) ]}\E$/m,
          'keys are given to less');
-    like(optex('-Mup', @cmd)->run->stdout,
-         qr/^KEYS: $/m, 'no keys without --lateral');
+    # Without --lateral, the pages fill the screen and go on below:
+    # the keys to go down and up move by the screen as space and b.
+    # Without pages, they move by the line as usual.
+    my $page_keys = 'j forw-screen;k back-screen;\\kd forw-screen;\\ku back-screen;d forw-screen;u back-screen;^D forw-screen;^U back-screen;\\r forw-screen;\\n forw-screen;J goto-end;K goto-line';
+    like(optex('-Mup', '-C2', @cmd)->run->stdout,
+         qr/^KEYS: \Q$page_keys\E$/m, 'keys of the pages without --lateral');
+    like(optex('-Mup', '-C2', '--no-paginate', @cmd)->run->stdout,
+         qr/^KEYS: $/m, 'no keys without pages');
+    like(optex('-Mup', '-C1', '-A', @cmd)->run->stdout,
+         qr/^KEYS: $/m, 'no keys with one pane and --auto-paginate');
+    {
+        local $ENV{LESSKEY_CONTENT} = 'x quit';
+        like(optex('-Mup', '-C2', @cmd)->run->stdout,
+             qr/^KEYS: x quit\n#command\n\Q$page_keys\E$/m,
+             'keys of the pages are added to LESSKEY_CONTENT of the user');
+        local $ENV{NUP_LESSKEY} = '';
+        like(optex('-Mup', '-C2', @cmd)->run->stdout,
+             qr/^KEYS: x quit$/m, 'no keys of the pages with empty NUP_LESSKEY');
+        $ENV{NUP_LESSKEY} = 'y quit';
+        like(optex('-Mup', '-C2', @cmd)->run->stdout,
+             qr/^KEYS: x quit$/m, 'NUP_LESSKEY is for --lateral');
+    }
     {
         # The keys go after the LESSKEY_CONTENT of the user, in a
         # #command section, so that they win over the same keys there
@@ -281,6 +307,59 @@ subtest 'device and output' => sub {
     unlike $geom->('-T a4p'), qr/hello/, '--geometry does not run the command';
     like $geom->("-o $dir/g.txt"), qr/^\d+ \d+ tty$/, '--geometry -o FILE is tty';
     ok !-e "$dir/g.txt", '--geometry writes no file for tty';
+};
+
+# --highlight gives ansicolumn the option to read the files through
+# skylighting
+subtest 'highlight' => sub {
+    my $dir = File::Temp::tempdir(CLEANUP => 1);
+    # an ansicolumn which shows its arguments
+    open my $fh, '>', "$dir/ansicolumn" or die;
+    print $fh qq{#!/bin/sh\nprintf '[%s]' "\$@"\n};
+    close $fh;
+    chmod 0755, "$dir/ansicolumn" or die;
+    local $ENV{PATH} = "$dir:$ENV{PATH}";
+
+    # without IO::Factotum, --highlight does nothing: ansicolumn would
+    # fail by the option
+  SKIP: {
+        skip 'IO::Factotum::Highlight::skylighting is installed', 1
+            if grep { -f "$_/IO/Factotum/Highlight/skylighting.pm" } @INC, split /:/, $ENV{PERL5LIB} // '';
+        unlike run('-Mup --highlight=skylighting --no-pager -- ansicolumn FILE')->stdout,
+            qr/highlight/, 'not without the highlighter';
+    }
+
+    # with it: the module files are only looked for, not loaded
+    my $module = sub {
+        my $file = "$dir/lib/" . shift;
+        open my $fh, '>', $file or die "$file: $!";
+        print $fh "die 'not to be loaded';\n";
+        close $fh;
+    };
+    mkdir "$dir/lib" and mkdir "$dir/lib/IO" and mkdir "$dir/lib/IO/Factotum"
+        and mkdir "$dir/lib/IO/Factotum/Highlight" or die;
+    $module->('IO/Factotum.pm');
+    $module->('IO/Factotum/Highlight/skylighting.pm');
+    local $ENV{PERL5LIB} = join ':', "$dir/lib", $ENV{PERL5LIB} // ();
+
+    like run('-Mup --highlight=skylighting --no-pager -- ansicolumn FILE -w 100')->stdout,
+        qr/\A\[--highlight=skylighting\]\[--bs=.*\[FILE\]\[-w\]\[100\]\z/,
+        'ansicolumn gets --highlight';
+
+    # the highlighter of the name has to be there
+  SKIP: {
+        skip 'IO::Factotum::Highlight::gnu is installed', 1
+            if grep { -f "$_/IO/Factotum/Highlight/gnu.pm" } @INC, split /:/, $ENV{PERL5LIB};
+        unlike run('-Mup --highlight=gnu --no-pager -- ansicolumn FILE')->stdout,
+            qr/highlight/, 'not without the highlighter of the name';
+    }
+    $module->('IO/Factotum/Highlight/gnu.pm');
+    like run('-Mup --highlight=gnu --no-pager -- ansicolumn FILE')->stdout,
+        qr/\A\[--highlight=gnu\]/, 'the name is given as it is';
+    unlike run('-Mup --no-pager -- ansicolumn FILE')->stdout, qr/highlight/,
+        'not without --highlight';
+    unlike run('-Mup --highlight=skylighting --no-pager -- echo hello')->stdout, qr/highlight/,
+        'not in command mode';
 };
 
 like run('-Mup --geometry -- echo hello')->stdout, qr/\A\d+ \d+ tty\n\z/, '--geometry on the terminal';

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 use File::Temp ();
 
 # OFFLINE tripwire for the ADR 0004 hard boundary (karr k15 point 8): this dist
@@ -49,6 +51,8 @@ use DBIO::Async::Storage;
 use DBIO::Async::Pool;
 use DBIO::Async::TransactionContext;
 use Future;
+use lib 't/lib';
+use ChannelPair;    # test helper: a socketpair, never a pipe (no DBD involved)
 
 # Not only loadable -- usable. A lazy `require DBD::Whatever` on the query path
 # would survive a load-only check and still couple this dist to a DBD, so the
@@ -65,7 +69,7 @@ use Future;
   sub _conn_fileno              { fileno $_[1]{r} }
 
   sub _create_pool_connection {
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { r => $r, w => $w };
   }

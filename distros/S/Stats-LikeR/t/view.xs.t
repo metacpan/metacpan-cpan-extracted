@@ -377,4 +377,43 @@ unless ($INC{'Devel/Cover.pm'}) {
 	close $fh;
 }
 
+# A key perl stores downgraded (a UTF-8 "é" held as the byte E9, flagged
+# HVhek_WASUTF8) is the UTF-8 string keys() gives back.  Up to 0.3422 the
+# HoH row labels and the AoH, HoA and HoH column names were read from the
+# stored bytes and printed a lone E9, while a flat hash printed C3 A9.
+{
+	my $k = "\x{e9}";
+	utf8::upgrade($k);
+	my $lone = qr/(?<!\xC3)\xE9/;	# an E9 byte that is not the end of a UTF-8 é
+	for my $case (
+		[ 'AoH column', [ { $k => 5 } ] ],
+		[ 'HoA column', { $k => [5] } ],
+		[ 'HoH column', { r => { $k => 1 } } ],
+		[ 'HoH row label', { $k => { a => 1 }, b => { a => 2 } } ],
+		[ 'HoH row label, among n of many', { $k => { a => 1 }, map { ($_ => { a => 2 }) } 'a' .. 'z' }, n => 30 ],
+		# every key past ASCII, so a downgraded one can displace a kept one in the heap
+		[ 'HoH row label, kept by the heap', { map { my $x = "\x{e9}$_"; utf8::upgrade($x); ($x => { a => 1 }) } 'a' .. 'z' }, n => 3 ],
+		[ 'flat hash', { $k => 5 } ],
+	) {
+		my ($name, $df, @o) = @$case;
+		my $out = plain($df, @o);
+		like($out, qr/\xC3\xA9/, "a downgraded UTF-8 key prints as UTF-8: $name");
+		unlike($out, $lone, "and not as its Latin-1 byte: $name");
+	}
+	my $heap = { map { my $x = "\x{e9}$_"; utf8::upgrade($x); ($x => { a => 1 }) } 'a' .. 'z' };
+	is_deeply([ labels(plain($heap, n => 3)) ], [ map { "\xC3\xA9$_" } qw(a b c) ],
+		'the heap keeps the first three downgraded keys, in order');
+	no_leaks_ok {
+		plain([ { $k => 5 }, { $k => 6, b => 1 } ]);
+		plain($heap, n => 3);
+	} 'a downgraded UTF-8 key: no memory leaks';
+}
+
+# A gap no buffer can hold is a croak, not perl's "Out of memory" exit.
+# 2**48 bytes is more than a 64-bit address space maps, so no machine grants
+# it (see "Whether an allocation fails" in CLAUDE.md); where size_t is 32 bits
+# the gap saturates and the size check before the probe refuses it.
+throws_ok { plain([ [ 1, 2 ] ], gap => 2**48) } qr/view: the table is too large to render/,
+	'a gap of 2**48 spaces is refused with a croak';
+
 done_testing;

@@ -184,7 +184,7 @@ my $tables = { ORDERS => { table_name => 'ORDERS', kind => 'table', schema => $S
   is($c[1]{default_value}, 'new', 'quoted literal default unquoted');
   is(ref $c[2]{default_value}, 'SCALAR', 'sysdate default is an expression ref');
   is(${ $c[2]{default_value} }, 'current_timestamp', 'sysdate -> current_timestamp');
-  ok(!defined $c[3]{default_value}, 'DEFAULT NULL is no default (karr k63)');
+  ok(!defined $c[3]{default_value}, 'DEFAULT NULL is no default');
 
   is($c[0]{is_auto_increment}, 1, 'ID auto_increment from trigger');
   is($c[0]{sequence}, 'TESTUSER.ORDERS_SEQ', 'sequence parsed from trigger body');
@@ -205,8 +205,8 @@ my $tables = { ORDERS => { table_name => 'ORDERS', kind => 'table', schema => $S
     } },
   ]);
   my $c = DBIO::Oracle::Introspect::Columns->fetch($dbh, $SCHEMA, $tables)->{ORDERS}[0];
-  is($c->{is_auto_increment}, 1, 'a quoted :new."col" of the install trigger is auto_increment (karr k42)');
-  is($c->{sequence}, "$SCHEMA.orders_id_seq", '... with its sequence, in the spelling the trigger quotes (karr k61)');
+  is($c->{is_auto_increment}, 1, 'a quoted :new."col" of the install trigger is auto_increment');
+  is($c->{sequence}, "$SCHEMA.orders_id_seq", '... with its sequence, in the spelling the trigger quotes');
 }
 
 # The model spells names as the server has them (karr k61): a bare name is

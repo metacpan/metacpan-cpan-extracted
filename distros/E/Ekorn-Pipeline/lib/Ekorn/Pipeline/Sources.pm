@@ -18,7 +18,9 @@ our @CARP_NOT = @Ekorn::Pipeline::Errors::INTERNAL;
 sub from_array (@values) {
     return source {
         my $i = 0;
-        return sub () { $i < @values ? $values[$i++] : () };
+
+        # Without a signature, as it's called for each value.
+        return sub { $i < @values ? $values[$i++] : () };
     };
 }
 
@@ -50,7 +52,9 @@ sub counter ($start = 1, $step = 1) {
         unless looks_like_number($start) && looks_like_number($step);
     return source {
         my $next = $start;
-        return sub () { my $n = $next; $next += $step; return $n };
+
+        # Without a signature, as it's called for each value.
+        return sub { my $n = $next; $next += $step; return $n };
     };
 }
 
@@ -59,7 +63,8 @@ sub counter ($start = 1, $step = 1) {
 # each read, with $/ taken off. With $/ undefined, what's left is one
 # record, and an empty file none, where readline gives an empty string.
 sub _records ($fh) {
-    return sub () {
+    # Without a signature, as it's called for each value.
+    return sub {
         my $read = readline $fh;
         return if !defined $read || (!defined $/ && $read eq '');
         chomp $read;

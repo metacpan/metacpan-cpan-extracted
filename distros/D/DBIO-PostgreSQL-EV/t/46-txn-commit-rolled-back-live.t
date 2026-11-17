@@ -95,7 +95,9 @@ sub other_session {
 
 # A pool of one with its connection up, over a fresh table holding $TAKEN.
 sub fresh {
-  my $h   = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 1 });
+  # lc_messages 'C': the test reads the server's English wording (the language
+  # of a message is the session's lc_messages, DBIO_TEST_SERVER_LANGUAGE sets it).
+  my $h   = DBIO::PostgreSQL::EV::TestHarness->new(connect_attrs => { pool_size => 1, on_connect_do => [ q{SET lc_messages = 'C'} ] });
   my $dbh = other_session($h);
   $dbh->do("DROP TABLE IF EXISTS $TABLE");
   $dbh->do("CREATE TABLE $TABLE (id serial PRIMARY KEY, name text NOT NULL UNIQUE)");

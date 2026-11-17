@@ -22,7 +22,6 @@ WriteMakefile(
 	EXE_FILES => [
 		'bin/test-generator-mutate',
 		'bin/benchmark-generator',
-		'bin/demo_extractor',
 		'bin/deploy-workflows',
 		'bin/fuzz-harness-generator',
 		'bin/extract-schemas',
@@ -128,11 +127,7 @@ WriteMakefile(
 				web => 'https://github.com/nigelhorne/App-Test-Generator',
 				# license => 'http://dev.perl.org/licenses/',
 			}, bugtracker => {
-				mailto => 'bug-App-Test-Generator@rt.cpan.org',
-				web => 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator',
-				url => 'https://rt.cpan.org/Public/Dist/Display.html?Name=App-Test-Generator',
-				# url => 'https://github.com/nigelhorne/App-Test-Generator/issues',
-				# web => 'https://github.com/nigelhorne/App-Test-Generator/issues'
+				web => 'https://github.com/nigelhorne/App-Test-Generator/issues',
 			}
 		},
 	},

@@ -4,7 +4,7 @@ package DBIO::Oracle::Introspect::Keys;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 
@@ -24,7 +24,8 @@ sub fetch {
     WHERE c.owner = ?
       AND c.constraint_type IN ('P', 'U')
       AND c.table_name NOT LIKE 'BIN$%'
-    ORDER BY c.table_name, c.constraint_type, c.constraint_name, cc.position
+    ORDER BY NLSSORT(c.table_name, 'NLS_SORT=BINARY'), c.constraint_type,
+             NLSSORT(c.constraint_name, 'NLS_SORT=BINARY'), cc.position
   });
   $sth->execute($schema);
 
@@ -71,7 +72,7 @@ DBIO::Oracle::Introspect::Keys - Introspect Oracle primary key and unique constr
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -80,6 +81,10 @@ C<all_constraints> and C<all_cons_columns>. The L<DBIO::Oracle::Introspect::Inde
 submodule deliberately excludes constraint-backed indexes, so this module is
 the source of primary/unique key information for the normalized generation
 contract in L<DBIO::Introspect::Base>.
+
+Tables, constraints and their names are read in binary order by name, in every
+session language (not by the C<NLS_SORT> of the session); the columns of a
+constraint follow C<position>.
 
 =head1 METHODS
 

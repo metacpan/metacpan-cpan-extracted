@@ -4,7 +4,7 @@ package DBIO::HashAccessor;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use parent 'DBIO::Row';
 
@@ -152,7 +152,7 @@ DBIO::HashAccessor - Accessor methods for serialized hash columns
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -29,6 +29,9 @@ use DiffTempDbProbe qw(temp_db_skip_reason);
 
 my $DB = "dbio_k84_$$";
 my $raw = DBI->connect($dsn, $user, $pass, { AutoCommit => 1, RaiseError => 1, PrintError => 0 });
+# MySQL reports in the language of the session; is_refused reads the English
+# "foreign key constraint fails".
+$raw->do("SET SESSION lc_messages = 'en_US'");
 
 sub drop_database { local $raw->{Warn} = 0; $raw->do("DROP DATABASE IF EXISTS `$DB`") }
 END { if ($raw) { local ($@, $?); eval { drop_database() } } }

@@ -1,7 +1,7 @@
 # ABSTRACT: Find or build libgit2, the linkable Git library
 
 package Alien::Libgit2;
-our $VERSION = '0.002';
+our $VERSION = '0.003';
 use strict;
 use warnings;
 use parent 'Alien::Base';
@@ -20,7 +20,7 @@ Alien::Libgit2 - Find or build libgit2, the linkable Git library
 
 =head1 VERSION
 
-version 0.002
+version 0.003
 
 =head1 SYNOPSIS
 
@@ -98,7 +98,7 @@ L<Git::Libgit2>, L<Git::Native>, L<Alien::Build>, L<Alien::Base>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-alien-libgit2/issues>.
 
 =head1 CONTRIBUTING

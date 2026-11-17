@@ -1,7 +1,9 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900004';
+requires 'DBIO', '0.900007';
 # Loaded directly, so declared directly rather than left to DBIO's closure.
-requires 'DBI', '1.57';                # Test.pm (use DBI)
+# 1.634, as the other DBIO dists ask; older DBI releases such as 1.57 do not
+# build on current perls.
+requires 'DBI', '1.634';               # Test.pm (use DBI)
 requires 'Try::Tiny', '0.32';          # Storage.pm
 requires 'namespace::clean', '0.27';   # Storage.pm, Storage/TxnScopeGuard.pm
 # Test.pm requires SQL::Abstract::Test lazily (is_same_sql_bind); t/ uses it.
@@ -11,9 +13,9 @@ requires 'SQL::Abstract', '2.000002';  # Test.pm
 # native DBD::ClickHouse on CPAN, so the driver rides a MySQL-wire DBD.
 # DBD::mysql is the standard: it sends no SQL at all on connect, so it works
 # against a STOCK ClickHouse server (and ClickHouse Cloud) with no server-side
-# accommodation -- verified live (karr k15: 33 files / 1035 tests against
-# 25.3.14.14). DBD::MariaDB is supported but needs custom_settings_prefixes
-# registered on the server (it sends SET character_set_server on every connect,
+# accommodation, verified live against 25.3.14.14. DBD::MariaDB is supported
+# but needs custom_settings_prefixes registered on the server (it sends SET
+# character_set_server on every connect,
 # which a stock server rejects), so it is only for servers whose config you
 # control. Connect with mysql_enable_utf8mb4 => 1 or DBD::mysql hands back
 # bytes; DBD::MariaDB decodes unconditionally. See

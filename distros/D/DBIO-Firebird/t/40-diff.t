@@ -64,7 +64,7 @@ use_ok 'DBIO::Firebird::Diff';
   # fails when the table it points at is created later in the same diff, and
   # a cycle cannot be written at all. It is an ALTER after every table
   # (t/69-diff-constraints.t).
-  unlike($sql, qr/FOREIGN KEY/, 'CREATE TABLE carries no foreign key (karr k34)');
+  unlike($sql, qr/FOREIGN KEY/, 'CREATE TABLE carries no foreign key');
 }
 
 # --- Diff::Table multi-column PK ---

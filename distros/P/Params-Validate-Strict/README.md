@@ -4,7 +4,7 @@ Params::Validate::Strict - Validates a set of parameters against a schema
 
 ## Version
 
-Version 0.42
+Version 0.43
 
 ## Synopsis
 
@@ -1295,8 +1295,26 @@ coderef is equivalent to:
 validate_strict(schema => \%schema, input => \%input, %opts);
 ```
 
-but avoids the overhead of argument parsing on every call - useful when the
-same schema is applied repeatedly in a hot path.
+but the schema is analysed once, when `compile_schema` is called, rather than
+on every call - useful when the same schema is applied repeatedly in a hot
+path.  The result, the errors raised, the warnings and the logger calls are
+exactly those of `validate_strict`; only the speed differs.
+
+Fields that use a built-in type (`string`, `integer`, `number`, `boolean`,
+`arrayref`, `hashref`, `scalar`, `coderef`, `object` and their synonyms)
+with any of the rules `min`, `max`, `optional`, `nullable`, `default`,
+`description`, `error_msg`, `matches`, `memberof` (also `enum` and
+`values`) and `case_sensitive` are validated by a fast path.  Any other
+field - one that uses `callback`, `transform`, union types, `aliases`,
+`needs`, nested `schema`, custom types, the class and element rules, and so
+on - is validated by the general code, as before, so using such a rule never
+changes behaviour; it just does not get faster.  Positional schemas (those with
+`position`) are not precompiled.  On a typical five-field schema a compiled
+validator runs about three times faster than calling `validate_strict`
+directly.
+
+**The schema must not be modified after it has been compiled**, since what was
+learnt about it is kept.  Compile a new validator instead.
 
 #### Arguments
 

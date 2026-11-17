@@ -3,7 +3,7 @@ package DBIO::GraphQL::Limits;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use Scalar::Util ();
 
@@ -205,7 +205,7 @@ DBIO::GraphQL::Limits - Check a GraphQL document for cycles, depth and cost befo
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 METHODS
 

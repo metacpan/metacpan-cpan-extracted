@@ -1,17 +1,36 @@
 Tie::Cache::Autoupdater
---------------
-Sometimes I need show in web rarely changes data. You may save it in memory, 
-but you never don't know how long script will be work. For example, fcgi scripts
-may work few days or weeks, but counters of database tables or site settings may 
-changed more frequent in the day, each hour or each 10 minutes. I wrote package,
-that help you cached data on fixed time.
+-----------------------
+A tied hash whose values refresh themselves on a timeout.
 
-COPYRIGHT
----------
-Copyright 2011 by the Anton Morozov (antonfin)
+Long-running processes - FastCGI workers, daemons, queue consumers - often need
+data that changes rarely, but not never: site settings, row counters, a price
+list, a feature flag. Fetching it from the database on every request is
+wasteful, and fetching it once at start-up is wrong, because the process may
+stay alive for days while the data behind it changes every few minutes.
 
-This program is free software; you can redistribute it and/or modify it
-under the same terms as Perl itself.
+This module ties a hash to a set of named data sources. You register a key with
+a subroutine and a timeout, and from then on reading that key gives you the
+cached value until the timeout expires; the first read after that calls the
+subroutine again and caches the new result.
+
+    use Tie::Cache::Autoupdater;
+
+    tie my %cache, 'Tie::Cache::Autoupdater',
+        settings => { source => \&read_settings_from_db, timeout => 60 },
+        counters => { source => \&count_table_rows,      timeout => 10 };
+
+    my $settings = $cache{settings};
+
+See the module documentation for the full description:
+
+    perldoc Tie::Cache::Autoupdater
+
+REQUIREMENTS
+------------
+Perl and the core modules Storable and, optionally, Time::HiRes - the latter is
+used for fractional timeouts when it is available.
+
+Tested on perl 5.26 through 5.42.
 
 HOW TO BUILD
 ------------
@@ -23,3 +42,10 @@ HOW TO INSTALL
 --------------
 make install
 
+COPYRIGHT
+---------
+Copyright 2011-2026 by Anton Morozov (antonfin)
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See the LICENSE file for the full text.

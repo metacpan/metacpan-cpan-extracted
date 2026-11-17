@@ -4,7 +4,7 @@ package DBIO::Storage::Pool;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp 'croak';
 use namespace::clean;
@@ -43,7 +43,7 @@ DBIO::Storage::Pool - Abstract connection pool interface for async storage
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

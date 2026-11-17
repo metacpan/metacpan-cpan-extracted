@@ -4,7 +4,7 @@ package DBIO::MSSQL::Storage::ODBC;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/
   DBIO::Storage::DBI::ODBC
@@ -59,6 +59,27 @@ sub _run_connection_actions {
   }
 
   return $self->next::method(@_);
+}
+
+# The text of DBD::ODBC carries no server message number, and the words of a
+# message change with the language of the session. The diagnostic records of
+# the failing handle do carry it, and they are gone once the handler is left,
+# so they are put where the masking of the text (_mask_error_values) finds
+# them. A handle without records (a $dbh->do with binds) leaves the SQLSTATE
+# behind the text to decide.
+sub _dbi_handle_error {
+  my ($self, $msg, $h) = @_;
+
+  my @diag;
+  if (Scalar::Util::blessed($h) and $h->can('odbc_getdiagrec')) {
+    for my $i (1 .. 20) {
+      my @rec = eval { $h->odbc_getdiagrec($i) } or last;
+      push @diag, [ $rec[1], $rec[2] ] if defined $rec[1] and defined $rec[2];
+    }
+  }
+
+  local $self->{_dbio_server_diag} = \@diag;
+  return $self->next::method($msg, $h, @_[3 .. $#_]);
 }
 
 # karr k58. The columns a Unicode value is bound for (see STRINGS BEYOND THE
@@ -324,7 +345,7 @@ DBIO::MSSQL::Storage::ODBC - Support for Microsoft SQL Server via DBD::ODBC
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

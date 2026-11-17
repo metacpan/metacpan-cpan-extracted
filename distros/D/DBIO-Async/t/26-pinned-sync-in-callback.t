@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 use Future;
 use Future::IO;
@@ -81,7 +83,7 @@ use DBIO::Async::TransactionContext;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w };
   }
@@ -137,14 +139,7 @@ sub new_storage {
 sub bounded {
   my ($code) = @_;
   my @result;
-  my $ok = eval {
-    local $SIG{ALRM} = sub { die "deadlock: timed out\n" };
-    alarm 10;
-    @result = $code->();
-    alarm 0;
-    1;
-  };
-  alarm 0;
+  my $ok = eval { @result = within(10, $code); 1 };
   return $ok ? (1, @result) : (0, $@);
 }
 
@@ -300,7 +295,7 @@ is refaddr(DBIO::Async::TransactionContext->can('select')),
 
   TODO: {
     local $TODO = 'a synchronous statement blocked in a callback cannot pass '
-                . 'statements issued before it (karr k34)';
+                . 'statements issued before it';
     ok $ok, 'behind a waiting statement: the synchronous statement completes'
       or diag $r[0];
     is $r[0], 'all', 'behind a waiting statement: ... and the transaction resolves';

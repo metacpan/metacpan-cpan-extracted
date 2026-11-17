@@ -190,9 +190,9 @@ my %target = (
 
   # The claims one by one, each for the failure it stands against.
   comes_before($diff, qr/^DROP TABLE old_ns\.gone;/, qr/^DROP SCHEMA old_ns;/,
-    'k109: the table is dropped before the schema it is in');
+    'the table is dropped before the schema it is in');
   comes_before($diff, qr/^DROP TRIGGER gone_trg ON old_ns\.gone;/, qr/^DROP TABLE old_ns\.gone;/,
-    'k109: a trigger is dropped before its table');
+    'a trigger is dropped before its table');
   comes_before($diff, qr/^DROP POLICY gone_pol ON old_ns\.gone;/, qr/^DROP TABLE old_ns\.gone;/,
     'a policy is dropped before its table');
   comes_before($diff, qr/^DROP TRIGGER keep_old_trg ON public\.keep;/, qr/^DROP FUNCTION old_ns\.old_fn\(\);/,
@@ -202,18 +202,18 @@ my %target = (
   comes_before($diff, qr/^ALTER TABLE public\.keep DROP COLUMN old_col;/, qr/^DROP TYPE old_ns\.old_type;/,
     'a column is dropped before the type it has');
   comes_before($diff, qr/^DROP FUNCTION old_ns\.old_fn\(\);/, qr/^DROP EXTENSION old_ext;/,
-    'k108: an extension is dropped after whatever may hang on it');
+    'an extension is dropped after whatever may hang on it');
   comes_before($diff, qr/^DROP EXTENSION old_ext;/, qr/^DROP SCHEMA old_ns;/,
-    'k106: an extension is dropped before a schema');
+    'an extension is dropped before a schema');
   comes_before($diff, qr/^CREATE SCHEMA new_ns;/, qr/^CREATE EXTENSION IF NOT EXISTS new_ext;/,
-    'k106: a schema is created before the extension that is installed into it');
+    'a schema is created before the extension that is installed into it');
   comes_before($diff, qr/^CREATE EXTENSION IF NOT EXISTS new_ext;/, qr/^CREATE TYPE new_ns\.new_type/,
     'an extension is created before the types, functions and tables that may use what it brings');
   comes_before($diff, qr/^CREATE POLICY keep_new_pol/, qr/^DROP POLICY gone_pol/,
     'the last thing created comes before the first thing dropped');
 
   unlike($diff->as_sql, qr/DROP INDEX old_ns\.gone_idx/,
-    'k32 still holds: the index of a dropped table is left to DROP TABLE ... CASCADE');
+    'the index of a dropped table is left to DROP TABLE ... CASCADE');
 
   # summary and as_sql are the same operations in the same order.
   my @sql     = split /\n/, $diff->as_sql;

@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 # OFFLINE test for karr k30 on IO::Async: a blocking call that waits for a pool
 # connection waits there too, driving the IO::Async loop through the
@@ -41,7 +43,7 @@ use DBIO::Async::Pool;
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     return { id => ++$self->{_next_id}, r => $r, w => $w };
   }
@@ -76,7 +78,7 @@ my $held = $storage->_query_async('SELECT held', []);
 is_deeply $storage->{wire}, [ [ 'SELECT held', 1 ] ],
   'io-async: the async query holds the one connection';
 
-my $got = eval { [ $storage->_query_async('SELECT sync', [])->get ] };
+my $got = eval { [ within(15, sub { $storage->_query_async('SELECT sync', [])->get }) ] };
 is $@, '', 'io-async: the blocking call waiting for the pool does not croak';
 is_deeply $got, [ [ 'row', 1 ] ],
   'io-async: ... it waited its turn and got the answer on the freed connection';

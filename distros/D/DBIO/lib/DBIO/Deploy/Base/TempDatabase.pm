@@ -4,7 +4,7 @@ package DBIO::Deploy::Base::TempDatabase;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Deploy::Base';
 
@@ -165,7 +165,7 @@ DBIO::Deploy::Base::TempDatabase - Deploy base for drivers that diff against a t
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

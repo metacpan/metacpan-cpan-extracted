@@ -107,7 +107,7 @@ ok(scalar(grep { /"mydb":informix\.systables/ } @{ $dbh->{sql} }),
 # (b) model read from the canned catalog
 my %col = map { $_->{column_name} => $_ } @{ $model->{columns}{book} };
 
-is($model->{tables}{book}{primary_key_name}, 'u10_2', 'the primary key name is read, blanks trimmed (karr k28)');
+is($model->{tables}{book}{primary_key_name}, 'u10_2', 'the primary key name is read, blanks trimmed');
 is($col{id}{not_null}, 1,    'coltype >= 256 -> not_null');
 is($col{title}{not_null}, 0, 'plain coltype -> nullable');
 is($col{id}{data_type}, 'serial', 'type is coltype % 256');

@@ -4,7 +4,7 @@ package DBIO::MySQL::Test::Conformance;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Test::Conformance';
 
@@ -325,7 +325,7 @@ DBIO::MySQL::Test::Conformance - Answers the shared conformance case table for t
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

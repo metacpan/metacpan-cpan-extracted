@@ -3,7 +3,7 @@ package DBIO::Test::Schema::PunctuatedColumnName;
 
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use strict;
 
@@ -48,7 +48,7 @@ DBIO::Test::Schema::PunctuatedColumnName - Test result class for columns with pu
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

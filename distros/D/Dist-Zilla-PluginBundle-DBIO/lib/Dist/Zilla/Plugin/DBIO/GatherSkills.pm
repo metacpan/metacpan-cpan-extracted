@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::DBIO::GatherSkills;
 # ABSTRACT: Ship a distribution's own agent skills as a sharedir (share/skills/)
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 use Moose;
 use Path::Tiny;
 use Dist::Zilla::File::InMemory;
@@ -64,12 +64,12 @@ sub gather_files {
       next unless $file->is_file;
       # skilletor writes a per-skill .gitignore (content "*") into every
       # installed skill dir; it is management state, not skill content, and must
-      # never be shipped into the tarball. Everything else ships unchanged.
+      # never be shipped into the tarball. Everything else ships byte for byte.
       next if $file->basename eq '.gitignore';
       my $rel = $file->relative($base);          # e.g. dbio-db2/SKILL.md
       $self->add_file(Dist::Zilla::File::InMemory->new(
         name    => "share/skills/$rel",
-        content => $file->slurp_utf8,
+        encoded_content => $file->slurp_raw,   # bytes as they are: binary files survive
       ));
       $self->log_debug("gathered share/skills/$rel");
     }
@@ -92,7 +92,7 @@ Dist::Zilla::Plugin::DBIO::GatherSkills - Ship a distribution's own agent skills
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -103,16 +103,17 @@ DBIO exposes its skills at runtime (see L<DBIO::Skills>) without keeping a
 second copy in the repository: the skill is authored once under C<.claude/> and
 copied into the sharedir at build time.
 
-Only owned skills are gathered — the linked-in family/shared skills belong to,
-and are shipped by, their own home distribution.
+Only owned skills are gathered — the skills installed from other sources belong
+to, and are shipped by, their own home distribution. Files are copied as bytes,
+so binary files in a skill arrive unchanged.
 
 =head1 ATTRIBUTES
 
 =head2 skill
 
 The names of the owned skills to ship (repeatable). These are declared
-explicitly in F<dist.ini> so the set is deterministic and independent of any
-hardlink/symlink state in the checkout:
+explicitly in F<dist.ini> so the set is deterministic and independent of what
+else lies under C<.claude/skills/>:
 
   [DBIO::GatherSkills]
   skill = dbio-db2

@@ -4,7 +4,7 @@ package DBIO::Informix::Introspect::Indexes;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::Informix::Introspect::Util ();
 
@@ -67,7 +67,7 @@ DBIO::Informix::Introspect::Indexes - Introspect Informix indexes
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

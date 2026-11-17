@@ -37,7 +37,7 @@ every page's footer.
 | `install.html` | CPAN and checkout installs, dependencies, optional modules |
 | `quickstart.html` | Schema to passing harness, then `t/fuzz.t` |
 | `schema.html` | Full schema reference |
-| `commands.html` | The ten command-line tools |
+| `commands.html` | The nine command-line tools |
 | `extraction.html` | `extract-schemas`, confidence levels, limits |
 | `fuzzing.html` | Harness contents, corpora, coverage-guided and property tests |
 | `mutation.html` | Operators, skip markers, the survivor feedback loop |

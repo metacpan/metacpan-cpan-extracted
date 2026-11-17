@@ -4,7 +4,7 @@ package DBIO::Test::BaseResult;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Core';
 
@@ -25,7 +25,7 @@ DBIO::Test::BaseResult - Base class for DBIO test Result classes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

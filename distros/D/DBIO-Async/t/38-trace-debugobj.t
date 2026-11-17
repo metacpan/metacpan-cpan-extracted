@@ -96,10 +96,14 @@ for my $kind (qw( pooled pinned )) {
   $storage->connect_info([{ host => 'localhost' }]);
   $storage->debugobj($owner->debugobj);
   $storage->{debug} = 2;
-  local *DBIO::Storage::DBI::redact_bind_value = sub { sub { 'masked' } };
-  $storage->_query_async($sql, [@bind]);
-  like $owner->output, qr/'masked', 'masked', NULL, 'masked'/,
-    'no owner: own debug object, class-level redactor';
+  {
+    # perls before 5.36 warn "redefined" on a localised sub replacement
+    no warnings 'redefine';
+    local *DBIO::Storage::DBI::redact_bind_value = sub { sub { 'masked' } };
+    $storage->_query_async($sql, [@bind]);
+    like $owner->output, qr/'masked', 'masked', NULL, 'masked'/,
+      'no owner: own debug object, class-level redactor';
+  }
 }
 
 # --- core k402 / k404: name and attributes, query_end, a select with bind ---

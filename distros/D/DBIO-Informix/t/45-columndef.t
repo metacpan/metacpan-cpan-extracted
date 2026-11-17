@@ -22,7 +22,7 @@ is(column_def_sql(name => 'label', type => 'varchar(64)', default_value => 'hi')
   q{label varchar(64) DEFAULT 'hi'}, 'character default quoted');
 
 is(column_def_sql(name => 'q', type => 'integer', not_null => 1, default_value => '0'),
-  'q integer DEFAULT 0 NOT NULL', 'DEFAULT precedes NOT NULL (HCL ALTER TABLE MODIFY example: DEFAULT 1 NOT NULL; live unmeasured, karr k14)');
+  'q integer DEFAULT 0 NOT NULL', 'DEFAULT precedes NOT NULL (HCL ALTER TABLE MODIFY example: DEFAULT 1 NOT NULL; live unmeasured)');
 
 is(column_def_sql(name => 'ts', type => 'datetime year to second', default_value => \'today'),
   'ts datetime year to second DEFAULT today', 'SCALAR ref => literal SQL, unquoted');

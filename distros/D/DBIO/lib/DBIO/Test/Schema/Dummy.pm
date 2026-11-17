@@ -4,7 +4,7 @@ package DBIO::Test::Schema::Dummy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Test::BaseResult/;
 
@@ -39,7 +39,7 @@ DBIO::Test::Schema::Dummy - Test result class for the dummy table
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 AUTHOR
 

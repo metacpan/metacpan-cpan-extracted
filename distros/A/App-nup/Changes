@@ -1,5 +1,33 @@
 Revision history for Perl extension App-nup
 
+1.19 2026-11-17T07:30:29Z
+
+    - The page number on the bottom border has the number of all the
+      pages, as 3/12
+    - With --lateral, the page number has a triangle on each side which
+      tells that the row can be scrolled in that direction
+    - j, k, the down and up arrows, d, u, ^D, ^U and the return key
+      move by the screen as space and b do when the output has pages,
+      without --lateral as well
+    - J and K go to the last and the first page, or to the right and
+      the left end with --lateral
+    - Requires App::ansicolumn 1.66
+
+1.18 2026-11-17T02:36:34Z
+
+    - Files are shown with syntax highlight, when the command of the
+      highlighter is installed: skylighting by default, or
+      source-highlight by --highlight=sourcehighlight.  --no-highlight
+      turns it off.  --hi is the short name of the option, and sky and
+      gnu are those of the highlighters (--hi=gnu).  The file names in
+      the headers are kept
+    - With the files side by side (more than one file, or -V), the
+      page number is shown on the top border as well, at the left
+    - With --lateral, j and k and the down and up arrows move by the
+      panes on the screen, as space and b do
+    - Requires Getopt::Long::Bash 1.3.0, App::ansicolumn 1.65 and
+      IO::Factotum 0.04
+
 1.17 2026-11-15T09:26:34Z
 
     - With --lateral and more than one file, or -V, the files side by

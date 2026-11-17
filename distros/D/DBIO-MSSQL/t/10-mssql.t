@@ -2,6 +2,8 @@ use strict;
 use warnings;
 
 use Test::More;
+use lib 't/lib';
+use MssqlServerLanguage ();   # DBIO_TEST_SERVER_LANGUAGE
 use Test::Exception;
 use Scalar::Util 'weaken';
 use DBIO::Optional::Dependencies ();

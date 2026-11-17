@@ -4,7 +4,7 @@ package DBIO::Cake;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use Carp ();
 use Scalar::Util ();
@@ -706,7 +706,7 @@ DBIO::Cake - DDL-like DSL for defining DBIO result classes
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 SYNOPSIS
 

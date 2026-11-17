@@ -1957,7 +1957,8 @@ C<My::Module::clean>. C<pipeline>, from Ekorn::Pipeline::Factories,
 makes a pipeline of stages and names, looked up in its caller's
 package as it's made. A name given alone gives the pipeline named, so
 its stages are numbered where it stands. The L<Sugar's
-definitions|/"statement"> take names too. Ekorn's reference has the
+definitions|/"statement"> take names too, and the Sugar's
+L<C<pipeline>|/"Defining them on use"> names pipelines as well. Ekorn's reference has the
 rules, in L<Named
 pipelines|Ekorn::Pipeline::Manual::Reference/"Named pipelines">.
 
@@ -2113,11 +2114,17 @@ which runs it with the bind values and any stages given.
         artist_names => [music => 'SELECT name FROM artist', sub ($row) { $row->[0] }],
         artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
     };
+    use DBIx::Squirrel::Sugar pipeline => {loud => [sub {uc}]};
     use DBIx::Squirrel::Sugar qw(database statement);
 
 Given a hash reference after C<database> or C<statement>, C<use> defines
 each database or statement named in it, with its arguments in an array
-reference. It gives the package each function while the package is
+reference. After C<pipeline>, it takes what Ekorn::Pipeline::Sugar
+takes, a hash reference, or an array reference of names and stages in
+turn, and names each pipeline, with a function of its name, as that
+module does. It names them before it defines any statement, wherever
+they're given, so a statement in the same C<use> can name one; it gives
+no C<pipeline> function, which is Ekorn's. It gives the package each function while the package is
 compiled, so the function can be called without parentheses. The
 arguments are worked out then too: the environment, literals, and what
 a C<BEGIN> block has set are there, but a variable the program sets as
@@ -2195,8 +2202,9 @@ is looked up as the statement is defined, in the package defining it,
 unless it's qualified, as C<My::Module::clean>, and stands in its place
 among the stages. So it must be defined first, and one that isn't
 croaks then: C<No pipeline named main::clean>. On C<use>, the definition
-is made as the program compiles, so define the name in a C<BEGIN> block
-before it.
+is made as the program compiles, so give the pipeline after C<pipeline>,
+in the same C<use> or one before it, or name it in a C<BEGIN> block
+above it.
 
 =head2 The function a statement is given
 
@@ -2212,15 +2220,13 @@ as C<iterate> does. The results go through its own stages, then those
 given. Stages given are for that call only. A string given is always a
 bind value, never a pipeline's name.
 
-    use Ekorn::Pipeline;
-
-    BEGIN { Ekorn::Pipeline->named(shouted => sub {uc}) }
-
-    use DBIx::Squirrel::Sugar statement => {
-        artist_names => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }],
-        loud_names   => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }, 'shouted'],
-        artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
-    };
+    use DBIx::Squirrel::Sugar
+        statement => {
+            artist_names => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }],
+            loud_names   => [music => 'SELECT name FROM artist ORDER BY id', sub { $_->[0] }, 'shouted'],
+            artist       => [music => 'SELECT * FROM artist WHERE id = :id'],
+        },
+        pipeline => {shouted => [sub {uc}]};
 
     say ref artist_names;                            # DBIx::Squirrel::Iterator
     say join ' ', artist_names keep_all;             # Abba Blur Cream
@@ -2759,9 +2765,17 @@ C<dump_to> or C<to_fh> was given something else.
 
 =over 4
 
-=item C<Expected database or statement, not %s>
+=item C<Expected database, pipeline or statement, not %s>
 
 C<use DBIx::Squirrel::Sugar> was given something else.
+
+=item C<Expected the pipelines after pipeline in a HASH or an ARRAY of pairs>
+
+What came after C<pipeline> was something else. This, and the other errors in the pipelines' definitions, are Ekorn::Pipeline::Sugar's.
+
+=item C<Expected the pipelines after pipeline in pairs of a name and an ARRAY>
+
+The array reference after C<pipeline> had an odd number of items.
 
 =item C<Expected the arguments to connect to %s in an ARRAY>
 

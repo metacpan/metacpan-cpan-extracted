@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::PostGIS::Topology::Extension;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Extension';
 
@@ -55,7 +55,7 @@ DBIO::PostgreSQL::PostGIS::Topology::Extension - The postgis_topology extension:
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

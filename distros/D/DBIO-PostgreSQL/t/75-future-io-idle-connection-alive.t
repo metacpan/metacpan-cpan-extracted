@@ -55,7 +55,7 @@ BEGIN {
   eval { require DBIO::PostgreSQL::Storage::Async; 1 }
     or plan skip_all =>
       'DBIO::Async not installed (recommends only) -- future_io transport unavailable';
-  plan skip_all => 'the installed dbio-async predates the _idle_connection_alive seam (dbio-async k28)'
+  plan skip_all => 'the installed dbio-async predates the _idle_connection_alive seam'
     unless DBIO::Async::Storage->can('_idle_connection_alive')
         && DBIO::Async::Pool->can('_idle_connection_alive');
 }
@@ -63,9 +63,12 @@ BEGIN {
 use Future;
 use Socket qw(AF_UNIX SOCK_STREAM PF_UNSPEC);
 use IO::Handle;
+use FindBin;
+use lib "$FindBin::Bin/lib";
+use SocketMode;
 
 # Every wait in this file is a zero-timeout select: a hang is a failure.
-$SIG{ALRM} = sub { die "k90 test: something blocked\n" };
+$SIG{ALRM} = sub { die "idle-connection test: something blocked\n" };
 alarm 30;
 
 # --- the fake DBD::Pg -----------------------------------------------------------
@@ -134,7 +137,7 @@ my $next_pid = 9500;
 
   sub pg_notifies {
     my ($self) = @_;
-    push @{ $self->{reads} }, { nonblocking => !$self->{client}->blocking };
+    push @{ $self->{reads} }, { nonblocking => SocketMode::nonblocking($self->{client}) };
     die "DBD::Pg::db pg_notifies failed: lost synchronization with server\n"
       if $self->{die_open};
     $self->_consume('pg_notifies');
@@ -353,8 +356,16 @@ sub reads { scalar @{ $_[0]{reads} } }
   is $dbh[$_]->server_received, '', "... and no byte reached server $_" for 0 .. 1;
   my @reads = map { @{ $_->{reads} } } @dbh;
   ok @reads, 'the reads that happened ...';
-  ok !(grep { !$_->{nonblocking} } @reads), '... all ran with the socket in O_NONBLOCK mode';
-  ok $dbh[1]{client}->blocking, '... and the socket is back in its previous (blocking) mode';
+  # SocketMode answers undef where fcntl is missing (Windows): the mode of a
+  # socket cannot be read there, so the two assertions on it are skipped.
+  SKIP: {
+    skip 'this perl cannot read a socket\'s blocking mode (no fcntl: Windows)', 2
+      unless defined SocketMode::nonblocking($dbh[1]{client});
+    ok !(grep { !$_->{nonblocking} } @reads),
+      '... all ran with the socket in O_NONBLOCK mode';
+    is SocketMode::nonblocking($dbh[1]{client}), 0,
+      '... and the socket is back in its previous (blocking) mode';
+  }
 }
 
 # ---------------------------------------------------------------------------

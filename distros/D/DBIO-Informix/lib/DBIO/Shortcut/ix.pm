@@ -4,7 +4,7 @@ package DBIO::Shortcut::ix;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 sub apply { DBIO->apply_driver($_[1], 'Informix') }
 
@@ -22,7 +22,7 @@ DBIO::Shortcut::ix - `use DBIO -ix` shortcut for the Informix driver
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 AUTHOR
 

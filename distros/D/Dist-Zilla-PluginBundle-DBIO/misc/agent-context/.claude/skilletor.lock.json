@@ -24,14 +24,14 @@
     "source": "dbio-core",
     "version": "local",
     "files": {
-      "agents/.local.karr-coordinator.md": "sha256:66a8f2c63e2d632238327d7480a2b552174c0a8b1792bf8a40742eb309ce055a"
+      "agents/.local.karr-coordinator.md": "sha256:3d602599e9431b2c809fb6f34f7390f20c948904ab439ccf6c7aeef9c2e25cfa"
     }
   },
   "rules/dbio-rules": {
     "source": "dbio-core",
     "version": "local",
     "files": {
-      "rules/.local.dbio-rules.md": "sha256:c02ee3a9c10bfc79b5899806c8b0add6b047cb5a097e4bedc8783d213651bef8"
+      "rules/.local.dbio-rules.md": "sha256:ef92652d2c10ae9c5e1244c0125c28a9bd6db0b735cd801138a86fc6170e6110"
     }
   },
   "skills/dbio-adr": {
@@ -39,7 +39,7 @@
     "version": "local",
     "files": {
       "skills/dbio-adr/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-adr/SKILL.md": "sha256:695d4e046e9224d5ea45c0da9f554934126243aeddc64b147a0a5e592f3059b8"
+      "skills/dbio-adr/SKILL.md": "sha256:1b86cbd4c12535edb7ea40d25e8d9ddedb77a2cdf10b152c1e0b8138c00ad82a"
     }
   },
   "skills/dbio-codeberg-user-issues": {
@@ -55,7 +55,8 @@
     "version": "local",
     "files": {
       "skills/dbio-consolidate-release/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-consolidate-release/SKILL.md": "sha256:63887a0a9aeab60b767db0e0ff6c99f8466f431b3884f1aa1fed7c7545652bdf"
+      "skills/dbio-consolidate-release/SKILL.md": "sha256:b34e4b177e3f40c86352b70a11586fa38a159d53cc76bf6241c0bd2a26d66167",
+      "skills/dbio-consolidate-release/references/all-and-recovery.md": "sha256:857a9d7acb7128a5db8a7bb08c813f4f15542e7140696a5e0a35c618e11c5216"
     }
   },
   "skills/dbio-coordination": {
@@ -63,7 +64,8 @@
     "version": "local",
     "files": {
       "skills/dbio-coordination/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-coordination/SKILL.md": "sha256:ed2347c9990e8c21bce4390462da93cc01ce4435c46c764885976fee93961b6a"
+      "skills/dbio-coordination/SKILL.md": "sha256:f3d891cea846562fe795a42a01240f22e2aeb35ca826239fc7692fc8c000dd82",
+      "skills/dbio-coordination/references/direct-execution.md": "sha256:2ccbc8540dcc15f1d1ac831458cd2df73342895690086a9477afa314880d2918"
     }
   },
   "skills/dbio-perl-pod": {
@@ -71,7 +73,7 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-pod/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-pod/SKILL.md": "sha256:ffd323a96fdb048358270349a146c0335e02aa9654e6b9026ca67bbabba1b74e"
+      "skills/dbio-perl-pod/SKILL.md": "sha256:73117b7414d66747b31d587b948da9789c98494314b4c4f7bd47da0b84967298"
     }
   },
   "skills/dbio-perl-release": {
@@ -79,7 +81,9 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-release/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-release/SKILL.md": "sha256:88d41995f66fcb1fc9ab968014e906285f66a57bb701d9c22dbd7e3ed6c356b6"
+      "skills/dbio-perl-release/SKILL.md": "sha256:4717f1a4df445b9ac2f12f784b8490c77bf40281290c3733b95e598f621e4027",
+      "skills/dbio-perl-release/references/bundle-tests.md": "sha256:ab06a655ec9360459e27d90d2379d01892332b280e2ec89dbf1d12e83da63fac",
+      "skills/dbio-perl-release/references/share-skill.md": "sha256:b1f4b89ab26edaad09c9baee27d589f929b3e8504161881756e7976d3fcb5fef"
     }
   },
   "skills/dbio-perl-syntax": {
@@ -87,7 +91,7 @@
     "version": "local",
     "files": {
       "skills/dbio-perl-syntax/.gitignore": "sha256:fc8e72cc019d4536c45df00567078e36003f1d7183747e03283549741c3424c9",
-      "skills/dbio-perl-syntax/SKILL.md": "sha256:459ed6ed8ae462bf2af5e055acd5b3a0f57a5d8579ffc14e0567f96efa0071d9"
+      "skills/dbio-perl-syntax/SKILL.md": "sha256:b749a184fe55e2de380c3c1cae55be65e9b813e229220a934cab9ef8eb144798"
     }
   },
   "skills/getty-git-commit-style": {

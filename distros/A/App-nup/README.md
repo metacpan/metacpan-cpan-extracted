@@ -32,6 +32,8 @@ nup - n-up, multi-column paged output for commands and files
     --cm --colormap=#       color mapping (LABEL=COLOR)
          --[no-]page-number page number on border (default: on)
          --textconv[=EXT]   textconv for non-text files
+    --hi --highlight[=#]    syntax highlight of files (default: on)
+         --no-highlight     disable syntax highlight (--no-hi)
          --pager=#          pager command (empty to disable)
          --no-pager         disable pager
      -T  --device=#         output device: tty, pdf, or a paper for PDF
@@ -46,7 +48,7 @@ nup - n-up, multi-column paged output for commands and files
 
 # VERSION
 
-Version 1.16
+Version 1.18
 
 # DESCRIPTION
 
@@ -155,6 +157,13 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
     as many as fit, or the number given by `-C`.  With `-C4`, four
     pages are on the screen at a time, each a quarter of it wide.
 
+    The page number has a triangle on each side, as `◂ 2/12 ▸`, which
+    tells that the row can be scrolled in that direction: the triangle is
+    filled when there is a page there, and open at the end of the row
+    (`◃ 1/12 ▸`).  They are the `%L` and `%R` of the `--label` option
+    of `ansicolumn`; give other marks by `--mark`, after the file names
+    (`--mark RIGHT=>> --mark RIGHT_END=`).
+
     When the pager is `less`, `nup` adds
     `-S --shift=_N_ --rscroll=-` to it, where _N_ is the width of
     a pane: the lines are not wrapped, and the right and left arrow keys
@@ -164,13 +173,18 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
     environment variable, which `less` 661 or later reads.  With three panes on the
     screen and a `less` older than 710, they are:
 
-        h , left    left-scroll         one page to the left
-        l . right   right-scroll        one page to the right
-        H g <       no-scroll           the left end of the row
-        L G >       end-scroll          the right end of the row
-        space       noaction ESC-) x 3  the panes on the screen to the right
-        b           noaction ESC-( x 3  the panes on the screen to the left
+        h , left      left-scroll         one page to the left
+        l . right     right-scroll        one page to the right
+        H g < K       no-scroll           the left end of the row
+        L G > J       end-scroll          the right end of the row
+        space j down  noaction ESC-) x 3  the panes on the screen to the right
+        d ^D return
+        b k up u ^U   noaction ESC-( x 3  the panes on the screen to the left
 
+    The pages have the height of the screen, and there is nothing to
+    scroll down to: `j` and `k`, the down and up arrows, `d` and `u`,
+    `^D` and `^U`, and the return key go on to the
+    next and the previous screen, as space and `b` do.
     `noaction` does nothing and then types the keys after it, here
     ESC-) three times.  It cannot type the arrow keys, so ESC-) and
     ESC-( are given the same actions as the right and left arrow.  In
@@ -291,8 +305,12 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
 
 - **--**\[**no-**\]**page-number**
 
-    Show page number on the bottom border of each column.  Enabled by
-    default.  Use `--no-page-number` to disable.
+    Show page number on the bottom border of each column, with the number
+    of all the pages, as `3/12`.  With the
+    files side by side (more than one file, or `-V`), which can be long,
+    it is shown on the top border as well, at the left, under the file
+    name.  Enabled by default.  Use
+    `--no-page-number` to disable.
 
 - **--white-board**, **--black-board**, **--green-board**, **--slate-board**
 
@@ -311,6 +329,33 @@ variable works in both modes; see ["Terminal Size"](#terminal-size).
     `pdf,docx,docm,pptx,pptm,xlsx,xlsm,jpg,jpeg`.
 
     Use `--textconv=none` to disable.
+
+- **--hi**, **--highlight**\[=_NAME_\], **--no-highlight**
+
+    Color the source files by their syntax in file view mode.  Enabled
+    by default, and done when the command of the highlighter and
+    [IO::Factotum](https://metacpan.org/pod/IO%3A%3AFactotum) are installed; nothing changes without them.
+    `ansicolumn` reads each file through the command, with the language
+    told from the name of the file, or from the first line of a script.
+    A file whose language is not known is shown as it is, and so is a
+    file which has ANSI sequences already.  The file names in the headers
+    are not changed.
+
+    _NAME_ is the highlighter:
+
+        skylighting, sky       skylighting, the highlighter of pandoc (default)
+        sourcehighlight, gnu   source-highlight of GNU Source-highlight
+
+        brew install skylighting
+        brew install source-highlight
+
+    Set the one to use in `NUP_OPTS`:
+
+        export NUP_OPTS=--highlight=sourcehighlight
+
+    Use `--no-highlight` to disable.  `--hi` is the short name of the
+    option, and `sky` and `gnu` are those of the highlighters:
+    `--hi=gnu`, `--no-hi`.
 
 ## Pager Options
 
@@ -425,6 +470,16 @@ variables for `less` (see ["ENVIRONMENT"](#environment)), and adds options to it
 for `-L`.  Some of them need a recent version, and a patched build
 of `less` does more for the pages of `nup`.
 
+The pages fill the screen and go on below, and a line down would show
+them cut in the middle.  So `j` and `k`, the down and up arrows,
+`d` and `u`, `^D` and `^U`, and the return key
+move by the screen, as space and `b` do, when the output has pages
+and the pager is `less` 661 or later, and `J` and `K` go to the
+last and the first page, as `G` and `g`.  The keys are put in
+`LESSKEY_CONTENT`, in the way `-L` does, and not when `NUP_LESSKEY`
+is set.  Without pages (`-F`, or the files side by side), they move
+by the line as usual.  `e` and `y` are left to move by the line.
+
 ## Versions
 
 - `less` 590
@@ -439,7 +494,10 @@ of `less` does more for the pages of `nup`.
 
     `LESSKEY_CONTENT` is read, which `-L` uses to put its keys:
     `h`, `l`, `,`, `.`, the arrow keys, ESC-( and ESC-), `H`, `L`, `g`, `G`,
-    `<`, `>`, space and `b`.
+    `<`, `>`, space, `b`, `j`, `k`, `d`, `u`, `^D`, `^U`,
+    the return key, `J` and `K`.
+    Without `-L`, the keys are `j`, `k`, the down and up arrows, `d`,
+    `u`, `^D`, `^U`, the return key, `J` and `K`.
     An older `less` ignores it.
 
 - `less` 710
@@ -477,16 +535,20 @@ two options:
     the screen and move by the screens to the next page that has one.
     `l`, `.` and the right arrow go on until the last page is at the left
     edge.  For this, the keys of `-L` are given a count instead of being repeated:
-    with three panes, space and `b` are `3` ESC-) and `3` ESC-(, and
+    with three panes, space and `b`, and the keys which do the same, are
+    `3` ESC-) and `3` ESC-(, and
     `G` and `>` are `3L`, while `L` shows the end of the row at
     the right edge of the screen.
 
-Install it with Homebrew.  It cannot be installed together with the
-`less` of Homebrew itself, which has the same command name:
+`app-nup` of the tap has it inside, and `nup` of `app-nup` runs it.
+It is put apart from the commands of Homebrew, so the `less` of
+Homebrew itself stays as it is.  To use it as `less` outside of
+`nup`, install it on its own; it cannot be installed together with
+the `less` of Homebrew, which has the same command name:
 
     brew install tecolicom/tap/less
 
-Then use `--align-record` for the pages:
+With either, use `--align-record` for the pages:
 
     export NUP_PAGER="less --file-size"
     export NUP_PAGE_PAGER="less --file-size --align-record=-1"
@@ -516,7 +578,8 @@ Then use `--align-record` for the pages:
 - `NUP_LESSKEY`
 
     The keys that `-L` gives to `less`, in place of those of `nup`.
-    Empty for no keys.  See `-L` in ["General Options"](#general-options).
+    Empty for no keys.  See `-L` in ["General Options"](#general-options).  When it is
+    set, the keys of the pages without `-L` are not added either.
 
 - `COLUMNS`, `LINES`
 
@@ -571,7 +634,8 @@ Use [tecolicom/tap](https://github.com/tecolicom/homebrew-tap):
     brew tap tecolicom/tap
     brew install app-nup
 
-See ["LESS INTEGRATION"](#less-integration) for the build of `less` in the same tap.
+It comes with the build of `less` in the same tap, which `nup` runs;
+see ["LESS INTEGRATION"](#less-integration).
 
 ## CPAN
 

@@ -4,7 +4,7 @@ package DBIO::Oracle::Introspect::Views;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 use constant LONG_READ_LEN => 16 * 1024 * 1024;
@@ -24,7 +24,7 @@ sub fetch {
     SELECT view_name, text
     FROM all_views
     WHERE owner = ?
-    ORDER BY view_name
+    ORDER BY NLSSORT(view_name, 'NLS_SORT=BINARY')
   });
   $sth->execute($schema);
 
@@ -40,7 +40,7 @@ sub fetch {
     SELECT table_name, column_name
     FROM all_tab_columns
     WHERE owner = ? AND column_id IS NOT NULL
-    ORDER BY table_name, column_id
+    ORDER BY NLSSORT(table_name, 'NLS_SORT=BINARY'), column_id
   });
   $csth->execute($schema);
   while (my $c = $csth->fetchrow_hashref('NAME_lc')) {
@@ -54,7 +54,9 @@ sub fetch {
     SELECT name, referenced_owner, referenced_name
     FROM all_dependencies
     WHERE owner = ? AND type = 'VIEW' AND referenced_type = 'VIEW'
-    ORDER BY name, referenced_owner, referenced_name
+    ORDER BY NLSSORT(name, 'NLS_SORT=BINARY'),
+             NLSSORT(referenced_owner, 'NLS_SORT=BINARY'),
+             NLSSORT(referenced_name, 'NLS_SORT=BINARY')
   });
   $dsth->execute($schema);
   while (my $d = $dsth->fetchrow_hashref('NAME_lc')) {
@@ -81,7 +83,7 @@ DBIO::Oracle::Introspect::Views - Introspect the definitions of Oracle views
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -95,6 +97,10 @@ fetch (set before the statement is prepared, when DBD::Oracle sizes the
 buffer) and C<LongTruncOk> is off: a definition that does not fit ends the
 fetch with an error instead of being cut. The setting of the handle is
 restored afterwards.
+
+Views, their columns and the views they rest on are read in binary order by
+name (the columns by C<column_id>), in every session language, not by the
+C<NLS_SORT> of the session.
 
 =head1 METHODS
 

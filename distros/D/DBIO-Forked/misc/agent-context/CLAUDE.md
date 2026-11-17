@@ -29,7 +29,7 @@ layer over it: both fulfil the core `DBIO::Storage::Async` contract, but —
 - `dbio-async` = `Future::IO` + an async client (PG/MySQL native async).
   Efficient; only for drivers with a non-blocking client.
 - `dbio-forked` = `fork()` + pipe + the ordinary sync driver run in a child.
-  Universal — covers the ~13 drivers that will never get a native async client
+  Universal — covers every driver without a native async client
   (Oracle, db2, Sybase, SQLite, …).
 
 ```
@@ -72,8 +72,18 @@ re-runs `on_connect_do` / `on_connect_call` in the child (`_connect` →
 
 Ships **no** DB-specific code, re-implements **no** SQL — the real driver does it
 in the child. **Dependency-free**: only core Perl (`fork`, `pipe`, `Storable`,
-`IO::Select`) + DBIO core. No `Future` / `Future::IO`, no event loop. That is the
+`IO::Select`, `POSIX`) + DBIO core. No `Future` / `Future::IO`, no event loop. That is the
 whole point: a driver gets fork-based async without pulling the async ecosystem.
+
+## Options, cancel, ownership
+
+- Connect options `statement_timeout` (seconds) and `max_in_flight` (calls), declared
+  through `async_option_names`; a call at its deadline fails with `statement_timeout
+  exceeded`, one beyond the limit fails before forking with `max_in_flight reached`.
+- `DBIO::Forked::Future::cancel` ends the child (SIGTERM, SIGKILL after one second,
+  reap); a dropped Future does the same.
+- A Future belongs to the process that created it; elsewhere it fails with `belongs to
+  process N` and reaps nothing.
 
 ## Known limits (Model A)
 
@@ -94,13 +104,13 @@ whole point: a driver gets fork-based async without pulling the async ecosystem.
   promise). A forked-aware layer would need its own capability axis — a
   core/family decision.
   POD: `DBIO::Forked::Storage`, "TRANSPORT CAPABILITIES AND ASYNC LAYERS".
-- **Exactly one capability, read by core: `broker_connect_options`** (core k243).
+- **Exactly one capability, read by core: `broker_connect_options`**.
   It lets a broker-backed connection carry DBD attributes and `pool_size` beside
   the broker — `connect($broker, { async => 'forked', … })` — instead of being
   refused at first async use. Kept with no code: the child's connection is the
   owner storage's own, reconnected through the broker with the options joined
   in; `pool_size` sizes nothing (no pool). No layer asks for it, so it is no
-  precedent for the point above. ADR 0002 addendum 2026-10-04,
+  precedent for the point above. ADR 0002 addendum,
   `t/06-broker-connect-options.t`.
 - **Rotating broker, expired lease in the parent: every forked query refreshes.**
   A refresh in the child dies with the child. If the parent holds an expired
@@ -111,7 +121,7 @@ whole point: a driver gets fork-based async without pulling the async ecosystem.
   Follows from Model A; pinned in `t/09-broker-in-child.t` section 3. Having the
   parent refresh before it forks is not implemented. POD:
   `DBIO::Forked::Storage`, "ROTATING BROKERS AND AN EXPIRED LEASE".
-- Unix fork only.
+- A real `fork()` is required: a perl without a real fork (`$Config{d_fork}` unset, e.g. Strawberry) is refused at install (Makefile.PL, "OS unsupported") and at use (`_run_forked` croaks); the capability decides, not the OS name.
 
 ## Version policy
 
@@ -124,17 +134,14 @@ DBIx::Class-derived (like `dbio-postgresql-async` / `dbio-mysql-async`).
 
 ## ADRs
 
-- 0001 — generic fork-per-query async backend (+ addendum: its activation model,
-  core ADR 0028/0029, is superseded by the explicit `forked` mode of core ADR
-  0030; the decision itself stands)
+- 0001 — generic fork-per-query async backend; activation is the explicit `forked`
+  mode of core ADR 0030
 - 0002 — the forked child reuses the inherited sync storage (+ addendum: the
   child's reconnect re-runs the connection actions; why that is not
   `on_connect_replay`; + addendum: the one declared capability,
   `broker_connect_options`, read by core)
 - 0003 — loop-free pipe-backed Future, EOF-framed, and its size limit
-  (+ addendum: the premise of the full `future_class` surface changed — the
-  withdrawn core ADR 0029 chain — the decision itself stands;
-  `DBIO::Test::Future` is now `DBIO::Future::Immediate`)
+  (+ addendum: the full `future_class` surface is `DBIO::Future::Immediate`-compatible)
 
 See `.claude/skills/dbio-forked/SKILL.md` for the full architecture.
 
@@ -162,4 +169,7 @@ DBD::SQLite); `t/06` connect options beside a broker; `t/07` the transport
 paths (all six `*_async`, `txn_do_async` failure modes); `t/08` `fork()`/`pipe()`
 failure; `t/09` the AccessBroker in the child (dry or rotating broker, expired
 lease, `*_async` inside a `txn_do_async` body); `t/10` exit status: reaping
-leaves `$?`, `$!`, `$@` alone.
+leaves `$?`, `$!`, `$@` alone; `t/12` a Future belongs to its creating process;
+`t/13` `connect_info` keeps the form only; `t/14` `cancel` and the dropped Future;
+`t/15` `statement_timeout` and `max_in_flight`; `t/16` both through core's connect
+path on SQLite; `t/17` a perl without a real fork is refused.

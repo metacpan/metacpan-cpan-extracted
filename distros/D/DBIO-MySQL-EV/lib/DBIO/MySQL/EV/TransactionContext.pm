@@ -4,7 +4,7 @@ package DBIO::MySQL::EV::TransactionContext;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage::Async::TransactionContext';
 
@@ -25,7 +25,7 @@ DBIO::MySQL::EV::TransactionContext - Pinned connection context for an async MyS
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ coderef that calls them runs from the idle watcher that settles the C<BEGIN>'s
 Future, outside every callback of the pinned connection, so a statement it sends
 -- with or without bind values -- goes out at once and a blocking call waiting
 for it returns: C<< $ctx->select >> without a C<WHERE> works in the coderef,
-inside the transaction (until then such a call was refused).
+inside the transaction.
 
 A blocking call on the B<storage> in the coderef -- C<< $storage->select >>
 where C<< $ctx->select_async >> was meant -- does not run on this context's
@@ -64,8 +64,8 @@ duplicated-context half of that ADR is superseded by core ADR 0030 §4.
 
 The pinned connection is passed to C<new> under the core constructor key
 C<txn_conn>, which L<DBIO::MySQL::EV::Storage/_txn_conn_accessor> names and
-core's C<txn_do_async> builds the context with. The pre-k31 key C<mdb> is gone:
-the constructor dies without C<txn_conn>.
+core's C<txn_do_async> builds the context with. The constructor dies without
+C<txn_conn>.
 
 =head1 ATTRIBUTES
 
@@ -73,11 +73,10 @@ the constructor dies without C<txn_conn>.
 
   my $mdb = $ctx->txn_mdb;
 
-Compatibility alias for the inherited
+Alias for the inherited
 L<DBIO::Storage::Async::TransactionContext/txn_conn>: the pinned
-L<EV::MariaDB> connection handle for the duration of this transaction. It is
-the name this driver's own context carried before it became a subclass of the
-core one, kept because it says B<which> kind of handle is pinned. C<txn_conn>
+L<EV::MariaDB> connection handle for the duration of this transaction. The name
+says B<which> kind of handle is pinned. C<txn_conn>
 is the name core's own code reaches for -- C<deploy_async>'s transactional
 branch among them -- so both answer the same handle.
 

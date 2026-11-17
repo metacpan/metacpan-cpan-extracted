@@ -4,7 +4,7 @@ package DBIO::Storage::QueryRewrite;
 use strict;
 use warnings;
 
-our $VERSION = '0.900006';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Storage';
 use mro 'c3';
@@ -1525,7 +1525,7 @@ DBIO::Storage::QueryRewrite - SQL analysis and query rewrite utilities
 
 =head1 VERSION
 
-version 0.900006
+version 0.900007
 
 =head1 DESCRIPTION
 

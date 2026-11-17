@@ -4,7 +4,7 @@ package DBIO::PK::Auto::Oracle;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base qw/DBIO::Core/;
 
@@ -25,7 +25,7 @@ DBIO::PK::Auto::Oracle - (DEPRECATED) Automatic primary key class for Oracle
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 SYNOPSIS
 

@@ -66,6 +66,12 @@ use DBI;
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use LiveServer;
+
+# The logins of this file are roles of its own, and a role that is no superuser
+# may not set lc_messages: with DBIO_TEST_SERVER_LANGUAGE set, the startup
+# option LiveServer put in PGOPTIONS would be refused at their login
+# ("permission denied to set parameter"). The file reads no server wording.
+delete $ENV{PGOPTIONS};
 use DBIO::AccessBroker;
 use DBIO::PostgreSQL::EV::Storage;
 use PoolReset;

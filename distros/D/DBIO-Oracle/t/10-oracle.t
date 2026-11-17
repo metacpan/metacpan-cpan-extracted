@@ -429,6 +429,12 @@ sub _run_tests {
     );
   } 'Populate with identity does not throw';
 
+  # The next assertion reads the server's English sentence ("unique
+  # constraint"); Oracle writes the text in the language of the session
+  # (NLS_LANGUAGE, taken from NLS_LANG / LC_ALL), so this connection is put on
+  # English messages first.
+  $schema->storage->dbh_do(sub { $_[1]->do(q{ALTER SESSION SET NLS_LANGUAGE = 'AMERICAN'}) });
+
   my $pop_err;
   eval {
     $pop_rs->populate([

@@ -132,7 +132,7 @@ for my $class (qw( DBIO::Firebird::Storage DBIO::Firebird::Storage::InterBase ))
     lives_ok { $storage->_connect }
       "$class, dbi:Firebird:, ib_ attributes in the hash answer: connects";
     is_deeply [ @{ $CONNECTS[0] || [] }[0 .. 2] ], [ "$FB_DSN;ib_dialect=3;ib_charset=UTF8", $USER, $PASSWORD ],
-      '... to the DSN the broker answered plus the SQL dialect (karr k43), with its credentials';
+      '... to the DSN the broker answered plus the SQL dialect, with its credentials';
     is_deeply connect_attrs(), { %IB, %UTF8 }, '... and DBI->connect gets the attributes';
   }
 
@@ -158,7 +158,7 @@ for my $class (qw( DBIO::Firebird::Storage DBIO::Firebird::Storage::InterBase ))
   local @CONNECTS;
   lives_ok { $storage->_connect } 'Static with ib_softcommit beside it: connects';
   is_deeply [ @{ $CONNECTS[0] || [] }[0 .. 2] ], [ "$FB_DSN;ib_dialect=3;ib_charset=UTF8", $USER, $PASSWORD ],
-    '... to the DSN built from its parameters, plus the SQL dialect (karr k43)';
+    '... to the DSN built from its parameters, plus the SQL dialect';
   is_deeply connect_attrs(), { ib_softcommit => 1, ib_enable_utf8 => 1 }, '... with the attribute';
 }
 

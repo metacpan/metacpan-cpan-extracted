@@ -58,8 +58,8 @@ DBIO::<DB>::Storage::Async  driver adapter: DB-specific seam hooks only
   AnyEvent / Mojo / UV / Glib impls). A sync-only driver pulls no async deps.
 - `@ISA` / `use base` changes of the storage classes are an architecture change:
   ticket and ADR.
-- The `_await_*` seam stays isolated, so the DBD::Pg-native spike (dbio-postgresql
-  k21) can rework it without rebuilding the skeleton (ADR 0004).
+- The `_await_*` seam stays isolated, so a driver's native async client can rework
+  it without rebuilding the skeleton (ADR 0004).
 
 ## Invariants
 
@@ -74,25 +74,24 @@ DBIO::<DB>::Storage::Async  driver adapter: DB-specific seam hooks only
   `_release_on_ready($conn, $pool, $caller)`.
 - A pooled connection is back in the pool before the caller's callbacks run; a
   pinned connection is idle before its statement's callbacks run.
-- `_query_async` does not consult pipeline state (ADR 0003 amendment, k7).
+- `_query_async` does not consult pipeline state (ADR 0003 amendment).
 - `shutdown`, `release`, `disconnect` stay core's. The pool's
   `_shutdown_connection` calls `_abandon_flights_on` before
   `_shutdown_pool_connection` (ADR 0007).
 - `_withdraw_waiter` runs for a blocking wait that dies; no wrapper around core's
   queue, no heuristic refusal (ADR 0008).
 - Every shipped `.pm` under `lib/` carries a literal `our $VERSION`, all the same
-  (`@Git::VersionManager` bumps them in lockstep). Pin cpanfile entries to the
-  latest released version, except where release staging pins the family ahead
-  (`requires 'DBIO', '0.900004'` is staged). Skill `dbio-perl-syntax`.
+  (`@Git::VersionManager` bumps them in lockstep). cpanfile entries name the
+  family version; the release run sets it. Skill `dbio-perl-syntax`.
 
 ## Known limits
 
 - The `Future::IO` implementation behaviours (built-in round dies on a poll
-  cancelled from another poll's callback, k37; IOAsync keeps a cancelled poll's
-  watch, k38; IOAsync's read handler is not reentrant) are described in
+  cancelled from another poll's callback; IOAsync keeps a cancelled poll's
+  watch; IOAsync's read handler is not reentrant) are described in
   `dbio-async`. **Nothing in `lib/` works around them.** Working around, reporting
-  upstream or leaving documented is the maintainer's decision (k37); a workaround
-  is not built in passing.
+  upstream or leaving documented is undecided; a workaround is not built in
+  passing.
 - `t/33` (built-in) and `t/34` (IO::Async) hold them as `TODO` on what the caller
   is owed, with the transport's own part asserted hard beside it. A `TODO passed`
   means upstream changed. One implementation per file, because a process loads
@@ -120,6 +119,9 @@ readiness and:
 | Area | Files |
 |------|-------|
 | load, API, boundary, seam ownership | `t/00`, `t/01`, `t/13`, `t/16` |
+| future class, transport, resolution contracts | `t/11`, `t/12`, `t/15` |
+| async mode, insert shape, dialect shaping | `t/07`, `t/08` |
+| bind release, on-connect replay, deploy | `t/04`, `t/10`, `t/17` |
 | broker answers, detach / switch | `t/02`, `t/20`, `t/29` |
 | pool: readiness, queue, wait, lease | `t/03`, `t/06`, `t/35`, `t/36`, `t/37` |
 | transactions, contexts, pipeline | `t/05`, `t/09`, `t/14`, `t/18` |
@@ -129,6 +131,10 @@ readiness and:
 | acquire cancelled while connecting | `t/27` |
 | flights: disconnect, dropped Future | `t/30`, `t/31`, `t/32` (IO::Async) |
 | `Future::IO` implementation limits | `t/33`, `t/34` (IO::Async) |
+| trace through the debug object | `t/38` |
+| no-reset retirement | `t/39` |
+| `statement_timeout`, `max_pending_pinned` | `t/40`, `t/41` |
+| core's pool limits through the pool | `t/42` |
 
 `t/32`, `t/34` and `t/36` skip without `Future::IO::Impl::IOAsync`.
 
@@ -136,11 +142,19 @@ readiness and:
 
 - 0001 sync methods block via `->get`; 0002 transaction pinning; 0003 pipeline
   bracketing; 0004 the generic Future::IO layer (split, dependencies, isolation
-  principle). 0001–0004 carry a 2026-09-05 addendum (k14): the implementation is
-  core's since ADR 0030 §4. Core ADR 0028 no longer exists; 0030 replaced it.
-- 0005 listen seams live here once (core ADR 0056, k22).
-- 0006 the driver says when a connection is dead (core ADR 0047 addenda, k26 / k28).
-- 0007 the transport holds its statements in flight (k46 / k39).
-- 0008 a blocking call waits for a pool connection (k30).
+  principle). Their implementation is core's since core ADR 0030 §4.
+- 0005 listen seams live here once (core ADR 0056).
+- 0006 the driver says when a connection is dead (core ADR 0047 addenda).
+- 0007 the transport holds its statements in flight.
+- 0008 a blocking call waits for a pool connection.
+- 0009 the trace runs through the owner storage's debug object and the
+  `redact_bind_value` hook (core ADR 0025): `DBIO_TRACE=1` the SQL, from `=2`
+  the binds, redacted and cut to 32 characters; the transport only calls core's
+  `_debug_query`.
+- 0010 a statement on the wire and a pinned queue are bounded (core ADR 0078):
+  `statement_timeout` cancels the statement and retires its connection,
+  `max_pending_pinned` fails the statement over the limit at once; both are
+  declared through `async_option_names`. Core's `acquire_timeout`,
+  `max_waiters`, `txn_timeout` and `reset_timeout` pass through the pool.
 
 A new decision of this kind is an ADR in this format; skill `dbio-adr`.

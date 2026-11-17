@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::SQLMaker;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::SQLMaker';
 
@@ -265,8 +265,7 @@ sub _insert_on_conflict {
       # The maker's own bindtype shapes the bind: [ $col => $val ] under
       # 'columns' (the sync driver), the bare value under 'normal' (the
       # future_io and ev transports build their maker without one). A pair
-      # pushed by hand among bare values reaches the driver as an array
-      # (karr k122).
+      # pushed by hand among bare values reaches the driver as an array.
       push @bind, $self->_bindtype($col, $val);
     }
   }
@@ -362,7 +361,7 @@ DBIO::PostgreSQL::SQLMaker - PostgreSQL-specific SQL generation for DBIO
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -618,7 +617,7 @@ C<SET> list.
 
 C<$table> is the target table the statement inserts into; L</insert> threads it
 through so the stored-side columns can be qualified with it (see below). It is
-optional, and omitting it renders the pre-k205 unqualified condition.
+optional; without it the condition is rendered with its columns unqualified.
 
 Two vocabularies, both engine-neutral:
 

@@ -125,6 +125,7 @@ sub cipher_of {
 sub measure {
   my ($start) = @_;
   my $ticks = 0;
+  EV::now_update();   # a timer counts from the loop's last "now", maybe long ago
   my $timer = EV::timer(0.05, 0.05, sub { $ticks++ });
   my ($in_call, $inside, $elapsed, $fin, $res, $err) = (1);
   my $t0 = Time::HiRes::time();
@@ -182,7 +183,7 @@ subtest 'no ssl_* parameter (clear text on these servers): the loop runs while t
   plan skip_all => "no connection: $err" unless $mdb;
   my $cipher = cipher_of($mdb);
   diag 'no ssl_* parameter: ' . (length $cipher ? "the session speaks TLS ($cipher)" : 'the session is clear text');
-  is is_nonblocking($mdb), 1, 'the transport made the socket non-blocking (k95: every handle)';
+  is is_nonblocking($mdb), 1, 'the transport made the socket non-blocking on every handle';
   my $m = sleep_query($mdb);
   report('plain query', $m);
   concurrent_ok($m, 'query');
@@ -228,7 +229,7 @@ subtest 'no ssl_* parameter (clear text on these servers): the loop runs while t
 };
 
 # -------------------------------------------------------------------- 2. TLS
-subtest 'TLS: statements leave the loop running (karr k85 work-around)' => sub {
+subtest 'TLS: statements leave the loop running (work-around)' => sub {
   my ($mdb, $err) = connect_handle(1, 'transport');
   plan skip_all => "no TLS connection to this server: $err" unless $mdb;
   my $cipher = cipher_of($mdb);

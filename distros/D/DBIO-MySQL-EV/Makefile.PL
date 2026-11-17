@@ -24,17 +24,17 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO::MySQL::EV",
   "PREREQ_PM" => {
-    "DBIO" => "0.900004",
-    "DBIO::MySQL" => "0.900004",
+    "DBIO" => "0.900007",
+    "DBIO::MySQL" => "0.900007",
     "EV" => "4.15",
-    "EV::MariaDB" => "0.08",
+    "EV::MariaDB" => "0.09",
     "Future" => "0.49"
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -42,10 +42,10 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DBIO" => "0.900004",
-  "DBIO::MySQL" => "0.900004",
+  "DBIO" => "0.900007",
+  "DBIO::MySQL" => "0.900007",
   "EV" => "4.15",
-  "EV::MariaDB" => "0.08",
+  "EV::MariaDB" => "0.09",
   "Future" => "0.49",
   "Test::Exception" => 0,
   "Test::More" => "0.98"

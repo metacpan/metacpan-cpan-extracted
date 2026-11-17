@@ -88,7 +88,7 @@ use DBIO::AccessBroker::Vault;
 use DBIO::PostgreSQL::EV::Storage;
 use DBIO::PostgreSQL::EV::ConnectInfo 'dbi_to_conninfo';
 
-plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker (core k243 / k245)'
+plan skip_all => 'the installed DBIO core predates connect options beside an AccessBroker'
   unless DBIO::Storage::Async->can('_access_broker_pool_size');
 
 alarm 60;

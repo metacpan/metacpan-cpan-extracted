@@ -1,8 +1,14 @@
 requires 'perl', '5.020';
-requires 'DBIO', '0.900004';
+requires 'DBIO', '0.900007';
 requires 'DateTime::Format::DB2';
 
 requires 'DBD::DB2';
+
+# DBD::DB2's Makefile.PL loads DBI before its own prereqs are installed
+# (ibmdb/perl_DBD-DB2#21): DBI goes in first, at configure time.
+on configure => sub {
+  requires 'DBI';
+};
 
 on test => sub {
   requires 'Test::More', '0.98';

@@ -4,6 +4,8 @@ use warnings;
 use Test::More;
 use DBI ();
 use DBIO::SQLite::Test;
+use lib 't/lib';
+use DBDSQLiteQuadmath qw($todo_quadmath);
 
 # karr k61.
 #
@@ -77,14 +79,20 @@ use DBIO::SQLite::Test;
     $t;
   };
 
-  is $typeof->(1.5), 'real', 'see_if_its_a_number: an untyped 1.5 is guessed as a number';
+  TODO: {
+    local $TODO = $todo_quadmath;
+    is $typeof->(1.5), 'real', 'see_if_its_a_number: an untyped 1.5 is guessed as a number';
+  }
 
   # a typed call on the same SQL text in between must not leave its mark
   $artists->search({ name => 'x' }, {
     columns => [ { t => \[ 'typeof(?)', [ { dbd_attrs => DBI::SQL_VARCHAR() } => 1.5 ] ] } ],
   })->cursor->next;
 
-  is $typeof->(1.5), 'real', '... also after the same statement ran with a typed bind';
+  TODO: {
+    local $TODO = $todo_quadmath;
+    is $typeof->(1.5), 'real', '... also after the same statement ran with a typed bind';
+  }
 }
 
 # the integer attribute taken back for a non-integer value

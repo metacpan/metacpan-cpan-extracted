@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::PostGIS::Deploy;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 
 1;
@@ -21,7 +21,7 @@ DBIO::PostgreSQL::PostGIS::Deploy - Stub: the PostGIS rules of a deploy live in 
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

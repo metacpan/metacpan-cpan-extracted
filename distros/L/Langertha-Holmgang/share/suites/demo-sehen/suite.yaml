@@ -1,0 +1,50 @@
+# Example suite shipped with Langertha-Holmgang, to learn suite format 2 from:
+# a user message with an image, and the answer world "sehen", where the model
+# hands in what the image shows.
+# Origin: written for this distribution; the flow chart in img/ablauf.png was
+# drawn by a small script for it, invented and no real benchmark case
+# (ADR 0003).
+# Author: Torsten Raudssus <torsten@raudssus.de>
+# License: same terms as Perl itself (Perl_5), like the distribution.
+format: 2
+id: demo-sehen
+version: 1
+title: "Demo: hand in what an image shows"
+description: An invented flow chart as an image on the user message; the model hands the graph in through the answer world sehen.
+license: Perl_5
+source:
+  title: Langertha-Holmgang example suites
+  authors: Torsten Raudssus <torsten@raudssus.de>
+  license: Perl_5
+  url: https://github.com/Getty/langertha-holmgang
+topic: demo
+threshold: { pass_rate: 1 }
+defaults:
+  system: "You read images and hand in what they show through the tools. Do not explain."
+  max_turns: 4
+tools:
+  - name: graph_abgeben
+    simulator: sehen
+    description: Hand in the graph or flow chart of the image. A later call replaces an earlier one.
+    parameters:
+      type: object
+      required: [gerichtet, knoten, kanten]
+      properties:
+        gerichtet: { type: boolean, description: true when the edges have a direction }
+        knoten: { type: array, items: { type: string }, description: the labels of the nodes }
+        kanten:
+          type: array
+          description: the edges, each from one node to another
+          items:
+            type: object
+            required: [von, nach]
+            properties: { von: { type: string }, nach: { type: string }, text: { type: string } }
+  - name: bild_melden
+    simulator: sehen
+    description: Report that the image cannot be read as asked.
+    parameters:
+      type: object
+      required: [grund, notiz]
+      properties:
+        grund: { type: string, enum: [kein_diagramm, unlesbar, teilweise_unlesbar] }
+        notiz: { type: string }

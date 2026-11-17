@@ -1,6 +1,8 @@
 use strict;
 use warnings;
 use Test::More;
+use lib 't/lib';
+use ChannelPair;
 
 # Loaded before anything polls: Future::IO takes the implementation that is
 # loaded first, and this one applies itself as it loads. Only a recommendation
@@ -164,7 +166,7 @@ sub watched { return scalar keys %LoopSpy34::READ }
 
   sub _create_pool_connection {
     my $self = shift;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     my $id = ++$self->{_next_id};
     $self->{server}{$id} = $w;
@@ -223,7 +225,7 @@ sub watched { return scalar keys %LoopSpy34::READ }
 
   sub _listen_open {
     my ($self) = @_;
-    pipe(my $r, my $w) or die "pipe: $!";
+    my ($r, $w) = ChannelPair::channel();
     $w->autoflush(1);
     $r->blocking(0);
     $self->{notifier} = $w;
@@ -270,15 +272,9 @@ sub answer { my ($server) = @_; syswrite $server, 'R' if $server; return }
 # is put back when it is done.
 sub bounded {
   my ($code) = @_;
-  my (@result, $outer);
-  my $ok = eval {
-    local $SIG{ALRM} = sub { die "timed out\n" };
-    $outer = alarm 10;
-    @result = $code->();
-    1;
-  };
+  my @result;
+  my $ok = eval { @result = within(10, $code); 1 };
   my $error = $@;
-  alarm($outer // 0);
   return $ok ? (1, @result) : (0, $error);
 }
 

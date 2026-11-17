@@ -230,8 +230,9 @@ for my $post_poison (0,1) {
 
 # Text::Balanced used to poison $@ with an exception object whose string
 # overloading was broken (RT#74994), tripping the guard's exception
-# handling. Fixed in the installed Text::Balanced (2.06); the assertion
-# below is now sharp.
+# handling. Fixed in Text::Balanced 2.06; older ones (perl 5.24 ships 2.03)
+# still leave the broken object in $@, and DBIO::Util::is_exception then warns
+# about it on purpose, so the warning count is only asserted from 2.06 on.
 # https://rt.cpan.org/Public/Bug/Display.html?id=74994
 {
 
@@ -255,7 +256,14 @@ for my $post_poison (0,1) {
     $g->commit;
   } 'Broken Text::Balanced is not screwing up txn_guard';
 
-  is(scalar @w, 0, 'no warnings \o/');
+  SKIP: {
+    skip sprintf(
+      'Text::Balanced %s still leaves a broken-overloading exception object in $@ (fixed in 2.06), the warning about it is expected',
+      Text::Balanced->VERSION,
+    ), 1 if Text::Balanced->VERSION < 2.06;
+
+    is(scalar @w, 0, 'no warnings \o/');
+  }
 }
 
 # ensure Devel::StackTrace-refcapture-like effects are countered

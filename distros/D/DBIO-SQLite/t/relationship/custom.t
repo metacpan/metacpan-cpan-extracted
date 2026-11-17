@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Test::More;
+use DBIO::Test::Slow;
 use Test::Exception;
 use Test::Warn;
 use DBIO::SQLite::Test ':DiffSQL';

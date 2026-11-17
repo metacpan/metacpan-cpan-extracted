@@ -52,14 +52,14 @@ my $waiter;
   my $exec = $h->async->_executor;
   $exec->execute($conn, 'SELECT SLEEP(5)', []);
   $waiter = $exec->execute_when_idle($conn, 'SELECT 1', []);
-  ok !$waiter->is_ready, 'k98: the statement waits behind the one in flight';
+  ok !$waiter->is_ready, 'the statement waits behind the one in flight';
 }
 
 $h->async->disconnect;
 
-ok $waiter->is_failed, 'k98: after the shutdown the waiting statement is failed, not open';
-isa_ok(($waiter->failure)[0], 'DBIO::Exception', 'k98: the failure');
-like(($waiter->failure)[0] . '', qr/torn down/, 'k98: the message says the connection was torn down');
+ok $waiter->is_failed, 'after the shutdown the waiting statement is failed, not open';
+isa_ok(($waiter->failure)[0], 'DBIO::Exception', 'the failure');
+like(($waiter->failure)[0] . '', qr/torn down/, 'the message says the connection was torn down');
 
 my $left = $count->();
 for (1 .. 50) {

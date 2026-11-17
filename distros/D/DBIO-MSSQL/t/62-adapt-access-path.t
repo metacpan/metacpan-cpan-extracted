@@ -341,7 +341,7 @@ SKIP: {
 
     ok !$storage->_identity_method && !$storage->_no_scope_identity_query,
       'adapted over FreeTDS, the declared storage asks SCOPE_IDENTITY() '
-    . 'and has no @@identity fallback (karr k39)';
+    . 'and has no @@identity fallback';
     ok $storage->disable_sth_caching,
       '... statement caching stays off (the other FreeTDS workaround)';
   }

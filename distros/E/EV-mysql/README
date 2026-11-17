@@ -1,0 +1,292 @@
+NAME
+    EV::mysql - Asynchronous MySQL client using libmysqlclient and EV
+
+SYNOPSIS
+        use EV;
+        use EV::mysql;
+
+        my $db;
+        $db = EV::mysql->new(
+            host       => '127.0.0.1',
+            port       => 3306,
+            user       => 'root',
+            password   => '',
+            database   => 'test',
+            utf8       => 1,
+            on_connect => sub { print "connected to ", $db->server_info, "\n" },
+            on_error   => sub { die "MySQL connection error: $_[0]\n" },
+        );
+
+        $db->query("select 1 + 1 as sum", sub {
+            my ($rows, $err, $fields) = @_;
+            die "Query failed: $err\n" if $err;
+            print "$fields->[0] = $rows->[0][0]\n";
+            $db->close_async(sub { EV::break });
+        });
+
+        EV::run;
+
+DESCRIPTION
+    "EV::mysql" is an asynchronous, non-blocking Perl client for MySQL built
+    on top of the EV event loop and Oracle's "libmysqlclient" (discovered or
+    built via Alien::MySQL).
+
+    Designed as a sibling module to EV::MariaDB with a compatible Perl API,
+    it allows EV-based applications targeting Oracle MySQL (including MySQL
+    8.x and 9.x) to execute queued queries, row-by-row streaming queries,
+    transactions, and prepared statements without blocking the event loop.
+
+INSTALLATION
+    Requires "EV" (>= 4.11) and "Alien::MySQL".
+
+        cpanm EV Alien::MySQL
+        perl Makefile.PL
+        make
+        TEST_MYSQL_HOST=127.0.0.1 TEST_MYSQL_USER=root make test
+        make install
+
+    Live server tests also accept "TEST_MYSQL_PORT", "TEST_MYSQL_PASS",
+    "TEST_MYSQL_DB", and "TEST_MYSQL_SOCKET" (for Unix domain socket
+    connections).
+
+METHODS
+  new(%args)
+    Creates a new "EV::mysql" connection handle. If "host" or "unix_socket"
+    is provided, an asynchronous connection is initiated immediately. Croaks
+    on any unrecognized argument.
+
+    Supported arguments:
+
+    *   "loop"
+
+        Optional EV loop object (defaults to EV::default_loop()).
+
+    *   "host", "user", "password", "database" (or "db"), "port",
+        "unix_socket"
+
+        Server connection parameters. "port" defaults to 3306.
+
+    *   "connect_timeout", "read_timeout", "write_timeout"
+
+        Timeouts in seconds (unsigned integers; 0 or "undef" disables the
+        timeout). "EV::mysql" enforces these deadlines with event-loop
+        timers on non-blocking network operations ("connect", "query",
+        "query_stream", and utility ops); synchronous "libmysqlclient"
+        operations (see "NOTES ON LIBMYSQLCLIENT ASYNC API") rely on
+        "libmysqlclient"'s socket-level timeouts.
+
+    *   "charset"
+
+        Client character set (for example 'utf8mb4').
+
+    *   "init_command"
+
+        SQL statement executed automatically upon establishing a connection.
+
+    *   "utf8"
+
+        Boolean; enables Perl UTF-8 decoding for UTF-8 result columns/field
+        names and UTF-8 encoding for queries, parameters, and escape().
+
+    *   "compress"
+
+        Boolean; enables MySQL client/server protocol compression.
+
+    *   "multi_statements"
+
+        Boolean; enables semicolon-separated multi-statement queries.
+
+    *   "found_rows"
+
+        Boolean; requests matched-row counts instead of changed-row counts
+        for DML.
+
+    *   "ssl_key", "ssl_cert", "ssl_ca", "ssl_capath", "ssl_cipher"
+
+        TLS certificate, key, CA, and cipher suite paths/settings.
+
+    *   "ssl_verify_server_cert"
+
+        Boolean; maps to "SSL_MODE_VERIFY_IDENTITY" when enabled.
+
+    *   "ssl_mode"
+
+        String SSL mode: 'DISABLED', 'PREFERRED', 'REQUIRED', 'VERIFY_CA',
+        or 'VERIFY_IDENTITY'.
+
+    *   "on_connect", "on_error"
+
+        Callbacks invoked with no arguments ("on_connect") or "($err_msg)"
+        ("on_error") on connection completion or connection-level failure.
+        When "on_error" is omitted or "undef" in new(), a default handler
+        that calls "die "$_[0]\n"" is installed.
+
+  connect($host, $user, $password, $database, $port, $unix_socket)
+    Initiates an asynchronous connection on a disconnected handle. Croaks if
+    already connected or connecting, or if $port is out of range (defaults
+    to 3306 when omitted, "undef", or 0).
+
+  reset()
+    Resets and reconnects the connection using the previously configured
+    connection parameters (alias "reconnect"). Cancels any pending
+    operations and invalidates outstanding prepared statement handles.
+
+  finish()
+    Immediately closes the connection, clears pending timeouts/watchers, and
+    cancels any queued operations with "connection finished" (alias
+    "disconnect"). Also invalidates any prepared statement handles.
+
+  close_async($cb)
+    Drains prior queued operations, sends "COM_QUIT", tears down the
+    connection, and invokes "$cb->(1, undef)". Rejects subsequent queuing
+    with "connection is closing"; previously prepared statement handles are
+    no longer valid after "close_async".
+
+  on_connect([$handler]), on_error([$handler])
+    Gets or sets the connection-level callback handlers. Calling with an
+    argument replaces the current handler (passing "undef" or a non-CODE
+    value clears it); calling with no arguments returns the current handler
+    (or "undef").
+
+  query($sql, $cb)
+    Queues an SQL query for asynchronous FIFO execution (alias "q").
+    Multiple queries may be queued while connecting or while a utility op
+    (such as "ping", "select_db", "reset_connection", "set_charset",
+    "commit", "rollback", "autocommit") is running; croaks "cannot queue
+    query while streaming is active" during "query_stream", "not connected"
+    on an uninitialized/disconnected handle, or "connection is closing"
+    after "close_async".
+
+    On completion, "$cb->($res, $err, $fields)" is invoked: for result sets
+    $res is an arrayref of arrayrefs and $fields is an arrayref of column
+    names; for non-select statements (insert, update, delete, do, etc.) $res
+    is the integer affected row count. On error $res is "undef" and $err
+    holds the error string. When "multi_statements" is enabled and the first
+    statement succeeds, secondary statement or drain errors are delivered to
+    "on_error".
+
+  query_stream($sql, $row_cb)
+    Streams result rows one at a time via "$row_cb->($row, $err, $fields)"
+    as they arrive, invoking $row_cb->(undef) at end-of-results (or
+    "$row_cb->(undef, $err)" on error). Croaks if streaming is already
+    active. Secondary errors in a "multi_statements" batch after the first
+    result completes are delivered to "on_error".
+
+  prepare($sql, $cb)
+    Prepares a server-side statement (alias "prep") and invokes
+    "$cb->($stmt, $err)". Prepared statement handles are invalidated by
+    "close_stmt", "finish", "reset", "reset_connection", "change_user", and
+    "close_async".
+
+  execute($stmt, \@params, $cb) / execute($stmt, $cb)
+    Executes a prepared statement (snapshotting "\@params" at queue time, or
+    using parameters bound via "bind_params" / "send_long_data" when
+    "\@params" is omitted or "undef") and invokes "$cb->($res, $err,
+    $fields)".
+
+  bind_params($stmt, \@params)
+    Manually binds parameters on a prepared statement (typically before
+    "send_long_data" or "execute($stmt, undef, $cb)"). Must be called when
+    no incompatible operation is in progress or queued.
+
+  send_long_data($stmt, $param_idx, $data, $cb)
+    Sends binary or text parameter chunks for 0-based parameter index
+    $param_idx before "execute" and invokes "$cb->($ok, $err)". Can be
+    called multiple times per parameter to stream chunks cleanly.
+
+  stmt_reset($stmt, $cb)
+    Resets a prepared statement handle on the server and invokes "$cb->($ok,
+    $err)". Prepared statement handles become invalid after "close_stmt",
+    "finish", "reset", "reset_connection", "change_user", or "close_async".
+
+  close_stmt($stmt, $cb)
+    Closes a prepared statement handle and invokes "$cb->($ok, $err)".
+    Calling "close_stmt", "finish", "reset", "reset_connection",
+    "change_user", or "close_async" invalidates outstanding statement
+    handles; closing an already-invalidated handle invokes "$cb->(1, undef)"
+    immediately.
+
+  ping($cb), select_db($db, $cb), reset_connection($cb)
+    Asynchronous connection maintenance helpers (utility ops) invoking
+    "$cb->($ok, $err)". "reset_connection" clears server session state and
+    invalidates outstanding prepared statement handles.
+
+  commit($cb), rollback($cb), autocommit($bool, $cb)
+    Asynchronous transaction helpers (utility ops) invoking "$cb->($ok,
+    $err)". For "autocommit", any truthy value enables autocommit and any
+    falsy value disables it.
+
+  set_charset($charset, $cb), change_user($user, $password, $db, $cb)
+    Updates the client character set (utility op) or re-authenticates the
+    session user/database (which also invalidates prepared statements) and
+    invokes "$cb->($ok, $err)". Pass "undef" for $db to keep the current
+    database.
+
+  skip_pending(), pending_count()
+    skip_pending() cancels queued callbacks with error "skipped" (closing
+    the wire socket if an in-flight request was already sent).
+    pending_count() returns the total number of currently active and queued
+    operations.
+
+  escape($str)
+    Escapes $str for SQL literal interpolation using
+    "mysql_real_escape_string". Requires an active connection.
+
+  is_connected(), is_connecting()
+    Returns connection state booleans.
+
+  error_message(), error_number(), sqlstate()
+    Returns the latest error message string (aliases "error", "errstr"),
+    MySQL error code (alias "errno"), and 5-character SQLSTATE string.
+
+  affected_rows(), insert_id(), warning_count(), info()
+    Returns metadata from the most recent completed query or statement
+    (note: insert_id() returns "undef" when disconnected).
+
+  thread_id(), host_info(), server_info(), server_version(), character_set_name(), socket()
+    Returns connection and server metadata (alias "socket_fd" for socket()).
+
+  EV::mysql->lib_version(), EV::mysql->lib_info()
+    Class methods returning the linked "libmysqlclient" version integer and
+    informational string (aliases "client_version", "client_info").
+
+NOTES ON LIBMYSQLCLIENT ASYNC API
+    Unlike MariaDB's "libmariadb", Oracle's "libmysqlclient" exports
+    non-blocking functions exclusively for connection setup, query
+    execution, result retrieval, row streaming, and connection reset
+    ("mysql_*_nonblocking"). Functions without non-blocking equivalents in
+    "libmysqlclient" (prepared statements, "set_charset", "change_user", and
+    "close_async") execute against "libmysqlclient" synchronously while
+    preserving "EV::mysql"'s queue, error handling, and asynchronous
+    callback semantics.
+
+    Handles are fork-safe (a forked child automatically detaches the
+    inherited socket without disturbing the parent connection) and set
+    "CLONE_SKIP" to 1 for Perl ithreads safety.
+
+EXAMPLES
+    See the eg/ directory included in the distribution:
+
+    *   eg/basic.pl - Connecting, creating a temporary table, inserting,
+        selecting, and closing cleanly
+
+    *   eg/pipeline.pl - Pipelined queries and FIFO result ordering
+
+    *   eg/prepared.pl - Prepared statements, parameter binding, NULL
+        values, and cleanup
+
+    *   eg/error_handling.pl - Query errors vs connection errors, recovery,
+        and "reset_connection"
+
+SEE ALSO
+    EV, Alien::MySQL, EV::MariaDB
+
+AUTHOR
+    vividsnow
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2026 by vividsnow.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

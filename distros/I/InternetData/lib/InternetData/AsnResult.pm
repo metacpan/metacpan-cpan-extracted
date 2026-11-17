@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.15.0';
+our $VERSION = '1.16.0';
 
 # Copied as served. Those the spec does not require are paid, and absent from an
 # answer whose plan leaves them out.
@@ -14,7 +14,7 @@ our @MEMBERS = qw(
     rpki_invalid rpki_not_found whois prefixes rank num_upstreams upstreams num_peers peers
     num_downstreams downstreams hosted_domains
 );
-our @MARKERS = qw(tier1 trial_expired);
+our @MARKERS = qw(tier1 trial_expired cap_reached);
 
 my %KNOWN = map { $_ => 1 } 'asn', @MEMBERS, @MARKERS;
 
@@ -115,6 +115,10 @@ C<domains>, an array reference of the 10 most popular.
 =head2 trial_expired
 
 On answers to a key on the free plan only, as on L<InternetData::Result>.
+
+=head2 cap_reached
+
+On answers to a key on a paid plan only, as on L<InternetData::Result>.
 
 =head2 has($field), fields, raw
 

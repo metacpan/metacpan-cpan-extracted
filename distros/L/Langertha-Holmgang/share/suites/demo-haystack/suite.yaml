@@ -1,0 +1,34 @@
+# Example suite shipped with Langertha-Holmgang, to learn suite format 2 from:
+# a long input made by the generator (generate:, Langertha::Holmgang::Haystack)
+# with one planted line the model has to find.
+# Origin: written for this distribution; the services, the planted line and
+# the task are invented and no real benchmark case (ADR 0003).
+# Author: Torsten Raudssus <torsten@raudssus.de>
+# License: same terms as Perl itself (Perl_5), like the distribution.
+format: 2
+id: demo-haystack
+version: 1
+title: "Demo: one line in a generated journal"
+description: An invented long-input case — a generated journal excerpt with one planted failure, reported through a handler tool.
+license: Perl_5
+source:
+  title: Langertha-Holmgang example suites
+  authors: Torsten Raudssus <torsten@raudssus.de>
+  license: Perl_5
+  url: https://github.com/Getty/langertha-holmgang
+topic: demo
+threshold: { pass_rate: 1 }
+defaults:
+  system: "You read operational logs and report findings through the tools."
+  max_turns: 4
+tools:
+  - name: report_finding
+    description: Report the service a finding is about, with a short note.
+    parameters:
+      type: object
+      required: [service, note]
+      properties: { service: { type: string }, note: { type: string } }
+    handlers:
+      - apply:
+          - { push: findings, value: { service: "{service}", note: "{note}" } }
+        output: "finding recorded"

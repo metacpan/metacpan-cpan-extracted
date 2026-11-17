@@ -1,5 +1,12 @@
 Revision history for DBIO-GraphQL
 
+0.900007  2026-11-17
+    * Documentation
+        - The dbio-graphql skill covers the on_error option, the introspection
+          key of the to_graphql result, the Policy, Limits and Error modules
+          and the singular lookup of keyed sources. The dbio-graphql-engine
+          skill describes the three build phases and the error envelope.
+
 0.900004  2026-11-08
     * Security
         - The generated API is full access to what to_graphql releases, and

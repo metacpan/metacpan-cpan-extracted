@@ -197,7 +197,7 @@ sub installed {
   like($@, qr/child_parent_id_fkey/, 'an orphan row: the upgrade dies at the VALIDATE, naming the key');
   is_deeply(fks($dbh), [
       'child child_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES parent(id) NOT VALID (not validated)',
-    ], '... and the ADD CONSTRAINT before it stays, NOT VALID (its own transaction, karr k145)');
+    ], '... and the ADD CONSTRAINT before it stays, NOT VALID (its own transaction)');
   $schema->storage->disconnect;
 }
 

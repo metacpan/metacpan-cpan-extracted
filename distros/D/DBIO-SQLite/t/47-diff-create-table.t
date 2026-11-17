@@ -201,7 +201,7 @@ my $CARD_T = 'CREATE TABLE t (id INTEGER PRIMARY KEY, code VARCHAR(10) NOT NULL,
 CT::Card->register_class(A => 'CT::Card::Result::A');
 CT::Card->register_class(T => 'CT::Card::Result::T');
 
-section "upgrade adds the table of karr k56" => sub {
+section "upgrade adds the table an install would create" => sub {
   my $schema = CT::Card->connect('dbi:SQLite::memory:');
   my $dbh    = $schema->storage->dbh;
   $dbh->do('PRAGMA foreign_keys = ON');

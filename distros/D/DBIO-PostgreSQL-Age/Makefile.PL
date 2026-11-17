@@ -24,15 +24,16 @@ my %WriteMakefileArgs = (
   "MIN_PERL_VERSION" => "5.020",
   "NAME" => "DBIO::PostgreSQL::Age",
   "PREREQ_PM" => {
-    "DBIO" => "0.900004",
-    "DBIO::PostgreSQL" => "0.900004",
+    "DBIO" => "0.900007",
+    "DBIO::PostgreSQL" => "0.900007",
     "JSON::MaybeXS" => 0
   },
   "TEST_REQUIRES" => {
     "Test::Exception" => "0.43",
+    "Test::Fatal" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -40,10 +41,11 @@ my %WriteMakefileArgs = (
 
 
 my %FallbackPrereqs = (
-  "DBIO" => "0.900004",
-  "DBIO::PostgreSQL" => "0.900004",
+  "DBIO" => "0.900007",
+  "DBIO::PostgreSQL" => "0.900007",
   "JSON::MaybeXS" => 0,
   "Test::Exception" => "0.43",
+  "Test::Fatal" => 0,
   "Test::More" => "0.98"
 );
 

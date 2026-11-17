@@ -42,6 +42,7 @@ use strict;
 use warnings;
 
 my @held;
+my $log;
 
 # Leaves nothing behind
 sub tidy
@@ -74,6 +75,30 @@ sub hoard
 		push @held, $fh;
 	}
 	return $n * 2;
+}
+
+# Opens one filehandle on first use and keeps it, as a logger does.  That is
+# a resource being held, not a leak: the count stops growing after one call.
+sub lazy
+{
+	my $n = shift;
+
+	if(!$log) {
+		open($log, '<', $INC{'Destructive/Fixture.pm'}) or die "$!";
+	}
+	return $n * 2;
+}
+
+# Takes an existing directory, and reads '' as "not given", as getsetters do
+sub place
+{
+	my $dir = shift;
+
+	if(defined($dir) && length($dir)) {
+		die "Invalid directory: $dir" unless -d $dir;
+		return $dir;
+	}
+	return '.';
 }
 
 1;
@@ -144,11 +169,32 @@ sub _generate
 	return { code => $code, out => ($stdout // '') . ($stderr // ''), left => \@left };
 }
 
+my $place_schema = <<'YAML';
+---
+module: Destructive::Fixture
+function: place
+
+config:
+  test_undef: no
+
+input:
+  dir:
+    type: string
+    semantic: directory
+    optional: 1
+    position: 0
+
+output:
+  type: string
+YAML
+
 my %harness = (
+	place => _generate('place', $place_schema),
 	tidy => _generate('tidy', _schema('tidy')),
 	litter => _generate('litter', _schema('litter')),
 	litter_gated => _generate('litter_gated', _schema('litter', "  check_files: no\n")),
 	hoard => _generate('hoard', _schema('hoard')),
+	lazy => _generate('lazy', _schema('lazy')),
 	hoard_gated => _generate('hoard_gated', _schema('hoard', "  check_fds: no\n")),
 );
 
@@ -180,6 +226,20 @@ subtest 'a routine that keeps a descriptor open is reported' => sub {
 		skip "$FD_DIR is not available on this platform", 1 unless -d $FD_DIR;
 		like($harness{hoard}{out}, qr/^not ok \d+ - \Q$FDS_MESSAGE\E/m, 'the leaked descriptor is reported');
 	}
+};
+
+subtest 'a descriptor opened once and kept is not reported' => sub {
+	like($harness{lazy}{out}, qr/^1\.\.\d+/m, 'harness ran to completion');
+	unlike($harness{lazy}{out}, qr/^not ok \d+ - \Q$FDS_MESSAGE\E/m, 'the held descriptor is not reported');
+	SKIP: {
+		skip "$FD_DIR is not available on this platform", 1 unless -d $FD_DIR;
+		like($harness{lazy}{out}, qr/^ok \d+ - \Q$FDS_MESSAGE\E/m, 'the check still ran');
+	}
+};
+
+subtest 'a directory parameter is not expected to die on an empty string' => sub {
+	like($harness{place}{out}, qr/^1\.\.\d+/m, 'harness ran to completion');
+	unlike($harness{place}{out}, qr/^not ok/m, 'no case fails');
 };
 
 subtest 'check_fds: no silences the report' => sub {

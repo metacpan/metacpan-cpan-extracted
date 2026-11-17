@@ -2855,11 +2855,13 @@ own.
 
 =back
 
-A push through plain subs takes a fast path, a plain loop with none of
-the machinery for flushes, ends and sinks. A run with a part made for
-it, such as a C<gather>, a sink, or C<take>, which is made with C<gather>,
-takes the full path, which costs about twice as much per value, and
-some 20 microseconds to set up each run.
+A push takes a fast path, a plain loop with none of the machinery for
+flushes, ends and sinks, whenever its run has none of them: through
+plain subs, and through stages made for the run with C<gather> that
+have no flush or end, such as C<take>, C<drop> and C<count_into>. A run
+with a flush, an end or a sink, such as C<batch>, C<take_last> or
+C<keep_all>, takes the full path, which costs about twice as much per
+value, and some 20 microseconds to set up each run.
 
 That sounds a lot, and for a tight loop over numbers in memory, it is:
 use C<map> and C<grep> there. But each value costs well under a
@@ -2869,8 +2871,8 @@ Against a database row, the pipeline's share is lost in the noise. And
 a pipeline that stops early does less work than code that can't:
 C<take(10)> over a million rows reads ten.
 
-Pushes through plain subs, and pulls, have been made faster so far.
-Runs with parts made for them haven't yet, so their figures describe
+Runs without flushes, ends or sinks, pushed or pulled, have been made
+faster so far. Runs with them haven't yet, so their figures describe
 the code as it is, not a limit of the design.
 
 =head2 How much memory does it use?

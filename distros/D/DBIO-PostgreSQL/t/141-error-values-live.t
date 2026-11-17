@@ -85,11 +85,16 @@ eval { require DBIO::PostgreSQL::Storage::Async; 1 }
 use FindBin;
 use lib "$FindBin::Bin/lib";
 use LiveServer;
+use LibpqEnglish;    # libpq words its messages by locale, see there
 LiveServer->require_server;
 
 my $S = 'dbio_fehlerwerte_live';
 
+# PostgreSQL reports in the language of lc_messages; this test compares the
+# server's English wording of every form, so its sessions (sync and the pool)
+# are set to 'C' after the connect (t/142 holds the other languages)
 my @on_connect = (
+  q{SET lc_messages = 'C'},
   'SET log_parameter_max_length_on_error = -1',
   "SET search_path = $S",
 );

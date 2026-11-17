@@ -49,7 +49,7 @@ invalid: app-graph, public.social, "graph name"
 my $rows = $storage->cypher($graph, $query, \@result_columns, \%params);
 ```
 
-Every result column is declared `agtype`. Returns arrayref of hashrefs.
+Every result column is declared `agtype`. Column names must be plain identifiers (`[A-Za-z_][A-Za-z0-9_]*`), otherwise `cypher()` throws `Invalid AGE column name`. Returns arrayref of hashrefs.
 
 ```perl
 my $rows = $storage->cypher(
@@ -127,7 +127,7 @@ my $rows = $storage->cypher(
 # $rows->[0]{age}    = 30
 ```
 
-Or decode a single cell: `$storage->decode_agtype($cell)`. Vertices and edges come back as `{ id, label, properties }`.
+Or decode a single cell: `$storage->decode_agtype($cell)`. Vertices come back as `{ id, label, properties }`, edges additionally with `start_id` and `end_id`.
 
 Fallback without auto_decode: scalar strings come back quoted.
 
@@ -171,11 +171,21 @@ $storage->cypher('social', q{
 - `pg_extensions('age')` and `load_components('PostgreSQL::Age')` on schema
 - `on_connect_call => 'load_age'` in connect attrs
 - `$storage->create_graph($name)` before use
-- Always provide `\@columns` matching RETURN exprs
+- Always provide `\@columns` matching RETURN exprs, each a plain identifier
 - Always parameterise; never interpolate
 - Return properties or projected maps for clean agtype parsing
 - `$storage->drop_graph($name, 1)` for test cleanup
 
 ## Async
 
-`cypher_async`, `create_graph_async` and `drop_graph_async` (on `$schema->storage->async`, or `cypher_async` on the sync storage) return Futures and take the same arguments, including `{ auto_decode => 1 }`. They run on a **pooled** connection only: inside `txn_do_async` or `pipeline` they execute outside that transaction. For transactional graph work use `$schema->txn_do(sub { $schema->storage->cypher(...) })`.
+`cypher_async`, `create_graph_async` and `drop_graph_async` (on `$schema->storage`, which routes to the async backend, or on `->async`) return Futures and take the same arguments, including `{ auto_decode => 1 }`. They run on a **pooled** connection only: inside `txn_do_async` or `pipeline` they execute outside that transaction. For transactional graph work use `$schema->txn_do(sub { $schema->storage->cypher(...) })`.
+
+## Tests
+
+Offline tests (`t/`) use mock storage and touch no database:
+
+```bash
+../dbio/maint/capped-test prove -lr t/
+```
+
+The live files (`t/*-live.t`, `t/11-age-deploy.t`) skip unless `DBIO_TEST_PG_DSN`, `DBIO_TEST_PG_USER` and `DBIO_TEST_PG_PASS` are set; they need PostgreSQL with the Apache AGE extension. On the maintainer's cluster `eval "$(dbio-db env postgresql)"` sets them; point the DSN at the repo's own database `dbio_age`. Run `maint/live-preflight` (in core) before, and the suite through `capped-test`. Paths, caps and sharing: core skill `dbio-driver-development`, `references/live-testing.md`.

@@ -4,7 +4,7 @@ package DBIO::Informix::Diff::PrimaryKey;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Diff::Op';
 
@@ -79,7 +79,7 @@ DBIO::Informix::Diff::PrimaryKey - Diff operations for Informix primary keys
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

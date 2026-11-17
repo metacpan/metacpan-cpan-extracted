@@ -1,5 +1,30 @@
 Revision history for DBIO-DB2
 
+0.900007  2026-11-17
+
+    * Storage
+        - A DECIMAL, NUMERIC, REAL, DOUBLE or DECFLOAT value is read with a
+          decimal point whatever the locale of the process is. Under a German
+          LC_CTYPE the Db2 CLI writes a comma (`1234567890,12`); the cursor,
+          select_single and the rows of explain put a point in its place.
+          Other values stay as the CLI hands them over. DBIO sets no
+          environment or session setting and leaves the locale of the
+          process alone.
+        - A `time` column with `inflate_datetime` is read and written through
+          DBIO::DB2::Storage::DateTimeFormat, the storage's datetime parser:
+          DateTime::Format::DB2 with a `parse_time` and a `format_time` of its
+          own. The time of day comes back on 1970-01-01 and is written as
+          `HH:MM:SS`, the form Db2 takes for a `TIME`.
+
+    * Installation
+        - DBI is a configure requirement, so it is installed before
+          DBD::DB2, whose Makefile.PL needs it.
+
+    * Documentation
+        - The dbio-db2 and dbio-db2-database skills follow the code: diff pass
+          order, model sections, type mapping, savepoints, pagination reason,
+          live-test setup.
+
 0.900004  2026-11-08
     * Breaking Changes
         - Every identifier is double-quoted as the result class spells it,

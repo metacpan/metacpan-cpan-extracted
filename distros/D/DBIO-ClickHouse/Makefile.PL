@@ -25,8 +25,8 @@ my %WriteMakefileArgs = (
   "NAME" => "DBIO::ClickHouse",
   "PREREQ_PM" => {
     "Crypt::URandom" => 0,
-    "DBI" => "1.57",
-    "DBIO" => "0.900004",
+    "DBI" => "1.634",
+    "DBIO" => "0.900007",
     "SQL::Abstract" => "2.000002",
     "Try::Tiny" => "0.32",
     "namespace::clean" => "0.27"
@@ -35,7 +35,7 @@ my %WriteMakefileArgs = (
     "Test::Exception" => 0,
     "Test::More" => "0.98"
   },
-  "VERSION" => "0.900004",
+  "VERSION" => "0.900007",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -44,8 +44,8 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "Crypt::URandom" => 0,
-  "DBI" => "1.57",
-  "DBIO" => "0.900004",
+  "DBI" => "1.634",
+  "DBIO" => "0.900007",
   "SQL::Abstract" => "2.000002",
   "Test::Exception" => 0,
   "Test::More" => "0.98",

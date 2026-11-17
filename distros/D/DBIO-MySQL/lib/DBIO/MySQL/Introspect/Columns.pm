@@ -4,7 +4,7 @@ package DBIO::MySQL::Introspect::Columns;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use DBIO::MySQL::Introspect::Util ();
 use DBIO::MySQL::DefaultValue ();
@@ -132,7 +132,7 @@ DBIO::MySQL::Introspect::Columns - Introspect MySQL/MariaDB columns
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 

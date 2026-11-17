@@ -122,10 +122,10 @@ my $live = 1;
 
 my $TABLE = 'txn_guard_live_item';
 
-# Cases 4 to 8 are about the FreeTDS class (karr k65); with any other client
+# Cases 4 to 8 are about the FreeTDS class; with any other client
 # library they are TODO: nothing here was ever run with Open Client.
 my $OPEN_OTHER = 'never run with the Sybase Open Client libraries; the '
-  . 'FreeTDS class these cases are about is not mixed in there (karr k65)';
+  . 'FreeTDS class these cases are about is not mixed in there';
 
 {
   package T::TxnGuard::Result::Item;

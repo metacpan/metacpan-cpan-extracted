@@ -282,7 +282,7 @@ sub snapshot {
   for my $row (@{ server_rows(qq{
     SELECT table_name, column_name, data_type, char_length, nullable
     FROM user_tab_columns WHERE UPPER(table_name) $OWN
-    ORDER BY table_name, column_id
+    ORDER BY NLSSORT(table_name, 'NLS_SORT=BINARY'), column_id
   }) }) {
     my ($table, $column, $type, $chars, $nullable) = @$row;
     push @tables, $table unless $columns{$table};
@@ -298,7 +298,7 @@ sub snapshot {
     FROM user_constraints c
     JOIN user_cons_columns cc ON cc.constraint_name = c.constraint_name
     WHERE c.constraint_type IN ('P', 'U', 'R') AND UPPER(c.table_name) $OWN
-    ORDER BY c.table_name, c.constraint_type, c.constraint_name, cc.position
+    ORDER BY NLSSORT(c.table_name, 'NLS_SORT=BINARY'), c.constraint_type, NLSSORT(c.constraint_name, 'NLS_SORT=BINARY'), cc.position
   }) }) {
     my ($type, $table, $name, $generated, $column) = @$row;
     $name = '(system)' if $generated eq 'GENERATED NAME';
@@ -315,7 +315,7 @@ sub snapshot {
     FROM user_indexes i
     JOIN user_ind_columns c ON c.index_name = i.index_name
     WHERE UPPER(i.table_name) $OWN
-    ORDER BY i.table_name, i.index_name, c.column_position
+    ORDER BY NLSSORT(i.table_name, 'NLS_SORT=BINARY'), NLSSORT(i.index_name, 'NLS_SORT=BINARY'), c.column_position
   }) }) {
     my ($table, $name, $generated, $uniqueness, $column) = @$row;
     $name = '(system)' if $generated eq 'Y';
@@ -327,12 +327,12 @@ sub snapshot {
 
   push @is, map { "SEQUENCE $_->[0]" } @{ server_rows(qq{
     SELECT sequence_name FROM user_sequences
-    WHERE UPPER(sequence_name) $OWN ORDER BY sequence_name
+    WHERE UPPER(sequence_name) $OWN ORDER BY NLSSORT(sequence_name, 'NLS_SORT=BINARY')
   }) };
 
   push @is, map { "TRIGGER $_->[0] ON $_->[1]" } @{ server_rows(qq{
     SELECT trigger_name, table_name FROM user_triggers
-    WHERE UPPER(table_name) $OWN ORDER BY trigger_name
+    WHERE UPPER(table_name) $OWN ORDER BY NLSSORT(trigger_name, 'NLS_SORT=BINARY')
   }) };
 
   return \@is;
@@ -508,20 +508,20 @@ sub in_callers_transaction {
     'ALTER TABLE "k36_live_book"',
   ], 'IS: ... with one statement per table, in the order of the source '
    . 'names, a sequence and its trigger for the auto-increment column (the '
-   . 'unique constraint is part of the CREATE TABLE, karr k46), and the '
-   . 'foreign key last (karr k42)';
+   . 'unique constraint is part of the CREATE TABLE), and the '
+   . 'foreign key last';
 
   is_deeply snapshot(), \@V2_INSTALLED,
     'IS: it leaves the tables with their primary keys, the unique constraint, '
   . 'the sequence with the trigger that fills the auto-increment column from '
   . 'it, and the foreign key of the belongs_to -- under the lower-case names '
-  . 'of the result classes (karr k42)';
+  . 'of the result classes';
 
   # The names are the ones the storage asks for (quoted, as the result class
   # spells them), so the schema that installed can read what it installed.
   my $schema = $deploy->schema;
   is eval { $schema->resultset('Author')->count }, 0,
-    'IS: the schema that installed can query what it installed (karr k42)'
+    'IS: the schema that installed can query what it installed'
     or diag $@;
 
   # The sequence of an auto-increment column is found by the storage in the
@@ -531,7 +531,7 @@ sub in_callers_transaction {
   my $author = eval { $schema->resultset('Author')->create({ name => 'first' }) };
   is_deeply [ map { $author && $author->get_column($_) } qw(id name) ], [ 1, 'first' ],
     'IS: create() without RETURNING reads the generated key back: the '
-  . 'storage found the sequence in the trigger the install wrote (karr k42)'
+  . 'storage found the sequence in the trigger the install wrote'
     or diag $@;
   my $seq = eval { $schema->storage->get_autoinc_seq($schema->source('Author'), 'id') };
   is ref $seq ? $$seq : $seq, uc($user) . '."k36_live_author_id_seq"',
@@ -543,10 +543,10 @@ sub in_callers_transaction {
   throws_ok {
     $schema->resultset('Book')->create({ id => 2, author_id => 99, title => 'orphan' });
   } qr/ORA-02291.*\Q$K36_FK\E/is,
-    'IS: ... and one of an author that does not exist is refused: the foreign key is there (karr k42)';
+    'IS: ... and one of an author that does not exist is refused: the foreign key is there';
   # The ORM deletes the parent first and its children after; the key has to be
   # ON DELETE CASCADE for that to get through (ORA-02292 without).
-  lives_ok { $author->delete } 'IS: deleting an author that has books (cascade_delete) goes through (karr k42)'
+  lives_ok { $author->delete } 'IS: deleting an author that has books (cascade_delete) goes through'
     or diag $@;
   is server_value('SELECT COUNT(*) FROM "k36_live_book"'), 0,
     'IS: ... and its books are gone';
@@ -575,7 +575,7 @@ sub in_callers_transaction {
     my ($id) = grep { $_->{column_name} eq 'id' } @{ $model->{columns}{k36_live_author} };
     ok $id && $id->{is_auto_increment},
       'IS: the auto-increment column of the installed schema is introspected as such: '
-    . 'the trigger names it :new."id" (karr k42)';
+    . 'the trigger names it :new."id"';
   }
 
 # ------------------------------------------------------ 1b. a second time
@@ -692,7 +692,7 @@ wipe();
   is_deeply $row, [ [ 'new', 0, 2, 'none', "it's", '007', '10', '0.5' ] ],
     'IS: a row inserted without those columns gets the defaults: the '
   . 'literal, the false one (0), the expression (1 + 1), that of the '
-  . 'nullable column, a string with an apostrophe (karr k47), a string that '
+  . 'nullable column, a string with an apostrophe, a string that '
   . 'looks like a number, a number in a character column and a fraction'
     or diag $@;
 
@@ -708,7 +708,7 @@ wipe();
   is_deeply [ @default{qw(state hits note quip lead varnum ratio)} ],
     [ 'new', 0, 'none', "it's", '007', 10, 0.5 ],
     'IS: the introspector reads the defaults back as declared, the apostrophe '
-  . 'undoubled (karr k47)';
+  . 'undoubled';
   is ${ $default{twice} // \'(none)' }, '1 + 1', 'IS: ... and the expression as one';
 
   my %declared_default = ( quip => "it's", lead => '007', varnum => 10, ratio => 0.5 );

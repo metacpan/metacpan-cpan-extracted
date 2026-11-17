@@ -4,7 +4,7 @@ package DBIO::PostgreSQL::Storage::Async;
 use strict;
 use warnings;
 
-our $VERSION = '0.900004';
+our $VERSION = '0.900007';
 
 use base 'DBIO::Async::Storage';
 
@@ -348,7 +348,8 @@ sub _pg_raise {
   my ($message, $dbh) = @_;
   $message =~ s/\n\z//;
   $message = _pg_mask_bound($message, $dbh);
-  $message = DBIO::PostgreSQL::Util::mask_error_details($message);
+  $message = DBIO::PostgreSQL::Util::mask_error_details(
+    $message, DBIO::PostgreSQL::Util::error_sqlstate($dbh));
   die $Carp::Verbose ? DBIO::Util::masked_longmess($message) : "$message\n";
 }
 
@@ -766,7 +767,7 @@ DBIO::PostgreSQL::Storage::Async - future_io async PostgreSQL transport over DBD
 
 =head1 VERSION
 
-version 0.900004
+version 0.900007
 
 =head1 DESCRIPTION
 
@@ -1338,7 +1339,11 @@ With the database handle the statement failed on, the text first loses the
 values bound to that statement (core's C<DBIO::Util/mask_bound_values>: each
 value whole, also as C<< $dbh->quote >> writes it), then the forms of the
 server's text (L<DBIO::PostgreSQL::Util/mask_error_details>) -- the order of
-the sync storage's C<_mask_error_values>. The values are those
+the sync storage's C<_mask_error_values>. The SQLSTATE of the error, read from
+C<$dbh> (L<DBIO::PostgreSQL::Util/error_sqlstate>), goes with the text, so the
+values are masked by the SQLSTATE and the quoting marks in any language of the
+server (C<lc_messages>), not by the English words alone; without a handle, only
+the English forms are read. The values are those
 L</_submit_query> put on the handle for the statement in flight; a handle
 without any (a statement without binds, a connect) leaves the text to the
 forms alone.
@@ -1889,7 +1894,8 @@ failed: ...>, and so does one on a connection that is gone.
 The text names no value the statement was run with. Of a statement with bound
 values every value of four characters or more is replaced by C<***> whole,
 also where the server reads it as a name (C<relation "***" does not exist>),
-and then the forms of the server's text are masked
+and then the forms of the server's text are masked, in whatever language the
+server reports
 (L<DBIO::PostgreSQL::Util/mask_error_details>), for a statement of the pool,
 of a transaction's pinned connection and of C<_query_async> alike. The values
 are at the connection's database handle (C<private_dbio_binds>) from

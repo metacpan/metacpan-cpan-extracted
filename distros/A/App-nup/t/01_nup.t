@@ -35,7 +35,14 @@ BEGIN {
 
 my $script = File::Spec->rel2abs('script/nup');
 
+# The command line by the dry-run.  The syntax highlight depends on the
+# skylighting command being installed, so it is off here, and is
+# tested by nup_highlight.
 sub nup {
+    nup_highlight('--no-highlight', @_);
+}
+
+sub nup_highlight {
     my @args = @_;
     my $cmd = "$script -n @args 2>&1";
     chomp(my $out = `$cmd`);
@@ -228,6 +235,122 @@ subtest 'geometry option' => sub {
         'options for ansicolumn are kept';
     like nup('--geometry date'), qr/-- ansicolumn date$/, 'a command is not run';
     like `$script --geometry 2>&1 </dev/null`, qr/\A\d+ \d+ tty\n\z/, 'size of the terminal';
+};
+
+subtest 'page number at the top' => sub {
+    like nup('script/nup'), qr{--label S= %n/%N }, 'one file: at the bottom, with the number of all';
+    unlike nup('script/nup'), qr/--label NW=/, 'one file: not at the top';
+    like nup('script/nup cpanfile'), qr{--label S= %n/%N .*--label NW= %n \@1},
+        'two files: at the top as well';
+    like nup('-V script/nup'), qr/--label NW= %n @1/, '-V: at the top as well';
+    like nup('-V date'), qr/--label NW= %n @1/, '-V with a command';
+    unlike nup('date'), qr/--label NW=/, 'a command: not at the top';
+    unlike nup('--no-page-number script/nup cpanfile'), qr/--label/,
+        '--no-page-number: no label';
+};
+
+subtest 'marks of --lateral' => sub {
+    my $mark = qr/--mark LEFT=◂  --mark LEFT_END=◃  --mark RIGHT= ▸ --mark RIGHT_END= ▹ -/;
+    my $out = nup('-L script/nup');
+    like $out, qr{--label S= %L%n/%N%R  --mark}, 'pages in a row: beside the page number';
+    like $out, $mark, 'pages in a row: the marks';
+    $out = nup('-L script/nup cpanfile');
+    like $out, qr/--label NW= %L%n%R \@1 --mark/, 'files side by side: beside the number at the top';
+    like $out, $mark, 'files side by side: the marks';
+    like nup('-L -V script/nup'), qr/--label NW= %L%n%R \@1 --mark/, '-L -V';
+    unlike nup('script/nup'), qr/%[LR]|--mark/, 'no mark without -L';
+    unlike nup('script/nup cpanfile'), qr/%[LR]|--mark/, 'no mark without -L, two files';
+    unlike nup('-L -F script/nup'), qr/%[LR]|--mark/, 'no mark when -L is turned off';
+    like nup('-L --no-page-number script/nup'), qr/--label S= %L%R  --mark/,
+        'the marks without the page number';
+    like nup('-L --no-page-number script/nup cpanfile'), qr/--label NW= %L%R \@1 --mark/,
+        'the marks without the number, files side by side';
+};
+
+subtest 'highlight' => sub {
+    use File::Temp qw(tempdir);
+    my $dir = tempdir(CLEANUP => 1);
+    my $find = sub {
+        my $name = shift;
+        (grep { -x } map { "$_/$name" } split /:/, $ENV{PATH})[0];
+    };
+
+    # with the commands in PATH (dummies; -n runs nothing)
+    mkdir "$dir/with" or die;
+    for my $command (qw(skylighting source-highlight)) {
+        open my $fh, '>', "$dir/with/$command" or die;
+        print $fh "#!/bin/sh\n";
+        close $fh;
+        chmod 0755, "$dir/with/$command" or die;
+    }
+    {
+        local $ENV{PATH} = "$dir/with:$ENV{PATH}";
+        like nup_highlight('script/nup'),
+            qr/-Mup .*--highlight=skylighting .*-- ansicolumn script\/nup$/,
+            'file view asks up.pm for it, skylighting by default';
+        like nup_highlight('--highlight script/nup'),
+            qr/--highlight=skylighting /, '--highlight without a name';
+        like nup_highlight('--highlight=sourcehighlight script/nup'),
+            qr/--highlight=sourcehighlight /, '--highlight=sourcehighlight';
+        like nup_highlight('script/nup cpanfile -w 100'),
+            qr/-Mup .*--highlight=skylighting .*-- ansicolumn script\/nup cpanfile -w 100$/,
+            'the arguments of ansicolumn are as they were';
+        unlike nup_highlight('--no-highlight script/nup'), qr/highlight/, '--no-highlight';
+        like nup_highlight('--no-highlight script/nup'), qr/-- ansicolumn script\/nup$/,
+            '--no-highlight leaves the command as it was';
+        unlike nup_highlight('--highlight=sourcehighlight --no-highlight script/nup'),
+            qr/highlight/, '--no-highlight after --highlight=NAME';
+        like nup_highlight('--no-highlight --highlight=sourcehighlight script/nup'),
+            qr/--highlight=sourcehighlight /, '--highlight=NAME after --no-highlight';
+        {
+            local $ENV{NUP_OPTS} = '--highlight=sourcehighlight';
+            like nup_highlight('script/nup'), qr/--highlight=sourcehighlight /,
+                'NUP_OPTS gives the default';
+            unlike nup_highlight('--no-highlight script/nup'), qr/highlight/,
+                '--no-highlight wins over NUP_OPTS';
+        }
+        # --hi is the short name
+        like nup_highlight('--hi script/nup'), qr/--highlight=skylighting /, '--hi';
+        like nup_highlight('--hi=sourcehighlight script/nup'),
+            qr/--highlight=sourcehighlight /, '--hi=sourcehighlight';
+        like nup_highlight('--no-hi script/nup'),
+            qr{-Mup --filename --label S= %n/%N  -- ansicolumn script/nup$}, '--no-hi';
+        like nup_highlight('--hi=sourcehighlight --no-hi script/nup'),
+            qr{-Mup --filename --label S= %n/%N  -- ansicolumn script/nup$},
+            '--no-hi after --hi=NAME';
+        # sky and gnu are the short names of the highlighters, given as they are
+        like nup_highlight('--hi=sky script/nup'), qr/--highlight=sky /, '--hi=sky';
+        like nup_highlight('--hi=gnu script/nup'),
+            qr/--highlight=gnu /, '--hi=gnu';
+        like nup_highlight('--highlight=gnu script/nup'),
+            qr/--highlight=gnu /, '--highlight=gnu';
+        {
+            local $ENV{NUP_OPTS} = '--hi=gnu';
+            like nup_highlight('script/nup'), qr/--highlight=gnu /,
+                'NUP_OPTS=--hi=gnu';
+        }
+        like nup_highlight('--highlight=nosuch script/nup'),
+            qr/nosuch: unknown highlighter/, 'unknown name';
+        unlike nup_highlight('-e echo hello'), qr/highlight/, 'command mode';
+        unlike nup_highlight('date'), qr/highlight/, 'command mode without -e';
+        unlike nup_highlight('--geometry'), qr/highlight/, '--geometry';
+    }
+
+    # without it: only bash and getoptlong.sh, and the system directories
+  SKIP: {
+        skip 'skylighting is in a system directory', 2
+            if grep { -x "$_/skylighting" } qw(/usr/bin /bin);
+        my($bash, $getoptlong) = map { $find->($_) } qw(bash getoptlong.sh);
+        skip 'bash or getoptlong.sh is not found', 2
+            unless $bash and $getoptlong;
+        mkdir "$dir/without" or die;
+        symlink $bash, "$dir/without/bash" or die;
+        symlink $getoptlong, "$dir/without/getoptlong.sh" or die;
+        local $ENV{PATH} = "$dir/without:/usr/bin:/bin";
+        my $out = nup_highlight('script/nup');
+        like $out, qr/-- ansicolumn script\/nup$/, 'as it was without skylighting';
+        unlike $out, qr/highlight/, 'no --highlight';
+    }
 };
 
 done_testing;

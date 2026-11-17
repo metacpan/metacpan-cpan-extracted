@@ -174,7 +174,7 @@ ok $conn, 'deploy_async acquired a pooled connection';
 
 my @wire = map { $_->{sql} } @{ $conn->{dbh}{wire} };
 like shift(@wire), qr/pg_available_extension_versions/,
-  'pgcrypto is declared: the control schemas are asked for first (karr k142)';
+  'pgcrypto is declared: the control schemas are asked for first';
 ok scalar(@wire) > 2, 'several statements reached the wire';
 
 # -----------------------------------------------------------------------
