@@ -403,7 +403,7 @@ priority when present. This follows the same pattern as `code_tick` / `code_inli
 [code_mark]='L20'
 [code_tick]='L15/L23'
 [code_info]='${base_name}=y70'
-[code_block]='/L23;E'
+[code_block]='/L24;E'
 [code_inline]='L00/L23'
 [emphasis_mark]='L18'
 

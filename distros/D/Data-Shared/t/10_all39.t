@@ -109,7 +109,7 @@ for my $key (@keys) {
             @args = ({ build_int => [1, 2, 3, 5, 8, 13] });
         }
         my $resolved = Data::Shared::Registry::resolve_spec($spec);
-        if (!eval { Data::Shared::_require_class($resolved->{load}); 1 }) {
+        if (!eval { Data::Shared::Storage::_load($resolved); 1 }) {
             push @absent, $key;
             plan skip_all => "backend unavailable: $@";
             return;
@@ -153,9 +153,7 @@ subtest 'every variant mounts as the class the registry names' => sub {
                 or do { fail "$spec resolves"; next };
             my $args = $override{$spec} || ($CASE{$key} && $CASE{$key}{args})
                 or do { fail "$spec has an argument row"; next };
-            my $mod = $want->{load} || $want->{class};
-            (my $file = "$mod.pm") =~ s{::}{/}g;
-            unless (eval { require $file; 1 }) { push @absent, $spec; next }
+            unless (eval { Data::Shared::Storage::_load($want); 1 }) { push @absent, $spec; next }
             $ran++;
             my $root = Data::Shared->new(tempdir(CLEANUP => 1));
             ok eval { $root->mount('x', $spec, @$args); 1 }, "$spec mounts"

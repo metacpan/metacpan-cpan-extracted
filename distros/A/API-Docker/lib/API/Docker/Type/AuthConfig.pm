@@ -1,6 +1,6 @@
 package API::Docker::Type::AuthConfig;
 # ABSTRACT: The body of a C<POST /auth> request
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -31,7 +31,7 @@ API::Docker::Type::AuthConfig - The body of a C<POST /auth> request
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ because deriving it from the Perl name would produce C<Serveraddress>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

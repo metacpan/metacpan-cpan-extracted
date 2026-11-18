@@ -1,6 +1,6 @@
 package API::Docker::Type::SwarmSpec;
 # ABSTRACT: User modifiable swarm configuration
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::SwarmSpec::CAConfig;
 use API::Docker::Type::SwarmSpec::Dispatcher;
@@ -49,7 +49,7 @@ API::Docker::Type::SwarmSpec - User modifiable swarm configuration
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -97,7 +97,7 @@ L<API::Docker::Type::SwarmSpec::TaskDefaults>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

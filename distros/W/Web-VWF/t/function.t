@@ -804,6 +804,9 @@ subtest 'Web::VWF::Utils' => sub {
 
 	subtest '_configure_file_based' => sub {
 		local $ENV{'root_dir'};
+		# The tests below are about the other sources, so keep whatever the
+		# developer's shell sets for the cache from taking precedence
+		local @ENV{qw(CACHEDIR CACHE_DIR)};
 		my $dir = tempdir(CLEANUP => 1);
 		croaks_with(sub { Web::VWF::Utils::_configure_file_based({}, {}, { config => {} }) },
 			"File-based cache drivers require 'root_dir' parameter", 'root_dir required');
@@ -821,6 +824,30 @@ subtest 'Web::VWF::Utils' => sub {
 		%chi = ();
 		Web::VWF::Utils::_configure_file_based(\%chi, { root_dir => $nowhere }, {});
 		is($chi{'root_dir'}, $dir, 'environment beats everything');
+
+		# $CACHEDIR and $CACHE_DIR beat even $root_dir, and are created
+		my $cachedir = File::Spec->catdir($dir, 'made', 'by', 'us');
+		my $cache_dir = File::Spec->catdir($dir, 'second');
+		{
+			local $ENV{'CACHEDIR'} = $cachedir;
+			local $ENV{'CACHE_DIR'} = $cache_dir;
+			%chi = ();
+			Web::VWF::Utils::_configure_file_based(\%chi, {}, {});
+			is($chi{'root_dir'}, $cachedir, 'CACHEDIR beats root_dir and CACHE_DIR');
+			ok(-d $cachedir, 'CACHEDIR is created when missing');
+		}
+		{
+			local $ENV{'CACHEDIR'} = '';
+			local $ENV{'CACHE_DIR'} = $cache_dir;
+			%chi = ();
+			Web::VWF::Utils::_configure_file_based(\%chi, {}, {});
+			is($chi{'root_dir'}, $cache_dir, 'CACHE_DIR is used when CACHEDIR is empty');
+			is(Web::VWF::Utils::env_cache_dir(), $cache_dir, 'env_cache_dir');
+		}
+		{
+			local @ENV{qw(CACHEDIR CACHE_DIR)};
+			is(Web::VWF::Utils::env_cache_dir(), undef, 'env_cache_dir is undef when neither is set');
+		}
 	};
 
 	subtest '_parse_server_config' => sub {

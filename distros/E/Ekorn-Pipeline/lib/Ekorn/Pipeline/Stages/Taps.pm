@@ -7,6 +7,7 @@ use Exporter     qw(import);
 use Ref::Util    qw(is_coderef is_plain_scalarref);
 use Scalar::Util qw(openhandle);
 
+use Ekorn::Pipeline         qw();
 use Ekorn::Pipeline::Errors qw(croakf);
 use Ekorn::Pipeline::Gather qw(gather);
 use Ekorn::Pipeline::Stage  qw();
@@ -15,7 +16,7 @@ use namespace::clean -except => 'import';
 
 our @EXPORT = qw(peek count_into);    ## no critic (Modules::ProhibitAutomaticExportation)
 
-our @EXPORT_OK   = (@EXPORT, qw(dump_to));
+our @EXPORT_OK   = (@EXPORT, qw(dump_to tee));
 our %EXPORT_TAGS = (all => \@EXPORT_OK);
 
 # Croak at the line that called Ekorn::Pipeline.
@@ -55,6 +56,47 @@ sub count_into ($count) {
         };
     };
 }
+
+# Return a stage running each value through a branch of the stages
+# given, one run of its own beside the main run, fed by the stage, and
+# passing the value on unchanged. What comes out of the branch is
+# dropped; a stop in it ends only it; its flushes are called in the
+# stage's flush, which closes it, and it's finished in the stage's
+# end, if the main run ended first. A branch with nothing to flush or
+# end needs neither, so the stage has none, and the main run can take
+# the plain loop.
+sub tee (@stages) {
+    my $branch = Ekorn::Pipeline->new(@stages);
+    return gather {
+        my $feed = $branch->feed;
+        # The feed's own code for push and ended, called directly, as
+        # they're called for each value: the branch can't reach its feed,
+        # so the checks push makes of it, that it's open and not pushed
+        # from inside, are made here, by $open, or can't fail.
+        my($push, $ended) = @$feed{qw(push ended)};
+        my $open = 1;
+        # The step, without a signature, as it's called for each value:
+        # into the branch while it's open, and on.
+        my $step = sub {
+            if ($open) {
+                $push->($_[0]);
+                $open = !defined $ended->();
+            }
+            return $_[0];
+        };
+        return $step if $feed->{plain};
+        # The flush: the branch's input has run out.
+        my $flush = sub () {
+            $feed->close if $open;
+            $open = 0;
+            return;
+        };
+        return ($step, $flush) unless $feed->{ends};
+        # The end: the branch, if still open, is told it stopped.
+        return ($step, $flush, sub ($how) { $feed->finish });
+    };
+}
+
 
 # Return a stage writing each value, with Data::Dumper, to the filehandle
 # given, or STDERR, and passing it on, with its secrets redacted when
@@ -142,7 +184,7 @@ __END__
 
 =head1 NAME
 
-Ekorn::Pipeline::Stages::Taps - stages run for their side effects: peek, count_into and dump_to
+Ekorn::Pipeline::Stages::Taps - stages run for their side effects: peek, count_into, dump_to and tee
 
 =head1 SYNOPSIS
 
@@ -156,9 +198,15 @@ Ekorn::Pipeline::Stages::Taps - stages run for their side effects: peek, count_i
         sub { $_->{name} },
     )->(@users);
 
-    use Ekorn::Pipeline::Stages::Taps qw(dump_to);
+    use Ekorn::Pipeline::Stages::Taps qw(dump_to tee);
 
     Ekorn::Pipeline->new(dump_to)->(@users);    # to STDERR
+
+    # A tap of any shape: a branch of stages, beside the main run
+    my @names = Ekorn::Pipeline->new(
+        tee(take_if { $_->{admin} }, take(1), sub { log_first_admin($_); () }),
+        sub { $_->{name} },
+    )->(@users);
 
 =head1 DESCRIPTION
 
@@ -167,6 +215,11 @@ for logging, counting or debugging. A stage passes on what it returns,
 so a stage of your own that runs for its side effects has to return
 its value. These do that for you. Each function returns a stage, and
 checks its arguments when it's called, not on each value.
+
+C<peek>, C<count_into> and C<dump_to> each do one thing. C<tee> takes
+stages, so a tap can be anything a pipeline can do: look only at some
+values, or the first few, batch them, total them when the values run
+out, or write them through a sink.
 
 Each stage is an object, an L<Ekorn::Pipeline::Stage> or, for those
 that keep state, an L<Ekorn::Pipeline::Gather>, called as a code
@@ -181,8 +234,8 @@ value is the object:
 
 =head1 FUNCTIONS
 
-C<peek> and C<count_into> are exported by default. C<dump_to> is
-exported on request, and C<:all> gives all three.
+C<peek> and C<count_into> are exported by default. C<dump_to> and
+C<tee> are exported on request, and C<:all> gives all four.
 
 =head2 peek
 
@@ -231,6 +284,72 @@ know, not every secret, so a dump can still hold some. It doesn't
 escape control characters in strings, so a value from outside can send
 escape sequences to a terminal.
 
+=head2 tee
+
+    tee(@stages)
+
+Runs each value through a branch of C<@stages>, for what they do on
+the side, and passes the value on unchanged. What comes out of the
+branch is dropped. C<@stages> are whatever L<Ekorn::Pipeline/new>
+takes, a pipeline or a sink last included, and are made into a
+pipeline when C<tee> is called, so a mistake croaks then, at your
+line, with C<new>'s message, a stage counted among the tee's. With no
+stages, it does nothing.
+
+The branch is one run of its own, beside the main run, fed a value at
+a time by an L<Ekorn::Pipeline::Feed> that the tee makes for each main
+run. So the branch's stages see every value the tee does, in order,
+and keep their state across them, and each main run gets a fresh
+branch:
+
+    # Note the first two big hits, and pass every track on
+    tee(take_if { $_->{plays} > 6000 }, take(2), sub { note_hit($_); () })
+
+=over
+
+=item * B<A stop> in the branch, such as C<take(2)>'s, ends only the
+branch. The tee passes the values after it on, without running them
+through the branch.
+
+=item * B<A death> in the branch kills the main run, as any stage's
+error does, and its message names the tee's stage, then, within it,
+the branch's:
+
+    Pipeline stage #1 failed at app.pl line 12:
+        Pipeline stage #2 failed at app.pl line 12:
+            bad value
+
+=item * B<The branch's flushes> are called in the tee's flush, which
+closes the branch: so once the main run's values have run out, before
+the stages after the tee are flushed. A total, a last batch or a
+sink's result is given then. If a stop after the tee ends the main
+run, the tee's flush isn't called, so neither are the branch's.
+
+=item * B<The branch's ends> are called as its run ends, told how it
+ended from where each stands: in the push that met a stop or a death
+in it; in the tee's flush, which closes it; or, if the main run ended
+before either, in the tee's end, told C<stopped>, as the branch's
+input was cut short. That's so even when the main run died, as it is
+for an iterator read as a source by a run that dies.
+
+=item * B<The value itself> goes into the branch, not a copy, as it
+goes to C<peek>'s block. A branch that changes a hash changes it for
+the main run too.
+
+=item * B<The main run's context> is the branch's: in the branch,
+L<Ekorn::Pipeline/run_context> gives what it gives in the main run,
+such as a statement's columns.
+
+=back
+
+Each value costs a push into the branch: about 1.3 microseconds a
+value through a branch of one plain stage, against C<peek>'s 0.4, on
+Perl 5.36. A tee has a flush, and an end, only if its branch needs
+them, so a branch of plain stages leaves the main run on the plain
+loop. A branch with a flush, such as C<batch>'s, puts the main run on
+the full path, and costs about 2.2 microseconds a value. It's for
+logging, debugging and side jobs, not a hot loop.
+
 =head1 DIAGNOSTICS
 
 =over
@@ -260,8 +379,8 @@ true to write dumps without redacting them.
 
 =head1 SEE ALSO
 
-L<Ekorn::Pipeline>, L<Ekorn::Pipeline::Gather>, L<Data::Dumper>,
-L<Text::Redact::Secrets>
+L<Ekorn::Pipeline>, L<Ekorn::Pipeline::Gather>,
+L<Ekorn::Pipeline::Feed>, L<Data::Dumper>, L<Text::Redact::Secrets>
 
 =head1 AUTHOR
 

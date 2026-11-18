@@ -1,6 +1,6 @@
 package API::Docker::Type::PluginsInfo;
 # ABSTRACT: Available plugins per type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -31,7 +31,7 @@ API::Docker::Type::PluginsInfo - Available plugins per type
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ Names of available logging-drivers, and logging-driver plugins.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

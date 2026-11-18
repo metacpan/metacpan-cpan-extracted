@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Data::Shared qw(shared_set shared_children);
 
 # `sort` in scalar context is undefined, so a sorted-list accessor must count instead.
@@ -29,7 +31,7 @@ my @types = Data::Shared::available_types();
 cmp_ok scalar @types, '==', $types, 'available_types list and scalar agree';
 
 SKIP: {
-    my $have = eval { require Data::HashMap::Shared; 1 };
+    my $have = have('hashmap');
     skip 'composite parent backend unavailable', 3 unless $have;
     my $dir = tempdir(CLEANUP => 1);
     my $app = Data::Shared->new($dir);

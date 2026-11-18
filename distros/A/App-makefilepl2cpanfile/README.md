@@ -4,7 +4,7 @@ App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
 
 ## Version
 
-This document describes App::makefilepl2cpanfile version 0.06.
+This document describes App::makefilepl2cpanfile version 0.07.
 
 ## Synopsis
 
@@ -90,7 +90,9 @@ thousands of unclosed braces) cannot make the tool hang.
 ### What It Reads
 
 - `PREREQ_PM`, `BUILD_REQUIRES`, `TEST_REQUIRES` and
-`CONFIGURE_REQUIRES`.  These become `requires` lines in the `runtime`,
+`CONFIGURE_REQUIRES`.  The key may be bare or in single or double quotes
+(`'PREREQ_PM' => { ... }`), and the same goes for `prereqs`, its
+phase and relationship names, and `MIN_PERL_VERSION`.  These become `requires` lines in the `runtime`,
 `build`, `test` and `configure` phases.
 - `prereqs => { PHASE => { RELATIONSHIP => { ... } } }`
 blocks (the CPAN::Meta::Spec version 2 layout), wherever they appear -

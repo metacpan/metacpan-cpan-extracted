@@ -93,63 +93,63 @@
    "provides" : {
       "Data::Shared" : {
          "file" : "lib/Data/Shared.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter" : {
          "file" : "lib/Data/Shared/Adapter.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Indexed" : {
          "file" : "lib/Data/Shared/Adapter/Indexed.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Keyed" : {
          "file" : "lib/Data/Shared/Adapter/Keyed.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Map" : {
          "file" : "lib/Data/Shared/Adapter/Map.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Queue" : {
          "file" : "lib/Data/Shared/Adapter/Queue.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Set" : {
          "file" : "lib/Data/Shared/Adapter/Set.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Sketch" : {
          "file" : "lib/Data/Shared/Adapter/Sketch.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Adapter::Sync" : {
          "file" : "lib/Data/Shared/Adapter/Sync.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Compiled" : {
          "file" : "lib/Data/Shared/Compiled.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Composite" : {
          "file" : "lib/Data/Shared/Composite.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Manifest" : {
          "file" : "lib/Data/Shared/Manifest.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Node" : {
          "file" : "lib/Data/Shared/Node.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Registry" : {
          "file" : "lib/Data/Shared/Registry.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       },
       "Data::Shared::Storage" : {
          "file" : "lib/Data/Shared/Storage.pm",
-         "version" : "0.01"
+         "version" : "0.02"
       }
    },
    "release_status" : "stable",
@@ -163,6 +163,6 @@
          "web" : "https://github.com/vividsnow/perl5-data-shared"
       }
    },
-   "version" : "0.01",
+   "version" : "0.02",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

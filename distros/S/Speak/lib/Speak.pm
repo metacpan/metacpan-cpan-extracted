@@ -51,8 +51,9 @@ no warnings 'experimental::signatures';
 use base 'Exporter';
 
 use Clipboard;
+use Fcntl qw(:flock);
 
-our $VERSION = '1.07';
+our $VERSION = '1.09';
 
 {
 
@@ -158,7 +159,7 @@ use File::Path qw(rmtree);
 use File::Basename;
 use Carp;
 
-our @EXPORT_OK = qw(speak say_persona last_message %PERSONA_MAP);
+our @EXPORT_OK = qw(speak say_persona last_message is_persona resolve_persona %PERSONA_MAP);
 
 our %PERSONA_MAP = (
   'Smith'              => 'Agent Smith',
@@ -172,6 +173,9 @@ our %PERSONA_MAP = (
   'Judy'               => 'Judy',
   'Michael'            => 'Michael',
   'Charles Clarke III' => 'Charles Clarke III',
+  'Charles Clark III'  => 'Charles Clark III',
+  'Default'            => 'default',
+  'default'            => 'default',
 );
 
 # Config paths searched in order; override @Speak::CONFIG_PATHS before calling
@@ -252,6 +256,154 @@ sub last_message ($logfile = '/var/log/speak.log') {
   }
 
   return;
+}
+
+=head2 is_persona($tag)
+
+Checks if the given string represents a valid persona or persona display name.
+
+=cut
+
+sub is_persona ($tag) {
+  return 0 unless defined $tag && length $tag;
+  return 1 if lc $tag eq 'default';
+
+  for my $k (keys %PERSONA_MAP) {
+    return 1 if lc $k eq lc $tag || lc $PERSONA_MAP{$k} eq lc $tag;
+  }
+
+  my $voices_dir = '/opt/tts/voices';
+  my @dirs = ($voices_dir, "$voices_dir/contacts", "$voices_dir/contact");
+  for my $d (@dirs) {
+    next unless -d $d;
+    return 1 if -f "$d/$tag";
+    for my $ext ('.wav', '.mp3', '.flac', '.ogg') {
+      return 1 if -f "$d/$tag$ext";
+    }
+    opendir (my $dh, $d);
+    my @files = grep { -f "$d/$_" && !/\.(txt|json|orig)$/i && !/^\./ } readdir ($dh);
+    closedir ($dh);
+    for my $f (@files) {
+      my ($base) = $f =~ /^([^.]+)/;
+      $base //= $f;
+      return 1 if lc $f eq lc $tag || lc $base eq lc $tag;
+    }
+  }
+
+  return 0;
+}
+
+=head2 resolve_persona($persona, %args)
+
+Resolves a requested persona (name, display name, 'random', or 'default') to:
+C<($resolved_voice_key, $display_persona, $is_fallback)>.
+If the persona is not found or invalid, it returns C<('Default', 'default', 1)>.
+
+=cut
+
+sub resolve_persona ($persona, %args) {
+  my $voices_dir   = $args{voices_dir} || '/opt/tts/voices';
+  my @contact_dirs = ("$voices_dir/contacts", "$voices_dir/contact");
+
+  return (undef, undef, 0) unless defined $persona && length $persona;
+
+  # Random persona selection
+  if ($persona =~ /^(random|rand|any)$/i) {
+    if (-d $voices_dir) {
+      opendir (my $dh, $voices_dir);
+      my @primary = grep { -f "$voices_dir/$_" && !/\.(txt|json|orig)$/i && !/^\./ && !/^default(\.|$)/i } readdir ($dh);
+      closedir ($dh);
+      if (@primary) {
+        my $chosen = $primary[rand @primary];
+        my ($base) = $chosen =~ /^([^.]+)/;
+        $base = $chosen unless defined $base && length $base;
+        my $display = $PERSONA_MAP{$base} || $base;
+        return ($base, $display, 0);
+      }
+    }
+    return ('Default', 'default', 0);
+  }
+
+  # Explicit default
+  if ($persona =~ /^default$/i) {
+    return ('Default', 'default', 0);
+  }
+
+  # Check Reverse Persona Map
+  my $reverse_base;
+  for my $k (keys %PERSONA_MAP) {
+    if (lc $PERSONA_MAP{$k} eq lc $persona || lc $k eq lc $persona) {
+      $reverse_base = $k;
+      last;
+    }
+  }
+
+  my @candidates_to_check = ();
+  push @candidates_to_check, $reverse_base if defined $reverse_base;
+  push @candidates_to_check, $persona unless defined $reverse_base && lc $reverse_base eq lc $persona;
+
+  my @dirs_to_search = ($voices_dir, @contact_dirs);
+
+  for my $dir (@dirs_to_search) {
+    next unless -d $dir;
+    for my $cand (@candidates_to_check) {
+      if (-f "$dir/$cand") {
+        my $display = $PERSONA_MAP{$cand} || $cand;
+        return ($cand, $display, 0);
+      }
+      for my $ext ('.wav', '.mp3', '.flac', '.ogg') {
+        if (-f "$dir/$cand$ext") {
+          my $display = $PERSONA_MAP{$cand} || $cand;
+          return ($cand, $display, 0);
+        }
+      }
+    }
+
+    opendir (my $dh, $dir);
+    my @files = grep { -f "$dir/$_" && !/\.(txt|json|orig)$/i && !/^\./ } readdir ($dh);
+    closedir ($dh);
+
+    for my $f (@files) {
+      my ($fbase) = $f =~ /^([^.]+)/;
+      $fbase //= $f;
+      for my $cand (@candidates_to_check) {
+        if (lc $f eq lc $cand || lc $fbase eq lc $cand) {
+          my $display = $PERSONA_MAP{$fbase} || $fbase;
+          return ($fbase, $display, 0);
+        }
+      }
+    }
+
+    # Token / partial word matching
+    my @target_tokens = grep { length $_ } split /[^a-zA-Z0-9]+/, lc $persona;
+    if (@target_tokens) {
+      for my $f (@files) {
+        my ($fbase) = $f =~ /^([^.]+)/;
+        $fbase //= $f;
+        my @cand_tokens = grep { length $_ } split /[^a-zA-Z0-9]+/, lc $fbase;
+        next unless @cand_tokens;
+
+        my %t_set = map { $_ => 1 } @target_tokens;
+        my %c_set = map { $_ => 1 } @cand_tokens;
+        my $all_c_in_t = 1;
+        for my $t (@cand_tokens) { $all_c_in_t = 0 unless $t_set{$t}; }
+        my $all_t_in_c = 1;
+        for my $t (@target_tokens) { $all_t_in_c = 0 unless $c_set{$t}; }
+
+        if ($all_c_in_t || $all_t_in_c) {
+          my $display = $PERSONA_MAP{$fbase} || $fbase;
+          return ($fbase, $display, 0);
+        }
+      }
+    }
+  }
+
+  if (defined $reverse_base && !-d $voices_dir) {
+    my $display = $PERSONA_MAP{$reverse_base} || $reverse_base;
+    return ($reverse_base, $display, 0);
+  }
+
+  return ('Default', 'default', 1);
 }
 
 sub _fetch_mp3 ($ua, $text, $lang) {
@@ -437,7 +589,12 @@ Returns:
   $msg =~ s/\s+/ /g;
   $msg =~ s/^\s+|\s+$//g;
 
-  my $display_persona = ($persona && $PERSONA_MAP{$persona}) ? $PERSONA_MAP{$persona} : $persona;
+  my ($resolved_persona, $display_persona, $is_fallback);
+  if ($persona) {
+    ($resolved_persona, $display_persona, $is_fallback) = resolve_persona ($persona);
+    $persona = $resolved_persona;
+  }
+
   my $tag = $app || $display_persona || basename ($0);
   $tag =~ s/\.pl$// if $tag;
 
@@ -513,7 +670,17 @@ Returns:
             -x '/usr/bin/paplay'
             ? 'paplay'
             : (-x '/bin/paplay' ? 'paplay' : 'play -q');
+          my $lock_file = '/tmp/.speak_playback.lock';
+          my $lock_fh;
+          if (open $lock_fh, '>>', $lock_file) {
+            flock ($lock_fh, LOCK_EX);
+          }
           system ("$player \"$filename\"");
+          select (undef, undef, undef, 0.25);
+          if ($lock_fh) {
+            flock ($lock_fh, LOCK_UN);
+            close $lock_fh;
+          }
         } ## end else [ if ($os eq 'darwin') ]
         unlink $filename;
         return;
@@ -671,6 +838,11 @@ Returns:
       # Linux / Unix
       # paplay often requires WAV if libsndfile lacks mp3 support (e.g. on Mars)
       # We convert to WAV to be safe.
+        my $lock_file = '/tmp/.speak_playback.lock';
+        my $lock_fh;
+        if (open $lock_fh, '>>', $lock_file) {
+          flock ($lock_fh, LOCK_EX);
+        }
         if (-x '/usr/bin/paplay' || -x '/bin/paplay') {
           my ($fh_wav, $wav_file) = tempfile (SUFFIX => '.wav', UNLINK => 0);
           close $fh_wav;
@@ -686,6 +858,11 @@ Returns:
           }
         } else {
           system ("play -q $final_file");
+        }
+        select (undef, undef, undef, 0.25);
+        if ($lock_fh) {
+          flock ($lock_fh, LOCK_UN);
+          close $lock_fh;
         }
       } ## end else [ if ($os eq 'darwin') ]
 

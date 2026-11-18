@@ -154,7 +154,8 @@ sub _extract
 {
 	my ($module) = @_;
 
-	my $out = File::Spec->catdir($dir, 'schemas', $module);
+	# "::" is not legal in a Windows directory name
+	my $out = File::Spec->catdir($dir, 'schemas', $module =~ s{::}{-}gr);
 	make_path($out);
 
 	my ($stdout, $stderr) = ('', '');
@@ -167,7 +168,7 @@ sub _extract
 
 	my %schema;
 	for my $yml (glob("$out/*.yml")) {
-		my ($name) = $yml =~ m{/([^/]+)\.yml$};
+		my ($name) = $yml =~ m{([^/\\]+)\.yml$};
 		$schema{$name} = eval { (LoadFile($yml))[0] };
 		die "cannot load $yml: $@" unless $schema{$name};
 	}

@@ -228,79 +228,79 @@ EOS
     
   }
   
-  method get : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method get : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "GET";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
   
-  method head : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method head : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "HEAD";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
   
-  method delete : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method delete : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "DELETE";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
   
-  method options : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method options : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "OPTIONS";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
   
-  method patch : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method patch : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "PATCH";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
   
-  method post : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method post : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "POST";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
   
-  method put : Mojo::Transaction::HTTP ($ctx : Go::Context, $url : string|Mojo::URL, $args : object...) {
+  method put : Mojo::Transaction::HTTP ($context : Go::Context, $url : string|Mojo::URL, $args : object...) {
     
     my $method = "PUT";
     
     my $tx = $self->build_tx($method, $url, $args);
     
-    $tx = $self->start($ctx, $tx);
+    $tx = $self->start($context, $tx);
     
     return $tx;
   }
@@ -309,7 +309,7 @@ EOS
     return $self->transactor->tx($method, $url, $args);
   }
   
-  method start : Mojo::Transaction::HTTP ($ctx : Go::Context, $tx : Mojo::Transaction::HTTP) {
+  method start : Mojo::Transaction::HTTP ($context : Go::Context, $tx : Mojo::Transaction::HTTP) {
     
     # Application server
     $self->emit(prepare => $tx);
@@ -329,12 +329,12 @@ EOS
     
     my $req = $tx->req;
     
-    $tx = $self->_request($ctx, $tx);
+    $tx = $self->_request($context, $tx);
     
     return $tx;
   }
   
-  private method _request : Mojo::Transaction::HTTP ($ctx : Go::Context, $tx : Mojo::Transaction::HTTP)  {
+  private method _request : Mojo::Transaction::HTTP ($context : Go::Context, $tx : Mojo::Transaction::HTTP)  {
     
     my $method = $tx->req->method;
     
@@ -357,18 +357,18 @@ EOS
       $tx->req->content->set_headers($headers);
     }
     
-    $tx = $self->_connect($ctx, $tx);
+    $tx = $self->_connect($context, $tx);
     
-    $self->write_request($ctx, $tx);
+    $self->write_request($context, $tx);
     
-    $self->read_response($ctx, $tx);
+    $self->read_response($context, $tx);
     
-    $tx = $self->_finish($ctx, $tx);
+    $tx = $self->_finish($context, $tx);
     
     return $tx;
   }
   
-  private method _connect : Mojo::Transaction::HTTP ($ctx : Go::Context, $tx : Mojo::Transaction::HTTP)  {
+  private method _connect : Mojo::Transaction::HTTP ($context : Go::Context, $tx : Mojo::Transaction::HTTP)  {
     
     my $handle = (IO::Socket)undef;
     
@@ -399,7 +399,7 @@ EOS
     }
     
     # CONNECT request to proxy required
-    if (my $connect_tx = $self->_connect_proxy($ctx, $tx)) {
+    if (my $connect_tx = $self->_connect_proxy($context, $tx)) {
       return $connect_tx;
     }
     
@@ -415,7 +415,9 @@ EOS
     }
     
     my $options_h = Hash->new;
-    $options_h->set(Timeout => $self->connect_timeout);
+    
+    # TODO
+    # $options_h->set(Timeout => $self->connect_timeout);
     
     if ($proto eq "http+unix") { $options_h->set(path => $host); }
     else {
@@ -427,6 +429,8 @@ EOS
     my $tls = $proto eq "https";
     
     my $path = $options_h->{"path"}->(string);
+    
+    $options_h->{"Context"} = $context;
     
     # UNIX domain socket
     if ($path) {
@@ -486,7 +490,7 @@ EOS
     return $tx;
   }
   
-  private method write_request : void ($ctx : Go::Context, $tx : Mojo::Transaction::HTTP) {
+  private method write_request : void ($context : Go::Context, $tx : Mojo::Transaction::HTTP) {
     
     my $req = $tx->req;
     
@@ -495,31 +499,31 @@ EOS
     my $start_line = $req->build_start_line;
     
     # Check context before I/O
-    if ($ctx->err > 0) { die "Write aborted: " . $ctx->cause; }
-    $handle->syswrite($start_line);
+    if ($context->err > 0) { die "Write aborted: " . $context->cause; }
+    $handle->syswrite($context, $start_line);
     
     my $header_lines = $req->build_headers;
     
-    if ($ctx->err > 0) { die "Write aborted: " . $ctx->cause; }
-    $handle->syswrite($header_lines);
+    if ($context->err > 0) { die "Write aborted: " . $context->cause; }
+    $handle->syswrite($context, $header_lines);
     
-    $handle->syswrite("\r\n");
+    $handle->syswrite($context, "\r\n");
   }
   
-  private method read_response : void ($ctx : Go::Context, $tx : Mojo::Transaction::HTTP) {
+  private method read_response : void ($context : Go::Context, $tx : Mojo::Transaction::HTTP) {
     my $res = Mojo::Message::Response->new;
     
     my $handle = (IO::Socket)$self->{connections_h}->get(Fn->to_address($tx));
     
     while (1) {
       # Check context in each iteration of the read loop
-      if ($ctx->err > 0) {
-        die "Read aborted: " . $ctx->cause;
+      if ($context->err > 0) {
+        die "Read aborted: " . $context->cause;
       }
 
       my $chunk = (mutable string)new_string_len &READ_BUFFER_SIZE;
       
-      my $read_length = $handle->sysread($chunk);
+      my $read_length = $handle->sysread($context, $chunk);
       
       if ($read_length == 0) {
         $res->finish;
@@ -538,7 +542,7 @@ EOS
     $tx->set_res($res);
   }
   
-  private method _finish : Mojo::Transaction::HTTP ($ctx : Go::Context, $tx : Mojo::Transaction) {
+  private method _finish : Mojo::Transaction::HTTP ($context : Go::Context, $tx : Mojo::Transaction) {
     
     # Premature connection close
     $tx->closed;
@@ -578,13 +582,13 @@ EOS
         $self->_reuse($tx) ;
       }
       
-      $tx = $self->_redirect($ctx, $tx);
+      $tx = $self->_redirect($context, $tx);
       
       return $tx;
     }
   }
   
-  private method _redirect : Mojo::Transaction::HTTP ($ctx : Go::Context, $old : Mojo::Transaction::HTTP) {
+  private method _redirect : Mojo::Transaction::HTTP ($context : Go::Context, $old : Mojo::Transaction::HTTP) {
     
     my $new = $self->transactor->redirect($old);
     
@@ -596,7 +600,7 @@ EOS
       return $old;
     }
     
-    $self->start($ctx, $new);
+    $self->start($context, $new);
     
     return $new;
   }
@@ -625,7 +629,7 @@ EOS
     $keep_alive_sockets->push([(object)$endpoint, $handle]);
   }
   
-  private method _connect_proxy : Mojo::Transaction::HTTP ($ctx : Go::Context, $old : Mojo::Transaction::HTTP) {
+  private method _connect_proxy : Mojo::Transaction::HTTP ($context : Go::Context, $old : Mojo::Transaction::HTTP) {
     
     # Start CONNECT request
     my $new = $self->transactor->proxy_connect($old);
@@ -634,7 +638,7 @@ EOS
       return undef;
     }
     
-    my $tx = $self->start($ctx, $new);
+    my $tx = $self->start($context, $new);
     
     # Real transaction
     $old->set_previous($tx);
@@ -652,7 +656,7 @@ EOS
     }
     
     # TLS upgrade before starting the real transaction
-    $tx = $self->_connect($ctx, $old);
+    $tx = $self->_connect($context, $old);
     
     return $tx;
   }

@@ -1,0 +1,137 @@
+#!perl
+
+use v5.24;
+use warnings;
+
+use DDP;
+use File::Slurper qw( read_lines );
+use HTTP::Tiny;
+use JQ::Lite;
+use Scalar::Util qw( blessed );
+use String::Util qw( trim );
+use TOML::Tiny qw( from_toml );
+use Try::Tiny;
+
+use experimental qw( signatures );
+
+my ($year, $month, $day) = reverse( (localtime)[3..5] );
+my $date = sprintf('%4u-%02u-%02u', $year + 1900, $month + 1, $day );
+
+my $file = shift;
+
+my @lines = read_lines($file);
+
+my @buffer;
+for my $line (@lines) {
+
+    my $text = trim($line);
+    next if $text eq "";
+
+    if ( $text =~ /\A \[ [\w\-]+ \] \z/x ) {
+        process_section(\@buffer);
+        @buffer = ()
+    }
+
+    push @buffer, $text;
+}
+
+process_section(\@buffer);
+
+
+sub process_section($buffer) {
+    return unless $buffer->@*;
+
+    my @networks;
+    my %fields;
+
+    my sub _normalise_header($line) {
+        return $line unless $line =~ /\A \#\#+ \s* \w+(?:-\w+)* :/ax;
+        my ($field, $value) = $line =~ /\A \#\#+ \s* (\w+(?:-\w+)* ): \s* (\S.*) \z/x;
+        $field = lc($field) =~ s/\b([a-z])/\U$1/gr;
+        push @networks, $value if $field =~ /\A Network/ax;
+        $fields{$field} = $value;
+        return '## ' . $field . ': ' . $value;
+    }
+
+    my ($name, @lines ) = $buffer->@*;
+
+    my @info = map { _normalise_header($_) } grep { /\A \# /xa } @lines;
+
+    my $data = from_toml( join("\n", @lines) );
+
+    if ( @networks ) {
+
+        my $jq = JQ::Lite->new;
+
+        my @ips;
+        for my $url (@networks) {
+
+            my $res = HTTP::Tiny->new->get($url);
+            if ( $res->{success} ) {
+
+                my $type = $res->{headers}{"content-type"} // "";
+                if ( $type =~ m[ \A application / (json|octet-stream) \b ]x ) {
+
+                    my $query = $fields{Query} //  '.prefixes[] | .ipv4Prefix // .ipv6Prefix';
+                    push @ips, grep { !!$_ } map { trim( $_ // "" ) } $jq->run_query( $res->{content}, $query );
+
+                }
+                elsif ( $type eq "text/plain" ) {
+
+                    push @ips, grep { !!$_ } map { trim( ($_ // "") =~ s/\#.*\z//r ) } split /[\n\r]+/, $res->{content};
+                }
+            }
+            else {
+                warn "# Request to ${url} returned status " . $res->{status};
+            }
+        }
+
+        if (@ips) {
+            $data->{network} = \@ips;
+            @info = grep { $_ !~ /\A \#\# [ ] Date: /x } @info;
+            unshift @info, "## Date: $date";
+        }
+
+    }
+
+    return if $name =~ /^#/;
+
+    my ($rulename) = $name =~ /\A \[ ( (?:\w+\-)*\w+ ) \] \z/ax;
+
+    say "\n<Rule ${rulename}>\n";
+
+    say join("\n", ( map { "\t$_" } @info ), '');
+
+    for my $key (sort keys $data->%*) {
+
+        my $val = $data->{$key};
+        if ( ref $val ) {
+            try {
+                if (blessed($val)) {
+                    say join("\t", '', $key, "$val" );
+                }
+                else {
+                    say join("\t", '', $key, $_ )  for $val->@*;
+                }
+            }
+            catch  {
+                p $val;
+                die "$_\n";
+            }
+        }
+        else {
+            say join("\t", '', $key, $val );
+        }
+
+        print "\n";
+    }
+
+
+    say  "</Rule ${rulename}>";
+
+    # my $text = to_toml($data);
+
+    # push @info, '' if @info;
+
+    # say join("\n", $name, @info, $text, '');
+}

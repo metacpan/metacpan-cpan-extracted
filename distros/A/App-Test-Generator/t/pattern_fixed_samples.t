@@ -18,6 +18,7 @@ use warnings;
 # ======================================================================
 
 use Test::Most;
+use Config;
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -155,7 +156,7 @@ sub _run
 	unlink($log);
 
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', grep { defined($_) && length($_) } ($lib, $ENV{PERL5LIB}));
+	local $ENV{PERL5LIB} = join($Config{path_sep}, grep { defined($_) && length($_) } ($lib, $ENV{PERL5LIB}));
 	local $ENV{COOKIE_VALUE_LOG} = $log;
 	run3([ $^X, $file ], \undef, \$stdout, \$stderr);
 

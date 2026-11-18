@@ -89,11 +89,11 @@
    "provides" : {
       "Net::OpenSSH::More" : {
          "file" : "lib/Net/OpenSSH/More.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       },
       "Net::OpenSSH::More::Linux" : {
          "file" : "lib/Net/OpenSSH/More/Linux.pm",
-         "version" : "1.05"
+         "version" : "1.06"
       }
    },
    "release_status" : "stable",
@@ -108,9 +108,10 @@
          "web" : "https://github.com/troglodyne-internet-widgets/perl-Net-Openssh-More"
       }
    },
-   "version" : "1.05",
+   "version" : "1.06",
    "x_contributors" : [
-      "Andy Baugh <andy@troglodyne.net>"
+      "Andy Baugh <andy@troglodyne.net>",
+      "Troglodyne LLC Crash test Dummy <trogbot@troglodyne.net>"
    ],
    "x_generated_by_perl" : "v5.44.0",
    "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",

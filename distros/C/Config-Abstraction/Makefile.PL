@@ -48,10 +48,12 @@ WriteMakefile(
 		'XML::PP' => 0.06,
 		'File::Spec' => 0,
 		'Hash::Merge'	=> 0,
+		'MIME::Base64' => 0,
 		'Hash::Flatten'	=> '0.05',	# earlier versions mishandle keys containing dots
 		'Params::Validate::Strict' => 0.37,
 		'Pod::Usage' => 0,
 		'Scalar::Util' => 0,
+		'Sys::Hostname' => 0,
 		'TOML::Tiny' => 0,
 		'YAML::XS' => '0.80',	# _sanitize_yaml_values guards against !!perl/code in any version
 	}, META_MERGE => {
@@ -71,8 +73,14 @@ WriteMakefile(
 				# url => 'https://github.com/nigelhorne/Config-Abstraction/issues',
 			}
 		}, prereqs => {
+			runtime => {
+				recommends => {
+					'Config::General' => 0,	# Apache-style *.conf files
+				},
+			},
 			test => {
 				recommends => {
+					'Config::General' => 0,	# t/config-general.t is skipped without it
 					'Test::Permissions' => 0,	# probes whether chmod can revoke read access; t/extended_tests.t falls back to -r
 				},
 			},
@@ -85,6 +93,7 @@ WriteMakefile(
 	}, TEST_REQUIRES => {
 		'autodie' => 0,
 		'File::Glob' => 0,
+		'File::Path' => 0,
 		'File::stat' => 0,
 		'IPC::System::Simple' => 0,	# for scripts/generate_index
 		'POSIX' => 0,

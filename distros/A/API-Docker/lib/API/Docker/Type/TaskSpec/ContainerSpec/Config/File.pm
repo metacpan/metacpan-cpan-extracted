@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::ContainerSpec::Config::File;
 # ABSTRACT: A specific target that is backed by a file
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -31,7 +31,7 @@ API::Docker::Type::TaskSpec::ContainerSpec::Config::File - A specific target tha
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -62,7 +62,7 @@ Mode represents the FileMode of the file.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -19,6 +19,12 @@ karr sync --accept-foreign-board   # accept a pull whose remote presents a diffe
 mailbox, design documents) after the board, in the same run; mutating commands
 sync the board only. Deletions travel: a pruned run log does not come back.
 
+`--local-only` (on every command that syncs) writes the local refs and skips both
+fetch and push. It exists for a configured remote that is unreachable or silent,
+where the inline fetch and push would run into the caller's timeout; with no
+remote configured it changes nothing. Never use it to dodge the push. Run
+`karr sync` once the remote answers: it publishes what was written.
+
 **A fresh clone fetches the board by itself.** `git clone` does not carry
 `refs/karr/*`. Where nothing exists under `refs/karr/` and the remote has a
 board, the read commands (`board`, `list`, `show`, `log`, `context`,

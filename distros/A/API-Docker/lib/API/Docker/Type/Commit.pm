@@ -1,6 +1,6 @@
 package API::Docker::Type::Commit;
 # ABSTRACT: Commit holds the Git-commit (SHA1) that a binary was built from, as reported in the version-string of external tools, such as C<containerd>, or C<runC>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::Commit - Commit holds the Git-commit (SHA1) that a binary was
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ because deriving it from the Perl name would produce C<Id>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

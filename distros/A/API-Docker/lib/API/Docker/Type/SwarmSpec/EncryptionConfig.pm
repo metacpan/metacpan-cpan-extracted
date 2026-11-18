@@ -1,6 +1,6 @@
 package API::Docker::Type::SwarmSpec::EncryptionConfig;
 # ABSTRACT: Parameters related to encryption-at-rest
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::SwarmSpec::EncryptionConfig - Parameters related to encryptio
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ If set, generate a key and use it to lock data stored on the managers.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

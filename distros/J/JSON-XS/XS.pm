@@ -89,7 +89,7 @@ package JSON::XS;
 
 use common::sense;
 
-our $VERSION = '4.05';
+our $VERSION = '4.06';
 our @ISA = qw(Exporter);
 
 our @EXPORT = qw(encode_json decode_json);
@@ -764,6 +764,12 @@ whitespace) between the JSON objects or arrays, instead they must be
 concatenated back-to-back. If an error occurs, an exception will be
 raised as in the scalar context case. Note that in this case, any
 previously-parsed JSON texts will be lost.
+
+The parser extracts the longest unambiguous JSON prefix. In particular,
+a top-level number requires one character of lookahead that is not part
+of the number before it can be returned: C<12> alone might still become
+C<123> or C<12.3>, while C<12 > or C<12[> allows C<12> to be returned.
+Other JSON values can be returned as soon as their end is recognized.
 
 Example: Parse some JSON arrays/objects in a given string and return
 them.

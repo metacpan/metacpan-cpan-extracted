@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerPidsStats;
 # ABSTRACT: PidsStats contains Linux-specific stats of a container's process-IDs (PIDs)
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::ContainerPidsStats - PidsStats contains Linux-specific stats 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ deriving it from the Perl name would produce C<Limit>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

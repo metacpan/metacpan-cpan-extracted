@@ -8,6 +8,7 @@ use warnings;
 use Carp;
 use Cwd ();
 use JSON::MaybeXS 'decode_json';	# Doesn't behave well with require
+use File::Basename ();
 use File::Slurp qw(read_file);
 use File::Spec;
 use Hash::Merge qw(merge);
@@ -16,7 +17,7 @@ use Params::Validate::Strict 0.37;
 use Scalar::Util;
 use Readonly;
 
-# AES-256-GCM constants — do not change without updating _decrypt_enc_value and encrypt_value
+# AES-256-GCM constants - do not change without updating _decrypt_enc_value and encrypt_value
 Readonly::Scalar my $_AES_NONCE_SIZE  => 12;	# GCM standard nonce length in bytes
 Readonly::Scalar my $_AES_TAG_SIZE    => 16;	# GCM authentication tag length in bytes
 Readonly::Scalar my $_AES_KEY_SIZE    => 32;	# AES-256 key length in bytes
@@ -36,11 +37,11 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 =head1 VERSION
 
-Version 0.42
+Version 0.43
 
 =cut
 
-our $VERSION = '0.42';
+our $VERSION = '0.43';
 
 =head1 SYNOPSIS
 
@@ -242,23 +243,23 @@ so that configuration on remote machines can be centrally managed.
 
 =item * YAML (C<*.yaml>, C<*.yml>)
 
-Loaded with C<YAML::XS>.
+Loaded with L<YAML::XS>.
 
 =item * JSON (C<*.json>)
 
-Loaded with C<JSON::MaybeXS>.
+Loaded with L<JSON::MaybeXS>.
 
 =item * XML (C<*.xml>)
 
-Loaded with C<XML::Simple> (preferred) or C<XML::PP> (fallback).
+Loaded with L<XML::Simple> (preferred) or L<XML::PP> (fallback).
 
 =item * INI (C<*.ini>)
 
-Loaded with C<Config::IniFiles>.
+Loaded with L<Config::IniFiles>.
 
 =item * TOML (C<*.toml>)
 
-Loaded with C<TOML::Tiny>, which implements TOML 1.0.  TOML is a good choice
+Loaded with L<TOML::Tiny>, which implements TOML 1.0.  TOML is a good choice
 for human-editable configuration because its syntax is unambiguous: all values
 are typed, strings must be quoted, and nesting uses C<[section]> headers or
 dotted keys rather than indentation.
@@ -281,7 +282,108 @@ in the all-parsers chain used for extensionless C<config_file> entries.
 If C<TOML::Tiny> is not installed, TOML files are silently skipped with a
 C<carp> warning.
 
+=item * Apache-style (C<*.conf>)
+
+Loaded with L<Config::General>, which is optional.  C<base.conf>,
+C<local.conf> and their environment-specific forms are discovered like the
+other formats, and Config::General is the last parser tried for an
+extensionless C<config_file>.  If it is not installed, C<.conf> files are
+skipped.
+
+  name      = myapp
+  log       debug
+  log       trace            # repeated keys become an array
+  <database>
+      host  = db.example.com
+      port  = 5432
+  </database>
+  <host www.example.com>     # a named block nests one level further
+      root  /var/www
+  </host>
+
+Config::General's own C<E<lt>E<lt>include ...E<gt>E<gt>> directive is B<not>
+honoured, and a file that uses it is skipped with a warning, because it reads
+any file the process can read.  Use the C<include> key described under
+L</INCLUDING FILES> instead.  Config::General's variable interpolation is
+switched off in favour of L</VARIABLE INTERPOLATION>.
+
+Apache-style content has C<E<lt>blockE<gt>...E<lt>/blockE<gt>> tags that look
+like XML.  When an extensionless C<config_file> that does not begin with an
+C<E<lt>?xmlE<gt>> declaration fails to parse as XML, it is given one attempt
+as Apache-style configuration before the XML error is reported.
+
 =back
+
+=head2 INCLUDING FILES
+
+With C<allow_includes =E<gt> 1>, a configuration file may name other files
+in a top-level C<include> key (a path, a glob, or an arrayref of them):
+
+  # base.yaml
+  include:
+    - defaults/common.yaml
+    - conf.d/*.json
+  name: myapp
+
+Any format may include any other.  The included files are merged I<under> the
+file that includes them, so the including file wins over its includes and,
+of several includes, the later one wins over the earlier.  Globs are expanded
+in sorted order.  A relative path is taken relative to the including file, not
+to the current directory.  Included files appear in C<config_path> and, with
+their own entries, in C<explain_sources()>.
+
+Because an include is a way to make the module read a file, it is confined:
+an included file must be within the directory of the file that began the
+chain (any depth below it), or within a directory listed in C<include_dirs>.
+Symbolic links are resolved before the check.  A file outside those
+directories, a circular include, or a chain deeper than C<include_max_depth>
+croaks.  An include that does not exist is skipped with a warning.
+
+The key name can be changed with C<include_key>.  A glob that matches no
+file is silently ignored, whereas an explicit path that does not exist warns.
+A file that starts with C<#!> is a program and is never read as an include, and
+the running script is never included.  An included file with an unrecognised
+extension is detected by its content (JSON, YAML, TOML, then Apache-style).
+
+Includes are not followed in files fetched from remote directories
+(Newcastle Connection).
+
+=head2 VARIABLE INTERPOLATION
+
+With C<interpolate =E<gt> 1>, string values may refer to other values:
+
+  database:
+    host: db.example.com
+    port: 5432
+  dsn:  "dbi:Pg:host=${database.host};port=${database.port}"
+  home: "${env:HOME}/app"
+  lang: "${env:LANG:-C}"
+  cost: "$$5"                    # a literal $5
+
+=over 4
+
+=item * C<${a.b}> -- the value of the configuration key C<a.b> (always C<.>-separated, whatever C<sep_char> is)
+
+=item * C<${env:NAME}> -- the environment variable C<NAME>
+
+=item * C<${...:-default}> -- C<default> when the key or variable is missing
+
+=item * C<$$> -- a literal C<$>
+
+=back
+
+Expansion happens after every source (files, includes, environment, command
+line) has been merged, so a reference sees the final value of its key, and
+references may chain.  A bare C<$name> is not special.  Values that are
+C<ENC[...]> tokens are left alone, so a secret can be referred to only after
+decryption by not referring to it.  An undefined key or variable, a circular
+reference, or a reference to a hash or array croaks, unless
+C<interpolate_strict> is false.  The caller's C<data> hashref is never
+modified.
+
+Turn this on only for configuration you trust: a value taken from an
+environment variable or command-line argument that contains
+C<${env:NAME}> will be expanded too.
 
 =head2 ENVIRONMENT VARIABLE HANDLING
 
@@ -486,6 +588,36 @@ Synonym for C<config_file>
 
 If true, returns a flat hash structure like C<{database.user}> (default: C<0>) instead of C<{database}{user}>.
 `
+=item * C<allow_includes>
+
+If true, a top-level C<include> key in any configuration file (YAML, JSON,
+XML, INI, TOML or Apache-style) names further file(s) to read and merge in.
+It is off by default, because an existing configuration may already use a key
+called C<include> for something else.  See L</INCLUDING FILES>.
+
+=item * C<include_key>
+
+The name of the key that holds the files to include (default: C<include>).
+
+=item * C<include_dirs>
+
+A directory, or an arrayref of directories, from which files may be included
+in addition to the directory of the including file.  See L</INCLUDING FILES>.
+
+=item * C<include_max_depth>
+
+How deeply includes may nest before the constructor croaks (default: 10).
+
+=item * C<interpolate>
+
+If true, C<${...}> references in string values are expanded once all the
+sources have been merged.  Off by default.  See L</VARIABLE INTERPOLATION>.
+
+=item * C<interpolate_strict>
+
+When C<interpolate> is on, a reference that cannot be resolved croaks
+(the default, C<1>).  Set this to C<0> to leave such references as written.
+
 =item * C<level>
 
 Level for logging.
@@ -681,6 +813,36 @@ validation and need errors to point at the construction site.
 =back
 
 If just one argument is given, it is assumed to be the name of a file.
+
+=head3 API SPECIFICATION
+
+=head4 Input
+
+  A hash or hashref of the options above, or a single SCALAR (a file name).
+  All are optional.
+
+  allow_includes      -- BOOLEAN  -- follow the include key (default 0)
+  include_key         -- SCALAR   -- name of the include key (default 'include')
+  include_dirs        -- SCALAR | ARRAYREF -- extra directories includes may read
+  include_max_depth   -- INTEGER  -- deepest include nesting (default 10)
+  interpolate         -- BOOLEAN  -- expand ${...} references (default 0)
+  interpolate_strict  -- BOOLEAN  -- croak on an unresolved reference (default 1)
+
+=head4 Output
+
+  Config::Abstraction object, or undef when no configuration was found and
+  lazy is not set.
+
+=head3 MESSAGES
+
+  croaks   encryption_key_file does not exist
+  croaks   invalid environment name
+  croaks   an include outside the permitted directories, a circular include,
+           or includes nested more than include_max_depth deep
+  croaks   an unresolved, circular or non-scalar ${...} reference (when
+           interpolate_strict is true)
+  carps    an include that is missing, unreadable or not a configuration hash
+  carps    a configuration file that cannot be parsed
 
 =cut
 
@@ -905,7 +1067,7 @@ sub _decode_encryption_key
 
 	if(length($raw) >= $_B64_KEY_MIN && length($raw) <= $_B64_KEY_MAX) {
 		require MIME::Base64;
-		(my $b64 = $raw) =~ tr/-_/+\//;   # base64url → base64
+		(my $b64 = $raw) =~ tr/-_/+\//;   # base64url to base64
 		$b64 .= '=' x ((4 - length($b64) % 4) % 4);
 		my $bytes = MIME::Base64::decode_base64($b64);
 		return $bytes if length($bytes) == $_AES_KEY_SIZE;
@@ -950,7 +1112,7 @@ sub _decrypt_enc_value
 		ENC\[
 		([A-Za-z0-9]+)		# algorithm name  (e.g. AES256GCM)
 		,
-		([A-Za-z0-9_-]+)	# base64url payload (RFC 4648 §5 alphabet)
+		([A-Za-z0-9_-]+)	# base64url payload (RFC 4648 section 5 alphabet)
 		\]
 	$/x) {
 		Carp::croak(ref($self) . ": malformed ENC token: $token");
@@ -1049,7 +1211,7 @@ sub _validate_value_spec
 }
 
 # Validate a single value against a named type.
-# Not a method — takes (key, value, type_string).
+# Not a method - takes (key, value, type_string).
 sub _validate_type
 {
 	my ($key, $value, $type) = @_;
@@ -1185,7 +1347,7 @@ sub _load_config
 	}
 
 	my $environment = $self->_get_environment();
-	my @_formats    = qw(yaml yml json xml ini toml);
+	my @_formats    = qw(yaml yml json xml ini toml conf);
 	my @_file_list  = (
 		(map { "base.$_"              } @_formats),
 		($environment ? (map { "base.$environment.$_"  } @_formats) : ()),
@@ -1323,6 +1485,8 @@ sub _load_config
 						$data = $toml_data;
 					}
 				}
+			} elsif ($file =~ /\.conf$/) {
+				$data = $self->_load_config_general($path);
 			}
 			if($data) {
 				if(!ref($data)) {
@@ -1340,13 +1504,15 @@ sub _load_config
 				if($logger) {
 					$logger->debug(ref($self), ' ', __LINE__, ": Loaded data from $path");
 				}
+				my ($full, $inc_paths);
+				($data, $full, $inc_paths) = $self->_process_includes($data, $path);
 				push @{$self->{'_source_records'}}, {
 					type      => 'file',
 					label     => $path,
 					flat_data => { _flatten_keys($data) },
 				};
-				%merged = %{ merge( $data, \%merged ) };
-				push @{$merged{'config_path'}}, $path;
+				%merged = %{ merge( $full, \%merged ) };
+				push @{$merged{'config_path'}}, $path, @{$inc_paths};
 			}
 		}
 
@@ -1401,9 +1567,20 @@ sub _load_config
 							if($data =~ /<!ENTITY\s+\w+\s+(?:SYSTEM|PUBLIC)\b/i) {
 								Carp::carp(ref($self) . ": skipping $path: XML external entity declarations not permitted");
 								undef $data;
-							} elsif(my $xml_data = XMLin(\$data, ForceArray => 0, KeyAttr => [])) {
-								$data = $xml_data;
-								$self->{'type'} = 'XML';
+							} else {
+								my $xml_data = eval { XMLin(\$data, ForceArray => 0, KeyAttr => []) };
+								my $xml_err = $@;
+								if($xml_data) {
+									$data = $xml_data;
+									$self->{'type'} = 'XML';
+								} elsif($xml_err) {
+									# Apache-style <block>...</block> looks like XML.  Real XML, which
+									# starts with a declaration, is never second-guessed.
+									my $general = ($data !~ /^\s*<\?xml/) ? $self->_load_config_general($path, $data) : undef;
+									die $xml_err unless($general);
+									$data = $general;
+									$self->{'type'} = 'Config::General';
+								}
 							}
 						} elsif($self->_load_driver('XML::PP')) {
 							my $xml_pp = XML::PP->new();
@@ -1459,7 +1636,7 @@ sub _load_config
 								# Do not inspect or modify coderefs, blessed objects, or any reference
 								next unless _is_plain_scalar($v);
 
-								next if($v =~ /^"[^"]+"$/);	# Single-quoted field — skip comma-splitting
+								next if($v =~ /^"[^"]+"$/);	# Single-quoted field - skip comma-splitting
 								if($v =~ /,/) {
 									my @vals = split(/\s*,\s*/, $v);
 									delete $data->{$k};
@@ -1528,10 +1705,25 @@ sub _load_config
 								}
 								if((!$data) || (ref($data) ne 'HASH')) {
 									$self->_load_driver('Config::Auto');
-									my $ca = Config::Auto->new(source => $path);
-									if($data = $ca->parse()) {
-										$self->{'type'} = $ca->format();
+									# Config::Auto dies on content it mistakes for XML, which would skip the
+									# Config::General attempt below; keep the error and raise it only if
+									# nothing else reads the file.
+									my $auto_err;
+									eval {
+										my $ca = Config::Auto->new(source => $path);
+										if($data = $ca->parse()) {
+											$self->{'type'} = $ca->format();
+										}
+									};
+									$auto_err = $@;
+									if((!$data) || (ref($data) ne 'HASH')) {
+										# Last resort: Apache-style configuration
+										if($data = $self->_load_config_general($path, $raw_content)) {
+											$self->{'type'} = 'Config::General';
+											undef $auto_err;
+										}
 									}
+									die $auto_err if($auto_err);
 								}
 							}
 						}
@@ -1545,7 +1737,9 @@ sub _load_config
 						$logger->debug(ref($self), ' ', __LINE__, ': Loaded data from', $self->{'type'}, "file $path");
 					}
 				}
+				my ($full, $inc_paths) = ($data, []);
 				if($data && ref($data) eq 'HASH') {
+					($data, $full, $inc_paths) = $self->_process_includes($data, $path);
 					push @{$self->{'_source_records'}}, {
 						type      => 'file',
 						label     => $path,
@@ -1553,16 +1747,16 @@ sub _load_config
 					};
 				}
 				if(scalar(keys %merged)) {
-					if($data) {
-						%merged = %{ merge($data, \%merged) };
+					if($full) {
+						%merged = %{ merge($full, \%merged) };
 					}
-				} elsif($data && (ref($data) eq 'HASH')) {
-					%merged = %{$data};
+				} elsif($full && (ref($full) eq 'HASH')) {
+					%merged = %{$full};
 				} elsif((!$@) && $logger) {
 					$logger->debug(ref($self), ' ', __LINE__, ': No configuration file loaded');
 				}
 
-				push @{$merged{'config_path'}}, $path;
+				push @{$merged{'config_path'}}, $path, @{$inc_paths};
 			}
 		}
 	}
@@ -1615,6 +1809,10 @@ sub _load_config
 				flat_data => { join('.', @parts) => $value },
 			};
 		}
+	}
+
+	if($self->{'interpolate'}) {
+		%merged = %{ $self->_interpolate_tree(\%merged) };
 	}
 
 	if($self->{'flatten'}) {
@@ -2333,6 +2531,370 @@ sub _load_driver
 	return 1;
 }
 
+# Parse an Apache-style configuration with Config::General.  Returns a hashref
+# or undef (driver absent, unreadable, rejected or empty).  Config::General's
+# own <<include>> directive is never honoured: it would read any file the
+# process can read, outside the allowlist that _process_includes enforces, so
+# a file that uses it is skipped.  The 'include' key (see allow_includes) is the
+# supported way to include files.  Config::General's variable interpolation is
+# switched off in favour of this module's own (see the interpolate option).
+sub _load_config_general
+{
+	my ($self, $path, $content) = @_;
+
+	return undef unless $self->_load_driver('Config::General');
+
+	$content //= eval { scalar(read_file($path)) };
+	return undef unless defined($content);
+	return undef if $content =~ /\A#!/;
+
+	if($content =~ /^\s*<<\s*include\b/mi) {
+		Carp::carp(ref($self) . ": skipping $path: Config::General <<include>> directives are not permitted; use the 'include' key with allow_includes");
+		return undef;
+	}
+
+	my %conf = eval {
+		Config::General->new(
+			-String => $content,
+			-InterPolateVars => 0,
+			-InterPolateEnv => 0,
+			-UseApacheInclude => 0,
+			-IncludeGlob => 0,
+		)->getall();
+	};
+	if($@) {
+		if(my $logger = $self->{'logger'}) {
+			$logger->notice("Failed to load Config::General data from $path: $@");
+		} else {
+			Carp::carp("Failed to load Config::General data from $path: $@");
+		}
+		return undef;
+	}
+
+	return scalar(keys %conf) ? \%conf : undef;
+}
+
+# Parse one file chosen by its extension, for use by the include mechanism.
+# Files with an unrecognised extension are tried as JSON, YAML, TOML, then
+# Config::General.  Returns a hashref or undef; never dies.
+sub _parse_file
+{
+	my ($self, $path) = @_;
+
+	my $raw = eval { scalar(read_file($path)) };
+	return undef unless defined($raw);
+	# A program is never configuration
+	return undef if $raw =~ /\A#!/;
+
+	my $logger = $self->{'logger'};
+	my $fail = sub {
+		my ($what, $err) = @_;
+		if($logger) {
+			$logger->notice("Failed to load $what from $path: $err");
+		} else {
+			Carp::carp("Failed to load $what from $path: $err");
+		}
+		return undef;
+	};
+	my $xxe = qr/<!ENTITY\s+\w+\s+(?:SYSTEM|PUBLIC)\b/i;
+
+	my $data;
+	if($path =~ /\.ya?ml$/i) {
+		$self->_load_driver('YAML::XS', ['Load']) or return undef;
+		$data = eval { YAML::XS::Load($raw) };
+		return $fail->('YAML', $@) if($@);
+		$data = $self->_sanitize_yaml_values($data) if ref($data);
+	} elsif($path =~ /\.json$/i) {
+		$data = eval { decode_json($raw) };
+		return $fail->('JSON', $@) if($@);
+	} elsif($path =~ /\.xml$/i) {
+		if($raw =~ $xxe) {
+			Carp::carp(ref($self) . ": skipping $path: XML external entity declarations not permitted");
+			return undef;
+		}
+		if($self->_load_driver('XML::Simple', ['XMLin'])) {
+			$data = eval { XMLin(\$raw, ForceArray => 0, KeyAttr => []) };
+			return $fail->('XML', $@) if($@);
+		} elsif($self->_load_driver('XML::PP')) {
+			my $xml_pp = XML::PP->new();
+			if(my $tree = eval { $xml_pp->parse(\$raw) }) {
+				$data = $xml_pp->collapse_structure($tree);
+				$data = $data->{'config'} if(ref($data) eq 'HASH' && $data->{'config'});
+			}
+		}
+	} elsif($path =~ /\.ini$/i) {
+		$self->_load_driver('Config::IniFiles') or return undef;
+		if(my $ini = Config::IniFiles->new(-file => $path)) {
+			$data = { map {
+				my $section = $_;
+				$section => { map { $_ => $ini->val($section, $_) } $ini->Parameters($section) }
+			} $ini->Sections() };
+		} else {
+			my @errors = do { no warnings "once"; @Config::IniFiles::errors };
+			return $fail->('INI', join(q{; }, @errors));
+		}
+	} elsif($path =~ /\.toml$/i) {
+		$self->_load_driver('TOML::Tiny', ['from_toml']) or return undef;
+		my ($toml, $err) = from_toml($raw);
+		return $fail->('TOML', $err) if($err);
+		$data = $toml;
+	} elsif($path =~ /\.(?:conf|cnf)$/i) {
+		$data = $self->_load_config_general($path, $raw);
+	} else {
+		if($raw =~ /^\s*\{/ && $self->_load_driver('JSON::Parse')) {
+			my $is_json = eval { JSON::Parse::parse_json($raw) };
+			$data = eval { decode_json($raw) } if($is_json);
+		}
+		if(ref($data) ne 'HASH' && $raw !~ $xxe && $self->_load_driver('YAML::XS', ['Load'])) {
+			$data = eval { YAML::XS::Load($raw) };
+			$data = $self->_sanitize_yaml_values($data) if ref($data);
+		}
+		if(ref($data) ne 'HASH' && $self->_load_driver('TOML::Tiny', ['from_toml'])) {
+			my ($toml, $err) = eval { from_toml($raw) };
+			$data = $toml if(!$err && ref($toml) eq 'HASH' && scalar(keys %{$toml}));
+		}
+		if(ref($data) ne 'HASH') {
+			$data = $self->_load_config_general($path, $raw);
+		}
+	}
+
+	return (ref($data) eq 'HASH') ? $data : undef;
+}
+
+# True when the (already resolved) path lies within one of the root directories.
+sub _path_within
+{
+	my ($path, $roots) = @_;
+
+	foreach my $root (@{$roots}) {
+		(my $r = $root) =~ s{[/\\]+$}{};
+		return 1 if($path eq $r || index($path, "$r/") == 0);
+	}
+	return 0;
+}
+
+# Expand the include key of a freshly parsed file.
+#
+# Returns ($own, $full, \@included_paths):
+#   $own  the file's own data, without the include key
+#   $full $own merged over everything it includes (the file wins over its
+#         includes; of several includes the later one wins), ready to be merged
+#         into the configuration in place of the file's data
+#   the paths of the files included (recursively), in the order they were read
+#
+# A no-op returning ($data, $data, []) unless allow_includes is set.  Included
+# files must lie within the directory of the file that started the include
+# chain, or within one of the include_dirs; anything else croaks, as does a
+# circular include or a chain deeper than include_max_depth.  A missing include
+# is skipped with a warning, as a malformed config file is.
+sub _process_includes
+{
+	my ($self, $data, $path, $stack, $roots) = @_;
+
+	return ($data, $data, []) unless($self->{'allow_includes'} && ref($data) eq 'HASH');
+
+	my $key = $self->{'include_key'} // 'include';
+	return ($data, $data, []) unless(exists($data->{$key}));
+
+	my %own = %{$data};
+	my $spec = delete $own{$key};
+
+	my $real = Cwd::abs_path($path) // $path;
+	my $dir = File::Basename::dirname($real);
+
+	if(!$stack) {
+		$stack = [ $real ];
+		my @extra = ref($self->{'include_dirs'}) eq 'ARRAY' ? @{$self->{'include_dirs'}}
+			: defined($self->{'include_dirs'}) ? ($self->{'include_dirs'}) : ();
+		$roots = [ $dir, grep { defined } map { Cwd::abs_path($_) } grep { defined && length } @extra ];
+	}
+
+	my $max_depth = $self->{'include_max_depth'} // 10;
+	if(scalar(@{$stack}) > $max_depth) {
+		Carp::croak(ref($self) . ": includes nested more than $max_depth deep at $path");
+	}
+
+	my (%acc, @paths);
+	foreach my $inc (ref($spec) eq 'ARRAY' ? @{$spec} : ($spec)) {
+		next unless defined($inc);
+		if(ref($inc) || !length($inc)) {
+			Carp::carp(ref($self) . ": ignoring invalid '$key' entry in $path");
+			next;
+		}
+
+		my $target = File::Spec->file_name_is_absolute($inc) ? $inc : File::Spec->catfile($dir, $inc);
+		my @targets = ($target);
+		if($target =~ /[*?\[{]/) {
+			require File::Glob;
+			@targets = sort(File::Glob::bsd_glob($target));
+		}
+
+		foreach my $t (@targets) {
+			my $tr = Cwd::abs_path($t);
+			if(!defined($tr) || !-f $tr) {
+				Carp::carp(ref($self) . ": $key '$inc' in $path not found") if($t eq $target);
+				next;
+			}
+			if(!_path_within($tr, $roots)) {
+				Carp::croak(ref($self) . ": $key '$inc' in $path resolves to $tr, which is outside the permitted directories");
+			}
+			if(grep { $_ eq $tr } @{$stack}) {
+				Carp::croak(ref($self) . ": circular $key of $tr from $path");
+			}
+			if(defined($_RUNNING_SCRIPT) && $tr eq $_RUNNING_SCRIPT) {
+				next;
+			}
+			if(!-r $tr) {
+				Carp::carp(ref($self) . ": $key '$inc' in $path is not readable");
+				next;
+			}
+
+			my $inc_data = $self->_parse_file($tr);
+			if(ref($inc_data) ne 'HASH') {
+				Carp::carp(ref($self) . ": $key '$inc' in $path did not contain a configuration hash");
+				next;
+			}
+
+			my ($inc_own, $inc_full, $inc_paths) = $self->_process_includes($inc_data, $tr, [ @{$stack}, $tr ], $roots);
+			push @{$self->{'_source_records'}}, {
+				type      => 'file',
+				label     => $tr,
+				flat_data => { _flatten_keys($inc_own) },
+			};
+			%acc = %{ merge($inc_full, \%acc) };
+			push @paths, $tr, @{$inc_paths};
+		}
+	}
+
+	return (\%own, scalar(keys %acc) ? merge(\%own, \%acc) : \%own, \@paths);
+}
+
+# Expand ${...} references in every string value of the merged configuration
+# and return the result as a new tree; the input, which can share structure with
+# the caller's data argument, is left untouched.
+#
+#   ${a.b}            the value of config key a.b
+#   ${env:NAME}       the environment variable NAME
+#   ${a.b:-default}   as above, but default when it is missing or undef
+#   $$                a literal dollar sign
+#
+# Values that are ENC[...] tokens are left alone.  A reference to a missing key,
+# a circular reference, or a reference to a non-scalar croaks, unless
+# interpolate_strict is set to a false value, in which case the reference is
+# left as written.
+sub _interpolate_tree
+{
+	my ($self, $root) = @_;
+
+	my $strict = $self->{'interpolate_strict'} // 1;
+	my (%memo, %busy, $expand, $lookup);
+
+	$lookup = sub {
+		my ($name, $where) = @_;
+
+		return @{$memo{$name}} if($memo{$name});
+
+		my $node = $root;
+		my ($found, $value);
+		if(exists($root->{$name})) {
+			($found, $value) = (1, $root->{$name});
+		} else {
+			foreach my $part (split /\./, $name, -1) {
+				if(ref($node) eq 'HASH' && exists($node->{$part})) {
+					$node = $node->{$part};
+					$found = 1;
+				} else {
+					$found = 0;
+					last;
+				}
+			}
+			$value = $node if($found);
+		}
+		return (0) unless($found && defined($value));
+
+		if(ref($value)) {
+			Carp::croak(ref($self) . ": \${$name} in $where refers to a non-scalar value");
+		}
+		if($busy{$name}) {
+			Carp::croak(ref($self) . ": circular reference to \${$name} in $where");
+		}
+		local $busy{$name} = 1;
+		my $resolved = $expand->($value, $name);
+		$memo{$name} = [ 1, $resolved ];
+		return (1, $resolved);
+	};
+
+	$expand = sub {
+		my ($str, $where) = @_;
+
+		return $str if(!defined($str) || ref($str) || $str !~ /\$/ || $str =~ /^ENC\[/);
+
+		$str =~ s{ \$\$ | \$\{ ([^{}]*) \} }{
+			my $spec = $1;
+			my $whole = $&;
+			if(!defined($spec)) {
+				'$';
+			} else {
+				my ($name, $default) = $spec =~ /^(.*?)(?::-(.*))?$/s;
+				$name =~ s/^\s+|\s+$//g;
+				Carp::croak(ref($self) . ": empty \${} reference in $where") unless length($name);
+
+				my ($ok, $val);
+				if($name =~ /^env:(.+)$/i) {
+					my $var = $1;
+					($ok, $val) = defined($ENV{$var}) ? (1, $ENV{$var}) : (0);
+				} else {
+					($ok, $val) = $lookup->($name, $where);
+				}
+				if($ok) {
+					$val;
+				} elsif(defined($default)) {
+					$default;
+				} elsif($strict) {
+					Carp::croak(ref($self) . ": \${$name} in $where is not defined");
+				} else {
+					$whole;
+				}
+			}
+		}gex;
+		return $str;
+	};
+
+	my $seen = {};
+	my $walk;
+	$walk = sub {
+		my ($node, $prefix) = @_;
+
+		my $r = ref($node);
+		if($r eq 'HASH') {
+			my $addr = Scalar::Util::refaddr($node);
+			return $node if($seen->{$addr}++);
+			my %new;
+			foreach my $k (keys %{$node}) {
+				if($prefix eq '' && $k eq 'config_path') {
+					$new{$k} = $node->{$k};
+					next;
+				}
+				$new{$k} = $walk->($node->{$k}, length($prefix) ? "$prefix.$k" : $k);
+			}
+			delete $seen->{$addr};
+			return \%new;
+		}
+		if($r eq 'ARRAY') {
+			my $addr = Scalar::Util::refaddr($node);
+			return $node if($seen->{$addr}++);
+			my $i = 0;
+			my @new = map { $walk->($_, "$prefix\[" . $i++ . ']') } @{$node};
+			delete $seen->{$addr};
+			return \@new;
+		}
+		return $node if($r);	# code refs, objects: not ours to rewrite
+		return $expand->($node, $prefix);
+	};
+
+	return $walk->($root, '');
+}
+
 =head2 Remote configuration directories (Newcastle Connection)
 
 Any entry in C<config_dirs> whose path begins with C</../> is treated as a
@@ -2933,6 +3495,11 @@ Notable changes by release.  Full details are in the C<Changes> file.
 
 =over 4
 
+=item * B<0.43> (unreleased)
+
+Includes (C<allow_includes>), variable interpolation (C<interpolate>) and
+Apache-style C<*.conf> files via the optional L<Config::General>.
+
 =item * B<0.40> (unreleased)
 
 TOML file support (C<*.toml>) via C<TOML::Tiny>; C<base.toml> and C<local.toml>
@@ -3039,6 +3606,22 @@ AUTOLOAD method dispatch converts underscores to key separators.  If C<sep_char>
 the default C<'.'>, AUTOLOAD cannot reach nested keys because Perl method names cannot
 contain dots.
 
+=item * B<Includes are checked, then read>
+
+The directory check on an included file resolves its path and reads it a moment
+later.  Someone who can write to the configuration directory could swap the file
+for a symbolic link in between.  Anyone with that access can already change the
+configuration, so this is not a privilege boundary, but do not rely on
+C<include_dirs> to confine a directory that untrusted users can write to.
+
+=item * B<Interpolation reaches values from every source>
+
+With C<interpolate>, a configuration value is expanded whichever source it came
+from, so an C<APP_> environment variable or command-line argument that
+contains C<${env:NAME}> will pull in that other variable.  The text of a
+variable read through C<${env:NAME}> is inserted as it is, without being
+expanded again.
+
 =item * B<Remote directory TOML support requires File::Slurp::Remote>
 
 TOML files in Newcastle Connection remote directories are only fetched when the
@@ -3084,6 +3667,8 @@ You can find documentation for this module with the perldoc command.
 =item * L<Config::Any>
 
 =item * L<Config::Auto>
+
+=item * L<Config::General>
 
 =item * L<Data::Reuse>
 

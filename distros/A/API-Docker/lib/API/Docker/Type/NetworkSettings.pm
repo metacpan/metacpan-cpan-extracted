@@ -1,6 +1,6 @@
 package API::Docker::Type::NetworkSettings;
 # ABSTRACT: NetworkSettings exposes the network settings in the API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Address;
 use API::Docker::Type::EndpointSettings;
@@ -78,7 +78,7 @@ API::Docker::Type::NetworkSettings - NetworkSettings exposes the network setting
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -243,7 +243,7 @@ and are never translated.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

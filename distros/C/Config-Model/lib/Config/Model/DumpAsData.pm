@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::DumpAsData 2.168;
+package Config::Model::DumpAsData 2.169;
 
 use Carp;
 use strict;
@@ -28,6 +28,8 @@ sub dump_as_data ($self, %args) {
     my $dump_node = delete $args{node}
         || croak "dump_as_data: missing 'node' parameter";
     my $mode = delete $args{mode} // '';
+    my $ordered_hash_as_list_of_hashes = delete $args{ordered_hash_as_list_of_hashes} // 0;
+    my $ordered_hash_key_name = delete $args{ordered_hash_key_name} // 'name';
     my $skip_aw = delete $args{skip_auto_write} || '';
     my $auto_v  = delete $args{auto_vivify}     || 0;
     my $ordered_hash_as_list = delete $args{ordered_hash_as_list} // 1;
@@ -59,12 +61,15 @@ sub dump_as_data ($self, %args) {
         return;
     };
 
-    my $hash_element_cb = sub ($scanner, $data_ref, $node, $element_name, @keys) {
+    # ordered hash is written as list of { $key => $name, value =>
+    # $value} for leaf cargo type, or a list of { $key => $name, %v }
+    # for node cargo type.
+    my $ordered_list_of_hash_element_cb = sub ($scanner, $data_ref, $node, $element_name, @keys) {
         my $force_write = $node->fetch_element($element_name)->write_empty_value;
+        my $elt_type = $node->fetch_element($element_name)->get_cargo_type;
 
         # resume exploration but pass a ref on $data_ref hash element
         # instead of data_ref
-        my %h;
         my @res;
         foreach my $k (@keys) {
             my $v;
@@ -72,21 +77,68 @@ sub dump_as_data ($self, %args) {
 
             # don't create the key if $v is undef
             if (defined $v or $force_write) {
-                $h{$k} = $v;
+                # preserve order inside the ref, mostly useful for tests
+                my $ref = {};
+                $ref->{$ordered_hash_key_name} = $k;
+                if ($elt_type =~ /node/) {
+                    # merge $v hash into $ref
+                    while (my ($subk, $subv) = each $v->%*) {
+                        $ref->{$subk} = $subv;
+                    }
+                }
+                else {
+                    $ref->{value} = $v;
+                }
+                push @res, $ref;
+            }
+        } ;
+
+        if (@res) {
+            $data_ref->$* = \@res;
+        }
+    };
+
+    my $ordered_hash_as_flat_list = sub ($scanner, $data_ref, $node, $element_name, @keys) {
+        my $force_write = $node->fetch_element($element_name)->write_empty_value;
+
+        # resume exploration but pass a ref on $data_ref hash element
+        # instead of data_ref
+        my @res;
+        foreach my $k (@keys) {
+            my $v;
+            $scanner->scan_hash( \$v, $node, $element_name, $k );
+
+            # don't create the key if $v is undef
+            if (defined $v or $force_write) {
                 push @res , $k, $v;
             }
         } ;
 
-        my $ordered_hash = $node->fetch_element($element_name)->ordered;
+        if (@res) {
+            $data_ref->$* = \@res;
+        }
+    };
 
-        if ( $ordered_hash and $ordered_hash_as_list ) {
-            $$data_ref = \@res if @res;
-        }
-        else {
-            $h{'__'.$element_name.'_order'} = \@keys if $ordered_hash and @keys;
-            $$data_ref = \%h if scalar %h;
-        }
-        return;
+    my $ordered_hash_element_cb = $ordered_hash_as_list_of_hashes ?
+        $ordered_list_of_hash_element_cb : $ordered_hash_as_flat_list;
+
+    my $hash_element_cb = sub ($scanner, $data_ref, $node, $element_name, @keys) {
+        my $force_write = $node->fetch_element($element_name)->write_empty_value;
+
+        # resume exploration but pass a ref on $data_ref hash element
+        # instead of data_ref
+        my $h = {};
+        foreach my $k (@keys) {
+            my $v;
+            $scanner->scan_hash(\$v, $node, $element_name, $k);
+
+            # don't create the key if $v is undef
+            if (defined $v or $force_write) {
+                $h->{$k} = $v;
+            }
+        } ;
+
+        $data_ref->$* = $h if keys $h->%*;
     };
 
     my $list_element_cb = sub ($scanner, $data_ref, $node, $element_name, @idx) {
@@ -126,6 +178,7 @@ sub dump_as_data ($self, %args) {
         list_element_cb       => $list_element_cb,
         check_list_element_cb => $check_list_element_cb,
         hash_element_cb       => $hash_element_cb,
+        ordered_hash_element_cb => $ordered_hash_element_cb,
         leaf_cb               => $std_cb,
         node_element_cb       => $node_element_cb,
         node_content_cb       => $node_content_cb,
@@ -178,7 +231,7 @@ Config::Model::DumpAsData - Dump configuration content as a perl data structure
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -190,19 +243,24 @@ version 2.168
  $model ->create_config_class (
     name => "MyClass",
     element => [
-        [qw/foo bar/] => {
-            type => 'leaf',
-            value_type => 'string'
+      {
+        name => 'foo',
+        type => 'leaf',
+        value_type => 'string',
+      },
+      {
+        name => 'bar',
+        alias => 'foo',
+      },
+      {
+        name => 'baz',
+        type => 'hash',
+        index_type => 'string',
+        cargo => {
+          type => 'leaf',
+          value_type => 'string',
         },
-        baz => {
-            type => 'hash',
-            index_type => 'string' ,
-            cargo => {
-                type => 'leaf',
-                value_type => 'string',
-            },
-        },
-
+      },
     ],
  ) ;
 
@@ -246,6 +304,99 @@ Note that undefined values are skipped for list element. I.e. if a
 list element contains C<('a',undef,'b')>, the data structure then
 contains C<'a','b'>.
 
+=head1 Dumping ordered hash
+
+Dumping an ordered hash is a bit of a mess. Perl does not guarantee to
+preserve hash key order. So some tricks must be used to dump an
+ordered hash.
+
+First, the ordered hash can be dumped as a list. In the examples
+below, the key order is C<foo, bar>. So the hash:
+
+ { foo => v1, bar => v2 }
+
+is dumped as:
+
+ [ foo => v1, bar => v2 ]
+
+Another trick is to convert the ordered hash in a list of hash when
+C<ordered_hash_as_list_of_hashes> parameter is true. For instance, the
+ordered hash
+
+ { foo => v1, bar => v2 }
+
+can be converted in:
+
+ [
+   { name => 'foo', value => 'v1'},
+   { name => 'bar', value => 'v2'},
+ ]
+
+Another issue, arises for ordered hash of node. Lets start from this
+example written with a L<Config::Model::Loader> string:
+
+ ordered_hash_of_node:z aa2=foo_x -
+ ordered_hash_of_node:y aa2=foo_y ab2=bar_y -
+
+A Perl dump with the same technique as above would yield:
+
+  [
+    {
+      name => 'z',     # hash key
+      value => {       # another hash to contain the node attribute values
+        aa2 => 'foo_x'
+      }
+    },
+    {
+       name => 'y',
+       value => {
+         aa2 => 'foo_y',
+         ab2 => 'bar_y'
+       }
+    }
+   ]
+
+which may be confusing due to additional hash level.
+
+So the Perl dump is done merging the content of the node in the first
+hash level:
+
+ [
+   {
+     name => 'z,      # hash key
+     aa2 => 'foo_x,   # node attribute
+   },
+   {
+     name => 'y,      # hash key
+     aa2 => 'foo_y,   # node attribute
+     ab2 => 'bar_y,   # another node attribute
+   }
+ ]
+
+The parameter C<ordered_hash_key_name> parameter can be used to
+avoid a collision between a node attribute and the hash key.
+
+For instance, calling
+
+  $node->dump_as_data(
+     ordered_hash_as_list_of_hashes => 1,
+     ordered_hash_key_name => "my_unique_key"
+  );
+
+would yield:
+
+ [
+   {
+     my_unique_key => 'z,
+     aa2 => 'foo_x,
+   },
+   {
+     my_unique_key => 'y,
+     aa2 => 'foo_y,
+     ab2 => 'bar_y,
+   }
+ ]
+
 =head1 CONSTRUCTOR
 
 =head2 new
@@ -278,6 +429,27 @@ deprecated in favor of mode parameter.
 Note that C<mode> parameter is also accepted and overrides
 C<full_dump> parameter. See L<Config::Model::Value/fetch> for
 details on C<mode>.
+
+=item ordered_hash_as_list_of_hashes
+
+Boolean. Dump ordered hash as list of hashes. See L</Dumping ordered
+hash> for details. Default is C<false>
+
+=item ordered_hash_key_name
+
+Key name to use when inserting original hash key in dumped hash
+value. Default is C<name>.
+
+For instance, if the original hash contains:
+
+ { foo => v1, bar => v2 }
+
+The original hash is dumped in this list of hashes:
+
+ [
+   { name => 'foo', value => 'v1'},
+   { name => 'bar', value => 'v2'},
+ ]
 
 =item skip_auto_write
 

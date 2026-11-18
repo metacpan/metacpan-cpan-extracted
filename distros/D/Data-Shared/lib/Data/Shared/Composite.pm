@@ -6,7 +6,7 @@ use Scalar::Util qw(weaken);
 use Fcntl qw(:flock O_RDWR O_APPEND O_CREAT);
 use Errno ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @CARP_NOT = qw(Data::Shared Data::Shared::Manifest Data::Shared::Storage
                    Data::Shared::Composite);

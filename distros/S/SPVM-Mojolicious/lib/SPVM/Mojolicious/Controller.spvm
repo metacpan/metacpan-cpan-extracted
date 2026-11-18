@@ -674,7 +674,8 @@ class Mojolicious::Controller {
   
     my $connection = $self->tx->connection;
     if ($connection) {
-      $connection->set_timeout($timeout);
+      # TODO
+      # $connection->set_timeout($timeout);
     }
   }
   

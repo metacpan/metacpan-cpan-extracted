@@ -51,12 +51,28 @@ sub disp_hash_hook {
     $$data_r .= "disp_hash_hook " . $node->name . " element($element): @keys\n";
 }
 
+sub disp_ordered_hash_hook {
+    my ( $scanner, $data_r, $node, $element, @keys ) = @_;
+    return unless @keys;
+    $$data_r .= "disp_ordered_hash_hook " . $node->name . " element($element): @keys\n";
+}
+
 sub disp_hash {
     my ( $scanner, $data_r, $node, $element, @keys ) = @_;
 
     return unless @keys;
 
     $$data_r .= "disp_hash " . $node->name . " element($element): @keys\n";
+
+    map { $scanner->scan_hash( $data_r, $node, $element, $_ ) } @keys;
+}
+
+sub disp_ordered_hash {
+    my ( $scanner, $data_r, $node, $element, @keys ) = @_;
+
+    return unless @keys;
+
+    $$data_r .= "disp_ordered_hash " . $node->name . " element($element): @keys\n";
 
     map { $scanner->scan_hash( $data_r, $node, $element, $_ ) } @keys;
 }
@@ -112,13 +128,15 @@ ok( $inst, "created dummy instance" );
 my $root = $inst->config_root;
 
 my $step = 'std_id:ab X=Bv - std_id:bc X=Av - a_string="toto tata" '
-    . 'hash_a:X2=x hash_a:Y2=xy  hash_b:X3=xy my_check_list=X2,X3';
+    . 'hash_a:X2=x hash_a:Y2=xy  hash_b:X3=xy my_check_list=X2,X3 '
+    . 'ordered_hash:foo1=bar1 ordered_hash:foo2=bar2';
 ok( $root->load( step => $step ), "set up data in tree with '$step'" );
 
 my $scan = Config::Model::ObjTreeScanner->new(
     list_element_cb       => \&disp_hash,
     check_list_element_cb => \&disp_check_list,
     hash_element_cb       => \&disp_hash,
+    ordered_hash_element_cb => \&disp_ordered_hash,
     node_element_cb       => \&disp_node_elt,
     node_content_cb       => \&disp_node_content,
     node_dispatch_cb      => { SubSlave2 => \&disp_dispatch_node_sub_slave2, },
@@ -131,6 +149,7 @@ my $scan = Config::Model::ObjTreeScanner->new(
     reference_value_cb    => \&disp_leaf,
     node_content_hook     => \&disp_node_content_hook,
     hash_element_hook     => \&disp_hash_hook,
+    ordered_hash_element_hook => \&disp_ordered_hash_hook,
     list_element_hook     => \&disp_list_hook,
 
     up_cb => \&disp_up
@@ -170,6 +189,10 @@ disp_leaf Master element hash_a value xy
 disp_hash_hook Master element(hash_b): X3
 disp_hash Master element(hash_b): X3
 disp_leaf Master element hash_b value xy
+disp_ordered_hash_hook Master element(ordered_hash): foo1 foo2
+disp_ordered_hash Master element(ordered_hash): foo1 foo2
+disp_leaf Master element ordered_hash value bar1
+disp_leaf Master element ordered_hash value bar2
 disp_leaf Master element tree_macro
 disp_node_elt Master element: warp
 disp_node_content_hook warp element: X std_id sub_slave warp2 Y
@@ -286,6 +309,8 @@ disp_leaf std_id:bc element DX value Dv
 disp_leaf Master element hash_a value x
 disp_leaf Master element hash_a value xy
 disp_leaf Master element hash_b value xy
+disp_leaf Master element ordered_hash value bar1
+disp_leaf Master element ordered_hash value bar2
 disp_leaf Master element tree_macro
 disp_leaf warp element X
 disp_leaf warp sub_slave element aa

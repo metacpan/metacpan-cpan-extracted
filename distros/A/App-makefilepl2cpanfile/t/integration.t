@@ -259,6 +259,26 @@ subtest 'CLI: legacy recommends/suggests reach the written cpanfile' => sub {
 	unlike $written, qr/git:/, 'unrelated META_MERGE content ignored';
 };
 
+subtest 'CLI: quoted keys in Makefile.PL reach every section of the cpanfile' => sub {
+	my $dir = make_project(<<'END_MF');
+WriteMakefile(
+	'MIN_PERL_VERSION' => '5.016',
+	'CONFIGURE_REQUIRES' => { 'ExtUtils::MakeMaker' => 6.64 },
+	'PREREQ_PM' => { 'Mail::DKIM' => 0 },
+	"TEST_REQUIRES" => { 'Test::Most' => 0 },
+);
+END_MF
+	my ($out, $err, $exit) = run_cli($dir, make_home(), '--no-develop');
+	is $exit, 0, 'exit status 0';
+	is $err, q{}, 'nothing on STDERR';
+
+	my $written = $dir->child($CFG{cpanfile})->slurp_utf8;
+	like $written, qr/^requires 'perl', '5\.016';$/m, 'perl requirement written';
+	like $written, qr/^requires 'Mail::DKIM';$/m,      'runtime section written';
+	like $written, qr/^on 'test' => sub \{\n\trequires 'Test::Most';/m, 'test section written';
+	like $written, qr/^on 'configure' => sub/m,        'configure section written';
+};
+
 # -----------------------------------------------------------------------
 # 3. Stateful CLI workflow across runs
 #

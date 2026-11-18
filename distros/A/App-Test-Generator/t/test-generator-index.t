@@ -111,6 +111,14 @@ sub _resolve_report_path {
 	my $relative_path = File::Spec->catfile($dir, $file . '.html');
 	my $out_dir = dirname($relative_path);
 
+	my $walk = $dir;
+	for my $part (File::Spec->splitdir(dirname($file))) {
+		next if($part eq '' || $part eq File::Spec->curdir);
+		$walk = File::Spec->catdir($walk, $part);
+		die "Refusing to write report outside $dir: $relative_path\n" if -l $walk;
+	}
+	die "Refusing to write report outside $dir: $relative_path\n" if -l $relative_path;
+
 	make_path($out_dir) unless -d $out_dir;
 
 	my $resolved_dir = abs_path($dir) // $dir;

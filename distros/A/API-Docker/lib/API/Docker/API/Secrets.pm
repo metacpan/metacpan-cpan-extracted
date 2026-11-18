@@ -1,6 +1,6 @@
 package API::Docker::API::Secrets;
 # ABSTRACT: Docker Engine Secrets API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 with 'API::Docker::Role::Filters', 'API::Docker::Role::Using';
 use API::Docker::Role::Entity::Secret;
@@ -128,7 +128,7 @@ API::Docker::API::Secrets - Docker Engine Secrets API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -392,7 +392,7 @@ secrecy
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

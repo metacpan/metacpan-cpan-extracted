@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use JSON::PP ();
 use Data::Shared qw(shared_get shared_set);
 use Data::Shared::Manifest ();
@@ -77,7 +79,7 @@ subtest 'an unrepresentable mount argument is refused at mount time' => sub {
 # JSON::PP writes an NV with %.15g and reads 1e+15 back as an integer.
 subtest 'a float argument does not fake a stale revision' => sub {
     plan skip_all => 'histogram backend unavailable'
-        unless eval { require Data::Histogram::Shared; 1 };
+        unless have('histogram');
     plan skip_all => $HASHMAP if $HASHMAP;
     for my $value (1e15, 1000000000000000, 2**50) {
         my $dir = tempdir(CLEANUP => 1);

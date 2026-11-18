@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Cwd ();
 use Data::Shared qw(shared_get shared_set shared_delete shared_exists shared_incr
                     shared_call shared_push shared_pop
@@ -208,14 +210,14 @@ subtest 'hashref specs and special constructors' => sub {
     ok !shared_call($r, '/plain', 'is_weighted'), 'and the plain family does not';
     SKIP: {
         skip 'topk:decayed unavailable', 1
-            unless eval { require Data::TopK::Shared; 1 };
+            unless have('topk');
         ok eval { $r->mount('td', 'topk:decayed', undef, 16, 32, 60); 1 },
             'a variant whose constructor takes an extra argument mounts' or diag $@;
     }
     SKIP: {
         my $r2 = Data::Shared->new;
         skip 'sortedset:strings unavailable', 3
-            unless eval { require Data::SortedSet::Shared::Strings; 1 };
+            unless have('sortedset:strings');
         $r2->mount('board', 'sortedset:strings', max => 100, set => undef, keys => undef);
         shared_set($r2, '/board/alice', 42);
         is shared_get($r2, '/board/alice'), 42, 'strings via list form anonymous';
@@ -338,7 +340,7 @@ subtest 'an explicit backing path must be absolute' => sub {
     }
     # The refusals above load no backend, so they run unguarded.
     SKIP: {
-        eval { require Data::HashMap::Shared::II; 1 }
+        have('hashmap:ii')
             or skip 'hashmap backend unavailable', 2;
         ok eval { $root->mount('stats', 'hashmap:ii', "$dir/stats.shm", 16); 1 },
             'the absolute form mounts' or diag $@;
@@ -352,7 +354,7 @@ subtest 'an explicit backing path must be absolute' => sub {
     }
 
     SKIP: {
-        eval { require Data::SortedSet::Shared::Strings; 1 }
+        have('sortedset:strings')
             or skip 'Data::SortedSet::Shared::Strings not installed', 3;
         my $s = Data::Shared->new("$dir/strings");
         ok !eval { $s->mount('names', 'sortedset:strings',

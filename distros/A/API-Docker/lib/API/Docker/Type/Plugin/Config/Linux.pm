@@ -1,6 +1,6 @@
 package API::Docker::Type::Plugin::Config::Linux;
 # ABSTRACT: The Linux-specific capabilities and devices a plugin needs
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::PluginDevice;
 use namespace::clean;
@@ -29,7 +29,7 @@ API::Docker::Type::Plugin::Config::Linux - The Linux-specific capabilities and d
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ L</allow_all_devices>. See L<API::Docker::Type::PluginDevice>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

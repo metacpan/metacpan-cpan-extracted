@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -15,6 +16,7 @@ use JSON::MaybeXS qw( encode_json );
 # the bytes -- returning `1/0` on the wire (the old logic) makes them red.
 
 subtest 'exec->create sends booleans as JSON true/false' => sub {
+  plan skip_all => 'route assertions are fixture-only' if is_live();
   my $body;
   my $docker = test_docker(
     'POST /containers/test/exec' => sub {
@@ -39,6 +41,7 @@ subtest 'exec->create sends booleans as JSON true/false' => sub {
 };
 
 subtest 'containers->create sends booleans as JSON true/false' => sub {
+  plan skip_all => 'route assertions are fixture-only' if is_live();
   my $body;
   my $docker = test_docker(
     'POST /containers/create' => sub {
@@ -69,6 +72,7 @@ subtest 'containers->create sends booleans as JSON true/false' => sub {
 };
 
 subtest 'a caller-supplied JSON boolean is passed through' => sub {
+  plan skip_all => 'route assertions are fixture-only' if is_live();
   my $body;
   my $docker = test_docker(
     'POST /containers/test/exec' => sub {

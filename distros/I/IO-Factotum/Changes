@@ -1,5 +1,14 @@
 Revision history for Perl extension IO-Factotum
 
+0.05 2026-11-18T07:51:40Z
+
+    - register(with => $object): an object is a converter, by its
+      method file, which returns the content to be read in place of
+      the file, or undef to leave the file to the next converter
+    - The converters for syntax highlight (IO::Factotum::Highlight)
+      are taken away.  Text::ANSI::Highlight::IO gives a highlighter
+      of Text::ANSI::Highlight to this module
+
 0.04 2026-11-17T00:33:46Z
 
     - The converters for syntax highlight are under

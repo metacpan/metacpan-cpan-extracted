@@ -1,6 +1,6 @@
 package API::Docker::Type::OCIPlatform;
 # ABSTRACT: Describes the platform which the image in the manifest runs on, as defined in the L<OCI Image Index Specification|https://github.com/opencontainers/image-spec/blob/v1.0.1/image-index.md>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -34,7 +34,7 @@ API::Docker::Type::OCIPlatform - Describes the platform which the image in the m
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -75,7 +75,7 @@ because deriving it from the Perl name would produce C<Variant>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerCreateResponse;
 # ABSTRACT: OK response to ContainerCreate operation
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::ContainerCreateResponse - OK response to ContainerCreate oper
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ L<API::Docker::Type/C<since> is documentation>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

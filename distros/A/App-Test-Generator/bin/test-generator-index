@@ -5369,6 +5369,17 @@ sub _mutant_file_report {
 
 	my $out_dir = dirname($relative_path);
 
+	# abs_path does not follow symlinks on Win32, so the containment check
+	# below cannot see a link inside $dir that points out of it; refuse any
+	# linked component explicitly.
+	my $walk = $dir;
+	for my $part (File::Spec->splitdir(dirname($file))) {
+		next if($part eq '' || $part eq File::Spec->curdir);
+		$walk = File::Spec->catdir($walk, $part);
+		croak("Refusing to write report outside $dir: $relative_path") if -l $walk;
+	}
+	croak("Refusing to write report outside $dir: $relative_path") if -l $relative_path;
+
 	make_path($out_dir) unless -d $out_dir;
 
 	my $resolved_dir = abs_path($dir) // $dir;

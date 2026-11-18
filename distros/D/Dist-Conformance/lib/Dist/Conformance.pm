@@ -1,4 +1,4 @@
-package Dist::Conformance 0.005;
+package Dist::Conformance 0.006;
 
 # ABSTRACT: Whether the development harness of a repository conforms to its standards, and bringing it up to date
 
@@ -160,7 +160,7 @@ Dist::Conformance - Whether the development harness of a repository conforms to 
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

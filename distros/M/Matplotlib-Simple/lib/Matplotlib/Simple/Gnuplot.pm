@@ -24,7 +24,7 @@ package Matplotlib::Simple::Gnuplot;
 # 4.8 inch figure (rcParams figure.figsize) and 100 dots per inch for a PNG
 # (rcParams figure.dpi).
 require 5.010;
-our $VERSION = 0.3343;
+our $VERSION = 0.3344;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max min sum);
 use POSIX ();

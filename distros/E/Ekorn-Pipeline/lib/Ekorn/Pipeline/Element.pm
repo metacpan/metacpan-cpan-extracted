@@ -34,11 +34,12 @@ Ekorn::Pipeline::Element - what Ekorn's types are made from
 
 =head1 DESCRIPTION
 
-Each of Ekorn's types is an element: a pipeline, a stage, a gather, a
-source, a sink and an iterator. An element is an object that can be
-called as a code reference, and what that does is each type's own: a
-pipeline runs the values it's given through its stages; an iterator
-hands out its next value.
+Each of Ekorn's types that's called as code is an element: a
+pipeline, a stage, a gather, a source, a sink and an iterator. A feed,
+L<Ekorn::Pipeline::Feed>, is used only by its methods, so it isn't
+one. An element is an object that can be called as a code reference,
+and what that does is each type's own: a pipeline runs the values it's
+given through its stages; an iterator hands out its next value.
 
 An element holds the closure it's called as, and that closure never
 refers to the element itself. So an element is freed as soon as

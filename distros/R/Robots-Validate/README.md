@@ -22,16 +22,26 @@ This module allows one to validate a robot user-agent string against the IP addr
 
 # RECENT CHANGES
 
-Changes for version v0.4.15 (2026-11-12)
+Changes for version v0.4.16 (2026-11-17)
 
 - Enhancements
     - Added or updated the robot rules for the following:
-        - ethicrawl (updated agents and network)
-        - GenomeCrawler
-        - GlintscoutBot
-        - MorsillaBot
+        - ChatCPT-User (updated network)
+        - Claude (updated network)
+        - FreeConnector
+        - GeneralRetrievalBot
+        - Google-User (updated network)
+        - GreenFaceLabsCensus (removed, offline)
+        - IsonSearchBot (updated network)
+        - Kaupr
+        - LinerBot (removed, offline)
+        - NetAPI (updated network)
+        - PerplexityBot (updated network)
+        - RiverBot (updated network)
+    - Minor code improvements.
 - Documentation
-    - Fixed incorrect type for the networks attribute: it has been using Net::IP::LPM since v0.4.3.
+    - Updated networks attribute.
+    - Improved readability of Changes.
 
 See the `Changes` file for more details.
 

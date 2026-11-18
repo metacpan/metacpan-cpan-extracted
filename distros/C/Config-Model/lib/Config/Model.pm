@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model 2.168;
+package Config::Model 2.169;
 
 use 5.20.0;
 use strict ;
@@ -52,11 +52,11 @@ my $logger = get_logger("Model") ;
 # cme function
 my $model_storage;
 
-enum LegacyTreament => qw/die warn ignore/;
+enum LegacyTreatment => qw/die warn note ignore /;
 
 has skip_include => ( isa => 'Bool',           is => 'ro', default => 0 );
 has model_dir    => ( isa => 'Str',            is => 'ro', default => 'Config/Model/models' );
-has legacy       => ( isa => 'LegacyTreament', is => 'ro', default => 'warn' );
+has legacy       => ( isa => 'LegacyTreatment', is => 'rw', default => 'warn' );
 has instances => (
     isa => 'HashRef[Config::Model::Instance]',
     is => 'ro',
@@ -685,23 +685,44 @@ sub extract_element_list ($self, $raw_model) {
 # in [ { pattern => '', info}, ...]
 sub translate_legacy_accept_info ($self, $config_class_name, $accept_info) {
     return unless defined $accept_info;
-
-    # already translated
-    return $accept_info if ref $accept_info->[0] eq 'HASH';
-
-    $self->show_legacy_issue(
-        "$config_class_name class: accept attribute should be a list of hash "
-        ."with 'pattern' key. I.e. something like [ { pattern => 'xyz.*', info}, ...] instead "
-        ."of [ 'xyz.*' => {info}, ... ]",
-        "note"
-    );
-
     my @new;
-    while (@$accept_info) {
-        my $pattern = shift $accept_info->@*;
-        my $info = shift $accept_info->@*;
-        $info->{pattern} = $pattern;
-        push @new, $info;
+    if (ref $accept_info->[0] eq 'HASH') {
+        # already translated
+        @new = $accept_info->@*;
+    }
+    else {
+        $self->show_legacy_issue(
+            "$config_class_name class: accept attribute should be a list of hash "
+            ."with 'pattern' key. I.e. something like [ { pattern => 'xyz.*', info}, ...] instead "
+            ."of [ 'xyz.*' => {info}, ... ]",
+            "note"
+        );
+
+        while (@$accept_info) {
+            my $pattern = shift $accept_info->@*;
+            my $info = shift $accept_info->@*;
+            $info->{name} = $pattern;
+            push @new, $info;
+        }
+    }
+
+    # now check if name is provided
+    foreach my $item (@new) {
+        if (not defined $item->{name} and not defined $item->{pattern}) {
+            $self->show_legacy_issue(
+                "$config_class_name class: accept attribute should feature a name parameter, using pattern instead",
+                "note"
+            );
+            $item->{name} = $item->{pattern};
+        }
+        if (defined $item->{name} and not defined $item->{pattern}) {
+            # happens when old representation is dumped by Config::Model::Itself
+            $self->show_legacy_issue(
+                "$config_class_name class: accept attribute should feature a pattern parameter, using name instead",
+                "note"
+            );
+            $item->{pattern} = $item->{name};
+        }
     }
 
     return \@new;
@@ -714,15 +735,16 @@ sub extract_accept_parameter ($self, $config_class_name, $model, $raw_model) {
     my $accept_info = delete $raw_model->{'accept'} || [];
 
     foreach my $info ($accept_info->@*) {
-        my $pattern = delete $info->{pattern};
+        my $name = delete $info->{name};
+        my $pattern = $info->{pattern};
         if (not $pattern) {
             Config::Model::Exception::ModelDeclaration->throw(
                 error => "create class $config_class_name: Missing pattern attribute for accept spec"
             );
         }
 
-        push @accept_list, $pattern;
-        $accept_hash{$pattern} = $info;
+        push @accept_list, $name;
+        $accept_hash{$name} = $info;
     }
 
     $model->{accept}      = \%accept_hash;
@@ -1110,8 +1132,7 @@ sub translate_id_default_info {
 
     my $def_info = delete $info->{default};
     if ( ref($def_info) eq 'HASH' ) {
-        $info->{default_with_init} = $def_info;
-        $self->show_legacy_issue([ $warn, "Use default_with_init" ]);
+        $self->show_legacy_issue([ "$config_class_name->$elt_name: 'default' parameter for HASH is obsolete" ], "die");
     }
     elsif ( ref($def_info) eq 'ARRAY' ) {
         $info->{default_keys} = $def_info;
@@ -2112,7 +2133,7 @@ Config::Model - a framework to validate, migrate and edit configuration files
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -2479,6 +2500,14 @@ less traces.
 
 This parameter is used to override the log level specified in log
 configuration file.
+
+=item legacy
+
+Specify the action to take on depracated model constructs. Either
+C<die>, C<warn> (default), C<note> or C<ignore>.
+
+Except for C<die>, depreccation messages are sent through
+C<Log::Log4perl> using C<Model::Legacy> log class.
 
 =back
 

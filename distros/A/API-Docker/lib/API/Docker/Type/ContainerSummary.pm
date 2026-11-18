@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerSummary;
 # ABSTRACT: One entry of the C<200> response to C<GET /containers/json>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerSummary::HostConfig;
 use API::Docker::Type::ContainerSummary::NetworkSettings;
@@ -73,7 +73,7 @@ API::Docker::Type::ContainerSummary - One entry of the C<200> response to C<GET 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -189,7 +189,7 @@ List of mounts used by the container. See L<API::Docker::Type::MountPoint>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

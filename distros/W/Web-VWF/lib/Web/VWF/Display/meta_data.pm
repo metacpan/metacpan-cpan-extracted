@@ -2,16 +2,20 @@ package Web::VWF::Display::meta_data;
 
 # Display the meta-data page - the internal status of the server and VWF system
 
-# TODO:  Add breakdown by browser
+# TODO:  Add breakdown by browser name; the chart counts the types of client
+# (web, mobile, search engine, ...), which is not the same thing
 
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 use parent 'Web::VWF::Display';
 
-use HTML::D3;
+# 0.23 and earlier take positional arguments (render_pie_chart_snippet($data,
+# $opts)) and die "Data must be an array of arrays" on the hashes passed here;
+# 0.24 was the first to take them, and the charts were built and tested on 0.30.
+use HTML::D3 0.30;
 
 # Filesys::Df refuses to install on Windows, so Makefile.PL does not require it
 # there.  A server without it just has no disk figure: df() then answers as if
@@ -420,3 +424,82 @@ sub _utc_offset
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Web::VWF::Display::meta_data - The status page: the server and its traffic
+
+=head1 VERSION
+
+Version 0.003.0
+
+=head1 DESCRIPTION
+
+A dashboard for the site's owner.  It reads the access log through the
+C<vwf_log> handle (see L<Web::VWF::Data::vwf_log>) and shows the server's load,
+memory, disk and uptime, the counts of requests, and five L<HTML::D3> charts: the
+browser types, the HTTP status codes, requests and errors per hour, latency per
+hour, and the slowest endpoints.  A chart with nothing to draw is replaced by a
+sentence saying so.  It needs L<HTML::D3> 0.30 or later.
+
+=head1 METHODS
+
+=head2 html
+
+Needs the C<vwf_log> handle and dies without it.  Returns the HTML from
+F<meta_data.tmpl>.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ vwf_log => { type => 'object' } }
+
+=head4 OUTPUT
+
+	{ type => 'string' }
+
+=head2 get_server_metrics
+
+The state of the server as a hash reference: C<cpu_count>, C<cpu_type>,
+C<disk_used_pct> (undef when L<Filesys::Df> is not installed) and
+C<memory_used_pct>.
+
+=head2 get_traffic_metrics
+
+Takes the log handle and the domain name.  Returns a hash reference with
+C<requests_per_hour>, C<active_users> (distinct addresses) and C<errors_last_hour>
+for the last hour.
+
+=head2 get_request_rate_24h
+
+Takes the log handle and the domain name.  Returns C<{ total, errors, error_pct }>,
+each a list of C<[ hour, value ]> pairs for the last 24 hours.
+
+=head2 get_latency_24h
+
+Takes the log handle and the domain name.  Returns C<{ avg, p95 }>, each a list of
+C<[ hour, milliseconds ]> pairs for the last 24 hours.  Durations over a day are
+log rows written by an old bug and are left out.
+
+=head2 get_slow_endpoints_24h
+
+Takes the log handle and the domain name.  Returns up to ten C<[ template,
+milliseconds ]> pairs, the 95th percentile of the slowest templates in the last
+24 hours, ignoring any that were asked for fewer than five times.
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

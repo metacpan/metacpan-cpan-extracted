@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::DistFiles 0.005;
+package Dist::Conformance::Check::DistFiles 0.006;
 
 # ABSTRACT: A distribution has the files that its build needs
 
@@ -47,7 +47,7 @@ Dist::Conformance::Check::DistFiles - A distribution has the files that its buil
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

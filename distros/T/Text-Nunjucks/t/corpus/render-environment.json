@@ -1,0 +1,140 @@
+[
+  {
+    "name": "is defined undefined null tests",
+    "template": "{{ a is defined }} {{ b is defined }} {{ n is defined }} {{ b is undefined }} {{ n is null }} {{ a is null }}",
+    "context": {
+      "a": 1,
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "true false true true true false"
+    }
+  },
+  {
+    "name": "is odd even divisibleby tests",
+    "template": "{{ 3 is odd }} {{ 4 is even }} {{ 9 is divisibleby(3) }} {{ 9 is divisibleby(2) }}",
+    "expected": {
+      "ok": true,
+      "output": "true true true false"
+    }
+  },
+  {
+    "name": "is string number equalto tests",
+    "template": "{{ 'x' is string }} {{ 5 is number }} {{ '5' is number }} {{ 5 is equalto(5) }} {{ 5 is equalto('5') }}",
+    "expected": {
+      "ok": true,
+      "output": "true true false true false"
+    }
+  },
+  {
+    "name": "is upper lower iterable mapping tests",
+    "template": "{{ 'ABC' is upper }} {{ 'abc' is lower }} {{ [1,2] is iterable }} {{ 'ab' is iterable }} {{ o is mapping }} {{ [1] is mapping }}",
+    "context": {
+      "o": {
+        "k": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "true true true true true false"
+    }
+  },
+  {
+    "name": "context value with dollar at backslash quotes escaped",
+    "template": "{{ v }}",
+    "context": {
+      "v": "a $x @y \\z `t` 'q' \"d\" <b>"
+    },
+    "expected": {
+      "ok": true,
+      "output": "a $x @y &#92;z `t` &#39;q&#39; &quot;d&quot; &lt;b&gt;"
+    }
+  },
+  {
+    "name": "include from loader",
+    "render": "page.njk",
+    "templates": {
+      "page.njk": "[{% include 'partial.njk' %}]",
+      "partial.njk": "P={{ n }}"
+    },
+    "context": {
+      "n": 7
+    },
+    "expected": {
+      "ok": true,
+      "output": "[P=7]"
+    }
+  },
+  {
+    "name": "include ignore missing",
+    "template": "[{% include 'nope.njk' ignore missing %}]",
+    "templates": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "extends override block",
+    "render": "child.njk",
+    "templates": {
+      "base.njk": "<{% block body %}base{% endblock %}>",
+      "child.njk": "{% extends 'base.njk' %}{% block body %}child{% endblock %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<child>"
+    }
+  },
+  {
+    "name": "extends with super",
+    "render": "child.njk",
+    "templates": {
+      "base.njk": "{% block b %}BASE{% endblock %}",
+      "child.njk": "{% extends 'base.njk' %}{% block b %}{{ super() }}+CHILD{% endblock %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "BASE+CHILD"
+    }
+  },
+  {
+    "name": "import macro from loader",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro hi(x) %}hi {{ x }}{% endmacro %}",
+      "main.njk": "{% import 'lib.njk' as m %}{{ m.hi('bob') }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "hi bob"
+    }
+  },
+  {
+    "name": "from import names",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro a() %}A{% endmacro %}{% macro b() %}B{% endmacro %}",
+      "main.njk": "{% from 'lib.njk' import a, b %}{{ a() }}{{ b() }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "AB"
+    }
+  },
+  {
+    "name": "throwOnUndefined string '0' opt is JS-truthy",
+    "template": "[{{ missing }}]",
+    "opts": {
+      "throwOnUndefined": "0"
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 2]\n  attempted to output null or undefined value"
+      }
+    }
+  }
+]

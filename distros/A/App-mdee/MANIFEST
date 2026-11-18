@@ -46,6 +46,7 @@ t/12_widen.t
 t/13_begin.t
 t/14_escape.t
 t/15_front_matter.t
+t/16_highlight.t
 t/Util.pm
 t/demo.md
 t/table_wrap.md

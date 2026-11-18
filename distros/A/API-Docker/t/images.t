@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -324,6 +325,7 @@ subtest 'image name required' => sub {
 # for each case by capturing the params off the mock route table. Returning ''
 # gives pull's ndjson decode an empty stream, which comes back as [].
 subtest 'pull only defaults tag when the reference has none' => sub {
+  plan skip_all => 'route assertions are fixture-only' if is_live();
   my $captured;
   my $docker = test_docker(
     'POST /images/create' => sub {

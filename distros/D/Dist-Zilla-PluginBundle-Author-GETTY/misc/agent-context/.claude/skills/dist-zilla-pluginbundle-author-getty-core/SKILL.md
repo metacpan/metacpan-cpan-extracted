@@ -116,8 +116,8 @@ develop-phase author-test deps — notably `Test::Pod`, which `[PodSyntaxTests]`
 **Never fake `Test::Pod` (or any author-test dep) into a dist's cpanfile
 `on test` block.** That hack is exactly what this action removes: the deps belong
 in the develop phase, and `--author` is how CI installs them. This repo's own
-`cpanfile` proves the rule — its `on test` block carries only `Test::More`, no
-`Test::Pod`, and CI still passes.
+`cpanfile` proves the rule — its `on test` block carries no `Test::Pod`, and CI
+still passes.
 
 The bundle's own `.github/workflows/ci.yml` dogfoods the action through the local
 path `./.github/actions/dzil-test` (not the cross-repo URL), so a change to the

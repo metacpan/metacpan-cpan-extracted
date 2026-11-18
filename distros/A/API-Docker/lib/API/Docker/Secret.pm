@@ -1,6 +1,6 @@
 package API::Docker::Secret;
 # ABSTRACT: Removed in 0.004 -- replaced by API::Docker::Type::Secret
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use strict;
 use warnings;
 use Carp qw( croak );
@@ -54,7 +54,7 @@ API::Docker::Secret - Removed in 0.004 -- replaced by API::Docker::Type::Secret
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -95,7 +95,7 @@ L<API::Docker::API::Secrets> documents the shape each method returns.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

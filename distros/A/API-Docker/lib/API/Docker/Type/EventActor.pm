@@ -1,6 +1,6 @@
 package API::Docker::Type::EventActor;
 # ABSTRACT: Actor describes something that generates events, like a container, network, or a volume
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::EventActor - Actor describes something that generates events,
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ keys are the caller's data> and are never translated.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

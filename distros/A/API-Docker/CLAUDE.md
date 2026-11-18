@@ -115,13 +115,14 @@ maint/spec-common.pl                    # the spec loader shared by the two scri
 maint/spec-to-type-names.yaml           # inline-class naming exceptions the generator and checker share
 maint/spec-to-type-prose.yaml           # hand-written POD for fields/classes the swagger describes poorly
 maint/spec-drift-exceptions.yaml        # deliberate deviations the drift checker accepts
-spec/v1.41.yaml, v1.44.yaml, v1.51.yaml # Docker's own swagger, checked in; generation runs against v1.51
+maint/spec-overlay.yaml                 # named fields of v1.55 grafted onto the v1.51 base model
+spec/v1.41.yaml .. v1.55.yaml           # Docker's own swagger, checked in; generation runs against v1.51 plus the overlay
 t/                                      # tests (prove -lr t/)
 t/lib/Test/API/Docker/Mock.pm           # fixture-driven mock helper
 t/fixtures/*.json                       # captured daemon responses
 .claude/agents/                         # the api-docker-* subagents
 .claude/rules/api-docker-rules.md       # house rules, auto-loaded every turn
-.claude/skills/                         # briefed skills (hardlinked + owned)
+.claude/skills/                         # briefed skills (owned + skilletor-installed)
 ```
 
 ## Build and test
@@ -168,7 +169,8 @@ fixed too — `_request` returns `[]` rather than `undef` for a zero-byte
 ## Delegation
 
 Don't touch behavior-relevant code yourself — hand it to the right agent.
-The principle, the lanes and the repo's hazards are in
+The delegation lock and the publish gate are shared house rules (skilletor
+bundle `getty-cpan-dist@getty`); the lanes and the repo's hazards are in
 `.claude/rules/api-docker-rules.md`.
 
 | Task | Agent |
@@ -177,7 +179,7 @@ The principle, the lanes and the repo's hazards are in
 | The Perl side — Moo, transport internals, entities, refactoring, cpanfile | `api-docker-worker` (default) |
 | Write/extend tests, add fixtures | `api-docker-test-writer` |
 | The generated type model — `API::Docker::Type::*`, the DSL, the drift checker, `spec/` | `api-docker-type-writer` |
-| Pre-release audit | `api-docker-release-checker` |
+| Commits, `Changes`, card → done, pre-release audit | `api-docker-release-manager` |
 | POD and README | `api-docker-doc-writer` |
 
 The two workers split by question, not by file. Only `api-docker-engine-worker`
@@ -188,9 +190,10 @@ pattern for the generated classes; see karr k79.
 
 The agents carry their skills via `briefing.skills` (see `.claude/agents/`);
 the main agent delegates rather than loading them. Skill sources live under
-`.claude/skills/` — `api-docker-core` is owned here, the rest are hardlinks
-managed with `manage-skills` (`docker-engine-api` lives in the shared library and
-is reused by `../p5-dist-zilla-plugin-docker-api`).
+`.claude/skills/` — `api-docker-core`, `api-docker-hazards` and `api-docker-type-model`
+are owned here, the rest are installed by skilletor from `.claude/skilletor.json`
+(`docker-engine-api` lives in the shared library and is reused by
+`../p5-dist-zilla-plugin-docker-api`).
 
 Ticket coordination runs on the repo's `karr` board (`karr board`).
 

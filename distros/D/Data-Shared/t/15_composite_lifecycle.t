@@ -4,12 +4,11 @@ use Test::More;
 use File::Temp qw(tempdir);
 use Scalar::Util qw(weaken);
 use Data::Shared;
+use lib 't/lib';
+use Backends qw(have);
 
-eval {
-    require Data::HashMap::Shared::SS;
-    require Data::Sync::Shared::RWLock;
-    1;
-} or plan skip_all => "composite backends unavailable: $@";
+have('hashmap:ss', 'sync:rwlock')
+    or plan skip_all => "composite backends unavailable: $@";
 
 sub mount_maps {
     my ($root, %opts) = @_;
@@ -77,7 +76,7 @@ subtest 'composite directory aliases fail before sharing storage' => sub {
 };
 
 subtest 'string sorted-set sidecars are reserved' => sub {
-    eval { require Data::SortedSet::Shared::Strings; 1 }
+    have('sortedset:strings')
         or plan skip_all => "string sorted-set backend unavailable: $@";
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     $root->mount('board', 'sortedset:strings', { max => 100 });
@@ -137,7 +136,7 @@ subtest 'retiring an address that was never created creates nothing' => sub {
 subtest 'a scored child that was never built is deleted and torn down' => sub {
     my $dir = tempdir(CLEANUP => 1);
     my $root = Data::Shared->new($dir);
-    plan skip_all => 'sortedset unavailable' unless eval { require Data::SortedSet::Shared; 1 };
+    plan skip_all => 'sortedset unavailable' unless have('sortedset');
     $root->mount('board', ['sortedset', 1000, ['hashmap:ii', 16, ['hashmap:ii', 8]]]);
     $root->set('/board/7', 42);
     is_deeply [$root->children('/board')], [7], 'a score alone registers the address';

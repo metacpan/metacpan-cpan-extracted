@@ -5,7 +5,7 @@
 #          config values from a given file and
 #          return it as hash structure
 #
-# Copyright (c) 2000-2025 Thomas Linden <tlinden |AT| cpan.org>.
+# Copyright (c) 2000-2026 Thomas Linden <tlinden |AT| cpan.org>.
 # All Rights Reserved. Std. disclaimer applies.
 # Licensed under the Artistic License 2.0.
 #
@@ -20,7 +20,7 @@ use IO::File;
 use FileHandle;
 use File::Spec::Functions qw(splitpath file_name_is_absolute catfile catpath);
 use File::Glob qw/:glob/;
-
+use Data::Dumper;
 
 # on debian with perl > 5.8.4 croak() doesn't work anymore without this.
 # There is some require statement which dies 'cause it can't find Carp::Heavy,
@@ -32,7 +32,7 @@ use Carp::Heavy;
 use Carp;
 use Exporter;
 
-$Config::General::VERSION = "2.67";
+$Config::General::VERSION = "2.69";
 
 use base qw(Exporter);
 our @EXPORT_OK = qw(ParseConfig SaveConfig SaveConfigString);
@@ -286,6 +286,10 @@ sub _prepare {
     $self->{ConfigFile} = delete $conf{-file};
   }
   if (exists $conf{-hash}) {
+    if (! $self->_validate_input_hash($conf{-hash})) {
+      croak "Config::General: supplied -hash hash contains invalid keys or values!\n";
+    }
+    
     $self->{ConfigHash} = delete $conf{-hash};
   }
 
@@ -294,6 +298,10 @@ sub _prepare {
     $self->{ConfigFile} = delete $conf{-ConfigFile};
   }
   if (exists $conf{-ConfigHash}) {
+    if (! $self->_validate_input_hash($conf{-ConfigHash})) {
+      croak "Config::General: supplied -ConfigHash hash contains invalid keys or values!\n";
+    }
+
     $self->{ConfigHash} = delete $conf{-ConfigHash};
   }
 
@@ -340,6 +348,10 @@ sub _prepare {
   if (exists $conf{-DefaultConfig}) {
     if ($conf{-DefaultConfig} && ref($conf{-DefaultConfig}) eq 'HASH') {
       # copy the hashref so that it is not being modified by subsequent calls, fixes bug#142095
+      if (! $self->_validate_input_hash($conf{-DefaultConfig})) {
+        croak "Config::General: supplied -DefaultConfig hash contains invalid keys or values!\n";
+      }
+
       $self->{DefaultConfig} = $self->_copy($conf{-DefaultConfig});
     }
     elsif ($conf{-DefaultConfig} && ref($conf{-DefaultConfig}) eq q()) {
@@ -1492,6 +1504,61 @@ sub _hashref {
   else {
     return {};
   }
+}
+
+sub _validate_input_hash {
+  #
+  # Checks if a given input hash contains invalid keys or values.
+  # Fixes https://codeberg.org/scip/Config-General/issues/9.
+  #
+  my($this, $hash) = @_;
+
+  if (ref($hash) eq '') {
+    return $this->_validate_input_hash_value($hash);
+  }
+  elsif (ref($hash) eq 'ARRAY') {
+    foreach my $sub (@{$hash}) {
+      return $this->_validate_input_hash($sub);
+    }
+  } 
+  
+  foreach my $key (keys %{$hash}) {
+    if (! $this->_validate_input_hash_value($key)) {
+      return 0;
+    }
+
+    if (ref($hash->{$key}) eq 'ARRAY') {
+      foreach my $sub (@{$hash->{$key}}) {
+        if (! $this->_validate_input_hash($sub)) {
+          return 0;
+        }
+      }
+    }
+    elsif(ref($hash->{$key}) eq 'HASH') {
+      if (! $this->_validate_input_hash($hash->{$key})) {
+        return 0;
+      }
+    }
+    else {
+      if (! $this->_validate_input_hash_value($hash->{$key})) {
+        return 0;
+      }
+    }
+  }
+
+  return 1;
+}
+
+sub _validate_input_hash_value {
+  #
+  # Checks a given key or value against a deny regex
+  my ($this, $value) = @_;
+
+  if ($value =~ /(<<|>>|\*\/|\/\*|#)/) {
+    return 0;
+  }
+
+  return 1;
 }
 
 
@@ -2859,7 +2926,7 @@ I recommend you to read the following documents, which are supplied with Perl:
 
 =head1 LICENSE AND COPYRIGHT
 
-Copyright (c) 2000-2025 Thomas Linden
+Copyright (c) 2000-2026 Thomas Linden
 
 This library is free software; you can redistribute it and/or
 modify it under the same terms of the Artistic License 2.0.
@@ -2888,7 +2955,7 @@ Thomas Linden <tlinden |AT| cpan.org>
 
 =head1 VERSION
 
-2.67
+2.69
 
 =cut
 

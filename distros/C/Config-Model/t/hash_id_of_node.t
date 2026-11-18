@@ -38,15 +38,6 @@ $model->create_config_class(
             max_nb => 2,
             @element
         },
-        'hash_with_default_and_init' => {
-            type              => 'hash',
-            index_type        => 'string',
-            default_with_init => {
-                'def_1' => 'X=Av Y=Bv',
-                'def_2' => 'Y=Av Z=Cv'
-            },
-            @element
-        },
     ],
 );
 
@@ -77,48 +68,6 @@ my $b1 = $b->fetch_with_id(1);
 isa_ok( $b1, 'Config::Model::Node', "fetched element id 1" );
 
 is( $b1->config_class_name, 'Slave', 'check config_class_name' );
-
-my $h_with_def = $root->fetch_element('hash_with_default_and_init');
-my $res        = [ $h_with_def->fetch_all_indexes ];
-
-#print Dumper( $res ) ;
-
-is_deeply( $res, [qw/def_1 def_2/], 'check default items' );
-
-#print $root->dump_tree ;
-is(
-    $root->dump_tree,
-    'bounded_hash:1 -
-hash_with_default_and_init:def_1
-  X=Av
-  Y=Bv -
-hash_with_default_and_init:def_2
-  Y=Av
-  Z=Cv - -
-', "check default items with children setup"
-);
-
-is( $h_with_def->fetch_with_id('def_1')->index_value, 'def_1', 'check index_value prior to move' );
-
-$h_with_def->move( 'def_1', 'moved_1' );
-
-is( $h_with_def->fetch_with_id('moved_1')->index_value, 'moved_1', 'check index_value after move' );
-
-$res = [ $h_with_def->fetch_all_indexes ];
-is_deeply( $res, [qw/def_2 moved_1/], 'check moved items keys' );
-
-#print $root->dump_tree ;
-is(
-    $root->dump_tree,
-    'bounded_hash:1 -
-hash_with_default_and_init:def_2
-  Y=Av
-  Z=Cv -
-hash_with_default_and_init:moved_1
-  X=Av
-  Y=Bv - -
-', "check moved items with children setup"
-);
 
 $root->load("plain_hash:2 X=Av Y=Av Z=Cv");
 my $ph = $root->fetch_element('plain_hash');

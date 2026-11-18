@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerStatus;
 # ABSTRACT: represents the status of a container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ API::Docker::Type::ContainerStatus - represents the status of a container
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ C<Task> example, whose container is still running.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

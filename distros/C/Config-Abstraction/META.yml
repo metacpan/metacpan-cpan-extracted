@@ -5,6 +5,7 @@ author:
 build_requires:
   ExtUtils::MakeMaker: '0'
   File::Glob: '0'
+  File::Path: '0'
   File::stat: '0'
   IPC::System::Simple: '0'
   POSIX: '0'
@@ -36,6 +37,8 @@ optional_features:
     description: 'AES-256-GCM encryption of config values via ENC[] tokens'
     requires:
       CryptX: '0.062'
+recommends:
+  Config::General: '0'
 requires:
   Carp: '0'
   Config::Auto: '0'
@@ -51,11 +54,13 @@ requires:
   Hash::Merge: '0'
   JSON::MaybeXS: '0'
   JSON::Parse: '0'
+  MIME::Base64: '0'
   Params::Get: '0.15'
   Params::Validate::Strict: '0.37'
   Pod::Usage: '0'
   Readonly: '0'
   Scalar::Util: '0'
+  Sys::Hostname: '0'
   TOML::Tiny: '0'
   XML::PP: '0.06'
   YAML::XS: '0.80'
@@ -64,5 +69,5 @@ resources:
   bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Config-Abstraction
   homepage: https://metacpan.org/pod/Config::Abstraction
   repository: git://github.com/nigelhorne/Config-Abstraction.git
-version: '0.42'
+version: '0.43'
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

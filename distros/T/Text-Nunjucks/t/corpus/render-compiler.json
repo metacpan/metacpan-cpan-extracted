@@ -1,0 +1,631 @@
+[
+  {
+    "name": "mixed compare precedence 2==1<5",
+    "template": "{{ 2 == 1 < 5 }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "mixed compare precedence 1==0<2",
+    "template": "{{ 1 == 0 < 2 }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "chained less-than",
+    "template": "{{ 1 < 2 < 3 }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "comparison ops",
+    "template": "{% if 10 <= 10 %}a{% endif %}{% if 9 >= 10 %}b{% endif %}{% if 10 != 9 %}c{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "ac"
+    }
+  },
+  {
+    "name": "loose vs strict equality",
+    "template": "{% if \"0\" == 0 %}a{% endif %}{% if \"0\" === 0 %}b{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "a"
+    }
+  },
+  {
+    "name": "arithmetic precedence",
+    "template": "{{ 3 + 4 - 5 * 6 / 10 }}",
+    "expected": {
+      "ok": true,
+      "output": "4"
+    }
+  },
+  {
+    "name": "floordiv mod pow neg",
+    "template": "{{ 9//5 }} {{ 9%5 }} {{ 4**5 }} {{ -5 }}",
+    "expected": {
+      "ok": true,
+      "output": "1 4 1024 -5"
+    }
+  },
+  {
+    "name": "number vs string plus",
+    "template": "{{ 1 + 1 }} {{ '1' + 1 }} {{ '3' * '2' }}",
+    "expected": {
+      "ok": true,
+      "output": "2 11 6"
+    }
+  },
+  {
+    "name": "concat tilde",
+    "template": "{{ 4 ~ 'hello' ~ 5 }}",
+    "expected": {
+      "ok": true,
+      "output": "4hello5"
+    }
+  },
+  {
+    "name": "ternary false branch",
+    "template": "{{ 'a' if cond else 'b' }}",
+    "context": {
+      "cond": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "b"
+    }
+  },
+  {
+    "name": "ternary no else",
+    "template": "{{ 'good' if flag }}",
+    "context": {
+      "flag": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "dict literal insertion order iterate",
+    "template": "{% for k, v in { b: 1, a: 2 } %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "b=1;a=2;"
+    }
+  },
+  {
+    "name": "dict literal member access",
+    "template": "{{ { x: 9, y: 8 }.x }}",
+    "expected": {
+      "ok": true,
+      "output": "9"
+    }
+  },
+  {
+    "name": "for over array with loop vars",
+    "template": "{% for i in [7,3,6] %}{{ loop.index }}:{{ loop.revindex }}:{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1:3:7,2:2:3,3:1:6,"
+    }
+  },
+  {
+    "name": "for else on empty array",
+    "template": "{% for i in a %}{{ i }}{% else %}empty{% endfor %}",
+    "context": {
+      "a": []
+    },
+    "expected": {
+      "ok": true,
+      "output": "empty"
+    }
+  },
+  {
+    "name": "for single over string iterates chars",
+    "template": "{% for c in s %}{{ c }},{% endfor %}",
+    "context": {
+      "s": "abc"
+    },
+    "expected": {
+      "ok": true,
+      "output": "a,b,c,"
+    }
+  },
+  {
+    "name": "for single over object is empty",
+    "template": "[{% for i in obj %}{{ i }}{% else %}none{% endfor %}]",
+    "context": {
+      "obj": {
+        "a": 1,
+        "b": 2
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "[none]"
+    }
+  },
+  {
+    "name": "for destructured two-dimensional",
+    "template": "{% for x, y in points %}[{{ x }},{{ y }}]{% endfor %}",
+    "context": {
+      "points": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4]"
+    }
+  },
+  {
+    "name": "switch fall-through",
+    "template": "{% switch x %}{% case 1 %}{% case 2 %}TWO{% default %}D{% endswitch %}",
+    "context": {
+      "x": 1
+    },
+    "expected": {
+      "ok": true,
+      "output": "TWO"
+    }
+  },
+  {
+    "name": "switch default no match",
+    "template": "{% switch x %}{% case 1 %}ONE{% case 2 %}TWO{% default %}D{% endswitch %}",
+    "context": {
+      "x": 9
+    },
+    "expected": {
+      "ok": true,
+      "output": "D"
+    }
+  },
+  {
+    "name": "switch no default no match",
+    "template": "[{% switch x %}{% case 1 %}ONE{% endswitch %}]",
+    "context": {
+      "x": 9
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "in operator arrays and strings",
+    "template": "{% if 1 in [1,2] %}a{% endif %}{% if 5 not in [1,2] %}b{% endif %}{% if 'oo' in 'foobar' %}c{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "abc"
+    }
+  },
+  {
+    "name": "in operator object",
+    "template": "{% if 'a' in obj %}yes{% endif %}",
+    "context": {
+      "obj": {
+        "a": true
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "yes"
+    }
+  },
+  {
+    "name": "and or not",
+    "template": "{{ z or 'd' }} {{ '0' and 1 }} {{ not none }}",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "d 1 true"
+    }
+  },
+  {
+    "name": "set arithmetic and reference",
+    "template": "{% set x = 1 + 2 %}{% set y = x * 10 %}{{ x }}-{{ y }}",
+    "expected": {
+      "ok": true,
+      "output": "3-30"
+    }
+  },
+  {
+    "name": "set multi target",
+    "template": "{% set x, y = 'foo' %}{{ x }}{{ y }}",
+    "expected": {
+      "ok": true,
+      "output": "foofoo"
+    }
+  },
+  {
+    "name": "set scoping in for loop",
+    "template": "{% for i in [1] %}{% set v = 5 %}{% endfor %}[{{ v }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "macro with defaults",
+    "template": "{% macro foo(x, y=2, z=5) %}{{ x }}{{ y }}{{ z }}{% endmacro %}{{ foo(1) }}",
+    "expected": {
+      "ok": true,
+      "output": "125"
+    }
+  },
+  {
+    "name": "macro with keyword args",
+    "template": "{% macro foo(x, y=2, z=5) %}{{ x }}{{ y }}{{ z }}{% endmacro %}{{ foo(1, z=3) }}",
+    "expected": {
+      "ok": true,
+      "output": "123"
+    }
+  },
+  {
+    "name": "macro out of order kwargs",
+    "template": "{% macro foo(x, y=2, z=5) %}{{ x }}{{ y }}{{ z }}{% endmacro %}{{ foo(1, z=3, y=9) }}",
+    "expected": {
+      "ok": true,
+      "output": "193"
+    }
+  },
+  {
+    "name": "autoescape on default",
+    "template": "{{ x }}",
+    "context": {
+      "x": "<b>&'\"</b>"
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;&amp;&#39;&quot;&lt;/b&gt;"
+    }
+  },
+  {
+    "name": "autoescape backslash",
+    "template": "{{ x }}",
+    "context": {
+      "x": "foo \\' bar"
+    },
+    "expected": {
+      "ok": true,
+      "output": "foo &#92;&#39; bar"
+    }
+  },
+  {
+    "name": "safe raw with autoescape off",
+    "template": "{{ [1,2] }} {{ 1/3 }} {{ 0.1 + 0.2 }}",
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "1,2 0.3333333333333333 0.30000000000000004"
+    }
+  },
+  {
+    "name": "none display and defined",
+    "template": "[{{ none }}][{% if none is none %}n{% endif %}]",
+    "expected": {
+      "ok": true,
+      "output": "[][n]"
+    }
+  },
+  {
+    "name": "asyncEach over array",
+    "template": "{% asyncEach i in [1,2,3] %}{{ i }}{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "123"
+    }
+  },
+  {
+    "name": "asyncAll over array",
+    "template": "{% asyncAll i in [1,2,3] %}-{{ i }}{% endall %}",
+    "expected": {
+      "ok": true,
+      "output": "-1-2-3"
+    }
+  },
+  {
+    "name": "asyncEach over dict literal (k41, Hash::Ordered)",
+    "template": "{% asyncEach k, v in { one: 1, two: 2 } %}-{{ k }}:{{ v }}-{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "-one:1--two:2-"
+    }
+  },
+  {
+    "name": "asyncAll over dict literal (k41, Hash::Ordered)",
+    "template": "{% asyncAll k, v in { one: 1, two: 2 } %}-{{ k }}:{{ v }}-{% endall %}",
+    "expected": {
+      "ok": true,
+      "output": "-one:1--two:2-"
+    }
+  },
+  {
+    "name": "asyncEach else on empty",
+    "template": "{% asyncEach i in a %}{{ i }}{% else %}empty{% endeach %}",
+    "context": {
+      "a": []
+    },
+    "expected": {
+      "ok": true,
+      "output": "empty"
+    }
+  },
+  {
+    "name": "asyncEach destructured",
+    "template": "{% asyncEach x, y in points %}[{{ x }},{{ y }}]{% endeach %}",
+    "context": {
+      "points": [
+        [
+          1,
+          2
+        ],
+        [
+          3,
+          4
+        ]
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4]"
+    }
+  },
+  {
+    "name": "call block",
+    "template": "{% macro wrap(el) %}<{{ el }}>{{ caller() }}</{{ el }}>{% endmacro %}{% call wrap(\"div\") %}Hello{% endcall %}",
+    "expected": {
+      "ok": true,
+      "output": "<div>Hello</div>"
+    }
+  },
+  {
+    "name": "call block with args",
+    "template": "{% macro list(items) %}<ul>{% for i in items %}<li>{{ caller(i) }}</li>{% endfor %}</ul>{% endmacro %}{% call(item) list([\"a\", \"b\"]) %}{{ item }}{% endcall %}",
+    "expected": {
+      "ok": true,
+      "output": "<ul><li>a</li><li>b</li></ul>"
+    }
+  },
+  {
+    "name": "high-precision float literal round-trip",
+    "template": "{{ 0.30000000000000004 }}",
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "0.30000000000000004"
+    }
+  },
+  {
+    "name": "regex literal toString: name [0-9] backslash (autoescape off, k43)",
+    "template": "{{ r/name [0-9] \\// }}",
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "/name [0-9] \\//"
+    }
+  },
+  {
+    "name": "regex literal toString: simple gi (autoescape on, k43)",
+    "template": "{{ r/x/gi }}",
+    "expected": {
+      "ok": true,
+      "output": "/x/gi"
+    }
+  },
+  {
+    "name": "regex property: source (k43)",
+    "template": "{{ r/x/gi.source }}",
+    "expected": {
+      "ok": true,
+      "output": "x"
+    }
+  },
+  {
+    "name": "regex property: flags (k43)",
+    "template": "{{ r/x/gi.flags }}",
+    "expected": {
+      "ok": true,
+      "output": "gi"
+    }
+  },
+  {
+    "name": "regex property: global true (k43)",
+    "template": "{{ r/x/g.global }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "regex property: global false when flag absent (k43)",
+    "template": "{{ r/x/y.global }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "regex method: test true (k43)",
+    "template": "{{ r/h/.test(\"hi\") }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "regex method: test false (k43)",
+    "template": "{{ r/x/.test(\"hi\") }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "regex method: exec captures joined (k43)",
+    "template": "{{ r/(.)(.)/.exec(\"ab\") }}",
+    "expected": {
+      "ok": true,
+      "output": "ab,a,b"
+    }
+  },
+  {
+    "name": "regex method: exec no match renders empty (k43)",
+    "template": "{{ r/x/.exec(\"ab\") }}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "regex method: exec no capture groups returns single-element array (k48)",
+    "template": "{{ r/x/.exec(\"xx\") }}",
+    "expected": {
+      "ok": true,
+      "output": "x"
+    }
+  },
+  {
+    "name": "regex method: exec no capture groups keyed access [0] (k48)",
+    "template": "{{ r/x/.exec(\"xx\")[0] }}",
+    "expected": {
+      "ok": true,
+      "output": "x"
+    }
+  },
+  {
+    "name": "regex method: exec no capture groups keyed access [1] renders empty (k48)",
+    "template": "{{ r/x/.exec(\"xx\")[1] }}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "regex method: exec no capture groups no-match renders empty (k48)",
+    "template": "{{ r/x/.exec(\"yy\") }}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "regex string concat (k43)",
+    "template": "{{ r/x/gi + \"!\" }}",
+    "expected": {
+      "ok": true,
+      "output": "/x/gi!"
+    }
+  },
+  {
+    "name": "regex exec falsy in if (k43)",
+    "template": "{% if r/x/.exec(\"ab\") %}YES{% else %}NO{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "NO"
+    }
+  },
+  {
+    "name": "regex exec truthy in if (k43)",
+    "template": "{% if r/h/.exec(\"hi\") %}YES{% else %}NO{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "YES"
+    }
+  },
+  {
+    "name": "regex sticky y: test no-match at lastIndex=0 (k46)",
+    "template": "{{ r/x/y.test(\"yxy\") }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "regex sticky y: exec at lastIndex=0 no-match (k46)",
+    "template": "{{ r/x/y.exec(\"yxy\") }}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "regex sticky y: lastIndex resets to 0 on no-match (k46)",
+    "template": "{% set r = r/x/y %}{{ r.lastIndex }}{% if r.test(\"yxy\") %}T{% endif %}{{ r.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "00"
+    }
+  },
+  {
+    "name": "regex sticky y: test match advances lastIndex (k46)",
+    "template": "{% set r = r/x/y %}{% if r.test(\"xyx\") %}T{% endif %}{{ r.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "T1"
+    }
+  },
+  {
+    "name": "regex sticky y: {% if %} matches on first char (k40/k46)",
+    "template": "{% set r = r/x/y %}{% if r.test(\"xyx\") %}YES{% else %}NO{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "YES"
+    }
+  },
+  {
+    "name": "regex global g: stateful exec iteration (k46)",
+    "template": "{% set r = r/(\\d)/g %}{% set m1 = r.exec(\"1 2 3\") %}{% set m2 = r.exec(\"1 2 3\") %}{% set m3 = r.exec(\"1 2 3\") %}{{ m1 }}|{{ m2 }}|{{ m3 }}",
+    "expected": {
+      "ok": true,
+      "output": "1,1|2,2|3,3"
+    }
+  },
+  {
+    "name": "regex global g: lastIndex ends at 5 after three execs (k46)",
+    "template": "{% set r = r/\\d/g %}{% set m1 = r.exec(\"1 2 3\") %}{% set m2 = r.exec(\"1 2 3\") %}{% set m3 = r.exec(\"1 2 3\") %}{{ r.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "5"
+    }
+  },
+  {
+    "name": "regex global g: no-match resets lastIndex to 0 (k46)",
+    "template": "{% set r = r/\\d/g %}{{ r.exec(\"abc\") }}{{ r.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "regex global g: test advances lastIndex, then resets on no-match (k46)",
+    "template": "{% set r = r/x/g %}{% if r.test(\"axb\") %}T{% endif %}{{ r.lastIndex }}{% if r.test(\"abc\") %}T{% endif %}{{ r.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "T20"
+    }
+  }
+]

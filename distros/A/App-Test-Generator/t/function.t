@@ -4,6 +4,8 @@ use strict;
 use warnings;
 
 use Test::Most;
+use Config;
+use IPC::Open3 ();
 use Test::Mockingbird;
 use Test::Returns;
 use Test::Memory::Cycle;
@@ -3164,7 +3166,7 @@ subtest 'Devel::App::Test::Generator::LCSAJ::Runtime - BEGIN-time LCSAJ_TARGETS 
 	# so it is exercised by loading a fresh copy of the module in a child
 	# process with the env var pre-set, then reading back %TARGET -- a
 	# single bounded perl -e invocation, not a recursive test/prove run
-	my $targets = '/build/blib/lib/Foo.pm:/home/user/proj/lib/Bar.pm:' . "\n";
+	my $targets = join($Config{path_sep}, '/build/blib/lib/Foo.pm', '/home/user/proj/lib/Bar.pm', "\n");
 	local $ENV{LCSAJ_TARGETS} = $targets;
 
 	# List-form system() under capture_merged(), not qx{}/backticks --
@@ -3184,6 +3186,24 @@ subtest 'Devel::App::Test::Generator::LCSAJ::Runtime - BEGIN-time LCSAJ_TARGETS 
 		'lib/Bar.pm,lib/Foo.pm',
 		'LCSAJ_TARGETS entries are normalised (blib/lib and lib stripped) and stray trailing newlines are removed'
 	);
+};
+
+subtest 'Devel::App::Test::Generator::LCSAJ::Runtime - Windows separators' => sub {
+	my $norm = \&Devel::App::Test::Generator::LCSAJ::Runtime::_normalize;
+	is($norm->('D:\\a\\proj\\blib\\lib\\Foo\\Bar.pm'), 'lib/Foo/Bar.pm', 'backslashed blib path');
+	is($norm->('C:\\proj\\lib\\Foo.pm'), 'lib/Foo.pm', 'backslashed lib path');
+	is($norm->('C:/proj\\lib/Foo\\Bar.pm'), 'lib/Foo/Bar.pm', 'mixed separators');
+	is($norm->('/home/user/proj/lib/Foo.pm'), 'lib/Foo.pm', 'Unix path unchanged');
+
+	# No drive letters: on Unix path_sep is ':' and would split them
+	local $ENV{LCSAJ_TARGETS} = join($Config{path_sep}, '\\a\\proj\\blib\\lib\\Foo.pm', '\\proj\\lib\\Bar\\Baz.pm');
+	my @inc_args = map { ('-I', $_) } @INC;
+	my $code = 'print join(q{,}, sort keys %Devel::App::Test::Generator::LCSAJ::Runtime::TARGET)';
+	my ($output, $exit) = capture_merged {
+		system($^X, @inc_args, '-MDevel::App::Test::Generator::LCSAJ::Runtime', '-e', $code);
+	};
+	is($exit, 0, 'the child process exits cleanly') or diag($output);
+	is($output, 'lib/Bar/Baz.pm,lib/Foo.pm', 'backslashed LCSAJ_TARGETS entries are normalised');
 };
 
 # Clear %HITS so this module's END block (_write_results) does not write
@@ -3806,8 +3826,8 @@ subtest 'SchemaExtractor::_compile_signature_isolated: empty stdout and empty st
 	# Test::Builder subtest boundary, killing the test process with exit 255.
 	#
 	# Strategy: mock open3 in the consuming namespace so the "child" returns
-	# empty filehandles without spawning a real process.  waitpid($$, 0) on
-	# our own PID returns -1 immediately (not our child), which is harmless.
+	# empty filehandles; the PID is a real child that has already exited (see
+	# _exited_child_pid).
 
 	my $e = bless { allow_signature_exec => 1, verbose => 0 }, 'App::Test::Generator::SchemaExtractor';
 
@@ -3820,7 +3840,7 @@ subtest 'SchemaExtractor::_compile_signature_isolated: empty stdout and empty st
 		$_[0] = do { open my $fh, '>', \my $buf; $fh };	# writable stdin for child
 		$_[1] = $fake_rdr;					# stdout: empty
 		$_[2] = $fake_err;					# stderr: empty
-		return $$;						# our own PID → waitpid returns -1 quickly
+		return _exited_child_pid();
 	};
 
 	my $result;
@@ -3848,7 +3868,7 @@ subtest 'SchemaExtractor::_compile_signature_isolated: non-JSON stdout -> return
 		$_[0] = do { open my $fh, '>', \my $buf; $fh };
 		$_[1] = $fake_rdr;
 		$_[2] = $fake_err;
-		return $$;
+		return _exited_child_pid();
 	};
 
 	my $result;
@@ -4250,5 +4270,14 @@ subtest 'CoverageGuidedFuzzer::minimize_corpus - return shape and idempotent con
 
 	done_testing();
 };
+
+# The code under test waits for the PID its open3 returns.  A mock must hand
+# back a real child: on Windows waitpid on a non-child (such as $$) opens
+# that process and waits for it to exit, which never happens for ourselves.
+sub _exited_child_pid {
+	my $pid = IPC::Open3::open3(my $in, my $out, undef, $^X, q{-e}, q{1});
+	close $in;
+	return $pid;
+}
 
 done_testing();

@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-
+use 5.022;
 
 use ExtUtils::MakeMaker;
 
@@ -14,15 +14,18 @@ my %WriteMakefileArgs = (
   },
   "DISTNAME" => "Dist-Zilla-PluginBundle-Author-GETTY",
   "LICENSE" => "perl",
+  "MIN_PERL_VERSION" => "5.022",
   "NAME" => "Dist::Zilla::PluginBundle::Author::GETTY",
   "PREREQ_PM" => {
     "App::cpanminus" => "1.7049",
+    "CPAN::Meta::Merge" => "2.150005",
+    "Config::Identity" => "0.0019",
     "Dist::Zilla" => "6.040",
     "Dist::Zilla::Plugin::Alien" => "0.024",
     "Dist::Zilla::Plugin::AlienBuild" => "0.33",
     "Dist::Zilla::Plugin::Authority" => "1.009",
     "Dist::Zilla::Plugin::Deprecated" => "0.007",
-    "Dist::Zilla::Plugin::Docker::API" => "0.105",
+    "Dist::Zilla::Plugin::Docker::API" => "0.107",
     "Dist::Zilla::Plugin::GatherAgentContext" => "0.002",
     "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.015",
     "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0012",
@@ -41,15 +44,21 @@ my %WriteMakefileArgs = (
     "Dist::Zilla::Plugin::Test::ChangesHasContent" => "0.011",
     "Dist::Zilla::PluginBundle::Git" => "2.052",
     "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007",
+    "Moose" => 0,
+    "Path::Tiny" => 0,
+    "Pithub" => "0.01043",
     "Pod::Elemental" => "0.103006",
     "Pod::Elemental::Transformer::List" => "0.102001",
     "Pod::Weaver" => "4.022",
-    "Pod::Weaver::Section::Support" => "1.014"
+    "namespace::autoclean" => 0
   },
   "TEST_REQUIRES" => {
+    "Archive::Zip" => 0,
+    "Module::Runtime" => 0,
+    "Software::License" => 0,
     "Test::More" => "1.302226"
   },
-  "VERSION" => "0.327",
+  "VERSION" => "0.328",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -58,12 +67,15 @@ my %WriteMakefileArgs = (
 
 my %FallbackPrereqs = (
   "App::cpanminus" => "1.7049",
+  "Archive::Zip" => 0,
+  "CPAN::Meta::Merge" => "2.150005",
+  "Config::Identity" => "0.0019",
   "Dist::Zilla" => "6.040",
   "Dist::Zilla::Plugin::Alien" => "0.024",
   "Dist::Zilla::Plugin::AlienBuild" => "0.33",
   "Dist::Zilla::Plugin::Authority" => "1.009",
   "Dist::Zilla::Plugin::Deprecated" => "0.007",
-  "Dist::Zilla::Plugin::Docker::API" => "0.105",
+  "Dist::Zilla::Plugin::Docker::API" => "0.107",
   "Dist::Zilla::Plugin::GatherAgentContext" => "0.002",
   "Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch" => "0.015",
   "Dist::Zilla::Plugin::GitHub::CreateRelease" => "0.0012",
@@ -82,11 +94,16 @@ my %FallbackPrereqs = (
   "Dist::Zilla::Plugin::Test::ChangesHasContent" => "0.011",
   "Dist::Zilla::PluginBundle::Git" => "2.052",
   "Dist::Zilla::PluginBundle::Git::VersionManager" => "0.007",
+  "Module::Runtime" => 0,
+  "Moose" => 0,
+  "Path::Tiny" => 0,
+  "Pithub" => "0.01043",
   "Pod::Elemental" => "0.103006",
   "Pod::Elemental::Transformer::List" => "0.102001",
   "Pod::Weaver" => "4.022",
-  "Pod::Weaver::Section::Support" => "1.014",
-  "Test::More" => "1.302226"
+  "Software::License" => 0,
+  "Test::More" => "1.302226",
+  "namespace::autoclean" => 0
 );
 
 

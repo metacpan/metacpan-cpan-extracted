@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerWaitResponse;
 # ABSTRACT: OK response to ContainerWait operation
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerWaitExitError;
 use namespace::clean;
@@ -26,7 +26,7 @@ API::Docker::Type::ContainerWaitResponse - OK response to ContainerWait operatio
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ L<API::Docker::Type::ContainerWaitExitError>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -47,6 +47,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
   
   has idle_accepted_connections_h : Hash of Mojo::Connection::Stream;
   
+  has signal : Go::OS::Signal;
+  
   # Class Methods
   static method new : Mojo::Server::Daemon () {
     
@@ -103,11 +105,12 @@ class Mojo::Server::Daemon extends Mojo::Server {
   
   method run : void () {
     
-    Go::OS::Signal->start_signal_handler;
     Go->go([$self : Mojo::Server::Daemon] method : void () {
       
-      Fn->defer(method : void () {
-        Go::OS::Signal->stop_signal_handler;
+      $self->{signal} = Go::OS::Signal->new;
+      
+      Fn->defer([$self : , ] method : void () {
+        $self->{signal} = undef;
       });
       
       $self->add_signal_handler;
@@ -134,8 +137,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
       });
       
       my $signal_ch = Go->make(1);
-      Go::OS::Signal->notify($signal_ch, SIGNAL->SIGTERM);
-      Go::OS::Signal->notify($signal_ch, SIGNAL->SIGINT);
+      $self->{signal}->notify($signal_ch, SIGNAL->SIGTERM);
+      $self->{signal}->notify($signal_ch, SIGNAL->SIGINT);
       
       my $select = Go->new_select;
       $select->add_read($signal_ch);
@@ -186,7 +189,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
           
           my $accepted_handle = (IO::Socket)undef;
           eval {
-            $accepted_handle = $acceptor->handle->accept;
+            $accepted_handle = $acceptor->handle->accept(Go->bg);
             
             # Disable Nagle's algorithm
             $accepted_handle->setsockopt(SOCKET->IPPROTO_TCP, SOCKET->TCP_NODELAY, 1);
@@ -234,7 +237,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
                   }
                   else {
                     my $read_length = (int)-1;
-                    eval { $read_length = $accepted_connection->read($chunk); }
+                    eval { $read_length = $accepted_connection->read(Go->bg, $chunk); }
                     if ($@) {
                       # Connection is closed
                       return;
@@ -272,7 +275,7 @@ class Mojo::Server::Daemon extends Mojo::Server {
                     last;
                   }
                   
-                  $accepted_connection->write($chunk);
+                  $accepted_connection->write(Go->bg, $chunk);
                 }
                 
                 $self->_finish($accepted_connection);
@@ -311,7 +314,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     my $handle = $accepted_connection->handle;
     
-    $accepted_connection->set_timeout($self->inactivity_timeout);
+    # TODO
+    # $accepted_connection->set_timeout($self->inactivity_timeout);
     
     unless ($handle isa IO::Socket::UNIX) {
       $tx->set_local_address($handle->(IO::Socket::IP)->sockhost);
@@ -354,7 +358,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     # Keep-alive connection
     unless ($accepted_connection->tx) {
-      $accepted_connection->set_timeout($self->keep_alive_timeout);
+      # TODO
+      # $accepted_connection->set_timeout($self->keep_alive_timeout);
     }
   }
   
@@ -439,7 +444,8 @@ class Mojo::Server::Daemon extends Mojo::Server {
     
     $acceptor->listen($options);
     
-    $acceptor->set_timeout($self->inactivity_timeout);
+    # TODO
+    # $acceptor->set_timeout($self->inactivity_timeout);
     
     my $acceptors = (List of Mojo::Connection::Server)List->new_ref($self->{acceptors});
     

@@ -1,6 +1,6 @@
 package App::optex::up;
 
-our $VERSION = "1.19";
+our $VERSION = "1.20";
 
 =encoding utf-8
 
@@ -202,10 +202,10 @@ after the paper, so they take precedence.
 
 When the command is C<ansicolumn>, give it the option
 C<--highlight=>I<NAME>: the files are read through the highlighter of
-the name, and shown with syntax highlight.  The highlighters are the
-modules of L<IO::Factotum::Highlight>: C<skylighting> (C<sky>) and
-C<sourcehighlight> (C<gnu>).  Nothing is done when the module of the
-highlighter is not installed.
+the name, and shown with syntax highlight.  The highlighters are
+those of L<Text::ANSI::Highlight>: C<pandoc>, C<sourcehighlight>
+(C<gnu>) and C<skylighting> (C<sky>).  Nothing is done when
+L<Text::ANSI::Highlight::IO> is not installed.
 
 =item Other options
 
@@ -289,7 +289,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2025 Kazumasa Utashiro.
+Copyright © 2025 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -649,15 +649,14 @@ sub finalize {
 
     if (@$argv && $argv->[0] eq 'ansicolumn') {
 
-        # --highlight=NAME: ansicolumn reads the files through the
-        # highlighter (IO::Factotum::Highlight::NAME).  Without the
-        # module of the name, ansicolumn fails by the option: look
-        # for it, without loading.
+        # --highlight=NAME: ansicolumn reads the files in the colors
+        # of the highlighter of the name, by Text::ANSI::Highlight::IO.
+        # Without the module, ansicolumn fails by the option: look for
+        # it, without loading.
         if (my $name = $config->{highlight}) {
-            my $module = "IO/Factotum/Highlight/$name.pm";
             unshift @ac_opts, "--highlight=$name"
                 if $name =~ /\A\w+\z/
-                and grep { !ref and -f "$_/$module" } @INC;
+                and grep { !ref and -f "$_/Text/ANSI/Highlight/IO.pm" } @INC;
         }
 
         # the options go before those of the user, which win

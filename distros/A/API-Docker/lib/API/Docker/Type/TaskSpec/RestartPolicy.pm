@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::RestartPolicy;
 # ABSTRACT: Specification for the restart policy which applies to containers created as part of this service
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -31,7 +31,7 @@ API::Docker::Type::TaskSpec::RestartPolicy - Specification for the restart polic
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ value is 0, which is unbounded).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

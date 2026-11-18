@@ -3,6 +3,9 @@ abstract: 'BeLike::GETTY when you build your dists'
 author:
   - 'Torsten Raudssus <getty@cpan.org>'
 build_requires:
+  Archive::Zip: '0'
+  Module::Runtime: '0'
+  Software::License: '0'
   Test::More: '1.302226'
 configure_requires:
   ExtUtils::MakeMaker: '0'
@@ -14,32 +17,51 @@ meta-spec:
   version: '1.4'
 name: Dist-Zilla-PluginBundle-Author-GETTY
 provides:
+  Dist::Zilla::Plugin::Author::GETTY::Binary:
+    file: lib/Dist/Zilla/Plugin/Author/GETTY/Binary.pm
+    version: '0.328'
+  Dist::Zilla::Plugin::Author::GETTY::GitHubRelease:
+    file: lib/Dist/Zilla/Plugin/Author/GETTY/GitHubRelease.pm
+    version: '0.328'
   Dist::Zilla::Plugin::Author::GETTY::GiteaMeta:
     file: lib/Dist/Zilla/Plugin/Author/GETTY/GiteaMeta.pm
-    version: '0.327'
+    version: '0.328'
+  Dist::Zilla::Plugin::Author::GETTY::InstallCheck:
+    file: lib/Dist/Zilla/Plugin/Author/GETTY/InstallCheck.pm
+    version: '0.328'
   Dist::Zilla::PluginBundle::Author::GETTY:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY.pm
-    version: '0.327'
+    version: '0.328'
+  Dist::Zilla::PluginBundle::Author::GETTY::Binary:
+    file: lib/Dist/Zilla/PluginBundle/Author/GETTY/Binary.pm
+    version: '0.328'
   Dist::Zilla::PluginBundle::Author::GETTY::Docker:
     file: lib/Dist/Zilla/PluginBundle/Author/GETTY/Docker.pm
-    version: '0.327'
+    version: '0.328'
   Pod::Elemental::Transformer::Author::GETTY:
     file: lib/Pod/Elemental/Transformer/Author/GETTY.pm
-    version: '0.327'
+    version: '0.328'
   Pod::Weaver::PluginBundle::Author::GETTY:
     file: lib/Pod/Weaver/PluginBundle/Author/GETTY.pm
-    version: '0.327'
+    version: '0.328'
   Pod::Weaver::Section::Author::GETTY::Legal:
     file: lib/Pod/Weaver/Section/Author/GETTY/Legal.pm
-    version: '0.327'
+    version: '0.328'
+  Pod::Weaver::Section::Author::GETTY::Support:
+    file: lib/Pod/Weaver/Section/Author/GETTY/Support.pm
+    version: '0.328'
+recommends:
+  PAR::Packer: '1.031'
 requires:
   App::cpanminus: '1.7049'
+  CPAN::Meta::Merge: '2.150005'
+  Config::Identity: '0.0019'
   Dist::Zilla: '6.040'
   Dist::Zilla::Plugin::Alien: '0.024'
   Dist::Zilla::Plugin::AlienBuild: '0.33'
   Dist::Zilla::Plugin::Authority: '1.009'
   Dist::Zilla::Plugin::Deprecated: '0.007'
-  Dist::Zilla::Plugin::Docker::API: '0.105'
+  Dist::Zilla::Plugin::Docker::API: '0.107'
   Dist::Zilla::Plugin::GatherAgentContext: '0.002'
   Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: '0.015'
   Dist::Zilla::Plugin::GitHub::CreateRelease: '0.0012'
@@ -58,15 +80,19 @@ requires:
   Dist::Zilla::Plugin::Test::ChangesHasContent: '0.011'
   Dist::Zilla::PluginBundle::Git: '2.052'
   Dist::Zilla::PluginBundle::Git::VersionManager: '0.007'
+  Moose: '0'
+  Path::Tiny: '0'
+  Pithub: '0.01043'
   Pod::Elemental: '0.103006'
   Pod::Elemental::Transformer::List: '0.102001'
   Pod::Weaver: '4.022'
-  Pod::Weaver::Section::Support: '1.014'
+  namespace::autoclean: '0'
+  perl: '5.022'
 resources:
   bugtracker: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty/issues
   homepage: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty
   repository: https://github.com/Getty/p5-dist-zilla-pluginbundle-author-getty.git
-version: '0.327'
+version: '0.328'
 x_Dist_Zilla:
   perl:
     version: '5.040001'
@@ -142,12 +168,16 @@ x_Dist_Zilla:
       name: '@Author::GETTY/@Filter/TestRelease'
       version: '6.040'
     -
-      class: Dist::Zilla::Plugin::ConfirmRelease
-      name: '@Author::GETTY/@Filter/ConfirmRelease'
-      version: '6.040'
-    -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Author::GETTY/@Filter/UploadToCPAN'
+      version: '6.040'
+    -
+      class: Dist::Zilla::Plugin::Author::GETTY::InstallCheck
+      name: '@Author::GETTY/Author::GETTY::InstallCheck'
+      version: '0.328'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::GETTY/ConfirmRelease'
       version: '6.040'
     -
       class: Dist::Zilla::Plugin::LicenseFile
@@ -272,9 +302,9 @@ x_Dist_Zilla:
               name: '@GETTY/postlude'
               version: '4.022'
             -
-              class: Pod::Weaver::Section::GenerateSection
+              class: Pod::Weaver::Section::Author::GETTY::Support
               name: '@GETTY/Support'
-              version: '4.022'
+              version: '0.328'
             -
               class: Pod::Weaver::Section::GenerateSection
               name: '@GETTY/Contributing'
@@ -286,7 +316,7 @@ x_Dist_Zilla:
             -
               class: Pod::Weaver::Section::Author::GETTY::Legal
               name: '@GETTY/Legal'
-              version: '0.327'
+              version: '0.328'
             -
               class: Pod::Weaver::Plugin::Transformer
               name: '@GETTY/List'
@@ -357,7 +387,7 @@ x_Dist_Zilla:
           branch: ~
           changelog: Changes
           signed: 0
-          tag: '0.327'
+          tag: '0.328'
           tag_format: '%v'
           tag_message: v%V
         Dist::Zilla::Role::Git::Repo:
@@ -419,9 +449,9 @@ x_Dist_Zilla:
       name: '@Author::GETTY/Git::Push'
       version: '2.052'
     -
-      class: Dist::Zilla::Plugin::GitHub::CreateRelease
-      name: '@Author::GETTY/GitHub::CreateRelease'
-      version: '0.0012'
+      class: Dist::Zilla::Plugin::Author::GETTY::GitHubRelease
+      name: '@Author::GETTY/Author::GETTY::GitHubRelease'
+      version: '0.328'
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'

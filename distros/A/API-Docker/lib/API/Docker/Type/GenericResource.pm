@@ -1,6 +1,6 @@
 package API::Docker::Type::GenericResource;
 # ABSTRACT: User-defined resources can be either Integer resources (e.g, C<SSD=3>) or String resources (e.g, C<GPU=UUID1>)
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::GenericResource::DiscreteResourceSpec;
 use API::Docker::Type::GenericResource::NamedResourceSpec;
@@ -27,7 +27,7 @@ API::Docker::Type::GenericResource - User-defined resources can be either Intege
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ L<API::Docker::Type::GenericResource::DiscreteResourceSpec>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

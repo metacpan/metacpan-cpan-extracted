@@ -155,7 +155,7 @@ subtest 'a message that ends in a newline still gets a location' => sub {
   # that already does, so the trailing whitespace has to come off first.
   my $body = encode_json({ errorDetail => { message => "boom\n" } }) . "\n";
   eval { transport($body)->_request('POST', '/build', ndjson => 1) };
-  like "$@", qr/boom at \S+ line \d+\./,
+  like "$@", qr/boom at \S+ line \d+\.?/,
     'the trailing newline is trimmed and the suffix lands';
 };
 

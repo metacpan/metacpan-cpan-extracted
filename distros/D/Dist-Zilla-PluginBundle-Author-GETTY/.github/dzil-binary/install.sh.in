@@ -1,0 +1,121 @@
+#!/bin/sh
+# Installer for the binaries of @REPO@ @VERSION@ (release @TAG@).
+#   sh install.sh [name ...]      default: all of @BINARIES@
+# Environment (prefix @ENV@_):
+#   VERSION     install this version instead (the tag is built with the same prefix)
+#   INSTALL_DIR target directory (default ~/.local/bin)
+#   PLATFORM    override the detected platform
+#   BASE_URL    releases URL (default https://github.com/@OWNER@/@REPO@/releases)
+set -eu
+set -f
+
+ENVP='@ENV@'
+TAG='@TAG@'
+VERSION='@VERSION@'
+BINARIES='@BINARIES@'
+PLATFORMS='@PLATFORMS@'
+DEFAULT_BASE='https://github.com/@OWNER@/@REPO@/releases'
+
+getenv() { eval "printf '%s' \"\${${ENVP}_$1:-}\""; }
+
+die() { printf '%s\n' "$*" >&2; exit 1; }
+
+TMPDIR_=''
+cleanup() {
+  if [ -n "$TMPDIR_" ]; then rm -rf -- "$TMPDIR_"; fi
+}
+trap cleanup EXIT
+trap 'exit 1' HUP INT TERM
+
+BASE=$(getenv BASE_URL)
+[ -n "$BASE" ] || BASE=$DEFAULT_BASE
+DIR=$(getenv INSTALL_DIR)
+[ -n "$DIR" ] || DIR="${HOME:-.}/.local/bin"
+PIN=$(getenv VERSION)
+if [ -n "$PIN" ]; then
+  PREFIX=${TAG%"$VERSION"}
+  TAG="$PREFIX$PIN"
+  VERSION=$PIN
+fi
+
+PLATFORM=$(getenv PLATFORM)
+if [ -z "$PLATFORM" ]; then
+  os=$(uname -s)
+  arch=$(uname -m)
+  case "$os" in
+    Linux) os=linux ;;
+    Darwin) os=macos ;;
+    *) die "Unsupported operating system: $os. Built platforms: $PLATFORMS" ;;
+  esac
+  case "$arch" in
+    x86_64|amd64) arch=x86_64 ;;
+    aarch64|arm64) arch=arm64 ;;
+    *) die "Unsupported architecture: $arch. Built platforms: $PLATFORMS" ;;
+  esac
+  PLATFORM="$os-$arch"
+fi
+case " $PLATFORMS " in
+  *" $PLATFORM "*) ;;
+  *) die "No build for platform $PLATFORM. Built platforms: $PLATFORMS" ;;
+esac
+
+SUFFIX=''
+[ "$PLATFORM" = windows-x86_64 ] && SUFFIX='.exe'
+
+if [ $# -gt 0 ]; then
+  SELECTED=''
+  for want in "$@"; do
+    case " $BINARIES " in
+      *" $want "*) ;;
+      *) die "Unknown binary: $want. Available: $BINARIES" ;;
+    esac
+    case " $SELECTED " in
+      *" $want "*) ;;
+      *) SELECTED="$SELECTED $want" ;;
+    esac
+  done
+else
+  SELECTED=$BINARIES
+fi
+
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256() { sha256sum "$1" | cut -d ' ' -f 1; }
+elif command -v shasum >/dev/null 2>&1; then
+  sha256() { shasum -a 256 "$1" | cut -d ' ' -f 1; }
+else
+  die "Need sha256sum or shasum to verify the download"
+fi
+command -v curl >/dev/null 2>&1 || die "Need curl to download"
+
+mkdir -p "$DIR"
+URL="$BASE/download/$TAG"
+
+TMPDIR_=$(mktemp -d "$DIR/.install.XXXXXX")
+SUMS="$TMPDIR_/SHA256SUMS"
+curl -fsSL -o "$SUMS" "$URL/SHA256SUMS" || die "Download failed: $URL/SHA256SUMS"
+
+# Download and verify everything first; install only when all of it checks out.
+for name in $SELECTED; do
+  asset="$name-$VERSION-$PLATFORM$SUFFIX"
+  tmp="$TMPDIR_/$name"
+  curl -fsSL -o "$tmp" "$URL/$asset" || die "Download failed: $URL/$asset"
+  want=$(awk -v a="$asset" '$2 == a { print $1 }' "$SUMS")
+  [ -n "$want" ] || die "No checksum for $asset in SHA256SUMS"
+  got=$(sha256 "$tmp")
+  [ "$got" = "$want" ] || die "Checksum mismatch for $asset (expected $want, got $got)"
+  chmod 755 "$tmp"
+done
+
+for name in $SELECTED; do
+  mv -f "$TMPDIR_/$name" "$DIR/$name$SUFFIX"
+  printf 'Installed %s\n' "$DIR/$name$SUFFIX"
+  # The first start unpacks the PAR cache; do it now rather than on first use.
+  "$DIR/$name$SUFFIX" --help </dev/null >/dev/null 2>&1 || true
+done
+rm -rf -- "$TMPDIR_"
+TMPDIR_=''
+
+case ":${PATH:-}:" in
+  *":$DIR:"*) ;;
+  *) printf '%s is not in your PATH; add that directory to it.\n' "$DIR" ;;
+esac

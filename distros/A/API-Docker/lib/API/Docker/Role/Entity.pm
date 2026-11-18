@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity;
 # ABSTRACT: The client reference an entity delegates through
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 use namespace::clean;
 
@@ -33,7 +33,7 @@ API::Docker::Role::Entity - The client reference an entity delegates through
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -122,7 +122,7 @@ the client in a live variable.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

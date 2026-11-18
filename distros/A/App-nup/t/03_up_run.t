@@ -15,6 +15,9 @@ BEGIN {
 use lib '.';
 use t::Util;
 
+# The settings of the user are not those of the tests
+delete @ENV{qw(NUP_OPTS NUP_PAGER NUP_PAGE_PAGER NUP_LESSKEY LESSKEY_CONTENT)};
+
 is(run()->status, 2, 'no arg');
 is(run('--version')->status, 0, '--version');
 
@@ -310,7 +313,7 @@ subtest 'device and output' => sub {
 };
 
 # --highlight gives ansicolumn the option to read the files through
-# skylighting
+# the highlighter
 subtest 'highlight' => sub {
     my $dir = File::Temp::tempdir(CLEANUP => 1);
     # an ansicolumn which shows its arguments
@@ -320,45 +323,36 @@ subtest 'highlight' => sub {
     chmod 0755, "$dir/ansicolumn" or die;
     local $ENV{PATH} = "$dir:$ENV{PATH}";
 
-    # without IO::Factotum, --highlight does nothing: ansicolumn would
-    # fail by the option
+    # ansicolumn needs Text::ANSI::Highlight::IO for the option, and
+    # fails by it without the module: --highlight does nothing unless
+    # it is there
   SKIP: {
-        skip 'IO::Factotum::Highlight::skylighting is installed', 1
-            if grep { -f "$_/IO/Factotum/Highlight/skylighting.pm" } @INC, split /:/, $ENV{PERL5LIB} // '';
-        unlike run('-Mup --highlight=skylighting --no-pager -- ansicolumn FILE')->stdout,
-            qr/highlight/, 'not without the highlighter';
+        skip 'Text::ANSI::Highlight::IO is installed', 1
+            if grep { -f "$_/Text/ANSI/Highlight/IO.pm" } @INC, split /:/, $ENV{PERL5LIB} // '';
+        unlike run('-Mup --highlight=pandoc --no-pager -- ansicolumn FILE')->stdout,
+            qr/highlight/, 'not without the module';
     }
 
-    # with it: the module files are only looked for, not loaded
-    my $module = sub {
-        my $file = "$dir/lib/" . shift;
-        open my $fh, '>', $file or die "$file: $!";
+    # with it: the module file is only looked for, not loaded
+    mkdir "$dir/lib" and mkdir "$dir/lib/Text" and mkdir "$dir/lib/Text/ANSI"
+        and mkdir "$dir/lib/Text/ANSI/Highlight" or die;
+    {
+        open my $fh, '>', "$dir/lib/Text/ANSI/Highlight/IO.pm" or die;
         print $fh "die 'not to be loaded';\n";
         close $fh;
-    };
-    mkdir "$dir/lib" and mkdir "$dir/lib/IO" and mkdir "$dir/lib/IO/Factotum"
-        and mkdir "$dir/lib/IO/Factotum/Highlight" or die;
-    $module->('IO/Factotum.pm');
-    $module->('IO/Factotum/Highlight/skylighting.pm');
+    }
     local $ENV{PERL5LIB} = join ':', "$dir/lib", $ENV{PERL5LIB} // ();
 
-    like run('-Mup --highlight=skylighting --no-pager -- ansicolumn FILE -w 100')->stdout,
-        qr/\A\[--highlight=skylighting\]\[--bs=.*\[FILE\]\[-w\]\[100\]\z/,
+    like run('-Mup --highlight=pandoc --no-pager -- ansicolumn FILE -w 100')->stdout,
+        qr/\A\[--highlight=pandoc\]\[--bs=.*\[FILE\]\[-w\]\[100\]\z/,
         'ansicolumn gets --highlight';
-
-    # the highlighter of the name has to be there
-  SKIP: {
-        skip 'IO::Factotum::Highlight::gnu is installed', 1
-            if grep { -f "$_/IO/Factotum/Highlight/gnu.pm" } @INC, split /:/, $ENV{PERL5LIB};
-        unlike run('-Mup --highlight=gnu --no-pager -- ansicolumn FILE')->stdout,
-            qr/highlight/, 'not without the highlighter of the name';
-    }
-    $module->('IO/Factotum/Highlight/gnu.pm');
     like run('-Mup --highlight=gnu --no-pager -- ansicolumn FILE')->stdout,
         qr/\A\[--highlight=gnu\]/, 'the name is given as it is';
+    unlike run('-Mup --highlight=a/b --no-pager -- ansicolumn FILE')->stdout,
+        qr/highlight/, 'a name which is not a word is not given';
     unlike run('-Mup --no-pager -- ansicolumn FILE')->stdout, qr/highlight/,
         'not without --highlight';
-    unlike run('-Mup --highlight=skylighting --no-pager -- echo hello')->stdout, qr/highlight/,
+    unlike run('-Mup --highlight=pandoc --no-pager -- echo hello')->stdout, qr/highlight/,
         'not in command mode';
 };
 

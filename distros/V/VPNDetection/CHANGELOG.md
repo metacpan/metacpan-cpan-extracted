@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 3.3.2 are described by their release commits.
 
+## 3.16.0 - 2026-11-18
+
+### Features
+
+- Read cap_reached past a paid plan's overage cap, and re-pin the spec ([`ca0cffb`](https://github.com/vpndetection-io/sdk-perl/commit/ca0cffb8957cab256fa090d1a328b71529152cdc))
+
 ## 3.15.0 - 2026-11-16
 
 ### Features

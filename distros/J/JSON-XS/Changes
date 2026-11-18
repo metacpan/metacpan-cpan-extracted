@@ -13,6 +13,62 @@ TODO: security considerations
 TODO: decode_av/hv can leak memory when exceptions through through.
 TODO: perl 5.36 has builtin::true/false/is_bool. Not sure how to integrate those.
 
+4.06  Wed 18 Nov 2026 08:32:16 CET
+	- a large number of CVEs were reported against Cpanel::JSON::XS,
+	  which is a fork of this module, but CPANSec did not make
+	  any report against JSON::XS for some reason. Here is a review
+	  of these recently reported CVEs and if/how they apply to JSON::XS.
+	  Thanks to everybdoy who reported these issues!
+	  .
+	  Bogus CVEs / not a vulnerability, but fixed in this version:
+	  110682 - Incremental parsing of numbers depended on input
+	           chunk boundaries.
+	  110686 - Use-after-free when an object-filter callback
+	           unregisters itself during decoding.
+	  .
+	  Valid, but already fixed in JSON::XS 4.05 (independently reported):
+	  110672 - Reference leak when decoding malformed object keys.
+	  110673 - Tagged values could bypass max_depth.
+	  .
+	  Not applicable, exist only in Cpanel::JSON::XS:
+	  110674 - Duplicate-key handling involving bare UTF-8 keys
+	           and dupkeys_as_arrayref.
+	  110675 - Malformed UTF-8 accepted in bare object keys.
+	  110677 - Reference leak in dupkeys_as_arrayref.
+	  110684 - Reference leak in Cpanel's encode_stringify.
+	  110687 - Incorrect UTF-16 canonical ordering of Perl
+	           byte-string keys. JSON::XS does not promise
+	           RFC 8785 ordering.
+	  110688 - Quadratic UTF-8 validation during incremental parsing.
+	  .
+	  Not applicable, different implementation behavior:
+	  110680 - Out-of-bounds write when canonical encoding encounters
+	           a growing tied/shared hash. JSON::XS excludes hashes
+	           with read magic from canonical sorting.
+	  110681 - Invalid SV pointers after ithread cloning. JSON::XS
+	           explicitly does not guarantee ithread/MULTIPLICITY
+	           safety.
+	  .
+	  Bogus CVEs / not security issues:
+	  110676 - Large decimal expansion of Math::BigFloat. Normal
+	           behavior of arbitrary-precision numbers, not a
+	           JSON::XS security vulnerability.
+	  110678 - max_size not enforced by void-context incr_parse.
+	           Documented, intentional exception-free buffering;
+	           no decoding is attempted.
+	  110685 - Reference leak when application-supplied THAW throws.
+	           Real leak under unsupported exceptional behavior,
+	           but no demonstrated security vulnerability. Cpanel's
+	           patch fixes the submitted reproducer while exceptions
+	           still leak.
+	- fix ->boolean_values leaking memory (reported by Albert Gierlach).
+	- incremental parsing now waits for lookahead before returning
+	  a number, to avoid prematurely ending a numeric JSON prefix
+	  (should fix the same problem as reported in CVE-2026-110682).
+	  Sidenote: I think the cpanel fix does not actually fix the CVE
+	  at all, it simply makes numbers illegal by default, and when
+	  enabled, still misparses them.
+
 4.05 Fri 13 Nov 2026 05:21:06 CET
 	- the incremental parser would not properly reset parsing offset
 	  after removing a top-level number json number, causing memory

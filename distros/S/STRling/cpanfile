@@ -1,0 +1,12 @@
+requires 'perl', '5.010';
+requires 'FFI::Platypus', '2.10';
+requires 'JSON::PP', '4.00';
+
+on 'configure' => sub {
+    requires 'ExtUtils::MakeMaker', '0';
+};
+
+on 'test' => sub {
+    requires 'Test::More', '0';
+    requires 'JSON::PP', '0';
+};

@@ -316,6 +316,15 @@ subtest 'test behavior when skipping bad value' => sub {
     $cl->set_checked_list([qw/A bug/], check => 'skip');
 };
 
+subtest "test fetch_gist" => sub {
+    my @set = ('A' .. 'D');
+    $cl->set_checked_list(\@set);
+    is($cl->fetch_gist(), join(',',@set), "small gist");
+
+    $cl->set_checked_list('A'..'Z');
+    is($cl->fetch_gist(), 'A,B,C,D,E,F,G,H...', "truncated gist");
+};
+
 $cl->clear;
 $inst->clear_changes;
 

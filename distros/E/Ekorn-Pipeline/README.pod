@@ -218,7 +218,7 @@ would in a C<for> loop. The values come out in order, and each stage
 sees them in order. Nothing is held between stages, so a pipeline over
 a million values needs no more memory than one over ten.
 
-A pipeline runs two ways:
+A pipeline runs three ways:
 
 =over
 
@@ -235,6 +235,17 @@ its caller asks for.
 
     my $next = $pipeline->iterator(sub { @queue ? shift @queue : () });
     while (my($result) = $next->()) { ... }
+
+=item * B<Fed:> C<feed> returns a I<feed>, one run you give values to
+as they arrive, from a library that calls you back, an event loop, or
+a stage of your own, getting back what came out of each push. When a
+stage stops the run, C<ended> says so, and you stop feeding.
+
+    my $feed = $pipeline->feed;
+    on_message(sub ($message) {
+        handle($_) for $feed->push($message);
+        return !defined $feed->ended;    # false: stop listening
+    });
 
 =back
 
@@ -487,7 +498,9 @@ already in memory, call the pipeline with them. If they're made one at
 a time, from a file, a socket, a database or a computation, give
 C<iterator> a source and return the iterator. Then a stage that stops
 saves the work of making the rest, and a source that closes what it
-opens closes it however the caller's use ends.
+opens closes it however the caller's use ends. If they come from a
+library that calls you back, feed them to the pipeline as they come,
+and tell the library to stop once a stage has ended the run.
 
 =item * B<Let the stages do the optional work.> If you're about to add
 an option that filters, reshapes or limits what's returned, a stage
@@ -584,9 +597,10 @@ or by a test.
 =item * L<Ekorn::Pipeline::Stages::Batch>: C<batch> and C<collect>,
 which gather values and pass them on together.
 
-=item * L<Ekorn::Pipeline::Stages::Taps>: C<peek>, C<count_into> and
-C<dump_to>, which look at each value and pass it on, for logging,
-counting and debugging.
+=item * L<Ekorn::Pipeline::Stages::Taps>: C<peek>, C<count_into>,
+C<dump_to> and C<tee>, which look at each value and pass it on, for
+logging, counting and debugging; C<tee> runs each through a branch of
+stages of your own, so a tap can be any pipeline.
 
 =item * L<Ekorn::Pipeline::Sources> and L<Ekorn::Pipeline::Sinks>:
 the sources and sinks above.

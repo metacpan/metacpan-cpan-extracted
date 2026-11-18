@@ -1,6 +1,6 @@
 package Pod::Weaver::PluginBundle::Author::GETTY;
 # ABSTRACT: GETTY's default Pod::Weaver config
-our $VERSION = '0.327';
+our $VERSION = '0.328';
 use strict;
 use warnings;
 
@@ -55,7 +55,7 @@ END_TEMPLATE
   push @plugins, (
     [ '@GETTY/Leftovers', _exp('Leftovers'),    {} ],
     [ '@GETTY/postlude',  _exp('Region'),       { region_name => 'postlude' } ],
-    [ '@GETTY/Support',   _exp('GenerateSection'), {
+    [ '@GETTY/Support',   _exp('Author::GETTY::Support'), {
       title => 'SUPPORT',
       is_template => 1,
       text => $support_template,
@@ -88,7 +88,7 @@ Pod::Weaver::PluginBundle::Author::GETTY - GETTY's default Pod::Weaver config
 
 =head1 VERSION
 
-version 0.327
+version 0.328
 
 =head1 SYNOPSIS
 
@@ -276,7 +276,7 @@ C<STABILITY> - from C<=head1 STABILITY> in source (optional)
 
 =item *
 
-C<SUPPORT> - GitHub issues (if available) and IRC contact info
+C<SUPPORT> - issue tracker and IRC contact info; left out when there is neither
 
 =item *
 
@@ -335,11 +335,9 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-L<https://raudssus.de/>
 
 =cut

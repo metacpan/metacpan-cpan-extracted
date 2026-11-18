@@ -1,0 +1,59 @@
+[
+  {
+    "name": "greeting with context",
+    "template": "Hello {{ name }}",
+    "context": {
+      "name": "world"
+    },
+    "expected": {
+      "ok": true,
+      "output": "Hello world"
+    }
+  },
+  {
+    "name": "number vs string plus",
+    "template": "{{ 1 + 1 }} {{ '1' + 1 }}",
+    "expected": {
+      "ok": true,
+      "output": "2 11"
+    }
+  },
+  {
+    "name": "array and division stringify",
+    "template": "{{ [1,2] }} {{ 1/3 }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2 0.3333333333333333"
+    }
+  },
+  {
+    "name": "autoescape on by default",
+    "template": "{{ x }}",
+    "context": {
+      "x": "<b>&'\"</b>"
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;&amp;&#39;&quot;&lt;/b&gt;"
+    }
+  },
+  {
+    "name": "literal passthrough of dollar at backslash",
+    "template": "a $b @c \\d",
+    "expected": {
+      "ok": true,
+      "output": "a $b @c \\d"
+    }
+  },
+  {
+    "name": "unknown block tag error",
+    "template": "{% foo %}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 4]\n  unknown block tag: foo"
+      }
+    }
+  }
+]

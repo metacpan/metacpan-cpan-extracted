@@ -1,5 +1,9 @@
 Revision history for Alien::sqlite
 
+1.08 2026-11-18
+    - Set minimum sqlite version to 3.37.2. This matches Ubuntu 22.04 LTS.
+    - Share builds now install 3.54.1
+
 1.07 2022-09-19
     - Share builds:
       - Install sqlite 3.39.3

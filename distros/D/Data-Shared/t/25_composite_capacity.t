@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Data::Shared qw(shared_set shared_push shared_pop shared_compile sharedc_pop);
 
 my $probe = Data::Shared->new;
@@ -94,7 +96,7 @@ subtest 'a nested level keeps serving the budget its storage was built for' => s
 subtest 'a full parent leaf names itself as the ceiling' => sub {
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     plan skip_all => 'sortedset or bloomfilter unavailable'
-        unless eval { require Data::SortedSet::Shared; require Data::BloomFilter::Shared; 1 };
+        unless have('sortedset', 'bloomfilter');
     $root->mount('l', ['sortedset', 4, ['bloomfilter', 10_000, 0.01]]);
     my $made = 0;
     for my $i (1 .. 8) {
@@ -175,7 +177,7 @@ subtest 'retiring below a missing child allocates nothing' => sub {
 };
 
 subtest 'polling a missing child allocates nothing' => sub {
-    plan skip_all => 'queue unavailable' unless eval { require Data::Queue::Shared; 1 };
+    plan skip_all => 'queue unavailable' unless have('queue');
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     $root->mount('q', ['hashmap:ss', 100, ['queue:int', 8], { max_children => 2 }]);
     my $compiled = shared_compile('/q/carol');

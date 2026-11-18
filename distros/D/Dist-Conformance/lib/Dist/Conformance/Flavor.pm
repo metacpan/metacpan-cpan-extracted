@@ -1,4 +1,4 @@
-package Dist::Conformance::Flavor 0.005;
+package Dist::Conformance::Flavor 0.006;
 
 # ABSTRACT: A named set of checks and their configuration, read from a standards source
 
@@ -118,7 +118,7 @@ Dist::Conformance::Flavor - A named set of checks and their configuration, read 
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

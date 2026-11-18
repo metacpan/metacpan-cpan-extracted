@@ -1,3 +1,129 @@
+0.328     2026-11-18 03:01:44Z
+
+  - The release test-installs the tarball with "cpanm --test-only" before
+    the upload (Author::GETTY::InstallCheck, between TestRelease and
+    ConfirmRelease): unpacked outside of the checkout, built from blib, with
+    RELEASE_TESTING and AUTHOR_TESTING off, like a user and a CPAN tester
+    see it. A failing install test aborts the release, so that nothing is
+    uploaded. "no_installrelease" and the Alien options leave it out.
+
+  - Requires CPAN::Meta::Merge 2.150005, so a dist with several
+    binaries merges its x_binaries on older perls too.
+
+  - "run_if_trial_<phase>" runs its command only on a trial build or
+    release, "run_no_trial_<phase>" only when it is not a trial,
+    "run_if_release_<phase>" only during "dzil release" and
+    "run_no_release_<phase>" only outside of it. They reach the
+    [Run::<Phase>] of their phase as "run_if_trial", "run_no_trial",
+    "run_if_release" and "run_no_release", next to "run_<phase>" in the
+    same plugin. For a "no_cpan" dist, any of the release-phase keys brings
+    the Releaser, so it gets no FakeRelease.
+
+  - The SUPPORT section is written when the dist has an issue tracker or an
+    IRC resource.
+  - Repository metadata comes from GithubMeta for a GitHub remote, from
+    GiteaMeta for a Gitea or Forgejo remote and from [Repository] for any
+    other remote; each of them reads origin, or the first remote when there
+    is no origin. A repository without a remote builds without one and
+    without empty bugtracker or repository entries in META.json.
+
+  - The remote detection and GiteaMeta run git directly, without a shell,
+    so GitHub, Gitea and Forgejo remotes are also recognised on native
+    Windows, and a remote name reaches git as it is.
+
+  - The prerequisites name what the bundle loads: perl 5.22, the minimum of
+    Dist::Zilla and Pod::Weaver, Moose and namespace::autoclean. PAR::Packer
+    1.031 is recommended for the local pp check; Module::Runtime and
+    Software::License are test requirements.
+
+  - New option family for dists that ship standalone binaries: "binary = name"
+    (repeatable) with the optional "binary_modules", "binary_require",
+    "binary_platforms", "binary_pp_args", "binary_verify", "binary_smoke" and
+    "binary_prepare" keys adds one [@Author::GETTY::Binary / name] subsection
+    per binary, and its plugin writes them as "x_binaries" into META.json.
+    "binary_default = 0" leaves the subsections out. A binary release is
+    published as assets of the GitHub release, so "dzil" now dies at build
+    when "binary" is set together with "no_github" or "no_github_release",
+    or when the dist has no GitHub remote (which makes "no_github" default
+    to on). A trailing "::*" in "binary_modules" packs every module below the
+    namespace at any depth, not the module itself (pp gets "-M Foo::**"), which
+    is the namespace "binary_require" checks for "Foo::*".
+    Dists without "binary" keys are unchanged.
+
+  - The new plugin Author::GETTY::GitHubRelease replaces GitHub::CreateRelease
+    for every dist with a GitHub remote: it creates the release as a draft,
+    attaches the tarball and only then publishes it, so a release is never
+    visible without its tarball. A failed upload or publish fails "dzil release"
+    loudly and leaves the draft in place for inspection. The release is
+    marked as latest unless the dist ships binaries.
+
+  - A "task" dist stamps Changes with [NextRelease] in the same format and
+    UTC time as the other dists, ahead of @Git, so the stamped Changes is
+    committed with the release and GitHub::CreateRelease finds its notes.
+    Test::ChangesHasContent checks it again (not with "no_changes").
+
+  - A dist with "binary" keys now packs each declared binary with pp during
+    "dzil build" and runs its verify and smoke commands on the result, so a
+    broken binary already fails the local build. When pp cannot be started,
+    the build names the reason. "dzil release" requires
+    .github/workflows/binaries.yml calling the shared dzil-binary.yml and
+    dies without it. The dzil-test action sets DZIL_BINARY_SKIP=1, so CI
+    builds skip the pp step. On native Windows the local pp step starts pp
+    with the building perl, writes the binary as NAME.exe and hands
+    binary_pp_args and the verify and smoke commands to sh unchanged. The
+    verify commands run without PERL5LIB, so the binary under test does not
+    see the libraries of its dependencies, and get the PERL5LIB value under
+    which the dependencies load as DZIL_BINARY_PERL5LIB (in the CI leg the
+    local lib of the dependencies, in the local check the PERL5LIB of the
+    caller, empty when there is none); a verify command that needs a perl
+    loading the dist's modules runs "PERL5LIB=$DZIL_BINARY_PERL5LIB perl
+    -Ilib ...". The smoke commands run without either variable. Dists
+    without "binary" keys are unchanged.
+
+  - Build-leg helper scripts for the shared binary release workflow live in
+    .github/dzil-binary (plan.pl, pp-args.pl, require-gate.pl, lib-gate.pl,
+    win-dlls.pl).
+    They plan the platform legs, assemble the pp command line, gate the
+    packed binary on its declared requirements and fail it when it links a
+    shared library other than the system ones or needs a glibc newer than
+    2.28. lib-gate.pl also starts each packed binary once (--help, stdin
+    at EOF, a fresh PAR_GLOBAL_TEMP, 60 s bound), checks every native
+    object that first start extracts (libperl, the inner executable, PAR's
+    own XS) like the packed ones, and fails when no perl library was
+    extracted, and a tool it runs (ldd, objdump, otool) that is killed by
+    a signal now fails the gate. On Windows the pack step also links (pp -l)
+    the DLLs from the packing perl's own perl\bin and c\bin that the packed
+    XS needs and the gate would otherwise reject as foreign, such as
+    Strawberry's OpenSSL. No effect on dists without "binary" keys.
+
+  - The shared binary release workflow gets its publish-job helper
+    .github/dzil-binary/publish.pl (render, expected, sums, check) and the
+    install script templates install.sh.in and install.ps1.in. The rendered
+    install scripts download the binaries of a GitHub release, verify them
+    against SHA256SUMS and install them; install.ps1 defaults to
+    %LOCALAPPDATA%\Programs\<dist name>. No effect on dists without "binary"
+    keys.
+
+  - The shared binary release workflow .github/workflows/dzil-binary.yml
+    (workflow_call, inputs "tag" and "bundle_ref") builds the binaries a
+    dist declares on every platform leg with a packing perl of its own
+    (.github/dzil-binary/build-perl.sh) and the leg phases of
+    .github/dzil-binary/build-leg.sh, gates and verifies them, smoke-tests
+    them on clean images and runners, and attaches them with SHA256SUMS,
+    install.sh and install.ps1 to the GitHub release. An empty "tag" is a
+    probe run that builds the checked-out commit and touches no release;
+    its version slot is "probe-<sha7>". A dist calls it from
+    .github/workflows/binaries.yml at @binary-v1. No effect on dists
+    without "binary" keys. Its publish job marks a release as latest only
+    when there is no latest release yet or the latest one is not newer, so
+    re-running an older release never rolls releases/latest back, and it
+    fails on an empty list of expected binaries. .gitattributes keeps
+    .github/dzil-binary at LF line endings on every checkout. Archive::Zip
+    is a test requirement.
+  - Requires Dist::Zilla::Plugin::Docker::API 0.107 and with it API::Docker
+    0.006: when the engine rejects an image build before it has read the
+    whole context, the release stops with the engine's error message.
+
 0.327     2026-10-26 00:40:01Z
 
   - The CI documentation says when the "v1" tag of the dzil-test action

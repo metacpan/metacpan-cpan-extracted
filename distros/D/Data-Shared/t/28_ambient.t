@@ -3,9 +3,11 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 use Data::Shared qw(shared_set shared_get);
+use lib 't/lib';
+use Backends qw(have);
 
 plan skip_all => 'hashmap backend unavailable'
-    unless eval { require Data::HashMap::Shared::II; 1 };
+    unless have('hashmap:ii');
 
 for my $case (['$,' => sub { $, = ',' }], ['$\\' => sub { $\ = ";\n" }]) {
     my ($name, $set) = @$case;

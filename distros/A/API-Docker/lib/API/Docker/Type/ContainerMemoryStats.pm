@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerMemoryStats;
 # ABSTRACT: Aggregates all memory stats since container inception on Linux
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -43,7 +43,7 @@ API::Docker::Type::ContainerMemoryStats - Aggregates all memory stats since cont
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -123,7 +123,7 @@ name would produce C<Privateworkingset>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::HashId 2.168;
+package Config::Model::HashId 2.169;
 
 use Mouse;
 use 5.20.0;
@@ -157,6 +157,13 @@ sub get_info ($self) {
     return @items;
 }
 
+sub fetch_gist ($self) {
+    my @v = $self->fetch_all_indexes(check => 'no');
+    my $str = join(",", @v);
+    $str = substr( $str, 0, 15 ) . '...' if length($str) > 15;
+    return $str;
+}
+
 # important: return the actual size (not taking into account auto-created stuff)
 sub fetch_size ($self) {
     return scalar keys %{ $self->{data} };
@@ -212,7 +219,6 @@ sub create_default ($self) {
     # hash is empty so create empty element for default keys
     my $def = $self->get_default_keys;
     map { $self->_store( $_, undef ) } @$def;
-    $self->create_default_with_init;
     return;
 }
 
@@ -565,7 +571,7 @@ Config::Model::HashId - Handle hash element for configuration model
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -597,6 +603,14 @@ Returns C<hash>.
 =head2 fetch_size
 
 Returns the number of elements of the hash.
+
+=head2 fetch_gist
+
+Returns the gist of the hash, i.e. a string containg the
+list of hash keys, truncated to 15 char.
+
+The gist value should be used in UI or in user messages, but should
+not be persisted.
 
 =head2 sort
 

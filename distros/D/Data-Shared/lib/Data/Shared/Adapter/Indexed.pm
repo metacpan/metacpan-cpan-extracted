@@ -5,7 +5,7 @@ use Carp ();
 use parent 'Data::Shared::Adapter';
 use Data::Shared::Registry ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @CARP_NOT = qw(Data::Shared);
 

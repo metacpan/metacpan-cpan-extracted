@@ -1,0 +1,75 @@
+[
+  {
+    "name": "known difference: an import inside an if, the imported name used after the if (found during k108, unrelated to the leak)",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro a(x) %}[{{ x }}]{% endmacro %}",
+      "main.njk": "{% if x %}{% from 'lib.njk' import a %}{% endif %}{{ a(1) }}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "todo": "k117: JS var is function-scoped; upstream's import binds the name in a callback function, the read outside it throws ReferenceError, the port says 'Unable to call'",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  ReferenceError: t_4 is not defined"
+      }
+    }
+  },
+  {
+    "name": "known difference: a caller block made in a for loop, stored and called after the loop (found during k108, unrelated to the leak)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% macro stash() %}{% set _ = bag.push(caller) %}{% endmacro %}{% for i in [1,2] %}{% call stash() %}c{{ i }}{{ x }}{% endcall %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "todo": "k117: JS var is function-scoped; the call blocks of a for loop share one hoisted loop temporary upstream (both see the last value), the port makes one per iteration",
+    "expected": {
+      "ok": true,
+      "output": "c2Xc2X"
+    }
+  },
+  {
+    "name": "known difference: a macro defined inside an if, called after the if (found during k108, unrelated to the leak)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% if x %}{% macro m() %}M{{ x }}{% endmacro %}{% endif %}{{ m() }}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "todo": "k117: JS var is function-scoped; upstream's macro variable is visible after the if, the port scopes it to the if block",
+    "expected": {
+      "ok": true,
+      "output": "MX"
+    }
+  },
+  {
+    "name": "known difference: the length filter on a macro (found during k108, unrelated to the leak)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro m() %}x{% endmacro %}{{ m|length }}"
+    },
+    "todo": "k88: a macro has no JS function own properties (length); {{ m|length }} is 0 upstream, empty in the port",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "known difference: the length filter on a function in a variable (found during k108, unrelated to the leak)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro m(a, b) %}x{% endmacro %}{% set f = m %}{{ f|length }}"
+    },
+    "todo": "k88: a function value has no JS function own properties (length); {{ f|length }} is 0 upstream, empty in the port",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  }
+]

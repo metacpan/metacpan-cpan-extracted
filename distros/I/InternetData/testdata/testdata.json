@@ -714,6 +714,1141 @@
       "ip": "192.0.3.0",
       "expect": false,
       "why": "first address past 192.0.2.0/24; a mask one bit too wide claims it"
+    },
+    {
+      "ip": "0.255.255.255",
+      "expect": true,
+      "why": "last address of 0.0.0.0/8"
+    },
+    {
+      "ip": "1.0.0.0",
+      "expect": false,
+      "why": "just above 0.0.0.0/8"
+    },
+    {
+      "ip": "10.0.0.0",
+      "expect": true,
+      "why": "first address of 10.0.0.0/8"
+    },
+    {
+      "ip": "9.255.255.255",
+      "expect": false,
+      "why": "just below 10.0.0.0/8"
+    },
+    {
+      "ip": "100.64.0.0",
+      "expect": true,
+      "why": "first address of 100.64.0.0/10"
+    },
+    {
+      "ip": "100.63.255.255",
+      "expect": false,
+      "why": "just below 100.64.0.0/10"
+    },
+    {
+      "ip": "127.0.0.0",
+      "expect": true,
+      "why": "first address of 127.0.0.0/8"
+    },
+    {
+      "ip": "127.255.255.255",
+      "expect": true,
+      "why": "last address of 127.0.0.0/8"
+    },
+    {
+      "ip": "126.255.255.255",
+      "expect": false,
+      "why": "just below 127.0.0.0/8"
+    },
+    {
+      "ip": "128.0.0.0",
+      "expect": false,
+      "why": "just above 127.0.0.0/8"
+    },
+    {
+      "ip": "169.254.0.0",
+      "expect": true,
+      "why": "first address of 169.254.0.0/16"
+    },
+    {
+      "ip": "169.254.255.255",
+      "expect": true,
+      "why": "last address of 169.254.0.0/16"
+    },
+    {
+      "ip": "169.253.255.255",
+      "expect": false,
+      "why": "just below 169.254.0.0/16"
+    },
+    {
+      "ip": "169.255.0.0",
+      "expect": false,
+      "why": "just above 169.254.0.0/16"
+    },
+    {
+      "ip": "172.16.0.0",
+      "expect": true,
+      "why": "first address of 172.16.0.0/12"
+    },
+    {
+      "ip": "172.15.255.255",
+      "expect": false,
+      "why": "just below 172.16.0.0/12"
+    },
+    {
+      "ip": "192.0.0.0",
+      "expect": true,
+      "why": "first address of 192.0.0.0/24"
+    },
+    {
+      "ip": "192.0.0.255",
+      "expect": true,
+      "why": "last address of 192.0.0.0/24"
+    },
+    {
+      "ip": "191.255.255.255",
+      "expect": false,
+      "why": "just below 192.0.0.0/24"
+    },
+    {
+      "ip": "192.0.1.0",
+      "expect": false,
+      "why": "just above 192.0.0.0/24"
+    },
+    {
+      "ip": "192.0.2.0",
+      "expect": true,
+      "why": "first address of 192.0.2.0/24"
+    },
+    {
+      "ip": "192.0.1.255",
+      "expect": false,
+      "why": "just below 192.0.2.0/24"
+    },
+    {
+      "ip": "192.88.99.2",
+      "expect": true,
+      "why": "first address of 192.88.99.2/32"
+    },
+    {
+      "ip": "192.88.99.1",
+      "expect": false,
+      "why": "just below 192.88.99.2/32"
+    },
+    {
+      "ip": "192.88.99.3",
+      "expect": false,
+      "why": "just above 192.88.99.2/32"
+    },
+    {
+      "ip": "192.168.0.0",
+      "expect": true,
+      "why": "first address of 192.168.0.0/16"
+    },
+    {
+      "ip": "192.168.255.255",
+      "expect": true,
+      "why": "last address of 192.168.0.0/16"
+    },
+    {
+      "ip": "192.167.255.255",
+      "expect": false,
+      "why": "just below 192.168.0.0/16"
+    },
+    {
+      "ip": "192.169.0.0",
+      "expect": false,
+      "why": "just above 192.168.0.0/16"
+    },
+    {
+      "ip": "198.18.0.0",
+      "expect": true,
+      "why": "first address of 198.18.0.0/15"
+    },
+    {
+      "ip": "198.17.255.255",
+      "expect": false,
+      "why": "just below 198.18.0.0/15"
+    },
+    {
+      "ip": "198.51.100.0",
+      "expect": true,
+      "why": "first address of 198.51.100.0/24"
+    },
+    {
+      "ip": "198.51.100.255",
+      "expect": true,
+      "why": "last address of 198.51.100.0/24"
+    },
+    {
+      "ip": "198.51.99.255",
+      "expect": false,
+      "why": "just below 198.51.100.0/24"
+    },
+    {
+      "ip": "198.51.101.0",
+      "expect": false,
+      "why": "just above 198.51.100.0/24"
+    },
+    {
+      "ip": "203.0.113.0",
+      "expect": true,
+      "why": "first address of 203.0.113.0/24"
+    },
+    {
+      "ip": "203.0.113.255",
+      "expect": true,
+      "why": "last address of 203.0.113.0/24"
+    },
+    {
+      "ip": "203.0.112.255",
+      "expect": false,
+      "why": "just below 203.0.113.0/24"
+    },
+    {
+      "ip": "203.0.114.0",
+      "expect": false,
+      "why": "just above 203.0.113.0/24"
+    },
+    {
+      "ip": "224.0.0.0",
+      "expect": true,
+      "why": "first address of 224.0.0.0/4"
+    },
+    {
+      "ip": "239.255.255.255",
+      "expect": true,
+      "why": "last address of 224.0.0.0/4"
+    },
+    {
+      "ip": "223.255.255.255",
+      "expect": false,
+      "why": "just below 224.0.0.0/4"
+    },
+    {
+      "ip": "240.0.0.0",
+      "expect": true,
+      "why": "just above 224.0.0.0/4"
+    },
+    {
+      "ip": "255.255.255.254",
+      "expect": true,
+      "why": "just below 255.255.255.255/32"
+    },
+    {
+      "ip": "::",
+      "expect": true,
+      "why": "first address of ::/128"
+    },
+    {
+      "ip": "::2",
+      "expect": true,
+      "why": "just above ::1/128"
+    },
+    {
+      "ip": "::fffe:ffff:ffff",
+      "expect": true,
+      "why": "just below ::ffff:0:0/96"
+    },
+    {
+      "ip": "::1:0:0:0",
+      "expect": true,
+      "why": "just above ::ffff:0:0/96"
+    },
+    {
+      "ip": "::ffff:ffff",
+      "expect": true,
+      "why": "last address of ::/96"
+    },
+    {
+      "ip": "::1:0:0",
+      "expect": true,
+      "why": "just above ::/96"
+    },
+    {
+      "ip": "64:ff9b::",
+      "expect": true,
+      "why": "first address of 64:ff9b::/96"
+    },
+    {
+      "ip": "64:ff9b::ffff:ffff",
+      "expect": true,
+      "why": "last address of 64:ff9b::/96"
+    },
+    {
+      "ip": "64:ff9a:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 64:ff9b::/96"
+    },
+    {
+      "ip": "64:ff9b::1:0:0",
+      "expect": true,
+      "why": "just above 64:ff9b::/96"
+    },
+    {
+      "ip": "64:ff9b:1::",
+      "expect": true,
+      "why": "first address of 64:ff9b:1::/48"
+    },
+    {
+      "ip": "64:ff9b:1:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 64:ff9b:1::/48"
+    },
+    {
+      "ip": "64:ff9b:0:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 64:ff9b:1::/48"
+    },
+    {
+      "ip": "64:ff9b:2::",
+      "expect": true,
+      "why": "just above 64:ff9b:1::/48"
+    },
+    {
+      "ip": "100::",
+      "expect": true,
+      "why": "first address of 100::/64"
+    },
+    {
+      "ip": "ff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 100::/64"
+    },
+    {
+      "ip": "100::1:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 100:0:0:1::/64"
+    },
+    {
+      "ip": "100:0:0:2::",
+      "expect": true,
+      "why": "just above 100:0:0:1::/64"
+    },
+    {
+      "ip": "2001:2::",
+      "expect": true,
+      "why": "first address of 2001:2::/48"
+    },
+    {
+      "ip": "2001:2:0:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:2::/48"
+    },
+    {
+      "ip": "2001:1:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 2001:2::/48"
+    },
+    {
+      "ip": "2001:2:1::",
+      "expect": true,
+      "why": "just above 2001:2::/48"
+    },
+    {
+      "ip": "2001:10::",
+      "expect": true,
+      "why": "first address of 2001:10::/28"
+    },
+    {
+      "ip": "2001:1f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:10::/28"
+    },
+    {
+      "ip": "2001:f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 2001:10::/28"
+    },
+    {
+      "ip": "2001:20::",
+      "expect": true,
+      "why": "just above 2001:10::/28"
+    },
+    {
+      "ip": "2001:db8::",
+      "expect": true,
+      "why": "first address of 2001:db8::/32"
+    },
+    {
+      "ip": "2001:db7:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:db8::/32"
+    },
+    {
+      "ip": "3fff::",
+      "expect": true,
+      "why": "first address of 3fff::/20"
+    },
+    {
+      "ip": "3ffe:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 3fff::/20"
+    },
+    {
+      "ip": "5f00::",
+      "expect": true,
+      "why": "first address of 5f00::/16"
+    },
+    {
+      "ip": "5f00:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 5f00::/16"
+    },
+    {
+      "ip": "5eff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 5f00::/16"
+    },
+    {
+      "ip": "5f01::",
+      "expect": true,
+      "why": "just above 5f00::/16"
+    },
+    {
+      "ip": "fc00::",
+      "expect": true,
+      "why": "first address of fc00::/7"
+    },
+    {
+      "ip": "fbff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below fc00::/7"
+    },
+    {
+      "ip": "fe80::",
+      "expect": true,
+      "why": "first address of fe80::/10"
+    },
+    {
+      "ip": "febf:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of fe80::/10"
+    },
+    {
+      "ip": "fe7f:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below fe80::/10"
+    },
+    {
+      "ip": "fec0::",
+      "expect": true,
+      "why": "just above fe80::/10"
+    },
+    {
+      "ip": "feff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of fec0::/10"
+    },
+    {
+      "ip": "ff00::",
+      "expect": true,
+      "why": "just above fec0::/10"
+    },
+    {
+      "ip": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of ff00::/8"
+    },
+    {
+      "ip": "2002::",
+      "expect": true,
+      "why": "first address of 2002::/24"
+    },
+    {
+      "ip": "2002:ff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002::/24"
+    },
+    {
+      "ip": "2001:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002::/24"
+    },
+    {
+      "ip": "2002:100::",
+      "expect": false,
+      "why": "just above 2002::/24"
+    },
+    {
+      "ip": "2002:a00::",
+      "expect": true,
+      "why": "first address of 2002:a00::/24"
+    },
+    {
+      "ip": "2002:aff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:a00::/24"
+    },
+    {
+      "ip": "2002:9ff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:a00::/24"
+    },
+    {
+      "ip": "2002:b00::",
+      "expect": false,
+      "why": "just above 2002:a00::/24"
+    },
+    {
+      "ip": "2002:6440::",
+      "expect": true,
+      "why": "first address of 2002:6440::/26"
+    },
+    {
+      "ip": "2002:647f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:6440::/26"
+    },
+    {
+      "ip": "2002:643f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:6440::/26"
+    },
+    {
+      "ip": "2002:6480::",
+      "expect": false,
+      "why": "just above 2002:6440::/26"
+    },
+    {
+      "ip": "2002:7f00::",
+      "expect": true,
+      "why": "first address of 2002:7f00::/24"
+    },
+    {
+      "ip": "2002:7fff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:7f00::/24"
+    },
+    {
+      "ip": "2002:7eff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:7f00::/24"
+    },
+    {
+      "ip": "2002:8000::",
+      "expect": false,
+      "why": "just above 2002:7f00::/24"
+    },
+    {
+      "ip": "2002:a9fe::",
+      "expect": true,
+      "why": "first address of 2002:a9fe::/32"
+    },
+    {
+      "ip": "2002:a9fd:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:a9fe::/32"
+    },
+    {
+      "ip": "2002:ac10::",
+      "expect": true,
+      "why": "first address of 2002:ac10::/28"
+    },
+    {
+      "ip": "2002:ac1f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:ac10::/28"
+    },
+    {
+      "ip": "2002:ac0f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:ac10::/28"
+    },
+    {
+      "ip": "2002:ac20::",
+      "expect": false,
+      "why": "just above 2002:ac10::/28"
+    },
+    {
+      "ip": "2002:c000::",
+      "expect": true,
+      "why": "first address of 2002:c000::/40"
+    },
+    {
+      "ip": "2002:c000:ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:c000::/40"
+    },
+    {
+      "ip": "2002:bfff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:c000::/40"
+    },
+    {
+      "ip": "2002:c000:100::",
+      "expect": false,
+      "why": "just above 2002:c000::/40"
+    },
+    {
+      "ip": "2002:c000:200::",
+      "expect": true,
+      "why": "first address of 2002:c000:200::/40"
+    },
+    {
+      "ip": "2002:c000:2ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:c000:200::/40"
+    },
+    {
+      "ip": "2002:c000:1ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:c000:200::/40"
+    },
+    {
+      "ip": "2002:c000:300::",
+      "expect": false,
+      "why": "just above 2002:c000:200::/40"
+    },
+    {
+      "ip": "2002:c058:6302::",
+      "expect": true,
+      "why": "first address of 2002:c058:6302::/48"
+    },
+    {
+      "ip": "2002:c058:6302:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:c058:6302::/48"
+    },
+    {
+      "ip": "2002:c058:6301:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:c058:6302::/48"
+    },
+    {
+      "ip": "2002:c058:6303::",
+      "expect": false,
+      "why": "just above 2002:c058:6302::/48"
+    },
+    {
+      "ip": "2002:c0a8::",
+      "expect": true,
+      "why": "first address of 2002:c0a8::/32"
+    },
+    {
+      "ip": "2002:c0a8:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:c0a8::/32"
+    },
+    {
+      "ip": "2002:c0a7:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:c0a8::/32"
+    },
+    {
+      "ip": "2002:c0a9::",
+      "expect": false,
+      "why": "just above 2002:c0a8::/32"
+    },
+    {
+      "ip": "2002:c612::",
+      "expect": true,
+      "why": "first address of 2002:c612::/31"
+    },
+    {
+      "ip": "2002:c613:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:c612::/31"
+    },
+    {
+      "ip": "2002:c611:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:c612::/31"
+    },
+    {
+      "ip": "2002:c614::",
+      "expect": false,
+      "why": "just above 2002:c612::/31"
+    },
+    {
+      "ip": "2002:c633:6400::",
+      "expect": true,
+      "why": "first address of 2002:c633:6400::/40"
+    },
+    {
+      "ip": "2002:c633:64ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:c633:6400::/40"
+    },
+    {
+      "ip": "2002:c633:63ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:c633:6400::/40"
+    },
+    {
+      "ip": "2002:c633:6500::",
+      "expect": false,
+      "why": "just above 2002:c633:6400::/40"
+    },
+    {
+      "ip": "2002:cb00:7100::",
+      "expect": true,
+      "why": "first address of 2002:cb00:7100::/40"
+    },
+    {
+      "ip": "2002:cb00:71ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:cb00:7100::/40"
+    },
+    {
+      "ip": "2002:cb00:70ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:cb00:7100::/40"
+    },
+    {
+      "ip": "2002:cb00:7200::",
+      "expect": false,
+      "why": "just above 2002:cb00:7100::/40"
+    },
+    {
+      "ip": "2002:e000::",
+      "expect": true,
+      "why": "first address of 2002:e000::/20"
+    },
+    {
+      "ip": "2002:efff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:e000::/20"
+    },
+    {
+      "ip": "2002:dfff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2002:e000::/20"
+    },
+    {
+      "ip": "2002:f000::",
+      "expect": true,
+      "why": "just above 2002:e000::/20"
+    },
+    {
+      "ip": "2002:ffff:ffff::",
+      "expect": true,
+      "why": "first address of 2002:ffff:ffff::/48"
+    },
+    {
+      "ip": "2002:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2002:ffff:ffff::/48"
+    },
+    {
+      "ip": "2002:ffff:fffe:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 2002:ffff:ffff::/48"
+    },
+    {
+      "ip": "2003::",
+      "expect": false,
+      "why": "just above 2002:ffff:ffff::/48"
+    },
+    {
+      "ip": "2001::",
+      "expect": true,
+      "why": "first address of 2001::/40"
+    },
+    {
+      "ip": "2001:0:ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001::/40"
+    },
+    {
+      "ip": "2000:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001::/40"
+    },
+    {
+      "ip": "2001:0:100::",
+      "expect": false,
+      "why": "just above 2001::/40"
+    },
+    {
+      "ip": "2001:0:a00::",
+      "expect": true,
+      "why": "first address of 2001:0:a00::/40"
+    },
+    {
+      "ip": "2001:0:aff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:a00::/40"
+    },
+    {
+      "ip": "2001:0:9ff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:a00::/40"
+    },
+    {
+      "ip": "2001:0:b00::",
+      "expect": false,
+      "why": "just above 2001:0:a00::/40"
+    },
+    {
+      "ip": "2001:0:6440::",
+      "expect": true,
+      "why": "first address of 2001:0:6440::/42"
+    },
+    {
+      "ip": "2001:0:647f:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:6440::/42"
+    },
+    {
+      "ip": "2001:0:643f:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:6440::/42"
+    },
+    {
+      "ip": "2001:0:6480::",
+      "expect": false,
+      "why": "just above 2001:0:6440::/42"
+    },
+    {
+      "ip": "2001:0:7f00::",
+      "expect": true,
+      "why": "first address of 2001:0:7f00::/40"
+    },
+    {
+      "ip": "2001:0:7fff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:7f00::/40"
+    },
+    {
+      "ip": "2001:0:7eff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:7f00::/40"
+    },
+    {
+      "ip": "2001:0:8000::",
+      "expect": false,
+      "why": "just above 2001:0:7f00::/40"
+    },
+    {
+      "ip": "2001:0:a9fe::",
+      "expect": true,
+      "why": "first address of 2001:0:a9fe::/48"
+    },
+    {
+      "ip": "2001:0:a9fe:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:a9fe::/48"
+    },
+    {
+      "ip": "2001:0:a9fd:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:a9fe::/48"
+    },
+    {
+      "ip": "2001:0:a9ff::",
+      "expect": false,
+      "why": "just above 2001:0:a9fe::/48"
+    },
+    {
+      "ip": "2001:0:ac10::",
+      "expect": true,
+      "why": "first address of 2001:0:ac10::/44"
+    },
+    {
+      "ip": "2001:0:ac1f:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:ac10::/44"
+    },
+    {
+      "ip": "2001:0:ac0f:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:ac10::/44"
+    },
+    {
+      "ip": "2001:0:ac20::",
+      "expect": false,
+      "why": "just above 2001:0:ac10::/44"
+    },
+    {
+      "ip": "2001:0:c000::",
+      "expect": true,
+      "why": "first address of 2001:0:c000::/56"
+    },
+    {
+      "ip": "2001:0:c000:ff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:c000::/56"
+    },
+    {
+      "ip": "2001:0:bfff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:c000::/56"
+    },
+    {
+      "ip": "2001:0:c000:100::",
+      "expect": false,
+      "why": "just above 2001:0:c000::/56"
+    },
+    {
+      "ip": "2001:0:c000:200::",
+      "expect": true,
+      "why": "first address of 2001:0:c000:200::/56"
+    },
+    {
+      "ip": "2001:0:c000:1ff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:c000:200::/56"
+    },
+    {
+      "ip": "2001:0:c058:6302::",
+      "expect": true,
+      "why": "first address of 2001:0:c058:6302::/64"
+    },
+    {
+      "ip": "2001:0:c058:6302:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:c058:6302::/64"
+    },
+    {
+      "ip": "2001:0:c058:6301:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:c058:6302::/64"
+    },
+    {
+      "ip": "2001:0:c058:6303::",
+      "expect": false,
+      "why": "just above 2001:0:c058:6302::/64"
+    },
+    {
+      "ip": "2001:0:c0a8::",
+      "expect": true,
+      "why": "first address of 2001:0:c0a8::/48"
+    },
+    {
+      "ip": "2001:0:c0a8:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:c0a8::/48"
+    },
+    {
+      "ip": "2001:0:c0a7:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:c0a8::/48"
+    },
+    {
+      "ip": "2001:0:c0a9::",
+      "expect": false,
+      "why": "just above 2001:0:c0a8::/48"
+    },
+    {
+      "ip": "2001:0:c612::",
+      "expect": true,
+      "why": "first address of 2001:0:c612::/47"
+    },
+    {
+      "ip": "2001:0:c613:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:c612::/47"
+    },
+    {
+      "ip": "2001:0:c611:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:c612::/47"
+    },
+    {
+      "ip": "2001:0:c614::",
+      "expect": false,
+      "why": "just above 2001:0:c612::/47"
+    },
+    {
+      "ip": "2001:0:c633:6400::",
+      "expect": true,
+      "why": "first address of 2001:0:c633:6400::/56"
+    },
+    {
+      "ip": "2001:0:c633:64ff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:c633:6400::/56"
+    },
+    {
+      "ip": "2001:0:c633:63ff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:c633:6400::/56"
+    },
+    {
+      "ip": "2001:0:c633:6500::",
+      "expect": false,
+      "why": "just above 2001:0:c633:6400::/56"
+    },
+    {
+      "ip": "2001:0:cb00:7100::",
+      "expect": true,
+      "why": "first address of 2001:0:cb00:7100::/56"
+    },
+    {
+      "ip": "2001:0:cb00:71ff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:cb00:7100::/56"
+    },
+    {
+      "ip": "2001:0:cb00:70ff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:cb00:7100::/56"
+    },
+    {
+      "ip": "2001:0:cb00:7200::",
+      "expect": false,
+      "why": "just above 2001:0:cb00:7100::/56"
+    },
+    {
+      "ip": "2001:0:e000::",
+      "expect": true,
+      "why": "first address of 2001:0:e000::/36"
+    },
+    {
+      "ip": "2001:0:efff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:e000::/36"
+    },
+    {
+      "ip": "2001:0:dfff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 2001:0:e000::/36"
+    },
+    {
+      "ip": "2001:0:f000::",
+      "expect": true,
+      "why": "just above 2001:0:e000::/36"
+    },
+    {
+      "ip": "2001:0:ffff:ffff::",
+      "expect": true,
+      "why": "first address of 2001:0:ffff:ffff::/64"
+    },
+    {
+      "ip": "2001:0:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:0:ffff:ffff::/64"
+    },
+    {
+      "ip": "2001:0:ffff:fffe:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "just below 2001:0:ffff:ffff::/64"
+    },
+    {
+      "ip": "2001:1::",
+      "expect": true,
+      "why": "just above 2001:0:ffff:ffff::/64"
+    },
+    {
+      "ip": "2001:3:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:2::/31"
+    },
+    {
+      "ip": "2001:4::",
+      "expect": true,
+      "why": "just above 2001:2::/31"
+    },
+    {
+      "ip": "2001:7:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:4::/30"
+    },
+    {
+      "ip": "2001:8::",
+      "expect": true,
+      "why": "just above 2001:4::/30"
+    },
+    {
+      "ip": "2001:3f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:20::/27"
+    },
+    {
+      "ip": "2001:40::",
+      "expect": true,
+      "why": "just above 2001:20::/27"
+    },
+    {
+      "ip": "2001:7f:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:40::/26"
+    },
+    {
+      "ip": "2001:80::",
+      "expect": true,
+      "why": "just above 2001:40::/26"
+    },
+    {
+      "ip": "2001:ff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 2001:80::/25"
+    },
+    {
+      "ip": "2001:100::",
+      "expect": true,
+      "why": "just above 2001:80::/25"
+    },
+    {
+      "ip": "1fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of ::/3"
+    },
+    {
+      "ip": "2000::",
+      "expect": false,
+      "why": "just above ::/3"
+    },
+    {
+      "ip": "4000::",
+      "expect": true,
+      "why": "first address of 4000::/3"
+    },
+    {
+      "ip": "5fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 4000::/3"
+    },
+    {
+      "ip": "3fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": false,
+      "why": "just below 4000::/3"
+    },
+    {
+      "ip": "6000::",
+      "expect": true,
+      "why": "just above 4000::/3"
+    },
+    {
+      "ip": "7fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 6000::/3"
+    },
+    {
+      "ip": "8000::",
+      "expect": true,
+      "why": "just above 6000::/3"
+    },
+    {
+      "ip": "9fff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of 8000::/3"
+    },
+    {
+      "ip": "a000::",
+      "expect": true,
+      "why": "just above 8000::/3"
+    },
+    {
+      "ip": "bfff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of a000::/3"
+    },
+    {
+      "ip": "c000::",
+      "expect": true,
+      "why": "just above a000::/3"
+    },
+    {
+      "ip": "dfff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
+      "expect": true,
+      "why": "last address of c000::/3"
+    },
+    {
+      "ip": "e000::",
+      "expect": true,
+      "why": "just above c000::/3"
     }
   ],
   "ipv4Mapped": [

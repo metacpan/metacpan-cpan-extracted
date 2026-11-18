@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Scalar::Util qw(refaddr);
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 sub components { return [ @{ $_[0]{components} } ] }
 sub raw        { return $_[0]{is_array} ? [ @{ $_[0]{raw} } ] : $_[0]{raw} }

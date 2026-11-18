@@ -1,6 +1,6 @@
 package API::Docker;
 # ABSTRACT: Perl client for the Docker Engine API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 use Carp qw( croak );
 use Log::Any qw( $log );
@@ -239,7 +239,7 @@ API::Docker - Perl client for the Docker Engine API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -884,7 +884,7 @@ before the response it announced was complete
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -281,4 +281,36 @@ is_deeply $dep9->{runtime}{requires}, { 'Good' => { version => 0, comment => 'no
 	}
 }
 
+# -----------------------------------------------------------------------
+# Quoted keys: 'PREREQ_PM' => { ... } is as valid as PREREQ_PM => { ... }
+# -----------------------------------------------------------------------
+
+{
+	my $quoted = <<'END_Q';
+WriteMakefile(
+	'MIN_PERL_VERSION' => '5.016',
+	"CONFIGURE_REQUIRES" => { 'ExtUtils::MakeMaker' => 6.64 },
+	'PREREQ_PM' => { 'Mail::DKIM' => 0 },
+	'TEST_REQUIRES' => { 'Test::Most' => 0 },
+	'BUILD_REQUIRES' => { 'Module::Build' => '0.42' },
+);
+END_Q
+	my $d = App::makefilepl2cpanfile::parse_prereqs($quoted);
+	is_deeply [sort keys %{$d}], [qw(build configure runtime test)], 'quoted simple keys: every phase found';
+	ok exists $d->{runtime}{requires}{'Mail::DKIM'}, 'quoted PREREQ_PM parsed';
+	ok exists $d->{test}{requires}{'Test::Most'}, 'quoted TEST_REQUIRES parsed';
+	is App::makefilepl2cpanfile::_parse_min_perl($quoted), '5.016', 'quoted MIN_PERL_VERSION parsed';
+
+	my $nested = App::makefilepl2cpanfile::parse_prereqs(
+		q{'prereqs' => { 'test' => { 'requires' => { 'A' => 1 } }, "runtime" => { "suggests" => { 'B' => 0 } } },});
+	is_deeply $nested, {
+		test    => { requires => { A => { version => '1', comment => undef } } },
+		runtime => { suggests => { B => { version => '0', comment => undef } } },
+	}, 'quoted prereqs, phase and relationship names parsed';
+
+	my $gen = App::makefilepl2cpanfile::generate(content => $quoted, with_develop => 0);
+	like $gen, qr/^on 'test' => sub/m, 'generate emits the test section for quoted keys';
+	like $gen, qr/^requires 'perl', '5\.016';/m, 'generate emits perl for quoted MIN_PERL_VERSION';
+}
+
 done_testing;

@@ -1,6 +1,6 @@
 package API::Docker::Type::VolumeListResponse;
 # ABSTRACT: Volume list response
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Volume;
 use namespace::clean;
@@ -26,7 +26,7 @@ API::Docker::Type::VolumeListResponse - Volume list response
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ Warnings that occurred when fetching the list of volumes.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

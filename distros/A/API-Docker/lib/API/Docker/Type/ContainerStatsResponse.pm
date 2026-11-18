@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerStatsResponse;
 # ABSTRACT: Statistics sample for a container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerBlkioStats;
 use API::Docker::Type::ContainerCPUStats;
@@ -67,7 +67,7 @@ API::Docker::Type::ContainerStatsResponse - Statistics sample for a container
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -165,7 +165,7 @@ because deriving it from the Perl name would produce C<Networks>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

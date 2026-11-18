@@ -1,3 +1,23 @@
+2.169 2026-11-17
+
+  New features:
+    * DumpAsData: add option to dump ordered hash as list of hash
+    * ObjTreeScanner: add ordered_hash_element_cb and
+      ordered_hash_element_hook callbacks
+    * Node: allow constructing a gist with any element
+    * ListId: allow sorting a list of nodes
+
+  Bug fixes:
+    * Loader: fix ~ (clear) action on check_list
+    * Node gist: handle node with missing mandatory value
+
+  Obsolete feature:
+    * AnyId: default_with_init is now obsolete
+
+  Doc updates:
+    * AnyId: clarify doc about "duplicates" property
+    * Model: document and fix legacy attribute
+
 2.168 2026-10-04
 
   Bug fix:

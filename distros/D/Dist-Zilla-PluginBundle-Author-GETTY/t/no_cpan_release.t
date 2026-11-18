@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -31,6 +32,14 @@ is_deeply [ releasers(no_cpan => 1, docker_image => 'foo/bar') ],
 is_deeply [ releasers(no_cpan => 1, run_release => ['deploy.sh %v']) ],
   ['Dist::Zilla::Plugin::Run::Release'],
   'run_release is the Releaser, no fake next to it';
+
+is_deeply [ releasers(no_cpan => 1, run_no_trial_release => ['deploy.sh %v']) ],
+  ['Dist::Zilla::Plugin::Run::Release'],
+  'a conditional run way of the release phase also brings the Releaser, no fake';
+
+is_deeply [ releasers(no_cpan => 1, run_if_trial_test => ['t.sh']) ],
+  ['Dist::Zilla::Plugin::FakeRelease'],
+  'a run way of another phase is no Releaser, so the fake stays';
 
 is_deeply [ releasers(no_cpan => 1, docker_image => 'foo/bar', docker_default => 0) ],
   ['Dist::Zilla::Plugin::FakeRelease'],

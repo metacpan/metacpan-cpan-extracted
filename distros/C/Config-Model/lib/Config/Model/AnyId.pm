@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::AnyId 2.168;
+package Config::Model::AnyId 2.169;
 
 use 5.020;
 
@@ -103,9 +103,6 @@ has has_fixes => (
 my @common_int_params = qw/min_index max_index max_nb auto_create_ids/;
 has \@common_int_params => ( is => 'ro', isa => 'Maybe[Int]' );
 
-my @common_hash_params = qw/default_with_init/;
-has \@common_hash_params => ( is => 'ro', isa => 'Maybe[HashRef]' );
-
 my @common_list_params = qw/allow_keys default_keys auto_create_keys/;
 has \@common_list_params => (
     is => 'ro',
@@ -120,7 +117,7 @@ my @common_str_params = qw/allow_keys_from allow_keys_matching follow_keys_from
 has \@common_str_params => ( is => 'ro', isa => 'Maybe[Str]' );
 
 my @common_params =
-    ( @common_int_params, @common_str_params, @common_list_params, @common_hash_params );
+    ( @common_int_params, @common_str_params, @common_list_params );
 my @allowed_warp_params = ( @common_params, qw/level convert/ );
 
 around BUILDARGS => sub {
@@ -285,44 +282,6 @@ sub set_properties ($self, %raw_args) {
     return;
 }
 
-sub create_default_with_init {
-    my $self = shift;
-    my $idx = shift;
-
-    return unless defined $self->{default_with_init};
-
-    say "default_with_init will soon be deprecated. Please use a add_content_check methods instead.";
-
-    my $h = $self->{default_with_init};
-    foreach my $def_key ( keys %$h ) {
-        $self->create_default_content($def_key);
-    }
-    return;
-}
-
-sub create_default_content {
-    my $self = shift;
-    my $idx = shift //  die "missing index";
-
-    return unless defined $self->{default_with_init};
-
-    my $def = $self->{default_with_init}{$idx};
-    return unless defined $def; # no default content to create for $idx
-
-    return if $self->_defined($idx) ; # object already created
-
-    $self->auto_vivify($idx);
-
-    my $v_obj = $self->_fetch_with_id($idx);
-    if ( $v_obj->get_type eq 'leaf' ) {
-        $v_obj->store( $def );
-    }
-    else {
-        $v_obj->load( $def );
-    }
-    return;
-}
-
 sub max {
     my $self = shift;
     carp $self->name, ": max param is deprecated, use max_index\n";
@@ -391,9 +350,6 @@ sub get_default_keys {
 
     push @res, @{ $self->{default_keys} }
         if defined $self->{default_keys};
-
-    push @res, keys %{ $self->{default_with_init} }
-        if defined $self->{default_with_init};
 
     return wantarray ? @res : \@res;
 }
@@ -738,9 +694,6 @@ sub fetch_with_id ($self, @args) {
         or $check eq 'no';
 
     if ( $ok or $check eq 'no' ) {
-        # create another method
-        $self->create_default_content($idx); # no-op if idx exists
-
         $self->auto_vivify($idx) unless $self->_defined($idx);
         return $self->_fetch_with_id($idx);
     }
@@ -932,25 +885,24 @@ my %can_override_class = (
 sub auto_vivify {
     my ( $self, $idx ) = @_;
     my %cargo_args = %{ $self->cargo };
-    my $class      = delete $cargo_args{class};    # to override class in cargo
+    my $override_class = delete $cargo_args{class};    # to override class in cargo
 
     my $cargo_type = delete $cargo_args{type};
 
-    Config::Model::Exception::Model->throw(
-        object  => $self,
-        message => "unknown '$cargo_type' cargo type:  "
-            . "in cargo_args. Expected "
-            . join( ' or ', keys %element_default_class )
-    ) unless defined $element_default_class{$cargo_type};
+    unless (defined $element_default_class{$cargo_type}) {
+        my $msg = sprintf("unknown '%s' cargo type in cargo_args. Expected %s",
+                          $cargo_type, join( ' or ', keys %element_default_class ));
+        Config::Model::Exception::Model->throw(object  => $self, message => $msg);
+    }
 
     my $el_class = 'Config::Model::' . $element_default_class{$cargo_type};
 
-    if ( defined $class ) {
+    if ( defined $override_class ) {
         Config::Model::Exception::Model->throw(
             object  => $self,
-            message => "$cargo_type class " . "cannot be overidden by '$class'"
+            message => "$cargo_type class cannot be overidden by '$override_class'"
         ) unless $can_override_class{$cargo_type};
-        $el_class = $class;
+        $el_class = $override_class;
     }
 
     foreach my $parm (qw/default upstream_default/) {
@@ -961,6 +913,13 @@ sub auto_vivify {
                 message => "Setting $parm value in a $type does not make sense."
             );
         }
+    }
+
+    if ($self->{default_with_init}) {
+        Config::Model::Exception::Model->throw(
+            object  => $self,
+            message => "default_with_init is obsolete"
+        );
     }
 
     my @common_args = (
@@ -1090,7 +1049,7 @@ Config::Model::AnyId - Base class for hash or list element
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -1209,9 +1168,9 @@ L<move_down|Config::Model::HashId/"move_down ( key )">.
 Specify the policy regarding duplicated values stored in the list or as
 hash values (valid only when cargo type is C<leaf>). The policy can be
 C<allow> (default), C<suppress>, C<warn> (which offers the possibility
-to apply a fix), C<forbid>. Note that duplicates I<check cannot be
-performed when the duplicated value is stored>: this happens outside of
-this object. Duplicates can be check only after when the value is read.
+to apply a fix), C<forbid>. Note that duplicate I<check cannot be
+performed when the duplicated value is stored>: the check happens outside of
+this object. Duplicated values can be checked only when the values are read.
 
 =item write_empty_value
 
@@ -1275,29 +1234,6 @@ functions are used on an I<empty> hash.
 
 You can use C<< default_keys => 'foo' >>,
 or C<< default_keys => ['foo', 'bar'] >>.
-
-=item default_with_init
-
-To perform special set-up on children nodes you can also use
-
-   default_with_init =>  {
-      foo => 'X=Av Y=Bv',
-      bar => 'Y=Av Z=Cv'
-   }
-
-When the hash contains leaves, you can also use:
-
-   default_with_init => {
-       def_1 => 'def_1 stuff',
-       def_2 => 'def_2 stuff'
-   }
-
-With a list, you must use numeric keys:
-
-   default_with_init => {
-       0 => 'def_1 stuff',
-       1 => 'def_2 stuff'
-   },
 
 =item migrate_keys_from
 
@@ -1529,8 +1465,6 @@ object (as declared in the model unless they were warped):
 
 =item default_keys
 
-=item default_with_init
-
 =item follow_keys_from
 
 =item auto_create_ids
@@ -1561,7 +1495,7 @@ Returns undef if the requested info is not provided in the model.
 =head2 get_default_keys
 
 Returns a list (or a list ref) of the current default keys. These keys
-can be set by the C<default_keys> or C<default_with_init> parameters
+can be set by the C<default_keys> parameters
 or by the other hash pointed by C<follow_keys_from> parameter.
 
 =head2 name

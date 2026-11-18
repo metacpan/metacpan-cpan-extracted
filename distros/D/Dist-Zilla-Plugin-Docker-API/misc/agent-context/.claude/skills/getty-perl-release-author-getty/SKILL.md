@@ -74,6 +74,14 @@ Every file the bundle processes carries `# ABSTRACT: <one line>` directly under
 PodWeaver turns it into the NAME section. Outside a bundle-managed distribution
 the line does nothing — do not scatter it into files Dist::Zilla never sees.
 
+## What the tarball ships
+
+`Git::GatherDir` gathers every tracked file, dotfiles included
+(`gather_include_dotfiles` defaults to 1), so `.claude/`, `CLAUDE.md` and `.github/`
+ship with the dist; `[GatherAgentContext]` adds a snapshot of the agent context under
+`misc/agent-context/` (build provenance, not installed). We keep them in. Out by
+default: `README.md` (see `include_readme`) and `.karr`.
+
 ## @Author::GETTY Options
 
 ### Feature Toggles (Boolean)
@@ -115,6 +123,21 @@ the line does nothing — do not scatter it into files Dist::Zilla never sees.
 - `docker_tags` - Whitespace-separated tag list (default: `latest %V %v`)
 - `docker_local` - Build and tag the image, but don't push
 - `docker_default` - Set to 0 to suppress the auto-added plugin when you configure builds exclusively through `[@Author::GETTY::Docker / name]` subsections
+
+### Binary
+Standalone `pp` binaries of the dist's scripts as assets of the GitHub release. Only `binary` is needed. Packing itself (what `pp` misses, verify and smoke scripts): skill `perl-par-binary-release`.
+- `binary` - Whitespace-separated names, repeatable; each is packed from `bin/NAME`. Turns the binary release on and forces the GitHub release: the bundle dies with `no_github`, `no_github_release` or no GitHub remote
+- `binary_modules` - Extra modules packed into every binary (`-M`). `Foo::*` packs everything below `Foo/` but not `Foo.pm` itself; an empty namespace does not fail
+- `binary_require` - Modules or `Namespace::*` globs that must be inside every finished binary, or the build fails
+- `binary_pp_args` - Shell command whose output is added to the `pp` command line, one argument per line
+- `binary_verify` - Shell command run after packing with the binary's path appended; runs without `PERL5LIB`, the packing perl's is in `DZIL_BINARY_PERL5LIB`
+- `binary_smoke` - Like `binary_verify`, run by the workflow on every platform on a machine without Perl; neither `PERL5LIB` nor `DZIL_BINARY_PERL5LIB`
+- `binary_platforms` - Out of `linux-x86_64 linux-arm64 macos-arm64 macos-x86_64 windows-x86_64` (default: all five). Dist-wide, refused in a subsection
+- `binary_prepare` - Shell command run once per platform before the dependencies are installed; its first word must be a file of the dist. Dist-wide, refused in a subsection
+- `binary_default` - Set to 0 to not add the binaries from `binary` and configure them through `[@Author::GETTY::Binary / name]` subsections
+- `[@Author::GETTY::Binary / name]` - One binary configured on its own, e.g. `script` when it is not `bin/name`; inherits `binary_modules`, `binary_require`, `binary_pp_args`, `binary_verify`, `binary_smoke`
+- Caller workflow - the dist's own `.github/workflows/binaries.yml` calls `Getty/p5-dist-zilla-pluginbundle-author-getty/.github/workflows/dzil-binary.yml@binary-v1` on `release: published`; `dzil release` is refused without that file. Full text in the bundle POD under "Binaries"
+- `DZIL_BINARY_SKIP=1` - `dzil build` packs again as a local check and needs `pp` in the `PATH`; this skips it, including `binary_verify` and `binary_smoke`
 
 ### Support
 - `irc = #channel` - IRC channel

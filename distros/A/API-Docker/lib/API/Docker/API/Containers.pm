@@ -1,6 +1,6 @@
 package API::Docker::API::Containers;
 # ABSTRACT: Docker Engine Containers API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 with 'API::Docker::Role::Filters', 'API::Docker::Role::Using',
   'API::Docker::Role::JSONBody';
@@ -628,7 +628,7 @@ API::Docker::API::Containers - Docker Engine Containers API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1878,7 +1878,7 @@ returns
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

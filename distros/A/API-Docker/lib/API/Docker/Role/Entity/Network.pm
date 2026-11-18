@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity::Network;
 # ABSTRACT: Network operations, on the generated network type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 with 'API::Docker::Role::Entity';
 requires 'id';
@@ -74,7 +74,7 @@ API::Docker::Role::Entity::Network - Network operations, on the generated networ
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -157,7 +157,7 @@ return
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

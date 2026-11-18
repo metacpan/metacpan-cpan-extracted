@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::Placement;
 # ABSTRACT: Where in the swarm a task may be scheduled
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Platform;
 use API::Docker::Type::TaskSpec::Placement::Preference;
@@ -33,7 +33,7 @@ API::Docker::Type::TaskSpec::Placement - Where in the swarm a task may be schedu
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -86,7 +86,7 @@ L<API::Docker::Type::Platform>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

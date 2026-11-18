@@ -1,6 +1,6 @@
 package API::Docker::Type::Mount::TmpfsOptions;
 # ABSTRACT: Optional configuration for the C<tmpfs> type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ API::Docker::Type::Mount::TmpfsOptions - Optional configuration for the C<tmpfs>
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -56,7 +56,7 @@ second the value. For example: C<< [["noexec"], ["size", "64m"]] >>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

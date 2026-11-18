@@ -1,6 +1,6 @@
 package API::Docker::Type::ImageSummary;
 # ABSTRACT: One entry of the C<200> response to C<GET /images/json>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ImageManifestSummary;
 use API::Docker::Type::OCIDescriptor;
@@ -54,7 +54,7 @@ API::Docker::Type::ImageSummary - One entry of the C<200> response to C<GET /ima
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -168,7 +168,7 @@ backward compatibility. See L<API::Docker::Type::OCIDescriptor>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -1,6 +1,6 @@
 package API::Docker::Error::Stream;
 # ABSTRACT: Failure reported inside a Docker Engine progress stream
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 # namespace::clean has to come BEFORE "use overload" here, not after it as
 # everywhere else in this distribution. It sweeps the symbols `overload`
@@ -53,7 +53,7 @@ API::Docker::Error::Stream - Failure reported inside a Docker Engine progress st
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -146,7 +146,7 @@ stringification overload returns.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

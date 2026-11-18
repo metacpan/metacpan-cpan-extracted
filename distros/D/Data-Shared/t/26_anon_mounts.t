@@ -3,10 +3,12 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 use Data::Shared qw(shared_get shared_set);
+use lib 't/lib';
+use Backends qw(have);
 
 # Buffer variants reject an undef path with EFAULT; the facade falls back to their new_anon.
 plan skip_all => 'Data::Buffer::Shared::I64 not installed'
-    unless eval { require Data::Buffer::Shared::I64; 1 };
+    unless have('buffer:i64');
 
 my $root = Data::Shared->new;
 my $mounted = eval { $root->mount('b', 'buffer:i64', undef, 10); 1 };

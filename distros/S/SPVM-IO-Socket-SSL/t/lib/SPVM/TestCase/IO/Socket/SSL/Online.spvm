@@ -19,16 +19,16 @@ class TestCase::IO::Socket::SSL::Online {
       # Socket
       my $host = "httpbin.org";
       my $port = 443;
-      my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port});
+      my $socket = IO::Socket::SSL->new({Context => Go->bg, PeerAddr => $host, PeerPort => $port});
       
       # Send a GET request to httpbin.org/get
       my $write_buffer = "GET /get HTTP/1.0\r\nHost: $host\r\n\r\n";
-      $socket->syswrite($write_buffer);
+      $socket->syswrite(Go->bg, $write_buffer);
       
       my $total_read_buffer = "";
       my $read_buffer = (mutable string)new_string_len 8192;
       while (1) {
-        my $read_length = $socket->sysread($read_buffer);
+        my $read_length = $socket->sysread(Go->bg, $read_buffer);
         
         # End of file (EOF). Errors throw exceptions.
         if ($read_length == 0) {
@@ -53,24 +53,24 @@ class TestCase::IO::Socket::SSL::Online {
       # Socket
       my $host = "httpbin.org";
       my $port = 443;
-      my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
+      my $socket = IO::Socket::SSL->new({Context => Go->bg, PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
       
       my $ssl_ctx = $socket->ssl_ctx;
       unless ($ssl_ctx is_type Net::SSLeay::SSL_CTX) { return 0; }
       
       # Perform the SSL handshake manually
-      $socket->connect_SSL;
+      $socket->connect_SSL(Go->bg);
       
       my $ssl = $socket->ssl;
       unless ($ssl && $ssl is_type Net::SSLeay) { return 0; }
       
       my $write_buffer = "GET /get HTTP/1.0\r\nHost: $host\r\n\r\n";
-      $socket->syswrite($write_buffer);
+      $socket->syswrite(Go->bg, $write_buffer);
       
       my $total_read_buffer = "";
       my $read_buffer = (mutable string)new_string_len 8192;
       while (1) {
-        my $read_length = $socket->sysread($read_buffer);
+        my $read_length = $socket->sysread(Go->bg, $read_buffer);
         
         if ($read_length == 0) {
           last;
@@ -109,18 +109,19 @@ class TestCase::IO::Socket::SSL::Online {
       
       my $host = "httpbin.org";
       my $socket = IO::Socket::SSL->new({
+        Context => Go->bg,
         PeerAddr => $host,
         PeerPort => 443,
         SSL_ca => $cas,
       });
       
       my $write_buffer = "GET /get HTTP/1.0\r\nHost: $host\r\n\r\n";
-      $socket->syswrite($write_buffer);
+      $socket->syswrite(Go->bg, $write_buffer);
       
       my $total_read_buffer = "";
       my $read_buffer = (mutable string)new_string_len 8192;
       while (1) {
-        my $read_length = $socket->sysread($read_buffer);
+        my $read_length = $socket->sysread(Go->bg, $read_buffer);
         if ($read_length == 0) { last; }
         $total_read_buffer .= Fn->substr($read_buffer, 0, $read_length);
       }
@@ -143,18 +144,19 @@ class TestCase::IO::Socket::SSL::Online {
       
       my $host = "httpbin.org";
       my $socket = IO::Socket::SSL->new({
+        Context => Go->bg,
         PeerAddr => $host,
         PeerPort => 443,
         SSL_ca_file => $ca_file,
       });
       
       my $write_buffer = "GET /get HTTP/1.0\r\nHost: $host\r\n\r\n";
-      $socket->syswrite($write_buffer);
+      $socket->syswrite(Go->bg, $write_buffer);
       
       my $total_read_buffer = "";
       my $read_buffer = (mutable string)new_string_len 8192;
       while (1) {
-        my $read_length = $socket->sysread($read_buffer);
+        my $read_length = $socket->sysread(Go->bg, $read_buffer);
         if ($read_length == 0) { last; }
         $total_read_buffer .= Fn->substr($read_buffer, 0, $read_length);
       }
@@ -179,6 +181,7 @@ class TestCase::IO::Socket::SSL::Online {
       
       my $host = "httpbin.org";
       my $socket = IO::Socket::SSL->new({
+        Context => Go->bg,
         PeerAddr => $host,
         PeerPort => 443,
         SSL_ca_path => $ca_path,
@@ -186,12 +189,12 @@ class TestCase::IO::Socket::SSL::Online {
       });
       
       my $write_buffer = "GET /get HTTP/1.0\r\nHost: $host\r\n\r\n";
-      $socket->syswrite($write_buffer);
+      $socket->syswrite(Go->bg, $write_buffer);
       
       my $total_read_buffer = "";
       my $read_buffer = (mutable string)new_string_len 8192;
       while (1) {
-        my $read_length = $socket->sysread($read_buffer);
+        my $read_length = $socket->sysread(Go->bg, $read_buffer);
         if ($read_length == 0) { last; }
         $total_read_buffer .= Fn->substr($read_buffer, 0, $read_length);
       }

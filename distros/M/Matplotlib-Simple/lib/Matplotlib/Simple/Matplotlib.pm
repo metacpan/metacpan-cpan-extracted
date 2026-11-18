@@ -12,7 +12,7 @@ package Matplotlib::Simple::Matplotlib;
 # The helpers keep checking their own keywords, against the same lists Matplotlib::Simple
 # checks them with, which are shared below rather than copied.
 require 5.010;
-our $VERSION = 0.3343;
+our $VERSION = 0.3344;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use File::Spec;
@@ -95,15 +95,35 @@ sub norm_args {
 	# args: lo, hi   => the ends of the scale, either undef to take it from
 	#                   "values", or from matplotlib if there are none
 	#       values   => array ref, optional: the values being colored
+	#       rows     => array ref of array refs, optional, in place of
+	#                   "values": the values being colored, a row at a time
 	#       log      => Perl true for a log scale
 	#       fh, sub  => the script, and the helper, for the import and errors
 	# A log scale cannot start at 0 or below, so its default bottom is the
 	# smallest value above 0, as LogNorm would choose for itself.
+	#
+	# The range is kept a row at a time, and looked for only where an end is
+	# not given. imshow passed its image flattened into one list, which was
+	# copied twice more here: with the rest of its work, a 1500 x 1500 image
+	# took 956 MB at its peak.
 	my ($args) = @_;
 	my ( $lo, $hi ) = @{$args}{qw(lo hi)};
-	my @values = finite_values( @{ $args->{values} // [] } );
+	my ( $min, $min_above_0, $max );
+	if ( ( not defined $lo ) || ( not defined $hi ) ) {
+		foreach my $row ( defined $args->{rows} ? @{ $args->{rows} } : ( $args->{values} // [] ) ) {
+			my @values = finite_values( @{$row} );
+			next if scalar @values == 0;
+			my ( $row_min, $row_max ) = ( min(@values), max(@values) );
+			$min = $row_min if ( not defined $min ) || ( $row_min < $min );
+			$max = $row_max if ( not defined $max ) || ( $row_max > $max );
+			next unless $args->{log};
+			my $row_min_above_0 = min( grep { $_ > 0 } @values );
+			next unless defined $row_min_above_0;
+			$min_above_0 = $row_min_above_0 if ( not defined $min_above_0 ) || ( $row_min_above_0 < $min_above_0 );
+		}
+	}
 	if ( $args->{log} ) {
-		$lo = $lo // min( grep { $_ > 0 } @values );
+		$lo = $lo // $min_above_0;
 		if ( not defined $lo ) {
 			die "\"cb_logscale\" needs a color value above 0 to start the scale at, or a \"vmin\" or \"cb_min\" above 0, and $args->{sub} has neither";
 		}
@@ -111,9 +131,9 @@ sub norm_args {
 			die "\"cb_logscale\" cannot start at $lo in $args->{sub}: a log scale needs a minimum above 0";
 		}
 	} else {
-		$lo = $lo // min(@values);
+		$lo = $lo // $min;
 	}
-	$hi = $hi // max(@values);
+	$hi = $hi // $max;
 	my @kw;
 	push @kw, 'vmin = ' . py_num($lo) if defined $lo;
 	push @kw, 'vmax = ' . py_num($hi) if defined $hi;
@@ -145,8 +165,12 @@ sub write_data {
 	my $json_string = $json_encoder->encode( decoded_data( $args->{data} ) );
 	# 3. Base64 Encode the JSON String, not the reference
 	my $b64_data = encode_base64($json_string, ''); 
-	# Assign the b64 string to a temp python variable
-	say {$args->{fh}} "$args->{name}_b64 = '$b64_data'";
+	# Assign the b64 string to a temp python variable. The JSON is let go
+	# first, and the line printed in pieces rather than interpolated, which
+	# made a third copy: for a 1500 x 1500 imshow that took the peak from
+	# 299 MB to 247 MB.
+	undef $json_string;
+	print {$args->{fh}} "$args->{name}_b64 = '", $b64_data, "'\n";
 	# Decode b64 -> bytes -> utf8 string -> json load -> python object
 	say {$args->{fh}} "$args->{name} = json.loads(base64.b64decode($args->{name}_b64).decode('utf-8'))";
 }
@@ -1625,6 +1649,7 @@ sub imshow_helper {
 		die "$current_sub cannot draw an undefined cell, and \"data\" has them at " . join( ', ', @undef_cells ) . '; a NaN is drawn as an empty cell';
 	}
 	my $non_numeric_data = 0;
+	my $any_nonfinite    = 0;    # 1 once a value of a numeric image is NaN or infinite
 	foreach my $row (@{ $plot->{data} }) {
 		if (grep {not looks_like_number($_)} @{ $row }) {
 			$non_numeric_data = 1;
@@ -1672,7 +1697,12 @@ sub imshow_helper {
 		# numpy refused as "Image data of dtype object"; they travel as the
 		# strings "nan", "inf" and "-inf" instead, which the float conversion
 		# written after the data below reads back as the numbers they were.
-		$data = [ map { [ map { nonfinite_name($_) // 0 + $_ } @{ $_ } ] } @{ $data } ];
+		#
+		# Whether any value is not finite is noted as each is copied. It was
+		# looked for afterwards with a regex over every value, which gave each
+		# number a string as well, and for a 1500 x 1500 image cost 0.2 s and
+		# about 140 MB.
+		$data = [ map { [ map { my $name = nonfinite_name($_); $any_nonfinite = 1 if defined $name; $name // 0 + $_ } @{ $_ } ] } @{ $data } ];
 	}
 	my ( $min_val, $max_val );    # the ends of a stringmap's scale; numbers are left to norm_args
 	my $opts = '';
@@ -1708,7 +1738,7 @@ sub imshow_helper {
 	});
 	# Only where a value needs it, so that an image of whole numbers is still
 	# drawn from whole numbers.
-	if ( ( not $non_numeric_data ) && ( grep { grep { m/^-?(?:nan|inf)$/ } @{$_} } @{$data} ) ) {
+	if ($any_nonfinite) {
 		say { $args->{fh} } 'import numpy as np';
 		say { $args->{fh} } 'd = np.asarray(d, dtype = float)';
 	}
@@ -1729,7 +1759,7 @@ sub imshow_helper {
 	$opts .= norm_args({
 		lo     => $plot->{vmin} // ( $non_numeric_data ? $min_val : undef ),
 		hi     => $plot->{vmax} // ( $non_numeric_data ? $max_val : undef ),
-		values => $non_numeric_data ? [] : [ map { @{$_} } @{$data} ],
+		rows   => $non_numeric_data ? [] : $data,
 		log    => $plot->{cb_logscale},
 		fh     => $args->{fh},
 		sub    => $current_sub

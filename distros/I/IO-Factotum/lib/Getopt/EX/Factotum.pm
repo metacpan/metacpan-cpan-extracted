@@ -26,7 +26,7 @@ Getopt::EX::Factotum - Getopt::EX module to load IO::Factotum converters
 
 =head1 SYNOPSIS
 
-    ansicolumn -MFactotum::load=Highlight::skylighting file.c file.h
+    ansicolumn -MFactotum::load=NAME file ...
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ Register the converter of C<IO::Factotum::>I<name>
 
 =head1 SEE ALSO
 
-L<IO::Factotum>, L<IO::Factotum::Highlight::skylighting>, L<Getopt::EX>
+L<IO::Factotum>, L<Getopt::EX>
 
 =cut
 

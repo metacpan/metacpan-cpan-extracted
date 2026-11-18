@@ -1,6 +1,6 @@
 package API::Docker::Type::Resources;
 # ABSTRACT: A container's resources (cgroups config, ulimits, etc)
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::DeviceMapping;
 use API::Docker::Type::DeviceRequest;
@@ -119,7 +119,7 @@ API::Docker::Type::Resources - A container's resources (cgroups config, ulimits,
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -321,7 +321,7 @@ it from the Perl name would produce C<IoMaximumBandwidth>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

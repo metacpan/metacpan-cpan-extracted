@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Test::Most;
+use IPC::Open3 ();
 use Test::Mockingbird 0.10;
 use File::Temp qw(tempdir tempfile);
 use File::Spec;
@@ -1164,7 +1165,7 @@ subtest 'SchemaExtractor: _compile_signature_isolated subprocess failures degrad
 			$_[0] = do { open my $fh, '>', \my $b; $fh };
 			$_[1] = $rdr;
 			$_[2] = $err;
-			return $$;
+			return _exited_child_pid();
 		};
 		my $res;
 		lives_ok { $res = $make_e->()->_compile_signature_isolated('f', '(positional => [])') }
@@ -1183,7 +1184,7 @@ subtest 'SchemaExtractor: _compile_signature_isolated subprocess failures degrad
 			$_[0] = do { open my $fh, '>', \my $b; $fh };
 			$_[1] = $rdr;
 			$_[2] = $err;
-			return $$;
+			return _exited_child_pid();
 		};
 		my $res;
 		lives_ok { $res = $make_e->()->_compile_signature_isolated('f', '(positional => [])') }
@@ -1686,5 +1687,14 @@ PODPM
 	}
 	done_testing();
 };
+
+# The code under test waits for the PID its open3 returns.  A mock must hand
+# back a real child: on Windows waitpid on a non-child (such as $$) opens
+# that process and waits for it to exit, which never happens for ourselves.
+sub _exited_child_pid {
+	my $pid = IPC::Open3::open3(my $in, my $out, undef, $^X, q{-e}, q{1});
+	close $in;
+	return $pid;
+}
 
 done_testing();

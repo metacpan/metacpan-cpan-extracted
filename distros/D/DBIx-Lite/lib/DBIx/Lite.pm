@@ -1,5 +1,5 @@
 package DBIx::Lite;
-$DBIx::Lite::VERSION = '0.40';
+$DBIx::Lite::VERSION = '0.41';
 # ABSTRACT: Chained and minimal ORM
 use strict;
 use warnings;
@@ -161,7 +161,7 @@ DBIx::Lite - Chained and minimal ORM
 
 =head1 VERSION
 
-version 0.40
+version 0.41
 
 =head1 SYNOPSIS
 

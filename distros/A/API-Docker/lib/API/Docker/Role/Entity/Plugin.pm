@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity::Plugin;
 # ABSTRACT: Plugin operations, on the generated plugin type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 with 'API::Docker::Role::Entity';
 requires 'name';
@@ -94,7 +94,7 @@ API::Docker::Role::Entity::Plugin - Plugin operations, on the generated plugin t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -229,7 +229,7 @@ return
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

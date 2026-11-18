@@ -43,6 +43,9 @@
          }
       },
       "runtime" : {
+         "recommends" : {
+            "Config::General" : "0"
+         },
          "requires" : {
             "Carp" : "0",
             "Config::Auto" : "0",
@@ -58,11 +61,13 @@
             "Hash::Merge" : "0",
             "JSON::MaybeXS" : "0",
             "JSON::Parse" : "0",
+            "MIME::Base64" : "0",
             "Params::Get" : "0.15",
             "Params::Validate::Strict" : "0.37",
             "Pod::Usage" : "0",
             "Readonly" : "0",
             "Scalar::Util" : "0",
+            "Sys::Hostname" : "0",
             "TOML::Tiny" : "0",
             "XML::PP" : "0.06",
             "YAML::XS" : "0.80",
@@ -71,10 +76,12 @@
       },
       "test" : {
          "recommends" : {
+            "Config::General" : "0",
             "Test::Permissions" : "0"
          },
          "requires" : {
             "File::Glob" : "0",
+            "File::Path" : "0",
             "File::stat" : "0",
             "IPC::System::Simple" : "0",
             "POSIX" : "0",
@@ -106,6 +113,6 @@
          "x_repository" : "https://github.com/nigelhorne/Config-Abstraction"
       }
    },
-   "version" : "0.42",
+   "version" : "0.43",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

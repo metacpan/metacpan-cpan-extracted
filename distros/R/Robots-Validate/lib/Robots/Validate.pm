@@ -9,7 +9,7 @@ use Moo 1;
 use Algorithm::AhoCorasick::SearchMachine;
 use File::ShareDir qw( dist_file );
 use File::Slurper  qw( read_binary );
-use List::Util     1.33 qw( all any none );
+use List::Util     1.33 qw( all any );
 use Module::Load qw( load );
 use Net::DNS::Resolver;
 use Net::IP qw( ip_expand_address ip_is_ipv4 ip_is_ipv6 ip_splitprefix );
@@ -30,7 +30,7 @@ use experimental qw( lexical_subs signatures );
 
 use namespace::autoclean;
 
-our $VERSION = 'v0.4.15';
+our $VERSION = 'v0.4.16';
 
 
 has resolver => (
@@ -469,7 +469,6 @@ sub _add_rule( $self, $rule ) {
             }
         }
         else {
-            # TODO add support for matching on IP
             die "an agent substring is required";
         }
 
@@ -608,7 +607,7 @@ Robots::Validate - Validate that IP addresses are associated with known robots
 
 =head1 VERSION
 
-version v0.4.15
+version v0.4.16
 
 =head1 SYNOPSIS
 
@@ -648,11 +647,9 @@ This was added in version v0.3.11.
 
 =head2 networks
 
-This is a L<Net::IP::LPM> object used for matching networks..
+This is a L<Net::IP::LPM> object used for matching networks, which is agnostic about IPv4 and IPv6 addresses.
 
 This can only be set via the constructor.
-
-Note that internally IPv4 addresses are converted to IPv6 addresses.
 
 =head2 config
 

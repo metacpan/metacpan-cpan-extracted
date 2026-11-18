@@ -28,6 +28,20 @@ An explicit `--claim NAME` still wins. Agents in separate worktrees already
 differ by name; several agents in the **same** directory take
 `karr agent-name --unique` (`karr-8fa`).
 
+## The board is the exchange — keep it pushed
+
+Other agents, sessions and machines see a card only once it is on the remote;
+one that stays local does not exist for them. So every mutating command pulls
+first and pushes `refs/karr/*` after, and that is the point of the board, not a
+side effect: never ask before a board write, never save findings up for later.
+The push is not a publish-gate action, and a "don't push" in a plan or brief
+means commits and tags, not the board. `--local-only` is for a configured remote
+that cannot be reached, never for avoiding the push; `karr sync` publishes what
+it wrote once the remote answers again. A push that fails (credentials,
+rejected) goes at the top of your report — not into a sub-bullet, and not
+a reason to stay local for the rest of the session. Card text is as public as
+the repository: no secrets, no home-directory paths.
+
 ## Read the board
 
 ```bash

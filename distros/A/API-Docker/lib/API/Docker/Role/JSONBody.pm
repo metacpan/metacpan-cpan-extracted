@@ -1,6 +1,6 @@
 package API::Docker::Role::JSONBody;
 # ABSTRACT: coerce known boolean keys of a request body to JSON booleans
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 use namespace::clean;
 
@@ -30,7 +30,7 @@ API::Docker::Role::JSONBody - coerce known boolean keys of a request body to JSO
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ caller's own nested HashRef.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

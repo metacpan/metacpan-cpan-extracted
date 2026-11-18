@@ -1,3 +1,19 @@
+0.107     2026-11-18 02:25:08Z
+  - Requires API::Docker 0.006, which installs with cpanm and on CPAN
+    smokers.
+  - Requires perl 5.14, like API::Docker.
+  - The commit SHA and branch name that tag templates use (%H, %h, %b and
+    the image labels) are filled on Windows too: git is called in list
+    form instead of through the implicit fork.
+  - The test suite runs on Windows: the build-context test skips the
+    symlink checks where symbolic links cannot be created and the
+    executable-mode check where the mode has no execute bit.
+
+0.106     2026-11-17 21:48:37Z
+  - Requires API::Docker 0.005: when the engine rejects a build before it
+    has read the whole context, the release stops with the engine's error
+    message.
+
 0.105     2026-10-25 18:39:55Z
   - The build context sent to the engine now keeps what Dist::Zilla wrote
     into the build root: file modes (an executable stays executable, so

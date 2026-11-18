@@ -1,13 +1,19 @@
-2.67  - fix github.com/TLINDEN/Config-General/issues/5:
+2.69  - fix Changelog
+
+2.68  - fixes fix codeberg.org/scip/Config-General/issues/10:
+        and closes CVE-2026-129820 + CVE-2026-129821:
+        validate incoming config hashes, forbid comment, here-doc and include markers
+
+2.67  - fix codeberg.org/scip/Config-General/issues/5:
 	fixing tests (add missing file to dist tarball) contributed
 	by @paulwalrath.
       - created gitignore file.
 
-2.66  - fix github.com/TLINDEN/Config-General/issues/1:
+2.66  - fix codeberg.org/scip/Config-General/issues/1:
 	add support to quote values containing whitespace using the
 	new flag -AlwaysQuoteOutput.
 
-      - apply patch by @haarg github.com/TLINDEN/Config-General/pull/2:
+      - apply patch by @haarg codeberg.org/scip/Config-General/pull/2:
 	fix exporter setup, use "our" where appropriate.
 
 2.65  - fix rt.cpan.org#132893: clarified license, now licensed
@@ -25,7 +31,7 @@
       - the Catalyst folks who hosted the source of this module
         closed or moved the repository, I have not been informed and
         have therefore lost all history of the module. So I moved
-        to github (https://github.com/TLINDEN/Config-General).
+        to github (https://codeberg.org/scip/Config-General).
         Thanks for nothing, Catalyst.
 
 2.63  - fix for rt.cpan.org#116340: do only consider a backslash

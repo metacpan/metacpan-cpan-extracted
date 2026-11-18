@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::ContainerSpec::Privileges;
 # ABSTRACT: Security options for the container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::TaskSpec::ContainerSpec::Privileges::AppArmor;
 use API::Docker::Type::TaskSpec::ContainerSpec::Privileges::CredentialSpec;
@@ -42,7 +42,7 @@ API::Docker::Type::TaskSpec::ContainerSpec::Privileges - Security options for th
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -79,7 +79,7 @@ Configuration of the no_new_privs bit in the container.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

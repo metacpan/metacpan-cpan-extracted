@@ -75,6 +75,7 @@ subtest "mega regexp" => sub {
         #                              id_operation                        leaf_operation
         # string                 elt   op   (param)          id             op    (param)    val        note
         [ 'a',                 [ 'a',  'x',  'x',           'x',            'x',  'x',      'x',        'x' ] ],
+        [ 'a~',                [ 'a',  '~',  'x',           'x',            'x',  'x',      'x',        'x' ] ],
         [ '#C',                [ 'x',  'x',  'x',           'x',            'x',  'x',      'x',        'C' ] ],
         [ '#"m C"',            [ 'x',  'x',  'x',           'x',            'x',  'x',      'x',        '"m C"' ] ],
         [ q!#'m C'!,           [ 'x',  'x',  'x',           'x',            'x',  'x',      'x',        "'m C'" ] ],
@@ -214,6 +215,17 @@ subtest "check with embedded \n" => sub {
 
 subtest "check with quoted element string \n" => sub {
     #  also check that instance can load before config_root is called
+    my $step = qq!alpha_check_list=A,C,G!;
+    ok( $inst->load( step => $step ), "load check list" );
+    $root = $inst->config_root;
+    is_deeply([$root->fetch_element('alpha_check_list')->get_checked_list],
+               [qw/A C G/], "check alpha_check_list" );
+    ok( $inst->load( step => 'alpha_check_list~' ), "delete check list" );
+    is_deeply([$root->fetch_element('alpha_check_list')->get_checked_list],
+               [], "check empty alpha_check_list" );
+};
+
+subtest "set and delete check_list" => sub {
     my $step = qq!"a.string"="foo"!;
     ok( $inst->load( step => $step ), "load steps with embedded \\n" );
     $root = $inst->config_root;

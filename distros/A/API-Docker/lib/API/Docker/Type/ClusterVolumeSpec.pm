@@ -1,6 +1,6 @@
 package API::Docker::Type::ClusterVolumeSpec;
 # ABSTRACT: Cluster-specific options used to create the volume
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ClusterVolumeSpec::AccessMode;
 use namespace::clean;
@@ -26,7 +26,7 @@ API::Docker::Type::ClusterVolumeSpec - Cluster-specific options used to create t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -49,7 +49,7 @@ L<API::Docker::Type::ClusterVolumeSpec::AccessMode>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

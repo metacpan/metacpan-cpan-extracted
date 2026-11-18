@@ -2,6 +2,57 @@ Revision history for Ekorn-Pipeline
 
 Unreleased
 
+v0.3.6 2026-11-17
+
+    A pipeline can be fed its values as they arrive, from a library
+    that calls you back, an event loop, or a stage running its values
+    through a pipeline of its own; and tee, built on that, is a tap of
+    any shape, running each value through a branch of stages beside
+    the main run.
+
+    It ships roadmap 2026-0044 and 2026-0048. It only adds: pushed and
+    pulled runs, the messages, and the order things run in are as they
+    were, and no slower; a push through plain stages is a little faster.
+
+    - $pipeline->feed returns an Ekorn::Pipeline::Feed, one run, made
+      then: push runs values through the stages, and returns what came
+      out of them; close ends the input, and returns what the flushes
+      give, and a sink's result; finish ends the run as from outside;
+      ended says how it ended. Fed the same values, a feed gives what
+      a call gives, a push at a time. A stop ends the run in the push
+      that meets it. Once the run has ended, a push or a close croaks,
+      "Expected a feed still open, but its run has ended", so values
+      can't go nowhere unnoticed; a push, close or finish from inside
+      the feed's own run croaks too. A feed has no context of its own:
+      its stages see the context of the code pushing into it, none from
+      outside a run. A push costs about 1.3 µs a value through a bare
+      stage, and 2 µs through a gather with a flush, on Perl 5.36 and
+      5.44. The user guide shows a library's callbacks feeding a
+      function's caller's stages, a tee running values through a
+      branch of stages beside the main run, and a stage running each
+      key's values through a run of their own. (roadmap 2026-0044)
+    - tee(@stages), in Ekorn::Pipeline::Stages::Taps, exported on
+      request and in :all and Ekorn::Pipeline::Tooling's :taps, runs
+      each value through a branch of the stages, and passes it on
+      unchanged; what comes out of the branch is dropped. The branch is
+      one run of its own, beside the main run, fed by a feed made for
+      each main run, so its stages keep their state across the values.
+      A stop in it, such as take's, ends only the branch. A death in it
+      kills the run, named as the tee's stage, then the branch's within
+      it. Its flushes are called in the tee's flush, and its ends as its
+      run ends, or, if the main run ended first, in the tee's end, told
+      stopped. The branch sees the main run's context, so stages that
+      read it, such as a statement's columns, work there. It takes
+      whatever new takes, a pipeline or a sink last included. A tee has
+      a flush and an end only if its branch needs them, so a branch of
+      plain stages leaves the main run on the plain loop, and costs
+      about 1.3 µs a value, against peek's 0.4. (roadmap 2026-0048)
+    - A push through plain stages, and through stages made with gather
+      that have no flush or end, copies its values once less, costing
+      about 5% less a value: through one plain stage, 332 to 335 ns,
+      not 348 to 360, on Perl 5.36, and 370 to 375, not 395 to 411, on
+      5.44.
+
 v0.3.5 2026-11-16
 
     Pushing values through take, drop and the other stages made with

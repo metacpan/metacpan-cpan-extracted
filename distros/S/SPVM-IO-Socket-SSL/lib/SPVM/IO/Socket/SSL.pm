@@ -1,6 +1,6 @@
 package SPVM::IO::Socket::SSL;
 
-our $VERSION = "0.021";
+our $VERSION = "0.025";
 
 1;
 
@@ -35,6 +35,7 @@ As a subclass of L<IO::Socket|SPVM::IO::Socket>, it inherits the support for **d
     
     # Use "ReadDeadline" and WriteDeadline options (defined in IO::Socket)
     my $socket = IO::Socket::SSL->new({
+      Context => Go->bg,
       PeerAddr => $host, 
       PeerPort => $port,
       ReadDeadline => $ctx->deadline,
@@ -70,6 +71,7 @@ As a subclass of L<IO::Socket|SPVM::IO::Socket>, it inherits the support for **d
 
   # --- Server with Goroutines ---
   my $server_socket = IO::Socket::SSL->new({
+    Context => Go->bg,
     LocalPort => 443,
     Listen    => 10,
     SSL_cert_file => "server.crt",
@@ -105,15 +107,15 @@ C<has ssl : ro L<Net::SSLeay|SPVM::Net::SSLeay>;>
 
 A L<Net::SSLeay|SPVM::Net::SSLeay> object. This object is set after L</"connect_SSL"> method or L</"accept_SSL"> method succeeds.
 
-=head2 before_connect_SSL_cbs
+=head2 before_connect_ssl_cbs
 
-C<has before_connect_SSL_cbs : ro L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>[];>
+C<has before_connect_ssl_cbs : ro L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>[];>
 
 A list of callbacks called before L</"connect_SSL"> method.
 
-=head2 before_accept_SSL_cbs
+=head2 before_accept_ssl_cbs
 
-C<has before_accept_SSL_cbs : ro L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>[];>
+C<has before_accept_ssl_cbs : ro L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>[];>
 
 A list of callbacks called before L</"accept_SSL"> method.
 
@@ -243,6 +245,8 @@ See L</"Constructor Options"> about $options.
 
 Note:
 
+If the value of L</"Context"> option is not defined, an exception is thrown.
+
 If the value of L</"PeerAddr"> option is defined, a client socket is created.
 
 If the value of L</"Listen"> option is a positive value, a server socket is created.
@@ -289,11 +293,11 @@ Creates a new L<Net::SSLeay::SSL_CTX|SPVM::Net::SSLeay::SSL_CTX> object, configu
 
 =head2 connect_SSL
 
-C<method connect_SSL : void ();>
+C<method connect_SSL : void ($context : Go::Context);>
 
 Creates a new L<Net::SSLeay|SPVM::Net::SSLeay> object, and connects the SSL connection by calling L<Net::SSLeay#connect|SPVM::Net::SSLeay/"connect"> method.
 
-If there are callbacks in L</"before_connect_SSL_cbs"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#connect|SPVM::Net::SSLeay/"connect"> method.
+If there are callbacks in L</"before_connect_ssl_cbs"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#connect|SPVM::Net::SSLeay/"connect"> method.
 
 If an IO wait occurs, the program jumps to the L<goroutine scheduler|SPVM::Go>, and retries this operation until it succeeds or the timeout seconds set by L<Timeout|SPVM::IO::Socket/"Timeout"> field expires.
 
@@ -305,11 +309,11 @@ If timeout occurs, an exception is thrown with C<eval_error_id> set to the basic
 
 =head2 accept_SSL
 
-C<method accept_SSL : void ();>
+C<method accept_SSL : void ($context : Go::Context);>
 
 Creates a new L<Net::SSLeay|SPVM::Net::SSLeay> object, and accepts the SSL connection by calling L<Net::SSLeay#accept|SPVM::Net::SSLeay/"accept"> method.
 
-If there are callbacks in L</"before_accept_SSL_cbs"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#accept|SPVM::Net::SSLeay/"accept"> method.
+If there are callbacks in L</"before_accept_ssl_cbs"> field, these callbacks are performed given the instance, the new L<Net::SSLeay|SPVM::Net::SSLeay> object before calling L<Net::SSLeay#accept|SPVM::Net::SSLeay/"accept"> method.
 
 If an IO wait occurs, the program jumps to the L<goroutine scheduler|SPVM::Go>, and retries this operation until it succeeds or the timeout seconds set by L<Timeout|SPVM::IO::Socket/"Timeout"> field expires.
 
@@ -321,7 +325,7 @@ If timeout occurs, an exception is thrown with C<eval_error_id> set to the basic
 
 =head2 accept
 
-C<method accept : L<IO::Socket::SSL|SPVM::IO::Socket::SSL> ($peer_ref : Sys::Socket::Sockaddr[] = undef);>
+C<method accept : L<IO::Socket::SSL|SPVM::IO::Socket::SSL> ($context : Go::Context, $peer_ref : Sys::Socket::Sockaddr[] = undef);>
 
 Creates a new L<IO::Socket::SSL|SPVM::IO::Socket::SSL> object by calling L<accept|SPVM::IO::Socket::IP/"accept"> method in the super class.
 
@@ -333,7 +337,7 @@ And returns the new object.
 
 =head2 sysread
 
-C<method sysread : int ($buffer : mutable string, $length : int = -1, $offset : int = 0);>
+C<method sysread : int ($context : Go::Context, $buffer : mutable string, $length : int = -1, $offset : int = 0);>
 
 Reads the buffer $buffer at offset $offset to the length $length from the socket by calling L<Net::SSLeay#read|SPVM::Net::SSLeay/"read"> method.
 
@@ -347,7 +351,7 @@ If timeout occurs, an exception is thrown with C<eval_error_id> set to the basic
 
 =head2 syswrite
 
-C<method syswrite : int ($buffer : string, $length : int = -1, $offset : int = 0);>
+C<method syswrite : int ($context : Go::Context, $buffer : string, $length : int = -1, $offset : int = 0);>
 
 Writes the buffer $buffer at offset $offset to the length $length to the socket by calling L<Net::SSLeay#write|SPVM::Net::SSLeay/"write"> method.
 
@@ -451,17 +455,17 @@ Exceptions:
 
 Exceptions thrown by L<Net::SSLeay#get_certificate|SPVM::Net::SSLeay/"get_certificate"> method could be thrown.
 
-=head2 add_before_connect_SSL_cb
+=head2 add_before_connect_ssl_cb
 
-C<method add_before_connect_SSL_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>);>
+C<method add_before_connect_ssl_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeConnectSSL|SPVM::IO::Socket::SSL::Callback::BeforeConnectSSL>);>
 
-Adds the callback $cb to the end of the elements of L</"before_connect_SSL_cb"> field.
+Adds the callback $cb to the end of the elements of L</"before_connect_ssl_cbs"> field.
 
-=head2 add_before_accept_SSL_cb
+=head2 add_before_accept_ssl_cb
 
-C<method add_before_accept_SSL_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>);>
+C<method add_before_accept_ssl_cb : void ($cb : L<IO::Socket::SSL::Callback::BeforeAcceptSSL|SPVM::IO::Socket::SSL::Callback::BeforeAcceptSSL>);>
 
-Adds the callback $cb to the end of the elements of L</"before_accept_SSL_cb"> field.
+Adds the callback $cb to the end of the elements of L</"before_accept_ssl_cbs"> field.
 
 =head2 dump_peer_certificate
 
@@ -549,7 +553,7 @@ Client:
   
   my $host = "www.google.com";
   my $port = 443;
-  my $socket = IO::Socket::SSL->new({PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
+  my $socket = IO::Socket::SSL->new({Context => Go->bg, PeerAddr => $host, PeerPort => $port, SSL_startHandshake => 0});
   
   my $ssl_ctx = $socket->ssl_ctx;
   
@@ -565,7 +569,7 @@ Server:
   
   my $host = "www.google.com";
   my $port = 443;
-  my $socket = IO::Socket::SSL->new({Listen => 1, SSL_startHandshake => 0});
+  my $socket = IO::Socket::SSL->new({Context => Go->bg, Listen => 1, SSL_startHandshake => 0});
   
   my $ssl_ctx = $socket->ssl_ctx;
   
@@ -631,4 +635,3 @@ Yuki Kimoto C<kimoto.yuki@gmail.com>
 Copyright (c) 2024 Yuki Kimoto
 
 MIT License
-

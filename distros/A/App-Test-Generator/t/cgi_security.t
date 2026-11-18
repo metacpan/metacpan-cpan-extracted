@@ -48,6 +48,14 @@ sub _resolve_report_path {
 	my $relative_path = File::Spec->catfile($dir, $file . '.html');
 	my $out_dir = dirname($relative_path);
 
+	my $walk = $dir;
+	for my $part (File::Spec->splitdir(dirname($file))) {
+		next if($part eq '' || $part eq File::Spec->curdir);
+		$walk = File::Spec->catdir($walk, $part);
+		die "Refusing to write report outside $dir: $relative_path\n" if -l $walk;
+	}
+	die "Refusing to write report outside $dir: $relative_path\n" if -l $relative_path;
+
 	make_path($out_dir) unless -d $out_dir;
 
 	my $resolved_dir = abs_path($dir) // $dir;
@@ -197,7 +205,8 @@ subtest 'PT-02: _resolve_report_path rejects CRLF in path' => sub {
 
 subtest 'PT-03: _resolve_report_path catches symlink escape (abs_path guard)' => sub {
 	# A symlink inside the report directory that points outside it should
-	# be caught by the abs_path-based containment check.
+	# be caught.  abs_path does not follow links on Win32, so the guard also
+	# refuses any linked component with -l.
 	my $container = tempdir(CLEANUP => 1);
 	my $report_dir = File::Spec->catdir($container, 'rpt');
 	mkdir $report_dir;
@@ -205,14 +214,17 @@ subtest 'PT-03: _resolve_report_path catches symlink escape (abs_path guard)' =>
 	# Create a symlink inside the report dir that points to the parent
 	my $target_dir = tempdir(CLEANUP => 1);
 	my $link_name  = File::Spec->catdir($report_dir, 'evil_link');
-	symlink $target_dir, $link_name or skip('symlink not supported on this platform', 1);
+	SKIP: {
+		skip('symlink not supported on this platform', 1)
+			unless(eval { symlink($target_dir, $link_name) });
 
-	# Build a path that traverses through the symlink
-	throws_ok(
-		sub { _resolve_report_path($report_dir, 'evil_link/escaped_file.pm') },
-		qr/Refusing to write report outside/,
-		'abs_path guard catches symlink-based escape from report directory'
-	);
+		# Build a path that traverses through the symlink
+		throws_ok(
+			sub { _resolve_report_path($report_dir, 'evil_link/escaped_file.pm') },
+			qr/Refusing to write report outside/,
+			'symlink guard catches an escape from the report directory'
+		);
+	}
 };
 
 # ==================================================================
@@ -260,15 +272,18 @@ subtest 'SH-02: reporter field with shell backtick injection stays in comment li
 		$dir,
 	);
 	my $path = File::Spec->catfile($dir, 'reproduce', "reproduce-$guid.sh");
-	open my $fh, '<', $path or skip("script not written (open failed)", 1);
-	my $content = do { local $/; <$fh> };
-	close $fh;
+	SKIP: {
+		skip("script not written", 1) unless(-f $path);
+		open my $fh, '<', $path or die "$path: $!";
+		my $content = do { local $/; <$fh> };
+		close $fh;
 
-	# Reporter line must be a comment — the backtick must not appear on
-	# an uncommented executable line.
-	my @exec_lines = grep { /\Q$SHELL_BACKTICK\E/ && !/^#/ } split /\n/, $content;
-	is(scalar @exec_lines, 0,
-		'backtick in reporter name does not appear on an executable shell line');
+		# Reporter line must be a comment; the backtick must not appear on
+		# an uncommented executable line.
+		my @exec_lines = grep { /\Q$SHELL_BACKTICK\E/ && !/^#/ } split /\n/, $content;
+		is(scalar @exec_lines, 0,
+			'backtick in reporter name does not appear on an executable shell line');
+	}
 };
 
 subtest 'SH-03: reporter field with $() injection stays in comment line' => sub {
@@ -282,13 +297,16 @@ subtest 'SH-03: reporter field with $() injection stays in comment line' => sub 
 		$dir,
 	);
 	my $path = File::Spec->catfile($dir, 'reproduce', "reproduce-$guid.sh");
-	open my $fh, '<', $path or skip("script not written (open failed)", 1);
-	my $content = do { local $/; <$fh> };
-	close $fh;
+	SKIP: {
+		skip("script not written", 1) unless(-f $path);
+		open my $fh, '<', $path or die "$path: $!";
+		my $content = do { local $/; <$fh> };
+		close $fh;
 
-	my @exec_lines = grep { /\Q$SHELL_DOLLAR_SUB\E/ && !/^#/ } split /\n/, $content;
-	is(scalar @exec_lines, 0,
-		'$() in reporter name does not appear on an executable shell line');
+		my @exec_lines = grep { /\Q$SHELL_DOLLAR_SUB\E/ && !/^#/ } split /\n/, $content;
+		is(scalar @exec_lines, 0,
+			'$() in reporter name does not appear on an executable shell line');
+	}
 };
 
 subtest 'SH-04: module version in cpanm line contains no shell metacharacters' => sub {

@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 # ABSTRACT: Map::Tube::Nuremberg - interface to the Nuremberg U-Bahn map
 
@@ -31,7 +31,7 @@ Map::Tube::Nuremberg - Map::Tube::Nuremberg - interface to the Nuremberg U-Bahn 
 
 =head1 VERSION
 
-version 0.08
+version 0.09
 
 =head1 DESCRIPTION
 

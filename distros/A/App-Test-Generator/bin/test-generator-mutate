@@ -563,7 +563,7 @@ if(system('prove', '-Mblib', '-l', '-r', $opt{tests}) != 0) {
 # via environment variable so it knows which files to instrument
 # during the mutation runs below.
 if(@files) {
-	$ENV{LCSAJ_TARGETS} = join(':', map { abs_path($_) } @files);
+	$ENV{LCSAJ_TARGETS} = join($Config{path_sep}, map { abs_path($_) } @files);
 } else {
 	# No files to mutate -- preserve existing LCSAJ hit data
 	delete $ENV{LCSAJ_TARGETS};

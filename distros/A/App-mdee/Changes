@@ -1,5 +1,19 @@
 Revision history for Perl extension App-mdee
 
+1.21 2026-11-18T09:43:38Z
+
+    - The code in a fenced code block is shown in the colors of its
+      language, by Text::ANSI::Highlight: pandoc by default, and
+      --config highlight=gnu (source-highlight), highlight=sky
+      (skylighting) or highlight=0 to turn it off.  A style of the
+      highlighter can be given after a colon (highlight=pandoc:haddock).
+      The code is shown as it was when the command of the highlighter
+      is not installed
+    - The background of code blocks is L24 on a light background, one
+      step lighter than before
+    - Passes --no-highlight to nup: the text is colored by mdee
+    - Requires Text::ANSI::Highlight 0.03
+
 1.20 2026-11-17T07:47:33Z
 
     - --no-pager works with Getopt::Long::Bash 1.2.0, which unsets the

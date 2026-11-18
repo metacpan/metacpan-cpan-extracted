@@ -1,6 +1,6 @@
 package Pod::Weaver::Section::Author::GETTY::Legal;
 # ABSTRACT: Copyright and license section with a link to the author's site
-our $VERSION = '0.327';
+our $VERSION = '0.328';
 use Moose;
 extends 'Pod::Weaver::Section::Legal';
 
@@ -48,7 +48,7 @@ Pod::Weaver::Section::Author::GETTY::Legal - Copyright and license section with 
 
 =head1 VERSION
 
-version 0.327
+version 0.328
 
 =head1 SYNOPSIS
 
@@ -89,11 +89,9 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-L<https://raudssus.de/>
 
 =cut

@@ -4,14 +4,14 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Changes — App::Test::Generator</title>
-<meta name="description" content="Release history for App::Test::Generator 0.49: mutation survivors fed back into harness generation, documented constraints checked against behaviour, element schemas, deterministic regex generation, and the side-effect checks from 0.48.">
+<meta name="description" content="Release history for App::Test::Generator 0.50: files with a helper package extracted, constructors that need live objects skipped, required flags in Input specs honoured, and from 0.49 mutation survivors fed back into harness generation, documented constraints checked against behaviour, element schemas, deterministic regex generation.">
 <link rel="canonical" href="changelog.html">
 <meta name="theme-color" content="#fbfaf7" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#12161b" media="(prefers-color-scheme: dark)">
 <meta property="og:type" content="article">
 <meta property="og:site_name" content="App::Test::Generator">
 <meta property="og:title" content="Changes — App::Test::Generator">
-<meta property="og:description" content="What changed in 0.49 and 0.48, and where to find the rest.">
+<meta property="og:description" content="What changed in 0.50 and 0.49, and where to find the rest.">
 <meta name="twitter:card" content="summary">
 <link rel="stylesheet" href="../css/site.css">
 </head>
@@ -46,6 +46,32 @@
 		The two most recent releases in full, then the version history. The
 		distribution's <code>Changes</code> file is the authoritative record.
 	</p>
+
+	<h2 id="v0-50">0.50 — 17 November 2026</h2>
+
+	<h3>Enhancements</h3>
+	<ul>
+		<li><strong>Files with a helper package are extracted.</strong>
+		<code>extract-schemas</code> used to die on a file that declares a second
+		package, such as a small error class. It now analyses the first package,
+		ignores routines owned by later ones, and marks every schema from the file
+		<code>skip</code> so harnesses are not run against it, printing a note
+		that says so.</li>
+	</ul>
+
+	<h3>Bug fixes</h3>
+	<ul>
+		<li><strong>Constructors that need live objects are skipped.</strong> A
+		constructor that rejects an empty arrayref, or calls methods on its
+		elements, cannot be given a YAML fixture. Its schema now carries a
+		<code>skip</code> reason and its instance methods get
+		<code>new: ~</code>.</li>
+		<li><strong><code>required =&gt; 1</code> is honoured</strong> in a
+		formal Input spec, including a bare list with no outer braces, so POD
+		stays authoritative over a validator that calls the same parameter
+		optional. An explicit <code>optional</code> wins, and a flag inside a
+		nested <code>properties</code> map applies only to that property.</li>
+	</ul>
 
 	<h2 id="v0-49">0.49 — November 2026</h2>
 
@@ -126,57 +152,6 @@
 		1, which is what it has always returned.</li>
 	</ul>
 
-	<h2 id="v0-48">0.48 — 11 November 2026</h2>
-
-	<h3>Enhancements</h3>
-	<ul>
-		<li><strong>Harnesses check what a call leaves behind.</strong> Every call
-		is checked for changes to the caller's globals (<code>$_</code>,
-		<code>$/</code>, <code>$,</code> and <code>$;</code>), for files left in
-		the working directory and for leaked file descriptors. The last two have
-		config keys, <code>check_files</code> and <code>check_fds</code>, for
-		routines whose job is to write a file or hand a handle back.</li>
-		<li><strong>Accessors are tested for damage to their object.</strong> A
-		getter must not change the object it was given, and a getset must change
-		nothing but its own property. Memoised values and lazy initialisation are
-		not reported. The config key is <code>check_accessors</code>.</li>
-		<li><strong>Unbuildable classes are skipped, not failed.</strong> When a
-		constructor refuses — an abstract base class, for example —
-		<code>extract-schemas</code> marks the class so that its routines are
-		skipped.</li>
-		<li><strong>A <code>directory</code> semantic.</strong> A parameter the
-		routine tests with <code>-d</code> is given a real temporary directory
-		instead of an invented string.</li>
-	</ul>
-
-	<h3>Bug fixes</h3>
-	<ul>
-		<li><strong>Coverage-guided fuzzing now gets coverage.</strong> The fuzzer
-		was reading the names of the coverage criteria rather than the counters,
-		so every run was random-only. The program must be started under
-		Devel::Cover. Dies on hashref inputs with <code>properties</code> are now
-		recorded as bugs, and corpus files are UTF-8.</li>
-		<li><strong>BenchmarkGenerator</strong> quotes and escapes every name and
-		constructor value, so the generated script always compiles, and no longer
-		dies on <code>input: undef</code>.</li>
-		<li><strong>Extraction</strong> recognises accessors that guard on
-		<code>defined($arg)</code>, no longer takes a getter driven by
-		<code>%ENV</code> for a getset, types a wrapping setter as
-		<code>any</code>, gives a wrapper that forwards <code>@_</code> the
-		target's input schema, emits <code>matches</code> patterns as Regexp
-		objects, and no longer types a return built from <code>$1</code> as an
-		integer.</li>
-		<li><strong>Harnesses</strong> now pass scalar inputs to positional
-		routines, compare numeric getset round trips with <code>==</code>, and
-		only assert that a wrong-typed argument dies when the routine's own
-		validator enforces the type.</li>
-		<li><strong><code>deploy-workflows</code></strong> ships the current
-		workflow files again; the embedded copies had fallen behind.</li>
-		<li><strong>Prerequisites.</strong> The modules a generated harness loads
-		(Test::Most, Test::Returns, Test::LectroTest) are now runtime
-		prerequisites.</li>
-	</ul>
-
 	<h2 id="earlier">Earlier releases</h2>
 	<div class="table-wrap">
 		<table>
@@ -184,6 +159,7 @@
 				<tr><th>Version</th><th>Date</th><th>Highlights</th></tr>
 			</thead>
 			<tbody>
+				<tr><td>0.48</td><td>11 November 2026</td><td>Harnesses check what a call leaves behind (globals, files, file descriptors) and whether accessors damage their object; unbuildable classes are skipped; coverage-guided fuzzing reads real coverage counters.</td></tr>
 				<tr><td>0.47</td><td>7 October 2026</td><td><code>extract-schemas --function NAME</code> for isolating one routine, a self-fuzz summary that lists every routine and why it was skipped, and <code>$pkg</code>, <code>$proto</code> and <code>$klass</code> recognised as invocants.</td></tr>
 				<tr><td>0.46</td><td>18 August 2026</td><td>Duplication drill-down pages, sortable and reorderable dashboard tables with saved state, and the domain, path, data-flow and transaction test suites.</td></tr>
 				<tr><td>0.45</td><td>10 August 2026</td><td>Bug fixes and test-suite work.</td></tr>
@@ -208,7 +184,7 @@
 <pre><code>cpanm App::Test::Generator
 </code></pre>
 	<p>
-		Schemas are compatible across releases: a schema that works with 0.49 has
+		Schemas are compatible across releases: a schema that works with 0.50 has
 		worked since the transform syntax settled. Generated harnesses are
 		regenerated by tooling, so a stale one is replaced rather than migrated.
 		If you keep generated <code>.t</code> files in version control, regenerate
@@ -225,7 +201,7 @@
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.50 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

@@ -1,0 +1,497 @@
+[
+  {
+    "name": "utf16: length counts code units",
+    "template": "{{ s.length }}|{{ s['length'] }}",
+    "context": {
+      "s": "héllo😀"
+    },
+    "expected": {
+      "ok": true,
+      "output": "7|7"
+    }
+  },
+  {
+    "name": "utf16: index access before and past an astral character",
+    "template": "{{ s[1] }}|{{ s[4] }}|{{ s[7] }}|{{ e[2] }}{{ e[3] }}|{{ e[4] }}|",
+    "context": {
+      "s": "héllo😀",
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "é|o||ab||"
+    }
+  },
+  {
+    "name": "utf16: index access inside a surrogate pair yields one code unit",
+    "template": "{{ e[0].length }}|{{ e[1].length }}|{{ e[1] == e.charAt(1) }}|{{ e[1] == 'a' }}|{{ e[0] == '😀' }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "1|1|true|false|false"
+    }
+  },
+  {
+    "name": "utf16: charAt in code units and its argument coercion",
+    "template": "{{ e.charAt(2) }}|{{ e.charAt(0).length }}|{{ e.charAt(4) }}|{{ e.charAt(-1) }}|{{ e.charAt().length }}|{{ e.charAt('3') }}|{{ t.charAt(3.9) }}|{{ t.charAt('x') }}|{{ t.charAt(n) }}|{{ t.charAt(true).length }}|{{ t.charAt(1/0) }}",
+    "context": {
+      "e": "😀ab",
+      "t": "a😀b😀c",
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "a|1|||1|b|b|a|a|1|"
+    }
+  },
+  {
+    "name": "utf16: slice through and around a surrogate pair",
+    "template": "{{ t.slice(1, 3) }}|{{ t.slice(-3) }}|{{ t.slice(2).length }}|{{ t.slice(0, 2).length }}|{{ t.slice(3, 1) }}|{{ t.slice(-100, 1) }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀c|5|2||a"
+    }
+  },
+  {
+    "name": "utf16: slice argument coercion",
+    "template": "{{ t.slice(1.7, 3.2) }}|{{ t.slice('1', '3') }}|{{ t.slice(n, 3) }}|{{ t.slice(true, 3) }}|{{ t.slice(0, 1/0) }}|{{ t.slice(-1/0, 1) }}|{{ t.slice(0, 'x') }}|{{ t.slice(1, u) }}",
+    "context": {
+      "t": "a😀b😀c",
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀|a😀|😀|a😀b😀c|a||😀b😀c"
+    }
+  },
+  {
+    "name": "utf16: substring swaps and clamps in code units",
+    "template": "{{ t.substring(3, 1) }}|{{ t.substring(4) }}|{{ t.substring(0, 2).length }}|{{ t.substring(-5, 100) }}|{{ t.substring(1.7, 3.2) }}|{{ t.substring('x', 3) }}|{{ t.substring(n, 3) }}|{{ t.substring(5, -1/0).length }}|{{ t.substring(1, u) }}",
+    "context": {
+      "t": "a😀b😀c",
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀c|2|a😀b😀c|😀|a😀|a😀|5|😀b😀c"
+    }
+  },
+  {
+    "name": "utf16: substr start and length in code units",
+    "template": "{{ t.substr(1, 2) }}|{{ t.substr(-3, 2) }}|[{{ 'abc'.substr(0, -1) }}]|{{ t.substr(2).length }}|{{ 'abc'.substr(1) }}|{{ 'abc'.substr(-5, 2) }}|{{ 'abc'.substr(1, 100) }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀|[]|5|bc|ab|bc"
+    }
+  },
+  {
+    "name": "utf16: substr argument coercion",
+    "template": "{{ t.substr(1.9, 2.9) }}|{{ t.substr(-1/0, 2).length }}|{{ t.substr(1, 1/0) }}|[{{ t.substr(1, 'x') }}]|[{{ t.substr(1, n) }}]|{{ t.substr(1, u) }}|{{ t.substr('x') }}",
+    "context": {
+      "t": "a😀b😀c",
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|2|😀b😀c|[]|[]|😀b😀c|a😀b😀c"
+    }
+  },
+  {
+    "name": "utf16: indexOf after an astral character",
+    "template": "{{ t.indexOf('b') }}|{{ t.indexOf('😀', 2) }}|{{ t.indexOf('c') }}|{{ t.indexOf('z') }}|{{ t.indexOf('') }}|{{ t.indexOf('', 99) }}|{{ t.indexOf('😀', -5) }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "3|4|6|-1|0|7|1"
+    }
+  },
+  {
+    "name": "utf16: indexOf argument coercion",
+    "template": "{{ t.indexOf('b', 3.9) }}|{{ t.indexOf('b', 'x') }}|{{ t.indexOf('b', 1/0) }}|{{ t.indexOf(n) }}|{{ t.indexOf() }}|{{ 'undefined'.indexOf() }}|{{ 'a1b'.indexOf(1) }}|{{ 'xtrue'.indexOf(true) }}",
+    "context": {
+      "t": "a😀b😀c",
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "3|3|-1|-1|-1|0|1|1"
+    }
+  },
+  {
+    "name": "utf16: lastIndexOf with fromIndex",
+    "template": "{{ t.lastIndexOf('😀') }}|{{ t.lastIndexOf('😀', 3) }}|{{ t.lastIndexOf('a', -1) }}|{{ t.lastIndexOf('') }}|{{ t.lastIndexOf('c', 0) }}|{{ t.lastIndexOf('b', 'x') }}|{{ t.lastIndexOf('😀', 4.5) }}|{{ t.lastIndexOf('😀', -1/0) }}|{{ t.lastIndexOf('a', n) }}|{{ t.lastIndexOf('c', u) }}|{{ 'abab'.lastIndexOf('ab', 1) }}|{{ 'abab'.lastIndexOf('', 2) }}",
+    "context": {
+      "t": "a😀b😀c",
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "4|1|0|7|-1|3|4|-1|0|6|0|2"
+    }
+  },
+  {
+    "name": "utf16: split on separators and into code units",
+    "template": "{{ t.split('').length }}|{{ t.split('b') }}|{{ t.split('😀') }}|{{ t.split('', 3).length }}|{{ t.split('')[1].length }}|{{ t.split('😀', 2) }}|{{ t.split() }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "7|a😀,😀c|a,b,c|3|1|a,b|a😀b😀c"
+    }
+  },
+  {
+    "name": "utf16: split limit and separator coercion",
+    "template": "{{ 'a,b,c'.split(',', -1).length }}|{{ 'a,b,c'.split(',', 0).length }}|{{ 'a,b,c'.split(',', 1.9) }}|{{ 'a,b,c'.split(',', 'x').length }}|{{ 'anullb'.split(n) }}|{{ 'a,b'.split(',', n).length }}|{{ 'a,b'.split(',', u).length }}|{{ 'a1b'.split(1) }}|{{ ',a,'.split(',').length }}|{{ 'abc'.split('', 1/0).length }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "3|0|a|0|a,b|0|2|a,b|3|0"
+    }
+  },
+  {
+    "name": "utf16: slice and substr with negative fractional bounds, split limit modulo 2^32",
+    "template": "{{ t.slice(0, -1) }}|{{ t.slice(-2, -1).length }}|{{ t.slice(-1.5) }}|{{ t.substr(-1.5, 1) }}|{{ t.slice(-3.5, -1.5) }}|{{ 'a,b,c'.split(',', 4294967297).length }}|{{ 'a,b,c'.split(',', 4294967296).length }}|{{ 'a,b,c'.split(',', -4294967295).length }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "a😀b😀|1|c|c|😀|1|0|1"
+    }
+  },
+  {
+    "name": "string-split-empty",
+    "template": "{{ ''.split('').length }}|{{ ''.split(',').length }}|[{{ ''.split(',')[0] }}]|{{ ''.split().length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|1|[]|1"
+    }
+  },
+  {
+    "name": "utf16: split('') pieces are lone surrogates that indexOf finds again",
+    "template": "{% set p = t.split('') %}{{ p.length }}|{{ p[1].length }}|{{ p[1] in t }}|{{ t.indexOf(p[2]) }}|{{ t.lastIndexOf(p[1]) }}|{{ t.split(p[1]).length }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "7|1|true|2|4|3"
+    }
+  },
+  {
+    "name": "utf16: a sliced lone surrogate searched for and split on",
+    "template": "{% set lo = t.slice(2, 3) %}{{ lo.length }}|{{ t.indexOf(lo) }}|{{ t.lastIndexOf(lo) }}|{{ t.split(lo).length }}|{{ t.split(lo)[1].length }}",
+    "context": {
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "1|2|5|3|2"
+    }
+  },
+  {
+    "name": "utf16: string comparison orders code units, not code points",
+    "template": "{{ fw < em }}|{{ em < fw }}|{{ fw > em }}|{{ fw <= em }}|{{ em >= fw }}|{{ 'a' < 'b' }}|{{ '😀' < '😁' }}|{{ x < em }}|{{ em < x }}|{{ r < em }}",
+    "context": {
+      "fw": "！",
+      "em": "😀",
+      "x": "퟿",
+      "r": "�"
+    },
+    "expected": {
+      "ok": true,
+      "output": "false|true|true|false|false|true|true|true|false|false"
+    }
+  },
+  {
+    "name": "utf16: replace around astral characters",
+    "template": "{{ s.replace('😀', '!') }}|{{ t.replace('b', '-') }}|{{ t.replace('😀', '') }}",
+    "context": {
+      "s": "héllo😀",
+      "t": "a😀b😀c"
+    },
+    "expected": {
+      "ok": true,
+      "output": "héllo!|a😀-😀c|ab😀c"
+    }
+  },
+  {
+    "name": "utf16: SafeString from a macro measures and slices in code units",
+    "template": "{% macro m() %}héllo😀{% endmacro %}{{ m().length }}|{{ m().slice(5, 7) }}|{{ m().charAt(1) }}|{{ m().indexOf('😀') }}",
+    "expected": {
+      "ok": true,
+      "output": "7|😀|é|5"
+    }
+  },
+  {
+    "name": "utf16: SafeString from the safe filter measures in code units",
+    "template": "{{ ('héllo😀'|safe).length }}",
+    "expected": {
+      "ok": true,
+      "output": "7"
+    }
+  },
+  {
+    "name": "utf16: the length filter reads a SafeString length in code units",
+    "template": "{% macro m() %}héllo😀{% endmacro %}{{ m()|length }}",
+    "expected": {
+      "ok": true,
+      "output": "7"
+    }
+  },
+  {
+    "name": "utf16: in operator finds a lone surrogate",
+    "template": "{{ e[0] in e }}|{{ e[1] in e }}|{{ '😀' in e }}|{{ e[1] in 'ab' }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "true|true|true|false"
+    }
+  },
+  {
+    "name": "utf16: for loop over a string walks its code units",
+    "template": "{% for c in e %}{{ loop.index }}/{{ loop.length }}:{{ c.length }};{% endfor %}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "1/4:1;2/4:1;3/4:1;4/4:1;"
+    }
+  },
+  {
+    "name": "utf16: Array sort orders by code units",
+    "template": "{{ a.sort() }}|{{ b.sort() }}",
+    "context": {
+      "a": [
+        "😀",
+        "！",
+        "a"
+      ],
+      "b": [
+        "！",
+        "😀",
+        "ﬁ",
+        "퟿"
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "a,😀,！|퟿,😀,ﬁ,！"
+    }
+  },
+  {
+    "name": "utf16: BMP characters are one code unit each",
+    "template": "{{ s.length }}|{{ s[0] }}|{{ s.slice(1) }}|{{ s.split('').length }}|{{ s.indexOf('ü') }}|{{ c.length }}|{{ c.split('').length }}",
+    "context": {
+      "s": "äöü€",
+      "c": "é"
+    },
+    "expected": {
+      "ok": true,
+      "output": "4|ä|öü€|4|2|2|2"
+    }
+  },
+  {
+    "name": "utf16: case mapping does not die on a lone surrogate",
+    "template": "{{ e[0].toUpperCase().length }}|{{ e[1].toLowerCase().length }}|{{ e.toUpperCase() }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "1|1|😀AB"
+    }
+  },
+  {
+    "name": "utf16: select over a string walks its code units",
+    "template": "{{ e|select|length }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "4"
+    }
+  },
+  {
+    "name": "utf16: reverse splits a surrogate pair and a second reverse rejoins it",
+    "template": "{{ (s|reverse).length }}|{{ (s|reverse)[0] }}|{{ s|reverse|reverse }}",
+    "context": {
+      "s": "a😀b"
+    },
+    "expected": {
+      "ok": true,
+      "output": "4|b|a😀b"
+    }
+  },
+  {
+    "name": "utf16: two lone surrogates output side by side form the pair",
+    "template": "{{ e[0] }}{{ e[1] }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀"
+    }
+  },
+  {
+    "name": "utf16: concatenating two lone surrogates forms the pair",
+    "template": "{{ e[0] ~ e[1] }}|{{ (e[0] ~ e[1]) == '😀' }}|{{ (e[0] + e[1]) == e.slice(0, 2) }}|{{ e[0].concat(e[1]) == '😀' }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|true|true|true"
+    }
+  },
+  {
+    "name": "utf16: joining split('') pieces restores the string",
+    "template": "{{ e.split('').join('') }}|{{ e.split('').join('') == e }}|{{ e.split('').join('').length }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀ab|true|4"
+    }
+  },
+  {
+    "name": "utf16: replace re-pairs at both of its joins",
+    "template": "{% set s = e[0] ~ 'X' ~ e[1] %}{{ s.length }}|{{ s.replace('X', '') == '😀' }}|{{ (e[0] ~ 'X').replace('X', e[1]) == '😀' }}|{{ ('X' ~ e[1]).replace('X', e[0]) == '😀' }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "3|true|true|true"
+    }
+  },
+  {
+    "name": "utf16: a re-paired pair is the same object key and in-operand",
+    "template": "{{ (e[0] ~ e[1]) in d }}|{{ d[e[0] ~ e[1]] }}|{{ d[e[0] + e[1]] }}|{{ d[e.split('').join('')] }}|{{ (e[0] ~ e[1]) in ['😀'] }}|{{ e.split('').join('') in 'x😀' }}",
+    "context": {
+      "e": "😀",
+      "d": {
+        "😀": "hit"
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "true|hit|hit|hit|true|true"
+    }
+  },
+  {
+    "name": "utf16: Array join re-pairs at element and separator boundaries",
+    "template": "{{ [e[0], 'x'].join(e[1]) }}|{{ [e[0], 'x'].join(e[1]).length }}|{{ [e[0], e[1]].join('') == '😀' }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀x|3|true"
+    }
+  },
+  {
+    "name": "utf16: output of each code unit in a for loop restores the string",
+    "template": "{% for c in e %}{{ c }}{% endfor %}|{% set s %}{% for c in e %}{{ c }}{% endfor %}{% endset %}{{ s == e }}|{{ s.length }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀ab|true|4"
+    }
+  },
+  {
+    "name": "utf16: a block output re-pairs with the buffer around it",
+    "template": "{{ e[0] }}{% block b %}{{ e[1] }}{% endblock %}|{% block c %}{{ e[0] }}{% endblock %}{{ e[1] }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀"
+    }
+  },
+  {
+    "name": "utf16: an included template output re-pairs with the buffer",
+    "render": "page.njk",
+    "templates": {
+      "page.njk": "{{ e[0] }}{% include 'lo.njk' %}",
+      "lo.njk": "{{ e[1] }}ab"
+    },
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀ab"
+    }
+  },
+  {
+    "name": "utf16: an extended block and super() re-pair with the parent buffer",
+    "render": "child.njk",
+    "templates": {
+      "base.njk": "{{ e[0] }}{% block b %}{% endblock %}|{% block c %}{{ e[0] }}{% endblock %}",
+      "child.njk": "{% extends 'base.njk' %}{% block b %}{{ e[1] }}{% endblock %}{% block c %}{{ super() }}{{ e[1] }}{% endblock %}"
+    },
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀"
+    }
+  },
+  {
+    "name": "utf16: caller() and a set block capture re-pair",
+    "template": "{% macro w() %}{{ caller() }}{% endmacro %}{{ e[0] }}{% call w() %}{{ e[1] }}{% endcall %}|{% set x %}{{ e[0] }}{% endset %}{{ x }}{{ e[1] }}|{{ (x ~ e[1]) == '😀' }}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀|😀|true"
+    }
+  },
+  {
+    "name": "utf16: asyncEach and asyncAll output re-pair",
+    "template": "{% asyncEach c in e.split('') %}{{ c }}{% endeach %}|{% asyncAll c in e.split('') %}{{ c }}{% endall %}|{{ e[0] }}{% asyncAll c in [e[1]] %}{{ c }}{% endall %}",
+    "context": {
+      "e": "😀ab"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀ab|😀ab|😀"
+    }
+  },
+  {
+    "name": "utf16: case mapping of astral letters",
+    "template": "{{ d.toUpperCase() }}|{{ d.toLowerCase() }}|{{ d.toUpperCase().length }}",
+    "context": {
+      "d": "𐐨𐐀"
+    },
+    "expected": {
+      "ok": true,
+      "output": "𐐀𐐀|𐐨𐐨|4"
+    }
+  }
+]

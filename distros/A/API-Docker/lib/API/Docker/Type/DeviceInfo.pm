@@ -1,6 +1,6 @@
 package API::Docker::Type::DeviceInfo;
 # ABSTRACT: A device that can be used by a container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::DeviceInfo - A device that can be used by a container
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -45,7 +45,7 @@ devices, this would be an FQDN like "vendor.com/gpu=0". Serialised as C<ID>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

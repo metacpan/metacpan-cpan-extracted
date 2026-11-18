@@ -1,6 +1,6 @@
 package API::Docker::Type::CreateImageInfo;
 # ABSTRACT: One event of the stream a C<POST /images/create> answers with
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ErrorDetail;
 use API::Docker::Type::ProgressDetail;
@@ -39,7 +39,7 @@ API::Docker::Type::CreateImageInfo - One event of the stream a C<POST /images/cr
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -105,7 +105,7 @@ would produce C<ProgressDetail>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

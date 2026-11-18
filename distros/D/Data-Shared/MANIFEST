@@ -80,6 +80,7 @@ t/32_retained.t
 t/33_host_boundary.t
 t/34_fork_families.t
 t/35_xs_dispatch.t
+t/lib/Backends.pm
 xt/bench_runs.t
 xt/cookbook.t
 xt/croak_prefix.t

@@ -3,7 +3,7 @@
 use strict;
 no warnings;
 use Test::More;
-BEGIN { plan tests => 745 };
+BEGIN { plan tests => 758 };
 
 use JSON::XS;
 
@@ -36,8 +36,27 @@ splitter +JSON::XS->new->allow_nonref (0), '  ["x\\"","\\u1000\\\\n\\nx",1,{"\\\
 splitter +JSON::XS->new->allow_nonref (0), '[ "x\\"","\\u1000\\\\n\\nx" , 1,{"\\\\ " :5 , "": " x"} ] ';
 splitter +JSON::XS->new                  , '"test"';
 splitter +JSON::XS->new                  , ' "5" ';
-splitter +JSON::XS->new                  , '-1e5';
+splitter +JSON::XS->new                  , '-1e5 ';
 splitter +JSON::XS->new                  , ' 0.00E+00 ';
+
+{
+   my $coder = JSON::XS->new;
+   ok (!defined $coder->incr_parse ("12"), "number needs lookahead");
+   ok (!defined $coder->incr_parse, "number still needs lookahead");
+   is (scalar $coder->incr_parse ("x "), 12, "number ends at non-number");
+   eval { scalar $coder->incr_parse }; like ($@, qr/malformed/, "invalid tail");
+}
+
+{
+   my $coder = JSON::XS->new;
+   my @data = $coder->incr_parse ("12 []13");
+   is (scalar @data, 2, "two complete prefixes");
+   is ($data[0], 12, "first prefix number");
+   is_deeply ($data[1], [], "second prefix array");
+   ok (!defined $coder->incr_parse, "final number waits");
+   is (scalar $coder->incr_parse ("x "), 13, "final number finishes");
+   eval { scalar $coder->incr_parse }; like ($@, qr/malformed/, "invalid final tail");
+}
 
 {
    my $text = '[5],{"":1} , [ 1,2, 3], {"3":null}';

@@ -1,6 +1,6 @@
 package API::Docker::Type::Plugin::Settings;
 # ABSTRACT: Settings that can be modified by users
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::PluginDevice;
 use API::Docker::Type::PluginMount;
@@ -33,7 +33,7 @@ API::Docker::Type::Plugin::Settings - Settings that can be modified by users
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ See L<API::Docker::Type::PluginDevice>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

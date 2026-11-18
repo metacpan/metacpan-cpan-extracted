@@ -1,6 +1,6 @@
 package API::Docker::Role::HTTP;
 # ABSTRACT: HTTP transport role for Docker Engine API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 use IO::Socket::UNIX;
 use IO::Socket::INET;
@@ -833,7 +833,23 @@ sub _request {
   # request, not per client: a socket is opened and closed for each one, so
   # this is the connection the option belongs to.
   $self->_apply_read_timeout($sock, $timeout);
-  print $sock $request;
+
+  # The request goes out with SIGPIPE ignored and every write checked
+  # (karr k114). A daemon that answers and closes before it has read the
+  # body -- dockerd does this for a rejected put_archive or build -- used to
+  # raise SIGPIPE on the next write and end the calling process with status
+  # 141, no exception. Now the failed write is only remembered: the response
+  # the daemon may already have sent is still read, so a 4xx reaches the
+  # caller as an Error::HTTP, and only when there is none is the write error
+  # the answer.
+  my $write_error;
+  # print rather than syswrite: it also serves the in-memory sinks the test
+  # transports use, and IO::Socket handles are autoflushed, so its result is
+  # the result of the write.
+  {
+    local $SIG{PIPE} = 'IGNORE';
+    $write_error = $!.'' unless print $sock $request;
+  }
 
   # Reading can croak, and now does so from further in than it used to: an
   # on_event stream raises Error::Stream at the event that reports the
@@ -848,6 +864,12 @@ sub _request {
   my $err = $@;
   close $sock;
   $self->_clear_socket;
+  if (!$ok && defined $write_error) {
+    # The daemon sent nothing usable and the write had failed: the write is
+    # the cause, and the endpoint belongs in the message.
+    croak 'Docker API request to '.$endpoint.' failed: could not send the '
+      .'request ('.$write_error.') and no response followed';
+  }
   die $err unless $ok;
 
   my ($status_code, $status_text, $headers, $body, $summary) = @$response;
@@ -1679,7 +1701,7 @@ API::Docker::Role::HTTP - HTTP transport role for Docker Engine API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1927,10 +1949,10 @@ daemon to hang up when it is done, and the readers wait for that -- so a
 daemon that has nothing more to send and does not hang up leaves the client
 blocked with no way out. That is not hypothetical: attaching to a container
 that has B<already exited> answers, delivers the buffered frames and then
-holds the connection open indefinitely on rootless Podman (karr k52), and
+holds the connection open indefinitely on rootless Podman, and
 C</containers/{id}/stats> opened on a running container does not end when that
 container exits on Docker -- it degrades into zero-filled readings and keeps
-going (karr k59).
+going.
 
 L</read_timeout> bounds that:
 
@@ -2519,7 +2541,7 @@ a 200 event stream
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

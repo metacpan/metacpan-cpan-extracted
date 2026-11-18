@@ -1,6 +1,6 @@
 package API::Docker::Type::SystemVersion;
 # ABSTRACT: Response of Engine API: GET "/version"
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::SystemVersion::Component;
 use API::Docker::Type::SystemVersion::Platform;
@@ -57,7 +57,7 @@ API::Docker::Type::SystemVersion - Response of Engine API: GET "/version"
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -129,7 +129,7 @@ The date and time that the daemon was compiled.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

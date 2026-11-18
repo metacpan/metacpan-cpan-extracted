@@ -10,6 +10,7 @@ use Capture::Tiny qw(capture);
 use File::Path    qw(make_path);
 use File::Spec;
 use File::Temp    qw(tempdir tempfile);
+use IPC::Open3 ();
 
 # Destructive, pathological, and boundary-condition tests for
 # App::Test::Generator and its sub-modules.
@@ -1233,26 +1234,20 @@ subtest '_compile_signature_isolated: pathological subprocess outputs are handle
 	# "malformed JSON string" (regression: the croak used to propagate through
 	# Test::Builder's subtest boundary and exit the process with code 255).
 	#
-	# Strategy: mock open3 in the consuming namespace so no real subprocess
-	# is spawned; waitpid($$, 0) on our own PID returns -1 harmlessly.
+	# Strategy: mock open3 in the consuming namespace so the payload is never
+	# run, but hand back the PID of a real child that exits at once, because
+	# the code under test waits for it.  Returning $$ is not portable: on
+	# Windows waitpid on a non-child opens that process and waits for it to
+	# exit, so waiting on our own PID hung the test until the job timed out.
+	my $exited_child = sub {
+		my $pid = IPC::Open3::open3(my $in, my $out, undef, $^X, q{-e}, q{1});
+		close $in;
+		return $pid;
+	};
 
 	my $make_extractor = sub {
 		bless { allow_signature_exec => 1, verbose => 0 },
 			'App::Test::Generator::SchemaExtractor';
-	};
-
-	my $mock_open3 = sub {
-		my ($stdout_content, $stderr_content) = @_;
-		open my $fake_rdr, '<', \$stdout_content or die;
-		open my $fake_err, '<', \$stderr_content or die;
-		no warnings 'redefine';
-		local *App::Test::Generator::SchemaExtractor::open3 = sub {
-			$_[0] = do { open my $fh, '>', \my $buf; $fh };
-			$_[1] = $fake_rdr;
-			$_[2] = $fake_err;
-			return $$;
-		};
-		return;
 	};
 
 	{
@@ -1264,7 +1259,7 @@ subtest '_compile_signature_isolated: pathological subprocess outputs are handle
 			$_[0] = do { open my $fh, '>', \my $buf; $fh };
 			$_[1] = $fake_rdr;
 			$_[2] = $fake_err;
-			return $$;
+			return $exited_child->();
 		};
 		my $result;
 		lives_ok { $result = $make_extractor->()->_compile_signature_isolated('f', '(positional => [])') }
@@ -1282,7 +1277,7 @@ subtest '_compile_signature_isolated: pathological subprocess outputs are handle
 			$_[0] = do { open my $fh, '>', \my $buf; $fh };
 			$_[1] = $fake_rdr;
 			$_[2] = $fake_err;
-			return $$;
+			return $exited_child->();
 		};
 		my $result;
 		lives_ok { $result = $make_extractor->()->_compile_signature_isolated('f', '(positional => [])') }
@@ -1300,7 +1295,7 @@ subtest '_compile_signature_isolated: pathological subprocess outputs are handle
 			$_[0] = do { open my $fh, '>', \my $buf; $fh };
 			$_[1] = $fake_rdr;
 			$_[2] = $fake_err;
-			return $$;
+			return $exited_child->();
 		};
 		my $result;
 		lives_ok { $result = $make_extractor->()->_compile_signature_isolated('f', '(positional => [])') }

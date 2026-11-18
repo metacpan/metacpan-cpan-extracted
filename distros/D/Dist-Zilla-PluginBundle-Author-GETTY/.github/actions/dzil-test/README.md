@@ -12,7 +12,9 @@ every distribution using `[@Author::GETTY]` shares one source of truth:
    pulls author-test deps like `Test::Pod` that `[PodSyntaxTests]` registers as
    `develop requires`. Without it you'd have to fake `Test::Pod` into the
    cpanfile's `on test` block — don't.
-4. `dzil <command>` (default `test`).
+4. `dzil <command>` (default `test`), with `DZIL_BINARY_SKIP=1` in its
+   environment: a dist that declares binaries skips the local `pp` build and
+   check on `dzil build` in CI (the binary workflow builds them).
 
 ## Use it (you already have a workflow)
 

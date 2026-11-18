@@ -1,6 +1,6 @@
 package API::Docker::Type::TLSInfo;
 # ABSTRACT: Information about the issuer of leaf TLS certificates and the trusted root CA certificate
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ API::Docker::Type::TLSInfo - Information about the issuer of leaf TLS certificat
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -50,7 +50,7 @@ The base64-url-safe-encoded raw public key bytes of the issuer.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

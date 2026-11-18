@@ -8,6 +8,7 @@ briefing:
     - getty-perl-moose
     - getty-perl-release-author-getty
     - perl-release-dist-ini
+    - perl-par-binary-release
     - kanban-issues-karr-ticket
 ---
 

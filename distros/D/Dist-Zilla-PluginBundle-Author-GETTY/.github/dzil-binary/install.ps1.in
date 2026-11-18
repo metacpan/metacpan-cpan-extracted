@@ -1,0 +1,93 @@
+# Installer for the binaries of @REPO@ @VERSION@ (release @TAG@).
+#   powershell -File install.ps1 [name ...]      default: all of @BINARIES@
+# With names, straight from the web:
+#   & ([scriptblock]::Create((irm https://github.com/@OWNER@/@REPO@/releases/latest/download/install.ps1))) <name> ...
+# Environment (prefix @ENV@_): VERSION, INSTALL_DIR, PLATFORM, BASE_URL
+
+# The whole body runs in its own scope, so `iex` leaves nothing behind in the caller's session.
+& {
+$ErrorActionPreference = 'Stop'
+$ProgressPreference = 'SilentlyContinue'
+# Windows PowerShell 5.1 does not offer TLS 1.2 by default.
+[Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+
+$Tag = '@TAG@'
+$Version = '@VERSION@'
+$Binaries = '@BINARIES@'.Split(' ')
+$Platforms = '@PLATFORMS@'.Split(' ')
+
+function Get-Setting($name) { [Environment]::GetEnvironmentVariable('@ENV@_' + $name) }
+
+$Base = Get-Setting 'BASE_URL'
+if (-not $Base) { $Base = 'https://github.com/@OWNER@/@REPO@/releases' }
+$Dir = Get-Setting 'INSTALL_DIR'
+if (-not $Dir) { $Dir = Join-Path $env:LOCALAPPDATA 'Programs\@DIST@' }
+$Pin = Get-Setting 'VERSION'
+if ($Pin) {
+  $Prefix = $Tag.Substring(0, $Tag.Length - $Version.Length)
+  $Tag = $Prefix + $Pin
+  $Version = $Pin
+}
+
+$Platform = Get-Setting 'PLATFORM'
+if (-not $Platform) { $Platform = 'windows-x86_64' }
+if ($Platforms -cnotcontains $Platform) {
+  throw "No build for platform $Platform. Built platforms: $($Platforms -join ' ')"
+}
+
+$Selected = $Binaries
+if ($args.Count -gt 0) {
+  $Selected = @()
+  foreach ($a in $args) {
+    if ($Binaries -cnotcontains $a) { throw "Unknown binary: $a. Available: $($Binaries -join ' ')" }
+    if ($Selected -cnotcontains $a) { $Selected += $a }
+  }
+}
+$Suffix = ''
+if ($Platform -ceq 'windows-x86_64') { $Suffix = '.exe' }
+
+New-Item -ItemType Directory -Force -Path $Dir | Out-Null
+$Url = "$Base/download/$Tag"
+$Work = Join-Path $Dir ('.install.' + [guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Force -Path $Work | Out-Null
+try {
+  $SumsFile = Join-Path $Work 'SHA256SUMS'
+  Invoke-WebRequest -UseBasicParsing -Uri "$Url/SHA256SUMS" -OutFile $SumsFile
+  $Sums = Get-Content $SumsFile
+
+  # Download and verify everything first; install only when all of it checks out.
+  foreach ($name in $Selected) {
+    $asset = "$name-$Version-$Platform$Suffix"
+    $tmp = Join-Path $Work $name
+    Invoke-WebRequest -UseBasicParsing -Uri "$Url/$asset" -OutFile $tmp
+    $line = $Sums | Where-Object { ($_ -split '\s+')[1] -ceq $asset } | Select-Object -First 1
+    if (-not $line) { throw "No checksum for $asset in SHA256SUMS" }
+    $want = ($line -split '\s+')[0].ToLower()
+    $got = (Get-FileHash -Algorithm SHA256 -Path $tmp).Hash.ToLower()
+    if ($got -ne $want) { throw "Checksum mismatch for $asset (expected $want, got $got)" }
+  }
+
+  $EmptyIn = Join-Path $Work 'stdin'
+  New-Item -ItemType File -Path $EmptyIn | Out-Null
+  foreach ($name in $Selected) {
+    $dest = Join-Path $Dir ($name + $Suffix)
+    Move-Item -Force -Path (Join-Path $Work $name) -Destination $dest
+    Write-Host "Installed $dest"
+    # The first start unpacks the PAR cache; do it now rather than on first use.
+    # Empty stdin, output discarded, exit status ignored.
+    try {
+      Start-Process -FilePath $dest -ArgumentList '--help' -NoNewWindow -Wait `
+        -RedirectStandardInput $EmptyIn `
+        -RedirectStandardOutput (Join-Path $Work 'out') `
+        -RedirectStandardError (Join-Path $Work 'err')
+    } catch { }
+  }
+}
+finally {
+  Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $Work
+}
+
+if (($env:PATH -split ';') -cnotcontains $Dir) {
+  Write-Host "$Dir is not in your PATH; add it to use the installed commands."
+}
+} @args

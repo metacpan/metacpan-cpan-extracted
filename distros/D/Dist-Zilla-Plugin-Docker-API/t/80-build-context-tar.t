@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -18,8 +19,17 @@ $exe->spew("#!/bin/sh\necho hi\n");
 chmod 0755, "$exe";
 $ctx->child('.dockerignore')->spew("x\n");
 $ctx->child('empty')->mkpath;
-symlink 'bin/entry.sh', $ctx->child('link.sh')->stringify or die "symlink: $!";
-symlink 'does/not/exist', $ctx->child('dangling')->stringify or die "symlink: $!";
+
+# Windows without the right to create symbolic links (the default there) and
+# file systems without them cannot make the symlinks: those checks are skipped.
+my $symlink_skip;
+if (symlink 'bin/entry.sh', $ctx->child('link.sh')->stringify) {
+    symlink 'does/not/exist', $ctx->child('dangling')->stringify
+        or $symlink_skip = "cannot create a symlink: $!";
+}
+else {
+    $symlink_skip = "cannot create a symlink: $!";
+}
 
 my $client = Dist::Zilla::Plugin::Docker::API::Client->new(
     logger       => sub {},
@@ -35,18 +45,25 @@ ok $entry{'Dockerfile'}, 'Dockerfile is in the context';
 ok $entry{'.dockerignore'}, 'top-level dotfile is kept';
 
 ok $entry{'bin/entry.sh'}, 'nested executable is in the context';
-is sprintf('%04o', $entry{'bin/entry.sh'}->mode & 07777), '0755',
-    'executable keeps its mode';
+SKIP: {
+    skip 'no execute bit in the mode on Windows', 1 if $^O eq 'MSWin32';
+    is sprintf('%04o', $entry{'bin/entry.sh'}->mode & 07777), '0755',
+        'executable keeps its mode';
+}
 ok !$entry{'bin/entry.sh'}->is_symlink, 'executable is a regular file';
 is $entry{'bin/entry.sh'}->get_content, "#!/bin/sh\necho hi\n", 'content intact';
 
-ok $entry{'link.sh'}, 'symlink is in the context';
-ok $entry{'link.sh'}->is_symlink, 'symlink is stored as a symlink entry';
-is $entry{'link.sh'}->linkname, 'bin/entry.sh', 'symlink keeps its target';
+SKIP: {
+    skip $symlink_skip, 6 if $symlink_skip;
 
-ok $entry{'dangling'}, 'dangling symlink is in the context';
-ok $entry{'dangling'}->is_symlink, 'dangling symlink is a symlink entry';
-is $entry{'dangling'}->linkname, 'does/not/exist', 'dangling symlink keeps its target';
+    ok $entry{'link.sh'}, 'symlink is in the context';
+    ok $entry{'link.sh'}->is_symlink, 'symlink is stored as a symlink entry';
+    is $entry{'link.sh'}->linkname, 'bin/entry.sh', 'symlink keeps its target';
+
+    ok $entry{'dangling'}, 'dangling symlink is in the context';
+    ok $entry{'dangling'}->is_symlink, 'dangling symlink is a symlink entry';
+    is $entry{'dangling'}->linkname, 'does/not/exist', 'dangling symlink keeps its target';
+}
 
 ok $entry{'empty'}, 'empty directory is in the context';
 ok $entry{'empty'}->is_dir, 'empty directory is a directory entry';

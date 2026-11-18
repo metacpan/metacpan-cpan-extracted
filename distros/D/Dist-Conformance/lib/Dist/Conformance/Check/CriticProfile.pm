@@ -1,4 +1,4 @@
-package Dist::Conformance::Check::CriticProfile 0.005;
+package Dist::Conformance::Check::CriticProfile 0.006;
 
 # ABSTRACT: The perlcritic profile enables or turns off every policy of its template, and no retired one
 
@@ -189,7 +189,7 @@ Dist::Conformance::Check::CriticProfile - The perlcritic profile enables or turn
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 DESCRIPTION
 

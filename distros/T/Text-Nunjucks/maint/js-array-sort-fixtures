@@ -1,0 +1,276 @@
+#!/usr/bin/env node
+// Record what V8's Array.prototype.sort does, comparator call by comparator
+// call, into t/data/js-array-sort.json, which t/10-lib.t replays against
+// Text::Nunjucks::Lib->js_array_sort (decision B on k17: the port is V8's
+// TimSort, pinned to the V8 of the oracle's Node).
+//
+//   maint/js-array-sort-fixtures            # writes t/data/js-array-sort.json
+//
+// It sorts with the node it runs under and refuses any V8 but the pinned one:
+// another V8 may sort differently, and the fixture would then pin the wrong
+// engine. Bumping PINNED_V8 is a porting decision, like the upstream tag.
+//
+// Cases (deterministic: a fixed-seed PRNG builds every input):
+//
+//   comparator cases -- elements are {id, key} objects (id = input index) or
+//     undefined; a named comparator (the same name is implemented in
+//     t/10-lib.t) looks at key, id or a per-sort PRNG. Recorded: every (x, y)
+//     pair V8 passes, as ids, in call order, and the ids of the sorted array
+//     (null for undefined). Consistent and inconsistent comparators, sizes
+//     around the minimum run length (64), with runs that make merge_lo /
+//     merge_hi gallop and with runs tailored to the branches random input
+//     misses (TAILORED). A long call sequence is stored as count + digest only,
+//     a long result as digest only (digest: h = (h * 31 + v + 1) mod 2^32 over
+//     the flat id sequence, -1 for undefined).
+//
+//   default cases -- no comparator, mixed-kind elements in the tagged form
+//     below; recorded: the sorted array, each element as a kind-tagged string.
+//
+// Element encoding in the JSON: plain JSON values, null is JS null, and
+// {"$": "undefined" | "NaN" | "Infinity" | "-Infinity" | "-0" | "object"} for
+// the values JSON cannot carry ("object" is an empty plain object).
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+
+const PINNED_V8 = '13.6.233.17';
+const FULL_CALLS_MAX = 150;   // longer call sequences: count + digest only
+const FULL_RESULT_MAX = 300;  // longer arrays: the sorted ids as a digest only
+
+const root = path.join(__dirname, '..');
+const outFile = path.join(root, 't', 'data', 'js-array-sort.json');
+
+if (!process.versions.v8.startsWith(PINNED_V8 + '-') && process.versions.v8 !== PINNED_V8) {
+  process.stderr.write('V8 is ' + process.versions.v8 + ', the fixtures pin ' + PINNED_V8 + '\n');
+  process.exit(1);
+}
+
+// mulberry32: the input generator's PRNG (inputs are stored, so Perl never
+// needs it).
+function prng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+const rand = prng(20261113);
+const randInt = (n) => Math.floor(rand() * n);
+
+// The comparators. Each takes the case's seed for the ones that keep state
+// across calls (MINSTD: s = s * 48271 mod 2^31 - 1, exact in doubles and in
+// Perl integers). t/10-lib.t implements every name with the same results.
+const COMPARATORS = {
+  // consistent
+  'numeric':           () => (a, b) => a.key - b.key,
+  'numeric-desc':      () => (a, b) => b.key - a.key,
+  'mod5':              () => (a, b) => (a.key % 5) - (b.key % 5),
+  'fraction':          () => (a, b) => (a.key - b.key) / 1024,
+  'neg-zero':          () => (a, b) => (a.key === b.key ? -0 : a.key - b.key),
+  'string-result':     () => (a, b) => String(a.key - b.key),
+  'whitespace-result': () => (a, b) => ' \n' + String(a.key - b.key) + '\t ',
+  'array-result':      () => (a, b) => [a.key - b.key],
+  'null-result':       () => (a, b) => (a.key < b.key ? -1 : (a.key > b.key ? 1 : null)),
+  // inconsistent: no order at all, or one that never says "less"
+  'undefined-result':  () => (a, b) => (a.key < b.key ? -1 : (a.key > b.key ? undefined : 0)),
+  'gt-boolean':        () => (a, b) => a.key > b.key,
+  'sign-flip':         () => (a, b) => (a.key < b.key ? -1 : 1),
+  'nan-result':        () => () => 'x',
+  'hash3':             () => (a, b) => ((a.id * 7919 + b.id * 104729 + 12345) % 3) - 1,
+  'minstd':            (seed) => { let s = seed; return () => { s = (s * 48271) % 2147483647; return (s % 3) - 1; }; },
+  'minstd-neg':        (seed) => { let s = seed; return () => { s = (s * 48271) % 2147483647; return s % 8 === 0 ? 1 : -1; }; },
+  'minstd-pos':        (seed) => { let s = seed; return () => { s = (s * 48271) % 2147483647; return s % 8 === 0 ? -1 : 1; }; },
+};
+
+// Key patterns over n elements.
+const PATTERNS = {
+  'random':          (n) => Array.from({length: n}, () => randInt(n)),
+  'few-unique':      (n) => Array.from({length: n}, () => randInt(4)),
+  'ascending':       (n) => Array.from({length: n}, (_, i) => i),
+  'descending':      (n) => Array.from({length: n}, (_, i) => n - i),
+  'descending-ties': (n) => Array.from({length: n}, (_, i) => Math.floor((n - i) / 2)),
+  'all-equal':       (n) => Array.from({length: n}, () => 7),
+  'ascending-swaps': (n) => {
+    const k = Array.from({length: n}, (_, i) => i);
+    for (let s = 0; n > 1 && s < Math.max(1, n >> 4); s++) {
+      const i = randInt(n), j = randInt(n);
+      [k[i], k[j]] = [k[j], k[i]];
+    }
+    return k;
+  },
+  'organ-pipe':      (n) => Array.from({length: n}, (_, i) => (i < n / 2 ? i : n - i)),
+  'sawtooth-80':     (n) => Array.from({length: n}, (_, i) => i % 80),
+  'runs-random':     (n) => {
+    const k = [];
+    while (k.length < n) {
+      const len = 1 + randInt(150), start = randInt(n), down = rand() < 0.3;
+      for (let j = 0; j < len && k.length < n; j++) k.push(down ? start - j : start + j);
+    }
+    return k;
+  },
+  // two ascending halves whose blocks of b alternate: merge_lo / merge_hi see
+  // one run win b times in a row, which drives them into galloping
+  'blocks-3':        (n) => blocks(n, 3),
+  'blocks-9':        (n) => blocks(n, 9),
+  'blocks-40':       (n) => blocks(n, 40),
+  // natural runs that walk the branches random input does not reach, each at
+  // the sizes of TAILORED below:
+  // a run of n - 1, then one element: the last CountAndMakeRun sees one
+  'last-run-one':    (n) => Array.from({length: n}, (_, i) => (i < n - 1 ? i + 1 : 0)),
+  // two runs whose gallops leave one element each: merge_lo returns after
+  // its first move
+  'merge-one-one':   (n) => {
+    const h = n >> 1;
+    const a = Array.from({length: h - 1}, (_, i) => i).concat([3 * n]);
+    const b = [2 * n].concat(Array.from({length: n - h - 1}, (_, i) => 3 * n + 1 + i));
+    return a.concat(b);
+  },
+  // runs of 120 : 80 : 25 : 20 : 30 : 60 (scaled to n, all above the minimum
+  // run length): after the fifth, merge_collapse finds run_length(n - 1) >
+  // run_length(n) + run_length(n + 1) but not run_length(n - 2) >
+  // run_length(n - 1) + run_length(n) -- the stack invariant the .tq checks one
+  // level deeper than the original TimSort; the sixth makes a missed merge
+  // change the merge order
+  'deep-invariant':  (n) => runsOf([120, 80, 25, 20, 30, 60].map((l) => l * n / 335)),
+};
+// Ascending runs of the given lengths, interleaved in value (run i holds
+// j * runs + i), so every run starts below the end of the one before it.
+function runsOf(lengths) {
+  const k = [];
+  lengths.forEach((len, i) => {
+    for (let j = 0; j < len; j++) k.push(j * lengths.length + i);
+  });
+  return k;
+}
+function blocks(n, b) {
+  const h = n >> 1;
+  const k = [];
+  for (let j = 0; j < h; j++) k.push(Math.floor(j / b) * 2 * b + (j % b));
+  for (let j = 0; j < n - h; j++) k.push(Math.floor(j / b) * 2 * b + b + (j % b));
+  return k;
+}
+
+// Sizes around the minimum run length (n < 64 is one binary insertion sort,
+// 64 and above are runs of 32..64 merged) and its powers of two.
+const SIZES = [0, 1, 2, 3, 5, 8, 16, 17, 32, 33, 63, 64, 65, 128, 129, 257, 2048];
+const SIZES_SMALL = [2, 3, 5, 9, 17, 33, 64, 65, 129];
+const SIZES_LARGE = [500];
+const TAILORED = {'last-run-one': [65, 129, 2048], 'merge-one-one': [80, 128], 'deep-invariant': [1340, 1675]};
+
+function digest(seq) {
+  let h = 0;
+  for (const v of seq) h = (h * 31 + v + 1) % 4294967296;
+  return h;
+}
+
+function comparatorCase(name, pattern, n, undefRate) {
+  const keys = PATTERNS[pattern](n);
+  if (keys.length !== n || !keys.every(Number.isInteger)) {
+    throw new Error(pattern + ' / ' + n + ': the keys must be ' + n + ' integers');
+  }
+  const input = keys.map((key, id) => (rand() < undefRate ? undefined : {id, key}));
+  const seed = 1 + randInt(2147483645);
+  const cmp = COMPARATORS[name](seed);
+  const calls = [];
+  const arr = input.slice();
+  arr.sort((a, b) => {
+    calls.push(a === undefined ? -1 : a.id, b === undefined ? -1 : b.id);
+    return cmp(a, b);
+  });
+  const c = {
+    name: name + ' / ' + pattern + ' / ' + n + (undefRate ? ' / undefined' : ''),
+    comparator: name,
+    seed,
+    input: input.map((e) => (e === undefined ? null : e.key)),
+    calls_count: calls.length / 2,
+    calls_digest: digest(calls),
+  };
+  if (calls.length / 2 <= FULL_CALLS_MAX) c.calls = calls;
+  const result = arr.map((e) => (e === undefined ? null : e.id));
+  if (n <= FULL_RESULT_MAX) c.result = result;
+  else c.result_digest = digest(result.map((id) => (id === null ? -1 : id)));
+  return c;
+}
+
+// Default comparator: mixed kinds.
+const POOL = [
+  0, 1, 2, 9, 10, 11, 100, -1, -2, -10, 1.5, 0.1, 1e21, 1e-7, 2 ** 53, NaN, Infinity, -Infinity, -0,
+  '', '0', '1', '10', '9', '01', '-1', 'a', 'A', 'b', 'B', 'ab', 'a b', 'null', 'undefined',
+  'true', 'false', 'NaN', 'Infinity', '[object Object]', 'é', 'e', 'É', '\u{1F600}', '\uFF01', '\uFFFF',
+  true, false, null, undefined,
+  [], [1], [1, 2], [10], [2, 1], [null], [undefined], ['a', 'b'], [[1], 2], {},
+];
+function encode(v) {
+  if (v === undefined) return {$: 'undefined'};
+  if (typeof v === 'number') {
+    if (Number.isNaN(v)) return {$: 'NaN'};
+    if (v === Infinity) return {$: 'Infinity'};
+    if (v === -Infinity) return {$: '-Infinity'};
+    if (Object.is(v, -0)) return {$: '-0'};
+    return v;
+  }
+  if (Array.isArray(v)) return v.map(encode);
+  if (v !== null && typeof v === 'object') return {$: 'object'};
+  return v;
+}
+function tag(v) {
+  if (v === undefined) return 'u';
+  if (v === null) return 'l';
+  if (typeof v === 'boolean') return 'b:' + v;
+  if (typeof v === 'number') return 'n:' + (Object.is(v, -0) ? '-0' : String(v));
+  if (typeof v === 'string') return 's:' + v;
+  if (Array.isArray(v)) return 'a[' + v.map(tag).join(',') + ']';
+  return 'o';
+}
+function defaultCase(name, input) {
+  const arr = input.slice();
+  arr.sort();
+  return {name: 'default / ' + name, input: input.map(encode), result: arr.map(tag)};
+}
+
+const cases = [];
+for (const n of SIZES) {
+  for (const pattern of Object.keys(PATTERNS).filter((p) => !(p in TAILORED))) {
+    cases.push(comparatorCase('numeric', pattern, n, 0));
+  }
+}
+for (const [pattern, sizes] of Object.entries(TAILORED)) {
+  for (const n of sizes) {
+    for (const name of ['numeric', 'numeric-desc', 'minstd']) {
+      cases.push(comparatorCase(name, pattern, n, 0));
+    }
+  }
+}
+const LARGE = ['numeric-desc', 'mod5', 'sign-flip', 'hash3', 'minstd', 'minstd-neg', 'minstd-pos'];
+for (const name of Object.keys(COMPARATORS).filter((c) => c !== 'numeric')) {
+  for (const n of SIZES_SMALL.concat(LARGE.includes(name) ? SIZES_LARGE : [])) {
+    for (const pattern of ['random', 'few-unique', 'descending', 'runs-random', 'blocks-9']) {
+      cases.push(comparatorCase(name, pattern, n, 0));
+    }
+  }
+}
+for (const name of ['numeric', 'sign-flip', 'minstd', 'nan-result']) {
+  for (const n of [2, 3, 10, 65, 257]) {
+    cases.push(comparatorCase(name, 'random', n, 0.25));
+  }
+}
+cases.push(comparatorCase('numeric', 'random', 6, 1));
+for (const n of [0, 1, 2, 3, 5, 10, 33, 64, 65, 200, 600]) {
+  for (let r = 0; r < 2; r++) {
+    cases.push(defaultCase(n + ' / ' + r, Array.from({length: n}, () => POOL[randInt(POOL.length)])));
+  }
+}
+cases.push(defaultCase('the whole pool', POOL));
+cases.push(defaultCase('the whole pool reversed', POOL.slice().reverse()));
+
+// One case per line, so a regeneration diffs case by case.
+const head = {generator: 'maint/js-array-sort-fixtures', node: process.version, v8: process.versions.v8};
+fs.mkdirSync(path.dirname(outFile), {recursive: true});
+fs.writeFileSync(outFile, JSON.stringify(head).replace(/}$/, ',"cases":[\n') +
+  cases.map((c) => JSON.stringify(c)).join(',\n') + '\n]}\n');
+process.stderr.write('wrote ' + path.relative(root, outFile) + ': ' + cases.length + ' cases, ' +
+  cases.reduce((s, c) => s + (c.calls_count || 0), 0) + ' comparator calls\n');

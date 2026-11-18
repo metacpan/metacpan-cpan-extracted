@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Value 2.168;
+package Config::Model::Value 2.169;
 
 use v5.20;
 
@@ -1841,6 +1841,13 @@ sub fetch_summary ($self, @args) {
     return $value;
 }
 
+sub fetch_gist ($self) {
+    my $value = $self->fetch(check => 'no') // '';
+    $value =~ s/\n/ /g;
+    $value = substr( $value, 0, 15 ) . '...' if length($value) > 15;
+    return $value;
+}
+
 sub fetch ($self, @args) {
     my %args = @args > 1 ? @args : ( mode => $args[0] );
     my $mode   = $args{mode}   || 'backend';
@@ -2027,7 +2034,7 @@ Config::Model::Value - Strongly typed configuration value
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -2938,6 +2945,13 @@ mandatory value leads to an exception.
 
 Returns a truncated value when the value is a string or uniline that
 is too long to be displayed.
+
+=head2 fetch_gist
+
+Returns the gist of the value, i.e. the value, truncated to 15 char.
+
+The gist value should be used in UI or in user messages, but should
+not be persisted.
 
 =head2 user_value
 

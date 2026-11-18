@@ -1,0 +1,345 @@
+[
+  {
+    "name": "deep recursion: 120 sequential includes",
+    "render": "page.njk",
+    "templates": {
+      "page.njk": "{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}{% include \"item.njk\" %}",
+      "item.njk": "i"
+    },
+    "expected": {
+      "ok": true,
+      "output": "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii"
+    }
+  },
+  {
+    "name": "deep recursion: a template that includes itself 120 deep",
+    "render": "self.njk",
+    "templates": {
+      "self.njk": "{% if n > 0 %}{% set n = n - 1 %}{% include \"self.njk\" %}{% endif %}."
+    },
+    "context": {
+      "n": 120
+    },
+    "expected": {
+      "ok": true,
+      "output": "........................................................................................................................."
+    }
+  },
+  {
+    "name": "deep recursion: 120 sequential imports",
+    "render": "page.njk",
+    "templates": {
+      "page.njk": "{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{% import \"lib.njk\" as lib %}{{ lib.m() }}",
+      "lib.njk": "{% macro m() %}m{% endmacro %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "m"
+    }
+  },
+  {
+    "name": "deep recursion: 120 sequential from-imports",
+    "render": "page.njk",
+    "templates": {
+      "page.njk": "{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{% from \"lib.njk\" import m %}{{ m() }}",
+      "lib.njk": "{% macro m() %}m{% endmacro %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "m"
+    }
+  },
+  {
+    "name": "deep recursion: asyncEach over 120 items",
+    "template": "{% asyncEach x in range(120) %}{{ x }},{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,"
+    }
+  },
+  {
+    "name": "deep recursion: asyncEach over 120 pairs",
+    "template": "{% set arr = [] %}{% for i in range(120) %}{% set _ = arr.push([i, \"b\"]) %}{% endfor %}{% asyncEach a, b in arr %}{{ a }}{{ b }},{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "0b,1b,2b,3b,4b,5b,6b,7b,8b,9b,10b,11b,12b,13b,14b,15b,16b,17b,18b,19b,20b,21b,22b,23b,24b,25b,26b,27b,28b,29b,30b,31b,32b,33b,34b,35b,36b,37b,38b,39b,40b,41b,42b,43b,44b,45b,46b,47b,48b,49b,50b,51b,52b,53b,54b,55b,56b,57b,58b,59b,60b,61b,62b,63b,64b,65b,66b,67b,68b,69b,70b,71b,72b,73b,74b,75b,76b,77b,78b,79b,80b,81b,82b,83b,84b,85b,86b,87b,88b,89b,90b,91b,92b,93b,94b,95b,96b,97b,98b,99b,100b,101b,102b,103b,104b,105b,106b,107b,108b,109b,110b,111b,112b,113b,114b,115b,116b,117b,118b,119b,"
+    }
+  },
+  {
+    "name": "deep recursion: asyncEach over 120 triples",
+    "template": "{% set arr = [] %}{% for i in range(120) %}{% set _ = arr.push([i, \"b\", \"c\"]) %}{% endfor %}{% asyncEach a, b, c in arr %}{{ a }}{{ b }}{{ c }},{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "0bc,1bc,2bc,3bc,4bc,5bc,6bc,7bc,8bc,9bc,10bc,11bc,12bc,13bc,14bc,15bc,16bc,17bc,18bc,19bc,20bc,21bc,22bc,23bc,24bc,25bc,26bc,27bc,28bc,29bc,30bc,31bc,32bc,33bc,34bc,35bc,36bc,37bc,38bc,39bc,40bc,41bc,42bc,43bc,44bc,45bc,46bc,47bc,48bc,49bc,50bc,51bc,52bc,53bc,54bc,55bc,56bc,57bc,58bc,59bc,60bc,61bc,62bc,63bc,64bc,65bc,66bc,67bc,68bc,69bc,70bc,71bc,72bc,73bc,74bc,75bc,76bc,77bc,78bc,79bc,80bc,81bc,82bc,83bc,84bc,85bc,86bc,87bc,88bc,89bc,90bc,91bc,92bc,93bc,94bc,95bc,96bc,97bc,98bc,99bc,100bc,101bc,102bc,103bc,104bc,105bc,106bc,107bc,108bc,109bc,110bc,111bc,112bc,113bc,114bc,115bc,116bc,117bc,118bc,119bc,"
+    }
+  },
+  {
+    "name": "deep recursion: asyncEach over 120 quadruples",
+    "template": "{% set arr = [] %}{% for i in range(120) %}{% set _ = arr.push([i, \"b\", \"c\", \"d\"]) %}{% endfor %}{% asyncEach a, b, c, d in arr %}{{ a }}{{ b }}{{ c }}{{ d }},{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "0bcd,1bcd,2bcd,3bcd,4bcd,5bcd,6bcd,7bcd,8bcd,9bcd,10bcd,11bcd,12bcd,13bcd,14bcd,15bcd,16bcd,17bcd,18bcd,19bcd,20bcd,21bcd,22bcd,23bcd,24bcd,25bcd,26bcd,27bcd,28bcd,29bcd,30bcd,31bcd,32bcd,33bcd,34bcd,35bcd,36bcd,37bcd,38bcd,39bcd,40bcd,41bcd,42bcd,43bcd,44bcd,45bcd,46bcd,47bcd,48bcd,49bcd,50bcd,51bcd,52bcd,53bcd,54bcd,55bcd,56bcd,57bcd,58bcd,59bcd,60bcd,61bcd,62bcd,63bcd,64bcd,65bcd,66bcd,67bcd,68bcd,69bcd,70bcd,71bcd,72bcd,73bcd,74bcd,75bcd,76bcd,77bcd,78bcd,79bcd,80bcd,81bcd,82bcd,83bcd,84bcd,85bcd,86bcd,87bcd,88bcd,89bcd,90bcd,91bcd,92bcd,93bcd,94bcd,95bcd,96bcd,97bcd,98bcd,99bcd,100bcd,101bcd,102bcd,103bcd,104bcd,105bcd,106bcd,107bcd,108bcd,109bcd,110bcd,111bcd,112bcd,113bcd,114bcd,115bcd,116bcd,117bcd,118bcd,119bcd,"
+    }
+  },
+  {
+    "name": "deep recursion: asyncEach over an object of 120 keys",
+    "template": "{% asyncEach k, v in obj %}{{ k }}={{ v }},{% endeach %}",
+    "context": {
+      "obj": {
+        "k001": 1,
+        "k002": 2,
+        "k003": 3,
+        "k004": 4,
+        "k005": 5,
+        "k006": 6,
+        "k007": 7,
+        "k008": 8,
+        "k009": 9,
+        "k010": 10,
+        "k011": 11,
+        "k012": 12,
+        "k013": 13,
+        "k014": 14,
+        "k015": 15,
+        "k016": 16,
+        "k017": 17,
+        "k018": 18,
+        "k019": 19,
+        "k020": 20,
+        "k021": 21,
+        "k022": 22,
+        "k023": 23,
+        "k024": 24,
+        "k025": 25,
+        "k026": 26,
+        "k027": 27,
+        "k028": 28,
+        "k029": 29,
+        "k030": 30,
+        "k031": 31,
+        "k032": 32,
+        "k033": 33,
+        "k034": 34,
+        "k035": 35,
+        "k036": 36,
+        "k037": 37,
+        "k038": 38,
+        "k039": 39,
+        "k040": 40,
+        "k041": 41,
+        "k042": 42,
+        "k043": 43,
+        "k044": 44,
+        "k045": 45,
+        "k046": 46,
+        "k047": 47,
+        "k048": 48,
+        "k049": 49,
+        "k050": 50,
+        "k051": 51,
+        "k052": 52,
+        "k053": 53,
+        "k054": 54,
+        "k055": 55,
+        "k056": 56,
+        "k057": 57,
+        "k058": 58,
+        "k059": 59,
+        "k060": 60,
+        "k061": 61,
+        "k062": 62,
+        "k063": 63,
+        "k064": 64,
+        "k065": 65,
+        "k066": 66,
+        "k067": 67,
+        "k068": 68,
+        "k069": 69,
+        "k070": 70,
+        "k071": 71,
+        "k072": 72,
+        "k073": 73,
+        "k074": 74,
+        "k075": 75,
+        "k076": 76,
+        "k077": 77,
+        "k078": 78,
+        "k079": 79,
+        "k080": 80,
+        "k081": 81,
+        "k082": 82,
+        "k083": 83,
+        "k084": 84,
+        "k085": 85,
+        "k086": 86,
+        "k087": 87,
+        "k088": 88,
+        "k089": 89,
+        "k090": 90,
+        "k091": 91,
+        "k092": 92,
+        "k093": 93,
+        "k094": 94,
+        "k095": 95,
+        "k096": 96,
+        "k097": 97,
+        "k098": 98,
+        "k099": 99,
+        "k100": 100,
+        "k101": 101,
+        "k102": 102,
+        "k103": 103,
+        "k104": 104,
+        "k105": 105,
+        "k106": 106,
+        "k107": 107,
+        "k108": 108,
+        "k109": 109,
+        "k110": 110,
+        "k111": 111,
+        "k112": 112,
+        "k113": 113,
+        "k114": 114,
+        "k115": 115,
+        "k116": 116,
+        "k117": 117,
+        "k118": 118,
+        "k119": 119,
+        "k120": 120
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "k001=1,k002=2,k003=3,k004=4,k005=5,k006=6,k007=7,k008=8,k009=9,k010=10,k011=11,k012=12,k013=13,k014=14,k015=15,k016=16,k017=17,k018=18,k019=19,k020=20,k021=21,k022=22,k023=23,k024=24,k025=25,k026=26,k027=27,k028=28,k029=29,k030=30,k031=31,k032=32,k033=33,k034=34,k035=35,k036=36,k037=37,k038=38,k039=39,k040=40,k041=41,k042=42,k043=43,k044=44,k045=45,k046=46,k047=47,k048=48,k049=49,k050=50,k051=51,k052=52,k053=53,k054=54,k055=55,k056=56,k057=57,k058=58,k059=59,k060=60,k061=61,k062=62,k063=63,k064=64,k065=65,k066=66,k067=67,k068=68,k069=69,k070=70,k071=71,k072=72,k073=73,k074=74,k075=75,k076=76,k077=77,k078=78,k079=79,k080=80,k081=81,k082=82,k083=83,k084=84,k085=85,k086=86,k087=87,k088=88,k089=89,k090=90,k091=91,k092=92,k093=93,k094=94,k095=95,k096=96,k097=97,k098=98,k099=99,k100=100,k101=101,k102=102,k103=103,k104=104,k105=105,k106=106,k107=107,k108=108,k109=109,k110=110,k111=111,k112=112,k113=113,k114=114,k115=115,k116=116,k117=117,k118=118,k119=119,k120=120,"
+    }
+  },
+  {
+    "name": "deep recursion: asyncEach over 120 items, each including a template",
+    "render": "page.njk",
+    "templates": {
+      "page.njk": "{% asyncEach x in range(120) %}{% include \"item.njk\" %}{% endeach %}",
+      "item.njk": "[{{ x }}]"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[0][1][2][3][4][5][6][7][8][9][10][11][12][13][14][15][16][17][18][19][20][21][22][23][24][25][26][27][28][29][30][31][32][33][34][35][36][37][38][39][40][41][42][43][44][45][46][47][48][49][50][51][52][53][54][55][56][57][58][59][60][61][62][63][64][65][66][67][68][69][70][71][72][73][74][75][76][77][78][79][80][81][82][83][84][85][86][87][88][89][90][91][92][93][94][95][96][97][98][99][100][101][102][103][104][105][106][107][108][109][110][111][112][113][114][115][116][117][118][119]"
+    }
+  },
+  {
+    "name": "deep recursion: a template that extends a layout and includes itself 120 deep",
+    "render": "self.njk",
+    "templates": {
+      "layout.njk": "[{% block b %}{% endblock %}]",
+      "self.njk": "{% extends \"layout.njk\" %}{% block b %}{% if n > 0 %}{% set n = n - 1 %}{% include \"self.njk\" %}{% endif %}.{% endblock %}"
+    },
+    "context": {
+      "n": 120
+    },
+    "expected": {
+      "ok": true,
+      "output": "[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[[.].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].]"
+    }
+  },
+  {
+    "name": "deep recursion: a template that calls super() and includes itself 120 deep",
+    "render": "self.njk",
+    "templates": {
+      "layout.njk": "[{% block b %}L{% endblock %}]",
+      "self.njk": "{% extends \"layout.njk\" %}{% block b %}{{ super() }}{% if n > 0 %}{% set n = n - 1 %}{% include \"self.njk\" %}{% endif %}.{% endblock %}"
+    },
+    "context": {
+      "n": 120
+    },
+    "expected": {
+      "ok": true,
+      "output": "[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L[L.].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].].]"
+    }
+  },
+  {
+    "name": "deep recursion: a template that includes itself 120 deep from an asyncEach",
+    "render": "self.njk",
+    "templates": {
+      "self.njk": "{% set n = n - 1 %}{% asyncEach x in [1] %}{% if n > 0 %}{% include \"self.njk\" %}{% endif %}{% endeach %}."
+    },
+    "context": {
+      "n": 121
+    },
+    "expected": {
+      "ok": true,
+      "output": "........................................................................................................................."
+    }
+  },
+  {
+    "name": "deep recursion: a template that includes itself 120 deep from an asyncEach over an object",
+    "render": "self.njk",
+    "templates": {
+      "self.njk": "{% set n = n - 1 %}{% asyncEach k, v in {a: 1} %}{% if n > 0 %}{% include \"self.njk\" %}{% endif %}{% endeach %}."
+    },
+    "context": {
+      "n": 121
+    },
+    "expected": {
+      "ok": true,
+      "output": "........................................................................................................................."
+    }
+  },
+  {
+    "name": "deep recursion: a template that includes itself 110 deep and reads a context variable",
+    "render": "self.njk",
+    "templates": {
+      "self.njk": "{% if n > 0 %}{% set n = n - 1 %}{% include \"self.njk\" %}{% endif %}{{ x }}"
+    },
+    "context": {
+      "n": 110,
+      "x": "x"
+    },
+    "expected": {
+      "ok": true,
+      "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    }
+  },
+  {
+    "name": "deep recursion: a template that includes itself 60 deep and sets a variable in an asyncEach",
+    "render": "self.njk",
+    "templates": {
+      "self.njk": "{% set n = n - 1 %}{% asyncEach i in [1] %}{% set y = i %}{% if n > 0 %}{% include \"self.njk\" %}{% endif %}{% endeach %}{{ y }}"
+    },
+    "context": {
+      "n": 60
+    },
+    "expected": {
+      "ok": true,
+      "output": "11111111111111111111111111111111111111111111111111111111111"
+    }
+  },
+  {
+    "name": "deep recursion: a template that imports itself with context 110 deep",
+    "render": "self.njk",
+    "templates": {
+      "self.njk": "{% if n > 0 %}{% set n = n - 1 %}{% import \"self.njk\" as m with context %}{% endif %}."
+    },
+    "context": {
+      "n": 110
+    },
+    "expected": {
+      "ok": true,
+      "output": "."
+    }
+  },
+  {
+    "name": "deep recursion: a macro that calls itself 120 deep",
+    "template": "{% macro f(n) %}{% if n > 0 %}{{ f(n - 1) }}{% endif %}.{% endmacro %}{{ f(120) }}",
+    "expected": {
+      "ok": true,
+      "output": "........................................................................................................................."
+    }
+  },
+  {
+    "name": "deep recursion: a macro that calls itself 120 deep through a call block",
+    "template": "{% macro f(n) %}{% if n > 0 %}{% call f(n - 1) %}{% endcall %}{% endif %}.{% endmacro %}{{ f(120) }}",
+    "expected": {
+      "ok": true,
+      "output": "........................................................................................................................."
+    }
+  }
+]

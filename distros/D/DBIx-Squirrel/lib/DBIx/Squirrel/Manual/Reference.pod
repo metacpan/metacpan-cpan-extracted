@@ -231,7 +231,7 @@ B<Made in:> L<Stages::Batch|/"Batching and collecting">
 
 =item C<:taps>
 
-B<Holds:> C<peek>, C<count_into>, C<dump_to>
+B<Holds:> C<peek>, C<count_into>, C<dump_to>, C<tee>
 
 B<Made in:> L<Stages::Taps|/"Canned stages">
 
@@ -1280,7 +1280,7 @@ B<Exported by default:> C<batch($n)>, C<collect>, C<collect { ... }>
 
 B<Exported by default:> C<peek { ... }>, C<count_into(\$n)>
 
-B<On request:> C<dump_to($fh)>
+B<On request:> C<dump_to($fh)>, C<tee(@stages)>
 
 =back
 
@@ -1315,6 +1315,10 @@ Counts the values into C<$n>, from 0 on each run, and passes them on.
 =item C<dump_to($fh)>
 
 Writes each value, with Data::Dumper, to C<$fh> or STDERR, and passes it on.
+
+=item C<tee(@stages)>
+
+Runs each value through a branch of C<@stages>, a run of its own beside the main run, and passes it on. A stop in the branch ends only the branch; a death kills the run. The branch shares the run's context, so C<pluck> and C<as_hash> work in it.
 
 =back
 
@@ -3554,7 +3558,7 @@ Canned stages gathering values: C<batch>, C<collect>.
 
 =item C<DBIx::Squirrel::Stages::Taps>
 
-Canned stages run for their side effects: C<peek>, C<count_into>, C<dump_to>.
+Canned stages run for their side effects: C<peek>, C<count_into>, C<dump_to>, C<tee>.
 
 =item C<DBIx::Squirrel::Context>
 

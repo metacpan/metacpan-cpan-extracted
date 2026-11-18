@@ -1,0 +1,478 @@
+[
+  {
+    "name": "FileSystemLoader: extends and includes relative to the parent, './' and '../' (Loader resolve)",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: relative import and from-import",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "sub/import.njk",
+    "expected": {
+      "ok": true,
+      "output": "hi a/hi b"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a '..' inside a non-relative name collapses in getSource",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "inner-dotdot.njk",
+    "expected": {
+      "ok": true,
+      "output": "[d]"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a top-level '../views2/...' passes the string-prefix guard of search path 'views'",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "../views2/secret.njk",
+    "expected": {
+      "ok": true,
+      "output": "secret from views2"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a relative include into the sibling 'views2' passes the guard",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "escape-sibling.njk",
+    "expected": {
+      "ok": true,
+      "output": "[secret from views2]"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a top-level '../outside.njk' is refused by the guard",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "../outside.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Error",
+        "message": "template not found: ../outside.njk"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a relative include above the search path is refused, named by its resolved path",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "escape-parent.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(<root>/t/data/loader/views/escape-parent.njk)\n  Error: template not found: <root>/t/data/loader/outside.njk"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a missing template",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "nope.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Error",
+        "message": "template not found: nope.njk"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a missing relative include, named by its resolved path",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "missing-include.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(<root>/t/data/loader/views/missing-include.njk)\n  Error: template not found: <root>/t/data/loader/views/nope.njk"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a UTF-8 BOM is kept as U+FEFF",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "bom.njk",
+    "expected": {
+      "ok": true,
+      "output": "﻿bom:2"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a BOM in the parent template",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "bom-child.njk",
+    "expected": {
+      "ok": true,
+      "output": "﻿bom:2"
+    }
+  },
+  {
+    "name": "FileSystemLoader: malformed UTF-8 becomes U+FFFD per maximal subpart",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "malformed.njk",
+    "expected": {
+      "ok": true,
+      "output": "a�b|��|���|����|�|�|􏿿=22"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a directory name throws node's EISDIR",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "sub",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Error",
+        "message": "EISDIR: illegal operation on a directory, read"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: the empty name is the search path itself, a directory",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Error",
+        "message": "EISDIR: illegal operation on a directory, read"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: an include of a directory",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "render": "include-dir.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(<root>/t/data/loader/views/include-dir.njk)\n  Error: EISDIR: illegal operation on a directory, read"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: an error inside an included file names that file's path",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "template": "{% include 'sub/part.njk' %}{{ x() }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: (<root>/t/data/loader/views/sub/part.njk)\n  Error: Unable to call `x`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: renderString includes './d.njk' as is (no parent path)",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views"
+    },
+    "template": "{% include './d.njk' %}",
+    "expected": {
+      "ok": true,
+      "output": "d"
+    }
+  },
+  {
+    "name": "FileSystemLoader: search paths are path.normalize'd",
+    "fileSystemLoader": {
+      "searchPaths": "./t/data//loader/./views2/../views/"
+    },
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: the first search path with the name wins",
+    "fileSystemLoader": {
+      "searchPaths": [
+        "t/data/loader/views2",
+        "t/data/loader/views"
+      ]
+    },
+    "render": "same.njk",
+    "expected": {
+      "ok": true,
+      "output": "views2:same"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a later search path is tried when the first lacks the name",
+    "fileSystemLoader": {
+      "searchPaths": [
+        "t/data/loader/views2",
+        "t/data/loader/views"
+      ]
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": true,
+      "output": "d"
+    }
+  },
+  {
+    "name": "FileSystemLoader: no search paths is ['.'], the working directory",
+    "fileSystemLoader": {},
+    "cwd": "t/data/loader/views",
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a null searchPaths is falsy, the default ['.']",
+    "fileSystemLoader": {
+      "searchPaths": null
+    },
+    "cwd": "t/data/loader/views",
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a null search path is no string, node's validateString TypeError",
+    "fileSystemLoader": {
+      "searchPaths": [
+        null
+      ]
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "The \"path\" argument must be of type string. Received null"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a number as searchPaths becomes [5], refused by path.normalize",
+    "fileSystemLoader": {
+      "searchPaths": 5
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "The \"path\" argument must be of type string. Received type number (5)"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a boolean as searchPaths is refused by path.normalize",
+    "fileSystemLoader": {
+      "searchPaths": true
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "The \"path\" argument must be of type string. Received type boolean (true)"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: an array inside the search paths is refused by path.normalize",
+    "fileSystemLoader": {
+      "searchPaths": [
+        [
+          "t/data/loader/views"
+        ]
+      ]
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "The \"path\" argument must be of type string. Received an instance of Array"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: an object as searchPaths is refused by path.normalize",
+    "fileSystemLoader": {
+      "searchPaths": {
+        "path": "t/data/loader/views"
+      }
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "The \"path\" argument must be of type string. Received an instance of Object"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: a refused search path after a good one still throws",
+    "fileSystemLoader": {
+      "searchPaths": [
+        "t/data/loader/views",
+        5
+      ]
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "The \"path\" argument must be of type string. Received type number (5)"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: an object search path with an own constructor 1: V8's 'in' TypeError from determineSpecificType",
+    "fileSystemLoader": {
+      "searchPaths": [
+        {
+          "constructor": 1
+        }
+      ]
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "TypeError",
+        "message": "Cannot use 'in' operator to search for 'name' in 1"
+      }
+    }
+  },
+  {
+    "name": "FileSystemLoader: relative search paths resolve against the working directory",
+    "fileSystemLoader": {
+      "searchPaths": "views"
+    },
+    "cwd": "t/data/loader",
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: opts noCache",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views",
+      "opts": {
+        "noCache": true
+      }
+    },
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a boolean as opts prints upstream's warning on stdout",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views",
+      "opts": true
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": true,
+      "output": "d",
+      "stdout": "[nunjucks] Warning: you passed a boolean as the second argument to FileSystemLoader, but it now takes an options object. See http://mozilla.github.io/nunjucks/api.html#filesystemloader\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: a boolean false as opts warns as well",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views",
+      "opts": false
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": true,
+      "output": "d",
+      "stdout": "[nunjucks] Warning: you passed a boolean as the second argument to FileSystemLoader, but it now takes an options object. See http://mozilla.github.io/nunjucks/api.html#filesystemloader\n"
+    }
+  },
+  {
+    "name": "FileSystemLoader: opts watch throws upstream's no-chokidar error (ADR 0018)",
+    "fileSystemLoader": {
+      "searchPaths": "t/data/loader/views",
+      "opts": {
+        "watch": true
+      }
+    },
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Error",
+        "message": "watch requires chokidar to be installed"
+      }
+    }
+  },
+  {
+    "name": "Environment default loader: FileSystemLoader('views') under the working directory",
+    "defaultLoader": true,
+    "cwd": "t/data/loader",
+    "render": "sub/page.njk",
+    "expected": {
+      "ok": true,
+      "output": "<layout>page[part][d][x(d)]</layout>\n"
+    }
+  },
+  {
+    "name": "Environment default loader: no views directory, template not found",
+    "defaultLoader": true,
+    "render": "d.njk",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Error",
+        "message": "template not found: d.njk"
+      }
+    }
+  }
+]

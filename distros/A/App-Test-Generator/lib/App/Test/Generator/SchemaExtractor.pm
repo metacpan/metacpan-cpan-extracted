@@ -21,7 +21,7 @@ use File::Basename;
 use File::Path qw(make_path);
 use Params::Get;
 use Safe;
-use Scalar::Util qw(looks_like_number refaddr);
+use Scalar::Util qw(looks_like_number refaddr reftype);
 use YAML::XS;
 use IPC::Open3;
 use JSON::MaybeXS qw(encode_json decode_json);
@@ -84,11 +84,11 @@ App::Test::Generator::SchemaExtractor - Extract test schemas from Perl modules
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 SYNOPSIS
 
@@ -123,6 +123,10 @@ Parses embedded documentation to extract:
   - Method signatures with positional parameters
   - Return value specifications from "Returns:" sections
   - Constraints (ranges, patterns, required/optional status)
+    (in a formal C<=head4 Input> spec, C<required =E<gt> 1> means
+    C<optional: 0> and an explicit C<optional> flag wins; a bare list of
+    C<name =E<gt> { ... }> entries with no outer braces contributes only
+    its top-level C<required> flags)
   - Semantic type detection (email, URL, filename)
 
 =item * B<Code Pattern Detection>
@@ -243,6 +247,13 @@ Recognizes singleton patterns through multiple signals: method names like C<inst
 
 Examines C<new> methods to determine required and optional parameters, validation requirements, and default values. This enables test generators to provide appropriate constructor arguments when object instantiation is needed.
 
+A constructor that rejects an empty arrayref, or calls methods on (or
+checks C<blessed> on) the elements of a required arrayref parameter, needs
+live objects that a YAML fixture cannot hold.  Its C<new> schema gets a
+C<skip> reason such as C<needs a non-empty arrayref of live objects in
+'databases'>, and its instance methods are emitted with C<new: ~> so
+harnesses skip them.
+
 =item * B<Inheritance Relationship Handling>
 
 Detects parent classes through C<use parent>, C<use base>, and C<@ISA> declarations. Identifies when methods use C<SUPER::> calls and determines whether the current class or a parent class constructor should be used for object instantiation.
@@ -358,6 +369,15 @@ beyond the built-in detectors.
 
 Analysis quality improves significantly with comprehensive POD
 documentation following consistent patterns.
+
+=item * B<Multi-Package Files>
+
+Only the first package in a file is analysed.  A file that declares
+additional packages, such as a small error class, is still extracted, but
+its schemas carry a C<skip> reason so generated harnesses are not run
+against it.  Perl 5.38 C<class> blocks are not detected in such a file:
+the C<class>/C<method> scan reads the whole source, so it runs only when
+the file declares at most one C<package>.
 
 =back
 
@@ -1513,6 +1533,18 @@ sub extract_all {
 		}
 	}
 
+	# A constructor that insists on a non-empty arrayref of live objects
+	# cannot be built from YAML: no generated array is made of blessed
+	# instances whose methods it can call.  Database::Join->new is the case
+	# that exposed this.  Recording the precondition on new() itself lets
+	# callers skip that constructor and, through the block below, gives the
+	# instance methods new: ~ as well.
+	if($ctor_body && $schemas{new}
+	   && (my $reason = _constructor_requires_live_objects($ctor_body, $schemas{new}))) {
+		$schemas{new}{skip} = $reason;
+		$self->_log("  UNBUILDABLE: new: $reason");
+	}
+
 	# A constructor can refuse to build the package itself: an abstract base
 	# class croaks on direct instantiation, and a constructor that croaks over
 	# an argument the extractor cannot supply cannot be built either.  Either
@@ -1630,7 +1662,7 @@ sub extract_all {
 			my $schema = $schemas{$method_name};
 			next unless(exists($schema->{new}) && defined($schema->{new}));
 			$schema->{new} = $package_name;
-			$self->_log("  UNBUILDABLE: $method_name new: ~ ($package_name constructor needs an input file)");
+			$self->_log("  UNBUILDABLE: $method_name new: ~ ($package_name constructor is not auto-buildable)");
 		}
 	}
 
@@ -1658,6 +1690,17 @@ sub extract_all {
 		};
 		push @{$schema->{_notes}}, "input inherited from $target(), which this routine forwards \@_ to";
 		$self->_log("  DELEGATE: $method_name input inherited from $target");
+	}
+
+	# A multi-package file is analysed as its primary package, but it is not
+	# fuzzed: the helper package's routines are deliberately excluded, and
+	# the primary package's routines may not be fuzzable without it.  Mark
+	# them skipped rather than letting the harness fail on every routine.
+	if($self->{_multiple_packages}) {
+		for my $method_name (keys %schemas) {
+			$schemas{$method_name}{skip} //=
+				"multi-package file; only the primary package $package_name is extracted";
+		}
 	}
 
 	unless ($params->{no_write}) {
@@ -1720,9 +1763,11 @@ sub _delegated_method {
 #               $self->{_package_name} if not already
 #               set.
 #
-# Notes:      Croaks if more than one package
-#             declaration is found — multi-package
-#             files are not supported.
+# Notes:      A file may declare more than one package (a
+#             main class plus a small error class).  The
+#             first package is the primary one; routines
+#             owned by later packages are ignored rather
+#             than aborting the extraction.
 # --------------------------------------------------
 sub _extract_package_name {
 	my ($self, $document) = @_;
@@ -1735,9 +1780,35 @@ sub _extract_package_name {
 		my $package_stmt = $document->find_first('PPI::Statement::Package');
 		return $package_stmt ? $package_stmt->namespace() : '';
 	}
-	croak('More than one package declaration found') if @$pkgs > 1;
 	$self->{_package_name} //= $pkgs->[0]->namespace();
+	if(@$pkgs > 1) {
+		$self->{_multiple_packages} = 1;
+		$self->_log("  Multiple packages; analyzing " . $pkgs->[0]->namespace() . " only");
+	}
 	return $pkgs->[0]->namespace();
+}
+
+# True when a node belongs to the primary (first) package of the document.
+# PPI nodes carry a location, so each routine belongs to the last package
+# declaration at or before its line.  A single-package file trivially passes.
+sub _in_primary_package {
+	my ($self, $node, $pkgs) = @_;
+
+	return 1 unless($pkgs && @$pkgs > 1);
+
+	my $loc = eval { $node->location };
+	return 1 unless(ref($loc) eq 'ARRAY');
+
+	my $owner = $pkgs->[0];
+	for my $pkg (@$pkgs) {
+		my $pkg_loc = eval { $pkg->location };
+		next unless(ref($pkg_loc) eq 'ARRAY');
+		last if($pkg_loc->[0] > $loc->[0]);
+		$owner = $pkg;
+	}
+
+	my $primary = $self->{_package_name} // $pkgs->[0]->namespace();
+	return $owner->namespace() eq $primary;
 }
 
 # --------------------------------------------------
@@ -1773,6 +1844,7 @@ sub _find_methods {
 	my ($self, $document) = @_;
 
 	my $subs = $document->find('PPI::Statement::Sub') || [];
+	my $pkgs = $document->find('PPI::Statement::Package') || [];
 	# Only fetch statements that begin with a Moose modifier keyword —
 	# fetching ALL PPI::Statement nodes on a large file returns thousands
 	# of nodes and then discards nearly all of them in the loop below.
@@ -1786,6 +1858,9 @@ sub _find_methods {
 		my $name = $sub->name();
 
 		next unless defined $name;	# Skip anonymous routines
+		# A file may define helper packages after the main one; their subs
+		# are not part of the module under test.
+		next unless $self->_in_primary_package($sub, $pkgs);
 		next if $name =~ /^(BEGIN|END|DESTROY|AUTOLOAD|CHECK|INIT|UNITCHECK)$/;
 		next if $name =~ /::/;		# cross-package sub (e.g. sub DB::DB { })
 
@@ -1806,9 +1881,10 @@ sub _find_methods {
 		};
 	}
 
-	# Look for class { method } syntax (Perl 5.38+)
+	# Look for class { method } syntax (Perl 5.38+).  The regex scans the
+	# whole document, so it is only safe when there is a single package.
 	my $content = $document->content();
-	if ($content =~ /\bclass\b/) {
+	if (@$pkgs <= 1 && $content =~ /\bclass\b/) {
 		$self->_log('  Detecting class/method syntax...');
 		# Strip POD blocks and line comments before the regex scan so that
 		# patterns like  class Name {  inside documentation examples or
@@ -1821,6 +1897,7 @@ sub _find_methods {
 
 	# Process method modifiers (Moose)
 	foreach my $decl (@$sub_decls) {
+		next unless $self->_in_primary_package($decl, $pkgs);
 		my $content = $decl->content;
 		if ($content =~ /^\s*(before|after|around)\s+['"]?(\w+)['"]?\b/) {
 			my ($modifier, $method_name) = ($1, $2);
@@ -4253,8 +4330,8 @@ sub _analyze_pod {
 						$params{$name}{type} = $t;
 						$self->_log("  POD: $name type '$t' from =head Input (positional $idx)");
 					}
-					if ($spec =~ /\boptional\s*=>\s*(0|1)/i) {
-						$params{$name}{optional} = $1 + 0;
+					if(defined(my $opt = _spec_optionality($spec))) {
+						$params{$name}{optional} = $opt;
 					}
 				}
 				$idx++;
@@ -4270,8 +4347,8 @@ sub _analyze_pod {
 					$params{$name}{type} = $t;
 					$self->_log("  POD: $name type '$t' from =head Input (named)");
 				}
-				if ($spec =~ /\boptional\s*=>\s*(0|1)/i) {
-					$params{$name}{optional} = $1 + 0;
+				if(defined(my $opt = _spec_optionality($spec))) {
+					$params{$name}{optional} = $opt;
 				}
 				if ($spec =~ /\bmemberof\s*=>\s*\[([^\]]*)\]/i) {
 					my $list_str = $1;
@@ -4309,6 +4386,25 @@ sub _analyze_pod {
 			# argument, which _positional_pod_input decides once the body is
 			# known.
 			delete $params{$_}{position} for keys %params;
+		}
+
+		# Some input specs are a bare list of `name => { ... }` entries with no
+		# outer braces, as Database::Join's new() has.  Parsing the whole bare
+		# list would read unrelated examples in the block, so only the
+		# unambiguous required flag is taken from it; the parameter itself is
+		# described by the validator, signature or prose.  A structured spec
+		# was read above, and only top-level entries count: a nested
+		# properties entry's required flag belongs to that property.
+		unless($block =~ /\A[\[\{]/) {
+			for my $entry (_top_level_hash_entries($block)) {
+				my ($bare_name, $bare_spec) = @{$entry};
+				next if $bare_name =~ /^(self|class|pkg|proto|klass)$/i;
+				my $own = _own_spec_text($bare_spec);
+				next unless $own =~ /\brequired\s*=>\s*(0|1)/i;
+				next if $own =~ /\boptional\s*=>\s*(?:0|1)/i;
+				$params{$bare_name} //= { _source => SOURCE_INPUT_SPEC };
+				$params{$bare_name}{optional} = 1 - ($1 + 0);
+			}
 		}
 	}
 
@@ -9253,7 +9349,7 @@ sub _serialize_parameter_for_yaml {
 	# is written to YAML as a !!perl/regexp object that a YAML consumer
 	# cannot read back, and the schema is a data file.
 	if(defined(my $pattern = $cleaned{matches})) {
-		if((builtin::reftype($pattern) // '') eq 'REGEXP') {
+		if((reftype($pattern) // '') eq 'REGEXP') {
 			# Some extraction paths hand over a compiled pattern, possibly a
 			# blessed subclass (e.g. a regexp from a Safe compartment).
 			my ($body) = re::regexp_pattern($pattern);
@@ -9377,6 +9473,111 @@ sub _requires_input_file
 
 		my $spec = $input->{$param};
 		$spec->{semantic} = 'existing_file' if(ref($spec) eq 'HASH');
+	}
+
+	return undef;
+}
+
+# The part of a formal-spec entry that describes the entry itself, without
+# any nested { ... } such as a properties map.  The named and positional
+# parsers capture up to the first closing brace, so an unbalanced trailing
+# nested opening is dropped as well.
+sub _own_spec_text
+{
+	my $spec = $_[0] // '';
+
+	1 while($spec =~ s/\{[^{}]*\}//g);
+	$spec =~ s/\{.*\z//s;
+
+	return $spec;
+}
+
+# The optional flag a formal-spec entry gives its own parameter: 0 or 1, or
+# undef when it says nothing.  An explicit optional wins over required.
+sub _spec_optionality
+{
+	my $own = _own_spec_text($_[0]);
+
+	return $1 + 0 if($own =~ /\boptional\s*=>\s*(0|1)/i);
+	return 1 - $1 if($own =~ /\brequired\s*=>\s*(0|1)/i);
+	return undef;
+}
+
+# The name => { ... } entries at brace depth 0 of a bare-list spec, as
+# [ name, body ] pairs with the body's nested braces intact.
+sub _top_level_hash_entries
+{
+	my $text = $_[0];
+
+	my (@entries, $pending, $name, $start);
+	my $depth = 0;
+	while($text =~ /\b(\w+)\s*=>\s*(?=\{)|([{}])/g) {
+		if(defined($1)) {
+			$pending = $1 if($depth == 0);
+			next;
+		}
+		if($2 eq '{') {
+			if(($depth == 0) && defined($pending)) {
+				($name, $start) = ($pending, pos($text));
+			}
+			undef $pending;
+			$depth++;
+			next;
+		}
+		next unless($depth > 0);
+		$depth--;
+		if(($depth == 0) && defined($name)) {
+			push @entries, [ $name, substr($text, $start, pos($text) - 1 - $start) ];
+			undef $name;
+		}
+	}
+
+	return @entries;
+}
+
+# True when a required arrayref constructor parameter is not a list of
+# values but a list of live objects: the constructor rejects an empty list,
+# calls methods on the elements, or checks that they are blessed.  A YAML
+# fixture cannot contain such objects, so both new() and the instance methods
+# that need its result must be reported as skipped.
+#
+# Database::Join->new is the motivating case: its databases parameter must
+# hold one or more Database::Abstraction instances, and the constructor calls
+# columns() on each one to build its routing table.
+sub _constructor_requires_live_objects
+{
+	my ($body, $ctor_schema) = @_;
+
+	my $content = ref($body) ? eval { $body->content } : $body;
+	return undef unless(defined($content) && length($content));
+
+	my $input = $ctor_schema->{input};
+	return undef unless(ref($input) eq 'HASH');
+
+	for my $param (sort keys %$input) {
+		my $spec = $input->{$param};
+		next unless(ref($spec) eq 'HASH');
+		next if($spec->{optional});
+
+		my $type = $spec->{type} // '';
+		next unless(($type eq 'arrayref') || ($type eq 'array'));
+
+		my $p = quotemeta($param);
+		my $field = qr/\$\w+(?:->)?\{\s*['"]?$p['"]?\s*\}/;
+
+		# `croak ... unless @{ $p->{databases} }`.
+		my $empty_guard = ($content =~ /\bcroak\b[^;]*?\bunless\b[^;]*?\@\{\s*$field\s*\}/s);
+
+		# An element is blessed or has a method called on it.
+		my $elements_are_objects =
+			   ($content =~ /$field\s*(?:->\s*)?\[\s*[^\]]+\s*\]\s*->\s*\w+/)
+			|| ($content =~ /\bblessed\s*\(\s*$field\s*(?:->\s*)?\[\s*[^\]]+\s*\]\s*\)/);
+
+		next unless($empty_guard || $elements_are_objects);
+
+		return $empty_guard
+			? "needs a non-empty arrayref of live objects in '$param'"
+			: "needs live objects in '$param'";
 	}
 
 	return undef;

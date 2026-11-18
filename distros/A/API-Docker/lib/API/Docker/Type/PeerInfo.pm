@@ -1,6 +1,6 @@
 package API::Docker::Type::PeerInfo;
 # ABSTRACT: One peer of an overlay network
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::PeerInfo - One peer of an overlay network
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ spelled out, because deriving it from the Perl name would produce C<Ip>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

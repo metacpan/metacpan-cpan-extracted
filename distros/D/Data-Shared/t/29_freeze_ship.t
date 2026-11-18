@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Data::Shared qw(shared_get shared_set shared_exists shared_push);
 
 my $probe = Data::Shared->new(tempdir(CLEANUP => 1));
@@ -67,7 +69,7 @@ subtest 'frozen reports whether the store can be shipped' => sub {
 
     my $mixed = Data::Shared->new(tempdir(CLEANUP => 1));
     $mixed->mount('cache', 'hashmap:ii', undef, 64);
-    if (eval { require Data::Queue::Shared; 1 }) {
+    if (have('queue')) {
         $mixed->mount('jobs', 'queue:int', undef, 8);
         $mixed->handle('/cache')->freeze;
         ok !$mixed->frozen, 'a store with an unfreezable mount is never shippable';
@@ -86,7 +88,7 @@ subtest 'a transient mount is not part of the store frozen answers for' => sub {
     my ($root, $dir) = store(children => 1);
     $root->freeze_all;
     my $q = Data::Shared->new;
-    plan skip_all => 'queue unavailable' unless eval { require Data::Queue::Shared; 1 };
+    plan skip_all => 'queue unavailable' unless have('queue');
     $q->mount('q', 'queue:int', undef, 8);
     $root->mount('jobs', $q->handle('/q'));
     ok $root->frozen, 'an unsealable handle the caller attached does not unship it';
@@ -130,7 +132,7 @@ subtest 'freeze_all seals in mount order' => sub {
 };
 
 subtest 'freeze_all refuses a store it cannot seal whole' => sub {
-    plan skip_all => 'queue unavailable' unless eval { require Data::Queue::Shared; 1 };
+    plan skip_all => 'queue unavailable' unless have('queue');
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     $root->mount('cache', 'hashmap:ii', undef, 16);
     $root->mount('jobs', 'queue:int', undef, 8);

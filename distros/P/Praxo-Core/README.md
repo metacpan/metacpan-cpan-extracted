@@ -1,17 +1,21 @@
 # PRAXO-CORE Perl Core
 
-PRAXO-CORE is an embeddable, MIT-licensed agent framework. This distribution is
-its native Perl Core: an agent loop with tool registration and dispatch, policy
-hooks, human-in-the-loop interrupt decisions, typed events, memory, checkpoints,
-context budgets, middleware, OTel and Harmovela sinks, MCP, retriever and
-synchronous delegation seams, JSON Schema validation, and plugin manifest
-parsing.
+PRAXO-CORE is an embeddable, MIT-licensed AI agent framework. This distribution
+is its native Perl Core: an agent loop with tool registration and dispatch,
+policy hooks, human-in-the-loop interrupt decisions, typed events, memory,
+checkpoints, context budgets, middleware, OTel and Harmovela sinks, MCP,
+retriever and synchronous delegation seams, JSON Schema validation, and plugin
+manifest parsing.
+
+It is not an HTTP user agent, web crawler, or hosted AI agent service. HTTP is
+used by optional adapters to communicate with model providers and external
+services.
 
 The normative contract is [`spec/`](../../spec/README.md); Go remains the
 reference implementation.
 
 - `SPEC_VERSION`: `0.2.0`
-- Core version: `0.6.0`
+- Core version: `0.6.2`
 - Tier: core
 - License: MIT
 - Dependencies: Perl core modules only (`JSON::PP`, `File::Spec`, `Cwd`)
@@ -61,6 +65,8 @@ Runnable examples live under [`language/perl/examples`](https://github.com/axisv
 | Retry transient failures | [retry](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/retry) |
 | Add provider fallback | [provider-fallback](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/provider-fallback) |
 | Observe agent events | [event-sink](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/event-sink) |
+| Run the representative chain | [representative-chain](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/representative-chain) |
+| Apply governed delegation | [advanced-delegation](https://github.com/axisvela/praxo-core/tree/main/language/perl/examples/advanced-delegation) |
 
 ## Scope
 

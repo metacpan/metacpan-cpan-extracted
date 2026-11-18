@@ -484,7 +484,7 @@ subtest 'T9: extract_all() is idempotent — two runs produce identical YAML' =>
 	my $source = File::Spec->catfile(
 		File::Spec->curdir(), 'lib', 'App', 'Test', 'Generator', 'BenchmarkGenerator.pm',
 	);
-	skip 'BenchmarkGenerator.pm not found', 1 unless -f $source;
+	plan(skip_all => 'BenchmarkGenerator.pm not found') unless(-f $source);
 
 	my $dir_a = tempdir(CLEANUP => 1);
 	my $dir_b = tempdir(CLEANUP => 1);
@@ -532,7 +532,7 @@ subtest 'T10: extract_all() creates a missing output dir and writes YAML files' 
 	my $source = File::Spec->catfile(
 		File::Spec->curdir(), 'lib', 'App', 'Test', 'Generator', 'Sample', 'Module.pm',
 	);
-	skip 'Sample::Module.pm not found', 2 unless -f $source;
+	plan(skip_all => 'Sample::Module.pm not found') unless(-f $source);
 
 	my $parent  = tempdir(CLEANUP => 1);
 	my $new_dir = File::Spec->catfile($parent, 'nested', 'output');

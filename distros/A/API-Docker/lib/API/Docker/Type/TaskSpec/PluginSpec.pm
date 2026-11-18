@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::PluginSpec;
 # ABSTRACT: Plugin spec for the service
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::PluginPrivilege;
 use namespace::clean;
@@ -32,7 +32,7 @@ API::Docker::Type::TaskSpec::PluginSpec - Plugin spec for the service
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -69,7 +69,7 @@ one is not. See L<API::Docker::Type::PluginPrivilege>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

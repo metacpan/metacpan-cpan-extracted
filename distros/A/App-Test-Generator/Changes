@@ -1,5 +1,44 @@
 Revision history for App-Test-Generator
 
+0.50	Tue Nov 17 08:48:54 PM EST 2026
+	[Enhancements]
+	- extract-schemas no longer dies with "More than one package declaration
+	  found" on a file that declares a helper package (such as a small error
+	  class) after the main one.  The first package is analysed, routines
+	  owned by later packages are ignored, and every schema from the file
+	  carries a skip reason so generated harnesses do not run against it;
+	  extract-schemas prints a note on stderr when this happens.  Perl 5.38
+	  class blocks are not detected in such a file
+
+	[Bug fixes]
+	- test-generator-index refuses to write a mutation report through a symlink
+	  inside the report directory on every platform.  Its containment check
+	  relied on abs_path, which does not follow links on Windows, so a link
+	  pointing out of the report directory was not caught there
+	- No "builtin::reftype is experimental" warning on Perl 5.36 and 5.38
+	- A routine whose only argument is mandatory and has a memberof list now
+	  gets that list's test cases (each member, and a value outside it).
+	  Before, it got a single case, and for a number that case was a random
+	  value, so a routine enforcing the list failed and a documented-only
+	  list was checked only by chance
+	- LCSAJ_TARGETS is separated by the platform path separator (";" on
+	  Windows) rather than ":", which split every absolute Windows path at
+	  its drive letter so test-generator-mutate recorded no LCSAJ hits there.
+	  Backslashed Windows paths are normalised to lib/... as well
+	- A constructor that needs a non-empty arrayref of live objects is no
+	  longer given an empty-array fixture.  Database::Join->new is the case:
+	  its new() schema now carries the skip reason "needs a non-empty arrayref
+	  of live objects in 'databases'", and its instance methods emit new: ~
+	  so generated harnesses skip them rather than build an object the
+	  constructor refuses
+	- A required => 1 flag in a formal =head4 Input POD spec is read as
+	  optional: 0, including bare-list specs with no outer braces.  This keeps
+	  POD authoritative over a validator that declares the same parameter
+	  optional, and generated harnesses now pass required constructor and
+	  method arguments instead of omitting them.  An explicit optional flag
+	  wins over required, and a required flag inside a nested properties
+	  map applies to that property, not to its parent parameter
+
 0.49	Mon Nov 16 10:59:07 AM EST 2026
 	[Enhancements]
 	- A matches pattern is written to schema YAML as a plain pattern string

@@ -18,7 +18,8 @@ our @INTERNAL = qw(
     Ekorn::Pipeline::Stop
     Ekorn::Pipeline::Stages::Batch Ekorn::Pipeline::Stages::Flow
     Ekorn::Pipeline::Stages::Taps
-    Ekorn::Pipeline::Factories  Ekorn::Pipeline::Iterator
+    Ekorn::Pipeline::Factories Ekorn::Pipeline::Iterator
+    Ekorn::Pipeline::Feed
     Ekorn::Pipeline::Operators  Ekorn::Pipeline::Operators::Chain
     Ekorn::Pipeline::Sink       Ekorn::Pipeline::Sinks
     Ekorn::Pipeline::Sink::Many Ekorn::Pipeline::Sink::One

@@ -11,6 +11,7 @@ lib/Ekorn/Pipeline.pm
 lib/Ekorn/Pipeline/Element.pm
 lib/Ekorn/Pipeline/Errors.pm
 lib/Ekorn/Pipeline/Factories.pm
+lib/Ekorn/Pipeline/Feed.pm
 lib/Ekorn/Pipeline/Gather.pm
 lib/Ekorn/Pipeline/Iterator.pm
 lib/Ekorn/Pipeline/JSON.pm
@@ -56,6 +57,8 @@ t/24-json.t
 t/25-sugar.t
 t/26-dump-to-redacts.t
 t/27-plain-runs.t
+t/28-feed.t
+t/29-tee.t
 xt/howto.t
 xt/manuals.t
 xt/scaling.t

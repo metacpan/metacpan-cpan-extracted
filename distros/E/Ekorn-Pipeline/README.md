@@ -201,7 +201,7 @@ would in a `for` loop. The values come out in order, and each stage
 sees them in order. Nothing is held between stages, so a pipeline over
 a million values needs no more memory than one over ten.
 
-A pipeline runs two ways:
+A pipeline runs three ways:
 
 - **Pushed:** called with values, it returns the list that comes
 out of the last stage.
@@ -219,6 +219,19 @@ its caller asks for.
     ```perl
     my $next = $pipeline->iterator(sub { @queue ? shift @queue : () });
     while (my($result) = $next->()) { ... }
+    ```
+
+- **Fed:** `feed` returns a _feed_, one run you give values to
+as they arrive, from a library that calls you back, an event loop, or
+a stage of your own, getting back what came out of each push. When a
+stage stops the run, `ended` says so, and you stop feeding.
+
+    ```perl
+    my $feed = $pipeline->feed;
+    on_message(sub ($message) {
+        handle($_) for $feed->push($message);
+        return !defined $feed->ended;    # false: stop listening
+    });
     ```
 
 The simplest source is a sub that returns the next value, or an empty
@@ -466,7 +479,9 @@ already in memory, call the pipeline with them. If they're made one at
 a time, from a file, a socket, a database or a computation, give
 `iterator` a source and return the iterator. Then a stage that stops
 saves the work of making the rest, and a source that closes what it
-opens closes it however the caller's use ends.
+opens closes it however the caller's use ends. If they come from a
+library that calls you back, feed them to the pipeline as they come,
+and tell the library to stop once a stage has ended the run.
 - **Let the stages do the optional work.** If you're about to add
 an option that filters, reshapes or limits what's returned, a stage
 does it already, and it's one less thing for you to maintain. Keep the
@@ -556,9 +571,10 @@ operators, from one module, by tags: `:core`, `:flow`, `:batch`,
 or by a test.
 - [Ekorn::Pipeline::Stages::Batch](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AStages%3A%3ABatch): `batch` and `collect`,
 which gather values and pass them on together.
-- [Ekorn::Pipeline::Stages::Taps](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AStages%3A%3ATaps): `peek`, `count_into` and
-`dump_to`, which look at each value and pass it on, for logging,
-counting and debugging.
+- [Ekorn::Pipeline::Stages::Taps](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AStages%3A%3ATaps): `peek`, `count_into`,
+`dump_to` and `tee`, which look at each value and pass it on, for
+logging, counting and debugging; `tee` runs each through a branch of
+stages of your own, so a tap can be any pipeline.
 - [Ekorn::Pipeline::Sources](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ASources) and [Ekorn::Pipeline::Sinks](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3ASinks):
 the sources and sinks above.
 - [Ekorn::Pipeline::JSON](https://metacpan.org/pod/Ekorn%3A%3APipeline%3A%3AJSON): `from_json` and `to_json`, which

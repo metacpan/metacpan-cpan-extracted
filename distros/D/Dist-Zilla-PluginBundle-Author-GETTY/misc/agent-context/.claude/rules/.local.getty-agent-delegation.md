@@ -19,7 +19,7 @@ lane table (task → agent) and say what counts as behavior-relevant there.
     it "read-only, change nothing"). Never the built-in `general-purpose`, `Explore` or
     `Plan`: they get no briefing either.
   - **A task spanning several lanes** → spawn every owning agent in parallel, then merge
-    their reports.
+    their reports. Agents that would edit the same files run one after another instead.
   - **The right agent is missing or its spawn is refused** (unresolved briefing skill,
     agent file not loaded yet) → report that and stop; never substitute a built-in or
     unbriefed agent.
@@ -28,7 +28,9 @@ lane table (task → agent) and say what counts as behavior-relevant there.
   goes back to the main agent instead of being done across.
 
 **Only the release-manager commits.** A worker leaves a commit-ready tree and a report; the
-main agent then dispatches the release-manager to cut the commit.
+main agent then dispatches the release-manager to cut the commit. A team without a
+release-manager: the main agent commits, after reviewing the diff — unless the project rules
+name another committer.
 
 **Card life cycle:** the main agent claims and hands out → the worker notes and ends at
 `review` → the release-manager commits and moves the card to `done`.

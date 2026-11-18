@@ -1,6 +1,6 @@
 package API::Docker::Type::SystemInfo;
 # ABSTRACT: The body of the C<200> response to C<GET /info>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Commit;
 use API::Docker::Type::ContainerdInfo;
@@ -215,7 +215,7 @@ API::Docker::Type::SystemInfo - The body of the C<200> response to C<GET /info>
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -640,7 +640,7 @@ daemon. See L<API::Docker::Type::ContainerdInfo>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

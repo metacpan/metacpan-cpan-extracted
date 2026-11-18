@@ -1,6 +1,6 @@
 package API::Docker::Type::ImageInspect::Metadata;
 # ABSTRACT: Additional metadata of the image in the local cache
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::ImageInspect::Metadata - Additional metadata of the image in 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -43,7 +43,7 @@ omitted otherwise.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

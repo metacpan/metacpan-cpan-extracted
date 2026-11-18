@@ -1,6 +1,6 @@
 package App::nup;
 
-our $VERSION = "1.19";
+our $VERSION = "1.20";
 
 1;
 =encoding utf-8
@@ -54,7 +54,7 @@ nup - n-up, multi-column paged output for commands and files
 
 =head1 VERSION
 
-Version 1.19
+Version 1.20
 
 =cut
 =head1 DESCRIPTION
@@ -360,20 +360,26 @@ Use C<--textconv=none> to disable.
 
 Color the source files by their syntax in file view mode.  Enabled
 by default, and done when the command of the highlighter and
-L<IO::Factotum> are installed; nothing changes without them.
-C<ansicolumn> reads each file through the command, with the language
+L<Text::ANSI::Highlight::IO> are installed; nothing changes without
+them.
+C<ansicolumn> reads each file through the highlighter, with the language
 told from the name of the file, or from the first line of a script.
+In a Markdown file, the code in a fence is colored by the language of
+the fence.
 A file whose language is not known is shown as it is, and so is a
 file which has ANSI sequences already.  The file names in the headers
 are not changed.
 
 I<NAME> is the highlighter:
 
-    skylighting, sky       skylighting, the highlighter of pandoc (default)
-    sourcehighlight, gnu   source-highlight of GNU Source-highlight
+    pandoc                 pandoc, by its ansi writer (default)
+    sourcehighlight, gnu   source-highlight of GNU Source-highlight,
+                           the colors of less
+    skylighting, sky       the skylighting command
 
-    brew install skylighting
+    brew install pandoc
     brew install source-highlight
+    brew install skylighting
 
 Set the one to use in C<NUP_OPTS>:
 
@@ -715,7 +721,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2025-2026 Kazumasa Utashiro.
+Copyright © 2025-2026 Kazumasa Utashiro.
 
 This software is released under the MIT License.
 L<https://opensource.org/licenses/MIT>

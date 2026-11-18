@@ -3,7 +3,7 @@
  use strict;
  use warnings;
 
- use Test::More tests => 19;
+ use Test::More tests => 23;
  use DBIx::Lite;
 
  my $dbix = DBIx::Lite->new(driver_name => 'Pg');
@@ -40,6 +40,41 @@
 {
     my ($sql) = $dbix->table('authors')->table_alias('target')->select('id')->select_sql;
     is $sql, 'SELECT target.id FROM authors AS target', 'custom table alias';
+}
+
+{
+    # Table names can be SQL expressions (e.g. unnest(CASE ... '{null}' ...)).
+    # Joining must not interpolate them into a regex unescaped (Perl 5.42+ warns).
+    my $warnings = '';
+    local $SIG{__WARN__} = sub { $warnings .= $_[0] };
+    my $table = q{unnest(CASE WHEN me.arr <> '{}' THEN me.arr ELSE '{null}' END)};
+    my ($sql) = $dbix->table($table)
+        ->table_alias('_conn_id')
+        ->left_join(['other' => 'o'], { '_conn_id' => 'o.id' })
+        ->select(\'1')
+        ->select_sql;
+    unlike $warnings, qr/Unescaped left brace/,
+        'join with brace-containing table name does not warn';
+    like $sql, qr/unnest\(CASE/, 'select_sql still emits the expression table';
+}
+
+{
+    # ARRAY[NULL]::integer[] embeds '[' / ']' — without quotemeta this is a
+    # hard "Unmatched [" regex error (worse than the brace warning).
+    my $err;
+    my $table = q{unnest(CASE WHEN cardinality(me.arr) > 0 THEN me.arr ELSE ARRAY[NULL]::integer[] END)};
+    my ($sql) = eval {
+        $dbix->table($table)
+            ->table_alias('_conn_id')
+            ->left_join(['other' => 'o'], { '_conn_id' => 'o.id' })
+            ->select(\'1')
+            ->select_sql;
+    };
+    $err = $@;
+    is $err, '', 'join with ARRAY[NULL]::integer[] table name does not die'
+        or diag $err;
+    like $sql // '', qr/ARRAY\[NULL\]::integer\[\]/,
+        'select_sql still emits ARRAY[NULL] table expr';
 }
 
 {

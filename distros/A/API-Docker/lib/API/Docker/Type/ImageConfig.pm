@@ -1,6 +1,6 @@
 package API::Docker::Type::ImageConfig;
 # ABSTRACT: Configuration of the image
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::HealthConfig;
 use namespace::clean;
@@ -59,7 +59,7 @@ API::Docker::Type::ImageConfig - Configuration of the image
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -135,7 +135,7 @@ Shell for when C<RUN>, C<CMD>, and C<ENTRYPOINT> uses a shell.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

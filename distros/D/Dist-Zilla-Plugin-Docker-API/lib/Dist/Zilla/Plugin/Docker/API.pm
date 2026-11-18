@@ -1,6 +1,6 @@
 package Dist::Zilla::Plugin::Docker::API;
 # ABSTRACT: Build and publish Docker images as Dist::Zilla release artifacts
-our $VERSION = '0.105';
+our $VERSION = '0.107';
 use Moose;
 with 'Dist::Zilla::Role::Plugin';
 with 'Dist::Zilla::Role::BeforeBuild';
@@ -10,6 +10,7 @@ with 'Dist::Zilla::Role::Releaser';
 use namespace::autoclean;
 use Log::Any qw($log);
 use Path::Tiny;
+use File::Spec;
 
 use Dist::Zilla::Plugin::Docker::API::TagTemplate;
 use Dist::Zilla::Plugin::Docker::API::Result;
@@ -489,18 +490,34 @@ sub _git_info {
 
 sub _git_capture {
     my ($dir, @cmd) = @_;
-    my $pid = open(my $fh, '-|');
-    return '' unless defined $pid;
-    if ($pid == 0) {
-        chdir $dir or exit 1;
-        open STDERR, '>', '/dev/null';
-        exec 'git', @cmd;
-        exit 127;
+    # No implicit fork, so it also runs on Windows. The list form of a piped
+    # open is native from perl 5.22 on Win32 and everywhere on Unix; a Win32
+    # perl before 5.22 gets one quoted command string for cmd.exe instead.
+    # git's stderr goes to the null device for the time of the call.
+    open(my $olderr, '>&', \*STDERR) or return '';
+    unless (open(STDERR, '>', File::Spec->devnull)) {
+        open(STDERR, '>&', $olderr);
+        return '';
     }
-    my $out = do { local $/; <$fh> } // '';
-    close $fh;
-    return '' if $? != 0;
-    chomp $out;
+    my ($out, $status) = ('', 1);
+    my @open = ('git', '-C', $dir, @cmd);
+    if ($^O eq 'MSWin32' && $] < 5.022) {
+        @open = (join ' ', map {
+            my $word = $_;
+            $word =~ s/(\\*)"/$1$1\\"/g;
+            $word =~ s/(\\+)\z/$1$1/;
+            qq{"$word"};
+        } @open);
+    }
+    if (open(my $fh, '-|', @open)) {
+        binmode $fh;
+        $out = do { local $/; <$fh> } // '';
+        close $fh;
+        $status = $?;
+    }
+    open(STDERR, '>&', $olderr);
+    return '' if $status != 0;
+    $out =~ s/\r?\n\z//;
     return $out;
 }
 
@@ -640,7 +657,7 @@ Dist::Zilla::Plugin::Docker::API - Build and publish Docker images as Dist::Zill
 
 =head1 VERSION
 
-version 0.105
+version 0.107
 
 =head1 SYNOPSIS
 

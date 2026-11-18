@@ -1,6 +1,6 @@
 package API::Docker::Role::RegistryAuth;
 # ABSTRACT: AuthConfig encoding shared by the registry-facing endpoints
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 use Carp qw( croak );
 use JSON::MaybeXS qw( decode_json encode_json );
@@ -94,7 +94,7 @@ API::Docker::Role::RegistryAuth - AuthConfig encoding shared by the registry-fac
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -196,7 +196,7 @@ header only when credentials were given
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

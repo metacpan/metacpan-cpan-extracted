@@ -15,6 +15,7 @@ t/argv.t
 t/autoload.t
 t/coderefs.t
 t/comment-spelling.t
+t/config-general.t
 t/cover.t
 t/edge_cases.t
 t/eof.t
@@ -22,7 +23,9 @@ t/eol.t
 t/extended_tests.t
 t/flatten.t
 t/function.t
+t/includes.t
 t/integration.t
+t/interpolate.t
 t/locales.t
 t/logger.t
 t/manifest.t

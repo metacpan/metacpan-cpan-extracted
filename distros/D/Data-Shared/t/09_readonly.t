@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Data::Shared qw(shared_get shared_set shared_exists shared_call shared_push
     shared_compile sharedc_set sharedc_push shareda_call sharedc_call);
 
@@ -44,7 +46,7 @@ subtest 'the strict refusal names the mount, not only the class' => sub {
     my $d = tempdir(CLEANUP => 1);
     {
         my $m = Data::Shared->new($d);
-        plan skip_all => 'buffer unavailable' unless eval { require Data::Buffer::Shared; 1 };
+        plan skip_all => 'buffer unavailable' unless have('buffer');
         $m->mount('cache', 'hashmap:ii', undef, 64);
         $m->mount('counters', 'buffer:i64', undef, 8);
         $m->handle('/cache')->freeze;

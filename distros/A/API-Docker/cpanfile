@@ -27,9 +27,9 @@ requires 'Types::Standard';
 recommends 'IO::Socket::SSL';
 
 on test => sub {
-    requires 'Test::More';
-    requires 'Path::Tiny';
     requires 'Exporter';
+    requires 'Path::Tiny';
+    requires 'Test::More';
 };
 
 # The drift checker under maint/ reads Docker's swagger from spec/ and the

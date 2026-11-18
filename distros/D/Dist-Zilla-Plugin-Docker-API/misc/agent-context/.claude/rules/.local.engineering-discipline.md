@@ -34,5 +34,7 @@ non-trivial work; use judgment on trivial tasks.
     Never continue from a state you can't describe back. When a session grows long or
     muddy, summarize and start fresh rather than grind on.
 11. **Fail loud** — "Done" is wrong if anything was skipped silently; report passed, failed
-    and skipped as they are. Claim only what you verified, with the command or output that
-    shows it — "should work now" is not done.
+    and skipped as they are — name every suite that skipped itself (missing dependency,
+    unset env var for a live run) and every TODO left. A refused or skipped check is not a
+    pass. Claim only what you verified, with the command or output that shows it — "should
+    work now" is not done.

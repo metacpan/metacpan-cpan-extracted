@@ -152,7 +152,7 @@ for my $key (@keys) {
     subtest "$key crosses a fork" => sub {
         my $spec = $case->{variant} // $key;
         my $resolved = Data::Shared::Registry::resolve_spec($spec);
-        unless (eval { Data::Shared::_require_class($resolved->{load}); 1 }) {
+        unless (eval { Data::Shared::Storage::_load($resolved); 1 }) {
             push @absent, $key;
             plan skip_all => "backend unavailable: $@";
             return;

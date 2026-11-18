@@ -15,7 +15,7 @@ use Params::Get;
 use Params::Validate::Strict;
 use Readonly;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 # Used when the configuration file has no blacklist_countries entry
 Readonly my @DEFAULT_COUNTRIES => qw(
@@ -29,17 +29,17 @@ Readonly my $COUNTRY_CODE => qr/\A[A-Za-z]{2}\z/;
 
 =head1 NAME
 
-VWF::Blacklist - Country-based access control for VWF pages
+Web::VWF::Blacklist - Country-based access control for VWF pages
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.003.0
 
 =head1 SYNOPSIS
 
-	use VWF::Blacklist;
+	use Web::VWF::Blacklist;
 
-	my $bl = VWF::Blacklist->new(countries => $config->{blacklist_countries});
+	my $bl = Web::VWF::Blacklist->new(countries => $config->{blacklist_countries});
 	if($bl->is_blocked($lingua->country())) { ... }
 
 =head1 METHODS
@@ -52,19 +52,19 @@ Args: C<countries> (optional) - an arrayref of two-letter country codes, or a
 comma/space separated string, as an XML configuration file gives.  Defaults to the
 built-in list.
 
-Returns: a C<VWF::Blacklist>.
+Returns: a C<Web::VWF::Blacklist>.
 
 Side Effects: none.  Each object has its own list, so two objects never
 affect one another.
 
 Usage:
 
-	my $bl = VWF::Blacklist->new(countries => [qw(CN RU)]);
+	my $bl = Web::VWF::Blacklist->new(countries => [qw(CN RU)]);
 
 =head3 EXAMPLE
 
-	my $bl = VWF::Blacklist->new();			# built-in list
-	my $strict = VWF::Blacklist->new(countries => 'CN, RU');
+	my $bl = Web::VWF::Blacklist->new();			# built-in list
+	my $strict = Web::VWF::Blacklist->new(countries => 'CN, RU');
 
 =head3 API SPECIFICATION
 
@@ -76,7 +76,7 @@ Usage:
 
 =head4 OUTPUT
 
-	{ type => 'object', isa => 'VWF::Blacklist' }
+	{ type => 'object', isa => 'Web::VWF::Blacklist' }
 
 =head3 MESSAGES
 
@@ -141,7 +141,7 @@ Usage:
 
 =head3 EXAMPLE
 
-	my $bl = VWF::Blacklist->new(countries => ['CN']);
+	my $bl = Web::VWF::Blacklist->new(countries => ['CN']);
 	$bl->is_blocked('cn');	# 1
 	$bl->is_blocked('GB');	# 0
 	$bl->is_blocked(undef);	# 0
@@ -193,7 +193,7 @@ Usage:
 
 =head3 EXAMPLE
 
-	VWF::Blacklist->new(countries => 'ru cn')->countries();	# ['CN', 'RU']
+	Web::VWF::Blacklist->new(countries => 'ru cn')->countries();	# ['CN', 'RU']
 
 =head3 API SPECIFICATION
 
@@ -234,3 +234,17 @@ databases all defeat it.  It is a noise filter, not a security boundary.
 =cut
 
 1;
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

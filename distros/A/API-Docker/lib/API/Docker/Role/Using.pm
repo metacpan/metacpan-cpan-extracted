@@ -1,6 +1,6 @@
 package API::Docker::Role::Using;
 # ABSTRACT: A resource class clone that bounds a run of calls
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 use Carp qw( croak );
 use namespace::clean;
@@ -62,7 +62,7 @@ API::Docker::Role::Using - A resource class clone that bounds a run of calls
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -208,7 +208,7 @@ C<connect_timeout>, per transport
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

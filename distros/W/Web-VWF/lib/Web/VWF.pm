@@ -6,7 +6,7 @@ use strict;
 use warnings;
 # use diagnostics;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 # TODO: Try Log::Any::Adapter::Abstraction instead of Log::Any
 
@@ -91,9 +91,6 @@ my $tmpdir;
 # $vwflog holds the path to the CSV access log; resolved from config on first request.
 my $vwflog;
 
-# These caches are created lazily on the first request and reused across the
-# FCGI accept loop to amortise the cost of cache initialisation.
-my $info_cache;
 my $lingua_cache;
 my $buffercache;
 
@@ -115,10 +112,10 @@ our $RUNNING;
 # use Web::VWF::Display::editor;
 # use Web::VWF::Display::meta_data;
 
-# ── What a site declares, and what it gets if it declares nothing ───────────
+# -- What a site declares, and what it gets if it declares nothing -----------
 # The directory its databases are in, the data modules it loads, the languages
 # it offers and the addresses it allows or trusts are all site settings, read
-# from the domain's configuration file - see "Site Settings" in Web::VWF's
+# from the domain's configuration file - see "CONFIGURATION" in Web::VWF's
 # documentation.  What is below is what this script used to hardcode, so a site
 # that says nothing behaves exactly as it did before.  The settings are resolved
 # by _site_setup() on the first request, because the configuration cannot be read
@@ -160,6 +157,14 @@ my $config;
 # The pages that may be loaded; worked out in doit() since it needs $config
 my @valid_pages;
 
+# What each valid page says it is for, keyed by page name; only the pages the
+# site described in its configuration have an entry.  Used by the 300 response.
+my %page_description;
+
+# Where a page's module is, for the pages that have a <directory> of their own
+# or inherit <display><directory>; any other page's module is found in @INC.
+my %page_directory;
+
 # FastCGI signal handling: the FCGI process lives across many requests so we
 # cannot exit immediately on SIGTERM/SIGUSR1 - we set a flag and exit cleanly
 # after the current request finishes.  See http://fastcgi.com/docs/faq.html#PerlSignals
@@ -184,7 +189,16 @@ Web::VWF - Versatile Web Framework - easily build a website to support different
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.003.0
+
+=head1 SYNOPSIS
+
+A site's page script, F<cgi-bin/page.fcgi>, is all of this:
+
+	use FindBin;
+	use Web::VWF;
+
+	Web::VWF->new({ directory => "$FindBin::Bin/../conf" })->run();
 
 =head1 DESCRIPTION
 
@@ -257,6 +271,302 @@ A site that used to carry a renamed copy of VWF of its own deletes that copy,
 installs this distribution, renames C<VWF::> to C<Web::VWF::> in its own code,
 and moves its templates from C<.../VWF/Display/> to C<.../Web/VWF/Display/>.
 
+=head1 CONFIGURATION
+
+A site is configured by files, usually XML, in its F<conf/> directory (see
+L<Web::VWF::Config> for where they are looked for, in which order, and how an
+environment variable of the same name as a top-level key overrides that key).
+The file named F<default> is read first, then one named for the site's domain
+name, then C<$CONFIG_FILE>.  F<example/conf/default> is a complete working
+example.
+
+Every setting is optional.  What a site does not say gets the default given
+below, which is what the framework did before the setting existed.
+
+=head2 Environment variables
+
+=over 4
+
+=item C<CONFIG_DIR>
+
+The one directory configuration is read from.  When it is set nothing else is
+searched.  It must exist.
+
+=item C<CONFIG_FILE>
+
+An extra configuration file, read after C<default> and the domain's file.
+
+=item C<root_dir>
+
+The site's own directory: where the templates are.  It also overrides the C<root_dir> of every cache driver,
+and the one in the configuration.  The server's directory of sites, for a
+server that has one directory for each, is the C<directory> argument of
+L</new> and defaults to this variable and then to F</usr/lib/vwf>.
+
+=item C<CACHEDIR>, C<CACHE_DIR>
+
+Where the file-based caches (C<File> and C<BerkeleyDB>) are kept, so that they
+need not be inside the site: C<CACHEDIR> is used if it is set and not empty,
+else C<CACHE_DIR>.  Either beats C<root_dir> above, and the directory is
+created if it does not exist.
+
+=back
+
+=head2 Pages: C<display>
+
+	<display>
+		<directory>/path/to/modules</directory>
+		<page>
+			<name>states</name>
+			<description>Displays information about the U.S. states</description>
+			<directory>/path/to/this/page</directory>
+		</page>
+	</display>
+
+One C<page> for each page that C<?page=> may name.  The C<name> is required and
+may only be word characters.  The C<description> is shown in the C<300 Multiple
+Choices> response, which lists the pages when no C<page> is given.  A page is
+the class C<Web::VWF::Display::E<lt>nameE<gt>> and its template.
+
+C<directory> says where the page modules are.  In C<display> it is the default
+for all of them, in a C<page> it is that page's alone and wins.  It is where the
+F<E<lt>nameE<gt>.pm> file is, not a directory of templates.  A relative one is
+taken from the directory the page script is in.  A page with no directory at
+all is found in C<@INC>.
+
+With no C<page> at all, C<display>'s C<directory> is searched and every F<.pm>
+in it, except F<captcha.pm>, is a page.  With no C<display> either, that is
+F<../lib/Web/VWF/Display> beside the script.
+
+The old C<pages> is read when there is no C<display>, as is its old form of one
+string of names, C<< <pages>index, meta_data</pages> >>.
+
+=head2 Data: C<databases>
+
+	<databases>
+		<directory>/path/to/modules</directory>
+		<database>
+			<name>states</name>
+			<description>List of data about the U.S. states</description>
+			<directory>/path/to/this/module</directory>
+		</database>
+	</databases>
+
+One C<database> for each data module a page may use.  A page is given each as
+a variable named for the last part of its class, lower-cased: the module
+C<Web::VWF::Data::states> is C<$states> in the page.  A C<name> with no C<::> in it is
+a C<Web::VWF::Data::> module; one with C<::>, such as C<Bands::Data::bands>, is
+used as written.  The C<description> is only logged.
+
+C<directory> is where the module's F<.pm> file is, in the same way as for
+C<display>, named for the last part of the class.  It is not where the
+database's own files are: that is C<database_dir>.
+
+What is loaded, in order of preference:
+
+=over 4
+
+=item 1. the C<database> elements;
+
+=item 2. the old C<data_modules>, one string of names, C<index, states> (an empty
+one means none);
+
+=item 3. with only a C<databases> C<directory>, every F<.pm> in it;
+
+=item 4. the default, C<Web::VWF::Data::index>.
+
+=back
+
+A module that cannot be loaded is logged and skipped; the pages that do not
+need it still work.
+
+This is not called C<data> because the data modules are given the configuration's top-level
+keys as their constructor arguments, and a key called C<data> replaces the rows
+of every database.
+
+=head2 Other settings
+
+=over 4
+
+=item C<database_dir>
+
+The directory of the database files (CSV, XML, SQLite) read by the data
+modules.  Default: F<../data> beside the script.  Pages are told it as
+C<database_dir> and C<databasedir>.
+
+=item C<supported_languages>
+
+The languages the site has templates for.  Default: C<en-gb>.
+
+=item C<allow_ips>
+
+Addresses always allowed through the access control.  Default: C<108.44.193.70>
+and C<127.0.0.1>; a site should set its own.  It is not called C<allowed_ips>,
+which would be taken as a constructor argument by L<CGI::ACL>.
+
+=item C<rate_limit_trusted_ips>
+
+Addresses never rate limited.  Default: C<127.0.0.1> and C<192.168.1.1>.
+
+=item C<blacklist_countries>
+
+Two-letter country codes to refuse.  Default: C<BY MD RU CN BR UY TR MA VE SA
+CY CO MX IN RS PK UA XH>.  Setting it replaces the list.
+
+=item C<vwflog>
+
+The path of the access log, a CSV file that the C<meta_data> page reads.
+Default: F<vwf.log> in the log directory L<CGI::Info> chooses.
+
+=item C<root_dir>
+
+The site's own directory, as the environment variable of the same name, which
+wins.  When it is set, the output of pages other than the home page and mail
+sending is also saved, for a day, in F<save_to> inside it, by L<FCGI::Buffer>.
+
+=item C<twitter>
+
+A Twitter handle, which gives the pages a tweet button.
+
+=item C<SiteTitle>, C<contact>, and any other key
+
+All of the configuration is available to the templates, so a site may put its
+own settings in it.  C<SiteTitle> and C<contact> in the example are only
+that.
+
+=item C<syslog>
+
+Passed to L<CGI::Info> to log to syslog.  C<server> is accepted for C<host>.
+
+=item C<DKIMSelector>, C<DKIMKey>
+
+The selector and the private key file with which the mail the contact page
+sends is signed.  Without both it is sent unsigned.  See L<Web::VWF::Mail>.
+
+=back
+
+List-valued settings (C<supported_languages>, C<allow_ips>,
+C<rate_limit_trusted_ips>, C<blacklist_countries>) may be written as one string
+separated by commas or spaces, or as an element with one child for each value.
+
+=head2 C<recaptcha>
+
+	<recaptcha>
+		<enabled>1</enabled>
+		<site_key>...</site_key>
+		<secret_key>...</secret_key>
+	</recaptcha>
+
+Google reCAPTCHA, from L<https://www.google.com/recaptcha/admin>.  When it is
+enabled a client past the soft rate limit is shown a challenge instead of
+being refused.  When it is not, the hard limit refuses with a plain-text C<429>.
+
+=head2 C<security>
+
+=over 4
+
+=item C<security.rate_limiting.max_requests>
+
+Requests from one address in the C<time_window> after which the CAPTCHA is
+shown.  Default: 100.
+
+=item C<security.rate_limiting.max_requests_hard>
+
+After which the request is refused.  Default: one and a half times
+C<max_requests>.
+
+=item C<security.rate_limiting.time_window>
+
+A duration such as C<60s> or C<5 minutes>.  Default: C<60s>.
+
+=item C<security.rate_limiting.captcha_bypass_duration>
+
+How long a solved CAPTCHA exempts the client from the limit.  Default: C<300s>.
+
+=item C<security.ids_threshold>
+
+The L<CGI::IDS> impact above which a request is treated as an attack.
+Default: 50.
+
+=item C<security.csrf.enable>
+
+Set to C<0> to turn off the CSRF cookie that pages with a form are given.
+Default: 1.
+
+=item C<security.csrf.secret>
+
+The secret the CSRF tokens are signed with.  Without one a random secret is
+made for each process and the tokens do not outlive it.  See
+L<Web::VWF::Display>.
+
+=back
+
+=head2 C<throttle>
+
+The per-address throttle used by L<Web::VWF::Allow> and by
+L<Web::VWF::Display>, which share one file.
+
+=over 4
+
+=item C<throttle.max_items>
+
+Requests allowed in the interval.  Default: 30.
+
+=item C<throttle.interval>
+
+The interval, in seconds.  Default: 90.
+
+=item C<throttle.file>
+
+The file the counts are kept in.  Default: F<throttle> in the temporary
+directory.
+
+=back
+
+=head2 Caches: C<disc_cache> and C<memory_cache>
+
+	<disc_cache>
+		<driver>File</driver>
+		<root_dir>/var/tmp/cache</root_dir>
+	</disc_cache>
+
+The L<CHI> caches.  C<driver> is one of C<Memory>, C<BerkeleyDB>, C<DBI>,
+C<Redis>, C<Memcached>, C<SharedMem>, C<File> or C<Null>.  Default for
+C<disc_cache>: C<BerkeleyDB>, or C<File> where that is not installed; for
+C<memory_cache>: C<Memory>.  The other keys depend on the driver:
+
+=over 4
+
+=item C<root_dir>
+
+For C<File> and C<BerkeleyDB>.  Overridden by C<$CACHEDIR>, C<$CACHE_DIR> and
+C<$root_dir>, in that order.  It must exist and be writable unless one of the
+environment variables made it.
+
+=item C<server> (or C<host>) and C<port>
+
+For C<Memcached>: C<host:port> pairs separated by commas, or a host with the
+port in C<port>.  Default: C<127.0.0.1:11211>.
+
+=item C<connect>, C<create_table>
+
+For C<DBI>: the DSN, which is required, and whether to create the table
+(default: yes).
+
+=item C<reconnect>, C<every>, C<encoding>, C<redis_options>
+
+For C<Redis>, which also takes C<server> (or C<host>) and C<port> as above.
+
+=item C<shm_key>, C<shm_size>, C<max_size>
+
+For C<SharedMem>; C<shm_key> is required.
+
+=item C<global>, C<datastore>
+
+For C<Memory>; not both.
+
+=back
+
 =head1 SUBROUTINES/METHODS
 
 =head2 new
@@ -315,6 +625,37 @@ sub new
 		params => $params,
 	}, $class;
 }
+
+=head2 run
+
+Serve requests.  It accepts FastCGI requests one after another and sends each
+one to the page named by C<?page=>, as described in L</DESCRIPTION>; an error in
+one request is logged and does not end the worker.
+
+The loop ends, and C<run> returns, when the web server asks the worker to exit,
+after a TERM or USR1 signal, or when the page script has been changed since the
+worker started, so that the next request starts a worker with the new code.
+
+When C<REMOTE_ADDR> is not set, which is how the script is run from a command
+line, there is no web server: C<run> handles one request, built from the
+command-line arguments such as C<page=index>, turns caching off, takes the
+language from C<LANG> and prints debug logging to STDOUT among the response.
+
+C<run> refuses to run again from inside itself, and to run while the script is
+still being compiled, which happens when something reads the page script as if
+it were a configuration file.  It prints a message on STDERR and returns.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{}
+
+=head4 OUTPUT
+
+	{ type => 'undef' }
+
+=cut
 
 =head2 _directory
 
@@ -492,7 +833,7 @@ sub run
 	# my $request = FCGI::Request($stdin, $stdout, $stderr);
 	my $request = FCGI::Request();
 
-	# ─── Main FCGI request loop ───────────────────────────────────────────────────
+	# --- Main FCGI request loop ---------------------------------------------------
 	# Accept() blocks until the web server sends a new request.  It returns a
 	# negative value when the server wants this worker to exit (e.g. graceful
 	# shutdown), which breaks the loop naturally.
@@ -540,7 +881,7 @@ sub run
 			last;	# command-line mode is single-shot; exit the accept loop
 		}
 
-		# ── Live HTTP request ──────────────────────────────────────────────────
+		# -- Live HTTP request --------------------------------------------------
 		$requestcount++;
 		$logger->info("Request $requestcount: ", $ENV{'REMOTE_ADDR'});
 
@@ -578,7 +919,7 @@ sub run
 	}
 }
 
-# ─── doit() — per-request handler ────────────────────────────────────────────
+# --- doit() - per-request handler --------------------------------------------
 # Called once per FCGI iteration.  Handles security checks, language detection,
 # template dispatch, response caching, and access logging.
 sub _doit
@@ -626,13 +967,19 @@ sub _doit
 		$acl->allow_ip($ip);
 	}
 
-	@valid_pages = $self->_valid_pages($config) unless(@valid_pages);
+	unless(@valid_pages) {
+		@valid_pages = $self->_valid_pages($config);
+		%page_description = $self->_page_descriptions($config);
+		%page_directory = $self->_page_directories($config, @valid_pages);
+	}
 
+	# These caches are created lazily on the first request and reused across the
+	# FCGI accept loop to amortise the cost of cache initialisation.
 	# The CGI::Info disc cache stores parsed request data across FCGI restarts.
-	$info_cache ||= create_disc_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
+	$self->{info_cache} ||= create_disc_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
 
 	my $options = {
-		cache => $info_cache,
+		cache => $self->{info_cache},
 		logger => $logger
 	};
 
@@ -750,7 +1097,7 @@ sub _doit
 		syslog => $syslog,
 	});
 
-	my $cachedir = $params{'cachedir'} || $config->{disc_cache}->{root_dir} || File::Spec->catfile($tmpdir, 'cache');
+	my $cachedir = Web::VWF::Utils::env_cache_dir() || $params{'cachedir'} || $config->{disc_cache}->{root_dir} || File::Spec->catfile($tmpdir, 'cache');
 
 	# Rate limit by IP (unless bypassed)
 	unless($has_captcha_bypass || grep { $_ eq $client_ip } @rate_limit_trusted_ips) {
@@ -811,14 +1158,24 @@ sub _doit
 					config => $config,
 				});
 
-				print $display->as_string({
-					'Retry-After' => $retry_after,
-					Retry_After => $retry_after,
-					hard_block => 0,
-					request_count => $request_count,
-				});
+				if($display) {
+					print $display->as_string({
+						'Retry-After' => $retry_after,
+						Retry_After => $retry_after,
+						hard_block => 0,
+						request_count => $request_count,
+					});
 
-				$self->_vwflog($vwflog, $info, $lingua, $syslog, 'Soft rate limit - CAPTCHA shown', $log, $request_start);
+					$self->_vwflog($vwflog, $info, $lingua, $syslog, 'Soft rate limit - CAPTCHA shown', $log, $request_start);
+				} else {
+					my $error = $@;
+					if($error) {
+						$logger->error($error);
+					} else {
+						$logger->error("Unable to show captcha page - request count = $request_count");
+					}
+					$self->_vwflog($vwflog, $info, $lingua, $syslog, 'Soft rate limit - CAPTCHA not shown', $log, $request_start);
+				}
 				return;
 			}
 		}
@@ -836,11 +1193,11 @@ sub _doit
 		return;
 	}
 
-	# ── Multi-layer access control ─────────────────────────────────────────
+	#  Multi-layer access control
 	# Three independent checks are run in order of cheapness:
-	#   1. CGI::ACL — cloud ranges, country blocks, explicit IP allow/deny.
-	#   2. blacklisted() — in-process IP set built from prior SQL-injection attempts.
-	#   3. Web::VWF::Allow — DShield feed, user-agent blacklist, throttler, IDS.
+	#   1. CGI::ACL - cloud ranges, country blocks, explicit IP allow/deny.
+	#   2. blacklisted() - in-process IP set built from prior SQL-injection attempts.
+	#   3. Web::VWF::Allow - DShield feed, user-agent blacklist, throttler, IDS.
 	if(my $remote_addr = $ENV{'REMOTE_ADDR'}) {
 		my $reason;
 		if($acl->all_denied(lingua => $lingua)) {
@@ -875,7 +1232,7 @@ sub _doit
 		}
 	}
 
-	# ── FCGI::Buffer setup ────────────────────────────────────────────────
+	# -- FCGI::Buffer setup ------------------------------------------------
 	# FCGI::Buffer post-processes the output: compresses it, generates an ETag
 	# and Last-Modified header, and serves a 304 Not Modified when appropriate.
 	my $args = {
@@ -950,7 +1307,7 @@ sub _doit
 		log => $log
 	};
 
-	# ── Page dispatch ──────────────────────────────────────────────────────
+	# -- Page dispatch ------------------------------------------------------
 	# The outer block eval catches any exception thrown during module loading
 	# or display-object construction, setting $@ for inspection below.
 	eval {
@@ -991,7 +1348,7 @@ sub _doit
 		} else {
 			my $display_module = "Web::VWF::Display::$page";
 
-			$logger->debug("doit(): Loading module $display_module from @INC");
+			$logger->debug("doit(): Loading module $display_module from ", $page_directory{$page} // '@INC');
 			unless($display_module->can('new')) {
 				# String-eval elimination:
 				#   The original code used eval "require $display_module" which is a
@@ -999,7 +1356,17 @@ sub _doit
 				#   stripped of \W characters, a Unicode or locale edge-case could
 				#   allow a bypass.  Module::Runtime::require_module() loads a module
 				#   by name using a block eval internally, with no string-eval surface.
-				eval { require_module($display_module) };
+				#
+				# A page with a directory is loaded from its file there instead
+				# of from @INC.  Its name has been checked against the valid
+				# pages, which are \w+ only, so the path cannot leave the
+				# directory.
+				if(my $dir = $page_directory{$page}) {
+					my $file = File::Spec->catfile($dir, "$page.pm");
+					eval { -f $file or die "No such file $file\n"; require $file };
+				} else {
+					eval { require_module($display_module) };
+				}
 				$display_module->import() unless $@;
 			}
 			if($@) {
@@ -1126,10 +1493,12 @@ sub choose
 
 	print "\n";
 
-	# RFC 7231 §4.3.2: a HEAD response must not include a body.
+	# RFC 7231 section 4.3.2: a HEAD response must not include a body.
 	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		# The same list that doit() allows, so the two cannot differ
-		print map { "/cgi-bin/page.fcgi?page=$_\n" } @valid_pages;
+		print map {
+			"/cgi-bin/page.fcgi?page=$_" . (length($page_description{$_} // '') ? " - $page_description{$_}" : '') . "\n"
+		} @valid_pages;
 	}
 }
 
@@ -1151,7 +1520,7 @@ sub send_error
 		"Content-type: text/plain\n",
 		"Pragma: no-cache\n\n";
 
-	# RFC 9110 §9.3.2: a HEAD response must not include a body.
+	# RFC 9110 section 9.3.2: a HEAD response must not include a body.
 	my $is_head = $ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD');
 	print $args{'body'} if(defined($args{'body'}) && !$is_head);
 
@@ -1191,21 +1560,203 @@ sub _config_list
 	return grep { defined($_) && length($_) && !$seen{$_}++ } @values;
 }
 
-# The pages that ?page= may load.  Sites can list them in the config file
-# (<pages>index, meta_data</pages>); otherwise every ../lib/Web/VWF/Display/*.pm
-# next to this script is allowed, except captcha, which only the rate limiter
-# shows.
+# The <display> setting, named after the Web::VWF::Display directory the pages
+# live in.  A site written before the rename used <pages>, which is still read
+# when there is no <display>.
+sub _display_setting
+{
+	my $config = shift;
+
+	return $config->{'display'} // $config->{'pages'};
+}
+
+# The pages the site's configuration file declares, as a list of
+# { name => ..., description => ... } in the order they were written:
+#	<display>
+#		<page><name>states</name><description>About the U.S. states</description></page>
+#		<directory>/path/to/pages</directory>
+#	</display>
+# A <directory> in <display> is where the page modules are looked for, and the
+# list of pages when there are no <page>s (see _valid_pages); one in a <page>
+# is where that page's module is, and beats the one in <display>.  One <page> is read as a hash and several as an array, so both are handled.
+# The old form, a single string of names (<pages>index, meta_data</pages>), is
+# still read, with no descriptions, so existing sites keep working.  A page
+# without a usable name is dropped, and so is a repeated one, since the same
+# file can be loaded more than once when the configuration is merged.
+sub _config_pages
+{
+	my (undef, $config) = @_;
+
+	return _config_entries(_display_setting($config), 'page');
+}
+
+# The common reader for a setting that is a list of named things, each with an
+# optional description and directory: the elements called $item inside $setting
+# (a hash), or the array or string of names of the old form.  Returns
+# { name, description, directory } hashes, in order, without repetitions.
+sub _config_entries
+{
+	my ($setting, $item) = @_;
+
+	return unless(defined($setting));
+
+	my @entries;
+	if(ref($setting) eq 'HASH') {
+		my $found = $setting->{$item};
+		return unless(defined($found));
+		@entries = (ref($found) eq 'ARRAY') ? @{$found} : ($found);
+	} elsif(ref($setting) eq 'ARRAY') {
+		@entries = @{$setting};
+	} else {
+		@entries = split /[\s,]+/, $setting;
+	}
+
+	my (%seen, @found);
+	foreach my $entry (@entries) {
+		next unless(defined($entry));
+		my ($name, $description, $directory) = (ref($entry) eq 'HASH') ? @{$entry}{qw(name description directory)} : ($entry, undef, undef);
+		next unless(defined($name) && !ref($name) && length($name));
+		next if($seen{$name}++);
+		push @found, {
+			name => $name,
+			description => (defined($description) && !ref($description)) ? $description : '',
+			directory => (defined($directory) && !ref($directory)) ? $directory : '',
+		};
+	}
+	return @found;
+}
+
+# The pages that ?page= may load.  Sites declare them in the config file (see
+# _config_pages); otherwise every *.pm in the page directory is allowed, except
+# captcha, which only the rate limiter shows.  The page directory is
+# <display><directory>, or ../lib/Web/VWF/Display next to this script.
 sub _valid_pages
 {
 	my $self = shift;
 	my $config = shift;
 
-	my @pages = $self->_config_list($config, 'pages');
+	my @pages = map { $_->{'name'} } $self->_config_pages($config);
 	return grep { /\A\w+\z/ } @pages if(@pages);
 
-	# FIXME: Remove the hard coding
-	my $dir = File::Spec->catdir($script_dir, File::Spec->updir(), 'lib', 'Web', 'VWF', 'Display');
-	return sort(grep { $_ ne 'captcha' } map { basename($_, '.pm') } glob(File::Spec->catfile($dir, '*.pm')));
+	# <display><directory> overrides where the page modules are looked for.
+	# Only the default has the framework's own hard-coded layout.
+	my $dir = $self->_pages_directory($config);
+	unless(defined($dir)) {
+		# FIXME: Remove the hard coding
+		$dir = File::Spec->catdir($script_dir, File::Spec->updir(), 'lib', 'Web', 'VWF', 'Display');
+	}
+	# The list is built first rather than returned from inside sort(): a sort
+	# that is returned directly takes the caller's context, and sort in scalar
+	# context has no defined meaning.
+	my @found = sort(grep { $_ ne 'captcha' } map { basename($_, '.pm') } glob(File::Spec->catfile($dir, '*.pm')));
+	return @found;
+}
+
+# A directory from the configuration, made absolute: a relative one is taken
+# from the script's directory, as the default is.  Undef if there isn't one.
+sub _resolve_directory
+{
+	my $directory = shift;
+
+	# An explicit undef, not a bare return: this is used inside map, where an
+	# empty list would unbalance the hash being built
+	return undef unless(defined($directory) && !ref($directory) && length($directory));	## no critic (ProhibitExplicitReturnUndef)
+	return File::Spec->file_name_is_absolute($directory) ? $directory : File::Spec->catdir($script_dir, $directory);
+}
+
+# <display><directory>, resolved, or undef
+sub _pages_directory
+{
+	my (undef, $config) = @_;
+
+	my $display = _display_setting($config);
+	return unless(ref($display) eq 'HASH');
+	return _resolve_directory($display->{'directory'});
+}
+
+# name => directory for each of the given pages whose module is not simply in
+# @INC: the page's own <directory>, else <display><directory> if there is one.
+sub _page_directories
+{
+	my ($self, $config, @pages) = @_;
+
+	my $default = $self->_pages_directory($config);
+	my %own = map { $_->{'name'} => _resolve_directory($_->{'directory'}) } $self->_config_pages($config);
+
+	my %directory;
+	foreach my $page (@pages) {
+		my $dir = $own{$page} // $default;
+		$directory{$page} = $dir if(defined($dir));
+	}
+	return %directory;
+}
+
+# name => description for each page the configuration describes
+sub _page_descriptions
+{
+	my ($self, $config) = @_;
+
+	return map { $_->{'name'} => $_->{'description'} } grep { length($_->{'description'}) } $self->_config_pages($config);
+}
+
+# The data modules the site declares, as a list of
+# { name, module, description, directory } in the order they were written:
+#	<databases>
+#		<directory>/path/to/modules</directory>
+#		<database>
+#			<name>states</name>
+#			<description>List of data about the U.S. states</description>
+#			<directory>/path/to/states/module</directory>
+#		</database>
+#	</databases>
+# The container is <databases>, not <data>: the data modules take their
+# constructor arguments from the configuration's top-level keys, and a key called
+# data would replace the rows of every database with the setting itself.
+# name is what the page is given (lower-cased last part), module the class, and
+# directory where its .pm file is, or undef to find the class in @INC.  A
+# <directory> in a <database> beats the one in <databases>.  The directories are those
+# of the modules, not of the databases' files: those are <database_dir>.
+# What is declared, in order of preference:
+#	1. the <database> elements;
+#	2. the old <data_modules>index, states</data_modules> string, which is also
+#	   how a site says "none" by leaving it empty;
+#	3. with a <databases><directory> and no <database>, every *.pm in that directory;
+#	4. the default, Web::VWF::Data::index.
+# A name with no :: is one of this distribution's own, so index is
+# Web::VWF::Data::index; a name that has :: is used as written, which is how a
+# site names its own modules.  The file looked for in a directory is named for
+# the last part of the class, whichever way the class was written.
+sub _data_modules
+{
+	my ($self, $config) = @_;
+
+	my $databases = $config->{'databases'};
+	my $default_dir = (ref($databases) eq 'HASH') ? _resolve_directory($databases->{'directory'}) : undef;
+
+	my @entries = _config_entries($databases, 'database');
+	unless(@entries) {
+		if(defined($config->{'data_modules'})) {
+			@entries = map { +{ name => $_, description => '', directory => '' } } $self->_config_list($config, 'data_modules');
+		} elsif(defined($default_dir)) {
+			@entries = map { +{ name => $_, description => '', directory => '' } } sort(map { basename($_, '.pm') } glob(File::Spec->catfile($default_dir, '*.pm')));
+		} else {
+			@entries = map { +{ name => $_, description => '', directory => '' } } @DEFAULT_DATA_MODULES;
+		}
+	}
+
+	my @modules;
+	foreach my $entry (@entries) {
+		my $module = ($entry->{'name'} =~ /::/) ? $entry->{'name'} : "Web::VWF::Data::$entry->{'name'}";
+		my $last = (split(/::/, $module))[-1];
+		my $dir = _resolve_directory($entry->{'directory'}) // $default_dir;
+		push @modules, {
+			name => lc($last),
+			module => $module,
+			description => $entry->{'description'},
+			file => defined($dir) ? File::Spec->catfile($dir, "$last.pm") : undef,
+		};
+	}
+	return @modules;
 }
 
 # Read the settings this site declares, once per process, and act on them: open
@@ -1244,14 +1795,21 @@ sub _site_setup
 	# Addresses exempt from rate limiting
 	@rate_limit_trusted_ips = $self->_config_list($config, 'rate_limit_trusted_ips', @DEFAULT_RATE_LIMIT_TRUSTED_IPS);
 
-	# The site's data modules.  Each is loaded, constructed with ->new() and
-	# given to every page under the last part of its name, lower-cased:
-	# Web::VWF::Data::index arrives at a page as index, and a site's own
-	# Bands::Data::bands as bands.
-	foreach my $module ($self->_config_list($config, 'data_modules', @DEFAULT_DATA_MODULES)) {
+	# The site's data modules (see _data_modules).  Each is loaded, constructed
+	# with ->new() and given to every page under the last part of its name,
+	# lower-cased: Web::VWF::Data::index arrives at a page as index, and a
+	# site's own Bands::Data::bands as bands.
+	foreach my $database ($self->_data_modules($config)) {
+		my $module = $database->{'module'};
 		my $handle;
 		eval {
-			require_module($module);
+			if(defined($database->{'file'})) {
+				# From the directory the site gave, not from @INC
+				-f $database->{'file'} or die "No such file $database->{'file'}\n";
+				require $database->{'file'};
+			} else {
+				require_module($module);
+			}
 			$module->import() if($module->can('import'));
 			$handle = $module->new();
 		};
@@ -1263,10 +1821,10 @@ sub _site_setup
 			next;
 		}
 
-		my $name = lc((split(/::/, $module))[-1]);
+		my $name = $database->{'name'};
 		$handle->set_logger($logger) if($handle->can('set_logger'));
 		$data{$name} = $handle;
-		$logger->debug("Data module $module is available to pages as \$$name");
+		$logger->debug("Data module $module is available to pages as \$$name", length($database->{'description'}) ? ": $database->{'description'}" : '');
 	}
 
 	return 1;
@@ -1364,7 +1922,7 @@ sub filter
 }
 
 # Escape a single value for safe inclusion in a double-quoted CSV field.
-# Follows RFC 4180 §2.7 and additionally neutralises spreadsheet formulas.
+# Follows RFC 4180 section 2.7 and additionally neutralises spreadsheet formulas.
 sub _csv_escape
 {
 	my $v = shift // '';
@@ -1435,7 +1993,7 @@ sub _vwflog
 	# Open the log in append mode.  If the open fails we skip logging silently
 	# so that a disk-full or permissions error does not crash the live request.
 	if(open(my $fout, '>>', $vwflog)) {
-		# SECURITY — CSV injection defence:
+		# SECURITY - CSV injection defence:
 		#   Every user-visible field is passed through _csv_escape so that
 		#   embedded double-quotes cannot break the CSV column structure, and
 		#   leading formula characters cannot trigger code execution when the
@@ -1493,6 +2051,7 @@ sub DESTROY
 	if(defined($^V) && ($^V ge 'v5.14.0')) {
 		return if ${^GLOBAL_PHASE} eq 'DESTRUCT';	# >= 5.14.0 only
 	}
+	my $self = shift;
 
 	# Clean up resources before shutdown
 	$logger->info('Shutting down') if(defined($logger));
@@ -1504,7 +2063,7 @@ sub DESTROY
 		# I don't like this hardwired code, it would be better if I could find a way to determine if a driver can run purge()
 		$rate_limit_cache->purge() if($rate_limit_cache->short_driver_name() ne 'Memcached');
 	}
-	if($info_cache) {
+	if(my $info_cache = $self->{info_cache}) {
 		$info_cache->purge();
 	}
 	if($lingua_cache) {

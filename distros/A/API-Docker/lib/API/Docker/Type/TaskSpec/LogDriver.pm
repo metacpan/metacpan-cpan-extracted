@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::LogDriver;
 # ABSTRACT: Specifies the log driver to use for tasks created from this spec
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::TaskSpec::LogDriver - Specifies the log driver to use for tas
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -53,7 +53,7 @@ the caller's data> and are never translated.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

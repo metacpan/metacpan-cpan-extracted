@@ -15,7 +15,7 @@ use DBIx::Squirrel::st   qw();
 use namespace::clean;
 
 our @ISA     = 'DBI';
-our $VERSION = 'v3.1.0';
+our $VERSION = 'v3.2.0';
 
 # Export what the DBI exports, such as :sql_types, to the package using
 # DBIx::Squirrel. The names are the DBI's, so the DBI's import exports
@@ -459,7 +459,7 @@ rows of any shape;
 =item * L<DBIx::Squirrel::Stages::Batch>: C<batch> and C<collect>;
 
 =item * L<DBIx::Squirrel::Stages::Taps>: C<peek> and C<count_into>,
-with C<dump_to> on request.
+with C<dump_to> and C<tee> on request.
 
 =back
 

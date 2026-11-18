@@ -1,6 +1,6 @@
 package API::Docker::Type::Plugin::Config::RootFS;
 # ABSTRACT: The root filesystem of a plugin
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::Plugin::Config::RootFS - The root filesystem of a plugin
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -55,7 +55,7 @@ name would produce C<DiffIds>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

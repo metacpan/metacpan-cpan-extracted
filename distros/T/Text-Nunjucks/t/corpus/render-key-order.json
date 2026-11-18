@@ -1,0 +1,572 @@
+[
+  {
+    "name": "literal b,2,1 (k51 probe) for k,v",
+    "template": "{% for k, v in {\"b\":1, \"2\":2, \"1\":3} %}{{ k }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1;2;b;"
+    }
+  },
+  {
+    "name": "literal a,10,9,01,-1,4294967295,4294967294,1.5 (k51 probe)",
+    "template": "{% for k, v in {\"a\":1,\"10\":2,\"9\":3,\"01\":4,\"-1\":5,\"4294967295\":6,\"4294967294\":7,\"1.5\":8} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;4294967294=7;a=1;01=4;-1=5;4294967295=6;1.5=8;"
+    }
+  },
+  {
+    "name": "index boundary 4294967294 vs 4294967295",
+    "template": "{% for k, v in {\"4294967295\":1,\"x\":2,\"4294967294\":3,\"4294967293\":4} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "4294967293=4;4294967294=3;4294967295=1;x=2;"
+    }
+  },
+  {
+    "name": "zero-like keys 0 00 -0 1e3 and space-one",
+    "template": "{% for k, v in {\"x\":0,\"00\":1,\"-0\":2,\"1e3\":3,\" 1\":4,\"0\":5,\"1\":6} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "0=5;1=6;x=0;00=1;-0=2;1e3=3; 1=4;"
+    }
+  },
+  {
+    "name": "large non-index numerics",
+    "template": "{% for k, v in {\"9007199254740993\":1,\"4294967296\":2,\"18446744073709551616\":3,\"7\":4,\"b\":5} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "7=4;9007199254740993=1;4294967296=2;18446744073709551616=3;b=5;"
+    }
+  },
+  {
+    "name": "compile error (not order): numeric-literal keys in dict literal",
+    "template": "{% for k, v in {b:1, 2:2, 1:3, 10:4} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 22]\n  compilePair: Dict keys must be strings or names"
+      }
+    }
+  },
+  {
+    "name": "compile error (not order): unquoted names then ints as dict keys",
+    "template": "{% for k, v in {z:1, y:2, 3:3, 2:4} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 27]\n  compilePair: Dict keys must be strings or names"
+      }
+    }
+  },
+  {
+    "name": "duplicate key in literal keeps first position",
+    "template": "{% for k, v in {\"b\":1,\"2\":2,\"b\":3,\"1\":4,\"2\":5} %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1=4;2=5;b=3;"
+    }
+  },
+  {
+    "name": "order-insensitive: for k in over a dict literal",
+    "template": "{% for k in {\"b\":1, \"2\":2, \"1\":3} %}{{ k }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "order-insensitive: for single var over dict literal",
+    "template": "{% for x in {\"b\":1, \"2\":2, \"1\":3} %}{{ x }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "list filter of dict literal, keys joined",
+    "template": "{{ {\"b\":1, \"2\":2, \"1\":3} | list | join(\",\", \"key\") }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2,b"
+    }
+  },
+  {
+    "name": "list filter of dict literal with mixed keys, keys joined",
+    "template": "{{ {\"b\":1, \"2\":2, \"1\":3, \"a\":4, \"10\":5, \"9\":6} | list | join(\"|\", \"key\") }}",
+    "expected": {
+      "ok": true,
+      "output": "1|2|9|10|b|a"
+    }
+  },
+  {
+    "name": "urlencode of dict literal",
+    "template": "{{ {\"b\":1, \"2\":2, \"1\":3} | urlencode }}",
+    "expected": {
+      "ok": true,
+      "output": "1=3&amp;2=2&amp;b=1"
+    }
+  },
+  {
+    "name": "urlencode of dict literal with index keys among strings",
+    "template": "{{ {\"z\":\"a b\", \"10\":\"x&y\", \"9\":\"q\", \"a\":\"é\"} | urlencode }}",
+    "expected": {
+      "ok": true,
+      "output": "9=q&amp;10=x%26y&amp;z=a%20b&amp;a=%C3%A9"
+    }
+  },
+  {
+    "name": "order-insensitive: length of dict literal",
+    "template": "{{ {\"b\":1, \"2\":2, \"1\":3} | length }}",
+    "expected": {
+      "ok": true,
+      "output": "3"
+    }
+  },
+  {
+    "name": "compile error (not order): numeric key in dict literal under length filter",
+    "template": "{{ {\"1\":1, \"1\":2, 1:3} | length }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 19]\n  compilePair: Dict keys must be strings or names"
+      }
+    }
+  },
+  {
+    "name": "loop.index first last over dict iteration",
+    "template": "{% for k, v in {\"b\":1, \"2\":2, \"1\":3} %}{{ loop.index }}{{ loop.index0 }}{{ loop.revindex }}{{ loop.revindex0 }}{{ \"F\" if loop.first }}{{ \"L\" if loop.last }}={{ k }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1032F=1;2121=2;3210L=b;"
+    }
+  },
+  {
+    "name": "order-insensitive: for else over empty dict literal",
+    "template": "{% for k, v in {} %}{{ k }}{% else %}empty{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "empty"
+    }
+  },
+  {
+    "name": "for else over non-empty dict literal",
+    "template": "{% for k, v in {\"b\":1,\"1\":2} %}{{ k }}{% else %}empty{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1b"
+    }
+  },
+  {
+    "name": "set dict then iterate",
+    "template": "{% set d = {'b':1, '2':2, '1':3} %}{% for k, v in d %}{{ k }}={{ v }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1=3;2=2;b=1;"
+    }
+  },
+  {
+    "name": "set dict then list, keys joined",
+    "template": "{% set d = {'b':1, '2':2, '1':3} %}{{ d | list | join(',', 'key') }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2,b"
+    }
+  },
+  {
+    "name": "set block capture of list of pair keys",
+    "template": "{% set d %}{{ {'b':1,'1':2} | list | join(',', 'key') }}{% endset %}{{ d }}",
+    "expected": {
+      "ok": true,
+      "output": "1,b"
+    }
+  },
+  {
+    "name": "nested dict inner for",
+    "template": "{% for k, v in {\"b\":{\"y\":1,\"2\":2,\"1\":3},\"2\":{\"z\":1,\"10\":2,\"9\":3} } %}{{ k }}:{% for k2, v2 in v %}{{ k2 }},{% endfor %};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "2:9,10,z,;b:1,2,y,;"
+    }
+  },
+  {
+    "name": "dict literal inside array literal",
+    "template": "{% for d in [{\"b\":1,\"1\":2},{\"a\":1,\"3\":2,\"2\":3}] %}{% for k, v in d %}{{ k }}{% endfor %}|{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1b|23a|"
+    }
+  },
+  {
+    "name": "dict passed to macro",
+    "template": "{% macro m(d) %}{% for k, v in d %}{{ k }}{% endfor %}{% endmacro %}{{ m({'b':1,'2':2,'1':3}) }}",
+    "expected": {
+      "ok": true,
+      "output": "12b"
+    }
+  },
+  {
+    "name": "dict as macro kwargs-like default",
+    "template": "{% macro m(d={'b':1,'2':2,'1':3}) %}{% for k, v in d %}{{ k }}{% endfor %}{% endmacro %}{{ m() }}",
+    "expected": {
+      "ok": true,
+      "output": "12b"
+    }
+  },
+  {
+    "name": "dict via namespace-free inline if",
+    "template": "{% for k, v in ({'b':1,'1':2} if true else {}) %}{{ k }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1b"
+    }
+  },
+  {
+    "name": "dict from default filter",
+    "template": "{% for k, v in (undefinedvar | default({'b':1,'2':2,'1':3})) %}{{ k }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "12b"
+    }
+  },
+  {
+    "name": "dict from first of array of dicts",
+    "template": "{% for k, v in ([{'b':1,'2':2,'1':3}] | first) %}{{ k }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "12b"
+    }
+  },
+  {
+    "name": "dict set earlier nested as value in a later dict literal, then iterated",
+    "template": "{% set a = {'b':1} %}{% set b = {'2':2, 'a':a, '1':3} %}{% for k, v in b %}{{ k }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "12a"
+    }
+  },
+  {
+    "name": "order-insensitive: in operator and dict key lookup unaffected",
+    "template": "{{ '1' in {'b':1,'1':2} }} {{ ({'b':1,'1':2})['1'] }} {{ ({'b':1,'1':2})[1] }}",
+    "expected": {
+      "ok": true,
+      "output": "true 2 2"
+    }
+  },
+  {
+    "name": "for k,v over dict literal printing values only",
+    "template": "{% for k, v in {\"x\":\"X\",\"3\":\"T\",\"2\":\"S\"} %}{{ v }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "STX"
+    }
+  },
+  {
+    "name": "order-insensitive: single var for over dict with key lookup",
+    "template": "{% set d = {\"b\":1,\"2\":2,\"1\":3} %}{% for k in d %}{{ k }}{{ d[k] }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "ctx hash b,2,1 for k,v",
+    "template": "{% for k, v in h %}{{ k }}={{ v }};{% endfor %}",
+    "context": {
+      "h": {
+        "1": 3,
+        "2": 2,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "1=3;2=2;b=1;"
+    }
+  },
+  {
+    "name": "ctx hash a,10,9,01,-1,4294967295,4294967294,1.5 (string keys given in sorted order) for k,v",
+    "template": "{% for k, v in h %}{{ k }}={{ v }};{% endfor %}",
+    "context": {
+      "h": {
+        "9": 3,
+        "10": 2,
+        "4294967294": 7,
+        "-1": 5,
+        "01": 4,
+        "1.5": 8,
+        "4294967295": 6,
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;4294967294=7;-1=5;01=4;1.5=8;4294967295=6;a=1;"
+    }
+  },
+  {
+    "name": "ctx hash boundary and non-index numerics for k,v",
+    "template": "{% for k, v in h %}{{ k }}={{ v }};{% endfor %}",
+    "context": {
+      "h": {
+        "0": 3,
+        "7": 9,
+        "4294967294": 2,
+        " 1": 7,
+        "-0": 5,
+        "00": 4,
+        "1e3": 6,
+        "4294967295": 1,
+        "9007199254740993": 8
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "0=3;7=9;4294967294=2; 1=7;-0=5;00=4;1e3=6;4294967295=1;9007199254740993=8;"
+    }
+  },
+  {
+    "name": "ctx hash string keys only (given in sorted order) for k,v",
+    "template": "{% for k, v in h %}{{ k }}={{ v }};{% endfor %}",
+    "context": {
+      "h": {
+        "Beta": 4,
+        "alpha": 2,
+        "mid": 3,
+        "zeta": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "Beta=4;alpha=2;mid=3;zeta=1;"
+    }
+  },
+  {
+    "name": "ctx hash nested for k,v",
+    "template": "{% for k, v in h %}{{ k }}={{ v }};{% endfor %}",
+    "context": {
+      "h": {
+        "1": 0,
+        "2": {
+          "9": 3,
+          "10": 2,
+          "z": 1
+        },
+        "b": {
+          "1": 3,
+          "2": 2,
+          "10": 4,
+          "y": 1
+        }
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "1=0;2=[object Object];b=[object Object];"
+    }
+  },
+  {
+    "name": "ctx hash list, keys joined",
+    "template": "{{ h | list | join('|', 'key') }}",
+    "context": {
+      "h": {
+        "1": 3,
+        "2": 2,
+        "9": 6,
+        "10": 5,
+        "a": 4,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "1|2|9|10|a|b"
+    }
+  },
+  {
+    "name": "ctx hash urlencode",
+    "template": "{{ h | urlencode }}",
+    "context": {
+      "h": {
+        "9": "q",
+        "10": "x&y",
+        "a": "é",
+        "z": "a b"
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "9=q&amp;10=x%26y&amp;a=%C3%A9&amp;z=a%20b"
+    }
+  },
+  {
+    "name": "order-insensitive: ctx hash length",
+    "template": "{{ h | length }}",
+    "context": {
+      "h": {
+        "1": 3,
+        "2": 2,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "3"
+    }
+  },
+  {
+    "name": "order-insensitive: ctx hash for k in",
+    "template": "{% for k in h %}{{ k }};{% endfor %}",
+    "context": {
+      "h": {
+        "1": 3,
+        "2": 2,
+        "10": 4,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "ctx hash loop vars",
+    "template": "{% for k, v in h %}{{ loop.index }}{{ 'F' if loop.first }}{{ 'L' if loop.last }}={{ k }};{% endfor %}",
+    "context": {
+      "h": {
+        "1": 3,
+        "2": 2,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "1F=1;2=2;3L=b;"
+    }
+  },
+  {
+    "name": "order-insensitive: ctx hash for else empty",
+    "template": "{% for k, v in h %}{{ k }}{% else %}empty{% endfor %}",
+    "context": {
+      "h": {}
+    },
+    "expected": {
+      "ok": true,
+      "output": "empty"
+    }
+  },
+  {
+    "name": "ctx hash nested iteration",
+    "template": "{% for k, v in h %}{{ k }}:{% for k2, v2 in v %}{{ k2 }},{% endfor %};{% endfor %}",
+    "context": {
+      "h": {
+        "1": {},
+        "2": {
+          "9": 3,
+          "10": 2,
+          "z": 1
+        },
+        "b": {
+          "1": 3,
+          "2": 2,
+          "10": 4,
+          "y": 1
+        }
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "1:;2:9,10,z,;b:1,2,10,y,;"
+    }
+  },
+  {
+    "name": "ctx hash set copy then iterate",
+    "template": "{% set d = h %}{% for k, v in d %}{{ k }}{% endfor %}",
+    "context": {
+      "h": {
+        "1": 3,
+        "2": 2,
+        "10": 4,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "1210b"
+    }
+  },
+  {
+    "name": "ctx hash in array of hashes",
+    "template": "{% for o in l %}{% for k, v in o %}{{ k }}{% endfor %}|{% endfor %}",
+    "context": {
+      "l": [
+        {
+          "1": 3,
+          "2": 2,
+          "b": 1
+        },
+        {
+          "9": 2,
+          "10": 1,
+          "a": 3
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "12b|910a|"
+    }
+  },
+  {
+    "name": "asyncEach over dict literal with index keys",
+    "template": "{% asyncEach k, v in {b:1,'10':2,'9':3,a:4} %}{{ k }}={{ v }};{% endeach %}",
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;b=1;a=4;"
+    }
+  },
+  {
+    "name": "asyncEach over ctx hash with index keys",
+    "template": "{% asyncEach k, v in h %}{{ k }}={{ v }};{% endeach %}",
+    "context": {
+      "h": {
+        "9": 3,
+        "10": 2,
+        "a": 4,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;a=4;b=1;"
+    }
+  },
+  {
+    "name": "asyncAll over dict literal with index keys",
+    "template": "{% asyncAll k, v in {b:1,'10':2,'9':3,a:4} %}{{ k }}={{ v }};{% endall %}",
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;b=1;a=4;"
+    }
+  },
+  {
+    "name": "asyncAll over ctx hash with index keys",
+    "template": "{% asyncAll k, v in h %}{{ k }}={{ v }};{% endall %}",
+    "context": {
+      "h": {
+        "9": 3,
+        "10": 2,
+        "a": 4,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;a=4;b=1;"
+    }
+  }
+]

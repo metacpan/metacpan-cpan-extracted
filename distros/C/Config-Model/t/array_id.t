@@ -1,5 +1,3 @@
-# -*- cperl -*-
-
 use ExtUtils::testlib;
 use Test::More;
 use Test::Exception;
@@ -55,29 +53,17 @@ $model->create_config_class(
                 config_class_name => 'Slave'
             },
         },
+        named_list => {
+            type  => 'list',
+            cargo => {
+                type              => 'node',
+                config_class_name => 'Named'
+            },
+        },
         list_that_needs_foo => {
             type => 'list',
             class => 'ListWithCheck',
             @string_cargo,
-        },
-        list_with_default_with_init_leaf => {
-            type              => 'list',
-            default_with_init => {
-                0 => 'def_1 stuff',
-                1 => 'def_2 stuff'
-            },
-            @string_cargo,
-        },
-        list_with_default_with_init_node => {
-            type              => 'list',
-            default_with_init => {
-                0 => 'X=Bv Y=Cv',
-                1 => 'X=Av'
-            },
-            cargo => {
-                type              => 'node',
-                config_class_name => 'Slave'
-            },
         },
         map {(
             "list_with_" . $_ . "_duplicates"
@@ -118,6 +104,17 @@ $model->create_config_class(
             choice     => [qw/Av Bv Cv/]
         },
     ] );
+
+$model->create_config_class(
+    name    => "Named",
+    gist => '{name}',
+    element => [
+        [qw/name value/] => {
+            type       => 'leaf',
+            value_type => 'uniline',
+        },
+    ]
+);
 
 ok( 1, "config classes created" );
 
@@ -352,22 +349,6 @@ subtest "preset mode" => sub {
     eq_or_diff([$inst->list_changes],['plain_list: cleared all entries'],"check change message after clear");
 };
 
-subtest "default_with_init on leaf" => sub {
-    my $lwdwil = $root->fetch_element('list_with_default_with_init_leaf');
-
-    # note: calling fetch_all_indexes is required to trigger creation of default_with_init keys
-    eq_or_diff( [ $lwdwil->fetch_all_indexes ], [ 0, 1 ], "check default keys" );
-    is( $lwdwil->fetch_with_id(0)->fetch, 'def_1 stuff', "test default_with_init leaf 0" );
-    is( $lwdwil->fetch_with_id(1)->fetch, 'def_2 stuff', "test default_with_init leaf 1" );
-
-    # test default_with_init on node
-    my $lwdwin = $root->fetch_element('list_with_default_with_init_node');
-    eq_or_diff( [ $lwdwin->fetch_all_indexes ], [ 0, 1 ], "check default keys" );
-    is( $lwdwin->fetch_with_id(0)->fetch_element('X')->fetch, 'Bv', "test default_with_init node 0" );
-    is( $lwdwin->fetch_with_id(0)->fetch_element('Y')->fetch, 'Cv', "test default_with_init node 0" );
-    is( $lwdwin->fetch_with_id(1)->fetch_element('X')->fetch, 'Av', "test default_with_init node 0" );
-};
-
 foreach my $what (qw/forbid warn suppress/) {
     my $elt_name = 'list_with_' . $what . '_duplicates';
 
@@ -597,6 +578,46 @@ subtest "test that list contains foo" => sub {
     is($need_foo->fetch_with_id(2)->fetch, "foo", "check fixed list");
 };
 
+subtest "test gist on list of values" => sub {
+    my $l = $root->fetch_element('plain_list');
+    $l->clear;
+    my @set = qw/foo bar baz/;
+    $l->store_set(@set);
+    is($l->fetch_gist, join(',',@set), "small gist");
+
+    $l->push('a long value');
+    is($l->fetch_gist, join(',',@set).',a l...', "truncated gist");
+};
+
+subtest "test gist on list of nodes" => sub {
+    my $l = $root->fetch_element('named_list');
+    $l->clear;
+    my $set = [{name => 'joe dalton', value => 'mean'}];
+    $l->load_data($set);
+    is($l->fetch_gist, $set->[0]{name}, "small gist");
+
+    push $set->@*, {name => 'averell dalton', value => 'hungry'};
+    $l->load_data($set);
+    is($l->fetch_gist, 'joe dalton,aver...', "truncated gist");
+};
+
+subtest "sort list of nodes with gist" => sub {
+    my $list = $root->fetch_element('named_list');
+    $list->clear;
+    my @list = qw/Marc Joe Albert Mike/;
+    my $i=0;
+
+    foreach my $in (@list) {
+        $list->fetch_with_id($i++)->fetch_element('name')->store($in);
+    }
+
+    $list->sort();
+
+    my $j=0;
+    foreach my $out (sort @list) {
+        is($list->fetch_with_id($j++)->fetch_element_value('name'), $out,"$out was sorted");
+    }
+};
 
 memory_cycle_ok( $model, "memory cycles" );
 

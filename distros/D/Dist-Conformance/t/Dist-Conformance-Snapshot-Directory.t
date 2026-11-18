@@ -9,6 +9,11 @@ use File::Temp();
 use Mojo::File();
 
 use Dist::Conformance::Snapshot::Directory();
+use Dist::Conformance::Source::Git();
+
+# The configuration of the person who runs the tests, such as a core.hooksPath, stays out.
+local $ENV{GIT_CONFIG_GLOBAL}   = '/dev/null';
+local $ENV{GIT_CONFIG_NOSYSTEM} = 1;
 
 sub checkout () {
     my $root = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
@@ -75,31 +80,41 @@ subtest write => sub {
     ok( $snapshot->writable, 'a directory is writable' );
 };
 
+# A repository that git made, with one commit, so that a worktree can start from it.
+sub repository () {
+    my $root = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
+    Dist::Conformance::Source::Git::git( qw{init --quiet}, "$root" );
+    Dist::Conformance::Source::Git::git( q{-C}, "$root", qw{-c user.name=t -c user.email=t@test.test commit --quiet --allow-empty -m one} );
+    return $root;
+}
+
 subtest hooks_dir => sub {
-    my $root = checkout();
-    is( Dist::Conformance::Snapshot::Directory->new( root => $root )->hooks_dir->to_string, $root->child(qw{.git hooks})->to_string, 'a checkout keeps them in .git/hooks' );
+    my $hooks_of = sub ($root) { return Dist::Conformance::Snapshot::Directory->new( root => $root )->hooks_dir };
+    my $root     = repository();
+    is( $hooks_of->($root)->to_string, $root->child(qw{.git hooks})->to_string, 'a checkout keeps them in .git/hooks' );
 
     my $plain = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
-    is( Dist::Conformance::Snapshot::Directory->new( root => $plain )->hooks_dir, undef, 'a directory that is not a checkout has none' );
+    is( $hooks_of->($plain), undef, 'a directory that is not a checkout has none' );
 
-    my $main     = checkout();
-    my $gitdir   = $main->child(qw{.git worktrees wt})->make_path;
-    my $worktree = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
-    $gitdir->child('commondir')->spew("../..\n");
-    $worktree->child('.git')->spew("gitdir: $gitdir\n");
-    is(
-        Dist::Conformance::Snapshot::Directory->new( root => $worktree )->hooks_dir->to_string,
-        $main->child(qw{.git worktrees wt .. .. hooks})->to_string,
-        'a worktree uses the hooks of its main checkout'
-    );
+    my $worktree = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) )->child('wt');
+    Dist::Conformance::Source::Git::git( q{-C}, "$root", qw{worktree add --quiet --detach}, "$worktree" );
+    is( $hooks_of->($worktree)->realpath->to_string, $root->child(qw{.git hooks})->realpath->to_string, 'a worktree uses the hooks of its main checkout' );
+
+    my $elsewhere = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
+    Dist::Conformance::Source::Git::git( q{-C}, "$root", qw{config core.hooksPath}, "$elsewhere" );
+    is( $hooks_of->($worktree)->to_string, "$elsewhere", 'or the directory that core.hooksPath names' );
+
+    Dist::Conformance::Source::Git::git( q{-C}, "$root", qw{config core.hooksPath git-hooks} );
+    is( $hooks_of->($worktree)->to_string, $worktree->child('git-hooks')->to_string, 'which, when it is relative, each worktree finds in its own root' );
+    is( $hooks_of->($root)->to_string,     $root->child('git-hooks')->to_string,     'and so does the main checkout' );
 
     my $odd = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
     $odd->child('.git')->spew("nonsense\n");
-    is( Dist::Conformance::Snapshot::Directory->new( root => $odd )->hooks_dir, undef, 'a .git file without a gitdir line is not a checkout' );
+    like( dies { $hooks_of->($odd) }, qr/rev-parse\ --git-path\ hooks\ failed:/, 'a .git that git cannot read is an error of git' );
 };
 
 subtest 'install_hook and installed_hook' => sub {
-    my $root     = checkout();
+    my $root     = repository();
     my $snapshot = Dist::Conformance::Snapshot::Directory->new( root => $root );
     is( $snapshot->installed_hook('pre-commit'), undef, 'no hook before it is installed' );
     $snapshot->install_hook( 'pre-commit', "#!/bin/sh\n" );

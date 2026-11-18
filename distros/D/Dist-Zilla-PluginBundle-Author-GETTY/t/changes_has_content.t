@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -17,7 +18,8 @@ sub has_test {
 
 ok  has_test(),                          'default: Changes is checked';
 ok !has_test(no_changes => 1),           'no_changes: the version heading is blank, no check';
-ok !has_test(task => 1),                 'task: no NextRelease, no check';
+ok  has_test(task => 1),                 'task: NextRelease stamps Changes, so it is checked';
+ok !has_test(task => 1, no_changes => 1), 'task with no_changes: the version heading is blank, no check';
 ok  has_test(manual_version => 1),   'manual_version: the author writes the heading, so it is checked';
 
 done_testing;

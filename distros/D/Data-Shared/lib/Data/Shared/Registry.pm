@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Carp ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @CARP_NOT = qw(Data::Shared Data::Shared::Adapter::Map
                    Data::Shared::Adapter::Set Data::Shared::Adapter::Indexed

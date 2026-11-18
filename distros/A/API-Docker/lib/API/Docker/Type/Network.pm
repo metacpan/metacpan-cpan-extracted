@@ -1,10 +1,11 @@
 package API::Docker::Type::Network;
 # ABSTRACT: One entry of the C<200> response to C<GET /networks>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ConfigReference;
 use API::Docker::Type::IPAM;
 use API::Docker::Type::NetworkContainer;
+use API::Docker::Type::NetworkStatus;
 use API::Docker::Type::PeerInfo;
 use namespace::clean;
 
@@ -60,6 +61,9 @@ docker labels => { Str, Str };
 docker peers => [ 'PeerInfo' ];
 
 
+docker status => 'NetworkStatus', since => '1.55';
+
+
 1;
 
 __END__
@@ -74,7 +78,7 @@ API::Docker::Type::Network - One entry of the C<200> response to C<GET /networks
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -177,11 +181,16 @@ List of peer nodes for an overlay network. This field is only present for
 overlay networks, and omitted for other network types. See
 L<API::Docker::Type::PeerInfo>.
 
+=head2 status
+
+Provides runtime information about the network such as the number of
+allocated IPs. See L<API::Docker::Type::NetworkStatus>.
+
 =head1 SUPPORT
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

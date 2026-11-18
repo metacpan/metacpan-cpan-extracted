@@ -7,8 +7,10 @@ use POSIX qw(_exit);
 use Fcntl ();
 use Time::HiRes ();
 use Data::Shared qw(shared_compile sharedc_get);
+use lib 't/lib';
+use Backends qw(have);
 
-eval { require Data::HashMap::Shared::SS; 1 }
+have('hashmap:ss')
     or plan skip_all => "composite backends unavailable: $@";
 
 sub map_store {
@@ -81,7 +83,7 @@ subtest 'failed readiness publication is rolled back' => sub {
 };
 
 subtest 'score-only registration survives failed lazy construction' => sub {
-    eval { require Data::SortedSet::Shared::Strings; 1 }
+    have('sortedset:strings')
         or plan skip_all => "string sorted set unavailable: $@";
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     $root->mount('users', { spec => 'sortedset:strings', args => [{ max => 32 }],

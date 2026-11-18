@@ -19,6 +19,9 @@
          "inc",
          "example",
          "t"
+      ],
+      "package" : [
+         "Data::Throttler::Backend::VWF"
       ]
    },
    "prereqs" : {
@@ -30,6 +33,12 @@
       "configure" : {
          "requires" : {
             "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.22",
+            "Test::Pod::Coverage" : "1.04"
          }
       },
       "runtime" : {
@@ -66,7 +75,7 @@
             "File::Spec" : "0",
             "File::pfopen" : "0",
             "Filesys::Df" : "0",
-            "HTML::D3" : "0",
+            "HTML::D3" : "0.3",
             "HTML::SocialMedia" : "0",
             "HTTP::Date" : "0",
             "HTTP::Status" : "0",
@@ -104,6 +113,10 @@
          }
       },
       "test" : {
+         "recommends" : {
+            "Crypt::OpenSSL::RSA" : "0",
+            "Mail::DKIM" : "0"
+         },
          "requires" : {
             "File::Copy::Recursive" : "0",
             "HTTP::Response" : "0",
@@ -111,6 +124,7 @@
             "Test::Memory::Cycle" : "0",
             "Test::Mockingbird" : "0",
             "Test::Most" : "0",
+            "Test::Needs" : "0",
             "Test::Returns" : "0"
          }
       }
@@ -127,6 +141,6 @@
          "web" : "https://github.com/nigelhorne/Web-VWF"
       }
    },
-   "version" : "0.002.0",
+   "version" : "0.003.0",
    "x_serialization_backend" : "JSON::PP version 4.18"
 }

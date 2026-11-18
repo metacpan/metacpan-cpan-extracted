@@ -1,0 +1,78 @@
+#!/usr/bin/env node
+// Regenerates the expected side of t/data/include-failure.json from real
+// upstream (nunjucks v3.2.4, upstream/ as fetched by maint/fetch-upstream).
+//
+//   maint/include-failure-fixtures     # rewrites t/data/include-failure.json in place
+//
+// Each case of the file holds an input (group, name, templates, context) and,
+// written by this script and never by hand, calls / notes / marks / died / threw:
+// what an asynchronous env.render('main.njk', context, callback) did.
+//   calls  every call of the render callback, [error message | null, output | null]
+//   notes  the arguments of the template global note(), in call order
+//   marks  the arguments of the template global mark(), in call order, joined by ","
+//   died   the exceptions of parked filter answers that were run afterwards
+//   threw  an exception env.render itself threw (null when none)
+//
+// The environment: a memory loader (noCache), async filters  later  (parks its
+// callback, answered later, in order, one per macrotask),  af  (answers at once)
+// and  twice  (parks two answers, the second one is a second call of the same
+// callback), globals note() and mark() (record their arguments), reg() (keeps
+// the macro it is given), regc() (keeps the call block of a {% call regc() %}),
+// callkept() (calls what reg() / regc() kept and returns the output joined) and
+// callreg() (takes a macro or a call block and returns ''; t/10-leaks.t gives
+// it a body that keeps it, to count what stays alive).
+// This is a port-only fixture generator: the oracle (maint/oracle.js) cannot
+// defer or take a callback, so these are not corpus cases.
+'use strict';
+const fs = require('fs');
+const path = require('path');
+const root = path.join(__dirname, '..');
+const file = path.join(root, 't', 'data', 'include-failure.json');
+const nunjucks = require(path.join(root, 'upstream', 'nunjucks', 'nunjucks', 'index.js'));
+
+class MemLoader extends nunjucks.Loader {
+  constructor(t) { super(); this.t = t; }
+  getSource(n) { return n in this.t ? { src: this.t[n], path: n, noCache: true } : null; }
+}
+const msg = (e) => (e ? String(e.message !== undefined ? e.message : e) : null);
+const wait = (n) => (async () => { for (let i = 0; i < n; i++) { await new Promise((r) => setTimeout(r, 2)); } })();
+
+(async () => {
+  const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+  const out = [];
+  for (const c of data.cases) {
+    const queue = [], notes = [], marks = [], calls = [], died = [], kept = [];
+    const env = new nunjucks.Environment(new MemLoader(c.templates));
+    env.addFilter('later', (v, cb) => { queue.push(() => cb(null, '<' + v + '>')); }, true);
+    env.addFilter('af', (v, cb) => { cb(null, '<' + v + '>'); }, true);
+    env.addFilter('twice', (v, cb) => {
+      queue.push(() => cb(null, '<' + v + '>'));
+      queue.push(() => cb(null, '<' + v + ' again>'));
+    }, true);
+    env.addGlobal('note', (n) => { notes.push(String(n)); return ''; });
+    env.addGlobal('mark', function () {
+      marks.push(Array.from(arguments).map((a) => (a === undefined || a === null ? 'undef' : String(a))).join(','));
+      return '';
+    });
+    env.addGlobal('reg', (f) => { kept.push(f); return ''; });
+    env.addGlobal('regc', function () { kept.push(arguments[arguments.length - 1].caller); return ''; });
+    env.addGlobal('callkept', () => kept.map((f) => String(f())).join(''));
+    env.addGlobal('callreg', () => '');
+    let threw = null;
+    try {
+      env.render('main.njk', c.context, (err, res) => {
+        calls.push([msg(err), res === undefined || res === null ? null : String(res)]);
+      });
+    } catch (e) { threw = msg(e); }
+    await wait(4);
+    while (queue.length) {
+      const job = queue.shift();
+      try { job(); } catch (e) { died.push(msg(e)); }
+      await wait(3);
+    }
+    out.push({ group: c.group, name: c.name, templates: c.templates, context: c.context, calls, notes, marks, died, threw });
+  }
+  data.cases = out;
+  fs.writeFileSync(file, JSON.stringify(data, null, 1) + '\n');
+  console.log('wrote ' + out.length + ' cases to ' + path.relative(root, file));
+})();

@@ -1,6 +1,6 @@
 package API::Docker::Type::Mount::VolumeOptions;
 # ABSTRACT: Optional configuration for the C<volume> type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Mount::VolumeOptions::DriverConfig;
 use namespace::clean;
@@ -32,7 +32,7 @@ API::Docker::Type::Mount::VolumeOptions - Optional configuration for the C<volum
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ Source path inside the volume. Must be relative without any back traversals.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

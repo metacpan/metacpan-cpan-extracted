@@ -8,7 +8,7 @@
 
 
 use Data::Dumper;
-use Test::More tests => 79;
+use Test::More tests => 93;
 #use Test::More qw(no_plan);
 
 # ahem, we deliver the test code with a local copy of
@@ -801,3 +801,66 @@ my $conf59 = Config::General->new(
     -AlwaysQuoteOutput => 1);
 my $got59 = $conf59->save_string();
 is_deeply \$expected59, \$got59, "quotes";
+
+
+# test for CVE-2026-129820 and CVE-2026-129821 fixes
+my $cvedefaults = [
+    {
+        "*/ foo" => 1,
+    },
+    {
+        "foo */" => 1,
+    },
+    {
+        "foo <<EOF foo" => 1,
+    },
+    {
+        "<<include nix>>" => 1,
+    },
+    {
+        "*/ foo" => "hans",
+    },
+    {
+        "foo # 1" => "nix",
+    },
+    {
+        "foo" => "*/ hier",
+    },
+    {
+        "foo" => "hier */",
+    },
+    {
+        "foo" => "<<EOF hier",
+    },
+    {
+        "foo" => "<<include hier>>",
+    },
+    {
+        "users" => {
+            "hans" => "*/ maddock",
+        },
+    },
+    {
+        "users" => {
+            "hans" => "maddock /*",
+        },
+    },
+    {
+        "users" => {
+            "hans" => "<<EOF maddock",
+        },
+    },
+    {
+        "list" => [
+            "ok",
+            "*/ foo",
+            ]
+    }
+];
+foreach my $default (@{$cvedefaults}) {
+    eval {
+        my $conf60 = Config::General->new(-ConfigHash => $default) or die "$@";
+    };
+    
+    ok($@, "cve check failed: " . Dumper($default));
+}

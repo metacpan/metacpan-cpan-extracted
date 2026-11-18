@@ -1,6 +1,6 @@
 package API::Docker::Type;
 # ABSTRACT: The DSL and attribute registry behind the generated Docker types
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 our %REGISTRY;
 use Moo ();
 use Moo::Role ();
@@ -339,7 +339,7 @@ API::Docker::Type - The DSL and attribute registry behind the generated Docker t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -409,20 +409,25 @@ key.
 
 =head2 What C<since> can and cannot say
 
-C<spec/> holds v1.41, v1.44 and v1.51, which is what the C<--from>/C<--to>
-mode of C<maint/spec-drift-check.pl> diffs to produce these values -- the
-swagger itself carries no per-field version at all. So C<< since => '1.51' >>
-means "not in v1.44, present in v1.51", not "introduced in v1.51": the field
-appeared somewhere in v1.45 .. v1.51. An attribute with no C<since> is
-already in v1.41, the oldest spec checked in here.
+C<spec/> holds v1.41, v1.44, v1.51 and v1.55. The C<--from>/C<--to> mode of
+C<maint/spec-drift-check.pl> diffs the first three to produce these values --
+the swagger itself carries no per-field version at all. So C<< since =>
+'1.51' >> means "not in v1.44, present in v1.51", not "introduced in v1.51":
+the field appeared somewhere in v1.45 .. v1.51.
+
+The fields grafted from v1.55 onto the v1.51 base, listed in
+C<maint/spec-overlay.yaml>, carry C<< since => '1.55' >> from the overlay
+itself. That means "not in v1.51, present in v1.55": the field appeared
+somewhere in v1.52 .. v1.55. An attribute with no C<since> is already in
+v1.41, the oldest spec checked in here.
 
 =head2 C<since> is documentation
 
 C<since> records which API version introduced a field. Nothing is checked,
 warned about or dropped at runtime, ever. Podman serves fields its announced
 version does not promise and refuses ones it does; we are not the authority
-on what an engine can do. The registry keeps the value so a runtime check
-could be retrofitted, and so the POD can state it.
+on what an engine can do. The value is visible in the C<since> key of each
+field's declaration in its class's source, and in the registry.
 
 C<required> is recorded from the swagger's C<required:> list and is likewise
 not enforced: the same engines omit fields the specification calls required,
@@ -546,7 +551,7 @@ as C<< object<Class> >>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

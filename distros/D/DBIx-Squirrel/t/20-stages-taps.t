@@ -6,6 +6,8 @@ use DBIx::Squirrel;
 use Ekorn::Pipeline qw();
 use DBIx::Squirrel::Stages::Flow;
 use DBIx::Squirrel::Stages::Taps qw(:all);
+use DBIx::Squirrel::Stages::Rows qw(pluck as_hash);
+use Ekorn::Pipeline::Sinks       qw(count_items);
 
 my $class = 'Ekorn::Pipeline';
 
@@ -13,14 +15,14 @@ subtest 'what is exported' => sub {
 
     package Defaults {    ## no critic (Modules::ProhibitMultiplePackages)
         use DBIx::Squirrel::Stages::Taps;
-        ::ok __PACKAGE__->can($_),  "$_ by default" for qw(peek count_into);
-        ::ok !__PACKAGE__->can($_), "not $_"        for qw(dump_to);
+        ::ok __PACKAGE__->can($_),  "$_ by default" for qw(peek    count_into);
+        ::ok !__PACKAGE__->can($_), "not $_"        for qw(dump_to tee);
     }
 
     package None {        ## no critic (Modules::ProhibitMultiplePackages)
         use DBIx::Squirrel::Stages::Taps ();
         ::ok !__PACKAGE__->can($_), "not $_ with ()"
-            for qw(peek count_into dump_to);
+            for qw(peek count_into dump_to tee);
     }
 };
 
@@ -103,6 +105,35 @@ subtest 'from an iterator' => sub {
     is \@two,  [qw(Abba Blur)], 'the results';
     is $read,  2,               'counting the rows read';
     is \@seen, [qw(Abba Blur)], 'and peeking at each';
+};
+
+subtest 'tee, from an iterator' => sub {
+    my(@branch, @rows);
+    my $it = $dbh->iterate(
+        'SELECT id, name FROM artist ORDER BY id',
+        tee(take(2), pluck('name'), sub { push @branch, $_; () }),
+    );
+    while (my $row = $it->next) { push @rows, [@$row] }
+    is \@rows, [[1, 'Abba'], [2, 'Blur'], [3, 'Cream']],
+        'every row passed on as it came, past a stop in the branch';
+    is \@branch, [qw(Abba Blur)],
+        "pluck by name in the branch, on array rows, from the run's context";
+
+    my @hashes;
+    $dbh->iterate(
+        'SELECT id, name FROM artist ORDER BY id',
+        tee(as_hash, sub { push @hashes, $_; () }),
+        count_items,
+    );
+    is \@hashes, [map { {id => $_->[0], name => $_->[1]} } @rows],
+        'and as_hash';
+
+    like dies {
+        $dbh->iterate(
+            'SELECT name FROM artist', tee(sub { die "bad\n" }),
+            count_items,
+        )
+    }, qr( bad )x, 'a death in the branch kills the run';
 };
 
 subtest 'on a handle, with pipe and tap' => sub {

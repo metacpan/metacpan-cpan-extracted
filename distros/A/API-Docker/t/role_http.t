@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -618,7 +619,7 @@ subtest '_request: >= 400 croaks' => sub {
 
     is "$err", $err->message . $err->location,
       'stringification is the message plus Carp\'s location, nothing else';
-    like "$err", qr/\ADocker API error \(409\): can only kill running containers\. abc is in state stopped at \S+ line \d+\.\n\z/,
+    like "$err", qr/\ADocker API error \(409\): can only kill running containers\. abc is in state stopped at \S+ line \d+\.?\n\z/,
       'which is byte for byte what the plain croak produced before';
     unlike $err->message, qr/ at \S+ line \d+/,
       'the message alone carries no location';

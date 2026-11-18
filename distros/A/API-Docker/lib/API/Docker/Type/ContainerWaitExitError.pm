@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerWaitExitError;
 # ABSTRACT: container waiting error, if any
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::ContainerWaitExitError - container waiting error, if any
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ Details of an error.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

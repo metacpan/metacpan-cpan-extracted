@@ -1,0 +1,844 @@
+[
+  {
+    "name": "include failure: E3 inc: import(lib sync, plain macro) then missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% import \"lib.njk\" as l %}{% include \"missing.njk\" %}",
+      "lib.njk": "{% macro m(a) %}[{{ a }}]{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E5 inc: import(lib sync, macro with include) then missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% import \"lib.njk\" as l %}{% include \"missing.njk\" %}",
+      "lib.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E8 inc: own macro with include, then missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E9 inc: own macro with include, then nope()",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{{ nope() }}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: Unable to call `nope`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "include failure: E10 inc: own plain macro, then missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{{ a }}]{% endmacro %}{% include \"missing.njk\" %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E11 inc: own macro with include, missing include FIRST",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% include \"missing.njk\" %}{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E12 inc: own macro with include, then error in an expression (undefined filter at runtime: 1/none)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{{ x.y.z.w }}{{ nope.a() }}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: Unable to call `nope[\"a\"]`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "include failure: E13 ROOT: own macro with include, then missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{% include \"missing.njk\" %}",
+      "i.njk": "unused",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E15 inc in if: own macro with include, then missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% if x %}{% include \"i.njk\" %}{% endif %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E16 inc: own macro with include, missing include, ignore missing",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{% include \"missing.njk\" ignore missing %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "AB"
+    }
+  },
+  {
+    "name": "include failure: E17 inc: own macro with include, fine (control)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{{ m(1) }}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "A[P]B"
+    }
+  },
+  {
+    "name": "include failure: E18 inc: call block + missing include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro w() %}{{ caller() }}{% endmacro %}{% call w() %}{% include \"p.njk\" %}{% endcall %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E19 nested: main -> i -> j(macro with include, then missing include)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "i{% include \"j.njk\" %}i",
+      "j.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Template render error: (j.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E20 inc: own macro with include, extends a missing parent",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% extends \"missing.njk\" %}{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: E21 import (not include): lib has macro with include, then fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% import \"i.njk\" as l %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F1 includer fails in the tail after a closure-making include (top)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}{{ nope() }}",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}i",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: Unable to call `nope`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "include failure: F2 includer fails after the if that holds the include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% if x %}{% include \"i.njk\" %}{% endif %}{{ nope() }}",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}i",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: Unable to call `nope`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "include failure: F3 includer fails after a for loop of includes",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% for r in [1,2] %}{% include \"i.njk\" %}{% endfor %}{{ nope() }}",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}i",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: Unable to call `nope`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "include failure: F4 includer: second include missing after a closure-making one",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}{% include \"missing.njk\" %}",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}i",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F6 included fails, include in a for loop (first iteration)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% for r in [1,2] %}{% include \"i.njk\" %}{% endfor %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F7 included fails in asyncAll",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% asyncAll r in [1,2] %}{% include \"i.njk\" %}{% endall %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F8 included fails in asyncEach",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% asyncEach r in [1,2] %}{% include \"i.njk\" %}{% endeach %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F9 included: macro call fails inside the macro (missing include in the macro)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"missing.njk\" %}]{% endmacro %}{{ m(1) }}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F10 included hands the macro up (push), then fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% set _ = bag.push(m) %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F12 included fails, include inside a macro body of the includer",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro w() %}{% include \"i.njk\" %}{% endmacro %}A{{ w() }}B",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F13 included fails, include inside a block",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% block b %}{% include \"i.njk\" %}{% endblock %}",
+      "i.njk": "{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F15 included: call block with an include, then fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro w() %}{{ caller() }}{% endmacro %}{% call w() %}{% include \"p.njk\" %}{% endcall %}{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F17 included extends a parent whose block makes an async macro and fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "{% extends \"base.njk\" %}{% block b %}{% macro m(a) %}[{% include \"p.njk\" %}{{ a }}]{% endmacro %}{% include \"missing.njk\" %}{% endblock %}",
+      "p.njk": "P",
+      "base.njk": "<{% block b %}{% endblock %}>"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: F18 control: included plain, fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "A{% include \"i.njk\" %}B",
+      "i.njk": "i{% include \"missing.njk\" %}",
+      "p.njk": "P"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: G1 plain macro, pushed up, included fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% macro m() %}m{% endmacro %}{% set _ = bag.push(m) %}{% include \"missing.njk\" %}",
+      "p.njk": "P",
+      "lib.njk": "{% macro h() %}h{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: G2 plain macro defined after an import, pushed up, included fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% from \"lib.njk\" import h %}{% macro m() %}m{% endmacro %}{% set _ = bag.push(m) %}{% include \"missing.njk\" %}",
+      "p.njk": "P",
+      "lib.njk": "{% macro h() %}h{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: G3 plain macro defined after an include, pushed up, included fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% include \"p.njk\" %}{% macro m() %}m{% endmacro %}{% set _ = bag.push(m) %}{% include \"missing.njk\" %}",
+      "p.njk": "P",
+      "lib.njk": "{% macro h() %}h{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: G4 plain macro defined after an include, NOT pushed, included fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% include \"p.njk\" %}{% macro m() %}m{% endmacro %}{% include \"missing.njk\" %}",
+      "p.njk": "P",
+      "lib.njk": "{% macro h() %}h{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: G5 imported plain macro pushed up, included fails",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% from \"lib.njk\" import h %}{% set _ = bag.push(h) %}{% include \"missing.njk\" %}",
+      "p.njk": "P",
+      "lib.njk": "{% macro h() %}h{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Error: template not found: missing.njk"
+      }
+    }
+  },
+  {
+    "name": "include failure: G6 plain macro defined after an include, pushed up, included fails via nope()",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}A{% include \"i.njk\" %}B",
+      "i.njk": "{% include \"p.njk\" %}{% macro m() %}m{% endmacro %}{% set _ = bag.push(m) %}{{ nope() }}",
+      "p.njk": "P",
+      "lib.njk": "{% macro h() %}h{% endmacro %}"
+    },
+    "context": {
+      "x": "X",
+      "y": "Y",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Template render error: (i.njk)\n  Template render error: (p.njk)\n  Error: Unable to call `nope`, which is undefined or falsey"
+      }
+    }
+  }
+]

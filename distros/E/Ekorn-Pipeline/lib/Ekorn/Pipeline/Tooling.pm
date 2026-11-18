@@ -24,7 +24,7 @@ our %EXPORT_TAGS = (
         qw(drop drop_if    drop_while),
     ],
     batch   => [qw(batch      collect)],
-    taps    => [qw(peek       count_into dump_to)],
+    taps    => [qw(peek       count_into dump_to   tee)],
     sources => [qw(from_array from_fh    from_file counter)],
     sinks   => [
         qw(count_items keep keep_all keep_first keep_last keep_single),
@@ -117,7 +117,7 @@ C<collect>.
 =item C<:taps>
 
 Everything L<Ekorn::Pipeline::Stages::Taps> exports: C<peek>,
-C<count_into> and C<dump_to>.
+C<count_into>, C<dump_to> and C<tee>.
 
 =item C<:stages>
 

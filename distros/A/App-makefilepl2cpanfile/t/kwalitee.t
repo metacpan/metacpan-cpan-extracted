@@ -1,13 +1,15 @@
+#!/usr/bin/env perl
+
+# CPANTS Kwalitee checks (author test).  META.yml only exists in a built
+# distribution, so that check is skipped when running from a checkout.
+
 use strict;
 use warnings;
 
 use Test::DescribeMe qw(author);
 use Test::Most;
+use Test::Needs 'Test::Kwalitee';
 
-eval 'use Test::Kwalitee tests => [ qw( -has_meta_yml ) ]';
+Test::Kwalitee::kwalitee_ok(-e 'META.yml' ? () : '-has_meta_yml');
 
-if($@) {
-	plan(skip_all => 'Test::Kwalitee not installed; skipping') if $@;
-} else {
-	unlink('Debian_CPANTS.txt') if -e 'Debian_CPANTS.txt';
-}
+done_testing();

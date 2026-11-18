@@ -142,15 +142,6 @@ $model->create_config_class(
             @element,
             warn_unless_key_match => 'foo',
         },
-        hash_with_default_and_init => {
-            type              => 'hash',
-            index_type        => 'string',
-            default_with_init => {
-                'def_1' => 'def_1 stuff',
-                'def_2' => 'def_2 stuff'
-            },
-            @element
-        },
         hash_with_convert_lc => {
             type       => 'hash',
             index_type => 'string',
@@ -521,18 +512,22 @@ my @to_migrate = $root->fetch_element('hash_with_several_auto_created_id')->fetc
 eq_or_diff( [ $hwmkf->fetch_all_indexes ],
     \@to_migrate, "check ids of hash_with_migrate_keys_from" );
 
-my $hwdai = $root->fetch_element('hash_with_default_and_init');
-
-# calling fetch_all_indexes will trigger the creation of the default_with_init keys
-foreach my $idx ( $hwdai->fetch_all_indexes ) {
-    is( $hwdai->fetch_with_id($idx)->fetch, "$idx stuff", "check default_with_init with '$idx'" );
-}
-
 # test convert lc
 my $hwclc = $root->fetch_element('hash_with_convert_lc');
 $hwclc->fetch_with_id('Debian')->store('DebV');
 $hwclc->fetch_with_id('Grip')->store('GripV');
 eq_or_diff( [ $hwclc->fetch_all_indexes ], [qw/debian grip/], "check converted ids" );
+
+subtest "test gist" => sub{
+    my $h = $root->fetch_element('ordered_hash');
+    $h->clear;
+    $h->fetch_with_id('key_1')->store('dont care');
+    $h->fetch_with_id('key_2')->store('dont care');
+    is($h->fetch_gist, 'key_1,key_2',"small gist");
+
+    $h->fetch_with_id('a_very_long_key')->store('dont care');
+    is($h->fetch_gist, 'key_1,key_2,a_v...',"truncated gist");
+};
 
 memory_cycle_ok( $model, "check memory cycles" );
 

@@ -1,6 +1,6 @@
 package API::Docker::Role::Type;
 # ABSTRACT: Instance behaviour of a generated API::Docker::Type class
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 use Carp qw( croak );
 use JSON::MaybeXS ();
@@ -296,7 +296,7 @@ API::Docker::Role::Type - Instance behaviour of a generated API::Docker::Type cl
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -327,7 +327,7 @@ The split is what keeps the passthrough invariant true. Resolving a Perl name
 on the response path renames the engine's data -- Docker's swagger spells 114
 fields with a lowercase first letter, so a lowercase key off an engine is
 ordinary rather than exotic, and reading C<id> as the Perl name of C<Id> both
-loses the field it really was and rewrites one we did know (karr k85).
+loses the field it really was and rewrites one we did know.
 
 The same split decides what happens to a value that does not fit its declared
 type. L</from_data> keeps it -- unset attribute, raw value in
@@ -475,7 +475,7 @@ daemon B<cannot> tell an explicit null from an absent field, and collapsing
 the two loses no meaning it could have expressed. It holds outbound too,
 which is why a null reaches us where a key could simply have been left out:
 a nil slice marshals to C<null>, and C<GET /images/{id}/history> answers
-C<"Tags": null> for a layer that carries no tag (karr k93).
+C<"Tags": null> for a layer that carries no tag.
 
 Three things that all look like a null therefore behave differently, on
 purpose:
@@ -558,7 +558,7 @@ is the order the fields appear in the swagger.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

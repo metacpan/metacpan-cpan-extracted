@@ -1,6 +1,6 @@
 package API::Docker::Type::ImageManifestSummary::ImageData::Size;
 # ABSTRACT: The unpacked size of an image manifest
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::ImageManifestSummary::ImageData::Size - The unpacked size of 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -42,7 +42,7 @@ distributable/compressed content is already gone.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

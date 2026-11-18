@@ -15,6 +15,7 @@ class TestCase::IO::Socket::SSL {
     my $localhost = "127.0.0.1";
     
     my $server_socket = IO::Socket::SSL->new({
+      Context => Go->bg,
       LocalAddr => $localhost,
       Listen    => 5,
       SSL_startHandshake => 0,
@@ -46,8 +47,8 @@ class TestCase::IO::Socket::SSL {
     
     my $accepted_socket = (IO::Socket::SSL)undef;
     eval {
-      $accepted_socket = $server_socket->accept;
-      $accepted_socket->accept_SSL;
+      $accepted_socket = $server_socket->accept(Go->bg);
+      $accepted_socket->accept_SSL(Go->bg);
     }
     
     if ($@) {
@@ -57,14 +58,14 @@ class TestCase::IO::Socket::SSL {
     while (1) {
       
       my $data = (mutable string)new_string_len 1;
-      my $read_length = $accepted_socket->sysread($data);
+      my $read_length = $accepted_socket->sysread(Go->bg, $data);
       
       if ($read_length > 0) {
         if ($data eq "\0") {
           last;
         }
         
-        $accepted_socket->syswrite($data);
+        $accepted_socket->syswrite(Go->bg, $data);
       }
       else {
         last;
@@ -78,6 +79,7 @@ class TestCase::IO::Socket::SSL {
     my $localhost = "127.0.0.1";
     
     my $server_socket = IO::Socket::SSL->new({
+      Context => Go->bg,
       LocalAddr => $localhost,
       Listen    => 5,
       SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
@@ -88,7 +90,7 @@ class TestCase::IO::Socket::SSL {
     $start_server_ch->write(1);
     
     my $accepted_socket = (IO::Socket::SSL)undef;
-    eval { $accepted_socket = $server_socket->accept; }
+    eval { $accepted_socket = $server_socket->accept(Go->bg); }
     
     if ($@) {
       warn "[Test Output][IO::Socket::SSL#accept]$@";
@@ -98,14 +100,14 @@ class TestCase::IO::Socket::SSL {
       while (1) {
         
         my $data = (mutable string)new_string_len 1;
-        my $read_length = $accepted_socket->sysread($data);
+        my $read_length = $accepted_socket->sysread(Go->bg, $data);
         
         if ($read_length > 0) {
           if ($data eq "\0") {
             last;
           }
           
-          $accepted_socket->syswrite($data);
+          $accepted_socket->syswrite(Go->bg, $data);
         }
         else {
           last;
@@ -148,6 +150,7 @@ class TestCase::IO::Socket::SSL {
         
         my $host = "127.0.0.1";
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => $host,
           PeerPort => $port,
           SSL_startHandshake => 0,
@@ -191,7 +194,7 @@ class TestCase::IO::Socket::SSL {
           $ssl->set_msg_callback($msg_callback);
         });
         
-        $socket->connect_SSL;
+        $socket->connect_SSL(Go->bg);
         
         my $ssl = $socket->ssl;
         
@@ -281,9 +284,9 @@ class TestCase::IO::Socket::SSL {
         
         my $write_buffer = "abc";
           
-        $socket->syswrite($write_buffer);
+        $socket->syswrite(Go->bg, $write_buffer);
         
-        $socket->syswrite("\0");
+        $socket->syswrite(Go->bg, "\0");
         
         my $string_buffer = StringBuffer->new;
         
@@ -293,7 +296,7 @@ class TestCase::IO::Socket::SSL {
           
           my $recv_length = -1;
           
-          eval { $recv_length = $socket->sysread($recv_buffer); }
+          eval { $recv_length = $socket->sysread(Go->bg, $recv_buffer); }
           
           if ($recv_length > 0) {
             $string_buffer->push($recv_buffer);
@@ -311,7 +314,7 @@ class TestCase::IO::Socket::SSL {
           $success_ref->[0] = 0;
         }
         
-        $socket->shutdown_SSL;
+        $socket->shutdown_SSL(Go->bg);
       }
     });
     $wg->wait;
@@ -347,6 +350,7 @@ class TestCase::IO::Socket::SSL {
       {
         my $host = "127.0.0.1";
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => $host,
           PeerPort => $port,
           SSL_startHandshake => 0,
@@ -419,6 +423,7 @@ class TestCase::IO::Socket::SSL {
         
         my $host = "127.0.0.1";
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => $host,
           PeerPort => $port,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
@@ -428,9 +433,9 @@ class TestCase::IO::Socket::SSL {
         
         my $write_buffer = "abc";
           
-        $socket->syswrite($write_buffer);
+        $socket->syswrite(Go->bg, $write_buffer);
         
-        $socket->syswrite("\0");
+        $socket->syswrite(Go->bg, "\0");
         
         my $string_buffer = StringBuffer->new;
         
@@ -440,7 +445,7 @@ class TestCase::IO::Socket::SSL {
           
           my $recv_length = -1;
           
-          eval { $recv_length = $socket->sysread($recv_buffer); }
+          eval { $recv_length = $socket->sysread(Go->bg, $recv_buffer); }
           
           if ($recv_length > 0) {
             $string_buffer->push($recv_buffer);
@@ -477,6 +482,7 @@ class TestCase::IO::Socket::SSL {
       my $socket = (IO::Socket::SSL)undef;
       eval {
         $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => $host,
           ReadDeadline => $deadline,
           WriteDeadline => $deadline,
@@ -521,6 +527,7 @@ class TestCase::IO::Socket::SSL {
       Go->go([$server_start_ch : Go::Channel, $port_ref : int[]] method : void () {
         eval {
           my $listen_socket = IO::Socket::SSL->new({
+            Context => Go->bg,
             LocalAddr => "127.0.0.1",
             Listen => 5,
             SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
@@ -529,7 +536,7 @@ class TestCase::IO::Socket::SSL {
           
           $port_ref->[0] = $listen_socket->sockport;
           $server_start_ch->write(1);
-          my $client_socket = $listen_socket->accept;
+          my $client_socket = $listen_socket->accept(Go->bg);
           
           # Sleep longer than the client's deadline to trigger the timeout.
           Go->sleep(Go::Duration_1l->new_from_sec(1.0));
@@ -547,6 +554,7 @@ class TestCase::IO::Socket::SSL {
         
         # Connect to the server
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => $host,
           PeerPort => $port,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
@@ -559,7 +567,7 @@ class TestCase::IO::Socket::SSL {
         my $buffer = (mutable string)new_string_len 1024;
         
         # This should block and eventually throw DeadlineExceeded because the server sends nothing.
-        $socket->sysread($buffer);
+        $socket->sysread(Go->bg, $buffer);
         
         # If no exception is thrown, it's a failure.
         warn "sysread unexpectedly succeeded or returned 0 before deadline.";
@@ -591,6 +599,7 @@ class TestCase::IO::Socket::SSL {
     Go->go([$success_ref : int[]] method : void () {
       eval {
         my $listen_socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           LocalAddr => "127.0.0.1",
           Listen => 5,
           SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
@@ -602,7 +611,7 @@ class TestCase::IO::Socket::SSL {
         $listen_socket->set_deadline($deadline);
         
         # This should block and eventually throw DeadlineExceeded because no client connects.
-        my $client_socket = $listen_socket->accept;
+        my $client_socket = $listen_socket->accept(Go->bg);
         
         warn "accept unexpectedly succeeded before deadline.";
         $success_ref->[0] = 0;
@@ -639,6 +648,7 @@ class TestCase::IO::Socket::SSL {
       Go->go([$server_start_ch : Go::Channel, $port_ref : int[]] method : void () {
         eval {
           my $listen_socket = IO::Socket::SSL->new({
+            Context => Go->bg,
             LocalAddr => "127.0.0.1",
             Listen => 5,
             SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
@@ -649,7 +659,7 @@ class TestCase::IO::Socket::SSL {
           $server_start_ch->write(1);
           
           # Accept the connection but DO NOT read.
-          my $client_socket = $listen_socket->accept;
+          my $client_socket = $listen_socket->accept(Go->bg);
           
           # Keep the connection alive longer than the client's deadline.
           Go->sleep(Go::Duration_1l->new_from_sec(2.0));
@@ -666,6 +676,7 @@ class TestCase::IO::Socket::SSL {
         
         my $host = "127.0.0.1";
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => $host,
           PeerPort => $port,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
@@ -679,7 +690,7 @@ class TestCase::IO::Socket::SSL {
         my $payload = Fn->repeat("a", 8192);
         
         while (1) {
-          $socket->syswrite($payload);
+          $socket->syswrite(Go->bg, $payload);
         }
       }
       if ($@) {
@@ -718,6 +729,7 @@ class TestCase::IO::Socket::SSL {
       Go->go([$server_start_ch : Go::Channel, $port_ref : int[]] method : void () {
         eval {
           my $listen_socket = IO::Socket::SSL->new({
+            Context => Go->bg,
             LocalAddr => "127.0.0.1",
             Listen => 5,
             SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
@@ -726,7 +738,7 @@ class TestCase::IO::Socket::SSL {
           $server_start_ch->write(1);
           $port_ref->[0] = $listen_socket->sockport;
           
-          my $client_socket = $listen_socket->accept;
+          my $client_socket = $listen_socket->accept(Go->bg);
           
           # Server sleeps to trigger client-side read timeout
           Go->sleep(Go::Duration_1l->new_from_sec(1.0));
@@ -740,6 +752,7 @@ class TestCase::IO::Socket::SSL {
         $server_start_ch->read;
         my $port = $port_ref->[0];
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => "127.0.0.1",
           PeerPort => $port,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
@@ -749,7 +762,7 @@ class TestCase::IO::Socket::SSL {
         $socket->set_read_deadline($read_deadline);
         
         my $buffer = (mutable string)new_string_len 1024;
-        $socket->sysread($buffer);
+        $socket->sysread(Go->bg, $buffer);
         
         warn "sysread unexpectedly succeeded before ReadDeadline.";
         $success_ref->[0] = 0;
@@ -787,6 +800,7 @@ class TestCase::IO::Socket::SSL {
       Go->go([$server_start_ch : Go::Channel, $port_ref : int[]] method : void () {
         eval {
           my $listen_socket = IO::Socket::SSL->new({
+            Context => Go->bg,
             LocalAddr => "127.0.0.1",
             Listen => 5,
             SSL_cert_file => "$FILE_DIR/simple-cert.cert.pem",
@@ -796,7 +810,7 @@ class TestCase::IO::Socket::SSL {
           $port_ref->[0] = $listen_socket->sockport;
           
           $server_start_ch->write(1);
-          my $client_socket = $listen_socket->accept;
+          my $client_socket = $listen_socket->accept(Go->bg);
           
           # Do not read to let the client's send buffer fill up.
           Go->sleep(Go::Duration_1l->new_from_sec(2.0));
@@ -811,6 +825,7 @@ class TestCase::IO::Socket::SSL {
         my $port = $port_ref->[0];
         
         my $socket = IO::Socket::SSL->new({
+          Context => Go->bg,
           PeerAddr => "127.0.0.1",
           PeerPort => $port,
           SSL_verify_mode => SSL->SSL_VERIFY_NONE,
@@ -821,7 +836,7 @@ class TestCase::IO::Socket::SSL {
         
         my $payload = Fn->repeat("a", 8192);
         while (1) {
-          $socket->syswrite($payload);
+          $socket->syswrite(Go->bg, $payload);
         }
       }
       if ($@) {

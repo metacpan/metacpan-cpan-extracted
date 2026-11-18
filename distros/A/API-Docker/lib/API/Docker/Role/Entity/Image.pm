@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity::Image;
 # ABSTRACT: Image operations, on the generated image types
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 with 'API::Docker::Role::Entity';
 requires 'id';
@@ -80,7 +80,7 @@ API::Docker::Role::Entity::Image - Image operations, on the generated image type
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -177,7 +177,7 @@ Remove the image.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

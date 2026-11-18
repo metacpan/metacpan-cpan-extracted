@@ -42,9 +42,9 @@
    "release_status" : "stable",
    "resources" : {
       "repository" : {
-         "url" : "https://github.com/TLINDEN/Config-General"
+         "url" : "https://codeberg.org/scip/Config-General"
       }
    },
-   "version" : "2.67",
+   "version" : "2.69",
    "x_serialization_backend" : "JSON::PP version 4.06"
 }

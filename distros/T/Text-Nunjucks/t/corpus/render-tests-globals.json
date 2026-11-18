@@ -1,0 +1,2017 @@
+[
+  {
+    "name": "tests: lower: number -> TypeError",
+    "template": "{{ 5 is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: null -> TypeError",
+    "template": "{{ null is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'toLowerCase')"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: undefined -> TypeError",
+    "template": "{{ x is lower }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'toLowerCase')"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: array -> TypeError",
+    "template": "{{ [] is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: object -> TypeError",
+    "template": "{{ {} is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: boolean -> TypeError",
+    "template": "{{ true is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: upper: number -> TypeError",
+    "template": "{{ 5 is upper }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: upper: null -> TypeError",
+    "template": "{{ null is upper }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'toUpperCase')"
+      }
+    }
+  },
+  {
+    "name": "tests: upper: array -> TypeError",
+    "template": "{{ [] is upper }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: upper: undefined -> TypeError",
+    "template": "{{ x is upper }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'toUpperCase')"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: empty string",
+    "template": "{{ '' is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: upper: empty string",
+    "template": "{{ '' is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: lower: digits only",
+    "template": "{{ '123' is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: upper: digits only",
+    "template": "{{ '123' is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: lower: sharp s",
+    "template": "{{ 'ß' is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: upper: sharp s",
+    "template": "{{ 'ß' is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: upper: dotless i",
+    "template": "{{ 'ı' is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: lower: safe string",
+    "template": "{{ ('abc' | safe) is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: lower: not-form on number",
+    "template": "{{ 5 is not lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: mapping: regex literal",
+    "template": "{{ r/a/ is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: mapping: object literal",
+    "template": "{{ {} is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: mapping: array",
+    "template": "{{ [] is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: string",
+    "template": "{{ 'a' is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: number",
+    "template": "{{ 1 is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: null",
+    "template": "{{ null is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: undefined",
+    "template": "{{ x is mapping }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: true",
+    "template": "{{ true is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: safe string",
+    "template": "{{ ('a' | safe) is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: mapping: macro result",
+    "template": "{% macro m() %}x{% endmacro %}{{ m() is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: mapping: context object",
+    "template": "{{ o is mapping }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: iterable: macro result",
+    "template": "{% macro m() %}x{% endmacro %}{{ m() is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: iterable: string",
+    "template": "{{ 'abc' is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: iterable: empty string",
+    "template": "{{ '' is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: iterable: number",
+    "template": "{{ 1 is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: iterable: null",
+    "template": "{{ null is iterable }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: object null is not iterable (cannot read property Symbol(Symbol.iterator))"
+      }
+    }
+  },
+  {
+    "name": "tests: iterable: undefined",
+    "template": "{{ x is iterable }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: undefined is not iterable (cannot read property Symbol(Symbol.iterator))"
+      }
+    }
+  },
+  {
+    "name": "tests: iterable: object",
+    "template": "{{ {} is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: iterable: array",
+    "template": "{{ [] is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: iterable: safe string",
+    "template": "{{ ('a' | safe) is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: iterable: regex",
+    "template": "{{ r/a/ is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: iterable: true",
+    "template": "{{ true is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: callable: macro",
+    "template": "{% macro m() %}x{% endmacro %}{{ m is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: callable: macro result",
+    "template": "{% macro m() %}x{% endmacro %}{{ m() is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: callable: string",
+    "template": "{{ 'a' is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: callable: undefined",
+    "template": "{{ x is callable }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: callable: global range (function)",
+    "template": "{{ range is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: callable: regex",
+    "template": "{{ r/a/ is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: defined: false",
+    "template": "{{ false is defined }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: defined: zero and empty string",
+    "template": "{{ 0 is defined }}{{ '' is defined }}",
+    "expected": {
+      "ok": true,
+      "output": "truetrue"
+    }
+  },
+  {
+    "name": "tests: undefined: undefined literal",
+    "template": "{{ undefined is undefined }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: defined: dotted lookup on undefined",
+    "template": "{{ a.b is defined }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: defined: missing member of object",
+    "template": "{{ a.b is defined }}",
+    "context": {
+      "a": {}
+    },
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: null: undefined is not null",
+    "template": "{{ x is null }}{{ x is none }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "falsefalse"
+    }
+  },
+  {
+    "name": "tests: null: false and zero are not null",
+    "template": "{{ false is null }}{{ 0 is null }}{{ '' is none }}",
+    "expected": {
+      "ok": true,
+      "output": "falsefalsefalse"
+    }
+  },
+  {
+    "name": "tests: divisibleby: zero divisor -> NaN",
+    "template": "{{ 6 is divisibleby(0) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: divisibleby: zero by zero",
+    "template": "{{ 0 is divisibleby(0) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: divisibleby: zero",
+    "template": "{{ 0 is divisibleby(5) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: divisibleby: float",
+    "template": "{{ 7.5 is divisibleby(2.5) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: divisibleby: negative",
+    "template": "{{ -6 is divisibleby(3) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: divisibleby: non-numeric",
+    "template": "{{ 'a' is divisibleby(3) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: divisibleby: undefined arg",
+    "template": "{{ 6 is divisibleby }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: divisibleby: string args",
+    "template": "{{ '6' is divisibleby('3') }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: escaped: markSafe'd macro result",
+    "template": "{% macro m() %}x{% endmacro %}{{ m() is escaped }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: escaped: autoescape filter result",
+    "template": "{{ ('<' | escape) is escaped }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: escaped: number",
+    "template": "{{ 1 is escaped }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: escaped: undefined",
+    "template": "{{ x is escaped }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: escaped: null",
+    "template": "{{ null is escaped }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: equalto: strict number vs string",
+    "template": "{{ 1 is equalto('1') }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: equalto: same string",
+    "template": "{{ 'a' is equalto('a') }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: equalto: NaN",
+    "template": "{{ x is equalto(x) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: equalto: null vs undefined",
+    "template": "{{ null is equalto(x) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: equalto: null vs null",
+    "template": "{{ null is equalto(null) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: equalto: distinct arrays",
+    "template": "{{ [1] is equalto([1]) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: equalto: same context array",
+    "template": "{{ a is equalto(a) }}",
+    "context": {
+      "a": [
+        1
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: eq alias",
+    "template": "{{ 2 is eq(2) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: sameas alias distinct objects",
+    "template": "{{ {} is sameas({}) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: even: zero",
+    "template": "{{ 0 is even }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: even: negative",
+    "template": "{{ -2 is even }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: even: float",
+    "template": "{{ 1.5 is even }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: even: even string",
+    "template": "{{ '4' is even }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: even: non-numeric",
+    "template": "{{ 'a' is even }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: even: null",
+    "template": "{{ null is even }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: odd: zero",
+    "template": "{{ 0 is odd }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: odd: negative",
+    "template": "{{ -3 is odd }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: odd: float",
+    "template": "{{ 1.5 is odd }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: odd: non-numeric",
+    "template": "{{ 'a' is odd }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: odd: undefined",
+    "template": "{{ x is odd }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: falsy: empty string",
+    "template": "{{ '' is falsy }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: falsy: empty array",
+    "template": "{{ [] is falsy }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: falsy: string zero",
+    "template": "{{ '0' is falsy }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: falsy: null undefined false NaN",
+    "template": "{{ null is falsy }}{{ x is falsy }}{{ false is falsy }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "truetruetrue"
+    }
+  },
+  {
+    "name": "tests: falsy: empty object",
+    "template": "{{ {} is falsy }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: truthy: empty array",
+    "template": "{{ [] is truthy }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: truthy: empty object",
+    "template": "{{ {} is truthy }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: truthy: string zero",
+    "template": "{{ '0' is truthy }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: truthy: zero",
+    "template": "{{ 0 is truthy }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: truthy: empty string",
+    "template": "{{ '' is truthy }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: truthy: true",
+    "template": "{{ true is truthy }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: truthy: undefined",
+    "template": "{{ x is truthy }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: gt: string comparison",
+    "template": "{{ 'b' is gt('a') }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: gt: numeric strings compare as numbers",
+    "template": "{{ '10' is gt('9') }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: gt: equal",
+    "template": "{{ 5 is gt(5) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: gt: null vs number",
+    "template": "{{ null is gt(-1) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: gt: undefined",
+    "template": "{{ x is gt(1) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: greaterthan alias",
+    "template": "{{ 3 is greaterthan(2) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: lt: string comparison",
+    "template": "{{ 'a' is lt('b') }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: lt: mixed string number",
+    "template": "{{ 'a' is lt(1) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: lt: undefined",
+    "template": "{{ x is lt(1) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: lt: null vs number",
+    "template": "{{ null is lt(1) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: ge: strings",
+    "template": "{{ 'a' is ge('a') }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: ge: undefined",
+    "template": "{{ x is ge(x) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: le: null vs zero",
+    "template": "{{ null is le(0) }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: le: strings",
+    "template": "{{ 'b' is le('a') }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: ne: strict number vs string",
+    "template": "{{ 1 is ne('1') }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: ne: NaN",
+    "template": "{{ x is ne(x) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: number: NaN is a number",
+    "template": "{{ x is number }}{{ (0/0) is number }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "falsetrue"
+    }
+  },
+  {
+    "name": "tests: number: Infinity",
+    "template": "{{ (1/0) is number }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: number: null undefined bool",
+    "template": "{{ null is number }}{{ x is number }}{{ true is number }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "falsefalsefalse"
+    }
+  },
+  {
+    "name": "tests: number: array and object",
+    "template": "{{ [1] is number }}{{ {} is number }}",
+    "expected": {
+      "ok": true,
+      "output": "falsefalse"
+    }
+  },
+  {
+    "name": "tests: number: float",
+    "template": "{{ 1.5 is number }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: string: safe string",
+    "template": "{{ ('a' | safe) is string }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: string: macro result",
+    "template": "{% macro m() %}x{% endmacro %}{{ m() is string }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: string: empty",
+    "template": "{{ '' is string }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: string: null undefined array",
+    "template": "{{ null is string }}{{ x is string }}{{ [] is string }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "falsefalsefalse"
+    }
+  },
+  {
+    "name": "tests: string: regex",
+    "template": "{{ r/a/ is string }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: is not with parenthesised test",
+    "template": "{{ 1 is not (equalto(2)) }}",
+    "todo": "k90: Compiler dies on a parenthesised test name",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: unknown test",
+    "template": "{{ 1 is nosuchtest }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Error: test not found: nosuchtest"
+      }
+    }
+  },
+  {
+    "name": "tests: unknown test not-form",
+    "template": "{{ 1 is not nosuchtest }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Error: test not found: nosuchtest"
+      }
+    }
+  },
+  {
+    "name": "tests: test in if with and",
+    "template": "{% if 3 is odd and 4 is even %}y{% else %}n{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "y"
+    }
+  },
+  {
+    "name": "tests: test binds tighter than not",
+    "template": "{{ not 3 is odd }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: test with filter operand",
+    "template": "{{ 'ABC' | lower is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: test with arithmetic operand",
+    "template": "{{ 1 + 2 is odd }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: test in ternary",
+    "template": "{{ 'y' if 2 is even else 'n' }}",
+    "expected": {
+      "ok": true,
+      "output": "y"
+    }
+  },
+  {
+    "name": "tests: test with is not equalto expression",
+    "template": "{{ 2 is not equalto 2 }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 21]\n  expected variable end"
+      }
+    }
+  },
+  {
+    "name": "tests: test with kwarg",
+    "template": "{{ 6 is divisibleby(num=3) }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: lower: lone surrogate",
+    "template": "{{ ('😀'|first) is lower }}{{ ('😀'|first) is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "truetrue"
+    }
+  },
+  {
+    "name": "tests: lower: final sigma",
+    "template": "{{ 'ΑΣ' is lower }}{{ ('ΑΣ'|lower) is lower }}{{ 'ας' is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "falsetruetrue"
+    }
+  },
+  {
+    "name": "tests: upper: dotted capital I",
+    "template": "{{ 'İ' is upper }}{{ 'İ' is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "truefalse"
+    }
+  },
+  {
+    "name": "tests: lower/upper: titlecase digraph",
+    "template": "{{ 'ǅ' is upper }}{{ 'ǅ' is lower }}",
+    "expected": {
+      "ok": true,
+      "output": "falsefalse"
+    }
+  },
+  {
+    "name": "tests: upper: safe string",
+    "template": "{{ ('ABC' | safe) is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: lower: object with toLowerCase key",
+    "template": "{{ {'toLowerCase': 1} is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: regex -> TypeError",
+    "template": "{{ r/a/ is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: upper: boolean -> TypeError",
+    "template": "{{ true is upper }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: lower: macro -> TypeError",
+    "template": "{% macro m() %}x{% endmacro %}{{ m is lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: value.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "tests: upper: macro result",
+    "template": "{% macro m() %}X{% endmacro %}{{ m() is upper }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: iterable: macro",
+    "template": "{% macro m() %}x{% endmacro %}{{ m is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: iterable: context array and object",
+    "template": "{{ a is iterable }}{{ o is iterable }}",
+    "context": {
+      "a": [
+        1
+      ],
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "truefalse"
+    }
+  },
+  {
+    "name": "tests: mapping: macro",
+    "template": "{% macro m() %}x{% endmacro %}{{ m is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: mapping: escaped string",
+    "template": "{{ ('<'|escape) is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "tests: mapping: context array",
+    "template": "{{ a is mapping }}",
+    "context": {
+      "a": [
+        1
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "tests: select mapping",
+    "template": "{{ [{}, [], 'a', r/a/, 1, null]|select('mapping')|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2"
+    }
+  },
+  {
+    "name": "tests: reject iterable on undefined",
+    "template": "{{ [1, x]|reject('iterable')|length }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: undefined is not iterable (cannot read property Symbol(Symbol.iterator))"
+      }
+    }
+  },
+  {
+    "name": "globals: range: stop zero",
+    "template": "[{% for i in range(0) %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: negative stop",
+    "template": "[{% for i in range(-3) %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: no args",
+    "template": "[{% for i in range() %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: start after stop",
+    "template": "[{% for i in range(5, 0) %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: step zero falls back to one",
+    "template": "{% for i in range(0, 5, 0) %}{{ i }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "01234"
+    }
+  },
+  {
+    "name": "globals: range: negative step wrong direction",
+    "template": "[{% for i in range(0, 5, -1) %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: positive step wrong direction",
+    "template": "[{% for i in range(5, 0, 1) %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: negative step to negative stop",
+    "template": "{% for i in range(2, -3, -1) %}{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "2,1,0,-1,-2,"
+    }
+  },
+  {
+    "name": "globals: range: float stop",
+    "template": "{% for i in range(2.5) %}{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "0,1,2,"
+    }
+  },
+  {
+    "name": "globals: range: float start",
+    "template": "{% for i in range(1.5, 4) %}{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1.5,2.5,3.5,"
+    }
+  },
+  {
+    "name": "globals: range: float accumulation",
+    "template": "{% for i in range(0, 1, 0.1) %}{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "0,0.1,0.2,0.30000000000000004,0.4,0.5,0.6,0.7,0.7999999999999999,0.8999999999999999,0.9999999999999999,"
+    }
+  },
+  {
+    "name": "globals: range: three-arg step null falls back to one",
+    "template": "{% for i in range(0, 3, null) %}{{ i }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "012"
+    }
+  },
+  {
+    "name": "globals: range: null stop gives empty",
+    "template": "[{% for i in range(0, null) %}{{ i }}{% endfor %}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: undefined stop uses start",
+    "template": "{% for i in range(3, x) %}{{ i }}{% endfor %}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "012"
+    }
+  },
+  {
+    "name": "globals: range: NaN stop",
+    "template": "[{% for i in range(x * 1) %}{{ i }}{% endfor %}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: negative float step",
+    "template": "{% for i in range(1, 0, -0.25) %}{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1,0.75,0.5,0.25,"
+    }
+  },
+  {
+    "name": "globals: range: step ignored with one arg",
+    "template": "{% for i in range(3, undefined, 2) %}{{ i }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "012"
+    }
+  },
+  {
+    "name": "globals: range: printed as array",
+    "template": "{{ range(3) }}",
+    "expected": {
+      "ok": true,
+      "output": "0,1,2"
+    }
+  },
+  {
+    "name": "globals: range: length filter",
+    "template": "{{ range(0, 10, 3) | length }}",
+    "expected": {
+      "ok": true,
+      "output": "4"
+    }
+  },
+  {
+    "name": "globals: range: loop variables",
+    "template": "{% for i in range(3) %}{{ loop.index }}{{ loop.last }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1false2false3true"
+    }
+  },
+  {
+    "name": "globals: range: numeric string stop",
+    "template": "{% for i in range('3') %}{{ i }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "012"
+    }
+  },
+  {
+    "name": "globals: range: kwargs are not parameters",
+    "template": "{% for i in range(stop=3) %}{{ i }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": ""
+    }
+  },
+  {
+    "name": "globals: range: large step",
+    "template": "{% for i in range(0, 5, 10) %}{{ i }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "0,"
+    }
+  },
+  {
+    "name": "globals: range: from context",
+    "template": "{% for i in range(a, b) %}{{ i }}{% endfor %}",
+    "context": {
+      "a": 2,
+      "b": 5
+    },
+    "expected": {
+      "ok": true,
+      "output": "234"
+    }
+  },
+  {
+    "name": "globals: range: in set and sum",
+    "template": "{% set r = range(1, 5) %}{{ r | sum }}",
+    "expected": {
+      "ok": true,
+      "output": "10"
+    }
+  },
+  {
+    "name": "globals: range: global shadowed by context",
+    "template": "{{ range }}",
+    "context": {
+      "range": "mine"
+    },
+    "expected": {
+      "ok": true,
+      "output": "mine"
+    }
+  },
+  {
+    "name": "globals: range: is not defined by missing global",
+    "template": "{{ nosuchglobal is defined }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "globals: cycler: initial current is null",
+    "template": "{% set cls = cycler(1, 2) %}[{{ cls.current }}]{{ cls.current is null }}",
+    "expected": {
+      "ok": true,
+      "output": "[]true"
+    }
+  },
+  {
+    "name": "globals: cycler: empty cycler",
+    "template": "{% set cls = cycler() %}[{{ cls.next() }}][{{ cls.current }}]{{ cls.current is undefined }}",
+    "expected": {
+      "ok": true,
+      "output": "[][]true"
+    }
+  },
+  {
+    "name": "globals: cycler: single item",
+    "template": "{% set cls = cycler('a') %}{{ cls.next() }}{{ cls.next() }}{{ cls.next() }}",
+    "expected": {
+      "ok": true,
+      "output": "aaa"
+    }
+  },
+  {
+    "name": "globals: cycler: wraps over three",
+    "template": "{% set cls = cycler(1, 2, 3) %}{% for i in range(7) %}{{ cls.next() }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1231231"
+    }
+  },
+  {
+    "name": "globals: cycler: reset clears current",
+    "template": "{% set cls = cycler(1, 2) %}{{ cls.next() }}{{ cls.reset() }}[{{ cls.current }}]{{ cls.next() }}",
+    "expected": {
+      "ok": true,
+      "output": "1[]1"
+    }
+  },
+  {
+    "name": "globals: cycler: reset returns undefined",
+    "template": "{% set cls = cycler(1, 2) %}[{{ cls.reset() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: cycler: independent instances",
+    "template": "{% set a = cycler(1, 2) %}{% set b = cycler(1, 2) %}{{ a.next() }}{{ a.next() }}{{ b.next() }}",
+    "expected": {
+      "ok": true,
+      "output": "121"
+    }
+  },
+  {
+    "name": "globals: cycler: mixed item types",
+    "template": "{% set cls = cycler(1, 'a', true, null) %}{% for i in range(5) %}[{{ cls.next() }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1][a][true][][1]"
+    }
+  },
+  {
+    "name": "globals: cycler: inside a for loop",
+    "template": "{% set cls = cycler('odd', 'even') %}{% for i in [1,2,3,4] %}{{ cls.next() }} {% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "odd even odd even "
+    }
+  },
+  {
+    "name": "globals: cycler: object printed",
+    "template": "{{ cycler(1) }}",
+    "expected": {
+      "ok": true,
+      "output": "[object Object]"
+    }
+  },
+  {
+    "name": "globals: cycler: object is mapping",
+    "template": "{{ cycler(1) is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "globals: cycler: next is callable",
+    "template": "{% set cls = cycler(1) %}{{ cls.next is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "globals: cycler: array argument is one item",
+    "template": "{% set cls = cycler([1, 2]) %}{{ cls.next() }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2"
+    }
+  },
+  {
+    "name": "globals: cycler: current set from a loop over next",
+    "template": "{% set cls = cycler('x', 'y') %}{% for i in range(3) %}{{ cls.next() }}{{ cls.current }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "xxyyxx"
+    }
+  },
+  {
+    "name": "globals: joiner: default separator",
+    "template": "{% set j = joiner() %}[{{ j() }}][{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][,][,]"
+    }
+  },
+  {
+    "name": "globals: joiner: empty string separator falls back to comma",
+    "template": "{% set j = joiner('') %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][,]"
+    }
+  },
+  {
+    "name": "globals: joiner: zero separator falls back to comma",
+    "template": "{% set j = joiner(0) %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][,]"
+    }
+  },
+  {
+    "name": "globals: joiner: number separator",
+    "template": "{% set j = joiner(1) %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][1]"
+    }
+  },
+  {
+    "name": "globals: joiner: multichar separator",
+    "template": "{% set j = joiner(' | ') %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][ | ]"
+    }
+  },
+  {
+    "name": "globals: joiner: independent instances",
+    "template": "{% set a = joiner() %}{% set b = joiner() %}[{{ a() }}][{{ a() }}][{{ b() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][,][]"
+    }
+  },
+  {
+    "name": "globals: joiner: in a for loop",
+    "template": "{% set j = joiner(', ') %}{% for i in [1,2,3] %}{{ j() }}{{ i }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1, 2, 3"
+    }
+  },
+  {
+    "name": "globals: joiner: is callable",
+    "template": "{{ joiner() is callable }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "globals: joiner: null separator",
+    "template": "{% set j = joiner(null) %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][,]"
+    }
+  },
+  {
+    "name": "globals: joiner: html separator is escaped",
+    "template": "{% set j = joiner('<') %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][&lt;]"
+    }
+  },
+  {
+    "name": "globals: joiner: separator ignores extra args",
+    "template": "{% set j = joiner('-', '+') %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][-]"
+    }
+  },
+  {
+    "name": "globals: joiner: call with args ignored",
+    "template": "{% set j = joiner('-') %}[{{ j(1) }}][{{ j(2) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][-]"
+    }
+  },
+  {
+    "name": "globals: cycler: unbound method through for-in",
+    "template": "{% set cls = cycler(1, 2) %}{% for k, v in cls %}{% if k == 'next' %}{{ v() }}{% endif %}{% endfor %}[{{ cls.current }}]",
+    "todo": "k93: engine-built method reading `this` called without memberLookup (open decision)",
+    "expected": {
+      "ok": true,
+      "output": "1[]"
+    }
+  },
+  {
+    "name": "globals: cycler: next read then called",
+    "template": "{% set cls = cycler(1, 2) %}{% set n = cls.next %}{{ n() }}{{ n() }}[{{ cls.current }}]",
+    "expected": {
+      "ok": true,
+      "output": "12[2]"
+    }
+  },
+  {
+    "name": "globals: cycler: next of a temporary cycler",
+    "template": "{% set n = cycler(1, 2).next %}{{ n() }}{{ n() }}{{ n() }}",
+    "expected": {
+      "ok": true,
+      "output": "121"
+    }
+  },
+  {
+    "name": "globals: cycler: own keys in order",
+    "template": "{% for k, v in cycler(1) %}{{ k }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "current;reset;next;"
+    }
+  },
+  {
+    "name": "globals: cycler: dump",
+    "template": "{{ cycler(1, 2) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "{&quot;current&quot;:null}"
+    }
+  },
+  {
+    "name": "globals: cycler: dump after next",
+    "template": "{% set c = cycler('a') %}{{ c.next() }}{{ c | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "a{&quot;current&quot;:&quot;a&quot;}"
+    }
+  },
+  {
+    "name": "globals: cycler: dictsort",
+    "template": "{% set c = cycler(1) %}{% for k, v in c | dictsort %}{{ k }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "current;next;reset;"
+    }
+  },
+  {
+    "name": "globals: cycler: kwargs are one item",
+    "template": "{% set c = cycler(a=1) %}{{ c.next() }}|{{ c.next() | dump }}",
+    "todo": "k79: kwargs object enumeration (__keywords)",
+    "expected": {
+      "ok": true,
+      "output": "[object Object]|{&quot;a&quot;:1,&quot;__keywords&quot;:true}"
+    }
+  },
+  {
+    "name": "globals: cycler: next stored in a dict",
+    "template": "{% set c = cycler(1, 2) %}{% set o = {'n': c.next} %}{{ o.n() }}[{{ c.current }}]",
+    "expected": {
+      "ok": true,
+      "output": "1[1]"
+    }
+  },
+  {
+    "name": "globals: cycler: empty cycler current dump",
+    "template": "{% set c = cycler() %}{{ c.next() | dump }}|{{ c | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "|{}"
+    }
+  },
+  {
+    "name": "globals: cycler: length counts own keys",
+    "template": "{{ cycler(1, 2) | length }}",
+    "expected": {
+      "ok": true,
+      "output": "3"
+    }
+  },
+  {
+    "name": "globals: cycler: not iterable",
+    "template": "{{ cycler(1) is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "false"
+    }
+  },
+  {
+    "name": "globals: cycler: reading next does not call it",
+    "template": "{% set c = cycler(1, 2) %}{{ c.next is callable }}{{ c.next is callable }}{{ c.next() }}",
+    "expected": {
+      "ok": true,
+      "output": "truetrue1"
+    }
+  },
+  {
+    "name": "globals: range: numeric string start concatenates",
+    "template": "{{ range('3', 5) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[&quot;3&quot;]"
+    }
+  },
+  {
+    "name": "globals: range: numeric string step concatenates",
+    "template": "{{ range(0, 3, '1') | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[0,&quot;01&quot;]"
+    }
+  },
+  {
+    "name": "globals: range: boolean stop",
+    "template": "{{ range(true) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[0]"
+    }
+  },
+  {
+    "name": "globals: range: boolean step",
+    "template": "{{ range(0, 3, true) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[0,1,2]"
+    }
+  },
+  {
+    "name": "globals: range: negative float stop",
+    "template": "{{ range(-0.5) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: array stop",
+    "template": "{{ range([3]) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[0,1,2]"
+    }
+  },
+  {
+    "name": "globals: range: NaN step falls back to one",
+    "template": "{{ range(0, 3, x * 1) | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[0,1,2]"
+    }
+  },
+  {
+    "name": "globals: range: non-numeric step takes the descending branch",
+    "template": "{{ range(0, 3, 'a') | dump }}",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: range: result is an array",
+    "template": "{{ range(3) is mapping }}{{ range(3) is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "falsetrue"
+    }
+  },
+  {
+    "name": "globals: range: is not a mapping",
+    "template": "{{ range is mapping }}{{ range is iterable }}",
+    "expected": {
+      "ok": true,
+      "output": "falsefalse"
+    }
+  },
+  {
+    "name": "globals: joiner: array separator",
+    "template": "{% set j = joiner([1, 2]) %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][1,2]"
+    }
+  },
+  {
+    "name": "globals: joiner: safe separator is not escaped",
+    "template": "{% set j = joiner('<b>' | safe) %}[{{ j() }}][{{ j() }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][<b>]"
+    }
+  },
+  {
+    "name": "globals: joiner: dump of the function",
+    "template": "[{{ joiner() | dump }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "globals: the built-in globals",
+    "template": "{{ range is defined }}{{ cycler is defined }}{{ joiner is defined }}{{ lipsum is defined }}",
+    "expected": {
+      "ok": true,
+      "output": "truetruetruefalse"
+    }
+  },
+  {
+    "name": "globals: global shadowed by a set",
+    "template": "{% set range = 'mine' %}{{ range }}",
+    "expected": {
+      "ok": true,
+      "output": "mine"
+    }
+  },
+  {
+    "name": "globals: cycler: reset through for-in",
+    "template": "{% set c = cycler('a','b') %}{% for k, v in c %}{% if k == 'reset' %}{{ c.next() }}{{ v() }}{% endif %}{% endfor %}[{{ c.current }}]{{ c.next() }}",
+    "todo": "k93: engine-built method reading `this` called without memberLookup (open decision)",
+    "expected": {
+      "ok": true,
+      "output": "a[a]a"
+    }
+  },
+  {
+    "name": "globals: cycler: next through list filter",
+    "template": "{% set c = cycler('a','b') %}{% for item in c | list %}{% if item.key == 'next' %}{{ item.value() }}{% endif %}{% endfor %}[{{ c.current }}]",
+    "todo": "k93: engine-built method reading `this` called without memberLookup (open decision)",
+    "expected": {
+      "ok": true,
+      "output": "a[]"
+    }
+  },
+  {
+    "name": "globals: cycler: next as sort comparator",
+    "template": "{% set c = cycler('a','b') %}{% for k, v in c %}{% if k == 'next' %}{{ [3,1].sort(v) | join }}{% endif %}{% endfor %}",
+    "todo": "k93: engine-built method reading `this` called without memberLookup (open decision)",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot set properties of undefined (setting 'current')"
+      }
+    }
+  }
+]

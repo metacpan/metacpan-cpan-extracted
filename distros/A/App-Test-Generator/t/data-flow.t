@@ -958,7 +958,7 @@ subtest 'DF47 — mutant objects are independent: modifying one does not affect 
 	my ($m, $tmpdir) = _mutator_in_tmp();
 
 	my @mutants = _in_dir($tmpdir, sub { $m->generate_mutants() });
-	skip 'no mutants generated for this body', 1 unless @mutants >= 2;
+	plan(skip_all => 'no mutants generated for this body') unless(@mutants >= 2);
 
 	my $orig_desc = $mutants[1]->{description};
 	$mutants[0]->{description} = 'CORRUPTED';
@@ -972,7 +972,7 @@ subtest 'DF48 — apply_mutant() without prepare_workspace() croaks "Workspace n
 
 	# generate_mutants() first so we have something to pass to apply_mutant
 	my @mutants = _in_dir($tmpdir, sub { $m->generate_mutants() });
-	skip 'no mutants to apply', 1 unless @mutants;
+	plan(skip_all => 'no mutants to apply') unless(@mutants);
 
 	# No prepare_workspace() called — _workspace key is absent
 	throws_ok(

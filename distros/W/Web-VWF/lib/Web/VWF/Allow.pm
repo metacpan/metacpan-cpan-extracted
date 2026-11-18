@@ -5,12 +5,12 @@ use Web::VWF::Utils;
 
 # Decide if we're going to allow this client to view the website
 # Usage:
-#	unless(VWF::Allow::allow({info => $info, lingua => $lingua})) {
+#	unless(Web::VWF::Allow::allow({info => $info, lingua => $lingua})) {
 
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 use Carp;
 use Error;
 use File::Spec;
@@ -320,3 +320,78 @@ sub allow {
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Web::VWF::Allow - The last access check a request must pass
+
+=head1 VERSION
+
+Version 0.003.0
+
+=head1 SYNOPSIS
+
+	unless(Web::VWF::Allow::allow({ info => $info, lingua => $lingua, config => $config, logger => $logger })) {
+		# refused
+	}
+
+=head1 DESCRIPTION
+
+Decides whether a client may be shown the site.  It checks, in this order, the
+user agent against a list of unwelcome robots, the per-address L<Data::Throttler>
+limit (the C<throttle> settings, see L<Web::VWF/CONFIGURATION>), the country
+against the C<blacklist_countries> setting, L<CGI::IDS>, a few known attack
+signatures in the Referer and URL, the DShield list of attacking addresses, and a
+cookie set by one kind of scanner.
+
+Search engines are not throttled.  The verdict for an address is remembered for
+five minutes.
+
+=head1 FUNCTIONS
+
+=head2 allow
+
+Takes a hash or a hash reference: C<info> (a L<CGI::Info>, required in practice),
+C<lingua> (a L<CGI::Lingua>), C<logger>, C<config> and C<cache>.  One of
+C<cache> and C<config> is needed for the DShield list.
+
+Returns true when the client is allowed, which is always so when C<REMOTE_ADDR>
+is not set (the script is being run from a command line), and when C<info> is
+not given, which is logged.  A client that is refused makes it throw an
+L<Error::Simple>, and the next calls for the same address in the following five
+minutes return false instead of throwing.  C<info-E<gt>status> is set to 429 for
+a throttled address.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+		info => { type => 'object', optional => 1 },
+		lingua => { type => 'object', optional => 1 },
+		logger => { type => 'object', optional => 1 },
+		config => { type => 'object', optional => 1 },
+		cache => { type => 'object', optional => 1 },
+	}
+
+=head4 OUTPUT
+
+	{ type => 'boolean' }
+
+and throws L<Error::Simple> when the client is refused.
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

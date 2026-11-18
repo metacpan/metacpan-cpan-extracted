@@ -57,4 +57,5 @@ runs:
       shell: bash
       env:
         ALIEN_INSTALL_TYPE: ${{ inputs.install-type }}
+        DZIL_BINARY_SKIP: 1
       run: dzil ${{ inputs.command }}

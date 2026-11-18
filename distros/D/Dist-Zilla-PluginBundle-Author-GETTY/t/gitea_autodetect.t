@@ -1,6 +1,8 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
+use File::Spec;
 use File::Temp qw(tempdir);
 use Cwd qw(getcwd);
 
@@ -99,7 +101,15 @@ subtest 'linked worktree -> remote still found' => sub {
   _git($main, qw(-c user.name=t -c user.email=t@t commit -q --allow-empty -m init));
   _git($main, qw(remote add origin git@codeberg.org:getty/some-dist.git));
   my $wt = "$main/wt";
-  _git($main, qw(worktree add -q), $wt);
+  # no -q: git 2.11 (perl:5.22 image) has no such switch on `worktree add`; keep its chatter off the TAP stream
+  {
+    open my $olderr, '>&', \*STDERR or die "dup STDERR: $!";
+    open STDERR, '>', File::Spec->devnull or die "silence STDERR: $!";
+    my $ok = eval { _git($main, qw(worktree add), $wt); 1 };
+    my $e = $@;
+    open STDERR, '>&', $olderr or die "restore STDERR: $!";
+    die $e unless $ok;
+  }
   ok -f "$wt/.git", 'the worktree has a .git file, not a directory';
   my $r = _detect_in_dir($wt);
   is $r->{host},     'codeberg.org', 'host found through the worktree';

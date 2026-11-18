@@ -180,7 +180,7 @@ C<ref> or C<is_coderef> sees an object: v0.2.0 gave code references.
 C<take>, C<drop>, C<take_last>, C<take_single> and C<drop_while> keep
 state, so they're made with L<Ekorn::Pipeline::Gather> and start
 afresh on each run. A run is a call of a pipeline with values, or an
-iterator made from it.
+iterator or a feed made from it.
 
 C<take_if> and C<drop_if> test every value; C<take_while> and
 C<drop_while> stop testing at the first value the test fails, one by

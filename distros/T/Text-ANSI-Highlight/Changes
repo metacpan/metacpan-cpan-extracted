@@ -1,0 +1,28 @@
+Revision history for Perl extension Text-ANSI-Highlight
+
+0.03 2026-11-18T09:18:39Z
+
+    - The style of the highlighter can be given: new(style => ...),
+      or "name:style" in one word (pandoc:haddock, gnu:esc256), and
+      --style of ansihighlight.  It is the name of a style of the
+      highlighter, or a file
+    - Markdown in a fence goes to the highlighter with the rest, in
+      one call: it was a call for each, and slow with many of them
+
+0.02 2026-11-18T08:06:25Z
+
+    - Text::ANSI::Highlight::IO: a program which reads files by <>
+      reads them in colors, as it is.  It gives a highlighter to
+      IO::Factotum (perl -MText::ANSI::Highlight::IO -ne ...)
+    - The highlighter method tells whether a name is that of a
+      highlighter
+    - pl is Perl: source-highlight took it for Prolog
+    - SEE ALSO has modules which do similar things
+    - Requires IO::Factotum 0.05
+
+0.01 2026-11-18T03:43:37Z
+
+    - original version: Text::ANSI::Highlight, with the highlighters
+      pandoc, sourcehighlight (gnu) and skylighting (sky), and the
+      ansihighlight command
+

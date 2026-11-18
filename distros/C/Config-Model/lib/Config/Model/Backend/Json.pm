@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Backend::Json 2.168;
+package Config::Model::Backend::Json 2.169;
 
 use 5.020;
 use Carp;
@@ -90,7 +90,7 @@ Config::Model::Backend::Json - Read and write config as a JSON data structure
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 

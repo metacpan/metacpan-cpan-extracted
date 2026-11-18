@@ -13,5 +13,6 @@ t/01-internal.t
 t/bin_speak_file.t
 t/escape_sequences.t
 t/last_message.t
+t/persona.t
 META.yml                                 Module YAML meta-data (added by MakeMaker)
 META.json                                Module JSON meta-data (added by MakeMaker)

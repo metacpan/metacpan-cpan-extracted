@@ -1,4 +1,4 @@
-package Dist::Conformance::Snapshot::Directory 0.005;
+package Dist::Conformance::Snapshot::Directory 0.006;
 
 # ABSTRACT: A snapshot of a checkout on this machine, which an update can change
 
@@ -12,6 +12,7 @@ use File::Slurper::Temp();
 use Mojo::File();
 
 use Dist::Conformance::Schema();
+use Dist::Conformance::Source::Git();
 
 
 has 'root';
@@ -20,12 +21,6 @@ has 'root';
 my sub bytes_at ($name) {
     return readlink $name if -l $name;
     return Mojo::File->new($name)->slurp;
-}
-
-# Mojo::File's to_abs resolves against the working directory, never a base.
-my sub relative_to ( $path, $base ) {
-    my $file = Mojo::File->new($path);
-    return $file->is_abs ? $file : $base->child($path);
 }
 
 
@@ -99,16 +94,16 @@ sub write ( $self, $path, $bytes, $mode = oct 644 ) {    ## no critic (Subroutin
 
 
 sub hooks_dir ($self) {
-    my $dot_git = $self->root->child('.git');
-    return $dot_git->child('hooks') if -d $dot_git;
-    return undef                    if !-e $dot_git;
-    my ($gitdir) = $dot_git->slurp =~ m{\Agitdir:\ *(.+?)\s*\z};
-    return undef if !defined $gitdir;
-    $gitdir = relative_to( $gitdir, $self->root );
-    my $common = $gitdir->child('commondir');
-    return $gitdir->child('hooks') if !-e $common;
-    ( my $relative = $common->slurp ) =~ s/\s+\z//;
-    return relative_to( $relative, $gitdir )->child('hooks');
+    my $root = $self->root;
+    return undef if !-e $root->child('.git');
+
+    # The root decides, not a repository that the environment names.
+    delete local @ENV{qw{GIT_DIR GIT_WORK_TREE GIT_COMMON_DIR}};
+    chomp( my $path = Dist::Conformance::Source::Git::git( q{-C}, "$root", qw{rev-parse --git-path hooks} ) );
+    my $hooks = Mojo::File->new($path);
+
+    # Mojo::File's to_abs resolves against the working directory, never a base.
+    return $hooks->is_abs ? $hooks : $root->child($path);
 }
 
 
@@ -141,7 +136,7 @@ Dist::Conformance::Snapshot::Directory - A snapshot of a checkout on this machin
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -215,8 +210,14 @@ directories.  C<$mode> defaults to 0644.
 =head2 hooks_dir
 
 The directory that git runs the hooks of this checkout from, or C<undef> when
-the root is not a checkout.  In a worktree that is the F<hooks> of the main
-checkout.  C<core.hooksPath> is not read.
+the root is not a checkout.  That is what C<git rev-parse --git-path hooks>
+answers in the root: F<.git/hooks>, or in a worktree the F<hooks> of the main
+checkout, unless C<core.hooksPath> names another directory.  A relative
+C<core.hooksPath> is relative to the root, so a C<core.hooksPath> of
+F<git-hooks> makes each worktree run the hooks that its own branch tracks.  It
+dies with the error of git when git finds no repository in a root that has a
+F<.git>.  It needs git 2.10 or later, the first whose C<--git-path> honors
+C<core.hooksPath>.
 
 =head2 installed_hook
 

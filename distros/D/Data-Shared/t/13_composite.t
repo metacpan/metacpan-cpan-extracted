@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Data::Shared qw(shared_get shared_set shared_delete shared_exists shared_call
                     shared_compile sharedc_get sharedc_exists shared_node shared_children
                     shared_incr shared_push shared_pop shareda_get sharedc_set);
@@ -102,7 +104,7 @@ subtest 'sortedset int of roaringbitmap' => sub {
 };
 
 subtest 'three levels: hashmap of kdtree of hashmap' => sub {
-    if (!eval { require Data::KDTree::Shared; 1 }) { plan skip_all => 'kdtree backend unavailable'; return }
+    if (!have('kdtree')) { plan skip_all => 'kdtree backend unavailable'; return }
     my $r = Data::Shared->new;
     mount_or_skip($r, 'atlas', ['hashmap:ss', 1000, ['kdtree', 2, 1000, ['hashmap:ss', 1000]]]);
     my $eu = $r->node('/atlas/europe');
@@ -117,7 +119,7 @@ subtest 'three levels: hashmap of kdtree of hashmap' => sub {
 };
 
 subtest 'a composite checks its child backend at mount time' => sub {
-    eval { require Data::HashMap::Shared::SS; 1 }
+    have('hashmap:ss')
         or plan skip_all => 'hashmap backend unavailable, so the child check cannot be isolated';
     my $r = Data::Shared->new(tempdir(CLEANUP => 1));
     ok !eval { $r->mount('c', ['hashmap:ss', 64, ['Data::Shared::NoSuchBackend', 8]]); 1 },
@@ -255,7 +257,7 @@ subtest 'id-parents address by integer id' => sub {
     }
     is_deeply [$r->children('/net')], [1, 2, 3, 10, 11, 12], 'no phantom children registered';
 
-    if (eval { require Data::KDTree::Shared; 1 }) {
+    if (have('kdtree')) {
         my $k = Data::Shared->new;
         $k->mount('pts', ['kdtree', 2, 1000, ['hashmap:ss', 100]]);
         shared_set($k, "/pts/$_/name", "p$_") for 1, 2, 10;
@@ -321,7 +323,7 @@ subtest 'a composite child cannot name its own backing path' => sub {
     plan skip_all => 'sortedset:strings unavailable'
         unless eval { $root->mount('probe', 'sortedset:strings', { max => 8 }); 1 };
     plan skip_all => 'hashmap:ss unavailable'
-        unless eval { require Data::HashMap::Shared::SS; 1 };
+        unless have('hashmap:ss');
 
     for my $case (['set alone', { max => 8, set => "$dir/s.set" }],
                   ['keys alone', { max => 8, keys => "$dir/s.keys" }],
@@ -439,7 +441,7 @@ subtest 'a malformed child spec is refused before the composite publishes' => su
     plan skip_all => 'sortedset:strings unavailable'
         unless eval { $root->mount('probe', 'sortedset:strings', { max => 8 }); 1 };
     plan skip_all => 'hashmap:ss unavailable'
-        unless eval { require Data::HashMap::Shared::SS; 1 };
+        unless have('hashmap:ss');
     my $i = 0;
     for my $case (['an empty option hash', ['sortedset:strings', {}], qr/requires 'max'/],
                   ['an odd option list', ['sortedset:strings', 'max', 8, 'set'],

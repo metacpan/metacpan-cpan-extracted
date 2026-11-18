@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Fetch the pinned upstream Nunjucks into upstream/nunjucks (gitignored).
+# It is both the reference source the port is read against and the oracle
+# maint/oracle.js renders with. Bumping NUNJUCKS_TAG is a porting decision,
+# not a chore -- every divergence list and the corpus are measured against it.
+set -euo pipefail
+
+NUNJUCKS_TAG=v3.2.4
+NUNJUCKS_REPO=https://github.com/mozilla/nunjucks.git
+
+root=$(cd "$(dirname "$0")/.." && pwd)
+dest=$root/upstream/nunjucks
+
+if [ -d "$dest/.git" ]; then
+  have=$(git -C "$dest" describe --tags --exact-match 2>/dev/null || true)
+  if [ "$have" != "$NUNJUCKS_TAG" ]; then
+    echo "upstream/nunjucks is at '$have', want $NUNJUCKS_TAG -- remove it and rerun" >&2
+    exit 1
+  fi
+else
+  mkdir -p "$root/upstream"
+  git clone --quiet --depth 1 --branch "$NUNJUCKS_TAG" "$NUNJUCKS_REPO" "$dest"
+fi
+
+# Runtime deps only (asap, a-sync-waterfall); no build, no dev tooling.
+( cd "$dest" && npm install --omit=dev --ignore-scripts --no-audit --no-fund >/dev/null )
+
+echo "upstream/nunjucks ready at $NUNJUCKS_TAG"

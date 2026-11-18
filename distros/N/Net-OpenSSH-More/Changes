@@ -1,5 +1,11 @@
 Revision history for Net-OpenSSH-More
 
+1.06 2026-11-18 TEODESIAN
+    - Pass options of 0 to Net::OpenSSH, so strict_mode => 0 applies and a
+      TMPDIR under a group-writable directory is no longer "not secure"
+    - Give the control socket a short name, so a deep TMPDIR no longer
+      makes its path too long for a Unix socket
+
 1.05 2026-09-28 TEODESIAN
     - Note the reason an SSH connection failed
 

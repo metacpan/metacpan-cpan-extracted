@@ -1,6 +1,6 @@
 package API::Docker::Type::Plugin::Config::Interface;
 # ABSTRACT: The interface between Docker and the plugin
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::PluginInterfaceType;
 use namespace::clean;
@@ -29,7 +29,7 @@ API::Docker::Type::Plugin::Config::Interface - The interface between Docker and 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -58,7 +58,7 @@ the empty string and C<moby.plugins.http/v1>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

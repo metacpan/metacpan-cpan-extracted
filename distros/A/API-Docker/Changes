@@ -1,5 +1,39 @@
 Revision history for API-Docker
 
+0.006     2026-11-18 01:20:29Z
+
+  - The test suite runs again in an installed distribution (`perl Makefile.PL
+    && make && make test`, as cpanm and CPAN smokers do): t/dist_source.t now
+    checks only a git checkout and skips elsewhere.
+
+  - The tests accept the location Carp before 1.25 (perl 5.14 and 5.16)
+    appends to an error, without the final full stop.
+
+0.005     2026-11-17 21:33:48Z
+
+  - API::Docker::Type::Network has a typed `status` accessor for the
+    runtime IPAM usage the daemon reports on `GET /networks/{id}`
+    (NetworkStatus, IPAMStatus, SubnetStatus). Before, the daemon's `Status`
+    landed in `unknown_fields`. The fixture was captured from Docker 29.8.0
+    (API 1.56); Podman 5.8.4 (API 1.44) reports no `Status`, so `status` is
+    undef there.
+
+  - maint/spec-overlay.yaml grafts named fields of a newer spec onto the
+    v1.51 base model, together with the definitions they need. The
+    generator, the drift checker and t/spec_to_type.t read the grafted
+    model, and a grafted field carries the `since` of its spec. The overlay
+    holds Network.Status from v1.55.
+
+  - maint/spec-to-type.pl takes the version it writes into the generated
+    classes from lib/API/Docker.pm, and t/spec_to_type.t runs in a git
+    worktree as well.
+
+  - A daemon that answers and closes before reading the request body leaves
+    the calling process running: the request is written with SIGPIPE
+    ignored and every write checked, the response the daemon sent is still
+    read, so a 4xx arrives as `API::Docker::Error::HTTP`, and without a
+    response the call croaks naming the endpoint.
+
 0.004     2026-08-30 03:30:59Z
 
   - The typed object model: `list` and `inspect` on every resource now

@@ -23,7 +23,8 @@ my $base_dir = getcwd();
 use Env qw { @PATH };
 
 
-my $min_target_version = '3.26.0';
+#  ubuntu 22.04 LTS has this
+my $min_target_version = '3.37.2';
 
 plugin 'PkgConfig' => (
     pkg_name => 'sqlite3',
@@ -53,9 +54,9 @@ share {
   my $with_cpp11 = '';
 
   #  need to work out how to get latest without updating next lines
-  start_url 'https://www.sqlite.org/2022/sqlite-autoconf-3390300.tar.gz';
+  start_url 'https://www.sqlite.org/2026/sqlite-autoconf-3540100.tar.gz';
   plugin Download => (
-    version => '3.39.3',
+    version => '3.54.1',
   );
 
   
@@ -65,12 +66,13 @@ share {
   plugin Extract => (format => 'tar.gz');
 
 
-  plugin 'Build::Autoconf' => ();
+  plugin 'Build::Autoconf' => (with_pic => 0);
 
   my $build_static = ($^O =~ /mswin/i) ? '' : '--disable-shared';
   $build_static = '';
-  $build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
-  $build_static = '' if $ENV{FORCE_DYNAMIC};
+  #$build_static = '--enable-static=no';  #  override - needed?  leftover from gdal
+  $build_static = '--disable-static';
+  #$build_static = '' if $ENV{FORCE_DYNAMIC};
   
   
   if ($^O =~ /bsd/) {
@@ -82,6 +84,9 @@ share {
   elsif ($^O =~ /dragonfly/) {
     #  might need to be combined with bsd check above
     #  but not sure if /usr/local is needed yet
+    plugin 'Build::Make' => 'gmake';
+  }
+  elsif ($on_windows) {
     plugin 'Build::Make' => 'gmake';
   }
 
@@ -117,10 +122,23 @@ share {
       $orig->($build, @args);
     }
   );
+  if ($on_windows) {
+    #  avoid some double-path shenanigens on Windows
+    meta->around_hook (
+      build => sub {
+        my ($orig, $build, @args) = @_;
+        local $ENV{DESTDIR} = "$ENV{DESTDIR}/" 
+          if not $ENV{DESTDIR} =~ m{/$};
+        $build->install_prop->{prefix} = '.';
+        local $ENV{CFLAGS} .= ' -D_WIN32_WINNT=0x0600';  #  for older Strawberry toolchains
+        $orig->($build, @args);
+      }
+    );
+  }
 
   build [
-    "%{configure} $with_local $with_cpp11 $build_static",
-    \&pause,
+    "%{configure} $build_static $with_local $with_cpp11",
+    #\&pause,
     $make_cmd,
     $make_inst_cmd,
     #@make_clean,

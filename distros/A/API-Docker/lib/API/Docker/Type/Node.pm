@@ -1,6 +1,6 @@
 package API::Docker::Type::Node;
 # ABSTRACT: One entry of the C<200> response to C<GET /nodes>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ManagerStatus;
 use API::Docker::Type::NodeDescription;
@@ -48,7 +48,7 @@ API::Docker::Type::Node - One entry of the C<200> response to C<GET /nodes>
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -106,7 +106,7 @@ L<API::Docker::Type::ManagerStatus>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

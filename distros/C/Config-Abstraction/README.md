@@ -4,7 +4,7 @@ Config::Abstraction - Merge and manage configuration data from different sources
 
 ## Version
 
-Version 0.42
+Version 0.43
 
 ## Synopsis
 
@@ -203,23 +203,23 @@ $APP_DATABASE__HOST  =>  'db.override.example.com'    <-- this wins
 
 - YAML (`*.yaml`, `*.yml`)
 
-    Loaded with `YAML::XS`.
+    Loaded with [YAML::XS](https://metacpan.org/pod/YAML%3A%3AXS).
 
 - JSON (`*.json`)
 
-    Loaded with `JSON::MaybeXS`.
+    Loaded with [JSON::MaybeXS](https://metacpan.org/pod/JSON%3A%3AMaybeXS).
 
 - XML (`*.xml`)
 
-    Loaded with `XML::Simple` (preferred) or `XML::PP` (fallback).
+    Loaded with [XML::Simple](https://metacpan.org/pod/XML%3A%3ASimple) (preferred) or [XML::PP](https://metacpan.org/pod/XML%3A%3APP) (fallback).
 
 - INI (`*.ini`)
 
-    Loaded with `Config::IniFiles`.
+    Loaded with [Config::IniFiles](https://metacpan.org/pod/Config%3A%3AIniFiles).
 
 - TOML (`*.toml`)
 
-    Loaded with `TOML::Tiny`, which implements TOML 1.0.  TOML is a good choice
+    Loaded with [TOML::Tiny](https://metacpan.org/pod/TOML%3A%3ATiny), which implements TOML 1.0.  TOML is a good choice
     for human-editable configuration because its syntax is unambiguous: all values
     are typed, strings must be quoted, and nesting uses `[section]` headers or
     dotted keys rather than indentation.
@@ -243,6 +243,106 @@ $APP_DATABASE__HOST  =>  'db.override.example.com'    <-- this wins
 
     If `TOML::Tiny` is not installed, TOML files are silently skipped with a
     `carp` warning.
+
+- Apache-style (`*.conf`)
+
+    Loaded with [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral), which is optional.  `base.conf`,
+    `local.conf` and their environment-specific forms are discovered like the
+    other formats, and Config::General is the last parser tried for an
+    extensionless `config_file`.  If it is not installed, `.conf` files are
+    skipped.
+
+    ```
+    name      = myapp
+    log       debug
+    log       trace            # repeated keys become an array
+    <database>
+        host  = db.example.com
+        port  = 5432
+    </database>
+    <host www.example.com>     # a named block nests one level further
+        root  /var/www
+    </host>
+    ```
+
+    Config::General's own `<<include ...>>` directive is **not**
+    honoured, and a file that uses it is skipped with a warning, because it reads
+    any file the process can read.  Use the `include` key described under
+    ["INCLUDING FILES"](#including-files) instead.  Config::General's variable interpolation is
+    switched off in favour of ["VARIABLE INTERPOLATION"](#variable-interpolation).
+
+    Apache-style content has `<block>...</block>` tags that look
+    like XML.  When an extensionless `config_file` that does not begin with an
+    `<?xml>` declaration fails to parse as XML, it is given one attempt
+    as Apache-style configuration before the XML error is reported.
+
+### Including Files
+
+With `allow_includes => 1`, a configuration file may name other files
+in a top-level `include` key (a path, a glob, or an arrayref of them):
+
+```
+# base.yaml
+include:
+  - defaults/common.yaml
+  - conf.d/*.json
+name: myapp
+```
+
+Any format may include any other.  The included files are merged _under_ the
+file that includes them, so the including file wins over its includes and,
+of several includes, the later one wins over the earlier.  Globs are expanded
+in sorted order.  A relative path is taken relative to the including file, not
+to the current directory.  Included files appear in `config_path` and, with
+their own entries, in `explain_sources()`.
+
+Because an include is a way to make the module read a file, it is confined:
+an included file must be within the directory of the file that began the
+chain (any depth below it), or within a directory listed in `include_dirs`.
+Symbolic links are resolved before the check.  A file outside those
+directories, a circular include, or a chain deeper than `include_max_depth`
+croaks.  An include that does not exist is skipped with a warning.
+
+The key name can be changed with `include_key`.  A glob that matches no
+file is silently ignored, whereas an explicit path that does not exist warns.
+A file that starts with `#!` is a program and is never read as an include, and
+the running script is never included.  An included file with an unrecognised
+extension is detected by its content (JSON, YAML, TOML, then Apache-style).
+
+Includes are not followed in files fetched from remote directories
+(Newcastle Connection).
+
+### Variable Interpolation
+
+With `interpolate => 1`, string values may refer to other values:
+
+```
+database:
+  host: db.example.com
+  port: 5432
+dsn:  "dbi:Pg:host=${database.host};port=${database.port}"
+home: "${env:HOME}/app"
+lang: "${env:LANG:-C}"
+cost: "$$5"                    # a literal $5
+```
+
+- `${a.b}` -- the value of the configuration key `a.b` (always `.`-separated, whatever `sep_char` is)
+- `${env:NAME}` -- the environment variable `NAME`
+- `${...:-default}` -- `default` when the key or variable is missing
+- `$$` -- a literal `$`
+
+Expansion happens after every source (files, includes, environment, command
+line) has been merged, so a reference sees the final value of its key, and
+references may chain.  A bare `$name` is not special.  Values that are
+`ENC[...]` tokens are left alone, so a secret can be referred to only after
+decryption by not referring to it.  An undefined key or variable, a circular
+reference, or a reference to a hash or array croaks, unless
+`interpolate_strict` is false.  The caller's `data` hashref is never
+modified.
+
+Turn this on only for configuration you trust: a value taken from an
+environment variable or command-line argument that contains
+`${env:NAME}` will be expanded too.
 
 ### Environment Variable Handling
 
@@ -437,7 +537,37 @@ Options:
 
     If true, returns a flat hash structure like `{database.user}` (default: `0`) instead of `{database}{user}`.
     \`
-    &#x3d;item \* `level`
+    &#x3d;item \* `allow_includes`
+
+    If true, a top-level `include` key in any configuration file (YAML, JSON,
+    XML, INI, TOML or Apache-style) names further file(s) to read and merge in.
+    It is off by default, because an existing configuration may already use a key
+    called `include` for something else.  See ["INCLUDING FILES"](#including-files).
+
+- `include_key`
+
+    The name of the key that holds the files to include (default: `include`).
+
+- `include_dirs`
+
+    A directory, or an arrayref of directories, from which files may be included
+    in addition to the directory of the including file.  See ["INCLUDING FILES"](#including-files).
+
+- `include_max_depth`
+
+    How deeply includes may nest before the constructor croaks (default: 10).
+
+- `interpolate`
+
+    If true, `${...}` references in string values are expanded once all the
+    sources have been merged.  Off by default.  See ["VARIABLE INTERPOLATION"](#variable-interpolation).
+
+- `interpolate_strict`
+
+    When `interpolate` is on, a reference that cannot be resolved croaks
+    (the default, `1`).  Set this to `0` to leave such references as written.
+
+- `level`
 
     Level for logging.
 
@@ -634,6 +764,42 @@ Options:
     validation and need errors to point at the construction site.
 
 If just one argument is given, it is assumed to be the name of a file.
+
+#### Api Specification
+
+##### Input
+
+```
+A hash or hashref of the options above, or a single SCALAR (a file name).
+All are optional.
+
+allow_includes      -- BOOLEAN  -- follow the include key (default 0)
+include_key         -- SCALAR   -- name of the include key (default 'include')
+include_dirs        -- SCALAR | ARRAYREF -- extra directories includes may read
+include_max_depth   -- INTEGER  -- deepest include nesting (default 10)
+interpolate         -- BOOLEAN  -- expand ${...} references (default 0)
+interpolate_strict  -- BOOLEAN  -- croak on an unresolved reference (default 1)
+```
+
+##### Output
+
+```
+Config::Abstraction object, or undef when no configuration was found and
+lazy is not set.
+```
+
+#### Messages
+
+```
+croaks   encryption_key_file does not exist
+croaks   invalid environment name
+croaks   an include outside the permitted directories, a circular include,
+         or includes nested more than include_max_depth deep
+croaks   an unresolved, circular or non-scalar ${...} reference (when
+         interpolate_strict is true)
+carps    an include that is missing, unreadable or not a configuration hash
+carps    a configuration file that cannot be parsed
+```
 
 ### Get(key)
 
@@ -1445,6 +1611,11 @@ option documentation in ["new"](#new) for the full list of debugging implication
 
 Notable changes by release.  Full details are in the `Changes` file.
 
+- **0.43** (unreleased)
+
+    Includes (`allow_includes`), variable interpolation (`interpolate`) and
+    Apache-style `*.conf` files via the optional [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral).
+
 - **0.40** (unreleased)
 
     TOML file support (`*.toml`) via `TOML::Tiny`; `base.toml` and `local.toml`
@@ -1547,6 +1718,22 @@ Notable changes by release.  Full details are in the `Changes` file.
     the default `'.'`, AUTOLOAD cannot reach nested keys because Perl method names cannot
     contain dots.
 
+- **Includes are checked, then read**
+
+    The directory check on an included file resolves its path and reads it a moment
+    later.  Someone who can write to the configuration directory could swap the file
+    for a symbolic link in between.  Anyone with that access can already change the
+    configuration, so this is not a privilege boundary, but do not rely on
+    `include_dirs` to confine a directory that untrusted users can write to.
+
+- **Interpolation reaches values from every source**
+
+    With `interpolate`, a configuration value is expanded whichever source it came
+    from, so an `APP_` environment variable or command-line argument that
+    contains `${env:NAME}` will pull in that other variable.  The text of a
+    variable read through `${env:NAME}` is inserted as it is, without being
+    expanded again.
+
 - **Remote directory TOML support requires File::Slurp::Remote**
 
     TOML files in Newcastle Connection remote directories are only fetched when the
@@ -1591,6 +1778,7 @@ perldoc Config::Abstraction
 
 - [Config::Any](https://metacpan.org/pod/Config%3A%3AAny)
 - [Config::Auto](https://metacpan.org/pod/Config%3A%3AAuto)
+- [Config::General](https://metacpan.org/pod/Config%3A%3AGeneral)
 - [Data::Reuse](https://metacpan.org/pod/Data%3A%3AReuse)
 
     Used to `fixate()` elements when installed, unless `no-fixate` is given

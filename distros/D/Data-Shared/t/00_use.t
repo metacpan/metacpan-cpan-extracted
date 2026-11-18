@@ -6,7 +6,7 @@ BEGIN { use_ok('Data::Shared') or BAIL_OUT('cannot load Data::Shared') }
 BEGIN { use_ok('Data::Shared::Registry') or BAIL_OUT('cannot load Registry') }
 BEGIN { use_ok('Data::Shared::Compiled') or BAIL_OUT('cannot load Compiled') }
 
-is $Data::Shared::VERSION, '0.01', 'version';
+is $Data::Shared::VERSION, '0.02', 'version';
 
 # The package defines its own `open`, so a bare open() inside it warns at compile time.
 {

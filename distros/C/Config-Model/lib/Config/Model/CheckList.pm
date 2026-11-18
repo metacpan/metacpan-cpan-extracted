@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::CheckList 2.168;
+package Config::Model::CheckList 2.169;
 
 use Mouse;
 use 5.020;
@@ -619,7 +619,13 @@ sub get_checked_list ($self, @args) {
 }
 
 sub fetch ($self, @args) {
-    return join( ',', $self->get_checked_list(@args) );
+    return join( ',', $self->get_checked_list(@args));
+}
+
+sub fetch_gist ($self) {
+    my $value = join( ',', $self->get_checked_list(check => 'no') );
+    $value = substr( $value, 0, 15 ) . '...' if length($value) > 15;
+    return $value;
 }
 
 sub fetch_custom {
@@ -839,7 +845,7 @@ Config::Model::CheckList - Handle check list element
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -1159,6 +1165,14 @@ Return the help string on this choice value
 
 Returns a list of information related to the check list. See
 L<Config::Model::Value/get_info> for more details.
+
+=head2 fetch_gist
+
+Returns the gist of the checked values, i.e. a string containg the
+list of checked values, truncated to 15 char.
+
+The gist value should be used in UI or in user messages, but should
+not be persisted.
 
 =head2 clear
 

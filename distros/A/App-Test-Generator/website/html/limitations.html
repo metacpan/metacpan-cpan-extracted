@@ -84,6 +84,13 @@
 		bound enforced in another function, or by a database, is invisible.</li>
 		<li>Inheritance is not followed: a constructor defined in a parent class
 		leaves the schema with an unenrichable <code>new:</code> key.</li>
+		<li>Only the first package in a file is analysed. A file that also
+		declares a helper package is extracted, but every schema from it is
+		marked <code>skip</code>, and Perl 5.38 <code>class</code> blocks in such
+		a file are not detected.</li>
+		<li>A constructor that needs live objects, such as a non-empty list of
+		database handles, cannot be built from a YAML fixture; its schema is
+		marked <code>skip</code> and its instance methods are not fuzzed.</li>
 		<li>Heuristics can also be too eager. A validation regex in the body can
 		be read as an enum; a documented type can conflict with the code. The
 		confidence level says how much evidence there was, and
@@ -200,7 +207,7 @@
 
 <footer class="site-footer">
 	<div class="wrap">
-		<p>App::Test::Generator 0.49 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
+		<p>App::Test::Generator 0.50 — Copyright 2025&ndash;2026 Nigel Horne. Released under the GNU General Public License, version 2.</p>
 		<p>
 			<a href="https://metacpan.org/dist/App-Test-Generator">MetaCPAN</a> ·
 			<a href="https://github.com/nigelhorne/App-Test-Generator">Source</a> ·

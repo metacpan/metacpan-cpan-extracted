@@ -1,0 +1,417 @@
+name: dzil-binary
+
+# Standalone pp binaries of a dist that declares binary keys in its
+# [@Author::GETTY] section (META.json x_binaries), attached to its GitHub release.
+# Called from the dist's .github/workflows/binaries.yml:
+#   uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/workflows/dzil-binary.yml@binary-v1
+# tag set:   build from the release's CPAN tarball, upload the binaries, SHA256SUMS,
+#            install.sh and install.ps1 to that release.
+# tag empty: probe run - dzil build of the checked-out commit through this repo's
+#            in-development bundle (bundle_ref); artifacts only, no release touched.
+# Scripts: .github/dzil-binary/ of this repo, checked out at bundle_ref.
+on:
+  workflow_call:
+    inputs:
+      tag:
+        description: Release tag to build and attach; empty = probe run
+        type: string
+        required: false
+        default: ''
+      bundle_ref:
+        description: Ref of p5-dist-zilla-pluginbundle-author-getty the scripts come from
+        type: string
+        required: false
+        default: binary-v1
+
+permissions:
+  contents: read
+
+concurrency:
+  group: dzil-binary-${{ inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-24.04
+    # A probe installs Dist::Zilla, the bundle and the dist's deps from cold.
+    timeout-minutes: 60
+    outputs:
+      legs: ${{ steps.plan.outputs.legs }}
+      smoke: ${{ steps.plan.outputs.smoke }}
+      prepare_key: ${{ steps.plan.outputs.prepare_key }}
+      binaries: ${{ steps.plan.outputs.binaries }}
+      version: ${{ steps.plan.outputs.version }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      TAG: ${{ inputs.tag }}
+      # The probe's dzil build: a docker_image dist would build its image.
+      DZIL_DOCKER_API_SKIP: 1
+    steps:
+      # The dist first, at the workspace root: a later checkout there would wipe the bundle.
+      - name: Check out the dist (probe)
+        if: inputs.tag == ''
+        uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check out the bundle scripts
+        uses: actions/checkout@v7
+        with:
+          repository: Getty/p5-dist-zilla-pluginbundle-author-getty
+          ref: ${{ inputs.bundle_ref }}
+          path: .dzil-binary
+          persist-credentials: false
+      - name: Set up perl (probe)
+        if: inputs.tag == ''
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+      # With the checkout's lib on PERL5LIB, `dzil authordeps --missing` takes the
+      # bundle for installed and skips its plugins: install its cpanfile deps here.
+      - name: Install the bundle's dependencies (probe)
+        if: inputs.tag == ''
+        env:
+          PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
+        run: |
+          cpanm -nq --installdeps ./.dzil-binary
+          echo "PERL5LIB=$GITHUB_WORKSPACE/.dzil-binary/lib${PERL5LIB:+:$PERL5LIB}" >>"$GITHUB_ENV"
+      - name: dzil build (probe)
+        if: inputs.tag == ''
+        uses: ./.dzil-binary/.github/actions/dzil-test
+        with:
+          command: build
+      - name: Collect the built tarball (probe)
+        if: inputs.tag == ''
+        run: |
+          mkdir dl
+          mv ./*.tar.gz dl/
+      - name: Download the release tarball
+        if: inputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for i in $(seq 1 30); do
+            if gh release download "$TAG" -R "$GITHUB_REPOSITORY" -p '*.tar.gz' -D dl --clobber; then
+              exit 0
+            fi
+            [ "$i" -lt 30 ] && sleep 10
+          done
+          echo "::error::release $TAG has no *.tar.gz asset after 30 tries"
+          exit 1
+      - name: Plan
+        id: plan
+        run: |
+          set -euo pipefail
+          set -- dl/*.tar.gz
+          if [ $# -ne 1 ] || [ ! -f "$1" ]; then
+            echo "::error::want exactly one dist tarball, found: $*"
+            exit 1
+          fi
+          mkdir src
+          tar xzf "$1" -C src --strip-components=1
+          perl .dzil-binary/.github/dzil-binary/plan.pl src/META.json | tee -a "$GITHUB_OUTPUT"
+          version=$(perl -MJSON::PP -e '
+            open my $fh, "<:raw", $ARGV[0] or die "cannot read $ARGV[0]: $!\n";
+            print JSON::PP->new->decode(do { local $/; <$fh> })->{version} // "";
+          ' src/META.json)
+          [ -n "$version" ] || { echo "::error::META.json has no version"; exit 1; }
+          if [ -n "$TAG" ]; then
+            case $TAG in
+              *"$version") ;;
+              *) echo "::error::tag $TAG does not end with the dist version $version"; exit 1 ;;
+            esac
+            prefix=${TAG%"$version"}
+            case $prefix in
+              *[0-9]*) echo "::error::tag $TAG: the prefix '$prefix' before version $version contains a digit"; exit 1 ;;
+            esac
+            slot=$version
+          else
+            sha=$(git rev-parse HEAD)
+            slot=probe-${sha:0:7}
+          fi
+          echo "version=$slot" | tee -a "$GITHUB_OUTPUT"
+          perl -MJSON::PP -e '
+            open my $fh, "<:raw", $ARGV[0] or die "cannot read $ARGV[0]: $!\n";
+            my $bins = (JSON::PP->new->decode(do { local $/; <$fh> })->{x_binaries} || {})->{binaries};
+            die "x_binaries has no binaries\n" unless ref $bins eq "HASH" && %$bins;
+            my @b = map { { name => $_, defined $bins->{$_}{smoke} ? (smoke => $bins->{$_}{smoke}) : () } } sort keys %$bins;
+            print "binaries=", JSON::PP->new->canonical->encode(\@b), "\n";
+          ' src/META.json | tee -a "$GITHUB_OUTPUT"
+      - name: Keep the tarball for the legs
+        uses: actions/upload-artifact@v7
+        with:
+          name: dist-tarball
+          path: dl/*.tar.gz
+          if-no-files-found: error
+
+  build:
+    name: build ${{ matrix.platform }}
+    needs: plan
+    runs-on: ${{ matrix.runner }}
+    container: ${{ matrix.container || null }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        include: ${{ fromJSON(needs.plan.outputs.legs) }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      PLATFORM: ${{ matrix.platform }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      PREPARE_KEY: ${{ needs.plan.outputs.prepare_key }}
+      LEG_IMAGE: ${{ matrix.container || matrix.runner }}
+      # The whole macOS leg: perl, prepare, deps and pp.
+      MACOSX_DEPLOYMENT_TARGET: ${{ startsWith(matrix.platform, 'macos-') && '12.0' || '' }}
+      PERL_CPANM_OPT: --mirror https://cpan.metacpan.org --mirror-only
+    steps:
+      # almalinux:8 ships none of git, perl, unzip; no system perl is installed.
+      - name: Leg tools (Linux)
+        if: startsWith(matrix.platform, 'linux-')
+        run: |
+          for i in 1 2 3; do
+            if dnf install -y -q --setopt=install_weak_deps=False gcc make patch unzip git-core diffutils; then
+              exit 0
+            fi
+            [ "$i" -lt 3 ] && sleep 10
+          done
+          echo "::error::dnf install failed three times"
+          exit 1
+      - name: Check out the bundle scripts
+        uses: actions/checkout@v7
+        with:
+          repository: Getty/p5-dist-zilla-pluginbundle-author-getty
+          ref: ${{ inputs.bundle_ref }}
+          path: .dzil-binary
+          persist-credentials: false
+      - name: Fetch the dist tarball
+        uses: actions/download-artifact@v8
+        with:
+          name: dist-tarball
+          path: tarball
+      - name: Strawberry Perl 5.40 (Windows)
+        if: startsWith(matrix.platform, 'windows-')
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: '5.40'
+          distribution: strawberry
+      # Git Bash puts its own perl first; build-leg.sh puts this one ahead of it.
+      - name: Record Strawberry's perl bin (Windows)
+        if: startsWith(matrix.platform, 'windows-')
+        shell: pwsh
+        run: Add-Content -Path $env:GITHUB_ENV -Value "DZIL_BINARY_PERL_BIN=$(Split-Path (Get-Command perl.exe).Source)"
+      - name: Unpack the dist
+        id: init
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh init
+
+      - name: Restore the packing perl
+        id: perl-cache
+        if: ${{ !startsWith(matrix.platform, 'windows-') }}
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/dzil-binary/perl
+          key: ${{ steps.init.outputs.perl_key }}
+      - name: Packing perl
+        if: ${{ !startsWith(matrix.platform, 'windows-') }}
+        run: bash .dzil-binary/.github/dzil-binary/build-perl.sh "$HOME/dzil-binary/perl"
+      - name: Save the packing perl
+        if: ${{ !startsWith(matrix.platform, 'windows-') && steps.perl-cache.outputs.cache-hit != 'true' }}
+        uses: actions/cache/save@v6
+        with:
+          path: ~/dzil-binary/perl
+          key: ${{ steps.init.outputs.perl_key }}
+
+      - name: Cache keys
+        id: keys
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh keys
+      - name: Restore the prepare cache
+        id: prepare-cache
+        if: needs.plan.outputs.prepare_key != 'none'
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/dzil-binary/prepare
+          key: prepare-${{ matrix.platform }}-${{ needs.plan.outputs.prepare_key }}
+      - name: Restore the local lib
+        id: lib-cache
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/dzil-binary/local
+          key: ${{ steps.keys.outputs.lib_key }}
+      - name: Prepare
+        if: needs.plan.outputs.prepare_key != 'none'
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh prepare
+      - name: Save the prepare cache
+        if: needs.plan.outputs.prepare_key != 'none' && steps.prepare-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/dzil-binary/prepare
+          key: prepare-${{ matrix.platform }}-${{ needs.plan.outputs.prepare_key }}
+      - name: Dependencies
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh deps
+      - name: Pack and gate
+        id: pack
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh pack
+      # Only a lib whose binaries passed lib-gate.pl and require-gate.pl is kept.
+      - name: Save the local lib
+        if: steps.lib-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/dzil-binary/local
+          key: ${{ steps.keys.outputs.lib_key }}
+      - name: Verify
+        run: bash .dzil-binary/.github/dzil-binary/build-leg.sh verify
+      # One artifact per leg, <dist>-<version>-<platform>, holding the binaries
+      # named like their release assets.
+      - name: Keep the binaries
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ steps.pack.outputs.artifact }}
+          path: out/
+          if-no-files-found: error
+
+  smoke:
+    name: smoke ${{ matrix.bin.name }} ${{ matrix.cell.platform }} ${{ matrix.cell.image || matrix.cell.runner }}
+    needs: [plan, build]
+    runs-on: ${{ matrix.cell.runner }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        cell: ${{ fromJSON(needs.plan.outputs.smoke) }}
+        bin: ${{ fromJSON(needs.plan.outputs.binaries) }}
+    defaults:
+      run:
+        shell: bash
+    env:
+      PLATFORM: ${{ matrix.cell.platform }}
+      IMAGE: ${{ matrix.cell.image }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      BIN_NAME: ${{ matrix.bin.name }}
+      SMOKE: ${{ matrix.bin.smoke }}
+    steps:
+      - name: Fetch the dist tarball
+        uses: actions/download-artifact@v8
+        with:
+          name: dist-tarball
+          path: tarball
+      - name: Fetch the platform's binaries
+        uses: actions/download-artifact@v8
+        with:
+          pattern: '*-${{ needs.plan.outputs.version }}-${{ matrix.cell.platform }}*'
+          merge-multiple: true
+          path: bins
+      - name: Unpack
+        id: unpack
+        run: |
+          set -euo pipefail
+          asset=$BIN_NAME-$VERSION-$PLATFORM
+          case $PLATFORM in windows-*) asset=$asset.exe ;; esac
+          [ -f "bins/$asset" ] || { echo "::error::no $asset among the build artifacts"; exit 1; }
+          chmod +x "bins/$asset"
+          mkdir dist
+          tar xzf tarball/*.tar.gz -C dist --strip-components=1
+          echo "asset=$asset" >>"$GITHUB_OUTPUT"
+          [ -n "$SMOKE" ] || echo "::notice::$BIN_NAME: x_binaries declares no smoke"
+      # A clean image: no perl at all (debian slim's Essential perl-base removed first)
+      # and none of the build leg's.
+      - name: Smoke (Linux)
+        if: startsWith(matrix.cell.platform, 'linux-') && env.SMOKE != ''
+        env:
+          ASSET: ${{ steps.unpack.outputs.asset }}
+        run: |
+          docker run --rm -v "$PWD/dist:/dist" -v "$PWD/bins:/bins:ro" -w /dist \
+            -e SMOKE -e BIN="/bins/$ASSET" "$IMAGE" sh -c '
+              set -eu
+              rm -f /usr/bin/perl /usr/bin/perl5*
+              if command -v perl >/dev/null 2>&1; then echo "::error::perl on PATH: $(command -v perl)"; exit 1; fi
+              if [ -e /github/home/dzil-binary ]; then echo "::error::the build perl is here"; exit 1; fi
+              sh -c "$SMOKE \"\$@\"" sh "$BIN"
+            '
+      # The runner image as it is: no setup-perl, nothing of the build leg's. On
+      # Windows, Strawberry's directories and Git's mingw64/bin leave PATH: their
+      # libssl/libcrypto/zlib DLLs are not on a clean machine. Git's usr/bin stays (sh).
+      - name: Smoke (macOS, Windows)
+        if: ${{ !startsWith(matrix.cell.platform, 'linux-') && env.SMOKE != '' }}
+        env:
+          ASSET: ${{ steps.unpack.outputs.asset }}
+        run: |
+          set -euo pipefail
+          if [ -e "$HOME/dzil-binary" ]; then echo "::error::the build perl is here"; exit 1; fi
+          bin=$PWD/bins/$ASSET
+          case $PLATFORM in
+            windows-*)
+              bin=$(cygpath -m "$bin")
+              keep=''
+              IFS=: read -r -a dirs <<<"$PATH"
+              for d in "${dirs[@]}"; do
+                case $(printf '%s' "$d" | tr '[:upper:]' '[:lower:]') in
+                  *strawberry*|*/mingw64/bin|*/mingw64/bin/) ;;
+                  *) keep=${keep:+$keep:}$d ;;
+                esac
+              done
+              PATH=$keep
+              ;;
+          esac
+          echo "smoke PATH: $PATH"
+          cd dist
+          sh -c "$SMOKE \"\$@\"" sh "$bin"
+
+  publish:
+    if: inputs.tag != ''
+    needs: [plan, build, smoke]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    defaults:
+      run:
+        shell: bash
+    env:
+      TAG: ${{ inputs.tag }}
+      VERSION: ${{ needs.plan.outputs.version }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - name: Check out the bundle scripts
+        uses: actions/checkout@v7
+        with:
+          repository: Getty/p5-dist-zilla-pluginbundle-author-getty
+          ref: ${{ inputs.bundle_ref }}
+          path: .dzil-binary
+          persist-credentials: false
+      - name: Fetch the dist tarball
+        uses: actions/download-artifact@v8
+        with:
+          name: dist-tarball
+          path: tarball
+      - name: Fetch the binaries
+        uses: actions/download-artifact@v8
+        with:
+          pattern: '*-${{ needs.plan.outputs.version }}-*'
+          merge-multiple: true
+          path: assets
+      - name: Upload to the release
+        run: |
+          set -euo pipefail
+          p=.dzil-binary/.github/dzil-binary/publish.pl
+          mkdir src
+          tar xzf tarball/*.tar.gz -C src --strip-components=1
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$TAG" >release.json
+          # only a 404 means "no latest release yet" (an empty file); any other failure stops here
+          if ! gh api "repos/$GITHUB_REPOSITORY/releases/latest" >latest.json 2>latest.err; then
+            cat latest.err >&2
+            grep -Eq '\(HTTP 404\)$|^gh: HTTP 404$' latest.err || { echo "::error::cannot read releases/latest"; exit 1; }
+            : >latest.json
+          fi
+          latest=$(perl "$p" check src/META.json "$VERSION" assets release.json latest.json)
+          perl "$p" sums assets
+          perl "$p" render src/META.json "${GITHUB_REPOSITORY%%/*}" "${GITHUB_REPOSITORY#*/}" "$TAG" assets
+          list=$(perl "$p" expected src/META.json "$VERSION")
+          [ -n "$list" ] || { echo "::error::publish.pl expected listed no binaries"; exit 1; }
+          files=()
+          while IFS= read -r name; do files+=("assets/$name"); done <<<"$list"
+          gh release upload "$TAG" -R "$GITHUB_REPOSITORY" "${files[@]}" assets/SHA256SUMS assets/install.sh assets/install.ps1
+          if [ "$latest" = latest=true ]; then
+            gh release edit "$TAG" -R "$GITHUB_REPOSITORY" --latest
+          fi

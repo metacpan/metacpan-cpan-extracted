@@ -131,13 +131,14 @@ use 5.008;
 use strict;
 use warnings;
 
-our $VERSION=1.09;
+our $VERSION='1.10';
 
 use constant DEFANG_NONE => 0;
 use constant DEFANG_ALWAYS => 1;
 use constant DEFANG_DEFAULT => 2;
 
 use Encode;
+use Carp ();
 
 my $HasScalarReadonly = 0;
 BEGIN { eval "use Scalar::Readonly qw(readonly_on);" && ($HasScalarReadonly = 1); }
@@ -779,6 +780,31 @@ modification, even if they are flagged to be defanged by the
 return value of a callback.  Any tag or attribute modifications made
 directly by a callback are still performed.
 
+=item B<extract_styles>
+
+If set, C<< <style> >> elements are removed from the output, and their
+defanged contents collected, to be fetched with C<extracted_styles> after
+each call to C<defang>. A C<media> attribute on the element becomes an
+C<@media> block around its contents. Use this to move a document's styles
+somewhere else, such as into the C<< <head> >> of the page it's embedded in.
+
+=item B<scope_id>
+
+An id for an element the output will be put inside, such as C<'qt'>, to
+keep the output's styles from applying to anything else in the page. Every
+selector in a C<< <style> >> is put under C<#qt>, with a leading C<html>,
+C<body> or C<:root> standing for that element itself; ids and classes in
+selectors and markup get a C<qt-> prefix to match each other; and so do
+C<name>s on C<< <a> >> and C<< <map> >> and the C<#> links to them. The
+caller must add the element with that id. Usually used with
+B<extract_styles>.
+
+=item B<url_policy>
+
+Set to C<'mail'> to check URLs with C<mail_url_callback>, rather than the
+built in attribute rules: suitable for HTML from an email message. Ignored
+if a B<url_callback> is given.
+
 =item B<delete_defang_content>
 
 Normally defanged tags are turned into comments and prefixed by defang_,
@@ -812,6 +838,16 @@ sub new {
   my %mismatched_tags_to_fix = %MismatchedTags;
   %mismatched_tags_to_fix = map { $_ => 1 } @$mismatched_tags_to_fix if $mismatched_tags_to_fix;
 
+  !defined $Opts{scope_id} || $Opts{scope_id} =~ /^[A-Za-z][A-Za-z0-9_-]*$/
+    or Carp::croak("Invalid scope_id: $Opts{scope_id}");
+
+  my $url_callback = $Opts{url_callback};
+  if (!$url_callback && defined $Opts{url_policy}) {
+    $Opts{url_policy} eq 'mail'
+      or Carp::croak("Unknown url_policy: $Opts{url_policy}");
+    $url_callback = \&mail_url_callback;
+  }
+
   my $Self = {
     defang_string => 'defang_',
     defang_re => qr/^defang_/,
@@ -821,7 +857,7 @@ sub new {
     tags_callback => $Opts{tags_callback},
     attribs_to_callback => \%attribs_to_callback,
     attribs_callback => $Opts{attribs_callback},
-    url_callback => $Opts{url_callback},
+    url_callback => $url_callback,
     css_callback => $Opts{css_callback},
     content_callback => $Opts{content_callback},
     mismatched_tags_to_fix => \%mismatched_tags_to_fix,
@@ -833,6 +869,10 @@ sub new {
     empty_tags_to_collapse => \%empty_tags_to_collapse,
     quiet => $Opts{quiet},
     delete_defang_content => $Opts{delete_defang_content},
+    extract_styles => $Opts{extract_styles},
+    scope_id => $Opts{scope_id},
+    extracted_styles => '',
+    body_style => '',
     Debug => $Opts{Debug},
   };
 
@@ -851,7 +891,7 @@ implicit options
 
 =item B<delete_defang_content = 1>
 
-=item B<tags_to_callback = [ qw(html head link body meta title bgsound) ]>
+=item B<tags_to_callback = [ qw(html head link body meta title bgsound base) ]>
 
 =item B<tags_callback = { ... remove all above tags and related content ... }>
 
@@ -860,7 +900,9 @@ implicit options
 =back
 
 Basically this is a easy way to remove all html boiler plate
-content and return only the html body content.
+content and return only the html body content. That includes any
+C<< <base> >>, which would otherwise change how every relative URL around
+the content resolves once it's embedded in another page.
 
 =cut
 
@@ -868,7 +910,7 @@ sub new_bodyonly {
   return shift->new(
     fix_mismatched_tags => 1,
     delete_defang_content => 1,
-    tags_to_callback => [ qw(html head link body meta title bgsound) ],
+    tags_to_callback => [ qw(html head link body meta title bgsound base) ],
     tags_callback => sub {
       my (undef, $Defang, $Angle, $lcTag, $IsEndTag, $AttributeHash, $AttributesEnd, $HtmlR, $OutR) = @_;
       $$HtmlR =~ m{\G.*?(?=</title|</head)}gcis if $lcTag eq 'title' && !$IsEndTag;
@@ -877,6 +919,155 @@ sub new_bodyonly {
     url_callback => sub { return DEFANG_NONE; },
     @_
   );
+}
+
+=item I<HTML::Defang-E<gt>new_quote(%Options)>
+
+Constructs a new HTML::Defang object for quoting the HTML body of an email
+message inside another one, as in a reply or forward. Use it with
+C<quote>. It has the following implicit options, overridable as usual:
+
+=over 4
+
+=item B<fix_mismatched_tags = 1>, B<delete_defang_content = 1>, B<quiet = 1>
+
+=item B<extract_styles = 1>
+
+=item B<scope_id = 'qt'>
+
+=item B<url_policy = 'mail'>
+
+=item B<tags_to_callback = [ qw(html head link body meta title bgsound base) ]>
+
+=item B<tags_callback = { ... remove all above tags and related content, keeping the body's style for C<quote> ... }>
+
+=back
+
+=cut
+
+sub new_quote {
+  return shift->new(
+    fix_mismatched_tags => 1,
+    delete_defang_content => 1,
+    quiet => 1,
+    extract_styles => 1,
+    scope_id => 'qt',
+    url_policy => 'mail',
+    tags_to_callback => [ qw(html head link body meta title bgsound base) ],
+    tags_callback => \&quote_tags_callback,
+    @_
+  );
+}
+
+sub quote_tags_callback {
+  my (undef, $Defang, $Angle, $lcTag, $IsEndTag, $AttributeHash, $AttributesEnd, $HtmlR, $OutR) = @_;
+  $$HtmlR =~ m{\G.*?(?=</title|</head)}gcis if $lcTag eq 'title' && !$IsEndTag;
+  $Defang->{body_style} = $Defang->defang_body_style($AttributeHash, $HtmlR, $OutR)
+    if $lcTag eq 'body' && !$IsEndTag;
+  return DEFANG_ALWAYS;
+}
+
+# The <body>'s presentation as a style attribute value for whatever element
+#  replaces it, without the sizing and positioning a body uses to fill the
+#  window, which on an element within a page would clip or misplace it
+my %BodyAttributeStyles = (bgcolor => 'background-color', text => 'color');
+
+sub defang_body_style {
+  my ($Self, $AttributeHash, $HtmlR, $OutR) = @_;
+
+  my @Styles;
+  for my $Attr (sort keys %BodyAttributeStyles) {
+    my $ValR = $AttributeHash->{$Attr};
+    push @Styles, "$BodyAttributeStyles{$Attr}: $$ValR"
+      if $ValR && defined $$ValR && $$ValR =~ $Rules{color};
+  }
+
+  if (my $ValR = $AttributeHash->{style}) {
+    my $UserCallback = $Self->{css_callback};
+    local $Self->{css_callback} = sub {
+      my ($Context, $Defang, $Selectors, $SelectorRules) = @_;
+      $UserCallback->(@_) if $UserCallback;
+      for my $KeyValueRule (map { @$_ } map { @$_ } @$SelectorRules) {
+        $KeyValueRule->[2] = DEFANG_ALWAYS
+          if $KeyValueRule->[0] =~ /^\s*(?:(?:min-|max-)?height|overflow(?:-[xy])?|position)\s*$/i;
+      }
+    };
+    my $Style = $Self->defang_style_text(defined $$ValR ? $$ValR : '', 'body', 1, $AttributeHash, $HtmlR, $OutR);
+    $Style =~ s/^[\s;]+|[\s;]+$//g;
+    push @Styles, $Style if length $Style;
+  }
+
+  return join '; ', @Styles;
+}
+
+=item I<quote($InputHtml)>
+
+Defang the HTML body of an email message for quoting, with an object from
+C<new_quote>. Returns a hash reference of:
+
+=over 4
+
+=item B<html>
+
+The body's content, to put inside an element with the B<scope_id>.
+
+=item B<styles>
+
+The message's CSS, scoped to that element, for a C<< <style> >> in the
+C<< <head> >> of the new message.
+
+=item B<body_style>
+
+A CSS declaration list from the original C<< <body> >>, for that element's
+C<style> attribute. It is not HTML escaped.
+
+=back
+
+For example:
+
+  my $Quote = HTML::Defang->new_quote->quote($OriginalHtml);
+  my $Html = qq{<!DOCTYPE html><html><head><style>$Quote->{styles}</style></head><body>}
+    . qq{<p>My reply</p><blockquote type="cite" id="qt" style="}
+    . escape_html($Quote->{body_style}) . qq{">$Quote->{html}</blockquote></body></html>};
+
+=cut
+
+sub quote {
+  my ($Self, $Html) = @_;
+
+  my $Out = $Self->defang($Html);
+
+  return {
+    html => $Out,
+    styles => $Self->{extracted_styles},
+    body_style => $Self->{body_style},
+  };
+}
+
+=item I<mail_url_callback(...)>
+
+A B<url_callback> (see C<url_callback>) for HTML from an email message,
+used by C<< url_policy => 'mail' >>. A link (C<href>) may go to an http(s),
+mailto, tel or cid URL, or an anchor in the message. Anything the client
+loads itself (C<src>, C<background>, CSS C<url()>) may only come from an
+http(s) or cid URL, or be an inline raster image in a C<data:> URL. Anything
+else is defanged, including relative URLs, which have nothing to resolve
+against in a message.
+
+=cut
+
+my $MailLinkRE = qr/^(?:(?:https?|mailto|tel|cid):|#)/i;
+my $MailLoadRE = qr{^(?:(?:https?|cid):|data:image/(?:png|gif|jpe?g|webp|bmp);base64,)}i;
+
+sub mail_url_callback {
+  my (undef, $Defang, $lcTag, $lcAttrKey, $AttrValR) = @_;
+
+  # The stripped value is what a browser would see, with entities, escapes,
+  #  control chars and leading space already undone
+  my $Url = $Defang->strip_attribute($$AttrValR);
+  my $IsLink = defined $lcAttrKey && $lcAttrKey eq 'href';
+
+  return $Url =~ ($IsLink ? $MailLinkRE : $MailLoadRE) ? DEFANG_NONE : DEFANG_ALWAYS;
 }
 
 =back
@@ -1087,6 +1278,13 @@ If $Defang->{css_callback} exists, and HTML::Defang has parsed a <style> tag or 
 
 Reference to an array containing the selectors in a style tag or attribute.
 
+A callback may rewrite a selector in place (for instance to scope it by
+prefixing it), but must not add or remove entries. Each C<@media> block
+appears as an entry for its C<@media ...> prelude and an empty entry for
+its closing brace, and each selector inside it is the prelude and the
+selector joined with a C<\0> character, of which only the part after the
+last C<\0> is output.
+
 =item I<$SelectorRules>
 
 Reference to an array containing the style declaration blocks of all selectors in a style tag or attribute. Consider the below CSS:
@@ -1175,7 +1373,8 @@ sub defang {
   my $FallbackCharset = $Opts->{fallback_charset};
   warn("defang FallbackCharset=$FallbackCharset") if $Debug;
 
-  $Self->{Reentrant}++;
+  # Per document results, reset by the outermost call
+  @$Self{qw(extracted_styles body_style)} = ('', '') if ++$Self->{Reentrant} == 1;
 
   # Output buffer
   local $Self->{OutR} = $Opts->{add_to_existing} ? $Self->{OutR} : \(my $O = "");
@@ -1296,6 +1495,7 @@ sub defang {
 
         }
         die "Callback reset pos on Tag=$Tag IsEndTag=$IsEndTag" if !defined pos($I);
+        goto SkipOutput if delete $Self->{SkipTagOutput};
         warn "defang Defang=$Defang" if $Debug;
 
         # RCDATA/RAWTEXT elements (title, textarea, noembed, noframes): their
@@ -1451,6 +1651,18 @@ sub defang {
   Encode::_utf8_on($$OutR) if $UTF8Input;
 
   return $$OutR;
+}
+
+=item I<extracted_styles()>
+
+With B<extract_styles> set, the defanged contents of the C<< <style> >>
+elements removed by the last call to C<defang>, ready to be put in a
+C<< <style> >> element of their own.
+
+=cut
+sub extracted_styles {
+  my $Self = shift;
+  return $Self->{extracted_styles};
 }
 
 =item I<add_to_output($String)>
@@ -1640,6 +1852,14 @@ sub defang_style_tag {
 
   warn "defang_style_tag Tag=$lcTag IsEndTag=$IsEndTag" if $Self->{Debug};
 
+  my $Extract = $Self->{extract_styles};
+  $Self->{SkipTagOutput} = 1 if $Extract;
+
+  # The media attribute isn't allowed on the tag, but is kept on extracted
+  #  styles as an @media block
+  my ($Media) = map { $Self->cleanup_attribute($_->[4]) }
+    grep { defined $_->[0] && lc $_->[0] eq 'media' && defined $_->[4] } @$Attributes;
+
   # Defang attributes
   my $Defang = $Self->defang_attributes($OutR, $HtmlR, $TagOps, $OpenAngle, $IsEndTag, $lcTag, $TagTrail, $Attributes, $CloseAngle);
 
@@ -1678,6 +1898,16 @@ sub defang_style_tag {
   }
 
   my $StyleOut = $Self->defang_style_text($Content, $lcTag, 0, undef, $HtmlR, $OutR);
+
+  if ($Extract) {
+    return $Defang if $StyleOut !~ /\S/;
+    $StyleOut = "\@media $Media {\n$StyleOut\n}"
+      if defined $Media && $Media =~ $Rules{media} && $Media !~ /^\s*all\s*$/i;
+    # Make sure nothing can end the <style> element it's put into
+    $StyleOut =~ s{</}{<\\/}g;
+    $Self->{extracted_styles} .= "$StyleOut\n";
+    return $Defang;
+  }
 
   $Self->add_to_output($OpeningHtmlComment . $StyleOut . $ClosingHtmlComment);
   $Self->add_to_output("</style>") if !$ClosingStyleTagPresent;
@@ -1763,6 +1993,11 @@ sub defang_style_text {
   # Check declaration elements for defanging
   $Self->defang_stylerule(\@Selectors, \@SelectorRules, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR);
 
+  # An undef selector drops its rule from the output below
+  if (defined $Self->{scope_id} && !$IsAttr) {
+    $_ = $Self->scope_selector($_) for @Selectors;
+  }
+
   my $StyleOut = "";
 
   # Re-create the style data
@@ -1790,6 +2025,140 @@ sub defang_style_text {
   warn "defang_style StyleOut=$StyleOut" if $Self->{Debug};
 
   return $StyleOut;
+}
+
+=item I<scope_selector($Selector)>
+
+With B<scope_id> set, scope a selector (or comma separated list of them)
+from a C<< <style> >> as described there, in the form given to
+B<css_callback>. Returns undef if no part of it could match inside the
+scope element, so the rule should be dropped.
+
+=cut
+sub scope_selector {
+  my ($Self, $Selector) = @_;
+  use bytes;
+
+  return $Selector if !defined $Selector || $Selector !~ /\S/;
+
+  # Only the part after any @media prelude is a selector, and at-rules
+  #  (@media, @font-face, @page) aren't
+  my @Parts = split /\0/, $Selector, -1;
+  return $Selector if $Parts[-1] =~ /^\s*\@/;
+
+  my @Scoped = grep { defined } map { $Self->scope_complex_selector($_) }
+    split_selector_list($Parts[-1]);
+  return undef if !@Scoped;
+
+  $Parts[-1] = join ", ", @Scoped;
+  return join "\0", @Parts;
+}
+
+# Split a selector list on the commas between selectors, not those inside
+#  parentheses, attribute selectors, strings or escapes
+sub split_selector_list {
+  my ($List) = @_;
+  use bytes;
+
+  my (@Selectors, $Depth);
+  my $Current = '';
+  $Depth = 0;
+  while ($List =~ m{\G(\\.|"(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?|[^\\"'()\[\],]+|.)}gcs) {
+    my $Token = $1;
+    if ($Token eq ',' && !$Depth) {
+      push @Selectors, $Current;
+      $Current = '';
+      next;
+    }
+    $Depth++ if $Token eq '(' || $Token eq '[';
+    $Depth-- if ($Token eq ')' || $Token eq ']') && $Depth;
+    $Current .= $Token;
+  }
+  push @Selectors, $Current;
+
+  return @Selectors;
+}
+
+sub scope_complex_selector {
+  my ($Self, $Selector) = @_;
+  use bytes;
+
+  $Selector =~ s/^\s+//;
+  $Selector =~ s/\s+$//;
+  return undef if $Selector eq '';
+
+  # The scope element stands in for the document's root and body, so
+  #  "body > p" is "#qt > p", and "body.x" is "#qt.qt-x"
+  my $OnScope = 0;
+  while ($Selector =~ s/^(?:html|body|:root)(?![\w-])(\s*)//i) {
+    $OnScope = !length $1;
+    $Selector =~ s/^>\s*(?=(?:html|body|:root)(?![\w-]))//i;
+  }
+  # The scope element's siblings aren't the document's
+  return undef if $Selector =~ /^[~+]/;
+  $OnScope = 0 if $Selector eq '' || $Selector =~ /^[>\s]/;
+
+  # "* p" is just any p inside
+  $Selector =~ s/^\*\s+(?=[^\s>+~])//;
+
+  my $Prefix = "$Self->{scope_id}-";
+  my $Out = '';
+  while ($Selector =~ m{\G(?:(\\.|"(?:[^"\\]|\\.)*"?|'(?:[^'\\]|\\.)*'?)|(\[(?:[^\]"'\\]|\\.|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')*\]?)|([#.])(?=[A-Za-z_\x80-\xff\\-])|([^\\"'\[#.]+|.))}gcs) {
+    if (defined $2) {
+      $Out .= scope_attribute_selector($2, $Prefix);
+    } elsif (defined $3) {
+      $Out .= $3 . $Prefix;
+    } else {
+      $Out .= defined $1 ? $1 : $4;
+    }
+  }
+
+  my $Scope = "#$Self->{scope_id}";
+  return $Out eq '' ? $Scope : $OnScope ? "$Scope$Out" : "$Scope $Out";
+}
+
+# Prefix the value in an [id=...], [class~=...] or [for=...] selector the
+#  same way as the attribute it matches. Matching the end or middle of one
+#  doesn't need it, except for the words after a space in a class.
+sub scope_attribute_selector {
+  my ($AttributeSelector, $Prefix) = @_;
+
+  $AttributeSelector =~ m{^\[\s*(id|class|for)\s*([~|^\$*]?=)\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)'|([^\s\]"']+))\s*([is]?)\s*\]$}is
+    or return $AttributeSelector;
+
+  my ($Name, $Operator, $Flag) = ($1, $2, $6);
+  my $Quote = defined $4 ? "'" : '"';
+  my $Value = defined $3 ? $3 : defined $4 ? $4 : $5;
+  my $FromStart = $Operator ne '$=' && $Operator ne '*=';
+
+  if (lc $Name eq 'class') {
+    $Value =~ s/(^|\s+)(?=\S)/length $1 || $FromStart ? "$1$Prefix" : ''/ge;
+  } elsif ($FromStart) {
+    $Value = $Prefix . $Value;
+  }
+
+  return "[$Name$Operator$Quote$Value$Quote" . ($Flag ? " $Flag" : '') . "]";
+}
+
+=item I<scope_attribute($lcTag, $lcAttrKey, $AttrValR)>
+
+With B<scope_id> set, prefix an id, class or reference to one in an
+attribute value to match scoped selectors.
+
+=cut
+sub scope_attribute {
+  my ($Self, $lcTag, $lcAttrKey, $AttrValR) = @_;
+
+  my $Prefix = "$Self->{scope_id}-";
+
+  if ($lcAttrKey eq 'id' || $lcAttrKey eq 'for'
+      || ($lcAttrKey eq 'name' && ($lcTag eq 'a' || $lcTag eq 'map'))) {
+    $$AttrValR =~ s/^(\s*)(?=\S)/$1$Prefix/;
+  } elsif ($lcAttrKey eq 'class' || $lcAttrKey eq 'headers') {
+    $$AttrValR =~ s/(^|\s+)(?=\S)/$1$Prefix/g;
+  } elsif ($lcAttrKey eq 'href' || $lcAttrKey eq 'usemap') {
+    $$AttrValR =~ s/^(\s*#)(?=\S)/$1$Prefix/;
+  }
 }
 
 =item I<cleanup_style($StyleString)>
@@ -1893,7 +2262,10 @@ A scalar reference to the processed output so far.
 sub defang_stylerule {
   my ($Self, $SelectorsIn, $StyleRules, $lcTag, $IsAttr, $AttributeHash, $HtmlR, $OutR) = @_;
 
-  my (@SelectorStyleKeyValues, %SelectorStyleKeyExtraData);
+  # Formatting of each declaration (whitespace, separators), per rule. Kept
+  #  by position rather than by selector text, so it survives a css_callback
+  #  renaming a selector, and repeated selectors don't overwrite each other
+  my @SelectorStyleKeyExtraData;
 
   my (@Selectors, @SelectorRules);
 
@@ -1913,14 +2285,20 @@ sub defang_stylerule {
       my $DefangStyleRule = $Self->{defang_default};
 
       # If the style value has a URL in it and URL callback has been supplied, make a url_callback
+      # Check every url() in the value (there can be several, e.g. layered
+      #  backgrounds), and defang the declaration if any of them is defanged
       if ($Self->{url_callback}) {
         our $StartPos = 0;
-        while ($Value =~ m/\G\s*url\(\s*((?:['"])?)(?{ $StartPos = pos; })(.*?)\1\s*\)/gci) {
+        my $AnyUrlDefanged = 0;
+        while ($Value =~ m/\burl\(\s*((?:['"])?)(?{ $StartPos = pos; })(.*?)\1\s*\)/gci) {
           my ($UrlOrig, $Url) = $2 ? ($2, $2) : ('', '');
           my $EndPos = pos($Value);
           warn "defang_stylerule Url found in style property value. Url=$Url" if $Self->{Debug};
           my $lcAttrKey = $IsAttr ? "style" : undef;
-          $DefangStyleRule = $Self->{url_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, \$Url, $AttributeHash, $HtmlR, $OutR, lc $Key) if $Url;
+          if ($Url) {
+            $DefangStyleRule = $Self->{url_callback}->($Self->{context}, $Self, $lcTag, $lcAttrKey, \$Url, $AttributeHash, $HtmlR, $OutR, lc $Key);
+            $AnyUrlDefanged = 1 if defined $DefangStyleRule && $DefangStyleRule == DEFANG_ALWAYS;
+          }
           # Save back any changes
           warn "defang_stylerule After URL callback, Value=$Value DefangStyleRule=$DefangStyleRule" if $Self->{Debug};
           if ($UrlOrig) {
@@ -1928,6 +2306,7 @@ sub defang_stylerule {
             pos($Value) = $EndPos - length($UrlOrig) + length($Url);
           }
         }
+        $DefangStyleRule = DEFANG_ALWAYS if $AnyUrlDefanged;
       }
 
       # Save the style property, value and defang flag      
@@ -1939,7 +2318,7 @@ sub defang_stylerule {
     push (@SelectorRule, \@KeyValueRules);
     push (@Selectors, $Selector);
     push (@SelectorRules, \@SelectorRule);
-    $SelectorStyleKeyExtraData{$Selector} = \%StyleKeyExtraData;
+    push @SelectorStyleKeyExtraData, \%StyleKeyExtraData;
 
   }
 
@@ -1953,7 +2332,7 @@ sub defang_stylerule {
   foreach my $Selector (@Selectors) {
 
     my $SelectorRule = $SelectorRules[$Counter];
-    my $ExtraData = $SelectorStyleKeyExtraData{$Selector};
+    my $ExtraData = ($SelectorStyleKeyExtraData[$Counter] ||= {});
     my $Rule;
 
     for (my $j = 0; $j < @$SelectorRule; $j++) {
@@ -1984,7 +2363,7 @@ sub defang_stylerule {
   
     $SelectorsIn->[$Counter] = $Selector if $SelectorsIn->[$Counter] && !$IsAttr;
     my $SelectorRule = $SelectorRules[$Counter];
-    my $ExtraData = $SelectorStyleKeyExtraData{$Selector};
+    my $ExtraData = $SelectorStyleKeyExtraData[$Counter];
     my $Rule;
     
     foreach my $KeyRules (@$SelectorRule) {
@@ -2088,6 +2467,9 @@ sub defang_attributes {
     my ($lcAttrKey, $AttrKey, $AttrValR) = ($Attr->[7], $Attr->[0], \$Attr->[4]);
 
     warn "defang_attributes Tag=$lcTag lcAttrKey=$lcAttrKey AttrVal=$$AttrValR" if $Debug;
+
+    $Self->scope_attribute($lcTag, $lcAttrKey, $AttrValR)
+      if defined $Self->{scope_id} && defined $$AttrValR;
 
     my $AttribRule = "";
     if (ref($Tags{$lcTag}) eq 'HASH') {

@@ -122,7 +122,7 @@ B<Chapter:> 1
 
 =item Pipelines
 
-B<What it gives you:> stages in order, which you call with values, or pull results from one at a time
+B<What it gives you:> stages in order, which you call with values, pull results from one at a time, or feed values as they arrive
 
 B<Chapter:> 2
 
@@ -250,7 +250,7 @@ B<Made in:> Ekorn::Pipeline::Stages::Batch
 
 =item C<:taps>
 
-B<What it gives you:> C<peek>, C<count_into> and C<dump_to>
+B<What it gives you:> C<peek>, C<count_into>, C<dump_to> and C<tee>
 
 B<Made in:> Ekorn::Pipeline::Stages::Taps
 
@@ -436,7 +436,9 @@ value it was given, or the value is dropped:
 
 Forget the C<$_> at the end, and C<push> returns the length of C<@seen>,
 which goes on in place of the track. L<C<peek>|/"Watch values go by">
-does this for you, and can't forget.
+does this for you, and can't forget. For a side job of more than one
+step, L<C<tee>|/"Tap with a pipeline of stages"> runs each value through
+stages of its own, and passes it on.
 
 =head2 See the order values move in
 
@@ -525,8 +527,8 @@ needed.
 
 =back
 
-Each call, and each iterator, is a I<run>. A pipeline can have as many
-runs as you like.
+Each call, and each iterator, is a I<run>, and so is each feed, which
+you'll meet below. A pipeline can have as many runs as you like.
 
 =head2 Make a pipeline, and call it
 
@@ -740,7 +742,52 @@ in each other's way:
     my $two      = $numbered->iterator(sub { @right ? shift @right : () });
     say join ' ', $one->(), $two->(), $one->(), $two->();    # <a> <x> <b> <y>
 
-=head2 Push or pull?
+=head2 Feed values in as they arrive
+
+Sometimes the values don't come from you when you want them: a
+library calls you back with each one, or an event loop hands you each
+message. Then make a I<feed>, one run you give values to as they come,
+with C<push>, which returns what came out of them, there and then.
+C<close> says there are no more, and returns what the flushes give.
+Between the two, the run keeps going, so C<batch> fills its batches
+across pushes:
+
+    my $feed = Ekorn::Pipeline->new(sub { $_->{artist} }, batch(2))->feed;
+    for my $track (@tracks[0 .. 4]) {
+        say "batch: @$_" for $feed->push($track);
+    }
+    # batch: Abba Abba
+    # batch: Blur Blur
+    say "last: @$_" for $feed->close;    # last: Blur
+    say $feed->ended;                    # done
+
+Fed the same values, a feed gives what calling the pipeline with them
+gives, in the same order, only a push at a time.
+
+=head2 Stop feeding when a stage says so
+
+A stage can still stop a fed run, as C<take> does. The push that meets
+the stop returns what came out, and the run has ended: C<ended> says
+so. Ask it after each push, and stop feeding once it's defined, as a
+push after that croaks, so values can't go nowhere unnoticed:
+
+    my $feed = Ekorn::Pipeline->new(take_if { $_->{plays} > 6000 }, take(2))->feed;
+    for my $track (@tracks) {
+        say $_->{title} for $feed->push($track);
+        last if defined $feed->ended;
+    }
+    # Dancing Queen
+    # Girls & Boys
+    say $feed->ended;    # stopped
+
+    eval { $feed->push($tracks[5]) };
+    say $@ =~ s( \ at \ .* )( at your line)xsr;    # Expected a feed still open, but its run has ended: a stage stopped it at your line
+
+Whoever sends the values can be told to stop too, as the next chapters
+show: a library that calls you back, in chapter 9, and a stage feeding
+a pipeline of its own, in chapter 10.
+
+=head2 Push, pull or feed?
 
 =over 4
 
@@ -756,6 +803,13 @@ socket, a database or a calculation, so that a stage that stops
 saves the work of making the rest; or when there are too many to
 hold at once; or when the caller wants to handle each result as it
 comes.
+
+=item *
+
+B<Feed> when the values arrive one at a time from something you
+don't drive, such as a library's callbacks or an event loop, so you
+can't pull them: you push each as it comes, and stop when a stage
+says so.
 
 =back
 
@@ -2102,6 +2156,53 @@ The caller got one error, the function read two lines, and the file
 was closed as C<take(1)> stopped the run. The function didn't need to
 know any of that was going to happen.
 
+=head2 Take stages for a library that calls you back
+
+Some libraries don't hand out their values: they call you back with
+each, a line, a row, a record or a file, until you tell them to stop.
+You can't pull from them, but a feed can still run each value through
+your caller's stages as it comes, and the library can still stop when
+a stage has had enough. Here C<each_line> stands for such a library:
+
+    # A library's reader: calls back with each line, until the callback
+    # returns false; returns how many lines it read.
+    sub each_line ($path, $callback) {
+        open my $in, '<', $path or die "Can't read $path: $!\n";
+        my $read = 0;
+        while (defined(my $line = <$in>)) {
+            chomp $line;
+            $read++;
+            $callback->($line) or last;
+        }
+        close $in;
+        return $read;
+    }
+
+    # The setlist's titles, read by the library, through the caller's stages.
+    sub setlist_titles (@stages) {
+        my $feed = Ekorn::Pipeline->new(@stages)->feed;
+        my @titles;
+        my $read = each_line($setlist, sub ($line) {
+            push @titles, $feed->push($line);
+            return !defined $feed->ended;    # false: the library stops reading
+        });
+        push @titles, $feed->close unless defined $feed->ended;
+        say "read $read of 6 lines";
+        return @titles;
+    }
+
+    say join ', ', setlist_titles(take_if { m( \A [DG] )x }, take(2));
+    # read 3 of 6 lines
+    # Dancing Queen, Girls & Boys
+    say join ', ', setlist_titles(sub { uc }, take_last);
+    # read 6 of 6 lines
+    # SUNSHINE OF YOUR LOVE
+
+C<take(2)> stopped the run at the third line, so the library read no
+further; C<take_last> waited for the close to give its value. The
+caller's stages work as they would with any function, and the library
+needn't know they're there.
+
 =head2 Do some of the work yourself, then the caller's
 
 Put stages of your own before your caller's, so their stages are
@@ -2247,7 +2348,10 @@ written for.
 =back
 
 What callbacks have going for them: everyone knows them already, and
-a single callback call is cheaper than a pipeline run.
+a single callback call is cheaper than a pipeline run. And the two
+meet: where a library offers only a callback, a feed runs what it
+calls you with through your caller's stages (see L<Take stages for a
+library that calls you back|/"Take stages for a library that calls you back">).
 
 =head1 10. Building parts for others
 
@@ -2319,6 +2423,120 @@ for one more:
 
 C<up_to> compares the whole value, so it's given titles here, not
 tracks. Say in a stage's documentation what it expects to be given.
+
+=head2 Run values through a branch, with a feed
+
+A stage made with C<gather> can make a feed for each run, of a pipeline
+of its own, push its values into it, close it in its flush and finish
+it in its end. The branch is one run, beside the main one, over every
+value the stage is given: its C<take> counts across them all, its
+flushes are called when the main run's values run out, and its ends
+when the main run ends. That opens a family of stages that send values
+on to other runs: one copying values off to the side, one sending
+each value to one of several branches, one running each key's values
+through a run of their own.
+
+A I<tee> is the simplest. It runs each value through a branch of
+stages, for what they do on the side, throws away what comes out of
+the branch, and passes the value on unchanged, so a tap can be any
+pipeline, where C<peek> does one thing. Ekorn has one, C<tee>, in
+Ekorn::Pipeline::Stages::Taps, which chapter 11 uses. Here is one like
+it, built by hand, to show how a stage made with C<gather> drives a
+feed:
+
+    package My::Stages::Tee {
+        use Ekorn::Pipeline::Gather;
+
+        sub tee (@stages) {
+            my $branch = Ekorn::Pipeline->new(@stages);
+            return gather {
+                my $feed = $branch->feed;    # this run's
+                return (
+                    sub ($value) {
+                        $feed->push($value) unless defined $feed->ended;
+                        return $value;
+                    },
+                    sub () {
+                        $feed->close unless defined $feed->ended;
+                        return;
+                    },
+                    sub ($how) { $feed->finish },
+                );
+            };
+        }
+    }
+
+    use List::Util qw(sum);
+
+    my $titles = Ekorn::Pipeline->new(
+        My::Stages::Tee::tee(
+            take_if { $_->{artist} eq 'Blur' }, take(1),
+            sub { say "first by Blur: $_->{title}"; return },
+        ),
+        My::Stages::Tee::tee(
+            sub { $_->{plays} }, collect,
+            sub { say 'plays: ', sum(@$_); return },
+        ),
+        sub { $_->{title} },
+    );
+    say join ', ', $titles->(@tracks);
+    # first by Blur: Girls & Boys
+    # plays: 36800
+    # Dancing Queen, Knowing Me, Knowing You, Girls & Boys, Parklife, Country House, Sunshine of Your Love
+
+The first branch's C<take(1)> stopped its own run at the first Blur
+track, and the main run went on; the second branch's C<collect> gave
+its total when the main run's values ran out. A branch that stops
+ends only itself, as the tee checks C<ended> before each push; one that
+dies kills the main run, as any stage's error does. Its ends are
+called as its run ends: at a stop or a death in it, when the flush
+closes it, or, if the main run ended first, when the end's C<finish>
+tells it that it stopped. Ekorn's C<tee> works just so.
+
+=head2 Run each key's values through a run of their own
+
+With a feed for each key, a stage can run each key's values through a
+run of their own, of one pipeline: C<take(1)> then takes the first of
+each key, and C<collect> gathers each key's values, with no grouping
+written by hand:
+
+    package My::Stages::PerKey {
+        use Ekorn::Pipeline::Gather;
+
+        sub per_key ($key_of, @stages) {
+            my $each = Ekorn::Pipeline->new(@stages);
+            return gather {
+                my(%feeds, @keys);    # this run's
+                return (
+                    sub ($value) {
+                        my $key  = $key_of->($value);
+                        my $feed = $feeds{$key} //= do { push @keys, $key; $each->feed };
+                        return defined $feed->ended ? () : $feed->push($value);
+                    },
+                    sub () {
+                        return map { defined $_->ended ? () : $_->close } @feeds{@keys};
+                    },
+                    sub ($how) { $_->finish for values %feeds },
+                );
+            };
+        }
+    }
+
+    my $by_artist = sub ($track) { $track->{artist} };
+    say join ', ', tracks(My::Stages::PerKey::per_key($by_artist, take(1)), sub { $_->{title} });
+    # Dancing Queen, Girls & Boys, Sunshine of Your Love
+
+    say for tracks(
+        My::Stages::PerKey::per_key($by_artist, sub { $_->{title} }, collect),
+        sub { join ' / ', @$_ },
+    );
+    # Dancing Queen / Knowing Me, Knowing You
+    # Girls & Boys / Parklife / Country House
+    # Sunshine of Your Love
+
+Unlike the tee, it passes on what comes out of each key's run, as it
+comes, and what their flushes give, in the order the keys were first
+seen.
 
 =head2 Make your objects sources and sinks
 
@@ -2783,6 +3001,60 @@ C<count_into> counts the values going by into a variable, setting it to
 This uses C<at_least>, from L<Build a vocabulary of
 stages|/"Build a vocabulary of stages">.
 
+=head2 Tap with a pipeline of stages
+
+C<peek>, C<count_into> and C<dump_to> each do one thing with every value.
+When the job on the side needs more, C<tee>, imported on request, runs
+each value through a branch of stages of its own, and passes the value
+on unchanged, whatever the branch does with it. Here the branch notes
+the first two big hits, while every track goes on:
+
+    my @hits;
+    my @titles = tracks(
+        tee(take_if { $_->{plays} > 6000 }, take(2), sub { push @hits, $_->{title}; () }),
+        sub { $_->{title} },
+    );
+    say scalar @titles, ' titles';    # 6 titles
+    say join ', ', @hits;             # Dancing Queen, Girls & Boys
+
+The branch is a run of its own, beside the main one. Its C<take(2)>
+stopped the branch after the second hit, and only the branch: the main
+run went on to the end. What comes out of the branch is thrown away,
+so its last stage returns nothing.
+
+The branch's flushes are called when the main run's values run out,
+so it can total, batch or collect what it saw:
+
+    use List::Util qw(sum);
+
+    my $total;
+    my @titles = tracks(
+        tee(sub { $_->{plays} }, collect, sub { $total = sum(@$_); () }),
+        sub { $_->{title} },
+    );
+    say "$total plays over ", scalar @titles, ' tracks';    # 36800 plays over 6 tracks
+
+And it can end in a sink, or in another tap, so a dump while
+debugging can show only the values you're after:
+
+    open my $out, '>', \my $dumped or die "Can't write the dump: $!\n";
+    my @titles = tracks(
+        tee(take_if { $_->{artist} eq 'Cream' }, dump_to($out)),
+        sub { $_->{title} },
+    );
+    print $dumped;
+    # {
+    #   'artist' => 'Cream',
+    #   'plays' => 7700,
+    #   'title' => 'Sunshine of Your Love'
+    # }
+
+A stage in the branch that dies kills the whole run, as any stage's
+error does, named as the tee's stage, then the branch's within it. A
+tee costs several times what C<peek> does, a value, so it's for side
+jobs and debugging, not a hot loop. Chapter 10 shows L<how it's
+built|/"Run values through a branch, with a feed">, on a feed.
+
 =head2 Dump values while debugging
 
 C<dump_to>, imported on request, writes each value with Data::Dumper,
@@ -2861,7 +3133,9 @@ plain subs, and through stages made for the run with C<gather> that
 have no flush or end, such as C<take>, C<drop> and C<count_into>. A run
 with a flush, an end or a sink, such as C<batch>, C<take_last> or
 C<keep_all>, takes the full path, which costs about twice as much per
-value, and some 20 microseconds to set up each run.
+value, and some 20 microseconds to set up each run. A C<tee> costs more
+again, about 1.3 microseconds a value through a branch of plain
+stages, as each value is pushed into its branch's run too.
 
 That sounds a lot, and for a tight loop over numbers in memory, it is:
 use C<map> and C<grep> there. But each value costs well under a
@@ -2894,7 +3168,10 @@ values from its last call have all gone through.
 No. A pipeline runs in the calling thread, one value at a time, from
 start to end, and a stage that blocks blocks the run. That keeps it
 simple and predictable, with no locks and no surprises in the order of
-results, but it isn't a tool for concurrency.
+results, but it isn't a tool for concurrency. An event loop can still
+feed a pipeline, though: push each message as it arrives, and stop
+listening once a stage has ended the run (see L<Feed values in as they
+arrive|/"Feed values in as they arrive">).
 
 =head2 Does it need a database?
 
@@ -2951,6 +3228,12 @@ told when the run ends, however it ends;
 
 =item *
 
+B<with values that arrive when they will,> from a library's
+callbacks or an event loop, fed in as they come, a stop telling
+whoever sends them to stop too;
+
+=item *
+
 B<in reuse,> as a stage written once works with every function that
 takes stages, whoever wrote it.
 
@@ -2967,7 +3250,9 @@ C<grep> are much faster;
 
 =item *
 
-B<on concurrency,> which it doesn't do at all;
+B<on concurrency,> which it doesn't do itself: an event loop can
+feed it, but its stages run one value at a time, in the calling
+thread;
 
 =item *
 

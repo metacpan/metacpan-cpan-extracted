@@ -16,14 +16,17 @@ requires 'Hash::Flatten', '0.05';   # earlier versions mishandle keys containing
 requires 'Hash::Merge';
 requires 'JSON::MaybeXS';
 requires 'JSON::Parse';
+requires 'MIME::Base64';
 requires 'Params::Get', '0.15';
 requires 'Params::Validate::Strict', '0.37';
 requires 'Pod::Usage';
 requires 'Readonly';   # used at module load time for AES-256-GCM size constants
 requires 'Scalar::Util';
+requires 'Sys::Hostname';
 requires 'TOML::Tiny';
 requires 'XML::PP', '0.06';
 requires 'YAML::XS', '0.80';   # _sanitize_yaml_values guards against !!perl/code in any version
+recommends 'Config::General';   # Apache-style *.conf files
 
 on 'configure' => sub {
 	requires 'ExtUtils::MakeMaker', '6.64';   # Minimum version for TEST_REQUIRES
@@ -31,6 +34,7 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'File::Glob';
+	requires 'File::Path';
 	requires 'File::stat';
 	requires 'IPC::System::Simple';   # for scripts/generate_index
 	requires 'POSIX';
@@ -44,6 +48,7 @@ on 'test' => sub {
 	requires 'Test::TempDir::Tiny';
 	requires 'Test::Without::Module';
 	requires 'autodie';
+	recommends 'Config::General';   # t/config-general.t is skipped without it
 	recommends 'Test::Permissions';   # probes whether chmod can revoke read access; t/extended_tests.t falls back to -r
 };
 

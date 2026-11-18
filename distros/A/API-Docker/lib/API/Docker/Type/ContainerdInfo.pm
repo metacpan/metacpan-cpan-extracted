@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerdInfo;
 # ABSTRACT: Information for connecting to the containerd instance that is used by the daemon
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerdInfo::Namespaces;
 use namespace::clean;
@@ -26,7 +26,7 @@ API::Docker::Type::ContainerdInfo - Information for connecting to the containerd
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -54,7 +54,7 @@ L<API::Docker::Type::ContainerdInfo::Namespaces>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -16,11 +16,11 @@ Provides cross-driver cache initialization and Haversine formula implementation.
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.003.0
 
 =cut
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 use v5.20;
 use strict;
@@ -30,7 +30,7 @@ no warnings qw(experimental::signatures);
 
 use Exporter qw(import);
 our @EXPORT = qw(create_disc_cache create_memory_cache distance);
-our @EXPORT_OK = qw(redact_config);
+our @EXPORT_OK = qw(redact_config env_cache_dir);
 
 use CHI;
 use DBI;
@@ -39,6 +39,7 @@ use Module::Runtime qw(require_module);	# Safe dynamic loading; avoids string ev
 use Params::Get 0.13;
 use Try::Tiny;
 use Carp qw(croak carp);
+use File::Path qw(make_path);
 use Readonly;
 use Scalar::Util qw(looks_like_number reftype);
 use Math::Trig qw(deg2rad rad2deg asin great_circle_distance);
@@ -102,6 +103,10 @@ Parameters:
 - logger: Logger object (optional)
 - namespace: Cache namespace (optional)
 - root_dir: Root directory override (optional)
+
+File-based drivers store their files in $CACHEDIR, or failing that $CACHE_DIR,
+when either is set (the directory is created if need be); otherwise in the
+first of $root_dir, the root_dir argument and the configured root_dir.
 
 Returns: CHI cache object
 
@@ -361,8 +366,52 @@ sub _configure_memcached($chi_args, $config, $args, $logger) {
 	}
 }
 
+=head2 env_cache_dir
+
+The directory that the environment says the caches are to be kept in: the value
+of C<$CACHEDIR> or, if that is unset or empty, of C<$CACHE_DIR>.  Returns undef
+when neither is set.  File-based cache drivers use it in preference to
+C<root_dir>, which lets an administrator keep the caches outside the site; it is
+created if it does not exist.  It is exported on request.
+
+	use Web::VWF::Utils qw(env_cache_dir);
+	my $dir = env_cache_dir();
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{}
+
+=head4 OUTPUT
+
+	{ type => 'string', optional => 1 }
+
+=cut
+
+# Where the environment says the caches go: $CACHEDIR, or failing that
+# $CACHE_DIR, so that an administrator can put them somewhere better than the
+# site's own directory without editing any configuration.  Undef when neither
+# is set, or when they are empty.
+sub env_cache_dir() {
+	foreach my $name (qw(CACHEDIR CACHE_DIR)) {
+		my $dir = $ENV{$name};
+		return $dir if(defined($dir) && length($dir));
+	}
+	return;
+}
+
 sub _configure_file_based($chi_args, $config, $args) {
-	my $root_dir = $ENV{'root_dir'} || $args->{'root_dir'} || $config->{root_dir} || $args->{'config'}->{root_dir};
+	# $CACHEDIR / $CACHE_DIR come first: they are set deliberately for the
+	# cache, whereas $root_dir names the whole site and so used to drag the
+	# caches (Berkeley DB files and all) into the site's own directory.
+	my $env_dir = env_cache_dir();
+	if(defined($env_dir)) {
+		# Unlike the other sources this directory is not expected to have been
+		# made already: it is the one an administrator chose for the purpose
+		make_path($env_dir) unless(-d $env_dir);
+	}
+	my $root_dir = $env_dir || $ENV{'root_dir'} || $args->{'root_dir'} || $config->{root_dir} || $args->{'config'}->{root_dir};
 
 	croak "File-based cache drivers require 'root_dir' parameter" unless $root_dir;
 	croak "Root directory '$root_dir' does not exist or is not writable"
@@ -514,7 +563,7 @@ Please report any bugs or feature requests to the author.
 
 You can find documentation for this module with the perldoc command.
 
-    perldoc VWF::Utils
+    perldoc Web::VWF::Utils
 
 =head1 LICENSE AND COPYRIGHT
 

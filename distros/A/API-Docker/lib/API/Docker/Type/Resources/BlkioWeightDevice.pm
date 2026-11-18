@@ -1,6 +1,6 @@
 package API::Docker::Type::Resources::BlkioWeightDevice;
 # ABSTRACT: A per-device block IO weight
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -25,7 +25,7 @@ API::Docker::Type::Resources::BlkioWeightDevice - A per-device block IO weight
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ constrains it to 0 or above and nothing else.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

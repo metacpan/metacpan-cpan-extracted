@@ -1,6 +1,6 @@
 package API::Docker::Type::EndpointSpec;
 # ABSTRACT: Properties that can be configured to access and load balance a service
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::EndpointPortConfig;
 use namespace::clean;
@@ -26,7 +26,7 @@ API::Docker::Type::EndpointSpec - Properties that can be configured to access an
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -47,7 +47,7 @@ L<API::Docker::Type::EndpointPortConfig>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -1,5 +1,27 @@
 Revision history for Matplotlib-Simple
 
+0.3344 2026-11-17 CST (Claude Opus 5.5 helped)
+
+ [Performance]
+
+ - A large `imshow` takes about a third of the memory and half the time it did: a 1500 x 1500 image peaked at 956 MB in Perl, and now at 247 MB, and `plt` writes its script in 1.8 s rather than 3.25 s. The image was copied whole three more times than it needed to be: once to decode its strings, which an image of numbers has none of; once flattened, to find the ends of the color scale, which are now found a row at a time and only when `vmin` or `vmax` is not given; and once as text, by the check for NaN and infinity, which is now made as each value is copied. The script it writes is the same.
+
+ - `colored_table`s that share a colorbar find their common range a row at a time, rather than gathering every cell of every table into one list first. Two 800 x 800 tables peak at 256 MB rather than 290 MB.
+
+ [Fixed]
+
+ - `xbins` and `ybins` of `hexbin` and `hist2d` that are not whole numbers are refused: `"xbins" must be a whole number of at least 1 for hexbin_helper, not "1.5"`. A fraction was cut to its whole part without a word, so `xbins => 1.5` drew one bin and `2.9` drew two. A whole number written as `3.0` or `1e1` is taken as before.
+
+ - A color given as a tuple with a NaN in it, `[ 'NaN', 0.5, 0.5 ]` or `'(NaN, 0.5, 0.5)'`, is refused by the gnuplot and ggplot2 engines, as a channel outside 0 to 1 already was. It was written into the script as `#NaN8080`. An infinite channel was already refused.
+
+ - `df` with `by`, and every type that orders its keys as numbers, no longer dies when a group is `NaN`: `Use of uninitialized value in sort`. A NaN or an infinity among the groups now puts them all in string order, as a word among them does. Groups that are equal as numbers, such as `2` and `2.0`, come out in string order; they came out in the order of a hash's keys, which changes from run to run.
+
+ - `nrows` and `nrow` given together with different values, or `ncols` and `ncol`, are refused: `"nrow" is another name for "nrows", and they disagree: "nrow" = 1, "nrows" = 2`. With `p`, the grid was sized by one and drawn by the other, so `nrows => 2, nrow => 1` with three plots died as `There are not enough subplots for the data`. The same value under both names is accepted.
+
+ - `execute` and `fh` in a subplot or an `add` graph, and `output_file` in an `add` graph, are refused by name, as `engine` and `style` are: `"execute" at subplot 1: the figure is one script, which is run or not, so give "execute" once, beside "plots" or "p"`. They were accepted and never read, so `execute => 0` in a subplot still ran the script. `output_file` in a subplot was already refused, and the message now says where it goes.
+
+ - The note of where a figure came from names the calling script by its own directory. It named the working directory instead, so `perl dir/plot.pl` was noted as `<cwd>/plot.pl`, and a script run from `/` as `//plot.pl`.
+
 0.3343 2026-11-09 CST (Claude Fable 5.2 helped)
 
  [New]

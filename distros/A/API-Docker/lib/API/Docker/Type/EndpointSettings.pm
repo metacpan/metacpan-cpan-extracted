@@ -1,6 +1,6 @@
 package API::Docker::Type::EndpointSettings;
 # ABSTRACT: Configuration for a network endpoint
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::EndpointIPAMConfig;
 use namespace::clean;
@@ -65,7 +65,7 @@ API::Docker::Type::EndpointSettings - Configuration for a network endpoint
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -168,7 +168,7 @@ deriving it from the Perl name would produce C<DnsNames>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

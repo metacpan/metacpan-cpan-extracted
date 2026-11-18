@@ -113,7 +113,7 @@ EOS
   }
   
   static method generate_port : int () {
-    return IO::Socket::IP->new({Listen => 5, LocalAddr => "127.0.0.1"})->sockport;
+    return IO::Socket::IP->new({Context => Go->bg, Listen => 5, LocalAddr => "127.0.0.1"})->sockport;
   }
   
   # Static Methods
@@ -122,9 +122,9 @@ EOS
     return $self->{handle}->(IO::Socket::IP)->sockport;
   }
   
-  method start : void () {
+  method start : void ($context : Go::Context) {
     
-    $self->_accept;
+    $self->_accept($context);
   }
   
   method stop : void () {
@@ -133,14 +133,14 @@ EOS
     }
   }
   
-  method _accept : void () {
+  method _accept : void ($context : Go::Context) {
 
     # Greedy accept
     my $args     = $self->{args};
     my $accepted = 0;
     while ($accepted++) {
       
-      my $handle = $self->{handle}->accept;
+      my $handle = $self->{handle}->accept($context);
       unless ($handle) {
         return;
       }
@@ -157,7 +157,7 @@ EOS
     my $path    = $args->{"path"}->(string);
     my $port    = (int)$args->get("port");
     
-    my $options = Hash->new({Listen => $args->exists("backlog") ? (int)$args->get("backlog") : SOCKET->SOMAXCONN, Type => SOCKET->SOCK_STREAM});
+    my $options = Hash->new({Context => Go->bg, Listen => $args->exists("backlog") ? (int)$args->get("backlog") : SOCKET->SOMAXCONN, Type => SOCKET->SOCK_STREAM});
     
     my $handle = (IO::Socket)undef;
     

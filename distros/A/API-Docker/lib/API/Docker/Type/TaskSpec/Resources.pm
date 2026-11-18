@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::Resources;
 # ABSTRACT: Resource requirements which apply to each individual container created as part of the service
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Limit;
 use API::Docker::Type::ResourceObject;
@@ -27,7 +27,7 @@ API::Docker::Type::TaskSpec::Resources - Resource requirements which apply to ea
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -46,7 +46,7 @@ Define resources reservation. See L<API::Docker::Type::ResourceObject>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

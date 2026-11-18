@@ -1,6 +1,6 @@
 package API::Docker::Type::Health;
 # ABSTRACT: Information about the container's healthcheck results
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::HealthcheckResult;
 use namespace::clean;
@@ -29,7 +29,7 @@ API::Docker::Type::Health - Information about the container's healthcheck result
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -64,7 +64,7 @@ L<API::Docker::Type::HealthcheckResult>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

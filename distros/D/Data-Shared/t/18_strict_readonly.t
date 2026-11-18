@@ -3,8 +3,10 @@ use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
 use Data::Shared qw(shared_compile sharedc_call);
+use lib 't/lib';
+use Backends qw(have);
 
-eval { require Data::HashMap::Shared::SS; require Data::Queue::Shared::Int; 1 }
+have('hashmap:ss', 'queue:int')
     or plan skip_all => "backends unavailable: $@";
 
 subtest 'native readonly backend rejects writes through every entry point' => sub {
@@ -38,7 +40,7 @@ subtest 'unsupported backend refused and legacy fallback remains explicit' => su
 };
 
 subtest 'immutable perfecthash is loaded without rebuilding' => sub {
-    eval { require Data::PerfectHash::Shared; 1 } or plan skip_all => "perfecthash unavailable: $@";
+    have('perfecthash') or plan skip_all => "perfecthash unavailable: $@";
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     $root->mount('words', 'perfecthash', { build_str => [qw(apple banana)] });
     {
@@ -63,7 +65,8 @@ subtest 'backend minimum is checked before creating storage' => sub {
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     local $Data::Shared::Registry::REGISTRY{hashmap}{min_version} = '999.0';
     ok !eval { $root->mount('old', 'hashmap:ss', undef, 32); 1 }, 'insufficient backend version rejected';
-    like $@, qr/requires version 999/, 'version requirement explained';
+    like $@, qr/is not available; install the Data-HashMap-Shared dist 999\.0 or newer/,
+        'version requirement explained, in the form a missing backend takes';
     ok !-e $root->dir . '/old.shm', 'storage not created';
 };
 
@@ -83,7 +86,7 @@ subtest 'strict composite reads reopen frozen children without writes' => sub {
 };
 
 subtest 'missing sorted-set sidecar is not recreated' => sub {
-    eval { require Data::SortedSet::Shared::Strings; 1 }
+    have('sortedset:strings')
         or plan skip_all => "strings unavailable: $@";
     my $root = Data::Shared->new(tempdir(CLEANUP => 1));
     $root->mount('names', 'sortedset:strings', { max => 32 });

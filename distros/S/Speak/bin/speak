@@ -55,7 +55,7 @@ use Pod::Usage;
 use FindBin;
 use lib "$FindBin::Bin/../lib";
 
-use Speak qw(speak last_message);
+use Speak qw(speak last_message is_persona);
 use Clipboard;
 
 sub error ($msg, $exit_code = 1) {
@@ -98,6 +98,11 @@ if ($opts{lastmsg}) {
   my ($last, $tag) = last_message ();
   error 'No previous spoken message found in log', 1 unless defined $last;
   $msg = $last;
+  if (defined $tag && length $tag && !defined $opts{persona}) {
+    if (is_persona ($tag)) {
+      $opts{persona} = $tag;
+    }
+  }
 } elsif ($opts{clipboard}) {
   if ($opts{file}) {
     error 'Cannot specify both -clipboard and -file', 1;

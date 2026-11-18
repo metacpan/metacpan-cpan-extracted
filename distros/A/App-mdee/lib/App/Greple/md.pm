@@ -6,7 +6,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 =encoding utf-8
 
@@ -289,6 +289,8 @@ Available parameters:
     tick_open       inline code open marker (default: `)
     tick_close      inline code close marker (default: ´)
     nofork          nofork+raw mode for code ref calls (default: 1)
+    highlight       syntax highlight of fenced code: 1, the name
+                    of a highlighter, or 0 (default: 1)
     hashed.h1-h6    closing hashes per level (default: 0)
 
 =head2 Paragraph Refill
@@ -324,6 +326,21 @@ Front matter is not part of CommonMark.  pandoc and L<Markdown::Perl>
 take YAML front matter as metadata, while libcmark reads it as a rule,
 paragraphs and list items.  C<front_matter=0> takes the lines as
 Markdown, as libcmark does.
+
+=head2 Syntax Highlight of Code
+
+The code in a fenced code block is shown in the colors of its
+language, the first word after the opening fence, inside the
+C<code_block> color.  The colors are those of a highlighter of
+L<Text::ANSI::Highlight>: C<highlight=1> is its default, C<pandoc>,
+and C<highlight=sourcehighlight> (C<gnu>) or C<highlight=skylighting>
+(C<sky>) is the one of the name.  All the blocks of a file are given
+to the highlighter at once, and each is colored by itself.
+
+A block is shown as it is when it has no language, when the
+highlighter does not know the language, and when the module, the
+highlighter or its command (C<pandoc>, C<source-highlight>,
+C<skylighting>) is not installed.  C<highlight=0> turns it off.
 
 =head2 OSC 8 Hyperlinks
 
@@ -395,7 +412,7 @@ are used instead, and these are emphasis.
     code_mark    L20                L10
     code_tick    L15/L23            L15/L05
     code_info    ${base_name}=y70   L10
-    code_block   /L23;E             /L05;E
+    code_block   /L24;E             /L05;E
     code_inline  L00/L23            L25/L05
     meta_mark    L15/L10E           L10/L15E
     meta_block   L25/L12E           L00/L13E
@@ -488,7 +505,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2025-2026 Kazumasa Utashiro.
+Copyright © 2025-2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.
@@ -540,6 +557,7 @@ my $config = Getopt::EX::Config->new(
     rule            => 1,        # box-drawing characters for tables
     table_style     => 'lattice', # lattice (or pipe): column separators; 3line, simple: spaces and rules only
     nofork          => 1,        # use nofork+raw for code ref calls
+    highlight       => 1,        # syntax highlight of fenced code: 1, the name of a highlighter, or 0
     heading_markup  => 0,        # inline formatting in headings
     cjk_friendly    => 0,        # markdown-cjk-friendly rules for * and ** emphasis
     tick_open       => '`',      # inline code open marker
@@ -561,7 +579,7 @@ my %default_colors = (
     code_mark       => 'L20',
     code_tick       => 'L15/L23',
     code_info       => '${base_name}=y70',
-    code_block      => '/L23;E',
+    code_block      => '/L24;E',
     code_inline     => 'L00/L23',
     meta_mark       => 'L15/L10E',
     meta_block      => 'L25/L12E',
@@ -891,8 +909,20 @@ my %colorize = (
 
     code_blocks => Step(sub {
         # closing fence: the same character, at least as long (CommonMark)
-        s{^( {0,3})((`|~)\3{2,})(.*)\n((?s:.*?))^( {0,3})(\2\3*)(\h*)$}{
+        my $block = qr{^( {0,3})((`|~)\3{2,})(.*)\n((?s:.*?))^( {0,3})(\2\3*)(\h*)$}m;
+        # the code of all the blocks, in the colors of their languages
+        my @highlight;
+        if ($config->{highlight}) {
+            my @code;
+            while (/$block/g) {
+                my($info, $body) = ($4, $5);
+                push @code, [ $info =~ /^\h*([\w+#.-]+)/ ? $1 : '', $body ];
+            }
+            @highlight = highlight_code(@code);
+        }
+        s{$block}{
             my($oi, $fence, $lang, $body, $ci, $close, $trail) = ($1, $2, $4, $5, $6, $7, $8);
+            $body = shift(@highlight) // $body;
             my $result = md_color('code_mark', "$oi$fence");
             $result .= md_color('code_info', $lang) if length($lang);
             $result .= "\n";
@@ -1403,6 +1433,30 @@ sub parse_separator {
     # Minimize dashes so separator width doesn't inflate column widths
     $$blockref =~ s{$SEP}{ ${^MATCH} =~ s/:?-+:?/-/gr }mpe;
     (\@right, \@center);
+}
+
+# Color the code of fenced code blocks by a highlighter of
+# Text::ANSI::Highlight: the one of the name in the config highlight,
+# or its default for 1.  Takes [ language, code ] of each block, and
+# returns as many: the code in colors, or undef for a block which is
+# not colored, as one with no language or with one the highlighter
+# does not know.  All are undef when the module, the highlighter or
+# its command is not there, and the blocks are shown as they are.
+#
+# All the blocks are given at once, and each is colored by itself.
+# What comes back is the code which was given, with colors, so the
+# lines are those of the file.
+sub highlight_code {
+    my @code = @_;
+    my @none = (undef) x @code;
+    @code or return @none;
+    my $name = $config->{highlight};
+    my $hl = eval {
+        require Text::ANSI::Highlight;
+        Text::ANSI::Highlight->new($name eq '1' ? () : $name);
+    } or return @none;
+    my @color = eval { $hl->highlight(@code) };
+    @color == @code ? @color : @none;
 }
 
 sub call_ansicolumn {

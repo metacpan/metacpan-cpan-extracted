@@ -1,6 +1,6 @@
 package API::Docker::Type::ImageManifestSummary;
 # ABSTRACT: A summary of an image manifest
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ImageManifestSummary::AttestationData;
 use API::Docker::Type::ImageManifestSummary::ImageData;
@@ -46,7 +46,7 @@ API::Docker::Type::ImageManifestSummary - A summary of an image manifest
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -111,7 +111,7 @@ L<API::Docker::Type::ImageManifestSummary::AttestationData>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

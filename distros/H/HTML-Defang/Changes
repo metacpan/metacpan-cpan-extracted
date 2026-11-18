@@ -1,5 +1,21 @@
 Revision history for Perl extension HTML::Defang.
 
+1.10  Wed Nov 18 12:00:00 2026
+  - Pass every url() in a CSS value to url_callback, and defang the
+    declaration if any is defanged. Previously only the first url() was
+    checked, so "url(http://ok), url(javascript:...)" got past any URL
+    policy.
+  - Keep CSS declaration formatting when a css_callback renames a selector
+    (previously the ':' separators were lost) or a selector is repeated, and
+    document renaming selectors as supported
+  - Remove <base> in new_bodyonly
+  - Add url_policy => 'mail' (and mail_url_callback) for HTML from email:
+    links may be http(s)/mailto/tel/cid/#anchor, loaded resources
+    http(s)/cid/inline raster images
+  - Add extract_styles to collect <style> contents out of the output
+  - Add scope_id to scope CSS selectors, ids and classes to one element
+  - Add new_quote and quote() for quoting an email's HTML body in another
+
 1.09  Wed Aug 6 12:00:00 2026
   - Treat the contents of the RCDATA/RAWTEXT "text" elements <title>,
     <textarea>, <noembed> and <noframes> as opaque text (like <script>/

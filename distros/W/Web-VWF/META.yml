@@ -10,6 +10,7 @@ build_requires:
   Test::Memory::Cycle: '0'
   Test::Mockingbird: '0'
   Test::Most: '0'
+  Test::Needs: '0'
   Test::Returns: '0'
 configure_requires:
   ExtUtils::MakeMaker: '6.64'
@@ -26,6 +27,8 @@ no_index:
     - inc
     - example
     - t
+  package:
+    - Data::Throttler::Backend::VWF
 recommends:
   Mail::DKIM: '0'
 requires:
@@ -58,7 +61,7 @@ requires:
   File::Spec: '0'
   File::pfopen: '0'
   Filesys::Df: '0'
-  HTML::D3: '0'
+  HTML::D3: '0.3'
   HTML::SocialMedia: '0'
   HTTP::Date: '0'
   HTTP::Status: '0'
@@ -96,5 +99,5 @@ requires:
 resources:
   bugtracker: https://github.com/nigelhorne/Web-VWF/issues
   repository: git://github.com/nigelhorne/Web-VWF.git
-version: 0.002.0
+version: 0.003.0
 x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -17,9 +17,13 @@ IO::Factotum - read files through a converter chosen by their names
         ...
     }
 
+    # an object which gives the content of a file
+    use Text::ANSI::Highlight;
+    IO::Factotum::register(with => Text::ANSI::Highlight->new);
+
 # VERSION
 
-Version 0.04
+Version 0.05
 
 # DESCRIPTION
 
@@ -63,6 +67,23 @@ Nothing is exported.
     reference fails by `die`.  A code reference prints bytes, and the
     `END` blocks of the program do not run in its process.
 
+- **register**(**with** => _object_)
+
+    Register an object as a converter.  Its method `file` is called with
+    the name of a file, and returns the content to be read in place of
+    the file, or `undef` for a file it has nothing to do with: the file
+    then goes to the next converter, or is read as it is.  So does it
+    when the method dies.  The content is taken byte for byte, and
+    characters are written as UTF-8.
+
+        use Text::ANSI::Highlight;
+        register(with => Text::ANSI::Highlight->new);
+
+    The object tells by itself which files are its own, so `match` is
+    not required; when it is given, the object is asked only for the
+    files which match.  The method is called in the process of the
+    program.
+
 - **clear**()
 
     Remove all the converters.
@@ -90,7 +111,7 @@ Nothing is exported.
     calling their `setup` function.  It dies when there is no such
     module.
 
-        IO::Factotum::load('Highlight::skylighting');
+        IO::Factotum::load('Gunzip');     # IO::Factotum::Gunzip::setup()
 
 - **tie\_argv**()
 
@@ -113,23 +134,19 @@ Nothing is exported.
 
 # CONVERTERS
 
-The converters which come with this module are under
-`IO::Factotum::Highlight`.  They color source files by their syntax.
+A module `IO::Factotum::_NAME_` which has a function `setup` is a
+converter by the name: `load('_NAME_')` calls the function, which
+registers what it has.  None comes with this module.
 
-- [IO::Factotum::Highlight::skylighting](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Askylighting) (`Highlight::sky`)
+For syntax highlight, register an object of [Text::ANSI::Highlight](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AHighlight):
+it colors source files by a highlighter, and gives nothing for a file
+whose language it does not know.
 
-    by the `skylighting` command, the highlighter of pandoc
-
-- [IO::Factotum::Highlight::sourcehighlight](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Asourcehighlight) (`Highlight::gnu`)
-
-    by the `source-highlight` command of GNU Source-highlight
-
-    IO::Factotum::load('Highlight::sky');
+    IO::Factotum::register(with => Text::ANSI::Highlight->new('pandoc'));
 
 # SEE ALSO
 
-[IO::Factotum::Highlight::skylighting](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Askylighting),
-[IO::Factotum::Highlight::sourcehighlight](https://metacpan.org/pod/IO%3A%3AFactotum%3A%3AHighlight%3A%3Asourcehighlight), [Getopt::EX::Factotum](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AFactotum)
+[Text::ANSI::Highlight](https://metacpan.org/pod/Text%3A%3AANSI%3A%3AHighlight), [Getopt::EX::Factotum](https://metacpan.org/pod/Getopt%3A%3AEX%3A%3AFactotum)
 
 [Command::Run](https://metacpan.org/pod/Command%3A%3ARun)
 
@@ -139,7 +156,7 @@ Kazumasa Utashiro
 
 # LICENSE
 
-Copyright 2026 Kazumasa Utashiro.
+Copyright © 2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

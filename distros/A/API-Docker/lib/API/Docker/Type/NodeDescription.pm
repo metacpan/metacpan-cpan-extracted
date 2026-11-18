@@ -1,6 +1,6 @@
 package API::Docker::Type::NodeDescription;
 # ABSTRACT: NodeDescription encapsulates the properties of the Node as reported by the agent
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::EngineDescription;
 use API::Docker::Type::Platform;
@@ -38,7 +38,7 @@ API::Docker::Type::NodeDescription - NodeDescription encapsulates the properties
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -76,7 +76,7 @@ C<TlsInfo>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

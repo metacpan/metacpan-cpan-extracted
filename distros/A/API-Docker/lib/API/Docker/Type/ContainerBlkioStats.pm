@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerBlkioStats;
 # ABSTRACT: BlkioStats stores all IO service stats for data read and write
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerBlkioStatEntry;
 use namespace::clean;
@@ -52,7 +52,7 @@ API::Docker::Type::ContainerBlkioStats - BlkioStats stores all IO service stats 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -134,7 +134,7 @@ would produce C<SectorsRecursive>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

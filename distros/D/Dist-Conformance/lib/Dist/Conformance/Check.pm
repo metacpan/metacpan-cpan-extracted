@@ -1,4 +1,4 @@
-package Dist::Conformance::Check 0.005;
+package Dist::Conformance::Check 0.006;
 
 # ABSTRACT: The interface of a check, and what the checks share
 
@@ -91,7 +91,7 @@ Dist::Conformance::Check - The interface of a check, and what the checks share
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

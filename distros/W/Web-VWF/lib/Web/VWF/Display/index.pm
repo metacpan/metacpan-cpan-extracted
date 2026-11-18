@@ -7,7 +7,7 @@ package Web::VWF::Display::index;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 use Carp;
 use Web::VWF::Display;
@@ -154,3 +154,67 @@ sub html {
 }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Web::VWF::Display::index - The home page, with its contact form
+
+=head1 VERSION
+
+Version 0.003.0
+
+=head1 DESCRIPTION
+
+With no parameters it shows the F<index.tmpl> template.  With C<?person=NAME>
+it looks the address of C<NAME> up in the C<index> database (see
+L<Web::VWF::Data::index>) and sends a message there with L<Web::VWF::Mail>,
+signed with DKIM if the site has a key.  Each client address may send two
+messages in the life of the worker.
+
+C<action=login> with C<name> and C<password> starts an administrator session
+(a cookie, kept in the C<logindata> cache for a day) and redirects to
+C<?page=admin>.  B<That login is a placeholder>: the credentials are fixed in
+the code and it must be replaced before a site relies on it.
+
+=head1 METHODS
+
+=head2 html
+
+Takes C<config>, C<logger>, C<cachedir> and the C<index> data handle, which
+L<Web::VWF> passes to every page.  Croaks without C<_info> or the C<index>
+handle, or when the person named has no address.  Returns the HTML, or a string
+starting C<Location:> for a redirect.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+		index => { type => 'object' },
+		config => { type => 'object', optional => 1 },
+		logger => { type => 'object', optional => 1 },
+		cachedir => { type => 'string', optional => 1 },
+	}
+
+and the CGI parameters C<person>, C<action>, C<name>, C<password>, C<page>,
+C<lang> and C<lint_content>.
+
+=head4 OUTPUT
+
+	{ type => 'string' }
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

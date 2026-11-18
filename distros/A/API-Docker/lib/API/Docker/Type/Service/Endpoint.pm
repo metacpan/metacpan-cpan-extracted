@@ -1,6 +1,6 @@
 package API::Docker::Type::Service::Endpoint;
 # ABSTRACT: The resolved endpoint of a service
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::EndpointPortConfig;
 use API::Docker::Type::EndpointSpec;
@@ -32,7 +32,7 @@ API::Docker::Type::Service::Endpoint - The resolved endpoint of a service
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -65,7 +65,7 @@ produce C<VirtualIps>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

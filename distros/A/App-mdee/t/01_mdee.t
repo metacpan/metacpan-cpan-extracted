@@ -680,6 +680,12 @@ subtest q(filename option) => sub {
     like($none, qr/debug: greple .* -h /, q(--no-filename passes -h to greple));
 };
 
+# Test: nup does not highlight the output of mdee
+subtest q(no highlight by nup) => sub {
+    my $out = `COLUMNS=200 $mdee -ddn $test_md 2>&1`;
+    like($out, qr/^pass_nup: '--no-highlight'$/m, q(--no-highlight is passed to nup));
+};
+
 # Test: run-in and run-out
 subtest q(runin and runout options) => sub {
     my $help = `$mdee --help 2>&1`;

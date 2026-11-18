@@ -1,4 +1,4 @@
-package Dist::Conformance::Source::Directory 0.005;
+package Dist::Conformance::Source::Directory 0.006;
 
 # ABSTRACT: Standards read from a directory on this machine
 
@@ -43,7 +43,7 @@ Dist::Conformance::Source::Directory - Standards read from a directory on this m
 
 =head1 VERSION
 
-version 0.005
+version 0.006
 
 =head1 SYNOPSIS
 

@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Loader 2.168;
+package Config::Model::Loader 2.169;
 
 use Carp;
 use strict;
@@ -449,6 +449,16 @@ sub _load_check_list {
     my $element = $node->fetch_element( name => $element_name, check => $check );
 
     if ( defined $note and not defined $action and not defined $subaction ) {
+        $self->_load_note( $element, $note, $inst, $cmdref, $cmd );
+        return 'ok';
+    }
+
+    if ( defined $action and $action eq '~' ) {
+        $logger->debug("_load_check_list: clear list");
+
+        $self->_log_cmd($cmd, 'clearing %name.');
+        # valid for check_list or list
+        $element->clear();
         $self->_load_note( $element, $note, $inst, $cmdref, $cmd );
         return 'ok';
     }
@@ -1134,7 +1144,7 @@ Config::Model::Loader - Load serialized data into config tree
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 

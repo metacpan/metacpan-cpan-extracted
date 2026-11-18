@@ -483,6 +483,18 @@ subtest "summary method" => sub {
     is($s->fetch_summary, "Lorem ipsum dol...", "test summary on string with \n");
 };
 
+subtest "fetch gist method" => sub {
+    my $s = $root->fetch_element('string');
+    $s->store("Lorem ipsum dolor sit amet, consectetur adipiscing elit,");
+    is($s->fetch_gist, "Lorem ipsum dol...", "test gist on string");
+
+    $s->store("Lorem ipsum\ndolor sit amet, consectetur adipiscing elit,");
+    is($s->fetch_gist, "Lorem ipsum dol...", "test gist on string with \n");
+
+    my $ms = $root->fetch_element('mandatory_string');
+    is($ms->fetch_gist(), '', "fetch gist on empty mandatory value");
+};
+
 subtest "bounded number" => sub {
     my $nb = $root->fetch_element('bounded_number');
     ok( $nb, "created " . $nb->name );

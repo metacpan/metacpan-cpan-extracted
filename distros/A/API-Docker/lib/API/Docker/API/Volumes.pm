@@ -1,6 +1,6 @@
 package API::Docker::API::Volumes;
 # ABSTRACT: Docker Engine Volumes API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 with 'API::Docker::Role::Filters', 'API::Docker::Role::Using';
 use API::Docker::Role::Entity::Volume;
@@ -108,7 +108,7 @@ API::Docker::API::Volumes - Docker Engine Volumes API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -240,7 +240,7 @@ C<create> return
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -1,6 +1,6 @@
 package API::Docker::Type::NetworkingConfig;
 # ABSTRACT: The container's networking configuration for each of its interfaces
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::EndpointSettings;
 use namespace::clean;
@@ -23,7 +23,7 @@ API::Docker::Type::NetworkingConfig - The container's networking configuration f
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ and are never translated.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

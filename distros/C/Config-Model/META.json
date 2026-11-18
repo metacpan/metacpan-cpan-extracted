@@ -4,7 +4,7 @@
       "Dominique Dumont"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150013",
    "license" : [
       "lgpl_2_1"
    ],
@@ -125,9 +125,9 @@
          "web" : "http://github.com/dod38fr/config-model"
       }
    },
-   "version" : "2.168",
-   "x_generated_by_perl" : "v5.42.3",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.51",
+   "version" : "2.169",
+   "x_generated_by_perl" : "v5.44.0",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.80",
    "x_spdx_expression" : "LGPL-2.1"
 }
 

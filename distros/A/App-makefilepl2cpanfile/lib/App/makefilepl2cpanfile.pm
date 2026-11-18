@@ -19,11 +19,11 @@ App::makefilepl2cpanfile - Convert Makefile.PL to a cpanfile automatically
 
 =head1 VERSION
 
-This document describes App::makefilepl2cpanfile version 0.06.
+This document describes App::makefilepl2cpanfile version 0.07.
 
 =cut
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 # -----------------------------------------------------------------------
 # Constants
@@ -159,10 +159,10 @@ Readonly::Scalar my $SIMPLE_KEY_RE => qr/
 
 # Openers of dependency blocks: each captures its key in $1 and ends with
 # the '{', whose block _blocks() then takes from the matching-brace table.
-Readonly::Scalar my $SIMPLE_OPEN_RE  => qr/ \b ($SIMPLE_KEY_RE) \s*+ => \s*+ \{ /x;
-Readonly::Scalar my $PREREQS_OPEN_RE => qr/ \b (prereqs) \s*+ => \s*+ \{ /x;
+Readonly::Scalar my $SIMPLE_OPEN_RE  => qr/ \b ($SIMPLE_KEY_RE) ['"]? \s*+ => \s*+ \{ /x;
+Readonly::Scalar my $PREREQS_OPEN_RE => qr/ \b (prereqs) ['"]? \s*+ => \s*+ \{ /x;
 # A child of a prereqs or phase block: a phase or relationship name.
-Readonly::Scalar my $CHILD_OPEN_RE   => qr/ \b (\w++) \s*+ => \s*+ \{ /x;
+Readonly::Scalar my $CHILD_OPEN_RE   => qr/ \b (\w++) ['"]? \s*+ => \s*+ \{ /x;
 # The META spec 1.x top-level keys of %LEGACY_KEY, optionally quoted.
 Readonly::Scalar my $LEGACY_OPEN_RE  => qr/
 	\b ( requires | build_requires | configure_requires | recommends | suggests | conflicts )
@@ -276,7 +276,9 @@ thousands of unclosed braces) cannot make the tool hang.
 =over 4
 
 =item * C<PREREQ_PM>, C<BUILD_REQUIRES>, C<TEST_REQUIRES> and
-C<CONFIGURE_REQUIRES>.  These become C<requires> lines in the C<runtime>,
+C<CONFIGURE_REQUIRES>.  The key may be bare or in single or double quotes
+(C<'PREREQ_PM' =E<gt> { ... }>), and the same goes for C<prereqs>, its
+phase and relationship names, and C<MIN_PERL_VERSION>.  These become C<requires> lines in the C<runtime>,
 C<build>, C<test> and C<configure> phases.
 
 =item * C<prereqs =E<gt> { PHASE =E<gt> { RELATIONSHIP =E<gt> { ... } } }>
@@ -1169,7 +1171,7 @@ sub _extract_pairs {
 sub _parse_min_perl {
 	my $content = $_[0];
 	return undef if !defined $content || ref $content;	## no critic (ProhibitExplicitReturnUndef)
-	return undef unless $content =~ /\bMIN_PERL_VERSION\b\s*=>\s*$VALUE_TOKEN_RE/x;	## no critic (ProhibitExplicitReturnUndef)
+	return undef unless $content =~ /\bMIN_PERL_VERSION\b['"]?\s*=>\s*$VALUE_TOKEN_RE/x;	## no critic (ProhibitExplicitReturnUndef)
 	my $ver = $1 // $2 // $3;
 	return _valid_version($ver) ? $ver : undef;
 }

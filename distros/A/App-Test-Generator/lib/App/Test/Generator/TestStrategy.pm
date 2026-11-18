@@ -39,11 +39,11 @@ Readonly my $TEST_BOUNDARY        => 'boundary_tests';
 Readonly my $TEST_CHAINING        => 'chaining_test';
 Readonly my $TEST_BASIC           => 'basic_test';
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =head1 DESCRIPTION
 

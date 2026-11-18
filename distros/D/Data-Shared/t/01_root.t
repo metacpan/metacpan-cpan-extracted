@@ -2,6 +2,8 @@ use strict;
 use warnings;
 use Test::More;
 use File::Temp qw(tempdir);
+use lib 't/lib';
+use Backends qw(have);
 use Data::Shared qw(shared_get shared_set shared_exists shared_call);
 
 my $root = Data::Shared->new;
@@ -18,7 +20,7 @@ like $@, qr/no mount matches/, 'unknown mount error';
 
 subtest 'nested mounts longest prefix' => sub {
     my $r = Data::Shared->new;
-    plan skip_all => 'hashmap unavailable' unless eval { require Data::HashMap::Shared; 1 };
+    plan skip_all => 'hashmap unavailable' unless have('hashmap');
     $r->mount('cache', 'hashmap:ii', undef, 1000);
     my $h2 = $r->mount('cache/sessions', 'hashmap:ii', undef, 1000);
     shared_set($r, '/cache/1', 10);
@@ -111,7 +113,7 @@ subtest ':keywords not provided' => sub {
 
 subtest 'unmount and mount_info canonicalize the name mount accepts' => sub {
     my $r = Data::Shared->new;
-    plan skip_all => 'hashmap unavailable' unless eval { require Data::HashMap::Shared; 1 };
+    plan skip_all => 'hashmap unavailable' unless have('hashmap');
     $r->mount('/a/', 'hashmap:ii', undef, 16);
     is_deeply [$r->mounts], ['a'], 'mount installed the canonical name';
     ok $r->mount_info('/a/'), 'mount_info accepts the spelling mount took';

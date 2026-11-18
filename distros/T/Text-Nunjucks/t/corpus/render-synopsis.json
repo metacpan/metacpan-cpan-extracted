@@ -1,0 +1,20 @@
+[
+  {
+    "name": "SYNOPSIS of Text::Nunjucks (t/00-synopsis.t runs the POD example against this case)",
+    "template": "Hello {{ name | title }}\n{% for item in items %}\n- {{ item | upper }}\n{% endfor %}",
+    "context": {
+      "name": "world",
+      "items": [
+        "a",
+        "b<c"
+      ]
+    },
+    "opts": {
+      "trimBlocks": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "Hello World\n- A\n- B&lt;C\n"
+    }
+  }
+]

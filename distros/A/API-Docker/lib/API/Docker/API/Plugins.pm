@@ -1,6 +1,6 @@
 package API::Docker::API::Plugins;
 # ABSTRACT: Docker Engine Plugins API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 with 'API::Docker::Role::Filters', 'API::Docker::Role::RegistryAuth',
   'API::Docker::Role::Using';
@@ -243,7 +243,7 @@ API::Docker::API::Plugins - Docker Engine Plugins API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -695,7 +695,7 @@ a 200 event stream by L</install>, L</upgrade> and L</push>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

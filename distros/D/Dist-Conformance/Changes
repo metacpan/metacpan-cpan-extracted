@@ -1,5 +1,17 @@
 Revision history for Dist-Conformance
 
+0.006 2026-11-17 TEODESIAN
+    - The update of GitHooks installs each hook where git runs it from,
+      as git rev-parse --git-path hooks says, so it honors
+      core.hooksPath.  Before, it always wrote into the hooks directory of
+      the common git directory, which git does not read when
+      core.hooksPath is set.  So with a core.hooksPath of the tracked
+      directory, such as git-hooks, the update installed a copy that
+      nothing ran, and reported the install again whenever another
+      worktree had installed different bytes.  Now it finds the hooks
+      installed where they are tracked.  A checkout whose .git git cannot
+      read is now an error of git, not a checkout without hooks.
+
 0.005 2026-11-11 TEODESIAN
     - CriticProfile takes retired: a list of the policies that the
       standards have taken back.  The check fails a profile that still

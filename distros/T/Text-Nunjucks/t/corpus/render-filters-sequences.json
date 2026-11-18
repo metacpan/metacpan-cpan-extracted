@@ -1,0 +1,3532 @@
+[
+  {
+    "name": "sequences: first: undefined input",
+    "template": "[{{ u|first }}]",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading '0')"
+      }
+    }
+  },
+  {
+    "name": "sequences: first: null input",
+    "template": "[{{ n|first }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading '0')"
+      }
+    }
+  },
+  {
+    "name": "sequences: first: empty string",
+    "template": "[{{ ''|first }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: first: string",
+    "template": "[{{ 'abc'|first }}]|[{{ '42'|first }}]",
+    "expected": {
+      "ok": true,
+      "output": "[a]|[4]"
+    }
+  },
+  {
+    "name": "sequences: first: numbers",
+    "template": "[{{ z|first }}]|[{{ n|first }}]|[{{ f|first }}]",
+    "context": {
+      "z": 0,
+      "n": 42,
+      "f": 1.5
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]|[]"
+    }
+  },
+  {
+    "name": "sequences: first: booleans",
+    "template": "[{{ t|first }}]|[{{ f|first }}]",
+    "context": {
+      "t": true,
+      "f": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: first: empty array",
+    "template": "[{{ []|first }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: first: arrays",
+    "template": "[{{ [1,2,3]|first }}]|[{{ [[1,2],3]|first }}]|[{{ [{a:1}]|first }}]|[{{ [0]|first }}]|[{{ [false]|first }}]|[{{ [null]|first }}]|[{{ [\"\", 1]|first }}]",
+    "expected": {
+      "ok": true,
+      "output": "[1]|[1,2]|[[object Object]]|[0]|[false]|[]|[]"
+    }
+  },
+  {
+    "name": "sequences: first: array from context",
+    "template": "[{{ a|first }}]|[{{ b|first }}]",
+    "context": {
+      "a": [
+        null,
+        1
+      ],
+      "b": [
+        [],
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: first: object with key 0",
+    "template": "[{{ {\"0\":\"z\",\"1\":\"y\"}|first }}]|[{{ {a:1}|first }}]|[{{ o|first }}]|[{{ p|first }}]",
+    "context": {
+      "o": {
+        "a": 1
+      },
+      "p": {
+        "0": "zero"
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "[z]|[]|[]|[zero]"
+    }
+  },
+  {
+    "name": "sequences: first: astral string is a lone surrogate",
+    "template": "{{ ('😀x'|first)|length }}|{{ ('😀x'|first) == '😀' }}|{{ ('😀x'|first) == 'x' }}|{{ ('x😀'|first) }}",
+    "expected": {
+      "ok": true,
+      "output": "1|false|false|x"
+    }
+  },
+  {
+    "name": "sequences: first: combining character",
+    "template": "{{ ('éx'|first)|length }}|{{ 'éx'|first == 'e' }}|{{ 'ñ'|first }}",
+    "expected": {
+      "ok": true,
+      "output": "1|true|ñ"
+    }
+  },
+  {
+    "name": "sequences: first: extra argument ignored",
+    "template": "{{ [1,2]|first(9) }}|{{ [1,2]|first(x=1) }}",
+    "expected": {
+      "ok": true,
+      "output": "1|1"
+    }
+  },
+  {
+    "name": "sequences: first: SafeString has no index properties",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}[{{ m()|first }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: first: empty SafeString",
+    "template": "{% macro e() %}{% endmacro %}[{{ e()|first }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: first: autoescape on array element",
+    "template": "{{ [\"<b>\", 2]|first }}|{{ \"<b>\"|first }}",
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;|&lt;"
+    }
+  },
+  {
+    "name": "sequences: first: autoescape off",
+    "template": "{{ [\"<b>\", 2]|first }}",
+    "opts": {
+      "autoescape": false
+    },
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "<b>"
+    }
+  },
+  {
+    "name": "sequences: first: chained",
+    "template": "{{ [[3,4],[5]]|first|first }}|{{ \"abc\"|list|first }}|{{ [1,2,3]|reverse|first }}",
+    "expected": {
+      "ok": true,
+      "output": "3|a|3"
+    }
+  },
+  {
+    "name": "sequences: last: undefined input",
+    "template": "[{{ u|last }}]",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: last: null input",
+    "template": "[{{ n|last }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: last: empty string",
+    "template": "[{{ ''|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: last: string",
+    "template": "[{{ 'abc'|last }}]|[{{ '42'|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[c]|[2]"
+    }
+  },
+  {
+    "name": "sequences: last: numbers",
+    "template": "[{{ z|last }}]|[{{ n|last }}]",
+    "context": {
+      "z": 0,
+      "n": 42
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: last: booleans",
+    "template": "[{{ t|last }}]|[{{ f|last }}]",
+    "context": {
+      "t": true,
+      "f": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: last: empty array",
+    "template": "[{{ []|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: last: arrays",
+    "template": "[{{ [1,2,3]|last }}]|[{{ [1,[2,3]]|last }}]|[{{ [{a:1}]|last }}]|[{{ [0]|last }}]|[{{ [1,false]|last }}]|[{{ [1,null]|last }}]|[{{ [1,\"\"]|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[3]|[2,3]|[[object Object]]|[0]|[false]|[]|[]"
+    }
+  },
+  {
+    "name": "sequences: last: single element",
+    "template": "[{{ [7]|last }}]|[{{ \"x\"|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[7]|[x]"
+    }
+  },
+  {
+    "name": "sequences: last: dict with length key is array-like",
+    "template": "[{{ o|last }}]|[{{ {\"length\":2,\"1\":\"b\"}|last }}]|[{{ {a:1}|last }}]",
+    "context": {
+      "o": {
+        "2": "two",
+        "length": 3
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "[two]|[b]|[]"
+    }
+  },
+  {
+    "name": "sequences: last: astral string is a lone surrogate",
+    "template": "{{ ('x😀'|last)|length }}|{{ ('x😀'|last) == '😀' }}|{{ ('😀x'|last) }}",
+    "expected": {
+      "ok": true,
+      "output": "1|false|x"
+    }
+  },
+  {
+    "name": "sequences: last: combining character",
+    "template": "{{ ('xé'|last)|length }}|{{ 'xé'|last == 'e' }}",
+    "expected": {
+      "ok": true,
+      "output": "1|false"
+    }
+  },
+  {
+    "name": "sequences: last: SafeString length minus one is no index",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}[{{ m()|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: last: empty SafeString",
+    "template": "{% macro e() %}{% endmacro %}[{{ e()|last }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: last: autoescape",
+    "template": "{{ [1,\"<b>\"]|last }}|{{ \"a<\"|last }}",
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;|&lt;"
+    }
+  },
+  {
+    "name": "sequences: last: chained with first and reverse",
+    "template": "{{ [1,2,3]|reverse|last }}|{{ [[1,2],[3,4]]|last|last }}",
+    "expected": {
+      "ok": true,
+      "output": "1|4"
+    }
+  },
+  {
+    "name": "sequences: length: undefined input",
+    "template": "[{{ u|length }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[0]"
+    }
+  },
+  {
+    "name": "sequences: length: null input",
+    "template": "[{{ n|length }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[0]"
+    }
+  },
+  {
+    "name": "sequences: length: false input",
+    "template": "[{{ f|length }}]",
+    "context": {
+      "f": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[0]"
+    }
+  },
+  {
+    "name": "sequences: length: true input has no length",
+    "template": "[{{ t|length }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: length: empty string",
+    "template": "[{{ ''|length }}]",
+    "expected": {
+      "ok": true,
+      "output": "[0]"
+    }
+  },
+  {
+    "name": "sequences: length: number input has no length",
+    "template": "[{{ z|length }}]|[{{ n|length }}]|[{{ f|length }}]",
+    "context": {
+      "z": 0,
+      "n": 42,
+      "f": 1.5
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]|[]"
+    }
+  },
+  {
+    "name": "sequences: length: NaN input",
+    "template": "[{{ (0/0)|length }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: length: strings",
+    "template": "{{ 'abc'|length }}|{{ '42'|length }}|{{ ' '|length }}|{{ 'a b'|length }}|{{ 'ñ'|length }}",
+    "expected": {
+      "ok": true,
+      "output": "3|2|1|3|1"
+    }
+  },
+  {
+    "name": "sequences: length: arrays",
+    "template": "{{ []|length }}|{{ [1]|length }}|{{ [1,2,3]|length }}|{{ [[1,2],[3]]|length }}|{{ [null,null]|length }}|{{ [[]]|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|1|3|2|2|1"
+    }
+  },
+  {
+    "name": "sequences: length: dicts count keys",
+    "template": "{{ {}|length }}|{{ {a:1}|length }}|{{ {a:1,b:2}|length }}|{{ {\"length\":5}|length }}|{{ {a:null}|length }}|{{ {a:{b:1,c:2} }|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|1|2|1|1|1"
+    }
+  },
+  {
+    "name": "sequences: length: context objects",
+    "template": "{{ o|length }}|{{ e|length }}|{{ n|length }}",
+    "context": {
+      "o": {
+        "x": 1,
+        "y": 2,
+        "z": 3
+      },
+      "e": {},
+      "n": {
+        "a": {
+          "b": 1
+        }
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "3|0|1"
+    }
+  },
+  {
+    "name": "sequences: length: integer-like keys",
+    "template": "{{ {\"2\":\"b\",\"1\":\"a\"}|length }}|{{ o|length }}",
+    "context": {
+      "o": {
+        "1": 2,
+        "3": 1,
+        "x": 3
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "2|3"
+    }
+  },
+  {
+    "name": "sequences: length: astral and combining characters count code units",
+    "template": "{{ '😀'|length }}|{{ 'a😀b'|length }}|{{ 'é'|length }}|{{ '👨‍👩‍👧'|length }}|{{ '𐐨'|length }}|{{ 'héllo😀'|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2|4|2|8|2|7"
+    }
+  },
+  {
+    "name": "sequences: length: lone surrogates after reverse",
+    "template": "{{ ('😀'|reverse)|length }}|{{ ('😀'|reverse) == '😀' }}|{{ ('a😀'|reverse)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2|false|3"
+    }
+  },
+  {
+    "name": "sequences: length: SafeString is a string length not a key count",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% macro e() %}{% endmacro %}{% macro a() %}😀é{% endmacro %}{{ m()|length }}|{{ e()|length }}|{{ a()|length }}",
+    "expected": {
+      "ok": true,
+      "output": "9|0|3"
+    }
+  },
+  {
+    "name": "sequences: length: kwargs ignored",
+    "template": "{{ [1,2]|length(x=1) }}|{{ [1,2]|length(5) }}",
+    "expected": {
+      "ok": true,
+      "output": "2|2"
+    }
+  },
+  {
+    "name": "sequences: length: of filter results",
+    "template": "{{ \"abc\"|list|length }}|{{ [1,2,3]|batch(2)|length }}|{{ [1,2,3]|slice(2)|length }}|{{ [1,2,3]|reverse|length }}",
+    "expected": {
+      "ok": true,
+      "output": "3|2|2|3"
+    }
+  },
+  {
+    "name": "sequences: length: usable in expressions",
+    "template": "{% if \"ab\"|length > 1 %}yes{% endif %}|{{ (\"ab\"|length) + 1 }}|{{ u|length == 0 }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "yes|3|true"
+    }
+  },
+  {
+    "name": "sequences: length: map-like with length property is a key count",
+    "template": "{{ {\"length\":0,\"0\":\"a\"}|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2"
+    }
+  },
+  {
+    "name": "sequences: list: string",
+    "template": "{{ 'abc'|list }}|{{ ''|list|length }}|{{ '42'|list }}|{{ ' a '|list|length }}",
+    "expected": {
+      "ok": true,
+      "output": "a,b,c|0|4,2|3"
+    }
+  },
+  {
+    "name": "sequences: list: string items",
+    "template": "{% for c in 'a b'|list %}[{{ c }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[a][ ][b]"
+    }
+  },
+  {
+    "name": "sequences: list: astral string splits surrogates",
+    "template": "{% set l = '😀'|list %}{{ l|length }}|{{ l[0]|length }}|{{ l[0] == '😀' }}|{{ l[0] == l[1] }}|{{ l|join == '😀' }}",
+    "expected": {
+      "ok": true,
+      "output": "2|1|false|false|true"
+    }
+  },
+  {
+    "name": "sequences: list: astral string among ascii",
+    "template": "{% set l = 'a😀b'|list %}{{ l|length }}|{{ l|first }}|{{ l|last }}|{{ l[1]|length }}",
+    "expected": {
+      "ok": true,
+      "output": "4|a|b|1"
+    }
+  },
+  {
+    "name": "sequences: list: combining character",
+    "template": "{% set l = 'éx'|list %}{{ l|length }}|{{ l[0] }}|{{ l[1]|length }}|{{ l[2] }}",
+    "expected": {
+      "ok": true,
+      "output": "3|e|1|x"
+    }
+  },
+  {
+    "name": "sequences: list: object becomes key value pairs",
+    "template": "{% for p in {a:1,b:2}|list %}{{ p.key }}={{ p.value }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "a=1;b=2;"
+    }
+  },
+  {
+    "name": "sequences: list: empty object",
+    "template": "{{ {}|list|length }}|{{ o|list|length }}",
+    "context": {
+      "o": {}
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: list: context object",
+    "template": "{% for p in o|list %}{{ p.key }}={{ p.value }};{% endfor %}|{% for p in {x:1,y:\"two\",z:[3],w:null,v:{q:1} }|list %}{{ p.key }}={{ p.value }};{% endfor %}",
+    "context": {
+      "o": {
+        "x": [
+          3
+        ]
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "x=3;|x=1;y=two;z=3;w=;v=[object Object];"
+    }
+  },
+  {
+    "name": "sequences: list: pair shape",
+    "template": "{% set l = {a:1}|list %}{{ l|length }}|{{ l[0]|length }}|{{ l[0].key }}|{{ l[0].value }}|{{ l[0][0] }}",
+    "expected": {
+      "ok": true,
+      "output": "1|2|a|1|"
+    }
+  },
+  {
+    "name": "sequences: list: nested object value kept",
+    "template": "{% for p in o|list %}{{ p.key }}:{{ p.value.n }};{% endfor %}",
+    "context": {
+      "o": {
+        "a": {
+          "n": 1
+        }
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "a:1;"
+    }
+  },
+  {
+    "name": "sequences: list: key named length or val",
+    "template": "{% for p in o|list %}{{ p.key }}={{ p.value }};{% endfor %}|{% for p in {length:2,val:\"v\"}|list %}{{ p.key }}={{ p.value }};{% endfor %}",
+    "context": {
+      "o": {
+        "length": 2
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "length=2;|length=2;val=v;"
+    }
+  },
+  {
+    "name": "sequences: list: integer-like keys come first numerically",
+    "template": "{% for p in {\"b\":1,\"10\":2,\"9\":3}|list %}{{ p.key }};{% endfor %}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "9;10;b;"
+    }
+  },
+  {
+    "name": "sequences: list: integer-like keys from context",
+    "template": "{% for p in o|list %}{{ p.key }}={{ p.value }};{% endfor %}",
+    "context": {
+      "o": {
+        "9": 3,
+        "10": 2,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "9=3;10=2;b=1;"
+    }
+  },
+  {
+    "name": "sequences: list: array returned as is",
+    "template": "{{ [1,2,3]|list }}|{{ []|list|length }}|{{ [[1],[2]]|list|length }}|{{ [null]|list|length }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2,3|0|2|1"
+    }
+  },
+  {
+    "name": "sequences: list: array identity",
+    "template": "{% set a = [1,2] %}{% set l = a|list %}{{ l == a }}|{{ l === a }}",
+    "expected": {
+      "ok": true,
+      "output": "true|true"
+    }
+  },
+  {
+    "name": "sequences: list: undefined input throws",
+    "template": "[{{ u|list }}]",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: list filter: type not iterable"
+      }
+    }
+  },
+  {
+    "name": "sequences: list: null input throws",
+    "template": "[{{ n|list }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: list filter: type not iterable"
+      }
+    }
+  },
+  {
+    "name": "sequences: list: number input throws",
+    "template": "[{{ n|list }}]",
+    "context": {
+      "n": 42
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: list filter: type not iterable"
+      }
+    }
+  },
+  {
+    "name": "sequences: list: zero input throws",
+    "template": "[{{ n|list }}]",
+    "context": {
+      "n": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: list filter: type not iterable"
+      }
+    }
+  },
+  {
+    "name": "sequences: list: true input throws",
+    "template": "[{{ n|list }}]",
+    "context": {
+      "n": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: list filter: type not iterable"
+      }
+    }
+  },
+  {
+    "name": "sequences: list: false input throws",
+    "template": "[{{ n|list }}]",
+    "context": {
+      "n": false
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  Template render error: list filter: type not iterable"
+      }
+    }
+  },
+  {
+    "name": "sequences: list: SafeString is an object with val and length entries",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% for p in m()|list %}{{ p.key }}={{ p.value }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "val=&lt;b&gt;ab&lt;/b&gt;;length=9;"
+    }
+  },
+  {
+    "name": "sequences: list: SafeString entry count",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% macro e() %}{% endmacro %}{{ m()|list|length }}|{{ e()|list|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2|2"
+    }
+  },
+  {
+    "name": "sequences: list: kwargs ignored",
+    "template": "{{ 'ab'|list(x=1) }}|{{ [1]|list(5) }}",
+    "expected": {
+      "ok": true,
+      "output": "a,b|1"
+    }
+  },
+  {
+    "name": "sequences: list: chained",
+    "template": "{{ 'abc'|list|reverse|join }}|{{ 'abc'|list|first }}|{{ {a:1}|list|first|length }}",
+    "expected": {
+      "ok": true,
+      "output": "cba|a|2"
+    }
+  },
+  {
+    "name": "sequences: random: one element array",
+    "template": "{{ [7]|random }}|{{ [\"x\"]|random }}|{{ [null]|random }}|{{ [[1,2]]|random }}|{{ [0]|random }}",
+    "expected": {
+      "ok": true,
+      "output": "7|x||1,2|0"
+    }
+  },
+  {
+    "name": "sequences: random: one character string",
+    "template": "{{ 'q'|random }}|{{ '4'|random }}",
+    "expected": {
+      "ok": true,
+      "output": "q|4"
+    }
+  },
+  {
+    "name": "sequences: random: membership in array",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ ((arr|random) in arr) }},{% endfor %}",
+    "context": {
+      "arr": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,"
+    }
+  },
+  {
+    "name": "sequences: random: membership in literal array",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ ([\"a\",\"b\",\"c\"]|random) in [\"a\",\"b\",\"c\"] }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,"
+    }
+  },
+  {
+    "name": "sequences: random: membership in string",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ (s|random) in s }},{% endfor %}",
+    "context": {
+      "s": "abcdef"
+    },
+    "expected": {
+      "ok": true,
+      "output": "true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,"
+    }
+  },
+  {
+    "name": "sequences: random: never undefined for a non-empty array",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{% if (arr|random) is defined %}.{% else %}X{% endif %}{% endfor %}",
+    "context": {
+      "arr": [
+        0,
+        false,
+        "",
+        null
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "........................................"
+    }
+  },
+  {
+    "name": "sequences: random: two element array stays in bounds",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ ([\"x\",\"y\"]|random) in [\"x\",\"y\"] }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,true,"
+    }
+  },
+  {
+    "name": "sequences: random: empty array",
+    "template": "[{{ []|random }}]|[{{ e|random }}]",
+    "context": {
+      "e": []
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: random: empty string",
+    "template": "[{{ ''|random }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: random: undefined input throws",
+    "template": "[{{ u|random }}]",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: random: null input throws",
+    "template": "[{{ n|random }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: random: number input has no elements",
+    "template": "[{{ n|random }}]|[{{ z|random }}]",
+    "context": {
+      "n": 5,
+      "z": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: random: true input has no elements",
+    "template": "[{{ t|random }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: random: dict input has no elements",
+    "template": "[{{ {a:1}|random }}]|[{{ o|random }}]",
+    "context": {
+      "o": {
+        "x": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: random: array-like dict",
+    "template": "{{ {\"length\":1,\"0\":\"only\"}|random }}",
+    "expected": {
+      "ok": true,
+      "output": "only"
+    }
+  },
+  {
+    "name": "sequences: random: astral string yields one code unit",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ ('😀'|random)|length }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "11111111111111111111"
+    }
+  },
+  {
+    "name": "sequences: random: astral string yields half of the pair",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ (('😀'|random) == '😀') }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,false,"
+    }
+  },
+  {
+    "name": "sequences: random: combining string yields one code unit",
+    "template": "{% for i in [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1] %}{{ ('é'|random)|length }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "11111111111111111111"
+    }
+  },
+  {
+    "name": "sequences: random: SafeString has no index properties",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}[{{ m()|random }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: random: autoescape of the picked element",
+    "template": "{{ [\"<b>\"]|random }}|{{ \"<\"|random }}",
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;|&lt;"
+    }
+  },
+  {
+    "name": "sequences: random: kwargs ignored",
+    "template": "{{ [3]|random(x=1) }}|{{ [4]|random(2) }}",
+    "expected": {
+      "ok": true,
+      "output": "3|4"
+    }
+  },
+  {
+    "name": "sequences: reverse: string",
+    "template": "{{ 'abc'|reverse }}|{{ ''|reverse }}|[{{ 'a b'|reverse }}]|{{ '123'|reverse }}|{{ 'a'|reverse }}",
+    "expected": {
+      "ok": true,
+      "output": "cba||[b a]|321|a"
+    }
+  },
+  {
+    "name": "sequences: reverse: array",
+    "template": "{{ [1,2,3]|reverse }}|{{ []|reverse }}|{{ [1]|reverse }}|{{ [1,[2,3]]|reverse }}|{{ [null,1]|reverse }}|{{ [0,false,\"\"]|reverse|length }}",
+    "expected": {
+      "ok": true,
+      "output": "3,2,1||1|2,3,1|1,|3"
+    }
+  },
+  {
+    "name": "sequences: reverse: array result elements",
+    "template": "{% for x in [1,\"b\",[3]]|reverse %}[{{ x }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[3][b][1]"
+    }
+  },
+  {
+    "name": "sequences: reverse: original array is copied not mutated",
+    "template": "{% set a = [1,2,3] %}{{ a|reverse }}|{{ a }}|{{ a|reverse|reverse }}|{{ a }}",
+    "expected": {
+      "ok": true,
+      "output": "3,2,1|1,2,3|1,2,3|1,2,3"
+    }
+  },
+  {
+    "name": "sequences: reverse: context array is not mutated",
+    "template": "{{ a|reverse }}|{{ a }}",
+    "context": {
+      "a": [
+        1,
+        2,
+        3
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "3,2,1|1,2,3"
+    }
+  },
+  {
+    "name": "sequences: reverse: result is a fresh array",
+    "template": "{% set a = [1,2] %}{% set r = a|reverse %}{{ r == a }}|{{ r === a }}",
+    "expected": {
+      "ok": true,
+      "output": "false|false"
+    }
+  },
+  {
+    "name": "sequences: reverse: astral string splits surrogates",
+    "template": "{{ ('😀'|reverse)|length }}|{{ ('😀'|reverse) == '😀' }}|{{ ('a😀b'|reverse)|length }}|{{ ('a😀b'|reverse)|first }}|{{ ('a😀b'|reverse)|last }}",
+    "expected": {
+      "ok": true,
+      "output": "2|false|4|b|a"
+    }
+  },
+  {
+    "name": "sequences: reverse: double reverse restores the pair",
+    "template": "{{ 'a😀b'|reverse|reverse }}|{{ '😀😀'|reverse|reverse == '😀😀' }}|{{ 'x😀'|reverse|reverse|length }}",
+    "expected": {
+      "ok": true,
+      "output": "a😀b|true|3"
+    }
+  },
+  {
+    "name": "sequences: reverse: combining character",
+    "template": "{{ ('xé'|reverse)|length }}|{{ 'éx'|reverse == 'xé' }}|{{ 'éx'|reverse == 'x́e' }}",
+    "expected": {
+      "ok": true,
+      "output": "3|false|true"
+    }
+  },
+  {
+    "name": "sequences: reverse: astral list via list",
+    "template": "{{ 'a😀'|list|reverse|length }}|{{ 'a😀'|list|reverse|first|length }}",
+    "expected": {
+      "ok": true,
+      "output": "3|1"
+    }
+  },
+  {
+    "name": "sequences: reverse: undefined input",
+    "template": "[{{ u|reverse }}]|{{ u|reverse|length }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]|0"
+    }
+  },
+  {
+    "name": "sequences: reverse: null input",
+    "template": "[{{ n|reverse }}]|{{ n|reverse|length }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|0"
+    }
+  },
+  {
+    "name": "sequences: reverse: number input",
+    "template": "[{{ n|reverse }}]|{{ n|reverse|length }}|[{{ z|reverse }}]",
+    "context": {
+      "n": 42,
+      "z": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|0|[]"
+    }
+  },
+  {
+    "name": "sequences: reverse: boolean input",
+    "template": "[{{ t|reverse }}]|{{ t|reverse|length }}|{{ f|reverse|length }}",
+    "context": {
+      "t": true,
+      "f": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|0|0"
+    }
+  },
+  {
+    "name": "sequences: reverse: dict input",
+    "template": "[{{ {a:1}|reverse }}]|{{ {a:1}|reverse|length }}|{{ o|reverse|length }}",
+    "context": {
+      "o": {
+        "x": 1,
+        "y": 2
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|0|0"
+    }
+  },
+  {
+    "name": "sequences: reverse: array-like dict with length",
+    "template": "{% for x in {\"length\":3,\"0\":\"a\",\"1\":\"b\",\"2\":\"c\"}|reverse %}[{{ x }}]{% endfor %}|{{ {\"length\":2}|reverse|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[c][b][a]|2"
+    }
+  },
+  {
+    "name": "sequences: reverse: SafeString is not a string and loses its text",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}[{{ m()|reverse }}]|{{ m()|reverse|length }}|{{ m()|reverse|first }}",
+    "expected": {
+      "ok": true,
+      "output": "[,,,,,,,,]|9|"
+    }
+  },
+  {
+    "name": "sequences: reverse: empty SafeString",
+    "template": "{% macro e() %}{% endmacro %}[{{ e()|reverse }}]|{{ e()|reverse|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[]|0"
+    }
+  },
+  {
+    "name": "sequences: reverse: autoescape on plain string",
+    "template": "{{ '<b>'|reverse }}|{{ 'a&b'|reverse }}",
+    "expected": {
+      "ok": true,
+      "output": "&gt;b&lt;|b&amp;a"
+    }
+  },
+  {
+    "name": "sequences: reverse: autoescape off plain string",
+    "template": "{{ '<b>'|reverse }}",
+    "opts": {
+      "autoescape": false
+    },
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": ">b<"
+    }
+  },
+  {
+    "name": "sequences: reverse: reversed string is not safe",
+    "template": "{{ '<b>'|reverse|length }}|{{ '<b>'|reverse == '>b<' }}",
+    "expected": {
+      "ok": true,
+      "output": "3|true"
+    }
+  },
+  {
+    "name": "sequences: reverse: markup string made safe stays safe",
+    "template": "{{ '<b>ab'|safe|reverse }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": ",,,,"
+    }
+  },
+  {
+    "name": "sequences: reverse: kwargs ignored",
+    "template": "{{ 'ab'|reverse(x=1) }}|{{ [1,2]|reverse(5) }}",
+    "expected": {
+      "ok": true,
+      "output": "ba|2,1"
+    }
+  },
+  {
+    "name": "sequences: reverse: reverse of list of an object",
+    "template": "{% for p in {a:1,b:2}|list|reverse %}{{ p.key }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "b;a;"
+    }
+  },
+  {
+    "name": "sequences: reverse: reverse of integer keyed object list",
+    "template": "{% for p in o|list|reverse %}{{ p.key }};{% endfor %}",
+    "context": {
+      "o": {
+        "9": 3,
+        "10": 2,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "b;10;9;"
+    }
+  },
+  {
+    "name": "sequences: reverse: reverse of integer keyed literal dict list",
+    "template": "{% for p in {\"b\":1,\"10\":2,\"9\":3}|list|reverse %}{{ p.key }};{% endfor %}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "b;10;9;"
+    }
+  },
+  {
+    "name": "sequences: reverse: numeric strings stay strings",
+    "template": "{{ '12'|reverse }}|{{ ('12'|reverse) + 1 }}|{{ ('12'|reverse)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "21|211|2"
+    }
+  },
+  {
+    "name": "sequences: slice: documented example",
+    "template": "{% for r in [1,2,3,4,5,6,7]|slice(3) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5][6,7]"
+    }
+  },
+  {
+    "name": "sequences: slice: documented example with fill",
+    "template": "{% for r in [1,2,3,4,5,6,7]|slice(3, \"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5,x][6,7,x]"
+    }
+  },
+  {
+    "name": "sequences: slice: even split",
+    "template": "{% for r in [1,2,3,4,5,6]|slice(3) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5,6]|slice(3, \"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5,6]|[1,2,x][3,4,x][5,6,x]"
+    }
+  },
+  {
+    "name": "sequences: slice: one slice",
+    "template": "{% for r in [1,2,3,4,5,6,7]|slice(1) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5,6,7]|slice(1,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5,6,7]|[1,2,3,4,5,6,7,x]"
+    }
+  },
+  {
+    "name": "sequences: slice: as many slices as elements",
+    "template": "{% for r in [1,2,3]|slice(3) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(3,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1][2][3]|[1,x][2,x][3,x]"
+    }
+  },
+  {
+    "name": "sequences: slice: more slices than elements",
+    "template": "{% for r in [1,2]|slice(5) %}[{{ r }}]{% endfor %}|{% for r in [1,2]|slice(5,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1][2][][][]|[1][2][x][x][x]"
+    }
+  },
+  {
+    "name": "sequences: slice: slices larger than the length by far",
+    "template": "{% for r in [1]|slice(4) %}[{{ r }}]{% endfor %}|{{ [1]|slice(4,\"-\")|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1][][][]|4"
+    }
+  },
+  {
+    "name": "sequences: slice: empty array",
+    "template": "{{ []|slice(2)|length }}|{% for r in []|slice(2) %}[{{ r }}]{% endfor %}|{% for r in []|slice(2,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "2|[][]|[x][x]"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count zero",
+    "template": "{{ [1,2,3]|slice(0)|length }}|{{ [1,2,3]|slice(0,\"x\")|length }}|{{ []|slice(0)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count negative",
+    "template": "{{ [1,2,3]|slice(-1)|length }}|{{ [1,2,3]|slice(-3,\"x\")|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count NaN",
+    "template": "{{ [1,2,3]|slice(0/0)|length }}|{{ [1,2,3]|slice(n)|length }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count missing",
+    "template": "{{ [1,2,3]|slice|length }}|{{ [1,2,3]|slice(u)|length }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count null",
+    "template": "{{ [1,2,3]|slice(n)|length }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count a numeric string",
+    "template": "{% for r in [1,2,3,4,5]|slice(\"2\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|slice(\" 2 \", \"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5]|[1,2,3][4,5,x]"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count a non-numeric string",
+    "template": "{{ [1,2,3]|slice(\"x\")|length }}|{{ [1,2,3]|slice(\"\")|length }}|{{ [1,2,3]|slice(\"2x\")|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count true",
+    "template": "{% for r in [1,2,3]|slice(true) %}[{{ r }}]{% endfor %}|{{ [1,2,3]|slice(false)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3]|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count an array",
+    "template": "{% for r in [1,2,3,4]|slice([2]) %}[{{ r }}]{% endfor %}|{{ [1,2,3]|slice([])|length }}|{{ [1,2,3]|slice([1,2])|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4]|0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count fractional",
+    "template": "{% for r in [1,2,3,4,5,6,7]|slice(2.5) %}[{{ r }}]{% endfor %}|{{ [1,2,3,4,5]|slice(1.5)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5,6][7]|2"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count fractional with fill",
+    "template": "{% for r in [1,2,3,4,5,6,7]|slice(2.5,\"x\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(0.5,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5,6][7,x]|[1,2,3,x]"
+    }
+  },
+  {
+    "name": "sequences: slice: slice count fractional below one",
+    "template": "{{ [1,2,3]|slice(0.3)|length }}|{% for r in [1,2,3]|slice(0.9) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1|[1,2,3]"
+    }
+  },
+  {
+    "name": "sequences: slice: fillWith falsy values add nothing",
+    "template": "{% for r in [1,2,3]|slice(2,0) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,\"\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,false) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,null) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,u) %}[{{ r }}]{% endfor %}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3]|[1,2][3]|[1,2][3]|[1,2][3]|[1,2][3]"
+    }
+  },
+  {
+    "name": "sequences: slice: fillWith NaN adds nothing",
+    "template": "{% for r in [1,2,3]|slice(2,0/0) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3]"
+    }
+  },
+  {
+    "name": "sequences: slice: fillWith truthy values",
+    "template": "{% for r in [1,2,3]|slice(2,\"0\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,1) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,true) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,\" \") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,[]) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,[0]) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3]|slice(2,{}) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,0]|[1,2][3,1]|[1,2][3,true]|[1,2][3, ]|[1,2][3,]|[1,2][3,0]|[1,2][3,[object Object]]"
+    }
+  },
+  {
+    "name": "sequences: slice: fillWith object is the same reference",
+    "template": "{% set f = [9] %}{% for r in [1,2,3]|slice(2,f) %}{{ r|last === f }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "falsetrue"
+    }
+  },
+  {
+    "name": "sequences: slice: fill only the short slices",
+    "template": "{% for r in [1,2,3,4,5]|slice(3,\"-\") %}[{{ r|length }}:{{ r|last }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[2:2][2:4][2:-]"
+    }
+  },
+  {
+    "name": "sequences: slice: nested arrays and elements kept",
+    "template": "{% for r in [[1,2],[3],{a:1},null]|slice(2) %}[{{ r|length }}:{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[2:1,2,3][2:[object Object],]"
+    }
+  },
+  {
+    "name": "sequences: slice: slices are fresh arrays",
+    "template": "{% set a = [1,2,3,4] %}{% set s = a|slice(2) %}{{ s[0] == a }}|{{ a }}|{{ s|length }}",
+    "expected": {
+      "ok": true,
+      "output": "false|1,2,3,4|2"
+    }
+  },
+  {
+    "name": "sequences: slice: string input",
+    "template": "{% for r in 'abcdefg'|slice(3) %}[{{ r }}]{% endfor %}|{% for r in 'abcdef'|slice(3) %}[{{ r }}]{% endfor %}|{{ ''|slice(2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[abc][de][fg]|[ab][cd][ef]|2"
+    }
+  },
+  {
+    "name": "sequences: slice: string input with more slices than characters",
+    "template": "{% for r in 'ab'|slice(4) %}[{{ r }}]{% endfor %}|{{ 'ab'|slice(4)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[a][b][][]|4"
+    }
+  },
+  {
+    "name": "sequences: slice: string input with falsy fill",
+    "template": "{% for r in 'abcde'|slice(2,0) %}[{{ r }}]{% endfor %}|{% for r in 'abcde'|slice(2,'') %}[{{ r }}]{% endfor %}|{% for r in 'abcde'|slice(2,null) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[abc][de]|[abc][de]|[abc][de]"
+    }
+  },
+  {
+    "name": "sequences: slice: string input with fill throws on push",
+    "template": "{{ 'abcdef'|slice(3,'x') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: currSlice.push is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: string input fill throws even when sliced evenly",
+    "template": "{{ 'abcd'|slice(2,'x') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: currSlice.push is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: string input fill throws on first short slice",
+    "template": "{{ 'abcde'|slice(2,'x') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: currSlice.push is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: string input fill with a number throws",
+    "template": "{{ 'abc'|slice(2,1) }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: currSlice.push is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: empty string with fill throws",
+    "template": "{{ ''|slice(2,'x') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: currSlice.push is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: string with zero slices needs no push",
+    "template": "{{ 'abc'|slice(0,'x')|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "sequences: slice: astral string split in the middle of a pair",
+    "template": "{% for r in '😀😀'|slice(2) %}[{{ r|length }}]{% endfor %}|{% for r in '😀😀'|slice(3) %}[{{ r|length }}]{% endfor %}|{% for r in '😀😀'|slice(4) %}[{{ r|length }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[2][2]|[2][1][1]|[1][1][1][1]"
+    }
+  },
+  {
+    "name": "sequences: slice: astral string slices that stay valid",
+    "template": "{% for r in '😀😀'|slice(2) %}[{{ r }}]{% endfor %}|{{ ('😀😀'|slice(2))[0] == '😀' }}|{% for r in 'a😀b'|slice(2) %}[{{ r|length }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[😀][😀]|true|[2][2]"
+    }
+  },
+  {
+    "name": "sequences: slice: astral string cut observed by equality",
+    "template": "{% set s = '😀😀'|slice(3) %}{{ s[0] == '😀' }}|{{ s[1] == s[2] }}|{{ (s[1] + s[2]) == '😀' }}|{{ s|join == '😀😀' }}",
+    "expected": {
+      "ok": true,
+      "output": "true|false|true|true"
+    }
+  },
+  {
+    "name": "sequences: slice: combining character",
+    "template": "{% for r in 'éxy'|slice(2) %}[{{ r|length }}]{% endfor %}|{% for r in 'é'|slice(2) %}[{{ r|length }}]{% endfor %}|{{ ('é'|slice(2))[0] == 'e' }}",
+    "expected": {
+      "ok": true,
+      "output": "[2][2]|[1][1]|true"
+    }
+  },
+  {
+    "name": "sequences: slice: undefined input throws",
+    "template": "{{ u|slice(2) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: null input throws",
+    "template": "{{ n|slice(2) }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: number input throws",
+    "template": "{{ n|slice(2) }}",
+    "context": {
+      "n": 42
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.slice is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: zero input throws",
+    "template": "{{ n|slice(2) }}",
+    "context": {
+      "n": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.slice is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: true input throws",
+    "template": "{{ n|slice(2) }}",
+    "context": {
+      "n": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.slice is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: false input throws",
+    "template": "{{ n|slice(2) }}",
+    "context": {
+      "n": false
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.slice is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: dict input throws",
+    "template": "{{ {a:1}|slice(2) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.slice is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: context dict input throws",
+    "template": "{{ o|slice(2) }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.slice is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: dict input with slice count zero has no loop",
+    "template": "{{ {a:1}|slice(0)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "sequences: slice: number input with slice count NaN has no loop",
+    "template": "{{ n|slice(u)|length }}|{{ n|slice(0)|length }}",
+    "context": {
+      "n": 5
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: slice: SafeString slices like a string",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% for r in m()|slice(3) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[&lt;b&gt;][ab&lt;][/b&gt;]"
+    }
+  },
+  {
+    "name": "sequences: slice: SafeString slices are plain strings",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% for r in m()|slice(2) %}[{{ r|length }}]{% endfor %}|{{ m()|slice(2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[5][4]|2"
+    }
+  },
+  {
+    "name": "sequences: slice: SafeString with fill throws",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ m()|slice(2,'x') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: currSlice.push is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: slice: empty SafeString",
+    "template": "{% macro e() %}{% endmacro %}{{ e()|slice(2)|length }}|{% for r in e()|slice(2) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "2|[][]"
+    }
+  },
+  {
+    "name": "sequences: slice: kwargs as slice count",
+    "template": "{{ [1,2,3]|slice(slices=2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "sequences: slice: kwargs as fillWith is a truthy object",
+    "template": "{% for r in [1,2,3]|slice(2, fillWith=\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,[object Object]]"
+    }
+  },
+  {
+    "name": "sequences: slice: kwargs after positional fill",
+    "template": "{% for r in [1,2,3]|slice(2, \"y\", z=1) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,y]"
+    }
+  },
+  {
+    "name": "sequences: slice: result of slice then batch and join",
+    "template": "{{ [1,2,3,4,5]|slice(2)|first|join(\"+\") }}|{{ [1,2,3,4,5]|slice(2)|last|join(\"+\") }}",
+    "expected": {
+      "ok": true,
+      "output": "1+2+3|4+5"
+    }
+  },
+  {
+    "name": "sequences: batch: documented example",
+    "template": "{% for r in [1,2,3,4,5]|batch(2) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5]"
+    }
+  },
+  {
+    "name": "sequences: batch: with fill",
+    "template": "{% for r in [1,2,3,4,5]|batch(2, \"x\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3, \"-\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5,x]|[1,2,3][4,5,-]"
+    }
+  },
+  {
+    "name": "sequences: batch: even split gets no fill",
+    "template": "{% for r in [1,2,3,4]|batch(2, \"x\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4]|batch(4, \"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4]|[1,2,3,4]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count one",
+    "template": "{% for r in [1,2,3,4,5]|batch(1) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(1,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1][2][3][4][5]|[1][2][3][4][5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count larger than the array",
+    "template": "{% for r in [1,2,3,4,5]|batch(9) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(9,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|[1,2,3,4,5,x,x,x,x]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count equal to the length",
+    "template": "{% for r in [1,2,3,4,5]|batch(5) %}[{{ r }}]{% endfor %}|{{ [1,2,3,4,5]|batch(5,\"x\")|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|1"
+    }
+  },
+  {
+    "name": "sequences: batch: empty array",
+    "template": "{{ []|batch(2)|length }}|{{ []|batch(2,\"x\")|length }}|{{ []|batch(0)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "0|0|0"
+    }
+  },
+  {
+    "name": "sequences: batch: line count zero keeps one batch",
+    "template": "{% for r in [1,2,3,4,5]|batch(0) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(0,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|[1,2,3,4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count negative splits by absolute value without fill",
+    "template": "{% for r in [1,2,3,4,5]|batch(-2) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(-2,\"x\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(-1) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(-9,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5]|[1,2][3,4][5]|[1][2][3][4][5]|[1,2,3,4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count NaN",
+    "template": "{% for r in [1,2,3,4,5]|batch(0/0) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(0/0,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|[1,2,3,4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count missing",
+    "template": "{% for r in [1,2,3,4,5]|batch %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(u) %}[{{ r }}]{% endfor %}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|[1,2,3,4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count null",
+    "template": "{% for r in [1,2,3,4,5]|batch(n) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(n,\"x\") %}[{{ r }}]{% endfor %}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|[1,2,3,4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count a numeric string",
+    "template": "{% for r in [1,2,3,4,5]|batch(\"2\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(\"3\",\"x\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(\" 2 \") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5]|[1,2,3][4,5,x]|[1,2][3,4][5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count a non-numeric string",
+    "template": "{% for r in [1,2,3,4,5]|batch(\"x\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(\"\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(\"2x\",\"y\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5]|[1,2,3,4,5]|[1,2,3,4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count true",
+    "template": "{% for r in [1,2,3,4,5]|batch(true) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(true,\"x\") %}[{{ r }}]{% endfor %}|{{ [1,2,3,4,5]|batch(false)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1][2][3][4][5]|[1][2][3][4][5]|1"
+    }
+  },
+  {
+    "name": "sequences: batch: line count an array",
+    "template": "{% for r in [1,2,3,4,5]|batch([2]) %}[{{ r }}]{% endfor %}|{{ [1,2,3,4,5]|batch([1,2])|length }}|{{ [1,2,3,4,5]|batch([])|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5]|1|1"
+    }
+  },
+  {
+    "name": "sequences: batch: line count fractional",
+    "template": "{% for r in [1,2,3,4,5,6,7,8,9,10,11]|batch(2.5) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5,6]|batch(2.5,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,4,5][6,7,8,9,10][11]|[1,2,3,4,5][6,x,x]"
+    }
+  },
+  {
+    "name": "sequences: batch: line count fractional below one",
+    "template": "{% for r in [1,2,3,4,5]|batch(0.5) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(1.5) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1][2][3][4][5]|[1,2,3][4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: fractional line count pads to the ceiling",
+    "template": "{% for r in [1,2,3]|batch(3.5,\"x\") %}[{{ r }}]{% endfor %}|{% for r in [1]|batch(2.5,\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3,x]|[1,x,x]"
+    }
+  },
+  {
+    "name": "sequences: batch: fillWith falsy values add nothing",
+    "template": "{% for r in [1,2,3,4,5]|batch(3,0) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,\"\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,false) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,null) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,u) %}[{{ r }}]{% endfor %}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5]|[1,2,3][4,5]|[1,2,3][4,5]|[1,2,3][4,5]|[1,2,3][4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: fillWith NaN adds nothing",
+    "template": "{% for r in [1,2,3,4,5]|batch(3,0/0) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5]"
+    }
+  },
+  {
+    "name": "sequences: batch: fillWith truthy values",
+    "template": "{% for r in [1,2,3,4,5]|batch(3,\"0\") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,1) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,true) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,\" \") %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,[]) %}[{{ r }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,{}) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2,3][4,5,0]|[1,2,3][4,5,1]|[1,2,3][4,5,true]|[1,2,3][4,5, ]|[1,2,3][4,5,]|[1,2,3][4,5,[object Object]]"
+    }
+  },
+  {
+    "name": "sequences: batch: fillWith is a shared reference",
+    "template": "{% set f = [9] %}{% for r in [1,2,3,4]|batch(3,f) %}{{ r|last === f }},{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "false,true,"
+    }
+  },
+  {
+    "name": "sequences: batch: fill count",
+    "template": "{% for r in [1]|batch(4,\"x\") %}[{{ r|length }}]{% endfor %}|{% for r in [1,2,3,4,5]|batch(3,\"x\") %}[{{ r|length }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[4]|[3][3]"
+    }
+  },
+  {
+    "name": "sequences: batch: nested arrays and elements kept",
+    "template": "{% for r in [[1,2],[3],{a:1},null,0]|batch(2) %}[{{ r|length }}:{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[2:1,2,3][2:[object Object],][1:0]"
+    }
+  },
+  {
+    "name": "sequences: batch: batches are fresh arrays",
+    "template": "{% set a = [1,2,3] %}{% set b = a|batch(2) %}{{ b[0] == a }}|{{ a }}|{{ b|length }}",
+    "expected": {
+      "ok": true,
+      "output": "false|1,2,3|2"
+    }
+  },
+  {
+    "name": "sequences: batch: string input",
+    "template": "{% for r in 'abcde'|batch(2) %}[{{ r }}]{% endfor %}|{% for r in 'abcde'|batch(2,'-') %}[{{ r }}]{% endfor %}|{{ ''|batch(2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[a,b][c,d][e]|[a,b][c,d][e,-]|0"
+    }
+  },
+  {
+    "name": "sequences: batch: string input yields arrays of characters",
+    "template": "{% set b = 'abc'|batch(2) %}{{ b|length }}|{{ b[0]|length }}|{{ b[0][0] }}|{{ b[1]|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2|2|a|1"
+    }
+  },
+  {
+    "name": "sequences: batch: astral string splits a pair",
+    "template": "{% set b = '😀x'|batch(1) %}{{ b|length }}|{{ b[0][0]|length }}|{{ b[0][0] == '😀' }}|{{ b[1][0] == b[0][0] }}|{{ b[2][0] }}",
+    "expected": {
+      "ok": true,
+      "output": "3|1|false|false|x"
+    }
+  },
+  {
+    "name": "sequences: batch: astral string batches keep a pair together by chance",
+    "template": "{% for r in '😀😀'|batch(2) %}[{{ r|length }}:{{ r|join == '😀' }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[2:true][2:true]"
+    }
+  },
+  {
+    "name": "sequences: batch: combining character",
+    "template": "{% for r in 'éxy'|batch(2) %}[{{ r|length }}]{% endfor %}|{{ 'é'|batch(1)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[2][2]|2"
+    }
+  },
+  {
+    "name": "sequences: batch: undefined input throws",
+    "template": "{{ u|batch(2) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: batch: null input throws",
+    "template": "{{ n|batch(2) }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'length')"
+      }
+    }
+  },
+  {
+    "name": "sequences: batch: number input has no elements",
+    "template": "{{ n|batch(2)|length }}|{{ z|batch(2,\"x\")|length }}",
+    "context": {
+      "n": 42,
+      "z": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: batch: boolean input has no elements",
+    "template": "{{ t|batch(2)|length }}|{{ f|batch(2)|length }}",
+    "context": {
+      "t": true,
+      "f": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: batch: dict input has no elements",
+    "template": "{{ {a:1}|batch(2)|length }}|{{ o|batch(2)|length }}",
+    "context": {
+      "o": {
+        "x": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|0"
+    }
+  },
+  {
+    "name": "sequences: batch: array-like dict with length",
+    "template": "{% for r in {\"length\":3,\"0\":\"a\",\"1\":\"b\",\"2\":\"c\"}|batch(2) %}[{{ r }}]{% endfor %}|{% for r in {\"length\":2}|batch(2) %}[{{ r|length }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[a,b][c]|[2]"
+    }
+  },
+  {
+    "name": "sequences: batch: SafeString batches undefined characters",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% for r in m()|batch(3) %}[{{ r|length }}:{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[3:,,][3:,,][3:,,]"
+    }
+  },
+  {
+    "name": "sequences: batch: SafeString batch count",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% macro e() %}{% endmacro %}{{ m()|batch(4)|length }}|{{ e()|batch(2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "3|0"
+    }
+  },
+  {
+    "name": "sequences: batch: SafeString fill goes after undefined elements",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{% for r in m()|batch(5,\"x\") %}[{{ r|length }}:{{ r|last }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[5:][5:x]"
+    }
+  },
+  {
+    "name": "sequences: batch: kwargs as line count",
+    "template": "{{ [1,2,3,4,5]|batch(linecount=2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "1"
+    }
+  },
+  {
+    "name": "sequences: batch: kwargs as fillWith is a truthy object",
+    "template": "{% for r in [1,2,3,4,5]|batch(2, fillWith=\"x\") %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5,[object Object]]"
+    }
+  },
+  {
+    "name": "sequences: batch: kwargs after positional fill",
+    "template": "{% for r in [1,2,3,4,5]|batch(2, \"y\", z=1) %}[{{ r }}]{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "[1,2][3,4][5,y]"
+    }
+  },
+  {
+    "name": "sequences: batch: chained with join",
+    "template": "{% for r in [1,2,3,4,5]|batch(2) %}{{ r|join(\"+\") }};{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "1+2;3+4;5;"
+    }
+  },
+  {
+    "name": "sequences: batch: batch of a slice",
+    "template": "{{ [1,2,3,4,5,6]|slice(2)|first|batch(2)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "2"
+    }
+  },
+  {
+    "name": "sequences: join: default delimiter is empty",
+    "template": "{{ [1,2,3]|join }}|{{ ['a','b']|join }}|{{ []|join }}|[{{ [1]|join }}]",
+    "expected": {
+      "ok": true,
+      "output": "123|ab||[1]"
+    }
+  },
+  {
+    "name": "sequences: join: string delimiter",
+    "template": "{{ [1,2,3]|join(',') }}|{{ ['a','b']|join(', ') }}|{{ [1,2]|join('') }}|{{ [1,2,3]|join('--') }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2,3|a, b|12|1--2--3"
+    }
+  },
+  {
+    "name": "sequences: join: falsy delimiters mean empty",
+    "template": "{{ [1,2]|join(0) }}|{{ [1,2]|join(false) }}|{{ [1,2]|join(null) }}|{{ [1,2]|join(u) }}|{{ [1,2]|join(\"\") }}|{{ [1,2]|join(0/0) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "12|12|12|12|12|12"
+    }
+  },
+  {
+    "name": "sequences: join: non-string delimiters are stringified",
+    "template": "{{ [1,2,3]|join(1) }}|{{ [1,2,3]|join(true) }}|{{ [1,2,3]|join(1.5) }}|{{ [1,2,3]|join(',') }}|{{ [1,2,3]|join([4,5]) }}|{{ [1,2,3]|join([]) }}|{{ [1,2]|join({}) }}|{{ [1,2]|join('0') }}|{{ [1,2]|join(' ') }}",
+    "expected": {
+      "ok": true,
+      "output": "11213|1true2true3|11.521.53|1,2,3|14,524,53|123|1[object Object]2|102|1 2"
+    }
+  },
+  {
+    "name": "sequences: join: delimiter that is a macro output",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ [1,2]|join(m()) }}",
+    "expected": {
+      "ok": true,
+      "output": "1&lt;b&gt;ab&lt;/b&gt;2"
+    }
+  },
+  {
+    "name": "sequences: join: element kinds",
+    "template": "{{ [1,'a',null,true,false,0,1.5]|join(',') }}|{{ [[1,2],[3]]|join('|') }}|{{ [{a:1}]|join }}|{{ [[],[[]]]|join('|') }}|{{ [0.1+0.2]|join }}",
+    "expected": {
+      "ok": true,
+      "output": "1,a,,true,false,0,1.5|1,2|3|[object Object]|||0.30000000000000004"
+    }
+  },
+  {
+    "name": "sequences: join: null elements are empty",
+    "template": "{{ [null,null]|join('-') }}|{{ [1,null,2]|join('-') }}|{{ [null]|join('-') }}",
+    "expected": {
+      "ok": true,
+      "output": "-|1--2|"
+    }
+  },
+  {
+    "name": "sequences: join: array from context",
+    "template": "{{ a|join('/') }}",
+    "context": {
+      "a": [
+        "x",
+        1,
+        null,
+        2.5,
+        true,
+        [
+          1,
+          [
+            2
+          ]
+        ],
+        {
+          "k": 1
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "x/1//2.5/true/1,2/[object Object]"
+    }
+  },
+  {
+    "name": "sequences: join: single element and empty",
+    "template": "[{{ []|join(',') }}]|[{{ ['a']|join(',') }}]|[{{ ['']|join(',') }}]|[{{ ['','']|join(',') }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]|[a]|[]|[,]"
+    }
+  },
+  {
+    "name": "sequences: join: attr picks a property",
+    "template": "{{ o|join(',', 'n') }}",
+    "context": {
+      "o": [
+        {
+          "n": 1
+        },
+        {
+          "n": "b"
+        },
+        {
+          "n": 3
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "1,b,3"
+    }
+  },
+  {
+    "name": "sequences: join: attr missing property is empty",
+    "template": "{{ o|join(',', 'n') }}",
+    "context": {
+      "o": [
+        {
+          "n": 1
+        },
+        {
+          "m": 2
+        },
+        {
+          "n": null
+        },
+        {
+          "n": 0
+        },
+        {
+          "n": false
+        },
+        {
+          "n": ""
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "1,,,0,false,"
+    }
+  },
+  {
+    "name": "sequences: join: attr on literal dicts",
+    "template": "{{ [{a:1},{a:2}]|join('+', 'a') }}|{{ [{a:1},{b:2}]|join('+', 'a') }}",
+    "expected": {
+      "ok": true,
+      "output": "1+2|1+"
+    }
+  },
+  {
+    "name": "sequences: join: attr falsy is ignored",
+    "template": "{{ [{a:1}]|join(',', 0) }}|{{ [{a:1}]|join(',', '') }}|{{ [{a:1}]|join(',', null) }}|{{ [{a:1}]|join(',', false) }}|{{ [{a:1}]|join(',', u) }}|{{ [[1,2]]|join(',', 0) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[object Object]|[object Object]|[object Object]|[object Object]|[object Object]|1,2"
+    }
+  },
+  {
+    "name": "sequences: join: attr numeric index",
+    "template": "{{ [[1,2],[3,4]]|join(',', 1) }}|{{ [[1,2],[3]]|join(',', 1) }}|{{ ['ab','cd']|join(',', 1) }}|{{ [[1,2]]|join(',', '0') }}",
+    "expected": {
+      "ok": true,
+      "output": "2,4|2,|b,d|1"
+    }
+  },
+  {
+    "name": "sequences: join: attr containing a dot is a literal key",
+    "template": "{{ o|join(',', 'a.b') }}",
+    "context": {
+      "o": [
+        {
+          "a.b": 1,
+          "a": {
+            "b": 2
+          }
+        },
+        {
+          "a.b": 3,
+          "a": {
+            "b": 4
+          }
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "1,3"
+    }
+  },
+  {
+    "name": "sequences: join: attr with a dot does not walk nested objects",
+    "template": "{{ [{a:{b:2} }]|join(',', 'a.b') }}|{{ [{a:{b:2} }]|join(',', 'a') }}|{{ o|join(',', 'a') }}",
+    "context": {
+      "o": [
+        {
+          "a": {
+            "b": 2
+          }
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "|[object Object]|[object Object]"
+    }
+  },
+  {
+    "name": "sequences: join: attr dot key beside nested one",
+    "template": "[{{ o|join('|', 'a') }}]|[{{ o|join('|', 'a.') }}]|[{{ o|join('|', '.a') }}]",
+    "context": {
+      "o": [
+        {
+          "a": 1,
+          "a.": 2,
+          ".a": 3
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "[1]|[2]|[3]"
+    }
+  },
+  {
+    "name": "sequences: join: attr length on strings and arrays",
+    "template": "{{ ['ab','c','']|join(',', 'length') }}|{{ [[1,2],[]]|join(',', 'length') }}",
+    "expected": {
+      "ok": true,
+      "output": "2,1,0|2,0"
+    }
+  },
+  {
+    "name": "sequences: join: attr on nested array elements",
+    "template": "{{ [{k:[1,2]},{k:[3]}]|join('|', 'k') }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2|3"
+    }
+  },
+  {
+    "name": "sequences: join: attr non-string truthy",
+    "template": "{{ [{a:1}]|join(',', true) }}|{{ [{'true':5}]|join(',', true) }}|{{ [{'1':5}]|join(',', 1) }}|{{ [{'1.5':5}]|join(',', 1.5) }}",
+    "expected": {
+      "ok": true,
+      "output": "|5|5|5"
+    }
+  },
+  {
+    "name": "sequences: join: attr array",
+    "template": "{{ [{'x':5, 'a,b': 6}]|join(',', ['x']) }}|{{ [{'x,y':5}]|join(',', ['x','y']) }}",
+    "expected": {
+      "ok": true,
+      "output": "5|5"
+    }
+  },
+  {
+    "name": "sequences: join: attr over null element throws",
+    "template": "{{ [{a:1},null]|join(',', 'a') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'a')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: attr over number elements",
+    "template": "{{ [1,2]|join(',', 'a') }}|{{ [1,2]|join(',', 'x.y') }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": ",|,"
+    }
+  },
+  {
+    "name": "sequences: join: attr over undefined or null input is empty",
+    "template": "[{{ u|join(',', 'a') }}]|[{{ n|join(',', 'a') }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]"
+    }
+  },
+  {
+    "name": "sequences: join: undefined input throws",
+    "template": "{{ u|join(',') }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'join')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: null input throws",
+    "template": "{{ n|join(',') }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'join')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: string input has no join method",
+    "template": "{{ 'abc'|join('-') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: empty string input has no join method",
+    "template": "{{ ''|join('-') }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: string input with attr maps characters",
+    "template": "{{ 'abc'|join('-', 'length') }}|{{ 'abc'|join('-', 'x') }}|[{{ ''|join('-', 'length') }}]",
+    "expected": {
+      "ok": true,
+      "output": "1-1-1|--|[]"
+    }
+  },
+  {
+    "name": "sequences: join: number input throws",
+    "template": "{{ n|join(\",\") }}",
+    "context": {
+      "n": 5
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: zero input throws",
+    "template": "{{ n|join(\",\") }}",
+    "context": {
+      "n": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: boolean input throws",
+    "template": "{{ t|join(\",\") }}",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: false input throws",
+    "template": "{{ t|join(\",\") }}",
+    "context": {
+      "t": false
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: dict input throws",
+    "template": "{{ {a:1}|join(\",\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: number input with attr is empty",
+    "template": "[{{ n|join(\",\", \"a\") }}]|[{{ t|join(\",\", \"a\") }}]|[{{ {a:1}|join(\",\", \"a\") }}]",
+    "context": {
+      "n": 5,
+      "t": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]|[]|[]"
+    }
+  },
+  {
+    "name": "sequences: join: array-like dict with attr",
+    "template": "{{ {\"length\":2,\"0\":{a:1},\"1\":{a:2} }|join(\"-\", \"a\") }}|[{{ {\"length\":0}|join(\"-\", \"a\") }}]",
+    "expected": {
+      "ok": true,
+      "output": "1-2|[]"
+    }
+  },
+  {
+    "name": "sequences: join: array-like dict with undefined entries and attr throws",
+    "template": "{{ {\"length\":1}|join(\"-\", \"a\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'a')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: SafeString input throws",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ m()|join(\",\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: SafeString input with attr throws on undefined",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ m()|join(\",\", \"x\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'x')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: empty SafeString input with attr",
+    "template": "{% macro e() %}{% endmacro %}[{{ e()|join(\",\", \"x\") }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "sequences: join: autoescape applies to the joined string",
+    "template": "{{ ['<b>','&']|join(',') }}|{{ ['a','b']|join('<') }}|{{ ['a','b']|join('<br>') }}",
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;,&amp;|a&lt;b|a&lt;br&gt;b"
+    }
+  },
+  {
+    "name": "sequences: join: autoescape off",
+    "template": "{{ ['<b>','&']|join('<') }}",
+    "opts": {
+      "autoescape": false
+    },
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "<b><&"
+    }
+  },
+  {
+    "name": "sequences: join: SafeString elements",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ [m(), 'x<']|join('-') }}|{{ [m()]|join }}",
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;ab&lt;/b&gt;-x&lt;|&lt;b&gt;ab&lt;/b&gt;"
+    }
+  },
+  {
+    "name": "sequences: join: markup made safe",
+    "template": "{{ ['<b>','x']|join(',')|safe }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "<b>,x"
+    }
+  },
+  {
+    "name": "sequences: join: astral and combining elements",
+    "template": "{{ ['😀','é']|join('·') }}|{{ ['😀','😀']|join('')|length }}|{{ 'a😀'|list|join('-')|length }}|{{ 'a😀'|list|join == 'a😀' }}",
+    "expected": {
+      "ok": true,
+      "output": "😀·é|4|5|true"
+    }
+  },
+  {
+    "name": "sequences: join: kwargs delimiter becomes the object",
+    "template": "{{ [1,2]|join(del=',') }}|{{ [1,2]|join(attr='a') }}",
+    "expected": {
+      "ok": true,
+      "output": "1[object Object]2|1[object Object]2"
+    }
+  },
+  {
+    "name": "sequences: join: kwargs attr after positional delimiter becomes the object",
+    "template": "[{{ [{a:1}]|join(',', attr='a') }}]|[{{ [{a:1}]|join(',', 'a', x=1) }}]|[{{ [{a:1}]|join(',', attr=u) }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]|[1]|[]"
+    }
+  },
+  {
+    "name": "sequences: join: joining a list of an object",
+    "template": "{{ {a:1,b:2}|list|join(\",\", \"key\") }}|{{ {a:1,b:2}|list|join(\",\", \"value\") }}",
+    "expected": {
+      "ok": true,
+      "output": "a,b|1,2"
+    }
+  },
+  {
+    "name": "sequences: join: joining integer keyed object list keys",
+    "template": "{{ o|list|join(\",\", \"key\") }}",
+    "context": {
+      "o": {
+        "9": 3,
+        "10": 2,
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "9,10,b"
+    }
+  },
+  {
+    "name": "sequences: join: joining integer keyed literal dict list keys",
+    "template": "{{ {\"b\":1,\"10\":2,\"9\":3}|list|join(\",\", \"key\") }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "9,10,b"
+    }
+  },
+  {
+    "name": "sequences: join: joining a batch",
+    "template": "{{ [1,2,3,4,5]|batch(2)|join(\"|\") }}",
+    "expected": {
+      "ok": true,
+      "output": "1,2|3,4|5"
+    }
+  },
+  {
+    "name": "sequences: join: joining reversed array",
+    "template": "{{ [1,2,3]|reverse|join(\",\") }}",
+    "expected": {
+      "ok": true,
+      "output": "3,2,1"
+    }
+  },
+  {
+    "name": "sequences: join: reversed string has no join method",
+    "template": "{{ \"abc\"|reverse|join(\"-\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.join is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: joining the list of a string",
+    "template": "{{ \"abc\"|list|join(\"-\") }}|{{ \"abc\"|list|reverse|join }}",
+    "expected": {
+      "ok": true,
+      "output": "a-b-c|cba"
+    }
+  },
+  {
+    "name": "sequences: join: result is a string",
+    "template": "{{ ([1,2]|join)|length }}|{{ ([1,2]|join(',')) + 1 }}|{{ [1,2]|join == '12' }}",
+    "expected": {
+      "ok": true,
+      "output": "2|1,21|true"
+    }
+  },
+  {
+    "name": "sequences: sum: numbers",
+    "template": "{{ [1,2,3]|sum }}|{{ [1]|sum }}|{{ [0]|sum }}|{{ [-1,1]|sum }}|{{ [1.5,2.25]|sum }}",
+    "expected": {
+      "ok": true,
+      "output": "6|1|0|0|3.75"
+    }
+  },
+  {
+    "name": "sequences: sum: float rounding",
+    "template": "{{ [0.1,0.2]|sum }}|{{ [0.1,0.2,0.3]|sum }}|{{ [9007199254740993,1]|sum }}",
+    "expected": {
+      "ok": true,
+      "output": "0.30000000000000004|0.6000000000000001|9007199254740992"
+    }
+  },
+  {
+    "name": "sequences: sum: exponent notation from the context",
+    "template": "{{ a|sum }}|{{ b|sum }}|{{ c|sum }}|{{ [1,2]|sum(null, d) }}",
+    "context": {
+      "a": [
+        1e+21,
+        1
+      ],
+      "b": [
+        1e-7,
+        0
+      ],
+      "c": [
+        1.5e+300,
+        1.5e+300
+      ],
+      "d": 1e+21
+    },
+    "expected": {
+      "ok": true,
+      "output": "1e+21|1e-7|3e+300|1e+21"
+    }
+  },
+  {
+    "name": "sequences: sum: exponent literal in the template",
+    "template": "{{ [1e21,1]|sum }}|{{ 1e3 }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN|"
+    }
+  },
+  {
+    "name": "sequences: sum: negative zero",
+    "template": "{{ [-0]|sum }}|{{ [-0,-0]|sum }}|{{ [0]|sum(null, -0) }}",
+    "expected": {
+      "ok": true,
+      "output": "0|0|0"
+    }
+  },
+  {
+    "name": "sequences: sum: empty array",
+    "template": "{{ []|sum }}|{{ []|sum(null, 5) }}|{{ []|sum(\"\", \"s\") }}|{{ []|sum(null, u) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "0|5|s0|0"
+    }
+  },
+  {
+    "name": "sequences: sum: attr",
+    "template": "{{ o|sum(\"n\") }}",
+    "context": {
+      "o": [
+        {
+          "n": 1
+        },
+        {
+          "n": 2
+        },
+        {
+          "n": 3.5
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "6.5"
+    }
+  },
+  {
+    "name": "sequences: sum: attr on literal dicts",
+    "template": "{{ [{n:1},{n:2}]|sum(\"n\") }}|{{ [{n:1},{m:2}]|sum(\"n\") }}",
+    "expected": {
+      "ok": true,
+      "output": "3|NaN"
+    }
+  },
+  {
+    "name": "sequences: sum: attr missing property makes NaN",
+    "template": "{{ [{n:1},{m:2}]|sum(\"n\") }}|{{ [{m:2}]|sum(\"n\") }}|{{ [{n:null}]|sum(\"n\") }}|{{ [{n:true}]|sum(\"n\") }}|{{ [{n:false},{n:1}]|sum(\"n\") }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN|NaN|0|1|1"
+    }
+  },
+  {
+    "name": "sequences: sum: attr falsy is ignored",
+    "template": "{{ [1,2]|sum(0) }}|{{ [1,2]|sum(\"\") }}|{{ [1,2]|sum(null) }}|{{ [1,2]|sum(false) }}|{{ [1,2]|sum(u) }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "3|3|3|3|3"
+    }
+  },
+  {
+    "name": "sequences: sum: attr numeric index",
+    "template": "{{ [[1,2],[3,4]]|sum(1) }}|{{ [[1,2],[3,4]]|sum(\"0\") }}|{{ [[1,2],[3]]|sum(1) }}",
+    "expected": {
+      "ok": true,
+      "output": "6|4|NaN"
+    }
+  },
+  {
+    "name": "sequences: sum: attr containing a dot is a literal key",
+    "template": "{{ o|sum(\"a.b\") }}",
+    "context": {
+      "o": [
+        {
+          "a.b": 1,
+          "a": {
+            "b": 20
+          }
+        },
+        {
+          "a.b": 2,
+          "a": {
+            "b": 30
+          }
+        }
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "3"
+    }
+  },
+  {
+    "name": "sequences: sum: attr with a dot does not walk nested objects",
+    "template": "{{ [{a:{b:2} }]|sum(\"a.b\") }}|{{ [{a:{b:2} }]|sum(\"a\") }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN|00[object Object]"
+    }
+  },
+  {
+    "name": "sequences: sum: attr length",
+    "template": "{{ ['ab','c']|sum('length') }}|{{ [[1,2],[3]]|sum('length') }}",
+    "expected": {
+      "ok": true,
+      "output": "3|3"
+    }
+  },
+  {
+    "name": "sequences: sum: attr over null element throws",
+    "template": "{{ [{n:1},null]|sum(\"n\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'n')"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: attr over number elements gives NaN",
+    "template": "{{ [1,2]|sum(\"n\") }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN"
+    }
+  },
+  {
+    "name": "sequences: sum: attr over undefined or null input is the start",
+    "template": "{{ u|sum(\"a\") }}|{{ n|sum(\"a\") }}|{{ u|sum(\"a\", 7) }}|{{ n|sum(\"a\", \"s\") }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|0|7|s0"
+    }
+  },
+  {
+    "name": "sequences: sum: start number",
+    "template": "{{ [1,2]|sum(null, 10) }}|{{ [1,2]|sum(\"\", 10) }}|{{ [1,2]|sum(0, -3) }}|{{ [1,2]|sum(null, 0.5) }}",
+    "expected": {
+      "ok": true,
+      "output": "13|13|0|3.5"
+    }
+  },
+  {
+    "name": "sequences: sum: start with attr",
+    "template": "{{ [{n:1},{n:2}]|sum(\"n\", 10) }}",
+    "expected": {
+      "ok": true,
+      "output": "13"
+    }
+  },
+  {
+    "name": "sequences: sum: start string concatenates",
+    "template": "{{ [1,2]|sum(null, \"s\") }}|{{ [1,2]|sum(null, \"\") }}|{{ [1,2]|sum(null, \"1\") }}|{{ []|sum(null, \"s\") }}",
+    "expected": {
+      "ok": true,
+      "output": "s3|3|13|s0"
+    }
+  },
+  {
+    "name": "sequences: sum: start undefined falls back to zero",
+    "template": "{{ [1,2]|sum(null, u) }}|{{ [1,2]|sum(null, u2) }}|{{ [1,2]|sum(\"\") }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "3|3|3"
+    }
+  },
+  {
+    "name": "sequences: sum: start null",
+    "template": "{{ [1,2]|sum(null, n) }}|{{ []|sum(null, n) }}|{{ [1,2]|sum(null, null) }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "3|0|3"
+    }
+  },
+  {
+    "name": "sequences: sum: start boolean",
+    "template": "{{ [1,2]|sum(null, true) }}|{{ [1,2]|sum(null, false) }}|{{ []|sum(null, true) }}",
+    "expected": {
+      "ok": true,
+      "output": "4|3|1"
+    }
+  },
+  {
+    "name": "sequences: sum: start array or object",
+    "template": "{{ [1,2]|sum(null, []) }}|{{ [1,2]|sum(null, [4]) }}|{{ [1,2]|sum(null, {}) }}|{{ [1,2]|sum(null, [1,2]) }}",
+    "expected": {
+      "ok": true,
+      "output": "3|43|[object Object]3|1,23"
+    }
+  },
+  {
+    "name": "sequences: sum: start NaN",
+    "template": "{{ [1,2]|sum(null, 0/0) }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN"
+    }
+  },
+  {
+    "name": "sequences: sum: start a numeric string stays a string",
+    "template": "{{ ([1,2]|sum(null, \"5\")) + 1 }}|{{ ([1,2]|sum(null, 5)) + 1 }}|{{ [1,2]|sum(null, \"5\")|length }}",
+    "expected": {
+      "ok": true,
+      "output": "531|9|2"
+    }
+  },
+  {
+    "name": "sequences: sum: mixed numbers and strings concatenate",
+    "template": "{{ [1,'2',3]|sum }}|{{ ['1','2']|sum }}|{{ [1,2,'3']|sum }}|{{ ['a','b']|sum }}|{{ ['a']|sum }}|{{ [1,'a',2]|sum }}",
+    "expected": {
+      "ok": true,
+      "output": "0123|0012|033|00ab|00a|01a2"
+    }
+  },
+  {
+    "name": "sequences: sum: mixed with start",
+    "template": "{{ [1,'2',3]|sum(null, 5) }}|{{ ['a','b']|sum(null, 5) }}|{{ ['a']|sum(null, 'z') }}",
+    "expected": {
+      "ok": true,
+      "output": "5123|50ab|z0a"
+    }
+  },
+  {
+    "name": "sequences: sum: numeric strings concatenate with the zero seed",
+    "template": "{{ ['1','2']|sum|length }}|{{ ['1','2']|sum == '012' }}|{{ ['1','2']|sum == 3 }}|{{ ['1','2']|sum == '00012' }}",
+    "expected": {
+      "ok": true,
+      "output": "4|false|false|false"
+    }
+  },
+  {
+    "name": "sequences: sum: empty string element",
+    "template": "{{ ['']|sum }}|{{ [1,'']|sum }}|{{ ['',1]|sum }}|{{ ['']|sum|length }}",
+    "expected": {
+      "ok": true,
+      "output": "00|01|001|2"
+    }
+  },
+  {
+    "name": "sequences: sum: null and boolean elements coerce",
+    "template": "{{ [null,1]|sum }}|{{ [true,true]|sum }}|{{ [false,1]|sum }}|{{ [null]|sum }}|{{ [true]|sum }}",
+    "expected": {
+      "ok": true,
+      "output": "1|2|1|0|1"
+    }
+  },
+  {
+    "name": "sequences: sum: array and object elements stringify",
+    "template": "{{ [[1],[2]]|sum }}|{{ [1,[2]]|sum }}|{{ [[],1]|sum }}|{{ [{}]|sum }}|{{ [1,{a:1}]|sum }}",
+    "expected": {
+      "ok": true,
+      "output": "0012|012|001|00[object Object]|01[object Object]"
+    }
+  },
+  {
+    "name": "sequences: sum: NaN element",
+    "template": "{{ [1,0/0]|sum }}|{{ [0/0]|sum(null, 5) }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN|NaN"
+    }
+  },
+  {
+    "name": "sequences: sum: context numbers",
+    "template": "{{ a|sum }}|{{ b|sum }}|{{ c|sum }}",
+    "context": {
+      "a": [
+        1,
+        2,
+        3
+      ],
+      "b": [
+        "4",
+        "5"
+      ],
+      "c": [
+        0.5,
+        0.25,
+        null
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "6|0045|0.75"
+    }
+  },
+  {
+    "name": "sequences: sum: undefined input throws",
+    "template": "{{ u|sum }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'reduce')"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: null input throws",
+    "template": "{{ n|sum }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'reduce')"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: string input has no reduce",
+    "template": "{{ 'abc'|sum }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: empty string input has no reduce",
+    "template": "{{ ''|sum }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: numeric string input has no reduce",
+    "template": "{{ '123'|sum }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: number input throws",
+    "template": "{{ n|sum }}",
+    "context": {
+      "n": 5
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: zero input throws",
+    "template": "{{ n|sum }}",
+    "context": {
+      "n": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: boolean input throws",
+    "template": "{{ t|sum }}",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: false input throws",
+    "template": "{{ t|sum }}",
+    "context": {
+      "t": false
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: dict input throws",
+    "template": "{{ {a:1}|sum }}|{{ 1 }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: context dict input throws",
+    "template": "{{ o|sum }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: string input with attr maps characters",
+    "template": "{{ 'abc'|sum('length') }}|{{ 'abc'|sum('x') }}|{{ 'ab'|sum('length', 10) }}|[{{ ''|sum('length') }}]",
+    "expected": {
+      "ok": true,
+      "output": "3|NaN|12|[0]"
+    }
+  },
+  {
+    "name": "sequences: sum: number input with attr is the start",
+    "template": "{{ n|sum(\"a\") }}|{{ n|sum(\"a\", 4) }}|{{ t|sum(\"a\") }}|{{ {a:1}|sum(\"a\") }}",
+    "context": {
+      "n": 5,
+      "t": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "0|4|0|0"
+    }
+  },
+  {
+    "name": "sequences: sum: array-like dict with attr",
+    "template": "{{ {\"length\":2,\"0\":{a:1},\"1\":{a:2} }|sum(\"a\") }}|{{ {\"length\":0}|sum(\"a\") }}",
+    "expected": {
+      "ok": true,
+      "output": "3|0"
+    }
+  },
+  {
+    "name": "sequences: sum: array-like dict without attr throws",
+    "template": "{{ {\"length\":0}|sum }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: SafeString input throws",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ m()|sum }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: arr.reduce is not a function"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: SafeString input with attr throws on undefined",
+    "template": "{% macro m() %}<b>ab</b>{% endmacro %}{{ m()|sum(\"x\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'x')"
+      }
+    }
+  },
+  {
+    "name": "sequences: sum: empty SafeString input with attr",
+    "template": "{% macro e() %}{% endmacro %}{{ e()|sum(\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "0"
+    }
+  },
+  {
+    "name": "sequences: sum: kwargs as attr",
+    "template": "{{ [1,2]|sum(attr=\"n\") }}|{{ [{n:1}]|sum(attr=\"n\") }}",
+    "expected": {
+      "ok": true,
+      "output": "NaN|NaN"
+    }
+  },
+  {
+    "name": "sequences: sum: kwargs as start",
+    "template": "{{ [1,2]|sum(null, start=5) }}|{{ [1,2]|sum(\"\", start=5)|length }}",
+    "expected": {
+      "ok": true,
+      "output": "[object Object]3|16"
+    }
+  },
+  {
+    "name": "sequences: sum: kwargs after positional start",
+    "template": "{{ [1,2]|sum(null, 5, x=1) }}",
+    "expected": {
+      "ok": true,
+      "output": "8"
+    }
+  },
+  {
+    "name": "sequences: sum: sum of batch lengths",
+    "template": "{{ [1,2,3,4,5]|batch(2)|sum(\"length\") }}|{{ [1,2,3,4,5]|slice(2)|sum(\"length\") }}",
+    "expected": {
+      "ok": true,
+      "output": "5|5"
+    }
+  },
+  {
+    "name": "sequences: sum: result used in arithmetic",
+    "template": "{{ ([1,2]|sum) * 2 }}|{{ ([]|sum) == 0 }}|{{ ([1,2]|sum) === 3 }}",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "6|true|true"
+    }
+  },
+  {
+    "name": "sequences: reverse: probe length 2.5",
+    "template": "{{ o|reverse|length }}",
+    "context": {
+      "o": {
+        "length": 2.5
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  RangeError: Invalid array length"
+      }
+    }
+  },
+  {
+    "name": "sequences: reverse: probe length -1",
+    "template": "{{ o|reverse|length }}",
+    "context": {
+      "o": {
+        "length": -1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  RangeError: Invalid array length"
+      }
+    }
+  },
+  {
+    "name": "sequences: reverse: probe array-like object with string length",
+    "template": "{{ o|reverse|join(\",\") }}",
+    "context": {
+      "o": {
+        "0": "x",
+        "1": "y",
+        "length": "2"
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "y,x"
+    }
+  },
+  {
+    "name": "sequences: join: probe read-error key x",
+    "template": "{{ [undefined]|join(\",\", 'x') }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'x')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: probe read-error key 1.5",
+    "template": "{{ [undefined]|join(\",\", 1.5) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading '1.5')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: probe read-error key true",
+    "template": "{{ [undefined]|join(\",\", true) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'true')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: probe read-error key {}",
+    "template": "{{ [undefined]|join(\",\", {}) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading '#<Object>')"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: probe read-error key [1]",
+    "template": "{{ [undefined]|join(\",\", [1]) }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined"
+      }
+    }
+  },
+  {
+    "name": "sequences: join: probe null element with attr",
+    "template": "{{ [null]|join(\",\", \"a\") }}",
+    "context": {},
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'a')"
+      }
+    }
+  },
+  {
+    "name": "sequences: is_object widening: in on a SafeString (macro result) checks own keys",
+    "template": "{% macro m() %}val{% endmacro %}{{ 'val' in m() }}|{{ 'length' in m() }}|{{ 'x' in m() }}|{{ 'a' in m() }}|{{ 0 in m() }}",
+    "expected": {
+      "ok": true,
+      "output": "true|true|false|false|false"
+    }
+  },
+  {
+    "name": "sequences: is_object widening: 'toString' in a SafeString finds the prototype member",
+    "template": "{% macro m() %}val{% endmacro %}{{ 'toString' in m() }}",
+    "todo": "k73: in on a SafeString checks only own keys",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  },
+  {
+    "name": "sequences: is_object widening: a SafeString (macro result) is mapping (a test, not a filter)",
+    "template": "{% macro m() %}val{% endmacro %}{{ m() is mapping }}",
+    "expected": {
+      "ok": true,
+      "output": "true"
+    }
+  }
+]

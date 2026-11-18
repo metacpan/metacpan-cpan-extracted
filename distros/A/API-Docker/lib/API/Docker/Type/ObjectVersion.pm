@@ -1,6 +1,6 @@
 package API::Docker::Type::ObjectVersion;
 # ABSTRACT: The version number of the object such as node, service, etc
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::ObjectVersion - The version number of the object such as node
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -52,7 +52,7 @@ L<API::Docker::Role::Entity::Config> read it out as C<version_index>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

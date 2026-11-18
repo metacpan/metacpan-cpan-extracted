@@ -4,7 +4,7 @@ use 5.026;
 use warnings;
 use utf8;
 
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 use Exporter 'import';
 our @EXPORT_OK = qw(blocks available);
@@ -275,7 +275,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2026 Kazumasa Utashiro.
+Copyright © 2026 Kazumasa Utashiro.
 
 This software is released under the MIT License.
 L<https://opensource.org/licenses/MIT>

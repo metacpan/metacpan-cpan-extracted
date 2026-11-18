@@ -9,7 +9,7 @@ use Socket qw(AF_INET AF_INET6 inet_pton);
 use InternetData::Bogons;
 use InternetData::Result;
 
-our $VERSION = '1.16.0';
+our $VERSION = '1.16.1';
 
 # Whether an address is private, loopback, link-local, documentation, multicast
 # or otherwise not routable on the public internet, including the IPv6

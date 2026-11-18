@@ -1,10 +1,26 @@
 ==================================================
-Changes from 2025-09-07 00:00:00 +0000 to present.
+Changes from 2025-11-17 00:00:00 +0000 to present.
 ==================================================
 
 -----------------------------------------
-version 0.40 at 2026-09-07 10:42:26 +0000
+version 0.41 at 2026-11-17 14:39:59 +0000
 -----------------------------------------
+
+  Change: 852c04ffaa39ae1fcdf77990ca70467716321646
+  Author: Alessandro Ranellucci <alessandro@pintle.it>
+  Date : 2026-11-17 15:39:44 +0000
+
+    Quote table names before using them in regexes 
+
+-----------------------------------------
+version 0.40 at 2026-09-07 10:42:43 +0000
+-----------------------------------------
+
+  Change: 01615ebd1ed512b6bcfcedd88b8796dc5326f118
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2026-09-07 10:42:43 +0000
+
+    v0.40 
 
   Change: 94d37080e893dac07116bc3cb73c67a145b49441
   Author: Alessandro Ranellucci <alessandro@pintle.it>
@@ -193,5 +209,5 @@ version 0.37 at 2026-05-05 08:01:10 +0000
     Add test for default functionality 
 
 =================================================
-Plus 27 releases after 2025-09-07 00:00:00 +0000.
+Plus 27 releases after 2025-11-17 00:00:00 +0000.
 =================================================

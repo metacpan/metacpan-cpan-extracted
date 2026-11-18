@@ -1,5 +1,17 @@
 Revision history for Perl extension App-nup
 
+1.20 2026-11-18T08:34:01Z
+
+    - The default highlighter is pandoc (--highlight=pandoc), in place
+      of skylighting.  The highlighters are those of
+      Text::ANSI::Highlight: pandoc, sourcehighlight (gnu) and
+      skylighting (sky)
+    - In a Markdown file, the code in a fence is colored by the
+      language of the fence, each block by itself.  With skylighting
+      as it was, the rest of the file was taken for the code of a
+      fence after a function of a shell script or __DATA__ of Perl
+    - Requires App::ansicolumn 1.67 and Text::ANSI::Highlight 0.02
+
 1.19 2026-11-17T07:30:29Z
 
     - The page number on the bottom border has the number of all the

@@ -1,5 +1,32 @@
 Revision history for Config::Abstraction - Merge and manage configuration data from different sources
 
+0.43	Tue Nov 17 09:40:47 AM EST 2026
+	[ Behaviour Changes ]
+	- A base.conf, local.conf (or base.{env}.conf, local.{env}.conf) in a
+	  configuration directory is now read when Config::General is installed.
+	  Previously these names were ignored.  Move or rename such a file if it
+	  is not Apache-style configuration.
+	[ Security ]
+	- Includes are confined: an included file must lie within the directory of
+	  the file that began the include chain, or within include_dirs, after
+	  symbolic links are resolved.  Config::General's own <<include>> directive
+	  is never honoured (it would read any file), and files using it are skipped.
+	[ Enhancements ]
+	- New allow_includes option (with include_key, include_dirs and
+	  include_max_depth): a top-level 'include' key in a configuration file
+	  of any format names files, or globs, to merge in beneath it.  Cycles and
+	  excessive depth croak.  Included files appear in config_path and
+	  explain_sources().
+	- New interpolate option (with interpolate_strict): ${a.b}, ${env:NAME},
+	  ${...:-default} and $$ in string values are expanded after all sources
+	  are merged.  Undefined and circular references croak.
+	- Apache-style configuration via the optional Config::General: base.conf,
+	  local.conf (and their environment-specific forms) are now read, and it
+	  is the last parser tried for an extensionless config_file.
+	- MIME::Base64 and Sys::Hostname (core modules) are now declared in
+	  PREREQ_PM, and Config::General is recommended.
+	- New tests t/includes.t, t/interpolate.t and t/config-general.t.
+
 0.42	Sun Nov  8 02:18:25 PM EST 2026
 	[ Bug Fixes ]
 	- The running script is never read as its own configuration file.  The

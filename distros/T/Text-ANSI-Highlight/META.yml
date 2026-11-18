@@ -1,0 +1,51 @@
+---
+abstract: 'syntax highlight for the terminal, by a highlighter of your choice'
+author:
+  - 'Kazumasa Utashiro'
+build_requires:
+  File::Temp: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.1.29, CPAN::Meta::Converter version 2.150013'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Text-ANSI-Highlight
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Text::ANSI::Highlight:
+    file: lib/Text/ANSI/Highlight.pm
+    version: '0.03'
+  Text::ANSI::Highlight::IO:
+    file: lib/Text/ANSI/Highlight/IO.pm
+  Text::ANSI::Highlight::pandoc:
+    file: lib/Text/ANSI/Highlight/pandoc.pm
+  Text::ANSI::Highlight::skylighting:
+    file: lib/Text/ANSI/Highlight/skylighting.pm
+  Text::ANSI::Highlight::sourcehighlight:
+    file: lib/Text/ANSI/Highlight/sourcehighlight.pm
+requires:
+  IO::Factotum: '0.05'
+  perl: v5.16.0
+resources:
+  bugtracker: https://github.com/tecolicom/Text-ANSI-Highlight/issues
+  homepage: https://github.com/tecolicom/Text-ANSI-Highlight
+  repository: https://github.com/tecolicom/Text-ANSI-Highlight.git
+version: '0.03'
+x_authority: cpan:UTASHIRO
+x_contributors:
+  - 'Kazumasa Utashiro <kaz@utashiro.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'
+x_static_install: 0

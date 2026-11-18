@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity::Volume;
 # ABSTRACT: Volume operations, on the generated volume type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 with 'API::Docker::Role::Entity';
 requires 'name';
@@ -62,7 +62,7 @@ API::Docker::Role::Entity::Volume - Volume operations, on the generated volume t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -135,7 +135,7 @@ C<create> return
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

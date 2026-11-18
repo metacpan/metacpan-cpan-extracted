@@ -1,6 +1,6 @@
 package API::Docker::Type::OCIDescriptor;
 # ABSTRACT: A descriptor struct containing digest, media type, and size, as defined in the L<OCI Content Descriptors Specification|https://github.com/opencontainers/image-spec/blob/v1.0.1/descriptor.md>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::OCIPlatform;
 use namespace::clean;
@@ -44,7 +44,7 @@ API::Docker::Type::OCIDescriptor - A descriptor struct containing digest, media 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -105,7 +105,7 @@ produce C<ArtifactType>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

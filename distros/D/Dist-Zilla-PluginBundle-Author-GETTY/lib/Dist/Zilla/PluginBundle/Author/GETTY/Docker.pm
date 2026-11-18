@@ -1,6 +1,6 @@
 package Dist::Zilla::PluginBundle::Author::GETTY::Docker;
 # ABSTRACT: Docker image subsection for @Author::GETTY
-our $VERSION = '0.327';
+our $VERSION = '0.328';
 use Moose;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
@@ -74,7 +74,7 @@ Dist::Zilla::PluginBundle::Author::GETTY::Docker - Docker image subsection for @
 
 =head1 VERSION
 
-version 0.327
+version 0.328
 
 =head1 SYNOPSIS
 
@@ -166,11 +166,9 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-L<https://raudssus.de/>
 
 =cut

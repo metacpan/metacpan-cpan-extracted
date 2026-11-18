@@ -1,14 +1,19 @@
 package Dist::Zilla::PluginBundle::Author::GETTY;
 # ABSTRACT: BeLike::GETTY when you build your dists
-our $VERSION = '0.327';
+our $VERSION = '0.328';
 use Moose;
 use Dist::Zilla;
+use File::Spec;
 with 'Dist::Zilla::Role::PluginBundle::Easy';
 
 # Defaults published for any [@Author::GETTY::Docker / ...] subsections that
 # appear after [@Author::GETTY] in dist.ini. The subsection bundle reads from
 # here when no explicit value is set on the subsection itself.
 our %DOCKER_DEFAULTS;
+
+# The same for [@Author::GETTY::Binary / ...] subsections, from the binary_*
+# keys. has_release says whether the GitHub release plugin is active.
+our %BINARY_DEFAULTS;
 
 sub bundle_config {
   my ($class, $section) = @_;
@@ -20,6 +25,8 @@ sub bundle_config {
     tags  => $self->payload->{docker_tags},
     local => $self->payload->{docker_local},
   );
+
+  %BINARY_DEFAULTS = $self->_binary_defaults;
 
   $self->configure;
 
@@ -143,13 +150,28 @@ has no_github_release => (
 # Empty when there is no repository, no git, or no remote.
 sub _remote_urls {
   my @remotes;
-  my $out = `git config --get-regexp '^remote\\..*\\.url\$' 2>/dev/null`;
-  return () if $? != 0 or !defined $out;
+  my $out = _git_output('config', '--get-regexp', '^remote\..*\.url$');
+  return () unless defined $out;
   for my $line (split /\n/, $out) {
     my ($key, $url) = $line =~ m{^remote\.(.+)\.url\s+(\S+)} or next;
     push @remotes, [ $key, $url ];
   }
   return ( (grep { $_->[0] eq 'origin' } @remotes), (grep { $_->[0] ne 'origin' } @remotes) );
+}
+
+# Output of `git ARGS` in the cwd; undef when git cannot be started or exits
+# non-zero. git runs without a shell: cmd.exe, the shell of backticks on
+# Windows, knows neither ' quoting nor 2>/dev/null. Its STDERR goes to the null
+# device. Author::GETTY::GiteaMeta has the same helper.
+sub _git_output {
+  my (@args) = @_;
+  open my $stderr, '>&', \*STDERR or die "cannot dup STDERR: $!\n";
+  my $fh;
+  my $started = open(STDERR, '>', File::Spec->devnull) && open($fh, '-|', 'git', @args);
+  open STDERR, '>&', $stderr or die "cannot restore STDERR: $!\n";
+  return undef unless $started;
+  my $out = do { local $/; <$fh> };
+  return close($fh) ? $out : undef;
 }
 
 # True if any remote URL points at github.com. Used to auto-disable the
@@ -161,6 +183,18 @@ has _has_github_remote => (
   lazy    => 1,
   default => sub {
     return (grep { $_->[1] =~ m{\bgithub\.com\b}i } _remote_urls()) ? 1 : 0;
+  },
+);
+
+# True if the repository has any remote at all. Without one there is no URL
+# for [Repository] to report: it would only fall back to `git svn info`.
+has _has_remote => (
+  is      => 'ro',
+  isa     => 'Bool',
+  lazy    => 1,
+  default => sub {
+    my @remotes = _remote_urls();
+    return @remotes ? 1 : 0;
   },
 );
 
@@ -176,8 +210,8 @@ has gitea => (
 my @KNOWN_GITEA_HOSTS = qw( codeberg.org src.ci );
 
 # Host of the dist's origin remote, or of the first remote if there is no
-# origin (GiteaMeta reads remote.origin.url and wants the hosts to match).
-# Undef when there is no remote.
+# origin (GiteaMeta is pointed at the same remote and wants the hosts to
+# match). Undef when there is no remote.
 has _remote_host => (
   is      => 'ro',
   isa     => 'Maybe[Str]',
@@ -186,6 +220,18 @@ has _remote_host => (
     my ($remote) = _remote_urls() or return undef;
     my ($host) = $remote->[1] =~ m{(?: ^\w+:// (?:[^/\@]+\@)? | ^[^/\@]+\@ ) ([^/:]+)}x;
     return $host;
+  },
+);
+
+# Name of the same remote: origin, or the first remote if there is no origin.
+# Undef when there is no remote.
+has _remote_name => (
+  is      => 'ro',
+  isa     => 'Maybe[Str]',
+  lazy    => 1,
+  default => sub {
+    my ($remote) = _remote_urls() or return undef;
+    return $remote->[0];
   },
 );
 
@@ -445,7 +491,7 @@ has alien_bin_requires => (
   default => sub { defined $_[0]->payload->{alien_bin_requires} ? $_[0]->payload->{alien_bin_requires} : [] },
 );
 
-sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes, 'commit_files_after_release', 'version_finder' }
+sub mvp_multivalue_args { @run_attributes, @gather_array_attributes, 'alien_bin_requires', @alien_array_attributes, 'commit_files_after_release', 'version_finder', qw(binary binary_modules binary_require binary_platforms) }
 
 sub effective_gather_exclude_filename {
   my ($self) = @_;
@@ -464,6 +510,39 @@ sub _docker_default {
   return defined $self->payload->{docker_image}
     && length $self->payload->{docker_image}
     && ($self->payload->{docker_default} // 1);
+}
+
+# The binary_* keys, as the defaults of the Binary subsections (their own
+# names, without the prefix). Only those that are set.
+sub _binary_defaults {
+  my ($self) = @_;
+  my $p = $self->payload;
+  my %d;
+  for my $k (qw( modules require platforms pp_args verify smoke prepare )) {
+    $d{$k} = $p->{"binary_$k"} if defined $p->{"binary_$k"};
+  }
+  $d{has_release} = ($self->no_github || $self->no_github_release) ? 0 : 1;
+  return %d;
+}
+
+# The run_*_<phase> keys of one phase, as the options of its Run::<Phase>
+# plugin (their own names, without the phase suffix). Only those that are set.
+sub _run_config {
+  my ($self, $phase) = @_;
+  my %run;
+  for my $way (@run_ways) {
+    my $attr = $way.'_'.$phase;
+    $run{$way} = $self->$attr if @{ $self->$attr };
+  }
+  return \%run;
+}
+
+# The binary names declared with binary = ..., whitespace split.
+sub _binaries {
+  my ($self) = @_;
+  my $b = $self->payload->{binary};
+  return () unless defined $b;
+  return map { split /\s+/ } grep { defined && length } ref $b eq 'ARRAY' ? @$b : ($b);
 }
 
 sub configure {
@@ -494,6 +573,10 @@ sub configure {
   $self->add_plugins('GatherAgentContext');
 
   my @removes = ('GatherDir','PruneCruft');
+  # ConfirmRelease is always added again further down (behind InstallCheck, or
+  # on its own), so the Filter drops the one @Basic carries.
+  my $install_check = !($self->no_installrelease || $self->is_alien);
+  push @removes, 'ConfirmRelease';
   if ($self->no_cpan || $self->no_makemaker) {
     push @removes, 'UploadToCPAN' if $self->no_cpan;
     push @removes, 'MakeMaker' if $self->no_makemaker;
@@ -507,6 +590,11 @@ sub configure {
     -bundle => '@Basic',
     -remove => [@removes],
   });
+
+  # Test-install the tarball before the upload: after TestRelease, before the
+  # question whether to release. ConfirmRelease keeps its place either way.
+  $self->add_plugins('Author::GETTY::InstallCheck') if $install_check;
+  $self->add_plugins('ConfirmRelease');
 
   $self->add_plugins('LicenseFile') unless $self->generate_license || $self->no_license;
 
@@ -568,13 +656,11 @@ sub configure {
 
   for (@run_options) {
     my $net = $_;
-    my $func = 'run_'.$_;
-    if (@{$self->$func}) {
+    my $run = $self->_run_config($_);
+    if (%$run) {
       my $plugin = join('',map { ucfirst($_) } split(/_/,$_));
       $self->add_plugins([
-        'Run::'.$plugin => {
-          run => $self->$func,
-        }
+        'Run::'.$plugin => $run,
       ]);
     }
   }
@@ -595,10 +681,10 @@ sub configure {
   ));
 
   # The generated test looks for a heading of the version being released in
-  # Changes. NextRelease writes it, but not with no_changes (blank format) and
-  # not for a task (no NextRelease), so the test could only fail there.
+  # Changes. NextRelease writes it (for a task too, see below), but not with
+  # no_changes (blank format), so the test could only fail there.
   $self->add_plugins('Test::ChangesHasContent')
-    unless $self->no_changes || $self->is_task;
+    unless $self->no_changes;
 
   $self->add_plugins([
     'MetaProvides::Package' => {
@@ -611,18 +697,31 @@ sub configure {
   # Repository metadata. Three-way, additive: GitHub dists keep GithubMeta
   # exactly as before; Gitea/Forgejo dists (a known host, or gitea = 1) get
   # proper forge URLs via Author::GETTY::GiteaMeta built for the actual remote
-  # host; anything else falls back to the generic Repository.
+  # host; anything else with a remote falls back to the generic Repository.
+  # Without any remote there is no URL to report, and Repository would only
+  # run `git svn info` ("git: 'svn' is not a git command"), so none is added.
+  # Each of the three reads a single remote, origin by default, so a
+  # repository with no origin points them at its first remote (the one
+  # _remote_host comes from). With origin nothing is passed.
+  my $remote = $self->_remote_name;
+  undef $remote if defined $remote && $remote eq 'origin';
   if (!$self->no_github) {
-    $self->add_plugins([ 'GithubMeta' => { issues => 1 } ]);
+    $self->add_plugins([ 'GithubMeta' => {
+      issues => 1,
+      (defined $remote ? (remote => $remote) : ()),
+    } ]);
   }
   elsif ($self->_is_gitea_remote) {
     $self->add_plugins([ 'Author::GETTY::GiteaMeta' => {
       issues => 1,
       host   => $self->_remote_host,
+      (defined $remote ? (remote => $remote) : ()),
     } ]);
   }
-  else {
-    $self->add_plugins('Repository');
+  elsif ($self->_has_remote) {
+    $self->add_plugins(defined $remote
+      ? [ 'Repository' => { git_remote => $remote } ]
+      : 'Repository');
   }
 
   # Add IRC metadata if configured
@@ -691,9 +790,10 @@ sub configure {
 
   # @Basic's UploadToCPAN is the Releaser that no_cpan removes, and
   # Dist::Zilla refuses to release without any Releaser. Unless the dist
-  # brings its own (the Docker default, or run_release), fake one so the rest
-  # of the flow (changelog, tag, version bump, push) runs.
-  if ($self->no_cpan && !$self->_docker_default && !@{ $self->run_release }) {
+  # brings its own (the Docker default, or the Run::Release that any
+  # run_*_release adds), fake one so the rest of the flow (changelog, tag,
+  # version bump, push) runs.
+  if ($self->no_cpan && !$self->_docker_default && !%{ $self->_run_config('release') }) {
     $self->add_plugins('FakeRelease');
   }
 
@@ -705,7 +805,20 @@ sub configure {
 
   $self->add_plugins('Prereqs::FromCPANfile');
 
-  # NextRelease is handled by @Git::VersionManager
+  # NextRelease is handled by @Git::VersionManager, except for a task, which
+  # uses @Git: it stamps Changes here, with the same format and time zone as
+  # @Git::VersionManager (changes_version_columns 10). It has to come before
+  # @Git, so that its Git::Commit sees the stamped Changes (allow_dirty), and
+  # before Author::GETTY::GitHubRelease, which reads the release notes from Changes.
+  if ($self->is_task && !$self->no_changes) {
+    $self->add_plugins([
+      'NextRelease' => {
+        ':version' => '5.033',
+        time_zone  => 'UTC',
+        format     => q<%-8v  %{yyyy-MM-dd HH:mm:ss'Z'}d%{ (TRIAL RELEASE)}T>,
+      }
+    ]);
+  }
 
   if ($self->is_task) {
     $self->add_plugins('TaskWeaver');
@@ -748,11 +861,23 @@ sub configure {
 
   unless ($self->no_github || $self->no_github_release) {
     $self->add_plugins([
-      'GitHub::CreateRelease' => {
+      'Author::GETTY::GitHubRelease' => {
         branch     => $self->release_branch,
         notes_from => 'ChangeLog',
       }
     ]);
+  }
+
+  # Binaries: one @Author::GETTY::Binary per binary = ..., sharing the
+  # binary_* keys. They are published as assets of the GitHub release, so
+  # that has to exist.
+  if ($self->_binaries) {
+    die "[\@Author::GETTY] binary release needs the GitHub release, but it is off "
+      . "(no_github, no_github_release or no GitHub remote)\n"
+      if $self->no_github || $self->no_github_release;
+    unless (defined $self->payload->{binary_default} && !$self->payload->{binary_default}) {
+      $self->add_bundle('@Author::GETTY::Binary' => { binary_name => $_ }) for $self->_binaries;
+    }
   }
 
   # Docker support: if docker_image is set on this bundle, auto-add a single
@@ -781,7 +906,7 @@ Dist::Zilla::PluginBundle::Author::GETTY - BeLike::GETTY when you build your dis
 
 =head1 VERSION
 
-version 0.327
+version 0.328
 
 =head1 SYNOPSIS
 
@@ -832,6 +957,11 @@ In default configuration it is equivalent to:
   -remove = GatherDir
   -remove = PruneCruft
   -remove = License ; LICENSE is committed, see generate_license
+  -remove = ConfirmRelease ; comes back behind InstallCheck
+
+  [Author::GETTY::InstallCheck] ; cpanm --test-only on the tarball, before the upload;
+                                ; not with no_installrelease or Alien
+  [ConfirmRelease]
 
   [LicenseFile]     ; checks the committed LICENSE against dist.ini
 
@@ -845,7 +975,9 @@ In default configuration it is equivalent to:
   meta_noindex    = 1
 
   [GithubMeta]      ; with a GitHub remote; a Gitea/Forgejo remote gets
-                    ; [Author::GETTY::GiteaMeta], anything else [Repository]
+                    ; [Author::GETTY::GiteaMeta], any other remote
+                    ; [Repository], no remote at all none of them;
+                    ; each reads origin, or the first remote without one
 
   [InstallRelease]
   install_command = cpanm .
@@ -872,14 +1004,18 @@ In default configuration it is equivalent to:
   [Git::Push]
   push_to = origin
 
-  [GitHub::CreateRelease]   ; with a GitHub remote
+  [Author::GETTY::GitHubRelease]   ; with a GitHub remote
   branch     = main
   notes_from = ChangeLog
   ; notes_file defaults to "Changes" when notes_from = ChangeLog
 
 If the C<task> argument is given to the bundle, PodWeaver is replaced with
 TaskWeaver and AutoVersion is used for versioning (instead of
-@Git::VersionManager). You can also give a bigger major version with C<version>:
+@Git::VersionManager). L<Dist::Zilla::Plugin::NextRelease> stamps F<Changes>
+with the version and the UTC release time exactly like it does with
+@Git::VersionManager, before @Git commits it, and
+L<Dist::Zilla::Plugin::Test::ChangesHasContent> checks it (unless
+C<no_changes> is set). You can also give a bigger major version with C<version>:
 
   [@Author::GETTY]
   task = 1
@@ -901,6 +1037,77 @@ You can also use shortcuts for integrating L<Dist::Zilla::Plugin::Run>:
   run_test = script/tester.pl --name %n --version %v some_file.ext
   run_if_release_test = ./Build install
   run_if_release_test = make install
+
+The phases are C<after_build>, C<before_build>, C<before_release>, C<release>,
+C<after_release> and C<test>; each phase that has any of these keys gets one
+plugin of the matching name (L<Dist::Zilla::Plugin::Run::AfterBuild>,
+L<Dist::Zilla::Plugin::Run::BeforeBuild>,
+L<Dist::Zilla::Plugin::Run::BeforeRelease>,
+L<Dist::Zilla::Plugin::Run::Release>,
+L<Dist::Zilla::Plugin::Run::AfterRelease>, L<Dist::Zilla::Plugin::Run::Test>).
+Besides C<run_E<lt>phaseE<gt>>, which always runs its command, every phase
+takes the conditional forms of L<Dist::Zilla::Plugin::Run>, passed on as the
+option of the same name without the phase suffix (C<run_if_release_test>
+becomes C<run_if_release> of C<Run::Test>):
+
+=over 4
+
+=item *
+
+C<run_if_trial_E<lt>phaseE<gt>> runs its command only on a trial build or
+release
+
+=item *
+
+C<run_no_trial_E<lt>phaseE<gt>> runs its command only on a build or release
+that is not a trial
+
+=item *
+
+C<run_if_release_E<lt>phaseE<gt>> runs its command only during C<dzil release>
+(C<DZIL_RELEASING> is set)
+
+=item *
+
+C<run_no_release_E<lt>phaseE<gt>> runs its command only outside of
+C<dzil release>
+
+=back
+
+All of these keys can be given more than once. C<dzil release> sets
+C<DZIL_RELEASING> before it builds the release, so in C<before_release>,
+C<release> and C<after_release> a C<run_if_release_E<lt>phaseE<gt>> command
+always runs and a C<run_no_release_E<lt>phaseE<gt>> command never does.
+
+The commands take the placeholders of L<Dist::Zilla::Plugin::Run>, among them
+C<%n> (distribution name), C<%v> (version), C<%d> (build directory, not in
+C<before_build>) and C<%a> (archive, in C<before_release>, C<release> and
+C<after_release>). C<%s> is positional: each C<%s> takes the next value of its
+phase, and is empty once they run out:
+
+=over 4
+
+=item *
+
+C<before_build>: the version
+
+=item *
+
+C<after_build>: the build directory, then the version
+
+=item *
+
+C<before_release> and C<release>: the archive
+
+=item *
+
+C<after_release>: the archive, then the version
+
+=item *
+
+C<test>: none
+
+=back
 
 You can also use add up configuration for L<Dist::Zilla::Plugin::Git::GatherDir>,
 excluding I<root> or I<prefix>:
@@ -994,8 +1201,9 @@ L<Dist::Zilla::Plugin::PodWeaver>.
 =head2 no_github
 
 If set to 1, this attribute will disable L<Dist::Zilla::Plugin::GithubMeta> and
-will add L<Dist::Zilla::Plugin::Repository> instead. It also disables
-L<Dist::Zilla::Plugin::GitHub::CreateRelease>.
+will add L<Dist::Zilla::Plugin::Repository> instead (if the repository has a
+remote, see below). It also disables
+L<Dist::Zilla::Plugin::Author::GETTY::GitHubRelease>.
 
 When unset, the bundle auto-detects whether the repository has a remote
 pointing at C<github.com> (by scanning F<.git/config>). If no GitHub remote is
@@ -1008,11 +1216,16 @@ For repository metadata in the no-GitHub case the bundle is forge-aware: a
 remote pointing at a Gitea/Forgejo host gets proper C<repository>/
 C<bugtracker>/C<homepage> resources via
 L<Dist::Zilla::Plugin::Author::GETTY::GiteaMeta> (the Gitea/Forgejo counterpart
-of L<Dist::Zilla::Plugin::GithubMeta>); anything else falls back to the generic
-L<Dist::Zilla::Plugin::Repository>. The known Gitea hosts (C<codeberg.org> and
-the author's own instance) are detected automatically; for any other
-self-hosted Gitea/Forgejo instance set L</gitea>. Purely additive —
-GitHub-hosted distributions are unaffected.
+of L<Dist::Zilla::Plugin::GithubMeta>); any other remote falls back to the
+generic L<Dist::Zilla::Plugin::Repository>. A repository without any remote
+gets none of them: there is no URL to report. The known Gitea hosts
+(C<codeberg.org> and the author's own instance) are detected automatically;
+for any other self-hosted Gitea/Forgejo instance set L</gitea>. Purely
+additive — GitHub-hosted distributions are unaffected.
+
+The repository metadata comes from the C<origin> remote, or from the first
+remote when there is no C<origin>: GithubMeta, GiteaMeta and Repository are all
+pointed at it, and its host is the one checked for a Gitea/Forgejo forge.
 
 =head2 gitea
 
@@ -1024,7 +1237,7 @@ hosts. Has no effect when a GitHub remote is present (GitHub wins).
 
 =head2 no_github_release
 
-If set to 1, L<Dist::Zilla::Plugin::GitHub::CreateRelease> will not be used
+If set to 1, L<Dist::Zilla::Plugin::Author::GETTY::GitHubRelease> will not be used
 even though GitHub integration is otherwise active. Like L</no_github>, this
 defaults to 1 when no GitHub remote is detected in the repository's remotes.
 
@@ -1044,18 +1257,20 @@ Dist::Zilla refuses to release without a Releaser plugin, so the bundle adds
 L<Dist::Zilla::Plugin::FakeRelease> in its place, which lets C<dzil release>
 run the rest of the flow (changelog, tag, version bump, push). It is left out
 when the dist brings a Releaser of its own: the default Docker subsection
-(L</docker_image>) or C<run_release>. A Releaser you add by hand to your
-F<dist.ini> is not seen by the bundle, so if you do that, you will have the
-fake one as well.
+(L</docker_image>) or L<Dist::Zilla::Plugin::Run::Release>, which any of
+C<run_release>, C<run_if_trial_release>, C<run_no_trial_release>,
+C<run_if_release_release> and C<run_no_release_release> adds. A Releaser you
+add by hand to your F<dist.ini> is not seen by the bundle, so if you do that,
+you will have the fake one as well.
 
 It also makes B<version_finder> default to C<:MainModule>.
 
 =head2 no_changes
 
-If set to 1, then L<Dist::Zilla::Plugin::NextRelease> (from @Git::VersionManager)
-will not generate changes entries. As the version heading is then blank,
-L<Dist::Zilla::Plugin::Test::ChangesHasContent> is left out as well; it is
-also left out for a C<task>, which has no NextRelease either.
+If set to 1, then L<Dist::Zilla::Plugin::NextRelease> (from @Git::VersionManager,
+or the one a C<task> adds itself) will not generate changes entries. As the
+version heading is then blank, L<Dist::Zilla::Plugin::Test::ChangesHasContent>
+is left out as well.
 
 =head2 commit_files_after_release
 
@@ -1150,7 +1365,9 @@ this flag.
 =head2 no_installrelease
 
 By default, this bundle will install your distribution after the release. If
-you set this attribute to 1, then this will not happen. See
+you set this attribute to 1, then this will not happen, and neither does the
+install test before the upload
+(L<Dist::Zilla::Plugin::Author::GETTY::InstallCheck>). See
 L<Dist::Zilla::Plugin::InstallRelease>.
 
 If you use the L<Dist::Zilla::Plugin::Alien> options, then this one will not
@@ -1397,6 +1614,8 @@ L<Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch>
 
 L<Dist::Zilla::Plugin::GitHub::CreateRelease>
 
+L<Dist::Zilla::Plugin::Author::GETTY::GitHubRelease>
+
 L<Dist::Zilla::Plugin::GithubMeta>
 
 L<Dist::Zilla::Plugin::InstallRelease>
@@ -1478,6 +1697,158 @@ C<docker_image> is set — use this when you configure your Docker builds
 exclusively through explicit C<[@Author::GETTY::Docker / name]> subsections
 and don't want an extra plugin added behind your back.
 
+=head2 Binaries
+
+A distribution can ship standalone binaries of its scripts, packed with
+L<PAR::Packer> (C<pp>), as assets of its GitHub release. Declare them with
+C<binary>; the bundle adds one L<Dist::Zilla::Plugin::Author::GETTY::Binary>
+per binary, which writes them to the C<x_binaries> key of F<META.json>. A
+reusable GitHub Actions workflow of this repository reads that key, packs the
+binaries on the five platforms, checks them and attaches them to the release.
+
+  [@Author::GETTY]
+  binary           = foo bar
+  binary_modules   = Some::Module Other::*
+  binary_require   = Some::Module
+  binary_platforms = linux-x86_64 linux-arm64
+  binary_pp_args   = sh share/pp-args.sh
+  binary_verify    = sh share/verify.sh
+  binary_smoke     = sh share/smoke.sh
+  binary_prepare   = sh share/prepare.sh
+
+Only C<binary> is needed; every other key is optional. A binary C<foo> is packed
+from F<bin/foo> (a different script needs an explicit
+C<[@Author::GETTY::Binary / foo]> subsection with C<script>, see
+L<Dist::Zilla::PluginBundle::Author::GETTY::Binary>).
+
+The distribution calls the workflow from its own
+F<.github/workflows/binaries.yml>, which has to exist before C<dzil release>
+(the release is refused without it):
+
+  name: binaries
+  on:
+    release:
+      types: [published]
+    workflow_dispatch:
+      inputs:
+        tag:
+          description: Release tag to build and attach; empty = probe run
+          required: false
+  jobs:
+    binaries:
+      permissions:
+        contents: write
+      uses: Getty/p5-dist-zilla-pluginbundle-author-getty/.github/workflows/dzil-binary.yml@binary-v1
+      with:
+        tag: ${{ github.event.release.tag_name || inputs.tag }}
+
+A published release builds from the release's CPAN tarball and attaches, per
+binary and platform, C<NAME-VERSION-PLATFORM> (C<.exe> on Windows), plus
+F<SHA256SUMS>, F<install.sh> and F<install.ps1>. Started by hand with an empty
+C<tag>, the workflow is a probe run: it builds the checked-out commit and keeps
+the result as workflow artifacts, touching no release.
+
+Binaries are assets of the GitHub release, so C<binary> forces it: the bundle
+dies when C<no_github> or C<no_github_release> is set, or when no GitHub remote
+was found. The release of a distribution with binaries is not marked as the
+latest release by the release plugin
+(L<Dist::Zilla::Plugin::Author::GETTY::GitHubRelease>); the workflow marks it
+after it attached the binaries, when its version is newer than the current
+latest release.
+
+The installers are rendered per release. With the distribution name upper-cased
+and C<-> turned into C<_> as prefix (C<MCP_WIKI_> for C<MCP-Wiki>), they read
+C<PREFIX_VERSION> (install that version instead), C<PREFIX_INSTALL_DIR>
+(default F<~/.local/bin>, or F<%LOCALAPPDATA%\Programs\DIST> on Windows),
+C<PREFIX_PLATFORM> (override the detected platform) and C<PREFIX_BASE_URL> (the
+releases URL, default the GitHub releases of the repository):
+
+  curl -fsSL https://github.com/OWNER/REPO/releases/latest/download/install.sh | sh -s -- foo
+
+Without names they install every binary of the release. The binaries are built
+for C<linux-x86_64>, C<linux-arm64>, C<macos-arm64>, C<macos-x86_64> and
+C<windows-x86_64>. The Linux binaries must not need a glibc newer than 2.28,
+which the build checks (C<$GLIBC_FLOOR> in F<.github/dzil-binary/lib-gate.pl>).
+
+Packing runs again at C<dzil build> as a local check, which needs C<pp> in the
+C<PATH> (L<PAR::Packer>) and fails the build without it. Set the environment
+variable C<DZIL_BINARY_SKIP> to a true value to skip that local check,
+including C<binary_verify> and C<binary_smoke>. As in the workflow, neither
+sees C<PERL5LIB> in the local check, and C<binary_verify> gets the caller's in
+C<DZIL_BINARY_PERL5LIB>.
+
+=head2 binary
+
+Whitespace-separated names of the binaries; may be repeated. Each name becomes
+a binary packed from F<bin/NAME>. Setting it turns the binary release on.
+
+=head2 binary_default
+
+Defaults to true. Set to C<0> to not add the binaries from C<binary> and
+configure them through explicit C<[@Author::GETTY::Binary / name]> subsections
+instead, as with C<docker_default>.
+
+=head2 binary_modules
+
+Whitespace-separated modules packed into every binary besides what C<pp>
+finds itself, each passed as C<-M>. A trailing C<::*> takes the whole
+namespace below, at any depth, but not the module itself: C<Foo::*> goes to
+C<pp> as C<-M Foo::**> and packs every F<.pm> file below F<Foo/> in F<lib> and
+C<@INC>, not F<Foo.pm>; name C<Foo> as well to pack that too. A namespace with
+nothing in it packs nothing and does not fail the build; list it in
+C<binary_require> to make it fail. Default: none. Inherited by subsections.
+
+=head2 binary_require
+
+Whitespace-separated modules (or C<Namespace::*> globs) that have to be inside
+every finished binary; the build fails when one is missing. A glob is the
+namespace of C<binary_modules>: any one module below C<Namespace>, at any
+depth, meets it, F<Namespace.pm> alone does not. Default: none.
+Inherited by subsections.
+
+=head2 binary_platforms
+
+Whitespace-separated platforms to build, out of C<linux-x86_64>,
+C<linux-arm64>, C<macos-arm64>, C<macos-x86_64> and C<windows-x86_64>. Default:
+all five. Dist-wide: a subsection that sets C<platforms> is refused.
+
+=head2 binary_pp_args
+
+A shell command run in the distribution root whose output is added to the
+C<pp> command line, one argument per line (empty lines dropped, a trailing
+carriage return removed, no word splitting). Default: none. Inherited by
+subsections.
+
+=head2 binary_verify
+
+A shell command run in the distribution root after packing, with the path of
+the binary appended as its argument. A failing exit status fails the build.
+It runs without C<PERL5LIB>, so the binary under test finds no module outside
+itself, and gets in C<DZIL_BINARY_PERL5LIB> the C<PERL5LIB> under which the
+packing perl loads the distribution's dependencies: in the workflow the build
+leg's local lib, with the packing perl first in the C<PATH>; in the local check
+the caller's C<PERL5LIB>, empty without one. A verify that compares the binary
+with its script runs that perl as
+C<PERL5LIB=$DZIL_BINARY_PERL5LIB perl -Ilib bin/foo>.
+Default: none, the workflow then notes that no verify is declared. Inherited by
+subsections.
+
+=head2 binary_smoke
+
+A shell command like C<binary_verify>, which the workflow runs on every
+platform on a clean machine without Perl (Linux inside the images AlmaLinux 8
+and 9 and Debian bookworm slim, macOS and Windows on the runner as it is),
+with the binary as its argument. It runs without C<PERL5LIB> and without
+C<DZIL_BINARY_PERL5LIB>, in the local check too. Default: none, the binary is
+then not smoke tested. Inherited by subsections.
+
+=head2 binary_prepare
+
+A shell command run once per platform before the dependencies are installed,
+for building what the binaries need (a system library, say). Its first word
+has to be a file of the distribution; the file's checksum keys the cache of its
+result. Default: none. Dist-wide: a subsection that sets C<prepare> is refused.
+
 =head1 SUPPORT
 
 =head2 Issues
@@ -1495,11 +1866,9 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-L<https://raudssus.de/>
 
 =cut

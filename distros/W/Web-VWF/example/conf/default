@@ -1,6 +1,42 @@
 <?xml version="1.0"?>
 <config>
-	<pages>index, meta_data</pages>
+	<display>
+		<!--
+			Without any <page> elements, the page modules found in <directory>
+			are the valid pages (default: ../lib/Web/VWF/Display beside cgi-bin).
+			<directory>/path/to/Display</directory>
+			A <directory> inside a <page> says where that page's module is, and
+			beats this one.
+		-->
+		<page>
+			<name>index</name>
+			<description>The home page, with the contact form</description>
+		</page>
+		<page>
+			<name>meta_data</name>
+			<description>Charts of the server and of the traffic it has handled</description>
+		</page>
+		<page>
+			<name>states</name>
+			<description>Displays information about the U.S. states</description>
+		</page>
+	</display>
+	<databases>
+		<!--
+			Each <database> names a Web::VWF::Data:: module (a name with :: in it
+			is used as written).  A <directory> here, or inside a <database>, is
+			where the module's .pm file is, instead of @INC; the files that hold
+			the data are in database_dir.
+		-->
+		<database>
+			<name>index</name>
+			<description>The people who can be contacted from the index page (index.csv)</description>
+		</database>
+		<database>
+			<name>states</name>
+			<description>List of data about the U.S. states</description>
+		</database>
+	</databases>
 	<memory_cache>
 		<driver>Null</driver>
 	</memory_cache>

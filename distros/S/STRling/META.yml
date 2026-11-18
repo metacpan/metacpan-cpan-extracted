@@ -1,0 +1,27 @@
+---
+abstract: 'thin Perl adapter over the canonical STRling native interop boundary'
+author:
+  - 'STRling Team'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  JSON::PP: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: STRling
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  FFI::Platypus: '2.10'
+  JSON::PP: '4.00'
+  perl: '5.010'
+version: v4.0.1
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+Makefile.PL
+README.md
+cpanfile
+lib/STRling.pm
+lib/STRling/NativeClient.pm
+lib/STRling/Requests.pm
+lib/STRling/StdlibGenerated.pm
+lib/STRling/StrictJSON.pm
+t/adapter.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

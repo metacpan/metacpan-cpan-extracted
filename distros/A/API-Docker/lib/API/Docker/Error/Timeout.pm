@@ -1,6 +1,6 @@
 package API::Docker::Error::Timeout;
 # ABSTRACT: Read timeout while waiting for the Docker Engine
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 # namespace::clean has to come BEFORE "use overload" here, not after it as
 # everywhere else in this distribution -- same reason as in
@@ -77,7 +77,7 @@ API::Docker::Error::Timeout - Read timeout while waiting for the Docker Engine
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -259,7 +259,7 @@ inside a stream the daemon already answered with HTTP 200
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

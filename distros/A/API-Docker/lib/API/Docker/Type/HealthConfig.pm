@@ -1,6 +1,6 @@
 package API::Docker::Type::HealthConfig;
 # ABSTRACT: A test to perform to check that the container is healthy
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -37,7 +37,7 @@ API::Docker::Type::HealthConfig - A test to perform to check that the container 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -109,7 +109,7 @@ should be 0 or at least 1000000 (1 ms). 0 means inherit.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

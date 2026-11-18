@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::NetworkAttachmentSpec;
 # ABSTRACT: Read-only spec type for non-swarm containers attached to swarm overlay networks
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::TaskSpec::NetworkAttachmentSpec - Read-only spec type for non
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -44,7 +44,7 @@ C<ContainerId>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

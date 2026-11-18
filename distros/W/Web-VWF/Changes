@@ -1,5 +1,50 @@
 Revision history for Web-VWF
 
+0.003.0	Tue Nov 17 12:05:14 PM EST 2026
+	[ Enhancements ]
+	- The pages a site serves are declared in <display>, one <page> element for
+	each, with a <name> and a <description> (shown in the 300 response).  A
+	<directory> in <display> or in a <page> says where the page modules are, instead
+	of @INC; with no <page>, the modules found in the <display> directory are the
+	pages.  The old <pages> setting, and its string of names, is still read.
+	- The data modules a site loads are declared in <databases>, one <database>
+	element for each, with a <name>, a <description> and a <directory> likewise.
+	A name with no :: in it is a Web::VWF::Data:: module, so <name>states</name> is
+	Web::VWF::Data::states.  The old <data_modules> string is still read.  (It is
+	not called <data> because Database::Abstraction takes constructor arguments
+	from top-level configuration keys, and data is one of them.)
+	- File-based caches (Berkeley DB, File) now go in $CACHEDIR, or failing that
+	$CACHE_DIR, when either is set, ahead of $root_dir and the configuration; the
+	directory is created if it does not exist.  Previously root_dir=example put
+	CGI+3a+3aLingua, __db.* and the rest inside example/.
+	- The example site has a states page (?page=states), reading
+	example/data/states.csv (the 50 U.S. states) through Web::VWF::Data::states,
+	Web::VWF::Display::states and states.tmpl, which are in example/lib; and
+	example/data/index.csv, the people the contact form can reach.
+	- Documented every site setting: a new CONFIGURATION section in the Web::VWF
+	POD and the README, with the defaults.  Added the SYNOPSIS and run() to the
+	POD, POD for every module, Web::VWF::Utils::env_cache_dir, an AUTHOR and a
+	LICENCE section for each, and a LICENSE file.
+	- t/pod-coverage.t (an author test) checks that every public subroutine is
+	documented, and t/version.t no longer skips a Changes entry that has no date
+	yet when checking its version (the date is required under RELEASE_TESTING),
+	and checks the example site's modules too.
+	[ Bug Fixes ]
+	- Require HTML::D3 0.30.  CPAN Testers (Perl 5.44, aarch64 Linux) had 0.23 and
+	the meta_data page, t/function.t and t/meta-data-charts.t died with "Data must
+	be an array of arrays": 0.23 takes render_pie_chart_snippet($data, $opts)
+	positionally, and meta_data passes a hash.  The prerequisite is now declared in
+	Makefile.PL, cpanfile and linux.yml, and meta_data checks it on load.
+	Fixes https://matrix.perl-magpie.org/results/ffb3469e-de40-11f1-a09d-aafb97416a10
+	- Handle captcha display failure
+	- The POD of Blacklist, Utils and Config still used the old VWF:: names, so
+	its SYNOPSIS did not load.
+	- Data::Throttler::Backend::VWF, which Web::VWF::Throttle defines in another
+	distribution's namespace, is no longer offered to PAUSE (no_index).
+	- Declared Test::Needs, which t/pod.t uses, and recommend Mail::DKIM and
+	Crypt::OpenSSL::RSA for the tests that sign a message.
+	- ASCII only in the source of Web::VWF; one line indented with spaces now uses tabs.
+
 0.002.0	Wed Nov 11 08:54:17 PM EST 2026
 	[ Enhancements ]
 	- Added Web::VWF::Mail: sends mail through sendmail(1), signed with DKIM when

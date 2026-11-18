@@ -1,6 +1,6 @@
 package API::Docker::Type::BuildInfo;
 # ABSTRACT: One event of the stream a C<POST /build> answers with
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ErrorDetail;
 use API::Docker::Type::ImageID;
@@ -46,7 +46,7 @@ API::Docker::Type::BuildInfo - One event of the stream a C<POST /build> answers 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -127,7 +127,7 @@ Image ID or Digest. See L<API::Docker::Type::ImageID>. Serialised as C<aux>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

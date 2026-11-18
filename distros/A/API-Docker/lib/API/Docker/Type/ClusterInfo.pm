@@ -1,6 +1,6 @@
 package API::Docker::Type::ClusterInfo;
 # ABSTRACT: Information about the swarm as is returned by the "/info" endpoint
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ObjectVersion;
 use API::Docker::Type::SwarmSpec;
@@ -52,7 +52,7 @@ API::Docker::Type::ClusterInfo - Information about the swarm as is returned by t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -115,7 +115,7 @@ default subnet pool.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

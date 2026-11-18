@@ -29,17 +29,9 @@ provides:
     file: lib/Getopt/EX/Factotum.pm
   IO::Factotum:
     file: lib/IO/Factotum.pm
-    version: '0.04'
+    version: '0.05'
   IO::Factotum::ARGV:
     file: lib/IO/Factotum/ARGV.pm
-  IO::Factotum::Highlight::gnu:
-    file: lib/IO/Factotum/Highlight/gnu.pm
-  IO::Factotum::Highlight::sky:
-    file: lib/IO/Factotum/Highlight/sky.pm
-  IO::Factotum::Highlight::skylighting:
-    file: lib/IO/Factotum/Highlight/skylighting.pm
-  IO::Factotum::Highlight::sourcehighlight:
-    file: lib/IO/Factotum/Highlight/sourcehighlight.pm
 requires:
   Command::Run: '1.05'
   perl: v5.16.0
@@ -47,7 +39,7 @@ resources:
   bugtracker: https://github.com/tecolicom/IO-Factotum/issues
   homepage: https://github.com/tecolicom/IO-Factotum
   repository: https://github.com/tecolicom/IO-Factotum.git
-version: '0.04'
+version: '0.05'
 x_authority: cpan:UTASHIRO
 x_contributors:
   - 'Kazumasa Utashiro <kaz@utashiro.com>'

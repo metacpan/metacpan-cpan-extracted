@@ -1,9 +1,16 @@
 Changes
+LICENSE
 cpanfile
 example/cgi-bin/page.fcgi
 example/conf/default
+example/data/index.csv
+example/data/states.csv
+example/lib/Web/VWF/Data/states.pm
+example/lib/Web/VWF/Display/states.pm
+example/templates/web/Web/VWF/Display/captcha.tmpl
 example/templates/web/Web/VWF/Display/index.tmpl
 example/templates/web/Web/VWF/Display/meta_data.tmpl
+example/templates/web/Web/VWF/Display/states.tmpl
 lib/Web/VWF.pm
 lib/Web/VWF/Allow.pm
 lib/Web/VWF/Blacklist.pm
@@ -23,10 +30,14 @@ Makefile.PL
 MANIFEST			This list of files
 MANIFEST.SKIP
 README.md
+t/example-data.t
+t/example-site.t
 t/function.t
 t/mail.t
 t/meta-data-charts.t
-t/example-site.t
+t/pages-config.t
+t/data-config.t
+t/pod-coverage.t
 t/pod.t
 t/redact.t
 t/version.t

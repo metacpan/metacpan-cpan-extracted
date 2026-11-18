@@ -1,0 +1,36 @@
+# Dist::Zilla build artifacts
+/Text-Nunjucks-*/
+/Text-Nunjucks-*.tar.gz
+/.build/
+
+# Carton
+/local/
+
+# Upstream Nunjucks checkout (reference source + oracle) -- refetched with
+# maint/fetch-upstream at the tag pinned there; never committed.
+/upstream/
+
+# Claude Code — commit: skills/, agents/, rules/, settings.json
+# Ignore: local overrides, credentials, session data
+.claude/*.local.*
+.claude/local/
+.claude/.credentials.json
+.claude/statsig/
+.claude/todos/
+.claude/projects/
+# Temporary git worktrees created for isolated agent runs
+.claude/worktrees/
+
+# karr materialized task view -- never commit
+tasks/
+config.yml
+
+# Devel::NYTProf profile output, Devel::Cover database
+nytprof.out
+/cover_db/
+
+# ExtUtils::MakeMaker build junk (perl Makefile.PL && make)
+/blib/
+/Makefile
+/MYMETA.*
+/pm_to_blib

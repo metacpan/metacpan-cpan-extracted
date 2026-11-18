@@ -1,0 +1,435 @@
+[
+  {
+    "name": "include closure: control: a top-level include hands a macro to the includer, called after the include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% include 'inc.njk' %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside an if",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'inc.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside a for loop (two iterations)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% for i in [1,2] %}{% include 'inc.njk' %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside a macro body",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% macro wrap() %}{% include 'inc.njk' %}{% endmacro %}[{{ wrap() }}]{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]<VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside a set capture",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% set cap %}{% include 'inc.njk' %}{% endset %}[{{ cap }}]{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]<VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside an if inside a for loop inside an if",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% for i in [1,2] %}{% if i %}{% include 'inc.njk' %}{% endif %}{% endfor %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside a block",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% block c %}{% for i in [1] %}{% include 'inc.njk' %}{% endfor %}{% endblock %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside an asyncEach loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% asyncEach i in [1,2] %}{% include 'inc.njk' %}{% endeach %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: the include sits inside an asyncAll loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% asyncAll i in [1,2] %}{% include 'inc.njk' %}{% endall %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: the included macro reads the includer's loop variable after the loop has ended",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% for i in [1,2] %}{% include 'i2.njk' %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "i2.njk": "{% macro m() %}<{{ i }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<X><X>"
+    }
+  },
+  {
+    "name": "include closure: the included template from-imports a macro and hands it up, include inside an if",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'i2.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "lib.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}",
+      "i2.njk": "{% from 'lib.njk' import m %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<V>"
+    }
+  },
+  {
+    "name": "include closure: the included template from-imports with context and hands it up, include inside a for loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% for i in [1,2] %}{% include 'i2.njk' %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "lib.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}",
+      "i2.njk": "{% from 'lib.njk' import m with context %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: the included template imports a namespace and hands up one of its macros, include inside an if",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'i2.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "lib.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}",
+      "i2.njk": "{% import 'lib.njk' as ns %}{% set _ = bag.push(ns.m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<V>"
+    }
+  },
+  {
+    "name": "include closure: the included template imports a namespace and hands up one of its macros, include inside a macro body",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% macro wrap() %}{% include 'i2.njk' %}{% endmacro %}{{ wrap() }}{% for f in bag %}{{ f() }}{% endfor %}",
+      "lib.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}",
+      "i2.njk": "{% import 'lib.njk' as ns %}{% set _ = bag.push(ns.m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<V>"
+    }
+  },
+  {
+    "name": "include closure: a call block registered through an includer macro, include inside a for loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% macro reg() %}{% set _ = bag.push(caller) %}{% endmacro %}{% for i in [1,2] %}{% include 'i2.njk' %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "i2.njk": "{% set v = 'V' %}{% call reg() %}<{{ v }}{{ x }}>{% endcall %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: a call block registered through an includer macro, include inside an if",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% macro reg() %}{% set _ = bag.push(caller) %}{% endmacro %}{% if true %}{% include 'i2.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "i2.njk": "{% set v = 'V' %}{% call reg() %}<{{ v }}{{ x }}>{% endcall %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VX>"
+    }
+  },
+  {
+    "name": "include closure: a call block of the included template reads the includer's loop variable, called after the loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% macro reg() %}{% set _ = bag.push(caller) %}{% endmacro %}{% for i in [1,2] %}{% include 'i2.njk' %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "i2.njk": "{% set v = 'V' %}{% call reg() %}<{{ v }}{{ i }}{{ x }}>{% endcall %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<V2X><V2X>"
+    }
+  },
+  {
+    "name": "include closure: nested include: the grandchild hands the macro up, both includes inside an if",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'g.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "g.njk": "g{% if true %}{% include 'inc.njk' %}{% endif %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "g<VX>"
+    }
+  },
+  {
+    "name": "include closure: nested include: the grandchild hands the macro up, the child is a plain partial in a for loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% for i in [1,2] %}{% include 'g.njk' %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "g.njk": "g{% for j in [1] %}{% include 'inc.njk' %}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "gg<VX><VX>"
+    }
+  },
+  {
+    "name": "include closure: nested include: three levels, only the innermost makes a macro",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'g.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "g.njk": "g{% if true %}{% include 'h.njk' %}{% endif %}",
+      "h.njk": "h{% if true %}{% include 'inc.njk' %}{% endif %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "gh<VX>"
+    }
+  },
+  {
+    "name": "include closure: a plain partial in a loop next to one that hands up a macro",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% for i in [1,2,3] %}{% if i == 2 %}{% include 'inc.njk' %}{% else %}{% include 'plain.njk' %}{% endif %}{% endfor %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}",
+      "plain.njk": "p"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "pp<VX>"
+    }
+  },
+  {
+    "name": "include closure: the macro handed up calls a sibling macro of the included template and reads a global",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'i2.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "i2.njk": "{% macro b() %}b{% endmacro %}{% macro m() %}<{{ b() }}{{ range(0,2) | join('') }}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b01X>"
+    }
+  },
+  {
+    "name": "include closure: the macro handed up contains an include of its own",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set bag = [] %}{% if true %}{% include 'i2.njk' %}{% endif %}{% for f in bag %}{{ f() }}{% endfor %}",
+      "plain.njk": "p",
+      "i2.njk": "{% macro m() %}<{% include 'plain.njk' %}{{ x }}>{% endmacro %}{% set _ = bag.push(m) %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<pX>"
+    }
+  },
+  {
+    "name": "include closure: content_for / yield_content: rows included in a loop, call blocks collected, read after the loop",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set slots = [] %}{% macro content_for(name) %}{% set _ = slots.push([name, caller]) %}{% endmacro %}{% macro yield_content(n) %}{% for name, f in slots %}{% if name == n %}{{ f() }}{% endif %}{% endfor %}{% endmacro %}{% for r in rows %}{% include 'row.njk' %}{% endfor %}|{{ yield_content('head') }}|{{ yield_content('foot') }}",
+      "row.njk": "<li>{{ r }}</li>{% call content_for('head') %}[{{ x }}]{% endcall %}{% call content_for('foot') %}({{ x }}){% endcall %}"
+    },
+    "context": {
+      "x": "X",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "<li>1</li><li>2</li>|[X][X]|(X)(X)"
+    }
+  },
+  {
+    "name": "include closure: content_for / yield_content: the call blocks read the row variable",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set slots = [] %}{% macro content_for(name) %}{% set _ = slots.push([name, caller]) %}{% endmacro %}{% macro yield_content(n) %}{% for name, f in slots %}{% if name == n %}{{ f() }}{% endif %}{% endfor %}{% endmacro %}{% for r in rows %}{% include 'row.njk' %}{% endfor %}|{{ yield_content('head') }}",
+      "row.njk": "<li>{{ r }}</li>{% call content_for('head') %}[{{ r }}{{ x }}]{% endcall %}"
+    },
+    "context": {
+      "x": "X",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "<li>1</li><li>2</li>|[2X][2X]"
+    }
+  },
+  {
+    "name": "include closure: content_for / yield_content: the collecting loop is inside an if, rows come through a nested include",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% set slots = [] %}{% macro content_for(name) %}{% set _ = slots.push([name, caller]) %}{% endmacro %}{% macro yield_content(n) %}{% for name, f in slots %}{% if name == n %}{{ f() }}{% endif %}{% endfor %}{% endmacro %}{% if true %}{% for r in rows %}{% include 'row.njk' %}{% endfor %}{% endif %}|{{ yield_content('head') }}",
+      "row.njk": "{% include 'cell.njk' %}",
+      "cell.njk": "{% call content_for('head') %}[{{ x }}]{% endcall %}"
+    },
+    "context": {
+      "x": "X",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "|[X][X]"
+    }
+  },
+  {
+    "name": "include closure: content_for / yield_content: collected through a macro of an imported library, read in the layout",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% import 'lib.njk' as h %}{% set slots = [] %}{% for r in rows %}{% include 'row.njk' %}{% endfor %}|{% for f in slots %}{{ f() }}{% endfor %}",
+      "lib.njk": "{% macro put(list) %}{% set _ = list.push(caller) %}{% endmacro %}",
+      "row.njk": "{% call h.put(slots) %}[{{ x }}]{% endcall %}"
+    },
+    "context": {
+      "x": "X",
+      "rows": [
+        1,
+        2
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "|[X][X]"
+    }
+  }
+]

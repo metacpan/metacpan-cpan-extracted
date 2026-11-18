@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use autodie     qw(open close);
 use Carp        qw(croak);
+use Config;
 use Cwd         qw(abs_path);
 use JSON::MaybeXS;
 use File::Path  qw(make_path);
@@ -22,11 +23,11 @@ Devel::App::Test::Generator::LCSAJ::Runtime - Debugger backend for LCSAJ coverag
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =cut
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 SYNOPSIS
 
@@ -53,8 +54,9 @@ one file per process so that parallel test runs do not overwrite each other.
 
 =item LCSAJ_TARGETS
 
-Optional colon-separated list of B<absolute> paths (as produced by C<realpath>)
-to restrict recording to specific source files. When empty or unset every
+Optional list of B<absolute> paths (as produced by C<realpath>), separated by
+C<$Config{path_sep}> (C<:> on Unix, C<;> on Windows, as in C<PATH>), to
+restrict recording to specific source files. When empty or unset every
 non-internal file is recorded.
 
 =back
@@ -79,20 +81,22 @@ our %NORM_CACHE;
 # --------------------------------------------------
 # Populate %TARGET from LCSAJ_TARGETS at compile time.
 # The env var contains absolute realpath() output
-# separated by colons. Stray newlines from broken
-# shell pipelines are stripped defensively.
+# separated by $Config{path_sep}; a colon would split
+# a Windows drive letter off its path. Stray newlines
+# from broken shell pipelines are stripped defensively.
 # --------------------------------------------------
 BEGIN {
 	my $targets_env = $ENV{LCSAJ_TARGETS} // '';
 	$targets_env =~ s/\n//g;
 
-	for my $t (split /:/, $targets_env) {
+	for my $t (split /\Q$Config{path_sep}\E/, $targets_env) {
 		next unless length $t;
 
 		# Inline normalisation — cannot call _normalize here since
 		# BEGIN runs before named subs are compiled when BEGIN
 		# appears at the top of the file
 		my $f = $t;
+		$f =~ tr{\\}{/};
 		$f =~ s{^.*/blib/lib/}{lib/};
 		$f =~ s{^.*/lib/}{lib/};
 		$TARGET{$f} = 1;
@@ -123,9 +127,13 @@ END {
 # Examples:
 #   /home/user/proj/blib/lib/Foo/Bar.pm  ->  lib/Foo/Bar.pm
 #   /home/user/proj/lib/Foo/Bar.pm       ->  lib/Foo/Bar.pm
+#   D:\a\proj\blib\lib\Foo\Bar.pm        ->  lib/Foo/Bar.pm
 # --------------------------------------------------
 sub _normalize {
 	my $f = $_[0];
+
+	# Windows paths (abs_path, %INC, caller) may use either separator
+	$f =~ tr{\\}{/};
 
 	# Strip everything up to and including blib/lib/ or lib/
 	$f =~ s{^.*/blib/lib/}{lib/};

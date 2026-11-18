@@ -4,7 +4,7 @@
       "Torsten Raudssus <getty@cpan.org>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 6.037, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Dist::Zilla version 6.040, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -65,955 +65,967 @@
    "provides" : {
       "API::Docker" : {
          "file" : "lib/API/Docker.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Configs" : {
          "file" : "lib/API/Docker/API/Configs.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Containers" : {
          "file" : "lib/API/Docker/API/Containers.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Distribution" : {
          "file" : "lib/API/Docker/API/Distribution.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Exec" : {
          "file" : "lib/API/Docker/API/Exec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Images" : {
          "file" : "lib/API/Docker/API/Images.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Networks" : {
          "file" : "lib/API/Docker/API/Networks.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Plugins" : {
          "file" : "lib/API/Docker/API/Plugins.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Secrets" : {
          "file" : "lib/API/Docker/API/Secrets.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::System" : {
          "file" : "lib/API/Docker/API/System.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::API::Volumes" : {
          "file" : "lib/API/Docker/API/Volumes.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Config" : {
          "file" : "lib/API/Docker/Config.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Container" : {
          "file" : "lib/API/Docker/Container.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Error::HTTP" : {
          "file" : "lib/API/Docker/Error/HTTP.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Error::Stream" : {
          "file" : "lib/API/Docker/Error/Stream.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Error::Timeout" : {
          "file" : "lib/API/Docker/Error/Timeout.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Error::Truncated" : {
          "file" : "lib/API/Docker/Error/Truncated.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Image" : {
          "file" : "lib/API/Docker/Image.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Network" : {
          "file" : "lib/API/Docker/Network.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Plugin" : {
          "file" : "lib/API/Docker/Plugin.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity" : {
          "file" : "lib/API/Docker/Role/Entity.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Config" : {
          "file" : "lib/API/Docker/Role/Entity/Config.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Container" : {
          "file" : "lib/API/Docker/Role/Entity/Container.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Image" : {
          "file" : "lib/API/Docker/Role/Entity/Image.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Network" : {
          "file" : "lib/API/Docker/Role/Entity/Network.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Plugin" : {
          "file" : "lib/API/Docker/Role/Entity/Plugin.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Secret" : {
          "file" : "lib/API/Docker/Role/Entity/Secret.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Entity::Volume" : {
          "file" : "lib/API/Docker/Role/Entity/Volume.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Filters" : {
          "file" : "lib/API/Docker/Role/Filters.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::HTTP" : {
          "file" : "lib/API/Docker/Role/HTTP.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::JSONBody" : {
          "file" : "lib/API/Docker/Role/JSONBody.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::RegistryAuth" : {
          "file" : "lib/API/Docker/Role/RegistryAuth.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Type" : {
          "file" : "lib/API/Docker/Role/Type.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Role::Using" : {
          "file" : "lib/API/Docker/Role/Using.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Secret" : {
          "file" : "lib/API/Docker/Secret.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type" : {
          "file" : "lib/API/Docker/Type.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Address" : {
          "file" : "lib/API/Docker/Type/Address.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::AuthConfig" : {
          "file" : "lib/API/Docker/Type/AuthConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::BuildCache" : {
          "file" : "lib/API/Docker/Type/BuildCache.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::BuildInfo" : {
          "file" : "lib/API/Docker/Type/BuildInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterInfo" : {
          "file" : "lib/API/Docker/Type/ClusterInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolume" : {
          "file" : "lib/API/Docker/Type/ClusterVolume.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolume::Info" : {
          "file" : "lib/API/Docker/Type/ClusterVolume/Info.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolume::PublishStatus" : {
          "file" : "lib/API/Docker/Type/ClusterVolume/PublishStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolumeSpec" : {
          "file" : "lib/API/Docker/Type/ClusterVolumeSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolumeSpec::AccessMode" : {
          "file" : "lib/API/Docker/Type/ClusterVolumeSpec/AccessMode.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolumeSpec::AccessMode::AccessibilityRequirements" : {
          "file" : "lib/API/Docker/Type/ClusterVolumeSpec/AccessMode/AccessibilityRequirements.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolumeSpec::AccessMode::CapacityRange" : {
          "file" : "lib/API/Docker/Type/ClusterVolumeSpec/AccessMode/CapacityRange.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ClusterVolumeSpec::AccessMode::Secret" : {
          "file" : "lib/API/Docker/Type/ClusterVolumeSpec/AccessMode/Secret.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Commit" : {
          "file" : "lib/API/Docker/Type/Commit.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Config" : {
          "file" : "lib/API/Docker/Type/Config.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ConfigReference" : {
          "file" : "lib/API/Docker/Type/ConfigReference.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ConfigSpec" : {
          "file" : "lib/API/Docker/Type/ConfigSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerBlkioStatEntry" : {
          "file" : "lib/API/Docker/Type/ContainerBlkioStatEntry.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerBlkioStats" : {
          "file" : "lib/API/Docker/Type/ContainerBlkioStats.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerCPUStats" : {
          "file" : "lib/API/Docker/Type/ContainerCPUStats.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerCPUUsage" : {
          "file" : "lib/API/Docker/Type/ContainerCPUUsage.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerConfig" : {
          "file" : "lib/API/Docker/Type/ContainerConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerCreateResponse" : {
          "file" : "lib/API/Docker/Type/ContainerCreateResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerInspectResponse" : {
          "file" : "lib/API/Docker/Type/ContainerInspectResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerMemoryStats" : {
          "file" : "lib/API/Docker/Type/ContainerMemoryStats.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerNetworkStats" : {
          "file" : "lib/API/Docker/Type/ContainerNetworkStats.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerPidsStats" : {
          "file" : "lib/API/Docker/Type/ContainerPidsStats.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerState" : {
          "file" : "lib/API/Docker/Type/ContainerState.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerStatsResponse" : {
          "file" : "lib/API/Docker/Type/ContainerStatsResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerStatus" : {
          "file" : "lib/API/Docker/Type/ContainerStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerStorageStats" : {
          "file" : "lib/API/Docker/Type/ContainerStorageStats.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerSummary" : {
          "file" : "lib/API/Docker/Type/ContainerSummary.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerSummary::HostConfig" : {
          "file" : "lib/API/Docker/Type/ContainerSummary/HostConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerSummary::NetworkSettings" : {
          "file" : "lib/API/Docker/Type/ContainerSummary/NetworkSettings.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerThrottlingData" : {
          "file" : "lib/API/Docker/Type/ContainerThrottlingData.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerTopResponse" : {
          "file" : "lib/API/Docker/Type/ContainerTopResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerUpdateResponse" : {
          "file" : "lib/API/Docker/Type/ContainerUpdateResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerWaitExitError" : {
          "file" : "lib/API/Docker/Type/ContainerWaitExitError.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerWaitResponse" : {
          "file" : "lib/API/Docker/Type/ContainerWaitResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerdInfo" : {
          "file" : "lib/API/Docker/Type/ContainerdInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ContainerdInfo::Namespaces" : {
          "file" : "lib/API/Docker/Type/ContainerdInfo/Namespaces.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::CreateImageInfo" : {
          "file" : "lib/API/Docker/Type/CreateImageInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::DeviceInfo" : {
          "file" : "lib/API/Docker/Type/DeviceInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::DeviceMapping" : {
          "file" : "lib/API/Docker/Type/DeviceMapping.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::DeviceRequest" : {
          "file" : "lib/API/Docker/Type/DeviceRequest.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::DistributionInspect" : {
          "file" : "lib/API/Docker/Type/DistributionInspect.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Driver" : {
          "file" : "lib/API/Docker/Type/Driver.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::DriverData" : {
          "file" : "lib/API/Docker/Type/DriverData.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EndpointIPAMConfig" : {
          "file" : "lib/API/Docker/Type/EndpointIPAMConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EndpointPortConfig" : {
          "file" : "lib/API/Docker/Type/EndpointPortConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EndpointSettings" : {
          "file" : "lib/API/Docker/Type/EndpointSettings.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EndpointSpec" : {
          "file" : "lib/API/Docker/Type/EndpointSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EngineDescription" : {
          "file" : "lib/API/Docker/Type/EngineDescription.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EngineDescription::Plugin" : {
          "file" : "lib/API/Docker/Type/EngineDescription/Plugin.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ErrorDetail" : {
          "file" : "lib/API/Docker/Type/ErrorDetail.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ErrorResponse" : {
          "file" : "lib/API/Docker/Type/ErrorResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EventActor" : {
          "file" : "lib/API/Docker/Type/EventActor.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::EventMessage" : {
          "file" : "lib/API/Docker/Type/EventMessage.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::FilesystemChange" : {
          "file" : "lib/API/Docker/Type/FilesystemChange.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::FirewallInfo" : {
          "file" : "lib/API/Docker/Type/FirewallInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::GenericResource" : {
          "file" : "lib/API/Docker/Type/GenericResource.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::GenericResource::DiscreteResourceSpec" : {
          "file" : "lib/API/Docker/Type/GenericResource/DiscreteResourceSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::GenericResource::NamedResourceSpec" : {
          "file" : "lib/API/Docker/Type/GenericResource/NamedResourceSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Health" : {
          "file" : "lib/API/Docker/Type/Health.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::HealthConfig" : {
          "file" : "lib/API/Docker/Type/HealthConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::HealthcheckResult" : {
          "file" : "lib/API/Docker/Type/HealthcheckResult.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::HostConfig" : {
          "file" : "lib/API/Docker/Type/HostConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::HostConfig::LogConfig" : {
          "file" : "lib/API/Docker/Type/HostConfig/LogConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::IDResponse" : {
          "file" : "lib/API/Docker/Type/IDResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::IPAM" : {
          "file" : "lib/API/Docker/Type/IPAM.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::IPAMConfig" : {
          "file" : "lib/API/Docker/Type/IPAMConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
+      },
+      "API::Docker::Type::IPAMStatus" : {
+         "file" : "lib/API/Docker/Type/IPAMStatus.pm",
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageConfig" : {
          "file" : "lib/API/Docker/Type/ImageConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageDeleteResponseItem" : {
          "file" : "lib/API/Docker/Type/ImageDeleteResponseItem.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageHistoryResponseItem" : {
          "file" : "lib/API/Docker/Type/ImageHistoryResponseItem.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageID" : {
          "file" : "lib/API/Docker/Type/ImageID.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageInspect" : {
          "file" : "lib/API/Docker/Type/ImageInspect.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageInspect::Metadata" : {
          "file" : "lib/API/Docker/Type/ImageInspect/Metadata.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageInspect::RootFS" : {
          "file" : "lib/API/Docker/Type/ImageInspect/RootFS.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageManifestSummary" : {
          "file" : "lib/API/Docker/Type/ImageManifestSummary.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageManifestSummary::AttestationData" : {
          "file" : "lib/API/Docker/Type/ImageManifestSummary/AttestationData.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageManifestSummary::ImageData" : {
          "file" : "lib/API/Docker/Type/ImageManifestSummary/ImageData.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageManifestSummary::ImageData::Size" : {
          "file" : "lib/API/Docker/Type/ImageManifestSummary/ImageData/Size.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageManifestSummary::Size" : {
          "file" : "lib/API/Docker/Type/ImageManifestSummary/Size.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ImageSummary" : {
          "file" : "lib/API/Docker/Type/ImageSummary.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::IndexInfo" : {
          "file" : "lib/API/Docker/Type/IndexInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::JoinTokens" : {
          "file" : "lib/API/Docker/Type/JoinTokens.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Limit" : {
          "file" : "lib/API/Docker/Type/Limit.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ManagerStatus" : {
          "file" : "lib/API/Docker/Type/ManagerStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Mount" : {
          "file" : "lib/API/Docker/Type/Mount.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Mount::BindOptions" : {
          "file" : "lib/API/Docker/Type/Mount/BindOptions.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Mount::ImageOptions" : {
          "file" : "lib/API/Docker/Type/Mount/ImageOptions.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Mount::TmpfsOptions" : {
          "file" : "lib/API/Docker/Type/Mount/TmpfsOptions.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Mount::VolumeOptions" : {
          "file" : "lib/API/Docker/Type/Mount/VolumeOptions.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Mount::VolumeOptions::DriverConfig" : {
          "file" : "lib/API/Docker/Type/Mount/VolumeOptions/DriverConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::MountPoint" : {
          "file" : "lib/API/Docker/Type/MountPoint.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Network" : {
          "file" : "lib/API/Docker/Type/Network.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NetworkAttachmentConfig" : {
          "file" : "lib/API/Docker/Type/NetworkAttachmentConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NetworkContainer" : {
          "file" : "lib/API/Docker/Type/NetworkContainer.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NetworkCreateResponse" : {
          "file" : "lib/API/Docker/Type/NetworkCreateResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NetworkSettings" : {
          "file" : "lib/API/Docker/Type/NetworkSettings.pm",
-         "version" : "0.004"
+         "version" : "0.006"
+      },
+      "API::Docker::Type::NetworkStatus" : {
+         "file" : "lib/API/Docker/Type/NetworkStatus.pm",
+         "version" : "0.006"
       },
       "API::Docker::Type::NetworkingConfig" : {
          "file" : "lib/API/Docker/Type/NetworkingConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Node" : {
          "file" : "lib/API/Docker/Type/Node.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NodeDescription" : {
          "file" : "lib/API/Docker/Type/NodeDescription.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NodeSpec" : {
          "file" : "lib/API/Docker/Type/NodeSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::NodeStatus" : {
          "file" : "lib/API/Docker/Type/NodeStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::OCIDescriptor" : {
          "file" : "lib/API/Docker/Type/OCIDescriptor.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::OCIPlatform" : {
          "file" : "lib/API/Docker/Type/OCIPlatform.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ObjectVersion" : {
          "file" : "lib/API/Docker/Type/ObjectVersion.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PeerInfo" : {
          "file" : "lib/API/Docker/Type/PeerInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PeerNode" : {
          "file" : "lib/API/Docker/Type/PeerNode.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Platform" : {
          "file" : "lib/API/Docker/Type/Platform.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin" : {
          "file" : "lib/API/Docker/Type/Plugin.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config" : {
          "file" : "lib/API/Docker/Type/Plugin/Config.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config::Args" : {
          "file" : "lib/API/Docker/Type/Plugin/Config/Args.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config::Interface" : {
          "file" : "lib/API/Docker/Type/Plugin/Config/Interface.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config::Linux" : {
          "file" : "lib/API/Docker/Type/Plugin/Config/Linux.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config::Network" : {
          "file" : "lib/API/Docker/Type/Plugin/Config/Network.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config::RootFS" : {
          "file" : "lib/API/Docker/Type/Plugin/Config/RootFS.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Config::User" : {
          "file" : "lib/API/Docker/Type/Plugin/Config/User.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Plugin::Settings" : {
          "file" : "lib/API/Docker/Type/Plugin/Settings.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PluginDevice" : {
          "file" : "lib/API/Docker/Type/PluginDevice.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PluginEnv" : {
          "file" : "lib/API/Docker/Type/PluginEnv.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PluginInterfaceType" : {
          "file" : "lib/API/Docker/Type/PluginInterfaceType.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PluginMount" : {
          "file" : "lib/API/Docker/Type/PluginMount.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PluginPrivilege" : {
          "file" : "lib/API/Docker/Type/PluginPrivilege.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PluginsInfo" : {
          "file" : "lib/API/Docker/Type/PluginsInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Port" : {
          "file" : "lib/API/Docker/Type/Port.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PortBinding" : {
          "file" : "lib/API/Docker/Type/PortBinding.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PortStatus" : {
          "file" : "lib/API/Docker/Type/PortStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ProcessConfig" : {
          "file" : "lib/API/Docker/Type/ProcessConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ProgressDetail" : {
          "file" : "lib/API/Docker/Type/ProgressDetail.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::PushImageInfo" : {
          "file" : "lib/API/Docker/Type/PushImageInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::RegistryServiceConfig" : {
          "file" : "lib/API/Docker/Type/RegistryServiceConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ResourceObject" : {
          "file" : "lib/API/Docker/Type/ResourceObject.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Resources" : {
          "file" : "lib/API/Docker/Type/Resources.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Resources::BlkioWeightDevice" : {
          "file" : "lib/API/Docker/Type/Resources/BlkioWeightDevice.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Resources::Ulimit" : {
          "file" : "lib/API/Docker/Type/Resources/Ulimit.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::RestartPolicy" : {
          "file" : "lib/API/Docker/Type/RestartPolicy.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Runtime" : {
          "file" : "lib/API/Docker/Type/Runtime.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Secret" : {
          "file" : "lib/API/Docker/Type/Secret.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SecretSpec" : {
          "file" : "lib/API/Docker/Type/SecretSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Service" : {
          "file" : "lib/API/Docker/Type/Service.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Service::Endpoint" : {
          "file" : "lib/API/Docker/Type/Service/Endpoint.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Service::Endpoint::VirtualIP" : {
          "file" : "lib/API/Docker/Type/Service/Endpoint/VirtualIP.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Service::JobStatus" : {
          "file" : "lib/API/Docker/Type/Service/JobStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Service::ServiceStatus" : {
          "file" : "lib/API/Docker/Type/Service/ServiceStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Service::UpdateStatus" : {
          "file" : "lib/API/Docker/Type/Service/UpdateStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceCreateResponse" : {
          "file" : "lib/API/Docker/Type/ServiceCreateResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceSpec" : {
          "file" : "lib/API/Docker/Type/ServiceSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceSpec::Mode" : {
          "file" : "lib/API/Docker/Type/ServiceSpec/Mode.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceSpec::Mode::Replicated" : {
          "file" : "lib/API/Docker/Type/ServiceSpec/Mode/Replicated.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceSpec::Mode::ReplicatedJob" : {
          "file" : "lib/API/Docker/Type/ServiceSpec/Mode/ReplicatedJob.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceSpec::RollbackConfig" : {
          "file" : "lib/API/Docker/Type/ServiceSpec/RollbackConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceSpec::UpdateConfig" : {
          "file" : "lib/API/Docker/Type/ServiceSpec/UpdateConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ServiceUpdateResponse" : {
          "file" : "lib/API/Docker/Type/ServiceUpdateResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
+      },
+      "API::Docker::Type::SubnetStatus" : {
+         "file" : "lib/API/Docker/Type/SubnetStatus.pm",
+         "version" : "0.006"
       },
       "API::Docker::Type::Swarm" : {
          "file" : "lib/API/Docker/Type/Swarm.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmInfo" : {
          "file" : "lib/API/Docker/Type/SwarmInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec" : {
          "file" : "lib/API/Docker/Type/SwarmSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::CAConfig" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/CAConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::CAConfig::ExternalCA" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/CAConfig/ExternalCA.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::Dispatcher" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/Dispatcher.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::EncryptionConfig" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/EncryptionConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::Orchestration" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/Orchestration.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::Raft" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/Raft.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::TaskDefaults" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/TaskDefaults.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SwarmSpec::TaskDefaults::LogDriver" : {
          "file" : "lib/API/Docker/Type/SwarmSpec/TaskDefaults/LogDriver.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SystemInfo" : {
          "file" : "lib/API/Docker/Type/SystemInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SystemInfo::DefaultAddressPool" : {
          "file" : "lib/API/Docker/Type/SystemInfo/DefaultAddressPool.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SystemVersion" : {
          "file" : "lib/API/Docker/Type/SystemVersion.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SystemVersion::Component" : {
          "file" : "lib/API/Docker/Type/SystemVersion/Component.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::SystemVersion::Platform" : {
          "file" : "lib/API/Docker/Type/SystemVersion/Platform.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TLSInfo" : {
          "file" : "lib/API/Docker/Type/TLSInfo.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Task" : {
          "file" : "lib/API/Docker/Type/Task.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec" : {
          "file" : "lib/API/Docker/Type/TaskSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Config" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Config.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Config::File" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Config/File.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::DNSConfig" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/DNSConfig.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Privileges" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Privileges.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Privileges::AppArmor" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Privileges/AppArmor.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Privileges::CredentialSpec" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Privileges/CredentialSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Privileges::SELinuxContext" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Privileges/SELinuxContext.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Privileges::Seccomp" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Privileges/Seccomp.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Secret" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Secret.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Secret::File" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Secret/File.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::ContainerSpec::Ulimit" : {
          "file" : "lib/API/Docker/Type/TaskSpec/ContainerSpec/Ulimit.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::LogDriver" : {
          "file" : "lib/API/Docker/Type/TaskSpec/LogDriver.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::NetworkAttachmentSpec" : {
          "file" : "lib/API/Docker/Type/TaskSpec/NetworkAttachmentSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::Placement" : {
          "file" : "lib/API/Docker/Type/TaskSpec/Placement.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::Placement::Preference" : {
          "file" : "lib/API/Docker/Type/TaskSpec/Placement/Preference.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::Placement::Preference::Spread" : {
          "file" : "lib/API/Docker/Type/TaskSpec/Placement/Preference/Spread.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::PluginSpec" : {
          "file" : "lib/API/Docker/Type/TaskSpec/PluginSpec.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::Resources" : {
          "file" : "lib/API/Docker/Type/TaskSpec/Resources.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskSpec::RestartPolicy" : {
          "file" : "lib/API/Docker/Type/TaskSpec/RestartPolicy.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::TaskStatus" : {
          "file" : "lib/API/Docker/Type/TaskStatus.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::ThrottleDevice" : {
          "file" : "lib/API/Docker/Type/ThrottleDevice.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Topology" : {
          "file" : "lib/API/Docker/Type/Topology.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Volume" : {
          "file" : "lib/API/Docker/Type/Volume.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::Volume::UsageData" : {
          "file" : "lib/API/Docker/Type/Volume/UsageData.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::VolumeCreateOptions" : {
          "file" : "lib/API/Docker/Type/VolumeCreateOptions.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Type::VolumeListResponse" : {
          "file" : "lib/API/Docker/Type/VolumeListResponse.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       },
       "API::Docker::Volume" : {
          "file" : "lib/API/Docker/Volume.pm",
-         "version" : "0.004"
+         "version" : "0.006"
       }
    },
    "release_status" : "stable",
@@ -1028,7 +1040,7 @@
          "web" : "https://github.com/Getty/p5-api-docker"
       }
    },
-   "version" : "0.004",
+   "version" : "0.006",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.040001"
@@ -1039,6 +1051,7 @@
             "config" : {
                "Dist::Zilla::Plugin::GatherDir" : {
                   "exclude_filename" : [
+                     ".karr",
                      "README.md"
                   ],
                   "exclude_match" : [],
@@ -1055,34 +1068,39 @@
             "version" : "2.052"
          },
          {
+            "class" : "Dist::Zilla::Plugin::GatherAgentContext",
+            "name" : "@Author::GETTY/GatherAgentContext",
+            "version" : "0.002"
+         },
+         {
             "class" : "Dist::Zilla::Plugin::ManifestSkip",
             "name" : "@Author::GETTY/@Filter/ManifestSkip",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaYAML",
             "name" : "@Author::GETTY/@Filter/MetaYAML",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Readme",
             "name" : "@Author::GETTY/@Filter/Readme",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExtraTests",
             "name" : "@Author::GETTY/@Filter/ExtraTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ExecDir",
             "name" : "@Author::GETTY/@Filter/ExecDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::ShareDir",
             "name" : "@Author::GETTY/@Filter/ShareDir",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MakeMaker",
@@ -1092,27 +1110,32 @@
                }
             },
             "name" : "@Author::GETTY/@Filter/MakeMaker",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Manifest",
             "name" : "@Author::GETTY/@Filter/Manifest",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::TestRelease",
             "name" : "@Author::GETTY/@Filter/TestRelease",
-            "version" : "6.037"
-         },
-         {
-            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
-            "name" : "@Author::GETTY/@Filter/ConfirmRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::UploadToCPAN",
             "name" : "@Author::GETTY/@Filter/UploadToCPAN",
-            "version" : "6.037"
+            "version" : "6.040"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Author::GETTY::InstallCheck",
+            "name" : "@Author::GETTY/Author::GETTY::InstallCheck",
+            "version" : "0.328"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Author::GETTY/ConfirmRelease",
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::LicenseFile",
@@ -1122,17 +1145,17 @@
          {
             "class" : "Dist::Zilla::Plugin::MetaConfig",
             "name" : "@Author::GETTY/MetaConfig",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::MetaJSON",
             "name" : "@Author::GETTY/MetaJSON",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
             "name" : "@Author::GETTY/PodSyntaxTests",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Test::ChangesHasContent",
@@ -1147,7 +1170,7 @@
                      {
                         "class" : "Dist::Zilla::Plugin::FinderCode",
                         "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-                        "version" : "6.037"
+                        "version" : "6.040"
                      }
                   ],
                   "include_underscores" : 0
@@ -1212,92 +1235,92 @@
                      {
                         "class" : "Pod::Weaver::Plugin::EnsurePod5",
                         "name" : "@CorePrep/EnsurePod5",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::H1Nester",
                         "name" : "@CorePrep/H1Nester",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::SingleEncoding",
                         "name" : "@GETTY/SingleEncoding",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Name",
                         "name" : "@GETTY/Name",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Version",
                         "name" : "@GETTY/Version",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/Prelude",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Synopsis",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Description",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Overview",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Generic",
                         "name" : "@GETTY/Stability",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Leftovers",
                         "name" : "@GETTY/Leftovers",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Region",
                         "name" : "@GETTY/postlude",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::GenerateSection",
+                        "class" : "Pod::Weaver::Section::Author::GETTY::Support",
                         "name" : "@GETTY/Support",
-                        "version" : "4.020"
+                        "version" : "0.328"
                      },
                      {
                         "class" : "Pod::Weaver::Section::GenerateSection",
                         "name" : "@GETTY/Contributing",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Section::Authors",
                         "name" : "@GETTY/Authors",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
-                        "class" : "Pod::Weaver::Section::Legal",
+                        "class" : "Pod::Weaver::Section::Author::GETTY::Legal",
                         "name" : "@GETTY/Legal",
-                        "version" : "4.020"
+                        "version" : "0.328"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/List",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      },
                      {
                         "class" : "Pod::Weaver::Plugin::Transformer",
                         "name" : "@GETTY/GETTY",
-                        "version" : "4.020"
+                        "version" : "4.022"
                      }
                   ]
                }
@@ -1314,7 +1337,7 @@
                }
             },
             "name" : "@Author::GETTY/@Git::VersionManager/pluginbundle version",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::RewriteVersion::Transitional",
@@ -1322,8 +1345,8 @@
                "Dist::Zilla::Plugin::RewriteVersion" : {
                   "add_tarball_name" : 0,
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "skip_version_provider" : 0
@@ -1384,7 +1407,7 @@
                   "branch" : null,
                   "changelog" : "Changes",
                   "signed" : 0,
-                  "tag" : "0.004",
+                  "tag" : "0.006",
                   "tag_format" : "%v",
                   "tag_message" : "v%V"
                },
@@ -1404,8 +1427,8 @@
             "config" : {
                "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
                   "finders" : [
-                     ":ExecFiles",
-                     ":InstallModules"
+                     ":InstallModules",
+                     ":PerlExecFiles"
                   ],
                   "global" : 0,
                   "munge_makefile_pl" : 1
@@ -1418,7 +1441,7 @@
          {
             "class" : "Dist::Zilla::Plugin::NextRelease",
             "name" : "@Author::GETTY/@Git::VersionManager/NextRelease",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::Git::Commit",
@@ -1469,69 +1492,69 @@
             "version" : "2.052"
          },
          {
-            "class" : "Dist::Zilla::Plugin::GitHub::CreateRelease",
-            "name" : "@Author::GETTY/GitHub::CreateRelease",
-            "version" : "0.0012"
+            "class" : "Dist::Zilla::Plugin::Author::GETTY::GitHubRelease",
+            "name" : "@Author::GETTY/Author::GETTY::GitHubRelease",
+            "version" : "0.328"
          },
          {
             "class" : "Dist::Zilla::Plugin::PruneFiles",
             "name" : "PruneFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":InstallModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":IncModules",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":TestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExtraTestFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":PerlExecFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":ShareFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":MainModule",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":AllFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : ":NoFiles",
-            "version" : "6.037"
+            "version" : "6.040"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",
             "name" : "@Author::GETTY/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
-            "version" : "6.037"
+            "version" : "6.040"
          }
       ],
       "zilla" : {
@@ -1539,12 +1562,12 @@
          "config" : {
             "is_trial" : 0
          },
-         "version" : "6.037"
+         "version" : "6.040"
       }
    },
    "x_authority" : "cpan:GETTY",
    "x_generated_by_perl" : "v5.40.1",
-   "x_serialization_backend" : "Cpanel::JSON::XS version 4.43",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 4.53",
    "x_spdx_expression" : "Artistic-1.0-Perl OR GPL-1.0-or-later"
 }
 

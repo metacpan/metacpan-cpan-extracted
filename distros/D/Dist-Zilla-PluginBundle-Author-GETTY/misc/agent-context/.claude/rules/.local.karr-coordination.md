@@ -14,6 +14,9 @@ kanban; state lives in `refs/karr/*`, one board per repo.
 - `karr move ID in-progress --claim NAME` — start · `karr handoff ID --claim NAME --note "…"` — to review
 - mutating commands auto-sync; `karr sync --pull|--push` for explicit exchange
 
+**Write ticket ids as `kNN`** (`k12`) in commits, notes and docs — never `#12`, which every
+hosting platform links to its own issue 12.
+
 **Serialize board writes when fanning out.** Implementation may run in parallel; collect the
 results, then loop `move`/`handoff`/`sync` one after another — N of them landing at once has
 OOM-rebooted a host.

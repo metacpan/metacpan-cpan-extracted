@@ -2,6 +2,52 @@ Revision history for DBIx-Squirrel
 
 Unreleased
 
+v3.2.0 2026-11-18
+
+    tee, a tap that takes stages, and loading rows with a feed.
+
+    DBIx::Squirrel exports Ekorn::Pipeline's new tee, which runs each
+    value through stages of its own beside the pipeline (roadmap
+    2026-0035). Requires Ekorn::Pipeline >= v0.3.6, < v0.4.0, which
+    also brings $pipeline->feed, a run fed values as they arrive: the
+    user guide shows it loading rows into a table.
+
+    - DBIx::Squirrel::Stages::Taps exports tee on request, as
+      Ekorn::Pipeline's does, and in :all, and DBIx::Squirrel::Tooling
+      has it in :taps, :stages and :all. tee(@stages) runs each value
+      through a branch of stages, beside the pipeline, and passes it on
+      unchanged; pluck and as_hash work in the branch on a statement's
+      rows. Requires Ekorn::Pipeline v0.3.6 (roadmap 2026-0035).
+
+    - The user guide's "Load rows as they arrive" shows
+      $pipeline->feed as a loader: rows pushed in as they come,
+      batched, and each batch written with execute_array in a
+      transaction of its own, the last by close.
+
+v3.1.1 2026-11-17
+
+    An install that passes its tests when Ekorn::Pipeline adds a name,
+    and the user guide on the last row.
+
+    Ekorn::Pipeline v0.3.6 adds tee to its Tooling; v3.1.0's tests
+    would fail on a fresh install with it, and not install. This
+    release passes with any Ekorn::Pipeline v0.3.x, v0.3.6 included
+    (roadmap 2026-0034). Exporting tee from DBIx::Squirrel follows in
+    v3.2.0, once Ekorn::Pipeline v0.3.6 is out. Requires
+    Ekorn::Pipeline >= v0.3.3, < v0.4.0, as before.
+
+    - An installed DBIx::Squirrel no longer fails its tests when a
+      later Ekorn::Pipeline v0.3.x adds a name to its Tooling, as
+      v0.3.6 will with tee: t/28-tooling.t checked that
+      DBIx::Squirrel::Tooling holds every name Ekorn's does, which a
+      release can't promise for names added after it. That check is
+      now an author test (roadmap 2026-0034).
+
+    - The user guide's "Get the first, the last, or the only one" says
+      keep_last fetches every row, and shows the database's way to the
+      last: the ORDER BY reversed, with LIMIT 1. Without an ORDER BY,
+      no row is the last.
+
 v3.1.0 2026-11-16
 
     The Sugar names pipelines, a handle keeps the statements it uses,

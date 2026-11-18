@@ -12,7 +12,12 @@ use Mojo::File();
 use Fixture();
 use Dist::Conformance::Check::GitHooks();
 use Dist::Conformance::Snapshot::Directory();
+use Dist::Conformance::Source::Git();
 use Dist::Conformance::Snapshot::Tree();
+
+# The configuration of the person who runs the tests, such as a core.hooksPath, stays out.
+local $ENV{GIT_CONFIG_GLOBAL}   = '/dev/null';
+local $ENV{GIT_CONFIG_NOSYSTEM} = 1;
 
 my $PRE    = "#!/bin/sh\n# The fixture pre-commit hook.\nexit 0\n";
 my $POST   = "#!/bin/sh\n# The fixture post-commit hook.\nexit 0\n";
@@ -68,6 +73,13 @@ subtest update => sub {
     my $not   = Fixture::run_update( hooks(), $plain );
     is( [ map { $_->{action} } @{ $not->changes } ], [qw{create create}], 'outside a checkout the hooks are still written' );
     is( scalar @{ $not->manual },                    2,                   'and a person is told that they cannot be installed' );
+};
+
+subtest 'update: core.hooksPath at the tracked hooks' => sub {
+    my $root = Fixture::checkout( 'git-hooks/pre-commit' => "$PRE# mine\n" );
+    Dist::Conformance::Source::Git::git( q{-C}, "$root", qw{config core.hooksPath git-hooks} );
+    my $update = Fixture::run_update( hooks(), $root );
+    is( $update->changes, [ { action => 'create', path => 'git-hooks/post-commit' } ], 'writes the missing hook, and installs nothing, because git runs the hooks where they are tracked' );
 };
 
 subtest 'update: a dry run' => sub {

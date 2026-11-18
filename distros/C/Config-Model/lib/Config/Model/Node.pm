@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::Node 2.168;
+package Config::Model::Node 2.169;
 
 use Mouse;
 with "Config::Model::Role::NodeLoader";
@@ -89,13 +89,12 @@ has gist => (
     default => '',
 );
 
-sub fetch_gist {
-    my $self = shift;
+sub fetch_gist ($self) {
     my $gist = $self->gist // '';
     # handle hash or list element count
     $gist =~ s!\@\{([\w -]+)\}!$self->grab($1)->fetch_size!ge;
-    # handle element value
-    $gist =~ s!{([\w -]+)}!$self->grab($1)->fetch // ''!ge;
+
+    $gist =~ s!{([\w -]+)}!$self->grab($1)->fetch_gist() // ''!ge;
 
     # cleanup extra white spaces
     $gist =~ s!\s+! !g;
@@ -124,8 +123,7 @@ has config_model => (
     builder  => '_config_model'
 );
 
-sub _config_model {
-    my $self = shift;
+sub _config_model ($self) {
     return $self->instance->config_model;
 }
 
@@ -147,16 +145,13 @@ has warned_deprecated_element => (
 ) ;
 
 # attribute is defined in Config::Model::Anything
-sub _backend_support_annotation {
-    my $self = shift;
+sub _backend_support_annotation ($self) {
     return $self->backend_mgr ? $self->backend_mgr->support_annotation
         :  $self->parent      ? $self->parent->backend_support_annotation
         :                       undef ; # no backend at all. test only
 }
 
-sub BUILD {
-    my $self = shift;
-
+sub BUILD ($self, $) {
     my $caller_class = defined $self->parent ? $self->parent->name : 'user';
 
     my $class_name = $self->config_class_name;
@@ -213,9 +208,7 @@ sub create_element ($self, @args) {
     return $self->$method( $element_name, $check );
 }
 
-sub create_node {
-    my ( $self, $element_name, $check ) = @_;
-
+sub create_node ($self, $element_name, $check) {
     my $element_info = dclone( $self->{model}{element}{$element_name} );
     my $config_class_name = $element_info->{config_class_name};
 
@@ -235,8 +228,7 @@ sub create_node {
     return $self->{element}{$element_name} = $self->load_node(@args);
 }
 
-sub create_warped_node {
-    my ( $self, $element_name, $check ) = @_;
+sub create_warped_node ($self, $element_name, $check) {
 
     my $element_info = dclone( $self->{model}{element}{$element_name} );
 
@@ -254,8 +246,7 @@ sub create_warped_node {
         Config::Model::WarpedNode->new( %$element_info, @args );
 }
 
-sub create_leaf {
-    my ( $self, $element_name, $check ) = @_;
+sub create_leaf ($self, $element_name, $check) {
 
     my $element_info = dclone( $self->{model}{element}{$element_name} );
 
@@ -281,8 +272,7 @@ my %id_class_hash = (
     check_list => 'CheckList',
 );
 
-sub create_id {
-    my ( $self, $element_name, $check ) = @_;
+sub create_id ($self, $element_name, $check) {
 
     my $element_info = dclone( $self->{model}{element}{$element_name} );
     my $type         = delete $element_info->{type};
@@ -312,9 +302,7 @@ sub create_id {
 }
 
 # check validity of level and status declaration.
-sub check_properties {
-    my $self = shift;
-
+sub check_properties ($self) {
     # a model should no longer contain attributes attached to
     # an element (like description, level ...). There are copied here
     # because Node needs them as hash or lists
@@ -372,9 +360,7 @@ sub init ($self, @args) {
     return;
 }
 
-sub read_config_data {
-    my ( $self, %args ) = @_;
-
+sub read_config_data ($self, %args) {
     my $model = $self->{model};
 
     if ( $self->location and $args{config_file} ) {
@@ -417,8 +403,7 @@ sub is_auto_write_for_type ($self, @args) {
     return $self->backend_mgr->is_auto_write_for_type(@args);
 }
 
-sub name {
-    my $self = shift;
+sub name ($self) {
     return $self->location() || $self->config_class_name;
 }
 
@@ -457,8 +442,7 @@ sub has_element ($self, @args) {
 }
 
 # should I autovivify this element: NO
-sub find_element {
-    my ( $self, $name, %args ) = @_;
+sub find_element ($self, $name, %args) {
     croak "find_element: missing element name" unless defined $name;
 
     # should be the case if people are using cme edit
@@ -482,8 +466,7 @@ sub element_model ($self, $elt_name) {
     return $self->{model}{element}{ $elt_name };
 }
 
-sub element_type {
-    my ($self, $name) = @_;
+sub element_type ($self, $name) {
     croak "element_type: missing element name" unless $name;
 
     my $element_info = $self->{model}{element}{$name} // $self-> _get_accepted_data($name);
@@ -550,8 +533,7 @@ sub get_element_names ($self, %args) {
     return wantarray ? @result : join( ' ', @result );
 }
 
-sub children {
-    my $self = shift;
+sub children ($self) {
     return $self->get_element_names;
 }
 
@@ -698,8 +680,7 @@ sub fetch_element ($self, @args) {
     return $self->fetch_element_no_check($element_name);
 }
 
-sub fetch_element_no_check {
-    my ( $self, $element_name ) = @_;
+sub fetch_element_no_check ($self, $element_name) {
     return $self->{element}{$element_name};
 }
 
@@ -776,8 +757,7 @@ sub is_element_available ($self, @args) {
     return 1;
 }
 
-sub accept_element {
-    my ( $self, $name ) = @_;
+sub accept_element ($self, $name) {
 
     my $model_data = $self->{model}{element};
 
@@ -791,47 +771,50 @@ sub accept_element {
 }
 
 # return accepted model data or undef
-sub _get_accepted_data {
-    my ( $self, $name ) = @_;
+sub _get_accepted_data ($self, $candidate) {
 
     return unless defined $self->{model}{accept};
 
     eval {require Text::Levenshtein::Damerau} ;
     my $has_tld = ! $@ ;
 
-    foreach my $accept_regexp ( @{ $self->{model}{accept_list} } ) {
-        next unless  $name =~ /^$accept_regexp$/;
+    foreach my $accept_name ( @{ $self->{model}{accept_list} } ) {
+        my $accept_regexp = $self->{model}{accept}{$accept_name}{pattern};
+        next unless  $candidate =~ /^$accept_regexp$/;
         my $element_list = $self->{original_model}{element_list} ;
 
         if ($has_tld and $element_list and @$element_list) {
-            my $tld = Text::Levenshtein::Damerau->new($name);
+            my $tld = Text::Levenshtein::Damerau->new($candidate);
             my $tld_arg = {list => $element_list };
             my $dist = $tld->dld_best_distance($tld_arg);
             if ($dist < 3) {
                 my $best = $tld->dld_best_match($tld_arg);
                 $user_logger->warn(
                     "Warning: ".$self->location
-                    ." '$name' is confusingly close to '$best' (edit distance is $dist)."
+                    ." '$candidate' is confusingly close to '$best' (edit distance is $dist)."
                     ." Is there a typo ?"
                 );
             }
 
         }
 
-        return $self->{model}{accept}{$accept_regexp};
+        $logger->info("$candidate parameter accepted with $accept_name accept rule");
+
+        # shallow clone
+        my %accepted_data = $self->{model}{accept}{$accept_name}->%*;
+        delete $accepted_data{pattern};
+
+        return \%accepted_data;
     }
 
     return ;
 }
 
-sub accept_regexp {
-    my ($self) = @_;
-
-    return @{ $self->{model}{accept_list} || [] };
+sub accept_regexp ($self) {
+    return map {$self->{model}{accept}{$_}{pattern}} $self->{model}{accept_list}->@*;
 }
 
-sub reset_accepted_element_model {
-    my ( $self, $element_name, $accept_model ) = @_;
+sub reset_accepted_element_model ($self, $element_name, $accept_model) {
 
     my $model = dclone $accept_model ;
     my $accept_after = delete $model->{accept_after};
@@ -1059,7 +1042,7 @@ sub copy_from ($self, @args) {
 
 # TODO: need Pod::Text attribute -> move that to a role ?
 # to translate Pod description to plain text when help is displayed
-sub get_help ($self, $tag = '', $elt_name = ''){
+sub get_help ($self, $tag = '', $elt_name = '') {
     if ($elt_name) {
         if ( $tag !~ /^(summary|description)$/ ) {
             croak "get_help: wrong argument $tag, expected ", "'description' or 'summary'";
@@ -1073,9 +1056,7 @@ sub get_help ($self, $tag = '', $elt_name = ''){
     return $self->{model}{class_description} // '';
 }
 
-sub get_info {
-    my $self = shift;
-
+sub get_info ($self) {
     my @items = ( 'type: ' . $self->get_type, 'class name: ' . $self->config_class_name, );
 
     my @rexp = $self->accept_regexp;
@@ -1184,7 +1165,7 @@ Config::Model::Node - Class for configuration tree node
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -1331,11 +1312,17 @@ String used to construct a summary of the content of a node. This
 parameter is used by user interface to show users the gist of the
 content of this node. This parameter has no other effect. This string
 may contain element values in the form "C<{foo} and
-@{a_hash_or_list}>". When constructing the gist, C<{foo}> is replaced
-by the value of element C<foo>, and C<@{a_hash_of_list}> is replaced
-by the number of elements of the hash or list element.
+@{a_hash_or_list}>".
 
-Resulting gist is trimmed of extra spaces.
+When constructing the gist, C<{foo}> is replaced by the gist of
+element C<foo>. This element can be a value, a list, a hash, a
+check_list or another node, although using gist of a value is probably
+the more readable.
+
+And C<@{a_hash_of_list}> is replaced by the number of elements of the
+hash or list element.
+
+The resulting gist is trimmed of extra spaces.
 
 =item B<rw_config>
 
@@ -1358,6 +1345,7 @@ Example:
 
  accept => [
     {
+        name => 'allow_list_prefix',
         pattern => 'list.*',
         type => 'list',
         cargo => {
@@ -1366,6 +1354,7 @@ Example:
         },
     },
     {
+        name => 'allow_str_prefix',
         pattern => 'str.*',
         type => 'leaf',
         value_type => 'uniline'
@@ -1373,6 +1362,8 @@ Example:
   ]
 
 All C<element> parameters can be used in specifying accepted elements.
+
+C<name> is the name of the accept rule and is used only for error messages of logs.
 
 If L<Text::Levenshtein::Damerau> module is installed, a warning is
 issued if an accepted element is too close to an existing element.
@@ -1387,6 +1378,7 @@ Example:
     { name => 'Bug', type => 'leaf', value_type => 'uniline' } ,
  ]
  accept => [{
+     name => "bug_param",
      pattern => 'Bug-.*',
      type => 'leaf'
      value_type => 'uniline',

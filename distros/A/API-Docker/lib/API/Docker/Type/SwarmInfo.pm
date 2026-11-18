@@ -1,6 +1,6 @@
 package API::Docker::Type::SwarmInfo;
 # ABSTRACT: Represents generic information about swarm
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ClusterInfo;
 use API::Docker::Type::PeerNode;
@@ -49,7 +49,7 @@ API::Docker::Type::SwarmInfo - Represents generic information about swarm
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -106,7 +106,7 @@ ClusterInfo represents information about the swarm as is returned by the
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

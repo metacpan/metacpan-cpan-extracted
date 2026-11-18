@@ -1,5 +1,5 @@
 package Net::OpenSSH::More;
-$Net::OpenSSH::More::VERSION = '1.05';
+$Net::OpenSSH::More::VERSION = '1.06';
 #ABSTRACT: Net::OpenSSH submodule with many useful features
 
 use strict;
@@ -191,7 +191,6 @@ $init_ssh = sub {
             open( $temp_fh, "+>", "$tmp_dir/STDERR" ) or $die_no_trace->("Can't open $tmp_dir/STDERR for reading and writing: $!");
             $opts->{'master_stderr_fh'} = $temp_fh;
         }
-        $opts->{'ctl_dir'}     = $tmp_dir;
         $opts->{'strict_mode'} = 0;
 
         $opts->{'master_opts'} = [
@@ -246,6 +245,9 @@ $init_ssh = sub {
             next;
         }
 
+        # A short name for each attempt, because a socket path holds 108 bytes.
+        $opts->{'ctl_path'} = "$tmp_dir/$attempt" if !$opts->{'external_master'};
+
         # Now, per the POD of Net::OpenSSH, new will NEVER DIE, so just trust it.
         my @base_module_opts =
           qw{host user port password passphrase key_path gateway proxy_command batch_mode ctl_dir ctl_path ssh_cmd scp_cmd rsync_cmd remote_shell timeout kill_ssh_on_timeout strict_mode async connect master_opts default_ssh_opts forward_agent forward_X11 default_stdin_fh default_stdout_fh default_stderr_fh default_stdin_file default_stdout_file default_stderr_file master_stdout_fh master_stderr_fh master_stdout_discard master_stderr_discard expand_vars vars external_master default_encoding default_stream_encoding default_argument_encoding password_prompt login_handler master_setpgrp master_pty_force};
@@ -261,7 +263,8 @@ $init_ssh = sub {
         # Subclassing here is a bit tricky, especially *after* you have gone down more than one layer.
         # Ultimately we only ever want the constructor for Net::OpenSSH, so start there and then
         # Re-bless into subclass if that's relevant.
-        $self = $class4super->SUPER::new( map { $_ => $opts->{$_} } grep { $opts->{$_} } @base_module_opts );
+        # Defined, not true: a 0, such as strict_mode above, is a choice.
+        $self = $class4super->SUPER::new( map { $_ => $opts->{$_} } grep { defined $opts->{$_} } @base_module_opts );
         my $ssh_error = $self->error;
         my $error     = $ssh_error;
 
@@ -784,7 +787,7 @@ Net::OpenSSH::More - Net::OpenSSH submodule with many useful features
 
 =head1 VERSION
 
-version 1.05
+version 1.06
 
 =head1 SYNOPSIS
 
@@ -1195,11 +1198,21 @@ George S. Baugh <teodesian@gmail.com>
 
 =back
 
-=head1 CONTRIBUTOR
+=head1 CONTRIBUTORS
 
-=for stopwords Andy Baugh
+=for stopwords Andy Baugh Troglodyne LLC Crash test Dummy
+
+=over 4
+
+=item *
 
 Andy Baugh <andy@troglodyne.net>
+
+=item *
+
+Troglodyne LLC Crash test Dummy <trogbot@troglodyne.net>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

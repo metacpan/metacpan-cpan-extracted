@@ -76,7 +76,7 @@ fresh state on each run, and a call at the end.
 C<gather> makes such a stage. Its block is the stage's I<set-up>,
 called at the start of each run, so whatever the block declares is
 fresh each time. A run is a call of a pipeline with values, or an
-iterator made from it. The block returns:
+iterator or a feed made from it. The block returns:
 
 =over
 

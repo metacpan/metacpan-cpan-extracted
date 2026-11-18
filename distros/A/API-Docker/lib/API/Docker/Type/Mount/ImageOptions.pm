@@ -1,6 +1,6 @@
 package API::Docker::Type::Mount::ImageOptions;
 # ABSTRACT: Optional configuration for the C<image> type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::Mount::ImageOptions - Optional configuration for the C<image>
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -37,7 +37,7 @@ Source path inside the image. Must be relative without any back traversals.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

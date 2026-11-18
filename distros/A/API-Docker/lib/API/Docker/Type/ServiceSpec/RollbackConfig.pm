@@ -1,6 +1,6 @@
 package API::Docker::Type::ServiceSpec::RollbackConfig;
 # ABSTRACT: Specification for the rollback strategy of the service
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -37,7 +37,7 @@ API::Docker::Type::ServiceSpec::RollbackConfig - Specification for the rollback 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -80,7 +80,7 @@ C<start-first>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

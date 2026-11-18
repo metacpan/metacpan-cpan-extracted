@@ -5,7 +5,7 @@ use warnings;
 
 use Carp ();
 
-our $VERSION = '1.16.0';
+our $VERSION = '1.16.1';
 
 our @FLAGS = qw(
     is_vpn is_tor is_relay is_resproxy is_dcproxy is_mobproxy is_pubproxy is_hosting is_cdn

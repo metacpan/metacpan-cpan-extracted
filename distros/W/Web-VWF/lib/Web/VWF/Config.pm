@@ -30,11 +30,11 @@ Web::VWF::Config - Site-independent configuration file for the Versatile Web Fra
 
 =head1 VERSION
 
-Version 0.002.0
+Version 0.003.0
 
 =cut
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 # Where the server keeps one configuration directory per site, named after the
 # site - see Web::VWF::directory()
@@ -84,7 +84,7 @@ B<Directory Search Order:>
 5. $DOCUMENT_ROOT/../lib/conf
 6. $HOME/lib/conf
 
-B<Returns:> Blessed VWF::Config object
+B<Returns:> Blessed Web::VWF::Config object
 
 B<Throws:> Error::Simple on configuration errors
 
@@ -317,3 +317,17 @@ sub AUTOLOAD
 }
 
 1;
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

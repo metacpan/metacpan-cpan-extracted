@@ -21,6 +21,7 @@ my @files = (
     't/Net-OpenSSH-More-Linux.t',
     't/Net-OpenSSH-More-badcreds.t',
     't/Net-OpenSSH-More-cache.t',
+    't/Net-OpenSSH-More-options.t',
     't/Net-OpenSSH-More-retry.t',
     't/Net-OpenSSH-More-stderr.t',
     't/Net-OpenSSH-More.t',

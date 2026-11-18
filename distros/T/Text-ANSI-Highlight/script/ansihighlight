@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+
+use v5.16;
+use warnings;
+use Getopt::Long qw(:config bundling no_ignore_case);
+use Text::ANSI::Highlight;
+
+my %opt;
+GetOptions(\%opt,
+    'with|w=s',
+    'style|s=s',
+    'language|l=s',
+    'list-highlighters',
+    'help|h',
+    'version|v',
+) or usage(2);
+usage(0) if $opt{help};
+if ($opt{version}) {
+    say "ansihighlight $Text::ANSI::Highlight::VERSION";
+    exit;
+}
+
+sub usage {
+    my $status = shift;
+    print { $status ? *STDERR : *STDOUT } <<'END';
+Usage: ansihighlight [ options ] [ file ... ]
+
+    -w NAME  --with=NAME         highlighter: pandoc (default),
+                                 sourcehighlight (gnu), skylighting (sky)
+    -s NAME  --style=NAME        style of the highlighter, or a file
+                                 (-w pandoc:haddock, -w gnu:esc256)
+    -l LANG  --language=LANG     language of the text; told from the
+                                 name of the file by default
+             --list-highlighters highlighters, and whether the command
+                                 of each is found
+    -h       --help
+    -v       --version
+
+A file whose language is not known is printed as it is.  The
+standard input is read with no file, or for the file "-".
+END
+    exit $status;
+}
+
+if ($opt{'list-highlighters'}) {
+    for my $name (qw(pandoc sourcehighlight skylighting)) {
+        my $hl = Text::ANSI::Highlight->new($name);
+        my($out) = $hl->highlight([ c => "int x;\n" ]);
+        printf "%-16s %s\n", $name, defined $out ? 'found' : 'not found';
+    }
+    exit;
+}
+
+my $hl = Text::ANSI::Highlight->new(
+    with => $opt{with} // '',
+    defined $opt{style} ? (style => $opt{style}) : ());
+my %lang = defined $opt{language} ? (language => $opt{language}) : ();
+
+my $status = 0;
+for my $file (@ARGV ? @ARGV : '-') {
+    my $text;
+    if ($file eq '-') {
+        binmode STDIN;
+        $text = do { local $/; <STDIN> } // '';
+    } else {
+        open my $fh, '<:raw', $file or do {
+            warn "$file: $!\n";
+            $status = 1;
+            next;
+        };
+        $text = do { local $/; <$fh> } // '';
+    }
+    my $max = $Text::ANSI::Highlight::MAX_SIZE;
+    my $color = $max && length($text) > $max ? undef
+        : $hl->text($text, name => $file eq '-' ? '' : $file, %lang);
+    binmode STDOUT;
+    print $color // $text;
+}
+exit $status;
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+ansihighlight - syntax highlight for the terminal
+
+=head1 SYNOPSIS
+
+    ansihighlight lib/Foo.pm
+    ansihighlight README.md
+    ansihighlight -w gnu script.sh
+    ansihighlight -w pandoc:haddock lib/Foo.pm
+    command | ansihighlight -l json
+
+=head1 DESCRIPTION
+
+B<ansihighlight> prints files in colors for the terminal.  The colors
+are those of a highlighter, a command which is installed: C<pandoc>
+by default.  A file whose language is not known is printed as it is,
+and so is every file when the highlighter is not installed.
+
+The language is told from the extension of the file, from its name,
+or from the interpreter on its first line.  In a Markdown file, the
+code in a fence is colored by the language of the fence, and the text
+around it as Markdown.
+
+The standard input is read when no file is given, or for the file
+C<->.  Its language is given by C<-l>, or told from its first line.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-w> I<name>, B<--with>=I<name>
+
+The highlighter: C<pandoc> (default), C<sourcehighlight> (C<gnu>) or
+C<skylighting> (C<sky>).  See L<Text::ANSI::Highlight/HIGHLIGHTERS>.
+
+=item B<-s> I<style>, B<--style>=I<style>
+
+The style of the highlighter, which gives the colors: its name, or a
+file.  It can be written with the highlighter as well, after a colon:
+C<-w pandoc:haddock>, C<-w gnu:esc256>.  See
+L<Text::ANSI::Highlight/STYLES>.
+
+=item B<-l> I<language>, B<--language>=I<language>
+
+The language of all the files.  C<markdown> for a Markdown text.
+
+=item B<--list-highlighters>
+
+Print the highlighters, and whether the command of each is found.
+
+=item B<-h>, B<--help>
+
+=item B<-v>, B<--version>
+
+=back
+
+=head1 SEE ALSO
+
+L<Text::ANSI::Highlight>
+
+=head1 AUTHOR
+
+Kazumasa Utashiro
+
+=head1 LICENSE
+
+Copyright © 2026 Kazumasa Utashiro.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

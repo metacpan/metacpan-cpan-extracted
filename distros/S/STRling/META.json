@@ -1,0 +1,50 @@
+{
+   "abstract" : "thin Perl adapter over the canonical STRling native interop boundary",
+   "author" : [
+      "STRling Team"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.70, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "STRling",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "FFI::Platypus" : "2.10",
+            "JSON::PP" : "4.00",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON::PP" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v4.0.1",
+   "x_serialization_backend" : "JSON::PP version 4.16"
+}

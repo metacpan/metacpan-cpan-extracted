@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ListId 2.168;
+package Config::Model::ListId 2.169;
 
 use 5.20.0;
 use Mouse;
@@ -159,6 +159,16 @@ sub _fetch_with_id {
     return $self->{data}[$idx];
 }
 
+sub fetch_gist ($self) {
+    my @v = map {
+        $self->fetch_with_id($_)->fetch_gist
+    } $self->fetch_all_indexes(check => 'no');
+
+    my $str = join(",", @v);
+    $str = substr( $str, 0, 15 ) . '...' if length($str) > 15;
+    return $str;
+}
+
 sub load {
     my ( $self, $string, %args ) = @_;
     my $check = $self->_check_check( $args{check} );    # I write too many checks.
@@ -169,12 +179,10 @@ sub load {
 
     my $regex = qr/^(
                     (?:
-                             "
-                        (?: \\" | [^"] )*?
-                      "
+                      "(?: \\" | [^"] )*?" # quoted string
                     )
                     |
-                    [^,]+
+                    [^,]+ # plain string delimited by comma
                    )
                   /x;
 
@@ -182,6 +190,7 @@ sub load {
         $string =~ s/$regex// or last;
         my $tmp = $1;
 
+        # cleanup quoted string: remove surrounding quotes and escapes
         $tmp =~ s/^"|"$//g if defined $tmp;
         $tmp =~ s/\\"/"/g  if defined $tmp;
         push @set, $tmp;
@@ -397,14 +406,13 @@ sub _assert_leaf_cargo {
 }
 
 sub sort_algorithm {
-    return sub { $_[0]->fetch cmp $_[1]->fetch; };
+    return sub { $_[0]->fetch_gist cmp $_[1]->fetch_gist; };
 }
 
 ## no critic (Subroutines::ProhibitBuiltinHomonyms)
 sub sort {
     my $self = shift;
 
-    $self->_assert_leaf_cargo;
     $self->_sort_data( $self->sort_algorithm );
 
     my $has_changed = $self->_reindex;
@@ -496,10 +504,7 @@ sub create_default {
 
     # list is empty so create empty element for default keys
     my $def = $self->get_default_keys;
-
     map { $self->{data}[$_] = undef } @$def;
-
-    $self->create_default_with_init;
     return;
 }
 
@@ -552,7 +557,7 @@ Config::Model::ListId - Handle list element for configuration model
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -581,6 +586,16 @@ Returns C<list>.
 =head2 fetch_size
 
 Returns the number of elements of the list.
+
+=head2 fetch_gist
+
+Returns the gist of the array, i.e. a string containg the
+list of value gist, truncated to 15 char.
+
+This applies to list of values or to list of nodes.
+
+The gist value should be used in UI or in user messages, but should
+not be persisted.
 
 =head2 load
 
@@ -661,6 +676,8 @@ Parameters: C<< ( value1, [ value2 ... ] ) >>
 Insert C<zz> value on C<xxx> list so that existing alphanumeric order is preserved.
 C<insort> yields unpexpected results when called on an unsorted list.
 
+This method cannot be used on a list of nodes.
+
 =head2 store
 
 Equivalent to push_x. This method is provided to help write
@@ -689,7 +706,17 @@ Example:
 
 =head2 sort
 
-Sort the content of the list. Can only be called on list of leaf.
+Sort the content of the list according to the gist of the value. The
+gist of a value is a very rough summary of its content. See
+L<Config::Model::Value/"fetch_gist">,
+L<Config::Model::HashId/"fetch_gist">,
+L<Config::Model::ListId/"fetch_gist"> and
+L<Config::Model::CheckList/"fetch_gist">.
+
+The gist of a node is also a summary of the node content, but the gist
+is defined in the model of the Node. See C<gist> item in
+L<Config::Mode::Node/"Configuration class declaration"> and
+L<Config::Model::Node/"fetch_gist">.
 
 =head2 swap
 

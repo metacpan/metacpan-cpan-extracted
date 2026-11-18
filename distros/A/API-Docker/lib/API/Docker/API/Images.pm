@@ -1,6 +1,6 @@
 package API::Docker::API::Images;
 # ABSTRACT: Docker Engine Images API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 with 'API::Docker::Role::Filters', 'API::Docker::Role::RegistryAuth',
   'API::Docker::Role::Using';
@@ -374,7 +374,7 @@ API::Docker::API::Images - Docker Engine Images API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -1168,7 +1168,7 @@ and C<load>
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

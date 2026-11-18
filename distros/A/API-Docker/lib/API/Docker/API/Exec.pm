@@ -1,6 +1,6 @@
 package API::Docker::API::Exec;
 # ABSTRACT: Docker Engine Exec API
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo;
 with 'API::Docker::Role::Using', 'API::Docker::Role::JSONBody';
 use Carp qw( croak );
@@ -86,7 +86,7 @@ API::Docker::API::Exec - Docker Engine Exec API
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -254,7 +254,7 @@ Get information about an exec instance.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

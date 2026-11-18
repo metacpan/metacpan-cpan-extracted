@@ -224,4 +224,25 @@ return [
 
         ]
     },
+    {
+        name => 'ForceLowerCase',
+        rw_config => {
+            backend           => 'IniFile',
+            file              => 'test.ini',
+            auto_create       => 1,
+            quote_value       => 'shell_style',
+            force_lc_section => 1,
+            force_lc_key => 1,
+            force_lc_value => 1,
+        },
+        element => [
+            baz => {
+                qw/type leaf value_type uniline/,
+            },
+            obj => {
+                type              => 'node',
+                config_class_name => 'IniTest::Class'
+            }
+        ]
+    }
 ];

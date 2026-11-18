@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>U.S. states - VWF example site</title>
+</head>
+<body>
+	<h1>U.S. states</h1>
+	<p>This page is rendered by the states page class from
+	<code>example/templates/web/Web/VWF/Display/states.tmpl</code>.  The rows
+	are read from <code>example/data/states.csv</code> through
+	<code>Web::VWF::Data::states</code>.</p>
+	<table>
+		<thead>
+			<tr><th>Code</th><th>Abbreviation</th><th>Name</th></tr>
+		</thead>
+		<tbody>
+[% FOREACH row IN states %]
+			<tr><td>[% row.state | html %]</td><td>[% row.abbreviation | html %]</td><td>[% row.name | html %]</td></tr>
+[% END %]
+		</tbody>
+	</table>
+</body>
+</html>

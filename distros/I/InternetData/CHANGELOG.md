@@ -2,6 +2,12 @@
 
 What each release changed for you, newest first. Each line is a commit's summary, linked to its full description and diff. Releases before 1.6.1 are described by their release commits.
 
+## 1.16.1 - 2026-11-18
+
+### Fixes
+
+- Re-pin the spec to 2026.11.17 as republished: KEY_OVER_HTTP on the account 403 ([`06da942`](https://github.com/internetdata/sdk-perl/commit/06da9420f191d28a9564a7e81884e8aea3cc7e8f))
+
 ## 1.16.0 - 2026-11-17
 
 ### Features

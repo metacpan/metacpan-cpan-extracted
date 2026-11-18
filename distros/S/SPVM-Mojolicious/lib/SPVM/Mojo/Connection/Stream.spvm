@@ -12,20 +12,20 @@ class Mojo::Connection::Stream extends Mojo::Connection {
     return $self;
   }
   
-  method write : int ($chunk : string) {
+  method write : int ($context : Go::Context, $chunk : string) {
     
     my $handle = $self->{handle};
     
-    my $write_length = $handle->syswrite($chunk);
+    my $write_length = $handle->syswrite($context, $chunk);
     
     return $write_length;
   }
   
-  method read : int ($buffer : mutable string) {
+  method read : int ($context : Go::Context, $buffer : mutable string) {
     
     my $handle = $self->{handle};
     
-    my $read_length = $handle->sysread($buffer);
+    my $read_length = $handle->sysread($context, $buffer);
     
     return $read_length;
   }

@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -5,76 +6,41 @@ use Path::Tiny;
 use Cwd qw( abs_path );
 use Module::Runtime qw( require_module );
 
-# k91: `prove -l` PREPENDS "lib" to @INC, it does not replace it -- an
-# installed copy of this distribution stays reachable right behind the
-# checkout's own lib/. That is how a module k84 deleted from
-# lib/API/Docker/Image.pm kept "loading": t/basic.t's use_ok stayed green
-# because API::Docker::Image resolved from
-# a local::lib copy (~/perl5/lib/perl5/API/Docker/Image.pm) instead. The installed
-# copy reported the same $VERSION as the checkout, too -- a released 0.003
-# and an unreleased 0.004 carry the identical literal under this repo's
-# version discipline -- so a version check would not have caught the
-# substitution either.
+# `prove -l` PREPENDS "lib" to @INC, it does not replace it: an installed copy
+# of this distribution stays reachable right behind the checkout's own lib/. A
+# module deleted from lib/ can keep "loading" from that copy, and t/basic.t's
+# use_ok stays green. The installed copy reports the same $VERSION as the
+# checkout, so a version check would not see the substitution either.
 #
-# This test requires every .pm file this checkout ships under lib/ -- both
-# what is physically there right now and, wherever a checkout (not a build
-# tree) makes it cheap to ask, whatever `git` still tracks there even if a
-# file went missing from disk -- then asserts that whatever ended up in %INC
-# for API::Docker::* came from a file inside this checkout. Anything under
-# an installed site/vendor path fails it, by name. One assertion, three
-# failure modes: a stale installed copy, a leftover blib/ picked up ahead of
-# lib/, and a module gone from disk but still tracked (or still referenced
-# by some other module this test loads) -- k84's shape exactly: t/basic.t's
-# use_ok('API::Docker::Image') kept passing, silently sourced from the
-# install, for as long as the file was merely deleted from the working tree
-# and not yet un-tracked.
+# This test therefore only checks a git checkout -- the dist root itself
+# carries .git. It requires every .pm file the checkout ships under lib/ (what
+# is on disk and what `git` still tracks there, even if the file is gone from
+# disk), then asserts that whatever ended up in %INC for API::Docker::* came
+# from a file under lib/. Anything else fails by name: a stale installed copy,
+# a leftover blib/ picked up ahead of lib/, a module gone from disk but still
+# tracked (or still referenced by another module this test loads).
+#
+# Outside a checkout (an unpacked tarball built by `make`, `dzil test`) the
+# modules legitimately load from blib/lib, so the file skips there.
 #
 # API::Docker::{Container,Image,Network,Volume,Plugin,Secret,Config} are
-# legacy CPAN-compatibility stubs (karr k92): they ship under lib/ again on
-# purpose, but are allowed to croak on load rather than load silently, and
-# t/basic.t deliberately carries no use_ok for them -- do not "fix" that by
-# adding one. A module that dies while loading is not silently invisible in
-# %INC, though: `require`/Module::Runtime still leave the key set, just with
-# an undef value, as a guard against re-attempting a load that is known to
-# fail -- and Cwd::abs_path(undef) resolves to the current directory rather
-# than returning undef, which reads as a false "loaded from the checkout
-# root" pass if that key is not screened out first. So a defined %INC value
-# is what "actually loaded" means below; an undef one is treated as no entry
-# at all, on purpose, and never checked. The question here is not "does
-# everything compile" -- that is each module's own t/*.t -- only "whatever
-# DID load, did it come from here".
+# legacy CPAN-compatibility stubs: they ship under lib/ on purpose, but are
+# allowed to croak on load rather than load silently, and t/basic.t
+# deliberately carries no use_ok for them. A module that dies while loading
+# still leaves its %INC key set, with an undef value, and Cwd::abs_path(undef)
+# resolves to the current directory, which would read as a false pass. So a
+# defined %INC value is what "actually loaded" means below; an undef one is
+# treated as no entry at all. The question here is not "does everything
+# compile" -- that is each module's own t/*.t -- only "whatever DID load, did
+# it come from here".
 
 my $dist_root = path(__FILE__)->parent->parent->realpath;
 my $lib_dir   = $dist_root->child('lib');
 
-my @acceptable_roots = ($lib_dir->stringify);
+plan skip_all => 'not a git checkout; modules load from blib/lib there'
+  unless $dist_root->child('.git')->exists;
 
-# `dzil test` builds and runs from a fresh temporary directory under
-# <checkout>/.build/<random> -- created new for every run, so it can never
-# hold a leftover -- and its TestRunner loads modules from that tree's
-# blib/lib, not its lib/. `dzil release`'s [@Filter/TestRelease] instead
-# builds the tarball and EXTRACTS it, so this test then runs one level
-# deeper still: <checkout>/.build/<random>/<Dist-Version>/, with the
-# extracted distribution's own directory as an extra ancestor between
-# $dist_root and .build. Checking only the immediate parent (as this used
-# to) catches the first shape and misses the second, so every release-time
-# run of this test failed even though blib/lib held exactly the right
-# modules. Recognise both shapes by walking $dist_root's ancestors for one
-# named .build, and only that signal, as what makes blib/lib a second
-# acceptable root -- so a blib/ sitting directly in a real, persistent
-# checkout (the actual "leftover blib" failure mode, which has no .build
-# ancestor at all) still fails this test rather than being waved through.
-my $in_build_tree = 0;
-my $ancestor       = $dist_root;
-while ($ancestor->parent->stringify ne $ancestor->stringify) {
-  $ancestor = $ancestor->parent;
-  if ($ancestor->basename eq '.build') {
-    $in_build_tree = 1;
-    last;
-  }
-}
-push @acceptable_roots, $dist_root->child('blib', 'lib')->stringify
-  if $in_build_tree;
+my @acceptable_roots = ($lib_dir->stringify);
 
 my %rel_paths;   # e.g. "API/Docker/Image.pm" => 1
 
@@ -89,19 +55,14 @@ $lib_dir->visit(
 
 # `git ls-files` answers from the index, not the working tree, so a file
 # `mv`d or `rm`d out of lib/ without also being `git rm`d still comes back --
-# which is exactly the shape of check this test exists for. Only meaningful
-# in a checkout (a `dzil test` build tree has no .git of its own, but it only
-# ever contains what Git::GatherDir already limited to tracked files, so the
-# walk above already covers it there).
-if ($dist_root->child('.git')->exists) {
-  if (open my $fh, '-|', 'git', '-C', "$dist_root", 'ls-files', '--', 'lib') {
-    while (my $line = <$fh>) {
-      chomp $line;
-      $line =~ s{\Alib/}{} or next;
-      $rel_paths{$line} = 1 if $line =~ /\.pm\z/;
-    }
-    close $fh;
+# which is exactly the shape of check this test exists for.
+if (open my $fh, '-|', 'git', '-C', "$dist_root", 'ls-files', '--', 'lib') {
+  while (my $line = <$fh>) {
+    chomp $line;
+    $line =~ s{\Alib/}{} or next;
+    $rel_paths{$line} = 1 if $line =~ /\.pm\z/;
   }
+  close $fh;
 }
 
 ok(scalar(keys %rel_paths) > 0, 'found .pm files under lib/ to check')
@@ -113,7 +74,7 @@ for my $rel (sort keys %rel_paths) {
 
   local $@;
   eval { require_module($pkg); 1 };
-  # A load failure is tolerated here on purpose -- see the k92 note above --
+  # A load failure is tolerated here on purpose -- see the legacy-stub note above --
   # and is out of this test's remit either way: it is covered, if at all, by
   # that module's own test file.
 }

@@ -4,7 +4,7 @@ package App::mdee;
 # POD documentation is appended from script/mdee at release time.
 # See minil.toml for details.
 
-our $VERSION = "1.20";
+our $VERSION = "1.21";
 
 1;
 =encoding utf-8
@@ -64,7 +64,7 @@ mdee - em·dee, Markdown Easy on the Eyes
 
 =head1 VERSION
 
-Version 1.20
+Version 1.21
 
 =cut
 =head1 DESCRIPTION
@@ -140,6 +140,13 @@ Others are always processed for structural integrity.
 
 Tables and list item folding are controlled by C<--table> and
 C<--fold> options, not by C<--show>.
+
+The code in a fenced code block is shown in the colors of its
+language (C<```perl>), when L<Text::ANSI::Highlight> and the command
+of its highlighter, C<pandoc> by default, are installed.
+C<--config highlight=gnu> uses C<source-highlight>, and
+C<--config highlight=0> turns it off.  See
+L<App::Greple::md/"Syntax Highlight of Code">.
 
 =head2 Multi-column Layout and Pagination
 
@@ -1101,6 +1108,11 @@ This command requires the following:
 
 =back
 
+The code in fenced code blocks is colored by
+L<Text::ANSI::Highlight>, with C<pandoc> 3.4 or later
+(C<brew install pandoc>), or with C<source-highlight> or
+C<skylighting>.  Without the command, the code is shown as it is.
+
 C<--refill> finds the paragraphs with L<Markdown::Perl> (pure Perl,
 installed with this distribution).  The L<CommonMark> module, which
 needs the libcmark C library (C<brew install cmark>, C<apt-get install
@@ -1295,7 +1307,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2026 Kazumasa Utashiro.
+Copyright © 2026 Kazumasa Utashiro.
 
 This software is released under the MIT License.
 L<https://opensource.org/licenses/MIT>

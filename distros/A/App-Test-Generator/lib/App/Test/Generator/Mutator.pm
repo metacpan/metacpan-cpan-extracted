@@ -35,7 +35,7 @@ Readonly my $ERR_FILE_REQUIRED     => 'file required';
 Readonly my $ERR_WORKSPACE_NOT_SET => 'Workspace not prepared -- call prepare_workspace first';
 Readonly my $ERR_RELATIVE_NOT_SET  => 'Relative path not set -- call prepare_workspace first';
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =encoding utf8
 
@@ -45,7 +45,7 @@ App::Test::Generator::Mutator - Generate and apply mutation tests
 
 =head1 VERSION
 
-Version 0.49
+Version 0.50
 
 =head1 SYNOPSIS
 

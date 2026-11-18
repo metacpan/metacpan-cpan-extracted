@@ -1,4 +1,4 @@
-#!perl -T
+#!perl
 
 #use v5.10;
 

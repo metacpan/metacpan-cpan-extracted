@@ -287,7 +287,7 @@ B<Made in:> DBIx::Squirrel::Stages::Batch
 
 =item C<:taps>
 
-B<What it gives you:> C<peek>, C<count_into> and C<dump_to>
+B<What it gives you:> C<peek>, C<count_into>, C<dump_to> and C<tee>
 
 B<Made in:> DBIx::Squirrel::Stages::Taps
 
@@ -1101,6 +1101,23 @@ debug, and to be taken out before the code goes live. With
 Text::Redact::Secrets installed, it redacts the secrets it finds, as
 the reference's L<Canned stages|DBIx::Squirrel::Manual::Reference/"Canned stages"> says.
 
+C<tee>, on request too, is a tap of any shape: it runs each row through
+stages of its own, beside the pipeline, and passes the row on as it
+came. Its stages can pick out some rows, stop early, or use C<pluck>,
+as the pipeline's can:
+
+    my @first_two;
+    my $count = $dbh->iterate(
+        'SELECT name FROM artist ORDER BY name',
+        tee(take(2), pluck('name'), sub { push @first_two, $_; () }),
+        count_items,
+    );
+    say "@first_two, of $count";    # Abba Blur, of 3
+
+A stop in C<tee>'s stages, such as C<take(2)>'s, ends only them: the
+pipeline reads on. It costs a good deal more than C<peek>, so keep it
+for side jobs and debugging.
+
 =head2 Compared with C<map> over every row
 
 The obvious alternative is to fetch every row and use Perl's own C<map>
@@ -1480,6 +1497,13 @@ C<undef> if there are none:
     my $nobody = $dbh->iterate('SELECT name FROM artist WHERE id = ?', 9, keep_single);
     say defined $nobody ? 'found' : 'none';    # none
 
+C<keep_last> still fetches every row, as a database hands them over in
+order, from the first. For the last row, ask the database: reverse the
+C<ORDER BY>, and add C<LIMIT 1>. Without an C<ORDER BY>, a query's rows
+come in no order, so none of them is the last:
+
+    say $dbh->selectrow_array('SELECT name FROM track ORDER BY plays ASC LIMIT 1');    # Country House
+
 =head2 Keep the first few
 
 C<keep(N)> keeps the first N results, and stops the run once it has
@@ -1682,6 +1706,55 @@ Stages that need a statement's column names, C<as_hash>, and C<pluck> by
 a name for an array row, can't work there, as there's no statement:
 they croak "Expected a statement to read, for the column names".
 C<pluck> by name on hashes, which reads their keys, works anywhere.
+
+=head2 Load rows as they arrive
+
+C<< $pipeline->feed >> starts one run of a pipeline and gives it to you,
+to push values into as they arrive: lines read from a socket, records
+a callback hands you, or rows from somewhere other than a statement.
+Each C<push> gives back what came out of the values pushed. C<close>
+ends the input, and gives what the stages still held, such as a last,
+part-filled batch. C<ended> says how the run ended.
+
+So a feed is a loader. Here rows go into a table two at a time, each
+batch in a transaction of its own, with C<execute_array> writing it:
+
+    use Ekorn::Pipeline;
+
+    $dbh->do('CREATE TEMP TABLE heard (track_id INTEGER, plays INTEGER)');
+    my $insert = $dbh->prepare('INSERT INTO heard (track_id, plays) VALUES (?, ?)');
+
+    my $load = Ekorn::Pipeline->new(
+        drop_if { $_->{plays} == 0 },
+        batch(2),
+        sub {
+            my $rows = $_;
+            $dbh->begin_work;
+            $insert->execute_array(
+                {},
+                [map { $_->{track_id} } @$rows],
+                [map { $_->{plays} } @$rows],
+            );
+            $dbh->commit;
+            scalar @$rows;    # how many were written
+        },
+    )->feed;
+
+    my @written;
+    push @written, $load->push($_)
+        for {track_id => 1, plays => 3}, {track_id => 2, plays => 0},
+            {track_id => 3, plays => 5}, {track_id => 4, plays => 1};
+    push @written, $load->close;
+    say "@written";         # 2 1
+    say $load->ended;       # done
+    say $dbh->selectrow_array('SELECT COUNT(*) FROM heard');    # 3
+
+The first batch is written in the push that fills it, and the last, of
+one row, by C<close>. A stop, such as C<take>'s, ends the run in the push
+that meets it, and a push after that croaks, so ask C<ended> after each
+push when a stop may come. Ekorn::Pipeline's L<how-to on
+feeds|Ekorn::Pipeline::Manual::HowTo/"Feed values in as they arrive">
+has the rest.
 
 =head2 Name a pipeline, and use it by name
 

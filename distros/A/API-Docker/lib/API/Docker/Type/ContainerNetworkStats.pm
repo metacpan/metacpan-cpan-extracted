@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerNetworkStats;
 # ABSTRACT: Aggregates the network stats of one container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -49,7 +49,7 @@ API::Docker::Type::ContainerNetworkStats - Aggregates the network stats of one c
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -124,7 +124,7 @@ would produce C<InstanceId>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

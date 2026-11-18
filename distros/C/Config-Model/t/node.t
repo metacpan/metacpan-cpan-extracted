@@ -34,13 +34,19 @@ $model->create_config_class(
 $model->create_config_class(
     name       => 'Captain',
 
-    gist => '{bar X} and {bar Y}',
+    gist => '{name}: {bar X} and {bar Y}',
 
     element    => [
         bar => {
             type              => 'node',
             config_class_name => 'Sarge'
-        } ] );
+        },
+        name => {
+            type => 'leaf',
+            value_type => 'uniline',
+            mandatory => 1,
+        }
+    ] );
 
 $model->create_config_class(
     name       => "Master",
@@ -107,13 +113,16 @@ subtest "check deprecated element warning" => sub{
     $b->fetch_element('D');
 };
 
+subtest "check node gist" => sub {
+    $b->fetch_element('X')->store('Av');
+    $b->fetch_element('Y')->store('Bv');
+    $w->fetch_element('name')->store("Joe");
 
-$b->fetch_element('X')->store('Av');
-$b->fetch_element('Y')->store('Bv');
-my $expected_gist = 'Av and Bv';
-is($b->fetch_gist,$expected_gist, 'test Sarge gist');
-is($w->fetch_gist,$expected_gist, 'test Captain gist');
-is($root->fetch_gist,$expected_gist, 'test Master gist');
+    my $expected_gist = 'Av and Bv';
+    is($b->fetch_gist,$expected_gist, 'test Sarge gist');
+    is($w->fetch_gist,"Joe: ".$expected_gist, 'test Captain gist');
+    is($root->fetch_gist,$expected_gist, 'test Master gist');
+};
 
 my $tested = $root->fetch_element('hash_args')->fetch_element('bar');
 

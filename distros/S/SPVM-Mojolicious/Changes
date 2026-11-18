@@ -1,3 +1,19 @@
+0.047 2026-11-18
+  [Internal Changes]
+    * Catch up with latest SPVM::IO and SPVM::IO::Socket::SSL.
+    
+0.046 2026-11-18
+  [Internal Changes]
+    * Catch up with latest SPVM::IO and SPVM::IO::Socket::SSL.
+    
+0.045 2026-11-18
+  [Bug Fix]
+    * Fix 0.044 bugs.
+    
+0.044 2026-11-18
+  [Incompatibe Changes]
+    * Support Go::Context in needed methods.
+    
 0.043 2026-02-06
   [Test Improvement]
     * Update TestCase::Online to use httpbin.org instead of google.com and ensure all test methods return 1 on success.

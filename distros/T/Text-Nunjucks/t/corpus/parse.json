@@ -1,0 +1,1709 @@
+[
+  {
+    "name": "symbol lookup",
+    "mode": "parse",
+    "template": "{{ a }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Symbol",
+                "lineno": 0,
+                "colno": 3,
+                "value": "a"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "filter application",
+    "mode": "parse",
+    "template": "{{ x|upper }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Filter",
+                "lineno": 0,
+                "colno": 5,
+                "name": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 5,
+                  "value": "upper"
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 5,
+                  "children": [
+                    {
+                      "type": "Symbol",
+                      "lineno": 0,
+                      "colno": 3,
+                      "value": "x"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "literal array",
+    "mode": "parse",
+    "template": "{{ [1,2] }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Array",
+                "lineno": 0,
+                "colno": 3,
+                "children": [
+                  {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 4,
+                    "value": 1
+                  },
+                  {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 6,
+                    "value": 2
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "if statement",
+    "mode": "parse",
+    "template": "{% if x %}y{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "If",
+            "lineno": 0,
+            "colno": 3,
+            "cond": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 6,
+              "value": "x"
+            },
+            "body": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 10,
+                  "children": [
+                    {
+                      "type": "TemplateData",
+                      "lineno": 0,
+                      "colno": 10,
+                      "value": "y"
+                    }
+                  ]
+                }
+              ]
+            },
+            "else_": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "regex literal member call",
+    "mode": "parse",
+    "template": "{{ r/^h.l/g.test(s) }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "FunCall",
+                "lineno": 0,
+                "colno": 16,
+                "name": {
+                  "type": "LookupVal",
+                  "lineno": 0,
+                  "colno": 11,
+                  "target": {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 3,
+                    "value": {
+                      "regex": "^h.l",
+                      "flags": "g"
+                    }
+                  },
+                  "val": {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 12,
+                    "value": "test"
+                  }
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 16,
+                  "children": [
+                    {
+                      "type": "Symbol",
+                      "lineno": 0,
+                      "colno": 17,
+                      "value": "s"
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "compare operators",
+    "mode": "parse",
+    "template": "{{ 1 < 2 }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Compare",
+                "lineno": 0,
+                "colno": 5,
+                "expr": {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": 1
+                },
+                "ops": [
+                  {
+                    "type": "<",
+                    "lineno": 0,
+                    "colno": 5,
+                    "expr": {
+                      "type": "Literal",
+                      "lineno": 0,
+                      "colno": 7,
+                      "value": 2
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "operator precedence",
+    "mode": "parse",
+    "template": "{{ x or y and z }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Or",
+                "lineno": 0,
+                "colno": 3,
+                "left": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": "x"
+                },
+                "right": {
+                  "type": "And",
+                  "lineno": 0,
+                  "colno": 8,
+                  "left": {
+                    "type": "Symbol",
+                    "lineno": 0,
+                    "colno": 8,
+                    "value": "y"
+                  },
+                  "right": {
+                    "type": "Symbol",
+                    "lineno": 0,
+                    "colno": 14,
+                    "value": "z"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "unary negation",
+    "mode": "parse",
+    "template": "{{ -1 }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Neg",
+                "lineno": 0,
+                "colno": 3,
+                "target": {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 4,
+                  "value": 1
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "string concat tilde",
+    "mode": "parse",
+    "template": "{{ 2 ~ 3 }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Concat",
+                "lineno": 0,
+                "colno": 3,
+                "left": {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": 2
+                },
+                "right": {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 7,
+                  "value": 3
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "for loop",
+    "mode": "parse",
+    "template": "{% for x in [1, 2] %}{{ x }}{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "For",
+            "lineno": 0,
+            "colno": 3,
+            "arr": {
+              "type": "Array",
+              "lineno": 0,
+              "colno": 12,
+              "children": [
+                {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 13,
+                  "value": 1
+                },
+                {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 16,
+                  "value": 2
+                }
+              ]
+            },
+            "name": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 7,
+              "value": "x"
+            },
+            "body": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 21,
+                  "children": [
+                    {
+                      "type": "Symbol",
+                      "lineno": 0,
+                      "colno": 24,
+                      "value": "x"
+                    }
+                  ]
+                }
+              ]
+            },
+            "else_": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "macro definition with kwargs",
+    "mode": "parse",
+    "template": "{% macro foo(bar, baz=\"x\") %}m{% endmacro %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Macro",
+            "lineno": 0,
+            "colno": 3,
+            "name": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 9,
+              "value": "foo"
+            },
+            "args": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 12,
+              "children": [
+                {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 13,
+                  "value": "bar"
+                },
+                {
+                  "type": "KeywordArgs",
+                  "lineno": 0,
+                  "colno": 12,
+                  "children": [
+                    {
+                      "type": "Pair",
+                      "lineno": 0,
+                      "colno": 18,
+                      "key": {
+                        "type": "Symbol",
+                        "lineno": 0,
+                        "colno": 18,
+                        "value": "baz"
+                      },
+                      "value": {
+                        "type": "Literal",
+                        "lineno": 0,
+                        "colno": 22,
+                        "value": "x"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            "body": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 29,
+                  "children": [
+                    {
+                      "type": "TemplateData",
+                      "lineno": 0,
+                      "colno": 29,
+                      "value": "m"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "funcall keyword args",
+    "mode": "parse",
+    "template": "{{ foo(\"a\", b=1) }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "FunCall",
+                "lineno": 0,
+                "colno": 6,
+                "name": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": "foo"
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 6,
+                  "children": [
+                    {
+                      "type": "Literal",
+                      "lineno": 0,
+                      "colno": 7,
+                      "value": "a"
+                    },
+                    {
+                      "type": "KeywordArgs",
+                      "lineno": 0,
+                      "colno": 6,
+                      "children": [
+                        {
+                          "type": "Pair",
+                          "lineno": 0,
+                          "colno": 12,
+                          "key": {
+                            "type": "Symbol",
+                            "lineno": 0,
+                            "colno": 12,
+                            "value": "b"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "lineno": 0,
+                            "colno": 14,
+                            "value": 1
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "member lookup dot",
+    "mode": "parse",
+    "template": "{{ a.b }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "LookupVal",
+                "lineno": 0,
+                "colno": 4,
+                "target": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": "a"
+                },
+                "val": {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 5,
+                  "value": "b"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "dict literal",
+    "mode": "parse",
+    "template": "{{ {foo: 1} }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Dict",
+                "lineno": 0,
+                "colno": 3,
+                "children": [
+                  {
+                    "type": "Pair",
+                    "lineno": 0,
+                    "colno": 4,
+                    "key": {
+                      "type": "Symbol",
+                      "lineno": 0,
+                      "colno": 4,
+                      "value": "foo"
+                    },
+                    "value": {
+                      "type": "Literal",
+                      "lineno": 0,
+                      "colno": 9,
+                      "value": 1
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "set assignment",
+    "mode": "parse",
+    "template": "{% set x = 1 %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Set",
+            "lineno": 0,
+            "colno": 3,
+            "targets": [
+              {
+                "type": "Symbol",
+                "lineno": 0,
+                "colno": 7,
+                "value": "x"
+              }
+            ],
+            "value": {
+              "type": "Literal",
+              "lineno": 0,
+              "colno": 11,
+              "value": 1
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "import as with filter",
+    "mode": "parse",
+    "template": "{% import \"foo/bar.html\"|replace(\"html\",\"j2\") as baz %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Import",
+            "lineno": 0,
+            "colno": 3,
+            "template": {
+              "type": "Filter",
+              "lineno": 0,
+              "colno": 25,
+              "name": {
+                "type": "Symbol",
+                "lineno": 0,
+                "colno": 25,
+                "value": "replace"
+              },
+              "args": {
+                "type": "NodeList",
+                "lineno": 0,
+                "colno": 25,
+                "children": [
+                  {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 10,
+                    "value": "foo/bar.html"
+                  },
+                  {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 33,
+                    "value": "html"
+                  },
+                  {
+                    "type": "Literal",
+                    "lineno": 0,
+                    "colno": 40,
+                    "value": "j2"
+                  }
+                ]
+              }
+            },
+            "target": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 49,
+              "value": "baz"
+            },
+            "withContext": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "inline if else",
+    "mode": "parse",
+    "template": "{{ a if b else c }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "InlineIf",
+                "lineno": 0,
+                "colno": 3,
+                "cond": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 8,
+                  "value": "b"
+                },
+                "body": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": "a"
+                },
+                "else_": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 15,
+                  "value": "c"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "whitespace control trim",
+    "mode": "parse",
+    "template": "{% if x -%}\n  hi \n{%- endif %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "If",
+            "lineno": 0,
+            "colno": 3,
+            "cond": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 6,
+              "value": "x"
+            },
+            "body": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 11,
+                  "children": [
+                    {
+                      "type": "TemplateData",
+                      "lineno": 0,
+                      "colno": 11,
+                      "value": "hi"
+                    }
+                  ]
+                }
+              ]
+            },
+            "else_": null
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "is not test",
+    "mode": "parse",
+    "template": "{{ x is not callable }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "Not",
+                "lineno": 0,
+                "colno": 3,
+                "target": {
+                  "type": "Is",
+                  "lineno": 0,
+                  "colno": 3,
+                  "left": {
+                    "type": "Symbol",
+                    "lineno": 0,
+                    "colno": 3,
+                    "value": "x"
+                  },
+                  "right": {
+                    "type": "Symbol",
+                    "lineno": 0,
+                    "colno": 12,
+                    "value": "callable"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "switch case node has undefined position",
+    "mode": "parse",
+    "template": "{% switch x %}{% case 1 %}a{% default %}b{% endswitch %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Switch",
+            "lineno": 0,
+            "colno": 3,
+            "expr": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 10,
+              "value": "x"
+            },
+            "cases": [
+              {
+                "type": "Case",
+                "cond": {
+                  "type": "Literal",
+                  "lineno": 0,
+                  "colno": 22,
+                  "value": 1
+                },
+                "body": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 0,
+                  "children": [
+                    {
+                      "type": "Output",
+                      "lineno": 0,
+                      "colno": 26,
+                      "children": [
+                        {
+                          "type": "TemplateData",
+                          "lineno": 0,
+                          "colno": 26,
+                          "value": "a"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ],
+            "default": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 40,
+                  "children": [
+                    {
+                      "type": "TemplateData",
+                      "lineno": 0,
+                      "colno": 40,
+                      "value": "b"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "call block keyword args and empty nodelist have undefined position",
+    "mode": "parse",
+    "template": "{% call foo() %}body{% endcall %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 3,
+            "children": [
+              {
+                "type": "FunCall",
+                "lineno": 0,
+                "colno": 11,
+                "name": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 8,
+                  "value": "foo"
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 11,
+                  "children": [
+                    {
+                      "type": "KeywordArgs",
+                      "children": [
+                        {
+                          "type": "Pair",
+                          "lineno": 0,
+                          "colno": 3,
+                          "key": {
+                            "type": "Symbol",
+                            "lineno": 0,
+                            "colno": 3,
+                            "value": "caller"
+                          },
+                          "value": {
+                            "type": "Caller",
+                            "lineno": 0,
+                            "colno": 3,
+                            "name": {
+                              "type": "Symbol",
+                              "lineno": 0,
+                              "colno": 3,
+                              "value": "caller"
+                            },
+                            "args": {
+                              "type": "NodeList",
+                              "children": []
+                            },
+                            "body": {
+                              "type": "NodeList",
+                              "lineno": 0,
+                              "colno": 0,
+                              "children": [
+                                {
+                                  "type": "Output",
+                                  "lineno": 0,
+                                  "colno": 16,
+                                  "children": [
+                                    {
+                                      "type": "TemplateData",
+                                      "lineno": 0,
+                                      "colno": 16,
+                                      "value": "body"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "error expected variable end",
+    "mode": "parse",
+    "template": "hello {{ foo",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "expected variable end"
+      }
+    }
+  },
+  {
+    "name": "error underscore import",
+    "mode": "parse",
+    "template": "{% from \"foo\" import _bar %}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "parseFrom: names starting with an underscore cannot be imported"
+      }
+    }
+  },
+  {
+    "name": "error unknown block tag",
+    "mode": "parse",
+    "template": "hello {% bar %} dsfsdf",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "unknown block tag: bar"
+      }
+    }
+  },
+  {
+    "name": "raw block",
+    "mode": "parse",
+    "template": "{% raw %}hello {{ {% %} }}{% endraw %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 7,
+            "children": [
+              {
+                "type": "TemplateData",
+                "lineno": 0,
+                "colno": 7,
+                "value": "hello {{ {% %} }}"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "raw with broken variables",
+    "mode": "parse",
+    "template": "{% raw %}{{ x }{% endraw %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 7,
+            "children": [
+              {
+                "type": "TemplateData",
+                "lineno": 0,
+                "colno": 7,
+                "value": "{{ x }"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "verbatim block",
+    "mode": "parse",
+    "template": "{% verbatim %}hello {{ {% %} }}{% endverbatim %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 12,
+            "children": [
+              {
+                "type": "TemplateData",
+                "lineno": 0,
+                "colno": 12,
+                "value": "hello {{ {% %} }}"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "multiple raw blocks",
+    "mode": "parse",
+    "template": "{% raw %}{{ var }}{% endraw %}{{ var }}{% raw %}{{ var }}{% endraw %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 7,
+            "children": [
+              {
+                "type": "TemplateData",
+                "lineno": 0,
+                "colno": 7,
+                "value": "{{ var }}"
+              }
+            ]
+          },
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 30,
+            "children": [
+              {
+                "type": "Symbol",
+                "lineno": 0,
+                "colno": 33,
+                "value": "var"
+              }
+            ]
+          },
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 46,
+            "children": [
+              {
+                "type": "TemplateData",
+                "lineno": 0,
+                "colno": 46,
+                "value": "{{ var }}"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "for loop with else",
+    "mode": "parse",
+    "template": "{% for x in [] %}{{ x }}{% else %}empty{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "For",
+            "lineno": 0,
+            "colno": 3,
+            "arr": {
+              "type": "Array",
+              "lineno": 0,
+              "colno": 12,
+              "children": []
+            },
+            "name": {
+              "type": "Symbol",
+              "lineno": 0,
+              "colno": 7,
+              "value": "x"
+            },
+            "body": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 17,
+                  "children": [
+                    {
+                      "type": "Symbol",
+                      "lineno": 0,
+                      "colno": 20,
+                      "value": "x"
+                    }
+                  ]
+                }
+              ]
+            },
+            "else_": {
+              "type": "NodeList",
+              "lineno": 0,
+              "colno": 0,
+              "children": [
+                {
+                  "type": "Output",
+                  "lineno": 0,
+                  "colno": 34,
+                  "children": [
+                    {
+                      "type": "TemplateData",
+                      "lineno": 0,
+                      "colno": 34,
+                      "value": "empty"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "call block",
+    "mode": "parse",
+    "template": "{% call foo(\"bar\") %}This is the caller{% endcall %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 3,
+            "children": [
+              {
+                "type": "FunCall",
+                "lineno": 0,
+                "colno": 11,
+                "name": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 8,
+                  "value": "foo"
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 11,
+                  "children": [
+                    {
+                      "type": "Literal",
+                      "lineno": 0,
+                      "colno": 12,
+                      "value": "bar"
+                    },
+                    {
+                      "type": "KeywordArgs",
+                      "children": [
+                        {
+                          "type": "Pair",
+                          "lineno": 0,
+                          "colno": 3,
+                          "key": {
+                            "type": "Symbol",
+                            "lineno": 0,
+                            "colno": 3,
+                            "value": "caller"
+                          },
+                          "value": {
+                            "type": "Caller",
+                            "lineno": 0,
+                            "colno": 3,
+                            "name": {
+                              "type": "Symbol",
+                              "lineno": 0,
+                              "colno": 3,
+                              "value": "caller"
+                            },
+                            "args": {
+                              "type": "NodeList",
+                              "children": []
+                            },
+                            "body": {
+                              "type": "NodeList",
+                              "lineno": 0,
+                              "colno": 0,
+                              "children": [
+                                {
+                                  "type": "Output",
+                                  "lineno": 0,
+                                  "colno": 21,
+                                  "children": [
+                                    {
+                                      "type": "TemplateData",
+                                      "lineno": 0,
+                                      "colno": 21,
+                                      "value": "This is the caller"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "call block with args",
+    "mode": "parse",
+    "template": "{% call(i) foo(\"bar\", baz=\"foobar\") %}This is {{ i }}{% endcall %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 3,
+            "children": [
+              {
+                "type": "FunCall",
+                "lineno": 0,
+                "colno": 14,
+                "name": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 11,
+                  "value": "foo"
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 14,
+                  "children": [
+                    {
+                      "type": "Literal",
+                      "lineno": 0,
+                      "colno": 15,
+                      "value": "bar"
+                    },
+                    {
+                      "type": "KeywordArgs",
+                      "lineno": 0,
+                      "colno": 14,
+                      "children": [
+                        {
+                          "type": "Pair",
+                          "lineno": 0,
+                          "colno": 22,
+                          "key": {
+                            "type": "Symbol",
+                            "lineno": 0,
+                            "colno": 22,
+                            "value": "baz"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "lineno": 0,
+                            "colno": 26,
+                            "value": "foobar"
+                          }
+                        },
+                        {
+                          "type": "Pair",
+                          "lineno": 0,
+                          "colno": 3,
+                          "key": {
+                            "type": "Symbol",
+                            "lineno": 0,
+                            "colno": 3,
+                            "value": "caller"
+                          },
+                          "value": {
+                            "type": "Caller",
+                            "lineno": 0,
+                            "colno": 3,
+                            "name": {
+                              "type": "Symbol",
+                              "lineno": 0,
+                              "colno": 3,
+                              "value": "caller"
+                            },
+                            "args": {
+                              "type": "NodeList",
+                              "lineno": 0,
+                              "colno": 7,
+                              "children": [
+                                {
+                                  "type": "Symbol",
+                                  "lineno": 0,
+                                  "colno": 8,
+                                  "value": "i"
+                                }
+                              ]
+                            },
+                            "body": {
+                              "type": "NodeList",
+                              "lineno": 0,
+                              "colno": 0,
+                              "children": [
+                                {
+                                  "type": "Output",
+                                  "lineno": 0,
+                                  "colno": 38,
+                                  "children": [
+                                    {
+                                      "type": "TemplateData",
+                                      "lineno": 0,
+                                      "colno": 38,
+                                      "value": "This is "
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "Output",
+                                  "lineno": 0,
+                                  "colno": 46,
+                                  "children": [
+                                    {
+                                      "type": "Symbol",
+                                      "lineno": 0,
+                                      "colno": 49,
+                                      "value": "i"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "keyword and non-keyword funcall args",
+    "mode": "parse",
+    "template": "{{ foo(\"bar\", falalalala, baz=\"foobar\") }}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "Output",
+            "lineno": 0,
+            "colno": 0,
+            "children": [
+              {
+                "type": "FunCall",
+                "lineno": 0,
+                "colno": 6,
+                "name": {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 3,
+                  "value": "foo"
+                },
+                "args": {
+                  "type": "NodeList",
+                  "lineno": 0,
+                  "colno": 6,
+                  "children": [
+                    {
+                      "type": "Literal",
+                      "lineno": 0,
+                      "colno": 7,
+                      "value": "bar"
+                    },
+                    {
+                      "type": "Symbol",
+                      "lineno": 0,
+                      "colno": 14,
+                      "value": "falalalala"
+                    },
+                    {
+                      "type": "KeywordArgs",
+                      "lineno": 0,
+                      "colno": 6,
+                      "children": [
+                        {
+                          "type": "Pair",
+                          "lineno": 0,
+                          "colno": 26,
+                          "key": {
+                            "type": "Symbol",
+                            "lineno": 0,
+                            "colno": 26,
+                            "value": "baz"
+                          },
+                          "value": {
+                            "type": "Literal",
+                            "lineno": 0,
+                            "colno": 30,
+                            "value": "foobar"
+                          }
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  {
+    "name": "from import plain",
+    "mode": "parse",
+    "template": "{% from \"foo/bar.njk\" import baz, foobar as foobarbaz %}",
+    "expected": {
+      "ok": true,
+      "output": {
+        "type": "Root",
+        "lineno": 0,
+        "colno": 0,
+        "children": [
+          {
+            "type": "FromImport",
+            "lineno": 0,
+            "colno": 3,
+            "template": {
+              "type": "Literal",
+              "lineno": 0,
+              "colno": 8,
+              "value": "foo/bar.njk"
+            },
+            "names": {
+              "type": "NodeList",
+              "children": [
+                {
+                  "type": "Symbol",
+                  "lineno": 0,
+                  "colno": 29,
+                  "value": "baz"
+                },
+                {
+                  "type": "Pair",
+                  "lineno": 0,
+                  "colno": 34,
+                  "key": {
+                    "type": "Symbol",
+                    "lineno": 0,
+                    "colno": 34,
+                    "value": "foobar"
+                  },
+                  "value": {
+                    "type": "Symbol",
+                    "lineno": 0,
+                    "colno": 44,
+                    "value": "foobarbaz"
+                  }
+                }
+              ]
+            },
+            "withContext": null
+          }
+        ]
+      }
+    }
+  }
+]

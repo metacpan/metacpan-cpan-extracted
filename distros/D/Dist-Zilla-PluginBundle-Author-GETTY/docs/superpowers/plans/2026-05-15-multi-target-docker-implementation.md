@@ -60,7 +60,7 @@ sub _default_docker_image {
 
 - [ ] **Step 4: Run tests to verify no breakage**
 
-Run: `cd /storage/raid/home/getty/dev/perl/p5-dist-zilla-pluginbundle-author-getty && dzil test`
+Run: `dzil test`
 Expected: All existing tests pass
 
 - [ ] **Step 5: Commit**
@@ -170,7 +170,7 @@ sub _validate_docker_subsections {
 
 - [ ] **Step 3: Run tests**
 
-Run: `cd /storage/raid/home/getty/dev/perl/p5-dist-zilla-pluginbundle-author-getty && dzil test`
+Run: `dzil test`
 Expected: All existing tests pass
 
 - [ ] **Step 4: Commit**
@@ -242,7 +242,7 @@ Replace lines 857-877 (the existing `if ($self->docker_image)` block) with:
 
 - [ ] **Step 2: Run tests**
 
-Run: `cd /storage/raid/home/getty/dev/perl/p5-dist-zilla-pluginbundle-author-getty && dzil test`
+Run: `dzil test`
 Expected: All existing tests pass
 
 - [ ] **Step 3: Commit**
@@ -416,7 +416,7 @@ CONF
 
 - [ ] **Step 5: Run tests and fix**
 
-Run: `cd /storage/raid/home/getty/dev/perl/p5-dist-zilla-pluginbundle-author-getty && dzil test --test-file t/docker-subsection.t`
+Run: `dzil test --test-file t/docker-subsection.t`
 Expected: Tests demonstrate subsection behavior. Adjust assertions as needed.
 
 - [ ] **Step 6: Commit**
@@ -439,7 +439,7 @@ Create `t/docker-test-app/` directory with a minimal dist.ini that uses the subs
 
 - [ ] **Step 2: Run integration test**
 
-Run: `cd /storage/raid/home/getty/dev/perl/p5-dist-zilla-pluginbundle-author-getty/t/docker-test-app && dzil test`
+Run: `cd t/docker-test-app && dzil test`
 Expected: The plugin correctly processes subsections
 
 - [ ] **Step 3: Commit**
@@ -455,7 +455,7 @@ git commit -m "test: add docker subsection integration test app"
 
 - [ ] **Step 1: Run full test suite**
 
-Run: `cd /storage/raid/home/getty/dev/perl/p5-dist-zilla-pluginbundle-author-getty && dzil test`
+Run: `dzil test`
 Expected: All tests pass
 
 - [ ] **Step 2: Build distribution**

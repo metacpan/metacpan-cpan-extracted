@@ -1,0 +1,239 @@
+[
+  {
+    "name": "macro lifetime: from-import of one macro; it calls a sibling and reads a global and a library variable, called after the import statement",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% set v = 'V' %}{% macro a() %}[{{ v }}{{ range(0,3) | join('') }}{{ b() }}{{ _helper() }}]{% endmacro %}{% macro b() %}b{% endmacro %}{% macro _helper() %}h{% endmacro %}",
+      "main.njk": "{% from 'lib.njk' import a %}{{ a() }}|{{ a() }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[V012bh]|[V012bh]"
+    }
+  },
+  {
+    "name": "macro lifetime: import as namespace; library macros call a sibling and read a global",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% set v = 'V' %}{% macro a() %}[{{ v }}{{ range(0,3) | join('') }}{{ b() }}{{ _helper() }}]{% endmacro %}{% macro b() %}b{% endmacro %}{% macro _helper() %}h{% endmacro %}",
+      "main.njk": "{% import 'lib.njk' as ns %}{{ ns.a() }}|{{ ns.b() }}|{{ ns.a() }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[V012bh]|b|[V012bh]"
+    }
+  },
+  {
+    "name": "macro lifetime: a library re-exports another library's macro through set; the macro reads outer names of its own library",
+    "render": "main.njk",
+    "templates": {
+      "b.njk": "{% macro m() %}{{ x }}<{{ v }}{{ range(0,2) | join(',') }}>{% endmacro %}{% set v = 'bv' %}",
+      "a.njk": "{% from 'b.njk' import m %}{% set g = m %}",
+      "main.njk": "{% from 'a.njk' import g %}{{ g() }}|{{ g() }}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<bv0,1>|<bv0,1>"
+    }
+  },
+  {
+    "name": "macro lifetime: an import executed inside a macro body, the macro called several times",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% set v = 'V' %}{% macro a() %}[{{ v }}{{ range(0,3) | join('') }}{{ b() }}]{% endmacro %}{% macro b() %}b{% endmacro %}",
+      "main.njk": "{% macro outer() %}{% from 'lib.njk' import a %}{{ a() }}{% endmacro %}{{ outer() }}{{ outer() }}{{ outer() }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[V012b][V012b][V012b]"
+    }
+  },
+  {
+    "name": "macro lifetime: a macro defined in a block, stored with set there and called after the block's own statements",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% block c %}{% macro m() %}{{ x }}{% endmacro %}{% set f = m %}{{ f() }}{{ m() }}{% endblock %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "XX"
+    }
+  },
+  {
+    "name": "macro lifetime: from-import with context inside a for loop; the macro reads a context name",
+    "render": "main.njk",
+    "templates": {
+      "libx.njk": "{% macro m() %}<{{ x }}>{% endmacro %}",
+      "main.njk": "{% for i in [1,2] %}{% from 'libx.njk' import m with context %}{{ m() }}{% endfor %}"
+    },
+    "context": {
+      "x": "X"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<X><X>"
+    }
+  },
+  {
+    "name": "macro lifetime: a macro that throws while called with a caller block",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro m() %}{{ caller() }}{{ nope() }}{% endmacro %}{% call m() %}c{% endcall %}"
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: Unable to call `nope`, which is undefined or falsey"
+      }
+    }
+  },
+  {
+    "name": "macro lifetime: quirk: caller body sees the callee's args (same template)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro w(q) %}<{{ caller() }}>{% endmacro %}{% call w(5) %}{{ q }}{% endcall %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<5>"
+    }
+  },
+  {
+    "name": "macro lifetime: quirk: imported macro; call block inside it sees the args of a sibling callee",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro w(q) %}<{{ caller() }}>{% endmacro %}{% macro m() %}{% call w(5) %}{{ q }}{% endcall %}{% endmacro %}",
+      "main.njk": "{% from 'lib.njk' import m %}{{ m() }}|{{ m() }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<5>|<5>"
+    }
+  },
+  {
+    "name": "macro lifetime: quirk: imported caller-taking macro called with a call block of the importer",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro w(q) %}<{{ caller() }}>{% endmacro %}",
+      "main.njk": "{% from 'lib.njk' import w %}{% call w(5) %}[{{ q }}]{% endcall %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<[]>"
+    }
+  },
+  {
+    "name": "macro lifetime: an included template pushes a macro into the includer's array; the includer calls it from a for loop after the include",
+    "render": "main.njk",
+    "context": {
+      "x": "X"
+    },
+    "templates": {
+      "inc.njk": "{% set v = 'V' %}{% macro m() %}<{{ v }}{{ x }}{{ h() }}>{% endmacro %}{% macro h() %}h{% endmacro %}{% set _ = bag.push(m) %}",
+      "main.njk": "{% set bag = [] %}{% include 'inc.njk' %}{% for f in bag %}{{ f() }}{% endfor %}|{{ bag | length }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "<VXh>|1"
+    }
+  },
+  {
+    "name": "macro lifetime: a plain macro of an included template, called from a for loop after the include",
+    "render": "main.njk",
+    "templates": {
+      "inc.njk": "{% macro m() %}plain{% endmacro %}{% set _ = bag.push(m) %}",
+      "main.njk": "{% set bag = [] %}{% include 'inc.njk' %}{% for f in bag %}{{ f() }}{% endfor %}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "plain"
+    }
+  },
+  {
+    "name": "macro lifetime: macro in a block called from the root after the block",
+    "render": "main.njk",
+    "context": {
+      "x": "X"
+    },
+    "templates": {
+      "main.njk": "{% block c %}{% macro m(a) %}{{ x }}{{ a }}{% endmacro %}{% endblock %}|{{ m(1) }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "|X1"
+    }
+  },
+  {
+    "name": "macro lifetime: identity: an imported macro compared with itself through a library function",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro a() %}a{% endmacro %}{% macro same(f) %}{{ f == a }}{% endmacro %}",
+      "main.njk": "{% import 'lib.njk' as l %}{{ l.same(l.a) }}|{% from 'lib.njk' import a %}{{ l.same(a) }}|{{ l.a == l.a }}"
+    },
+    "todo": "k92: memberLookup wraps a function member in a fresh closure per read upstream; the port returns the same coderef",
+    "expected": {
+      "ok": true,
+      "output": "false|false|false"
+    }
+  },
+  {
+    "name": "macro lifetime: dump of an import namespace",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% set v = 'V' %}{% macro a() %}a{% endmacro %}{% set w = [1] %}",
+      "main.njk": "{% import 'lib.njk' as l %}{{ l | dump }}|{% for k, v in l %}{{ k }},{% endfor %}"
+    },
+    "todo": "k80: the import namespace is a plain hash; it iterates key-sorted, upstream in insertion order",
+    "expected": {
+      "ok": true,
+      "output": "{&quot;v&quot;:&quot;V&quot;,&quot;w&quot;:[1]}|v,a,w,"
+    }
+  },
+  {
+    "name": "macro lifetime: error inside a macro body include (missing template) of an imported macro",
+    "render": "main.njk",
+    "templates": {
+      "lib.njk": "{% macro m() %}[{% include 'nope.njk' %}]{% endmacro %}",
+      "main.njk": "{% from 'lib.njk' import m %}{{ m() }}"
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(main.njk)\n  Error: template not found: nope.njk"
+      }
+    }
+  },
+  {
+    "name": "macro lifetime: imported macro containing an include",
+    "render": "main.njk",
+    "templates": {
+      "part.njk": "P",
+      "lib.njk": "{% macro m() %}[{% include 'part.njk' %}]{% endmacro %}",
+      "main.njk": "{% from 'lib.njk' import m %}{{ m() }}"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[P]"
+    }
+  },
+  {
+    "name": "macro lifetime: a macro in an array, called by index (found during k108, unrelated to the leak)",
+    "render": "main.njk",
+    "templates": {
+      "main.njk": "{% macro m() %}p{% endmacro %}{% set bag = [m] %}{{ bag[0]() }}"
+    },
+    "todo": "k91: member_lookup_method ignores array indices: a[0]() on a function element",
+    "expected": {
+      "ok": true,
+      "output": "p"
+    }
+  }
+]

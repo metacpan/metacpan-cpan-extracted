@@ -1,5 +1,20 @@
 Revision history for App-makefilepl2cpanfile
 
+0.07	Tue Nov 17 09:19:45 PM EST 2026
+	[ Bug Fixes ]
+	Quoted keys in a Makefile.PL were ignored: 'PREREQ_PM' => { ... },
+	  'TEST_REQUIRES', 'CONFIGURE_REQUIRES', 'BUILD_REQUIRES', 'prereqs'
+	  (with its quoted phase and relationship names) and
+	  'MIN_PERL_VERSION' produced no output, so the cpanfile could lack
+	  the runtime and test sections and the perl requirement.  Both
+	  single and double quotes are now accepted
+	[ Tests ]
+	The timing checks in t/edge_cases.t now multiply their time limits
+	  by PERL_TEST_TIME_OUT_FACTOR when it is set.  On a slow or loaded
+	  machine (a 32-bit ARM smoker took about 10 seconds against a 5
+	  second limit) they failed although the parser is linear
+	Fixes https://matrix.perl-magpie.org/results/cec173e0-bd5b-11f1-9843-dfd40a5fc8d7
+
 0.06	Wed Sep 30 07:44:13 PM EDT 2026
 	[ Security ]
 	Reading a Makefile.PL with many unclosed dependency blocks

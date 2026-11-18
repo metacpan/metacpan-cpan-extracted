@@ -3,9 +3,10 @@ package IO::Factotum;
 use v5.16;
 use warnings;
 
-our $VERSION = "0.04";
+our $VERSION = "0.05";
 
 use Carp;
+use Scalar::Util ();
 use IO::File;
 use IO::Handle;
 use File::Spec;
@@ -16,14 +17,30 @@ my @converter;
 
 sub register {
     my %arg = @_;
-    my $match   = delete $arg{match}   // croak "register: match is required";
-    my $command = delete $arg{command} // croak "register: command is required";
+    my $match   = delete $arg{match};
+    my $command = delete $arg{command};
+    my $with    = delete $arg{with};
     croak "register: unknown parameter: @{[ sort keys %arg ]}" if %arg;
-    ref $match eq 'Regexp' or ref $match eq 'CODE'
+    if (defined $with) {
+	# An object which gives the content of a file by its method
+	# file.  It tells by itself which files are its own, so match
+	# is not required.
+	croak "register: with and command can not be given together"
+	    if defined $command;
+	Scalar::Util::blessed($with) && $with->can('file')
+	    or croak "register: with must be an object which has the method file";
+    } else {
+	$match   // croak "register: match is required";
+	$command // croak "register: command is required";
+	ref $command eq 'ARRAY' && @$command
+	    or croak "register: command must be an array reference";
+    }
+    !defined $match or ref $match eq 'Regexp' or ref $match eq 'CODE'
 	or croak "register: match must be a regex or a code reference";
-    ref $command eq 'ARRAY' && @$command
-	or croak "register: command must be an array reference";
-    push @converter, { match => $match, command => [ @$command ] };
+    push @converter, {
+	match => $match,
+	defined $with ? (with => $with) : (command => [ @$command ]),
+    };
     return;
 }
 
@@ -32,15 +49,13 @@ sub clear {
     return;
 }
 
+# The converters which take the file, in the order they were registered
 sub converter {
     my $file = shift;
-    for my $c (@converter) {
-	my $match = $c->{match};
-	if (ref $match eq 'CODE' ? $match->($file) : $file =~ $match) {
-	    return $c;
-	}
-    }
-    undef;
+    grep {
+	my $match = $_->{match};
+	!defined $match or ref $match eq 'CODE' ? $match->($file) : $file =~ $match;
+    } @converter;
 }
 
 sub open_input {
@@ -55,9 +70,31 @@ sub open_input {
     my $fh = IO::File->new($file, '<') // return undef;
     binmode $fh, ':raw';
 
-    my $c = converter($file) // return $fh;
-    # a converter which fails leaves the file as it is
-    convert($c->{command}, $file) // $fh;
+    for my $c (converter($file)) {
+	if (my $with = $c->{with}) {
+	    # an object which gives nothing passes the file to the next
+	    my $converted = content($with, $file) // next;
+	    return $converted;
+	}
+	# a command which fails leaves the file as it is
+	return convert($c->{command}, $file) // $fh;
+    }
+    $fh;
+}
+
+# Ask the object for the content of the file, and return the handle of
+# a temporary file which has it, or undef when the object gives
+# nothing, or dies.  Characters are written as UTF-8.
+sub content {
+    my($with, $file) = @_;
+    my $content = eval { $with->file($file) } // return undef;
+    utf8::encode($content) if utf8::is_utf8($content);
+    my $tmp = Command::Run::Tmpfile->new(raw => 1);
+    my $fh = $tmp->fh;
+    print $fh $content or return undef;
+    $fh->flush;
+    $fh->seek(0, 0) or return undef;
+    $fh;
 }
 
 # Run the command with the file name, in a process of its own, and
@@ -156,9 +193,13 @@ IO::Factotum - read files through a converter chosen by their names
         ...
     }
 
+    # an object which gives the content of a file
+    use Text::ANSI::Highlight;
+    IO::Factotum::register(with => Text::ANSI::Highlight->new);
+
 =head1 VERSION
 
-Version 0.04
+Version 0.05
 
 =head1 DESCRIPTION
 
@@ -204,6 +245,23 @@ thrown away.  It fails by an exit status other than 0; a code
 reference fails by C<die>.  A code reference prints bytes, and the
 C<END> blocks of the program do not run in its process.
 
+=item B<register>(B<with> => I<object>)
+
+Register an object as a converter.  Its method C<file> is called with
+the name of a file, and returns the content to be read in place of
+the file, or C<undef> for a file it has nothing to do with: the file
+then goes to the next converter, or is read as it is.  So does it
+when the method dies.  The content is taken byte for byte, and
+characters are written as UTF-8.
+
+    use Text::ANSI::Highlight;
+    register(with => Text::ANSI::Highlight->new);
+
+The object tells by itself which files are its own, so C<match> is
+not required; when it is given, the object is asked only for the
+files which match.  The method is called in the process of the
+program.
+
 =item B<clear>()
 
 Remove all the converters.
@@ -231,7 +289,7 @@ Register the converters of the modules C<IO::Factotum::>I<name>, by
 calling their C<setup> function.  It dies when there is no such
 module.
 
-    IO::Factotum::load('Highlight::skylighting');
+    IO::Factotum::load('Gunzip');     # IO::Factotum::Gunzip::setup()
 
 =item B<tie_argv>()
 
@@ -256,27 +314,19 @@ not supported.
 
 =head1 CONVERTERS
 
-The converters which come with this module are under
-C<IO::Factotum::Highlight>.  They color source files by their syntax.
+A module C<IO::Factotum::I<NAME>> which has a function C<setup> is a
+converter by the name: C<load('I<NAME>')> calls the function, which
+registers what it has.  None comes with this module.
 
-=over 4
+For syntax highlight, register an object of L<Text::ANSI::Highlight>:
+it colors source files by a highlighter, and gives nothing for a file
+whose language it does not know.
 
-=item L<IO::Factotum::Highlight::skylighting> (C<Highlight::sky>)
-
-by the C<skylighting> command, the highlighter of pandoc
-
-=item L<IO::Factotum::Highlight::sourcehighlight> (C<Highlight::gnu>)
-
-by the C<source-highlight> command of GNU Source-highlight
-
-=back
-
-    IO::Factotum::load('Highlight::sky');
+    IO::Factotum::register(with => Text::ANSI::Highlight->new('pandoc'));
 
 =head1 SEE ALSO
 
-L<IO::Factotum::Highlight::skylighting>,
-L<IO::Factotum::Highlight::sourcehighlight>, L<Getopt::EX::Factotum>
+L<Text::ANSI::Highlight>, L<Getopt::EX::Factotum>
 
 L<Command::Run>
 
@@ -286,7 +336,7 @@ Kazumasa Utashiro
 
 =head1 LICENSE
 
-Copyright 2026 Kazumasa Utashiro.
+Copyright © 2026 Kazumasa Utashiro.
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself.

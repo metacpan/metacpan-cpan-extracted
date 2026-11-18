@@ -1,6 +1,6 @@
 package API::Docker::Type::ServiceSpec::Mode::Replicated;
 # ABSTRACT: The replicated mode of a service, and its replica count
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -22,7 +22,7 @@ API::Docker::Type::ServiceSpec::Mode::Replicated - The replicated mode of a serv
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -39,7 +39,7 @@ L<API::Docker::Type::Task/slot> C<1>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

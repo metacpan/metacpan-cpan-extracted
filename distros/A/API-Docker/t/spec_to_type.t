@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -30,7 +31,7 @@ my $SPEC   = File::Spec->catfile($ROOT, 'spec', 'v1.51.yaml');
 # against are no longer the files the generator writes, and the comparison
 # would be against the weaver rather than against the model.
 plan skip_all => 'not a checkout; the POD in a built distribution is woven'
-  unless -d File::Spec->catdir($ROOT, '.git');
+  unless -e File::Spec->catdir($ROOT, '.git');
 plan skip_all => 'maint/spec-to-type.pl is not in this distribution' unless -f $SCRIPT;
 plan skip_all => 'spec/v1.51.yaml is not in this distribution'       unless -f $SPEC;
 plan skip_all => 'YAML::XS is not installed (develop-only dependency)'

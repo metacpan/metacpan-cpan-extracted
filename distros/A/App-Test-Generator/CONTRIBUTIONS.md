@@ -41,6 +41,7 @@ PATH=$A/bin:$PATH PERL5LIB=$A/lib EXTENDED_TESTING=1 prove -Ilib t/all-fuzz.t
 
 - `CGI-Info` — `directory` semantics and the fd-leak check (`logdir`)
 - `Database-Abstraction` — validator-backed schemas with many required parameters
+- `Database-Join` — a constructor that needs a non-empty arrayref of live objects, a bare-list `=head4 Input` spec with `required => 1`, and a helper error package in the same file (`Database::Join::Catalog`)
 - `Lingua-EN-NameCase` — a documented size bound the code does not enforce (`min => 1` versus `[]`), and the positional/named argument distinction (`nc`, `NameCase`)
 - `Schema-Validator` — the largest suite (~12k generated tests); `load_dynamic_vocabulary` is skipped when it exceeds that suite's own per-routine timeout, which is a skip, not a failure
 

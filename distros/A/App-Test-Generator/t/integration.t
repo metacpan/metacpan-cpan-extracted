@@ -4,6 +4,7 @@ use strict;
 use warnings;
 use Readonly;
 use Test::Most;
+use IPC::Open3 ();
 use Test::Mockingbird;
 use Test::Needs;
 use Test::Returns;
@@ -1209,7 +1210,7 @@ subtest '_compile_signature_isolated: memory limit is passed via env var to chil
 		my $empty = '';
 		open $_[1], '<', \$empty;
 		open $_[2], '<', \$empty;
-		return $$;	# harmless: waitpid($$,0) returns -1 immediately
+		return _exited_child_pid();
 	};
 
 	my $e = bless { allow_signature_exec => 1, verbose => 0 },
@@ -1538,5 +1539,14 @@ subtest 'PodExampleExtractor: structural validation across all lib/ modules' => 
 	ok(!%ledger, 'all documented PodExampleExtractor structural properties verified')
 		or diag('untested ledger keys: ', explain \%ledger);
 };
+
+# The code under test waits for the PID its open3 returns.  A mock must hand
+# back a real child: on Windows waitpid on a non-child (such as $$) opens
+# that process and waits for it to exit, which never happens for ourselves.
+sub _exited_child_pid {
+	my $pid = IPC::Open3::open3(my $in, my $out, undef, $^X, q{-e}, q{1});
+	close $in;
+	return $pid;
+}
 
 done_testing();

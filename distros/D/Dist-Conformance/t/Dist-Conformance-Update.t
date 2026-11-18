@@ -13,6 +13,10 @@ use Dist::Conformance::Snapshot::Directory();
 use Dist::Conformance::Snapshot::Tree();
 use Dist::Conformance::Update();
 
+# The configuration of the person who runs the tests, such as a core.hooksPath, stays out.
+local $ENV{GIT_CONFIG_GLOBAL}   = '/dev/null';
+local $ENV{GIT_CONFIG_NOSYSTEM} = 1;
+
 sub update_of ( $root, $dry_run = 0 ) {
     return Dist::Conformance::Update->new( snapshot => Dist::Conformance::Snapshot::Directory->new( root => $root ), dry_run => $dry_run );
 }

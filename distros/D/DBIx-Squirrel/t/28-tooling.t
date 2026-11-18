@@ -62,15 +62,6 @@ subtest ':all is every tag, each name once' => sub {
     is [exported_by($tooling)], [sort keys %every], 'and is what it exports';
 };
 
-subtest "Ekorn's tags, by the same names, with the same words" => sub {
-    no warnings 'once';
-    for my $tag (sort keys %Ekorn::Pipeline::Tooling::EXPORT_TAGS) {
-        my %ours = map { $_ => 1 } @{ tag($tag) };
-        is [grep { !$ours{$_} } @{ tag($tag, $ekorn) }], [],
-            ":$tag holds every name Ekorn's does";
-    }
-};
-
 subtest 'not for callers: is_stage, is_sink, croakf, the operators' => sub {
     my %all = map { $_ => 1 } @{ tag('all') };
     ok !$all{$_}, "no $_" for qw(is_stage is_sink croakf chain drain);
@@ -96,11 +87,14 @@ subtest "each name is its own module's sub, DBIx::Squirrel's first" => sub {
         "gather, Factories' word too, is DBIx::Squirrel::Gather's";
 };
 
+# Only the names both export: a name Ekorn::Pipeline adds to its Tooling
+# in a later v0.3.x isn't in a DBIx::Squirrel already installed, and
+# mustn't fail its tests. xt/ekorn-tooling.t checks that ours holds
+# every name Ekorn's does.
 subtest 'each name both export is one sub' => sub {
     my %ours = map  { $_ => 1 } @{ tag('all') };
     my @both = grep { $ours{$_} } @{ tag('all', $ekorn) };
-    is scalar(@both), scalar @{ tag('all', $ekorn) },
-        "every name Ekorn's exports, ours does";
+    ok scalar(@both), 'some names are in both';
     ref_is $tooling->can($_), $ekorn->can($_), $_ for @both;
 };
 

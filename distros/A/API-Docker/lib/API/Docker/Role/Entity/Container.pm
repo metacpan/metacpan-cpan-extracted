@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity::Container;
 # ABSTRACT: Container operations, on the generated container types
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 with 'API::Docker::Role::Entity';
 requires 'id';
@@ -177,7 +177,7 @@ API::Docker::Role::Entity::Container - Container operations, on the generated co
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -406,7 +406,7 @@ C<inspect> returns
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

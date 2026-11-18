@@ -1,4 +1,21 @@
 Revision history for Map::Tube::Nuremberg
 
+0.09    2026-11-16
+        * fixed issue #9: removed taint mode (-T) from t/map.t, which made
+          the test fail with Map::Tube 4.09 ("Malformed Map Data") and on
+          Perl 5.14 to 5.20 ("Insecure dependency in eval")
+        * declared test dependencies (Test::More, Test::Map::Tube)
+        * minimum Perl version is now 5.14, as required by Map::Tube
+        * replaced Travis CI with GitHub Actions
+
+0.08    2024-12-02
+        * added missing station for U3: Großreuth bei Schweinau
+        * Friedrich-Ebert-Platz abbreviation replaced by full name
+        * added more tests
+
+0.07    2024-12-01
+        * added missing link Rathenauplatz to Maxfeld (issue #7)
+        * upgraded dependency on Map::Tube to 3.62
+
 0.06    2018-05-01
         * fixed issue #2 (Map::Tube::Plugin::Formatter missing as Dependency)

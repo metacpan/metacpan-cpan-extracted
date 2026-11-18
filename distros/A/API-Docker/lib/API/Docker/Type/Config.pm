@@ -1,6 +1,6 @@
 package API::Docker::Type::Config;
 # ABSTRACT: One entry of the C<200> response to C<GET /configs>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ConfigSpec;
 use API::Docker::Type::ObjectVersion;
@@ -36,7 +36,7 @@ API::Docker::Type::Config - One entry of the C<200> response to C<GET /configs>
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -78,7 +78,7 @@ base64-decodes it. See L<API::Docker::Type::ConfigSpec>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

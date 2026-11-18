@@ -247,6 +247,43 @@ subtest "Test handling of double quote" => sub {
     }
 };
 
+subtest "Test handling of force lowercase" => sub {
+    $wr_root->remove_tree;
+    my $test_class = "ForceLowerCase";
+
+    # TODO: test also quotes in hash/list like values
+    my ($model, $i_test, $wr_dir, $conf_file) = init_backend_test(
+        $test_class => [
+            q!Baz = "blork Blork"!."\n",
+            "[Obj]\n",
+            "Lista = Foo"
+        ],
+        "test_force_lc", '/etc/'
+    );
+    is($conf_file->exists, 1, "ini file was written");
+
+    my $i_root = $i_test->config_root;
+    is($i_root->grab_value("baz"), qq!blork blork!, "check lc key and value");
+    is($i_root->grab_value("obj lista:0"), qq!foo!, "check load of list 0");
+
+    my $orig = $i_test->config_root->dump_tree;
+    print $orig if $trace;
+
+    $i_test->write_back(force => 1);
+
+    foreach my $item  (
+        qq!baz = "blork blork"!,
+        "[obj]",
+        q!lista = foo!,
+    ) {
+        file_contents_like(
+            $conf_file->stringify,
+            $item,
+            "check content of written file $conf_file with «$item»"
+        );
+    }
+};
+
 memory_cycle_ok( $model, "memory cycle test" );
 
 done_testing;

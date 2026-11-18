@@ -32,7 +32,15 @@ WriteMakefile(
 		'Test::DescribeMe' => 0,
 		'Test::Memory::Cycle' => 0,
 		'Test::Most' => 0,
+		'Config' => 0,
+		'Data::Dumper' => 0,
+		'Errno' => 0,
 		'File::Temp' => 0,
+		'FindBin' => 0,
+		'IPC::Open3' => 0,
+		'POSIX' => 0,
+		'Scalar::Util' => 0,
+		'Time::HiRes' => 0,
 		'Test::Mockingbird' => '0.13',	# around, mock_scoped, spy, unmock, restore
 		'Test::Permissions' => 0,	# can_revoke_*, why_not
 		'Test::Returns' => 0.04,

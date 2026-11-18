@@ -1,6 +1,6 @@
 package API::Docker::Role::Entity::Config;
 # ABSTRACT: Config operations, on the generated config type
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use Moo::Role;
 with 'API::Docker::Role::Entity';
 requires 'id';
@@ -90,7 +90,7 @@ API::Docker::Role::Entity::Config - Config operations, on the generated config t
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 SYNOPSIS
 
@@ -234,7 +234,7 @@ that cannot be read back
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

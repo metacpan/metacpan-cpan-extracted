@@ -1,5 +1,8 @@
 Revision history for Data-Shared
 
+0.02  2026-11-17
+    - A backend older than its required version is reported like a missing one, naming the version to install; tests skip it instead of failing.
+
 0.01  2026-10-29
     - Initial release: Linux shared-memory facade over 39 optional backends.
     - String, array and compiled paths with an XS fast path, composite structures and node cursors.

@@ -11,6 +11,7 @@ use warnings;
 # ======================================================================
 
 use Test::Most;
+use Config;
 use Cwd qw(abs_path);
 use File::Path qw(make_path);
 use File::Spec;
@@ -53,7 +54,7 @@ sub extract_with_seed
 	my ($seed) = @_;
 
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', $lib, File::Spec->catdir($dir, 'lib'), $ENV{PERL5LIB} // '');
+	local $ENV{PERL5LIB} = join($Config{path_sep}, $lib, File::Spec->catdir($dir, 'lib'), $ENV{PERL5LIB} // '');
 	local $ENV{PERL_HASH_SEED} = $seed;
 	local $ENV{PERL_PERTURB_KEYS} = 2;
 	run3([$^X, "-I$lib", $script, '--output-dir', $out, $module_file], \undef, \$stdout, \$stderr);

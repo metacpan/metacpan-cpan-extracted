@@ -3,9 +3,25 @@ package Web::VWF::Display;
 # Display a page. Certain variables are available to all templates, such as
 # the stuff in the configuration file
 
+=encoding utf8
+
+=head1 NAME
+
+Web::VWF::Display - The base class of the pages
+
 =head1 VERSION
 
-Version 0.002.0
+Version 0.003.0
+
+=head1 DESCRIPTION
+
+Every page, such as C<Web::VWF::Display::index>, inherits from this.  Its
+constructor checks the request, as C<Referer>, L<CGI::IDS>, the throttle and the
+country blacklist, and returns undef to refuse or croaks on an attack;
+C<as_string> gives the headers and then the page, which a subclass makes by
+calling C<html>.  The template is chosen from the class name, the kind of client
+and the language: see L<Web::VWF/DESCRIPTION>.  The settings are in
+L<Web::VWF/CONFIGURATION>.
 
 =cut
 
@@ -93,7 +109,7 @@ server-side form handling and do not need CSRF tokens at all:
 
 # -----------------------------------------------------------------------
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 use v5.20;
 use strict;
@@ -1000,3 +1016,75 @@ sub cache_key_from_hashref {
 }
 
 1;
+
+=head1 METHODS
+
+=head2 new
+
+Takes a hash or a hash reference of the request's C<info>, C<lingua>, C<config>,
+C<logger>, C<cache>, C<config_dir> and so on, which L<Web::VWF> supplies.
+Validates the Referer, reads the configuration again for itself, runs
+L<CGI::IDS> and the throttle, and blocks a blacklisted country.  Returns undef
+when the request is to be refused and croaks on an attack.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{
+		info => { type => 'object' },
+		lingua => { type => 'object', optional => 1 },
+		config => { type => 'object', optional => 1 },
+		logger => { type => 'object', optional => 1 },
+		cache => { type => 'object', optional => 1 },
+		config_dir => { type => 'string', optional => 1 },
+	}
+
+=head4 OUTPUT
+
+	{ type => 'object', isa => 'Web::VWF::Display', optional => 1 }
+
+=head2 as_string
+
+Takes a hash reference of the variables for the template and returns the
+headers, from C<http>, and the page, from C<html>.  The result is kept in memory
+for five minutes unless the client has a cart.  A page that returns a string
+starting C<Location:> from C<html> is sent as a redirect.
+
+=head2 html
+
+Renders the template found by C<get_template_path>.  A subclass overrides it,
+validates its input, and calls C<SUPER::html> with the variables for the
+template.  The template sees the configuration, then the CGI parameters, then
+those variables, each overriding the one before.
+
+=head2 get_template_path
+
+The path of the template for the page: under F<$root_dir/templates/>, by the kind
+of client, the language and its dialect, and then the class's name, so that
+C<Web::VWF::Display::index> is F<web/Web/VWF/Display/index.tmpl>.  Dies if there
+is none.
+
+=head2 cache_key_from_hashref
+
+A function and not a method: an MD5 sum of a hash reference, the same for
+equal contents, to name the cached page.
+
+=head2 obfuscate
+
+A function and not a method: a string written as HTML numeric entities, which
+a template uses to make an e-mail address harder for a robot to read.
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

@@ -5,7 +5,7 @@ use Carp ();
 use Scalar::Util ();
 use Data::Shared::Manifest ();
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 our @CARP_NOT = qw(Data::Shared Data::Shared::Manifest Data::Shared::Storage
                    Data::Shared::Composite);
@@ -101,9 +101,12 @@ sub _load {
     return if $LOADED{$key};
     # Variant module names do not determine the distribution that provides them.
     Data::Shared::_require_class($load, $resolved->{entry} && $resolved->{entry}{dist});
-    if ($minimum) {
-        eval { $load->VERSION($minimum) };
-        Carp::croak("Data::Shared: backend $load requires version $minimum or newer: $@") if $@;
+    # Too old reads as absent: the remedy is the same install, and callers that
+    # tolerate a missing backend must tolerate this too.
+    if ($minimum && !eval { $load->VERSION($minimum); 1 }) {
+        (my $e = $@) =~ s/ at \S+ line \d+\.?\s*\z//;
+        Carp::croak("Data::Shared: backend $load is not available; install the"
+            . " $resolved->{entry}{dist} dist $minimum or newer: $e");
     }
     $LOADED{$key} = 1;
 }

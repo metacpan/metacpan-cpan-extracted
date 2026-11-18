@@ -33,10 +33,14 @@ BEGIN {
     }
 }
 
+# The settings of the user are not those of the tests: with NUP_OPTS=-L,
+# every command would have -L and its labels
+delete @ENV{qw(NUP_OPTS NUP_PAGER NUP_PAGE_PAGER NUP_LESSKEY)};
+
 my $script = File::Spec->rel2abs('script/nup');
 
 # The command line by the dry-run.  The syntax highlight depends on the
-# skylighting command being installed, so it is off here, and is
+# command of the highlighter being installed, so it is off here, and is
 # tested by nup_highlight.
 sub nup {
     nup_highlight('--no-highlight', @_);
@@ -277,7 +281,7 @@ subtest 'highlight' => sub {
 
     # with the commands in PATH (dummies; -n runs nothing)
     mkdir "$dir/with" or die;
-    for my $command (qw(skylighting source-highlight)) {
+    for my $command (qw(pandoc skylighting source-highlight)) {
         open my $fh, '>', "$dir/with/$command" or die;
         print $fh "#!/bin/sh\n";
         close $fh;
@@ -286,14 +290,14 @@ subtest 'highlight' => sub {
     {
         local $ENV{PATH} = "$dir/with:$ENV{PATH}";
         like nup_highlight('script/nup'),
-            qr/-Mup .*--highlight=skylighting .*-- ansicolumn script\/nup$/,
-            'file view asks up.pm for it, skylighting by default';
+            qr/-Mup .*--highlight=pandoc .*-- ansicolumn script\/nup$/,
+            'file view asks up.pm for it, pandoc by default';
         like nup_highlight('--highlight script/nup'),
-            qr/--highlight=skylighting /, '--highlight without a name';
+            qr/--highlight=pandoc /, '--highlight without a name';
         like nup_highlight('--highlight=sourcehighlight script/nup'),
             qr/--highlight=sourcehighlight /, '--highlight=sourcehighlight';
         like nup_highlight('script/nup cpanfile -w 100'),
-            qr/-Mup .*--highlight=skylighting .*-- ansicolumn script\/nup cpanfile -w 100$/,
+            qr/-Mup .*--highlight=pandoc .*-- ansicolumn script\/nup cpanfile -w 100$/,
             'the arguments of ansicolumn are as they were';
         unlike nup_highlight('--no-highlight script/nup'), qr/highlight/, '--no-highlight';
         like nup_highlight('--no-highlight script/nup'), qr/-- ansicolumn script\/nup$/,
@@ -310,7 +314,7 @@ subtest 'highlight' => sub {
                 '--no-highlight wins over NUP_OPTS';
         }
         # --hi is the short name
-        like nup_highlight('--hi script/nup'), qr/--highlight=skylighting /, '--hi';
+        like nup_highlight('--hi script/nup'), qr/--highlight=pandoc /, '--hi';
         like nup_highlight('--hi=sourcehighlight script/nup'),
             qr/--highlight=sourcehighlight /, '--hi=sourcehighlight';
         like nup_highlight('--no-hi script/nup'),
@@ -324,6 +328,9 @@ subtest 'highlight' => sub {
             qr/--highlight=gnu /, '--hi=gnu';
         like nup_highlight('--highlight=gnu script/nup'),
             qr/--highlight=gnu /, '--highlight=gnu';
+        like nup_highlight('--hi=skylighting script/nup'),
+            qr/--highlight=skylighting /, '--hi=skylighting';
+        like nup_highlight('--hi=pandoc script/nup'), qr/--highlight=pandoc /, '--hi=pandoc';
         {
             local $ENV{NUP_OPTS} = '--hi=gnu';
             like nup_highlight('script/nup'), qr/--highlight=gnu /,
@@ -338,8 +345,8 @@ subtest 'highlight' => sub {
 
     # without it: only bash and getoptlong.sh, and the system directories
   SKIP: {
-        skip 'skylighting is in a system directory', 2
-            if grep { -x "$_/skylighting" } qw(/usr/bin /bin);
+        skip 'pandoc is in a system directory', 2
+            if grep { -x "$_/pandoc" } qw(/usr/bin /bin);
         my($bash, $getoptlong) = map { $find->($_) } qw(bash getoptlong.sh);
         skip 'bash or getoptlong.sh is not found', 2
             unless $bash and $getoptlong;
@@ -348,7 +355,7 @@ subtest 'highlight' => sub {
         symlink $getoptlong, "$dir/without/getoptlong.sh" or die;
         local $ENV{PATH} = "$dir/without:/usr/bin:/bin";
         my $out = nup_highlight('script/nup');
-        like $out, qr/-- ansicolumn script\/nup$/, 'as it was without skylighting';
+        like $out, qr/-- ansicolumn script\/nup$/, 'as it was without the highlighter';
         unlike $out, qr/highlight/, 'no --highlight';
     }
 };

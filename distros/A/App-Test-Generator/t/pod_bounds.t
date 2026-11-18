@@ -16,6 +16,7 @@ use warnings;
 # ======================================================================
 
 use Test::Most;
+use Config;
 use Cwd qw(abs_path);
 use File::Path qw(make_path);
 use File::Spec;
@@ -473,6 +474,22 @@ sub pick
 }
 BODY
 
+# The same set, enforced: a hand-written schema must not feed it a random
+# integer as a valid value.
+_write_module(
+	'Bounds::EnforcesIntegerMemberof',
+	_spec_block("level => { type => 'integer', memberof => [1, 2] }"),
+	'integer',
+	<<'BODY');
+sub pick
+{
+	my $level = shift;
+
+	croak('level must be 1 or 2') unless(defined($level) && ($level eq '1' || $level eq '2'));
+	return $level;
+}
+BODY
+
 # A prose minimum on an integer.
 _write_module(
 	'Bounds::ProseInteger',
@@ -553,11 +570,11 @@ sub _extract
 {
 	my ($module) = @_;
 
-	my $out = File::Spec->catdir($dir, 'schemas', $module);
+	my $out = File::Spec->catdir($dir, 'schemas', $module =~ s{::}{-}gr);
 	make_path($out);
 
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', $lib, File::Spec->catdir($dir, 'lib'), $ENV{PERL5LIB} // '');
+	local $ENV{PERL5LIB} = join($Config{path_sep}, $lib, File::Spec->catdir($dir, 'lib'), $ENV{PERL5LIB} // '');
 	run3([$^X, "-I$lib", $script, '--output-dir', $out, $module_file{$module}], \undef, \$stdout, \$stderr);
 	is($? >> 8, 0, "$module: extract-schemas succeeded")
 		or diag("stdout:\n$stdout\nstderr:\n$stderr");
@@ -589,7 +606,7 @@ sub _run_harness
 
 	my $test_file = File::Spec->catfile($dir, "$label.t");
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', $lib, File::Spec->catdir($dir, 'lib'), $ENV{PERL5LIB} // '');
+	local $ENV{PERL5LIB} = join($Config{path_sep}, $lib, File::Spec->catdir($dir, 'lib'), $ENV{PERL5LIB} // '');
 	run3([$^X, "-I$lib", $generator, @generator_args, $schema_file, '-o', $test_file], \undef, \$stdout, \$stderr);
 	is($? >> 8, 0, "$label: harness generated") or diag("stdout:\n$stdout\nstderr:\n$stderr");
 
@@ -966,6 +983,34 @@ subtest 'a documented member list on an integer is tolerated' => sub {
 	like($output, qr/documented-only constraint on 'level'/, 'the tolerated set is logged');
 	like($output, qr/routine accepted a value outside the documented memberof list on 'level' \(one of: 1, 2\)/,
 		'the run reports the integer it accepted outside the documented set');
+	like($output, qr/pick\(3\) survives/, 'the value outside the set is always tried, not left to chance');
+};
+
+subtest 'a hand-written integer member list on a lone mandatory argument' => sub {
+	my $schema = {
+		module   => 'Bounds::EnforcesIntegerMemberof',
+		function => 'pick',
+		input    => {
+			level => { type => 'integer', optional => 0, position => 0, memberof => [1, 2] },
+		},
+		output => { type => 'integer' },
+		config => {
+			test_empty     => 0,
+			test_nuls      => 0,
+			test_non_ascii => 0,
+			test_security  => 0,
+			test_undef     => 0,
+		},
+	};
+
+	my $yml = File::Spec->catfile($dir, 'enforced_integer_memberof.yml');
+	DumpFile($yml, $schema);
+
+	my ($exit, $output) = _run_harness($yml, 'enforced_integer_memberof');
+
+	is($exit, 0, 'a routine that enforces the set passes') or diag($output);
+	like($output, qr/pick\(3\) dies/, 'the value outside the set must die');
+	unlike($output, qr/pick\((?![12]\))[^)]*\) survives/, 'no value outside the set is expected to survive');
 };
 
 subtest '--strict-documented fails on an accepted non-matching value' => sub {

@@ -34,7 +34,7 @@ our %EXPORT_TAGS = (
         qw(drop drop_if    drop_while),
     ],
     batch   => [qw(batch      collect)],
-    taps    => [qw(peek       count_into dump_to)],
+    taps    => [qw(peek       count_into dump_to tee)],
     rows    => [qw(pluck      as_hash)],
     context => [qw(iterator   result_number result_original)],
     sources => [qw(from_array from_fh from_file counter)],
@@ -138,7 +138,7 @@ C<collect>.
 =item C<:taps>
 
 Everything L<DBIx::Squirrel::Stages::Taps> exports: C<peek>,
-C<count_into> and C<dump_to>.
+C<count_into>, C<dump_to> and C<tee>.
 
 =item C<:rows>
 

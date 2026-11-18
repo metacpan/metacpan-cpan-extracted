@@ -7,7 +7,7 @@
 #
 #   The GNU Lesser General Public License, Version 2.1, February 1999
 #
-package Config::Model::ObjTreeScanner 2.168;
+package Config::Model::ObjTreeScanner 2.169;
 
 use 5.20.0;
 use strict;
@@ -56,6 +56,10 @@ sub new ($type, %args) {
             unless defined $self->{$param};
     }
 
+    # setup ordered hash fallbacks
+    $self->{ordered_hash_element_cb} = delete $args{ordered_hash_element_cb} // $self->{hash_element_cb};
+    $self->{ordered_hash_element_hook} = delete $args{ordered_hash_element_hook} // $self->{hash_element_hook};
+
     # this parameter is optional and does not need a fallback
     $self->{node_dispatch_cb} = delete $args{node_dispatch_cb} || {};
 
@@ -77,48 +81,42 @@ sub create_default_callbacks ($self) {
         $self->{$item} = sub { };
     }
 
-    my $node_content_cb = sub {
-        my ( $scanner, $data_r, $node, @elements ) = @_;
+    my $node_content_cb = sub ($scanner, $data_r, $node, @elements) {
         foreach my $item (@elements) { $scanner->scan_element( $data_r, $node, $item ) };
     };
 
-        my $node_element_cb = sub {
-            my ( $scanner, $data_r, $node, $element_name, $key, $next_node ) = @_;
-            $scanner->scan_node( $data_r, $next_node );
-        };
+    my $node_element_cb = sub ($scanner, $data_r, $node, $element_name, $key, $next_node) {
+        $scanner->scan_node( $data_r, $next_node );
+    };
 
-        my $hash_element_cb = sub {
-            my ( $scanner, $data_r, $node, $element_name, @keys ) = @_;
-            foreach my $item (@keys) { $scanner->scan_hash( $data_r, $node, $element_name, $item ) };
-        };
+    my $hash_element_cb = sub ($scanner, $data_r, $node, $element_name, @keys) {
+        foreach my $item (@keys) {
+            $scanner->scan_hash( $data_r, $node, $element_name, $item );
+        }
+    };
 
-        $self->{list_element_cb} = $hash_element_cb;
-        $self->{hash_element_cb} = $hash_element_cb;
-        $self->{node_element_cb} = $node_element_cb;
-        $self->{node_content_cb} = $node_content_cb;
-        $self->{up_cb}           = sub { };            # do nothing
+    $self->{list_element_cb} = $hash_element_cb;
+    $self->{hash_element_cb} = $hash_element_cb;
+    $self->{node_element_cb} = $node_element_cb;
+    $self->{node_content_cb} = $node_content_cb;
+    $self->{up_cb}           = sub { }; # do nothing
 
     my $l = $self->{string_value_cb} ||= $self->{leaf_cb};
 
-        foreach my $cb (@value_cb, "check_list_element_cb") {
-            $self->{$cb} ||= $l;
+    foreach my $cb (@value_cb, "check_list_element_cb") {
+        $self->{$cb} ||= $l;
     }
 
     return;
 }
 
-sub scan_node {
-    my ( $self, $data_r, $node ) = @_;
-
-    #print "scan_node ",$node->name,"\n";
-    # get all elements according to catalog
-
+sub scan_node ($self, $data_r, $node) {
     Config::Model::Exception::Internal->throw( error => "'$node' is not a Config::Model object" )
         unless blessed($node)
         and $node->isa("Config::Model::AnyThing");
 
     # skip exploration of warped out node
-    if ( $node->isa('Config::Model::WarpedNode') ) {
+    if ($node->isa('Config::Model::WarpedNode') ) {
         $node = $node->get_actual_node;
         return unless defined $node;
     }
@@ -140,51 +138,38 @@ sub scan_node {
     return;
 }
 
-sub scan_element {
-    my ( $self, $data_r, $node, $element_name ) = @_;
-
+sub scan_element ($self, $data_r, $node, $element_name) {
     my $element_type = $node->element_type($element_name);
 
     my $autov = $self->{auto_vivify};
 
-    #print "scan_element $element_name ";
     if ( $element_type eq 'hash' ) {
-
-        #print "type hash\n";
+        my $ordered = $node->fetch_element($element_name)->ordered();
+        my $hook = $ordered ? 'ordered_hash_element_hook' : 'hash_element_hook';
+        my $cb = $ordered ? 'ordered_hash_element_cb' : 'hash_element_cb';
         my @keys = $self->get_keys( $node, $element_name );
 
-        # if hash element grab keys and perform callback
-        $self->{hash_element_hook}->( $self, $data_r, $node, $element_name, @keys );
-        $self->{hash_element_cb}->( $self, $data_r, $node, $element_name, @keys );
+        $self->{$hook}->( $self, $data_r, $node, $element_name, @keys );
+        $self->{$cb}->( $self, $data_r, $node, $element_name, @keys );
     }
     elsif ( $element_type eq 'list' ) {
-
-        #print "type list\n";
         my @keys = $self->get_keys( $node, $element_name );
         $self->{list_element_hook}->( $self, $data_r, $node, $element_name, @keys );
         $self->{list_element_cb}->( $self, $data_r, $node, $element_name, @keys );
     }
     elsif ( $element_type eq 'check_list' ) {
-
-        #print "type list\n";
         my $cl_elt = $node->fetch_element( name => $element_name, check => $self->{check} );
         $self->{check_list_element_cb}->( $self, $data_r, $node, $element_name, undef, $cl_elt );
     }
     elsif ( $element_type eq 'node' ) {
-
-        #print "type object\n";
-        # avoid auto-vivification
         my $next_obj =
             ( $autov or $node->is_element_defined($element_name) )
             ? $node->fetch_element( name => $element_name, check => $self->{check} )
             : undef;
 
-        # if obj element, cb
         $self->{node_element_cb}->( $self, $data_r, $node, $element_name, undef, $next_obj );
     }
     elsif ( $element_type eq 'warped_node' ) {
-
-        #print "type warped\n";
         my $next_obj =
             ( $autov or $node->is_element_defined($element_name) )
             ? $node->fetch_element( name => $element_name, check => $self->{check} )
@@ -193,13 +178,14 @@ sub scan_element {
     }
     elsif ( $element_type eq 'leaf' ) {
         my $next_obj = $node->fetch_element( name => $element_name, check => $self->{check} );
-        my $type = $next_obj->value_type;
-        return unless $type;
-        my $cb_name = $type . '_value_cb';
-        my $cb      = $self->{$cb_name};
-        croak "scan_element: No call_back specified for '$cb_name'"
-            unless defined $cb;
-        $cb->( $self, $data_r, $node, $element_name, undef, $next_obj );
+
+        if (my $type = $next_obj->value_type) {
+            my $cb_name = $type . '_value_cb';
+            my $cb      = $self->{$cb_name};
+            croak "scan_element: No call_back specified for '$cb_name'"
+                unless defined $cb;
+            $cb->( $self, $data_r, $node, $element_name, undef, $next_obj );
+        }
     }
     else {
         croak "Unexpected element_type: $element_type";
@@ -207,20 +193,15 @@ sub scan_element {
     return;
 }
 
-sub scan_hash {
-    my ( $self, $data_r, $node, $element_name, $key ) = @_;
-
+sub scan_hash ($self, $data_r, $node, $element_name, $key) {
     assert_like( $node->element_type($element_name), qr/(hash|list)/ );
 
-    #print "scan_hash ",$node->name," element $element_name key $key ";
     my $item = $node->fetch_element( name => $element_name, check => $self->{check} );
 
     my $cargo_type = $item->cargo_type($element_name);
     my $next_obj = $item->fetch_with_id( index => $key, check => $self->{check} );
 
     if ( $cargo_type =~ /node$/ ) {
-
-        #print "type object or warped\n";
         $self->{node_element_cb}->( $self, $data_r, $node, $element_name, $key, $next_obj );
     }
     elsif ( $cargo_type eq 'leaf' ) {
@@ -240,9 +221,7 @@ sub scan_list {
     goto &scan_hash;
 }
 
-sub get_keys {
-    my ( $self, $node, $element_name ) = @_;
-
+sub get_keys ($self, $node, $element_name) {
     my $element_type = $node->element_type($element_name);
     my $item = $node->fetch_element( name => $element_name, check => $self->{check} );
 
@@ -274,7 +253,7 @@ Config::Model::ObjTreeScanner - Scan config tree and perform call-backs for each
 
 =head1 VERSION
 
-version 2.168
+version 2.169
 
 =head1 SYNOPSIS
 
@@ -404,11 +383,13 @@ C<node_content_hook>
 
 All these call-backs are called on the elements of a node:
 C<list_element_cb>, C<check_list_element_cb>, C<hash_element_cb>,
+C<ordered_hash_element_cb> (available since v2.169),
 C<node_element_cb>, C<node_content_cb>.
 
 =item element hooks:
 
-C<list_element_hook>, C<hash_element_hook>.
+C<list_element_hook>, C<hash_element_hook>,
+C<ordered_hash_element_hook> (available since v2.169).
 
 =back
 
@@ -525,8 +506,8 @@ C<index> is always undef as a check_list cannot be contained in a hash or list (
 
 =head2 Hash element callback
 
-C<hash_element_cb>: Like C<list_element_cb>, but called on a
-hash element.
+C<hash_element_cb> and C<ordered_hash_element_cb>: Like
+C<list_element_cb>, but called on a hash element.
 
  ($scanner, $data_ref,$node,$element_name,@keys)
 
@@ -545,10 +526,21 @@ Example:
      }
   }
 
+C<ordered_hash_element_cb> is available since v2.169.
+
+To ensure backward compatibility, C<hash_element_cb> is used on
+ordered hash when C<ordered_hash_element_cb> is not specified.
+
 =head2 Hash element hook
 
-C<hash_element_hook>: Works like the hash element callback. Except that the calls to
-C<scan_hash> are not required. This is done once the hook returns.
+C<hash_element_hook> and C<ordered_hash_element_hook>: Work like the
+hash element callback, except that the calls to C<scan_hash> are not
+required. The call to C<scan_hash> is done once the hook returns.
+
+C<ordered_hash_element_hook> is available since v2.169.
+
+To ensure backward compatibility, C<hash_element_hook> is used on
+ordered hash when C<ordered_hash_element_hook> is not specified.
 
 =head2 Node content callback
 
@@ -582,7 +574,7 @@ C<scan_element> are not required. This is done once the hook returns.
 
 C<node_dispatch_cb>: Any callback specified in the hash is called for
 each instance of the specified configuration class.
-(this may include the  root node).
+(this may include the root node).
 
 For instance, if you have:
 

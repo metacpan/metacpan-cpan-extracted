@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec::ContainerSpec::Privileges::Seccomp;
 # ABSTRACT: Options for configuring seccomp on the container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -26,7 +26,7 @@ API::Docker::Type::TaskSpec::ContainerSpec::Privileges::Seccomp - Options for co
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -48,7 +48,7 @@ The custom seccomp profile as a json object.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

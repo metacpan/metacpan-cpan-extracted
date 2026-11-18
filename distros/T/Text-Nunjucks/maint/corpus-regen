@@ -1,0 +1,126 @@
+#!/usr/bin/env node
+// Regenerate the committed "expected" of every corpus case from the oracle.
+//
+//   maint/corpus-regen                 # every t/corpus/*.json
+//   maint/corpus-regen t/corpus/lex.json ...   # only the named files
+//
+// For each file: strip the old "expected" from every case, run the remaining
+// input through `node maint/oracle.js`, and write the oracle result back as
+// "expected" (the {ok, output} / {ok, error} object, minus the echoed name,
+// plus "stdout" when the case printed to console.log).
+//
+// This is a node script on purpose: it must preserve the oracle's number text
+// byte for byte (e.g. 0.30000000000000004), and JSON.parse/stringify does that
+// while a Perl JSON round-trip does not. It is the reason the whole pipeline
+// stays in node from the oracle to the file.
+//
+// Deterministic output: JSON.stringify(x, null, 2) -- 2-space indent, keys in
+// their existing (insertion) order, "expected" appended last, one trailing
+// newline. A regen on an unchanged corpus is therefore a no-op diff.
+//
+// Harness-only keys: "todo" (a per-case TODO reason, see t/corpus.t) is kept in
+// the file and never sent to the oracle.
+//
+// Lone surrogates are refused: JSON.stringify writes one as a "\ud83d" escape,
+// which Perl's JSON decoders reject, so a single such case would make t/corpus.t
+// unable to read the whole file. A case whose input or expected holds one
+// aborts the regen with its name; observe the surrogate indirectly instead.
+'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const {execFileSync} = require('child_process');
+
+const root = path.join(__dirname, '..');
+const oracle = path.join(__dirname, 'oracle.js');
+const corpusDir = path.join(root, 't', 'corpus');
+
+function corpusFiles(argv) {
+  if (argv.length) {
+    return argv;
+  }
+  return fs.readdirSync(corpusDir)
+    .filter((f) => f.endsWith('.json'))
+    .sort()
+    .map((f) => path.join(corpusDir, f));
+}
+
+// Ask the oracle for the results of a whole file's worth of input cases.
+function ask(inputs) {
+  const out = execFileSync('node', [oracle], {
+    input: JSON.stringify(inputs),
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+  });
+  return JSON.parse(out);
+}
+
+// True if any string (or key) anywhere in x holds a lone UTF-16 surrogate; a
+// valid pair is one code point under /u and does not match \p{Surrogate}.
+function hasLoneSurrogate(x) {
+  if (typeof x === 'string') {
+    return /\p{Surrogate}/u.test(x);
+  }
+  if (x !== null && typeof x === 'object') {
+    return Object.keys(x).some((k) => hasLoneSurrogate(k) || hasLoneSurrogate(x[k]));
+  }
+  return false;
+}
+
+function regen(file) {
+  const cases = JSON.parse(fs.readFileSync(file, 'utf8'));
+  if (!Array.isArray(cases)) {
+    throw new Error(file + ': corpus file must be a JSON array of cases');
+  }
+
+  // The input sent to the oracle is the case without its stored expectation
+  // and without the harness-only keys.
+  const inputs = cases.map((c) => {
+    const input = Object.assign({}, c);
+    delete input.expected;
+    delete input.todo;
+    return input;
+  });
+
+  const results = ask(inputs);
+  if (results.length !== cases.length) {
+    throw new Error(file + ': oracle returned ' + results.length +
+      ' results for ' + cases.length + ' cases');
+  }
+
+  const out = cases.map((c, i) => {
+    const r = results[i];
+    const expected = r.ok
+      ? {ok: true, output: r.output}
+      : {ok: false, error: r.error};
+    if (r.stdout !== undefined) {
+      expected.stdout = r.stdout;
+    }
+    // Rebuild each case with its input keys in their existing order and
+    // "expected" always last, so the serialization is stable across runs.
+    const rebuilt = {};
+    for (const k of Object.keys(c)) {
+      if (k !== 'expected') {
+        rebuilt[k] = c[k];
+      }
+    }
+    rebuilt.expected = expected;
+    if (hasLoneSurrogate(rebuilt)) {
+      throw new Error(file + ': case "' + c.name + '" holds a lone surrogate, ' +
+        'which Perl cannot decode from JSON -- observe it indirectly instead');
+    }
+    return rebuilt;
+  });
+
+  fs.writeFileSync(file, JSON.stringify(out, null, 2) + '\n');
+}
+
+function main() {
+  const files = corpusFiles(process.argv.slice(2));
+  for (const file of files) {
+    regen(file);
+    process.stderr.write('regenerated ' + path.relative(root, file) + '\n');
+  }
+}
+
+main();

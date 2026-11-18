@@ -1807,7 +1807,11 @@ decode_json (SV *string, JSON *json, STRLEN *offset_return)
   dec.depth = 0;
 
   if (dec.json.cb_object || dec.json.cb_sk_object)
-    dec.json.flags |= F_HOOK;
+    {
+      dec.json.flags |= F_HOOK;
+      sv_2mortal (SvREFCNT_inc (dec.json.cb_object));
+      sv_2mortal (SvREFCNT_inc (dec.json.cb_sk_object));
+    }
 
   *dec.end = 0; // this should basically be a nop, too, but make sure it's there
 
@@ -1959,6 +1963,10 @@ incr_parse (JSON *self)
                   case '5': case '6': case '7': case '8': case '9':
                     // allowed
                     break;
+
+                  case 0: // numbers are not self-delimited in newer JSON
+                    --p;
+                    goto nul;
 
                   default:
                     --p;
@@ -2127,8 +2135,8 @@ void new (char *klass)
 
 void boolean_values (JSON *self, SV *v_false = 0, SV *v_true = 0)
 	PPCODE:
-	self->v_false = newSVsv (v_false);
-	self->v_true  = newSVsv (v_true);
+        sv_2mortal (self->v_false); self->v_false = 0; self->v_false = newSVsv (v_false);
+        sv_2mortal (self->v_true ); self->v_true  = 0; self->v_true  = newSVsv (v_true );
         XPUSHs (ST (0));
 
 void get_boolean_values (JSON *self)

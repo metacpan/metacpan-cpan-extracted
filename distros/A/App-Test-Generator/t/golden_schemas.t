@@ -21,6 +21,7 @@ use warnings;
 # ======================================================================
 
 use Test::Most;
+use Config;
 use Cwd qw(abs_path);
 use File::Path qw(make_path);
 use File::Spec;
@@ -104,7 +105,7 @@ sub _extract
 	return undef unless -f $module;
 
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', $lib, File::Spec->catdir($root, $distribution->{dir}, 'lib'), $ENV{PERL5LIB} // '');
+	local $ENV{PERL5LIB} = join($Config{path_sep}, $lib, File::Spec->catdir($root, $distribution->{dir}, 'lib'), $ENV{PERL5LIB} // '');
 	run3([$^X, "-I$lib", $script, '--output-dir', $out, $module], \undef, \$stdout, \$stderr);
 
 	if($? >> 8) {

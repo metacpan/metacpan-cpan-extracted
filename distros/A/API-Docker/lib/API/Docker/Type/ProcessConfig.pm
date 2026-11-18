@@ -1,6 +1,6 @@
 package API::Docker::Type::ProcessConfig;
 # ABSTRACT: The C<ProcessConfig> field of the C<200> response to C<GET /exec/{id}/json>
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -34,7 +34,7 @@ API::Docker::Type::ProcessConfig - The C<ProcessConfig> field of the C<200> resp
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -87,7 +87,7 @@ because deriving it from the Perl name would produce C<Arguments>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

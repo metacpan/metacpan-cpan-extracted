@@ -1,0 +1,34 @@
+Revision history for Text-Nunjucks
+
+0.001     2026-11-17 20:12:32Z
+  - First release: a Perl port of Nunjucks 3.2.4. The same template,
+    context and options are meant to give the same output and the same
+    error messages as the JavaScript original. Requires Perl 5.40 or newer.
+  - Use Text::Nunjucks::Environment as the entry point. The top-level API of
+    Nunjucks' index.js (configure, render, compile, render_string over a
+    default environment) is not in this release, so Text::Nunjucks itself
+    loads no code.
+  - Included: the template pipeline, the built-in filters, the "is" tests, the
+    globals (range, cycler, joiner) and the FileSystem and Precompiled
+    loaders. Not included: jinja-compat, precompile and its CLI,
+    NodeResolveLoader, WebLoader, watch, express and the browser bundles.
+  - Numbers are IEEE doubles and print as JavaScript prints them on every
+    perl, also with long double or quadmath NVs and on 32-bit perls.
+  - Every class lives in its own .pm file and each module loads on its own
+    (use Text::Nunjucks::Template, ::Context, ::Runtime::SafeString and so
+    on). Loading a parent module (Environment, Nodes, Runtime, ...) loads
+    its classes.
+  - A render frees its Context when nothing of it is going to run any more,
+    also for templates with macros, caller blocks, imports and includes. A
+    macro your own Perl code keeps and calls after its render ended dies when
+    it reads a template variable.
+  - The port sets no depth limit of its own: where Nunjucks stops with a
+    RangeError (many asyncEach items, sequential includes, a template that
+    includes itself, a macro that calls itself) the port renders, bounded
+    only by memory, and an endless recursion runs until memory is exhausted.
+  - Paths follow the POSIX model of node's path module; Windows paths
+    (path.win32) come later. The tests that rest on the POSIX model are
+    skipped on Windows, all others run there.
+  - See "DIFFERENCES FROM NUNJUCKS" in the Text::Nunjucks documentation for
+    every deliberate and every known open difference, and "SECURITY" before
+    passing template names you do not control to the FileSystem loader.

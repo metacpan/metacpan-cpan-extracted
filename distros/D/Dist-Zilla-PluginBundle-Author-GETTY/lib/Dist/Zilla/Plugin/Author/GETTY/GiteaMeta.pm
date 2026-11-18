@@ -1,9 +1,10 @@
 package Dist::Zilla::Plugin::Author::GETTY::GiteaMeta;
 # ABSTRACT: Add Gitea/Forgejo (incl. Codeberg) repository metadata to META.{json,yml}
 use Moose;
+use File::Spec;
 with 'Dist::Zilla::Role::MetaProvider';
 
-our $VERSION = '0.327';
+our $VERSION = '0.328';
 
 
 
@@ -49,10 +50,24 @@ has _remote_info => (
 
 sub _build_remote_info {
   my ($self) = @_;
-  my $remote = $self->remote;
-  chomp(my $url = `git config --get remote.$remote.url 2>/dev/null` // '');
+  chomp(my $url = _git_output('config', '--get', 'remote.' . $self->remote . '.url') // '');
   return undef unless length $url;
   return $self->_parse_remote_url($url);
+}
+
+# Output of `git ARGS` in the cwd; undef when git cannot be started or exits
+# non-zero. git runs without a shell, so the remote name reaches it as it is,
+# also on Windows (cmd.exe knows no 2>/dev/null). Its STDERR goes to the null
+# device. The same helper as in Dist::Zilla::PluginBundle::Author::GETTY.
+sub _git_output {
+  my (@args) = @_;
+  open my $stderr, '>&', \*STDERR or die "cannot dup STDERR: $!\n";
+  my $fh;
+  my $started = open(STDERR, '>', File::Spec->devnull) && open($fh, '-|', 'git', @args);
+  open STDERR, '>&', $stderr or die "cannot restore STDERR: $!\n";
+  return undef unless $started;
+  my $out = do { local $/; <$fh> };
+  return close($fh) ? $out : undef;
 }
 
 # Parse a git remote URL into { host => ..., slug => 'owner/repo' }, or undef.
@@ -146,7 +161,7 @@ Dist::Zilla::Plugin::Author::GETTY::GiteaMeta - Add Gitea/Forgejo (incl. Codeber
 
 =head1 VERSION
 
-version 0.327
+version 0.328
 
 =head1 DESCRIPTION
 
@@ -162,8 +177,9 @@ API).
 
 Within L<Dist::Zilla::PluginBundle::Author::GETTY> this plugin is the
 Gitea/Forgejo counterpart of L<Dist::Zilla::Plugin::GithubMeta>: the bundle
-auto-selects it (passing the detected L</host>) for dists whose remote points
-at a known Gitea host, or when C<gitea = 1> is set. It is additive —
+auto-selects it (passing the detected L</host>, and L</remote> when the dist
+has no C<origin>) for dists whose remote points at a known Gitea host, or when
+C<gitea = 1> is set. It is additive —
 GitHub-hosted distributions keep using C<GithubMeta> unchanged.
 
 The C<owner/repo> slug is taken from the git remote and the URLs are built for
@@ -174,6 +190,7 @@ never emits metadata for the wrong forge.
 =head2 remote
 
 Name of the git remote to read the repository URL from. Default: C<origin>.
+The bundle sets this to the dist's first remote when there is no C<origin>.
 
 =head2 host
 
@@ -213,11 +230,9 @@ Torsten Raudssus <getty@cpan.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de>.
+This software is copyright (c) 2012-2026 by Torsten Raudssus <torsten@raudssus.de> L<https://raudssus.de/>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
-
-L<https://raudssus.de/>
 
 =cut

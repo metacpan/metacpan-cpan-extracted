@@ -12,6 +12,7 @@ use warnings;
 # ======================================================================
 
 use Test::Most;
+use Config;
 use Cwd qw(getcwd);
 use File::Path qw(make_path);
 use File::Spec;
@@ -157,7 +158,7 @@ sub _run
 	my ($file) = @_;
 
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', grep { defined($_) && length($_) } ($lib, $ENV{PERL5LIB}));
+	local $ENV{PERL5LIB} = join($Config{path_sep}, grep { defined($_) && length($_) } ($lib, $ENV{PERL5LIB}));
 	run3([$^X, $file], \undef, \$stdout, \$stderr);
 
 	return ($? >> 8, "$stdout$stderr");
@@ -276,7 +277,7 @@ YAML
 
 	my $out = File::Spec->catfile($dir, 'feedback_cli.t');
 	my ($stdout, $stderr) = ('', '');
-	local $ENV{PERL5LIB} = join(':', grep { defined($_) && length($_) } ($lib, $ENV{PERL5LIB}));
+	local $ENV{PERL5LIB} = join($Config{path_sep}, grep { defined($_) && length($_) } ($lib, $ENV{PERL5LIB}));
 	my $generator = File::Spec->rel2abs(File::Spec->catfile('bin', 'fuzz-harness-generator'));
 	_in_dir($dir, sub {
 		run3(

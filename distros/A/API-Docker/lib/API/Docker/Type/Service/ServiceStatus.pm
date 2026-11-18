@@ -1,6 +1,6 @@
 package API::Docker::Type::Service::ServiceStatus;
 # ABSTRACT: The status of the service's tasks
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -28,7 +28,7 @@ API::Docker::Type::Service::ServiceStatus - The status of the service's tasks
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -59,7 +59,7 @@ tasks yet Completed.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

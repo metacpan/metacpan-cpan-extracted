@@ -1,6 +1,6 @@
 package API::Docker::Type::Mount;
 # ABSTRACT: One entry of a container's Mounts specification
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Mount::BindOptions;
 use API::Docker::Type::Mount::ImageOptions;
@@ -50,7 +50,7 @@ API::Docker::Type::Mount - One entry of a container's Mounts specification
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -140,7 +140,7 @@ L<API::Docker::Type::Mount::TmpfsOptions>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

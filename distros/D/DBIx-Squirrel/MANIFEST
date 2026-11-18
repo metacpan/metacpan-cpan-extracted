@@ -58,6 +58,7 @@ t/26-context-in-pipelines.t
 t/27-sinks.t
 t/28-tooling.t
 t/29-objects.t
+xt/ekorn-tooling.t
 xt/examples.t
 xt/manuals.t
 META.yml

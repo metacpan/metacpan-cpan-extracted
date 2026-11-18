@@ -1,5 +1,28 @@
 Revision history for Robots-Validate:
 
+v0.4.16   2026-11-17 16:35:53+00:00 Europe/London
+  [Enhancements]
+  - Added or updated the robot rules for the following:
+    - ChatCPT-User (updated network)
+    - Claude (updated network)
+    - FreeConnector
+    - GeneralRetrievalBot
+    - Google-User (updated network)
+    - GreenFaceLabsCensus (removed, offline)
+    - IsonSearchBot (updated network)
+    - Kaupr
+    - LinerBot (removed, offline)
+    - NetAPI (updated network)
+    - PerplexityBot (updated network)
+    - RiverBot (updated network)
+
+  - Minor code improvements.
+
+  [Documentation]
+  - Updated networks attribute.
+
+  - Improved readability of Changes.
+
 v0.4.15   2026-11-12 16:27:37+00:00 Europe/London
   [Enhancements]
   - Added or updated the robot rules for the following:
@@ -7,6 +30,7 @@ v0.4.15   2026-11-12 16:27:37+00:00 Europe/London
     - GenomeCrawler
     - GlintscoutBot
     - MorsillaBot
+
   [Documentation]
   - Fixed incorrect type for the networks attribute: it has been using Net::IP::LPM since v0.4.3.
 

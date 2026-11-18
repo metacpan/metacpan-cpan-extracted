@@ -1,6 +1,6 @@
 package API::Docker::Type::SecretSpec;
 # ABSTRACT: The body of a C<POST /secrets/create> request
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::Driver;
 use namespace::clean;
@@ -35,7 +35,7 @@ API::Docker::Type::SecretSpec - The body of a C<POST /secrets/create> request
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -81,7 +81,7 @@ L<API::Docker::Type::Driver>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

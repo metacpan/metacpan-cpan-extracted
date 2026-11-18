@@ -1,0 +1,3991 @@
+[
+  {
+    "name": "strings: capitalize: undefined input",
+    "template": "[{{ u|capitalize }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: capitalize: null input",
+    "template": "[{{ n|capitalize }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: capitalize: empty string input",
+    "template": "[{{ e|capitalize }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: capitalize: zero input",
+    "template": "[{{ z|capitalize }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: capitalize: numeric string input",
+    "template": "[{{ ns|capitalize }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: capitalize: true input",
+    "template": "[{{ t|capitalize }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: capitalize: false input",
+    "template": "[{{ fl|capitalize }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: capitalize: word and mixed case",
+    "template": "{{ \"hELLO wORLD\"|capitalize }}|{{ \"  lead\"|capitalize }}|{{ \"1abc\"|capitalize }}|{{ \"ABC\"|capitalize }}",
+    "expected": {
+      "ok": true,
+      "output": "Hello world|  lead|1abc|Abc"
+    }
+  },
+  {
+    "name": "strings: capitalize: non-ASCII letters, sharp s, combining mark, astral",
+    "template": "{{ \"élan\"|capitalize }}|{{ \"ÉLAN\"|capitalize }}|{{ \"ßa\"|capitalize }}|{{ \"ǆx\"|capitalize }}|{{ \"éa\"|capitalize }}|{{ \"😀abc\"|capitalize }}|{{ \"𐐨𐐨\"|capitalize }}|{{ \"ΑΣ\"|capitalize }}|{{ \"ΑΣ ΟΔΟΣ\"|capitalize }}|{{ \"i̇x\"|capitalize }}",
+    "expected": {
+      "ok": true,
+      "output": "Élan|Élan|SSa|Ǆx|Éa|😀abc|𐐨𐐨|Ας|Ας οδος|İx"
+    }
+  },
+  {
+    "name": "strings: capitalize: Turkish dotted capital I and ligature",
+    "template": "{{ \"İx\"|capitalize }}|{{ \"ﬁx\"|capitalize }}|{{ \"ŉx\"|capitalize }}",
+    "expected": {
+      "ok": true,
+      "output": "İx|FIx|ʼNx"
+    }
+  },
+  {
+    "name": "strings: capitalize: array input rejected (no toLowerCase)",
+    "template": "{{ a|capitalize }}",
+    "context": {
+      "a": [
+        "x"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: capitalize: object input rejected",
+    "template": "{{ o|capitalize }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: capitalize: number input rejected",
+    "template": "{{ 5|capitalize }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: capitalize: truthy boolean input rejected",
+    "template": "{{ true|capitalize }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: capitalize: macro output (SafeString) autoescape on, markup escaped only once",
+    "template": "{% macro m() %}<b>HI</b>{% endmacro %}{{ m()|capitalize }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>hi</b>"
+    }
+  },
+  {
+    "name": "strings: capitalize: SafeString stays safe under autoescape",
+    "template": "{% macro m() %}<B>x</B>{% endmacro %}[{{ m()|capitalize }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[<b>x</b>]"
+    }
+  },
+  {
+    "name": "strings: capitalize: plain string escaped under autoescape",
+    "template": "{{ s|capitalize }}",
+    "context": {
+      "s": "<B>X</B>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;x&lt;/b&gt;"
+    }
+  },
+  {
+    "name": "strings: capitalize: plain string with autoescape off",
+    "template": "{{ s|capitalize }}",
+    "context": {
+      "s": "<B>X</B>"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>x</b>"
+    }
+  },
+  {
+    "name": "strings: capitalize: safe input",
+    "template": "{{ s|safe|capitalize }}",
+    "context": {
+      "s": "<B>X</B>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>x</b>"
+    }
+  },
+  {
+    "name": "strings: center: undefined input",
+    "template": "[{{ u|center(10) }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[          ]"
+    }
+  },
+  {
+    "name": "strings: center: null input",
+    "template": "[{{ n|center(10) }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[          ]"
+    }
+  },
+  {
+    "name": "strings: center: empty string input",
+    "template": "[{{ e|center(10) }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[          ]"
+    }
+  },
+  {
+    "name": "strings: center: zero input",
+    "template": "[{{ z|center(10) }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "[0]"
+    }
+  },
+  {
+    "name": "strings: center: numeric string input",
+    "template": "[{{ ns|center(10) }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[    42    ]"
+    }
+  },
+  {
+    "name": "strings: center: true input",
+    "template": "[{{ t|center(10) }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[true]"
+    }
+  },
+  {
+    "name": "strings: center: false input",
+    "template": "[{{ fl|center(10) }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[          ]"
+    }
+  },
+  {
+    "name": "strings: center: default width 80",
+    "template": "[{{ \"ab\"|center }}]",
+    "expected": {
+      "ok": true,
+      "output": "[                                       ab                                       ]"
+    }
+  },
+  {
+    "name": "strings: center: odd spaces",
+    "template": "[{{ \"ab\"|center(7) }}][{{ \"abc\"|center(6) }}][{{ \"a\"|center(2) }}][{{ \"a\"|center(3) }}][{{ \"a\"|center(4) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[  ab   ][ abc  ][a ][ a ][ a  ]"
+    }
+  },
+  {
+    "name": "strings: center: even spaces",
+    "template": "[{{ \"ab\"|center(8) }}][{{ \"ab\"|center(4) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[   ab   ][ ab ]"
+    }
+  },
+  {
+    "name": "strings: center: width smaller than or equal to length",
+    "template": "[{{ \"abcd\"|center(2) }}][{{ \"abcd\"|center(4) }}][{{ \"abcd\"|center(0) }}][{{ \"\"|center(0) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[abcd][abcd][                                      abcd                                      ][                                                                                ]"
+    }
+  },
+  {
+    "name": "strings: center: negative width",
+    "template": "[{{ \"ab\"|center(-3) }}][{{ \"ab\"|center(-80) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[ab][ab]"
+    }
+  },
+  {
+    "name": "strings: center: NaN width",
+    "template": "[{{ \"ab\"|center(n) }}][{{ \"ab\"|center(0/0) }}][{{ \"ab\"|center(\"x\") }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[                                       ab                                       ][                                       ab                                       ][ab]"
+    }
+  },
+  {
+    "name": "strings: center: string width",
+    "template": "[{{ \"ab\"|center(\"6\") }}][{{ \"ab\"|center(\"7\") }}][{{ \"ab\"|center(\"\") }}]",
+    "expected": {
+      "ok": true,
+      "output": "[  ab  ][  ab   ][                                       ab                                       ]"
+    }
+  },
+  {
+    "name": "strings: center: fractional width",
+    "template": "[{{ \"ab\"|center(5.5) }}][{{ \"ab\"|center(6.5) }}][{{ \"ab\"|center(4.2) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[ ab  ][  ab   ][ ab  ]"
+    }
+  },
+  {
+    "name": "strings: center: width true, false, null, undefined",
+    "template": "[{{ \"ab\"|center(true) }}][{{ \"ab\"|center(false) }}][{{ \"ab\"|center(null) }}][{{ \"ab\"|center(nothing) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[ab][                                       ab                                       ][                                       ab                                       ][                                       ab                                       ]"
+    }
+  },
+  {
+    "name": "strings: center: astral characters count as two units",
+    "template": "[{{ \"😀\"|center(6) }}][{{ (\"😀\"|center(7)).length }}][{{ \"é\"|center(6) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[  😀  ][7][  é  ]"
+    }
+  },
+  {
+    "name": "strings: center: array input (length defined)",
+    "template": "[{{ a|center(6) }}]",
+    "context": {
+      "a": [
+        "x"
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "[  x   ]"
+    }
+  },
+  {
+    "name": "strings: center: number input",
+    "template": "[{{ 5|center(4) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[5]"
+    }
+  },
+  {
+    "name": "strings: center: macro output stays safe autoescape on",
+    "template": "{% macro m() %}<b>{% endmacro %}[{{ m()|center(7) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[  <b>  ]"
+    }
+  },
+  {
+    "name": "strings: center: macro output wider than width returns same SafeString",
+    "template": "{% macro m() %}<b>{% endmacro %}[{{ m()|center(1) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[<b>]"
+    }
+  },
+  {
+    "name": "strings: center: plain string escaped",
+    "template": "[{{ s|center(9) }}]",
+    "context": {
+      "s": "<b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[   &lt;b&gt;   ]"
+    }
+  },
+  {
+    "name": "strings: center: safe input",
+    "template": "[{{ s|safe|center(9) }}]",
+    "context": {
+      "s": "<b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[   <b>   ]"
+    }
+  },
+  {
+    "name": "strings: indent: undefined input",
+    "template": "[{{ u|indent(2) }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: indent: null input",
+    "template": "[{{ n|indent(2) }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: indent: empty string input",
+    "template": "[{{ e|indent(2) }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: indent: zero input",
+    "template": "[{{ z|indent(2) }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: indent: numeric string input",
+    "template": "[{{ ns|indent(2) }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: indent: true input",
+    "template": "[{{ t|indent(2) }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: indent: false input",
+    "template": "[{{ fl|indent(2) }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: indent: default width 4, no first line",
+    "template": "{{ \"a\nb\nc\"|indent }}",
+    "expected": {
+      "ok": true,
+      "output": "a\n    b\n    c"
+    }
+  },
+  {
+    "name": "strings: indent: indentfirst true",
+    "template": "{{ \"a\nb\"|indent(2,true) }}|{{ \"a\nb\"|indent(2,1) }}|{{ \"a\"|indent(2,true) }}",
+    "expected": {
+      "ok": true,
+      "output": "  a\n  b|  a\n  b|  a"
+    }
+  },
+  {
+    "name": "strings: indent: indentfirst falsy kinds",
+    "template": "{{ \"a\nb\"|indent(2,0) }}|{{ \"a\nb\"|indent(2,\"\") }}|{{ \"a\nb\"|indent(2,null) }}|{{ \"a\nb\"|indent(2,\"false\") }}",
+    "expected": {
+      "ok": true,
+      "output": "a\n  b|a\n  b|a\n  b|  a\n  b"
+    }
+  },
+  {
+    "name": "strings: indent: width 0 falls back to 4",
+    "template": "{{ \"a\nb\"|indent(0) }}|{{ \"a\nb\"|indent(null) }}|{{ \"a\nb\"|indent(false) }}|{{ \"a\nb\"|indent(nothing) }}",
+    "expected": {
+      "ok": true,
+      "output": "a\n    b|a\n    b|a\n    b|a\n    b"
+    }
+  },
+  {
+    "name": "strings: indent: string width",
+    "template": "{{ \"a\nb\"|indent(\"3\") }}|{{ \"a\nb\"|indent(\"\") }}",
+    "expected": {
+      "ok": true,
+      "output": "a\n   b|a\n    b"
+    }
+  },
+  {
+    "name": "strings: indent: non-numeric string width",
+    "template": "{{ \"a\nb\"|indent(\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "a\nb"
+    }
+  },
+  {
+    "name": "strings: indent: negative width throws RangeError in repeat",
+    "template": "{{ \"a\nb\"|indent(-2) }}",
+    "expected": {
+      "ok": true,
+      "output": "a\nb"
+    }
+  },
+  {
+    "name": "strings: indent: fractional width",
+    "template": "{{ \"a\nb\"|indent(2.5) }}|{{ \"a\nb\"|indent(1.5,true) }}",
+    "expected": {
+      "ok": true,
+      "output": "a\n   b|  a\n  b"
+    }
+  },
+  {
+    "name": "strings: indent: width true",
+    "template": "{{ \"a\nb\"|indent(true) }}",
+    "expected": {
+      "ok": true,
+      "output": "a\n b"
+    }
+  },
+  {
+    "name": "strings: indent: empty and blank lines",
+    "template": "[{{ \"\"|indent(2) }}][{{ \"\n\"|indent(2) }}][{{ \"a\n\nb\"|indent(2) }}][{{ \"a\n\"|indent(2,true) }}][{{ \" \"|indent(2,true) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][\n  ][a\n  \n  b][  a\n  ][   ]"
+    }
+  },
+  {
+    "name": "strings: indent: CRLF only splits on LF",
+    "template": "{{ (\"a\r\nb\rc\nd\"|indent(2)).length }}|{{ \"a\r\nb\"|indent(2) }}",
+    "expected": {
+      "ok": true,
+      "output": "12|a\r\n  b"
+    }
+  },
+  {
+    "name": "strings: indent: U+2028 is not a line break",
+    "template": "{{ \"a b\"|indent(2) }}",
+    "expected": {
+      "ok": true,
+      "output": "a b"
+    }
+  },
+  {
+    "name": "strings: indent: astral and combining",
+    "template": "{{ \"😀\né\"|indent(1,true) }}",
+    "expected": {
+      "ok": true,
+      "output": " 😀\n é"
+    }
+  },
+  {
+    "name": "strings: indent: number input throws",
+    "template": "{{ 123|indent(2) }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: indent: array input throws",
+    "template": "{{ a|indent(2) }}",
+    "context": {
+      "a": [
+        "x",
+        "y"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: indent: macro output safe",
+    "template": "{% macro m() %}<b>\n<i>{% endmacro %}{{ m()|indent(2) }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>\n  <i>"
+    }
+  },
+  {
+    "name": "strings: indent: macro output empty string",
+    "template": "{% macro m() %}{% endmacro %}[{{ m()|indent(2) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: indent: plain string escaped",
+    "template": "{{ s|indent(2) }}",
+    "context": {
+      "s": "<b>\n<i>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;\n  &lt;i&gt;"
+    }
+  },
+  {
+    "name": "strings: indent: autoescape off",
+    "template": "{{ s|indent(2) }}",
+    "context": {
+      "s": "<b>\n<i>"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>\n  <i>"
+    }
+  },
+  {
+    "name": "strings: indent: safe input",
+    "template": "{{ s|safe|indent(2) }}",
+    "context": {
+      "s": "<b>\n<i>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>\n  <i>"
+    }
+  },
+  {
+    "name": "strings: indent: huge width 50",
+    "template": "{{ ('a\nb'|indent(50)).length }}",
+    "expected": {
+      "ok": true,
+      "output": "53"
+    }
+  },
+  {
+    "name": "strings: lower: undefined input",
+    "template": "[{{ u|lower }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: lower: null input",
+    "template": "[{{ n|lower }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: lower: empty string input",
+    "template": "[{{ e|lower }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: lower: zero input",
+    "template": "[{{ z|lower }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: lower: numeric string input",
+    "template": "[{{ ns|lower }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: lower: true input",
+    "template": "[{{ t|lower }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: lower: false input",
+    "template": "[{{ fl|lower }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: lower: ascii and mixed",
+    "template": "{{ \"HeLLo WORLD 123\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "hello world 123"
+    }
+  },
+  {
+    "name": "strings: lower: Greek final sigma at end of word",
+    "template": "{{ \"ΑΣ ΟΔΟΣ\"|lower }}|{{ \"ΟΔΟΣ\"|lower }}|{{ \"Σ\"|lower }}|{{ \"ΑΣ\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "ας οδος|οδος|σ|ας"
+    }
+  },
+  {
+    "name": "strings: lower: Greek sigma before punctuation and digits",
+    "template": "{{ \"ΑΣ.\"|lower }}|{{ \"ΑΣ1\"|lower }}|{{ \"ΑΣ,ΒΣ\"|lower }}|{{ \"ΑΣΑ\"|lower }}|{{ \"ΑΣ-ΑΣ\"|lower }}|{{ \"Σ1\"|lower }}|{{ \"1Σ\"|lower }}|{{ \"ΑΣ'\"|lower }}|{{ \"ΑΣ_\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "ας.|ας1|ας,βς|ασα|ας-ας|σ1|1σ|ας&#39;|ας_"
+    }
+  },
+  {
+    "name": "strings: lower: sigma and combining marks",
+    "template": "{{ \"ΑΣ́\"|lower }}|{{ \"ΑΣ́Α\"|lower }}|{{ \"ΆΣ\"|lower }}|{{ \"ΑΣ​\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "ας́|ασ́α|άς|ας​"
+    }
+  },
+  {
+    "name": "strings: lower: sigma between spaces and end",
+    "template": "{{ \"ΑΣ ΑΣ\"|lower }}|{{ \"ΑΣ\nΑΣ\"|lower }}|{{ \" Σ \"|lower }}|{{ \"ΑΣΣ\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "ας ας|ας\nας| σ |ασς"
+    }
+  },
+  {
+    "name": "strings: lower: Turkish dotted capital I",
+    "template": "{{ \"İ\"|lower }}|{{ (\"İ\"|lower).length }}|{{ \"İSTANBUL\"|lower }}|{{ \"I\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "i̇|2|i̇stanbul|i"
+    }
+  },
+  {
+    "name": "strings: lower: non-ASCII, astral, special",
+    "template": "{{ \"ÀÉÎÕÜ\"|lower }}|{{ \"ẞ\"|lower }}|{{ \"𐐀\"|lower }}|{{ \"😀A\"|lower }}|{{ \"ǅ\"|lower }}|{{ \"ǈ\"|lower }}",
+    "expected": {
+      "ok": true,
+      "output": "àéîõü|ß|𐐨|😀a|ǆ|ǉ"
+    }
+  },
+  {
+    "name": "strings: lower: number input throws",
+    "template": "{{ 5|lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: lower: array input throws",
+    "template": "{{ a|lower }}",
+    "context": {
+      "a": [
+        "A"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: lower: object input throws",
+    "template": "{{ o|lower }}",
+    "context": {
+      "o": {
+        "A": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: lower: true input throws",
+    "template": "{{ true|lower }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toLowerCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: lower: macro output not safe afterwards (no copySafeness)",
+    "template": "{% macro m() %}<B>{% endmacro %}{{ m()|lower }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;"
+    }
+  },
+  {
+    "name": "strings: lower: plain string escaped",
+    "template": "{{ s|lower }}",
+    "context": {
+      "s": "<B>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;"
+    }
+  },
+  {
+    "name": "strings: lower: autoescape off",
+    "template": "{{ s|lower }}",
+    "context": {
+      "s": "<B>"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>"
+    }
+  },
+  {
+    "name": "strings: lower: safe input",
+    "template": "{{ s|safe|lower }}",
+    "context": {
+      "s": "<B>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;"
+    }
+  },
+  {
+    "name": "strings: nl2br: input kinds (undefined null only give empty)",
+    "template": "[{{ u|nl2br }}]|[{{ n|nl2br }}]|[{{ e|nl2br }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]|[]|[]"
+    }
+  },
+  {
+    "name": "strings: nl2br: zero throws no replace",
+    "template": "{{ z|nl2br }}",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: nl2br: false throws no replace",
+    "template": "{{ fl|nl2br }}",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: nl2br: true throws",
+    "template": "{{ t|nl2br }}",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: nl2br: numeric string",
+    "template": "{{ ns|nl2br }}",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "42"
+    }
+  },
+  {
+    "name": "strings: nl2br: number throws",
+    "template": "{{ 42|nl2br }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: nl2br: array throws",
+    "template": "{{ a|nl2br }}",
+    "context": {
+      "a": [
+        "a\nb"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: nl2br: LF CRLF and lone CR",
+    "template": "{{ \"a\nb\"|nl2br }}|{{ \"a\r\nb\"|nl2br }}|{{ \"a\rb\"|nl2br }}|{{ \"a\n\nb\"|nl2br }}|{{ \"\r\n\r\n\"|nl2br }}|{{ \"\n\r\"|nl2br }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a<br />\nb|a<br />\nb|a\rb|a<br />\n<br />\nb|<br />\n<br />\n|<br />\n\r"
+    }
+  },
+  {
+    "name": "strings: nl2br: U+2028 U+2029 and NEL untouched",
+    "template": "{{ \"a b cd\"|nl2br }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a b cd"
+    }
+  },
+  {
+    "name": "strings: nl2br: no newline and empty",
+    "template": "[{{ \"abc\"|nl2br }}][{{ \"\"|nl2br }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[abc][]"
+    }
+  },
+  {
+    "name": "strings: nl2br: plain string escaped under autoescape",
+    "template": "{{ s|nl2br }}",
+    "context": {
+      "s": "<a>\nb"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;a&gt;&lt;br /&gt;\nb"
+    }
+  },
+  {
+    "name": "strings: nl2br: macro output safe",
+    "template": "{% macro m() %}<a>\nb{% endmacro %}{{ m()|nl2br }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<a><br />\nb"
+    }
+  },
+  {
+    "name": "strings: nl2br: autoescape off",
+    "template": "{{ s|nl2br }}",
+    "context": {
+      "s": "<a>\nb"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<a><br />\nb"
+    }
+  },
+  {
+    "name": "strings: nl2br: safe input",
+    "template": "{{ s|safe|nl2br }}",
+    "context": {
+      "s": "<a>\nb"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<a><br />\nb"
+    }
+  },
+  {
+    "name": "strings: nl2br: astral around newline",
+    "template": "{{ \"😀\n😀\"|nl2br }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀<br />\n😀"
+    }
+  },
+  {
+    "name": "strings: replace: basic",
+    "template": "{{ \"aaa\"|replace(\"a\",\"b\") }}|{{ \"abc\"|replace(\"b\",\"\") }}|{{ \"abc\"|replace(\"x\",\"y\") }}|{{ \"\"|replace(\"a\",\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "bbb|ac|abc|"
+    }
+  },
+  {
+    "name": "strings: replace: maxCount 0",
+    "template": "{{ \"aaa\"|replace(\"a\",\"b\",0) }}",
+    "expected": {
+      "ok": true,
+      "output": "aaa"
+    }
+  },
+  {
+    "name": "strings: replace: maxCount positive below, equal and above the count",
+    "template": "{{ \"aaa\"|replace(\"a\",\"b\",1) }}|{{ \"aaa\"|replace(\"a\",\"b\",2) }}|{{ \"aaa\"|replace(\"a\",\"b\",3) }}|{{ \"aaa\"|replace(\"a\",\"b\",10) }}",
+    "expected": {
+      "ok": true,
+      "output": "baa|bba|bbb|bbb"
+    }
+  },
+  {
+    "name": "strings: replace: maxCount negative",
+    "template": "{{ \"aaa\"|replace(\"a\",\"b\",-1) }}|{{ \"aaa\"|replace(\"a\",\"b\",-5) }}",
+    "expected": {
+      "ok": true,
+      "output": "bbb|aaa"
+    }
+  },
+  {
+    "name": "strings: replace: maxCount null, false, string, fractional, NaN",
+    "template": "{{ \"aaa\"|replace(\"a\",\"b\",null) }}|{{ \"aaa\"|replace(\"a\",\"b\",false) }}|{{ \"aaa\"|replace(\"a\",\"b\",\"2\") }}|{{ \"aaa\"|replace(\"a\",\"b\",1.5) }}|{{ \"aaa\"|replace(\"a\",\"b\",0/0) }}|{{ \"aaa\"|replace(\"a\",\"b\",true) }}",
+    "expected": {
+      "ok": true,
+      "output": "aaa|aaa|bba|bba|aaa|baa"
+    }
+  },
+  {
+    "name": "strings: replace: empty search string",
+    "template": "{{ \"abc\"|replace(\"\",\".\") }}|{{ \"\"|replace(\"\",\".\") }}|{{ \"abc\"|replace(\"\",\"\") }}|{{ \"abc\"|replace(\"\",\".\",1) }}|{{ \"abc\"|replace(\"\",\".\",0) }}",
+    "expected": {
+      "ok": true,
+      "output": ".a.b.c.|..|abc|.a.b.c.|.a.b.c."
+    }
+  },
+  {
+    "name": "strings: replace: empty search on astral splits code units (observed via length)",
+    "template": "{{ (\"a😀\"|replace(\"\",\"-\")).length }}|{{ (\"😀\"|replace(\"\",\"-\")).length }}|{{ \"😀\"|replace(\"\",\"\") }}",
+    "expected": {
+      "ok": true,
+      "output": "7|5|😀"
+    }
+  },
+  {
+    "name": "strings: replace: number as search",
+    "template": "{{ \"a1b1\"|replace(1,\"x\") }}|{{ \"a1.5\"|replace(1.5,\"x\") }}|{{ \"a0b\"|replace(0,\"x\") }}|{{ \"a-1\"|replace(-1,\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "axbx|ax|axb|ax"
+    }
+  },
+  {
+    "name": "strings: replace: number input string-cast",
+    "template": "{{ 123|replace(2,\"x\") }}|{{ 123|replace(\"2\",\"x\") }}|{{ 0|replace(0,9) }}",
+    "expected": {
+      "ok": true,
+      "output": "1x3|1x3|9"
+    }
+  },
+  {
+    "name": "strings: replace: number replacement",
+    "template": "{{ \"abc\"|replace(\"b\",5) }}|{{ \"abc\"|replace(\"b\",0) }}",
+    "expected": {
+      "ok": true,
+      "output": "a5c|a0c"
+    }
+  },
+  {
+    "name": "strings: replace: replacement null or undefined is stringified",
+    "template": "{{ \"abc\"|replace(\"b\",null) }}|{{ \"abc\"|replace(\"b\",nothing) }}|{{ \"abc\"|replace(\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "anullc|aundefinedc|aundefinedc"
+    }
+  },
+  {
+    "name": "strings: replace: replacement boolean array object",
+    "template": "{{ \"abc\"|replace(\"b\",true) }}|{{ \"abc\"|replace(\"b\",[1,2]) }}|{{ \"abc\"|replace(\"b\",o) }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "atruec|a1,2c|a[object Object]c"
+    }
+  },
+  {
+    "name": "strings: replace: non-string search returns original",
+    "template": "{{ \"abc\"|replace(null,\"x\") }}|{{ \"abc\"|replace(true,\"x\") }}|{{ \"abc\"|replace(nothing,\"x\") }}|{{ \"abc\"|replace([\"b\"],\"x\") }}|{{ \"abc\"|replace(o,\"x\") }}|{{ \"abc\"|replace(false,\"x\") }}",
+    "context": {
+      "o": {
+        "b": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "abc|abc|abc|abc|abc|abc"
+    }
+  },
+  {
+    "name": "strings: replace: no search argument at all",
+    "template": "{{ \"abc\"|replace }}",
+    "expected": {
+      "ok": true,
+      "output": "abc"
+    }
+  },
+  {
+    "name": "strings: replace: non-string input returned as-is (array)",
+    "template": "{{ a|replace(\"a\",\"b\") }}",
+    "context": {
+      "a": [
+        "a"
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "a"
+    }
+  },
+  {
+    "name": "strings: replace: null input returned as-is",
+    "template": "[{{ n|replace(\"a\",\"b\") }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: replace: undefined input",
+    "template": "[{{ u|replace(\"a\",\"b\") }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: replace: undefined input with non-string search",
+    "template": "[{{ u|replace(null,\"b\") }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: replace: true input returned as-is",
+    "template": "[{{ t|replace(\"a\",\"b\") }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[true]"
+    }
+  },
+  {
+    "name": "strings: replace: object input returned as-is",
+    "template": "[{{ o|replace(\"a\",\"b\") }}]",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "[[object Object]]"
+    }
+  },
+  {
+    "name": "strings: replace: overlapping and adjacent matches",
+    "template": "{{ \"aaaa\"|replace(\"aa\",\"b\") }}|{{ \"aaa\"|replace(\"aa\",\"b\") }}|{{ \"abab\"|replace(\"ab\",\"ba\") }}|{{ \"aXbX\"|replace(\"X\",\"XX\") }}",
+    "expected": {
+      "ok": true,
+      "output": "bb|ba|baba|aXXbXX"
+    }
+  },
+  {
+    "name": "strings: replace: replacement text is not scanned again, $ is literal for strings",
+    "template": "{{ \"abc\"|replace(\"b\",\"$&\") }}|{{ \"abc\"|replace(\"b\",\"$1\") }}|{{ \"abc\"|replace(\"b\",\"$$\") }}|{{ \"abc\"|replace(\"b\",\"$`\") }}|{{ \"abc\"|replace(\"b\",\"$'\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a$&c|a$1c|a$$c|a$`c|a$'c"
+    }
+  },
+  {
+    "name": "strings: replace: multi-char tail after last match",
+    "template": "{{ \"abcabcab\"|replace(\"abc\",\"-\") }}|{{ \"xabc\"|replace(\"abc\",\"-\") }}|{{ \"abcx\"|replace(\"abc\",\"-\") }}",
+    "expected": {
+      "ok": true,
+      "output": "--ab|x-|-x"
+    }
+  },
+  {
+    "name": "strings: replace: astral search and replacement",
+    "template": "{{ \"a😀b😀\"|replace(\"😀\",\"x\") }}|{{ \"ab\"|replace(\"b\",\"😀\") }}|{% set h = \"😀\".charAt(0) %}{{ (\"a😀\"|replace(h,\"x\")).length }}|{{ (\"a😀\"|replace(h,\"x\")) == \"ax\" }}",
+    "expected": {
+      "ok": true,
+      "output": "axbx|a😀|3|false"
+    }
+  },
+  {
+    "name": "strings: replace: combining mark search",
+    "template": "{{ \"ée\"|replace(\"e\",\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "x́x"
+    }
+  },
+  {
+    "name": "strings: replace: case sensitive",
+    "template": "{{ \"Abc\"|replace(\"a\",\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "Abc"
+    }
+  },
+  {
+    "name": "strings: replace: macro output SafeString input with string search",
+    "template": "{% macro m() %}<b>x</b>{% endmacro %}{{ m()|replace(\"x\",\"y\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>y</b>"
+    }
+  },
+  {
+    "name": "strings: replace: macro output with empty search keeps safeness",
+    "template": "{% macro m() %}<b>{% endmacro %}{{ m()|replace(\"\",\"-\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "-<-b->-"
+    }
+  },
+  {
+    "name": "strings: replace: SafeString with maxCount 0 returns it unchanged",
+    "template": "{% macro m() %}<b>{% endmacro %}{{ m()|replace(\"b\",\"y\",0) }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>"
+    }
+  },
+  {
+    "name": "strings: replace: SafeString no match",
+    "template": "{% macro m() %}<b>{% endmacro %}{{ m()|replace(\"q\",\"y\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>"
+    }
+  },
+  {
+    "name": "strings: replace: replacement markup in plain string escaped",
+    "template": "{{ \"abc\"|replace(\"b\",\"<i>\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "a&lt;i&gt;c"
+    }
+  },
+  {
+    "name": "strings: replace: autoescape off",
+    "template": "{{ \"abc\"|replace(\"b\",\"<i>\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a<i>c"
+    }
+  },
+  {
+    "name": "strings: replace: safe input",
+    "template": "{{ s|safe|replace(\"b\",\"<i>\") }}",
+    "context": {
+      "s": "abc"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "a<i>c"
+    }
+  },
+  {
+    "name": "strings: replace: regex literal without g replaces first only",
+    "template": "{{ \"aaa\"|replace(r/a/,\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "baa"
+    }
+  },
+  {
+    "name": "strings: replace: regex literal with g replaces all",
+    "template": "{{ \"aaa\"|replace(r/a/g,\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "bbb"
+    }
+  },
+  {
+    "name": "strings: replace: regex $& $1 $$ with g",
+    "template": "{{ \"abc abc\"|replace(r/(b)/g,\"[$&|$1|$$]\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a[b|b|$]c a[b|b|$]c"
+    }
+  },
+  {
+    "name": "strings: replace: regex $` and $' with g",
+    "template": "{{ \"abcd\"|replace(r/(b)/g,\"<$`|$'>\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a<a|cd>cd"
+    }
+  },
+  {
+    "name": "strings: replace: regex $` and $' without g",
+    "template": "{{ \"abcb\"|replace(r/b/,\"<$`|$'>\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a<a|cb>cb"
+    }
+  },
+  {
+    "name": "strings: replace: regex $2 missing group and $0",
+    "template": "{{ \"abc\"|replace(r/(b)/,\"[$2|$0|$01|$10]\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a[$2|$0|b|b0]c"
+    }
+  },
+  {
+    "name": "strings: replace: regex named group $<n>",
+    "template": "{{ \"abc\"|replace(r/(?<x>b)/,\"[$<x>|$<y>]\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a[b|]c"
+    }
+  },
+  {
+    "name": "strings: replace: regex case-insensitive flag",
+    "template": "{{ \"aAa\"|replace(r/a/gi,\"b\") }}|{{ \"aAa\"|replace(r/a/i,\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "bbb|bAa"
+    }
+  },
+  {
+    "name": "strings: replace: regex multiline and anchors",
+    "template": "{{ \"a\na\"|replace(r/^a/gm,\"b\") }}|{{ \"a\na\"|replace(r/^a/g,\"b\") }}|{{ \"a\na\"|replace(r/a$/,\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "b\nb|b\na|a\nb"
+    }
+  },
+  {
+    "name": "strings: replace: regex ignores maxCount",
+    "template": "{{ \"aaa\"|replace(r/a/g,\"b\",1) }}|{{ \"aaa\"|replace(r/a/g,\"b\",0) }}",
+    "expected": {
+      "ok": true,
+      "output": "bbb|bbb"
+    }
+  },
+  {
+    "name": "strings: replace: regex on non-string input throws (number)",
+    "template": "{{ 123|replace(r/2/,\"x\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: replace: regex on SafeString input",
+    "template": "{% macro m() %}<b>{% endmacro %}{{ m()|replace(r/b/,\"x\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;x&gt;"
+    }
+  },
+  {
+    "name": "strings: replace: regex plain string result escaped",
+    "template": "{{ \"abc\"|replace(r/b/,\"<i>\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "a&lt;i&gt;c"
+    }
+  },
+  {
+    "name": "strings: replace: regex match empty string with g",
+    "template": "{{ \"abc\"|replace(r/x*/g,\"-\") }}|{{ \"abc\"|replace(r/(?:)/,\"-\") }}",
+    "expected": {
+      "ok": true,
+      "output": "-a-b-c-|-abc"
+    }
+  },
+  {
+    "name": "strings: replace: regex dot on astral matches code units",
+    "template": "{{ (\"😀\"|replace(r/./g,\"x\")).length }}",
+    "todo": "k53: regex matches code points, not UTF-16 code units",
+    "expected": {
+      "ok": true,
+      "output": "2"
+    }
+  },
+  {
+    "name": "strings: replace: regex u flag is not supported by the expression parser",
+    "template": "{{ (\"😀\"|replace(r/./gu,\"x\")).length }}",
+    "todo": "k52: lexer column counts code points",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path) [Line 1, Column 23]\n  parseSignature: expected comma after expression"
+      }
+    }
+  },
+  {
+    "name": "strings: replace: regex replacement number or null",
+    "template": "{{ \"abc\"|replace(r/b/,5) }}|{{ \"abc\"|replace(r/b/,null) }}|{{ \"abc\"|replace(r/b/,nothing) }}",
+    "expected": {
+      "ok": true,
+      "output": "a5c|anullc|aundefinedc"
+    }
+  },
+  {
+    "name": "strings: replace: regex sticky flag",
+    "template": "{{ \"aab\"|replace(r/a/y,\"x\") }}|{{ \"aab\"|replace(r/b/y,\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "xab|aab"
+    }
+  },
+  {
+    "name": "strings: replace: regex on array input",
+    "template": "{{ a|replace(r/a/,\"x\") }}",
+    "context": {
+      "a": [
+        "a"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: replace: regex on null input throws",
+    "template": "{{ n|replace(r/a/,\"x\") }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'replace')"
+      }
+    }
+  },
+  {
+    "name": "strings: replace: regex on undefined input throws",
+    "template": "{{ u|replace(r/a/,\"x\") }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'replace')"
+      }
+    }
+  },
+  {
+    "name": "strings: replace: kwarg style maxCount is a positional keyword",
+    "template": "{{ \"aaa\"|replace(\"a\",\"b\",maxCount=1) }}",
+    "expected": {
+      "ok": true,
+      "output": "aaa"
+    }
+  },
+  {
+    "name": "strings: replace: kwargs object is an unknown search type",
+    "template": "{{ \"aaa\"|replace(old=\"a\",new_=\"b\") }}",
+    "expected": {
+      "ok": true,
+      "output": "aaa"
+    }
+  },
+  {
+    "name": "strings: striptags: undefined input",
+    "template": "[{{ u|striptags }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: striptags: null input",
+    "template": "[{{ n|striptags }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: striptags: empty string input",
+    "template": "[{{ e|striptags }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: striptags: zero input",
+    "template": "[{{ z|striptags }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: striptags: numeric string input",
+    "template": "[{{ ns|striptags }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: striptags: true input",
+    "template": "[{{ t|striptags }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: striptags: false input",
+    "template": "[{{ fl|striptags }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: striptags: simple tags",
+    "template": "{{ \"<p>Hello <b>World</b></p>\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "Hello World"
+    }
+  },
+  {
+    "name": "strings: striptags: attributes",
+    "template": "{{ '<a href=\"x>y\" class=z>link</a>'|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "y\" class=z>link"
+    }
+  },
+  {
+    "name": "strings: striptags: attribute containing greater-than splits the tag",
+    "template": "{{ '<a title=\"a>b\">t</a>'|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "b\">t"
+    }
+  },
+  {
+    "name": "strings: striptags: comments",
+    "template": "{{ \"a<!-- c -->b<!---->c<!-- a\nb -->d\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "abcd"
+    }
+  },
+  {
+    "name": "strings: striptags: unterminated comment and tag",
+    "template": "{{ \"a<!-- b\"|striptags }}|{{ \"a<b\"|striptags }}|{{ \"a<p\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "a<!-- b|a<b|a<p"
+    }
+  },
+  {
+    "name": "strings: striptags: less-than without a tag",
+    "template": "{{ \"1 < 2 and 3 > 2\"|striptags }}|{{ \"a<3 b\"|striptags }}|{{ \"<>x\"|striptags }}|{{ \"< p>x\"|striptags }}|{{ \"<1a>x\"|striptags }}|{{ \"<-a>x\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "1 < 2 and 3 > 2|a<3 b|<>x|< p>x|<1a>x|<-a>x"
+    }
+  },
+  {
+    "name": "strings: striptags: closing tags, self closing, uppercase, digits in name",
+    "template": "{{ \"<BR/>a<H1>b</H1>c</ p>d</p >e<br />f\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "abc</ p>def"
+    }
+  },
+  {
+    "name": "strings: striptags: word boundary after the tag name",
+    "template": "{{ \"<a-b>x\"|striptags }}|{{ \"<a_b>x\"|striptags }}|{{ \"<ab:c>x\"|striptags }}|{{ \"<a\nb>x\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "x|<a_b>x|x|x"
+    }
+  },
+  {
+    "name": "strings: striptags: whitespace is collapsed and trimmed",
+    "template": "[{{ \"  a   b \t c\n\nd  \"|striptags }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a b c d]"
+    }
+  },
+  {
+    "name": "strings: striptags: whitespace-only and empty after strip",
+    "template": "[{{ \"   \"|striptags }}][{{ \"<b></b>\"|striptags }}][{{ \" <b> </b> \"|striptags }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[][][]"
+    }
+  },
+  {
+    "name": "strings: striptags: NBSP BOM and U+2028 count as JS whitespace",
+    "template": "[{{ \" a  b \"|striptags }}][{{ \"﻿a﻿ b\"|striptags }}][{{ \"a b c\"|striptags }}][{{ \" a b　\"|striptags }}][{{ \"a​b\"|striptags }}][{{ \"a᠎b\"|striptags }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a b][a b][a b c][a b][a​b][a᠎b]"
+    }
+  },
+  {
+    "name": "strings: striptags: CRLF tabs and vertical tab form feed",
+    "template": "[{{ \"a\r\nb\tc\u000bd\fe\"|striptags }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a b c d e]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks keeps LF",
+    "template": "[{{ \"a\nb\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\nb]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks squashes 3+ LF to two",
+    "template": "[{{ \"a\n\nb\n\n\nc\n\n\n\n\nd\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\n\nb\n\nc\n\nd]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks CRLF normalised, then triple squashed",
+    "template": "[{{ \"a\r\nb\r\n\r\n\r\nc\r\n\r\nd\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\nb\n\nc\n\nd]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks lone CR left in place",
+    "template": "[{{ \"a\rb\r\rc\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\rb\r\rc]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks trims spaces at line edges and squashes inner",
+    "template": "[{{ \"  a   b  \n   c  \n\n  d   e  \"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a b\nc\n\nd e]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks tabs are not squashed",
+    "template": "[{{ \"a\t\tb \t c\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\t\tb \t c]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks NBSP not treated as space",
+    "template": "[{{ \"a  b  c\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a  b c]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks outer trim removes edge newlines",
+    "template": "[{{ \"\n\na\n\n\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks with tags",
+    "template": "[{{ \"<p>a</p>\n<p>b</p>\n\n\n<p>c   d</p>\"|striptags(true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\nb\n\nc d]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks falsy kinds",
+    "template": "[{{ \"a\nb\"|striptags(0) }}][{{ \"a\nb\"|striptags(null) }}][{{ \"a\nb\"|striptags(\"\") }}][{{ \"a\nb\"|striptags(false) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a b][a b][a b][a b]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks truthy kinds",
+    "template": "[{{ \"a\nb\"|striptags(1) }}][{{ \"a\nb\"|striptags(\"x\") }}][{{ \"a\nb\"|striptags(\"false\") }}][{{ \"a\nb\"|striptags([]) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\nb][a\nb][a\nb][a\nb]"
+    }
+  },
+  {
+    "name": "strings: striptags: preserveLinebreaks as kwarg",
+    "template": "[{{ \"a\n\n\nb\"|striptags(preserveLinebreaks=true) }}]",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[a\n\nb]"
+    }
+  },
+  {
+    "name": "strings: striptags: entities left alone",
+    "template": "{{ \"&lt;b&gt; &amp; <i>x</i>\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt; &amp; x"
+    }
+  },
+  {
+    "name": "strings: striptags: script and style content stays",
+    "template": "{{ \"<script>var a = 1 < 2;</script>x\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "var a = 1 < 2;x"
+    }
+  },
+  {
+    "name": "strings: striptags: astral and combining",
+    "template": "{{ \"<b>😀</b> é\"|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀 é"
+    }
+  },
+  {
+    "name": "strings: striptags: number input throws",
+    "template": "{{ 5|striptags }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: striptags: array input throws",
+    "template": "{{ a|striptags }}",
+    "context": {
+      "a": [
+        "<b>"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: striptags: true input throws",
+    "template": "{{ true|striptags }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: striptags: macro output safe (autoescape on) after strip",
+    "template": "{% macro m() %}<b>x & y</b>{% endmacro %}{{ m()|striptags }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "x & y"
+    }
+  },
+  {
+    "name": "strings: striptags: plain string result escaped under autoescape",
+    "template": "{{ s|striptags }}",
+    "context": {
+      "s": "<b>x & \"y\"</b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "x &amp; &quot;y&quot;"
+    }
+  },
+  {
+    "name": "strings: striptags: safe input",
+    "template": "{{ s|safe|striptags }}",
+    "context": {
+      "s": "<b>x & y</b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "x & y"
+    }
+  },
+  {
+    "name": "strings: title: undefined input",
+    "template": "[{{ u|title }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: title: null input",
+    "template": "[{{ n|title }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: title: empty string input",
+    "template": "[{{ e|title }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: title: zero input",
+    "template": "[{{ z|title }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: title: numeric string input",
+    "template": "[{{ ns|title }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: title: true input",
+    "template": "[{{ t|title }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: title: false input",
+    "template": "[{{ fl|title }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: title: words",
+    "template": "{{ \"hello wORLD foo\"|title }}",
+    "expected": {
+      "ok": true,
+      "output": "Hello World Foo"
+    }
+  },
+  {
+    "name": "strings: title: multiple, leading and trailing spaces",
+    "template": "[{{ \"a  b\"|title }}][{{ \" a b \"|title }}][{{ \"   \"|title }}]",
+    "expected": {
+      "ok": true,
+      "output": "[A  B][ A B ][   ]"
+    }
+  },
+  {
+    "name": "strings: title: only the space character separates words",
+    "template": "{{ \"a\tb\nc d-e_f\"|title }}|{{ \"a-b o'neil\"|title }}|{{ \"x y\"|title }}",
+    "expected": {
+      "ok": true,
+      "output": "A\tb\nc d-e_f|A-b O&#39;neil|X y"
+    }
+  },
+  {
+    "name": "strings: title: non-ASCII letters",
+    "template": "{{ \"élan vital\"|title }}|{{ \"ÉLAN VITAL\"|title }}|{{ \"ßa ǆb\"|title }}|{{ \"ΑΣ ΟΔΟΣ\"|title }}|{{ \"ΟΔΟΣ\"|title }}",
+    "expected": {
+      "ok": true,
+      "output": "Élan Vital|Élan Vital|SSa Ǆb|Ας Οδος|Οδος"
+    }
+  },
+  {
+    "name": "strings: title: Turkish dotted capital I and ligature",
+    "template": "{{ \"İstanbul ıi\"|title }}|{{ \"ﬁx ﬂy\"|title }}",
+    "expected": {
+      "ok": true,
+      "output": "İstanbul Ii|FIx FLy"
+    }
+  },
+  {
+    "name": "strings: title: astral and combining",
+    "template": "{{ \"😀a b\"|title }}|{{ \"𐐨x 𐐨y\"|title }}|{{ \"éa é\"|title }}",
+    "expected": {
+      "ok": true,
+      "output": "😀a B|𐐨x 𐐨y|Éa É"
+    }
+  },
+  {
+    "name": "strings: title: digits and punctuation lead",
+    "template": "{{ \"1abc 2DEF .xyz\"|title }}",
+    "expected": {
+      "ok": true,
+      "output": "1abc 2def .xyz"
+    }
+  },
+  {
+    "name": "strings: title: number input throws",
+    "template": "{{ 5|title }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: title: array input throws",
+    "template": "{{ a|title }}",
+    "context": {
+      "a": [
+        "a"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: title: true input throws",
+    "template": "{{ true|title }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.split is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: title: macro output safe",
+    "template": "{% macro m() %}<b> x</b>{% endmacro %}{{ m()|title }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b> X</b>"
+    }
+  },
+  {
+    "name": "strings: title: plain string escaped",
+    "template": "{{ s|title }}",
+    "context": {
+      "s": "<b> x</b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt; X&lt;/b&gt;"
+    }
+  },
+  {
+    "name": "strings: title: autoescape off",
+    "template": "{{ s|title }}",
+    "context": {
+      "s": "<b> x</b>"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b> X</b>"
+    }
+  },
+  {
+    "name": "strings: title: safe input",
+    "template": "{{ s|safe|title }}",
+    "context": {
+      "s": "<b> x</b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b> X</b>"
+    }
+  },
+  {
+    "name": "strings: title: empty input and split edge",
+    "template": "[{{ \"\"|title }}][{{ \" \"|title }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][ ]"
+    }
+  },
+  {
+    "name": "strings: trim: undefined input throws",
+    "template": "{{ u|trim }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'replace')"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: null input throws",
+    "template": "{{ n|trim }}",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of null (reading 'replace')"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: empty string",
+    "template": "[{{ \"\"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: trim: numeric string",
+    "template": "[{{ ns|trim }}]",
+    "context": {
+      "ns": " 42 "
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: trim: number input throws",
+    "template": "{{ 42|trim }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: zero input throws",
+    "template": "{{ z|trim }}",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: booleans throw",
+    "template": "{{ t|trim }}",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: false input throws",
+    "template": "{{ fl|trim }}",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: array input throws",
+    "template": "{{ a|trim }}",
+    "context": {
+      "a": [
+        " a "
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: object input throws",
+    "template": "{{ o|trim }}",
+    "context": {
+      "o": {}
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.replace is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: trim: spaces tabs newlines",
+    "template": "[{{ \"  a b  \"|trim }}][{{ \"\t\na\r\n\"|trim }}][{{ \"   \"|trim }}][{{ \"a\"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[a b][a][][a]"
+    }
+  },
+  {
+    "name": "strings: trim: NBSP BOM and line separators are JS whitespace",
+    "template": "[{{ \" a \"|trim }}][{{ \"﻿a﻿\"|trim }}][{{ \" a \"|trim }}][{{ \" a　\"|trim }}][{{ \" a  \"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[a][a][a][a][a]"
+    }
+  },
+  {
+    "name": "strings: trim: characters that are not JS whitespace",
+    "template": "[{{ \"​a​\"|trim }}][{{ \"᠎a᠎\"|trim }}][{{ \"a\"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[​a​][᠎a᠎][a]"
+    }
+  },
+  {
+    "name": "strings: trim: vertical tab and form feed",
+    "template": "[{{ \"\u000ba\f\"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[a]"
+    }
+  },
+  {
+    "name": "strings: trim: inner whitespace untouched",
+    "template": "[{{ \" a \n b \"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[a \n b]"
+    }
+  },
+  {
+    "name": "strings: trim: astral and combining at edges",
+    "template": "[{{ \" 😀 \"|trim }}][{{ \" é \"|trim }}]",
+    "expected": {
+      "ok": true,
+      "output": "[😀][é]"
+    }
+  },
+  {
+    "name": "strings: trim: macro output keeps safeness",
+    "template": "{% macro m() %}  <b>  {% endmacro %}[{{ m()|trim }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[<b>]"
+    }
+  },
+  {
+    "name": "strings: trim: plain string escaped",
+    "template": "[{{ s|trim }}]",
+    "context": {
+      "s": "  <b>  "
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[&lt;b&gt;]"
+    }
+  },
+  {
+    "name": "strings: trim: autoescape off",
+    "template": "[{{ s|trim }}]",
+    "context": {
+      "s": "  <b>  "
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[<b>]"
+    }
+  },
+  {
+    "name": "strings: trim: safe input",
+    "template": "[{{ s|safe|trim }}]",
+    "context": {
+      "s": "  <b>  "
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[<b>]"
+    }
+  },
+  {
+    "name": "strings: trim: macro with undefined filter input throws before copySafeness",
+    "template": "{% macro m() %}x{% endmacro %}{{ u|trim }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: Cannot read properties of undefined (reading 'replace')"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: undefined input",
+    "template": "[{{ u|truncate(3) }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: truncate: null input",
+    "template": "[{{ n|truncate(3) }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: truncate: empty string input",
+    "template": "[{{ e|truncate(3) }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: truncate: zero input",
+    "template": "[{{ z|truncate(3) }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.lastIndexOf is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: numeric string input",
+    "template": "[{{ ns|truncate(3) }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: truncate: true input",
+    "template": "[{{ t|truncate(3) }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.lastIndexOf is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: false input",
+    "template": "[{{ fl|truncate(3) }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: truncate: default length 255 not reached",
+    "template": "{{ \"short\"|truncate }}",
+    "expected": {
+      "ok": true,
+      "output": "short"
+    }
+  },
+  {
+    "name": "strings: truncate: default length 255 reached",
+    "template": "{{ s|truncate }}",
+    "context": {
+      "s": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word "
+    },
+    "expected": {
+      "ok": true,
+      "output": "word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word word..."
+    }
+  },
+  {
+    "name": "strings: truncate: default length with killwords",
+    "template": "{{ s|truncate(0,true) }}",
+    "context": {
+      "s": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    },
+    "expected": {
+      "ok": true,
+      "output": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx..."
+    }
+  },
+  {
+    "name": "strings: truncate: exactly length and one over",
+    "template": "[{{ \"abcde\"|truncate(5) }}][{{ \"abcdef\"|truncate(5) }}][{{ \"abcdef\"|truncate(6) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[abcde][abcde...][abcdef]"
+    }
+  },
+  {
+    "name": "strings: truncate: killwords true",
+    "template": "{{ \"The quick brown fox\"|truncate(10,true) }}|{{ \"The quick brown fox\"|truncate(10,true,\"!\") }}",
+    "expected": {
+      "ok": true,
+      "output": "The quick ...|The quick !"
+    }
+  },
+  {
+    "name": "strings: truncate: killwords false cuts at last space",
+    "template": "{{ \"The quick brown fox\"|truncate(10) }}|{{ \"The quick brown fox\"|truncate(10,false) }}|{{ \"The quick brown fox\"|truncate(11) }}|{{ \"The quick brown fox\"|truncate(9) }}",
+    "expected": {
+      "ok": true,
+      "output": "The quick...|The quick...|The quick...|The quick..."
+    }
+  },
+  {
+    "name": "strings: truncate: no space inside falls back to length",
+    "template": "{{ \"Thequickbrownfox\"|truncate(6) }}|{{ \"Thequickbrownfox\"|truncate(6,false,\"\") }}",
+    "expected": {
+      "ok": true,
+      "output": "Thequi...|Thequi"
+    }
+  },
+  {
+    "name": "strings: truncate: lastIndexOf includes position length (space right after cut)",
+    "template": "{{ \"abcd efgh\"|truncate(4) }}|{{ \"abcd efgh\"|truncate(5) }}|{{ \"abc defgh\"|truncate(4) }}",
+    "expected": {
+      "ok": true,
+      "output": "abcd...|abcd...|abc..."
+    }
+  },
+  {
+    "name": "strings: truncate: leading space gives empty prefix",
+    "template": "[{{ \" abcdefgh\"|truncate(5) }}][{{ \" abcdefgh\"|truncate(0) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[...][ abcdefgh]"
+    }
+  },
+  {
+    "name": "strings: truncate: custom end",
+    "template": "{{ \"abcdefghij\"|truncate(5,true,\"~\") }}|{{ \"abcdefghij\"|truncate(5,true,\"\") }}|{{ \"abc def ghi\"|truncate(5,false,\"[more]\") }}",
+    "expected": {
+      "ok": true,
+      "output": "abcde~|abcde|abc[more]"
+    }
+  },
+  {
+    "name": "strings: truncate: end null and undefined fall back to dots",
+    "template": "{{ \"abcdefghij\"|truncate(5,true,null) }}|{{ \"abcdefghij\"|truncate(5,true,nothing) }}",
+    "expected": {
+      "ok": true,
+      "output": "abcde...|abcde..."
+    }
+  },
+  {
+    "name": "strings: truncate: end false, zero, number and booleans are used as-is",
+    "template": "{{ \"abcdefghij\"|truncate(5,true,false) }}|{{ \"abcdefghij\"|truncate(5,true,0) }}|{{ \"abcdefghij\"|truncate(5,true,9) }}|{{ \"abcdefghij\"|truncate(5,true,true) }}",
+    "expected": {
+      "ok": true,
+      "output": "abcdefalse|abcde0|abcde9|abcdetrue"
+    }
+  },
+  {
+    "name": "strings: truncate: end array and object",
+    "template": "{{ \"abcdefghij\"|truncate(5,true,[1,2]) }}|{{ \"abcdefghij\"|truncate(5,true,o) }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": true,
+      "output": "abcde1,2|abcde[object Object]"
+    }
+  },
+  {
+    "name": "strings: truncate: length shorter than end",
+    "template": "{{ \"abcdefghij\"|truncate(2,true,\"......\") }}|{{ \"abcdefghij\"|truncate(1) }}",
+    "expected": {
+      "ok": true,
+      "output": "ab......|a..."
+    }
+  },
+  {
+    "name": "strings: truncate: length 0 means 255",
+    "template": "{{ \"abcdefghij\"|truncate(0) }}",
+    "expected": {
+      "ok": true,
+      "output": "abcdefghij"
+    }
+  },
+  {
+    "name": "strings: truncate: length null false undefined mean 255",
+    "template": "{{ \"abcdefghij\"|truncate(null) }}|{{ \"abcdefghij\"|truncate(false) }}|{{ \"abcdefghij\"|truncate(nothing) }}",
+    "expected": {
+      "ok": true,
+      "output": "abcdefghij|abcdefghij|abcdefghij"
+    }
+  },
+  {
+    "name": "strings: truncate: negative length",
+    "template": "{{ \"abcdefghij\"|truncate(-1) }}|{{ \"abcdefghij\"|truncate(-1,true) }}|{{ \"abc def\"|truncate(-3) }}",
+    "expected": {
+      "ok": true,
+      "output": "...|...|..."
+    }
+  },
+  {
+    "name": "strings: truncate: NaN length",
+    "template": "{{ \"abc\"|truncate(0/0) }}|{{ \"abc\"|truncate(\"x\") }}",
+    "expected": {
+      "ok": true,
+      "output": "abc|..."
+    }
+  },
+  {
+    "name": "strings: truncate: string length",
+    "template": "{{ \"abcdefghij\"|truncate(\"5\",true) }}|{{ \"abcdefghij\"|truncate(\"5\") }}",
+    "expected": {
+      "ok": true,
+      "output": "abcde...|abcde..."
+    }
+  },
+  {
+    "name": "strings: truncate: fractional length",
+    "template": "{{ \"abcdefghij\"|truncate(5.7,true) }}|{{ \"abcdefghij\"|truncate(5.2) }}|{{ \"abc def ghi\"|truncate(5.9) }}",
+    "expected": {
+      "ok": true,
+      "output": "abcde...|abcde...|abc..."
+    }
+  },
+  {
+    "name": "strings: truncate: huge length",
+    "template": "{{ \"abc\"|truncate(1/0) }}",
+    "expected": {
+      "ok": true,
+      "output": "abc"
+    }
+  },
+  {
+    "name": "strings: truncate: killwords falsy kinds",
+    "template": "{{ \"abc def\"|truncate(5,0) }}|{{ \"abc def\"|truncate(5,\"\") }}|{{ \"abc def\"|truncate(5,null) }}",
+    "expected": {
+      "ok": true,
+      "output": "abc...|abc...|abc..."
+    }
+  },
+  {
+    "name": "strings: truncate: killwords truthy kinds",
+    "template": "{{ \"abc def\"|truncate(5,1) }}|{{ \"abc def\"|truncate(5,\"x\") }}|{{ \"abc def\"|truncate(5,\"false\") }}",
+    "expected": {
+      "ok": true,
+      "output": "abc d...|abc d...|abc d..."
+    }
+  },
+  {
+    "name": "strings: truncate: kwargs",
+    "template": "{{ \"abcdefghij\"|truncate(length=5,killwords=true,end=\"!\") }}",
+    "expected": {
+      "ok": true,
+      "output": "..."
+    }
+  },
+  {
+    "name": "strings: truncate: kwarg end only",
+    "template": "{{ \"abcdefghij\"|truncate(5,end=\"!\") }}",
+    "expected": {
+      "ok": true,
+      "output": "abcde..."
+    }
+  },
+  {
+    "name": "strings: truncate: cut inside astral character kills the pair (observed by length)",
+    "template": "{{ (\"a😀b\"|truncate(2,true,\"\")).length }}|{{ (\"a😀b\"|truncate(2,true,\"\")) == \"a\" }}|{{ (\"a😀b\"|truncate(3,true,\"\")) == \"a😀\" }}|{{ (\"😀😀\"|truncate(1,true,\"\")).length }}|{{ (\"😀😀\"|truncate(1,true,\"\")) == \"😀\" }}",
+    "expected": {
+      "ok": true,
+      "output": "2|false|true|1|false"
+    }
+  },
+  {
+    "name": "strings: truncate: word boundary inside astral run",
+    "template": "{{ (\"😀 😀😀 x\"|truncate(4)).length }}|{{ (\"😀 😀😀 x\"|truncate(4)) }}|{{ (\"😀😀😀 x\"|truncate(3)).length }}|{{ (\"😀😀😀 x\"|truncate(3)) == \"😀😀😀 x\" }}|{{ (\"😀😀😀😀\"|truncate(3)).length }}",
+    "expected": {
+      "ok": true,
+      "output": "5|😀...|6|false|6"
+    }
+  },
+  {
+    "name": "strings: truncate: astral lengths are code units",
+    "template": "{{ \"😀😀\"|truncate(4) }}|{{ (\"😀😀\"|truncate(3)).length }}|{{ (\"😀😀😀\"|truncate(5,true,\"\")).length }}",
+    "expected": {
+      "ok": true,
+      "output": "😀😀|6|5"
+    }
+  },
+  {
+    "name": "strings: truncate: combining mark cut",
+    "template": "{{ (\"éé\"|truncate(2,true,\"\")).length }}|{{ \"éé\"|truncate(1,true,\"\") }}",
+    "expected": {
+      "ok": true,
+      "output": "2|e"
+    }
+  },
+  {
+    "name": "strings: truncate: space only separator, tab and newline do not count",
+    "template": "{{ \"ab\tcd ef\"|truncate(5) }}|{{ \"ab\ncd\nef\"|truncate(5) }}|{{ \"ab cd ef\"|truncate(5) }}",
+    "expected": {
+      "ok": true,
+      "output": "ab\tcd...|ab\ncd...|ab cd..."
+    }
+  },
+  {
+    "name": "strings: truncate: numeric string input",
+    "template": "{{ ns|truncate(1) }}|{{ ns|truncate(3) }}",
+    "context": {
+      "ns": "12345"
+    },
+    "expected": {
+      "ok": true,
+      "output": "1...|123..."
+    }
+  },
+  {
+    "name": "strings: truncate: number input throws no length compare",
+    "template": "{{ 12345|truncate(2) }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.lastIndexOf is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: number input shorter than... undefined length passes through",
+    "template": "{{ 12345|truncate(2,true) }}|{{ 5|truncate }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.substring is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: array input (length and substring)",
+    "template": "{{ a|truncate(2) }}",
+    "context": {
+      "a": [
+        "a",
+        "b",
+        "c"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.substring is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: array input within length returned as array",
+    "template": "{{ a|truncate(5) }}",
+    "context": {
+      "a": [
+        "a",
+        "b"
+      ]
+    },
+    "expected": {
+      "ok": true,
+      "output": "a,b"
+    }
+  },
+  {
+    "name": "strings: truncate: object input has no length so passes through",
+    "template": "{{ o|truncate(1) }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.lastIndexOf is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: true input passes through",
+    "template": "{{ t|truncate(1) }}",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: input.lastIndexOf is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: truncate: within length returns input without copySafeness on macro",
+    "template": "{% macro m() %}<b>{% endmacro %}{{ m()|truncate(10) }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>"
+    }
+  },
+  {
+    "name": "strings: truncate: macro output truncated stays safe",
+    "template": "{% macro m() %}<b>text here</b>{% endmacro %}{{ m()|truncate(7,true) }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>text..."
+    }
+  },
+  {
+    "name": "strings: truncate: macro output end markup is not escaped when safe",
+    "template": "{% macro m() %}<b>text here</b>{% endmacro %}{{ m()|truncate(7,true,\"<i>\") }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>text<i>"
+    }
+  },
+  {
+    "name": "strings: truncate: plain string escaped incl. end",
+    "template": "{{ s|truncate(5,true,\"<i>\") }}",
+    "context": {
+      "s": "<b>text here</b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;te&lt;i&gt;"
+    }
+  },
+  {
+    "name": "strings: truncate: plain string within length under autoescape",
+    "template": "{{ s|truncate(50) }}",
+    "context": {
+      "s": "<b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;"
+    }
+  },
+  {
+    "name": "strings: truncate: autoescape off",
+    "template": "{{ s|truncate(5,true,\"<i>\") }}",
+    "context": {
+      "s": "<b>text here</b>"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>te<i>"
+    }
+  },
+  {
+    "name": "strings: truncate: safe input",
+    "template": "{{ s|safe|truncate(5,true) }}",
+    "context": {
+      "s": "<b>text here</b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "<b>te..."
+    }
+  },
+  {
+    "name": "strings: truncate: empty input",
+    "template": "[{{ \"\"|truncate(0) }}][{{ \"\"|truncate(3) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][]"
+    }
+  },
+  {
+    "name": "strings: upper: undefined input",
+    "template": "[{{ u|upper }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: upper: null input",
+    "template": "[{{ n|upper }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: upper: empty string input",
+    "template": "[{{ e|upper }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: upper: zero input",
+    "template": "[{{ z|upper }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: upper: numeric string input",
+    "template": "[{{ ns|upper }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[42]"
+    }
+  },
+  {
+    "name": "strings: upper: true input",
+    "template": "[{{ t|upper }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: upper: false input",
+    "template": "[{{ fl|upper }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: upper: ascii mixed",
+    "template": "{{ \"HeLLo world 123\"|upper }}",
+    "expected": {
+      "ok": true,
+      "output": "HELLO WORLD 123"
+    }
+  },
+  {
+    "name": "strings: upper: sharp s expands",
+    "template": "{{ \"ß\"|upper }}|{{ (\"ß\"|upper).length }}|{{ \"straße\"|upper }}|{{ \"ẞ\"|upper }}",
+    "expected": {
+      "ok": true,
+      "output": "SS|2|STRASSE|ẞ"
+    }
+  },
+  {
+    "name": "strings: upper: special case mappings",
+    "template": "{{ \"ﬁ\"|upper }}|{{ \"ŉ\"|upper }}|{{ \"ǰ\"|upper }}|{{ \"ΐ\"|upper }}|{{ \"ﬃ\"|upper }}",
+    "expected": {
+      "ok": true,
+      "output": "FI|ʼN|J̌|Ϊ́|FFI"
+    }
+  },
+  {
+    "name": "strings: upper: Turkish dotless i and dotted",
+    "template": "{{ \"ı\"|upper }}|{{ \"i\"|upper }}|{{ \"İ\"|upper }}|{{ \"i̇\"|upper }}",
+    "expected": {
+      "ok": true,
+      "output": "I|I|İ|İ"
+    }
+  },
+  {
+    "name": "strings: upper: Greek final sigma",
+    "template": "{{ \"ας οδος\"|upper }}|{{ \"σ\"|upper }}",
+    "expected": {
+      "ok": true,
+      "output": "ΑΣ ΟΔΟΣ|Σ"
+    }
+  },
+  {
+    "name": "strings: upper: non-ASCII, astral, combining",
+    "template": "{{ \"àéîõü\"|upper }}|{{ \"𐐨\"|upper }}|{{ \"😀a\"|upper }}|{{ \"é\"|upper }}|{{ \"ǆ\"|upper }}|{{ \"ǅ\"|upper }}",
+    "expected": {
+      "ok": true,
+      "output": "ÀÉÎÕÜ|𐐀|😀A|É|Ǆ|Ǆ"
+    }
+  },
+  {
+    "name": "strings: upper: number input throws",
+    "template": "{{ 5|upper }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: upper: array input throws",
+    "template": "{{ a|upper }}",
+    "context": {
+      "a": [
+        "a"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: upper: object input throws",
+    "template": "{{ o|upper }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: upper: true input throws",
+    "template": "{{ true|upper }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.toUpperCase is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: upper: macro output is not safe afterwards",
+    "template": "{% macro m() %}<b>{% endmacro %}{{ m()|upper }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;B&gt;"
+    }
+  },
+  {
+    "name": "strings: upper: plain string escaped",
+    "template": "{{ s|upper }}",
+    "context": {
+      "s": "<b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;B&gt;"
+    }
+  },
+  {
+    "name": "strings: upper: autoescape off",
+    "template": "{{ s|upper }}",
+    "context": {
+      "s": "<b>"
+    },
+    "opts": {
+      "autoescape": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "<B>"
+    }
+  },
+  {
+    "name": "strings: upper: safe input",
+    "template": "{{ s|safe|upper }}",
+    "context": {
+      "s": "<b>"
+    },
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;B&gt;"
+    }
+  },
+  {
+    "name": "strings: wordcount: undefined input",
+    "template": "[{{ u|wordcount }}]",
+    "context": {},
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: null input",
+    "template": "[{{ n|wordcount }}]",
+    "context": {
+      "n": null
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: empty string input",
+    "template": "[{{ e|wordcount }}]",
+    "context": {
+      "e": ""
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: zero input",
+    "template": "[{{ z|wordcount }}]",
+    "context": {
+      "z": 0
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: numeric string input",
+    "template": "[{{ ns|wordcount }}]",
+    "context": {
+      "ns": "42"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[1]"
+    }
+  },
+  {
+    "name": "strings: wordcount: true input",
+    "template": "[{{ t|wordcount }}]",
+    "context": {
+      "t": true
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.match is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: wordcount: false input",
+    "template": "[{{ fl|wordcount }}]",
+    "context": {
+      "fl": false
+    },
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: words",
+    "template": "{{ \"hello world\"|wordcount }}|{{ \"one\"|wordcount }}|{{ \"  a  b  \"|wordcount }}|{{ \"a\nb\tc\"|wordcount }}",
+    "expected": {
+      "ok": true,
+      "output": "2|1|2|3"
+    }
+  },
+  {
+    "name": "strings: wordcount: no word gives null which renders empty",
+    "template": "[{{ \"\"|wordcount }}][{{ \"   \"|wordcount }}][{{ \"!!! ???\"|wordcount }}]",
+    "expected": {
+      "ok": true,
+      "output": "[][][]"
+    }
+  },
+  {
+    "name": "strings: wordcount: punctuation splits words",
+    "template": "{{ \"don't stop\"|wordcount }}|{{ \"a-b-c\"|wordcount }}|{{ \"a.b,c;d\"|wordcount }}|{{ \"a/b\"|wordcount }}",
+    "expected": {
+      "ok": true,
+      "output": "3|3|4|2"
+    }
+  },
+  {
+    "name": "strings: wordcount: digits and underscores",
+    "template": "{{ \"123 456\"|wordcount }}|{{ \"a_b c1 _\"|wordcount }}|{{ \"__\"|wordcount }}|{{ \"1.5\"|wordcount }}|{{ \"007\"|wordcount }}",
+    "expected": {
+      "ok": true,
+      "output": "2|3|1|2|1"
+    }
+  },
+  {
+    "name": "strings: wordcount: non-ASCII letters are not word characters",
+    "template": "{{ \"héllo\"|wordcount }}|{{ \"über\"|wordcount }}|{{ \"日本語\"|wordcount }}|{{ \"ß\"|wordcount }}|{{ \"Σ ΑΣ\"|wordcount }}|{{ \"я\"|wordcount }}|[{{ \"é\"|wordcount }}]",
+    "expected": {
+      "ok": true,
+      "output": "2|1|||||[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: astral and combining",
+    "template": "{{ \"😀 a 😀\"|wordcount }}|{{ \"é\"|wordcount }}|{{ \"a😀b\"|wordcount }}",
+    "expected": {
+      "ok": true,
+      "output": "1|1|2"
+    }
+  },
+  {
+    "name": "strings: wordcount: HTML-ish text",
+    "template": "{{ \"<b>hi there</b>\"|wordcount }}",
+    "expected": {
+      "ok": true,
+      "output": "4"
+    }
+  },
+  {
+    "name": "strings: wordcount: number input throws (truthy, no match)",
+    "template": "{{ 12|wordcount }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.match is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: wordcount: zero is falsy and gives empty",
+    "template": "[{{ 0|wordcount }}]",
+    "expected": {
+      "ok": true,
+      "output": "[]"
+    }
+  },
+  {
+    "name": "strings: wordcount: array input throws",
+    "template": "{{ a|wordcount }}",
+    "context": {
+      "a": [
+        "a b"
+      ]
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.match is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: wordcount: object input throws",
+    "template": "{{ o|wordcount }}",
+    "context": {
+      "o": {
+        "a": 1
+      }
+    },
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.match is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: wordcount: true input throws",
+    "template": "{{ true|wordcount }}",
+    "expected": {
+      "ok": false,
+      "error": {
+        "name": "Template render error",
+        "message": "(unknown path)\n  TypeError: str.match is not a function"
+      }
+    }
+  },
+  {
+    "name": "strings: wordcount: macro output counts",
+    "template": "{% macro m() %}one two {{ \"three\" }}{% endmacro %}{{ m()|wordcount }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "3"
+    }
+  },
+  {
+    "name": "strings: wordcount: macro output SafeString match",
+    "template": "{% macro m() %}one two{% endmacro %}{{ m()|wordcount }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "2"
+    }
+  },
+  {
+    "name": "strings: wordcount: used in arithmetic and comparison",
+    "template": "{{ (\"a b c\"|wordcount) + 1 }}|{{ (\"a b c\"|wordcount) == 3 }}|{{ (\"!\"|wordcount) == null }}",
+    "expected": {
+      "ok": true,
+      "output": "4|true|true"
+    }
+  },
+  {
+    "name": "strings: wordcount: null result in if",
+    "template": "{% if \"\"|wordcount %}yes{% else %}no{% endif %}",
+    "expected": {
+      "ok": true,
+      "output": "no"
+    }
+  },
+  {
+    "name": "strings: wordcount: result is a number not escaped",
+    "template": "{{ \"a b\"|wordcount }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "2"
+    }
+  },
+  {
+    "name": "strings: wordcount: large string",
+    "template": "{{ s|wordcount }}",
+    "context": {
+      "s": "w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w w "
+    },
+    "expected": {
+      "ok": true,
+      "output": "1000"
+    }
+  },
+  {
+    "name": "strings: chain: trim then title then center",
+    "template": "[{{ \"  hello wORLD  \"|trim|title|center(15) }}]",
+    "expected": {
+      "ok": true,
+      "output": "[  Hello World  ]"
+    }
+  },
+  {
+    "name": "strings: chain: lower capitalize truncate",
+    "template": "{{ \"HELLO WORLD FOO\"|lower|capitalize|truncate(11) }}",
+    "expected": {
+      "ok": true,
+      "output": "Hello world..."
+    }
+  },
+  {
+    "name": "strings: chain: striptags wordcount truncate",
+    "template": "{{ \"<p>a b c</p>\"|striptags|wordcount }}|{{ \"<p>abc def</p>\"|striptags|truncate(4,true) }}",
+    "expected": {
+      "ok": true,
+      "output": "3|abc ..."
+    }
+  },
+  {
+    "name": "strings: chain: macro safeness survives capitalize then trim but not lower",
+    "template": "{% macro m() %}  <B>x</B>  {% endmacro %}[{{ m()|trim|capitalize }}][{{ m()|trim|lower|capitalize }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[<b>x</b>][&lt;b&gt;x&lt;/b&gt;]"
+    }
+  },
+  {
+    "name": "strings: chain: indent then nl2br on macro output",
+    "template": "{% macro m() %}<a>\n<b>{% endmacro %}{{ m()|indent(2,true)|nl2br }}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "  <a><br />\n  <b>"
+    }
+  },
+  {
+    "name": "strings: filter: for loop over filter results",
+    "template": "{% for w in \"b a\"|upper|replace(\" \",\",\")|replace(\",\",\"\") %}{{ w }}.{% endfor %}",
+    "expected": {
+      "ok": true,
+      "output": "B.A."
+    }
+  },
+  {
+    "name": "strings: filter: set block with filter",
+    "template": "{% set x %}<b> hi{% endset %}[{{ x|trim|upper }}][{{ x|trim }}]",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "[&lt;B&gt; HI][&lt;b&gt; hi]"
+    }
+  },
+  {
+    "name": "strings: filter: filter block",
+    "template": "{% filter upper %}<b> hi{% endfilter %}|{% filter replace(\"h\",\"j\") %}<b> hi{% endfilter %}|{% filter trim %}  x  {% endfilter %}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;B&gt; HI|&lt;b&gt; ji|x"
+    }
+  },
+  {
+    "name": "strings: filter: filter block with truncate and args",
+    "template": "{% filter truncate(4,true,\"!\") %}abcdefgh{% endfilter %}|{% filter center(7) %}ab{% endfilter %}|{% filter title %}a b{% endfilter %}",
+    "expected": {
+      "ok": true,
+      "output": "abcd!|  ab   |A B"
+    }
+  },
+  {
+    "name": "strings: filter: filter block output is safe (macro-like)",
+    "template": "{% filter capitalize %}<b>X</b>{% endfilter %}",
+    "context": {},
+    "opts": {
+      "autoescape": true
+    },
+    "expected": {
+      "ok": true,
+      "output": "&lt;b&gt;x&lt;/b&gt;"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-macro",
+    "template": "{% macro m(x, p, s) %}[{{x}}@{{p}}/{{s}}]{% endmacro %}{{ 'abcb'|replace(r/b/g, m) }}",
+    "expected": {
+      "ok": true,
+      "output": "a[b@1/abcb]c[b@3/abcb]"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-macro-caps",
+    "template": "{% macro m(x, c1, c2, p) %}[{{x}}|{{c1}}|{{c2 is undefined}}|{{p}}]{% endmacro %}{{ 'xaby'|replace(r/(a)(z)?b/, m) }}",
+    "expected": {
+      "ok": true,
+      "output": "x[ab|a|true|1]y"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-macro-named",
+    "template": "{% macro m(x, c1, p, s, g) %}[{{ g.n }}|{{ p }}]{% endmacro %}{{ 'xab'|replace(r/(?<n>a)b/, m) }}",
+    "expected": {
+      "ok": true,
+      "output": "x[a|1]"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-named",
+    "template": "{{ 'xab'|replace(r/(?<n>a)(?<o>z)?b/, '[$<n>|$<o>|$<p>|$1]') }}",
+    "expected": {
+      "ok": true,
+      "output": "x[a|||a]"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-regex-safe-in",
+    "template": "{{ ('<a>b'|safe)|replace(r/b/, '<i>') }}",
+    "expected": {
+      "ok": true,
+      "output": "&lt;a&gt;&lt;i&gt;"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-regex-i",
+    "template": "{{ 'AbA'|replace(r/a/gi, '-') }}|{{ 'ǅ'|replace(r/ǆ/i, '-') }}",
+    "expected": {
+      "ok": true,
+      "output": "-b-|-"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-regex-m",
+    "template": "{{ 'a\nb'|replace(r/^b/m, '-') }}|{{ 'a\rb'|replace(r/^b/m, '-') }}",
+    "todo": "k66: make_regex line terminators",
+    "expected": {
+      "ok": true,
+      "output": "a\n-|a\r-"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-dollar-end",
+    "template": "{{ 'abc'|replace(r/b/, '$') }}|{{ 'abc'|replace(r/b/, 'x$') }}|{{ 'abc'|replace(r/(b)/, '$1$') }}|{{ 'abc'|replace(r/(b)/, '$10') }}|{{ 'abc'|replace(r/(b)/, '$01') }}",
+    "expected": {
+      "ok": true,
+      "output": "a$c|ax$c|ab$c|ab0c|abc"
+    }
+  },
+  {
+    "name": "strings: replace: probe striptags-kw",
+    "template": "[{{ '<p>a  b</p>\n\n\n<p> c </p>'|striptags(preserve_linebreaks=true) }}]|[{{ '<P class=\"x\">A</P><!-- c\nd -->B<br/>'|striptags }}]",
+    "expected": {
+      "ok": true,
+      "output": "[a b\n\nc]|[AB]"
+    }
+  },
+  {
+    "name": "strings: striptags: probe striptags-lone",
+    "template": "{{ (s[0] ~ '<b>' ~ s[1]) | striptags == s }}|{{ ((s[0] ~ '<b>' ~ s[1]) | striptags).length }}",
+    "context": {
+      "s": "😀"
+    },
+    "expected": {
+      "ok": true,
+      "output": "true|2"
+    }
+  },
+  {
+    "name": "strings: trim: probe trim-ws",
+    "template": "[{{ s | trim }}]",
+    "context": {
+      "s": "  ﻿ x y　​"
+    },
+    "expected": {
+      "ok": true,
+      "output": "[  ﻿ x y　​]"
+    }
+  },
+  {
+    "name": "strings: replace: probe repl-fn-pos",
+    "template": "{{ s | replace(r/b/g, '[$`]') }}",
+    "context": {
+      "s": "😀ab😀b"
+    },
+    "expected": {
+      "ok": true,
+      "output": "😀a[😀a]😀[😀ab😀]"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-pat",
+    "template": "{{ 'abc'|replace(r/b/, '[$&]') }}|{{ 'abc'|replace(r/b/, '$$') }}|{{ 'abc'|replace(r/b/, '[$`]') }}|{{ 'abc'|replace(r/b/, \"[$']\") }}|{{ 'abc'|replace(r/(b)/, '[$1$2$0$01$10]') }}|{{ 'abc'|replace(r/(?<n>b)/, '[$<n>$<m>]') }}|{{ 'abc'|replace(r/b/, '[$<n>]') }}|{{ 'abc'|replace(r/b/, '$') }}|{{ 'abc'|replace(r/b/, '$x') }}",
+    "expected": {
+      "ok": true,
+      "output": "a[b]c|a$c|a[a]c|a[c]c|a[b$2$0bb0]c|a[b]c|a[$&lt;n&gt;]c|a$c|a$xc"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-caps",
+    "template": "{{ 'abcdefghijkl'|replace(r/(a)(b)(c)(d)(e)(f)(g)(h)(i)(j)(k)/, '[$11|$10|$1|$12|$011|$00|$100]') }}|{{ 'ab'|replace(r/(a)|(z)/, '[$1|$2]') }}",
+    "expected": {
+      "ok": true,
+      "output": "[k|j|a|a2|a1|$00|j0]l|[a|]b"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-g",
+    "template": "{{ 'aaa'|replace(r/a*/g, '-') }}|{{ 'abc'|replace(r//g, '-') }}|{{ 'abc'|replace(r/x*/g, '-') }}|{{ 'ab'|replace(r/x*|a/g, '-') }}|{{ 'a😀b'|replace(r//g, '-')|length }}",
+    "todo": "k53: regex matches code points, not UTF-16 code units",
+    "expected": {
+      "ok": true,
+      "output": "--|-a-b-c-|-a-b-c-|-a-b-|9"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-y",
+    "template": "{{ 'aab'|replace(r/a/y, '-') }}|{{ 'aab'|replace(r/a/gy, '-') }}|{{ 'baa'|replace(r/a/gy, '-') }}|{{ 'baa'|replace(r/a/y, '-') }}",
+    "expected": {
+      "ok": true,
+      "output": "-ab|--b|baa|baa"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-state",
+    "template": "{% set re = r/a/g %}{{ re.test('xa') }}{{ re.lastIndex }}|{{ 'aXa'|replace(re, '-') }}|{{ re.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "true2|-X-|0"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-state2",
+    "template": "{% set re = r/a/y %}{{ re.test('a') }}{{ re.lastIndex }}|{{ 'aaa'|replace(re, '-') }}|{{ re.lastIndex }}|{{ 'aaa'|replace(re, '-') }}|{{ re.lastIndex }}",
+    "expected": {
+      "ok": true,
+      "output": "true1|a-a|2|aa-|3"
+    }
+  },
+  {
+    "name": "strings: replace: probe rep-regex-new",
+    "template": "{{ 'abc'|replace(r/b/) }}|{{ 'abc'|replace(r/b/, null) }}|{{ 'abc'|replace(r/b/, 5) }}|{{ 'abc'|replace(r/b/, [1,'$&']) }}",
+    "expected": {
+      "ok": true,
+      "output": "aundefinedc|anullc|a5c|a1,bc"
+    }
+  }
+]

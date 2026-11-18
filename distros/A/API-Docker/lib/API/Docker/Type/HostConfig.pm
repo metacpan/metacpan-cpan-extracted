@@ -1,6 +1,6 @@
 package API::Docker::Type::HostConfig;
 # ABSTRACT: Container configuration that depends on the host we are running on
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::HostConfig::LogConfig;
 use API::Docker::Type::Mount;
@@ -142,7 +142,7 @@ API::Docker::Type::HostConfig - Container configuration that depends on the host
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -447,7 +447,7 @@ overrides the default set of paths).
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

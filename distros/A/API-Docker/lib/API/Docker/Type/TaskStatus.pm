@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskStatus;
 # ABSTRACT: represents the status of a task
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerStatus;
 use API::Docker::Type::PortStatus;
@@ -43,7 +43,7 @@ API::Docker::Type::TaskStatus - represents the status of a task
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -89,7 +89,7 @@ published host ports. See L<API::Docker::Type::PortStatus>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -11,16 +11,15 @@ package Matplotlib::Simple;
 # alone, so the keywords are matplotlib's names throughout, and an engine that
 # has no counterpart for one refuses it by name rather than leaving it out (check_engine).
 require 5.010;
-our $VERSION = 0.3343;
+our $VERSION = 0.3344;
 use Scalar::Util 'looks_like_number';
 use List::Util qw(max sum min);
 use POSIX ();
-use Cwd 'getcwd';
 use File::Spec;
 use File::Temp;
 use DDP { output => 'STDOUT', array_max => 10, show_memsize => 1 };
 use Devel::Confess 'color';
-use FindBin '$RealScript';
+use FindBin qw($RealBin $RealScript);
 use Exporter 'import';
 use Capture::Tiny 'capture';
 our @EXPORT = qw(plt bar barh boxplot colored_table hexbin hist hist2d imshow pie plot scatter venn_proportional_area violinplot violin wide);
@@ -615,15 +614,53 @@ sub decoded_text {
 	return defined $decoded ? $decoded : $str;
 }
 sub decoded_data {
-	# decoded_text of every string in a structure bound for write_data, in a
-	# copy. A number is passed through untouched: a regex match would mark it
-	# as a string, and the JSON encoder would then write it as one.
+	# decoded_text of every string in a structure bound for write_data. A
+	# number is passed through untouched: a regex match would mark it as a
+	# string, and the JSON encoder would then write it as one.
+	#
+	# The structure is copied only along the way to a string that decoding
+	# changes, and returned as it is when there is none, which is nearly
+	# always. A copy of the whole was made every time, and for a 1500 x 1500
+	# imshow it took 0.64 s of plt's 3.25 s and another copy of the image in
+	# memory. Nothing that reads the result changes it.
+	my ($data) = @_;
+	my $decoded = redecoded($data);
+	return defined $decoded ? $decoded : $data;
+}
+sub redecoded {
+	# decoded_data's walk: $data with every string decoded, or undef if
+	# decoding changes nothing in it.
 	my ($data) = @_;
 	my $ref = ref $data;
-	return [ map { decoded_data($_) } @{$data} ] if $ref eq 'ARRAY';
-	return { map { decoded_text($_) => decoded_data( $data->{$_} ) } keys %{$data} } if $ref eq 'HASH';
-	return $data if $ref || ( not defined $data ) || looks_like_number($data);
-	return decoded_text($data);
+	if ( $ref eq 'ARRAY' ) {
+		my $copy;
+		foreach my $i ( 0 .. $#{$data} ) {
+			my $item = $data->[$i];
+			# Inline, to save a call per cell of an image: what is neither a
+			# reference nor a string with a byte above 0x7f is left alone.
+			next if ( not ref $item ) && ( ( not defined $item ) || looks_like_number($item) || ( $item !~ m/[\x80-\xff]/ ) );
+			my $decoded = redecoded($item);
+			next unless defined $decoded;
+			$copy //= [ @{$data} ];
+			$copy->[$i] = $decoded;
+		}
+		return $copy;
+	}
+	if ( $ref eq 'HASH' ) {
+		my $copy;
+		foreach my $key ( keys %{$data} ) {
+			my $new_key = decoded_text($key);
+			my $decoded = redecoded( $data->{$key} );
+			next if ( $new_key eq $key ) && ( not defined $decoded );
+			$copy //= { %{$data} };
+			delete $copy->{$key} if $new_key ne $key;
+			$copy->{$new_key} = defined $decoded ? $decoded : $data->{$key};
+		}
+		return $copy;
+	}
+	return undef if $ref || ( not defined $data ) || looks_like_number($data);
+	my $text = decoded_text($data);
+	return ( $text eq $data ) ? undef : $text;
 }
 sub py_str {
 	# Render a Perl string as a Python single-quoted string literal.
@@ -863,12 +900,13 @@ sub bin_counts {
 	#
 	# Only 0 was refused. A negative count reached numpy, which refused it as
 	# "'minlength' must not be negative", and a word died at int() as
-	# 'Argument "ten" isn't numeric'.
+	# 'Argument "ten" isn't numeric'. A fraction was cut to its whole part, so
+	# that "xbins => 1.5" drew one bin.
 	my ( $plot, $current_sub ) = @_;
 	foreach my $bins ( 'xbins', 'ybins' ) {
 		$plot->{$bins} = $plot->{$bins} // 15;
 		my $n = $plot->{$bins};
-		if ( ( ref $n ) || ( not looks_like_number($n) ) || ( not is_finite($n) ) || ( int($n) < 1 ) ) {
+		if ( ( ref $n ) || ( not looks_like_number($n) ) || ( not is_finite($n) ) || ( $n != int $n ) || ( $n < 1 ) ) {
 			die "\"$bins\" must be a whole number of at least 1 for $current_sub, not \"$n\"";
 		}
 		$plot->{$bins} = int $n;
@@ -1369,12 +1407,17 @@ sub group_order {
 	# The distinct values of a grouping column, in numeric order when every
 	# one is a number and in string order otherwise: 2 before 10, as a reader
 	# expects, where the sorted order of keys would put 10 first.
+	#
+	# A NaN made "<=>" return undef, which FATAL warnings turned into a death
+	# in sort, so NaN and the infinities count as text. Values that are equal
+	# as numbers, "2" and "2.0", are ordered as strings: they came in the
+	# order of a hash's keys, which changes from run to run.
 	my @values = @_;
 	my %seen;
 	my @groups = grep { not $seen{$_}++ } @values;
-	return ( grep { not looks_like_number($_) } @groups )
+	return ( grep { ( not looks_like_number($_) ) || ( not is_finite($_) ) } @groups )
 	 ? sort @groups
-	 : sort { $a <=> $b } @groups;
+	 : sort { ( $a <=> $b ) || ( $a cmp $b ) } @groups;
 }
 sub first_seen {
 	# The distinct values of a column, in the order of the rows they first
@@ -1707,9 +1750,13 @@ sub shared_table_range {
 	my ( $args, $current_sub ) = @_;
 	my @tables = grep { ( $args->{plots}[$_]{plot_type} // '' ) eq 'colored_table' } @{ $args->{shared_colorbar} };
 	return if scalar @tables < 2;
-	my ( @values, $log );
+	# Any one table on a log scale puts them all on one, so this is known
+	# before the first cell is looked at.
+	my $log = grep { bool_option( $_->{cb_logscale}, 'cb_logscale', $current_sub ) } map { $args->{plots}[$_] } @tables;
+	# The range is kept as it goes, a row at a time; every cell of every table
+	# was gathered into one list first, a copy of all of them.
+	my ( $lo, $hi );
 	foreach my $plot ( map { $args->{plots}[$_] } @tables ) {
-		$log = 1 if bool_option( $plot->{cb_logscale}, 'cb_logscale', $current_sub );
 		next unless ref $plot->{data} eq 'HASH';
 		# The cells the table draws, not every cell of "data": a cell that
 		# "col_labels" left out stretched the shared scale, and
@@ -1717,12 +1764,15 @@ sub shared_table_range {
 		# undefined.
 		my ( $row_keys, $cols, $cells ) = table_cells( $plot, $current_sub );
 		foreach my $k1 ( @{$row_keys} ) {
-			push @values, finite_values( map { $cells->{$k1}{$_} // $plot->{default_undefined} } @{$cols} );
+			my @row = finite_values( map { $cells->{$k1}{$_} // $plot->{default_undefined} } @{$cols} );
+			@row = grep { $_ > 0 } @row if $log;    # a log scale starts above 0, as colored_table_helper's does
+			next if scalar @row == 0;
+			my ( $row_lo, $row_hi ) = ( min(@row), max(@row) );
+			$lo = $row_lo if ( not defined $lo ) || ( $row_lo < $lo );
+			$hi = $row_hi if ( not defined $hi ) || ( $row_hi > $hi );
 		}
 	}
-	@values = grep { $_ > 0 } @values if $log;    # a log scale starts above 0, as colored_table_helper's does
-	return if scalar @values == 0;                 # each table refuses an empty one by name
-	my ( $lo, $hi ) = ( min(@values), max(@values) );
+	return if not defined $lo;    # each table refuses an empty one by name
 	foreach my $plot ( map { $args->{plots}[$_] } @tables ) {
 		$plot->{cb_min} = $plot->{cb_min} // $lo;
 		$plot->{cb_max} = $plot->{cb_max} // $hi;
@@ -1897,22 +1947,33 @@ sub style_name {
 	return $style;
 }
 sub refuse_subplot_choices {
-	# Die if a subplot, or an "add" graph, names an engine or a style. One
-	# engine draws the whole figure in one style, so each is given once,
+	# Die if a subplot, or an "add" graph, gives a choice that belongs to the
+	# whole figure. One engine draws the whole figure in one style, and one
+	# script is written, to one file, and run or not; each is given once,
 	# beside "plots" or "p".
+	#
+	# "execute" and "fh" in a subplot or an "add" graph, and "output_file" in
+	# an "add" graph, were accepted and never read.
 	my ( $args, $current_sub ) = @_;
+	my %why = (
+		engine      => 'one engine draws the whole figure in one style',
+		style       => 'one engine draws the whole figure in one style',
+		execute     => 'the figure is one script, which is run or not',
+		fh          => 'the figure is one script, written to one file',
+		output_file => 'the figure is saved to one file',
+	);
 	my @plots = ( $args, @{ ( ref $args->{plots} eq 'ARRAY' ) ? $args->{plots} : [] } );
 	foreach my $i ( 0 .. $#plots ) {
 		my $plot = $plots[$i];
 		next unless ref $plot eq 'HASH';
 		my $where = ( $i == 0 ) ? '' : ' at subplot ' . ( $i - 1 );
-		foreach my $choice ( 'engine', 'style' ) {
+		foreach my $choice ( sort keys %why ) {
 			if ( ( $i > 0 ) && ( exists $plot->{$choice} ) ) {
-				die "$current_sub: \"$choice\"$where: one engine draws the whole figure in one style, so give \"$choice\" once, beside \"plots\" or \"p\"";
+				die "$current_sub: \"$choice\"$where: $why{$choice}, so give \"$choice\" once, beside \"plots\" or \"p\"";
 			}
 			next unless ref $plot->{add} eq 'ARRAY';
 			if ( grep { ( ref $_ eq 'HASH' ) && ( exists $_->{$choice} ) } @{ $plot->{add} } ) {
-				die "$current_sub: \"$choice\" in an \"add\" graph$where: one engine draws the whole figure in one style, so give \"$choice\" once, at the top level";
+				die "$current_sub: \"$choice\" in an \"add\" graph$where: $why{$choice}, so give \"$choice\" once, at the top level";
 			}
 		}
 	}
@@ -2100,8 +2161,12 @@ sub creator_note {
 	# writes: the script that called plt, the call, this module and Perl. The
 	# engine adds its own name and version, and the user and the host, which
 	# its script reads as it runs.
+	#
+	# The script's own directory, not the working directory: run from
+	# elsewhere, "perl dir/plot.pl" was noted as "<cwd>/plot.pl", and from /
+	# as "//plot.pl".
 	my ($current_sub) = @_;
-	return getcwd() . "/$RealScript called using \"$current_sub\" in "
+	return File::Spec->catfile( $RealBin, $RealScript ) . " called using \"$current_sub\" in "
 	 . ( $INC{'Matplotlib/Simple.pm'} // __FILE__ ) . " version $VERSION with Perl " . sprintf( '%vd', $^V );
 }
 sub svg_creator_metadata {
@@ -2200,6 +2265,8 @@ sub color_hex {
 	# gray level from "0" to "1", or an RGB or RGBA tuple of numbers from 0 to
 	# 1, as an array or as Python. The names are matplotlib's because gnuplot
 	# and R each have their own lists, which differ from it and from each other.
+	#
+	# A NaN channel is neither below 0 nor above 1, and came out as "#NaN8080".
 	my ( $color, $option, $engine, $current_sub ) = @_;
 	require Matplotlib::Simple::Colors;
 	my $named = do { no warnings 'once'; \%Matplotlib::Simple::Colors::named };
@@ -2225,7 +2292,7 @@ sub color_hex {
 		}
 	}
 	if ( ( ( scalar @channels == 3 ) || ( scalar @channels == 4 ) )
-		&& ( not grep { ( not defined ) || ( not looks_like_number($_) ) || ( $_ < 0 ) || ( $_ > 1 ) } @channels ) ) {
+		&& ( not grep { ( not defined ) || ( not looks_like_number($_) ) || ( not is_finite($_) ) || ( $_ < 0 ) || ( $_ > 1 ) } @channels ) ) {
 		pop @channels if ( scalar @channels == 4 ) && ( $channels[3] == 1 );
 		return '#' . join( '', map { sprintf '%02x', int( $_ * 255 + 0.5 ) } @channels );
 	}
@@ -2275,6 +2342,14 @@ sub plt {
 	# As numbers: they are written into plt.subplots() as they stand, and
 	# "ncols => '02'" passed the check above and was a SyntaxError there.
 	$args->{$_} = 0 + $args->{$_} foreach grep { defined $args->{$_} } ( 'ncol', 'ncols', 'nrow', 'nrows' );
+	# An alias and its name both given, and different: normalise_p sized the
+	# grid by "nrows" and plt then replaced it with "nrow", so that "nrows =>
+	# 2, nrow => 1" with three plots made a grid too small for them.
+	foreach my $pair ( [ 'nrow', 'nrows' ], [ 'ncol', 'ncols' ] ) {
+		my ( $alias, $name ) = @{$pair};
+		next unless ( defined $args->{$alias} ) && ( defined $args->{$name} ) && ( $args->{$alias} != $args->{$name} );
+		die "$current_sub: \"$alias\" is another name for \"$name\", and they disagree: \"$alias\" = $args->{$alias}, \"$name\" = $args->{$name}";
+	}
 	# fold the "p" interface into the engine's internal plot model
 	normalise_p( $args, $current_sub ) if defined $args->{p};
 	# and every "df" into the "data" of its plot_type, before anything checks
@@ -2336,10 +2411,8 @@ sub plt {
 	}
 	my @defined_args = (@reqd_args, @ax_methods, @fig_methods, @plt_methods, @arg, @plt_arg,
 	 defined $type_opt ? @{ $opt{$type_opt} } : @all_opt);
-	my @bad_args = grep {
-	  my $key = $_;
-	  not grep { $_ eq $key } @defined_args
-	} keys %{$args};
+	my %defined_arg = map { $_ => 1 } @defined_args;
+	my @bad_args = grep { not $defined_arg{$_} } keys %{$args};
 	if ( scalar @bad_args > 0 ) {
 		bad_keyword_error({
 			bad       => \@bad_args,
@@ -2443,12 +2516,6 @@ sub plt {
 				p $args->{plots}[$i];
 			}
 			die "the above hash ref indices have empty data hashes for $current_sub";
-		}
-		my @output_file = grep {defined $args->{plots}[$_]{output_file}} 0..$max_i;
-		if (scalar @output_file > 0) {
-			p $args;
-			p @output_file;
-			die '"output_file" was defined at subplots indices above, which does not make sense';
 		}
 	}
 	if (($single_plot == 1) && (ref $args->{data} eq 'HASH') && (scalar keys %{ $args->{data}} == 0 )) {

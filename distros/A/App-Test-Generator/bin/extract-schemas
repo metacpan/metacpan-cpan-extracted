@@ -262,6 +262,11 @@ my $extractor = App::Test::Generator::SchemaExtractor->new(
 
 my $schemas = $extractor->extract_all();
 
+# Downstream all-fuzz runs otherwise just see a module stop being fuzzed.
+if(grep { ref($_) eq 'HASH' && ($_->{skip} // '') =~ /^multi-package file/ } values %$schemas) {
+	print STDERR "Note: $input_file declares more than one package; its schemas are marked skip and will not be fuzzed\n";
+}
+
 # ---------------------------------------------------------------------------
 # Optional: restrict to a single routine
 # ---------------------------------------------------------------------------

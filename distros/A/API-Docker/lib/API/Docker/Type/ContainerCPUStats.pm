@@ -1,6 +1,6 @@
 package API::Docker::Type::ContainerCPUStats;
 # ABSTRACT: CPU related info of the container
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ContainerCPUUsage;
 use API::Docker::Type::ContainerThrottlingData;
@@ -34,7 +34,7 @@ API::Docker::Type::ContainerCPUStats - CPU related info of the container
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -74,7 +74,7 @@ would produce C<ThrottlingData>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -15,6 +15,7 @@ use warnings;
 # ======================================================================
 
 use Test::Most;
+use Config;
 use File::Path qw(make_path);
 use File::Spec;
 use File::Temp qw(tempdir);
@@ -96,7 +97,7 @@ lives_ok {
 ok(-f $harness, 'the harness was written');
 
 my ($stdout, $stderr) = ('', '');
-local $ENV{PERL5LIB} = join(':', $lib, $ENV{PERL5LIB} // '');
+local $ENV{PERL5LIB} = join($Config{path_sep}, $lib, $ENV{PERL5LIB} // '');
 run3([$^X, $harness], \undef, \$stdout, \$stderr);
 my $exit = $? >> 8;
 

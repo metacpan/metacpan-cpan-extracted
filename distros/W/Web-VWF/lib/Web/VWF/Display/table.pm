@@ -3,7 +3,7 @@ package Web::VWF::Display::table;
 use strict;
 use warnings;
 
-use version; our $VERSION = version->declare('0.002.0');
+use version; our $VERSION = version->declare('0.003.0');
 
 use CGI::Info;
 use Config::Auto;
@@ -181,3 +181,76 @@ sub load_data {
 # }
 
 1;
+
+=encoding utf8
+
+=head1 NAME
+
+Web::VWF::Display::table - Read a small flat file for a page or its template
+
+=head1 VERSION
+
+Version 0.003.0
+
+=head1 DESCRIPTION
+
+B<This is not a page> and so it is not in the C<display> setting: it does not
+inherit from L<Web::VWF::Display>.  It is a helper for a page or template that
+wants a small C<!>-separated file with a header line, read from
+F<databases/NAME> in the site's C<root_dir>.  Blank lines and lines starting
+with C<#> are ignored.  The site's own settings are found with L<Config::Auto>
+in F<$DOCUMENT_ROOT/../lib/conf>, or F<$HOME/lib/conf>.
+
+=head1 METHODS
+
+=head2 new
+
+Takes C<info> (a L<CGI::Info>, made if not given) and C<table>, the file's name,
+which is the class name, with C</> for C<::>, if not given.  Dies when the
+configuration cannot be read.
+
+=head2 get_file_path
+
+The path of the file, which must be readable and inside F<databases/>.  Dies
+otherwise.
+
+=head2 columns
+
+The names of the columns, as an array reference.
+
+=head2 fetch
+
+With C<key>, the row with that first column as a hash reference; without, all the
+rows as an array reference of hash references.
+
+=head2 fetch_as_hash
+
+All the rows as a hash reference keyed on the first column.
+
+=head2 load_data
+
+Reads the file once.  The other methods call it.
+
+=head3 API SPECIFICATION
+
+=head4 INPUT
+
+	{ info => { type => 'object', optional => 1 }, table => { type => 'string', optional => 1 } }
+
+=head4 OUTPUT
+
+	{ type => 'object', isa => 'Web::VWF::Display::table' }
+
+=head1 AUTHOR
+
+Nigel Horne, C<< <njh at nigelhorne.com> >>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright 2010-2026 Nigel Horne.
+
+Usage is subject to the GPL2 licence terms.
+If you use it,
+please let me know.
+
+=cut

@@ -13,6 +13,7 @@ use Mojo::File();
 
 use Dist::Conformance::Snapshot::Directory();
 use Dist::Conformance::Source::Directory();
+use Dist::Conformance::Source::Git();
 use Dist::Conformance::Update();
 
 # The fixture standards in t/data/standards.
@@ -20,10 +21,10 @@ sub standards () {
     return Dist::Conformance::Source::Directory->new( directory => "$FindBin::Bin/data/standards" );
 }
 
-# A temporary checkout with a .git/hooks directory and %files, path => bytes.
+# A temporary git checkout, made by git init, with %files, path => bytes.
 sub checkout (%files) {
     my $root = Mojo::File->new( File::Temp::tempdir( CLEANUP => 1 ) );
-    $root->child(qw{.git hooks})->make_path;
+    Dist::Conformance::Source::Git::git( qw{init --quiet}, "$root" );
     for my $path ( sort keys %files ) {
         my $file = $root->child( split m{/}, $path );
         $file->dirname->make_path;

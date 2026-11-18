@@ -1,6 +1,6 @@
 package API::Docker::Type::ImageInspect;
 # ABSTRACT: Information about an image in the local image cache
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::DriverData;
 use API::Docker::Type::ImageConfig;
@@ -82,7 +82,7 @@ API::Docker::Type::ImageInspect - Information about an image in the local image 
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -227,7 +227,7 @@ L<API::Docker::Type::ImageInspect::Metadata>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

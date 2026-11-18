@@ -10,7 +10,7 @@ use File::Spec;
 use Getopt::Long qw(GetOptions);
 use Pod::Usage;
 
-our $VERSION = '0.49';
+our $VERSION = '0.50';
 
 =head1 NAME
 
@@ -252,7 +252,7 @@ jobs:
             perl Makefile.PL && make install
           else
             echo "Install ATG"
-            cpanm -iqn App::Test::Generator@0.49
+            cpanm -iqn App::Test::Generator@0.50
           fi
 
       - name: Generate dashboard
@@ -406,7 +406,7 @@ jobs:
         run: |
           if [ "${{ github.repository }}" != "nigelhorne/App-Test-Generator" ]; then
             cpanm -iqn Data::Random::Structure Data::Random::String::Matches Data::Random::String Data::Random
-            cpanm -iqn App::Test::Generator@0.49
+            cpanm -iqn App::Test::Generator@0.50
           fi
 
       - name: Generate the mutants

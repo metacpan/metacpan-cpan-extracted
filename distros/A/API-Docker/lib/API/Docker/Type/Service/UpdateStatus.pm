@@ -1,6 +1,6 @@
 package API::Docker::Type::Service::UpdateStatus;
 # ABSTRACT: The status of a service update
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use namespace::clean;
 
@@ -31,7 +31,7 @@ API::Docker::Type::Service::UpdateStatus - The status of a service update
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -61,7 +61,7 @@ of L</state>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

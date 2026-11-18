@@ -2,7 +2,7 @@ package Data::Shared;
 use strict;
 use warnings;
 
-our $VERSION = '0.01';
+our $VERSION = '0.02';
 
 # Report mount-time errors at the caller across the manifest lock.
 our @CARP_NOT = qw(Data::Shared Data::Shared::Manifest Data::Shared::Storage
@@ -1417,9 +1417,9 @@ operating system -- and is reported as it was written.
 The leaf dists are recommended rather than required, so installing this
 facade does not compile all 39 of them. Install the ones you mount;
 mounting a type whose dist is absent croaks naming the dist to install.
-C<cpanm --with-recommends Data::Shared> installs every leaf, and each
-leaf's minimum version (recorded in L<Data::Shared::Registry>) is enforced
-when it is first used. One dependency is not implied by what you mount: a
+C<cpanm --with-recommends Data::Shared> installs every leaf. A leaf older
+than its minimum version (recorded in L<Data::Shared::Registry>) is refused
+the same way when it is first used, naming the version to install. One dependency is not implied by what you mount: a
 composite on an anonymous root locks its children with Data-Sync-Shared, so
 install that dist too. File-backed composites use the directory lock and do
 not need it.

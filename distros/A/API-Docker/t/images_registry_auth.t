@@ -1,3 +1,4 @@
+#!/usr/bin/env perl
 use strict;
 use warnings;
 use Test::More;
@@ -61,6 +62,8 @@ subtest 'a pre-encoded standard-base64 auth is respelled URL-safe' => sub {
 
 # ---------------------------------------------------------------------------
 subtest 'pull sends X-Registry-Auth only when auth is given' => sub {
+  plan skip_all => 'route assertions are fixture-only' if is_live();
+
   my $captured;
   my $docker = test_docker(
     'POST /images/create' => sub {
@@ -86,6 +89,8 @@ subtest 'pull sends X-Registry-Auth only when auth is given' => sub {
 
 # ---------------------------------------------------------------------------
 subtest 'build sends X-Registry-Config only when registry_config is given' => sub {
+  plan skip_all => 'route assertions are fixture-only' if is_live();
+
   my $captured;
   my $docker = test_docker(
     'POST /build' => sub {

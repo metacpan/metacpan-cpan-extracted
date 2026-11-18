@@ -11,6 +11,7 @@ Makefile.PL
 README.md
 SECURITY.md
 cpanfile
+devel/convert-robots-config
 devel/rebuild-robots-config
 dist.ini
 doap.xml

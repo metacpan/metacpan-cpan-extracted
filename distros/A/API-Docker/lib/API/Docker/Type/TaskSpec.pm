@@ -1,6 +1,6 @@
 package API::Docker::Type::TaskSpec;
 # ABSTRACT: User modifiable task configuration
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::NetworkAttachmentConfig;
 use API::Docker::Type::TaskSpec::ContainerSpec;
@@ -57,7 +57,7 @@ API::Docker::Type::TaskSpec - User modifiable task configuration
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -132,7 +132,7 @@ L<API::Docker::Type::TaskSpec::LogDriver>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

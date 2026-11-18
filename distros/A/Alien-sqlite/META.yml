@@ -6,21 +6,12 @@ build_requires:
   Alien::Build: '2.25'
   Alien::Build::MM: '1.74'
   Alien::Build::Plugin::Cleanse::BuildDir: '0'
-  Archive::Tar: '0'
-  Config: '0'
   ExtUtils::MakeMaker: '6.52'
   FFI::CheckLib: '0.23'
   File::Find::Rule: '0'
-  HTTP::Tiny: '0.044'
-  IO::Socket::SSL: '1.56'
-  IO::Zlib: '0'
-  Mojo::DOM58: '1.00'
-  Net::SSLeay: '1.49'
   PkgConfig: '0.19026'
   Sort::Versions: '0'
   Test::Alien: '0'
-  URI: '0'
-  URI::Escape: '0'
 configure_requires:
   Alien::Build: '2.25'
   Alien::Build::MM: '1.74'
@@ -30,7 +21,7 @@ configure_requires:
   PkgConfig: '0'
   Sort::Versions: '0'
 dynamic_config: 1
-generated_by: 'ExtUtils::MakeMaker version 7.64, CPAN::Meta::Converter version 2.150010'
+generated_by: 'ExtUtils::MakeMaker version 7.76, CPAN::Meta::Converter version 2.150010'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -47,9 +38,9 @@ requires:
 resources:
   bugtracker: https://github.com/shawnlaffan/perl-alien-sqlite/issues/
   repository: https://github.com/shawnlaffan/perl-alien-sqlite
-version: '1.07'
+version: '1.08'
 x_alienfile:
-  generated_by: 'Alien::Build::MM version 2.59'
+  generated_by: 'Alien::Build::MM version 2.84'
   requires:
     share:
       Archive::Tar: '0'
@@ -58,9 +49,10 @@ x_alienfile:
       IO::Socket::SSL: '1.56'
       IO::Zlib: '0'
       Mojo::DOM58: '1.00'
+      Mozilla::CA: '0'
       Net::SSLeay: '1.49'
       Sort::Versions: '0'
       URI: '0'
       URI::Escape: '0'
     system: {}
-x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.020'

@@ -1,6 +1,6 @@
 package API::Docker::Type::ClusterVolume;
 # ABSTRACT: Options and information specific to, and only present on, Swarm CSI cluster volumes
-our $VERSION = '0.004';
+our $VERSION = '0.006';
 use API::Docker::Type;
 use API::Docker::Type::ClusterVolume::Info;
 use API::Docker::Type::ClusterVolume::PublishStatus;
@@ -44,7 +44,7 @@ API::Docker::Type::ClusterVolume - Options and information specific to, and only
 
 =head1 VERSION
 
-version 0.004
+version 0.006
 
 =head1 DESCRIPTION
 
@@ -92,7 +92,7 @@ specific nodes. See L<API::Docker::Type::ClusterVolume::PublishStatus>.
 
 =head2 Issues
 
-Please report bugs and feature requests on GitHub at
+Please report bugs and feature requests at
 L<https://github.com/Getty/p5-api-docker/issues>.
 
 =head1 CONTRIBUTING

@@ -20,8 +20,15 @@ on 'configure' => sub {
 
 on 'test' => sub {
 	requires 'Capture::Tiny';
+	requires 'Config';
+	requires 'Data::Dumper';
+	requires 'Errno';
 	requires 'File::Temp';
+	requires 'FindBin';
+	requires 'IPC::Open3';
 	requires 'Module::CPANfile';
+	requires 'POSIX';
+	requires 'Scalar::Util';
 	requires 'Test::DescribeMe';
 	requires 'Test::Memory::Cycle';
 	requires 'Test::Mockingbird', '0.13';   # around, mock_scoped, spy, unmock, restore
@@ -29,6 +36,7 @@ on 'test' => sub {
 	requires 'Test::Permissions';   # can_revoke_*, why_not
 	requires 'Test::Returns', '0.04';
 	requires 'Test::Without::Module';
+	requires 'Time::HiRes';
 };
 
 on 'develop' => sub {

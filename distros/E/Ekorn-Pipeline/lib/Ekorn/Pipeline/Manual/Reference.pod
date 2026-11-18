@@ -164,6 +164,13 @@ L<The modules|/"The modules">
     while (my($square) = $next->()) { push @squares, $square }
     say "@squares";    # 1 4 9
 
+    # Fed: given values as they arrive, a push at a time, it returns what
+    # comes out of each; close gives what's held back, and ends the run.
+    my $feed = Ekorn::Pipeline->new(batch(2))->feed;
+    my @batches = map { $feed->push($_) } 1 .. 3;
+    push @batches, $feed->close;
+    say join ' ', map { "[@$_]" } @batches;    # [1 2] [3]
+
     # A function of your own, taking stages from its caller.
     sub numbers (@stages) { Ekorn::Pipeline->new(@stages)->(1 .. 10) }
     say join ' ', numbers(
@@ -204,7 +211,7 @@ B<Made in:> L<Stages::Batch|/"Ekorn::Pipeline::Stages::Batch">
 
 =item C<:taps>
 
-B<Holds:> C<peek>, C<count_into>, C<dump_to>
+B<Holds:> C<peek>, C<count_into>, C<dump_to>, C<tee>
 
 B<Made in:> L<Stages::Taps|/"Ekorn::Pipeline::Stages::Taps">
 
@@ -315,8 +322,14 @@ C<pipeline> or C<source {...}>, from Ekorn::Pipeline::Factories.
 
 =item *
 
-B<Run:> one call of a pipeline with values, or one iterator made
-from it. Gathers, sources and sinks are made afresh for each run.
+B<Run:> one call of a pipeline with values, or one iterator or feed
+made from it. Gathers, sources and sinks are made afresh for each
+run.
+
+=item *
+
+B<Feed:> a run you give values to as they arrive, with C<push>, and
+end with C<close> (see L<Feeds|/"Feeds: Ekorn::Pipeline::Feed">).
 
 =item *
 
@@ -543,6 +556,40 @@ A source that returns C<shift @queue // ()> ends at the first C<undef> in
 the queue; C<@queue ? shift @queue : ()> doesn't. Read a filehandle in
 scalar context, C<< sub { scalar(<$fh>) // () } >>, so that each call reads
 one line.
+
+=head2 feed
+
+    my $feed    = $p->feed;
+    my @results = $feed->push(@values);    # as often as values arrive
+    my @rest    = $feed->close;            # what the flushes give, and a sink's result
+
+Returns a feed, an Ekorn::Pipeline::Feed: one run of the stages,
+which you give values as they arrive, rather than all at once, as a
+call does, or when a result is wanted, as an iterator asks its source.
+Each C<push> runs its values through the stages, and returns what came
+out of them, there and then; C<close> ends the input, calls the
+flushes, returns what they give, and calls the ends. Between the two,
+the run's C<gather> stages keep their state, so C<take(5)> takes five
+values from all that are pushed, and C<batch(3)> fills its batches
+across pushes:
+
+    my $feed = Ekorn::Pipeline->new(sub { $_ * 10 }, batch(3))->feed;
+    my @first  = $feed->push(1, 2);
+    my @second = $feed->push(3, 4);
+    my @rest   = $feed->close;
+    say scalar @first, ' / ', join(' ', map {"[@$_]"} @second, @rest);    # 0 / [10 20 30] [40]
+
+Fed the same values, a feed gives what a call gives, in the same
+order, a push at a time. The run is made when C<feed> is called, so a
+C<gather>'s block is called then, and an error in it is thrown then.
+C<feed> takes no arguments.
+
+Use a feed where the values don't come from you but arrive a value at
+a time. They may come from a library calling back for each row,
+record or file it finds, from an event loop, or from a stage that runs
+its values through another pipeline, such as a tee.
+L<Feeds|/"Feeds: Ekorn::Pipeline::Feed"> has its methods, and how its run
+ends.
 
 =head2 stages
 
@@ -791,8 +838,9 @@ Returns the context the run's source gave, if any: its C<context>, or
 the third part its C<EKORN_SOURCE> returned as a list, such as a
 statement's column names. It's for stages that need to know about the
 values' source, called as they run. Each run has its own. A pushed run
-has none, and an iterator used as a source passes on its own run's. It
-isn't exported, and is new in v0.3.0. L<Stages that ask about their
+has none, and an iterator used as a source passes on its own run's. A
+feed has none of its own: its stages see the context of the code
+pushing into it. It isn't exported, and is new in v0.3.0. L<Stages that ask about their
 run|/"Stages that ask about their run"> has an example.
 
 =head1 Words: Ekorn::Pipeline::Factories
@@ -1159,10 +1207,11 @@ value is dropped.
 =head2 Runs
 
 Each call of a pipeline with values is a run, and so is each iterator
-made from it. At the start of each run, the set-up of every gather,
-source and sink is called, so what they keep starts afresh (see L<Made
-for a run|/"Made for a run">). An iterator's run starts when the
-iterator is made, not when it's first read.
+or feed made from it. At the start of each run, the set-up of every
+gather, source and sink is called, so what they keep starts afresh
+(see L<Made for a run|/"Made for a run">). An iterator's run starts when
+the iterator is made, not when it's first read, and a feed's when it's
+made, not at its first push.
 
 A stage not made with C<gather> is the same code reference on every
 run. Whatever it keeps in a closure stays there from one run to the
@@ -1198,12 +1247,16 @@ stages start afresh on each value the outer stage is given, and its
 flushes and ends are called at the end of each call. A stop in it ends
 only that call, not the outer pipeline. To run its stages in the outer
 pipeline's run instead, give the pipeline itself as a stage (see
-L<A pipeline as a stage|/"A pipeline as a stage">).
+L<A pipeline as a stage|/"A pipeline as a stage">). To run them beside
+the outer run, as one run of their own over every value the stage is
+given, have a C<gather> make a feed of the pipeline for each run, push
+each value into it, close it in the flush and finish it in the end
+(see L<Feeds|/"Feeds: Ekorn::Pipeline::Feed">).
 
 =head1 Runs and how they end
 
-A run is one call of a pipeline with values, or one iterator made from
-it. Each run has its own state. A part of the pipeline that needs
+A run is one call of a pipeline with values, or one iterator or feed
+made from it. Each run has its own state. A part of the pipeline that needs
 state, such as a batch it's filling or a file it has open, is made
 afresh for each run, and can be told when the run ends, however it
 ends, so it can close the file, or commit what it wrote.
@@ -1538,6 +1591,82 @@ it has handed out everything it will; after, it croaks "Expected a
 source with values still to give: an iterator is one run, and this one
 is spent".
 
+=head2 Feeds: Ekorn::Pipeline::Feed
+
+A feed, made by L<feed|/"feed">, is one run, which you give values as
+they arrive. It has four methods:
+
+    my @results = $feed->push(@values);    # what came out of them
+    my $results = $feed->push(@values);    # the same, as an array reference
+    my @rest    = $feed->close;            # no more values: the flushes', and a sink's result
+    $feed->finish;                         # end the run now
+    my $how     = $feed->ended;            # done, stopped or died, once the run has ended
+
+=over 4
+
+=item *
+
+**C<push>** runs its values through the stages, each through every
+stage before the next, and returns what came out of them: a list,
+or, in scalar context, an array reference. A value held back, as
+C<batch> holds values, comes out of a later push, or of C<close>. A
+sink's result isn't among them: C<close> gives it.
+
+=item *
+
+**C<close>** ends the input, as a source running out does. It calls
+the flushes, in order, and returns what they give, through the
+stages after them, and a sink's result: a list, or, in scalar
+context, an array reference. Then it calls the ends, each told
+C<done>, or C<stopped> if a flush's stop cut its input short.
+
+=item *
+
+**C<finish>** ends the run now, as from outside, if it hasn't ended:
+nothing waiting goes on, no flush is called, and each end is told
+C<stopped>, if its input hadn't run out. A feed let go before it's
+closed is finished as the last reference to it goes, as an iterator
+let go is.
+
+=item *
+
+**C<ended>** gives nothing while the run is open; then C<done> once
+it's closed, C<stopped> once a stop or C<finish> has ended it, and
+C<died> if anything in it died.
+
+=back
+
+A stop, from a stage, a flush or a sink, such as C<take>'s, ends the run
+in the push that meets it, as it ends any run. The values it carries
+go on, the flushes of the stages after it are called, then every end,
+and that push returns all of it. The values after the one that met the
+stop are dropped. A stage that dies kills the run, and the push dies
+with it, named as a run names it.
+
+Once the run has ended, however it ended, C<push> and C<close> croak
+"Expected a feed still open, but its run has ended", with the reason,
+so values can't go nowhere unnoticed. A caller feeding values as they
+arrive asks C<ended> after each push, and stops once it's defined, and
+so can tell whoever is sending the values to stop too:
+
+    my $feed = Ekorn::Pipeline->new(sub { $_ * 2 }, take(2))->feed;
+    my @out;
+    for my $value (1 .. 5) {
+        push @out, $feed->push($value);
+        last if defined $feed->ended;
+    }
+    say "@out, ", $feed->ended;    # 2 4, stopped
+
+A feed has no context of its own. Its stages and ends see the context
+of the code pushing into it, through C<run_context>: none, pushed from
+outside any run, or, pushed from a stage, that stage's run's, such as
+a statement's columns. So a stage that feeds a branch passes its run's
+context on to it. A C<push>, C<close> or C<finish> from inside the feed's
+own run, such as from one of its stages, croaks: a stage can push into
+another pipeline's feed, but not its own. Each feed is a run of its
+own, so a stage can keep feeds of several pipelines, or several feeds
+of one, as the user guide's tee and its run for each key do.
+
 =head2 Stages and elements
 
 C<new> keeps each code reference it's given as an
@@ -1548,10 +1677,12 @@ object called as one; C<< $stage->code >> gives back what it was made of.
 Called directly, a stage calls its code with what it's given, but
 doesn't set C<$_>: only a run does.
 
-Each of Ekorn's types, a pipeline, a stage, a gather, a source, a sink
-and an iterator, is an B<Ekorn::Pipeline::Element>: an object called
-as a code reference, which holds the closure it's called as, so it's
-freed as soon as nothing else holds it. C<< $element->call(@arguments) >>
+Each of Ekorn's types that's called as code, a pipeline, a stage, a
+gather, a source, a sink and an iterator, is an
+B<Ekorn::Pipeline::Element>: an object called as a code reference,
+which holds the closure it's called as, so it's freed as soon as
+nothing else holds it. A feed is used only by its methods, so it isn't
+one. C<< $element->call(@arguments) >>
 does what calling it does.
 
 =head1 Stopping a pipeline: Ekorn::Pipeline::Stop
@@ -2014,6 +2145,14 @@ B<Passes on:> every value, after writing it to C<$fh> or STDERR
 
 B<Exported:> on request
 
+=item C<tee(@stages)>
+
+B<Module:> Taps
+
+B<Passes on:> every value, after running it through a branch of C<@stages>
+
+B<Exported:> on request
+
 =back
 
 Each module exports its defaults with a plain C<use>, and every stage
@@ -2164,7 +2303,9 @@ memory at once.
 =head2 Ekorn::Pipeline::Stages::Taps
 
 Stages that look at each value as it goes by and pass it on unchanged,
-for logging, counting or debugging.
+for logging, counting or debugging. C<peek>, C<count_into> and C<dump_to>
+each do one thing; C<tee> takes stages, so a tap can be anything a
+pipeline can do.
 
 =head3 peek
 
@@ -2235,6 +2376,102 @@ It's for debugging. Text::Redact::Secrets finds the secrets its rules
 know, not every secret, so a dump can still hold some. It doesn't
 escape control characters in strings, so a value from outside can send
 escape sequences to a terminal.
+
+=head3 tee
+
+    tee(@stages)
+
+Runs each value through a branch of C<@stages>, for what they do on the
+side, and passes the value on unchanged. What comes out of the branch
+is dropped. C<@stages> are whatever L<new|/"new"> takes, a pipeline or a
+sink last included. They're made into a pipeline when C<tee> is called,
+so a mistake croaks then, at your line, with C<new>'s message, a stage
+counted among the tee's: C<tee(sub { ... }, 'oops')> croaks "Expected
+stage #2 to be a stage". With no stages, it does nothing.
+
+Where C<peek> does one thing with each value, a tee's branch can look
+only at some values, or the first few, batch them, total them when the
+values run out, or write them through a sink:
+
+    my @hits;
+    my @titles = Ekorn::Pipeline->new(
+        tee(take_if { $_ > 6000 }, take(2), sub { push @hits, $_; () }),
+        sub { "$_ plays" },
+    )->(9100, 4200, 6100, 5800, 7700);
+    say scalar @titles, ' titles; first hits: ', join ', ', @hits;    # 5 titles; first hits: 9100, 6100
+
+The branch is one run of its own, beside the main run, fed a value at
+a time by a L<feed|/"feed"> the tee makes for each main run. So the
+branch's stages see every value the tee does, in order, and keep
+their state across them; each main run gets a fresh branch.
+
+=over 4
+
+=item *
+
+B<A stop> in the branch, such as C<take(2)>'s, ends only the branch.
+The tee passes the values after it on, without running them through
+the branch.
+
+=item *
+
+B<A death> in the branch kills the main run, as any stage's error
+does. Its message names the tee's stage, then, within it, the
+branch's, as below.
+
+=item *
+
+B<The branch's flushes> are called in the tee's flush, which closes
+the branch: once the main run's values have run out, before the
+stages after the tee are flushed. A total, a last batch or a sink's
+result is given then, as below. If a stop after the tee ends the
+main run, the tee's flush isn't called, so neither are the branch's.
+
+=item *
+
+B<The branch's ends> are called as its run ends, each told how it
+ended from where it stands: in the push that met a stop or a death
+in the branch; in the tee's flush, which closes it; or, if the main
+run ended before either, in the tee's end, told C<stopped>, as the
+branch's input was cut short. That's so even when the main run died,
+as it is for an iterator read as a source by a run that dies.
+
+=item *
+
+B<The value itself> goes into the branch, not a copy, as it goes to
+C<peek>'s block. A branch that changes a hash changes it for the main
+run too.
+
+=item *
+
+B<The main run's context> is the branch's: in the branch,
+C<run_context> gives what it gives in the main run, such as a
+statement's columns.
+
+=back
+
+A death in the branch, its stage #2, of a tee given as stage #1:
+
+    Pipeline stage #1 failed at app.pl line 12:
+        Pipeline stage #2 failed at app.pl line 12:
+            bad value
+
+A branch totalling what it saw, in its flush:
+
+    my $total = 0;
+    my @values = Ekorn::Pipeline->new(
+        tee(collect { $total += $_ for @_; () }),
+        sub { $_ * 2 },
+    )->(1 .. 4);
+    say "@values; total $total";    # 2 4 6 8; total 10
+
+Each value costs a push into the branch: about 1.3 microseconds a
+value through a branch of one plain stage, against C<peek>'s 0.4, on
+Perl 5.36. A tee has a flush, and an end, only if its branch needs
+them, so a branch of plain stages leaves the main run on the plain
+loop. A branch with a flush, such as C<batch>'s, puts the main run on
+the full path, and costs about 2.2 microseconds a value. It's for
+logging, debugging and side jobs, not a hot loop.
 
 =head1 Sources: Ekorn::Pipeline::Sources
 
@@ -3870,6 +4107,26 @@ it had handed out everything it will, been finished, or died.
 
 =back
 
+=head2 Ekorn::Pipeline::Feed
+
+=over 4
+
+=item *
+
+B<Expected a feed still open, but its run has ended: %s:> a C<push>
+or C<close> came after the feed's run had ended, for the reason
+given: it was closed; it was finished; a stage stopped it; or it
+died. Ask C<ended> after each push, and stop pushing once it's
+defined.
+
+=item *
+
+B<Expected no %s of a feed from inside its own run:> a C<push>,
+C<close> or C<finish> was called from one of the feed's own stages,
+flushes or ends. It's reported as that stage's error.
+
+=back
+
 =head2 Ekorn::Pipeline::Stop
 
 =over 4
@@ -4015,7 +4272,7 @@ B<By default:> C<gather>
 
 B<By default:> nothing: a parent class
 
-=item C<Ekorn::Pipeline::Source>, C<::Sink>, C<::Stage>, C<::Iterator>, C<::Element>
+=item C<Ekorn::Pipeline::Source>, C<::Sink>, C<::Stage>, C<::Iterator>, C<::Feed>, C<::Element>
 
 B<By default:> nothing: classes
 
@@ -4043,7 +4300,7 @@ B<Tags:> C<:all>
 
 B<By default:> C<peek>, C<count_into>
 
-B<On request:> C<dump_to>
+B<On request:> C<dump_to>, C<tee>
 
 B<Tags:> C<:all>
 
@@ -4058,7 +4315,7 @@ empty list: C<use Ekorn::Pipeline::Stop ();>.
 
 =item C<Ekorn::Pipeline>
 
-Runs values through a list of stages: C<new>, C<pipeline_in>, C<named>, C<iterator>, C<stages>, C<is_stage>, C<is_sink>, C<ending> and C<run_context>.
+Runs values through a list of stages: C<new>, C<pipeline_in>, C<named>, C<iterator>, C<feed>, C<stages>, C<is_stage>, C<is_sink>, C<ending> and C<run_context>.
 
 =item C<Ekorn::Pipeline::Tooling>
 
@@ -4108,6 +4365,10 @@ A sink made afresh for each run, giving one value or a list: C<new_sink_one> and
 
 One run, handing out its values: C<all>, C<first>, C<single>, C<finish> and C<ended>.
 
+=item C<Ekorn::Pipeline::Feed>
+
+One run, fed values as they arrive: C<push>, C<close>, C<finish> and C<ended>.
+
 =item C<Ekorn::Pipeline::Stage>
 
 A code reference kept as a stage: C<new> and C<code>.
@@ -4134,7 +4395,7 @@ Canned stages gathering values: C<batch>, C<collect>.
 
 =item C<Ekorn::Pipeline::Stages::Taps>
 
-Canned stages run for their side effects: C<peek>, C<count_into>, C<dump_to>.
+Canned stages run for their side effects: C<peek>, C<count_into>, C<dump_to>, C<tee>.
 
 =back
 
